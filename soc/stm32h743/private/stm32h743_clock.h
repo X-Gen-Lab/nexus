@@ -10,6 +10,17 @@
 extern "C" {
 #endif
 /**
+ * \brief Identify the H743 group and revision V from the raw DBGMCU value.
+ * \param[in] identity: Observed IDCODE, not an authored configuration value.
+ * \return True for DEV_ID 0x450 and REV_ID 0x2003 only.
+ * \note This is one hardware identity fact. Each clock or Flash operation
+ *       still owns its electrical, timing and execution admission policy.
+ *       Identity alone does not authorize a capability or qualify hardware.
+ */
+static inline bool nx_stm32h743_is_revision_v(uint32_t identity) {
+    return (identity & 0xfffU) == 0x450U && (identity >> 16U) == 0x2003U;
+}
+/**
  * \brief Read prerequisites for the optional nominal CPU384/HCLK192 profile.
  * \param[in] system: Exact exclusive cold context after trusted reset.
  * \return SUCCESS or INVALID/CONTEXT/BUSY/STATE/UNSUPPORTED without mutation.

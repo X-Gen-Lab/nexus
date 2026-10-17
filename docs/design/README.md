@@ -12,11 +12,12 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |
 | [内容与图示标准](documentation-standards.md) | 清晰表达、规范用语、事实/资格、示例、架构图和独立审查约束 |
 | [页面模板](documentation-templates.md) | tutorial/how-to/reference/explanation/status必需问题 |
-| [当前与目标参考图](../assets/diagrams/README.md) | 18 对本地 SVG/DOT：16 类主图与 2 张补充图；身份与范围由图册清单维护 |
+| [当前与目标参考图](../assets/diagrams/README.md) | 20 对本地 DOT/SVG：18 张编号主图与 2 张补充图；新增 target 图的渲染与审查另行记录 |
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
 | [H743 V 修订高速时钟参考](h743-high-clock.md) | 已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界 |
+| [H743 Flash RAM 维护设计](h743-flash-ram.md) | 选定 V／Cache off 的私有 CPU bridge、RAM VTOR、MPU 保护与真实排空；生产 ELF 闭包及完整软件退出尚未完成 |
 | [有限 PWM/ADC 联合采样](pwm-adc.md) | 单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界 |
 | [U575 有限 UART GPDMA](u575-uart-gpdma.md) | 精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空 |
 | [G474 CAN FD](can-fd.md) | 固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界 |

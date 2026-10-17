@@ -10,6 +10,7 @@
 #if defined(NX_I2C_LONG_G474)
 #include "stm32g474_provider.h"
 #elif defined(NX_I2C_LONG_H743)
+#include "h743_flash_fixture.h"
 #include "stm32h743_provider.h"
 #else
 #include "stm32u575_provider.h"
@@ -57,7 +58,7 @@ namespace {
 constexpr uint32_t start = I2C_CR2_START;
 constexpr uint32_t reload = I2C_CR2_RELOAD;
 constexpr uint32_t autoend = I2C_CR2_AUTOEND;
-constexpr uint32_t read = I2C_CR2_RD_WRN;
+constexpr uint32_t read_direction = I2C_CR2_RD_WRN;
 constexpr uint32_t busy = I2C_ISR_BUSY;
 constexpr uint32_t tcr = I2C_ISR_TCR;
 constexpr uint32_t tc = I2C_ISR_TC;
@@ -131,6 +132,7 @@ extern "C" void nx_i2c_long_factory_reset(void) {
     g_long_i2c.reset_mask = RCC_APB1RSTR1_I2C1RST;
 #elif defined(NX_I2C_LONG_H743)
     nx_h743_model_reset();
+    nexus_test::h743_fixture::ResetExternalCpu();
     PWR->D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
     PWR->CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
     g_h743_model.pwm = TIM3;
@@ -273,7 +275,7 @@ extern "C" void nx_i2c_long_factory_poll(nx_i2c_v2_state_t* state) {
         r.cr2 &= ~start;
         ++m.addresses;
         if (m.event != nullptr)
-            m.event(NX_LONG_ADDRESS, (r.cr2 & read) != 0U);
+            m.event(NX_LONG_ADDRESS, (r.cr2 & read_direction) != 0U);
     }
     if (m.pending_tx) {
         m.pending_tx = false;
@@ -291,7 +293,7 @@ extern "C" void nx_i2c_long_factory_poll(nx_i2c_v2_state_t* state) {
     }
     if (!m.running || m.remaining == 0U)
         return;
-    if ((r.cr2 & read) == 0U) {
+    if ((r.cr2 & read_direction) == 0U) {
         r.isr |= txis;
     } else if ((r.isr & rxne) == 0U) {
         r.rxdr = static_cast<uint8_t>(m.received_in_message * 37U + 0x5AU);

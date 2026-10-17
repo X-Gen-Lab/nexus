@@ -6,6 +6,7 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "h743_flash_fixture.h"
 #include "h743_high_fixture.h"
 #include "nexus/core/fault.h"
 #include <array>
@@ -436,6 +437,7 @@ class H743HighFlash : public H743HighReference {
     alignas(uint32_t) std::array<uint8_t, 2097152U> memory{};
     nx_stm32h743_flash_state_t state{};
     nx_flash_port_t face{&nx_stm32h743_flash_ops, &state};
+    alignas(1024) nx_stm32h743_flash_ram_workspace_t execution{};
     void SetUp() override {
         H743HighReference::SetUp();
         ASSERT_EQ(NX_SUCCESS, StartClock().primary);
@@ -449,8 +451,14 @@ class H743HighFlash : public H743HighReference {
         state.poll_limit = 8U;
         g_h743_model.physical_flash = &state;
         state.registers->CR1 = state.registers->CR2 = FLASH_CR_LOCK;
+        nexus_test::h743_fixture::ResetExternalCpu();
+        nexus_test::h743_fixture::SetIsolatedTimer(192000000U);
+        ASSERT_EQ(NX_SUCCESS,
+                  nexus_test::h743_fixture::Prepare(&state, &execution));
     }
     void TearDown() override {
+        nexus_test::h743_fixture::CheckedStop(&execution);
+        nexus_test::h743_fixture::StopIsolatedTimer();
         EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_stop(&state));
         WithdrawIsolatedKernelFixture();
         H743HighReference::TearDown();

@@ -57,7 +57,30 @@ if(h7_i2c_modes)
     list(APPEND h7_sources "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c")
 endif()
 if(h7_flash_modes)
-    list(APPEND h7_sources drivers/flash_execution.c)
+    set(h7_flash_ram_sources
+        drivers/flash_ram.c drivers/flash_ram_owner.c
+        drivers/flash_ram_transaction.c drivers/flash_mpu.c)
+    list(APPEND h7_sources drivers/flash_execution.c drivers/flash_ram_enter.S
+        ${h7_flash_ram_sources})
+    # Busy-bank execution cannot gain implicit FP, stack-protector, libc or
+    # LTO-generated calls. Actual linked instruction closure is checked too.
+    set_source_files_properties(${h7_flash_ram_sources} PROPERTIES
+        COMPILE_OPTIONS "-mgeneral-regs-only;-fno-lto;-fno-builtin;-fno-stack-protector;-fno-jump-tables;-fno-tree-loop-distribute-patterns;-fno-unwind-tables;-fno-asynchronous-unwind-tables;-fstack-usage")
+    set(h7_flash_su_files)
+    foreach(source IN LISTS h7_flash_ram_sources)
+        set(stack_file "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/nexus_soc_stm32h743.dir/${source}.su")
+        set_property(SOURCE "${source}" APPEND PROPERTY OBJECT_OUTPUTS "${stack_file}")
+        list(APPEND h7_flash_su_files "${stack_file}")
+    endforeach()
+    set(h7_stack_witness "${CMAKE_CURRENT_BINARY_DIR}/flash-stack-outputs.stamp")
+    add_custom_target(nexus_h743_flash_stack_outputs
+        COMMAND "${CMAKE_COMMAND}" "-DNEXUS_STACK_WITNESS=${h7_stack_witness}"
+            "-DNEXUS_STACK_FILES=${h7_flash_su_files}"
+            -P "${NEXUS_SOURCE_DIR}/cmake/platform/H743StackUsage.cmake"
+        BYPRODUCTS "${h7_stack_witness}"
+        VERBATIM)
+    set_property(SOURCE ${h7_flash_ram_sources} APPEND PROPERTY
+        OBJECT_DEPENDS "${h7_stack_witness}")
 endif()
 if(h7_sources)
     add_library(nexus_soc_stm32h743 STATIC ${h7_sources})
@@ -70,6 +93,11 @@ if(h7_sources)
     target_include_directories(nexus_soc_stm32h743 SYSTEM PRIVATE
         "${h7_device}/Include" "${h7_cmsis}")
     target_compile_definitions(nexus_soc_stm32h743 PRIVATE STM32H743xx)
+    if(h7_flash_modes)
+        add_dependencies(nexus_soc_stm32h743 nexus_h743_flash_stack_outputs)
+        set_property(TARGET nexus_soc_stm32h743 PROPERTY
+            NEXUS_H743_FLASH_SU_FILES "${h7_flash_su_files}")
+    endif()
     if(h7_spi_modes OR h7_adc_modes OR "irq-fifo-bytes" IN_LIST h7_uart_modes OR
             "irq-fifo-rtscts-bytes" IN_LIST h7_uart_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")

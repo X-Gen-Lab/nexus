@@ -6,12 +6,14 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "h743_flash_fixture.h"
 #include "h743_high_factory_model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #include "stm32h743_provider.h"
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
 extern "C" {
@@ -25,6 +27,7 @@ class H743HighFactory : public testing::Test {
     nx_uart_tx_request_t request{};
     void SetUp() override {
         nx_h743_model_reset();
+        nexus_test::h743_fixture::ResetExternalCpu();
         nx_request_initialize(&request.base);
         PWR->D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
         PWR->CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
@@ -49,13 +52,20 @@ class H743HighFactory : public testing::Test {
         std::fill_n(g_h743_high_factory_flash_words, 524288U, UINT32_MAX);
     }
     void TearDown() override {
-        g_h743_model.ignore_write = nullptr;
-        g_h743_model.hold_irq_off = false;
-        g_h743_model.hold_uart_off = false;
-        g_h743_clock_behavior.hold_source_restore = false;
-        USART3->ISR |= USART_ISR_TC;
-        nx_uart_port_service(nx_factory_uart(NX_UART_ID_CONSOLE));
-        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+        EXPECT_EQ(nullptr, g_h743_model.ignore_write);
+        EXPECT_FALSE(g_h743_model.hold_irq_off);
+        EXPECT_FALSE(g_h743_model.hold_uart_off);
+        EXPECT_FALSE(g_h743_clock_behavior.hold_source_restore);
+        const nx_request_state_t state = nx_request_state(&request.base);
+        EXPECT_TRUE(state == NX_REQUEST_READY || state == NX_REQUEST_SETTLED);
+        if (state != NX_REQUEST_READY && state != NX_REQUEST_SETTLED)
+            std::abort();
+        const nx_result_t stopped = nx_platform_stop();
+        EXPECT_EQ(NX_SUCCESS, stopped);
+        if (stopped != NX_SUCCESS)
+            std::abort();
+        nexus_test::h743_fixture::CheckedStop(
+            nexus_test::h743_ram::cpu.execution);
     }
     void Start() {
         const auto result = nx_platform_start();
@@ -169,6 +179,8 @@ TEST_F(H743HighFactory, FailedTimerSetupRollsBackSystemThenJointClock) {
     EXPECT_EQ(64000000U, g_nx_stm32h743_system.core_hz);
     EXPECT_EQ(0U, RCC->D2CCIP2R);
     EXPECT_EQ(FLASH_ACR_LATENCY_7WS, FLASH->ACR);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
 }
 TEST_F(H743HighFactory, FailedSystemStopRetainsActualPllClockForRetry) {
     ASSERT_NO_FATAL_FAILURE(Start());

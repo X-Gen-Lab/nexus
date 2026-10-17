@@ -6,6 +6,7 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "h743_flash_fixture.h"
 #include "h743_flash_image_admission_model.h"
 #include "nexus/io/flash.h"
 #include "stm32h743_provider.h"
@@ -29,6 +30,7 @@ class H743FlashImageAdmission : public testing::Test {
     std::array<uint8_t, 32U> input{};
     nx_stm32h743_flash_state_t state{};
     nx_flash_port_t face{&nx_stm32h743_flash_ops, &state};
+    alignas(1024) nx_stm32h743_flash_ram_workspace_t execution{};
     void SetUp() override {
         nx_h743_model_reset();
         /* Erased model bytes deliberately isolate image ownership from the
@@ -46,6 +48,14 @@ class H743FlashImageAdmission : public testing::Test {
         state.supply_mv = 3300U;
         state.poll_limit = 8U;
         g_h743_model.physical_flash = &state;
+        nexus_test::h743_fixture::ResetExternalCpu();
+        nexus_test::h743_fixture::SetIsolatedTimer(64000000U);
+        ASSERT_EQ(NX_SUCCESS,
+                  nexus_test::h743_fixture::Prepare(&state, &execution));
+    }
+    void TearDown() override {
+        nexus_test::h743_fixture::CheckedStop(&execution);
+        nexus_test::h743_fixture::StopIsolatedTimer();
     }
     void ExpectRejectedWithoutPulse(uint32_t offset, bool erase) {
         const nx_result_t result =
@@ -222,6 +232,9 @@ TEST_F(H743FlashImageAdmission, EraseCannotTargetItsOwnControllerMetadata) {
               nx_flash_port_erase(&invalid_face, 131072U, 131072U, 10000U));
     EXPECT_EQ(0U, g_h743_model.writes);
     EXPECT_EQ(0U, g_h743_model.flash_store_count);
+    /* The rejected operation retained no metadata. Withdraw the external
+     * hardware model's temporary pointer before its stack backing expires. */
+    g_h743_model.physical_flash = &state;
 }
 TEST_F(H743FlashImageAdmission, ExplicitControlBoundariesRemainHalfOpen) {
     struct AdjacentStorage {

@@ -6,15 +6,18 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "h743_flash_fixture.h"
 #include "h743_peripheral_factory_model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #include "stm32h743_provider.h"
+#include <cstdlib>
 #include <gtest/gtest.h>
 class H743PeripheralFactory : public testing::Test {
   protected:
     void SetUp() override {
         nx_h743_model_reset();
+        nexus_test::h743_fixture::ResetExternalCpu();
         PWR->D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
         PWR->CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
         g_h743_model.pwm = TIM3;
@@ -26,8 +29,13 @@ class H743PeripheralFactory : public testing::Test {
         IWDG1->WINR = IWDG1->RLR = 4095U;
     }
     void TearDown() override {
-        g_h743_model.ignore_write = nullptr;
-        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+        EXPECT_EQ(nullptr, g_h743_model.ignore_write);
+        const nx_result_t stopped = nx_platform_stop();
+        EXPECT_EQ(NX_SUCCESS, stopped);
+        if (stopped != NX_SUCCESS)
+            std::abort();
+        nexus_test::h743_fixture::CheckedStop(
+            nexus_test::h743_ram::cpu.execution);
     }
 };
 TEST_F(H743PeripheralFactory, ColdTypedLookupHasNoHardwareEffects) {
@@ -58,6 +66,8 @@ TEST_F(H743PeripheralFactory, RefusedFlashTimingAcquireRollsBackTheSystem) {
     EXPECT_EQ(0U, TIM2->CR1 & TIM_CR1_CEN);
     EXPECT_EQ(0U, RCC->APB1LENR & RCC_APB1LENR_TIM2EN);
     EXPECT_EQ(0U, g_h743_model.gpio_writes);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
 }
 TEST_F(H743PeripheralFactory, RefusedTimingRestoreRetainsTheLiveSystem) {
     ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c1bb1e2324db56950f93c39ef77bbde7203ad209d69b3a1afcc88fc714b572d0\n"
+"X-Nexus-Source-SHA256: cfbd7fc6071501edd529780b09a26a04762af02bf3f3f6ee335257c4abf641a1\n"
 
 msgid "当前设计与实施台账"
 msgstr "Current design and execution ledgers"
@@ -76,10 +76,10 @@ msgstr ""
 msgid "[当前与目标参考图](../assets/diagrams/README.md)"
 msgstr "[Current and target reference diagrams](../assets/diagrams/README.md)"
 
-msgid "18 对本地 SVG/DOT：16 类主图与 2 张补充图；身份与范围由图册清单维护"
+msgid "20 对本地 DOT/SVG：18 张编号主图与 2 张补充图；新增 target 图的渲染与审查另行记录"
 msgstr ""
-"18 local SVG/DOT pairs: 16 main views and two supplements; the diagram index"
-" owns identity and scope"
+"20 local DOT/SVG pairs: 18 numbered main figures and 2 supplements; "
+"rendering and review of the new target figures are recorded separately"
 
 msgid "{download}`文档迁移映射 <documentation-migration.csv>`"
 msgstr ""
@@ -104,6 +104,62 @@ msgid "资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与
 msgstr ""
 "Resource/trigger/DMA plans, optional traits, silicon admission, data units "
 "and current/pending boundaries; IO-01–42 owns status"
+
+msgid "[H743 V 修订高速时钟参考](h743-high-clock.md)"
+msgstr "[H743 V-only high-clock reference](h743-high-clock.md)"
+
+msgid "已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界"
+msgstr "Reviewed V-cut HSI/PLL384 cold lifecycle, immutable clock domains and peripheral kernel contracts; software evidence and unverified hardware limits"
+
+msgid "[H743 Flash RAM 维护设计](h743-flash-ram.md)"
+msgstr "[H743 Flash RAM maintenance design](h743-flash-ram.md)"
+
+msgid "选定 V／Cache off 的私有 CPU bridge、RAM VTOR、MPU 保护与真实排空；生产 ELF 闭包及完整软件退出尚未完成"
+msgstr ""
+"Selected V/cache-off private CPU bridge, RAM VTOR, MPU protection and real"
+" drain; production-ELF closure and complete software exits remain open"
+
+msgid "[有限 PWM/ADC 联合采样](pwm-adc.md)"
+msgstr "[Finite coupled PWM/ADC acquisition](pwm-adc.md)"
+
+msgid "单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界"
+msgstr "One owner, two primes, TIM1-triggered regular ADC DMA, drain and cold recovery; software reference/HIL boundaries"
+
+msgid "[U575 有限 UART GPDMA](u575-uart-gpdma.md)"
+msgstr "[U575 finite UART GPDMA](u575-uart-gpdma.md)"
+
+msgid "精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空"
+msgstr "Exact TZEN0 USART1 finite GPDMA TX, persistent DMAT, SRAM1 admission and request/wire/IRQ drain"
+
+msgid "[G474 CAN FD](can-fd.md)"
+msgstr "[G474 CAN FD](can-fd.md)"
+
+msgid "固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界"
+msgstr "Fixed FDCAN1 message RAM, explicit mode, physical TX completion and reference drain; transceiver and hardware boundaries"
+
+msgid "[UART FIFO 有界中断服务](uart-fifo.md)"
+msgstr "[Bounded UART FIFO interrupt service](uart-fifo.md)"
+
+msgid "H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界"
+msgstr "H743/U575 official LL thresholds, RX/TX budgets, IDLE short tails and TC drain; formal configuration and hardware boundaries"
+
+msgid "[ADC 分组采集](adc-group.md)"
+msgstr "[ADC group acquisition](adc-group.md)"
+
+msgid "G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置"
+msgstr "G474 regular/injected groups, silicon revision admission, sample format, calibration freshness and proven stop; product algorithms remain external"
+
+msgid "[增强以太网帧](ethernet-frames.md)"
+msgstr "[Enhanced Ethernet frames](ethernet-frames.md)"
+
+msgid "F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置"
+msgstr "F407/GD470 SG/VLAN, frame borrowing, hardware timestamps and global abort; PHY and protocol policy remain external"
+
+msgid "[本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md)"
+msgstr "[This I/O and clock delivery observation](../delivery/io-evolution-next-wave.md)"
+
+msgid "逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格"
+msgstr "Record per-configuration development evidence, source awaiting freeze and final qualification separately; inherit neither old CI nor hardware qualification"
 
 msgid "[工程手册](engineering-handbook.md)"
 msgstr "[Engineering handbook](engineering-handbook.md)"
@@ -448,51 +504,3 @@ msgstr ""
 
 msgid "[Source compatibility and SDK versions](source-compatibility.md)"
 msgstr "[Source compatibility and SDK versions](source-compatibility.md)"
-
-msgid "[H743 V 修订高速时钟参考](h743-high-clock.md)"
-msgstr "[H743 V-only high-clock reference](h743-high-clock.md)"
-
-msgid "已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界"
-msgstr "Reviewed V-cut HSI/PLL384 cold lifecycle, immutable clock domains and peripheral kernel contracts; software evidence and unverified hardware limits"
-
-msgid "[有限 PWM/ADC 联合采样](pwm-adc.md)"
-msgstr "[Finite coupled PWM/ADC acquisition](pwm-adc.md)"
-
-msgid "单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界"
-msgstr "One owner, two primes, TIM1-triggered regular ADC DMA, drain and cold recovery; software reference/HIL boundaries"
-
-msgid "[U575 有限 UART GPDMA](u575-uart-gpdma.md)"
-msgstr "[U575 finite UART GPDMA](u575-uart-gpdma.md)"
-
-msgid "精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空"
-msgstr "Exact TZEN0 USART1 finite GPDMA TX, persistent DMAT, SRAM1 admission and request/wire/IRQ drain"
-
-msgid "[G474 CAN FD](can-fd.md)"
-msgstr "[G474 CAN FD](can-fd.md)"
-
-msgid "固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界"
-msgstr "Fixed FDCAN1 message RAM, explicit mode, physical TX completion and reference drain; transceiver and hardware boundaries"
-
-msgid "[本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md)"
-msgstr "[This I/O and clock delivery observation](../delivery/io-evolution-next-wave.md)"
-
-msgid "逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格"
-msgstr "Record per-configuration development evidence, source awaiting freeze and final qualification separately; inherit neither old CI nor hardware qualification"
-
-msgid "[UART FIFO 有界中断服务](uart-fifo.md)"
-msgstr "[Bounded UART FIFO interrupt service](uart-fifo.md)"
-
-msgid "H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界"
-msgstr "H743/U575 official LL thresholds, RX/TX budgets, IDLE short tails and TC drain; formal configuration and hardware boundaries"
-
-msgid "[ADC 分组采集](adc-group.md)"
-msgstr "[ADC group acquisition](adc-group.md)"
-
-msgid "G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置"
-msgstr "G474 regular/injected groups, silicon revision admission, sample format, calibration freshness and proven stop; product algorithms remain external"
-
-msgid "[增强以太网帧](ethernet-frames.md)"
-msgstr "[Enhanced Ethernet frames](ethernet-frames.md)"
-
-msgid "F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置"
-msgstr "F407/GD470 SG/VLAN, frame borrowing, hardware timestamps and global abort; PHY and protocol policy remain external"

@@ -13,6 +13,11 @@ The [I/O evolution design](../design/io-evolution.md) explains resource plans,
 optional traits and enhanced data contracts; its execution ledger keeps current
 and pending work separate.
 
+The [H743 Flash RAM design](../design/h743-flash-ram.md) explains the selected
+V/cache-off maintenance boundary: a private CPU bridge, RAM vector owner,
+temporary MPU protection and real drain before return. The source is integrated;
+the target diagrams retain open production-ELF and complete software exits.
+
 ```{toctree}
 :maxdepth: 2
 

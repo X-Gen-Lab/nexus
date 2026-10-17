@@ -67,7 +67,7 @@ class MemoryLinkerTests(unittest.TestCase):
 
     @classmethod
     def link(cls, directory, compiler, flags, board, clock, extras, alignment,
-             selected_flash=False):
+             selected_flash=False, ram_pod=False):
         assembly = directory / "assembly.toml"
         assembly.write_text(
             f'schema=2\nboard="{board}"\nbackend="baremetal"\n'
@@ -89,6 +89,12 @@ class MemoryLinkerTests(unittest.TestCase):
             f'__attribute__((aligned({alignment})))\n'
             'unsigned char primary_data = 0x73;\n'
             'unsigned char primary_bss[3];\n' +
+            ('__attribute__((section(".nx_flash_ram"), noinline))\n'
+             'void ram_leaf(void) { __asm__ volatile ("" ::: "memory"); }\n'
+             '__attribute__((section(".bss.nx_h743_flash_workspace"), '
+             'aligned(1024)))\n'
+             'unsigned char g_nx_stm32h743_flash_ram_workspace[2048];\n'
+             if ram_pod else "") +
             "".join(
                 f'__attribute__((section(".nx_{name}_data"), '
                 f'aligned({alignment})))\n'
@@ -131,8 +137,10 @@ class MemoryLinkerTests(unittest.TestCase):
         for line in table.splitlines():
             fields = line.split()
             if fields and fields[0] == "LOAD":
-                loads.append(dict(zip(("offset", "vma", "lma", "files", "size"),
-                                      (int(item, 16) for item in fields[1:6]))))
+                load = dict(zip(("offset", "vma", "lma", "files", "size"),
+                                (int(item, 16) for item in fields[1:6])))
+                load["flags"] = "".join(fields[6:-1])
+                loads.append(load)
         return {"label": (compiler, board, extras, alignment),
                 "sections": sections, "alignment": alignment,
                 "symbols": symbols, "loads": loads, "bytes": elf.read_bytes(),
@@ -204,6 +212,53 @@ class MemoryLinkerTests(unittest.TestCase):
                 self.assertEqual((tail["lma"] + tail["size"]) % 4, 1)
                 self.assert_data(image, ".data", "_sidata", "_sdata", "_edata",
                                  "primary_data", 0x73)
+
+    def test_selected_ram_pod_has_exact_zeroed_vectors_stack_and_rx_copy(self):
+        for index, (compiler, flags) in enumerate(self.compilers):
+            with self.subTest(compiler=compiler):
+                directory = self.root / ("selected-ram-pod-" + str(index))
+                directory.mkdir()
+                image = self.link(directory, compiler, flags,
+                                  "stm32h743zi_hsi_reference",
+                                  "hsi64-fixed-cache-off", (), 1,
+                                  selected_flash=True, ram_pod=True)
+                symbols = image["symbols"]
+                required = ("__nx_flash_ram_vector_start",
+                            "__nx_flash_ram_vector_end",
+                            "__nx_flash_ram_stack_start",
+                            "__nx_flash_ram_stack_end",
+                            "__nx_flash_ram_workspace_end")
+                self.assertTrue(all(name in symbols for name in required),
+                                "selected physical workspace bounds are missing")
+                start, vectors_end, stack_start, stack_end, end = (
+                    symbols[name] for name in required)
+                self.assertEqual(start % 1024, 0)
+                self.assertEqual(start, symbols[
+                    "g_nx_stm32h743_flash_ram_workspace"])
+                self.assertEqual(vectors_end - start, 166 * 4)
+                self.assertEqual(stack_start, vectors_end)
+                self.assertEqual(stack_end - stack_start, 256 * 4)
+                self.assertEqual(stack_end % 8, 0)
+                self.assertEqual(end - start, 2048)
+                self.assertLessEqual(symbols["_sbss"], start)
+                self.assertLessEqual(end, symbols["_ebss"])
+                self.assertLessEqual(symbols["__nx_flash_ram_end"], start)
+                section = image["sections"][".nx_flash_ram"]
+                self.assertGreater(section["size"], 0)
+                self.assertEqual(section["lma"], symbols[
+                    "__nx_flash_ram_load_start"])
+                self.assertEqual(section["lma"] + section["size"], symbols[
+                    "__nx_flash_ram_load_end"])
+                self.assertLessEqual(symbols["__nx_flash_ram_load_end"], symbols[
+                    "__nx_flash_image_load_end"])
+                code_loads = [load for load in image["loads"]
+                              if load["vma"] <= section["vma"] and
+                              section["vma"] + section["size"] <=
+                              load["vma"] + load["files"]]
+                self.assertEqual(len(code_loads), 1)
+                self.assertEqual(code_loads[0]["flags"], "RE")
+                self.assertTrue(all(load["flags"] != "RWE"
+                                    for load in image["loads"]))
 
     def test_optional_initializer_load_and_run_addresses_are_word_aligned(self):
         for image in self.images:

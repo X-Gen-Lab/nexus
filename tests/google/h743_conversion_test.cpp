@@ -6,11 +6,13 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "h743_flash_fixture.h"
 #include "h743_peripheral_model.h"
 #include "nexus/core/fault.h"
 #include "stm32h743_provider.h"
 #include "terminal_watchdog.h"
 #include <array>
+#include <cstdlib>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 namespace {
@@ -26,6 +28,8 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
     EXPECT_EQ(NX_ERROR_IO, reason);
     EXPECT_NE(nullptr, file);
     EXPECT_NE(0U, line);
+    ++nexus_test::h743_ram::cpu.flash_fault_observers;
+    ADD_FAILURE() << "RAM maintenance called a Flash-resident fault observer";
     flash_fault->Observe();
 }
 class H743Adc : public testing::Test {
@@ -194,6 +198,8 @@ class H743Flash : public testing::Test {
     std::array<uint8_t, 2097152U> memory{};
     nx_stm32h743_flash_state_t state{};
     nx_flash_port_t face{&nx_stm32h743_flash_ops, &state};
+    alignas(1024) nx_stm32h743_flash_ram_workspace_t execution{};
+    testing::NiceMock<nexus_test::h743_ram::RamHardwareBoundary> hardware;
     testing::NiceMock<FlashFaultBoundary> faults;
     void SetUp() override {
         nx_h743_model_reset();
@@ -210,6 +216,17 @@ class H743Flash : public testing::Test {
         g_h743_model.physical_flash = &state;
         flash_fault = &faults;
         state.registers->CR1 = state.registers->CR2 = FLASH_CR_LOCK;
+        nexus_test::h743_fixture::ResetExternalCpu();
+        nexus_test::h743_fixture::SetIsolatedTimer(64000000U);
+        ASSERT_EQ(NX_SUCCESS,
+                  nexus_test::h743_fixture::Prepare(&state, &execution));
+        nexus_test::h743_ram::cpu.observer = &hardware;
+    }
+    void TearDown() override {
+        EXPECT_EQ(0U, nexus_test::h743_ram::cpu.flash_fault_observers);
+        nexus_test::h743_fixture::CheckedStop(&execution);
+        nexus_test::h743_fixture::StopIsolatedTimer();
+        flash_fault = nullptr;
     }
 };
 TEST_F(H743Flash, GeometryExposesAllPhysicalSectorsAndFlashwordGranularity) {
@@ -321,7 +338,7 @@ TEST_F(H743Flash, EraseRequiresWholeExactSectorsAndSelectsThePhysicalBank) {
 }
 TEST_F(H743Flash, PulseErrorDoesNotLeaveProgrammingOrAnUnlockedController) {
     std::array<uint8_t, 32U> input{};
-    g_h743_model.flash_pulse_error = true;
+    nexus_test::h743_ram::cpu.pulse_error = true;
     EXPECT_EQ(NX_ERROR_IO, nx_flash_port_program(&face, spare_offset,
                                                  input.data(), 32U, 10000U));
     EXPECT_EQ(0U, state.registers->CR1 & FLASH_CR_PG);
@@ -348,30 +365,50 @@ TEST_F(H743Flash, AnUnobservedEraseStartCannotBeReportedAsSuccess) {
     EXPECT_NE(0U, state.registers->CR1 & FLASH_CR_LOCK);
 }
 TEST_F(H743Flash, StuckPulseRetainsTheCallerAndParksAfterTheObserverReturns) {
-    g_h743_model.hold_flash_busy = true;
+    auto& cpu = nexus_test::h743_ram::cpu;
+    cpu.clear_after = 0U;
+    g_h743_model.flash_poll_advance = 10000U;
     EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
         std::array<uint8_t, 32U> input{};
         input.fill(0x66U);
-        EXPECT_CALL(faults, Observe()).WillOnce([&] {
-            nexus_test::RecordTerminalObservation(
-                nx_arch_irq_is_masked() && state.active &&
-                (state.registers->SR1 & FLASH_SR_BSY) != 0U &&
-                (state.registers->CR1 & FLASH_CR_PG) != 0U &&
-                input[0] == 0x66U);
-        });
+        bool recorded = false;
+        EXPECT_CALL(hardware, Poll(testing::_, true, true))
+            .WillRepeatedly([&](uint32_t pending, bool, bool) {
+                if (!recorded && cpu.polls > state.poll_limit) {
+                    recorded = true;
+                    nexus_test::RecordTerminalObservation(
+                        cpu.primask == 1U && state.active && execution.active &&
+                        nexus_test::h743_ram::PrivateStack() &&
+                        g_h743_model.core->VTOR ==
+                            nexus_test::h743_ram::ram_vector_address &&
+                        (pending & FLASH_SR_BSY) != 0U &&
+                        (state.registers->CR1 & FLASH_CR_PG) != 0U &&
+                        execution.guard.remaining_effects != 0U &&
+                        g_h743_model.timer.CNT >= 10000U &&
+                        cpu.flash_fault_observers == 0U && input[0] == 0x66U);
+                }
+            });
         (void)nx_flash_port_program(&face, spare_offset, input.data(), 32U,
                                     10000U);
     }));
 }
 TEST_F(H743Flash, RefusedControlRelockRetainsTheExecutionOwner) {
-    g_h743_model.ignore_write = &state.registers->CR1;
+    auto& cpu = nexus_test::h743_ram::cpu;
+    cpu.reject_lock = true;
     EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
         std::array<uint8_t, 32U> input{};
-        EXPECT_CALL(faults, Observe()).WillOnce([&] {
-            nexus_test::RecordTerminalObservation(
-                nx_arch_irq_is_masked() && state.active &&
-                (state.registers->CR1 & FLASH_CR_LOCK) == 0U);
-        });
+        EXPECT_CALL(hardware, Terminal(NX_H743_FLASH_RAM_FAULT_LOCK))
+            .WillOnce([&] {
+                nexus_test::RecordTerminalObservation(
+                    cpu.primask == 1U && state.active && execution.active &&
+                    nexus_test::h743_ram::PrivateStack() &&
+                    g_h743_model.core->VTOR ==
+                        nexus_test::h743_ram::ram_vector_address &&
+                    (state.registers->CR1 & FLASH_CR_LOCK) == 0U &&
+                    g_h743_model.flash_store_count == 8U &&
+                    execution.guard.remaining_effects != 0U &&
+                    cpu.flash_fault_observers == 0U);
+            });
         (void)nx_flash_port_program(&face, spare_offset, input.data(), 32U,
                                     10000U);
     }));
@@ -383,6 +420,12 @@ class H743FlashTiming : public H743Flash {
     void SetUp() override {
         H743Flash::SetUp();
         state.registers->ACR = FLASH_ACR_LATENCY_7WS;
+    }
+    void TearDown() override {
+        EXPECT_FALSE(timing.retained);
+        if (timing.retained)
+            std::abort();
+        H743Flash::TearDown();
     }
 };
 TEST_F(H743FlashTiming, Cold64MHzOwnsOnlyTheProgrammingDelayUntilStop) {
@@ -405,6 +448,7 @@ TEST_F(H743FlashTiming, Cold64MHzOwnsOnlyTheProgrammingDelayUntilStop) {
 TEST_F(H743FlashTiming, Cold32MHzNeedsNoTimingMutationOrRetainedState) {
     g_nx_stm32h743_system.core_hz = 32000000U;
     g_h743_model.rcc.CR |= RCC_CR_HSIDIV_2 | RCC_CR_HSIDIVF;
+    nexus_test::h743_fixture::SetIsolatedTimer(32000000U);
     const uint32_t writes = g_h743_model.writes;
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
     EXPECT_FALSE(timing.retained);
@@ -439,6 +483,8 @@ TEST_F(H743FlashTiming, RetainedPulseControlsRejectBeforeAcquiringAcr) {
         EXPECT_FALSE(timing.retained);
         EXPECT_EQ(writes, g_h743_model.writes);
     }
+    /* The external foreign controller owner withdraws its test controls. */
+    state.registers->CR2 = FLASH_CR_LOCK;
 }
 TEST_F(H743FlashTiming, ForeignTimingCannotBeAdoptedOrOverwritten) {
     for (uint32_t acr :
@@ -467,6 +513,7 @@ TEST_F(H743FlashTiming, DeclaredFrequencyCannotOverrideObservedClockState) {
     EXPECT_EQ(0U, g_h743_model.writes);
 }
 TEST_F(H743FlashTiming, UnsettledVoltageAndCacheStateNeverAcquireTiming) {
+    const uint32_t original_ccr = g_h743_model.core->CCR;
     g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_1 | PWR_CSR1_ACTVOSRDY;
     EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
     g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
@@ -474,6 +521,11 @@ TEST_F(H743FlashTiming, UnsettledVoltageAndCacheStateNeverAcquireTiming) {
     EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
     EXPECT_FALSE(timing.retained);
     EXPECT_EQ(0U, g_h743_model.writes);
+    /* Withdraw only this test's external cache injection before the real
+     * cold-context RAM owner stop. Teardown must not repair live state. */
+    g_h743_model.core->CCR = original_ccr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_ram_stop(&execution));
+    EXPECT_FALSE(execution.prepared);
 }
 TEST_F(H743FlashTiming, FailedAcquireKeepsCleanupResponsibilityUntilObserved) {
     g_h743_model.ignore_write = &state.registers->ACR;
@@ -512,6 +564,10 @@ TEST_F(H743FlashTiming, ForeignLatencyIsNeverRestoredOverOrReleased) {
     EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_stop(&timing));
     EXPECT_TRUE(timing.retained);
     EXPECT_EQ(writes, g_h743_model.writes);
+    /* External policy restores its conflicting latency before owner retry. */
+    state.registers->ACR = FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_0;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_FALSE(timing.retained);
 }
 TEST_F(H743FlashTiming, CompleteStopDoesNotTouchAnyLaterOwner) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
@@ -532,4 +588,7 @@ TEST_F(H743FlashTiming,
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32h743_flash_timing_stop(&timing));
     EXPECT_TRUE(timing.retained);
     EXPECT_EQ(writes, g_h743_model.writes);
+    g_h743_model.privileged = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_FALSE(timing.retained);
 }

@@ -225,12 +225,15 @@ nx_result_t nx_stm32h743_adc_stop(nx_stm32h743_adc_state_t* port);
 #endif
 /** \brief Exact two-bank physical Flash; no product reservations or partitions.
  */
+typedef struct nx_stm32h743_flash_ram_workspace
+    nx_stm32h743_flash_ram_workspace_t;
 typedef struct {
     FLASH_TypeDef* registers;
     volatile uint8_t* memory;
     uint32_t supply_mv;
     uint32_t poll_limit;
     bool active;
+    nx_stm32h743_flash_ram_workspace_t* execution;
 } nx_stm32h743_flash_state_t;
 extern const nx_flash_geometry_t g_nx_stm32h743_flash_geometry;
 extern const nx_flash_ops_t nx_stm32h743_flash_ops;
@@ -265,6 +268,9 @@ nx_stm32h743_flash_timing_stop(nx_stm32h743_flash_timing_state_t* state);
 nx_result_t nx_stm32h743_flash_stop(nx_stm32h743_flash_state_t* port);
 #ifndef NX_H743_FLASH_POLL
 #define NX_H743_FLASH_POLL(port) ((void)(port))
+#endif
+#ifndef NX_H743_FLASH_READ8
+#define NX_H743_FLASH_READ8(address) (*(const volatile uint8_t*)(address))
 #endif
 #ifndef NX_H743_FLASH_WRITE32
 #define NX_H743_FLASH_WRITE32(address, value) (*(address) = (value))

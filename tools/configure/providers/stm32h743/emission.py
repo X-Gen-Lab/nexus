@@ -16,6 +16,8 @@ def operations(item):
 
 def includes(result):
     source = ['#include "stm32h743_provider.h"']
+    if any(item.kind == "flash" for item in result.controllers):
+        source.append('#include "stm32h743_flash_ram.h"')
     if result.clock_plan is not None:
         source.append('#include "stm32h743_clock.h"')
     if any(item.kind == "uart" and item.mode == "irq-fifo-bytes"
@@ -35,7 +37,11 @@ def includes(result):
 
 
 def instance_declarations(item, result):
-    del item, result
+    del result
+    if item.kind == "flash":
+        return ['__attribute__((section(".bss.nx_h743_flash_workspace")))',
+                "_Alignas(1024) nx_stm32h743_flash_ram_workspace_t "
+                "g_nx_stm32h743_flash_ram_workspace;"]
     return []
 
 

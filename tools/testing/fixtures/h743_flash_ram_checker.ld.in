@@ -1,0 +1,34 @@
+/* Unit-test linker input, not a replacement for generated memory.ld. */
+ENTRY(Reset_Handler)
+MEMORY {
+    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 2048K
+    RAM (rwx) : ORIGIN = 0x24000000, LENGTH = 512K
+}
+PHDRS {
+    flash PT_LOAD FLAGS(5);
+    pod PT_LOAD FLAGS(5);
+    data PT_LOAD FLAGS(6);
+    workspace PT_LOAD FLAGS(6);
+}
+SECTIONS {
+    .isr_vector : ALIGN(1024) { KEEP(*(.isr_vector)) } >FLASH :flash
+    .text : ALIGN(4) { *(.text*) *(.rodata*) } >FLASH :flash
+    .fini_array : ALIGN(4) { KEEP(*(.fini_array*)) } >FLASH :flash
+    @IMAGE_RECORD@
+    __nx_flash_live_start = ORIGIN(FLASH);
+    __nx_flash_live_end = .;
+    .nx_flash_ram : ALIGN(32) {
+        __nx_flash_ram_start = .;
+        *(.nx_flash_ram*)
+        . = ALIGN(4);
+        __nx_flash_ram_end = .;
+    } >RAM AT>FLASH :pod
+    __nx_flash_ram_load_start = LOADADDR(.nx_flash_ram);
+    __nx_flash_ram_load_end = LOADADDR(.nx_flash_ram) +
+                             SIZEOF(.nx_flash_ram) @BAD_LOAD_TAIL@;
+    .data : ALIGN(4) { *(.data*) . = ALIGN(4); } >RAM AT>FLASH :data
+    __nx_flash_image_load_start = ORIGIN(FLASH);
+    __nx_flash_image_load_end = LOADADDR(.data) + SIZEOF(.data);
+    .bss (NOLOAD) : ALIGN(1024) { *(.bss*) *(COMMON) } >RAM :workspace
+    /DISCARD/ : { *(.comment*) *(.note*) }
+}

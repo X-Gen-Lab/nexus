@@ -6,8 +6,8 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "nexus/core/fault.h"
 #include "stm32h743_flash_execution.h"
+#include "stm32h743_flash_ram.h"
 #include "stm32h743_provider.h"
 #if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
@@ -18,10 +18,10 @@
 #define NX_H743_SECTOR_BYTES 131072U
 #define NX_H743_WORD_BYTES   32U
 #define BUSY_FLAGS           ((uint32_t)(FLASH_SR_BSY | FLASH_SR_QW | FLASH_SR_WBNE))
-#define ERROR_FLAGS                                                            \
-    ((uint32_t)(FLASH_SR_WRPERR | FLASH_SR_PGSERR | FLASH_SR_STRBERR |         \
-                FLASH_SR_INCERR | FLASH_SR_OPERR | FLASH_SR_RDPERR |           \
-                FLASH_SR_RDSERR | FLASH_SR_SNECCERR | FLASH_SR_DBECCERR))
+#ifndef NX_H743_FLASH_RAM_ENTER
+#define NX_H743_FLASH_RAM_ENTER(execution)                                     \
+    nx_stm32h743_flash_ram_enter(execution)
+#endif
 #ifndef NX_H743_FLASH_IMAGE
 /* The selected linker output emits these four physical endpoints as LONGs.
  * This immutable record needs no runtime registry or RAM initialization. */
@@ -91,7 +91,8 @@ static bool external(const nx_stm32h743_flash_state_t* p, const void* value,
            !overlap(value, bytes, p->registers, sizeof(*p->registers)) &&
            !overlap(value, bytes, (const void*)p->memory,
                     NX_H743_FLASH_BYTES) &&
-           !system_overlap(value, bytes);
+           !system_overlap(value, bytes) &&
+           nx_stm32h743_flash_ram_external(p, value, bytes);
 }
 static bool idle(const nx_stm32h743_flash_state_t* p) {
     return !p->active && ((NX_H743_READ(&p->registers->SR1) |
@@ -230,6 +231,13 @@ nx_stm32h743_flash_timing_stop(nx_stm32h743_flash_timing_state_t* state) {
 static const nx_flash_geometry_t* geometry(const void* context) {
     return valid(context) ? &g_nx_stm32h743_flash_geometry : NULL;
 }
+static nx_result_t read_status(const nx_stm32h743_flash_state_t* p) {
+    return ((NX_H743_READ(&p->registers->SR1) |
+             NX_H743_READ(&p->registers->SR2)) &
+            (FLASH_SR_SNECCERR | FLASH_SR_DBECCERR)) == 0U
+               ? NX_SUCCESS
+               : NX_ERROR_IO;
+}
 static nx_result_t read(const void* context, uint32_t offset, void* data,
                         size_t length) {
     const nx_stm32h743_flash_state_t* p = context;
@@ -242,21 +250,8 @@ static nx_result_t read(const void* context, uint32_t offset, void* data,
         return NX_ERROR_BUSY;
     uint8_t* out = data;
     for (size_t i = 0U; i < length; ++i)
-        out[i] = p->memory[offset + i];
-    return ((NX_H743_READ(&p->registers->SR1) |
-             NX_H743_READ(&p->registers->SR2)) &
-            (FLASH_SR_SNECCERR | FLASH_SR_DBECCERR)) == 0U
-               ? NX_SUCCESS
-               : NX_ERROR_IO;
-}
-/** \brief A failed physical pulse or control drain cannot release its caller.
- */
-static _Noreturn void retained_fault(nx_stm32h743_flash_state_t* p) {
-    p->active = true;
-    (void)nx_arch_irq_save();
-    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
-    for (;;) {
-    }
+        out[i] = NX_H743_FLASH_READ8(p->memory + offset + i);
+    return read_status(p);
 }
 static nx_result_t admission(nx_stm32h743_flash_state_t* p,
                              nx_time_us_t deadline) {
@@ -264,6 +259,9 @@ static nx_result_t admission(nx_stm32h743_flash_state_t* p,
         return NX_ERROR_CONTEXT;
     if (!valid(p))
         return NX_ERROR_INVALID;
+    nx_result_t ready = nx_stm32h743_flash_ram_admission(p);
+    if (ready != NX_SUCCESS)
+        return ready;
     if (!g_nx_stm32h743_system.started || g_nx_stm32h743_system.core == NULL)
         return NX_ERROR_STATE;
     if (!idle(p))
@@ -285,60 +283,36 @@ static nx_result_t admission(nx_stm32h743_flash_state_t* p,
     return nx_deadline_expired(deadline, nx_time_now_us()) ? NX_ERROR_TIMEOUT
                                                            : NX_SUCCESS;
 }
-static volatile uint32_t* control(nx_stm32h743_flash_state_t* p,
-                                  unsigned bank) {
-    return bank == 0U ? &p->registers->CR1 : &p->registers->CR2;
-}
-static volatile uint32_t* status(nx_stm32h743_flash_state_t* p, unsigned bank) {
-    return bank == 0U ? &p->registers->SR1 : &p->registers->SR2;
-}
-static nx_result_t begin(nx_stm32h743_flash_state_t* p, unsigned bank,
-                         uint32_t* saved) {
-    volatile uint32_t* cr = control(p, bank);
-    volatile uint32_t* key =
-        bank == 0U ? &p->registers->KEYR1 : &p->registers->KEYR2;
-    *saved = NX_H743_READ(cr) & FLASH_CR_PSIZE;
-    if ((NX_H743_READ(cr) & FLASH_CR_LOCK) != 0U) {
-        NX_H743_WRITE(key, 0x45670123U);
-        NX_H743_WRITE(key, 0xcdef89abU);
-        nx_arch_dsb();
-        if ((NX_H743_READ(cr) & FLASH_CR_LOCK) != 0U)
-            return NX_ERROR_IO;
-    }
+/** \brief Stage only after final live admission, then enter the real RAM pod.
+ */
+static nx_result_t command(nx_stm32h743_flash_state_t* p, unsigned bank,
+                           uint32_t configuration,
+                           volatile uint32_t* destination,
+                           const uint32_t* words, nx_time_us_t deadline) {
+    nx_result_t result = nx_stm32h743_flash_ram_admission(p);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_stm32h743_flash_ram_workspace_t* execution = p->execution;
+    volatile uint32_t* control =
+        bank == 0U ? &p->registers->CR1 : &p->registers->CR2;
+    execution->bank = bank;
+    execution->configuration = configuration;
+    execution->destination = destination;
+    execution->saved_control = NX_H743_READ(control) & FLASH_CR_PSIZE;
+    execution->deadline = deadline;
+    execution->program = words != NULL;
+    if (words != NULL)
+        for (unsigned i = 0U; i < 8U; ++i)
+            execution->words[i] = words[i];
+    execution->active = true;
     p->active = true;
-    volatile uint32_t* clear =
-        bank == 0U ? &p->registers->CCR1 : &p->registers->CCR2;
-    NX_H743_WRITE(clear, ERROR_FLAGS | FLASH_SR_EOP);
-    nx_arch_dsb();
-    if ((NX_H743_READ(status(p, bank)) & (ERROR_FLAGS | FLASH_SR_EOP)) != 0U)
-        return NX_ERROR_IO;
-    return NX_SUCCESS;
-}
-/** \brief Timeout never aborts a pulse. A bounded stuck controller parks. */
-static nx_result_t pulse(nx_stm32h743_flash_state_t* p, unsigned bank,
-                         nx_time_us_t deadline) {
-    uint32_t remaining = p->poll_limit;
-    do {
-        NX_H743_FLASH_POLL(p);
-        if ((NX_H743_READ(status(p, bank)) & BUSY_FLAGS) == 0U)
-            break;
-    } while (--remaining != 0U);
-    if ((NX_H743_READ(status(p, bank)) & BUSY_FLAGS) != 0U)
-        retained_fault(p);
-    if ((NX_H743_READ(status(p, bank)) & ERROR_FLAGS) != 0U ||
-        (NX_H743_READ(status(p, bank)) & FLASH_SR_EOP) == 0U)
-        return NX_ERROR_IO;
-    return nx_deadline_expired(deadline, nx_time_now_us()) ? NX_ERROR_TIMEOUT
-                                                           : NX_SUCCESS;
-}
-static void end(nx_stm32h743_flash_state_t* p, unsigned bank, uint32_t saved) {
-    volatile uint32_t* cr = control(p, bank);
-    NX_H743_WRITE(cr, saved | FLASH_CR_LOCK);
-    nx_arch_dsb();
-    nx_arch_isb();
-    if (NX_H743_READ(cr) != (saved | FLASH_CR_LOCK))
-        retained_fault(p);
+    result = NX_H743_FLASH_RAM_ENTER(execution);
+    /* This continuation is legal only because the RAM transaction proved
+     * physical drain, LOCK and MPU/VTOR restoration before bridge return. */
+    execution->active = false;
     p->active = false;
+    execution->destination = NULL;
+    return result;
 }
 static nx_result_t program(void* context, uint32_t offset, const void* data,
                            size_t length, nx_time_us_t deadline) {
@@ -359,8 +333,13 @@ static nx_result_t program(void* context, uint32_t offset, const void* data,
     /* The caller proves fresh erase provenance; visible all-FF data cannot
      * prove virgin ECC cells. Reject visible prior writes before any pulse. */
     for (size_t i = 0U; i < length; ++i)
-        if (p->memory[offset + i] != 0xffU)
+        if (NX_H743_FLASH_READ8(p->memory + offset + i) != 0xffU)
             return NX_ERROR_STATE;
+    /* Corrected bytes may still compare equal. Retain the read diagnostic
+     * before an all-FF no-op or a later pulse can hide it. */
+    result = read_status(p);
+    if (result != NX_SUCCESS)
+        return result;
     const uint8_t* input = data;
     for (size_t i = 0U; i < length; i += NX_H743_WORD_BYTES) {
         if (nx_deadline_expired(deadline, nx_time_now_us()))
@@ -373,34 +352,18 @@ static nx_result_t program(void* context, uint32_t offset, const void* data,
         if (erased_input)
             continue;
         unsigned bank = (offset + (uint32_t)i) / NX_H743_BANK_BYTES;
-        uint32_t saved = 0U;
-        result = begin(p, bank, &saved);
-        if (result != NX_SUCCESS) {
-            if (p->active)
-                end(p, bank, saved);
-            return result;
-        }
-        NX_H743_WRITE(control(p, bank), FLASH_CR_PG);
-        nx_arch_dsb();
-        if (NX_H743_READ(control(p, bank)) != FLASH_CR_PG) {
-            end(p, bank, saved);
-            return NX_ERROR_IO;
-        }
-        volatile uint32_t* destination =
-            (volatile uint32_t*)(p->memory + offset + i);
-        nx_arch_irq_state_t mask = nx_arch_irq_save();
-        for (unsigned word = 0U; word < 8U; ++word)
-            NX_H743_FLASH_WRITE32(destination + word, words[word]);
-        nx_arch_dsb();
-        nx_arch_isb();
-        nx_arch_irq_restore(mask);
-        result = pulse(p, bank, deadline);
-        end(p, bank, saved);
+        result = command(p, bank, FLASH_CR_PG,
+                         (volatile uint32_t*)(p->memory + offset + i), words,
+                         deadline);
         if (result != NX_SUCCESS)
             return result;
         for (unsigned byte = 0U; byte < NX_H743_WORD_BYTES; ++byte)
-            if (p->memory[offset + i + byte] != input[i + byte])
+            if (NX_H743_FLASH_READ8(p->memory + offset + i + byte) !=
+                input[i + byte])
                 return NX_ERROR_IO;
+        result = read_status(p);
+        if (result != NX_SUCCESS)
+            return result;
     }
     return NX_SUCCESS;
 }
@@ -426,25 +389,9 @@ static nx_result_t erase(void* context, uint32_t offset, size_t length,
         unsigned bank = (offset + (uint32_t)i) / NX_H743_BANK_BYTES;
         unsigned sector = ((offset + (uint32_t)i) % NX_H743_BANK_BYTES) /
                           NX_H743_SECTOR_BYTES;
-        uint32_t saved = 0U;
-        result = begin(p, bank, &saved);
-        if (result != NX_SUCCESS) {
-            if (p->active)
-                end(p, bank, saved);
-            return result;
-        }
-        uint32_t config =
+        const uint32_t config =
             FLASH_CR_SER | FLASH_CR_PSIZE_1 | (sector << FLASH_CR_SNB_Pos);
-        NX_H743_WRITE(control(p, bank), config);
-        nx_arch_dsb();
-        if (NX_H743_READ(control(p, bank)) != config) {
-            end(p, bank, saved);
-            return NX_ERROR_IO;
-        }
-        NX_H743_WRITE(control(p, bank), config | FLASH_CR_START);
-        nx_arch_dsb();
-        result = pulse(p, bank, deadline);
-        end(p, bank, saved);
+        result = command(p, bank, config, NULL, NULL, deadline);
         if (result != NX_SUCCESS)
             return result;
     }

@@ -26,6 +26,25 @@ class DescriptorBoundaryTests(unittest.TestCase):
                      "soc/stm32h743/private/stm32h743_dma.h"):
             self.assertIn(name, payload)
 
+    def test_h743_flash_configuration_binds_the_complete_private_ram_pod(self):
+        from tools.configure import dependencies
+
+        payload = set(descriptor.maintained("stm32h743").owned_payload)
+        required = {"soc/stm32h743/" + name for name in (
+            "drivers/flash_ram.c", "drivers/flash_ram_owner.c",
+            "drivers/flash_ram_transaction.c", "drivers/flash_mpu.c",
+            "drivers/flash_ram_enter.S", "private/stm32h743_flash_ram.h",
+            "private/stm32h743_flash_ram_layout.h",
+            "private/stm32h743_flash_mpu.h")}
+        self.assertTrue(required <= payload, sorted(required - payload))
+        names = set(dependencies._names("platform", "stm32h743"))
+        # CMake owns firmware inputs; generator identity binds the descriptor,
+        # not a competing collection of C/ASM compilation units.
+        self.assertTrue(required.isdisjoint(names))
+        self.assertIn("tools/configure/providers/descriptor.py", names)
+        self.assertTrue(required.isdisjoint(
+            dependencies._names("platform", "native")))
+
     def test_native_configuration_does_not_import_unselected_physical_families(self):
         run = subprocess.run([sys.executable, "-B", "-c",
             "import sys; from tools.configure.providers import maintained; "

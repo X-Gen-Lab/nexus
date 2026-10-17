@@ -47,6 +47,9 @@ foreach(long_family g474 h743 u575)
         set(long_define NX_I2C_LONG_G474)
     elseif(long_family STREQUAL "h743")
         list(APPEND long_sources h743_model.cpp h743_flash_image_model.cpp
+            h743_flash_fixture.cpp h743_flash_fixture_generated.cpp
+            h743_flash_ram_closure_model.cpp h743_flash_mpu_model.cpp
+            h743_flash_ram_observer.cpp ${h743_flash_ram_production_sources}
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
@@ -81,4 +84,8 @@ foreach(long_family g474 h743 u575)
         _fini=nx_${long_family}_i2c_long_fixture_fini)
     target_compile_options(${long_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_v2_long_factory_model.h")
+    if(long_family STREQUAL "h743")
+        target_link_options(${long_target} PRIVATE
+            "-Wl,--wrap=nx_stm32h743_flash_ram_initialize")
+    endif()
 endforeach()

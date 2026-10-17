@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "h743_flash_execution_model.h"
+#include "h743_flash_fixture.h"
 #include "nexus/io/flash.h"
 #include "stm32h743_flash_execution.h"
 #include "stm32h743_provider.h"
@@ -102,30 +103,16 @@ class FlashPulseBoundary {
   public:
     MOCK_METHOD(void, Observe, (uint32_t pending, bool active, bool locked));
 };
-FlashPulseBoundary* boundary;
-uint32_t tail_flag;
-unsigned tail_polls;
 } /* namespace */
 
-extern "C" void nx_h743_flash_execution_poll(void* context) {
-    auto* state = static_cast<nx_stm32h743_flash_state_t*>(context);
-    nx_h743_model_flash_poll(context);
-    ++tail_polls;
-    state->registers->SR1 = static_cast<uint32_t>(FLASH_SR_EOP) |
-                            (tail_polls < 3U ? tail_flag : 0U);
-    if (boundary != nullptr) {
-        boundary->Observe(
-            static_cast<uint32_t>(state->registers->SR1 &
-                                  (FLASH_SR_BSY | FLASH_SR_QW | FLASH_SR_WBNE)),
-            state->active, (state->registers->CR1 & FLASH_CR_LOCK) != 0U);
-    }
-}
 class H743FlashPulseDrain : public testing::Test {
   protected:
     std::array<uint32_t, 524288U> memory{};
     nx_stm32h743_flash_state_t state{};
     nx_flash_port_t face{&nx_stm32h743_flash_ops, &state};
     testing::StrictMock<FlashPulseBoundary> hardware;
+    testing::NiceMock<nexus_test::h743_ram::RamHardwareBoundary> ram_hardware;
+    alignas(1024) nx_stm32h743_flash_ram_workspace_t execution{};
     void SetUp() override {
         nx_h743_model_reset();
         memory.fill(UINT32_MAX);
@@ -140,22 +127,31 @@ class H743FlashPulseDrain : public testing::Test {
         state.supply_mv = 3300U;
         state.poll_limit = 8U;
         g_h743_model.physical_flash = &state;
-        g_h743_model.hold_flash_busy = true;
-        boundary = &hardware;
-        tail_polls = 0U;
+        nexus_test::h743_fixture::ResetExternalCpu();
+        nexus_test::h743_fixture::SetIsolatedTimer(64000000U);
+        ASSERT_EQ(NX_SUCCESS,
+                  nexus_test::h743_fixture::Prepare(&state, &execution));
+        nexus_test::h743_ram::cpu.observer = &ram_hardware;
+        EXPECT_CALL(ram_hardware, Poll(testing::_, true, true))
+            .WillRepeatedly([&](uint32_t pending, bool active, bool) {
+                hardware.Observe(pending, active,
+                                 (state.registers->CR1 & FLASH_CR_LOCK) != 0U);
+            });
     }
     void TearDown() override {
-        boundary = nullptr;
+        nexus_test::h743_fixture::CheckedStop(&execution);
+        nexus_test::h743_fixture::StopIsolatedTimer();
     }
     void ProgramWithTail(uint32_t pending) {
-        tail_flag = pending;
+        nexus_test::h743_ram::cpu.pending = pending;
+        nexus_test::h743_ram::cpu.clear_after = 3U;
         std::array<uint8_t, 32U> data{};
         data.fill(0x55U);
         EXPECT_CALL(hardware, Observe(pending, true, false)).Times(2);
         EXPECT_CALL(hardware, Observe(0U, true, false)).Times(1);
         EXPECT_EQ(NX_SUCCESS, nx_flash_port_program(&face, 131072U, data.data(),
                                                     data.size(), 10000U));
-        EXPECT_EQ(3U, tail_polls);
+        EXPECT_EQ(3U, nexus_test::h743_ram::cpu.polls);
         EXPECT_FALSE(state.active);
         EXPECT_EQ(FLASH_CR_LOCK, state.registers->CR1);
         EXPECT_EQ(8U, g_h743_model.flash_store_count);

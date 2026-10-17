@@ -241,8 +241,8 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.memory = (volatile uint8_t*)FLASH_BASE;",
                         f"    {state}.supply_mv = {supply}u;",
                         f"    {state}.poll_limit = 500000000u;",
-                        f"    return nx_stm32h743_flash_stop(&{state});", "}"]
-        stop = f"nx_stm32h743_flash_stop(&{state})"
+                        f"    return nx_stm32h743_flash_ram_initialize(&{state}, &g_nx_stm32h743_flash_ram_workspace);", "}"]
+        stop = "nx_stm32h743_flash_ram_stop(&g_nx_stm32h743_flash_ram_workspace)"
     elif item.kind == "watchdog":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.state.enabled || {state}.lsi_added || {state}.debug_pending) {{ return NX_ERROR_BUSY; }}",
@@ -282,4 +282,4 @@ def constructor(item, result, board_bindings, routes, devices):
     return Construction(
         state_type=f"nx_stm32h743_{implementation}_state_t",
         definitions=definitions, initialize=f"prepare_{name}()",
-        stop=[stop], retain_on_failed_init=item.kind != "flash")
+        stop=[stop], retain_on_failed_init=True)

@@ -10,6 +10,9 @@
 #elif defined(NX_I2C_LONG_H743)
 #include "h743_flash_image_model.h"
 #include "h743_peripheral_factory_model.h"
+
+/* Bind selected peripheral addresses before RAM private headers load V2. */
+#include "h743_flash_mpu_model.h"
 #elif defined(NX_I2C_LONG_U575)
 #include "u575_devices_model.h"
 #else

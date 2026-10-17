@@ -14,6 +14,9 @@
 #include <cstdlib>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#if defined(NX_I2C_LONG_H743)
+#include "h743_flash_fixture.h"
+#endif
 #if defined(NX_I2C_LONG_G474)
 #define SELECTED_BUS    NX_I2C_ID_BUS
 #define SELECTED_DEVICE NX_I2C_LONG_DEVICE_ID_SENSOR_REGISTERS
@@ -85,6 +88,10 @@ class I2CLongNormalFactory : public testing::Test {
              * failed cleanup still retains the actual provider owner. */
             std::abort();
         }
+#if defined(NX_I2C_LONG_H743)
+        nexus_test::h743_fixture::CheckedStop(
+            nexus_test::h743_ram::cpu.execution);
+#endif
     }
     nx_result_t Transfer(size_t* count, nx_time_us_t lifetime = 10000U) {
         return nx_i2c_long_endpoint_transaction(

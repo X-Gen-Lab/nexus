@@ -18,7 +18,7 @@
  */
 static nx_result_t factory_trim(const nx_stm32h743_system_t* s) {
     const uint32_t identity = NX_H743_SILICON_ID();
-    if ((identity & 0xfffU) != 0x450U || (identity >> 16U) != 0x2003U)
+    if (!nx_stm32h743_is_revision_v(identity))
         return NX_ERROR_UNSUPPORTED;
     return (NX_H743_READ(&s->rcc->HSICFGR) & RCC_HSICFGR_HSITRIM) ==
                    (0x40U << RCC_HSICFGR_HSITRIM_Pos)

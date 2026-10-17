@@ -15,3 +15,9 @@ target_compile_definitions(nexus_h743_flash_execution_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_flash_execution_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_execution_model.h"
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h")
+
+target_sources(nexus_h743_flash_execution_test PRIVATE h743_flash_fixture.cpp
+    h743_flash_ram_closure_model.cpp h743_flash_mpu_model.cpp
+    ${h743_flash_ram_production_sources})
+target_compile_options(nexus_h743_flash_execution_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_mpu_model.h")

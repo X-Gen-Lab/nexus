@@ -338,14 +338,30 @@ are checked. Pulse error is returned only after BSY/QW/WBNE withdraw. A stuck
 pulse or refused final control/lock write retains the active caller and enters a
 nonreturning fault path; timeout never aborts a pulse or releases storage early.
 
-Execution or IRQ/vector fetch from a busy bank can stall until its physical
-pulse ends. This synchronous mode provides no tight interrupt-latency or wall-time
-deadline ceiling; deadline expiry is observed after the unabortable operation
-settles. The32-bit TIM2 timebase can recover one pending wrap, and consumers must
-still respect its documented service interval. Interrupt-safe RAM execution,
+The current development path requires selected-only cold RAM preparation and
+V revision `0x2003` admission before physical programming or erase. This applies
+to every selected Flash profile, including fixed HSI32/64 and HSI64/PLL384;
+unknown cuts are rejected. The restriction does not propagate to other
+peripherals or UART profiles, and assemblies without Flash acquire no RAM
+workspace. One generated
+workspace holds private vectors, stack, staged input and protection state. The
+CPU-only assembly bridge installs private MSP; the RAM transaction owns VTOR
+publication/readback, the MPU guard and physical both-bank drain. There is no
+fallback to the former ordinary Flash-resident pulse path. These mechanisms and
+their still-open production-ELF/software exits are described in the
+[RAM maintenance design](../../docs/design/h743-flash-ram.md).
+
+This synchronous maintenance mode masks configurable interrupts and provides no
+tight interrupt-latency or wall-time deadline ceiling. Deadline expiry after
+trigger only latches a result; it cannot cancel the pulse or authorize an early
+return. The32-bit TIM2 timebase can recover one pending wrap, and consumers must
+still respect its documented service interval. CPU MPU protection does not stop
+other bus masters: the external maintenance caller must withdraw and join them.
 Cache-on self-programming, bank swapping, option/OTP programming, ECC exception
-recovery and product boot/update policy are separate scopes. The reference's3.3V
-is an authored software assumption; no voltage or analog path has been measured.
+recovery and product boot/update policy remain separate scopes. The reference's
+3.3V is an authored software assumption; no voltage or analog path has been
+measured. Source integration and a successful link do not establish completed
+IO-24, software-candidate or physical qualification.
 
 The selected private LL SPI/ADC headers and original BSD-3-Clause notice are
 paired with STM32CubeH7v1.13.0 by the reviewed source lock. Public faces retain
@@ -389,5 +405,12 @@ Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不�
 明确的Board supply_mv，3.3V仅是软件参考假定；调用者必须证明目标自上次编程
 后已成功擦除，全FF读回不能证明ECC单元尚未编程；全FF输入跳过物理脉冲。Cache-on、Bank swap、OTP与option
 byte写入均未开放。正在执行的Flash脉冲不能被timeout撤销；必须等硬件排空后才返回，
-排空或最终锁定失败将保留调用帧并进入终止故障路径。同Bank取指和中断可能停顿，
-因此不承诺严格中断延迟或硬实时deadline。所有物理HIL仍为not_executed。
+排空或最终锁定失败将保留调用帧并进入终止故障路径。当前开发路径要求选定的
+V修订0x2003、冷态RAM复制与独立工作区；该准入适用于包括固定HSI32/64和PLL384
+在内的所有选定Flash配置，未知cut拒绝，其他外设与UART配置不继承此限制，未选
+Flash的装配也不取得RAM工作区。不再回退到原Flash驻留的脉冲路径；CPU bridge
+仅负责栈和CPU状态，RAM事务负责VTOR、MPU和实际排空。生产ELF闭包及完整软件
+退出尚未完成，IO-24仍为in_progress。维护窗口屏蔽可配置中断，不承诺严格中断
+延迟或硬实时deadline；MPU不停止其他bus master，外部调用者必须撤回并join。
+完整边界见[RAM维护设计](../../docs/design/h743-flash-ram.md)。所有物理HIL仍为
+not_executed。

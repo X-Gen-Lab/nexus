@@ -293,6 +293,13 @@ CPU/bus/kernel clock domains and a cold clock/voltage/Flash lifecycle. Its joint
 owner replaces the fixed-HSI Flash timing owner for that high profile; support
 does not extend to unreviewed cuts, Cache-on execution or physical qualification.
 
+The selected V/cache-off Flash implementation now requires the
+[private RAM maintenance boundary](h743-flash-ram.md): cold copy/readiness,
+one selected workspace, a CPU-only stack bridge, RAM-owned VTOR and a temporary
+MPU guard. Deadline expiry after trigger only latches the result; actual both-bank
+drain, LOCK and protection/vector restoration precede any return. Production-ELF
+closure and complete software exits remain open, so IO-24 stays `in_progress`.
+
 ## Observe time without inventing timing guarantees
 
 [Timestamp facts](../../io/include/nexus/io/observation.h) distinguish hardware

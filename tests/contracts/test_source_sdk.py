@@ -73,6 +73,12 @@ class SourceSDKSelectionTests(unittest.TestCase):
         additions = {
             "stm32h743": ("drivers/flash_execution.c",
                           "private/stm32h743_flash_execution.h",
+                          "drivers/flash_ram.c", "drivers/flash_ram_owner.c",
+                          "drivers/flash_ram_transaction.c",
+                          "drivers/flash_ram_enter.S", "drivers/flash_mpu.c",
+                          "private/stm32h743_flash_ram.h",
+                          "private/stm32h743_flash_ram_layout.h",
+                          "private/stm32h743_flash_mpu.h",
                           "drivers/uart_fifo.c",
                           "private/stm32h743_uart_fifo.h"),
             "stm32u575": ("drivers/uart_fifo.c",

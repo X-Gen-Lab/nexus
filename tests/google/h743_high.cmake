@@ -76,7 +76,18 @@ target_compile_options(nexus_h743_high_factory_test PRIVATE
 foreach(h743_high_flash_target nexus_h743_high_kernel_test
         nexus_h743_high_factory_test)
     target_sources(${h743_high_flash_target} PRIVATE h743_flash_image_model.cpp
+        h743_flash_fixture.cpp h743_flash_ram_closure_model.cpp
+        h743_flash_mpu_model.cpp ${h743_flash_ram_production_sources}
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c")
     target_compile_options(${h743_high_flash_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h")
 endforeach()
+
+target_compile_options(nexus_h743_high_kernel_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_fixture_high_model.h")
+target_compile_options(nexus_h743_high_factory_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_ram_high_model.h")
+target_sources(nexus_h743_high_factory_test PRIVATE
+    h743_flash_fixture_generated.cpp)
+target_link_options(nexus_h743_high_factory_test PRIVATE
+    "-Wl,--wrap=nx_stm32h743_flash_ram_initialize")
