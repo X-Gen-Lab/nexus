@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "DS12288 Rev6 silicon routes; software fixture only",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32g474re.pdf",
+      "scope": "DS12288 G474RE silicon pin multiplexing only; fixture wiring, input voltage and external output stages are not inspected."
+    }
+  ],
+  "id": "stm32g474re-fdcan-software-fixture",
+  "bindings": [
+    {
+      "id": "fieldbus",
+      "controller": "FDCAN1",
+      "route": "fdcan1-pa11-pa12",
+      "mask": 6144,
+      "initial": 4096
+    }
+  ],
+  "unknowns": [
+    "Software fixture only: physical PCB revision, clock population and HIL are not observed.",
+    "The24MHz HSE is a declared software input, not a measured oscillator envelope.",
+    "PA11/PA12 AF9 is a silicon route for explicitly selected ISO-FD loopback or normal controller mode; no transceiver, termination, connector, external traffic or electrical timing is qualified.",
+    "Hardware timestamping is disabled; IRQ/acquisition time cannot establish SOF time."
+  ]
+}

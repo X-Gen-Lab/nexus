@@ -462,3 +462,828 @@ msgstr "Single-waiter notification port."
 
 msgid "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
 msgstr "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "Startup context; not a task/queue emulation. Word publication uses the reviewed inline compiler/CPU port."
+msgstr "Startup context; not a task/queue emulation. Word publication uses the reviewed inline compiler/CPU port."
+
+msgid "[out] Unused caller-owned storage"
+msgstr "[out] Unused caller-owned storage"
+
+msgid "[in] Monotonic microsecond source, continuing while waiting"
+msgstr "[in] Monotonic microsecond source, continuing while waiting"
+
+msgid "[in] Clock source context"
+msgstr "[in] Clock source context"
+
+msgid "NX_SUCCESS or NX_ERROR_INVALID"
+msgstr "NX_SUCCESS or NX_ERROR_INVALID"
+
+msgid "wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That guard requires one CPU and privileged Thread/configurable-IRQ callers; NMI/HardFault, unprivileged, DMA and other security-domain access to its metadata are unsupported. The owner loop continues to service controller/drain after BUSY. No WFI/WFE is inserted without a reviewed architecture-specific atomic sleep contract."
+msgstr "wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That guard requires one CPU and privileged Thread/configurable-IRQ callers; NMI/HardFault, unprivileged, DMA and other security-domain access to its metadata are unsupported. The owner loop continues to service controller/drain after BUSY. No WFI/WFE is inserted without a reviewed architecture-specific atomic sleep contract."
+
+msgid "[in] Initialized storage"
+msgstr "[in] Initialized storage"
+
+msgid "Port whose wait returns BUSY while unchanged before deadline; NX_DEADLINE_NEVER disables expiry, never implies blocking"
+msgstr "Port whose wait returns BUSY while unchanged before deadline; NX_DEADLINE_NEVER disables expiry, never implies blocking"
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Startup or exclusive lifecycle owner only. Both allocations remain alive until all publishers and readers are stopped. Entries cannot alias ring state or a submitted record."
+msgstr "Startup or exclusive lifecycle owner only. Both allocations remain alive until all publishers and readers are stopped. Entries cannot alias ring state or a submitted record."
+
+msgid "[out] Unused caller-owned state."
+msgstr "[out] Unused caller-owned state."
+
+msgid "[in] Naturally aligned contiguous entry storage."
+msgstr "[in] Naturally aligned contiguous entry storage."
+
+msgid "[in] Nonzero storage length, at most UINT32_MAX."
+msgstr "[in] Nonzero storage length, at most UINT32_MAX."
+
+msgid "SUCCESS or INVALID without modifying storage on rejection."
+msgstr "SUCCESS or INVALID without modifying storage on rejection."
+
+msgid "Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, unprivileged, SMP, DMA and other security worlds are excluded. Full rings retain older records and saturate the lost-record counter. No clock callback, OS operation, heap, string formatting or transport is used."
+msgstr "Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, unprivileged, SMP, DMA and other security worlds are excluded. Full rings retain older records and saturate the lost-record counter. No clock callback, OS operation, heap, string formatting or transport is used."
+
+msgid "[inout] Initialized ring."
+msgstr "[inout] Initialized ring."
+
+msgid "[in] Stable record until this call returns."
+msgstr "[in] Stable record until this call returns."
+
+msgid "SUCCESS, BUSY when full, INVALID or CONTEXT."
+msgstr "SUCCESS, BUSY when full, INVALID or CONTEXT."
+
+msgid "Same privileged single-CPU domain as write. Failed reads leave destination unchanged. This is diagnostic storage, never a completion queue or application work queue."
+msgstr "Same privileged single-CPU domain as write. Failed reads leave destination unchanged. This is diagnostic storage, never a completion queue or application work queue."
+
+msgid "[inout] Initialized ring with live producers."
+msgstr "[inout] Initialized ring with live producers."
+
+msgid "[out] Separate caller-owned destination."
+msgstr "[out] Separate caller-owned destination."
+
+msgid "SUCCESS, BUSY when empty, INVALID or CONTEXT."
+msgstr "SUCCESS, BUSY when empty, INVALID or CONTEXT."
+
+msgid "Uses the same bounded saved-mask domain as record access."
+msgstr "Uses the same bounded saved-mask domain as record access."
+
+msgid "[in] Initialized ring."
+msgstr "[in] Initialized ring."
+
+msgid "[out] Caller-owned result."
+msgstr "[out] Caller-owned result."
+
+msgid "SUCCESS, INVALID or CONTEXT."
+msgstr "SUCCESS, INVALID or CONTEXT."
+
+msgid "Running task operations require privileged unmasked Thread mode; IRQ wake has its own contract. Before scheduler start, the selected Baseline port may retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other masks must be zero. Matching a value cannot prove mask provenance. Unsafe contexts return CONTEXT before mutating kernel APIs or object storage; a scheduler-state read may be needed. Startup permits init, task creation, wake and zero-wait queues. Wait, join and nonzero waits require a running scheduler. Port binding and sequence snapshots remain reads. MPU user-task gateways and cross-world secure task calls are outside these privileged, current-security-domain APIs."
+msgstr "Running task operations require privileged unmasked Thread mode; IRQ wake has its own contract. Before scheduler start, the selected Baseline port may retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other masks must be zero. Matching a value cannot prove mask provenance. Unsafe contexts return CONTEXT before mutating kernel APIs or object storage; a scheduler-state read may be needed. Startup permits init, task creation, wake and zero-wait queues. Wait, join and nonzero waits require a running scheduler. Port binding and sequence snapshots remain reads. MPU user-task gateways and cross-world secure task calls are outside these privileged, current-security-domain APIs."
+
+msgid "Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-owned exceptions are rejected before entering FreeRTOS. Mainline priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports accept every configurable IRQ and do not read Mainline priority grouping. Nonsecure permission does not exclude Secure-side accesses."
+msgstr "Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-owned exceptions are rejected before entering FreeRTOS. Mainline priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports accept every configurable IRQ and do not read Mainline priority grouping. Nonsecure permission does not exclude Secure-side accesses."
+
+msgid "True for a privileged unmasked external Cortex-M IRQ within the selected CPU/SoC bounds and kernel mask contract"
+msgstr "True for a privileged unmasked external Cortex-M IRQ within the selected CPU/SoC bounds and kernel mask contract"
+
+msgid "Task/startup context; no heap or timer daemon is needed."
+msgstr "Task/startup context; no heap or timer daemon is needed."
+
+msgid "[out] Caller storage, zeroed before first use"
+msgstr "[out] Caller storage, zeroed before first use"
+
+msgid "SUCCESS or invalid/context/initialization error"
+msgstr "SUCCESS or invalid/context/initialization error"
+
+msgid "Task wake uses xSemaphoreGive. IRQ wake validates priority then uses xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request predicates remain authoritative. No deferred daemon publishes wakes."
+msgstr "Task wake uses xSemaphoreGive. IRQ wake validates priority then uses xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request predicates remain authoritative. No deferred daemon publishes wakes."
+
+msgid "[in] Initialized live storage"
+msgstr "[in] Initialized live storage"
+
+msgid "Notification port using nx_time_now_us clock domain"
+msgstr "Notification port using nx_time_now_us clock domain"
+
+msgid "Task context. Quiescence is required beyond this busy check."
+msgstr "Task context. Quiescence is required beyond this busy check."
+
+msgid "[inout] Live storage with no future users"
+msgstr "[inout] Live storage with no future users"
+
+msgid "SUCCESS, BUSY if a waiter is still registered, or error"
+msgstr "SUCCESS, BUSY if a waiter is still registered, or error"
+
+msgid "Task/startup context. No hidden worker or maximum pool. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
+msgstr "Task/startup context. No hidden worker or maximum pool. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
+
+msgid "[out] Zero-initialized unused control storage"
+msgstr "[out] Zero-initialized unused control storage"
+
+msgid "[in] Kernel diagnostic name, copied by the kernel"
+msgstr "[in] Kernel diagnostic name, copied by the kernel"
+
+msgid "[in] StackType_t array kept until successful join"
+msgstr "[in] StackType_t array kept until successful join"
+
+msgid "[in] Actual capacity, at least the selected port startup minimum; runtime stack budget remains caller-owned"
+msgstr "[in] Actual capacity, at least the selected port startup minimum; runtime stack budget remains caller-owned"
+
+msgid "[in] Priority below configMAX_PRIORITIES"
+msgstr "[in] Priority below configMAX_PRIORITIES"
+
+msgid "[in] Application entry, may return after cooperative stop"
+msgstr "[in] Application entry, may return after cooperative stop"
+
+msgid "[in] Entry context kept until join"
+msgstr "[in] Entry context kept until join"
+
+msgid "SUCCESS or invalid/context/start error"
+msgstr "SUCCESS or invalid/context/start error"
+
+msgid "Single privileged startup lifecycle owner; scheduler state must be NOT_STARTED. The kernel candidate is first suspended to remove its retained TCB reference before deletion. No unmatched vTaskSuspendAll may remain during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension nesting. This caller precondition applies before mutation. Success permits TCB, stack and context reuse after all external users are quiescent. This does not cancel or join an executed task."
+msgstr "Single privileged startup lifecycle owner; scheduler state must be NOT_STARTED. The kernel candidate is first suspended to remove its retained TCB reference before deletion. No unmatched vTaskSuspendAll may remain during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension nesting. This caller precondition applies before mutation. Success permits TCB, stack and context reuse after all external users are quiescent. This does not cancel or join an executed task."
+
+msgid "[inout] Live caller-owned static task, unused by other callers"
+msgstr "[inout] Live caller-owned static task, unused by other callers"
+
+msgid "SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for absent, incomplete or already entered control; CONTEXT for ISR, unprivileged, noncanonical masks or a running/suspended scheduler, without mutation"
+msgstr "SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for absent, incomplete or already entered control; CONTEXT for ISR, unprivileged, noncanonical masks or a running/suspended scheduler, without mutation"
+
+msgid "Single joiner, task context. The entry return parks its wrapper; no self-delete/idle cleanup race releases caller storage early. Stop producers, keep bus owner draining, join producers, then join owner."
+msgstr "Single joiner, task context. The entry return parks its wrapper; no self-delete/idle cleanup race releases caller storage early. Stop producers, keep bus owner draining, join producers, then join owner."
+
+msgid "[inout] Started task, distinct from current task"
+msgstr "[inout] Started task, distinct from current task"
+
+msgid "[in] Absolute wait deadline in nx_time_now_us domain"
+msgstr "[in] Absolute wait deadline in nx_time_now_us domain"
+
+msgid "SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-join or stopped scheduler"
+msgstr "SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-join or stopped scheduler"
+
+msgid "[out] Zero-initialized caller queue control"
+msgstr "[out] Zero-initialized caller queue control"
+
+msgid "[in] Byte buffer kept until destroy"
+msgstr "[in] Byte buffer kept until destroy"
+
+msgid "[in] Actual byte capacity"
+msgstr "[in] Actual byte capacity"
+
+msgid "[in] Number of items"
+msgstr "[in] Number of items"
+
+msgid "[in] Bytes copied per item"
+msgstr "[in] Bytes copied per item"
+
+msgid "Task context. Admission/stop belongs to the application's explicit owner adapter, not this generic copy queue."
+msgstr "Task context. Admission/stop belongs to the application's explicit owner adapter, not this generic copy queue."
+
+msgid "[inout] Live queue"
+msgstr "[inout] Live queue"
+
+msgid "[in] At least configured item bytes; not retained afterward"
+msgstr "[in] At least configured item bytes; not retained afterward"
+
+msgid "[in] Explicit relative wait; portMAX_DELAY prohibited"
+msgstr "[in] Explicit relative wait; portMAX_DELAY prohibited"
+
+msgid "SUCCESS, TIMEOUT, INVALID or CONTEXT"
+msgstr "SUCCESS, TIMEOUT, INVALID or CONTEXT"
+
+msgid "[out] Configured item byte capacity, valid only on success"
+msgstr "[out] Configured item byte capacity, valid only on success"
+
+msgid "[inout] Live drained queue, no future operations"
+msgstr "[inout] Live drained queue, no future operations"
+
+msgid "SUCCESS, BUSY while users/items remain, or invalid/context"
+msgstr "SUCCESS, BUSY while users/items remain, or invalid/context"
+
+msgid "Immediate readiness wins over expiration. Stop admission and user quiescence remain external raw-queue obligations."
+msgstr "Immediate readiness wins over expiration. Stop admission and user quiescence remain external raw-queue obligations."
+
+msgid "[inout] Live raw queue"
+msgstr "[inout] Live raw queue"
+
+msgid "[in] Configured bytes borrowed until return"
+msgstr "[in] Configured bytes borrowed until return"
+
+msgid "[in] nx_time_now_us domain, NEVER permits long waits"
+msgstr "[in] nx_time_now_us domain, NEVER permits long waits"
+
+msgid "SUCCESS, TIMEOUT or validation/context error"
+msgstr "SUCCESS, TIMEOUT or validation/context error"
+
+msgid "[out] Configured bytes valid only on SUCCESS"
+msgstr "[out] Configured bytes valid only on SUCCESS"
+
+msgid "[in] nx_time_now_us domain"
+msgstr "[in] nx_time_now_us domain"
+
+msgid "Caller ensures slot exclusivity. No global slot registry, allocation, slot discovery or cross-world synchronization."
+msgstr "Caller ensures slot exclusivity. No global slot registry, allocation, slot discovery or cross-world synchronization."
+
+msgid "[out] Zeroed caller storage"
+msgstr "[out] Zeroed caller storage"
+
+msgid "[in] Task retained until all publishers quiesce"
+msgstr "[in] Task retained until all publishers quiesce"
+
+msgid "[in] Exclusively owned kernel notification slot"
+msgstr "[in] Exclusively owned kernel notification slot"
+
+msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED by OS profile"
+msgstr "SUCCESS, INVALID, CONTEXT or UNSUPPORTED by OS profile"
+
+msgid "Only receiver may wait. Task/validated IRQ publishers use the exclusive slot; notification remains a predicate hint."
+msgstr "Only receiver may wait. Task/validated IRQ publishers use the exclusive slot; notification remains a predicate hint."
+
+msgid "[in] Live explicitly bound storage"
+msgstr "[in] Live explicitly bound storage"
+
+msgid "Port using nx_time_now_us or an invalid zero port"
+msgstr "Port using nx_time_now_us or an invalid zero port"
+
+msgid "Does not delete receiver or clear its kernel slot. Receiver and storage must outlive every retained port and publisher."
+msgstr "Does not delete receiver or clear its kernel slot. Receiver and storage must outlive every retained port and publisher."
+
+msgid "SUCCESS, BUSY if waiting, or validation/context error"
+msgstr "SUCCESS, BUSY if waiting, or validation/context error"
+
+msgid "No join latch, destroy or forced deletion. Choose joinable tasks for cooperative shutdown and reclaimable storage."
+msgstr "No join latch, destroy or forced deletion. Choose joinable tasks for cooperative shutdown and reclaimable storage."
+
+msgid "[out] Zeroed permanent control, retained until reset"
+msgstr "[out] Zeroed permanent control, retained until reset"
+
+msgid "[in] Copied kernel diagnostic name"
+msgstr "[in] Copied kernel diagnostic name"
+
+msgid "[in] Aligned actual stack retained until reset"
+msgstr "[in] Aligned actual stack retained until reset"
+
+msgid "[in] Capacity includes reviewed startup minimum"
+msgstr "[in] Capacity includes reviewed startup minimum"
+
+msgid "[in] Below configMAX_PRIORITIES"
+msgstr "[in] Below configMAX_PRIORITIES"
+
+msgid "[in] Permanent entry; return violates kernel contract"
+msgstr "[in] Permanent entry; return violates kernel contract"
+
+msgid "[in] Retained until reset"
+msgstr "[in] Retained until reset"
+
+msgid "SUCCESS or validation/context/start error"
+msgstr "SUCCESS or validation/context/start error"
+
+msgid "[out] Zeroed storage, one simultaneous operation maximum"
+msgstr "[out] Zeroed storage, one simultaneous operation maximum"
+
+msgid "[inout] Live storage without future callers"
+msgstr "[inout] Live storage without future callers"
+
+msgid "SUCCESS, BUSY if active, or validation/context error"
+msgstr "SUCCESS, BUSY if active, or validation/context error"
+
+msgid "No hidden worker or waiter pool. Each concurrent blocking operation supplies its own initialized waiter. Broadcasting pauses scheduling while visiting at most maximum_waiters latches. Kernel payload copies and each latch signal have their own short IRQ guards. Budget scheduling delay and IRQ latency separately. Large payloads should queue stable handles. The registry is single-core and task-only."
+msgstr "No hidden worker or waiter pool. Each concurrent blocking operation supplies its own initialized waiter. Broadcasting pauses scheduling while visiting at most maximum_waiters latches. Kernel payload copies and each latch signal have their own short IRQ guards. Budget scheduling delay and IRQ latency separately. Large payloads should queue stable handles. The registry is single-core and task-only."
+
+msgid "[out] Zeroed control kept until destroy"
+msgstr "[out] Zeroed control kept until destroy"
+
+msgid "[in] Payload buffer kept until destroy"
+msgstr "[in] Payload buffer kept until destroy"
+
+msgid "[in] Actual payload capacity"
+msgstr "[in] Actual payload capacity"
+
+msgid "[in] Positive item count"
+msgstr "[in] Positive item count"
+
+msgid "[in] Positive byte-copy size"
+msgstr "[in] Positive byte-copy size"
+
+msgid "[in] Explicit positive simultaneous-call budget"
+msgstr "[in] Explicit positive simultaneous-call budget"
+
+msgid "Readiness/admission and close serialize in a kernel task scheduling guard. A latched wake closes wake-before-sleep."
+msgstr "Readiness/admission and close serialize in a kernel task scheduling guard. A latched wake closes wake-before-sleep."
+
+msgid "[inout] Live closable queue"
+msgstr "[inout] Live closable queue"
+
+msgid "[in] Bytes borrowed until return, never after timeout"
+msgstr "[in] Bytes borrowed until return, never after timeout"
+
+msgid "[in] nx_time_now_us domain, NEVER supported"
+msgstr "[in] nx_time_now_us domain, NEVER supported"
+
+msgid "[inout] Exclusive initialized caller waiter"
+msgstr "[inout] Exclusive initialized caller waiter"
+
+msgid "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
+msgstr "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
+
+msgid "SUCCESS, CANCELLED when closed/empty, TIMEOUT or error"
+msgstr "SUCCESS, CANCELLED when closed/empty, TIMEOUT or error"
+
+msgid "Task-only, no forced cancellation or task deletion. Close does not join users or authorize storage reclamation."
+msgstr "Task-only, no forced cancellation or task deletion. Close does not join users or authorize storage reclamation."
+
+msgid "SUCCESS, including repeated close, or validation/context"
+msgstr "SUCCESS, including repeated close, or validation/context"
+
+msgid "Stop/join producers, drain with owner, join consumers and then destroy queue and every waiter independently."
+msgstr "Stop/join producers, drain with owner, join consumers and then destroy queue and every waiter independently."
+
+msgid "[inout] Live queue without future entrants"
+msgstr "[inout] Live queue without future entrants"
+
+msgid "SUCCESS, BUSY while open/users/items remain, or error"
+msgstr "SUCCESS, BUSY while open/users/items remain, or error"
+
+msgid "Control fields are adapter-owned. The caller zero-initializes storage before first use and does not modify live fields. Entry is consumed as the wrapper begins execution; context remains borrowed until successful join or prestart discard."
+msgstr "Control fields are adapter-owned. The caller zero-initializes storage before first use and does not modify live fields. Entry is consumed as the wrapper begins execution; context remains borrowed until successful join or prestart discard."
+
+msgid "Application may override the weak no-op and write an explicit nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so never block, allocate, format, transmit, acquire OS locks or call kernel services. The sink owns timestamp and lifetime; no buffer is provided automatically. Trace profile enables real kernel hooks."
+msgstr "Application may override the weak no-op and write an explicit nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so never block, allocate, format, transmit, acquire OS locks or call kernel services. The sink owns timestamp and lifetime; no buffer is provided automatically. Trace profile enables real kernel hooks."
+
+msgid "[in] Maintained trace kind."
+msgstr "[in] Maintained trace kind."
+
+msgid "[in] Opaque task identity, never a dereference license."
+msgstr "[in] Opaque task identity, never a dereference license."
+
+msgid "[in] Optional caller-defined numeric diagnostic."
+msgstr "[in] Optional caller-defined numeric diagnostic."
+
+msgid "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
+msgstr "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
+
+msgid "[inout] Zero/live-free metadata in protected linker RAM."
+msgstr "[inout] Zero/live-free metadata in protected linker RAM."
+
+msgid "[in] Validated user entry, stack and data mappings."
+msgstr "[in] Validated user entry, stack and data mappings."
+
+msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission."
+msgstr "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission."
+
+msgid "One privileged lifecycle owner stops external access first. Single-core kernel deletion removes scheduler references synchronously. Self deletion is rejected; no hidden reaper."
+msgstr "One privileged lifecycle owner stops external access first. Single-core kernel deletion removes scheduler references synchronously. Self deletion is rejected; no hidden reaper."
+
+msgid "[inout] Owned live protected metadata; never the calling task."
+msgstr "[inout] Owned live protected metadata; never the calling task."
+
+msgid "Success, INVALID, CONTEXT or STATE with storage retained."
+msgstr "Success, INVALID, CONTEXT or STATE with storage retained."
+
+msgid "Zero-initialize in privileged RAM. The TCB includes the real port's context and syscall stack, inaccessible to users. One privileged lifecycle owner serializes start/delete."
+msgstr "Zero-initialize in privileged RAM. The TCB includes the real port's context and syscall stack, inaccessible to users. One privileged lifecycle owner serializes start/delete."
+
+msgid "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
+msgstr "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
+
+msgid "Privileged unmasked running Thread; task stack quiescent throughout the scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies TCB/stack identity, not size. The original capacity is a caller contract. No task suspend, interrupt mask, allocation or live painting is performed. Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. The POSIX kernel port uses a separate pthread execution stack; its query is not an MCU or Linux execution-stack peak measurement."
+msgstr "Privileged unmasked running Thread; task stack quiescent throughout the scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies TCB/stack identity, not size. The original capacity is a caller contract. No task suspend, interrupt mask, allocation or live painting is performed. Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. The POSIX kernel port uses a separate pthread execution stack; its query is not an MCU or Linux execution-stack peak measurement."
+
+msgid "[in] Exact original TCB, stack and capacity, all live."
+msgstr "[in] Exact original TCB, stack and capacity, all live."
+
+msgid "[out] Distinct output, unchanged on rejection."
+msgstr "[out] Distinct output, unchanged on rejection."
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
+msgstr "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
+
+msgid "The caller retains all storage, excludes delete/join/discard and never replaces the live binding. This is not a registry."
+msgstr "The caller retains all storage, excludes delete/join/discard and never replaces the live binding. This is not a registry."
+
+msgid "Thread only with a running scheduler. No handle or pointer crosses the boundary. This is not a microsecond deadline."
+msgstr "Thread only with a running scheduler. No handle or pointer crosses the boundary. This is not a microsecond deadline."
+
+msgid "[in] Relative kernel ticks; zero requests rescheduling."
+msgstr "[in] Relative kernel ticks; zero requests rescheduling."
+
+msgid "Thread-only MPU profile service, distinct from Core time. No object, memory, I/O or privilege-changing API exists."
+msgstr "Thread-only MPU profile service, distinct from Core time. No object, memory, I/O or privilege-changing API exists."
+
+msgid "Current kernel tick count in the selected OS clock domain."
+msgstr "Current kernel tick count in the selected OS clock domain."
+
+msgid "A maintained SoC binding or application implementation overrides the weak NULL default. The port and context remain live throughout the scheduler; no runtime rebinding, hidden pool or worker is provided. Absence of a port never stops ticks or sleeps."
+msgstr "A maintained SoC binding or application implementation overrides the weak NULL default. The port and context remain live throughout the scheduler; no runtime rebinding, hidden pool or worker is provided. Absence of a port never stops ticks or sleeps."
+
+msgid "Stable port or NULL to leave normal periodic ticking."
+msgstr "Stable port or NULL to leave normal periodic ticking."
+
+msgid "Called only by Idle with scheduler suspended. Uses reviewed masked shallow WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The configured tick rate must divide 1000000 exactly. The final kernel readiness check precedes tick pause; a rejected pause makes no changes. Default profiles do not call this hook. HIL must verify the concrete timer, clock continuity and actual wake latency."
+msgstr "Called only by Idle with scheduler suspended. Uses reviewed masked shallow WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The configured tick rate must divide 1000000 exactly. The final kernel readiness check precedes tick pause; a rejected pause makes no changes. Default profiles do not call this hook. HIL must verify the concrete timer, clock continuity and actual wake latency."
+
+msgid "[in] Kernel's bounded next-unblock window."
+msgstr "[in] Kernel's bounded next-unblock window."
+
+msgid "Clock value; clock_gettime failure is process-fatal"
+msgstr "Clock value; clock_gettime failure is process-fatal"
+
+msgid "Task context; POSIX signal handlers are unsupported."
+msgstr "Task context; POSIX signal handlers are unsupported."
+
+msgid "[out] Storage kept alive through all publishers"
+msgstr "[out] Storage kept alive through all publishers"
+
+msgid "NX_SUCCESS or an initialization error"
+msgstr "NX_SUCCESS or an initialization error"
+
+msgid "Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for untimed waiting"
+msgstr "Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for untimed waiting"
+
+msgid "Stop and join publishers first. The check cannot authorize a future call to race destruction. No storage access is allowed afterward."
+msgstr "Stop and join publishers first. The check cannot authorize a future call to race destruction. No storage access is allowed afterward."
+
+msgid "[inout] Live storage with no future publishers"
+msgstr "[inout] Live storage with no future publishers"
+
+msgid "NX_SUCCESS or BUSY when a waiter is still registered"
+msgstr "NX_SUCCESS or BUSY when a waiter is still registered"
+
+msgid "Task context; caller keeps buffer until successful destroy."
+msgstr "Task context; caller keeps buffer until successful destroy."
+
+msgid "[out] Unused caller storage"
+msgstr "[out] Unused caller storage"
+
+msgid "[in] Caller-owned byte buffer"
+msgstr "[in] Caller-owned byte buffer"
+
+msgid "[in] Number of items, greater than zero"
+msgstr "[in] Number of items, greater than zero"
+
+msgid "[in] Bytes per item, greater than zero"
+msgstr "[in] Bytes per item, greater than zero"
+
+msgid "NX_SUCCESS or invalid/initialization error"
+msgstr "NX_SUCCESS or invalid/initialization error"
+
+msgid "Immediately available capacity is used even at an expired deadline. A finite deadline bounds waiting; spurious wakes never restart its budget. No item is retained on failure."
+msgstr "Immediately available capacity is used even at an expired deadline. A finite deadline bounds waiting; spurious wakes never restart its budget. No item is retained on failure."
+
+msgid "[in] At least item_size bytes, borrowed during call only"
+msgstr "[in] At least item_size bytes, borrowed during call only"
+
+msgid "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
+msgstr "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
+
+msgid "SUCCESS, TIMEOUT, STATE (closed) or error"
+msgstr "SUCCESS, TIMEOUT, STATE (closed) or error"
+
+msgid "An immediately available item can be received at an expired deadline. On failure the output is unchanged. Closed queues return STATE only after existing items have been drained."
+msgstr "An immediately available item can be received at an expired deadline. On failure the output is unchanged. Closed queues return STATE only after existing items have been drained."
+
+msgid "[out] At least item_size bytes; valid only on SUCCESS"
+msgstr "[out] At least item_size bytes; valid only on SUCCESS"
+
+msgid "Task context; caller must join queue users before destroy."
+msgstr "Task context; caller must join queue users before destroy."
+
+msgid "NX_SUCCESS or invalid error"
+msgstr "NX_SUCCESS or invalid error"
+
+msgid "[inout] Closed queue, no future users"
+msgstr "[inout] Closed queue, no future users"
+
+msgid "NX_SUCCESS or BUSY if users/items remain"
+msgstr "NX_SUCCESS or BUSY if users/items remain"
+
+msgid "Task context. No default task, pool or hidden stack exists. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence."
+msgstr "Task context. No default task, pool or hidden stack exists. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence."
+
+msgid "[out] Zero-initialized unused caller handle"
+msgstr "[out] Zero-initialized unused caller handle"
+
+msgid "[in] Aligned storage accepted by pthread_attr_setstack"
+msgstr "[in] Aligned storage accepted by pthread_attr_setstack"
+
+msgid "[in] Host stack size, at least PTHREAD_STACK_MIN"
+msgstr "[in] Host stack size, at least PTHREAD_STACK_MIN"
+
+msgid "[in] Returning bounded application entry"
+msgstr "[in] Returning bounded application entry"
+
+msgid "[in] Entry context, kept alive until join"
+msgstr "[in] Entry context, kept alive until join"
+
+msgid "NX_SUCCESS or invalid/start error"
+msgstr "NX_SUCCESS or invalid/start error"
+
+msgid "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage."
+msgstr "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage."
+
+msgid "[inout] Started task; caller must not be the joined task"
+msgstr "[inout] Started task; caller must not be the joined task"
+
+msgid "NX_SUCCESS only after pthread_join confirms execution exit"
+msgstr "NX_SUCCESS only after pthread_join confirms execution exit"
+
+msgid "Initialize/destroy have one external lifecycle owner. Stop and join all publishers and the waiter before destroy. External pthread_cancel of a caller blocked in these APIs is unsupported; use cooperative stop, publish and join."
+msgstr "Initialize/destroy have one external lifecycle owner. Stop and join all publishers and the waiter before destroy. External pthread_cancel of a caller blocked in these APIs is unsupported; use cooperative stop, publish and join."
+
+msgid "One lifecycle owner initializes, closes and destroys. Multiple producers/consumers are supported while live. External pthread_cancel of blocked users is unsupported."
+msgstr "One lifecycle owner initializes, closes and destroys. Multiple producers/consumers are supported while live. External pthread_cancel of blocked users is unsupported."
+
+msgid "Start/join are serialized by one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
+msgstr "Start/join are serialized by one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
+
+msgid "Secure privileged Thread startup/exclusive lifecycle owner. Both memory spans must be Secure, writable and disjoint. No NS task may run against this identity during prepare. Repeat prepare is rejected; epochs are never reset. No allocation, kernel operation or runtime registry is used."
+msgstr "Secure privileged Thread startup/exclusive lifecycle owner. Both memory spans must be Secure, writable and disjoint. No NS task may run against this identity during prepare. Repeat prepare is rejected; epochs are never reset. No allocation, kernel operation or runtime registry is used."
+
+msgid "[out] Zero-initialized caller-owned Secure metadata."
+msgstr "[out] Zero-initialized caller-owned Secure metadata."
+
+msgid "[in] Eight-byte-aligned Secure writable stack allocation."
+msgstr "[in] Eight-byte-aligned Secure writable stack allocation."
+
+msgid "[in] Whole allocation, including eight-byte upper seal."
+msgstr "[in] Whole allocation, including eight-byte upper seal."
+
+msgid "[in] Opaque NS task identity, never dereferenced here."
+msgstr "[in] Opaque NS task identity, never dereferenced here."
+
+msgid "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
+msgstr "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
+
+msgid "Secure lifecycle owner only after joining the previous task and stopping every observer. Existing stack is reused; stale handles remain invalid after the next allocation."
+msgstr "Secure lifecycle owner only after joining the previous task and stopping every observer. Existing stack is reused; stale handles remain invalid after the next allocation."
+
+msgid "[inout] Prepared, unleased and unloaded Secure metadata."
+msgstr "[inout] Prepared, unleased and unloaded Secure metadata."
+
+msgid "[in] New trusted NS task identity."
+msgstr "[in] New trusted NS task identity."
+
+msgid "Secure application overrides the weak NULL default with an immutable mapping. Called with both PRIMASK states held; never dereference an NS-provided metadata pointer, allocate, block, discover objects, call a kernel or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this mechanism does not authenticate an adversarial NS privileged kernel. NS Thread calls cannot spoof Handler origin."
+msgstr "Secure application overrides the weak NULL default with an immutable mapping. Called with both PRIMASK states held; never dereference an NS-provided metadata pointer, allocate, block, discover objects, call a kernel or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this mechanism does not authenticate an adversarial NS privileged kernel. NS Thread calls cannot spoof Handler origin."
+
+msgid "[in] Opaque identity supplied by the trusted NS kernel."
+msgstr "[in] Opaque identity supplied by the trusted NS kernel."
+
+msgid "Prepared caller-owned metadata, or NULL when unauthorized."
+msgstr "Prepared caller-owned metadata, or NULL when unauthorized."
+
+msgid "Secure application may override to record/reset safely. Called with both masks held; must not return, block, call a kernel or release retained storage. Default holds masks and spins. No transport or product recovery policy is imposed."
+msgstr "Secure application may override to record/reset safely. Called with both masks held; must not return, block, call a kernel or release retained storage. Default holds masks and spins. No transport or product recovery policy is imposed."
+
+msgid "[in] Seal or stack invariant violation."
+msgstr "[in] Seal or stack invariant violation."
+
+msgid "Zero-initialize before prepare. Fields are mechanism-owned while prepared; applications cannot modify them. Metadata and stack remain alive until the task is joined, lease freed and no loaded context remains. Runtime Secure stack capacity is an application budget, not this port minimum."
+msgstr "Zero-initialize before prepare. Fields are mechanism-owned while prepared; applications cannot modify them. Metadata and stack remain alive until the task is joined, lease freed and no loaded context remains. Runtime Secure stack capacity is an application budget, not this port minimum."
+
+msgid "Privileged, single-core, current-security-domain APIs. All controls start zeroed and remain adapter-owned while live. One external lifecycle owner serializes init/destroy and joins; publishers, queue callers and IRQ sources must quiesce before reclaiming storage. Runtime task operations require unmasked Thread mode and a running kernel. Actual bootstrap permits object init, task create/discard and wake; it does not permit blocking waits or queue operations. A manual mask, ISR or unsupported context returns CONTEXT before mutation. The byte queue's task threshold guard rejects foreign priority-zero time-sliced callers. Caller controls, stack ranges, full borrowed name/context objects, queue payloads, item buffers and waiters must be disjoint. Cold admission rejects known control/stack/payload overlap and name/context starting inside control or stack; unknown opaque extents remain the caller's responsibility. Never operate a closable queue through its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is an actual unbounded kernel wait. Timeout never revokes any accepted I/O borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are outside this backend scope."
+msgstr "Privileged, single-core, current-security-domain APIs. All controls start zeroed and remain adapter-owned while live. One external lifecycle owner serializes init/destroy and joins; publishers, queue callers and IRQ sources must quiesce before reclaiming storage. Runtime task operations require unmasked Thread mode and a running kernel. Actual bootstrap permits object init, task create/discard and wake; it does not permit blocking waits or queue operations. A manual mask, ISR or unsupported context returns CONTEXT before mutation. The byte queue's task threshold guard rejects foreign priority-zero time-sliced callers. Caller controls, stack ranges, full borrowed name/context objects, queue payloads, item buffers and waiters must be disjoint. Cold admission rejects known control/stack/payload overlap and name/context starting inside control or stack; unknown opaque extents remain the caller's responsibility. Never operate a closable queue through its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is an actual unbounded kernel wait. Timeout never revokes any accepted I/O borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are outside this backend scope."
+
+msgid "Privileged cold Thread/MSP, no live FP context or masks. Startup may create and discard unused static objects. After startup returns, the bootstrap scope is sealed. Only the trusted kernel may call adapter tx_application_define; it validates canonical privileged Thread context before the product callback. This is not a security isolation API. An unexpected kernel return invokes fail-stop and retains all effects; it never reopens bootstrap reclamation."
+msgstr "Privileged cold Thread/MSP, no live FP context or masks. Startup may create and discard unused static objects. After startup returns, the bootstrap scope is sealed. Only the trusted kernel may call adapter tx_application_define; it validates canonical privileged Thread context before the product callback. This is not a security isolation API. An unexpected kernel return invokes fail-stop and retains all effects; it never reopens bootstrap reclamation."
+
+msgid "[in] Product initialization inside tx_application_define"
+msgstr "[in] Product initialization inside tx_application_define"
+
+msgid "[in] Borrowed through startup and kernel lifetime"
+msgstr "[in] Borrowed through startup and kernel lifetime"
+
+msgid "CONTEXT or INVALID before entry; successful entry never returns"
+msgstr "CONTEXT or INVALID before entry; successful entry never returns"
+
+msgid "Actual fault context is not repaired or normalized; it may be masked, ISR or unprivileged. Do not assume a working kernel, clock, stack or permission to access a peripheral. The adapter observes the Core fault hook before this hook. Product owns separately reviewed safe output/reset actions. Returning does not authorize cleanup; the adapter parks."
+msgstr "Actual fault context is not repaired or normalized; it may be masked, ISR or unprivileged. Do not assume a working kernel, clock, stack or permission to access a peripheral. The adapter observes the Core fault hook before this hook. Product owns separately reviewed safe output/reset actions. Returning does not authorize cleanup; the adapter parks."
+
+msgid "[in] Context, permanent-entry or kernel-return failure"
+msgstr "[in] Context, permanent-entry or kernel-return failure"
+
+msgid "Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer clock and IRQ ceiling; it must not change the platform's continuous monotonic clock. Missing hook fails linking. Failure enters retaining fail-stop."
+msgstr "Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer clock and IRQ ceiling; it must not change the platform's continuous monotonic clock. Missing hook fails linking. Failure enters retaining fail-stop."
+
+msgid "[in] Exact immutable resolved kernel frequency"
+msgstr "[in] Exact immutable resolved kernel frequency"
+
+msgid "SUCCESS after binding a real bounded periodic IRQ source"
+msgstr "SUCCESS after binding a real bounded periodic IRQ source"
+
+msgid "Native has no hardware IRQ source and returns false."
+msgstr "Native has no hardware IRQ source and returns false."
+
+msgid "True only in a privileged unmasked reviewed external IRQ"
+msgstr "True only in a privileged unmasked reviewed external IRQ"
+
+msgid "[inout] Zeroed caller control retained until destroy"
+msgstr "[inout] Zeroed caller control retained until destroy"
+
+msgid "SUCCESS, INVALID, CONTEXT or IO"
+msgstr "SUCCESS, INVALID, CONTEXT or IO"
+
+msgid "Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration precedes a changed sequence."
+msgstr "Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration precedes a changed sequence."
+
+msgid "[inout] Live latch retained through every port user"
+msgstr "[inout] Live latch retained through every port user"
+
+msgid "Wait face; empty face for null or non-live control"
+msgstr "Wait face; empty face for null or non-live control"
+
+msgid "[inout] Live caller latch"
+msgstr "[inout] Live caller latch"
+
+msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
+msgstr "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
+
+msgid "No adapter heap or worker. Name is borrowed, not copied. Linux uses its own pthread stack; the caller buffer only validates kernel metadata and is not a host stack budget. Higher-priority entries may run before start returns."
+msgstr "No adapter heap or worker. Name is borrowed, not copied. Linux uses its own pthread stack; the caller buffer only validates kernel metadata and is not a host stack budget. Higher-priority entries may run before start returns."
+
+msgid "[inout] Zeroed caller TCB/control, retained until join/discard"
+msgstr "[inout] Zeroed caller TCB/control, retained until join/discard"
+
+msgid "[in] Borrowed immutable name, retained until reclamation"
+msgstr "[in] Borrowed immutable name, retained until reclamation"
+
+msgid "[in] Eight-byte aligned caller storage"
+msgstr "[in] Eight-byte aligned caller storage"
+
+msgid "[in] Actual capacity, at least TX_MINIMUM_STACK"
+msgstr "[in] Actual capacity, at least TX_MINIMUM_STACK"
+
+msgid "[in] ThreadX priority; smaller values run first"
+msgstr "[in] ThreadX priority; smaller values run first"
+
+msgid "[in] Returns only after application stop/drain"
+msgstr "[in] Returns only after application stop/drain"
+
+msgid "[in] Borrowed until successful join/discard"
+msgstr "[in] Borrowed until successful join/discard"
+
+msgid "SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if reclamation cannot be established"
+msgstr "SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if reclamation cannot be established"
+
+msgid "Self-join is rejected. Timeout retains task, borrowed name, stack and context. Completion hint alone never reclaims; successful real kernel deletion establishes detachment."
+msgstr "Self-join is rejected. Timeout retains task, borrowed name, stack and context. Completion hint alone never reclaims; successful real kernel deletion establishes detachment."
+
+msgid "[inout] Live caller task, one external joiner only"
+msgstr "[inout] Live caller task, one external joiner only"
+
+msgid "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
+msgstr "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
+
+msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
+msgstr "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
+
+msgid "This is prestart rollback, never runtime cancellation."
+msgstr "This is prestart rollback, never runtime cancellation."
+
+msgid "[inout] Live task whose entry has never begun"
+msgstr "[inout] Live task whose entry has never begun"
+
+msgid "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
+msgstr "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
+
+msgid "Eight-byte stack alignment; failure can retain live state."
+msgstr "Eight-byte stack alignment; failure can retain live state."
+
+msgid "[inout] Zeroed caller control, retained until reset"
+msgstr "[inout] Zeroed caller control, retained until reset"
+
+msgid "[in] Borrowed immutable name, retained until reset"
+msgstr "[in] Borrowed immutable name, retained until reset"
+
+msgid "[in] Aligned caller buffer, retained until reset"
+msgstr "[in] Aligned caller buffer, retained until reset"
+
+msgid "[in] Smaller ThreadX priority values run first"
+msgstr "[in] Smaller ThreadX priority values run first"
+
+msgid "[in] Never returns; return invokes retaining fail-stop"
+msgstr "[in] Never returns; return invokes retaining fail-stop"
+
+msgid "[in] Borrowed until reset"
+msgstr "[in] Borrowed until reset"
+
+msgid "[in] Caller payload storage retained until destroy"
+msgstr "[in] Caller payload storage retained until destroy"
+
+msgid "[in] Exact depth multiplied by item_size"
+msgstr "[in] Exact depth multiplied by item_size"
+
+msgid "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
+msgstr "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
+
+msgid "[in] Positive byte count, without word-size narrowing"
+msgstr "[in] Positive byte count, without word-size narrowing"
+
+msgid "[inout] Live queue retained throughout the operation"
+msgstr "[inout] Live queue retained throughout the operation"
+
+msgid "[in] Exactly item_size readable bytes borrowed until return"
+msgstr "[in] Exactly item_size readable bytes borrowed until return"
+
+msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
+msgstr "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
+
+msgid "[out] Exactly item_size writable bytes borrowed until return"
+msgstr "[out] Exactly item_size writable bytes borrowed until return"
+
+msgid "[inout] Live caller control and storage"
+msgstr "[inout] Live caller control and storage"
+
+msgid "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
+msgstr "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
+
+msgid "[inout] Zeroed caller storage retained until waiter destroy"
+msgstr "[inout] Zeroed caller storage retained until waiter destroy"
+
+msgid "[inout] Live caller latch with no concurrent users"
+msgstr "[inout] Live caller latch with no concurrent users"
+
+msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO"
+msgstr "SUCCESS, INVALID, CONTEXT, BUSY or IO"
+
+msgid "Payload size and maximum_waiters bound task scheduling pause; the entire copy/broadcast does not mask interrupts."
+msgstr "Payload size and maximum_waiters bound task scheduling pause; the entire copy/broadcast does not mask interrupts."
+
+msgid "[in] Positive capacity below TX_WAIT_FOREVER"
+msgstr "[in] Positive capacity below TX_WAIT_FOREVER"
+
+msgid "[in] Positive exact payload byte count"
+msgstr "[in] Positive exact payload byte count"
+
+msgid "[in] Positive maximum simultaneous operations"
+msgstr "[in] Positive maximum simultaneous operations"
+
+msgid "[inout] Live close-aware queue"
+msgstr "[inout] Live close-aware queue"
+
+msgid "SUCCESS, INVALID or CONTEXT; close is idempotent"
+msgstr "SUCCESS, INVALID or CONTEXT; close is idempotent"
+
+msgid "A closed queue rejects sends without changing payload."
+msgstr "A closed queue rejects sends without changing payload."
+
+msgid "[inout] Live exclusive latch for this simultaneous call"
+msgstr "[inout] Live exclusive latch for this simultaneous call"
+
+msgid "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
+msgstr "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
+
+msgid "Closed and empty returns CANCELLED; failure leaves output."
+msgstr "Closed and empty returns CANCELLED; failure leaves output."
+
+msgid "[inout] Live control and its borrowed payload storage"
+msgstr "[inout] Live control and its borrowed payload storage"
+
+msgid "Applications implement these symbols only when the authored OS policy enables them. No weak timer/counter fallback is supplied. The platform never invents timer wiring."
+msgstr "Applications implement these symbols only when the authored OS policy enables them. No weak timer/counter fallback is supplied. The platform never invents timer wiring."
+
+msgid "Scheduler startup calls this in its canonical masked, privileged context. Configure a periodic interrupt, clear pending state and route it to the selected kernel Tick handler at its validated priority. Do not start tasks here. Hardware clock and routing remain application/SoC-owned."
+msgstr "Scheduler startup calls this in its canonical masked, privileged context. Configure a periodic interrupt, clear pending state and route it to the selected kernel Tick handler at its validated priority. Do not start tasks here. Hardware clock and routing remain application/SoC-owned."
+
+msgid "[in] Exact authored Tick frequency in hertz"
+msgstr "[in] Exact authored Tick frequency in hertz"
+
+msgid "Called during scheduler startup. Counter initialization must be bounded, allocation-free and safe in the startup mask."
+msgstr "Called during scheduler startup. Counter initialization must be bounded, allocation-free and safe in the startup mask."
+
+msgid "Called by the kernel during context switches. It must be bounded, allocation-free and safe in interrupt/critical context. Configure a frequency above Tick frequency and account for wrapping when interpreting recorded totals."
+msgstr "Called by the kernel during context switches. It must be bounded, allocation-free and safe in interrupt/critical context. Configure a frequency above Tick frequency and account for wrapping when interpreting recorded totals."
+
+msgid "Monotonic modulo-32-bit counter in application-defined units"
+msgstr "Monotonic modulo-32-bit counter in application-defined units"
+
+msgid "Task context. No service, queue, callback dispatch or task creation is implicit. A shared-bus client must not use ready to service the controller; its execution owner must remain running during stop/drain."
+msgstr "Task context. No service, queue, callback dispatch or task creation is implicit. A shared-bus client must not use ready to service the controller; its execution owner must remain running during stop/drain."
+
+msgid "[in] Live single-waiter notification port"
+msgstr "[in] Live single-waiter notification port"
+
+msgid "[in] Bounded predicate, called in caller context"
+msgstr "[in] Bounded predicate, called in caller context"
+
+msgid "[in] Predicate context, retained for this call only"
+msgstr "[in] Predicate context, retained for this call only"
+
+msgid "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no wall-clock or relative values"
+msgstr "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no wall-clock or relative values"
+
+msgid "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
+msgstr "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"

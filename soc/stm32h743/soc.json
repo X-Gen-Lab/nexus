@@ -302,6 +302,89 @@
       "core_hz": 64000000,
       "apb1_hz": 64000000,
       "apb2_hz": 64000000
+    },
+    "hsi64-pll384-cache-off": {
+      "source": "hsi",
+      "input_hz": 64000000,
+      "input_min_hz": 62000000,
+      "input_max_hz": 65000000,
+      "reviewed_revision_ids": [
+        8195
+      ],
+      "domains": {
+        "cpu": {
+          "source": "pll1p",
+          "nominal_hz": 384000000,
+          "minimum_hz": 364560000,
+          "maximum_hz": 397800000
+        },
+        "hclk": {
+          "source": "cpu",
+          "nominal_hz": 192000000,
+          "minimum_hz": 182280000,
+          "maximum_hz": 198900000
+        },
+        "apb1": {
+          "source": "hclk",
+          "nominal_hz": 96000000,
+          "minimum_hz": 91140000,
+          "maximum_hz": 99450000
+        },
+        "apb2": {
+          "source": "hclk",
+          "nominal_hz": 96000000,
+          "minimum_hz": 91140000,
+          "maximum_hz": 99450000
+        },
+        "apb3": {
+          "source": "hclk",
+          "nominal_hz": 96000000,
+          "minimum_hz": 91140000,
+          "maximum_hz": 99450000
+        },
+        "apb4": {
+          "source": "hclk",
+          "nominal_hz": 96000000,
+          "minimum_hz": 91140000,
+          "maximum_hz": 99450000
+        },
+        "tim2": {
+          "source": "hclk",
+          "nominal_hz": 192000000,
+          "minimum_hz": 182280000,
+          "maximum_hz": 198900000
+        },
+        "tim3": {
+          "source": "hclk",
+          "nominal_hz": 192000000,
+          "minimum_hz": 182280000,
+          "maximum_hz": 198900000
+        },
+        "usart3": {
+          "source": "hsi",
+          "nominal_hz": 64000000,
+          "minimum_hz": 62000000,
+          "maximum_hz": 65000000
+        },
+        "i2c1": {
+          "source": "hsi",
+          "nominal_hz": 64000000,
+          "minimum_hz": 62000000,
+          "maximum_hz": 65000000
+        },
+        "spi4": {
+          "source": "apb2",
+          "nominal_hz": 96000000,
+          "minimum_hz": 91140000,
+          "maximum_hz": 99450000
+        },
+        "adc12_input": {
+          "source": "per_ck",
+          "nominal_hz": 64000000,
+          "minimum_hz": 62000000,
+          "maximum_hz": 65000000
+        }
+      }
     }
   },
   "controllers": {
@@ -321,7 +404,9 @@
       "modes": [
         "irq-bytes",
         "dma-tx",
-        "rx-dma-idle"
+        "rx-dma-idle",
+        "irq-fifo-bytes",
+        "irq-fifo-rtscts-bytes"
       ],
       "irq": [
         "USART3_IRQn"
@@ -332,7 +417,9 @@
       "clock_hz": 64000000,
       "pins": [
         "PD8",
-        "PD9"
+        "PD9",
+        "PD11",
+        "PD12"
       ]
     },
     "GPIOE": {

@@ -1,6 +1,18 @@
 {
   "commit": "f5929f431f9effe45fbe18f5337e4753ced9ac92",
   "files": {
+    "Inc/Legacy/stm32_hal_legacy.h": {
+      "bytes": 238453,
+      "sha256": "97a63cd0d7e27f692d92f475179ea949751f790a08b7d80fb5f611792be98236"
+    },
+    "Inc/stm32g4xx_hal_def.h": {
+      "bytes": 6966,
+      "sha256": "adcb12d4eeb391241481a75f738f81dc7c186abe0ded173da3a1191803658eb7"
+    },
+    "Inc/stm32g4xx_hal_fdcan.h": {
+      "bytes": 79977,
+      "sha256": "085076ee896219babd0801c0f8c3a97b65e5ae2cb88c78f6b43124925deb1c56"
+    },
     "Inc/stm32g4xx_ll_adc.h": {
       "bytes": 530084,
       "sha256": "c76242a6b0786d4f4f9f8c1b534350702cbf98b154f654d4b53d0684e92493a9"
@@ -37,5 +49,5 @@
   "release": "STM32CubeG4-v1.6.3-pinned-driver",
   "repository": "https://github.com/STMicroelectronics/stm32g4xx_hal_driver.git",
   "schema_version": 1,
-  "selected_api": "stm32g474-ll-inline"
+  "selected_api": "stm32g474-ll-inline-fdcan-definitions"
 }

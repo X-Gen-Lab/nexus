@@ -104,8 +104,9 @@ struct nx_i2c_endpoint {
  *
  * \param[in]       deadline: Finite absolute provider-clock deadline.
  *
- * \param[out]      transferred: Completed byte prefix across messages,
- *                  including error returns.
+ * \param[out]      transferred: Provider byte progress across messages,
+ *                  including error returns. TX may count bytes handed to the
+ *                  data register before their wire/ACK outcome is known.
  *
  * \return          Success or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY/TIMEOUT/
  *                  NACK/ARBITRATION/IO. Each message has

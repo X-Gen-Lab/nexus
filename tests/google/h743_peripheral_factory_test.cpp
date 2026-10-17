@@ -6,15 +6,20 @@
  * \date            2026-10-16
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "h743_flash_fixture.h"
 #include "h743_peripheral_factory_model.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 #include "stm32h743_provider.h"
+#include <cstdlib>
 #include <gtest/gtest.h>
 class H743PeripheralFactory : public testing::Test {
   protected:
     void SetUp() override {
         nx_h743_model_reset();
+        nexus_test::h743_fixture::ResetExternalCpu();
+        PWR->D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
+        PWR->CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
         g_h743_model.pwm = TIM3;
         g_h743_model.spi = SPI4;
         g_h743_model.adc = ADC1;
@@ -24,8 +29,13 @@ class H743PeripheralFactory : public testing::Test {
         IWDG1->WINR = IWDG1->RLR = 4095U;
     }
     void TearDown() override {
-        g_h743_model.ignore_write = nullptr;
-        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+        EXPECT_EQ(nullptr, g_h743_model.ignore_write);
+        const nx_result_t stopped = nx_platform_stop();
+        EXPECT_EQ(NX_SUCCESS, stopped);
+        if (stopped != NX_SUCCESS)
+            std::abort();
+        nexus_test::h743_fixture::CheckedStop(
+            nexus_test::h743_ram::cpu.execution);
     }
 };
 TEST_F(H743PeripheralFactory, ColdTypedLookupHasNoHardwareEffects) {
@@ -38,6 +48,49 @@ TEST_F(H743PeripheralFactory, ColdTypedLookupHasNoHardwareEffects) {
     EXPECT_NE(nullptr, nx_factory_watchdog(NX_WATCHDOG_ID_WATCHDOG0));
     EXPECT_EQ(0U, g_h743_model.reads);
     EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743PeripheralFactory, SelectedFlashAcquiresAndRestoresOnlyItsDelay) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_0, FLASH->ACR);
+    ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS, FLASH->ACR);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+}
+TEST_F(H743PeripheralFactory, RefusedFlashTimingAcquireRollsBackTheSystem) {
+    g_h743_model.ignore_write = &FLASH->ACR;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_EQ(0U, TIM2->CR1 & TIM_CR1_CEN);
+    EXPECT_EQ(0U, RCC->APB1LENR & RCC_APB1LENR_TIM2EN);
+    EXPECT_EQ(0U, g_h743_model.gpio_writes);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+}
+TEST_F(H743PeripheralFactory, RefusedTimingRestoreRetainsTheLiveSystem) {
+    ASSERT_EQ(NX_SUCCESS, nx_platform_start().primary);
+    g_h743_model.ignore_write = &FLASH->ACR;
+    EXPECT_EQ(NX_ERROR_IO, nx_platform_stop());
+    EXPECT_TRUE(g_nx_stm32h743_system.started);
+    EXPECT_NE(0U, TIM2->CR1 & TIM_CR1_CEN);
+    EXPECT_NE(0U, RCC->APB1LENR & RCC_APB1LENR_TIM2EN);
+    EXPECT_EQ(FLASH_ACR_WRHIGHFREQ_0, FLASH->ACR & FLASH_ACR_WRHIGHFREQ);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS, FLASH->ACR);
+}
+TEST_F(H743PeripheralFactory, UnsettledFlashVoltageRejectsBeforeDeviceSetup) {
+    PWR->CSR1 = PWR_CSR1_ACTVOS_1 | PWR_CSR1_ACTVOSRDY;
+    const auto result = nx_platform_start();
+    EXPECT_EQ(NX_ERROR_STATE, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_EQ(0U, result.remaining_effects);
+    EXPECT_FALSE(g_nx_stm32h743_system.started);
+    EXPECT_EQ(0U, g_h743_model.gpio_writes);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS, FLASH->ACR);
 }
 TEST_F(H743PeripheralFactory, AllConcreteProvidersAndEndpointPinsAreAssembled) {
     auto result = nx_platform_start();

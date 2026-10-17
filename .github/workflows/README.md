@@ -1,6 +1,7 @@
 # Maintained platform workflows
 
-`ci.yml` gates main/develop PRs, maintained branch pushes, nightly and manual runs.
+`ci.yml` gates all PR base branches, main/develop and `codex/**`/`feat/**`
+pushes, nightly and manual runs. Stacked PRs run the same read-only checks.
 Required-job aggregation rejects failed/cancelled results and unjustified skips.
 Workflow edits require build, tool, analyzer and documentation validation.
 

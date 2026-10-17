@@ -8,6 +8,8 @@ soc
 boards
 tests
 tools/measurement
+tools/testing/fixtures
+cmake/package/verification
 
 # External source and generated outputs are not maintained source.
 !ext

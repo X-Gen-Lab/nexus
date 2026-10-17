@@ -1,0 +1,252 @@
+#
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 034166864f0441b93f9cce3e7cc5b471700aaab623f989971ec03c3653a08743\n"
+
+msgid "H743 V-only high-clock profile"
+msgstr "H743 仅限 V 修订的高频配置"
+
+msgid "Use `hsi64-pll384-cache-off` when a cold STM32H743ZIT6 reference needs distinct CPU, bus and peripheral clock domains. This page explains the current fixed profile, its joint owner and failure boundaries. It covers V revision `0x2003` only, with Cache off. Physical HIL remains `not_executed`; software execution does not measure supply, junction temperature, clock accuracy or communication."
+msgstr "冷启动 STM32H743ZIT6 参考配置需要区分 CPU、总线与外设时钟域时，可选择 `hsi64-pll384-cache-off`。本页说明当前固定配置、统一 owner 及失败边界，仅覆盖 V 修订 `0x2003`，Cache 关闭。实板 HIL 仍为 `not_executed`；软件执行不能测量供电、结温、时钟精度或通信表现。"
+
+msgid "One assembly selects one clock owner"
+msgstr "一份装配选择一个时钟 owner"
+
+msgid "![FIG-05: current generated Platform lifecycle; arrows describe explicit startup, reverse cleanup and retained responsibilities](../assets/diagrams/platform-lifecycle.svg)"
+msgstr "![FIG-05：当前生成 Platform 的生命周期；箭头表示显式启动、逆序清理与保留责任](../assets/diagrams/platform-lifecycle.svg)"
+
+msgid "FIG-05: current generated Platform lifecycle; arrows describe explicit startup, reverse cleanup and retained responsibilities"
+msgstr "FIG-05：当前生成 Platform 的生命周期；箭头表示显式启动、逆序清理与保留责任"
+
+msgid "FIG-05 describes the common Platform lifecycle. For this exact reference, its SoC startup expands to clock owner, System timebase and selected consumers, in that order. The reverse path must withdraw consumers and System before the clock owner. The diagram is not a frequency-transition sequence or physical proof; the exact clock stages below specialize its lifecycle responsibilities."
+msgstr "FIG-05 描述通用 Platform 生命周期。对本精确参考配置，SoC 启动依次展开为时钟 owner、System 时基和选定 consumer。逆向路径必须先撤销 consumer 与 System，再撤销时钟 owner。该图不是调频时序或物理证明；下文的精确时钟阶段细化了图中的生命周期责任。"
+
+msgid "One TOML `clock` selection resolves through reviewed [SoC facts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/soc.json) into immutable clock-domain IR. The generated bundle selects the private implementation and CMake selects its translation unit. The typed factory still returns existing static faces without MMIO, allocation, clock setup or discovery. Runtime calls enter the selected provider directly through its shared read-only operations table."
+msgstr "一项 TOML `clock` 选择经已审[SoC 事实](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/soc.json)解析为不可变时钟域 IR。生成 bundle 选择私有实现，CMake 选择其编译单元。typed factory 仍只返回已有静态 face，不执行 MMIO、分配、时钟设置或探测。运行调用通过共享只读方法表直接进入选定 provider。"
+
+msgid "The [private clock contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/private/stm32h743_clock.h) owns admission and clock responsibility. [System](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/system.c) owns TIM2 and its vector. The generated [lifecycle glue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/providers/stm32h743/emission.py) orders them and preserves startup and cleanup diagnostics. Their effect masks are different namespaces; the platform projects retained responsibility without treating the numeric masks as interchangeable."
+msgstr "[私有时钟合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/private/stm32h743_clock.h)负责准入与时钟责任，[System](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/system.c)负责 TIM2 及其向量。生成的[生命周期装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/providers/stm32h743/emission.py)规定调用顺序并保留启动、清理诊断。两者的 effect mask 属于不同命名空间；平台投影仍保留的责任，不能把数值 mask 当作可互换标识。"
+
+msgid "Admit an exact cold configuration"
+msgstr "准入精确的冷态配置"
+
+msgid "Automatic high-profile admission requires DEV_ID `0x450`, REV_ID `0x2003` (V) and the factory-default HSI user trim. ES0392 Rev15 Table 2 maps `0x1003` to both Y and W, and `0x2001` to X. The reviewed DS12110 Rev11 electrical chapter explicitly covers V; the Y/W ambiguity and lack of an explicitly reviewed X chapter prevent admitting those IDs. They and unknown revisions return `UNSUPPORTED` without acquiring effects. There is no automatic fallback or user-overridable revision allowlist."
+msgstr "高频配置的自动准入要求 DEV_ID `0x450`、REV_ID `0x2003`（V）及出厂默认 HSI 用户 trim。ES0392 Rev15 表 2 将 `0x1003` 同时映射到 Y/W，将 `0x2001` 映射到 X。已审 DS12110 Rev11 电气章节明确覆盖 V；Y/W 无法区分，X 又缺少明确审查对应的电气章节，因此不能准入这些 ID。它们与未知修订均返回 `UNSUPPORTED`，不取得效果。没有自动回退或可由用户覆盖的修订允许列表。"
+
+msgid "Startup requires the real reset-owned call sequence before SysTick, a scheduler, I/O or another clock owner has run. Matching register values cannot prove that history. The diagnostic deliberately avoids reading SysTick CTRL because its COUNTFLAG is read-clear; zero LOAD/VAL are not proof that ENABLE is clear. Bootloader adoption and runtime frequency scaling require separate contracts."
+msgstr "启动必须遵循实际由 reset owner 控制的调用顺序，发生在 SysTick、调度器、I/O 或其他时钟 owner 运行之前。寄存器值相符不能证明这些历史前提。诊断刻意不读取 SysTick CTRL，因为 COUNTFLAG 是读清位；LOAD/VAL 为零不能证明 ENABLE 已清零。接管 bootloader 和运行时调频需要独立合同。"
+
+msgid "Cold checks include ready LDO/VOS3, inactive Flash pulses and programming modes, reset PLL configuration, quiet consumers and known-clean disabled caches. Readable disabled cache bits do not prove that foreign dirty lines are absent. Supply, temperature, package and PCB cannot be qualified by IDCODE or readback."
+msgstr "冷态检查包括 LDO/VOS3 就绪、Flash 脉冲及编程模式未活动、PLL 配置处于复位值、consumer 静止，以及已知干净且关闭的 cache。可读的 cache 关闭位不能证明没有外来脏行。IDCODE 或读回不能建立供电、温度、封装及 PCB 的资格。"
+
+msgid "Keep clock domains and uncertainty separate"
+msgstr "分别表达时钟域与不确定度"
+
+msgid "The following are reviewed design bounds, not frequency measurements. CPU and PLL-derived domains include the conservative PLL-ready deviation in addition to the HSI envelope. Unmultiplied HSI kernels do not inherit that PLL multiplier."
+msgstr "下列数值是已审设计边界，不是频率测量值。CPU 与源于 PLL 的时钟域在 HSI 包络之外计入保守的 PLL-ready 偏差。未经倍频的 HSI kernel 不承担该 PLL 系数。"
+
+msgid "Domain"
+msgstr "时钟域"
+
+msgid "Nominal frequency"
+msgstr "名义频率"
+
+msgid "Reviewed design interval"
+msgstr "已审设计区间"
+
+msgid "Consumer responsibility"
+msgstr "consumer 责任"
+
+msgid "CPU"
+msgstr "CPU"
+
+msgid "384 MHz"
+msgstr "384 MHz"
+
+msgid "364.56..397.8 MHz"
+msgstr "364.56..397.8 MHz"
+
+msgid "PLL1P, M=10/N=120/P=2"
+msgstr "PLL1P，M=10/N=120/P=2"
+
+msgid "HCLK"
+msgstr "HCLK"
+
+msgid "192 MHz"
+msgstr "192 MHz"
+
+msgid "182.28..198.9 MHz"
+msgstr "182.28..198.9 MHz"
+
+msgid "CPU /2"
+msgstr "CPU /2"
+
+msgid "APB1..4"
+msgstr "APB1..4"
+
+msgid "96 MHz"
+msgstr "96 MHz"
+
+msgid "91.14..99.45 MHz"
+msgstr "91.14..99.45 MHz"
+
+msgid "HCLK /2"
+msgstr "HCLK /2"
+
+msgid "TIM2/TIM3"
+msgstr "TIM2/TIM3"
+
+msgid "Doubled APB timer kernel, not CPU frequency"
+msgstr "APB 倍频后的 timer kernel，不是 CPU 频率"
+
+msgid "USART3/I2C1"
+msgstr "USART3/I2C1"
+
+msgid "64 MHz"
+msgstr "64 MHz"
+
+msgid "62..65 MHz"
+msgstr "62..65 MHz"
+
+msgid "Explicit HSI kernel selectors"
+msgstr "显式 HSI kernel selector"
+
+msgid "SPI4"
+msgstr "SPI4"
+
+msgid "APB2; divider admission uses its upper bound"
+msgstr "APB2；分频准入使用其上界"
+
+msgid "ADC12 input"
+msgstr "ADC12 输入"
+
+msgid "per_ck from HSI; input selection is not ADC conversion setup"
+msgstr "per_ck 源自 HSI；输入选择不等于配置 ADC 转换"
+
+msgid "Selected ADC1 conversion"
+msgstr "选定 ADC1 转换"
+
+msgid "16 MHz"
+msgstr "16 MHz"
+
+msgid "15.5..16.25 MHz"
+msgstr "15.5..16.25 MHz"
+
+msgid "Provider selects async /4 after acquiring ADC12"
+msgstr "provider 取得 ADC12 后选择 async /4"
+
+msgid "The empty profile configures ADC12's input selector but does not initialize an ADC or its divider. TIM2 uses PSC191 for a nominal 1 MHz counter. A software millisecond remains an HSI-derived nominal interval; PSC383 would halve the counter rate and is rejected by the production-model tests. TIM3 likewise uses its actual 192 MHz kernel when admitting an integer tick divisor."
+msgstr "空配置设置 ADC12 输入 selector，但不初始化 ADC 或其分频器。TIM2 使用 PSC191 得到名义 1 MHz 计数器。软件毫秒仍是源于 HSI 的名义时间；PSC383 会使计数速率减半，真实生产模型测试会拒绝该错误。TIM3 同样使用实际 192 MHz kernel 准入整数 tick 分频。"
+
+msgid "Where the HSI envelope comes from"
+msgstr "HSI 包络的来源"
+
+msgid "[DS12110 Rev11](https://www.st.com/resource/en/datasheet/stm32h743vi.pdf) Table 134, page 232, gives V-cut factory HSI frequency 63.7..64.3 MHz at VDD 3.3 V and junction 30 °C. It separately specifies voltage drift −0.12..+0.03% over VDD 1.62..3.6 V and temperature drift −2..+1% over −40 °C..TJmax. Factory frequency limits use production testing; the full temperature drift uses characterization. These assurance levels remain distinct. The narrower −20..105 °C row is not the full-temperature envelope. Suffix 6 junction limits must not be confused with ambient limits or thermal dissipation."
+msgstr "[DS12110 Rev11](https://www.st.com/resource/en/datasheet/stm32h743vi.pdf)表 134、第 232 页给出 V 修订在 VDD 3.3 V、结温 30 °C 下的出厂 HSI 频率 63.7..64.3 MHz，并分别规定 VDD 1.62..3.6 V 下的电压漂移 −0.12..+0.03%，以及 −40 °C..TJmax 下的温度漂移 −2..+1%。出厂频率边界通过生产测试保证，完整温度漂移使用特性表征，二者保证程度不同。−20..105 °C 的较窄行不是完整温度包络；后缀 6 的结温边界不能与环境温度或热耗散条件混淆。"
+
+msgid "Conservative multiplicative endpoints are `63.7 × 0.98 × 0.9988 = 62.3510888 MHz` and `64.3 × 1.01 × 1.0003 = 64.9624829 MHz`. The additive lower estimate `63.7 − 64.3 × (0.02 + 0.0012)` is 62.33684 MHz. The selected 62..65 MHz interval covers these compositions; it is a reviewed engineering envelope, not a literal datasheet interval. RM0433 Rev9's PLL-ready deviation adds the conservative factor 0.98..1.02, yielding `62 × 6 × 0.98 = 364.56 MHz` through `65 × 6 × 1.02 = 397.8 MHz`. The design stays below the reviewed VOS1 CPU/HCLK/APB limits of 400/200/100 MHz. Different source assumptions require a new reviewed profile."
+msgstr "保守乘法端点为 `63.7 × 0.98 × 0.9988 = 62.3510888 MHz` 和 `64.3 × 1.01 × 1.0003 = 64.9624829 MHz`。加法下界估计 `63.7 − 64.3 × (0.02 + 0.0012)` 为 62.33684 MHz。选定 62..65 MHz 区间覆盖这些组合，是已审工程包络，不是数据手册原文区间。RM0433 Rev9 的 PLL-ready 偏差再计入保守系数 0.98..1.02，得到 `62 × 6 × 0.98 = 364.56 MHz` 至 `65 × 6 × 1.02 = 397.8 MHz`。设计保持低于已审 VOS1 的 CPU/HCLK/APB 上限 400/200/100 MHz；不同源假设需要新的已审配置。"
+
+msgid "Local UART arithmetic does not qualify a link"
+msgstr "本地 UART 算术不能建立链路资格"
+
+msgid "At requested 115200 baud, oversampling 16 and prescaler 1, the selected HSI64 kernel produces BRR556. Nominal baud is about 115107.914; the 62..65 MHz source envelope produces about 111510.791..116906.475 baud, or −3.202438..+1.481315% relative to the request. The lower endpoint already exceeds a hypothetical 2% local budget. Nominal divider accuracy alone cannot establish acceptable communication over the whole source envelope."
+msgstr "请求 115200 baud、16 倍过采样、预分频 1 时，选定 HSI64 kernel 得到 BRR556。名义 baud 约为 115107.914；62..65 MHz 源包络对应约 111510.791..116906.475 baud，相对请求值为 −3.202438..+1.481315%。下端点已超过假设的 2% 本地预算。因此，仅名义分频精度不能证明整个源包络内的通信均可接受。"
+
+msgid "The platform checks local divider representability and exposes the selected source bounds. It does not invent a zero-error peer, require product peer-budget fields or silently choose another source. The external product must evaluate the complete transmitter, receiver, quantization, line and wakeup budget in RM0433 Rev9 section 48.5.8, then obtain physical evidence for its link."
+msgstr "平台检查本地分频的可表示性并提供选定源边界，不虚构零误差对端，不要求产品对端预算字段，也不暗中改选时钟源。外部产品必须按 RM0433 Rev9 第 48.5.8 节评估发送端、接收端、量化、线路与唤醒的完整预算，再取得其链路的物理证据。"
+
+msgid "Establish protection before speed and retain failed cleanup"
+msgstr "先建立保护再提速，清理失败保留责任"
+
+msgid "The selected joint owner stores one four-byte effect record. It owns the reversible SYSCFG gate, voltage request, shared Flash timing, bus prescalers, PLL configuration/source and USART/I2C/ADC kernel selectors. It does not own consumer requests, buffers, worker tasks or a scheduler."
+msgstr "选定的统一 owner 保存一份四字节 effect 记录，拥有可撤回的 SYSCFG gate、电压请求、共享 Flash 时序、总线预分频、PLL 配置与源，以及 USART/I2C/ADC kernel selector。它不拥有 consumer 请求、缓冲区、worker task 或调度器。"
+
+msgid "Validate cold prerequisites, acquire the reversible gate and reject foreign overdrive. Prove VOS1 readiness and Flash LATENCY2/WRHIGHFREQ2 readback."
+msgstr "校验冷态前提，取得可撤回 gate 并拒绝外来 overdrive，证明 VOS1 已就绪，以及 Flash LATENCY2/WRHIGHFREQ2 的读回结果。"
+
+msgid "Program the fixed bus dividers and wait 32 ordered RCC observations before programming PLL1. RM0433 section 8.7.8 allows HPRE propagation up to 16 slowest-APB periods; this profile has APB=HCLK/2. Readable HPRE alone is not proof that the effective divider has settled."
+msgstr "配置固定总线分频，在配置 PLL1 前等待 32 次有序 RCC 观测。RM0433 第 8.7.8 节允许 HPRE 传播最长占用 16 个最慢 APB 周期，本配置 APB=HCLK/2。能读回 HPRE 不能证明有效分频器已稳定。"
+
+msgid "Establish PLL1, observe readiness, request its source and prove actual SWS before publishing the nominal CPU clock. Acquire and verify the kernel selectors, then start System and selected consumers."
+msgstr "建立 PLL1、观察就绪、请求切换时钟源，并在发布名义 CPU 时钟前证明实际 SWS。取得并验证 kernel selector，然后启动 System 与选定 consumer。"
+
+msgid "Stop admission, drain and join consumers, and withdraw System. A failed consumer or System stop retains the clock owner and its protections."
+msgstr "关闭准入，排空并 join consumer，然后撤销 System。任一 consumer 或 System 停止失败都保留时钟 owner 及其保护。"
+
+msgid "Restore only owned selectors; each may already be at its baseline or owned target. A foreign selector rejects without clobbering its register. Prove actual HSI selection before disabling PLL or reducing bus, Flash and voltage protections. Clear an effect only after its restoration is observed."
+msgstr "仅恢复自有 selector；每个字段可以已处于基线或自有目标值。遇到外来 selector 时拒绝，不覆盖所在寄存器。关闭 PLL 或降低总线、Flash 和电压保护前，必须证明实际已选择 HSI。只有观察到恢复成功后才清除对应 effect。"
+
+msgid "A startup error preserves its primary result while ordered cleanup reports its own failure and retained responsibility. A failed restore keeps the same owner alive for retry; timeout does not authorize releasing unproved effects. This is a single fixed cold profile, not a general-purpose clock tree manager."
+msgstr "启动错误保留 primary 结果，有序清理另行报告自己的失败和保留责任。恢复失败使同一 owner 继续存活以供重试；timeout 不能授权释放未被证明已撤回的效果。这是单一固定冷态配置，不是通用时钟树管理器。"
+
+msgid "High-profile Flash pulses require the observed V-cut, VOS1, HCLK, 2WS/WR2 and Cache-off combination. The high owner replaces the fixed-HSI optional Flash timing owner; both must not manage the same timing field. A pulse never retunes ACR. Original voltage, unswapped-bank, region, alignment and fresh-erase requirements still apply. All-FF readback does not prove virgin ECC cells. Busy-bank instruction fetch may stall; an unabortable pulse must settle before return, and failure to prove final withdrawal retains the calling frame through the existing terminal fault path. There is no tight physical deadline promise."
+msgstr "高频配置的 Flash 脉冲要求观察到 V 修订、VOS1、HCLK、2WS/WR2 及 Cache-off 组合。高频 owner 替代固定 HSI 的可选 Flash 时序 owner，二者不能管理同一时序字段。脉冲期间不重新调整 ACR；原有电压、未交换 bank、区域、对齐和新鲜擦除要求仍适用。全 FF 读回不能证明 ECC 单元尚未编程。忙 bank 取指可能停顿；不可中止的脉冲必须结束后才能返回，无法证明最终撤回时，现有终止故障路径会保留调用帧。因此不承诺严格物理 deadline。"
+
+msgid "I2C timing requires explicit kernel and electrical bounds; PCLK is not its selected 64 MHz kernel. SPI divider selection uses 99.45 MHz, while its stored nominal source remains 96 MHz. For a 1.5 MHz ceiling it selects /128, rather than /64 from nominal arithmetic. Wire-tail drain and CS release remain required even after the caller's deadline. ADC's 16-bit storage does not establish measured effective resolution or calibrated voltage."
+msgstr "I2C 时序需要显式 kernel 和电气边界；PCLK 不是其选定的 64 MHz kernel。SPI 分频使用 99.45 MHz，而保存的名义源仍为 96 MHz。1.5 MHz 上限对应 /128，而非按名义值算出的 /64。即使调用者 deadline 到期，仍必须完成线上尾部排空与 CS 释放。ADC 的 16 位存储不能建立实测有效精度或校准电压的结论。"
+
+msgid "Selection cost, executed scope and next exits"
+msgstr "选入成本、已执行范围与下一退出条件"
+
+msgid "Only the high profile emits the joint owner and selects `clock.c`. The four existing fixed-HSI/cache profiles retain their own lifecycle and do not call this owner. The four-byte record is a source-level selected-state fact, not a measured whole-image RAM delta; alignment, retained code and linked ELF costs must be observed separately. No allocation or extra hot-path forwarding layer is introduced by clock selection."
+msgstr "仅高频配置生成统一 owner 并选入 `clock.c`。已有四种固定 HSI/cache 配置保留各自生命周期，不调用此 owner。四字节记录是源码层面的选配状态事实，不是整幅镜像 RAM 增量的测量；对齐、代码保留及已链接 ELF 成本须分别观察。选择时钟不引入分配或额外热路径转发层。"
+
+msgid "Executed development scope"
+msgstr "已执行开发范围"
+
+msgid "Actual result"
+msgstr "实际结果"
+
+msgid "Boundary"
+msgstr "边界"
+
+msgid "[Clock tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_clock_test.cpp)"
+msgstr "[时钟测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_clock_test.cpp)"
+
+msgid "38 GoogleTest cases passed"
+msgstr "38 个 GoogleTest case 通过"
+
+msgid "V-only rejection, ordering, partial effects and retry in external register models"
+msgstr "外部寄存器模型中的 V-only 拒绝、顺序、部分效果与重试"
+
+msgid "[High System tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_high_system_test.cpp)"
+msgstr "[高频 System 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_high_system_test.cpp)"
+
+msgid "19 cases passed"
+msgstr "19 个 case 通过"
+
+msgid "Actual clock owner plus TIM2, IRQ, nominal time and failure cleanup"
+msgstr "真实时钟 owner 加 TIM2、IRQ、名义时间和失败清理"
+
+msgid "[Kernel tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_high_kernel_test.cpp)"
+msgstr "[Kernel 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_high_kernel_test.cpp)"
+
+msgid "30 cases passed"
+msgstr "30 个 case 通过"
+
+msgid "Distinct domains, divider bounds, Flash admission and mixed-selector rollback"
+msgstr "独立时钟域、分频边界、Flash 准入和混合 selector 回退"
+
+msgid "[Generated factory tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_high_factory_test.cpp)"
+msgstr "[生成 factory 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_high_factory_test.cpp)"
+
+msgid "10 cases passed"
+msgstr "10 个 case 通过"
+
+msgid "Normal TOML/IR/generated lifecycle, cold lookup, consumer calls and stop-failure retry"
+msgstr "正常 TOML/IR/生成生命周期、冷查找、consumer 调用及停止失败重试"
+
+msgid "Three normal ARM configurations"
+msgstr "三个正常 ARM 配置"
+
+msgid "Configure and build returned zero"
+msgstr "configure 和 build 返回零"
+
+msgid "Exact empty, UART and peripheral fixtures below; code generation and linking, not hardware"
+msgstr "下述精确 empty、UART、peripheral fixture；覆盖代码生成和链接，不是硬件"
+
+msgid "The ARM presets are `fixture-io-evolution-h743-high-empty`, `fixture-io-evolution-h743-high-uart` and `fixture-io-evolution-h743-high-peripherals`. Their maintained inputs are [empty](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-empty.toml), [UART](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-uart.toml) and [peripherals](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-peripherals.toml). These records describe this development iteration; they do not establish a clean software candidate, offline reproducibility or physical qualification. The {download}`I/O ledger <io-evolution-execution.csv>` remains the status authority."
+msgstr "ARM preset 为 `fixture-io-evolution-h743-high-empty`、`fixture-io-evolution-h743-high-uart` 和 `fixture-io-evolution-h743-high-peripherals`。其维护输入是 [empty](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-empty.toml)、[UART](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-uart.toml) 和 [peripherals](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-peripherals.toml)。这些记录描述本开发迭代，不建立 clean 软件候选、离线可复现或物理资格。{download}`I/O 台账 <io-evolution-execution.csv>`仍是状态权威。"
+
+msgid "High Cache-on, continuous H743 DMA, SPI DMA, additional silicon cuts, bootloader handoff and running-clock transitions have separate implementation and acceptance exits. Existing finite DMA modes do not imply these extensions. Physical clock, voltage, temperature, UART, SPI, I2C, ADC and Flash tests remain `not_executed` until connected equipment actually measures the selected image."
+msgstr "高频 Cache-on、H743 连续 DMA、SPI DMA、更多硅片修订、bootloader 接管及运行时切换时钟均有独立实施和验收退出条件。已有有限 DMA 模式不能推导出这些扩展。物理时钟、电压、温度、UART、SPI、I2C、ADC 和 Flash 测试均保持 `not_executed`，直到连接的设备实际测量选定镜像。"

@@ -384,3 +384,600 @@ msgstr "Fully initialized copied result; value is zero for errors/WRITE."
 
 msgid "Distinguish admission, cleanup retention and possible effect."
 msgstr "Distinguish admission, cleanup retention and possible effect."
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "[in] Register block beginning at 0x88"
+msgstr "[in] Register block beginning at 0x88"
+
+msgid "[in] Must be exactly 24"
+msgstr "[in] Must be exactly 24"
+
+msgid "[out] Written only on success"
+msgstr "[out] Written only on success"
+
+msgid "SUCCESS or INVALID for length/zero pressure divisor"
+msgstr "SUCCESS or INVALID for length/zero pressure divisor"
+
+msgid "[in] Parsed calibration"
+msgstr "[in] Parsed calibration"
+
+msgid "[in] Unsigned 20-bit ADC value"
+msgstr "[in] Unsigned 20-bit ADC value"
+
+msgid "SUCCESS, INVALID for malformed/overflow calibration or IO for disabled ADC sentinel/out-of-datasheet-range physical output"
+msgstr "SUCCESS, INVALID for malformed/overflow calibration or IO for disabled ADC sentinel/out-of-datasheet-range physical output"
+
+msgid "Task context; failure leaves initialized false and no borrow. Does not soft-reset the part or create a wait loop/task. Retry BUSY explicitly."
+msgstr "Task context; failure leaves initialized false and no borrow. Does not soft-reset the part or create a wait loop/task. Retry BUSY explicitly."
+
+msgid "[out] Zero-initialized unused instance"
+msgstr "[out] Zero-initialized unused instance"
+
+msgid "[in] Synchronous settled port and live monotonic clock"
+msgstr "[in] Synchronous settled port and live monotonic clock"
+
+msgid "[in] Absolute deadline for all initialization accesses"
+msgstr "[in] Absolute deadline for all initialization accesses"
+
+msgid "SUCCESS, BUSY for NVM update, or transport/identity error"
+msgstr "SUCCESS, BUSY for NVM update, or transport/identity error"
+
+msgid "Task-only serialized driver owner; oversampling x1/x1."
+msgstr "Task-only serialized driver owner; oversampling x1/x1."
+
+msgid "[inout] Initialized non-measuring instance"
+msgstr "[inout] Initialized non-measuring instance"
+
+msgid "[in] Absolute deadline covering conversion and reads"
+msgstr "[in] Absolute deadline covering conversion and reads"
+
+msgid "SUCCESS, BUSY, TIMEOUT or transport error"
+msgstr "SUCCESS, BUSY, TIMEOUT or transport error"
+
+msgid "Task-only. Every port call releases temporary buffers before return. BUSY retains device conversion state, never stack or caller buffers. After terminal failure, begin may retry; the external owner chooses policy."
+msgstr "Task-only. Every port call releases temporary buffers before return. BUSY retains device conversion state, never stack or caller buffers. After terminal failure, begin may retry; the external owner chooses policy."
+
+msgid "[inout] Instance with a previously started conversion"
+msgstr "[inout] Instance with a previously started conversion"
+
+msgid "[out] Written only on SUCCESS"
+msgstr "[out] Written only on SUCCESS"
+
+msgid "SUCCESS, BUSY while converting, TIMEOUT or transport error"
+msgstr "SUCCESS, BUSY while converting, TIMEOUT or transport error"
+
+msgid "Does not power off or reset a physical part. Sensor-internal conversion can finish without accessing MCU storage. No MCU borrow remains."
+msgstr "Does not power off or reset a physical part. Sensor-internal conversion can finish without accessing MCU storage. No MCU borrow remains."
+
+msgid "[inout] Quiesced driver instance"
+msgstr "[inout] Quiesced driver instance"
+
+msgid "exchange always releases every TX/RX buffer before returning, including TIMEOUT/error. One CS interval covers all bytes; mode 0 or 3, 8-bit words, <=10 MHz. Caller serializes this device and its bus owner. Driver stack transactions never cross asynchronous borrowing boundaries."
+msgstr "exchange always releases every TX/RX buffer before returning, including TIMEOUT/error. One CS interval covers all bytes; mode 0 or 3, 8-bit words, <=10 MHz. Caller serializes this device and its bus owner. Driver stack transactions never cross asynchronous borrowing boundaries."
+
+msgid "[in] Fixed endpoint kept alive throughout device use"
+msgstr "[in] Fixed endpoint kept alive throughout device use"
+
+msgid "[in] Same monotonic domain as IO transfer deadlines"
+msgstr "[in] Same monotonic domain as IO transfer deadlines"
+
+msgid "Narrow transport; no global discovery or CS selection"
+msgstr "Narrow transport; no global discovery or CS selection"
+
+msgid "Startup context; no task, worker, timer or heap is created."
+msgstr "Startup context; no task, worker, timer or heap is created."
+
+msgid "[out] Unused caller-owned adapter storage"
+msgstr "[out] Unused caller-owned adapter storage"
+
+msgid "[in] Exact queue capacity, no maximum pool"
+msgstr "[in] Exact queue capacity, no maximum pool"
+
+msgid "[in] Number of slots, greater than zero"
+msgstr "[in] Number of slots, greater than zero"
+
+msgid "[in] Live short exclusion port"
+msgstr "[in] Live short exclusion port"
+
+msgid "[in] Single real execution port"
+msgstr "[in] Single real execution port"
+
+msgid "[in] Same monotonic domain as request deadlines"
+msgstr "[in] Same monotonic domain as request deadlines"
+
+msgid "[in] Optional static executor notification, or NULL"
+msgstr "[in] Optional static executor notification, or NULL"
+
+msgid "SUCCESS or INVALID"
+msgstr "SUCCESS or INVALID"
+
+msgid "Task multi-producer context. Free-slot admission and FIFO insertion use constant metadata work under the guard. An exhausted epoch permanently retires its slot. Deadline includes queue residence. Caller must not modify request, operation or buffers after admission. A notification error after admission cannot change SUCCESS to rejection; executor must recheck/pump periodically."
+msgstr "Task multi-producer context. Free-slot admission and FIFO insertion use constant metadata work under the guard. An exhausted epoch permanently retires its slot. Deadline includes queue residence. Caller must not modify request, operation or buffers after admission. A notification error after admission cannot change SUCCESS to rejection; executor must recheck/pump periodically."
+
+msgid "[inout] Live accepting adapter"
+msgstr "[inout] Live accepting adapter"
+
+msgid "[inout] Prepared READY storage, retained until SETTLED"
+msgstr "[inout] Prepared READY storage, retained until SETTLED"
+
+msgid "[in] Executor-specific descriptor and payload storage"
+msgstr "[in] Executor-specific descriptor and payload storage"
+
+msgid "[in] Optional static caller wake port, or NULL"
+msgstr "[in] Optional static caller wake port, or NULL"
+
+msgid "[out] Stable cancellation identity, valid on SUCCESS"
+msgstr "[out] Stable cancellation identity, valid on SUCCESS"
+
+msgid "SUCCESS means ACCEPTED; rejection retains zero references"
+msgstr "SUCCESS means ACCEPTED; rejection retains zero references"
+
+msgid "Task multi-producer context. No request pointer is accepted. Queued cancellation settles without starting. Active cancellation drains cooperatively; an irreversible operation may already have transferred data."
+msgstr "Task multi-producer context. No request pointer is accepted. Queued cancellation settles without starting. Active cancellation drains cooperatively; an irreversible operation may already have transferred data."
+
+msgid "[inout] Live adapter"
+msgstr "[inout] Live adapter"
+
+msgid "[in] Previously accepted slot/epoch"
+msgstr "[in] Previously accepted slot/epoch"
+
+msgid "SUCCESS when marked, STATE for stale/released identity"
+msgstr "SUCCESS when marked, STATE for stale/released identity"
+
+msgid "Task/explicit loop only. Consumers never service through wait. Keep calling during stop until idle; no callback creates a worker."
+msgstr "Task/explicit loop only. Consumers never service through wait. Keep calling during stop until idle; no callback creates a worker."
+
+msgid "[inout] Live adapter, called by its unique executor"
+msgstr "[inout] Live adapter, called by its unique executor"
+
+msgid "SUCCESS for progress/idle, BUSY for provider wait/contention, or provider error while retaining ownership for continued recovery"
+msgstr "SUCCESS for progress/idle, BUSY for provider wait/contention, or provider error while retaining ownership for continued recovery"
+
+msgid "Task context. Executor must keep servicing/draining while producers wait/join. Stop is not settlement or storage reclamation."
+msgstr "Task context. Executor must keep servicing/draining while producers wait/join. Stop is not settlement or storage reclamation."
+
+msgid "Join producers and any wake publishers before reclaiming owner, slots, guard or notifications. No future submit/cancel is permitted."
+msgstr "Join producers and any wake publishers before reclaiming owner, slots, guard or notifications. No future submit/cancel is permitted."
+
+msgid "True if no queue/active/service publisher remains"
+msgstr "True if no queue/active/service publisher remains"
+
+msgid "Task producer calls only. enter/leave must serialize all producers and the executor. Never hold this guard over start/service/cancel, waiting, payload copies or notification callbacks. State restores incoming interrupt mask when an architecture guard is used. Port storage stays live."
+msgstr "Task producer calls only. enter/leave must serialize all producers and the executor. Never hold this guard over start/service/cancel, waiting, payload copies or notification callbacks. State restores incoming interrupt mask when an architecture guard is used. Port storage stays live."
+
+msgid "terminal_authority selects providers that observe deadlines and latch their first terminal hardware fact themselves. Their final result survives late cancellation/publication. Other executors use adapter deadline/cancellation results. Queued deadlines always belong to the adapter."
+msgstr "terminal_authority selects providers that observe deadlines and latch their first terminal hardware fact themselves. Their final result survives late cancellation/publication. Other executors use adapter deadline/cancellation results. Queued deadlines always belong to the adapter."
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Zero-initialize before first acquisition. On SUCCESS the provider borrows this exact object; do not copy, mutate or reclaim it until release succeeds. Internal fields are not application controls. A release is the provider's final access, not proof that a peripheral has stopped. Release only after that consumer's IRQ, DMA and observer drain."
+msgstr "Zero-initialize before first acquisition. On SUCCESS the provider borrows this exact object; do not copy, mutate or reclaim it until release succeeds. Internal fields are not application controls. A release is the provider's final access, not proof that a peripheral has stopped. Release only after that consumer's IRQ, DMA and observer drain."
+
+msgid "Privileged Thread or configurable IRQ only; same CPU, saved-mask metadata guard. NMI/HardFault/SMP excluded. Capacity bounds token/alias scans. Token remains borrowed until successful release, even while admission is closed."
+msgstr "Privileged Thread or configurable IRQ only; same CPU, saved-mask metadata guard. NMI/HardFault/SMP excluded. Capacity bounds token/alias scans. Token remains borrowed until successful release, even while admission is closed."
+
+msgid "SUCCESS, BUSY for closed admission, EXHAUSTED for budget, or INVALID/STATE/CONTEXT with no retained token or effects"
+msgstr "SUCCESS, BUSY for closed admission, EXHAUSTED for budget, or INVALID/STATE/CONTEXT with no retained token or effects"
+
+msgid "Same contexts as acquire. Copied tokens cannot release the original. There is no callback or last access after SUCCESS."
+msgstr "Same contexts as acquire. Copied tokens cannot release the original. There is no callback or last access after SUCCESS."
+
+msgid "SUCCESS or INVALID/STATE/CONTEXT without removing a borrow"
+msgstr "SUCCESS or INVALID/STATE/CONTEXT without removing a borrow"
+
+msgid "Serialized privileged Thread only. No waiting, cancellation, clock writes or implicit consumer shutdown. Idempotent in the same closed epoch; output must not alias live storage."
+msgstr "Serialized privileged Thread only. No waiting, cancellation, clock writes or implicit consumer shutdown. Idempotent in the same closed epoch; output must not alias live storage."
+
+msgid "Same CPU privileged Thread. This certifies only explicitly enrolled consumers. It does not authorize PLL reprogramming, suspend kernel Tick or change the Core deadline domain."
+msgstr "Same CPU privileged Thread. This certifies only explicitly enrolled consumers. It does not authorize PLL reprogramming, suspend kernel Tick or change the Core deadline domain."
+
+msgid "SUCCESS, BUSY while consumers remain, STATE for stale/open control, INVALID or CONTEXT; no state changes"
+msgstr "SUCCESS, BUSY while consumers remain, STATE for stale/open control, INVALID or CONTEXT; no state changes"
+
+msgid "Serialized privileged Thread. Does not restart the clock or reinterpret existing deadlines. Actual cold clock changes additionally require all Tick/time providers stopped and a new explicit deadline domain; this API performs neither."
+msgstr "Serialized privileged Thread. Does not restart the clock or reinterpret existing deadlines. Actual cold clock changes additionally require all Tick/time providers stopped and a new explicit deadline domain; this API performs neither."
+
+msgid "SUCCESS, BUSY, STATE, EXHAUSTED or CONTEXT without changes"
+msgstr "SUCCESS, BUSY, STATE, EXHAUSTED or CONTEXT without changes"
+
+msgid "A value copy is allowed. This is not an authorization token or proof about unregistered consumers. Domain storage lives longer than every copy. A successful reopen invalidates all prior controls without resetting the epoch."
+msgstr "A value copy is allowed. This is not an authorization token or proof about unregistered consumers. Domain storage lives longer than every copy. A successful reopen invalidates all prior controls without resetting the epoch."
+
+msgid "[inout] Explicit MDIO face, address and expected supported model."
+msgstr "[inout] Explicit MDIO face, address and expected supported model."
+
+msgid "[in] Finite absolute MDIO clock deadline."
+msgstr "[in] Finite absolute MDIO clock deadline."
+
+msgid "Success, UNSUPPORTED for identity mismatch, or MDIO error."
+msgstr "Success, UNSUPPORTED for identity mismatch, or MDIO error."
+
+msgid "Task-only finite absolute deadline; reset restraps the device and clears configured truth. This is not a GPIO, power or strap proof."
+msgstr "Task-only finite absolute deadline; reset restraps the device and clears configured truth. This is not a GPIO, power or strap proof."
+
+msgid "[inout] Proved identity and caller-owned component state."
+msgstr "[inout] Proved identity and caller-owned component state."
+
+msgid "Success after real reset acknowledgement, or state/MDIO error."
+msgstr "Success after real reset acknowledgement, or state/MDIO error."
+
+msgid "Task-only; identity must be proved. SUCCESS means registers configured, not autonegotiation complete. Failures retain configured=false."
+msgstr "Task-only; identity must be proved. SUCCESS means registers configured, not autonegotiation complete. Failures retain configured=false."
+
+msgid "[inout] Proved identity, kept live through operations."
+msgstr "[inout] Proved identity, kept live through operations."
+
+msgid "[in] Explicit fixed mode or negotiation advertisement."
+msgstr "[in] Explicit fixed mode or negotiation advertisement."
+
+msgid "Success means configured registers; otherwise no configured truth."
+msgstr "Success means configured registers; otherwise no configured truth."
+
+msgid "Task-only; output changes only on SUCCESS. up requires actual link and complete autonegotiation when selected. Protocol or remote fault does not invent speed/link. MAC application remains an external action."
+msgstr "Task-only; output changes only on SUCCESS. up requires actual link and complete autonegotiation when selected. Protocol or remote fault does not invent speed/link. MAC application remains an external action."
+
+msgid "[inout] Probed and configured caller-owned component."
+msgstr "[inout] Probed and configured caller-owned component."
+
+msgid "[out] Observed value, separate from component storage."
+msgstr "[out] Observed value, separate from component storage."
+
+msgid "Success copies observed link; other results preserve output."
+msgstr "Success copies observed link; other results preserve output."
+
+msgid "expected_id selects TI or NS model, ignoring revision nibble only. One task owner serializes this component and the shared MDIO port."
+msgstr "expected_id selects TI or NS model, ignoring revision nibble only. One task owner serializes this component and the shared MDIO port."
+
+msgid "2026-10-09"
+msgstr "2026-10-09"
+
+msgid "Task-only POSIX model. Does not qualify MCU Flash or actual power loss; existing file size mismatch is rejected without truncation."
+msgstr "Task-only POSIX model. Does not qualify MCU Flash or actual power loss; existing file size mismatch is rejected without truncation."
+
+msgid "[out] Unused caller-owned storage"
+msgstr "[out] Unused caller-owned storage"
+
+msgid "[in] Regular-file path; symlink traversal rejected"
+msgstr "[in] Regular-file path; symlink traversal rejected"
+
+msgid "[in] Exact persistent byte size"
+msgstr "[in] Exact persistent byte size"
+
+msgid "[in] Uniform erase block bytes"
+msgstr "[in] Uniform erase block bytes"
+
+msgid "[in] Aligned program bytes, 1..256"
+msgstr "[in] Aligned program bytes, 1..256"
+
+msgid "OK or INVALID/IO; failed open retains no file descriptor"
+msgstr "OK or INVALID/IO; failed open retains no file descriptor"
+
+msgid "No future port calls are permitted until explicit reopen."
+msgstr "No future port calls are permitted until explicit reopen."
+
+msgid "[inout] Open serialized model"
+msgstr "[inout] Open serialized model"
+
+msgid "Zero simulates power-off until explicitly cleared."
+msgstr "Zero simulates power-off until explicitly cleared."
+
+msgid "[inout] Serialized open model"
+msgstr "[inout] Serialized open model"
+
+msgid "[in] Programmed/erased bytes and sync attempts permitted; negative disables"
+msgstr "[in] Programmed/erased bytes and sync attempts permitted; negative disables"
+
+msgid "Task-only, serialized caller. No region is reserved by the platform. Mixed sector geometries require another explicit storage adapter; this one rejects them. IO pulse settlement guarantees sync durability; no caller buffer survives a port call. Physical power-loss remains unqualified. The caller must honor geometry.program_flags when using this port directly: ECC units require actual erase provenance, not an all-0xff read. nx_storage_save erases its inactive bank and writes each distinct full program unit at most once before its next erase, including its separate final commit marker. This adapter does not track hidden program-pulse history."
+msgstr "Task-only, serialized caller. No region is reserved by the platform. Mixed sector geometries require another explicit storage adapter; this one rejects them. IO pulse settlement guarantees sync durability; no caller buffer survives a port call. Physical power-loss remains unqualified. The caller must honor geometry.program_flags when using this port directly: ECC units require actual erase provenance, not an all-0xff read. nx_storage_save erases its inactive bank and writes each distinct full program unit at most once before its next erase, including its separate final commit marker. This adapter does not track hidden program-pulse history."
+
+msgid "[out] Unused caller storage kept through all store calls"
+msgstr "[out] Unused caller storage kept through all store calls"
+
+msgid "[in] Externally selected writable physical region"
+msgstr "[in] Externally selected writable physical region"
+
+msgid "[in] Absolute whole-transaction deadline for mutations"
+msgstr "[in] Absolute whole-transaction deadline for mutations"
+
+msgid "[out] Narrow synchronous persistent port, valid on SUCCESS"
+msgstr "[out] Narrow synchronous persistent port, valid on SUCCESS"
+
+msgid "SUCCESS or INVALID/PERMISSION/UNSUPPORTED geometry error"
+msgstr "SUCCESS or INVALID/PERMISSION/UNSUPPORTED geometry error"
+
+msgid "Caller serializes and sets this before open/save/recovery. Per-pulse timeouts cannot preempt hardware pulses; IO settles before return."
+msgstr "Caller serializes and sets this before open/save/recovery. Per-pulse timeouts cannot preempt hardware pulses; IO settles before return."
+
+msgid "[inout] Bound adapter with no active store operation"
+msgstr "[inout] Bound adapter with no active store operation"
+
+msgid "[in] Absolute deadline in nx_time_now_us domain"
+msgstr "[in] Absolute deadline in nx_time_now_us domain"
+
+msgid "[out] Unused caller storage"
+msgstr "[out] Unused caller storage"
+
+msgid "[in] Required bounded synchronous sink"
+msgstr "[in] Required bounded synchronous sink"
+
+msgid "[in] Minimum accepted severity"
+msgstr "[in] Minimum accepted severity"
+
+msgid "Task multi-producer entry with nonblocking serialization. M0/M0+ use CPU-local saved-PRIMASK metadata exclusion and require privileged callers on one CPU. Sink calls run after restoring the incoming mask. This does not make NMI/HardFault or cross-security-domain writers valid. IRQ use is prohibited. Drop/retry policy remains with the external caller."
+msgstr "Task multi-producer entry with nonblocking serialization. M0/M0+ use CPU-local saved-PRIMASK metadata exclusion and require privileged callers on one CPU. Sink calls run after restoring the incoming mask. This does not make NMI/HardFault or cross-security-domain writers valid. IRQ use is prohibited. Drop/retry policy remains with the external caller."
+
+msgid "[inout] Live instance"
+msgstr "[inout] Live instance"
+
+msgid "[in] Message severity"
+msgstr "[in] Message severity"
+
+msgid "[in] Message bytes, borrowed only during this call"
+msgstr "[in] Message bytes, borrowed only during this call"
+
+msgid "[in] Byte count; zero permits NULL"
+msgstr "[in] Byte count; zero permits NULL"
+
+msgid "[in] Absolute deadline understood by sink"
+msgstr "[in] Absolute deadline understood by sink"
+
+msgid "SUCCESS for filtered/sent bytes, BUSY for concurrent/recursive writes, STATE after stop, otherwise sink error"
+msgstr "SUCCESS for filtered/sent bytes, BUSY for concurrent/recursive writes, STATE after stop, otherwise sink error"
+
+msgid "Same task/privilege/CPU domain as write."
+msgstr "Same task/privilege/CPU domain as write."
+
+msgid "[in] Absolute sink deadline"
+msgstr "[in] Absolute sink deadline"
+
+msgid "SUCCESS, BUSY, STATE, UNSUPPORTED or sink error"
+msgstr "SUCCESS, BUSY, STATE, UNSUPPORTED or sink error"
+
+msgid "Task context. A stop caller may retry; no active sink call is forcibly cancelled. Join publishers before reclaiming logger/sink storage."
+msgstr "Task context. A stop caller may retry; no active sink call is forcibly cancelled. Join publishers before reclaiming logger/sink storage."
+
+msgid "[inout] Live instance; external users must eventually join"
+msgstr "[inout] Live instance; external users must eventually join"
+
+msgid "SUCCESS when no sink call is active, BUSY while draining"
+msgstr "SUCCESS when no sink call is active, BUSY while draining"
+
+msgid "write/flush release every byte buffer before returning even on timeout/error; asynchronous/DMA sinks require their own settled adapter. Calls are bounded by absolute monotonic deadlines, in task context. No sink discovery, allocation, formatting, worker or global error handler exists."
+msgstr "write/flush release every byte buffer before returning even on timeout/error; asynchronous/DMA sinks require their own settled adapter. Calls are bounded by absolute monotonic deadlines, in task context. No sink discovery, allocation, formatting, worker or global error handler exists."
+
+msgid "[in] Input, NULL only when length is zero"
+msgstr "[in] Input, NULL only when length is zero"
+
+msgid "[in] Byte count"
+msgstr "[in] Byte count"
+
+msgid "CRC16; zero for invalid NULL input with nonzero length"
+msgstr "CRC16; zero for invalid NULL input with nonzero length"
+
+msgid "Task-only; configuration is copied, contexts stay live. First direction(false) failure is reported; no worker or UART is created. Reinitializing a faulted TX borrow is prohibited; stop/recover it first."
+msgstr "Task-only; configuration is copied, contexts stay live. First direction(false) failure is reported; no worker or UART is created. Reinitializing a faulted TX borrow is prohibited; stop/recover it first."
+
+msgid "[out] Caller-owned storage, no existing transport borrow"
+msgstr "[out] Caller-owned storage, no existing transport borrow"
+
+msgid "[in] Explicit register/RS485 ports and finite budgets"
+msgstr "[in] Explicit register/RS485 ports and finite budgets"
+
+msgid "True when initialized into RX silence acquisition"
+msgstr "True when initialized into RX silence acquisition"
+
+msgid "Task-only. IRQ queues are external, bounded and explicit; queue overflow must call rx_error. No live UART discovery or ISR callback."
+msgstr "Task-only. IRQ queues are external, bounded and explicit; queue overflow must call rx_error. No live UART discovery or ISR callback."
+
+msgid "[inout] Initialized instance, serialized by caller"
+msgstr "[inout] Initialized instance, serialized by caller"
+
+msgid "[in] Wire byte"
+msgstr "[in] Wire byte"
+
+msgid "[in] Capture timestamp in port monotonic domain"
+msgstr "[in] Capture timestamp in port monotonic domain"
+
+msgid "True if byte joined the frame, false for discard/error"
+msgstr "True if byte joined the frame, false for discard/error"
+
+msgid "Task-only, explicit external scheduling. RS485 drain must observe the final stop bit. Failed abort retains TX bytes and asserted DE in LINK_FAULTED; keep instance/port alive until successful recover or stop."
+msgstr "Task-only, explicit external scheduling. RS485 drain must observe the final stop bit. Failed abort retains TX bytes and asserted DE in LINK_FAULTED; keep instance/port alive until successful recover or stop."
+
+msgid "[inout] Initialized instance, single execution owner"
+msgstr "[inout] Initialized instance, single execution owner"
+
+msgid "[in] Snapshot in the same monotonic domain"
+msgstr "[in] Snapshot in the same monotonic domain"
+
+msgid "True for successful progress, false for clock/transport error"
+msgstr "True for successful progress, false for clock/transport error"
+
+msgid "Task-only. Does not discard a retained faulted TX borrow."
+msgstr "Task-only. Does not discard a retained faulted TX borrow."
+
+msgid "[inout] Initialized serialized instance"
+msgstr "[inout] Initialized serialized instance"
+
+msgid "[in] Error timestamp in port's monotonic domain"
+msgstr "[in] Error timestamp in port's monotonic domain"
+
+msgid "Explicit task maintenance action, no fabricated recovery."
+msgstr "Explicit task maintenance action, no fabricated recovery."
+
+msgid "[inout] Initialized serialized instance with live ports"
+msgstr "[inout] Initialized serialized instance with live ports"
+
+msgid "True only after actual port abort/drain and receive direction"
+msgstr "True only after actual port abort/drain and receive direction"
+
+msgid "Stop future feed/poll users first. No future use except explicit initialization is allowed after successful stop."
+msgstr "Stop future feed/poll users first. No future use except explicit initialization is allowed after successful stop."
+
+msgid "[inout] Initialized, exclusively owned instance"
+msgstr "[inout] Initialized, exclusively owned instance"
+
+msgid "True when no transport borrow remains and instance is stopped; false preserves fault state, TX bytes and all port lifetime obligations"
+msgstr "True when no transport borrow remains and instance is stopped; false preserves fault state, TX bytes and all port lifetime obligations"
+
+msgid "[inout] Fresh zero/detached sidecar, distinct from owner."
+msgstr "[inout] Fresh zero/detached sidecar, distinct from owner."
+
+msgid "[inout] Initialized stable owner, no concurrent lifecycle."
+msgstr "[inout] Initialized stable owner, no concurrent lifecycle."
+
+msgid "SUCCESS or INVALID/STATE, no service or borrow on rejection."
+msgstr "SUCCESS or INVALID/STATE, no service or borrow on rejection."
+
+msgid "Clock reversal never blocks drain or rewrites its result. Snapshot uses the existing guard outside hardware service. No callback, slot scan or worker occurs under that guard. Quarantine and elapsed deadlines never release a loan. Output also excludes accepted descriptors and payloads. Only the owner/slot control spans are checked here."
+msgstr "Clock reversal never blocks drain or rewrites its result. Snapshot uses the existing guard outside hardware service. No callback, slot scan or worker occurs under that guard. Quarantine and elapsed deadlines never release a loan. Output also excludes accepted descriptors and payloads. Only the owner/slot control spans are checked here."
+
+msgid "[inout] Bound sidecar on the unique executor."
+msgstr "[inout] Bound sidecar on the unique executor."
+
+msgid "[in] Monotonic timestamp, independent of service result."
+msgstr "[in] Monotonic timestamp, independent of service result."
+
+msgid "[out] Distinct stable output, no retained references."
+msgstr "[out] Distinct stable output, no retained references."
+
+msgid "Actual service result; invalid bindings reject beforehand."
+msgstr "Actual service result; invalid bindings reject beforehand."
+
+msgid "[inout] Caller-serialized sidecar, no remaining readers."
+msgstr "[inout] Caller-serialized sidecar, no remaining readers."
+
+msgid "Exact owner, slots and guard remain live until detach and all observer calls exit. The same unique owner executor calls this wrapper; producer calls retain the owner guard. Never reinitialize/replace the bound owner underneath it."
+msgstr "Exact owner, slots and guard remain live until detach and all observer calls exit. The same unique owner executor calls this wrapper; producer calls retain the owner guard. Never reinitialize/replace the bound owner underneath it."
+
+msgid "Startup/task context. Operations use nx_spi_owner_operation_t endpoints on this bus only; membership is checked before admission. No polling fallback is selected. Controller and executor remain live through drain, control acknowledgement and observer exit. QUARANTINED retains both buffer loans. Hardware stop and IRQ/notification destruction are explicit external steps after owner shutdown, not part of this bind."
+msgstr "Startup/task context. Operations use nx_spi_owner_operation_t endpoints on this bus only; membership is checked before admission. No polling fallback is selected. Controller and executor remain live through drain, control acknowledgement and observer exit. QUARANTINED retains both buffer loans. Hardware stop and IRQ/notification destruction are explicit external steps after owner shutdown, not part of this bind."
+
+msgid "[out] Fresh storage with no previous outstanding loans."
+msgstr "[out] Fresh storage with no previous outstanding loans."
+
+msgid "[in] Initialized controller exclusively owned by this executor; direct clients and other owners must quiesce."
+msgstr "[in] Initialized controller exclusively owned by this executor; direct clients and other owners must quiesce."
+
+msgid "Valid executor port, or a zero port for incomplete methods."
+msgstr "Valid executor port, or a zero port for incomplete methods."
+
+msgid "inner is a private publication object. Its borrow must end before the outer owner publishes SETTLED. No queue, payload copy, allocation or hidden worker is created."
+msgstr "inner is a private publication object. Its borrow must end before the outer owner publishes SETTLED. No queue, payload copy, allocation or hidden worker is created."
+
+msgid "start executes a real CPU-active polling transaction and releases all IO buffers before returning. Owner service later publishes its caller-owned request. Polling cannot be preempted by another task's cancel; once the polling call returns, its result is final despite later cancellation or publication delay. Do not claim IRQ/DMA mode or low-CPU asynchronous hardware execution. Endpoints must prove their controller identity before any wire effect; distinct chip selects on this controller remain valid. The controller and executor outlive owner shutdown and all observers."
+msgstr "start executes a real CPU-active polling transaction and releases all IO buffers before returning. Owner service later publishes its caller-owned request. Polling cannot be preempted by another task's cancel; once the polling call returns, its result is final despite later cancellation or publication delay. Do not claim IRQ/DMA mode or low-CPU asynchronous hardware execution. Endpoints must prove their controller identity before any wire effect; distinct chip selects on this controller remain valid. The controller and executor outlive owner shutdown and all observers."
+
+msgid "[out] Fresh storage with no outstanding operation"
+msgstr "[out] Fresh storage with no outstanding operation"
+
+msgid "[in] Controller exclusively serviced by this owner"
+msgstr "[in] Controller exclusively serviced by this owner"
+
+msgid "Port for nx_bus_owner_init, or a zero port for invalid input"
+msgstr "Port for nx_bus_owner_init, or a zero port for invalid input"
+
+msgid "Task-only bounded scan over both bank payloads. Workspace remains borrowed by the instance through every subsequent load/save call."
+msgstr "Task-only bounded scan over both bank payloads. Workspace remains borrowed by the instance through every subsequent load/save call."
+
+msgid "[out] Unused or quiesced instance, no concurrent calls"
+msgstr "[out] Unused or quiesced instance, no concurrent calls"
+
+msgid "[in] Persistent settled port, may be storage's existing port"
+msgstr "[in] Persistent settled port, may be storage's existing port"
+
+msgid "[in] Erase-aligned start within port region"
+msgstr "[in] Erase-aligned start within port region"
+
+msgid "[in] Each bank's erase-aligned byte size"
+msgstr "[in] Each bank's erase-aligned byte size"
+
+msgid "[in] Caller buffer, disjoint from instance/payload"
+msgstr "[in] Caller buffer, disjoint from instance/payload"
+
+msgid "[in] At least max(32, port.program_size)"
+msgstr "[in] At least max(32, port.program_size)"
+
+msgid "OK for recovered/empty store, CORRUPT for ambiguous or only invalid committed generations, IO/INVALID for port/geometry failures"
+msgstr "OK for recovered/empty store, CORRUPT for ambiguous or only invalid committed generations, IO/INVALID for port/geometry failures"
+
+msgid "Output bytes valid only on OK; failure may partially write output. No destination pointer is retained after returning."
+msgstr "Output bytes valid only on OK; failure may partially write output. No destination pointer is retained after returning."
+
+msgid "[inout] Open instance, exclusively owned for this call"
+msgstr "[inout] Open instance, exclusively owned for this call"
+
+msgid "[out] Destination; NULL requests only required size"
+msgstr "[out] Destination; NULL requests only required size"
+
+msgid "[inout] Input capacity, output payload/required bytes"
+msgstr "[inout] Input capacity, output payload/required bytes"
+
+msgid "OK, NOT_FOUND, NO_SPACE, CORRUPT or IO/INVALID"
+msgstr "OK, NOT_FOUND, NO_SPACE, CORRUPT or IO/INVALID"
+
+msgid "Marker is programmed last after sync. Failed mutation keeps the previous bank and requires reopen; ambiguous marker failure can mean the new blob committed. Product owns migration/authentication/recovery policy."
+msgstr "Marker is programmed last after sync. Failed mutation keeps the previous bank and requires reopen; ambiguous marker failure can mean the new blob committed. Product owns migration/authentication/recovery policy."
+
+msgid "[inout] Open exclusively owned instance"
+msgstr "[inout] Open exclusively owned instance"
+
+msgid "[in] Payload disjoint from workspace, borrowed during call"
+msgstr "[in] Payload disjoint from workspace, borrowed during call"
+
+msgid "[in] Payload bytes; zero permits NULL"
+msgstr "[in] Payload bytes; zero permits NULL"
+
+msgid "OK, NO_SPACE, INVALID or underlying port error"
+msgstr "OK, NO_SPACE, INVALID or underlying port error"
+
+msgid "[in] Geometry-established instance, or NULL"
+msgstr "[in] Geometry-established instance, or NULL"
+
+msgid "Payload bytes per bank, or zero for invalid geometry"
+msgstr "Payload bytes per bank, or zero for invalid geometry"
+
+msgid "Task-only; caller serializes every operation. Offsets are byte-relative to the supplied region. program changes only 1 to 0 in complete aligned program units; erase uses complete uniform erase units. sync makes earlier successful writes durable. Errors can change a subset of addressed units, but never retain caller buffers after returning. RAM is a model, not a persistent implementation. Product owns the region/layout and power policy."
+msgstr "Task-only; caller serializes every operation. Offsets are byte-relative to the supplied region. program changes only 1 to 0 in complete aligned program units; erase uses complete uniform erase units. sync makes earlier successful writes durable. Errors can change a subset of addressed units, but never retain caller buffers after returning. RAM is a model, not a persistent implementation. Product owns the region/layout and power policy."
+
+msgid "Two independently erasable banks commit whole blobs. No heap, global registry, maximum pool or default product reservation. Wire format v1 is explicit little-endian and CRC-protected, not authenticated. Keep instance, port context and workspace alive through close/quiescence. A mutating I/O error invalidates opened; reopen to establish which commit actually survived."
+msgstr "Two independently erasable banks commit whole blobs. No heap, global registry, maximum pool or default product reservation. Wire format v1 is explicit little-endian and CRC-protected, not authenticated. Keep instance, port context and workspace alive through close/quiescence. A mutating I/O error invalidates opened; reopen to establish which commit actually survived."
+
+msgid "Startup/task context. Controller and executor remain alive through owner stop/drain and external observer quiescence. Direct UART users must not share this controller. Queued time belongs to the bus owner; after start the UART's first terminal TC/error/cancel/deadline fact is authoritative. cancel observes provider completion/deadline before asking it to abort. Failed drain keeps both requests QUARANTINED; service must continue during recovery. Outer SETTLED never precedes inner acquire-observed SETTLED and pointer detach. The application separately stops hardware and RX consumers only after all owner operations and controls quiesce."
+msgstr "Startup/task context. Controller and executor remain alive through owner stop/drain and external observer quiescence. Direct UART users must not share this controller. Queued time belongs to the bus owner; after start the UART's first terminal TC/error/cancel/deadline fact is authoritative. cancel observes provider completion/deadline before asking it to abort. Failed drain keeps both requests QUARANTINED; service must continue during recovery. Outer SETTLED never precedes inner acquire-observed SETTLED and pointer detach. The application separately stops hardware and RX consumers only after all owner operations and controls quiesce."
+
+msgid "[inout] Unused caller-owned storage, no concurrent calls"
+msgstr "[inout] Unused caller-owned storage, no concurrent calls"
+
+msgid "[inout] Initialized UART exclusively owned by this executor"
+msgstr "[inout] Initialized UART exclusively owned by this executor"
+
+msgid "Port for nx_bus_owner_init, or an invalid zero port for NULL"
+msgstr "Port for nx_bus_owner_init, or an invalid zero port for NULL"
+
+msgid "inner is a separate publication object, not another outer queue or caller admission. Only this executor accesses it; producers retain their outer request and payload until the bus owner publishes outer SETTLED. No buffer copy, heap, worker or pool. Never pass inner to application observers."
+msgstr "inner is a separate publication object, not another outer queue or caller admission. Only this executor accesses it; producers retain their outer request and payload until the bus owner publishes outer SETTLED. No buffer copy, heap, worker or pool. Never pass inner to application observers."
+
+msgid "Kernel-invoked privileged Thread with incoming masks clear, one serialized broker executor. Principal comes from the configured trusted kernel identity port. Pin both validated memory ranges before any GPIO call; snapshot input once, copy an initialized reply. Kernel call storage is zero-initialized outside user RAM and must outlive retained pins. No OS SVC/MPU/TZ wiring or user privilege elevation is provided by this component."
+msgstr "Kernel-invoked privileged Thread with incoming masks clear, one serialized broker executor. Principal comes from the configured trusted kernel identity port. Pin both validated memory ranges before any GPIO call; snapshot input once, copy an initialized reply. Kernel call storage is zero-initialized outside user RAM and must outlive retained pins. No OS SVC/MPU/TZ wiring or user privilege elevation is provided by this component."
+
+msgid "REJECTED has accepted=false, no pin/effect. ACCEPTED may already be detached or retain cleanup after a failure."
+msgstr "REJECTED has accepted=false, no pin/effect. ACCEPTED may already be detached or retain cleanup after a failure."
+
+msgid "Same privileged serialized kernel owner, incoming masks clear. Successful unpin follows actual provider/observer drain; a failed unpin keeps memory, call slot and identity retained. Does not imply that a previously performed GPIO write can be reversed."
+msgstr "Same privileged serialized kernel owner, incoming masks clear. Successful unpin follows actual provider/observer drain; a failed unpin keeps memory, call slot and identity retained. Does not imply that a previously performed GPIO write can be reversed."
+
+msgid "No arbitrary port, MMIO, callback, slot or principal pointer. reserved words must be zero. WRITE has read_mask=0 and disjoint set/reset masks. READ has zero set/reset masks and a positive authorized read_mask. Caller keeps storage immutable until the gateway completes or retains its pin."
+msgstr "No arbitrary port, MMIO, callback, slot or principal pointer. reserved words must be zero. WRITE has read_mask=0 and disjoint set/reset masks. READ has zero set/reset masks and a positive authorized read_mask. Caller keeps storage immutable until the gateway completes or retains its pin."
+
+msgid "accepted means at least one memory pin was acquired. On retained=true the exact kernel call slot and user address space remain borrowed. device_effect_possible is set before a WRITE provider call; an error cannot authorize replay. result describes admission/device execution; cleanup_result separately describes the most recent release attempt. This is software responsibility, not physical pin evidence."
+msgstr "accepted means at least one memory pin was acquired. On retained=true the exact kernel call slot and user address space remain borrowed. device_effect_possible is set before a WRITE provider call; an error cannot authorize replay. result describes admission/device execution; cleanup_result separately describes the most recent release attempt. This is software responsibility, not physical pin evidence."

@@ -26,10 +26,16 @@ CCM 不属于接收 DMA 可达 SRAM。两款 MCU 没有 CPU D-cache，这些 pro
 不执行虚构的 cache clean/invalidate。以后接入带 cache 的 MCU，需要新的
 域和维护合同，不能复用这里的无 cache 假设。
 
-RX-only 与 duplex 使用不同的只读 ops 和直接 TX 调用。TX 热路径没有运行时
-`dma_transmit` 判断；RX-only 链接不保留 TX-DMA ops。当前 provider 使用同一
-显式选择的接收状态布局，因此 RX-only 的冷存储仍含 TX-DMA 基类字段；这
-不是零字段开销声明。
+STM32F407 与 GD32F470 的 RX-only 使用独立紧凑接收状态，保留普通 UART
+前缀的 IRQ TX 能力；只有 duplex 在同一接收 owner 后附加 TX-DMA 扩展。
+两者复用接收贷款算法，使用各自只读 ops 和直接 TX 调用，没有可选实现
+指针或运行时 `dma_transmit` 判断。RX-only 不取得或撤销 TX-DMA 目标，
+其链接不保留 TX-DMA ops；普通 IRQ 状态与默认 ops 槽数保持不变。上述是
+这两款 provider 的结构事实，不是所有芯片的固定 RAM／Flash 成本：
+2026-10-17 IO23 成对 ARM ELF 中，所选 RX-only 状态分别由 200 降至 184
+字节、由 184 降至 168 字节，duplex 状态保持 200／184 字节。数值仅适用
+当次配置与工具链，不能替代其他修订、实例或芯片的实际 ELF 测量，也不
+代表零 Flash 开销或已测得 IRQ 周期。
 
 ## 块所有权与连续接收
 

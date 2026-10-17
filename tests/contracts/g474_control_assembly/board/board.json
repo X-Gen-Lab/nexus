@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474re-control-software-fixture",
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "DS12288 Rev6 silicon route; software fixture only",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "bindings": [
+    {
+      "id": "wave",
+      "controller": "TIM1",
+      "route": "tim1-group-pa8-pa9-pa10-comp1-pa1-pa4",
+      "mask": 1810,
+      "initial": 0
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: physical PCB revision and solder bridges not inspected",
+    "X3 crystal population/frequency and SB25/SB26/SB24/SB28/SB27 electrical states not inspected",
+    "PA5 LD2/SB6 fitting and LPUART1 VCP SB17/SB23/SB18/SB22/SB13/SB19 paths not inspected",
+    "No physical HIL executed; clock timing, serial traffic and electrical behavior unqualified",
+    "Additional USART1/2/3, UART4/5 and GPIOB0/GPIOC0 bindings are silicon-route software fixtures only; connector exposure, solder bridges and attached loads are not inspected. PF0/PF1 HSE and PG10 reset are not exposed as Board bindings.",
+    "SPI1/2 bindings and PA4/PB12 active-low chip selects are unattached silicon-route software fixtures; no external device, connector voltage or bus electrical facts have been observed.",
+    "TIM3 CH1 PA6 and TIM4 CH1 PB6 PWM bindings are unattached silicon-route software fixtures; connector exposure, idle-level suitability and electrical loads have not been inspected.",
+    "TIM1 PA8/PA9/PA10 outputs and COMP1 PA1/PA4 inputs are unattached silicon-route software fixtures; no output stage, external analog threshold, voltage, load or physical timing is qualified."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf",
+      "scope": "UM2505 Rev7 section7.5.1 p22 default X3 crystal24MHz SB25/SB26ON,SB24/SB28OFF,SB27OFF,C56/C59ON6.8pF. LD2 PA5activehigh SB6ON. VCP LPUART1 PA2/PA3AF12 SB17/SB23ON,SB18/SB22/SB13/SB19OFF. Source PDF SHA25635549bd8805ed884ce0e0eeceb9ce94097ecba2a7d95560e6d1109fb119fd3d4; actual Board not inspected."
+    },
+    {
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-g4",
+      "tree": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+      "scope": "Actual G474 register layout/masks/startup/IRQ range102; no actual PCB or PHY qualification."
+    }
+  ]
+}

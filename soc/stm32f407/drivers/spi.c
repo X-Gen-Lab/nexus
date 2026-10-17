@@ -6,6 +6,7 @@
  * \date            2026-10-09
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/io/spi_transaction.h"
 #include "stm32f407_provider.h"
 #include "stm32f4xx_ll_spi.h"
 
@@ -201,4 +202,141 @@ nx_result_t nx_stm32_spi_recover(void* context) {
  */
 const nx_spi_ops_t nx_stm32_spi_ops = {
     .recover = nx_stm32_spi_recover,
+};
+
+#ifndef NX_STM32_SPI_TRANSACTION_CS
+#define NX_STM32_SPI_TRANSACTION_CS(active) ((void)(active))
+#endif
+#ifndef NX_STM32_SPI_TRANSACTION_WRITE
+#define NX_STM32_SPI_TRANSACTION_WRITE(port, value, bits)                      \
+    do {                                                                       \
+        if ((bits) == 16U) {                                                   \
+            LL_SPI_TransmitData16((port)->registers, (value));                 \
+        } else {                                                               \
+            LL_SPI_TransmitData8((port)->registers, (uint8_t)(value));         \
+        }                                                                      \
+    } while (0)
+#endif
+
+/** \brief Optional word-mode polling keeps all phases inside one CS interval.
+ */
+static nx_result_t transaction_transfer(void* context,
+                                        const nx_spi_segment_t* segments,
+                                        size_t count, uint8_t word_bits,
+                                        nx_time_us_t deadline,
+                                        size_t* transferred) {
+    const nx_stm32_spi_endpoint_state_t* endpoint = context;
+    if (endpoint == NULL || endpoint->port == NULL || endpoint->cs == NULL ||
+        endpoint->mode > 3U || endpoint->frequency_hz == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    nx_stm32_spi_state_t* port = endpoint->port;
+    if (port->registers == NULL || port->rcc == NULL || port->clock_hz == 0U ||
+        endpoint->cs->registers == NULL || !endpoint->cs->initialized ||
+        !endpoint->cs->output || endpoint->cs_mask == 0U ||
+        (endpoint->cs_mask & ~endpoint->cs->mask) != 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    size_t total = 0U;
+    for (size_t i = 0U; i < count; ++i) {
+        total += segments[i].words;
+    }
+    if (total > 256U || deadline == NX_DEADLINE_NEVER) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if (port->active) {
+        return NX_ERROR_BUSY;
+    }
+    if (port->fault) {
+        return NX_ERROR_STATE;
+    }
+    if (nx_deadline_expired(deadline, nx_time_now_us())) {
+        return NX_ERROR_TIMEOUT;
+    }
+    uint32_t divisor = 2U;
+    uint32_t baud = 0U;
+    while (port->clock_hz / divisor > endpoint->frequency_hz &&
+           divisor < 256U) {
+        divisor *= 2U;
+        ++baud;
+    }
+    if (port->clock_hz / divisor > endpoint->frequency_hz) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    if ((port->registers->SR & SPI_SR_BSY) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    port->active = true;
+    /* DFF is programmed with SPE clear, once for the complete transaction. */
+    LL_SPI_Disable(port->registers);
+    port->registers->CR1 = SPI_CR1_MSTR | SPI_CR1_SSM | SPI_CR1_SSI |
+                           (baud << 3U) |
+                           (word_bits == 16U ? SPI_CR1_DFF : 0U) |
+                           ((endpoint->mode & 1U) != 0U ? SPI_CR1_CPHA : 0U) |
+                           ((endpoint->mode & 2U) != 0U ? SPI_CR1_CPOL : 0U);
+    port->registers->CR2 = 0U;
+    LL_SPI_Enable(port->registers);
+    nx_result_t result =
+        nx_stm32_gpio_write(endpoint->cs, 0U, endpoint->cs_mask);
+    if (result == NX_SUCCESS) {
+        NX_STM32_SPI_TRANSACTION_CS(true);
+    }
+    for (size_t phase = 0U; phase < count && result == NX_SUCCESS; ++phase) {
+        const nx_spi_segment_t* segment = &segments[phase];
+        for (size_t word = 0U; word < segment->words; ++word) {
+            result = wait_status(port, SPI_SR_TXE, SPI_SR_TXE, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            uint16_t value = segment->dummy;
+            if (segment->tx != NULL) {
+                value = word_bits == 8U ? ((const uint8_t*)segment->tx)[word]
+                                        : ((const uint16_t*)segment->tx)[word];
+            }
+            NX_STM32_SPI_TRANSACTION_WRITE(port, value, word_bits);
+            result = wait_status(port, SPI_SR_RXNE, SPI_SR_RXNE, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            uint16_t received = word_bits == 8U
+                                    ? LL_SPI_ReceiveData8(port->registers)
+                                    : LL_SPI_ReceiveData16(port->registers);
+            if (segment->rx != NULL) {
+                if (word_bits == 8U) {
+                    ((uint8_t*)segment->rx)[word] = (uint8_t)received;
+                } else {
+                    ((uint16_t*)segment->rx)[word] = received;
+                }
+            }
+            ++*transferred;
+        }
+    }
+    if (result == NX_SUCCESS) {
+        result = wait_status(port, SPI_SR_BSY, 0U, deadline);
+    }
+    if (result == NX_SUCCESS) {
+        LL_SPI_Disable(port->registers);
+    } else {
+        abort_controller(port);
+    }
+    nx_result_t release =
+        nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+    NX_STM32_SPI_TRANSACTION_CS(false);
+    port->active = false;
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    if (release != NX_SUCCESS) {
+        return release;
+    }
+    return nx_deadline_expired(deadline, nx_time_now_us()) ? NX_ERROR_TIMEOUT
+                                                           : NX_SUCCESS;
+}
+
+/** \brief Selected enhanced face adds no fields to legacy tables or state. */
+const nx_spi_transaction_ops_t nx_stm32_spi_transaction_ops = {
+    .transfer = transaction_transfer,
 };

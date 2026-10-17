@@ -20,10 +20,17 @@ PINS = {
     "advanced_pwm": (("PA8", "output", 1), ("PB13", "complement", 1),
                      ("PB12", "break", 1))}
 FACTS = {
+    "stm32g474": {"timer_capture": ("TIM5", "TIM5", 50, 170000000)},
     "stm32": {"timer_capture": ("TIM4", "TIM4", 30, 84000000),
               "advanced_pwm": ("TIM1", "TIM1_BRK_TIM9", 24, 168000000)},
     "gd32": {"timer_capture": ("TIMER3", "TIMER3", 30, 100000000),
              "advanced_pwm": ("TIMER0", "TIMER0_BRK_TIMER8", 24, 200000000)}}
+
+
+def pins(prefix, kind):
+    """Keep each reviewed package route separate from its public personality."""
+    return ((("PA0", "capture", 2),) if prefix == "stm32g474" and
+            kind == "timer_capture" else PINS[kind])
 
 
 def resources(prefix, kind):
@@ -44,7 +51,7 @@ def validate_soc(soc, provider):
         if (facts is None or name != facts[0] or item["modes"] != [mode] or
                 item["irq"] != [facts[1]] or item.get("irq_numbers") != [facts[2]] or
                 type(item.get("clock_hz")) is not int or item["clock_hz"] != facts[3] or
-                item["pins"] != [pin for pin, _, _ in PINS[kind]] or
+                item["pins"] != [pin for pin, _, _ in pins(provider.PREFIX, kind)] or
                 item.get("resources") != resources(provider.PREFIX, kind)):
             fail("Timer controller, shared vector, clock or pin facts differ from the SDK")
 
@@ -56,7 +63,7 @@ def validate_selection(selection, route, provider):
         fail("Timer requires explicit clock, mode, safe policy, exclusive owner and IRQ")
     facts = FACTS.get(provider.PREFIX, {}).get(kind)
     actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
-    if facts is None or route["controller"] != facts[0] or actual != PINS[kind]:
+    if facts is None or route["controller"] != facts[0] or actual != pins(provider.PREFIX, kind):
         fail("Timer selection differs from the reviewed exclusive pad route")
     tick = integer(selection["tick_hz"], 1, context="Timer tick_hz")
     if facts[3] % tick or not 1 <= facts[3] // tick <= 65536:
@@ -234,3 +241,64 @@ def stop_system(result, prefix):
             "        nx_arch_dsb();",
             "        if ((RCU_AHB1EN & s_nx_timer_gpio_clocks_added) != 0u) { return NX_ERROR_IO; }",
             "        s_nx_timer_gpio_clocks_added = 0u;", "    }"]
+
+
+def g474_constructor(item):
+    """One selected timer personality, with caller-owned capture storage."""
+    capture = item.kind == "timer_capture"
+    name = item.id.replace("-", "_")
+    state, config = "s_nx_port_" + name, "s_nx_timer_config_" + name
+    vector, priority = "s_nx_vector_" + name, "s_nx_priority_" + name
+    options = item.options
+    lines = []
+    if capture:
+        lines += [f"static bool {vector};", f"static uint8_t {priority};",
+                  f"static const nx_timer_capture_config_t {config} = {{",
+                  f"    170000000u, {options.tick_hz}u, NX_TIMER_EDGE_{options.edge.upper()}, {options.filter}u, true }};"]
+    else:
+        mode = {"x2-ti1": "NX_ENCODER_MODE_X2_TI1",
+                "x2-ti2": "NX_ENCODER_MODE_X2_TI2",
+                "x4-ti12": "NX_ENCODER_MODE_X4_TI12"}[options.counting]
+        lines += [f"static const nx_stm32g474_encoder_config_t {config} = {{",
+                  f"    {mode}, {options.filter_a}u, {options.filter_b}u,",
+                  f"    {str(options.invert_a).lower()}, {str(options.invert_b).lower()}, true }};"]
+    lines += [f"static nx_result_t prepare_{name}(void) {{",
+              f"    if ({state}.config != NULL || {state}.initialized) {{ return NX_ERROR_BUSY; }}",
+              "    nx_result_t status;"]
+    for pin in item["pins"]:
+        lines += [f"    status = nx_stm32g474_pin_alternate(GPIOA, {int(pin['pin'][2:])}u, 2u);",
+                  "    if (status != NX_SUCCESS) { return status; }"]
+    kind = item.kind
+    lines += [f"    status = nx_stm32g474_{kind}_initialize(&{state}, &{config});",
+              "    if (status != NX_SUCCESS) { return status; }"]
+    if capture:
+        lines += [f"    {priority} = (uint8_t)NX_G474_IRQ_PRIORITY(TIM5_IRQn);",
+                  f"    {vector} = true;",
+                  f"    return NX_G474_IRQ_CONTROL(TIM5_IRQn, true, {options.irq.priority}u);"]
+    else:
+        lines += ["    return NX_SUCCESS;"]
+    lines += ["}", f"static nx_result_t stop_{name}(void) {{",
+              "    nx_result_t status;",
+              f"    if ({state}.config != NULL) {{",
+              f"        status = nx_{kind}_stop(&s_nx_face_{name});",
+              "        if (status != NX_SUCCESS) { return status; }", "    }"]
+    if capture:
+        lines += [f"    if ({vector}) {{",
+                  "        status = NX_G474_IRQ_CONTROL(TIM5_IRQn, false, 0u);",
+                  "        if (status != NX_SUCCESS) { return status; }",
+                  "        if (!NX_G474_IRQ_AVAILABLE(TIM5_IRQn)) { return NX_ERROR_BUSY; }",
+                  f"        NX_G474_IRQ_PRIORITY_WRITE(TIM5_IRQn, {priority});",
+                  "        nx_arch_dsb(); nx_arch_isb();",
+                  f"        if (NX_G474_IRQ_PRIORITY(TIM5_IRQn) != {priority}) {{ return NX_ERROR_IO; }}",
+                  f"        {vector} = false;", "    }",
+                  f"    return nx_stm32g474_timer_capture_release(&{state});", "}",
+                  "void TIM5_IRQHandler(void);",
+                  r"/** \brief One selected raw32-bit TIM5 capture observation. */",
+                  f"void TIM5_IRQHandler(void) {{ nx_stm32g474_timer_capture_irq(&{state}); }}"]
+    else:
+        lines += [f"    return nx_stm32g474_encoder_close(&{state});", "}"]
+    return Construction(
+        state_type=("nx_timer_capture_controller_t" if capture else
+                    "nx_stm32g474_encoder_state_t"),
+        definitions=lines, initialize=f"prepare_{name}()",
+        stop=[f"stop_{name}()"], retain_on_failed_init=True)

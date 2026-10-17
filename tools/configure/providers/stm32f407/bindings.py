@@ -2,9 +2,12 @@
 try:
     from ...emission import dma_regions
     from ...gpio_phase import rollback_pin, withdraw_pin
+    from ... import enhanced_endpoints, uart_formats
 except ImportError:
     from emission import dma_regions
     from gpio_phase import rollback_pin, withdraw_pin
+    import enhanced_endpoints
+    import uart_formats
 from ..common import Construction, controller_ir, mode_traits
 from .. import hardware
 try:
@@ -121,7 +124,10 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             if index != 0:
                 declarations.append(f"static nx_stm32_{implementation}_endpoint_state_t {endpoint};")
             declarations += [f"static nx_stm32_gpio_state_t s_nx_cs_{child_name};",
-                             *_endpoint_face("spi", child_name, endpoint, implementation)]
+                             *enhanced_endpoints.face(
+                                 child, endpoint,
+                                 f"nx_stm32_{implementation}_endpoint_ops",
+                                 "stm32")]
             _check(body, f"nx_stm32_gpio_clock_enable({ord(cs_pin[1]) - ord('A')}u)")
             _capture(body, cs_pin)
             rollback_extra.append(f"    s_nx_cs_{child_name}.initialized = false;")
@@ -560,7 +566,9 @@ def _uart_constructor(item, result):
     traits = mode_traits("uart", item.mode)
     dma_uart, receive_uart = traits.tx_dma, traits.rx_dma
     block_uart = traits.block_stream
-    implementation = ("uart_duplex" if receive_uart and dma_uart else
+    words = item.mode == "irq-words"
+    implementation = ("uart_word" if words else
+                      "uart_duplex" if receive_uart and dma_uart else
                       "uart_receive" if receive_uart else
                       "uart_dma" if dma_uart else
                       "uart_stream" if block_uart else "uart")
@@ -568,23 +576,35 @@ def _uart_constructor(item, result):
     profile = ("NX_UART_RX_BLOCKS" if block_uart else
                "NX_UART_RX_EVENTS" if options.rx_profile == "events" else
                "NX_UART_RX_BYTES")
-    storage = ("nx_uart_rx_event_t" if options.rx_profile == "events" else
+    storage = ("uint16_t" if words else
+               "nx_uart_rx_event_t" if options.rx_profile == "events" else
                "uint8_t")
     capacity = options.rx_capacity or 0
     definitions = []
     if not block_uart:
         definitions.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
-    dma_state = f"s_nx_port_{name}" + (".transmit" if receive_uart else "")
+    dma_state = f"s_nx_port_{name}" + (".receive" if receive_uart and dma_uart else "")
+    tx_state = f"s_nx_port_{name}.transmit"
     uart_state = (dma_state + ".uart" if receive_uart or dma_uart or block_uart
                   else dma_state)
     rx_storage = 'NULL' if block_uart else f's_nx_rx_{name}'
     definitions += [f'static nx_result_t prepare_{name}(void) {{',
-               f'    {uart_state}.registers = {item["controller"]};',
-               f'    {uart_state}.rx_storage = {rx_storage};',
-               f'    {uart_state}.rx_capacity = {capacity}u;',
-               f'    {uart_state}.baud = {item.options.baud}u;',
-               f'    {uart_state}.profile = {profile};',
-               f'    {uart_state}.irq = {item["controller"]}_IRQn;',
+               f'    {uart_state}.registers = {item["controller"]};']
+    if not words:
+        definitions += [f'    {uart_state}.rx_storage = {rx_storage};',
+                        f'    {uart_state}.rx_capacity = {capacity}u;',
+                        f'    {uart_state}.baud = {item.options.baud}u;',
+                        f'    {uart_state}.profile = {profile};']
+    initialize = (f"nx_stm32_uart_word_initialize(&s_nx_port_{name}, "
+                  f"84000000u, {options.baud}u, s_nx_rx_{name}, {capacity}u)"
+                  if words else
+                  f"nx_stm32_{implementation}_initialize(&s_nx_port_{name}, "
+                  "84000000u)")
+    if not words and uart_formats.changed(item):
+        initialize = (f"nx_stm32_uart_initialize_format(&s_nx_port_{name}, "
+                      f"84000000u, {uart_formats.expression(options.frame)})")
+    stop_function = "nx_uart_word_port_stop" if words else "nx_uart_port_stop"
+    definitions += [f'    {uart_state}.irq = {item["controller"]}_IRQn;',
                '    uint32_t saved_clock = RCC->AHB1ENR & RCC_AHB1ENR_GPIOAEN;',
                '    uint32_t saved_uart_clock = RCC->APB2ENR & RCC_APB2ENR_USART1EN;',
                '    nx_result_t clock = nx_stm32_gpio_clock_enable(0u);',
@@ -594,7 +614,7 @@ def _uart_constructor(item, result):
                '    uint16_t saved_tx = nx_stm32_pin_capture(GPIOA, 9u);',
                '    uint16_t saved_rx = nx_stm32_pin_capture(GPIOA, 10u);',
                '    nx_result_t pins = nx_stm32_uart1_pins_prepare();',
-               f'    nx_result_t uart = pins == NX_SUCCESS ? nx_stm32_{implementation}_initialize(&s_nx_port_{name}, 84000000u) : pins;',
+               f'    nx_result_t uart = pins == NX_SUCCESS ? {initialize} : pins;',
                '    if (uart != NX_SUCCESS) {',
                '        uint32_t retained_gpio_clocks = 0u;']
     definitions += rollback_pin("stm32", "PA9", "saved_tx")
@@ -606,7 +626,7 @@ def _uart_constructor(item, result):
                f'    NVIC_SetPriority({uart_state}.irq, {item.options.irq.priority}u);',
                '    return NX_SUCCESS;', '}',
                f'static nx_result_t stop_{name}(void) {{',
-               f'    nx_result_t status = nx_uart_port_stop(&s_nx_face_{name});',
+               f'    nx_result_t status = {stop_function}(&s_nx_face_{name});',
                '    if (status != NX_SUCCESS) { return status; }']
     definitions += withdraw_pin("stm32", "PA9", indent=4)
     definitions += withdraw_pin("stm32", "PA10", indent=4)
@@ -617,12 +637,19 @@ def _uart_constructor(item, result):
                '    nx_arch_dsb();', '    return NX_SUCCESS;', '}']
     init = f'prepare_{name}()'
     irq = item["controller"] + '_IRQHandler'
-    irq_implementation = ("uart_duplex" if receive_uart and dma_uart else
+    irq_implementation = ("uart_word" if words else
+                         "uart_format" if uart_formats.changed(item) else
+                         "uart_duplex" if receive_uart and dma_uart else
                       "uart_receive" if receive_uart else
                           "uart_dma_uart" if dma_uart else
                           "uart_stream" if block_uart else "uart")
+    irq_call = uart_formats.irq_call(item, f"nx_stm32_{irq_implementation}_irq(&s_nx_port_{name});")
     definitions += [f'void {irq}(void);', '/** \\brief Fixed single-controller IRQ dispatch. */',
-               f'void {irq}(void) {{ nx_stm32_{irq_implementation}_irq(&s_nx_port_{name}); }}']
+               f'void {irq}(void) {{ {irq_call} }}']
+    if words or uart_formats.changed(item):
+        rejected = definitions.index('    if (uart != NX_SUCCESS) {') + 1
+        definitions[rejected:rejected] = [
+            f'        if (s_nx_port_{name}.initialized) {{ return uart; }}']
     if traits.dma:
         from . import _FIXED_DMA
         expected = _FIXED_DMA.get((item["controller"], item.mode))
@@ -634,21 +661,21 @@ def _uart_constructor(item, result):
         definitions[position:position] = region_lines
         port_binding = hardware.maintained("stm32f407", item.controller)
         path = port_binding.dma(item.mode)[0]
-        prefix = [f"    {dma_state}.dma = DMA{path[0]};",
-                  f"    {dma_state}.regions = s_nx_dma_regions_{name};",
-                  f"    {dma_state}.region_count = {region_count}u;"]
+        prefix = [f"    {dma_state}.resources.dma = DMA{path[0]};",
+                  f"    {dma_state}.resources.regions = s_nx_dma_regions_{name};",
+                  f"    {dma_state}.resources.region_count = {region_count}u;"]
         if receive_uart:
             rx = port_binding.dma("rx-dma-idle")[0]
             rx_vector = hardware.dma_vector("stm32f407", rx)
-            prefix += [f"    s_nx_port_{name}.receive = {rx_vector};",
-                       f"    s_nx_port_{name}.continuous = {'true' if traits.continuous else 'false'};"]
+            prefix += [f"    {dma_state}.receive = {rx_vector};",
+                       f"    {dma_state}.continuous = {'true' if traits.continuous else 'false'};"]
         if dma_uart:
             tx = port_binding.dma("dma-tx")[0]
             tx_vector = hardware.dma_vector("stm32f407", tx)
-            prefix += [f"    {dma_state}.tx = {tx_vector};",
-                       f"    {dma_state}.dma_irq = {tx_vector}_IRQn;",
-                       f"    {dma_state}.stream = {tx[1]}u;",
-                       f"    {dma_state}.channel = {tx[2]}u;"]
+            prefix += [f"    {tx_state}.tx = {tx_vector};",
+                       f"    {tx_state}.dma_irq = {tx_vector}_IRQn;",
+                       f"    {tx_state}.stream = {tx[1]}u;",
+                       f"    {tx_state}.channel = {tx[2]}u;"]
         position += len(region_lines) + 1
         definitions[position:position] = prefix
         priority_line = definitions.index(
@@ -658,29 +685,30 @@ def _uart_constructor(item, result):
             priorities.append(f"    NVIC_SetPriority({rx_vector}_IRQn, {item.options.irq.priority}u);")
             definitions += [f"void {rx_vector}_IRQHandler(void);",
                             "/** \\brief Exact selected DMA receive publisher. */",
-                            f"void {rx_vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
+                            f"void {rx_vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&{dma_state}); }}"]
         if dma_uart:
-            priorities.append(f"    NVIC_SetPriority({dma_state}.dma_irq, {item.options.irq.priority}u);")
+            priorities.append(f"    NVIC_SetPriority({tx_state}.dma_irq, {item.options.irq.priority}u);")
             definitions += [f"void {tx_vector}_IRQHandler(void);",
                             "/** \\brief Exact selected DMA TX observation. */",
-                            f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&{dma_state}); }}"]
+                            f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_{'duplex_dma' if receive_uart else 'dma'}_irq(&s_nx_port_{name}); }}"]
         definitions[priority_line + 1:priority_line + 1] = priorities
     return Construction(
         state_type=f"nx_stm32_{implementation}_state_t",
         definitions=definitions, initialize=init, stop=[f"stop_{name}()"],
-        retain_on_failed_init=False)
+        retain_on_failed_init=words or uart_formats.changed(item))
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed STM32 instance, including its rollback and stop."""
     item = controller_ir(item, "stm32f407")
     if secondary_controllers.applies(item, result, "stm32"):
-        return secondary_controllers.constructor(item, result, "stm32")
+        construction = secondary_controllers.constructor(item, result, "stm32")
+        return enhanced_endpoints.dma_construction(item, construction, "stm32")
     if item.kind in timer_advanced.KINDS:
         return timer_advanced.constructor(item, result, "stm32")
     if item.kind == "can":
         return can.constructor(item, result, "stm32")
-    if item.kind == "eth":
+    if item.kind in {"eth", "eth_frames"}:
         return ethernet.constructor(item, result, "stm32")
     if item.kind == "usb_device":
         return usb_device.constructor(item, result, "stm32")
@@ -688,4 +716,6 @@ def constructor(item, result, board_bindings, routes, devices):
         return _gpio_constructor(item)
     if item.kind == "uart":
         return _uart_constructor(item, result)
-    return _controller_constructor(item, result, board_bindings, routes, devices)
+    construction = _controller_constructor(item, result, board_bindings,
+                                            routes, devices)
+    return enhanced_endpoints.dma_construction(item, construction, "stm32")

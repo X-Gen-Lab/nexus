@@ -141,10 +141,11 @@ nx_result_t nx_stm32u575_i2c_clock_stop(nx_stm32u575_i2c_clock_t* clock) {
     clock->retained = false;
     return NX_SUCCESS;
 }
-nx_result_t nx_stm32u575_i2c_initialize(nx_stm32u575_i2c_state_t* port) {
+nx_result_t nx_stm32u575_i2c_initialize_timing(nx_stm32u575_i2c_state_t* port,
+                                               uint32_t timing) {
     if (!task())
         return NX_ERROR_CONTEXT;
-    if (!valid(port))
+    if (!valid(port) || timing == 0U || (timing & 0x0f000000U) != 0U)
         return NX_ERROR_INVALID;
     if (port->initialized || port->retained || port->active)
         return NX_ERROR_BUSY;
@@ -156,22 +157,27 @@ nx_result_t nx_stm32u575_i2c_initialize(nx_stm32u575_i2c_state_t* port) {
         (NX_U575_READ(&NX_U575_RCC->CCIPR1) & RCC_CCIPR1_I2C1SEL) !=
             RCC_CCIPR1_I2C1SEL_1)
         return NX_ERROR_STATE;
-    /* RM0456 timing: HSI16, PRESC=1, SCLL/H=47, SDADEL=4, SCLDEL=15,
-     * analog filter on and digital filter off. At DS13737 Table81's
-     * 15.65..16.25MHz limits, low/high counters each exceed5.9us and
-     * SCLDEL exceeds1.96us, leaving margin for rise<=1000ns/fall<=300ns
-     * and Standard250ns setup. SCL stays below100kHz; physical pull-ups,
-     * voltage, temperature and package/solder effects require validation. */
-    port->timing = 0x10f42f2fU;
+    /* The assembly checks the complete HSI16/electrical envelope. Keeping the
+     * selected word in the existing state also preserves it through recover;
+     * no separate timing owner or runtime clock calculation is introduced. */
+    port->timing = timing;
     /* ES0499 Rev12 2.20.1 permits Standard250ns setup at>=4MHz kernel.
      * Section2.20.2 requires clearing spurious master BERR without abort. */
     port->ignore_master_berr = true;
     port->receive_reload_one = false;
     nx_result_t result = nx_i2c_v2_initialize(port);
     if (result == NX_SUCCESS &&
-        LL_I2C_GetTimingPrescaler((I2C_TypeDef*)port->registers) != 1U)
+        LL_I2C_GetTimingPrescaler((I2C_TypeDef*)port->registers) !=
+            ((timing >> 28U) & 15U))
         return NX_ERROR_IO;
     return result;
+}
+nx_result_t nx_stm32u575_i2c_initialize(nx_stm32u575_i2c_state_t* port) {
+    /* RM0456 default: HSI16, PRESC=1, SCLL/H=47, SDADEL=4, SCLDEL=15,
+     * AF on/DNF0. DS13737 Table81's15.65..16.25MHz bounds give low/high
+     * above5.9us and SCLDEL above1.96us, with rise<=1000ns/fall<=300ns.
+     * Physical pull-ups, voltage and temperature still require validation. */
+    return nx_stm32u575_i2c_initialize_timing(port, 0x10f42f2fU);
 }
 nx_result_t nx_stm32u575_i2c1_pins_prepare(void) {
     nx_result_t result = nx_stm32u575_gpio_clock_enable(1U);

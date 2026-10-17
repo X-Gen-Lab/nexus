@@ -82,6 +82,42 @@ TEST_F(H743System, PowerNotReadyCannotStartOrWriteRuntimeRamHardware) {
     EXPECT_EQ(Start().primary, NX_ERROR_BUSY);
     EXPECT_EQ(g_h743_model.writes, 0U);
 }
+TEST_F(H743System, QueuedFlashWorkRejectsBeforeHsi32DividerOrTimerMutation) {
+    for (uint32_t busy : {uint32_t(FLASH_SR_QW), uint32_t(FLASH_SR_WBNE)}) {
+        for (unsigned bank = 0U; bank < 2U; ++bank) {
+            nx_h743_model_reset();
+            volatile uint32_t* status =
+                bank == 0U ? &g_h743_model.flash.SR1 : &g_h743_model.flash.SR2;
+            *status = busy;
+            const auto result = Start(32000000U);
+            EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+            EXPECT_EQ(NX_SUCCESS, result.cleanup);
+            EXPECT_EQ(0U, result.remaining_effects);
+            EXPECT_EQ(0U, g_h743_model.writes);
+            EXPECT_EQ(RCC_CR_HSION | RCC_CR_HSIRDY, g_h743_model.rcc.CR);
+            EXPECT_EQ(busy, *status);
+        }
+    }
+}
+TEST_F(H743System, ArmedFlashPulseRejectsBeforeHsi32DividerOrTimerMutation) {
+    for (uint32_t control :
+         {uint32_t(FLASH_CR_PG), uint32_t(FLASH_CR_SER), uint32_t(FLASH_CR_BER),
+          uint32_t(FLASH_CR_START)}) {
+        for (unsigned bank = 0U; bank < 2U; ++bank) {
+            nx_h743_model_reset();
+            volatile uint32_t* armed =
+                bank == 0U ? &g_h743_model.flash.CR1 : &g_h743_model.flash.CR2;
+            *armed = FLASH_CR_LOCK | control;
+            const auto result = Start(32000000U);
+            EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+            EXPECT_EQ(NX_SUCCESS, result.cleanup);
+            EXPECT_EQ(0U, result.remaining_effects);
+            EXPECT_EQ(0U, g_h743_model.writes);
+            EXPECT_EQ(RCC_CR_HSION | RCC_CR_HSIRDY, g_h743_model.rcc.CR);
+            EXPECT_EQ(FLASH_CR_LOCK | control, *armed);
+        }
+    }
+}
 TEST_F(H743System, ExistingTimerOrIrqCannotBeAdopted) {
     g_h743_model.irq_enabled[TIM2_IRQn] = true;
     EXPECT_EQ(Start().primary, NX_ERROR_BUSY);

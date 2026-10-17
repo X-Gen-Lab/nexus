@@ -25,10 +25,10 @@ class F103Watchdog : public testing::Test {
 };
 TEST_F(F103Watchdog, OneSecondUsesNominal40KhzAnd30To60KhzBounds) {
     ASSERT_EQ(NX_SUCCESS,
-              nx_watchdog_port_enable(&face, 1000000, true, &observed));
+              nx_watchdog_port_enable(&face, 1000000, false, &observed));
     EXPECT_TRUE(observed.enabled);
     EXPECT_TRUE(observed.irreversible);
-    EXPECT_TRUE(observed.debug_freeze);
+    EXPECT_FALSE(observed.debug_freeze);
     EXPECT_EQ(666666U, observed.minimum_timeout_us);
     EXPECT_EQ(1333334U, observed.maximum_timeout_us);
     EXPECT_EQ(2U, g_f103_model.watchdog.PR);
@@ -134,21 +134,29 @@ TEST_F(F103Watchdog, FailedLsiRollbackKeepsPendingLeaseAndRejectsReenable) {
     EXPECT_FALSE(state.lsi_owned);
     EXPECT_EQ(0U, g_f103_model.rcc.CSR & RCC_CSR_LSION);
 }
-TEST_F(F103Watchdog, StateObservesActualDebugFreezeForSoftwareEnable) {
+TEST_F(F103Watchdog, StateDoesNotClaimObservationOfExternalDebugFreeze) {
     ASSERT_EQ(NX_SUCCESS,
               nx_watchdog_port_enable(&face, 1000, false, &observed));
+    /* This models an external debug agent, never a normal CPU read. */
     g_f103_model.debug.CR = DBGMCU_CR_DBG_IWDG_STOP;
     EXPECT_EQ(NX_SUCCESS, nx_watchdog_port_state(&face, &observed));
-    EXPECT_TRUE(observed.debug_freeze);
+    EXPECT_FALSE(observed.debug_freeze);
+    EXPECT_EQ(0U, g_f103_model.debug_control_reads);
+    EXPECT_EQ(0U, g_f103_model.debug_control_writes);
+    EXPECT_EQ(DBGMCU_CR_DBG_IWDG_STOP, g_f103_model.debug.CR);
 }
 TEST_F(F103Watchdog, StateOutputCannotOverwritePrivateOwner) {
     EXPECT_EQ(NX_ERROR_INVALID, nx_watchdog_port_state(&face, &state.state));
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_watchdog_port_enable(&face, 1000, false, &state.state));
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_watchdog_port_enable(&face, 1000, true, &state.state));
     EXPECT_EQ(0U, g_f103_model.writes);
 }
 TEST_F(F103Watchdog, UnprivilegedFeedAndStateHaveNoEffects) {
     g_f103_model.privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT,
+              nx_watchdog_port_enable(&face, 1000, true, &observed));
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_watchdog_port_feed(&face));
     EXPECT_EQ(NX_ERROR_CONTEXT, nx_watchdog_port_state(&face, &observed));
     EXPECT_EQ(0U, g_f103_model.writes);
@@ -160,4 +168,70 @@ TEST_F(F103Watchdog, CapturedResetCausesDoNotClearHardwareFlags) {
     EXPECT_EQ(NX_RESET_PIN | NX_RESET_IWDG, nx_reset_cause());
     EXPECT_EQ(raw, g_f103_model.rcc.CSR);
     EXPECT_EQ(0U, g_f103_model.writes);
+}
+
+/* ES096 2.2.2 excludes CPU DBGMCU_CR access. Ordinary watchdog ownership
+ * neither adopts nor changes debugger configuration. */
+TEST_F(F103Watchdog, StandaloneEnableFeedAndStateNeverAccessDebugControl) {
+    ASSERT_EQ(NX_SUCCESS,
+              nx_watchdog_port_enable(&face, 1000U, false, &observed));
+    EXPECT_TRUE(observed.enabled);
+    EXPECT_TRUE(observed.irreversible);
+    EXPECT_FALSE(observed.debug_freeze);
+    ASSERT_EQ(NX_SUCCESS, nx_watchdog_port_feed(&face));
+    ASSERT_EQ(NX_SUCCESS, nx_watchdog_port_state(&face, &observed));
+    EXPECT_EQ(2U, g_f103_model.feeds);
+    EXPECT_EQ(0U, g_f103_model.debug_control_reads);
+    EXPECT_EQ(0U, g_f103_model.debug_control_writes);
+}
+TEST_F(F103Watchdog, DebugFreezeRequestRejectsBeforeAnyHardwareAccess) {
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_watchdog_port_enable(&face, 1000U, true, &observed));
+    EXPECT_EQ(0U, g_f103_model.reads);
+    EXPECT_EQ(0U, g_f103_model.writes);
+    EXPECT_EQ(0U, g_f103_model.debug_control_reads);
+    EXPECT_EQ(0U, g_f103_model.debug_control_writes);
+    EXPECT_EQ(0U, g_f103_model.rcc.CSR & RCC_CSR_LSION);
+    EXPECT_FALSE(g_f103_model.watchdog_enabled);
+    EXPECT_FALSE(state.preparation_retained);
+}
+TEST_F(F103Watchdog, ExternallySetDebugControlIsNeitherAdoptedNorCleared) {
+    g_f103_model.debug.CR = DBGMCU_CR_DBG_IWDG_STOP | DBGMCU_CR_DBG_SLEEP;
+    const uint32_t external = g_f103_model.debug.CR;
+    ASSERT_EQ(NX_SUCCESS,
+              nx_watchdog_port_enable(&face, 1000U, false, &observed));
+    EXPECT_FALSE(observed.debug_freeze);
+    EXPECT_EQ(external, g_f103_model.debug.CR);
+    EXPECT_EQ(0U, g_f103_model.debug_control_reads);
+    EXPECT_EQ(0U, g_f103_model.debug_control_writes);
+}
+TEST_F(F103Watchdog, AutomaticWatchdogQueryAndFeedDoNotReadDebugControl) {
+    g_f103_model.flash.OBR = 0U;
+    g_f103_model.debug.CR = DBGMCU_CR_DBG_IWDG_STOP;
+    ASSERT_EQ(NX_SUCCESS, nx_watchdog_port_state(&face, &observed));
+    EXPECT_TRUE(observed.enabled);
+    EXPECT_TRUE(observed.irreversible);
+    EXPECT_FALSE(observed.debug_freeze);
+    ASSERT_EQ(NX_SUCCESS, nx_watchdog_port_feed(&face));
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32f103_watchdog_stop(&state));
+    EXPECT_EQ(0U, g_f103_model.debug_control_reads);
+    EXPECT_EQ(0U, g_f103_model.debug_control_writes);
+    EXPECT_EQ(DBGMCU_CR_DBG_IWDG_STOP, g_f103_model.debug.CR);
+}
+TEST_F(F103Watchdog, FailedLsiPreparationAndRetryStopNeverTouchDebugControl) {
+    g_f103_model.hold_lsi = true;
+    g_f103_model.hold_lsi_off = true;
+    g_f103_model.debug.CR = DBGMCU_CR_DBG_IWDG_STOP;
+    EXPECT_EQ(NX_ERROR_IO,
+              nx_watchdog_port_enable(&face, 1000U, false, &observed));
+    EXPECT_TRUE(state.preparation_retained);
+    EXPECT_TRUE(state.lsi_owned);
+    g_f103_model.hold_lsi_off = false;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f103_watchdog_stop(&state));
+    EXPECT_FALSE(state.preparation_retained);
+    EXPECT_FALSE(state.lsi_owned);
+    EXPECT_EQ(0U, g_f103_model.rcc.CSR & RCC_CSR_LSION);
+    EXPECT_EQ(0U, g_f103_model.debug_control_reads);
+    EXPECT_EQ(0U, g_f103_model.debug_control_writes);
+    EXPECT_EQ(DBGMCU_CR_DBG_IWDG_STOP, g_f103_model.debug.CR);
 }

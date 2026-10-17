@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474re-pwm-shared-software-reference",
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "DS12288 Rev6 PA6/PA7 AF2; RM0440 Rev9 TIM3; software reference only",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "bindings": [
+    {
+      "id": "left-output",
+      "controller": "TIM3",
+      "route": "tim3-ch1-pa6",
+      "mask": 64,
+      "initial": 0
+    },
+    {
+      "id": "right-output",
+      "controller": "TIM3",
+      "route": "tim3-ch2-pa7",
+      "mask": 128,
+      "initial": 128
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: physical PCB revision, connector exposure, output stages and HIL are not observed.",
+    "The24MHz HSE and opposite inactive output latches are declared software inputs, not measured clock or safe product output facts.",
+    "PA6/TIM3_CH1 and PA7/TIM3_CH2 AF2 are unattached silicon routes; pin loading, electrical levels, peer phase and first-pulse timing are not qualified."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32g474re.pdf",
+      "scope": "DS12288 Rev6 Table13 PA6 TIM3_CH1 and PA7 TIM3_CH2 AF2 in the exact RE package; existing encoder route independently uses the same pad mappings. No PCB connection is inferred."
+    },
+    {
+      "url": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "scope": "RM0440 Rev9 TIM3 fixed up-counting base and channel PWM1 compare/preload controls; only the exact selected two-lane software contract is proposed."
+    }
+  ]
+}

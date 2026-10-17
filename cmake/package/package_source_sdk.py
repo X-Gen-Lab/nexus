@@ -143,6 +143,40 @@ REQUIRED_FILES = (
     "cmake/package/NexusConfig.cmake.in", "cmake/package/NexusConfigVersion.cmake.in",
     "cmake/package/package_source_sdk.py")
 MANIFEST = ".nexus-source-sdk.json"
+IO_EVOLUTION_VERIFICATION_FILES = tuple(
+    "cmake/package/verification/io_evolution/" + name for name in (
+        "h743-high-empty.toml", "h743-high-uart.toml",
+        "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
+        "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
+        "g474-pwm-adc.toml", "boards/g474-fdcan/board.json",
+        "boards/g474-pwm-adc/board.json", "consumers/h743-high.c",
+        "consumers/u575-uart-gpdma.c", "consumers/g474-can-fd.c",
+        "consumers/g474-pwm-adc.c",
+        "g474-adc-group-regular-software.toml",
+        "g474-adc-group-regular-timer.toml",
+        "g474-adc-group-injected-software.toml",
+        "g474-adc-group-injected-timer.toml",
+        "boards/g474-adc-group/board.json", "consumers/g474-adc-group.c",
+        "h743-uart-fifo.toml", "u575-uart-fifo.toml",
+        "consumers/uart-fifo.c", "f407zg-eth-frames.toml",
+        "gd470-eth-frames.toml", "boards/f407zg-eth-frames/board.json",
+        "boards/gd470-eth-frames/board.json", "consumers/ethernet-frames.c",
+        "h743-uart-rtscts.toml", "u575-uart-rtscts.toml",
+        "g474-pwm-shared.toml", "boards/g474-pwm-shared/board.json",
+        "consumers/g474-pwm-shared.c"))
+REQUIRED_FILES += ("tools/configure/selected_contracts.py",
+                   *IO_EVOLUTION_VERIFICATION_FILES)
+REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
+REQUIRED_FILES += (
+    "io/include/nexus/io/ethernet_frames.h",
+    "io/private/eth_frames_mac.h", "io/private/eth_frames_validation.h",
+    "io/src/ethernet_frames.c", "io/src/eth_frames_mac.c",
+    "io/native/ethernet_frames.c", "io/native/ethernet_frames.h",
+    "io/native/ethernet_frames_access.h")
+REQUIRED_FILES += (
+    "tools/configure/providers/stm32g474/adc_group.py",
+    "soc/stm32g474/reviews/adc-group.json",
+    "io/include/nexus/io/adc_group.h", "io/src/adc_group.c")
 # Required payload identity is separate from CMake's production source graph.
 # Every exposed kernel profile must survive a rehashed omission attempt.
 for _port in ("ARM_CM0", "ARM_CM3", "ARM_CM4F", "ARM_CM7/r0p1",
@@ -226,26 +260,38 @@ REQUIRED_FILES += (
     "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h")
 REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
     "fault", "memory", "request", "request_observer", "stack_observation",
-    "status", "time"))
+    "silicon", "status", "time"))
+REQUIRED_FILES += ("core/src/silicon.c", "soc/common/stm32_identity.h")
 REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
-    "adc", "adc_observer", "advanced_pwm", "can", "dma", "ethernet",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd", "cycle_probe",
+    "dma", "encoder",
+    "ethernet",
     "exti", "flash", "gpio", "i2c", "i2c_bus_clear", "mdio", "native/model",
-    "spi", "stream", "stream_budget", "timer", "timer_capture", "uart",
-    "uart_rs485", "usb_device", "wake", "watchdog"))
+    "i2c_long", "observation", "pwm_adc", "pwm_group", "spi_transaction",
+    "spi_dma_transaction", "spi_dma_owner_binding", "uart_format", "uart_word",
+    "native/spi_dma_model", "spi", "stream", "stream_budget", "stream_profile", "timer",
+    "timer_capture", "uart", "uart_rs485", "usb_device", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/src/" + name + ".c" for name in (
-    "adc", "adc_observer", "advanced_pwm", "can", "can_controller", "dma",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd",
+    "can_controller", "cycle_probe", "dma", "encoder",
     "eth_mac", "ethernet", "exti", "flash", "flash_region", "gpio", "i2c",
-    "i2c_bus_clear", "mdio", "spi", "stream", "stream_budget", "timer",
+    "i2c_bus_clear", "i2c_long", "mdio", "observation", "pwm_adc", "pwm_group", "spi",
+    "spi_transaction", "spi_dma_transaction", "spi_dma_sequence",
+    "spi_dma_owner_binding", "uart_word", "stream", "stream_budget",
+    "stream_profile", "timer",
     "timer_capture", "uart", "uart_rs485", "usb_device",
     "usb_device_controller", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
-    "advanced_pwm_impl", "can_controller", "eth_mac",
+    "advanced_pwm_impl", "can_controller", "can_fd_impl", "eth_mac",
+    "spi_dma_sequence", "spi_dma_sequence_owner",
     "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
 REQUIRED_FILES += tuple("io/native/" + name + ".c" for name in (
     "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
-    "spi_async", "stream", "time", "timer", "uart", "usb_device", "watchdog"))
+    "spi_async", "spi_dma_transaction", "stream", "time", "timer", "uart", "uart_word",
+    "usb_device", "watchdog"))
 REQUIRED_FILES += tuple("io/native/" + name + ".h" for name in (
     "can", "can_access", "ethernet", "ethernet_access", "provider",
+    "spi_dma_provider", "uart_word_provider",
     "usb_device", "usb_device_access"))
 for _family in ("stm32f407", "gd32f470"):
     REQUIRED_FILES += tuple("soc/" + _family + "/" + name for name in (
@@ -256,11 +302,22 @@ for _family in ("stm32f407", "gd32f470"):
         "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
         "ethernet", "exti", "flash", "gpio", "i2c", "i2c_async", "spi",
         "spi_dma", "timer", "timer_capture", "uart", "uart_dma",
-        "uart_receive", "uart_stream", "usb_device", "watchdog"))
+        "uart_receive", "uart_duplex", "uart_stream", "uart_word", "usb_device", "watchdog"))
     REQUIRED_FILES += tuple("soc/" + _family + "/private/" + _family + "_"
                             + name + ".h" for name in (
         "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
-        "timer_advanced", "uart_receive", "usb_clock", "usb_device"))
+        "timer_advanced", "uart_receive", "uart_word", "usb_clock", "usb_device"))
+REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
+    "resource_graph", "trigger_graph", "dma_topology", "io_traits", "i2c_timing",
+    "enhanced_endpoints", "uart_formats", "i2c_timing_selection",
+    "stream_profiles", "coupled_io"))
+REQUIRED_FILES += (
+    "soc/stm32g474/drivers/pwm_group.c",
+    "soc/stm32g474/drivers/timer_capture.c",
+    "soc/stm32g474/drivers/encoder.c",
+    "soc/stm32g474/private/stm32g474_pwm_group.h",
+    "soc/stm32g474/private/stm32g474_timer.h",
+    "soc/common/uart_control.h")
 REQUIRED_FILES += (
     "tools/configure/fact_references.py", "tools/configure/preflight.py",
     "tools/configure/gpio_phase.py",
@@ -314,10 +371,10 @@ REQUIRED_FILES += (
     "tools/measurement/elf.py", "tools/evidence/common.py",
     "tools/evidence/identity.py")
 REQUIRED_FILES += tuple("components/bus_owner/src/" + name + ".c" for name in (
-    "bus_owner", "spi_owner", "spi_async_owner", "uart_owner"))
+    "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
 REQUIRED_FILES += tuple("components/bus_owner/include/nexus/components/" + name
                         + ".h" for name in (
-    "bus_owner", "spi_owner", "spi_async_owner", "uart_owner"))
+    "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
 REQUIRED_FILES += (
     "components/bmp280/src/bmp280.c", "components/bmp280/src/spi_transport.c",
     "components/bmp280/include/nexus/components/bmp280.h",
@@ -480,6 +537,10 @@ def dependency_entries(root, dependency):
 
 
 def selected(name):
+    # Only reviewed public smoke programs and their canonical software-reference
+    # inputs belong in this namespace. Host models and private products do not.
+    if name.startswith("cmake/package/verification/io_evolution/"):
+        return name in IO_EVOLUTION_VERIFICATION_FILES
     # Historical audit archives belong to the repository, not the source SDK.
     if name.startswith("tools/testing/evidence/"):
         return False

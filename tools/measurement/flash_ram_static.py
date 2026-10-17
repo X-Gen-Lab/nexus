@@ -1,0 +1,591 @@
+"""Bounded H743 RAM instruction closure and conservative stack admission.
+
+Every instruction comes from ELF-validated bytes; printed mnemonics carry no
+meaning here. This finite classifier checks direct control/literal closure,
+canonical returns and a static frame bound under explicit C memory and compiler
+ABI obligations. It does not prove arbitrary pointer ownership, Flash-data
+access, MPU ordering, timing, CPU execution or hardware behavior.
+"""
+
+from __future__ import annotations
+
+from bisect import bisect_left
+from dataclasses import dataclass
+import hashlib
+from pathlib import Path
+import re
+
+from tools.evidence.common import EvidenceError
+from tools.measurement.flash_execution import verify_h743_cpu_bridge
+from tools.measurement.soc_costs import decode_symbol
+
+PREFIX = "nx_stm32h743_flash_ram_"
+EXCEPTION_RESERVE = 224
+MAX_FRAME = 1 << 20
+
+
+def _require(ok, message):
+    if not ok:
+        raise EvidenceError("H743 RAM static: " + message)
+
+
+def _signed(value, bits):
+    return value - (1 << bits) if value & (1 << (bits - 1)) else value
+
+
+def _destination(register):
+    _require(register not in (13, 15),
+             "unknown SP write or PC write in ordinary instruction")
+
+
+@dataclass(frozen=True)
+class _Op:
+    kind: str = "plain"
+    target: int = 0
+    delta: int = 0
+    registers: tuple = ()
+    literal: tuple = ()
+    it_count: int = 0
+    writes_lr: bool = False
+    stack_store: tuple = ()
+    writes: tuple = ()
+    reads: tuple = ()
+    store_bases: tuple = ()
+
+
+def _expanded(value):
+    if value >> 10 == 0:
+        byte = value & 255
+        return (byte, byte << 16 | byte, byte << 24 | byte << 8,
+                byte * 0x01010101)[value >> 8]
+    rotation = (value >> 7) & 31
+    byte = 128 | value & 127
+    return ((byte >> rotation) | (byte << (32 - rotation))) & 0xffffffff
+
+
+def _data(op, rd, rn, rm=None):
+    # TST/TEQ/CMN/CMP use the PC destination encoding as an opcode alias;
+    # this is not permission for an arithmetic PC write.
+    if rd == 15:
+        _require(op in (0, 4, 8, 13), "unknown arithmetic PC write")
+    else:
+        _destination(rd)
+    _require(rm != 15 and (rn != 15 or op in (2, 3)),
+             "unsupported PC operand in data instruction")
+    return _Op(writes_lr=rd == 14, writes=() if rd == 15 else (rd,),
+               reads=tuple(reg for reg in (rn, rm) if reg not in (None, 15)))
+
+
+def _decode(address, encoded, *, bridge):
+    """Only audited M7 integer/control encodings; no mnemonic decisions."""
+    h = int.from_bytes(encoded[:2], "little")
+    k = int.from_bytes(encoded[2:], "little") if len(encoded) == 4 else 0
+    if len(encoded) == 2:
+        if h & 0xe000 == 0:
+            rd, rn = h & 7, (h >> 3) & 7
+            reads = (rn,)
+            if h & 0x1800 == 0x1800 and not h & 0x400:
+                reads += ((h >> 6) & 7,)
+            return _Op(writes=(rd,), reads=reads)
+        if h & 0xe000 == 0x2000:
+            op, rd = (h >> 11) & 3, (h >> 8) & 7
+            return _Op(writes=() if op == 1 else (rd,),
+                       reads=(rd,) if op >= 2 else ())
+        if h & 0xfc00 == 0x4000:
+            op, rd, rm = (h >> 6) & 15, h & 7, (h >> 3) & 7
+            return _Op(writes=() if op in (8, 10, 11) else (rd,),
+                       reads=(rm,) if op == 9 else (rd, rm))
+        if h & 0xfc00 == 0x4400:
+            if h & 0xff87 in (0x4700, 0x4780):
+                _require(h & 0xff87 == 0x4700 and (h >> 3) & 15 == 14,
+                         "unknown indirect branch/call")
+                return _Op("return")
+            op, rd = (h >> 8) & 3, (h & 7) | ((h >> 4) & 8)
+            _require(op != 3, "unknown indirect branch/call encoding")
+            if op != 1:
+                _destination(rd)
+            rm = (h >> 3) & 15
+            return _Op(writes_lr=rd == 14 and op != 1,
+                       writes=() if op == 1 else (rd,),
+                       reads=(rm,) if op == 2 else (rd, rm))
+        if h & 0xf800 == 0x4800:
+            return _Op(literal=(((address + 4) & ~3) + (h & 255) * 4, 4),
+                       writes=((h >> 8) & 7,))
+        if h & 0xf000 == 0x9000:
+            return _Op(stack_store=((h & 255) * 4, 4) if not h & 0x800 else (),
+                       writes=((h >> 8) & 7,) if h & 0x800 else ())
+        if h & 0xf000 == 0x5000:
+            load = (h >> 9) & 7 not in (0, 1, 2)
+            return _Op(writes=(h & 7,) if load else (),
+                       store_bases=() if load else ((h >> 3) & 7, (h >> 6) & 7))
+        if h & 0xf000 in (0x6000, 0x7000, 0x8000):
+            return _Op(writes=(h & 7,) if h & 0x800 else (),
+                       store_bases=() if h & 0x800 else ((h >> 3) & 7,))
+        if h & 0xf000 == 0xa000:
+            return _Op(writes=((h >> 8) & 7,),
+                       reads=(13,) if h & 0x800 else ())
+        if h & 0xff00 == 0xb000:
+            return _Op(delta=(h & 127) * (4 if h & 128 else -4))
+        if h & 0xf500 == 0xb100:
+            return _Op("conditional", address + 4 +
+                       ((h >> 9) & 1) * 64 + ((h >> 3) & 31) * 2)
+        if h & 0xfe00 in (0xb400, 0xbc00):
+            regs = tuple(i for i in range(8) if h & (1 << i))
+            if h & 256:
+                regs += (14 if h & 0xfe00 == 0xb400 else 15,)
+            _require(regs, "empty stack register list")
+            push = h & 0xfe00 == 0xb400
+            return _Op("push" if push else "pop",
+                       delta=len(regs) * (4 if push else -4), registers=regs)
+        if h in (0xb672, 0xb662):
+            _require(bridge and h == 0xb672, "C CPU state write")
+            return _Op()
+        if h & 0xff00 in (0xb200, 0xba00):
+            return _Op(writes=(h & 7,), reads=((h >> 3) & 7,))
+        if h & 0xff00 == 0xbf00:
+            mask = h & 15
+            if not mask:
+                _require(h in (0xbf00, 0xbf10, 0xbf20, 0xbf30, 0xbf40),
+                         "unsupported Thumb hint")
+                return _Op()
+            _require((h >> 4) & 15 < 14, "invalid IT condition")
+            return _Op(it_count=4 - ((mask & -mask).bit_length() - 1))
+        if h & 0xf000 == 0xc000:
+            _require(h & 255, "empty integer multiple transfer")
+            return _Op(writes=tuple(i for i in range(8) if h & (1 << i))
+                       if h & 0x800 else (),
+                       store_bases=() if h & 0x800 else ((h >> 8) & 7,))
+        if h & 0xf000 == 0xd000 and (h >> 8) & 15 < 14:
+            return _Op("conditional", address + 4 + _signed((h & 255) * 2, 9))
+        if h & 0xf800 == 0xe000:
+            return _Op("branch", address + 4 + _signed((h & 2047) * 2, 12))
+    else:
+        if h & 0xec00 == 0xec00:
+            raise EvidenceError("H743 RAM static: FP/coprocessor instruction")
+        if h == 0xf3ef and k & 0xf000 == 0x8000:
+            rd = (k >> 8) & 15
+            _destination(rd)
+            _require(k & 255 in (0, 5, 8, 9, 16, 17, 19, 20),
+                     "unsupported system-register read")
+            return _Op(writes_lr=rd == 14, writes=(rd,),
+                       reads=(13,) if k & 255 in (8, 9) else ())
+        if h & 0xfff0 == 0xf380 and k & 0xff00 == 0x8800:
+            system = k & 255
+            _require(system in (8, 9, 16, 17, 19, 20),
+                     "unsupported system-register write")
+            _require(bridge, "C CPU state write")
+            return _Op()
+        if h == 0xf3bf and k in (0x8f4f, 0x8f5f, 0x8f6f):
+            return _Op()
+        if h & 0xf800 == 0xf000 and k & 0x8000:
+            s, j1, j2 = (h >> 10) & 1, (k >> 13) & 1, (k >> 11) & 1
+            form = k & 0xd000
+            if form in (0xd000, 0x9000):
+                value = (s << 24 | (1 ^ j1 ^ s) << 23 |
+                         (1 ^ j2 ^ s) << 22 | (h & 1023) << 12 |
+                         (k & 2047) << 1)
+                return _Op("call" if form == 0xd000 else "branch",
+                           address + 4 + _signed(value, 25))
+            if form == 0x8000:
+                _require((h >> 6) & 15 < 14, "invalid wide branch condition")
+                value = (s << 20 | j2 << 19 | j1 << 18 |
+                         (h & 63) << 12 | (k & 2047) << 1)
+                return _Op("conditional", address + 4 + _signed(value, 21))
+            raise EvidenceError(
+                "H743 RAM static: unknown indirect branch encoding")
+        if h in (0xe92d, 0xe8bd):
+            regs = tuple(i for i in range(16) if k & (1 << i))
+            push = h == 0xe92d
+            _require(regs and 13 not in regs and not (push and 15 in regs),
+                     "unsupported wide stack register list")
+            _require(not (14 in regs and 15 in regs),
+                     "unsupported wide stack register list with LR and PC")
+            return _Op("push" if push else "pop",
+                       delta=len(regs) * (4 if push else -4), registers=regs)
+        if h & 0xfff0 == 0xe8d0 and k & 0xffe0 == 0xf000:
+            raise EvidenceError("H743 RAM static: table branch")
+        if h == 0xf85d and k == 0xfb04:
+            # GCC's one-word canonical pop-PC epilogue, not an arbitrary PC
+            # load. _walk requires the exact previously saved incoming LR.
+            return _Op("pop", delta=-4, registers=(15,))
+        if h & 0xff7f == 0xf85f:
+            _require(k >> 12 not in (13, 14, 15),
+                     "unreviewed literal PC write / veneer")
+            return _Op(literal=(((address + 4) & ~3) +
+                                ((k & 4095) if h & 128 else -(k & 4095)), 4),
+                       writes=(k >> 12,))
+        if h & 0xfff0 in (0xf8d0, 0xf8c0, 0xf890, 0xf880, 0xf8b0,
+                          0xf8a0, 0xf990, 0xf9b0):
+            _destination(k >> 12)
+            _require(h & 15 != 15, "unsupported PC-based memory instruction")
+            size = {0xf8c0: 4, 0xf880: 1, 0xf8a0: 2}.get(h & 0xfff0)
+            return _Op(writes_lr=k >> 12 == 14 and bool(h & 16),
+                       stack_store=(k & 4095, size)
+                       if h & 15 == 13 and size else (),
+                       writes=(k >> 12,) if h & 16 else (),
+                       store_bases=() if h & 16 or h & 15 == 13 else (h & 15,))
+        if h & 0xfff0 in (0xf850, 0xf840, 0xf810, 0xf800, 0xf830, 0xf820):
+            _destination(k >> 12)
+            _require(h & 15 != 15, "unknown memory PC write")
+            if k & 0x800:
+                _require(k & 0x500, "invalid indexed transfer")
+                _require(h & 15 != 13 or not k & 0x100, "dynamic SP write")
+            else:
+                _require(h & 15 != 13 or h & 16,
+                         "unknown indexed SP store footprint")
+                _require(k & 0xfc0 == 0 and k & 15 not in (13, 15),
+                         "unsupported register-offset transfer")
+            size = {0xf840: 4, 0xf800: 1, 0xf820: 2}.get(h & 0xfff0)
+            offset = (k & 255) * (1 if k & 0x200 else -1)
+            return _Op(writes_lr=(k >> 12 == 14 and bool(h & 16)) or
+                       (h & 15 == 14 and bool(k & 0x800 and k & 0x100)),
+                       stack_store=(offset, size)
+                       if h & 15 == 13 and size else (),
+                       writes=(k >> 12,) if h & 16 else (),
+                       store_bases=() if h & 16 or h & 15 == 13 else
+                       (h & 15,) + ((k & 15,) if not k & 0x800 else ()))
+        if h & 0xffe0 in (0xe9c0, 0xe940):
+            _destination(k >> 12)
+            _destination((k >> 8) & 15)
+            _require(h & 15 != 15 and (h & 0x120) and
+                     not (h & 15 == 13 and h & 32), "unsupported dual transfer")
+            return _Op(writes_lr=bool(h & 16) and
+                       14 in (k >> 12, (k >> 8) & 15),
+                       stack_store=((k & 255) * (4 if h & 128 else -4), 8)
+                       if h & 15 == 13 and not h & 16 else (),
+                       writes=(k >> 12, (k >> 8) & 15) if h & 16 else (),
+                       store_bases=() if h & 16 or h & 15 == 13 else (h & 15,))
+        if h & 0xfe00 in (0xea00, 0xeb00):
+            op = (h >> 5) & 15
+            _require(op in (0, 1, 2, 3, 4, 8, 10, 11, 13, 14),
+                     "unsupported shifted integer instruction")
+            rd = (k >> 8) & 15
+            _require(rd != 15 or h & 16, "arithmetic PC write")
+            return _data(op, rd, h & 15, k & 15)
+        if h & 0xfa00 == 0xf000 and not k & 0x8000:
+            op, rd, rn = (h >> 5) & 15, (k >> 8) & 15, h & 15
+            _require(op in (0, 1, 2, 3, 4, 8, 10, 11, 13, 14),
+                     "unsupported immediate integer instruction")
+            immediate = (((h >> 10) & 1) << 11 |
+                         ((k >> 12) & 7) << 8 | (k & 255))
+            if rd == 13:
+                _require(rn == 13 and op in (8, 13), "dynamic SP write")
+                return _Op(delta=_expanded(immediate) * (1 if op == 13 else -1))
+            _require(rd != 15 or h & 16, "arithmetic PC write")
+            return _data(op, rd, rn)
+        if h & 0xfbf0 in (0xf200, 0xf2a0):
+            rd, rn = (k >> 8) & 15, h & 15
+            immediate = (((h >> 10) & 1) << 11 |
+                         ((k >> 12) & 7) << 8 | (k & 255))
+            if rd == 13:
+                _require(rn == 13, "dynamic SP write")
+                return _Op(delta=immediate * (1 if h & 0xa0 else -1))
+            _destination(rd)
+            return _Op(writes_lr=rd == 14, writes=(rd,),
+                       reads=(rn,) if rn != 15 else ())
+        if (h & 0xfbf0 in (0xf240, 0xf2c0) or
+                h & 0xfff0 in (0xf340, 0xf360, 0xf3c0)):
+            rd = (k >> 8) & 15
+            _destination(rd)
+            preserve = h & 0xfbf0 == 0xf2c0 or h & 0xfff0 == 0xf360
+            sources = (rd,) if preserve else ()
+            if h & 0xfff0 in (0xf340, 0xf360, 0xf3c0) and h & 15 != 15:
+                sources += (h & 15,)
+            return _Op(writes_lr=rd == 14, writes=(rd,), reads=sources)
+        if h & 0xfff0 == 0xfab0 and k & 0xf0f0 == 0xf080:
+            _destination((k >> 8) & 15)
+            _require(h & 15 == k & 15 and h & 15 not in (13, 15),
+                     "unsupported CLZ source")
+            return _Op(writes_lr=(k >> 8) & 15 == 14,
+                       writes=((k >> 8) & 15,), reads=(h & 15,))
+    raise EvidenceError(
+        f"H743 RAM static: unsupported Thumb bytes at {address:#x}: "
+        f"{encoded.hex()}")
+
+
+def _stack_records(records):
+    _require(isinstance(records, (list, tuple)) and len(records) <= 256,
+             "bounded actual SU records required")
+    rows, sources = [], set()
+    for record in records:
+        _require(isinstance(record, dict) and set(record) == {"source", "raw"},
+                 "SU source/raw fields required")
+        source, raw = record["source"], record["raw"]
+        _require(isinstance(source, str) and Path(source).is_file(),
+                 "SU source does not exist")
+        source = str(Path(source).resolve())
+        _require(source not in sources, "ambiguous duplicate SU source")
+        sources.add(source)
+        _require(isinstance(raw, bytes) and 0 < len(raw) <= 1024 * 1024,
+                 "actual nonempty bounded SU bytes required")
+        for line in raw.decode("utf-8").splitlines():
+            parts = line.split("\t")
+            _require(len(parts) == 3, "invalid SU row")
+            match = re.fullmatch(r"(.+):\d+:\d+:(.+)", parts[0])
+            _require(match and Path(match[1]).resolve() == Path(source),
+                     "SU source identity differs")
+            _require(parts[1].isdigit() and int(parts[1]) <= MAX_FRAME,
+                     "invalid SU frame")
+            _require(parts[2] == "static", "dynamic or unknown SU frame")
+            rows.append({"name": match[2], "source": source,
+                         "frame": int(parts[1]),
+                         "su_sha256": hashlib.sha256(raw).hexdigest(),
+                         "source_sha256": hashlib.sha256(
+                             Path(source).read_bytes()).hexdigest()})
+    return rows
+
+
+def _normalized(name):
+    return re.sub(r"\.(isra|constprop|part|clone)\.\d+", r".\1", name)
+
+
+def _walk(code, start, calls, may_return, *, ordinary_c):
+    """Bound SP paths and check returns under the C memory/ABI obligations.
+
+    Track register copies/arithmetic of SP, MSP and PSP conservatively. This
+    finite provenance blocks known stack-address stores; it is not arbitrary
+    pointer-alias, interprocedural argument or spilled-value analysis.
+    """
+    pending, seen, depths = [(start, 0, True, (), (13,))], set(), {}
+    maximum, returned = 0, False
+    while pending:
+        address, depth, lr, saved, tainted = pending.pop()
+        state = address, depth, lr, saved, tainted
+        if state in seen:
+            continue
+        _require(len(seen) < 20000, "CFG state bound exceeded")
+        seen.add(state)
+        _require(address in code,
+                 "reachable flow leaves an instruction boundary")
+        _require(address not in depths or depths[address] == depth,
+                 "dynamic/unbounded SP loop")
+        depths[address] = depth
+        instruction, op, conditional = code[address]
+        _require(not any(register in tainted for register in op.store_bases),
+                 "stack-derived store through a register address")
+        derived = any(register in tainted for register in op.reads)
+        changed = set(tainted).difference(op.writes)
+        if derived:
+            changed.update(op.writes)
+        changed = tuple(sorted(changed))
+        following = address + len(bytes.fromhex(instruction["encoding"]))
+        slots, after = dict(saved), depth + op.delta
+        restored = lr and not op.writes_lr
+        _require(0 <= after <= MAX_FRAME, "SP frame underflow/overflow")
+        maximum = max(maximum, after)
+        if op.stack_store:
+            offset, size = op.stack_store
+            _require(0 <= offset and offset + size <= depth,
+                     "explicit SP store leaves owned frame")
+            first = -depth + offset
+            _require(not any(first < slot + 4 and slot < first + size
+                             for slot in slots),
+                     "explicit SP store overlaps saved LR")
+        if op.kind == "push":
+            for index, register in enumerate(op.registers):
+                if register == 14:
+                    slots[-after + index * 4] = lr
+        if op.kind == "pop":
+            for index, register in enumerate(op.registers):
+                if register in (14, 15):
+                    value = slots.get(-depth + index * 4, False)
+                    _require(value, "unknown indirect stack return")
+                    restored = value
+        slots = tuple(sorted((offset, value) for offset, value in slots.items()
+                             if offset >= -after))
+        next_nodes = []
+        if op.kind == "return" or op.kind == "pop" and 15 in op.registers:
+            _require(after == 0 and restored,
+                     "unknown indirect return or live frame")
+            returned = True
+        elif op.kind in ("call", "branch", "conditional"):
+            callee = calls.get(address)
+            if callee is not None:
+                _require(op.kind != "call" or not ordinary_c or after % 8 == 0,
+                         "ordinary C call violates 8-byte SP alignment")
+                if op.kind != "call":
+                    _require(after == 0 and restored,
+                             "tailcall retains an SP frame")
+                if may_return[callee]:
+                    if op.kind == "call":
+                        next_nodes.append(
+                            (following, after, False, slots, changed))
+                    else:
+                        returned = True
+            else:
+                next_nodes.append((op.target, after, restored, slots, changed))
+            if op.kind == "conditional":
+                next_nodes.append((following, after, restored, slots, changed))
+        else:
+            next_nodes.append((following, after, restored, slots, changed))
+        if conditional:
+            next_nodes.append((following, depth, lr, saved, tainted))
+        pending.extend(next_nodes)
+    return maximum, returned
+
+
+def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
+    """Validate every RAM function and sum Thread/NMI/HardFault frame bounds.
+
+    SU source bytes are identified and matched, not attested compiler history.
+    Actual build receipts must bind these identities to the ELF separately.
+    The internally executed CPU bridge proof supplies its private frame only;
+    it does not make the C transaction or its device protocol trustworthy.
+    """
+    _require(isinstance(observations, dict) and
+             observations.get("elf_sha256") ==
+             hashlib.sha256(elf.data).hexdigest(),
+             "ELF observation hash differs")
+    raw = observations.get("objdump")
+    _require(isinstance(raw, bytes) and 0 < len(raw) <= 16 * 1024 * 1024,
+             "bounded actual objdump bytes required")
+    first = elf.symbol("__nx_flash_ram_start")
+    end = elf.symbol("__nx_flash_ram_end")
+    _require(0x24000000 <= first < end <= 0x24080000,
+             "invalid exact RAM pod span")
+    lines = {}
+    for line in raw.decode("ascii").splitlines(keepends=True):
+        match = re.match(r"^\s*([0-9a-f]+):\s", line)
+        if match:
+            address = int(match[1], 16)
+            _require(address not in lines, "duplicate disassembly address")
+            lines[address] = line
+    addresses = sorted(lines)
+    functions, by_start, names = {}, {}, {}
+    for index, symbol in enumerate(elf.defined_symbols):
+        start = symbol["value"] & ~1
+        if symbol["type"] != 2 or not first <= start < end:
+            continue
+        _require(symbol["size"] > 0 and start + symbol["size"] <= end,
+                 "zero-sized or crossing RAM function")
+        _require(start not in by_start, "overlapping/aliased RAM function")
+        selected = addresses[bisect_left(addresses, start):
+                             bisect_left(addresses, start + symbol["size"])]
+        decoded = decode_symbol(
+            elf, index, "".join(lines[x] for x in selected).encode("ascii"))
+        code, it_left = {}, 0
+        for instruction in decoded["instructions"]:
+            op = _decode(instruction["address"],
+                         bytes.fromhex(instruction["encoding"]),
+                         bridge=symbol["name"] == PREFIX + "enter")
+            _require(not (it_left and op.it_count), "nested IT block")
+            code[instruction["address"]] = instruction, op, bool(it_left)
+            if it_left:
+                it_left -= 1
+                _require(not it_left or
+                         op.kind not in
+                         ("call", "branch", "conditional", "return")
+                         and not (op.kind == "pop" and 15 in op.registers),
+                         "control flow before last IT instruction")
+            if op.it_count:
+                it_left = op.it_count
+            if op.literal:
+                target, size = op.literal
+                _require(first <= target < target + size <= end,
+                         "literal fetch leaves exact RAM pod")
+        _require(not it_left, "truncated IT block")
+        functions[index] = {"symbol": symbol, "code": code,
+                            "calls": {}, "children": set()}
+        by_start[start] = index
+        names.setdefault(symbol["name"], []).append(index)
+    _require(functions, "RAM pod contains no functions")
+    for left, right in zip(sorted(by_start), sorted(by_start)[1:]):
+        _require(left + functions[by_start[left]]["symbol"]["size"] <= right,
+                 "overlapping executable RAM functions")
+    mandatory = tuple(PREFIX + name for name in
+                      ("enter", "transaction", "nmi", "hardfault"))
+    _require(isinstance(roots, (tuple, list)) and len(roots) <= 32,
+             "bounded mandatory root names required")
+    for name in (*mandatory, *roots):
+        _require(isinstance(name, str) and len(names.get(name, ())) == 1,
+                 "missing or ambiguous mandatory RAM root")
+    edges = []
+    for index, function in functions.items():
+        for address, (instruction, op, conditional) in function["code"].items():
+            if op.kind not in ("call", "branch", "conditional"):
+                continue
+            if op.kind != "call" and op.target in function["code"]:
+                continue
+            _require(op.target in by_start,
+                     "direct target leaves RAM function instruction boundary")
+            target = by_start[op.target]
+            function["calls"][address] = target
+            function["children"].add(target)
+            edges.append({"from": index, "to": target, "address": address,
+                          "kind": "call" if op.kind == "call" else "tail"})
+    order, active, completed = [], set(), set()
+    def visit(index):
+        _require(index not in active, "recursive RAM call/tailcall graph")
+        if index in completed:
+            return
+        active.add(index)
+        for child in functions[index]["children"]:
+            visit(child)
+        active.remove(index)
+        completed.add(index)
+        order.append(index)
+    for index in functions:
+        visit(index)
+    bridge = verify_h743_cpu_bridge(elf, observations)
+    _require(bridge.get("status") == "passed" and
+             bridge.get("private_frame_bytes") == 0,
+             "actual bridge private frame proof missing")
+    records = _stack_records(stack_usage)
+    reports, bounds, may_return = [], {}, {}
+    for index in order:
+        function, symbol = functions[index], functions[index]["symbol"]
+        peak, returns = _walk(function["code"], symbol["value"] & ~1,
+                              function["calls"], may_return,
+                              ordinary_c=symbol["name"] != PREFIX + "enter")
+        source = None
+        if symbol["name"] == PREFIX + "enter":
+            frame = bridge["private_frame_bytes"]
+        else:
+            matches = [
+                row for row in records
+                if row["name"] == _normalized(symbol["name"]) and
+                (not symbol["file"] or
+                 Path(row["source"]).name == symbol["file"])]
+            _require(len(matches) == 1,
+                     "missing or ambiguous SU function identity: " +
+                     symbol["name"])
+            record = matches[0]
+            frame, source = record["frame"], record["source"]
+            _require(frame >= peak,
+                     "SU frame understates actual SP instructions")
+        may_return[index] = returns
+        bound = frame + max((bounds[x] for x in function["children"]),
+                            default=0)
+        _require(bound <= MAX_FRAME, "static stack bound overflow")
+        bounds[index] = bound
+        reports.append({"index": index, "name": symbol["name"],
+                        "source": source,
+                        "address": symbol["value"] & ~1, "frame_bytes": frame,
+                        "encoded_frame_bytes": peak, "chain_bytes": bound,
+                        "may_return": returns})
+    nmi, hardfault = names[PREFIX + "nmi"][0], names[PREFIX + "hardfault"][0]
+    _require(not may_return[nmi] and not may_return[hardfault],
+             "NMI/HardFault has an actual return path; nonreturn required")
+    thread = max(bounds.values())
+    required = thread + bounds[nmi] + bounds[hardfault] + EXCEPTION_RESERVE
+    available = bridge["stack_end"] - bridge["stack_start"]
+    _require(required <= available,
+             "private stack cannot fit conservative stack bound")
+    return {"status": "passed", "qualification": False,
+            "elf_sha256": hashlib.sha256(elf.data).hexdigest(),
+            "physical_execution": "not_executed", "cycles": "not_measured",
+            "thread_chain_bytes": thread, "nmi_chain_bytes": bounds[nmi],
+            "hardfault_chain_bytes": bounds[hardfault],
+            "exception_reserve_bytes": EXCEPTION_RESERVE,
+            "stack_required_bytes": required,
+            "stack_available_bytes": available,
+            "functions": reports, "edges": edges,
+            "stack_sources": records,
+            "assumptions": [
+                "compiler AAPCS compliance for C callees and frame records",
+                "C memory ownership prevents untracked saved-return aliases"],
+            "limits": ["no C data-pointer/Flash-read or MPU protocol proof",
+                       "stack-address taint is intrafunction/register-only",
+                       "no CPU execution, timing or hardware qualification",
+                       "SU identities are not signed build attestation",
+                       "tail chains retain caller frame conservatively"]}

@@ -7,6 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32h743_provider.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #include "stm32h7xx_ll_adc.h"
 
 #ifndef NX_H743_SILICON_ID
@@ -27,8 +30,12 @@ static bool valid(const nx_stm32h743_adc_state_t* p) {
 }
 static bool clock_ready(void) {
     return g_nx_stm32h743_system.started &&
+#if NEXUS_CORE_HZ == 384000000U
+           nx_stm32h743_pll384_clocks_ready() &&
+#else
            (g_nx_stm32h743_system.core_hz == 32000000U ||
             g_nx_stm32h743_system.core_hz == 64000000U) &&
+#endif
            g_nx_stm32h743_system.rcc != NULL &&
            (NX_H743_READ(&g_nx_stm32h743_system.rcc->AHB1ENR) &
             RCC_AHB1ENR_ADC12EN) != 0U;
@@ -107,14 +114,22 @@ nx_result_t nx_stm32h743_adc_initialize(nx_stm32h743_adc_state_t* p) {
     p->fault = false;
     /* The synchronous HCLK/4 path avoids unowned PLL and ADC kernel muxes.
      * Official LL boost encoding preserves the cut1/cut2 distinction. */
+#if NEXUS_CORE_HZ == 384000000U
+    /* Joint owner selects per_ck/HSI64; acquire only this ADC divider.
+     * The source envelope62..65MHz gives15.5..16.25MHz conversion clocks. */
+    uint32_t boost = LL_ADC_BOOST_MODE_20MHZ;
+    const uint32_t adc_clock = LL_ADC_CLOCK_ASYNC_DIV4;
+#else
     uint32_t boost = g_nx_stm32h743_system.core_hz == 64000000U
                          ? LL_ADC_BOOST_MODE_20MHZ
                          : LL_ADC_BOOST_MODE_12MHZ5;
+    const uint32_t adc_clock = LL_ADC_CLOCK_SYNC_PCLK_DIV4;
+#endif
     boost = (NX_H743_SILICON_ID() & 0x30000000U) == 0x10000000U
                 ? (boost >> 2U) & ADC_CR_BOOST_0
                 : boost & ADC_CR_BOOST;
-    if (!checked(&p->common->CCR, LL_ADC_CLOCK_SYNC_PCLK_DIV4) ||
-        !control(p, 0U) || !control(p, ADC_CR_ADVREGEN | boost))
+    if (!checked(&p->common->CCR, adc_clock) || !control(p, 0U) ||
+        !control(p, ADC_CR_ADVREGEN | boost))
         return NX_ERROR_IO;
     nx_time_us_t ready = nx_deadline_after(nx_time_now_us(), 25U);
     uint32_t remaining = p->poll_limit;

@@ -29,9 +29,12 @@ class Construction(Mapping):
     retain_on_failed_init: bool
     exports: tuple[str, ...] = ()
     pin_snapshots: Mapping[str, str] = field(default_factory=dict)
+    face_context: str | None = None
+    face_definitions: tuple[str, ...] = ()
 
     _FIELDS = ("state_type", "definitions", "initialize", "stop",
-               "retain_on_failed_init", "exports", "pin_snapshots")
+               "retain_on_failed_init", "exports", "pin_snapshots",
+               "face_context", "face_definitions")
 
     def __post_init__(self):
         if (not isinstance(self.state_type, str) or
@@ -42,7 +45,11 @@ class Construction(Mapping):
             fail("Construction requires an explicit initializer")
         if type(self.retain_on_failed_init) is not bool:
             fail("Construction requires boolean failed-init responsibility")
-        for name in ("definitions", "stop", "exports"):
+        if (self.face_context is not None and
+                re.fullmatch(r"&[A-Za-z_][A-Za-z0-9_]*",
+                             self.face_context) is None):
+            fail("Construction face context requires an explicit static object")
+        for name in ("definitions", "stop", "exports", "face_definitions"):
             values = tuple(getattr(self, name))
             if any(not isinstance(value, str) for value in values):
                 fail(f"Construction {name} requires C source strings")
@@ -89,15 +96,26 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("adc_group", "injected-sequence"): ModeTraits(irq=True),
+    ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),
+    ("can_fd", "iso-fd-normal"): ModeTraits(irq=True),
+    ("pwm_group", "coherent-pwm"): ModeTraits(irq=True),
+    ("encoder", "quadrature"): ModeTraits(),
     ("timer_capture", "edge-capture"): ModeTraits(irq=True),
     ("advanced_pwm", "complementary-pwm"): ModeTraits(irq=True),
     ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
+    ("eth_frames", "rmii-vlan-sg-ptp"): ModeTraits(irq=True, bus_master=True),
     ("usb_device", "device-fs"): ModeTraits(irq=True),
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
+    ("uart", "irq-words"): ModeTraits(irq=True),
     ("uart", "irq-bytes"): ModeTraits(irq=True),
+    ("uart", "irq-fifo-bytes"): ModeTraits(irq=True),
+    ("uart", "irq-fifo-rtscts-bytes"): ModeTraits(irq=True),
     ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
     ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
     ("uart", "rx-dma-idle"): ModeTraits(
@@ -109,6 +127,7 @@ _MODE_TRAITS = MappingProxyType({
     ("uart", "dma-duplex-continuous"): ModeTraits(
         irq=True, block_stream=True, tx_dma=True, rx_dma=True, continuous=True),
     ("spi", "short-poll"): ModeTraits(polling=True),
+    ("spi", "async-model"): ModeTraits(irq=True),
     ("spi", "dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("spi", "dma-full-duplex"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
@@ -121,6 +140,7 @@ _MODE_TRAITS = MappingProxyType({
     ("watchdog", "independent"): ModeTraits(),
     ("exti", "edge-event"): ModeTraits(irq=True),
     ("pwm", "fixed-pwm"): ModeTraits(),
+    ("pwm", "shared-fixed-pwm"): ModeTraits(),
     ("adc", "single-shot"): ModeTraits(polling=True),
     ("adc", "low-rate-scan"): ModeTraits(polling=True),
     ("adc", "trigger-dma"): ModeTraits(
@@ -174,6 +194,7 @@ def validate_clock_profiles(soc, provider):
     except ImportError:
         import clocks
     for name, expected in supported.items():
+        clocks.plan(name, actual[name])
         if clocks.normalize(actual[name]) != clocks.normalize(expected):
             fail(f"Clock profile differs from the fixed cold implementation: {name}")
 
@@ -240,21 +261,35 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "adc_group": {"channels", "sample_times", "reference_mv", "exclusive",
+                      "silicon_profile", "trigger", "period_us", "watchdog",
+                      "irq_priority", "calls_os"},
+        "pwm_adc": {"tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks",
+                    "channels", "sample_times", "reference_mv", "exclusive",
+                    "irq_priority", "calls_os"},
+        "can_fd": {"bitrate", "data_bitrate", "event_capacity", "filters",
+                   "drain_timeout_us", "poll_limit", "exclusive",
+                   "irq_priority", "calls_os", "message_ram_words"},
+        "encoder": {"counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
+        "pwm_group": {"tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq_priority", "calls_os"},
         "timer_capture": {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"},
         "advanced_pwm": {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
                          "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"},
         "eth": {"tx_count", "rx_count", "rx_storage_bytes", "address",
                 "init_timeout_us", "drain_timeout_us", "irq_priority", "calls_os"},
+        "eth_frames": {"tx_count", "rx_count", "rx_storage_bytes", "address",
+                       "init_timeout_us", "drain_timeout_us", "irq_priority",
+                       "calls_os"},
         "usb_device": {"event_capacity", "rx_fifo_words", "vbus_sensing",
                        "poll_limit", "drain_timeout_us", "clock_timeout_us",
                        "irq_priority", "calls_os"},
         "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
                 "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
-        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os"},
-        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os"}, "flash": set(), "watchdog": set(),
+        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame", "stream", "irq_probe", "fifo"},
+        "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os", "timing"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
-        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os"},
+        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os", "stream"},
     }
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
@@ -265,7 +300,7 @@ def validate_selection(selection, route, provider, ram_size):
         except ImportError:
             import timer_advanced
         timer_advanced.validate_selection(selection, route, provider)
-    elif kind == "eth":
+    elif kind in {"eth", "eth_frames"}:
         try:
             from .. import ethernet
         except ImportError:
@@ -287,7 +322,17 @@ def validate_selection(selection, route, provider, ram_size):
         if not {"baud", "rx_profile", "irq_priority"}.issubset(selection):
             fail("UART requires baud, RX profile and IRQ priority")
         integer(selection["baud"], *provider.LIMITS["uart_baud"], "UART baud")
-        if selection["rx_profile"] == "blocks":
+        try:
+            from .. import uart_formats
+        except ImportError:
+            import uart_formats
+        uart_formats.validate(selection, route, provider)
+        if selection["mode"] == "irq-words":
+            if selection["rx_profile"] != "words":
+                fail("Word UART requires RX words, never byte/event storage")
+            integer(selection.get("rx_capacity"), 1,
+                    min(4096, ram_size // 2), "UART RX word capacity")
+        elif selection["rx_profile"] == "blocks":
             if not mode_traits(kind, selection["mode"]).block_stream:
                 fail("UART RX blocks requires irq-blocks or a reviewed RX-DMA provider")
             if "rx_capacity" in selection:

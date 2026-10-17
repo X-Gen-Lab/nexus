@@ -1,0 +1,201 @@
+# Authored translation; independent semantic review completed.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0b5a581ac0c38b0c3b0531720fcbfaa92d4ff37266987a0a2b9570f96fd5fee3\n"
+
+msgid "Finite USART1 GPDMA TX on STM32U575"
+msgstr "STM32U575 USART1 有限 GPDMA TX"
+
+msgid "Select this mode when an exact STM32U575ZIT6Q TZEN0 assembly needs finite byte transmission through USART1 while retaining independent IRQ-byte reception. The implementation uses one static UART owner, caller-owned requests and TX buffers, and the pinned official LL register operations. Product tasks, wait policy, protocol framing and recovery policy remain external. Physical HIL is `not_executed`."
+msgstr "当精确 STM32U575ZIT6Q 的 TZEN0 装配需要通过 USART1 发送有限字节，同时保留独立的 IRQ 字节接收时，选择此模式。实现使用一个静态 UART 所有者、调用方持有的请求和 TX 缓冲区，以及锁定的官方 LL 寄存器操作。产品任务、等待策略、协议组帧和恢复策略仍由外部工程负责。物理 HIL 为 `not_executed`。"
+
+msgid "Select the exact assembly"
+msgstr "选择精确装配"
+
+msgid "![FIG-16: current generated faces, private providers and caller-owned requests; this selection has one UART owner](../assets/diagrams/io-evolution.svg)"
+msgstr "![FIG-16：当前生成的接口、私有 provider 与调用方持有的请求；此选型只有一个 UART 所有者](../assets/diagrams/io-evolution.svg)"
+
+msgid "FIG-16: current generated faces, private providers and caller-owned requests; this selection has one UART owner"
+msgstr "FIG-16：当前生成的接口、私有 provider 与调用方持有的请求；此选型只有一个 UART 所有者"
+
+msgid "**FIG-16 shows current shared construction and runtime ownership. It is not a U575 DMA timing diagram or hardware qualification.** For this selection, the generated face is `nx_uart_port_t`, its shared table is `nx_stm32u575_uart_gpdma_ops`, and its private owner embeds one UART prefix plus selected GPDMA metadata. The arrows retain their generation, lookup and call meanings. No second UART face or hidden DMA worker owns the same controller. Ordinary IRQ-byte UART state and operations gain no fields."
+msgstr "**FIG-16 展示当前共享的构造和运行时所有权，不表示 U575 DMA 时序或硬件资格。** 此选型生成 `nx_uart_port_t` 接口，共享方法表为 `nx_stm32u575_uart_gpdma_ops`，私有所有者包含一个 UART 前缀和按选型保留的 GPDMA 元数据。箭头仍分别表示生成、查找和调用。不存在第二个 UART 接口或隐藏 DMA worker 共同拥有同一控制器。普通 IRQ 字节 UART 的状态和方法表不增加字段。"
+
+msgid "Fact"
+msgstr "事实"
+
+msgid "Maintained selection"
+msgstr "维护的选型"
+
+msgid "Chip and execution"
+msgstr "芯片与执行环境"
+
+msgid "STM32U575ZIT6Q, TZEN0 baremetal reference, existing MSIS/PCLK4MHz profile"
+msgstr "STM32U575ZIT6Q、TZEN0 裸机参考、既有 MSIS/PCLK4MHz 配置"
+
+msgid "UART"
+msgstr "UART"
+
+msgid "USART1, PA9/PA10 AF7,8N1, FIFO disabled, baud62..250000"
+msgstr "USART1、PA9/PA10 AF7、8N1、禁用 FIFO、波特率62..250000"
+
+msgid "TX engine"
+msgstr "TX 引擎"
+
+msgid "GPDMA1 channel0, request25, IRQ29"
+msgstr "GPDMA1 channel0、request25、IRQ29"
+
+msgid "RX and UART IRQ"
+msgstr "RX 与 UART IRQ"
+
+msgid "Independent caller-selected byte ring, USART1 IRQ61"
+msgstr "调用方独立选择的字节环，USART1 IRQ61"
+
+msgid "IRQ policy"
+msgstr "IRQ 策略"
+
+msgid "Both vectors priority5; validate each selected kernel policy"
+msgstr "两个向量均为优先级5；分别验证选定的内核策略"
+
+msgid "TX count"
+msgstr "TX 数量"
+
+msgid "1..65535bytes, matching the16bit BNDT field"
+msgstr "1..65535字节，对应16位 BNDT 字段"
+
+msgid "TX source"
+msgstr "TX 源"
+
+msgid "Entire nonwrapping span in nonsecure SRAM1 `[0x20000000,0x20030000)`"
+msgstr "完整且不回绕的区间必须位于非安全 SRAM1 `[0x20000000,0x20030000)`"
+
+msgid "Current Board input"
+msgstr "当前 Board 输入"
+
+msgid "Source-reviewed NUCLEO-U575ZI-Q reference; physical wiring remains unqualified"
+msgstr "经源码审查的 NUCLEO-U575ZI-Q 参考；实际接线尚未取得资格"
+
+msgid "The normal fixture supplies the existing Board package and UART mode. Physical engine, channel, request and vector facts come from the exact SoC descriptor; there is no competing authored DMA register configuration."
+msgstr "正常夹具提供既有 Board 包和 UART 模式。物理引擎、通道、请求和向量事实来自精确 SoC 描述，不另建相互竞争的手写 DMA 寄存器配置。"
+
+msgid "The last SRAM1 byte is valid for a one-byte transfer. SRAM2/3/4, Secure aliases and LPDMA-only memory are outside this selected source domain. The provider rejects wrapping, oversized or unreachable payloads and overlap with its known state, immutable route facts, RX ring and controlled MMIO before admission. RX read outputs and count storage cannot overwrite those controls or an active request/payload. These checks do not replace the caller's obligation to supply live, correctly typed storage."
+msgstr "SRAM1 最后一个字节可用于单字节传输。SRAM2/3/4、Secure 别名和仅 LPDMA 可达的内存不属于此选型的源地址域。provider 在准入前拒绝回绕、超长、不可达的数据，以及与已知状态、不可变路由事实、RX 环和受控 MMIO 重叠的区间。RX 输出及计数存储不能覆写这些控制区，也不能覆写活动请求或数据。检查不能替代调用方提供有效、存活且类型正确的存储的责任。"
+
+msgid "Execute through the existing UART face"
+msgstr "通过既有 UART 接口执行"
+
+msgid "Call platform start from the privileged task owner. Check its primary error, cleanup error and remaining effects. A failed partial constructor can retain ownership; keep its storage and cold leases live while retrying stop."
+msgstr "由特权任务所有者调用平台启动。检查主要错误、清理错误及剩余效果。部分构造失败仍可能保留所有权；重试停止期间，必须保持其存储和冷态租约有效。"
+
+msgid "Obtain the static face through `nx_factory_uart(NX_UART_ID_CONSOLE)`. Lookup is pure identity and may happen before startup; hardware operations require successful platform startup."
+msgstr "通过 `nx_factory_uart(NX_UART_ID_CONSOLE)` 取得静态接口。查找只返回身份，可以在启动前执行；硬件操作要求平台已成功启动。"
+
+msgid "Initialize a fresh request once with `nx_request_initialize`, then prepare it with `nx_uart_tx_prepare`. The deadline is absolute in the live `nx_time_now_us` domain. Keep the entire payload immutable while borrowed."
+msgstr "对新请求调用一次 `nx_request_initialize`，随后通过 `nx_uart_tx_prepare` 准备请求。deadline 是有效 `nx_time_now_us` 时间域内的绝对时间。借用期间必须保持整个数据区不可变。"
+
+msgid "Submit through `nx_uart_port_submit`. Rejection retains no request, payload or new hardware effects. `NX_SUCCESS` means ACCEPTED, including a subsequent hardware start failure that the same owner must drain. An explicit adapter may instead pass its existing QUEUED loan through `nx_uart_port_start_admitted`."
+msgstr "通过 `nx_uart_port_submit` 提交。拒绝不会保留请求、数据或新增硬件效果。`NX_SUCCESS` 表示 ACCEPTED，也包括后续硬件启动失败；同一所有者必须完成其排空。显式适配器也可通过 `nx_uart_port_start_admitted` 传入自己已经持有的 QUEUED 借用。"
+
+msgid "The same task calls `nx_uart_port_service` to advance deadline observation and drain. IRQs only latch bounded physical facts and issue an optional wake hint. A wait adapter is optional; it must validate both IRQ policies before using kernel notifications. A wake hint never replaces the request level."
+msgstr "同一任务调用 `nx_uart_port_service` 推进 deadline 观察与排空。IRQ 只锁存有界的物理事实，并可发出唤醒提示。等待适配器是可选项；使用内核通知前，必须验证两个 IRQ 策略。唤醒提示不能替代请求状态。"
+
+msgid "Acquire-observe `SETTLED` before reading the result or reusing the request and payload. Adapter observers must also join before their storage is reused. Ordinary RX reads remain available during DMA TX."
+msgstr "读取结果或复用请求及数据前，必须通过 acquire 观察到 `SETTLED`。适配器观察者也必须退出后才能复用其存储。DMA TX 期间仍可进行普通 RX 读取。"
+
+msgid "No scheduler, worker, allocation or runtime name registry is created by lookup, startup, submission or IRQ dispatch. One privileged task serializes controls; cross-task cancellation uses the established external slot/epoch adapter rather than sharing a mutable request pointer."
+msgstr "查找、启动、提交和 IRQ 分派均不创建调度器、worker、动态分配或运行时名称注册表。一个特权任务串行执行控制操作；跨任务取消使用既有的外部 slot/epoch 适配器，不共享可变请求指针。"
+
+msgid "Separate DMA, wire and reference completion"
+msgstr "区分 DMA、线上与引用完成"
+
+msgid "![FIG-06: current request states retain the borrow through drain and quarantine until final release-publication](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：当前请求状态在排空和隔离期间保留借用，直到最终 release 发布](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "FIG-06: current request states retain the borrow through drain and quarantine until final release-publication"
+msgstr "FIG-06：当前请求状态在排空和隔离期间保留借用，直到最终 release 发布"
+
+msgid "**FIG-06 describes the current shared request contract, not a promise that a timeout can stop hardware.** Its optional QUEUED path belongs to an explicit adapter. In this provider, cancellation and deadline observation retain the same request and source until hardware and reference withdrawal is proved."
+msgstr "**FIG-06 描述当前共享的请求合同，不承诺超时能够停止硬件。** 可选的 QUEUED 路径属于显式适配器。此 provider 在取消和 deadline 观察后仍保留同一请求及源数据，直到证明硬件和引用已经撤离。"
+
+msgid "Observation"
+msgstr "观察结果"
+
+msgid "Provider action and release condition"
+msgstr "provider 动作与释放条件"
+
+msgid "DMA `TCF`"
+msgstr "DMA `TCF`"
+
+msgid "Latch block completion; still retain the request and source. Prove disabled/idle engine with no FIFO data before relying on USART wire state."
+msgstr "锁存块完成事实，继续保留请求和源数据。依赖 USART 线上状态前，必须证明引擎已禁用、空闲且 FIFO 无剩余数据。"
+
+msgid "Cancellation, deadline or DMA error"
+msgstr "取消、deadline 或 DMA 错误"
+
+msgid "Retain the first terminal cause, begin bounded drain and preserve the earliest existing drain bound. No buffer revocation follows from a timeout."
+msgstr "保留首个终止原因，开始有界排空，并保持既有的最早排空期限。超时不撤销缓冲区借用。"
+
+msgid "Active channel withdrawal"
+msgstr "活动通道撤离"
+
+msgid "Request `SUSP`; observe fresh hardware `SUSPF` and `IDLEF`; issue legal `RESET` and read back disabled/idle state. Writing zero to `EN` does not disable GPDMA."
+msgstr "请求 `SUSP`，观察新的硬件 `SUSPF` 和 `IDLEF`，发出合法 `RESET`，并读回已禁用及空闲状态。向 `EN` 写零不会禁用 GPDMA。"
+
+msgid "Suspension IRQ"
+msgstr "挂起 IRQ"
+
+msgid "Withdraw `SUSPIE` with readback and preserve the actual `SUSPF` needed by the later reset proof. Cached flags cannot authorize reset."
+msgstr "撤销 `SUSPIE` 并确认读回，保留后续复位证明所需的实际 `SUSPF`。缓存的标志不能授权复位。"
+
+msgid "Independent USART `TC`"
+msgstr "独立的 USART `TC`"
+
+msgid "The final stop bit is complete; source/IRQ/publisher withdrawal is still required before settlement."
+msgstr "最后一个停止位已完成；发布完成前仍须撤离各源、IRQ 和发布者。"
+
+msgid "All required proof joined"
+msgstr "全部必要排空条件成立"
+
+msgid "Clear the active reference, then release-publish `SETTLED` as the final provider request access."
+msgstr "先清除活动引用，再通过 release 发布 `SETTLED`，作为 provider 对请求的最后一次访问。"
+
+msgid "Proof still missing when the drain bound expires"
+msgstr "排空期限届满仍缺少证明"
+
+msgid "Keep `QUARANTINED` storage borrowed and expose continued owner recovery responsibility."
+msgstr "继续借用 `QUARANTINED` 存储，并保留所有者继续恢复的责任。"
+
+msgid "Normal block completion does not require a reset on every request when the engine is already proved disabled, idle and empty. Cancellation of an active channel requires the suspension/reset sequence above. Old completion and suspension flags are drained before a new `EN`; errors remain latched and an old `TCF` cannot start the next request's wire-drain budget. DMA errors arriving while flags are acknowledged cannot turn a failed request into success."
+msgstr "当引擎已证明禁用、空闲且为空时，普通块完成不要求每个请求都复位。取消活动通道需要上述挂起和复位顺序。新的 `EN` 前先排空旧完成和挂起标志；错误保持锁存，旧 `TCF` 不能启动下一请求的线上排空预算。标志确认期间到达的 DMA 错误不能使失败请求变为成功。"
+
+msgid "Task service withdraws DMA/USART TX interrupt sources and checks their readback, disabled/not-pending/inactive DMA vector state, active UART IRQ and captured wake publishers. Only after DMA cannot load another TDR byte does it independently observe USART `TC`. IRQ-byte RX remains independent of TX DMA. An error or aborted request reports zero guaranteed transferred bytes; a successful request reports its full submitted byte count."
+msgstr "任务 service 撤销 DMA/USART TX 中断源并检查读回，确认 DMA 向量已禁用、无 pending、无 active，同时检查活动 UART IRQ 及已捕获的唤醒发布者。只有 DMA 已不能继续装载 TDR 字节后，才独立观察 USART `TC`。IRQ 字节 RX 与 TX DMA 保持独立。错误或中止的请求将保证有效的传输字节数报告为零；成功请求报告全部提交字节数。"
+
+msgid "Preserve the USART request gate through recovery"
+msgstr "恢复期间保持 USART 请求门控"
+
+msgid "ES0499 Rev12 section2.21.2 describes lost subsequent DMA requests when `DMAT` is cleared and set again. This mode uses the documented persistent-gate workaround: install `DMAT=1` before the first `UE` enable and retain it through success, cancellation, errors, channel reset and rearm. Per-request recovery does not cycle the receiver's `UE`."
+msgstr "ES0499 Rev12 第2.21.2节描述了清除再设置 `DMAT` 后可能丢失后续 DMA 请求的问题。此模式采用文档中的持续门控规避措施：首次启用 `UE` 前建立 `DMAT=1`，并在成功、取消、错误、通道复位及重新装载期间保持。逐请求恢复不会循环关闭再开启接收器的 `UE`。"
+
+msgid "Whole stop closes admission and retains `DMAT` until the outstanding request, interrupt sources, both vectors and wake publishers have joined and `UE=0`, `TEACK=0` and `REACK=0` are observed. Only then may it clear `DMAT` and withdraw its added GPDMA clock. Partial initialization records effects before their first write and retains unproved cleanup. Repeated stop on a cold or successfully stopped owner performs no hardware access, including after a successor starts on the same controller."
+msgstr "整体停止先关闭准入，并保持 `DMAT`，直到未完成请求、中断源、两个向量和唤醒发布者均已退出，且观察到 `UE=0`、`TEACK=0` 和 `REACK=0`。之后才可清除 `DMAT` 并撤销本次新增的 GPDMA 时钟。部分初始化在第一次写入前记录效果，并保留未证明完成的清理责任。对冷态或已成功停止的所有者重复停止不会访问硬件，包括同一控制器已由后继实例启动之后。"
+
+msgid "If service or stop cannot prove withdrawal, keep the request, payload, ring, wake target and selected cold owner live. Continue bounded service/stop through that same owner. A product decides how to handle a permanently unresponsive peripheral; this platform does not invent a successful release or automatically restart protocol traffic."
+msgstr "如果 service 或 stop 无法证明撤离，必须保持请求、数据、环、唤醒目标及选定冷态所有者有效。通过同一所有者继续有界 service/stop。产品决定如何处理永久无响应的外设；平台不会虚构成功释放，也不会自动恢复协议流量。"
+
+msgid "Build and assess the evidence"
+msgstr "构建与评估证据"
+
+msgid "From the repository root with the pinned tools and dependencies prepared, run:"
+msgstr "在仓库根目录准备好锁定工具和依赖后，运行："
+
+msgid "The maintained input is the TOML above. Successful commands produce `io_evolution_fixture.elf`, `.bin`, `.map`, `.resources.json` and `provider-retention.json` under the preset's `bin` directory. Check successful resource validation and retention of one selected UART face with the real GPDMA operations table. These commands build software and do not flash a board or execute physical HIL. Application TX execution requires the explicit task flow above; the linked smoke fixture only establishes its declared link scope."
+msgstr "维护的输入为上述 TOML。成功后在该 preset 的 `bin` 目录生成 `io_evolution_fixture.elf`、`.bin`、`.map`、`.resources.json` 和 `provider-retention.json`。检查资源验证成功，且保留了一个选定 UART 接口及其真实 GPDMA 方法表。这些命令只构建软件，不烧写开发板或执行物理 HIL。应用 TX 执行需要上述显式任务流程；链接冒烟夹具只建立其声明的链接范围。"
+
+msgid "Current development evidence includes 40 real-provider GoogleTest/GoogleMock cases, 8 normal-TOML/generated-factory cases, and the normal ARM configure/build with linked resource and provider-retention checks. All recorded model cases passed with no skips. Model execution establishes the tested software behavior; ARM artifacts establish linking/resources. Neither establishes clean-source full-gate candidate status, measured cycles, oscillator accuracy, electrical behavior or physical erratum qualification. Physical HIL is `not_executed`."
+msgstr "当前开发证据包括40个真实 provider 的 GoogleTest/GoogleMock 用例、8个正常 TOML/生成工厂用例，以及通过资源和 provider 保留检查的正常 ARM 配置与构建。记录的模型用例全部通过，无跳过。模型执行建立所测软件行为，ARM 产物建立链接和资源证据。两者均不建立 clean-source 完整门禁候选资格，也不建立实测周期、振荡器精度、电气行为或实物勘误资格。物理 HIL 为 `not_executed`。"
+
+msgid "The source uses the already pinned official LL DMA and USART headers for the selected register operations. It adds no vendor HAL handle, HAL tick, vendor IRQ callback, linked-list descriptor or second transfer owner. USART2 DMA, RX DMA, continuous streams, autonomous/low-power DMA and a TrustZone broker remain outside this implementation. The general Cortex-M33 architecture and other chip DMA capabilities do not extend this exact provider scope."
+msgstr "源码使用已锁定的官方 LL DMA 和 USART 头文件完成选定寄存器操作，不增加厂商 HAL 句柄、HAL tick、厂商 IRQ 回调、链表描述符或第二个传输所有者。USART2 DMA、RX DMA、连续流、自主或低功耗 DMA 及 TrustZone broker 均不在此实现范围内。通用 Cortex-M33 架构和芯片的其他 DMA 能力不会扩大此精确 provider 的范围。"
+
+msgid "See the [U575 source map](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md), [private provider contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/private/stm32u575_uart_gpdma.h), [real provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_dma.c), [public UART ownership contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h) and [current qualification boundaries](../delivery/qualification.md)."
+msgstr "参见 [U575 源码地图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md)、[私有 provider 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/private/stm32u575_uart_gpdma.h)、[真实 provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_dma.c)、[公共 UART 所有权合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h) 和[当前资格边界](../delivery/qualification.md)。"

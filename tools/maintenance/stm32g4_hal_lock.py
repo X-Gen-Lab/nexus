@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed STM32G474 inline LL source/CMSIS compatibility profile."""
+"""Fixed STM32G474 private LL and FDCAN definitions/CMSIS pairing."""
 from pathlib import Path
 import sys
 

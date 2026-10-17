@@ -8,6 +8,7 @@
  */
 #include "gd32f470_provider.h"
 #include "gd32f4xx.h"
+#include "nexus/io/spi_transaction.h"
 #include "private/system.h"
 
 const nx_gd32_spi_controller_t nx_gd32_spi0_controller = {SPI0, 100000000U,
@@ -261,4 +262,107 @@ nx_result_t nx_gd32_spi_recover(void* context) {
 /** \brief Shared controller recovery methods independent of child devices. */
 const nx_spi_ops_t nx_gd32_spi_ops = {
     .recover = nx_gd32_spi_recover,
+};
+
+#ifndef NX_GD32_SPI_TRANSACTION_CS
+#define NX_GD32_SPI_TRANSACTION_CS(active) ((void)(active))
+#endif
+#ifndef NX_GD32_SPI_TRANSACTION_WRITE
+#define NX_GD32_SPI_TRANSACTION_WRITE(port, value, bits)                       \
+    do {                                                                       \
+        (void)(bits);                                                          \
+        SPI_DATA((port)->controller->registers) = (value);                     \
+    } while (0)
+#endif
+
+/** \brief Native-width data spans retain one CS across every phase. */
+static nx_result_t transaction_transfer(void* context,
+                                        const nx_spi_segment_t* segments,
+                                        size_t count, uint8_t word_bits,
+                                        nx_time_us_t deadline,
+                                        size_t* transferred) {
+    const nx_gd32_spi_endpoint_state_t* endpoint = context;
+    if (endpoint == NULL || endpoint->port == NULL ||
+        !endpoint->port->initialized || endpoint->port->controller == NULL ||
+        endpoint->cs_gpio < GPIOA || endpoint->cs_gpio > GPIOI ||
+        (endpoint->cs_gpio - GPIOA) % (GPIOB - GPIOA) != 0U ||
+        endpoint->cs_mask == 0U ||
+        (endpoint->cs_mask & ~UINT32_C(0xFFFF)) != 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
+        return NX_ERROR_CONTEXT;
+    }
+    size_t total = 0U;
+    for (size_t i = 0U; i < count; ++i) {
+        total += segments[i].words;
+    }
+    if (total > 256U || deadline == NX_DEADLINE_NEVER) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    nx_gd32_spi_state_t* port = endpoint->port;
+    if (port->active ||
+        (SPI_STAT(port->controller->registers) & SPI_STAT_TRANS) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (nx_deadline_expired(deadline, nx_time_now_us())) {
+        return NX_ERROR_TIMEOUT;
+    }
+    port->active = true;
+    /* FF16 changes only while SPI is disabled, never between phases. */
+    SPI_CTL0(port->controller->registers) &= ~SPI_CTL0_SPIEN;
+    SPI_CTL0(port->controller->registers) =
+        (endpoint->control & ~(SPI_CTL0_SPIEN | SPI_CTL0_FF16)) |
+        (word_bits == 16U ? SPI_CTL0_FF16 : 0U) | SPI_CTL0_SPIEN;
+    GPIO_BOP(endpoint->cs_gpio) = endpoint->cs_mask << 16U;
+    NX_GD32_SPI_TRANSACTION_CS(true);
+    nx_result_t result = NX_SUCCESS;
+    for (size_t phase = 0U; phase < count && result == NX_SUCCESS; ++phase) {
+        const nx_spi_segment_t* segment = &segments[phase];
+        for (size_t word = 0U; word < segment->words; ++word) {
+            result = wait_status(port, SPI_STAT_TBE, true, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            uint16_t value = segment->dummy;
+            if (segment->tx != NULL) {
+                value = word_bits == 8U ? ((const uint8_t*)segment->tx)[word]
+                                        : ((const uint16_t*)segment->tx)[word];
+            }
+            NX_GD32_SPI_TRANSACTION_WRITE(port, value, word_bits);
+            result = wait_status(port, SPI_STAT_RBNE, true, deadline);
+            if (result != NX_SUCCESS) {
+                break;
+            }
+            uint16_t received = (uint16_t)SPI_DATA(port->controller->registers);
+            if (segment->rx != NULL) {
+                if (word_bits == 8U) {
+                    ((uint8_t*)segment->rx)[word] = (uint8_t)received;
+                } else {
+                    ((uint16_t*)segment->rx)[word] = received;
+                }
+            }
+            ++*transferred;
+        }
+    }
+    if (result == NX_SUCCESS) {
+        result = wait_status(port, SPI_STAT_TRANS, false, deadline);
+    }
+    if (result != NX_SUCCESS) {
+        spi_i2s_deinit(port->controller->registers);
+    }
+    SPI_CTL0(port->controller->registers) &= ~SPI_CTL0_SPIEN;
+    nx_gd32_peripheral_barrier();
+    GPIO_BOP(endpoint->cs_gpio) = endpoint->cs_mask;
+    NX_GD32_SPI_TRANSACTION_CS(false);
+    port->active = false;
+    return result == NX_SUCCESS &&
+                   nx_deadline_expired(deadline, nx_time_now_us())
+               ? NX_ERROR_TIMEOUT
+               : result;
+}
+
+/** \brief Independent enhanced methods leave default faces/state unchanged. */
+const nx_spi_transaction_ops_t nx_gd32_spi_transaction_ops = {
+    .transfer = transaction_transfer,
 };

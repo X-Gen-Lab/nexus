@@ -171,3 +171,243 @@ msgstr "显式注入的时钟；其上下文必须在所有借用者退出前保
 
 msgid "State for extending one 32-bit free-running hardware counter."
 msgstr "用于扩展一个 32 位自由运行硬件计数器的状态。"
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "The weak default returns and has no state or side effects. A product may supply one strong implementation, bounded and allocation-free in every calling task/ISR/masked context. No functioning kernel, clock, stack, transport or peripheral may be assumed after corruption. This is best-effort observation, not stack repair, safe outputs or reset proof. The hook must not acquire OS locks, reenter the provider, change incoming masks, mutate accepted requests or release retained storage. If it returns, the terminal caller still parks. A product may perform a separately reviewed non-returning recovery action. No retained event, registry or worker is implicit."
+msgstr "默认弱实现直接返回，不保存状态，也不产生副作用。产品可提供一个强实现，但在每种调用它的任务／ISR／已屏蔽上下文中都必须有界且不分配内存。发生损坏后，不得假定内核、时钟、栈、传输或外设仍正常。这里只提供尽力而为的观察，不修复栈，也不证明安全输出或复位。hook 不得取得 OS 锁、重入 provider、改变传入屏蔽、修改已接受的请求或释放保留的存储。若 hook 返回，终止路径的调用方仍将停驻。产品可执行另行审查且不返回的恢复操作。不隐式保留事件、注册表或 worker。"
+
+msgid "[in] Actual reporting path, not a severity assessment."
+msgstr "[in] 实际报告路径，不表示严重程度评估。"
+
+msgid "[in] Observed failure, never permission to reclaim loans."
+msgstr "[in] 观察到的故障，绝不授予回收借用的权限。"
+
+msgid "[in] Static source literal or NULL; do not retain or read untrusted dynamic memory. No task name is dereferenced."
+msgstr "[in] 静态源码字符串字面量或 NULL；不得保留或读取不可信动态内存。不解引用任务名。"
+
+msgid "[in] Diagnostic location, zero when unavailable."
+msgstr "[in] 诊断位置；不可用时为零。"
+
+msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout."
+msgstr "这些属性用于变量定义，置于类型之前，每个声明只定义一个变量；它们不是函数或指令属性。每次使用都有独立的输入 section，便于回收未使用存储。DATA 在复位时从 Flash 复制初始值；BSS 在复位时清零；NOINIT 既不复制也不清零，读取前必须初始化。不承诺掉电保持。BSS/NOINIT 拒绝非零初始值。存储按字对齐，并受显式 ELF 预算约束。未选入时使用会触发编译错误。TCM 仅用于 CPU 数据，绝不能用作 DMA 或可执行存储。CCM 同样仅用于 CPU 数据，放置在其中不授予总线主设备访问权限。ADDSRAM DMA 仍须由 provider 验证地址、对齐和所有权。普通存储、主 MSP 及未选入的镜像保留现有布局。"
+
+msgid "Task-only. Never use initialization to revoke a live borrow."
+msgstr "仅限任务上下文。绝不能通过初始化撤销存续的借用。"
+
+msgid "[out] Fresh storage, not visible to a provider/observer."
+msgstr "[out] 全新存储，尚不对 provider／观察者可见。"
+
+msgid "Single owner, task-only; failure creates no borrow."
+msgstr "唯一所有者，仅限任务上下文；失败不产生借用。"
+
+msgid "[inout] Storage with no remaining observers or adapter loans."
+msgstr "[inout] 不再有观察者或适配器借用的存储。"
+
+msgid "[in] Absolute transfer deadline, including queue time."
+msgstr "[in] 包含排队时间的绝对传输 deadline。"
+
+msgid "NX_SUCCESS; invalid pointer or borrowed state is rejected."
+msgstr "成功返回 NX_SUCCESS；拒绝无效指针或已借用状态。"
+
+msgid "Task/IRQ bounded; SETTLED guarantees provider's final access has occurred, not that separate adapter observers exited."
+msgstr "任务／IRQ 中的有界操作；SETTLED 保证 provider 的最终访问已经发生，不保证独立的适配器观察者已经退出。"
+
+msgid "[in] Initialized storage kept alive by the caller."
+msgstr "[in] 由调用者保持存续的已初始化存储。"
+
+msgid "Current state, or QUARANTINED for NULL."
+msgstr "当前状态；NULL 返回 QUARANTINED。"
+
+msgid "One serialized execution owner; validate hardware/buffers first. Multi-producer adapters hold their metadata guard across admission; concurrent admissions are unsupported."
+msgstr "只允许一个串行化的执行所有者；先验证硬件／缓冲区。多生产者适配器须在整个准入期间持有元数据保护；不支持并发准入。"
+
+msgid "[inout] READY request; caller owns storage until SETTLED."
+msgstr "[inout] READY 请求；调用者须保持存储，直到 SETTLED。"
+
+msgid "[in] QUEUED for adapter or ACTIVE for direct provider."
+msgstr "[in] 适配器使用 QUEUED；直接 provider 使用 ACTIVE。"
+
+msgid "NX_SUCCESS means ACCEPTED. Any failure means REJECTED with zero retained references, payload access or residual effects."
+msgstr "NX_SUCCESS 表示 ACCEPTED。任何失败均表示 REJECTED，且不保留引用、不访问载荷，也不遗留效果。"
+
+msgid "Execution owner; short task/IRQ metadata operation."
+msgstr "执行所有者调用；任务／IRQ 中的短元数据操作。"
+
+msgid "[inout] Admitted request owned by the executor."
+msgstr "[inout] 已获准入、由执行器拥有的请求。"
+
+msgid "[in] ACTIVE, DRAINING or QUARANTINED."
+msgstr "[in] ACTIVE、DRAINING 或 QUARANTINED。"
+
+msgid "NX_SUCCESS or NX_ERROR_STATE for an illegal transition."
+msgstr "成功返回 NX_SUCCESS；非法转换返回 NX_ERROR_STATE。"
+
+msgid "Detach active/queued references and capture any static wake target first. No hardware/IRQ/deferred observer may access request or payload afterwards. Cancel/timeout alone do not satisfy this requirement. A failed drain stays QUARANTINED."
+msgstr "先撤离 active/queued 引用，并捕获所有静态唤醒目标。此后任何硬件／IRQ／延后观察者都不得再访问请求或载荷。仅取消／超时不能满足此条件。排空失败时继续保持 QUARANTINED。"
+
+msgid "[inout] Borrowed storage after all sources have drained."
+msgstr "[inout] 所有源均已排空后的借用存储。"
+
+msgid "[in] Final transfer result, not admission status."
+msgstr "[in] 最终传输结果，不是准入状态。"
+
+msgid "[in] Valid transferred bytes/samples."
+msgstr "[in] 有效传输的字节／样本数。"
+
+msgid "[in] Live request storage with no concurrent reuse."
+msgstr "[in] 存续的请求存储，且不得并发复用。"
+
+msgid "[out] Final operation result."
+msgstr "[out] 最终操作结果。"
+
+msgid "[out] Valid byte/sample count."
+msgstr "[out] 有效字节／样本数。"
+
+msgid "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
+msgstr "成功返回 NX_SUCCESS；仍在借用时返回 NX_ERROR_BUSY；参数无效时拒绝。"
+
+msgid "[inout] Zero-initialized, unbound adapter-owned slot."
+msgstr "[inout] 零初始化、尚未绑定且由适配器拥有的槽。"
+
+msgid "[in] Live storage to bind; binding itself is not admission."
+msgstr "[in] 待绑定的存续存储；绑定本身不表示准入。"
+
+msgid "[out] Nonzero identity for later control commands."
+msgstr "[out] 用于后续控制命令的非零身份标识。"
+
+msgid "NX_SUCCESS, BUSY, INVALID or EXHAUSTED; no identity repeats."
+msgstr "返回 NX_SUCCESS、BUSY、INVALID 或 EXHAUSTED；身份标识绝不重复。"
+
+msgid "[in] Stable slot protected by adapter synchronization."
+msgstr "[in] 由适配器同步保护的稳定槽。"
+
+msgid "[in] Incarnation named by the command."
+msgstr "[in] 命令所指定的实例代次。"
+
+msgid "Live request only for a matching bound incarnation; else NULL."
+msgstr "仅在已绑定的实例代次匹配时返回存续请求；否则返回 NULL。"
+
+msgid "[inout] Stable slot whose commands/observers have exited."
+msgstr "[inout] 相关命令／观察者均已退出的稳定槽。"
+
+msgid "[in] Incarnation to release."
+msgstr "[in] 要释放的实例代次。"
+
+msgid "NX_SUCCESS, STATE for stale identity, BUSY while borrowed."
+msgstr "成功返回 NX_SUCCESS；身份标识过期返回 STATE；仍有借用返回 BUSY。"
+
+msgid "Fields are private to helpers/providers while borrowed. Initialize before first use. One owner prepares/submits and consumes results. GCC/Clang lock-free 32-bit atomic access publishes state; fields are read only after acquire SETTLED."
+msgstr "借用期间字段只由 helper/provider 私有访问。首次使用前先初始化。由同一所有者准备／提交并消费结果。通过 GCC/Clang 无锁的 32 位原子访问发布状态；只有以 acquire 语义观察到 SETTLED 后才读取字段。"
+
+msgid "The slot, not a possibly freed request, is targeted by cross- task commands. Serialize bind/lookup/release in the adapter. Keep slot and command storage until command acknowledgement; epoch exhaustion rejects rebinding rather than reusing IDs."
+msgstr "跨任务命令针对槽，而不针对可能已释放的请求。在适配器中串行化 bind/lookup/release。保留槽与命令存储，直到命令获确认；epoch 耗尽时拒绝重新绑定，不复用 ID。"
+
+msgid "[inout] Fresh zero/detached sidecar, distinct control."
+msgstr "[inout] 全新且已零初始化，或已撤离的 sidecar；控制存储须独立。"
+
+msgid "[in] Stable caller slot, protected by caller exclusion."
+msgstr "[in] 由调用者互斥保护的稳定调用者槽。"
+
+msgid "[in] Nonzero exact slot incarnation, never regenerated."
+msgstr "[in] 非零且精确的槽实例代次，绝不重新生成。"
+
+msgid "SUCCESS or INVALID/STATE, no retained reference on rejection."
+msgstr "返回 SUCCESS 或 INVALID/STATE；拒绝时不保留引用。"
+
+msgid "Borrowed state exposes no speculative result/count. NULL slot, stale epoch and overlap reject before request access. This neither services hardware nor interprets deadline as borrow release. Caller guarantees binding storage lifetime. Output is disjoint from the complete descriptor and borrowed buffers; only the common request span is checked here."
+msgstr "借用状态不暴露推测的结果／计数。NULL 槽、过期 epoch 和重叠均在访问请求前拒绝。它既不推进硬件，也不把 deadline 解释为借用释放。调用者保证绑定存储的生命周期。输出须与完整描述符及已借用缓冲区不重叠；这里只检查公共 request 跨度。"
+
+msgid "[inout] Bound sidecar under caller serialization."
+msgstr "[inout] 由调用者串行化保护的已绑定 sidecar。"
+
+msgid "[in] Same monotonic domain as the request deadline."
+msgstr "[in] 与请求 deadline 相同的单调时间域。"
+
+msgid "[out] Distinct output, unchanged on error."
+msgstr "[out] 独立输出；错误时保持不变。"
+
+msgid "Caller-serialized; allowed while request is quarantined. It is not request settlement, slot release or destruction."
+msgstr "由调用者串行化；请求处于 QUARANTINED 时也允许调用。它不表示请求结算、槽释放或销毁。"
+
+msgid "[inout] Live sidecar after all its readers have exited."
+msgstr "[inout] 所有读取者均已退出后的存续 sidecar。"
+
+msgid "One serialized observer; no Arch/OS/SoC dependency or lock. Caller excludes slot bind/release, request prepare/reuse and concurrent observer calls during sample. Stable slot stays alive until detach; observing never acquires/releases a loan."
+msgstr "只允许一个串行化观察者；不依赖 Arch/OS/SoC，也不使用锁。采样期间调用者须排除槽 bind/release、请求 prepare/reuse 及并发观察调用。稳定槽须存续至 detach；观察绝不取得或释放借用。"
+
+msgid "Caller ensures this region is quiescent and painting had no live frames. No Arch/OS dependency or internal mask occurs. Work is at most bytes reads. Unwritten reservations or writes equal to paint can hide usage; this is not overflow detection. MSP qualification needs independently established boot paint and a quiescent sampling point. The span excludes current SP, all active frames and exception-stack reservation. It never paints or claims to read the physical MSP register."
+msgstr "调用者须保证该区域静默，且填充标记时没有活动栈帧。不依赖 Arch/OS，也不在内部屏蔽中断。工作量最多为 bytes 次读取。未被写入的保留区，或恰好等于填充值的写入，可能掩盖实际使用；这不是溢出检测。MSP 资格需要独立确认启动时填充标记的来源，以及静默的采样点。该跨度须排除当前 SP、全部活动栈帧及异常栈保留区。它既不填充栈，也不声称读取物理 MSP 寄存器。"
+
+msgid "[in] Live downward-growing stack region, caller-provenance."
+msgstr "[in] 调用者证明来源的、存续且向下增长的栈区域。"
+
+msgid "[in] Original positive painted region capacity in bytes."
+msgstr "[in] 原始已填充标记区域的正容量，单位为字节。"
+
+msgid "[in] Exact fill used before the region became active."
+msgstr "[in] 区域启用前使用的精确填充值。"
+
+msgid "[out] Distinct output, unchanged on invalid span or alias."
+msgstr "[out] 独立输出；跨度或别名无效时保持不变。"
+
+msgid "SUCCESS or INVALID, without allocation or retained pointers."
+msgstr "返回 SUCCESS 或 INVALID，不分配内存，也不保留指针。"
+
+msgid "Physical providers require successful platform startup and a privileged task/configurable IRQ; NMI/HardFault callers are unsupported. No OS, allocation or wait. Physical clocks return zero outside a successfully started live epoch; zero alone cannot prove readiness. Startup status is authoritative. All consumers join before clock withdrawal. Stop/restart or a clock change invalidates every old deadline, even if a new epoch has the same numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled restart. An observed hardware overflow acknowledgement failure ends the live epoch and is terminal, even when finite source isolation succeeds. The provider retains ownership, masks interrupts, calls nx_fault_observe and parks if the observer returns. It never resumes deadline consumers with invalid zero time. Observation neither releases loans nor proves safe outputs; products own separately reviewed non-returning recovery. Ordinary shutdown still requires every consumer and optional low-power owner joined first."
+msgstr "物理 provider 要求平台已成功启动，调用者为特权任务／可配置 IRQ；不支持 NMI/HardFault 调用者。不调用 OS、不分配内存，也不等待。物理时钟在已成功启动且仍存续的 epoch 之外返回零；仅凭零不能证明就绪，启动状态才是权威。撤销时钟前须等待全部消费者退出。停止／重启或时钟变化会使全部旧 deadline 失效，即使新 epoch 的数值相同。UINT64_MAX 为保留值；时钟耗尽要求受控重启。若观察到硬件溢出确认失败，即使已成功隔离有限源，也会终止当前 epoch，并进入不可继续的终态。provider 保留所有权、屏蔽中断、调用 nx_fault_observe；若观察者返回则停驻。它绝不会以无效的零时间恢复 deadline 消费者。观察既不释放借用，也不证明安全输出；产品负责另行审查且不返回的恢复路径。普通关闭仍须先等待所有消费者及可选低功耗所有者退出。"
+
+msgid "Microseconds since domain initialization."
+msgstr "自时间域初始化以来的微秒数。"
+
+msgid "[in] Absolute time or NX_DEADLINE_NEVER."
+msgstr "[in] 绝对时间或 NX_DEADLINE_NEVER。"
+
+msgid "[in] Snapshot in the same clock domain."
+msgstr "[in] 同一时钟域中的快照。"
+
+msgid "True when a finite deadline has expired, including equality."
+msgstr "有限 deadline 已到期时为 true，包含恰好相等的情况。"
+
+msgid "[in] Current finite time."
+msgstr "[in] 当前有限时间。"
+
+msgid "[in] Relative duration in microseconds."
+msgstr "[in] 相对时长，单位为微秒。"
+
+msgid "Absolute deadline, saturating at NX_DEADLINE_NEVER."
+msgstr "绝对 deadline，饱和于 NX_DEADLINE_NEVER。"
+
+msgid "Single execution owner. Reset creates a new clock domain; do not reuse outstanding deadlines after reset/clock change."
+msgstr "唯一执行所有者。复位会建立新的时钟域；复位／时钟变化后不得复用尚未完成的 deadline。"
+
+msgid "[out] Caller-owned extension state."
+msgstr "[out] 调用者拥有的扩展状态。"
+
+msgid "[in] First hardware snapshot."
+msgstr "[in] 第一次硬件快照。"
+
+msgid "[in] Nonzero stable counter frequency."
+msgstr "[in] 非零且稳定的计数器频率。"
+
+msgid "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
+msgstr "成功返回 NX_SUCCESS；参数无效返回 NX_ERROR_INVALID。"
+
+msgid "Observe at least once per 2^32 ticks, even when idle. Multiple missed wraps cannot be detected from two snapshots. Counter must continue through waits; frequency cannot change."
+msgstr "即使空闲，也必须至少每 2^32 个 tick 观察一次。仅凭两次快照无法检测多次漏掉的回绕。计数器须在等待期间持续运行，频率不得变化。"
+
+msgid "[inout] Initialized, single-owner extension state."
+msgstr "[inout] 已初始化、仅有一个所有者的扩展状态。"
+
+msgid "[in] Current counter snapshot."
+msgstr "[in] 当前计数器快照。"
+
+msgid "[out] Extended elapsed microseconds."
+msgstr "[out] 扩展后的已用微秒数。"
+
+msgid "NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED."
+msgstr "返回 NX_SUCCESS、NX_ERROR_STATE 或 NX_ERROR_EXHAUSTED。"
+
+msgid "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."
+msgstr "成功返回 SUCCESS；身份标识过期／已释放返回 STATE；参数无效返回 INVALID；时间倒退返回 IO；计数器饱和，不复用 epoch。"

@@ -11,11 +11,13 @@ try:
     from .emission import dma_regions
     from .providers.common import Construction, fail, mode_traits
     from .providers import hardware
+    from . import enhanced_endpoints
 except ImportError:
     from gpio_phase import withdraw_pin
     from emission import dma_regions
     from providers.common import Construction, fail, mode_traits
     from providers import hardware
+    import enhanced_endpoints
 
 
 # Assertions for the maintained SDK cold constructors, not Board wiring.
@@ -142,9 +144,8 @@ def _endpoint_faces(item, result, prefix):
             declarations.append(f"static nx_{prefix}_{implementation}_endpoint_state_t {endpoint}{initializer};")
         operations = (f"nx_{prefix}_spi_dma_endpoint_ops" if item.kind == "spi" else
                       "nx_i2c_v1_async_endpoint_ops")
-        declarations += [f"static const nx_{item.kind}_endpoint_t s_nx_device_face_{child} = {{",
-                         f"    &{operations}, &{endpoint}", "};",
-                         f"const nx_{item.kind}_endpoint_t* const nx_device_{child} = &s_nx_device_face_{child};"]
+        declarations += enhanced_endpoints.face(device, endpoint,
+                                                 operations, prefix)
         if item.kind != "i2c":
             pins = (result["routes"][result["board_bindings"][device["cs_binding"]]["route"]]["pins"]
                     if "cs_binding" in device else [pin for pin in item["pins"] if pin["function"] == "cs"])
@@ -239,8 +240,8 @@ def constructor(item, result, prefix):
         open_drain = "true" if item.kind == "i2c" else "false"
         _check(body, f"nx_{prefix}_pin_configure(GPIO{port}, {number}u, {mode}u, {pin['af']}u, {pull}u, {open_drain})")
     if item.kind == "uart":
-        body += [f"    {state}.regions = s_nx_dma_regions_{name};",
-                 f"    {state}.region_count = {region_count}u;"]
+        body += [f"    {state}.resources.regions = s_nx_dma_regions_{name};",
+                 f"    {state}.resources.region_count = {region_count}u;"]
         if stm:
             dma, stream, channel = DMA_FACTS[prefix][controller][0]
             body += [f"    {state}.uart.registers = {controller};",
@@ -249,9 +250,9 @@ def constructor(item, result, prefix):
                      f"    {state}.uart.rx_storage = s_nx_rx_{name};",
                      f"    {state}.uart.rx_capacity = {item.options.rx_capacity}u;",
                      f"    {state}.uart.irq = {controller}_IRQn;",
-                     f"    {state}.dma = DMA{dma};", f"    {state}.tx = DMA{dma}_Stream{stream};",
-                     f"    {state}.dma_irq = DMA{dma}_Stream{stream}_IRQn;",
-                     f"    {state}.stream = {stream}u;", f"    {state}.channel = {channel}u;"]
+                     f"    {state}.resources.dma = DMA{dma};", f"    {state}.transmit.tx = DMA{dma}_Stream{stream};",
+                     f"    {state}.transmit.dma_irq = DMA{dma}_Stream{stream}_IRQn;",
+                     f"    {state}.transmit.stream = {stream}u;", f"    {state}.transmit.channel = {channel}u;"]
             call = f"nx_stm32_uart_dma_initialize(&{state}, {84000000 if controller == 'USART1' else 42000000}u)"
         else:
             call = f"nx_gd32_uart_dma_initialize_at(&{state}, &nx_gd32_{controller.lower()}_controller, {item.options.baud}u, NX_UART_RX_{item.options.rx_profile.upper()}, s_nx_rx_{name}, {item.options.rx_capacity}u, {item.options.irq.priority}u)"

@@ -570,6 +570,7 @@
         "soc/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
         "soc/stm32f407/drivers/uart_receive.c",
+        "soc/stm32f407/drivers/uart_duplex.c",
         "io/src/stream.c"
       ],
       "model_sources": [
@@ -577,7 +578,7 @@
       ],
       "assertions": [
         "ASSERT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)",
-        "ASSERT_EQ(nx_stm32_uart_duplex_initialize(&state,84000000U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_stm32_uart_duplex_initialize(&duplex,84000000U),NX_SUCCESS)",
         "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
         "ASSERT_EQ(nx_uart_tx_prepare(&request,tx,sizeof(tx),1000U),NX_SUCCESS)",
         "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
@@ -594,7 +595,7 @@
       "calls": [
         "nx_request_initialize(",
         "nx_request_state(",
-        "nx_stm32_uart_dma_irq(",
+        "nx_stm32_uart_duplex_dma_irq(",
         "nx_stm32_uart_duplex_initialize(",
         "nx_stm32_uart_duplex_irq(",
         "nx_uart_port_rx_start(",
@@ -1803,6 +1804,7 @@
         "soc/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
         "soc/gd32f470/drivers/uart_receive.c",
+        "soc/gd32f470/drivers/uart_duplex.c",
         "io/src/stream.c"
       ],
       "model_sources": [
@@ -1810,7 +1812,7 @@
       ],
       "assertions": [
         "ASSERT_EQ(nx_uart_port_stop(&port),NX_SUCCESS)",
-        "ASSERT_EQ(nx_gd32_uart_duplex_initialize(&state,115200U,5U),NX_SUCCESS)",
+        "ASSERT_EQ(nx_gd32_uart_duplex_initialize(&duplex,115200U,5U),NX_SUCCESS)",
         "ASSERT_EQ(nx_uart_port_rx_start(&port,&stream),NX_SUCCESS)",
         "ASSERT_EQ(nx_uart_tx_prepare(&request,tx,sizeof(tx),1000U),NX_SUCCESS)",
         "ASSERT_EQ(nx_uart_port_submit(&port,&request),NX_SUCCESS)",
@@ -1825,7 +1827,7 @@
         "EXPECT_NE(DMA_CH2CTL(DMA1)&DMA_CHXCTL_CHEN,0U)"
       ],
       "calls": [
-        "nx_gd32_uart_dma_irq(",
+        "nx_gd32_uart_duplex_dma_irq(",
         "nx_gd32_uart_duplex_initialize(",
         "nx_gd32_uart_duplex_irq(",
         "nx_request_initialize(",

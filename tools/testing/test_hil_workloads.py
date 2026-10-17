@@ -102,11 +102,11 @@ class HilWorkloadTests(unittest.TestCase):
             "plan", "--fixture", str(fixture), "--resolved", str(resolved),
             "--report", str(report), *map(str, extra)])
 
-    def test_twenty_one_cases_cover_requested_items_without_measurements(self):
+    def test_twenty_five_cases_cover_requested_items_without_measurements(self):
         report = self.plan()
-        self.assertEqual(len(report["cases"]), 21)
+        self.assertEqual(len(report["cases"]), 25)
         self.assertEqual({item["work_item"] for item in report["cases"]},
-                         set(range(47, 58)) | set(range(25, 31)) | {12, 14, 15})
+                         set(range(47, 58)) | set(range(25, 31)) | {7, 12, 14, 15})
         self.assertEqual(report["status"], "prepared_unbound")
         self.assertEqual(report["physical_status"], "not_executed")
         for item in report["cases"]:
@@ -163,13 +163,16 @@ class HilWorkloadTests(unittest.TestCase):
             self.assertEqual(self.case(name)["availability"], "unsupported")
 
     def test_reviewed_protocol_is_still_unbound_and_input_is_unchanged(self):
-        workload = self.reviewed(tuple(self.module.WORKLOADS))
+        selected = tuple(item["id"] for item in self.plan()["cases"]
+                         if item["availability"] == "selected")
+        self.assertEqual(len(selected), 21)
+        workload = self.reviewed(selected)
         before = copy.deepcopy(workload)
         report = self.plan(workload)
         self.assertEqual(workload, before)
         self.assertEqual(report["physical_status"], "not_executed")
-        self.assertTrue(all(item["reviewed_protocol"] is not None for
-                            item in report["cases"]))
+        self.assertEqual({item["id"] for item in report["cases"]
+                          if item["reviewed_protocol"] is not None}, set(selected))
         report["cases"][0]["reviewed_protocol"]["stimulus"] = "changed"
         self.assertEqual(workload, before)
 
@@ -387,7 +390,7 @@ class HilWorkloadTests(unittest.TestCase):
         self.assertEqual(template["kind"], "hil_workload")
         self.assertIsNone(template["board"])
         self.assertIsNone(template["part"])
-        self.assertEqual(len(template["cases"]), 21)
+        self.assertEqual(len(template["cases"]), 25)
         with self.assertRaises(EvidenceError):
             self.validate(template)
 

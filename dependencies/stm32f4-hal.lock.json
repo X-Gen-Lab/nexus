@@ -1,6 +1,18 @@
 {
   "commit": "b6f0ed3829f3829eb358a2e7417d80bba1a42db7",
   "files": {
+    "Inc/Legacy/stm32_hal_legacy.h": {
+      "bytes": 240833,
+      "sha256": "8c2d2feb90e8ed88fe5756f3f1616a2b67aa1cd0858da8b130ed69607688c8c0"
+    },
+    "Inc/stm32f4xx_hal_def.h": {
+      "bytes": 7563,
+      "sha256": "c8eb3f7b393f8c5a0c32e16ccfa101c83ddb59e96bd42239b8a5c5d4da83e97f"
+    },
+    "Inc/stm32f4xx_hal_eth.h": {
+      "bytes": 89154,
+      "sha256": "596e6eb83351a5cb3cad97750f2c7536069c278bb58fc52ccce74a0bfc34beb5"
+    },
     "Inc/stm32f4xx_ll_adc.h": {
       "bytes": 284748,
       "sha256": "fabfc9706709a9997e96d87aee25356b3ca84021668a915ad816ba42e1babadc"
@@ -49,5 +61,5 @@
   "release": "v1.8.5",
   "repository": "https://github.com/STMicroelectronics/stm32f4xx-hal-driver.git",
   "schema_version": 1,
-  "selected_api": "stm32f407-ll-inline"
+  "selected_api": "stm32f407-ll-inline-eth-definitions"
 }

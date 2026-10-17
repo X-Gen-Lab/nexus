@@ -15,8 +15,11 @@
 #include "nexus/io/gpio.h"
 #include "nexus/io/i2c.h"
 #include "nexus/io/spi.h"
+#include "nexus/io/spi_dma_owner_binding.h"
+#include "nexus/io/spi_transaction.h"
 #include "nexus/io/timer.h"
 #include "nexus/io/uart.h"
+#include "nexus/io/uart_format.h"
 #include "nexus/io/watchdog.h"
 #include "stm32f407_system.h"
 
@@ -208,9 +211,34 @@ nx_result_t nx_stm32_gpio_stop(nx_stm32_gpio_state_t* port, uint32_t inactive);
 /** \brief Initialize authorized pins, preloading BSRR before output mode. */
 nx_result_t nx_stm32_gpio_initialize(nx_stm32_gpio_state_t* port,
                                      uint32_t initial);
-/** \brief Initialize one fixed 8N1 UART; storage must outlive IRQ and stop. */
+/** \brief Initialize one fixed 8N1 UART; storage outlives IRQ and stop.
+ * \param[in,out] port: Fresh zeroed state with selected config filled in.
+ * \note Live or retained ownership rejects reinitialization. Reuse after
+ *       successful stop; never zero state to revoke a live borrow.
+ */
 nx_result_t nx_stm32_uart_initialize(nx_stm32_uart_state_t* port,
                                      uint32_t clock_hz);
+/** \brief Cold selected frame is installed before UE and IRQ publication. */
+nx_result_t nx_stm32_uart_initialize_format(nx_stm32_uart_state_t* port,
+                                            uint32_t clock_hz,
+                                            nx_uart_format_t format);
+/** \brief Apply a selected byte format only under quiescent cold ownership.
+ * \param[in,out] state: Initialized byte UART; no TX/RX loan or queued RX.
+ * \param[in] format: 7E/O or 8N/E/O with one/two stop bits and reviewed flow.
+ * \return Success or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY before writes;
+ *         IO attempts rollback after failed register readback. If rollback
+ *         cannot be proven, initialized remains true and closing rejects new
+ *         work. Retain pins, clock and storage until stop proves withdrawal.
+ * \note Startup task must quiesce the peer. Seven-bit receive uses the separate
+ *         format_irq entry. Format selection adds no default state or ops slot.
+ */
+nx_result_t nx_stm32_uart_format_configure(nx_stm32_uart_state_t* state,
+                                           nx_uart_format_t format);
+/** \brief IRQ entry for explicitly selected seven/eight-bit parity formats.
+ * \param[in,out] port: Exact live binding; preserves RX parity/error facts.
+ */
+void nx_stm32_uart_format_irq(nx_stm32_uart_state_t* port);
+
 /**
  * \brief           Select independent RTS/CTS only on an idle live controller.
  * \param[in,out]   state: Startup-controlled UART, no active TX or RX DMA.
@@ -264,6 +292,7 @@ nx_result_t nx_stm32_uart_stop(void* context);
 extern const nx_spi_ops_t nx_stm32_spi_ops;
 nx_result_t nx_stm32_spi_recover(void* context);
 extern const nx_spi_endpoint_ops_t nx_stm32_spi_endpoint_ops;
+extern const nx_spi_transaction_ops_t nx_stm32_spi_transaction_ops;
 nx_result_t nx_stm32_spi_endpoint_transfer(void* context, const uint8_t* tx,
                                            uint8_t* rx, size_t length,
                                            nx_time_us_t deadline,
@@ -320,5 +349,15 @@ nx_result_t nx_stm32_adc_sample(void* context, uint16_t* samples,
  */
 nx_result_t nx_stm32_uart_tx_validate(void* context,
                                       const nx_uart_tx_request_t* request);
+
+/** \brief Exact enhanced sequence and underlying controller membership. */
+bool nx_stm32_spi_dma_owner_contains(
+    const nx_spi_dma_transaction_endpoint_t* endpoint,
+    const nx_spi_dma_transaction_port_t* port);
+/** \brief Bind one borrowed wake sink to the exact enhanced controller. */
+nx_result_t
+nx_stm32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t* port,
+                                   const nx_irq_wake_t* wake,
+                                   uint8_t syscall_ceiling);
 
 #endif

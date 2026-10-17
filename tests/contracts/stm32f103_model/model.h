@@ -39,6 +39,8 @@ typedef struct {
     unsigned irq_enables[43];
     IWDG_TypeDef watchdog;
     DBGMCU_TypeDef debug;
+    uint32_t debug_control_reads;
+    uint32_t debug_control_writes;
     bool hold_lsi;
     bool hold_lsi_off;
     bool hold_watchdog_update;
@@ -47,6 +49,7 @@ typedef struct {
     USART_TypeDef* uart;
     uint16_t flash_kib;
     uint16_t device_id;
+    uint32_t device_id_reads;
     uint32_t writes;
     uint32_t ungated_timer_writes;
     uint32_t timer_writes;
@@ -79,6 +82,7 @@ uint8_t nx_f103_model_spi_read(SPI_TypeDef* spi);
 void nx_f103_model_watchdog_poll(void* port);
 void nx_f103_model_device_poll(unsigned kind, void* port);
 bool nx_f103_model_privileged(void);
+uint32_t nx_f103_model_device_id(void);
 uint32_t nx_f103_model_read(volatile uint32_t* reg);
 void nx_f103_model_write(volatile uint32_t* reg, uint32_t value);
 nx_result_t nx_f103_model_irq_control(int irq, bool enabled, uint8_t priority);
@@ -101,7 +105,7 @@ nx_result_t nx_f103_model_irq_control(int irq, bool enabled, uint8_t priority);
 #define NX_F103_IRQ_PRIORITY(irq)         g_f103_model.priority[(irq)]
 #define NX_F103_IRQ_GROUP()               g_f103_model.group
 #define NX_F103_FLASH_KIB()               g_f103_model.flash_kib
-#define NX_F103_DEVICE_ID()               g_f103_model.device_id
+#define NX_F103_DEVICE_ID()               nx_f103_model_device_id()
 #define NX_F103_UART_TRANSMIT(regs, byte) nx_f103_model_write(&(regs)->DR, byte)
 #define NX_F103_UART_RECEIVE(regs)        ((uint8_t)nx_f103_model_read(&(regs)->DR))
 #define NX_F103_GPIOA                     (&g_f103_model.gpio)

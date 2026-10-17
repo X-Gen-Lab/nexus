@@ -80,8 +80,25 @@ static uint32_t read_reg(nx_eth_mac_t* mac, unsigned offset) {
 }
 static void write_reg(nx_eth_mac_t* mac, unsigned offset, uint32_t value) {
     NX_ETH_WRITE(mac->registers, offset, value);
+    if (offset == MAC_CONTROL || offset == MAC_FILTER ||
+        offset == MAC_ADDRESS_HIGH || offset == MAC_ADDRESS_LOW ||
+        offset == DMA_BUS || offset == DMA_CONTROL) {
+        /* ES0182 2.16.6 requires four TX/RX clocks, not four HCLKs.
+         * At 10 Mbit/s the MAC clock is 2.5 MHz (RM0090 Figure 358),
+         * including RMII's internal REF_CLK/20 divider. Each volatile
+         * Device read takes at least one HCLK. Two microseconds therefore
+         * exceed the worst-case 1.6 us without depending on SysTick, a
+         * running scheduler or a mutable delay state. The GD32 leaf keeps
+         * this conservative control-write discipline; this is not a claim
+         * that ST's erratum applies to GD32 silicon. Poll/W1C writes on the
+         * packet path do not incur this control-path guard. */
+        uint32_t cycles =
+            mac->hclk_hz / 500000U + (mac->hclk_hz % 500000U != 0U ? 1U : 0U);
+        while (cycles-- != 0U)
+            (void)NX_ETH_READ(mac->registers, offset);
+    }
 }
-/** \brief Ethernet register writes require four HCLK cycles before readback. */
+/** \brief Verify visible control bits after the internal clock guard. */
 static bool write_checked(nx_eth_mac_t* mac, unsigned offset, uint32_t value,
                           uint32_t mask) {
     write_reg(mac, offset, value);
@@ -333,6 +350,10 @@ static bool tx_quiet(nx_eth_mac_t* mac) {
         (read_reg(mac, MAC_CONTROL) & 8U) != 0U)
         return false;
     if (!mac->flush_started) {
+        /* ES0182 2.16.3: FTF may only follow an already empty TX FIFO.
+         * Flushing a nonempty FIFO cannot manufacture withdrawal proof. */
+        if ((read_reg(mac, MAC_DEBUG) & TX_DEBUG) != 0U)
+            return false;
         write_reg(mac, DMA_CONTROL, read_reg(mac, DMA_CONTROL) | DMA_FLUSH);
         nx_arch_dsb();
         mac->flush_started = true;

@@ -74,13 +74,13 @@ class Stm32UartDma : public testing::Test {
         state.uart.profile = NX_UART_RX_BYTES;
         state.uart.baud = 115200U;
         state.uart.irq = USART1_IRQn;
-        state.dma = &dma;
-        state.tx = &tx;
-        state.regions = &region;
-        state.region_count = 1U;
-        state.stream = 7U;
-        state.channel = 4U;
-        state.dma_irq = DMA2_Stream7_IRQn;
+        state.resources.dma = &dma;
+        state.transmit.tx = &tx;
+        state.resources.regions = &region;
+        state.resources.region_count = 1U;
+        state.transmit.stream = 7U;
+        state.transmit.channel = 4U;
+        state.transmit.dma_irq = DMA2_Stream7_IRQn;
         ASSERT_EQ(nx_stm32_uart_dma_initialize(&state, 84000000U), NX_SUCCESS);
         nx_request_initialize(&request.base);
         ASSERT_EQ(nx_uart_tx_prepare(&request, payload, sizeof(payload), 1000U),

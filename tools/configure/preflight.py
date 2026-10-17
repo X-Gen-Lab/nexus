@@ -99,6 +99,9 @@ def _modern_selected(result):
                               f"RCC_{gate_register}_{uart}EN) != 0u")
             source += _reject(f"(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u")
             source += _reject(f"!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)")
+            if not h7 and item.get("mode") == "dma-tx":
+                source += _reject(
+                    "!NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)")
             if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle"}:
                 lane = 1 if item.get("mode") == "rx-dma-idle" else 0
                 source += _reject(
@@ -195,7 +198,12 @@ def selected(result):
                 if item.kind == "i2c":
                     source += _reject(
                         "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u")
-            if item.kind == "adc":
+            if item.kind == "can_fd":
+                source += _reject(
+                    "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_FDCANEN) != 0u || "
+                    "(NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_FDCANRST) != 0u || "
+                    "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_FDCANSEL) != 0u")
+            if item.kind in {"adc", "pwm_adc", "adc_group"}:
                 source += _reject(
                     "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != 0u")
                 source += _reject(
@@ -205,6 +213,32 @@ def selected(result):
                 if item.mode == "trigger-dma":
                     source += _reject(
                         "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_TIM6EN) != 0u")
+                if item.kind == "adc_group":
+                    source += _reject("!NX_G474_IRQ_AVAILABLE(ADC1_2_IRQn)")
+                    if item.options.trigger == "tim6-trgo":
+                        source += _reject(
+                            "(NX_G474_READ(&RCC->APB1ENR1) & "
+                            "RCC_APB1ENR1_TIM6EN) != 0u || "
+                            "(NX_G474_READ(&RCC->APB1RSTR1) & "
+                            "RCC_APB1RSTR1_TIM6RST) != 0u")
+                    if item.mode == "regular-sequence-dma":
+                        source += _reject(
+                            "!NX_G474_IRQ_AVAILABLE(DMA1_Channel1_IRQn)")
+                        source += [
+                            "    if ((NX_G474_READ(&RCC->AHB1ENR) & "
+                            "RCC_AHB1ENR_DMA1EN) != 0u) {"]
+                        source += _reject(
+                            "NX_G474_READ(&DMA1_Channel1->CCR) != 0u || "
+                            "NX_G474_READ(&DMA1_Channel1->CNDTR) != 0u || "
+                            "NX_G474_READ(&DMA1_Channel1->CPAR) != 0u || "
+                            "NX_G474_READ(&DMA1_Channel1->CMAR) != 0u",
+                            indent=8)
+                        source += ["    }"]
+                if item.kind == "pwm_adc":
+                    source += _reject(
+                        "(NX_G474_READ(&RCC->AHB1ENR) & "
+                        "(RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMAMUX1EN)) != 0u || "
+                        "(NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u")
         for item in result.controllers:
             if item.kind == "flash":
                 source += _reject(
@@ -235,13 +269,17 @@ def selected(result):
                 clocks.add(("RCC->AHB2ENR", "RCC_AHB2ENR_OTGFSEN") if
                            family == "stm32f407" else
                            ("RCU_AHB2EN", "RCU_AHB2EN_USBFSEN"))
-            elif item.kind == "eth":
+            elif item.kind in {"eth", "eth_frames"}:
                 clocks.add(("RCC->AHB1ENR", "RCC_AHB1ENR_ETHMACEN | "
                             "RCC_AHB1ENR_ETHMACTXEN | "
                             "RCC_AHB1ENR_ETHMACRXEN") if
                            family == "stm32f407" else
                            ("RCU_AHB1EN", "RCU_AHB1EN_ENETEN | "
                             "RCU_AHB1EN_ENETTXEN | RCU_AHB1EN_ENETRXEN"))
+                if item.kind == "eth_frames":
+                    clocks.add(("RCC->AHB1ENR", "RCC_AHB1ENR_ETHMACPTPEN") if
+                               family == "stm32f407" else
+                               ("RCU_AHB1EN", "RCU_AHB1EN_ENETPTPEN"))
             elif item.kind == "exti":
                 line = int(item["pins"][0]["pin"][2:])
                 registers = ("EXTI->IMR | EXTI->EMR | EXTI->PR" if

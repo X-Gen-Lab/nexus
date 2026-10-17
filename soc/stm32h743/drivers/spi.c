@@ -8,6 +8,9 @@
  */
 #include "nexus/core/fault.h"
 #include "stm32h743_provider.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #include "stm32h7xx_ll_spi.h"
 /* ES0392 2.22.5: CRC-disabled finite reception still requires CRCSIZE=7. */
 #define BYTE_CONFIG (7U | (7U << SPI_CFG1_CRCSIZE_Pos))
@@ -20,13 +23,21 @@ static bool valid(const nx_stm32h743_spi_state_t* p) {
     return p != NULL && p->registers != NULL && p->reset != NULL &&
            p->reset_mask != 0U &&
            (p->reset_mask & (p->reset_mask - 1U)) == 0U &&
+#if NEXUS_CORE_HZ == 384000000U
+           p->clock_hz == 96000000U &&
+#else
            (p->clock_hz == 32000000U || p->clock_hz == 64000000U) &&
+#endif
            p->poll_limit != 0U;
 }
 static bool clock_ready(const nx_stm32h743_spi_state_t* p) {
     RCC_TypeDef* r = g_nx_stm32h743_system.rcc;
     if (r == NULL || !g_nx_stm32h743_system.started ||
+#if NEXUS_CORE_HZ == 384000000U
+        !nx_stm32h743_pll384_clocks_ready())
+#else
         g_nx_stm32h743_system.core_hz != p->clock_hz)
+#endif
         return false;
     if (p->reset == &r->APB2RSTR && p->reset_mask == RCC_APB2RSTR_SPI4RST)
         return (NX_H743_READ(&r->APB2ENR) & RCC_APB2ENR_SPI4EN) != 0U &&
@@ -184,12 +195,21 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         return NX_ERROR_TIMEOUT;
     uint32_t divisor = 2U;
     uint32_t baud = 0U;
-    while ((uint64_t)p->clock_hz > (uint64_t)e->frequency_hz * divisor &&
+#if NEXUS_CORE_HZ == 384000000U
+    /* HSI upper65MHz times PLL ratio6 and ready tolerance1.02, APB/4.
+     * Retain clock_hz as the nominal96MHz; never report the bound as a
+     * measurement. The fixed timer/SPI ratio also bounds trailing-edge drain.
+     */
+    const uint32_t source_max = 99450000U;
+#else
+    const uint32_t source_max = p->clock_hz;
+#endif
+    while ((uint64_t)source_max > (uint64_t)e->frequency_hz * divisor &&
            divisor < 256U) {
         divisor *= 2U;
         ++baud;
     }
-    if ((uint64_t)p->clock_hz > (uint64_t)e->frequency_hz * divisor)
+    if ((uint64_t)source_max > (uint64_t)e->frequency_hz * divisor)
         return NX_ERROR_UNSUPPORTED;
     p->active = true;
     uint32_t config = SPI_CFG2_MASTER | SPI_CFG2_SSM | SPI_CFG2_AFCNTR |

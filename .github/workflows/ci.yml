@@ -6,9 +6,8 @@ permissions:
 
 on:
   push:
-    branches: [ main, develop, 'codex/**' ]
+    branches: [ main, develop, 'codex/**', 'feat/**' ]
   pull_request:
-    branches: [ main, develop ]
   workflow_dispatch:
   schedule:
     - cron: '0 2 * * *'

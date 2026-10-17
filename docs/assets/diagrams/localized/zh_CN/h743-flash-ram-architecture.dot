@@ -1,0 +1,54 @@
+// FIG-17 target IO-24 design; not completed code or physical qualification.
+// Scope: selected STM32H743ZIT6 V / Cache off only.
+// Basis: docs/design/h743-flash-ram.md target contract and IO-24 ledger.
+// Edges are explicitly lookup, call, copy, protection or caller preconditions.
+// This diagram introduces no second physical owner or background executor.
+digraph h743FlashRamArchitecture {
+    graph [label="FIG-17 H743 Flash RAM 边界目标设计\\n仅选定 V / Cache off；完整软件与 ELF 退出尚未完成",
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
+           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.6,
+           newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
+    build [label="单份 authored TOML 与已审事实\\n不可变 IR；按选择生成 bundle 与 CMake"];
+    app [label="外部维护调用者\\n负责调度、bus-master join 与恢复策略",
+         fillcolor="#f8fafc"];
+    factory [label="冷态 typed factory\\n返回既有不可变 Flash face"];
+    face [label="Flash face\\n共享只读 ops 与私有 context"];
+    lifecycle [label="显式 Platform 生命周期\\n准备选定字节；保留清理失败责任"];
+    subgraph clusterOwner {
+        label="单一私有 H743 Flash 控制器 owner：目标设计";
+        color="#64748b"; fontname="Noto Sans CJK SC";
+        provider [label="Flash provider\\n校验操作、区域、别名与调用上下文"];
+        prepare [label="冷态 RAM 准备\\n校验 LOAD / RUN；复制并证明就绪"];
+        bridge [label="仅负责 CPU 的 RAM bridge\\n保存 CPU 状态；安装私有 MSP"];
+        pod [label="整个忙事务留在 AXI RAM\\n发布／恢复 VTOR；保留输入与诊断"];
+        guard [label="RAM 内私有 MPU guard\\nCode XN 与 Strongly-ordered；AP001；CTRL7"];
+        prepare -> bridge [label="提供已证明的代码与私有 RAM"];
+        provider -> bridge [label="最终准入后直接调用"];
+        bridge -> pod [label="在私有 MSP 下调用；事务负责 VTOR"];
+        pod -> guard [label="触发前安装；排空后恢复"];
+    }
+    flash [label="实际 Flash 控制器／双 Bank\\n编程 store 或擦除 START；观测排空与 LOCK",
+           fillcolor="#f8fafc"];
+    time [label="既有 System TIM2 时间域与 epoch\\n证明回绕 service；不伪造丢失时间",
+          fillcolor="#f8fafc"];
+    build -> lifecycle [label="生成选定准备／清理"];
+    build -> face [label="生成静态 face 与共享 ops 引用"];
+    app -> factory [label="查找 typed Flash 身份"];
+    factory -> face [label="返回既有引用；不执行准备"];
+    app -> lifecycle [label="显式 start / stop 调用"];
+    lifecycle -> prepare [label="使用前调用准备"];
+    app -> face [label="直接同步 I/O 调用"];
+    face -> provider [label="ops(context, ...) 调用"];
+    app -> provider [label="前提：撤回并 join 其他 master",
+                     style=dashed];
+    pod -> flash [label="已校验写入／实际状态观测",
+                  dir=both];
+    pod -> time [label="同域 deadline 与 epoch 观测",
+                 dir=both];
+    // No return edge bypasses drain, LOCK or restoration; see FIG-18.
+}

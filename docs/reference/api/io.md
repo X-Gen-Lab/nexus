@@ -9,11 +9,29 @@ source_language: en
 
 These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records.
 
+The Native model controls in `model.h` and `spi_dma_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider.
+
 (adc_8h)=
 
 ## adc.h
 
 ```{doxygenfile} adc.h
+:project: nexus
+```
+
+(adc__format_8h)=
+
+## adc_format.h
+
+```{doxygenfile} adc_format.h
+:project: nexus
+```
+
+(adc__group_8h)=
+
+## adc_group.h
+
+```{doxygenfile} adc_group.h
 :project: nexus
 ```
 
@@ -41,6 +59,22 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(can__fd_8h)=
+
+## can_fd.h
+
+```{doxygenfile} can_fd.h
+:project: nexus
+```
+
+(cycle__probe_8h)=
+
+## cycle_probe.h
+
+```{doxygenfile} cycle_probe.h
+:project: nexus
+```
+
 (dma_8h)=
 
 ## dma.h
@@ -49,11 +83,27 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(encoder_8h)=
+
+## encoder.h
+
+```{doxygenfile} encoder.h
+:project: nexus
+```
+
 (ethernet_8h)=
 
 ## ethernet.h
 
 ```{doxygenfile} ethernet.h
+:project: nexus
+```
+
+(ethernet__frames_8h)=
+
+## ethernet_frames.h
+
+```{doxygenfile} ethernet_frames.h
 :project: nexus
 ```
 
@@ -97,6 +147,14 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(i2c__long_8h)=
+
+## i2c_long.h
+
+```{doxygenfile} i2c_long.h
+:project: nexus
+```
+
 (mdio_8h)=
 
 ## mdio.h
@@ -113,11 +171,67 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(observation_8h)=
+
+## observation.h
+
+```{doxygenfile} observation.h
+:project: nexus
+```
+
+(pwm__adc_8h)=
+
+## pwm_adc.h
+
+```{doxygenfile} pwm_adc.h
+:project: nexus
+```
+
+(pwm__group_8h)=
+
+## pwm_group.h
+
+```{doxygenfile} pwm_group.h
+:project: nexus
+```
+
 (spi_8h)=
 
 ## spi.h
 
 ```{doxygenfile} spi.h
+:project: nexus
+```
+
+(spi__dma__model_8h)=
+
+## spi_dma_model.h
+
+```{doxygenfile} spi_dma_model.h
+:project: nexus
+```
+
+(spi__dma__owner__binding_8h)=
+
+## spi_dma_owner_binding.h
+
+```{doxygenfile} spi_dma_owner_binding.h
+:project: nexus
+```
+
+(spi__dma__transaction_8h)=
+
+## spi_dma_transaction.h
+
+```{doxygenfile} spi_dma_transaction.h
+:project: nexus
+```
+
+(spi__transaction_8h)=
+
+## spi_transaction.h
+
+```{doxygenfile} spi_transaction.h
 :project: nexus
 ```
 
@@ -134,6 +248,14 @@ These declarations come from public header files. Selection, lifecycle, supporte
 ## stream_budget.h
 
 ```{doxygenfile} stream_budget.h
+:project: nexus
+```
+
+(stream__profile_8h)=
+
+## stream_profile.h
+
+```{doxygenfile} stream_profile.h
 :project: nexus
 ```
 
@@ -161,11 +283,27 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(uart__format_8h)=
+
+## uart_format.h
+
+```{doxygenfile} uart_format.h
+:project: nexus
+```
+
 (uart__rs485_8h)=
 
 ## uart_rs485.h
 
 ```{doxygenfile} uart_rs485.h
+:project: nexus
+```
+
+(uart__word_8h)=
+
+## uart_word.h
+
+```{doxygenfile} uart_word.h
 :project: nexus
 ```
 

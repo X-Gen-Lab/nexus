@@ -12,6 +12,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "spi_dma_sequence_owner.h"
 #include "stm32f407_dma.h"
 #include "stm32f4xx_ll_spi.h"
 
@@ -21,6 +22,10 @@
 
 #ifndef NX_STM32_SPI_DMA_ACK
 #define NX_STM32_SPI_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
+#endif
+
+#ifndef NX_SPI_DMA_SEQUENCE_ENGINE_READ
+#define NX_SPI_DMA_SEQUENCE_ENGINE_READ(control) (*(control))
 #endif
 
 /** \brief Selected register identity determines the immutable reviewed route.
@@ -168,9 +173,10 @@ static nx_result_t configuration(nx_stm32_spi_dma_endpoint_state_t* device,
  * payload. */
 static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
                                     const nx_spi_request_t* request,
-                                    uint8_t memory_flags) {
-    if ((memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
-        0U) {
+                                    uint8_t memory_flags, uint8_t bits) {
+    if ((bits != 8U && bits != 16U) ||
+        (memory_flags & ~(NX_SPI_MEMORY_TX_FIXED | NX_SPI_MEMORY_RX_FIXED)) !=
+            0U) {
         return NX_ERROR_INVALID;
     }
     if (request == NULL || request->length == 0U || request->length > 65535U) {
@@ -179,19 +185,22 @@ static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
     if (request->tx == NULL || request->rx == NULL) {
         return NX_ERROR_UNSUPPORTED;
     }
-    size_t tx_span =
-        (memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U ? 1U : request->length;
-    size_t rx_span =
-        (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U ? 1U : request->length;
+    size_t width = bits / 8U;
+    size_t tx_span = (memory_flags & NX_SPI_MEMORY_TX_FIXED) != 0U
+                         ? width
+                         : request->length * width;
+    size_t rx_span = (memory_flags & NX_SPI_MEMORY_RX_FIXED) != 0U
+                         ? width
+                         : request->length * width;
     nx_result_t result =
         nx_dma_buffer_validate(state->regions, state->region_count, request->tx,
-                               tx_span, 1U, NX_DMA_TO_DEVICE);
+                               tx_span, width, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
     result =
         nx_dma_buffer_validate(state->regions, state->region_count, request->rx,
-                               rx_span, 1U, NX_DMA_FROM_DEVICE);
+                               rx_span, width, NX_DMA_FROM_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
@@ -203,7 +212,7 @@ static nx_result_t validate_buffers(nx_stm32_spi_dma_state_t* state,
 
 /** \brief Program exactly one disabled DMA memory engine. */
 static void program(nx_stm32_spi_dma_state_t* state, bool receive,
-                    nx_spi_request_t* request) {
+                    nx_spi_request_t* request, uint8_t bits) {
     DMA_Stream_TypeDef* stream = receive ? state->rx : state->tx;
     acknowledge(state, receive);
     stream->PAR = (uint32_t)(uintptr_t)&state->spi.registers->DR;
@@ -214,6 +223,7 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
     uint32_t increment =
         (state->memory_flags & fixed) != 0U ? 0U : DMA_SxCR_MINC;
     stream->CR = ((primary(state) ? 3U : 0U) << DMA_SxCR_CHSEL_Pos) |
+                 (bits == 16U ? DMA_SxCR_MSIZE_0 | DMA_SxCR_PSIZE_0 : 0U) |
                  increment | DMA_SxCR_PL_1 | DMA_SxCR_TCIE | DMA_SxCR_TEIE |
                  DMA_SxCR_DMEIE | (receive ? 0U : DMA_SxCR_DIR_0);
 }
@@ -222,7 +232,7 @@ static void program(nx_stm32_spi_dma_state_t* state, bool receive,
  * interval. */
 static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
                          nx_spi_request_t* request, bool admitted,
-                         uint8_t memory_flags) {
+                         uint8_t memory_flags, uint8_t bits, bool retained_cs) {
     uint32_t control;
     nx_result_t result = configuration(device, &control);
     if (result != NX_SUCCESS) {
@@ -232,23 +242,29 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
         return NX_ERROR_CONTEXT;
     }
     nx_stm32_spi_dma_state_t* state = device->dma;
-    result = validate_buffers(state, request, memory_flags);
+    result = validate_buffers(state, request, memory_flags, bits);
     if (result != NX_SUCCESS) {
         return result;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    if (!state->initialized || state->stopping || state->spi.fault) {
-        result = NX_ERROR_STATE;
-    } else if (state->active != NULL || state->spi.active ||
-               ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
-               (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
-        result = NX_ERROR_BUSY;
-    } else if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        result = NX_ERROR_TIMEOUT;
-    } else {
-        result = admitted
-                     ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
-                     : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
+    /* Invalid state/lease defaults to STATE; physical BUSY keeps priority. */
+    result = NX_ERROR_STATE;
+    if (state->initialized && !state->stopping && !state->spi.fault) {
+        if (state->active != NULL || (state->spi.active && !retained_cs) ||
+            ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+            (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
+            result = NX_ERROR_BUSY;
+        } else if (!retained_cs ||
+                   (state->spi.active && state->endpoint == device)) {
+            if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
+                result = NX_ERROR_TIMEOUT;
+            } else {
+                result = admitted ? nx_request_transition(&request->base,
+                                                          NX_REQUEST_ACTIVE)
+                                  : nx_request_admit(&request->base,
+                                                     NX_REQUEST_ACTIVE);
+            }
+        }
     }
     if (result != NX_SUCCESS) {
         nx_arch_irq_restore(saved);
@@ -263,12 +279,14 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
     state->tx_complete = false;
     state->rx_complete = false;
     state->drain_deadline = NX_DEADLINE_NEVER;
-    state->spi.registers->CR1 = control;
+    state->spi.registers->CR1 = control | (bits == 16U ? SPI_CR1_DFF : 0U);
     state->spi.registers->CR2 = 0U;
-    program(state, true, request);
-    program(state, false, request);
-    (void)nx_stm32_gpio_write(device->endpoint.cs, 0U,
-                              device->endpoint.cs_mask);
+    program(state, true, request, bits);
+    program(state, false, request, bits);
+    if (!retained_cs) {
+        (void)nx_stm32_gpio_write(device->endpoint.cs, 0U,
+                                  device->endpoint.cs_mask);
+    }
     nx_arch_dsb();
     state->rx->CR |= DMA_SxCR_EN;
     state->tx->CR |= DMA_SxCR_EN;
@@ -281,13 +299,13 @@ static nx_result_t start(nx_stm32_spi_dma_endpoint_state_t* device,
 /** \brief Start direct finite DMA after every rejection condition is resolved.
  */
 static nx_result_t submit(void* context, nx_spi_request_t* request) {
-    return start(context, request, false, 0U);
+    return start(context, request, false, 0U, 8U, false);
 }
 
 /** \brief Copy explicit memory modes only after valid request admission. */
 static nx_result_t submit_memory(void* context, nx_spi_request_t* request,
                                  uint8_t memory_flags) {
-    return start(context, request, false, memory_flags);
+    return start(context, request, false, memory_flags, 8U, false);
 }
 
 /** \brief Transfer an existing adapter loan to the exact selected endpoint. */
@@ -296,7 +314,7 @@ static nx_result_t start_admitted(void* context, nx_spi_request_t* request) {
         nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
         return NX_ERROR_STATE;
     }
-    return start(context, request, true, 0U);
+    return start(context, request, true, 0U, 8U, false);
 }
 
 /** \brief Stopping DMA does not withdraw CS before an actual SPI idle
@@ -375,7 +393,7 @@ void nx_stm32_spi_dma_irq(nx_stm32_spi_dma_state_t* state, bool receive) {
 
 /** \brief SETTLED follows two engine proofs and true peripheral idle, then CS
  * release. */
-static void service(void* context) {
+static void service_phase(void* context, bool retained_cs) {
     nx_stm32_spi_dma_state_t* state = context;
     if (state == NULL || nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return;
@@ -398,23 +416,35 @@ static void service(void* context) {
                nx_deadline_expired(request->base.deadline, now)) {
         begin_drain(state, NX_ERROR_TIMEOUT);
     }
-    bool idle = (status & SPI_SR_BSY) == 0U && (status & SPI_SR_TXE) != 0U;
     bool terminal =
         state->draining || (state->tx_complete && state->rx_complete);
     uint32_t irq_mask =
         DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+    /* A final DMA beat may affect SPI as EN clears. Observe all withdrawal
+     * readbacks before the barrier and the final peripheral-idle snapshot. */
+    uint32_t requests = state->spi.registers->CR2;
+    uint32_t tx_control = NX_SPI_DMA_SEQUENCE_ENGINE_READ(&state->tx->CR);
+    uint32_t rx_control = NX_SPI_DMA_SEQUENCE_ENGINE_READ(&state->rx->CR);
+    size_t tx_remaining = state->tx->NDTR;
+    size_t rx_remaining = state->rx->NDTR;
+    bool requests_detached =
+        (requests & (SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN)) == 0U;
+    nx_arch_dsb();
+    status = state->spi.registers->SR;
+    bool idle = (status & SPI_SR_BSY) == 0U && (status & SPI_SR_TXE) != 0U;
     nx_dma_drain_facts_t tx = {
         .length = request->length,
-        .remaining = state->tx->NDTR,
-        .engine_disabled = (state->tx->CR & DMA_SxCR_EN) == 0U,
-        .irq_detached = (state->tx->CR & irq_mask) == 0U,
+        .remaining = tx_remaining,
+        .engine_disabled = (tx_control & DMA_SxCR_EN) == 0U,
+        .irq_detached = (tx_control & irq_mask) == 0U,
         .peripheral_idle = idle,
     };
     nx_dma_drain_facts_t rx = tx;
-    rx.remaining = state->rx->NDTR;
-    rx.engine_disabled = (state->rx->CR & DMA_SxCR_EN) == 0U;
-    rx.irq_detached = (state->rx->CR & irq_mask) == 0U;
-    if (terminal && nx_dma_drain_check(&tx) == NX_SUCCESS &&
+    rx.remaining = rx_remaining;
+    rx.engine_disabled = (rx_control & DMA_SxCR_EN) == 0U;
+    rx.irq_detached = (rx_control & irq_mask) == 0U;
+    if (terminal && requests_detached &&
+        nx_dma_drain_check(&tx) == NX_SUCCESS &&
         nx_dma_drain_check(&rx) == NX_SUCCESS) {
         state->spi.registers->CR2 = 0U;
         LL_SPI_Disable(state->spi.registers);
@@ -422,7 +452,9 @@ static void service(void* context) {
         (void)state->spi.registers->SR;
         nx_arch_dsb();
         nx_stm32_spi_endpoint_state_t* endpoint = &state->endpoint->endpoint;
-        (void)nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+        if (!retained_cs) {
+            (void)nx_stm32_gpio_write(endpoint->cs, endpoint->cs_mask, 0U);
+        }
         /* Both engines are actually disabled; do not erase a late error. */
         if (state->terminal == NX_SUCCESS &&
             ((flags(state, true) | flags(state, false)) & 0x0DU) != 0U) {
@@ -432,8 +464,10 @@ static void service(void* context) {
         size_t count = result == NX_SUCCESS ? request->length : 0U;
         state->spi.fault = result == NX_ERROR_IO;
         state->active = NULL;
-        state->endpoint = NULL;
-        state->spi.active = false;
+        if (!retained_cs) {
+            state->endpoint = NULL;
+        }
+        state->spi.active = retained_cs;
         nx_request_settle(&request->base, result, count);
     } else {
         if (!state->draining && state->tx_complete && state->rx_complete &&
@@ -451,6 +485,11 @@ static void service(void* context) {
     nx_arch_irq_restore(saved);
 }
 
+/** \brief Legacy transactions release their own complete CS interval. */
+static void service(void* context) {
+    service_phase(context, false);
+}
+
 /** \brief One stopped controller retains no DMA, IRQ or selected endpoint
  * access. */
 static nx_result_t stop(void* context) {
@@ -460,6 +499,9 @@ static nx_result_t stop(void* context) {
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
+    }
+    if (!state->initialized) {
+        return NX_SUCCESS;
     }
     state->stopping = true;
     if (state->active != NULL) {
@@ -559,3 +601,146 @@ const nx_spi_endpoint_ops_t nx_stm32_spi_dma_endpoint_ops = {
     .start_admitted = start_admitted,
     .on_port = on_port,
 };
+
+/** \brief Validate every future DMA span before first CS or outer admission. */
+static nx_result_t
+sequence_validate(void* context, void* child,
+                  const nx_spi_dma_transaction_request_t* request) {
+    nx_stm32_spi_dma_state_t* state = context;
+    nx_stm32_spi_dma_endpoint_state_t* endpoint = child;
+    uint32_t control;
+    nx_result_t result = configuration(endpoint, &control);
+    if (result != NX_SUCCESS || endpoint->dma != state) {
+        return result != NX_SUCCESS ? result : NX_ERROR_INVALID;
+    }
+    if (!state->initialized || state->stopping || state->spi.fault) {
+        return NX_ERROR_STATE;
+    }
+    if (state->active != NULL || state->spi.active ||
+        ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+        (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (state->region_count > SIZE_MAX / sizeof(*state->regions)) {
+        return NX_ERROR_INVALID;
+    }
+    result =
+        nx_spi_dma_sequence_storage_validate(request, state, sizeof(*state));
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(request, endpoint,
+                                                      sizeof(*endpoint));
+    }
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(
+            request, state->regions,
+            state->region_count * sizeof(*state->regions));
+    }
+    if (result == NX_SUCCESS) {
+        result = nx_spi_dma_sequence_storage_validate(
+            request, endpoint->endpoint.cs, sizeof(*endpoint->endpoint.cs));
+    }
+    if (result != NX_SUCCESS) {
+        return result;
+    }
+    for (size_t i = 0U; i < request->count; ++i) {
+        const nx_spi_dma_segment_t* segment = &request->segments[i];
+        nx_spi_request_t phase = {
+            .tx = segment->tx, .rx = segment->rx, .length = segment->words};
+        result = validate_buffers(state, &phase, segment->memory_flags,
+                                  request->word_bits);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+    }
+    return NX_SUCCESS;
+}
+
+/** \brief Preserve a held CS only for this controller's exact retained child.
+ */
+static nx_result_t sequence_begin(void* context, void* child,
+                                  nx_spi_request_t* phase, uint8_t bits,
+                                  uint8_t memory_flags, bool retained_cs) {
+    nx_stm32_spi_dma_endpoint_state_t* endpoint = child;
+    if (endpoint == NULL || endpoint->dma != context) {
+        return NX_ERROR_INVALID;
+    }
+    return start(endpoint, phase, false, memory_flags, bits, retained_cs);
+}
+
+/** \brief Settle a phase after true engine/wire drain while retaining CS. */
+static void sequence_advance(void* context) {
+    service_phase(context, true);
+}
+
+/** \brief Release final CS only after no DMA engine or phase can touch memory.
+ */
+static nx_result_t sequence_release(void* context, void* child) {
+    nx_stm32_spi_dma_state_t* state = context;
+    nx_stm32_spi_dma_endpoint_state_t* endpoint = child;
+    if (state == NULL || endpoint == NULL || endpoint->dma != state ||
+        state->endpoint != endpoint) {
+        return NX_ERROR_INVALID;
+    }
+    if (state->active != NULL ||
+        ((state->tx->CR | state->rx->CR) & DMA_SxCR_EN) != 0U ||
+        (state->spi.registers->SR & SPI_SR_BSY) != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    nx_arch_dsb();
+    nx_result_t result = nx_stm32_gpio_write(endpoint->endpoint.cs,
+                                             endpoint->endpoint.cs_mask, 0U);
+    if (result == NX_SUCCESS) {
+        state->endpoint = NULL;
+        state->spi.active = false;
+    }
+    return result;
+}
+
+/** \brief Opt-in sequence owner reuses hardware without growing legacy state.
+ */
+const nx_spi_dma_sequence_backend_t nx_stm32_spi_dma_sequence_backend = {
+    .validate = sequence_validate,
+    .begin = sequence_begin,
+    .advance = sequence_advance,
+    .cancel = cancel,
+    .release = sequence_release,
+    .stop = stop,
+};
+
+/** \brief Prove physical endpoint ownership after canonical logical identity.
+ */
+bool nx_stm32_spi_dma_owner_contains(
+    const nx_spi_dma_transaction_endpoint_t* endpoint,
+    const nx_spi_dma_transaction_port_t* port) {
+    if (!nx_spi_dma_sequence_contains(endpoint, port)) {
+        return false;
+    }
+    const nx_spi_dma_sequence_state_t* sequence = port->context;
+    const nx_spi_dma_sequence_endpoint_t* child = endpoint->context;
+    if (sequence->backend != &nx_stm32_spi_dma_sequence_backend ||
+        sequence->context == NULL) {
+        return false;
+    }
+    const nx_stm32_spi_dma_state_t* state = sequence->context;
+    const nx_stm32_spi_dma_endpoint_state_t* device = child->endpoint;
+    return device->dma == state && device->endpoint.port == &state->spi;
+}
+/** \brief Reuse both actual DMA IRQ policy checks without exposing byte IO. */
+nx_result_t
+nx_stm32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t* port,
+                                   const nx_irq_wake_t* wake,
+                                   uint8_t syscall_ceiling) {
+    if (port == NULL || port->ops != &nx_spi_dma_sequence_port_ops ||
+        port->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    const nx_spi_dma_sequence_state_t* sequence = port->context;
+    if (sequence->backend != &nx_stm32_spi_dma_sequence_backend ||
+        sequence->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (sequence->stopping || sequence->stopped) {
+        return NX_ERROR_STATE;
+    }
+    return attach_wake(sequence->context, wake, syscall_ceiling);
+}

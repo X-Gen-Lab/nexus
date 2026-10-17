@@ -1,23 +1,27 @@
 # Nexus 平台图册
 
-本图册交付15类必需视图及两张补充图。主图登记见
+本图册保留15类必需视图、两张补充图与本轮 I/O 架构视图 FIG-16，
+另加入 IO-24 的 FIG-17/18 目标图源。主图登记见
 [图清单](diagram-index.csv)，维护规则见
-[图示标准](../../design/documentation-standards.md)。图有精确current/reference身份，
+[图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份，
 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。
 
-代码依据固定为`0111c8d3b9c7b37d258b9c401070305b13b6f3a1`，该提交后的本轮
-文档工具实现另以最终执行记录为准；固件源码关系没有随图生成改变。图源为可编辑
-DOT，输出为本地SVG。深色标签、线型和文字共同表达关系，不依赖颜色单独传达。
+原15类主图及两张补充图的代码依据保持`0111c8d3b9c7b37d258b9c401070305b13b6f3a1`。
+FIG-16 描述 `c4249e98` 基线之后的 I/O 增量机制，其具体源码链接和执行状态见
+[本轮架构说明](../../design/io-evolution.md)与42项台账，不能继承原候选资格。
+文档工具的实际结果另见执行记录。图源为可编辑 DOT，输出为本地 SVG；标签、
+线型和文字共同表达关系，不只依赖颜色。
 
-17个图源各派生中文与英文视图，页面按所选语言使用本地SVG。节点、箭头、属性与
+20个图源按合同各派生中文与英文视图；新增 FIG-17/18 的渲染与审查须分别取得
+实际记录。页面按所选语言使用本地SVG。节点、箭头、属性与
 范围仍由同一canonical DOT维护；`labels.json`只维护完整标签译文，不能改变拓扑。
-34组语言DOT/SVG与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
+全部40组语言DOT/SVG应与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
 SVG采用Graphviz Cairo字形路径输出，使离线读者无需安装中文字体；每图附title、
 desc和正文alt/caption。生成主机需要锁定Graphviz、Cairo及Noto Sans CJK SC，
 最终工具身份与自动检查结果由文档交付记录绑定。源码语义、实际浏览器桌面/窄屏/
-放大/打印与离线包验收分开记录。15主图和2补充图已独立逐边与PNG审查；current为source_reviewed，reference为
-reference_reviewed，补充target为design_reviewed。浏览器与正式包验收另按实际
-执行记录判断，这些状态不建立HIL或公开部署资格。
+放大/打印与离线包验收分开记录。原15主图和2补充图保留各自已完成的审查；新增
+FIG-16/17/18 的内容、图示和翻译审查状态单独记录，不能从渲染成功推断。浏览器与正式包
+验收另按实际执行记录判断，这些状态不建立 HIL 或公开部署资格。
 
 修改标签后显式使用已准备的锁定工具生成语言视图，然后执行完整检查：
 
@@ -195,6 +199,63 @@ preposted producer和普通producer不得混用。旧块在两个hardware target
 
 依据：[UART DMA/连续贷款合同](../../design/uart-dma-rs485.md)、[stream状态合同](../../../io/include/nexus/io/stream.h)、[容量与观察合同](../../design/io-observation-recovery.md)、[F407 RX DMA实现](../../../soc/stm32f407/drivers/uart_receive.c)、[ADC显式rearm](../../../soc/stm32f407/drivers/adc_stream.c)。
 [可编辑DOT](continuous-stream.dot)；实施关联：DOC-57。
+
+## FIG-16 当前 I/O 装配与执行
+
+**身份：current。范围：本轮软件机制；精确模式与验证状态由 IO-01–42 台账维护。**
+
+![FIG-16：构建期资源计划、静态 factory 与运行调用分别标记；可选机制不建立硬件资格](io-evolution.svg)
+
+上部箭头表达 authored TOML、SoC/Board 事实、typed IR、原子 bundle 与 CMake 的
+构建关系；下部箭头表达查找、调用和复制观测。factory 只返回既有引用，日常 I/O
+通过 face 直接进入 provider。硅片准入、traits 和时间戳辅助均显式可选；准入结果
+不自动启动硬件，checked service 不证明请求已经结束。应用拥有执行推进与停机。
+
+依据：[本轮 I/O 架构](../../design/io-evolution.md)、
+[typed IR](../../../tools/configure/ir.py)、
+[选定 traits](../../../tools/configure/io_traits.py)、
+[硅片准入](../../../core/include/nexus/core/silicon.h)、
+[观测合同](../../../io/include/nexus/io/observation.h)。
+[可编辑 DOT](io-evolution.dot)；实施关联：IO-01/02/03/09/11/12/21。
+
+## FIG-17 H743 Flash RAM 边界目标设计
+
+**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／Cache off；源已集成，生产 ELF 闭包
+与完整软件退出尚未完成，实板 HIL 未执行。**
+
+![FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU bridge、RAM VTOR 与 MPU guard 的完整退出尚未完成](h743-flash-ram-architecture.svg)
+
+构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；运行边分别表达查找、调用、
+复制结果与真实 MMIO 观测。factory 仅返回既有 face。忙区间内全部执行、输入、
+向量、栈及诊断必须留在已准入 RAM；guard 只约束 CPU。虚线所示其他 bus master
+撤回／join 由外部维护调用者负责，不表示平台创建 worker 或已停止硬件。
+
+目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
+[既有 H743 provider 范围](../../../soc/stm32h743/README.md)、
+[IO-24 原始退出条件](../../design/io-evolution-execution.csv)。
+[可编辑 DOT](h743-flash-ram-architecture.dot)。新增图的渲染、语义独立审查、双语
+输出检查、实际浏览器与软件／实板资格须分别记录，不能从草稿存在推断。
+
+## FIG-18 RAM 维护结清目标设计
+
+**身份：target。范围：选定 V 修订／Cache off 的同步物理脉冲；这是协议阶段，
+不新增公共 request enum，不证明有界返回时间。**
+
+![FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy 无返回边](h743-flash-ram-lifecycle.svg)
+
+每条边表示有条件的控制流。触发前已有临时效果的拒绝必须先证明回退；触发后
+TIMEOUT 只锁存结果，不撤销脉冲，也不返回 Flash handler。双 Bank 真实空闲后，
+仍须证明 LOCK、TIM2 时间域／epoch 及精确 MPU／VTOR 恢复；CPU bridge 的精确恢复由实际 ARM 指令流另行证明。永久 busy 持续留在
+RAM 排空环；无法证明恢复则留在不返回 RAM fail-stop，不暗示自动复位或喂狗。
+所有返回的 RAM 路径，包括触发前 VTOR 发布拒绝和 guard／deadline 拒绝，都必须
+先通过共同返回门：双 Bank 空闲、guard 无保留效果、完整保存的目标控制值与 LOCK
+已读回证明；必要时先锁定空闲目标，再恢复 VTOR。
+
+目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
+[Arch 合同](../../design/arch-contracts.md)、
+[当前软件与物理资格边界](../../delivery/qualification.md)。
+[可编辑 DOT](h743-flash-ram-lifecycle.dot)。图中返回条件仍需实际
+生产 ELF、真实 provider 测试与物理 station 分别建立证据。
 
 ## 补充视图
 

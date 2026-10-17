@@ -225,19 +225,52 @@ nx_result_t nx_stm32h743_adc_stop(nx_stm32h743_adc_state_t* port);
 #endif
 /** \brief Exact two-bank physical Flash; no product reservations or partitions.
  */
+typedef struct nx_stm32h743_flash_ram_workspace
+    nx_stm32h743_flash_ram_workspace_t;
 typedef struct {
     FLASH_TypeDef* registers;
     volatile uint8_t* memory;
     uint32_t supply_mv;
     uint32_t poll_limit;
     bool active;
+    nx_stm32h743_flash_ram_workspace_t* execution;
 } nx_stm32h743_flash_state_t;
 extern const nx_flash_geometry_t g_nx_stm32h743_flash_geometry;
 extern const nx_flash_ops_t nx_stm32h743_flash_ops;
+/** \brief Optional cold owner of the shared Flash programming-delay field. */
+typedef struct {
+    uint32_t saved_acr;
+    bool retained;
+} nx_stm32h743_flash_timing_state_t;
+/**
+ * \brief Acquire programming timing for the exact fixed HSI32/HSI64 profile.
+ * \param[in,out] state: Zeroed, exclusive static state selected with Flash.
+ * \return SUCCESS or error; retained requires explicit successful stop.
+ * \note Privileged unmasked task after system start and before consumers.
+ *       Only ready LDO/VOS3, Cache-off, reset LATENCY7/WRHIGHFREQ0 and both
+ *       idle banks are admitted. HSI64 acquires WRHIGHFREQ1; HSI32 needs no
+ *       write or lease. A failed readback retains cleanup responsibility.
+ */
+nx_result_t
+nx_stm32h743_flash_timing_initialize(nx_stm32h743_flash_timing_state_t* state);
+/**
+ * \brief Restore owned programming delay after all Flash consumers join.
+ * \param[in,out] state: Same exclusive owner; live system remains available.
+ * \return SUCCESS after release, or error with retained responsibility.
+ * \note Both banks and pulse controls must be quiet. Preserve LATENCY7 and
+ *       unrelated ACR fields; do not restore a saved unsafe read latency.
+ *       Failed restoration is retryable. An already released owner returns
+ *       without MMIO and cannot modify a later owner's hardware state.
+ */
+nx_result_t
+nx_stm32h743_flash_timing_stop(nx_stm32h743_flash_timing_state_t* state);
 /** \brief Stop succeeds only after both physical banks release all pulses. */
 nx_result_t nx_stm32h743_flash_stop(nx_stm32h743_flash_state_t* port);
 #ifndef NX_H743_FLASH_POLL
 #define NX_H743_FLASH_POLL(port) ((void)(port))
+#endif
+#ifndef NX_H743_FLASH_READ8
+#define NX_H743_FLASH_READ8(address) (*(const volatile uint8_t*)(address))
 #endif
 #ifndef NX_H743_FLASH_WRITE32
 #define NX_H743_FLASH_WRITE32(address, value) (*(address) = (value))

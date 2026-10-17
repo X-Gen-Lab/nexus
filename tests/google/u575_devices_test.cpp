@@ -142,6 +142,36 @@ TEST_F(U575I2c, IndependentHsi16ClockAndFiniteReloadPreserveSystemTime) {
     EXPECT_EQ(0U, g_u575_model.rcc.CCIPR1);
     EXPECT_FALSE(clock.retained);
 }
+TEST_F(U575I2c, ExplicitTimingReachesActualRegistersAndSurvivesRecovery) {
+    g_u575_model.rcc.APB1ENR1 = RCC_APB1ENR1_I2C1EN;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_i2c_clock_start(&clock, &state));
+    constexpr uint32_t timing = 0x20f41f1fU;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_i2c_initialize_timing(&state, timing));
+    EXPECT_EQ(timing, registers.timing);
+    EXPECT_EQ(timing, state.timing);
+    nx_i2c_port_t face{&nx_i2c_v2_ops, &state};
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_port_recover(&face));
+    EXPECT_EQ(timing, registers.timing);
+    nx_stm32u575_i2c_endpoint_state_t endpoint{&state, 0x50U};
+    nx_i2c_long_endpoint_t child{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    uint8_t rx[511]{};
+    registers.rxdr = 0x5aU;
+    nx_i2c_message_t message{rx, sizeof(rx), true};
+    size_t done = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_i2c_long_endpoint_transaction(&child, &message, 1U,
+                                                           1000000U, &done));
+    EXPECT_EQ(511U, done);
+    EXPECT_EQ(0x5aU, rx[510]);
+    EXPECT_EQ(NX_SUCCESS, nx_i2c_port_stop(&face));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_i2c_clock_stop(&clock));
+}
+TEST_F(U575I2c, ReservedTimingBitsRejectBeforeAnyPeripheralWrite) {
+    const auto writes = g_u575_model.writes;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32u575_i2c_initialize_timing(&state, 0x0f000000U));
+    EXPECT_EQ(writes, g_u575_model.writes);
+    EXPECT_FALSE(state.retained);
+}
 TEST_F(U575I2c, ForeignSourceOrSelectorRejectWithoutClockEffects) {
     g_u575_model.rcc.APB1ENR1 = RCC_APB1ENR1_I2C1EN;
     for (uint32_t foreign : {static_cast<uint32_t>(RCC_CR_HSION),

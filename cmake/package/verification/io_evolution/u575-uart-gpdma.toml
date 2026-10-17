@@ -1,0 +1,30 @@
+# Exact finite byte-TX software fixture; physical HIL remains not executed.
+# Resolve DMA engine/channel/request/vector from exact SoC facts, not a new
+# authored option or alternate build authority. Physical HIL remains pending.
+schema = 2
+board_package = "../../../../boards/stm32u575_nucleo_zi_q"
+backend = "baremetal"
+clock = "msis4"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[uart.console]
+binding = "uart1"
+mode = "dma-tx"
+baud = 115200
+
+[uart.console.rx]
+format = "bytes"
+capacity = 64
+
+[uart.console.irq]
+priority = 5
+calls_os = false

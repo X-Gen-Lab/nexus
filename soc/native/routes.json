@@ -40,7 +40,8 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "irq-words"
       ],
       "source": "Host virtual model; no physical timing"
     },
@@ -53,7 +54,8 @@
       "kind": "spi",
       "pins": [],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "source": "Host virtual model; no physical timing"
     },
@@ -97,7 +99,8 @@
         }
       ],
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "irq-words"
       ],
       "source": "Host independent UART model; no physical timing"
     },
@@ -110,7 +113,8 @@
       "kind": "spi",
       "pins": [],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "source": "Host independent SPI model; no physical timing"
     },

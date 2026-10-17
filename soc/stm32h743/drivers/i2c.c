@@ -8,6 +8,9 @@
  */
 #include "i2c_v2.h"
 #include "stm32h743_provider.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #include <stddef.h>
 #define SAME(member, sdk)                                                      \
     _Static_assert(offsetof(nx_i2c_v2_registers_t, member) ==                  \
@@ -43,9 +46,15 @@ nx_result_t nx_stm32h743_i2c_pins_prepare(void) {
         return NX_ERROR_CONTEXT;
     RCC_TypeDef* rcc = g_nx_stm32h743_system.rcc;
     if (!g_nx_stm32h743_system.started || rcc == NULL ||
+#if NEXUS_CORE_HZ == 384000000U
+        !nx_stm32h743_pll384_clocks_ready() ||
+        (NX_H743_READ(&rcc->D2CCIP2R) & RCC_D2CCIP2R_I2C123SEL) !=
+            (2U << RCC_D2CCIP2R_I2C123SEL_Pos) ||
+#else
         (g_nx_stm32h743_system.core_hz != 32000000U &&
          g_nx_stm32h743_system.core_hz != 64000000U) ||
         (NX_H743_READ(&rcc->D2CCIP2R) & RCC_D2CCIP2R_I2C123SEL) != 0U ||
+#endif
         (NX_H743_READ(&rcc->APB1LENR) & RCC_APB1LENR_I2C1EN) == 0U ||
         (NX_H743_READ(&rcc->AHB4ENR) & RCC_AHB4ENR_GPIOBEN) == 0U ||
         (NX_H743_READ(&rcc->APB1LRSTR) & RCC_APB1LRSTR_I2C1RST) != 0U)

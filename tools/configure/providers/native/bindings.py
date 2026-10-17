@@ -27,6 +27,14 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = [f"nx_native_gpio_stop_instance({state}, {initial}u)"]
     elif kind == "uart":
         capacity = item.options.rx_capacity
+        if item.mode == "irq-words":
+            return Construction(
+                state_type="nx_native_uart_word_state_t",
+                definitions=[f"static uint16_t s_nx_rx_{name}[{capacity}];"],
+                initialize=(f"nx_native_uart_word_initialize({state}, "
+                            f"s_nx_rx_{name}, {capacity}u, NULL, 0u)"),
+                stop=[f"nx_uart_word_port_stop({face})"],
+                retain_on_failed_init=False)
         events = item.options.rx_profile == "events"
         data_type = "nx_uart_rx_event_t" if events else "uint8_t"
         profile = "NX_UART_RX_EVENTS" if events else "NX_UART_RX_BYTES"
@@ -38,6 +46,24 @@ def constructor(item, result, board_bindings, routes, devices):
         initialize = (f"nx_native_uart_configure_instance({state}, "
                       f"&s_nx_config_{name})")
         stop = [f"nx_uart_port_stop({face})"]
+    elif kind == "spi" and item.interface_kind == "spi_dma_transaction":
+        sequence = f"s_nx_sequence_{name}"
+        return Construction(
+            state_type="nx_native_spi_dma_state_t",
+            face_context="&" + sequence,
+            face_definitions=[
+                f"static nx_spi_dma_sequence_state_t {sequence} = {{",
+                f"    .backend = &nx_native_spi_dma_sequence_backend, .context = {state}",
+                "};"],
+            definitions=[f"static nx_result_t prepare_{name}(void) {{",
+                f"    if ({sequence}.active != NULL || {sequence}.cs_held || {sequence}.pending_release) {{ return NX_ERROR_BUSY; }}",
+                f"    nx_result_t status = nx_native_spi_dma_initialize({state});",
+                "    if (status != NX_SUCCESS) { return status; }",
+                f"    return nx_spi_dma_sequence_initialize(&{sequence},",
+                f"        &nx_native_spi_dma_sequence_backend, {state});", "}"],
+            initialize=f"prepare_{name}()",
+            stop=[f"nx_spi_dma_transaction_stop({face})"],
+            retain_on_failed_init=True)
     elif kind in {"spi", "i2c"}:
         definitions = [f"static nx_result_t prepare_{name}(void) {{",
                        f"    nx_result_t status = nx_native_{kind}_port_configure_instance({state});",

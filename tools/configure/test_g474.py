@@ -41,10 +41,13 @@ class G474ConfigurationTests(unittest.TestCase):
         with patch.object(gate, "dependency_identity", wraps=gate.dependency_identity) as dependency:
             result = gate.resolve_ir(self.assembly())
         paths = [call.args[1] for call in dependency.call_args_list]
-        self.assertEqual(paths, ["vendors/arm/CMSIS_5", "vendors/st/cmsis_device_g4"])
+        self.assertEqual(paths, ["vendors/arm/CMSIS_5", "vendors/st/cmsis_device_g4",
+                                 "vendors/st/stm32g4_hal"])
         self.assertNotIn("vendors/st/cmsis_device_f4", paths)
         self.assertEqual(result["source_dependencies"][1]["commit"],
                          "626ee412334a5ed2e5b320af5a8d77d69f03a558")
+        self.assertEqual(result["source_dependencies"][2]["commit"],
+                         "f5929f431f9effe45fbe18f5337e4753ced9ac92")
 
     def test_byte_mode_emits_exact_static_ring_and_counts_before_cold_call(self):
         output = self.directory / "generated"

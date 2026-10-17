@@ -53,6 +53,19 @@ software candidate additionally requires all other qualification scopes for
 the same source, resolved configuration and ELF. Physical HIL stays
 `not_executed` until equipment actually runs it.
 
+Development source observations can also describe a dirty checkout. Only these
+dirty records add `working_tree_sha256`, binding the Git-visible tracked patch,
+index, untracked regular-file bytes and modes, symlink text and initialized
+submodule observations. Identical bytes rewritten with a new modification time
+keep the same identity. Historical dirty records without this fingerprint are
+stale; they cannot retrospectively prove which dirty bytes were observed.
+
+Clean source records keep exactly `root`, `commit`, `tree`, `dirty` and
+`submodules`. Candidates and external consumers still require clean source.
+Dirty observation does not qualify a candidate or an OCI/offline reproduction.
+It excludes ignored or Git-hidden worktree data and does not lock out concurrent
+writers or prove that no change-and-restore occurred between observations.
+
 # 离线构建与外部工程
 
 复现输入分别绑定平台的干净 Git 版本、完整可发布 Source SDK、不可变 OCI
@@ -81,3 +94,13 @@ Overlay2／overlayfs 使用共享只读镜像层、有界 tmpfs 并关闭 daemon
 取消会终止 CLI 进程组并清理命名容器；真实退出码和原始日志保留。失败或取消
 不产生通过资格。最终候选还须满足同一源码、resolved 配置和 ELF 的全部软件
 验收范围。实板未执行时，物理 HIL 始终记录为 `not_executed`。
+
+开发阶段也可观察 dirty 工作区。仅 dirty 记录新增 `working_tree_sha256`，
+绑定 Git 可见的已跟踪补丁、索引、未跟踪普通文件的字节和权限、符号链接文本，
+以及已初始化子模块的观察结果。相同字节只因重写而修改时间发生变化时，身份不变。
+缺少该指纹的历史 dirty 记录视为过期，不能追溯证明当时观察了哪些 dirty 字节。
+
+clean 源码记录仍精确包含 `root`、`commit`、`tree`、`dirty` 和 `submodules`
+五项。候选与外部工程消费仍要求 clean 源码。dirty 观察不能赋予候选或 OCI／离线
+复现资格；它不涵盖被忽略或被 Git 隐藏的工作区数据，也不锁住并发写入者，不能
+证明两次观察之间没有发生修改后恢复原值的操作。

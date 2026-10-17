@@ -1,0 +1,243 @@
+#
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0f5f506393556b5669f73dfc4f800f566270d2aff923ca637ffd4052a5c83b2d\n"
+
+msgid "Selected I/O and clock extension delivery"
+msgstr "选定 I/O 与时钟扩展交付"
+
+msgid "This page records development observations for the selected H743, U575 and G474 software extensions and the checks actually executed for them. The current working source has not reached its final freeze. Focused model results below do not qualify a later commit, an ARM image, an electrical connection or a software candidate."
+msgstr "本页记录选定 H743、U575 和 G474 软件扩展的开发观察，以及针对它们实际执行的检查。当前工作源码尚未最终冻结。下列专项模型结果不能为后续提交、ARM 镜像、电气连接或软件候选建立资格。"
+
+msgid "The {download}`result index <io-evolution-next-wave-results.json>` identifies the exact fixtures, raw command receipts and fresh XML. The [I/O architecture contract](../design/io-evolution.md) and its FIG-16 explain static assembly and direct runtime dispatch; the [request lifecycle diagram](../assets/diagrams/request-lifecycle.svg) defines borrow and withdrawal transitions. These existing diagrams do not establish qualification of the new selections."
+msgstr "{download}`结果索引 <io-evolution-next-wave-results.json>` 标识精确夹具、原始命令回执与新生成的 XML。[I/O 架构合同](../design/io-evolution.md) 及其 FIG-16 说明静态装配与直接运行时派发；[请求生命周期图](../assets/diagrams/request-lifecycle.svg) 定义借用与撤离转换。这些既有图示不建立新增装配的资格。"
+
+msgid "Selected implementation"
+msgstr "选定实现"
+
+msgid "Slice"
+msgstr "范围"
+
+msgid "Exact selection"
+msgstr "精确选择"
+
+msgid "Ownership and present boundary"
+msgstr "所有权与当前边界"
+
+msgid "STM32H743"
+msgstr "STM32H743"
+
+msgid "`hsi64-pll384-cache-off`, reviewed V revision, bare-metal reference"
+msgstr "`hsi64-pll384-cache-off`、已审 V 修订、裸机参考"
+
+msgid "Explicit cold clock plan, nominal CPU 384 MHz/HCLK 192 MHz/APB 96 MHz with authored HSI bounds; peripheral kernel and timer domains remain distinct. This is a selected reference, not DVFS or a measured clock."
+msgstr "显式冷态时钟计划，标称 CPU 384 MHz／HCLK 192 MHz／APB 96 MHz，并带明确编写的 HSI 边界；外设内核与定时器时钟域仍分别定义。这是选定参考，不是 DVFS，也不是实测时钟。"
+
+msgid "STM32U575"
+msgstr "STM32U575"
+
+msgid "USART1 `dma-tx`, TZEN=0, MSIS 4 MHz, 8N1"
+msgstr "USART1 `dma-tx`, TZEN=0, MSIS 4 MHz, 8N1"
+
+msgid "One selected state and const ops table; GPDMA1/channel0/request25, finite 1–65535-byte TX wholly inside nonsecure SRAM1 `[0x20000000,0x20030000)`. IRQ byte RX remains available; RX DMA, linked lists and a TrustZone broker remain outside this mode."
+msgstr "一个选定状态与 const ops 表；GPDMA1/channel0/request25，有限 1–65535 字节 TX 全部位于非安全 SRAM1 `[0x20000000,0x20030000)`。IRQ 字节 RX 仍可用；该模式不包含 RX DMA、链表或 TrustZone broker。"
+
+msgid "STM32G474"
+msgstr "STM32G474"
+
+msgid "`can_fd` / `iso-fd-normal` or `iso-fd-loopback`, FDCAN1"
+msgstr "`can_fd` / `iso-fd-normal` 或 `iso-fd-loopback`，FDCAN1"
+
+msgid "One fixed 212-word message-RAM slice and three physical TX elements; nominal 500 kbit/s and data 2 Mbit/s at HSE24. Normal and internal-loopback model tests do not qualify a transceiver, terminated bus or peer."
+msgstr "一个固定 212 word 消息 RAM 区间与三个物理 TX 元素；HSE24 下标称仲裁速率 500 kbit/s、数据速率 2 Mbit/s。正常模式与内部环回模型测试不为收发器、带终端电阻的总线或对端建立资格。"
+
+msgid "`pwm_adc` / `finite-regular-dma`"
+msgstr "`pwm_adc` / `finite-regular-dma`"
+
+msgid "One whole TIM1/ADC1/ADC12/DMA1-channel1/DMAMUX/COMP1 reference owner; 1 MHz counter, 100-tick period, 50-tick trigger and 170 kernel-tick deadtime. Finite halfword samples and the PWM frame remain borrowed through proven withdrawal."
+msgstr "一个完整 TIM1/ADC1/ADC12/DMA1-channel1/DMAMUX/COMP1 参考 owner；1 MHz 计数器、100 刻度周期、50 刻度触发与 170 内核刻度死区。有限半字采样与 PWM 帧持续借用，直到撤离得到证明。"
+
+msgid "The authored fixtures choose exact SoC facts and Board routes. Applications, control policies, network protocols, worker tasks, private PCB data and recovery policy remain in external repositories. The platform does not infer electrical thresholds or acceptable actuator behavior from a software fixture."
+msgstr "明确编写的夹具选择精确 SoC 事实与 Board 路线。应用、控制策略、网络协议、工作任务、私有 PCB 数据及恢复策略仍位于外部仓库。平台不会从软件夹具推断电气阈值或可接受的执行器行为。"
+
+msgid "Typed factory lookup returns existing immutable faces without hardware access, allocation or a hidden worker. Optional state and private official headers are selected by the assembly. A source selection alone is not a measured Flash/RAM or latency result; final ARM costs require the matching ELF/BIN/map and checks."
+msgstr "Typed factory 查询返回既有不可变接口，不访问硬件、不分配，也没有隐藏工作线程。装配选择可选状态与私有官方头文件。仅源码选择不是实测 Flash/RAM 或延迟结果；最终 ARM 成本需要匹配的 ELF/BIN/map 与检查。"
+
+msgid "Completion and failure"
+msgstr "完成与失败"
+
+msgid "U575 DMA transfer completion does not imply USART wire completion. The selected mode retains DMAT across requests and cancellation, in accordance with the reviewed U5 erratum. Final settlement requires fresh channel withdrawal/reset proof, independent USART TC and reference drain. Failed drain retains the request in `QUARANTINED`; a timeout does not revoke its source-buffer loan."
+msgstr "U575 DMA 传输完成不代表 USART 线上完成。选定模式依据已审 U5 勘误，跨请求与取消保留 DMAT。最终结清需要新鲜的通道撤离／复位证明、独立 USART TC 与引用排空。排空失败时，请求保留在 `QUARANTINED`；超时不会撤销对源缓冲的借用。"
+
+msgid "G474 CAN FD separates pending TX add/request bits from fresh per-element sent or cancellation outcomes. Receive queue capacity does not hide the latched protocol state. G474 PWM/ADC joins timer, ADC, DMA and IRQ references and latches late faults before publishing its final request state. Products must continue service and preserve storage whenever withdrawal fails. See the public API and [finite PWM/ADC contract](../design/pwm-adc.md) for the selected call contexts and physical reference assumptions."
+msgstr "G474 CAN FD 将待处理 TX 添加／请求位与新鲜的逐元素发送或取消结果分开。接收队列容量不会掩盖锁存协议状态。G474 PWM/ADC 汇合定时器、ADC、DMA 与 IRQ 引用，并在发布最终请求状态前锁存晚到故障。撤离失败时，产品必须继续服务并保留存储。选定调用上下文与物理参考假设见公共 API 和[有限 PWM/ADC 合同](../design/pwm-adc.md)。"
+
+msgid "Executed generated-factory scopes"
+msgstr "已执行的生成工厂范围"
+
+msgid "These five programs resolve the maintained TOML and run generated C together with actual providers on the host. GoogleTest/GoogleMock replaces only external CPU, MMIO, NVIC and explicit bus/event leaves. It does not replace provider admission, drain, factory lookup or platform rollback algorithms."
+msgstr "这五个程序解析维护中的 TOML，并在主机上将生成 C 与实际提供者一同运行。GoogleTest/GoogleMock 只替换外部 CPU、MMIO、NVIC 及显式总线／事件叶子，不替换提供者准入、排空、工厂查询或平台回滚算法。"
+
+msgid "Program"
+msgstr "程序"
+
+msgid "Executed cases"
+msgstr "已执行用例"
+
+msgid "Failures/errors/skips"
+msgstr "失败／错误／跳过"
+
+msgid "What the result establishes"
+msgstr "结果建立的事实"
+
+msgid "`nexus_h743_high_factory_test`"
+msgstr "`nexus_h743_high_factory_test`"
+
+msgid "10"
+msgstr "10"
+
+msgid "0/0/0"
+msgstr "0/0/0"
+
+msgid "Selected high-profile cold assembly and software rollback behavior"
+msgstr "选定高速配置的冷装配与软件回滚行为"
+
+msgid "`nexus_g474_fdcan_factory_test`"
+msgstr "`nexus_g474_fdcan_factory_test`"
+
+msgid "5"
+msgstr "5"
+
+msgid "Selected internal-loopback factory, domain and modeled hardware behavior"
+msgstr "选定内部环回工厂、域与模型硬件行为"
+
+msgid "`nexus_g474_fdcan_normal_factory_test`"
+msgstr "`nexus_g474_fdcan_normal_factory_test`"
+
+msgid "Selected normal-mode factory and modeled controller behavior"
+msgstr "选定正常模式工厂与模型控制器行为"
+
+msgid "`nexus_u575_uart_gpdma_factory_test`"
+msgstr "`nexus_u575_uart_gpdma_factory_test`"
+
+msgid "8"
+msgstr "8"
+
+msgid "Exact generated channel/vector binding, byte RX, finite TX and lifecycle behavior"
+msgstr "精确生成的通道／向量绑定、字节 RX、有限 TX 与生命周期行为"
+
+msgid "`nexus_g474_pwm_adc_factory_test`"
+msgstr "`nexus_g474_pwm_adc_factory_test`"
+
+msgid "11"
+msgstr "11"
+
+msgid "Coupled generated ownership and finite-window software behavior"
+msgstr "联合生成的所有权与有限窗口软件行为"
+
+msgid "Counts belong to their named scopes and are not a complete-project test count. Later provider changes require a matching rerun; the result index keeps each original receipt. Earlier RED attempts, fixture failures and corrected runs remain preserved rather than overwritten."
+msgstr "计数仅属于各自具名范围，不是整个项目的测试数量。提供者后续变化需要匹配重跑；结果索引保留各次原始回执。早期 RED 尝试、夹具失败与修正执行均保留，不被覆盖。"
+
+msgid "Recorded ARM development builds"
+msgstr "已记录的 ARM 开发构建"
+
+msgid "Six normal preset configurations and builds completed with actual exit 0. The following values come from their resource reports and matching ELF files; Flash LOAD, Flash footprint and reserved RAM are separate byte quantities. Reserved RAM includes linker reservations and is not a measured stack high-water mark. These are recorded development builds, not final-source cost comparisons."
+msgstr "六个正常预设配置与构建实际以退出码 0 完成。以下数值来自其资源报告及匹配 ELF 文件；Flash LOAD、Flash 占用范围与预留 RAM 是不同的字节量。预留 RAM 包含链接器预留，不是实测栈高水位。这些是已记录的开发构建，不是最终源码成本对比。"
+
+msgid "Preset suffix"
+msgstr "预设后缀"
+
+msgid "Flash LOAD (B)"
+msgstr "Flash LOAD (B)"
+
+msgid "Flash footprint (B)"
+msgstr "Flash 占用范围（B）"
+
+msgid "Reserved RAM (B)"
+msgstr "预留 RAM（B）"
+
+msgid "Provider retention"
+msgstr "提供者保留检查"
+
+msgid "`h743-high-empty`"
+msgstr "`h743-high-empty`"
+
+msgid "5403"
+msgstr "5403"
+
+msgid "5404"
+msgstr "5404"
+
+msgid "2104"
+msgstr "2104"
+
+msgid "Not generated for the empty standard firmware target"
+msgstr "空标准固件目标未生成此报告"
+
+msgid "`h743-high-uart`"
+msgstr "`h743-high-uart`"
+
+msgid "12016"
+msgstr "12016"
+
+msgid "2336"
+msgstr "2336"
+
+msgid "Passed"
+msgstr "通过"
+
+msgid "`h743-high-peripherals`"
+msgstr "`h743-high-peripherals`"
+
+msgid "23660"
+msgstr "23660"
+
+msgid "2628"
+msgstr "2628"
+
+msgid "`u575-uart-gpdma`"
+msgstr "`u575-uart-gpdma`"
+
+msgid "8964"
+msgstr "8964"
+
+msgid "2312"
+msgstr "2312"
+
+msgid "`g474-can-fd`"
+msgstr "`g474-can-fd`"
+
+msgid "10184"
+msgstr "10184"
+
+msgid "2788"
+msgstr "2788"
+
+msgid "`g474-pwm-adc`"
+msgstr "`g474-pwm-adc`"
+
+msgid "13620"
+msgstr "13620"
+
+msgid "2264"
+msgstr "2264"
+
+msgid "Each suffix belongs to `fixture-io-evolution-SUFFIX`. The empty H743 result uses `nexus_firmware`, not a leftover `io_evolution_fixture` from an earlier failed strong-retention attempt. The other five use `io_evolution_fixture` and have actual passing provider-retention reports. The CAN FD build here is the loopback selection; no normal-bus ARM build is claimed by this table. No cycles, latency, electrical accuracy or dynamic high-water value was measured."
+msgstr "每个后缀对应 `fixture-io-evolution-SUFFIX`。空 H743 结果使用 `nexus_firmware`，不使用先前强制保留尝试失败留下的 `io_evolution_fixture`。其余五个使用 `io_evolution_fixture`，并有实际通过的提供者保留报告。这里 CAN FD 构建选择内部环回；本表不主张正常总线 ARM 构建已完成。未测量周期、延迟、电气精度或动态高水位。"
+
+msgid "Build and dependency delivery"
+msgstr "构建与依赖交付"
+
+msgid "Private official inputs add exactly two U5 LL headers (`dma`, `usart`) and three G4 FDCAN-definition headers, including their transitive definitions. Pins, licenses and CMSIS pairing remain checked. The selected closure does not link HAL handles, a vendor tick, vendor IRQ callbacks or a second transfer owner."
+msgstr "私有官方输入精确新增两个 U5 LL 头文件（`dma`、`usart`）与三个 G4 FDCAN 定义头文件，包含它们的传递定义。版本锁定、许可与 CMSIS 配对仍被检查。选定闭包不链接 HAL handle、厂商 tick、厂商 IRQ 回调或第二个传输 owner。"
+
+msgid "The source SDK now requires the new public/private I/O modules, coupled configuration code and explicit family payload. `verify_consumers --parallel N` accepts a strict positive job count for every consumer build. Omitting it preserves the previous 4-job base/2-job modern defaults. Its Python regression checks all 13 consumer roots and 16 image targets with external subprocess test doubles; it does not constitute execution of a new real SDK consumer package."
+msgstr "源码 SDK 现在要求新的公共／私有 I/O 模块、联合配置代码与显式系列载荷。`verify_consumers --parallel N` 为每个消费者构建接受严格正整数并行任务数。省略时保留既有基础消费者 4 任务、现代消费者 2 任务的默认值。其 Python 回归借助外部子进程替身检查全部 13 个消费者根目录与 16 个镜像目标，不构成新真实 SDK 消费者包的执行。"
+
+msgid "Source and remaining qualification"
+msgstr "源码与剩余资格"
+
+msgid "Historical GitHub run [39028022087](https://github.com/X-Gen-Lab/nexus/actions/runs/39028022087) reports 30 completed jobs with scalar `conclusion=\"success\"` for clean source `2963c34aa399c43bea05022eb8846ad2370f0f76`. This is the previous committed source. It does not validate the current working extensions. Job-level documentation success alone also does not establish a newly inspected whole documentation package or prove that every documentation step ran."
+msgstr "历史 GitHub 运行 [39028022087](https://github.com/X-Gen-Lab/nexus/actions/runs/39028022087) 为 clean 源码 `2963c34aa399c43bea05022eb8846ad2370f0f76` 报告 30 个已完成任务，标量 `conclusion=\"success\"`。这是上一份已提交源码，不验证当前工作扩展。仅任务级文档成功也不建立新近检查的完整文档包，或证明每个文档步骤均已执行。"
+
+msgid "Before final delivery, bind the frozen source to complete normal hooks, focused final model reruns, exact ARM resource/retention checks, fresh source SDK and independent consumers, and current API/English/Chinese documentation checks. Report each actual result separately. Offline reproduction and a software candidate require their own executed evidence. Physical HIL remains `not_executed`; IO-01–42 ledger status is maintained separately and is not advanced by this page."
+msgstr "最终交付前，将冻结源码绑定到完整正常 hooks、最终专项模型重跑、精确 ARM 资源／保留检查、新源码 SDK 与独立消费者，以及当前 API／英文／中文文档检查。逐项报告实际结果。离线复现与软件候选需要各自实际执行的证据。物理 HIL 仍为 `not_executed`；IO-01–42 台账状态单独维护，本页不推进其状态。"

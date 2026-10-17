@@ -117,6 +117,12 @@ nx_result_t nx_stm32u575_i2c_clock_start(nx_stm32u575_i2c_clock_t* clock,
 nx_result_t nx_stm32u575_i2c_clock_stop(nx_stm32u575_i2c_clock_t* clock);
 /** \brief Admit I2C1/HSI16, finite polling, reviewed conservative timing. */
 nx_result_t nx_stm32u575_i2c_initialize(nx_stm32u575_i2c_state_t* port);
+/** \brief Initialize with an assembly-validated AF-on/DNF0 timing value.
+ * \note Caller has already reviewed HSI tolerance, pin electrical bounds and
+ *       exact-part errata. This private helper does not synthesize timing.
+ */
+nx_result_t nx_stm32u575_i2c_initialize_timing(nx_stm32u575_i2c_state_t* port,
+                                               uint32_t timing);
 /** \brief Prepare leased PB8/PB9 AF4, open drain; pull-ups remain external. */
 nx_result_t nx_stm32u575_i2c1_pins_prepare(void);
 /** \brief SPI1 V3 finite polling, byte FIFO and explicit TSIZE/CSTART. */

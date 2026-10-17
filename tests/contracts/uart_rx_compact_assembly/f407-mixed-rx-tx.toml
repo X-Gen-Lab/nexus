@@ -1,0 +1,38 @@
+# Exact software resource fixture; physical HIL is not implied.
+schema = 2
+board_package = "../multi_controller_assembly/stm32-zg-board"
+backend = "baremetal"
+clock = "hse8-pll168"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[uart.uart1]
+binding = "primary-uart"
+mode = "rx-dma-idle"
+baud = 115200
+
+[uart.uart1.rx]
+format = "blocks"
+
+[uart.uart1.irq]
+priority = 5
+
+[factory]
+capabilities = true
+
+[uart.aux]
+binding = "secondary-uart"
+mode = "dma-tx"
+baud = 115200
+
+[uart.aux.rx]
+format = "bytes"
+capacity = 32
+
+[uart.aux.irq]
+priority = 5

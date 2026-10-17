@@ -25,11 +25,13 @@ int main(void) {
     if (start.primary != NX_SUCCESS) {
         return (int)start.primary;
     }
-#ifdef NX_U575_IO_FIXTURE
+#ifdef NX_U575_GPIO_FIXTURE
     const nx_gpio_port_t* led = nx_factory_gpio(NX_GPIO_ID_LED);
+    (void)nx_gpio_port_write(led, 1U << 7U, 0U);
+#endif
+#ifdef NX_U575_IO_FIXTURE
     const nx_uart_port_t* console = nx_factory_uart(NX_UART_ID_CONSOLE);
     nx_request_initialize(&s_request.base);
-    (void)nx_gpio_port_write(led, 1U << 7U, 0U);
     (void)nx_uart_tx_prepare(&s_request, s_data, sizeof(s_data),
                              nx_deadline_after(nx_time_now_us(), 1000U));
     (void)nx_uart_port_submit(console, &s_request);

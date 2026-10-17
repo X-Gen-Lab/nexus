@@ -1,14 +1,57 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
+try:
+    from ... import enhanced_endpoints, uart_formats
+except ImportError:
+    import enhanced_endpoints
+    import uart_formats
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
+
+
+def _gpdma_uart(item, result, state, name, capacity):
+    """One selected finite-TX extension; ordinary byte state stays unchanged."""
+    options, irq = item.options, result["irq"]
+    facts = "s_nx_uart_gpdma_" + name
+    definitions = [f"static uint8_t s_nx_rx_{name}[{capacity}];",
+        f"static const nx_stm32u575_uart_gpdma_facts_t {facts} = {{",
+        "    .engine = GPDMA1, .channel = GPDMA1_Channel0,",
+        "    .irq = GPDMA1_Channel0_IRQn, .request = 25u,",
+        f"    .priority = {options.irq.priority}u }};",
+        f"static nx_result_t prepare_{name}(void) {{",
+        f"    if ({state}.uart.retained || {state}.uart.initialized || {state}.uart.active != NULL || {state}.uart.wake != NULL || {state}.uart.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
+        f"    {state}.uart.registers = USART1;",
+        f"    {state}.uart.rx_storage = s_nx_rx_{name};",
+        f"    {state}.uart.rx_capacity = {capacity}u;",
+        f"    {state}.uart.baud = {options.baud}u;",
+        f"    {state}.uart.irq = USART1_IRQn;",
+        f"    {state}.uart.profile = NX_UART_RX_BYTES;",
+        f"    {state}.uart.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
+        f"    {state}.dma_irq_policy = {state}.uart.irq_policy;",
+        f"    {state}.facts = &{facts};",
+        "    nx_result_t status = nx_stm32u575_usart1_pins_prepare();",
+        "    if (status != NX_SUCCESS) { return status; }",
+        f"    return nx_stm32u575_uart_gpdma_initialize(&{state}, 4000000u, 1000000u);",
+        "}", "void USART1_IRQHandler(void);",
+        r"/** \brief One selected RX-byte and independent USART wire fact source. */",
+        "void USART1_IRQHandler(void) { "
+        f"nx_stm32u575_uart_gpdma_uart_irq(&{state}); }}",
+        "void GPDMA1_Channel0_IRQHandler(void);",
+        r"/** \brief One exact GPDMA1 channel; no request settlement in IRQ. */",
+        "void GPDMA1_Channel0_IRQHandler(void) { "
+        f"nx_stm32u575_uart_gpdma_irq(&{state}); }}"]
+    return Construction(state_type="nx_stm32u575_uart_gpdma_state_t",
+        definitions=definitions, initialize=f"prepare_{name}()",
+        stop=[f"nx_uart_port_stop(&s_nx_face_{name})"],
+        retain_on_failed_init=True)
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct the selected exact static provider and cold resource leases."""
-    from . import validate_selection
+    from . import mode_implementation, validate_selection
     item = controller_ir(item, "stm32u575")
     if item.provider != "stm32u575":
         fail("U575 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
+    implementation = mode_implementation(item.kind, item.mode)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
@@ -26,6 +69,14 @@ def constructor(item, result, board_bindings, routes, devices):
         capacity = options.rx_capacity
         if type(capacity) is not int or not 1 <= capacity <= 4096:
             raise ValueError("U575 USART requires an explicit bounded byte ring")
+        if item.mode == "dma-tx":
+            return _gpdma_uart(item, result, state, name, capacity)
+        fifo = item.mode in uart_formats.FIFO_MODES
+        flow = item.mode == uart_formats.RTSCTS_MODE
+        owner = state
+        if fifo:
+            definitions += uart_formats.fifo_definitions(item)
+            state += ".uart"
         irq = result["irq"]
         definitions += [f"static uint8_t s_nx_rx_{name}[{capacity}];",
                         f"static nx_result_t prepare_{name}(void) {{",
@@ -37,12 +88,21 @@ def constructor(item, result, board_bindings, routes, devices):
                         f"    {state}.irq = {item.controller}_IRQn;",
                         f"    {state}.profile = NX_UART_RX_BYTES;",
                         f"    {state}.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
-                        f"    nx_result_t status = nx_stm32u575_{item.controller.lower()}_pins_prepare();",
-                        "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32u575_uart_initialize(&{state}, 4000000u, 1000000u);",
-                        "}", f"void {item.controller}_IRQHandler(void);",
-                        r"/** \brief One selected controller, at most one TX/RX byte. */",
-                        f"void {item.controller}_IRQHandler(void) {{ nx_stm32u575_uart_irq(&{state}); }}"]
+                        f"    nx_result_t status = nx_stm32u575_{item.controller.lower()}"
+                        + ("_rtscts" if flow else "") + "_pins_prepare();",
+                        "    if (status != NX_SUCCESS) { return status; }"]
+        if fifo:
+            definitions += [f"    {owner}.fifo = &s_nx_fifo_profile_{name};",
+                            f"    return nx_stm32u575_{implementation}_initialize("
+                            f"&{owner}, 4000000u, 1000000u);"]
+        else:
+            definitions += [f"    return nx_stm32u575_uart_initialize(&{state}, 4000000u, 1000000u);"]
+        handler = implementation if fifo else "uart"
+        brief = ("Selected bounded FIFO RX/TX budgets." if fifo else
+                 "One selected controller, at most one TX/RX byte.")
+        definitions += ["}", f"void {item.controller}_IRQHandler(void);",
+                        "/** \\brief " + brief + " */",
+                        f"void {item.controller}_IRQHandler(void) {{ nx_stm32u575_{handler}_irq(&{owner}); }}"]
         stop = f"nx_uart_port_stop(&s_nx_face_{name})"
     elif item.kind == "spi":
         children = [child for child in devices if child["controller"] == item.id]
@@ -151,6 +211,10 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_exti_port_stop(&s_nx_face_{name})"
     elif item.kind == "i2c":
         clock = f"s_nx_i2c_clock_{name}"
+        initialize = (f"nx_stm32u575_i2c_initialize_timing(&{state}, "
+                      f"0x{item.options.timing.timingr:08x}u)"
+                      if item.options.timing is not None else
+                      f"nx_stm32u575_i2c_initialize(&{state})")
         definitions += [f"static nx_stm32u575_i2c_clock_t {clock};",
                         f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
@@ -162,7 +226,7 @@ def constructor(item, result, board_bindings, routes, devices):
                         "    if (status != NX_SUCCESS) { return status; }",
                         f"    status = nx_stm32u575_i2c_clock_start(&{clock}, &{state});",
                         "    if (status != NX_SUCCESS) { return status; }",
-                        f"    return nx_stm32u575_i2c_initialize(&{state});", "}",
+                        f"    return {initialize};", "}",
                         f"static nx_result_t stop_{name}(void) {{",
                         f"    nx_result_t status = nx_i2c_port_stop(&s_nx_face_{name});",
                         "    if (status != NX_SUCCESS) { return status; }",
@@ -175,8 +239,8 @@ def constructor(item, result, board_bindings, routes, devices):
             if type(address) is not int or not 8 <= address <= 119:
                 fail("U575 I2C requires an explicit nonreserved7bit address")
             definitions += [f"static nx_stm32u575_i2c_endpoint_state_t {endpoint} = {{ &{state}, {address}u }};",
-                            f"static const nx_i2c_endpoint_t s_nx_device_face_{child_name} = {{ &nx_i2c_v2_endpoint_ops, &{endpoint} }};",
-                            f"const nx_i2c_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};"]
+                            *enhanced_endpoints.face(child, endpoint,
+                                                     "nx_i2c_v2_endpoint_ops")]
         stop = f"stop_{name}()"
     elif item.kind == "adc":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
@@ -215,6 +279,6 @@ def constructor(item, result, board_bindings, routes, devices):
         raise ValueError("Unmaintained U575 constructor")
     return Construction(
         state_type=("nx_i2c_v2_state_t" if item.kind == "i2c" else
-                    f"nx_stm32u575_{item.kind}_state_t"),
+                    f"nx_stm32u575_{implementation}_state_t"),
         definitions=definitions, initialize=f"prepare_{name}()",
         stop=[stop], retain_on_failed_init=True)

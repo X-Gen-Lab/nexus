@@ -21,7 +21,61 @@ def workflow(name):
     return yaml.load((ROOT / '.github/workflows' / name).read_text(), Loader=yaml.BaseLoader)
 
 
+def selects_branch(event, branch):
+    # The maintained CI policy uses literals and prefix/** only. This does not
+    # emulate arbitrary Actions globs, path selection or GitHub run execution.
+    if not event:
+        return True
+    if 'branches-ignore' in event:
+        raise AssertionError('CI must not hide stacked PR bases')
+    branches = event.get('branches')
+    if branches is None:
+        return True
+    for pattern in branches:
+        if pattern.endswith('/**'):
+            if branch.startswith(pattern[:-2]):
+                return True
+        elif '*' in pattern or '?' in pattern or pattern.startswith('!'):
+            raise AssertionError('Unexpected maintained branch pattern')
+        elif branch == pattern:
+            return True
+    return False
+
+
 class WorkflowContracts(unittest.TestCase):
+    def test_feature_pushes_select_the_actual_workflow(self):
+        event = workflow('ci.yml')['on']['push']
+        cases = [('main', True), ('develop', True), ('codex/task', True),
+                 ('codex/team/task', True), ('feat/io-evolution-20261017', True),
+                 ('feat/industrial-platform', True), ('feat/team/task', True),
+                 ('feature/task', False), ('docs-delivery', False)]
+        for branch, expected in cases:
+            with self.subTest(branch=branch):
+                self.assertEqual(selects_branch(event, branch), expected)
+        self.assertEqual(set(event['branches']),
+                         {'main', 'develop', 'codex/**', 'feat/**'})
+
+    def test_pull_requests_admit_stacked_and_other_base_branches(self):
+        event = workflow('ci.yml')['on']['pull_request']
+        for base in ('main', 'develop', 'feat/industrial-platform',
+                     'feat/io-evolution-20261017', 'maintenance/next'):
+            with self.subTest(base=base):
+                self.assertTrue(selects_branch(event, base))
+        # Actions evaluates PR branch filters against the base, not head.
+        # No path/base exclusion may prevent the aggregate status from running.
+        self.assertFalse(event)
+
+    def test_broader_ci_does_not_gain_a_privileged_event_or_permissions(self):
+        document = workflow('ci.yml')
+        self.assertEqual(set(document['on']),
+                         {'push', 'pull_request', 'workflow_dispatch', 'schedule'})
+        self.assertEqual(document['permissions'],
+                         {'contents': 'read', 'pull-requests': 'read'})
+        self.assertEqual(document['jobs']['docs']['permissions'],
+                         {'contents': 'read'})
+        self.assertEqual(document['on']['schedule'], [{'cron': '0 2 * * *'}])
+        self.assertEqual(document['jobs']['status-check']['if'], 'always()')
+
     def test_dependency_review_is_weekly_read_only_and_source_bound(self):
         document = workflow('dependency-maintenance.yml')
         self.assertEqual(document['on']['schedule'][0]['cron'], '0 3 * * 1')
@@ -60,6 +114,21 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('shutil.copytree(source, staging)', commands)
         self.assertIn('delivery.verify', commands)
         self.assertNotIn('sudo apt-get', commands)
+
+    def test_docs_tests_reuse_the_prepared_nondefault_tool_prefix(self):
+        steps = workflow('docs-build.yml')['jobs']['build']['steps']
+        prepared = next(step['run'] for step in steps
+                        if 'tools/documentation/install.py' in step.get('run', ''))
+        execute = next(step['run'] for step in steps
+                       if 'tools/dev/dev.py docs test' in step.get('run', ''))
+        prepared_arguments = shlex.split(prepared.replace('\\\n', ' '))
+        test_arguments = shlex.split(execute.replace('\\\n', ' '))
+        prefix = prepared_arguments[prepared_arguments.index('--prefix') + 1]
+        self.assertEqual(prefix, '$RUNNER_TEMP/nexus-docs-tools')
+        self.assertEqual(test_arguments[0], prefix + '/venv/bin/python')
+        self.assertIn('--tool-prefix', test_arguments)
+        self.assertEqual(test_arguments[test_arguments.index('--tool-prefix') + 1],
+                         prefix)
         self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
 
     def test_docs_preview_only_uploads_successful_bound_outputs(self):
@@ -241,7 +310,7 @@ class WorkflowContracts(unittest.TestCase):
         # Maintained work branches must retain pre-PR checks.
         ci_events = workflow('ci.yml')['on']
         self.assertEqual(set(ci_events['push']['branches']),
-                         {'main', 'develop', 'codex/**'})
+                         {'main', 'develop', 'codex/**', 'feat/**'})
         self.assertIn('pull_request', ci_events)
 
     def test_each_arm_link_retains_an_unbound_hil_work_plan(self):

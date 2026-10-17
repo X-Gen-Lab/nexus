@@ -25,6 +25,18 @@ class MaintainedMatrixTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "components"):
                 matrix.check_contracts()
 
+    def test_reviewed_alternate_interface_requires_execution_traits(self):
+        original = matrix.mode_traits
+
+        def without_encoder(kind, mode):
+            if kind == "encoder":
+                raise ValueError("alternate execution contract is missing")
+            return original(kind, mode)
+
+        with patch.object(matrix, "mode_traits", side_effect=without_encoder):
+            with self.assertRaisesRegex(ValueError, "alternate execution"):
+                matrix.check_contracts()
+
     def test_explicit_references_resolve_without_claiming_physical_support(self):
         result = matrix.resolve_catalogue()
         self.assertEqual(result["physical_status"], "not_executed")

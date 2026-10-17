@@ -11,8 +11,11 @@
 #include "nexus/io/gpio.h"
 #include "nexus/io/i2c.h"
 #include "nexus/io/spi.h"
+#include "nexus/io/spi_dma_owner_binding.h"
+#include "nexus/io/spi_transaction.h"
 #include "nexus/io/timer.h"
 #include "nexus/io/uart.h"
+#include "nexus/io/uart_format.h"
 #include "nexus/io/watchdog.h"
 
 #include "gd32f4xx.h"
@@ -202,18 +205,37 @@ nx_result_t nx_gd32_gpio_initialize(nx_gd32_gpio_state_t* port,
                                     uint32_t initial, bool output);
 /**
  * \brief           Assemble USART0 PA9/PA10 IRQ 8N1 without hidden storage.
- * \param[out]      port: Fresh storage; one serialized executor.
+ * \param[in,out]   port: Fresh zeroed idle state; one serialized executor.
  * \param[in]       baud: Baud rate between 1526 and 1000000.
  * \param[in]       profile: Byte/event ring or explicit block-only profile.
- * \param[in,out]   storage: Exclusive byte/event array matching profile.
- * \param[in]       capacity: Positive ring count, or NULL/zero for block mode.
+ * \param[in,out]   storage: Exclusive byte/event array, or NULL for blocks.
+ * \param[in]       capacity: Positive ring count, or zero for block mode.
  * \param[in]       priority: NVIC preemption priority 0 through 15.
- * \return          Success or INVALID/BUSY/CONTEXT. Block IRQs start
- * separately.
+ * \return          Success or INVALID/BUSY/CONTEXT/IO. Block IRQs start
+ *                  separately; IO can retain cleanup ownership.
+ * \note            Live or retained state rejects reinitialization. Reuse
+ *                  after successful stop; never zero a live borrow.
  */
 nx_result_t nx_gd32_uart_initialize(nx_gd32_uart_state_t* port, uint32_t baud,
                                     nx_uart_rx_profile_t profile, void* storage,
                                     size_t capacity, unsigned priority);
+/** \brief Apply a selected byte format only under quiescent cold ownership.
+ * \param[in,out] state: Initialized byte UART; no TX/RX loan or queued RX.
+ * \param[in] format: 7E/O or 8N/E/O with one/two stop bits and reviewed flow.
+ * \return Success or INVALID/UNSUPPORTED/CONTEXT/STATE/BUSY before writes;
+ *         IO attempts rollback after failed register readback. If rollback
+ *         cannot be proven, initialized remains true and stopping rejects new
+ *         work. Retain pins, clock and storage until stop proves withdrawal.
+ * \note Startup task must quiesce the peer. Seven-bit receive uses the separate
+ *         format_irq entry. Format selection adds no default state or ops slot.
+ */
+nx_result_t nx_gd32_uart_format_configure(nx_gd32_uart_state_t* state,
+                                          nx_uart_format_t format);
+/** \brief IRQ entry for explicitly selected seven/eight-bit parity formats.
+ * \param[in,out] port: Exact live binding; preserves RX parity/error facts.
+ */
+void nx_gd32_uart_format_irq(nx_gd32_uart_state_t* port);
+
 /**
  * \brief           Select independent RTS/CTS only on an idle live controller.
  * \param[in,out]   state: Startup-controlled UART, no active TX or RX DMA.
@@ -425,6 +447,7 @@ nx_result_t nx_gd32_uart_stop(void* context);
 extern const nx_spi_ops_t nx_gd32_spi_ops;
 nx_result_t nx_gd32_spi_recover(void* context);
 extern const nx_spi_endpoint_ops_t nx_gd32_spi_endpoint_ops;
+extern const nx_spi_transaction_ops_t nx_gd32_spi_transaction_ops;
 nx_result_t nx_gd32_spi_endpoint_transfer(void* context, const uint8_t* tx,
                                           uint8_t* rx, size_t length,
                                           nx_time_us_t deadline,
@@ -469,12 +492,21 @@ nx_result_t nx_gd32_adc_sample(void* context, uint16_t* samples,
                                size_t capacity, nx_time_us_t deadline,
                                size_t* count);
 
-/** \brief Initialize a selected UART after Board AF wiring is prepared. */
+/** \brief Initialize a selected UART after Board AF wiring is prepared.
+ * \param[in,out] port: Fresh zeroed idle or successfully stopped state.
+ * \note Live or retained ownership rejects reinitialization. Failed
+ *       cleanup retains state and storage until stop succeeds.
+ */
 nx_result_t
 nx_gd32_uart_initialize_at(nx_gd32_uart_state_t* port,
                            const nx_gd32_uart_controller_t* controller,
                            uint32_t baud, nx_uart_rx_profile_t profile,
                            void* storage, size_t capacity, unsigned priority);
+/** \brief Cold selected frame is installed before UEN and IRQ publication. */
+nx_result_t nx_gd32_uart_initialize_format_at(
+    nx_gd32_uart_state_t* port, const nx_gd32_uart_controller_t* controller,
+    uint32_t baud, nx_uart_rx_profile_t profile, void* storage, size_t capacity,
+    unsigned priority, nx_uart_format_t format);
 /** \brief Dispatch one exact generated UART binding without a registry. */
 void nx_gd32_uart_irq(nx_gd32_uart_state_t* port);
 /**
@@ -524,5 +556,15 @@ nx_result_t nx_gd32_spi_endpoint_initialize(
  */
 nx_result_t nx_gd32_uart_tx_validate(void* context,
                                      const nx_uart_tx_request_t* request);
+
+/** \brief Exact enhanced sequence and underlying controller membership. */
+bool nx_gd32_spi_dma_owner_contains(
+    const nx_spi_dma_transaction_endpoint_t* endpoint,
+    const nx_spi_dma_transaction_port_t* port);
+/** \brief Bind one borrowed wake sink to the exact enhanced controller. */
+nx_result_t
+nx_gd32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t* port,
+                                  const nx_irq_wake_t* wake,
+                                  uint8_t syscall_ceiling);
 
 #endif

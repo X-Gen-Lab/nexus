@@ -21,8 +21,10 @@ def implementation(item):
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
     selected = implementation(item)
-    if item.kind == "eth":
-        return "nx_eth_mac_ops"
+    if item.interface_kind == "spi_dma_transaction":
+        return "nx_spi_dma_sequence_port_ops"
+    if item.kind in {"eth", "eth_frames"}:
+        return f"nx_{item.kind}_mac_ops"
     if item.kind == "can":
         return "nx_classic_can_ops"
     if item.kind == "usb_device":
@@ -36,6 +38,12 @@ def includes(result):
     selections = result.controllers
     source = []
     source.append('#include "stm32f407_provider.h"')
+    if any(item.mode == "irq-words" for item in selections):
+        source.append('#include "stm32f407_uart_word.h"')
+    if any(item.interface_kind == "spi_dma_transaction" for item in selections):
+        source += ['#include "spi_dma_sequence.h"',
+                   'extern const nx_spi_dma_sequence_backend_t',
+                   '    nx_stm32_spi_dma_sequence_backend;']
     if any(implementation(item) in {"uart_dma", "spi_dma"}
            for item in selections):
         source.append('#include "stm32f407_dma.h"')
@@ -52,6 +60,8 @@ def includes(result):
         source.append('#include "stm32f407_timer_advanced.h"')
     if any(item.kind == "eth" for item in selections):
         source.append('#include "stm32f407_eth.h"')
+    if any(item.kind == "eth_frames" for item in selections):
+        source.append('#include "stm32f407_eth_frames.h"')
     if any(item.kind == "can" for item in selections):
         source.append('#include "stm32f407_can.h"')
     if any(item.kind == "usb_device" for item in selections):

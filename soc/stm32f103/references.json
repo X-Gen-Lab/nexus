@@ -27,14 +27,15 @@
         "gpio": "GPIO CRL/CRH CNF/MODE nibbles, BSRR atomic preload and AFIO_MAPR default USART2 mapping.",
         "uart": "USART SR read followed by DR read clears RXNE/error flags; TC write0 or SR read followed by DR write. No ICR/RDR/TDR or TEACK/REACK on F1.",
         "timer": "16-bit TIM2 counter/ARR, PSC preload UG update, SR W0C; nominal1 MHz overflow65.536 ms.",
-        "watchdog": "Chapter19 sections19.3/19.4: IWDG KR CCCC enable, 5555 access, AAAA feed; initial counter4096, PR/RLR independent updates and SR PVU/RVU. FLASH_OBR IWDG_SW observed only; DBGMCU_CR IWDG freeze.",
+        "watchdog": "Chapter19 sections19.3/19.4: IWDG KR CCCC enable, 5555 access, AAAA feed; initial counter4096, PR/RLR independent updates and SR PVU/RVU. FLASH_OBR IWDG_SW observed only. ES0962.2.2 excludes CPU DBGMCU_CR access: only debug_freeze=false is supported, true returns UNSUPPORTED before activation; no external debugger state is observed or controlled.",
         "exti": "AFIO EXTICR GPIOA mux0; CRL floating input nibble4; EXTI IMR/EMR/RTSR/FTSR/PR W1C and independent EXTI0/1 IRQ6/7.",
         "spi": "SPI1 master default PA5/PA6/PA7; CR1 BR=APB2/2..256, CPOL/CPHA, 8-bit DR accesses, RXNE/TXE/BSY, RCC APB2RSTR reset and exclusive software PA4 CS.",
         "flash": "PM0075 Rev2 Aug2012 sections2.3.2/2.3.3/2.3.4 pages13-15: medium-density128x1KiB pages,16bit halfwordprogramming requires erasedexceptzero; CPUstalls duringBUSY. https://www.st.com/resource/en/programming_manual/pm0075-stm32f10xxx-flash-memory-microcontrollers-stmicroelectronics.pdf SHA2562296c5d528f71ddc7502baa907a0d6a7473ad10f1c67e8b07bb046f291dd4a8a bytes302996. DS5319maxpageerase40ms; combinedTIM2servicegap65.536ms mustincludealllatency. PM0075 section3.4 p25 EOP latches for each successful pulse independently of EOPIE; write1 clear must be readback-proven before every next pulse.",
         "adc": "RM0008 chapter11: independent ADC1PA0channel0, APB2/2=4MHz,14clockstability, RSTCAL/CAL and SWSTART/EXTTRIG/EXTSEL7; sample239.5+conversion12.5cycles.",
         "pwm": "RM0008 TIM3CH1 PA6 default AFIO_MAPR_TIM3_REMAP0,8MHzprescaler,16bitARR/CCR1, PWM1preload; MMS=CENwhileCEN0 preventsUGTRGO.",
         "uart_channel_dma": "RM0008 Rev21 13.3.7 Figure50/Table78: DMA1 channel7 USART2_TX and channel6 USART2_RX; normal byte DMA, CCR EN/TCIE/TEIE and four-bit ISR groups. USART2 SR/DR read acknowledgement precedes finite block publication after source withdrawal.",
-        "i2c_irq": "RM0008 I2C1 default PB6/PB7 AF open-drain, 8MHz standard-mode CCR50/TRISE9 nominal80kHz; explicit 7-bit addressed master messages, one/two/final-three receive windows and STOP/master drain."
+        "i2c_irq": "RM0008 I2C1 default PB6/PB7 AF open-drain, 8MHz standard-mode CCR50/TRISE9 nominal80kHz; explicit 7-bit addressed master messages, one/two/final-three receive windows and STOP/master drain.",
+        "electronic_signature": "RM0008 Rev21 section30 and30.1.1 p1076: CPU-readable factory Flash-size halfword at0x1FFFF7E0; bits15:0 report KiB. This is density only, never exact group, revision, part, package or PCB identity."
       }
     },
     "errata": {
@@ -49,7 +50,8 @@
         "applicability": "Medium-density STM32F103x8/xB; actual revision not observed. Used-mode errata require explicit applicability review before physical qualification.",
         "usart2_profile": "ES096 Rev15 section2.3.9: receive-only TE0 TX pad cannot share another alternate output. The maintained profile always uses TE+RE with exclusive PA2/PA3 leases. Stop restores input/analog only after withdrawal. RX-only and a complete errata audit are not claimed.",
         "i2c_selected_profile": "ES096 Rev15 2.8.1 highest-priority IRQ0 service; 2.8.2 protected receive STOP/data windows; 2.8.5 excludes88..100kHz repeated-START, selected nominal80kHz. BUSY/low lines reject; analog-filter GPIO reset workaround and physical timing are not silently inferred.",
-        "flash": "ES0962.2.11: BSYonecycledelay afterSTRT; controlreadandDSB beforestatuspoll. Physicaltimingunqualified."
+        "flash": "ES0962.2.11: BSYonecycledelay afterSTRT; controlreadandDSB beforestatuspoll. Physicaltimingunqualified.",
+        "debug_identity_access": "ES096 Rev15 section2.2.2 p7 and Table3: DBGMCU_IDCODE/CR are debug-mode-only; normal user software reads0, no workaround. Table2 revision0 is a real code A, so an unavailable all-zero debug read must not become an observed cut."
       }
     }
   },
@@ -67,7 +69,7 @@
     "silicon_revision": "not_observed",
     "mode_workarounds": "not_fully_audited",
     "hardware_qualification": "not_executed",
-    "identification": "Medium-density DEV_ID0x410 plus FLASH_SIZE128 KiB cannot identify package or Board."
+    "identification": "Normal firmware observes only factory FLASH_SIZE128KiB. ES096 Rev15 2.2.2 prevents standalone DBGMCU device-group/revision observation; declared STM32F103RBT6/package and physical marking remain independent. No debug-only IDCODE or assembly literal is treated as runtime observed silicon."
   },
   "limitations": [
     "Official source identity is recorded; this is not a complete errata workaround audit.",

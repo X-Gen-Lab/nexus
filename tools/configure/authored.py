@@ -2,6 +2,16 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "adc_group": {"binding", "mode", "channels", "sample_times",
+                  "reference_mv", "exclusive", "silicon_profile", "trigger",
+                  "period_us", "watchdog", "irq"},
+    "pwm_adc": {"binding", "mode", "tick_hz", "period_ticks", "trigger_ticks",
+                "deadtime_ticks", "channels", "sample_times", "reference_mv",
+                "exclusive", "irq"},
+    "can_fd": {"binding", "mode", "bitrate", "data_bitrate", "event_capacity",
+               "drain_timeout_us", "poll_limit", "filters", "exclusive", "irq"},
+    "encoder": {"binding", "mode", "counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
+    "pwm_group": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq"},
     "timer_capture": {"binding", "mode", "tick_hz", "edge", "filter", "exclusive", "irq"},
     "advanced_pwm": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks",
                      "break_active_high", "idle_high", "idle_complement_high", "exclusive", "irq"},
@@ -13,15 +23,17 @@ INSTANCE_FIELDS = {
     "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
             "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
     "gpio": {"binding", "mode"},
-    "uart": {"binding", "mode", "baud", "rx", "irq"},
+    "uart": {"binding", "mode", "baud", "rx", "irq", "frame", "stream",
+             "fifo"},
     "spi": {"binding", "mode", "max_hz", "irq"},
-    "i2c": {"binding", "mode", "max_hz", "irq"},
+    "i2c": {"binding", "mode", "max_hz", "irq", "timing"},
     "flash": {"binding", "mode"},
     "watchdog": {"binding", "mode"},
     "exti": {"binding", "mode", "edge", "event_capacity", "irq"},
     "pwm": {"binding", "mode", "period_ticks", "duty_ticks", "tick_hz"},
-    "adc": {"binding", "mode", "channels", "sample_times", "reference_mv", "timeout_ms", "irq"},
+    "adc": {"binding", "mode", "channels", "sample_times", "reference_mv", "timeout_ms", "irq", "stream"},
 }
+INSTANCE_FIELDS["eth_frames"] = set(INSTANCE_FIELDS["eth"])
 KINDS = set(INSTANCE_FIELDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
                  "flash_load_limit_bytes", "regions"}
@@ -71,17 +83,19 @@ def normalize(data, path, root, fail, obj, integer, text):
             selection["authored_kind"] = kind
             if kind == "uart":
                 obj(selection, {"id", "authored_kind", "binding", "mode", "baud", "rx", "irq"},
-                    (), f"uart.{name}")
+                    {"frame", "stream", "fifo"}, f"uart.{name}")
                 rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
-                irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"uart.{name}.irq")
+                irq = obj(selection.pop("irq"), {"priority"}, {"calls_os", "probe"}, f"uart.{name}.irq")
                 selection.update(rx_profile=rx["format"], irq_priority=irq["priority"])
                 if "capacity" in rx:
                     selection["rx_capacity"] = rx["capacity"]
                 if "calls_os" in irq:
                     selection["calls_os"] = irq["calls_os"]
+                if "probe" in irq:
+                    selection["irq_probe"] = irq["probe"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth", "timer_capture", "advanced_pwm"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "adc_group", "i2c", "can", "can_fd", "pwm_adc", "usb_device", "eth", "eth_frames", "timer_capture", "advanced_pwm", "pwm_group"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -135,10 +149,11 @@ def read(path, snapshots, root, fail, obj, integer, text):
 def editor_schema():
     """Expose the same authoring fields for editor completion, not resolution."""
     try:
-        from . import kernel, threadx
+        from . import kernel, threadx, uart_formats
     except ImportError:
         import kernel
         import threadx
+        import uart_formats
 
     def record(fields, required=()):
         properties = {name: {"type": "string"} for name in sorted(fields)}
@@ -150,13 +165,15 @@ def editor_schema():
                    "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo",
                    "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words",
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
-                   "filter", "deadtime_ticks"}
+                   "filter", "filter_a", "filter_b", "deadtime_ticks",
+                   "trigger_ticks", "data_bitrate", "period_us", "lower",
+                   "upper"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
-                             "break_active_high", "idle_high", "idle_complement_high", "exclusive"}:
+                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b"}:
             properties[name] = {"type": "boolean"}
         if "timing" in fields:
             properties["timing"] = record(
@@ -169,7 +186,36 @@ def editor_schema():
             properties["irq"]["properties"]["calls_os"] = {"type": "boolean"}
         if "rx" in fields:
             properties["rx"] = record({"format", "capacity"}, {"format"})
-            properties["rx"]["properties"]["format"]["enum"] = ["bytes", "events", "blocks"]
+            properties["rx"]["properties"]["format"]["enum"] = ["bytes", "events", "blocks", "words"]
+        if "frame" in fields:
+            properties["frame"] = record(
+                {"data_bits", "parity", "stop_bits", "flow"},
+                {"data_bits", "parity", "stop_bits", "flow"})
+            frame = properties["frame"]["properties"]
+            frame["data_bits"] = {"enum": [7, 8, 9]}
+            frame["stop_bits"] = {"enum": [1, 2]}
+            frame["parity"] = {"enum": ["none", "even", "odd"]}
+            frame["flow"] = {"const": "none"}
+        if "stream" in fields:
+            stream_fields = {"max_units_per_second", "units_per_block",
+                             "blocks", "release_delay_us", "target_delay_us",
+                             "on_exhaustion", "source"}
+            stream = record(stream_fields, stream_fields)
+            for name in stream_fields - {"on_exhaustion", "source"}:
+                stream["properties"][name] = {"type": "integer", "minimum": 0}
+            stream["properties"]["on_exhaustion"] = {
+                "const": "stop-and-report-gap"}
+            properties["stream"] = stream
+        if "watchdog" in fields:
+            properties["watchdog"] = record({"lower", "upper"},
+                                             {"lower", "upper"})
+        if "fifo" in fields:
+            names = {"rx_threshold", "tx_threshold", "rx_budget_bytes",
+                     "tx_budget_bytes"}
+            properties["fifo"] = record(names, names)
+            for name in ("rx_budget_bytes", "tx_budget_bytes"):
+                properties["fifo"]["properties"][name] = {
+                    "type": "integer", "minimum": 1, "maximum": 16}
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
     schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
@@ -206,7 +252,33 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
-        if kind == "eth":
+        if kind == "can_fd":
+            filter_fields = {"id", "mask", "format", "fifo"}
+            filters = record(filter_fields, filter_fields)
+            filters["properties"]["format"] = {"enum": ["standard", "extended"]}
+            filters["properties"]["fifo"] = {"enum": [0, 1]}
+            properties[kind]["additionalProperties"]["properties"]["filters"] = {
+                "type": "array", "items": filters, "maxItems": 36}
+        if kind == "uart":
+            uart = properties[kind]["additionalProperties"]
+            irq = uart["properties"]["irq"]
+            irq["properties"]["probe"] = {"type": "boolean"}
+            uart["properties"]["frame"]["properties"]["flow"] = {"type": "string"}
+            uart["allOf"] = [{
+                "if": {"properties": {"mode": {"const": uart_formats.RTSCTS_MODE}},
+                       "required": ["mode"]},
+                "then": {"properties": {
+                    "frame": {"const": dict(uart_formats.RTSCTS_FRAME)}}},
+                "else": {"properties": {
+                    "frame": {"properties": {"flow": {"const": "none"}}}}}}]
+        if kind == "i2c":
+            timing_fields = {"kernel_hz_min", "kernel_hz_max", "pclk_hz_min",
+                             "bus_hz_min", "rise_ns_max", "fall_ns_max", "source"}
+            timing = record(timing_fields, timing_fields)
+            for name in timing_fields - {"source"}:
+                timing["properties"][name] = {"type": "integer", "minimum": 0}
+            properties[kind]["additionalProperties"]["properties"]["timing"] = timing
+        if kind in {"eth", "eth_frames"}:
             properties[kind]["additionalProperties"]["properties"]["address"] = {
                 "type": "array", "minItems": 6, "maxItems": 6,
                 "items": {"type": "integer", "minimum": 0, "maximum": 255}}

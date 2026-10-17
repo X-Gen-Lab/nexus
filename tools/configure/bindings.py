@@ -2,13 +2,18 @@
 try:
     from .providers import maintained
     from .ir import ConfigurationIR
-    from .factory import interface_type, public_header
+    from .factory import interface_type, public_header, controller_class
     from . import gpio_phase
+    from . import enhanced_endpoints
+    from . import stream_profiles, uart_formats
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
-    from factory import interface_type, public_header
+    from factory import interface_type, public_header, controller_class
     import gpio_phase
+    import enhanced_endpoints
+    import stream_profiles
+    import uart_formats
 
 
 def symbol(name):
@@ -57,9 +62,16 @@ def emit(result):
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_BINDINGS_H', '#define NEXUS_BINDINGS_H',
               '#include "nexus/core/status.h"']
-    for kind in sorted({item["kind"] for item in selections}):
+    if uart_formats.probed(result):
+        header.insert(-1, '#include "nexus_config.h"')
+    for kind in sorted({controller_class(item) for item in selections}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
-    if any(item.kind == "eth" for item in selections):
+    for kind in sorted({enhanced_endpoints.class_name(item)
+                        for item in result.devices} &
+                       {"spi_transaction_device", "i2c_long_device",
+                        "spi_dma_transaction_device"}):
+        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+    if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif', 'typedef struct {', '    nx_result_t primary;',
                '    nx_result_t cleanup;', '    uint32_t remaining_effects;',
@@ -108,32 +120,64 @@ def emit(result):
               ' * \\author          Nexus Team', ' * \\version         1.0.0',
               ' * \\date            2026-10-09',
               ' * \\copyright       Copyright (c) 2026 Nexus Team', ' */',
-              '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus_config.h"',
+              '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus/arch/arch.h"']
     source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
                "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
                "#endif", "#ifndef NX_PLATFORM_PRIORITY_WRITE",
                "#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))",
                "#endif"]
+    if uart_formats.probed(result):
+        source.append('#include "nexus/io/cycle_probe.h"')
+        source += [f"NX_IO_IRQ_PROBE_DECLARE({item.controller})"
+                   for item in uart_formats.probed(result)]
     source.extend(provider.includes(result))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
     initialize = []
+    initialization_indices = []
     retained_initialization = []
     stop = []
     pin_snapshots = {}
-    for item in selections:
+    shared_members = {member.id: owner for owner in result.pwm_shared_owners
+                      for member in owner.members}
+    physical_constructed = set()
+    if shared_members:
+        try:
+            from .providers.stm32g474 import pwm_shared
+        except ImportError:
+            from providers.stm32g474 import pwm_shared
+    for selection_index, item in enumerate(selections):
         name = symbol(item.id)
-        exported_type = interface_type(item.kind, "port")
+        exported_type = interface_type(controller_class(item), "port")
         header += ['/** \\brief Fixed static identity; lifecycle stays explicit. */',
                    f'extern const {exported_type}* const nx_binding_{name};']
+        if item.id in shared_members:
+            owner = shared_members[item.id]
+            physical = pwm_shared.state_symbol(owner)
+            if physical not in physical_constructed:
+                construction = pwm_shared.constructor(owner)
+                source.append(f'static {construction.state_type} {physical};')
+                source.extend(construction.definitions)
+                initialize.append(construction.initialize)
+                initialization_indices.append(selection_index)
+                retained_initialization.append(construction.retain_on_failed_init)
+                stop.extend((len(initialize), expression)
+                            for expression in construction.stop)
+                physical_constructed.add(physical)
+            source.extend(pwm_shared.face(item, owner))
+            continue
         construction = provider.constructor(item, result, result["board_bindings"],
                                             result["routes"], result.devices)
-        source += [f'static {construction.state_type} s_nx_port_{name};',
+        source += [f'static {construction.state_type} s_nx_port_{name};']
+        source.extend(construction.face_definitions)
+        face_context = construction.face_context or f"&s_nx_port_{name}"
+        source += [
                    f'static const {exported_type} s_nx_face_{name} = {{',
-                   f'    &{provider.operations(item)}, &s_nx_port_{name}', '};',
+                   f'    &{provider.operations(item)}, {face_context}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
+        source.extend(stream_profiles.emit_instance(item))
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)
         header.extend(construction.exports)
@@ -142,12 +186,13 @@ def emit(result):
                                      construction.pin_snapshots,
                                      pin_snapshots)
         initialize.append(construction.initialize)
+        initialization_indices.append(selection_index)
         retained_initialization.append(construction.retain_on_failed_init)
         stop.extend((len(initialize), expression)
                     for expression in construction.stop)
     for device in result.devices:
         kind = device.kind
-        class_name = "usb_endpoint" if kind == "usb_device" else kind + "_device"
+        class_name = enhanced_endpoints.class_name(device)
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')
     source.extend(provider.shared_irqs(result))
     # All constructor arrays precede their shared cold lease functions.
@@ -169,7 +214,7 @@ def emit(result):
         source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
         source.append(
             '        nx_platform_diagnostic_phase(diagnostic, cleanup, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {index - 1}u);')
+            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index - 1]}u);')
         for counter, (_, expression) in enumerate(entry for entry in stop if entry[0] == index):
             source += [f'        nx_result_t status_{counter} = {expression};',
                        f'        if (status_{counter} != NX_SUCCESS) {{ return status_{counter}; }}']
@@ -211,7 +256,7 @@ def emit(result):
     for index, expression in enumerate(initialize):
         source.append(
             '    nx_platform_diagnostic_phase(diagnostic, false, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {index}u);')
+            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index]}u);')
         if retained_initialization[index]:
             # Cold failure may retain live hardware; include that instance
             # in reverse cleanup before attempting initialization.

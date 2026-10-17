@@ -12,6 +12,49 @@ Public C11 GPIO/UART faces remain immutable; each static instance owns its
 private state and caller-explicit byte ring. Shared readonly ops perform hot
 I/O directly. No allocator, worker, registry or DMA fallback is introduced.
 
+## Optional V-only high-clock reference
+
+The additional `hsi64-pll384-cache-off` profile is a cold-start configuration
+for DEV_ID `0x450`, REV_ID `0x2003` (V) only. Revision `0x1003` cannot distinguish
+Y from W; `0x2001` (X) and unknown revisions are rejected without fallback.
+Read the [high-clock contract](../../docs/design/h743-high-clock.md) before
+selecting it. It is not runtime frequency scaling or support for every H743 cut.
+
+Nominal CPU/HCLK/APB frequencies are 384/192/96 MHz; TIM2 and TIM3 use 192 MHz,
+not the CPU clock. USART3 and I2C1 select the unmultiplied HSI64 kernel. SPI4 uses
+APB2 with a reviewed 99.45 MHz upper bound for divider selection. ADC12 receives
+HSI64 through per_ck; only an initialized ADC1 provider selects async /4 for
+nominal 16 MHz conversions. The empty profile does not configure ADC conversions.
+
+The reviewed 62..65 MHz HSI design envelope derives from DS12110 Rev11 V-cut
+factory, voltage and full-junction-temperature limits; it is not a measurement.
+The PLL budget adds the RM0433 Rev9 PLL-ready deviation. A requested 115200 baud
+with BRR556 can consequently span about 111511..116906 baud. This local divider
+contract does not qualify a remote receiver, line or physical baud tolerance.
+The detailed contract records the source conditions and calculation.
+
+One selected four-byte clock responsibility record owns power/Flash protection,
+PLL, buses and kernel selectors. Startup proves VOS1 and Flash 2WS/WRHIGHFREQ2
+before increasing clocks. Stop first joins devices and withdraws the TIM2 System
+owner, then proves actual HSI selection before reducing protections. Failed
+withdrawal retains its effects for retry. The high profile uses this joint owner
+instead of the fixed-HSI optional Flash-timing owner. Flash still requires a
+fresh erase and the original geometry, voltage, alignment and pulse-drain rules.
+
+The existing four fixed-HSI selections do not select the high owner or clock
+translation unit. Four bytes describes the selected responsibility type, not a
+measured whole-image RAM delta. Default-path machine-code and linked cost remain
+separate checks. Cache-on, bootloader adoption and running-clock changes are
+outside this high profile.
+
+This iteration executed 38 clock, 19 high-System, 30 kernel and 10 normally
+generated factory GoogleTest cases successfully. Three normal ARM presets also
+configured and linked: `fixture-io-evolution-h743-high-empty`,
+`fixture-io-evolution-h743-high-uart` and
+`fixture-io-evolution-h743-high-peripherals`. These are development software
+results; physical HIL remains `not_executed`. See the linked contract for exact
+fixtures, sources and failure boundaries.
+
 ## Reset and ownership
 
 Official reset calls `ExitRun0Mode` before `SystemInit`, DATA/BSS initialization
@@ -41,7 +84,7 @@ ST 官方系统模板；完整 140 字节 ARM 指令和分支验收不能替代�
 
 `SystemInit` uses only CPU/system registers after power entry permits stack
 writes. It sets the explicit FPU/vector/grouping ABI without initialized globals.
-Runtime start accepts only cold HSI64, undivided buses, ready LDO, conservative
+The fixed-HSI runtime starts from cold HSI64, undivided buses, ready LDO, conservative
 reset Flash latency 7WS and Cache off. It rejects unknown running states before
 mutation. Trusted reset or a prior successful owned clean/disable must establish
 known-clean caches; clear CCR bits alone cannot prove foreign dirty lines are
@@ -58,7 +101,7 @@ divider or cache changes. A failed second admission restores only that gate;
 it never clears the foreign timer, reset, flags or vector. Refused gate rollback
 retains a distinct gate responsibility for retry without acquiring the timer.
 
-The authored clock profile selects `hsi32-fixed-cache-off`,
+The fixed-HSI clock profile selects `hsi32-fixed-cache-off`,
 `hsi32-fixed-cache-on`, `hsi64-fixed-cache-off` or `hsi64-fixed-cache-on`.
 HSI32 changes HSIDIV only after cold admission and confirms HSIRDY, HSIDIV and
 HSIDIVF before publishing frequency or enabling TIM2. UART uses the same selected
@@ -99,7 +142,8 @@ pin as unlocked input/analog before capturing any fields/latches. A foreign pin
 behind a disabled gate is rejected without pin writes or an unauthorized lease.
 The assembly captures only selected GPIO fields/latches and added clock gates.
 Partial initialization includes the failing instance in reverse cleanup.
-GPIO preloads and observes safe levels before publishing output mode. UART uses
+GPIO preloads and observes safe levels before publishing output mode. Ordinary
+IRQ-byte UART uses
 8N1, PRESC1 and the selected PCLK, no FIFO, actual TEACK/REACK and IRQ readback.
 In IRQ-byte mode its bounded ISR moves at most one TX and one RX byte.
 Requests settle only after actual wire
@@ -165,6 +209,36 @@ are possible, and borrowed blocks are never overwritten. This is neither
 circular DMA nor continuous no-gap reception; no byte-exact loss count is
 inferred. Additional H7 DMA engines, RX continuous/double-buffer modes and
 physical cache coherence remain separate acceptance scopes.
+
+## Optional bounded hardware FIFO bytes
+
+The separate `irq-fifo-bytes` selection uses USART3 PD8/PD9 AF7, 8N1, priority 5
+and the exact `hsi64-fixed-cache-off` 64 MHz profile. It enables the hardware 16-byte RX
+and TX FIFOs; RX can additionally hold one RDR byte. Explicit threshold and
+per-entry RX/TX byte budgets are independent. An IDLE/threshold handler drains
+at most each budget, uses a checked RX-not-empty fallback for a short remaining
+tail, and preserves per-head error ordering. TX space/FIFO-empty never replaces
+wire TC. Cancel/drain and whole stop retain storage until source, vector,
+publisher and UE/ACK withdrawal is proved.
+
+The selected state adds only a const-profile link to the existing UART prefix;
+ordinary UART state/operations and FIFO-disabled DMA modes remain unchanged.
+H743 high-clock profiles, DMA, non-8N1 and flow-control combinations are not
+admitted by this mode. The shared compile-time algorithm reuses pinned official
+LL USART leaves without a second hardware owner. See the
+[FIFO selection and lifecycle contract](../../docs/design/uart-fifo.md).
+Its 45 real-provider and 9 normal-TOML/generated-factory model cases passed,
+along with the selected normal ARM build, resource and retention checks.
+Physical HIL is `not_executed`;
+bounded register accesses are not measured latency or a throughput guarantee.
+
+中文：可选 `irq-fifo-bytes` 仅接入上述 USART3、HSI64 缓存关闭配置和8N1，
+硬件 FIFO 每方向16字节，RX 另有1字节 RDR。阈值与每次中断 RX/TX 字节预算独立；
+短尾通过经读回确认的 RX 非空中断继续排空，错误按当前队首处理。FIFO 空或有空间
+不等于线上 TC；取消和停止仍须证明所有来源、向量、发布者及 UE/ACK 已撤回，才能
+归还存储。普通模式状态与接口不增长，不自动扩展到高频或 DMA。45项外部寄存器
+模型和9项正常生成工厂用例，以及选定 ARM 链接/资源/保留检查已通过；这些结果
+仍不代表实板测量，物理 HIL 为 `not_executed`。
 
 ## Memory and evidence
 
@@ -264,14 +338,30 @@ are checked. Pulse error is returned only after BSY/QW/WBNE withdraw. A stuck
 pulse or refused final control/lock write retains the active caller and enters a
 nonreturning fault path; timeout never aborts a pulse or releases storage early.
 
-Execution or IRQ/vector fetch from a busy bank can stall until its physical
-pulse ends. This synchronous mode provides no tight interrupt-latency or wall-time
-deadline ceiling; deadline expiry is observed after the unabortable operation
-settles. The32-bit TIM2 timebase can recover one pending wrap, and consumers must
-still respect its documented service interval. Interrupt-safe RAM execution,
+The current development path requires selected-only cold RAM preparation and
+V revision `0x2003` admission before physical programming or erase. This applies
+to every selected Flash profile, including fixed HSI32/64 and HSI64/PLL384;
+unknown cuts are rejected. The restriction does not propagate to other
+peripherals or UART profiles, and assemblies without Flash acquire no RAM
+workspace. One generated
+workspace holds private vectors, stack, staged input and protection state. The
+CPU-only assembly bridge installs private MSP; the RAM transaction owns VTOR
+publication/readback, the MPU guard and physical both-bank drain. There is no
+fallback to the former ordinary Flash-resident pulse path. These mechanisms and
+their still-open production-ELF/software exits are described in the
+[RAM maintenance design](../../docs/design/h743-flash-ram.md).
+
+This synchronous maintenance mode masks configurable interrupts and provides no
+tight interrupt-latency or wall-time deadline ceiling. Deadline expiry after
+trigger only latches a result; it cannot cancel the pulse or authorize an early
+return. The32-bit TIM2 timebase can recover one pending wrap, and consumers must
+still respect its documented service interval. CPU MPU protection does not stop
+other bus masters: the external maintenance caller must withdraw and join them.
 Cache-on self-programming, bank swapping, option/OTP programming, ECC exception
-recovery and product boot/update policy are separate scopes. The reference's3.3V
-is an authored software assumption; no voltage or analog path has been measured.
+recovery and product boot/update policy remain separate scopes. The reference's
+3.3V is an authored software assumption; no voltage or analog path has been
+measured. Source integration and a successful link do not establish completed
+IO-24, software-candidate or physical qualification.
 
 The selected private LL SPI/ADC headers and original BSD-3-Clause notice are
 paired with STM32CubeH7v1.13.0 by the reviewed source lock. Public faces retain
@@ -279,6 +369,19 @@ Nexus types. Official LL field encodings and pure TSIZE access are reused while
 Nexus remains the single transfer, time, IRQ and shutdown owner.
 
 ## 中文范围说明
+
+新增 `hsi64-pll384-cache-off` 仅准入 DEV_ID `0x450`、REV_ID `0x2003`（V）。
+`0x1003` 无法区分 Y/W，`0x2001`（X）及未知修订均拒绝，不自动回退。
+该冷启动配置的名义 CPU/HCLK/APB 为 384/192/96 MHz，TIM2/TIM3 为 192 MHz；
+USART3/I2C1 使用未倍频的 HSI64，SPI4 按 APB2 的 99.45 MHz 保守上界选分频。
+ADC12 输入为 HSI64，只有初始化 ADC1 后才设置 async /4，得到名义 16 MHz。
+62..65 MHz 是按官方出厂、电压及完整结温范围推导的设计包络，不是实测值；
+115200 baud 的本地分频不能证明整条通信链路的容差。四字节选配责任记录统一
+管理时钟、电压、Flash 时序和 kernel mux；所有设备及 System 停止后，才撤销
+时钟责任，读回失败保留以便重试。现有四种固定 HSI 配置不选入该 owner。
+本轮 38+19+30+10 个模型测试与三个正常 ARM 配置已通过；实板 HIL 仍为
+`not_executed`。Cache-on、所有修订支持、运行时调频和整机资格不在本次结论内。
+完整条件、公式、调用顺序和验证边界以[高频合同](../../docs/design/h743-high-clock.md)为准。
 
 本轮接入精确STM32H743ZIT6软件参考的SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、
 IWDG1与双Bank物理Flash。原NUCLEO GPIO/USART3参考保持独立；新增引脚组合位于
@@ -302,5 +405,12 @@ Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不�
 明确的Board supply_mv，3.3V仅是软件参考假定；调用者必须证明目标自上次编程
 后已成功擦除，全FF读回不能证明ECC单元尚未编程；全FF输入跳过物理脉冲。Cache-on、Bank swap、OTP与option
 byte写入均未开放。正在执行的Flash脉冲不能被timeout撤销；必须等硬件排空后才返回，
-排空或最终锁定失败将保留调用帧并进入终止故障路径。同Bank取指和中断可能停顿，
-因此不承诺严格中断延迟或硬实时deadline。所有物理HIL仍为not_executed。
+排空或最终锁定失败将保留调用帧并进入终止故障路径。当前开发路径要求选定的
+V修订0x2003、冷态RAM复制与独立工作区；该准入适用于包括固定HSI32/64和PLL384
+在内的所有选定Flash配置，未知cut拒绝，其他外设与UART配置不继承此限制，未选
+Flash的装配也不取得RAM工作区。不再回退到原Flash驻留的脉冲路径；CPU bridge
+仅负责栈和CPU状态，RAM事务负责VTOR、MPU和实际排空。生产ELF闭包及完整软件
+退出尚未完成，IO-24仍为in_progress。维护窗口屏蔽可配置中断，不承诺严格中断
+延迟或硬实时deadline；MPU不停止其他bus master，外部调用者必须撤回并join。
+完整边界见[RAM维护设计](../../docs/design/h743-flash-ram.md)。所有物理HIL仍为
+not_executed。

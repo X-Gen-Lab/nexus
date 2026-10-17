@@ -175,6 +175,25 @@ TEST_F(G474I2cV2, TwoHundredFiftySixBytesReloadWithoutRestart) {
     EXPECT_NE(0U, controls[0] & (1U << 24));
     EXPECT_EQ(0U, controls[1] & (1U << 13));
 }
+TEST_F(G474I2cV2, LongWriteReadReloadsOnlyInsideItsOwnMessage) {
+    Start();
+    nx_i2c_long_endpoint_t extended{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    uint8_t tx[511] = {};
+    uint8_t rx[257] = {};
+    nx_i2c_message_t messages[] = {{tx, sizeof(tx), false},
+                                   {rx, sizeof(rx), true}};
+    size_t done = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_long_endpoint_transaction(
+                              &extended, messages, 2U, 1000000U, &done));
+    EXPECT_EQ(768U, done);
+    ASSERT_EQ(5U, controls.size());
+    for (size_t i = 0U; i < controls.size(); ++i) {
+        EXPECT_EQ(i == 0U || i == 3U, (controls[i] & (1U << 13U)) != 0U);
+        EXPECT_EQ(i < 3U ? 0U : 1U, (controls[i] >> 10U) & 1U);
+        EXPECT_EQ(i == 4U, (controls[i] & (1U << 25U)) != 0U);
+    }
+    EXPECT_EQ(0x5aU, rx[256]);
+}
 TEST_F(G474I2cV2, TwoHundredFiftySixByteReceptionKeepsOneReadDirection) {
     Start();
     uint8_t rx[256] = {};

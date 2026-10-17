@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Verify the original STM32F4 LL closure and its official CMSIS pairing.
+"""Verify STM32F4 LL and ETH definitions with their official CMSIS pairing.
 
 STM32CubeF4 v1.28.3 pins both reviewed components. Only selected inline LL
-headers and their original notice are admitted; no HAL initialization, tick,
-Handle, full LL implementation or additional driver is selected implicitly.
+headers, transitive ETH definitions and their original notice are admitted.
+No vendor C, HAL initialization, tick, Handle instance or full LL implementation
+is selected implicitly.
 """
 from __future__ import annotations
 import argparse
@@ -32,6 +33,8 @@ REVIEWED_FILES = frozenset({
     "Inc/stm32f4xx_ll_adc.h", "Inc/stm32f4xx_ll_tim.h",
     "Inc/stm32f4xx_ll_iwdg.h", "LICENSE.md",
     "Inc/stm32f4xx_ll_i2c.h",
+    "Inc/stm32f4xx_hal_eth.h", "Inc/stm32f4xx_hal_def.h",
+    "Inc/Legacy/stm32_hal_legacy.h",
 })
 PAIRING = {
     "repository": "https://github.com/STMicroelectronics/STM32CubeF4.git",
@@ -51,7 +54,7 @@ def contract(lock):
         raise ValueError("Unsupported STM32F4 official driver lock schema")
     if (lock["repository"] != ORIGIN or lock["commit"] != COMMIT or
             lock["release"] != "v1.8.5" or
-            lock["selected_api"] != "stm32f407-ll-inline" or
+            lock["selected_api"] != "stm32f407-ll-inline-eth-definitions" or
             lock["pairing"] != PAIRING):
         raise ValueError("Exact official STM32F4 release and CMSIS pairing required")
     if not isinstance(lock["files"], dict) or set(lock["files"]) != REVIEWED_FILES:

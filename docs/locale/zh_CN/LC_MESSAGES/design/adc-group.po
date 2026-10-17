@@ -1,0 +1,213 @@
+# Independently reviewed full70 content and final count-only fresh-gettext binding.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 947ce23aaeb834f14aaefb2f923f76a20809e7a00f757475358eaa0e69aee484\n"
+
+msgid "Finite ADC sequences with explicit integer frames"
+msgstr "采用显式整数帧的有限 ADC 序列"
+
+msgid "Use `nx_adc_group_port_t` to acquire complete ordered ADC frames through one physical owner. The current reference selects STM32G474RET6, HSE24/PLL170 and baremetal, with regular normal DMA or one injected frame. It keeps integer layout, trigger provenance, silicon expectations and storage ownership explicit. Control algorithms, calibrated engineering units and product sampling policy remain external. Physical HIL is `not_executed`."
+msgstr "通过 `nx_adc_group_port_t`，由同一物理 owner 采集完整、有序的 ADC 帧。当前参考选择 STM32G474RET6、HSE24/PLL170 与 baremetal，使用 regular 普通 DMA 或一个 injected 帧。整数布局、触发来源、芯片期待与存储所有权均显式定义。控制算法、经校准的工程量与产品采样策略由外部工程负责。实板 HIL 为 `not_executed`。"
+
+msgid "Select one static owner"
+msgstr "选择一个静态 owner"
+
+msgid "![FIG-16: current assembly, static factory lookup and direct provider calls for one selected ADC sequence owner](../assets/diagrams/io-evolution.svg)"
+msgstr "![FIG-16：当前装配、静态 factory 查找和直达 provider 的调用；只选择一个 ADC 序列 owner](../assets/diagrams/io-evolution.svg)"
+
+msgid "FIG-16: current assembly, static factory lookup and direct provider calls for one selected ADC sequence owner"
+msgstr "FIG-16：当前装配、静态 factory 查找和直达 provider 的调用；只选择一个 ADC 序列 owner"
+
+msgid "**FIG-16 describes shared assembly and ownership mechanisms, not an ADC timing measurement.** Here the generated face is `nx_adc_group_port_t`; its private context owns the selected ADC1 sequence and optional DMA/TIM6 resources. The application owns the request and complete raw frame array. Generation, lookup and runtime call arrows retain their distinct meanings. Factory lookup performs no conversion, calibration, resource acquisition or task scheduling."
+msgstr "**FIG-16 描述共用的装配和所有权机制，不是 ADC 时序测量。** 此处生成的接口为 `nx_adc_group_port_t`；其私有 context 拥有选定的 ADC1 序列以及可选的 DMA/TIM6 资源。应用拥有请求和完整的原始帧数组。生成、查找和运行时调用箭头保持各自不同的含义。factory 查找不会执行转换、校准、资源取得或任务调度。"
+
+msgid "The four complete maintained inputs select [regular software](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml), [regular TIM6](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml), [injected software](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml) or [injected TIM6](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml). Their software-only Board supplies PA0/PA1 analog route and voltage assumptions; it does not establish a fitted analog circuit, source impedance or connector access. The resolver rejects conflicting ADC/common, DMA, timer, vector and pad claims before publishing one atomic bundle."
+msgstr "四份维护中的完整输入分别选择[regular 软件触发](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-regular-software.toml)、[regular TIM6](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-regular-timer.toml)、[injected 软件触发](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-injected-software.toml)或[injected TIM6](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-adc-group-injected-timer.toml)。其纯软件 Board 提供 PA0/PA1 模拟路由与电压假设，不建立已安装模拟电路、源阻抗或连接器可达性的事实。解析器在发布一个原子 bundle 前拒绝 ADC/common、DMA、定时器、向量与引脚资源冲突。"
+
+msgid "Owner"
+msgstr "owner"
+
+msgid "Responsibility"
+msgstr "责任"
+
+msgid "Authored assembly and typed IR"
+msgstr "手写装配与定型 IR"
+
+msgid "Select logical rank order, sample codes, named silicon layout, trigger and exact resource claims"
+msgstr "选择逻辑 rank 顺序、采样码、命名芯片布局、触发及精确资源声明"
+
+msgid "Platform Construction"
+msgstr "Platform Construction"
+
+msgid "Admit actual silicon before effects; acquire and restore pins, kernel mux, gates and system time"
+msgstr "在产生效果前准入实际芯片；取得并恢复引脚、内核时钟选择、门控与系统时间"
+
+msgid "Private provider"
+msgstr "私有 provider"
+
+msgid "Independently recheck cold silicon; program actual SQR/JSQR/SMPR, own source/ADC/DMA/vector drain and retain partial effects"
+msgstr "独立复查冷态芯片；编程真实 SQR/JSQR/SMPR，负责源/ADC/DMA/向量排空并保留部分效果"
+
+msgid "Application executor"
+msgstr "应用执行者"
+
+msgid "Serialize privileged, unmasked task calls, preserve monotonic deadlines and explicitly advance service"
+msgstr "串行执行特权、未屏蔽中断的任务调用，保持单调 deadline 并显式推进 service"
+
+msgid "Application storage"
+msgstr "应用存储"
+
+msgid "Keep accepted metadata immutable and exclude all other access to the complete raw array until acquired SETTLED"
+msgstr "保持已接受元数据不可变，在 acquire 观察 SETTLED 前禁止其他主体访问完整原始数组"
+
+msgid "The factory returns the existing `NX_ADC_GROUP_ID_SAMPLES` face through `nx_factory_adc_group`. The two-pointer face shares one const five-operation table. On a 32-bit target these structural costs are 8 B per face and 20 B per shared table; private state, request and caller arrays are separate. Ordinary single ADC, continuous-block ADC and PWM/ADC state and tables do not grow. There is no allocator, maximum pool, hidden worker or runtime registry."
+msgstr "factory 通过 `nx_factory_adc_group` 返回既有的 `NX_ADC_GROUP_ID_SAMPLES` 接口。两指针接口共享一个 const 五操作方法表。在 32 位目标上，这些结构开销为每个接口 8 B、每张共享表 20 B；私有状态、请求和调用者数组另行计入。普通单次 ADC、连续 block ADC 与 PWM/ADC 的状态和方法表不会增长。没有分配器、最大池、隐藏 worker 或运行时注册表。"
+
+msgid "Exact hardware profiles and layout"
+msgstr "精确硬件配置与布局"
+
+msgid "Selection"
+msgstr "选择"
+
+msgid "Actual execution and finite boundary"
+msgstr "实际执行与有限边界"
+
+msgid "Regular, software"
+msgstr "Regular，软件触发"
+
+msgid "Real ADC `CONT1` scan sequence with finite normal DMA; software service does not emulate each conversion or frame"
+msgstr "真实 ADC `CONT1` 扫描序列与有限普通 DMA；软件 service 不模拟逐次转换或逐帧触发"
+
+msgid "Regular, TIM6"
+msgstr "Regular，TIM6"
+
+msgid "Rising TIM6 TRGO drives each complete regular scan; finite normal DMA ends on a whole physical-rank boundary"
+msgstr "TIM6 TRGO 上升沿驱动每个完整 regular 扫描；有限普通 DMA 结束于完整物理 rank 边界"
+
+msgid "Injected, software"
+msgstr "Injected，软件触发"
+
+msgid "One software JADSTART with JQDIS1 and fresh JEOS; the task copies the whole group only after source/vector drain"
+msgstr "一次软件 JADSTART、JQDIS1 及新 JEOS；任务只在源/向量排空后复制整组"
+
+msgid "Injected, TIM6"
+msgstr "Injected，TIM6"
+
+msgid "One owned TIM6 OPM update drives one injected group; no second context or trigger is admitted before complete withdrawal"
+msgstr "独占 TIM6 OPM 的一次更新驱动一个 injected 组；完全撤离前不准入第二个 context 或触发"
+
+msgid "All selections use ADC12 SYSCLK/8 = 21.25 MHz and HCLK 170 MHz, single-ended unsigned12 normal sampling. Regular has at most 16 physical ranks; injected has at most four. Regular owns DMA1 channel1, DMAMUX1 channel0/request5 and vectors 11 and 18. Injected owns vector 18 and performs no DMA-channel admission or access. Software selections do not lease TIM6. TIM6 selections additionally own the whole timer at a 1 MHz counter tick. All vectors use logical priority 5 and no kernel calls."
+msgstr "所有选择均使用 ADC12 SYSCLK/8 = 21.25 MHz、HCLK 170 MHz、单端无符号 12 位普通采样。regular 最多 16 个物理 rank，injected 最多四个。regular 拥有 DMA1 channel1、DMAMUX1 channel0/request5 与向量 11/18。injected 拥有向量 18，不进行 DMA 通道准入或访问。软件触发不租用 TIM6；TIM6 触发另行独占整个定时器，计数 tick 为 1 MHz。所有向量采用逻辑优先级 5，不调用内核。"
+
+msgid "The maintained inputs select channels `[2, 1]`, sample codes `[0, 0]` and nominal 3300 mV. Channel 1 is PA0 and channel 2 is PA1. The provider also admits the reviewed internal channels 16/17/18 for temperature, VBAT and VREF respectively. One physical channel has one SMPR field, so repeated logical occurrences cannot select different sample codes."
+msgstr "维护中的输入选择通道 `[2, 1]`、采样码 `[0, 0]` 与标称 3300 mV。通道 1 为 PA0，通道 2 为 PA1。provider 还准入经审查的内部通道 16/17/18，分别对应温度、VBAT 和 VREF。每个物理通道只有一个 SMPR 字段，因此同一通道重复出现于逻辑序列时，不能选择不同采样码。"
+
+msgid "`nx_adc_group_info` reports the actual immutable channel order, sampling-code lookup, physical rank count and integer format. Storage is little-endian, two-byte unsigned12 with zero LSB offset. A normal layout has sample stride 2; the Z layout has stride 4 because each logical rank occupies two physical slots. The scan stride is logical channel count multiplied by sample stride. Consumers use `nx_adc_format_decode` after SETTLED and ignore discarded padding. The raw array is not a floating-point voltage array."
+msgstr "`nx_adc_group_info` 报告实际不可变通道顺序、采样码查表、物理 rank 数和整数格式。存储采用小端、两字节无符号 12 位，LSB 偏移为零。普通布局的样本步幅为 2；Z 布局每个逻辑 rank 占用两个物理槽，因此步幅为 4。扫描步幅等于逻辑通道数乘样本步幅。消费者在 SETTLED 后使用 `nx_adc_format_decode`，忽略被丢弃的填充槽。原始数组不是浮点电压数组。"
+
+msgid "Regular requests contain 1 through `floor(65535 / physical_ranks)` whole frames, further bounded by their actual DMA-visible memory span. Injected requests contain exactly one frame. The four reference bundles select writable SRAM1/2 domains; this selection does not authorize CCM aliases. The exact byte length must equal `frame_count * scan_stride`, including all padding, with halfword alignment. A partial rank, EOC, JEOC or DMA prefix never establishes a valid frame result."
+msgstr "regular 请求包含 1 至 `floor(65535 / physical_ranks)` 个完整帧，并受实际 DMA 可达内存范围限制。injected 请求恰好包含一帧。四个参考 bundle 选择可写 SRAM1/2 域，不授权 CCM 别名。精确字节长度必须等于 `frame_count * scan_stride`，包含所有填充并按半字对齐。部分 rank、EOC、JEOC 或 DMA 前缀均不能建立有效帧结果。"
+
+msgid "The trigger identity is zero for software and a nonzero assembly provenance for TIM6. It is not a counter, aperture timestamp, physical wire identity or measured phase relationship. `period_us` describes the selected timer period; it does not describe an instantaneous ADC aperture."
+msgstr "软件触发的身份为零，TIM6 的身份为非零装配来源。该值不是计数器、孔径时间戳、物理线路身份或实测相位关系。`period_us` 描述所选定时器周期，不描述瞬时 ADC 孔径。"
+
+msgid "Observe silicon and execute its actual algorithm"
+msgstr "观察芯片并执行真实算法"
+
+msgid "The named `g474-adc-group-x`, `g474-adc-group-y` and `g474-adc-group-z` profiles expect revisions 0x2003, 0x2002 and 0x2001 respectively. A profile is an immutable expectation, not observed hardware. Platform admission and the independent private constructor use the existing `nx_stm32_identity_read` source and shared core silicon policy against actual IDCODE and Flash-size registers. Wrong group/density, unavailable density, unknown cuts and mismatched expected cuts reject. An ordinary restart observes again rather than caching admission. All four canonical inputs select the X layout. Y/Z selections require their matching observed cut and separate qualification receipts; an X factory run does not qualify those configurations."
+msgstr "`g474-adc-group-x`、`g474-adc-group-y` 与 `g474-adc-group-z` 命名配置分别期待修订 0x2003、0x2002 与 0x2001。配置是不可变期待，不是实读硬件。Platform 准入与独立私有构造函数使用既有 `nx_stm32_identity_read` source 和共享 core 芯片策略，对比实际 IDCODE 与 Flash 大小寄存器。错误 group/密度、密度不可用、未知 cut 或与期待不符的 cut 均拒绝。普通重新启动会再次观察，不缓存准入结果。四个规范输入均选择 X 布局；Y/Z 选择必须观察到匹配 cut，并取得各自独立的资格记录。一次 X factory 执行不能为这些配置建立资格。"
+
+msgid "[The reviewed mode record](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/reviews/adc-group.json) is the single source of cut rules and required workaround masks. The provider does not maintain another revision allowlist or reader. The group and density values cannot identify an exact package or orderable part by themselves; the selected SoC and Board must still authorize their exact routes."
+msgstr "[经审查的模式记录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/reviews/adc-group.json) 是 cut 规则及所需 workaround mask 的唯一来源。provider 不维护第二份修订允许列表或 reader。group 和密度本身不能识别精确封装或可订购料号；选定的 SoC 与 Board 仍必须授权各自的精确路由。"
+
+msgid "The Z profile repeats every physical channel rank twice and keeps the first slot of each pair. It therefore permits at most eight logical regular ranks or two logical injected ranks. The explicit raw stride preserves the extra slots; there is no hidden packing buffer. Every profile discards a real priming scan and disables/re-enables ADC around each valid acquisition. These are actual register algorithms, not evidence inferred from workaround metadata."
+msgstr "Z 配置将每个物理通道 rank 重复两次，保留每对的第一个槽。因此最多允许八个逻辑 regular rank 或两个逻辑 injected rank。显式原始步幅保留额外槽，没有隐藏打包缓冲区。每种配置均丢弃一次真实预转换扫描，并在每次有效采样前后实际禁用/重新启用 ADC。这些是实际寄存器算法，不能由 workaround 元数据推定已经执行。"
+
+msgid "The fixed ratio HCLK/ADC = 8 avoids ES0430 section 2.7.5's condition above 10. JQDIS1, one ADC group, no dual conversion, no automatic injected conversion and no preemption exclude additional dynamic-context cases. These mode constraints do not qualify unselected continuous injected queues or different clock ratios."
+msgstr "固定 HCLK/ADC 比值为 8，避开 ES0430 第 2.7.5 节大于 10 的条件。JQDIS1、单个 ADC 组、无双重转换、无自动 injected 转换、无抢占等约束排除另外的动态 context 情况。这些模式限制不为未选择的连续 injected 队列或其他时钟比值建立资格。"
+
+msgid "Sampling time and real priming"
+msgstr "采样时间与真实预转换"
+
+msgid "The eight sample codes represent 2.5, 6.5, 12.5, 24.5, 47.5, 92.5, 247.5 and 640.5 ADC cycles. Conversion adds 12.5 cycles per physical rank. The reported halfcycle lookup and expanded scan budget include discarded ranks. Internal sources require at least code 5 for VREF, code 6 for temperature and code 7 for VBAT at the selected ADC clock. Cold initialization enables only the selected internal sources, waits 122 us if temperature is selected or 22 us otherwise, performs calibration and waits at least four ADC cycles afterwards. These unmasked waits do not establish analog accuracy or calibrated voltage."
+msgstr "八个采样码分别代表 2.5、6.5、12.5、24.5、47.5、92.5、247.5 和 640.5 个 ADC 周期。每个物理 rank 另需 12.5 个转换周期。报告的半周期查表及展开扫描预算包含所有丢弃 rank。在所选 ADC 时钟下，内部 VREF 至少需 code 5，温度至少需 code 6，VBAT 至少需 code 7。冷态初始化只启用选定的内部源；选择温度时等待 122 us，否则等待 22 us；执行校准后再等待至少四个 ADC 周期。这些未屏蔽中断的等待不建立模拟精度或校准电压。"
+
+msgid "Calibration has no independent fresh-completion flag. A short guard saves and restores the incoming interrupt mask around the ADCAL command, barrier and immediate busy observation; the completion wait runs unmasked. Initialization requires observed ADCAL1 followed by hardware ADCAL0. An initial zero is ambiguous: the command may have been refused, or calibration may already have finished before the read. It conservatively reports IO and retains partial effects for joined cleanup and a cold retry. An unchanged CALFACT or the nominal 116-cycle duration cannot prove fresh completion; no factor sentinel is written."
+msgstr "校准没有独立的新完成标志。短保护区围绕 ADCAL 命令、屏障和紧随的 busy 观察，保存并恢复进入时的中断屏蔽状态；等待完成时不屏蔽中断。初始化要求先观察 ADCAL1，再观察硬件清为 ADCAL0。首次观察为零具有歧义：命令可能被拒绝，也可能在读取前已经完成校准。此时保守报告 IO，保留部分效果，供完成退出的清理和冷态重试。未变化的 CALFACT 或标称 116 周期时长均不能证明新完成；不会写入因子哨兵值。"
+
+msgid "Before valid samples of each accepted acquisition, the provider executes one complete discarded software scan. Regular priming uses the accepted raw output span as temporary DMA storage; injected priming uses the JDR bank. The caller cannot read either as valid samples. Watchdog and periodic trigger sources are disabled during priming. Idle leaves ADC disabled, and a late task must really prime again; updating a timestamp cannot substitute for a conversion."
+msgstr "每个已接受请求取得有效采样前，provider 执行并丢弃一次完整软件扫描。regular 预转换暂时使用已借用的原始输出范围作为 DMA 存储，injected 使用 JDR 寄存器组。调用者不能将其作为有效样本读取。预转换期间禁用看门狗与周期触发源。空闲时禁用 ADC；任务延迟后必须真实重新预转换，不能只更新时间戳。"
+
+msgid "For a hardware trigger, the complete expanded scan and asynchronous-trigger margin must fit the exact period. The necessary cold freshness budget is `period_us + ceil(scan_halfcycles * 4 / 170) < 1000`; slow sample codes therefore reduce the admitted maximum period. Configuration and the private constructor use the same physical units and reject impossible budgets without rounding. Runtime freshness checks still cover actual task/arm delays. A stale arm retains the loan, legally withdraws the in-progress hardware and converts another discarded scan before publishing valid frames."
+msgstr "硬件触发的精确周期必须容纳完整展开扫描和异步触发裕量。必要冷态新鲜度预算为 `period_us + ceil(scan_halfcycles * 4 / 170) < 1000`；较慢采样码因此降低可准入的最大周期。配置与私有构造函数采用相同物理单位，拒绝不可能满足的预算，不进行舍入。运行时新鲜度检查仍需覆盖实际任务/装载延迟。陈旧装载保留借用，合法撤离进行中的硬件，再丢弃一次真实扫描后才发布有效帧。"
+
+msgid "The optional analog watchdog applies raw lower/upper thresholds to the selected group. It is disabled during discarded priming and latches a terminal IO fault in the valid window. It does not supply a product trip policy, comparator break route, safe output or guaranteed reaction time."
+msgstr "可选模拟看门狗将原始上下阈值应用于选定组。丢弃预转换期间禁用看门狗，有效窗口中锁存终止 IO 故障。它不提供产品跳闸策略、比较器 break 路由、安全输出或保证的反应时间。"
+
+msgid "Admit, advance and consume"
+msgstr "准入、推进与消费"
+
+msgid "Retrieve the static typed face and explicitly start Platform. Startup calibrates the cold owner but starts no acquisition and no hidden task."
+msgstr "取得静态定型接口并显式启动 Platform。启动会校准冷态 owner，但不启动采样或隐藏任务。"
+
+msgid "Initialize the request, obtain the current immutable info and prepare a separate complete raw array with a finite absolute monotonic deadline. Preparation borrows nothing, touches no sample bytes and validates no chip or DMA domain on its own."
+msgstr "初始化请求，取得当前不可变 info，为独立完整原始数组准备有限的绝对单调 deadline。prepare 不借用、不触碰样本字节，本身不验证芯片或 DMA 域。"
+
+msgid "Submit through the unique privileged, unmasked task executor. Rejection retains no pointers or new effects. `NX_SUCCESS` means ACCEPTED, including an arm failure that may already have settled through actual withdrawal."
+msgstr "通过唯一的特权、未屏蔽中断的任务执行者提交。拒绝不保留指针或新效果。`NX_SUCCESS` 表示 ACCEPTED，包括装载失败后可能已通过实际撤离而 SETTLED 的情况。"
+
+msgid "Preserve the descriptor and array. IRQs record bounded owned facts; the same task explicitly advances service through priming, acquisition and drain. No worker supplies progress when the application stops calling service."
+msgstr "保持描述符与数组有效。IRQ 只记录有界的所属事实；同一任务显式调用 service，推进预转换、采样与排空。应用停止调用 service 后，没有 worker 代为推进。"
+
+msgid "Acquire-observe `NX_REQUEST_SETTLED`, inspect result and decode valid frames. Join any external observers separately before preparing the same storage for another request. An ordinary success never automatically rearms itself."
+msgstr "acquire 观察 `NX_REQUEST_SETTLED` 后检查结果并解码有效帧。在重新 prepare 同一存储前，另行等待所有外部观察者退出。普通成功不会自动重装。"
+
+msgid "The provider rejects wrapping, overlapping, control-aliasing and incomplete spans before admission; known control descriptors reject before their fields are read. Without a trusted completion timestamp, completion first observed at or after the deadline reports TIMEOUT. Completion already observed in time may finish required withdrawal later. This observation rule is not a physical execution-time or service-latency guarantee."
+msgstr "provider 在准入前拒绝回绕、重叠、控制别名和不完整范围；已知控制描述符在首次读取字段前即拒绝。没有可信完成时间戳时，首次在 deadline 或之后观察到完成则报告 TIMEOUT。deadline 前已观察的完成允许稍后结束必要撤离。该观察规则不是物理执行时间或 service 延迟保证。"
+
+msgid "Withdraw before releasing the loan"
+msgstr "归还借用前先撤离"
+
+msgid "![FIG-06: current request lifecycle; cancellation and quarantine retain ADC frame storage until actual source and reference withdrawal](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：当前请求生命周期；在实际源和引用撤离前，取消和隔离继续保留 ADC 帧存储](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "FIG-06: current request lifecycle; cancellation and quarantine retain ADC frame storage until actual source and reference withdrawal"
+msgstr "FIG-06：当前请求生命周期；在实际源和引用撤离前，取消和隔离继续保留 ADC 帧存储"
+
+msgid "**FIG-06 supplies the shared request-state contract.** ACCEPTED and REJECTED are admission outcomes, not extra request states. In this provider, SETTLED requires the following physical and reference proofs."
+msgstr "**FIG-06 提供共享请求状态合同。** ACCEPTED 和 REJECTED 是准入结果，不是新增请求状态。在本 provider 中，SETTLED 必须具备下述硬件与引用证明。"
+
+msgid "For TIM6, prove CEN0 before selecting the quiet enable-based MMS route. Cold/rearm UG occurs behind that quiet route with fresh UIF/acknowledgement; stop does not issue UG or create another update trigger."
+msgstr "对于 TIM6，先证明 CEN0，再选择基于 enable 的静默 MMS 路由。冷态/重装 UG 位于该静默路由后，并要求新 UIF 及其确认；stop 不发出 UG，也不产生额外更新触发。"
+
+msgid "Request only the matching regular or injected stop, observe its START/STOP withdrawal, then legally disable ADC and observe ADEN/ADDIS0. JEXTEN changes follow JADSTART0; ADDIS never substitutes for group drain."
+msgstr "只请求匹配的 regular 或 injected stop，观察所属 START/STOP 撤离，然后合法禁用 ADC 并观察 ADEN/ADDIS0。只有 JADSTART0 后才能改变 JEXTEN；ADDIS 不能替代组排空。"
+
+msgid "For regular DMA, prove EN0, detach addresses and remaining count, and detach DMAMUX. TC and CNDTR0 alone do not stop a CONT1 scan or a hardware trigger."
+msgstr "对于 regular DMA，证明 EN0，撤离地址、剩余计数和 DMAMUX。TC 与 CNDTR0 本身不会停止 CONT1 扫描或硬件触发。"
+
+msgid "Preserve captured TE/OVR/watchdog faults before W1C, acknowledge only owned observed flags and recheck during drain and final publication."
+msgstr "在 W1C 前保留已捕获的 TE/OVR/看门狗故障，只确认已观察的所属标志，并在排空与最终发布期间复查。"
+
+msgid "Disable/join selected vectors and active publishers. The final metadata guard detaches the request and release-publishes SETTLED as the final provider access. Injected JDR values are copied only after whole fresh JEOS and drain."
+msgstr "禁用并等待选定向量及活跃发布者退出。最终元数据保护区先分离请求，再以 release 发布 SETTLED，作为 provider 的最后一次访问。injected JDR 值只在完整的新 JEOS 与排空后复制。"
+
+msgid "Success reports exactly the requested frame count. Errors, cancellation and timeout report zero guaranteed valid frames, even if raw storage contains a partial or complete-looking prefix. The first terminal cause remains latched. A refused counter, ADC, DMA or vector withdrawal retains QUARANTINED storage and recovery responsibility; service can retry the same real drain. A retired predecessor's repeated stop cannot withdraw a successor's controller."
+msgstr "成功恰好报告所请求帧数。错误、取消和超时报告的保证有效帧数为零，即使原始存储看起来具有部分或完整前缀。首次终止原因保持锁存。计数器、ADC、DMA 或向量拒绝撤离时，保留 QUARANTINED 存储及恢复责任，service 可以重试同一真实排空。已退出前任的重复 stop 不能撤离后继 owner 的控制器。"
+
+msgid "Public stop closes new admission and drains the accepted request. Its success does not release pins, internal-source enables or clock leases. Final Platform close restores logical priorities and common configuration only after complete request/source/vector withdrawal, then releases outer resources. Failed close retains unfinished leases for retry. Fault recovery is an explicit joined cold close and restart, never an automatic replay."
+msgstr "公共 stop 关闭新准入并排空已接受请求，其成功不释放引脚、内部源使能或时钟租约。最终 Platform close 只有在完整请求/源/向量撤离后才恢复逻辑优先级和公共配置，随后释放外层资源。close 失败保留未完成租约，供重试。故障恢复必须显式完成退出的冷态 close 与 restart，不会自动重放。"
+
+msgid "Sources and software evidence"
+msgstr "来源与软件证据"
+
+msgid "The authoritative API is [the public group contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/adc_group.h). [The private provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/adc_group.c) implements the actual sequencer, timer, watchdog and DMA transitions. The selected official ADC/DMAMUX definitions remain private and locked by [the STM32G4 dependency record](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json). RM0440 Rev9, DS12288 Rev6 and ES0430 Rev9 establish the reviewed hardware facts; the mode record binds their source identities and algorithm scope."
+msgstr "权威 API 为[公共组合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/adc_group.h)。[私有 provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/adc_group.c) 实现真实序列、定时器、看门狗与 DMA 迁移。选定的官方 ADC/DMAMUX 定义保持私有，由 [STM32G4 依赖记录](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json) 锁定。RM0440 Rev9、DS12288 Rev6 与 ES0430 Rev9 建立经审查的硬件事实；模式记录绑定其来源身份与算法范围。"
+
+msgid "[Public GoogleTest/GoogleMock contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/adc_group_test.cpp), [external register/event tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_adc_group_test.cpp) and [normal generated-factory tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_adc_group_factory_test.cpp) exercise real common/provider code. They cover whole-rank boundaries, integer decoding, discarded priming, actual continuous regular scans, OPM, aliases, deadline/late faults, refused withdrawal, instance handoff and retained cleanup. Independent admission cases use actual IDCODE/Flash-size storage and the same generated policy, without replacing the reader or comparison function."
+msgstr "[公共 GoogleTest/GoogleMock 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/adc_group_test.cpp)、[外部寄存器/事件测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_adc_group_test.cpp)及[正常生成 factory 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_adc_group_factory_test.cpp)执行真实 common/provider 代码，覆盖完整 rank 边界、整数解码、丢弃预转换、真实连续 regular 扫描、OPM、别名、deadline/迟到故障、拒绝撤离、实例交接及保留清理。独立准入用例使用真实 IDCODE/Flash 大小存储和同一生成策略，不替换 reader 或比较函数。"
+
+msgid "Current development validation passed eight public API cases, 55 real-provider cases and four normal generated-factory programs with 16 cases each: 127 cases with no failures or skips. All four canonical X configurations also passed normal ARM configure/build, resource budgets and retention checks for one face, one table and its five method slots. These are model and firmware-link results, not executed analog measurements, Y/Z normal-configuration qualification or a clean reproducible software candidate."
+msgstr "当前开发验证通过八项公共 API 用例、55 项真实 provider 用例，以及四个正常生成 factory 程序各 16 项用例，共 127 项，无失败或跳过。四个规范 X 配置也均通过正常 ARM 配置/构建、资源预算，以及一个接口、一张方法表和五个方法槽的保留检查。这些是模型及固件链接结果，不代表已经完成模拟信号实测、正常 Y/Z 配置的资格或干净且可复现的软件候选。"
+
+msgid "Actual model results and ARM ELF/resource checks belong to their exact source, configuration and execution receipts. Linking does not execute ADC or prove analog waveforms. A clean reproducible software candidate, installed-SDK composition and physical station acceptance have separate evidence. No model, diagram or policy mask establishes PCB connectivity, measured accuracy, aperture timing, physical HIL or a safety-qualified control system."
+msgstr "实际模型结果和 ARM ELF/资源检查属于其精确来源、配置与执行记录。链接不会执行 ADC，也不证明模拟波形。干净且可复现的软件候选、已安装 SDK 组合与实板 station 验收分别具有独立证据。模型、框图或策略 mask 均不建立 PCB 接线、实测精度、孔径时序、物理 HIL 或经过安全资格认定的控制系统。"

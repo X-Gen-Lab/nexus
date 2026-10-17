@@ -1,0 +1,207 @@
+# Authored Chinese translation of the exact enhanced Ethernet contract.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 83075b0cb74ec385701f37907cc347d342a9b02601db1decb69edcde93576d64\n"
+
+msgid "Ethernet frame loans and the MAC hardware clock"
+msgstr "以太网帧借用与 MAC 硬件时钟"
+
+msgid "The optional `eth_frames` face adds complete scatter-gather frames, one in-band VLAN C-tag and MAC hardware-event timestamps. It selects independent provider state, eight-word descriptors and caller-owned storage. The existing `eth` face keeps its contiguous untagged-frame contract, four-word descriptors and existing operations table. Selecting one does not expand the other."
+msgstr "可选的 `eth_frames` 接口提供完整的分散聚集帧、一个带内 VLAN C-tag 和 MAC硬件事件时间戳。它选择独立的 provider 状态、八字描述符和调用方存储。现有 `eth` 接口保留连续无标签帧契约、四字描述符及原有操作表。选择其中一个接口不会扩大另一个接口的能力。"
+
+msgid "The first hardware-facing implementations are the exact STM32F407 and GD32F470 RMII providers at their maintained 168 MHz and 200 MHz HCLK profiles. Native provides an explicit C hardware model. Executed host validation covers public contracts, the common engine, exact family providers, Native and normal assembly/factory composition. Both canonical ARM firmware configurations also compile and link. These are software checks. Physical RMII, PHY behavior, external bus timing, timestamp accuracy and station HIL remain `not_executed`."
+msgstr "首批面向硬件的实现是采用已维护 168 MHz、200 MHz HCLK 配置的精确STM32F407、GD32F470 RMII provider。Native 提供显式的 C 硬件模型。已执行的主机验证覆盖公共契约、共享引擎、精确系列 provider、Native 和普通装配／工厂组合。两个规范 ARM 固件配置也已编译和链接通过。这些属于软件检查；物理 RMII、PHY 行为、外部总线时序、时间戳准确度和工位 HIL 仍为`not_executed`。"
+
+msgid "![FIG-16: build-time assembly selects one immutable face and one private physical owner; normal frame calls dispatch directly to that owner](../assets/diagrams/io-evolution.svg)"
+msgstr "![FIG-16：构建期装配选择一个不可变接口和一个私有物理所有者；普通帧调用直接派发给该所有者](../assets/diagrams/io-evolution.svg)"
+
+msgid "FIG-16: build-time assembly selects one immutable face and one private physical owner; normal frame calls dispatch directly to that owner"
+msgstr "FIG-16：构建期装配选择一个不可变接口和一个私有物理所有者；普通帧调用直接派发给该所有者"
+
+msgid "Assembly and hardware ownership"
+msgstr "装配与硬件所有权"
+
+msgid "The maintained normal assembly contract uses an authored `eth_frames.mac` controller to select `rmii-vlan-sg-ptp`, a reviewed RMII route, MAC address, exact TX/RX ring sizes, RX-buffer size, IRQ policy and finite initialization/drain budgets. The factory contract returns the existing static `nx_eth_frames_port_t` through `nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC)`. Lookup must perform no hardware access, allocation or initialization. The paired MDIO face addresses the same physical owner through its separate public type. The canonical `f407zg-eth-frames.toml` and `gd470-eth-frames.toml` fixtures in `cmake/package/verification/io_evolution/` exercise this complete composition."
+msgstr "已维护的普通装配契约使用 authored `eth_frames.mac` 控制器选择`rmii-vlan-sg-ptp`、已审核 RMII 路由、MAC 地址、精确 TX／RX 环大小、RX缓冲大小、IRQ 策略以及有限初始化／排空预算。工厂契约通过`nx_factory_eth_frames(NX_ETH_FRAMES_ID_MAC)` 返回已有的静态`nx_eth_frames_port_t`。查找不得访问硬件、分配或初始化。配对的 MDIO 接口通过独立公共类型访问同一物理所有者。位于`cmake/package/verification/io_evolution/` 的两个规范示例配置`f407zg-eth-frames.toml` 和 `gd470-eth-frames.toml` 验证了这一完整组合。"
+
+msgid "Platform owns the System clock lease, pins, RMII selection and MAC/TX/RX/PTP clock gates. The provider manages its MAC, DMA, PTP counter and IRQ inside that lease. Old raw Ethernet and enhanced frames cannot own the same MAC concurrently. A product supplies PHY reset, address, power, autonegotiation/link observation, network stack, packet classification and shutdown policy outside this repository."
+msgstr "Platform 拥有 System 时钟租约、引脚、RMII 选择及 MAC／TX／RX／PTP 时钟门。provider 在该租约内管理 MAC、DMA、PTP 计数器和 IRQ。旧 raw Ethernet 与增强帧不能同时拥有同一 MAC。产品在本仓库之外提供 PHY 复位、地址、电源、自协商／链路观测、网络栈、报文分类和关闭策略。"
+
+msgid "Startup establishes actual HSE8/PLL168 or HXTAL25/PLL200 before MAC access. The family provider checks fresh oscillator/PLL readiness, actual source status, PLL factors, AHB/APB dividers, RMII selection and the separate PTP gate. Merely requesting PLL selection or declaring a configured frequency cannot authorize 16 MHz fallback or a different actual divider. Both manuals require Ethernet AHB at least 25 MHz. External RMII REF_CLK at 50 MHz does not establish HCLK or the PTP input clock."
+msgstr "启动先建立实际 HSE8／PLL168 或 HXTAL25／PLL200，再访问 MAC。系列 provider检查最新的振荡器／PLL 就绪、实际时钟源状态、PLL 参数、AHB／APB 分频、RMII选择及独立 PTP 时钟门。仅请求切换到 PLL 或声明配置频率，不能授权 16 MHz回退或其他实际分频。两份手册都要求 Ethernet AHB 至少 25 MHz。外部 50 MHzRMII REF_CLK 不能证明 HCLK 或 PTP 输入时钟。"
+
+msgid "The provider rejects foreign/live descriptor tables before reset. Descriptors and packet storage must be in the exact main-SRAM DMA domain. F407 CCM and GD470 TCM are excluded. Software metadata may use other CPU-accessible storage. The hardware descriptor stride is 32 bytes; the ST HAL descriptor type has additional software backup words and is not used as the hardware stride. Official headers supply reviewed layout/mask definitions; vendor C runtimes, descriptor pools, mutable global cursors and HAL tick initialization are not selected."
+msgstr "provider 在复位前拒绝外部／活动描述符表。描述符和报文存储必须处于精确的主SRAM DMA 域；排除 F407 CCM 和 GD470 TCM。软件元数据可使用其他 CPU 可访问存储。硬件描述符步长为 32 字节；ST HAL 描述符类型还含软件备份字，不能以其大小作为硬件步长。官方头文件提供经过审核的布局／掩码定义；不选择厂商 C运行时、描述符池、可变全局游标或 HAL tick 初始化。"
+
+msgid "Complete frames and VLAN handling"
+msgstr "完整帧与 VLAN 处理"
+
+msgid "A TX request contains immutable `nx_eth_fragment_t` views. Preparation validates all lengths, pointer overflow and the complete L2 header across fragments before changing request storage. Empty fragments reject. One EtherType 0x8100 C-tag is accepted; its TCI remains in the payload. Nested tags, 0x88A8 and length-coded 802.3 frames reject. Untagged frames contain 14..1514 caller bytes; tagged frames contain 18..1518, excluding preamble, hardware padding and hardware FCS."
+msgstr "TX 请求包含不可变 `nx_eth_fragment_t` 视图。准备阶段在改变请求存储前检查全部长度、指针溢出及跨片段的完整 L2 首部，拒绝空片段。允许一个 EtherType0x8100 C-tag；TCI 保留在载荷中。拒绝嵌套标签、0x88A8 和采用长度字段的802.3 帧。无标签帧包含 14..1514 个调用方字节；带标签帧包含 18..1518 个，均不含前导码、硬件填充和硬件 FCS。"
+
+msgid "The selected mode performs no tag insertion or stripping. PCP/DEI/VID policy, access-port/trunk policy and VLAN membership belong to the product. Hardware padding/FCS remain enabled and checksum offload remains disabled."
+msgstr "所选模式不插入或剥离标签。PCP／DEI／VID、access／trunk 端口策略及 VLAN成员关系属于产品。保持硬件填充／FCS 开启，校验和卸载关闭。"
+
+msgid "Fact"
+msgstr "事实"
+
+msgid "TX"
+msgstr "TX"
+
+msgid "RX"
+msgstr "RX"
+
+msgid "Unit"
+msgstr "单位"
+
+msgid "One complete L2 frame"
+msgstr "一个完整 L2 帧"
+
+msgid "Hardware storage"
+msgstr "硬件存储"
+
+msgid "One descriptor per supplied fragment"
+msgstr "每个提供的片段使用一个描述符"
+
+msgid "As many ring buffers as the received frame needs"
+msgstr "按接收帧所需使用环缓冲"
+
+msgid "First/last facts"
+msgstr "首尾事实"
+
+msgid "Software metadata selects FS and LS before publication"
+msgstr "软件元数据在发布前选择 FS 与 LS"
+
+msgid "Actual FS/LS writeback delimits the frame"
+msgstr "实际 FS／LS 回写划定帧边界"
+
+msgid "FCS"
+msgstr "FCS"
+
+msgid "Inserted by hardware"
+msgstr "硬件插入"
+
+msgid "Excluded from views, including a four-byte FCS spanning two buffers"
+msgstr "视图排除 FCS，包括跨两个缓冲的四字节 FCS"
+
+msgid "Buffer availability"
+msgstr "缓冲可用性"
+
+msgid "Complete chain is admitted before any first OWN"
+msgstr "在发布任何首 OWN 前准入完整链"
+
+msgid "A held descriptor is never rearmed or overwritten"
+msgstr "永不重新交付或覆盖被持有的描述符"
+
+msgid "Result"
+msgstr "结果"
+
+msgid "`transferred` is full caller length on proven MAC success, otherwise zero"
+msgstr "证明 MAC 成功后 `transferred` 为完整调用方长度，否则为零"
+
+msgid "All-or-nothing view capacity; no partial public frame"
+msgstr "视图容量全部成功或全部拒绝，不公开半帧"
+
+msgid "Admission first checks every fragment, DMA range and free descriptor. Rejection leaves request and OWN state unchanged. After acceptance the provider records a PREPARING reservation, programs variable descriptor work without masking IRQs, then publishes the first OWN only after all following descriptors are ready. An IRQ cannot interpret a CPU-owned PREPARING descriptor as completed traffic. Each IRQ advances at most one TX descriptor and one RX descriptor. Intermediate TX writeback is not whole-frame wire completion; the actual last descriptor provides the final status and optional capture."
+msgstr "准入先检查全部片段、DMA 范围及空闲描述符。拒绝时请求与 OWN 状态不变。接受后，provider 记录 PREPARING 预留，在不屏蔽 IRQ 的情况下准备可变数量的描述符，待后续所有描述符就绪后才发布首个 OWN。IRQ 不能把 CPU 所有的PREPARING 描述符解释为已完成流量。每次 IRQ 最多推进一个 TX 和一个 RX描述符。中间 TX 回写不能证明整帧线上完成；实际末描述符提供最终状态及可选捕获。"
+
+msgid "RX acquisition produces one `nx_eth_frames_rx_loan_t` plus caller-provided fragment views. Too few views return `OVERFLOW` without dequeuing the frame or changing outputs. Views exclude FCS even when the FCS consumes the whole tail descriptor. The token retains every hardware descriptor until exact release. Copying a token creates no additional loan. Stale, foreign, semantically altered and repeated releases reject. Structure padding is not token identity."
+msgstr "RX 获取产生一个 `nx_eth_frames_rx_loan_t` 和调用方提供的片段视图。视图不足返回 `OVERFLOW`，不将帧出队或改变输出。即使 FCS 占据整个尾描述符，视图仍排除 FCS。令牌持有全部硬件描述符，直到精确释放。复制令牌不增加借用。过期、外部、语义字段被改变或重复的释放均拒绝。结构体填充字节不属于令牌身份。"
+
+msgid "Borrow, cancellation and recovery"
+msgstr "借用、取消与恢复"
+
+msgid "![FIG-06: admission establishes a borrow; cancellation and quarantine retain storage until actual withdrawal precedes SETTLED](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：准入建立借用；取消与隔离继续保留存储，直到实际撤离完成后才能发布 SETTLED](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "FIG-06: admission establishes a borrow; cancellation and quarantine retain storage until actual withdrawal precedes SETTLED"
+msgstr "FIG-06：准入建立借用；取消与隔离继续保留存储，直到实际撤离完成后才能发布 SETTLED"
+
+msgid "Accepted TX borrows the complete request, fragment array and every payload until acquire-observed `SETTLED`. A descriptor returning OWN does not release a fragment independently. RX bytes remain immutable while the complete-frame loan is held. The view array itself is an unretained output and may be reused after acquisition. Provider output storage must remain disjoint from provider state, rings, control objects and all active request/payload loans."
+msgstr "接受 TX 后，完整请求、片段数组及全部载荷一直被借用，直到以 acquire 语义观测到 `SETTLED`。单个描述符归还 OWN 不会独立释放片段。完整帧借用被持有时，RX 字节保持不可变。视图数组本身只是未保留的输出，可在获取后复用。provider 的输出存储必须与其状态、环、控制对象及全部活动请求／载荷借用分离。"
+
+msgid "The MAC has controller-wide TX withdrawal. Cancelling one pending request closes TX admission and drains other pending TX too; it does not invent per-frame abort support. Actual completed transmission may win cancellation. Timeout, cancellation and a failed drain never revoke a borrow. Failure to prove engine/MAC/FIFO quiet leaves requests `QUARANTINED` with their payload addresses retained."
+msgstr "MAC 仅提供控制器范围的 TX 撤离。取消一个待处理请求会关闭 TX 准入并排空其他待处理 TX，不虚构逐帧中止能力。实际完成的发送可以优先于取消。超时、取消和排空失败都不会撤销借用。无法证明引擎／MAC／FIFO 静止时，请求保留为`QUARANTINED`，载荷地址继续保留。"
+
+msgid "The STM32 ES0182 control-write workaround uses a finite volatile Device-read guard based on the leased HCLK. The guard exceeds four internal TX/RX clocks at the slowest supported 10 Mbit/s rate, including RMII's internal REF_CLK/20 divider. Four HCLK readbacks or the fastest possible 80 ns lower bound are insufficient. The guard applies to affected control writes, not packet poll/W1C writes. The shared GD32 mechanism keeps the same conservative discipline without attributing ST's silicon erratum to GD32. FIFO empty must be observed before issuing FTF; flushing a nonempty FIFO cannot manufacture cancellation proof."
+msgstr "STM32 ES0182 控制写规避措施依据租用的 HCLK，执行有限次 volatile Device读取。该间隔超过最慢所支持 10 Mbit/s 下的四个内部 TX／RX 时钟周期，包含RMII 内部 REF_CLK／20 分频。四次 HCLK 回读或最快情况下的 80 ns 下界都不足。该间隔用于受影响的控制写，不用于报文 poll／W1C 写。GD32 共享机制采用同样的保守顺序，但不将 ST 的硅勘误归于 GD32。发出 FTF 前必须观测 FIFO 已空；刷新非空 FIFO 不能制造取消完成的证明。"
+
+msgid "Stop closes new admission/acquisition and withdraws MAC/DMA/IRQ references before releasing storage. Held RX and captured wake publishers return `BUSY`. An optional wake sink remains borrowed until publishers exit; notification is a hint, not the completion predicate. The caller separately stops and joins external producers, consumers, waiters and observers before reclaiming their storage."
+msgstr "Stop 关闭新准入／获取，在释放存储前证明 MAC／DMA／IRQ 引用撤离。被持有的RX 或已捕获的 wake 发布者返回 `BUSY`。可选 wake 接收器一直被借用到发布者退出；通知只是提示，不是完成谓词。调用方在回收各自存储前，还须分别停止并join 外部生产者、消费者、等待者与观测者。"
+
+msgid "Explicit recovery belongs to the exclusive MAC owner. It rejects held RX or live publishers before issuing reset. Only acknowledged reset may detach incomplete TX and settle it with its locked failure cause. A reset timeout retains ownership; there is no automatic reset, retry or replay. Successful reset records an RX gap and advances the MAC clock epoch. Stop/start preserves RX-token incarnation and clock-epoch counters so old identities cannot become valid again."
+msgstr "显式恢复属于 MAC 的排他所有者。它在发出复位前拒绝被持有的 RX 或活动发布者。只有复位被实际确认后，才能撤离未完成 TX 并以已锁定失败原因结算。复位超时继续保留所有权，不自动复位、重试或重放。成功复位记录 RX 缺口并递增 MAC时钟 epoch。Stop／start 保留 RX 令牌代次和时钟 epoch 计数，防止旧身份再次有效。"
+
+msgid "Timestamp meaning"
+msgstr "时间戳含义"
+
+msgid "Every time fact uses the existing `nx_io_timestamp_t`. The assembly contract allocates one nonzero 32-bit domain from its namespace of real counters; applications cannot make unrelated counters comparable by assigning the same local device ID."
+msgstr "所有时间事实都使用已有 `nx_io_timestamp_t`。装配契约从实际计数器的统一命名空间分配一个非零 32 位 domain；应用不能通过赋予相同本地设备 ID，就使互不相关的计数器具备可比较性。"
+
+msgid "The selected clock uses digital nanosecond rollover, 20 ns subsecond increment and fine update. Its accumulator input is HCLK, with addend 1278264076 at 168 MHz or 1073741824 at 200 MHz. These values and stated units are not measured oscillator accuracy. The counter is not UTC, TAI or a synchronized network clock."
+msgstr "所选时钟使用数字纳秒回卷、20 ns 子秒增量和精细更新。累加器输入为 HCLK，168 MHz 时 addend 为 1278264076，200 MHz 时为 1073741824。上述数值和声明单位不代表量测的振荡器准确度。该计数器不是 UTC、TAI 或已同步网络时钟。"
+
+msgid "Observation"
+msgstr "观测"
+
+msgid "Source"
+msgstr "来源"
+
+msgid "Value"
+msgstr "数值"
+
+msgid "Valid TX last-descriptor or RX last-descriptor capture"
+msgstr "有效 TX 末描述符或 RX 末描述符捕获"
+
+msgid "`HARDWARE_EVENT`"
+msgstr "`HARDWARE_EVENT`"
+
+msgid "Extended nanosecond ticks from the MAC"
+msgstr "MAC 扩展纳秒 tick"
+
+msgid "Coherent current MAC-counter read"
+msgstr "一致读取当前 MAC 计数器"
+
+msgid "`SERVICE_OBSERVATION`"
+msgstr "`SERVICE_OBSERVATION`"
+
+msgid "Same domain, epoch and 1e9 ticks/second"
+msgstr "相同 domain、epoch 和每秒 1e9 tick"
+
+msgid "Consumer obtains an RX loan"
+msgstr "消费者取得 RX 借用"
+
+msgid "`ACQUIRE_OBSERVATION`"
+msgstr "`ACQUIRE_OBSERVATION`"
+
+msgid "Separate `acquired_us` in the core monotonic domain"
+msgstr "独立的核心单调域 `acquired_us`"
+
+msgid "Missing/corrupt capture"
+msgstr "缺失／损坏捕获"
+
+msgid "`UNKNOWN`"
+msgstr "`UNKNOWN`"
+
+msgid "No usable event measurement"
+msgstr "不具备可用事件量测"
+
+msgid "Capture validity comes from actual TTSS/TSV writeback. A valid zero capture is a real zero event. Missing validity never reuses a previous descriptor capture. All-ones or malformed raw capture records a separate corruption flag and an UNKNOWN stamp, without replacing it with acquisition time. Unknown uncertainty remains explicit; zero uncertainty is not invented."
+msgstr "捕获有效性来自实际 TTSS／TSV 回写。有效的零捕获是真实零事件。缺失有效位不会复用描述符的前次捕获。全一或格式错误的原始捕获记录独立损坏标志及UNKNOWN 时间戳，不用获取时间替代。不确定度未知保持显式，不能虚构零不确定度。"
+
+msgid "Coherent counter reads retry a seconds rollover. Natural 32-bit seconds wrap is extended without changing epoch. Reset/restart changes epoch. The owner rejects counter regression within one epoch, ambiguous observation/capture gaps and 64-bit tick overflow rather than assuming how many wraps elapsed. Timestamp comparison requires matching domain, epoch and rate. Products explicitly establish event pairing and any cross-clock mapping."
+msgstr "一致读取会在秒回卷时重试。自然 32 位秒回卷被扩展而不改变 epoch；复位／重启改变 epoch。所有者拒绝同一 epoch 内计数器回退、有歧义的观测／捕获间隔及64 位 tick 溢出，不假定经历了几次回卷。时间戳比较要求相同 domain、epoch和频率。产品显式建立事件配对及跨时钟映射。"
+
+msgid "Validation and remaining physical work"
+msgstr "验证与剩余物理工作"
+
+msgid "The maintained external MMIO model distinguishes visible register readback from internal latching, models W1C separately from read-only DMA process state, and refuses engine withdrawal/reset when fault controls request it. Native ingress and egress are explicit complete-frame events: they do not automatically service or settle the provider. Each model instance has its own counter and DMA identity."
+msgstr "已维护的外部 MMIO 模型区分可见寄存器回读与内部锁存，分别建模 W1C 和只读DMA 进程状态，并在故障控制要求时拒绝引擎撤离／复位。Native 收发是显式的完整帧事件，不会自动 service 或结算 provider。各模型实例具有独立计数器与 DMA 身份。"
+
+msgid "The Native source validates active loans under the same exclusion as provider settlement. A deterministic final-access regression lets the real provider settle an accepted request and lets its consumer legally protect the reclaimed page; an old unprotected reader faults. This establishes that software boundary and does not substitute for physical DMA or complete concurrent-system qualification."
+msgstr "Native 源在与 provider 结算相同的排他域中验证活动借用。确定性的最终访问回归让真实 provider 结算已接受请求，随后让消费者合法保护已回收页；旧的未受保护读取会触发故障。这仅证明该软件边界，不代替物理 DMA 或完整并发系统资格。"
+
+msgid "Executed host validation contains 108 public/common/family/Native cases plus six factory cases for each canonical assembly, with no failures or skips. Factory cases exercise real System/GPIO/provider code against one shared clock/timer oracle and actual DMA-visible addresses. Both canonical ARM configurations compile and link with the selected sources. Station evidence remains separate: verify PHY clock/reset, routes and electrical levels, both link rates, DMA traffic under load, control-write timing, VLAN preservation, error/drain/reset, PTP capture behavior and measured clock accuracy on actual boards."
+msgstr "已执行的主机验证包含 108 个公共／共享引擎／系列／Native 用例，加上每个规范装配各六个工厂用例，全部无失败、无跳过。工厂用例针对同一共享时钟／定时器oracle 和实际 DMA 可达地址，执行真实 System／GPIO／provider 代码。两个规范ARM 配置均使用所选源码编译和链接通过。工位证据保持独立：在实板验证 PHY 时钟／复位、路由与电平、两种链路速率、负载下DMA 流量、控制写间隔、VLAN 保留、错误／排空／复位、PTP 捕获行为及量测的时钟准确度。"
+
+msgid "The known GD32 ENET inter-frame-gap limitation remains a physical qualification constraint; this software mode does not assert IEEE timing conformance from host models. Protocol stacks, PHY/PCB policy, time synchronization and application products remain external platform consumers."
+msgstr "已知 GD32 ENET 帧间隔限制仍是物理资格约束；本软件模式不能凭主机模型声明IEEE 时序符合性。协议栈、PHY／PCB 策略、时间同步及应用产品仍是外部平台消费者。"

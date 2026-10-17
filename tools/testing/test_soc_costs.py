@@ -166,6 +166,63 @@ class SocCostsTests(unittest.TestCase):
     def test_duplicate_function_selection_is_rejected(self):
         self.bad_observe(symbols=["Reset_Handler", "Reset_Handler"])
 
+    def test_actual_duplicate_locals_require_validated_symbol_identity(self):
+        from tools.measurement.elf import Elf32
+        sources = []
+        for index in range(2):
+            source = self.output / f"local{index}.S"
+            source.write_text(
+                '.syntax unified\n.thumb\n.eabi_attribute 28,1\n.file "local' +
+                str(index) + '.c"\n'
+                '.section .text.local,"ax",%progbits\n'
+                '.local repeated_local\n.type repeated_local,%function\n'
+                '.thumb_func\nrepeated_local:\nmovs r0,#' + str(index) +
+                '\nbx lr\n.size repeated_local,.-repeated_local\n')
+            sources.append(source)
+        image = self.output / "locals.elf"
+        subprocess.run([
+            self.compiler, "-mcpu=cortex-m4", "-mthumb", "-mfpu=fpv4-sp-d16",
+            "-mfloat-abi=hard", "-nostdlib", "-Wl,--build-id=none",
+            "-T", str(self.fixture / "memory.ld"),
+            str(self.fixture / "image.c"), *map(str, sources), "-o", str(image)
+        ], check=True, capture_output=True, timeout=30)
+        elf = Elf32(image.read_bytes())
+        raw = subprocess.run([self.objdump, "-d", str(image)], check=True,
+                             capture_output=True, timeout=30).stdout
+        symbols = [(index, symbol) for index, symbol in
+                   enumerate(elf.defined_symbols)
+                   if symbol["name"] == "repeated_local"]
+        self.assertEqual(2, len(symbols))
+        self.assertNotEqual(symbols[0][1]["value"], symbols[1][1]["value"])
+        self.assertTrue(callable(getattr(soc_costs, "decode_symbol", None)),
+                        "actual ELF symbol identity decoder is missing")
+        with self.assertRaises(EvidenceError):
+            soc_costs.decode_function(elf, "repeated_local", raw)
+        selected = []
+        for index, symbol in symbols:
+            start = symbol["value"] & ~1
+            lines = []
+            for line in raw.decode("ascii").splitlines(keepends=True):
+                match = re.match(r"^\s*([0-9a-f]+):\s", line)
+                if match and start <= int(match[1], 16) < start + symbol["size"]:
+                    lines.append(line)
+            decoded_raw = "".join(lines).encode("ascii")
+            selected.append(decoded_raw)
+            report = soc_costs.decode_symbol(elf, index, decoded_raw)
+            self.assertEqual(start, report["address"])
+            self.assertEqual("repeated_local", report["symbol"])
+            self.assertEqual(2, report["static_instructions"])
+        with self.assertRaises(EvidenceError):
+            soc_costs.decode_symbol(elf, symbols[0][0], selected[1])
+        for index in (True, -1, len(elf.defined_symbols)):
+            with self.subTest(index=index), self.assertRaises(EvidenceError):
+                soc_costs.decode_symbol(elf, index, selected[0])
+        non_function = next(index for index, symbol in
+                            enumerate(elf.defined_symbols)
+                            if symbol["type"] != 2)
+        with self.assertRaises(EvidenceError):
+            soc_costs.decode_symbol(elf, non_function, selected[0])
+
     def test_symbol_cannot_inject_adapter_options(self):
         self.bad_observe(symbols=["--help"])
 

@@ -1,4 +1,16 @@
 # Actual H743 provider sources with real fixed SDK register definitions.
+nexus_google_test(nexus_h743_clock_test SOURCES h743_clock_test.cpp
+    h743_clock_model.cpp h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32h743/clock.c"
+    LIBRARIES Nexus::IO Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+target_include_directories(nexus_h743_clock_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
+    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+target_compile_definitions(nexus_h743_clock_test PRIVATE STM32H743xx)
+target_compile_options(nexus_h743_clock_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_clock_model.h")
+
 nexus_google_test(nexus_h743_memory_test SOURCES h743_memory_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/memory_init.c"
     LIBRARIES Nexus::IO
@@ -145,3 +157,19 @@ target_include_directories(nexus_h743_i2c_v2_test SYSTEM PRIVATE
 target_compile_definitions(nexus_h743_i2c_v2_test PRIVATE STM32H743xx)
 target_compile_options(nexus_h743_i2c_v2_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_i2c_v2_model.h")
+
+# One external physical image is shared by unit and normal factory consumers.
+foreach(h743_flash_target nexus_h743_conversion_test
+        nexus_h743_peripheral_factory_test)
+    target_sources(${h743_flash_target} PRIVATE h743_flash_image_model.cpp
+        h743_flash_fixture.cpp h743_flash_ram_closure_model.cpp
+        h743_flash_mpu_model.cpp ${h743_flash_ram_production_sources}
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c")
+    target_compile_options(${h743_flash_target} PRIVATE
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h"
+        "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_mpu_model.h")
+endforeach()
+target_sources(nexus_h743_peripheral_factory_test PRIVATE
+    h743_flash_fixture_generated.cpp)
+target_link_options(nexus_h743_peripheral_factory_test PRIVATE
+    "-Wl,--wrap=nx_stm32h743_flash_ram_initialize")

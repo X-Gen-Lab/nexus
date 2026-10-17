@@ -41,6 +41,7 @@ extern "C" {
 #define CAP_PSC     TIMER_PSC(TIMER3)
 #define CAP_ARR     TIMER_CAR(TIMER3)
 #define CAP_CCR     TIMER_CH0CV(TIMER3)
+#define CAP_EGR     TIMER_SWEVG(TIMER3)
 #define CAP_CCMR    TIMER_CHCTL0(TIMER3)
 #define CAP_CCER    TIMER_CHCTL2(TIMER3)
 #define CAP_DIER    TIMER_DMAINTEN(TIMER3)
@@ -74,6 +75,7 @@ extern "C" {
 #define CAP_PSC     TIM4->PSC
 #define CAP_ARR     TIM4->ARR
 #define CAP_CCR     TIM4->CCR1
+#define CAP_EGR     TIM4->EGR
 #define CAP_CCMR    TIM4->CCMR1
 #define CAP_CCER    TIM4->CCER
 #define CAP_DIER    TIM4->DIER
@@ -145,6 +147,9 @@ extern "C" void nx_timer_model_write(volatile uint32_t* address,
         *address &= value;
     } else {
         *address = value;
+    }
+    if (address == &CAP_EGR && (value & 1U) != 0U && (CAP_CR1 & 2U) == 0U) {
+        CAP_SR |= 1U;
     }
     if (address == &ADV_BDTR && (value & 32768U) != 0U && s_break_on_enable) {
         BREAK_INPUT |= 4096U;

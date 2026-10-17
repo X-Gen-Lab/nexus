@@ -54,6 +54,51 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         document = (ROOT / capabilities.DOCUMENT).read_text()
         capabilities.check_block(document, expected)
 
+    def test_redistributed_references_preserve_selected_source_provenance(self):
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        fixtures = sorted(directory.glob("*.toml"))
+        self.assertTrue(fixtures)
+        rows = capabilities.collect(ROOT)
+        for fixture in fixtures:
+            resolved = capabilities.configure.resolve(fixture, ROOT)
+            relative = fixture.relative_to(ROOT).as_posix()
+            for item in resolved["controllers"]:
+                with self.subTest(fixture=fixture.name, device=item["id"]):
+                    selected = [row for row in rows if
+                                (row["family"], row["controller"], row["kind"],
+                                 row["mode"]) ==
+                                (resolved["soc_family"], item["controller"],
+                                 item["kind"], item["mode"])]
+                    self.assertEqual(len(selected), 1)
+                    self.assertIn(relative, selected[0]["fixtures"])
+                    self.assertTrue(selected[0]["exports"])
+
+    def test_alternate_interface_uses_its_exact_route_and_source_on_one_timer(self):
+        rows = capabilities.collect(ROOT)
+        timer = [row for row in rows if row["family"] == "stm32g474" and
+                 row["controller"] == "TIM3"]
+        self.assertEqual({(row["kind"], row["mode"]) for row in timer},
+                         {("pwm", "fixed-pwm"),
+                          ("pwm", "shared-fixed-pwm"),
+                          ("encoder", "quadrature")})
+        encoder = next(row for row in timer if row["kind"] == "encoder")
+        pwm = next(row for row in timer if row["mode"] == "fixed-pwm")
+        shared = next(row for row in timer
+                      if row["mode"] == "shared-fixed-pwm")
+        self.assertEqual(encoder["routes"], ["tim3-encoder-pa6-pa7"])
+        self.assertEqual(pwm["routes"], ["tim3-ch1-pa6"])
+        self.assertEqual(shared["routes"], ["tim3-ch1-pa6", "tim3-ch2-pa7"])
+        self.assertEqual(shared["exports"],
+                         ["soc/stm32g474/drivers/pwm_shared.c"])
+        self.assertIn("cmake/package/verification/io_evolution/"
+                      "g474-pwm-shared.toml",
+                      shared["fixtures"])
+        self.assertEqual(encoder["exports"],
+                         ["soc/stm32g474/drivers/encoder.c"])
+        self.assertIn("tests/contracts/g474_control_assembly/encoder.toml",
+                      encoder["fixtures"])
+        self.assertEqual(encoder["boards"], [])
+
 
 class AgentMaintenanceTests(unittest.TestCase):
     def setUp(self):

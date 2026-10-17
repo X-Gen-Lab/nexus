@@ -11,11 +11,39 @@ except ImportError:
 
 
 class DescriptorBoundaryTests(unittest.TestCase):
+    def test_coupled_g474_generator_inputs_are_part_of_source_identity(self):
+        from tools.configure import dependencies
+
+        names = set(dependencies._names("platform", "stm32g474"))
+        self.assertIn("tools/configure/coupled_io.py", names)
+        self.assertIn("tools/configure/providers/stm32g474/coupled.py", names)
+        native = set(dependencies._names("platform", "native"))
+        self.assertNotIn("tools/configure/providers/stm32g474/coupled.py", native)
+
     def test_h743_dma_configuration_binds_private_provider_payload(self):
         payload = descriptor.maintained("stm32h743").owned_payload
         for name in ("soc/stm32h743/drivers/uart_dma.c",
                      "soc/stm32h743/private/stm32h743_dma.h"):
             self.assertIn(name, payload)
+
+    def test_h743_flash_configuration_binds_the_complete_private_ram_pod(self):
+        from tools.configure import dependencies
+
+        payload = set(descriptor.maintained("stm32h743").owned_payload)
+        required = {"soc/stm32h743/" + name for name in (
+            "drivers/flash_ram.c", "drivers/flash_ram_owner.c",
+            "drivers/flash_ram_transaction.c", "drivers/flash_mpu.c",
+            "drivers/flash_ram_enter.S", "private/stm32h743_flash_ram.h",
+            "private/stm32h743_flash_ram_layout.h",
+            "private/stm32h743_flash_mpu.h")}
+        self.assertTrue(required <= payload, sorted(required - payload))
+        names = set(dependencies._names("platform", "stm32h743"))
+        # CMake owns firmware inputs; generator identity binds the descriptor,
+        # not a competing collection of C/ASM compilation units.
+        self.assertTrue(required.isdisjoint(names))
+        self.assertIn("tools/configure/providers/descriptor.py", names)
+        self.assertTrue(required.isdisjoint(
+            dependencies._names("platform", "native")))
 
     def test_native_configuration_does_not_import_unselected_physical_families(self):
         run = subprocess.run([sys.executable, "-B", "-c",
@@ -48,8 +76,10 @@ class DescriptorBoundaryTests(unittest.TestCase):
             ("cmsis_core", "vendors/arm/CMSIS_5"),
             ("cmsis_device_f4", "vendors/st/cmsis_device_f4"),
             ("hal_driver_f4", "vendors/st/stm32f4_hal")))
-        self.assertEqual(g4.git_dependencies[-1], (
-            "cmsis_device_g4", "vendors/st/cmsis_device_g4"))
+        self.assertEqual(g4.git_dependencies, (
+            ("cmsis_core", "vendors/arm/CMSIS_5"),
+            ("cmsis_device_g4", "vendors/st/cmsis_device_g4"),
+            ("hal_driver_g4", "vendors/st/stm32g4_hal")))
         self.assertEqual(descriptor.maintained("gd32f470").import_lock,
                          "vendors/gigadevice/gd32f4xx/source.lock.json")
 
