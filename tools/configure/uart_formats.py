@@ -10,6 +10,12 @@ DEFAULT = {"data_bits": 8, "parity": "none", "stop_bits": 1, "flow": "none"}
 
 def validate(selection, route, provider):
     """Do not infer flow-control wiring or reinterpret word data as bytes."""
+    if "irq_probe" in selection:
+        if type(selection["irq_probe"]) is not bool:
+            fail("UART IRQ probe must be boolean")
+        if selection["irq_probe"] and (provider.PREFIX not in {"stm32", "gd32"} or
+                                      selection["mode"] != "irq-words"):
+            fail("UART IRQ probe requires a reviewed physical word vector")
     frame = selection.get("frame")
     words = selection["mode"] == "irq-words"
     if frame is None:
@@ -59,3 +65,37 @@ def changed(item):
     return frame is not None and (
         frame.data_bits, frame.parity, frame.stop_bits, frame.flow) != (
             8, "none", 1, "none")
+
+
+def probed(result):
+    """Selected physical word vectors, without changing default provider state."""
+    return tuple(item for item in result.controllers if item.kind == "uart" and
+                 item.options.irq is not None and item.options.irq.probe)
+
+
+def irq_call(item, call):
+    """Keep the direct dispatch unchanged and optional observation outside it."""
+    if not item.options.irq.probe:
+        return call
+    vector = item.controller
+    return (f"NX_IO_IRQ_PROBE_BEGIN({vector}); " + call +
+            f" NX_IO_IRQ_PROBE_END({vector});")
+
+
+def emit_probe_factory(result):
+    """One immutable identity per selected physical vector, using word IDs."""
+    selected = probed(result)
+    if not selected:
+        return [], []
+    header = ['#include "nexus/io/cycle_probe.h"',
+              '/** \\brief Pure lookup; snapshot copies optional raw IRQ facts. */',
+              'const nx_io_cycle_probe_t* nx_factory_uart_word_irq_probe(',
+              '    nx_uart_word_id_t id);']
+    source = ['const nx_io_cycle_probe_t* nx_factory_uart_word_irq_probe(',
+              '    nx_uart_word_id_t id) {', '    switch (id) {']
+    for item in selected:
+        name = item.id.replace("-", "_").upper()
+        source += [f'        case NX_UART_WORD_ID_{name}:',
+                   f'            return &nx_io_irq_probe_{item.controller};']
+    return header, source + ['        default:', '            return NULL;',
+                             '    }', '}']

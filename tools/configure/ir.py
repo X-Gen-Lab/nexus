@@ -49,6 +49,7 @@ class Record(Mapping):
 class IrqOptions:
     priority: int
     calls_os: bool
+    probe: bool = False
 
 
 @dataclass(frozen=True)
@@ -182,12 +183,43 @@ class UartFrameOptions:
 
 
 @dataclass(frozen=True)
+class StreamProfileIR(Record):
+    max_units_per_second: int
+    units_per_block: int
+    blocks: int
+    release_delay_us: int
+    target_delay_us: int
+    hardware_targets: int
+    spare_blocks: int
+    unit_bytes: int
+    counter_units_per_block: int
+    retained_blocks: int
+    required_blocks: int
+    required_payload_bytes: int
+    configured_payload_bytes: int
+    block_fill_us: int
+    producer_control: str
+    provenance: str
+    physical_qualified: bool
+    source: str
+    on_exhaustion: str
+    values: Mapping
+
+    @classmethod
+    def from_validated(cls, values):
+        fields = cls.__dataclass_fields__.keys() - {"values"}
+        return cls(**{name: values[name] for name in fields},
+                   values=freeze(values))
+
+
+@dataclass(frozen=True)
 class UartOptions:
     baud: int
     rx_profile: str
     rx_capacity: int | None
     irq: IrqOptions
     frame: UartFrameOptions | None = None
+    stream_profile: StreamProfileIR | None = None
 
 
 @dataclass(frozen=True)
@@ -227,6 +259,25 @@ class ExtiOptions:
 
 
 @dataclass(frozen=True)
+class EncoderOptions:
+    counting: str
+    filter_a: int
+    filter_b: int
+    invert_a: bool
+    invert_b: bool
+    exclusive: bool
+
+
+@dataclass(frozen=True)
+class PwmGroupOptions:
+    tick_hz: int
+    period_ticks: int
+    deadtime_ticks: int
+    exclusive: bool
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
 class PwmOptions:
     period_ticks: int
     duty_ticks: int
@@ -240,6 +291,7 @@ class AdcOptions:
     reference_mv: int
     timeout_ms: int | None
     irq: IrqOptions | None
+    stream_profile: StreamProfileIR | None = None
 
 
 @dataclass(frozen=True)
@@ -341,7 +393,7 @@ class NoOptions:
 
 
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
-                     ExtiOptions | PwmOptions | AdcOptions | CanOptions |
+                     ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | TimerCaptureOptions |
                      AdvancedPwmOptions | NoOptions)
 
@@ -349,7 +401,8 @@ ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
 def mode_options(values):
     """Project one validated mode into immutable named constructor arguments."""
     kind = values["kind"]
-    irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False))
+    irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False),
+                      values.get("irq_probe", False))
            if "irq_priority" in values else None)
     if kind == "can":
         return CanOptions(values["operation"], values["event_capacity"],
@@ -360,6 +413,12 @@ def mode_options(values):
         return UsbDeviceOptions(*(values[key] for key in (
             "event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",
             "drain_timeout_us", "clock_timeout_us")), irq)
+    if kind == "encoder":
+        return EncoderOptions(*(values[key] for key in (
+            "counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive")))
+    if kind == "pwm_group":
+        return PwmGroupOptions(*(values[key] for key in (
+            "tick_hz", "period_ticks", "deadtime_ticks", "exclusive")), irq)
     if kind == "timer_capture":
         return TimerCaptureOptions(*(values[key] for key in (
             "tick_hz", "edge", "filter", "exclusive")), irq)
@@ -377,7 +436,10 @@ def mode_options(values):
         return UartOptions(values["baud"], values["rx_profile"],
                            values.get("rx_capacity"), irq,
                            UartFrameOptions(**values["frame"])
-                           if "frame" in values else None)
+                           if "frame" in values else None,
+                           StreamProfileIR.from_validated(
+                               values["stream_resolution"])
+                           if "stream_resolution" in values else None)
     if kind == "spi":
         return SpiOptions(values.get("max_hz", 1000000), irq)
     if kind == "i2c":
@@ -393,7 +455,10 @@ def mode_options(values):
     if kind == "adc":
         return AdcOptions(tuple(values["channels"]),
                           tuple(values["sample_times"]), values["reference_mv"],
-                          values.get("timeout_ms"), irq)
+                          values.get("timeout_ms"), irq,
+                          StreamProfileIR.from_validated(
+                              values["stream_resolution"])
+                          if "stream_resolution" in values else None)
     if kind in {"flash", "watchdog"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")

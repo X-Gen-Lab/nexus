@@ -64,7 +64,7 @@ IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = physical_facts.GPIO_PIN
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "pwm", "adc", "can", "usb_device", "eth",
-         "timer_capture", "advanced_pwm"}
+         "timer_capture", "advanced_pwm", "pwm_group", "encoder"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -328,7 +328,7 @@ def validate_soc(soc, part):
         identity(name, "controller")
         obj(controller, {"kind", "modes", "irq", "pins"},
             {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
-             "fifo_words", "endpoint_numbers"}, name)
+             "fifo_words", "endpoint_numbers", "interfaces"}, name)
         if controller["kind"] not in KINDS:
             fail(f"Unmaintained controller kind: {controller['kind']}")
         for field in ("modes", "irq", "pins"):
@@ -340,6 +340,22 @@ def validate_soc(soc, part):
             fail(f"Controller {name} has no maintained mode")
         for mode in controller["modes"]:
             provider.mode_implementation(controller["kind"], mode)
+        # Primary kind names the existing default public interface. Reviewed
+        # personalities share this physical controller and its resource claim.
+        interfaces = obj(controller.get("interfaces", {}), (), KINDS,
+                         name + ".interfaces")
+        if controller["kind"] in interfaces:
+            fail("Controller interfaces cannot repeat its primary kind")
+        reviewed = getattr(provider, "CONTROLLER_INTERFACES", {}).get(name, {})
+        if set(interfaces) != set(reviewed):
+            fail("Controller interfaces differ from reviewed provider facts")
+        for kind, modes in interfaces.items():
+            modes = sequence(modes, name + ".interfaces." + kind)
+            unique(modes, "controller interface modes")
+            if not modes or tuple(modes) != reviewed[kind]:
+                fail("Controller interface modes differ from reviewed facts")
+            for mode in modes:
+                provider.mode_implementation(kind, text(mode, "interface mode"))
         for resource in sequence(controller.get("resources", []),
                                  f"{name}.resources"):
             validate_resource_fact(resource, provider, "SoC resource")
@@ -391,9 +407,12 @@ def resolve_routes(routes_doc, soc, part, provider):
         if any(value not in soc["variants"] for value in route["variants"]):
             fail(f"Route {route['id']} has unknown exact variant")
         controller = soc["controllers"].get(route["controller"])
-        if not controller or controller["kind"] != route["kind"]:
+        modes = (None if controller is None else
+                 controller["modes"] if controller["kind"] == route["kind"] else
+                 controller.get("interfaces", {}).get(route["kind"]))
+        if modes is None:
             fail(f"Route {route['id']} does not match a maintained controller")
-        if not set(route["modes"]).issubset(controller["modes"]):
+        if not set(route["modes"]).issubset(modes):
             fail(f"Route {route['id']} advertises unsupported modes")
         for dma in sequence(route.get("dma", []), "DMA route"):
             provider.dma_irq(text(dma, "DMA route resource"))
@@ -693,7 +712,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                  "fifo_order", "rx_fifo_words", "vbus_sensing", "clock_timeout_us",
                  "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
                  "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
-                 "idle_complement_high", "frame"}, "controller selection")
+                 "idle_complement_high", "frame", "stream", "irq_probe",
+                 "counting", "filter_a", "filter_b", "invert_a", "invert_b"}, "controller selection")
             name = identity(selection["id"], "instance id")
             c_identity(name)
             instance_ids.append(name)
@@ -772,6 +792,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     import i2c_timing_selection
                 resolved_timing = i2c_timing_selection.resolve(
                     selection, clock, provider)
+            try:
+                from . import stream_profiles
+            except ImportError:
+                import stream_profiles
+            resolved_stream = stream_profiles.resolve(
+                selection, route["kind"], provider)
             selected.append({**selection, "controller": route["controller"],
                              "kind": route["kind"], "route": route["id"],
                              "pins": route["pins"], "initial": binding.get("initial", 0),
@@ -779,7 +805,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                              **({"dma": route_dma(route, mode)} if traits.dma else {}),
                              **({"timing_resolution": resolved_timing}
                                 if resolved_timing is not None else {}),
+                             **({"stream_resolution": resolved_stream}
+                                if resolved_stream is not None else {}),
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
+    if (family == "stm32h743" and provider.cache_mask(assembly["clock_profile"]) != 0
+            and any(item["kind"] == "flash" for item in selected)):
+        fail("H743 physical Flash requires the reviewed cache-off timing owner")
     unique(instance_ids, "controller instance IDs")
     unique([c_id(name).upper() for name in instance_ids], "generated C identifiers")
     can_domain = can.resolve_domain(assembly.get("can_domain"), selected,
@@ -839,11 +870,15 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     fail("Long I2C requires a maintained polling V2 provider")
             if device["driver"] == "spi-dma-transaction":
                 allowed = {"stm32f407": ("SPI1", "dma"),
-                           "gd32f470": ("SPI4", "dma-full-duplex")}
+                           "gd32f470": ("SPI4", "dma-full-duplex"),
+                           "native": (controller["controller"], "async-model")}
                 if (controller["kind"] != "spi" or family not in allowed or
                         (controller["controller"], controller["mode"]) !=
                         allowed[family]):
                     fail("SPI DMA transaction requires a reviewed DMA mode")
+            if family == "native" and controller["mode"] == "async-model":
+                if device["driver"] != "spi-dma-transaction" or "model_bytes" in device:
+                    fail("Native async SPI requires enhanced echo transactions without model_bytes")
             if device["driver"] == "bmp280" and controller["kind"] != "spi":
                 fail("BMP280 currently requires its maintained SPI transport")
             if device["driver"] == "spi-endpoint" and controller["kind"] != "spi":
@@ -893,6 +928,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     usb_device.complete_plan(selected, assembly["devices"], claim)
     for controller in selected:
         children = [item for item in assembly["devices"] if item["controller"] == controller["id"]]
+        if (family == "native" and controller["kind"] == "spi" and
+                controller["mode"] == "async-model" and not children):
+            fail("Native async SPI requires at least one explicit enhanced endpoint")
         if any(item["driver"] == "spi-dma-transaction" for item in children):
             if any(item["driver"] != "spi-dma-transaction" for item in children):
                 fail("SPI DMA sequence requires all endpoints; mixed faces forbidden")
@@ -1062,6 +1100,13 @@ def generate(result, output):
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
               *metadata.header_lines(thaw(result["platform_metadata"]))]
+    probes = any(getattr(getattr(item.options, "irq", None), "probe", False)
+                 for item in result.controllers)
+    if probes:
+        header += ["#if defined(NX_IO_CYCLE_PROBES) && NX_IO_CYCLE_PROBES != 1",
+                   '#error "Probe choice must match the selected Platform usage"',
+                   "#endif", "#ifndef NX_IO_CYCLE_PROBES",
+                   "#define NX_IO_CYCLE_PROBES 1", "#endif"]
     if result["clock"]["source"] == "hse":
         header.insert(7, f'#define NEXUS_HSE_HZ {result["clock"]["input_hz"]}u')
     if result["soc_family"] == "stm32h743":
@@ -1079,6 +1124,7 @@ def generate(result, output):
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
+    cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
     for selection in result.controllers:
         prefix = "NEXUS_" + c_id(selection.id).upper()
         header.append(f"#define {prefix}_SELECTED 1")

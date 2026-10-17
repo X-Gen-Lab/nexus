@@ -33,7 +33,7 @@ class HilPlatformExtensionTests(unittest.TestCase):
 
     def test_current_protocol_inventory_has_no_invented_observations(self):
         report = self.fixture.plan()
-        self.assertEqual(len(report["cases"]), 21)
+        self.assertEqual(len(report["cases"]), 25)
         for item in report["cases"]:
             self.assertEqual(item["status"], "not_executed")
             self.assertTrue(all(value is None

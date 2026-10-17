@@ -2,6 +2,8 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "encoder": {"binding", "mode", "counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
+    "pwm_group": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq"},
     "timer_capture": {"binding", "mode", "tick_hz", "edge", "filter", "exclusive", "irq"},
     "advanced_pwm": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks",
                      "break_active_high", "idle_high", "idle_complement_high", "exclusive", "irq"},
@@ -13,14 +15,14 @@ INSTANCE_FIELDS = {
     "can": {"binding", "mode", "operation", "event_capacity", "bitrate",
             "timing", "irq", "drain_timeout_us", "poll_limit", "fifo_order"},
     "gpio": {"binding", "mode"},
-    "uart": {"binding", "mode", "baud", "rx", "irq", "frame"},
+    "uart": {"binding", "mode", "baud", "rx", "irq", "frame", "stream"},
     "spi": {"binding", "mode", "max_hz", "irq"},
     "i2c": {"binding", "mode", "max_hz", "irq", "timing"},
     "flash": {"binding", "mode"},
     "watchdog": {"binding", "mode"},
     "exti": {"binding", "mode", "edge", "event_capacity", "irq"},
     "pwm": {"binding", "mode", "period_ticks", "duty_ticks", "tick_hz"},
-    "adc": {"binding", "mode", "channels", "sample_times", "reference_mv", "timeout_ms", "irq"},
+    "adc": {"binding", "mode", "channels", "sample_times", "reference_mv", "timeout_ms", "irq", "stream"},
 }
 KINDS = set(INSTANCE_FIELDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
@@ -71,17 +73,19 @@ def normalize(data, path, root, fail, obj, integer, text):
             selection["authored_kind"] = kind
             if kind == "uart":
                 obj(selection, {"id", "authored_kind", "binding", "mode", "baud", "rx", "irq"},
-                    {"frame"}, f"uart.{name}")
+                    {"frame", "stream"}, f"uart.{name}")
                 rx = obj(selection.pop("rx"), {"format"}, {"capacity"}, f"uart.{name}.rx")
-                irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"uart.{name}.irq")
+                irq = obj(selection.pop("irq"), {"priority"}, {"calls_os", "probe"}, f"uart.{name}.irq")
                 selection.update(rx_profile=rx["format"], irq_priority=irq["priority"])
                 if "capacity" in rx:
                     selection["rx_capacity"] = rx["capacity"]
                 if "calls_os" in irq:
                     selection["calls_os"] = irq["calls_os"]
+                if "probe" in irq:
+                    selection["irq_probe"] = irq["probe"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth", "timer_capture", "advanced_pwm"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -150,13 +154,13 @@ def editor_schema():
                    "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo",
                    "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words",
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
-                   "filter", "deadtime_ticks"}
+                   "filter", "filter_a", "filter_b", "deadtime_ticks"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
             properties[name] = {"type": "array", "items": {"type": "integer", "minimum": 0}}
         for name in fields & {"fifo_order", "remote", "match_remote", "vbus_sensing",
-                             "break_active_high", "idle_high", "idle_complement_high", "exclusive"}:
+                             "break_active_high", "idle_high", "idle_complement_high", "exclusive", "invert_a", "invert_b"}:
             properties[name] = {"type": "boolean"}
         if "timing" in fields:
             properties["timing"] = record(
@@ -179,6 +183,16 @@ def editor_schema():
             frame["stop_bits"] = {"enum": [1, 2]}
             frame["parity"] = {"enum": ["none", "even", "odd"]}
             frame["flow"] = {"const": "none"}
+        if "stream" in fields:
+            stream_fields = {"max_units_per_second", "units_per_block",
+                             "blocks", "release_delay_us", "target_delay_us",
+                             "on_exhaustion", "source"}
+            stream = record(stream_fields, stream_fields)
+            for name in stream_fields - {"on_exhaustion", "source"}:
+                stream["properties"][name] = {"type": "integer", "minimum": 0}
+            stream["properties"]["on_exhaustion"] = {
+                "const": "stop-and-report-gap"}
+            properties["stream"] = stream
         return {"type": "object", "properties": properties,
                 "required": sorted(required), "additionalProperties": False}
     schema = record(TOP_REQUIRED | TOP_OPTIONAL | KINDS | {"spi_device", "i2c_device", "usb_endpoint"},
@@ -215,6 +229,9 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "uart":
+            irq = properties[kind]["additionalProperties"]["properties"]["irq"]
+            irq["properties"]["probe"] = {"type": "boolean"}
         if kind == "i2c":
             timing_fields = {"kernel_hz_min", "kernel_hz_max", "pclk_hz_min",
                              "bus_hz_min", "rise_ns_max", "fall_ns_max", "source"}

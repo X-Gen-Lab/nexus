@@ -132,3 +132,33 @@ def emit_traits(result):
                        f'            return &s_nx_traits_{namespace}_{name};']
         source += ['        default:', '            return NULL;', '    }', '}']
     return header, source
+
+
+def emit_owner_factory(result):
+    """Bind each enhanced owner to its exact provider membership proof."""
+    selected = [item for item in result.controllers
+                if item.interface_kind == "spi_dma_transaction"]
+    if not selected:
+        return [], []
+    prefixes = {"stm32f407": "stm32", "gd32f470": "gd32", "native": "native"}
+    header = ['#include "nexus/io/spi_dma_owner_binding.h"',
+              '/** \\brief Pure lookup of the selected physical/model owner. */',
+              'const nx_spi_dma_owner_binding_t* nx_factory_spi_dma_owner_binding(',
+              '    nx_spi_dma_transaction_id_t id);']
+    source = []
+    for item in selected:
+        name = item.id.replace("-", "_")
+        prefix = prefixes[item.provider]
+        source += [f'static const nx_spi_dma_owner_binding_t s_nx_spi_owner_{name} = {{',
+                   f'    .port = &s_nx_face_{name},',
+                   f'    .contains = nx_{prefix}_spi_dma_owner_contains,',
+                   f'    .attach_wake = nx_{prefix}_spi_dma_owner_attach_wake',
+                   '};']
+    source += ['const nx_spi_dma_owner_binding_t* nx_factory_spi_dma_owner_binding(',
+               '    nx_spi_dma_transaction_id_t id) {', '    switch (id) {']
+    for item in selected:
+        name = item.id.replace("-", "_")
+        source += [f'        case NX_SPI_DMA_TRANSACTION_ID_{name.upper()}:',
+                   f'            return &s_nx_spi_owner_{name};']
+    return header, source + ['        default:', '            return NULL;',
+                             '    }', '}']

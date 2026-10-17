@@ -147,6 +147,20 @@ static inline nx_result_t nx_stm32g474_irq_control(int irq, bool enabled,
 #define NX_G474_IRQ_CONTROL(irq, enabled, priority)                            \
     nx_stm32g474_irq_control((irq), (enabled), (priority))
 #endif
+#ifndef NX_G474_IRQ_PRIORITY
+#define NX_G474_IRQ_PRIORITY(irq) NVIC_GetPriority((IRQn_Type)(irq))
+#endif
+#ifndef NX_G474_IRQ_PRIORITY_WRITE
+/** \brief Restore one exclusively owned logical priority without enabling it.
+ */
+static inline void nx_stm32g474_irq_priority_write(int irq, uint32_t priority) {
+    NVIC_SetPriority((IRQn_Type)irq, priority);
+    nx_arch_dsb();
+    nx_arch_isb();
+}
+#define NX_G474_IRQ_PRIORITY_WRITE(irq, priority)                              \
+    nx_stm32g474_irq_priority_write((irq), (priority))
+#endif
 #ifdef __cplusplus
 }
 #endif

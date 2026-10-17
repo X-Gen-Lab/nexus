@@ -650,32 +650,59 @@
       "modes": [
         "fixed-pwm"
       ],
-      "irq": [],
+      "irq": [
+        "TIM3_IRQn"
+      ],
       "clock_hz": 170000000,
       "pins": [
-        "PA6"
+        "PA6",
+        "PA7"
+      ],
+      "interfaces": {
+        "encoder": [
+          "quadrature"
+        ]
+      },
+      "irq_numbers": [
+        29
       ]
     },
     "ADC1": {
       "kind": "adc",
-      "modes": ["single-shot", "trigger-dma"],
+      "modes": [
+        "single-shot",
+        "trigger-dma"
+      ],
       "irq": [],
-      "pins": ["PA0"],
+      "pins": [
+        "PA0"
+      ],
       "clock_hz": 1328125
     },
     "I2C1": {
       "kind": "i2c",
-      "modes": ["poll-messages"],
+      "modes": [
+        "poll-messages"
+      ],
       "irq": [],
-      "pins": ["PB8", "PB9"],
+      "pins": [
+        "PB8",
+        "PB9"
+      ],
       "clock_hz": 16000000,
       "max_hz": 100000
     },
     "FLASH": {
       "kind": "flash",
-      "modes": ["poll-word"],
-      "irq": ["FLASH_IRQn"],
-      "irq_numbers": [4],
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [
+        "FLASH_IRQn"
+      ],
+      "irq_numbers": [
+        4
+      ],
       "pins": []
     },
     "TIM4": {
@@ -687,6 +714,52 @@
       "clock_hz": 170000000,
       "pins": [
         "PB6"
+      ]
+    },
+    "TIM1": {
+      "kind": "pwm_group",
+      "modes": [
+        "coherent-pwm"
+      ],
+      "irq": [
+        "TIM1_BRK_TIM15_IRQn"
+      ],
+      "irq_numbers": [
+        24
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA1",
+        "PA4"
+      ],
+      "resources": [
+        "controller:COMP1",
+        "controller:TIM15",
+        "timer:TIM1",
+        "clock:TIM1",
+        "clock:SYSCFG"
+      ]
+    },
+    "TIM5": {
+      "kind": "timer_capture",
+      "modes": [
+        "edge-capture"
+      ],
+      "irq": [
+        "TIM5"
+      ],
+      "irq_numbers": [
+        50
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA0"
+      ],
+      "resources": [
+        "clock:TIM5"
       ]
     }
   },

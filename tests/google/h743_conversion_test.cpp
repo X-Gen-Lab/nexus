@@ -200,6 +200,9 @@ class H743Flash : public testing::Test {
         g_nx_stm32h743_system.started = true;
         g_nx_stm32h743_system.core_hz = 64000000U;
         state.registers = &g_h743_model.flash;
+        g_h743_model.power.D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
+        g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
+        state.registers->ACR = FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_0;
         state.memory = memory.data();
         state.supply_mv = 3300U;
         state.poll_limit = 8U;
@@ -217,6 +220,43 @@ TEST_F(H743Flash, GeometryExposesAllPhysicalSectorsAndFlashwordGranularity) {
     ASSERT_EQ(16U, geometry->sector_count);
     EXPECT_EQ(0x1e0000U, geometry->sectors[15].offset);
     EXPECT_EQ(131072U, geometry->sectors[15].size);
+}
+TEST_F(H743Flash, Unsafe64MHzProgrammingDelayRejectsBeforeUnlockOrPulse) {
+    /* RM0433 Rev9 Table17: VOS3/HSI64 needs WRHIGHFREQ1, not reset0. */
+    g_h743_model.power.D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
+    g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
+    state.registers->ACR = FLASH_ACR_LATENCY_7WS;
+    std::array<uint8_t, 32U> input{};
+    input.fill(0x55U);
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_program(&face, 0U, input.data(),
+                                                    input.size(), 10000U));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
+    EXPECT_EQ(0xffU, memory[0]);
+    EXPECT_EQ(FLASH_CR_LOCK, state.registers->CR1);
+}
+TEST_F(H743Flash, Unsafe64MHzEraseDelayRejectsBeforeUnlockOrStart) {
+    g_h743_model.power.D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
+    g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
+    state.registers->ACR = FLASH_ACR_LATENCY_7WS;
+    memory[0] = 0U;
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_erase(&face, 0U, 131072U, 10000U));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(0U, memory[0]);
+    EXPECT_EQ(FLASH_CR_LOCK, state.registers->CR1);
+}
+TEST_F(H743Flash, UnsettledVoltageCannotAuthorizeAFlashPulse) {
+    g_h743_model.power.D3CR = PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY;
+    g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_1 | PWR_CSR1_ACTVOSRDY;
+    state.registers->ACR = FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_0;
+    std::array<uint8_t, 32U> input{};
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_program(&face, 0U, input.data(),
+                                                    input.size(), 10000U));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
 }
 TEST_F(H743Flash, BankTwoFlashwordDrainsAndRelocksWithoutChangingBankOne) {
     std::array<uint8_t, 32U> input{};
@@ -322,4 +362,158 @@ TEST_F(H743Flash, RefusedControlRelockRetainsTheExecutionOwner) {
         });
         (void)nx_flash_port_program(&face, 0U, input.data(), 32U, 10000U);
     }));
+}
+
+class H743FlashTiming : public H743Flash {
+  protected:
+    nx_stm32h743_flash_timing_state_t timing{};
+    void SetUp() override {
+        H743Flash::SetUp();
+        state.registers->ACR = FLASH_ACR_LATENCY_7WS;
+    }
+};
+TEST_F(H743FlashTiming, Cold64MHzOwnsOnlyTheProgrammingDelayUntilStop) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    EXPECT_TRUE(timing.retained);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_0,
+              state.registers->ACR);
+    std::array<uint8_t, 32U> input{};
+    EXPECT_EQ(NX_SUCCESS, nx_flash_port_program(&face, 0U, input.data(),
+                                                input.size(), 10000U));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_FALSE(timing.retained);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS, state.registers->ACR);
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_flash_port_erase(&face, 0U, 131072U, 10000U));
+    EXPECT_EQ(writes, g_h743_model.writes);
+}
+TEST_F(H743FlashTiming, Cold32MHzNeedsNoTimingMutationOrRetainedState) {
+    g_nx_stm32h743_system.core_hz = 32000000U;
+    g_h743_model.rcc.CR |= RCC_CR_HSIDIV_2 | RCC_CR_HSIDIVF;
+    const uint32_t writes = g_h743_model.writes;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    EXPECT_FALSE(timing.retained);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    std::array<uint8_t, 32U> input{};
+    EXPECT_EQ(NX_SUCCESS, nx_flash_port_program(&face, 0U, input.data(),
+                                                input.size(), 10000U));
+}
+TEST_F(H743FlashTiming, BothBanksMustBeQuiescentBeforeAnyTimingWrite) {
+    for (uint32_t busy : {uint32_t(FLASH_SR_BSY), uint32_t(FLASH_SR_QW),
+                          uint32_t(FLASH_SR_WBNE)}) {
+        for (volatile uint32_t* bank :
+             {&state.registers->SR1, &state.registers->SR2}) {
+            *bank = busy;
+            const uint32_t writes = g_h743_model.writes;
+            EXPECT_EQ(NX_ERROR_BUSY,
+                      nx_stm32h743_flash_timing_initialize(&timing));
+            EXPECT_FALSE(timing.retained);
+            EXPECT_EQ(writes, g_h743_model.writes);
+            *bank = 0U;
+        }
+    }
+}
+TEST_F(H743FlashTiming, RetainedPulseControlsRejectBeforeAcquiringAcr) {
+    for (uint32_t control :
+         {uint32_t(FLASH_CR_PG), uint32_t(FLASH_CR_SER), uint32_t(FLASH_CR_BER),
+          uint32_t(FLASH_CR_START)}) {
+        state.registers->CR2 = FLASH_CR_LOCK | control;
+        const uint32_t writes = g_h743_model.writes;
+        EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_flash_timing_initialize(&timing));
+        EXPECT_FALSE(timing.retained);
+        EXPECT_EQ(writes, g_h743_model.writes);
+    }
+}
+TEST_F(H743FlashTiming, ForeignTimingCannotBeAdoptedOrOverwritten) {
+    for (uint32_t acr :
+         {uint32_t(FLASH_ACR_LATENCY_6WS),
+          uint32_t(FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_0),
+          uint32_t(FLASH_ACR_LATENCY_7WS | FLASH_ACR_WRHIGHFREQ_1)}) {
+        state.registers->ACR = acr;
+        const uint32_t writes = g_h743_model.writes;
+        EXPECT_EQ(NX_ERROR_STATE,
+                  nx_stm32h743_flash_timing_initialize(&timing));
+        EXPECT_FALSE(timing.retained);
+        EXPECT_EQ(writes, g_h743_model.writes);
+        EXPECT_EQ(acr, state.registers->ACR);
+    }
+}
+TEST_F(H743FlashTiming, DeclaredFrequencyCannotOverrideObservedClockState) {
+    g_h743_model.rcc.CR |= RCC_CR_HSIDIV_2 | RCC_CR_HSIDIVF;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
+    g_h743_model.rcc.CR &= ~(uint32_t)(RCC_CR_HSIDIV | RCC_CR_HSIDIVF);
+    g_h743_model.rcc.CFGR = RCC_CFGR_SW_PLL1 | RCC_CFGR_SWS_PLL1;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
+    g_h743_model.rcc.CFGR = 0U;
+    g_h743_model.rcc.D1CFGR = RCC_D1CFGR_HPRE_DIV2;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
+    EXPECT_FALSE(timing.retained);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashTiming, UnsettledVoltageAndCacheStateNeverAcquireTiming) {
+    g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_1 | PWR_CSR1_ACTVOSRDY;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
+    g_h743_model.power.CSR1 = PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY;
+    g_h743_model.core->CCR = SCB_CCR_DC_Msk;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_initialize(&timing));
+    EXPECT_FALSE(timing.retained);
+    EXPECT_EQ(0U, g_h743_model.writes);
+}
+TEST_F(H743FlashTiming, FailedAcquireKeepsCleanupResponsibilityUntilObserved) {
+    g_h743_model.ignore_write = &state.registers->ACR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32h743_flash_timing_initialize(&timing));
+    EXPECT_TRUE(timing.retained);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS, state.registers->ACR);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_FALSE(timing.retained);
+}
+TEST_F(H743FlashTiming, FailedRestoreRetainsOwnerUntilSuccessfulRetry) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    g_h743_model.ignore_write = &state.registers->ACR;
+    EXPECT_EQ(NX_ERROR_IO, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_TRUE(timing.retained);
+    EXPECT_EQ(FLASH_ACR_WRHIGHFREQ_0,
+              state.registers->ACR & FLASH_ACR_WRHIGHFREQ);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_FALSE(timing.retained);
+    EXPECT_EQ(FLASH_ACR_LATENCY_7WS, state.registers->ACR);
+}
+TEST_F(H743FlashTiming, BusyPeerBankPreventsRestoreAndKeepsTheTimingOwner) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    state.registers->SR2 = FLASH_SR_QW;
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_TRUE(timing.retained);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    state.registers->SR2 = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+}
+TEST_F(H743FlashTiming, ForeignLatencyIsNeverRestoredOverOrReleased) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    state.registers->ACR = FLASH_ACR_LATENCY_6WS | FLASH_ACR_WRHIGHFREQ_0;
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_TRUE(timing.retained);
+    EXPECT_EQ(writes, g_h743_model.writes);
+}
+TEST_F(H743FlashTiming, CompleteStopDoesNotTouchAnyLaterOwner) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    state.registers->ACR = FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_1;
+    const uint32_t reads = g_h743_model.reads;
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_EQ(reads, g_h743_model.reads);
+    EXPECT_EQ(writes, g_h743_model.writes);
+}
+TEST_F(H743FlashTiming,
+       LiveOwnerCannotBeReinitializedOrStoppedWithoutPrivilege) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_timing_initialize(&timing));
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_flash_timing_initialize(&timing));
+    g_h743_model.privileged = false;
+    EXPECT_EQ(NX_ERROR_CONTEXT, nx_stm32h743_flash_timing_stop(&timing));
+    EXPECT_TRUE(timing.retained);
+    EXPECT_EQ(writes, g_h743_model.writes);
 }

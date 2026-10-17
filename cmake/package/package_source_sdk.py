@@ -229,33 +229,35 @@ REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
     "silicon", "status", "time"))
 REQUIRED_FILES += ("core/src/silicon.c", "soc/common/stm32_identity.h")
 REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
-    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "dma",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "cycle_probe",
+    "dma", "encoder",
     "ethernet",
     "exti", "flash", "gpio", "i2c", "i2c_bus_clear", "mdio", "native/model",
     "i2c_long", "observation", "pwm_group", "spi_transaction",
-    "spi_dma_transaction", "uart_format", "uart_word",
-    "spi", "stream", "stream_budget", "timer", "timer_capture", "uart",
-    "uart_rs485", "usb_device", "wake", "watchdog"))
+    "spi_dma_transaction", "spi_dma_owner_binding", "uart_format", "uart_word",
+    "native/spi_dma_model", "spi", "stream", "stream_budget", "stream_profile", "timer",
+    "timer_capture", "uart", "uart_rs485", "usb_device", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/src/" + name + ".c" for name in (
     "adc", "adc_format", "adc_observer", "advanced_pwm", "can",
-    "can_controller", "dma",
+    "can_controller", "cycle_probe", "dma", "encoder",
     "eth_mac", "ethernet", "exti", "flash", "flash_region", "gpio", "i2c",
     "i2c_bus_clear", "i2c_long", "mdio", "observation", "pwm_group", "spi",
-    "spi_transaction", "spi_dma_transaction", "spi_dma_sequence", "uart_word",
-    "stream", "stream_budget", "timer",
+    "spi_transaction", "spi_dma_transaction", "spi_dma_sequence",
+    "spi_dma_owner_binding", "uart_word", "stream", "stream_budget",
+    "stream_profile", "timer",
     "timer_capture", "uart", "uart_rs485", "usb_device",
     "usb_device_controller", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
     "advanced_pwm_impl", "can_controller", "eth_mac",
-    "spi_dma_sequence",
+    "spi_dma_sequence", "spi_dma_sequence_owner",
     "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
 REQUIRED_FILES += tuple("io/native/" + name + ".c" for name in (
     "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
-    "spi_async", "stream", "time", "timer", "uart", "uart_word",
+    "spi_async", "spi_dma_transaction", "stream", "time", "timer", "uart", "uart_word",
     "usb_device", "watchdog"))
 REQUIRED_FILES += tuple("io/native/" + name + ".h" for name in (
     "can", "can_access", "ethernet", "ethernet_access", "provider",
-    "uart_word_provider",
+    "spi_dma_provider", "uart_word_provider",
     "usb_device", "usb_device_access"))
 for _family in ("stm32f407", "gd32f470"):
     REQUIRED_FILES += tuple("soc/" + _family + "/" + name for name in (
@@ -266,17 +268,21 @@ for _family in ("stm32f407", "gd32f470"):
         "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
         "ethernet", "exti", "flash", "gpio", "i2c", "i2c_async", "spi",
         "spi_dma", "timer", "timer_capture", "uart", "uart_dma",
-        "uart_receive", "uart_stream", "uart_word", "usb_device", "watchdog"))
+        "uart_receive", "uart_duplex", "uart_stream", "uart_word", "usb_device", "watchdog"))
     REQUIRED_FILES += tuple("soc/" + _family + "/private/" + _family + "_"
                             + name + ".h" for name in (
         "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
         "timer_advanced", "uart_receive", "uart_word", "usb_clock", "usb_device"))
 REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
     "resource_graph", "trigger_graph", "dma_topology", "io_traits", "i2c_timing",
-    "enhanced_endpoints", "uart_formats", "i2c_timing_selection"))
+    "enhanced_endpoints", "uart_formats", "i2c_timing_selection",
+    "stream_profiles"))
 REQUIRED_FILES += (
     "soc/stm32g474/drivers/pwm_group.c",
+    "soc/stm32g474/drivers/timer_capture.c",
+    "soc/stm32g474/drivers/encoder.c",
     "soc/stm32g474/private/stm32g474_pwm_group.h",
+    "soc/stm32g474/private/stm32g474_timer.h",
     "soc/common/uart_control.h")
 REQUIRED_FILES += (
     "tools/configure/fact_references.py", "tools/configure/preflight.py",
@@ -331,10 +337,10 @@ REQUIRED_FILES += (
     "tools/measurement/elf.py", "tools/evidence/common.py",
     "tools/evidence/identity.py")
 REQUIRED_FILES += tuple("components/bus_owner/src/" + name + ".c" for name in (
-    "bus_owner", "spi_owner", "spi_async_owner", "uart_owner"))
+    "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
 REQUIRED_FILES += tuple("components/bus_owner/include/nexus/components/" + name
                         + ".h" for name in (
-    "bus_owner", "spi_owner", "spi_async_owner", "uart_owner"))
+    "bus_owner", "spi_owner", "spi_async_owner", "spi_dma_owner", "uart_owner"))
 REQUIRED_FILES += (
     "components/bmp280/src/bmp280.c", "components/bmp280/src/spi_transport.c",
     "components/bmp280/include/nexus/components/bmp280.h",

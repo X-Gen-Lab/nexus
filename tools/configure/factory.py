@@ -6,16 +6,19 @@ try:
     from .ir import ConfigurationIR
     from . import io_traits
     from . import enhanced_endpoints
+    from . import stream_profiles, uart_formats
 except ImportError:
     from providers.common import mode_traits, fail
     from providers import maintained
     from ir import ConfigurationIR
     import io_traits
     import enhanced_endpoints
+    import stream_profiles
+    import uart_formats
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder")
 
 
 def symbol(name):
@@ -24,7 +27,7 @@ def symbol(name):
 
 def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
-    if class_name in {"timer_capture", "advanced_pwm"}:
+    if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder"}:
         return f"nx_{class_name}_t"
     if class_name in {"eth", "mdio"}:
         return f"nx_{class_name}_port_t"
@@ -86,6 +89,8 @@ def emit(result):
               ' * \\brief           Typed lookup of statically selected instances.',
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_FACTORY_H', '#define NEXUS_FACTORY_H']
+    if uart_formats.probed(result):
+        header.append('#include "nexus_config.h"')
     for kind in KINDS:
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     for name, _, _ in classes(result):
@@ -134,6 +139,15 @@ def emit(result):
         endpoint_header, endpoint_source = enhanced_endpoints.emit_traits(result)
         header.extend(endpoint_header)
         source.extend(endpoint_source)
+    owner_header, owner_source = enhanced_endpoints.emit_owner_factory(result)
+    header.extend(owner_header)
+    source.extend(owner_source)
+    probe_header, probe_source = uart_formats.emit_probe_factory(result)
+    header.extend(probe_header)
+    source.extend(probe_source)
+    profile_header, profile_source = stream_profiles.emit_factory(result)
+    header.extend(profile_header)
+    source.extend(profile_source)
     header += ['#ifdef __cplusplus', '}', '#endif', '#endif', '']
     return "\n".join(header), "\n".join(source) + "\n"
 

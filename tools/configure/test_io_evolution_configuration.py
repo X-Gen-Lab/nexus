@@ -61,6 +61,69 @@ class EnhancedEndpointConfiguration(unittest.TestCase):
         self.assertIn("nx_native_spi_transaction_ops", generated_source)
         self.assertNotIn("(const nx_spi_endpoint_t*)", generated_source)
 
+    def test_spi_dma_owner_is_a_normal_explicit_component(self):
+        path = configure.ROOT / (
+            "tests/contracts/io_evolution_assembly/f407-spi-dma-transaction.toml")
+        contents = path.read_text().replace(
+            'board_package = "../stm32_assembly/zg_board"',
+            'board_package = "' + str(configure.ROOT /
+                "tests/contracts/stm32_assembly/zg_board") + '"')
+        contents = 'components = ["spi-dma-owner"]\n' + contents
+        selected = self.root / "owner.toml"
+        selected.write_text(contents)
+        result = configure.resolve_ir(selected)
+        self.assertIn("spi-dma-owner", result["components"])
+
+    def test_dma_owner_binding_uses_exact_physical_provider_membership(self):
+        for family, prefix in (("f407", "stm32"), ("gd470", "gd32")):
+            with self.subTest(family=family):
+                path = configure.ROOT / (
+                    "tests/contracts/io_evolution_assembly/" + family +
+                    "-spi-dma-transaction.toml")
+                result = configure.resolve_ir(path)
+                header, getters = factory.emit(result)
+                self.assertIn("const nx_spi_dma_owner_binding_t*", header)
+                self.assertIn("nx_factory_spi_dma_owner_binding(", header)
+                self.assertIn(f"nx_{prefix}_spi_dma_owner_contains", getters)
+                self.assertIn(f"nx_{prefix}_spi_dma_owner_attach_wake", getters)
+                self.assertNotIn(".contains = nx_spi_dma_sequence_contains",
+                                 getters)
+
+    def test_native_async_assembly_uses_independent_real_model_contexts(self):
+        path = configure.ROOT / (
+            "tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml")
+        result = configure.resolve_ir(path)
+        self.assertEqual(len(result.controllers), 2)
+        self.assertEqual(len(result.devices), 3)
+        _, source = bindings.emit(result)
+        self.assertIn("static nx_native_spi_dma_state_t s_nx_port_bus", source)
+        self.assertIn("nx_native_spi_dma_endpoint_state_t", source)
+        self.assertIn("nx_native_spi_dma_initialize(", source)
+        self.assertIn("nx_native_spi_dma_sequence_backend", source)
+        self.assertNotIn("nx_native_spi_port_configure_instance", source)
+        self.assertNotIn("static uint8_t s_nx_model_", source)
+        header, getters = factory.emit(result)
+        self.assertIn("NX_SPI_DMA_TRANSACTION_ID_OTHER_BUS", header)
+        self.assertIn("nx_native_spi_dma_owner_contains", getters)
+        self.assertNotIn("NX_FACTORY_CAP_TX_DMA", source)
+
+    def test_native_async_model_cannot_become_a_register_file_or_legacy_face(self):
+        original = configure.ROOT / (
+            "tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml")
+        contents = original.read_text().replace(
+            '"../native_assembly/multi_board"',
+            '"' + str(configure.ROOT /
+                      "tests/contracts/native_assembly/multi_board") + '"')
+        for before, after in (("driver = \"spi-dma-transaction\"",
+                              "driver = \"spi-dma-transaction\"\nmodel_bytes = 64"),
+                             ("driver = \"spi-dma-transaction\"",
+                              "driver = \"spi-endpoint\"")):
+            path = self.root / "bad-native-async.toml"
+            path.write_text(contents.replace(before, after))
+            with self.subTest(after=after), self.assertRaisesRegex(
+                    ValueError, "model|async|enhanced|transaction"):
+                configure.resolve_ir(path)
+
     def test_reviewed_f407_and_f470_polling_routes_emit_enhanced_faces(self):
         for fixture, operations in (
                 ("stm32_assembly/zg-spi.toml", "nx_stm32_spi_transaction_ops"),

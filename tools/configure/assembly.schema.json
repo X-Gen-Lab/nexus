@@ -66,6 +66,47 @@
               "minimum": 0
             }
           },
+          "stream": {
+            "type": "object",
+            "properties": {
+              "blocks": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "max_units_per_second": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "on_exhaustion": {
+                "const": "stop-and-report-gap"
+              },
+              "release_delay_us": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "source": {
+                "type": "string"
+              },
+              "target_delay_us": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "units_per_block": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "blocks",
+              "max_units_per_second",
+              "on_exhaustion",
+              "release_delay_us",
+              "source",
+              "target_delay_us",
+              "units_per_block"
+            ],
+            "additionalProperties": false
+          },
           "timeout_ms": {
             "type": "integer",
             "minimum": 0
@@ -307,6 +348,45 @@
         "type": "string"
       },
       "uniqueItems": true
+    },
+    "encoder": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "counting": {
+            "type": "string"
+          },
+          "exclusive": {
+            "type": "boolean"
+          },
+          "filter_a": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "filter_b": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "invert_a": {
+            "type": "boolean"
+          },
+          "invert_b": {
+            "type": "boolean"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
     },
     "eth": {
       "type": "object",
@@ -788,6 +868,56 @@
         "additionalProperties": false
       }
     },
+    "pwm_group": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "deadtime_ticks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exclusive": {
+            "type": "boolean"
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string"
+          },
+          "period_ticks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tick_hz": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
     "schema": {
       "const": 2
     },
@@ -969,6 +1099,9 @@
               "priority": {
                 "type": "integer",
                 "minimum": 0
+              },
+              "probe": {
+                "type": "boolean"
               }
             },
             "required": [
@@ -998,6 +1131,47 @@
             },
             "required": [
               "format"
+            ],
+            "additionalProperties": false
+          },
+          "stream": {
+            "type": "object",
+            "properties": {
+              "blocks": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "max_units_per_second": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "on_exhaustion": {
+                "const": "stop-and-report-gap"
+              },
+              "release_delay_us": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "source": {
+                "type": "string"
+              },
+              "target_delay_us": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "units_per_block": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "blocks",
+              "max_units_per_second",
+              "on_exhaustion",
+              "release_delay_us",
+              "source",
+              "target_delay_us",
+              "units_per_block"
             ],
             "additionalProperties": false
           }

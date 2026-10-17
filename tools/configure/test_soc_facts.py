@@ -55,22 +55,26 @@ class PackagePinContractTests(unittest.TestCase):
         self.assertEqual({f"P{port}{pin}" for port in "ABC"
                           for pin in range(16)} | {"PD2", "PF0", "PF1", "PG10"},
                          set(pins))
-        expected = {"GPIO" + bank: ("gpio", ["input", "output"])
+        expected = {"GPIO" + bank: ("gpio", ["input", "output"], {})
                     for bank in "ABCDFG"}
-        expected.update({name: ("uart", ["irq-bytes"])
+        expected.update({name: ("uart", ["irq-bytes"], {})
                          for name in ("LPUART1", "USART1", "USART2", "USART3",
                                       "UART4", "UART5")})
-        expected.update({name: ("spi", ["short-poll"])
+        expected.update({name: ("spi", ["short-poll"], {})
                          for name in ("SPI1", "SPI2")})
-        expected.update({name: ("pwm", ["fixed-pwm"])
-                         for name in ("TIM3", "TIM4")})
-        expected.update({"ADC1": ("adc", ["single-shot", "trigger-dma"]),
-                         "I2C1": ("i2c", ["poll-messages"]),
-                         "FLASH": ("flash", ["poll-word"]),
-                         "IWDG": ("watchdog", ["independent"]),
-                         "EXTI0": ("exti", ["edge-event"]),
-                         "EXTI1": ("exti", ["edge-event"])})
-        self.assertEqual({name: (item["kind"], item["modes"])
+        expected.update({"TIM3": ("pwm", ["fixed-pwm"],
+                                  {"encoder": ["quadrature"]}),
+                         "TIM4": ("pwm", ["fixed-pwm"], {}),
+                         "TIM1": ("pwm_group", ["coherent-pwm"], {}),
+                         "TIM5": ("timer_capture", ["edge-capture"], {}),
+                         "ADC1": ("adc", ["single-shot", "trigger-dma"], {}),
+                         "I2C1": ("i2c", ["poll-messages"], {}),
+                         "FLASH": ("flash", ["poll-word"], {}),
+                         "IWDG": ("watchdog", ["independent"], {}),
+                         "EXTI0": ("exti", ["edge-event"], {}),
+                         "EXTI1": ("exti", ["edge-event"], {})})
+        self.assertEqual({name: (item["kind"], item["modes"],
+                                item.get("interfaces", {}))
                           for name, item in soc["controllers"].items()}, expected)
         for line in (0, 1):
             self.assertEqual(soc["controllers"][f"EXTI{line}"]["modes"],

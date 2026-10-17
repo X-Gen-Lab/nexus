@@ -20,17 +20,28 @@
  *                  exclude CPU-only CCM. RX uses the existing independent IRQ
  *                  ring.
  */
+/** \brief Immutable selected DMA domain facts, independent of TX storage. */
 typedef struct {
-    nx_stm32_uart_state_t uart;
     DMA_TypeDef* dma;
-    DMA_Stream_TypeDef* tx;
     const nx_dma_memory_region_t* regions;
     size_t region_count;
+} nx_stm32_uart_dma_resources_t;
+
+/** \brief Only TX-DMA modes allocate these exact engine and drain facts. */
+typedef struct {
+    DMA_Stream_TypeDef* tx;
     IRQn_Type dma_irq;
     uint8_t stream;
     uint8_t channel;
     bool dma_complete;
     bool aborting;
+} nx_stm32_uart_tx_dma_extension_t;
+
+/** \brief One UART owner plus its selected finite TX-DMA extension. */
+typedef struct {
+    nx_stm32_uart_state_t uart;
+    nx_stm32_uart_dma_resources_t resources;
+    nx_stm32_uart_tx_dma_extension_t transmit;
 } nx_stm32_uart_dma_state_t;
 
 typedef struct nx_stm32_spi_dma_endpoint_state
@@ -169,6 +180,41 @@ nx_result_t nx_stm32_uart_dma_cancel(void* context,
 void nx_stm32_uart_dma_service(void* context);
 /** \brief Close TX admission and prove both memory and wire drain. */
 nx_result_t nx_stm32_uart_dma_stop(void* context);
+
+/** \brief Cold component constructor; initializes the shared UART once. */
+nx_result_t nx_stm32_uart_dma_initialize_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, uint32_t clock_hz, bool blocks);
+/** \brief Typed TX extension operation; no outer-owner context cast. */
+nx_result_t nx_stm32_uart_dma_submit_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, nx_uart_tx_request_t* request);
+/** \brief Typed TX extension operation; no outer-owner context cast. */
+nx_result_t nx_stm32_uart_dma_start_admitted_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, nx_uart_tx_request_t* request);
+/** \brief Typed TX extension operation; no outer-owner context cast. */
+nx_result_t nx_stm32_uart_dma_cancel_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, nx_uart_tx_request_t* request);
+/** \brief Typed TX extension operation; no outer-owner context cast. */
+nx_result_t nx_stm32_uart_dma_tx_validate_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit,
+    const nx_uart_tx_request_t* request);
+/** \brief Progress or quiesce TX without releasing the shared UART. */
+void nx_stm32_uart_dma_irq_parts(nx_stm32_uart_state_t* uart,
+                                 const nx_stm32_uart_dma_resources_t* resources,
+                                 nx_stm32_uart_tx_dma_extension_t* transmit);
+/** \brief Progress or quiesce TX without releasing the shared UART. */
+void nx_stm32_uart_dma_service_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit);
+/** \brief Progress or quiesce TX without releasing the shared UART. */
+nx_result_t
+nx_stm32_uart_dma_stop_parts(nx_stm32_uart_state_t* uart,
+                             const nx_stm32_uart_dma_resources_t* resources,
+                             nx_stm32_uart_tx_dma_extension_t* transmit);
 
 #ifdef __cplusplus
 }

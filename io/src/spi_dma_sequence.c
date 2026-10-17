@@ -268,7 +268,11 @@ static nx_result_t stop(void* context) {
     }
     nx_result_t result = state->backend->stop(state->context);
     if (result == NX_SUCCESS) {
+        /* Optional source observers share this cold handoff publication guard.
+         */
+        nx_arch_irq_state_t saved = nx_arch_irq_save();
         state->stopped = true;
+        nx_arch_irq_restore(saved);
     }
     return result;
 }

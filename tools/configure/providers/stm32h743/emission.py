@@ -82,6 +82,8 @@ def _extra_gates(result):
 def state_declarations(result):
     source = [f'static uint32_t s_nx_extra_{reg.lower()}_added;'
               for reg, _ in _extra_gates(result)]
+    if any(item.kind == "flash" for item in result.controllers):
+        source.append('static nx_stm32h743_flash_timing_state_t s_nx_flash_timing;')
     if _dma(result):
         source.append('static uint32_t s_nx_dma_clocks_added;')
     if _ports(result):
@@ -123,7 +125,7 @@ def state_declarations(result):
 def start_system(result):
     from . import cache_mask
     cache = f'{cache_mask(result["clock_profile"])}u'
-    return preflight.emit(result) + [
+    source = preflight.emit(result) + [
         '    result.primary = nx_stm32h743_validate_identity();',
         '    if (result.primary != NX_SUCCESS) { return result; }',
         f'    nx_stm32h743_start_result_t system = nx_stm32h743_system_start(&g_nx_stm32h743_system, {result["clock"]["core_hz"]}u, {cache}, 1000000u);',
@@ -133,6 +135,14 @@ def start_system(result):
         '        result.remaining_effects = system.remaining_effects;',
         '        s_nx_platform_started = result.remaining_effects != 0u;',
         '        return result;', '    }']
+    if any(item.kind == "flash" for item in result.controllers):
+        source += ['    s_nx_platform_started = true;',
+                   '    result.primary = nx_stm32h743_flash_timing_initialize(&s_nx_flash_timing);',
+                   '    if (result.primary != NX_SUCCESS) {',
+                   '        result.cleanup = nx_platform_stop_impl(diagnostic, true);',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
+    return source
 
 
 def start_resources(result, *, cleanup="nx_platform_stop()"):
@@ -234,6 +244,9 @@ def stop_system(result, *, system_phase=None):
                    f'        {slot} = 0u;', '    }']
     if system_phase is not None:
         source.append(f'    {system_phase};')
+    if any(item.kind == "flash" for item in result.controllers):
+        source += ['    nx_result_t timing = nx_stm32h743_flash_timing_stop(&s_nx_flash_timing);',
+                   '    if (timing != NX_SUCCESS) { return timing; }']
     return source + ['    if (s_nx_platform_started) {',
                      '        nx_result_t system = nx_stm32h743_system_stop(&g_nx_stm32h743_system, 1000000u);',
                      '        if (system != NX_SUCCESS) { return system; }',

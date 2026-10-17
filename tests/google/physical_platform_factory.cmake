@@ -4,7 +4,8 @@ file(GLOB_RECURSE physical_factory_codegen CONFIGURE_DEPENDS
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${physical_factory_codegen})
 set(physical_kinds gpio uart spi i2c flash watchdog exti pwm adc can usb_device
-    eth timer_capture advanced_pwm spi_device i2c_device usb_endpoint mdio)
+    eth timer_capture advanced_pwm pwm_group encoder spi_device i2c_device
+    usb_endpoint mdio)
 foreach(physical_family stm32 gd32)
     set(physical_official)
     if(physical_family STREQUAL "stm32")

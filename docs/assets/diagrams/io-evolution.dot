@@ -17,7 +17,7 @@ digraph ioEvolution {
         color="#64748b"; fontname="Noto Sans CJK SC";
         assembly [label="Authored TOML"];
         facts [label="Reviewed SoC modes and Board routes"];
-        resolver [label="Strict resolver\nResource / trigger / DMA plans"];
+        resolver [label="Strict resolver\nResource / trigger / DMA / stream plans"];
         ir [label="Immutable typed IR"];
         bundle [label="Atomic generated bundle"];
         cmake [label="CMake: sole software target graph"];
@@ -35,11 +35,21 @@ digraph ioEvolution {
         face [label="Immutable typed face\nShared ops + instance context"];
         lifecycle [label="Public platform lifecycle\nnx_platform_start / stop"];
         provider [label="Selected provider\nPrivate state and controller owner"];
-        traits [label="Optional selected traits\nRead-only facts", style="rounded,dashed,filled"];
+        traits [label="Optional traits / stream profiles\nRead-only selected facts", style="rounded,dashed,filled"];
+        owner [label="Optional typed SPI executor\nExisting bounded BusOwner",
+               style="rounded,dashed,filled"];
+        probe [label="Optional vector / service cycle probe\nRaw modulo only; elapsed unknown",
+               style="rounded,dashed,filled"];
         preflight [label="Optional cold silicon preflight\nExplicit source and immutable policy",
                    style="rounded,dashed,filled"];
         time [label="Optional timestamp facts\nDomain / epoch / rate / uncertainty",
               style="rounded,dashed,filled"];
+        // Layout only: three short rows keep optional nodes readable.
+        { rank=same; factory; lifecycle; preflight; }
+        { rank=same; owner; traits; time; }
+        { rank=same; face; probe; }
+        factory -> owner [style=invis, weight=20];
+        traits -> probe [style=invis, weight=20];
         app -> factory [label="looks up a typed identity"];
         factory -> face [label="returns an existing reference"];
         app -> face [label="calls I/O and service after startup"];
@@ -47,6 +57,10 @@ digraph ioEvolution {
         app -> lifecycle [label="explicit start / stop calls"];
         lifecycle -> provider [label="initializes / drains private state"];
         app -> traits [label="optionally inspects selected facts", style=dashed];
+        app -> owner [label="explicit submit / service", style=dashed];
+        owner -> face [label="calls the same enhanced face", style=dashed];
+        app -> probe [label="explicit service wrapper / Task snapshot",
+                      style=dashed, dir=both];
         app -> preflight [label="cold call / copied admission result",
                           style=dashed, dir=both];
         app -> time [label="paired facts / same-domain elapsed result",
@@ -59,6 +73,7 @@ digraph ioEvolution {
     bundle -> provider [label="emits private instance state"];
     bundle -> lifecycle [label="emits lifecycle glue"];
     bundle -> traits [label="emits only when selected", style=dashed];
+    bundle -> probe [label="emits selected vector sidecar / hooks", style=dashed];
     cmake -> provider [label="selects and links implementation"];
     // Layout only: keep all build nodes above the runtime view.
     cmake -> app [style=invis, weight=100];

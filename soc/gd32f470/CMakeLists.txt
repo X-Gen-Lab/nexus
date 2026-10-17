@@ -45,10 +45,13 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
             OR "dma-duplex-continuous" IN_LIST modes)
             list(APPEND gd_sources drivers/uart_dma.c)
         endif()
+        if("dma-duplex" IN_LIST modes OR "dma-duplex-continuous" IN_LIST modes)
+            list(APPEND gd_sources drivers/uart_duplex.c)
+        endif()
         if("rx-dma-idle" IN_LIST modes OR "rx-dma-continuous" IN_LIST modes
             OR "dma-duplex" IN_LIST modes
             OR "dma-duplex-continuous" IN_LIST modes)
-            list(APPEND gd_sources drivers/uart_receive.c drivers/uart_dma.c)
+            list(APPEND gd_sources drivers/uart_receive.c)
         endif()
         if("irq-blocks" IN_LIST modes)
             list(APPEND gd_sources drivers/uart_stream.c)

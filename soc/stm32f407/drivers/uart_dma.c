@@ -22,124 +22,123 @@
 #define NX_STM32_UART_DMA_ACK(clear, mask) (*(clear) = (uint32_t)(mask))
 #endif
 
-/** \brief Exact selected stream6/7 flags use the retained high status bank. */
-static uint32_t flags(const nx_stm32_uart_dma_state_t* state) {
-    return (state->dma->HISR >> (state->stream == 7U ? 22U : 16U)) & 0x3DU;
+/** \brief Read the exact selected high status bank. */
+static uint32_t flags(const nx_stm32_uart_dma_resources_t* resources,
+                      nx_stm32_uart_tx_dma_extension_t* transmit) {
+    return (resources->dma->HISR >> (transmit->stream == 7U ? 22U : 16U)) &
+           0x3DU;
 }
 
-/** \brief Acknowledge only the selected stream; preserve unrelated channels. */
-static void acknowledge_bits(nx_stm32_uart_dma_state_t* state,
+/** \brief Acknowledge this TX source only. */
+static void acknowledge_bits(const nx_stm32_uart_dma_resources_t* resources,
+                             nx_stm32_uart_tx_dma_extension_t* transmit,
                              uint32_t observed) {
-    NX_STM32_UART_DMA_ACK(&state->dma->HIFCR,
-                          observed << (state->stream == 7U ? 22U : 16U));
+    NX_STM32_UART_DMA_ACK(&resources->dma->HIFCR,
+                          observed << (transmit->stream == 7U ? 22U : 16U));
 #ifndef NEXUS_STM32_MODEL
-    NVIC_ClearPendingIRQ(state->dma_irq);
+    NVIC_ClearPendingIRQ(transmit->dma_irq);
 #endif
 }
 
-/** \brief Cold/reset cleanup owns the complete stale flag group. */
-static void acknowledge(nx_stm32_uart_dma_state_t* state) {
-    acknowledge_bits(state, 0x3DU);
+/** \brief Cold cleanup owns the selected complete stale flag group. */
+static void acknowledge(const nx_stm32_uart_dma_resources_t* resources,
+                        nx_stm32_uart_tx_dma_extension_t* transmit) {
+    acknowledge_bits(resources, transmit, 0x3DU);
 }
 
-/** \brief Disable both request and memory engine before observing quiescence.
- */
-static void detach(nx_stm32_uart_dma_state_t* state) {
-    state->uart.registers->CR3 &= ~(uint32_t)USART_CR3_DMAT;
-    NX_STM32_DMA_DISABLE(state->tx, DMA_SxCR_EN | DMA_SxCR_TCIE |
-                                        DMA_SxCR_HTIE | DMA_SxCR_TEIE |
-                                        DMA_SxCR_DMEIE);
+/** \brief Withdraw request and memory engine before observing drain. */
+static void detach(nx_stm32_uart_state_t* uart,
+                   const nx_stm32_uart_dma_resources_t* resources,
+                   nx_stm32_uart_tx_dma_extension_t* transmit) {
+    uart->registers->CR3 &= ~(uint32_t)USART_CR3_DMAT;
+    NX_STM32_DMA_DISABLE(transmit->tx, DMA_SxCR_EN | DMA_SxCR_TCIE |
+                                           DMA_SxCR_HTIE | DMA_SxCR_TEIE |
+                                           DMA_SxCR_DMEIE);
     nx_arch_dsb();
     /* Completion W1C cannot erase an error arriving during withdrawal. */
-    acknowledge_bits(state, flags(state) & 0x30U);
+    acknowledge_bits(resources, transmit, flags(resources, transmit) & 0x30U);
 }
 
-/** \brief Reject alternate silicon routes before touching clocks or registers.
- */
-static nx_result_t initialize(nx_stm32_uart_dma_state_t* state,
-                              uint32_t clock_hz, bool blocks) {
-    if (state == NULL || state->dma == NULL || state->tx == NULL ||
-        state->regions == NULL || state->region_count == 0U) {
+/** \brief Initialize the sole UART owner and its selected TX extension once. */
+nx_result_t nx_stm32_uart_dma_initialize_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, uint32_t clock_hz,
+    bool blocks) {
+    if (uart == NULL || resources == NULL || transmit == NULL ||
+        resources->dma == NULL || transmit->tx == NULL ||
+        resources->regions == NULL || resources->region_count == 0U) {
         return NX_ERROR_INVALID;
     }
-    if (state->uart.profile == NX_UART_RX_BLOCKS && !blocks) {
+    if (uart->profile == NX_UART_RX_BLOCKS && !blocks) {
         return NX_ERROR_UNSUPPORTED;
     }
-    bool primary = state->uart.irq == USART1_IRQn;
-    if ((!primary && state->uart.irq != USART2_IRQn) || state->channel != 4U ||
-        state->stream != (primary ? 7U : 6U) ||
-        state->dma_irq != (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) ||
+    bool primary = uart->irq == USART1_IRQn;
+    if ((!primary && uart->irq != USART2_IRQn) || transmit->channel != 4U ||
+        transmit->stream != (primary ? 7U : 6U) ||
+        transmit->dma_irq !=
+            (primary ? DMA2_Stream7_IRQn : DMA1_Stream6_IRQn) ||
         clock_hz != (primary ? 84000000U : 42000000U)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #ifndef NEXUS_STM32_MODEL
-    if (state->dma != (primary ? DMA2 : DMA1) ||
-        state->tx != (primary ? DMA2_Stream7 : DMA1_Stream6) ||
-        state->uart.registers != (primary ? USART1 : USART2)) {
+    if (resources->dma != (primary ? DMA2 : DMA1) ||
+        transmit->tx != (primary ? DMA2_Stream7 : DMA1_Stream6) ||
+        uart->registers != (primary ? USART1 : USART2)) {
         return NX_ERROR_UNSUPPORTED;
     }
 #endif
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    if ((state->tx->CR & DMA_SxCR_EN) != 0U ||
-        LL_USART_IsEnabled(state->uart.registers) != 0U) {
+    if ((transmit->tx->CR & DMA_SxCR_EN) != 0U ||
+        LL_USART_IsEnabled(uart->registers) != 0U) {
         return NX_ERROR_BUSY;
     }
 #ifndef NEXUS_STM32_MODEL
     /* A disabled engine can still belong to another retained IRQ publisher. */
-    unsigned vector = (unsigned)state->dma_irq;
+    unsigned vector = (unsigned)transmit->dma_irq;
     if ((NVIC->ISER[vector / 32U] & (1UL << (vector % 32U))) != 0U) {
         return NX_ERROR_BUSY;
     }
 #endif
-    nx_result_t result = nx_stm32_uart_initialize(&state->uart, clock_hz);
+    nx_result_t result = nx_stm32_uart_initialize(uart, clock_hz);
     if (result != NX_SUCCESS) {
         return result;
     }
-    state->dma_complete = false;
-    state->aborting = false;
-    acknowledge(state);
+    transmit->dma_complete = false;
+    transmit->aborting = false;
+    acknowledge(resources, transmit);
 #ifndef NEXUS_STM32_MODEL
-    NVIC_SetPriority(state->dma_irq, 5U);
-    NVIC_EnableIRQ(state->dma_irq);
+    NVIC_SetPriority(transmit->dma_irq, 5U);
+    NVIC_EnableIRQ(transmit->dma_irq);
 #endif
     return NX_SUCCESS;
 }
 
-/** \brief Existing TX-DMA mode retains its independent IRQ ring contract. */
-nx_result_t nx_stm32_uart_dma_initialize(nx_stm32_uart_dma_state_t* state,
-                                         uint32_t clock_hz) {
-    return initialize(state, clock_hz, false);
-}
-
-/** \brief Explicit receive provider supplies the separate block producer. */
-nx_result_t nx_stm32_uart_dma_block_initialize(nx_stm32_uart_dma_state_t* state,
-                                               uint32_t clock_hz) {
-    return initialize(state, clock_hz, true);
-}
-
-/** \brief Exact DMA-domain and controller checks, without stores or loans. */
-static inline nx_result_t validate_tx(nx_stm32_uart_dma_state_t* state,
-                                      const nx_uart_tx_request_t* request) {
-    if (state == NULL || request == NULL || request->data == NULL ||
-        request->length == 0U || request->length > UINT16_MAX ||
-        state->tx == NULL) {
+/** \brief Check the exact TX path without stores or loans. */
+static inline nx_result_t
+validate_tx(nx_stm32_uart_state_t* uart,
+            const nx_stm32_uart_dma_resources_t* resources,
+            nx_stm32_uart_tx_dma_extension_t* transmit,
+            const nx_uart_tx_request_t* request) {
+    if (uart == NULL || resources == NULL || transmit == NULL ||
+        request == NULL || request->data == NULL || request->length == 0U ||
+        request->length > UINT16_MAX || transmit->tx == NULL) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     nx_result_t result = nx_dma_buffer_validate(
-        state->regions, state->region_count, request->data, request->length, 1U,
-        NX_DMA_TO_DEVICE);
+        resources->regions, resources->region_count, request->data,
+        request->length, 1U, NX_DMA_TO_DEVICE);
     if (result != NX_SUCCESS) {
         return result;
     }
-    if (!state->uart.initialized || state->uart.closing) {
+    if (!uart->initialized || uart->closing) {
         return NX_ERROR_STATE;
     }
-    if (state->uart.active != NULL || (state->tx->CR & DMA_SxCR_EN) != 0U) {
+    if (uart->active != NULL || (transmit->tx->CR & DMA_SxCR_EN) != 0U) {
         return NX_ERROR_BUSY;
     }
     return nx_deadline_expired(request->base.deadline, nx_time_now_us())
@@ -147,15 +146,16 @@ static inline nx_result_t validate_tx(nx_stm32_uart_dma_state_t* state,
                : NX_SUCCESS;
 }
 
-/** \brief Validate all rejectable inputs before unique request admission. */
-static nx_result_t start(nx_stm32_uart_dma_state_t* state,
+/** \brief Admit once after all rejectable DMA checks. */
+static nx_result_t start(nx_stm32_uart_state_t* uart,
+                         const nx_stm32_uart_dma_resources_t* resources,
+                         nx_stm32_uart_tx_dma_extension_t* transmit,
                          nx_uart_tx_request_t* request, bool admitted) {
-    nx_result_t result = validate_tx(state, request);
+    nx_result_t result = validate_tx(uart, resources, transmit, request);
     if (result != NX_SUCCESS) {
         return result;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    nx_stm32_uart_state_t* uart = &state->uart;
     result = admitted ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
                       : nx_request_admit(&request->base, NX_REQUEST_ACTIVE);
     if (result != NX_SUCCESS) {
@@ -167,54 +167,38 @@ static nx_result_t start(nx_stm32_uart_dma_state_t* state,
     uart->tx_complete = false;
     uart->terminal = NX_SUCCESS;
     uart->drain_deadline = NX_DEADLINE_NEVER;
-    state->dma_complete = false;
-    state->aborting = false;
-    acknowledge(state);
-    state->tx->PAR = (uint32_t)(uintptr_t)&uart->registers->DR;
-    state->tx->M0AR = (uint32_t)(uintptr_t)request->data;
-    state->tx->NDTR = (uint32_t)request->length;
-    state->tx->FCR = 0U;
-    state->tx->CR = ((uint32_t)state->channel << DMA_SxCR_CHSEL_Pos) |
-                    DMA_SxCR_MINC | DMA_SxCR_DIR_0 | DMA_SxCR_PL_1 |
-                    DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
+    transmit->dma_complete = false;
+    transmit->aborting = false;
+    acknowledge(resources, transmit);
+    transmit->tx->PAR = (uint32_t)(uintptr_t)&uart->registers->DR;
+    transmit->tx->M0AR = (uint32_t)(uintptr_t)request->data;
+    transmit->tx->NDTR = (uint32_t)request->length;
+    transmit->tx->FCR = 0U;
+    transmit->tx->CR = ((uint32_t)transmit->channel << DMA_SxCR_CHSEL_Pos) |
+                       DMA_SxCR_MINC | DMA_SxCR_DIR_0 | DMA_SxCR_PL_1 |
+                       DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
     uart->registers->CR1 &= ~(uint32_t)(USART_CR1_TXEIE | USART_CR1_TCIE);
     uart->registers->SR &= ~(uint32_t)USART_SR_TC;
     nx_arch_dsb();
-    state->tx->CR |= DMA_SxCR_EN;
+    transmit->tx->CR |= DMA_SxCR_EN;
     uart->registers->CR3 |= USART_CR3_DMAT;
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
 
-/** \brief Admission borrows memory only after strict DMA-domain validation. */
-nx_result_t nx_stm32_uart_dma_submit(void* context,
-                                     nx_uart_tx_request_t* request) {
-    return start(context, request, false);
-}
-
-/** \brief Preserve the adapter admission without a second provider borrow. */
-nx_result_t nx_stm32_uart_dma_start_admitted(void* context,
-                                             nx_uart_tx_request_t* request) {
-    if (request == NULL ||
-        nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
-        return NX_ERROR_STATE;
-    }
-    return start(context, request, true);
-}
-
-/** \brief Latch one terminal cause while retaining independently draining
- * memory. */
-static void begin_drain(nx_stm32_uart_dma_state_t* state,
+/** \brief Keep the request borrowed while DMA and wire drain independently. */
+static void begin_drain(nx_stm32_uart_state_t* uart,
+                        const nx_stm32_uart_dma_resources_t* resources,
+                        nx_stm32_uart_tx_dma_extension_t* transmit,
                         nx_result_t terminal) {
-    nx_stm32_uart_state_t* uart = &state->uart;
-    detach(state);
-    state->aborting = true;
+    detach(uart, resources, transmit);
+    transmit->aborting = true;
     uart->terminal = terminal;
     (void)nx_request_transition(&uart->active->base, NX_REQUEST_DRAINING);
     uart->drain_deadline =
         nx_deadline_after(nx_time_now_us(), 20000000U / uart->baud + 100U);
-    bool untouched = (state->tx->CR & DMA_SxCR_EN) == 0U &&
-                     state->tx->NDTR == uart->active->length;
+    bool untouched = (transmit->tx->CR & DMA_SxCR_EN) == 0U &&
+                     transmit->tx->NDTR == uart->active->length;
     uart->tx_complete =
         untouched || LL_USART_IsActiveFlag_TC(uart->registers) != 0U;
     if (!uart->tx_complete) {
@@ -222,19 +206,18 @@ static void begin_drain(nx_stm32_uart_dma_state_t* state,
     }
 }
 
-/** \brief Cancel closes the DMA source; it never converts NDTR into wire bytes.
- */
-nx_result_t nx_stm32_uart_dma_cancel(void* context,
-                                     nx_uart_tx_request_t* request) {
-    nx_stm32_uart_dma_state_t* state = context;
-    if (state == NULL || request == NULL) {
+/** \brief Cancel cannot revoke the request borrow. */
+nx_result_t nx_stm32_uart_dma_cancel_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, nx_uart_tx_request_t* request) {
+    if (uart == NULL || resources == NULL || transmit == NULL ||
+        request == NULL) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    nx_stm32_uart_state_t* uart = &state->uart;
     if (uart->active != request) {
         nx_result_t result =
             nx_request_state(&request->base) == NX_REQUEST_SETTLED
@@ -243,111 +226,110 @@ nx_result_t nx_stm32_uart_dma_cancel(void* context,
         nx_arch_irq_restore(saved);
         return result;
     }
-    if (!uart->tx_complete && !state->aborting) {
-        begin_drain(state, NX_ERROR_CANCELLED);
+    if (!uart->tx_complete && !transmit->aborting) {
+        begin_drain(uart, resources, transmit, NX_ERROR_CANCELLED);
     }
     nx_arch_irq_restore(saved);
     return NX_SUCCESS;
 }
 
-/** \brief DMA TC detaches memory and enables a distinct USART TC observation.
+/** \brief DMA completion enables a distinct UART wire completion observation.
  */
-void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state) {
-    if (state == NULL || !state->uart.initialized) {
+void nx_stm32_uart_dma_irq_parts(nx_stm32_uart_state_t* uart,
+                                 const nx_stm32_uart_dma_resources_t* resources,
+                                 nx_stm32_uart_tx_dma_extension_t* transmit) {
+    if (uart == NULL || resources == NULL || transmit == NULL ||
+        !uart->initialized) {
         return;
     }
-    uint32_t status = flags(state);
+    uint32_t status = flags(resources, transmit);
     if ((status & 0x2DU) == 0U) {
         return;
     }
-    nx_stm32_uart_state_t* uart = &state->uart;
     if (uart->active == NULL) {
-        acknowledge(state);
+        acknowledge(resources, transmit);
         return;
     }
-    if (!state->aborting && (status & 0x0DU) != 0U) {
-        begin_drain(state, NX_ERROR_IO);
+    if (!transmit->aborting && (status & 0x0DU) != 0U) {
+        begin_drain(uart, resources, transmit, NX_ERROR_IO);
         (void)nx_irq_wake_signal(uart->wake);
-    } else if (!state->aborting && !state->dma_complete) {
-        if ((status & 0x0DU) != 0U || state->tx->NDTR != 0U) {
-            begin_drain(state, NX_ERROR_IO);
+    } else if (!transmit->aborting && !transmit->dma_complete) {
+        if ((status & 0x0DU) != 0U || transmit->tx->NDTR != 0U) {
+            begin_drain(uart, resources, transmit, NX_ERROR_IO);
         } else {
             uart->drain_deadline = nx_deadline_after(
                 nx_time_now_us(), 20000000U / uart->baud + 100U);
-            detach(state);
-            if ((flags(state) & 0x0DU) != 0U) {
-                begin_drain(state, NX_ERROR_IO);
+            detach(uart, resources, transmit);
+            if ((flags(resources, transmit) & 0x0DU) != 0U) {
+                begin_drain(uart, resources, transmit, NX_ERROR_IO);
             } else {
-                state->dma_complete = true;
+                transmit->dma_complete = true;
                 uart->registers->CR1 |= USART_CR1_TCIE;
             }
         }
         (void)nx_irq_wake_signal(uart->wake);
     } else {
-        acknowledge_bits(state, flags(state) & 0x30U);
+        acknowledge_bits(resources, transmit,
+                         flags(resources, transmit) & 0x30U);
     }
 }
 
-/** \brief Ordinary RX facts and TC latch remain bounded and mode-independent.
- */
-void nx_stm32_uart_dma_uart_irq(nx_stm32_uart_dma_state_t* state) {
-    if (state != NULL) {
-        nx_stm32_uart_irq(&state->uart);
-    }
-}
-
-/** \brief Detach engine and IRQ references before the final release
- * publication. */
-void nx_stm32_uart_dma_service(void* context) {
-    nx_stm32_uart_dma_state_t* state = context;
-    if (state == NULL || nx_arch_in_isr() || nx_arch_irq_is_masked()) {
+/** \brief Settle only after independently proved memory and wire drain. */
+void nx_stm32_uart_dma_service_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit) {
+    if (uart == NULL || resources == NULL || transmit == NULL ||
+        nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    nx_stm32_uart_state_t* uart = &state->uart;
     nx_uart_tx_request_t* request = uart->active;
     if (request == NULL) {
         nx_arch_irq_restore(saved);
         return;
     }
     nx_time_us_t now = nx_time_now_us();
-    if (!state->aborting && (flags(state) & 0x0DU) != 0U) {
-        begin_drain(state, NX_ERROR_IO);
+    if (!transmit->aborting && (flags(resources, transmit) & 0x0DU) != 0U) {
+        begin_drain(uart, resources, transmit, NX_ERROR_IO);
     }
-    if (!uart->tx_complete && !state->aborting &&
+    if (!uart->tx_complete && !transmit->aborting &&
         nx_deadline_expired(request->base.deadline, now)) {
-        begin_drain(state, NX_ERROR_TIMEOUT);
+        begin_drain(uart, resources, transmit, NX_ERROR_TIMEOUT);
     }
     nx_dma_drain_facts_t facts = {
         .length = request->length,
-        .remaining = state->tx->NDTR,
-        .engine_disabled = (state->tx->CR & DMA_SxCR_EN) == 0U,
+        .remaining = transmit->tx->NDTR,
+        .engine_disabled = (transmit->tx->CR & DMA_SxCR_EN) == 0U,
         .irq_detached =
-            (state->tx->CR & (DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE |
-                              DMA_SxCR_DMEIE)) == 0U,
+            (transmit->tx->CR & (DMA_SxCR_TCIE | DMA_SxCR_HTIE | DMA_SxCR_TEIE |
+                                 DMA_SxCR_DMEIE)) == 0U,
         .peripheral_idle = uart->tx_complete,
     };
     if (nx_dma_drain_check(&facts) == NX_SUCCESS) {
         uart->registers->CR1 &= ~(uint32_t)(USART_CR1_TCIE | USART_CR1_TXEIE);
-        acknowledge_bits(state, flags(state) & 0x30U);
+        acknowledge_bits(resources, transmit,
+                         flags(resources, transmit) & 0x30U);
         /* Actual EN/IRQ withdrawal precedes this final error observation. */
-        if (uart->terminal == NX_SUCCESS && (flags(state) & 0x0DU) != 0U) {
+        if (uart->terminal == NX_SUCCESS &&
+            (flags(resources, transmit) & 0x0DU) != 0U) {
             uart->terminal = NX_ERROR_IO;
         }
-        size_t transferred = state->dma_complete && uart->terminal == NX_SUCCESS
-                                 ? request->length
-                                 : 0U;
+        size_t transferred =
+            transmit->dma_complete && uart->terminal == NX_SUCCESS
+                ? request->length
+                : 0U;
         nx_result_t terminal = uart->terminal;
         uart->active = NULL;
         nx_request_settle(&request->base, terminal, transferred);
     } else {
-        if (!state->aborting && state->dma_complete &&
+        if (!transmit->aborting && transmit->dma_complete &&
             nx_deadline_expired(uart->drain_deadline, now)) {
             nx_time_us_t deadline = uart->drain_deadline;
-            begin_drain(state, NX_ERROR_IO);
+            begin_drain(uart, resources, transmit, NX_ERROR_IO);
             uart->drain_deadline = deadline;
         }
-        if (state->aborting && nx_deadline_expired(uart->drain_deadline, now) &&
+        if (transmit->aborting &&
+            nx_deadline_expired(uart->drain_deadline, now) &&
             nx_request_state(&request->base) != NX_REQUEST_QUARANTINED) {
             (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
         }
@@ -355,50 +337,168 @@ void nx_stm32_uart_dma_service(void* context) {
     nx_arch_irq_restore(saved);
 }
 
-/** \brief Close admission while preserving active DMA and RX storage ownership.
- */
-nx_result_t nx_stm32_uart_dma_stop(void* context) {
-    nx_stm32_uart_dma_state_t* state = context;
-    if (state == NULL) {
+/** \brief Quiesce TX extension without releasing its shared UART owner. */
+nx_result_t
+nx_stm32_uart_dma_stop_parts(nx_stm32_uart_state_t* uart,
+                             const nx_stm32_uart_dma_resources_t* resources,
+                             nx_stm32_uart_tx_dma_extension_t* transmit) {
+    if (uart == NULL || resources == NULL || transmit == NULL) {
         return NX_ERROR_INVALID;
     }
     if (nx_arch_in_isr() || nx_arch_irq_is_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    state->uart.closing = true;
-    if (state->uart.active != NULL) {
-        (void)nx_stm32_uart_dma_cancel(state, state->uart.active);
-        nx_stm32_uart_dma_service(state);
-        if (state->uart.active != NULL) {
+    uart->closing = true;
+    if (uart->active != NULL) {
+        (void)nx_stm32_uart_dma_cancel_parts(uart, resources, transmit,
+                                             uart->active);
+        nx_stm32_uart_dma_service_parts(uart, resources, transmit);
+        if (uart->active != NULL) {
             return NX_ERROR_BUSY;
         }
     }
-    detach(state);
-    if ((state->tx->CR & DMA_SxCR_EN) != 0U) {
+    detach(uart, resources, transmit);
+    if ((transmit->tx->CR & DMA_SxCR_EN) != 0U) {
         return NX_ERROR_BUSY;
     }
 #ifndef NEXUS_STM32_MODEL
-    NVIC_DisableIRQ(state->dma_irq);
-    NVIC_ClearPendingIRQ(state->dma_irq);
+    NVIC_DisableIRQ(transmit->dma_irq);
+    NVIC_ClearPendingIRQ(transmit->dma_irq);
 #endif
-    return nx_stm32_uart_stop(&state->uart);
+    return NX_SUCCESS;
 }
 
-/** \brief Both publishers must satisfy the sink's syscall ceiling. */
+/** \brief Direct request admission over explicit selected components. */
+nx_result_t nx_stm32_uart_dma_submit_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, nx_uart_tx_request_t* request) {
+    return start(uart, resources, transmit, request, false);
+}
+
+/** \brief Transfer an adapter loan without readmission. */
+nx_result_t nx_stm32_uart_dma_start_admitted_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit, nx_uart_tx_request_t* request) {
+    if (request == NULL ||
+        nx_request_state(&request->base) != NX_REQUEST_QUEUED) {
+        return NX_ERROR_STATE;
+    }
+    return start(uart, resources, transmit, request, true);
+}
+
+/** \brief Expose the matching pure selected validator. */
+nx_result_t nx_stm32_uart_dma_tx_validate_parts(
+    nx_stm32_uart_state_t* uart, const nx_stm32_uart_dma_resources_t* resources,
+    nx_stm32_uart_tx_dma_extension_t* transmit,
+    const nx_uart_tx_request_t* request) {
+    return validate_tx(uart, resources, transmit, request);
+}
+
+/** \brief Decode one finite TX owner; storage remains allocation-free. */
+nx_result_t nx_stm32_uart_dma_initialize(nx_stm32_uart_dma_state_t* state,
+                                         uint32_t clock_hz) {
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_stm32_uart_dma_initialize_parts(
+        &state->uart, &state->resources, &state->transmit, clock_hz, false);
+}
+
+/** \brief Decode one finite TX owner; storage remains allocation-free. */
+nx_result_t nx_stm32_uart_dma_block_initialize(nx_stm32_uart_dma_state_t* state,
+                                               uint32_t clock_hz) {
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_stm32_uart_dma_initialize_parts(&state->uart, &state->resources,
+                                              &state->transmit, clock_hz, true);
+}
+
+/** \brief Decode the immutable face context into explicit typed components. */
+nx_result_t nx_stm32_uart_dma_submit(void* context,
+                                     nx_uart_tx_request_t* request) {
+    nx_stm32_uart_dma_state_t* state = context;
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_stm32_uart_dma_submit_parts(&state->uart, &state->resources,
+                                          &state->transmit, request);
+}
+
+/** \brief Decode the immutable face context into explicit typed components. */
+nx_result_t nx_stm32_uart_dma_start_admitted(void* context,
+                                             nx_uart_tx_request_t* request) {
+    nx_stm32_uart_dma_state_t* state = context;
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_stm32_uart_dma_start_admitted_parts(
+        &state->uart, &state->resources, &state->transmit, request);
+}
+
+/** \brief Decode the immutable face context into explicit typed components. */
+nx_result_t nx_stm32_uart_dma_cancel(void* context,
+                                     nx_uart_tx_request_t* request) {
+    nx_stm32_uart_dma_state_t* state = context;
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_stm32_uart_dma_cancel_parts(&state->uart, &state->resources,
+                                          &state->transmit, request);
+}
+
+/** \brief Use the one UART identity shared with its selected TX extension. */
+void nx_stm32_uart_dma_service(void* context) {
+    nx_stm32_uart_dma_state_t* state = context;
+    if (state == NULL) {
+        return;
+    }
+    nx_stm32_uart_dma_service_parts(&state->uart, &state->resources,
+                                    &state->transmit);
+}
+
+/** \brief Use the one UART identity shared with its selected TX extension. */
+void nx_stm32_uart_dma_irq(nx_stm32_uart_dma_state_t* state) {
+    if (state == NULL) {
+        return;
+    }
+    nx_stm32_uart_dma_irq_parts(&state->uart, &state->resources,
+                                &state->transmit);
+}
+
+/** \brief Release the UART only after its finite TX extension is quiescent. */
+nx_result_t nx_stm32_uart_dma_stop(void* context) {
+    nx_stm32_uart_dma_state_t* state = context;
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    nx_result_t result = nx_stm32_uart_dma_stop_parts(
+        &state->uart, &state->resources, &state->transmit);
+    return result == NX_SUCCESS ? nx_stm32_uart_stop(&state->uart) : result;
+}
+
+/** \brief Finite TX mode retains independent IRQ RX. */
+void nx_stm32_uart_dma_uart_irq(nx_stm32_uart_dma_state_t* state) {
+    if (state != NULL) {
+        nx_stm32_uart_irq(&state->uart);
+    }
+}
+
+/** \brief Preserve independently budgeted byte RX and wake semantics. */
 static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
                                uint8_t syscall_ceiling) {
     nx_stm32_uart_dma_state_t* state = context;
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
-    nx_result_t result =
-        nx_stm32_irq_wake_validate(wake, state->dma_irq, syscall_ceiling);
+    nx_result_t result = nx_stm32_irq_wake_validate(
+        wake, state->transmit.dma_irq, syscall_ceiling);
     return result == NX_SUCCESS ? nx_stm32_uart_ops.attach_wake(
                                       &state->uart, wake, syscall_ceiling)
                                 : result;
 }
 
-/** \brief RX storage and semantics are shared with the independent IRQ mode. */
+/** \brief Preserve independently budgeted byte RX and wake semantics. */
 static nx_result_t read_events(void* context, nx_uart_rx_event_t* events,
                                size_t capacity, size_t* count) {
     nx_stm32_uart_dma_state_t* state = context;
@@ -407,7 +507,7 @@ static nx_result_t read_events(void* context, nx_uart_rx_event_t* events,
                                                      capacity, count);
 }
 
-/** \brief DMA TX never changes the independently budgeted RX byte ring. */
+/** \brief Preserve independently budgeted byte RX and wake semantics. */
 static nx_result_t read_bytes(void* context, uint8_t* bytes, size_t capacity,
                               size_t* count) {
     nx_stm32_uart_dma_state_t* state = context;
@@ -416,8 +516,7 @@ static nx_result_t read_bytes(void* context, uint8_t* bytes, size_t capacity,
                : nx_stm32_uart_read_bytes(&state->uart, bytes, capacity, count);
 }
 
-/** \brief One immutable operation table for all selected finite UART DMA
- * instances. */
+/** \brief One shared immutable finite TX DMA operations table. */
 const nx_uart_ops_t nx_stm32_uart_dma_ops = {
     .submit = nx_stm32_uart_dma_submit,
     .start_admitted = nx_stm32_uart_dma_start_admitted,
@@ -429,8 +528,13 @@ const nx_uart_ops_t nx_stm32_uart_dma_ops = {
     .attach_wake = attach_wake,
 };
 
-/** \brief Expose this exact DMA validator only for an opt-in adapter. */
+/** \brief Match the actual finite TX face admission checks. */
 nx_result_t nx_stm32_uart_dma_tx_validate(void* context,
                                           const nx_uart_tx_request_t* request) {
-    return validate_tx(context, request);
+    nx_stm32_uart_dma_state_t* state = context;
+    if (state == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_stm32_uart_dma_tx_validate_parts(&state->uart, &state->resources,
+                                               &state->transmit, request);
 }

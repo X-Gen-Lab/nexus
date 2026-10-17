@@ -146,7 +146,7 @@ records test tooling and never establish qualification for the three boards.
 
 ## Reviewed acquisition adapters
 
-`workloads.py plan` supplies twenty-one explicit acquisition protocols for station
+`workloads.py plan` supplies twenty-five explicit acquisition protocols for station
 binding; clock/reset/GPIO/watchdog; UART/SPI/DMA; I2C; ADC/PWM/EXTI; Flash power
 loss; concurrent load; M4F context; time/deadlines; all task/MSP peaks; lifecycle
 endurance; tickless timer-port wake; and fail-stop/external safe outputs. Separate
@@ -158,6 +158,19 @@ selecting a UART alone does not install RTS/CTS, DE wiring or a transceiver.
 station. Budgets, instrument identities, wiring and safety steps must come from
 the actual station owner. Missing selected controllers/modes stay
 `requires_selection`; unsupported CPU/backend cases stay `unsupported`.
+
+The four typed I/O protocols select exact resolved faces: `uart_word_wire`
+requires an IRQ 9N1 word port and a native nine-bit peer that preserves bit 8;
+`spi_dma_whole_cs_segments` requires a same-controller enhanced DMA endpoint;
+`i2c_v2_long_timing` requires a selected long endpoint and the authored
+G474/H743/U575 analog-filter-on, digital-filter-zero timing projection;
+`pwm_group_comp_break` requires the generated exclusive TIM1/COMP1 route.
+Generic SPI, I2C or advanced PWM selection cannot substitute for these faces.
+Each protocol retains waveform, drain and instrument obligations with null
+limits until reviewed. They remain `not_executed`. A word-only assembly cannot
+use the eight-bit smoke adapter: supply a separately selected and reviewed 8N1
+control console before full workload or station admission. The offline mode
+selector alone establishes neither that console nor physical readiness.
 
 ```sh
 python tools/hil/workloads.py plan \

@@ -15,6 +15,8 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 0, "dcache_line_bytes": 0, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32g474"
+CONTROLLER_INTERFACES = MappingProxyType({
+    "TIM3": MappingProxyType({"encoder": ("quadrature",)})})
 MODEL = False
 FACT_REFERENCES = descriptor.maintained("stm32g474").references
 CAN_CONTROLLERS = ()
@@ -39,6 +41,9 @@ _MODES = MappingProxyType({
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi",
     ("pwm", "fixed-pwm"): "pwm",
+    ("pwm_group", "coherent-pwm"): "pwm_group",
+    ("timer_capture", "edge-capture"): "timer_capture",
+    ("encoder", "quadrature"): "encoder",
     ("adc", "single-shot"): "adc",
     ("adc", "trigger-dma"): "adc_stream",
     ("flash", "poll-word"): "flash",
@@ -113,6 +118,43 @@ def validate_selection(selection, route):
             common.fail("G474 SPI requires its exact reviewed AF5 route")
         common.integer(selection.get("max_hz"), *LIMITS["spi_hz"],
                        "G474 SPI maximum frequency")
+    elif kind == "timer_capture":
+        if selection.get("irq_priority") != 5:
+            common.fail("G474 TIM5 capture requires IRQ priority5")
+    elif kind == "encoder":
+        expected = (("PA6", "encoder-a", 2), ("PA7", "encoder-b", 2))
+        if (route["controller"] != "TIM3" or
+                tuple((pin["pin"], pin["function"], pin["af"])
+                      for pin in route["pins"]) != expected):
+            common.fail("G474 encoder requires exact TIM3 PA6/PA7 AF2")
+        if selection.get("counting") not in {"x2-ti1", "x2-ti2", "x4-ti12"}:
+            common.fail("G474 encoder counting personality is unmaintained")
+        common.integer(selection.get("filter_a"), 0, 15, "Encoder filter_a")
+        common.integer(selection.get("filter_b"), 0, 15, "Encoder filter_b")
+        if any(type(selection.get(key)) is not bool for key in
+               ("invert_a", "invert_b", "exclusive")) or not selection["exclusive"]:
+            common.fail("G474 encoder requires explicit input polarity and exclusive ownership")
+    elif kind == "pwm_group":
+        actual = tuple((pin["pin"], pin["function"], pin["af"])
+                       for pin in route["pins"])
+        expected = (("PA8", "ch1", 6), ("PA9", "ch2", 6),
+                    ("PA10", "ch3", 6), ("PA1", "comp1-inp", 0),
+                    ("PA4", "comp1-inm", 0))
+        if route["controller"] != "TIM1" or actual != expected:
+            common.fail("G474 coherent PWM requires exact TIM1/COMP1 routes")
+        if type(selection.get("exclusive")) is not bool or not selection["exclusive"]:
+            common.fail("G474 coherent PWM requires an exclusive owner")
+        tick = common.integer(selection.get("tick_hz"), 1, 170000000, "PWM group tick")
+        if 170000000 % tick or 170000000 // tick > 65536:
+            common.fail("PWM group tick must exactly divide its timer kernel")
+        common.integer(selection.get("period_ticks"), 2, 65535, "PWM group period")
+        ticks = common.integer(selection.get("deadtime_ticks"), 0, 1008, "PWM group deadtime")
+        if not (ticks <= 127 or ticks <= 254 and ticks % 2 == 0 or
+                256 <= ticks <= 504 and ticks % 8 == 0 or
+                512 <= ticks <= 1008 and ticks % 16 == 0):
+            common.fail("PWM group deadtime requires exact hardware encoding")
+        if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
+            common.fail("G474 coherent PWM implements IRQ priority5 only")
     elif kind == "pwm":
         expected = {"TIM3": "PA6", "TIM4": "PB6"}.get(route["controller"])
         if tuple((pin["pin"], pin["function"], pin["af"])

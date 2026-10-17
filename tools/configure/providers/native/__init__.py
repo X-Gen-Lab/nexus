@@ -31,6 +31,7 @@ _MODE_IMPLEMENTATIONS = MappingProxyType({
     ('uart', 'irq-byte-event'): 'uart',
     ('uart', 'irq-words'): 'uart_word',
     ('spi', 'short-poll'): 'spi',
+    ('spi', 'async-model'): 'spi_dma',
     ('i2c', 'poll-messages'): 'i2c',
     ('flash', 'poll-byte'): 'flash',
     ('watchdog', 'independent'): 'watchdog',

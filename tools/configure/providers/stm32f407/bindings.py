@@ -583,7 +583,8 @@ def _uart_constructor(item, result):
     definitions = []
     if not block_uart:
         definitions.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
-    dma_state = f"s_nx_port_{name}" + (".transmit" if receive_uart else "")
+    dma_state = f"s_nx_port_{name}" + (".receive" if receive_uart and dma_uart else "")
+    tx_state = f"s_nx_port_{name}.transmit"
     uart_state = (dma_state + ".uart" if receive_uart or dma_uart or block_uart
                   else dma_state)
     rx_storage = 'NULL' if block_uart else f's_nx_rx_{name}'
@@ -642,8 +643,9 @@ def _uart_constructor(item, result):
                       "uart_receive" if receive_uart else
                           "uart_dma_uart" if dma_uart else
                           "uart_stream" if block_uart else "uart")
+    irq_call = uart_formats.irq_call(item, f"nx_stm32_{irq_implementation}_irq(&s_nx_port_{name});")
     definitions += [f'void {irq}(void);', '/** \\brief Fixed single-controller IRQ dispatch. */',
-               f'void {irq}(void) {{ nx_stm32_{irq_implementation}_irq(&s_nx_port_{name}); }}']
+               f'void {irq}(void) {{ {irq_call} }}']
     if words or uart_formats.changed(item):
         rejected = definitions.index('    if (uart != NX_SUCCESS) {') + 1
         definitions[rejected:rejected] = [
@@ -659,21 +661,21 @@ def _uart_constructor(item, result):
         definitions[position:position] = region_lines
         port_binding = hardware.maintained("stm32f407", item.controller)
         path = port_binding.dma(item.mode)[0]
-        prefix = [f"    {dma_state}.dma = DMA{path[0]};",
-                  f"    {dma_state}.regions = s_nx_dma_regions_{name};",
-                  f"    {dma_state}.region_count = {region_count}u;"]
+        prefix = [f"    {dma_state}.resources.dma = DMA{path[0]};",
+                  f"    {dma_state}.resources.regions = s_nx_dma_regions_{name};",
+                  f"    {dma_state}.resources.region_count = {region_count}u;"]
         if receive_uart:
             rx = port_binding.dma("rx-dma-idle")[0]
             rx_vector = hardware.dma_vector("stm32f407", rx)
-            prefix += [f"    s_nx_port_{name}.receive = {rx_vector};",
-                       f"    s_nx_port_{name}.continuous = {'true' if traits.continuous else 'false'};"]
+            prefix += [f"    {dma_state}.receive = {rx_vector};",
+                       f"    {dma_state}.continuous = {'true' if traits.continuous else 'false'};"]
         if dma_uart:
             tx = port_binding.dma("dma-tx")[0]
             tx_vector = hardware.dma_vector("stm32f407", tx)
-            prefix += [f"    {dma_state}.tx = {tx_vector};",
-                       f"    {dma_state}.dma_irq = {tx_vector}_IRQn;",
-                       f"    {dma_state}.stream = {tx[1]}u;",
-                       f"    {dma_state}.channel = {tx[2]}u;"]
+            prefix += [f"    {tx_state}.tx = {tx_vector};",
+                       f"    {tx_state}.dma_irq = {tx_vector}_IRQn;",
+                       f"    {tx_state}.stream = {tx[1]}u;",
+                       f"    {tx_state}.channel = {tx[2]}u;"]
         position += len(region_lines) + 1
         definitions[position:position] = prefix
         priority_line = definitions.index(
@@ -683,12 +685,12 @@ def _uart_constructor(item, result):
             priorities.append(f"    NVIC_SetPriority({rx_vector}_IRQn, {item.options.irq.priority}u);")
             definitions += [f"void {rx_vector}_IRQHandler(void);",
                             "/** \\brief Exact selected DMA receive publisher. */",
-                            f"void {rx_vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
+                            f"void {rx_vector}_IRQHandler(void) {{ nx_stm32_uart_receive_dma_irq(&{dma_state}); }}"]
         if dma_uart:
-            priorities.append(f"    NVIC_SetPriority({dma_state}.dma_irq, {item.options.irq.priority}u);")
+            priorities.append(f"    NVIC_SetPriority({tx_state}.dma_irq, {item.options.irq.priority}u);")
             definitions += [f"void {tx_vector}_IRQHandler(void);",
                             "/** \\brief Exact selected DMA TX observation. */",
-                            f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_dma_irq(&{dma_state}); }}"]
+                            f"void {tx_vector}_IRQHandler(void) {{ nx_stm32_uart_{'duplex_dma' if receive_uart else 'dma'}_irq(&s_nx_port_{name}); }}"]
         definitions[priority_line + 1:priority_line + 1] = priorities
     return Construction(
         state_type=f"nx_stm32_{implementation}_state_t",

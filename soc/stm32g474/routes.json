@@ -1315,33 +1315,72 @@
     },
     {
       "id": "adc1-in1-pa0",
-      "variants": ["STM32G474RET6"],
+      "variants": [
+        "STM32G474RET6"
+      ],
       "controller": "ADC1",
       "kind": "adc",
-      "pins": [{"pin": "PA0", "function": "analog", "af": 0}],
-      "modes": ["single-shot", "trigger-dma"],
-      "mode_dma": {"trigger-dma": ["DMA1:stream1:channel5"]},
-      "mode_resources": {"trigger-dma": ["controller:TIM6"]},
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot",
+        "trigger-dma"
+      ],
+      "mode_dma": {
+        "trigger-dma": [
+          "DMA1:stream1:channel5"
+        ]
+      },
+      "mode_resources": {
+        "trigger-dma": [
+          "controller:TIM6"
+        ]
+      },
       "source": "DS12288 PA0 ADC1_IN1; RM0440 ADC12 asynchronous SYSCLK/128=1.328125MHz, TIM6 TRGO EXTSEL13, DMA1 channel1 DMAMUX request5. Single ended12bit, samplecode0/2.5cycles, bulb2.5..640.5cycle bounds, exact2.5..50kHz finite normal DMA only. Software fixture, Board input and analog accuracy unqualified."
     },
     {
       "id": "i2c1-pb8-pb9",
-      "variants": ["STM32G474RET6"],
+      "variants": [
+        "STM32G474RET6"
+      ],
       "controller": "I2C1",
       "kind": "i2c",
-      "pins": [{"pin": "PB8", "function": "scl", "af": 4},
-               {"pin": "PB9", "function": "sda", "af": 4}],
-      "modes": ["poll-messages"],
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB9",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
       "source": "DS12288 Table13 PB8/PB9 AF4 I2C1. RM0440 I2C V2 finite7bit repeated START, HSI16 kernel and TIMINGR0x30420f13 standard mode with analogfilter/DNF0. Board external pullups, rise<=1000ns and fall<=300ns require physical qualification."
     },
     {
       "id": "internal-flash",
-      "variants": ["STM32G474RET6"],
+      "variants": [
+        "STM32G474RET6"
+      ],
       "controller": "FLASH",
       "kind": "flash",
       "pins": [],
-      "modes": ["poll-word"],
-      "resources": ["irq:FLASH_IRQn"],
+      "modes": [
+        "poll-word"
+      ],
+      "resources": [
+        "irq:FLASH_IRQn"
+      ],
       "source": "RM0440 Category3 DBANK1, 512KiB two banks each128x2KiB pages,64bitdoubleword plusECC programming. EOPIE/ERRIE sources use exclusivelyclaimedFLASHIRQ4 withNVICneverenabled; sourcewithdrawal thenstatusclear andpendingjoin precede release. No product reservation. Fixed software reference3300mV must be confirmed by Board before writes; physical HIL unexecuted."
     },
     {
@@ -1362,6 +1401,91 @@
         "fixed-pwm"
       ],
       "source": "DS12288 Rev6 Table13 PA6 TIM3_CH1 AF2 and PB6 TIM4_CH1 AF2; RM0440 Rev9 general-purpose TIM3/4 16-bit PWM1 CCR preload and MMS/CEN trigger selection. Silicon software fixture only; no physical loads qualified."
+    },
+    {
+      "id": "tim1-group-pa8-pa9-pa10-comp1-pa1-pa4",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM1",
+      "kind": "pwm_group",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "ch1",
+          "af": 6
+        },
+        {
+          "pin": "PA9",
+          "function": "ch2",
+          "af": 6
+        },
+        {
+          "pin": "PA10",
+          "function": "ch3",
+          "af": 6
+        },
+        {
+          "pin": "PA1",
+          "function": "comp1-inp",
+          "af": 0
+        },
+        {
+          "pin": "PA4",
+          "function": "comp1-inm",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "coherent-pwm"
+      ],
+      "source": "DS12288 Rev6 Table13 TIM1 CH1/2/3 PA8/9/10 AF6; RM0440 Rev9 TIM1 CH4 internal TRGO2 and COMP1 PA1 positive/PA4 negative IO1. Official locked LL COMP CSR EN|INMSEL_2|INMSEL_1. Silicon software fixture only; no external threshold or output stage qualification."
+    },
+    {
+      "id": "tim5-ch1-pa0",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM5",
+      "kind": "timer_capture",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "capture",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "edge-capture"
+      ],
+      "source": "DS12288 Rev6 Table13 PA0 TIM5_CH1 AF2; RM0440 Rev9 TIM5 32-bit counter; official locked G474 CMSIS TIM5_IRQn50. Silicon software fixture, no physical edges qualified."
+    },
+    {
+      "id": "tim3-encoder-pa6-pa7",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM3",
+      "kind": "encoder",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "encoder-a",
+          "af": 2
+        },
+        {
+          "pin": "PA7",
+          "function": "encoder-b",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "quadrature"
+      ],
+      "resources": [
+        "irq:TIM3_IRQn"
+      ],
+      "source": "DS12288 Rev6 Table13 PA6/PA7 TIM3_CH1/CH2 AF2; RM0440 Rev9 encoder SMS1/2/3 and 16-bit TIM3. One physical controller shared exclusively with PWM; vector reserved quiet, never enabled. Silicon software fixture only."
     }
   ]
 }

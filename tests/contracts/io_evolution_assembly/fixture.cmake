@@ -8,7 +8,9 @@ if(NOT NEXUS_IO_EVOLUTION_FIXTURE_MAIN STREQUAL fixture_main)
     message(FATAL_ERROR "I/O fixture requires its explicit maintained main")
 endif()
 set(fixture_definitions NX_FIXTURE_UART_WORD NX_FIXTURE_SPI_TRANSACTION
-    NX_FIXTURE_SPI_DMA_TRANSACTION NX_FIXTURE_I2C_LONG)
+    NX_FIXTURE_SPI_DMA_TRANSACTION NX_FIXTURE_I2C_LONG
+    NX_FIXTURE_UART_STREAM_PROFILE NX_FIXTURE_ADC_STREAM_PROFILE
+    NX_FIXTURE_UART_WORD_IRQ_PROBE)
 foreach(definition IN LISTS NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS)
     if(NOT definition IN_LIST fixture_definitions)
         message(FATAL_ERROR "Unknown I/O fixture definition: ${definition}")

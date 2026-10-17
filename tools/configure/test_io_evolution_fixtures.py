@@ -30,6 +30,9 @@ class IOEvolutionFixtures(unittest.TestCase):
     def test_all_enhanced_fixtures_generate_real_typed_factories(self):
         fixtures = {
             "native-uart9n1": "nx_factory_uart_word(",
+            "f407-uart9n1-probe": "nx_factory_uart_word_irq_probe(",
+            "gd470-uart9n1-probe": "nx_factory_uart_word_irq_probe(",
+            "native-spi-dma-transaction": "nx_factory_spi_dma_owner_binding(",
             "f407-uart7e2": "nx_factory_uart(",
             "f407-uart9n1": "nx_factory_uart_word(",
             "gd470-uart7e2": "nx_factory_uart(",

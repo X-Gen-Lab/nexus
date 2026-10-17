@@ -32,6 +32,7 @@ void TIMER0_BRK_TIMER8_IRQHandler(void);
 
 #ifdef NX_TIMER_FACTORY_STM32
 #define CAP_CR1     TIM4->CR1
+#define CAP_EGR     TIM4->EGR
 #define CAP_PSC     TIM4->PSC
 #define CAP_CCR     TIM4->CCR1
 #define CAP_CCER    TIM4->CCER
@@ -52,6 +53,7 @@ void TIMER0_BRK_TIMER8_IRQHandler(void);
 #define ADV_IRQ     TIM1_BRK_TIM9_IRQHandler
 #else
 #define CAP_CR1     TIMER_CTL0(TIMER3)
+#define CAP_EGR     TIMER_SWEVG(TIMER3)
 #define CAP_PSC     TIMER_PSC(TIMER3)
 #define CAP_CCR     TIMER_CH0CV(TIMER3)
 #define CAP_CCER    TIMER_CHCTL2(TIMER3)
@@ -188,6 +190,9 @@ extern "C" void nx_timer_factory_write(volatile uint32_t* address,
         *address = value;
     } else
         *address = value;
+    if (address == &CAP_EGR && (value & 1U) != 0U && (CAP_CR1 & 2U) == 0U) {
+        CAP_SR |= 1U;
+    }
 }
 /** \brief Priority byte storage remains independent from NVIC live facts. */
 extern "C" void nx_timer_factory_priority_write(volatile uint8_t* address,

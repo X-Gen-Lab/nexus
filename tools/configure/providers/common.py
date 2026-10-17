@@ -96,6 +96,8 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("pwm_group", "coherent-pwm"): ModeTraits(irq=True),
+    ("encoder", "quadrature"): ModeTraits(),
     ("timer_capture", "edge-capture"): ModeTraits(irq=True),
     ("advanced_pwm", "complementary-pwm"): ModeTraits(irq=True),
     ("eth", "raw-rmii"): ModeTraits(irq=True, bus_master=True),
@@ -117,6 +119,7 @@ _MODE_TRAITS = MappingProxyType({
     ("uart", "dma-duplex-continuous"): ModeTraits(
         irq=True, block_stream=True, tx_dma=True, rx_dma=True, continuous=True),
     ("spi", "short-poll"): ModeTraits(polling=True),
+    ("spi", "async-model"): ModeTraits(irq=True),
     ("spi", "dma"): ModeTraits(irq=True, tx_dma=True, rx_dma=True),
     ("spi", "dma-full-duplex"): ModeTraits(
         irq=True, tx_dma=True, rx_dma=True),
@@ -248,6 +251,8 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "encoder": {"counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
+        "pwm_group": {"tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq_priority", "calls_os"},
         "timer_capture": {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"},
         "advanced_pwm": {"tick_hz", "period_ticks", "deadtime_ticks", "break_active_high",
                          "idle_high", "idle_complement_high", "exclusive", "irq_priority", "calls_os"},
@@ -258,11 +263,11 @@ def validate_selection(selection, route, provider, ram_size):
                        "irq_priority", "calls_os"},
         "can": {"operation", "event_capacity", "bitrate", "timing", "irq_priority",
                 "calls_os", "drain_timeout_us", "poll_limit", "fifo_order"},
-        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame"},
+        "gpio": set(), "uart": {"baud", "rx_capacity", "rx_profile", "irq_priority", "calls_os", "frame", "stream", "irq_probe"},
         "spi": {"max_hz", "irq_priority", "calls_os"}, "i2c": {"max_hz", "irq_priority", "calls_os", "timing"}, "flash": set(), "watchdog": set(),
         "exti": {"edge", "event_capacity", "irq_priority", "calls_os"},
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
-        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os"},
+        "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os", "stream"},
     }
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:

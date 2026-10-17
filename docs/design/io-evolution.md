@@ -69,6 +69,33 @@ pin assignments differ. Common base frequency, update events, trigger outputs,
 break inputs, reset and clock ownership can still conflict. Likewise, two typed
 interfaces for one physical IP do not create two independent peripherals.
 
+## Bind declared stream budgets to the actual pool
+
+An optional [stream profile](../../io/include/nexus/io/stream_profile.h) binds
+immutable capacity assumptions to one selected continuous UART or ADC face.
+The [resolver](../../tools/configure/stream_profiles.py) generates this constant
+only when the assembly authors a profile. Factory lookup returns that existing
+profile; it neither creates a pool nor starts acquisition. Unprofiled entry
+points retain their own contracts and do not implicitly enforce this profile.
+
+The current F407/F470 double-buffer modes require two hardware targets, one
+replacement and enough additional blocks for the declared FIFO-frontier release
+delay. The calculation rounds retained blocks up and checks integer overflow,
+the 32-bit address extent and the 16-bit DMA counter. Target-replacement latency
+must be strictly shorter than a block's declared fill time. UART units are
+bytes; ADC units are complete scans containing one `uint16_t` per selected
+channel. ADC resolution bits do not change this storage width.
+
+Cold profile admission checks the caller's actual block count, equal capacities,
+existing loans, state and payload/control disjointness before invoking the
+original provider. Pool users must already be joined. Alias checking is bounded
+by the configured pool and is quadratic; it adds no checks to the IRQ or steady
+data path. The application still owns pool storage, consumer release order and
+execution progress. Rate, release delay and IRQ latency are authored assumptions,
+with `physical_qualified = false`. Exhaustion stops and reports a gap. It does
+not create UART backpressure, lossless transport or preservation of ADC samples
+that would have occurred while the trigger was stopped.
+
 ## Optional traits report selected behavior
 
 The existing `factory.capabilities` switch controls generated read-only trait
@@ -127,7 +154,24 @@ cancel or deadline never returns the request or payload early. The owner keeps
 servicing wire completion and drain; failure to prove drain retains QUARANTINED
 storage. Byte UART buffers and state do not become nine-bit buffers implicitly.
 
-SPI validates every segment and data span before hardware use. A null TX pointer
+F407 and F470 RX-only DMA modes now use a compact receive owner with ordinary
+IRQ TX. Only a duplex DMA mode embeds the separate TX-DMA extension. Both reuse
+the same receive loan algorithm and shared read-only public operations layout;
+there is no stored optional implementation pointer or runtime TX-provider
+selection. RX-only operation does not acquire or withdraw the unrelated TX-DMA
+lane. Duplex vectors decode their real outer owner and its separate components.
+The receive pool excludes the complete duplex object, including its extension.
+
+RX and TX admission exclude both the TX payload and the complete TX request
+descriptor from every future RX target, in both admission orders. Stopping first
+closes admission and drains RX producer and consumer loans, then drains selected
+TX memory and wire activity, and finally withdraws the UART and RX vector.
+Failed drain retains the corresponding storage and responsibility. Actual linked
+ELF comparisons determine Flash and RAM savings; host `sizeof` expectations alone
+do not establish MCU costs or an unchanged instruction path.
+
+The synchronous whole-CS interface validates every segment and data span before
+hardware use. A null TX pointer
 means repeated dummy words, a null RX pointer means discard, and both may be null
 for clock-only phases. All segments share one asserted CS interval. Polling
 return releases the synchronous borrow only after CS is released and either wire
@@ -143,6 +187,26 @@ all descriptors, all spans and explicit fixed dummy/discard cells stay borrowed
 until acquire-observed SETTLED. Intermediate completion, cancel and timeout do
 not release them. Caller-driven service remains necessary; wake attachment and
 recovery capabilities cannot be inferred from the base SPI port.
+
+The optional [segmented SPI owner](../../components/bus_owner/include/nexus/components/spi_dma_owner.h)
+adapts this enhanced face to the existing bounded BusOwner queue. Caller-supplied
+slots and epochs remain the queue authority; no worker, payload copy or second
+controller owner is added. One uniquely scheduled executor services the inner
+request. Only after acquire-observed inner SETTLED does it detach private
+descriptor references and allow outer settlement. Queue time counts toward the
+outer deadline. Failed drain retains inner and outer borrows; late cancellation
+cannot replace an earlier terminal result.
+
+An owner binding must prove that the endpoint's actual provider controller
+matches the selected enhanced controller. Matching a common sequence table and
+logical parent pointer alone is insufficient. The Native word model supplies an
+independent backend and checks its actual model-controller identity; it models
+8/16-bit words, fixed cells, selected CS, faults and retained drain rather than
+forwarding to a byte-SPI implementation. A model's controller identity is a
+software identity, not observed silicon. Family hooks, generated owner bindings,
+publisher handoff and each target's execution evidence remain separate checks.
+Join publishers and observers before reclaiming their storage; an empty queue
+or a stopped transfer alone is not publisher join.
 
 I2C hardware reload advances a long message without inserting another address
 phase. STOP and successful bus-idle observation precede successful return.
@@ -164,8 +228,45 @@ PWM group commit stages one coherent shadow batch; `SUCCESS` does not prove the
 timer already applied it. A partial hardware-write failure must withdraw output
 and retain fault responsibility. Clearing a break does not enable output. The
 limited G474 register implementation does not supply PCB pin selection, analog
-thresholds, a power stage or a synchronized ADC provider. Those remain explicit
-integration and physical-validation tasks, with product control policy external.
+threshold measurements, a power stage or a synchronized ADC provider. A selected
+software reference now generates exclusive TIM1/COMP1 construction, fixed
+PA8/PA9/PA10 PWM pads and PA1/PA4 comparator pads. Its cold lifecycle owns the
+selected clock/reset, safe levels, comparator setup and settling, shared break
+vector and reverse cleanup. Partial cleanup failure retains responsibility.
+These source facts establish neither a fitted PCB route nor analog accuracy.
+
+Separate concrete G474 providers implement TIM5 CH1 capture on PA0 and TIM3
+two-input quadrature counting on PA6/PA7. Capture publishes raw 32-bit counter
+facts and explicit overcapture/loss under its bounded ring contract. Encoder
+reports a raw 16-bit count; it does not extend wrap, supply an index input or
+estimate speed. Separate
+[capture](../../tests/contracts/g474_control_assembly/timer-capture.toml) and
+[encoder](../../tests/contracts/g474_control_assembly/encoder.toml) software
+references now generate their own static faces, typed getters and cold
+pin/clock/vector lifecycle with whole-timer ownership and source/vector drain.
+Startup starts neither a capture session nor encoder counting. The application
+supplies the capture ring and explicitly starts and stops each session. Failed
+source/vector or storage drain retains cleanup
+responsibility. These exact selections do not inherit PWM-group capabilities,
+synchronize ADC apertures or establish external wiring. Product control and
+recovery policies remain external.
+
+## Preserve a single owner for H743 Flash timing
+
+The selected fixed-HSI32/64 Flash path checks actual clock, requested and observed
+voltage scale, Cache state and Flash programming-delay fields before a program
+or erase pulse. Read latency alone does not satisfy the programming contract.
+An optional cold timing owner changes the reviewed Flash field only with both
+banks idle, verifies readback and retains its saved state until reverse cleanup
+has safely restored it. The generated Flash assembly selects this owner; a build
+without Flash does not acquire it. Product erase regions and recovery policy
+remain outside this repository.
+
+This is a bounded programming-timing correction for the selected existing clock
+profiles. It does not enable a new high-speed clock, change option bytes, qualify
+all silicon revisions or establish physical Flash endurance. A proposed 384 MHz
+profile remains separate until its complete CPU/bus/kernel-clock, voltage,
+Flash, peripheral and lifecycle contracts have been implemented and verified.
 
 ## Observe time without inventing timing guarantees
 
@@ -184,6 +285,56 @@ Checked UART/SPI/I2C service reports an invalid face or an absent service method
 `SUCCESS` establishes one dispatch only. It does not establish progress, health,
 SETTLED, wire completion or permission to reclaim storage. The ordinary service
 context, serialization and lifetime rules still apply, with no hidden worker.
+
+The optional [raw cycle probe](../../io/include/nexus/io/cycle_probe.h) brackets
+one selected vector or one explicit typed service call with real Arch counter
+snapshots. The initial generated path accepts `probe = true` inside
+`[uart.NAME.irq]` only for a reviewed F407/F470 IRQ-word UART selection. It adds
+one sidecar per physical vector and
+a pure typed getter for that sidecar. Unselected macros evaluate no arguments,
+create no sidecar and add no provider state or operations-table fields. The
+optional library is linked only when selected; linked ELF checks establish the
+actual default and selected cost.
+
+A readable counter pair is a raw modulo-2^32 difference, including probe cost
+and preemption. Multiple wraps, reset and clock-epoch continuity are unknown;
+`elapsed_known` is always false. The probe neither enables nor resets DWT.
+Unavailable samples and same-sidecar reentry are counted, and diagnostic totals
+saturate instead of wrapping. Different nested vectors require distinct
+sidecars. This is neither elapsed-time validation nor IRQ arrival latency,
+exclusive execution time or a passed budget.
+
+Privileged Task snapshot saves and restores the incoming local interrupt mask
+for a bounded statistics copy. A task producer must use that same executor or
+be joined before reading; masking local IRQs does not join another preempted
+Task, core or security state. Reclaim joins all tokens, producers and readers.
+Typed UART-word and segmented-SPI service wrappers dispatch the original service
+once even when observation is unavailable. Observation failure never stops
+drain or releases a QUARANTINED borrow. Consumers must prove private state and
+borrowed storage disjoint from the optional observer. Raw probe samples cannot
+be promoted to validated timing budgets without independent continuity proof.
+
+## Prepare exact HIL protocols without promoting software facts
+
+The existing [HIL workload planner](../../tools/hil/workloads.py) now contains
+four additional exact protocols. Selection inspects resolved controller and
+endpoint facts; a chip's advertised peripherals do not select a workload.
+
+| Protocol | Required selected mechanism | Additional station obligations |
+| --- | --- | --- |
+| `uart_word_wire` | IRQ 9N1 word face and word RX profile | MCU/FPGA peer with native nine-bit hardware and raw bit-8-preserving captures; waveform and load/TC/settlement order |
+| `spi_dma_whole_cs_segments` | Enhanced DMA face and same-controller `spi-dma-transaction` endpoint | CS/SCK/data waveforms, fixed-cell tests and independent memory/wire drain facts |
+| `i2c_v2_long_timing` | G474/H743/U575 long endpoint and authored AF50..260 ns/DNF0 timing projection | Measured clock, rise/fall and voltage; 255/256/257/511/512-byte boundaries; TXDR progress separate from wire ACK |
+| `pwm_group_comp_break` | Exclusive generated G474 TIM1/COMP1 and its exact five-pad route | Analog limits, passive loads, coherent commits, break latch, safe stop and IRQ join |
+
+Plans remain `prepared_unbound` and every physical case remains `not_executed`.
+The authoring template leaves instrument identities and limits null. Full
+workload and station admission still require a separately selected, reviewed
+8N1 byte smoke console. An eight-bit USB serial adapter cannot validate nine-bit
+words; a word-only or no-console software fixture does not satisfy that station
+contract. Actual instruments, positive workload amounts, waveform acquisition,
+numeric limits and equipment execution remain necessary. No new acquisition
+schema, hidden hardware action or qualification follows from these selectors.
 
 ## Cost and validation stay visible
 

@@ -49,7 +49,11 @@ endfunction()
 
 include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/uart_formats.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cycle_probe.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/adc_control.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_timer_modes.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_control_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_timer_factory.cmake")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/legacy_devices.cmake")
 
@@ -90,6 +94,24 @@ nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
     INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 nexus_google_test(nexus_stream_storage_test SOURCES stream_storage_test.cpp
     LIBRARIES Nexus::IO Nexus::Arch)
+nexus_google_test(nexus_stream_profile_test SOURCES stream_profile_test.cpp
+    LIBRARIES Nexus::IO Nexus::Arch)
+nexus_google_test(nexus_spi_dma_owner_test SOURCES spi_dma_owner_test.cpp
+    LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch)
+nexus_google_test(nexus_native_spi_dma_owner_test
+    SOURCES native_spi_dma_owner_test.cpp
+        "${NEXUS_SOURCE_DIR}/io/native/spi_dma_transaction.c"
+    LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+        "${NEXUS_SOURCE_DIR}/io/private")
+target_compile_options(nexus_native_spi_dma_owner_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/native_spi_dma_owner_model.h")
+nexus_google_test(nexus_spi_dma_owner_wait_test
+    SOURCES spi_dma_owner_wait_test.cpp
+    LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::OSNative
+        Nexus::OwnerObserver Threads::Threads Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+        "${NEXUS_SOURCE_DIR}/io/private")
 nexus_google_test(nexus_flash_provenance_test SOURCES flash_provenance_test.cpp
     LIBRARIES Nexus::FlashStorage Nexus::NativeModel)
 nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
@@ -171,6 +193,7 @@ target_compile_options(nexus_stm32_uart_dma_test PRIVATE
 set(gd_multi_root "${NEXUS_SOURCE_DIR}/soc/gd32f470")
 set(gd_multi_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
 include("${CMAKE_CURRENT_SOURCE_DIR}/spi_transaction.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/spi_dma_owner_factory.cmake")
 nexus_google_test(nexus_irq_wake_gd32_test SOURCES irq_wake_gd32_test.cpp
     "${gd_multi_root}/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
@@ -240,6 +263,7 @@ nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_dma.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_receive.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_duplex.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
 target_include_directories(nexus_stm32_uart_receive_test SYSTEM PRIVATE
@@ -255,6 +279,7 @@ nexus_google_test(nexus_gd32_uart_receive_test
         "${gd_multi_root}/drivers/uart.c"
         "${gd_multi_root}/drivers/uart_dma.c"
         "${gd_multi_root}/drivers/uart_receive.c"
+        "${gd_multi_root}/drivers/uart_duplex.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"

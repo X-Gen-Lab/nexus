@@ -23,6 +23,10 @@ def includes(result):
         source.append('#include "stm32g474_acquisition.h"')
     if any(item.kind == "i2c" for item in result.controllers):
         source.append('#include "i2c_v2.h"')
+    if any(item.kind == "pwm_group" for item in result.controllers):
+        source.append('#include "stm32g474_pwm_group.h"')
+    if any(item.kind in {"timer_capture", "encoder"} for item in result.controllers):
+        source.append('#include "stm32g474_timer.h"')
     return source + ['void _init(void);',
             'void _fini(void);',
             r'/** \brief C runtime hooks; constructors use .init_array. */',
@@ -40,19 +44,19 @@ def shared_irqs(result):
 
 
 def _syscfg(result):
-    return any(item.kind in {"exti", "flash"} for item in result.controllers)
+    return any(item.kind in {"exti", "flash", "pwm_group"} for item in result.controllers)
 
 
 def _peripheral_gates(result):
     selected = {item.controller for item in result.controllers
-                if item.kind in {"uart", "spi", "pwm", "i2c"}}
+                if item.kind in {"uart", "spi", "pwm", "pwm_group", "i2c", "timer_capture", "encoder"}}
     if any(item.kind == "adc" for item in result.controllers):
         selected.add("ADC12")
     if any(item.kind == "adc" and item.mode == "trigger-dma"
            for item in result.controllers):
         selected.update({"TIM6", "DMA1", "DMAMUX1"})
-    groups = (("APB1ENR1", ("USART2", "USART3", "UART4", "UART5", "SPI2", "TIM3", "TIM4", "I2C1", "TIM6")),
-              ("APB1ENR2", ("LPUART1",)), ("APB2ENR", ("USART1", "SPI1")))
+    groups = (("APB1ENR1", ("USART2", "USART3", "UART4", "UART5", "SPI2", "TIM3", "TIM4", "TIM5", "I2C1", "TIM6")),
+              ("APB1ENR2", ("LPUART1",)), ("APB2ENR", ("USART1", "SPI1", "TIM1")))
     groups += (("AHB2ENR", ("ADC12",)), ("AHB1ENR", ("DMA1", "DMAMUX1")))
     return tuple((register, " | ".join(
         f"RCC_{register}_{controller}EN" for controller in controllers
@@ -74,6 +78,20 @@ def state_declarations(result):
 
 def start_system(result):
     source = preflight.emit(result)
+    if any(item.kind == "pwm_group" for item in result.controllers):
+        source += ['    if ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM1EN) != 0u ||',
+                   '        ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN) != 0u && (NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != 0u) ||',
+                   '        ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u && NX_G474_READ(&TIM15->DIER) != 0u) ||',
+                   '        !NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn)) {',
+                   '        result.primary = NX_ERROR_BUSY; return result;', '    }']
+    for item in result.controllers:
+        if item.kind not in {"timer_capture", "encoder"}:
+            continue
+        timer = item.controller
+        source += [f'    if ((NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_{timer}EN) != 0u ||',
+                   f'        (NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_{timer}RST) != 0u ||',
+                   f'        !NX_G474_IRQ_AVAILABLE({timer}_IRQn)) {{',
+                   '        result.primary = NX_ERROR_BUSY; return result;', '    }']
     source += ['    result.primary = nx_stm32g474_validate_identity();',
                '    if (result.primary != NX_SUCCESS) { return result; }']
     source += gpio_phase.acquire(result)

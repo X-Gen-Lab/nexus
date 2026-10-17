@@ -94,6 +94,7 @@ class Stm32UartReceive : public testing::Test {
     nx_stream_t stream = {};
     nx_dma_memory_region_t region = {};
     nx_stm32_uart_receive_state_t state = {};
+    nx_stm32_uart_duplex_state_t duplex = {};
     nx_uart_port_t port = {&nx_stm32_uart_receive_ops, &state};
 
     void SetUp() override {
@@ -116,17 +117,17 @@ class Stm32UartReceive : public testing::Test {
             slots[i].capacity = sizeof(payload[i]);
         }
         ASSERT_EQ(nx_stream_initialize(&stream, slots, 3U), NX_SUCCESS);
-        state.transmit.uart.registers = &uart;
-        state.transmit.uart.baud = 115200U;
-        state.transmit.uart.profile = NX_UART_RX_BLOCKS;
-        state.transmit.uart.irq = USART1_IRQn;
-        state.transmit.dma = &dma;
-        state.transmit.tx = &transmit;
-        state.transmit.regions = &region;
-        state.transmit.region_count = 1U;
-        state.transmit.stream = 7U;
-        state.transmit.channel = 4U;
-        state.transmit.dma_irq = DMA2_Stream7_IRQn;
+        state.uart.registers = &uart;
+        state.uart.baud = 115200U;
+        state.uart.profile = NX_UART_RX_BLOCKS;
+        state.uart.irq = USART1_IRQn;
+        state.resources.dma = &dma;
+        duplex.transmit.tx = &transmit;
+        state.resources.regions = &region;
+        state.resources.region_count = 1U;
+        duplex.transmit.stream = 7U;
+        duplex.transmit.channel = 4U;
+        duplex.transmit.dma_irq = DMA2_Stream7_IRQn;
         state.receive = &receive;
         ASSERT_EQ(nx_stm32_uart_receive_initialize(&state, 84000000U),
                   NX_SUCCESS);
@@ -142,6 +143,45 @@ TEST_F(Stm32UartReceive, StartProgramsCallerBufferWithoutCpuPayloadCopy) {
     EXPECT_NE(uart.CR3 & USART_CR3_DMAR, 0U);
     EXPECT_EQ(uart.CR1 & USART_CR1_RXNEIE, 0U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
+}
+
+TEST_F(Stm32UartReceive,
+       CompactReceiveStateKeepsIrqTxWithoutOwningTheTxDmaLane) {
+    EXPECT_LT(sizeof(nx_stm32_uart_receive_state_t),
+              sizeof(nx_stm32_uart_duplex_state_t));
+    const uint32_t other_control = DMA_SxCR_EN | DMA_SxCR_MINC;
+    transmit.CR = other_control;
+    transmit.NDTR = 77U;
+    transmit.M0AR = 0x20001000U;
+    const_cast<uint32_t&>(dma.HISR) = 1U << 27U;
+    ASSERT_EQ(nx_uart_port_rx_start(&port, &stream), NX_SUCCESS);
+    uint8_t bytes[2] = {0x31U, 0x32U};
+    nx_uart_tx_request_t request = {};
+    nx_request_initialize(&request.base);
+    ASSERT_EQ(nx_uart_tx_prepare(&request, bytes, sizeof(bytes), 1000U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
+    uart.SR = USART_SR_TXE;
+    nx_stm32_uart_receive_irq(&state);
+    EXPECT_EQ(uart.DR, bytes[0]);
+    uart.SR = USART_SR_TXE;
+    nx_stm32_uart_receive_irq(&state);
+    EXPECT_EQ(uart.DR, bytes[1]);
+    nx_uart_port_service(&port);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_NE(receive.CR & DMA_SxCR_EN, 0U);
+    uart.SR = USART_SR_TC;
+    nx_stm32_uart_receive_irq(&state);
+    nx_uart_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_EQ(request.base.transferred, sizeof(bytes));
+    EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FILLING);
+    EXPECT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
+    EXPECT_EQ(transmit.CR, other_control);
+    EXPECT_EQ(transmit.NDTR, 77U);
+    EXPECT_EQ(transmit.M0AR, 0x20001000U);
+    EXPECT_EQ(dma.HISR, 1U << 27U);
 }
 
 TEST_F(Stm32UartReceive, InvalidFutureBufferRejectsWithoutLoanOrMmioEffect) {
@@ -402,14 +442,15 @@ TEST_F(Stm32UartReceive, ContinuousUnexpectedParityOfBankStopsAndLatchesLoss) {
 TEST_F(Stm32UartReceive,
        DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan) {
     ASSERT_EQ(nx_uart_port_stop(&port), NX_SUCCESS);
-    port.ops = &nx_stm32_uart_duplex_ops;
-    ASSERT_EQ(nx_stm32_uart_duplex_initialize(&state, 84000000U), NX_SUCCESS);
+    duplex.receive = state;
+    port = {&nx_stm32_uart_duplex_ops, &duplex};
+    ASSERT_EQ(nx_stm32_uart_duplex_initialize(&duplex, 84000000U), NX_SUCCESS);
     uint8_t tx[4] = {1U, 2U, 3U, 4U};
     nx_dma_memory_region_t domains[2] = {
         region,
         {reinterpret_cast<uintptr_t>(tx), sizeof(tx), NX_DMA_MEMORY_READ}};
-    state.transmit.regions = domains;
-    state.transmit.region_count = 2U;
+    duplex.receive.resources.regions = domains;
+    duplex.receive.resources.region_count = 2U;
     ASSERT_EQ(nx_uart_port_rx_start(&port, &stream), NX_SUCCESS);
     nx_uart_tx_request_t request = {};
     nx_request_initialize(&request.base);
@@ -419,12 +460,12 @@ TEST_F(Stm32UartReceive,
     EXPECT_NE(receive.CR & DMA_SxCR_EN, 0U);
     transmit.NDTR = 0U;
     const_cast<uint32_t&>(dma.HISR) = (1U << 27U);
-    nx_stm32_uart_dma_irq(&state.transmit);
+    nx_stm32_uart_duplex_dma_irq(&duplex);
     nx_uart_port_service(&port);
     EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_NE(receive.CR & DMA_SxCR_EN, 0U);
     uart.SR = USART_SR_TC;
-    nx_stm32_uart_duplex_irq(&state);
+    nx_stm32_uart_duplex_irq(&duplex);
     nx_uart_port_service(&port);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_EQ(request.base.result, NX_SUCCESS);
@@ -441,7 +482,7 @@ TEST_F(Stm32UartReceive,
     ASSERT_EQ(nx_uart_tx_prepare(&request, payload[1], 4U, 1000U), NX_SUCCESS);
     EXPECT_EQ(nx_uart_port_submit(&port, &request), NX_ERROR_INVALID);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
-    EXPECT_EQ(state.transmit.uart.active, nullptr);
+    EXPECT_EQ(state.uart.active, nullptr);
     EXPECT_EQ(transmit.CR & DMA_SxCR_EN, 0U);
 }
 
@@ -478,15 +519,15 @@ TEST_F(Stm32UartReceive,
 
 TEST_F(Stm32UartReceive,
        HardwareFlowSelectsActualIndependentBitsWithoutDefaultRam) {
-    ASSERT_EQ(nx_stm32_uart_flow_configure(&state.transmit.uart, true, false),
+    ASSERT_EQ(nx_stm32_uart_flow_configure(&state.uart, true, false),
               NX_SUCCESS);
     EXPECT_NE(uart.CR3 & USART_CR3_RTSE, 0U);
     EXPECT_EQ(uart.CR3 & USART_CR3_CTSE, 0U);
-    ASSERT_EQ(nx_stm32_uart_flow_configure(&state.transmit.uart, false, true),
+    ASSERT_EQ(nx_stm32_uart_flow_configure(&state.uart, false, true),
               NX_SUCCESS);
     EXPECT_EQ(uart.CR3 & USART_CR3_RTSE, 0U);
     EXPECT_NE(uart.CR3 & USART_CR3_CTSE, 0U);
-    ASSERT_EQ(nx_stm32_uart_flow_configure(&state.transmit.uart, false, false),
+    ASSERT_EQ(nx_stm32_uart_flow_configure(&state.uart, false, false),
               NX_SUCCESS);
     EXPECT_EQ(uart.CR3 & (USART_CR3_RTSE | USART_CR3_CTSE), 0U);
 }
@@ -495,7 +536,7 @@ TEST_F(Stm32UartReceive,
        HardwareFlowRejectsLiveRxAndTxWithoutChangingRegisters) {
     ASSERT_EQ(nx_uart_port_rx_start(&port, &stream), NX_SUCCESS);
     uint32_t before = uart.CR3;
-    EXPECT_EQ(nx_stm32_uart_flow_configure(&state.transmit.uart, true, true),
+    EXPECT_EQ(nx_stm32_uart_flow_configure(&state.uart, true, true),
               NX_ERROR_BUSY);
     EXPECT_EQ(uart.CR3, before);
     ASSERT_EQ(nx_uart_port_rx_stop(&port), NX_SUCCESS);
@@ -505,7 +546,7 @@ TEST_F(Stm32UartReceive,
     ASSERT_EQ(nx_uart_tx_prepare(&request, &byte, 1U, 1000U), NX_SUCCESS);
     ASSERT_EQ(nx_uart_port_submit(&port, &request), NX_SUCCESS);
     before = uart.CR3;
-    EXPECT_EQ(nx_stm32_uart_flow_configure(&state.transmit.uart, true, true),
+    EXPECT_EQ(nx_stm32_uart_flow_configure(&state.uart, true, true),
               NX_ERROR_BUSY);
     EXPECT_EQ(uart.CR3, before);
 }
@@ -567,13 +608,13 @@ TEST_F(Stm32UartReceive,
     ASSERT_EQ(nx_uart_tx_prepare(&request, &byte, 1U, 1000U), NX_SUCCESS);
     EXPECT_CALL(hardware, Direction(8U, 0U))
         .WillOnce(testing::Invoke([this](uint32_t, uint32_t) {
-            EXPECT_EQ(state.transmit.uart.active, nullptr);
+            EXPECT_EQ(state.uart.active, nullptr);
             return NX_SUCCESS;
         }));
     ASSERT_EQ(nx_uart_port_submit(&rs485, &request), NX_SUCCESS);
     ASSERT_EQ(nx_native_clock_advance(10U), NX_SUCCESS);
     nx_uart_port_service(&rs485);
-    ASSERT_NE(state.transmit.uart.active, nullptr);
+    ASSERT_NE(state.uart.active, nullptr);
     uart.SR = USART_SR_TXE;
     nx_stm32_uart_receive_irq(&state);
     nx_uart_port_service(&rs485);
@@ -581,7 +622,7 @@ TEST_F(Stm32UartReceive,
     uart.SR = USART_SR_TC;
     nx_stm32_uart_receive_irq(&state);
     nx_uart_port_service(&rs485);
-    EXPECT_EQ(state.transmit.uart.active, nullptr);
+    EXPECT_EQ(state.uart.active, nullptr);
     EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
     EXPECT_CALL(hardware, Direction(0U, 8U))
         .WillOnce(testing::Return(NX_SUCCESS));
@@ -601,7 +642,7 @@ TEST_F(Stm32UartReceive,
     uint32_t control = uart.CR1;
     EXPECT_EQ(nx_stm32_uart_receive_tx_validate(&state, &request),
               NX_ERROR_TIMEOUT);
-    EXPECT_EQ(state.transmit.uart.active, nullptr);
+    EXPECT_EQ(state.uart.active, nullptr);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
     EXPECT_EQ(uart.CR1, control);
 }
@@ -689,4 +730,57 @@ TEST_F(Stm32UartReceive,
     EXPECT_EQ(stream.outstanding, 0U);
     EXPECT_EQ(stream.losses, 1U);
     EXPECT_EQ(slots[0].state, NX_STREAM_SLOT_FREE);
+}
+
+TEST_F(Stm32UartReceive, TransmitDescriptorPrecedesReceiveRejectsCrossLoan) {
+    nx_uart_tx_request_t descriptors[3] = {};
+    nx_stream_slot_t descriptor_slots[3] = {};
+    nx_stream_t descriptor_stream = {};
+    uint8_t tx[2] = {0x31U, 0x32U};
+    nx_dma_memory_region_t descriptor_region = {
+        reinterpret_cast<uintptr_t>(descriptors), sizeof(descriptors),
+        NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    state.resources.regions = &descriptor_region;
+    for (size_t index = 0U; index < 3U; ++index) {
+        descriptor_slots[index].data =
+            reinterpret_cast<uint8_t*>(&descriptors[index]);
+        descriptor_slots[index].capacity = sizeof(descriptors[index]);
+    }
+    ASSERT_EQ(nx_stream_initialize(&descriptor_stream, descriptor_slots, 3U),
+              NX_SUCCESS);
+    nx_request_initialize(&descriptors[0].base);
+    ASSERT_EQ(nx_uart_tx_prepare(&descriptors[0], tx, sizeof(tx), 1000U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_uart_port_submit(&port, &descriptors[0]), NX_SUCCESS);
+    EXPECT_EQ(nx_uart_port_rx_start(&port, &descriptor_stream),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(descriptor_stream.outstanding, 0U);
+    EXPECT_EQ(state.stream, nullptr);
+    EXPECT_EQ(nx_request_state(&descriptors[0].base), NX_REQUEST_ACTIVE);
+}
+
+TEST_F(Stm32UartReceive,
+       ReceivePoolPrecedesTransmitDescriptorRejectsCrossLoan) {
+    nx_uart_tx_request_t descriptors[3] = {};
+    nx_stream_slot_t descriptor_slots[3] = {};
+    nx_stream_t descriptor_stream = {};
+    uint8_t tx[2] = {0x31U, 0x32U};
+    nx_dma_memory_region_t descriptor_region = {
+        reinterpret_cast<uintptr_t>(descriptors), sizeof(descriptors),
+        NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+    state.resources.regions = &descriptor_region;
+    for (size_t index = 0U; index < 3U; ++index) {
+        descriptor_slots[index].data =
+            reinterpret_cast<uint8_t*>(&descriptors[index]);
+        descriptor_slots[index].capacity = sizeof(descriptors[index]);
+    }
+    ASSERT_EQ(nx_stream_initialize(&descriptor_stream, descriptor_slots, 3U),
+              NX_SUCCESS);
+    nx_request_initialize(&descriptors[0].base);
+    ASSERT_EQ(nx_uart_tx_prepare(&descriptors[0], tx, sizeof(tx), 1000U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_uart_port_rx_start(&port, &descriptor_stream), NX_SUCCESS);
+    EXPECT_EQ(nx_uart_port_submit(&port, &descriptors[0]), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&descriptors[0].base), NX_REQUEST_READY);
+    EXPECT_EQ(state.uart.active, nullptr);
 }

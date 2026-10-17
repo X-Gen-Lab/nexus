@@ -54,6 +54,22 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         document = (ROOT / capabilities.DOCUMENT).read_text()
         capabilities.check_block(document, expected)
 
+    def test_alternate_interface_uses_its_exact_route_and_source_on_one_timer(self):
+        rows = capabilities.collect(ROOT)
+        timer = [row for row in rows if row["family"] == "stm32g474" and
+                 row["controller"] == "TIM3"]
+        self.assertEqual({(row["kind"], row["mode"]) for row in timer},
+                         {("pwm", "fixed-pwm"), ("encoder", "quadrature")})
+        encoder = next(row for row in timer if row["kind"] == "encoder")
+        pwm = next(row for row in timer if row["kind"] == "pwm")
+        self.assertEqual(encoder["routes"], ["tim3-encoder-pa6-pa7"])
+        self.assertEqual(pwm["routes"], ["tim3-ch1-pa6"])
+        self.assertEqual(encoder["exports"],
+                         ["soc/stm32g474/drivers/encoder.c"])
+        self.assertIn("tests/contracts/g474_control_assembly/encoder.toml",
+                      encoder["fixtures"])
+        self.assertEqual(encoder["boards"], [])
+
 
 class AgentMaintenanceTests(unittest.TestCase):
     def setUp(self):

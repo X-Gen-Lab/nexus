@@ -120,7 +120,9 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         return NX_ERROR_BUSY;
 #endif
     /* Never adopt a clock/cache/power state whose owner cannot be withdrawn.
-     * The assembly power entry has already permitted initialized RAM use. */
+     * The assembly power entry has already permitted initialized RAM use.
+     * A bank can retain queued writes or an armed pulse while BSY is clear;
+     * neither permits changing the shared clock or Flash timing. */
     uint32_t cr = NX_H743_READ(&s->rcc->CR);
     if ((cr & (RCC_CR_HSION | RCC_CR_HSIRDY | RCC_CR_HSIDIV)) !=
             (RCC_CR_HSION | RCC_CR_HSIRDY) ||
@@ -141,7 +143,9 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         (NX_H743_READ(&s->flash->ACR) & FLASH_ACR_LATENCY) !=
             FLASH_LATENCY_DEFAULT ||
         ((NX_H743_READ(&s->flash->SR1) | NX_H743_READ(&s->flash->SR2)) &
-         FLASH_SR_BSY) != 0U ||
+         (FLASH_SR_BSY | FLASH_SR_QW | FLASH_SR_WBNE)) != 0U ||
+        ((NX_H743_READ(&s->flash->CR1) | NX_H743_READ(&s->flash->CR2)) &
+         ~(uint32_t)(FLASH_CR_LOCK | FLASH_CR_PSIZE)) != 0U ||
         (NX_H743_READ(&s->rcc->APB1LENR) & RCC_APB1LENR_TIM2EN) != 0U ||
         !timer_idle(s) || !NX_H743_IRQ_AVAILABLE(TIM2_IRQn))
         return NX_ERROR_BUSY;

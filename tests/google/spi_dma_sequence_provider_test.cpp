@@ -52,6 +52,31 @@ extern uint32_t g_gd32_model_mask;
 #endif
 }
 #include <gtest/gtest.h>
+#if defined(NX_SPI_DMA_OWNER_TEST)
+#include "nexus/arch/arch.h"
+#include "nexus/components/spi_dma_owner.h"
+#include "spi_dma_sequence_owner.h"
+#include <gmock/gmock.h>
+extern "C" {
+#if defined(NX_SPI_TRANSACTION_STM32)
+bool nx_stm32_spi_dma_owner_contains(const nx_spi_dma_transaction_endpoint_t*,
+                                     const nx_spi_dma_transaction_port_t*);
+nx_result_t
+nx_stm32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t*,
+                                   const nx_irq_wake_t*, uint8_t);
+#define OWNER_CONTAINS nx_stm32_spi_dma_owner_contains
+#define OWNER_ATTACH   nx_stm32_spi_dma_owner_attach_wake
+#else
+bool nx_gd32_spi_dma_owner_contains(const nx_spi_dma_transaction_endpoint_t*,
+                                    const nx_spi_dma_transaction_port_t*);
+nx_result_t
+nx_gd32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t*,
+                                  const nx_irq_wake_t*, uint8_t);
+#define OWNER_CONTAINS nx_gd32_spi_dma_owner_contains
+#define OWNER_ATTACH   nx_gd32_spi_dma_owner_attach_wake
+#endif
+}
+#endif
 #include <sys/mman.h>
 
 namespace {
@@ -299,6 +324,161 @@ TEST_F(SPIDMAProviderSequence, CancelAfterFirstPhaseRetainsCurrentDmaAndCs) {
     EXPECT_EQ(request.base.transferred, 1U);
     EXPECT_EQ(CS, 1U);
 }
+#if defined(NX_SPI_DMA_OWNER_TEST)
+/** \brief Compose actual family DMA, retained sequence and original owner. */
+class SPIDMAProviderOwner : public SPIDMAProviderSequence {
+  protected:
+    const nx_spi_dma_owner_binding_t owner_binding{&port, OWNER_CONTAINS,
+                                                   OWNER_ATTACH};
+    nx_spi_dma_owner_executor_t executor{};
+    nx_bus_owner_t owner{};
+    nx_owner_slot_t slots[2]{};
+    nx_request_t outer{};
+    nx_owner_ticket_t ticket{};
+    nx_spi_dma_owner_operation_t operation{&endpoint, segments, 2U, 16U};
+    testing::StrictMock<testing::MockFunction<nx_result_t()>> notifications;
+    const nx_irq_wake_t wake{
+        &notifications,
+        [](void* p) {
+            return static_cast<testing::MockFunction<nx_result_t()>*>(p)
+                ->Call();
+        },
+        true};
+    void SetUp() override {
+        SPIDMAProviderSequence::SetUp();
+        const auto execution =
+            nx_spi_dma_owner_executor_port(&executor, &owner_binding);
+        const nx_owner_guard_port_t guard{
+            nullptr,
+            [](void*) -> uintptr_t { return nx_arch_irq_save().value; },
+            [](void*, uintptr_t previous) {
+                nx_arch_irq_restore({static_cast<uint32_t>(previous)});
+            }};
+        const nx_clock_t clock{[](void*) { return nx_time_now_us(); }, nullptr};
+        ASSERT_EQ(nx_bus_owner_init(&owner, slots, 2U, guard, execution, clock,
+                                    nullptr),
+                  NX_SUCCESS);
+        nx_request_initialize(&outer);
+        ASSERT_EQ(nx_request_prepare(&outer, NX_DEADLINE_NEVER), NX_SUCCESS);
+    }
+    void TearDown() override {
+        held = nullptr;
+        busy_on_detach = false;
+        busy_on_final_disable = false;
+        if (owner.capacity != 0U) {
+            nx_bus_owner_stop(&owner);
+            for (unsigned i = 0U; i < 8U && !nx_bus_owner_idle(&owner); ++i) {
+                RXCR &= ~1U;
+                TXCR &= ~1U;
+                STATUS = TXEMPTY;
+                (void)nx_bus_owner_service(&owner);
+            }
+            EXPECT_TRUE(nx_bus_owner_idle(&owner));
+        }
+        EXPECT_EQ(nx_spi_dma_transaction_stop(&port), NX_SUCCESS);
+        SPIDMAProviderSequence::TearDown();
+    }
+    void StartOwner() {
+        ASSERT_EQ(nx_spi_dma_owner_submit(&owner, &outer, &operation, nullptr,
+                                          &ticket),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_bus_owner_service(&owner), NX_SUCCESS);
+        ASSERT_EQ(nx_request_state(&outer), NX_REQUEST_ACTIVE);
+    }
+};
+TEST_F(SPIDMAProviderOwner, BothDmaIrqsWakeAfterFactsWhileOneCsSpansChain) {
+    ASSERT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &wake, 5U),
+              NX_SUCCESS);
+    EXPECT_CALL(notifications, Call())
+        .Times(4)
+        .WillRepeatedly(testing::Invoke([&] {
+            EXPECT_FALSE(nx_arch_irq_is_masked());
+            EXPECT_NE(state.active, nullptr);
+            EXPECT_EQ(sequence.active, &executor.inner);
+            EXPECT_NE(nx_request_state(&outer), NX_REQUEST_SETTLED);
+            return NX_SUCCESS;
+        }));
+    ASSERT_NO_FATAL_FAILURE(StartOwner());
+    EXPECT_EQ(CS, 1U << 16U);
+    Complete();
+    ASSERT_EQ(nx_bus_owner_service(&owner), NX_ERROR_BUSY);
+    EXPECT_EQ(sequence.phase, 1U);
+    EXPECT_EQ(executor.inner.segments, segments);
+    EXPECT_EQ(CS, 1U << 16U);
+    Complete();
+    ASSERT_EQ(nx_bus_owner_service(&owner), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&outer), NX_REQUEST_SETTLED);
+    EXPECT_EQ(outer.result, NX_SUCCESS);
+    EXPECT_EQ(outer.transferred, 2U);
+    EXPECT_EQ(executor.inner.segments, nullptr);
+    EXPECT_EQ(CS, 1U);
+    EXPECT_TRUE(nx_bus_owner_idle(&owner));
+}
+TEST_F(SPIDMAProviderOwner, ForgedPhysicalEndpointRejectsBeforeOuterAdmission) {
+    DMA_STATE foreign{};
+    DEVICE_STATE wrong = child;
+    wrong.dma = &foreign;
+    wrong.endpoint.port = &foreign.spi;
+    nx_spi_dma_sequence_endpoint_t forged{&sequence, &wrong};
+    const nx_spi_dma_transaction_endpoint_t wrong_face{
+        &nx_spi_dma_sequence_endpoint_ops, &forged};
+    operation.endpoint = &wrong_face;
+    EXPECT_FALSE(nx_spi_dma_owner_contains(&owner_binding, &wrong_face));
+    EXPECT_EQ(
+        nx_spi_dma_owner_submit(&owner, &outer, &operation, nullptr, &ticket),
+        NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&outer), NX_REQUEST_READY);
+    EXPECT_EQ(CS, 0U);
+    EXPECT_EQ(sequence.active, nullptr);
+    EXPECT_TRUE(nx_bus_owner_idle(&owner));
+}
+TEST_F(SPIDMAProviderOwner, WakePolicyRejectionPreservesPreviousLiveSink) {
+    ASSERT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &wake, 5U),
+              NX_SUCCESS);
+    const nx_irq_wake_t denied{nullptr, [](void*) { return NX_SUCCESS; }, true};
+#if defined(NX_SPI_TRANSACTION_STM32)
+    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &denied, 6U),
+              NX_ERROR_PERMISSION);
+#else
+    NVIC_SetPriority(DMA1_Channel3_IRQn, 3U);
+    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &denied, 5U),
+              NX_ERROR_PERMISSION);
+    NVIC_SetPriority(DMA1_Channel3_IRQn, 6U);
+    NVIC_SetPriority(DMA1_Channel4_IRQn, 4U);
+    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, &denied, 5U),
+              NX_ERROR_PERMISSION);
+    NVIC_SetPriority(DMA1_Channel4_IRQn, 6U);
+#endif
+    EXPECT_EQ(state.wake, &wake);
+    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&owner_binding, nullptr, 0U),
+              NX_SUCCESS);
+    EXPECT_EQ(state.wake, nullptr);
+}
+TEST_F(SPIDMAProviderOwner,
+       StopKeepsBothBorrowLayersUntilFinalEngineWithdraws) {
+    ASSERT_NO_FATAL_FAILURE(StartOwner());
+    Complete();
+    ASSERT_EQ(nx_bus_owner_service(&owner), NX_ERROR_BUSY);
+    ASSERT_EQ(sequence.phase, 1U);
+    held = &RXCR;
+    nx_bus_owner_stop(&owner);
+    EXPECT_EQ(nx_bus_owner_service(&owner), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&outer), NX_REQUEST_SETTLED);
+    EXPECT_EQ(sequence.active, &executor.inner);
+    EXPECT_EQ(executor.inner.segments, segments);
+    EXPECT_EQ(CS, 1U << 16U);
+    EXPECT_FALSE(nx_bus_owner_idle(&owner));
+    held = nullptr;
+    RXCR &= ~1U;
+    EXPECT_EQ(nx_bus_owner_service(&owner), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&outer), NX_REQUEST_SETTLED);
+    EXPECT_EQ(outer.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(outer.transferred, 1U);
+    EXPECT_EQ(CS, 1U);
+    EXPECT_TRUE(nx_bus_owner_idle(&owner));
+    EXPECT_EQ(nx_spi_dma_transaction_stop(&port), NX_SUCCESS);
+}
+#endif
 } /* namespace */
 /** \brief W1C applies only the selected actual flag bank. */
 extern "C" void nx_spi_multi_dma_ack(volatile uint32_t* clear, uint32_t mask) {

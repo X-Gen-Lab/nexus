@@ -63,6 +63,126 @@ static bool idle(const nx_stm32h743_flash_state_t* p) {
                            NX_H743_READ(&p->registers->SR2)) &
                           BUSY_FLAGS) == 0U;
 }
+/** \brief The fixed HSI pulse profile never adopts a foreign clock or VOS.
+ * \note RM0433 Rev9 Table17 and section4.3.9: read latency alone does not
+ *       establish the programming delay. ACR is shared by both banks and
+ *       cannot be retuned by a physical pulse submission.
+ */
+static bool fixed_profile_valid(const nx_stm32h743_system_t* s) {
+    if (!s->started || s->rcc == NULL || s->power == NULL || s->flash == NULL ||
+        s->core == NULL || (s->core_hz != 32000000U && s->core_hz != 64000000U))
+        return false;
+    const uint32_t cr = NX_H743_READ(&s->rcc->CR);
+    const uint32_t divider =
+        s->core_hz == 32000000U ? RCC_CR_HSIDIV_2 : RCC_CR_HSIDIV_1;
+    if ((cr & (RCC_CR_HSION | RCC_CR_HSIRDY | RCC_CR_HSIDIV)) !=
+            (RCC_CR_HSION | RCC_CR_HSIRDY | divider) ||
+        (divider != RCC_CR_HSIDIV_1 && (cr & RCC_CR_HSIDIVF) == 0U) ||
+        (cr & (RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_PLL1ON | RCC_CR_PLL2ON |
+               RCC_CR_PLL3ON)) != 0U ||
+        (NX_H743_READ(&s->rcc->CFGR) & (RCC_CFGR_SW | RCC_CFGR_SWS)) !=
+            (RCC_CFGR_SW_HSI | RCC_CFGR_SWS_HSI) ||
+        (NX_H743_READ(&s->rcc->D1CFGR) &
+         (RCC_D1CFGR_D1CPRE | RCC_D1CFGR_HPRE | RCC_D1CFGR_D1PPRE)) != 0U ||
+        (NX_H743_READ(&s->rcc->D2CFGR) &
+         (RCC_D2CFGR_D2PPRE1 | RCC_D2CFGR_D2PPRE2)) != 0U ||
+        (NX_H743_READ(&s->rcc->D3CFGR) & RCC_D3CFGR_D3PPRE) != 0U ||
+        (NX_H743_READ(&s->power->CR3) & (PWR_CR3_LDOEN | PWR_CR3_BYPASS)) !=
+            PWR_CR3_LDOEN ||
+        (NX_H743_READ(&s->power->D3CR) & (PWR_D3CR_VOS | PWR_D3CR_VOSRDY)) !=
+            (PWR_D3CR_VOS_0 | PWR_D3CR_VOSRDY) ||
+        (NX_H743_READ(&s->power->CSR1) &
+         (PWR_CSR1_ACTVOS | PWR_CSR1_ACTVOSRDY)) !=
+            (PWR_CSR1_ACTVOS_0 | PWR_CSR1_ACTVOSRDY))
+        return false;
+    return true;
+}
+static bool pulse_timing_valid(const nx_stm32h743_flash_state_t* p) {
+    const nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    if (p->registers != s->flash || !fixed_profile_valid(s))
+        return false;
+    const uint32_t delay =
+        s->core_hz == 64000000U ? FLASH_ACR_WRHIGHFREQ_0 : 0U;
+    return (NX_H743_READ(&p->registers->ACR) &
+            (FLASH_ACR_LATENCY | FLASH_ACR_WRHIGHFREQ)) ==
+           (FLASH_ACR_LATENCY_7WS | delay);
+}
+/** \brief Idle status alone cannot exclude a bank whose pulse is armed. */
+static bool timing_idle(FLASH_TypeDef* flash) {
+    const uint32_t permitted = FLASH_CR_LOCK | FLASH_CR_PSIZE;
+    return ((NX_H743_READ(&flash->SR1) | NX_H743_READ(&flash->SR2)) &
+            BUSY_FLAGS) == 0U &&
+           ((NX_H743_READ(&flash->CR1) | NX_H743_READ(&flash->CR2)) &
+            ~permitted) == 0U;
+}
+_Static_assert(sizeof(nx_stm32h743_flash_timing_state_t) == 8U,
+               "Selected H743 Flash timing owner exceeds its static budget");
+nx_result_t
+nx_stm32h743_flash_timing_initialize(nx_stm32h743_flash_timing_state_t* state) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL)
+        return NX_ERROR_INVALID;
+    if (state->retained)
+        return NX_ERROR_BUSY;
+    nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    if (!fixed_profile_valid(s) ||
+        (NX_H743_READ(&s->core->CCR) & (SCB_CCR_DC_Msk | SCB_CCR_IC_Msk)) != 0U)
+        return NX_ERROR_STATE;
+    if (!timing_idle(s->flash))
+        return NX_ERROR_BUSY;
+    const uint32_t acr = NX_H743_READ(&s->flash->ACR);
+    if ((acr & (FLASH_ACR_LATENCY | FLASH_ACR_WRHIGHFREQ)) !=
+        FLASH_ACR_LATENCY_7WS)
+        return NX_ERROR_STATE;
+    if (s->core_hz == 32000000U)
+        return NX_SUCCESS;
+    /* Shared ACR changes only before either bank can have a consumer. Set
+     * responsibility before the write: a refused readback is not release. */
+    state->saved_acr = acr;
+    state->retained = true;
+    const uint32_t value = acr | FLASH_ACR_WRHIGHFREQ_0;
+    NX_H743_WRITE(&s->flash->ACR, value);
+    nx_arch_dsb();
+    nx_arch_isb();
+    return NX_H743_READ(&s->flash->ACR) == value ? NX_SUCCESS : NX_ERROR_IO;
+}
+nx_result_t
+nx_stm32h743_flash_timing_stop(nx_stm32h743_flash_timing_state_t* state) {
+    if (!task())
+        return NX_ERROR_CONTEXT;
+    if (state == NULL)
+        return NX_ERROR_INVALID;
+    if (!state->retained)
+        return NX_SUCCESS;
+    nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    if (!fixed_profile_valid(s) || s->core_hz != 64000000U ||
+        (NX_H743_READ(&s->core->CCR) & (SCB_CCR_DC_Msk | SCB_CCR_IC_Msk)) !=
+            0U ||
+        (state->saved_acr & (FLASH_ACR_LATENCY | FLASH_ACR_WRHIGHFREQ)) !=
+            FLASH_ACR_LATENCY_7WS)
+        return NX_ERROR_STATE;
+    if (!timing_idle(s->flash))
+        return NX_ERROR_BUSY;
+    const uint32_t acr = NX_H743_READ(&s->flash->ACR);
+    const uint32_t delay = acr & FLASH_ACR_WRHIGHFREQ;
+    if ((acr & FLASH_ACR_LATENCY) != FLASH_ACR_LATENCY_7WS ||
+        (delay != 0U && delay != FLASH_ACR_WRHIGHFREQ_0))
+        return NX_ERROR_STATE;
+    /* Preserve the conservative CPU read latency and every unowned bit.
+     * Restored delay0 forbids further HSI64 pulses through admission(). */
+    const uint32_t restored = (acr & ~(uint32_t)FLASH_ACR_WRHIGHFREQ) |
+                              (state->saved_acr & FLASH_ACR_WRHIGHFREQ);
+    if (acr != restored) {
+        NX_H743_WRITE(&s->flash->ACR, restored);
+        nx_arch_dsb();
+        nx_arch_isb();
+        if (NX_H743_READ(&s->flash->ACR) != restored)
+            return NX_ERROR_IO;
+    }
+    state->retained = false;
+    return NX_SUCCESS;
+}
 static const nx_flash_geometry_t* geometry(const void* context) {
     return valid(context) ? &g_nx_stm32h743_flash_geometry : NULL;
 }
@@ -110,6 +230,8 @@ static nx_result_t admission(nx_stm32h743_flash_state_t* p,
         (NX_H743_READ(&p->registers->OPTSR_CUR) & FLASH_OPTSR_SWAP_BANK_OPT) !=
             0U)
         return NX_ERROR_UNSUPPORTED;
+    if (!pulse_timing_valid(p))
+        return NX_ERROR_STATE;
     uint32_t permitted = FLASH_CR_LOCK | FLASH_CR_PSIZE;
     if (((NX_H743_READ(&p->registers->CR1) | NX_H743_READ(&p->registers->CR2)) &
          ~permitted) != 0U)

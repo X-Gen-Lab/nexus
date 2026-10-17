@@ -54,7 +54,8 @@
       "kind": "spi",
       "pins": [],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "source": "Host virtual model; no physical timing"
     },
@@ -112,7 +113,8 @@
       "kind": "spi",
       "pins": [],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "source": "Host independent SPI model; no physical timing"
     },

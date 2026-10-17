@@ -139,9 +139,10 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                 raise ValueError("UART DMA differs from its reviewed fixed route")
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
-            prefix = [f"    s_nx_port_{name}.transmit.regions = s_nx_dma_regions_{name};",
-                      f"    s_nx_port_{name}.transmit.region_count = {region_count}u;",
-                      f"    s_nx_port_{name}.continuous = {'true' if traits.continuous else 'false'};"]
+            receive_state = f"s_nx_port_{name}" + (".receive" if dma else "")
+            prefix = [f"    {receive_state}.resources.regions = s_nx_dma_regions_{name};",
+                      f"    {receive_state}.resources.region_count = {region_count}u;",
+                      f"    {receive_state}.continuous = {'true' if traits.continuous else 'false'};"]
             receive_impl = "uart_duplex" if dma else "uart_receive"
             call = (f"nx_gd32_{receive_impl}_initialize(&s_nx_port_{name}, "
                     f"{item.options.baud}u, {item.options.irq.priority}u)")
@@ -151,8 +152,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         elif dma:
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
-            prefix = [f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
-                      f"    s_nx_port_{name}.region_count = {region_count}u;"]
+            prefix = [f"    s_nx_port_{name}.resources.regions = s_nx_dma_regions_{name};",
+                      f"    s_nx_port_{name}.resources.region_count = {region_count}u;"]
             call = (f"nx_gd32_uart_dma_initialize(&s_nx_port_{name}, "
                     f"{item.options.baud}u, {profile}, s_nx_rx_{name}, {capacity}u, {item.options.irq.priority}u)")
         else:
@@ -184,22 +185,22 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                               "uart_receive" if receive else
                               "uart_dma_uart" if dma else
                               "uart_stream" if blocks else "uart")
+        irq_call = uart_formats.irq_call(item, f"nx_gd32_{irq_implementation}_irq(&s_nx_port_{name});")
         declarations += [f"void {vector}(void);",
                          "/** \\brief Fixed generated UART controller dispatch. */",
-                         f"void {vector}(void) {{ nx_gd32_{irq_implementation}_irq(&s_nx_port_{name}); }}"]
+                         f"void {vector}(void) {{ {irq_call} }}"]
         if receive:
             port_binding = hardware.maintained("gd32f470", item.controller)
             vector = hardware.dma_vector("gd32f470", port_binding.dma("rx-dma-idle")[0])
             declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact selected GD DMA RX publisher. */",
-                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
-        dma_state = f"s_nx_port_{name}" + (".transmit" if receive else "")
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_receive_dma_irq(&{receive_state}); }}"]
         if dma:
             port_binding = hardware.maintained("gd32f470", item.controller)
             vector = hardware.dma_vector("gd32f470", port_binding.dma("dma-tx")[0])
             declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact GD USART0 TX DMA terminal observation. */",
-                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_dma_irq(&{dma_state}); }}"]
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_{'duplex_dma' if receive else 'dma'}_irq(&s_nx_port_{name}); }}"]
         initialize = f"prepare_{name}()"
         stop = [f"stop_{name}()"]
     elif kind == "spi":

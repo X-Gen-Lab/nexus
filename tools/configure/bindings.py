@@ -5,12 +5,15 @@ try:
     from .factory import interface_type, public_header, controller_class
     from . import gpio_phase
     from . import enhanced_endpoints
+    from . import stream_profiles, uart_formats
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
     from factory import interface_type, public_header, controller_class
     import gpio_phase
     import enhanced_endpoints
+    import stream_profiles
+    import uart_formats
 
 
 def symbol(name):
@@ -59,6 +62,8 @@ def emit(result):
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_BINDINGS_H', '#define NEXUS_BINDINGS_H',
               '#include "nexus/core/status.h"']
+    if uart_formats.probed(result):
+        header.insert(-1, '#include "nexus_config.h"')
     for kind in sorted({controller_class(item) for item in selections}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     for kind in sorted({enhanced_endpoints.class_name(item)
@@ -115,14 +120,18 @@ def emit(result):
               ' * \\author          Nexus Team', ' * \\version         1.0.0',
               ' * \\date            2026-10-09',
               ' * \\copyright       Copyright (c) 2026 Nexus Team', ' */',
-              '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus_config.h"',
+              '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus/arch/arch.h"']
     source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
                "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
                "#endif", "#ifndef NX_PLATFORM_PRIORITY_WRITE",
                "#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))",
                "#endif"]
+    if uart_formats.probed(result):
+        source.append('#include "nexus/io/cycle_probe.h"')
+        source += [f"NX_IO_IRQ_PROBE_DECLARE({item.controller})"
+                   for item in uart_formats.probed(result)]
     source.extend(provider.includes(result))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
@@ -144,6 +153,7 @@ def emit(result):
                    f'static const {exported_type} s_nx_face_{name} = {{',
                    f'    &{provider.operations(item)}, {face_context}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
+        source.extend(stream_profiles.emit_instance(item))
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)
         header.extend(construction.exports)

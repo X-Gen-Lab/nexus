@@ -436,7 +436,6 @@
     "Build time: one authored assembly": "Build time: one authored assembly",
     "Authored TOML": "Authored TOML",
     "Reviewed SoC modes and Board routes": "Reviewed SoC modes and Board routes",
-    "Strict resolver\\nResource / trigger / DMA plans": "Strict resolver\nResource / trigger / DMA plans",
     "Immutable typed IR": "Immutable typed IR",
     "Atomic generated bundle": "Atomic generated bundle",
     "CMake: sole software target graph": "CMake: sole software target graph",
@@ -450,7 +449,6 @@
     "Typed factory\\nExisting static identity only": "Typed factory\nExisting static identity only",
     "Immutable typed face\\nShared ops + instance context": "Immutable typed face\nShared ops + instance context",
     "Selected provider\\nPrivate state and controller owner": "Selected provider\nPrivate state and controller owner",
-    "Optional selected traits\\nRead-only facts": "Optional selected traits\nRead-only facts",
     "Optional cold silicon preflight\\nExplicit source and immutable policy": "Optional cold silicon preflight\nExplicit source and immutable policy",
     "Optional timestamp facts\\nDomain / epoch / rate / uncertainty": "Optional timestamp facts\nDomain / epoch / rate / uncertainty",
     "looks up a typed identity": "looks up a typed identity",
@@ -471,7 +469,15 @@
     "emits lookup code": "emits lookup code",
     "emits private instance state": "emits private instance state",
     "emits lifecycle glue": "emits lifecycle glue",
-    "provider configures / IRQ reports facts": "provider configures / IRQ reports facts"
+    "provider configures / IRQ reports facts": "provider configures / IRQ reports facts",
+    "explicit submit / service": "explicit submit / service",
+    "Optional typed SPI executor\\nExisting bounded BusOwner": "Optional typed SPI executor\nExisting bounded BusOwner",
+    "emits selected vector sidecar / hooks": "emits selected vector sidecar / hooks",
+    "calls the same enhanced face": "calls the same enhanced face",
+    "Strict resolver\\nResource / trigger / DMA / stream plans": "Strict resolver\nResource / trigger / DMA / stream plans",
+    "Optional traits / stream profiles\\nRead-only selected facts": "Optional traits / stream profiles\nRead-only selected facts",
+    "explicit service wrapper / Task snapshot": "explicit service wrapper / Task snapshot",
+    "Optional vector / service cycle probe\\nRaw modulo only; elapsed unknown": "Optional vector / service cycle probe\nRaw modulo only; elapsed unknown"
   },
   "zh_CN": {
     "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用": "FIG-02 H743 / baremetal / IRQ UART：选定目标依赖\n箭头：依赖者 → 被依赖目标；不是运行调用",
@@ -909,7 +915,6 @@
     "Build time: one authored assembly": "构建阶段：一份 authored 装配",
     "Authored TOML": "Authored TOML",
     "Reviewed SoC modes and Board routes": "已审 SoC 模式与 Board 路线",
-    "Strict resolver\\nResource / trigger / DMA plans": "严格解析器\n资源 / 触发 / DMA 计划",
     "Immutable typed IR": "不可变 typed IR",
     "Atomic generated bundle": "原子生成 bundle",
     "CMake: sole software target graph": "CMake：唯一软件目标图",
@@ -923,7 +928,6 @@
     "Typed factory\\nExisting static identity only": "Typed factory\n仅取得既有静态身份",
     "Immutable typed face\\nShared ops + instance context": "不可变 typed face\n共享 ops + 实例 context",
     "Selected provider\\nPrivate state and controller owner": "选定 provider\n私有状态与控制器所有者",
-    "Optional selected traits\\nRead-only facts": "可选 selected traits\n只读事实",
     "Optional cold silicon preflight\\nExplicit source and immutable policy": "可选冷态 silicon preflight\n显式来源与不可变策略",
     "Optional timestamp facts\\nDomain / epoch / rate / uncertainty": "可选时间戳事实\n域 / epoch / 速率 / 不确定度",
     "looks up a typed identity": "查找 typed 身份",
@@ -944,6 +948,14 @@
     "emits lookup code": "生成查找代码",
     "emits private instance state": "生成私有实例状态",
     "emits lifecycle glue": "生成生命周期装配",
-    "provider configures / IRQ reports facts": "provider 配置 / IRQ 报告事实"
+    "provider configures / IRQ reports facts": "provider 配置 / IRQ 报告事实",
+    "explicit submit / service": "显式 submit / service",
+    "Optional typed SPI executor\\nExisting bounded BusOwner": "可选 typed SPI 执行器\n复用有界 BusOwner",
+    "emits selected vector sidecar / hooks": "生成所选向量 sidecar / hook",
+    "calls the same enhanced face": "调用同一增强 face",
+    "Strict resolver\\nResource / trigger / DMA / stream plans": "严格解析器\n资源 / 触发 / DMA / 流预算计划",
+    "Optional traits / stream profiles\\nRead-only selected facts": "可选 traits / 流 profile\n只读的所选事实",
+    "explicit service wrapper / Task snapshot": "显式 service 包装 / Task 快照",
+    "Optional vector / service cycle probe\\nRaw modulo only; elapsed unknown": "可选向量 / service 周期探针\n仅原始模差；经过时间未知"
   }
 }

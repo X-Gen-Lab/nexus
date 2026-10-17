@@ -27,6 +27,80 @@ class UARTFormatConfiguration(unittest.TestCase):
         path.write_text(contents)
         return configure.resolve_ir(path)
 
+    def test_selected_word_vector_probe_has_one_sidecar_and_real_build_fact(self):
+        for family, vector in (("f407", "USART1"), ("gd470", "USART0")):
+            with self.subTest(family=family):
+                contents = (configure.ROOT / (
+                    "tests/contracts/io_evolution_assembly/" + family +
+                    "-uart9n1.toml")).read_text()
+                path = self.root / "probe.toml"
+                path.write_text(contents.replace("priority = 5",
+                                                "priority = 5\nprobe = true"))
+                result = configure.resolve_ir(path)
+                self.assertTrue(result.controllers[0].options.irq.probe)
+                _, source = bindings.emit(result)
+                declaration = "NX_IO_IRQ_PROBE_DECLARE(" + vector + ")"
+                self.assertEqual(source.count(declaration), 1)
+                self.assertNotIn(declaration + ";", source)
+                self.assertIn("NX_IO_IRQ_PROBE_BEGIN(" + vector + ")", source)
+                self.assertIn("NX_IO_IRQ_PROBE_END(" + vector + ")", source)
+                header, getters = factory.emit(result)
+                self.assertIn("nx_factory_uart_word_irq_probe(", header)
+                self.assertIn("&nx_io_irq_probe_" + vector, getters)
+                output = self.root / family
+                configure.configure(path, output)
+                self.assertIn("#define NX_IO_CYCLE_PROBES 1",
+                              (output / "nexus_config.h").read_text())
+                self.assertIn("set(NEXUS_IO_CYCLE_PROBES ON)",
+                              (output / "selection.cmake").read_text())
+
+    def test_unselected_word_vector_adds_no_probe_state_or_lookup(self):
+        path = configure.ROOT / (
+            "tests/contracts/io_evolution_assembly/f407-uart9n1.toml")
+        result = configure.resolve_ir(path)
+        self.assertFalse(result.controllers[0].options.irq.probe)
+        self.assertNotIn("NX_IO_IRQ_PROBE_", bindings.emit(result)[1])
+        self.assertNotIn("nx_factory_uart_word_irq_probe(", factory.emit(result)[0])
+
+    def test_probe_selection_precedes_every_transitive_probe_macro_header(self):
+        contents = (configure.ROOT / (
+            "tests/contracts/io_evolution_assembly/f407-uart9n1.toml")).read_text()
+        path = self.root / "probe-order.toml"
+        path.write_text(contents.replace("priority = 5",
+                                        "priority = 5\nprobe = true"))
+        result = configure.resolve_ir(path)
+        config_include = '#include "nexus_config.h"'
+        header, _ = factory.emit(result)
+        self.assertIn(config_include, header)
+        self.assertLess(header.index(config_include),
+                        header.index('#include "nexus/io/cycle_probe.h"'))
+        _, source = bindings.emit(result)
+        self.assertLess(source.index(config_include),
+                        source.index('#include "nexus_factory.h"'))
+        output = self.root / "ordered"
+        configure.configure(path, output)
+        config = (output / "nexus_config.h").read_text()
+        self.assertIn("#if defined(NX_IO_CYCLE_PROBES)", config)
+        self.assertIn("#error", config)
+
+    def test_unreviewed_probe_mode_and_nonboolean_reject(self):
+        for family in ("native", "f407"):
+            for value in ('"true"', '1'):
+                path = configure.ROOT / (
+                    "tests/contracts/io_evolution_assembly/" + family +
+                    "-uart9n1.toml")
+                destination = self.root / "bad-probe.toml"
+                destination.write_text(path.read_text().replace(
+                    "priority = 5", "priority = 5\nprobe = " + value))
+                with self.subTest(family=family, value=value), self.assertRaises(ValueError):
+                    configure.resolve_ir(destination)
+        contents = (configure.ROOT / (
+            "tests/contracts/io_evolution_assembly/native-uart9n1.toml")).read_text()
+        path = self.root / "native-probe.toml"
+        path.write_text(contents.replace("priority = 5", "priority = 5\nprobe = true"))
+        with self.assertRaisesRegex(ValueError, "probe.*reviewed|reviewed.*probe"):
+            configure.resolve_ir(path)
+
     def test_reviewed_irq_frames_emit_configuration_and_masked_irq_entry(self):
         frame = 'data_bits=7\nparity="even"\nstop_bits=2\nflow="none"'
         for fixture, prefix in (("qiming-baremetal-uart.toml", "stm32"),

@@ -9,6 +9,11 @@
  *                  Methods are linked but never called by this fixture. This
  *                  is software evidence, not a HIL image or Board wiring proof.
  */
+#if defined(NX_FIXTURE_UART_WORD_IRQ_PROBE)
+/* Ordinary Platform usage must propagate the same selected probe definition
+ * even when a consumer includes its generic I/O header before the factory. */
+#include "nexus/io/cycle_probe.h"
+#endif
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 
@@ -45,6 +50,10 @@ int main(void) {
     NX_FIXTURE_RETAIN_FACES(exti, nx_exti_port_t, NX_EXTI_ID_COUNT);
     NX_FIXTURE_RETAIN_FACES(pwm, nx_pwm_port_t, NX_PWM_ID_COUNT);
     NX_FIXTURE_RETAIN_FACES(adc, nx_adc_port_t, NX_ADC_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(pwm_group, nx_pwm_group_t, NX_PWM_GROUP_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(timer_capture, nx_timer_capture_t,
+                            NX_TIMER_CAPTURE_ID_COUNT);
+    NX_FIXTURE_RETAIN_FACES(encoder, nx_encoder_t, NX_ENCODER_ID_COUNT);
     NX_FIXTURE_RETAIN_FACES(spi_device, nx_spi_endpoint_t,
                             NX_SPI_DEVICE_ID_COUNT);
     NX_FIXTURE_RETAIN_FACES(i2c_device, nx_i2c_endpoint_t,
@@ -64,10 +73,61 @@ int main(void) {
     NX_FIXTURE_RETAIN_FACES(spi_dma_transaction_device,
                             nx_spi_dma_transaction_endpoint_t,
                             NX_SPI_DMA_TRANSACTION_DEVICE_ID_COUNT);
+    for (size_t index = 0; index < NX_SPI_DMA_TRANSACTION_ID_COUNT; ++index) {
+        const volatile nx_spi_dma_owner_binding_t* owner =
+            nx_factory_spi_dma_owner_binding(
+                (nx_spi_dma_transaction_id_t)index);
+        if (owner != NULL) {
+            (void)owner->port;
+            (void)owner->contains;
+            (void)owner->attach_wake;
+        }
+    }
+#endif
+#if defined(NX_FIXTURE_UART_WORD_IRQ_PROBE)
+    for (size_t index = 0; index < NX_UART_WORD_ID_COUNT; ++index) {
+        const volatile nx_io_cycle_probe_t* probe =
+            nx_factory_uart_word_irq_probe((nx_uart_word_id_t)index);
+        if (probe != NULL) {
+            (void)probe->observation.maximum_modulo_cycles;
+        }
+    }
+    nx_result_t (*volatile snapshot)(const nx_io_cycle_probe_t*,
+                                     nx_io_cycle_observation_t*) =
+        nx_io_cycle_probe_snapshot;
+    (void)snapshot;
 #endif
 #if defined(NX_FIXTURE_I2C_LONG)
     NX_FIXTURE_RETAIN_FACES(i2c_long_device, nx_i2c_long_endpoint_t,
                             NX_I2C_LONG_DEVICE_ID_COUNT);
+#endif
+#if defined(NX_FIXTURE_UART_STREAM_PROFILE)
+    for (size_t index = 0; index < NX_UART_ID_COUNT; ++index) {
+        const volatile nx_uart_stream_profile_t* profile =
+            nx_factory_uart_stream_profile((nx_uart_id_t)index);
+        if (profile != NULL) {
+            (void)profile->port;
+            (void)profile->budget.configured_blocks;
+        }
+    }
+    nx_result_t (*volatile uart_start)(const nx_uart_stream_profile_t*,
+                                       nx_stream_t*) =
+        nx_uart_stream_profile_start;
+    (void)uart_start;
+#endif
+#if defined(NX_FIXTURE_ADC_STREAM_PROFILE)
+    for (size_t index = 0; index < NX_ADC_ID_COUNT; ++index) {
+        const volatile nx_adc_stream_profile_t* profile =
+            nx_factory_adc_stream_profile((nx_adc_id_t)index);
+        if (profile != NULL) {
+            (void)profile->port;
+            (void)profile->budget.configured_blocks;
+        }
+    }
+    nx_result_t (*volatile adc_start)(const nx_adc_stream_profile_t*,
+                                      nx_stream_t*, uint32_t) =
+        nx_adc_stream_profile_start;
+    (void)adc_start;
 #endif
     for (;;) {
     }

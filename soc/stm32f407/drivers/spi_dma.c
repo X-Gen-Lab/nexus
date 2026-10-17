@@ -12,7 +12,7 @@
  *
  * \copyright       Copyright (c) 2026 Nexus Team
  */
-#include "spi_dma_sequence.h"
+#include "spi_dma_sequence_owner.h"
 #include "stm32f407_dma.h"
 #include "stm32f4xx_ll_spi.h"
 
@@ -703,3 +703,41 @@ const nx_spi_dma_sequence_backend_t nx_stm32_spi_dma_sequence_backend = {
     .release = sequence_release,
     .stop = stop,
 };
+
+/** \brief Prove physical endpoint ownership after canonical logical identity.
+ */
+bool nx_stm32_spi_dma_owner_contains(
+    const nx_spi_dma_transaction_endpoint_t* endpoint,
+    const nx_spi_dma_transaction_port_t* port) {
+    if (!nx_spi_dma_sequence_contains(endpoint, port)) {
+        return false;
+    }
+    const nx_spi_dma_sequence_state_t* sequence = port->context;
+    const nx_spi_dma_sequence_endpoint_t* child = endpoint->context;
+    if (sequence->backend != &nx_stm32_spi_dma_sequence_backend ||
+        sequence->context == NULL) {
+        return false;
+    }
+    const nx_stm32_spi_dma_state_t* state = sequence->context;
+    const nx_stm32_spi_dma_endpoint_state_t* device = child->endpoint;
+    return device->dma == state && device->endpoint.port == &state->spi;
+}
+/** \brief Reuse both actual DMA IRQ policy checks without exposing byte IO. */
+nx_result_t
+nx_stm32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t* port,
+                                   const nx_irq_wake_t* wake,
+                                   uint8_t syscall_ceiling) {
+    if (port == NULL || port->ops != &nx_spi_dma_sequence_port_ops ||
+        port->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    const nx_spi_dma_sequence_state_t* sequence = port->context;
+    if (sequence->backend != &nx_stm32_spi_dma_sequence_backend ||
+        sequence->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (sequence->stopping || sequence->stopped) {
+        return NX_ERROR_STATE;
+    }
+    return attach_wake(sequence->context, wake, syscall_ceiling);
+}

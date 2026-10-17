@@ -240,8 +240,8 @@ def constructor(item, result, prefix):
         open_drain = "true" if item.kind == "i2c" else "false"
         _check(body, f"nx_{prefix}_pin_configure(GPIO{port}, {number}u, {mode}u, {pin['af']}u, {pull}u, {open_drain})")
     if item.kind == "uart":
-        body += [f"    {state}.regions = s_nx_dma_regions_{name};",
-                 f"    {state}.region_count = {region_count}u;"]
+        body += [f"    {state}.resources.regions = s_nx_dma_regions_{name};",
+                 f"    {state}.resources.region_count = {region_count}u;"]
         if stm:
             dma, stream, channel = DMA_FACTS[prefix][controller][0]
             body += [f"    {state}.uart.registers = {controller};",
@@ -250,9 +250,9 @@ def constructor(item, result, prefix):
                      f"    {state}.uart.rx_storage = s_nx_rx_{name};",
                      f"    {state}.uart.rx_capacity = {item.options.rx_capacity}u;",
                      f"    {state}.uart.irq = {controller}_IRQn;",
-                     f"    {state}.dma = DMA{dma};", f"    {state}.tx = DMA{dma}_Stream{stream};",
-                     f"    {state}.dma_irq = DMA{dma}_Stream{stream}_IRQn;",
-                     f"    {state}.stream = {stream}u;", f"    {state}.channel = {channel}u;"]
+                     f"    {state}.resources.dma = DMA{dma};", f"    {state}.transmit.tx = DMA{dma}_Stream{stream};",
+                     f"    {state}.transmit.dma_irq = DMA{dma}_Stream{stream}_IRQn;",
+                     f"    {state}.transmit.stream = {stream}u;", f"    {state}.transmit.channel = {channel}u;"]
             call = f"nx_stm32_uart_dma_initialize(&{state}, {84000000 if controller == 'USART1' else 42000000}u)"
         else:
             call = f"nx_gd32_uart_dma_initialize_at(&{state}, &nx_gd32_{controller.lower()}_controller, {item.options.baud}u, NX_UART_RX_{item.options.rx_profile.upper()}, s_nx_rx_{name}, {item.options.rx_capacity}u, {item.options.irq.priority}u)"

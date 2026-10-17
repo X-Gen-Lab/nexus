@@ -11,6 +11,7 @@
 #include "nexus/io/gpio.h"
 #include "nexus/io/i2c.h"
 #include "nexus/io/spi.h"
+#include "nexus/io/spi_dma_owner_binding.h"
 #include "nexus/io/spi_transaction.h"
 #include "nexus/io/timer.h"
 #include "nexus/io/uart.h"
@@ -549,5 +550,15 @@ nx_result_t nx_gd32_spi_endpoint_initialize(
  */
 nx_result_t nx_gd32_uart_tx_validate(void* context,
                                      const nx_uart_tx_request_t* request);
+
+/** \brief Exact enhanced sequence and underlying controller membership. */
+bool nx_gd32_spi_dma_owner_contains(
+    const nx_spi_dma_transaction_endpoint_t* endpoint,
+    const nx_spi_dma_transaction_port_t* port);
+/** \brief Bind one borrowed wake sink to the exact enhanced controller. */
+nx_result_t
+nx_gd32_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t* port,
+                                  const nx_irq_wake_t* wake,
+                                  uint8_t syscall_ceiling);
 
 #endif

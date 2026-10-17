@@ -1,0 +1,34 @@
+# Software contract fixture; no physical qualification is implied.
+schema = 2
+board = "gd32f470_liangshan"
+backend = "baremetal"
+clock = "hxtal25-pll200"
+optimization = "Os"
+
+[memory]
+main_stack_bytes = 2048
+flash_load_limit_bytes = 65536
+static_ram_limit_bytes = 32768
+libc_heap_bytes = 0
+
+[uart.uart0]
+binding = "console"
+mode = "irq-words"
+baud = 115200
+
+[uart.uart0.rx]
+format = "words"
+capacity = 32
+
+[uart.uart0.irq]
+priority = 5
+probe = true
+
+[factory]
+capabilities = true
+
+[uart.uart0.frame]
+data_bits = 9
+parity = "none"
+stop_bits = 1
+flow = "none"

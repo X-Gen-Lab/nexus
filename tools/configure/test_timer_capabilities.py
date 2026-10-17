@@ -69,7 +69,15 @@ class TimerCapabilityObserverTests(unittest.TestCase):
     def test_actual_selected_timer_faces_use_real_public_types(self):
         rows = capabilities.collect(configure.ROOT)
         selected = [row for row in rows if row["kind"] in {"timer_capture", "advanced_pwm"}]
-        self.assertEqual(len(selected), 4)
+        expected = {
+            ("stm32f407", "TIM4", "timer_capture", "edge-capture"),
+            ("stm32f407", "TIM1", "advanced_pwm", "complementary-pwm"),
+            ("gd32f470", "TIMER3", "timer_capture", "edge-capture"),
+            ("gd32f470", "TIMER0", "advanced_pwm", "complementary-pwm"),
+            ("stm32g474", "TIM5", "timer_capture", "edge-capture"),
+        }
+        self.assertEqual({(row["family"], row["controller"], row["kind"],
+                           row["mode"]) for row in selected}, expected)
         for row in selected:
             self.assertTrue(row["fixtures"])
             self.assertEqual(row["exports"], [f"soc/{row['family']}/drivers/{row['kind']}.c"])

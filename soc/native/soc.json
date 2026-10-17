@@ -71,7 +71,8 @@
     "SPI0": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "irq": [],
       "pins": []
@@ -91,7 +92,8 @@
     "SPI1": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "irq": [],
       "pins": []

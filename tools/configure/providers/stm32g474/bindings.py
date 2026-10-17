@@ -1,8 +1,9 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 try:
-    from ... import enhanced_endpoints
+    from ... import enhanced_endpoints, timer_advanced
 except ImportError:
     import enhanced_endpoints
+    import timer_advanced
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
 try:
     from ...emission import dma_regions
@@ -17,6 +18,8 @@ def constructor(item, result, board_bindings, routes, devices):
     if item.provider != "stm32g474":
         fail("G474 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
+    if item.kind in {"timer_capture", "encoder"}:
+        return timer_advanced.g474_constructor(item)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
@@ -112,6 +115,79 @@ def constructor(item, result, board_bindings, routes, devices):
                      "    if (status != NX_SUCCESS) { return status; }"]
         definitions += body + ["    return NX_SUCCESS;", "}"]
         definitions += stops + ["    return NX_SUCCESS;", "}"]
+        stop = f"stop_{name}()"
+    elif item.kind == "pwm_group":
+        if board_bindings[item.binding].get("mask") != 1810 or board_bindings[item.binding].get("initial") != 0:
+            fail("G474 coherent PWM requires explicit three-pin inactive-low Board facts")
+        cfg = "s_nx_config_" + name
+        comp = "s_nx_comp_" + name
+        vector = "s_nx_vector_" + name
+        priority = "s_nx_priority_" + name
+        definitions += [
+            f"static const nx_stm32g474_pwm_group_config_t {cfg} = {{",
+            f"    {item.options.tick_hz}u, {item.options.period_ticks}u, {item.options.deadtime_ticks}u,",
+            "    COMP_CSR_EN | COMP_CSR_INMSEL_2 | COMP_CSR_INMSEL_1, true };",
+            f"static struct {{ uint32_t saved; bool retained; }} {comp};",
+            f"static bool {vector};",
+            f"static uint8_t {priority};",
+            f"static nx_result_t prepare_{name}(void) {{",
+            f"    if ({state}.retained || {state}.initialized || {comp}.retained || {vector}) {{ return NX_ERROR_BUSY; }}",
+            "    (void)NX_G474_READ(&RCC->APB2ENR);",
+            "    (void)NX_G474_READ(&RCC->APB2ENR);",
+            "    if ((NX_G474_READ(&RCC->APB2RSTR) & (RCC_APB2RSTR_TIM1RST | RCC_APB2RSTR_SYSCFGRST)) != 0u ||",
+            "        (NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != 0u || !NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn)) { return NX_ERROR_BUSY; }",
+            f"    {comp}.saved = NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE;",
+            f"    {comp}.retained = true;",
+            "    NX_G474_WRITE(&GPIOA->BSRR, 1792u << 16u);",
+            "    nx_arch_dsb();",
+            "    if ((NX_G474_READ(&GPIOA->ODR) & 1792u) != 0u) { return NX_ERROR_IO; }",
+            "    NX_G474_WRITE(&GPIOA->PUPDR, NX_G474_READ(&GPIOA->PUPDR) & ~((3u << 2u) | (3u << 8u)));",
+            "    NX_G474_WRITE(&GPIOA->MODER, NX_G474_READ(&GPIOA->MODER) | (3u << 2u) | (3u << 8u));",
+            "    nx_arch_dsb();",
+            "    if ((NX_G474_READ(&GPIOA->PUPDR) & ((3u << 2u) | (3u << 8u))) != 0u ||",
+            "        (NX_G474_READ(&GPIOA->MODER) & ((3u << 2u) | (3u << 8u))) != ((3u << 2u) | (3u << 8u))) { return NX_ERROR_IO; }",
+            f"    NX_G474_WRITE(&COMP1->CSR, {cfg}.comparator_csr);",
+            "    nx_arch_dsb();",
+            f"    if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != {cfg}.comparator_csr) {{ return NX_ERROR_IO; }}",
+            "    uint64_t began = nx_stm32g474_system_now(&g_nx_stm32g474_system);",
+            "    uint32_t polls = 1000000u;",
+            "    while (nx_stm32g474_system_now(&g_nx_stm32g474_system) - began < 6u) {",
+            "        if (polls-- == 0u) { return NX_ERROR_TIMEOUT; }",
+            "        NX_G474_SYSTEM_POLL(&g_nx_stm32g474_system);",
+            "    }",
+            f"    nx_result_t status = nx_stm32g474_pwm_group_initialize(&{state}, &{cfg});",
+            "    if (status != NX_SUCCESS) { return status; }"]
+        for number in (8, 9, 10):
+            definitions += [f"    status = nx_stm32g474_pin_alternate(GPIOA, {number}u, 6u);",
+                            "    if (status != NX_SUCCESS) { return status; }"]
+        definitions += [
+            f"    {priority} = (uint8_t)NX_G474_IRQ_PRIORITY(TIM1_BRK_TIM15_IRQn);",
+            f"    {vector} = true;",
+            "    return NX_G474_IRQ_CONTROL(TIM1_BRK_TIM15_IRQn, true, 5u);", "}",
+            "void TIM1_BRK_TIM15_IRQHandler(void);",
+            r"/** \brief One exclusive TIM1/COMP1 latched break observation. */",
+            f"void TIM1_BRK_TIM15_IRQHandler(void) {{ nx_stm32g474_pwm_group_irq(&{state}); }}",
+            f"static nx_result_t stop_{name}(void) {{",
+            "    nx_result_t status;",
+            f"    if ({state}.initialized) {{",
+            f"        status = nx_pwm_group_stop(&s_nx_face_{name});",
+            "        if (status != NX_SUCCESS) { return status; }", "    }",
+            f"    if ({vector}) {{",
+            "        status = NX_G474_IRQ_CONTROL(TIM1_BRK_TIM15_IRQn, false, 0u);",
+            "        if (status != NX_SUCCESS) { return status; }",
+            "        if (!NX_G474_IRQ_AVAILABLE(TIM1_BRK_TIM15_IRQn)) { return NX_ERROR_BUSY; }",
+            f"        NX_G474_IRQ_PRIORITY_WRITE(TIM1_BRK_TIM15_IRQn, {priority});",
+            "        nx_arch_dsb(); nx_arch_isb();",
+            f"        if (NX_G474_IRQ_PRIORITY(TIM1_BRK_TIM15_IRQn) != {priority}) {{ return NX_ERROR_IO; }}",
+            f"        {vector} = false;", "    }",
+            f"    status = nx_stm32g474_pwm_group_close(&{state});",
+            "    if (status != NX_SUCCESS) { return status; }",
+            f"    if ({comp}.retained) {{",
+            f"        NX_G474_WRITE(&COMP1->CSR, {comp}.saved);",
+            "        nx_arch_dsb();",
+            f"        if ((NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != {comp}.saved) {{ return NX_ERROR_IO; }}",
+            f"        {comp}.retained = false;", "    }",
+            "    return NX_SUCCESS;", "}"]
         stop = f"stop_{name}()"
     elif item.kind == "pwm":
         pin = item["pins"][0]["pin"]

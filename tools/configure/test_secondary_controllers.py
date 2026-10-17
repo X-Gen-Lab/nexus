@@ -79,7 +79,7 @@ class SecondaryControllerConfigurationTests(unittest.TestCase):
                 self.assertIn("nx_device_secondary_sensor", source)
                 self.assertIn("nx_binding_secondary_spi", source)
                 self.assertIn("DMA0_Channel6_IRQHandler" if label == "gd32" else "DMA1_Stream6_IRQHandler", source)
-                self.assertIn("nx_gd32_uart_dma_initialize_at" if label == "gd32" else "s_nx_port_secondary_uart.tx = DMA1_Stream6", source)
+                self.assertIn("nx_gd32_uart_dma_initialize_at" if label == "gd32" else "s_nx_port_secondary_uart.transmit.tx = DMA1_Stream6", source)
                 self.assertNotIn("malloc", source)
                 self.assertNotIn("strcmp", source)
 
