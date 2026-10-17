@@ -50,6 +50,8 @@ class FamilyDescriptor:
             "__init__.py", "bindings.py", "emission.py"))
         if self.family in {"stm32f103", "gd32f303"}:
             modules += ("tools/configure/providers/legacy_transport.py",)
+        if self.family == "stm32g474":
+            modules += (f"{directory}/coupled.py",)
         return modules
 
     @property
@@ -137,7 +139,8 @@ _DESCRIPTORS = MappingProxyType({
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_dbg.h")),
     "stm32g474": FamilyDescriptor("stm32g474", (
         ("cmsis_core", "cmsis5"),
-        ("cmsis_device_g4", "stm32g4_cmsis")), references="references.json",
+        ("cmsis_device_g4", "stm32g4_cmsis"),
+        ("hal_driver_g4", "stm32g4_hal")), references="references.json",
         owned_payload=(
             "soc/stm32g474/CMakeLists.txt", "soc/stm32g474/system.c",
             "soc/stm32g474/drivers/gpio.c", "soc/stm32g474/drivers/uart.c",
@@ -147,8 +150,12 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32g474/drivers/encoder.c",
             "soc/stm32g474/drivers/timer_capture.c",
             "soc/stm32g474/drivers/adc.c", "soc/stm32g474/drivers/adc_stream.c",
+            "soc/stm32g474/drivers/fdcan.c",
+            "soc/stm32g474/drivers/pwm_adc.c",
             "soc/stm32g474/drivers/i2c.c", "soc/stm32g474/drivers/flash.c",
             "soc/stm32g474/private/stm32g474_acquisition.h",
+            "soc/stm32g474/private/stm32g474_fdcan.h",
+            "soc/stm32g474/private/stm32g474_pwm_adc.h",
             "soc/stm32g474/private/stm32g474_pwm_group.h",
             "soc/stm32g474/private/stm32g474_timer.h",
             "soc/stm32g474/private/stm32g474_system.h",
@@ -180,9 +187,12 @@ _DESCRIPTORS = MappingProxyType({
             "boards/stm32h743_nucleo_zi2/board.json")),
     "stm32u575": FamilyDescriptor("stm32u575", (
         ("cmsis_core", "cmsis5"),
-        ("cmsis_device_u5", "stm32u5_cmsis")), owned_payload=(
+        ("cmsis_device_u5", "stm32u5_cmsis"),
+        ("hal_driver_u5", "stm32u5_hal")), owned_payload=(
             "soc/stm32u575/CMakeLists.txt", "soc/stm32u575/system.c",
             "soc/stm32u575/drivers/gpio.c", "soc/stm32u575/drivers/uart.c",
+            "soc/stm32u575/drivers/uart_dma.c",
+            "soc/stm32u575/private/stm32u575_uart_gpdma.h",
             "soc/stm32u575/drivers/watchdog.c",
             "soc/stm32u575/drivers/spi.c",
             "soc/stm32u575/drivers/i2c.c",

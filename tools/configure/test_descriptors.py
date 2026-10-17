@@ -11,6 +11,15 @@ except ImportError:
 
 
 class DescriptorBoundaryTests(unittest.TestCase):
+    def test_coupled_g474_generator_inputs_are_part_of_source_identity(self):
+        from tools.configure import dependencies
+
+        names = set(dependencies._names("platform", "stm32g474"))
+        self.assertIn("tools/configure/coupled_io.py", names)
+        self.assertIn("tools/configure/providers/stm32g474/coupled.py", names)
+        native = set(dependencies._names("platform", "native"))
+        self.assertNotIn("tools/configure/providers/stm32g474/coupled.py", native)
+
     def test_h743_dma_configuration_binds_private_provider_payload(self):
         payload = descriptor.maintained("stm32h743").owned_payload
         for name in ("soc/stm32h743/drivers/uart_dma.c",
@@ -48,8 +57,10 @@ class DescriptorBoundaryTests(unittest.TestCase):
             ("cmsis_core", "vendors/arm/CMSIS_5"),
             ("cmsis_device_f4", "vendors/st/cmsis_device_f4"),
             ("hal_driver_f4", "vendors/st/stm32f4_hal")))
-        self.assertEqual(g4.git_dependencies[-1], (
-            "cmsis_device_g4", "vendors/st/cmsis_device_g4"))
+        self.assertEqual(g4.git_dependencies, (
+            ("cmsis_core", "vendors/arm/CMSIS_5"),
+            ("cmsis_device_g4", "vendors/st/cmsis_device_g4"),
+            ("hal_driver_g4", "vendors/st/stm32g4_hal")))
         self.assertEqual(descriptor.maintained("gd32f470").import_lock,
                          "vendors/gigadevice/gd32f4xx/source.lock.json")
 

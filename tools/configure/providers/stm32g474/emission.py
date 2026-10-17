@@ -27,6 +27,10 @@ def includes(result):
         source.append('#include "stm32g474_pwm_group.h"')
     if any(item.kind in {"timer_capture", "encoder"} for item in result.controllers):
         source.append('#include "stm32g474_timer.h"')
+    if any(item.kind == "pwm_adc" for item in result.controllers):
+        source.append('#include "stm32g474_pwm_adc.h"')
+    if any(item.kind == "can_fd" for item in result.controllers):
+        source.append('#include "stm32g474_fdcan.h"')
     return source + ['void _init(void);',
             'void _fini(void);',
             r'/** \brief C runtime hooks; constructors use .init_array. */',
@@ -44,18 +48,22 @@ def shared_irqs(result):
 
 
 def _syscfg(result):
-    return any(item.kind in {"exti", "flash", "pwm_group"} for item in result.controllers)
+    return any(item.kind in {"exti", "flash", "pwm_group", "pwm_adc"} for item in result.controllers)
 
 
 def _peripheral_gates(result):
     selected = {item.controller for item in result.controllers
-                if item.kind in {"uart", "spi", "pwm", "pwm_group", "i2c", "timer_capture", "encoder"}}
-    if any(item.kind == "adc" for item in result.controllers):
+                if item.kind in {"uart", "spi", "pwm", "pwm_group", "pwm_adc", "i2c", "timer_capture", "encoder"}}
+    if any(item.kind in {"adc", "pwm_adc"} for item in result.controllers):
         selected.add("ADC12")
+    if any(item.kind == "pwm_adc" for item in result.controllers):
+        selected.update({"DMA1", "DMAMUX1"})
+    if any(item.kind == "can_fd" for item in result.controllers):
+        selected.add("FDCAN")
     if any(item.kind == "adc" and item.mode == "trigger-dma"
            for item in result.controllers):
         selected.update({"TIM6", "DMA1", "DMAMUX1"})
-    groups = (("APB1ENR1", ("USART2", "USART3", "UART4", "UART5", "SPI2", "TIM3", "TIM4", "TIM5", "I2C1", "TIM6")),
+    groups = (("APB1ENR1", ("USART2", "USART3", "UART4", "UART5", "SPI2", "TIM3", "TIM4", "TIM5", "I2C1", "TIM6", "FDCAN")),
               ("APB1ENR2", ("LPUART1",)), ("APB2ENR", ("USART1", "SPI1", "TIM1")))
     groups += (("AHB2ENR", ("ADC12",)), ("AHB1ENR", ("DMA1", "DMAMUX1")))
     return tuple((register, " | ".join(
@@ -71,14 +79,14 @@ def state_declarations(result):
         source += ['static uint32_t s_nx_platform_syscfg_clock_added;']
     if any(item.kind == "i2c" for item in result.controllers):
         source += ['static bool s_nx_platform_i2c_mux_owned;']
-    if any(item.kind == "adc" for item in result.controllers):
+    if any(item.kind in {"adc", "pwm_adc"} for item in result.controllers):
         source += ['static bool s_nx_platform_adc_mux_owned;']
     return source
 
 
 def start_system(result):
     source = preflight.emit(result)
-    if any(item.kind == "pwm_group" for item in result.controllers):
+    if any(item.kind in {"pwm_group", "pwm_adc"} for item in result.controllers):
         source += ['    if ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM1EN) != 0u ||',
                    '        ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_SYSCFGEN) != 0u && (NX_G474_READ(&COMP1->CSR) & ~(uint32_t)COMP_CSR_VALUE) != 0u) ||',
                    '        ((NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u && NX_G474_READ(&TIM15->DIER) != 0u) ||',
@@ -116,7 +124,7 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
                    f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
                    '        return result;', '    }']
-    if any(item.kind == "adc" for item in result.controllers):
+    if any(item.kind in {"adc", "pwm_adc"} for item in result.controllers):
         source += ['    s_nx_platform_adc_mux_owned = true;',
                    '    NX_G474_WRITE(&RCC->CCIPR, NX_G474_READ(&RCC->CCIPR) | RCC_CCIPR_ADC12SEL_1);',
                    '    nx_arch_dsb();',
@@ -174,7 +182,7 @@ def stop_system(result, *, system_phase=None):
                    '        nx_arch_dsb();',
                    '        if ((NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u) { return NX_ERROR_IO; }',
                    '        s_nx_platform_i2c_mux_owned = false;', '    }']
-    if any(item.kind == "adc" for item in result.controllers):
+    if any(item.kind in {"adc", "pwm_adc"} for item in result.controllers):
         source += ['    if (s_nx_platform_adc_mux_owned) {',
                    '        NX_G474_WRITE(&RCC->CCIPR, NX_G474_READ(&RCC->CCIPR) & ~(uint32_t)RCC_CCIPR_ADC12SEL);',
                    '        nx_arch_dsb();',

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import contextlib
+import importlib.util
+import io
 import json
 from pathlib import Path
 import shutil
@@ -9,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -82,6 +86,165 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("actual payload changed", result.stdout + result.stderr)
         self.assertEqual((self.source.parent / "count").read_text(), "3")
+
+
+class SDKConsumerParallelTests(unittest.TestCase):
+    """Real CLI and templates; external CMake/SDK processes are test doubles."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
+        self.addCleanup(self.temporary.cleanup)
+        self.directory = Path(self.temporary.name)
+        self.prefix = self.directory / "prefix with spaces"
+        self.output = self.directory / "consumer results with spaces"
+        self.sdk = self.prefix / "share/nexus/src"
+        policy = self.sdk / "dependencies/platform-compatibility.json"
+        policy.parent.mkdir(parents=True)
+        shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
+        (self.sdk / ".nexus-source-sdk.json").write_text(json.dumps({
+            "publishable": True, "source_dirty": False,
+            "source_revision": "a" * 40, "source_tree": "b" * 40}))
+        specification = importlib.util.spec_from_file_location(
+            "nexus_consumer_parallel_contract",
+            ROOT / "cmake/package/verify_consumers.py")
+        self.consumer = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(self.consumer)
+        self.commands = []
+        self.failed_build = False
+        self.failed_sdk = False
+
+    def external_process(self, command, **options):
+        command = [str(argument) for argument in command]
+        self.commands.append(command)
+        code = 0
+        if command[0] == "cmake" and "-S" in command:
+            source = Path(command[command.index("-S") + 1])
+            build = Path(command[command.index("-B") + 1])
+            build.mkdir(parents=True)
+            (build / "resolved-sdk.txt").write_text(str(self.sdk))
+            products = [path for path in (source / "main.c", source / "main.cpp")
+                        if path.exists()]
+            (build / "compile_commands.json").write_text(json.dumps([
+                {"file": str(path), "command": "cc -c " + str(path)}
+                for path in products]))
+            config = build / "configuration"
+            config.mkdir()
+            (config / "bindings.c").write_text("/* external CMake fixture */")
+            (config / "resolved.json").write_text("{}")
+            (build / "resolved-config.txt").write_text(str(config))
+            binary = build / "bin"
+            binary.mkdir()
+            for name in ("installed_c", "installed_cpp", "installed_modern"):
+                (binary / (name + ".resources.json")).write_text(
+                    '{"status":"passed"}')
+                (binary / (name + ".elf")).write_bytes(b"test double")
+        elif command[0] == "cmake" and "--build" in command:
+            code = 42 if self.failed_build else 0
+        elif any(argument.endswith("retention.py") for argument in command):
+            Path(command[command.index("--output") + 1]).write_text(
+                '{"status":"passed"}')
+        elif any(argument.endswith("package_source_sdk.py")
+                 for argument in command):
+            code = 9 if self.failed_sdk else 0
+        return subprocess.CompletedProcess(command, code, "external fixture\n", "")
+
+    def execute(self, extra=()):
+        with mock.patch.object(self.consumer.subprocess, "run",
+                               side_effect=self.external_process):
+            status = self.consumer.main([
+                "--prefix", str(self.prefix), "--output", str(self.output),
+                *extra])
+        report = json.loads((self.output / "verification.json").read_text())
+        return status, report
+
+    def builds(self):
+        return [command for command in self.commands
+                if command[0] == "cmake" and "--build" in command]
+
+    def assert_complete_matrix(self):
+        builds = self.builds()
+        expected = {"native", "stm32", "gd32"} | {
+            family + " " + backend
+            for family in ("h743", "u575", "f103", "gd303", "g474")
+            for backend in ("baremetal", "freertos")}
+        self.assertEqual({Path(command[2]).name.removesuffix(" build")
+                          for command in builds}, expected)
+        self.assertEqual(len(builds), 13)
+        self.assertEqual(sum(len(command) - command.index("--target") - 1
+                             for command in builds), 16)
+        configurations = [command for command in self.commands
+                          if command[0] == "cmake" and "-S" in command]
+        self.assertEqual(len(configurations), 13)
+        for command in configurations:
+            self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
+                          command)
+        retention = [command for command in self.commands
+                     if any(arg.endswith("retention.py") for arg in command)]
+        self.assertEqual(len(retention), 10)
+        native = [command for command in self.commands if len(command) == 1]
+        self.assertEqual({Path(command[0]).name for command in native},
+                         {"installed_c", "installed_cpp"})
+        self.assertEqual(len(native), 2)
+        self.assertIn("--verify", self.commands[0])
+
+    def test_explicit_one_bounds_every_build_without_reducing_the_matrix(self):
+        with mock.patch.dict("os.environ", {"CMAKE_BUILD_PARALLEL_LEVEL": "99"}):
+            status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 0)
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["physical_status"], "not_executed")
+        self.assert_complete_matrix()
+        self.assertEqual([command[command.index("--parallel") + 1]
+                          for command in self.builds()], ["1"] * 13)
+
+    def test_default_retains_three_four_job_and_ten_two_job_builds(self):
+        status, report = self.execute()
+        self.assertEqual(status, 0)
+        self.assertEqual(report["source_revision"], "a" * 40)
+        self.assertEqual(report["source_tree"], "b" * 40)
+        self.assert_complete_matrix()
+        self.assertEqual([command[command.index("--parallel") + 1]
+                          for command in self.builds()], ["4"] * 3 + ["2"] * 10)
+
+    def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
+        status, _ = self.execute(("--parallel", "3"))
+        self.assertEqual(status, 0)
+        self.assert_complete_matrix()
+        self.assertEqual([command[command.index("--parallel") + 1]
+                          for command in self.builds()], ["3"] * 13)
+
+    def test_invalid_budget_rejects_before_any_output_or_external_command(self):
+        for value in ("0", "-1", "01", "+1", "1.5", "True", "", " 1"):
+            with self.subTest(value=value), mock.patch.object(
+                    self.consumer.subprocess, "run") as command:
+                errors = io.StringIO()
+                with contextlib.redirect_stderr(errors), self.assertRaises(
+                        SystemExit) as failure:
+                    self.consumer.main([
+                        "--prefix", str(self.prefix), "--output", str(self.output),
+                        "--parallel", value])
+                self.assertEqual(failure.exception.code, 2)
+                self.assertIn("positive integer", errors.getvalue())
+                self.assertFalse(self.output.exists())
+                command.assert_not_called()
+
+    def test_explicit_budget_preserves_a_real_subprocess_failure(self):
+        self.failed_build = True
+        with contextlib.redirect_stderr(io.StringIO()):
+            status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(len(self.builds()), 1)
+        self.assertEqual(report["commands"][-1]["exit_code"], 42)
+
+    def test_explicit_budget_cannot_skip_sdk_verification(self):
+        self.failed_sdk = True
+        with contextlib.redirect_stderr(io.StringIO()):
+            status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(self.builds(), [])
+        self.assertEqual(report["commands"][-1]["exit_code"], 9)
 
 
 if __name__ == "__main__":

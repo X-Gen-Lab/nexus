@@ -18,7 +18,7 @@ except ImportError:
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd")
 
 
 def symbol(name):
@@ -27,7 +27,7 @@ def symbol(name):
 
 def interface_type(class_name, shape):
     """Use actual public types where controller/direction names differ."""
-    if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder"}:
+    if class_name in {"timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc"}:
         return f"nx_{class_name}_t"
     if class_name in {"eth", "mdio"}:
         return f"nx_{class_name}_port_t"
@@ -231,6 +231,10 @@ def _capability(item, model, endpoint=None):
         if not model:
             units = "NX_I2C_MAX_MESSAGE_BYTES"
             messages = "NX_I2C_MAX_MESSAGES"
+    elif kind == "pwm_adc":
+        units, unit_bytes, alignment = 65535, 2, 2
+    elif kind == "can_fd":
+        units, unit_bytes, messages = 64, 1, 1
     elif kind == "adc":
         unit_bytes, alignment = 2, 2
         count = len(item.options.channels)

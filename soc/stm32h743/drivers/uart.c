@@ -7,6 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32h743_provider.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #include <limits.h>
 #ifndef NX_H743_IRQ_AVAILABLE
 #define NX_H743_IRQ_AVAILABLE(irq)                                             \
@@ -387,7 +390,11 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
          (p->rx_storage != NULL || p->rx_capacity != 0U)))
         return NX_ERROR_INVALID;
     if ((p->profile != NX_UART_RX_BYTES && p->profile != NX_UART_RX_BLOCKS) ||
+#if NEXUS_CORE_HZ == 384000000U
+        clock != 64000000U)
+#else
         (clock != 64000000U && clock != 32000000U))
+#endif
         return NX_ERROR_UNSUPPORTED;
     if (p->irq != USART3_IRQn)
         return NX_ERROR_UNSUPPORTED;
@@ -397,11 +404,20 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
         !NX_H743_IRQ_AVAILABLE(p->irq))
         return NX_ERROR_BUSY;
     if (!g_nx_stm32h743_system.started ||
+#if NEXUS_CORE_HZ == 384000000U
+        !nx_stm32h743_pll384_clocks_ready() ||
+#else
         g_nx_stm32h743_system.core_hz != clock ||
+#endif
         (NX_H743_READ(&g_nx_stm32h743_system.rcc->APB1LENR) &
          RCC_APB1LENR_USART3EN) == 0U ||
         (NX_H743_READ(&g_nx_stm32h743_system.rcc->D2CCIP2R) &
-         RCC_D2CCIP2R_USART28SEL) != 0U)
+         RCC_D2CCIP2R_USART28SEL) !=
+#if NEXUS_CORE_HZ == 384000000U
+            (3U << RCC_D2CCIP2R_USART28SEL_Pos))
+#else
+            0U)
+#endif
         return NX_ERROR_STATE;
     if (overlap(p->rx_storage, p->rx_capacity, p, sizeof(*p)) ||
         overlap(p->rx_storage, p->rx_capacity, p->registers,

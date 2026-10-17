@@ -17,7 +17,11 @@ def constructor(item, result, board_bindings, routes, devices):
     item = controller_ir(item, "stm32g474")
     if item.provider != "stm32g474":
         fail("G474 constructor cannot reinterpret a foreign provider decision")
-    validate_selection(item, item)
+    validate_selection(item, routes[item["route"]] if item.kind in {
+        "pwm_adc", "can_fd"} else item)
+    if item.kind in {"pwm_adc", "can_fd"}:
+        from . import coupled
+        return coupled.constructor(item, result, board_bindings)
     if item.kind in {"timer_capture", "encoder"}:
         return timer_advanced.g474_constructor(item)
     name = item.id.replace("-", "_")

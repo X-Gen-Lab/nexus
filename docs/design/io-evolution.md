@@ -227,13 +227,16 @@ software observation into a sample-aperture timestamp.
 PWM group commit stages one coherent shadow batch; `SUCCESS` does not prove the
 timer already applied it. A partial hardware-write failure must withdraw output
 and retain fault responsibility. Clearing a break does not enable output. The
-limited G474 register implementation does not supply PCB pin selection, analog
-threshold measurements, a power stage or a synchronized ADC provider. A selected
-software reference now generates exclusive TIM1/COMP1 construction, fixed
+ordinary G474 PWM-group provider does not supply PCB pin selection, analog
+threshold measurements or a power stage, and does not itself create a
+synchronized ADC session. A selected software reference now generates exclusive
+TIM1/COMP1 construction, fixed
 PA8/PA9/PA10 PWM pads and PA1/PA4 comparator pads. Its cold lifecycle owns the
 selected clock/reset, safe levels, comparator setup and settling, shared break
 vector and reverse cleanup. Partial cleanup failure retains responsibility.
-These source facts establish neither a fitted PCB route nor analog accuracy.
+The separate [finite coupled PWM/ADC owner](pwm-adc.md) now binds one fixed
+TIM1/ADC1/COMP1/DMA window without independently startable PWM-group or ADC
+subfaces. Neither selection establishes a fitted PCB route or analog accuracy.
 
 Separate concrete G474 providers implement TIM5 CH1 capture on PA0 and TIM3
 two-input quadrature counting on PA6/PA7. Capture publishes raw 32-bit counter
@@ -264,9 +267,11 @@ remain outside this repository.
 
 This is a bounded programming-timing correction for the selected existing clock
 profiles. It does not enable a new high-speed clock, change option bytes, qualify
-all silicon revisions or establish physical Flash endurance. A proposed 384 MHz
-profile remains separate until its complete CPU/bus/kernel-clock, voltage,
-Flash, peripheral and lifecycle contracts have been implemented and verified.
+all silicon revisions or establish physical Flash endurance. The separate
+selected [V-only HSI/PLL384 reference](h743-high-clock.md) now implements distinct
+CPU/bus/kernel clock domains and a cold clock/voltage/Flash lifecycle. Its joint
+owner replaces the fixed-HSI Flash timing owner for that high profile; support
+does not extend to unreviewed cuts, Cache-on execution or physical qualification.
 
 ## Observe time without inventing timing guarantees
 
@@ -360,12 +365,15 @@ control algorithms and recovery policy remain in external consumer projects.
 ## Work that is still a separate implementation
 
 The ledger retains the exits for real linked-list DMA, continuous high-throughput
-H743 paths, U575 low-power autonomous execution, synchronized control groups,
-CAN-FD, advanced Ethernet/USB, external storage, TrustZone services, multicore
-transport, audio and frame devices. A public type, validated topology or model
-does not complete these exits. Each mode needs its own provider, reviewed route,
+H743 paths, U575 low-power autonomous execution, broader or continuous
+synchronized control groups, advanced Ethernet/USB, external storage, TrustZone
+services, multicore transport, audio and frame devices. A public type, validated
+topology or model does not complete these exits. Each mode needs its own provider, reviewed route,
 failure and ownership tests, ARM/SDK checks, resource costs and physical evidence
-where applicable.
+where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), the
+[joint PWM/ADC window](pwm-adc.md) and selected [G474 CAN FD modes](can-fd.md) now
+have specific software paths; those selections do not complete the broader exits
+or establish external wiring, measured performance or HIL.
 
 Use [platform integration contracts](integration-contracts.md),
 [the lifecycle matrix](io-lifecycle-matrix.md),

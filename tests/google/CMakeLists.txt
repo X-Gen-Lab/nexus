@@ -54,6 +54,13 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/adc_control.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/g474_timer_modes.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/g474_control_factory.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/g474_timer_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_pwm_adc.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/u575_uart_gpdma.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/u575_uart_gpdma_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_pwm_adc_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/fdcan.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_fdcan_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/h743_high.cmake")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/legacy_devices.cmake")
 

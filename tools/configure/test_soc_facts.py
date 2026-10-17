@@ -65,14 +65,17 @@ class PackagePinContractTests(unittest.TestCase):
         expected.update({"TIM3": ("pwm", ["fixed-pwm"],
                                   {"encoder": ["quadrature"]}),
                          "TIM4": ("pwm", ["fixed-pwm"], {}),
-                         "TIM1": ("pwm_group", ["coherent-pwm"], {}),
+                         "TIM1": ("pwm_group", ["coherent-pwm"],
+                                  {"pwm_adc": ["finite-regular-dma"]}),
                          "TIM5": ("timer_capture", ["edge-capture"], {}),
                          "ADC1": ("adc", ["single-shot", "trigger-dma"], {}),
                          "I2C1": ("i2c", ["poll-messages"], {}),
                          "FLASH": ("flash", ["poll-word"], {}),
                          "IWDG": ("watchdog", ["independent"], {}),
                          "EXTI0": ("exti", ["edge-event"], {}),
-                         "EXTI1": ("exti", ["edge-event"], {})})
+                         "EXTI1": ("exti", ["edge-event"], {}),
+                         "FDCAN1": ("can_fd",
+                                    ["iso-fd-loopback", "iso-fd-normal"], {})})
         self.assertEqual({name: (item["kind"], item["modes"],
                                 item.get("interfaces", {}))
                           for name, item in soc["controllers"].items()}, expected)

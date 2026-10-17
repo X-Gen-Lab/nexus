@@ -96,6 +96,9 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
+    ("can_fd", "iso-fd-loopback"): ModeTraits(irq=True),
+    ("can_fd", "iso-fd-normal"): ModeTraits(irq=True),
     ("pwm_group", "coherent-pwm"): ModeTraits(irq=True),
     ("encoder", "quadrature"): ModeTraits(),
     ("timer_capture", "edge-capture"): ModeTraits(irq=True),
@@ -185,6 +188,7 @@ def validate_clock_profiles(soc, provider):
     except ImportError:
         import clocks
     for name, expected in supported.items():
+        clocks.plan(name, actual[name])
         if clocks.normalize(actual[name]) != clocks.normalize(expected):
             fail(f"Clock profile differs from the fixed cold implementation: {name}")
 
@@ -251,6 +255,12 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "pwm_adc": {"tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks",
+                    "channels", "sample_times", "reference_mv", "exclusive",
+                    "irq_priority", "calls_os"},
+        "can_fd": {"bitrate", "data_bitrate", "event_capacity", "filters",
+                   "drain_timeout_us", "poll_limit", "exclusive",
+                   "irq_priority", "calls_os", "message_ram_words"},
         "encoder": {"counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
         "pwm_group": {"tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq_priority", "calls_os"},
         "timer_capture": {"tick_hz", "edge", "filter", "exclusive", "irq_priority", "calls_os"},

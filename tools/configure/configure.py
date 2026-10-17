@@ -64,7 +64,7 @@ IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = physical_facts.GPIO_PIN
 KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "pwm", "adc", "can", "usb_device", "eth",
-         "timer_capture", "advanced_pwm", "pwm_group", "encoder"}
+         "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())
 
 
@@ -328,7 +328,7 @@ def validate_soc(soc, part):
         identity(name, "controller")
         obj(controller, {"kind", "modes", "irq", "pins"},
             {"resources", "max_hz", "irq_numbers", "channel_count", "clock_hz",
-             "fifo_words", "endpoint_numbers", "interfaces"}, name)
+             "fifo_words", "endpoint_numbers", "interfaces", "message_ram_words"}, name)
         if controller["kind"] not in KINDS:
             fail(f"Unmaintained controller kind: {controller['kind']}")
         for field in ("modes", "irq", "pins"):
@@ -364,6 +364,11 @@ def validate_soc(soc, part):
     ethernet.validate_soc(soc, provider)
     timer_advanced.validate_soc(soc, provider)
     secondary_controllers.validate_soc(soc, provider)
+    try:
+        from . import coupled_io
+    except ImportError:
+        import coupled_io
+    coupled_io.validate_soc(soc, provider)
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
     for name, profile in soc["clock_profiles"].items():
@@ -469,7 +474,7 @@ def resolve_bindings(board, routes, part):
         if not route or part not in route["variants"] or route["controller"] != binding["controller"]:
             fail(f"Board binding {binding['id']} has no reviewed exact-part route")
         if "supply_mv" in binding:
-            if route["kind"] not in {"flash", "adc"}:
+            if route["kind"] not in {"flash", "adc", "pwm_adc"}:
                 fail("Supply voltage belongs to a Flash or ADC binding")
             integer(binding["supply_mv"], 1, 5000, "Supply millivolts")
         if "initial" in binding:
@@ -616,6 +621,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     clock = soc["clock_profiles"].get(assembly["clock_profile"])
     if clock is None:
         fail(f"Unknown clock profile: {assembly['clock_profile']}")
+    clock_plan = clocks.plan(assembly["clock_profile"], clock)
     clock = clocks.normalize(clock)
     clocks.match_board(clock, board["clocks"])
     if "os" in assembly and not isinstance(assembly["os"], dict):
@@ -713,7 +719,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                  "tx_count", "rx_count", "rx_storage_bytes", "address", "init_timeout_us",
                  "filter", "exclusive", "deadtime_ticks", "break_active_high", "idle_high",
                  "idle_complement_high", "frame", "stream", "irq_probe",
-                 "counting", "filter_a", "filter_b", "invert_a", "invert_b"}, "controller selection")
+                 "counting", "filter_a", "filter_b", "invert_a", "invert_b",
+                 "trigger_ticks", "data_bitrate", "filters"}, "controller selection")
             name = identity(selection["id"], "instance id")
             c_identity(name)
             instance_ids.append(name)
@@ -791,7 +798,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 except ImportError:
                     import i2c_timing_selection
                 resolved_timing = i2c_timing_selection.resolve(
-                    selection, clock, provider)
+                    selection, clock, provider, clock_plan=clock_plan)
             try:
                 from . import stream_profiles
             except ImportError:
@@ -808,6 +815,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                              **({"stream_resolution": resolved_stream}
                                 if resolved_stream is not None else {}),
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
+            if route["kind"] == "can_fd":
+                selected[-1]["message_ram_words"] = hardware["message_ram_words"]
     if (family == "stm32h743" and provider.cache_mask(assembly["clock_profile"]) != 0
             and any(item["kind"] == "flash" for item in selected)):
         fail("H743 physical Flash requires the reviewed cache-off timing owner")
@@ -894,6 +903,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             if controller["kind"] == "spi":
                 speed = device.get("max_hz", controller.get("max_hz", 1000000))
                 limit = soc["controllers"][controller["controller"]].get("max_hz")
+                if (family == "stm32h743" and clock_plan is not None and
+                        speed * 256 < clock_plan["domains"]["spi4"]["maximum_hz"]):
+                    fail("SPI speed cannot be realized by the reviewed upper clock bound and divider")
                 if not provider.MODEL and (limit is None or speed < (limit + 127) // 128):
                     fail("SPI endpoint speed cannot be realized by the reviewed clock divider")
                 builtin_cs = provider.builtin_cs(controller)
@@ -1029,6 +1041,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
     result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
+    if clock_plan is not None:
+        result["clock_plan"] = clock_plan
     result["resource_plan"] = resource_graph.resolve(claim_list).to_dict()
     result["trigger_plan"] = trigger_graph.resolve_fixed(selected, routes).to_dict()
     result["dma_topology"] = dma_topology.resolve_selected(selected, provider).to_dict()
@@ -1048,6 +1062,10 @@ def normalize_resource(value):
     if timer is not None:
         return "controller:" + timer[1]
     if value.startswith("dma:"):
+        channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
+                               r"(?::request(0|[1-9][0-9]*))?", value)
+        if channel is not None:
+            return f"dma:{channel[1]}:channel{channel[2]}"
         match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
                              r"(?::channel([0-9]+))?", value)
         if match is None:

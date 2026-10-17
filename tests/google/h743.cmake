@@ -1,6 +1,6 @@
 # Actual H743 provider sources with real fixed SDK register definitions.
 nexus_google_test(nexus_h743_clock_test SOURCES h743_clock_test.cpp
-    h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
+    h743_clock_model.cpp h743_model.cpp "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/clock.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")

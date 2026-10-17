@@ -339,6 +339,100 @@
       ],
       "additionalProperties": false
     },
+    "can_fd": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "bitrate": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "data_bitrate": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "drain_timeout_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "event_capacity": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exclusive": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fifo": {
+                  "enum": [
+                    0,
+                    1
+                  ]
+                },
+                "format": {
+                  "enum": [
+                    "standard",
+                    "extended"
+                  ]
+                },
+                "id": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mask": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "fifo",
+                "format",
+                "id",
+                "mask"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 36
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string"
+          },
+          "poll_limit": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
     "clock": {
       "type": "string"
     },
@@ -857,6 +951,78 @@
             "minimum": 0
           },
           "tick_hz": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "binding",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "pwm_adc": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "binding": {
+            "type": "string"
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "deadtime_ticks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exclusive": {
+            "type": "boolean"
+          },
+          "irq": {
+            "type": "object",
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "additionalProperties": false
+          },
+          "mode": {
+            "type": "string"
+          },
+          "period_ticks": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reference_mv": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sample_times": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "tick_hz": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "trigger_ticks": {
             "type": "integer",
             "minimum": 0
           }

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5cb4538275db9683548a655d3fb46939641cbd74210933780bdc85c24fc1de6a\n"
+"X-Nexus-Source-SHA256: fef2c2545d56b6c7b3b15d06c60dc578015db279d55ef61123b948676096f302\n"
 
 msgid "当前设计与实施台账"
 msgstr "当前设计与实施台账"
@@ -352,3 +352,33 @@ msgstr ""
 
 msgid "[Source compatibility and SDK versions](source-compatibility.md)"
 msgstr "[源码兼容性与 SDK 版本](source-compatibility.md)"
+
+msgid "[H743 V 修订高速时钟参考](h743-high-clock.md)"
+msgstr "[H743 V 修订高速时钟参考](h743-high-clock.md)"
+
+msgid "已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界"
+msgstr "已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界"
+
+msgid "[有限 PWM/ADC 联合采样](pwm-adc.md)"
+msgstr "[有限 PWM/ADC 联合采样](pwm-adc.md)"
+
+msgid "单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界"
+msgstr "单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界"
+
+msgid "[U575 有限 UART GPDMA](u575-uart-gpdma.md)"
+msgstr "[U575 有限 UART GPDMA](u575-uart-gpdma.md)"
+
+msgid "精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空"
+msgstr "精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空"
+
+msgid "[G474 CAN FD](can-fd.md)"
+msgstr "[G474 CAN FD](can-fd.md)"
+
+msgid "固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界"
+msgstr "固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界"
+
+msgid "[本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md)"
+msgstr "[本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md)"
+
+msgid "逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格"
+msgstr "逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格"

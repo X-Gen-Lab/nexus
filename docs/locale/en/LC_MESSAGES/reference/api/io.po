@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a5f53133afdb560bcef446bfcc833ddbf8fc66f73b64833e5759efaedd6312c9\n"
+"X-Nexus-Source-SHA256: 04795bd47b332367857eb0fc03c7e5f7406a65ebbebaf0bc0605cdff55f7f848\n"
 
 msgid "Typed I/O: devices and execution contracts"
 msgstr "Typed I/O: devices and execution contracts"
@@ -912,3 +912,456 @@ msgstr "Read latched boot reset causes captured before clearing flags."
 
 msgid "Hardware-selected timeout bounds, including declared LSI uncertainty."
 msgstr "Hardware-selected timeout bounds, including declared LSI uncertainty."
+
+msgid "The Native model controls in `model.h` and `spi_dma_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider."
+msgstr "The Native model controls in `model.h` and `spi_dma_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider."
+
+msgid "adc_format.h"
+msgstr "adc_format.h"
+
+msgid "Explicit integer sample representation and scan layout."
+msgstr "Explicit integer sample representation and scan layout."
+
+msgid "Integer encoding; no implicit voltage or floating-point conversion."
+msgstr "Integer encoding; no implicit voltage or floating-point conversion."
+
+msgid "Byte order is explicit, independently of the executing CPU."
+msgstr "Byte order is explicit, independently of the executing CPU."
+
+msgid "Hardware conversion group; descriptive facts do not enable it."
+msgstr "Hardware conversion group; descriptive facts do not enable it."
+
+msgid "Trigger identity is not a sample aperture timestamp."
+msgstr "Trigger identity is not a sample aperture timestamp."
+
+msgid "Validate a complete immutable layout without reading sample storage."
+msgstr "Validate a complete immutable layout without reading sample storage."
+
+msgid "Decode one integer from a caller-owned or consumer-acquired scan."
+msgstr "Decode one integer from a caller-owned or consumer-acquired scan."
+
+msgid "Immutable uniform-channel integer layout, independent of ADC faces."
+msgstr "Immutable uniform-channel integer layout, independent of ADC faces."
+
+msgid "can_fd.h"
+msgstr "can_fd.h"
+
+msgid "Optional CAN FD value ports and retained hardware requests."
+msgstr "Optional CAN FD value ports and retained hardware requests."
+
+msgid "Exact wire format; the classic interface remains independent."
+msgstr "Exact wire format; the classic interface remains independent."
+
+msgid "Validate and copy an exact frame into unborrowed request storage."
+msgstr "Validate and copy an exact frame into unborrowed request storage."
+
+msgid "Admit one exact value into a physical hardware transmit element."
+msgstr "Admit one exact value into a physical hardware transmit element."
+
+msgid "Request cancellation while preserving the accepted storage loan."
+msgstr "Request cancellation while preserving the accepted storage loan."
+
+msgid "Process bounded hardware facts and absolute deadline progress."
+msgstr "Process bounded hardware facts and absolute deadline progress."
+
+msgid "Copy ordered value events into unretained caller output storage."
+msgstr "Copy ordered value events into unretained caller output storage."
+
+msgid "Copy authoritative latched protocol and ownership state."
+msgstr "Copy authoritative latched protocol and ownership state."
+
+msgid "Close admission, drain transmit loans and withdraw IRQ publishers."
+msgstr "Close admission, drain transmit loans and withdraw IRQ publishers."
+
+msgid "Recover the same hardware identity after complete transmit drain."
+msgstr "Recover the same hardware identity after complete transmit drain."
+
+msgid "Borrow a wake sink after validating the actual enabled IRQ source."
+msgstr "Borrow a wake sink after validating the actual enabled IRQ source."
+
+msgid "Value frame with an exact byte length, never raw or shifted DLC."
+msgstr "Value frame with an exact byte length, never raw or shifted DLC."
+
+msgid "Prepare copies a complete value; accepted request stays borrowed."
+msgstr "Prepare copies a complete value; accepted request stays borrowed."
+
+msgid "Acquired value event, including observed transmitter ESI."
+msgstr "Acquired value event, including observed transmitter ESI."
+
+msgid "Immutable mask filter; no product register or protocol policy."
+msgstr "Immutable mask filter; no product register or protocol policy."
+
+msgid "Latched protocol state; payload length never describes a frame count."
+msgstr "Latched protocol state; payload length never describes a frame count."
+
+msgid "cycle_probe.h"
+msgstr "cycle_probe.h"
+
+msgid "Opt-in raw cycle observations without elapsed-time claims."
+msgstr "Opt-in raw cycle observations without elapsed-time claims."
+
+msgid "Start one raw observation without enabling or resetting DWT."
+msgstr "Start one raw observation without enabling or resetting DWT."
+
+msgid "Finish the exact token, publish raw facts and remove its reference."
+msgstr "Finish the exact token, publish raw facts and remove its reference."
+
+msgid "Copy bounded IRQ statistics under saved local interrupt exclusion."
+msgstr "Copy bounded IRQ statistics under saved local interrupt exclusion."
+
+msgid "Dispatch exactly one word service step with optional raw observation."
+msgstr "Dispatch exactly one word service step with optional raw observation."
+
+msgid "Dispatch exactly one whole-CS DMA service step with raw observation."
+msgstr "Dispatch exactly one whole-CS DMA service step with raw observation."
+
+msgid "Copied raw counter facts; readable does not mean elapsed is known."
+msgstr "Copied raw counter facts; readable does not mean elapsed is known."
+
+msgid "Optional zero-initialized sidecar; no default provider state grows."
+msgstr "Optional zero-initialized sidecar; no default provider state grows."
+
+msgid "Zero-initialized stack token; do not copy or rebind while active."
+msgstr "Zero-initialized stack token; do not copy or rebind while active."
+
+msgid "encoder.h"
+msgstr "encoder.h"
+
+msgid "Optional raw modulo quadrature encoder observations."
+msgstr "Optional raw modulo quadrature encoder observations."
+
+msgid "Exact edge counting personality, never a freely combinable mask."
+msgstr "Exact edge counting personality, never a freely combinable mask."
+
+msgid "Enable only the two cold-selected encoder inputs and counter."
+msgstr "Enable only the two cold-selected encoder inputs and counter."
+
+msgid "Observe counter and input-source withdrawal before returning."
+msgstr "Observe counter and input-source withdrawal before returning."
+
+msgid "Read one modulo position without inferring travel across wraps."
+msgstr "Read one modulo position without inferring travel across wraps."
+
+msgid "Report exact counter width and selected silicon filter codes."
+msgstr "Report exact counter width and selected silicon filter codes."
+
+msgid "One raw modulo counter and separate software observation time."
+msgstr "One raw modulo counter and separate software observation time."
+
+msgid "Immutable input/filter facts and actual counter enable state."
+msgstr "Immutable input/filter facts and actual counter enable state."
+
+msgid "Shared methods; no ring, request, allocation, callback or worker."
+msgstr "Shared methods; no ring, request, allocation, callback or worker."
+
+msgid "Immutable identity; exact private state owns the whole controller."
+msgstr "Immutable identity; exact private state owns the whole controller."
+
+msgid "i2c_long.h"
+msgstr "i2c_long.h"
+
+msgid "Optional bounded long I2C messages without extra START."
+msgstr "Optional bounded long I2C messages without extra START."
+
+msgid "Validate complete messages before acquiring any hardware."
+msgstr "Validate complete messages before acquiring any hardware."
+
+msgid "Execute finite messages without splitting address phases."
+msgstr "Execute finite messages without splitting address phases."
+
+msgid "Shared read-only optional long-message implementation."
+msgstr "Shared read-only optional long-message implementation."
+
+msgid "Optional immutable face; controller state is shared with base I2C."
+msgstr "Optional immutable face; controller state is shared with base I2C."
+
+msgid "observation.h"
+msgstr "observation.h"
+
+msgid "Explicit timestamp provenance and checked service dispatch."
+msgstr "Explicit timestamp provenance and checked service dispatch."
+
+msgid "Observation location; software time never implies hardware SOF."
+msgstr "Observation location; software time never implies hardware SOF."
+
+msgid "Compare two explicitly related observed events."
+msgstr "Compare two explicitly related observed events."
+
+msgid "Dispatch the selected UART service or explain its absence."
+msgstr "Dispatch the selected UART service or explain its absence."
+
+msgid "Dispatch the selected SPI service or explain its absence."
+msgstr "Dispatch the selected SPI service or explain its absence."
+
+msgid "Dispatch the selected I2C service or explain its absence."
+msgstr "Dispatch the selected I2C service or explain its absence."
+
+msgid "Explicit, caller-supplied time fact without clock access."
+msgstr "Explicit, caller-supplied time fact without clock access."
+
+msgid "Delta in one common clock domain, with stated error bound."
+msgstr "Delta in one common clock domain, with stated error bound."
+
+msgid "pwm_adc.h"
+msgstr "pwm_adc.h"
+
+msgid "Optional finite coherent PWM / triggered ADC window."
+msgstr "Optional finite coherent PWM / triggered ADC window."
+
+msgid "Prepare distinct unborrowed request, frame and sample storage."
+msgstr "Prepare distinct unborrowed request, frame and sample storage."
+
+msgid "Admit and arm one complete finite window on the unique task owner."
+msgstr "Admit and arm one complete finite window on the unique task owner."
+
+msgid "Latch cancellation while retaining the exact live window loan."
+msgstr "Latch cancellation while retaining the exact live window loan."
+
+msgid "Advance bounded completion or source drain on the same task owner."
+msgstr "Advance bounded completion or source drain on the same task owner."
+
+msgid "Close admission and attempt final drain without revoking a loan."
+msgstr "Close admission and attempt final drain without revoking a loan."
+
+msgid "Copy exact fixed facts and observed active/fault/quarantine state."
+msgstr "Copy exact fixed facts and observed active/fault/quarantine state."
+
+msgid "One finite window; transferred counts are raw samples, never bytes."
+msgstr "One finite window; transferred counts are raw samples, never bytes."
+
+msgid "Borrow and release publication state."
+msgstr "Borrow and release publication state."
+
+msgid "Exclusive writable raw sample storage."
+msgstr "Exclusive writable raw sample storage."
+
+msgid "Positive number of requested samples."
+msgstr "Positive number of requested samples."
+
+msgid "Copied metadata; duty array is borrowed."
+msgstr "Copied metadata; duty array is borrowed."
+
+msgid "Exact selected facts and observed source/recovery state."
+msgstr "Exact selected facts and observed source/recovery state."
+
+msgid "Actual integer storage and provenance."
+msgstr "Actual integer storage and provenance."
+
+msgid "PWM counter ticks per second."
+msgstr "PWM counter ticks per second."
+
+msgid "Fixed period in counter ticks."
+msgstr "Fixed period in counter ticks."
+
+msgid "Fixed phase in counter ticks."
+msgstr "Fixed phase in counter ticks."
+
+msgid "Deadtime in separate deadtime_hz units."
+msgstr "Deadtime in separate deadtime_hz units."
+
+msgid "Deadtime clock; never inferred from PSC."
+msgstr "Deadtime clock; never inferred from PSC."
+
+msgid "Complete fixed-order frame width."
+msgstr "Complete fixed-order frame width."
+
+msgid "Provider/DMA finite-window count bound."
+msgstr "Provider/DMA finite-window count bound."
+
+msgid "Observed source/counter activity."
+msgstr "Observed source/counter activity."
+
+msgid "Latched fault requiring cold recovery."
+msgstr "Latched fault requiring cold recovery."
+
+msgid "Incomplete withdrawal retains ownership."
+msgstr "Incomplete withdrawal retains ownership."
+
+msgid "Selected-only operations; no growth to ordinary PWM/ADC tables."
+msgstr "Selected-only operations; no growth to ordinary PWM/ADC tables."
+
+msgid "Immutable cold-selected identity, never an allocating factory."
+msgstr "Immutable cold-selected identity, never an allocating factory."
+
+msgid "pwm_group.h"
+msgstr "pwm_group.h"
+
+msgid "Fixed-base atomic multi-channel PWM shadow commits."
+msgstr "Fixed-base atomic multi-channel PWM shadow commits."
+
+msgid "Stage a complete channel group and its internal trigger comparison."
+msgstr "Stage a complete channel group and its internal trigger comparison."
+
+msgid "Start only from disabled outputs and an inactive, cleared break."
+msgstr "Start only from disabled outputs and an inactive, cleared break."
+
+msgid "Withdraw master output, channels, counter and owned IRQ sources."
+msgstr "Withdraw master output, channels, counter and owned IRQ sources."
+
+msgid "Explicitly clear fault while disabled after checking actual break."
+msgstr "Explicitly clear fault while disabled after checking actual break."
+
+msgid "Read fixed units and observed enable/fault facts without starting."
+msgstr "Read fixed units and observed enable/fault facts without starting."
+
+msgid "One synchronous shadow batch; channel order is fixed by assembly."
+msgstr "One synchronous shadow batch; channel order is fixed by assembly."
+
+msgid "Fixed units, software fault latch and actual hardware enable state."
+msgstr "Fixed units, software fault latch and actual hardware enable state."
+
+msgid "Shared operations; commit must prevent partial shadow publication."
+msgstr "Shared operations; commit must prevent partial shadow publication."
+
+msgid "Immutable identity with no default-device state or allocation."
+msgstr "Immutable identity with no default-device state or allocation."
+
+msgid "spi_dma_model.h"
+msgstr "spi_dma_model.h"
+
+msgid "Explicit Native segmented wire and drain fault controls."
+msgstr "Explicit Native segmented wire and drain fault controls."
+
+msgid "Move one modeled wire word or observe its final idle event."
+msgstr "Move one modeled wire word or observe its final idle event."
+
+msgid "Select optional single-step progress during task service."
+msgstr "Select optional single-step progress during task service."
+
+msgid "Inject or remove inability to prove physical model drain."
+msgstr "Inject or remove inability to prove physical model drain."
+
+msgid "Fail a phase before the selected zero-based wire word."
+msgstr "Fail a phase before the selected zero-based wire word."
+
+msgid "spi_dma_owner_binding.h"
+msgstr "spi_dma_owner_binding.h"
+
+msgid "Optional immutable segmented SPI ownership and IRQ binding."
+msgstr "Optional immutable segmented SPI ownership and IRQ binding."
+
+msgid "Check exact endpoint membership without hardware effects."
+msgstr "Check exact endpoint membership without hardware effects."
+
+msgid "Attach a borrowed hint to actual validated IRQ publishers."
+msgstr "Attach a borrowed hint to actual validated IRQ publishers."
+
+msgid "Selected-only provider capability without changing IO faces."
+msgstr "Selected-only provider capability without changing IO faces."
+
+msgid "spi_dma_transaction.h"
+msgstr "spi_dma_transaction.h"
+
+msgid "Optional finite whole-CS segmented SPI DMA request contract."
+msgstr "Optional finite whole-CS segmented SPI DMA request contract."
+
+msgid "Prepare unborrowed storage after validating every span."
+msgstr "Prepare unborrowed storage after validating every span."
+
+msgid "Validate immutable fields without admission or memory modification."
+msgstr "Validate immutable fields without admission or memory modification."
+
+msgid "Admit one finite chain on a task-only single executor."
+msgstr "Admit one finite chain on a task-only single executor."
+
+msgid "Cancel an exact live request while retaining all its loans."
+msgstr "Cancel an exact live request while retaining all its loans."
+
+msgid "Advance a bounded phase boundary, completion or drain."
+msgstr "Advance a bounded phase boundary, completion or drain."
+
+msgid "Close admission and stop after complete source withdrawal."
+msgstr "Close admission and stop after complete source withdrawal."
+
+msgid "Explicit DMA words with caller-owned dummy/discard cells."
+msgstr "Explicit DMA words with caller-owned dummy/discard cells."
+
+msgid "Caller-owned request retaining every segment through drain."
+msgstr "Caller-owned request retaining every segment through drain."
+
+msgid "spi_transaction.h"
+msgstr "spi_transaction.h"
+
+msgid "Optional multi-segment whole-CS 8/16-bit polling SPI."
+msgstr "Optional multi-segment whole-CS 8/16-bit polling SPI."
+
+msgid "Bounded descriptor count; no hidden concatenation buffer exists."
+msgstr "Bounded descriptor count; no hidden concatenation buffer exists."
+
+msgid "Validate every descriptor and span without hardware effects."
+msgstr "Validate every descriptor and span without hardware effects."
+
+msgid "Execute all segments under exactly one asserted CS interval."
+msgstr "Execute all segments under exactly one asserted CS interval."
+
+msgid "One phase within a single CS interval."
+msgstr "One phase within a single CS interval."
+
+msgid "Shared immutable methods; absent transfer reports UNSUPPORTED."
+msgstr "Shared immutable methods; absent transfer reports UNSUPPORTED."
+
+msgid "Optional face sharing the selected provider's existing bus state."
+msgstr "Optional face sharing the selected provider's existing bus state."
+
+msgid "stream_profile.h"
+msgstr "stream_profile.h"
+
+msgid "Optional readonly continuous-stream cold admission profiles."
+msgstr "Optional readonly continuous-stream cold admission profiles."
+
+msgid "Validate an actual pool before the bound UART may borrow it."
+msgstr "Validate an actual pool before the bound UART may borrow it."
+
+msgid "Validate pool and whole-scan rate before ADC admission."
+msgstr "Validate pool and whole-scan rate before ADC admission."
+
+msgid "Selected UART face and immutable byte-stream assumptions."
+msgstr "Selected UART face and immutable byte-stream assumptions."
+
+msgid "Selected ADC face and complete-scan stream assumptions."
+msgstr "Selected ADC face and complete-scan stream assumptions."
+
+msgid "uart_format.h"
+msgstr "uart_format.h"
+
+msgid "Explicit payload, parity, stop and hardware-flow format."
+msgstr "Explicit payload, parity, stop and hardware-flow format."
+
+msgid "Validate the common USART-v1 subset without hardware access."
+msgstr "Validate the common USART-v1 subset without hardware access."
+
+msgid "Immutable wire format; data_bits excludes the parity bit."
+msgstr "Immutable wire format; data_bits excludes the parity bit."
+
+msgid "uart_word.h"
+msgstr "uart_word.h"
+
+msgid "Independent nine-bit face and caller-owned word requests."
+msgstr "Independent nine-bit face and caller-owned word requests."
+
+msgid "Prepare an unborrowed nine-bit payload, without admitting it."
+msgstr "Prepare an unborrowed nine-bit payload, without admitting it."
+
+msgid "Admit one READY request to the single unmasked task executor."
+msgstr "Admit one READY request to the single unmasked task executor."
+
+msgid "Transfer an adapter's QUEUED borrow without readmission."
+msgstr "Transfer an adapter's QUEUED borrow without readmission."
+
+msgid "Request cancellation without revoking request/payload ownership."
+msgstr "Request cancellation without revoking request/payload ownership."
+
+msgid "Perform bounded owner-driven deadline, drain and settlement work."
+msgstr "Perform bounded owner-driven deadline, drain and settlement work."
+
+msgid "Copy words without retaining destination storage."
+msgstr "Copy words without retaining destination storage."
+
+msgid "Close admission and stop after active TX and IRQ sources drain."
+msgstr "Close admission and stop after active TX and IRQ sources drain."
+
+msgid "Each uint16_t contains 0..511; count excludes bytes and parity."
+msgstr "Each uint16_t contains 0..511; count excludes bytes and parity."
+
+msgid "Independent immutable face; default byte face/state do not grow."
+msgstr "Independent immutable face; default byte face/state do not grow."

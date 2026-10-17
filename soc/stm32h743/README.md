@@ -12,6 +12,49 @@ Public C11 GPIO/UART faces remain immutable; each static instance owns its
 private state and caller-explicit byte ring. Shared readonly ops perform hot
 I/O directly. No allocator, worker, registry or DMA fallback is introduced.
 
+## Optional V-only high-clock reference
+
+The additional `hsi64-pll384-cache-off` profile is a cold-start configuration
+for DEV_ID `0x450`, REV_ID `0x2003` (V) only. Revision `0x1003` cannot distinguish
+Y from W; `0x2001` (X) and unknown revisions are rejected without fallback.
+Read the [high-clock contract](../../docs/design/h743-high-clock.md) before
+selecting it. It is not runtime frequency scaling or support for every H743 cut.
+
+Nominal CPU/HCLK/APB frequencies are 384/192/96 MHz; TIM2 and TIM3 use 192 MHz,
+not the CPU clock. USART3 and I2C1 select the unmultiplied HSI64 kernel. SPI4 uses
+APB2 with a reviewed 99.45 MHz upper bound for divider selection. ADC12 receives
+HSI64 through per_ck; only an initialized ADC1 provider selects async /4 for
+nominal 16 MHz conversions. The empty profile does not configure ADC conversions.
+
+The reviewed 62..65 MHz HSI design envelope derives from DS12110 Rev11 V-cut
+factory, voltage and full-junction-temperature limits; it is not a measurement.
+The PLL budget adds the RM0433 Rev9 PLL-ready deviation. A requested 115200 baud
+with BRR556 can consequently span about 111511..116906 baud. This local divider
+contract does not qualify a remote receiver, line or physical baud tolerance.
+The detailed contract records the source conditions and calculation.
+
+One selected four-byte clock responsibility record owns power/Flash protection,
+PLL, buses and kernel selectors. Startup proves VOS1 and Flash 2WS/WRHIGHFREQ2
+before increasing clocks. Stop first joins devices and withdraws the TIM2 System
+owner, then proves actual HSI selection before reducing protections. Failed
+withdrawal retains its effects for retry. The high profile uses this joint owner
+instead of the fixed-HSI optional Flash-timing owner. Flash still requires a
+fresh erase and the original geometry, voltage, alignment and pulse-drain rules.
+
+The existing four fixed-HSI selections do not select the high owner or clock
+translation unit. Four bytes describes the selected responsibility type, not a
+measured whole-image RAM delta. Default-path machine-code and linked cost remain
+separate checks. Cache-on, bootloader adoption and running-clock changes are
+outside this high profile.
+
+This iteration executed 38 clock, 19 high-System, 30 kernel and 10 normally
+generated factory GoogleTest cases successfully. Three normal ARM presets also
+configured and linked: `fixture-io-evolution-h743-high-empty`,
+`fixture-io-evolution-h743-high-uart` and
+`fixture-io-evolution-h743-high-peripherals`. These are development software
+results; physical HIL remains `not_executed`. See the linked contract for exact
+fixtures, sources and failure boundaries.
+
 ## Reset and ownership
 
 Official reset calls `ExitRun0Mode` before `SystemInit`, DATA/BSS initialization
@@ -41,7 +84,7 @@ ST 官方系统模板；完整 140 字节 ARM 指令和分支验收不能替代�
 
 `SystemInit` uses only CPU/system registers after power entry permits stack
 writes. It sets the explicit FPU/vector/grouping ABI without initialized globals.
-Runtime start accepts only cold HSI64, undivided buses, ready LDO, conservative
+The fixed-HSI runtime starts from cold HSI64, undivided buses, ready LDO, conservative
 reset Flash latency 7WS and Cache off. It rejects unknown running states before
 mutation. Trusted reset or a prior successful owned clean/disable must establish
 known-clean caches; clear CCR bits alone cannot prove foreign dirty lines are
@@ -58,7 +101,7 @@ divider or cache changes. A failed second admission restores only that gate;
 it never clears the foreign timer, reset, flags or vector. Refused gate rollback
 retains a distinct gate responsibility for retry without acquiring the timer.
 
-The authored clock profile selects `hsi32-fixed-cache-off`,
+The fixed-HSI clock profile selects `hsi32-fixed-cache-off`,
 `hsi32-fixed-cache-on`, `hsi64-fixed-cache-off` or `hsi64-fixed-cache-on`.
 HSI32 changes HSIDIV only after cold admission and confirms HSIRDY, HSIDIV and
 HSIDIVF before publishing frequency or enabling TIM2. UART uses the same selected
@@ -279,6 +322,19 @@ Nexus types. Official LL field encodings and pure TSIZE access are reused while
 Nexus remains the single transfer, time, IRQ and shutdown owner.
 
 ## 中文范围说明
+
+新增 `hsi64-pll384-cache-off` 仅准入 DEV_ID `0x450`、REV_ID `0x2003`（V）。
+`0x1003` 无法区分 Y/W，`0x2001`（X）及未知修订均拒绝，不自动回退。
+该冷启动配置的名义 CPU/HCLK/APB 为 384/192/96 MHz，TIM2/TIM3 为 192 MHz；
+USART3/I2C1 使用未倍频的 HSI64，SPI4 按 APB2 的 99.45 MHz 保守上界选分频。
+ADC12 输入为 HSI64，只有初始化 ADC1 后才设置 async /4，得到名义 16 MHz。
+62..65 MHz 是按官方出厂、电压及完整结温范围推导的设计包络，不是实测值；
+115200 baud 的本地分频不能证明整条通信链路的容差。四字节选配责任记录统一
+管理时钟、电压、Flash 时序和 kernel mux；所有设备及 System 停止后，才撤销
+时钟责任，读回失败保留以便重试。现有四种固定 HSI 配置不选入该 owner。
+本轮 38+19+30+10 个模型测试与三个正常 ARM 配置已通过；实板 HIL 仍为
+`not_executed`。Cache-on、所有修订支持、运行时调频和整机资格不在本次结论内。
+完整条件、公式、调用顺序和验证边界以[高频合同](../../docs/design/h743-high-clock.md)为准。
 
 本轮接入精确STM32H743ZIT6软件参考的SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、
 IWDG1与双Bank物理Flash。原NUCLEO GPIO/USART3参考保持独立；新增引脚组合位于

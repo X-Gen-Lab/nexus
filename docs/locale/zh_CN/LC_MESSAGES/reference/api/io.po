@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a5f53133afdb560bcef446bfcc833ddbf8fc66f73b64833e5759efaedd6312c9\n"
+"X-Nexus-Source-SHA256: 04795bd47b332367857eb0fc03c7e5f7406a65ebbebaf0bc0605cdff55f7f848\n"
 
 msgid "Typed I/O: devices and execution contracts"
 msgstr "类型化 I/O：设备与执行合同"
@@ -901,3 +901,456 @@ msgstr "读取清除标志前捕获的锁存启动复位原因。"
 
 msgid "Hardware-selected timeout bounds, including declared LSI uncertainty."
 msgstr "硬件选定的超时边界，包含声明的 LSI 不确定性。"
+
+msgid "The Native model controls in `model.h` and `spi_dma_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider."
+msgstr "`model.h` 和 `spi_dma_model.h` 中的 Native 模型控制用于主机测试，不据此认定 MCU 硬件支持或设备发现能力。可选接口描述选定的合同；接口存在不表示每个提供者均支持它。"
+
+msgid "adc_format.h"
+msgstr "adc_format.h"
+
+msgid "Explicit integer sample representation and scan layout."
+msgstr "明确的整数采样表示与扫描布局。"
+
+msgid "Integer encoding; no implicit voltage or floating-point conversion."
+msgstr "整数编码；不隐式转换电压或浮点数。"
+
+msgid "Byte order is explicit, independently of the executing CPU."
+msgstr "显式声明字节序，与执行代码的 CPU 无关。"
+
+msgid "Hardware conversion group; descriptive facts do not enable it."
+msgstr "硬件转换组；描述性事实不会启用该组。"
+
+msgid "Trigger identity is not a sample aperture timestamp."
+msgstr "触发身份不是采样孔径时间戳。"
+
+msgid "Validate a complete immutable layout without reading sample storage."
+msgstr "验证完整的不可变布局，不读取采样存储。"
+
+msgid "Decode one integer from a caller-owned or consumer-acquired scan."
+msgstr "从调用者拥有或消费者已取得的扫描数据中解码一个整数。"
+
+msgid "Immutable uniform-channel integer layout, independent of ADC faces."
+msgstr "各通道存储格式一致的不可变整数布局，与 ADC 接口独立。"
+
+msgid "can_fd.h"
+msgstr "can_fd.h"
+
+msgid "Optional CAN FD value ports and retained hardware requests."
+msgstr "可选 CAN FD 值接口与持续借用的硬件请求。"
+
+msgid "Exact wire format; the classic interface remains independent."
+msgstr "精确的线上格式；经典 CAN 接口保持独立。"
+
+msgid "Validate and copy an exact frame into unborrowed request storage."
+msgstr "验证精确帧并复制到尚未借用的请求存储。"
+
+msgid "Admit one exact value into a physical hardware transmit element."
+msgstr "将一个精确值准入物理硬件发送元素。"
+
+msgid "Request cancellation while preserving the accepted storage loan."
+msgstr "请求取消，同时保留已接受的存储借用。"
+
+msgid "Process bounded hardware facts and absolute deadline progress."
+msgstr "处理有界的硬件事实与绝对截止时间进展。"
+
+msgid "Copy ordered value events into unretained caller output storage."
+msgstr "将有序值事件复制到不会被持续借用的调用者输出存储。"
+
+msgid "Copy authoritative latched protocol and ownership state."
+msgstr "复制权威的锁存协议状态与所有权状态。"
+
+msgid "Close admission, drain transmit loans and withdraw IRQ publishers."
+msgstr "关闭准入、排空发送借用并撤离 IRQ 发布者。"
+
+msgid "Recover the same hardware identity after complete transmit drain."
+msgstr "完整排空发送后，恢复同一硬件身份。"
+
+msgid "Borrow a wake sink after validating the actual enabled IRQ source."
+msgstr "验证实际启用的 IRQ 源后借用唤醒接收端。"
+
+msgid "Value frame with an exact byte length, never raw or shifted DLC."
+msgstr "具有精确字节长度的值帧，不使用原始或移位后的 DLC。"
+
+msgid "Prepare copies a complete value; accepted request stays borrowed."
+msgstr "准备操作复制完整值；被接受的请求保持借用。"
+
+msgid "Acquired value event, including observed transmitter ESI."
+msgstr "已取得的值事件，包含观察到的发送者 ESI。"
+
+msgid "Immutable mask filter; no product register or protocol policy."
+msgstr "不可变掩码过滤器；不包含产品寄存器或协议策略。"
+
+msgid "Latched protocol state; payload length never describes a frame count."
+msgstr "锁存协议状态；载荷长度不表示帧数量。"
+
+msgid "cycle_probe.h"
+msgstr "cycle_probe.h"
+
+msgid "Opt-in raw cycle observations without elapsed-time claims."
+msgstr "显式选用的原始周期观察，不作经过时间承诺。"
+
+msgid "Start one raw observation without enabling or resetting DWT."
+msgstr "开始一次原始观察，不启用或复位 DWT。"
+
+msgid "Finish the exact token, publish raw facts and remove its reference."
+msgstr "结束对应令牌，发布原始事实并移除其引用。"
+
+msgid "Copy bounded IRQ statistics under saved local interrupt exclusion."
+msgstr "保存并恢复本地中断排除状态，在保护期间复制有界 IRQ 统计。"
+
+msgid "Dispatch exactly one word service step with optional raw observation."
+msgstr "仅派发一个字服务步骤，可选记录原始观察。"
+
+msgid "Dispatch exactly one whole-CS DMA service step with raw observation."
+msgstr "仅派发一个完整 CS 区间的 DMA 服务步骤，并记录原始观察。"
+
+msgid "Copied raw counter facts; readable does not mean elapsed is known."
+msgstr "复制的原始计数器事实；可读不表示经过时间已知。"
+
+msgid "Optional zero-initialized sidecar; no default provider state grows."
+msgstr "可选的零初始化附属状态；默认提供者状态不增加。"
+
+msgid "Zero-initialized stack token; do not copy or rebind while active."
+msgstr "零初始化栈令牌；活动期间不得复制或重新绑定。"
+
+msgid "encoder.h"
+msgstr "encoder.h"
+
+msgid "Optional raw modulo quadrature encoder observations."
+msgstr "可选的原始模数正交编码器观察。"
+
+msgid "Exact edge counting personality, never a freely combinable mask."
+msgstr "精确的边沿计数模式，不是可任意组合的掩码。"
+
+msgid "Enable only the two cold-selected encoder inputs and counter."
+msgstr "仅启用冷装配选定的两个编码器输入与计数器。"
+
+msgid "Observe counter and input-source withdrawal before returning."
+msgstr "观察计数器与输入源均已撤离后才返回。"
+
+msgid "Read one modulo position without inferring travel across wraps."
+msgstr "读取一个模数位置，不推断跨回绕的行程。"
+
+msgid "Report exact counter width and selected silicon filter codes."
+msgstr "报告精确计数器位宽与选定的硅片过滤器编码。"
+
+msgid "One raw modulo counter and separate software observation time."
+msgstr "一个原始模数计数值与独立的软件观察时间。"
+
+msgid "Immutable input/filter facts and actual counter enable state."
+msgstr "不可变输入／过滤器事实与实际计数器启用状态。"
+
+msgid "Shared methods; no ring, request, allocation, callback or worker."
+msgstr "共享方法；无环形缓冲、请求、分配、回调或工作线程。"
+
+msgid "Immutable identity; exact private state owns the whole controller."
+msgstr "不可变身份；精确的私有状态拥有整个控制器。"
+
+msgid "i2c_long.h"
+msgstr "i2c_long.h"
+
+msgid "Optional bounded long I2C messages without extra START."
+msgstr "可选的有界 I2C 长消息，不产生额外 START。"
+
+msgid "Validate complete messages before acquiring any hardware."
+msgstr "取得任何硬件之前验证完整消息。"
+
+msgid "Execute finite messages without splitting address phases."
+msgstr "执行有限消息，不拆分地址阶段。"
+
+msgid "Shared read-only optional long-message implementation."
+msgstr "共享只读的可选长消息实现。"
+
+msgid "Optional immutable face; controller state is shared with base I2C."
+msgstr "可选不可变接口；控制器状态与基础 I2C 共享。"
+
+msgid "observation.h"
+msgstr "observation.h"
+
+msgid "Explicit timestamp provenance and checked service dispatch."
+msgstr "显式时间戳来源与经过检查的服务派发。"
+
+msgid "Observation location; software time never implies hardware SOF."
+msgstr "观察位置；软件时间不表示硬件 SOF。"
+
+msgid "Compare two explicitly related observed events."
+msgstr "比较两个关系已明确的观察事件。"
+
+msgid "Dispatch the selected UART service or explain its absence."
+msgstr "派发选定的 UART 服务，或说明服务缺失。"
+
+msgid "Dispatch the selected SPI service or explain its absence."
+msgstr "派发选定的 SPI 服务，或说明服务缺失。"
+
+msgid "Dispatch the selected I2C service or explain its absence."
+msgstr "派发选定的 I2C 服务，或说明服务缺失。"
+
+msgid "Explicit, caller-supplied time fact without clock access."
+msgstr "由调用者明确提供的时间事实，不访问时钟。"
+
+msgid "Delta in one common clock domain, with stated error bound."
+msgstr "同一时钟域内的差值，带明确的误差界。"
+
+msgid "pwm_adc.h"
+msgstr "pwm_adc.h"
+
+msgid "Optional finite coherent PWM / triggered ADC window."
+msgstr "可选的有限相干 PWM／触发 ADC 窗口。"
+
+msgid "Prepare distinct unborrowed request, frame and sample storage."
+msgstr "准备彼此独立且尚未借用的请求、帧和采样存储。"
+
+msgid "Admit and arm one complete finite window on the unique task owner."
+msgstr "由唯一任务所有者准入并布防一个完整有限窗口。"
+
+msgid "Latch cancellation while retaining the exact live window loan."
+msgstr "锁存取消，同时保留对应活动窗口的借用。"
+
+msgid "Advance bounded completion or source drain on the same task owner."
+msgstr "由同一任务所有者推进有界完成或源排空。"
+
+msgid "Close admission and attempt final drain without revoking a loan."
+msgstr "关闭准入并尝试最终排空，不撤销借用。"
+
+msgid "Copy exact fixed facts and observed active/fault/quarantine state."
+msgstr "复制精确的固定事实与观察到的活动／故障／隔离状态。"
+
+msgid "One finite window; transferred counts are raw samples, never bytes."
+msgstr "一个有限窗口；传输数量以原始采样为单位，不以字节计。"
+
+msgid "Borrow and release publication state."
+msgstr "借用状态与释放发布状态。"
+
+msgid "Exclusive writable raw sample storage."
+msgstr "独占可写的原始采样存储。"
+
+msgid "Positive number of requested samples."
+msgstr "请求的采样数量，必须为正。"
+
+msgid "Copied metadata; duty array is borrowed."
+msgstr "复制的元数据；占空比数组保持借用。"
+
+msgid "Exact selected facts and observed source/recovery state."
+msgstr "精确的选定事实与观察到的源／恢复状态。"
+
+msgid "Actual integer storage and provenance."
+msgstr "实际整数存储表示与来源。"
+
+msgid "PWM counter ticks per second."
+msgstr "PWM 计数器每秒的计数刻度数。"
+
+msgid "Fixed period in counter ticks."
+msgstr "以计数器刻度表示的固定周期。"
+
+msgid "Fixed phase in counter ticks."
+msgstr "以计数器刻度表示的固定相位。"
+
+msgid "Deadtime in separate deadtime_hz units."
+msgstr "以独立的 deadtime_hz 单位表示的死区时间。"
+
+msgid "Deadtime clock; never inferred from PSC."
+msgstr "死区时钟；不得从 PSC 推断。"
+
+msgid "Complete fixed-order frame width."
+msgstr "完整、固定顺序的帧通道数。"
+
+msgid "Provider/DMA finite-window count bound."
+msgstr "提供者／DMA 的有限窗口计数上限。"
+
+msgid "Observed source/counter activity."
+msgstr "观察到的源／计数器活动状态。"
+
+msgid "Latched fault requiring cold recovery."
+msgstr "需要冷恢复的锁存故障。"
+
+msgid "Incomplete withdrawal retains ownership."
+msgstr "撤离未完成时保留所有权。"
+
+msgid "Selected-only operations; no growth to ordinary PWM/ADC tables."
+msgstr "仅选定实例具有的操作；普通 PWM／ADC 方法表不增加。"
+
+msgid "Immutable cold-selected identity, never an allocating factory."
+msgstr "不可变的冷装配选定身份；工厂不执行分配。"
+
+msgid "pwm_group.h"
+msgstr "pwm_group.h"
+
+msgid "Fixed-base atomic multi-channel PWM shadow commits."
+msgstr "固定时基、原子的多通道 PWM 影子提交。"
+
+msgid "Stage a complete channel group and its internal trigger comparison."
+msgstr "暂存完整通道组及其内部触发比较值。"
+
+msgid "Start only from disabled outputs and an inactive, cleared break."
+msgstr "仅输出已禁用且刹车未激活、已清除时启动。"
+
+msgid "Withdraw master output, channels, counter and owned IRQ sources."
+msgstr "撤离主输出、通道、计数器与拥有的 IRQ 源。"
+
+msgid "Explicitly clear fault while disabled after checking actual break."
+msgstr "禁用期间检查实际刹车状态后显式清除故障。"
+
+msgid "Read fixed units and observed enable/fault facts without starting."
+msgstr "读取固定单位与观察到的启用／故障事实，不启动硬件。"
+
+msgid "One synchronous shadow batch; channel order is fixed by assembly."
+msgstr "一个同步影子批次；通道顺序由装配固定。"
+
+msgid "Fixed units, software fault latch and actual hardware enable state."
+msgstr "固定单位、软件故障锁存与实际硬件启用状态。"
+
+msgid "Shared operations; commit must prevent partial shadow publication."
+msgstr "共享操作；提交必须防止部分影子发布。"
+
+msgid "Immutable identity with no default-device state or allocation."
+msgstr "不可变身份；无默认设备状态或分配。"
+
+msgid "spi_dma_model.h"
+msgstr "spi_dma_model.h"
+
+msgid "Explicit Native segmented wire and drain fault controls."
+msgstr "显式 Native 分段传输与排空故障控制。"
+
+msgid "Move one modeled wire word or observe its final idle event."
+msgstr "推进一个模型传输字，或观察最终空闲事件。"
+
+msgid "Select optional single-step progress during task service."
+msgstr "选择在任务服务期间进行可选的单步推进。"
+
+msgid "Inject or remove inability to prove physical model drain."
+msgstr "注入或解除无法证明模型物理排空的故障。"
+
+msgid "Fail a phase before the selected zero-based wire word."
+msgstr "在选定的零基传输字之前使阶段失败。"
+
+msgid "spi_dma_owner_binding.h"
+msgstr "spi_dma_owner_binding.h"
+
+msgid "Optional immutable segmented SPI ownership and IRQ binding."
+msgstr "可选不可变的分段 SPI 所有权与 IRQ 绑定。"
+
+msgid "Check exact endpoint membership without hardware effects."
+msgstr "检查精确端点归属，不产生硬件效果。"
+
+msgid "Attach a borrowed hint to actual validated IRQ publishers."
+msgstr "将借用的提示接收端附加到实际验证过的 IRQ 发布者。"
+
+msgid "Selected-only provider capability without changing IO faces."
+msgstr "仅选定实例具有的提供者能力，不修改 IO 接口。"
+
+msgid "spi_dma_transaction.h"
+msgstr "spi_dma_transaction.h"
+
+msgid "Optional finite whole-CS segmented SPI DMA request contract."
+msgstr "可选的有限、完整 CS 区间分段 SPI DMA 请求合同。"
+
+msgid "Prepare unborrowed storage after validating every span."
+msgstr "验证每个范围后准备尚未借用的存储。"
+
+msgid "Validate immutable fields without admission or memory modification."
+msgstr "验证不可变字段，不执行准入或修改内存。"
+
+msgid "Admit one finite chain on a task-only single executor."
+msgstr "在仅限任务的单一执行者上准入一个有限链。"
+
+msgid "Cancel an exact live request while retaining all its loans."
+msgstr "取消对应活动请求，同时保留全部借用。"
+
+msgid "Advance a bounded phase boundary, completion or drain."
+msgstr "推进一个有界阶段边界、完成或排空。"
+
+msgid "Close admission and stop after complete source withdrawal."
+msgstr "关闭准入，并在源完整撤离后停止。"
+
+msgid "Explicit DMA words with caller-owned dummy/discard cells."
+msgstr "显式 DMA 字，使用调用者拥有的填充值／丢弃单元。"
+
+msgid "Caller-owned request retaining every segment through drain."
+msgstr "调用者拥有的请求；每个分段持续借用至排空完成。"
+
+msgid "spi_transaction.h"
+msgstr "spi_transaction.h"
+
+msgid "Optional multi-segment whole-CS 8/16-bit polling SPI."
+msgstr "可选的多分段、完整 CS 区间 8／16 位轮询 SPI。"
+
+msgid "Bounded descriptor count; no hidden concatenation buffer exists."
+msgstr "描述符数量有界；不存在隐藏的拼接缓冲。"
+
+msgid "Validate every descriptor and span without hardware effects."
+msgstr "验证每个描述符与范围，不产生硬件效果。"
+
+msgid "Execute all segments under exactly one asserted CS interval."
+msgstr "在同一个 CS 有效区间内执行全部分段。"
+
+msgid "One phase within a single CS interval."
+msgstr "单个 CS 区间内的一个阶段。"
+
+msgid "Shared immutable methods; absent transfer reports UNSUPPORTED."
+msgstr "共享不可变方法；缺少传输方法时报告 UNSUPPORTED。"
+
+msgid "Optional face sharing the selected provider's existing bus state."
+msgstr "可选接口，与选定提供者的现有总线状态共享。"
+
+msgid "stream_profile.h"
+msgstr "stream_profile.h"
+
+msgid "Optional readonly continuous-stream cold admission profiles."
+msgstr "可选只读的连续流冷准入配置。"
+
+msgid "Validate an actual pool before the bound UART may borrow it."
+msgstr "绑定的 UART 借用缓冲池之前验证实际缓冲池。"
+
+msgid "Validate pool and whole-scan rate before ADC admission."
+msgstr "ADC 准入之前验证缓冲池与完整扫描速率。"
+
+msgid "Selected UART face and immutable byte-stream assumptions."
+msgstr "选定的 UART 接口与不可变的字节流假设。"
+
+msgid "Selected ADC face and complete-scan stream assumptions."
+msgstr "选定的 ADC 接口与完整扫描流假设。"
+
+msgid "uart_format.h"
+msgstr "uart_format.h"
+
+msgid "Explicit payload, parity, stop and hardware-flow format."
+msgstr "显式的载荷、校验、停止位与硬件流控格式。"
+
+msgid "Validate the common USART-v1 subset without hardware access."
+msgstr "验证公共 USART-v1 子集，不访问硬件。"
+
+msgid "Immutable wire format; data_bits excludes the parity bit."
+msgstr "不可变的线上格式；data_bits 不含校验位。"
+
+msgid "uart_word.h"
+msgstr "uart_word.h"
+
+msgid "Independent nine-bit face and caller-owned word requests."
+msgstr "独立的九位接口与调用者拥有的字请求。"
+
+msgid "Prepare an unborrowed nine-bit payload, without admitting it."
+msgstr "准备尚未借用的九位载荷，不执行准入。"
+
+msgid "Admit one READY request to the single unmasked task executor."
+msgstr "将一个 READY 请求准入唯一、未屏蔽中断的任务执行者。"
+
+msgid "Transfer an adapter's QUEUED borrow without readmission."
+msgstr "接管适配器的 QUEUED 借用，不再次准入。"
+
+msgid "Request cancellation without revoking request/payload ownership."
+msgstr "请求取消，不撤销请求／载荷的所有权。"
+
+msgid "Perform bounded owner-driven deadline, drain and settlement work."
+msgstr "由所有者执行有界的截止时间、排空与结清工作。"
+
+msgid "Copy words without retaining destination storage."
+msgstr "复制字，不持续借用目标存储。"
+
+msgid "Close admission and stop after active TX and IRQ sources drain."
+msgstr "关闭准入，并在活动 TX 与 IRQ 源排空后停止。"
+
+msgid "Each uint16_t contains 0..511; count excludes bytes and parity."
+msgstr "每个 uint16_t 包含 0..511；按字计数，不以字节计且不包含校验位。"
+
+msgid "Independent immutable face; default byte face/state do not grow."
+msgstr "独立不可变接口；默认字节接口／状态不增加。"

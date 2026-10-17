@@ -83,6 +83,19 @@ class QualificationPlanTests(unittest.TestCase):
                                  "New fixture omitted from formal software plan")
         validate_plan(self.plan)
 
+    def test_each_io_evolution_preset_configures_and_builds_once(self):
+        presets = load_json(ROOT / "CMakePresets.json")["configurePresets"]
+        selected = [preset["name"] for preset in presets
+                    if preset["name"].startswith("fixture-io-evolution-")]
+        self.assertTrue(selected)
+        for preset in selected:
+            with self.subTest(preset=preset):
+                stages = [stage for stage in self.stages
+                          if stage["args"] == ["--preset", preset]]
+                self.assertEqual([stage["checker"] for stage in stages],
+                                 ["configure", "build"])
+        validate_plan(self.plan)
+
 
 if __name__ == "__main__":
     unittest.main()

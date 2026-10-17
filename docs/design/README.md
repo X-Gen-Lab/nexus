@@ -16,6 +16,11 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
+| [H743 V 修订高速时钟参考](h743-high-clock.md) | 已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界 |
+| [有限 PWM/ADC 联合采样](pwm-adc.md) | 单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界 |
+| [U575 有限 UART GPDMA](u575-uart-gpdma.md) | 精确 TZEN0 USART1 有限 GPDMA TX、persistent DMAT、SRAM1 准入及请求/线上/IRQ 排空 |
+| [G474 CAN FD](can-fd.md) | 固定 FDCAN1 消息 RAM、显式模式、TX 物理完成与引用排空；收发器和实板边界 |
+| [本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md) | 逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |
 | [构建系统48项台账](build-system-execution.csv) | 原始退出条件、实现路径与本轮执行证据 |

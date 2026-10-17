@@ -2,6 +2,11 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "pwm_adc": {"binding", "mode", "tick_hz", "period_ticks", "trigger_ticks",
+                "deadtime_ticks", "channels", "sample_times", "reference_mv",
+                "exclusive", "irq"},
+    "can_fd": {"binding", "mode", "bitrate", "data_bitrate", "event_capacity",
+               "drain_timeout_us", "poll_limit", "filters", "exclusive", "irq"},
     "encoder": {"binding", "mode", "counting", "filter_a", "filter_b", "invert_a", "invert_b", "exclusive"},
     "pwm_group": {"binding", "mode", "tick_hz", "period_ticks", "deadtime_ticks", "exclusive", "irq"},
     "timer_capture": {"binding", "mode", "tick_hz", "edge", "filter", "exclusive", "irq"},
@@ -85,7 +90,7 @@ def normalize(data, path, root, fail, obj, integer, text):
                     selection["irq_probe"] = irq["probe"]
                 if selection["mode"] == "irq":
                     selection["mode"] = "irq-byte-event"
-            elif kind in {"exti", "spi", "adc", "i2c", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group"} and "irq" in selection:
+            elif kind in {"exti", "spi", "adc", "i2c", "can", "can_fd", "pwm_adc", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group"} and "irq" in selection:
                 irq = obj(selection.pop("irq"), {"priority"}, {"calls_os"}, f"{kind}.{name}.irq")
                 selection["irq_priority"] = irq["priority"]
                 if "calls_os" in irq:
@@ -154,7 +159,8 @@ def editor_schema():
                    "segment1", "segment2", "sjw", "split", "bank", "id", "mask", "fifo",
                    "rx_fifo_words", "clock_timeout_us", "number", "max_packet", "fifo_words",
                    "tx_count", "rx_count", "rx_storage_bytes", "init_timeout_us",
-                   "filter", "filter_a", "filter_b", "deadtime_ticks"}
+                   "filter", "filter_a", "filter_b", "deadtime_ticks",
+                   "trigger_ticks", "data_bitrate"}
         for name in fields & numeric:
             properties[name] = {"type": "integer", "minimum": 0}
         for name in fields & {"channels", "sample_times"}:
@@ -229,6 +235,13 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "can_fd":
+            filter_fields = {"id", "mask", "format", "fifo"}
+            filters = record(filter_fields, filter_fields)
+            filters["properties"]["format"] = {"enum": ["standard", "extended"]}
+            filters["properties"]["fifo"] = {"enum": [0, 1]}
+            properties[kind]["additionalProperties"]["properties"]["filters"] = {
+                "type": "array", "items": filters, "maxItems": 36}
         if kind == "uart":
             irq = properties[kind]["additionalProperties"]["properties"]["irq"]
             irq["properties"]["probe"] = {"type": "boolean"}

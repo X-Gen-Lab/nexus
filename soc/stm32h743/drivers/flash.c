@@ -8,6 +8,9 @@
  */
 #include "nexus/core/fault.h"
 #include "stm32h743_provider.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #include <string.h>
 #define NX_H743_FLASH_BYTES  2097152U
 #define NX_H743_BANK_BYTES   1048576U
@@ -99,13 +102,22 @@ static bool fixed_profile_valid(const nx_stm32h743_system_t* s) {
 }
 static bool pulse_timing_valid(const nx_stm32h743_flash_state_t* p) {
     const nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
-    if (p->registers != s->flash || !fixed_profile_valid(s))
+    if (p->registers != s->flash)
+        return false;
+#if NEXUS_CORE_HZ == 384000000U
+    /* RM0433 Table17 and4.3.9: WR2 covers the upper198.9MHz envelope;
+     * a longer programming delay only reduces speed at its lower end.
+     * The joint cold owner establishes timing before any physical pulse. */
+    return s->started && nx_stm32h743_pll384_clocks_ready();
+#else
+    if (!fixed_profile_valid(s))
         return false;
     const uint32_t delay =
         s->core_hz == 64000000U ? FLASH_ACR_WRHIGHFREQ_0 : 0U;
     return (NX_H743_READ(&p->registers->ACR) &
             (FLASH_ACR_LATENCY | FLASH_ACR_WRHIGHFREQ)) ==
            (FLASH_ACR_LATENCY_7WS | delay);
+#endif
 }
 /** \brief Idle status alone cannot exclude a bank whose pulse is armed. */
 static bool timing_idle(FLASH_TypeDef* flash) {

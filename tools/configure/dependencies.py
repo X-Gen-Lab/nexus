@@ -14,7 +14,7 @@ COMMON = (
 )
 PLATFORM = (
     "configure", "authored", "bindings", "emission", "can", "memory", "contracts",
-    "usb_device", "ethernet", "timer_advanced", "secondary_controllers",
+    "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
     "fact_references", "clocks", "physical_facts", "preflight", "gpio_phase",
     "i2c_timing", "i2c_timing_selection",
     "providers/hardware",

@@ -733,7 +733,8 @@
         "PA9",
         "PA10",
         "PA1",
-        "PA4"
+        "PA4",
+        "PA0"
       ],
       "resources": [
         "controller:COMP1",
@@ -741,7 +742,12 @@
         "timer:TIM1",
         "clock:TIM1",
         "clock:SYSCFG"
-      ]
+      ],
+      "interfaces": {
+        "pwm_adc": [
+          "finite-regular-dma"
+        ]
+      }
     },
     "TIM5": {
       "kind": "timer_capture",
@@ -761,6 +767,31 @@
       "resources": [
         "clock:TIM5"
       ]
+    },
+    "FDCAN1": {
+      "kind": "can_fd",
+      "modes": [
+        "iso-fd-loopback",
+        "iso-fd-normal"
+      ],
+      "irq": [
+        "FDCAN1_IT0_IRQn",
+        "FDCAN1_IT1_IRQn"
+      ],
+      "irq_numbers": [
+        21,
+        22
+      ],
+      "clock_hz": 24000000,
+      "message_ram_words": 212,
+      "pins": [
+        "PA11",
+        "PA12"
+      ],
+      "resources": [
+        "clock:FDCAN",
+        "message-ram:FDCAN1"
+      ]
     }
   },
   "reserved_resources": [
@@ -772,7 +803,8 @@
   ],
   "source_lock": {
     "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
-    "cmsis_device_g4": "626ee412334a5ed2e5b320af5a8d77d69f03a558"
+    "cmsis_device_g4": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+    "hal_driver_g4": "f5929f431f9effe45fbe18f5337e4753ced9ac92"
   },
   "provenance": [
     "DS12288 Rev6 STM32G474xx: exact RE512KiB/LQFP64; SRAM1 80KiB+SRAM2 16KiB are DMA-visible96KiB at0x20000000. CCM32KiB is declared once at0x10000000. RM0440p89 also permits DMA through its0x20018000 SRAM-bus alias; the selected linker/DMA policy deliberately excludes both CCM addresses rather than claiming a silicon restriction. Default linker and generated DMA domains select96KiB SRAM1/2 only.",

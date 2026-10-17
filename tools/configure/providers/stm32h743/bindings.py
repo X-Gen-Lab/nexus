@@ -32,10 +32,12 @@ def constructor(item, result, board_bindings, routes, devices):
         owner = state
         if dma:
             state += ".uart"
-        clock = result["clock"]["apb1_hz"]
+        plan = result.get("clock_plan")
+        clock = (plan["domains"]["usart3"]["nominal_hz"] if plan is not None
+                 else result["clock"]["apb1_hz"])
         divisor = (clock + options.baud // 2) // options.baud
         if not 16 <= divisor <= 0xffff:
-            fail("USART baud is not representable by the selected APB1 clock")
+            fail("USART baud is not representable by the selected local kernel")
         if dma:
             try:
                 from ...emission import dma_regions

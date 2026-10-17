@@ -99,6 +99,9 @@ def _modern_selected(result):
                               f"RCC_{gate_register}_{uart}EN) != 0u")
             source += _reject(f"(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u")
             source += _reject(f"!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)")
+            if not h7 and item.get("mode") == "dma-tx":
+                source += _reject(
+                    "!NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)")
             if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle"}:
                 lane = 1 if item.get("mode") == "rx-dma-idle" else 0
                 source += _reject(
@@ -195,7 +198,12 @@ def selected(result):
                 if item.kind == "i2c":
                     source += _reject(
                         "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u")
-            if item.kind == "adc":
+            if item.kind == "can_fd":
+                source += _reject(
+                    "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_FDCANEN) != 0u || "
+                    "(NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_FDCANRST) != 0u || "
+                    "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_FDCANSEL) != 0u")
+            if item.kind in {"adc", "pwm_adc"}:
                 source += _reject(
                     "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != 0u")
                 source += _reject(
@@ -205,6 +213,11 @@ def selected(result):
                 if item.mode == "trigger-dma":
                     source += _reject(
                         "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_TIM6EN) != 0u")
+                if item.kind == "pwm_adc":
+                    source += _reject(
+                        "(NX_G474_READ(&RCC->AHB1ENR) & "
+                        "(RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMAMUX1EN)) != 0u || "
+                        "(NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u")
         for item in result.controllers:
             if item.kind == "flash":
                 source += _reject(

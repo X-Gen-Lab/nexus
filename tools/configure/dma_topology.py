@@ -7,6 +7,7 @@ SETTLED before reclaiming descriptors or payloads.
 """
 
 from dataclasses import asdict, dataclass
+import re
 
 try:
     from .resource_graph import fail, identifier, json_value, number, record
@@ -87,17 +88,31 @@ def resolve_selected(selected, provider):
             identifier(path, "DMA route")
             engine, lane, request = provider.validate_dma_resource(
                 "dma:" + path)
-            number(engine, 0, 255, "DMA engine")
             number(lane, 0, 65535, "DMA physical lane")
             number(request, 0, 65535, "DMA request selector")
-            physical = f"dma:DMA{engine}:stream{lane}"
+            if type(engine) is str:
+                # Named engines need an explicit family physical-identity hook;
+                # channel-based GPDMA is never reinterpreted as a DMA stream.
+                physical_key = getattr(provider, "dma_physical_key", None)
+                if (re.fullmatch(r"[A-Z][A-Z0-9_]*", engine) is None or
+                        not callable(physical_key)):
+                    fail("Named DMA engine requires a physical identity hook")
+                physical = identifier(physical_key("dma:" + path),
+                                      "DMA physical identity")
+                if not physical.startswith(f"dma:{engine}:"):
+                    fail("DMA physical identity must name its actual engine")
+                engine_name = engine
+            else:
+                number(engine, 0, 255, "DMA engine")
+                engine_name = f"DMA{engine}"
+                physical = f"dma:{engine_name}:stream{lane}"
             if physical in occupied:
                 fail(f"DMA physical lane conflict: {physical}")
             occupied.add(physical)
             lanes.append(DmaLaneIR(identifier(item["id"], "DMA owner"),
                                    identifier(item["controller"],
                                               "DMA peripheral"),
-                                   f"DMA{engine}", lane, request, physical))
+                                   engine_name, lane, request, physical))
     return DmaTopologyIR(tuple(lanes))
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify fixed selected inline LL graphs paired with official Cube releases.
+"""Verify fixed selected private headers paired with official Cube releases.
 
 The verifier shares source-proof behavior, not register layouts or I/O policy.
 Original inline APIs stay private; Nexus retains request, IRQ and DMA ownership.
@@ -30,6 +30,8 @@ class Profile:
     cube_release: str
     cube_commit: str
     units: tuple[str, ...]
+    extra_headers: tuple[str, ...] = ()
+    api_scope: str = "ll-inline"
 
     @property
     def directory(self):
@@ -70,7 +72,7 @@ class Profile:
     @property
     def selected_files(self):
         return {"LICENSE.md", *(f"Inc/stm32{self.family}xx_ll_{unit}.h"
-                                for unit in self.units)}
+                                for unit in self.units), *self.extra_headers}
 
     def contract(self, lock):
         """Reject changed revisions, notices, pairing or a widened source graph."""
@@ -82,7 +84,7 @@ class Profile:
                 lock["repository"] != self.origin or lock["commit"] != self.commit or
                 lock["release"] != "STM32Cube" + self.family.upper() + "-" +
                     self.cube_release + "-pinned-driver" or
-                lock["selected_api"] != self.part + "-ll-inline" or
+                lock["selected_api"] != self.part + "-" + self.api_scope or
                 lock["pairing"] != self.pairing):
             raise ValueError("Exact reviewed official LL release and pairing required")
         if not isinstance(lock["files"], dict) or set(lock["files"]) != self.selected_files:
@@ -197,11 +199,14 @@ def canonical_directory(path):
 PROFILES = {
     "g4": Profile("g4", "stm32g474", "f5929f431f9effe45fbe18f5337e4753ced9ac92",
         "626ee412334a5ed2e5b320af5a8d77d69f03a558", "v1.6.3",
-        "d11b194a9f05d1b143d154771f3dbc282c8052a5", ("adc", "dmamux")),
+        "d11b194a9f05d1b143d154771f3dbc282c8052a5", ("adc", "dmamux"),
+        extra_headers=("Inc/stm32g4xx_hal_fdcan.h",
+            "Inc/stm32g4xx_hal_def.h", "Inc/Legacy/stm32_hal_legacy.h"),
+        api_scope="ll-inline-fdcan-definitions"),
     "h7": Profile("h7", "stm32h743", "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
         "8f922cdc7cc6de2344e75ddd657889f4ff761790", "v1.13.0",
         "5abb9764b32e11a6557b90bf39531528019b5761", ("adc", "spi")),
     "u5": Profile("u5", "stm32u575", "2552682ee5a0d6f826a6435750fc9267be65868b",
         "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8", "v1.9.0",
-        "d88042df24f16799957c24f00c2b234c9e306188", ("adc", "spi", "i2c", "tim")),
+        "d88042df24f16799957c24f00c2b234c9e306188", ("adc", "spi", "i2c", "tim", "dma", "usart")),
 }

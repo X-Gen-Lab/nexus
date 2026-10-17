@@ -16,6 +16,8 @@ def operations(item):
 
 def includes(result):
     source = ['#include "stm32h743_provider.h"']
+    if result.clock_plan is not None:
+        source.append('#include "stm32h743_clock.h"')
     if _dma(result):
         source.append('#include "stm32h743_dma.h"')
     if any(item.kind == "uart" and item.mode == "rx-dma-idle"
@@ -82,7 +84,9 @@ def _extra_gates(result):
 def state_declarations(result):
     source = [f'static uint32_t s_nx_extra_{reg.lower()}_added;'
               for reg, _ in _extra_gates(result)]
-    if any(item.kind == "flash" for item in result.controllers):
+    if result.clock_plan is not None:
+        source.append('static nx_stm32h743_pll384_state_t s_nx_high_clock;')
+    elif any(item.kind == "flash" for item in result.controllers):
         source.append('static nx_stm32h743_flash_timing_state_t s_nx_flash_timing;')
     if _dma(result):
         source.append('static uint32_t s_nx_dma_clocks_added;')
@@ -125,6 +129,24 @@ def state_declarations(result):
 def start_system(result):
     from . import cache_mask
     cache = f'{cache_mask(result["clock_profile"])}u'
+    if result.clock_plan is not None:
+        return preflight.emit(result) + [
+            '    result.primary = nx_stm32h743_validate_identity();',
+            '    if (result.primary != NX_SUCCESS) { return result; }',
+            '    nx_stm32h743_start_result_t clock = nx_stm32h743_pll384_start(&s_nx_high_clock, 1000000u);',
+            '    if (clock.primary != NX_SUCCESS) {',
+            '        result.primary = clock.primary;',
+            '        result.cleanup = clock.cleanup;',
+            '        result.remaining_effects = clock.remaining_effects == 0u ? 0u : 1u;',
+            '        s_nx_platform_started = result.remaining_effects != 0u;',
+            '        return result;', '    }',
+            '    s_nx_platform_started = true;',
+            f'    nx_stm32h743_start_result_t system = nx_stm32h743_pll384_system_start(&s_nx_high_clock, {cache}, 1000000u);',
+            '    if (system.primary != NX_SUCCESS) {',
+            '        result.primary = system.primary;',
+            '        result.cleanup = nx_platform_stop_impl(diagnostic, true);',
+            '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+            '        return result;', '    }']
     source = preflight.emit(result) + [
         '    result.primary = nx_stm32h743_validate_identity();',
         '    if (result.primary != NX_SUCCESS) { return result; }',
@@ -135,7 +157,7 @@ def start_system(result):
         '        result.remaining_effects = system.remaining_effects;',
         '        s_nx_platform_started = result.remaining_effects != 0u;',
         '        return result;', '    }']
-    if any(item.kind == "flash" for item in result.controllers):
+    if result.clock_plan is None and any(item.kind == "flash" for item in result.controllers):
         source += ['    s_nx_platform_started = true;',
                    '    result.primary = nx_stm32h743_flash_timing_initialize(&s_nx_flash_timing);',
                    '    if (result.primary != NX_SUCCESS) {',
@@ -244,10 +266,13 @@ def stop_system(result, *, system_phase=None):
                    f'        {slot} = 0u;', '    }']
     if system_phase is not None:
         source.append(f'    {system_phase};')
-    if any(item.kind == "flash" for item in result.controllers):
+    if result.clock_plan is None and any(item.kind == "flash" for item in result.controllers):
         source += ['    nx_result_t timing = nx_stm32h743_flash_timing_stop(&s_nx_flash_timing);',
                    '    if (timing != NX_SUCCESS) { return timing; }']
-    return source + ['    if (s_nx_platform_started) {',
-                     '        nx_result_t system = nx_stm32h743_system_stop(&g_nx_stm32h743_system, 1000000u);',
-                     '        if (system != NX_SUCCESS) { return system; }',
-                     '    }']
+    source += ['    if (s_nx_platform_started) {',
+               '        nx_result_t system = nx_stm32h743_system_stop(&g_nx_stm32h743_system, 1000000u);',
+               '        if (system != NX_SUCCESS) { return system; }', '    }']
+    if result.clock_plan is not None:
+        source += ['    nx_result_t clock = nx_stm32h743_pll384_stop(&s_nx_high_clock, 1000000u);',
+                   '    if (clock != NX_SUCCESS) { return clock; }']
+    return source

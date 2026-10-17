@@ -132,6 +132,48 @@ def _execute(command, root, environment, workspace, stage, timeout):
     return str(result.receipt_path)
 
 
+def run_tests(root, report, tool_prefix=None):
+    """Run the complete suite in the verified tuple, without installing it."""
+    from tools.documentation import install
+    from tools.testing.run_tool_tests import execute_directory
+    report.unlink(missing_ok=True)
+    environment = install.environment(tool_prefix)
+    prefix = Path(environment["NEXUS_DOCS_TOOL_PREFIX"])
+    try:
+        if Path(sys.prefix).resolve() == (prefix / "venv").resolve():
+            record = execute_directory(root / "tools/documentation", "documentation")
+        else:
+            command = [str(prefix / "venv/bin/python"),
+                       str(root / "tools/documentation/cli.py"), "test",
+                       "--tool-prefix", str(prefix), "--report", str(report)]
+            result = process.run(command, cwd=root, env=environment,
+                log=root / "build/documentation-attempts" / uuid.uuid4().hex / "tests.log",
+                stage="documentation-tests")
+            print(result.stdout, end="")
+            print(result.stderr, end="", file=sys.stderr)
+            if result.returncode:
+                report.unlink(missing_ok=True)
+                return result.returncode
+            record = json.loads(report.read_text())
+        # The existing runner rejects incomplete execution. A child exit alone
+        # cannot replace its fresh, nonempty complete-suite result.
+        counts = ("discovered", "executed", "skipped", "failures", "errors",
+                  "expected_failures", "unexpected_successes")
+        if (not isinstance(record, dict) or record.get("suite") != "documentation"
+                or record.get("status") != "passed"
+                or any(type(record.get(name)) is not int for name in counts)
+                or record["discovered"] <= 0
+                or record["executed"] != record["discovered"]
+                or any(record[name] != 0 for name in counts[2:])):
+            raise ValueError("documentation suite lacks a complete passing result")
+        _record(report, record)
+        print(json.dumps(record, indent=2))
+        return 0
+    except (OSError, ValueError, subprocess.SubprocessError):
+        report.unlink(missing_ok=True)
+        raise
+
+
 def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
     """Build fresh XML and HTML; no previous success can survive a failure."""
     from tools.documentation import install
@@ -298,11 +340,7 @@ def main(arguments=None, *, root=ROOT):
             from tools.documentation import install
             print(json.dumps(install.diagnose(args.tool_prefix), indent=2))
         elif args.action == "test":
-            args.report.unlink(missing_ok=True)
-            from tools.testing.run_tool_tests import execute_directory
-            record = execute_directory(root / "tools/documentation", "documentation")
-            _record(args.report, record)
-            print(json.dumps(record, indent=2))
+            return run_tests(root, args.report, args.tool_prefix)
         elif args.action == "build":
             build(root, args.output, language=args.language,
                   tool_prefix=args.tool_prefix, timeout=args.timeout)

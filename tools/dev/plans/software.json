@@ -261,6 +261,528 @@
       "timeout_s": 7200
     },
     {
+      "name": "configure-fixture-io-evolution-f407-spi-dma-transaction",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-spi-dma-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-spi-dma-transaction",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-spi-dma-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-f407-spi-transaction",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-spi-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-spi-transaction",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-spi-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-f407-uart7e2",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart7e2"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-uart7e2",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart7e2"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-f407-uart9n1",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart9n1"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-uart9n1",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart9n1"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-i2c-long-timing",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-i2c-long-timing"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-i2c-long-timing",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-i2c-long-timing"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-spi-dma-transaction",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-spi-dma-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-spi-dma-transaction",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-spi-dma-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-spi-transaction",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-spi-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-spi-transaction",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-spi-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-uart7e2",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart7e2"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-uart7e2",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart7e2"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-uart9n1",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart9n1"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-uart9n1",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart9n1"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-h743-i2c-long-timing",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-i2c-long-timing"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-h743-i2c-long-timing",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-i2c-long-timing"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-native-uart9n1",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-uart9n1"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-native-uart9n1",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-uart9n1"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-u575-i2c-long-timing",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-u575-i2c-long-timing"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-u575-i2c-long-timing",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-u575-i2c-long-timing"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-f407-uart-stream-profile",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-uart-stream-profile",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-f407-adc-stream-profile",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-adc-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-adc-stream-profile",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-adc-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-uart-stream-profile",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-uart-stream-profile",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-adc-stream-profile",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-adc-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-adc-stream-profile",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-adc-stream-profile"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-f407-uart9n1-probe",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart9n1-probe"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-f407-uart9n1-probe",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-f407-uart9n1-probe"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-gd470-uart9n1-probe",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart9n1-probe"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-gd470-uart9n1-probe",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-gd470-uart9n1-probe"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-native-spi-dma-transaction",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-spi-dma-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-native-spi-dma-transaction",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-spi-dma-transaction"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-pwm-group",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-pwm-group"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-pwm-group",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-pwm-group"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-timer-capture",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-timer-capture"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-timer-capture",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-timer-capture"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-encoder",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-encoder"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-encoder",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-encoder"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-h743-high-empty",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-high-empty"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-h743-high-empty",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-high-empty"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-h743-high-uart",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-high-uart"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-h743-high-uart",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-high-uart"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-h743-high-peripherals",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-high-peripherals"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-h743-high-peripherals",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-h743-high-peripherals"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-pwm-adc",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-pwm-adc"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-pwm-adc",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-pwm-adc"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-can-fd",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-can-fd"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-can-fd",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-can-fd"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-g474-can-fd-normal",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-can-fd-normal"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-g474-can-fd-normal",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-g474-can-fd-normal"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "configure-fixture-io-evolution-u575-uart-gpdma",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-u575-uart-gpdma"
+      ],
+      "timeout_s": 1800
+    },
+    {
+      "name": "build-fixture-io-evolution-u575-uart-gpdma",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-u575-uart-gpdma"
+      ],
+      "timeout_s": 1800
+    },
+    {
       "name": "source-sdk",
       "checker": "source_sdk",
       "args": [
@@ -741,7 +1263,9 @@
         "--fixture",
         "{root}/tests/contracts/u575_assembly/pwm-freertos.toml",
         "--fixture",
-        "{root}/tests/contracts/u575_assembly/pwm.toml"
+        "{root}/tests/contracts/u575_assembly/pwm.toml",
+        "--fixture",
+        "{root}/tests/contracts/u575_assembly/usart1-dma-tx.toml"
       ],
       "timeout_s": 7200
     },

@@ -10,33 +10,20 @@
 #ifndef NX_H743_SILICON_ID
 #define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
 #endif
-/** \brief The pinned HAL uses different HSI user-trim layouts by known cut.
- * \note ES0392 Rev15 Table2 identifies Y/W=1003, X=2001 and V=2003.
- *       Locked HAL RCC calibration adjustment selects the legacy 6-bit field
- *       through Y, then the 7-bit field. Never apply this as an admission
- *       threshold to an unknown revision or change a foreign calibration.
+/** \brief Admit only the cut whose complete HSI envelope was reviewed.
+ * \note DS12110 Rev11 chapter7/Table134 covers V. ES0392 Rev15 Table2 maps
+ *       V to2003, but Y and W share1003 and X has no explicit electrical
+ *       chapter. Known register layout does not establish electrical limits.
+ *       Never adopt those cuts, unknown revisions or a foreign user trim.
  */
 static nx_result_t factory_trim(const nx_stm32h743_system_t* s) {
     const uint32_t identity = NX_H743_SILICON_ID();
-    if ((identity & 0xfffU) != 0x450U)
+    if ((identity & 0xfffU) != 0x450U || (identity >> 16U) != 0x2003U)
         return NX_ERROR_UNSUPPORTED;
-    uint32_t mask;
-    uint32_t expected;
-    switch (identity >> 16U) {
-        case 0x1003U:
-            mask = 0x0003f000U;
-            expected = 0x00020000U;
-            break;
-        case 0x2001U:
-        case 0x2003U:
-            mask = RCC_HSICFGR_HSITRIM;
-            expected = 0x40U << RCC_HSICFGR_HSITRIM_Pos;
-            break;
-        default:
-            return NX_ERROR_UNSUPPORTED;
-    }
-    return (NX_H743_READ(&s->rcc->HSICFGR) & mask) == expected ? NX_SUCCESS
-                                                               : NX_ERROR_STATE;
+    return (NX_H743_READ(&s->rcc->HSICFGR) & RCC_HSICFGR_HSITRIM) ==
+                   (0x40U << RCC_HSICFGR_HSITRIM_Pos)
+               ? NX_SUCCESS
+               : NX_ERROR_STATE;
 }
 nx_result_t nx_stm32h743_pll384_preflight(const nx_stm32h743_system_t* s) {
     if (!nx_arch_is_privileged() || nx_arch_in_isr() || nx_arch_irq_is_masked())
@@ -101,7 +88,8 @@ nx_result_t nx_stm32h743_pll384_preflight(const nx_stm32h743_system_t* s) {
 #define CLOCK_PLL     32U
 #define CLOCK_SOURCE  64U
 #define CLOCK_READY   128U
-#define CLOCK_EFFECTS 255U
+#define CLOCK_KERNEL  256U
+#define CLOCK_EFFECTS 511U
 #define PLL_ON_MASK   ((uint32_t)(RCC_CR_PLL1ON | RCC_CR_PLL2ON | RCC_CR_PLL3ON))
 #define PLL_READY_MASK                                                         \
     ((uint32_t)(RCC_CR_PLL1RDY | RCC_CR_PLL2RDY | RCC_CR_PLL3RDY))
@@ -128,6 +116,12 @@ nx_result_t nx_stm32h743_pll384_preflight(const nx_stm32h743_system_t* s) {
 #define FLASH_TIMING_MASK ((uint32_t)(FLASH_ACR_LATENCY | FLASH_ACR_WRHIGHFREQ))
 #define FLASH_TIMING_TARGET                                                    \
     ((uint32_t)(FLASH_ACR_LATENCY_2WS | FLASH_ACR_WRHIGHFREQ_1))
+#define KERNEL_D2_MASK                                                         \
+    ((uint32_t)(RCC_D2CCIP2R_USART28SEL | RCC_D2CCIP2R_I2C123SEL))
+#define KERNEL_D2_TARGET                                                       \
+    ((3U << RCC_D2CCIP2R_USART28SEL_Pos) | (2U << RCC_D2CCIP2R_I2C123SEL_Pos))
+#define KERNEL_D3_MASK   ((uint32_t)RCC_D3CCIPR_ADCSEL)
+#define KERNEL_D3_TARGET ((uint32_t)RCC_D3CCIPR_ADCSEL_1)
 _Static_assert(sizeof(nx_stm32h743_pll384_state_t) == 4U,
                "Optional H743 clock owner exceeds its static type budget");
 static bool clock_task(void) {
@@ -159,6 +153,48 @@ static bool voltage_ready(const nx_stm32h743_system_t* s, uint32_t scale) {
            (NX_H743_READ(&s->power->CSR1) &
             (PWR_CSR1_ACTVOS | PWR_CSR1_ACTVOSRDY)) ==
                (scale | PWR_CSR1_ACTVOSRDY);
+}
+bool nx_stm32h743_pll384_clocks_ready(void) {
+    const nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    if (!clock_context_valid(s) || s->core_hz != 384000000U ||
+        factory_trim(s) != NX_SUCCESS)
+        return false;
+    const uint32_t cr = NX_H743_READ(&s->rcc->CR);
+    return (cr & (RCC_CR_HSION | RCC_CR_HSIRDY | RCC_CR_HSIDIV | RCC_CR_HSEON |
+                  RCC_CR_HSEBYP | PLL_ON_MASK | PLL_READY_MASK)) ==
+               (RCC_CR_HSION | RCC_CR_HSIRDY | RCC_CR_PLL1ON |
+                RCC_CR_PLL1RDY) &&
+           NX_H743_READ(&s->rcc->CFGR) ==
+               (RCC_CFGR_SW_PLL1 | RCC_CFGR_SWS_PLL1) &&
+           (NX_H743_READ(&s->rcc->D1CFGR) & D1_MASK) == D1_TARGET &&
+           (NX_H743_READ(&s->rcc->D2CFGR) & D2_MASK) == D2_TARGET &&
+           (NX_H743_READ(&s->rcc->D3CFGR) & D3_MASK) == D3_TARGET &&
+           (NX_H743_READ(&s->rcc->PLLCKSELR) & PLL_SELECT_MASK) ==
+               (10U << RCC_PLLCKSELR_DIVM1_Pos) &&
+           (NX_H743_READ(&s->rcc->PLLCFGR) & PLL_CONTROL_MASK) ==
+               PLL_CONTROL_TARGET &&
+           (NX_H743_READ(&s->rcc->PLL1DIVR) & PLL_DIVIDER_MASK) ==
+               0x01010277U &&
+           NX_H743_READ(&s->rcc->PLL1FRACR) == 0U &&
+           (NX_H743_READ(&s->rcc->D1CCIPR) & RCC_D1CCIPR_CKPERSEL) == 0U &&
+           (NX_H743_READ(&s->rcc->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) == 0U &&
+           (NX_H743_READ(&s->rcc->D2CCIP2R) & KERNEL_D2_MASK) ==
+               KERNEL_D2_TARGET &&
+           (NX_H743_READ(&s->rcc->D3CCIPR) & KERNEL_D3_MASK) ==
+               KERNEL_D3_TARGET &&
+           (NX_H743_READ(&s->power->CR3) & (PWR_CR3_LDOEN | PWR_CR3_BYPASS)) ==
+               PWR_CR3_LDOEN &&
+           voltage_ready(s, PWR_D3CR_VOS) &&
+           (NX_H743_READ(&s->flash->ACR) & FLASH_TIMING_MASK) ==
+               FLASH_TIMING_TARGET &&
+           (NX_H743_READ(&s->rcc->APB4ENR) & RCC_APB4ENR_SYSCFGEN) != 0U &&
+           (NX_H743_READ(&SYSCFG->PWRCR) & SYSCFG_PWRCR_ODEN) == 0U &&
+           (NX_H743_READ(&s->core->CCR) & (SCB_CCR_DC_Msk | SCB_CCR_IC_Msk)) ==
+               0U;
+}
+bool nx_stm32h743_pll384_owner_ready(const nx_stm32h743_pll384_state_t* state) {
+    return state != NULL && state->remaining_effects == CLOCK_EFFECTS &&
+           nx_stm32h743_pll384_clocks_ready();
 }
 static nx_result_t wait_voltage(const nx_stm32h743_system_t* s, uint32_t scale,
                                 uint32_t limit) {
@@ -243,6 +279,33 @@ nx_result_t nx_stm32h743_pll384_stop(nx_stm32h743_pll384_state_t* state,
          ~(uint32_t)(RCC_CFGR_SW | RCC_CFGR_SWS)) != 0U)
         return NX_ERROR_STATE;
     state->remaining_effects &= ~CLOCK_READY;
+    if ((state->remaining_effects & CLOCK_KERNEL) != 0U) {
+        if ((NX_H743_READ(&s->rcc->D1CCIPR) & RCC_D1CCIPR_CKPERSEL) != 0U)
+            return NX_ERROR_STATE;
+        /* Validate both neighbors before restoring either. A foreign field
+         * cannot authorize mutation of another field in the same register. */
+        const uint32_t d2 = NX_H743_READ(&s->rcc->D2CCIP2R);
+        const uint32_t uart = d2 & RCC_D2CCIP2R_USART28SEL;
+        const uint32_t i2c = d2 & RCC_D2CCIP2R_I2C123SEL;
+        if ((uart != 0U && uart != (3U << RCC_D2CCIP2R_USART28SEL_Pos)) ||
+            (i2c != 0U && i2c != (2U << RCC_D2CCIP2R_I2C123SEL_Pos)))
+            return NX_ERROR_STATE;
+        nx_result_t kernel = clock_restore(&s->rcc->D3CCIPR, KERNEL_D3_MASK, 0U,
+                                           KERNEL_D3_TARGET);
+        if (kernel != NX_SUCCESS)
+            return kernel;
+        /* Each independently owned selector may already be at baseline.
+         * A partial acquisition must not strand its accepted neighbor. */
+        kernel = clock_restore(&s->rcc->D2CCIP2R, RCC_D2CCIP2R_I2C123SEL, 0U,
+                               2U << RCC_D2CCIP2R_I2C123SEL_Pos);
+        if (kernel != NX_SUCCESS)
+            return kernel;
+        kernel = clock_restore(&s->rcc->D2CCIP2R, RCC_D2CCIP2R_USART28SEL, 0U,
+                               3U << RCC_D2CCIP2R_USART28SEL_Pos);
+        if (kernel != NX_SUCCESS)
+            return kernel;
+        state->remaining_effects &= ~CLOCK_KERNEL;
+    }
     /* No lower-voltage/Flash/bus/PLL withdrawal is safe until SWS proves HSI.
      * Requested SW alone cannot establish the processor's actual clock. */
     nx_result_t result;
@@ -412,6 +475,14 @@ nx_stm32h743_pll384_start(nx_stm32h743_pll384_state_t* state, uint32_t limit) {
     nx_arch_dsb();
     nx_arch_isb();
     s->core_hz = 384000000U;
+    /* This same cold lease owns the shared kernel selectors. The ADC input
+     * is HSI64; only a selected ADC provider acquires its async/4 divider. */
+    state->remaining_effects |= CLOCK_KERNEL;
+    if (!clock_write(&s->rcc->D2CCIP2R, KERNEL_D2_TARGET, KERNEL_D2_MASK) ||
+        !clock_write(&s->rcc->D3CCIPR, KERNEL_D3_TARGET, KERNEL_D3_MASK)) {
+        result.primary = NX_ERROR_IO;
+        goto rollback;
+    }
     state->remaining_effects |= CLOCK_READY;
     return result;
 rollback:

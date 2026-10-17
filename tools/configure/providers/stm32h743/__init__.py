@@ -27,11 +27,16 @@ DMA_VECTOR = "Stream"
 DMA_TOPOLOGY = (frozenset((1,)), range(2), range(45, 47))
 DMA_MEMORY_ENGINES = ("DMA1", "DMA2", "BDMA", "MDMA")
 CONDITIONAL_PACKAGE_PADS = ("PC2_C", "PC3_C")
-CLOCK_PROFILES = MappingProxyType({
+CLOCK_PROFILES = MappingProxyType({**{
     f"hsi{mhz}-fixed-cache-{cache}": MappingProxyType({
         "source": "hsi", "input_hz": 64000000, "core_hz": mhz * 1000000,
         "apb1_hz": mhz * 1000000, "apb2_hz": mhz * 1000000})
-    for mhz in (32, 64) for cache in ("off", "on")})
+    for mhz in (32, 64) for cache in ("off", "on")},
+    "hsi64-pll384-cache-off": MappingProxyType({
+        "source": "hsi", "input_hz": 64000000,
+        "core_hz": 64000000 * 6,
+        "apb1_hz": 64000000 * 6 // 4,
+        "apb2_hz": 64000000 * 6 // 4})})
 LIMITS = MappingProxyType({"uart_baud": (977, 1000000), "spi_hz": (250000, 16000000), "pwm_period": 65535, "timer_hz": 64000000})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",

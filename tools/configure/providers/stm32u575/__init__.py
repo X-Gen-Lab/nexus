@@ -1,5 +1,6 @@
 """Source-reviewed U575 GPIO/USART byte-mode and inactive IWDG contract."""
 from types import MappingProxyType
+import re
 from .. import common
 
 
@@ -22,6 +23,7 @@ CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = True
+# Stream-style helpers remain unavailable; GPDMA channel facts are explicit.
 DMA_VECTOR = None
 DMA_TOPOLOGY = (frozenset(), range(0), range(0))
 DMA_MEMORY_ENGINES = ("GPDMA1", "LPDMA1")
@@ -36,6 +38,7 @@ ADC_PIN_CHANNELS = MappingProxyType({("ADC4", "PC0"): 1})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
+    ("uart", "dma-tx"): "uart_gpdma",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi", ("i2c", "poll-messages"): "i2c",
     ("adc", "single-shot"): "adc", ("pwm", "fixed-pwm"): "pwm",
@@ -66,6 +69,12 @@ def validate_selection(selection, route):
                        for pin in route["pins"])
         if expected is None or actual != expected:
             common.fail("Only reviewed USART1 PA9/PA10 and USART2 PA2/PA3 AF7 are maintained")
+        if selection["mode"] == "dma-tx" and (
+                route["controller"] != "USART1" or
+                selection.get("frame") not in (None, {
+                    "data_bits": 8, "parity": "none", "stop_bits": 1,
+                    "flow": "none"})):
+            common.fail("U575 finite GPDMA TX requires exact USART1 8N1")
         baud = common.integer(selection["baud"], *LIMITS["uart_baud"],
                               "USART baud")
         divisor = (4000000 + baud // 2) // baud
@@ -149,16 +158,29 @@ def validate_selection(selection, route):
 
 
 def validate_dma(route, mode, normalize):
-    del route, mode, normalize
-    common.fail("U575 DMA provider is unimplemented")
+    expected = (("GPDMA1:channel0:request25",) if
+                route["kind"] == "uart" and route["controller"] == "USART1"
+                and mode == "dma-tx" else None)
+    common.validate_dma(route, mode, expected, "stm32u575", normalize)
 
 
 def validate_dma_resource(resource):
-    return common.validate_dma_resource(resource, DMA_TOPOLOGY)
+    if (type(resource) is not str or re.fullmatch(
+            r"dma:GPDMA1:channel0(?::request25)?", resource) is None):
+        common.fail("U575 DMA requires reviewed GPDMA1 channel0/request25")
+    return "GPDMA1", 0, 25 if resource.endswith(":request25") else None
+
+
+def dma_physical_key(resource):
+    """Canonical channel ownership excludes the independently checked request."""
+    validate_dma_resource(resource)
+    return "dma:GPDMA1:channel0"
 
 
 def dma_irq(dma):
-    return common.dma_irq(dma, DMA_VECTOR, DMA_TOPOLOGY)
+    if validate_dma_resource("dma:" + dma)[2] != 25:
+        common.fail("U575 GPDMA route requires explicit USART1 TX request25")
+    return "irq:GPDMA1_Channel0"
 
 
 def shares_irq(kind, key):

@@ -23,6 +23,30 @@ GIT_FIXTURE_OPTIONS = ("-c", "maintenance.auto=false", "-c", "gc.auto=0",
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_coupled_io_public_private_and_generator_payloads_are_required(self):
+        required = {
+            "io/include/nexus/io/can_fd.h", "io/include/nexus/io/pwm_adc.h",
+            "io/src/can_fd.c", "io/src/pwm_adc.c", "io/private/can_fd_impl.h",
+            "tools/configure/coupled_io.py",
+            "tools/configure/providers/stm32g474/coupled.py",
+            "soc/stm32g474/drivers/fdcan.c",
+            "soc/stm32g474/drivers/pwm_adc.c",
+            "soc/stm32g474/private/stm32g474_fdcan.h",
+            "soc/stm32g474/private/stm32g474_pwm_adc.h"}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+
+    def test_coupled_g474_units_and_generator_are_explicit_family_payload(self):
+        descriptor = source_sdk.provider_descriptors.maintained("stm32g474")
+        required = {"soc/stm32g474/drivers/fdcan.c",
+                    "soc/stm32g474/drivers/pwm_adc.c",
+                    "soc/stm32g474/private/stm32g474_fdcan.h",
+                    "soc/stm32g474/private/stm32g474_pwm_adc.h"}
+        self.assertTrue(required.issubset(set(descriptor.owned_payload)),
+                        sorted(required - set(descriptor.owned_payload)))
+        self.assertIn("tools/configure/providers/stm32g474/coupled.py",
+                      descriptor.configuration_modules)
+
     def test_build_policy_and_tool_module_closure_is_required(self):
         required = {"cmake/platform/TargetPolicy.cmake",
                     "tools/configure/bundle.py", "tools/configure/dependencies.py",

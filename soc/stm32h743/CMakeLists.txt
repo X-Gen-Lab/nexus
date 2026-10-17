@@ -70,13 +70,17 @@ else()
 endif()
 set(NEXUS_STARTUP_SOURCE
     "${h7_device}/Source/Templates/gcc/startup_stm32h743xx.s" PARENT_SCOPE)
-set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S" PARENT_SCOPE)
+set(h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S")
 if(NEXUS_MEMORY_SRAM1)
-    set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S"
-        "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c" PARENT_SCOPE)
+    list(APPEND h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")
 endif()
+file(READ "${NEXUS_CONFIG_DIR}/resolved.json" h7_resolved)
+string(JSON h7_clock_profile GET "${h7_resolved}" clock_profile)
+if(h7_clock_profile STREQUAL "hsi64-pll384-cache-off")
+    list(APPEND h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/clock.c")
+endif()
+set(NEXUS_SYSTEM_SOURCE ${h7_system_sources} PARENT_SCOPE)
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/private" PARENT_SCOPE)
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${h7_device}/Include" "${h7_cmsis}"

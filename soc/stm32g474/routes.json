@@ -1486,6 +1486,91 @@
         "irq:TIM3_IRQn"
       ],
       "source": "DS12288 Rev6 Table13 PA6/PA7 TIM3_CH1/CH2 AF2; RM0440 Rev9 encoder SMS1/2/3 and 16-bit TIM3. One physical controller shared exclusively with PWM; vector reserved quiet, never enabled. Silicon software fixture only."
+    },
+    {
+      "id": "tim1-adc1-window-pa8-pa9-pa10-pa0-comp1-pa1-pa4",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "TIM1",
+      "kind": "pwm_adc",
+      "pins": [
+        {
+          "pin": "PA8",
+          "function": "ch1",
+          "af": 6
+        },
+        {
+          "pin": "PA9",
+          "function": "ch2",
+          "af": 6
+        },
+        {
+          "pin": "PA10",
+          "function": "ch3",
+          "af": 6
+        },
+        {
+          "pin": "PA0",
+          "function": "analog",
+          "af": 0
+        },
+        {
+          "pin": "PA1",
+          "function": "comp1-inp",
+          "af": 0
+        },
+        {
+          "pin": "PA4",
+          "function": "comp1-inm",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "finite-regular-dma"
+      ],
+      "mode_dma": {
+        "finite-regular-dma": [
+          "DMA1:stream1:channel5"
+        ]
+      },
+      "resources": [
+        "controller:ADC1",
+        "controller:ADC2",
+        "controller:ADC345",
+        "controller:DMAMUX1_Channel0",
+        "irq:DMA1_Channel1",
+        "irq:ADC1_2",
+        "clock:ADC12",
+        "clock:DMA1",
+        "clock:DMAMUX1"
+      ],
+      "source": "DS12288 Rev6 TIM1 CH1/2/3 PA8/9/10 AF6, ADC1 PA0 IN1, COMP1 PA1/PA4; RM0440 Rev9 internal TIM1 CH4 OC4REF rising via TRGO2 to ADC1 regular, finite normal DMA1 channel1 request5. One joint software owner; external thresholds, PWM pulse count, aperture timing and Board wiring unqualified."
+    },
+    {
+      "id": "fdcan1-pa11-pa12",
+      "variants": [
+        "STM32G474RET6"
+      ],
+      "controller": "FDCAN1",
+      "kind": "can_fd",
+      "pins": [
+        {
+          "pin": "PA11",
+          "function": "rx",
+          "af": 9
+        },
+        {
+          "pin": "PA12",
+          "function": "tx",
+          "af": 9
+        }
+      ],
+      "modes": [
+        "iso-fd-loopback",
+        "iso-fd-normal"
+      ],
+      "source": "DS12288 G474RE PA11/PA12 FDCAN1 RX/TX AF9; RM0440 Rev9 reduced M_CAN FDCAN1 physical message RAM212words at0x4000A400, HSE24 kernel, explicit ISO FD+BRS internal monitored loopback or normal controller mode. IT0 publishes; IT1 reserved/cold checked. TSS0 disables hardware timestamps. Normal mode establishes controller behavior only; transceiver, termination, external traffic, SOF time and physical bus qualification remain unobserved."
     }
   ]
 }

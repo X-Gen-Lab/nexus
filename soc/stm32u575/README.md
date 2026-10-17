@@ -3,7 +3,8 @@
 This provider targets exact STM32U575ZIT6Q and the source-reviewed NUCLEO-U575ZI-Q
 MB1549 reference. The maintained slice is CPU startup, reset-like MSIS 4 MHz,
 reserved TIM2, exact-package GPIOA through GPIOH, USART1 PA9/PA10 and USART2
-PA2/PA3 AF7 IRQ bytes, and an explicitly enabled independent watchdog. The default linker RAM
+PA2/PA3 AF7 IRQ bytes, optional finite USART1 GPDMA TX with independent IRQ RX,
+and an explicitly enabled independent watchdog. The default linker RAM
 is SRAM1 192 KiB. It does not allocate storage or create tasks, workers or runtime
 registries. The typed factory returns existing readonly faces; instances own
 private state and share readonly GPIO/UART/watchdog operations. Each package GPIO
@@ -11,11 +12,12 @@ pad has a source-reviewed route; its inventory does not establish Board wiring.
 
 The selected finite peripheral extension adds SPI1, I2C1, ADC4, TIM3 CH1,
 EXTI0/1 and physical Flash. These reference selections keep TZEN0, MSIS4MHz,
-static typed factory objects and caller execution. They add no DMA engine,
-task, runtime registry or automatic clock adoption. The paired official U5 LL
+static typed factory objects and caller execution. Those six selections add no
+DMA engine, task, runtime registry or automatic clock adoption. The separate
+USART1 `dma-tx` selection owns its exact GPDMA channel. The official U5 LL
 headers are private, hash-locked CubeU5 v1.9.0 inputs; readonly configuration
-queries and encodings are reused without HAL handles, vendor IRQ callbacks,
-HAL ticks or a second transfer owner.
+queries, encodings and selected register operations are reused without HAL
+handles, vendor IRQ callbacks, HAL ticks or a second transfer owner.
 
 The official STM32U5 CMSIS device source is pinned to
 `624374fa1e21ca195d6f2102ac0caaa50d0ea4c8` (v1.4.3, Cube v1.9.0). The original
@@ -104,6 +106,30 @@ release-publication of SETTLED. Cancel/deadline begin drain; failed drain leaves
 QUARANTINED storage borrowed. Stop joins captured wake callbacks and observes
 UE/TEACK/REACK/NVIC withdrawal before releasing ring/wake references. Wake is a
 hint, and selected kernel IRQ policy is validated before kernel notifications.
+
+### Optional USART1 finite GPDMA TX
+
+The maintained [normal TOML fixture](../../tests/contracts/u575_assembly/usart1-dma-tx.toml)
+selects `dma-tx`: USART1 PA9/PA10 AF7,8N1/FIFO-off at4MHz; GPDMA1 channel0,
+request25/IRQ29 and USART1 IRQ61, both priority5. Its single UART prefix retains
+independent IRQ-byte RX; the selected-only extension does not grow ordinary
+IRQ-byte state or operations. Each TX payload is1..65535bytes entirely within
+nonsecure SRAM1 `[0x20000000,0x20030000)`.
+
+DMA `TCF` does not prove wire `TC` or release the borrow. Active cancellation
+uses fresh `SUSPF`/`IDLEF`, legal `RESET` and disabled/idle readback; its IRQ
+preserves the actual suspension proof. ES0499 2.21.2 persistent `DMAT` is set
+before first `UE` and stays high until whole stop proves UE/ACK, both vectors
+and publishers joined. Failed withdrawal retains `QUARANTINED` storage.
+The [complete execution and recovery contract](../../docs/design/u575-uart-gpdma.md)
+explains caller progression, source/IRQ/wake join and exact limits.
+
+Current development checks passed40 real-provider model cases,8 generated
+factory cases and the normal ARM configure/build with linked resource and
+provider-retention checks. They do not establish a clean-source full-gate
+candidate, physical erratum qualification or measured cycles. HIL is
+`not_executed`. USART2 DMA, RX DMA, linked lists, continuous streaming,
+low-power/autonomous operation and a TrustZone broker remain unselected.
 
 ## Independent watchdog
 
@@ -252,8 +278,9 @@ Optional DWT CYCCNT is disabled until its exact U575 implementation is reviewed;
 a Cortex-M33 architecture string does not authorize a cycle-counter capability.
 SoC ICACHE/DCACHE peripherals are disabled; their existence does not declare SCB
 cache lines. GPDMA1 and LPDMA1 have distinct physical bus paths and linked-list
-semantics, but **no DMA provider or descriptor authorization is implemented**.
-SRAM2/3/4, backup SRAM and Secure aliases are not selected by this first provider.
+semantics. Only the exact finite USART1/GPDMA1 TX selection above is maintained;
+LPDMA1, linked-list descriptors and RX DMA are not selected. SRAM2/3/4, backup
+SRAM and Secure aliases are outside this maintained DMA source domain.
 Secure and NonSecure aliases never count as two physical capacities.
 
 ES0499 Rev 12 section 2.21.1 describes receive corruption from a sub-half-bit low
@@ -261,7 +288,10 @@ glitch in the second half of a stop bit. Revisions W/U have no software workarou
 the stated measures are a noiseless line or an external glitch filter. IRQ error
 flags cannot promise detection or noise immunity. Section 2.21.2 describes missing
 DMA requests after clearing/re-setting DMAT. Its UE-cycle workaround excludes
-receiver use; it is not claimed solved here, because all DMA modes are excluded.
+receiver use. The selected USART1 DMA provider instead uses the documented
+persistent-DMAT workaround described above, retaining independent IRQ RX.
+Register-model passage does not establish the physical workaround's silicon
+revision or station qualification.
 
 The official Q-package inventory has 111 GPIOs, independently checked against the
 package table and figure. Inventory does not expose 111 reviewed PCB routes.

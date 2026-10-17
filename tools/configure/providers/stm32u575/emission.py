@@ -18,8 +18,10 @@ def operations(item):
 
 
 def includes(result):
-    del result
-    return ['#include "stm32u575_provider.h"', 'void _init(void);',
+    selected = ['#include "stm32u575_uart_gpdma.h"'] if any(
+        item.kind == "uart" and item.mode == "dma-tx"
+        for item in result.controllers) else []
+    return ['#include "stm32u575_provider.h"', *selected, 'void _init(void);',
             'void _fini(void);',
             r'/** \brief C runtime hooks; constructors use .init_array. */',
             'void _init(void) {}', 'void _fini(void) {}']

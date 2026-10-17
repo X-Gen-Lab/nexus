@@ -1,0 +1,222 @@
+#
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8b03a9175964b78933f92b1f0c7e87a99f4c0c7f627bb39170e5725401b86107\n"
+
+msgid "Finite PWM and ADC windows with one hardware owner"
+msgstr "由同一硬件 owner 管理的有限 PWM 与 ADC 窗口"
+
+msgid "Use this contract to select and execute a finite, timer-triggered acquisition window through `nx_pwm_adc_t`. The current implementation is the exact STM32G474RET6 `finite-regular-dma` software reference described below. It keeps one PWM duty frame constant while DMA fills a finite raw sample array, then withdraws the sources before releasing the request. Product control algorithms, power-stage policy and inspected PCB wiring remain external. HIL is `not_executed`."
+msgstr "本合同说明如何通过 `nx_pwm_adc_t` 选择并执行有限的定时器触发采样窗口。当前实现仅覆盖下述精确 STM32G474RET6 `finite-regular-dma` 软件参考：DMA 填充有限原始采样数组时保持一帧 PWM 占空比不变，随后先撤离各个源，再归还请求。产品控制算法、功率级策略和经实物检查的 PCB 接线仍由外部工程负责。HIL 为 `not_executed`。"
+
+msgid "Select one coupled interface"
+msgstr "选择一个联合接口"
+
+msgid "![FIG-16: current build-time assembly and runtime ownership; the coupled window uses one selected face and private owner](../assets/diagrams/io-evolution.svg)"
+msgstr "![FIG-16：当前构建期装配与运行时所有权；联合窗口只选择一个接口和私有 owner](../assets/diagrams/io-evolution.svg)"
+
+msgid "FIG-16: current build-time assembly and runtime ownership; the coupled window uses one selected face and private owner"
+msgstr "FIG-16：当前构建期装配与运行时所有权；联合窗口只选择一个接口和私有 owner"
+
+msgid "**FIG-16 describes current shared mechanisms, not a measured PWM/ADC timing diagram.** In this selection, its generated face is `nx_pwm_adc_t`, its provider is the joint TIM1/ADC1 owner, and its application-owned storage is the request, duty array and sample array. The arrows retain their generation, lookup and call meanings. Factory lookup never primes ADC, starts PWM or schedules work."
+msgstr "**FIG-16 描述当前共用机制，不是经过测量的 PWM/ADC 时序图。** 在本装配中，生成的接口为 `nx_pwm_adc_t`，provider 统一拥有 TIM1/ADC1；请求、占空比数组和采样数组由应用提供。箭头仍分别表示生成、查找和调用。factory 查找不会预转换 ADC、启动 PWM 或调度工作。"
+
+msgid "The normal input is [the maintained TOML fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/g474_control_assembly/pwm-adc.toml). Its software-only Board package supplies silicon pin and voltage assumptions; it does not establish a fitted analog circuit. The strict resolver selects a single Construction, a compact `NX_PWM_ADC_ID_WINDOW` and `nx_factory_pwm_adc`. It rejects conflicting TIM1, ADC/common, comparator, DMA, vector and pad claims before publishing an atomic bundle. Ordinary PWM-group and ADC faces do not independently expose this selection's hardware."
+msgstr "正常输入为[维护中的 TOML 夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/contracts/g474_control_assembly/pwm-adc.toml)。其纯软件 Board 包提供芯片引脚和供电假设，不建立已安装模拟电路的事实。严格解析器选择一个 Construction、紧凑的 `NX_PWM_ADC_ID_WINDOW` 和 `nx_factory_pwm_adc`，在发布原子 bundle 前拒绝 TIM1、ADC/common、比较器、DMA、向量和引脚的资源冲突。普通 PWM-group 与 ADC 接口不会再独立暴露该装配的硬件。"
+
+msgid "Layer"
+msgstr "层"
+
+msgid "Owned responsibility"
+msgstr "拥有的责任"
+
+msgid "Authored assembly and typed IR"
+msgstr "手写装配与定型 IR"
+
+msgid "Select the exact mode, immutable facts, trigger identity and resource claims"
+msgstr "选择精确模式、不可变事实、触发身份和资源声明"
+
+msgid "Platform Construction"
+msgstr "Platform Construction"
+
+msgid "Acquire and restore pads, clock/reset and comparator leases; establish comparator settling before the private constructor"
+msgstr "取得并恢复引脚、时钟/复位及比较器租约；在调用私有构造函数前完成比较器稳定等待"
+
+msgid "Coupled provider"
+msgstr "联合 provider"
+
+msgid "Own TIM1, ADC1/common, DMA1 channel1, DMAMUX channel0 and vectors11/24 as one retained lifecycle"
+msgstr "在同一保留生命周期中拥有 TIM1、ADC1/common、DMA1 channel1、DMAMUX channel0 和向量11/24"
+
+msgid "Application executor"
+msgstr "应用执行者"
+
+msgid "Serialize task calls, maintain absolute deadlines, advance service and join external observers before reuse"
+msgstr "串行调用任务接口，维护绝对 deadline，推进 service，并在复用前等待外部观察者退出"
+
+msgid "Application storage"
+msgstr "应用存储"
+
+msgid "Keep the admitted request and complete duty array immutable, and exclude all other access to the sample array until acquired SETTLED"
+msgstr "在 acquire 观察 SETTLED 前保持已接受请求和完整占空比数组不可变，并禁止其他主体访问采样数组"
+
+msgid "The public interface has two pointers and five shared operations. The optional provider adds private selected state; ordinary PWM and ADC state and tables do not acquire coupled-session fields. There is no allocator, hidden worker, runtime registry or independently startable subordinate face. On a 32-bit target, the face uses 8 B and its shared five-pointer table uses 20 B. Private context, request and caller arrays are separate costs; these structural sizes are not measured cycle, latency or stack bounds."
+msgstr "公共接口只有两个指针及五个共享操作。可选 provider 添加其选定模式的私有状态；普通 PWM、ADC 状态和方法表不会增加联合会话字段。没有分配器、隐藏工作线程、运行时注册表或可独立启动的下属接口。在 32 位目标上，接口占 8 B，共享的五指针方法表占 20 B。私有上下文、请求和调用者数组另行计入；这些结构大小不代表实测周期、延迟或栈上界。"
+
+msgid "Exact first software reference"
+msgstr "精确的首个软件参考"
+
+msgid "Fact"
+msgstr "事实"
+
+msgid "Selected value and boundary"
+msgstr "选定值与边界"
+
+msgid "Target and backend"
+msgstr "目标与后端"
+
+msgid "STM32G474RET6, baremetal, HSE24/PLL170 fixed system profile"
+msgstr "STM32G474RET6、baremetal、HSE24/PLL170 固定系统配置"
+
+msgid "PWM"
+msgstr "PWM"
+
+msgid "TIM1 main CH1/2/3 on PA8/PA9/PA10 AF6; whole-timer ownership; no complementary output"
+msgstr "TIM1 主输出 CH1/2/3，PA8/PA9/PA10 AF6；独占整个定时器；不含互补输出"
+
+msgid "Counter"
+msgstr "计数器"
+
+msgid "170 MHz kernel, PSC169, 1 MHz tick, 100-tick period and 50-tick trigger phase"
+msgstr "170 MHz 内核、PSC169、1 MHz tick、100-tick 周期和 50-tick 触发相位"
+
+msgid "Deadtime"
+msgstr "死区"
+
+msgid "170 kernel-clock ticks at 170 MHz; PSC does not scale this separate unit"
+msgstr "170 MHz 下的 170 个内核时钟 tick；该独立单位不受 PSC 缩放"
+
+msgid "Trigger"
+msgstr "触发"
+
+msgid "Internal CH4 PWM2 to TIM1 TRGO2; ADC regular EXTSEL10 rising edge"
+msgstr "内部 CH4 PWM2 连接 TIM1 TRGO2；ADC 常规转换组 EXTSEL10 上升沿触发"
+
+msgid "Comparator"
+msgstr "比较器"
+
+msgid "COMP1 PA1/PA4 analog inputs, enabled noninverted INMSEL6 and TIM1 break; no measured threshold or power-stage safety qualification"
+msgstr "COMP1 PA1/PA4 模拟输入，启用非反相 INMSEL6 并连接 TIM1 break；未建立实测阈值或功率级安全资格"
+
+msgid "ADC"
+msgstr "ADC"
+
+msgid "PA0/ADC1_IN1, single-ended unsigned12, BULB, sample code0; SYSCLK/128 = 1,328,125 Hz"
+msgstr "PA0/ADC1_IN1、单端无符号12位、BULB、采样 code0；SYSCLK/128 = 1,328,125 Hz"
+
+msgid "DMA"
+msgstr "DMA"
+
+msgid "DMA1 channel1, DMAMUX1 channel0/request5; halfword, MINC, normal DMA; ADC limited requests with DMACFG0"
+msgstr "DMA1 channel1、DMAMUX1 channel0/request5；半字、MINC、普通 DMA；ADC 通过 DMACFG0 发出有限请求"
+
+msgid "Storage"
+msgstr "存储"
+
+msgid "Entire aligned sample span inside a selected writable domain within 0x20000000..0x20018000; CCM and its alias are excluded"
+msgstr "整个对齐采样范围必须落在 0x20000000..0x20018000 内选定的可写存储域；排除 CCM 及其别名"
+
+msgid "Count and format"
+msgstr "数量与格式"
+
+msgid "1..65535 requested samples, additionally bounded by the actual whole memory span; two-byte little-endian storage and stride, one regular channel"
+msgstr "请求 1..65535 个样本，还受实际完整存储范围限制；两字节小端存储及步长，一个常规转换通道"
+
+msgid "Vectors"
+msgstr "向量"
+
+msgid "DMA1 channel1 IRQ11 and TIM1 break/TIM15 IRQ24, logical priority5; ADC IRQ18 remains disabled"
+msgstr "DMA1 channel1 IRQ11 和 TIM1 break/TIM15 IRQ24，逻辑优先级5；ADC IRQ18 始终禁用"
+
+msgid "The generated trigger identity is nonzero provenance within the assembly. It is not an address, sample-aperture timestamp, calibrated voltage, duty epoch or exact PWM pulse count. `nx_pwm_adc_state` reports the actual integer format and separate counter/deadtime units."
+msgstr "生成的触发身份是装配内非零的来源标识，不是地址、采样孔径时间戳、校准电压、占空比生效纪元或精确的 PWM 脉冲数。`nx_pwm_adc_state` 报告实际整数格式，以及相互独立的计数器和死区单位。"
+
+msgid "The fixed 100-tick period is deliberate. At the selected ADC clock, it keeps the normal BULB interval within DS12288's 2.5..640.5-cycle envelope. A 1 ms period from a different PWM-group example is unsupported here. The register model does not establish actual analog timing, trigger latency, clock accuracy or board loading."
+msgstr "固定 100-tick 周期有明确原因：在选定 ADC 时钟下，正常 BULB 间隔可保持在 DS12288 的 2.5..640.5 周期范围内。其他 PWM-group 示例中的 1 ms 周期在此不受支持。寄存器模型不能建立真实模拟时序、触发延迟、时钟精度或板级负载资格。"
+
+msgid "Prepare, admit and explicitly advance"
+msgstr "准备、准入与显式推进"
+
+msgid "Retrieve the immutable generated face and explicitly start Platform. Startup prepares the cold owner; it starts neither a request nor PWM output."
+msgstr "取得生成的不可变接口，并显式启动 Platform。启动只准备冷态 owner，不启动请求或 PWM 输出。"
+
+msgid "Initialize the request once, then prepare a separate sample array and complete three-channel duty frame with a finite absolute monotonic deadline. Preparation copies frame metadata, borrows nothing and touches no samples."
+msgstr "首次使用时初始化请求，然后准备独立采样数组、完整的三通道占空比帧及有限的绝对单调 deadline。准备操作复制帧元数据，不建立借用，也不访问采样内容。"
+
+msgid "Submit from the unique privileged, unmasked task executor. A rejected call leaves no new effects or retained references. `NX_SUCCESS` means ACCEPTED, including an arm error that may already have settled through its real drain."
+msgstr "由唯一的特权、未屏蔽中断的任务执行者提交。拒绝不遗留新效果或引用。`NX_SUCCESS` 表示 ACCEPTED，包括装载失败后可能已通过真实排空结束的请求。"
+
+msgid "After acceptance, preserve request and duty storage and exclude application reads/writes of sample storage. IRQs latch bounded facts; the same task calls service to advance completion or withdrawal. No implicit task supplies this progress."
+msgstr "接受后必须保留请求与占空比存储，应用不得读写采样存储。IRQ 只锁存有界事实，同一任务通过 service 推进完成或撤离。没有隐式任务代为推进。"
+
+msgid "Acquire-observe `NX_REQUEST_SETTLED` before consuming result and samples. Join adapter/observer references separately before preparing the storage for another explicit request. Ordinary successful completion never rearms itself."
+msgstr "在读取结果和样本前，以 acquire 观察 `NX_REQUEST_SETTLED`。再次准备同一存储以发起显式请求前，还要单独等待 adapter/observer 引用退出。普通成功完成不会自行重新装载。"
+
+msgid "Preparation rejects overlapping, misaligned or wrapping request, frame, duty and sample spans without changing the initialized request. The provider additionally rejects aliases with its retained state, facts, memory-domain descriptors and known MMIO controls before admission. Known control descriptors are rejected before their fields are read."
+msgstr "准备操作拒绝请求、帧、占空比与采样范围之间的重叠、未对齐或地址回绕，且不修改已初始化的请求。provider 还会在准入前拒绝与保留状态、事实、存储域描述符及已知 MMIO 控制区域重叠的别名。已知控制区域中的请求描述符会在读取字段前被拒绝。"
+
+msgid "Each accepted window loads a coherent frame while TIM1 is stopped and reloads preloads behind a quiet trigger route. It enables ADC and discards two software conversions before enabling normal DMA and the external regular trigger. Neither prime enters user DMA storage. The finite prime sequence uses at most a 100 us deadline and a secondary poll bound. Each later explicit window repeats ADC enable and both primes; idle never leaves the BULB sampler enabled."
+msgstr "每个已接受窗口在 TIM1 停止时装入一致帧，并在安静触发路由下使预装载生效。启用 ADC 后先丢弃两次软件转换，再启用普通 DMA 和外部常规组触发。两次预转换都不会进入用户 DMA 存储。有限预转换序列使用至多 100 us 的 deadline 预算及第二层轮询次数上界。后续每个显式窗口都会重新启用 ADC 并执行两次预转换；空闲时不会让 BULB 采样器持续启用。"
+
+msgid "The full-window deadline is an observation rule. Without a trusted completion timestamp, TC first observed at or after that deadline reports TIMEOUT. A TC already observed before the deadline may complete its required withdrawal later. This does not establish a physical execution-time bound. Timeout and cancellation retain the same loan until real source drain succeeds."
+msgstr "整个窗口的 deadline 是观察规则：缺少可信完成时间戳时，若首次观察 TC 已到达或超过 deadline，就报告 TIMEOUT。若在 deadline 前已经观察到 TC，之后仍可继续完成必要撤离。这不建立物理执行时间上界。超时和取消均保留原借用，直至真实源排空成功。"
+
+msgid "Prove withdrawal before publishing a result"
+msgstr "发布结果前证明撤离完成"
+
+msgid "![FIG-06: current request ownership states; cancellation and quarantine retain the window loan until actual withdrawal](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：当前请求所有权状态；取消和隔离保留窗口借用，直至真实撤离完成](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "FIG-06: current request ownership states; cancellation and quarantine retain the window loan until actual withdrawal"
+msgstr "FIG-06：当前请求所有权状态；取消和隔离保留窗口借用，直至真实撤离完成"
+
+msgid "**FIG-06 supplies the shared request-state contract.** ACCEPTED and REJECTED are admission results, not additional request states. In this provider, the source proof behind DRAINING/QUARANTINED and SETTLED includes each step below."
+msgstr "**FIG-06 提供共用请求状态合同。** ACCEPTED 与 REJECTED 是准入结果，不是额外的请求状态。在本 provider 中，DRAINING/QUARANTINED 与 SETTLED 背后的源撤离证明包括以下每一步。"
+
+msgid "Withdraw master output, channels and timer interrupt sources. Prove CEN0 before selecting the quiet enable-based trigger route; a refused CEN clear must not create a new rising TRGO2 edge."
+msgstr "撤离主输出、通道与定时器中断源。先证明 CEN0，再选择基于 enable 的安静触发路由；拒绝清除 CEN 时不得产生新的 TRGO2 上升沿。"
+
+msgid "Request ADC stop, observe ADSTART/ADSTP withdrawal, disable ADC and observe ADEN/ADDIS withdrawal. A service call uses bounded progress polls outside a long interrupt-masked wait."
+msgstr "请求停止 ADC，观察 ADSTART/ADSTP 撤离，再禁用 ADC 并观察 ADEN/ADDIS 撤离。service 使用有界进度轮询，不把长时间等待放在中断屏蔽区内。"
+
+msgid "Disable DMA and prove its state, detach both hardware addresses and count, and detach the DMAMUX route. A remaining-count snapshot does not establish a valid prefix after cancellation or error."
+msgstr "禁用 DMA 并证明其状态，撤除两个硬件地址及计数，随后撤除 DMAMUX 路由。取消或错误后，剩余计数快照不能证明有效样本前缀。"
+
+msgid "Preserve every captured TE/OVR/break fact before acknowledging its source. Clear only observed owned DMA flags, then recheck faults. Late flags during drain must not turn into successful acquisition."
+msgstr "应答中断源前，保留每个已捕获的 TE/OVR/break 事实。只清除观察到的自有 DMA 标志，再次检查故障。排空中迟到的标志不得被转成采样成功。"
+
+msgid "Disable and join both vectors, including pending and active publishers. Under the final short metadata guard, sample faults again, detach the active request and release-publish SETTLED as the final provider access."
+msgstr "禁用并等待两个向量退出，包括 pending 与 active 发布者。在最终短元数据保护区内再次采样故障，撤除 active 请求引用，再以 release 发布 SETTLED，作为 provider 对请求的最后一次访问。"
+
+msgid "DMA TC alone proves none of the output, trigger or ADC withdrawal. Limited DMA prevents repeated user-buffer overwrites while the terminal IRQ is late, but does not stop TIM1. COMP break withdraws MOE; it does not stop CEN, TRGO2, ADC or DMA. These independent facts must not substitute for one another."
+msgstr "单凭 DMA TC 无法证明输出、触发或 ADC 已撤离。有限 DMA 可在终止 IRQ 迟到时避免反复覆写用户缓冲区，但不会停止 TIM1。COMP break 撤除 MOE，却不会停止 CEN、TRGO2、ADC 或 DMA。这些独立事实不能相互替代。"
+
+msgid "An ordinary successful result reports exactly the requested sample count. Any error or cancellation reports zero guaranteed valid samples. The first error, cancellation or timeout cause remains authoritative while failed withdrawal retries retain ownership. DMA completion does not override a physical fault. An incomplete stop keeps the request QUARANTINED and the private recovery state live; a later successful retry can settle it. A latched fault requires cold recovery and never automatically restarts output."
+msgstr "普通成功结果精确报告请求的样本数。任何错误或取消均报告零个保证有效的样本。在失败撤离的重试期间，首个错误、取消或超时原因保持权威；DMA 完成不得覆盖物理故障。未完成的停止使请求保持 QUARANTINED，私有恢复状态继续存活；后续成功重试才可结束请求。锁存故障要求冷态恢复，不会自动重启输出。"
+
+msgid "Public stop closes further admission and attempts source drain. Its success does not release pads, clocks or private storage. Platform close additionally joins both vectors, closes the subordinate hardware state, restores the original logical priorities, and only then restores comparator, pins and clocks. A failed close preserves every unfinished outer lease for the same owner to retry. Stopped identities must not be treated as revoked pointers."
+msgstr "公共 stop 关闭后续准入并尝试源排空。成功不归还引脚、时钟或私有存储。Platform close 还要等待两个向量退出、关闭下属硬件状态、恢复原逻辑优先级，最后才恢复比较器、引脚和时钟。close 失败时，同一 owner 必须保留每个未完成的外层租约并继续重试。不得把已停止身份当作已撤销的指针。"
+
+msgid "Sources and software evidence"
+msgstr "来源与软件证据"
+
+msgid "The authoritative public contracts are [the coupled request API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/pwm_adc.h) and [the core request lifecycle](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/core/include/nexus/core/request.h). [The private provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/pwm_adc.c) reuses the selected official ADC/DMAMUX primitives and subordinate cold helpers; it does not replace the existing TIM6 stream's timer pointer or expose two hardware owners."
+msgstr "公共权威合同为[联合请求 API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/pwm_adc.h)和[核心请求生命周期](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/core/include/nexus/core/request.h)。[私有 provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/pwm_adc.c)复用选定的官方 ADC/DMAMUX 原语与下属冷态辅助函数，不会替换既有 TIM6 流的定时器指针，也不会暴露两个硬件 owner。"
+
+msgid "The reviewed hardware references are RM0440 Rev9, DS12288 Rev6 and ES0430 Rev9. The original official driver identities, paired CMSIS and licenses remain in [the exact source lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json). ADC priming, limited DMA and specific flag acknowledgement address the selected errata conditions; they are not a claim that every silicon limitation or physical circuit has been qualified."
+msgstr "已审阅的硬件来源为 RM0440 Rev9、DS12288 Rev6 和 ES0430 Rev9。官方驱动的原始身份、配对 CMSIS 与许可证保留在[精确源码锁](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json)中。ADC 预转换、有限 DMA 和特定标志应答处理了选定的勘误条件，不表示每一项芯片限制或物理电路均已通过验收。"
+
+msgid "[The external register/event tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_pwm_adc_test.cpp) exercise real provider code, rejected aliases, priming, late DMA completion, conservative deadlines, independent refused withdrawal, final fault snapshots and late IRQ reuse. [The generated-factory tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_pwm_adc_factory_test.cpp) execute the normal TOML bundle, cold clock/pin/comparator construction, two-prime acquisition and retained cleanup/priority restoration. GoogleMock observes external effects; it does not replace provider methods."
+msgstr "[外部寄存器/事件测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_pwm_adc_test.cpp)执行真实 provider 代码，覆盖别名拒绝、预转换、DMA 迟完成、保守 deadline、独立撤离拒写、最终故障快照和迟到 IRQ 后的存储复用。[生成 factory 测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_pwm_adc_factory_test.cpp)执行正常 TOML bundle、冷态时钟/引脚/比较器构造、两次预转换采样，以及清理失败保留和优先级恢复。GoogleMock 观察外部效果，不替换 provider 方法。"
+
+msgid "These actual host executions establish their recorded software scope. The normal `fixture-io-evolution-g474-pwm-adc` ARM selection also links with its resource budget and retention checks: one selected face, one concrete table and five methods. That software link does not establish a clean release candidate, reproducibility or physical HIL; each requires its own exact artifact and source evidence. No inspected PCB, analog accuracy, waveform measurement, interrupt latency or continuous/simultaneous/injected acquisition is established by this finite software reference."
+msgstr "这些实际主机执行只建立记录的软件范围。正常 `fixture-io-evolution-g474-pwm-adc` ARM 装配也已链接并通过资源预算和保留检查：一个选定接口、一个具体方法表和五个方法。该软件链接不建立 clean 发布候选、可复现性或物理 HIL 资格；各项均需要绑定精确产物和源码的独立证据。本有限软件参考不建立已检查 PCB、模拟精度、波形测量、中断延迟或连续/同时/注入组采样资格。"

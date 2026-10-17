@@ -392,10 +392,44 @@ class NoOptions:
     """Flash and watchdog have no authored construction options."""
 
 
+@dataclass(frozen=True)
+class PwmAdcOptions:
+    tick_hz: int
+    period_ticks: int
+    trigger_ticks: int
+    deadtime_ticks: int
+    channels: tuple[int, ...]
+    sample_times: tuple[int, ...]
+    reference_mv: int
+    exclusive: bool
+    irq: IrqOptions
+
+
+@dataclass(frozen=True)
+class CanFdFilterOptions:
+    id: int
+    mask: int
+    format: str
+    fifo: int
+
+
+@dataclass(frozen=True)
+class CanFdOptions:
+    bitrate: int
+    data_bitrate: int
+    event_capacity: int
+    filters: tuple[CanFdFilterOptions, ...]
+    drain_timeout_us: int
+    poll_limit: int
+    exclusive: bool
+    message_ram_words: int
+    irq: IrqOptions
+
+
 ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | TimerCaptureOptions |
-                     AdvancedPwmOptions | NoOptions)
+                     AdvancedPwmOptions | PwmAdcOptions | CanFdOptions | NoOptions)
 
 
 def mode_options(values):
@@ -404,6 +438,18 @@ def mode_options(values):
     irq = (IrqOptions(values["irq_priority"], values.get("calls_os", False),
                       values.get("irq_probe", False))
            if "irq_priority" in values else None)
+    if kind == "pwm_adc":
+        return PwmAdcOptions(*(values[key] for key in (
+            "tick_hz", "period_ticks", "trigger_ticks", "deadtime_ticks")),
+            tuple(values["channels"]), tuple(values["sample_times"]),
+            values["reference_mv"], values["exclusive"], irq)
+    if kind == "can_fd":
+        return CanFdOptions(values["bitrate"], values["data_bitrate"],
+                            values["event_capacity"],
+                            tuple(CanFdFilterOptions(**value) for value in values["filters"]),
+                            *(values[key] for key in (
+                                "drain_timeout_us", "poll_limit", "exclusive",
+                                "message_ram_words")), irq)
     if kind == "can":
         return CanOptions(values["operation"], values["event_capacity"],
                           values["bitrate"], CanTimingOptions(**values["timing"]),
@@ -580,6 +626,34 @@ class FactoryOptions:
 
 
 @dataclass(frozen=True)
+class ClockDomainIR:
+    """A reviewed source envelope, separate from board measurement."""
+    source: str
+    nominal_hz: int
+    minimum_hz: int
+    maximum_hz: int
+
+
+@dataclass(frozen=True)
+class ClockPlanIR:
+    """Selected-only cold clock facts; no public runtime clock manager."""
+    profile: str
+    input: ClockDomainIR
+    domains: Mapping
+    reviewed_revision_ids: tuple[int, ...]
+    provenance: str
+    physical_qualified: bool
+
+    @classmethod
+    def from_validated(cls, record):
+        return cls(record["profile"], ClockDomainIR(**record["input"]),
+                   MappingProxyType({name: ClockDomainIR(**value)
+                                     for name, value in record["domains"].items()}),
+                   tuple(record["reviewed_revision_ids"]),
+                   record["provenance"], record["physical_qualified"])
+
+
+@dataclass(frozen=True)
 class ConfigurationIR(Record):
     board: str
     soc_family: str
@@ -595,6 +669,7 @@ class ConfigurationIR(Record):
     resource_plan: ResourcePlanIR
     trigger_plan: TriggerPlanIR
     dma_topology: DmaTopologyIR
+    clock_plan: ClockPlanIR | None
     values: Mapping
 
     @classmethod
@@ -630,6 +705,8 @@ class ConfigurationIR(Record):
                    ResourcePlanIR.from_validated(result["resource_plan"]),
                    TriggerPlanIR.from_validated(result["trigger_plan"]),
                    DmaTopologyIR.from_validated(result["dma_topology"]),
+                   (ClockPlanIR.from_validated(result["clock_plan"])
+                    if result.get("clock_plan") is not None else None),
                    MappingProxyType(values))
 
     def to_dict(self):

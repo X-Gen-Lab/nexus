@@ -212,6 +212,26 @@ the reverse provider-owned drain contract. This is metadata, not a new emitter.
 """
     nodes, edges, startup = [], [], []
     for item in selected:
+        if item["kind"] == "pwm_adc":
+            owner = item["id"]
+            trigger, adc, dma = (owner + suffix for suffix in
+                                 (":trigger", ":adc", ":dma"))
+            for name, clock, events, actions in (
+                    (trigger, "controller:TIM1", ["oc4ref-rising"], ["stop"]),
+                    (adc, "controller:ADC1", ["sample-ready"], ["sample", "stop"]),
+                    (dma, "engine:DMA1", ["block-ready"], ["transfer", "stop"])):
+                nodes.append({"id": name, "owner": owner, "clock_domain": clock,
+                              "events": events, "actions": actions,
+                              "stop_actions": ["stop"]})
+            edges += [
+                {"source": trigger, "event": "oc4ref-rising", "target": adc,
+                 "action": "sample", "route": "TIM1:TRGO2:OC4REF:ADC1",
+                 "cross_domain": True},
+                {"source": adc, "event": "sample-ready", "target": dma,
+                 "action": "transfer", "route": item["dma"][0],
+                 "cross_domain": True}]
+            startup += [(dma, adc), (adc, trigger)]
+            continue
         if item["kind"] != "adc" or item["mode"] not in {
                 "trigger-dma", "trigger-dma-continuous"}:
             continue

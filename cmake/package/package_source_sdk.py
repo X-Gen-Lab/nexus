@@ -229,26 +229,26 @@ REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
     "silicon", "status", "time"))
 REQUIRED_FILES += ("core/src/silicon.c", "soc/common/stm32_identity.h")
 REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
-    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "cycle_probe",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd", "cycle_probe",
     "dma", "encoder",
     "ethernet",
     "exti", "flash", "gpio", "i2c", "i2c_bus_clear", "mdio", "native/model",
-    "i2c_long", "observation", "pwm_group", "spi_transaction",
+    "i2c_long", "observation", "pwm_adc", "pwm_group", "spi_transaction",
     "spi_dma_transaction", "spi_dma_owner_binding", "uart_format", "uart_word",
     "native/spi_dma_model", "spi", "stream", "stream_budget", "stream_profile", "timer",
     "timer_capture", "uart", "uart_rs485", "usb_device", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/src/" + name + ".c" for name in (
-    "adc", "adc_format", "adc_observer", "advanced_pwm", "can",
+    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd",
     "can_controller", "cycle_probe", "dma", "encoder",
     "eth_mac", "ethernet", "exti", "flash", "flash_region", "gpio", "i2c",
-    "i2c_bus_clear", "i2c_long", "mdio", "observation", "pwm_group", "spi",
+    "i2c_bus_clear", "i2c_long", "mdio", "observation", "pwm_adc", "pwm_group", "spi",
     "spi_transaction", "spi_dma_transaction", "spi_dma_sequence",
     "spi_dma_owner_binding", "uart_word", "stream", "stream_budget",
     "stream_profile", "timer",
     "timer_capture", "uart", "uart_rs485", "usb_device",
     "usb_device_controller", "wake", "watchdog"))
 REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
-    "advanced_pwm_impl", "can_controller", "eth_mac",
+    "advanced_pwm_impl", "can_controller", "can_fd_impl", "eth_mac",
     "spi_dma_sequence", "spi_dma_sequence_owner",
     "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
 REQUIRED_FILES += tuple("io/native/" + name + ".c" for name in (
@@ -276,7 +276,7 @@ for _family in ("stm32f407", "gd32f470"):
 REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
     "resource_graph", "trigger_graph", "dma_topology", "io_traits", "i2c_timing",
     "enhanced_endpoints", "uart_formats", "i2c_timing_selection",
-    "stream_profiles"))
+    "stream_profiles", "coupled_io"))
 REQUIRED_FILES += (
     "soc/stm32g474/drivers/pwm_group.c",
     "soc/stm32g474/drivers/timer_capture.c",

@@ -39,6 +39,7 @@ jobs:
         run: |
           "$RUNNER_TEMP/nexus-docs-tools/venv/bin/python" \
             tools/dev/dev.py docs test \
+            --tool-prefix "$RUNNER_TEMP/nexus-docs-tools" \
             --report build/documentation-tests.json
 
       - name: Build fresh API and bilingual documentation

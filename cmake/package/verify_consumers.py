@@ -193,10 +193,24 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     return source, build, arguments
 
 
+def positive_parallel(value):
+    """Require a canonical positive job count, without a policy maximum."""
+    try:
+        count = int(value)
+    except (TypeError, ValueError) as error:
+        raise argparse.ArgumentTypeError(
+            "parallel must be a positive integer") from error
+    if count < 1 or str(count) != value:
+        raise argparse.ArgumentTypeError("parallel must be a positive integer")
+    return count
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prefix", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--parallel", type=positive_parallel,
+                        help="Build jobs per consumer (default: 4 base, 2 modern)")
     args = parser.parse_args(argv)
     prefix, output = args.prefix.absolute(), args.output.absolute()
     records = []
@@ -236,7 +250,8 @@ def main(argv=None):
             source, build, command = prepare_consumer(prefix, output, name,
                 run_checked, arm=arm, chip=chip, expected_revision=identity["source_revision"])
             run_checked(command)
-            run_checked(["cmake", "--build", str(build), "--parallel", "4",
+            run_checked(["cmake", "--build", str(build), "--parallel",
+                         str(args.parallel) if args.parallel is not None else "4",
                          "--target", "installed_c", "installed_cpp"])
             commands = json.loads((build / "compile_commands.json").read_text())
             for entry in commands:
@@ -259,7 +274,8 @@ def main(argv=None):
                     prefix, output, family, backend, run_checked,
                     expected_revision=identity["source_revision"])
                 run_checked(command)
-                run_checked(["cmake", "--build", str(build), "--parallel", "2",
+                run_checked(["cmake", "--build", str(build), "--parallel",
+                             str(args.parallel) if args.parallel is not None else "2",
                              "--target", "installed_modern"])
                 commands = json.loads((build / "compile_commands.json").read_text())
                 products = [entry for entry in commands

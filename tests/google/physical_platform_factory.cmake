@@ -5,7 +5,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${physical_factory_codegen})
 set(physical_kinds gpio uart spi i2c flash watchdog exti pwm adc can usb_device
     eth timer_capture advanced_pwm pwm_group encoder spi_device i2c_device
-    usb_endpoint mdio)
+    usb_endpoint mdio pwm_adc can_fd)
 foreach(physical_family stm32 gd32)
     set(physical_official)
     if(physical_family STREQUAL "stm32")

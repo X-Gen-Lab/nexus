@@ -6,9 +6,10 @@ add_library(nexus_io STATIC
     src/watchdog.c src/exti.c src/timer.c src/adc.c src/adc_format.c
     src/flash_region.c
     src/dma.c src/stream.c src/wake.c src/i2c_bus_clear.c src/adc_observer.c
-    src/uart_rs485.c src/stream_budget.c src/can.c src/ethernet.c src/mdio.c
+    src/uart_rs485.c src/stream_budget.c src/can.c src/can_fd.c
+    src/ethernet.c src/mdio.c
     src/usb_device.c src/timer_capture.c src/advanced_pwm.c src/observation.c
-    src/pwm_group.c src/stream_profile.c src/encoder.c)
+    src/pwm_group.c src/pwm_adc.c src/stream_profile.c src/encoder.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(nexus_io PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private")
 target_link_libraries(nexus_io PUBLIC nexus_core PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)

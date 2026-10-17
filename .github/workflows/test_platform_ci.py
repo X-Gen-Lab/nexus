@@ -114,6 +114,21 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('shutil.copytree(source, staging)', commands)
         self.assertIn('delivery.verify', commands)
         self.assertNotIn('sudo apt-get', commands)
+
+    def test_docs_tests_reuse_the_prepared_nondefault_tool_prefix(self):
+        steps = workflow('docs-build.yml')['jobs']['build']['steps']
+        prepared = next(step['run'] for step in steps
+                        if 'tools/documentation/install.py' in step.get('run', ''))
+        execute = next(step['run'] for step in steps
+                       if 'tools/dev/dev.py docs test' in step.get('run', ''))
+        prepared_arguments = shlex.split(prepared.replace('\\\n', ' '))
+        test_arguments = shlex.split(execute.replace('\\\n', ' '))
+        prefix = prepared_arguments[prepared_arguments.index('--prefix') + 1]
+        self.assertEqual(prefix, '$RUNNER_TEMP/nexus-docs-tools')
+        self.assertEqual(test_arguments[0], prefix + '/venv/bin/python')
+        self.assertIn('--tool-prefix', test_arguments)
+        self.assertEqual(test_arguments[test_arguments.index('--tool-prefix') + 1],
+                         prefix)
         self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
 
     def test_docs_preview_only_uploads_successful_bound_outputs(self):

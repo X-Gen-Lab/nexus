@@ -16,7 +16,8 @@ CPU_FEATURES = MappingProxyType({
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32g474"
 CONTROLLER_INTERFACES = MappingProxyType({
-    "TIM3": MappingProxyType({"encoder": ("quadrature",)})})
+    "TIM3": MappingProxyType({"encoder": ("quadrature",)}),
+    "TIM1": MappingProxyType({"pwm_adc": ("finite-regular-dma",)})})
 MODEL = False
 FACT_REFERENCES = descriptor.maintained("stm32g474").references
 CAN_CONTROLLERS = ()
@@ -42,6 +43,9 @@ _MODES = MappingProxyType({
     ("spi", "short-poll"): "spi",
     ("pwm", "fixed-pwm"): "pwm",
     ("pwm_group", "coherent-pwm"): "pwm_group",
+    ("pwm_adc", "finite-regular-dma"): "pwm_adc",
+    ("can_fd", "iso-fd-loopback"): "fdcan",
+    ("can_fd", "iso-fd-normal"): "fdcan",
     ("timer_capture", "edge-capture"): "timer_capture",
     ("encoder", "quadrature"): "encoder",
     ("adc", "single-shot"): "adc",
@@ -61,7 +65,13 @@ def validate_selection(selection, route):
     """Accept only the actual fixed provider and reviewed route, not SKU potential."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
-    if kind == "uart":
+    if kind in {"pwm_adc", "can_fd"}:
+        try:
+            from ... import coupled_io
+        except ImportError:
+            import coupled_io
+        coupled_io.validate_selection(selection, route, PREFIX)
+    elif kind == "uart":
         reviewed = {
             "LPUART1": (("PA2", "tx", 12), ("PA3", "rx", 12)),
             "USART1": (("PA9", "tx", 7), ("PA10", "rx", 7)),
@@ -206,8 +216,9 @@ def validate_selection(selection, route):
 
 
 def validate_dma(route, mode, normalize):
-    expected = (("DMA1:stream1:channel5",) if route["controller"] == "ADC1" and
-                mode == "trigger-dma" else None)
+    expected = (("DMA1:stream1:channel5",) if (
+        route["controller"] == "ADC1" and mode == "trigger-dma" or
+        route["controller"] == "TIM1" and mode == "finite-regular-dma") else None)
     common.validate_dma(route, mode, expected, "stm32g474", normalize,
                         trigger="TIM6")
 

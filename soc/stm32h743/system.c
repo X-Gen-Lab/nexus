@@ -10,6 +10,9 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "stm32h743_system.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #if defined(NEXUS_MEMORY_SRAM1) && NEXUS_MEMORY_SRAM1 == 1
 #include "memory_init.h"
 #endif
@@ -151,28 +154,14 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         return NX_ERROR_BUSY;
     return NX_SUCCESS;
 }
-nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
-                                                      uint32_t core_hz,
-                                                      uint32_t cache_mask,
-                                                      uint32_t limit) {
+/** \brief Reuse one timer program with a distinct, already-proven input. */
+static nx_stm32h743_start_result_t
+system_start_owned(nx_stm32h743_system_t* s, uint32_t core_hz,
+                   uint32_t timer_hz, uint32_t cache_mask, uint32_t limit) {
     nx_stm32h743_start_result_t r = {NX_SUCCESS, NX_SUCCESS, 0U};
-    if (limit == 0U || (core_hz != 64000000U && core_hz != 32000000U) ||
-        (cache_mask != 0U &&
-         cache_mask != (NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION))) {
-        r.primary = NX_ERROR_INVALID;
-        return r;
-    }
-#ifndef NX_H743_MODEL
-    if (core_hz != NEXUS_CORE_HZ || cache_mask != NEXUS_SOC_CACHE_MASK) {
-        r.primary = NX_ERROR_INVALID;
-        return r;
-    }
-#endif
-    r.primary = nx_stm32h743_system_preflight(s);
-    if (r.primary != NX_SUCCESS)
-        return r;
+    (void)cache_mask;
     s->timer_error = NX_SUCCESS;
-    s->core_hz = 64000000U;
+    s->core_hz = core_hz == 32000000U ? 64000000U : core_hz;
     s->reset_cause = NX_H743_READ(&s->rcc->RSR);
     /* An off peripheral gate can hide retained controls. Only the reversible
      * gate is ours until a second observation proves the timer is unowned. */
@@ -229,7 +218,7 @@ nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
                        NX_H743_READ(&s->rcc->APB1LRSTR) &
                            ~(uint32_t)RCC_APB1LRSTR_TIM2RST,
                        RCC_APB1LRSTR_TIM2RST) ||
-        !write_checked(&s->timer->PSC, core_hz / 1000000U - 1U, UINT32_MAX) ||
+        !write_checked(&s->timer->PSC, timer_hz / 1000000U - 1U, UINT32_MAX) ||
         !write_checked(&s->timer->ARR, UINT32_MAX, UINT32_MAX) ||
         !write_checked(&s->timer->SR, 0U, UINT32_MAX)) {
         r.primary = NX_ERROR_IO;
@@ -277,6 +266,71 @@ rollback:
     r.remaining_effects = s->remaining_effects;
     return r;
 }
+nx_stm32h743_start_result_t nx_stm32h743_system_start(nx_stm32h743_system_t* s,
+                                                      uint32_t core_hz,
+                                                      uint32_t cache_mask,
+                                                      uint32_t limit) {
+    nx_stm32h743_start_result_t r = {NX_SUCCESS, NX_SUCCESS, 0U};
+    if (limit == 0U || (core_hz != 64000000U && core_hz != 32000000U) ||
+        (cache_mask != 0U &&
+         cache_mask != (NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION))) {
+        r.primary = NX_ERROR_INVALID;
+        return r;
+    }
+#ifndef NX_H743_MODEL
+    if (core_hz != NEXUS_CORE_HZ || cache_mask != NEXUS_SOC_CACHE_MASK) {
+        r.primary = NX_ERROR_INVALID;
+        return r;
+    }
+#endif
+    r.primary = nx_stm32h743_system_preflight(s);
+    if (r.primary != NX_SUCCESS)
+        return r;
+    return system_start_owned(s, core_hz, core_hz, cache_mask, limit);
+}
+#if NEXUS_CORE_HZ == 384000000U
+nx_stm32h743_start_result_t
+nx_stm32h743_pll384_system_start(nx_stm32h743_pll384_state_t* state,
+                                 uint32_t cache_mask, uint32_t limit) {
+    nx_stm32h743_start_result_t result = {NX_SUCCESS, NX_SUCCESS, 0U};
+    if (!task_context()) {
+        result.primary = NX_ERROR_CONTEXT;
+        return result;
+    }
+    if (state == NULL || limit == 0U) {
+        result.primary = NX_ERROR_INVALID;
+        return result;
+    }
+    if (cache_mask != 0U) {
+        result.primary = NX_ERROR_UNSUPPORTED;
+        return result;
+    }
+    nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    if (s->started || s->remaining_effects != 0U) {
+        result.primary = NX_ERROR_BUSY;
+        result.remaining_effects = s->remaining_effects;
+        return result;
+    }
+    if (!nx_stm32h743_pll384_owner_ready(state)) {
+        result.primary = NX_ERROR_STATE;
+        return result;
+    }
+#if NX_H743_CACHE_CONTROL_ENABLED
+    if (s->cache.owned_mask != 0U || s->cache.selector_pending) {
+        result.primary = NX_ERROR_BUSY;
+        return result;
+    }
+#endif
+    if ((NX_H743_READ(&s->rcc->APB1LENR) & RCC_APB1LENR_TIM2EN) != 0U ||
+        !timer_idle(s) || !NX_H743_IRQ_AVAILABLE(TIM2_IRQn)) {
+        result.primary = NX_ERROR_BUSY;
+        return result;
+    }
+    /* The joint clock owner remains live through every timer rollback.
+     * Only its separate stop may change the actual core frequency. */
+    return system_start_owned(s, 384000000U, 192000000U, 0U, limit);
+}
+#endif
 nx_result_t nx_stm32h743_system_stop(nx_stm32h743_system_t* s, uint32_t limit) {
     if (!task_context())
         return NX_ERROR_CONTEXT;
