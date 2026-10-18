@@ -198,6 +198,35 @@ class DirtyGitSourceObservationTests(unittest.TestCase):
             self.root, "status", "--porcelain", "--untracked-files=all"))
         self.assert_dirty_change_is_observed(before)
 
+    def test_initialized_submodule_rows_keep_markers_for_strict_portable_source(self):
+        origin = self.workspace / "locked-submodule-origin"
+        self.repository(origin)
+        (origin / "dependency.txt").write_bytes(b"locked dependency bytes\n")
+        self.commit(origin, "Commit locked dependency")
+        for name in ("deps/alpha", "deps/beta"):
+            self.git(self.root, "-c", "protocol.file.allow=always", "submodule",
+                     "add", "--quiet", str(origin), name)
+        self.commit(self.root, "Pin two initialized submodules")
+        command = ["git", "-C", str(self.root), "submodule", "status",
+                   "--recursive"]
+        raw = subprocess.run(command, capture_output=True, check=False,
+                             env={key: value for key, value in os.environ.items()
+                                  if not key.startswith("GIT_")})
+        self.assertEqual(raw.returncode, 0, raw.stderr)
+        expected = raw.stdout.decode().rstrip("\r\n").splitlines()
+        self.assertEqual(len(expected), 2)
+        self.assertTrue(all(row.startswith(" ") for row in expected))
+        observed = self.observe("two_initialized_locked_submodules")
+        self.assertFalse(observed["dirty"])
+        with self.subTest(contract="first_locked_marker_preserved"):
+            self.assertTrue(observed["submodules"][0].startswith(" "))
+        with self.subTest(contract="all_raw_recursive_rows_preserved"):
+            self.assertEqual(observed["submodules"], expected)
+        with self.subTest(contract="strict_portable_clean_source_admitted"):
+            from tools.evidence.u575_pair import _source
+            _source(observed)
+            self.verify(observed, clean=True)
+
     def test_normal_clean_commit_change_is_already_stale(self):
         before = self.observe("clean_before_commit")
         (self.root / "source.txt").write_bytes(b"next committed source\n")

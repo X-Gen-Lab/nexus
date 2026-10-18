@@ -116,7 +116,7 @@ def observe_git_source(root: Path) -> dict:
     """
     root = root.resolve()
     def git(*args):
-        return _git_output(root, *args).decode().strip()
+        return _git_output(root, *args).decode().rstrip("\r\n")
     commit = git("rev-parse", "HEAD")
     tree = git("rev-parse", "HEAD^{tree}")
     status = git("status", "--porcelain", "--untracked-files=all")
