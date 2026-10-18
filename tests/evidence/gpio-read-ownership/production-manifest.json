@@ -1,0 +1,10 @@
+{
+  "soc/stm32f407/drivers/gpio.c": {
+    "bytes": 8430,
+    "sha256": "de908497fed6d9c6023be8f3c75f9e17846e25c175b510eef054bf2b01eb474c"
+  },
+  "soc/gd32f470/drivers/gpio.c": {
+    "bytes": 7615,
+    "sha256": "4563397605d46c76b30e1da1e3019d3ed3c56c3d29db3e027697ff3a47213991"
+  }
+}

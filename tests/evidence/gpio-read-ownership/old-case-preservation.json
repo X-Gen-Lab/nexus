@@ -1,0 +1,12 @@
+{
+  "tests/google/stm32_official_test.cpp": {
+    "old_cases": 6,
+    "new_cases": 5,
+    "old_case_bodies_byte_identical": true
+  },
+  "tests/google/gd32_multi_test.cpp": {
+    "old_cases": 5,
+    "new_cases": 4,
+    "old_case_bodies_byte_identical": true
+  }
+}

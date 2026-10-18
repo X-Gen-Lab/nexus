@@ -1,0 +1,455 @@
+{
+  "schema": 1,
+  "kind": "independent final GPIO ownership code and TDD evidence review",
+  "reviewer": "/root/io24_checker_review_r2",
+  "reviewed_utc": "2026-10-18T05:42:46.658974+00:00",
+  "decision": {
+    "result": "PASS_EXACT_FOUR_SOURCE_FIX_AND_FOCUSED_EVIDENCE",
+    "blockers": [],
+    "meaning": "The exact two-provider read admission correction and preserved complete tests are suitable for Root integration and normal full gates. Focused native execution is not a clean candidate, ARM/SDK or physical qualification.",
+    "main_integration": "not performed by reviewer",
+    "ordinary_full_gate": "pending Root for integrated bytes",
+    "IO31_status": "pending/not_qualified/not_executed remains unchanged"
+  },
+  "bindings": {
+    "feature": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1",
+    "own_root": "/tmp/nexus-io36-native-20261018",
+    "base_commit": "a07bc6eecd8ef0d85a6882249c7a481a4f69dc28",
+    "base_tree": "663571602feb3fff66aaafcb89cdbcef42c7508a",
+    "freeze": {
+      "bytes": 21202,
+      "sha256": "0b8e56852040f1ecaaa91e10a2be797bf517e2064770c4ead9752cd76fb10fcf"
+    },
+    "author_transport": {
+      "bytes": 18153,
+      "sha256": "8d331334b7e7c71ccd9f31827ba26147a0103bfb2eb003aa44b2fbd2b94e561a"
+    },
+    "Root_normalized_transport": {
+      "bytes": 19530,
+      "sha256": "5032f4991b0271e70970323e0fc8d41cfde7cefa57dce63ced27f79485a8fe97"
+    },
+    "original_plan": {
+      "path": "validation/io31-next-slice-readonly-r1.json",
+      "bytes": 24148,
+      "sha256": "990d1ceecadaec9e69df83daa14fe8a9b29726f05291c33a0886b4c23575fe91"
+    },
+    "TG_addendum": {
+      "path": "validation/io31-gd470-gpio-tg-extent-addendum-r1.json",
+      "bytes": 7203,
+      "sha256": "e783cced3396ba8d3fd12f31c4d9ae85975e163044b168ac556a98a78fcd28b4"
+    },
+    "exact_final_sources": {
+      "soc/stm32f407/drivers/gpio.c": {
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production/soc/stm32f407/drivers/gpio.c",
+        "bytes": 8430,
+        "sha256": "de908497fed6d9c6023be8f3c75f9e17846e25c175b510eef054bf2b01eb474c"
+      },
+      "soc/gd32f470/drivers/gpio.c": {
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production/soc/gd32f470/drivers/gpio.c",
+        "bytes": 7615,
+        "sha256": "4563397605d46c76b30e1da1e3019d3ed3c56c3d29db3e027697ff3a47213991"
+      },
+      "tests/google/stm32_official_test.cpp": {
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only/tests/google/stm32_official_test.cpp",
+        "bytes": 10099,
+        "sha256": "15d53e9c4b3320bf4129385d2ca0d594ced36cc5455d9f970ada90f1fd20ff4f"
+      },
+      "tests/google/gd32_multi_test.cpp": {
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only/tests/google/gd32_multi_test.cpp",
+        "bytes": 17961,
+        "sha256": "69aa40bd5d015edb253849c1abcd71bddc0b966c88715dbe1034a61b0d9e285a"
+      }
+    }
+  },
+  "code_review": [
+    {
+      "topic": "Minimal production scope",
+      "finding": "Independent complete-file comparison after replacing only final nx_stm32_gpio_read/nx_gd32_gpio_read with their old bodies reproduces each baseline C file byte-for-byte. No include, other function, API/ops/state/header/layout/init/stop/policy change."
+    },
+    {
+      "topic": "Admission",
+      "finding": "STM retains initialized precondition; GD retains nonzero-mask precondition. New NULL/zero bank guards reject before input MMIO. Null context/output reject. Valid context storage is still required; no new task/IRQ-context or lifecycle restriction."
+    },
+    {
+      "topic": "Full spans",
+      "finding": "Check uint32 output alignment and output/state/bank uintptr end overflow before overlap additions. Half-open interval checks protect every byte of this state including padding and the complete selected register span. The checks have constant structure, no loop or lookup."
+    },
+    {
+      "topic": "STM register extent",
+      "finding": "sizeof actual locked F407 GPIO_TypeDef covers MODER0x00 through AFR[2]0x20/0x24 (40B), including IDR/ODR/BSRR/LCKR. It is not an IDR-only guard."
+    },
+    {
+      "topic": "GD corrected extent",
+      "finding": "0x30 exclusive bank size protects BC0x28 and TG0x2c as defined by exact locked GD32F4xx header. All12 aligned words are exercised, so BC and TG are distinct negative probes. This corrects the immutable original plan rather than editing its history; no TG production access or physical toggle claim added."
+    },
+    {
+      "topic": "Ordering",
+      "finding": "All alias/alignment/overflow guards precede the only LL_GPIO_ReadInputPort/GPIO_ISTAT and output assignment in C source. No rejection write occurs. Byte snapshots prove unchanged RAM-modeled output/state/registers; no MMIO-read tracing or ARM bus proof is claimed."
+    },
+    {
+      "topic": "Allowed boundaries",
+      "finding": "An aligned caller-writable value outside this state/bank still receives the masked snapshot. Strict half-open comparisons allow exact state-end adjacency, explicitly tested. Two instances retain distinct banks/masks; stopping one preserves its sentinel and leaves the other usable. No peer-owner registry or global address scan."
+    },
+    {
+      "topic": "Pointer/concurrency limits",
+      "finding": "Fixed live face/context, accessible valid provider state/bank, ordinary accessible caller-writable output and existing serialized lifetime rules remain preconditions. Context fields are read before range arithmetic. No arbitrary inaccessible/forged pointer validation, all-global/other-peer memory protection, concurrent-stop synchronization or cross-port simultaneity claim."
+    },
+    {
+      "topic": "Cost",
+      "finding": "No new persistent state, object field, heap, worker, lock or registry. Only stack-local uintptr values/fixed comparisons added. ARM generated instructions/stack, Flash cost, cycles and WCET were not measured; zero persistent growth is not zero execution cost."
+    }
+  ],
+  "tests_review": {
+    "old_cases_preserved": "Independently extracted complete balanced TEST_F bodies: all6 original STM and5 original GD bodies are byte-identical to baseline. Public header/dispatch/private state headers also unchanged. Four source diff has only two admission blocks and new test includes/cases.",
+    "authored_counts": {
+      "STM": {
+        "old": 6,
+        "new": 6,
+        "whole": 12
+      },
+      "GD": {
+        "old": 5,
+        "new": 6,
+        "whole": 11
+      }
+    },
+    "same_tests": "Final STM15d53e9c and GD69aa40bd test SHA appear unchanged in RED before-production and GREEN source guards. No assertion was weakened or filtered.",
+    "negative_oracles": "Every aligned own-state word (including host padding/pointer halves) and every owned bank word is tested via actual public read plus byte snapshots. Misalignment probes offsets1..alignof(uint32)-1. Wrapping pointer and zero/unbound bank cases run in EXPECT_EXIT children so actual baseline SIGSEGV becomes a genuine test failure with whole JUnit, not missing XML.",
+    "positive_oracles": "Exact adjacent output, ordinary independent output, masked snapshots, null output, stopped sentinel and still-live second instance. This positive case in each program already passes before fix: do not claim all12 added tests failed. RED is23total/10fail (five per family), GREEN23/0.",
+    "cleanup": "Real initialize/public read/stop paths used. Snapshot restores follow failed-effect assertions only to isolate negative probes; this synchronous read has no asynchronous loan to hide. Child state changes are separate; parent actually stops its valid original object. _Exit is not described as provider cleanup.",
+    "model_limit": "Mapped GD byte changes establish unintended command-register stores, not measured electrical pin toggles. Deliberately invalid pointer representations are this GNU/Linux admission boundary, not a universal C++ address-safety theorem.",
+    "actual_whole_runs": [
+      {
+        "phase": "green-gd-runtime",
+        "whole_cases": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "actual_exit": 0,
+        "XML": {
+          "bytes": 3239,
+          "sha256": "99f7aee2b4bd4583f0c9094daa86a984db76b946445f64ddb0b96a160a7eeb60"
+        },
+        "failed_cases": [],
+        "same_final_test_hashes": true
+      },
+      {
+        "phase": "green-stm-runtime",
+        "whole_cases": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "actual_exit": 0,
+        "XML": {
+          "bytes": 3506,
+          "sha256": "f7294e26744ba7f88bc168d12f3ad3c8177ef8abe5b8703f7422fbdd64548f6a"
+        },
+        "failed_cases": [],
+        "same_final_test_hashes": true
+      },
+      {
+        "phase": "red-gd-runtime",
+        "whole_cases": 11,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "actual_exit": 1,
+        "XML": {
+          "bytes": 35705,
+          "sha256": "ede61a0e9eb52d58ba577db761e91db59ed99d8949521293657a3e690117c20b"
+        },
+        "failed_cases": [
+          "GpioReadRejectsEveryOwnStateWordWithoutEffects",
+          "GpioReadRejectsEveryOwnedBankRegisterWithoutEffects",
+          "GpioReadRejectsUnalignedOutputsWithoutEffects",
+          "GpioReadRejectsWrappingOutputInAnIsolatedChild",
+          "GpioReadRejectsUnboundRegistersInAnIsolatedChild"
+        ],
+        "same_final_test_hashes": true
+      },
+      {
+        "phase": "red-stm-runtime",
+        "whole_cases": 12,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "actual_exit": 1,
+        "XML": {
+          "bytes": 33547,
+          "sha256": "c058ba6e8b4ae558d539901416a980e7c29749a03a4f7b7d44bc3da1b76b84f9"
+        },
+        "failed_cases": [
+          "GpioReadRejectsEveryOwnStateWordWithoutEffects",
+          "GpioReadRejectsEveryOwnedBankRegisterWithoutEffects",
+          "GpioReadRejectsUnalignedOutputsWithoutEffects",
+          "GpioReadRejectsWrappingOutputInAnIsolatedChild",
+          "GpioReadRejectsUnboundRegistersInAnIsolatedChild"
+        ],
+        "same_final_test_hashes": true
+      }
+    ]
+  },
+  "evidence": {
+    "recorded_executions": [
+      {
+        "archive": "configure-red.zip",
+        "bytes": 3856,
+        "sha256": "f08b61559c3310450ff384839fcac48ab5a25767f84221246b00eb2774f7ecef",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "2c881d0eacf661772543df74e5d1378db550be3bdd765be2dc05cdb7a151dd1f",
+        "start_ns": 1792301545602631809,
+        "finish_ns": 1792301567529259734,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "green-build.zip",
+        "bytes": 3608,
+        "sha256": "d48e0af1efb2ec47429cd86b889b71fc6d5947d9757b74ee33d491a0634a7356",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "6121cb6410039db6cb053d7e3ad903a57dce06e5908c017291e46d61356c06bb",
+        "start_ns": 1792301644442289918,
+        "finish_ns": 1792301646568615308,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "green-gd-runtime.zip",
+        "bytes": 4649,
+        "sha256": "d9fb9436e94b2d2812bfa337e8aae21d0dcb8be6d6f45c6ec5cc6406305bd342",
+        "members": 7,
+        "actual_exit": 0,
+        "receipt_sha256": "d6f8565ae6ba73b0c3f8ac29f38e335101028816e9b82d140b1c39fdeb3038fd",
+        "start_ns": 1792301662778455531,
+        "finish_ns": 1792301662786270604,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "green-stm-runtime.zip",
+        "bytes": 4706,
+        "sha256": "1477f7b0890c57b0bb1b96a9f4897b5fe2936eb67cd6d6d4c0feaae28b34d4fa",
+        "members": 7,
+        "actual_exit": 0,
+        "receipt_sha256": "77fcbb86cb495cfc72d78555b4f9d1079ff232dc0444405a2765ece2b0613699",
+        "start_ns": 1792301662485024040,
+        "finish_ns": 1792301662488876483,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "red-build-plan.zip",
+        "bytes": 3203,
+        "sha256": "97701cebcdb8cd3238a387e49cb8d22d04527fb24a4ca7de8513a28bb976f8ff",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "bcd640d1e5457d670f30b7623c7398600e183a79cfd894f0c6897d7381073278",
+        "start_ns": 1792301575607192913,
+        "finish_ns": 1792301575639539474,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "red-build.zip",
+        "bytes": 3898,
+        "sha256": "0861b0312f239921ac4af773607533bc80c14a063d528a5cab96a1de072721aa",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "e300fe0ca717e55fc24a428b0369ed91137e807a8186154824c28072ca1742fc",
+        "start_ns": 1792301580888932999,
+        "finish_ns": 1792301587235857565,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "red-gd-discovery.zip",
+        "bytes": 3533,
+        "sha256": "f395cdffd14b49b5f8fcc6ffce45f14c381c3de3c84c26dea49887b6cb5192e9",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "d9af6f6aa375462cd62084e808d15b2fff6e1fc44f1ad77aa4fac7285bfee15d",
+        "start_ns": 1792301600587899296,
+        "finish_ns": 1792301600591753522,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "red-gd-runtime.zip",
+        "bytes": 7513,
+        "sha256": "601561b68233301d651a3d35e9d142d89fc4021e9e3fddc67cd37e76fad98261",
+        "members": 7,
+        "actual_exit": 1,
+        "receipt_sha256": "bceb7b73ef0612d57f0a8ec1e6872c658e47dd77c131017ca497b5a33579ef6c",
+        "start_ns": 1792301608339547548,
+        "finish_ns": 1792301608347384603,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "red-stm-discovery.zip",
+        "bytes": 3572,
+        "sha256": "f439df6326b5e6a0cf35ce862ed1446c6e98f4ca4c65618ba7122dbf6ef595c8",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "01a4b12504e48a46caa54e9aaa9123cffd908b73855922ede7b5d8cc73a215ff",
+        "start_ns": 1792301600294951638,
+        "finish_ns": 1792301600298711712,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "red-stm-runtime.zip",
+        "bytes": 7470,
+        "sha256": "6868ae2c2e3f3ab162f29bbccbf686d09d9972f71ce659905ff9c76919ed52a6",
+        "members": 7,
+        "actual_exit": 1,
+        "receipt_sha256": "501a0ca02fba335758adac2c2cd32b8459d03ec8d0566fb7908bddaf872a12fc",
+        "start_ns": 1792301607979093966,
+        "finish_ns": 1792301607986972093,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "whole-file-comments.zip",
+        "bytes": 4323,
+        "sha256": "1a0d61691c85c2330a171dab6eb1b44eee4ea4b6913a787263715d252d480c2a",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "a48e0a33c2daaf74f9eaf04b730d0879dcc9fd641a96c90ae4db2a7e5c6d506c",
+        "start_ns": 1792301671348003916,
+        "finish_ns": 1792301671462489787,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      },
+      {
+        "archive": "whole-file-format.zip",
+        "bytes": 3398,
+        "sha256": "23d41574cd5f77006df19a60c5adc0b203dd07ef38b8e542b7d65ca9e6c7ef97",
+        "members": 6,
+        "actual_exit": 0,
+        "receipt_sha256": "8e38cf29913ff4d531514601d9b5bc06a85796b5e25109788f4c6d64ecc3442d",
+        "start_ns": 1792301670839992358,
+        "finish_ns": 1792301671054695124,
+        "source_guard_equal": true,
+        "all_children_joined": true
+      }
+    ],
+    "raw_checks": "All12 archives and76 members CRC/read-SHA verified against their per-archive maps and final freeze. Each inner receipt equals outer command except receipt pointer; raw channel sizes/SHA checked. All outcomes completed with actual statuses and stable/complete child withdrawal.",
+    "whole_case_admission": "Both real discovery outputs and fresh XML full case names/order match authored23 cases. XML cases all run/completed, zero skip/disabled/error. RED each actual1/five failed cases; final actual0/none. Configure/build/discovery/style actual0, not fake RED.",
+    "source_guard": "For every execution, before/after four-source/HEAD/index objects equal. RED binds baseline production plus final tests, GREEN final four hashes. Bound guard helper asserts protected hashes before/after. Current own HEADa07/index160a60eb, four source bytes and seven protected inputs independently match freeze.",
+    "native_inputs": "actual-native-inputs.json ten translation-unit identities, compile command rows and registration were read/current-hash checked. This is observed source/compile-plan metadata, not complete immutable per-object history or clean candidate proof.",
+    "current_matching_host_executables": {
+      "nexus_stm32_official_test": {
+        "path": "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_stm32_official_test",
+        "bytes": 2422192,
+        "sha256": "0c2b3ee7daba52db5f1a1d0ec0bef3dbfcb3d9425a8c7c710f9a2d49b8bf97ee",
+        "format": "actual host ELF64 x86-64; remains TMP; not ARM proof"
+      },
+      "nexus_gd32_multi_test": {
+        "path": "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_gd32_multi_test",
+        "bytes": 2500984,
+        "sha256": "b7c9408957301042fbd0e83d6282d3e591f77d74e6fe8d514b755871ac3b37f2",
+        "format": "actual host ELF64 x86-64; remains TMP; not ARM proof"
+      }
+    },
+    "binary_limit": "Final host ELF64 x86_64 byte identities independently matched without execution. Binaries remain TMP, not persistent immutable firmware/ARM payloads; historical original-RED ELF retention is not upgraded by this review.",
+    "history_corrections": "Original plan GD0x2c extent preserved and corrected by TG addendum to0x30. Initial inventory regex missed wrapped TEST_F additions; original and corrected-r2 inventory both retained. No test weakening or setup failure was relabeled behavior RED."
+  },
+  "transport": {
+    "author": {
+      "rows": 51,
+      "source": 4,
+      "evidence": 47,
+      "logical_bytes": 1008385
+    },
+    "Root_normalized": {
+      "rows": 54,
+      "source": 4,
+      "evidence": 50,
+      "logical_bytes": 1057889
+    },
+    "mapping_checks": "Original51 rows retained identically; only author map, old feasibility plan and TG correction added as evidence. All54 durable leaves size/SHA and unique canonical relative targets verified; contained under recovery root, no symlink/escape or extra production paths.",
+    "index_backup": {
+      "compressed_bytes": 729216,
+      "compressed_SHA": "5df5a4db40d0ec219805cd970730ec33a7d7834c678c484308a09b6a34cc2c70",
+      "zlib_decodes_to": {
+        "bytes": 3509285,
+        "sha256": "160a60eb1d8bcb850d23671f7edeab1896328f7e82094895b192ad8ff024ca37"
+      },
+      "current_index_matches": true
+    },
+    "precise_archive_count": "Final actual packet has12 ZIPs including format/comments, not11. All76 members independently verified; descriptive count correction only.",
+    "historical_text": "Prior source/helper bytes retain historical raw target extensions; no hiding/moving/deleting evidence to fit resource budget."
+  },
+  "official_scope": {
+    "GD_locked_header": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+    "GD_header_identity": {
+      "bytes": 29164,
+      "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a"
+    },
+    "F407_header_identity": {
+      "bytes": 1193992,
+      "sha256": "ae1ab57d8ab750f64f04fd73476bc2760c761e18e45bde648e0bc350c9a1d9ac"
+    },
+    "finding": "Read actual F407 struct and GD definitions, addendum binds official GD source/lock/exact F470 facts. No fresh RM PDF read or new silicon/whole-family qualification."
+  },
+  "resource_scope": {
+    "author_cap": 1572864,
+    "feature_allocated_including_root": 1163264,
+    "feature_logical_bytes": 982433,
+    "compressed_original_index_included": true,
+    "min_recorded_TMP_free": 430092288,
+    "min_recorded_cgroup_headroom": 2031804416,
+    "recorded_OOM_zero": true,
+    "current_persistent_free_snapshot": 83648512,
+    "limit": "Per-command guards measure TMP/cgroup, not historical persistent-free. Current persistent free exceeds64MiB; complete retained packet including compressed index stays within authorized1.5MiB. No continuous resource peak or physical budget claim."
+  },
+  "unchanged_protected": {
+    "io/include/nexus/io/gpio.h": {
+      "bytes": 2676,
+      "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778"
+    },
+    "io/src/gpio.c": {
+      "bytes": 1483,
+      "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0"
+    },
+    "soc/stm32f407/private/stm32f407_provider.h": {
+      "bytes": 15177,
+      "sha256": "fcea417654af6f84abe63437a991decd627854b2b322a47f23d8fc4c76421dde"
+    },
+    "soc/gd32f470/private/gd32f470_provider.h": {
+      "bytes": 26667,
+      "sha256": "4c59d09d32f17a8dc5378c7f9e5e8c5aed081d7da9fdaeba1d57ca3f418caac8"
+    },
+    "tests/google/CMakeLists.txt": {
+      "bytes": 28115,
+      "sha256": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444"
+    },
+    "tests/google/stm32_official.cmake": {
+      "bytes": 2166,
+      "sha256": "711aebb90a7a24cb164efa631cbe87c4e423b795e5a12d5aaa17eef157e45517"
+    },
+    "docs/design/io-evolution-execution.csv": {
+      "bytes": 11038,
+      "sha256": "b62cafcae16b39221023b53d9fef248ea4d32d2b27a6a7658807a38d1ac8e098"
+    }
+  },
+  "remaining_qualification": [
+    "Root integrates exact source/evidence and executes ordinary complete unchanged-index hooks.",
+    "No new ARM object/link, installed SDK, physical pins or HIL evidence from this focused fix.",
+    "IO31 sleep/wake/Board and remaining exit conditions unchanged; ownership prerequisite does not close the work package."
+  ],
+  "review_actions": {
+    "performed": "Read frozen code/contracts/SDK definitions, compare legacy bodies and complete production functions, verify54 map/source/index identities,12 command/receipt archives and four fresh XMLs.",
+    "not_performed": "No C/C++ binary/test execution, compile/configure/format invocation, network/install, source/index edit, stage/commit/push or cleanup.",
+    "write": "Only this fresh global independent review outside feature1.5MiB budget.",
+    "preparation_note": "A first in-memory detailed report exceeded32KiB and was rejected before writing; compact report here, unrelated to production/test execution."
+  },
+  "reviewed_inputs_and_own_index_unchanged_after_review": true
+}

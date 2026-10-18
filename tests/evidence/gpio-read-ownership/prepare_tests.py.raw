@@ -1,0 +1,202 @@
+"""Prepare complete GPIO regression overlays without changing production."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+ROOT = Path('/tmp/nexus-io36-native-20261018')
+DEST = Path(__file__).resolve().parent
+FMT = '/workspace/nexus-build-system-20261012/.venv/bin/clang-format'
+
+
+def cases(family):
+    stm = family == 'stm32'
+    fixture = 'Stm32Official' if stm else 'GD32MultiController'
+    state = 'nx_stm32_gpio_state_t' if stm else 'nx_gd32_gpio_state_t'
+    prefix = 'nx_stm32' if stm else 'nx_gd32'
+    size = 'sizeof(gpio)' if stm else '0x30U'
+    bank = '&gpio' if stm else 'reinterpret_cast<void*>(GPIOA)'
+    initialize = (f'{prefix}_gpio_initialize(&port, 0U)' if stm else
+                  f'{prefix}_gpio_initialize(&port, 0U, 0x18U, 0U, false)')
+    decl = ('    auto& port = pins;\n' if stm else f'    {state} port = {{}};\n')
+    seed = 'gpio.IDR = 0xA5A50010U;' if stm else 'GPIO_ISTAT(GPIOA) = 0xA5A50010U;'
+    result = f'''
+TEST_F({fixture}, GpioReadRejectsEveryOwnStateWordWithoutEffects) {{
+{decl}    ASSERT_EQ({initialize}, NX_SUCCESS);
+    {seed}
+    const nx_gpio_port_t api = {{&{prefix}_gpio_ops, &port}};
+    unsigned char saved[sizeof(port)];
+    unsigned char registers[{size}];
+    std::memcpy(saved, &port, sizeof(saved));
+    std::memcpy(registers, {bank}, sizeof(registers));
+    for (size_t offset = 0U; offset + sizeof(uint32_t) <= sizeof(port);
+         offset += alignof(uint32_t)) {{
+        SCOPED_TRACE(offset);
+        auto* output = reinterpret_cast<uint32_t*>(
+            reinterpret_cast<unsigned char*>(&port) + offset);
+        EXPECT_EQ(nx_gpio_port_read(&api, output), NX_ERROR_INVALID);
+        EXPECT_EQ(std::memcmp(saved, &port, sizeof(saved)), 0);
+        EXPECT_EQ(std::memcmp(registers, {bank}, sizeof(registers)), 0);
+        std::memcpy(&port, saved, sizeof(saved));
+    }}
+    EXPECT_EQ({prefix}_gpio_stop(&port, 0U), NX_SUCCESS);
+}}
+
+TEST_F({fixture}, GpioReadRejectsEveryOwnedBankRegisterWithoutEffects) {{
+{decl}    ASSERT_EQ({initialize}, NX_SUCCESS);
+    {seed}
+    const nx_gpio_port_t api = {{&{prefix}_gpio_ops, &port}};
+    unsigned char saved[sizeof(port)];
+    unsigned char registers[{size}];
+    std::memcpy(saved, &port, sizeof(saved));
+    std::memcpy(registers, {bank}, sizeof(registers));
+    for (size_t offset = 0U; offset < sizeof(registers);
+         offset += sizeof(uint32_t)) {{
+        SCOPED_TRACE(offset);
+        auto* output = reinterpret_cast<uint32_t*>(
+            reinterpret_cast<unsigned char*>({bank}) + offset);
+        EXPECT_EQ(nx_gpio_port_read(&api, output), NX_ERROR_INVALID);
+        EXPECT_EQ(std::memcmp(saved, &port, sizeof(saved)), 0);
+        EXPECT_EQ(std::memcmp(registers, {bank}, sizeof(registers)), 0);
+        std::memcpy({bank}, registers, sizeof(registers));
+    }}
+    EXPECT_EQ({prefix}_gpio_stop(&port, 0U), NX_SUCCESS);
+}}
+
+TEST_F({fixture}, GpioReadRejectsUnalignedOutputsWithoutEffects) {{
+{decl}    ASSERT_EQ({initialize}, NX_SUCCESS);
+    {seed}
+    const nx_gpio_port_t api = {{&{prefix}_gpio_ops, &port}};
+    alignas(uint32_t) unsigned char output[12];
+    unsigned char saved[sizeof(port)];
+    unsigned char registers[{size}];
+    std::memcpy(saved, &port, sizeof(saved));
+    std::memcpy(registers, {bank}, sizeof(registers));
+    for (size_t offset = 1U; offset < alignof(uint32_t); ++offset) {{
+        SCOPED_TRACE(offset);
+        std::memset(output, 0xA5, sizeof(output));
+        EXPECT_EQ(nx_gpio_port_read(
+                      &api, reinterpret_cast<uint32_t*>(output + offset)),
+                  NX_ERROR_INVALID);
+        for (unsigned char byte : output) {{
+            EXPECT_EQ(byte, 0xA5U);
+        }}
+        EXPECT_EQ(std::memcmp(saved, &port, sizeof(saved)), 0);
+        EXPECT_EQ(std::memcmp(registers, {bank}, sizeof(registers)), 0);
+    }}
+    EXPECT_EQ({prefix}_gpio_stop(&port, 0U), NX_SUCCESS);
+}}
+
+TEST_F({fixture}, GpioReadRejectsWrappingOutputInAnIsolatedChild) {{
+{decl}    ASSERT_EQ({initialize}, NX_SUCCESS);
+    const nx_gpio_port_t api = {{&{prefix}_gpio_ops, &port}};
+    EXPECT_EXIT(
+        {{
+            auto* output = reinterpret_cast<uint32_t*>(
+                UINTPTR_MAX - (sizeof(uint32_t) - 1U));
+            std::_Exit(nx_gpio_port_read(&api, output) == NX_ERROR_INVALID
+                           ? 0
+                           : 1);
+        }},
+        testing::ExitedWithCode(0), "");
+    EXPECT_EQ({prefix}_gpio_stop(&port, 0U), NX_SUCCESS);
+}}
+
+TEST_F({fixture}, GpioReadRejectsUnboundRegistersInAnIsolatedChild) {{
+{decl}    ASSERT_EQ({initialize}, NX_SUCCESS);
+    const nx_gpio_port_t api = {{&{prefix}_gpio_ops, &port}};
+    EXPECT_EXIT(
+        {{
+            port.registers = {('nullptr' if stm else '0U')};
+            uint32_t output = 0xA5A5A5A5U;
+            const nx_result_t result = nx_gpio_port_read(&api, &output);
+            std::_Exit(result == NX_ERROR_INVALID && output == 0xA5A5A5A5U
+                           ? 0
+                           : 1);
+        }},
+        testing::ExitedWithCode(0), "");
+    EXPECT_EQ({prefix}_gpio_stop(&port, 0U), NX_SUCCESS);
+}}
+'''
+    setup = ('''    GPIO_TypeDef first_bank = {};
+    GPIO_TypeDef second_bank = {};
+    adjacent.port.registers = &first_bank;
+    adjacent.port.mask = 0x18U;
+    second.registers = &second_bank;
+    second.mask = 0x60U;
+    ASSERT_EQ(nx_stm32_gpio_initialize(&adjacent.port, 0U), NX_SUCCESS);
+    ASSERT_EQ(nx_stm32_gpio_initialize(&second, 0U), NX_SUCCESS);
+    first_bank.IDR = 0xFFFF0010U;
+    second_bank.IDR = 0xFFFF0020U;''' if stm else '''    ASSERT_EQ(nx_gd32_gpio_initialize(&adjacent.port, 0U, 0x18U, 0U,
+                                      false), NX_SUCCESS);
+    ASSERT_EQ(nx_gd32_gpio_initialize(&second, 1U, 0x60U, 0U, false),
+              NX_SUCCESS);
+    GPIO_ISTAT(GPIOA) = 0xFFFF0010U;
+    GPIO_ISTAT(GPIOB) = 0xFFFF0020U;''')
+    firstbank = '&first_bank' if stm else 'reinterpret_cast<void*>(GPIOA)'
+    secondbank = '&second_bank' if stm else 'reinterpret_cast<void*>(GPIOB)'
+    n = 'sizeof(first_bank)' if stm else '0x30U'
+    result += f'''
+TEST_F({fixture}, GpioReadKeepsIndependentAdjacentOutputsAndStoppedSentinels) {{
+    struct Adjacent {{
+        {state} port;
+        uint32_t output;
+    }} adjacent = {{}};
+    {state} second = {{}};
+{setup}
+    const nx_gpio_port_t first_api = {{&{prefix}_gpio_ops, &adjacent.port}};
+    const nx_gpio_port_t second_api = {{&{prefix}_gpio_ops, &second}};
+    ASSERT_EQ(reinterpret_cast<uintptr_t>(&adjacent.output),
+              reinterpret_cast<uintptr_t>(&adjacent.port) +
+                  sizeof(adjacent.port));
+    unsigned char first_saved[sizeof(adjacent.port)];
+    unsigned char second_saved[sizeof(second)];
+    unsigned char first_registers[{n}];
+    unsigned char second_registers[{n}];
+    std::memcpy(first_saved, &adjacent.port, sizeof(first_saved));
+    std::memcpy(second_saved, &second, sizeof(second_saved));
+    std::memcpy(first_registers, {firstbank}, sizeof(first_registers));
+    std::memcpy(second_registers, {secondbank}, sizeof(second_registers));
+    uint32_t output = 0U;
+    EXPECT_EQ(nx_gpio_port_read(&first_api, &adjacent.output), NX_SUCCESS);
+    EXPECT_EQ(adjacent.output, 0x10U);
+    EXPECT_EQ(nx_gpio_port_read(&second_api, &output), NX_SUCCESS);
+    EXPECT_EQ(output, 0x20U);
+    EXPECT_EQ(nx_gpio_port_read(&first_api, nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(first_saved, &adjacent.port, sizeof(first_saved)), 0);
+    EXPECT_EQ(std::memcmp(second_saved, &second, sizeof(second_saved)), 0);
+    EXPECT_EQ(std::memcmp(first_registers, {firstbank},
+                          sizeof(first_registers)), 0);
+    EXPECT_EQ(std::memcmp(second_registers, {secondbank},
+                          sizeof(second_registers)), 0);
+    ASSERT_EQ({prefix}_gpio_stop(&adjacent.port, 0U), NX_SUCCESS);
+    adjacent.output = 0xA5A5A5A5U;
+    EXPECT_EQ(nx_gpio_port_read(&first_api, &adjacent.output), NX_ERROR_INVALID);
+    EXPECT_EQ(adjacent.output, 0xA5A5A5A5U);
+    EXPECT_EQ(nx_gpio_port_read(&second_api, &output), NX_SUCCESS);
+    EXPECT_EQ(output, 0x20U);
+    EXPECT_EQ({prefix}_gpio_stop(&second, 0U), NX_SUCCESS);
+}}
+'''
+    return result
+
+
+records = {}
+for family, name in [('stm32', 'stm32_official'), ('gd32', 'gd32_multi')]:
+    relative = Path('tests/google/' + name + '_test.cpp')
+    data = (DEST / 'before' / relative).read_text()
+    if family == 'stm32':
+        data = data.replace('#include <gtest/gtest.h>',
+                            '#include <cstdlib>\n#include <cstring>\n#include <gtest/gtest.h>')
+        data += cases(family)
+    else:
+        data = data.replace('#include <cstring>', '#include <cstdlib>\n#include <cstring>')
+        data = data.replace('} /* namespace */', cases(family) + '\n} /* namespace */')
+    data = subprocess.check_output([FMT, '--assume-filename=' + str(ROOT / relative)],
+                                   input=data.encode())
+    target = DEST / 'tests-only' / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+    records[str(relative)] = {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+(DEST / 'tests-only-manifest.json').write_text(json.dumps(records, indent=2) + '\n')
+print(json.dumps(records, indent=2))

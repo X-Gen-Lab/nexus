@@ -12,6 +12,7 @@ extern bool g_gd32_model_i2c_stop_works;
 extern bool g_gd32_model_isr;
 extern uint32_t g_gd32_model_mask;
 }
+#include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
 #include <sys/mman.h>
@@ -228,6 +229,168 @@ TEST_F(GD32MultiController, I2CRecoveryAndTransactionsUseTheirOwnLines) {
     EXPECT_NE(I2C_CTL0(I2C1) & I2C_CTL0_I2CEN, 0U);
     EXPECT_EQ(nx_gd32_i2c_stop(&second), NX_SUCCESS);
 }
+
+TEST_F(GD32MultiController, GpioReadRejectsEveryOwnStateWordWithoutEffects) {
+    nx_gd32_gpio_state_t port = {};
+    ASSERT_EQ(nx_gd32_gpio_initialize(&port, 0U, 0x18U, 0U, false), NX_SUCCESS);
+    GPIO_ISTAT(GPIOA) = 0xA5A50010U;
+    const nx_gpio_port_t api = {&nx_gd32_gpio_ops, &port};
+    unsigned char saved[sizeof(port)];
+    unsigned char registers[0x30U];
+    std::memcpy(saved, &port, sizeof(saved));
+    std::memcpy(registers, reinterpret_cast<void*>(GPIOA), sizeof(registers));
+    for (size_t offset = 0U; offset + sizeof(uint32_t) <= sizeof(port);
+         offset += alignof(uint32_t)) {
+        SCOPED_TRACE(offset);
+        auto* output = reinterpret_cast<uint32_t*>(
+            reinterpret_cast<unsigned char*>(&port) + offset);
+        EXPECT_EQ(nx_gpio_port_read(&api, output), NX_ERROR_INVALID);
+        EXPECT_EQ(std::memcmp(saved, &port, sizeof(saved)), 0);
+        EXPECT_EQ(std::memcmp(registers, reinterpret_cast<void*>(GPIOA),
+                              sizeof(registers)),
+                  0);
+        std::memcpy(&port, saved, sizeof(saved));
+    }
+    EXPECT_EQ(nx_gd32_gpio_stop(&port, 0U), NX_SUCCESS);
+}
+
+TEST_F(GD32MultiController,
+       GpioReadRejectsEveryOwnedBankRegisterWithoutEffects) {
+    nx_gd32_gpio_state_t port = {};
+    ASSERT_EQ(nx_gd32_gpio_initialize(&port, 0U, 0x18U, 0U, false), NX_SUCCESS);
+    GPIO_ISTAT(GPIOA) = 0xA5A50010U;
+    const nx_gpio_port_t api = {&nx_gd32_gpio_ops, &port};
+    unsigned char saved[sizeof(port)];
+    unsigned char registers[0x30U];
+    std::memcpy(saved, &port, sizeof(saved));
+    std::memcpy(registers, reinterpret_cast<void*>(GPIOA), sizeof(registers));
+    for (size_t offset = 0U; offset < sizeof(registers);
+         offset += sizeof(uint32_t)) {
+        SCOPED_TRACE(offset);
+        auto* output = reinterpret_cast<uint32_t*>(
+            reinterpret_cast<unsigned char*>(reinterpret_cast<void*>(GPIOA)) +
+            offset);
+        EXPECT_EQ(nx_gpio_port_read(&api, output), NX_ERROR_INVALID);
+        EXPECT_EQ(std::memcmp(saved, &port, sizeof(saved)), 0);
+        EXPECT_EQ(std::memcmp(registers, reinterpret_cast<void*>(GPIOA),
+                              sizeof(registers)),
+                  0);
+        std::memcpy(reinterpret_cast<void*>(GPIOA), registers,
+                    sizeof(registers));
+    }
+    EXPECT_EQ(nx_gd32_gpio_stop(&port, 0U), NX_SUCCESS);
+}
+
+TEST_F(GD32MultiController, GpioReadRejectsUnalignedOutputsWithoutEffects) {
+    nx_gd32_gpio_state_t port = {};
+    ASSERT_EQ(nx_gd32_gpio_initialize(&port, 0U, 0x18U, 0U, false), NX_SUCCESS);
+    GPIO_ISTAT(GPIOA) = 0xA5A50010U;
+    const nx_gpio_port_t api = {&nx_gd32_gpio_ops, &port};
+    alignas(uint32_t) unsigned char output[12];
+    unsigned char saved[sizeof(port)];
+    unsigned char registers[0x30U];
+    std::memcpy(saved, &port, sizeof(saved));
+    std::memcpy(registers, reinterpret_cast<void*>(GPIOA), sizeof(registers));
+    for (size_t offset = 1U; offset < alignof(uint32_t); ++offset) {
+        SCOPED_TRACE(offset);
+        std::memset(output, 0xA5, sizeof(output));
+        EXPECT_EQ(nx_gpio_port_read(
+                      &api, reinterpret_cast<uint32_t*>(output + offset)),
+                  NX_ERROR_INVALID);
+        for (unsigned char byte : output) {
+            EXPECT_EQ(byte, 0xA5U);
+        }
+        EXPECT_EQ(std::memcmp(saved, &port, sizeof(saved)), 0);
+        EXPECT_EQ(std::memcmp(registers, reinterpret_cast<void*>(GPIOA),
+                              sizeof(registers)),
+                  0);
+    }
+    EXPECT_EQ(nx_gd32_gpio_stop(&port, 0U), NX_SUCCESS);
+}
+
+TEST_F(GD32MultiController, GpioReadRejectsWrappingOutputInAnIsolatedChild) {
+    nx_gd32_gpio_state_t port = {};
+    ASSERT_EQ(nx_gd32_gpio_initialize(&port, 0U, 0x18U, 0U, false), NX_SUCCESS);
+    const nx_gpio_port_t api = {&nx_gd32_gpio_ops, &port};
+    EXPECT_EXIT(
+        {
+            auto* output = reinterpret_cast<uint32_t*>(UINTPTR_MAX -
+                                                       (sizeof(uint32_t) - 1U));
+            std::_Exit(nx_gpio_port_read(&api, output) == NX_ERROR_INVALID ? 0
+                                                                           : 1);
+        },
+        testing::ExitedWithCode(0), "");
+    EXPECT_EQ(nx_gd32_gpio_stop(&port, 0U), NX_SUCCESS);
+}
+
+TEST_F(GD32MultiController, GpioReadRejectsUnboundRegistersInAnIsolatedChild) {
+    nx_gd32_gpio_state_t port = {};
+    ASSERT_EQ(nx_gd32_gpio_initialize(&port, 0U, 0x18U, 0U, false), NX_SUCCESS);
+    const nx_gpio_port_t api = {&nx_gd32_gpio_ops, &port};
+    EXPECT_EXIT(
+        {
+            port.registers = 0U;
+            uint32_t output = 0xA5A5A5A5U;
+            const nx_result_t result = nx_gpio_port_read(&api, &output);
+            std::_Exit(result == NX_ERROR_INVALID && output == 0xA5A5A5A5U ? 0
+                                                                           : 1);
+        },
+        testing::ExitedWithCode(0), "");
+    EXPECT_EQ(nx_gd32_gpio_stop(&port, 0U), NX_SUCCESS);
+}
+
+TEST_F(GD32MultiController,
+       GpioReadKeepsIndependentAdjacentOutputsAndStoppedSentinels) {
+    struct Adjacent {
+        nx_gd32_gpio_state_t port;
+        uint32_t output;
+    } adjacent = {};
+    nx_gd32_gpio_state_t second = {};
+    ASSERT_EQ(nx_gd32_gpio_initialize(&adjacent.port, 0U, 0x18U, 0U, false),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_gd32_gpio_initialize(&second, 1U, 0x60U, 0U, false),
+              NX_SUCCESS);
+    GPIO_ISTAT(GPIOA) = 0xFFFF0010U;
+    GPIO_ISTAT(GPIOB) = 0xFFFF0020U;
+    const nx_gpio_port_t first_api = {&nx_gd32_gpio_ops, &adjacent.port};
+    const nx_gpio_port_t second_api = {&nx_gd32_gpio_ops, &second};
+    ASSERT_EQ(reinterpret_cast<uintptr_t>(&adjacent.output),
+              reinterpret_cast<uintptr_t>(&adjacent.port) +
+                  sizeof(adjacent.port));
+    unsigned char first_saved[sizeof(adjacent.port)];
+    unsigned char second_saved[sizeof(second)];
+    unsigned char first_registers[0x30U];
+    unsigned char second_registers[0x30U];
+    std::memcpy(first_saved, &adjacent.port, sizeof(first_saved));
+    std::memcpy(second_saved, &second, sizeof(second_saved));
+    std::memcpy(first_registers, reinterpret_cast<void*>(GPIOA),
+                sizeof(first_registers));
+    std::memcpy(second_registers, reinterpret_cast<void*>(GPIOB),
+                sizeof(second_registers));
+    uint32_t output = 0U;
+    EXPECT_EQ(nx_gpio_port_read(&first_api, &adjacent.output), NX_SUCCESS);
+    EXPECT_EQ(adjacent.output, 0x10U);
+    EXPECT_EQ(nx_gpio_port_read(&second_api, &output), NX_SUCCESS);
+    EXPECT_EQ(output, 0x20U);
+    EXPECT_EQ(nx_gpio_port_read(&first_api, nullptr), NX_ERROR_INVALID);
+    EXPECT_EQ(std::memcmp(first_saved, &adjacent.port, sizeof(first_saved)), 0);
+    EXPECT_EQ(std::memcmp(second_saved, &second, sizeof(second_saved)), 0);
+    EXPECT_EQ(std::memcmp(first_registers, reinterpret_cast<void*>(GPIOA),
+                          sizeof(first_registers)),
+              0);
+    EXPECT_EQ(std::memcmp(second_registers, reinterpret_cast<void*>(GPIOB),
+                          sizeof(second_registers)),
+              0);
+    ASSERT_EQ(nx_gd32_gpio_stop(&adjacent.port, 0U), NX_SUCCESS);
+    adjacent.output = 0xA5A5A5A5U;
+    EXPECT_EQ(nx_gpio_port_read(&first_api, &adjacent.output),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(adjacent.output, 0xA5A5A5A5U);
+    EXPECT_EQ(nx_gpio_port_read(&second_api, &output), NX_SUCCESS);
+    EXPECT_EQ(output, 0x20U);
+    EXPECT_EQ(nx_gd32_gpio_stop(&second, 0U), NX_SUCCESS);
+}
+
 } /* namespace */
 
 /** \brief The model's race hook dispatches an explicit fixture-owned state. */

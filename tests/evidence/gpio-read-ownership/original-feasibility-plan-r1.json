@@ -1,0 +1,402 @@
+{
+  "schema": 1,
+  "kind": "read-only bounded correction feasibility plan",
+  "created_ns": 1792301239010542105,
+  "status": "Analysis only; no implementation, test/build, installation, download or dispatch executed.",
+  "source": {
+    "root": "/tmp/nexus-io-validation-20261018",
+    "head": "a07bc6eecd8ef0d85a6882249c7a481a4f69dc28",
+    "index_file_sha256": "0894f5222aa1aa606fd33729178c921ceb6da39a73441f0cff4f9bacb3c45f30",
+    "index_entries_sha256": "bbf1f1deb0aa4604425c6f151bfaeb276b5fe1f4dfd91b3108c8cccc89ded853",
+    "first_read_head": "6cf753641feac380ebc130afe0f02ff0dc3f569e",
+    "concurrent_progress": "Root committed unrelated workflow work while research ran; the proposed four source files remain byte-identical between first-read HEAD and final staged blobs. Whole-repository locking is not claimed.",
+    "files": [
+      {
+        "path": "docs/design/io-evolution-execution.csv",
+        "bytes": 11038,
+        "sha256": "b62cafcae16b39221023b53d9fef248ea4d32d2b27a6a7658807a38d1ac8e098",
+        "matches_index_blob": true
+      },
+      {
+        "path": "docs/design/clock-domain-sleep.md",
+        "bytes": 4271,
+        "sha256": "bb3f933b69f840a103ce6ab04dac4bd9fd539b222396f98ff60857a4f5414f62",
+        "matches_index_blob": true
+      },
+      {
+        "path": "docs/design/integration-contracts.md",
+        "bytes": 27879,
+        "sha256": "ca371cfad6e2ff040be277e8925c85b52642561090efca318fbb19abdb1188f9",
+        "matches_index_blob": true
+      },
+      {
+        "path": "io/include/nexus/io/gpio.h",
+        "bytes": 2676,
+        "sha256": "38aaf53aab140ac4eceec9d8ab5a63cd92bec5129c8046e551dc67b3fc393778",
+        "matches_index_blob": true
+      },
+      {
+        "path": "io/include/nexus/io/exti.h",
+        "bytes": 4461,
+        "sha256": "c6eb87a14a40f5f9476b28233b517bb674f4bd7adfcac8c4c6dfc98a6e8e34d0",
+        "matches_index_blob": true
+      },
+      {
+        "path": "io/src/gpio.c",
+        "bytes": 1483,
+        "sha256": "cfa133514adbae4a42e9e39c83921f9e885117b4cf251f6325dc300b19a4b0e0",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32f407/drivers/gpio.c",
+        "bytes": 7691,
+        "sha256": "2153a20cf6eee4e35162696be8f321c71dba2e1359a8380f4927ff11e6eb3c5e",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/gd32f470/drivers/gpio.c",
+        "bytes": 6951,
+        "sha256": "85f4f9eff2c016a4d3d70be3f0df4f32e66fa9841701f99425e8247df4ec3140",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32h743/drivers/gpio.c",
+        "bytes": 8528,
+        "sha256": "c515680eb9762b4f13696c0a65fdfd487879729bd4624346acd245aa31834844",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32u575/drivers/gpio.c",
+        "bytes": 9038,
+        "sha256": "4b2bb04bf23883c3f73629d5ccac07fc1ad7e46910a36bbc5514e166382ff5bd",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32f407/drivers/exti.c",
+        "bytes": 10155,
+        "sha256": "907cec021c7a97a0a3c4ba4536c2055c7264836acd119847d31620c4bfc2893d",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/gd32f470/drivers/exti.c",
+        "bytes": 11310,
+        "sha256": "df73d89a3307fdd9adf4825fc8f963f2b9f6cac78b36c9b00521e609e9345300",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32h743/drivers/exti.c",
+        "bytes": 12755,
+        "sha256": "364c6453f14d1019b48fc802134e323a7b724623acc9edff2e1ec2d38eba2076",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32u575/drivers/exti.c",
+        "bytes": 12834,
+        "sha256": "3f2557dbc6374a13495579500f588654b7759ea42d4e5952900927f96d06fbc8",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32f407/private/stm32f407_provider.h",
+        "bytes": 15177,
+        "sha256": "fcea417654af6f84abe63437a991decd627854b2b322a47f23d8fc4c76421dde",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/gd32f470/private/gd32f470_provider.h",
+        "bytes": 26667,
+        "sha256": "4c59d09d32f17a8dc5378c7f9e5e8c5aed081d7da9fdaeba1d57ca3f418caac8",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tools/configure/gpio_phase.py",
+        "bytes": 13598,
+        "sha256": "c44745a2a714c2d74bcf344e4d29d3cf3be9c86033d272385f558c8bb834be92",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tools/configure/providers/stm32h743/emission.py",
+        "bytes": 15833,
+        "sha256": "657c3e95eb3f30c827a3492fc2e68e8a45e48fd633387885e3c9ebf56e12dd82",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tools/configure/providers/stm32u575/emission.py",
+        "bytes": 9962,
+        "sha256": "c3616d89898e0934aa249e2035445857bbf7a189b0c022a401a8884022937e97",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tools/configure/assembly.schema.json",
+        "bytes": 45315,
+        "sha256": "08789e1e25394039c209f5ebd48c0d86f20d2e9c8c233209ee6c1b53f229a67d",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/stm32_official_test.cpp",
+        "bytes": 3116,
+        "sha256": "e505586592c0354af8ec0d74d18c9b2796308b9a0c7e48c46148b82b50fdc70b",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/gd32_multi_test.cpp",
+        "bytes": 10447,
+        "sha256": "ed5d50a83373f3a774c3c772038d15cfd22392a6bfedae496f2e6a3467ef5402",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/stm32_official.cmake",
+        "bytes": 2166,
+        "sha256": "711aebb90a7a24cb164efa631cbe87c4e423b795e5a12d5aaa17eef157e45517",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/CMakeLists.txt",
+        "bytes": 28115,
+        "sha256": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/physical_platform_factory_test.cpp",
+        "bytes": 16254,
+        "sha256": "bd6f8f0d86004ee07bc79fd4dd3dce80ef2643fd852d6576fc48e2ea4bb6545b",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/h743_factory_test.cpp",
+        "bytes": 11047,
+        "sha256": "3fb5b4c2a0615d95919d174c14e6eb258eb8cd27ec5d9dde17a9fbb48d9aab13",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/u575_factory_test.cpp",
+        "bytes": 8134,
+        "sha256": "42e2533e932136f8338daa150a8191d5d6a92261e8fb8aec3c3b2dfcc26b8a7b",
+        "matches_index_blob": true
+      },
+      {
+        "path": "tests/google/stm32f103_provider_test.cpp",
+        "bytes": 13115,
+        "sha256": "e23da01fe243f48ad8ced9defbeb4c711ef6068ec5493ea8c83f088833c8bad3",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32f103/drivers/gpio.c",
+        "bytes": 5739,
+        "sha256": "585b1cd9a08e28f45cebecf0cff042e0789524dd48bdaca7b5feaaa7643797f3",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32h743/README.md",
+        "bytes": 32745,
+        "sha256": "ec4bdcdb5e73ca50c2348dc2e6be361f57be1ff26113a432f82b4bfbacdecaec",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32u575/README.md",
+        "bytes": 23649,
+        "sha256": "16df9fbb663967abd4d945c5a867e8556d6f7c13fa8efb7d4db82033f9065448",
+        "matches_index_blob": true
+      },
+      {
+        "path": "boards/stm32f407_qiming_v31/board.json",
+        "bytes": 2580,
+        "sha256": "9899b6036e9bc7d11eada7bc6a62a9601124099e440bbf9d862b760adbf75cf8",
+        "matches_index_blob": true
+      },
+      {
+        "path": "boards/stm32f407ve_sky_qingchun/board.json",
+        "bytes": 1412,
+        "sha256": "1ac4d6d1d771803b8e7ff3fa5e79bb39e4e078b568845969213b30142b485f80",
+        "matches_index_blob": true
+      },
+      {
+        "path": "boards/gd32f470_liangshan/board.json",
+        "bytes": 1653,
+        "sha256": "6aa6f232593de796cf311d74a753c402c3e960ff7ecc0dd8c753ea9379914b7c",
+        "matches_index_blob": true
+      },
+      {
+        "path": "boards/stm32h743_nucleo_zi2/board.json",
+        "bytes": 1565,
+        "sha256": "9d39e3fcf18e51603f19199073571092104f263a091ae61289fe8ebf545d17e3",
+        "matches_index_blob": true
+      },
+      {
+        "path": "boards/stm32u575_nucleo_zi_q/board.json",
+        "bytes": 4365,
+        "sha256": "b64b7cabcb04cd31372de36b3c41ef8c63e9fe7c6ee2a760a258455956f4ad9f",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32f407/soc.json",
+        "bytes": 12788,
+        "sha256": "10929c6ddcd3c76407a1e9dc2810da14782b297c3fffef8fa47c46758920ff9f",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/gd32f470/soc.json",
+        "bytes": 13001,
+        "sha256": "249b408f25e32c4af768fca4ce2c5dcd9f24ca673686cd175d77e79b986283b5",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32h743/soc.json",
+        "bytes": 12063,
+        "sha256": "11be37f2f42aaeb598c011df34cca8069d38b0edbdf60d2b8bd9784af245c7fa",
+        "matches_index_blob": true
+      },
+      {
+        "path": "soc/stm32u575/soc.json",
+        "bytes": 15501,
+        "sha256": "38c59273e978bfde5d74422dce584d401d4a70895ade49708edb4a29530850fc",
+        "matches_index_blob": true
+      },
+      {
+        "path": "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_standard_peripheral/Include/gd32f4xx_gpio.h",
+        "bytes": 29164,
+        "sha256": "6551fd3fb673b3e34d5f62b72cba8a0482ce051bf29ed475015b1f9ad178a57a",
+        "matches_index_blob": true
+      }
+    ]
+  },
+  "ledger": {
+    "item": "IO-31: explicit default/sleep/safe levels, wake and retention",
+    "original_state": "pending / not_qualified / not_executed",
+    "original_exit": "No invented Board wiring; selected reviewed state only.",
+    "recommended_slice": "Readonly GPIO output-span admission protects existing selected-pin ownership. An IO31 prerequisite, not completion of pinctrl state/wake/retention support.",
+    "status_change": "None."
+  },
+  "architecture": {
+    "api": "Immutable nx_gpio_port_t with shared ops/context; masked read/write/toggle, no allocation or policy. Public read forwards to exact provider. Caller keeps binding live and serializes mode/stop with writers and relevant IRQs.",
+    "pins": "F407/GD/G474 gpio_phase owns one cold lease per exact selected pad, including endpoints. It validates all selected powered gates/modes/locks before snapshots. H743/U575 have equivalent dedicated emission.py leases; absence from gpio_phase.FAMILIES is not missing modern ownership.",
+    "release": "Device and publisher drain precedes selected original field/latch restoration and release of only added shared gates. Failed readback retains cleanup responsibility. Provider inactive latch and Platform original state are different phases.",
+    "configuration_gap": "Current GPIO schema accepts binding/mode, with Board initial/mask. No authored default/sleep/safe/wakeup/retention state transaction exists. No generic PWR wake-pin or deep Stop sequencing is implied by EXTI edge events or notification.",
+    "policy": "PCB loads, external supply/oscillator preparation, electrical safe levels, debounce and product wake policy remain external."
+  },
+  "families": [
+    {
+      "soc": "STM32F407 VE/ZG",
+      "existing": "Official LL GPIO and CMSIS structures; BSRR preload before mode, static masks/ops, initialized flag; generated 12-bit per-pin original snapshots and restored selected state. Selected EXTI/shared vectors and explicit IRQ wake.",
+      "read_gap": "nx_stm32_gpio_read checks context/initialized/value, then stores IDR&mask. It does not reject self-state/MMIO output aliases, unaligned output or wrapping output span.",
+      "board": "Qiming/Sky bind source-reviewed LEDs/console/device routes; physical PCB revision remains unknown. Unbound EXTI connector/electrical facts cannot be inferred. Explicit fixed-RUN shallow sleep requires closed/drained clock owner and actual enabled wake IRQ."
+    },
+    {
+      "soc": "GD32F470ZG",
+      "existing": "Official register macros and SDK; BOP preload; private uint32 registers/mask plus output. Successful stop clears mask/output. Same generated cold lease; selected EXTI domain and wake priority checks.",
+      "read_gap": "nx_gd32_gpio_read checks context/value/nonzero mask then stores ISTAT&mask with no self-state/MMIO alias/alignment/wrap guard. Owned register span extends through GPIO_BC at offset0x28 (exclusive0x2c).",
+      "board": "Liangshan LED PD7, console and external NOR routes have source provenance. Actual PCB/NOR/electrical/EXTI connector state remains unknown; no wake pin invented."
+    },
+    {
+      "soc": "STM32H743ZI",
+      "existing": "NX_H743 leaves; observed ODR preload before mode; partial initialization retained. Generated all-bank admission and selected fields/latches/gates restoration. GPIO stop retries failed inactive-latch proof.",
+      "read_reference": "Already checks privilege, live state/registers/value, uint32 alignment and wrap, own complete state and bound GPIO_TypeDef overlap before IDR/store. Does not know other instances or arbitrary MMIO. GPIO read after successful stop INVALID.",
+      "board": "MB1364 LED PB0/VCP route has solder-bridge source conditions, actual board uninspected. No modern sleep pin state/wake retention implemented."
+    },
+    {
+      "soc": "STM32U575ZI-Q",
+      "existing": "Same modern GPIO output-span guard and retained lifecycle. A-H package references; PG15:2 requires externally prepared VDDIO2/PWR/IO2SV and never automatically changes supply/isolation. Dedicated generated selected original state leases.",
+      "read_reference": "Privilege/live/null/alignment/wrap plus own-state/bound-GPIO-TypeDef overlap rejected before IDR/store. Successful GPIO stop makes read INVALID; successful EXTI stop makes its read STATE.",
+      "board": "MB1549 LED/VCP and added single-pad/EXTI routes are software references, not observed connector/load/safe-level facts. Security/Stop/VBAT/retention need separate contracts and actual evidence."
+    }
+  ],
+  "source_proof": {
+    "symbols": [
+      "nx_stm32_gpio_read",
+      "nx_gd32_gpio_read"
+    ],
+    "trigger": "For a real live state/face, pass an aligned writable uint32 output inside its own state or owned GPIO register bank.",
+    "present_path": "Both functions directly store masked input and return SUCCESS. A state.registers alias corrupts the retained register identity; a BSRR/BOP alias turns an observation into a GPIO command. This is established by control-flow inspection, not a regression executed in this task.",
+    "why_real": "No PCB/load hypothesis required: provider metadata and read-only behavior are violated. Current H743/U575 guard the same state/register spans; F103 has a matching own-state/register-alias regression.",
+    "f103_precision": "F103 read rejects own state/GPIO_TypeDef overlap and output wrap, but has no explicit alignment check. Do not claim identical checks across all families.",
+    "limits": "Context itself must be valid live provider storage. No registry means no knowledge of another instance private storage, other GPIO bank/MMIO, face/ops object or opaque application storage. This is not arbitrary-pointer security or a RAM address validator; caller still provides valid exclusive writable output storage."
+  },
+  "window": {
+    "sources": [
+      "soc/stm32f407/drivers/gpio.c",
+      "soc/gd32f470/drivers/gpio.c",
+      "tests/google/stm32_official_test.cpp",
+      "tests/google/gd32_multi_test.cpp"
+    ],
+    "production": "Before IDR/ISTAT read or output store, validate live/non-null state and bound register base as appropriate, uint32 alignment/nonwrapping span, and no overlap with full own state or complete owned GPIO register interval. Reject INVALID without writes to output/state/registers. Match existing modern bounded uintptr_t approach; guard interval arithmetic, not just equality of base pointers.",
+    "f407": "Use sizeof(*port->registers), with null register rejection before deriving range. Do not impose a physical-address-only allowlist that rejects existing stack/model GPIO structures.",
+    "gd470": "Use official GPIO bank extent through GPIO_BC+sizeof(uint32_t), half-open44 bytes at offsets0x00..0x28. AFSEL1 is not the last register. SDK has no GPIO_TypeDef. Existing valid_gpio can support safe address arithmetic if needed; no discovery or new routes.",
+    "unchanged": [
+      "Public API/ops/provider state layout/constructor/stop",
+      "Existing privilege and Task/IRQ policy",
+      "Configuration, factory, Board, routes and ledger",
+      "No clock/pin repair, locks, heap, registry or runtime forwarding layer"
+    ]
+  },
+  "tdd": {
+    "framework": "Existing GoogleTest/GoogleMock targets and real production GPIO/official register structures or mapped GD MMIO. Preserve all old cases/assertions; do not mock the implementation.",
+    "whole_targets": [
+      "nexus_stm32_official_test",
+      "nexus_gd32_multi_test"
+    ],
+    "static_source_declarations": {
+      "tests/google/stm32_official_test.cpp": 6,
+      "tests/google/gd32_multi_test.cpp": 5
+    },
+    "count_scope": "Static TEST declarations only. Qualification requires actual fresh discovery/whole execution XML, nonzero count, no skips or filters; no inherited numbers.",
+    "tests_first": [
+      {
+        "case": "Own-state output overlap rejects without corruption",
+        "steps": "Construct real GPIO, build exact face; seed IDR/ISTAT value different from current mask/register-address bits; test aligned output into state.mask and aligned uint32 subspan of state.registers. Compare byte snapshots of whole state and GPIO bank, require INVALID and no mutation. Restore saved state between probes and before teardown so old faulty behavior cannot poison later assertions.",
+        "predicted_old_failure": "Current code returns SUCCESS and changes its own state. This predicted RED is not yet executed."
+      },
+      {
+        "case": "Owned MMIO output aliases never turn read into command/configuration write",
+        "steps": "Use real live input binding. Independently point output to BSRR/BOP, ODR/OCTL, mode, and GD last register BC. Seed each target to nonmatching sentinel, capture whole bank/state, require INVALID and byte preservation. A regular host model can prove command-register store refusal; it does not prove physical pin voltage.",
+        "predicted_old_failure": "Current code writes masked input into the selected MMIO address and returns SUCCESS."
+      },
+      {
+        "case": "Unaligned output rejects with all guard bytes preserved",
+        "steps": "Use alignas(uint32_t) byte storage, outputs at +1/+2/+3, require INVALID and every byte unchanged. On sanitizer/alignment-trap modes isolate the witness in EXPECT_EXIT rather than kill parent and truncate complete JUnit. Do not rely on deliberate unmapped main-process pointers.",
+        "predicted_old_failure": "Unchecked old Native store mutates storage or traps in isolated child; not valid Cortex-M uint32 output admission."
+      }
+    ],
+    "positive_and_lifecycle": [
+      {
+        "case": "Masked snapshot and normal instance isolation",
+        "steps": "Two real states/faces, disjoint masks and known inputs; valid ordinary RAM outputs equal masks; peer state and every GPIO register remain unchanged. This does not promise detecting a caller deliberately passing another instance private storage as output."
+      },
+      {
+        "case": "Null/stopped read keeps caller sentinel",
+        "steps": "Actual stop first; F407 initialized=false / GD mask=0. Subsequent read preserves sentinel and existing INVALID. Null output has no effects. Normal valid aligned output remains accepted; do not overreject adjacent legal output spans."
+      },
+      {
+        "case": "Wrap guard",
+        "steps": "Validate nonwrapping uintptr_t output span before all reads/stores. If tested against old source, use Google EXPECT_EXIT child so old fault does not truncate parent JUnit. Otherwise label it source-reviewed only until safe runtime evidence exists."
+      }
+    ],
+    "execution_order": "Use existing CMake target graph and maintained process.run, jobs1. Preserve full source/index/baseline guards and actual command raw. Execute complete tests-only RED before minimal production guard, then both complete GREEN programs. No new test/build graph or synthetic missing-API RED.",
+    "related": "Existing physical Platform factory (both families), F103 alias test and modern H743/U575 provider programs are useful references; run extra whole programs only where inputs/failure concerns justify. Do not alter EXTI or claim new wake coverage.",
+    "arm": "Use actual current production compile_commands per GPIO unit with explicit relocated source/output and bound compiler/headers, or normal real family ARM matrix. Object-only is not linked firmware/SDK/HIL qualification."
+  },
+  "lifecycle": {
+    "reject": "INVALID before GPIO input observation/output store; no owner identity, mask, latch/mux/gate, IRQ publication or clock barrier mutation. Byte snapshots prove no writes; source ordering review proves admission precedes IDR/ISTAT read (ordinary register snapshots do not themselves observe reads).",
+    "normal": "One bounded masked observation into valid caller RAM. Existing serialization against mode/stop/other direct writers remains mandatory.",
+    "sleep": "No sleep transaction added. Explicit F407/GD shallow sleep still requires closed/drained ClockDomain and actual enabled wake IRQ. No default/sleep/safe GPIO state switch is inferred or automatically applied.",
+    "wake": "A separately selected EXTI IRQ can publish a latched event/loss hint. After actual wake owner rechecks predicate and may read GPIO into ordinary RAM. Read cannot release/overwrite pin or notification ownership. No new wiring or PWR wake route is selected.",
+    "stop": "Caller quiesces direct writers and IRQs before existing provider stop/Platform original-pin restore. Rejected reads leave leases intact; successful stop rejects ordinary reads per existing state.",
+    "modern_exti_reference": "H743/U575 count captured wake publishers in IRQ critical sections, release target only after publishers/sources/vector/mux are proved drained; failed withdrawal retains ring/wake/retained. That proof belongs to EXTI, not GPIO read.",
+    "not_supported": "No Stop/Standby/autonomous LPDMA, backup/VBAT, electrical-safe or wake-retention qualification follows from this fix."
+  },
+  "cost_exit": {
+    "cost": "No new persistent bytes, heap, pool/registry or locks; O(1) integer comparisons before existing read. Exact flash/stack/cycles remain unmeasured until actual object/link evidence; no WCET claim.",
+    "exit": [
+      "Four full before/after source files and unchanged external baseline/index",
+      "Real whole tests-only RED demonstrating actual state/MMIO output corruption; original cases intact",
+      "Both complete Google GREEN programs with fresh matching discovery/JUnit and zero skip/error/failure",
+      "Whole-file format and independent exact source/transport review",
+      "Honest exact compiler/flags/headers and object-versus-link scope",
+      "IO31 remains pending with original Board/state/wake/retention exits unchanged"
+    ]
+  },
+  "independent_crosscheck": {
+    "agent": "/root/io24_delivery_docs/browser_driver_review",
+    "performed": "Read-only H743/U575 GPIO/EXTI/private/Board examination; no tests, builds or writes.",
+    "conclusion": "No rigorously proved modern capture/restore/safe/wake bug. Modern GPIO alias guards and Platform original-pin leases confirmed. U575 power prerequisites must not be repaired automatically. Pin-alternate LCKR check differences alone do not prove a legal-caller defect."
+  },
+  "report_preflight": "First oversized in-memory report measured25604B versus24576B cap and was rejected before writing any file. This smaller report preserves the required facts; no production/test result was involved."
+}

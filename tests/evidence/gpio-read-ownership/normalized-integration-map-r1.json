@@ -1,0 +1,386 @@
+{
+  "kind": "root-normalized-exact-gpio-read-ownership-transport",
+  "source_count": 4,
+  "files": [
+    {
+      "expected_path": "soc/stm32f407/drivers/gpio.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production/soc/stm32f407/drivers/gpio.c",
+      "bytes": 8430,
+      "sha256": "de908497fed6d9c6023be8f3c75f9e17846e25c175b510eef054bf2b01eb474c",
+      "kind": "source"
+    },
+    {
+      "expected_path": "soc/gd32f470/drivers/gpio.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production/soc/gd32f470/drivers/gpio.c",
+      "bytes": 7615,
+      "sha256": "4563397605d46c76b30e1da1e3019d3ed3c56c3d29db3e027697ff3a47213991",
+      "kind": "source"
+    },
+    {
+      "expected_path": "tests/google/stm32_official_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only/tests/google/stm32_official_test.cpp",
+      "bytes": 10099,
+      "sha256": "15d53e9c4b3320bf4129385d2ca0d594ced36cc5455d9f970ada90f1fd20ff4f",
+      "kind": "source"
+    },
+    {
+      "expected_path": "tests/google/gd32_multi_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only/tests/google/gd32_multi_test.cpp",
+      "bytes": 17961,
+      "sha256": "69aa40bd5d015edb253849c1abcd71bddc0b966c88715dbe1034a61b0d9e285a",
+      "kind": "source"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/actual-native-inputs.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/actual-native-inputs.json",
+      "kind": "evidence",
+      "bytes": 18645,
+      "sha256": "31ea1497e1ce332a0fd2350c4f77dd87e25e8bf491d95e307556389e732fcc47"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/actual-red-before-implementation.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/actual-red-before-implementation.json",
+      "kind": "evidence",
+      "bytes": 732,
+      "sha256": "6858d096af763e07c2d0de0d367526667cb7a214e605ae82bfe0b34132a56264"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/baseline.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/baseline.json",
+      "kind": "evidence",
+      "bytes": 2348,
+      "sha256": "40b61770623f538dfe00501383c611ef5d7b63655693dcd956f81c1ac40c6772"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/before/soc/gd32f470/drivers/gpio.c.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/before/soc/gd32f470/drivers/gpio.c",
+      "kind": "evidence",
+      "bytes": 6951,
+      "sha256": "85f4f9eff2c016a4d3d70be3f0df4f32e66fa9841701f99425e8247df4ec3140"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/before/soc/stm32f407/drivers/gpio.c.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/before/soc/stm32f407/drivers/gpio.c",
+      "kind": "evidence",
+      "bytes": 7691,
+      "sha256": "2153a20cf6eee4e35162696be8f321c71dba2e1359a8380f4927ff11e6eb3c5e"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/before/tests/google/gd32_multi_test.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/before/tests/google/gd32_multi_test.cpp",
+      "kind": "evidence",
+      "bytes": 10447,
+      "sha256": "ed5d50a83373f3a774c3c772038d15cfd22392a6bfedae496f2e6a3467ef5402"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/before/tests/google/stm32_official_test.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/before/tests/google/stm32_official_test.cpp",
+      "kind": "evidence",
+      "bytes": 3116,
+      "sha256": "e505586592c0354af8ec0d74d18c9b2796308b9a0c7e48c46148b82b50fdc70b"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/before-index.zlib",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/before-index.zlib",
+      "kind": "evidence",
+      "bytes": 729216,
+      "sha256": "5df5a4db40d0ec219805cd970730ec33a7d7834c678c484308a09b6a34cc2c70"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/configure-red-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/configure-red-archive.json",
+      "kind": "evidence",
+      "bytes": 1147,
+      "sha256": "babc8f271e3ab04025e83acb85f9c9e7dd845de8c91f239e2132c221ca2bccba"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/configure-red.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/configure-red.zip",
+      "kind": "evidence",
+      "bytes": 3856,
+      "sha256": "f08b61559c3310450ff384839fcac48ab5a25767f84221246b00eb2774f7ecef"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/four-source-diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/four-source-diff.raw",
+      "kind": "evidence",
+      "bytes": 18860,
+      "sha256": "874f0f6d443005fa8d24cd9db3ee28562007ec434b6cb6462954bc56ca87bcd8"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/green-build-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/green-build-archive.json",
+      "kind": "evidence",
+      "bytes": 1147,
+      "sha256": "c2926bd2dcac2055eb8f5f22e56b68018139114e08fc79ba483cf2b7488f88c7"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/green-build.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/green-build.zip",
+      "kind": "evidence",
+      "bytes": 3608,
+      "sha256": "d48e0af1efb2ec47429cd86b889b71fc6d5947d9757b74ee33d491a0634a7356"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/green-gd-runtime-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/green-gd-runtime-archive.json",
+      "kind": "evidence",
+      "bytes": 1279,
+      "sha256": "c4884065595b4902068787ddbac22c6a776f8b3cc290eb50c9ddddf28d962322"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/green-gd-runtime.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/green-gd-runtime.zip",
+      "kind": "evidence",
+      "bytes": 4649,
+      "sha256": "d9fb9436e94b2d2812bfa337e8aae21d0dcb8be6d6f45c6ec5cc6406305bd342"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/green-stm-runtime-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/green-stm-runtime-archive.json",
+      "kind": "evidence",
+      "bytes": 1279,
+      "sha256": "436332293db0d05c6da1f5b8a558a73ff6a74aa52b8c26c7903349ea26245707"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/green-stm-runtime.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/green-stm-runtime.zip",
+      "kind": "evidence",
+      "bytes": 4706,
+      "sha256": "1477f7b0890c57b0bb1b96a9f4897b5fe2936eb67cd6d6d4c0feaae28b34d4fa"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/old-case-preservation-corrected-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/old-case-preservation-corrected-r2.json",
+      "kind": "evidence",
+      "bytes": 2167,
+      "sha256": "8b0eaa75e22a32b4b471286eb71085108dbf368741962d136aeb586e21d71cb9"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/old-case-preservation.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/old-case-preservation.json",
+      "kind": "evidence",
+      "bytes": 263,
+      "sha256": "7b0c9986cb9ba3783b54ebf55bbfb9f619db11f9e7171c6374d8fa470c8a9fe2"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/prepare_production.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/prepare_production.py",
+      "kind": "evidence",
+      "bytes": 3412,
+      "sha256": "fd3a691f03537ed2ad096535cd9793acf53bfa0ab07e93337d1f3626eec57103"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/prepare_tests.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/prepare_tests.py",
+      "kind": "evidence",
+      "bytes": 9239,
+      "sha256": "0b55368c81db2ad7be1c08c2e66a7f8159d24bffbf27731ae4794c7265961836"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/production/soc/gd32f470/drivers/gpio.c.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production/soc/gd32f470/drivers/gpio.c",
+      "kind": "evidence",
+      "bytes": 7615,
+      "sha256": "4563397605d46c76b30e1da1e3019d3ed3c56c3d29db3e027697ff3a47213991"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/production/soc/stm32f407/drivers/gpio.c.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production/soc/stm32f407/drivers/gpio.c",
+      "kind": "evidence",
+      "bytes": 8430,
+      "sha256": "de908497fed6d9c6023be8f3c75f9e17846e25c175b510eef054bf2b01eb474c"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/production-manifest.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/production-manifest.json",
+      "kind": "evidence",
+      "bytes": 284,
+      "sha256": "8bc60405954a720d232c7d561c9626e8c6f61b016f7f7a3b7ec2945903e16650"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-build-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-build-archive.json",
+      "kind": "evidence",
+      "bytes": 1149,
+      "sha256": "da9c1d855eb4449d5f60ff1e02978ca6af49393b4fbc8e38fb0a24b4840d4cc5"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-build-plan-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-build-plan-archive.json",
+      "kind": "evidence",
+      "bytes": 1147,
+      "sha256": "6c19112946f7de39b22463050c5563588a71f684a4ea3ea107d55b6ba9d4dbbf"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-build-plan.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-build-plan.zip",
+      "kind": "evidence",
+      "bytes": 3203,
+      "sha256": "97701cebcdb8cd3238a387e49cb8d22d04527fb24a4ca7de8513a28bb976f8ff"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-build.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-build.zip",
+      "kind": "evidence",
+      "bytes": 3898,
+      "sha256": "0861b0312f239921ac4af773607533bc80c14a063d528a5cab96a1de072721aa"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-gd-discovery-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-gd-discovery-archive.json",
+      "kind": "evidence",
+      "bytes": 1147,
+      "sha256": "6c0b299198725408e23d57ae9ed895d47fbd6957a6b650b0fe4998c3716880b7"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-gd-discovery.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-gd-discovery.zip",
+      "kind": "evidence",
+      "bytes": 3533,
+      "sha256": "f395cdffd14b49b5f8fcc6ffce45f14c381c3de3c84c26dea49887b6cb5192e9"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-gd-runtime-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-gd-runtime-archive.json",
+      "kind": "evidence",
+      "bytes": 1282,
+      "sha256": "993399bbddac606b71b8a56a6a0acfb00b019bb407b4d1c84722a9ece0de81d2"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-gd-runtime.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-gd-runtime.zip",
+      "kind": "evidence",
+      "bytes": 7513,
+      "sha256": "601561b68233301d651a3d35e9d142d89fc4021e9e3fddc67cd37e76fad98261"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-stm-discovery-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-stm-discovery-archive.json",
+      "kind": "evidence",
+      "bytes": 1147,
+      "sha256": "57f95e7f21f2b87fbb9d78b43e5666c2bfe23120ffa33ec5014fc2ad99a0b88d"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-stm-discovery.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-stm-discovery.zip",
+      "kind": "evidence",
+      "bytes": 3572,
+      "sha256": "f439df6326b5e6a0cf35ce862ed1446c6e98f4ca4c65618ba7122dbf6ef595c8"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-stm-runtime-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-stm-runtime-archive.json",
+      "kind": "evidence",
+      "bytes": 1282,
+      "sha256": "d490db247b95bbc93f8c44b2a54f0a174894b882d44b3b0fc58b027af9525b62"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/red-stm-runtime.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/red-stm-runtime.zip",
+      "kind": "evidence",
+      "bytes": 7470,
+      "sha256": "6868ae2c2e3f3ab162f29bbccbf686d09d9972f71ce659905ff9c76919ed52a6"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/run_step.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/run_step.py",
+      "kind": "evidence",
+      "bytes": 4698,
+      "sha256": "20b34319632592e56790fba5f1f02a5149ac7230d37253d2f6a62430d7a3643e"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/seal.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/seal.py",
+      "kind": "evidence",
+      "bytes": 10623,
+      "sha256": "6440f7be64ca3a3185776c8fab647b95ada06312358c7926c3e5d9a1ebff50ad"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/source-and-execution-freeze-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/source-and-execution-freeze-r1.json",
+      "kind": "evidence",
+      "bytes": 21202,
+      "sha256": "0b8e56852040f1ecaaa91e10a2be797bf517e2064770c4ead9752cd76fb10fcf"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/test-install-and-sdk-fact-correction.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/test-install-and-sdk-fact-correction.json",
+      "kind": "evidence",
+      "bytes": 1951,
+      "sha256": "6f56087d2b7af395b878b578692cfd870a377443df30427ca4e958e88ad3f033"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/tests-only/tests/google/gd32_multi_test.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only/tests/google/gd32_multi_test.cpp",
+      "kind": "evidence",
+      "bytes": 17961,
+      "sha256": "69aa40bd5d015edb253849c1abcd71bddc0b966c88715dbe1034a61b0d9e285a"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/tests-only/tests/google/stm32_official_test.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only/tests/google/stm32_official_test.cpp",
+      "kind": "evidence",
+      "bytes": 10099,
+      "sha256": "15d53e9c4b3320bf4129385d2ca0d594ced36cc5455d9f970ada90f1fd20ff4f"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/tests-only-manifest.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/tests-only-manifest.json",
+      "kind": "evidence",
+      "bytes": 299,
+      "sha256": "5a6fe2f84bfaa4034bb31ee408edae4112d9bf7ccd21b096a955b6e8e907a12a"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/whole-file-comments-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/whole-file-comments-archive.json",
+      "kind": "evidence",
+      "bytes": 1149,
+      "sha256": "bce19f7a16bbfe8b4d562ee5f8c659e1adba8ea7a3c1d4bbef394938b41499fb"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/whole-file-comments.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/whole-file-comments.zip",
+      "kind": "evidence",
+      "bytes": 4323,
+      "sha256": "1a0d61691c85c2330a171dab6eb1b44eee4ea4b6913a787263715d252d480c2a"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/whole-file-format-archive.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/whole-file-format-archive.json",
+      "kind": "evidence",
+      "bytes": 1147,
+      "sha256": "4d3a6980d3bc4792583b2f8562e641ac6bb33aaca619e80b08de2f6a0443072c"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/whole-file-format.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/whole-file-format.zip",
+      "kind": "evidence",
+      "bytes": 3398,
+      "sha256": "23d41574cd5f77006df19a60c5adc0b203dd07ef38b8e542b7d65ca9e6c7ef97"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/author-integration-map-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/gpio-read-ownership-r1/transport-map-r1.json",
+      "bytes": 18153,
+      "sha256": "8d331334b7e7c71ccd9f31827ba26147a0103bfb2eb003aa44b2fbd2b94e561a",
+      "kind": "evidence"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/original-feasibility-plan-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/io31-next-slice-readonly-r1.json",
+      "bytes": 24148,
+      "sha256": "990d1ceecadaec9e69df83daa14fe8a9b29726f05291c33a0886b4c23575fe91",
+      "kind": "evidence"
+    },
+    {
+      "expected_path": "tests/evidence/gpio-read-ownership/gd470-tg-extent-plan-addendum-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/io31-gd470-gpio-tg-extent-addendum-r1.json",
+      "bytes": 7203,
+      "sha256": "e783cced3396ba8d3fd12f31c4d9ae85975e163044b168ac556a98a78fcd28b4",
+      "kind": "evidence"
+    }
+  ],
+  "author_map_sha256": "8d331334b7e7c71ccd9f31827ba26147a0103bfb2eb003aa44b2fbd2b94e561a",
+  "scope": "Four source changes; original feasibility plan and its SDK fact correction are both preserved; no ledger/ABI/board/runtime state change."
+}
