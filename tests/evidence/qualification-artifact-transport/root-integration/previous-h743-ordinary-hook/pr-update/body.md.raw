@@ -1,0 +1,14 @@
+完善通用嵌入式平台的静态装配、I/O 所有权与厂商适配验证。保留 typed factory、多态接口和静态实例，产品应用位于独立仓库。
+
+本次加入 H743 SPI4 有限 DMA 的 typed IR、静态实例、三种 UART 共存装配和双语能力目录；收紧 DMA1／DMA2 共享复位域隔离、UART TC 中断退出和 SPI 最终访问顺序，修复此前 CI 暴露的 SDK 归属清单、ASAN 模型转换及 Clang 不变量表达。既有 Flash RAM、RTC/LPTIM、GPIO、USB、睡眠计时、严格 SDK 消费计划和离线工作流 DSL 检查保持覆盖。
+
+当前已推送 HEAD `f9a1d157d19bdbe9b34137768263a80ab59c47f2`：
+
+- 完整普通提交门禁与 commit-msg 实际通过：309 个 GoogleTest 程序、5427 个用例、2377 个工具测试，零失败、零跳过；530 个变更文件和全部36份源码逐字绑定当前干净提交。所有先前失败、修正和原始执行记录保留。
+- H743 SPI DMA 当前仅精确 H743ZIT6、HSI64、裸机、cache-off、SPI4 mode0/8-bit 的有限双缓冲路径。UART TX 或 RX 共存，不宣称 continuous、duplex 或 cache-on。新3配置尚待 canonical SDK 消费迁移。
+- 400 个模型用例及5组 ARM 构建属于原 D2 源码冻结；SPI 隔离后续修正另有53 Debug、53 ASAN/UBSAN及完整831次 Clang 分析证据。这些开发证据不替代当前完整源码树的新 ARM／SDK／OCI 验收。
+- 旧精确提交 `474b3da3` 的[远端验证39108657073](https://github.com/X-Gen-Lab/nexus/actions/runs/39108657073)任务成功，包含 SDK、OCI 和两次新鲜禁网构建。809844813字节的单件 artifact 超过连接器512MiB限制，直接下载也被拒；API任务成功与日志已核，原始 ZIP 尚未下载独立核验，不能据此升级当前 HEAD 的软件资格。
+- 为关闭该验收障碍，证据分卷工具已完成31项工具测试、52项工作流测试、严格身份与体积回归及独审，等待单独正常提交后在新精确 HEAD 上执行真实远端上传／API绑定／下载验证。
+- 普通 CI 按每个实际源码树独立判定；当前提交不继承旧提交的通过结果。UART 运行期复位域保护和 canonical SPI SDK 接入继续实施。
+
+42项当前已提交台账仍为18 implemented、14 in_progress、10 pending；IO-27 将在规范化交付中据实际子集更新为 in_progress。software_status 保持 not_qualified，hardware_status 为 not_executed。PR 保持 draft，不作正式发布或实板验收。

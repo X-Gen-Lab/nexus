@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "/dev/shm/nexus-qualification-transport-feature-20261018-r1/core_binding_probe.py"
+  ],
+  "cwd": "/dev/shm/nexus-qualification-transport-20261018-r1",
+  "stage": "core-binding-probe-r1",
+  "started_ns": 1792313115709572120,
+  "finished_ns": 1792313115824324678,
+  "duration_seconds": 0.11475313900155015,
+  "timeout_seconds": 180.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/core-binding-probe-r1.attempts/1792313115709499981-cc3c0baa0182406f964fec56eef783cf/stdout.txt",
+    "bytes": 278,
+    "sha256": "3ff7840f2dbc52a6b50a4b55ee149bafa990f8f4b6ed3eadbf75b4c7131fcbe6"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/core-binding-probe-r1.attempts/1792313115709499981-cc3c0baa0182406f964fec56eef783cf/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -278,6 +278,12 @@ jobs:
               with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
                   stream.write('ready=true\n')
           PY
+      - name: Derive original role selectors from the maintained authority
+        id: transport_plan
+        if: always() && steps.readiness.outputs.ready == 'true'
+        run: >-
+          python3 tools/evidence/qualification_transfer.py plan
+          --github-output "$GITHUB_OUTPUT"
       - name: Bind available artifacts to the actual completed or failed job
         id: identity
         if: always() && steps.readiness.outputs.ready == 'true'
@@ -286,19 +292,134 @@ jobs:
           job: software-qualification
           result: ${{ job.status }}
           expected-commit: ${{ inputs.expected_commit }}
-          output: build/job-identities/software-qualification
+          output: ${{ steps.transport_plan.outputs.identity_output }}
           require-dependencies: 'true'
-          artifacts: |
-            build/software-qualification/
-            build/delivery/
+          artifacts: ${{ steps.transport_plan.outputs.identity_inputs }}
           tools: |
             python=python3
             cmake=cmake
             compiler=arm-none-eabi-gcc
             docker=docker
+      - name: Prepare complete lossless evidence volumes
+        id: prepare
+        if: always() && steps.identity.outcome == 'success'
+        run: >-
+          .venv/bin/python tools/evidence/qualification_transfer.py prepare
+          --root "$GITHUB_WORKSPACE"
+          --output "$GITHUB_WORKSPACE/build/qualification-transfer"
+          --commit "$NEXUS_EXPECTED_COMMIT"
+          --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
+          --github-output "$GITHUB_OUTPUT"
+      - name: Retain independent evidence volume 0
+        id: part0
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 0
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-000
+          path: build/qualification-transfer/parts/part-000
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 1
+        id: part1
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-001
+          path: build/qualification-transfer/parts/part-001
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 2
+        id: part2
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-002
+          path: build/qualification-transfer/parts/part-002
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 3
+        id: part3
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 3
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-003
+          path: build/qualification-transfer/parts/part-003
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 4
+        id: part4
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-004
+          path: build/qualification-transfer/parts/part-004
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 5
+        id: part5
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 5
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-005
+          path: build/qualification-transfer/parts/part-005
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 6
+        id: part6
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 6
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-006
+          path: build/qualification-transfer/parts/part-006
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain independent evidence volume 7
+        id: part7
+        if: always() && steps.prepare.outcome == 'success' && fromJSON(steps.prepare.outputs.count) > 7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-part-007
+          path: build/qualification-transfer/parts/part-007
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Record actual volume upload outcomes without qualification
+        id: transfer_result
+        if: always() && steps.prepare.outcome == 'success'
+        env:
+          NEXUS_UPLOAD_STEPS: ${{ toJSON(steps) }}
+        run: >-
+          .venv/bin/python tools/evidence/qualification_transfer.py finish
+          --output "$GITHUB_WORKSPACE/build/qualification-transfer"
+      - name: Retain the independently downloadable core index last
+        id: core
+        if: always() && steps.prepare.outcome == 'success'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: qualification-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}-core
+          path: build/qualification-transfer/core/
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
       - name: Retain exact software scopes or explicitly unqualified failure evidence
         id: upload
-        if: always()
+        if: always() && steps.prepare.outcome != 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: software-qualification-${{ github.sha }}-${{ github.run_attempt }}

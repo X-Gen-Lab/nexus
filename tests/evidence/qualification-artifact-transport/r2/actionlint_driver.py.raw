@@ -1,0 +1,13 @@
+import hashlib,json,os
+from pathlib import Path
+ROOT=Path('/dev/shm/nexus-qualification-transport-20261018-r1')
+FEATURE=Path('/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2')
+config=FEATURE/'neutral-actionlint.yml'
+config.write_text('{}\n')
+paths=sorted([*ROOT.glob('.github/workflows/*.yml'),*ROOT.glob('.github/workflows/*.yaml')])
+inputs={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+for p in sorted(ROOT.glob('.github/actions/*/action.y*ml')):inputs[str(p.relative_to(ROOT))]=hashlib.sha256(p.read_bytes()).hexdigest()
+(FEATURE/'actionlint-inputs.json').write_text(json.dumps(inputs,indent=2)+'\n')
+tool='/tmp/nexus-io-validation-20261018/.venv/nexus-actionlint/actionlint'
+os.environ['GOMAXPROCS']='1'
+os.execv(tool,[tool,'-shellcheck=','-pyflakes=','-no-color','-config-file',str(config),*[str(p) for p in paths]])

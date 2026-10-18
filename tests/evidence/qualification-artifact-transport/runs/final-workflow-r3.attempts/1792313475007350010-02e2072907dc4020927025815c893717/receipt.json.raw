@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    ".github/workflows",
+    "-p",
+    "test_platform_ci.py",
+    "-v"
+  ],
+  "cwd": "/dev/shm/nexus-qualification-transport-20261018-r1",
+  "stage": "final-workflow-r3",
+  "started_ns": 1792313475007478163,
+  "finished_ns": 1792313479848704587,
+  "duration_seconds": 4.841227295000863,
+  "timeout_seconds": 180.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-workflow-r3.attempts/1792313475007350010-02e2072907dc4020927025815c893717/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-workflow-r3.attempts/1792313475007350010-02e2072907dc4020927025815c893717/stderr.txt",
+    "bytes": 8697,
+    "sha256": "c0bf4faa726717f83df518a9c3b5770b70cff0db80bbabf6b6f74a0fab1a8597"
+  }
+}

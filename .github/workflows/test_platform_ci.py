@@ -523,6 +523,12 @@ class SoftwareQualificationContracts(unittest.TestCase):
             script = script.replace('.venv/bin/python tools/evidence/store.py',
                                     shlex.quote(sys.executable) + ' ' +
                                     shlex.quote(str(ROOT / 'tools/evidence/store.py')))
+        if env.get('REAL_QUALIFICATION_TRANSFER') == 'true':
+            for prefix in ('python3', '.venv/bin/python'):
+                script = script.replace(
+                    prefix + ' tools/evidence/qualification_transfer.py',
+                    shlex.quote(sys.executable) + ' ' + shlex.quote(str(
+                        ROOT / 'tools/evidence/qualification_transfer.py')))
         return subprocess.run(['bash', '-euo', 'pipefail', '-c', script],
                               cwd=root, env=env, capture_output=True, text=True)
 
@@ -895,8 +901,8 @@ class SoftwareQualificationContracts(unittest.TestCase):
             collection = self.execute('collect', root, env)
             self.assertEqual(collection.returncode, 0,
                              collection.stdout + collection.stderr)
-            selected = [root / path for path in
-                        self.step('identity')['with']['artifacts'].splitlines()]
+            from tools.evidence.qualification_transfer import ROOTS
+            selected = [root / path for _, path in ROOTS[:2]]
             try:
                 record = capture(root=root, job='offline-navigation-fixture',
                                  result='success', expected_commit=env['NEXUS_EXPECTED_COMMIT'],
@@ -948,6 +954,89 @@ class SoftwareQualificationContracts(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(result.stdout, expected)
 
+    def test_transport_plan_uses_the_single_role_authority(self):
+        from tools.evidence.qualification_transfer import ROOTS
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            env['REAL_QUALIFICATION_TRANSFER'] = 'true'
+            result = self.execute('transport_plan', root, env)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            actual = Path(env['GITHUB_OUTPUT']).read_text()
+            self.assertIn('identity_inputs<<NEXUS_ROOTS\n' +
+                          '\n'.join(path for _, path in ROOTS[:2]) +
+                          '\nNEXUS_ROOTS\n', actual)
+            self.assertIn('identity_output=' + dict(ROOTS)['job_identity'],
+                          actual)
+
+    def test_failed_prepare_preserves_original_diagnostics_without_ready(self):
+        from tools.evidence import store
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            env['REAL_QUALIFICATION_TRANSFER'] = 'true'
+            original = root / 'build/software-qualification'
+            original.mkdir(parents=True)
+            (original / 'failure.raw').write_bytes(b'original failure raw\n')
+            before = store.inventory(original)
+            result = self.execute('prepare', root, env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(store.inventory(original), before)
+            self.assertFalse(Path(env['GITHUB_OUTPUT']).exists())
+            self.assertFalse((root / 'build/qualification-transfer/core').exists())
+
+    def test_real_finalizer_preserves_partial_upload_failure(self):
+        from unittest.mock import patch
+        from tools.evidence.qualification_transfer import ROOTS
+        from tools.maintenance.job_identity import capture
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            env['REAL_QUALIFICATION_TRANSFER'] = 'true'
+            for _, relative in ROOTS[:2]:
+                directory = root / relative
+                directory.mkdir(parents=True)
+                (directory / 'original.raw').write_bytes(b'opaque raw\n')
+            with patch.dict(os.environ, env):
+                capture(root=root, job='software-qualification', result='success',
+                        expected_commit=env['NEXUS_EXPECTED_COMMIT'],
+                        artifacts=[root / p for _, p in ROOTS[:2]],
+                        tools={'python': sys.executable},
+                        output=root / dict(ROOTS)['job_identity'])
+            prepared = self.execute('prepare', root, env)
+            self.assertEqual(prepared.returncode, 0, prepared.stderr)
+            env['NEXUS_UPLOAD_STEPS'] = json.dumps({
+                'part0': {'outcome': 'failure', 'outputs': {}}})
+            failed = self.execute('transfer_result', root, env)
+            self.assertNotEqual(failed.returncode, 0)
+            receipt = json.loads((root / 'build/qualification-transfer/core/'
+                                  'uploads.json').read_text())
+            self.assertEqual(receipt['status'], 'partial')
+            self.assertFalse(receipt['qualified'])
+            self.assertEqual(receipt['uploads'][0]['outcome'], 'failure')
+
+    def test_multipart_uploads_are_individually_connector_bounded(self):
+        steps = self.steps()
+        parts = [step for step in steps
+                 if re.fullmatch(r'part[0-7]', step.get('id', ''))]
+        self.assertEqual(len(parts), 8,
+                         'One oversized ZIP cannot be independently downloaded')
+        for index, step in enumerate(parts):
+            self.assertEqual(step['id'], 'part' + str(index))
+            self.assertIn('always()', step['if'])
+            self.assertNotIn('continue-on-error', step)
+            self.assertEqual(step['with']['compression-level'], '0')
+            self.assertTrue(step['with']['path'].endswith(
+                '/parts/part-' + str(index).zfill(3)))
+        core = self.step('core')
+        self.assertEqual(core['with']['compression-level'], '0')
+        self.assertGreater(steps.index(core), steps.index(parts[-1]))
+        self.assertIn("steps.prepare.outcome != 'success'",
+                      self.step('upload')['if'])
+
     def test_identity_and_failure_upload_are_explicit_and_exact(self):
         steps = self.steps()
         identity = self.step('identity')
@@ -956,12 +1045,19 @@ class SoftwareQualificationContracts(unittest.TestCase):
         self.assertEqual(identity['with']['result'], '${{ job.status }}')
         self.assertEqual(identity['with']['require-dependencies'], 'true')
         upload = self.step('upload')
-        self.assertEqual(upload['if'], 'always()')
+        self.assertEqual(upload['if'],
+                         "always() && steps.prepare.outcome != 'success'")
         self.assertEqual(upload['with']['include-hidden-files'], 'true')
         self.assertEqual(upload['with']['if-no-files-found'], 'error')
         self.assertEqual(upload['with']['retention-days'], '30')
-        self.assertEqual(steps[steps.index(upload) - 1], identity)
-        self.assertIn(identity['with']['output'], upload['with']['path'])
+        self.assertLess(steps.index(identity), steps.index(self.step('prepare')))
+        self.assertEqual(identity['with']['output'],
+                         '${{ steps.transport_plan.outputs.identity_output }}')
+        self.assertEqual(identity['with']['artifacts'],
+                         '${{ steps.transport_plan.outputs.identity_inputs }}')
+        from tools.evidence.qualification_transfer import ROOTS
+        self.assertEqual(upload['with']['path'].splitlines(),
+                         [path + '/' for _, path in ROOTS])
         self.assertEqual(self.step('collect')['if'], 'always()')
         collect = self.step('collect')['run']
         self.assertIn('tools/evidence/store.py export', collect)

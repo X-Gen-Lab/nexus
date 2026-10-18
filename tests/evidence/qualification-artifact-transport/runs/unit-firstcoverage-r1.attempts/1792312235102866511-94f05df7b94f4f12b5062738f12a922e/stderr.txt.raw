@@ -1,0 +1,69 @@
+test_changed_original_snapshot_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_changed_original_snapshot_refused) ... ok
+test_complete_existing_portable_schema_round_trip (tools.testing.test_qualification_transfer.QualificationTransferTests.test_complete_existing_portable_schema_round_trip) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmp560069wt/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmp560069wt/joined'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_existing_output_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_existing_output_refused) ... ok
+test_hidden_zero_length_and_directory_modes_preserved (tools.testing.test_qualification_transfer.QualificationTransferTests.test_hidden_zero_length_and_directory_modes_preserved) ... ok
+test_identity_source_and_run_mismatch_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_identity_source_and_run_mismatch_refused) ... ok
+test_input_alias_symlink_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_input_alias_symlink_refused) ... ok
+test_missing_extra_and_changed_part_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_missing_extra_and_changed_part_refused) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpo01hlt46/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_missing_required_upload_never_complete (tools.testing.test_qualification_transfer.QualificationTransferTests.test_missing_required_upload_never_complete) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpvqncymft/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_missing_role_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_missing_role_refused) ... ok
+test_output_inside_input_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_output_inside_input_refused) ... ok
+test_partial_receipt_cannot_verify (tools.testing.test_qualification_transfer.QualificationTransferTests.test_partial_receipt_cannot_verify) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpdg1g0b1s/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_rehashed_bad_gzip_and_tar_tails_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_rehashed_bad_gzip_and_tar_tails_refused) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/bad-0'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/bad-1'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/bad-2'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/bad-3'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/bad-4'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmpe3pbz4f4/bad-5'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_rehashed_first_padding_malformed_header_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_rehashed_first_padding_malformed_header_refused) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmphpuwhw69/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmphpuwhw69/header-512'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmphpuwhw69/header-1'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_role_authority_is_exact (tools.testing.test_qualification_transfer.QualificationTransferTests.test_role_authority_is_exact) ... ok
+test_success_without_artifact_identity_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_success_without_artifact_identity_refused) ... /dev/shm/nexus-qualification-transport-20261018-r1/tools/evidence/qualification_transfer.py:162: ResourceWarning: unclosed file <_io.BufferedReader name='/dev/shm/nexus-qualification-transport-test-output-20261018-r1/tmp5svb5iyh/transfer/check.tar.gz'>
+  stream_digest(archive.open('rb')) != package['archive']['sha256']):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_tiny_split_boundaries_and_ninth_part_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_tiny_split_boundaries_and_ninth_part_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.084s
+
+OK

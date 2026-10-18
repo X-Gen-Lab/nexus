@@ -1,0 +1,483 @@
+{
+  "schema": 1,
+  "kind": "independent_read_only_qualification_multipart_transport_review",
+  "status": "PASS",
+  "open_blockers": [],
+  "reviewed_at_utc": "2026-10-18T09:02:04.202017+00:00",
+  "scope": "Exact final R2 five-source multipart evidence transport, original R1 history, tiny complete module/whole workflow/DSL/source-check evidence. This is byte/mode/context-consistency transport review, not API authentication or software qualification.",
+  "author_root": "/dev/shm/nexus-qualification-transport-20261018-r1",
+  "head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "index": {
+    "path": "/dev/shm/nexus-qualification-transport-20261018-r1/.git/index",
+    "bytes": 3575304,
+    "sha256": "83443500e47d1c7c3e8fee792f820385f0b77cc3c0e3aa9de96a9425647c5230"
+  },
+  "final_transport_map": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/transport-map-r2.json",
+    "bytes": 3392,
+    "sha256": "3f077a319c66062e2f198545cc64269b57ccf228834bde085563ce3d29bef405"
+  },
+  "final_freeze": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/source-and-execution-freeze-r2.json",
+    "bytes": 3527,
+    "sha256": "f31a18583af669e214c7fe16554ff025d8eaf337892aa9f9e605f7cae835d46b"
+  },
+  "final_handoff": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/handoff-r2.json",
+    "bytes": 1662,
+    "sha256": "2621dab2735067cff4a2f8af011f797cfc7da9f63318d7f7d43e839306732d42"
+  },
+  "original_transport_map_unchanged": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/transport-map-r1.json",
+    "bytes": 2862,
+    "sha256": "954fe7e710c30024da3a56681f73053dc7d1a52c19788d0fb24d8980c2660477"
+  },
+  "original_freeze_unchanged": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/source-and-execution-freeze-r1.json",
+    "bytes": 3293,
+    "sha256": "2d9179c3492b032b2f8cc9415850d9257ef64e81c74ee100fe34cb67e5d0ce4f"
+  },
+  "source_files": [
+    {
+      "bytes": 25434,
+      "mode": 384,
+      "relative_path": "tools/evidence/qualification_transfer.py",
+      "sha256": "72971508bbab15318cf33aff5b24fd10202a9c7c309d9b1348838575294a4931",
+      "source": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/files/tools/evidence/qualification_transfer.py"
+    },
+    {
+      "bytes": 23043,
+      "mode": 384,
+      "relative_path": "tools/testing/test_qualification_transfer.py",
+      "sha256": "55de5db88e4e0504cce620274fef2c03f3ead41894c1e1577e928ecd4bdf8811",
+      "source": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/files/tools/testing/test_qualification_transfer.py"
+    },
+    {
+      "bytes": 21872,
+      "mode": 384,
+      "relative_path": ".github/workflows/software-qualification.yml",
+      "sha256": "0e2f9855c403255f4a90e84d6bbc8add1d73736b3b3bf810cf351fe6b384611a",
+      "source": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/files/.github/workflows/software-qualification.yml"
+    },
+    {
+      "bytes": 65499,
+      "mode": 384,
+      "relative_path": ".github/workflows/test_platform_ci.py",
+      "sha256": "de74a13c78c849062ace3e5d285706c909ca873853ea25262237d3ee245d9d2b",
+      "source": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/files/.github/workflows/test_platform_ci.py"
+    },
+    {
+      "bytes": 10414,
+      "mode": 384,
+      "relative_path": "tools/evidence/README.md",
+      "sha256": "3adbf894062d5e2affa4c3120956767736e1344ccc18006713a903267ccc8bc6",
+      "source": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/files/tools/evidence/README.md"
+    }
+  ],
+  "source_scope": {
+    "only_authorized_five_tracked_untracked_paths": true,
+    "original_SDK_OCI_image_offline_and_checkout_guard_steps_before_identity_byte_identical": true,
+    "generic_store_unchanged_SHA256": "e3a9bde01dae28c3524daf9203a1512a66f317a99a62a7a0acf22e43a3013d7d",
+    "no_candidate_environment_recipe_reproduction_SDK_schema_or_cap_modified": true,
+    "source_dirty_and_some_submodules_uninitialized_explicit_in_frozen_record": true,
+    "not_a_clean_source_SDK_or_candidate_validation": true
+  },
+  "contract_review": {
+    "role_authority": "One immutable ROOTS table owns qualification=build/software-qualification, delivery=build/delivery, job_identity=build/job-identities/software-qualification. Plan CLI derives the original identity selectors from its first2 roles and output from third. Packaging includes all3 exact trees rather than selected OCI files.",
+    "inventory": "Hidden files, zero-byte files, empty directories, regular file bytes and portable-evidence permission bits0o777 are inventoried. Symlink/special paths, symlink ancestors and alias role-root inode pairs reject. Whole source membership/file hashes plus dev/inode/type-mode/size/uid/gid/mtime_ns/ctime_ns signatures are compared after streaming and after package validation; atime is ignored. No promise of preventing an external unobserved change after the call returns.",
+    "outputs": "Fresh prepare and join destinations reject overlap with owned input trees. No move/delete/hardlink of original tree files is used. CLI control output checks protected-root/output overlap and existing nlink1 regular-file shape, so it cannot append to a hardlinked protected file. Dedicated concurrent hostile-mount proof is not claimed.",
+    "stream_and_bounds": "Gzip TAR streams through SplitWriter directly into <=8 parts; production CLI uses fixed256MiB, MAX_BYTES8GiB, MAX_FILES100000, core64MiB. Internal tiny splitter sizes are test-only parameters, not CLI cap lowering. Exact multiples do not add an empty part. Ninth-part failure closes partial output without qualified success.",
+    "part_join": "Only exact part-000..count-1 directory membership is accepted. Count1..8, true integer nonbool ordinals/offsets/sizes, contiguous offsets, full nonfinal256MiB size, per-file before/after identity, each SHA and complete joined archive size/SHA are checked; fresh output is never an overwrite.",
+    "framing": "Full bounded single gzip decompression checks CRC/ISIZE, eof and rejects concatenated/trailing compressed data. TAR paths/count/types/duplicates are checked; logical parser seeks to archive.offset before requiring all-zero tail and at least2 end blocks, catching malformed or short first padding headers. Existing store.verify_package then checks complete manifest/modes/content, and store.restore_tree is exercised by tiny roundtrip.",
+    "sparse_and_logical_bounds": "FinalR2 rejects any member.sparse value and any GNU.sparse PAX metadata before generic store extraction. Each member logical size and cumulative file payload size excluding the delivery manifest must be within8GiB. This closes the real R1 sparse/logical-admission defect without altering generic store.",
+    "identity_closure": "Core identity record canonical selfhash/kind/schema/logical job, expected source commit, run and attempt, permitted original result, and clean source for original success are validated. The archived identity file SHA must equal exact original core identity bytes. Every qualification/delivery file path+size+SHA, including empty files and hidden names, must equal the complete original job artifact list; roots and duplicate refs reject. This is consistency of an unsigned source-bound record, not proof that a caller cannot fabricate a new complete record.",
+    "uploads": "Eight explicit static pinned upload steps each carry exactly one part, with compression0/hidden/error-on-missing/30day retention and source/run/attempt/ordinal names. always() makes later uploads and core attempt despite a prior part failure. Finish requires every used slot success plus numeric unique artifact ID and64hex digest; unused slots must be absent/skipped. Partial finish returnsnonzero and records partial; core uploads last. Its own upload/final job/API admission remains external, explicitly never inferred.",
+    "workflow_failure_path": "Prepare failure preserves original roots and uses the existing monolithic failure-only uploader; it can remain too large and unadmitted. No continue-on-error, matrix rebuild, custom network/container implementation or altered B=T identity appears. Original identity is captured before packing; its success cannot override a later upload or final-job failure."
+  },
+  "evidence_verification": {
+    "archives": [
+      {
+        "round": "r1",
+        "archive": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/execution-evidence-r1.tar.gz",
+          "bytes": 866919,
+          "sha256": "859690f10deb2da56dd0d12e05d61503c533dfc8c7b49a8d92807f278e4d91b2"
+        },
+        "map": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/execution-evidence-map-r1.json",
+          "bytes": 56055,
+          "sha256": "40113432dee813416d2bab8d36aa885173376053c76b76757ad14c550e0c403c"
+        },
+        "members": 167,
+        "expanded_tar_bytes": 1832960,
+        "all_member_bytes_sha_mode_and_original_file_matches": true,
+        "complete_gzip_CRC_ISIZE_EOF_read": true
+      },
+      {
+        "round": "r2",
+        "archive": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/execution-evidence-r2.tar.gz",
+          "bytes": 29903,
+          "sha256": "5c80305fea9e3135e1c1012207bda158a35bce52f7615d3dcfb07d901adeca35"
+        },
+        "map": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/execution-evidence-map-r2.json",
+          "bytes": 14292,
+          "sha256": "daa069908bfb022885a2144c7e4864dee07f4487a2783ad5d17fb14d1a64d3fe"
+        },
+        "members": 43,
+        "expanded_tar_bytes": 256000,
+        "all_member_bytes_sha_mode_and_original_file_matches": true,
+        "complete_gzip_CRC_ISIZE_EOF_read": true
+      }
+    ],
+    "total_original_members": 210,
+    "maintained_process_receipts": 28,
+    "all_actual_receipt_returncodes_match_child_and_completed_stable_withdrawal": true,
+    "parent167_all_bytes_modes_and_hashes_unchanged_after_R2": true,
+    "final_complete_unit_tests": 31,
+    "final_complete_workflow_tests": 52,
+    "final_failures_errors_skips": 0,
+    "final_stages": [
+      {
+        "stage": "r2-final-unit-r1",
+        "record": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-final-unit-r1.json",
+          "bytes": 3164,
+          "sha256": "5f801feaf9f95d50f4fdabf13357e158b963bf54e5f1eeee41fe5d8f4ce8f108"
+        },
+        "receipt": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-final-unit-r1.attempts/1792313720394152510-7f286e59254441248b24377278885c98/receipt.json",
+          "bytes": 1192,
+          "sha256": "7d2b21c782b46e246494017ac0423b5187a4cdaf23e762349ee3ebc7e354d2a4"
+        },
+        "maximum_child_kib": 27316
+      },
+      {
+        "stage": "r2-final-workflow-r1",
+        "record": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-final-workflow-r1.json",
+          "bytes": 3168,
+          "sha256": "0ca508e58f6742bbf5fec8cea8729077e7bb9a1e331e50cf1ea8f82f65fe7983"
+        },
+        "receipt": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-final-workflow-r1.attempts/1792313729511514761-b8dd922293394d5db301ea7c7ed9baf7/receipt.json",
+          "bytes": 1241,
+          "sha256": "7e57464ec0d6956c0fe4aa019e9a93afdc0b35725af0fc3bcf511abfabd7ec12"
+        },
+        "maximum_child_kib": 34184
+      },
+      {
+        "stage": "r2-source-check-r1",
+        "record": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-source-check-r1.json",
+          "bytes": 3166,
+          "sha256": "17a35a8eac3e60fa683ab249c75280bc9bc74134a4b5a040b11dc11f49d3f27e"
+        },
+        "receipt": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-source-check-r1.attempts/1792313744520768384-338ee2217f04404fab7020f9619d0a36/receipt.json",
+          "bytes": 1198,
+          "sha256": "61117bf4a0c590c44b8f0af2f2a67176c7b2be771bc99bcdc39cd9601354c5a4"
+        },
+        "maximum_child_kib": 32156
+      },
+      {
+        "stage": "r2-actionlint-r1",
+        "record": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-actionlint-r1.json",
+          "bytes": 3164,
+          "sha256": "86ca6779ef6bfbf07b3aabaa4c2a92628bf7abac9b4f256b555adb0e389b76be"
+        },
+        "receipt": {
+          "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-actionlint-r1.attempts/1792313749447764238-65835dd169144216aeef9383be6a3227/receipt.json",
+          "bytes": 1195,
+          "sha256": "ab178da8ed3ed45cc9150daacb286f2ccdae8a95d896a2d5817363dbebea5cca"
+        },
+        "maximum_child_kib": 27404
+      }
+    ],
+    "five_file_maintained_text_check_and_three_Python_AST": true,
+    "whole_repository_actionlint": "Actual locked1.7.12 over original YAML inputs recorded by hash; command uses neutral{}config and disables optional shellcheck/pyflakes per reported DSL scope. Not a live GitHub service dispatch.",
+    "receipts": [
+      {
+        "round": "r1",
+        "stage": "workflow-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792311650066862011,
+        "finished_ns": 1792311652646053114,
+        "sha256": "388eabf396f90ba222d057e02405432c3a9a34962725ce8c327b4fcb9ee7759a",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "workflow-red-r2",
+        "exit_code": 1,
+        "started_ns": 1792312081528063294,
+        "finished_ns": 1792312085365314008,
+        "sha256": "76e6dfb1638eafbae8f491f5274b92bc040b0c8066753bea7f65ecdc7168d93f",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "unit-firstcoverage-r1",
+        "exit_code": 0,
+        "started_ns": 1792312235102922164,
+        "finished_ns": 1792312235317602136,
+        "sha256": "ba65e86c44cc28ef729025a51b0da1ba1d6052baa22c948d1f043961858d602d",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "workflow-green-r1",
+        "exit_code": 0,
+        "started_ns": 1792312312114613935,
+        "finished_ns": 1792312316249426042,
+        "sha256": "91a91de42d43e9ea872a1beba0775da444e65e6b2d4ea1d4bcdd2550eecd7f33",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "parser-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792312371848774543,
+        "finished_ns": 1792312372063287826,
+        "sha256": "a0f9c49583acfbe2e7062f1f2166fe1a31173cf692f9b7977749190d127755cd",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "parser-green-r1",
+        "exit_code": 0,
+        "started_ns": 1792312407968888035,
+        "finished_ns": 1792312408183614816,
+        "sha256": "a349cf163edcd5eda46a6c4ac799ed509e09102eb26e04acc438740f7defcc53",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "workflow-green-r2",
+        "exit_code": 0,
+        "started_ns": 1792312502916896660,
+        "finished_ns": 1792312507557315626,
+        "sha256": "36439ba76b6aa6b8843da6e9208d4ea31a3e45294768c71297007497a2b6a91b",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "upload-identity-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792312564172292545,
+        "finished_ns": 1792312564387056466,
+        "sha256": "69ea45bfcef602d491d2fc52f981c602533ce8747fc4247f4bf44611b94d9811",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "unit-green-r2",
+        "exit_code": 0,
+        "started_ns": 1792312584362081177,
+        "finished_ns": 1792312584576590257,
+        "sha256": "565a8c20df2207e31b91c9133ca249254f7c43865dc8c57042ea4206df60e9f2",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "output-alias-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792312752800332340,
+        "finished_ns": 1792312753215586392,
+        "sha256": "27ad3ef23e4daf7280886a884f47cbcf57d0954ca68dd10c1cadbb562803dd6d",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "output-alias-green-r1",
+        "exit_code": 0,
+        "started_ns": 1792312773438751047,
+        "finished_ns": 1792312773805628517,
+        "sha256": "31a4cdf64500fec0706f0e1cd74263459c7b0b618d6c4969264cd170755c93ec",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "source-check-r1",
+        "exit_code": 0,
+        "started_ns": 1792312875326456397,
+        "finished_ns": 1792312875493842304,
+        "sha256": "898b71ae90fd8e5e9615ccfa8fde0bb3300c447d1d1d7ca3f02fb521d1308063",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "actionlint-r1",
+        "exit_code": 0,
+        "started_ns": 1792312926565795403,
+        "finished_ns": 1792312926630279791,
+        "sha256": "4710a46ca4882646f9c3b9b99bbbacb52fd92113afe1750dfff17538ecc6824f",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "final-unit-r1",
+        "exit_code": 0,
+        "started_ns": 1792312936678117222,
+        "finished_ns": 1792312937096207020,
+        "sha256": "b8d79d6acabf18f5fac9109b3cd2412c7384d992a498f72b790f740463efed69",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "final-workflow-r1",
+        "exit_code": 0,
+        "started_ns": 1792312958929505952,
+        "finished_ns": 1792312963872686767,
+        "sha256": "0d8cbda59bec79cb37c01f46714ba4063e325845d5319faa67d6aab8b0da4c94",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "core-binding-probe-r1",
+        "exit_code": 1,
+        "started_ns": 1792313115709572120,
+        "finished_ns": 1792313115824324678,
+        "sha256": "36a77080fbc6b384c7155d47c632678cd78342d70f21244cd9ba8cd0bf0581d1",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "identity-closure-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792313178070457779,
+        "finished_ns": 1792313178638910669,
+        "sha256": "b0d488b474a237dc78303ba4b975e6c50979c0c92a438a087dafe773b10bcf98",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "identity-closure-green-r1",
+        "exit_code": 0,
+        "started_ns": 1792313412290913148,
+        "finished_ns": 1792313412807411904,
+        "sha256": "420421cf41cc472de13d2c063df3e02f4799e9f3af48a92c7e2f593d17ce2e82",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "final-workflow-r2",
+        "exit_code": 0,
+        "started_ns": 1792313423538040799,
+        "finished_ns": 1792313428378150844,
+        "sha256": "63ca64da6191108b126b63e48fc120eabd2928faf15b32ef61782f53069f27d0",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "final-unit-r2",
+        "exit_code": 0,
+        "started_ns": 1792313460942274147,
+        "finished_ns": 1792313461357230458,
+        "sha256": "d3d3a9697a492ab2f4671fed78a26b8056989441432bf64902519625f396e973",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "final-workflow-r3",
+        "exit_code": 0,
+        "started_ns": 1792313475007478163,
+        "finished_ns": 1792313479848704587,
+        "sha256": "22e95155bf687bbbc227c5f02dda9aaae9151a0db559cf96b6f1f1ea8c3766f7",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "source-check-r2",
+        "exit_code": 0,
+        "started_ns": 1792313493473688061,
+        "finished_ns": 1792313493638582429,
+        "sha256": "77c1d199f1dc37bba73ad09f7e7233a0925fbf2a09ccc6ce440d089975c17f06",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r1",
+        "stage": "actionlint-r2",
+        "exit_code": 0,
+        "started_ns": 1792313497897857812,
+        "finished_ns": 1792313497930076600,
+        "sha256": "1a34439c8099d0da51c4765ddee097554b8b2a9c7bfc30483a061aed6f5138e6",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r2",
+        "stage": "r2-sparse-bound-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792313679407988694,
+        "finished_ns": 1792313679873563320,
+        "sha256": "d27e27a6ce9b21164c667cde2dfe24b49dba8cf6ea8977704739e576b764e694",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r2",
+        "stage": "r2-final-unit-r1",
+        "exit_code": 0,
+        "started_ns": 1792313720394215635,
+        "finished_ns": 1792313720863667069,
+        "sha256": "7d2b21c782b46e246494017ac0423b5187a4cdaf23e762349ee3ebc7e354d2a4",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r2",
+        "stage": "r2-final-workflow-r1",
+        "exit_code": 0,
+        "started_ns": 1792313729511577015,
+        "finished_ns": 1792313734270576730,
+        "sha256": "7e57464ec0d6956c0fe4aa019e9a93afdc0b35725af0fc3bcf511abfabd7ec12",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r2",
+        "stage": "r2-source-check-r1",
+        "exit_code": 0,
+        "started_ns": 1792313744520828395,
+        "finished_ns": 1792313744685279503,
+        "sha256": "61117bf4a0c590c44b8f0af2f2a67176c7b2be771bc99bcdc39cd9601354c5a4",
+        "withdrawal_complete": true
+      },
+      {
+        "round": "r2",
+        "stage": "r2-actionlint-r1",
+        "exit_code": 0,
+        "started_ns": 1792313749447825310,
+        "finished_ns": 1792313749481334224,
+        "sha256": "ab178da8ed3ed45cc9150daacb286f2ccdae8a95d896a2d5817363dbebea5cca",
+        "withdrawal_complete": true
+      }
+    ]
+  },
+  "TDD_and_failure_classification": {
+    "initial_capability": "New-module whole16 firstcoverage GREEN was recorded honestly, with observed ResourceWarning later resolved; not invented missing-import RED.",
+    "workflow_delivery_RED": "First whole workflow attempt mixed setup/path/dependency failures with new policy assertion and is not accepted as pure behaviorRED. Corrected whole49 actual1failure proves original single oversized upload violates new multipart declaration, then real workflow integration GREEN.",
+    "parser": "Whole18 actual2fail\u2192GREEN for bool ordinal/empty uploads; upload identity whole22 actual1fail\u2192GREEN; output alias whole24 actual4fail\u2192GREEN. Raw failures and old source snapshots remain in original167.",
+    "identity_closure": "Whole28 actual4fail/0error\u2192same28GREEN: rehashed core/source change, different source payload, rehashed new raw inconsistent with original artifact list, and another logical job. This closes the initial mixability finding rather than merely checking count.",
+    "independent_sparse_finding": "Reviewer static candidate was not claimed as runtimeRED. Author then executed tiny real PAX64B sparse and empty GNU sparse plus logical256B and cumulative2x80B with test-only128B bound. Whole31 actual4 assertion failures/0errors\u2192same test bytes whole31GREEN after minimal wrapper fix. No GiB hole expansion or SDK/OCI run was used.",
+    "test_preservation": "All28 original unit TEST method bodies independently byte-compared unchanged;3 new methods added. Exact RED source test file equals final31 test bytes. All workflow source changes within the five-path scope were reviewed; existing qualification commands stay intact.",
+    "R1_admission": "OriginalR1 remains immutable historical28/52 source tuple and is not signed independently as final safe delivery after the sparse defect was established. FinalPASS binds only the R2 module/tests/docs composition."
+  },
+  "resource_and_lifetime_limits": {
+    "feature_allocated_bytes_observed": 3112960,
+    "feature_cap": 4194304,
+    "declared_tiny_test_output_cap": 33554432,
+    "source_index_and_all_five_current_bytes_unchanged_during_review": true,
+    "no_exact_big_artifact_RSS_throughput_or_zip_overhead_measurement": true,
+    "original809844813B_ZIP_still_not_independently_read": true,
+    "parts_under_connector_limit": "256MiB per-part payload with compression0 leaves margin under512MiB per artifact; actual API ZIP bytes/digest must still be admitted on a real new run.",
+    "large_artifact_prepare_download_join_restore_resource_admission_still_required": true
+  },
+  "unverified_or_out_of_scope": [
+    "No new remote dispatch/upload/download, actual GitHub API artifact-ID/digest/final-job authentication, or actual connector ZIP roundtrip was executed in this review or focused author batch.",
+    "No800MiB/2GiB package test, 8GiB payload stress, maximum100000-entry/resource stress or large-case RSS/WCET claim. Tiny patched bounds test admission logic, not those large physical resource observations.",
+    "No local SDK/OCI/environment/reproduction/ARM build, candidate promotion, API credential validation, physical MCU/HIL or validation of the historical oversized ZIP. Inner tools retain their own admission contracts.",
+    "Whole workflow test names about ARM/provider matrices are declaration/fixture checks here, not actual new firmware linking. Dedicated live concurrent writer/adversarial filesystem alias stress is not claimed beyond source checks and observed tiny refusal cases.",
+    "Root must normalize/integrate the exact final5 source and complete historical evidence, run ordinary complete staged-index hooks, commit/push and perform new actual source-bound remote/API collection before any new delivery qualification."
+  ],
+  "review_actions": "Only read/diff/hash/AST and raw archive/process/source-index verification; this independent exec-shm report is the sole reviewer write. No tests, SDK/OCI/binary/helper build, remote operation, Main/source/Git index modification or author-packet rewrite."
+}
