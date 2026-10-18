@@ -30,7 +30,8 @@ static bool fixed_run(void) {
     return (RCC->CR & ready) == ready && (RCC->PLLCFGR & pll_mask) == pll &&
            (RCC->CFGR & bus_mask) == bus &&
            (FLASH->ACR & FLASH_ACR_LATENCY) == FLASH_ACR_LATENCY_5WS &&
-           (RCC->SSCGR & RCC_SSCGR_SSCGEN) == 0U;
+           (RCC->SSCGR & RCC_SSCGR_SSCGEN) == 0U &&
+           (RCC->APB1LPENR & RCC_APB1LPENR_TIM2LPEN) != 0U;
 }
 
 nx_result_t nx_stm32f407_sleep(nx_clock_barrier_t barrier,

@@ -1,0 +1,25 @@
+{
+  "actual_setup_failure": {
+    "command": [
+      ".venv/bin/ninja",
+      "-C",
+      "build/native-debug",
+      "-n",
+      "nexus_stm32f407_clock_sleep_test",
+      "nexus_gd32f470_clock_sleep_test",
+      "nexus_clock_domain_test",
+      "nexus_stm32f407_lowpower_test",
+      "nexus_gd32f470_lowpower_test",
+      "nexus_stm32f407_lowpower_integration_test",
+      "nexus_gd32f470_lowpower_integration_test"
+    ],
+    "exit_code": 127,
+    "stderr": "/bin/bash: line 1: .venv/bin/ninja: No such file or directory",
+    "meaning": "Initial readonly dependency probe setup failure, not behavioral RED; corrected to canonical executable already recorded by existing CMakeCache."
+  },
+  "corrected_dry_run": {
+    "exit_code": 0,
+    "stdout": "ninja: Entering directory `build/native-debug`\n[0/2] Re-checking globbed directories...\n[1/2] Re-running CMake...\n",
+    "meaning": "Actual command exit0; outer read batch ended2 because optional ls paths did not exist."
+  }
+}

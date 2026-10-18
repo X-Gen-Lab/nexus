@@ -1,0 +1,82 @@
+"""Bounded development driver; uses the maintained command and Google admission."""
+import hashlib,json,os,sys,time,subprocess,resource
+from pathlib import Path
+ROOT=Path("/tmp/nexus-h743-fixed-hsi-s0-20261018")
+EV=Path(__file__).resolve().parent
+OUT=Path("/tmp/nexus-sleep-timer-gate-20261018-r1")
+sys.path.insert(0,str(ROOT))
+from tools.dev import process
+from tools.evidence.identity import observe_git_source
+from scripts.ci.tdd_gate import discovered_count,validate_google_report
+from scripts.validation.junit import prepare_report
+BASE=json.loads((EV/"baseline.json").read_text())
+ENV={k:v for k,v in os.environ.items() if not k.startswith("GTEST_")}
+ENV.update(PYTHONDONTWRITEBYTECODE="1",NEXUS_BUILD_JOBS="1",CMAKE_BUILD_PARALLEL_LEVEL="1",CTEST_PARALLEL_LEVEL="1")
+ENV["PATH"]="/tmp/nexus-io-validation-20261018/.venv/bin:"+ENV.get("PATH","")
+ALLOWED={x["path"] for x in BASE["sources"]}
+def sha(p):
+ with Path(p).open("rb") as f:return hashlib.file_digest(f,"sha256").hexdigest()
+def allocated(p):
+ total=0;seen=set()
+ for base,ds,fs in os.walk(p):
+  for name in ds+fs:
+   s=(Path(base)/name).lstat();key=(s.st_dev,s.st_ino)
+   if key not in seen:seen.add(key);total+=s.st_blocks*512
+ return total
+def git(*args):return subprocess.check_output(["git",*args],cwd=ROOT)
+def guard():
+ assert git("rev-parse","HEAD").decode().strip()==BASE["head"]
+ assert hashlib.sha256(git("ls-files","--stage","-z")).hexdigest()==BASE["index_stage_sha256"]
+ index=Path(git("rev-parse","--git-path","index").decode().strip());index=index if index.is_absolute() else ROOT/index
+ assert sha(index)==BASE["index_sha256"]
+ changed={os.fsdecode(x) for x in git("diff","--name-only","-z").split(b"\0") if x}
+ assert changed<=ALLOWED,changed
+ actual={os.fsdecode(x) for x in git("ls-files","--others","--exclude-standard","-z").split(b"\0") if x}
+ assert actual=={x["path"] for x in BASE["untracked"]},actual
+ for x in BASE["untracked"]:assert sha(ROOT/x["path"])==x["sha256"]
+ growth=allocated(ROOT/"build")-BASE["build_allocated_before"]+allocated(OUT)
+ assert growth<=BASE["tmp_new_build_budget"],growth
+ return {"source":observe_git_source(ROOT),"build_plus_evidence_growth":growth,"memory_current":Path("/sys/fs/cgroup/memory.current").read_text().strip(),"memory_events":Path("/sys/fs/cgroup/memory.events").read_text()}
+def command(argv,folder,name):
+ return process.run(argv,cwd=ROOT,env=ENV,log=folder/(name+".raw"),timeout=600,stage=name)
+def main():
+ phase=sys.argv[1];folder=OUT/phase;folder.mkdir(parents=True,exist_ok=False)
+ before=guard();result={"phase":phase,"before":before,"started_ns":time.time_ns()}
+ try:
+  if phase.endswith("build"):
+   argv=["/tmp/nexus-io-validation-20261018/.venv/bin/cmake","--build",str(ROOT/"build/native-debug"),"--parallel","1","--target",*sys.argv[2:]]
+   r=command(argv,folder,"build");result["returncode"]=r.returncode
+   assert r.returncode==0,r.stderr
+  elif phase in ("red","green","related"):
+   import xml.etree.ElementTree as ET
+   rows=[]
+   for name in sys.argv[2:]:
+    binary=ROOT/"build/native-debug/bin"/name
+    listing=command([str(binary),"--gtest_filter=*","--gtest_list_tests"],folder,name+"-discovery")
+    assert listing.returncode==0
+    count=discovered_count(listing.stdout)
+    report=folder/(name+".xml");start=prepare_report(report)
+    r=command([str(binary),"--gtest_filter=*","--gtest_repeat=1","--gtest_also_run_disabled_tests","--gtest_output=xml:"+str(report)],folder,name+"-execution")
+    if phase=="red":
+     doc=ET.parse(report).getroot();cases=list(doc.iter("testcase"))
+     failures=[c.get("name") for c in cases if c.find("failure") is not None]
+     assert len(cases)==count and int(doc.get("disabled","0"))==0
+     assert all(c.get("status")=="run" and c.get("result")=="completed" and c.find("skipped") is None for c in cases)
+     assert r.returncode==1 and set(failures)=={"DisabledTimerSleepClockRejectsWithoutRepair","TimerSleepClockAtFinalMaskBoundaryIsRechecked"},failures
+     evidence={"tests":count,"failed_cases":failures,"passed":count-len(failures),"skipped":0}
+    else:
+     assert r.returncode==0
+     evidence=validate_google_report(report,not_before_ns=start,expected_cases=count)
+    rows.append({"binary":name,"binary_sha256":sha(binary),"exit_code":r.returncode,"discovered":count,"xml_sha256":sha(report),**evidence})
+   result["programs"]=rows;result["returncode"]=0
+  else:
+   r=command(sys.argv[2:],folder,phase);result["returncode"]=r.returncode;assert r.returncode==0
+  result["after"]=guard();assert result["before"]["source"]==result["after"]["source"]
+  result["status"]="completed"
+ except BaseException as e:
+  result["status"]="failed";result["error"]=str(e);raise
+ finally:
+  result["finished_ns"]=time.time_ns();result["self_maxrss_kib"]=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss;result["max_completed_child_rss_kib"]=resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+  (folder/"result.json").write_text(json.dumps(result,indent=2)+"\n")
+  print(json.dumps(result,indent=2),flush=True)
+if __name__=="__main__":main()

@@ -1,0 +1,494 @@
+{
+  "schema": "nexus.independent-code-review.v1",
+  "reviewed_at_utc": "2026-10-18T04:48:36.419852+00:00",
+  "reviewer": "/root/style_control_chars",
+  "subject": "STM32F407/GD32F470 shallow-sleep timer sleep-clock admission",
+  "status": "no-blockers-for-normal-integration-gates",
+  "blockers": [],
+  "scope": {
+    "mode": "Independent read-only review: exact3 sources/full diff, baseline preservation, original RED/GREEN/related process receipts/raw/XML, artifact/input identities and final archive. Reviewer ran no tests, compiler, build, SDK or hardware operations.",
+    "baseline_commit": "ce4bc5bb45eaa92a368017492f5e840ce8e5a3b2",
+    "author_root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "author_index_sha256": "9812cdded4af7887e8f20fd3964a753509dbb9e127248c4ea3eac9ff54f4a1e9",
+    "index_unchanged_at_review_end": true,
+    "baseline11_untracked_preserved": true,
+    "final3_source_packet_equal_author_tree": true,
+    "writes": "Only this new review report; no production/source/index/main/author-packet/raw/history edits."
+  },
+  "bindings": {
+    "source-freeze-r1.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/source-freeze-r1.json",
+      "bytes": 1048,
+      "sha256": "895135c28eb81adeb93a6f07d812b9cde592b60585f6a93c879163013c311f4c"
+    },
+    "source.diff": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/source.diff",
+      "bytes": 4840,
+      "sha256": "4c1d7f68a8adbf7738c6de58bc147275c8afe9b085e62c4d128a4d9cc5bacfc1"
+    },
+    "baseline.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/baseline.json",
+      "bytes": 3682,
+      "sha256": "a208a4838ec8f1dcb751e1ef509b355443b44c4b1804fe77ec25e94600b74348"
+    },
+    "completed-handoff-r1.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/completed-handoff-r1.json",
+      "bytes": 14045,
+      "sha256": "68656027ecac0a564234861ccaad7e1e212334b471ee13a48c192c553373b68d"
+    },
+    "inputs-and-artifacts.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/inputs-and-artifacts.json",
+      "bytes": 90791,
+      "sha256": "9536c30509ab43a0175cbd5a5a92714dc49f1e7956d613e7771d471db5f447e7"
+    },
+    "execution-evidence.tar.gz": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/execution-evidence.tar.gz",
+      "bytes": 52790,
+      "sha256": "19bdae9770c11fc0a99092c0a06cf0085ee6552afcfcafce83556b5ca2ef4f84"
+    },
+    "execution-archive-manifest.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/execution-archive-manifest.json",
+      "bytes": 38870,
+      "sha256": "f06de34a85c0b000e7fe3474384b692e8f9155449fb711d86671b2807ff1b5b5"
+    },
+    "arm-object-preparation.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/arm-object-preparation.json",
+      "bytes": 7282,
+      "sha256": "3f95390743eed5e4e8905680b48269574f6d6d9b49bdaaac8f90d812e09d5166"
+    },
+    "setup-observations.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/setup-observations.json",
+      "bytes": 981,
+      "sha256": "92704d3c6f3aef5b179b41558e6517b28e10020d5c5c9f80fa0d34672e7cc01b"
+    },
+    "report-generation-observation-r1.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/report-generation-observation-r1.json",
+      "bytes": 398,
+      "sha256": "859b8e905eb0ea85a8515889ae7b0a5ed300856efcddf1ec75dabf840baccbbb"
+    }
+  },
+  "source_map": [
+    {
+      "path": "soc/stm32f407/sleep.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/soc/stm32f407/sleep.c",
+      "sha256": "46ff30d8daed46d8974c23dcb9afb00c3cf48812109e584772552f559a1653bc",
+      "bytes": 3843
+    },
+    {
+      "path": "soc/gd32f470/sleep.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/soc/gd32f470/sleep.c",
+      "sha256": "9bc1732c1cac5fffd976cd3ca8a40d5a86efc874283dbb5b0495946307874fbc",
+      "bytes": 3878
+    },
+    {
+      "path": "tests/google/clock_sleep_soc_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/tests/google/clock_sleep_soc_test.cpp",
+      "sha256": "12966b51c1a92043185822db25b8456d23b377a9dd11a1b32e9af3a28fb08796",
+      "bytes": 11829
+    }
+  ],
+  "source_review": [
+    {
+      "area": "Minimal production change",
+      "finding": "Each file adds exactly one read-only fixed_run conjunction: F407 RCC->APB1LPENR & RCC_APB1LPENR_TIM2LPEN; GD RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN must be nonzero. Removing it restores each whole baseline file exactly. No clock repair, register write, initialization, owner state, ABI, namespace or dynamic path added."
+    },
+    {
+      "area": "Selected physical gate",
+      "finding": "Vendor headers place both selected sleep-enable registers at offset0x60, TIM2/TIMER1 bit0. Existing family timebase_lowpower admission checks these same gates. This check establishes sleep-gate admission only, not all timer configuration/health/wake IRQ/clock ownership."
+    },
+    {
+      "area": "Final masked observation",
+      "finding": "Original context/mask validation and IRQ save remain. Actual fixed_run MMIO read occurs under the saved mask after closed-domain quiescence and before acquire wake-sequence load/WFI. Removing an initially enabled bit in the IRQ-save hook is rejected by that actual later read. No cached gate or duplicate pre-mask check claim."
+    },
+    {
+      "area": "Failure contract",
+      "finding": "For valid shallow-sleep input and quiescent closed domain, missing gate yields NX_ERROR_UNSUPPORTED, slept=false, no WFI, restored IRQ state. Existing invalid/context/BUSY/barrier precedence remains. No token revocation, barrier consumption, domain/sequence mutation, reset or clock repair."
+    },
+    {
+      "area": "Regression mechanism",
+      "finding": "Two new cases use actual production sleep providers plus existing real clock-domain and guarded-WFI model; only CPU/context boundary leaves are injected. Missing-at-call and removed-at-final-mask each check unsupported/false/no WFI/restored mask, exact8192 MMIO bytes, domain/barrier/token bytes and wake sequence. Restoring the bit by external owner permits sleep on the same retained barrier."
+    },
+    {
+      "area": "Preserved tests",
+      "finding": "All18 old unique TEST_F bodies exact (17 F407 and18 GD runtime cases, one GD-only). Fixture explicitly enables the newly required gate. Existing context/deep/dynamic/wake/source/domain/borrow/overlap assertions remain. No filter/shard/skip/framework/debt change."
+    },
+    {
+      "area": "Scope limit",
+      "finding": "Shallow-sleep admission correction only. No claim of complete timer configuration, dynamic clocks, Stop continuity, active-I/O enrollment beyond contract, IO30 completion, current linked ARM budget, clean installed SDK, offline dual-build candidate or physical MCU/HIL."
+    }
+  ],
+  "preservation": {
+    "all3_before_images_equal_baseline_git_blobs": true,
+    "red_test_equals_final_bytes": true,
+    "test_sha256": "12966b51c1a92043185822db25b8456d23b377a9dd11a1b32e9af3a28fb08796",
+    "old_unique_test_bodies_exact": 18,
+    "old_runtime_cases": 35,
+    "new_runtime_cases": 4,
+    "unchanged_related_model_and_call_chain": [
+      {
+        "path": "tests/google/clock_domain.cmake",
+        "sha256": "aa9af9c12246b2e714d1b8d4592d7d4c877181d20be50b1722e45c0e87a906f4"
+      },
+      {
+        "path": "tests/google/clock_sleep_soc_model.h",
+        "sha256": "712b50471d79383a50ed51ae938b9bee81a08a877f7f171eb6baa4996c03f8f0"
+      },
+      {
+        "path": "tests/google/clock_domain_test.cpp",
+        "sha256": "b463bbcfcc04e22ead5c5f53fbbadde1fded7fcefaf4af9e2002e3033ff65664"
+      },
+      {
+        "path": "tests/google/timebase_lowpower.cmake",
+        "sha256": "a4d10203a8998c6edfccd96b14ea72b311d86e3db7e4cb74c47b945b6a0b6998"
+      },
+      {
+        "path": "tests/google/timebase_soc_test.cpp",
+        "sha256": "e035ff382338e97f32dbdda09908e5e8b4fc8558def8b88424de7134069cdc6b"
+      },
+      {
+        "path": "tests/google/timebase_soc_integration_test.cpp",
+        "sha256": "05d72601c949f7d6fb0b7a230ed6ad9cf774eaeec71a6603c3d0f286ebbc89d4"
+      },
+      {
+        "path": "tests/google/timebase_soc_model.h",
+        "sha256": "33b64e2d475a4d26daec64bd0ae90912f0ccab229fa245aff4984a93b8da4b84"
+      },
+      {
+        "path": "tests/google/timebase_lowpower_model.h",
+        "sha256": "0acc1b94511c701f436018a14c3a5fb290bc07045efa29b82499d9ced32684ee"
+      },
+      {
+        "path": "components/clock_domain/src/clock_domain.c",
+        "sha256": "2ed3d7bc5a032af162adf5da6c74e17156b05d2fdbe7d7fef6734d98a4bd8763"
+      },
+      {
+        "path": "arch/cortex_m/nx_arch_sleep.c",
+        "sha256": "c1f87ad482c11f41b785fdbded2ec4a96a59fdbd9db52e3417033ae8d1c33b4b"
+      },
+      {
+        "path": "soc/stm32f407/timebase_lowpower.c",
+        "sha256": "c7d3431e7ca69b9d1977641338f5b2a9336ee2ce65642158c41b1c56d9a1f3f7"
+      },
+      {
+        "path": "soc/gd32f470/timebase_lowpower.c",
+        "sha256": "4e746f2e5573483799ad4f8f561f70299c279577ca9a3d8c67c9a8ec6006625d"
+      }
+    ]
+  },
+  "source_tuple_check": {
+    "independent_method": "Reconstructed Git full-index binary patch, index-stage bytes, untracked byte/mode identities and recursive children; canonical SHA256 matches original observation. RED uses test-only patch over baseline production; GREEN uses final3 patch. No source/index mutation.",
+    "red": "40fc2fd42ec5f4c3d3cb6a1aba9dc3221e89d1c56e9c311c5e5f4e07ad9c5759",
+    "green": "3db53d56f8c32a961c352002f261bae0bb4e406abc2e0b12c97fe0410e892694",
+    "all_phase_source_before_after_equal": true,
+    "limit": "Execution-boundary observation is not concurrent/ABA locking. Restored dependency bytes and canonical donor recursive locks are separately bound; no fresh clean recursive candidate qualification."
+  },
+  "tdd": {
+    "red": {
+      "whole_programs": [
+        {
+          "binary": "nexus_stm32f407_clock_sleep_test",
+          "exit_code": 1,
+          "tests": 19,
+          "passed": 17,
+          "skipped": 0,
+          "binary_sha256": "1d012912a14a8090e0649638be77a7ddf09aa3ce2bdff5ca0f975650f2aae8d2",
+          "xml_sha256": "489caae75476572310cccb9aa94eee8ddfb552886de0143cd918f64a1fc21e18"
+        },
+        {
+          "binary": "nexus_gd32f470_clock_sleep_test",
+          "exit_code": 1,
+          "tests": 20,
+          "passed": 18,
+          "skipped": 0,
+          "binary_sha256": "02896d5d49e7feb29c6679e41e9ebfa7e98e95b8cae113a401c238a2e6838cf6",
+          "xml_sha256": "b01e890bb899d5a6d2fcbb14172d65101b5bb544dba1c5ad5d414cde4da7e54d"
+        }
+      ],
+      "total_cases": 39,
+      "actual_child_exits": [
+        1,
+        1
+      ],
+      "failed_case_names_each": [
+        "DisabledTimerSleepClockRejectsWithoutRepair",
+        "TimerSleepClockAtFinalMaskBoundaryIsRechecked"
+      ],
+      "failed_cases_total": 4,
+      "old_passed": 35,
+      "skips": 0,
+      "reason": "Actual baseline Sleep wrongly returns NX_SUCCESS, slept=true and invokes modeled WFI with missing gate, including final-mask removal. Original raw/XML show these expectations failing. Behavioral production RED, not setup/link failure.",
+      "phase_wrapper_exit": 0,
+      "wrapper_meaning": "Expected actual child failures asserted and recorded as child exits1, not relabeled success."
+    },
+    "green": {
+      "whole_programs": [
+        {
+          "binary": "nexus_stm32f407_clock_sleep_test",
+          "exit_code": 0,
+          "tests": 19,
+          "passed": 19,
+          "skipped": 0,
+          "binary_sha256": "4471c76aec1a7e5fe07afb48128262012c35e6466a46c4ec58efa5de1b93f025",
+          "xml_sha256": "56e87de2b5cfdbf95c606f74fddc61f987000b932c240b8d2e9f2ad376046234"
+        },
+        {
+          "binary": "nexus_gd32f470_clock_sleep_test",
+          "exit_code": 0,
+          "tests": 20,
+          "passed": 20,
+          "skipped": 0,
+          "binary_sha256": "0af658beb57f2c674dd6b08a4b269f8e40cf2b4a416907c1071a4401bf18f0a1",
+          "xml_sha256": "12e79013e305a2c11e56ab95a34f9ba9af5f0b3810d9290533f2860a04636fbd"
+        }
+      ],
+      "passed": 39,
+      "actual_child_exits": [
+        0,
+        0
+      ],
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "related": {
+      "whole_programs": [
+        {
+          "binary": "nexus_clock_domain_test",
+          "exit_code": 0,
+          "tests": 17,
+          "passed": 17,
+          "skipped": 0,
+          "binary_sha256": "9e2282f3aec738c3704b975d87bdd1357500a6b5c0f2ba490679d34ae2030163",
+          "xml_sha256": "232561ba3a86c0b3462516dfc748b31e1e279f96ee714f43d4fa1083638999ab"
+        },
+        {
+          "binary": "nexus_stm32f407_lowpower_test",
+          "exit_code": 0,
+          "tests": 6,
+          "passed": 6,
+          "skipped": 0,
+          "binary_sha256": "1ed3cc8b658cc532f7d3c42d4a4fbf59666b6906c07b123785cd9ae6f6723f21",
+          "xml_sha256": "b3d24269bf913c4d1b07322e58d4e14ed198780075dfb15c2310799fb2830873"
+        },
+        {
+          "binary": "nexus_gd32f470_lowpower_test",
+          "exit_code": 0,
+          "tests": 6,
+          "passed": 6,
+          "skipped": 0,
+          "binary_sha256": "e5add1108f3da917ca0c9ece644110095ede34077a31d16e69f0226d9b8bd200",
+          "xml_sha256": "46b0d4b7810a853b2e85edec845d49a545b95996b006a9cf7b5374784c0342b3"
+        },
+        {
+          "binary": "nexus_stm32f407_lowpower_integration_test",
+          "exit_code": 0,
+          "tests": 3,
+          "passed": 3,
+          "skipped": 0,
+          "binary_sha256": "42f8520e2bf0ab2d7d06b4813a391404fd687f80e8d92feb57f1b1b1695abb31",
+          "xml_sha256": "56386a24bccc63f9720754047364b9c8a8358240a52c91de06ea4f7ad3ed5ef5"
+        },
+        {
+          "binary": "nexus_gd32f470_lowpower_integration_test",
+          "exit_code": 0,
+          "tests": 3,
+          "passed": 3,
+          "skipped": 0,
+          "binary_sha256": "cfa07077e9ded6f86697620bda154e0a3affb4d8f259fff10d06dbc2b274c1d2",
+          "xml_sha256": "0b61110d99733d31c1657f495e9e581cd85de0258c9990db560d189c256d5ede"
+        }
+      ],
+      "passed": 35,
+      "actual_child_exits": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "total_current_passed": 74,
+    "red_green_build_actual_exits": [
+      0,
+      0
+    ],
+    "format_actual_exit": 0,
+    "format_scope": "All3 whole files through maintained format tool, locked clang-format14.",
+    "independent_checks": "All26 command/attempt receipts agree on command/times/actual child exits; stdout/stderr lengths+SHA verified. All9 runtime XML hashes/case counts independently checked: run/completed, zero disabled/not-run/skips/errors; exact2 new failures per RED family, no GREEN/related failures. Current7 GREEN ELF hashes match recorded bytes.",
+    "commands": "Whole discovery --gtest_filter=* --gtest_list_tests; whole execution --gtest_filter=* --gtest_repeat=1 --gtest_also_run_disabled_tests with fresh XML. No subset or rerun relabeling.",
+    "retention_boundary": "Normal GREEN rebuild overwrote original RED Native ELFs; their original SHA/raw/XML/source tuple remain bound. Current7 GREEN ELFs temporarily retained and hash verified. No durable Native ELF copy claimed; bounded archive retains2 ARM objects."
+  },
+  "arm_objects": {
+    "actual_exits": [
+      0,
+      0
+    ],
+    "compiler_sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385",
+    "compiler_version": "Arm GNU Toolchain14.3.Rel1 gcc14.3.1 20250623",
+    "objects": [
+      {
+        "family": "stm32f407",
+        "object": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/stm32f407/sleep.o",
+          "bytes": 1716,
+          "sha256": "96c7902ffbd9fc6fd74581b26e38583e8d10910fc7db1768917bf7a9031bdf5c"
+        },
+        "dependencies": 24,
+        "dependency_file": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/stm32f407/sleep.d",
+          "bytes": 2547,
+          "sha256": "16ca38e21557a65f6de2e9f1127bac8fb2f29dd00fa4745a58371072616edef3"
+        }
+      },
+      {
+        "family": "gd32f470",
+        "object": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/gd32f470/sleep.o",
+          "bytes": 1728,
+          "sha256": "026a2a212ae6d13f9df40371615c2f55ef1fdb837327b201f4d88809b8a8cce2"
+        },
+        "dependencies": 38,
+        "dependency_file": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/gd32f470/sleep.d",
+          "bytes": 4430,
+          "sha256": "0ee71beddb7a465f35b2e00535ed8b8e62d01f7e919ccdcd7d26d8357512b085"
+        }
+      }
+    ],
+    "method": "Historical actual production argv relocated to own current source/include/output paths and existing locked compiler, with explicit -std=c11/-MD/-MF additions. Both frozen TUs compile strict C11/warnings-as-errors. Original/actual argv, DB/config and dependencies preserved. Compiler/object/dependency hashes and original archive bytes verified.",
+    "limit": "Object compilation only: no new current CMake graph, firmware link/resource result, SDK/HIL or physical hardware qualification."
+  },
+  "transport": {
+    "compiled_inputs_headers": 442,
+    "all442_current_length_sha_verified": true,
+    "native_object_rows": 22,
+    "canonical_donor_recursive_git_locks": 15,
+    "lock_native_archive_compiler_and_anchor_hashes_verified": true,
+    "archive_members": 158,
+    "all_regular_unique_canonical": true,
+    "path_escape_or_link_members": 0,
+    "all_member_size_sha_mode_verified": true,
+    "all150_execution_members_equal_TMP_original": true,
+    "all8_ARM_members_equal_original": true,
+    "command_actual_exits": [
+      {
+        "stage": "arm-gd32f470/arm-gd32f470",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "arm-stm32f407/arm-stm32f407",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "arm-tool/arm-tool",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "dependency-locks/dependency-locks",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "format/format",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "green/nexus_gd32f470_clock_sleep_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "green/nexus_gd32f470_clock_sleep_test-execution",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "green/nexus_stm32f407_clock_sleep_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "green/nexus_stm32f407_clock_sleep_test-execution",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "green-build/build",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "native-dependencies/native-dependencies",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "red/nexus_gd32f470_clock_sleep_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "red/nexus_gd32f470_clock_sleep_test-execution",
+        "actual_child_exit": 1
+      },
+      {
+        "stage": "red/nexus_stm32f407_clock_sleep_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "red/nexus_stm32f407_clock_sleep_test-execution",
+        "actual_child_exit": 1
+      },
+      {
+        "stage": "red-build/build",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_clock_domain_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_clock_domain_test-execution",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_gd32f470_lowpower_integration_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_gd32f470_lowpower_integration_test-execution",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_gd32f470_lowpower_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_gd32f470_lowpower_test-execution",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_stm32f407_lowpower_integration_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_stm32f407_lowpower_integration_test-execution",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_stm32f407_lowpower_test-discovery",
+        "actual_child_exit": 0
+      },
+      {
+        "stage": "related/nexus_stm32f407_lowpower_test-execution",
+        "actual_child_exit": 0
+      }
+    ],
+    "history_boundary": "Before/after/red-source/driver are original evidence. This report does not create or approve a normalized main map. If integrating history, Root should map historical source-looking suffixes to unchanged-byte evidence-only .raw targets and select only3 after/ sources as maintained code.",
+    "input_limit": "442 actual compiled identities at review time do not qualify whole restored dependency trees or installed SDK."
+  },
+  "preserved_nonbehavioral_failures": {
+    "setup": "Initial readonly dry-run own .venv/bin/ninja missing, actual127; preserved then corrected to existing canonical executable. Not production RED.",
+    "report": "Summary expected10 result directories, actual11, exited1 after validations joined. Corrected inventory only; no source/index/test/gate changes. Original record retained."
+  },
+  "integration_conditions": [
+    "Use exact3 frozen source identities with ordinary complete final-index gates.",
+    "Preserve original RED/GREEN/raw/XML/source identity and ARM object-only boundaries.",
+    "Do not upgrade IO30/timer-completeness/dynamic/Stop/SDK/HIL claims."
+  ]
+}
