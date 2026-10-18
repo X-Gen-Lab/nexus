@@ -9,7 +9,8 @@ add_library(nexus_io STATIC
     src/uart_rs485.c src/stream_budget.c src/can.c src/can_fd.c
     src/ethernet.c src/ethernet_frames.c src/mdio.c
     src/usb_device.c src/timer_capture.c src/advanced_pwm.c src/observation.c
-    src/pwm_group.c src/pwm_adc.c src/stream_profile.c src/encoder.c)
+    src/pwm_group.c src/pwm_adc.c src/stream_profile.c src/encoder.c
+    src/rtc.c src/lptim.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(nexus_io PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private")
 target_link_libraries(nexus_io PUBLIC nexus_core PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)
@@ -25,7 +26,7 @@ if(NEXUS_SOC_FAMILY STREQUAL "native")
         native/flash.c native/watchdog.c native/exti.c native/timer.c native/adc.c
         native/spi_async.c native/spi_dma_transaction.c native/stream.c
         native/can.c native/ethernet.c native/ethernet_frames.c
-        native/usb_device.c)
+        native/usb_device.c native/rtc_lptim.c)
     target_link_libraries(nexus_io_native PUBLIC nexus_io nexus_arch
         PRIVATE nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_io_native PRIVATE

@@ -1,0 +1,66 @@
+Running main() from gmock_main.cc
+[==========] Running 27 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 26 tests from NativeTime
+[ RUN      ] NativeTime.ColdConstructionCopiesClockWithoutReadingOrSettingTime
+[       OK ] NativeTime.ColdConstructionCopiesClockWithoutReadingOrSettingTime (0 ms)
+[ RUN      ] NativeTime.StatelessClockAndRejectedConstructionLeaveStorageIntact
+[       OK ] NativeTime.StatelessClockAndRejectedConstructionLeaveStorageIntact (0 ms)
+[ RUN      ] NativeTime.CalendarValidationUsesRawMod4YearsAndIndependentWeekday
+[       OK ] NativeTime.CalendarValidationUsesRawMod4YearsAndIndependentWeekday (0 ms)
+[ RUN      ] NativeTime.PreparationValidatesEveryInputBeforeChangingBaseOrPayload
+[       OK ] NativeTime.PreparationValidatesEveryInputBeforeChangingBaseOrPayload (0 ms)
+[ RUN      ] NativeTime.PreparationRejectsPartialInputOverlapWithoutDereferencingIt
+[       OK ] NativeTime.PreparationRejectsPartialInputOverlapWithoutDereferencingIt (0 ms)
+[ RUN      ] NativeTime.TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains
+[       OK ] NativeTime.TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains (0 ms)
+[ RUN      ] NativeTime.SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm
+[       OK ] NativeTime.SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm (0 ms)
+[ RUN      ] NativeTime.AlreadyMatchingAlarmIsRejectedWithoutEffects
+[       OK ] NativeTime.AlreadyMatchingAlarmIsRejectedWithoutEffects (0 ms)
+[ RUN      ] NativeTime.EqualityDeadlineRejectsBeforeBorrowOrSourceEffects
+[       OK ] NativeTime.EqualityDeadlineRejectsBeforeBorrowOrSourceEffects (0 ms)
+[ RUN      ] NativeTime.InvalidStaticAdmissionDoesNotReadCoreClock
+[       OK ] NativeTime.InvalidStaticAdmissionDoesNotReadCoreClock (0 ms)
+[ RUN      ] NativeTime.AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement
+[       OK ] NativeTime.AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement (0 ms)
+[ RUN      ] NativeTime.CalendarCarryUsesActualMonthLengthAndIndependentWeekday
+[       OK ] NativeTime.CalendarCarryUsesActualMonthLengthAndIndependentWeekday (0 ms)
+[ RUN      ] NativeTime.AlarmCrossesMidnightWithoutLosingIntermediateMatch
+[       OK ] NativeTime.AlarmCrossesMidnightWithoutLosingIntermediateMatch (0 ms)
+[ RUN      ] NativeTime.ClosedCalendarCanAdvanceButPublicReadAndReconstructReject
+[       OK ] NativeTime.ClosedCalendarCanAdvanceButPublicReadAndReconstructReject (0 ms)
+[ RUN      ] NativeTime.Full65536ShotWrapsCounterWithoutPublishingEarly
+[       OK ] NativeTime.Full65536ShotWrapsCounterWithoutPublishingEarly (0 ms)
+[ RUN      ] NativeTime.IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused
+[       OK ] NativeTime.IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused (0 ms)
+[ RUN      ] NativeTime.HeldCancelKeepsBorrowAndReportsFinalSevenTicks
+[       OK ] NativeTime.HeldCancelKeepsBorrowAndReportsFinalSevenTicks (0 ms)
+[ RUN      ] NativeTime.HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks
+[       OK ] NativeTime.HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks (0 ms)
+[ RUN      ] NativeTime.HeldRTCEventDoesNotOverrideEarlierCancellation
+[       OK ] NativeTime.HeldRTCEventDoesNotOverrideEarlierCancellation (0 ms)
+[ RUN      ] NativeTime.FirstObservedExpiryWinsOverPendingRTCEvent
+[       OK ] NativeTime.FirstObservedExpiryWinsOverPendingRTCEvent (0 ms)
+[ RUN      ] NativeTime.DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses
+[       OK ] NativeTime.DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses (0 ms)
+[ RUN      ] NativeTime.HeldStopClosesAdmissionButNeverRevokesEitherLoan
+[       OK ] NativeTime.HeldStopClosesAdmissionButNeverRevokesEitherLoan (0 ms)
+[ RUN      ] NativeTime.ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot
+[       OK ] NativeTime.ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot (0 ms)
+[ RUN      ] NativeTime.WholeAndPartialProviderAliasesRejectBeforeAnyWrite
+[       OK ] NativeTime.WholeAndPartialProviderAliasesRejectBeforeAnyWrite (0 ms)
+[ RUN      ] NativeTime.ActiveRequestCannotBePreparedAgainOrUsedAsOutput
+[       OK ] NativeTime.ActiveRequestCannotBePreparedAgainOrUsedAsOutput (0 ms)
+[ RUN      ] NativeTime.InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider
+[       OK ] NativeTime.InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider (0 ms)
+[----------] 26 tests from NativeTime (0 ms total)
+
+[----------] 1 test from NativeTimeDispatch
+[ RUN      ] NativeTimeDispatch.SharedReadonlyTableSupportsAnUnrelatedProvider
+[       OK ] NativeTimeDispatch.SharedReadonlyTableSupportsAnUnrelatedProvider (0 ms)
+[----------] 1 test from NativeTimeDispatch (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 27 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 27 tests.

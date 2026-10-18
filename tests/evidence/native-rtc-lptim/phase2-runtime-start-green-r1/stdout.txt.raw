@@ -1,0 +1,27 @@
+Running main() from gmock_main.cc
+[==========] Running 9 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 9 tests from NativeReopen
+[ RUN      ] NativeReopen.InvalidAndUnconstructedStorageRejectWithoutWriting
+[       OK ] NativeReopen.InvalidAndUnconstructedStorageRejectWithoutWriting (0 ms)
+[ RUN      ] NativeReopen.OpenIdleIsStateButRetainedOpenLoansTakeBusyPriority
+[       OK ] NativeReopen.OpenIdleIsStateButRetainedOpenLoansTakeBusyPriority (0 ms)
+[ RUN      ] NativeReopen.ReopenPreservesUnsetCalendarAndCopiedClockAndRate
+[       OK ] NativeReopen.ReopenPreservesUnsetCalendarAndCopiedClockAndRate (0 ms)
+[ RUN      ] NativeReopen.ClosedSourceProgressIsRetainedAndOldReadyAlarmStaysStale
+[       OK ] NativeReopen.ClosedSourceProgressIsRetainedAndOldReadyAlarmStaysStale (0 ms)
+[ RUN      ] NativeReopen.ClosedHeldLoansRequireActualDrainBeforeReopen
+[       OK ] NativeReopen.ClosedHeldLoansRequireActualDrainBeforeReopen (0 ms)
+[ RUN      ] NativeReopen.ExhaustedClosedOwnersRejectWithoutWrappingOrReconstruction
+[       OK ] NativeReopen.ExhaustedClosedOwnersRejectWithoutWrappingOrReconstruction (0 ms)
+[ RUN      ] NativeReopen.LastAvailableReopenHasNoHiddenEpochReset
+[       OK ] NativeReopen.LastAvailableReopenHasNoHiddenEpochReset (0 ms)
+[ RUN      ] NativeReopen.ExternalWithdrawalFaultSurvivesAJoinedReopen
+[       OK ] NativeReopen.ExternalWithdrawalFaultSurvivesAJoinedReopen (0 ms)
+[ RUN      ] NativeReopen.RepeatedStopStartCannotReviveReadyTokensOrFreshConstruct
+[       OK ] NativeReopen.RepeatedStopStartCannotReviveReadyTokensOrFreshConstruct (0 ms)
+[----------] 9 tests from NativeReopen (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 9 tests from 1 test suite ran. (0 ms total)
+[  PASSED  ] 9 tests.

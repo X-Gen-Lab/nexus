@@ -591,3 +591,5 @@ include(g474_pwm_shared_factory.cmake)
 include(h743_flash_ram.cmake)
 include(h743_flash_ram_closure.cmake)
 include(h743_flash_mpu.cmake)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake")
