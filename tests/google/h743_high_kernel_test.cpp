@@ -257,6 +257,10 @@ class H743HighSpi : public H743HighReference {
         state.clock_hz = 96000000U;
         state.poll_limit = 32U;
         endpoint = {&state, &cs, cs.mask, 1500000U, 0U};
+        for (unsigned pin : {12U, 13U, 14U}) {
+            ASSERT_EQ(NX_SUCCESS, nx_stm32h743_pin_alternate(
+                                      &g_h743_model.gpio_e, pin, 5U));
+        }
     }
     void TearDown() override {
         if (state.retained) {

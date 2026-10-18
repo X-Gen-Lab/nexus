@@ -1,0 +1,10 @@
+{
+  "kind": "actual divider RED before any production behavior change",
+  "python": "whole7 methods/23subtests,4failure subtests, noerrors/skips; exact authored controller/endpoint fixture asserted",
+  "native_peripheral": "whole42,4failed cases/12assertion failures, old37 passing with two explicitly changed slowtail rates",
+  "native_factory": "whole11,1failed newcase/2divider assertions after cold SR fixture correction, old10 passing",
+  "production_spi_sha256": "533fc21e6e8c25d138c1b6b4d2561a59f96785ffbba2158f5484054c35461dcd",
+  "production_bindings_sha256": "8211df2a6f05c83bcbac31ecd7187b9dac5aac502384302b2e229d3486d18395",
+  "retained_red_elfs": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-red53",
+  "initial_factory_whole_boundary": "Initialwhole11 retained raw/XML/receipt/source; twoextra failures were missing cold reset SR fixture facts, that mixed-source ELF was not retained and is not qualified. Pure corrected whole11 retained exact ELF."
+}

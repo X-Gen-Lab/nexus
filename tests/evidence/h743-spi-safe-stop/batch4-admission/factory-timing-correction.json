@@ -1,0 +1,17 @@
+{
+  "classification": "new factory fixture correction; not a production RED",
+  "provisional_source": {
+    "soc/stm32h743/drivers/spi.c": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0",
+    "tests/google/h743_peripheral_test.cpp": "5f22040613ac9ec10d6179518c35e5aed3284476e3f23f9d9356f9ecad0fdf4a",
+    "tests/google/h743_peripheral_factory_test.cpp": "e4a96c38cfd9ca1a34a77c435888482a3e49509f8080875583988a6d0ec81ae9"
+  },
+  "retained_evidence": "build/batch4-admission-evidence",
+  "facts": [
+    "Initial observer required I2C TIMINGR and PA6 PWM output, whose setup does not enter an IRQ critical section. First qualifying critical port occurred in SPI pin_alternate after initialize.",
+    "Initial factory13 RED and fixed-source factory13 nonzero are preserved but do not prove cold SPI rejection.",
+    "Generated order is ADC, EXTI, Flash, I2C, PWM, SPI, watchdog. ADC ADRDY is established after its last critical port; EXTI enters the next critical port before SPI.",
+    "Corrected observer selects actual running TIM2 and ADC ADRDY at EXTI entry. V Flash acquisition does not read HSITRIM. No provider progress flags or hooks are used.",
+    "TIM2 CR1 write refusal affects real parent System stop after selected child cleanup; it does not block subsequent PWM preparation."
+  ],
+  "next": "Restore old divider source 26766 for corrected whole49/13 authoritative RED, then restore identical minimal guard and rerun all six whole programs."
+}

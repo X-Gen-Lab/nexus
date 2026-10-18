@@ -1,0 +1,14 @@
+[
+  {
+    "path": "soc/stm32h743/drivers/spi.c",
+    "before": "07c35dfc1b58a27c5436b6414dbd78fbca50eb67cd7d4177977865ffb8c62092",
+    "after": "26766fe3e5b9010eeaa92164556c8701fbfeaafc65ed038c030630259fd7937e",
+    "comment_stripped_equal": true
+  },
+  {
+    "path": "tests/google/h743_peripheral_factory_test.cpp",
+    "before": "7551119fdbddee24e9f60716c60aa537d1db59f566b76e4870d9339b9dc6b3ee",
+    "after": "da4874c4b4a0b20b81a3e6a83594c1bb679300dcb15aeca08bb8e57d8a1e5c0f",
+    "comment_stripped_equal": true
+  }
+]

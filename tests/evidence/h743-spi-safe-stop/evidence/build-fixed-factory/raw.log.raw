@@ -1,0 +1,26 @@
++ /tmp/nexus-io-validation-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_h743_peripheral_factory_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_peripheral_factory_test.cpp.o
+[2/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743-peripheral-factory/bindings.c.o
+[3/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_model.cpp.o
+[4/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/system.c.o
+[5/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/gpio.c.o
+[6/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/spi.c.o
+[7/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/pwm.c.o
+[8/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/exti.c.o
+[9/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/adc.c.o
+[10/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/flash.c.o
+[11/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/i2c.c.o
+[12/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/watchdog.c.o
+[13/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/common/i2c_v2.c.o
+[14/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_flash_image_model.cpp.o
+[15/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_flash_fixture.cpp.o
+[16/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_flash_ram_closure_model.cpp.o
+[17/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_flash_mpu_model.cpp.o
+[18/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/flash_ram.c.o
+[19/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/flash_ram_owner.c.o
+[20/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/flash_ram_transaction.c.o
+[21/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/flash_mpu.c.o
+[22/25] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/__/__/soc/stm32h743/drivers/flash_execution.c.o
+[23/25] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_factory_test.dir/h743_flash_fixture_generated.cpp.o
+[24/25] Linking CXX executable bin/nexus_h743_peripheral_factory_test

@@ -1,0 +1,35 @@
+{
+  "kind": "independent read-only review of H743 CSTART rs and corrected two-stage regression plan",
+  "reviewed_at_utc": "2026-10-18T02:19:13.650621+00:00",
+  "source_scope": "No source changes, configuration, compilation, test execution, staging or commit by reviewer. Original S0.2 remains BLOCKED pending new source-bound TDD and final independent review.",
+  "official_reference": {
+    "RM0433": "Rev 9",
+    "text_path": "/tmp/nexus-h743-spi-s0-2-official-20261018/rm0433-attempt2.txt",
+    "text_sha256": "7b142be592dfa60b2e977691f8c26cf05709fe73d194f6accebbed8df9499949",
+    "register_access": "section 1.2, text lines 4912-4913: rs permits read/set; writing 0 has no effect",
+    "CSTART": "CR1 bit 9, rs, pages 2215-2216; software 1 starts, EOT or accepted suspension clears by hardware",
+    "CSUSP": "CR1 bit 10, write command, reads 0; page 2216",
+    "completion": "section 50.4.12 page 2177; finite TSIZE>0 TXC/EOT match, suspend waits CSTART clear"
+  },
+  "confirmed_problem": "Read-modify-write of CR1 carrying sampled CSTART=1 can reissue the software-start command after asynchronous EOT cleared it. The specification does not supply precedence for simultaneous CSTART=1 and CSUSP=1; a model must not resolve that ambiguity by treating CSTART as read-only.",
+  "minimal_command_rule": "Emit CSUSP with CSTART masked to 0. Under documented rs semantics this does not clear an ongoing CSTART=1, and avoids requesting a new transfer. Preserve all required other control bits.",
+  "two_stage_TDD": [
+    "With the old production CSUSP RMW, record actual MMIO command values and require CSUSP writes never contain CSTART=1. Execute the whole regression module for genuine RED before the minimal mask fix and whole GREEN. Do not simulate an undocumented priority for an unsafe command.",
+    "On the safe command implementation and the old strict SUSP-only predicate, inject an external finite EOT completion before command acceptance, producing CSTART=0/EOT=1/TXC=1/SUSP=0. Execute the whole module for genuine RED, then minimally accept CSTART=0 and (SUSP or (TSIZE>0 and EOT and TXC)), followed by fresh complete whole results.",
+    "Retain independent quiet delay, RX-prefix accounting, SUSP-clear readback, SPE-clear readback, CS-high readback, SCK GPIO handoff, reset, and active/caller loan retention on every failed withdrawal. Zero TSIZE and one-status-only negative cases remain nonreturning/borrow-retained conservative tests."
+  ],
+  "prior_provisional_evidence": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch2-eot-race/actual-red.json",
+    "sha256": "9d8931d6b912d5dc0022c6db1ffee19413c58c838430623670e19afd7dd3c299",
+    "observed_whole_exit": 1,
+    "tests": 36,
+    "failed_cases": 2,
+    "failure_assertions": 5,
+    "limitation": "Executed using the prior model assumption; immutable failure history only, not closure of corrected rs command semantics. The original plan fixture sentence that stale CSTART cannot restart is invalid and must remain historical rather than current."
+  },
+  "qualification": {
+    "new_execution_by_reviewer": false,
+    "hardware_executed": false,
+    "integration_ready": false
+  }
+}

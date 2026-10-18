@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="30" failures="0" disabled="0" errors="0" time="0.002" timestamp="2026-10-18T01:59:44.718" name="AllTests">
+  <testsuite name="H743HighMux" tests="9" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:59:44.718">
+    <testcase name="DomainOracleDoesNotUseTheSoftwareCoreFrequencyNumber" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="21" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="ConservativeSourceEndpointsKeepKernelAndBusBoundsDistinct" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="31" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="TimerInputOracleDistinguishesCpu383FromTimer191Prescalers" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="52" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="OneColdOwnerSelectsIndependentKernelSourcesBeforeConsumers" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="74" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="PartialMuxWriteFailureRollsBackEveryEarlierOwnedStage" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="91" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="RefusedMuxRestoreRetainsJointOwnerAndCanBeRetried" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="102" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="ForeignOwnedMuxValueIsNotClobberedDuringWithdrawal" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="113" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="EachOwnedSelectorMayAlreadyHaveReturnedToItsBaseline" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="125" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+    <testcase name="PartialSelectorAcquireFailureRollsBackTheAcceptedNeighbor" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="140" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighMux" />
+  </testsuite>
+  <testsuite name="H743HighUart" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:59:44.718">
+    <testcase name="HsiKernelUsesItsOwnBrrInsteadOfCpuOrPclk" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="184" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighUart" />
+    <testcase name="AnApbFrequencyArgumentCannotOverrideTheSelectedHsiSource" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="191" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighUart" />
+    <testcase name="WrongKernelMuxRejectsBeforeUeOrRingMutation" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="197" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighUart" />
+  </testsuite>
+  <testsuite name="H743HighI2c" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:59:44.718">
+    <testcase name="HsiKernelAndSeparatePclkAdmitOnlyTheSelectedOpenDrainRoute" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="223" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighI2c" />
+    <testcase name="PclkFallbackCannotMasqueradeAsTheHsiTimingInput" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="231" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighI2c" />
+  </testsuite>
+  <testsuite name="H743HighSpi" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:59:44.718">
+    <testcase name="ApbKernelUsesNinetySixMhzInsteadOfCpu384" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="278" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighSpi" />
+    <testcase name="MaximumSourceBoundSelectsDiv128RatherThanNominalDiv64" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="283" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighSpi" />
+    <testcase name="ForeignKernelSelectorRejectsBeforeControllerReset" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="304" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighSpi" />
+  </testsuite>
+  <testsuite name="H743HighPwm" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:59:44.718">
+    <testcase name="TimerMultiplierProducesPsc191RatherThanCpu383OrPclk95" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="344" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighPwm" />
+    <testcase name="AForeignTimpreCannotSilentlyChangeThePwmTickDomain" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="350" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighPwm" />
+  </testsuite>
+  <testsuite name="H743HighAdc" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:59:44.718">
+    <testcase name="UnreviewedCutsCannotAcquireClockOrAdcPrerequisites" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="390" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighAdc" />
+    <testcase name="ReviewedVSelectsAsyncDiv4AndItsOwnBoostEncoding" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="407" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighAdc" />
+    <testcase name="ClockOracleExposesAnUnchangedHclkDiv4PathAsFortyEightMhz" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="417" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighAdc" />
+    <testcase name="ForeignPerClockSelectorRejectsBeforeRegulatorOrCalibration" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="428" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighAdc" />
+  </testsuite>
+  <testsuite name="H743HighFlash" tests="7" failures="0" disabled="0" skipped="0" errors="0" time="0.001" timestamp="2026-10-18T01:59:44.718">
+    <testcase name="ExactVos1Hclk192TwoWsWr2AllowsAnActualFlashword" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="471" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.718" classname="H743HighFlash" />
+    <testcase name="ExactProfileAllowsPhysicalBankTwoEraseWithoutRetuningAcr" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="482" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.719" classname="H743HighFlash" />
+    <testcase name="ReadLatencyCannotExcuseAnUnsafeProgrammingDelay" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="492" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.719" classname="H743HighFlash" />
+    <testcase name="CorrectWrDelayCannotExcuseAnUnsafeCpuReadLatency" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="503" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.719" classname="H743HighFlash" />
+    <testcase name="UnreadyActualVosRejectsBeforeUnlockOrDataStore" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="514" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.720" classname="H743HighFlash" />
+    <testcase name="Cpu384DoesNotAuthorizeForeignHclkOrFlashGeometry" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="526" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.720" classname="H743HighFlash" />
+    <testcase name="CacheOnFlashRemainsExplicitlyUnsupportedBeforeAnyPulse" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_kernel_test.cpp" line="537" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.720" classname="H743HighFlash" />
+  </testsuite>
+</testsuites>

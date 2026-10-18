@@ -1,0 +1,116 @@
+{
+  "kind": "Independent read-only transport and exact-source review of prepared final S0 integration r4",
+  "reviewed_at_utc": "2026-10-18T03:40:50.499048+00:00",
+  "decision": {
+    "result": "PASS for prepared transport and reviewed source identity",
+    "blocker_found": false,
+    "main_integrated_or_fresh_full_gate_qualification": false
+  },
+  "manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/manifest.json",
+    "bytes": 291006,
+    "sha256": "f5230764c3afee9675528ad8e1c6343205103e40f74d14f80e965b64fccadfe3"
+  },
+  "payload": {
+    "targets": 401,
+    "reviewed_source_files": 10,
+    "historical_evidence_files": 391,
+    "bytes": 2012245
+  },
+  "exact_source_map": [
+    {
+      "path": "soc/stm32h743/drivers/spi.c",
+      "bytes": 22078,
+      "sha256": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/soc/stm32h743/drivers/spi.c"
+    },
+    {
+      "path": "tests/google/h743_peripheral_test.cpp",
+      "bytes": 39244,
+      "sha256": "5f22040613ac9ec10d6179518c35e5aed3284476e3f23f9d9356f9ecad0fdf4a",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tests/google/h743_peripheral_test.cpp"
+    },
+    {
+      "path": "tests/google/h743_peripheral_factory_test.cpp",
+      "bytes": 11971,
+      "sha256": "4a06392b09493247486a25389e0b22eacf11dde2f1aa7d60131def6d3c8084ce",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tests/google/h743_peripheral_factory_test.cpp"
+    },
+    {
+      "path": "tests/google/h743_model.h",
+      "bytes": 7266,
+      "sha256": "1626b1cdbfb4750d550c359d37f6b34bb4fcbe8b742ef8f568c6d8fafeb91d8b",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tests/google/h743_model.h"
+    },
+    {
+      "path": "tests/google/h743_model.cpp",
+      "bytes": 24814,
+      "sha256": "05cee6923341a2a5f67486e4ef04dd506cd868054769e296a359d688bfc8eda7",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tests/google/h743_model.cpp"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/bindings.py",
+      "bytes": 18811,
+      "sha256": "d90c63ecb774f3c272b688882d312c41e0e5ab5486fa5a2f26ce07060e1f8d0b",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tools/configure/providers/stm32h743/bindings.py"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/test_peripherals.py",
+      "bytes": 7402,
+      "sha256": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tools/configure/providers/stm32h743/test_peripherals.py"
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_provider.h",
+      "bytes": 13407,
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/soc/stm32h743/private/stm32h743_provider.h"
+    },
+    {
+      "path": "tests/google/h743_high_kernel_test.cpp",
+      "bytes": 24034,
+      "sha256": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/tests/google/h743_high_kernel_test.cpp"
+    },
+    {
+      "path": "soc/stm32h743/README.md",
+      "bytes": 32745,
+      "sha256": "ec4bdcdb5e73ca50c2348dc2e6be361f57be1ff26113a432f82b4bfbacdecaec",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/prepared-integration-r4/files/soc/stm32h743/README.md"
+    }
+  ],
+  "binding": {
+    "code_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/independent-final-review-r1.json",
+      "bytes": 19867,
+      "sha256": "f0234a2ccd7a9cf514a1e16afeca31170e0854629202af73b48b482521d9e9d2"
+    },
+    "docs_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/adjacent-docs-r4/independent-review-r1.json",
+      "bytes": 5082,
+      "sha256": "57eeeb019f331541f2eb92837f0967a1196889a651104f5ad668bbb479e5ab5d"
+    },
+    "code_manifest": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/manifest.json",
+      "bytes": 82076,
+      "sha256": "38b87a219f8c2b8434bfe81b7b7b166822ce326782dde67d9aa92075fe09fac9"
+    },
+    "README": "ec4bdcdb5e73ca50c2348dc2e6be361f57be1ff26113a432f82b4bfbacdecaec",
+    "author_manifest_review_refs_match": true
+  },
+  "independent_checks": [
+    "Every target path is canonical relative POSIX spelling, nonempty, with noNUL/backslash/absolute or Windows drive form, no dot/dotdot component and no.git component. All401 names are unique even under case-fold comparison. No escape or target alias was found.",
+    "Every durable_source is exactly prepared-integration-r4/files/<target>, resolves to that path, is a regular file, and has no symlink along its ancestor chain. Every actual payload byte length/SHA matches the manifest; sum equals2012245bytes. These are read-only observations, not a future mutation or import race guarantee.",
+    "Every one of401 original source/evidence paths still exists and has matching byte length/SHA. Historical text renaming changed only the target extension, never the archived content. No original is selected from prepared-integration-r2.",
+    "The exact nine reviewed code/test paths match the final batch4 composition: three batch4 replacements plus six retained batch3/S0.2 files. The tenth source is exact adjacent-docs-r4 README. There are no extra current .c/.h/.cpp/.py/.md sources masquerading as evidence; prior obsolete drivers/tests/README remain historical raw/gzip/patch content only.",
+    "All other391 files are strictly under tests/evidence/h743-spi-safe-stop. They comprise67.raw,73.json,14.xml,4.patch and233.gz files. The prior RED, correction, provisional, failed partial and original review histories are preserved rather than relabeled as current source or full acceptance evidence.",
+    "Read current style_gate SOURCE_SUFFIXES/TEXT_SUFFIXES and documentation check.is_source/sources. .raw is not an owned C-family or selected text suffix and is not a special control filename; historical raw text does not enter those mechanical checks. These files are also outside the docs source root and have no.md/.rst/.toml suffix for page or literal-configuration selection.",
+    "This is not a blanket exemption of all evidence:73.json receipts remain subject to ordinary applicable text hygiene, while.gz/.xml/.patch/.raw are not converted into maintained prose or source by this package. No checker selection or exclusion was changed to obtain this transport result."
+  ],
+  "scope_preserved": [
+    "The author scope correctly calls187Google and7Python/23subscenarios dirty development proof. The manifest does not claim complete main hooks, ARM, SDK, offline reproducibility or physicalHIL. No such qualification was independently executed here.",
+    "The OPEN admission addendum is closed only by the exact final2bc6e44e source combination/code review, not by r2 packages or earlier178/provisional result identities. Old r2 transport must not be used to reconstruct the main source selection.",
+    "Root must apply/review the exact source and run fresh complete normal gates, ARM/SDK and other required validation separately. This report verifies package identities/paths/retained history; it is not an execution-evidence admission engine or clean software candidate."
+  ],
+  "reviewer_activity": "Only manifest,401small payload/original hash reads, reviewed source maps and maintained selection code were read. No build/test/configure/formatter/helper execution, main/index/ref change, manifest/files edit or subagent. Only this new report was written."
+}

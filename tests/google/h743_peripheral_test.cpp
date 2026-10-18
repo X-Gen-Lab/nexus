@@ -229,9 +229,17 @@ class H743Spi : public testing::Test {
         state.reset_mask = RCC_APB2RSTR_SPI4RST;
         state.clock_hz = 64000000U;
         state.poll_limit = 4U;
-        cs = {&g_h743_model.gpio_b, 1U, true, false, false};
-        endpoint = {&state, &cs, 1U, 1000000U, 0U};
-        ASSERT_EQ(NX_SUCCESS, nx_stm32h743_gpio_initialize(&cs, 1U));
+        /* This private caller owns the same GPIOE route as the selected
+         * assembly; register matches alone are not an ownership grant. */
+        g_h743_model.rcc.AHB4ENR |= RCC_AHB4ENR_GPIOEEN;
+        cs = {&g_h743_model.gpio_e, 1U << 11U, true, false, false};
+        endpoint = {&state, &cs, cs.mask, 1000000U, 0U};
+        ASSERT_EQ(NX_SUCCESS, nx_stm32h743_gpio_initialize(&cs, cs.mask));
+        for (unsigned pin : {12U, 13U, 14U}) {
+            ASSERT_EQ(NX_SUCCESS, nx_stm32h743_pin_alternate(
+                                      &g_h743_model.gpio_e, pin, 5U));
+        }
+        g_h743_model.spi_watch_pins = true;
     }
 };
 TEST_F(H743Spi, ColdAdmissionUsesV3CfgAndNoDmaOrInterrupt) {
@@ -255,7 +263,7 @@ TEST_F(H743Spi, V3TsizeAndByteAccessCompleteThenWithdrawBeforeCs) {
 }
 TEST_F(H743Spi, SlowClockTailSurvivesEarlyEotAndTxcBeforeResetAndCsRelease) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
-    endpoint.frequency_hz = 250000U;
+    endpoint.frequency_hz = 254000U;
     state.poll_limit = 16U;
     uint8_t byte = 0x25U;
     size_t transferred = 0U;
@@ -266,7 +274,7 @@ TEST_F(H743Spi, SlowClockTailSurvivesEarlyEotAndTxcBeforeResetAndCsRelease) {
 }
 TEST_F(H743Spi, CallerExpiryCannotCutShortTheFinalClockDrain) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
-    endpoint.frequency_hz = 250000U;
+    endpoint.frequency_hz = 254000U;
     state.poll_limit = 16U;
     uint8_t byte = 0x25U;
     size_t transferred = 0U;
@@ -328,6 +336,7 @@ TEST_F(H743Spi, RefusedResetKeepsPortResponsibilityForRetry) {
 TEST_F(H743Spi, RefusedDrainCannotReturnOrReleaseTheCallerAndChipSelect) {
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
     g_h743_model.hold_spi_progress = true;
+    g_h743_model.hold_spi_suspend = true;
     g_h743_model.hold_spi_reset = true;
     EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
         EXPECT_CALL(faults, Observe()).WillOnce([&] {
@@ -342,4 +351,538 @@ TEST_F(H743Spi, RefusedDrainCannotReturnOrReleaseTheCallerAndChipSelect) {
         (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 10000U,
                                        &transferred);
     }));
+}
+
+TEST_F(H743Spi, ModesZeroAndThreeKeepPinsControlledThroughFinalReset) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    for (uint8_t mode : {uint8_t(0U), uint8_t(3U), uint8_t(0U)}) {
+        endpoint.mode = mode;
+        uint8_t byte = 0x5aU;
+        size_t count = 0U;
+        ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_transfer(&device, &byte, nullptr,
+                                                       1U, 10000U, &count));
+        EXPECT_EQ(1U, count);
+        EXPECT_EQ(mode, g_h743_model.spi_observed_launch_mode);
+        EXPECT_EQ(0U, g_h743_model.spi_selected_control_losses);
+        EXPECT_EQ(0U, g_h743_model.spi_reset_order_errors);
+        EXPECT_EQ(1U, (g_h743_model.gpio_e.MODER >> 24U) & 3U);
+        EXPECT_EQ(mode == 3U ? 1U : 0U, (g_h743_model.gpio_e.ODR >> 12U) & 1U);
+        EXPECT_NE(0U, cs.registers->ODR & cs.mask);
+    }
+}
+TEST_F(H743Spi, StalledRxSuspendsTheRealFrameBeforeReturningPartialTimeout) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.hold_spi_progress = true;
+    uint8_t byte = 0x55U;
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_spi_endpoint_transfer(
+                                    &device, &byte, nullptr, 1U, 100U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_NE(0U, g_h743_model.spi_suspend_requests);
+    EXPECT_NE(0U, g_h743_model.spi_completed_suspensions);
+    EXPECT_EQ(0U, g_h743_model.spi_reset_order_errors);
+    EXPECT_EQ(0U, g_h743_model.spi_selected_control_losses);
+    EXPECT_NE(0U, cs.registers->ODR & cs.mask);
+    EXPECT_TRUE(state.fault);
+    EXPECT_FALSE(state.active);
+}
+TEST_F(H743Spi, RefusedSuspendCannotResetOrReturnTheBorrowedFrame) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.hold_spi_progress = true;
+    g_h743_model.hold_spi_suspend = true;
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        EXPECT_CALL(faults, Observe()).WillOnce([&] {
+            nexus_test::RecordTerminalObservation(
+                nx_arch_irq_is_masked() && state.active && state.retained &&
+                state.fault && state.held_cs == &cs &&
+                (registers.CR1 & (SPI_CR1_SPE | SPI_CR1_CSTART)) ==
+                    (SPI_CR1_SPE | SPI_CR1_CSTART) &&
+                (cs.registers->ODR & cs.mask) == 0U &&
+                g_h743_model.spi_suspend_requests != 0U &&
+                g_h743_model.spi_completed_suspensions == 0U &&
+                g_h743_model.spi_reset_assertions == 0U);
+        });
+        uint8_t byte = 0x55U;
+        size_t count = 0U;
+        (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U,
+                                       &count);
+    }));
+}
+TEST_F(H743Spi, RefusedCsHighLeavesSelectedPinsAndBorrowIntact) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.spi_hold_cs_high = true;
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        EXPECT_CALL(faults, Observe()).WillOnce([&] {
+            nexus_test::RecordTerminalObservation(
+                state.active && state.retained && state.fault &&
+                state.held_cs == &cs && (cs.registers->ODR & cs.mask) == 0U &&
+                (registers.CFG2 & SPI_CFG2_AFCNTR) != 0U &&
+                g_h743_model.spi_selected_control_losses == 0U &&
+                g_h743_model.spi_reset_assertions == 0U);
+        });
+        uint8_t byte = 0x55U;
+        size_t count = 0U;
+        (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U,
+                                       &count);
+    }));
+}
+TEST_F(H743Spi, RefusedSckTakeoverKeepsTheFrameAfterPhysicalCsHigh) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    endpoint.mode = 3U;
+    g_h743_model.spi_hold_sck_output = true;
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        EXPECT_CALL(faults, Observe()).WillOnce([&] {
+            nexus_test::RecordTerminalObservation(
+                state.active && state.retained && state.fault &&
+                state.held_cs == nullptr &&
+                (cs.registers->ODR & cs.mask) == cs.mask &&
+                (registers.CR1 & SPI_CR1_SPE) == 0U &&
+                (registers.CFG2 & (SPI_CFG2_AFCNTR | SPI_CFG2_CPOL)) ==
+                    (SPI_CFG2_AFCNTR | SPI_CFG2_CPOL) &&
+                g_h743_model.spi_reset_assertions == 0U);
+        });
+        uint8_t byte = 0x55U;
+        size_t count = 0U;
+        (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U,
+                                       &count);
+    }));
+}
+TEST_F(H743Spi, RefusedResetRetainsFrameAndSafeIdleAfterPhysicalCsHigh) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    endpoint.mode = 3U;
+    g_h743_model.ignore_write = &g_h743_model.rcc.APB2RSTR;
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        EXPECT_CALL(faults, Observe()).WillOnce([&] {
+            nexus_test::RecordTerminalObservation(
+                state.active && state.retained && state.fault &&
+                state.held_cs == nullptr &&
+                (cs.registers->ODR & cs.mask) == cs.mask &&
+                (registers.CR1 & SPI_CR1_SPE) == 0U &&
+                ((g_h743_model.gpio_e.MODER >> 24U) & 3U) == 1U &&
+                (g_h743_model.gpio_e.ODR & (1U << 12U)) != 0U &&
+                g_h743_model.spi_reset_order_errors == 0U);
+        });
+        uint8_t byte = 0x55U;
+        size_t count = 0U;
+        (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U,
+                                       &count);
+    }));
+}
+TEST_F(H743Spi, IdleStopResetReadbackFailureRetainsResponsibilityForRetry) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.ignore_write = &g_h743_model.rcc.APB2RSTR;
+    EXPECT_EQ(NX_ERROR_IO, nx_spi_port_stop(&face));
+    EXPECT_TRUE(state.retained);
+    EXPECT_FALSE(state.active);
+    const uint32_t sent = g_h743_model.spi_sent;
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_port_stop(&face));
+    EXPECT_FALSE(state.retained);
+    EXPECT_EQ(sent, g_h743_model.spi_sent);
+}
+
+TEST_F(H743Spi, LateCompleteRxDuringDrainExtendsOnlyTheSubmittedPrefix) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.hold_spi_progress = true;
+    g_h743_model.spi_late_rx_on_suspend = true;
+    uint8_t tx[2] = {0x35U, 0x42U};
+    uint8_t rx[2] = {0xaaU, 0xbbU};
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_spi_endpoint_transfer(&device, tx, rx, 2U, 3U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(uint8_t(~tx[0]), rx[0]);
+    EXPECT_EQ(0xbbU, rx[1]);
+    EXPECT_NE(0U, g_h743_model.spi_completed_suspensions);
+    EXPECT_EQ(0U, g_h743_model.spi_disable_before_stop);
+}
+TEST_F(H743Spi, SuspendedUnsentTxFifoIsFlushedWithoutInventingCompletion) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.spi_leave_tx_queued = true;
+    uint8_t tx[2] = {0x35U, 0x42U};
+    uint8_t rx[2] = {0xaaU, 0xbbU};
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_spi_endpoint_transfer(&device, tx, rx, 2U, 3U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(0xaaU, rx[0]);
+    EXPECT_EQ(0xbbU, rx[1]);
+    EXPECT_NE(0U, g_h743_model.spi_completed_suspensions);
+    EXPECT_EQ(0U, g_h743_model.spi_queued_words);
+    EXPECT_EQ(0U, g_h743_model.spi_disable_before_stop);
+}
+TEST_F(H743Spi, ForeignSckRouteRejectsBeforeAnyTransferEffect) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.gpio_e.AFR[1] ^= 1U << 16U;
+    const uint32_t writes = g_h743_model.writes;
+    uint8_t tx = 0x35U;
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_STATE, nx_spi_endpoint_transfer(&device, &tx, nullptr,
+                                                       1U, 100U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(0U, g_h743_model.spi_sent);
+    EXPECT_FALSE(state.active);
+    EXPECT_NE(0U, cs.registers->ODR & cs.mask);
+}
+TEST_F(H743Spi, ColdUnroutedStopDoesNotInventASelectedPinTransition) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.spi_watch_pins = false;
+    /* A failed generated prepare may not yet have installed AF routes. The
+     * existing static lease remains ours, with no transaction ever launched. */
+    g_h743_model.gpio_e.MODER &= ~(3U << 24U);
+    const uint32_t before = g_h743_model.gpio_e.MODER;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_port_stop(&face));
+    EXPECT_EQ(before, g_h743_model.gpio_e.MODER);
+    EXPECT_FALSE(state.retained);
+    EXPECT_EQ(0U, g_h743_model.spi_sent);
+}
+
+TEST_F(H743Spi, FullLateRxIsCountedWithoutMovingTheCompletedWireEpoch) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.hold_spi_progress = true;
+    g_h743_model.spi_late_rx_on_suspend = true;
+    uint8_t tx = 0x35U;
+    uint8_t rx[2] = {0xaaU, 0xbbU};
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_spi_endpoint_transfer(&device, &tx, rx, 1U, 3U, &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(uint8_t(~tx), rx[0]);
+    EXPECT_EQ(0xbbU, rx[1]);
+    EXPECT_EQ(0U, g_h743_model.spi_reset_order_errors);
+    EXPECT_EQ(0U, g_h743_model.spi_disable_before_stop);
+}
+
+TEST_F(H743Spi, SuspendCommandNeverWritesANewMasterStartRequest) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.hold_spi_progress = true;
+    uint8_t tx = 0x35U;
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_TIMEOUT,
+              nx_spi_endpoint_transfer(&device, &tx, nullptr, 1U, 3U, &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_NE(0U, g_h743_model.spi_suspend_requests);
+    EXPECT_EQ(0U, g_h743_model.spi_start_suspend_commands);
+    EXPECT_NE(0U, g_h743_model.spi_completed_suspensions);
+    EXPECT_EQ(0U, g_h743_model.spi_reset_order_errors);
+    EXPECT_FALSE(state.active);
+    EXPECT_NE(0U, cs.registers->ODR & cs.mask);
+}
+
+TEST_F(H743Spi, FiniteCompletionBeforeSuspendPreservesTimeoutAndCompleteRx) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.hold_spi_progress = true;
+    g_h743_model.spi_idle_before_suspend_status = SPI_SR_EOT | SPI_SR_TXC;
+    EXPECT_EXIT(
+        {
+            alarm(2U);
+            EXPECT_CALL(faults, Observe()).Times(0);
+            uint8_t tx = 0x35U;
+            uint8_t rx[2]{};
+            rx[0] = 0xaaU;
+            rx[1] = 0xbbU;
+            size_t count = 99U;
+            const nx_result_t result =
+                nx_spi_endpoint_transfer(&device, &tx, rx, 1U, 3U, &count);
+            const bool complete =
+                result == NX_ERROR_TIMEOUT && count == 1U &&
+                rx[0] == uint8_t(~tx) && rx[1] == 0xbbU && state.fault &&
+                state.retained && !state.active && state.held_cs == nullptr &&
+                (cs.registers->ODR & cs.mask) == cs.mask &&
+                ((g_h743_model.gpio_e.MODER >> 24U) & 3U) == 1U &&
+                registers.CR1 == 0U &&
+                g_h743_model.spi_idle_before_suspend_events == 1U &&
+                g_h743_model.spi_start_suspend_commands == 0U &&
+                g_h743_model.spi_completed_suspensions == 0U &&
+                g_h743_model.spi_reset_assertions == 1U &&
+                g_h743_model.spi_reset_order_errors == 0U &&
+                g_h743_model.spi_selected_control_losses == 0U &&
+                !g_h743_model.spi_tail_truncated;
+            std::_Exit(complete ? 0 : 1);
+        },
+        testing::ExitedWithCode(0), "");
+}
+TEST_F(H743Spi, FiniteCompletionBeforeSuspendPermitsIdleStop) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    /* Existing owner encounters its finite frame still active on idle stop;
+     * the peripheral completes normally before its CSUSP write is applied. */
+    registers.CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
+    registers.CR2 = 1U;
+    registers.CFG2 = SPI_CFG2_MASTER | SPI_CFG2_SSM | SPI_CFG2_AFCNTR;
+    registers.SR = SPI_SR_TXP;
+    g_h743_model.spi_sent = 1U;
+    g_h743_model.spi_received = 1U;
+    g_h743_model.spi_idle_before_suspend_status = SPI_SR_EOT | SPI_SR_TXC;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_port_stop(&face));
+    EXPECT_FALSE(state.retained);
+    EXPECT_FALSE(state.initialized);
+    EXPECT_EQ(1U, g_h743_model.spi_idle_before_suspend_events);
+    EXPECT_EQ(0U, g_h743_model.spi_start_suspend_commands);
+    EXPECT_EQ(0U, g_h743_model.spi_completed_suspensions);
+    EXPECT_EQ(1U, g_h743_model.spi_reset_assertions);
+    EXPECT_EQ(0U, g_h743_model.spi_reset_order_errors);
+    EXPECT_FALSE(g_h743_model.spi_tail_truncated);
+}
+TEST_F(H743Spi, UnprovedIdleStatusCannotReturnOrResetTheBorrowedFrame) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    for (unsigned scenario = 0U; scenario < 3U; ++scenario) {
+        SCOPED_TRACE(scenario);
+        EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+            g_h743_model.hold_spi_progress = true;
+            g_h743_model.spi_idle_before_suspend_status =
+                scenario == 0U ? (SPI_SR_EOT | SPI_SR_TXC)
+                               : (scenario == 1U ? SPI_SR_EOT : SPI_SR_TXC);
+            g_h743_model.spi_zero_tsize_before_suspend = scenario == 0U;
+            EXPECT_CALL(faults, Observe()).WillOnce([&] {
+                nexus_test::RecordTerminalObservation(
+                    nx_arch_irq_is_masked() && state.active && state.retained &&
+                    state.fault && state.held_cs == &cs &&
+                    (registers.CR1 & SPI_CR1_SPE) != 0U &&
+                    (registers.CR1 & SPI_CR1_CSTART) == 0U &&
+                    (registers.SR & SPI_SR_SUSP) == 0U &&
+                    (cs.registers->ODR & cs.mask) == 0U &&
+                    g_h743_model.spi_idle_before_suspend_events == 1U &&
+                    g_h743_model.spi_start_suspend_commands == 0U &&
+                    g_h743_model.spi_reset_assertions == 0U);
+            });
+            uint8_t tx = 0x35U;
+            size_t count = 99U;
+            (void)nx_spi_endpoint_transfer(&device, &tx, nullptr, 1U, 3U,
+                                           &count);
+        }));
+    }
+}
+
+TEST_F(H743Spi, FixedHsi64SixteenMhzMaximumRequiresDiv8AtLaunch) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    endpoint.frequency_hz = 16000000U;
+    uint8_t byte = 0x55U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U,
+                                                   100U, &count));
+    EXPECT_EQ(8U, g_h743_model.spi_observed_launch_divisor);
+    EXPECT_LE(65000000U, uint64_t(endpoint.frequency_hz) *
+                             g_h743_model.spi_observed_launch_divisor);
+    EXPECT_EQ(1U, count);
+}
+TEST_F(H743Spi, FixedHsi32EightMhzMaximumRequiresDiv8AtLaunch) {
+    g_nx_stm32h743_system.core_hz = 32000000U;
+    g_h743_model.actual_core_hz = 32000000U;
+    g_h743_model.rcc.CR = (g_h743_model.rcc.CR & ~(uint32_t)RCC_CR_HSIDIV) |
+                          RCC_CR_HSIDIV_2 | RCC_CR_HSIDIVF;
+    state.clock_hz = 32000000U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    endpoint.frequency_hz = 8000000U;
+    uint8_t byte = 0x55U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U,
+                                                   100U, &count));
+    EXPECT_EQ(8U, g_h743_model.spi_observed_launch_divisor);
+    EXPECT_LE(32500000U, uint64_t(endpoint.frequency_hz) *
+                             g_h743_model.spi_observed_launch_divisor);
+    EXPECT_EQ(1U, count);
+}
+TEST_F(H743Spi, FixedHsi64UnreachableMinimumRejectsWithoutTransferEffects) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    state.poll_limit = 16U;
+    const uint32_t writes = g_h743_model.writes;
+    uint8_t byte = 0x55U;
+    for (uint32_t rate : {250000U, 253906U}) {
+        endpoint.frequency_hz = rate;
+        size_t count = 99U;
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+                  nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U,
+                                           &count));
+        EXPECT_EQ(0U, count);
+        EXPECT_EQ(writes, g_h743_model.writes);
+        EXPECT_EQ(0U, g_h743_model.spi_sent);
+        EXPECT_FALSE(state.active);
+        EXPECT_NE(0U, cs.registers->ODR & cs.mask);
+    }
+}
+TEST_F(H743Spi, FixedHsi64FirstReachableIntegerRateUsesDiv256) {
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    endpoint.frequency_hz = 253907U;
+    state.poll_limit = 16U;
+    uint8_t byte = 0x55U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U,
+                                                   100U, &count));
+    EXPECT_EQ(256U, g_h743_model.spi_observed_launch_divisor);
+    EXPECT_LE(65000000U, uint64_t(endpoint.frequency_hz) * 256U);
+    EXPECT_EQ(1U, count);
+    EXPECT_FALSE(g_h743_model.spi_tail_truncated);
+}
+TEST_F(H743Spi, FixedHsi32TwoHundredFiftyKhzRemainsValidWithDiv256) {
+    g_nx_stm32h743_system.core_hz = 32000000U;
+    g_h743_model.actual_core_hz = 32000000U;
+    g_h743_model.rcc.CR = (g_h743_model.rcc.CR & ~(uint32_t)RCC_CR_HSIDIV) |
+                          RCC_CR_HSIDIV_2 | RCC_CR_HSIDIVF;
+    state.clock_hz = 32000000U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    endpoint.frequency_hz = 250000U;
+    state.poll_limit = 16U;
+    uint8_t byte = 0x55U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_SUCCESS, nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U,
+                                                   100U, &count));
+    EXPECT_EQ(256U, g_h743_model.spi_observed_launch_divisor);
+    EXPECT_LE(32500000U, uint64_t(endpoint.frequency_hz) *
+                             g_h743_model.spi_observed_launch_divisor);
+    EXPECT_EQ(1U, count);
+}
+
+/** \brief Fresh clock owner, followed by an independently owned SPI lease. */
+class H743SpiAdmission : public testing::Test {
+  protected:
+    SPI_TypeDef registers{};
+    nx_stm32h743_spi_state_t state{};
+    nx_stm32h743_gpio_state_t cs{};
+    nx_stm32h743_spi_endpoint_state_t endpoint{};
+    nx_spi_port_t port{&nx_stm32h743_spi_ops, &state};
+    nx_spi_endpoint_t device{&nx_stm32h743_spi_endpoint_ops, &endpoint};
+    testing::NiceMock<SpiFaultBoundary> faults;
+    void SetUp() override {
+        nx_h743_model_reset();
+        spi_fault = &faults;
+        g_h743_model.spi = &registers;
+        registers.CFG1 = 7U | (7U << SPI_CFG1_CRCSIZE_Pos);
+        registers.SR = SPI_SR_TXP | SPI_SR_TXC;
+        state.registers = &registers;
+        state.reset = &g_h743_model.rcc.APB2RSTR;
+        state.reset_mask = RCC_APB2RSTR_SPI4RST;
+        state.clock_hz = 64000000U;
+        state.poll_limit = 16U;
+        cs = {&g_h743_model.gpio_e, 1U << 11U, true, false, false};
+        endpoint = {&state, &cs, cs.mask, 1000000U, 0U};
+    }
+    nx_result_t StartParent(uint32_t identity) {
+        g_h743_model.silicon_id = identity;
+        if ((identity >> 16U) != 0x2003U)
+            g_h743_model.rcc.HSICFGR = 0x00020000U;
+        nx_result_t result = nx_stm32h743_validate_identity();
+        if (result != NX_SUCCESS)
+            return result;
+        result =
+            nx_stm32h743_system_start(&g_nx_stm32h743_system, 64000000U, 0U, 8U)
+                .primary;
+        if (result != NX_SUCCESS)
+            return result;
+        /* This fixture is the explicit static GPIO/SPI lease owner. Gates
+         * and routes are established after the actual parent clock starts. */
+        g_h743_model.rcc.APB2ENR |= RCC_APB2ENR_SPI4EN;
+        g_h743_model.rcc.AHB4ENR |= RCC_AHB4ENR_GPIOEEN;
+        result = nx_stm32h743_gpio_initialize(&cs, cs.mask);
+        for (unsigned pin : {12U, 13U, 14U}) {
+            if (result != NX_SUCCESS)
+                return result;
+            result = nx_stm32h743_pin_alternate(&g_h743_model.gpio_e, pin, 5U);
+        }
+        g_h743_model.spi_watch_pins = true;
+        return result;
+    }
+    void ExpectColdRejection(uint32_t identity, nx_result_t expected) {
+        ASSERT_EQ(NX_SUCCESS, StartParent(identity));
+        ASSERT_TRUE(g_nx_stm32h743_system.started);
+        const uint32_t writes = g_h743_model.writes;
+        EXPECT_EQ(expected, nx_stm32h743_spi_initialize(&state));
+        EXPECT_EQ(writes, g_h743_model.writes);
+        EXPECT_FALSE(state.retained);
+        EXPECT_FALSE(state.initialized);
+        EXPECT_FALSE(state.active);
+        EXPECT_EQ(nullptr, state.held_cs);
+        EXPECT_EQ(0U, registers.CR1);
+        EXPECT_EQ(0U, g_h743_model.spi_observed_launch_divisor);
+        EXPECT_EQ(cs.mask, cs.registers->ODR & cs.mask);
+    }
+    void TearDown() override {
+        /* No model reset can erase an erroneous acquisition: join the actual
+         * provider first, then this GPIO owner, then the real parent clock. */
+        const nx_result_t stopped = nx_spi_port_stop(&port);
+        EXPECT_EQ(NX_SUCCESS, stopped);
+        if (stopped != NX_SUCCESS)
+            std::abort();
+        EXPECT_FALSE(state.retained);
+        EXPECT_EQ(NX_SUCCESS, nx_stm32h743_gpio_stop(&cs, cs.mask));
+        EXPECT_EQ(NX_SUCCESS,
+                  nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+        EXPECT_FALSE(g_nx_stm32h743_system.started);
+    }
+};
+TEST_F(H743SpiAdmission, SharedYw1003ParentStartsButSpiRejectsBeforeMutation) {
+    ExpectColdRejection(0x10030450U, NX_ERROR_UNSUPPORTED);
+}
+TEST_F(H743SpiAdmission, X2001ParentStartsButSpiRejectsBeforeMutation) {
+    ExpectColdRejection(0x20010450U, NX_ERROR_UNSUPPORTED);
+}
+TEST_F(H743SpiAdmission,
+       UnknownRevisionParentStartsButSpiRejectsBeforeMutation) {
+    ExpectColdRejection(0x9abc0450U, NX_ERROR_UNSUPPORTED);
+}
+TEST_F(H743SpiAdmission, VTrimChangedAfterParentStartRejectsColdSpi) {
+    ASSERT_EQ(NX_SUCCESS, StartParent(0x20030450U));
+    for (uint32_t trim : {0x3fU, 0x41U}) {
+        g_h743_model.rcc.HSICFGR = trim << RCC_HSICFGR_HSITRIM_Pos;
+        const uint32_t writes = g_h743_model.writes;
+        EXPECT_EQ(NX_ERROR_STATE, nx_stm32h743_spi_initialize(&state));
+        EXPECT_EQ(writes, g_h743_model.writes);
+        EXPECT_FALSE(state.retained);
+        EXPECT_FALSE(state.initialized);
+        EXPECT_FALSE(state.active);
+        EXPECT_EQ(cs.mask, cs.registers->ODR & cs.mask);
+        /* The actual clock owner repairs its injected trim fault before any
+         * erroneous old implementation's acquired SPI is really stopped. */
+        g_h743_model.rcc.HSICFGR = 0x40U << RCC_HSICFGR_HSITRIM_Pos;
+        EXPECT_EQ(NX_SUCCESS, nx_spi_port_stop(&port));
+    }
+}
+TEST_F(H743SpiAdmission, LiveTrimRejectionKeepsCleanupResponsibility) {
+    ASSERT_EQ(NX_SUCCESS, StartParent(0x20030450U));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.rcc.HSICFGR = 0x3fU << RCC_HSICFGR_HSITRIM_Pos;
+    const uint32_t writes = g_h743_model.writes;
+    uint8_t tx = 0x55U;
+    size_t count = 99U;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_spi_endpoint_transfer(
+                  &device, &tx, nullptr, 1U,
+                  nx_deadline_after(nx_time_now_us(), 100U), &count));
+    EXPECT_EQ(0U, count);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_TRUE(state.retained);
+    EXPECT_TRUE(state.initialized);
+    EXPECT_FALSE(state.active);
+    EXPECT_EQ(nullptr, state.held_cs);
+    EXPECT_EQ(cs.mask, cs.registers->ODR & cs.mask);
+    EXPECT_EQ(NX_ERROR_STATE, nx_spi_port_recover(&port));
+    EXPECT_EQ(NX_ERROR_STATE, nx_spi_port_stop(&port));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_TRUE(state.retained);
+    EXPECT_TRUE(state.initialized);
+    g_h743_model.rcc.HSICFGR = 0x40U << RCC_HSICFGR_HSITRIM_Pos;
+}
+TEST_F(H743SpiAdmission, BusyReentryPrecedesChangedTrimAdmission) {
+    ASSERT_EQ(NX_SUCCESS, StartParent(0x20030450U));
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    g_h743_model.rcc.HSICFGR = 0x3fU << RCC_HSICFGR_HSITRIM_Pos;
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32h743_spi_initialize(&state));
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_TRUE(state.retained);
+    g_h743_model.rcc.HSICFGR = 0x40U << RCC_HSICFGR_HSITRIM_Pos;
+}
+TEST_F(H743SpiAdmission, VCalibrationLowBitsKeepTheReviewedSpiAdmission) {
+    g_h743_model.rcc.HSICFGR |= 0xabcU;
+    ASSERT_EQ(NX_SUCCESS, StartParent(0x20030450U));
+    const uint32_t configuration = g_h743_model.rcc.HSICFGR;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+    uint8_t tx = 0x55U;
+    size_t count = 0U;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_spi_endpoint_transfer(
+                  &device, &tx, nullptr, 1U,
+                  nx_deadline_after(nx_time_now_us(), 100U), &count));
+    EXPECT_EQ(1U, count);
+    EXPECT_EQ(configuration, g_h743_model.rcc.HSICFGR);
 }

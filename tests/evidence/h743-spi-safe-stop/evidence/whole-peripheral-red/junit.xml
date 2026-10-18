@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="32" failures="9" disabled="0" errors="0" time="1.012" timestamp="2026-10-18T01:56:33.312" name="AllTests">
+  <testsuite name="H743Pwm" tests="5" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:56:33.313">
+    <testcase name="ColdBaseAndBothDutyEndpointsUseTheSelectedClock" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="55" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Pwm" />
+    <testcase name="Hsi32ProfileUsesItsOwnPrescaler" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="71" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Pwm" />
+    <testcase name="ForeignTimerRejectsWithoutGpioOrRegisterWrites" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="76" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Pwm" />
+    <testcase name="FailedUpdateRetainsAndCloseCanRecover" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="82" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Pwm" />
+    <testcase name="FailedResetKeepsResponsibilityForRetry" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="89" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Pwm" />
+  </testsuite>
+  <testsuite name="H743Watchdog" tests="4" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:56:33.313">
+    <testcase name="StartAndFeedExposeIrreversibleUnknownTimingEnvelope" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="116" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Watchdog" />
+    <testcase name="LsiFailureHasNoIrreversibleActivation" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="132" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Watchdog" />
+    <testcase name="PostActivationFailureKeepsTheWatchdogEnabled" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="140" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Watchdog" />
+    <testcase name="ResetCausesAreLatchedBeforeExternalAcknowledgement" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="150" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Watchdog" />
+  </testsuite>
+  <testsuite name="H743Exti" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T01:56:33.313">
+    <testcase name="SelectedLineAcknowledgesOnlyItsOwnPendingBit" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="180" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Exti" />
+    <testcase name="ForeignPendingLineIsRejectedBeforeAnyEffect" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="194" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Exti" />
+    <testcase name="RefusedVectorWithdrawalRetainsStorageUntilRetry" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="199" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Exti" />
+  </testsuite>
+  <testsuite name="H743Spi" tests="20" failures="9" disabled="0" skipped="0" errors="0" time="1.011" timestamp="2026-10-18T01:56:33.313">
+    <testcase name="ColdAdmissionUsesV3CfgAndNoDmaOrInterrupt" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="245" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="V3TsizeAndByteAccessCompleteThenWithdrawBeforeCs" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="251" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="SlowClockTailSurvivesEarlyEotAndTxcBeforeResetAndCsRelease" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="264" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="CallerExpiryCannotCutShortTheFinalClockDrain" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="275" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="StalledByteResetsControllerAndRequiresExplicitRecovery" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="290" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="ForeignKernelSelectorRejectsWithoutChangingTheDomain" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="306" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="AliasedOrUnboundedRequestsRejectBeforeChipSelect" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="313" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="RefusedResetKeepsPortResponsibilityForRetry" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="326" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="RefusedDrainCannotReturnOrReleaseTheCallerAndChipSelect" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="336" status="run" result="completed" time="1.009" timestamp="2026-10-18T01:56:33.313" classname="H743Spi" />
+    <testcase name="ModesZeroAndThreeKeepPinsControlledThroughFinalReset" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="356" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.323" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:366&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_selected_control_losses&#x0A;    Which is: 4&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:366
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_selected_control_losses
+    Which is: 4
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:367&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_reset_order_errors&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:367
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_reset_order_errors
+    Which is: 1
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:368&#x0A;Expected equality of these values:&#x0A;  1U&#x0A;    Which is: 1&#x0A;  (g_h743_model.gpio_e.MODER &gt;&gt; 24U) &amp; 3U&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:368
+Expected equality of these values:
+  1U
+    Which is: 1
+  (g_h743_model.gpio_e.MODER >> 24U) & 3U
+    Which is: 2
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:366&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_selected_control_losses&#x0A;    Which is: 8&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:366
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_selected_control_losses
+    Which is: 8
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:367&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_reset_order_errors&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:367
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_reset_order_errors
+    Which is: 2
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:368&#x0A;Expected equality of these values:&#x0A;  1U&#x0A;    Which is: 1&#x0A;  (g_h743_model.gpio_e.MODER &gt;&gt; 24U) &amp; 3U&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:368
+Expected equality of these values:
+  1U
+    Which is: 1
+  (g_h743_model.gpio_e.MODER >> 24U) & 3U
+    Which is: 2
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:369&#x0A;Expected equality of these values:&#x0A;  mode == 3U ? 1U : 0U&#x0A;    Which is: 1&#x0A;  (g_h743_model.gpio_e.ODR &gt;&gt; 12U) &amp; 1U&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:369
+Expected equality of these values:
+  mode == 3U ? 1U : 0U
+    Which is: 1
+  (g_h743_model.gpio_e.ODR >> 12U) & 1U
+    Which is: 0
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:366&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_selected_control_losses&#x0A;    Which is: 12&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:366
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_selected_control_losses
+    Which is: 12
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:367&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_reset_order_errors&#x0A;    Which is: 3&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:367
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_reset_order_errors
+    Which is: 3
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:368&#x0A;Expected equality of these values:&#x0A;  1U&#x0A;    Which is: 1&#x0A;  (g_h743_model.gpio_e.MODER &gt;&gt; 24U) &amp; 3U&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:368
+Expected equality of these values:
+  1U
+    Which is: 1
+  (g_h743_model.gpio_e.MODER >> 24U) & 3U
+    Which is: 2
+]]></failure>
+    </testcase>
+    <testcase name="StalledRxSuspendsTheRealFrameBeforeReturningPartialTimeout" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="373" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.323" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:381&#x0A;Expected: (0U) != (g_h743_model.spi_suspend_requests), actual: 0 vs 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:381
+Expected: (0U) != (g_h743_model.spi_suspend_requests), actual: 0 vs 0
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:382&#x0A;Expected: (0U) != (g_h743_model.spi_completed_suspensions), actual: 0 vs 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:382
+Expected: (0U) != (g_h743_model.spi_completed_suspensions), actual: 0 vs 0
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:383&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_reset_order_errors&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:383
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_reset_order_errors
+    Which is: 1
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:384&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  g_h743_model.spi_selected_control_losses&#x0A;    Which is: 4&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:384
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.spi_selected_control_losses
+    Which is: 4
+]]></failure>
+    </testcase>
+    <testcase name="RefusedSuspendCannotResetOrReturnTheBorrowedFrame" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="389" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.323" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:393&#x0A;Value of: nexus_test::ObserveTerminal([&amp;] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt(&quot;/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp&quot;, 394, &quot;faults&quot;, &quot;Observe()&quot;).WillOnce([&amp;] { nexus_test::RecordTerminalObservation( nx_arch_irq_is_masked() &amp;&amp; state.active &amp;&amp; state.retained &amp;&amp; state.fault &amp;&amp; state.held_cs == &amp;cs &amp;&amp; (registers.CR1 &amp; ((0x1UL &lt;&lt; (0U)) | (0x1UL &lt;&lt; (9U)))) == ((0x1UL &lt;&lt; (0U)) | (0x1UL &lt;&lt; (9U))) &amp;&amp; (cs.registers-&gt;ODR &amp; cs.mask) == 0U &amp;&amp; g_h743_model.spi_suspend_requests != 0U &amp;&amp; g_h743_model.spi_completed_suspensions == 0U &amp;&amp; g_h743_model.spi_reset_assertions == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&amp;device, &amp;byte, nullptr, 1U, 100U, &amp;count); })&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:393
+Value of: nexus_test::ObserveTerminal([&] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt("/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp", 394, "faults", "Observe()").WillOnce([&] { nexus_test::RecordTerminalObservation( nx_arch_irq_is_masked() && state.active && state.retained && state.fault && state.held_cs == &cs && (registers.CR1 & ((0x1UL << (0U)) | (0x1UL << (9U)))) == ((0x1UL << (0U)) | (0x1UL << (9U))) && (cs.registers->ODR & cs.mask) == 0U && g_h743_model.spi_suspend_requests != 0U && g_h743_model.spi_completed_suspensions == 0U && g_h743_model.spi_reset_assertions == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U, &count); })
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="RefusedCsHighLeavesSelectedPinsAndBorrowIntact" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="411" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.323" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:414&#x0A;Value of: nexus_test::ObserveTerminal([&amp;] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt(&quot;/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp&quot;, 415, &quot;faults&quot;, &quot;Observe()&quot;).WillOnce([&amp;] { nexus_test::RecordTerminalObservation( state.active &amp;&amp; state.retained &amp;&amp; state.fault &amp;&amp; state.held_cs == &amp;cs &amp;&amp; (cs.registers-&gt;ODR &amp; cs.mask) == 0U &amp;&amp; (registers.CFG2 &amp; (0x1UL &lt;&lt; (31U))) != 0U &amp;&amp; g_h743_model.spi_selected_control_losses == 0U &amp;&amp; g_h743_model.spi_reset_assertions == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&amp;device, &amp;byte, nullptr, 1U, 100U, &amp;count); })&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:414
+Value of: nexus_test::ObserveTerminal([&] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt("/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp", 415, "faults", "Observe()").WillOnce([&] { nexus_test::RecordTerminalObservation( state.active && state.retained && state.fault && state.held_cs == &cs && (cs.registers->ODR & cs.mask) == 0U && (registers.CFG2 & (0x1UL << (31U))) != 0U && g_h743_model.spi_selected_control_losses == 0U && g_h743_model.spi_reset_assertions == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U, &count); })
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="RefusedSckTakeoverKeepsTheFrameAfterPhysicalCsHigh" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="429" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.324" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:433&#x0A;Value of: nexus_test::ObserveTerminal([&amp;] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt(&quot;/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp&quot;, 434, &quot;faults&quot;, &quot;Observe()&quot;).WillOnce([&amp;] { nexus_test::RecordTerminalObservation( state.active &amp;&amp; state.retained &amp;&amp; state.fault &amp;&amp; state.held_cs == nullptr &amp;&amp; (cs.registers-&gt;ODR &amp; cs.mask) == cs.mask &amp;&amp; (registers.CR1 &amp; (0x1UL &lt;&lt; (0U))) == 0U &amp;&amp; (registers.CFG2 &amp; ((0x1UL &lt;&lt; (31U)) | (0x1UL &lt;&lt; (25U)))) == ((0x1UL &lt;&lt; (31U)) | (0x1UL &lt;&lt; (25U))) &amp;&amp; g_h743_model.spi_reset_assertions == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&amp;device, &amp;byte, nullptr, 1U, 100U, &amp;count); })&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:433
+Value of: nexus_test::ObserveTerminal([&] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt("/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp", 434, "faults", "Observe()").WillOnce([&] { nexus_test::RecordTerminalObservation( state.active && state.retained && state.fault && state.held_cs == nullptr && (cs.registers->ODR & cs.mask) == cs.mask && (registers.CR1 & (0x1UL << (0U))) == 0U && (registers.CFG2 & ((0x1UL << (31U)) | (0x1UL << (25U)))) == ((0x1UL << (31U)) | (0x1UL << (25U))) && g_h743_model.spi_reset_assertions == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U, &count); })
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="RefusedResetRetainsFrameAndSafeIdleAfterPhysicalCsHigh" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="450" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.324" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:454&#x0A;Value of: nexus_test::ObserveTerminal([&amp;] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt(&quot;/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp&quot;, 455, &quot;faults&quot;, &quot;Observe()&quot;).WillOnce([&amp;] { nexus_test::RecordTerminalObservation( state.active &amp;&amp; state.retained &amp;&amp; state.fault &amp;&amp; state.held_cs == nullptr &amp;&amp; (cs.registers-&gt;ODR &amp; cs.mask) == cs.mask &amp;&amp; (registers.CR1 &amp; (0x1UL &lt;&lt; (0U))) == 0U &amp;&amp; ((g_h743_model.gpio_e.MODER &gt;&gt; 24U) &amp; 3U) == 1U &amp;&amp; (g_h743_model.gpio_e.ODR &amp; (1U &lt;&lt; 12U)) != 0U &amp;&amp; g_h743_model.spi_reset_order_errors == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&amp;device, &amp;byte, nullptr, 1U, 100U, &amp;count); })&#x0A;  Actual: false&#x0A;Expected: true&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:454
+Value of: nexus_test::ObserveTerminal([&] { ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt("/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp", 455, "faults", "Observe()").WillOnce([&] { nexus_test::RecordTerminalObservation( state.active && state.retained && state.fault && state.held_cs == nullptr && (cs.registers->ODR & cs.mask) == cs.mask && (registers.CR1 & (0x1UL << (0U))) == 0U && ((g_h743_model.gpio_e.MODER >> 24U) & 3U) == 1U && (g_h743_model.gpio_e.ODR & (1U << 12U)) != 0U && g_h743_model.spi_reset_order_errors == 0U); }); uint8_t byte = 0x55U; size_t count = 0U; (void)nx_spi_endpoint_transfer(&device, &byte, nullptr, 1U, 100U, &count); })
+  Actual: false
+Expected: true
+]]></failure>
+    </testcase>
+    <testcase name="IdleStopResetReadbackFailureRetainsResponsibilityForRetry" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="471" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.324" classname="H743Spi" />
+    <testcase name="LateCompleteRxDuringDrainExtendsOnlyTheSubmittedPrefix" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="484" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.324" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:493&#x0A;Expected equality of these values:&#x0A;  1U&#x0A;    Which is: 1&#x0A;  count&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:493
+Expected equality of these values:
+  1U
+    Which is: 1
+  count
+    Which is: 0
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:494&#x0A;Expected equality of these values:&#x0A;  uint8_t(~tx[0])&#x0A;    Which is: &apos;\xCA&apos; (202)&#x0A;  rx[0]&#x0A;    Which is: &apos;\xAA&apos; (170)&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:494
+Expected equality of these values:
+  uint8_t(~tx[0])
+    Which is: '\xCA' (202)
+  rx[0]
+    Which is: '\xAA' (170)
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:496&#x0A;Expected: (0U) != (g_h743_model.spi_completed_suspensions), actual: 0 vs 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:496
+Expected: (0U) != (g_h743_model.spi_completed_suspensions), actual: 0 vs 0
+]]></failure>
+    </testcase>
+    <testcase name="SuspendedUnsentTxFifoIsFlushedWithoutInventingCompletion" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="499" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.324" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:510&#x0A;Expected: (0U) != (g_h743_model.spi_completed_suspensions), actual: 0 vs 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:510
+Expected: (0U) != (g_h743_model.spi_completed_suspensions), actual: 0 vs 0
+]]></failure>
+    </testcase>
+    <testcase name="ForeignSckRouteRejectsBeforeAnyTransferEffect" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="514" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.324" classname="H743Spi">
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:520&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;  nx_spi_endpoint_transfer(&amp;device, &amp;tx, nullptr, 1U, 100U, &amp;count)&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:520
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  nx_spi_endpoint_transfer(&device, &tx, nullptr, 1U, 100U, &count)
+    Which is: 0
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:522&#x0A;Expected equality of these values:&#x0A;  0U&#x0A;    Which is: 0&#x0A;  count&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:522
+Expected equality of these values:
+  0U
+    Which is: 0
+  count
+    Which is: 1
+]]></failure>
+      <failure message="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:523&#x0A;Expected equality of these values:&#x0A;  writes&#x0A;    Which is: 20&#x0A;  g_h743_model.writes&#x0A;    Which is: 31&#x0A;" type=""><![CDATA[/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:523
+Expected equality of these values:
+  writes
+    Which is: 20
+  g_h743_model.writes
+    Which is: 31
+]]></failure>
+    </testcase>
+    <testcase name="ColdUnroutedStopDoesNotInventASelectedPinTransition" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp" line="528" status="run" result="completed" time="0." timestamp="2026-10-18T01:56:34.325" classname="H743Spi" />
+  </testsuite>
+</testsuites>

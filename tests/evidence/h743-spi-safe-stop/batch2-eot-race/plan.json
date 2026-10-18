@@ -1,0 +1,24 @@
+{
+  "kind": "S0.2 follow-up real finite completion race; no prior qualification inherited",
+  "baseline_manifest_sha256": "bbc68d7faeea961468659b28c84c3cacac891f447c403cf6a9aa96298395825b",
+  "source_paths": [
+    "soc/stm32h743/drivers/spi.c",
+    "tests/google/h743_model.h",
+    "tests/google/h743_model.cpp",
+    "tests/google/h743_peripheral_test.cpp"
+  ],
+  "contract": "After observed CSTART1, an EOT completion can clear CSTART before CSUSP reaches hardware; SUSP need not occur. Accept only CSTART0 and (SUSP or nonzero TSIZE with both EOT/TXC). Keep independent same-source quiet, complete RX-prefix, SUSP clearing, SPE0, CS high readback, SCK GPIO, reset and borrowing. Preserve first timeout result.",
+  "cases": [
+    "late finite completion before CSUSP returns original timeout and all complete submitted RX bytes",
+    "idle finite EOT-completion race permits stop success",
+    "zero TSIZE or EOT-only or TXC-only idle events cannot release the active borrowed frame; actual parked subprocess observed then killed/reaped"
+  ],
+  "fixture": "External MMIO event at CSUSP write, before hardware command application; CSTART cannot be restarted by stale write. Negative status/TSIZE inputs are explicit conservative corruption tests, not legal waveform claims.",
+  "planned_minimal_fix": "Only drain stopped predicate; no state growth or divider/quiet change",
+  "baseline": {
+    "soc/stm32h743/drivers/spi.c": "9cddd3444f868f41e05afa7984090da96a8889461d28042ab892e646fa41b1b1",
+    "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+    "tests/google/h743_model.cpp": "dd4162ee2aca3922b5ada815454cf516fc28a276ea479f027e7e07facddfa986",
+    "tests/google/h743_peripheral_test.cpp": "80074d225d9c7a6b540a32bbe7b5d6f7988b3b67919d4bc8457e7a629e440e20"
+  }
+}

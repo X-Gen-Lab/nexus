@@ -1,0 +1,4 @@
++ /tmp/nexus-io-validation-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_h743_peripheral_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/3] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/h743_peripheral_test.cpp.o
+[2/3] Linking CXX executable bin/nexus_h743_peripheral_test

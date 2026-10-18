@@ -109,6 +109,14 @@ def constructor(item, result, board_bindings, routes, devices):
         children = [child for child in devices if child["controller"] == item.id]
         if not children:
             fail("H743 SPI requires a reviewed active-low CS endpoint")
+        plan = result.get("clock_plan")
+        source_max = (plan["domains"]["spi4"]["maximum_hz"] if plan is not None
+                      else {32000000: 32500000, 64000000: 65000000}.get(
+                          result["clock"]["apb2_hz"]))
+        if source_max is None:
+            fail("H743 SPI requires an exact reviewed kernel profile")
+        if item.options.max_hz * 256 < source_max:
+            fail("H743 SPI controller rate is outside its hardware divider")
         body = [f"static nx_result_t prepare_{name}(void) {{",
                 f"    if ({state}.retained || {state}.initialized || {state}.active) {{ return NX_ERROR_BUSY; }}",
                 f"    {state}.registers = {item.controller};",
@@ -135,7 +143,9 @@ def constructor(item, result, board_bindings, routes, devices):
             if binding.get("initial") != mask:
                 fail("H743 SPI active-low CS requires an initial high latch")
             rate = child.get("max_hz", item.options.max_hz)
-            if type(rate) is not int or not 250000 <= rate <= item.options.max_hz:
+            if (type(rate) is not int or
+                    not 250000 <= rate <= item.options.max_hz or
+                    rate * 256 < source_max):
                 fail("H743 SPI endpoint rate is outside its hardware divider")
             mode = child.get("mode", 0)
             if type(mode) is not int or not 0 <= mode <= 3:

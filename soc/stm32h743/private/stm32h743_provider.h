@@ -116,7 +116,17 @@ typedef struct {
 } nx_stm32h743_spi_endpoint_state_t;
 extern const nx_spi_ops_t nx_stm32h743_spi_ops;
 extern const nx_spi_endpoint_ops_t nx_stm32h743_spi_endpoint_ops;
-/** \brief Acquire a cold H743 V3 SPI instance with byte RX threshold. */
+/**
+ * \brief Acquire a cold H743 V3 SPI instance with byte RX threshold.
+ * \note The trusted static constructor already owns the exclusive GPIOE
+ *       PE12/13/14 AF5 route and its clock through complete stop. Hand-built
+ *       private callers owe the same lifetime and serial-executor contract;
+ *       matching readable registers cannot grant a foreign lease. Selected
+ *       CS remains driven high before GPIO SCK idle takeover and SPI reset.
+ *       Transfer drain counts/copies complete late RX only within this call's
+ *       submitted prefix; unsent TXFIFO contents are flushed without counting.
+ *       An unproved active-frame drain cannot return its caller buffers.
+ */
 nx_result_t nx_stm32h743_spi_initialize(nx_stm32h743_spi_state_t* port);
 /** \brief Configure a leased push-pull AF pin with no pull and readbacks. */
 nx_result_t nx_stm32h743_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,

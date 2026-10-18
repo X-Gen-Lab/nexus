@@ -1,0 +1,10 @@
+{
+  "kind": "Root_adjacent_bilingual_SPI_docs_precision_r4",
+  "path": "soc/stm32h743/README.md",
+  "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/adjacent-docs-r4/files/soc/stm32h743/README.md",
+  "bytes": 32745,
+  "sha256": "ec4bdcdb5e73ca50c2348dc2e6be361f57be1ff26113a432f82b4bfbacdecaec",
+  "code_review": "f0234a2ccd7a9cf514a1e16afeca31170e0854629202af73b48b482521d9e9d2",
+  "scope": "Documentation only, no new source execution or qualification claim; unrelated source preserved.",
+  "precision_feedback": "Explicit nonzero TSIZE and EOT+TXC both set; no universal shortening claim after timer ceil quantization."
+}

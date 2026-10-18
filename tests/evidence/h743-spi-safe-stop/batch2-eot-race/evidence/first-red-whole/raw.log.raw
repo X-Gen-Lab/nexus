@@ -1,0 +1,126 @@
+Running main() from gmock_main.cc
+[==========] Running 36 tests from 4 test suites.
+[----------] Global test environment set-up.
+[----------] 5 tests from H743Pwm
+[ RUN      ] H743Pwm.ColdBaseAndBothDutyEndpointsUseTheSelectedClock
+[       OK ] H743Pwm.ColdBaseAndBothDutyEndpointsUseTheSelectedClock (0 ms)
+[ RUN      ] H743Pwm.Hsi32ProfileUsesItsOwnPrescaler
+[       OK ] H743Pwm.Hsi32ProfileUsesItsOwnPrescaler (0 ms)
+[ RUN      ] H743Pwm.ForeignTimerRejectsWithoutGpioOrRegisterWrites
+[       OK ] H743Pwm.ForeignTimerRejectsWithoutGpioOrRegisterWrites (0 ms)
+[ RUN      ] H743Pwm.FailedUpdateRetainsAndCloseCanRecover
+[       OK ] H743Pwm.FailedUpdateRetainsAndCloseCanRecover (0 ms)
+[ RUN      ] H743Pwm.FailedResetKeepsResponsibilityForRetry
+[       OK ] H743Pwm.FailedResetKeepsResponsibilityForRetry (0 ms)
+[----------] 5 tests from H743Pwm (0 ms total)
+
+[----------] 4 tests from H743Watchdog
+[ RUN      ] H743Watchdog.StartAndFeedExposeIrreversibleUnknownTimingEnvelope
+[       OK ] H743Watchdog.StartAndFeedExposeIrreversibleUnknownTimingEnvelope (0 ms)
+[ RUN      ] H743Watchdog.LsiFailureHasNoIrreversibleActivation
+[       OK ] H743Watchdog.LsiFailureHasNoIrreversibleActivation (0 ms)
+[ RUN      ] H743Watchdog.PostActivationFailureKeepsTheWatchdogEnabled
+[       OK ] H743Watchdog.PostActivationFailureKeepsTheWatchdogEnabled (0 ms)
+[ RUN      ] H743Watchdog.ResetCausesAreLatchedBeforeExternalAcknowledgement
+[       OK ] H743Watchdog.ResetCausesAreLatchedBeforeExternalAcknowledgement (0 ms)
+[----------] 4 tests from H743Watchdog (0 ms total)
+
+[----------] 3 tests from H743Exti
+[ RUN      ] H743Exti.SelectedLineAcknowledgesOnlyItsOwnPendingBit
+[       OK ] H743Exti.SelectedLineAcknowledgesOnlyItsOwnPendingBit (0 ms)
+[ RUN      ] H743Exti.ForeignPendingLineIsRejectedBeforeAnyEffect
+[       OK ] H743Exti.ForeignPendingLineIsRejectedBeforeAnyEffect (0 ms)
+[ RUN      ] H743Exti.RefusedVectorWithdrawalRetainsStorageUntilRetry
+[       OK ] H743Exti.RefusedVectorWithdrawalRetainsStorageUntilRetry (0 ms)
+[----------] 3 tests from H743Exti (0 ms total)
+
+[----------] 24 tests from H743Spi
+[ RUN      ] H743Spi.ColdAdmissionUsesV3CfgAndNoDmaOrInterrupt
+[       OK ] H743Spi.ColdAdmissionUsesV3CfgAndNoDmaOrInterrupt (0 ms)
+[ RUN      ] H743Spi.V3TsizeAndByteAccessCompleteThenWithdrawBeforeCs
+[       OK ] H743Spi.V3TsizeAndByteAccessCompleteThenWithdrawBeforeCs (0 ms)
+[ RUN      ] H743Spi.SlowClockTailSurvivesEarlyEotAndTxcBeforeResetAndCsRelease
+[       OK ] H743Spi.SlowClockTailSurvivesEarlyEotAndTxcBeforeResetAndCsRelease (0 ms)
+[ RUN      ] H743Spi.CallerExpiryCannotCutShortTheFinalClockDrain
+[       OK ] H743Spi.CallerExpiryCannotCutShortTheFinalClockDrain (0 ms)
+[ RUN      ] H743Spi.StalledByteResetsControllerAndRequiresExplicitRecovery
+[       OK ] H743Spi.StalledByteResetsControllerAndRequiresExplicitRecovery (0 ms)
+[ RUN      ] H743Spi.ForeignKernelSelectorRejectsWithoutChangingTheDomain
+[       OK ] H743Spi.ForeignKernelSelectorRejectsWithoutChangingTheDomain (0 ms)
+[ RUN      ] H743Spi.AliasedOrUnboundedRequestsRejectBeforeChipSelect
+[       OK ] H743Spi.AliasedOrUnboundedRequestsRejectBeforeChipSelect (0 ms)
+[ RUN      ] H743Spi.RefusedResetKeepsPortResponsibilityForRetry
+[       OK ] H743Spi.RefusedResetKeepsPortResponsibilityForRetry (0 ms)
+[ RUN      ] H743Spi.RefusedDrainCannotReturnOrReleaseTheCallerAndChipSelect
+[       OK ] H743Spi.RefusedDrainCannotReturnOrReleaseTheCallerAndChipSelect (1009 ms)
+[ RUN      ] H743Spi.ModesZeroAndThreeKeepPinsControlledThroughFinalReset
+[       OK ] H743Spi.ModesZeroAndThreeKeepPinsControlledThroughFinalReset (0 ms)
+[ RUN      ] H743Spi.StalledRxSuspendsTheRealFrameBeforeReturningPartialTimeout
+[       OK ] H743Spi.StalledRxSuspendsTheRealFrameBeforeReturningPartialTimeout (0 ms)
+[ RUN      ] H743Spi.RefusedSuspendCannotResetOrReturnTheBorrowedFrame
+[       OK ] H743Spi.RefusedSuspendCannotResetOrReturnTheBorrowedFrame (1003 ms)
+[ RUN      ] H743Spi.RefusedCsHighLeavesSelectedPinsAndBorrowIntact
+[       OK ] H743Spi.RefusedCsHighLeavesSelectedPinsAndBorrowIntact (1000 ms)
+[ RUN      ] H743Spi.RefusedSckTakeoverKeepsTheFrameAfterPhysicalCsHigh
+[       OK ] H743Spi.RefusedSckTakeoverKeepsTheFrameAfterPhysicalCsHigh (1009 ms)
+[ RUN      ] H743Spi.RefusedResetRetainsFrameAndSafeIdleAfterPhysicalCsHigh
+[       OK ] H743Spi.RefusedResetRetainsFrameAndSafeIdleAfterPhysicalCsHigh (1010 ms)
+[ RUN      ] H743Spi.IdleStopResetReadbackFailureRetainsResponsibilityForRetry
+[       OK ] H743Spi.IdleStopResetReadbackFailureRetainsResponsibilityForRetry (0 ms)
+[ RUN      ] H743Spi.LateCompleteRxDuringDrainExtendsOnlyTheSubmittedPrefix
+[       OK ] H743Spi.LateCompleteRxDuringDrainExtendsOnlyTheSubmittedPrefix (0 ms)
+[ RUN      ] H743Spi.SuspendedUnsentTxFifoIsFlushedWithoutInventingCompletion
+[       OK ] H743Spi.SuspendedUnsentTxFifoIsFlushedWithoutInventingCompletion (0 ms)
+[ RUN      ] H743Spi.ForeignSckRouteRejectsBeforeAnyTransferEffect
+[       OK ] H743Spi.ForeignSckRouteRejectsBeforeAnyTransferEffect (0 ms)
+[ RUN      ] H743Spi.ColdUnroutedStopDoesNotInventASelectedPinTransition
+[       OK ] H743Spi.ColdUnroutedStopDoesNotInventASelectedPinTransition (0 ms)
+[ RUN      ] H743Spi.FullLateRxIsCountedWithoutMovingTheCompletedWireEpoch
+[       OK ] H743Spi.FullLateRxIsCountedWithoutMovingTheCompletedWireEpoch (0 ms)
+[ RUN      ] H743Spi.FiniteCompletionBeforeSuspendPreservesTimeoutAndCompleteRx
+/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:554: Failure
+Death test: { alarm(2U); ((faults).gmock_Observe())(::testing::internal::GetWithoutMatchers(), nullptr) .InternalExpectedAt("/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp", 557, "faults", "Observe()").Times(0); uint8_t tx = 0x35U; uint8_t rx[2]{}; rx[0] = 0xaaU; rx[1] = 0xbbU; size_t count = 99U; const nx_result_t result = nx_spi_endpoint_transfer(&device, &tx, rx, 1U, 3U, &count); const bool complete = result == NX_ERROR_TIMEOUT && count == 1U && rx[0] == uint8_t(~tx) && rx[1] == 0xbbU && state.fault && state.retained && !state.active && state.held_cs == nullptr && (cs.registers->ODR & cs.mask) == cs.mask && ((g_h743_model.gpio_e.MODER >> 24U) & 3U) == 1U && registers.CR1 == 0U && g_h743_model.spi_idle_before_suspend_events == 1U && g_h743_model.spi_completed_suspensions == 0U && g_h743_model.spi_reset_assertions == 1U && g_h743_model.spi_reset_order_errors == 0U && g_h743_model.spi_selected_control_losses == 0U && !g_h743_model.spi_tail_truncated; std::_Exit(complete ? 0 : 1); }
+    Result: died but not with expected exit code:
+            Terminated by signal 14
+Actual msg:
+[  DEATH   ] 
+
+[  FAILED  ] H743Spi.FiniteCompletionBeforeSuspendPreservesTimeoutAndCompleteRx (2001 ms)
+[ RUN      ] H743Spi.FiniteCompletionBeforeSuspendPermitsIdleStop
+/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:593: Failure
+Expected equality of these values:
+  NX_SUCCESS
+    Which is: 0
+  nx_spi_port_stop(&face)
+    Which is: 6
+
+/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:594: Failure
+Value of: state.retained
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:595: Failure
+Value of: state.initialized
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_peripheral_test.cpp:598: Failure
+Expected equality of these values:
+  1U
+    Which is: 1
+  g_h743_model.spi_reset_assertions
+    Which is: 0
+
+[  FAILED  ] H743Spi.FiniteCompletionBeforeSuspendPermitsIdleStop (0 ms)
+[ RUN      ] H743Spi.UnprovedIdleStatusCannotReturnOrResetTheBorrowedFrame
+[       OK ] H743Spi.UnprovedIdleStatusCannotReturnOrResetTheBorrowedFrame (3031 ms)
+[----------] 24 tests from H743Spi (10067 ms total)
+
+[----------] Global test environment tear-down
+[==========] 36 tests from 4 test suites ran. (10067 ms total)
+[  PASSED  ] 34 tests.
+[  FAILED  ] 2 tests, listed below:
+[  FAILED  ] H743Spi.FiniteCompletionBeforeSuspendPreservesTimeoutAndCompleteRx
+[  FAILED  ] H743Spi.FiniteCompletionBeforeSuspendPermitsIdleStop
+
+ 2 FAILED TESTS

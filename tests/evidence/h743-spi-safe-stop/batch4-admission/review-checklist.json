@@ -1,0 +1,114 @@
+{
+  "kind": "Independent preparation checklist only: H743 SPI exact-cut/default-trim admission batch4",
+  "created_utc": "2026-10-18T03:01:17.623824+00:00",
+  "status": "PENDING final source and complete actual evidence freeze; no implementation or execution preapproved",
+  "read_only_basis": {
+    "frozen_batch3": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/manifest.json",
+      "bytes": 30240,
+      "sha256": "dc1eb13953cdb7fa7eb190643e4e739dbdfa168639cbab9ec7b1afc164a3ee60"
+    },
+    "admission_gap_addendum": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/independent-admission-scope-addendum-r1.json",
+      "bytes": 10309,
+      "sha256": "b520fe4f0c07c2ba30d8c925a18bc853136e52e3b9fe322cebc6a985fa282730"
+    },
+    "driver": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/soc/stm32h743/drivers/spi.c",
+      "bytes": 21301,
+      "sha256": "26766fe3e5b9010eeaa92164556c8701fbfeaafc65ed038c030630259fd7937e"
+    },
+    "official_envelope": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/official-review/manifest.json",
+      "bytes": 1214,
+      "sha256": "72ac5a50d34ff0d07ec13be0965e60dd393567f3845b5df04c6bbbc04a5f6697"
+    }
+  },
+  "runtime_contract_checks": [
+    {
+      "id": "A1",
+      "check": "Exact identity",
+      "expectation": "Cold fixed SPI requires observed DEV_ID0x450 and REV_ID0x2003, using the existing pure inline helper or equivalent exact predicate. Reject1003(Y/W),2001(X),unknown revision and wrong device group; do not use authored/caller safe booleans or DEV-only identity as the electrical capability proof."
+    },
+    {
+      "id": "A2",
+      "check": "V-only register ordering",
+      "expectation": "Test exactV before any read of V-only RCC_HSICFGR. A non-V path must return without evaluating that register. Inspect real control flow/short-circuit order independently; do not call a read-absence test proven if the external model did not actually observe reads by address."
+    },
+    {
+      "id": "A3",
+      "check": "Default trim and repeat observation",
+      "expectation": "Require actual HSITRIM[6:0]==0x40; HSICAL read-only factory data is not required to equal64. Reobserve on runtime transfer readiness, not only System startup. IDCODE is immutable in real hardware; midlife ID mutation is a conservative model fault, while user trim is writable. Neither test changes the physical ownership contract."
+    },
+    {
+      "id": "A4",
+      "check": "Minimal local boundary",
+      "expectation": "Only SPI capability admission is tightened. Fixed System may retain its existing older nominal uses; do not change generic System/other providers or add fixed-profile references to PLL ownership/clock.c, state fields, heap, pools, registry, virtual forwarding or hidden workers. An unconditional private clock header for its inline identity helper must not turn into a fixed runtime PLL dependency."
+    },
+    {
+      "id": "A5",
+      "check": "Error and BUSY precedence",
+      "expectation": "Preserve task-context and invalid-input guards; cold retained/initialized/active/held-CS/foreign cold-register BUSY remains before new identity/trim admission, as deliberately specified. Cold non-V UNSUPPORTED vsV-bad-trim STATE and runtime non-success STATE must be checked in actual cases. Do not claim all old combined-invalid ordering unchanged merely because one priority is preserved."
+    },
+    {
+      "id": "A6",
+      "check": "Rejected new admission",
+      "expectation": "No new retained/initialized/active state, transfer register/pin writes, CS acquisition or request/buffer borrow on rejected cold/transfer entry. Distinguish permitted register reads and existing output-count initialization from zero-MMIO-read or absolutely no output-memory writes."
+    },
+    {
+      "id": "A7",
+      "check": "Existing ownership and cleanup",
+      "expectation": "Bad midlife readiness never revokes prior ownership or silently clears retained/active/held-CS state. Failed stop/recover retains responsibility. Tests restore only external observed hardware facts and retry real public cleanup; they must not memset SUT state, clear owner booleans, fake a final reset or treat test-process exit as withdrawal."
+    },
+    {
+      "id": "A8",
+      "check": "Unchanged SPI execution",
+      "expectation": "Compare stripped production tokens: change only readiness/admission and necessary call-site status propagation. Keep65/32.5 divisor bounds,99450000 high branch, nominal same-source quiet, rs-safe CSUSP command, finiteEOT acceptance, late-RX prefix, CS-high/SCK-GPIO/reset order, nonreturning active-failure semantics and readonly factory faces."
+    }
+  ],
+  "TDD_and_fixture_checks": [
+    {
+      "id": "T1",
+      "check": "Legitimate non-V System path",
+      "expectation": "Manual fixture must start the real fixed System with legal1003/2001/unknown identity and otherwise coherent cold facts, then supply its existing trusted SPI/pin lease. Do not manufacture System.started/core_hz as the central proof of this admission gap. Treat wrong-device direct private scenarios as distinct contract negatives."
+    },
+    {
+      "id": "T2",
+      "check": "Corrected factory fault timing",
+      "expectation": "Use only external hardware facts for the one-shot mutable trim injection: actual running TIM2 plus ADC ADRDY at the EXTI critical entry, after earlier Flash/I2C operations and before SPI admission. Observe one actual injection and prove reached stage using hardware facts. Do not inspect SUT lifecycle indices/private owner booleans or infer the injection merely from a matching error result."
+    },
+    {
+      "id": "T3",
+      "check": "True factory RED",
+      "expectation": "The first mistaken injection time that let an earlier provider reject is setup/false-positive history, not SPI behavior proof. Restore exact26766fe3 batch3 driver with corrected test/model facts and execute the complete factory module for genuine RED before restoring the minimal new admission implementation. Bind raw/source/ELF/actual returns to each phase; do not inherit initial partial GREEN."
+    },
+    {
+      "id": "T4",
+      "check": "Actual rollback and retry",
+      "expectation": "New generated factory tests must exercise real Platform rollback after SPI rejection. Normal restoration should stop successfully; an independent GPIOA MODER restore refusal must keep cleanup/System ownership until that external fault is removed and real retry succeeds. Account for primary vscleanup result and actual remaining effects without requiring permanent QUARANTINED when stop can complete."
+    },
+    {
+      "id": "T5",
+      "check": "No weakened baseline",
+      "expectation": "Preserve original old cases/assertions, including37stop/race prefix plus documented prior rate refinements, factory11, high30 and Python7. New cold/runtime/BUSY/non-V/trim cases fail for intended behavior with old implementation. Keep setup corrections, mistaken timing, discarded/incomplete results and any partial GREEN in separate immutable history."
+    },
+    {
+      "id": "T6",
+      "check": "Whole-module execution",
+      "expectation": "Require fresh complete Google programs and actual child/nonzero RED then0 GREEN; no filters/shards/disabled/skipped-only admission. Count failed cases separately from assertion failures and parameter/subtest events. Confirm unique testcase identities, run/completed status, exact source before/after, raw/XML hashes and matching ELF."
+    },
+    {
+      "id": "T7",
+      "check": "Final exact freeze",
+      "expectation": "Inspect only the final authoritative frozen overlay/manifest, not ownTMP while editing. Bind additional unchanged provider/header/System/clock dependencies from final receipts; unchanged source-guard selection is not the full compiler graph. Confirm full expected six final whole results and any matching Python/style run without inheriting178 as current-head evidence."
+    }
+  ],
+  "qualification_and_reporting": [
+    "The prior178 focused result remains true, but the batch3 no-blocker conclusion is superseded by the OPEN admission addendum until this exact defect has new real TDD and source review.",
+    "A fixed32 private host case and model trim/readback tests do not establish ARM execution, physical oscillator frequency or hardware die qualification. The official bound is an engineering composition under voltage/junction/default-calibration constraints.",
+    "DS12110Rev11 chapter6/Table37 coversY with matching frequency numbers, but1003 cannot distinguishY/W; it is not automatic proof for all admitted non-V identities. Do not broaden electrical support toY/W/X/unknown to avoid the explicit guard.",
+    "Complete main normal hooks, ARM/SDK/fullmatrix/reproducibility/HIL remain separate. No preapproval of the in-progress source is implied by this checklist.",
+    "If private header/adjacent documentation needs the new exact-cut/default-trim/error wording, track an explicit integration documentation delta; do not silently modify paths beyond the authorized source batch."
+  ],
+  "reviewer_activity": "Only existing frozen batch3/addendum and received task facts were used. No in-progress ownTMP source inspected for this preparation, no tests/build/configuration/source/main/index mutation, and no child spawned."
+}

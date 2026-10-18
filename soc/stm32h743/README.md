@@ -292,13 +292,44 @@ outside this platform repository. Modes not listed are rejected at configuration
 | IWDG1 | Explicit irreversible start/feed, no window mode, observed debug-freeze and latched reset facts; LSI timing envelope remains unknown(0/0), enabled-state queries return UNSUPPORTED while preserving enabled responsibility |
 | FLASH | Full2MiB,16physical128KiB sectors, two1MiB banks,32-byte ECC flashwords, explicit erase-aligned consumer regions; no product partition |
 
-SPI v3 uses TSIZE, byte-width TXDR/RXDR, explicit CSTART and observed EOT/TXC;
-DMA completion or TX FIFO space cannot substitute for wire completion. A reset
-follows a quiet guard of at least one actual SCK period plus two timer quanta,
-independent of caller expiry, before releasing CS (ES0392 section2.22.6).
-CFG1 retains CRCSIZE7 even with CRC disabled (section2.22.5). Failed reset
-parks with the calling frame and CS responsibility retained. I2C reuses the
-reviewed private V2 engine after independent H743 register/bit layout assertions;
+SPI4 polling requires actual DEV_ID `0x450`, REV_ID `0x2003` (V) and
+HSITRIM `0x40`, including fixed-HSI profiles. Non-V cold admission returns
+`UNSUPPORTED` before reading the V-only HSICFGR layout; foreign V trim returns
+`STATE`. Retained/active cold responsibility keeps its existing `BUSY` priority.
+A later incompatible clock makes transfer/recover/stop return `STATE` while
+retained cleanup remains owned. This SPI contract does not narrow generic
+fixed-System or UART support.
+
+Divider selection uses the reviewed source upper bounds, not nominal rates:
+65 MHz for fixed HSI64, 32.5 MHz for fixed HSI32 and the existing 99.45 MHz
+APB2 bound for PLL384. The V factory-trim/voltage/junction envelope comes from
+DS12110 Rev11 Table 134; these are design bounds, not measured SCK. Thus a
+16 MHz ceiling on HSI64 selects /8, and a 250 kHz ceiling is unsupported on
+HSI64 but allowed on HSI32. The fixed-profile quiet guard retains the nominal
+same-source timer/SPI ratio; it does not estimate this wait from the source
+upper bound. A register match checks an existing exclusive lease, not authority
+to share or take over hardware.
+
+SPI v3 uses TSIZE, byte-width TXDR/RXDR and explicit CSTART. With nonzero
+TSIZE, TXC follows EOT; it is not an independent observation of wire completion.
+Stopping observes CSTART clear after EOT or an explicit CSUSP/SUSP handshake,
+then waits at least one SCK period plus two timer quanta independently of the
+caller deadline. The CSUSP read-modify-write masks the rs CSTART command;
+otherwise writing back a sampled one could restart the master. Normal EOT can
+win that race: CSTART clear with nonzero TSIZE and both EOT and TXC set accepts
+an actual stop even without SUSP. After RX withdrawal and SPE disable, it verifies CS high. If PE12
+still uses AF5, it latches the current CPOL and verifies its GPIO-output handoff; an
+already-owned GPIO idle latch is preserved. Only then does it assert the
+exclusive peripheral reset (ES0392 section2.22.6). The next transfer configures
+CPOL while CS is high before restoring PE12 AF5. No MOSI
+idle level or physical glitch-free behavior is inferred from these model checks.
+CFG1 retains CRCSIZE7 even with CRC disabled (section2.22.5). A failed active
+withdrawal parks with the caller frame and buffer loan retained, even if CS has
+already gone high. RX reads count completed frames; unsent TX FIFO bytes flushed
+after suspension do not. Generated assembly owns the GPIOE clock and selected
+pins; a private manual constructor must hold the same exclusive lease.
+I2C reuses the reviewed private V2 engine after independent H743 register/bit
+layout assertions;
 it never acquires a vendor HAL handle, tick, worker, IRQ or DMA owner. The fixed
 TIMINGR values are0x70f22727(HSI64) and0x30f22727(HSI32), with analog filter on,
 DNF0 and a standard-mode electrical envelope of rise<=1000ns/fall<=300ns.
@@ -341,9 +372,9 @@ nonreturning fault path; timeout never aborts a pulse or releases storage early.
 The current development path requires selected-only cold RAM preparation and
 V revision `0x2003` admission before physical programming or erase. This applies
 to every selected Flash profile, including fixed HSI32/64 and HSI64/PLL384;
-unknown cuts are rejected. The restriction does not propagate to other
-peripherals or UART profiles, and assemblies without Flash acquire no RAM
-workspace. One generated
+unknown cuts are rejected. UART and devices without their own cut contract
+do not inherit the Flash restriction; SPI has the separate V/trim contract
+above. Assemblies without Flash acquire no RAM workspace. One generated
 workspace holds private vectors, stack, staged input and protection state. The
 CPU-only assembly bridge installs private MSP; the RAM transaction owns VTOR
 publication/readback, the MPU guard and physical both-bank drain. There is no
@@ -397,8 +428,27 @@ ADC提供PA3/INP15的16位单次采样，包含稳压等待、偏移与线性校
 官方LL boost编码；旧cut只保留实际BOOST位，屏蔽编码中保留且读回为零的位。校准完成必须观察到全部六个线性校准握手标志，控制寄存器写入
 保留这些标志，停止和重启不隐式同时切换；每次退出深度掉电均重新校准。ADC的
 Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不得超过VDDA；16位数据格式
-不代表已测量有效精度。SPI保留CRCSIZE7，并在EOT后独立等待一个实际SCK周期加
-两个时基量化间隔后才复位和释放CS，调用者deadline不能截断最终边沿。I2C按勘误
+不代表已测量有效精度。
+
+SPI4 轮询在固定 HSI 配置下同样只准入 DEV_ID 0x450、REV_ID 0x2003（V）
+和 HSITRIM 0x40。先判实际修订，再读取 V 专用 HSICFGR；冷态非 V 返回
+UNSUPPORTED，V 的外来 trim 返回 STATE，已有责任仍优先 BUSY。运行中时钟
+不匹配时 transfer／recover／stop 返回 STATE，保留既有清理责任；这不收紧
+通用固定 System 或 UART 支持。分频采用 65／32.5 MHz 固定 HSI 上界，PLL384
+仍用 99.45 MHz APB2 上界；它们来自 DS12110 Rev11 V 修订的出厂 trim、电压和
+结温条件，并非实测 SCK。HSI64 下 16 MHz 上限选 /8，250 kHz 上限不支持；
+HSI32 下允许 250 kHz。quiet guard 继续用同源名义 timer／SPI 比，不能把频率
+上界作为该等待的时基。
+
+SPI 保留 CRCSIZE7。写 CSUSP 时屏蔽 rs 类型 CSTART 的采样值，避免误启动；
+CSTART 清零、TSIZE 非零且 EOT 和 TXC 均置位，可证明正常结束，不强求竞态中
+未出现的 SUSP。独立等待一个 SCK 周期加两个时基量化间隔后，排空 RX、关闭 SPE，实际
+读回 CS 高，再把 AF5 SCK 交接到 CPOL 的 GPIO 电平并复位外设。已有且独占的
+GPIO idle latch 保持不变；下一笔在 CS 高时配置 CPOL，再恢复 AF5。活动撤源
+失败会保留调用帧及缓冲区借用并停驻，CS 已高也不撤销责任。RX 实际读出才计为
+完成帧，TX FIFO 中未发送的字节不计入；timeout 原因一旦锁存不随迟到 RX 改写。
+这些模型读回不证明实板无毛刺、MOSI 空闲电平或 HIL；静态 GPIOE／引脚独占租约
+仍由装配方证明。I2C按勘误
 对需要RELOAD的长接收采用单字节重装，忽略规定的master伪BERR，仍保留NACK、
 仲裁丢失和溢出错误。Flash提供完整2MiB几何：每Bank1MiB、共16个128KiB sector、
 32字节ECC flashword；目标地址和长度按32对齐，输入buffer可按1字节对齐。电压来自
@@ -407,8 +457,8 @@ Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不�
 byte写入均未开放。正在执行的Flash脉冲不能被timeout撤销；必须等硬件排空后才返回，
 排空或最终锁定失败将保留调用帧并进入终止故障路径。当前开发路径要求选定的
 V修订0x2003、冷态RAM复制与独立工作区；该准入适用于包括固定HSI32/64和PLL384
-在内的所有选定Flash配置，未知cut拒绝，其他外设与UART配置不继承此限制，未选
-Flash的装配也不取得RAM工作区。不再回退到原Flash驻留的脉冲路径；CPU bridge
+在内的所有选定Flash配置，未知cut拒绝。UART和未声明自身cut合同的其他外设不
+继承Flash限制；SPI另有上文的独立V／trim合同。未选Flash的装配也不取得RAM工作区。不再回退到原Flash驻留的脉冲路径；CPU bridge
 仅负责栈和CPU状态，RAM事务负责VTOR、MPU和实际排空。生产ELF闭包及完整软件
 退出尚未完成，IO-24仍为in_progress。维护窗口屏蔽可配置中断，不承诺严格中断
 延迟或硬实时deadline；MPU不停止其他bus master，外部调用者必须撤回并join。

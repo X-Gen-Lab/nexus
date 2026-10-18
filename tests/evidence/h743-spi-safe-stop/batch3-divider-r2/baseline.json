@@ -1,0 +1,30 @@
+{
+  "soc/stm32h743/drivers/spi.c": {
+    "sha256": "7a39abffb787426c607588dabe8902ef424c7f25d2b3c170a4bfebc5af2e93bf",
+    "bytes": 21105
+  },
+  "tests/google/h743_peripheral_test.cpp": {
+    "sha256": "79f0a4c25d542b380603ae709bf044df54dd9e79e8b3165e0edd56df71848c13",
+    "bytes": 28646
+  },
+  "tests/google/h743_peripheral_factory_test.cpp": {
+    "sha256": "96433adaac7cfbc53b63bacb865f84c0b2c041d8fd7b2b58d400b2daf092dac9",
+    "bytes": 7040
+  },
+  "tests/google/h743_model.h": {
+    "sha256": "a717f36ee96d8e26c1e106e89215fd9908d32a64fc3558a037099419dd5e6ad7",
+    "bytes": 7224
+  },
+  "tests/google/h743_model.cpp": {
+    "sha256": "f98e3bf789f14fcd6db384d12613d51c2cdb5c4b203a36a458029446e5f64269",
+    "bytes": 24687
+  },
+  "tools/configure/providers/stm32h743/bindings.py": {
+    "sha256": "8211df2a6f05c83bcbac31ecd7187b9dac5aac502384302b2e229d3486d18395",
+    "bytes": 18264
+  },
+  "tools/configure/providers/stm32h743/test_peripherals.py": {
+    "sha256": "df414f697d3eff4ac281fe6ba054df159493ff3f121db56bff3dd513a8327d6f",
+    "bytes": 4049
+  }
+}

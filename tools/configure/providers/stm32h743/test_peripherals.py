@@ -2,6 +2,7 @@
 import unittest
 from pathlib import Path
 import tempfile
+import tomllib
 
 from tools.configure.providers import stm32h743
 from tools.configure.providers.common import ConfigurationError
@@ -10,6 +11,62 @@ from tools.configure import configure
 
 
 class H743PeripheralCapabilityTests(unittest.TestCase):
+    def spi_assembly(self, directory, profile, controller_rate, endpoint_rate):
+        root = Path(__file__).resolve().parents[4]
+        original = (root / "tests/contracts/h743_assembly/peripherals.toml").read_text()
+        self.assertIn('\n[pwm.wave3]', original)
+        original = original.split('\n[pwm.wave3]', 1)[0]
+        original = original.replace('../../../boards/stm32h743zi_hsi_reference',
+                                    str(root / "boards/stm32h743zi_hsi_reference"))
+        original = original.replace('hsi64-fixed-cache-off', profile)
+        controller, endpoint = original.split('\n[spi_device.device4]\n', 1)
+        self.assertEqual(1, controller.count('max_hz = 1000000'))
+        self.assertEqual(1, endpoint.count('max_hz = 1000000'))
+        controller = controller.replace('max_hz = 1000000',
+                                        f'max_hz = {controller_rate}', 1)
+        endpoint = endpoint.replace('max_hz = 1000000',
+                                    f'max_hz = {endpoint_rate}', 1)
+        original = controller + '\n[spi_device.device4]\n' + endpoint
+        authored = tomllib.loads(original)
+        self.assertEqual(controller_rate, authored['spi']['bus4']['max_hz'])
+        self.assertEqual(endpoint_rate,
+                         authored['spi_device']['device4']['max_hz'])
+        self.assertEqual(profile, authored['clock'])
+        source = Path(directory) / "assembly.toml"
+        source.write_text(original)
+        return source
+
+    def test_spi_unreachable_profile_rates_reject_controller_and_endpoint(self):
+        cases = (("hsi64-fixed-cache-off", 250000),
+                 ("hsi64-fixed-cache-on", 253906),
+                 ("hsi64-pll384-cache-off", 388476))
+        for profile, rate in cases:
+            for location in ("controller", "endpoint"):
+                with self.subTest(profile=profile, rate=rate, location=location), \
+                        tempfile.TemporaryDirectory() as directory:
+                    controller = rate if location == "controller" else 1000000
+                    source = self.spi_assembly(directory, profile, controller, rate)
+                    output = Path(directory) / "output"
+                    with self.assertRaisesRegex(ConfigurationError, "divider"):
+                        configure.configure(source, output)
+                    self.assertFalse((output / "bindings.c").exists())
+
+    def test_spi_first_reachable_rates_preserve_nominal_kernel_identity(self):
+        cases = (("hsi64-fixed-cache-off", 253907, 64000000),
+                 ("hsi64-fixed-cache-on", 254000, 64000000),
+                 ("hsi32-fixed-cache-off", 250000, 32000000),
+                 ("hsi32-fixed-cache-on", 250000, 32000000),
+                 ("hsi64-pll384-cache-off", 388477, 96000000))
+        for profile, rate, nominal in cases:
+            with self.subTest(profile=profile, rate=rate), \
+                    tempfile.TemporaryDirectory() as directory:
+                source = self.spi_assembly(directory, profile, rate, rate)
+                output = Path(directory) / "output"
+                configure.configure(source, output)
+                bindings = (output / "bindings.c").read_text()
+                self.assertIn(f".clock_hz = {nominal}u", bindings)
+                self.assertIn(f".frequency_hz = {rate}u", bindings)
+
     def test_sram1_requires_explicit_budget_and_extends_only_selected_dma(self):
         root = Path(__file__).resolve().parents[4]
         original = (root / "tests/contracts/h743_assembly/rx.toml").read_text()
