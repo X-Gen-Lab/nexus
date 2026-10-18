@@ -1,0 +1,221 @@
+{
+  "scope": "IO-35 first device reset/SETUP proof slice; dirty authoring development only",
+  "qualification": false,
+  "clean_source": false,
+  "source": {
+    "io/src/usb_device_controller.c": {
+      "bytes": 47104,
+      "sha256": "651bee8ac3d4da3a8169ef65329d3ccd5b411b2f46f220fca24f369f66e29313"
+    },
+    "io/native/usb_device.h": {
+      "bytes": 2243,
+      "sha256": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c"
+    },
+    "io/native/usb_device.c": {
+      "bytes": 11595,
+      "sha256": "21b34f1b88161a2c342743e03446dd117e591bd76653833d01b869126119925b"
+    },
+    "tests/google/usb_device_test.cpp": {
+      "bytes": 49144,
+      "sha256": "242933d8f43f8332db15a4fd69926a3812ae30dd08ca9a818d50a519f9351d94"
+    }
+  },
+  "support_inputs": {
+    "tests/google/usb_device.cmake": {
+      "bytes": 1928,
+      "sha256": "8c2b2b856f6dc5203a475c197f7d3b6fe17f9d51f5be638a1fd943f4c85da0db"
+    },
+    "tests/google/usb_factory.cmake": {
+      "bytes": 3134,
+      "sha256": "2ed241f698d537b86a37218608a443453128ef5a4280cfc469a1408bde580f8b"
+    },
+    "tests/google/usb_device_soc_test.cpp": {
+      "bytes": 8227,
+      "sha256": "041ba6871382424eac3887b5ad6c02ae68ee41ef5964571bfc9dc0bd4cf7a4e9"
+    },
+    "tests/google/usb_factory_test.cpp": {
+      "bytes": 16568,
+      "sha256": "f8fbff69b38ade406699d9f68de0a8688b6cfa677f5f7816dfa41ed1b5a0135b"
+    },
+    "tests/google/usb_device_soc_model.h": {
+      "bytes": 302,
+      "sha256": "a45366e59d30513573ddd79db39d110757f932b46fdf2f32a5dc2a3c6c8f6f31"
+    },
+    "tests/google/usb_factory_model.h": {
+      "bytes": 944,
+      "sha256": "f22df62d3976d27c2dd7a951369613cc54d6dd48e803748e0bbd74da64ebbbea"
+    },
+    "io/include/nexus/io/usb_device.h": {
+      "bytes": 8447,
+      "sha256": "759d26c0d51e28ca566a5ef5ca7e7d7fa86533812af40160abbbc216ab01fd6e"
+    },
+    "io/private/usb_device_controller.h": {
+      "bytes": 2861,
+      "sha256": "6a8006cc5b8d8bce56c84f46f5a52da3863555b43ac3c2ed1b93becdc3f1e39c"
+    },
+    "soc/stm32f407/drivers/usb_device.c": {
+      "bytes": 3862,
+      "sha256": "98f80491c5a7f872bf32070b9bda3a5208e5f3c0f12a3ce474d850297927d24a"
+    },
+    "soc/gd32f470/drivers/usb_device.c": {
+      "bytes": 3330,
+      "sha256": "7e97eb795e84df0c3726fc1762dab5ac05df167f8aa8c17bf793da6338e09432"
+    },
+    "soc/stm32f407/usb_clock.c": {
+      "bytes": 4694,
+      "sha256": "11e93443be03983abfa24d952d8c1b9896d7103be8b61d9b70768d338ae5b044"
+    },
+    "soc/gd32f470/usb_clock.c": {
+      "bytes": 7883,
+      "sha256": "fca632154fd0cb985780382d107dead46993a3f5278c88b201f7ad59737cc5dc"
+    },
+    "tools/configure/usb_device.py": {
+      "bytes": 12275,
+      "sha256": "876b169fd996088680b9c5c60bc6f2e9bebc8fb3b1cbf38dba79d19421a77e11"
+    },
+    "dependencies/googletest.lock.json": {
+      "bytes": 497,
+      "sha256": "31b213daa3c19b7ab4efa987c75a6bfdfdf717f9a8bed27c67620f3e4d129e68"
+    },
+    "dependencies/stm32f4-hal.lock.json": {
+      "bytes": 2296,
+      "sha256": "59e9b509aa7c9612793dce5851e7d9c13b39c9fa2e753fc743cb970ab893cfdc"
+    },
+    "vendors/gigadevice/gd32f4xx/source.lock.json": {
+      "bytes": 36539,
+      "sha256": "f0ebc062ec85d04d4fa0a00bb7b33719f2dc6020b64d92407c0cad0ea732c065"
+    },
+    "vendors/st/cmsis_device_f4/Include/stm32f407xx.h": {
+      "bytes": 1193992,
+      "sha256": "ae1ab57d8ab750f64f04fd73476bc2760c761e18e45bde648e0bc350c9a1d9ac"
+    },
+    "vendors/gigadevice/gd32f4xx/Firmware/GD32F4xx_usb_library/driver/Include/drv_usb_regs.h": {
+      "bytes": 47756,
+      "sha256": "18aebc7f97d182f7366af5433ad3867328c25c08198a2e80fc64caddbf297685"
+    },
+    "build/native-debug/tests/contracts/google/usb-factory-stm32/bindings.c": {
+      "bytes": 26782,
+      "sha256": "b04b23349c60fc2eb0d97e37d13496b800f6b4a294a977b7a45edef952576893"
+    },
+    "build/native-debug/tests/contracts/google/usb-factory-gd32/bindings.c": {
+      "bytes": 26935,
+      "sha256": "79c4470c2b4533b2c3022ac60962ef77372d3c71ad76223e588d433af14e73fb"
+    }
+  },
+  "executions": [
+    {
+      "stage": "whole-usb-red-r1",
+      "tests": 47,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "0487e1c6c2b237db563c852f96708e1940ee767019bcb012b50cec7f5a74f7b7",
+      "fresh": true,
+      "program_sha256": "ce70bbb4d7aac7bdc7002e0e74d8d5b2594b11659ff463d732b92be43b4ae1ee",
+      "exit_code": 1
+    },
+    {
+      "stage": "whole-usb-green-r1",
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "5631a19c54d9fb5163ed9908370e0a4df005f8a2e998267d1eb97c949002cac4",
+      "fresh": true,
+      "program_sha256": "48663d829ad16d3bd337a4db655429f769fe763ac8295416a503ee3c89fc7c62",
+      "exit_code": 0
+    },
+    {
+      "stage": "whole-usb-coverage-green-r1",
+      "tests": 50,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "4086ac989e3c5e536ddbb88922b65da1a499a5f6aaa3a5ffc6857c3f48cdb17a",
+      "fresh": true,
+      "program_sha256": "56458f29c4a89c2a0ba2fa587150ebacd97532b4d5b302e3608c6c0a2639d227",
+      "exit_code": 0
+    },
+    {
+      "stage": "whole-usb-guard-coverage-green-r1",
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "03bcb984799336e24917809d9bd6fa8aec2dcf55b45b961e930c477be701810a",
+      "fresh": true,
+      "program_sha256": "46c6bdded68e31216f742fe1fb11151bc3c14a6d9314f87663de6a29f972d36a",
+      "exit_code": 0
+    },
+    {
+      "stage": "stm32-binding-green-r1",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "f9a828f8c7a28d9fac8b105aed88504d4f4033b398632671d4985e3a68d4620d",
+      "fresh": true,
+      "program_sha256": "d4723457aa029b35e9cb39da1d30a3c0a28deb622f9b542ea3ce303401f2f6d3",
+      "exit_code": 0
+    },
+    {
+      "stage": "gd32-binding-green-r1",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "3421f86f02ecaa18c6d185bbef8a592b0759980fda0ec3943b546d84c4a708aa",
+      "fresh": true,
+      "program_sha256": "a0c0deabb8287385acc160c33fdba5e416ccaccd02b1a65fdc2c2aa3d6e9cc6e",
+      "exit_code": 0
+    },
+    {
+      "stage": "stm32-factory-green-r1",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "4ec84ec3b6a5a722aee836902b66e66abebbcac77b0ba3db40c66501a1e94268",
+      "fresh": true,
+      "program_sha256": "b1f166bf8e9b84ed2ef186895f9588a5201978b66b71698b2c28136f0d666148",
+      "exit_code": 0
+    },
+    {
+      "stage": "gd32-factory-green-r1",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "junit_sha256": "9fcd1fa324ae8025fde6e95ddbdeb57fb39ef2955ee3748dde4855869cc6c46c",
+      "fresh": true,
+      "program_sha256": "ce603efddc1e0fbacee76bda0de5a93df89ab1169939d618de4991147d2caae4",
+      "exit_code": 0
+    }
+  ],
+  "final_execution_cases": 92,
+  "production_red_chronology": "Actual original unchanged core + new MMIO facts + three regressions: complete 47-case program, exactly three behavioral failures; then minimal shared core prototype, same 47-case complete GREEN. Exact first-GREEN four sources frozen in first-47-green-source.tar.gz.",
+  "coverage_chronology": "ZLP/ACK/epoch three cases first executed GREEN at 50 total. Three additional guard fault cases first executed GREEN at 53 total after prototype existed. They are coverage-only, not a claim of original test-first RED.",
+  "extra_guard_cases": [
+    "ResetRetainsHaltsUntilNonOutZeroDirectionsAreInactive",
+    "ResetRetainsBulkHaltUntilReadableDataZeroIsObserved",
+    "UnprovedResetKeepsObservedOutNakAfterActualLoanDrain"
+  ],
+  "unchanged_existing_assertions": true,
+  "production_public_API_or_state_layout_changed": false,
+  "native_only_fault_fields": [
+    "hold_address_clear",
+    "hold_stall_clear_mask"
+  ],
+  "index_byte_change": "Metadata-only change recorded; semantic entries match same HEAD and no stage/restore command used.",
+  "not_executed": [
+    "main integration normal full hook",
+    "ARM target linking or full SDK export",
+    "clean-source candidate / reproducibility",
+    "physical USB/HIL/class compliance"
+  ],
+  "whole_file_style_and_format_passed": true,
+  "authoring_root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "head": "fc93be77d64dcd160886cb3b4c9c23ccbb943b59",
+  "one_build_job": true,
+  "new_evidence_budget_bytes": 900000
+}

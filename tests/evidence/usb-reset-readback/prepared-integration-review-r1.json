@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "kind": "independent-prepared-USB-transport-review",
+  "reviewer": "/root/io24_checker_review_r2",
+  "reviewed_utc": "2026-10-18T03:50:47.676168+00:00",
+  "decision": "PASS_TRANSPORT_AND_LEDGER_ONLY",
+  "blockers": [],
+  "authority": {
+    "prepared_manifest": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/manifest.json",
+      "bytes": 76850,
+      "sha256": "df9a392111959d0f1f60da2f2688941049f14707f9a155d65045f5b0b079eb64"
+    },
+    "original_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/independent-review-r1.json",
+      "bytes": 33562,
+      "sha256": "ade79d5b221a9dffcd436124fe22e468d4256928e8efa346083e59e59f6cae8b"
+    },
+    "original_freeze": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/freeze.json",
+      "bytes": 13358,
+      "sha256": "de9126f416733bd8d17470cd55873e0de292103b31f5a1c0dd8afae3b016ce9c"
+    },
+    "source_patch": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/source-and-ledger.patch",
+      "bytes": 26006,
+      "sha256": "18bc4b7a9f72b9ca158e199244fb5627f00bccefe4ec254238ca74f339f74d83"
+    },
+    "ledger_patch": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/ledger-only.patch",
+      "bytes": 2035,
+      "sha256": "9336317d0cb6dbf1fa69cc6eaf9ec164001bddb32823e2e2d07a7953460a35a7"
+    },
+    "ledger_baseline": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/baseline-io-evolution-execution.csv",
+      "bytes": 10983,
+      "sha256": "25b83573f1c6b2e8051f0ce5b4a5b4beff86f635f6888a3c98a162ff1e0c7be7"
+    }
+  },
+  "transport": {
+    "expected_targets": 86,
+    "verified_targets": 86,
+    "source_count": 4,
+    "ledger_count": 1,
+    "historical_count": 81,
+    "payload_bytes": 669687,
+    "all_prepared_file_sizes_SHA256_match": true,
+    "all_nonledger_source_origins_same_bytes": true,
+    "all_86_modes_match_manifest": true,
+    "all_actual_files_exact_manifest_set": true,
+    "paths": "JSON parsed with duplicate-key rejection. Every expected_path matches its dict key, is canonical relative POSIX, has no escape/dot/.git/NUL/backslash/drive, unique including case-folding. Every prepared_file is exactly files/<expected_path>, regular with no symlink or symlink ancestor; no undeclared files below files/.",
+    "raw_renames": 42,
+    "raw_history_statement": "All declared historical .txt/.py leaves copied to .raw compare equal by size/SHA with original feature bytes. 81 historical targets comprise 29 JSON, 42 raw, 2 gzip and 8 XML. No historical source text is presented as an active source extension. JSON still remains subject to ordinary hygiene; this review does not exempt all evidence from normal hooks."
+  },
+  "source_binding": {
+    "io/src/usb_device_controller.c": {
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/io/src/usb_device_controller.c",
+      "bytes": 47104,
+      "sha256": "651bee8ac3d4da3a8169ef65329d3ccd5b411b2f46f220fca24f369f66e29313",
+      "same_original_review_source_inventory": true,
+      "same_original_freeze_source": true
+    },
+    "io/native/usb_device.h": {
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/io/native/usb_device.h",
+      "bytes": 2243,
+      "sha256": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+      "same_original_review_source_inventory": true,
+      "same_original_freeze_source": true
+    },
+    "io/native/usb_device.c": {
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/io/native/usb_device.c",
+      "bytes": 11595,
+      "sha256": "21b34f1b88161a2c342743e03446dd117e591bd76653833d01b869126119925b",
+      "same_original_review_source_inventory": true,
+      "same_original_freeze_source": true
+    },
+    "tests/google/usb_device_test.cpp": {
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/google/usb_device_test.cpp",
+      "bytes": 49144,
+      "sha256": "242933d8f43f8332db15a4fd69926a3812ae30dd08ca9a818d50a519f9351d94",
+      "same_original_review_source_inventory": true,
+      "same_original_freeze_source": true
+    }
+  },
+  "ledger": {
+    "prepared": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/docs/design/io-evolution-execution.csv",
+      "bytes": 11038,
+      "sha256": "b62cafcae16b39221023b53d9fef248ea4d32d2b27a6a7658807a38d1ac8e098"
+    },
+    "task_count": 42,
+    "only_byte_changed_row": "IO-35",
+    "other_rows_byte_identical": 41,
+    "changed_columns": [
+      "implementation_paths",
+      "implementation_status"
+    ],
+    "before_row": {
+      "task_id": "IO-35",
+      "phase": "P2",
+      "area": "usb",
+      "task": "Optional class adapters and exact PHY endpoint capabilities",
+      "implementation_paths": "io;components",
+      "exit_condition": "Control reset ACK ZLP and device mode before additional USB modes",
+      "implementation_status": "pending",
+      "software_status": "not_qualified",
+      "hardware_status": "not_executed",
+      "maintenance_owner": "Codex"
+    },
+    "after_row": {
+      "task_id": "IO-35",
+      "phase": "P2",
+      "area": "usb",
+      "task": "Optional class adapters and exact PHY endpoint capabilities",
+      "implementation_paths": "io/src/usb_device_controller.c;io/native/usb_device.c;components",
+      "exit_condition": "Control reset ACK ZLP and device mode before additional USB modes",
+      "implementation_status": "in_progress",
+      "software_status": "not_qualified",
+      "hardware_status": "not_executed",
+      "maintenance_owner": "Codex"
+    },
+    "exit_condition_unchanged": true,
+    "software_status": "not_qualified",
+    "hardware_status": "not_executed",
+    "statement": "Only implementation_paths and implementation_status changed. pending becomes in_progress for the partial USB reset/SETUP slice; neither full IO-35 completion, optional classes nor additional modes are claimed. All other columns and all other 41 rows are unchanged including exact line bytes."
+  },
+  "original_review_scope": {
+    "disposition": "NO_CONFIRMED_FOCUSED_SOURCE_OR_EVIDENCE_BLOCKER_WITH_EXPLICIT_TDD_AND_DEVELOPMENT_LIMITS",
+    "remaining_limits": [
+      "Root integration and complete normal hooks/CI at exact final source remain pending; focused92 does not qualify the whole repository.",
+      "Actual ARM linking, clean installed SDK export/consumers and reproducibility for this USB change remain unexecuted here.",
+      "Physical USB/clock/IRQ/FIFO timing, actual host interoperability, electrical VBUS/PHY and HIL remain not_executed.",
+      "Three conservative guards have honest post-implementation coverage rather than their own authentic RED. Preserve this classification.",
+      "Only shared FS-device PIO reset/SETUP is in scope; Host/HS/DMA/ISO/Chapter9/classes, product VID/PID and app protocol are not delivered by this slice.",
+      "Refused writes and unexplained selected EPENA retain duties retried by service or stop; no finite physical recovery guarantee is claimed."
+    ],
+    "statement": "Exact source bytes continue to bind to ade79d5b...6cae8b. No new production semantics review or execution was needed for this transport check; original authentic RED/coverage/development classifications stay unchanged."
+  },
+  "baseline_readback": {
+    "files": {
+      "io/src/usb_device_controller.c": {
+        "path": "/tmp/nexus-io-validation-20261018/io/src/usb_device_controller.c",
+        "bytes": 45696,
+        "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3"
+      },
+      "io/native/usb_device.h": {
+        "path": "/tmp/nexus-io-validation-20261018/io/native/usb_device.h",
+        "bytes": 2179,
+        "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2"
+      },
+      "io/native/usb_device.c": {
+        "path": "/tmp/nexus-io-validation-20261018/io/native/usb_device.c",
+        "bytes": 11210,
+        "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a"
+      },
+      "tests/google/usb_device_test.cpp": {
+        "path": "/tmp/nexus-io-validation-20261018/tests/google/usb_device_test.cpp",
+        "bytes": 30601,
+        "sha256": "07ec5ad1c1b1f964b6bb0e9e8847e4bdf2eb507dd113f3e904dc8d99930c3614"
+      },
+      "docs/design/io-evolution-execution.csv": {
+        "path": "/tmp/nexus-io-validation-20261018/docs/design/io-evolution-execution.csv",
+        "bytes": 10983,
+        "sha256": "25b83573f1c6b2e8051f0ce5b4a5b4beff86f635f6888a3c98a162ff1e0c7be7"
+      }
+    },
+    "statement": "All five current main baseline bytes matched the manifest during this read-only review. No main/source/index changes were made."
+  },
+  "review_actions": {
+    "only_new_file": "/workspace/nexus-io-recovery-20261018/validation/usb-prepared-independent-review-r1.json",
+    "build_tests_configure_Git_or_index_mutation": false,
+    "implementation_tools_executed": false,
+    "method": "Small manifest/source/ledger/patch reads and SHA verification. No build, tests, test-framework import, unpacking of historical payload, API/network or source modification."
+  },
+  "qualification": false,
+  "remaining_scope": [
+    "Root must stage exact reviewed payload and execute fresh normal complete hooks. Current in-flight main r5 gate is independent; no verdict on its outcome is made here.",
+    "Transport integrity and in_progress metadata are not whole-repository, ARM, installed-SDK, reproducibility, physical USB/HIL or release qualification."
+  ]
+}

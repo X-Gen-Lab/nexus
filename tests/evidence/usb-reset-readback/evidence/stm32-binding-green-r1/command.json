@@ -1,0 +1,30 @@
+{
+  "kind": "focused development; whole selected program where named",
+  "qualification": false,
+  "command": [
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/bin/nexus_stm32f407_usb_device_test",
+    "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-binding-green-r1/junit.xml"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "started_ns": 1792291822831003361,
+  "ended_ns": 1792291822834735304,
+  "exit_code": 0,
+  "source_before": {
+    "io/src/usb_device_controller.c": "651bee8ac3d4da3a8169ef65329d3ccd5b411b2f46f220fca24f369f66e29313",
+    "io/native/usb_device.h": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+    "io/native/usb_device.c": "21b34f1b88161a2c342743e03446dd117e591bd76653833d01b869126119925b",
+    "tests/google/usb_device_test.cpp": "242933d8f43f8332db15a4fd69926a3812ae30dd08ca9a818d50a519f9351d94"
+  },
+  "source_after": {
+    "io/src/usb_device_controller.c": "651bee8ac3d4da3a8169ef65329d3ccd5b411b2f46f220fca24f369f66e29313",
+    "io/native/usb_device.h": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+    "io/native/usb_device.c": "21b34f1b88161a2c342743e03446dd117e591bd76653833d01b869126119925b",
+    "tests/google/usb_device_test.cpp": "242933d8f43f8332db15a4fd69926a3812ae30dd08ca9a818d50a519f9351d94"
+  },
+  "maxrss_kib": 10368,
+  "jobs": 1,
+  "environment_selection_cleared": true,
+  "stdout_sha256": "524b913ab9ee14311fdeb9d3c4f272a4cb518a38a13183499ab7b1aeeba65e27",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "program_sha256": "d4723457aa029b35e9cb39da1d30a3c0a28deb622f9b542ea3ce303401f2f6d3"
+}

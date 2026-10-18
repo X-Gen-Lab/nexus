@@ -1,0 +1,33 @@
+Running main() from gmock_main.cc
+[==========] Running 12 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 12 tests from UsbFactory
+[ RUN      ] UsbFactory.BasePreflightRejectsBeforeClockPinAndControllerEffects
+[       OK ] UsbFactory.BasePreflightRejectsBeforeClockPinAndControllerEffects (0 ms)
+[ RUN      ] UsbFactory.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint
+[       OK ] UsbFactory.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint (0 ms)
+[ RUN      ] UsbFactory.CapabilityDescribesExactlyOneSelectedPioPacket
+[       OK ] UsbFactory.CapabilityDescribesExactlyOneSelectedPioPacket (0 ms)
+[ RUN      ] UsbFactory.RealSelectedDirectionsFifoPlanAndClockConsumerAreBound
+[       OK ] UsbFactory.RealSelectedDirectionsFifoPlanAndClockConsumerAreBound (0 ms)
+[ RUN      ] UsbFactory.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof
+[       OK ] UsbFactory.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof (0 ms)
+[ RUN      ] UsbFactory.FailedClockReleaseKeepsBothPinLeases
+[       OK ] UsbFactory.FailedClockReleaseKeepsBothPinLeases (0 ms)
+[ RUN      ] UsbFactory.FailedPinReadbackRetainsOnlyTheUnreleasedLease
+[       OK ] UsbFactory.FailedPinReadbackRetainsOnlyTheUnreleasedLease (0 ms)
+[ RUN      ] UsbFactory.PartialPinConfigurationRestoresExactlyCapturedPins
+[       OK ] UsbFactory.PartialPinConfigurationRestoresExactlyCapturedPins (0 ms)
+[ RUN      ] UsbFactory.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement
+[       OK ] UsbFactory.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement (0 ms)
+[ RUN      ] UsbFactory.SuccessfulDrainAllowsTheSameStaticIdentityToRestart
+[       OK ] UsbFactory.SuccessfulDrainAllowsTheSameStaticIdentityToRestart (0 ms)
+[ RUN      ] UsbFactory.RestartCannotReuseAStaleSetupEpochForSetAddress
+[       OK ] UsbFactory.RestartCannotReuseAStaleSetupEpochForSetAddress (0 ms)
+[ RUN      ] UsbFactory.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction
+[       OK ] UsbFactory.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction (0 ms)
+[----------] 12 tests from UsbFactory (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 1 test suite ran. (1 ms total)
+[  PASSED  ] 12 tests.

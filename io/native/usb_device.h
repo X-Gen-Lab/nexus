@@ -34,6 +34,8 @@ typedef struct {
     bool hold_gonak;
     bool hold_irq_disable;
     bool hold_clear;
+    bool hold_address_clear;
+    uint8_t hold_stall_clear_mask;
     bool hold_in_nak;
     bool hold_disconnect;
     bool early_in_disable;

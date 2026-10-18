@@ -1,0 +1,1264 @@
+{
+  "schema": 1,
+  "kind": "reviewable-USB-reset-readback-prepared-integration",
+  "created_utc": "2026-10-18T03:10:28.568494+00:00",
+  "prepared_root": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1",
+  "main_root_readonly": "/tmp/nexus-io-validation-20261018",
+  "writes_outside_prepared_root": false,
+  "tests_build_clone_Git_or_index_mutation": false,
+  "budget_bytes": 1572864,
+  "payload_expected_file_count": 86,
+  "frozen_sources": 4,
+  "ledger_sources": 1,
+  "historical_evidence_files": 81,
+  "baseline_file_identities": {
+    "io/src/usb_device_controller.c": {
+      "path": "/tmp/nexus-io-validation-20261018/io/src/usb_device_controller.c",
+      "bytes": 45696,
+      "sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3"
+    },
+    "io/native/usb_device.h": {
+      "path": "/tmp/nexus-io-validation-20261018/io/native/usb_device.h",
+      "bytes": 2179,
+      "sha256": "f5a28d5a8c61d268f2a1f3d76bae5e73ee57dbc7ac898cbe1d9543e2119c34f2"
+    },
+    "io/native/usb_device.c": {
+      "path": "/tmp/nexus-io-validation-20261018/io/native/usb_device.c",
+      "bytes": 11210,
+      "sha256": "1ab60c470762567e0d7fcee9cb308c344fa964405f70ad3217978869f9827e4a"
+    },
+    "tests/google/usb_device_test.cpp": {
+      "path": "/tmp/nexus-io-validation-20261018/tests/google/usb_device_test.cpp",
+      "bytes": 30601,
+      "sha256": "07ec5ad1c1b1f964b6bb0e9e8847e4bdf2eb507dd113f3e904dc8d99930c3614"
+    },
+    "docs/design/io-evolution-execution.csv": {
+      "path": "/tmp/nexus-io-validation-20261018/docs/design/io-evolution-execution.csv",
+      "bytes": 10983,
+      "sha256": "25b83573f1c6b2e8051f0ce5b4a5b4beff86f635f6888a3c98a162ff1e0c7be7"
+    }
+  },
+  "freeze_origin": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/freeze.json",
+    "bytes": 13358,
+    "sha256": "de9126f416733bd8d17470cd55873e0de292103b31f5a1c0dd8afae3b016ce9c"
+  },
+  "review_origin": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/independent-review-r1.json",
+    "bytes": 33562,
+    "sha256": "ade79d5b221a9dffcd436124fe22e468d4256928e8efa346083e59e59f6cae8b"
+  },
+  "file_renames_without_byte_changes": {
+    "evidence/build-coverage-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stderr.raw",
+    "evidence/build-coverage-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stdout.raw",
+    "evidence/build-coverage-r2/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stderr.raw",
+    "evidence/build-coverage-r2/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stdout.raw",
+    "evidence/build-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-green-r1/stderr.raw",
+    "evidence/build-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-green-r1/stdout.raw",
+    "evidence/build-guard-coverage-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stderr.raw",
+    "evidence/build-guard-coverage-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stdout.raw",
+    "evidence/build-guard-coverage-r2/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stderr.raw",
+    "evidence/build-guard-coverage-r2/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stdout.raw",
+    "evidence/build-red-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-red-r1/stderr.raw",
+    "evidence/build-red-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-red-r1/stdout.raw",
+    "evidence/build-red-r2/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-red-r2/stderr.raw",
+    "evidence/build-red-r2/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-red-r2/stdout.raw",
+    "evidence/build-sdk-factory-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stderr.raw",
+    "evidence/build-sdk-factory-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stdout.raw",
+    "evidence/configure-red-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/configure-red-r1/stderr.raw",
+    "evidence/configure-red-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/configure-red-r1/stdout.raw",
+    "evidence/configure-red-r2/stderr.txt": "tests/evidence/usb-reset-readback/evidence/configure-red-r2/stderr.raw",
+    "evidence/configure-red-r2/stdout.txt": "tests/evidence/usb-reset-readback/evidence/configure-red-r2/stdout.raw",
+    "evidence/format-four-files-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stderr.raw",
+    "evidence/format-four-files-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stdout.raw",
+    "evidence/gd32-binding-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stderr.raw",
+    "evidence/gd32-binding-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stdout.raw",
+    "evidence/gd32-factory-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stderr.raw",
+    "evidence/gd32-factory-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stdout.raw",
+    "evidence/run-command.py": "tests/evidence/usb-reset-readback/evidence/run-command.raw",
+    "evidence/stm32-binding-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stderr.raw",
+    "evidence/stm32-binding-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stdout.raw",
+    "evidence/stm32-factory-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stderr.raw",
+    "evidence/stm32-factory-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stdout.raw",
+    "evidence/style-four-files-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stderr.raw",
+    "evidence/style-four-files-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stdout.raw",
+    "evidence/whole-usb-coverage-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stderr.raw",
+    "evidence/whole-usb-coverage-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stdout.raw",
+    "evidence/whole-usb-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stderr.raw",
+    "evidence/whole-usb-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stdout.raw",
+    "evidence/whole-usb-guard-coverage-green-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stderr.raw",
+    "evidence/whole-usb-guard-coverage-green-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stdout.raw",
+    "evidence/whole-usb-red-r1/stderr.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stderr.raw",
+    "evidence/whole-usb-red-r1/stdout.txt": "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stdout.raw",
+    "handoff.txt": "tests/evidence/usb-reset-readback/handoff.raw"
+  },
+  "source_patch": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/source-and-ledger.patch",
+    "bytes": 26006,
+    "sha256": "18bc4b7a9f72b9ca158e199244fb5627f00bccefe4ec254238ca74f339f74d83"
+  },
+  "ledger_patch": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/ledger-only.patch",
+    "bytes": 2035,
+    "sha256": "9336317d0cb6dbf1fa69cc6eaf9ec164001bddb32823e2e2d07a7953460a35a7"
+  },
+  "ledger_baseline_copy": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/baseline-io-evolution-execution.csv",
+    "bytes": 10983,
+    "sha256": "25b83573f1c6b2e8051f0ce5b4a5b4beff86f635f6888a3c98a162ff1e0c7be7"
+  },
+  "payload_bytes": 669687,
+  "files": {
+    "io/src/usb_device_controller.c": {
+      "expected_path": "io/src/usb_device_controller.c",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/io/src/usb_device_controller.c",
+      "bytes": 47104,
+      "sha256": "651bee8ac3d4da3a8169ef65329d3ccd5b411b2f46f220fca24f369f66e29313",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/files/io/src/usb_device_controller.c",
+        "bytes": 47104,
+        "sha256": "651bee8ac3d4da3a8169ef65329d3ccd5b411b2f46f220fca24f369f66e29313"
+      },
+      "kind": "frozen_USB_source"
+    },
+    "io/native/usb_device.h": {
+      "expected_path": "io/native/usb_device.h",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/io/native/usb_device.h",
+      "bytes": 2243,
+      "sha256": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/files/io/native/usb_device.h",
+        "bytes": 2243,
+        "sha256": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c"
+      },
+      "kind": "frozen_USB_source"
+    },
+    "io/native/usb_device.c": {
+      "expected_path": "io/native/usb_device.c",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/io/native/usb_device.c",
+      "bytes": 11595,
+      "sha256": "21b34f1b88161a2c342743e03446dd117e591bd76653833d01b869126119925b",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/files/io/native/usb_device.c",
+        "bytes": 11595,
+        "sha256": "21b34f1b88161a2c342743e03446dd117e591bd76653833d01b869126119925b"
+      },
+      "kind": "frozen_USB_source"
+    },
+    "tests/google/usb_device_test.cpp": {
+      "expected_path": "tests/google/usb_device_test.cpp",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/google/usb_device_test.cpp",
+      "bytes": 49144,
+      "sha256": "242933d8f43f8332db15a4fd69926a3812ae30dd08ca9a818d50a519f9351d94",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/files/tests/google/usb_device_test.cpp",
+        "bytes": 49144,
+        "sha256": "242933d8f43f8332db15a4fd69926a3812ae30dd08ca9a818d50a519f9351d94"
+      },
+      "kind": "frozen_USB_source"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-coverage-r1/command.json",
+      "bytes": 1547,
+      "sha256": "73be0e5accf263b81832357cd7e24b49c17711ea9e59eea258bb766c0cb96677",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-coverage-r1/command.json",
+        "bytes": 1547,
+        "sha256": "73be0e5accf263b81832357cd7e24b49c17711ea9e59eea258bb766c0cb96677"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-coverage-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-coverage-r1/stdout.raw",
+      "bytes": 562,
+      "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-coverage-r1/stdout.txt",
+        "bytes": 562,
+        "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-coverage-r2/command.json",
+      "bytes": 1547,
+      "sha256": "b42ea12b350044f4b0da2850d9a2a60d2670d082d1b91dc4d8c0c7318cb36342",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-coverage-r2/command.json",
+        "bytes": 1547,
+        "sha256": "b42ea12b350044f4b0da2850d9a2a60d2670d082d1b91dc4d8c0c7318cb36342"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-coverage-r2/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-coverage-r2/stdout.raw",
+      "bytes": 562,
+      "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-coverage-r2/stdout.txt",
+        "bytes": 562,
+        "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-green-r1/command.json",
+      "bytes": 1547,
+      "sha256": "2589149e6cfcba1d63108fab74f87ece968cf04fd9ae26afd705c1dfd9bc82c5",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-green-r1/command.json",
+        "bytes": 1547,
+        "sha256": "2589149e6cfcba1d63108fab74f87ece968cf04fd9ae26afd705c1dfd9bc82c5"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-green-r1/stdout.raw",
+      "bytes": 562,
+      "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-green-r1/stdout.txt",
+        "bytes": 562,
+        "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/command.json",
+      "bytes": 1547,
+      "sha256": "d9f6104c4b5b46b9cf6d10a02d0c6be25a71bdbc34f1dd1029750f4752a33622",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-guard-coverage-r1/command.json",
+        "bytes": 1547,
+        "sha256": "d9f6104c4b5b46b9cf6d10a02d0c6be25a71bdbc34f1dd1029750f4752a33622"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-guard-coverage-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r1/stdout.raw",
+      "bytes": 562,
+      "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-guard-coverage-r1/stdout.txt",
+        "bytes": 562,
+        "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/command.json",
+      "bytes": 1547,
+      "sha256": "88c51005fc9b9b185cc46fef262ea2ed340bd6083a4ffa0d83832e0800d6c179",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-guard-coverage-r2/command.json",
+        "bytes": 1547,
+        "sha256": "88c51005fc9b9b185cc46fef262ea2ed340bd6083a4ffa0d83832e0800d6c179"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-guard-coverage-r2/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-guard-coverage-r2/stdout.raw",
+      "bytes": 562,
+      "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-guard-coverage-r2/stdout.txt",
+        "bytes": 562,
+        "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-red-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-red-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-red-r1/command.json",
+      "bytes": 1547,
+      "sha256": "b3626d44bf50d3dd5418ada35400d0553d3c94dabde1294e6b101b7204ba53de",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-red-r1/command.json",
+        "bytes": 1547,
+        "sha256": "b3626d44bf50d3dd5418ada35400d0553d3c94dabde1294e6b101b7204ba53de"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-red-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-red-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-red-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-red-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-red-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-red-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-red-r1/stdout.raw",
+      "bytes": 4616,
+      "sha256": "dc305a18fcfb0452704c6b1ce4c03478a6abf3e981484d62b959d3363a1f90af",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-red-r1/stdout.txt",
+        "bytes": 4616,
+        "sha256": "dc305a18fcfb0452704c6b1ce4c03478a6abf3e981484d62b959d3363a1f90af"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-red-r2/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-red-r2/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-red-r2/command.json",
+      "bytes": 1547,
+      "sha256": "99592a7d3f91390a25c45b4396fbfc0f46698a2422335cbe92a1c7511f348554",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-red-r2/command.json",
+        "bytes": 1547,
+        "sha256": "99592a7d3f91390a25c45b4396fbfc0f46698a2422335cbe92a1c7511f348554"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-red-r2/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-red-r2/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-red-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-red-r2/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-red-r2/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-red-r2/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-red-r2/stdout.raw",
+      "bytes": 562,
+      "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-red-r2/stdout.txt",
+        "bytes": 562,
+        "sha256": "cd5fe049f12c487b6e045515e64ac8d2bb6186cdc8a98482b6e779833ce3f9b3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/command.json",
+      "bytes": 1666,
+      "sha256": "2f57f1f4757b5bca4c5da94806433c7ef587be3e4d7e76e256358a3e48e9a910",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-sdk-factory-green-r1/command.json",
+        "bytes": 1666,
+        "sha256": "2f57f1f4757b5bca4c5da94806433c7ef587be3e4d7e76e256358a3e48e9a910"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-sdk-factory-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/build-sdk-factory-green-r1/stdout.raw",
+      "bytes": 2300,
+      "sha256": "14b7034e0568d3a057a2705f7e8d4c66a2405898be0a20ae1f13da80750e4f47",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/build-sdk-factory-green-r1/stdout.txt",
+        "bytes": 2300,
+        "sha256": "14b7034e0568d3a057a2705f7e8d4c66a2405898be0a20ae1f13da80750e4f47"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/configure-red-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/configure-red-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/configure-red-r1/command.json",
+      "bytes": 1478,
+      "sha256": "c17131189286f4e6220081a2ee68ffb5a174cb9aec743f000c742bb05b060d7c",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/configure-red-r1/command.json",
+        "bytes": 1478,
+        "sha256": "c17131189286f4e6220081a2ee68ffb5a174cb9aec743f000c742bb05b060d7c"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/configure-red-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/configure-red-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/configure-red-r1/stderr.raw",
+      "bytes": 92,
+      "sha256": "9918bf8874bae4e634b822b6ae81428d3695d4d76e0fa4f6757a3a69826ac7a4",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/configure-red-r1/stderr.txt",
+        "bytes": 92,
+        "sha256": "9918bf8874bae4e634b822b6ae81428d3695d4d76e0fa4f6757a3a69826ac7a4"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/configure-red-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/configure-red-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/configure-red-r1/stdout.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/configure-red-r1/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/configure-red-r2/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/configure-red-r2/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/configure-red-r2/command.json",
+      "bytes": 1478,
+      "sha256": "e5c0844b66176edbe7f335f4e69e6bdf5835ef94ceb4c2132ea72192b75a6817",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/configure-red-r2/command.json",
+        "bytes": 1478,
+        "sha256": "e5c0844b66176edbe7f335f4e69e6bdf5835ef94ceb4c2132ea72192b75a6817"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/configure-red-r2/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/configure-red-r2/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/configure-red-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/configure-red-r2/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/configure-red-r2/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/configure-red-r2/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/configure-red-r2/stdout.raw",
+      "bytes": 955,
+      "sha256": "20e62cbbc876f359c19dbb638d78bfd9f7a6770c60f641b8499f6da700edc09b",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/configure-red-r2/stdout.txt",
+        "bytes": 955,
+        "sha256": "20e62cbbc876f359c19dbb638d78bfd9f7a6770c60f641b8499f6da700edc09b"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/execution.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/execution.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/execution.json",
+      "bytes": 8403,
+      "sha256": "1237a562b5fb06c3f896f6b7aa90343330c9e2bd334dd84860000206de9bf3bb",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/execution.json",
+        "bytes": 8403,
+        "sha256": "1237a562b5fb06c3f896f6b7aa90343330c9e2bd334dd84860000206de9bf3bb"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/first-47-green-source.tar.gz": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/first-47-green-source.tar.gz",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/first-47-green-source.tar.gz",
+      "bytes": 17771,
+      "sha256": "caa9e3cfe5acba65352081dc79bd8d8ba0cc762638df784bc0297202f61ebad5",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/first-47-green-source.tar.gz",
+        "bytes": 17771,
+        "sha256": "caa9e3cfe5acba65352081dc79bd8d8ba0cc762638df784bc0297202f61ebad5"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/format-four-files-r1/command.json",
+      "bytes": 1772,
+      "sha256": "864af6486b3a58b8ebb3843b96135b5dbe1eb4c70b7a5f058ae874f7dc3b1143",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/format-four-files-r1/command.json",
+        "bytes": 1772,
+        "sha256": "864af6486b3a58b8ebb3843b96135b5dbe1eb4c70b7a5f058ae874f7dc3b1143"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/format-four-files-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/format-four-files-r1/stdout.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/format-four-files-r1/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/command.json",
+      "bytes": 1687,
+      "sha256": "540830b71f3782baeb66770cb46c0c40bc117b407e04c8a50f294a7d3031151b",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-binding-green-r1/command.json",
+        "bytes": 1687,
+        "sha256": "540830b71f3782baeb66770cb46c0c40bc117b407e04c8a50f294a7d3031151b"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/junit.xml",
+      "bytes": 2153,
+      "sha256": "3421f86f02ecaa18c6d185bbef8a592b0759980fda0ec3943b546d84c4a708aa",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-binding-green-r1/junit.xml",
+        "bytes": 2153,
+        "sha256": "3421f86f02ecaa18c6d185bbef8a592b0759980fda0ec3943b546d84c4a708aa"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-binding-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-binding-green-r1/stdout.raw",
+      "bytes": 1326,
+      "sha256": "7714801ea0d3d38f93ff2e1c4fc5f3771c437038580eaa96e623d3a56b3f2d67",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-binding-green-r1/stdout.txt",
+        "bytes": 1326,
+        "sha256": "7714801ea0d3d38f93ff2e1c4fc5f3771c437038580eaa96e623d3a56b3f2d67"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/command.json",
+      "bytes": 1684,
+      "sha256": "1b28e0fd80a52268365474fc7c0194c9b0b57b0e4394d939f65a8cabc92b99b4",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-factory-green-r1/command.json",
+        "bytes": 1684,
+        "sha256": "1b28e0fd80a52268365474fc7c0194c9b0b57b0e4394d939f65a8cabc92b99b4"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/junit.xml",
+      "bytes": 3530,
+      "sha256": "9fcd1fa324ae8025fde6e95ddbdeb57fb39ef2955ee3748dde4855869cc6c46c",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-factory-green-r1/junit.xml",
+        "bytes": 3530,
+        "sha256": "9fcd1fa324ae8025fde6e95ddbdeb57fb39ef2955ee3748dde4855869cc6c46c"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-factory-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/gd32-factory-green-r1/stdout.raw",
+      "bytes": 2236,
+      "sha256": "966fc628499ccee8de6cfc9b85e2e21ddf6170bb3d0c9f48fc24f35d6149acd6",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/gd32-factory-green-r1/stdout.txt",
+        "bytes": 2236,
+        "sha256": "966fc628499ccee8de6cfc9b85e2e21ddf6170bb3d0c9f48fc24f35d6149acd6"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/index-byte-change.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/index-byte-change.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/index-byte-change.json",
+      "bytes": 495,
+      "sha256": "d82f6ded85d18f57038119ce88e8f049ac5d27421683175edbbd352232bdd46c",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/index-byte-change.json",
+        "bytes": 495,
+        "sha256": "d82f6ded85d18f57038119ce88e8f049ac5d27421683175edbbd352232bdd46c"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/preservation-after.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/preservation-after.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/preservation-after.json",
+      "bytes": 5567,
+      "sha256": "f1663c83577443da0e6aa7895c6acab010b12bbda76725b48340ec53fc4c7d1a",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/preservation-after.json",
+        "bytes": 5567,
+        "sha256": "f1663c83577443da0e6aa7895c6acab010b12bbda76725b48340ec53fc4c7d1a"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/preservation-before.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/preservation-before.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/preservation-before.json",
+      "bytes": 5579,
+      "sha256": "485cf31e7a9d4f014365d955ffb06017aa067416eb41ded286a3a093d3860bd3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/preservation-before.json",
+        "bytes": 5579,
+        "sha256": "485cf31e7a9d4f014365d955ffb06017aa067416eb41ded286a3a093d3860bd3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/prototype-scope.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/prototype-scope.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/prototype-scope.json",
+      "bytes": 1544,
+      "sha256": "ca63b24ac1b21b89d5a22d4345f6a2e4ea79748632e14cc2fbbc41c60f0e5077",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/prototype-scope.json",
+        "bytes": 1544,
+        "sha256": "ca63b24ac1b21b89d5a22d4345f6a2e4ea79748632e14cc2fbbc41c60f0e5077"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/red-classification.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/red-classification.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/red-classification.json",
+      "bytes": 860,
+      "sha256": "b478d9a8c50a1fac92a378d3315fd69193ee522fd3eade412e725183bbacd4be",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/red-classification.json",
+        "bytes": 860,
+        "sha256": "b478d9a8c50a1fac92a378d3315fd69193ee522fd3eade412e725183bbacd4be"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/red-source.tar.gz": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/red-source.tar.gz",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/red-source.tar.gz",
+      "bytes": 17770,
+      "sha256": "5d87906202151dac5ad678f441bfb43df59fa55aed920dd83adc5ff43f488241",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/red-source.tar.gz",
+        "bytes": 17770,
+        "sha256": "5d87906202151dac5ad678f441bfb43df59fa55aed920dd83adc5ff43f488241"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/run-command.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/run-command.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/run-command.raw",
+      "bytes": 2080,
+      "sha256": "e554f2ffe5060db90f1f3729d75501e97fa4e0065a147a9fd8d363f01ba01c56",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/run-command.py",
+        "bytes": 2080,
+        "sha256": "e554f2ffe5060db90f1f3729d75501e97fa4e0065a147a9fd8d363f01ba01c56"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/command.json",
+      "bytes": 1689,
+      "sha256": "27f4b14513813ae9389e27ebfbbb6da2fd8725503b08033c2819af0eac00c46d",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-binding-green-r1/command.json",
+        "bytes": 1689,
+        "sha256": "27f4b14513813ae9389e27ebfbbb6da2fd8725503b08033c2819af0eac00c46d"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/junit.xml",
+      "bytes": 2159,
+      "sha256": "f9a828f8c7a28d9fac8b105aed88504d4f4033b398632671d4985e3a68d4620d",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-binding-green-r1/junit.xml",
+        "bytes": 2159,
+        "sha256": "f9a828f8c7a28d9fac8b105aed88504d4f4033b398632671d4985e3a68d4620d"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-binding-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-binding-green-r1/stdout.raw",
+      "bytes": 1326,
+      "sha256": "524b913ab9ee14311fdeb9d3c4f272a4cb518a38a13183499ab7b1aeeba65e27",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-binding-green-r1/stdout.txt",
+        "bytes": 1326,
+        "sha256": "524b913ab9ee14311fdeb9d3c4f272a4cb518a38a13183499ab7b1aeeba65e27"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/command.json",
+      "bytes": 1686,
+      "sha256": "0e9616a7ca80a7f142bb65bc79f9419d4d5496c965f640c9467db0177b138ab9",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-factory-green-r1/command.json",
+        "bytes": 1686,
+        "sha256": "0e9616a7ca80a7f142bb65bc79f9419d4d5496c965f640c9467db0177b138ab9"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/junit.xml",
+      "bytes": 3804,
+      "sha256": "4ec84ec3b6a5a722aee836902b66e66abebbcac77b0ba3db40c66501a1e94268",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-factory-green-r1/junit.xml",
+        "bytes": 3804,
+        "sha256": "4ec84ec3b6a5a722aee836902b66e66abebbcac77b0ba3db40c66501a1e94268"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-factory-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/stm32-factory-green-r1/stdout.raw",
+      "bytes": 2409,
+      "sha256": "eed0d08e32a91ab22a49b791cb562855ff9ed8e1ce08808723e9afb48b04f5db",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/stm32-factory-green-r1/stdout.txt",
+        "bytes": 2409,
+        "sha256": "eed0d08e32a91ab22a49b791cb562855ff9ed8e1ce08808723e9afb48b04f5db"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/style-four-files-r1/command.json",
+      "bytes": 1691,
+      "sha256": "9d86a970aaa1784fce8668792ed81e556fc26238f8dcba435bbddfe2180ef6fe",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/style-four-files-r1/command.json",
+        "bytes": 1691,
+        "sha256": "9d86a970aaa1784fce8668792ed81e556fc26238f8dcba435bbddfe2180ef6fe"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/report.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/report.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/style-four-files-r1/report.json",
+      "bytes": 283433,
+      "sha256": "5d9d32bf546de7d50c6cf5b5179aef2aebba568eaa2719083fc9bd5a84227698",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/style-four-files-r1/report.json",
+        "bytes": 283433,
+        "sha256": "5d9d32bf546de7d50c6cf5b5179aef2aebba568eaa2719083fc9bd5a84227698"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/style-four-files-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/style-four-files-r1/stdout.raw",
+      "bytes": 90,
+      "sha256": "c18a391fd09d9c7e9e504f3b282fa707ecce386305ffe125e291b57de293e1d0",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/style-four-files-r1/stdout.txt",
+        "bytes": 90,
+        "sha256": "c18a391fd09d9c7e9e504f3b282fa707ecce386305ffe125e291b57de293e1d0"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/command.json",
+      "bytes": 1684,
+      "sha256": "68bef6c46c59fe8080b33fde4e4c95640c07fd70d75ba5e64acd2eff9dac7a5d",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-coverage-green-r1/command.json",
+        "bytes": 1684,
+        "sha256": "68bef6c46c59fe8080b33fde4e4c95640c07fd70d75ba5e64acd2eff9dac7a5d"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/junit.xml",
+      "bytes": 13596,
+      "sha256": "4086ac989e3c5e536ddbb88922b65da1a499a5f6aaa3a5ffc6857c3f48cdb17a",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-coverage-green-r1/junit.xml",
+        "bytes": 13596,
+        "sha256": "4086ac989e3c5e536ddbb88922b65da1a499a5f6aaa3a5ffc6857c3f48cdb17a"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-coverage-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-coverage-green-r1/stdout.raw",
+      "bytes": 8018,
+      "sha256": "71d0060e6b50a1c4d77453b8ed36192bb80a1c53c487107a5ed0680a253e2c12",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-coverage-green-r1/stdout.txt",
+        "bytes": 8018,
+        "sha256": "71d0060e6b50a1c4d77453b8ed36192bb80a1c53c487107a5ed0680a253e2c12"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/command.json",
+      "bytes": 1675,
+      "sha256": "b0b8a24b58e30247b506673347449fb4bedf9cc7d0d365768cd0fdee17e85b1f",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-green-r1/command.json",
+        "bytes": 1675,
+        "sha256": "b0b8a24b58e30247b506673347449fb4bedf9cc7d0d365768cd0fdee17e85b1f"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/junit.xml",
+      "bytes": 12804,
+      "sha256": "5631a19c54d9fb5163ed9908370e0a4df005f8a2e998267d1eb97c949002cac4",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-green-r1/junit.xml",
+        "bytes": 12804,
+        "sha256": "5631a19c54d9fb5163ed9908370e0a4df005f8a2e998267d1eb97c949002cac4"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-green-r1/stdout.raw",
+      "bytes": 7553,
+      "sha256": "3d4d5dbefd2dbd6af3a40bca146686f7806869b8bb8db38510422540ac4dd655",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-green-r1/stdout.txt",
+        "bytes": 7553,
+        "sha256": "3d4d5dbefd2dbd6af3a40bca146686f7806869b8bb8db38510422540ac4dd655"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/command.json",
+      "bytes": 1690,
+      "sha256": "f4b11ef7eceb60a8c4f3c6fa9ea3d412d2245844bbcc871911672d859096ee67",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-guard-coverage-green-r1/command.json",
+        "bytes": 1690,
+        "sha256": "f4b11ef7eceb60a8c4f3c6fa9ea3d412d2245844bbcc871911672d859096ee67"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/junit.xml",
+      "bytes": 14395,
+      "sha256": "03bcb984799336e24917809d9bd6fa8aec2dcf55b45b961e930c477be701810a",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-guard-coverage-green-r1/junit.xml",
+        "bytes": 14395,
+        "sha256": "03bcb984799336e24917809d9bd6fa8aec2dcf55b45b961e930c477be701810a"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-guard-coverage-green-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-guard-coverage-green-r1/stdout.raw",
+      "bytes": 8495,
+      "sha256": "af927469fd7c137889895d9249cc758b408d844acd73acda96ca97e82fc2a01c",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-guard-coverage-green-r1/stdout.txt",
+        "bytes": 8495,
+        "sha256": "af927469fd7c137889895d9249cc758b408d844acd73acda96ca97e82fc2a01c"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/command.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/command.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/command.json",
+      "bytes": 1673,
+      "sha256": "2ab09d3cca187135b8e6f71ef16da20bdc147debe012c2d8b43e6291af91ad61",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-red-r1/command.json",
+        "bytes": 1673,
+        "sha256": "2ab09d3cca187135b8e6f71ef16da20bdc147debe012c2d8b43e6291af91ad61"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/junit.xml": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/junit.xml",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/junit.xml",
+      "bytes": 18694,
+      "sha256": "0487e1c6c2b237db563c852f96708e1940ee767019bcb012b50cec7f5a74f7b7",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-red-r1/junit.xml",
+        "bytes": 18694,
+        "sha256": "0487e1c6c2b237db563c852f96708e1940ee767019bcb012b50cec7f5a74f7b7"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stderr.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stderr.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-red-r1/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stdout.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stdout.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/evidence/whole-usb-red-r1/stdout.raw",
+      "bytes": 10305,
+      "sha256": "c3e3bce52b19bccc9feb4178265187e307b1423ce5c5ecf6dd2141880f2875d3",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/evidence/whole-usb-red-r1/stdout.txt",
+        "bytes": 10305,
+        "sha256": "c3e3bce52b19bccc9feb4178265187e307b1423ce5c5ecf6dd2141880f2875d3"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/independent-review-r1.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/independent-review-r1.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/independent-review-r1.json",
+      "bytes": 33562,
+      "sha256": "ade79d5b221a9dffcd436124fe22e468d4256928e8efa346083e59e59f6cae8b",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/independent-review-r1.json",
+        "bytes": 33562,
+        "sha256": "ade79d5b221a9dffcd436124fe22e468d4256928e8efa346083e59e59f6cae8b"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/freeze.json": {
+      "expected_path": "tests/evidence/usb-reset-readback/freeze.json",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/freeze.json",
+      "bytes": 13358,
+      "sha256": "de9126f416733bd8d17470cd55873e0de292103b31f5a1c0dd8afae3b016ce9c",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/freeze.json",
+        "bytes": 13358,
+        "sha256": "de9126f416733bd8d17470cd55873e0de292103b31f5a1c0dd8afae3b016ce9c"
+      },
+      "kind": "historical_evidence"
+    },
+    "tests/evidence/usb-reset-readback/handoff.raw": {
+      "expected_path": "tests/evidence/usb-reset-readback/handoff.raw",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/tests/evidence/usb-reset-readback/handoff.raw",
+      "bytes": 1531,
+      "sha256": "0bace5aaa58d5b5d690c5bba89ef024bcfc509675728eb1358ef2375e930930d",
+      "mode": 384,
+      "source_origin": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io35-usb/handoff.txt",
+        "bytes": 1531,
+        "sha256": "0bace5aaa58d5b5d690c5bba89ef024bcfc509675728eb1358ef2375e930930d"
+      },
+      "kind": "historical_evidence"
+    },
+    "docs/design/io-evolution-execution.csv": {
+      "expected_path": "docs/design/io-evolution-execution.csv",
+      "prepared_file": "/workspace/nexus-io-recovery-20261018/features/io35-usb/prepared-integration-r1/files/docs/design/io-evolution-execution.csv",
+      "bytes": 11038,
+      "sha256": "b62cafcae16b39221023b53d9fef248ea4d32d2b27a6a7658807a38d1ac8e098",
+      "mode": 384,
+      "source_origin": {
+        "path": "/tmp/nexus-io-validation-20261018/docs/design/io-evolution-execution.csv",
+        "bytes": 10983,
+        "sha256": "25b83573f1c6b2e8051f0ce5b4a5b4beff86f635f6888a3c98a162ff1e0c7be7"
+      },
+      "kind": "metadata_progress_only",
+      "changed_task": "IO-35",
+      "changed_columns": [
+        "implementation_paths",
+        "implementation_status"
+      ],
+      "before_row": {
+        "task_id": "IO-35",
+        "phase": "P2",
+        "area": "usb",
+        "task": "Optional class adapters and exact PHY endpoint capabilities",
+        "implementation_paths": "io;components",
+        "exit_condition": "Control reset ACK ZLP and device mode before additional USB modes",
+        "implementation_status": "pending",
+        "software_status": "not_qualified",
+        "hardware_status": "not_executed",
+        "maintenance_owner": "Codex"
+      },
+      "after_row": {
+        "task_id": "IO-35",
+        "phase": "P2",
+        "area": "usb",
+        "task": "Optional class adapters and exact PHY endpoint capabilities",
+        "implementation_paths": "io/src/usb_device_controller.c;io/native/usb_device.c;components",
+        "exit_condition": "Control reset ACK ZLP and device mode before additional USB modes",
+        "implementation_status": "in_progress",
+        "software_status": "not_qualified",
+        "hardware_status": "not_executed",
+        "maintenance_owner": "Codex"
+      },
+      "other_41_rows_byte_identical": true,
+      "other_IO35_columns_identical": true
+    }
+  },
+  "qualification": false,
+  "scope": "Partial IO-35 reset/SETUP proof, not Chapter9/class adapter delivery. Existing focused dirty-development results retain original source/time scope. Root stages and runs all normal gates later."
+}
