@@ -1,0 +1,125 @@
+{
+  "source": [
+    {
+      "path": "soc/stm32h743/drivers/spi_dma.c",
+      "sha256": "ed920bc6ed9194049059b2d84f1352df667893f76716a2653f5a1e5a664d6ebc",
+      "bytes": 31696
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "sha256": "da0924272fc1ff39ba49088f5842e7e7208c9bd0cb46a0f7b4c947dd018bae6c",
+      "bytes": 2635
+    },
+    {
+      "path": "tests/google/CMakeLists.txt",
+      "sha256": "253f81ce4d095a05869c3c800b08381bc856b2810dfb156c6b71e30be8b66bde",
+      "bytes": 28144
+    },
+    {
+      "path": "tests/google/h743_spi_dma.cmake",
+      "sha256": "23843d102b3f357006c1c8b8c537ae654506aee73540bb45ca34a1bd7680fed1",
+      "bytes": 884
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.cpp",
+      "sha256": "bfbd9dc4a9a22d11a31a51e8922792f090118f6bac8b6deed6b7f8b8fb9154d4",
+      "bytes": 13688
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.h",
+      "sha256": "2ca1a328b052b8c28287f8f1a30208e2eaeb86a462eab6c5c48b31f9a7a19cd7",
+      "bytes": 4299
+    },
+    {
+      "path": "tests/google/h743_spi_dma_test.cpp",
+      "sha256": "074891001eb03560adb89eb97832bc3625e163d6edafd9ccc93ccbea2d0de4e7",
+      "bytes": 37709
+    }
+  ],
+  "closure": {
+    "head": "5095ad990a5ed0f45539320b1936260a027be9fb",
+    "branch": "feat/h743-spi-dma-d1-20261018",
+    "index_sha256": "224343a4534e36fb54eb1312cbafde0042a712cb4233e7beb6f399c15b756a93",
+    "unchanged_w1_sources": {
+      "soc/stm32h743/CMakeLists.txt": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+      "soc/stm32h743/drivers/spi.c": "3ca2b57e51bd46abcba837963f6db50f99a93e5821bcbdff565c1cf8958660ff",
+      "tests/google/h743.cmake": "0fb1560a4a087469304936c31a53ace7df31b997cf16fde3e536e15df88c0ca7",
+      "tests/google/h743_flash_ram_closure.cmake": "15456b1c63094444a098dfc8094d312ec731cab1622f46d4bef5f679dd5ad3db",
+      "tests/google/h743_high.cmake": "d851a64314bd66eb1d24dd722b98a752e74ac0cc9ff8087eaf4202d1e405769b",
+      "tests/google/i2c_v2_long_factory.cmake": "08dfdde41a33092db3b09e45ab1de02561dcae8634985555b4af711dc498c6bd",
+      "tools/configure/providers/descriptor.py": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+      "soc/stm32h743/drivers/spi_wire.c": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+      "soc/stm32h743/private/stm32h743_spi_wire.h": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7",
+      "tests/google/h743_spi_wire.cmake": "8d8076715a00b53d4a5e141fb4701a4fe2cab63f137d5547279ce4318dd52814",
+      "tests/google/h743_spi_wire_test.cpp": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c"
+    },
+    "historical_untracked_count": 36,
+    "historical_untracked_bytes_and_hashes_unchanged": true,
+    "tracked_diff": [
+      "tests/google/CMakeLists.txt"
+    ],
+    "public_api_catalog_ir_factory_descriptor_changed": false,
+    "ordinary_state_changed": false
+  },
+  "actual_47_discovery": [
+    "StaticFacesDoNotReadOrWriteHardware",
+    "InitializeRejectsNonVAndBadTrimWithoutAcquisition",
+    "GateOffRejectsBeforeUnclockedProbe",
+    "ForeignStreamMuxAndPendingAreNotCleared",
+    "PartialInitializeRetainsRetryResponsibility",
+    "RequestCopiesActualCallerDataAndWholeCs",
+    "OneAndMaximumByteCountsRemainFinite",
+    "InvalidAndProtectedPayloadsNeverBorrow",
+    "WrappedRegionCountRejectsBeforeReadingTable",
+    "NonAxiAndFixedModesAreExplicitlyRejected",
+    "AlreadyExpiredAdmissionHasNoHardwareEffects",
+    "BusyReinitializeNeverRevokesLiveRequest",
+    "PrestartTsizeFailureIsAcceptedAndNeverNeedsSusp",
+    "PrestartSpeFailureDoesNotReturnAnAdmissionError",
+    "AttemptedButRefusedStartKeepsLoanWithoutFakeFlags",
+    "CpuPublicationPrecedesDmaEnable",
+    "TxTcDoesNotReleaseRxOrWire",
+    "EotIrqPreservesTaskStopEvidence",
+    "EotAfterObserveNeedsNoSyntheticSusp",
+    "CancelAndSoftwareStopTcNeverBecomeSuccess",
+    "DeadlineFirstCauseSurvivesLateEot",
+    "DmaEnableRefusalKeepsBorrowUntilRealStop",
+    "PendingRxMemoryCommitKeepsActualEnableHigh",
+    "SpiSuspendRefusalRetainsUntilRealEvent",
+    "StickyTransferErrorWithdrawsLevelBeforeTaskRuns",
+    "ForeignExceptionHasZeroDmaEffects",
+    "MaskRefusalIsolatesOnlyOwnedVector",
+    "W1cRefusalKeepsDiagnosticsAndLoan",
+    "DualRefusalNeverTailChainsIntoTaskStarvation",
+    "PendingClearFailureRetainsUntilRealRetry",
+    "ClearAddressRefusalRetainsHardwareLoan",
+    "CsReadbackFailureRetainsSelectedLoan",
+    "SckHandoffFailureCannotResetOrReleaseLoan",
+    "ResetRefusalAfterCsHighNeverReplaysPayload",
+    "SettledRequestAndBuffersAreNeverTouchedAgain",
+    "UnisolatableLevelEntersMaskedNonreturningFault",
+    "ObservedCacheViolationRemainsTaintedAfterBitRestored",
+    "ExternalModelEotClearAndIdleSuspendDoNotInventProof",
+    "ExternalModelNvicDisablePreservesStickyPending",
+    "ColdConfiguredAddressesAndFifoAreNotAdopted",
+    "IrqGateViolationIsolatesWithoutUnclockedAccess",
+    "RealNonVParentBootStillRejectsSpiAdmission",
+    "SpiMaskRefusalPreservesEvidenceAndIsolatesVector",
+    "SpiFlagClearFailureLatchesCleanupErrorBeforeRetry",
+    "SuccessfulDataStillReportsRealCsWithdrawalFailure",
+    "RejectedSecondSubmitLatchesObservedCacheViolation",
+    "ExternalTransferErrorWaitsForPendingMemoryCommit"
+  ],
+  "actual_normal_mmio_maxima": {
+    "service_max_reads": 27,
+    "service_max_writes": 7,
+    "irq_max_reads": 12,
+    "irq_max_writes": 4
+  },
+  "normal_mmio_limits": {
+    "service_reads": 64,
+    "service_writes": 16,
+    "irq_reads": 16,
+    "irq_writes": 8
+  }
+}

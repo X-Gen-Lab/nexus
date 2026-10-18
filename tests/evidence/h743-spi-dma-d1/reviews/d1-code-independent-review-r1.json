@@ -1,0 +1,536 @@
+{
+  "kind": "Independent read-only final D1 code and evidence review",
+  "reviewer": "/root/io24_ram_impl_r2",
+  "decision": "PASS_EXACT_FINAL_PRIVATE_D1_TUPLE",
+  "open_blockers": [],
+  "final_source_freeze": {
+    "bytes": 5547,
+    "sha256": "bb812f45a61ad671c199868c3544d39baeec523b67c5e1eef0988397ab2ca240"
+  },
+  "delivery": {
+    "bytes": 10356,
+    "sha256": "ba879f2a400ca02b015e763332e2aa4bd05d4e6fad0243b1ba6dec076389abc3"
+  },
+  "source": [
+    {
+      "path": "soc/stm32h743/drivers/spi_dma.c",
+      "sha256": "ed920bc6ed9194049059b2d84f1352df667893f76716a2653f5a1e5a664d6ebc",
+      "bytes": 31696
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "sha256": "da0924272fc1ff39ba49088f5842e7e7208c9bd0cb46a0f7b4c947dd018bae6c",
+      "bytes": 2635
+    },
+    {
+      "path": "tests/google/CMakeLists.txt",
+      "sha256": "253f81ce4d095a05869c3c800b08381bc856b2810dfb156c6b71e30be8b66bde",
+      "bytes": 28144
+    },
+    {
+      "path": "tests/google/h743_spi_dma.cmake",
+      "sha256": "23843d102b3f357006c1c8b8c537ae654506aee73540bb45ca34a1bd7680fed1",
+      "bytes": 884
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.cpp",
+      "sha256": "bfbd9dc4a9a22d11a31a51e8922792f090118f6bac8b6deed6b7f8b8fb9154d4",
+      "bytes": 13688
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.h",
+      "sha256": "2ca1a328b052b8c28287f8f1a30208e2eaeb86a462eab6c5c48b31f9a7a19cd7",
+      "bytes": 4299
+    },
+    {
+      "path": "tests/google/h743_spi_dma_test.cpp",
+      "sha256": "074891001eb03560adb89eb97832bc3625e163d6edafd9ccc93ccbea2d0de4e7",
+      "bytes": 37709
+    }
+  ],
+  "base_commit": "5095ad990a5ed0f45539320b1936260a027be9fb",
+  "index_unchanged": {
+    "bytes": 3450395,
+    "sha256": "224343a4534e36fb54eb1312cbafde0042a712cb4233e7beb6f399c15b756a93"
+  },
+  "initial_review_tuple": {
+    "freeze_sha256": "11e8465373a0584111e08a98aaa6930fc80a58d1281e43c7025b5929526529ba",
+    "blocker": "Existing active loan could lose observed domain taint when second valid submit saw live() failure then external bit restored before service. Original45 tuple was not independently approved."
+  },
+  "closed_findings": [
+    {
+      "type": "production",
+      "finding": "second-submit observed-domain violation not sticky",
+      "actual_RED": "submit-taint46-whole-red: one failed case, three assertions",
+      "fix": "Only submit live-failure branch latches taint and first STATE cause, retains original active, quarantines and isolates owned vectors. New rejected request remains READY and unretained. Bit restoration cannot release original loan.",
+      "actual_GREEN": "Same complete46, no skips; final47 also passes."
+    },
+    {
+      "type": "external hardware model",
+      "finding": "RX transfer-error helper cleared EN despite pending memory commit that could later write",
+      "actual_RED": "pending-error47-model-whole-red: one external EN assertion",
+      "fix": "Pending RX keeps EN1 and stop_pending; actual commit permits EN0. Driver SHA unchanged; no production bus flush added.",
+      "actual_GREEN": "Same complete47, no skips."
+    }
+  ],
+  "code_contracts_reviewed": [
+    "Submit validates/admit without hardware launch; accepted launch failures retain loan. Non-SUCCESS does not retain the new request.",
+    "Real RX/TX EN0 precede clear_address. M0AR/PAR/NDTR/M1AR/control readback failure retains loan. Interrupted TC cannot establish successful length, RX commit or wire idle.",
+    "cstart_attempted set before unique CSTART command under saved mask is monotonic for loan. Never-issued uses actual idle baseline, not invented SUSP/EOT. Attempted refused-start remains Q without legal stop evidence.",
+    "Attempted stop requires actual CSTART0 plus SUSP or finite nonzero-TSIZE EOT/TXC, independent fresh same-source quiet, bounded RX drain, SPE0/FIFO proof. Unchanged shared W1 leaves implement these operations.",
+    "CPU DSB publishes previous CPU TX stores before DMA enable; it does not complete RX DMA hold. DMB and existing settle release order result/publication, not another bus-master flush.",
+    "Gate observations precede DMA/SPI probes. Observed cache/domain violation is sticky through service, IRQ and newly fixed second-submit observation; restoration does not revoke original loan.",
+    "Exact owned stream masks only; IRQ checks owned vector and exact IPSR. SPI IRQ preserves task EOT/SUSP evidence. Source/W1C failure isolates via real ISER0; final pending/active join precedes release.",
+    "Source and NVIC isolation refusal enters masked nonreturning fault with retained borrow and observer once. Parent child kill/reap is process handling, never cleanup.",
+    "First non-success cause survives late normal completion. Successful data plus real CS/source cleanup refusal latches IO; earlier cancel/deadline cause is not overwritten.",
+    "CS release, SCK handoff and SPI reset precede active/endpoint clearing. Request length/result access precedes settle; provider never touches request after SETTLED. PROT_NONE oracle supports this bounded software path.",
+    "Checked spans protect explicitly enumerated provider/endpoint/face/ops/System/MMIO/regions. No registry or arbitrary-address accessibility claim.",
+    "PE11/GPIOE route and shared gate/vector leases are trusted static constructor lifetime preconditions, not runtime PCB or ownership authorization from matching registers."
+  ],
+  "history_classification": {
+    "first-api-build": "setup compile failure; configure/build started with 4.4s overlap; no RED qualification",
+    "strict-api-link-red": "strictly sequential same setup compile failure; no behavior RED",
+    "strict-api-link-red-r2": "real five-symbol missing-backend link RED; 39 authored, no runtime ELF/XML",
+    "first-whole-39": "actual39/38passed/onecase2assert fixture errors, not production regression",
+    "corrected-first-whole39": "same production after external fixture corrections; first39 coverage GREEN",
+    "review-gaps42-build-red": "authoring setup left old39/no-op build, not42 RED",
+    "gaps42-whole-red": "real42 production regression RED two cases/14 assertions",
+    "gaps42-whole-green": "minimal cold/resource IRQ-domain fixes; actual42 GREEN",
+    "whole": "runner argument misuse actual exit2; setup only",
+    "cleanup45-whole-red": "real45 production regression RED two cases/four assertions",
+    "cleanup45-whole-green": "first cleanup error locked without erasing earlier cause; actual45 GREEN",
+    "submit-taint46-whole-red": "real46 production regression RED one case/three assertions",
+    "submit-taint46-whole-green": "observed borrowed-domain violation sticky, second request remains READY/no loan; actual46 GREEN",
+    "pending-error47-model-whole-red": "actual47 one assertion external model EN0-before-pending-write-completion mismatch; fixture RED only",
+    "pending-error47-model-whole-green": "only model corrected to keep EN1 until pending memory commit; production unchanged; actual47 GREEN"
+  },
+  "history_actual_xml": [
+    {
+      "stage": "strict-api-link-red-r2",
+      "receipt": {
+        "bytes": 8712,
+        "sha256": "4e2c1f675fad81133348e40571f972c8a4c22f8900955622a070ac72e2f9ffc5"
+      },
+      "exit_code": 1,
+      "source_stable": true,
+      "raw_sha256": "44caf451fb6aff013fca54a23ea138241ce8d50733333b5625d10c9fde131ea1"
+    },
+    {
+      "stage": "first-whole-39",
+      "receipt": {
+        "bytes": 9242,
+        "sha256": "7bc309d7a83a60bc447c101af7bb3ad8dcfba4785f3082535f8632ffde5f2d5b"
+      },
+      "exit_code": 1,
+      "source_stable": true,
+      "raw_sha256": "9fc0492f84479843c870b959cdec43c208599c8bb761458d50ff0353f6fa36e1",
+      "tests": 39,
+      "failed_cases": 1,
+      "failure_assertions": 2,
+      "failed": [
+        {
+          "name": "PendingClearFailureRetainsUntilRealRetry",
+          "assertions": 2
+        }
+      ],
+      "XML_sha256": "775f088ebff0f84b8ffbcc02f548e74c732d1cc3edccf0f2de2b2c88a77e7c45",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "corrected-first-whole39",
+      "receipt": {
+        "bytes": 9269,
+        "sha256": "ee597cc32459a47bbcce274ca31c0c29a8c9c4fb149a7f7ddf272ab4944b91a8"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "06c777f7a88474a1d5766a60d29e1aca7ef40dc8d3c40144af44f3ce7ecee528",
+      "tests": 39,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "d467cca5c88735224b1b3af1c7d2f275589d4f537e432750da8579ce8d6f3740",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "gaps42-whole-red",
+      "receipt": {
+        "bytes": 9249,
+        "sha256": "134b1423a1d9e6a387862182b29a925f53ea77282e1b15c343cd400dbc7963d2"
+      },
+      "exit_code": 1,
+      "source_stable": true,
+      "raw_sha256": "b25ef6b9ad6cb05d4622c19208bbc9fd0486cc292ec16c773499e3f52acaca8d",
+      "tests": 42,
+      "failed_cases": 2,
+      "failure_assertions": 14,
+      "failed": [
+        {
+          "name": "ColdConfiguredAddressesAndFifoAreNotAdopted",
+          "assertions": 12
+        },
+        {
+          "name": "IrqGateViolationIsolatesWithoutUnclockedAccess",
+          "assertions": 2
+        }
+      ],
+      "XML_sha256": "1892fc0aa451186b57379ac3c23a077a12bc2022be25180faf9f28eef48d4e4c",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "gaps42-whole-green",
+      "receipt": {
+        "bytes": 9254,
+        "sha256": "47ca17eb8e3d0fd8277df8ff57f7b9ce81813a2d54922d4abedac4df192c70a0"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "06c23bfa5fe28250cc0661168ff2c3f4f87d5c48f8e4dc6dc4b08cf1dba12368",
+      "tests": 42,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "309f005ab83cf8e7100c4567d0cf464a314ce2dbcf25b1734b4e5ca21f722b52",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "cleanup45-whole-red",
+      "receipt": {
+        "bytes": 9257,
+        "sha256": "c3958fb8ec5b19d3087eb6eeb3caa35f3b8f63bd2e8cd52fb43cb67e7f0e14e4"
+      },
+      "exit_code": 1,
+      "source_stable": true,
+      "raw_sha256": "8e59aff150d9509504531ff594b7dc1c1b7a6949cd377712743de8e29912be23",
+      "tests": 45,
+      "failed_cases": 2,
+      "failure_assertions": 4,
+      "failed": [
+        {
+          "name": "SpiFlagClearFailureLatchesCleanupErrorBeforeRetry",
+          "assertions": 2
+        },
+        {
+          "name": "SuccessfulDataStillReportsRealCsWithdrawalFailure",
+          "assertions": 2
+        }
+      ],
+      "XML_sha256": "e6c56680b5d2d83ee090b501df6240c0986ece33af4afaecbc3a32f7270df970",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "cleanup45-whole-green",
+      "receipt": {
+        "bytes": 9263,
+        "sha256": "51daa1cb58acc99ef48f00ff2154e6d185e7f855c519e701a1ef23943096c7af"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "0c24f33886e84a3d25212f0b90b4a9b56a575cc2052646ffe413aada99f0366f",
+      "tests": 45,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "165a95ab52fa7bace9bfa23f8ebf9805e35e7cd0ab726924a8e01b7170047758",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "submit-taint46-whole-red",
+      "receipt": {
+        "bytes": 9272,
+        "sha256": "83564cf610086f6cb29472cf87f064ca7bc8249c21a5fcc76ae537a82caf6b32"
+      },
+      "exit_code": 1,
+      "source_stable": true,
+      "raw_sha256": "cd538ba3e0e2e86430cd2b4402ae120b40cb40631ad37c0437d7563b8ae64bb0",
+      "tests": 46,
+      "failed_cases": 1,
+      "failure_assertions": 3,
+      "failed": [
+        {
+          "name": "RejectedSecondSubmitLatchesObservedCacheViolation",
+          "assertions": 3
+        }
+      ],
+      "XML_sha256": "90671e4429f752d5e7e3043eea02f5603af50930ac89f6b22bab0eced569fea4",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "submit-taint46-whole-green",
+      "receipt": {
+        "bytes": 9278,
+        "sha256": "f3b225f3a50efc2c2fddd6b3405ec2562c294fed1b08612f4799d3065d8f32d3"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "2b0d3da6814990acc6284cefcff2f5b4c449a3aa8f5c717824c7afd8bc349fac",
+      "tests": 46,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "ccd3de8d35866c5012309757a9b8a4c538ec9dfc28bebd20c3107b0700dbdd09",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "pending-error47-model-whole-red",
+      "receipt": {
+        "bytes": 9293,
+        "sha256": "ef21de12f50e9f1119957573a4f5f8612b696d675cc731185a54adfb13b9b190"
+      },
+      "exit_code": 1,
+      "source_stable": true,
+      "raw_sha256": "c53be0d0e2b70d717d8fa1a9ad06d0c208403e83e20e9af6193ca7dad7efcd98",
+      "tests": 47,
+      "failed_cases": 1,
+      "failure_assertions": 1,
+      "failed": [
+        {
+          "name": "ExternalTransferErrorWaitsForPendingMemoryCommit",
+          "assertions": 1
+        }
+      ],
+      "XML_sha256": "27fe5f35343cfe262775e1d1fd330dc665a8689cde83ee0bb705857e8810590a",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "pending-error47-model-whole-green",
+      "receipt": {
+        "bytes": 9299,
+        "sha256": "3510c5e299923e9f3f8e272921d24055d8f4ad5c8009901ac09f5d836578e0d1"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "674741fc32224217782ce29104861e61c666ad9ed59cb61c45c10361249dc901",
+      "tests": 47,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "03e298db7c55a844661f381411574945956692c815979af60aa2c8e982577cc4",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-spi_wire",
+      "receipt": {
+        "bytes": 9261,
+        "sha256": "cd4da0457712142cc89ac0a30f55ea3041dcad0cde4bc1307826a6ba4afdd69d"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "f68aa2ff30a174bbd901c81efae1e549ee4b63e908822ab20ab154ebfec76578",
+      "tests": 28,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "b17533dccce5a003b7be1cf05b44f47fcab188c9001799eedebca578b7111ee2",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-peripheral",
+      "receipt": {
+        "bytes": 9269,
+        "sha256": "207795393bff0294316b2d9ad7464de3f36b1658f1a437d1ac2ec279c35db462"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "4b062a04ef3de4272cf37b90b7c30b94477bfc809697a5b4ae3e5ce6f11d29c1",
+      "tests": 49,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "e231894003eff1c644a1134713ed5cded76b670a84835b1ab7ec970f8e5ad9b9",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-system",
+      "receipt": {
+        "bytes": 9253,
+        "sha256": "b7183c7988c0fed0be646e8ae10a8675b2764b9e9f381794b16ee2c8d2ca2e52"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "8504a4cda6c08bc13f3769b1e0951c6dc6a14c95da30a43b71bcac4f8e7b7a90",
+      "tests": 47,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "3484a5574698938b0803d2dc22940f7f44415cab6e1a347afa28c367c7ec1401",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-clock",
+      "receipt": {
+        "bytes": 9249,
+        "sha256": "8f1f5f4a0e85f032a6e84da7e34312d057008fe42f4dfaa934dac841b6d6ab70"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "1f40e7a0927c8a9808e2b4177ec4f148626fcb3e3c813b7f2798ffb264d41b45",
+      "tests": 38,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "a05a30ed0ed62245357821ef4e280ac484a14698cc8ae8f06ecabc20c5bf4516",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-high_kernel",
+      "receipt": {
+        "bytes": 9273,
+        "sha256": "be36060c182c771d21800494b71179e194cd2eeb1373b4d190b3df7a7856e086"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "0af7a1e5870861efce98f764259dc4adb1101a0f5e4cbd50d6d99a2987a95998",
+      "tests": 30,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "79001a9ff082b563245c84faf278a6dac4039f6b8575e9e6b8d0e9261307b470",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-high_factory",
+      "receipt": {
+        "bytes": 9277,
+        "sha256": "8ddc0fa13f89ab108ee70c62153698e39ad5c2c4450b199bc2a306aac5bb8f02"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "6fe72a0d2f29b92d6eb94bc460c1fbc856d20aaaeb4ac9f95bacb7978d77a150",
+      "tests": 10,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "528057dce8e8fb6baac04ae369a1124ff06b22891f0e654a500afd2d2b5b2146",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    },
+    {
+      "stage": "final-whole-peripheral_factory",
+      "receipt": {
+        "bytes": 9301,
+        "sha256": "40b52b5498ad8cab7b04b8dc2e3050711f3ec852712833afab844ce012178a52"
+      },
+      "exit_code": 0,
+      "source_stable": true,
+      "raw_sha256": "eacaa68456c0cc0d983b6498eca91f7bc0793d85ae5381ad562f6d5ae66180f8",
+      "tests": 13,
+      "failed_cases": 0,
+      "failure_assertions": 0,
+      "failed": [],
+      "XML_sha256": "01dc9c1287f93951fc73312f968686afa9174121f42f1e1c7220cb4155072803",
+      "fresh": true,
+      "zero_skip_error_notrun": true
+    }
+  ],
+  "final_software_execution": {
+    "whole_programs": 8,
+    "cases": 262,
+    "new": 47,
+    "legacy": 215,
+    "zero_failure_error_skip_notrun": true,
+    "Python_methods": 7,
+    "Python_subtests": 23,
+    "discovery_matches_complete47_XML": true,
+    "seven_legacy_test_sources_exact_base": [
+      "tests/google/h743_spi_wire_test.cpp",
+      "tests/google/h743_peripheral_test.cpp",
+      "tests/google/h743_system_test.cpp",
+      "tests/google/h743_clock_test.cpp",
+      "tests/google/h743_high_kernel_test.cpp",
+      "tests/google/h743_high_factory_test.cpp",
+      "tests/google/h743_peripheral_factory_test.cpp"
+    ],
+    "original39_bodies_unchanged_except_documented_fixture": [
+      "PendingClearFailureRetainsUntilRealRetry"
+    ],
+    "retained_matching_host_ELFs_SHA_verified": 8,
+    "host_ELFs_remain_TMP": true
+  },
+  "original_test_preservation": {
+    "original39": 39,
+    "preserved_byte_exact": 38,
+    "one_changed": "PendingClearFailureRetainsUntilRealRetry external pending-at-disable injection correction, all expected failure assertions preserved.",
+    "CMake_delta": "One separating empty line and one dedicated include; no deletion.",
+    "new_private_only_sources": 6
+  },
+  "official_definitions_independently_read": {
+    "CMSIS": "DMA1 stream2 IRQ13, stream3 IRQ14, SPI4 IRQ84 in current stm32h743xx.h; actual fixed HAL stm32h7_hal/Inc/stm32h7xx_hal_dma.h requests83/84.",
+    "RM_basis": "Existing reviewed controlled RM0433 Rev9 and r2 addendum; no fresh PDF download or invented new physical timing evidence."
+  },
+  "archive": {
+    "file": {
+      "bytes": 200013,
+      "sha256": "9bedfc2ade20ebb569a07f7dc3b1fa2c85731f0346b1be6b6431a68eec60fed9"
+    },
+    "entry_count": 123,
+    "all_CRC_member_bytes_SHA_original_TMP_match": true,
+    "manifest_entries": 95,
+    "manifest": {
+      "bytes": 18273,
+      "sha256": "2e9ca72ec317eb437f5e168fedf8d4f828290f31dba7bb197caaf87d3b0afe18"
+    },
+    "transport_map": {
+      "bytes": 20771,
+      "sha256": "d02de7ba18f23055bf2409c81266309e2c66fe14f9d4dc543bfb863796277c03"
+    }
+  },
+  "style": {
+    "five_whole_C_CPP_clang14_and_strict_comments": true,
+    "existing_tracked_CMake_text_gate": true,
+    "new_CMake_whitespace_author_check_and_static_read": true,
+    "receipt": {
+      "bytes": 7186,
+      "sha256": "e298dda7e908b1d25be4e317f4642d18688c0b306c2d6a6dab7412b64d993f4e"
+    },
+    "full_staged_gate": false
+  },
+  "observed_software_model_cost": {
+    "maxima": {
+      "service_max_reads": 27,
+      "service_max_writes": 7,
+      "irq_max_reads": 12,
+      "irq_max_writes": 4
+    },
+    "limits": {
+      "service_reads": 64,
+      "service_writes": 16,
+      "irq_reads": 16,
+      "irq_writes": 8
+    },
+    "not_WCET_or_physical_latency": true,
+    "not_ARM32_state_size_evidence": true
+  },
+  "scope_limits": [
+    "Private D1 only; no selectable production mode, generated factory/catalog/SDK support.",
+    "No ARM object size, firmware linking/resources, installed SDK execution or HIL qualification inherited.",
+    "Stable clocks/time/cache/pins/regions/gates/IRQ leases remain caller lifetime preconditions; observations do not prove unseen transients absent.",
+    "Fresh custom external execution receipts/JUnit establish development results, not normal full repository hooks/candidate.",
+    "Matching eight binaries remain TMP and are not persistent immutable ELF packages.",
+    "First API setup/fixture failures and later actual REDs are separately preserved, not retrospectively invented passes."
+  ],
+  "review_operations": {
+    "tests_or_builds_or_binary_execution": false,
+    "source_or_index_mutation": false,
+    "writes": "Only this new report in validation; author feature, GPIO, Main and ownROOT unchanged.",
+    "original36_historical_untracked_verified_unchanged": true,
+    "seven_sources_before_after_SHA_match": true,
+    "local_review_assertion_correction": "Initial read-only check counted a separating blank added CMake line as second include; corrected to count nonempty added lines, no source change or production issue.",
+    "SELF_maxrss_kib": 15312
+  }
+}

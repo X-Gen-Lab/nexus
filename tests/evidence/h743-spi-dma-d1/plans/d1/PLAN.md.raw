@@ -1,0 +1,92 @@
+# D1：H743 SPI4 有限 DMA 私有纵切实施清单
+
+状态：2026-10-18 只读计划；没有写 D1 源码、注册目标、配置、编译或执行测试。W1 已冻结并交独审；D1 必须等待 W1 发布后由 Root 安全 adoption 到新基线、另发生产写入窗口。W1 源、12-source freeze、Native215 和 ARM4 的原件不可更改。本文件细化已独审通过的 B1 r2，不替换它，不继承丢失的 DMA224/ARM13。
+
+## 1. 交付范围与退出条件
+
+唯一组合是 DEV450/REV2003/default HSITRIM64、HSI64 fixed/cache-off/baremetal、SPI4 mode0/8bit、TSIZE1..65535、PE11 CS 与 PE12/13/14 AF5 静态独占路由、DMA1 RX stream2 / DMAMUX ch2 / request83 / IRQ13，TX stream3 / ch3 / request84 / IRQ14，SPI4 IRQ84。各向量 priority5/calls_os=false。64MHz 名义、65MHz 选频上界与同源 quiet 比率沿用最终 W1，不重新实现频率/CSUSP/CS/SCK/reset 协议。
+
+D1 交付一个真实可运行的完整私有硬件合同程序：从真实 System/GPIO 初始化、静态 public face、公共 submit/cancel/service/stop 到实际模型 DMA→SPI→DMA 传输、失败撤回与最终借用归还。正常 submit 两个 non-NULL caller payload，二者均在 AXI SRAM [0x24000000,0x24080000)，1-byte alignment、完整跨度无回绕/别名。请求描述符寿命由调用者保证，不误限为 DMA payload 区。没有 provider dummy/discard cell。submit_memory(flags0) 可等价普通 submit；已知 TX_FIXED/RX_FIXED 非零 flags 明确 UNSUPPORTED，未知 flags INVALID，直到 D3 真 MINC0 回归完成才开放。未实现固定 RX 时不伪造 DME 硬件正例。
+
+D1 不开放 SoC mode catalog、TOML、typed factory 生成支持或 SDK 选择；这些在 D2 完成完整装配之后才准入。D1 本身不是空头文件：私有 API/ops、真正有界状态机和公共 API 硬件模型全闭环，结束可独立审阅、正常 commit。ARM/installed SDK/HIL 均不在 D1 的完成资格内。
+
+## 2. 唯一源写入窗口（等待另行授权）
+
+新文件六个：
+
+1. `soc/stm32h743/private/stm32h743_spi_dma.h`
+2. `soc/stm32h743/drivers/spi_dma.c`
+3. `tests/google/h743_spi_dma_model.h`
+4. `tests/google/h743_spi_dma_model.cpp`
+5. `tests/google/h743_spi_dma_test.cpp`
+6. `tests/google/h743_spi_dma.cmake`
+
+既有文件仅 `tests/google/CMakeLists.txt` 增一次独占 cmake include。首 RED 的专有 cmake 只注册完整 tests、外部 model、现有 h743_model.cpp、System/GPIO/W1 wire、Nexus::IO/Arch；不引用尚不存在的 spi_dma.c。真实缺实现 link RED 后，再新增 driver C 并只在专有 target SOURCES 加入它。
+
+不改 W1 helper/普通 spi.c/state/六旧程序/model、public SPI API、common spi_dma_sequence、生产 SoC CMake、descriptor、schema/IR/factory/selected_contracts 或 mode facts。任何额外路径先给 Root 精确原因/hunk；不能从当前 df/3e 旧文件整份覆盖已合 RTC 的未来基线。D2 前只读列后续 hunks，不提前写共享文件。
+
+## 3. 私有状态、ops 和硬件边界
+
+候选公开于私有头的五项链接合同是 initialize、`nx_stm32h743_spi_dma_irq(state, receive)`、`nx_stm32h743_spi_dma_wire_irq(state)`、`nx_stm32h743_spi_dma_ops`、`nx_stm32h743_spi_dma_endpoint_ops`。具体实参沿 public SPI 状态/错误语义；静态 C 聚合初始化与 face/ops lookup 零 MMIO，没有新 runtime construct/reset API。
+
+DMA controller 嵌入现有 32-bit ABI 的 wire state（目前32B），其后保存 DMA1、RX/TX stream、DMAMUX 两 channel 指针、只读 AXI domain 表引用、active request/endpoint、首因、真实 IRQ 诊断、阶段与 quiet deadline、最少 cleanup/IRQ ownership bits。状态只在 DMA mode 选入，不给 polling state 新字段。不做 registry/heap/worker/payload copy、隐藏固定 cell、每字节 MMIO 虚表或分段 owner。端点可组合现有 endpoint 绑定与 DMA controller 指针，目标≤32B；controller 目标≤192B（32-bit ABI，只是预算，最后以真实编译/对象计数，不在 host 上猜）。
+
+只有需要恢复责任的信息能入 state：哪些资源实际取得、请求/CS 借用、首因和哪一撤回阶段未完成。布尔值不能替代 DMA EN0、SPI CSTART/SR/TSIZE、CS ODR、NVIC ISER/ISPR 的实际证明。IRQ/短临界区仅锁存证据、修改自身通知源；不能调用用户回调、OS 或 nx_spi_port_service。
+
+正常 data path由真实 DMA硬件推动，不用 CPU 写逐字节搬运循环。service 单次最多一个阶段，RXFIFO 残留最多8次已停止 FIFO 读取。W1 wire_clock_ready/divider/quiet/suspend_once/stopped/disable/release_cs/sck_idle/reset 均直接复用；绝不调用 polling drain/finish_clock/retain_and_park。只有 pin检查的固定16步和 divider固定7步有界循环，不用 wait/poll 等时间流逝。
+
+common spi_dma_sequence 依然是未来分段唯一 owner。D1 不编入它或冗余分配 sequence state；D2/D3 后续实现其既有 backend，不能把多次 finite 请求假称连续 whole-CS sequence。
+
+## 4. 真实模型与初始 TDD
+
+新 forced header 仅属于新 target：包含既有真实 System/GPIO model，再仅替换新 SPI/DMA/DMAMUX/NVIC 的硬件端口叶子；原 h743_model.h/.cpp 不改。新 wrapper 对 System/GPIO 端口委托既有模型，对 SPI4 与 DMA1 stream2/3 的真实寄存器采取 RM 行为。测试不能读取 SUT stage/done/retained 去驱动外设，IRQ dispatch 只能由真实 flag&IE、NVIC enabled/pending/active/priority 与本地 mask 推进。
+
+Host 地址模型采用 Linux 固定 AXI bus window 的 MAP_FIXED_NOREPLACE，例如在真实0x24000000地址映射512KiB（只提交访问过的页）；失败是 setup failure，不能 skip 或放宽合法 DMA 域。真实 caller TX/RX 放入此 window，DMA M0AR 32-bit 地址直接映射到这些 byte。请求描述符可以独立普通 CPU RAM。没有把 host 栈通过 regions 配成 AXI 的捷径。fork 故障隔离继承相同硬件映射，使用独立共享 trace；测试不清 active 伪恢复。
+
+模型按每一次外部硬件 step 从 TXDMA 请求消费 caller TX 到 SPI TXFIFO，按帧移位从 RXFIFO 经 RX DMA 写回 caller RX；NDTR 只在该方向实际 transfer 完成后递减。TX TC 不能设置 RX TC、EOT/TXC或 wirequiet；终帧 EOT清CSTART，非零TSIZE时TXC复制EOT；EOTC实际同时清二者。CSUSP写不能携CSTART1，rs0不清ongoing；EOT赢竞态时不人为造SUSP。SPI SPE0可 flush未发TXFIFO，不能为了清FIFO强行再发字节。RX晚数据/计数首片失败结果采用保守0，成功才length，不宣称失败缓冲未被部分写。
+
+模型先有自身硬件事实自检：CSUSP read0/rs0、EOT/TXC耦合及无SUSP竞态、sticky level+IE真实重挂、ICER不清flag/pending、EN拒写保持EN1。初次这些自检纠正属于 fixture correction，不能冒称 provider behavior RED。
+
+然后完整 Google 程序带五项私有声明，正常 configure/build 到真实 undefined-symbol RED。此 RED 证明链接/API 合同，尚无 executable/runtime XML，绝不称34项运行失败。最小完整实现后保持同一 whole 程序真实执行；第一轮直接 GREEN 就如实记 first coverage GREEN，若失败先保原源码/ELF/XML/raw并区分 fixture setup与provider bug，禁止人为破坏代码制造 RED。后续行为新回归必须先 whole actual RED 再最小修。
+
+## 5. 首个完整 whole 的最小覆盖
+
+计划约34个独立 case，实际以 authored methods 与完整 XML 计算，不提前签结果：
+
+- 静态 face/lookup 零MMIO；实际initialize先exactID再V trim读取；cold BUSY优先且不清retained；cache/clock/route/foreignstream/mux/NVIC拒绝；partial initialize真实cleanup重试。
+- caller数据真实full-duplex1与65535长度；错误长度/NULL/回绕/区间/请求与provider/endpoint/MMIO别名拒绝；非零已知fixed flags unsupported、未知invalid；foreign endpoint/wrongrequeststate；deadline已过的未接纳请求仍READY且零新效果。
+- 接纳后启动读回拒绝保loan直至IO清理；TX TC先到不能RX/wire/SETTLED；software-stop TC不能SUCCESS；EOT先经IRQ仍保task的实际stop证据；安全CSUSP命令与合法EOT-after-observe无SUSP竞态。
+- cancel/TIMEOUT首因保留，late正常EOT仅作停止证据；DMA EN拒停→Q/保loan→外部解除后真实重试；未证SPIstop/quiet仍保CS/借用；RXFIFO排空≤8且未发送TX不计完成。
+- 合法TE错误sticky IRQ真实撤源；foreignstream/foreignIPSR/未取得向量零副作用；mask拒绝、W1C拒绝、两者拒绝时精确owned NVIC隔离；pendingclear拒绝→Q/ISER0→真实retry，禁止重新开启粘滞源。
+- CS release拒绝保持原引用；SCK latch/output拒绝不reset；CS已高但reset拒绝仍Q/全loan，重试不replay；SETTLED后将独立 request/payload页设PROT_NONE再service/IRQ，检测最终发布之后残留访问。
+- source与ICER均拒绝的真实level fault子进程：fault observer仅记录并返回，保Q/loan/PRIMASK后provider不返回；parent等待实际窗口后kill/reap，不能用throw/longjmp/abort冒充provider fail-stop，不能把终端路径声称为正常返回WCET。
+
+首次 whole GREEN 必须同时含真实copy、deadline/cancel、TXTC≠wire、EN拒停保loan及IRQlevel撤源，不允许只提交寄存器装配或空源骨架。有效自动清理只能调用真实service/stop；TearDown若未清净应失败并保现场，不 memset模型或置active=NULL。
+
+## 6. 启停、IRQ 与借用的不可弱化次序
+
+启动：先完整冷/运行准入与所有payload spans验证，成功admit才保存request。CS高配置CPOL/AFCNTR/MBR/CRCSIZE7/TSIZE并交回SCK AF5；按RM50.4.14先RXDMAEN、使RX/TX stream能服务请求、再TXDMAEN，最后SPE/CSTART，所有EN0可写寄存器条件与读回真实验证。
+
+停止每次service仅一步：锁定首因/关闭接纳→禁两DMA stream且实际EN0（保SPI DMA request位直到此证明）→安全CSUSP及实际CSTART0+SUSP或非零TSIZE EOT&TXC→新同源quiet guard到期→有界残留RX drain→SUSPclear/SPE0/FIFOproof→SPI DMA位撤回→ownedIRQ源撤回/flags清理/隔离及pending最终联结→CS实际高读回→SCK按CPOL GPIO latch/output读回→独占SPI4reset/readback→清全部provider引用→最后publishSETTLED。
+
+SPI IRQ不写IFCR，先锁存诊断再mask已取得IE并读回；task是唯一SPI flag清理者。DMA IRQ可在锁存实际flags/count/EN后W1C自己stream精确组，不触邻居；software-stop TC不变成正常complete。只有确已取得且当前IPSR是IRQ+16才允许IRQ路径效果：RX29、TX30、SPI100。用现有nx_arch_exception_number；新model只模拟外部IPSR，不加生产执行上下文hooks。
+
+source mask/W1C不能撤源时，单次owned NVIC disable+DSB/ISB并实际ISER0即可隔离delivery；ISPR1和当前IABR1不否定隔离。现有NX_H743_IRQ_CONTROL(false)还要求pending0，不能直接误用成sticky-isolation证明。新driver只用狭窄CMSIS私有leaf/测试macro，不引入generic controller framework。finalcleanup须源真实mask、flags清净、NVICpendingclear读回和Thread active0后才释放/重新开启新请求。
+
+若源和NVIC都拒隔离，进入B1 r2已审Arch/Core terminal boundary，保借用与本地IRQmask，observer一次后不返回，不承诺其它任务/中断正常进展。正常IRQ设计上限16read/8write、service64read/16write/最多8RX字节均先作为设计预算，外部模型计数审查；实测若超先报Root而不静默放大。
+
+Cache/时间/clock稳定性是借用期合同，运行中破坏则不沿用旧quiet/归还。尤其外部cache开过再关不能自动当作cachecoherence已恢复；无外部owner兼容恢复证明时永久保loan/隔离责任，不能测试中切回bit0即宣告成功。本批不新增cache-on接管能力。
+
+## 7. 分批、证据与预算
+
+D1一次独立提交范围是上述7路径，实际按TDD可形成如下小步骤但不提交空壳：①完整声明+model+selfcheck+whole tests 的 linkRED；②最小driver+同whole firstactual结果；③必要新增行为RED/修复；④保留W1七whole215旧断言并同最终源码正常重跑、Python7完整module与explicit/最终indexed style，冻结供独审。Root独立正常fullhooks后才commit发布。W1相关旧测试/普通state/helper不改；若确有共同helper新缺口须单独授权并重验，不悄悄在D1更改。
+
+新持久source+小证据建议≤1MiB，原始长raw/对象/ELF在ownTMP；任何gzip ELF必须单独Root授权。TMP新增预算建议≤64MiB，达到预测扩TU/失败历史次数预算前停报；不覆盖W1/S0匹配ELF或build保留目录。独立新testtarget和新evidence前缀避免覆写旧七ELF；新基线重新build/bin允许正常产物变化，但旧matching retained原件不可动。单job、启动内存余量≥600MiB/OOM0、输出FS余量≥200MiB，逐stage记录actual childRSS、全源/index身份、事件与分配块预算，不借其它mount/slab当可用输出。
+
+当前W1 ownROOT仍df HEAD/原index7172de…/12dirty源+36历史untracked；不可在此直接switch/覆盖丢WIP。必须Root先把W1源码/证据正常提交，按已采用的无丢弃index检查与普通switch流程adopt对应发布commit，确认12源与commit逐字节相同、36历史原件无隐藏/删除后，另授D1源窗口。D1不自行stage/commit/push/reset/stash/restore/clone。正常ARM/installedSDK须等D2正式mode装配，不将这个Native私有测试当平台已提供SPI DMA。
+
+## 8. 官源与待D2项
+
+精确资源当前已读：CMSIS H7锁8f922cdc…的stm32h743xx.h行74/75/139给IRQ13/14/84；HAL H7锁a1996eed…的stm32h7xx_hal_dma.h行327/328给request83/84。RM0433 Rev9受控SHA672a9433…6a0：DMAMUX channel到stream、DMA stream完成/禁流/FIFO commit、H7 SPI50.4.14及停机；ES0392 Rev15 SHAeffe23b2…a1f9e：CRCSIZE7与独立quiet；DS条件范围沿原72ac5a50 packet。官方HAL/LL只复用定义/适当叶子，不能照抄F4/UART停机次序或把库调用当测试证明。
+
+D2后续另授权：exact resource/mode facts、provider tuple gate、cacheoff/profile/backend gate、mode-onlybindings/IR traits/typedfactory+三真实handler、真实failedinit rollback、public-only ARM/SDK consumers与installedSDK。全部共享文件读取届时Root新基线，保留RTC/USB已集成内容。fixedcells/SRAM1/cacheon/16bit/segmented/wake继续后续slice，不扩笛卡尔积；continuous UART仍未准入。

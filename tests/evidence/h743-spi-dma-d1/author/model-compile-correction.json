@@ -1,0 +1,6 @@
+{
+  "classification": "fixture C++ compile setup, not provider RED",
+  "reason": "CMSIS bit macros are unsigned long on host; cast compound mask to actual uint32_t register width",
+  "before_sha256": "ab5d795dec5a2e2ebedeb2d5b1973be84d328af40d16180a3d0847bfbed7ccfe",
+  "after_sha256": "87e664d10b5531bd645befbc6d0b986b1c271156b3e59addbc6cf8fd6771a79c"
+}

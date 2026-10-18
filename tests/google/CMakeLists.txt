@@ -594,3 +594,5 @@ include(h743_flash_ram_closure.cmake)
 include(h743_flash_mpu.cmake)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake")
+
+include(h743_spi_dma.cmake)

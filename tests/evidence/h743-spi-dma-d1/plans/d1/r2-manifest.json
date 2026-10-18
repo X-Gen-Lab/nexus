@@ -1,0 +1,43 @@
+{
+  "kind": "read-only D1 r2 design addendum; no production authorization/execution",
+  "original_plan_sha256": "550730eb694a727a4b5ae217d497bc4014aab4f6e0eac55d9690e6f2bdb4adc0",
+  "addendum_sha256": "bc2f159e25b3320579b3c5795f8264885cf22a4b8c1789ee7113f9013dd86208",
+  "addendum_bytes": 16450,
+  "own_root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+  "head": "5095ad990a5ed0f45539320b1936260a027be9fb",
+  "index_sha256_before_after": "224343a4534e36fb54eb1312cbafde0042a712cb4233e7beb6f399c15b756a93",
+  "w1_source_hashes_before_after": {
+    "soc/stm32h743/CMakeLists.txt": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+    "soc/stm32h743/drivers/spi.c": "3ca2b57e51bd46abcba837963f6db50f99a93e5821bcbdff565c1cf8958660ff",
+    "tests/google/CMakeLists.txt": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444",
+    "tests/google/h743.cmake": "0fb1560a4a087469304936c31a53ace7df31b997cf16fde3e536e15df88c0ca7",
+    "tests/google/h743_flash_ram_closure.cmake": "15456b1c63094444a098dfc8094d312ec731cab1622f46d4bef5f679dd5ad3db",
+    "tests/google/h743_high.cmake": "d851a64314bd66eb1d24dd722b98a752e74ac0cc9ff8087eaf4202d1e405769b",
+    "tests/google/i2c_v2_long_factory.cmake": "08dfdde41a33092db3b09e45ab1de02561dcae8634985555b4af711dc498c6bd",
+    "tools/configure/providers/descriptor.py": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+    "soc/stm32h743/drivers/spi_wire.c": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+    "soc/stm32h743/private/stm32h743_spi_wire.h": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7",
+    "tests/google/h743_spi_wire.cmake": "8d8076715a00b53d4a5e141fb4701a4fe2cab63f137d5547279ce4318dd52814",
+    "tests/google/h743_spi_wire_test.cpp": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c"
+  },
+  "original_plan_unchanged": true,
+  "source_index_build_modified": false,
+  "official_rm_pdf_sha256": "672a9433d6602da224e5215f571beed2be0e683cb025526f4afe9db61c26b6a0",
+  "official_rm_text_sha256": "7b142be592dfa60b2e977691f8c26cf05709fe73d194f6accebbed8df9499949",
+  "official_sections": [
+    "15.3.15 p653\u2013654",
+    "15.3.16 p654",
+    "15.3.19 p656",
+    "15.5.6\u20138 p665\u2013666"
+  ],
+  "r2_closes_design_topics": [
+    "never-issued vs attempted CSTART",
+    "accepted-success return boundary",
+    "CPU publication and actual DMA completion contract",
+    "protected alias/count overflow",
+    "shared clock gate lease and gated MMIO",
+    "observable sticky taint limitation",
+    "C++17 placement-new and child nonreturn semantics"
+  ],
+  "qualification": false
+}

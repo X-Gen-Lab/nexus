@@ -1,0 +1,82 @@
+{
+  "status": "read-only revised plan; independent review pending; no implementation/RED/GREEN claimed",
+  "plan": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/PLAN.md",
+    "bytes": 38816,
+    "sha256": "10fc6cdf560a00ca5c7a9e268532c8d77b437c8cb2dfdce7e48c0020be5a0783"
+  },
+  "r1_unchanged": {
+    "r1_plan_sha256": "e72b80701c2515b5720b1236077484c11a4f1735ce848ea35567a37e8911fb39",
+    "r1_manifest_sha256": "ff6475e20d96d387d986c9bd789c5822b1137c8f8658d0003bb8cf4036ba0bf5",
+    "review_sha256": "30959642a0cb9640548ef7891829133a292311186f692866b5fcffed96010952",
+    "s04_manifest_sha256": "38b87a219f8c2b8434bfe81b7b7b166822ce326782dde67d9aa92075fe09fac9",
+    "purpose": "read-only plan revision; no production writes/build/test/clone/stage/commit"
+  },
+  "revision_scope": [
+    {
+      "id": "B1-COLD-TERM-01",
+      "resolution": "Pure static construction/lookup zero-MMIO; actual hardware initialize/start explicitly reads admission before acquisition."
+    },
+    {
+      "id": "B1-IRQ-EOT-01",
+      "resolution": "SPI ISR never writes IFCR; mask EOTIE and errors only, preserve EOT/TXC/SUSP for actual task stop+quiet. Task sole flag clearer with stage-specific EOTC/SUSPC timing and no stale replay."
+    },
+    {
+      "id": "B1-IRQ-ISOLATE-02",
+      "resolution": "Bounded owned source mask/ack attempt, then owned NVIC disable+ISER readback; pending may remain asserted. Verified delivery isolation permits Q+task retry. If both source isolation and NVIC disable fail, retain loans and enter explicit Arch PRIMASK/Core fault nonreturn boundary, no normal ISR WCET claim."
+    }
+  ],
+  "existing_mechanism_facts": [
+    "NX_H743_IRQ_CONTROL(false) requires pending0 as well as disabled; cannot use its result alone as sticky-level isolation proof.",
+    "Existing generic model irq_control clears pending when disable succeeds; B1 external level oracle must not inherit that as proof source deasserted.",
+    "CMSIS direct disable/readback leaves plus Arch barriers/masks and Core fault observation suffice privately; no generic framework/worker/public API change."
+  ],
+  "read_only_references": [
+    {
+      "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/arch/include/nexus/arch/arch.h",
+      "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289"
+    },
+    {
+      "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/core/include/nexus/core/fault.h",
+      "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b"
+    },
+    {
+      "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/soc/stm32h743/private/stm32h743_system.h",
+      "sha256": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25"
+    },
+    {
+      "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/tests/google/h743_model.cpp",
+      "sha256": "3877086d3448d19ab334225c957153c5935cdb34ce903b3215cba3e29a7ffd09"
+    },
+    {
+      "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/tests/google/h743_model.h",
+      "sha256": "11c0f74912a4c95e402af3e656344e6013756964326d034810a4232656ae8f15"
+    }
+  ],
+  "new_planned_oracles": [
+    "construct-vs-initialize distinct MMIO boundaries",
+    "EOT interrupt before task preserves physical flags",
+    "finite EOT wins CSUSP with no automatic SUSP",
+    "stale pending cannot settle a new request",
+    "SPI mask refusal with verified NVIC isolation and legal pending1",
+    "DMA W1C/mask/dual refusal with continuous level and neighbor preservation",
+    "isolated pending-clear refusal retains Q/loan then real retry",
+    "unisolatable source+ICER refusal terminal fault child, no fake cleanup"
+  ],
+  "planned_work_limits_not_measurements": {
+    "returning_irq_reads": 16,
+    "returning_irq_writes": 8,
+    "service_reads_per_stage": 64,
+    "service_writes_per_stage": 16,
+    "stopped_fifo_reads": 8,
+    "fault_total_return_time_bound": null
+  },
+  "implementation_authorized": false,
+  "not_performed": [
+    "No production/S0 source/index/refs modifications",
+    "No configure/build/test/compiler",
+    "No new clone/worker/framework",
+    "No copying/archiving or overwrite of existing S0 matching ELF"
+  ],
+  "workspace_free": 66555904
+}

@@ -1,0 +1,236 @@
+{
+  "kind": "independent read-only implementation-plan review",
+  "review_id": "h743-spi-dma-d1-plan-independent-review-r1",
+  "reviewed_at_utc": "2026-10-18T05:06:41.029305+00:00",
+  "reviewer": "/root/io24_checker_review_r2",
+  "decision": {
+    "result": "PASS_EXACT_REVISED_PLAN",
+    "remaining_design_blockers": [],
+    "meaning": "Original D1 plan plus the exact r2 addendum has no remaining identified design blocker. The addendum takes precedence where the old unified stop/admission wording conflicts.",
+    "implementation_authorized_by_this_report": false,
+    "production_implemented": false,
+    "tests_or_builds_executed_by_this_review": false,
+    "software_qualified": false,
+    "hardware_executed": false,
+    "next_step": "Root may separately authorize the exact seven-path tests-first implementation window. Actual final source, model behavior, whole execution and independent code review remain required."
+  },
+  "exact_inputs": [
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/PLAN.md",
+      "bytes": 38816,
+      "sha256": "10fc6cdf560a00ca5c7a9e268532c8d77b437c8cb2dfdce7e48c0020be5a0783"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/independent-plan-review-r2.json",
+      "bytes": 16801,
+      "sha256": "d5ed979d0b1df6f8a81cfafadaea8151cd299916ea680b3a8b7d621ddaa2f710"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/d1-implementation-r1/PLAN.md",
+      "bytes": 14438,
+      "sha256": "550730eb694a727a4b5ae217d497bc4014aab4f6e0eac55d9690e6f2bdb4adc0"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/d1-implementation-r1/manifest.json",
+      "bytes": 461,
+      "sha256": "d77da058e6d5f5a3cff8b028bf8e3307d4c8d6395e19005a5a9dad5bfdf62aa7"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/d1-implementation-r1/D1-R2-ADDENDUM.md",
+      "bytes": 16450,
+      "sha256": "bc2f159e25b3320579b3c5795f8264885cf22a4b8c1789ee7113f9013dd86208"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/d1-implementation-r1/r2-manifest.json",
+      "bytes": 2634,
+      "sha256": "2a4691606d08d7951b423a2d8e56a13e233104ac1a2172e0d60df822ab5fda78"
+    }
+  ],
+  "scope": {
+    "profile": "STM32H743 DEV_ID 0x450 / REV_ID 0x2003 with default HSITRIM64; fixed HSI64, cache off, bare metal; SPI4 mode0, 8-bit; TSIZE 1..65535.",
+    "route": "Exclusive PE11 GPIO CS and PE12/PE13/PE14 AF5, with caller-owned GPIOE/SPI4/DMA1 gates and route leases through successful stop.",
+    "resources": "RX DMA1 stream2 / DMAMUX1 channel2 / request83 / IRQ13; TX stream3 / channel3 / request84 / IRQ14; SPI4 IRQ84; priority5, calls_os=false.",
+    "payload": "Two non-NULL incrementing caller buffers within fixed AXI SRAM [0x24000000,0x24080000), full spans checked. No provider scratch/dummy/discard storage. Known fixed-address flags UNSUPPORTED until a separate MINC0 slice; unknown flags INVALID.",
+    "allowed_paths": [
+      "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "soc/stm32h743/drivers/spi_dma.c",
+      "tests/google/h743_spi_dma_model.h",
+      "tests/google/h743_spi_dma_model.cpp",
+      "tests/google/h743_spi_dma_test.cpp",
+      "tests/google/h743_spi_dma.cmake",
+      "tests/google/CMakeLists.txt (one new dedicated include only)"
+    ],
+    "excluded": "No W1/polling state or helper changes; no public SPI/Core/Arch changes; no shared sequence owner, catalog/schema/IR/factory, production SoC CMake, descriptor, SDK selection, cache-on/high/HSI32/16-bit/fixed-cell/segmented expansion.",
+    "cost_targets_not_measurements": {
+      "controller_arm32_bytes_max": 192,
+      "endpoint_arm32_bytes_max": 32,
+      "returning_irq_mmio_reads_max": 16,
+      "returning_irq_mmio_writes_max": 8,
+      "one_service_mmio_reads_max": 64,
+      "one_service_mmio_writes_max": 16,
+      "stopped_rx_drain_bytes_max": 8
+    },
+    "qualification": "D1 is a private Native hardware-contract slice. It establishes no normal ARM mode selection, installed SDK support, physical timing, HIL, candidate or release qualification."
+  },
+  "closed_design_findings": [
+    {
+      "topic": "Startup history and never-issued CSTART",
+      "old_problem": "A single stop predicate requiring SUSP or finite EOT/TXC can never settle a clean startup failure that issued no CSTART command; idle CSUSP need not create SUSP.",
+      "r2_resolution": "The DMA-only cstart_attempted fact is set before the unique CSTART1 MMIO command in the same short critical section, remains monotonic through the loan, and is never inferred from an idle snapshot. Initialization and prior withdrawal provide a clean baseline and the static lease excludes other initiators.",
+      "review": "Closed at design level. The never-issued branch still proves both actual EN0, actual CSTART0, SPE0/FIFO state, request-source withdrawal, IRQ join, owned address/count zero readback, real CS/SCK/reset cleanup. It neither invents SUSP/EOT nor launches data to obtain completion. An attempted-but-refused CSTART retains Q if no legal stop evidence exists.",
+      "required_actual_oracles": "Separate MMIO/frame-driven never-issued pre-launch failures and attempted-CSTART-command refusal tests; no model decisions based on the private stage/bit; retain the real EOT-wins-suspension race case."
+    },
+    {
+      "topic": "Accepted request return boundary",
+      "old_problem": "Returning a synchronous error after a hardware launch attempt could leave a provider borrow despite the public rejection contract.",
+      "r2_resolution": "Submit validates before admission, then saves ACTIVE/endpoint/initial stage and returns NX_SUCCESS. Bounded launch is serviced later; subsequent write/readback failure latches IO and drains or quarantines. No non-SUCCESS submit response may leave a provider reference or new residual hardware effect.",
+      "review": "Closed and consistent with io/include/nexus/io/spi.h. Existing QUEUED start_admitted ownership remains distinct: provider rejection does not revoke an adapter loan. Before-launch cancel/deadline is an accepted request cause, not a READY rejection; later EOT cannot overwrite it."
+    },
+    {
+      "topic": "DMA completion versus CPU memory ordering",
+      "old_problem": "CPU DSB must not be used to flush another master, and a model must not fabricate actual EN0 while an operation whose completion the RM promises is still pending.",
+      "r2_resolution": "An RX memory-commit hold keeps actual EN1 after a software disable request. Only actual commit permits the corresponding EN0/TC/NDTR completion observations. DSB before first DMA-enabling action publishes prior CPU TX data; final DMB plus the existing request release publication orders CPU observations and result publication.",
+      "review": "Closed and consistent with RM0433 sections 15.3.15, 15.3.16 and 15.3.19. TC may be caused by software interruption and does not establish successful length, RX completion or wire idle. No invented generic bus-flush API or physical SRAM buffering claim is introduced."
+    },
+    {
+      "topic": "Final hardware address references",
+      "r2_resolution": "After real EN0, clear the owned M0AR/PAR/NDTR and read back zero; DBM0/M1AR0 remains an invariant. A clear refusal preserves Q and all loans even after EN0. Do not clear count to manufacture completion.",
+      "review": "Closed. RM register write restrictions are satisfied only after actual EN0. This is a conservative no-old-address-reference release condition, not a claim that a nonzero disabled address itself keeps executing."
+    },
+    {
+      "topic": "Whole-span alias and count validation",
+      "r2_resolution": "Validate region-table count multiplication and pointer span before element access, each region span and every request/payload span before using them, with hard AXI bounds independent of caller declarations. Protect complete known live state, endpoints/faces/ops, region array, CS GPIO objects, System/clock/time state and actually referenced MMIO/lease metadata.",
+      "review": "Closed for the explicitly enumerated private slice. No runtime registry or scan of unrelated Board memory is added. The trusted immutable table is not authority to label TCM/Flash/host stack as DMA AXI. Implementation still must use a finite known static table and keep any table-dependent admission/initialization work bounded."
+    },
+    {
+      "topic": "Shared DMA clock and gated MMIO",
+      "r2_resolution": "Caller acquires the GPIOE/SPI4/DMA1 static gate/route leases before initialize and holds them until all retained cleanup ends. Driver checks actual gates before peripheral probes. It does not snapshot-close DMA1EN, reset all DMA1/DMAMUX1, or invent DMAMUX1EN.",
+      "review": "Closed. RM0433 identifies DMA1EN as enabling both DMA1 and DMAMUX1. A gate-off zero cannot serve as idle proof; runtime loss preserves responsibility. The model must detect forbidden gated probes rather than grant permanent readable/writable registers."
+    },
+    {
+      "topic": "Cache/clock/gate history and sticky taint",
+      "r2_resolution": "Stable cache-off, clock/gate/time epoch is an owner lifetime precondition. A sampled violation is sticky; restoring the bit does not prove coherence or historical stability and cannot automatically release a loan.",
+      "review": "Closed without overstating detection. Periodic observations cannot prove there was no transient violation between observations. No compatible recovery/cache-on protocol or omniscient history checker is claimed."
+    },
+    {
+      "topic": "Host object lifetime and nonreturning fault isolation",
+      "r2_resolution": "C++17 mapped request/state/face/region and payload objects explicitly begin lifetime with placement new and proper alignment. Destruction/unmap follows real borrow return. Nonrecoverable refusal/fault scenarios run in isolated children; parent kill/reap only ends the test process.",
+      "review": "Closed. Test teardown must not clear active, reset hardware facts or inject fake completion. Parent termination, PROT_NONE and barrier observers are bounded software oracles, not provider cleanup, physical output or arbitrary memory proofs."
+    }
+  ],
+  "retained_high_risk_requirements": [
+    "Static public face/ops lookup is zero MMIO. Actual initialization is a separate hardware operation and may require retained cleanup ownership on partial acquisition; rejection of a request is not equivalent to initialization rollback.",
+    "Before SPE enable, actual master/SSM/format/clock/route/TSIZE configuration is verified; CPOL/AFCNTR is established with CS high, SCK is returned to AF5 before CS selection. A never-issued shortcut requires the documented clean baseline and exclusive ownership, not only current CSTART0.",
+    "Attempted transfers stop in RM order: actual DMA EN0 while request bits remain valid; rs-safe CSUSP without CSTART1; actual CSTART0 and SUSP or nonzero TSIZE with both EOT and TXC; a fresh same-source quiet epoch; bounded RX drain; SUSP clear/SPE0/FIFO proof; actual DMA request withdrawal; IRQ/address/CS/SCK/reset cleanup.",
+    "Never-issued cleanup does not wait for an event that cannot legally arise, but does not bypass actual DMA, FIFO, IRQ, address-reference, CS/SCK or reset withdrawal. Refused CSTART commands are intentionally not recategorized as never-issued.",
+    "IRQ effects require already owned vector and exact IPSR. DMA W1C is only its exact stream group. SPI ISR does not clear IFCR. Source mask/W1C refusal uses owned NVIC isolation with actual ISER0; pending/active can remain during isolation but must be joined before release.",
+    "Source plus owned NVIC isolation refusal enters the explicit terminal fault with preserved borrow and incoming mask discipline; observer-once/nonreturn is not part of normal returning IRQ cost or a system-wide progress promise.",
+    "Normal successful count is full length; errors report conservative zero without promising that the RX buffer is unchanged. First cause remains latched through late successful wire completion.",
+    "Remove all provider and hardware references before nx_request_settle release publication. SETTLED must be this provider's final request access, including deadline/result/buffer reads.",
+    "Single executor and caller-owned stable lease are explicit preconditions; these do not establish safe arbitrary concurrent context destruction, route mutation or clock/cache mutation.",
+    "No state size, MMIO budget, memory use, WCET, bus throughput, physical waveform or power estimate is accepted until the corresponding actual source-bound evidence is produced."
+  ],
+  "independently_read_contracts": [
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/AGENTS.md",
+      "bytes": 8512,
+      "sha256": "91ba1419ff3afc491b593e21756c00d273caf716d39f72caf065638bbbd1e176"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/io/include/nexus/io/spi.h",
+      "bytes": 11660,
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/private/stm32h743_spi_wire.h",
+      "bytes": 5030,
+      "sha256": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_wire.c",
+      "bytes": 10313,
+      "sha256": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9"
+    }
+  ],
+  "official_basis": {
+    "authority": "Controlled local RM0433 Rev9 used by the existing reviewed W1/S0 packets; no new fetch or entire PDF qualification run in this review.",
+    "pdf_sha256": "672a9433d6602da224e5215f571beed2be0e683cb025526f4afe9db61c26b6a0",
+    "text_sha256": "7b142be592dfa60b2e977691f8c26cf05709fe73d194f6accebbed8df9499949",
+    "actual_bounded_text_reads": [
+      {
+        "section": "15.3.15",
+        "pages": "653-654",
+        "text_lines": "43715-43748",
+        "finding": "Completion may result from software interruption; P2M completion depends on remaining FIFO data reaching memory; normal noncircular NDT zero stops EN."
+      },
+      {
+        "section": "15.3.16",
+        "page": 654,
+        "text_lines": "43751-43782",
+        "finding": "Ongoing operation completes first on disable; actual EN0 confirms interruption and NDTR then identifies remaining data."
+      },
+      {
+        "section": "15.3.19",
+        "page": 656,
+        "text_lines": "43855-43877",
+        "finding": "Software EN0 request is not immediately effective; actual EN0 means no ongoing stream operation and permits reconfiguration."
+      },
+      {
+        "sections": "15.5.6-15.5.8",
+        "pages": "665-666",
+        "text_lines": "44330-44415",
+        "finding": "NDTR and PAR only writable with stream disabled; non-DBM M0AR write requires EN0."
+      },
+      {
+        "register": "RCC_AHB1ENR",
+        "page": 455,
+        "text_lines": "28654-28675",
+        "finding": "DMA1EN enables DMA1 and DMAMUX1; no independent DMAMUX1EN is implied."
+      }
+    ],
+    "interpretation_limit": "Relies on the documented DMA architectural completion/configuration contract. Does not quantify hidden interconnect queues, prove physical SRAM behavior, or substitute CPU barriers for another master's completion."
+  },
+  "mandatory_future_tdd_and_exit": [
+    "New API/model/full test program first: normal configure and compile through the five real undefined API symbols. Save genuine link RED. Do not cite missing source-file configuration errors or fabricate runtime XML for a nonlinked program.",
+    "Run the complete authored program without filter, disabled cases, skip or test-only production state mutation. A first runtime GREEN is first coverage, not retroactively a behavior RED.",
+    "Independently selfcheck actual model EN request/readback distinction, memory commit hold, rs-safe CSTART/CSUSP, EOT/TXC coupling and EOT/SUSP race, level IRQ and pending behavior, and direct-mode status limitations. Preserve fixture corrections as such.",
+    "Actual caller byte transfer at length1 and65535, TX completion preceding RX/wire, interrupted TC, valid stop/quiet, deadline/cancel cause, alias/overflow/flags/rejection and exact context/resource isolation.",
+    "Execute the separate never-issued and attempted-command refusal oracles, RX pending-commit hold, CPU TX publication, retained EN/address/source/CS/SCK/reset failure and actual retry cases. No synthetic events to make an impossible cleanup finish.",
+    "Whole-program behavior RED for later actual defect fixes, minimal production change, then same whole GREEN. Keep raw commands/return status/source/ELF/XML identities and classify setup/model failures honestly.",
+    "Measure fixed per-return MMIO and RX-work budgets using external ports; exceeding them requires review rather than changing thresholds silently. Use actual ARM32 evidence later for resource size, not host sizeof.",
+    "Same final source reruns all preserved W1 seven programs and full Python7 module plus whole-file style. Root full normal commit hooks and a new source/evidence independent review remain separate required gates.",
+    "Before D2 mode assembly there is no normal firmware/SDK mode qualification. Clean installed SDK, ARM linking/resource proof and physical HIL are distinct future work; no lost or W1 results are inherited."
+  ],
+  "source_identity_guard": {
+    "own_root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "head": "5095ad990a5ed0f45539320b1936260a027be9fb",
+    "expected_head": "5095ad990a5ed0f45539320b1936260a027be9fb",
+    "index_sha256": "224343a4534e36fb54eb1312cbafde0042a712cb4233e7beb6f399c15b756a93",
+    "index_bytes": 3450395,
+    "expected_index_sha256": "224343a4534e36fb54eb1312cbafde0042a712cb4233e7beb6f399c15b756a93",
+    "w1_expected_sha256": {
+      "soc/stm32h743/CMakeLists.txt": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+      "soc/stm32h743/drivers/spi.c": "3ca2b57e51bd46abcba837963f6db50f99a93e5821bcbdff565c1cf8958660ff",
+      "tests/google/CMakeLists.txt": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444",
+      "tests/google/h743.cmake": "0fb1560a4a087469304936c31a53ace7df31b997cf16fde3e536e15df88c0ca7",
+      "tests/google/h743_flash_ram_closure.cmake": "15456b1c63094444a098dfc8094d312ec731cab1622f46d4bef5f679dd5ad3db",
+      "tests/google/h743_high.cmake": "d851a64314bd66eb1d24dd722b98a752e74ac0cc9ff8087eaf4202d1e405769b",
+      "tests/google/i2c_v2_long_factory.cmake": "08dfdde41a33092db3b09e45ab1de02561dcae8634985555b4af711dc498c6bd",
+      "tools/configure/providers/descriptor.py": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+      "soc/stm32h743/drivers/spi_wire.c": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+      "soc/stm32h743/private/stm32h743_spi_wire.h": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7",
+      "tests/google/h743_spi_wire.cmake": "8d8076715a00b53d4a5e141fb4701a4fe2cab63f137d5547279ce4318dd52814",
+      "tests/google/h743_spi_wire_test.cpp": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c"
+    },
+    "all_12_match": true,
+    "review_writes": "Only this new independent JSON; no main/own source, Git reference or index edits.",
+    "before_after_equal": true,
+    "head_after": "5095ad990a5ed0f45539320b1936260a027be9fb"
+  },
+  "actual_review_operations": {
+    "read_only": "Targeted plan/addendum/contract reads, bounded controlled RM text reads, SHA256 identities of small source inputs and streamed index, git rev-parse HEAD/index path.",
+    "no_execution": "No configure, compile, tests, hardware/model execution, tool installation, network, Docker, SDK, staging, commit, push, ref mutation or cleanup.",
+    "old_evidence": "Original plan/manifests/reviews and frozen W1 packets remain unchanged; prior W1 results are context, not current D1 execution.",
+    "limits": "This reviews a precise proposed implementation contract. Correctness of the future code/model and the credibility of actual RED/GREEN evidence must be independently checked after implementation."
+  }
+}

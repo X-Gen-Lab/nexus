@@ -1,0 +1,5 @@
+{
+  "reason": "first build was launched before configure child join; retain this actual overlap and run a fresh strictly sequential build",
+  "target_pgid": 1944687,
+  "signal_sent": false
+}

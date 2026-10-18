@@ -1,0 +1,6 @@
+{
+  "classification": "authoring setup before source write; string patch expected else formatting mismatched",
+  "source_unchanged_on_failure": true,
+  "unintended_next_build": "review-gaps42-build-red was actual no-op whole39 build0, no42 tests yet, not RED",
+  "correction": "apply exact formatted hunk,42 authored cases, production unchanged"
+}
