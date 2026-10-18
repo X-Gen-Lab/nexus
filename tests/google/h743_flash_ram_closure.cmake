@@ -28,6 +28,7 @@ nexus_google_test(nexus_h743_flash_ram_generated_test
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/i2c.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/adc.c"

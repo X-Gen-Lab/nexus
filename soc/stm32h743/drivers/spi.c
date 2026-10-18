@@ -7,89 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/core/fault.h"
-#include "stm32h743_clock.h"
-#include "stm32h743_provider.h"
-#ifndef NX_H743_SILICON_ID
-#define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
-#endif
+#include "stm32h743_spi_wire.h"
 #include "stm32h7xx_ll_spi.h"
 /* ES0392 2.22.5: CRC-disabled finite reception still requires CRCSIZE=7. */
-#define BYTE_CONFIG (7U | (7U << SPI_CFG1_CRCSIZE_Pos))
-#define FIFO_LEVELS ((uint32_t)(SPI_SR_RXPLVL | SPI_SR_RXWNE | SPI_SR_RXP))
-#ifndef NX_H743_GPIOE
-#define NX_H743_GPIOE GPIOE
-#endif
-#define SCK_BIT  (1U << 12U)
-#define SCK_MODE (3U << 24U)
-/** \brief These observations check an existing static lease, never grant it. */
-static bool pins_ready(void) {
-    GPIO_TypeDef* gpio = NX_H743_GPIOE;
-    RCC_TypeDef* rcc = g_nx_stm32h743_system.rcc;
-    if (rcc == NULL ||
-        (NX_H743_READ(&rcc->AHB4ENR) & RCC_AHB4ENR_GPIOEEN) == 0U)
-        return false;
-    const uint32_t mode = NX_H743_READ(&gpio->MODER);
-    const uint32_t sck = (mode >> 24U) & 3U;
-    const uint32_t af = NX_H743_READ(&gpio->AFR[1]);
-    return (sck == 1U || sck == 2U) && ((mode >> 26U) & 3U) == 2U &&
-           ((mode >> 28U) & 3U) == 2U && ((af >> 16U) & 15U) == 5U &&
-           ((af >> 20U) & 15U) == 5U && ((af >> 24U) & 15U) == 5U &&
-           (NX_H743_READ(&gpio->OTYPER) & (SCK_BIT | (1U << 14U))) == 0U;
-}
-static bool cs_driven(const nx_stm32h743_gpio_state_t* gpio, uint32_t mask) {
-    const uint32_t mode = NX_H743_READ(&gpio->registers->MODER);
-    for (unsigned pin = 0U; pin < 16U; ++pin)
-        if ((mask & (1U << pin)) != 0U && ((mode >> (pin * 2U)) & 3U) != 1U)
-            return false;
-    return (NX_H743_READ(&gpio->registers->OTYPER) & mask) == 0U;
-}
-/** \brief Return the already leased SCK to its configured SPI idle driver. */
-static nx_result_t sck_alternate(void) {
-    if (!pins_ready())
-        return NX_ERROR_STATE;
-    GPIO_TypeDef* gpio = NX_H743_GPIOE;
-    nx_arch_irq_state_t saved = nx_arch_irq_save();
-    NX_H743_WRITE(&gpio->MODER,
-                  (NX_H743_READ(&gpio->MODER) & ~SCK_MODE) | (2U << 24U));
-    nx_arch_dsb();
-    const bool ready = (NX_H743_READ(&gpio->MODER) & SCK_MODE) == (2U << 24U);
-    nx_arch_irq_restore(saved);
-    return ready ? NX_SUCCESS : NX_ERROR_IO;
-}
-/** \brief With CS released, retain CPOL using GPIO before resetting SPI. */
-static nx_result_t sck_idle(nx_stm32h743_spi_state_t* p) {
-    GPIO_TypeDef* gpio = NX_H743_GPIOE;
-    RCC_TypeDef* rcc = g_nx_stm32h743_system.rcc;
-    if ((NX_H743_READ(&rcc->AHB4ENR) & RCC_AHB4ENR_GPIOEEN) == 0U)
-        return NX_ERROR_STATE;
-    const uint32_t mode = (NX_H743_READ(&gpio->MODER) >> 24U) & 3U;
-    /* Failed cold prepare can own a still-unrouted pad. No SPI output or
-     * selected interval was ever established; do not invent a transition. */
-    if ((mode == 0U || mode == 3U) && !p->active && p->held_cs == NULL &&
-        NX_H743_READ(&p->registers->CR1) == 0U &&
-        NX_H743_READ(&p->registers->CR2) == 0U &&
-        NX_H743_READ(&p->registers->CFG1) == BYTE_CONFIG &&
-        NX_H743_READ(&p->registers->CFG2) == 0U &&
-        NX_H743_READ(&p->registers->IER) == 0U)
-        return NX_SUCCESS;
-    if (!pins_ready())
-        return NX_ERROR_STATE;
-    if (mode == 1U)
-        return NX_SUCCESS; /* Our previous handoff already owns this latch. */
-    const bool high = (NX_H743_READ(&p->registers->CFG2) & SPI_CFG2_CPOL) != 0U;
-    nx_arch_irq_state_t saved = nx_arch_irq_save();
-    NX_H743_WRITE(&gpio->BSRR, high ? SCK_BIT : SCK_BIT << 16U);
-    nx_arch_dsb();
-    bool ready = ((NX_H743_READ(&gpio->ODR) & SCK_BIT) != 0U) == high;
-    if (ready) {
-        NX_H743_WRITE(&gpio->MODER,
-                      (NX_H743_READ(&gpio->MODER) & ~SCK_MODE) | (1U << 24U));
-        nx_arch_dsb();
-        ready = (NX_H743_READ(&gpio->MODER) & SCK_MODE) == (1U << 24U);
-    }
-    nx_arch_irq_restore(saved);
-    return ready ? NX_SUCCESS : NX_ERROR_IO;
-}
+#define BYTE_CONFIG NX_STM32H743_SPI_BYTE_CONFIG
+#define FIFO_LEVELS NX_STM32H743_SPI_FIFO_LEVELS
 static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
            !nx_arch_irq_is_masked();
@@ -104,32 +26,6 @@ static bool valid(const nx_stm32h743_spi_state_t* p) {
            (p->clock_hz == 32000000U || p->clock_hz == 64000000U) &&
 #endif
            p->poll_limit != 0U;
-}
-/** \brief The SPI clock envelope requires exact V identity and default trim. */
-static nx_result_t clock_ready(const nx_stm32h743_spi_state_t* p) {
-    RCC_TypeDef* r = g_nx_stm32h743_system.rcc;
-    if (r == NULL || !g_nx_stm32h743_system.started)
-        return NX_ERROR_STATE;
-    /* HSICFGR has the reviewed layout only on revision V. Do not read that
-     * register until the independent DEV_ID/REV_ID check admits this cut. */
-    if (!nx_stm32h743_is_revision_v(NX_H743_SILICON_ID()))
-        return NX_ERROR_UNSUPPORTED;
-    if ((NX_H743_READ(&r->HSICFGR) & RCC_HSICFGR_HSITRIM) !=
-        (0x40U << RCC_HSICFGR_HSITRIM_Pos))
-        return NX_ERROR_STATE;
-#if NEXUS_CORE_HZ == 384000000U
-    if (!nx_stm32h743_pll384_clocks_ready())
-#else
-    if (g_nx_stm32h743_system.core_hz != p->clock_hz)
-#endif
-        return NX_ERROR_STATE;
-    if (p->reset == &r->APB2RSTR && p->reset_mask == RCC_APB2RSTR_SPI4RST)
-        return (NX_H743_READ(&r->APB2ENR) & RCC_APB2ENR_SPI4EN) != 0U &&
-                       (NX_H743_READ(&r->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) ==
-                           0U
-                   ? NX_SUCCESS
-                   : NX_ERROR_STATE;
-    return NX_ERROR_STATE;
 }
 static bool span(const void* value, size_t size) {
     return value != NULL && size != 0U &&
@@ -148,42 +44,6 @@ static bool protected(const nx_stm32h743_spi_endpoint_state_t* e,
                    sizeof(*e->port->reset)) ||
            overlap(data, size, e->cs, sizeof(*e->cs)) ||
            overlap(data, size, e->cs->registers, sizeof(*e->cs->registers));
-}
-/** \brief H743 V3 reset stops its FIFO shifter; verify both reset edges and
- * idle. */
-static nx_result_t reset(nx_stm32h743_spi_state_t* p) {
-    NX_H743_WRITE(p->reset, NX_H743_READ(p->reset) | p->reset_mask);
-    nx_arch_dsb();
-    if ((NX_H743_READ(p->reset) & p->reset_mask) == 0U)
-        return NX_ERROR_IO;
-    NX_H743_WRITE(p->reset, NX_H743_READ(p->reset) & ~p->reset_mask);
-    nx_arch_dsb();
-    if ((NX_H743_READ(p->reset) & p->reset_mask) != 0U ||
-        NX_H743_READ(&p->registers->CR1) != 0U ||
-        NX_H743_READ(&p->registers->CR2) != 0U ||
-        NX_H743_READ(&p->registers->CFG1) != BYTE_CONFIG ||
-        NX_H743_READ(&p->registers->CFG2) != 0U ||
-        NX_H743_READ(&p->registers->IER) != 0U ||
-        (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) != 0U)
-        return NX_ERROR_IO;
-    return NX_SUCCESS;
-}
-/** \brief Failed CS withdrawal remains a concrete lease through recovery. */
-static nx_result_t release_cs(nx_stm32h743_spi_state_t* p) {
-    if (p->held_cs == NULL)
-        return NX_SUCCESS;
-    if (!cs_driven(p->held_cs, p->held_cs_mask))
-        return NX_ERROR_IO;
-    const nx_gpio_port_t face = {&nx_stm32h743_gpio_ops, p->held_cs};
-    nx_result_t result = nx_gpio_port_write(&face, p->held_cs_mask, 0U);
-    nx_arch_dsb();
-    if (result != NX_SUCCESS || !cs_driven(p->held_cs, p->held_cs_mask) ||
-        (NX_H743_READ(&p->held_cs->registers->ODR) & p->held_cs_mask) !=
-            p->held_cs_mask)
-        return NX_ERROR_IO;
-    p->held_cs = NULL;
-    p->held_cs_mask = 0U;
-    return NX_SUCCESS;
 }
 /** \brief Polling cannot return while wire/CS withdrawal remains unproved. */
 static _Noreturn void retain_and_park(nx_stm32h743_spi_state_t* p) {
@@ -211,13 +71,8 @@ static nx_result_t wait(nx_stm32h743_spi_state_t* p, uint32_t mask,
 }
 /** \brief ES0392 2.22.6 EOT/TXC may precede the final trailing SCK edge. */
 static void finish_clock(nx_stm32h743_spi_state_t* p, uint32_t divisor) {
-    uint32_t period =
-        (uint32_t)(((uint64_t)divisor * 1000000U + p->clock_hz - 1U) /
-                   p->clock_hz);
-    /* Two timer quanta cover observation phase/rounding. This drain deadline
-     * remains independent of the request deadline: expiry cannot truncate SCK.
-     */
-    nx_time_us_t quiet = nx_deadline_after(nx_time_now_us(), period + 2U);
+    nx_time_us_t quiet = nx_deadline_after(
+        nx_time_now_us(), nx_stm32h743_spi_wire_quiet_us(p->clock_hz, divisor));
     uint32_t remaining = p->poll_limit;
     while (!nx_deadline_expired(quiet, nx_time_now_us())) {
         if (remaining-- == 0U)
@@ -232,29 +87,12 @@ static void finish_clock(nx_stm32h743_spi_state_t* p, uint32_t divisor) {
 static nx_result_t drain(nx_stm32h743_spi_state_t* p, uint32_t divisor,
                          uint8_t* rx, size_t submitted, size_t* complete) {
     if ((NX_H743_READ(&p->registers->CR1) & SPI_CR1_CSTART) != 0U) {
-        /* CSTART is read/set: zero leaves an ongoing transfer unchanged.
-         * Never replay a stale start request with the suspend command. */
-        NX_H743_WRITE(&p->registers->CR1, (NX_H743_READ(&p->registers->CR1) &
-                                           ~(uint32_t)SPI_CR1_CSTART) |
-                                              SPI_CR1_CSUSP);
-        nx_arch_dsb();
+        nx_stm32h743_spi_wire_suspend_once(p);
         uint32_t remaining = p->poll_limit;
         bool stopped = false;
         do {
             NX_H743_SPI_POLL(p);
-            const uint32_t control = NX_H743_READ(&p->registers->CR1);
-            const uint32_t status = NX_H743_READ(&p->registers->SR);
-            /* EOT can clear CSTART before CSUSP reaches the peripheral;
-             * that idle command need not produce SUSP. Nonzero TSIZE and
-             * both completion flags admit only the finite-completion path.
-             * TXC is then a copy of EOT; the independent quiet guard below
-             * still covers the final trailing edge. */
-            const bool finite_complete =
-                (NX_H743_READ(&p->registers->CR2) & SPI_CR2_TSIZE) != 0U &&
-                (status & (SPI_SR_EOT | SPI_SR_TXC)) ==
-                    (SPI_SR_EOT | SPI_SR_TXC);
-            if ((control & SPI_CR1_CSTART) == 0U &&
-                ((status & SPI_SR_SUSP) != 0U || finite_complete)) {
+            if (nx_stm32h743_spi_wire_stopped(p)) {
                 stopped = true;
                 break;
             }
@@ -279,20 +117,7 @@ static nx_result_t drain(nx_stm32h743_spi_state_t* p, uint32_t divisor,
             ++*complete;
         }
     }
-    if ((NX_H743_READ(&p->registers->SR) & SPI_SR_SUSP) != 0U) {
-        NX_H743_WRITE(&p->registers->IFCR, SPI_IFCR_SUSPC);
-        nx_arch_dsb();
-        if ((NX_H743_READ(&p->registers->SR) & SPI_SR_SUSP) != 0U)
-            return NX_ERROR_IO;
-    }
-    NX_H743_WRITE(&p->registers->CR1,
-                  NX_H743_READ(&p->registers->CR1) & ~(uint32_t)SPI_CR1_SPE);
-    nx_arch_dsb();
-    return (NX_H743_READ(&p->registers->CR1) &
-            (SPI_CR1_SPE | SPI_CR1_CSTART)) == 0U &&
-                   (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) == 0U
-               ? NX_SUCCESS
-               : NX_ERROR_IO;
+    return nx_stm32h743_spi_wire_disable(p);
 }
 /** \brief No live caller frame exists on an idle recover/stop path. */
 static nx_result_t withdraw(nx_stm32h743_spi_state_t* p) {
@@ -300,8 +125,9 @@ static nx_result_t withdraw(nx_stm32h743_spi_state_t* p) {
         2U << ((NX_H743_READ(&p->registers->CFG1) & SPI_CFG1_MBR) >>
                SPI_CFG1_MBR_Pos);
     if (drain(p, divisor, NULL, 0U, NULL) != NX_SUCCESS ||
-        release_cs(p) != NX_SUCCESS || sck_idle(p) != NX_SUCCESS ||
-        reset(p) != NX_SUCCESS) {
+        nx_stm32h743_spi_wire_release_cs(p) != NX_SUCCESS ||
+        nx_stm32h743_spi_wire_sck_idle(p) != NX_SUCCESS ||
+        nx_stm32h743_spi_wire_reset(p) != NX_SUCCESS) {
         p->fault = true;
         return NX_ERROR_IO;
     }
@@ -320,7 +146,7 @@ nx_result_t nx_stm32h743_spi_initialize(nx_stm32h743_spi_state_t* p) {
         NX_H743_READ(&p->registers->CFG2) != 0U ||
         (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) != 0U)
         return NX_ERROR_BUSY;
-    const nx_result_t readiness = clock_ready(p);
+    const nx_result_t readiness = nx_stm32h743_spi_wire_clock_ready(p);
     if (readiness != NX_SUCCESS)
         return readiness;
     p->retained = true;
@@ -359,11 +185,12 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
     *transferred = 0U;
     nx_stm32h743_spi_state_t* p = e->port;
     if (!p->initialized || !e->cs->initialized || p->fault ||
-        clock_ready(p) != NX_SUCCESS)
+        nx_stm32h743_spi_wire_clock_ready(p) != NX_SUCCESS)
         return NX_ERROR_STATE;
     if (p->active || (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) != 0U)
         return NX_ERROR_BUSY;
-    if (!pins_ready() || !cs_driven(e->cs, e->cs_mask) ||
+    if (!nx_stm32h743_spi_wire_pins_ready() ||
+        !nx_stm32h743_spi_wire_cs_driven(e->cs, e->cs_mask) ||
         (NX_H743_READ(&e->cs->registers->ODR) & e->cs_mask) != e->cs_mask)
         return NX_ERROR_STATE;
     /* SPI4 is APB2-clocked in the admitted reset kernel selector. Restrict
@@ -375,25 +202,10 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         return NX_ERROR_TIMEOUT;
     uint32_t divisor = 2U;
     uint32_t baud = 0U;
-#if NEXUS_CORE_HZ == 384000000U
-    /* HSI upper65MHz times PLL ratio6 and ready tolerance1.02, APB/4.
-     * Retain clock_hz as the nominal96MHz; never report the bound as a
-     * measurement. The fixed timer/SPI ratio also bounds trailing-edge drain.
-     */
-    const uint32_t source_max = 99450000U;
-#else
-    /* Fixed HSI64 and HSIDIV2 require the 65/32.5MHz source envelope.
-     * Keep clock_hz nominal for the same-source TIM/SPI quiet ratio. */
-    const uint32_t source_max =
-        p->clock_hz == 32000000U ? 32500000U : 65000000U;
-#endif
-    while ((uint64_t)source_max > (uint64_t)e->frequency_hz * divisor &&
-           divisor < 256U) {
-        divisor *= 2U;
-        ++baud;
-    }
-    if ((uint64_t)source_max > (uint64_t)e->frequency_hz * divisor)
-        return NX_ERROR_UNSUPPORTED;
+    nx_result_t selected = nx_stm32h743_spi_wire_divider(
+        p->clock_hz, e->frequency_hz, &divisor, &baud);
+    if (selected != NX_SUCCESS)
+        return selected;
     p->active = true;
     uint32_t config = SPI_CFG2_MASTER | SPI_CFG2_SSM | SPI_CFG2_AFCNTR |
                       ((e->mode & 1U) != 0U ? SPI_CFG2_CPHA : 0U) |
@@ -411,7 +223,8 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
         LL_SPI_GetTransferSize(p->registers) != length ||
         NX_H743_READ(&p->registers->CR1) != SPI_CR1_SSI)
         result = NX_ERROR_IO;
-    if (result == NX_SUCCESS && sck_alternate() != NX_SUCCESS)
+    if (result == NX_SUCCESS &&
+        nx_stm32h743_spi_wire_sck_alternate() != NX_SUCCESS)
         result = NX_ERROR_IO;
     const nx_gpio_port_t cs = {&nx_stm32h743_gpio_ops, e->cs};
     if (result == NX_SUCCESS) {
@@ -452,8 +265,9 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
     if (result != NX_SUCCESS)
         p->fault = true;
     if (drain(p, divisor, rx, submitted, transferred) != NX_SUCCESS ||
-        release_cs(p) != NX_SUCCESS || sck_idle(p) != NX_SUCCESS ||
-        reset(p) != NX_SUCCESS)
+        nx_stm32h743_spi_wire_release_cs(p) != NX_SUCCESS ||
+        nx_stm32h743_spi_wire_sck_idle(p) != NX_SUCCESS ||
+        nx_stm32h743_spi_wire_reset(p) != NX_SUCCESS)
         retain_and_park(p);
     p->active = false;
     if (result == NX_SUCCESS && nx_deadline_expired(deadline, nx_time_now_us()))
@@ -468,7 +282,7 @@ static nx_result_t recover(void* context) {
         return NX_ERROR_INVALID;
     if (p->active)
         return NX_ERROR_BUSY;
-    if (!p->retained || clock_ready(p) != NX_SUCCESS)
+    if (!p->retained || nx_stm32h743_spi_wire_clock_ready(p) != NX_SUCCESS)
         return NX_ERROR_STATE;
     if (withdraw(p) != NX_SUCCESS)
         return NX_ERROR_IO;
@@ -490,7 +304,7 @@ static nx_result_t stop(void* context) {
         return NX_ERROR_BUSY;
     if (!p->retained)
         return NX_SUCCESS;
-    if (clock_ready(p) != NX_SUCCESS)
+    if (nx_stm32h743_spi_wire_clock_ready(p) != NX_SUCCESS)
         return NX_ERROR_STATE;
     if (withdraw(p) != NX_SUCCESS)
         return NX_ERROR_IO;

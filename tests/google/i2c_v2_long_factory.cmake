@@ -52,6 +52,7 @@ foreach(long_family g474 h743 u575)
             h743_flash_ram_observer.cpp ${h743_flash_ram_production_sources}
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/exti.c"
             "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/watchdog.c")

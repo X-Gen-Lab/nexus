@@ -40,6 +40,7 @@ nexus_google_test(nexus_h743_peripheral_test SOURCES h743_peripheral_test.cpp
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/exti.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/watchdog.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
 target_include_directories(nexus_h743_peripheral_test SYSTEM PRIVATE
@@ -123,6 +124,7 @@ nexus_google_test(nexus_h743_peripheral_factory_test SOURCES h743_peripheral_fac
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/exti.c"
     "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/adc.c"

@@ -1,0 +1,630 @@
+{
+  "schema": "nexus.independent-code-review.v1",
+  "reviewed_at_utc": "2026-10-18T04:43:42.664863+00:00",
+  "reviewer": "/root/style_control_chars",
+  "subject": "H743 W1 private bounded SPI wire-helper extraction",
+  "status": "no-blockers-for-normal-integration-gates",
+  "blockers": [],
+  "scope": {
+    "mode": "Independent read-only review of all 12 frozen source files, current diff, original process evidence, retained binaries and normalized transport. Reviewer ran no tests, builds, compiler or target code.",
+    "baseline_commit": "df2835f59ba6cb76afe3536e3da9bdfca090cc21",
+    "author_root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "author_index_sha256": "7172de6764210aa6c53bd3adfa73260ba6dd9134a641a5694b70f878e004f252",
+    "author_index_unchanged_at_review_end": true,
+    "all_12_sources_read_and_compared": true,
+    "packet_final_bytes_equal_author_tree": true,
+    "writes": "Only this new review report. No source, index, main, active/incoming, author evidence, raw logs or prior reports changed.",
+    "decision_boundary": "Ready for Root ordinary complete final-index gates. No substitute for those gates; no DMA/IO27 completion claim."
+  },
+  "bindings": {
+    "manifest.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/manifest.json",
+      "bytes": 11515,
+      "sha256": "333484a14a720b84588c47866f701d60d56d78f899845d367ed705ad0c194b7b"
+    },
+    "delivery.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/delivery.json",
+      "bytes": 14978,
+      "sha256": "3a7b2ff12d1d0e5aaddc46c19d50cd25dbb709637dd4f52c94fa03004219ebb8"
+    },
+    "final-source-freeze.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/final-source-freeze.json",
+      "bytes": 2338,
+      "sha256": "31ceb4123a843805fa09ad8bbe2d0ff233354e15750f8ac160bc1a372cb7f976"
+    },
+    "actual-command-evidence.zip": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/actual-command-evidence.zip",
+      "bytes": 314763,
+      "sha256": "2a43f5bef4dc1a8f680b3b2a792e9910993dea15a0bca973f6d57adfed7ea2eb"
+    },
+    "transport-map.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/transport-map.json",
+      "bytes": 41856,
+      "sha256": "442857919472d54ec3e5817289f0da061ed7cdfbcc000afcb7e5bcac2df18bbf"
+    },
+    "mechanical-extraction-proof.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/mechanical-extraction-proof.json",
+      "bytes": 2813,
+      "sha256": "197862020d2fec05ef100b01ee0bbdb7c60ac5b2d677658363ee0fe8cddb27fa"
+    },
+    "pre-header-final215-retained.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/pre-header-final215-retained.json",
+      "bytes": 7899,
+      "sha256": "3f080612c731323f9a6e41357257208542fda67aa90004191a3c5b5d3db765ff"
+    },
+    "header-only-correction.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/header-only-correction.json",
+      "bytes": 739,
+      "sha256": "d76d0ee58ef784a12409c8effad36f0ff2423b97fdb148de4f576d033ddc2d6f"
+    },
+    "arm-cost-retention-postcheck.json": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/arm-cost-retention-postcheck.json",
+      "bytes": 9052,
+      "sha256": "8320d7d8314e2abf60f105f85596ebf49869519ea890e5bdb5eb3252b4be28e8"
+    },
+    "normalized_transport": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-wire-w1-normalized-transport-r1.json",
+      "bytes": 24328,
+      "sha256": "fcf1bc52cc0706199190b73e18628e8daca467b6bcbd663968bd98a754c180ae"
+    },
+    "s0_arm_baseline_zip": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-s0-arm-r1/complete.zip",
+      "bytes": 1529458,
+      "sha256": "5b29c8c79759ebe4eb8bd30264b2214aa7f876a4e87350073e6a7ba65415257c"
+    }
+  },
+  "final_source_map": [
+    {
+      "relative": "soc/stm32h743/CMakeLists.txt",
+      "sha256": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+      "bytes": 6172
+    },
+    {
+      "relative": "soc/stm32h743/drivers/spi.c",
+      "sha256": "3ca2b57e51bd46abcba837963f6db50f99a93e5821bcbdff565c1cf8958660ff",
+      "bytes": 13488
+    },
+    {
+      "relative": "tests/google/CMakeLists.txt",
+      "sha256": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444",
+      "bytes": 28115
+    },
+    {
+      "relative": "tests/google/h743.cmake",
+      "sha256": "0fb1560a4a087469304936c31a53ace7df31b997cf16fde3e536e15df88c0ca7",
+      "bytes": 9825
+    },
+    {
+      "relative": "tests/google/h743_flash_ram_closure.cmake",
+      "sha256": "15456b1c63094444a098dfc8094d312ec731cab1622f46d4bef5f679dd5ad3db",
+      "bytes": 3106
+    },
+    {
+      "relative": "tests/google/h743_high.cmake",
+      "sha256": "d851a64314bd66eb1d24dd722b98a752e74ac0cc9ff8087eaf4202d1e405769b",
+      "bytes": 5340
+    },
+    {
+      "relative": "tests/google/i2c_v2_long_factory.cmake",
+      "sha256": "08dfdde41a33092db3b09e45ab1de02561dcae8634985555b4af711dc498c6bd",
+      "bytes": 5084
+    },
+    {
+      "relative": "tools/configure/providers/descriptor.py",
+      "sha256": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+      "bytes": 14537
+    },
+    {
+      "relative": "soc/stm32h743/drivers/spi_wire.c",
+      "sha256": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+      "bytes": 10313
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_spi_wire.h",
+      "sha256": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7",
+      "bytes": 5030
+    },
+    {
+      "relative": "tests/google/h743_spi_wire.cmake",
+      "sha256": "8d8076715a00b53d4a5e141fb4701a4fe2cab63f137d5547279ce4318dd52814",
+      "bytes": 812
+    },
+    {
+      "relative": "tests/google/h743_spi_wire_test.cpp",
+      "sha256": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c",
+      "bytes": 15961
+    }
+  ],
+  "source_findings": [
+    {
+      "area": "Private ABI/ownership",
+      "finding": "Private header and 12 useful register/calculation leaves; no new owner, dispatcher, service state, allocation or ordinary polling-object fields. Public SPI header and private provider.h retain baseline bytes. spi.c directly uses the leaves and retains wait/drain/quiet/retained-fault policy and transfer byte loop."
+    },
+    {
+      "area": "Boundedness",
+      "finding": "Every leaf finishes after a fixed number of CPU operations/MMIO accesses. cs_driven scans at most 16 pins; divider selects 2..256 in at most 7 steps. No leaf polls to eventual completion, waits, drains RX, invokes fault ownership or adds fallback async polling. W1 adds no async or DMA path."
+    },
+    {
+      "area": "CSUSP register semantics",
+      "finding": "suspend_once retains CR1 RMW semantics, explicitly excludes CSTART when setting CSUSP and issues DSB, so it cannot retrigger transfer. CSUSP is a read-as-zero command; the corrected new test uses model suspend_request rather than readable CSUSP=1."
+    },
+    {
+      "area": "Stop proof",
+      "finding": "stopped is a non-clearing snapshot: CSTART clear and either SUSP, or finite TSIZE>0 with EOT+TXC. TSIZE=0 is not completion. It does not claim quiet. Existing polling wrappers still enforce stop -> quiet -> RX drain -> disable."
+    },
+    {
+      "area": "Disable/final access",
+      "finding": "disable acknowledges SUSP before SPE=0, issues DSB, then proves CR1 and FIFO state. Its private contract retains caller-owned stopped/quiet/drained preconditions. Existing synchronous owner retains waits and faults; extraction promises no stronger timeout/completion contract."
+    },
+    {
+      "area": "CS and SCK park order",
+      "finding": "release_cs proves GPIO output/high ODR before clearing held-CS ownership; failure retains the pointer. Wrapper keeps CS high before SCK idle-latch/GPIO-output parking and checked reset. sck_idle writes the output latch before mode change. AF/pin checks and ordering remain unchanged."
+    },
+    {
+      "area": "Clock/calculations",
+      "finding": "clock_ready retains gate/mux/profile checks, revision-V guard before HSICFGR, default HSI trim64 and bounded high-profile checks. Divider retains 65/32.5/99.45MHz envelopes and output-on-success semantics. quiet_us retains ceil(divisor*1000000/nominal_clock)+2; calculated budget is not a measured SCK qualification."
+    },
+    {
+      "area": "Mechanical equivalence",
+      "finding": "Independently removed comments/whitespace and normalized extracted names: pins_ready, cs_driven, sck_alternate, sck_idle, clock_ready, reset and release_cs match old bodies exactly. Inspected the remaining five leaves and driver callers for equivalent expressions/preconditions. Driver wait and byte-transfer loop remain byte-identical."
+    },
+    {
+      "area": "Link/SDK closure",
+      "finding": "SoC CMake selects helper TU with SPI modes. All maintained direct spi.c test consumers receive it, including flash/RAM closure and I2C long-factory, without weakening assertions. Descriptor adds only private helper source/header payload. Empty selects neither SPI TU. No clean installed-SDK run is claimed."
+    },
+    {
+      "area": "Scope",
+      "finding": "No DMA stream/request/IRQ implementation, public ABI expansion, additional ordinary owner state, hardware qualification or IO27 status change. This polling-helper extraction only prepares for separately reviewed finite DMA work."
+    }
+  ],
+  "preserved_assertions": {
+    "independently_compared_to_baseline": true,
+    "old_native_programs": 6,
+    "old_native_cases": 187,
+    "old_assertions_and_model_unchanged": true,
+    "baseline_equal_sources": [
+      {
+        "relative": "soc/stm32h743/private/stm32h743_provider.h",
+        "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_peripheral_test.cpp",
+        "sha256": "5f22040613ac9ec10d6179518c35e5aed3284476e3f23f9d9356f9ecad0fdf4a",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_system_test.cpp",
+        "sha256": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_clock_test.cpp",
+        "sha256": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_high_kernel_test.cpp",
+        "sha256": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_high_factory_test.cpp",
+        "sha256": "32d33a6c04549bdbbfbbbb527726c59a436153cf81221c9fea4952481cde7807",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_peripheral_factory_test.cpp",
+        "sha256": "4a06392b09493247486a25389e0b22eacf11dde2f1aa7d60131def6d3c8084ce",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_model.h",
+        "sha256": "1626b1cdbfb4750d550c359d37f6b34bb4fcbe8b742ef8f568c6d8fafeb91d8b",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tests/google/h743_model.cpp",
+        "sha256": "05cee6923341a2a5f67486e4ef04dd506cd868054769e296a359d688bfc8eda7",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "tools/configure/providers/stm32h743/test_peripherals.py",
+        "sha256": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
+        "unchanged_from_df": true
+      },
+      {
+        "relative": "io/include/nexus/io/spi.h",
+        "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+        "unchanged_from_df": true
+      }
+    ],
+    "hot_paths": [
+      {
+        "region": "wait",
+        "bytes": 635,
+        "sha256": "54996128264ff1033b95431ce895dfa0ab9968664b136f9e7d9117ec9b738a2d",
+        "exact_bytes_preserved": true
+      },
+      {
+        "region": "per_byte_loop",
+        "bytes": 551,
+        "sha256": "11bd471e0926821a810d17e0016988c3f995a1ac36ca54c8b37ea625f8873377",
+        "exact_bytes_preserved": true
+      }
+    ],
+    "new_helper_cases": 28,
+    "new_test_coverage": "Clock/profile/divisor/quiet math; failed-output retention; pins/CS; SCK AF/idle; suspend once/no CSTART restart; TSIZE/SUSP/EOT/TXC distinctions; disable/FIFO; held-CS/reset. Actual helpers use existing MMIO model; no mocked helper implementation."
+  },
+  "tdd_and_native_evidence": {
+    "reviewer_rerun": false,
+    "missing_api_red": {
+      "normal_configure_actual_exit": 0,
+      "whole_target_build_actual_exit": 1,
+      "reason": "New target links against absent implementations: original diagnostics contain all 12 undefined nx_stm32h743_spi_wire_* APIs. No runtime/XML RED claim.",
+      "test_object_sha256": "c7ef66a1907e7661de1c3db5fa6e52debfeecc06c181eb900dc603303dc1b929",
+      "evidence": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/actual-missing-api-red.json",
+        "bytes": 1001,
+        "sha256": "32f89f96b1a593da01b0b7df8d6f4b1c4da5d3d067f6153791a6a36345280e6d"
+      }
+    },
+    "first_runtime_test_correction": {
+      "actual_exit": 1,
+      "reason": "One of 28 new cases expected CSUSP readback=1. Corrected only that new assertion to check model suspend_request per existing read-as-zero semantics. This is not a production behavioral RED or final-identical-test-byte RED claim.",
+      "evidence": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1/csusp-test-correction.json",
+        "bytes": 930,
+        "sha256": "fca1641472311a938b64ae1aaec71f6507eb9384f7b9f2931a6375d4ad4fbe47"
+      }
+    },
+    "native_whole_programs": {
+      "programs": 7,
+      "cases": 215,
+      "old_cases": 187,
+      "new_cases": 28,
+      "actual_exits": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "not_run": 0,
+      "counts": {
+        "clock": 38,
+        "high_factory": 10,
+        "high_kernel": 30,
+        "peripheral_factory": 13,
+        "peripheral": 49,
+        "spi_wire": 28,
+        "system": 47
+      },
+      "checks": "Independently verified retained 7 ELF hashes, original receipts/raw hashes, XML hashes and all testcase statuses/counts. Complete whole-program invocations, no filtering/sharding.",
+      "retained_ELFs": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215",
+      "tuple": "Pre-header-correction 12-source tuple retained in original gzip bytes; not final comment-corrected byte tuple."
+    },
+    "header_boundary": {
+      "changes": [
+        {
+          "relative": "soc/stm32h743/drivers/spi_wire.c",
+          "before_sha256": "1aa06e5375ce12b588230ff1544245d4d802febfb7acce29e637bc9cdd5bddfd",
+          "after_sha256": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+          "comment_removed_bytes_equal": true
+        },
+        {
+          "relative": "tests/google/h743_spi_wire_test.cpp",
+          "before_sha256": "27c836324de7b5cee6a49fe59928089e29a4e0becb338a931c812956bed6e1fd",
+          "after_sha256": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c",
+          "comment_removed_bytes_equal": true
+        }
+      ],
+      "independent_check": "All 12 retained gzip source hashes/decompressions verified. Only spi_wire.c and new test differ from final: add version/date/copyright file-header fields. Independently removing C comments gives exact remaining bytes equal. Other10 exact. No final Native rerun claimed.",
+      "final_tuple": "Final explicit format/comments and four ARM fixtures bind final source freeze. Root final-index gates will exercise integrated final source."
+    },
+    "python_whole_module": {
+      "module": "tools.configure.providers.stm32h743.test_peripherals",
+      "methods": 7,
+      "subtests": 23,
+      "actual_exit": 0,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "source_equal_baseline": true
+    },
+    "preserved_failed_checks": "Initial style invocation included untracked files and failed; first explicit comment check failed on new headers; first fixed3 ARM setup failed due nested-submodule materialization. Original receipts/raw preserved and classified, never promoted to behavioral RED.",
+    "final_format_comment_checks": "Final explicit4 C/H/CPP format/comments actual0 and tracked8 style actual0; untracked sources are explicitly covered."
+  },
+  "arm_review": {
+    "final_source_bound": true,
+    "fixed3_report": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-arm-fixed-r2/report.json",
+      "sha256": "992ab641585bbfeff31a5c4433cad3f05b92d1a200e3cc5178c9342361cf742a",
+      "actual_exit": 0,
+      "source_inputs_stable": true,
+      "tools_stable": true
+    },
+    "high_normal_configure_actual_exit": 0,
+    "high_normal_build_actual_exit": 0,
+    "independent_method": "Separate stdlib struct ELF32 reader reproduced PT_LOAD Flash union, allocated AXI union, helper symbols, writable object maps and ELF hashes. No target execution. Author postcheck supplies normalized compile-token/config/binding parity; reviewer separately verified linked-byte/resource/object comparisons, not a clean SDK rebuild.",
+    "fixtures": [
+      {
+        "fixture": "fixed-HSI64",
+        "elf": {
+          "bytes": 54024,
+          "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-arm-fixed-r2/000-h743_assembly-peripherals/bin/h743_assembly.elf",
+          "sha256": "6e945eb46e5bf45d38bcab20e5d2e04f3ce9dbd8dba3ad0fa585aac9be4d13c3"
+        },
+        "metrics": {
+          "flash_load_bytes": 26576,
+          "axi_allocated_union_bytes": 6920
+        },
+        "selected_helpers": 12,
+        "baseline_elf_sha256": "08bceeb19cd4273fdb5dc1659e672d01e8fcf286754aaff8ab9f0c622ceb9f06",
+        "baseline_metrics": {
+          "flash_load_bytes": 26436,
+          "axi_allocated_union_bytes": 6920
+        },
+        "flash_delta_bytes": 140,
+        "ram_delta_bytes": 0,
+        "all_writable_object_names_and_sizes_equal_baseline": true,
+        "spi_port_state_bytes": 32,
+        "spi_endpoint_state_bytes": 20,
+        "cs_state_bytes": 12
+      },
+      {
+        "fixture": "fixed-HSI32",
+        "elf": {
+          "bytes": 54024,
+          "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-arm-fixed-r2/001-h743_assembly-peripherals32/bin/h743_assembly.elf",
+          "sha256": "cea3371fc1b00cca8287377c7968a168647f04fce4a615a24896789201018493"
+        },
+        "metrics": {
+          "flash_load_bytes": 26656,
+          "axi_allocated_union_bytes": 6920
+        },
+        "selected_helpers": 12,
+        "baseline_elf_sha256": "8928a316df94fdd4428c663a1dc9bfaa7a9ca0c8068a61fcea65a8b95c15e39e",
+        "baseline_metrics": {
+          "flash_load_bytes": 26524,
+          "axi_allocated_union_bytes": 6920
+        },
+        "flash_delta_bytes": 132,
+        "ram_delta_bytes": 0,
+        "all_writable_object_names_and_sizes_equal_baseline": true,
+        "spi_port_state_bytes": 32,
+        "spi_endpoint_state_bytes": 20,
+        "cs_state_bytes": 12
+      },
+      {
+        "fixture": "empty",
+        "elf": {
+          "bytes": 17712,
+          "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-arm-fixed-r2/002-h743_assembly-empty/bin/h743_assembly.elf",
+          "sha256": "231911571b547da197907df6a444b31de0759607f2ddbb5c32cb9863d85e1166"
+        },
+        "metrics": {
+          "flash_load_bytes": 2926,
+          "axi_allocated_union_bytes": 2104
+        },
+        "selected_helpers": 0,
+        "strong_SPI_driver_symbols": 0,
+        "SPI_owner_state_objects": 0,
+        "SPI_translation_units_selected": 0,
+        "faces": 0,
+        "methods": 0,
+        "baseline_delta_claim": false
+      },
+      {
+        "fixture": "high-peripherals",
+        "elf": {
+          "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/fixture-io-evolution-h743-high-peripherals/bin/io_evolution_fixture.elf",
+          "sha256": "eb4ed9f152e8a35c74526c26b93790aadb40b87cf71941fa1aa355af601a4a3e",
+          "bytes": 58452
+        },
+        "metrics": {
+          "flash_load_bytes": 28472,
+          "axi_allocated_union_bytes": 6944
+        },
+        "selected_helpers": 12,
+        "baseline_elf_sha256": "57927261e2817058b110858d489555fcb60a5bc2a60e12b8dc5c8ed02045df31",
+        "baseline_metrics": {
+          "flash_load_bytes": 28300,
+          "axi_allocated_union_bytes": 6944
+        },
+        "flash_delta_bytes": 172,
+        "ram_delta_bytes": 0,
+        "all_writable_object_names_and_sizes_equal_baseline": true,
+        "spi_port_state_bytes": 32,
+        "spi_endpoint_state_bytes": 20,
+        "cs_state_bytes": 12
+      }
+    ],
+    "empty_baseline_limit": "No old matching empty baseline in supplied S0 ZIP, so no empty delta asserted.",
+    "limits": [
+      "ARM compile/link/resource retention only; no target execution.",
+      "No measured cycles/WCET/latency/electrical/stack-high-water claim.",
+      "Descriptor payload inspected; no clean installed SDK.",
+      "No DMA/IRQ/Stop/VBAT/HIL qualification or IO27-complete claim."
+    ]
+  },
+  "transport_and_receipts": {
+    "author_manifest_files": 61,
+    "all_original_size_sha_verified": true,
+    "zip_members": 119,
+    "all_member_crc_size_sha_verified": true,
+    "all_original_path_bytes_equal_zip": true,
+    "receipt_count": 24,
+    "all_receipt_and_raw_sha_actual_exits_verified": true,
+    "all_source_stable": true,
+    "receipts": [
+      {
+        "stage": "corrected-helper-build",
+        "actual_exit": 0,
+        "receipt_sha256": "afcebd372e41398950efcf1c11cdba9420aa3dbd958463b85acc31f2569b72b2",
+        "raw_sha256": "af5d1946a6cac319488c73c68314c930eeb6fcc5f6171579bd84055ee0e86cad"
+      },
+      {
+        "stage": "final-arm-fixed3",
+        "actual_exit": 1,
+        "receipt_sha256": "373a1a37e416a73a565ff03950c54879954f5d187a0f7e90d833bc81bad2c209",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stage": "final-arm-fixed3-r2",
+        "actual_exit": 0,
+        "receipt_sha256": "303b0f3db1d0e8d5a2cbc3845ebe1e5e33473a61217a0d56f117109c620065fa",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "stage": "final-explicit-comments",
+        "actual_exit": 1,
+        "receipt_sha256": "84c6d3d06f0da77640195e3080410c37d7360d550f6f2f0bc821718384d7bd44",
+        "raw_sha256": "51b55845d5ec123f9d33e87c434b9ae9c6b63a0839710d4af0e905a34dfa6144"
+      },
+      {
+        "stage": "final-explicit-comments-r2",
+        "actual_exit": 0,
+        "receipt_sha256": "75ac74d08252dc63485be52586b8cf02aac0dd584e3904b24b804b0cfc05e4d1",
+        "raw_sha256": "80ec3c813920727ab3df43a7c6aa140c58b7728a8e856e74d87d29547769a18c"
+      },
+      {
+        "stage": "final-explicit-format",
+        "actual_exit": 0,
+        "receipt_sha256": "68019dcb04bcef7b0927d6b3fc8bfca56d303634e76ddc89004ea14043c16309",
+        "raw_sha256": "2bfbb19feccd9deec9701715ea16fe5121f9b3e777d4efd300af5f6e7f75ee8c"
+      },
+      {
+        "stage": "final-explicit-format-r2",
+        "actual_exit": 0,
+        "receipt_sha256": "33e1f47cb01542d090810af29d66a34e8c2deab5311485f1490147d14bd5f4e2",
+        "raw_sha256": "2bfbb19feccd9deec9701715ea16fe5121f9b3e777d4efd300af5f6e7f75ee8c"
+      },
+      {
+        "stage": "final-high-normalbuild",
+        "actual_exit": 0,
+        "receipt_sha256": "67d084dae67dc35760ef5591761f73571c85616d8373d02472474660e0e0f09b",
+        "raw_sha256": "cb44d92eea4dd2ecc295de4339042a387cdf4481eccaf9895b87cd77a7c0530b"
+      },
+      {
+        "stage": "final-high-normalconfigure",
+        "actual_exit": 0,
+        "receipt_sha256": "77adcc45ec79885a8b963f78c90bf0e555755de58b7eccb8965351d1fc7e594a",
+        "raw_sha256": "0211e6b690f7299816ee4d8366578aa164838506fae3345c220b211db85fef3d"
+      },
+      {
+        "stage": "final-python-whole",
+        "actual_exit": 0,
+        "receipt_sha256": "de297d0e21c6787d8774d01319428bc71bc26d85a7793c6c56e3533dabe5ad23",
+        "raw_sha256": "81142492225b2ad90564f3413f30bd4ff82679180d2d341b377800868598dbc7"
+      },
+      {
+        "stage": "final-style",
+        "actual_exit": 1,
+        "receipt_sha256": "004392d3ecc5cac3fabcf31a8946a64e8a5955b98dbf2c31e8a8c3f8837c965e",
+        "raw_sha256": "ab040ee4b2a39f07c41aeb7d6c96ba5f8adb9b4a07e3dc79cf0b1ef6fc0274c2"
+      },
+      {
+        "stage": "final-tracked-style",
+        "actual_exit": 0,
+        "receipt_sha256": "fde27a953a443a78f46752aaff140d9b49db761ebdbf05a1929edef959d53391",
+        "raw_sha256": "4ec3785a36e14f5edc68b2c118015d82795e85abc728cd38dd4c8183d8e721c5"
+      },
+      {
+        "stage": "final-tracked-style-r2",
+        "actual_exit": 0,
+        "receipt_sha256": "35afd74625c3807a9d89a2d41e4e71bac86b090f3e121a573b23ae7040d489ec",
+        "raw_sha256": "4ec3785a36e14f5edc68b2c118015d82795e85abc728cd38dd4c8183d8e721c5"
+      },
+      {
+        "stage": "final-whole-nexus_h743_clock_test",
+        "actual_exit": 0,
+        "receipt_sha256": "001d9cbbdaefad75e35e53cdb9b954fd0cb86db90985a1012de6a7b25ec8abe9",
+        "raw_sha256": "1f40e7a0927c8a9808e2b4177ec4f148626fcb3e3c813b7f2798ffb264d41b45"
+      },
+      {
+        "stage": "final-whole-nexus_h743_high_factory_test",
+        "actual_exit": 0,
+        "receipt_sha256": "5083e3181313952340d7396d5913628a287eee4a6ba0ab17646ca773695d9a4f",
+        "raw_sha256": "81892fc5ec35287a3840072b9271984307b7cdc995677dca45113d1ad3322ace"
+      },
+      {
+        "stage": "final-whole-nexus_h743_high_kernel_test",
+        "actual_exit": 0,
+        "receipt_sha256": "b719adf60a7346204f2ef8a41e10e790ca0a22a948c58278ee545cf12cf69d92",
+        "raw_sha256": "0af7a1e5870861efce98f764259dc4adb1101a0f5e4cbd50d6d99a2987a95998"
+      },
+      {
+        "stage": "final-whole-nexus_h743_peripheral_factory_test",
+        "actual_exit": 0,
+        "receipt_sha256": "fc886d036e3dca05cf450b2e7e08e81553dab33803958a21e25e830d39c2bdb6",
+        "raw_sha256": "eacaa68456c0cc0d983b6498eca91f7bc0793d85ae5381ad562f6d5ae66180f8"
+      },
+      {
+        "stage": "final-whole-nexus_h743_peripheral_test",
+        "actual_exit": 0,
+        "receipt_sha256": "d16d92d38ba1b9210db546c6c900895332b0b9a68c8b96c85685d4dfeadb9725",
+        "raw_sha256": "8c9645b4f016c37618277aae43bcde1b8f5ad247ad922b5771c3e7476dc9828d"
+      },
+      {
+        "stage": "final-whole-nexus_h743_spi_wire_test",
+        "actual_exit": 0,
+        "receipt_sha256": "1883625c975d208a9e3a6ab1d6e879121f8bf02890f885ae46a9fb1670ed88c5",
+        "raw_sha256": "f68aa2ff30a174bbd901c81efae1e549ee4b63e908822ab20ab154ebfec76578"
+      },
+      {
+        "stage": "final-whole-nexus_h743_system_test",
+        "actual_exit": 0,
+        "receipt_sha256": "16fc58edc19a416580a022819f2f1dbccbec6ee78ce9b3014e2ad0747b7719a6",
+        "raw_sha256": "3b6a7a4fc293a22365690e40b2e5508b2ba5f9ad37d83774538f1e4ed52d7c45"
+      },
+      {
+        "stage": "first-green-seven-build",
+        "actual_exit": 0,
+        "receipt_sha256": "8413bdd02290c2abd139bc04f3cd4face7dbc6a7ec8115ba47353ca956abd468",
+        "raw_sha256": "6640bd74a1e439fde94341b6c7cc2661c037348414a3b28ace3d872695af1bd6"
+      },
+      {
+        "stage": "first-whole-helper",
+        "actual_exit": 1,
+        "receipt_sha256": "ba42fd2e980d98760eb6582c9d93311d14fc1ebf2a1ac05116664c578d817f3d",
+        "raw_sha256": "d6b3c10488370a46691f0964779f1305b6be37b897e8c4668109f4d0709f08e3"
+      },
+      {
+        "stage": "missing-api-normalconfigure",
+        "actual_exit": 0,
+        "receipt_sha256": "b6eb99bfd5ca69659815f35743eff137bc7168de7cd6d89e82c1cc454ca49ded",
+        "raw_sha256": "1a6d409c4e2bd7cd01d2e18e66ed4ba3717c92adad5f898e585471004d41731a"
+      },
+      {
+        "stage": "missing-api-whole-build",
+        "actual_exit": 1,
+        "receipt_sha256": "90f686efde64b827f4574b7ce468b7be4831fa1a2b98c6a16b49a3c549f46bee",
+        "raw_sha256": "8999e53dc0e88e68e8f7ce208dd9bc66ff32fbff1af11657059d4b6d2ffba1e4"
+      }
+    ],
+    "normalized_map": {
+      "rows": 62,
+      "source_rows": 12,
+      "history_rows_including_author_manifest": 50,
+      "unique_canonical_relative_targets": true,
+      "absolute_dotdot_or_symlink_escape": 0,
+      "all_62_durable_paths_exact_and_canonical": true,
+      "all_62_size_sha_exact": true,
+      "content_changes": false,
+      "historical_maintained_source_suffixes_remaining": 0,
+      "mapping": "12 files/ prefixes stripped to maintained canonical source. Historical .c/.h/.cpp/.py/.cmake/.txt suffixes replaced with .raw; other paths unchanged. Original author manifest retained as author-manifest-r1.json. No history bytes rewritten or treated as maintained source.",
+      "main_index_or_source_mutation_by_reviewer": false
+    }
+  },
+  "integration_conditions": [
+    "Use exact source hashes and normalized map with ordinary complete final-index gates; no skips, rebaseline or hook bypass.",
+    "Retain pre-header Native215 tuple distinction and original failed/setup evidence.",
+    "Keep W1 as polling-helper extraction; finite DMA/IRQ and IO27 status need separate source/evidence review."
+  ]
+}

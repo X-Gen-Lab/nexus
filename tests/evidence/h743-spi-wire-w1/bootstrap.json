@@ -1,0 +1,59 @@
+{
+  "head": "df2835f59ba6cb76afe3536e3da9bdfca090cc21",
+  "branch": "feat/h743-spi-wire-20261018",
+  "index_sha256": "7172de6764210aa6c53bd3adfa73260ba6dd9134a641a5694b70f878e004f252",
+  "baseline_sources": [
+    {
+      "relative": "soc/stm32h743/drivers/spi.c",
+      "sha256": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0",
+      "bytes": 22078
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_provider.h",
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "bytes": 13407
+    },
+    {
+      "relative": "soc/stm32h743/CMakeLists.txt",
+      "sha256": "9089a0e089fc6d3a96c230b4ef48f3a3218e11cffac4c9b8cbdfb1999ea95996",
+      "bytes": 6100
+    },
+    {
+      "relative": "tests/google/CMakeLists.txt",
+      "sha256": "1c855ad6b5ddb13788f5f992ec5ebb35e10f4d2708f7b813f2911d99de29ebbb",
+      "bytes": 28086
+    },
+    {
+      "relative": "tests/google/h743.cmake",
+      "sha256": "19219a4c8b6faf141ab17cdbec57185631e4e8cb52e34f600d8b2b10e86240a4",
+      "bytes": 9707
+    },
+    {
+      "relative": "tests/google/h743_high.cmake",
+      "sha256": "7a9494e6beefcc4e33da231ea1c815dfa1dbdf4830a2e9044842d4212335d1e1",
+      "bytes": 5214
+    },
+    {
+      "relative": "tests/google/h743_flash_ram_closure.cmake",
+      "sha256": "216f19ed27c8f50e2b3988fb91c0492d061ed7a5ba5bc3d60f3914f7262eacf8",
+      "bytes": 3043
+    },
+    {
+      "relative": "tests/google/i2c_v2_long_factory.cmake",
+      "sha256": "eb93e5d677be947eea6248e23503e47a07d49ce0ca00c35f784da6ed92b1738c",
+      "bytes": 5017
+    },
+    {
+      "relative": "tools/configure/providers/descriptor.py",
+      "sha256": "664108709333e6133c77000266ffff1cbcfb5483cd8ea5c61ad29151125baef8",
+      "bytes": 14419
+    }
+  ],
+  "baseline_build_allocated_bytes": 210907136,
+  "tmp_free": 679378944,
+  "persistent_free": 34619392,
+  "memory_current": 14856196096,
+  "memory_max": 17179869184,
+  "events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "allowed_source_window": "W1 r2 + 2 approved direct-source consumer CMake hunks; no D1 DMA"
+}

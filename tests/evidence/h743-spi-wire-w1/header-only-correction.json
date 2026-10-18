@@ -1,0 +1,18 @@
+{
+  "reason": "explicit strict comment_style found missing version/date/copyright in two new file headers",
+  "not_behavior_red": true,
+  "changes": [
+    {
+      "relative": "soc/stm32h743/drivers/spi_wire.c",
+      "before_sha256": "1aa06e5375ce12b588230ff1544245d4d802febfb7acce29e637bc9cdd5bddfd",
+      "after_sha256": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+      "comment_removed_bytes_equal": true
+    },
+    {
+      "relative": "tests/google/h743_spi_wire_test.cpp",
+      "before_sha256": "27c836324de7b5cee6a49fe59928089e29a4e0becb338a931c812956bed6e1fd",
+      "after_sha256": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c",
+      "comment_removed_bytes_equal": true
+    }
+  ]
+}

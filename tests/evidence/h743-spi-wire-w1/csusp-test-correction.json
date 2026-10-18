@@ -1,0 +1,11 @@
+{
+  "classification": "new test hardware expectation correction, not provider behavior fix",
+  "actual_whole_tests": 28,
+  "actual_failure_assertions": 1,
+  "source_freeze": "first-helper-test-failure-source",
+  "retained_matching_elf": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-first-helper-failure/nexus_h743_spi_wire_test",
+  "retained_elf_sha256": "860c40589e05b0e4471eba76bb22239d3391d083029176c05fc6646a2d4bb92d",
+  "actual_receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/first-whole-helper/receipt.json",
+  "official_rm_text": "RM0433 Rev9 text157951..157955: CSUSP reads as zero; accepted command suspends after current frame. Existing external model correctly records command then exposes zero.",
+  "new_expectation": "Keep writecount1/CSTART1/no CSTART in command assertions; assert readCSUSP0 and external suspend_requests1/pendingtrue; production helper unchanged."
+}
