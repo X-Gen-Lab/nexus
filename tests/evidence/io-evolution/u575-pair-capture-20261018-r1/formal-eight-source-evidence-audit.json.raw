@@ -1,0 +1,580 @@
+{
+  "kind": "readonly-U575-eight-source-and-evidence-audit",
+  "freeze": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final-source-freeze-r1.json",
+    "bytes": 4662,
+    "sha256": "4844f2af9e41f2a26f42a2af360b801bf02af689b98ae2bfd0cee391c6288392"
+  },
+  "leafmap": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final-eight-source-and-evidence-leafmap-r1.json",
+    "bytes": 106104,
+    "sha256": "a0e162e14a5b34f770d1581f6d526c8b201bd56c3d03bb44706e0b007a05da67"
+  },
+  "handoff": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/completed-handoff-r1.json",
+    "bytes": 1628,
+    "sha256": "193097e23a9c8ac548b1186dafe15834dd17ad75204941eeec14fc4ab2fb9024"
+  },
+  "source8_exact": true,
+  "distinct_referenced_regular_paths_verified": 296,
+  "all_current_feature_leaves_covered_except_self_roots": true,
+  "archive": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/execution-evidence-r1.tar.gz",
+    "bytes": 1000754,
+    "sha256": "93a7e172659d805e8000e34df7cdfb2efa6528aec086b17dbee804c695d9fcb4",
+    "member_count": 157,
+    "uncompressed_member_bytes": 1842893,
+    "all_mode_uid_gid_nsmtime_SHA_and_full_gzip_CRC_verified": true
+  },
+  "index_backup_full_gzip_CRC_and_original_sha": "1a4c0ef193f82f82a5152311e34487855eb24f517738722f6b045903ccd85f21",
+  "commands": [
+    {
+      "stage": "all-current-workflow-dsl",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/all-current-workflow-dsl.command.json",
+        "bytes": 1890,
+        "sha256": "8b09d0753fa5d8b45fdd7672959ff450935fa08495d511eeea640c278839da93"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": null,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/all-current-workflow-dsl.guard.json",
+        "bytes": 3324,
+        "sha256": "8d024dbee3257f1288d78611b855f6eb4fc610d315d6c11b5ed558ce0fde28e5"
+      },
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    {
+      "stage": "seal-complete-feature-157",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.command.json",
+        "bytes": 1345,
+        "sha256": "6520748104fea743ce6fe5f1df1db69cb094db03f0907f2eace11a3ff8eb1458"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": null,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.guard.json",
+        "bytes": 3324,
+        "sha256": "779f7b5f23ddfd49331e0314308dec5585d5bca7b950ba7d63ada6e2718789d4"
+      },
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    {
+      "stage": "source-eight-text-and-preserved54",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/source-eight-text-and-preserved54.command.json",
+        "bytes": 1377,
+        "sha256": "f3ac67eee67ef41f3ea7975c7e3b0e1034389baaf80c92aaca8021bc351fd71a"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": null,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/source-eight-text-and-preserved54.guard.json",
+        "bytes": 3324,
+        "sha256": "0c74f7c760addc50d6d0ac11ff84c3ac0e724310d6eb74c02cad90f12056849b"
+      },
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    {
+      "stage": "whole-capture-18-corrected-fixture-firstcoverage",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-18-corrected-fixture-firstcoverage.command.json",
+        "bytes": 1444,
+        "sha256": "3ff8d778f3243139d98d31e805f3c367ce511f55e0c253c3e4dcabdbbe1cbd69"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 18,
+      "failures": [],
+      "errors": [
+        "test_alias_library_choices_are_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_alias_library_choices_are_rejected)",
+        "test_before_queries_and_complete_bytes_precede_future_build (scripts.ci.test_u575_pair_context.PairContextCapture.test_before_queries_and_complete_bytes_precede_future_build)",
+        "test_changed_compiler_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_compiler_rejected)",
+        "test_changed_library_mode_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_library_mode_rejected)",
+        "test_changed_original_library_rejected_without_context (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_original_library_rejected_without_context)",
+        "test_changed_retained_before_bytes_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_retained_before_bytes_rejected)",
+        "test_coherent_closure_publishes_exact_context_and_explicit_unbuilt (scripts.ci.test_u575_pair_context.PairContextCapture.test_coherent_closure_publishes_exact_context_and_explicit_unbuilt)",
+        "test_dirty_source_is_rejected_before_query_or_copy (scripts.ci.test_u575_pair_context.PairContextCapture.test_dirty_source_is_rejected_before_query_or_copy)",
+        "test_existing_context_is_not_overwritten (scripts.ci.test_u575_pair_context.PairContextCapture.test_existing_context_is_not_overwritten)",
+        "test_existing_or_symlink_control_directory_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_existing_or_symlink_control_directory_is_rejected)",
+        "test_failed_original_report_cannot_publish_context (scripts.ci.test_u575_pair_context.PairContextCapture.test_failed_original_report_cannot_publish_context)",
+        "test_generated_bundle_symlink_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_generated_bundle_symlink_is_rejected)",
+        "test_missing_import_relation_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_missing_import_relation_is_rejected)",
+        "test_missing_internal_load_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_missing_internal_load_is_rejected)",
+        "test_original_gate_root_boundary_still_rejects_foreign_source (scripts.ci.test_u575_pair_context.PairContextCapture.test_original_gate_root_boundary_still_rejects_foreign_source)",
+        "test_relative_unresolved_library_query_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_relative_unresolved_library_query_is_rejected)",
+        "test_symlink_library_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_symlink_library_is_rejected)",
+        "test_unknown_external_load_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_unknown_external_load_is_rejected)"
+      ],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-18-corrected-fixture-firstcoverage.guard.json",
+        "bytes": 3324,
+        "sha256": "d1c49bd70a16f19bb0a280020c277b772f32a937acb72ef21b972c79b454414a"
+      },
+      "working_tree_sha256": "6a597bb2dac99a3878c5482f1087e74a54a194dd9839a30283af8b6876cd6778"
+    },
+    {
+      "stage": "whole-capture-18-first-green",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-18-first-green.command.json",
+        "bytes": 1364,
+        "sha256": "7f6e67687e6d781cc38ccd45fb4a9d593f7ea68082d58637b395d4c433c1152d"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 18,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-18-first-green.guard.json",
+        "bytes": 3324,
+        "sha256": "210c63b1e86e7a61f152da52a40a7fc0aca897e83140e5cfd421de372d865755"
+      },
+      "working_tree_sha256": "921c0061c432afc110cdb77239d74bbdfc0a940aad0ed070cae3dbfdd611c3f9"
+    },
+    {
+      "stage": "whole-capture-18-first-implementation",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-18-first-implementation.command.json",
+        "bytes": 1399,
+        "sha256": "ee6f72bf0e36c85f8347eaf1b21771be98427768426a90fdda81886ad26db096"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 18,
+      "failures": [
+        "test_missing_import_relation_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_missing_import_relation_is_rejected)",
+        "test_unknown_external_load_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_unknown_external_load_is_rejected)"
+      ],
+      "errors": [
+        "test_coherent_closure_publishes_exact_context_and_explicit_unbuilt (scripts.ci.test_u575_pair_context.PairContextCapture.test_coherent_closure_publishes_exact_context_and_explicit_unbuilt)",
+        "test_original_gate_root_boundary_still_rejects_foreign_source (scripts.ci.test_u575_pair_context.PairContextCapture.test_original_gate_root_boundary_still_rejects_foreign_source)"
+      ],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-18-first-implementation.guard.json",
+        "bytes": 3324,
+        "sha256": "366bad188ff4ad21a7a4b64ad958aa2bbd7342e5b303c6b62edc5bea316ac454"
+      },
+      "working_tree_sha256": "d5dbff9f218cbd6576e8358eea51dd928ca324567d51050642a398b762823a81"
+    },
+    {
+      "stage": "whole-capture-19-reader-rebinding-green",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-19-reader-rebinding-green.command.json",
+        "bytes": 1408,
+        "sha256": "0b26acd6a266667ba9dd2e7195cbc377f79456369c59ce04898070ab3d1912aa"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 19,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-19-reader-rebinding-green.guard.json",
+        "bytes": 3324,
+        "sha256": "54bb7c1280308a90d20f53b69411bae099bfaf5d2622a1cc23368ad9b2788ca8"
+      },
+      "working_tree_sha256": "c0d9176353fcde48728f2c64a70d97fa21fa9e519c3b0e72e16cc1054e7427cb"
+    },
+    {
+      "stage": "whole-capture-19-reader-rebinding-red",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-19-reader-rebinding-red.command.json",
+        "bytes": 1400,
+        "sha256": "8486b17320fc7d305af47677964a3d4e4421af7b3eabe7ca7f7654f4ea4917d2"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 19,
+      "failures": [
+        "test_changed_noncompiler_reader_cannot_rebind_report (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_noncompiler_reader_cannot_rebind_report)"
+      ],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-19-reader-rebinding-red.guard.json",
+        "bytes": 3324,
+        "sha256": "4de8701944513e4dd62a7bcd5553490f4604ba4025622dcaf86804dc76a3e16b"
+      },
+      "working_tree_sha256": "bd6c0ea474dd53d604716dceff61c866d4aa14b70eb5124709dcad22a92be467"
+    },
+    {
+      "stage": "whole-capture-21-fileapi-window-green",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-fileapi-window-green.command.json",
+        "bytes": 1400,
+        "sha256": "4efc8b56c48d9206b35c9e9c5a4495bc21386607f0f0c63fa7b04481cd32133e"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 21,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-fileapi-window-green.guard.json",
+        "bytes": 3324,
+        "sha256": "db393d99d15e58ce98913d5b8acb3176f4d2c539d78bcfcabea2a631d6539db6"
+      },
+      "working_tree_sha256": "06692713ee40805c024d6a1e4ba5ea1bc0ba5dd43b3564952082da6b9b4d8ceb"
+    },
+    {
+      "stage": "whole-capture-21-final",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-final.command.json",
+        "bytes": 1339,
+        "sha256": "229858faa63da03fe0be635cb59ef685501f9b50d59e2b15bf245dfc1e1f6041"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 21,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-final.guard.json",
+        "bytes": 3324,
+        "sha256": "4bad76e4392648da746f9d92685f8fd6ac1bd3b7844df0137f2a71fd4be49744"
+      },
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    {
+      "stage": "whole-capture-21-local-and-library-red",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-local-and-library-red.command.json",
+        "bytes": 1404,
+        "sha256": "0ca6b7927ab1bcf358f0aa69783711549a777c5d0a5b4a000675bf8ba50a580d"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 21,
+      "failures": [
+        "test_unrelated_local_load_cannot_be_promoted_by_map_alone (scripts.ci.test_u575_pair_context.PairContextCapture.test_unrelated_local_load_cannot_be_promoted_by_map_alone)"
+      ],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-local-and-library-red.guard.json",
+        "bytes": 3324,
+        "sha256": "b705dfdbcd96d292214a3e38b0a9aaf2240b8cff57021ab506acca498b4ac22d"
+      },
+      "working_tree_sha256": "c3ab032cb285c7b703714a6fe508eb2febfc7ce88a2240ba16b66cfd148af1be"
+    },
+    {
+      "stage": "whole-capture-21-stable-library-window-red",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-stable-library-window-red.command.json",
+        "bytes": 1420,
+        "sha256": "a5aa185e1afdcd883a9de3169f25676b5dd6c82fe10dcfce17d98d4f61073cd4"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 21,
+      "failures": [
+        "test_library_change_after_initial_after_snapshot_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_library_change_after_initial_after_snapshot_is_rejected)",
+        "test_unrelated_local_load_cannot_be_promoted_by_map_alone (scripts.ci.test_u575_pair_context.PairContextCapture.test_unrelated_local_load_cannot_be_promoted_by_map_alone)"
+      ],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-21-stable-library-window-red.guard.json",
+        "bytes": 3324,
+        "sha256": "e4a502586df791abb4bcd4a8fb62965df58f734ffc929a21daaa50aaa9981f77"
+      },
+      "working_tree_sha256": "b156bb9e189854cd9193caf25c46b4f1866ea6e791f46647fe988cd6fffc3eee"
+    },
+    {
+      "stage": "u575-pair-capture-newAPI-firstcoverage-setup",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-capture-firstcoverage-setup.command.json",
+        "bytes": 1395,
+        "sha256": "56338659c33f63c6519366c0ab6a76f945b71032082bb15d2bbed17851edf316"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 18,
+      "failures": [],
+      "errors": [
+        "test_alias_library_choices_are_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_alias_library_choices_are_rejected)",
+        "test_before_queries_and_complete_bytes_precede_future_build (scripts.ci.test_u575_pair_context.PairContextCapture.test_before_queries_and_complete_bytes_precede_future_build)",
+        "test_changed_compiler_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_compiler_rejected)",
+        "test_changed_library_mode_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_library_mode_rejected)",
+        "test_changed_original_library_rejected_without_context (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_original_library_rejected_without_context)",
+        "test_changed_retained_before_bytes_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_changed_retained_before_bytes_rejected)",
+        "test_coherent_closure_publishes_exact_context_and_explicit_unbuilt (scripts.ci.test_u575_pair_context.PairContextCapture.test_coherent_closure_publishes_exact_context_and_explicit_unbuilt)",
+        "test_dirty_source_is_rejected_before_query_or_copy (scripts.ci.test_u575_pair_context.PairContextCapture.test_dirty_source_is_rejected_before_query_or_copy)",
+        "test_existing_context_is_not_overwritten (scripts.ci.test_u575_pair_context.PairContextCapture.test_existing_context_is_not_overwritten)",
+        "test_existing_or_symlink_control_directory_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_existing_or_symlink_control_directory_is_rejected)",
+        "test_failed_original_report_cannot_publish_context (scripts.ci.test_u575_pair_context.PairContextCapture.test_failed_original_report_cannot_publish_context)",
+        "test_generated_bundle_symlink_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_generated_bundle_symlink_is_rejected)",
+        "test_missing_import_relation_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_missing_import_relation_is_rejected)",
+        "test_missing_internal_load_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_missing_internal_load_is_rejected)",
+        "test_original_gate_root_boundary_still_rejects_foreign_source (scripts.ci.test_u575_pair_context.PairContextCapture.test_original_gate_root_boundary_still_rejects_foreign_source)",
+        "test_relative_unresolved_library_query_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_relative_unresolved_library_query_is_rejected)",
+        "test_symlink_library_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_symlink_library_is_rejected)",
+        "test_unknown_external_load_is_rejected (scripts.ci.test_u575_pair_context.PairContextCapture.test_unknown_external_load_is_rejected)"
+      ],
+      "skips_mentioned": false,
+      "source_guard": null,
+      "working_tree_sha256": null
+    },
+    {
+      "stage": "whole-pair-65-fileapi-first-green",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-65-fileapi-first-green.command.json",
+        "bytes": 1388,
+        "sha256": "63a51bad3212c8c6dc25094069ad661a48341600c87b9f8de7743d5c20c7c177"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 65,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-65-fileapi-first-green.guard.json",
+        "bytes": 3324,
+        "sha256": "b7f2f6f44d86077ed9095beaddbdb2bf0baf9925baee45e25b4108513f992390"
+      },
+      "working_tree_sha256": "11124dfd48ef1b9d218f4b57aa6ebc839fd0db6531a5f93aac1109083c692c75"
+    },
+    {
+      "stage": "whole-pair-65-fileapi-firstcoverage",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-65-fileapi-firstcoverage.command.json",
+        "bytes": 1395,
+        "sha256": "6f8fad150c0f0a658dccb443940d6316be9a73b34ec35b205327a7e2cf095e22"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 65,
+      "failures": [],
+      "errors": [
+        "test_duplicate_target_ids_or_reply_paths_are_rejected (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_duplicate_target_ids_or_reply_paths_are_rejected) (key='id')",
+        "test_duplicate_target_ids_or_reply_paths_are_rejected (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_duplicate_target_ids_or_reply_paths_are_rejected) (key='jsonFile')",
+        "test_missing_or_cyclic_dependency_is_rejected (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_missing_or_cyclic_dependency_is_rejected) (dependencies=[{'id': 'absent'}])",
+        "test_missing_or_cyclic_dependency_is_rejected (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_missing_or_cyclic_dependency_is_rejected) (dependencies=[{'id': 'app-id'}])",
+        "test_only_actual_executable_dependency_closure_is_selected (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_only_actual_executable_dependency_closure_is_selected)",
+        "test_optional_typed_api_refs_are_collected_without_changing_legacy (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_optional_typed_api_refs_are_collected_without_changing_legacy)",
+        "test_reply_escape_and_artifact_escape_are_rejected (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_reply_escape_and_artifact_escape_are_rejected)",
+        "test_stage_root_image_and_target_identity_must_match (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_stage_root_image_and_target_identity_must_match) (field='build')",
+        "test_stage_root_image_and_target_identity_must_match (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_stage_root_image_and_target_identity_must_match) (field='image')",
+        "test_stage_root_image_and_target_identity_must_match (tools.testing.test_u575_pair_evidence.PortableCmakeLinkGraph.test_stage_root_image_and_target_identity_must_match) (field='target')"
+      ],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-65-fileapi-firstcoverage.guard.json",
+        "bytes": 3324,
+        "sha256": "7394f49a005032b1ef9fd4705f201b7f1a33b9be3143173ead88c5d13dc8dd81"
+      },
+      "working_tree_sha256": "c6c48594fa6e9a09714682588c19b80f09953c787b3b9bf992aa4148c278ab2f"
+    },
+    {
+      "stage": "whole-pair-70-capture-library-binding-green",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-70-capture-library-binding-green.command.json",
+        "bytes": 1427,
+        "sha256": "78cdcc9359a6e127c09eb066a9b0b84d1077ff9b87c57966f7a9d54d7207ff2e"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 70,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-70-capture-library-binding-green.guard.json",
+        "bytes": 3324,
+        "sha256": "57331acb26da62493018c7834658de94a989b860d17e4fa66b680f0c16eadce3"
+      },
+      "working_tree_sha256": "0965759fd30ab771c47688dee460da059ed66cbe22978579cbf8022e49039416"
+    },
+    {
+      "stage": "whole-pair-70-capture-library-binding-red",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-70-capture-library-binding-red.command.json",
+        "bytes": 1420,
+        "sha256": "33dc1b347ad6b3c365eadd926f2ecd0dbe28ef94af876b2acfb385a57ff15c0a"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 70,
+      "failures": [
+        "test_rehashed_library_bytes_must_equal_before_and_after (tools.testing.test_u575_pair_evidence.CapturedFileApiClosure.test_rehashed_library_bytes_must_equal_before_and_after)",
+        "test_unknown_external_load_cannot_be_after_authorized (tools.testing.test_u575_pair_evidence.CapturedFileApiClosure.test_unknown_external_load_cannot_be_after_authorized)"
+      ],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-70-capture-library-binding-red.guard.json",
+        "bytes": 3324,
+        "sha256": "6723db7530235416cf1ecdfb02865e9441d6ad794f57511301f80952b4c9b290"
+      },
+      "working_tree_sha256": "affc7cc4e973128788676e36b47bb74923de14eca74d62cd5abd5e8dedd1ec86"
+    },
+    {
+      "stage": "whole-pair-70-final",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-70-final.command.json",
+        "bytes": 1332,
+        "sha256": "0450623aeacbfb850eb4c5b98e83a29e9b6ced6619f88755c2e61a6ba0f6bc5f"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 70,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-pair-70-final.guard.json",
+        "bytes": 3324,
+        "sha256": "ba1e4c67303b2c4ca25c64fd456ba7073da0e8d8452eb0d423467df1a2cc9cb8"
+      },
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    {
+      "stage": "whole-workflow-57-correct-environment-red",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-57-correct-environment-red.command.json",
+        "bytes": 1393,
+        "sha256": "6b912af7a7206a9e0bcdc57f461ab76d750375ca18b98d6f89e62e18d2aa14f0"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 57,
+      "failures": [
+        "test_u575_pair_context_capture_is_required_on_original_gate (__main__.WorkflowContracts.test_u575_pair_context_capture_is_required_on_original_gate)",
+        "test_u575_pair_shell_requires_verify_before_copying_opaque_artifacts (__main__.WorkflowContracts.test_u575_pair_shell_requires_verify_before_copying_opaque_artifacts)",
+        "test_u575_pair_upload_binds_verified_transport_and_original_raw (__main__.WorkflowContracts.test_u575_pair_upload_binds_verified_transport_and_original_raw) (step='Preserve compiler evidence')",
+        "test_u575_pair_upload_binds_verified_transport_and_original_raw (__main__.WorkflowContracts.test_u575_pair_upload_binds_verified_transport_and_original_raw) (step='Bind the upload to observed execution identity')"
+      ],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-57-correct-environment-red.guard.json",
+        "bytes": 16785,
+        "sha256": "6832e52b31bfa3ee3d47373efedba21e1b78513ef93a933dfb6de9f8d7669cfb"
+      },
+      "working_tree_sha256": "6a597bb2dac99a3878c5482f1087e74a54a194dd9839a30283af8b6876cd6778"
+    },
+    {
+      "stage": "whole-workflow-57-final",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-57-final.command.json",
+        "bytes": 1320,
+        "sha256": "6da579b5451abed2518b7830a2fc642587d2c4de038602e193749830449c78b4"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 57,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-57-final.guard.json",
+        "bytes": 3324,
+        "sha256": "07ced43076df905b5c882eae96b331449c3dcacf91687802cf78ebec9ee79ff2"
+      },
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    {
+      "stage": "whole-workflow-57-first-green",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-57-first-green.command.json",
+        "bytes": 1344,
+        "sha256": "ab490bfaaa8c9077a1a3edd1283166f5d57609e2c495d00401006c32fd0a0afc"
+      },
+      "actual_exit": 0,
+      "withdrawal_complete": true,
+      "cases": 57,
+      "failures": [],
+      "errors": [],
+      "skips_mentioned": false,
+      "source_guard": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-57-first-green.guard.json",
+        "bytes": 3324,
+        "sha256": "0901fabeceea6d487dabd497d99011171517a0b528a8c03419d06c52346614f8"
+      },
+      "working_tree_sha256": "b1f80c683708d50851a62efb8c60ed3fb2d516e1e61cb1b1c18cab1206b05e76"
+    },
+    {
+      "stage": "u575-pair-CI-whole57-missing-delivery-red",
+      "command_record": {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/whole-workflow-missing-capture-red.command.json",
+        "bytes": 1373,
+        "sha256": "897f07eb4ebff1dd9ee0d6507868fe044b4d1e57c9c8fe56bcf2ba9eda7e8ca7"
+      },
+      "actual_exit": 1,
+      "withdrawal_complete": true,
+      "cases": 57,
+      "failures": [
+        "test_all_skipped_does_not_establish_execution (__main__.CTestAdmission.test_all_skipped_does_not_establish_execution)",
+        "test_failed_ctest_cannot_reuse_stale_success (__main__.CTestAdmission.test_failed_ctest_cannot_reuse_stale_success)",
+        "test_real_success_requires_fresh_test_execution (__main__.CTestAdmission.test_real_success_requires_fresh_test_execution)",
+        "test_zero_tests_fail (__main__.CTestAdmission.test_zero_tests_fail)",
+        "test_u575_pair_context_capture_is_required_on_original_gate (__main__.WorkflowContracts.test_u575_pair_context_capture_is_required_on_original_gate)",
+        "test_u575_pair_shell_requires_verify_before_copying_opaque_artifacts (__main__.WorkflowContracts.test_u575_pair_shell_requires_verify_before_copying_opaque_artifacts)",
+        "test_u575_pair_upload_binds_verified_transport_and_original_raw (__main__.WorkflowContracts.test_u575_pair_upload_binds_verified_transport_and_original_raw) (step='Preserve compiler evidence')",
+        "test_u575_pair_upload_binds_verified_transport_and_original_raw (__main__.WorkflowContracts.test_u575_pair_upload_binds_verified_transport_and_original_raw) (step='Bind the upload to observed execution identity')"
+      ],
+      "errors": [
+        "test_failed_prepare_preserves_original_diagnostics_without_ready (__main__.SoftwareQualificationContracts.test_failed_prepare_preserves_original_diagnostics_without_ready)",
+        "test_failed_validated_checkout_uses_actual_failed_job_identity (__main__.SoftwareQualificationContracts.test_failed_validated_checkout_uses_actual_failed_job_identity)",
+        "test_identity_and_failure_upload_are_explicit_and_exact (__main__.SoftwareQualificationContracts.test_identity_and_failure_upload_are_explicit_and_exact)",
+        "test_offline_navigation_is_sealed_opaque_before_actual_host_identity (__main__.SoftwareQualificationContracts.test_offline_navigation_is_sealed_opaque_before_actual_host_identity)",
+        "test_real_finalizer_preserves_partial_upload_failure (__main__.SoftwareQualificationContracts.test_real_finalizer_preserves_partial_upload_failure)",
+        "test_transport_plan_uses_the_single_role_authority (__main__.SoftwareQualificationContracts.test_transport_plan_uses_the_single_role_authority)",
+        "test_actions_initializer_covers_every_declared_gitlink (__main__.WorkflowContracts.test_actions_initializer_covers_every_declared_gitlink)",
+        "test_actions_initializer_uses_recursive_pinned_gitlinks (__main__.WorkflowContracts.test_actions_initializer_uses_recursive_pinned_gitlinks)",
+        "test_threadx_matrix_uses_locked_kernel_and_retains_execution (__main__.WorkflowContracts.test_threadx_matrix_uses_locked_kernel_and_retains_execution)"
+      ],
+      "skips_mentioned": false,
+      "source_guard": null,
+      "working_tree_sha256": null
+    }
+  ],
+  "old_workflow_methods_exactbytes": 54,
+  "final_workflow_methods": 57,
+  "legacy_gate19_and_README_exact_before_bytes": true,
+  "single_ELF_and_store_unchanged": [
+    {
+      "path": "tools/evidence/store.py",
+      "bytes": 20496,
+      "sha256": "e3a9bde01dae28c3524daf9203a1512a66f317a99a62a7a0acf22e43a3013d7d",
+      "working_equals_HEAD": true
+    },
+    {
+      "path": "tools/evidence/candidate.py",
+      "bytes": 15350,
+      "sha256": "e49e30fceecaccbe7b2d12de03ed35257cef7583e4158c4bc841a54113a085bd",
+      "working_equals_HEAD": true
+    },
+    {
+      "path": "tools/evidence/common.py",
+      "bytes": 11199,
+      "sha256": "70245d32c0f0dc2746d7f6a5403f5f5c6b426177d4b058ab42bc8434c7c38b7f",
+      "working_equals_HEAD": true
+    }
+  ],
+  "reviewer_adapter_first_attempt": "exit1 KeyError returncode: one historical guard stores CompletedProcess text under result. Maintained original receipt still supplies actual exit; source/index unchanged; no report written by first attempt. Reviewer assumption only, not product RED.",
+  "reviewer_imported_or_executed_project_tools": false,
+  "reviewer_reran_tests_or_ARM": false,
+  "reviewer_source_or_index_write": false
+}

@@ -1,0 +1,13 @@
+{
+  "frozen_original_leaves": 157,
+  "all_member_bytes_modes_uid_gid_nsmtime_verified": true,
+  "full_gzip_crc_eof": true,
+  "originals_before_after_unchanged": true,
+  "archive": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/execution-evidence-r1.tar.gz",
+    "bytes": 1000754,
+    "sha256": "93a7e172659d805e8000e34df7cdfb2efa6528aec086b17dbee804c695d9fcb4"
+  },
+  "plan_sha256": "915fe8b122eb684bc3087908f04aa1a09e08bb456c03660076ac6744622f5367",
+  "later_control_files_outside_archive": true
+}

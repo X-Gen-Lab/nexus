@@ -1,0 +1,1185 @@
+{
+  "schema_version": 1,
+  "kind": "independent-U575-final-Root-normalized34-transport-review",
+  "reviewer": "/root/d3_translation_review",
+  "utc": "2026-10-18T12:13:46.675Z",
+  "verdict": "PASS_FINAL_NORMALIZED34_TRANSPORT",
+  "confirmed_transport_blockers": [],
+  "conclusion": "The exact final Root map aba9 binds 34 safe, unique target rows: eight canonical source files and26 evidence files. All full bytes/SHA256/declared modes match; the first31 rows and their bytes remain identical to immutable f4dd. Complete archive/member/original closure preserves historical failed attempts and raw evidence. The three appended originals include the actual completed formal eight-source review and full audit; no pending review is presumed. This transport PASS is suitable for Root to bind before ordinary integration/full-index gates, not a report of those gates or a new ARM/restore/candidate qualification.",
+  "map": {
+    "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/root-integration-map-r2.json",
+    "bytes": 26823,
+    "sha256": "aba9a2a5e82f1015d59ecbab2cc4adffe704e720ce53d95e47dc980e73eec5a9"
+  },
+  "previous_immutable_map": {
+    "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/root-integration-map-r1.json",
+    "bytes": 24081,
+    "sha256": "f4dd9fb5a742aa9ef6714210d380141100df4be9b9badddca07c6ce6480226e1"
+  },
+  "counts": {
+    "rows": 34,
+    "source": 8,
+    "evidence": 26,
+    "logical_bytes": 2714653,
+    "source_bytes": 247291,
+    "evidence_prefix_allocated_bytes": 2514944,
+    "archives": 7,
+    "regular_member_occurrences": 351,
+    "nested_gzip_leaf_CRC_checks": 30,
+    "raw_JSON_copies": 15
+  },
+  "review_actions": {
+    "read_only": true,
+    "project_modules_imported": false,
+    "SUT_or_archived_tools_executed": false,
+    "tests_or_ARM_or_restore_rerun": false,
+    "Git_commands_or_Main_or_index_access": false,
+    "source_or_index_mutated": false,
+    "filesystem_archive_extraction": false,
+    "large_files_copied": false,
+    "method": "Read complete normalized files, matching origin/frozen copies and metadata, source freeze/handoff/leafmaps, actual final independent report/audit, every declared member of seven compressed archives, and exact file inventories of only the three named feature roots. Validate full gzip streams to EOF/CRC. Read bounded nested gzip data in memory to EOF and compute complete uncompressed hashes. Only this fresh independent report is written."
+  },
+  "path_and_identity_checks": {
+    "all34_targets_relative_canonical_POSIX_no_NUL_backslash_dotdot_or_dot_git": true,
+    "all34_casefold_unique_and_no_file_parent_prefix_conflict": true,
+    "all34_durable_paths_exact_under_Root_files_target": true,
+    "all34_durable_sources_canonical_regular_nonsymlink_with_nonsymlink_parents": true,
+    "all34_complete_size_SHA256_mode_matched": true,
+    "original31_declared_UID_GID_nsmtime_matched": true,
+    "new3_full_original_size_SHA256_mode_matched": true,
+    "new3_UID_GID_nsmtime_not_declared_in_map": "No extra metadata identity is inferred for fields omitted from the three appended rows.",
+    "exact_Root_files_physical_tree_equals_map34": true,
+    "canonical_source_count8_and_only8_targets_outside_evidence_prefix": true,
+    "evidence_prefix": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/",
+    "all_archive_member_names_safe_casefold_distinct_regular_no_symlink_hardlink_sparse_or_file_parent_conflict": true,
+    "literal_historical_absolute_path_labels": "Inert original labels remain unchanged; no archived command/tool/path is executed or used for source promotion."
+  },
+  "source_tuple": {
+    "freeze": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-source-freeze.json.raw",
+      "bytes": 4662,
+      "sha256": "4844f2af9e41f2a26f42a2af360b801bf02af689b98ae2bfd0cee391c6288392"
+    },
+    "source_rows": [
+      {
+        "path": "tools/evidence/u575_pair.py",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/tools/evidence/u575_pair.py",
+        "bytes": 44156,
+        "sha256": "41df8c286fc35b313490f5959e1fd9e87d4b448bf61efaff84ee8ad9ccb0333f",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": "tools/testing/test_u575_pair_evidence.py",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/tools/testing/test_u575_pair_evidence.py",
+        "bytes": 42646,
+        "sha256": "39ebf2c6707e3680ba7e90cf37132e8ae6fc22cd28cd2e2b18aa966618f8fe61",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": "tests/contracts/u575_trustzone/test_gate.py",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/before/tests/contracts/u575_trustzone/test_gate.py",
+        "bytes": 10349,
+        "sha256": "3b3b843c88d7aaf4eedca001ac26e824db4e883dcef9e3f970289f5959311d94",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": "tests/contracts/u575_trustzone/README.md",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/before/tests/contracts/u575_trustzone/README.md",
+        "bytes": 10974,
+        "sha256": "d8f2b8f116a5bc292be558accd6006f6e396c8b7a73b1d06425a516327eca4c5",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": ".github/workflows/build-matrix.yml",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/.github/workflows/build-matrix.yml",
+        "bytes": 20687,
+        "sha256": "2f9c7a87731c4d1f9dabfecd3177321745e227a96c01c4fece3f885186855bc6",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": "scripts/ci/u575_trustzone.py",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/scripts/ci/u575_trustzone.py",
+        "bytes": 29010,
+        "sha256": "81cbbb30339f418956f085a3211262d0ac33586212355d86457cfa50cc7fae3b",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": "scripts/ci/test_u575_pair_context.py",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/scripts/ci/test_u575_pair_context.py",
+        "bytes": 13267,
+        "sha256": "518e3b4cf4c104f5fb661049863563515a10b4f8ddd6807c10c37223a6ee3728",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      },
+      {
+        "path": ".github/workflows/test_platform_ci.py",
+        "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/.github/workflows/test_platform_ci.py",
+        "bytes": 76202,
+        "sha256": "638185c3262718743a09feab7afaf5672fcf35fab924a18f3f3c458864fb4540",
+        "source_persistence": "volatile_until_Root_normal_commit_and_push"
+      }
+    ],
+    "source_identity": {
+      "root": "/dev/shm/nexus-qualification-transport-20261018-r1",
+      "commit": "678245a3a981f17777d97220c8af63840a754596",
+      "tree": "cbe1042b0683582b80c180f4235cbc539030b284",
+      "dirty": true,
+      "submodules": [
+        "-dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos",
+        "-93387b0a60382a29579bbad5045c68328e3751df ext/threadx",
+        " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+        "-c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1",
+        " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+        "-626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4",
+        "-8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7",
+        "-624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5",
+        "-fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal",
+        " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)",
+        "-f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal",
+        "-a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal",
+        "-2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal"
+      ],
+      "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+    },
+    "index_sha256": "1a4c0ef193f82f82a5152311e34487855eb24f517738722f6b045903ccd85f21",
+    "all8_Root_full_copy_frozen_copy_and_current_author_owner_size_SHA_equal": true,
+    "map_leafmap_freeze_identity_exact": true,
+    "identity_scope": "Author baseline678245a3, dirty working tree73880b... and recorded partially initialized gitlinks are preserved as pure-development identity. Do not relabel this tuple as Main a3b8, a clean source, or an actual new ARM-pair source."
+  },
+  "anchors": {
+    "capture-source-freeze.json.raw": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-source-freeze.json.raw",
+      "bytes": 4662,
+      "sha256": "4844f2af9e41f2a26f42a2af360b801bf02af689b98ae2bfd0cee391c6288392"
+    },
+    "capture-completed-handoff.json.raw": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-completed-handoff.json.raw",
+      "bytes": 1628,
+      "sha256": "193097e23a9c8ac548b1186dafe15834dd17ad75204941eeec14fc4ab2fb9024"
+    },
+    "capture-full-leafmap.json.raw": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-full-leafmap.json.raw",
+      "bytes": 106104,
+      "sha256": "a0e162e14a5b34f770d1581f6d526c8b201bd56c3d03bb44706e0b007a05da67"
+    },
+    "capture-157-member-map.json.raw": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-157-member-map.json.raw",
+      "bytes": 46758,
+      "sha256": "915fe8b122eb684bc3087908f04aa1a09e08bb456c03660076ac6744622f5367"
+    },
+    "capture-validation-summary.json.raw": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-validation-summary.json.raw",
+      "bytes": 27448,
+      "sha256": "7cdf2edc26610ba33811ad725a6e089be83b2d4bd769912be3585d0db674e1e3"
+    },
+    "r1-complete-originals.tar.gz.inventory.json": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r1-complete-originals.tar.gz.inventory.json",
+      "bytes": 40824,
+      "sha256": "0f4f0d593ea56ebfdee60d1273de80c2479b010005171dc7340d57fd9659eda8"
+    },
+    "r2-complete-originals.tar.gz.inventory.json": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r2-complete-originals.tar.gz.inventory.json",
+      "bytes": 10951,
+      "sha256": "2b06b740553222c94becc834c7ea8b9c427ed260c070ed6e67189a7a1d457be2"
+    },
+    "capture-complete-later-controls.tar.gz.inventory.json": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-complete-later-controls.tar.gz.inventory.json",
+      "bytes": 5975,
+      "sha256": "f342da5e86a31a097d6c4b518fb0a47df7ffc77234b03ef538fd14b38900a090"
+    },
+    "integration-bridge-r1.json": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/integration-bridge-r1.json",
+      "bytes": 1901,
+      "sha256": "7cf95d0967140d94d1be63edb1a06b16e65a8bc385c284a59d3e1ac97f9e8960"
+    }
+  },
+  "normalized_delta": {
+    "original_first31_rows_deep_equal": true,
+    "source8_unchanged": true,
+    "added_only3_original_rows": [
+      {
+        "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-independent-review.json.raw",
+        "durable_source": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-independent-review.json.raw",
+        "bytes": 21494,
+        "sha256": "cf80a4f88dc01652807bb28e3a39c81d41c86a16b6a743c94361b91bcc9a191e",
+        "mode": 384,
+        "origin": {
+          "original": "/dev/shm/nexus-u575-pair-eight-source-independent-review-20261018-r1/final-review-r1.json",
+          "scope": "full original independent review/audit or immutable prior transport map; no rewrite of archived evidence"
+        }
+      },
+      {
+        "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-evidence-audit.json.raw",
+        "durable_source": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-evidence-audit.json.raw",
+        "bytes": 33153,
+        "sha256": "130fc14548247950e3deb9b1a6039ab9ec524bc81fee22a1e011e85a946dd30a",
+        "mode": 384,
+        "origin": {
+          "original": "/dev/shm/nexus-u575-pair-eight-source-independent-review-20261018-r1/evidence-audit-r1.json",
+          "scope": "full original independent review/audit or immutable prior transport map; no rewrite of archived evidence"
+        }
+      },
+      {
+        "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/original-root-normalization-map-r1.json.raw",
+        "durable_source": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/original-root-normalization-map-r1.json.raw",
+        "bytes": 24081,
+        "sha256": "f4dd9fb5a742aa9ef6714210d380141100df4be9b9badddca07c6ce6480226e1",
+        "mode": 384,
+        "origin": {
+          "original": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/root-integration-map-r1.json",
+          "scope": "full original independent review/audit or immutable prior transport map; no rewrite of archived evidence"
+        }
+      }
+    ],
+    "original_r1_map_file_is_full_exact_f4dd_raw_copy": true,
+    "changed_nonfile_fields": {
+      "evidence_file_count": {
+        "old": 23,
+        "new": 26
+      },
+      "formal_final8_review": {
+        "old": "pending_separate_bridge",
+        "new": {
+          "status": "PASS for exact eight source and original pure-development evidence; not actual ARM or candidate qualification",
+          "source_review_sha256": "cf80a4f88dc01652807bb28e3a39c81d41c86a16b6a743c94361b91bcc9a191e",
+          "evidence_audit_sha256": "130fc14548247950e3deb9b1a6039ab9ec524bc81fee22a1e011e85a946dd30a",
+          "original_transport_map_sha256": "f4dd9fb5a742aa9ef6714210d380141100df4be9b9badddca07c6ce6480226e1"
+        }
+      },
+      "Root_append_scope": {
+        "old": null,
+        "new": "Only original full final independent report, full evidence audit and prior map; all original31 rows and eight source bytes unchanged. Final normalization independent review pending."
+      }
+    },
+    "old_pending_wording_preserved": "The old f4dd map, archived original handoff/leafmap and integration-bridge retain their historical pending-separate-review text unchanged. The final Root map adds a separate formal-review bridge with actual cf80/130f hashes; it does not rewrite old evidence."
+  },
+  "archive_checks": [
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r1-complete-originals.tar.gz",
+        "bytes": 943623,
+        "sha256": "919caf20d4ac89e3430eec316da1510a05d8ad5fc3027417adb95ccda79d2858"
+      },
+      "members": 97,
+      "member_payload_bytes": 1275169,
+      "full_gzip_decoded_bytes": 1454080,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "before/tests/contracts/u575_trustzone/README.md",
+        "before/tests/contracts/u575_trustzone/test_gate.py",
+        "before-context-history.py.gz",
+        "before-include-conflict.py.gz",
+        "before-index.gz",
+        "before-member-digest.py.gz",
+        "before-strict-schema.py.gz",
+        "before-wrap-u575_pair.py.gz",
+        "before.json",
+        "context-history-tests.py.gz",
+        "files/tests/contracts/u575_trustzone/README.md",
+        "files/tests/contracts/u575_trustzone/test_gate.py",
+        "files/tools/evidence/u575_pair.py",
+        "files/tools/testing/test_u575_pair_evidence.py",
+        "final-checks-raw-map-r1.json",
+        "final-checks-raw-r1.tar.gz",
+        "final-four-source-freeze-r1.json",
+        "first-implementation/test_u575_pair_evidence.py.gz",
+        "first-implementation/u575_pair.py.gz",
+        "firstcoverage.attempts/1792318737036239667-dee0cee74a094cf0a2dd0c2b41a2a661/receipt.json",
+        "firstcoverage.attempts/1792318737036239667-dee0cee74a094cf0a2dd0c2b41a2a661/stderr.txt",
+        "firstcoverage.attempts/1792318737036239667-dee0cee74a094cf0a2dd0c2b41a2a661/stdout.txt",
+        "firstcoverage.command.json",
+        "firstcoverage.log",
+        "handoff-pure-r1.json",
+        "include-conflict-tests.py.gz",
+        "member-digest-red-tests.py.gz",
+        "real-corpus-budget-forecast-r1.json",
+        "same-checker-before-fixes.py.gz",
+        "same-checker-regressions.py.gz",
+        "strict-schema-tests.py.gz",
+        "two-schema-red-tests.py.gz",
+        "whole-context-history-red.attempts/1792319500133034100-c3a2d4b2e1a84e04908682147d4c1ea0/receipt.json",
+        "whole-context-history-red.attempts/1792319500133034100-c3a2d4b2e1a84e04908682147d4c1ea0/stderr.txt",
+        "whole-context-history-red.attempts/1792319500133034100-c3a2d4b2e1a84e04908682147d4c1ea0/stdout.txt",
+        "whole-context-history-red.command.json",
+        "whole-context-history-red.log",
+        "whole-corrected-regressions.attempts/1792319056894366433-37c3a2bc8de44a6f92e171e2ff816d5c/receipt.json",
+        "whole-corrected-regressions.attempts/1792319056894366433-37c3a2bc8de44a6f92e171e2ff816d5c/stderr.txt",
+        "whole-corrected-regressions.attempts/1792319056894366433-37c3a2bc8de44a6f92e171e2ff816d5c/stdout.txt",
+        "whole-corrected-regressions.command.json",
+        "whole-corrected-regressions.log",
+        "whole-discovered-regressions.attempts/1792319023587825374-a311f1976d2f4db59b26678c2aee5efe/receipt.json",
+        "whole-discovered-regressions.attempts/1792319023587825374-a311f1976d2f4db59b26678c2aee5efe/stderr.txt",
+        "whole-discovered-regressions.attempts/1792319023587825374-a311f1976d2f4db59b26678c2aee5efe/stdout.txt",
+        "whole-discovered-regressions.command.json",
+        "whole-discovered-regressions.log",
+        "whole-first-implementation.attempts/1792318947446576417-34b5640cf26a45c2b2547ce6b1342027/receipt.json",
+        "whole-first-implementation.attempts/1792318947446576417-34b5640cf26a45c2b2547ce6b1342027/stderr.txt",
+        "whole-first-implementation.attempts/1792318947446576417-34b5640cf26a45c2b2547ce6b1342027/stdout.txt",
+        "whole-first-implementation.command.json",
+        "whole-first-implementation.log",
+        "whole-include-conflict-green.attempts/1792319825548834263-882d144ab14b4e2782027d4947430865/receipt.json",
+        "whole-include-conflict-green.attempts/1792319825548834263-882d144ab14b4e2782027d4947430865/stderr.txt",
+        "whole-include-conflict-green.attempts/1792319825548834263-882d144ab14b4e2782027d4947430865/stdout.txt",
+        "whole-include-conflict-green.command.json",
+        "whole-include-conflict-green.log",
+        "whole-include-conflict-red.attempts/1792319809765977343-159cb7b3fa0e4808960e83fffe90ee69/receipt.json",
+        "whole-include-conflict-red.attempts/1792319809765977343-159cb7b3fa0e4808960e83fffe90ee69/stderr.txt",
+        "whole-include-conflict-red.attempts/1792319809765977343-159cb7b3fa0e4808960e83fffe90ee69/stdout.txt",
+        "whole-include-conflict-red.command.json",
+        "whole-include-conflict-red.log",
+        "whole-member-digest-green.attempts/1792319256406777011-8844d52310894de2b139ba8f530b3803/receipt.json",
+        "whole-member-digest-green.attempts/1792319256406777011-8844d52310894de2b139ba8f530b3803/stderr.txt",
+        "whole-member-digest-green.attempts/1792319256406777011-8844d52310894de2b139ba8f530b3803/stdout.txt",
+        "whole-member-digest-green.command.json",
+        "whole-member-digest-green.log",
+        "whole-member-digest-red.attempts/1792319238645207051-5188619146d84224ad4842f3f066f0c3/receipt.json",
+        "whole-member-digest-red.attempts/1792319238645207051-5188619146d84224ad4842f3f066f0c3/stderr.txt",
+        "whole-member-digest-red.attempts/1792319238645207051-5188619146d84224ad4842f3f066f0c3/stdout.txt",
+        "whole-member-digest-red.command.json",
+        "whole-member-digest-red.log",
+        "whole-pure-final-r1.attempts/1792319521056956306-58492977d0fa426694226817c5311875/receipt.json",
+        "whole-pure-final-r1.attempts/1792319521056956306-58492977d0fa426694226817c5311875/stderr.txt",
+        "whole-pure-final-r1.attempts/1792319521056956306-58492977d0fa426694226817c5311875/stdout.txt",
+        "whole-pure-final-r1.command.json",
+        "whole-pure-final-r1.log",
+        "whole-pure-final-r2.attempts/1792319567209794946-14291cbdd5ef4f13958f5bfd8c89502f/receipt.json",
+        "whole-pure-final-r2.attempts/1792319567209794946-14291cbdd5ef4f13958f5bfd8c89502f/stderr.txt",
+        "whole-pure-final-r2.attempts/1792319567209794946-14291cbdd5ef4f13958f5bfd8c89502f/stdout.txt",
+        "whole-pure-final-r2.command.json",
+        "whole-pure-final-r2.log",
+        "whole-schema-green.attempts/1792319198197528898-4732cc3ed4794d34aff4cd214e064043/receipt.json",
+        "whole-schema-green.attempts/1792319198197528898-4732cc3ed4794d34aff4cd214e064043/stderr.txt",
+        "whole-schema-green.attempts/1792319198197528898-4732cc3ed4794d34aff4cd214e064043/stdout.txt",
+        "whole-schema-green.command.json",
+        "whole-schema-green.log",
+        "whole-strict-schema-red.attempts/1792319136285354776-d96d8a9cda1a43ed885c95d86b584a1f/receipt.json",
+        "whole-strict-schema-red.attempts/1792319136285354776-d96d8a9cda1a43ed885c95d86b584a1f/stderr.txt",
+        "whole-strict-schema-red.attempts/1792319136285354776-d96d8a9cda1a43ed885c95d86b584a1f/stdout.txt",
+        "whole-strict-schema-red.command.json",
+        "whole-strict-schema-red.log",
+        "whole-two-schema-red.attempts/1792319181666692811-57501dd8f9e04109861639843ff7aea4/receipt.json",
+        "whole-two-schema-red.attempts/1792319181666692811-57501dd8f9e04109861639843ff7aea4/stderr.txt",
+        "whole-two-schema-red.attempts/1792319181666692811-57501dd8f9e04109861639843ff7aea4/stdout.txt",
+        "whole-two-schema-red.command.json",
+        "whole-two-schema-red.log"
+      ]
+    },
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r2-complete-originals.tar.gz",
+        "bytes": 69710,
+        "sha256": "32e98764f9cbcff9dd10a25d2fb15b5bab47fadd9ba22a4224c91321ed1a5781"
+      },
+      "members": 26,
+      "member_payload_bytes": 201813,
+      "full_gzip_decoded_bytes": 256000,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "before/tools/evidence/u575_pair.py",
+        "before/tools/testing/test_u575_pair_evidence.py",
+        "before.json",
+        "final-r2-source-map-and-handoff.json",
+        "final-two-full-sources.tar.gz",
+        "fresh-final-execution.tar.gz",
+        "mechanical-extracted-tests.py.gz",
+        "mechanical-extracted-tool.py.gz",
+        "mechanical-extraction.diff.raw",
+        "mechanical-extraction.json",
+        "tests-first.py.gz",
+        "whole-existing-body-red.attempts/1792320821025687375-8107a35753724565b646ba6ed8a32ec5/receipt.json",
+        "whole-existing-body-red.attempts/1792320821025687375-8107a35753724565b646ba6ed8a32ec5/stderr.txt",
+        "whole-existing-body-red.attempts/1792320821025687375-8107a35753724565b646ba6ed8a32ec5/stdout.txt",
+        "whole-existing-body-red.command.json",
+        "whole-existing-body-red.log",
+        "whole-minimal-green.attempts/1792320885200493737-65d30009575447429d17a9c35161c8ef/receipt.json",
+        "whole-minimal-green.attempts/1792320885200493737-65d30009575447429d17a9c35161c8ef/stderr.txt",
+        "whole-minimal-green.attempts/1792320885200493737-65d30009575447429d17a9c35161c8ef/stdout.txt",
+        "whole-minimal-green.command.json",
+        "whole-minimal-green.log",
+        "whole-tests-first.attempts/1792320775837409509-58a2f35da40743f6b0a52b5414ae7d7d/receipt.json",
+        "whole-tests-first.attempts/1792320775837409509-58a2f35da40743f6b0a52b5414ae7d7d/stderr.txt",
+        "whole-tests-first.attempts/1792320775837409509-58a2f35da40743f6b0a52b5414ae7d7d/stdout.txt",
+        "whole-tests-first.command.json",
+        "whole-tests-first.log"
+      ]
+    },
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-complete-later-controls.tar.gz",
+        "bytes": 36377,
+        "sha256": "466cb2003b5e27143f2f6301a9f50cb551ed5997f5d0fe7006ac3fc9ddfef541"
+      },
+      "members": 14,
+      "member_payload_bytes": 197181,
+      "full_gzip_decoded_bytes": 225280,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "archive-inputs-r1.json",
+        "archive-verification-r1.json",
+        "budget-revision-r2.json",
+        "completed-handoff-r1.json",
+        "final-eight-source-and-evidence-leafmap-r1.json",
+        "finalize_handoff.py",
+        "seal-complete-feature-157.attempts/1792324698629829405-e32c84390b94413f8212b511174240ed/receipt.json",
+        "seal-complete-feature-157.attempts/1792324698629829405-e32c84390b94413f8212b511174240ed/stderr.txt",
+        "seal-complete-feature-157.attempts/1792324698629829405-e32c84390b94413f8212b511174240ed/stdout.txt",
+        "seal-complete-feature-157.command.json",
+        "seal-complete-feature-157.guard.json",
+        "seal-complete-feature-157.log",
+        "seal_feature.py",
+        "validation-summary-r1.json"
+      ]
+    },
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-frozen-originals-157.tar.gz",
+        "bytes": 1000754,
+        "sha256": "93a7e172659d805e8000e34df7cdfb2efa6528aec086b17dbee804c695d9fcb4"
+      },
+      "members": 157,
+      "member_payload_bytes": 1842893,
+      "full_gzip_decoded_bytes": 2119680,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "actionlint-neutral.yml",
+        "all-current-workflow-dsl.attempts/1792324533240537784-275a3cfbe539485a93379cf384465004/receipt.json",
+        "all-current-workflow-dsl.attempts/1792324533240537784-275a3cfbe539485a93379cf384465004/stderr.txt",
+        "all-current-workflow-dsl.attempts/1792324533240537784-275a3cfbe539485a93379cf384465004/stdout.txt",
+        "all-current-workflow-dsl.command.json",
+        "all-current-workflow-dsl.guard.json",
+        "all-current-workflow-dsl.log",
+        "before/.github/workflows/build-matrix.yml",
+        "before/.github/workflows/test_platform_ci.py",
+        "before/scripts/ci/u575_trustzone.py",
+        "before/tests/contracts/u575_trustzone/README.md",
+        "before/tests/contracts/u575_trustzone/test_gate.py",
+        "before/tools/evidence/u575_pair.py",
+        "before/tools/testing/test_u575_pair_evidence.py",
+        "before-eight.json",
+        "before-index.gz",
+        "budget-revision-r1.json",
+        "capture-body.py",
+        "capture-local-red-source.py.gz",
+        "capture-reader-red-source.py.gz",
+        "capture-reader-red-test.py.gz",
+        "capture-tests-first.py.gz",
+        "capture-window-red-source.py.gz",
+        "check_eight.py",
+        "fileapi-body.py",
+        "fileapi-tests.py",
+        "final/.github/workflows/build-matrix.yml",
+        "final/.github/workflows/test_platform_ci.py",
+        "final/scripts/ci/test_u575_pair_context.py",
+        "final/scripts/ci/u575_trustzone.py",
+        "final/tools/evidence/u575_pair.py",
+        "final/tools/testing/test_u575_pair_evidence.py",
+        "final-source-freeze-r1.json",
+        "portable-graph-tests.py",
+        "run_pure.py",
+        "seal-step.yml",
+        "source-eight-text-and-preserved54.attempts/1792324524324715875-b3a61745c1bb4274a10399731968e2bc/receipt.json",
+        "source-eight-text-and-preserved54.attempts/1792324524324715875-b3a61745c1bb4274a10399731968e2bc/stderr.txt",
+        "source-eight-text-and-preserved54.attempts/1792324524324715875-b3a61745c1bb4274a10399731968e2bc/stdout.txt",
+        "source-eight-text-and-preserved54.command.json",
+        "source-eight-text-and-preserved54.guard.json",
+        "source-eight-text-and-preserved54.log",
+        "test_u575_pair_evidence-graph-library-red.py.gz",
+        "u575_pair-graph-library-red.py.gz",
+        "whole-capture-18-corrected-fixture-firstcoverage.attempts/1792323722831134060-930fde775c6347589de48b67ef4d4331/receipt.json",
+        "whole-capture-18-corrected-fixture-firstcoverage.attempts/1792323722831134060-930fde775c6347589de48b67ef4d4331/stderr.txt",
+        "whole-capture-18-corrected-fixture-firstcoverage.attempts/1792323722831134060-930fde775c6347589de48b67ef4d4331/stdout.txt",
+        "whole-capture-18-corrected-fixture-firstcoverage.command.json",
+        "whole-capture-18-corrected-fixture-firstcoverage.guard.json",
+        "whole-capture-18-corrected-fixture-firstcoverage.log",
+        "whole-capture-18-first-green.attempts/1792323816859425880-3b11591d82e745ccb3258e60d1d06773/receipt.json",
+        "whole-capture-18-first-green.attempts/1792323816859425880-3b11591d82e745ccb3258e60d1d06773/stderr.txt",
+        "whole-capture-18-first-green.attempts/1792323816859425880-3b11591d82e745ccb3258e60d1d06773/stdout.txt",
+        "whole-capture-18-first-green.command.json",
+        "whole-capture-18-first-green.guard.json",
+        "whole-capture-18-first-green.log",
+        "whole-capture-18-first-implementation.attempts/1792323794624176456-cff50911c32b4965a3fb6344c81f1ffb/receipt.json",
+        "whole-capture-18-first-implementation.attempts/1792323794624176456-cff50911c32b4965a3fb6344c81f1ffb/stderr.txt",
+        "whole-capture-18-first-implementation.attempts/1792323794624176456-cff50911c32b4965a3fb6344c81f1ffb/stdout.txt",
+        "whole-capture-18-first-implementation.command.json",
+        "whole-capture-18-first-implementation.guard.json",
+        "whole-capture-18-first-implementation.log",
+        "whole-capture-19-reader-rebinding-green.attempts/1792323960862684539-7e0ecc0aaa184eebaed1f7a43579e074/receipt.json",
+        "whole-capture-19-reader-rebinding-green.attempts/1792323960862684539-7e0ecc0aaa184eebaed1f7a43579e074/stderr.txt",
+        "whole-capture-19-reader-rebinding-green.attempts/1792323960862684539-7e0ecc0aaa184eebaed1f7a43579e074/stdout.txt",
+        "whole-capture-19-reader-rebinding-green.command.json",
+        "whole-capture-19-reader-rebinding-green.guard.json",
+        "whole-capture-19-reader-rebinding-green.log",
+        "whole-capture-19-reader-rebinding-red.attempts/1792323936759734514-bb085705fd9d42538097224178b075f1/receipt.json",
+        "whole-capture-19-reader-rebinding-red.attempts/1792323936759734514-bb085705fd9d42538097224178b075f1/stderr.txt",
+        "whole-capture-19-reader-rebinding-red.attempts/1792323936759734514-bb085705fd9d42538097224178b075f1/stdout.txt",
+        "whole-capture-19-reader-rebinding-red.command.json",
+        "whole-capture-19-reader-rebinding-red.guard.json",
+        "whole-capture-19-reader-rebinding-red.log",
+        "whole-capture-21-fileapi-window-green.attempts/1792324249414903325-a51874bf900a430a982d1e66546c2397/receipt.json",
+        "whole-capture-21-fileapi-window-green.attempts/1792324249414903325-a51874bf900a430a982d1e66546c2397/stderr.txt",
+        "whole-capture-21-fileapi-window-green.attempts/1792324249414903325-a51874bf900a430a982d1e66546c2397/stdout.txt",
+        "whole-capture-21-fileapi-window-green.command.json",
+        "whole-capture-21-fileapi-window-green.guard.json",
+        "whole-capture-21-fileapi-window-green.log",
+        "whole-capture-21-final.attempts/1792324482451172837-554b560865a647f19d069ef377784fd9/receipt.json",
+        "whole-capture-21-final.attempts/1792324482451172837-554b560865a647f19d069ef377784fd9/stderr.txt",
+        "whole-capture-21-final.attempts/1792324482451172837-554b560865a647f19d069ef377784fd9/stdout.txt",
+        "whole-capture-21-final.command.json",
+        "whole-capture-21-final.guard.json",
+        "whole-capture-21-final.log",
+        "whole-capture-21-local-and-library-red.attempts/1792324009013868793-4ca6b54c41d3456fb955708aa10ad1ac/receipt.json",
+        "whole-capture-21-local-and-library-red.attempts/1792324009013868793-4ca6b54c41d3456fb955708aa10ad1ac/stderr.txt",
+        "whole-capture-21-local-and-library-red.attempts/1792324009013868793-4ca6b54c41d3456fb955708aa10ad1ac/stdout.txt",
+        "whole-capture-21-local-and-library-red.command.json",
+        "whole-capture-21-local-and-library-red.guard.json",
+        "whole-capture-21-local-and-library-red.log",
+        "whole-capture-21-stable-library-window-red.attempts/1792324080134893247-774b030211da4f0cb59cf0cd96f516ff/receipt.json",
+        "whole-capture-21-stable-library-window-red.attempts/1792324080134893247-774b030211da4f0cb59cf0cd96f516ff/stderr.txt",
+        "whole-capture-21-stable-library-window-red.attempts/1792324080134893247-774b030211da4f0cb59cf0cd96f516ff/stdout.txt",
+        "whole-capture-21-stable-library-window-red.command.json",
+        "whole-capture-21-stable-library-window-red.guard.json",
+        "whole-capture-21-stable-library-window-red.log",
+        "whole-capture-firstcoverage-setup.attempts/1792323404950078979-2c030a3d41ad4756b64e9278117fe26d/receipt.json",
+        "whole-capture-firstcoverage-setup.attempts/1792323404950078979-2c030a3d41ad4756b64e9278117fe26d/stderr.txt",
+        "whole-capture-firstcoverage-setup.attempts/1792323404950078979-2c030a3d41ad4756b64e9278117fe26d/stdout.txt",
+        "whole-capture-firstcoverage-setup.command.json",
+        "whole-capture-firstcoverage-setup.log",
+        "whole-pair-65-fileapi-first-green.attempts/1792324183500531900-b8d780820fd6437ba70d0729252865d0/receipt.json",
+        "whole-pair-65-fileapi-first-green.attempts/1792324183500531900-b8d780820fd6437ba70d0729252865d0/stderr.txt",
+        "whole-pair-65-fileapi-first-green.attempts/1792324183500531900-b8d780820fd6437ba70d0729252865d0/stdout.txt",
+        "whole-pair-65-fileapi-first-green.command.json",
+        "whole-pair-65-fileapi-first-green.guard.json",
+        "whole-pair-65-fileapi-first-green.log",
+        "whole-pair-65-fileapi-firstcoverage.attempts/1792324120241582052-9e9d0a73a6544860a06f342bf6e5d170/receipt.json",
+        "whole-pair-65-fileapi-firstcoverage.attempts/1792324120241582052-9e9d0a73a6544860a06f342bf6e5d170/stderr.txt",
+        "whole-pair-65-fileapi-firstcoverage.attempts/1792324120241582052-9e9d0a73a6544860a06f342bf6e5d170/stdout.txt",
+        "whole-pair-65-fileapi-firstcoverage.command.json",
+        "whole-pair-65-fileapi-firstcoverage.guard.json",
+        "whole-pair-65-fileapi-firstcoverage.log",
+        "whole-pair-70-capture-library-binding-green.attempts/1792324362769196953-c51579791f994ca6bf45a6b5ccf8a0ec/receipt.json",
+        "whole-pair-70-capture-library-binding-green.attempts/1792324362769196953-c51579791f994ca6bf45a6b5ccf8a0ec/stderr.txt",
+        "whole-pair-70-capture-library-binding-green.attempts/1792324362769196953-c51579791f994ca6bf45a6b5ccf8a0ec/stdout.txt",
+        "whole-pair-70-capture-library-binding-green.command.json",
+        "whole-pair-70-capture-library-binding-green.guard.json",
+        "whole-pair-70-capture-library-binding-green.log",
+        "whole-pair-70-capture-library-binding-red.attempts/1792324314041730214-3a1873a3b9384dd89bc8e1d60f3f26c3/receipt.json",
+        "whole-pair-70-capture-library-binding-red.attempts/1792324314041730214-3a1873a3b9384dd89bc8e1d60f3f26c3/stderr.txt",
+        "whole-pair-70-capture-library-binding-red.attempts/1792324314041730214-3a1873a3b9384dd89bc8e1d60f3f26c3/stdout.txt",
+        "whole-pair-70-capture-library-binding-red.command.json",
+        "whole-pair-70-capture-library-binding-red.guard.json",
+        "whole-pair-70-capture-library-binding-red.log",
+        "whole-pair-70-final.attempts/1792324461451478012-ced7dd9930864d6292eebe07fd0ad4e2/receipt.json",
+        "whole-pair-70-final.attempts/1792324461451478012-ced7dd9930864d6292eebe07fd0ad4e2/stderr.txt",
+        "whole-pair-70-final.attempts/1792324461451478012-ced7dd9930864d6292eebe07fd0ad4e2/stdout.txt",
+        "whole-pair-70-final.command.json",
+        "whole-pair-70-final.guard.json",
+        "whole-pair-70-final.log",
+        "whole-workflow-57-correct-environment-red.attempts/1792323710198508678-ef5c5463bacd42c3a689f9b7930ddb25/receipt.json",
+        "whole-workflow-57-correct-environment-red.attempts/1792323710198508678-ef5c5463bacd42c3a689f9b7930ddb25/stderr.txt",
+        "whole-workflow-57-correct-environment-red.attempts/1792323710198508678-ef5c5463bacd42c3a689f9b7930ddb25/stdout.txt",
+        "whole-workflow-57-correct-environment-red.command.json",
+        "whole-workflow-57-correct-environment-red.guard.json",
+        "whole-workflow-57-correct-environment-red.log",
+        "whole-workflow-57-final.attempts/1792324517478330518-2e94848eab3e41b3b232f3260b7fda35/receipt.json",
+        "whole-workflow-57-final.attempts/1792324517478330518-2e94848eab3e41b3b232f3260b7fda35/stderr.txt",
+        "whole-workflow-57-final.attempts/1792324517478330518-2e94848eab3e41b3b232f3260b7fda35/stdout.txt",
+        "whole-workflow-57-final.command.json",
+        "whole-workflow-57-final.guard.json",
+        "whole-workflow-57-final.log",
+        "whole-workflow-57-first-green.attempts/1792323865796515750-029c293cddfd46f4a50d0678cf6022e7/receipt.json",
+        "whole-workflow-57-first-green.attempts/1792323865796515750-029c293cddfd46f4a50d0678cf6022e7/stderr.txt",
+        "whole-workflow-57-first-green.attempts/1792323865796515750-029c293cddfd46f4a50d0678cf6022e7/stdout.txt",
+        "whole-workflow-57-first-green.command.json",
+        "whole-workflow-57-first-green.guard.json",
+        "whole-workflow-57-first-green.log",
+        "whole-workflow-missing-capture-red.attempts/1792323260306584300-5a9d97822438445b93c486b1dda14a70/receipt.json",
+        "whole-workflow-missing-capture-red.attempts/1792323260306584300-5a9d97822438445b93c486b1dda14a70/stderr.txt",
+        "whole-workflow-missing-capture-red.attempts/1792323260306584300-5a9d97822438445b93c486b1dda14a70/stdout.txt",
+        "whole-workflow-missing-capture-red.command.json",
+        "whole-workflow-missing-capture-red.log",
+        "workflow-tests-first.py.gz"
+      ]
+    },
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r1-final-checks-raw-r1.tar.gz",
+        "bytes": 7857,
+        "sha256": "7a6c86a3203375e2f6bb38b7cf31dc73df7a2898ea0b848ddb82cfa330558819"
+      },
+      "members": 44,
+      "member_payload_bytes": 67408,
+      "full_gzip_decoded_bytes": 153600,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/receipt.json",
+        "check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/stderr.txt",
+        "check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/stdout.txt",
+        "check-four-r1.command.json",
+        "check-four-r1.log",
+        "check_four.py",
+        "final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/receipt.json",
+        "final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/stderr.txt",
+        "final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/stdout.txt",
+        "final-cli-help-r2.command.json",
+        "final-cli-help-r2.log",
+        "final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/receipt.json",
+        "final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/stderr.txt",
+        "final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/stdout.txt",
+        "final-cli-help.command.json",
+        "final-cli-help.log",
+        "final-source-and-execution-guard-r2.json",
+        "final-source-and-execution-guard.json",
+        "final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/receipt.json",
+        "final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/stderr.txt",
+        "final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/stdout.txt",
+        "final-text-check-r2.command.json",
+        "final-text-check-r2.log",
+        "final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/receipt.json",
+        "final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/stderr.txt",
+        "final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/stdout.txt",
+        "final-text-check.command.json",
+        "final-text-check.log",
+        "final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/receipt.json",
+        "final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/stderr.txt",
+        "final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/stdout.txt",
+        "final-whole50.command.json",
+        "final-whole50.log",
+        "final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/receipt.json",
+        "final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/stderr.txt",
+        "final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/stdout.txt",
+        "final-whole51.command.json",
+        "final-whole51.log",
+        "style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/receipt.json",
+        "style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/stderr.txt",
+        "style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/stdout.txt",
+        "style-r1.command.json",
+        "style-r1.log",
+        "style.json"
+      ]
+    },
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r2-final-two-full-sources.tar.gz",
+        "bytes": 15672,
+        "sha256": "1c00ff6fc2ef30ab71b27bb75b5d5df58919b1448a195a87ac136f46c0735290"
+      },
+      "members": 2,
+      "member_payload_bytes": 68618,
+      "full_gzip_decoded_bytes": 71680,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "tools/evidence/u575_pair.py",
+        "tools/testing/test_u575_pair_evidence.py"
+      ]
+    },
+    {
+      "archive": {
+        "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r2-fresh-final-execution.tar.gz",
+        "bytes": 4201,
+        "sha256": "5ac4f33068b504a36ab30968060abe9af98aee474344be46fc73c2a921b64ee9"
+      },
+      "members": 11,
+      "member_payload_bytes": 31262,
+      "full_gzip_decoded_bytes": 40960,
+      "unique_safe_casefold_regular_exact_member_set": true,
+      "all_member_size_SHA_mode_and_declared_uid_gid_nsmtime_equal": true,
+      "full_gzip_CRC_EOF": true,
+      "member_names": [
+        "fresh-source-and-execution.json",
+        "fresh-text-four.attempts/1792320950603737321-b8157d19e52b4a0fb9da094d78ccb1f3/receipt.json",
+        "fresh-text-four.attempts/1792320950603737321-b8157d19e52b4a0fb9da094d78ccb1f3/stderr.txt",
+        "fresh-text-four.attempts/1792320950603737321-b8157d19e52b4a0fb9da094d78ccb1f3/stdout.txt",
+        "fresh-text-four.command.json",
+        "fresh-text-four.log",
+        "fresh-whole58.attempts/1792320946960082864-a5c55df7133e4ef0bd3d8a172ccee7e5/receipt.json",
+        "fresh-whole58.attempts/1792320946960082864-a5c55df7133e4ef0bd3d8a172ccee7e5/stderr.txt",
+        "fresh-whole58.attempts/1792320946960082864-a5c55df7133e4ef0bd3d8a172ccee7e5/stdout.txt",
+        "fresh-whole58.command.json",
+        "fresh-whole58.log"
+      ]
+    }
+  ],
+  "nested_gzip_full_stream_checks": [
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "before-context-history.py.gz",
+      "expanded_bytes": 34254,
+      "expanded_sha256": "a40afb09103cc978a11547d37a0d34699b9272b37dc7f636fcd32f7b030c872a"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "before-include-conflict.py.gz",
+      "expanded_bytes": 34415,
+      "expanded_sha256": "4b4103b1aee244a6f0c5cc5ed131141c6beff4f75ddeaad40507fb77d6ba931f"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "before-index.gz",
+      "expanded_bytes": 3723811,
+      "expanded_sha256": "5341e956859733c2ef47e59647012a7b39cd7b7abbd4e33199a3acc82659bab5"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "before-member-digest.py.gz",
+      "expanded_bytes": 33123,
+      "expanded_sha256": "5a904fe395a7a4188b786a7c2722e05bbd43db1e9a6eaabeb0de9cdf1dfd9a51"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "before-strict-schema.py.gz",
+      "expanded_bytes": 32427,
+      "expanded_sha256": "43cc75f2948e9f9370e66bd76811605bcbc006c30e2b818da29dc1bbda5e515f"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "before-wrap-u575_pair.py.gz",
+      "expanded_bytes": 33779,
+      "expanded_sha256": "04a7c5bf0cb547ab9ebe71e3da8b7837f876c808d3e1fc97b1b2df40d5baf04d"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "context-history-tests.py.gz",
+      "expanded_bytes": 26804,
+      "expanded_sha256": "72085f25ce8e0127aa5d6a2b44953525d8f6102d3e29dd01f798da1d46ab7276"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "final-checks-raw-r1.tar.gz",
+      "expanded_bytes": 153600,
+      "expanded_sha256": "0857640f5bfcdd1fe05ff881419af63f2cb6ae54451821bdc69c304f932289ba"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "first-implementation/test_u575_pair_evidence.py.gz",
+      "expanded_bytes": 10594,
+      "expanded_sha256": "0c80f323f42d7d708dd13423eebfcc89f629ec0ae3370653ebd0df8a594788a7"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "first-implementation/u575_pair.py.gz",
+      "expanded_bytes": 31831,
+      "expanded_sha256": "c26d1c00554df8e7873efa3df660fe5f08d7f575ab1ddde5be5207ec70ffa69f"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "include-conflict-tests.py.gz",
+      "expanded_bytes": 28470,
+      "expanded_sha256": "2f4f4b2ddd977140bbc4da297cbbb262361ea94f0dae500b3eb6f7e1c53a4d13"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "member-digest-red-tests.py.gz",
+      "expanded_bytes": 25738,
+      "expanded_sha256": "0838b74a6c92d7101dfa4f365ad4ef639c2619071df4c3688e282b0d825823a2"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "same-checker-before-fixes.py.gz",
+      "expanded_bytes": 31831,
+      "expanded_sha256": "c26d1c00554df8e7873efa3df660fe5f08d7f575ab1ddde5be5207ec70ffa69f"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "same-checker-regressions.py.gz",
+      "expanded_bytes": 16667,
+      "expanded_sha256": "24801c042847c2e0ff02ab896a71aaab4379932b2af9b55949e5e33f915665df"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "strict-schema-tests.py.gz",
+      "expanded_bytes": 22181,
+      "expanded_sha256": "18117430fe7e7c10962ca1d3cba72273c6af14a1beae181d21bcc74343bec10d"
+    },
+    {
+      "archive": "r1-complete-originals.tar.gz",
+      "member": "two-schema-red-tests.py.gz",
+      "expanded_bytes": 24378,
+      "expanded_sha256": "eb7de34d7bf5b8a0b84efa62a70482341dfe0e194a5e03f4ede512f6c28e0ded"
+    },
+    {
+      "archive": "r2-complete-originals.tar.gz",
+      "member": "final-two-full-sources.tar.gz",
+      "expanded_bytes": 71680,
+      "expanded_sha256": "629dab7dd93d6840b4b3aa32abf6af49930de081e84fca913268132215f88d6a"
+    },
+    {
+      "archive": "r2-complete-originals.tar.gz",
+      "member": "fresh-final-execution.tar.gz",
+      "expanded_bytes": 40960,
+      "expanded_sha256": "fa6cfda0ba412e8e21032b9ec7c82a68fe7c914511155c156e6f3c1631d470ce"
+    },
+    {
+      "archive": "r2-complete-originals.tar.gz",
+      "member": "mechanical-extracted-tests.py.gz",
+      "expanded_bytes": 33052,
+      "expanded_sha256": "839b9b73db40e57bf6ad41e1faae9b9f7e3ec8f3d1702508b86aee911a4f6b24"
+    },
+    {
+      "archive": "r2-complete-originals.tar.gz",
+      "member": "mechanical-extracted-tool.py.gz",
+      "expanded_bytes": 34797,
+      "expanded_sha256": "898ac5e5a1c935a3eb35ab007dbdc3caaee4d49fe2e7933b64523e82968221c9"
+    },
+    {
+      "archive": "r2-complete-originals.tar.gz",
+      "member": "tests-first.py.gz",
+      "expanded_bytes": 32987,
+      "expanded_sha256": "45abe0e1c41835d070546d7c6670ed618705210b1e918e0e506e6be460e645ff"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "before-index.gz",
+      "expanded_bytes": 3813030,
+      "expanded_sha256": "1a4c0ef193f82f82a5152311e34487855eb24f517738722f6b045903ccd85f21"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "capture-local-red-source.py.gz",
+      "expanded_bytes": 25132,
+      "expanded_sha256": "ae993ac235cdf895b59aa4c5c1ccf59376598e97daf41cad55ec962fba54cd49"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "capture-reader-red-source.py.gz",
+      "expanded_bytes": 24829,
+      "expanded_sha256": "d6484a702c5b18928d242abc6ad8be8d13c640fe1b29f1ef04e8953071c14e41"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "capture-reader-red-test.py.gz",
+      "expanded_bytes": 9794,
+      "expanded_sha256": "f1bef4fde1ec29a4fa4b02939e697c807d05c26b9001ae1adfe1e0a2072c1bf7"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "capture-tests-first.py.gz",
+      "expanded_bytes": 9374,
+      "expanded_sha256": "bcecf338663aefeadb703f56e0145e7314b56c550d749edfb49bdebe1defc698"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "capture-window-red-source.py.gz",
+      "expanded_bytes": 25132,
+      "expanded_sha256": "ae993ac235cdf895b59aa4c5c1ccf59376598e97daf41cad55ec962fba54cd49"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "test_u575_pair_evidence-graph-library-red.py.gz",
+      "expanded_bytes": 42655,
+      "expanded_sha256": "c01c01452005b5b894e7f41a87e8fe3c790da9c556706a797d6358e3c2b6932c"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "u575_pair-graph-library-red.py.gz",
+      "expanded_bytes": 42044,
+      "expanded_sha256": "40d7c475071f98e5e428fb5d17410003fee67cc64c1720b541406af74328a06c"
+    },
+    {
+      "archive": "capture-frozen-originals-157.tar.gz",
+      "member": "workflow-tests-first.py.gz",
+      "expanded_bytes": 76202,
+      "expanded_sha256": "638185c3262718743a09feab7afaf5672fcf35fab924a18f3f3c458864fb4540"
+    }
+  ],
+  "closure": {
+    "R1_complete_physical_root": 97,
+    "R2_complete_physical_root": 26,
+    "new_capture_original157": 157,
+    "new_capture_later_controls": 14,
+    "new_capture_archive_file_separate": 1,
+    "new_capture_physical_total": 172,
+    "old_R1_external_raw_archive_members": 44,
+    "old_R2_frozen_sources_archive_members": 2,
+    "old_R2_external_fresh_raw_archive_members": 11,
+    "all7_top_archive_member_occurrences": 351,
+    "all_named_origin_physical_file_inventories_exact": true,
+    "all_declared_member_bytes_size_SHA_mode_and_where_present_UID_GID_nsmtime_equal": true,
+    "all7_gzip_full_CRC_EOF_verified": true,
+    "nested30_gzip_leaf_full_CRC_EOF_and_uncompressed_hashes_verified": true,
+    "historical_R1_R2_leafmap_rows_equal_complete_original_inventory": true,
+    "all157_rows_equal_capture_leafmap_original_member_rows": true,
+    "self_root_relationship": "The author's13 later-leaf rows contain the archive plus12 other controls and intentionally exclude the enclosing leafmap and handoff. Root's complete14-control archive consists of those12 control files plus the full leafmap and handoff. Therefore physical172=157+14+1, with no recursive self-archive or self-hash cycle.",
+    "historical_R2_source_binding": "The old35519/33099-byte source members are verified against their preserved R2 archive/handoff identities. Later live owner source is not substituted for historical source bytes.",
+    "failure_raw_preservation": "Exact original file inventories and archive member sets include all retained failed attempts, process/attempt receipts, stdout/stderr/logs and source preimages, with empty raw streams retained. Old external44/11 raw members also match their original full bytes. This is a preservation result, not a reclassification of failures as product RED or successful execution."
+  },
+  "original_JSON_raw_copies": [
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r1-handoff.json.raw",
+      "bytes": 7923,
+      "sha256": "e3a25b0aac1c62364afebbfe154560d4e38c47f5228d9fc43be7dbf8f2236ee6",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r1-source-freeze.json.raw",
+      "bytes": 2769,
+      "sha256": "76d846fa23756808b7d0aab630ba37cc2951bb3bafc5aa85950f038c29c4d6fc",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r1-final-raw-map.json.raw",
+      "bytes": 14926,
+      "sha256": "3f3701ba144f6a0bf96174cadaeab9d676016a74f656ec6ba16152d83a5331d4",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r2-handoff.json.raw",
+      "bytes": 11311,
+      "sha256": "551db17cf73e2e2e2769596272969a3c2d091d70d35344acc048771325d96ec1",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-source-freeze.json.raw",
+      "bytes": 4662,
+      "sha256": "4844f2af9e41f2a26f42a2af360b801bf02af689b98ae2bfd0cee391c6288392",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-completed-handoff.json.raw",
+      "bytes": 1628,
+      "sha256": "193097e23a9c8ac548b1186dafe15834dd17ad75204941eeec14fc4ab2fb9024",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-full-leafmap.json.raw",
+      "bytes": 106104,
+      "sha256": "a0e162e14a5b34f770d1581f6d526c8b201bd56c3d03bb44706e0b007a05da67",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-157-member-map.json.raw",
+      "bytes": 46758,
+      "sha256": "915fe8b122eb684bc3087908f04aa1a09e08bb456c03660076ac6744622f5367",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-archive-verification.json.raw",
+      "bytes": 515,
+      "sha256": "82253632fca478bea61bd1359047e9583fab8908b4cf274bf27391e9d9795343",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-validation-summary.json.raw",
+      "bytes": 27448,
+      "sha256": "7cdf2edc26610ba33811ad725a6e089be83b2d4bd769912be3585d0db674e1e3",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/r2-pure-independent-review.json.raw",
+      "bytes": 19010,
+      "sha256": "358ca9043288eaf2f177c4918eaf3328b859903be34c9a051775cee444f688ae",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-source-independent-review.json.raw",
+      "bytes": 7735,
+      "sha256": "fafb56a1f1c410088fb811185dc3e2c54a9d683b3a93da23b70edda2117c5fe2",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-independent-review.json.raw",
+      "bytes": 21494,
+      "sha256": "cf80a4f88dc01652807bb28e3a39c81d41c86a16b6a743c94361b91bcc9a191e",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-evidence-audit.json.raw",
+      "bytes": 33153,
+      "sha256": "130fc14548247950e3deb9b1a6039ab9ec524bc81fee22a1e011e85a946dd30a",
+      "ends_LF": true,
+      "CR_bytes": 0
+    },
+    {
+      "path": "tests/evidence/io-evolution/u575-pair-capture-20261018-r1/original-root-normalization-map-r1.json.raw",
+      "bytes": 24081,
+      "sha256": "f4dd9fb5a742aa9ef6714210d380141100df4be9b9badddca07c6ce6480226e1",
+      "ends_LF": true,
+      "CR_bytes": 0
+    }
+  ],
+  "JSON_byte_policy": {
+    "arbitrary_original_JSON_raw_byte_preservation": true,
+    "final_LF_or_line_ending_normalization_applied": false,
+    "new_control_JSON_LF_final_newline_no_CR_NUL_checked": true,
+    "original_metadata": "All original.json.raw copies are compared as opaque bytes with original source and recorded SHA. Their observed final-LF/CR states are included; lack of a final newline is not 'repaired'."
+  },
+  "independent_review_bridges": {
+    "source_only_peer": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/capture-source-independent-review.json.raw",
+      "bytes": 7735,
+      "sha256": "fafb56a1f1c410088fb811185dc3e2c54a9d683b3a93da23b70edda2117c5fe2"
+    },
+    "source_only_peer_scope": "Read-only independent static review of the frozen eight-source U575 pair evidence, opt-in producer capture, CMake File API closure and CI integration. Not a full-packet raw evidence review.",
+    "source_only_peer_conclusion": {
+      "source_semantics": "No confirmed blocking source defect identified in the frozen scope.",
+      "qualification": "No runtime, ARM, package, restore, hardware or product qualification is granted by this review.",
+      "full_packet_independent_review": "Separate Root-appointed review remains required."
+    },
+    "completed_formal_review": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-independent-review.json.raw",
+      "bytes": 21494,
+      "sha256": "cf80a4f88dc01652807bb28e3a39c81d41c86a16b6a743c94361b91bcc9a191e"
+    },
+    "completed_formal_audit": {
+      "path": "/dev/shm/nexus-u575-pair-root-integration-20261018-r1/files/tests/evidence/io-evolution/u575-pair-capture-20261018-r1/formal-eight-source-evidence-audit.json.raw",
+      "bytes": 33153,
+      "sha256": "130fc14548247950e3deb9b1a6039ab9ec524bc81fee22a1e011e85a946dd30a"
+    },
+    "formal_verdict": "PASS_WITH_EXPLICIT_DEVELOPMENT_SCOPE",
+    "formal_conclusion": "The exact final8 source tuple and complete submitted development evidence are internally consistent and have no confirmed blocking defect in this read-only review. Ready for Root integration and fresh normal full-index gates. This is not actual fresh ARM-pair, restore, SDK, OCI, candidate or hardware qualification.",
+    "formal_scope": "Pure stdlib/host tool development executions from this dirty owner. Do not present this as the clean source of a new ARM build. New capture requires clean source and initialized locked recursive submodules.",
+    "formal_qualification_boundaries": {
+      "development_contract_and_source_review": "passed for exact freeze only",
+      "new_actual_clean_ARM_pair_and19_mutation_tests": "not_executed",
+      "new_actual_FileAPI_ARM_corpus_seal_verify": "not_executed",
+      "actual_complete_independent_restore": "not_executed",
+      "old_dd_or_later_D3_UART_qualification_inherited": false,
+      "SDK_OCI_firmware_candidate_product_release": "not_granted",
+      "signature_status": "unsigned",
+      "software_status": "not_qualified",
+      "physical_status": "not_executed",
+      "Root_next": "Normal full-index commit from exact8+complete evidence, then execute the new producer from that clean committed Main with locked initialized dependencies, real19 and actual pair seal/verify; append actual evidence in a separate ordinary commit."
+    },
+    "formal_source8_and_entrypoint_freeze_handoff_leafmap_audit_link_identity_matched": true,
+    "semantic_TDD_and_source_review": "The actual completed cf80 review owns the independent source/raw meaning conclusions for final70/21/57 and the preserved historical RED/setup categories. This normalization review verifies that exact report/audit transport and source binding; it does not pretend to independently rerun or repeat that semantic audit.",
+    "formal_execution_classification_as_attributed_peer_conclusion": {
+      "final_same_tuple": [
+        {
+          "scope": "tools.testing.test_u575_pair_evidence",
+          "cases": 70,
+          "actual_exit": 0,
+          "skip": 0
+        },
+        {
+          "scope": "scripts.ci.test_u575_pair_context",
+          "cases": 21,
+          "actual_exit": 0,
+          "skip": 0
+        },
+        {
+          "scope": ".github/workflows/test_platform_ci.py",
+          "cases": 57,
+          "actual_exit": 0,
+          "skip": 0
+        }
+      ],
+      "complete_final_case_executions": 148,
+      "final_whole_text_inputs": 8,
+      "all_current_workflow_DSL_actual_exit": 0,
+      "true_regressions": [
+        {
+          "stage": "whole-workflow-57-correct-environment-red",
+          "cases": 57,
+          "failed_new_methods": 3,
+          "failure_records_including_subtests": 4,
+          "errors": 0,
+          "green": "whole-workflow-57-first-green and final57",
+          "contract": "Original gate capture flag, mandatory seal/verify, evidence identity/upload roots and real shell failure ordering"
+        },
+        {
+          "stage": "whole-capture-19-reader-rebinding-red",
+          "cases": 19,
+          "failed_cases": 1,
+          "errors": 0,
+          "green": "whole-capture-19-reader-rebinding-green",
+          "contract": "Changing a noncompiler reader cannot rebind original report tools"
+        },
+        {
+          "stage": "whole-capture-21-local-and-library-red",
+          "cases": 21,
+          "failed_cases": 1,
+          "errors": 0,
+          "contract": "Unrelated local LOAD cannot authorize its own retention"
+        },
+        {
+          "stage": "whole-capture-21-stable-library-window-red",
+          "cases": 21,
+          "failed_cases": 2,
+          "errors": 0,
+          "green": "whole-capture-21-fileapi-window-green and final21",
+          "contract": "Unknown local archive and original library mutation after initial after-snapshot but before final inventory"
+        },
+        {
+          "stage": "whole-pair-70-capture-library-binding-red",
+          "cases": 70,
+          "failed_cases": 2,
+          "errors": 0,
+          "green": "whole-pair-70-capture-library-binding-green and final70",
+          "contract": "Offline unknown external LOAD and rehashed final libraryB cannot replace before/after libraryA"
+        }
+      ],
+      "new_API_first_coverage_and_setup_preserved": [
+        "New begin/finish/run capture surface was genuinely missing before implementation (whole18 API errors). Initial /unrelated fixture path PermissionError and later two fixture mistakes are not old production behavior RED.",
+        "New FileAPI helper/optional typed field whole65 had10 API errors; this is new-surface missing API coverage, then full65 firstGREEN.",
+        "Earliest whole57 had incorrect owner environment/PYTHONPATH/cmake and old failures; retained unchanged and superseded by correct-environment full57 true contract RED.",
+        "All22 original command records remain, including setup failures and partial implementations; historical R1/R2 packets remain separate identities."
+      ],
+      "full_raw_and_failure_titles": "/dev/shm/nexus-u575-pair-eight-source-independent-review-20261018-r1/evidence-audit-r1.json"
+    }
+  },
+  "budget": {
+    "evidence_prefix_cap_bytes": 6291456,
+    "evidence_prefix_actual_allocated_bytes": 2514944,
+    "all34_files_logical_bytes": 2714653,
+    "below6MiB_even_counting_all34_logical_files": true,
+    "report_cap_bytes": 262144,
+    "future_stage": "Root plans to add this review and final map as two extra control entries, yielding36 staged paths/source8. That staging, complete-index hooks, normal commit and publication were not executed or approved by factual implication here."
+  },
+  "reviewer_adapter_attempt_history": [
+    {
+      "attempt": "initial31",
+      "tool_output_chunk": "6a2393",
+      "outcome": "Review assertion stopped before any report write because Root concurrently appended exactly three known original files, making the physical files tree34 while that initial adapter still required31. No original31 row or byte changed. Retained tool failure is a reviewer snapshot-admission event, not a product failure."
+    },
+    {
+      "attempt": "34-adapter1",
+      "tool_output_chunk": "13ede6",
+      "outcome": "Python dict.get default expression eagerly indexed a missing path key for valid historical member+source rows. Corrected review adapter to select member when present; no source data changed and no report was written."
+    },
+    {
+      "attempt": "34-adapter2",
+      "tool_output_chunk": "8f0060",
+      "outcome": "Review adapter incorrectly equated author's13 later leaf rows with the complete14 controls. Corrected only the schema relation:13 includes archive+12 controls; complete14 adds two self-roots and excludes archive. No reviewed artifact changed."
+    },
+    {
+      "attempt": "final34",
+      "outcome": "Successful complete audit, with all34 rows, seven archives351 regular member occurrences and30 nested gzip leaves checked. Earlier raw tool outputs remain preserved and are not relabelled successful."
+    }
+  ],
+  "status": {
+    "signature": "unsigned",
+    "software": "not_qualified",
+    "physical": "not_executed",
+    "candidate": false
+  },
+  "qualifications_not_granted": [
+    "Actual fresh clean-source ARM pair build or real19 gate execution",
+    "Actual seal/verify/restore of a new real ARM pair, installed SDK, OCI/offline or reproducibility",
+    "Main/full-index admission, normal commit, push, CI publication or clean software candidate",
+    "Physical HIL/electrical qualification"
+  ],
+  "final_disposition": "PASS the exact aba9 final34 normalization for complete-byte safe transport and finished peer-review binding. All original bytes, old reviews and history remain unchanged. Root should run ordinary integration/full-index gates on its concrete staged36 result and retain the resulting actual receipts separately."
+}

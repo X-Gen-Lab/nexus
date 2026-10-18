@@ -1,0 +1,2792 @@
+{
+  "kind": "u575_pair_eight_source_and_complete_evidence_handoff",
+  "source_count": 8,
+  "files": [
+    {
+      "path": "tools/evidence/u575_pair.py",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/tools/evidence/u575_pair.py",
+      "bytes": 44156,
+      "sha256": "41df8c286fc35b313490f5959e1fd9e87d4b448bf61efaff84ee8ad9ccb0333f",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": "tools/testing/test_u575_pair_evidence.py",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/tools/testing/test_u575_pair_evidence.py",
+      "bytes": 42646,
+      "sha256": "39ebf2c6707e3680ba7e90cf37132e8ae6fc22cd28cd2e2b18aa966618f8fe61",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": "tests/contracts/u575_trustzone/test_gate.py",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/before/tests/contracts/u575_trustzone/test_gate.py",
+      "bytes": 10349,
+      "sha256": "3b3b843c88d7aaf4eedca001ac26e824db4e883dcef9e3f970289f5959311d94",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": "tests/contracts/u575_trustzone/README.md",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/before/tests/contracts/u575_trustzone/README.md",
+      "bytes": 10974,
+      "sha256": "d8f2b8f116a5bc292be558accd6006f6e396c8b7a73b1d06425a516327eca4c5",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": ".github/workflows/build-matrix.yml",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/.github/workflows/build-matrix.yml",
+      "bytes": 20687,
+      "sha256": "2f9c7a87731c4d1f9dabfecd3177321745e227a96c01c4fece3f885186855bc6",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": "scripts/ci/u575_trustzone.py",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/scripts/ci/u575_trustzone.py",
+      "bytes": 29010,
+      "sha256": "81cbbb30339f418956f085a3211262d0ac33586212355d86457cfa50cc7fae3b",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": "scripts/ci/test_u575_pair_context.py",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/scripts/ci/test_u575_pair_context.py",
+      "bytes": 13267,
+      "sha256": "518e3b4cf4c104f5fb661049863563515a10b4f8ddd6807c10c37223a6ee3728",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "durable_source": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/.github/workflows/test_platform_ci.py",
+      "bytes": 76202,
+      "sha256": "638185c3262718743a09feab7afaf5672fcf35fab924a18f3f3c458864fb4540",
+      "source_persistence": "volatile_until_Root_normal_commit_and_push"
+    }
+  ],
+  "frozen_source_identity": {
+    "root": "/dev/shm/nexus-qualification-transport-20261018-r1",
+    "commit": "678245a3a981f17777d97220c8af63840a754596",
+    "tree": "cbe1042b0683582b80c180f4235cbc539030b284",
+    "dirty": true,
+    "submodules": [
+      "-dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos",
+      "-93387b0a60382a29579bbad5045c68328e3751df ext/threadx",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      "-c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      "-626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4",
+      "-8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7",
+      "-624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5",
+      "-fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)",
+      "-f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal",
+      "-a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal",
+      "-2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal"
+    ],
+    "working_tree_sha256": "73880b18534d112fb6b89d949660b22afca48b02c5681cdc904f94aa23df395a"
+  },
+  "index_sha256": "1a4c0ef193f82f82a5152311e34487855eb24f517738722f6b045903ccd85f21",
+  "new_feature": {
+    "root": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1",
+    "archive": {
+      "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/execution-evidence-r1.tar.gz",
+      "bytes": 1000754,
+      "sha256": "93a7e172659d805e8000e34df7cdfb2efa6528aec086b17dbee804c695d9fcb4",
+      "mode": 384,
+      "uid": 1000,
+      "gid": 1000,
+      "mtime_ns": 1792324698737313025
+    },
+    "archive_verification": {
+      "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/archive-verification-r1.json",
+      "bytes": 515,
+      "sha256": "82253632fca478bea61bd1359047e9583fab8908b4cf274bf27391e9d9795343",
+      "mode": 384,
+      "uid": 1000,
+      "gid": 1000,
+      "mtime_ns": 1792324698764643454
+    },
+    "frozen_original_leaf_count": 157,
+    "original_members": [
+      {
+        "path": "actionlint-neutral.yml",
+        "bytes": 3,
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324517005254070
+      },
+      {
+        "path": "all-current-workflow-dsl.attempts/1792324533240537784-275a3cfbe539485a93379cf384465004/receipt.json",
+        "bytes": 1718,
+        "sha256": "8d8c10f3e210819b3052f94b353c7bb5e049b6dddb0f37f011fa193e47d0efad",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324533254310614
+      },
+      {
+        "path": "all-current-workflow-dsl.attempts/1792324533240537784-275a3cfbe539485a93379cf384465004/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324533241246071
+      },
+      {
+        "path": "all-current-workflow-dsl.attempts/1792324533240537784-275a3cfbe539485a93379cf384465004/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324533241246071
+      },
+      {
+        "path": "all-current-workflow-dsl.command.json",
+        "bytes": 1890,
+        "sha256": "8b09d0753fa5d8b45fdd7672959ff450935fa08495d511eeea640c278839da93",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324533257738647
+      },
+      {
+        "path": "all-current-workflow-dsl.guard.json",
+        "bytes": 3324,
+        "sha256": "8d024dbee3257f1288d78611b855f6eb4fc610d315d6c11b5ed558ce0fde28e5",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324533739146661
+      },
+      {
+        "path": "all-current-workflow-dsl.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324533254310614
+      },
+      {
+        "path": "before/.github/workflows/build-matrix.yml",
+        "bytes": 18623,
+        "sha256": "10e52ea538c9c30822d5e0cbfc928f093d97bc2fe78da8c70d163d2136616d04",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211654075986
+      },
+      {
+        "path": "before/.github/workflows/test_platform_ci.py",
+        "bytes": 70701,
+        "sha256": "45ed33110b8cc8b3d952b5ad859d6e68faa7e63a7f2ddf0972d2ced016c16930",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211654284129
+      },
+      {
+        "path": "before/scripts/ci/u575_trustzone.py",
+        "bytes": 15796,
+        "sha256": "e65ad94831d7fa671448b236fbe284f31bc8f9cdf0a5883788d123146b8aa1e3",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211654163507
+      },
+      {
+        "path": "before/tests/contracts/u575_trustzone/README.md",
+        "bytes": 10974,
+        "sha256": "d8f2b8f116a5bc292be558accd6006f6e396c8b7a73b1d06425a516327eca4c5",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211653989686
+      },
+      {
+        "path": "before/tests/contracts/u575_trustzone/test_gate.py",
+        "bytes": 10349,
+        "sha256": "3b3b843c88d7aaf4eedca001ac26e824db4e883dcef9e3f970289f5959311d94",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211653875824
+      },
+      {
+        "path": "before/tools/evidence/u575_pair.py",
+        "bytes": 35519,
+        "sha256": "7d694d8b35aa104f5e6de9cf286f2b607cb5b6ce410ec0054f4b64a19d1d1da3",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211653596714
+      },
+      {
+        "path": "before/tools/testing/test_u575_pair_evidence.py",
+        "bytes": 33099,
+        "sha256": "a18ce10073b45e2031a01a8a8e62de532076abd4974dfbdeadb971b4b23f5fd9",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211653749644
+      },
+      {
+        "path": "before-eight.json",
+        "bytes": 2075,
+        "sha256": "b6564f35bde04381beefe46d70fca7f8d880980cfc8da2116ae6b90b40d147ce",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211888771917
+      },
+      {
+        "path": "before-index.gz",
+        "bytes": 806824,
+        "sha256": "2e4164cc3f96ff5246926a269d1b3fc5696db1a2fe82f86f3c096dd8e0688c8f",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323211815556566
+      },
+      {
+        "path": "budget-revision-r1.json",
+        "bytes": 463,
+        "sha256": "8f89c9ddde5647d828faf40312ea9fa24223eff417e2c756f03e8eb9cfb67f14",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324440920913905
+      },
+      {
+        "path": "capture-body.py",
+        "bytes": 8130,
+        "sha256": "4d96e55e19d27f044a8526d07968f8c8330760c0058844fc130ffeb39f4021fd",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323794152711081
+      },
+      {
+        "path": "capture-local-red-source.py.gz",
+        "bytes": 7326,
+        "sha256": "76a401fd72becb8ff49a12aff79d87c0cd9864f09d0ede196accf4b53a687a7d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324079661775403
+      },
+      {
+        "path": "capture-reader-red-source.py.gz",
+        "bytes": 7261,
+        "sha256": "e74b9d148cfaa3e0ad854dd7a7ddc10a9308ff272d1cc5e7f3c6c28804e10d2a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323960358391457
+      },
+      {
+        "path": "capture-reader-red-test.py.gz",
+        "bytes": 2389,
+        "sha256": "1233b793a37e4701132d5a474e52c9bcf0c47dfd584d6f7bfe330cc9ed10dd0a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323960358721835
+      },
+      {
+        "path": "capture-tests-first.py.gz",
+        "bytes": 2345,
+        "sha256": "715eaae3e990502208bcd2f4292e284ae7ca374fbb626146d8eeb335111febfd",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323404949917125
+      },
+      {
+        "path": "capture-window-red-source.py.gz",
+        "bytes": 7326,
+        "sha256": "76a401fd72becb8ff49a12aff79d87c0cd9864f09d0ede196accf4b53a687a7d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324248896020595
+      },
+      {
+        "path": "check_eight.py",
+        "bytes": 1133,
+        "sha256": "9e0957d6c32f50654fdb60702d062836dd39682b1b767b9789b4e75a7afeca03",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324517005120333
+      },
+      {
+        "path": "fileapi-body.py",
+        "bytes": 4391,
+        "sha256": "0ccfd2864ab29baee98de5948a97a545b347c0655ea2acb5946b51c66a15e35a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324183003999238
+      },
+      {
+        "path": "fileapi-tests.py",
+        "bytes": 5128,
+        "sha256": "07ddba870016c4b59cbe0f3af75a6f95c06a2d29e4e1579659a3ec7a1fb6bdc6",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324119714816272
+      },
+      {
+        "path": "final/.github/workflows/build-matrix.yml",
+        "bytes": 20687,
+        "sha256": "2f9c7a87731c4d1f9dabfecd3177321745e227a96c01c4fece3f885186855bc6",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323865318144518
+      },
+      {
+        "path": "final/.github/workflows/test_platform_ci.py",
+        "bytes": 76202,
+        "sha256": "638185c3262718743a09feab7afaf5672fcf35fab924a18f3f3c458864fb4540",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323260263571721
+      },
+      {
+        "path": "final/scripts/ci/test_u575_pair_context.py",
+        "bytes": 13267,
+        "sha256": "518e3b4cf4c104f5fb661049863563515a10b4f8ddd6807c10c37223a6ee3728",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324460953200489
+      },
+      {
+        "path": "final/scripts/ci/u575_trustzone.py",
+        "bytes": 29010,
+        "sha256": "81cbbb30339f418956f085a3211262d0ac33586212355d86457cfa50cc7fae3b",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324460953623105
+      },
+      {
+        "path": "final/tools/evidence/u575_pair.py",
+        "bytes": 44156,
+        "sha256": "41df8c286fc35b313490f5959e1fd9e87d4b448bf61efaff84ee8ad9ccb0333f",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324460953812330
+      },
+      {
+        "path": "final/tools/testing/test_u575_pair_evidence.py",
+        "bytes": 42646,
+        "sha256": "39ebf2c6707e3680ba7e90cf37132e8ae6fc22cd28cd2e2b18aa966618f8fe61",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324460953907103
+      },
+      {
+        "path": "final-source-freeze-r1.json",
+        "bytes": 4662,
+        "sha256": "4844f2af9e41f2a26f42a2af360b801bf02af689b98ae2bfd0cee391c6288392",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324576483014753
+      },
+      {
+        "path": "portable-graph-tests.py",
+        "bytes": 4428,
+        "sha256": "34074a7ac984acbf78cd2a57f2703b48a2b0c99855e13ca5cd75414461dc1446",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324313535643054
+      },
+      {
+        "path": "run_pure.py",
+        "bytes": 1661,
+        "sha256": "b62a7c7a76f863a7836e9c4f06012e72edc7ce27abc9270efdb0ecacafb778c7",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323722400680637
+      },
+      {
+        "path": "seal-step.yml",
+        "bytes": 1955,
+        "sha256": "b4ffab4064b86680a587100cbfaf858a060c8cbeb05c0e8ac3bac74b0ca3a6ef",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323865306433585
+      },
+      {
+        "path": "source-eight-text-and-preserved54.attempts/1792324524324715875-b3a61745c1bb4274a10399731968e2bc/receipt.json",
+        "bytes": 1196,
+        "sha256": "6a6de13b8d4340b66226b3d252d573064608b987988ea24877592a81fab1c74f",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324524539703208
+      },
+      {
+        "path": "source-eight-text-and-preserved54.attempts/1792324524324715875-b3a61745c1bb4274a10399731968e2bc/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324524324982957
+      },
+      {
+        "path": "source-eight-text-and-preserved54.attempts/1792324524324715875-b3a61745c1bb4274a10399731968e2bc/stdout.txt",
+        "bytes": 1508,
+        "sha256": "37940226b49f42c4a11159737c0fc1157fd327ce22c50a09f598d71c395d28fc",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324524514152261
+      },
+      {
+        "path": "source-eight-text-and-preserved54.command.json",
+        "bytes": 1377,
+        "sha256": "f3ac67eee67ef41f3ea7975c7e3b0e1034389baaf80c92aaca8021bc351fd71a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324524539885372
+      },
+      {
+        "path": "source-eight-text-and-preserved54.guard.json",
+        "bytes": 3324,
+        "sha256": "0c74f7c760addc50d6d0ac11ff84c3ac0e724310d6eb74c02cad90f12056849b",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324524970086836
+      },
+      {
+        "path": "source-eight-text-and-preserved54.log",
+        "bytes": 1508,
+        "sha256": "37940226b49f42c4a11159737c0fc1157fd327ce22c50a09f598d71c395d28fc",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324524539807926
+      },
+      {
+        "path": "test_u575_pair_evidence-graph-library-red.py.gz",
+        "bytes": 8910,
+        "sha256": "091125f929406a6e8ecb93e7f9a7ea2f1b90b56de608975a21f5f0a99bc1355a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324362292809649
+      },
+      {
+        "path": "u575_pair-graph-library-red.py.gz",
+        "bytes": 10664,
+        "sha256": "4d2061f1f20bac6f4a270b6eb267a2dca6f093893690eda3fd76ca6eac47546e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324362287213729
+      },
+      {
+        "path": "whole-capture-18-corrected-fixture-firstcoverage.attempts/1792323722831134060-930fde775c6347589de48b67ef4d4331/receipt.json",
+        "bytes": 1248,
+        "sha256": "eb0dc2f79ea38659dc9d319b1919d03cf2e5875801c6c6ee26083558c7bd5ad9",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323723196717485
+      },
+      {
+        "path": "whole-capture-18-corrected-fixture-firstcoverage.attempts/1792323722831134060-930fde775c6347589de48b67ef4d4331/stderr.txt",
+        "bytes": 18060,
+        "sha256": "2f3032eb6faf69a33c10efb5cb84fce1793d891ab536cab28409cccd7e3ac05a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323723131226920
+      },
+      {
+        "path": "whole-capture-18-corrected-fixture-firstcoverage.attempts/1792323722831134060-930fde775c6347589de48b67ef4d4331/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323722831589927
+      },
+      {
+        "path": "whole-capture-18-corrected-fixture-firstcoverage.command.json",
+        "bytes": 1444,
+        "sha256": "3ff8d778f3243139d98d31e805f3c367ce511f55e0c253c3e4dcabdbbe1cbd69",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323723196982474
+      },
+      {
+        "path": "whole-capture-18-corrected-fixture-firstcoverage.guard.json",
+        "bytes": 3324,
+        "sha256": "d1c49bd70a16f19bb0a280020c277b772f32a937acb72ef21b972c79b454414a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323723654060962
+      },
+      {
+        "path": "whole-capture-18-corrected-fixture-firstcoverage.log",
+        "bytes": 18060,
+        "sha256": "2f3032eb6faf69a33c10efb5cb84fce1793d891ab536cab28409cccd7e3ac05a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323723196844837
+      },
+      {
+        "path": "whole-capture-18-first-green.attempts/1792323816859425880-3b11591d82e745ccb3258e60d1d06773/receipt.json",
+        "bytes": 1188,
+        "sha256": "a5431243156baab91859285198366ee4f333c0420386d53c1a3d0ec5cb850346",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323817174610837
+      },
+      {
+        "path": "whole-capture-18-first-green.attempts/1792323816859425880-3b11591d82e745ccb3258e60d1d06773/stderr.txt",
+        "bytes": 2889,
+        "sha256": "3e5e68033708e61eafc6fb6176067545863a2ef5cdc82af339c6f27dc32a9f2c",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323817146115042
+      },
+      {
+        "path": "whole-capture-18-first-green.attempts/1792323816859425880-3b11591d82e745ccb3258e60d1d06773/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323816859679913
+      },
+      {
+        "path": "whole-capture-18-first-green.command.json",
+        "bytes": 1364,
+        "sha256": "7f6e67687e6d781cc38ccd45fb4a9d593f7ea68082d58637b395d4c433c1152d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323817174788995
+      },
+      {
+        "path": "whole-capture-18-first-green.guard.json",
+        "bytes": 3324,
+        "sha256": "210c63b1e86e7a61f152da52a40a7fc0aca897e83140e5cfd421de372d865755",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323817600411390
+      },
+      {
+        "path": "whole-capture-18-first-green.log",
+        "bytes": 2889,
+        "sha256": "3e5e68033708e61eafc6fb6176067545863a2ef5cdc82af339c6f27dc32a9f2c",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323817174723066
+      },
+      {
+        "path": "whole-capture-18-first-implementation.attempts/1792323794624176456-cff50911c32b4965a3fb6344c81f1ffb/receipt.json",
+        "bytes": 1214,
+        "sha256": "f6a3bdb366aca50d00c7bef91d4a3dd7d219f743a4274b86edbfdc49aa5df210",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323794989694591
+      },
+      {
+        "path": "whole-capture-18-first-implementation.attempts/1792323794624176456-cff50911c32b4965a3fb6344c81f1ffb/stderr.txt",
+        "bytes": 6915,
+        "sha256": "d1af39c75faec8f0101d0c7a07a970fd6eede9e9c0e7478455e5af3aed8f44bb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323794944186481
+      },
+      {
+        "path": "whole-capture-18-first-implementation.attempts/1792323794624176456-cff50911c32b4965a3fb6344c81f1ffb/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323794624469268
+      },
+      {
+        "path": "whole-capture-18-first-implementation.command.json",
+        "bytes": 1399,
+        "sha256": "ee6f72bf0e36c85f8347eaf1b21771be98427768426a90fdda81886ad26db096",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323794989889675
+      },
+      {
+        "path": "whole-capture-18-first-implementation.guard.json",
+        "bytes": 3324,
+        "sha256": "366bad188ff4ad21a7a4b64ad958aa2bbd7342e5b303c6b62edc5bea316ac454",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323795379395378
+      },
+      {
+        "path": "whole-capture-18-first-implementation.log",
+        "bytes": 6915,
+        "sha256": "d1af39c75faec8f0101d0c7a07a970fd6eede9e9c0e7478455e5af3aed8f44bb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323794989812940
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-green.attempts/1792323960862684539-7e0ecc0aaa184eebaed1f7a43579e074/receipt.json",
+        "bytes": 1221,
+        "sha256": "0f436bb3acfcd167c4a2fc1624f3e38332fe8f7c9abb046e7c56f6dc860040f2",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323961228421406
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-green.attempts/1792323960862684539-7e0ecc0aaa184eebaed1f7a43579e074/stderr.txt",
+        "bytes": 3057,
+        "sha256": "489190d6160519280903ee5bbfc94056d846ae0cd0b3d9626e690e5d8a1e928d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323961178019377
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-green.attempts/1792323960862684539-7e0ecc0aaa184eebaed1f7a43579e074/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323960862979083
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-green.command.json",
+        "bytes": 1408,
+        "sha256": "0b26acd6a266667ba9dd2e7195cbc377f79456369c59ce04898070ab3d1912aa",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323961228615598
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-green.guard.json",
+        "bytes": 3324,
+        "sha256": "54bb7c1280308a90d20f53b69411bae099bfaf5d2622a1cc23368ad9b2788ca8",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323961637989785
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-green.log",
+        "bytes": 3057,
+        "sha256": "489190d6160519280903ee5bbfc94056d846ae0cd0b3d9626e690e5d8a1e928d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323961228540535
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-red.attempts/1792323936759734514-bb085705fd9d42538097224178b075f1/receipt.json",
+        "bytes": 1215,
+        "sha256": "25e4156a1adab23eea30ac1e9f543edf56f9accfb5484a49ee36da7db10e8f0b",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323937125313055
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-red.attempts/1792323936759734514-bb085705fd9d42538097224178b075f1/stderr.txt",
+        "bytes": 3743,
+        "sha256": "1c9764a7f933e6f50814339cdbc2454b85f68e1c87b6e0ba3d6821ee002a8153",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323937072694060
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-red.attempts/1792323936759734514-bb085705fd9d42538097224178b075f1/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323936759995458
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-red.command.json",
+        "bytes": 1400,
+        "sha256": "8486b17320fc7d305af47677964a3d4e4421af7b3eabe7ca7f7654f4ea4917d2",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323937125585866
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-red.guard.json",
+        "bytes": 3324,
+        "sha256": "4de8701944513e4dd62a7bcd5553490f4604ba4025622dcaf86804dc76a3e16b",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323937553301656
+      },
+      {
+        "path": "whole-capture-19-reader-rebinding-red.log",
+        "bytes": 3743,
+        "sha256": "1c9764a7f933e6f50814339cdbc2454b85f68e1c87b6e0ba3d6821ee002a8153",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323937125509060
+      },
+      {
+        "path": "whole-capture-21-fileapi-window-green.attempts/1792324249414903325-a51874bf900a430a982d1e66546c2397/receipt.json",
+        "bytes": 1215,
+        "sha256": "c7c56bac40c1af743c607c8e1263f422bf9f82c3111579daef8fcd09f4c4bfd8",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324249830827255
+      },
+      {
+        "path": "whole-capture-21-fileapi-window-green.attempts/1792324249414903325-a51874bf900a430a982d1e66546c2397/stderr.txt",
+        "bytes": 3419,
+        "sha256": "855b8a48286e1b29be63626ee36a50c0f28a6c4d06a5de6deccd3538b8bd4e41",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324249801199567
+      },
+      {
+        "path": "whole-capture-21-fileapi-window-green.attempts/1792324249414903325-a51874bf900a430a982d1e66546c2397/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324249415167273
+      },
+      {
+        "path": "whole-capture-21-fileapi-window-green.command.json",
+        "bytes": 1400,
+        "sha256": "4efc8b56c48d9206b35c9e9c5a4495bc21386607f0f0c63fa7b04481cd32133e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324249831024933
+      },
+      {
+        "path": "whole-capture-21-fileapi-window-green.guard.json",
+        "bytes": 3324,
+        "sha256": "db393d99d15e58ce98913d5b8acb3176f4d2c539d78bcfcabea2a631d6539db6",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324250258856735
+      },
+      {
+        "path": "whole-capture-21-fileapi-window-green.log",
+        "bytes": 3419,
+        "sha256": "855b8a48286e1b29be63626ee36a50c0f28a6c4d06a5de6deccd3538b8bd4e41",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324249830960095
+      },
+      {
+        "path": "whole-capture-21-final.attempts/1792324482451172837-554b560865a647f19d069ef377784fd9/receipt.json",
+        "bytes": 1169,
+        "sha256": "3eb2542295086865a5e2c8440a597123949fa59a8a258036968defd0ccce0f50",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324482816732486
+      },
+      {
+        "path": "whole-capture-21-final.attempts/1792324482451172837-554b560865a647f19d069ef377784fd9/stderr.txt",
+        "bytes": 3401,
+        "sha256": "3078d45589f3c35d60db00aa2833552ca8469aeb1555baeedc984b294f927862",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324482797394517
+      },
+      {
+        "path": "whole-capture-21-final.attempts/1792324482451172837-554b560865a647f19d069ef377784fd9/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324482451630286
+      },
+      {
+        "path": "whole-capture-21-final.command.json",
+        "bytes": 1339,
+        "sha256": "229858faa63da03fe0be635cb59ef685501f9b50d59e2b15bf245dfc1e1f6041",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324482816894680
+      },
+      {
+        "path": "whole-capture-21-final.guard.json",
+        "bytes": 3324,
+        "sha256": "4bad76e4392648da746f9d92685f8fd6ac1bd3b7844df0137f2a71fd4be49744",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324483231593435
+      },
+      {
+        "path": "whole-capture-21-final.log",
+        "bytes": 3401,
+        "sha256": "3078d45589f3c35d60db00aa2833552ca8469aeb1555baeedc984b294f927862",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324482816830213
+      },
+      {
+        "path": "whole-capture-21-local-and-library-red.attempts/1792324009013868793-4ca6b54c41d3456fb955708aa10ad1ac/receipt.json",
+        "bytes": 1218,
+        "sha256": "4c2da89b81c4acf6e4a8a8e3cd3c9ebbaacf85badc09ddc36621fe2d9413711c",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324009379319706
+      },
+      {
+        "path": "whole-capture-21-local-and-library-red.attempts/1792324009013868793-4ca6b54c41d3456fb955708aa10ad1ac/stderr.txt",
+        "bytes": 4128,
+        "sha256": "063113013a9aa2380cbb715df6e597db832c96bf7eac50d7811732ed892f292a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324009341449575
+      },
+      {
+        "path": "whole-capture-21-local-and-library-red.attempts/1792324009013868793-4ca6b54c41d3456fb955708aa10ad1ac/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324009014125339
+      },
+      {
+        "path": "whole-capture-21-local-and-library-red.command.json",
+        "bytes": 1404,
+        "sha256": "0ca6b7927ab1bcf358f0aa69783711549a777c5d0a5b4a000675bf8ba50a580d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324009379535551
+      },
+      {
+        "path": "whole-capture-21-local-and-library-red.guard.json",
+        "bytes": 3324,
+        "sha256": "b705dfdbcd96d292214a3e38b0a9aaf2240b8cff57021ab506acca498b4ac22d",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324009810540615
+      },
+      {
+        "path": "whole-capture-21-local-and-library-red.log",
+        "bytes": 4128,
+        "sha256": "063113013a9aa2380cbb715df6e597db832c96bf7eac50d7811732ed892f292a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324009379462130
+      },
+      {
+        "path": "whole-capture-21-stable-library-window-red.attempts/1792324080134893247-774b030211da4f0cb59cf0cd96f516ff/receipt.json",
+        "bytes": 1230,
+        "sha256": "aedca8477bdd3845641bbb4117200fd1e1ae87362c913c76dfc621addb7cddda",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324080551123959
+      },
+      {
+        "path": "whole-capture-21-stable-library-window-red.attempts/1792324080134893247-774b030211da4f0cb59cf0cd96f516ff/stderr.txt",
+        "bytes": 4821,
+        "sha256": "c96b466894df34d6f23a8c1e441229f10096a45f784b6cbc924c7f66d45e9a79",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324080483667424
+      },
+      {
+        "path": "whole-capture-21-stable-library-window-red.attempts/1792324080134893247-774b030211da4f0cb59cf0cd96f516ff/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324080135181030
+      },
+      {
+        "path": "whole-capture-21-stable-library-window-red.command.json",
+        "bytes": 1420,
+        "sha256": "a5aa185e1afdcd883a9de3169f25676b5dd6c82fe10dcfce17d98d4f61073cd4",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324080551477282
+      },
+      {
+        "path": "whole-capture-21-stable-library-window-red.guard.json",
+        "bytes": 3324,
+        "sha256": "e4a502586df791abb4bcd4a8fb62965df58f734ffc929a21daaa50aaa9981f77",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324081038393611
+      },
+      {
+        "path": "whole-capture-21-stable-library-window-red.log",
+        "bytes": 4821,
+        "sha256": "c96b466894df34d6f23a8c1e441229f10096a45f784b6cbc924c7f66d45e9a79",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324080551320525
+      },
+      {
+        "path": "whole-capture-firstcoverage-setup.attempts/1792323404950078979-2c030a3d41ad4756b64e9278117fe26d/receipt.json",
+        "bytes": 1214,
+        "sha256": "85cc4110f24a7eb90a50b4bcdfa2cff03ecb945a382ba0ed393fcfe3d909012b",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323405265705922
+      },
+      {
+        "path": "whole-capture-firstcoverage-setup.attempts/1792323404950078979-2c030a3d41ad4756b64e9278117fe26d/stderr.txt",
+        "bytes": 21139,
+        "sha256": "e34110dd46d72874b018a167d767e83d866361b65aaea0e95c2f94cd4cdad3fb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323405211065114
+      },
+      {
+        "path": "whole-capture-firstcoverage-setup.attempts/1792323404950078979-2c030a3d41ad4756b64e9278117fe26d/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323404950425351
+      },
+      {
+        "path": "whole-capture-firstcoverage-setup.command.json",
+        "bytes": 1395,
+        "sha256": "56338659c33f63c6519366c0ab6a76f945b71032082bb15d2bbed17851edf316",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323405266107397
+      },
+      {
+        "path": "whole-capture-firstcoverage-setup.log",
+        "bytes": 21139,
+        "sha256": "e34110dd46d72874b018a167d767e83d866361b65aaea0e95c2f94cd4cdad3fb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323405265842768
+      },
+      {
+        "path": "whole-pair-65-fileapi-first-green.attempts/1792324183500531900-b8d780820fd6437ba70d0729252865d0/receipt.json",
+        "bytes": 1207,
+        "sha256": "cdf0e252ea965cd8196e73d847804ae7a37307dee0664611236d9339a355a005",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324187182169015
+      },
+      {
+        "path": "whole-pair-65-fileapi-first-green.attempts/1792324183500531900-b8d780820fd6437ba70d0729252865d0/stderr.txt",
+        "bytes": 10641,
+        "sha256": "f7e76574aed02ef449371608f7fe3d93bd0ba7600675119e6d1283296cca9c36",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324187151134557
+      },
+      {
+        "path": "whole-pair-65-fileapi-first-green.attempts/1792324183500531900-b8d780820fd6437ba70d0729252865d0/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324183500799313
+      },
+      {
+        "path": "whole-pair-65-fileapi-first-green.command.json",
+        "bytes": 1388,
+        "sha256": "63a51bad3212c8c6dc25094069ad661a48341600c87b9f8de7743d5c20c7c177",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324187182348024
+      },
+      {
+        "path": "whole-pair-65-fileapi-first-green.guard.json",
+        "bytes": 3324,
+        "sha256": "b7f2f6f44d86077ed9095beaddbdb2bf0baf9925baee45e25b4108513f992390",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324187617122109
+      },
+      {
+        "path": "whole-pair-65-fileapi-first-green.log",
+        "bytes": 10641,
+        "sha256": "f7e76574aed02ef449371608f7fe3d93bd0ba7600675119e6d1283296cca9c36",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324187182277157
+      },
+      {
+        "path": "whole-pair-65-fileapi-firstcoverage.attempts/1792324120241582052-9e9d0a73a6544860a06f342bf6e5d170/receipt.json",
+        "bytes": 1212,
+        "sha256": "0ca4bf32c9713c829d7f56e35bdb135a6ff171106e103bedd970794b0053a113",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324124322041662
+      },
+      {
+        "path": "whole-pair-65-fileapi-firstcoverage.attempts/1792324120241582052-9e9d0a73a6544860a06f342bf6e5d170/stderr.txt",
+        "bytes": 20989,
+        "sha256": "f8f5d48a6e66bf8236786a19b00ef8a543f489aa9e5492a51f62adac487be33e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324124290684769
+      },
+      {
+        "path": "whole-pair-65-fileapi-firstcoverage.attempts/1792324120241582052-9e9d0a73a6544860a06f342bf6e5d170/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324120241857998
+      },
+      {
+        "path": "whole-pair-65-fileapi-firstcoverage.command.json",
+        "bytes": 1395,
+        "sha256": "6f8fad150c0f0a658dccb443940d6316be9a73b34ec35b205327a7e2cf095e22",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324124322272990
+      },
+      {
+        "path": "whole-pair-65-fileapi-firstcoverage.guard.json",
+        "bytes": 3324,
+        "sha256": "7394f49a005032b1ef9fd4705f201b7f1a33b9be3143173ead88c5d13dc8dd81",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324124747111393
+      },
+      {
+        "path": "whole-pair-65-fileapi-firstcoverage.log",
+        "bytes": 20989,
+        "sha256": "f8f5d48a6e66bf8236786a19b00ef8a543f489aa9e5492a51f62adac487be33e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324124322158137
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-green.attempts/1792324362769196953-c51579791f994ca6bf45a6b5ccf8a0ec/receipt.json",
+        "bytes": 1236,
+        "sha256": "f965e9308dd771f3f248963b745e7851e6e47b6fed882605ba47bb0a4454ce31",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324366500778892
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-green.attempts/1792324362769196953-c51579791f994ca6bf45a6b5ccf8a0ec/stderr.txt",
+        "bytes": 11577,
+        "sha256": "d075b99509e5e4891e3a3b8edb07169063e3bcb60dd9f92e44c3e4fe8dc85b48",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324366467534497
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-green.attempts/1792324362769196953-c51579791f994ca6bf45a6b5ccf8a0ec/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324362769607271
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-green.command.json",
+        "bytes": 1427,
+        "sha256": "78cdcc9359a6e127c09eb066a9b0b84d1077ff9b87c57966f7a9d54d7207ff2e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324366500960886
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-green.guard.json",
+        "bytes": 3324,
+        "sha256": "57331acb26da62493018c7834658de94a989b860d17e4fa66b680f0c16eadce3",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324366923987618
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-green.log",
+        "bytes": 11577,
+        "sha256": "d075b99509e5e4891e3a3b8edb07169063e3bcb60dd9f92e44c3e4fe8dc85b48",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324366500889869
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-red.attempts/1792324314041730214-3a1873a3b9384dd89bc8e1d60f3f26c3/receipt.json",
+        "bytes": 1231,
+        "sha256": "bdb2c1a368f46bc53e9df3f1d4d2c9ffe10a855e71748c00d8df1723c78c01ff",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324317772394908
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-red.attempts/1792324314041730214-3a1873a3b9384dd89bc8e1d60f3f26c3/stderr.txt",
+        "bytes": 13000,
+        "sha256": "23a85dcc0ec2b3ee2ddde956c6b1ee1e0db5a8643a5e68497899b10713cfd7fc",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324317747818895
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-red.attempts/1792324314041730214-3a1873a3b9384dd89bc8e1d60f3f26c3/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324314041996115
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-red.command.json",
+        "bytes": 1420,
+        "sha256": "33dc1b347ad6b3c365eadd926f2ecd0dbe28ef94af876b2acfb385a57ff15c0a",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324317772587358
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-red.guard.json",
+        "bytes": 3324,
+        "sha256": "6723db7530235416cf1ecdfb02865e9441d6ad794f57511301f80952b4c9b290",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324318196426515
+      },
+      {
+        "path": "whole-pair-70-capture-library-binding-red.log",
+        "bytes": 13000,
+        "sha256": "23a85dcc0ec2b3ee2ddde956c6b1ee1e0db5a8643a5e68497899b10713cfd7fc",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324317772513116
+      },
+      {
+        "path": "whole-pair-70-final.attempts/1792324461451478012-ced7dd9930864d6292eebe07fd0ad4e2/receipt.json",
+        "bytes": 1165,
+        "sha256": "db951d6705c53c99bbe1474b32b461dc038be9ca27724f68bab88258ea2f6de8",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324465330834217
+      },
+      {
+        "path": "whole-pair-70-final.attempts/1792324461451478012-ced7dd9930864d6292eebe07fd0ad4e2/stderr.txt",
+        "bytes": 11509,
+        "sha256": "ef0e4aa2672c47b257dfbf3bee0c1d4c0f6053d5b4c48a0d763f382b2227d3d6",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324465270317851
+      },
+      {
+        "path": "whole-pair-70-final.attempts/1792324461451478012-ced7dd9930864d6292eebe07fd0ad4e2/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324461451739776
+      },
+      {
+        "path": "whole-pair-70-final.command.json",
+        "bytes": 1332,
+        "sha256": "0450623aeacbfb850eb4c5b98e83a29e9b6ced6619f88755c2e61a6ba0f6bc5f",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324465331068950
+      },
+      {
+        "path": "whole-pair-70-final.guard.json",
+        "bytes": 3324,
+        "sha256": "ba1e4c67303b2c4ca25c64fd456ba7073da0e8d8452eb0d423467df1a2cc9cb8",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324465745841356
+      },
+      {
+        "path": "whole-pair-70-final.log",
+        "bytes": 11509,
+        "sha256": "ef0e4aa2672c47b257dfbf3bee0c1d4c0f6053d5b4c48a0d763f382b2227d3d6",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324465330997563
+      },
+      {
+        "path": "whole-workflow-57-correct-environment-red.attempts/1792323710198508678-ef5c5463bacd42c3a689f9b7930ddb25/receipt.json",
+        "bytes": 1204,
+        "sha256": "c1bac19082f68c42338ad81559bae1ddd343457e9f91cfc7fe52b32eced201f7",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323715040526628
+      },
+      {
+        "path": "whole-workflow-57-correct-environment-red.attempts/1792323710198508678-ef5c5463bacd42c3a689f9b7930ddb25/stderr.txt",
+        "bytes": 12930,
+        "sha256": "a0c044466cb1e9172568baa2c4891c0bf397e49777851a9e64420b1470ee404e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323714983474597
+      },
+      {
+        "path": "whole-workflow-57-correct-environment-red.attempts/1792323710198508678-ef5c5463bacd42c3a689f9b7930ddb25/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323710198771594
+      },
+      {
+        "path": "whole-workflow-57-correct-environment-red.command.json",
+        "bytes": 1393,
+        "sha256": "6b912af7a7206a9e0bcdc57f461ab76d750375ca18b98d6f89e62e18d2aa14f0",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323715040947342
+      },
+      {
+        "path": "whole-workflow-57-correct-environment-red.guard.json",
+        "bytes": 16785,
+        "sha256": "6832e52b31bfa3ee3d47373efedba21e1b78513ef93a933dfb6de9f8d7669cfb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323715436207857
+      },
+      {
+        "path": "whole-workflow-57-correct-environment-red.log",
+        "bytes": 12930,
+        "sha256": "a0c044466cb1e9172568baa2c4891c0bf397e49777851a9e64420b1470ee404e",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323715040860361
+      },
+      {
+        "path": "whole-workflow-57-final.attempts/1792324517478330518-2e94848eab3e41b3b232f3260b7fda35/receipt.json",
+        "bytes": 1149,
+        "sha256": "7bda72e14440c25f749826a9d9649aadcd8c62fa383547656337dcd60c74c1b5",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324522610262444
+      },
+      {
+        "path": "whole-workflow-57-final.attempts/1792324517478330518-2e94848eab3e41b3b232f3260b7fda35/stderr.txt",
+        "bytes": 9111,
+        "sha256": "3708c5b7f91daff046b59db9374d216d756a44695de47ca8e4c45a5a28bdd656",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324522542116490
+      },
+      {
+        "path": "whole-workflow-57-final.attempts/1792324517478330518-2e94848eab3e41b3b232f3260b7fda35/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324517478657541
+      },
+      {
+        "path": "whole-workflow-57-final.command.json",
+        "bytes": 1320,
+        "sha256": "6da579b5451abed2518b7830a2fc642587d2c4de038602e193749830449c78b4",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324522610515766
+      },
+      {
+        "path": "whole-workflow-57-final.guard.json",
+        "bytes": 3324,
+        "sha256": "07ced43076df905b5c882eae96b331449c3dcacf91687802cf78ebec9ee79ff2",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324523008666817
+      },
+      {
+        "path": "whole-workflow-57-final.log",
+        "bytes": 9111,
+        "sha256": "3708c5b7f91daff046b59db9374d216d756a44695de47ca8e4c45a5a28bdd656",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324522610431018
+      },
+      {
+        "path": "whole-workflow-57-first-green.attempts/1792323865796515750-029c293cddfd46f4a50d0678cf6022e7/receipt.json",
+        "bytes": 1167,
+        "sha256": "56a32e1dae0ff74d026d85ac1c41052362ff0531f4f5b1a0076541151b0256b5",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323870882633644
+      },
+      {
+        "path": "whole-workflow-57-first-green.attempts/1792323865796515750-029c293cddfd46f4a50d0678cf6022e7/stderr.txt",
+        "bytes": 9111,
+        "sha256": "5e0bf8b658c3ecf7051e09a954b96444541efcd955b38d26e1f227da5d0ad3da",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323870854313892
+      },
+      {
+        "path": "whole-workflow-57-first-green.attempts/1792323865796515750-029c293cddfd46f4a50d0678cf6022e7/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323865796813138
+      },
+      {
+        "path": "whole-workflow-57-first-green.command.json",
+        "bytes": 1344,
+        "sha256": "ab490bfaaa8c9077a1a3edd1283166f5d57609e2c495d00401006c32fd0a0afc",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323870882836911
+      },
+      {
+        "path": "whole-workflow-57-first-green.guard.json",
+        "bytes": 3324,
+        "sha256": "0901fabeceea6d487dabd497d99011171517a0b528a8c03419d06c52346614f8",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323871318686547
+      },
+      {
+        "path": "whole-workflow-57-first-green.log",
+        "bytes": 9111,
+        "sha256": "5e0bf8b658c3ecf7051e09a954b96444541efcd955b38d26e1f227da5d0ad3da",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323870882766164
+      },
+      {
+        "path": "whole-workflow-missing-capture-red.attempts/1792323260306584300-5a9d97822438445b93c486b1dda14a70/receipt.json",
+        "bytes": 1191,
+        "sha256": "b2acd26700e3681d2ddd215d34fb6114b73334d8ab0b6b88dd4b4b92a0bde520",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323263396486090
+      },
+      {
+        "path": "whole-workflow-missing-capture-red.attempts/1792323260306584300-5a9d97822438445b93c486b1dda14a70/stderr.txt",
+        "bytes": 21439,
+        "sha256": "799a83fbc6f18211a96f0cfd4e2d6e4906e7a3ec1d6cd8e1372dfa63be9937a3",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323263363235603
+      },
+      {
+        "path": "whole-workflow-missing-capture-red.attempts/1792323260306584300-5a9d97822438445b93c486b1dda14a70/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323260307013228
+      },
+      {
+        "path": "whole-workflow-missing-capture-red.command.json",
+        "bytes": 1373,
+        "sha256": "897f07eb4ebff1dd9ee0d6507868fe044b4d1e57c9c8fe56bcf2ba9eda7e8ca7",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323263396647653
+      },
+      {
+        "path": "whole-workflow-missing-capture-red.log",
+        "bytes": 21439,
+        "sha256": "799a83fbc6f18211a96f0cfd4e2d6e4906e7a3ec1d6cd8e1372dfa63be9937a3",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323263396579240
+      },
+      {
+        "path": "workflow-tests-first.py.gz",
+        "bytes": 15959,
+        "sha256": "0006f80502503ffafd1edf87311888f15a1875968e072a87d9f52b640322a772",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792323260306405911
+      }
+    ],
+    "all_later_control_leaves": [
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/archive-inputs-r1.json",
+        "bytes": 46758,
+        "sha256": "915fe8b122eb684bc3087908f04aa1a09e08bb456c03660076ac6744622f5367",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698164743795
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/archive-verification-r1.json",
+        "bytes": 515,
+        "sha256": "82253632fca478bea61bd1359047e9583fab8908b4cf274bf27391e9d9795343",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698764643454
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/budget-revision-r2.json",
+        "bytes": 335,
+        "sha256": "dc6d25ac6aa36cc98bb67647ad5ae5e462f3cef1c6badfa013ccbadaeba61efc",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698164801282
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/execution-evidence-r1.tar.gz",
+        "bytes": 1000754,
+        "sha256": "93a7e172659d805e8000e34df7cdfb2efa6528aec086b17dbee804c695d9fcb4",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698737313025
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/finalize_handoff.py",
+        "bytes": 5411,
+        "sha256": "65893627197e3f2da436467f9826c725b089dba13356902f60eb0550b5982a1b",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324868960398817
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.attempts/1792324698629829405-e32c84390b94413f8212b511174240ed/receipt.json",
+        "bytes": 1172,
+        "sha256": "8ed83c1866286e4459e510b2a91a1db91e4feca450b95f0d2b9adbd74796c6ab",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698794850506
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.attempts/1792324698629829405-e32c84390b94413f8212b511174240ed/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698630120975
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.attempts/1792324698629829405-e32c84390b94413f8212b511174240ed/stdout.txt",
+        "bytes": 483,
+        "sha256": "d87a23dbbcf0fe23f516211a56d85621e0b0a8f34b71b3969810a7b74f6925eb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698764643454
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.command.json",
+        "bytes": 1345,
+        "sha256": "6520748104fea743ce6fe5f1df1db69cb094db03f0907f2eace11a3ff8eb1458",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698795025009
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.guard.json",
+        "bytes": 3324,
+        "sha256": "779f7b5f23ddfd49331e0314308dec5585d5bca7b950ba7d63ada6e2718789d4",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324699193157577
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal-complete-feature-157.log",
+        "bytes": 483,
+        "sha256": "d87a23dbbcf0fe23f516211a56d85621e0b0a8f34b71b3969810a7b74f6925eb",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698794960331
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/seal_feature.py",
+        "bytes": 2175,
+        "sha256": "126ee589edf8986c083fadb2f70cdda9ebaa794a44ba325f414f0d926fda098f",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324698169302722
+      },
+      {
+        "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/validation-summary-r1.json",
+        "bytes": 27448,
+        "sha256": "7cdf2edc26610ba33811ad725a6e089be83b2d4bd769912be3585d0db674e1e3",
+        "mode": 384,
+        "uid": 1000,
+        "gid": 1000,
+        "mtime_ns": 1792324868983507398
+      }
+    ],
+    "no_recursive_self_archive": true
+  },
+  "historical_packets": [
+    {
+      "root": "/dev/shm/nexus-u575-pair-feature-20261018-r1",
+      "unchanged_original_references_only": true,
+      "leaves": [
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before/tests/contracts/u575_trustzone/README.md",
+          "bytes": 6128,
+          "sha256": "9eda62f7aafa342ca7a9ae26e84637f4abecd5029302d526cabfed3858f020b5",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318648377750750
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before/tests/contracts/u575_trustzone/test_gate.py",
+          "bytes": 9297,
+          "sha256": "e81ebda8ca99b3ef92809f7808568465ea1568182469be8a3f519de2ad36debe",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318648377661385
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before-context-history.py.gz",
+          "bytes": 8934,
+          "sha256": "f1c421832e95e9f4d3e0e0d726625cb2e1e65abcc64201f1606a585b1fe9f4da",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319500131218474
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before-include-conflict.py.gz",
+          "bytes": 8968,
+          "sha256": "3d5f6a03090b6312eb94580acd7f06543c7205f704dedc77c8f02dc25ab6fc77",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319809763977781
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before-index.gz",
+          "bytes": 787965,
+          "sha256": "eb561803a81ecdfc5c5128f7b6775ed95e46f5d8e2743330c58d8f32e4d6c892",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318648540407093
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before-member-digest.py.gz",
+          "bytes": 8745,
+          "sha256": "1f362709d95cb8eead42f26d6e33505e09c239e56d185fdd11b4ee10ede9bd1b",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319238643275781
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before-strict-schema.py.gz",
+          "bytes": 8631,
+          "sha256": "a37f2a5ed2df17ccf43867e341495751006ee106f0e676e39aa5c52218ff522e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319136284016029
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before-wrap-u575_pair.py.gz",
+          "bytes": 8861,
+          "sha256": "6d2def6d3d89a3a7a26826d38a4eabe50dbe78b458e4ade30a59fb9b7d1f4f21",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319351450140962
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/before.json",
+          "bytes": 1015,
+          "sha256": "092db1c4afcb8394ae433dec2046af63c763577e56cf3948ce7bba243540bc71",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318648545059301
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/context-history-tests.py.gz",
+          "bytes": 6048,
+          "sha256": "2355506c68fc89ae5ddc6b4a866aa6decaf1bfc4b5a3ffe2b65611e0d5274b7b",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319500132875591
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tests/contracts/u575_trustzone/README.md",
+          "bytes": 10974,
+          "sha256": "d8f2b8f116a5bc292be558accd6006f6e396c8b7a73b1d06425a516327eca4c5",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319465171760604
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tests/contracts/u575_trustzone/test_gate.py",
+          "bytes": 10349,
+          "sha256": "3b3b843c88d7aaf4eedca001ac26e824db4e883dcef9e3f970289f5959311d94",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319324332042648
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tools/evidence/u575_pair.py",
+          "bytes": 34630,
+          "sha256": "3378cb0291ad6071169373bd3c9756089d03def4f9a3b81f270d20df873392d5",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319825519338882
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tools/testing/test_u575_pair_evidence.py",
+          "bytes": 28470,
+          "sha256": "2f4f4b2ddd977140bbc4da297cbbb262361ea94f0dae500b3eb6f7e1c53a4d13",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319809731240939
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/final-checks-raw-map-r1.json",
+          "bytes": 14926,
+          "sha256": "3f3701ba144f6a0bf96174cadaeab9d676016a74f656ec6ba16152d83a5331d4",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319933492106727
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/final-checks-raw-r1.tar.gz",
+          "bytes": 7857,
+          "sha256": "7a6c86a3203375e2f6bb38b7cf31dc73df7a2898ea0b848ddb82cfa330558819",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319933482567577
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/final-four-source-freeze-r1.json",
+          "bytes": 2769,
+          "sha256": "76d846fa23756808b7d0aab630ba37cc2951bb3bafc5aa85950f038c29c4d6fc",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319882990585895
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/first-implementation/test_u575_pair_evidence.py.gz",
+          "bytes": 2861,
+          "sha256": "7cb5b65b8a737c5560f9ad891cd30ef5f485e72e5db5ece5488b757a0e649f1b",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947446403056
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/first-implementation/u575_pair.py.gz",
+          "bytes": 8494,
+          "sha256": "b64a1dcce2b4de2d20276ad15ce6f1b09fd6822c85f22b1ab387cf4855dd552b",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947445917895
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/firstcoverage.attempts/1792318737036239667-dee0cee74a094cf0a2dd0c2b41a2a661/receipt.json",
+          "bytes": 1158,
+          "sha256": "7305d954672f47ae73bf9b62c47c7bc42c89d1a67fed7e79122c0c30e135a492",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318737201699788
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/firstcoverage.attempts/1792318737036239667-dee0cee74a094cf0a2dd0c2b41a2a661/stderr.txt",
+          "bytes": 998,
+          "sha256": "10f3e861da3598fce49d447c993bdc9259158047917abbbd7d8121401c88e450",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318737180840137
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/firstcoverage.attempts/1792318737036239667-dee0cee74a094cf0a2dd0c2b41a2a661/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318737036546078
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/firstcoverage.command.json",
+          "bytes": 1316,
+          "sha256": "9fb4b0d07bdd38294dfaabc001a6d6ebfba7d2fce828dc0f6b88dce2db708260",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318737201893470
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/firstcoverage.log",
+          "bytes": 998,
+          "sha256": "10f3e861da3598fce49d447c993bdc9259158047917abbbd7d8121401c88e450",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318737201823134
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/handoff-pure-r1.json",
+          "bytes": 7923,
+          "sha256": "e3a25b0aac1c62364afebbfe154560d4e38c47f5228d9fc43be7dbf8f2236ee6",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319933502841407
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/include-conflict-tests.py.gz",
+          "bytes": 6257,
+          "sha256": "df08277e460435852ecfd8a2f520fa06638f2b514b498974ffca231f396c3fa0",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319809765817843
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/member-digest-red-tests.py.gz",
+          "bytes": 5904,
+          "sha256": "d3dfe302b8248374c4e8c93a32aaab187e2a65e3489698de103dfb513a334b78",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319238644975181
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/real-corpus-budget-forecast-r1.json",
+          "bytes": 11760,
+          "sha256": "d3300a89d58d9b0d43e7783ba9df7c3f51c820d84b69f2997f009e7a9357f0d1",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320254944674999
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/same-checker-before-fixes.py.gz",
+          "bytes": 8494,
+          "sha256": "b64a1dcce2b4de2d20276ad15ce6f1b09fd6822c85f22b1ab387cf4855dd552b",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319023586941903
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/same-checker-regressions.py.gz",
+          "bytes": 4344,
+          "sha256": "79a5456dc84b566f989ec1bf6cafaee77cb903f9c1c8efc199008e241170851d",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319023587674296
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/strict-schema-tests.py.gz",
+          "bytes": 5428,
+          "sha256": "a588877f6b11b63aa93ca7907c6dde02e5a11969086f8c7dd6401c3d0f015ede",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319136285190268
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/two-schema-red-tests.py.gz",
+          "bytes": 5711,
+          "sha256": "1009eac719088404ac2dbd30a1d398b3e8b20e2f682611af424f993c92bde2f1",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319181666529485
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-context-history-red.attempts/1792319500133034100-c3a2d4b2e1a84e04908682147d4c1ea0/receipt.json",
+          "bytes": 1186,
+          "sha256": "44ca9eda9b825e59a35a9cbe7e95b3d7376f6c86da7555a56df4e272127257b8",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319503919041484
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-context-history-red.attempts/1792319500133034100-c3a2d4b2e1a84e04908682147d4c1ea0/stderr.txt",
+          "bytes": 8625,
+          "sha256": "a17412b3db6add27142bcf6a7623e2e7a4328d91838438cf6492a821899ff241",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319503889631114
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-context-history-red.attempts/1792319500133034100-c3a2d4b2e1a84e04908682147d4c1ea0/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319500133329344
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-context-history-red.command.json",
+          "bytes": 1356,
+          "sha256": "0d895e514b4b9deef57ef0b6caab1d148133f8e681ec661889d290c9d6922dcb",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319503919203027
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-context-history-red.log",
+          "bytes": 8625,
+          "sha256": "a17412b3db6add27142bcf6a7623e2e7a4328d91838438cf6492a821899ff241",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319503919136827
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-corrected-regressions.attempts/1792319056894366433-37c3a2bc8de44a6f92e171e2ff816d5c/receipt.json",
+          "bytes": 1191,
+          "sha256": "82be37be6808d31bc096baf219f12454c1998e5710cdb5ff6f2d425979188a03",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319059668023099
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-corrected-regressions.attempts/1792319056894366433-37c3a2bc8de44a6f92e171e2ff816d5c/stderr.txt",
+          "bytes": 6235,
+          "sha256": "2e4e8c930b1c8e94993b576ea8144413e487f13aaac746f10dc308707c30e168",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319059630668812
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-corrected-regressions.attempts/1792319056894366433-37c3a2bc8de44a6f92e171e2ff816d5c/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319056894612513
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-corrected-regressions.command.json",
+          "bytes": 1363,
+          "sha256": "8d2af7e07514f6ad1d8f60fda8637d89832b4c32b1fd80f6663e28b4e1631b68",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319059668209981
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-corrected-regressions.log",
+          "bytes": 6235,
+          "sha256": "2e4e8c930b1c8e94993b576ea8144413e487f13aaac746f10dc308707c30e168",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319059668137702
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-discovered-regressions.attempts/1792319023587825374-a311f1976d2f4db59b26678c2aee5efe/receipt.json",
+          "bytes": 1195,
+          "sha256": "3942d8a9b40b18927507c7c37b00bf935852c84ea60266b57c4bd6cb61dc785d",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319026309844332
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-discovered-regressions.attempts/1792319023587825374-a311f1976d2f4db59b26678c2aee5efe/stderr.txt",
+          "bytes": 9798,
+          "sha256": "2cd4c4124d0177a1f6785c373b4c943a33a5de2120c7ef336be1efcb302e5964",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319026286051644
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-discovered-regressions.attempts/1792319023587825374-a311f1976d2f4db59b26678c2aee5efe/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319023588203083
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-discovered-regressions.command.json",
+          "bytes": 1368,
+          "sha256": "11171fd31e7d3686a27a1597d91ddb39fa5b3960aa52d5464f983b0341b783d2",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319026310281100
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-discovered-regressions.log",
+          "bytes": 9798,
+          "sha256": "2cd4c4124d0177a1f6785c373b4c943a33a5de2120c7ef336be1efcb302e5964",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319026310199046
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-first-implementation.attempts/1792318947446576417-34b5640cf26a45c2b2547ce6b1342027/receipt.json",
+          "bytes": 1194,
+          "sha256": "ae9f9e864f38582baa03ef737637181a5fefeeaa76c3a8096fc81f3738ce7bf0",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947712045279
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-first-implementation.attempts/1792318947446576417-34b5640cf26a45c2b2547ce6b1342027/stderr.txt",
+          "bytes": 3834,
+          "sha256": "b91581c33ee83a1bca2b418e3179287a4a661411584bf1afcf661cb2b04d2a7f",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947673172663
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-first-implementation.attempts/1792318947446576417-34b5640cf26a45c2b2547ce6b1342027/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947446882649
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-first-implementation.command.json",
+          "bytes": 1365,
+          "sha256": "70922ff519646e346d1a9ebee9f8a9be03c7b564b1533f61c3c819fda39136b8",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947712206302
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-first-implementation.log",
+          "bytes": 3834,
+          "sha256": "b91581c33ee83a1bca2b418e3179287a4a661411584bf1afcf661cb2b04d2a7f",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792318947712143086
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-green.attempts/1792319825548834263-882d144ab14b4e2782027d4947430865/receipt.json",
+          "bytes": 1195,
+          "sha256": "9e775de66ed6081f1669908179fd8316a9a21b0c7bd3af48b1193eb8c6692921",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319829327212169
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-green.attempts/1792319825548834263-882d144ab14b4e2782027d4947430865/stderr.txt",
+          "bytes": 8106,
+          "sha256": "8d436356196467816e6e2ef0f51e2f51d803caf0c2f988f467cfda1a42cb5f80",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319829276686219
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-green.attempts/1792319825548834263-882d144ab14b4e2782027d4947430865/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319825549065140
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-green.command.json",
+          "bytes": 1368,
+          "sha256": "113cdf56b3206a4e42a0691b14a74669def929ba4962a1a8ec1e0b062945fdaf",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319829327578761
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-green.log",
+          "bytes": 8106,
+          "sha256": "8d436356196467816e6e2ef0f51e2f51d803caf0c2f988f467cfda1a42cb5f80",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319829327311539
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-red.attempts/1792319809765977343-159cb7b3fa0e4808960e83fffe90ee69/receipt.json",
+          "bytes": 1188,
+          "sha256": "ad0bd9607b4fb0a7f89422cdfcf34badd28e965cb7d991823ec9b7c406ea7dbc",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319813252396965
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-red.attempts/1792319809765977343-159cb7b3fa0e4808960e83fffe90ee69/stderr.txt",
+          "bytes": 8825,
+          "sha256": "5f5982c5d75add56dc3af2dfd3323d2661f1f0d01a85d9ff963330764efc08c4",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319813224396459
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-red.attempts/1792319809765977343-159cb7b3fa0e4808960e83fffe90ee69/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319809766407111
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-red.command.json",
+          "bytes": 1359,
+          "sha256": "1ef1cda8806f5815001b8e83df594c9f6bcbbd1eaffdf157b8a436b1d6735516",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319813253712843
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-red.log",
+          "bytes": 8825,
+          "sha256": "5f5982c5d75add56dc3af2dfd3323d2661f1f0d01a85d9ff963330764efc08c4",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319813253640233
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-green.attempts/1792319256406777011-8844d52310894de2b139ba8f530b3803/receipt.json",
+          "bytes": 1186,
+          "sha256": "c45bbef8247aab191b8b8a36294425dcaea57d94f7a7165532060cbf31388480",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319260040609379
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-green.attempts/1792319256406777011-8844d52310894de2b139ba8f530b3803/stderr.txt",
+          "bytes": 7750,
+          "sha256": "c5320ec26fb01fd4f8994da092eff025767b872d7b0e2b3fe6a5b0cbc1f4269e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319259978402065
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-green.attempts/1792319256406777011-8844d52310894de2b139ba8f530b3803/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319256407024574
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-green.command.json",
+          "bytes": 1356,
+          "sha256": "dba2673a275c4ef6de82d01c3b27f435c75a4c994b2b42b36604ffb583e5c10a",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319260040789290
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-green.log",
+          "bytes": 7750,
+          "sha256": "c5320ec26fb01fd4f8994da092eff025767b872d7b0e2b3fe6a5b0cbc1f4269e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319260040712064
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-red.attempts/1792319238645207051-5188619146d84224ad4842f3f066f0c3/receipt.json",
+          "bytes": 1179,
+          "sha256": "32d5326205eace233b83b021402f7f9fb480317fe7780fbc44e3a22fb9fcf5a9",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319242284124896
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-red.attempts/1792319238645207051-5188619146d84224ad4842f3f066f0c3/stderr.txt",
+          "bytes": 8785,
+          "sha256": "c39d6a2d1ab8c4b51121d5b2490b1074903d66ae3863235636a4d1426eedbfa6",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319242226077672
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-red.attempts/1792319238645207051-5188619146d84224ad4842f3f066f0c3/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319238645584870
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-red.command.json",
+          "bytes": 1347,
+          "sha256": "1632714c19b55972523b02916e2dae3604f4a3e1844301d3573dd680b67cfa0e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319242284292959
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-red.log",
+          "bytes": 8785,
+          "sha256": "c39d6a2d1ab8c4b51121d5b2490b1074903d66ae3863235636a4d1426eedbfa6",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319242284224255
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r1.attempts/1792319521056956306-58492977d0fa426694226817c5311875/receipt.json",
+          "bytes": 1168,
+          "sha256": "97cf287e18f33f4c32228746fb5e2cb191d4edbaf2256199077473c86bca7fb0",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319524683404059
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r1.attempts/1792319521056956306-58492977d0fa426694226817c5311875/stderr.txt",
+          "bytes": 8808,
+          "sha256": "19eabc2e8a194c2401e3855a0f143cdf88a8e19852a3f42fa8359fa5780f9e92",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319524635452130
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r1.attempts/1792319521056956306-58492977d0fa426694226817c5311875/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319521057192903
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r1.command.json",
+          "bytes": 1332,
+          "sha256": "b0b579dfe3161ae4557eee82ab59f5409c0ed0abf96a996b8ffe2a1867ed8c0c",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319524683590190
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r1.log",
+          "bytes": 8808,
+          "sha256": "19eabc2e8a194c2401e3855a0f143cdf88a8e19852a3f42fa8359fa5780f9e92",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319524683519754
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r2.attempts/1792319567209794946-14291cbdd5ef4f13958f5bfd8c89502f/receipt.json",
+          "bytes": 1167,
+          "sha256": "ca1ebdc79e38ea651da42e21ea96905f3646e1808e1183cedefb48d8c169bd53",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319570842133535
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r2.attempts/1792319567209794946-14291cbdd5ef4f13958f5bfd8c89502f/stderr.txt",
+          "bytes": 7919,
+          "sha256": "1a55c5defd7024fbaa5896fff17b76e46642d8bf01f03e0b6e4a8aeb69b5e720",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319570812034276
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r2.attempts/1792319567209794946-14291cbdd5ef4f13958f5bfd8c89502f/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319567210064672
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r2.command.json",
+          "bytes": 1331,
+          "sha256": "ad589d13a91a130bb8fc005be8fada32e40a54a0a6410b3b8118a342a8088d5c",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319570842331854
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r2.log",
+          "bytes": 7919,
+          "sha256": "1a55c5defd7024fbaa5896fff17b76e46642d8bf01f03e0b6e4a8aeb69b5e720",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319570842260236
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-schema-green.attempts/1792319198197528898-4732cc3ed4794d34aff4cd214e064043/receipt.json",
+          "bytes": 1165,
+          "sha256": "1d2d2c45ca2d78e64e0d3079a1b74d0942ff111797f05863d1d24258f8574009",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319201475275163
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-schema-green.attempts/1792319198197528898-4732cc3ed4794d34aff4cd214e064043/stderr.txt",
+          "bytes": 7574,
+          "sha256": "3b1b6d1b8757081235ba5133dee1e02f494e24e8c96e574636fbd70059e7abce",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319201433325517
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-schema-green.attempts/1792319198197528898-4732cc3ed4794d34aff4cd214e064043/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319198197974600
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-schema-green.command.json",
+          "bytes": 1328,
+          "sha256": "4b85a346ca4430b4ff25781a04a8fdb19c9614a3ec45d5488f8816108468081d",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319201475479391
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-schema-green.log",
+          "bytes": 7574,
+          "sha256": "3b1b6d1b8757081235ba5133dee1e02f494e24e8c96e574636fbd70059e7abce",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319201475407042
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-strict-schema-red.attempts/1792319136285354776-d96d8a9cda1a43ed885c95d86b584a1f/receipt.json",
+          "bytes": 1176,
+          "sha256": "38b44dc7a300b702d4a25e9a1eed6b8db34d00883091bdb1ecf88907f1ed2fb4",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319139258256709
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-strict-schema-red.attempts/1792319136285354776-d96d8a9cda1a43ed885c95d86b584a1f/stderr.txt",
+          "bytes": 8295,
+          "sha256": "016490c1643536fbb440ed8b58e4d82f900a38be146a149ba5e47bb94743f845",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319139224190939
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-strict-schema-red.attempts/1792319136285354776-d96d8a9cda1a43ed885c95d86b584a1f/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319136285741339
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-strict-schema-red.command.json",
+          "bytes": 1344,
+          "sha256": "500bc2f32a5650ae4c201514b910a9748137e7da9c6b76a98d8006e1e58d034f",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319139258470281
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-strict-schema-red.log",
+          "bytes": 8295,
+          "sha256": "016490c1643536fbb440ed8b58e4d82f900a38be146a149ba5e47bb94743f845",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319139258356600
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-two-schema-red.attempts/1792319181666692811-57501dd8f9e04109861639843ff7aea4/receipt.json",
+          "bytes": 1171,
+          "sha256": "772ee7641a61e7f8d27cfe40b13f7087e6cd3b11bb50be6f80aeea01c78df491",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319184792552129
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-two-schema-red.attempts/1792319181666692811-57501dd8f9e04109861639843ff7aea4/stderr.txt",
+          "bytes": 8467,
+          "sha256": "b267eede634accaaaf914d50475b815b23d0f5c626721ce3339bef4c164970db",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319184745014918
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-two-schema-red.attempts/1792319181666692811-57501dd8f9e04109861639843ff7aea4/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319181666983589
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-two-schema-red.command.json",
+          "bytes": 1336,
+          "sha256": "c7dbc05234ff6bff42c24a4d45d4e5f542ed44fb98b66b322850544140082aaf",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319184792803318
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-two-schema-red.log",
+          "bytes": 8467,
+          "sha256": "b267eede634accaaaf914d50475b815b23d0f5c626721ce3339bef4c164970db",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792319184792650487
+        }
+      ]
+    },
+    {
+      "root": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018",
+      "unchanged_original_references_only": true,
+      "leaves": [
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/before/tools/evidence/u575_pair.py",
+          "bytes": 34630,
+          "sha256": "3378cb0291ad6071169373bd3c9756089d03def4f9a3b81f270d20df873392d5",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320693691463697
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/before/tools/testing/test_u575_pair_evidence.py",
+          "bytes": 28470,
+          "sha256": "2f4f4b2ddd977140bbc4da297cbbb262361ea94f0dae500b3eb6f7e1c53a4d13",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320693691771621
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/before.json",
+          "bytes": 688,
+          "sha256": "7673c2f760fd3fe859eab9b7004e097e1381927708552ebbe6085aaf16a3096d",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320693698406015
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/final-r2-source-map-and-handoff.json",
+          "bytes": 11311,
+          "sha256": "551db17cf73e2e2e2769596272969a3c2d091d70d35344acc048771325d96ec1",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792321009502965252
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/final-two-full-sources.tar.gz",
+          "bytes": 15672,
+          "sha256": "1c00ff6fc2ef30ab71b27bb75b5d5df58919b1448a195a87ac136f46c0735290",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792321009500735393
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/fresh-final-execution.tar.gz",
+          "bytes": 4201,
+          "sha256": "5ac4f33068b504a36ab30968060abe9af98aee474344be46fc73c2a921b64ee9",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792321009501644883
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/mechanical-extracted-tests.py.gz",
+          "bytes": 7026,
+          "sha256": "93f1e9166f634a66c43d1b425009b5ac13072657b555f3973df30abc5ed9e73f",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320820987882739
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/mechanical-extracted-tool.py.gz",
+          "bytes": 9062,
+          "sha256": "57cad0dcfccfafa7f000f8e5e3a4c7e564c75e7bf1895d003ef7b7949b632ba4",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320820984752780
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/mechanical-extraction.diff.raw",
+          "bytes": 2843,
+          "sha256": "c99878f9dca87fd6bb9dbf9d393bf4d30990e0e07dff9cbdf6edbd5b39a66cdc",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320820988568502
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/mechanical-extraction.json",
+          "bytes": 567,
+          "sha256": "565c8637c4b8e2d31d62d4f6755b300277132d05271421c23e8241216cef9a78",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320820988678207
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/tests-first.py.gz",
+          "bytes": 7022,
+          "sha256": "28ecae7e48389ecc5566e5738c7ba7065fb3f4f33b30b24a931c6288c1310f59",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320775837202858
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-existing-body-red.attempts/1792320821025687375-8107a35753724565b646ba6ed8a32ec5/receipt.json",
+          "bytes": 1198,
+          "sha256": "37d8bb2f836b37771ace10bf6e426e04e08e19b2c4e444d2d97ed905209d5535",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320824814271713
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-existing-body-red.attempts/1792320821025687375-8107a35753724565b646ba6ed8a32ec5/stderr.txt",
+          "bytes": 12713,
+          "sha256": "3cb5ae3f97f66bfadb01fce74f1b9ecb5d7624afc07a77e25c1fb8347684f13e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320824777249114
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-existing-body-red.attempts/1792320821025687375-8107a35753724565b646ba6ed8a32ec5/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320821025926735
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-existing-body-red.command.json",
+          "bytes": 1367,
+          "sha256": "569e808f07237b735d56924c8bb3d63904d9e153b6d0249b499ccd6627280b5a",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320824814473347
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-existing-body-red.log",
+          "bytes": 12713,
+          "sha256": "3cb5ae3f97f66bfadb01fce74f1b9ecb5d7624afc07a77e25c1fb8347684f13e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320824814400016
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-minimal-green.attempts/1792320885200493737-65d30009575447429d17a9c35161c8ef/receipt.json",
+          "bytes": 1183,
+          "sha256": "25c4b1ab77948c7807b1f65d1693cca17ee29b9018728c04db3a01ad0f051f5e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320888998414844
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-minimal-green.attempts/1792320885200493737-65d30009575447429d17a9c35161c8ef/stderr.txt",
+          "bytes": 9365,
+          "sha256": "d26a8235ec3e582c8af738ff3dc86f06ef9c57e9eef43b0fd34cfea908bb73ea",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320888935467692
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-minimal-green.attempts/1792320885200493737-65d30009575447429d17a9c35161c8ef/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320885200737575
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-minimal-green.command.json",
+          "bytes": 1348,
+          "sha256": "f941dc8b01a8a455705964edd502b6274793585024576e2870141ff9f4322b8e",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320888998588826
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-minimal-green.log",
+          "bytes": 9365,
+          "sha256": "d26a8235ec3e582c8af738ff3dc86f06ef9c57e9eef43b0fd34cfea908bb73ea",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320888998517218
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-tests-first.attempts/1792320775837409509-58a2f35da40743f6b0a52b5414ae7d7d/receipt.json",
+          "bytes": 1186,
+          "sha256": "9095b20dca39e104f3810532c3509056cac4f110782525767eccba4359c3828d",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320779693873678
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-tests-first.attempts/1792320775837409509-58a2f35da40743f6b0a52b5414ae7d7d/stderr.txt",
+          "bytes": 14267,
+          "sha256": "91be813764bea8b5e7a9f92cf27099d1494eb57ff5c5a420d51d61da0bc16aff",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320779656143824
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-tests-first.attempts/1792320775837409509-58a2f35da40743f6b0a52b5414ae7d7d/stdout.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320775837940048
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-tests-first.command.json",
+          "bytes": 1349,
+          "sha256": "50e2ab8afac39b15186f9c26dcf5643e4f565a35009060e36c4b22f729bada18",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320779694039478
+        },
+        {
+          "path": "/dev/shm/nexus-u575-pair-copy-map-r2-20261018/whole-tests-first.log",
+          "bytes": 14267,
+          "sha256": "91be813764bea8b5e7a9f92cf27099d1494eb57ff5c5a420d51d61da0bc16aff",
+          "mode": 384,
+          "uid": 1000,
+          "gid": 1000,
+          "mtime_ns": 1792320779693972367
+        }
+      ]
+    }
+  ],
+  "independent_source_review": {
+    "path": "/dev/shm/nexus-u575-pair-capture-source-independent-review-20261018-r1.json",
+    "bytes": 7735,
+    "sha256": "fafb56a1f1c410088fb811185dc3e2c54a9d683b3a93da23b70edda2117c5fe2",
+    "mode": 384,
+    "uid": 1000,
+    "gid": 1000,
+    "mtime_ns": 1792324808514302614
+  },
+  "historical_independent_pure_R2_review": {
+    "path": "/dev/shm/nexus-u575-pair-independent-review-20261018-r2/report.json",
+    "bytes": 19010,
+    "sha256": "358ca9043288eaf2f177c4918eaf3328b859903be34c9a051775cee444f688ae",
+    "mode": 384,
+    "uid": 1000,
+    "gid": 1000,
+    "mtime_ns": 1792321315674899345
+  },
+  "budget_bytes": 3670016,
+  "source_persistence": "volatile_until_Root_normal_commit_push",
+  "classification_summary": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/validation-summary-r1.json",
+    "bytes": 27448,
+    "sha256": "7cdf2edc26610ba33811ad725a6e089be83b2d4bd769912be3585d0db674e1e3",
+    "mode": 384,
+    "uid": 1000,
+    "gid": 1000,
+    "mtime_ns": 1792324868983507398
+  }
+}

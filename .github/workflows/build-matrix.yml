@@ -155,12 +155,49 @@ jobs:
           --compiler arm-none-eabi-gcc
           --output build/u575-trustzone
           --parallel 2
+          --capture-pair-context
       - name: Reject mutations of the actual U575 pair and compiler ABI
         run: >-
           .venv/bin/python -m unittest discover
           -s tests/contracts/u575_trustzone -p 'test_*.py' -v
         env:
           NEXUS_U575_PAIR_BUILD: build/u575-trustzone
+      - name: Seal and independently verify the U575 software pair
+        shell: bash
+        run: |
+          set -euo pipefail
+          control=build/u575-trustzone/pair-context
+          export_root="$RUNNER_TEMP/nexus-u575-pair-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test ! -e "$export_root"
+          test ! -e build/u575-pair-evidence
+          context_sha=$(sha256sum "$control/context.json" | cut -d ' ' -f 1)
+          nm=$(realpath "$(command -v arm-none-eabi-nm)")
+          objdump=$(realpath "$(command -v arm-none-eabi-objdump)")
+          nm_sha=$(sha256sum "$nm" | cut -d ' ' -f 1)
+          objdump_sha=$(sha256sum "$objdump" | cut -d ' ' -f 1)
+          printf '%s\n' "$context_sha" > "$control/context.sha256"
+          .venv/bin/python tools/evidence/u575_pair.py seal \
+            --context "$control/context.json" \
+            --expected-context-sha256 "$context_sha" \
+            --output "$export_root" \
+            --nm "$nm" --nm-sha256 "$nm_sha" \
+            --objdump "$objdump" --objdump-sha256 "$objdump_sha" \
+            > "$control/seal.stdout.raw" 2> "$control/seal.stderr.raw"
+          manifest_sha=$(sha256sum "$export_root/manifest.json" | cut -d ' ' -f 1)
+          printf '%s\n' "$manifest_sha" > "$control/manifest.sha256"
+          archives=("$export_root"/store/*.tar.gz)
+          test "${#archives[@]}" -eq 1
+          test -f "${archives[0]}"
+          .venv/bin/python tools/evidence/u575_pair.py verify \
+            --manifest "$export_root/manifest.json" \
+            --expected-manifest-sha256 "$manifest_sha" \
+            --archive "${archives[0]}" \
+            --nm "$nm" --nm-sha256 "$nm_sha" \
+            --objdump "$objdump" --objdump-sha256 "$objdump_sha" \
+            > "$control/verify.stdout.raw" 2> "$control/verify.stderr.raw"
+          mkdir build/u575-pair-evidence
+          cp -p "$export_root/manifest.json" "${archives[0]}" \
+            build/u575-pair-evidence/
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity
@@ -182,6 +219,7 @@ jobs:
             build/stm32h743/
             build/stm32u575/
             build/u575-trustzone/
+            build/u575-pair-evidence/
           tools: |
             python=python3
             compiler=arm-none-eabi-gcc
@@ -202,6 +240,7 @@ jobs:
             build/stm32h743/
             build/stm32u575/
             build/u575-trustzone/
+            build/u575-pair-evidence/
             build/job-identities/arch/
           retention-days: 30
           include-hidden-files: true

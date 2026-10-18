@@ -516,6 +516,104 @@ class WorkflowContracts(unittest.TestCase):
             values = '\n'.join(str(value) for value in step['with'].values())
             self.assertIn('build/u575-trustzone/', values)
 
+    def test_u575_pair_context_capture_is_required_on_original_gate(self):
+        steps = workflow('build-matrix.yml')['jobs']['arch']['steps']
+        gates = [step for step in steps if
+                 'scripts/ci/u575_trustzone.py' in step.get('run', '')]
+        self.assertEqual(len(gates), 1)
+        self.assertIn('--capture-pair-context', gates[0]['run'])
+        paired = [step for step in steps if step.get('name') ==
+                  'Seal and independently verify the U575 software pair']
+        self.assertEqual(len(paired), 1)
+        self.assertNotIn('if', paired[0])
+        self.assertIn('--expected-context-sha256', paired[0]['run'])
+        self.assertIn('--expected-manifest-sha256', paired[0]['run'])
+        self.assertIn('"$RUNNER_TEMP/', paired[0]['run'])
+        self.assertNotIn('candidate.py', paired[0]['run'])
+
+    def test_u575_pair_upload_binds_verified_transport_and_original_raw(self):
+        steps = workflow('build-matrix.yml')['jobs']['arch']['steps']
+        for name in ('Preserve compiler evidence',
+                     'Bind the upload to observed execution identity'):
+            step = next(item for item in steps if item.get('name') == name)
+            values = '\n'.join(str(value) for value in step['with'].values())
+            with self.subTest(step=name):
+                self.assertIn('build/u575-pair-evidence/', values)
+                self.assertIn('build/u575-trustzone/', values)
+                self.assertNotIn('RUNNER_TEMP', values)
+                self.assertNotIn('/payload', values)
+
+    def test_u575_pair_shell_requires_verify_before_copying_opaque_artifacts(self):
+        steps = workflow('build-matrix.yml')['jobs']['arch']['steps']
+        selected = [step for step in steps if step.get('name') ==
+                    'Seal and independently verify the U575 software pair']
+        self.assertEqual(len(selected), 1)
+        fake = r'''#!/usr/bin/env python3
+import hashlib,json,os,pathlib,sys
+args=sys.argv[1:]
+assert args[0]=='tools/evidence/u575_pair.py'
+operation=args[1]
+def value(flag): return args[args.index(flag)+1]
+with open(os.environ['FAKE_PAIR_CALLS'],'a') as stream:
+    stream.write(json.dumps(args)+'\n')
+if operation=='seal':
+    context=pathlib.Path(value('--context'))
+    assert hashlib.sha256(context.read_bytes()).hexdigest()==value('--expected-context-sha256')
+    output=pathlib.Path(value('--output'))
+    assert not output.is_relative_to(pathlib.Path.cwd())
+    (output/'store').mkdir(parents=True)
+    (output/'store'/('a'*64+'.tar.gz')).write_bytes(b'opaque transport fixture')
+    (output/'manifest.json').write_text('{"pair":"fixture"}\n')
+elif operation=='verify':
+    manifest=pathlib.Path(value('--manifest'))
+    assert hashlib.sha256(manifest.read_bytes()).hexdigest()==value('--expected-manifest-sha256')
+    assert pathlib.Path(value('--archive')).read_bytes()==b'opaque transport fixture'
+    if os.environ['FAKE_PAIR_VERIFY_FAILURE']=='1': sys.exit(31)
+else: raise AssertionError(operation)
+print('{"status":"fixture-only"}')
+'''
+        for fail in ('0', '1'):
+            with self.subTest(verify_failure=fail), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory) / 'source'
+                tools = root / '.venv/bin'
+                tools.mkdir(parents=True)
+                executable = tools / 'python'
+                executable.write_text(fake.replace('#!/usr/bin/env python3',
+                                                    '#!' + sys.executable))
+                executable.chmod(0o755)
+                for name in ('nm', 'objdump'):
+                    path = tools / ('arm-none-eabi-' + name)
+                    path.write_bytes(b'external reader fixture')
+                    path.chmod(0o755)
+                control = root / 'build/u575-trustzone/pair-context'
+                control.mkdir(parents=True)
+                (control / 'context.json').write_bytes(b'context fixture')
+                (control / 'original.raw').write_bytes(b'original raw')
+                calls = Path(directory) / 'calls.jsonl'
+                temporary = Path(directory) / 'runner temp'
+                temporary.mkdir()
+                env = dict(os.environ, RUNNER_TEMP=str(temporary),
+                           GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='2',
+                           PATH=str(tools) + os.pathsep + os.environ['PATH'],
+                           FAKE_PAIR_CALLS=str(calls),
+                           FAKE_PAIR_VERIFY_FAILURE=fail)
+                result = subprocess.run(['bash', '-euo', 'pipefail', '-c',
+                                         selected[0]['run']], cwd=root,
+                                        env=env, capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0 if fail == '0' else 31,
+                                 result.stderr)
+                self.assertEqual([json.loads(line)[1] for line in
+                                  calls.read_text().splitlines()], ['seal', 'verify'])
+                artifact = root / 'build/u575-pair-evidence'
+                if fail == '1':
+                    self.assertFalse(artifact.exists())
+                else:
+                    self.assertEqual({p.suffix for p in artifact.iterdir()},
+                                     {'.json', '.gz'})
+                    self.assertEqual(len(list(artifact.iterdir())), 2)
+                self.assertEqual((control / 'original.raw').read_bytes(),
+                                 b'original raw')
+
     def test_optional_os_security_has_actual_link_gates_and_artifacts(self):
         job = workflow('build-matrix.yml')['jobs']['os-security']
         commands = '\n'.join(step.get('run', '') for step in job['steps'])

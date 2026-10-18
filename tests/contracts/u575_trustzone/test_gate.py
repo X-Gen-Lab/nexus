@@ -197,5 +197,25 @@ class TrustZonePairGate(unittest.TestCase):
                                   argv + ["-mfloat-abi=hard"])
 
 
+    def test_portable_profile_checks_actual_original_database(self):
+        from tools.evidence.u575_pair import compile_outputs
+        report = json.loads((self.directory / "report.json").read_text())
+        compiler = report["tools"]["gcc"]["path"]
+        for stage in ("secure", "nonsecure"):
+            database = json.loads((self.directory / stage /
+                                   "compile_commands.json").read_text())
+            outputs = compile_outputs(database, stage, compiler)
+            self.assertEqual(len(outputs), len(database))
+            self.assertEqual(len(outputs), len(set(outputs)))
+
+    def test_nonsecure_map_binds_original_secure_import_object(self):
+        from tools.evidence.u575_pair import map_inputs
+        report = json.loads((self.directory / "report.json").read_text())
+        stage = self.directory / "nonsecure"
+        paths = map_inputs((stage / "u575_nonsecure.map").read_bytes(),
+                           str(stage))
+        self.assertIn(report["artifacts"]["secure_import"]["path"], paths)
+
+
 if __name__ == "__main__":
     unittest.main()
