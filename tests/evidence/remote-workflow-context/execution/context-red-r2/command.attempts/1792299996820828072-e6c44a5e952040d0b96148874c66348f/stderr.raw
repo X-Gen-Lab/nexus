@@ -1,0 +1,13 @@
+...........F...................................
+======================================================================
+FAIL: test_job_environment_contexts_and_step_directory_scope_are_valid (complete_module_0.SoftwareQualificationContracts.test_job_environment_contexts_and_step_directory_scope_are_valid)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py", line 906, in test_job_environment_contexts_and_step_directory_scope_are_valid
+    self.assertIn(context, allowed, key + ': invalid job.env context')
+AssertionError: 'runner' not found in {'vars', 'inputs', 'needs', 'github', 'matrix', 'secrets', 'strategy'} : E: invalid job.env context
+
+----------------------------------------------------------------------
+Ran 47 tests in 3.806s
+
+FAILED (failures=1)

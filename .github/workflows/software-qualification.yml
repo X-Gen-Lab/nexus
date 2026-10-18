@@ -34,7 +34,6 @@ jobs:
       NEXUS_QUALIFICATION_ASSEMBLY: ${{ inputs.qualification_assembly }}
       NEXUS_QUALIFICATION_WORKLOAD: ${{ inputs.qualification_workload }}
       Q: ${{ github.workspace }}/build/software-qualification
-      E: ${{ runner.temp }}/nexus-reproduction-${{ github.run_id }}-${{ github.run_attempt }}
       PYTHONDONTWRITEBYTECODE: '1'
       CMAKE_BUILD_PARALLEL_LEVEL: '1'
       NEXUS_BUILD_JOBS: '1'
@@ -203,6 +202,7 @@ jobs:
       - name: Execute two fresh offline builds of the exact declared tuple
         id: reproduce
         run: |
+          E="$RUNNER_TEMP/nexus-reproduction-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           exec > >(tee "$Q/reproduce.raw") 2>&1
           mkdir "$E"
           .venv/bin/python tools/evidence/reproduce.py --prepare-spec \
@@ -220,6 +220,7 @@ jobs:
           NEXUS_CHECKOUT_VALIDATED: ${{ steps.source.outputs.validated }}
           NEXUS_JOB_RESULT: ${{ job.status }}
         run: |
+          E="$RUNNER_TEMP/nexus-reproduction-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           Q="$GITHUB_WORKSPACE/build/software-qualification"
           mkdir -p "$Q/setup"
           if test -d "$RUNNER_TEMP/nexus-qualification-early-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"; then

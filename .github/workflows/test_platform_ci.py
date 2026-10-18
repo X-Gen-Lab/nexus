@@ -890,6 +890,35 @@ class SoftwareQualificationContracts(unittest.TestCase):
             self.assertTrue(any(item['relative_path'].endswith('.tar.gz')
                                 for item in record['artifacts']))
 
+    def test_job_environment_contexts_and_step_directory_scope_are_valid(self):
+        # Official context-availability table: jobs.<job_id>.env excludes runner.
+        # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability
+        allowed = {'github', 'needs', 'strategy', 'matrix', 'vars', 'secrets', 'inputs'}
+        document = self.document()
+        for job in document['jobs'].values():
+            for key, value in job.get('env', {}).items():
+                for expression in re.findall(r'\$\{\{(.*?)\}\}', value):
+                    # Ignore quoted literals; inspect actual context references.
+                    expression = re.sub(r"'(?:[^']|'')*'", "''", expression)
+                    roots = re.findall(r'(?<![\w.])([A-Za-z_]\w*)\s*\.', expression)
+                    self.assertTrue(roots, 'Maintained env expression needs a context')
+                    for context in roots:
+                        self.assertIn(context, allowed, key + ': invalid job.env context')
+        self.assertNotIn('E', document['jobs']['qualify']['env'])
+        with tempfile.TemporaryDirectory(prefix='runner temp scope ') as temporary:
+            expected = str(Path(temporary) / 'nexus-reproduction-123-2')
+            for identifier in ('reproduce', 'collect'):
+                statements = [line for line in self.step(identifier)['run'].splitlines()
+                              if line.startswith('E=')]
+                self.assertEqual(len(statements), 1, identifier)
+                env = dict(os.environ, RUNNER_TEMP=temporary, GITHUB_RUN_ID='123',
+                           GITHUB_RUN_ATTEMPT='2', E='/inherited/wrong-location')
+                result = subprocess.run(['bash', '-euo', 'pipefail', '-c',
+                                         statements[0] + '\nprintf \'%s\' "$E"'],
+                                        env=env, capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout, expected)
+
     def test_identity_and_failure_upload_are_explicit_and_exact(self):
         steps = self.steps()
         identity = self.step('identity')

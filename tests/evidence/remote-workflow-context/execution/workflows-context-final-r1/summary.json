@@ -1,0 +1,9 @@
+{
+  "phase": "workflows-context-final-r1",
+  "exit_code": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-workflow-context-r1/execution/workflows-context-final-r1/command.attempts/1792300065091738579-57d4e1da7e93473e9af5c84a69a5594a/receipt.json",
+  "guards_stable": true,
+  "persistent_allocated_bytes": 352256,
+  "TMP_live_allocated_bytes": 0,
+  "child_max_rss_KiB": 37524
+}

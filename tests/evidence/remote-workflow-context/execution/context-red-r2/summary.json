@@ -1,0 +1,9 @@
+{
+  "phase": "context-red-r2",
+  "exit_code": 1,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-workflow-context-r1/execution/context-red-r2/command.attempts/1792299996820828072-e6c44a5e952040d0b96148874c66348f/receipt.json",
+  "guards_stable": true,
+  "persistent_allocated_bytes": 270336,
+  "TMP_live_allocated_bytes": 0,
+  "child_max_rss_KiB": 32700
+}

@@ -1,0 +1,391 @@
+{
+  "schema": 1,
+  "kind": "independent read-only context-fix code and evidence review",
+  "reviewer": "/root/io24_checker_review_r2",
+  "reviewed_at_utc": "2026-10-18T05:13:42.781935+00:00",
+  "decision": {
+    "result": "PASS_EXACT_CONTEXT_FIX",
+    "blockers": [],
+    "meaning": "The exact frozen two-file change resolves the observed forbidden job.env runner.temp context without changing the qualification protocol. Root normal integration gates and actual GitHub redispatch remain pending.",
+    "normal_full_gate_this_fix": "pending Root execution",
+    "revised_GitHub_dispatch_acceptance": "not established",
+    "runner_Docker_SDK_two_offline_execution": "not executed by this review",
+    "hardware": "not_executed"
+  },
+  "bindings": {
+    "feature_base": "/workspace/nexus-io-recovery-20261018/features/remote-workflow-context-r1",
+    "relative_report_paths": "Evidence paths below are relative to feature_base unless absolute.",
+    "freeze": {
+      "path": "source-and-execution-freeze-r1.json",
+      "bytes": 8679,
+      "sha256": "22407568e89a16777031c233ffd5db170bcbbf3d78614034f4b2eff1ed17d86d"
+    },
+    "integration_map": {
+      "path": "integration-manifest-r1.json",
+      "bytes": 22221,
+      "sha256": "a5e6a240b3c90b97c576e9a1953a1393aeb5641f808be5699ee8d46f91a32de4"
+    },
+    "baseline_commit": "19cf06b04173c254e3faf84b85760193e100b5b4",
+    "baseline_tree": "629e37e1a43c6747c2c0d70f99f9965f9cbed1ec",
+    "sources": [
+      {
+        "expected_path": ".github/workflows/software-qualification.yml",
+        "path": "implementation/.github/workflows/software-qualification.yml",
+        "bytes": 15588,
+        "sha256": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c"
+      },
+      {
+        "expected_path": ".github/workflows/test_platform_ci.py",
+        "path": "tests-first-r2/.github/workflows/test_platform_ci.py",
+        "bytes": 58474,
+        "sha256": "30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2"
+      }
+    ]
+  },
+  "actual_failure": {
+    "raw": {
+      "path": "actual-dispatch-422.raw",
+      "bytes": 323,
+      "sha256": "c9a4f1f4cb65cb553140cc3597d354354945875a7ee0376a1ccec6e4df7b5a9c"
+    },
+    "origin": "/workspace/nexus-io-recovery-20261018/validation/remote-qualification-dispatch-19cf06b0-r1/dispatch-stderr.raw",
+    "origin_bytes_and_sha_equal": true,
+    "observed": "GitHub failed to parse called software-qualification.yml at SHA19cf06b04173c254e3faf84b85760193e100b5b4, Line37 Col10: Unrecognized named-value runner in runner.temp (HTTP422).",
+    "qualification_boundary": "Workflow validation failure; no runner or SDK/Docker execution follows from this raw. Revised workflow remote acceptance is not present in this feature."
+  },
+  "code_review": {
+    "minimal_delta": "Remove exactly one baseline job.env E line and add the identical quoted shell E assignment once each to reproduce and collect. Removing those respective lines makes old/final YAML byte-identical.",
+    "context_scope": {
+      "authority_url": "https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability",
+      "job_env_allowed_roots": [
+        "github",
+        "inputs",
+        "matrix",
+        "needs",
+        "secrets",
+        "strategy",
+        "vars"
+      ],
+      "actual_final_env_expressions": [
+        {
+          "key": "NEXUS_EXPECTED_COMMIT",
+          "expression": "inputs.expected_commit",
+          "roots": [
+            "inputs"
+          ]
+        },
+        {
+          "key": "NEXUS_WORKFLOW_SHA",
+          "expression": "github.workflow_sha",
+          "roots": [
+            "github"
+          ]
+        },
+        {
+          "key": "NEXUS_QUALIFICATION_ASSEMBLY",
+          "expression": "inputs.qualification_assembly",
+          "roots": [
+            "inputs"
+          ]
+        },
+        {
+          "key": "NEXUS_QUALIFICATION_WORKLOAD",
+          "expression": "inputs.qualification_workload",
+          "roots": [
+            "inputs"
+          ]
+        },
+        {
+          "key": "Q",
+          "expression": "github.workspace",
+          "roots": [
+            "github"
+          ]
+        }
+      ],
+      "assessment": "jobs.<job_id>.env excludes runner; current env references only allowed inputs/github. Run steps instead use the standard RUNNER_TEMP/GITHUB_RUN_ID/GITHUB_RUN_ATTEMPT process environment. No new privileged context or permission.",
+      "fresh_official_fetch": false,
+      "actionlint_or_remote_validator_run_here": false
+    },
+    "two_shell_scopes": "Each consumer assigns E=\"$RUNNER_TEMP/nexus-reproduction-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT\" before use. Quoting preserves a spaced RUNNER_TEMP and assignment overrides a wrong inherited E. No caller input is pasted into executable shell text.",
+    "E_export": "E is only used in quoted shell path arguments by these steps. Python helpers obtain paths from argv; they do not require E in os.environ. No cross-step shell state is assumed.",
+    "archive_and_navigation": "Q remains workspace-local spec/raw/identity output. E remains runner-temp report/runs. The always collector still exports any existing E opaquely with maintained store.py; missing E stays explicit not_executed, success without E fails, export failure propagates. Identity/upload recurse only Q+delivery.",
+    "authority_unchanged": "Exact expected/context/workflow/clean-checkout B=T guard, assembly/workload checks, early unavailable identity and failed-job archive behavior remain byte-identical. SDK matrix, new sealed OCI and two fresh offline build commands remain byte-identical. contents:read, pinned actions, performance/default CI/release, engine/storage/identity code and locks are unchanged.",
+    "architecture": "No new wrapper, generic expression interpreter or state framework; only two step-local path assignments and one narrow regression."
+  },
+  "regression_review": {
+    "old_methods": 46,
+    "new_methods": 47,
+    "old_46_method_source_byte_equal": true,
+    "added_method": "test_job_environment_contexts_and_step_directory_scope_are_valid",
+    "real_expression_guard": "The new method checks every actual job env expression, strips quoted literals, extracts dotted context roots and validates against the official jobs.*.env availability set. It is not merely an E/runner.temp string matcher.",
+    "actual_assignment_oracle": "It extracts the unique E line from each actual reproduce/collect run body, then subprocess.run executes it using bash -euo pipefail with a spaced TemporaryDirectory, run123/attempt2 and inherited E=/inherited/wrong-location. Actual return0 and stdout equal the run-specific expected path are required; assignment and subprocess result are not mocked.",
+    "parser_limit": "Guard covers the maintained dotted env syntax, not all GitHub expression grammar/actionlint/remote schema checks. There is no bracket or dynamic context syntax in current env. A future different expression form requires reviewed coverage.",
+    "honest_history": "context-red-r1 is preserved SyntaxError during import of a misquoted new test string, with no counts report; it is setup failure, not behavioral RED. Corrected final test on old YAML is context-red-r2 complete47, actual1/one runner-context assertion failure/zero errors-skips. Then unchanged final test and minimal YAML fix are complete47 actual0.",
+    "final_related": "Same final source executes workflows80 and nine-boundary85, actual0 and no failures/errors/skips/expected-failures/unexpected-successes. Counts overlap: do not add47+80+85 as distinct cases or remote runtime evidence."
+  },
+  "verified_recorded_executions": [
+    {
+      "phase": "context-green-r1",
+      "command": {
+        "path": "execution/context-green-r1/command.command.json",
+        "bytes": 1636,
+        "sha256": "ddf7bbb30c6c5dc0135c696236288d62da1609d28c406623468406613b3c7a12"
+      },
+      "receipt": {
+        "path": "execution/context-green-r1/command.attempts/1792300034035040036-93660c7910e34a838c2b39bf0f580a1e/receipt.json",
+        "bytes": 1428,
+        "sha256": "1770b6b63b5d18f8ac48fa115542b2a71c4d45d42cb455c955ca615f0565d46a"
+      },
+      "exit": 0,
+      "outcome": "completed",
+      "all_children_joined": true,
+      "counts": {
+        "discovered": 47,
+        "executed": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "stdout": {
+        "path": "execution/context-green-r1/command.attempts/1792300034035040036-93660c7910e34a838c2b39bf0f580a1e/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "execution/context-green-r1/command.attempts/1792300034035040036-93660c7910e34a838c2b39bf0f580a1e/stderr.txt",
+        "bytes": 146,
+        "sha256": "6b7c5eb3ef53804cc3b0cbb83a72386ce043b6abfee7e4263a75f93396fa9b11"
+      },
+      "guards_equal": true,
+      "guard_source_sha256": {
+        ".github/workflows/software-qualification.yml": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c",
+        ".github/workflows/test_platform_ci.py": "30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2"
+      },
+      "child_max_RSS_KiB": 32560
+    },
+    {
+      "phase": "context-red-r1",
+      "command": {
+        "path": "execution/context-red-r1/command.command.json",
+        "bytes": 1627,
+        "sha256": "e943c786be8299b333d3101c3ee17997ad3a5e3da61aa58d370dcc9c78e666b9"
+      },
+      "receipt": {
+        "path": "execution/context-red-r1/command.attempts/1792299979221116909-945957dc5db342a29b4275fa6b887ccb/receipt.json",
+        "bytes": 1421,
+        "sha256": "b56fea0fd1f82b0b04fb6f49686d72ecdb5ed345a37375d6758ee71583068e1e"
+      },
+      "exit": 1,
+      "outcome": "completed",
+      "all_children_joined": true,
+      "counts": null,
+      "stdout": {
+        "path": "execution/context-red-r1/command.attempts/1792299979221116909-945957dc5db342a29b4275fa6b887ccb/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "execution/context-red-r1/command.attempts/1792299979221116909-945957dc5db342a29b4275fa6b887ccb/stderr.txt",
+        "bytes": 852,
+        "sha256": "6aede9ca636cd6bb7db96fbd740ef61126f1c7989d105cacee38d799fa4e5e60"
+      },
+      "guards_equal": true,
+      "guard_source_sha256": {
+        ".github/workflows/software-qualification.yml": "6402393134b489732549c67306c7b2e82825dac08236a4ac39b0730df2ca4a28",
+        ".github/workflows/test_platform_ci.py": "c09810859e92b61e7bc4793b74544b0a44c96b7b2920184d3ab6901291a8fd35"
+      },
+      "child_max_RSS_KiB": 23552
+    },
+    {
+      "phase": "context-red-r2",
+      "command": {
+        "path": "execution/context-red-r2/command.command.json",
+        "bytes": 1626,
+        "sha256": "06998fa8cf1e48d04c85f0e4d393a2e31af9a6c910874471f6ad651745838876"
+      },
+      "receipt": {
+        "path": "execution/context-red-r2/command.attempts/1792299996820828072-e6c44a5e952040d0b96148874c66348f/receipt.json",
+        "bytes": 1420,
+        "sha256": "d8fbe06b0619e6bb51e9be12e962508eeef07df2197c5a42792157b03710af0b"
+      },
+      "exit": 1,
+      "outcome": "completed",
+      "all_children_joined": true,
+      "counts": {
+        "discovered": 47,
+        "executed": 47,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "stdout": {
+        "path": "execution/context-red-r2/command.attempts/1792299996820828072-e6c44a5e952040d0b96148874c66348f/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "execution/context-red-r2/command.attempts/1792299996820828072-e6c44a5e952040d0b96148874c66348f/stderr.txt",
+        "bytes": 895,
+        "sha256": "2a9beb3e4f3f07401cd93bcc571d5e77f77c78469b639f9b8ac5ee44c5069277"
+      },
+      "guards_equal": true,
+      "guard_source_sha256": {
+        ".github/workflows/software-qualification.yml": "6402393134b489732549c67306c7b2e82825dac08236a4ac39b0730df2ca4a28",
+        ".github/workflows/test_platform_ci.py": "30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2"
+      },
+      "child_max_RSS_KiB": 32700
+    },
+    {
+      "phase": "context-related-final-r1",
+      "command": {
+        "path": "execution/context-related-final-r1/command.command.json",
+        "bytes": 2326,
+        "sha256": "2ae3b33509a820e9e5b989768319a3b4eeb4751ef50b10f249b45814d46c8fb6"
+      },
+      "receipt": {
+        "path": "execution/context-related-final-r1/command.attempts/1792300108207666236-5c8db9718e8a4aa6b0f12d4be43b7506/receipt.json",
+        "bytes": 2110,
+        "sha256": "4f1310b5f5ee013e752a899085e2ae93dc1f0cf221cef95bbe7fd6486341ade5"
+      },
+      "exit": 0,
+      "outcome": "completed",
+      "all_children_joined": true,
+      "counts": {
+        "discovered": 85,
+        "executed": 85,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "stdout": {
+        "path": "execution/context-related-final-r1/command.attempts/1792300108207666236-5c8db9718e8a4aa6b0f12d4be43b7506/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "execution/context-related-final-r1/command.attempts/1792300108207666236-5c8db9718e8a4aa6b0f12d4be43b7506/stderr.txt",
+        "bytes": 252,
+        "sha256": "3c9b0f028dc9317571f1666731cb34241d4c2591b582fa867a1aeac3a1052f6f"
+      },
+      "guards_equal": true,
+      "guard_source_sha256": {
+        ".github/workflows/software-qualification.yml": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c",
+        ".github/workflows/test_platform_ci.py": "30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2"
+      },
+      "child_max_RSS_KiB": 44084
+    },
+    {
+      "phase": "workflows-context-final-r1",
+      "command": {
+        "path": "execution/workflows-context-final-r1/command.command.json",
+        "bytes": 1597,
+        "sha256": "479310acd2e1e17818e2b261d3e607c55525f660b971f6e94c1601e6bc565270"
+      },
+      "receipt": {
+        "path": "execution/workflows-context-final-r1/command.attempts/1792300065091738579-57d4e1da7e93473e9af5c84a69a5594a/receipt.json",
+        "bytes": 1379,
+        "sha256": "313493b4cdb0fe55b2ea4cac96e5013f54db46540897c0a43ad207d2b23e1687"
+      },
+      "exit": 0,
+      "outcome": "completed",
+      "all_children_joined": true,
+      "counts": {
+        "suite": "workflows",
+        "discovered": 80,
+        "executed": 80,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "stdout": {
+        "path": "execution/workflows-context-final-r1/command.attempts/1792300065091738579-57d4e1da7e93473e9af5c84a69a5594a/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "execution/workflows-context-final-r1/command.attempts/1792300065091738579-57d4e1da7e93473e9af5c84a69a5594a/stderr.txt",
+        "bytes": 180,
+        "sha256": "ce48b572ff0308423a3307384334cdbb03f0db513304a23e819cb794ed877f63"
+      },
+      "guards_equal": true,
+      "guard_source_sha256": {
+        ".github/workflows/software-qualification.yml": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c",
+        ".github/workflows/test_platform_ci.py": "30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2"
+      },
+      "child_max_RSS_KiB": 37524
+    }
+  ],
+  "guards_and_transport": {
+    "mapped_targets": 55,
+    "current_source_targets": 2,
+    "history_targets": 53,
+    "logical_bytes": 266106,
+    "sources_already_in_files": true,
+    "complete_union_targets": 55,
+    "all_55_verified": "Each durable size and SHA256 checked; expected relative canonical paths are unique, have no escape/backslash; durable paths are contained in exact feature with no feature-local symlink ancestor. Both source rows have identical identities in files, so union55 not57.",
+    "historical_text": "Old YAML/test and misquoted fixture remain historical .raw targets rather than active production sources. Actual422 raw/setup failure/commands are retained. No original map or history rewritten.",
+    "guards": "All five recorded before/after guard objects match exactly: selected source, exact index, semantic index, status, eight protected authorities. Final47/80/85 all bind final YAML0c962200 and test30402005. Raw stdout/stderr SHA and inner/outer receipts match, outcomes completed and child withdrawal complete.",
+    "protected": {
+      ".github/workflows/performance.yml": {
+        "bytes": 3593,
+        "sha256": "26eddc2c2afd747addb52028746027119bc30abc0fa6726d87dc2c07829cd018"
+      },
+      ".github/workflows/ci.yml": {
+        "bytes": 2663,
+        "sha256": "d7e7f2309f3a16c709f0992d81dee28fa544e69c3b799fd998e4213f33143192"
+      },
+      ".github/workflows/release.yml": {
+        "bytes": 11948,
+        "sha256": "92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2"
+      },
+      "tools/evidence/reproduce.py": {
+        "bytes": 32866,
+        "sha256": "aaa431bfbfe1bae2b4453a2ec166cac05865856399ff409e33e3e9d33708887a"
+      },
+      "tools/evidence/storage.py": {
+        "bytes": 17178,
+        "sha256": "d959ea5b8ce2819ba6ef66e0671c2fdf44276f96b4d818a74b88de4cdeee1856"
+      },
+      "tools/maintenance/job_identity.py": {
+        "bytes": 14752,
+        "sha256": "5316c45e6ea7fb35f5f1c6d19f1faaade80c3283274e441a0996876260da024e"
+      },
+      "dependencies/environment.lock.json": {
+        "bytes": 1181,
+        "sha256": "ba90902e9048279fc38121fbcab003e8fed07dfd17044637d4aed979a7e966cd"
+      },
+      "dependencies/build-recipe.lock.json": {
+        "bytes": 832,
+        "sha256": "184f54646e38adea736a62f7e7b9ce7115dc8399f329ef2906f75cbd5daf30a6"
+      }
+    },
+    "recorded_index_sha256": "3e157e880e56d88f0086904b391775a2d95927d86dca6c1e86727947e139b43e",
+    "recorded_semantic_index_sha256": "d1fc8ad7d34130915f3e611031ea703688d2ac5e235e0d3f3e6efd0dcc6808d3",
+    "limit": "These guards describe the recorded author attempts at baseline19cf; they are not a claim that later moving main equals historical snapshots.",
+    "all_mapped_bytes_unchanged_after_review": true
+  },
+  "resources": {
+    "observed_max_child_RSS_KiB": 44084,
+    "author_final_allocated_bytes": 430080,
+    "author_feature_cap_bytes": 524288,
+    "TMP_at_all_recorded_joins_bytes": 0,
+    "limit": "Join snapshots do not prove a continuously sampled TMP peak."
+  },
+  "review_operations": {
+    "actual": "Read source delta/full workflow/new regression, whole loader, real422 raw, all five recorded commands/receipts/results/raw and guards; parse source YAML/AST and check55 leaf identities. No test module or workflow shell executed.",
+    "not_performed": "No tests, compile/configure, network, install, Docker, SDK or dispatch. No main/own source/index/ref mutation.",
+    "write": "Only this fresh global validation report. Frozen inputs/maps preserved.",
+    "remaining_exit": "Root normal full integration gate and new exact-SHA GitHub dispatch validation, followed by actual runtime/evidence admission. This report does not prequalify future remote execution.",
+    "report_preparation": "An initial in-memory report serialization exceeded the20KiB budget and was rejected before write; compacted here. This was not production/test execution."
+  }
+}

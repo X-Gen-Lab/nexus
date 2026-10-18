@@ -1,0 +1,11 @@
+{
+  "suite": "workflows",
+  "discovered": 80,
+  "executed": 80,
+  "skipped": 0,
+  "failures": 0,
+  "errors": 0,
+  "expected_failures": 0,
+  "unexpected_successes": 0,
+  "status": "passed"
+}
