@@ -9,10 +9,8 @@
 #include "boot_registers.h"
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
-#include "stm32h743_system.h"
-#if NEXUS_CORE_HZ == 384000000U
 #include "stm32h743_clock.h"
-#endif
+#include "stm32h743_system.h"
 #if defined(NEXUS_MEMORY_SRAM1) && NEXUS_MEMORY_SRAM1 == 1
 #include "memory_init.h"
 #endif
@@ -42,6 +40,9 @@ nx_stm32h743_system_t g_nx_stm32h743_system = {
 #ifndef NX_H743_FLASH_KIB
 #define NX_H743_FLASH_KIB() (*(volatile const uint16_t*)FLASHSIZE_BASE)
 #define NX_H743_DEVICE_ID() (DBGMCU->IDCODE)
+#endif
+#ifndef NX_H743_SILICON_ID
+#define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
 #endif
 static bool task_context(void) {
     return nx_arch_is_privileged() && !nx_arch_in_isr() &&
@@ -152,6 +153,13 @@ nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* s) {
         (NX_H743_READ(&s->rcc->APB1LENR) & RCC_APB1LENR_TIM2EN) != 0U ||
         !timer_idle(s) || !NX_H743_IRQ_AVAILABLE(TIM2_IRQn))
         return NX_ERROR_BUSY;
+    /* Only exact V has the reviewed factory-trim frequency envelope. Keep
+     * older fixed nominal contracts without imposing V's register layout.
+     * HSICAL is a read-only silicon value, not a user-trim prerequisite. */
+    if (nx_stm32h743_is_revision_v(NX_H743_SILICON_ID()) &&
+        (NX_H743_READ(&s->rcc->HSICFGR) & RCC_HSICFGR_HSITRIM) !=
+            (0x40U << RCC_HSICFGR_HSITRIM_Pos))
+        return NX_ERROR_STATE;
     return NX_SUCCESS;
 }
 /** \brief Reuse one timer program with a distinct, already-proven input. */

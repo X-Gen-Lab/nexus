@@ -26,6 +26,8 @@ void nx_h743_model_reset(void) {
     s_h743_core.CPACR = 0U;
     g_h743_model.core = &s_h743_core;
     g_h743_model.rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY;
+    /* Revision V resets the user trim to64; HSICAL remains silicon-specific. */
+    g_h743_model.rcc.HSICFGR = 0x40U << RCC_HSICFGR_HSITRIM_Pos;
     g_h743_model.power.CR3 = PWR_CR3_LDOEN;
     g_h743_model.power.CSR1 = PWR_CSR1_ACTVOSRDY;
     g_h743_model.flash.ACR = FLASH_ACR_LATENCY_7WS;

@@ -54,8 +54,11 @@ extern nx_stm32h743_system_t g_nx_stm32h743_system;
 /**
  * \brief           Read cold HSI64/LDO-ready/Cache-off and TIM2 prerequisites.
  * \param[in]       system: Exact privileged exclusive context after reset RAM.
- * \return          SUCCESS or INVALID/CONTEXT/BUSY without hardware mutation.
+ * \return          SUCCESS or INVALID/CONTEXT/BUSY/STATE without mutation.
  * \note            No running-clock, cache, scheduler or bootloader adoption.
+ *                  Exact DEV450/REV2003 requires factory-default user trim64;
+ *                  read-only HSICAL is preserved. Older fixed nominal cuts
+ *                  do not inherit the reviewed V electrical envelope.
  */
 nx_result_t nx_stm32h743_system_preflight(const nx_stm32h743_system_t* system);
 /**
