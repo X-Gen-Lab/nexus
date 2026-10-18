@@ -17,7 +17,8 @@
       ],
       "modes": [
         "output",
-        "input"
+        "input",
+        "named-states"
       ],
       "source": "DS12288 Rev6 LQFP64 PA5 pad; RM0440 Rev9 GPIO register descriptions. UM2505 Rev7 LD2 active high with SB6 ON, source-reference only."
     },

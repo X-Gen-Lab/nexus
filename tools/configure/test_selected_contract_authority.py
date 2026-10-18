@@ -80,6 +80,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
     def test_canonical_h743_spi_dma_keeps_exact_faces_lanes_and_mechanism(self):
         root = "tools/configure/assemblies/"
         variants = {"h743-spi-dma": None,
+                    "h743-spi-dma-runtime-clock": None,
                     "h743-spi-dma-uart-tx": (0, 46),
                     "h743-spi-dma-uart-rx": (1, 45)}
         self.assertEqual({path.stem for path in

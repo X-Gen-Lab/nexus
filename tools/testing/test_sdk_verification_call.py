@@ -125,13 +125,23 @@ class SDKConsumerParallelTests(unittest.TestCase):
             file = verification / "consumers" / (name + ".c")
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("/* installed public smoke: " + name + " */\n")
-        for variant in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx"):
+        for variant in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx",
+                        "spi-dma-runtime-clock"):
             relative = Path("tools/configure/assemblies") / ("h743-" + variant + ".toml")
             target = self.sdk / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / relative, target)
         shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
                         verification / "consumers/h743-spi-dma.c")
+        relative = Path("tools/configure/assemblies/g474-pin-states.toml")
+        target = self.sdk / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / relative, target)
+        shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
+                        verification / "consumers/pin-states.c")
+        runtime_smoke = ROOT / "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"
+        if runtime_smoke.is_file():
+            shutil.copyfile(runtime_smoke, verification / "consumers/h743-runtime-clock.c")
         # These two real canonical files are SUT inputs. Their actual C
         # execution/proc mapping checks are qualified by the separate installed
         # integration; this suite models only external process ports.
@@ -350,18 +360,18 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     for _, build, _ in consumer_layout()}
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 34)
+        self.assertEqual(len(builds), 36)
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 37)
+                             for command in builds), 39)
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 34)
+        self.assertEqual(len(configurations), 36)
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
         retention = [command for command in self.commands
                      if any(arg.endswith("retention.py") for arg in command)]
-        self.assertEqual(len(retention), 29)
+        self.assertEqual(len(retention), 31)
         native = [command for command in self.commands if len(command) == 1]
         self.assertEqual({Path(command[0]).name for command in native},
                          {"installed_c", "installed_cpp", "installed_selected"})
@@ -399,8 +409,23 @@ class SDKConsumerParallelTests(unittest.TestCase):
                             ".." not in Path(path).parts
                             for _, path, _ in self.consumer.SELECTED_CONSUMERS))
 
+    def test_runtime_clock_uses_canonical_input_and_public_lifecycle_smoke(self):
+        self.assertIn(("h743 runtime clock",
+                       "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
+                       "h743-runtime-clock"), self.consumer.SELECTED_CONSUMERS)
+        status, _ = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 0)
+        self.assert_complete_matrix()
+        smoke = self.output / "selected h743 runtime clock source/main.c"
+        canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"
+        self.assertEqual(smoke.read_bytes(), canonical.read_bytes())
+        for name in ("nx_platform_runtime_domain", "nx_platform_runtime_pause",
+                     "nx_platform_runtime_resume", "nx_clock_domain_quiescent"):
+            self.assertIn(name + "(", smoke.read_text())
+
     def test_missing_each_spi_input_is_terminal_without_directory_fallback(self):
-        for variant in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx"):
+        for variant in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx",
+                        "spi-dma-runtime-clock"):
             with self.subTest(variant=variant):
                 path = self.sdk / "tools/configure/assemblies" / (
                     "h743-" + variant + ".toml")
@@ -415,6 +440,20 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 self.assertEqual(report["status"], "failed")
                 path.write_bytes(original)
                 decoy.unlink()
+
+    def test_missing_named_pin_state_canonical_input_cannot_use_a_legacy_decoy(self):
+        relative = "tools/configure/assemblies/g474-pin-states.toml"
+        source = self.sdk / relative
+        original = source.read_bytes()
+        source.unlink()
+        decoy = self.sdk / "cmake/package/verification/io_evolution/g474-pin-states.toml"
+        decoy.write_bytes(original)
+        with contextlib.redirect_stderr(io.StringIO()):
+            status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertNotIn("g474 pin states", {row["name"] for row in report["selected_images"]})
+        self.assertIn("g474-pin-states.toml", report["error"])
 
     def test_sdk_relative_inputs_reject_alias_schema_and_symlink_before_output(self):
         relative = "tools/configure/assemblies/h743-spi-dma.toml"
@@ -465,7 +504,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["physical_status"], "not_executed")
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["1"] * 34)
+                          for command in self.builds()], ["1"] * 36)
 
     def test_default_retains_three_four_job_and_thirty_one_two_job_builds(self):
         status, report = self.execute()
@@ -474,14 +513,14 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["source_tree"], "b" * 40)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["4"] * 3 + ["2"] * 31)
+                          for command in self.builds()], ["4"] * 3 + ["2"] * 33)
 
     def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
         status, _ = self.execute(("--parallel", "3"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["3"] * 34)
+                          for command in self.builds()], ["3"] * 36)
 
     def test_selected_inputs_and_public_smokes_come_only_from_installed_sdk(self):
         status, report = self.execute(("--parallel", "1"))
@@ -490,13 +529,14 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           if command[0] == "cmake" and "-S" in command
                           and Path(command[command.index("-S") + 1]).name.startswith(
                               "selected ")]
-        self.assertEqual(len(configurations), 21)
+        self.assertEqual(len(configurations), 23)
         inputs = set()
         for command in configurations:
             assembly = Path(next(argument.split("=", 1)[1] for argument in command
                                  if argument.startswith("-DNEXUS_ASSEMBLY_FILE=")))
             expected_parent = (self.sdk / "tools/configure/assemblies"
-                               if assembly.name.startswith("h743-spi-dma") else
+                               if (assembly.name.startswith("h743-spi-dma") or
+                                   assembly.name == "g474-pin-states.toml") else
                                self.sdk / "cmake/package/verification/io_evolution")
             self.assertEqual(assembly.parent, expected_parent)
             inputs.add(assembly.name)
@@ -513,8 +553,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     self.assertIn('/proc/self/maps', smoke)
                     self.assertIn('readonly_mapping(a->ops, sizeof(*a->ops))', smoke)
             elif assembly.name.startswith("h743-spi-dma"):
-                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c"
+                stem = ("h743-runtime-clock" if assembly.stem ==
+                        "h743-spi-dma-runtime-clock" else "h743-spi-dma")
+                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.name == "g474-pin-states.toml":
+                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/pin-states.c"
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertIn("nx_factory_pin_state", smoke)
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             else:
                 self.assertTrue(smoke.startswith("/* installed public smoke: "))
@@ -524,7 +571,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "stm32f4xx.h", "gd32f4xx.h",
                          "stm32f407_eth_frames.h", "gd32f470_eth_frames.h",
                          "stm32g474_pwm_shared.h", "rtc_lptim_provider.h",
-                         "stm32h743_spi_dma.h"):
+                         "stm32h743_spi_dma.h", "stm32g474_pin_state.h",
+                         "pin_state_impl.h"):
                 self.assertIn('__has_include("' + name + '")', private_guard)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
         self.assertEqual(inputs, {
@@ -539,11 +587,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
             "native-time-pair.toml", "native-time-empty.toml",
             "h743-spi-dma.toml", "h743-spi-dma-uart-tx.toml",
-            "h743-spi-dma-uart-rx.toml"})
-        self.assertEqual(len(report["selected_images"]), 21)
+            "h743-spi-dma-uart-rx.toml", "h743-spi-dma-runtime-clock.toml",
+            "g474-pin-states.toml"})
+        self.assertEqual(len(report["selected_images"]), 23)
         arm_images = [image for image in report["selected_images"]
                       if not image["name"].startswith("native time ")]
-        self.assertEqual(len(arm_images), 19)
+        self.assertEqual(len(arm_images), 21)
         for image in arm_images:
             self.assertEqual(set(image["artifacts"]), {"elf", "bin", "map"})
         native_images = [image for image in report["selected_images"]

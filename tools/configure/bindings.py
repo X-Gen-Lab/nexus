@@ -3,7 +3,7 @@ try:
     from .providers import maintained
     from .ir import ConfigurationIR
     from .factory import interface_type, public_header, controller_class
-    from . import gpio_phase
+    from . import gpio_phase, runtime_power
     from . import enhanced_endpoints
     from . import stream_profiles, uart_formats
 except ImportError:
@@ -11,6 +11,7 @@ except ImportError:
     from ir import ConfigurationIR
     from factory import interface_type, public_header, controller_class
     import gpio_phase
+    import runtime_power
     import enhanced_endpoints
     import stream_profiles
     import uart_formats
@@ -51,6 +52,7 @@ def emit(result):
     provider = maintained(result["soc_family"])
     if not isinstance(result, ConfigurationIR):
         result = ConfigurationIR.from_validated(result)
+    runtime = result.runtime_power is not None
     selections = result.controllers
     context_guard = "nx_arch_in_isr() || nx_arch_irq_is_masked()"
     if not provider.MODEL:
@@ -115,6 +117,8 @@ def emit(result):
                ' * Context and ownership rules match nx_platform_stop.',
                ' */',
                'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);']
+    if runtime:
+        header.extend(runtime_power.header())
     source = ['/**', ' * \\file            bindings.c',
               ' * \\brief           Generated fixed typed hardware construction.',
               ' * \\author          Nexus Team', ' * \\version         1.0.0',
@@ -135,6 +139,8 @@ def emit(result):
     source.extend(provider.includes(result))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
+    if runtime:
+        source.extend(runtime_power.state())
     initialize = []
     initialization_indices = []
     retained_initialization = []
@@ -199,6 +205,13 @@ def emit(result):
     # Reuse those static slots directly; no pointer registry is emitted.
     source.extend(gpio_phase.declarations(result, pin_snapshots))
     source.extend(diagnostic_helpers())
+    if runtime:
+        source += ['static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup);',
+                   'static nx_platform_start_result_t nx_runtime_start_system(nx_platform_diagnostic_t* diagnostic) {',
+                   '    (void)diagnostic;',
+                   '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };']
+        source.extend(provider.start_system(result))
+        source += ['    return result;', '}']
     source += ['/** \\brief Stop only the initialized selected interfaces. */',
                'nx_result_t nx_platform_stop(void) {',
                '    return nx_platform_stop_impl(NULL, false);', '}',
@@ -210,6 +223,19 @@ def emit(result):
                'static nx_result_t nx_platform_stop_impl(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
                '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);',
                f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}']
+    if runtime:
+        source += ['    nx_result_t io = nx_platform_stop_io(diagnostic, cleanup);',
+                   '    if (io != NX_SUCCESS) { return io; }']
+        source.extend(provider.stop_system(result, resources=False,
+            system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
+        source += ['    s_nx_platform_started = false;',
+                   '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
+                   '    return NX_SUCCESS;', '}',
+                   '/** \\brief One I/O withdrawal body, also used by runtime pause. */',
+                   'static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
+                   '    nx_result_t closed = nx_runtime_close();',
+                   '    if (closed != NX_SUCCESS) { return closed; }',
+                   '    if (s_nx_runtime_lease.owner == NULL) { return nx_runtime_release(); }']
     for index in range(len(initialize), 0, -1):
         source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
         source.append(
@@ -220,12 +246,17 @@ def emit(result):
                        f'        if (status_{counter} != NX_SUCCESS) {{ return status_{counter}; }}']
         source += [f'        s_nx_platform_initialized = {index - 1}u;', '    }']
     source.append('    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
-    source.extend(provider.stop_system(
-        result, system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
-    source += ['    s_nx_platform_started = false;',
-               '    s_nx_platform_initialized = 0u;',
-               '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
-               '    return NX_SUCCESS;', '}']
+    if runtime:
+        source.extend(provider.stop_resources(result))
+        source += ['    return nx_runtime_release();', '}']
+        source.extend(runtime_power.runtime_functions(result, context_guard, initialize))
+    else:
+        source.extend(provider.stop_system(
+            result, system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
+        source += ['    s_nx_platform_started = false;',
+                   '    s_nx_platform_initialized = 0u;',
+                   '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
+                   '    return NX_SUCCESS;', '}']
     source += ['/** \\brief Start explicit hardware only; rollback retains error facts. */',
                'nx_platform_start_result_t nx_platform_start(void) {',
                '    return nx_platform_start_impl(NULL);', '}',
@@ -248,7 +279,21 @@ def emit(result):
                '        result.primary = NX_ERROR_CONTEXT; return result; }',
                '    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }']
     source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX);')
-    source.extend(provider.start_system(result))
+    if runtime:
+        source += ['    if (s_nx_runtime_domain.initialized && s_nx_runtime_domain.closing) {',
+                   '        result.primary = nx_runtime_reopen();',
+                   '        if (result.primary != NX_SUCCESS) { return result; }', '    }',
+                   '    result.primary = nx_runtime_acquire();',
+                   '    if (result.primary != NX_SUCCESS) { return result; }',
+                   '    result = nx_runtime_start_system(diagnostic);',
+                   '    if (result.primary != NX_SUCCESS) {',
+                   '        if (result.remaining_effects == 0u) {',
+                   '            nx_result_t cleanup = nx_runtime_close();',
+                   '            if (cleanup == NX_SUCCESS) { cleanup = nx_runtime_release(); }',
+                   '            if (cleanup != NX_SUCCESS) { result.cleanup = cleanup; result.remaining_effects = 1u; }',
+                   '        }', '        return result;', '    }']
+    else:
+        source.extend(provider.start_system(result))
     source.append("    s_nx_platform_started = true;")
     source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
     source.extend(provider.start_resources(

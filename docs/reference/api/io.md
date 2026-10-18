@@ -187,6 +187,14 @@ The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h
 :project: nexus
 ```
 
+(pin__state_8h)=
+
+## pin_state.h
+
+```{doxygenfile} pin_state.h
+:project: nexus
+```
+
 (pwm__adc_8h)=
 
 ## pwm_adc.h

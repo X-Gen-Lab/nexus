@@ -1,0 +1,108 @@
+"""Exact selected lifecycle lease, with System time retained during I/O pause."""
+from dataclasses import FrozenInstanceError
+from pathlib import Path
+import json
+import tempfile
+import unittest
+
+from tools.configure import bindings, configure as gate
+
+
+class RuntimePowerConfigurationTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+        self.base = (gate.ROOT / 'tools/configure/assemblies/h743-spi-dma.toml').read_text().replace(
+            '"../../../boards/stm32h743zi_hsi_reference"',
+            '"' + str(gate.ROOT / 'boards/stm32h743zi_hsi_reference') + '"')
+
+    def assembly(self, power='[power]\nmode = "fixed-run"\ncontrollers = ["bus4"]\n', base=None):
+        path = self.directory / 'runtime.toml'
+        path.write_text((self.base if base is None else base) + '\n' + power)
+        return path
+
+    def selected(self):
+        try:
+            return gate.resolve_ir(self.assembly())
+        except ValueError as error:
+            self.fail('Exact runtime power assembly must resolve: ' + str(error))
+
+    def test_exact_selection_resolves_one_immutable_lifecycle_domain(self):
+        result = self.selected()
+        self.assertEqual(result.runtime_power.mode, 'fixed-run')
+        self.assertEqual(result.runtime_power.controllers, ('bus4',))
+        with self.assertRaises(FrozenInstanceError):
+            result.runtime_power.mode = 'stop'
+        self.assertEqual(result['runtime_power']['controllers'], ('bus4',))
+        self.assertFalse(result['physical_qualified'])
+
+    def test_selected_generated_api_uses_existing_clock_domain(self):
+        header, source = bindings.emit(self.selected())
+        for api in ('nx_platform_runtime_domain', 'nx_platform_runtime_pause',
+                    'nx_platform_runtime_resume'):
+            self.assertIn(api + '(', header)
+            self.assertIn(api + '(', source)
+        self.assertIn('clock_domain_impl.h', source)
+        self.assertEqual(source.count('static nx_clock_domain_t '), 1)
+        self.assertEqual(source.count('static nx_clock_lease_t '), 1)
+        self.assertIn('nx_clock_domain_acquire(', source)
+        self.assertIn('nx_clock_domain_release(', source)
+
+    def test_unselected_default_keeps_no_runtime_state_or_public_api(self):
+        result = gate.resolve_ir(self.assembly(''))
+        header, source = bindings.emit(result)
+        self.assertNotIn('runtime_power', result)
+        for name in ('nx_platform_runtime_', 'nx_clock_domain_', 'nx_clock_lease_t'):
+            self.assertNotIn(name, header + source)
+
+    def test_generated_selection_derives_component_without_authored_vote(self):
+        output = self.directory / 'generated'
+        try:
+            gate.configure(self.assembly(), output)
+        except ValueError as error:
+            self.fail('Selected runtime power bundle required: ' + str(error))
+        self.assertIn('NEXUS_RUNTIME_POWER "ON"', (output / 'selection.cmake').read_text())
+        self.assertIn('tools/configure/runtime_power.py',
+                      (output / 'configuration_code_paths.json').read_text())
+
+    def test_unknown_or_malformed_power_tables_are_rejected(self):
+        for power in ('power = true', '[power]\nmode="stop"\ncontrollers=["bus4"]',
+                      '[power]\nmode="fixed-run"\ncontrollers=[]',
+                      '[power]\nmode="fixed-run"\ncontrollers=["bus4","bus4"]',
+                      '[power]\nmode="fixed-run"\ncontrollers=["device4"]',
+                      '[power]\nmode="fixed-run"\ncontrollers=[1]',
+                      '[power]\nmode="fixed-run"\ncontrollers=["bus4"]\nfrequency=64000000',
+                      '[power]\ncontrollers=["bus4"]'):
+            with self.subTest(power=power), self.assertRaises(ValueError):
+                gate.resolve_ir(self.assembly(power))
+
+    def test_other_profiles_and_controller_modes_have_no_silent_fallback(self):
+        for old, new in (('hsi64-fixed-cache-off', 'hsi64-fixed-cache-on'),
+                         ('hsi64-fixed-cache-off', 'hsi64-pll384-cache-off'),
+                         ('mode = "dma"', 'mode = "poll"')):
+            with self.subTest(choice=new), self.assertRaises(ValueError):
+                gate.resolve_ir(self.assembly(base=self.base.replace(old, new)))
+
+    def test_unenrolled_additional_controller_is_rejected(self):
+        additional = '\n[gpio.led]\nbinding="led"\nmode="output"\n'
+        with self.assertRaises(ValueError):
+            gate.resolve_ir(self.assembly(base=self.base + additional))
+
+    def test_explicit_null_power_is_not_an_absent_selection(self):
+        normalized = gate.load_assembly(self.assembly(), gate.ROOT, {})
+        normalized['power'] = None
+        path = self.directory / 'null-power.json'
+        path.write_text(json.dumps(normalized))
+        with self.assertRaises(ValueError):
+            gate.resolve_ir(path)
+
+    def test_failure_never_publishes_partial_runtime_bundle(self):
+        output = self.directory / 'out'
+        with self.assertRaises(ValueError):
+            gate.configure(self.assembly('[power]\nmode="fixed-run"\ncontrollers=["foreign"]'), output)
+        self.assertFalse(output.exists())
+
+
+if __name__ == '__main__':
+    unittest.main()

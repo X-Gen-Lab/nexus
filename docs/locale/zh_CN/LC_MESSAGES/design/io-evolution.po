@@ -8,27 +8,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a7153bfbcbc996c4336361c6207093f34e8855bddafd27fd82a1914ec9b4f2a9\n"
+"X-Nexus-Source-SHA256: 86ffca5044cb502423926475f3f24c714951e29745fb9ebebbf8700663b5dbee\n"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:10
 msgid "I/O evolution: static resources and explicit data contracts"
 msgstr "I/O 增量架构：静态资源与明确的数据合同"
 
-msgid ""
-"Use this page to extend an I/O mode without adding hidden execution, "
-"ambiguous units or a second resource owner. It describes the current "
-"iteration's software mechanisms and their boundaries. The {download}`42-item"
-" execution ledger <io-evolution-execution.csv>` owns implementation, "
-"software and hardware status; this page does not replace that ledger or "
-"declare the iteration complete. The sealed `c4249e98` candidate retains its "
-"original scope. New code must establish its own execution evidence."
-msgstr ""
-"本页帮助维护者扩展 I/O 模式，同时避免隐藏执行、计数单位歧义或重复的资源所有者。正文描述本轮软件机制及其边界。{download}`42 项实施台账"
-" <io-evolution-execution.csv>`维护实现、软件与硬件状态；本页不替代台账，也不宣称本轮工作全部完成。已封存的 "
-"`c4249e98` 候选保留原资格范围，新增代码必须建立自己的执行证据。"
-
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:22
 msgid "Assembly and execution have different responsibilities"
 msgstr "装配与执行承担不同责任"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:24
 msgid ""
 "![FIG-16: current I/O assembly and runtime responsibilities; arrows identify"
 " generation, lookup, calls and copied observations](../assets/diagrams/io-"
@@ -37,11 +27,13 @@ msgstr ""
 "![FIG-16：当前 I/O 装配与运行责任；箭头分别说明生成、查找、调用与复制观测](../assets/diagrams/io-"
 "evolution.svg)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:24
 msgid ""
 "FIG-16: current I/O assembly and runtime responsibilities; arrows identify "
 "generation, lookup, calls and copied observations"
 msgstr "FIG-16：当前 I/O 装配与运行责任；箭头分别说明生成、查找、调用与复制观测"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:26
 msgid ""
 "**FIG-16 is a current mechanism view, not a hardware qualification "
 "diagram.** The upper group shows build-time facts and generated objects. The"
@@ -52,6 +44,7 @@ msgstr ""
 "**FIG-16 是当前机制视图，不是硬件资格图。** "
 "上部展示构建期事实与生成对象，下部展示运行调用。实线箭头表达其文字标注的关系，虚线表示显式可选机制。任何箭头都不创建调度器、worker、全局设备注册表或隐式硬件探测。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:32
 msgid ""
 "One authored TOML assembly selects reviewed SoC modes and Board routes. The "
 "strict resolver checks fields, capacities and resource constraints before "
@@ -62,6 +55,7 @@ msgstr ""
 "一份 authored TOML 装配选择已审 SoC 模式与 Board 路线。严格解析器在发布不可变 typed IR 和原子生成 bundle "
 "之前检查字段、容量及资源约束。CMake 仍是唯一的软件目标图。非法输入不会触发便利的回退选择，也不会留下可使用的部分配置。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:38
 msgid ""
 "The generated factory returns an existing static face by typed identity. "
 "Lookup does not allocate, initialize hardware, read silicon, acquire locks "
@@ -75,6 +69,7 @@ msgstr ""
 "I/O 通过共享只读方法表和实例私有 context 调用实现。应用负责执行推进、调度与停机。可选增强 face 与其控制器共享预定的所有者；第二个 "
 "face 不会取得第二个硬件执行者。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:45
 msgid ""
 "The diagram's source contracts are [factory and "
 "instances](../explanation/factory.md), "
@@ -90,24 +85,30 @@ msgstr ""
 "DOCUMENTATION-SOURCE/tools/configure/ir.py)及下文链接的公共头文件。{download}`可编辑 DOT "
 "<../assets/diagrams/io-evolution.dot>`拥有图拓扑，语言标签不能改变边关系。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:51
 msgid "Describe resources before generating instances"
 msgstr "先描述资源，再生成实例"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:53
 msgid ""
 "The resource, trigger and DMA plans are compiler output. They let reviewers "
 "see why a selected combination is legal; they do not program an additional "
 "hardware mode or create a runtime resource manager."
 msgstr "资源、触发和 DMA 计划是配置编译器的输出，帮助评审者理解选定组合为何合法。它们不配置额外的硬件模式，也不创建运行时资源管理器。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Plan"
 msgstr "计划"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Responsibility"
 msgstr "责任"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Boundary"
 msgstr "边界"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[Resource graph](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/tools/configure/resource_graph.py)"
@@ -115,14 +116,17 @@ msgstr ""
 "[资源图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/resource_graph.py)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Physical IP aliases, personalities and hierarchical claims"
 msgstr "物理 IP 别名、功能 personality 与分层资源 claim"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Existing controller-exclusive modes remain exclusive; compatible sharing "
 "needs exact reviewed facts"
 msgstr "既有控制器独占模式保持独占；兼容共享需要精确的已审事实"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[Trigger graph](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/trigger_graph.py)"
@@ -130,14 +134,17 @@ msgstr ""
 "[触发图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/trigger_graph.py)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Event source, route, sink, startup ordering and stop responsibility"
 msgstr "事件源、路线、目标动作、启动顺序与停止责任"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Existing Timer-to-ADC-to-DMA routes are projected as facts; a new graph edge"
 " is not a new trigger provider"
 msgstr "仅将既有 Timer→ADC→DMA 路线投影为事实；新增图边不代表新增触发 provider"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[DMA topology](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/dma_topology.py)"
@@ -145,15 +152,18 @@ msgstr ""
 "[DMA 拓扑](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/dma_topology.py)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Separate execution lanes from requests; validate descriptor spans, memory, "
 "Cache and security facts"
 msgstr "区分执行 lane 与请求来源；检查描述符跨度、内存、Cache 与安全事实"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Validating a descriptor chain does not implement linked-list DMA execution"
 msgstr "描述符链校验不等于实现链表 DMA 执行"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[I2C timing](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/i2c_timing.py)"
@@ -161,14 +171,17 @@ msgstr ""
 "[I2C 时序](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/configure/i2c_timing.py)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Check explicit clock and electrical bounds using exact arithmetic"
 msgstr "用精确算术检查显式时钟与电气边界"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "The calculated unstretched-master rate is not measured bus speed or an "
 "allowance for unsupported filter settings"
 msgstr "计算得到的非拉伸主机速率不是实测总线速度，也不允许使用尚未支持的滤波设置"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:64
 msgid ""
 "Startup dependencies must form a directed acyclic graph. A runtime event "
 "chain may contain an explicitly autonomous cycle, but its declared stop "
@@ -180,6 +193,7 @@ msgstr ""
 "启动依赖必须是有向无环图。运行事件链可以包含显式声明的自主循环，但指定的停止所有者必须拥有整个循环分量，其停止动作必须切断每一条循环。这是关于输入事实的配置证明，不是硅片已经停止的证明。IRQ、DMA、总线和请求排空仍遵循各自"
 " provider 合同。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:70
 msgid ""
 "Do not infer that two timer channels can share a controller merely because "
 "their pin assignments differ. Common base frequency, update events, trigger "
@@ -190,9 +204,11 @@ msgstr ""
 "不能仅因引脚分配不同就推断两个 timer channel 可以共享控制器。公共基频、update event、触发输出、break "
 "输入、复位和时钟所有权仍可能冲突。同一物理 IP 的两个 typed 接口也不会变成两个独立外设。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:75
 msgid "Bind declared stream budgets to the actual pool"
 msgstr "将声明的流预算绑定到实际缓冲池"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:77
 msgid ""
 "An optional [stream profile](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/stream_profile.h) binds immutable "
@@ -210,6 +226,7 @@ msgstr ""
 "SOURCE/tools/configure/stream_profiles.py)仅在装配显式编写 profile 时生成该常量。factory "
 "查找返回已有 profile，既不创建缓冲池，也不启动采集。未使用 profile 的入口保持各自合同，不会隐式执行这一 profile 的约束。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:84
 msgid ""
 "The current F407/F470 double-buffer modes require two hardware targets, one "
 "replacement and enough additional blocks for the declared FIFO-frontier "
@@ -225,6 +242,7 @@ msgstr ""
 "计数器。目标替换延迟必须严格短于声明的单块填满时间。UART 的单位是字节；ADC 的单位是完整扫描，每个所选通道存储一个 `uint16_t`。ADC"
 " 分辨率位数不会改变这个存储宽度。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:92
 msgid ""
 "Cold profile admission checks the caller's actual block count, equal "
 "capacities, existing loans, state and payload/control disjointness before "
@@ -243,9 +261,11 @@ msgstr ""
 "`physical_qualified = false`。耗尽时停止并报告间隙，不会建立 UART 背压、无损传输，也不会保存在触发停止期间本来应发生的"
 " ADC 采样。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:102
 msgid "Optional traits report selected behavior"
 msgstr "可选 traits 描述选定行为"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:104
 msgid ""
 "The existing `factory.capabilities` switch controls generated read-only "
 "trait objects. [Selected I/O traits](https://github.com/X-Gen-"
@@ -261,6 +281,7 @@ msgstr ""
 "与模式，包括格式、限制、取消范围、连续性、时间戳来源与 DMA 策略。关闭开关不生成新增 trait 对象，不改变双指针 base "
 "face，也不增加可变设备状态。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:110
 msgid ""
 "A continuity value such as `double_buffer` or `rearm_gap` describes a "
 "mechanism, not demonstrated throughput. A Cache line requirement describes "
@@ -273,6 +294,7 @@ msgstr ""
 "的策略，不证明某个时钟 profile 已启用 Cache。CAN 邮箱数是 provider 专属事实。Traits 不授予 Board "
 "接线权限或物理资格，也不能覆盖准入检查。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:116
 msgid ""
 "Controller and endpoint records describe their own interfaces. Do not apply "
 "a parent controller's byte-SPI or ordinary-I2C limits to an enhanced "
@@ -283,9 +305,11 @@ msgstr ""
 "Controller 和 endpoint 记录分别描述各自接口。不能把父控制器的 byte-SPI 或普通 I2C 限制套到增强 "
 "endpoint。按请求确定 word 宽度的标记不代表长度无限。分配调用者存储前，先核对选定 face、计数单位和 provider 限制。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:121
 msgid "Cold silicon admission is an explicit step"
 msgstr "冷态硅片准入是显式步骤"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:123
 msgid ""
 "[Silicon preflight](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/core/include/nexus/core/silicon.h) reads one explicit, "
@@ -300,6 +324,7 @@ msgstr ""
 "上下文中读取一次显式、有界的来源，复制 device group、revision 与 Flash "
 "容量观测并比较不可变策略。它不探测设备、不启用时钟、不改 option bytes，也不保留借用。默认平台不会自动调用这个可选 helper。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:129
 msgid ""
 "A device group and Flash density cannot prove an exact orderable part, "
 "package or PCB. Revision rules bind a reviewed source digest and required "
@@ -313,15 +338,18 @@ msgstr ""
 "workaround mask；helper 不认证来源，也不证明 workaround 已经实现。未知 revision 必须拒绝或采用显式 "
 "unreviewed 策略。该策略不能绕过被阻止的 revision、缺失的观测、设备或容量不匹配，以及缺少必需 workaround 的情况。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:136
 msgid ""
 "The caller decides whether to start hardware after admission. Reading a "
 "revision does not establish electrical behavior, errata coverage for every "
 "mode or HIL."
 msgstr "准入后仍由调用者决定是否启动硬件。读取 revision 不建立电气行为、全部模式的 errata 覆盖或 HIL 资格。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:139
 msgid "Use units that match the selected data path"
 msgstr "计数单位必须匹配选定数据通路"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:141
 msgid ""
 "The enhanced contracts are separate typed interfaces. Their existence does "
 "not change the limits of the ordinary byte interfaces or enable a mode in "
@@ -331,15 +359,19 @@ msgstr ""
 "增强合同使用独立 typed 接口。接口存在不改变普通 byte 接口的限制，也不会在每个 provider "
 "中启用一种模式。当前生成选择与执行状态仍由台账记录。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Mechanism"
 msgstr "机制"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Units and ownership"
 msgstr "单位与所有权"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Current boundary"
 msgstr "当前边界"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[UART frame description](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/uart_format.h)"
@@ -347,14 +379,17 @@ msgstr ""
 "[UART 帧描述](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/uart_format.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Data bits exclude parity; stop and flow settings are explicit"
 msgstr "数据位不含 parity；stop 与 flow 设置显式表达"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Provider and reviewed Board routes must admit the combination; changing a "
 "format is a cold operation"
 msgstr "Provider 和已审 Board 路线必须允许该组合；格式变更属于冷态操作"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[UART words](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/uart_word.h)"
@@ -362,16 +397,19 @@ msgstr ""
 "[UART word](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/uart_word.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Each `uint16_t` carries a nine-bit value; counts and transferred prefixes "
 "are words"
 msgstr "每个 `uint16_t` 保存一个九位值；数量和已传输前缀均按 word 计数"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Independent Native, STM32F407 and GD32F470 IRQ paths; DMA and other "
 "providers do not inherit this interface"
 msgstr "Native、STM32F407 与 GD32F470 的独立 IRQ 路径；DMA 和其他 provider 不自动继承此接口"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[SPI whole-CS transaction](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/spi_transaction.h)"
@@ -379,15 +417,18 @@ msgstr ""
 "[SPI 全程保持 CS 的事务](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/spi_transaction.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Up to 16 segments, one common 8/16-bit word width, complete-word prefix"
 msgstr "最多 16 个 segment、全事务统一 8/16 位 word 宽度、完整 word 前缀"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Synchronous polling extension with explicit provider limits; existing byte-"
 "span and finite DMA contracts remain separate"
 msgstr "同步 polling 扩展，各 provider 限制仍显式生效；既有 byte-span 与有限 DMA 合同保持独立"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[Segmented SPI DMA](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/spi_dma_transaction.h)"
@@ -395,16 +436,19 @@ msgstr ""
 "[分段 SPI DMA](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/spi_dma_transaction.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Words; explicit TX/RX addresses and caller-owned fixed cells; one width "
 "across at most 16 segments"
 msgstr "单位为 word；TX/RX 地址和调用者所有的 fixed cell 显式提供；最多 16 段共用一个宽度"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Independent asynchronous request contract; provider integration and software"
 " verification remain specific to the selected mode"
 msgstr "独立异步请求合同；provider 接入与软件验证仍按选定模式分别建立"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[Long I2C messages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/i2c_long.h)"
@@ -412,14 +456,17 @@ msgstr ""
 "[I2C 长消息](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/i2c_long.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Bytes; one START per message; a later message causes repeated START"
 msgstr "单位为 byte；每条 message 一次 START，后续 message 才产生 repeated START"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Enhanced messages allow up to 65,535 bytes; ordinary messages retain their "
 "existing limit and require no additional face"
 msgstr "增强 message 最多 65,535 bytes；普通 message 保留原限制，无需新增 face"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[ADC integer format](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/adc_format.h)"
@@ -427,14 +474,17 @@ msgstr ""
 "[ADC 整数格式](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/adc_format.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Explicit signedness, byte order, storage width, padding and scan order"
 msgstr "显式描述符号、字节序、存储宽度、padding 和 scan 顺序"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Layout validation and decoding do not add injected conversion, wider "
 "acquisition or synchronized ADC hardware"
 msgstr "布局校验与解码不会新增 injected 转换、更宽采集或同步 ADC 硬件"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "[PWM group](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/pwm_group.h)"
@@ -442,14 +492,17 @@ msgstr ""
 "[PWM 组](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/io/include/nexus/io/pwm_group.h)"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "A complete fixed-base duty/trigger batch in declared timer ticks"
 msgstr "固定基频下完整的 duty/trigger 批次，单位为明确声明的 timer tick"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "A coherent staged batch is not an observed update; generated selection, "
 "analog wiring and ADC synchronization are separate exits"
 msgstr "一致地暂存一个批次不等于已经观察到 update；生成选择、模拟接线和 ADC 同步是独立退出条件"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:155
 msgid ""
 "UART word requests retain the ordinary ACCEPTED-to-SETTLED borrowing rule. A"
 " cancel or deadline never returns the request or payload early. The owner "
@@ -461,6 +514,7 @@ msgstr ""
 "payload。所有者必须继续 service，推进线上完成与排空；不能证明排空时保留 QUARANTINED 存储。Byte UART "
 "缓冲区和状态不会隐式变成九位缓冲区。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:160
 msgid ""
 "F407 and F470 RX-only DMA modes now use a compact receive owner with "
 "ordinary IRQ TX. Only a duplex DMA mode embeds the separate TX-DMA "
@@ -475,6 +529,7 @@ msgstr ""
 "扩展。两者复用相同的接收借用算法和共享只读公共方法表布局，不保存可选实现指针，也不在运行时选择 TX provider。仅 RX "
 "操作不会取得或撤回无关的 TX-DMA 执行通道。双向模式的向量按真实外层所有者及其独立部件解码。接收池排除完整双向对象，包括它的扩展。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:168
 msgid ""
 "RX and TX admission exclude both the TX payload and the complete TX request "
 "descriptor from every future RX target, in both admission orders. Stopping "
@@ -490,6 +545,7 @@ msgstr ""
 "向量。排空失败保留相应存储和责任。Flash 与 RAM 节省由实际链接 ELF 对比确定；仅主机 `sizeof` 预期不能建立 MCU "
 "成本或指令路径未变化的结论。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:176
 msgid ""
 "The synchronous whole-CS interface validates every segment and data span "
 "before hardware use. A null TX pointer means repeated dummy words, a null RX"
@@ -504,6 +560,7 @@ msgstr ""
 "指针为空表示丢弃，两者都为空可以表示仅产生时钟的阶段。所有 segment 共享一次 CS 有效区间。只有在 CS 已释放，并且已确认（线上排空或 "
 "provider 已复位）后，轮询返回才结束同步借用；超时不能抢占正在传输的字。错误不会重放之前的命令阶段。异步分段接口有独立的准入、描述符和取消合同。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:185
 msgid ""
 "The STM32F407/GD32F470 segmented DMA mechanism is a service-driven finite "
 "chain. Hardware DMA moves one segment, then the owner proves its drain "
@@ -520,6 +577,7 @@ msgstr ""
 "fixed dummy/discard cell 持续借用，直到 acquire 观察到 SETTLED。中间段完成、取消和 timeout "
 "都不释放这些存储。调用者仍须推动 service，不能从 base SPI port 推断附加唤醒或恢复能力。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:194
 msgid ""
 "The optional [segmented SPI owner](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
@@ -539,6 +597,7 @@ msgstr ""
 "复制或第二个控制器所有者。一个独立调度的唯一执行器推进内部请求。只有 acquire 观察内部 SETTLED "
 "后，它才移除私有描述符引用并允许外部请求结束。排队时间计入外部 deadline。排空失败保留内外借用，晚到的取消不能替换更早的终态结果。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:203
 msgid ""
 "An owner binding must prove that the endpoint's actual provider controller "
 "matches the selected enhanced controller. Matching a common sequence table "
@@ -557,9 +616,30 @@ msgstr ""
 "CS、故障和保留排空，而不是转发到字节 SPI 实现。模型控制器身份是软件身份，不是观测到的硅片。各系列 hook、生成的 owner "
 "binding、发布者交接和各目标执行证据仍需分别检查。回收存储前必须 join 发布者和观察者；队列为空或传输停止本身并不代表发布者已退出。"
 
-msgid "I2C hardware reload advances a long message without inserting another address phase. STOP and successful bus-idle observation precede successful return. On failure, the returned byte count records provider progress, including writes handed to TXDR before their wire ACK is known. The count does not authorize replay. Cancellation or failure does not justify replaying an acknowledged prefix or silently performing bus recovery. The enhanced face and base I2C interface share one executor. Timing inputs must include their reviewed clock and electrical bounds; a calculation is not a measurement of rise time or clock stretching. After physical STOP and bus idle are proved, refused STOP-flag or CR2 cleanup reports IO and preserves the actual progress count. The controller retains fault responsibility and rejects new admission until explicit recovery; already-drained caller storage may return."
-msgstr "I2C 硬件 reload 推进同一长消息，不插入新的地址阶段。成功返回前必须完成 STOP 并观察总线空闲。失败时，返回的字节数记录 provider 进度，其中可能包含已交给 TXDR、但尚不知道线上 ACK 结果的写入。该计数不能授权重放。取消或失败不允许重放已确认前缀，也不允许静默执行总线恢复。增强 face 与 base I2C 接口共用一个执行者。时序输入必须给出已审时钟和电气边界；计算结果不是上升时间或 clock stretching 的实测值。 在证明物理 STOP 已完成且总线空闲后，如果 STOP 标志或 CR2 的清理被拒绝，则返回 IO，并保留实际进度计数。控制器继续承担故障处理责任，在显式恢复前拒绝新请求准入；已完成排空的调用者存储可以归还。"
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:214
+msgid ""
+"I2C hardware reload advances a long message without inserting another "
+"address phase. STOP and successful bus-idle observation precede successful "
+"return. On failure, the returned byte count records provider progress, "
+"including writes handed to TXDR before their wire ACK is known. The count "
+"does not authorize replay. Cancellation or failure does not justify "
+"replaying an acknowledged prefix or silently performing bus recovery. The "
+"enhanced face and base I2C interface share one executor. Timing inputs must "
+"include their reviewed clock and electrical bounds; a calculation is not a "
+"measurement of rise time or clock stretching. After physical STOP and bus "
+"idle are proved, refused STOP-flag or CR2 cleanup reports IO and preserves "
+"the actual progress count. The controller retains fault responsibility and "
+"rejects new admission until explicit recovery; already-drained caller "
+"storage may return."
+msgstr ""
+"I2C 硬件 reload 推进同一长消息，不插入新的地址阶段。成功返回前必须完成 STOP 并观察总线空闲。失败时，返回的字节数记录 provider"
+" 进度，其中可能包含已交给 TXDR、但尚不知道线上 ACK "
+"结果的写入。该计数不能授权重放。取消或失败不允许重放已确认前缀，也不允许静默执行总线恢复。增强 face 与 base I2C "
+"接口共用一个执行者。时序输入必须给出已审时钟和电气边界；计算结果不是上升时间或 clock stretching 的实测值。 在证明物理 STOP "
+"已完成且总线空闲后，如果 STOP 标志或 CR2 的清理被拒绝，则返回 "
+"IO，并保留实际进度计数。控制器继续承担故障处理责任，在显式恢复前拒绝新请求准入；已完成排空的调用者存储可以归还。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:227
 msgid ""
 "ADC decoding reads only consumer-owned or acquired, producer-detached "
 "storage. It handles one-to-four-byte integer samples without allocating, "
@@ -574,12 +654,64 @@ msgstr ""
 "访问。声明的 regular/injected group 与 trigger "
 "身份描述已受支持的模式，不会启动转换，也不会将软件观测变成采样孔径时间戳。"
 
-msgid "The G474 `shared-fixed-pwm` selection gives two ordinary PWM factory faces one physical TIM3 owner: CH1/PA6 and CH2/PA7 AF2, with a common fixed 170 MHz kernel, tick and period. The two existing declarations derive one cold construction, two readonly channel references, compatible base claims and exclusive lane/pad claims. There is no authored share flag, runtime registry, timer IRQ or DMA. Each set changes only its own CCR preload. A channel joining a running peer adopts the current phase without UG or counter restart; independent calls do not provide coherent group start or a full first pulse. Channel stop preserves the peer and establishes its own declared inactive GPIO level; only the last lane stops CEN. The lifecycle caller quiesces both channel users before final Platform stop. Physical close precedes outer pin/clock release, retaining cleanup responsibility if reset, inactive-level or restoration proof fails. The [canonical software reference](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-pwm-shared.toml) requires the complete pair and excludes other whole-TIM3 or PA6/PA7 owners. Its Board choices do not establish PCB wiring, electrical safety or HIL."
-msgstr "G474 的 `shared-fixed-pwm` 选择让两个普通 PWM factory 接口共用一个物理 TIM3 owner：CH1/PA6 和 CH2/PA7 AF2，使用共同的固定 170 MHz 内核时钟、tick 和周期。两个既有声明派生一个冷态构造、两个只读通道引用、兼容的基准资源声明，以及独占的通道／引脚声明。没有作者填写的共享标志、运行时注册表、定时器 IRQ 或 DMA。每次 set 只修改本通道的 CCR 预装载值。后启动的通道加入正在运行的另一通道时沿用当前相位，不发出 UG，也不重启计数器；独立调用不提供多通道同步启动或完整首脉冲。通道 stop 不改变另一通道，并建立自身声明的不活动 GPIO 电平；只有最后一个通道停止 CEN。生命周期调用方须在最终 Platform stop 前确保两个通道的使用者均已停止访问。物理 close 先于外层引脚／时钟释放；若复位、不活动电平或恢复状态无法得到证明，则保留清理责任。[规范软件参考](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-pwm-shared.toml)要求完整通道对，并排除其他整个 TIM3 或 PA6/PA7 owner。其 Board 选择不证明 PCB 布线、电气安全或 HIL。"
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:234
+msgid ""
+"The G474 `shared-fixed-pwm` selection gives two ordinary PWM factory faces "
+"one physical TIM3 owner: CH1/PA6 and CH2/PA7 AF2, with a common fixed 170 "
+"MHz kernel, tick and period. The two existing declarations derive one cold "
+"construction, two readonly channel references, compatible base claims and "
+"exclusive lane/pad claims. There is no authored share flag, runtime "
+"registry, timer IRQ or DMA. Each set changes only its own CCR preload. A "
+"channel joining a running peer adopts the current phase without UG or "
+"counter restart; independent calls do not provide coherent group start or a "
+"full first pulse. Channel stop preserves the peer and establishes its own "
+"declared inactive GPIO level; only the last lane stops CEN. The lifecycle "
+"caller quiesces both channel users before final Platform stop. Physical "
+"close precedes outer pin/clock release, retaining cleanup responsibility if "
+"reset, inactive-level or restoration proof fails. The [canonical software "
+"reference](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/package/verification/io_evolution/g474-pwm-shared.toml) "
+"requires the complete pair and excludes other whole-TIM3 or PA6/PA7 owners. "
+"Its Board choices do not establish PCB wiring, electrical safety or HIL."
+msgstr ""
+"G474 的 `shared-fixed-pwm` 选择让两个普通 PWM factory 接口共用一个物理 TIM3 owner：CH1/PA6 和 "
+"CH2/PA7 AF2，使用共同的固定 170 MHz 内核时钟、tick "
+"和周期。两个既有声明派生一个冷态构造、两个只读通道引用、兼容的基准资源声明，以及独占的通道／引脚声明。没有作者填写的共享标志、运行时注册表、定时器 "
+"IRQ 或 DMA。每次 set 只修改本通道的 CCR 预装载值。后启动的通道加入正在运行的另一通道时沿用当前相位，不发出 "
+"UG，也不重启计数器；独立调用不提供多通道同步启动或完整首脉冲。通道 stop 不改变另一通道，并建立自身声明的不活动 GPIO "
+"电平；只有最后一个通道停止 CEN。生命周期调用方须在最终 Platform stop 前确保两个通道的使用者均已停止访问。物理 close "
+"先于外层引脚／时钟释放；若复位、不活动电平或恢复状态无法得到证明，则保留清理责任。[规范软件参考](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/cmake/package/verification/io_evolution/g474-pwm-"
+"shared.toml)要求完整通道对，并排除其他整个 TIM3 或 PA6/PA7 owner。其 Board 选择不证明 PCB 布线、电气安全或 "
+"HIL。"
 
-msgid "PWM group commit stages one coherent shadow batch; `SUCCESS` does not prove the timer already applied it. A partial hardware-write failure must withdraw output and retain fault responsibility. Clearing a break does not enable output. The ordinary G474 PWM-group provider does not supply PCB pin selection, analog threshold measurements or a power stage, and does not itself create a synchronized ADC session. A selected software reference now generates exclusive TIM1/COMP1 construction, fixed PA8/PA9/PA10 PWM pads and PA1/PA4 comparator pads. Its cold lifecycle owns the selected clock/reset, safe levels, comparator setup and settling, shared break vector and reverse cleanup. Partial cleanup failure retains responsibility. The separate [finite coupled PWM/ADC owner](pwm-adc.md) now binds one fixed TIM1/ADC1/COMP1/DMA window without independently startable PWM-group or ADC subfaces. Neither selection establishes a fitted PCB route or analog accuracy."
-msgstr "PWM group commit 暂存一个一致的影子批次；`SUCCESS` 不证明定时器已经应用该批次。部分硬件写入失败必须撤离输出并保留故障责任。清除刹车不会启用输出。普通 G474 PWM-group 提供者不提供 PCB 引脚选择、模拟阈值测量或功率级，也不自行建立同步 ADC 会话。选定的软件参考现生成独占 TIM1/COMP1 构造，固定 PA8/PA9/PA10 PWM 引脚和 PA1/PA4 比较器引脚。其冷生命周期拥有选定时钟／复位、安全电平、比较器设置和稳定等待、共享刹车向量以及逆序清理。部分清理失败时保留责任。独立的[有限 PWM/ADC 联合所有者](pwm-adc.md)现绑定一个固定 TIM1/ADC1/COMP1/DMA 窗口，不暴露可独立启动的 PWM-group 或 ADC 子接口。任一选择都不证明实际装配的 PCB 布线或模拟准确度。"
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:250
+msgid ""
+"PWM group commit stages one coherent shadow batch; `SUCCESS` does not prove "
+"the timer already applied it. A partial hardware-write failure must withdraw"
+" output and retain fault responsibility. Clearing a break does not enable "
+"output. The ordinary G474 PWM-group provider does not supply PCB pin "
+"selection, analog threshold measurements or a power stage, and does not "
+"itself create a synchronized ADC session. A selected software reference now "
+"generates exclusive TIM1/COMP1 construction, fixed PA8/PA9/PA10 PWM pads and"
+" PA1/PA4 comparator pads. Its cold lifecycle owns the selected clock/reset, "
+"safe levels, comparator setup and settling, shared break vector and reverse "
+"cleanup. Partial cleanup failure retains responsibility. The separate "
+"[finite coupled PWM/ADC owner](pwm-adc.md) now binds one fixed "
+"TIM1/ADC1/COMP1/DMA window without independently startable PWM-group or ADC "
+"subfaces. Neither selection establishes a fitted PCB route or analog "
+"accuracy."
+msgstr ""
+"PWM group commit 暂存一个一致的影子批次；`SUCCESS` "
+"不证明定时器已经应用该批次。部分硬件写入失败必须撤离输出并保留故障责任。清除刹车不会启用输出。普通 G474 PWM-group 提供者不提供 PCB "
+"引脚选择、模拟阈值测量或功率级，也不自行建立同步 ADC 会话。选定的软件参考现生成独占 TIM1/COMP1 构造，固定 PA8/PA9/PA10 "
+"PWM 引脚和 PA1/PA4 "
+"比较器引脚。其冷生命周期拥有选定时钟／复位、安全电平、比较器设置和稳定等待、共享刹车向量以及逆序清理。部分清理失败时保留责任。独立的[有限 "
+"PWM/ADC 联合所有者](pwm-adc.md)现绑定一个固定 TIM1/ADC1/COMP1/DMA 窗口，不暴露可独立启动的 PWM-group"
+" 或 ADC 子接口。任一选择都不证明实际装配的 PCB 布线或模拟准确度。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:264
 msgid ""
 "Separate concrete G474 providers implement TIM5 CH1 capture on PA0 and TIM3 "
 "two-input quadrature counting on PA6/PA7. Capture publishes raw 32-bit "
@@ -610,9 +742,11 @@ msgstr ""
 "排空责任。平台启动既不启动捕获会话，也不启动编码器计数。应用提供捕获 ring，并显式启动和停止各会话。source/vector "
 "或存储排空失败保留清理责任。这些精确选择不继承 PWM-group 能力，不同步 ADC 采样孔径，也不建立外部接线。产品控制与恢复策略保持外置。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:280
 msgid "Preserve a single owner for H743 Flash timing"
 msgstr "保持 H743 Flash 时序的唯一所有者"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:282
 msgid ""
 "The selected fixed-HSI32/64 Flash path checks actual clock, requested and "
 "observed voltage scale, Cache state and Flash programming-delay fields "
@@ -629,26 +763,42 @@ msgstr ""
 "字段，验证读回，并保留已保存状态，直到逆序清理安全恢复它。生成的 Flash 装配选择这一所有者；不含 Flash "
 "的构建不会取得它。产品擦除区域与恢复策略仍不属于本仓库。"
 
-msgid "This is a bounded programming-timing correction for the selected existing clock profiles. It does not enable a new high-speed clock, change option bytes, qualify all silicon revisions or establish physical Flash endurance. The separate selected [V-only HSI/PLL384 reference](h743-high-clock.md) now implements distinct CPU/bus/kernel clock domains and a cold clock/voltage/Flash lifecycle. Its joint owner replaces the fixed-HSI Flash timing owner for that high profile; support does not extend to unreviewed cuts, Cache-on execution or physical qualification."
-msgstr "这是针对选定既有时钟配置的有界编程时序修正。该修正本身不会启用新的高速时钟、修改选项字节、认定全部硅片修订合格或建立物理 Flash 耐久性。独立选定的[仅限 V 修订 HSI/PLL384 参考](h743-high-clock.md)现已实现独立的 CPU／总线／内核时钟域和冷态时钟／电压／Flash 生命周期。该高速配置以联合所有者替代固定 HSI Flash 时序所有者；支持范围不扩展到未经审查的修订、启用 Cache 的执行或物理资格。"
-
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:291
 msgid ""
-"The selected V/cache-off Flash implementation now requires the [private "
-"RAM maintenance boundary](h743-flash-ram.md): cold copy/readiness, one "
-"selected workspace, a CPU-only stack bridge, RAM-owned VTOR and a "
-"temporary MPU guard. Deadline expiry after trigger only latches the "
-"result; actual both-bank drain, LOCK and protection/vector restoration "
-"precede any return. Production-ELF closure and complete software exits "
-"remain open, so IO-24 stays `in_progress`."
+"This is a bounded programming-timing correction for the selected existing "
+"clock profiles. It does not enable a new high-speed clock, change option "
+"bytes, qualify all silicon revisions or establish physical Flash endurance. "
+"The separate selected [V-only HSI/PLL384 reference](h743-high-clock.md) now "
+"implements distinct CPU/bus/kernel clock domains and a cold "
+"clock/voltage/Flash lifecycle. Its joint owner replaces the fixed-HSI Flash "
+"timing owner for that high profile; support does not extend to unreviewed "
+"cuts, Cache-on execution or physical qualification."
 msgstr ""
-"选定 V／Cache off 的 Flash 实现现在要求[私有 RAM "
-"维护边界](h743-flash-ram.md)：冷态复制／就绪、单个选定工作区、仅负责 CPU 的栈 bridge、RAM 拥有的 VTOR "
-"和临时 MPU guard。触发后 deadline 到期只锁存结果；任何返回前都必须完成实际双 Bank 排空、LOCK 以及保护／向量恢复。生产"
-" ELF 闭包和完整软件退出仍未完成，因此 IO-24 保持 `in_progress`。"
+"这是针对选定既有时钟配置的有界编程时序修正。该修正本身不会启用新的高速时钟、修改选项字节、认定全部硅片修订合格或建立物理 Flash "
+"耐久性。独立选定的[仅限 V 修订 HSI/PLL384 参考](h743-high-clock.md)现已实现独立的 "
+"CPU／总线／内核时钟域和冷态时钟／电压／Flash 生命周期。该高速配置以联合所有者替代固定 HSI Flash "
+"时序所有者；支持范围不扩展到未经审查的修订、启用 Cache 的执行或物理资格。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:299
+msgid ""
+"The selected V/cache-off Flash implementation now requires the [private RAM "
+"maintenance boundary](h743-flash-ram.md): cold copy/readiness, one selected "
+"workspace, a CPU-only stack bridge, RAM-owned VTOR and a temporary MPU "
+"guard. Deadline expiry after trigger only latches the result; actual both-"
+"bank drain, LOCK and protection/vector restoration precede any return. "
+"Production-ELF closure and complete software exits remain open, so IO-24 "
+"stays `in_progress`."
+msgstr ""
+"选定 V／Cache off 的 Flash 实现现在要求[私有 RAM 维护边界](h743-flash-"
+"ram.md)：冷态复制／就绪、单个选定工作区、仅负责 CPU 的栈 bridge、RAM 拥有的 VTOR 和临时 MPU guard。触发后 "
+"deadline 到期只锁存结果；任何返回前都必须完成实际双 Bank 排空、LOCK 以及保护／向量恢复。生产 ELF "
+"闭包和完整软件退出仍未完成，因此 IO-24 保持 `in_progress`。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:306
 msgid "Observe time without inventing timing guarantees"
 msgstr "观测时间，不虚构时序保证"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:308
 msgid ""
 "[Timestamp facts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-SOURCE/io/include/nexus/io/observation.h) distinguish hardware"
@@ -662,6 +812,7 @@ msgstr ""
 "观测。调用者提供扩展 ticks、domain、epoch、准确声明的 tick rate，以及显式的不确定度已知状态。Domain 所有者扩展计数器 "
 "wrap，并在不连续、复位或变频后改变 epoch。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:314
 msgid ""
 "Elapsed-time comparison requires matching domain, epoch and rate, ordered "
 "ticks and a representable uncertainty bound. It does not synchronize clocks,"
@@ -672,6 +823,7 @@ msgstr ""
 "时间差比较要求 domain、epoch 与 rate 一致，ticks "
 "有序且不确定度边界可表示。它不做时钟同步、跨域换算或硬件时钟访问，也不证明两条事实具有因果配对关系。未知不确定度不同于已知为零的边界。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:319
 msgid ""
 "Checked UART/SPI/I2C service reports an invalid face or an absent service "
 "method. `SUCCESS` establishes one dispatch only. It does not establish "
@@ -683,6 +835,7 @@ msgstr ""
 "只说明完成一次派发，不证明有进展、健康、SETTLED、线上完成或可以回收存储。普通 service 的上下文、串行化和生命周期规则仍适用，没有隐藏 "
 "worker。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:324
 msgid ""
 "The optional [raw cycle probe](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/cycle_probe.h)"
@@ -702,6 +855,7 @@ msgstr ""
 "getter。未选宏不求值任何参数、不创建 sidecar，也不增加 provider 状态或方法表字段。只有显式选择才链接可选库；链接 ELF "
 "检查确定默认及选配的实际成本。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:334
 msgid ""
 "A readable counter pair is a raw modulo-2^32 difference, including probe "
 "cost and preemption. Multiple wraps, reset and clock-epoch continuity are "
@@ -715,6 +869,7 @@ msgstr ""
 " false。探针既不使能也不复位 DWT。不可用样本和同一 sidecar 重入被计数，诊断总数饱和而不回绕。不同嵌套向量需要不同 "
 "sidecar。这既不是经过时间验证，也不是 IRQ 到达延迟、独占执行时间或预算通过结论。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:342
 msgid ""
 "Privileged Task snapshot saves and restores the incoming local interrupt "
 "mask for a bounded statistics copy. A task producer must use that same "
@@ -733,9 +888,11 @@ msgstr ""
 "service。观测失败不会停止排空或释放 QUARANTINED 借用。consumer 必须证明私有状态及被借用存储与可选 observer "
 "不重叠。缺少独立连续性证明时，不得将原始探针样本提升为已验证时序预算。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:352
 msgid "Prepare exact HIL protocols without promoting software facts"
 msgstr "准备精确 HIL 协议，不将软件事实提升为资格"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:354
 msgid ""
 "The existing [HIL workload planner](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/workloads.py) now "
@@ -747,61 +904,77 @@ msgstr ""
 "DOCUMENTATION-SOURCE/tools/hil/workloads.py)现在增加四种精确协议。选择检查 resolved "
 "控制器与端点事实；芯片宣传的外设能力不会自动选中 workload。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Protocol"
 msgstr "协议"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Required selected mechanism"
 msgstr "要求选定的机制"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Additional station obligations"
 msgstr "额外工位责任"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "`uart_word_wire`"
 msgstr "`uart_word_wire`"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "IRQ 9N1 word face and word RX profile"
 msgstr "IRQ 9N1 字 face 与字 RX profile"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "MCU/FPGA peer with native nine-bit hardware and raw bit-8-preserving "
 "captures; waveform and load/TC/settlement order"
 msgstr "带原生九位硬件的 MCU/FPGA 对端和保留 bit 8 的原始采集；波形及 load/TC/settlement 顺序"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "`spi_dma_whole_cs_segments`"
 msgstr "`spi_dma_whole_cs_segments`"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Enhanced DMA face and same-controller `spi-dma-transaction` endpoint"
 msgstr "增强 DMA face 与同控制器 `spi-dma-transaction` 端点"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "CS/SCK/data waveforms, fixed-cell tests and independent memory/wire drain "
 "facts"
 msgstr "CS/SCK/data 波形、固定单元测试及独立内存/线上排空事实"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "`i2c_v2_long_timing`"
 msgstr "`i2c_v2_long_timing`"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "G474/H743/U575 long endpoint and authored AF50..260 ns/DNF0 timing "
 "projection"
 msgstr "G474/H743/U575 长消息端点及 authored AF50..260 ns/DNF0 时序投影"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Measured clock, rise/fall and voltage; 255/256/257/511/512-byte boundaries; "
 "TXDR progress separate from wire ACK"
 msgstr "实测时钟、上升/下降时间和电压；255/256/257/511/512 字节边界；TXDR 推进与线上 ACK 分开"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "`pwm_group_comp_break`"
 msgstr "`pwm_group_comp_break`"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Exclusive generated G474 TIM1/COMP1 and its exact five-pad route"
 msgstr "生成的独占 G474 TIM1/COMP1 及其精确五焊盘路线"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid ""
 "Analog limits, passive loads, coherent commits, break latch, safe stop and "
 "IRQ join"
 msgstr "模拟输入限制、无源负载、一致批量提交、break 锁存、安全停止和 IRQ join"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:365
 msgid ""
 "Plans remain `prepared_unbound` and every physical case remains "
 "`not_executed`. The authoring template leaves instrument identities and "
@@ -817,9 +990,11 @@ msgstr ""
 "workload 与工位准入仍要求单独选定并评审的 8N1 字节冒烟控制台。八位 USB 串口适配器不能验证九位字；仅字接口或无控制台的软件 "
 "fixture 不满足该工位合同。仍需实际仪器、正的工作量下界、波形采集、数值限值和设备执行。选择器不会建立新的采集 schema、隐藏硬件动作或资格。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:374
 msgid "Cost and validation stay visible"
 msgstr "成本和验证必须可见"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:376
 msgid ""
 "Build-time resource plans do not impose a runtime graph walk. Optional "
 "traits are constant data. Separate enhanced faces keep the simple path "
@@ -833,60 +1008,79 @@ msgstr ""
 "的状态、缓冲区和代码仍占空间，必须由实际链接镜像测量。Segment 校验成本与描述符数有关，硅片策略校验成本与规则数有关。不能从接口图推断 "
 "cycles、最坏延迟或内存零增长。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Evidence"
 msgstr "证据"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "What it establishes"
 msgstr "能够建立的结论"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "What it does not establish"
 msgstr "不能建立的结论"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Metadata and resolver tests"
 msgstr "元数据和解析器测试"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Rejection and generated-plan behavior for supplied facts"
 msgstr "对输入事实的拒绝与生成计划行为"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "New hardware execution or a reviewed PCB route"
 msgstr "新增硬件执行或已审 PCB 路线"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "GoogleTest/GoogleMock and register models"
 msgstr "GoogleTest/GoogleMock 与寄存器模型"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Executed production-code contracts under the stated host model"
 msgstr "所声明主机模型下真实生产代码合同的执行"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Real IRQ latency, electrical timing, uninterrupted throughput or power"
 msgstr "真实 IRQ 延迟、电气时序、连续吞吐或功耗"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "ARM ELF, map and resource checks"
 msgstr "ARM ELF、map 与资源检查"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Actual compilation, linking, retention and static budgets"
 msgstr "实际编译、链接、保留与静态预算"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Runtime correctness or measured stack high-water marks"
 msgstr "运行正确性或实测栈高水位"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Fresh offline builds and candidate verification"
 msgstr "全新离线构建与候选验证"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Their exact clean source, SDK and same-artifact software scope"
 msgstr "其精确 clean source、SDK 和同产物的软件范围"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Qualification of later commits or physical hardware"
 msgstr "后续提交或物理硬件资格"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Physical station execution"
 msgstr "实板工位执行"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "The exact Board, firmware, wiring and measured conditions"
 msgstr "精确 Board、固件、接线与测量条件"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:0
 msgid "Automatic qualification of a family, package or unrelated mode"
 msgstr "整个系列、封装或无关模式的自动资格"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:391
 msgid ""
 "The current iteration's physical status remains `not_executed` until a "
 "station runs the applicable checks. Applications, protocol policy, product "
@@ -896,12 +1090,32 @@ msgstr ""
 "在工位实际执行对应检查前，本轮物理状态保持 `not_executed`。应用、协议策略、产品分区、控制算法和恢复策略继续属于外部 consumer "
 "工程。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:395
 msgid "Work that is still a separate implementation"
 msgstr "仍需单独实现的工作"
 
-msgid "The ledger retains the exits for real linked-list DMA, continuous high-throughput H743 paths, U575 low-power autonomous execution, broader or continuous synchronized control groups, advanced Ethernet/USB, external storage, TrustZone services, multicore transport, audio and frame devices. A public type, validated topology or model does not complete these exits. Each mode needs its own provider, reviewed route, failure and ownership tests, ARM/SDK checks, resource costs and physical evidence where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), the [joint PWM/ADC window](pwm-adc.md) and selected [G474 CAN FD modes](can-fd.md) now have specific software paths; those selections do not complete the broader exits or establish external wiring, measured performance or HIL."
-msgstr "台账仍保留真实链表 DMA、H743 连续高速路径、U575 低功耗自主执行、更广泛或连续的同步控制组、高级 Ethernet/USB、外部存储、TrustZone 服务、多核传输、音频和帧设备的退出条件。公共类型、经验证的拓扑或模型不能完成这些退出条件。每个模式都需要自己的提供者、已审路由、故障与所有权测试、ARM／SDK 检查、资源成本以及适用的物理证据。有限 [U575 UART GPDMA TX](u575-uart-gpdma.md)、[PWM/ADC 联合窗口](pwm-adc.md)和选定的 [G474 CAN FD 模式](can-fd.md)现已有各自的软件路径；这些具体选择不代表更广泛的退出条件已完成，也不建立外部布线、实测性能或 HIL 资格。"
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:397
+msgid ""
+"The ledger retains the exits for real linked-list DMA, continuous high-"
+"throughput H743 paths, U575 low-power autonomous execution, broader or "
+"continuous synchronized control groups, advanced Ethernet/USB, external "
+"storage, TrustZone services, multicore transport, audio and frame devices. A"
+" public type, validated topology or model does not complete these exits. "
+"Each mode needs its own provider, reviewed route, failure and ownership "
+"tests, ARM/SDK checks, resource costs and physical evidence where "
+"applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), the [joint "
+"PWM/ADC window](pwm-adc.md) and selected [G474 CAN FD modes](can-fd.md) now "
+"have specific software paths; those selections do not complete the broader "
+"exits or establish external wiring, measured performance or HIL."
+msgstr ""
+"台账仍保留真实链表 DMA、H743 连续高速路径、U575 低功耗自主执行、更广泛或连续的同步控制组、高级 "
+"Ethernet/USB、外部存储、TrustZone "
+"服务、多核传输、音频和帧设备的退出条件。公共类型、经验证的拓扑或模型不能完成这些退出条件。每个模式都需要自己的提供者、已审路由、故障与所有权测试、ARM／SDK"
+" 检查、资源成本以及适用的物理证据。有限 [U575 UART GPDMA TX](u575-uart-gpdma.md)、[PWM/ADC "
+"联合窗口](pwm-adc.md)和选定的 [G474 CAN FD 模式](can-"
+"fd.md)现已有各自的软件路径；这些具体选择不代表更广泛的退出条件已完成，也不建立外部布线、实测性能或 HIL 资格。"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:408
 msgid ""
 "Use [platform integration contracts](integration-contracts.md), [the "
 "lifecycle matrix](io-lifecycle-matrix.md), [software "
@@ -914,3 +1128,36 @@ msgstr ""
 "评审和交付变更时，参照[平台接入合同](integration-contracts.md)、[生命周期矩阵](io-lifecycle-"
 "matrix.md)、[软件资格](../reference/platforms/qualification.md)和{download}`42 项台账"
 " <io-evolution-execution.csv>`。用实际证据更新这一份台账，不要用“支持整个 MCU 系列”等宽泛结论替代待完成工作。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/design/io-evolution.md:12
+msgid ""
+"Use this page to extend an I/O mode without adding hidden execution, "
+"ambiguous units or a second resource owner. It describes the current "
+"iteration's software mechanisms and their boundaries. The {download}`42-item"
+" execution ledger <io-evolution-execution.csv>` owns implementation, "
+"software and hardware status; this page does not replace that ledger or "
+"declare the iteration complete. The current [GPIO pin-state "
+"explanation](../explanation/gpio-pin-states.md) describes the exact selected"
+" G474 images, retained cold lease and independent provider/Platform cleanup;"
+" wake and retention remain separate work. The sealed `c4249e98` candidate "
+"retains its original scope. New code must establish its own execution "
+"evidence."
+msgstr ""
+"本文说明如何扩展 I/O 模式，同时避免隐藏执行、单位含混或增加第二个资源 owner。内容记录当前迭代的软件机制及其边界。{download}`42 "
+"项实施台账 <io-evolution-execution.csv>`是实现、软件和硬件状态的权威记录；本文不替代台账，也不宣布本轮迭代完成。当前 "
+"[GPIO 引脚状态说明](../explanation/gpio-pin-states.md)解释精确选定的 G474 图像、保留的冷态租约以及独立的"
+" provider/Platform 清理；wake 和 retention 仍是单独工作。已封存的 `c4249e98` "
+"候选保留原有范围。新增代码必须建立自身执行证据。"
+
+#~ msgid ""
+#~ "Use this page to extend an I/O mode without adding hidden execution, "
+#~ "ambiguous units or a second resource owner. It describes the current "
+#~ "iteration's software mechanisms and their boundaries. The {download}`42-item"
+#~ " execution ledger <io-evolution-execution.csv>` owns implementation, "
+#~ "software and hardware status; this page does not replace that ledger or "
+#~ "declare the iteration complete. The sealed `c4249e98` candidate retains its "
+#~ "original scope. New code must establish its own execution evidence."
+#~ msgstr ""
+#~ "本页帮助维护者扩展 I/O 模式，同时避免隐藏执行、计数单位歧义或重复的资源所有者。正文描述本轮软件机制及其边界。{download}`42 项实施台账"
+#~ " <io-evolution-execution.csv>`维护实现、软件与硬件状态；本页不替代台账，也不宣称本轮工作全部完成。已封存的 "
+#~ "`c4249e98` 候选保留原资格范围，新增代码必须建立自己的执行证据。"

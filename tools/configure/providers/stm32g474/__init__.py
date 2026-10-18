@@ -42,6 +42,7 @@ _MODES = MappingProxyType({
     ("adc_group", "regular-sequence-dma"): "adc_group",
     ("adc_group", "injected-sequence"): "adc_group",
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
+    ("gpio", "named-states"): "pin_state",
     ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi",

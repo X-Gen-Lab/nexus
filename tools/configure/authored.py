@@ -44,7 +44,7 @@ ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz
 USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
                        "max_packet", "fifo_words"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain"}
+TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power"}
 
 
 
@@ -130,7 +130,7 @@ def normalize(data, path, root, fail, obj, integer, text):
               "backend": data["backend"], "clock_profile": data["clock"],
               "controllers": controllers, "devices": devices,
               "memory_budgets": budgets, "layout": data.get("layout")}
-    for field in ("abi", "optimization", "components", "os", "factory", "can_domain"):
+    for field in ("abi", "optimization", "components", "os", "factory", "can_domain", "power"):
         if field in data:
             result[field] = data[field]
     return result
@@ -228,6 +228,9 @@ def editor_schema():
     properties["schema"] = {"const": 2}
     properties["backend"]["enum"] = ["native", "baremetal", "freertos", "threadx"]
     properties["optimization"]["enum"] = ["O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"]
+    properties["power"] = record({"mode", "controllers"}, {"mode", "controllers"})
+    properties["power"]["properties"]["mode"] = {"const": "fixed-run"}
+    properties["power"]["properties"]["controllers"] = {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string"}, "uniqueItems": True}
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})

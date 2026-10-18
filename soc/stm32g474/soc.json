@@ -369,7 +369,8 @@
       "kind": "gpio",
       "modes": [
         "input",
-        "output"
+        "output",
+        "named-states"
       ],
       "irq": [],
       "pins": [

@@ -503,5 +503,90 @@ class DocumentationTestEnvironmentTests(unittest.TestCase):
         self.assertFalse(self.report.exists())
 
 
+class DocumentationWorkspaceTests(unittest.TestCase):
+    """External output owns its work files and failure evidence together."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.base = Path(self.directory.name)
+        self.root = self.base / "source"
+        (self.root / "docs").mkdir(parents=True)
+        (self.root / "docs/index.md").write_text("# Start" + chr(10))
+        (self.root / "dependencies").mkdir()
+        (self.root / "dependencies/platform-compatibility.json").write_text(
+            json.dumps({"semantic_version": "fixture"}))
+        self.prefix = self.base / "locked tools"
+        self.external = self.base / "delivery/site"
+        self.enterContext(patch.object(install, "environment", return_value={}))
+        self.enterContext(patch.object(install, "diagnose", return_value={
+            "prefix": str(self.prefix)}))
+        self.enterContext(patch.object(cli, "observe_git_source", return_value={
+            "commit": "fixture", "dirty": False}))
+        self.enterContext(patch.object(cli.check, "scan", return_value={
+            "errors": []}))
+        self.enterContext(patch("tools.documentation.diagrams.check",
+                                return_value={"errors": []}))
+        self.run = self.enterContext(patch.object(
+            cli.process, "run", side_effect=self.failed_command))
+
+    def failed_command(self, command, **kwargs):
+        """Keep the actual workspace argument at the external command port."""
+        del command
+        log = kwargs["log"]
+        log.write_text("fixture doxygen failure" + chr(10))
+        receipt = log.with_suffix(".receipt.json")
+        receipt.write_text(json.dumps({"exit_code": 7}))
+        self.receipt = receipt
+        return SimpleNamespace(returncode=7, stdout="", stderr="",
+                               receipt_path=receipt)
+
+    def failed_build(self, destination):
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            with self.assertRaisesRegex(ValueError, "doxygen failed.*7"):
+                cli.build(self.root, destination, tool_prefix=self.prefix)
+
+    def test_external_build_does_not_write_source_build_directory(self):
+        self.failed_build(self.external)
+        self.assertFalse((self.root / "build").exists())
+        self.run.assert_called_once()
+
+    def test_external_failure_receipt_and_raw_stay_beside_output(self):
+        self.failed_build(self.external)
+        expected = self.external.parent / "documentation-attempts"
+        self.assertTrue(self.receipt.is_relative_to(expected))
+        self.assertTrue(self.receipt.is_file())
+        workspaces = list(expected.iterdir())
+        self.assertEqual(len(workspaces), 1)
+        failure = workspaces[0] / "documentation-build-failure.json"
+        record = json.loads(failure.read_text())
+        self.assertEqual(record["status"], "failed")
+        self.assertIn(str(self.receipt), record["error"])
+        self.assertTrue((workspaces[0] / "doxygen.log").is_file())
+        self.assertFalse((self.external / "documentation-build.json").exists())
+
+    def test_workspace_sibling_symlink_is_rejected_before_command(self):
+        actual = self.base / "unrelated"
+        actual.mkdir()
+        sentinel = actual / "keep.txt"
+        sentinel.write_text("untouched")
+        self.external.parent.mkdir()
+        (self.external.parent / "documentation-attempts").symlink_to(
+            actual, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, "workspace.*symlink"):
+            cli.build(self.root, self.external, tool_prefix=self.prefix)
+        self.run.assert_not_called()
+        self.assertEqual(sentinel.read_text(), "untouched")
+        self.assertEqual(list(actual.iterdir()), [sentinel])
+        self.assertFalse((self.root / "build").exists())
+
+    def test_default_output_keeps_original_build_workspace_location(self):
+        destination = self.root / "build/documentation"
+        self.failed_build(destination)
+        expected = self.root / "build/documentation-attempts"
+        self.assertTrue(self.receipt.is_relative_to(expected))
+        self.assertEqual(len(list(expected.iterdir())), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

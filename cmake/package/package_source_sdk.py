@@ -145,7 +145,7 @@ REQUIRED_FILES = (
 MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
-        "consumers/h743-spi-dma.c",
+        "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
         "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
         "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
@@ -165,9 +165,12 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "h743-uart-rtscts.toml", "u575-uart-rtscts.toml",
         "g474-pwm-shared.toml", "boards/g474-pwm-shared/board.json",
         "consumers/g474-pwm-shared.c",
+        "boards/g474-pin-states/board.json", "consumers/pin-states.c",
         "native-time-pair.toml", "native-time-empty.toml",
         "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
 REQUIRED_FILES += ("tools/configure/selected_contracts.py",
+                   "tools/configure/pin_states.py",
+                   "tools/configure/assemblies/g474-pin-states.toml",
                    *IO_EVOLUTION_VERIFICATION_FILES)
 REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
 REQUIRED_FILES += (
@@ -313,7 +316,7 @@ for _family in ("stm32f407", "gd32f470"):
 REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
     "resource_graph", "trigger_graph", "dma_topology", "io_traits", "i2c_timing",
     "enhanced_endpoints", "uart_formats", "i2c_timing_selection",
-    "stream_profiles", "coupled_io"))
+    "stream_profiles", "coupled_io", "runtime_power"))
 REQUIRED_FILES += (
     "soc/stm32g474/drivers/pwm_group.c",
     "soc/stm32g474/drivers/timer_capture.c",

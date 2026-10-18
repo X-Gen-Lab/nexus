@@ -82,6 +82,9 @@ SELECTED_CONSUMERS = (
     ("native time empty",
      "cmake/package/verification/io_evolution/native-time-empty.toml",
      "native-time-empty"),
+    ("h743 runtime clock",
+     "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
+     "h743-runtime-clock"),
     ("h743 spi dma",
      "tools/configure/assemblies/h743-spi-dma.toml",
      "h743-spi-dma"),
@@ -91,6 +94,9 @@ SELECTED_CONSUMERS = (
     ("h743 spi dma uart rx",
      "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
      "h743-spi-dma"),
+    ("g474 pin states",
+     "tools/configure/assemblies/g474-pin-states.toml",
+     "pin-states"),
 )
 
 def consumer_layout():

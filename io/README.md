@@ -1,6 +1,10 @@
 # Typed I/O
 
 GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 interfaces.
+The optional [GPIO pin-state contract](../docs/explanation/gpio-pin-states.md)
+adds an explicit selected face for authored DEFAULT/SLEEP images. Its generated
+instance ID and runtime selection enum remain separate; lookup never acquires
+pad ownership or starts a power transition.
 Each selected instance has an immutable face with two pointers: shared read-only
 methods and a pointer to private provider state. Generated faces live in read-only
 storage; their state and selected buffers are private static objects in the

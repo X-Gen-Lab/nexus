@@ -19,6 +19,18 @@ from tools.configure.providers import descriptor
 
 
 class DeviceSDKPayloadTests(unittest.TestCase):
+    def test_runtime_clock_helper_and_actual_consumer_are_mandatory(self):
+        names = {"tools/configure/runtime_power.py",
+                 "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
+                 "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"}
+        self.assertFalse(names - set(sdk.REQUIRED_FILES))
+        owned = set(descriptor.maintained("stm32h743").owned_payload)
+        self.assertFalse((names - {"tools/configure/runtime_power.py"}) - owned)
+        for name in names:
+            self.assertTrue(sdk.selected(name), name)
+        self.assertIn("cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c",
+                      sdk.IO_EVOLUTION_VERIFICATION_FILES)
+
     def test_h743_spi_canonical_inputs_and_shared_smoke_are_required(self):
         names = ["tools/configure/assemblies/h743-" + variant + ".toml"
                  for variant in ("spi-dma", "spi-dma-uart-tx",
@@ -33,6 +45,56 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         self.assertIn(smoke, sdk.IO_EVOLUTION_VERIFICATION_FILES)
         for name in names:
             self.assertNotIn(name, sdk.IO_EVOLUTION_VERIFICATION_FILES)
+
+    def test_named_pin_state_sdk_payload_and_canonical_plan_are_explicit(self):
+        canonical = "tools/configure/assemblies/g474-pin-states.toml"
+        directory = "cmake/package/verification/io_evolution/"
+        required = {
+            "io/include/nexus/io/pin_state.h", "io/src/pin_state.c",
+            "io/private/pin_state_impl.h", "tools/configure/pin_states.py",
+            "soc/stm32g474/drivers/pin_state.c",
+            "soc/stm32g474/private/stm32g474_pin_state.h",
+            canonical, directory + "boards/g474-pin-states/board.json",
+            directory + "consumers/pin-states.c",
+        }
+        self.assertFalse(required - set(sdk.REQUIRED_FILES))
+        for name in required:
+            with self.subTest(path=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(sdk.selected(name))
+        self.assertIn(("g474 pin states", canonical, "pin-states"),
+                      consumers.SELECTED_CONSUMERS)
+        from tools.release import transport
+        self.assertIs(consumers.SELECTED_CONSUMERS, transport.SELECTED_CONSUMERS)
+        self.assertNotIn(canonical, sdk.IO_EVOLUTION_VERIFICATION_FILES)
+        for relative in ("boards/g474-pin-states/board.json", "consumers/pin-states.c"):
+            self.assertIn(directory + relative, sdk.IO_EVOLUTION_VERIFICATION_FILES)
+
+    def test_named_pin_state_installed_template_uses_public_canonical_consumer(self):
+        canonical = Path("tools/configure/assemblies/g474-pin-states.toml")
+        smoke = Path("cmake/package/verification/io_evolution/consumers/pin-states.c")
+        with tempfile.TemporaryDirectory(prefix="Pin state SDK ") as value:
+            root = Path(value)
+            prefix = root / "prefix with spaces"
+            installed = prefix / "share/nexus/src"
+            for relative in (Path("dependencies/platform-compatibility.json"), canonical, smoke):
+                target = installed / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            source, _, command = consumers.prepare_selected_consumer(
+                prefix, root, "g474 pin states", canonical.as_posix(), "pin-states",
+                lambda argv: None, expected_revision="b" * 40)
+            self.assertEqual((source / "main.c").read_bytes(), (ROOT / smoke).read_bytes())
+            main = (source / "main.c").read_text()
+            for operation in ("nx_factory_pin_state", "NX_PIN_STATE_SLEEP",
+                              "NX_PIN_STATE_DEFAULT", "nx_platform_stop"):
+                self.assertIn(operation, main)
+            self.assertNotIn("stm32g474", main)
+            private = (source / "private_headers.c").read_text()
+            self.assertIn('__has_include("stm32g474_pin_state.h")', private)
+            self.assertIn('__has_include("pin_state_impl.h")', private)
+            self.assertIn("-DNEXUS_ASSEMBLY_FILE=" + str(installed / canonical), command)
+            self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
 
     def test_native_time_payload_and_selected_consumers_are_explicit(self):
         payload = {
@@ -206,7 +268,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                 self.assertTrue(sdk.selected(name))
         self.assertIn(("g474 shared pwm", directory + "g474-pwm-shared.toml",
                        "g474-pwm-shared"), consumers.SELECTED_CONSUMERS)
-        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 21)
+        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 23)
         board = json.loads((ROOT / directory /
                             "boards/g474-pwm-shared/board.json").read_text())
         self.assertIsNone(board["physical_pcb_revision"])
@@ -277,6 +339,9 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             "cmake/package/verification/io_evolution/consumers/g474-pwm-shared.c",
         }
         names.update(descriptor.maintained("native").owned_payload)
+        names.update({"tools/configure/runtime_power.py",
+                      "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
+                      "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"})
         names.update({
             "tools/configure/assemblies/h743-spi-dma.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",

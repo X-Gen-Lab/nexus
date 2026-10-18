@@ -113,6 +113,7 @@ _MODE_TRAITS = MappingProxyType({
     ("can", "classic-irq"): ModeTraits(irq=True),
     ("gpio", "input"): ModeTraits(),
     ("gpio", "output"): ModeTraits(),
+    ("gpio", "named-states"): ModeTraits(),
     ("uart", "irq-byte-event"): ModeTraits(irq=True),
     ("uart", "irq-words"): ModeTraits(irq=True),
     ("uart", "irq-bytes"): ModeTraits(irq=True),

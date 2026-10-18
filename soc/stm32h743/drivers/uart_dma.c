@@ -302,9 +302,8 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         return NX_ERROR_INVALID;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     nx_stm32h743_uart_state_t* uart = &s->uart;
-    if (!uart->initialized || !s->retained)
-        result = NX_ERROR_STATE;
-    else if (!domain_live(s) || uart->closing || cached() != s->cached)
+    if (!uart->initialized || !s->retained || !domain_live(s) ||
+        uart->closing || cached() != s->cached)
         result = NX_ERROR_STATE;
     else if (uart->active != NULL || s->preparing ||
              (domain_read(s, &s->tx->CR) &

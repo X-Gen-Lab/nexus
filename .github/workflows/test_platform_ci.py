@@ -382,14 +382,16 @@ class WorkflowContracts(unittest.TestCase):
             'assemblies': (
                 'tools/configure/assemblies/h743-spi-dma.toml\n'
                 'tools/configure/assemblies/h743-spi-dma-uart-tx.toml\n'
-                'tools/configure/assemblies/h743-spi-dma-uart-rx.toml\n')}
-        self.assertEqual(job['strategy']['matrix'].get('include'), [expected])
+                'tools/configure/assemblies/h743-spi-dma-uart-rx.toml\n'
+                'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml\n')}
+        self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
+                          if row.get('fixture') == 'h743_assembly'], [expected])
         canonical = expected['assemblies'].splitlines()
         original = sorted((ROOT / expected['project']).glob('*.toml'))
         self.assertEqual(len(original), 26)
         selected = original + [ROOT / value for value in canonical]
-        self.assertEqual(len(selected), 29)
-        self.assertEqual(len(set(selected)), 29)
+        self.assertEqual(len(selected), 30)
+        self.assertEqual(len(set(selected)), 30)
         self.assertTrue(all(path.is_file() for path in selected))
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
@@ -407,7 +409,8 @@ class WorkflowContracts(unittest.TestCase):
         canonical = [
             'tools/configure/assemblies/h743-spi-dma.toml',
             'tools/configure/assemblies/h743-spi-dma-uart-tx.toml',
-            'tools/configure/assemblies/h743-spi-dma-uart-rx.toml']
+            'tools/configure/assemblies/h743-spi-dma-uart-rx.toml',
+            'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml']
         for family in ('h743_assembly', 'gd32_assembly'):
             with self.subTest(family=family), tempfile.TemporaryDirectory() as name:
                 root = Path(name) / 'repository with spaces'
@@ -455,7 +458,7 @@ class WorkflowContracts(unittest.TestCase):
                             for name in fixture_names]
                 if family == 'h743_assembly':
                     expected += canonical
-                    self.assertEqual(len(actual), 29)
+                    self.assertEqual(len(actual), 30)
                     self.assertEqual(argv.count('--project'), 1)
                     self.assertEqual(argv[argv.index('--project') + 1],
                                      selected_project)
@@ -463,6 +466,48 @@ class WorkflowContracts(unittest.TestCase):
                     self.assertNotIn('--project', argv)
                 self.assertEqual(actual, expected)
 
+
+    def test_named_pin_state_ci_passes_only_the_canonical_input_without_local_toml(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        canonical = 'tools/configure/assemblies/g474-pin-states.toml'
+        project = 'tests/contracts/pin_state_fixture'
+        expected = {'fixture': 'pin_state_fixture', 'project': project,
+                    'assemblies': canonical + '\n'}
+        self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
+                          if row.get('fixture') == 'pin_state_fixture'], [expected])
+        self.assertFalse(list((ROOT / project).glob('*.toml')))
+        step = next(step for step in job['steps'] if step.get('name') ==
+                    'Link and audit each authored software assembly')
+        with tempfile.TemporaryDirectory(prefix='Named state CI ') as value:
+            root = Path(value) / 'repository with spaces'
+            (root / project).mkdir(parents=True)
+            assembly = root / canonical
+            assembly.parent.mkdir(parents=True)
+            assembly.write_text('canonical input port\n')
+            tool = root / '.venv/bin/python'
+            tool.parent.mkdir(parents=True)
+            tool.write_text('#!' + sys.executable + '\n'
+                'import json,os,sys\n'
+                'with open(os.environ["RECORDED_PROVIDER_ARGS"], "a") as f:\n'
+                '    f.write(json.dumps(sys.argv[1:]) + "\\n")\n')
+            tool.chmod(0o700)
+            record = root / 'arguments.jsonl'
+            env = dict(os.environ, FIXTURE='pin_state_fixture',
+                       GITHUB_WORKSPACE=str(root), PROVIDER_PROJECT=project,
+                       PROVIDER_ASSEMBLIES=canonical + '\n',
+                       RECORDED_PROVIDER_ARGS=str(record))
+            actual = subprocess.run(['bash', '-euo', 'pipefail', '-c', step['run']],
+                                    cwd=root, env=env, capture_output=True, text=True,
+                                    timeout=30)
+            self.assertEqual(actual.returncode, 0, actual.stdout + actual.stderr)
+            calls = [json.loads(line) for line in record.read_text().splitlines()]
+            self.assertEqual(len(calls), 1)
+            argv = calls[0]
+            selected = [argv[index + 1] for index, arg in enumerate(argv)
+                        if arg == '--fixture']
+            self.assertEqual(selected, [canonical])
+            self.assertEqual(argv[argv.index('--project') + 1], project)
+            self.assertEqual(argv[0], 'scripts/ci/provider_assemblies.py')
 
     def test_cpu_runtime_matrix_executes_real_kernel_links_and_keeps_evidence(self):
         job = workflow('build-matrix.yml')['jobs']['arch']

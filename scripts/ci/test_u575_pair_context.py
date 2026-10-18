@@ -288,5 +288,19 @@ class PairContextCapture(unittest.TestCase):
         self.assertFalse((output / "pair-context/context.json").exists())
 
 
+class RuntimeGeneratorInputs(unittest.TestCase):
+    def test_actual_runtime_generator_sources_are_retained(self):
+        from tools.configure import dependencies
+        paths, expected = dependencies.snapshot(mode="runtime")
+        observed = {row["path"]: row for row in gate.source_inputs(gate.ROOT)}
+        for row in expected["files"]:
+            path = paths[row["path"]]
+            with self.subTest(generator_source=row["path"]):
+                self.assertTrue(path in observed,
+                                "runtime generator source missing: " + row["path"])
+                if path in observed:
+                    self.assertEqual(observed[path]["sha256"], row["sha256"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -355,7 +355,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         models = [row for row in report["work_packages"] if row["family"] == "native"]
         physical = [row for row in report["work_packages"] if row["family"] != "native"]
         self.assertEqual(len(models), 19)
-        self.assertEqual(len(physical), 192)
+        self.assertEqual(len(physical), 193)
         spi = [row for row in physical
                if row["identity"] == "stm32h743.SPI4.dma"]
         self.assertEqual(len(spi), 1)
@@ -368,6 +368,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertEqual(selected["selected_ops_sources"], sources)
         self.assertEqual(selected["sdk_required_sources"], sources)
         self.assertEqual(selected["resolver_fixtures"], [
+            "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
             "tools/configure/assemblies/h743-spi-dma.toml",
@@ -375,6 +376,25 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertEqual(selected["implementation_status"], "source_selected")
         self.assertEqual(selected["software_status"], "not_executed")
         self.assertEqual(selected["hardware_status"], "not_executed")
+        pins = [row for row in physical
+                if row["identity"] == "stm32g474.GPIOA.named-states"]
+        self.assertEqual(len(pins), 1)
+        pin = pins[0]
+        self.assertEqual((pin["family"], pin["controller"], pin["kind"],
+                          pin["mode"], pin["provider_implementation"]),
+                         ("stm32g474", "GPIOA", "gpio", "named-states",
+                          "pin_state"))
+        self.assertEqual(pin["reviewed_routes"], ["gpio-pa5"])
+        source = ["soc/stm32g474/drivers/pin_state.c"]
+        self.assertEqual(pin["selected_ops_sources"], source)
+        self.assertEqual(pin["sdk_required_sources"], source)
+        self.assertEqual(pin["resolver_fixtures"],
+                         ["tools/configure/assemblies/g474-pin-states.toml"])
+        self.assertEqual(pin["implementation_status"], "source_selected")
+        self.assertEqual(pin["software_status"], "not_executed")
+        self.assertEqual(pin["hardware_status"], "not_executed")
+        self.assertFalse(report["software_qualification"])
+        self.assertFalse(report["physical_qualification"])
         expected = {
             "identity", "family", "controller", "kind", "mode", "provider",
             "reviewed_routes", "declared_boards", "resolver_fixtures",

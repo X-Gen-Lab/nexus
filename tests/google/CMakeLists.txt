@@ -63,6 +63,7 @@ function(nexus_google_test name)
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
 endfunction()
 
+include("${CMAKE_CURRENT_LIST_DIR}/g474_pin_state.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/uart_formats.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cycle_probe.cmake")
@@ -598,3 +599,4 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake")
 include(h743_spi_dma.cmake)
 
 include(h743_spi_dma_factory.cmake)
+include("${CMAKE_CURRENT_SOURCE_DIR}/h743_runtime_clock.cmake")

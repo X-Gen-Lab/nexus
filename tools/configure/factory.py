@@ -53,7 +53,7 @@ def classes(result):
     records = [(kind, "port", [item for item in result.controllers
                               if controller_class(item) == kind])
                for kind in KINDS]
-    for kind in ("uart_word", "spi_dma_transaction"):
+    for kind in ("uart_word", "spi_dma_transaction", "pin_state"):
         instances = [item for item in result.controllers
                      if controller_class(item) == kind]
         if instances:
@@ -91,7 +91,7 @@ def emit(result):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
     for name, _, _ in classes(result):
         if name in {"spi_transaction_device", "i2c_long_device", "uart_word",
-                    "spi_dma_transaction", "spi_dma_transaction_device"}:
+                    "spi_dma_transaction", "spi_dma_transaction_device", "pin_state"}:
             header.append(f'#include "nexus/io/{public_header(name)}.h"')
     header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif']

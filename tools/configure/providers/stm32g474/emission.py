@@ -19,6 +19,9 @@ def operations(item):
 
 def includes(result):
     source = ['#include "stm32g474_provider.h"']
+    if any(item.kind == "gpio" and item.mode == "named-states"
+           for item in result.controllers):
+        source.append('#include "stm32g474_pin_state.h"')
     if any(item.kind in {"adc", "flash"} for item in result.controllers):
         source.append('#include "stm32g474_acquisition.h"')
     if any(item.kind == "i2c" for item in result.controllers):

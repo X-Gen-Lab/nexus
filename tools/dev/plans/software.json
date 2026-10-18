@@ -1192,6 +1192,25 @@
       "timeout_s": 7200
     },
     {
+      "name": "providers-g474-pin-states",
+      "checker": "provider_assemblies",
+      "args": [
+        "--root",
+        "{root}",
+        "--output",
+        "{output}/providers/g474-pin-states",
+        "--fixture",
+        "{root}/tools/configure/assemblies/g474-pin-states.toml",
+        "--project",
+        "{root}/tests/contracts/pin_state_fixture",
+        "--family",
+        "stm32g474",
+        "--parallel",
+        "1"
+      ],
+      "timeout_s": 7200
+    },
+    {
       "name": "providers-h743_assembly",
       "checker": "provider_assemblies",
       "args": [

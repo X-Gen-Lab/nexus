@@ -251,6 +251,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '
         '__has_include("stm32g474_pwm_shared.h") || '
+        '__has_include("stm32g474_pin_state.h") || '
+        '__has_include("pin_state_impl.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
         '__has_include("gd32f470_eth_frames.h") || '
         '__has_include("stm32g474_provider.h") || '

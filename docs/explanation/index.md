@@ -20,6 +20,8 @@ the target diagrams retain open production-ELF and complete software exits.
 
 The [RTC/LPTIM explanation](rtc-lptim.md) separates raw calendar, finite counter and Core deadline domains. It covers current Native typed assembly, ownership, drain and explicit lifecycle; physical RTC/LPTIM and low-power support remain separate targets.
 
+The [GPIO pin-state explanation](gpio-pin-states.md) separates explicit GPIO images from factory identity, cold pad/gate ownership and checked cleanup. Its current G474 reference does not provide wake, retention or hardware low-power qualification.
+
 ```{toctree}
 :maxdepth: 2
 
@@ -27,5 +29,6 @@ platform-architecture
 factory
 ownership
 rtc-lptim
+gpio-pin-states
 source-map
 ```

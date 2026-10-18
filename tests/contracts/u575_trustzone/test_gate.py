@@ -19,7 +19,7 @@ from tools.measurement.elf import Elf32
 class TrustZonePairGate(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.directory = Path(os.environ["NEXUS_U575_PAIR_BUILD"])
+        cls.directory = Path(os.environ["NEXUS_U575_PAIR_BUILD"]).resolve()
         cls.secure = (cls.directory / "secure/u575_secure.elf").read_bytes()
         cls.nonsecure = (cls.directory / "nonsecure/u575_nonsecure.elf").read_bytes()
         cls.gateway = Elf32(cls.secure, float_abi="soft").symbol(

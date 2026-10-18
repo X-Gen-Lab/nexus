@@ -114,7 +114,8 @@ class SiliconPolicy:
 
 def controller_class(item):
     """Physical controller and nominal public face have separate identities."""
-    return ("uart_word" if item.mode == "irq-words" else
+    return ("pin_state" if item.kind == "gpio" and item.mode == "named-states" else
+            "uart_word" if item.mode == "irq-words" else
             item.interface_kind or item.kind)
 
 

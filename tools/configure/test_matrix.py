@@ -12,6 +12,7 @@ import matrix
 
 H743_SPI_DMA_REFERENCES = {
     "tools/configure/assemblies/h743-spi-dma.toml": None,
+    "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml": None,
     "tools/configure/assemblies/h743-spi-dma-uart-tx.toml": "dma-tx",
     "tools/configure/assemblies/h743-spi-dma-uart-rx.toml": "rx-dma-idle",
 }
@@ -69,6 +70,28 @@ class MaintainedMatrixTests(unittest.TestCase):
             elif item["family"] in {"stm32h743", "stm32u575"}:
                 self.assertTrue({entry["kind"] for entry in item["selected"]}.issubset(
                     {"gpio", "uart"}))
+
+
+    def test_g474_named_state_reference_is_exact_and_not_physical_qualification(self):
+        reference = "tools/configure/assemblies/g474-pin-states.toml"
+        catalogue = matrix.resolve_catalogue()
+        rows = [item for item in catalogue["references"]
+                if item["assembly"] == reference]
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual((row["family"], row["part"], row["backend"],
+                          row["scope"], row["physical_status"]),
+                         ("stm32g474", "STM32G474RET6", "baremetal",
+                          "public_reference", "not_executed"))
+        self.assertEqual([(item["kind"], item["controller"], item["mode"])
+                          for item in row["selected"]],
+                         [("gpio", "GPIOA", "named-states")])
+        result = configure.resolve_ir(configure.ROOT / reference)
+        self.assertEqual(result["clock_profile"], "hse24-pll170")
+        self.assertFalse(result["physical_qualified"])
+        classes = {name: items for name, _, items in factory.classes(result)}
+        self.assertEqual([item.id for item in classes["pin_state"]], ["status"])
+        self.assertEqual(classes["gpio"], [])
 
     def test_h743_spi_dma_references_keep_exact_finite_software_scope(self):
         result = matrix.resolve_catalogue()

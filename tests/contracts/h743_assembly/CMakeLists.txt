@@ -18,6 +18,10 @@ if("dma" IN_LIST h7_fixture_spi_modes)
     set(h7_fixture_main
         "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/h743-spi-dma.c")
 endif()
+if(NEXUS_RUNTIME_POWER)
+    set(h7_fixture_main
+        "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c")
+endif()
 nexus_add_firmware(h743_assembly SOURCES "${h7_fixture_main}")
 if("pwm" IN_LIST NEXUS_SELECTED_KINDS)
     target_compile_definitions(h743_assembly PRIVATE NX_H743_PERIPHERAL_FIXTURE)

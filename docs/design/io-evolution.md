@@ -13,7 +13,10 @@ Use this page to extend an I/O mode without adding hidden execution, ambiguous
 units or a second resource owner. It describes the current iteration's software
 mechanisms and their boundaries. The [42-item execution ledger](io-evolution-execution.csv)
 owns implementation, software and hardware status; this page does not replace
-that ledger or declare the iteration complete. The sealed `c4249e98` candidate
+that ledger or declare the iteration complete. The current [GPIO pin-state
+explanation](../explanation/gpio-pin-states.md) describes the exact selected G474
+images, retained cold lease and independent provider/Platform cleanup; wake and
+retention remain separate work. The sealed `c4249e98` candidate
 retains its original scope. New code must establish its own execution evidence.
 
 ## Assembly and execution have different responsibilities

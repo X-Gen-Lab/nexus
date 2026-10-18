@@ -179,7 +179,11 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
     from tools.documentation import install
     root = Path(root).resolve()
     output = prepare_output(root, destination)
-    workspace = root / "build/documentation-attempts" / uuid.uuid4().hex
+    workspace_parent = output.parent / "documentation-attempts"
+    if any(path.is_symlink() for path in
+           (workspace_parent, *workspace_parent.parents)):
+        raise ValueError("documentation workspace cannot use a symlink")
+    workspace = workspace_parent / uuid.uuid4().hex
     workspace.mkdir(parents=True)
     environment = install.environment(tool_prefix)
     observed_tools = install.diagnose(tool_prefix)

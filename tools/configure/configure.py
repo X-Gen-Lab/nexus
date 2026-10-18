@@ -467,7 +467,7 @@ def resolve_bindings(board, routes, part):
     bindings = {}
     for binding in sequence(board["bindings"], "Board bindings"):
         obj(binding, {"id", "controller", "route"},
-            {"initial", "mask", "supply_mv"}, "binding")
+            {"initial", "mask", "supply_mv", "pin_states"}, "binding")
         identity(binding["id"], "binding id")
         if binding["id"] in bindings:
             fail(f"Duplicate Board binding: {binding['id']}")
@@ -491,6 +491,13 @@ def resolve_bindings(board, routes, part):
             fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
         if route["kind"] == "gpio":
             binding = {**binding, "mask": actual_mask}
+        try:
+            from . import pin_states
+        except ImportError:
+            import pin_states
+        resolved_states = pin_states.validate_binding(binding, route["kind"], actual_mask)
+        if resolved_states is not None:
+            binding = {**binding, "pin_state_resolution": resolved_states}
         bindings[binding["id"]] = binding
     return bindings
 
@@ -549,7 +556,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os", "factory", "can_domain"}, "assembly")
+                   {"abi", "optimization", "components", "os", "factory", "can_domain", "power"}, "assembly")
     integer(assembly["schema_version"], 1, 1, "assembly schema")
     factory_options = obj(assembly.get("factory", {}), (),
                           {"capabilities"}, "factory policy")
@@ -747,6 +754,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
             validate_selection(selection, route, provider, ram["size"])
+            resolved_pin_states = None
+            if mode == "named-states":
+                try:
+                    from . import pin_states
+                except ImportError:
+                    import pin_states
+                resolved_pin_states = pin_states.select(
+                    binding, family=family, part=part,
+                    controller=route["controller"], backend=backend,
+                    clock=assembly["clock_profile"])
             if (family == "stm32h743" and route["kind"] == "spi" and
                     mode == "dma" and (backend != "baremetal" or
                     assembly["clock_profile"] != "hsi64-fixed-cache-off")):
@@ -833,6 +850,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                              "kind": route["kind"], "route": route["id"],
                              "pins": route["pins"], "initial": binding.get("initial", 0),
                              "mask": binding.get("mask", 0),
+                             **({"pin_state_resolution": resolved_pin_states}
+                                if resolved_pin_states is not None else {}),
                              **({"dma": route_dma(route, mode)} if traits.dma else {}),
                              **({"timing_resolution": resolved_timing}
                                 if resolved_timing is not None else {}),
@@ -1089,6 +1108,14 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "limitations": board["unknowns"] + ["Physical qualification not executed"],
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
+    try:
+        from . import runtime_power
+    except ImportError:
+        import runtime_power
+    runtime = (runtime_power.resolve(assembly["power"], result)
+               if "power" in assembly else None)
+    if runtime is not None:
+        result["runtime_power"] = {"mode": runtime.mode, "controllers": list(runtime.controllers)}
     result["factory"] = {"capabilities": factory_options.get("capabilities", False)}
     if clock_plan is not None:
         result["clock_plan"] = clock_plan
@@ -1202,6 +1229,7 @@ def generate(result, output):
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
+    cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
     for selection in result.controllers:
         prefix = "NEXUS_" + c_id(selection.id).upper()

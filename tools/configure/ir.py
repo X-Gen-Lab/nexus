@@ -175,6 +175,22 @@ class GpioOptions:
 
 
 @dataclass(frozen=True)
+class PinStateValueOptions:
+    mode: int
+    output_type: int
+    speed: int
+    pull: int
+    levels: int
+
+
+@dataclass(frozen=True)
+class PinStateOptions:
+    mask: int
+    default: PinStateValueOptions
+    sleep: PinStateValueOptions
+
+
+@dataclass(frozen=True)
 class UartFrameOptions:
     data_bits: int
     parity: str
@@ -530,7 +546,7 @@ class CanFdOptions:
     irq: IrqOptions
 
 
-ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
+ControllerOptions = (GpioOptions | PinStateOptions | UartOptions | SpiOptions | I2cOptions |
                      ExtiOptions | PwmOptions | PwmGroupOptions | EncoderOptions | AdcOptions | CanOptions |
                      UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
@@ -598,6 +614,11 @@ def mode_options(values):
         return (EthernetFramesOptions(*arguments, values["clock_domain"])
                 if kind == "eth_frames" else EthernetOptions(*arguments))
     if kind == "gpio":
+        if values["mode"] == "named-states":
+            states = values["pin_state_resolution"]
+            return PinStateOptions(values["mask"],
+                                   PinStateValueOptions(**states["default"]),
+                                   PinStateValueOptions(**states["sleep"]))
         return GpioOptions(values["mask"], values["initial"])
     if kind == "uart":
         return UartOptions(values["baud"], values["rx_profile"],
@@ -779,6 +800,13 @@ class ClockPlanIR:
 
 
 @dataclass(frozen=True)
+class RuntimePowerIR:
+    """Selected provider lifecycle enrollment, never nominal clock bounds."""
+    mode: str
+    controllers: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class ConfigurationIR(Record):
     board: str
     soc_family: str
@@ -797,6 +825,7 @@ class ConfigurationIR(Record):
     clock_plan: ClockPlanIR | None
     values: Mapping
     pwm_shared_owners: tuple[PwmSharedOwnerIR, ...] = ()
+    runtime_power: RuntimePowerIR | None = None
 
     @classmethod
     def from_validated(cls, result):
@@ -835,7 +864,10 @@ class ConfigurationIR(Record):
                     if result.get("clock_plan") is not None else None),
                    MappingProxyType(values),
                    tuple(PwmSharedOwnerIR.from_validated(item)
-                         for item in result.get("pwm_shared_owners", ())))
+                         for item in result.get("pwm_shared_owners", ())),
+                   (RuntimePowerIR(result["runtime_power"]["mode"],
+                                   tuple(result["runtime_power"]["controllers"]))
+                    if "runtime_power" in result else None))
 
     def to_dict(self):
         return thaw(self)

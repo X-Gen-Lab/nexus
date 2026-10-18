@@ -269,7 +269,7 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
     return source
 
 
-def stop_system(result, *, system_phase=None):
+def stop_resources(result):
     source = []
     if _ports(result):
         source += ['    if (s_nx_platform_started) {']
@@ -297,6 +297,11 @@ def stop_system(result, *, system_phase=None):
                    '        nx_arch_dsb();',
                    f'        if ((NX_H743_READ(&RCC->{register}) & {slot}) != 0u) {{ return NX_ERROR_IO; }}',
                    f'        {slot} = 0u;', '    }']
+    return source
+
+
+def stop_system(result, *, system_phase=None, resources=True):
+    source = stop_resources(result) if resources else []
     if system_phase is not None:
         source.append(f'    {system_phase};')
     if result.clock_plan is None and any(item.kind == "flash" for item in result.controllers):

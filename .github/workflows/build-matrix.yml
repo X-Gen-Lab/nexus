@@ -465,6 +465,11 @@ jobs:
               tools/configure/assemblies/h743-spi-dma.toml
               tools/configure/assemblies/h743-spi-dma-uart-tx.toml
               tools/configure/assemblies/h743-spi-dma-uart-rx.toml
+              tools/configure/assemblies/h743-spi-dma-runtime-clock.toml
+          - fixture: pin_state_fixture
+            project: tests/contracts/pin_state_fixture
+            assemblies: |
+              tools/configure/assemblies/g474-pin-states.toml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -486,7 +491,9 @@ jobs:
             arguments+=(--project "$PROVIDER_PROJECT")
           fi
           for assembly in "$fixture"/*.toml; do
-            arguments+=(--fixture "$assembly")
+            if [ -f "$assembly" ]; then
+              arguments+=(--fixture "$assembly")
+            fi
           done
           while IFS= read -r assembly; do
             if [ -n "$assembly" ]; then

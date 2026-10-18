@@ -32,6 +32,27 @@ def constructor(item, result, board_bindings, routes, devices):
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []
+    if item.kind == "gpio" and item.mode == "named-states":
+        options = item.options
+        plan = "s_nx_pin_plan_" + name
+        definitions += [f"static const nx_pin_state_plan_t {plan} = {{",
+                        f"    .pins = {options.mask}u, .states = {{"]
+        for value in (options.default, options.sleep):
+            definitions.append("        { " + ", ".join(str(getattr(value, key)) + "u"
+                for key in ("mode", "output_type", "speed", "pull", "levels")) + " },")
+        definitions += ["    } };", f"static nx_result_t prepare_{name}(void) {{",
+                        f"    if ({state}.control.retained || {state}.control.initialized) {{ return NX_ERROR_BUSY; }}",
+                        f"    {state}.gpio = {item.controller};",
+                        f"    {state}.rcc = RCC;",
+                        f"    {state}.bank_mask = RCC_AHB2ENR_GPIO{item.controller[-1]}EN;",
+                        f"    {state}.plan = &{plan};",
+                        f"    return nx_stm32g474_pin_state_initialize(&{state});",
+                        "}"]
+        return Construction(
+            state_type="nx_stm32g474_pin_state_t", definitions=definitions,
+            initialize=f"prepare_{name}()",
+            stop=[f"nx_stm32g474_pin_state_stop(&{state})"],
+            retain_on_failed_init=True)
     if item.kind == "gpio":
         definitions += [f"static nx_result_t prepare_{name}(void) {{",
                         f"    if ({state}.retained || {state}.initialized) {{ return NX_ERROR_BUSY; }}",

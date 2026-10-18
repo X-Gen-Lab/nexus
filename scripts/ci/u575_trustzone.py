@@ -19,6 +19,7 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from scripts.ci import arch_compile, provider_assemblies
+from tools.configure import dependencies
 from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
                                    regular_file)
 from tools.evidence.identity import git_source
@@ -147,6 +148,8 @@ def source_inputs(root):
     """Bind the complete maintained graph and fixture, including new files."""
     paths = {Path(item["path"]) for item in
              provider_assemblies.source_inputs(root, [])}
+    runtime_paths, _ = dependencies.snapshot(mode="runtime")
+    paths.update(Path(path) for path in runtime_paths.values())
     paths.add(Path(__file__).resolve())
     for directory in (root / "tests/contracts/u575_trustzone",
                       root / "vendors/st/cmsis_device_u5/Include",

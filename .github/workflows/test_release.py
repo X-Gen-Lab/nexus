@@ -378,7 +378,7 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 34)
+        self.assertEqual(len(list(raw.rglob(".git"))), 36)
         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
         self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
         self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
@@ -389,8 +389,8 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(len(list(raw.rglob(".git"))), 34)
-        self.assertEqual(len(manifest["consumer_images"]), 37)
+        self.assertEqual(len(list(raw.rglob(".git"))), 36)
+        self.assertEqual(len(manifest["consumer_images"]), 39)
         auxiliary = "stm32 build/bin/installed_c.bin"
         self.assertIn(auxiliary, manifest["files"])
         self.assertNotIn(auxiliary, manifest["consumer_images"])
@@ -627,7 +627,8 @@ class ConsumerTransportTests(unittest.TestCase):
     def test_previous_thirty_one_roots_cannot_replace_the_current_plan(self):
         from tools.release import transport
         base, raw = self.fixture()
-        for label in ("h743 spi dma", "h743 spi dma uart tx", "h743 spi dma uart rx"):
+        for label in ("h743 spi dma", "h743 spi dma uart tx", "h743 spi dma uart rx",
+                      "h743 runtime clock", "g474 pin states"):
             shutil.rmtree(raw / ("selected " + label + " source"))
             shutil.rmtree(raw / ("selected " + label + " build"))
         self.assertEqual(len(list(raw.rglob(".git"))), 31)

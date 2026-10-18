@@ -93,6 +93,26 @@ class QualificationPlanTests(unittest.TestCase):
                                  "New fixture omitted from formal software plan")
         validate_plan(self.plan)
 
+
+    def test_named_pin_state_canonical_has_one_real_arm_checker_stage(self):
+        fixture = "{root}/tools/configure/assemblies/g474-pin-states.toml"
+        selected = [stage for stage in self.stages if fixture in stage["args"]]
+        self.assertEqual(len(selected), 1)
+        stage = selected[0]
+        self.assertEqual(stage["checker"], "provider_assemblies")
+        args = stage["args"]
+        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
+                          if arg == "--fixture"], [fixture])
+        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
+                          if arg == "--project"],
+                         ["{root}/tests/contracts/pin_state_fixture"])
+        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
+                          if arg == "--family"], ["stm32g474"])
+        self.assertEqual([args[i + 1] for i, arg in enumerate(args)
+                          if arg == "--parallel"], ["1"])
+        self.assertNotIn("status", stage)
+        validate_plan(self.plan)
+
     def test_each_io_evolution_preset_configures_and_builds_once(self):
         presets = load_json(ROOT / "CMakePresets.json")["configurePresets"]
         selected = [preset["name"] for preset in presets

@@ -1,11 +1,13 @@
 {
   "assemblies": [
+    "g474-pin-states.toml",
     "gd32-f303-baremetal-empty.toml",
     "gd32-f303-baremetal-io.toml",
     "gd32-f303-baremetal-spi-watchdog.toml",
     "gd32-f303-freertos-empty.toml",
     "gd32-f303-freertos-io.toml",
     "gd32-f303-freertos-spi-watchdog.toml",
+    "h743-spi-dma-runtime-clock.toml",
     "h743-spi-dma-uart-rx.toml",
     "h743-spi-dma-uart-tx.toml",
     "h743-spi-dma.toml",

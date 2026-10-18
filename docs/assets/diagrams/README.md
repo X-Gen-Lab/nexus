@@ -1,7 +1,8 @@
 # Nexus 平台图册
 
 本图册保留15类必需视图、两张补充图与本轮 I/O 架构视图 FIG-16，
-另加入 IO-24 的 FIG-17/18 目标图源和 IO-36 的 FIG-21 Native 装配／生命周期图。主图登记见
+另加入 IO-24 的 FIG-17/18 目标图源、IO-36 的 FIG-21 Native 装配／生命周期图，
+以及 IO-31 的 FIG-22 G474 命名 GPIO 状态／所有权图。主图登记见
 [图清单](diagram-index.csv)，维护规则见
 [图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份，
 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。
@@ -12,10 +13,10 @@ FIG-16 描述 `c4249e98` 基线之后的 I/O 增量机制，其具体源码链�
 文档工具的实际结果另见执行记录。图源为可编辑 DOT，输出为本地 SVG；标签、
 线型和文字共同表达关系，不只依赖颜色。
 
-21个图源按合同各派生中文与英文视图；新增 FIG-17/18 的渲染与审查须分别取得
+当前每张图均提供中英文视图；新增 FIG-17/18 的渲染与审查须分别取得
 实际记录。页面按所选语言使用本地SVG。节点、箭头、属性与
 范围仍由同一canonical DOT维护；`labels.json`只维护完整标签译文，不能改变拓扑。
-全部42组语言DOT/SVG应与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
+各语言DOT/SVG应与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
 SVG采用Graphviz Cairo字形路径输出，使离线读者无需安装中文字体；每图附title、
 desc和正文alt/caption。生成主机需要锁定Graphviz、Cairo及Noto Sans CJK SC，
 最终工具身份与自动检查结果由文档交付记录绑定。源码语义、实际浏览器桌面/窄屏/
@@ -287,3 +288,14 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 [Native 装配](../../../tools/configure/providers/native/bindings.py)。
 [可编辑 DOT](rtc-lptim-lifecycle.dot)；实施关联：IO-36。软件开发证据与 main／SDK／
 候选／实板资格分别判断，不能从该图或渲染成功推断。
+
+## FIG-22 G474 命名 GPIO 状态与保留租约
+
+**身份：current。范围：STM32G474RET6／GPIOA／baremetal／hse24-pll170 的显式 DEFAULT／SLEEP；软件 Board PA5，不表示物理安全或低功耗资格。**
+
+![FIG-22：冷态 pad/gate 租约、显式目标读回、provider 撤驱动与 Platform 原快照恢复分开；失败保留责任](gpio-pin-states.svg)
+
+构建箭头只表示 Board/TOML 到不可变计划与静态对象的生成；factory 箭头只返回既有 face。运行选择不转让 pad 所有权。失败可能保留部分寄存器效果；重试目标或检查 stop 不能丢弃 lease。provider stop 成功后，Platform 仍须独立证明冷快照与 gate 清理；失败继续保留。图不表达 AF、wake、retention、深睡或实板结果。
+
+依据：[GPIO pin-state 说明](../../explanation/gpio-pin-states.md)、[公共接口](../../../io/include/nexus/io/pin_state.h)、[G474 provider](../../../soc/stm32g474/drivers/pin_state.c)、[冷态租约生成](../../../tools/configure/gpio_phase.py)。
+[可编辑 DOT](gpio-pin-states.dot)；实施关联：IO-31。

@@ -57,6 +57,7 @@ class PackagePinContractTests(unittest.TestCase):
                          set(pins))
         expected = {"GPIO" + bank: ("gpio", ["input", "output"], {})
                     for bank in "ABCDFG"}
+        expected["GPIOA"] = ("gpio", ["input", "output", "named-states"], {})
         expected.update({name: ("uart", ["irq-bytes"], {})
                          for name in ("LPUART1", "USART1", "USART2", "USART3",
                                       "UART4", "UART5")})

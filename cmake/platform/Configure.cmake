@@ -43,7 +43,7 @@ function(nexus_resolve_assembly)
                   NEXUS_OPTIMIZATION NEXUS_SELECTED_KINDS
                   NEXUS_MEMORY_ADDSRAM NEXUS_MEMORY_TCM NEXUS_MEMORY_CCM
                   NEXUS_MEMORY_SRAM1
-                  NEXUS_IO_CYCLE_PROBES
+                  NEXUS_IO_CYCLE_PROBES NEXUS_RUNTIME_POWER
                   NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256
                   NEXUS_OS_SELECTION_VARIABLES ${NEXUS_OS_SELECTION_VARIABLES})
         set(${value} "${${value}}" PARENT_SCOPE)

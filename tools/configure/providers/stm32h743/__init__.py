@@ -179,4 +179,4 @@ def builtin_cs(controller):
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
-                       start_system, start_resources)
+                       start_system, start_resources, stop_resources)

@@ -163,6 +163,10 @@ _DESCRIPTORS = MappingProxyType({
         owned_payload=(
             "soc/stm32g474/CMakeLists.txt", "soc/stm32g474/system.c",
             "soc/stm32g474/drivers/gpio.c", "soc/stm32g474/drivers/uart.c",
+            "soc/stm32g474/drivers/pin_state.c",
+            "soc/stm32g474/private/stm32g474_pin_state.h",
+            "io/include/nexus/io/pin_state.h", "io/src/pin_state.c",
+            "io/private/pin_state_impl.h",
             "soc/stm32g474/drivers/exti.c", "soc/stm32g474/drivers/spi.c",
             "soc/stm32g474/drivers/watchdog.c", "soc/stm32g474/drivers/pwm.c",
             "soc/stm32g474/drivers/pwm_group.c",
@@ -188,6 +192,8 @@ _DESCRIPTORS = MappingProxyType({
     "stm32h743": FamilyDescriptor("stm32h743", (
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
+            "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
+            "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c",
             "tools/configure/assemblies/h743-spi-dma.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",

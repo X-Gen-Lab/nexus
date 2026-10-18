@@ -1312,6 +1312,28 @@
         }
       ]
     },
+    "power": {
+      "additionalProperties": false,
+      "properties": {
+        "controllers": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "mode": {
+          "const": "fixed-run"
+        }
+      },
+      "required": [
+        "controllers",
+        "mode"
+      ],
+      "type": "object"
+    },
     "pwm": {
       "additionalProperties": {
         "additionalProperties": false,
