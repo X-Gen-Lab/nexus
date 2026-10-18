@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/cache.h"
+#include "nexus/core/fault.h"
 #include "stm32h743_uart_receive.h"
 #ifndef NX_H743_SILICON_ID
 #define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
@@ -18,6 +19,9 @@
     (NVIC_GetEnableIRQ((IRQn_Type)(irq)) == 0U &&                              \
      NVIC_GetPendingIRQ((IRQn_Type)(irq)) == 0U &&                             \
      NVIC_GetActive((IRQn_Type)(irq)) == 0U)
+#endif
+#ifndef NX_H743_IRQ_ENABLED
+#define NX_H743_IRQ_ENABLED(irq) (NVIC_GetEnableIRQ((IRQn_Type)(irq)) != 0U)
 #endif
 #ifndef NX_H743_DMA_INVALIDATE
 #define NX_H743_DMA_INVALIDATE(address, bytes)                                 \
@@ -73,34 +77,79 @@ static bool stream_alias(const nx_stm32h743_uart_receive_state_t* s,
             return true;
     return false;
 }
-static bool checked(volatile uint32_t* reg, uint32_t value, uint32_t mask) {
+static bool domain_hardware(void) {
+    RCC_TypeDef* rcc = g_nx_stm32h743_system.rcc;
+    return rcc != NULL &&
+           (NX_H743_READ(&rcc->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0U &&
+           (NX_H743_READ(&rcc->AHB1RSTR) &
+            (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) == 0U;
+}
+static bool domain_live(nx_stm32h743_uart_receive_state_t* s) {
+    if (!s->domain_lost && domain_hardware())
+        return true;
+    if (!s->retained && !s->uart.retained)
+        return false;
+    s->domain_lost = true;
+    s->quarantined = true;
+    if (s->uart.active != NULL) {
+        if (s->uart.terminal == NX_SUCCESS)
+            s->uart.terminal = NX_ERROR_STATE;
+        (void)nx_request_transition(&s->uart.active->base,
+                                    NX_REQUEST_QUARANTINED);
+    }
+    (void)NX_H743_IRQ_CONTROL(DMA1_Stream1_IRQn, false, 5U);
+    (void)NX_H743_IRQ_CONTROL(USART3_IRQn, false, 5U);
+    nx_arch_dsb();
+    nx_arch_isb();
+    bool isolated = !NX_H743_IRQ_ENABLED(DMA1_Stream1_IRQn);
+    isolated = !NX_H743_IRQ_ENABLED(USART3_IRQn) && isolated;
+    if (!isolated) {
+        (void)nx_arch_irq_save();
+        nx_arch_dsb();
+        nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+        for (;;) {
+        }
+    }
+    return false;
+}
+static uint32_t domain_read(nx_stm32h743_uart_receive_state_t* s,
+                            volatile uint32_t* reg) {
+    return domain_live(s) ? NX_H743_READ(reg) : 0U;
+}
+static bool checked(nx_stm32h743_uart_receive_state_t* s,
+                    volatile uint32_t* reg, uint32_t value, uint32_t mask) {
+    if (!domain_live(s))
+        return false;
     NX_H743_WRITE(reg, value);
     nx_arch_dsb();
-    return (NX_H743_READ(reg) & mask) == (value & mask);
+    return domain_live(s) && (NX_H743_READ(reg) & mask) == (value & mask);
 }
 static bool cached(void) {
     return (NX_H743_READ(&g_nx_stm32h743_system.core->CCR) & SCB_CCR_DC_Msk) !=
            0U;
 }
-static uint32_t flags(const nx_stm32h743_uart_receive_state_t* s) {
-    return NX_H743_READ(&s->dma->LISR) & RX_FLAGS;
+static uint32_t flags(nx_stm32h743_uart_receive_state_t* s) {
+    return domain_read(s, &s->dma->LISR) & RX_FLAGS;
 }
 static void acknowledge(nx_stm32h743_uart_receive_state_t* s, uint32_t mask) {
+    if (!domain_live(s))
+        return;
     NX_H743_WRITE(&s->dma->LIFCR, mask & RX_FLAGS);
     nx_arch_dsb();
+    (void)domain_live(s);
 }
 /** \brief Every withdrawal is attempted; writes alone never prove drain. */
 static bool detach(nx_stm32h743_uart_receive_state_t* s) {
     USART_TypeDef* uart = s->uart.registers;
-    bool request = checked(&uart->CR3,
+    bool request = checked(s, &uart->CR3,
                            NX_H743_READ(&uart->CR3) &
                                ~(uint32_t)(USART_CR3_DMAR | USART_CR3_EIE),
                            USART_CR3_DMAR | USART_CR3_EIE);
     bool vector =
-        checked(&uart->CR1, NX_H743_READ(&uart->CR1) & ~UART_RX_SOURCES,
+        checked(s, &uart->CR1, NX_H743_READ(&uart->CR1) & ~UART_RX_SOURCES,
                 UART_RX_SOURCES);
-    bool engine = checked(&s->rx->CR,
-                          NX_H743_READ(&s->rx->CR) &
+    bool engine = checked(s, &s->rx->CR,
+                          domain_read(s, &s->rx->CR) &
                               ~((uint32_t)DMA_SxCR_EN | RX_SOURCES),
                           (uint32_t)DMA_SxCR_EN | RX_SOURCES);
     return request && vector && engine;
@@ -133,7 +182,7 @@ static void observe(nx_stm32h743_uart_receive_state_t* s, uint32_t status) {
     /* Software interruption also sets TCIF with a nonzero count (RM0433
      * 15.3.16). Only an unsolicited completion has the zero-count invariant. */
     if (!s->draining && (dma & DMA_LISR_TCIF1) != 0U &&
-        NX_H743_READ(&s->rx->NDTR) != 0U)
+        domain_read(s, &s->rx->NDTR) != 0U)
         s->boundary |= NX_STREAM_BOUNDARY_ERROR;
     if ((status & USART_ISR_IDLE) != 0U)
         s->boundary |= NX_STREAM_BOUNDARY_IDLE;
@@ -184,6 +233,10 @@ static nx_result_t validate_stream(nx_stm32h743_uart_receive_state_t* s,
 /** \brief Cache work uses an owned full-line loan outside the IRQ mask. */
 static void arm(nx_stm32h743_uart_receive_state_t* s) {
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if (s->stream == NULL || s->stopping || s->filling || s->processing ||
         s->gap_error || !nx_stream_can_reserve(s->stream)) {
         nx_arch_irq_restore(guard);
@@ -203,6 +256,10 @@ static void arm(nx_stm32h743_uart_receive_state_t* s) {
             : NX_ARCH_OK;
     guard = nx_arch_irq_save();
     s->preparing = false;
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if ((NX_H743_READ(&s->uart.registers->ISR) & UART_ERRORS) != 0U)
         s->boundary |= NX_STREAM_BOUNDARY_ERROR;
     bool valid = maintenance == NX_ARCH_OK && cached() == s->cached &&
@@ -211,16 +268,17 @@ static void arm(nx_stm32h743_uart_receive_state_t* s) {
         acknowledge(s, RX_FLAGS);
         valid = flags(s) == 0U;
         valid =
-            checked(&s->rx->PAR, (uint32_t)(uintptr_t)&s->uart.registers->RDR,
-                    UINT32_MAX) &&
+            checked(s, &s->rx->PAR,
+                    (uint32_t)(uintptr_t)&s->uart.registers->RDR, UINT32_MAX) &&
             valid;
-        valid = checked(&s->rx->M0AR, (uint32_t)(uintptr_t)s->fill.data,
+        valid = checked(s, &s->rx->M0AR, (uint32_t)(uintptr_t)s->fill.data,
                         UINT32_MAX) &&
                 valid;
-        valid = checked(&s->rx->NDTR, (uint32_t)s->fill.capacity, UINT16_MAX) &&
-                valid;
         valid =
-            checked(&s->rx->FCR, 0U, DMA_SxFCR_DMDIS | DMA_SxFCR_FEIE) && valid;
+            checked(s, &s->rx->NDTR, (uint32_t)s->fill.capacity, UINT16_MAX) &&
+            valid;
+        valid = checked(s, &s->rx->FCR, 0U, DMA_SxFCR_DMDIS | DMA_SxFCR_FEIE) &&
+                valid;
         uint32_t control = DMA_SxCR_MINC | DMA_SxCR_PL_1 | DMA_SxCR_TCIE |
                            DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
         /* ES0392 Rev15 2.20.4: match the locked ST HAL's X/V protocol;
@@ -228,21 +286,21 @@ static void arm(nx_stm32h743_uart_receive_state_t* s) {
         if ((NX_H743_SILICON_ID() & UINT32_C(0xffff0000)) >=
             UINT32_C(0x20000000))
             control |= DMA_SxCR_TRBUFF;
-        valid = checked(&s->rx->CR, control, UINT32_MAX) && valid;
+        valid = checked(s, &s->rx->CR, control, UINT32_MAX) && valid;
         NX_H743_WRITE(&s->uart.registers->ICR, USART_ICR_IDLECF | UART_ERRORS);
         nx_arch_dsb();
         valid = (NX_H743_READ(&s->uart.registers->ISR) &
                  (USART_ISR_IDLE | UART_ERRORS)) == 0U &&
                 valid;
-        valid = checked(&s->uart.registers->CR1,
+        valid = checked(s, &s->uart.registers->CR1,
                         NX_H743_READ(&s->uart.registers->CR1) | UART_RX_SOURCES,
                         UART_RX_SOURCES) &&
                 valid;
         if (valid) {
             s->launched = true;
-            valid = checked(&s->rx->CR, control | DMA_SxCR_EN, UINT32_MAX);
+            valid = checked(s, &s->rx->CR, control | DMA_SxCR_EN, UINT32_MAX);
             if (valid)
-                valid = checked(&s->uart.registers->CR3,
+                valid = checked(s, &s->uart.registers->CR3,
                                 NX_H743_READ(&s->uart.registers->CR3) |
                                     USART_CR3_DMAR | USART_CR3_EIE,
                                 USART_CR3_DMAR | USART_CR3_EIE);
@@ -261,6 +319,10 @@ static void arm(nx_stm32h743_uart_receive_state_t* s) {
  */
 static void finish(nx_stm32h743_uart_receive_state_t* s) {
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if (!s->filling || s->preparing || s->processing || !s->draining) {
         nx_arch_irq_restore(guard);
         return;
@@ -271,7 +333,7 @@ static void finish(nx_stm32h743_uart_receive_state_t* s) {
         return;
     }
     size_t remaining =
-        s->launched ? NX_H743_READ(&s->rx->NDTR) : s->fill.capacity;
+        s->launched ? domain_read(s, &s->rx->NDTR) : s->fill.capacity;
     if (remaining > s->fill.capacity || (flags(s) & RX_ERRORS) != 0U ||
         (NX_H743_READ(&s->uart.registers->ISR) & UART_ERRORS) != 0U)
         s->boundary |= NX_STREAM_BOUNDARY_ERROR;
@@ -283,6 +345,10 @@ static void finish(nx_stm32h743_uart_receive_state_t* s) {
             : NX_ARCH_OK;
     guard = nx_arch_irq_save();
     s->processing = false;
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if (maintenance != NX_ARCH_OK || cached() != s->cached || !detach(s)) {
         s->quarantined = true;
         nx_arch_irq_restore(guard);
@@ -290,14 +356,22 @@ static void finish(nx_stm32h743_uart_receive_state_t* s) {
     }
     if ((flags(s) & RX_ERRORS) != 0U ||
         (NX_H743_READ(&s->uart.registers->ISR) & UART_ERRORS) != 0U ||
-        (s->launched && NX_H743_READ(&s->rx->NDTR) != remaining))
+        (s->launched && domain_read(s, &s->rx->NDTR) != remaining))
         s->boundary |= NX_STREAM_BOUNDARY_ERROR;
     acknowledge(s, RX_FLAGS);
     NX_H743_WRITE(&s->uart.registers->ICR, USART_ICR_IDLECF | UART_ERRORS);
     nx_arch_dsb();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if (flags(s) != 0U ||
         (NX_H743_READ(&s->uart.registers->ISR) & UART_ERRORS) != 0U) {
         s->quarantined = true;
+        nx_arch_irq_restore(guard);
+        return;
+    }
+    if (!domain_live(s)) {
         nx_arch_irq_restore(guard);
         return;
     }
@@ -321,8 +395,18 @@ static void service(void* context) {
     nx_stm32h743_uart_receive_state_t* s = context;
     if (s == NULL || !task_context() || !s->uart.initialized)
         return;
-    nx_stm32h743_uart_ops.service(&s->uart);
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
+    bool ready = nx_stm32h743_uart_tx_prepare_settle_locked(&s->uart);
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
+    if (ready)
+        nx_stm32h743_uart_tx_settle_locked(&s->uart);
     observe(s, NX_H743_READ(&s->uart.registers->ISR));
     nx_arch_irq_restore(guard);
     finish(s);
@@ -335,14 +419,14 @@ static nx_result_t rx_start(void* context, nx_stream_t* stream) {
     if (s == NULL)
         return NX_ERROR_INVALID;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
-    if (!s->uart.initialized || s->uart.closing || !s->retained ||
-        cached() != s->cached) {
+    if (!s->uart.initialized || !s->retained || !domain_live(s) ||
+        s->uart.closing || cached() != s->cached) {
         nx_arch_irq_restore(guard);
         return NX_ERROR_STATE;
     }
     if (s->stream != NULL || s->filling || s->preparing || s->processing ||
-        NX_H743_READ(&s->rx->CR) != 0U ||
-        NX_H743_READ(&s->mux->CCR) != RX_REQUEST) {
+        domain_read(s, &s->rx->CR) != 0U ||
+        domain_read(s, &s->mux->CCR) != RX_REQUEST) {
         nx_arch_irq_restore(guard);
         return NX_ERROR_BUSY;
     }
@@ -351,6 +435,10 @@ static nx_result_t rx_start(void* context, nx_stream_t* stream) {
     if (result != NX_SUCCESS)
         return result;
     guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_STATE;
+    }
     s->stream = stream;
     s->stopping = false;
     s->gap_error = false;
@@ -369,6 +457,10 @@ static nx_result_t rx_stop(void* context) {
     if (!s->retained && !s->uart.retained)
         return NX_SUCCESS;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_BUSY;
+    }
     s->stopping = true;
     s->draining = s->filling;
     bool detached = detach(s);
@@ -381,7 +473,7 @@ static nx_result_t rx_stop(void* context) {
     finish(s);
     guard = nx_arch_irq_save();
     nx_result_t result = NX_SUCCESS;
-    if (s->filling || !checked(&s->rx->CR, 0U, UINT32_MAX))
+    if (s->filling || !checked(s, &s->rx->CR, 0U, UINT32_MAX))
         result = NX_ERROR_BUSY;
     else if (s->stream != NULL) {
         result = nx_stream_stop(s->stream);
@@ -391,7 +483,8 @@ static nx_result_t rx_stop(void* context) {
     nx_arch_irq_restore(guard);
     return result;
 }
-static nx_result_t submit(void* context, nx_uart_tx_request_t* request) {
+static nx_result_t tx_start(void* context, nx_uart_tx_request_t* request,
+                            bool admitted) {
     nx_stm32h743_uart_receive_state_t* s = context;
     if (!task_context())
         return NX_ERROR_CONTEXT;
@@ -401,25 +494,48 @@ static nx_result_t submit(void* context, nx_uart_tx_request_t* request) {
         stream_alias(s, request, sizeof(*request)) ||
         stream_alias(s, request->data, request->length))
         return NX_ERROR_INVALID;
-    return nx_stm32h743_uart_ops.submit(&s->uart, request);
+    if (admitted && nx_request_state(&request->base) != NX_REQUEST_QUEUED)
+        return NX_ERROR_STATE;
+    nx_result_t result = nx_stm32h743_uart_tx_validate(&s->uart, request);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!s->uart.initialized || !s->retained || !domain_live(s))
+        result = NX_ERROR_STATE;
+    else {
+        result = nx_stm32h743_uart_tx_start_locked(&s->uart, request, admitted);
+        if (result == NX_SUCCESS)
+            (void)domain_live(s);
+    }
+    nx_arch_irq_restore(guard);
+    return result;
+}
+static nx_result_t submit(void* context, nx_uart_tx_request_t* request) {
+    return tx_start(context, request, false);
 }
 static nx_result_t start_admitted(void* context,
                                   nx_uart_tx_request_t* request) {
-    nx_stm32h743_uart_receive_state_t* s = context;
-    if (!task_context())
-        return NX_ERROR_CONTEXT;
-    if (s == NULL || request == NULL ||
-        protected_span(s, request, sizeof(*request)) ||
-        protected_span(s, request->data, request->length) ||
-        stream_alias(s, request, sizeof(*request)) ||
-        stream_alias(s, request->data, request->length))
-        return NX_ERROR_INVALID;
-    return nx_stm32h743_uart_ops.start_admitted(&s->uart, request);
+    return tx_start(context, request, true);
 }
 static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
     nx_stm32h743_uart_receive_state_t* s = context;
-    return s == NULL ? NX_ERROR_INVALID
-                     : nx_stm32h743_uart_ops.cancel(&s->uart, request);
+    if (s == NULL)
+        return NX_ERROR_INVALID;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (request == NULL)
+        return NX_ERROR_INVALID;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    nx_result_t result;
+    if ((s->retained || s->uart.retained) && !domain_live(s))
+        result = s->uart.active == request ? NX_SUCCESS : NX_ERROR_STATE;
+    else {
+        result = nx_stm32h743_uart_tx_cancel_locked(&s->uart, request);
+        if (s->retained || s->uart.retained)
+            (void)domain_live(s);
+    }
+    nx_arch_irq_restore(guard);
+    return result;
 }
 static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
                                uint8_t ceiling) {
@@ -447,21 +563,43 @@ static nx_result_t stop(void* context) {
         return NX_ERROR_INVALID;
     if (!s->retained && !s->uart.retained)
         return NX_SUCCESS;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    bool available = domain_live(s);
+    nx_arch_irq_restore(guard);
+    if (!available)
+        return NX_ERROR_BUSY;
     s->uart.closing = true;
     nx_result_t result = rx_stop(s);
     if (result != NX_SUCCESS)
         return result;
+    if (s->uart.active != NULL) {
+        (void)cancel(s, s->uart.active);
+        service(s);
+        if (s->uart.active != NULL)
+            return NX_ERROR_BUSY;
+    }
+    guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_BUSY;
+    }
     result = NX_H743_IRQ_CONTROL(DMA1_Stream1_IRQn, false, 5U);
+    if (result == NX_SUCCESS) {
+        acknowledge(s, RX_FLAGS);
+        if (flags(s) != 0U || !checked(s, &s->rx->CR, 0U, UINT32_MAX) ||
+            !checked(s, &s->mux->CCR, 0U, UINT32_MAX))
+            result = domain_live(s) ? NX_ERROR_IO : NX_ERROR_BUSY;
+    }
+    nx_arch_irq_restore(guard);
     if (result != NX_SUCCESS)
         return result;
-    acknowledge(s, RX_FLAGS);
-    if (flags(s) != 0U || !checked(&s->rx->CR, 0U, UINT32_MAX) ||
-        !checked(&s->mux->CCR, 0U, UINT32_MAX))
-        return NX_ERROR_IO;
     result = nx_stm32h743_uart_ops.stop(&s->uart);
-    if (result == NX_SUCCESS)
+    guard = nx_arch_irq_save();
+    available = domain_live(s);
+    if (available && result == NX_SUCCESS)
         s->retained = false;
-    return result;
+    nx_arch_irq_restore(guard);
+    return available ? result : NX_ERROR_BUSY;
 }
 nx_result_t
 nx_stm32h743_uart_receive_initialize(nx_stm32h743_uart_receive_state_t* state,
@@ -481,8 +619,14 @@ nx_stm32h743_uart_receive_initialize(nx_stm32h743_uart_receive_state_t* state,
         return NX_ERROR_UNSUPPORTED;
 #endif
     if (s->retained || s->uart.retained || s->stream != NULL || s->filling ||
-        s->preparing || s->processing || NX_H743_READ(&s->rx->CR) != 0U ||
-        NX_H743_READ(&s->mux->CCR) != 0U ||
+        s->preparing || s->processing)
+        return NX_ERROR_BUSY;
+    if (!domain_hardware())
+        return NX_ERROR_STATE;
+    s->domain_lost = false;
+    if (s->retained || s->uart.retained || s->stream != NULL || s->filling ||
+        s->preparing || s->processing || domain_read(s, &s->rx->CR) != 0U ||
+        domain_read(s, &s->mux->CCR) != 0U ||
         !NX_H743_IRQ_AVAILABLE(DMA1_Stream1_IRQn))
         return NX_ERROR_BUSY;
     if ((NX_H743_READ(&g_nx_stm32h743_system.rcc->AHB1ENR) &
@@ -497,14 +641,20 @@ nx_stm32h743_uart_receive_initialize(nx_stm32h743_uart_receive_state_t* state,
     result = nx_stm32h743_uart_initialize(&s->uart, clock_hz, poll_limit);
     if (result != NX_SUCCESS)
         return result;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
     s->retained = true;
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_STATE;
+    }
     s->cached = cached();
     s->stopping = s->draining = s->quarantined = s->launched = false;
     acknowledge(s, RX_FLAGS);
-    if (flags(s) != 0U || !checked(&s->mux->CCR, RX_REQUEST, UINT32_MAX))
+    if (flags(s) != 0U || !checked(s, &s->mux->CCR, RX_REQUEST, UINT32_MAX))
         result = NX_ERROR_IO;
     else
         result = NX_H743_IRQ_CONTROL(DMA1_Stream1_IRQn, true, 5U);
+    nx_arch_irq_restore(guard);
     if (result != NX_SUCCESS)
         (void)stop(s);
     return result;
@@ -514,6 +664,10 @@ void nx_stm32h743_uart_receive_dma_irq(
     if (state == NULL || !state->uart.initialized)
         return;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(state)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     observe(state, NX_H743_READ(&state->uart.registers->ISR));
     if (!state->filling)
         acknowledge(state, flags(state));
@@ -525,13 +679,22 @@ void nx_stm32h743_uart_receive_uart_irq(
     if (state == NULL || !state->uart.initialized)
         return;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(state)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     uint32_t status = NX_H743_READ(&state->uart.registers->ISR);
     observe(state, status);
+    if (!domain_live(state)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if ((status & (USART_ISR_IDLE | UART_ERRORS)) != 0U) {
         NX_H743_WRITE(&state->uart.registers->ICR,
                       status & (USART_ISR_IDLE | UART_ERRORS));
     }
     nx_stm32h743_uart_transmit_irq(&state->uart, status);
+    (void)domain_live(state);
     nx_arch_irq_restore(guard);
     nx_stm32h743_uart_signal(&state->uart);
 }

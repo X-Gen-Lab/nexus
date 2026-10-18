@@ -1,0 +1,1854 @@
+{
+  "leaves": [
+    {
+      "name": "feature/author.py",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/author.py",
+      "bytes": 696,
+      "sha256": "98e74a5d7b06c8e6eb4daf58de503fe7a7e99660a0d4f78342aff2720757e692"
+    },
+    {
+      "name": "feature/before/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 3882,
+      "sha256": "6fb134020c30668b43af07094771fdb05f454b9eb8b118da2159056717fc5d9f"
+    },
+    {
+      "name": "feature/before/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 4610,
+      "sha256": "565a87135eef2bbfd1b1970c9d9e3340d4bc4d3eb88617dfb4e6a110eaa15405"
+    },
+    {
+      "name": "feature/before/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 4738,
+      "sha256": "c3688217144538bcef0123df479917c0ab733bb58602a9c2a8aabf25581c224b"
+    },
+    {
+      "name": "feature/before/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 878,
+      "sha256": "72120a6f89b83251f7ec3a3d9a127956ab7eaf67575cdf24afd10ab441df4a27"
+    },
+    {
+      "name": "feature/before/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4303,
+      "sha256": "1561d06d06124445adbce7026c63224eb62f8a5e52d235c1e24430a611778848"
+    },
+    {
+      "name": "feature/before/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1034,
+      "sha256": "6429307d5d7334f6446b7434698837d43fdc0cdc8d7e6176cab6dcea8134abbc"
+    },
+    {
+      "name": "feature/before/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 676,
+      "sha256": "4d715f90aeecf811ab711d2a6c92e64ab5bb8dfc8b2300aaab1f7759bf408c95"
+    },
+    {
+      "name": "feature/before/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/tests__google__h743_dma_model.h.gz",
+      "bytes": 516,
+      "sha256": "e0fb21aea404c85e7820f731511be81c213828110aabd1f1cc7436b77eee8a63"
+    },
+    {
+      "name": "feature/before/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 3762,
+      "sha256": "9ec1dce8b0ed25109754f23baa2da2f8180c7581f4820005c337db0796e67b35"
+    },
+    {
+      "name": "feature/before/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/before/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 4076,
+      "sha256": "fc8671bea08f7fe607c24697cd4e5308322cfd54cfdcd6ea95dae22479b35376"
+    },
+    {
+      "name": "feature/behavior-red-source.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/behavior-red-source.json",
+      "bytes": 1771,
+      "sha256": "6a2aeb3cf8b8e16a2057a06c35b826358fd4cf42156baa033e7464fdd6342d85"
+    },
+    {
+      "name": "feature/behavior-red-sources/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/behavior-red-sources/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1404,
+      "sha256": "4dd4a564f77c860f7c07857bf8a9a8c9a807e4a0ed1c935eb40aa0dab99b230d"
+    },
+    {
+      "name": "feature/behavior-red-sources/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/behavior-red-sources/tests__google__h743_dma_model.h.gz",
+      "bytes": 707,
+      "sha256": "0eb672ddd5abc9829665819130313109d0606afc74911a6a33f30792c5e419c8"
+    },
+    {
+      "name": "feature/behavior-red-sources/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/behavior-red-sources/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5641,
+      "sha256": "0d162fd1523bfcaa182e656b181145b49f7575a27a2c876bcd6f9093433363ad"
+    },
+    {
+      "name": "feature/behavior-red-sources/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/behavior-red-sources/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 5958,
+      "sha256": "3884790d54701d46264d9097d4077813dff50c5cd0fac41356047810d9bc0b1c"
+    },
+    {
+      "name": "feature/bootstrap.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/bootstrap.json",
+      "bytes": 3273,
+      "sha256": "32245dd33f08e2b1acd84f51a33679a816df69b9815d9aa32f4b12f2fbecb002"
+    },
+    {
+      "name": "feature/budget-extension-224MiB-r1.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/budget-extension-224MiB-r1.json",
+      "bytes": 625,
+      "sha256": "a716677baba659583977e839189c6aba89d599d9d2bceb4e6723031cb9b2ee7c"
+    },
+    {
+      "name": "feature/budget-extension-r1.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/budget-extension-r1.json",
+      "bytes": 288,
+      "sha256": "113ddf105d6d98cfb5e5e797b2ec3570641e242e5f9605c443c4b0fc3569badd"
+    },
+    {
+      "name": "feature/candidate-d638-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-retention.json",
+      "bytes": 2700,
+      "sha256": "d2d0133ddd79b5e18e0b0922468959d112399b7eaf6024c3296a8adc24c3a983"
+    },
+    {
+      "name": "feature/candidate-d638-sources/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 4011,
+      "sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+    },
+    {
+      "name": "feature/candidate-d638-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 5009,
+      "sha256": "5da22cae754cfbe7b8496ac4c713a40c1b816745adda6ed36080343064f0f5df"
+    },
+    {
+      "name": "feature/candidate-d638-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 5373,
+      "sha256": "77ca5d2e5e6333c504d0efafd66aa524aca979ae869bc36d7e8f3e7d13dad018"
+    },
+    {
+      "name": "feature/candidate-d638-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 926,
+      "sha256": "a5dc8467dbb4280dd6674e0f805df12c67ba726308ad780b068c41303e3db594"
+    },
+    {
+      "name": "feature/candidate-d638-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4628,
+      "sha256": "e9355f1aae47731a6b10e80668450e23a437725af98eb0eef5fb8e5b61b3a2f0"
+    },
+    {
+      "name": "feature/candidate-d638-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1085,
+      "sha256": "4ff2d1434f33ba3a28f49c1efc8b4c4d68e071873c214ffd7006fb3566e62e25"
+    },
+    {
+      "name": "feature/candidate-d638-sources/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1492,
+      "sha256": "0ebc6128499b9cd727beaeae76b8a3fa7464ccab7b8876bebd110742521cc972"
+    },
+    {
+      "name": "feature/candidate-d638-sources/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_dma_model.h.gz",
+      "bytes": 733,
+      "sha256": "91ac102dd3a247e1a66be060d93cf04d55af665e6e6ec954cdffc6d6c34eb923"
+    },
+    {
+      "name": "feature/candidate-d638-sources/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5727,
+      "sha256": "0460966496cdd8d38b5a7fd11e12885c71c415f72fe2ceca93a73677d06fb141"
+    },
+    {
+      "name": "feature/candidate-d638-sources/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 6045,
+      "sha256": "c3d3dec5303c26efc29e7e47306eb4f68f906ae639c3f0254716079ca2357755"
+    },
+    {
+      "name": "feature/files/soc/stm32h743/drivers/uart.c",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/drivers/uart.c",
+      "bytes": 20027,
+      "sha256": "1d67d5573623c66e1fe1359706018c1370ee195fc4cc2a7613cc852a01c0ca82"
+    },
+    {
+      "name": "feature/files/soc/stm32h743/drivers/uart_dma.c",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/drivers/uart_dma.c",
+      "bytes": 24139,
+      "sha256": "3340215c2b2d4cefe7776476194c0f7dd08870e481e076c95f33f27b6f182232"
+    },
+    {
+      "name": "feature/files/soc/stm32h743/drivers/uart_receive.c",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/drivers/uart_receive.c",
+      "bytes": 27778,
+      "sha256": "a11b325a6ed1595f687d833e77370cbd7b461d08c52bf3a6e9e291cc9bd52915"
+    },
+    {
+      "name": "feature/files/soc/stm32h743/private/stm32h743_dma.h",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/private/stm32h743_dma.h",
+      "bytes": 2006,
+      "sha256": "9d1ce1c7e6e78873e82ae60eb55bdc5359b6d06344c73ad19d4488c182565b10"
+    },
+    {
+      "name": "feature/files/soc/stm32h743/private/stm32h743_provider.h",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/private/stm32h743_provider.h",
+      "bytes": 14743,
+      "sha256": "86a14eeb3bb5464266f507a38243ed8baff187f91f8262cc2e46d4d7ec5b2a36"
+    },
+    {
+      "name": "feature/files/soc/stm32h743/private/stm32h743_uart_receive.h",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/private/stm32h743_uart_receive.h",
+      "bytes": 2376,
+      "sha256": "f850e08354ef2f1d16b9bdcb3ba02d851fecab68a1adb0b5d6b90a98d3cc5e76"
+    },
+    {
+      "name": "feature/files/tests/google/h743_dma_model.cpp",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/tests/google/h743_dma_model.cpp",
+      "bytes": 5956,
+      "sha256": "d178c989d7fe3f44a023e02dac33427890cc31d14c9c28f72640e0b7250946b0"
+    },
+    {
+      "name": "feature/files/tests/google/h743_dma_model.h",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/tests/google/h743_dma_model.h",
+      "bytes": 2217,
+      "sha256": "8d397e54cd41f071e7a3d6c7a73f89e6ba47fa993324f14eb9d37ba0da7f63c2"
+    },
+    {
+      "name": "feature/files/tests/google/h743_dma_test.cpp",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/tests/google/h743_dma_test.cpp",
+      "bytes": 31508,
+      "sha256": "9217aa0937b8a4d5f0349dd4054e220e6b640e30b63f7431972e55bcf8ee30a3"
+    },
+    {
+      "name": "feature/files/tests/google/h743_receive_test.cpp",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/tests/google/h743_receive_test.cpp",
+      "bytes": 36976,
+      "sha256": "6be2c5698ed331cbb08b0bcf8549fccb6d0f7ba4c3aec898f2ce3649e99d62c8"
+    },
+    {
+      "name": "feature/final-asan-rx-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-asan-rx-result.json",
+      "bytes": 3176,
+      "sha256": "88b5af5a3b2a609e717d8b71fabc088c088202e4c13917c2dc3a1fb5aff24442"
+    },
+    {
+      "name": "feature/final-asan-tx-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-asan-tx-result.json",
+      "bytes": 3164,
+      "sha256": "3c3b068e2daa98768485968aefdddef93daf194c09d5fc87c17b56b2a5c77e65"
+    },
+    {
+      "name": "feature/final-debug-r2-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-debug-r2-result.json",
+      "bytes": 7781,
+      "sha256": "83f87c95b37590b18c2adcee7509d1feb10cbe4087ba18c4de90a1f9fa12a563"
+    },
+    {
+      "name": "feature/final-debug-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-debug-result.json",
+      "bytes": 7760,
+      "sha256": "bcdf754e9bcf897cb4df0a1a6e31d09632700c3a495388cbfa42961fbe5829f3"
+    },
+    {
+      "name": "feature/final-delivery-r1.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-delivery-r1.json",
+      "bytes": 39261,
+      "sha256": "f3fb9bfcb517fc6af5b69d0d6563e87f48c44516f3f9d98045fe6209dc76f260"
+    },
+    {
+      "name": "feature/final-discovery-proof.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-discovery-proof.json",
+      "bytes": 6546,
+      "sha256": "3ebcc0dda2f9c60377efa8ca797b4657d363e37190d810e597e4880966408c21"
+    },
+    {
+      "name": "feature/final-format-token-proof.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-format-token-proof.json",
+      "bytes": 3115,
+      "sha256": "07042f32d4198b161633d33c884104ed8a21099929acc1a88a294884785e922e"
+    },
+    {
+      "name": "feature/final-selected-compile-inputs.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-selected-compile-inputs.json",
+      "bytes": 122659,
+      "sha256": "85ea9c5b0314e43125642bdae9bf92bafcb2cadf32d423b5a6b9eb70789e83c4"
+    },
+    {
+      "name": "feature/first-green-ELF-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-ELF-retention.json",
+      "bytes": 797,
+      "sha256": "081127828ebc0931f9d07b89e6ea6cf8302c8714a6e974fd10dc0e0b7f0048b1"
+    },
+    {
+      "name": "feature/first-green-candidate-source.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-candidate-source.json",
+      "bytes": 1882,
+      "sha256": "6acbf071e30a161ca9d04ac0f4e8d7ca69dc6827064ad91f3060d2476b3dbc7b"
+    },
+    {
+      "name": "feature/first-green-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-result.json",
+      "bytes": 593,
+      "sha256": "01f805348a7a398815a318bcc9f7f534d59325a62c9003043fdf29618250066b"
+    },
+    {
+      "name": "feature/first-green-sources/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 4011,
+      "sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+    },
+    {
+      "name": "feature/first-green-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 4979,
+      "sha256": "05debb683779f8792ddf7d0dc370469dc0b4e0320da22dca1cb2e4977341b546"
+    },
+    {
+      "name": "feature/first-green-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 5347,
+      "sha256": "98963f08055181f36e98b1cc8f5d15e5b15ed5044706a78e801ad122c5866dfe"
+    },
+    {
+      "name": "feature/first-green-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 886,
+      "sha256": "5a2029ce496d1bfa297ca7e09b466009381876593ad984c4faad2cf6ca10910e"
+    },
+    {
+      "name": "feature/first-green-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4613,
+      "sha256": "15c6d445fdafd0da2eb31990f07532f55001460c981f912cf3516f6738766e9d"
+    },
+    {
+      "name": "feature/first-green-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1042,
+      "sha256": "4c7afc87fb4b24051bef69294f805ac542c297436fe8d16304823430abeb5481"
+    },
+    {
+      "name": "feature/first-green-sources/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1404,
+      "sha256": "4dd4a564f77c860f7c07857bf8a9a8c9a807e4a0ed1c935eb40aa0dab99b230d"
+    },
+    {
+      "name": "feature/first-green-sources/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/tests__google__h743_dma_model.h.gz",
+      "bytes": 707,
+      "sha256": "0eb672ddd5abc9829665819130313109d0606afc74911a6a33f30792c5e419c8"
+    },
+    {
+      "name": "feature/first-green-sources/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5641,
+      "sha256": "0d162fd1523bfcaa182e656b181145b49f7575a27a2c876bcd6f9093433363ad"
+    },
+    {
+      "name": "feature/first-green-sources/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-green-sources/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 5958,
+      "sha256": "3884790d54701d46264d9097d4077813dff50c5cd0fac41356047810d9bc0b1c"
+    },
+    {
+      "name": "feature/first-red-ELF-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-red-ELF-retention.json",
+      "bytes": 851,
+      "sha256": "c8522225e9e45659c9a7ea85ab2364a8eb8e744ccdfff37749adc818add00faa"
+    },
+    {
+      "name": "feature/first-red-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-red-result.json",
+      "bytes": 6608,
+      "sha256": "880ad8def7f3e36f9b42c5f7abdbea9c4575d4e3805471a884acce34129ef859"
+    },
+    {
+      "name": "feature/first-red-source.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/first-red-source.json",
+      "bytes": 1733,
+      "sha256": "3238ccf8773a0beed10881c3dfbf1860b5e9877b7139875093a84c1dd0f000f1"
+    },
+    {
+      "name": "feature/index-before.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/index-before.gz",
+      "bytes": 773314,
+      "sha256": "e14903eab54a1b8e750fd2830608f9c2951da3192d790cbfc33d4274d43ae1e6"
+    },
+    {
+      "name": "feature/post-review-token-and-boundary-proof.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/post-review-token-and-boundary-proof.json",
+      "bytes": 1877,
+      "sha256": "59000f754fb5da60cd3ffcf2854d34085f5217a86f09d77a1227501a1bf93072"
+    },
+    {
+      "name": "feature/pre-final-format/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 4011,
+      "sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+    },
+    {
+      "name": "feature/pre-final-format/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 5009,
+      "sha256": "5da22cae754cfbe7b8496ac4c713a40c1b816745adda6ed36080343064f0f5df"
+    },
+    {
+      "name": "feature/pre-final-format/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 5373,
+      "sha256": "77ca5d2e5e6333c504d0efafd66aa524aca979ae869bc36d7e8f3e7d13dad018"
+    },
+    {
+      "name": "feature/pre-final-format/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 886,
+      "sha256": "5a2029ce496d1bfa297ca7e09b466009381876593ad984c4faad2cf6ca10910e"
+    },
+    {
+      "name": "feature/pre-final-format/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4613,
+      "sha256": "15c6d445fdafd0da2eb31990f07532f55001460c981f912cf3516f6738766e9d"
+    },
+    {
+      "name": "feature/pre-final-format/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1042,
+      "sha256": "4c7afc87fb4b24051bef69294f805ac542c297436fe8d16304823430abeb5481"
+    },
+    {
+      "name": "feature/pre-final-format/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1489,
+      "sha256": "f2428d83f2a29ab2c012603b6c664ef0cf96c85ae37dd1469670fb5666998baf"
+    },
+    {
+      "name": "feature/pre-final-format/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/tests__google__h743_dma_model.h.gz",
+      "bytes": 733,
+      "sha256": "91ac102dd3a247e1a66be060d93cf04d55af665e6e6ec954cdffc6d6c34eb923"
+    },
+    {
+      "name": "feature/pre-final-format/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5727,
+      "sha256": "0460966496cdd8d38b5a7fd11e12885c71c415f72fe2ceca93a73677d06fb141"
+    },
+    {
+      "name": "feature/pre-final-format/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-final-format/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 6045,
+      "sha256": "c3d3dec5303c26efc29e7e47306eb4f68f906ae639c3f0254716079ca2357755"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 4011,
+      "sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 5009,
+      "sha256": "5da22cae754cfbe7b8496ac4c713a40c1b816745adda6ed36080343064f0f5df"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 5401,
+      "sha256": "12926e6866fe41cf5e4cb4d2e95d5255c7816bc59166a57063b7e2cc8ff67a4b"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 926,
+      "sha256": "a5dc8467dbb4280dd6674e0f805df12c67ba726308ad780b068c41303e3db594"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4628,
+      "sha256": "e9355f1aae47731a6b10e80668450e23a437725af98eb0eef5fb8e5b61b3a2f0"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1085,
+      "sha256": "4ff2d1434f33ba3a28f49c1efc8b4c4d68e071873c214ffd7006fb3566e62e25"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1492,
+      "sha256": "0ebc6128499b9cd727beaeae76b8a3fa7464ccab7b8876bebd110742521cc972"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/tests__google__h743_dma_model.h.gz",
+      "bytes": 733,
+      "sha256": "91ac102dd3a247e1a66be060d93cf04d55af665e6e6ec954cdffc6d6c34eb923"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5727,
+      "sha256": "0460966496cdd8d38b5a7fd11e12885c71c415f72fe2ceca93a73677d06fb141"
+    },
+    {
+      "name": "feature/pre-nonreturn-enhancement/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-enhancement/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 6238,
+      "sha256": "1c0b2693d018a8bc1cb1e09f563d6e640bf2ee591f34fb4d93c2628f47d0040a"
+    },
+    {
+      "name": "feature/pre-nonreturn-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/pre-nonreturn-retention.json",
+      "bytes": 1968,
+      "sha256": "0fb1c0274b3e854f407a8dd22872c4abde9e3d5c274c4b4fac2c029e1a907c4c"
+    },
+    {
+      "name": "feature/run_stage.py",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/run_stage.py",
+      "bytes": 2213,
+      "sha256": "a0333cd6cdd9757da320c052a0b5e83bad8d74ae9663f9614794d639bb313ad7"
+    },
+    {
+      "name": "feature/run_wholes.py",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/run_wholes.py",
+      "bytes": 1611,
+      "sha256": "1c2da0af0e11095fb8f39cb54e85650b0ef1da3cf3350b578f74828f5c796e41"
+    },
+    {
+      "name": "feature/runner-before-224MiB-extension.py.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/runner-before-224MiB-extension.py.gz",
+      "bytes": 1065,
+      "sha256": "c98c7e1148a18775a8ae865922216141ddf640738db6758fb0f6523b902ffc01"
+    },
+    {
+      "name": "feature/runner-before-budget-extension.py.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/runner-before-budget-extension.py.gz",
+      "bytes": 1065,
+      "sha256": "c3fe55a09922d1c6cbd8571aa9506ef6e848627adb35643ff3c1ab88e25a880b"
+    },
+    {
+      "name": "feature/seal_delivery.py",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/seal_delivery.py",
+      "bytes": 10376,
+      "sha256": "e73557a366be8efa5c2739a27740540a087d2dca2bbf96f116da8029bfffc39f"
+    },
+    {
+      "name": "feature/setup-correction.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/setup-correction.json",
+      "bytes": 441,
+      "sha256": "4211f2666c93ccc9fc6d7967d185c526b4b3d74bf6e572c44a41cabe923d6a4e"
+    },
+    {
+      "name": "feature/setup-rx-enum-source.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/setup-rx-enum-source.cpp.gz",
+      "bytes": 5963,
+      "sha256": "1d41f8e0fef4a9c7d80a0b00d0a14b8d13457e3b4d9fed11214f988b446b9308"
+    },
+    {
+      "name": "feature/source-freeze-candidate.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/source-freeze-candidate.json",
+      "bytes": 1999,
+      "sha256": "d638fb84131c47a0e8f5c58625a0729ce288c8e9ecd7260a536ca3e54ba06b48"
+    },
+    {
+      "name": "feature/source-freeze-r2.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/source-freeze-r2.json",
+      "bytes": 3525,
+      "sha256": "71e25e233bf97697d4191560c48523a98cc2afbf62c1b16196a2767599221e4c"
+    },
+    {
+      "name": "feature/source10-r2.patch",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/source10-r2.patch",
+      "bytes": 83093,
+      "sha256": "c7e6bdc5b1ed636533c7041c4eed95afc57566597b429cc112117a2a486aa077"
+    },
+    {
+      "name": "feature/stop-delegation-green-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-green-result.json",
+      "bytes": 3193,
+      "sha256": "7336cc25104bb07f5be898b5c2eaf2c486ba1a36331b8368b3b21265dc59552a"
+    },
+    {
+      "name": "feature/stop-delegation-red-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-result.json",
+      "bytes": 3500,
+      "sha256": "c8310a88d1411be5f2c66f77b0dc99b367581b3947398e3c50646631c397eca9"
+    },
+    {
+      "name": "feature/stop-delegation-red-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-retention.json",
+      "bytes": 3086,
+      "sha256": "f1c7a72d5b80edf26ab553eb3902eb6487301faa9a8660c0544794377983eb33"
+    },
+    {
+      "name": "feature/stop-delegation-red-source.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-source.json",
+      "bytes": 1945,
+      "sha256": "6874ebfd66e9a5fce46cf85d583fc6f5311c4e556264d58ae1b7ba3e2412d97c"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 4011,
+      "sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 5009,
+      "sha256": "5da22cae754cfbe7b8496ac4c713a40c1b816745adda6ed36080343064f0f5df"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 5373,
+      "sha256": "77ca5d2e5e6333c504d0efafd66aa524aca979ae869bc36d7e8f3e7d13dad018"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 926,
+      "sha256": "a5dc8467dbb4280dd6674e0f805df12c67ba726308ad780b068c41303e3db594"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4628,
+      "sha256": "e9355f1aae47731a6b10e80668450e23a437725af98eb0eef5fb8e5b61b3a2f0"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1085,
+      "sha256": "4ff2d1434f33ba3a28f49c1efc8b4c4d68e071873c214ffd7006fb3566e62e25"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1492,
+      "sha256": "0ebc6128499b9cd727beaeae76b8a3fa7464ccab7b8876bebd110742521cc972"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/tests__google__h743_dma_model.h.gz",
+      "bytes": 733,
+      "sha256": "91ac102dd3a247e1a66be060d93cf04d55af665e6e6ec954cdffc6d6c34eb923"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5727,
+      "sha256": "0460966496cdd8d38b5a7fd11e12885c71c415f72fe2ceca93a73677d06fb141"
+    },
+    {
+      "name": "feature/stop-delegation-red-sources/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-delegation-red-sources/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 6238,
+      "sha256": "1c0b2693d018a8bc1cb1e09f563d6e640bf2ee591f34fb4d93c2628f47d0040a"
+    },
+    {
+      "name": "feature/stop-mask-green-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-green-result.json",
+      "bytes": 3927,
+      "sha256": "6969d9a915a32645020d2d26821a6de16fcb2ab1441c6f7b5f5130bf73464c6f"
+    },
+    {
+      "name": "feature/stop-mask-green-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-green-retention.json",
+      "bytes": 805,
+      "sha256": "b5cc3504ca5bd6b60aa3ca065fb026b6968551eb063df2533564cff3f45b9c22"
+    },
+    {
+      "name": "feature/stop-mask-red-result.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-result.json",
+      "bytes": 4086,
+      "sha256": "a5f1eb236dbd27c0973d03497edf7ed32e26633fbd01734fcdf304130af9ac09"
+    },
+    {
+      "name": "feature/stop-mask-red-retention.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-retention.json",
+      "bytes": 791,
+      "sha256": "1c06d119184cd2bc606e591ba8472786c0966296f91dc039fa27d7a54467c343"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/soc__stm32h743__drivers__uart.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/soc__stm32h743__drivers__uart.c.gz",
+      "bytes": 4011,
+      "sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 4979,
+      "sha256": "05debb683779f8792ddf7d0dc370469dc0b4e0320da22dca1cb2e4977341b546"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+      "bytes": 5347,
+      "sha256": "98963f08055181f36e98b1cc8f5d15e5b15ed5044706a78e801ad122c5866dfe"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+      "bytes": 886,
+      "sha256": "5a2029ce496d1bfa297ca7e09b466009381876593ad984c4faad2cf6ca10910e"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+      "bytes": 4613,
+      "sha256": "15c6d445fdafd0da2eb31990f07532f55001460c981f912cf3516f6738766e9d"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+      "bytes": 1042,
+      "sha256": "4c7afc87fb4b24051bef69294f805ac542c297436fe8d16304823430abeb5481"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/tests__google__h743_dma_model.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/tests__google__h743_dma_model.cpp.gz",
+      "bytes": 1489,
+      "sha256": "f2428d83f2a29ab2c012603b6c664ef0cf96c85ae37dd1469670fb5666998baf"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/tests__google__h743_dma_model.h.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/tests__google__h743_dma_model.h.gz",
+      "bytes": 733,
+      "sha256": "91ac102dd3a247e1a66be060d93cf04d55af665e6e6ec954cdffc6d6c34eb923"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/tests__google__h743_dma_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/tests__google__h743_dma_test.cpp.gz",
+      "bytes": 5727,
+      "sha256": "0460966496cdd8d38b5a7fd11e12885c71c415f72fe2ceca93a73677d06fb141"
+    },
+    {
+      "name": "feature/stop-mask-red-sources/tests__google__h743_receive_test.cpp.gz",
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/stop-mask-red-sources/tests__google__h743_receive_test.cpp.gz",
+      "bytes": 6045,
+      "sha256": "c3d3dec5303c26efc29e7e47306eb4f68f906ae639c3f0254716079ca2357755"
+    },
+    {
+      "name": "commands/asan-configure/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-configure/receipt.json",
+      "bytes": 908,
+      "sha256": "515d334ab7cab5a5ee4f8cd34130ed2c0a2d4ec0d157201bd197ecbf858c5ccb"
+    },
+    {
+      "name": "commands/asan-configure/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-configure/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/asan-configure/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-configure/stdout.raw",
+      "bytes": 1719,
+      "sha256": "77e506382c3aa061e245a3966723c1bbaebd583540580bd95924de9ed15da48e"
+    },
+    {
+      "name": "commands/asan-nexus_h743_dma_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-nexus_h743_dma_test-final-discovery/receipt.json",
+      "bytes": 882,
+      "sha256": "a5e3761047db326a6e3f44c108b0c1c68ec1af68e0ea3b2090131e847e45ef57"
+    },
+    {
+      "name": "commands/asan-nexus_h743_dma_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-nexus_h743_dma_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/asan-nexus_h743_dma_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-nexus_h743_dma_test-final-discovery/stdout.raw",
+      "bytes": 4125,
+      "sha256": "5af0a7f3c81c17a53ccfbc4a3817459ab5ed8fe1275e530cadfb80884033194c"
+    },
+    {
+      "name": "commands/asan-nexus_h743_receive_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-nexus_h743_receive_test-final-discovery/receipt.json",
+      "bytes": 890,
+      "sha256": "85b71cc75920ddc205c5cf5cec52ebb306c6cb98b5ce6b7db3c3e99ce873bf6b"
+    },
+    {
+      "name": "commands/asan-nexus_h743_receive_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-nexus_h743_receive_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/asan-nexus_h743_receive_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/asan-nexus_h743_receive_test-final-discovery/stdout.raw",
+      "bytes": 4623,
+      "sha256": "ace20105d2a930ba493504f514f07671212fa463544291e54ef0c8ee874c9d16"
+    },
+    {
+      "name": "commands/debug-configure/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-configure/receipt.json",
+      "bytes": 909,
+      "sha256": "d450a52eff25458596eb19f8256c2288615cb23fcd0489d265b734b1ecc5bc5e"
+    },
+    {
+      "name": "commands/debug-configure/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-configure/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-configure/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-configure/stdout.raw",
+      "bytes": 1690,
+      "sha256": "6544f2289833d68123f7fe7040c322cac8d7568e1d790698a20860ff79342fef"
+    },
+    {
+      "name": "commands/debug-first-green-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-green-build/receipt.json",
+      "bytes": 989,
+      "sha256": "81d32a51fd21db9a6a21cfbd80c30c73bdab4aeb169d9041a8455e1a2c35b843"
+    },
+    {
+      "name": "commands/debug-first-green-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-green-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-first-green-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-green-build/stdout.raw",
+      "bytes": 1080,
+      "sha256": "9cc1f741e230a14eb0008cc85fa6a6d412737fc64afee49e6eeb5130b52b3860"
+    },
+    {
+      "name": "commands/debug-first-red-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-red-build/receipt.json",
+      "bytes": 986,
+      "sha256": "1b47f73115c6423d240df105b6ca290149e217bb60d4e501d5e44e1898aa2270"
+    },
+    {
+      "name": "commands/debug-first-red-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-red-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-first-red-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-red-build/stdout.raw",
+      "bytes": 8228,
+      "sha256": "ac22e0c8e823f0a5a7fdd7e7cd6828d913d9e7e932676f42fd9ae825e3d0499b"
+    },
+    {
+      "name": "commands/debug-first-red-build-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-red-build-r2/receipt.json",
+      "bytes": 989,
+      "sha256": "b8819c46f7ee24ffeb13baba98af76e0ce235c8c5b137919474e79384f965d7b"
+    },
+    {
+      "name": "commands/debug-first-red-build-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-red-build-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-first-red-build-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-first-red-build-r2/stdout.raw",
+      "bytes": 910,
+      "sha256": "2c6e99d51129d4940b7b4b4f3ec7e1981899081e1d66275d0d6b7dbe9a6576df"
+    },
+    {
+      "name": "commands/debug-nexus_h743_dma_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_dma_test-final-discovery/receipt.json",
+      "bytes": 884,
+      "sha256": "2c66228c2441ccacaf8513c693045bcd6a8b279fd37e3160fe7d8966df1cc345"
+    },
+    {
+      "name": "commands/debug-nexus_h743_dma_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_dma_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_dma_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_dma_test-final-discovery/stdout.raw",
+      "bytes": 4125,
+      "sha256": "5af0a7f3c81c17a53ccfbc4a3817459ab5ed8fe1275e530cadfb80884033194c"
+    },
+    {
+      "name": "commands/debug-nexus_h743_provider_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_provider_test-final-discovery/receipt.json",
+      "bytes": 894,
+      "sha256": "a07ba35f153994f409a86fe566c0e87072296d6b73e7be7b6a5a3e2015f436b0"
+    },
+    {
+      "name": "commands/debug-nexus_h743_provider_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_provider_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_provider_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_provider_test-final-discovery/stdout.raw",
+      "bytes": 1396,
+      "sha256": "f5a836002bb5ca76b7244473e1596d8a1377742e6a68a130b01fb556f06b53e1"
+    },
+    {
+      "name": "commands/debug-nexus_h743_receive_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_receive_test-final-discovery/receipt.json",
+      "bytes": 892,
+      "sha256": "f3030a0c473175541ffe4588ef9e98d08270cfc37b93dd57132b5b20c449fb10"
+    },
+    {
+      "name": "commands/debug-nexus_h743_receive_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_receive_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_receive_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_receive_test-final-discovery/stdout.raw",
+      "bytes": 4623,
+      "sha256": "ace20105d2a930ba493504f514f07671212fa463544291e54ef0c8ee874c9d16"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_fifo_factory_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_fifo_factory_test-final-discovery/receipt.json",
+      "bytes": 912,
+      "sha256": "4dd246bfc93eb40ea6a25463466aba0bed25083086b3b32332c6889be5f7a821"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_fifo_factory_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_fifo_factory_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_fifo_factory_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_fifo_factory_test-final-discovery/stdout.raw",
+      "bytes": 502,
+      "sha256": "962f55c6e0b218fad79ca75d50977bf9d021661e9d0d57c74c1992b7d184e589"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_fifo_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_fifo_test-final-discovery/receipt.json",
+      "bytes": 896,
+      "sha256": "ad64f282b6728df5fd6a6daa7a328fc24ac96807efc7067dcc260b3d031962ac"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_fifo_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_fifo_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_fifo_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_fifo_test-final-discovery/stdout.raw",
+      "bytes": 2291,
+      "sha256": "60abab8842ed2da3f3776a54b865e87e058c74cc7077154658f4116927dad5d2"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_rtscts_factory_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_rtscts_factory_test-final-discovery/receipt.json",
+      "bytes": 916,
+      "sha256": "5649a9f68faa7203027223600fa800ef052fad1513f359fc1a6dd44bc8432539"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_rtscts_factory_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_rtscts_factory_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_rtscts_factory_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_rtscts_factory_test-final-discovery/stdout.raw",
+      "bytes": 623,
+      "sha256": "d77b4dbc4a41fbb77777f3e5e7c247913c8351f60a0336a421f36021efab34c6"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_rtscts_test-final-discovery/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_rtscts_test-final-discovery/receipt.json",
+      "bytes": 900,
+      "sha256": "df3aa639ec33ef8737ba0036a8b1424f8bef53c65f3ccd9e262a1febff7d893e"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_rtscts_test-final-discovery/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_rtscts_test-final-discovery/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-nexus_h743_uart_rtscts_test-final-discovery/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-nexus_h743_uart_rtscts_test-final-discovery/stdout.raw",
+      "bytes": 2033,
+      "sha256": "566dfd794225475b88716cc0a41406f731017369c4b6915e9798bc7cdfa42ad6"
+    },
+    {
+      "name": "commands/debug-stop-mask-green-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-stop-mask-green-build/receipt.json",
+      "bytes": 992,
+      "sha256": "032a0253c249f6864ee0f1ed50cbc0f469092de86da74bcc0965cdea3c5932c1"
+    },
+    {
+      "name": "commands/debug-stop-mask-green-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-stop-mask-green-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-stop-mask-green-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-stop-mask-green-build/stdout.raw",
+      "bytes": 405,
+      "sha256": "761d36e6a2c03a87352fa078135da513d7138c9165a5d41d8ba695dca10a8c03"
+    },
+    {
+      "name": "commands/debug-stop-mask-red-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-stop-mask-red-build/receipt.json",
+      "bytes": 991,
+      "sha256": "2054fb1b9f8f5c155c8d584a7b2b53637fa3a21e85059b91afb7e97f65703213"
+    },
+    {
+      "name": "commands/debug-stop-mask-red-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-stop-mask-red-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/debug-stop-mask-red-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/debug-stop-mask-red-build/stdout.raw",
+      "bytes": 1532,
+      "sha256": "b3e36c4228ffac2eeb4f44d0d9d5b460074eed7c86b24bc58e44dd6242edfb45"
+    },
+    {
+      "name": "commands/final-asan-configure/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-configure/receipt.json",
+      "bytes": 914,
+      "sha256": "21cdef2255d85526a2f1a9fef2fab42fcdb049837fcfe33e512332d662690c7e"
+    },
+    {
+      "name": "commands/final-asan-configure/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-configure/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-asan-configure/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-configure/stdout.raw",
+      "bytes": 913,
+      "sha256": "545e93da90c004df52c0591b92be968d4332d27a5fa2eb5e2b6fb0c98bd33967"
+    },
+    {
+      "name": "commands/final-asan-dryrun/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-dryrun/receipt.json",
+      "bytes": 1002,
+      "sha256": "eaf48f1a709fb7762e1b0f102130877604bb941d3d5d0872158267d3276bc351"
+    },
+    {
+      "name": "commands/final-asan-dryrun/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-dryrun/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-asan-dryrun/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-dryrun/stdout.raw",
+      "bytes": 67,
+      "sha256": "382c384823673f78d470d2bc91b946dda671367e5537d3c0cdccfa106197ab2d"
+    },
+    {
+      "name": "commands/final-asan-dryrun-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-dryrun-r2/receipt.json",
+      "bytes": 1005,
+      "sha256": "4c1b7d2cd64dcf95fe498f6c887d72b732423d2a9df593ce271e058281b56bf2"
+    },
+    {
+      "name": "commands/final-asan-dryrun-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-dryrun-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-asan-dryrun-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-dryrun-r2/stdout.raw",
+      "bytes": 67,
+      "sha256": "382c384823673f78d470d2bc91b946dda671367e5537d3c0cdccfa106197ab2d"
+    },
+    {
+      "name": "commands/final-asan-rx-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-rx-build/receipt.json",
+      "bytes": 958,
+      "sha256": "b0d9132e9d5d6e625a1535721f1cc04eea97acbc7e42fc4f200389c66aa60f3f"
+    },
+    {
+      "name": "commands/final-asan-rx-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-rx-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-asan-rx-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-rx-build/stdout.raw",
+      "bytes": 795,
+      "sha256": "6b0e32ae9f0861e29f03c129477f08a368e250f4b73447ca1aef75f801d2d13a"
+    },
+    {
+      "name": "commands/final-asan-tx-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-tx-build/receipt.json",
+      "bytes": 954,
+      "sha256": "09a28273873e7fc6da066aa45439f7e36ebfc75cdde5395f25d814fd4ef49d43"
+    },
+    {
+      "name": "commands/final-asan-tx-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-tx-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-asan-tx-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-asan-tx-build/stdout.raw",
+      "bytes": 5254,
+      "sha256": "3776bf24b56ae276e66b7bc980f5729a9334abe989262ccd8ddfc6d11f7dc94a"
+    },
+    {
+      "name": "commands/final-debug-and-ordinary-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-debug-and-ordinary-build/receipt.json",
+      "bytes": 1181,
+      "sha256": "8836f51655652fd3e7f037d5e85dc6945700897f56972c447104313d4a7dcc24"
+    },
+    {
+      "name": "commands/final-debug-and-ordinary-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-debug-and-ordinary-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-debug-and-ordinary-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-debug-and-ordinary-build/stdout.raw",
+      "bytes": 6311,
+      "sha256": "b0f90fab1398191e75ca6e0a689c1a797581406d987c254db3aac64ec911bb92"
+    },
+    {
+      "name": "commands/final-style/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-style/receipt.json",
+      "bytes": 1356,
+      "sha256": "86a01b4d70fcb8e26f395a6c83687e87cc7334cf40fef763bc431dbdb43dee4a"
+    },
+    {
+      "name": "commands/final-style/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-style/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/final-style/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/final-style/stdout.raw",
+      "bytes": 89,
+      "sha256": "62ce630fbb2fe6f45c6ec64bdd6e8a6054c60d2ce66e4099200e142cced46cf3"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-asan-tx/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-asan-tx/receipt.json",
+      "bytes": 971,
+      "sha256": "378ae35c90913ed95ca8a6e57969256230f50d9da67301c8fb9e7d851d7fbaef"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-asan-tx/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-asan-tx/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-asan-tx/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-asan-tx/stdout.raw",
+      "bytes": 11898,
+      "sha256": "143ee973515da68b5ecb2a9b9727b703c460a73a316b9b683d4f5e394b8ac01d"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-debug/receipt.json",
+      "bytes": 968,
+      "sha256": "5e81a85e953df6e88d524ad688b0cb8ce4da030ec5dee5e7d118197f93bc92de"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-debug/stdout.raw",
+      "bytes": 11893,
+      "sha256": "f8599ec6746985e781b0f72fa53904d465f9dd6bdbb670bd62ade58b617974a7"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-debug-r2/receipt.json",
+      "bytes": 974,
+      "sha256": "7ae31fc59abd18bbbe37df4d6e501edfe5b0eb91ca78897b5db37b3a85a87e70"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-final-debug-r2/stdout.raw",
+      "bytes": 11898,
+      "sha256": "0eb5adcc0d1dbd0c589e1fc9423ea13852a03cde9668e7e7825e64fc3043411a"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-first-green/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-first-green/receipt.json",
+      "bytes": 967,
+      "sha256": "223387b03d0ceb304333225f0b6a1901e6ec0de883fbdf95275864e0752f858a"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-first-green/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-first-green/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-first-green/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-first-green/stdout.raw",
+      "bytes": 11734,
+      "sha256": "02d2b41a9fc5d5220702773ce98e3a2a10d9987429eca68f09479b68295703b1"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-first-red/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-first-red/receipt.json",
+      "bytes": 962,
+      "sha256": "f921dbf9b102aeae327321255cfa266ef85b35dfb290f4f7307b0f3c882f0163"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-first-red/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-first-red/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-first-red/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-first-red/stdout.raw",
+      "bytes": 52700,
+      "sha256": "9f10d7c2fb6e10ed2abe85fa8cc6a02c9f2ae09c014a06038b3f9eb34f3218d6"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-stop-mask-green/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-stop-mask-green/receipt.json",
+      "bytes": 975,
+      "sha256": "16ae7d1fc40cdaacdb17aa4c3612b8839a76b12281b77fd51e0e34e05c52e922"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-stop-mask-green/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-stop-mask-green/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-stop-mask-green/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-stop-mask-green/stdout.raw",
+      "bytes": 11893,
+      "sha256": "f8599ec6746985e781b0f72fa53904d465f9dd6bdbb670bd62ade58b617974a7"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-stop-mask-red/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-stop-mask-red/receipt.json",
+      "bytes": 971,
+      "sha256": "e5c4d0f16ddb41f1d4c122fc7c9ec72819be5fe323835472e1d6dbd824072969"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-stop-mask-red/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-stop-mask-red/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_dma_test-stop-mask-red/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_dma_test-stop-mask-red/stdout.raw",
+      "bytes": 12212,
+      "sha256": "e35b2532472ac143f196b1b8dbc52f58dcc1e5123a69103e1050c8e87ae03aa0"
+    },
+    {
+      "name": "commands/nexus_h743_provider_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_provider_test-final-debug/receipt.json",
+      "bytes": 983,
+      "sha256": "1fd37a8db76e37be4d03f2173ca48ccf2aa9b890c1a5dd1c8bc401b0cd57748c"
+    },
+    {
+      "name": "commands/nexus_h743_provider_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_provider_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_provider_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_provider_test-final-debug/stdout.raw",
+      "bytes": 4641,
+      "sha256": "d6a8ce7dbdc946b1d9ef341002ffcd21fc28bd3f0ee83a5d5b4a2bcf2aaad736"
+    },
+    {
+      "name": "commands/nexus_h743_provider_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_provider_test-final-debug-r2/receipt.json",
+      "bytes": 989,
+      "sha256": "ca8277a734fe1f02e59b67f9ea120c43a0e2f1d8c73936d2ea55c9d7c74de469"
+    },
+    {
+      "name": "commands/nexus_h743_provider_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_provider_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_provider_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_provider_test-final-debug-r2/stdout.raw",
+      "bytes": 4641,
+      "sha256": "15a42434f809b843d0740c2d4cfd8e32ad7b61cdc50c69d3fca7ad79ea1e9993"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-asan-rx/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-asan-rx/receipt.json",
+      "bytes": 983,
+      "sha256": "92af7a60a2d248a63c1a656d2325b231b3328e0db425980d89f355e2cb2f528d"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-asan-rx/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-asan-rx/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-asan-rx/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-asan-rx/stdout.raw",
+      "bytes": 13714,
+      "sha256": "bf79d28da8188a76541fd4f3b260964b473b418d7f7e0fc2fbb67efe00217bde"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-debug/receipt.json",
+      "bytes": 980,
+      "sha256": "689ce9aa60de3caaa1433baf648e4faeb691c5778cb2b9f357eb6d1fe1cab489"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-debug/stdout.raw",
+      "bytes": 13070,
+      "sha256": "a575c2351cca51b227ed4196c5cbf0ad4fe946caf079297b971c78fbee3b8866"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-debug-r2/receipt.json",
+      "bytes": 986,
+      "sha256": "ca94c2c3701d4a62fca70e99a9e5450273bf247eb33de8c22ff2ffbc265c9db1"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-final-debug-r2/stdout.raw",
+      "bytes": 13714,
+      "sha256": "531bd13ac96b4c1c2042458548aefb8db840645525ae86c3d65dc0d80f1bf611"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-first-green/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-first-green/receipt.json",
+      "bytes": 979,
+      "sha256": "17da58934a57ebcb3c3bac9926ffda262abb8c2da0d3dace02a735916127c3b2"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-first-green/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-first-green/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-first-green/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-first-green/stdout.raw",
+      "bytes": 12903,
+      "sha256": "1dce6bfd62b847b85c4485e04fb6dbf65d3fc102d2c5c24bf00d76d7eb4bdc33"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-first-red/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-first-red/receipt.json",
+      "bytes": 974,
+      "sha256": "69747d48b456829490dfaa12c97e4a6d0aa5ddf6c605ddb2b02a9f97ecf710e5"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-first-red/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-first-red/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-first-red/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-first-red/stdout.raw",
+      "bytes": 58822,
+      "sha256": "9926014cc45fc3c737c95d16ad0ab51182aad6ca41db8ef67447f58178b781ca"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-delegation-green/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-delegation-green/receipt.json",
+      "bytes": 1000,
+      "sha256": "70ef1f83b561fb7ad55ac95547876c42ac879849efcfe6fc16e6212be39fdb30"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-delegation-green/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-delegation-green/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-delegation-green/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-delegation-green/stdout.raw",
+      "bytes": 13709,
+      "sha256": "2a9704ed5462e83a679b3efb357db7ed0d137e080ac63bf6d26ee3a3db7f434d"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-delegation-red/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-delegation-red/receipt.json",
+      "bytes": 996,
+      "sha256": "f518a05bb92b2234e5648b9d40ee4927c978cf000ab95c7ed9098d486b1098cd"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-delegation-red/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-delegation-red/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-delegation-red/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-delegation-red/stdout.raw",
+      "bytes": 17119,
+      "sha256": "d8f1f55be510136d60486b8a91539c9a5c0d1892554fa718f9d23eb1ede654e4"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-mask-green/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-mask-green/receipt.json",
+      "bytes": 987,
+      "sha256": "877e93ecafd71f38752665c33eeda8c1fea781b6aa0390cf00dcc49704efa7c9"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-mask-green/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-mask-green/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-mask-green/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-mask-green/stdout.raw",
+      "bytes": 13070,
+      "sha256": "2b6593b2633db4915bdd7a0e0bb80240a627d3d9145fb0eca8fff042c1cb5543"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-mask-red/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-mask-red/receipt.json",
+      "bytes": 983,
+      "sha256": "3e8a78222ca6717e2767c0f957004f4805a63b175ac8dd53cca5a13f24b53338"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-mask-red/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-mask-red/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_receive_test-stop-mask-red/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_receive_test-stop-mask-red/stdout.raw",
+      "bytes": 13397,
+      "sha256": "7135392a2780dde7efb87f5143cf52c2c2cdebb3ca3dce95cf1c32028061acb9"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_factory_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_factory_test-final-debug/receipt.json",
+      "bytes": 1010,
+      "sha256": "cb4a9433f80c923126999ea26f58fca96f942f78a9a2dd156fb5d1de3e7636ae"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_factory_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_factory_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_factory_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_factory_test-final-debug/stdout.raw",
+      "bytes": 1874,
+      "sha256": "889e1de355913e230943d2f16801fabc40d5733fd73a224ab9449ae196e5f7af"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_factory_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_factory_test-final-debug-r2/receipt.json",
+      "bytes": 1016,
+      "sha256": "7898f9b1e715ad4276cd5e511929bee41ea446c019535e6024f529cdce3bfbba"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_factory_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_factory_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_factory_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_factory_test-final-debug-r2/stdout.raw",
+      "bytes": 1874,
+      "sha256": "889e1de355913e230943d2f16801fabc40d5733fd73a224ab9449ae196e5f7af"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_test-final-debug/receipt.json",
+      "bytes": 986,
+      "sha256": "7beb03ec74b95e3fd1d4842b3ae5b906a02b3b318724bb42ca6fd877b060c1df"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_test-final-debug/stdout.raw",
+      "bytes": 7311,
+      "sha256": "1d12281fc4f66f2839fc6b16a7b86c45f6913412b1927f88143dd058e4009371"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_test-final-debug-r2/receipt.json",
+      "bytes": 992,
+      "sha256": "523851fe3d3f63c4610076a435dd6f37e0b013e1074f44f6b31c3183ac3ddc79"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_fifo_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_fifo_test-final-debug-r2/stdout.raw",
+      "bytes": 7311,
+      "sha256": "a6c67fe3de2602280184ca6d2aff0f698b9589b798b60652475ec47403d09003"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_factory_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_factory_test-final-debug/receipt.json",
+      "bytes": 1016,
+      "sha256": "6c0305111be466c1ae1688643d094e5f1558f94900a8b11c62471c126c2df4b5"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_factory_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_factory_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_factory_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_factory_test-final-debug/stdout.raw",
+      "bytes": 2303,
+      "sha256": "527e921c776693ab704eebc67ecf1971cd71e7ab2d95a86e89c095f87bcbb754"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_factory_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_factory_test-final-debug-r2/receipt.json",
+      "bytes": 1022,
+      "sha256": "f1cfed51e0ba638e16b8977c94ecddf7ee6b03f10b27e951c86c54f33182e9b4"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_factory_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_factory_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_factory_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_factory_test-final-debug-r2/stdout.raw",
+      "bytes": 2303,
+      "sha256": "527e921c776693ab704eebc67ecf1971cd71e7ab2d95a86e89c095f87bcbb754"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_test-final-debug/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_test-final-debug/receipt.json",
+      "bytes": 992,
+      "sha256": "f8bd98e13e4a88059cff0d665dfc6fda332e3bfda6dace5b5f1e577e4ba21bca"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_test-final-debug/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_test-final-debug/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_test-final-debug/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_test-final-debug/stdout.raw",
+      "bytes": 6562,
+      "sha256": "a4f6716afc50a95f8d88010e118dad3f211b254560017161224d88d95e81682b"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_test-final-debug-r2/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_test-final-debug-r2/receipt.json",
+      "bytes": 998,
+      "sha256": "b924c238b1e7f2a07e407f5718fa362120419f3aa94c479522a69b7daac19785"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_test-final-debug-r2/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_test-final-debug-r2/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nexus_h743_uart_rtscts_test-final-debug-r2/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nexus_h743_uart_rtscts_test-final-debug-r2/stdout.raw",
+      "bytes": 6562,
+      "sha256": "a4f6716afc50a95f8d88010e118dad3f211b254560017161224d88d95e81682b"
+    },
+    {
+      "name": "commands/nonreturn-coverage-debug-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nonreturn-coverage-debug-build/receipt.json",
+      "bytes": 997,
+      "sha256": "eba4537af9cad7a6c415c901648a4618a05782ccbd9baa76995fba0cd789c4d8"
+    },
+    {
+      "name": "commands/nonreturn-coverage-debug-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nonreturn-coverage-debug-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/nonreturn-coverage-debug-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/nonreturn-coverage-debug-build/stdout.raw",
+      "bytes": 367,
+      "sha256": "425f63354897b7fb728072e88ed7666f686aeebd56f92c0f79b835175350be97"
+    },
+    {
+      "name": "commands/stop-delegation-green-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/stop-delegation-green-build/receipt.json",
+      "bytes": 966,
+      "sha256": "af40108711f31e41f02f69e49d041776f83cc058b7cb7577c6dcb628804be2db"
+    },
+    {
+      "name": "commands/stop-delegation-green-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/stop-delegation-green-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/stop-delegation-green-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/stop-delegation-green-build/stdout.raw",
+      "bytes": 229,
+      "sha256": "f2d1878ee84a5fbd21aa627514830ded28aab4d1af4d726f79ca5b43c41a4f75"
+    },
+    {
+      "name": "commands/stop-delegation-red-build/receipt.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/stop-delegation-red-build/receipt.json",
+      "bytes": 965,
+      "sha256": "be2f2384f82c81af4a9f2cc274b6f9dc42898e20b493c10fe1123221476bd8e3"
+    },
+    {
+      "name": "commands/stop-delegation-red-build/stderr.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/stop-delegation-red-build/stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "commands/stop-delegation-red-build/stdout.raw",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/stop-delegation-red-build/stdout.raw",
+      "bytes": 210,
+      "sha256": "97c89e8c730343ebf760e85811b38f96007b2e53ef16d43b2c7c3d75f27db2e9"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-final-asan-tx.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-final-asan-tx.xml",
+      "bytes": 19377,
+      "sha256": "76f08ed5a665c40ceede6749d42e25199234353b7403d3d2a16af386918fcb0e"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-final-debug-r2.xml",
+      "bytes": 19374,
+      "sha256": "d406c9302f6784f34f8b8e8d72af8fa9d97f901ff5e15c8b0074173e74bd1c68"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-final-debug.xml",
+      "bytes": 19374,
+      "sha256": "6e8622c1fe37916ac39dbad4ea736ff48d2198c1065c4d228076cb554819877c"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-first-green.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-first-green.xml",
+      "bytes": 19109,
+      "sha256": "dc0731241a82bd546807ab19d5ad12424a8909de0543de3a34157634cd2d9b40"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-first-red.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-first-red.xml",
+      "bytes": 35083,
+      "sha256": "aa5c12ecfd6eec9c1d18c8b95483137befe27e074cde6f3a2966560da0622a56"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-stop-mask-green.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-stop-mask-green.xml",
+      "bytes": 19374,
+      "sha256": "be3d177d273e5fbe143e2540a3f17b99b4cf173654e5419c7b026ba3d1692e6f"
+    },
+    {
+      "name": "junit/nexus_h743_dma_test-stop-mask-red.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-stop-mask-red.xml",
+      "bytes": 19839,
+      "sha256": "9c51c52673d3cd540acb96413f1648b33cefbafc2e3e1f1c7511640c0da6a241"
+    },
+    {
+      "name": "junit/nexus_h743_provider_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_provider_test-final-debug-r2.xml",
+      "bytes": 7997,
+      "sha256": "d5cb357f7a5c28f13df3b571e5939d7f627555e7a7deca4a5570b64ef736bed4"
+    },
+    {
+      "name": "junit/nexus_h743_provider_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_provider_test-final-debug.xml",
+      "bytes": 8003,
+      "sha256": "5bead4ab44a1d42db8bbaff0d963be37792ecf99e25ae6605ee52bdfffdcd666"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-final-asan-rx.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-final-asan-rx.xml",
+      "bytes": 21482,
+      "sha256": "66b583f67da3f4fe0d6ccb00dde29175e74611aa455743c58d7cf150e2b0b1c6"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-final-debug-r2.xml",
+      "bytes": 21476,
+      "sha256": "671072ce239abb2c82c104bcc7facf97debfff968680a5250630f77593965082"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-final-debug.xml",
+      "bytes": 20534,
+      "sha256": "82f3cac051512307f6433dece39f0e7b07b0527a5f3cdcfb79d38fd9ce558793"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-first-green.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-first-green.xml",
+      "bytes": 20261,
+      "sha256": "b60f1ae25eaa3a68df869dd04da7574ccae00c88d35863f19f169a41ca0d2e02"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-first-red.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-first-red.xml",
+      "bytes": 36679,
+      "sha256": "9bf5401448511b44153d8ce6cac823bbc0532e6b4ecaeb9836804f8ad23abd4e"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-stop-delegation-green.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-stop-delegation-green.xml",
+      "bytes": 21478,
+      "sha256": "3aad586c1045aa022a3abc20056257c71f4d1c411b86ea6de7ae235e8579002c"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-stop-delegation-red.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-stop-delegation-red.xml",
+      "bytes": 22559,
+      "sha256": "0053c0c0e39eeff11f34636627bc7cf3c674ced8cce6d1de97ee121d147c56fc"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-stop-mask-green.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-stop-mask-green.xml",
+      "bytes": 20534,
+      "sha256": "d53592ae0b9f895c95b402af3ce38da51f611dbdf2865bfdb175f7413cb7f18f"
+    },
+    {
+      "name": "junit/nexus_h743_receive_test-stop-mask-red.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-stop-mask-red.xml",
+      "bytes": 21007,
+      "sha256": "515c7bb46fe1ba316397a85641f67e1b873f27f7328ba58b78f939a613782b1c"
+    },
+    {
+      "name": "junit/nexus_h743_uart_fifo_factory_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_fifo_factory_test-final-debug-r2.xml",
+      "bytes": 2889,
+      "sha256": "f6720b2d5bcfa603335001d90ac211d152dde2b8a76c37a1435d5b27489e295b"
+    },
+    {
+      "name": "junit/nexus_h743_uart_fifo_factory_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_fifo_factory_test-final-debug.xml",
+      "bytes": 2889,
+      "sha256": "15e1e27ede44a2fba7bff325a2cc06d792f73aff790986068b6026f374ce38b3"
+    },
+    {
+      "name": "junit/nexus_h743_uart_fifo_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_fifo_test-final-debug-r2.xml",
+      "bytes": 12435,
+      "sha256": "d03530b5d6c8599cc77fba1ff9f3818fb59e09c83db38fad0ca182969bd16fa3"
+    },
+    {
+      "name": "junit/nexus_h743_uart_fifo_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_fifo_test-final-debug.xml",
+      "bytes": 12435,
+      "sha256": "cfc938f92ebd8677e07291758354217ae52b14d624aa9cde2fff968658038d87"
+    },
+    {
+      "name": "junit/nexus_h743_uart_rtscts_factory_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_rtscts_factory_test-final-debug-r2.xml",
+      "bytes": 3524,
+      "sha256": "11955e03f510adbf0054b091414ff272d37a0cbacd4d126534cdbad4d068254b"
+    },
+    {
+      "name": "junit/nexus_h743_uart_rtscts_factory_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_rtscts_factory_test-final-debug.xml",
+      "bytes": 3524,
+      "sha256": "64e167d94b6b23ae74de5bb0119c2de6159b36ca29c67e3f2b8c4cd37354b74a"
+    },
+    {
+      "name": "junit/nexus_h743_uart_rtscts_test-final-debug-r2.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_rtscts_test-final-debug-r2.xml",
+      "bytes": 10796,
+      "sha256": "c705161b1f2f327ddbff3c20322fe8a5c489bb94b598e5a4baa430508bd69eab"
+    },
+    {
+      "name": "junit/nexus_h743_uart_rtscts_test-final-debug.xml",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_rtscts_test-final-debug.xml",
+      "bytes": 10796,
+      "sha256": "2d5742058fb75bcc01c24ae3f57fb457bf63e852b8bb8c74bf9331df4c925ea6"
+    },
+    {
+      "name": "checks/final-style.json",
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/final-style.json",
+      "bytes": 4181,
+      "sha256": "0c5d5299b5c8a14681c796026561434f42821b99c83db0bf995e701312146924"
+    }
+  ],
+  "all_raw_before_after_and_failed_attempts_preserved": true,
+  "excluded_large_ELFs": "Exact paths/fullSHA/gzipCRC are recorded in final-delivery-r1.json; no deletion or rewriting."
+}

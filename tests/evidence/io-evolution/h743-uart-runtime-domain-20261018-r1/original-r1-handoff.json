@@ -1,0 +1,26 @@
+{
+  "summary": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-delivery-r1.json",
+    "sha256": "f3fb9bfcb517fc6af5b69d0d6563e87f48c44516f3f9d98045fe6209dc76f260"
+  },
+  "inventory": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/final-leaf-inventory-r1.json",
+    "sha256": "e4b0685b3d86c0ad5b2e0e5b0711a56295bfb1d2a1625699fbb1b52b8eff6640",
+    "leaves": 308
+  },
+  "archive": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/delivery-evidence-r1.zip",
+    "sha256": "fd33ed8068070be2183e0bed5158d92658a7f7468e95711ae11fad1c7aba6e6b",
+    "bytes": 1322250,
+    "members": 309,
+    "full_member_SHA_CRC_readback": true
+  },
+  "source_freeze_sha256": "71e25e233bf97697d4191560c48523a98cc2afbf62c1b16196a2767599221e4c",
+  "index_before_after_sha256": "56f0b6f8ef5eb2045c54ed54060080162028558cf104bbe3d77c5218b0a3152d",
+  "final_programs": 9,
+  "final_case_executions": 408,
+  "feature_allocated_before_final_handoff": 3260416,
+  "build_allocated": 211726336,
+  "all_children_joined": true,
+  "no_extra_qualification": true
+}

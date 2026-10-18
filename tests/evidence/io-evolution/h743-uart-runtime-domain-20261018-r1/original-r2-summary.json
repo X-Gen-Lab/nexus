@@ -1,0 +1,380 @@
+{
+  "baseline_HEAD": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+  "source_freeze": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/source-freeze-final.json",
+    "sha256": "d2565120f5cb2d470f1fccfff5cefb46c66f81dd43f64ba0ffc9278bbf1ebe4e"
+  },
+  "base_packet_immutable": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/completed-handoff-r1.json",
+    "sha256": "37ed79723d02646309ededf548fec1c2554d02b21dc9f4a4e73f27b3af782ef8",
+    "archive_sha256": "fd33ed8068070be2183e0bed5158d92658a7f7468e95711ae11fad1c7aba6e6b"
+  },
+  "patch": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/source10.patch",
+    "sha256": "c52642353fc382328d4959169abbc64ece95ca6d348d1232fa10e38def9e7dc0"
+  },
+  "actual_TDD": "Same-test wholeTX70fail3/RX74fail3\u2192GREEN70/74; realUSART IRQ after ordinaryretained/initialized/enable before mode irqsave observes loss; externalrestore must not wash sticky. No model or existing testbody changes.",
+  "production_fix": "Only a freshunowned cold lifecycle clears domain_lost before first DMAprobe; masked postordinarysuccess mode-retain/domain_live guard preserves observedloss and returnsSTATE without new selectedDMAsetup.",
+  "final_programs": [
+    {
+      "profile": "debug",
+      "target": "nexus_h743_dma_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_dma_test",
+      "ELF_sha256": "0fcaf9073fbf4b4c3a5d3370a5c26f38954ff3bb2b49783dd66a01c56deaaec4",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "70",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.114",
+        "timestamp": "2026-10-18T10:03:12.571",
+        "name": "AllTests"
+      },
+      "XML_sha256": "50d9eb01449e78699f24e7e435148ec075444d23424027efec68328a21574abf",
+      "failed_cases": []
+    },
+    {
+      "profile": "debug",
+      "target": "nexus_h743_receive_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_receive_test",
+      "ELF_sha256": "b2fddb80cc80703c93e4e3010fbc432982af89f435a9e2cdc92d78d09c5c48b3",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "74",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.119",
+        "timestamp": "2026-10-18T10:03:12.891",
+        "name": "AllTests"
+      },
+      "XML_sha256": "4aa3443ec0753a9193eac407f200eed13c301ee03ee61effdc304a96cc08c56e",
+      "failed_cases": []
+    },
+    {
+      "profile": "debug",
+      "target": "nexus_h743_provider_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_provider_test",
+      "ELF_sha256": "be32f4e1300dcf101678dca54d08164cc76dba14ca76c7140f89cb8d9614ce37",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_provider_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "29",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.001",
+        "timestamp": "2026-10-18T10:03:13.190",
+        "name": "AllTests"
+      },
+      "XML_sha256": "9c60bfa71592f361e3134f8e917312fb51eff8389a4fee5255b30f1ee89db14f",
+      "failed_cases": []
+    },
+    {
+      "profile": "debug",
+      "target": "nexus_h743_uart_fifo_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_uart_fifo_test",
+      "ELF_sha256": "a697078feab1cff0f18ec8d50e59452f452ed4f9e7cca0225ece15dded3a14b1",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_fifo_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "45",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.001",
+        "timestamp": "2026-10-18T10:03:13.375",
+        "name": "AllTests"
+      },
+      "XML_sha256": "414b0e08b62a47857fb9abe620a435a921f0c81ae69135c7106d439510dd4967",
+      "failed_cases": []
+    },
+    {
+      "profile": "debug",
+      "target": "nexus_h743_uart_rtscts_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_uart_rtscts_test",
+      "ELF_sha256": "c854824fd34946ba4f2ef2a388ed8cf3b00e4fc7ca6e5c7806961e5bdbbc1ac5",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_rtscts_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "38",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.001",
+        "timestamp": "2026-10-18T10:03:13.555",
+        "name": "AllTests"
+      },
+      "XML_sha256": "8eea562ca518bb29a549689bc9e3c4d4c08de06807b51a347ef158913f4acc4f",
+      "failed_cases": []
+    },
+    {
+      "profile": "debug",
+      "target": "nexus_h743_uart_fifo_factory_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_uart_fifo_factory_test",
+      "ELF_sha256": "eda785446b59b7c709f4a002db988e76dbe7f10a0289039b0fc6d33406dba998",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_fifo_factory_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "9",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.",
+        "timestamp": "2026-10-18T10:03:13.770",
+        "name": "AllTests"
+      },
+      "XML_sha256": "3f081af755dc9e07773f82b4594ece9c8e6e8d43d40db2fa28e9c056b86d9b84",
+      "failed_cases": []
+    },
+    {
+      "profile": "debug",
+      "target": "nexus_h743_uart_rtscts_factory_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/debug/bin/nexus_h743_uart_rtscts_factory_test",
+      "ELF_sha256": "c8219b6e908033cd25fb023cf5d9f26a4bc39b9d1e8b0515fd301ed58919a982",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_uart_rtscts_factory_test-lifecycle-final-debug.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "11",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.",
+        "timestamp": "2026-10-18T10:03:13.953",
+        "name": "AllTests"
+      },
+      "XML_sha256": "fe98d2a4be850310bedea0c67e69efe3d3cd7fc0f6685232f59a524dabba838e",
+      "failed_cases": []
+    },
+    {
+      "profile": "asan",
+      "target": "nexus_h743_dma_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/asan/bin/nexus_h743_dma_test",
+      "ELF_sha256": "462b061bf891378ada6a0b1e0638e34f6f91af4c77fdaaac0be337f34213af68",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_dma_test-lifecycle-final-asan.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "70",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.158",
+        "timestamp": "2026-10-18T10:03:37.501",
+        "name": "AllTests"
+      },
+      "XML_sha256": "2dcacbb414eedf4f8d72c1c2e3f48fcd232b4cab9b463a603a853dfa9523aa8b",
+      "failed_cases": []
+    },
+    {
+      "profile": "asan",
+      "target": "nexus_h743_receive_test",
+      "actual_exit": 0,
+      "ELF_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/asan/bin/nexus_h743_receive_test",
+      "ELF_sha256": "998057b60795a12723dd9534f005848c906ae61517930ea646d5f5e35474a25d",
+      "XML_path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/junit/nexus_h743_receive_test-lifecycle-final-asan.xml",
+      "XML_exists": true,
+      "XML": {
+        "tests": "74",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.165",
+        "timestamp": "2026-10-18T10:03:37.896",
+        "name": "AllTests"
+      },
+      "XML_sha256": "eff0ff19b22cebe756a1ea72e0df0f7ebe4bd8ea85f1f97dbb0a73ab594650b0",
+      "failed_cases": []
+    }
+  ],
+  "totals": {
+    "programs": 9,
+    "Debug": 276,
+    "ASAN": 144,
+    "case_executions": 420,
+    "failures": 0,
+    "errors": 0,
+    "disabled": 0,
+    "whole_no_filters_shards": true
+  },
+  "all_new_receipts": [
+    {
+      "name": "lifecycle-asan-nexus_h743_dma_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-asan-nexus_h743_dma_test-discovery/receipt.json",
+      "sha256": "c20b2b3217b35556c073170acdc09df83824ee9fe7e5882e7e9a332208eeb568",
+      "child_RSS_max_KiB": 20612
+    },
+    {
+      "name": "lifecycle-asan-nexus_h743_receive_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-asan-nexus_h743_receive_test-discovery/receipt.json",
+      "sha256": "7b94162009c06a1e0ec0996d68e80f10cd3d51f6577b29ae1f2070ec70742325",
+      "child_RSS_max_KiB": 20740
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_dma_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_dma_test-discovery/receipt.json",
+      "sha256": "9ced3180a1e94649c583843a2b913b0909e27597bdfa68d3cec352f5868257fb",
+      "child_RSS_max_KiB": 20740
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_provider_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_provider_test-discovery/receipt.json",
+      "sha256": "e467c0a53985128e9e69b5dbc43cdd2093dc212310fbf10f81119e859fb8dc7a",
+      "child_RSS_max_KiB": 20612
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_receive_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_receive_test-discovery/receipt.json",
+      "sha256": "8f704178f08b7ae0fe53a07403de57b87fddd8c7e0c4752046fbf18ff40ab17a",
+      "child_RSS_max_KiB": 20740
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_uart_fifo_factory_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_uart_fifo_factory_test-discovery/receipt.json",
+      "sha256": "06e46b8440d1898bff87c619dfb814c5f6cb83564d75c512f08d67c1e6be3fd4",
+      "child_RSS_max_KiB": 20612
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_uart_fifo_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_uart_fifo_test-discovery/receipt.json",
+      "sha256": "9ede845e190dcd9833b83eada2be58f3021c56c47e1edd4d85d82a72739b5e1a",
+      "child_RSS_max_KiB": 20612
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_uart_rtscts_factory_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_uart_rtscts_factory_test-discovery/receipt.json",
+      "sha256": "6d1110823466fe3b7ef62cead33f3bcdd03b545d956f7fa4ccfe3fe7e4c6fbcb",
+      "child_RSS_max_KiB": 20612
+    },
+    {
+      "name": "lifecycle-debug-nexus_h743_uart_rtscts_test-discovery",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-debug-nexus_h743_uart_rtscts_test-discovery/receipt.json",
+      "sha256": "a87c9c2b23e860be92b5ea0f08d7b83e8ae634c78cb55923d5aa3142aa7669b7",
+      "child_RSS_max_KiB": 20612
+    },
+    {
+      "name": "lifecycle-final-asan-build",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-final-asan-build/receipt.json",
+      "sha256": "462499a0ecfeba19c0e4259c5dc880af2e6f1578dd1c143b784a3085dd2831b8",
+      "child_RSS_max_KiB": 624244
+    },
+    {
+      "name": "lifecycle-final-style",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-final-style/receipt.json",
+      "sha256": "2e973709e7932d174ec42b218c019f4e7d1a6b3166fbb5a2dfb7f24710975bdd",
+      "child_RSS_max_KiB": 40048
+    },
+    {
+      "name": "lifecycle-green-build",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-green-build/receipt.json",
+      "sha256": "75489c91d47988769b1fe8e59090bd60e7be5b9e12946c7b4f8b3444f87b6fd3",
+      "child_RSS_max_KiB": 44228
+    },
+    {
+      "name": "lifecycle-red-build",
+      "actual_exit": 0,
+      "receipt": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/commands/lifecycle-red-build/receipt.json",
+      "sha256": "acb59c62c645a5781342f2a2b793a502503d39379cec18d008aa3871413cebe7",
+      "child_RSS_max_KiB": 476324
+    }
+  ],
+  "retained_prior_final4_and_new_RED2_ELFs": [
+    {
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/retained-final-r1/asan/nexus_h743_dma_test.gz",
+      "gzip_sha256": "94ea405999721e5cfdf9d313adca7f1109467d1db38ee0f17e9ed358f26e9d22",
+      "original_sha256": "3d3b7da9c0869b6636dc243fc70930f8ec80a921dd67d2e1f85d9f37f57dd74b",
+      "original_bytes": 7318928,
+      "full_decompression_CRC_SHA_checked": true
+    },
+    {
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/retained-final-r1/asan/nexus_h743_receive_test.gz",
+      "gzip_sha256": "af9250101293f93e12cae07b285cea64b1ace90b99fdf4dece5fbe54d5b8b4e0",
+      "original_sha256": "d49012cea4a638819da43b1a35c828f6f32725f83cbd43f00c4cfa67ae3ef53c",
+      "original_bytes": 8078408,
+      "full_decompression_CRC_SHA_checked": true
+    },
+    {
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/retained-final-r1/debug/nexus_h743_dma_test.gz",
+      "gzip_sha256": "46b313b22b393893186c7b423cbd10c2f07c6dffc4198d50041921800e9dd791",
+      "original_sha256": "3b5ab660ed839b3ff0e0645b6f1dbcde597cd1c8a159682cf24c16e8cc08a901",
+      "original_bytes": 3319144,
+      "full_decompression_CRC_SHA_checked": true
+    },
+    {
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/retained-final-r1/debug/nexus_h743_receive_test.gz",
+      "gzip_sha256": "981b2ce9dfd55e002abdc2dbb2c5487bacc526ae9251e2b048bbbb012e929a1d",
+      "original_sha256": "123f945308d6950652e9dd3b6bd6dd603ede2b98758bd415d611da82c3dc739b",
+      "original_bytes": 3473784,
+      "full_decompression_CRC_SHA_checked": true
+    },
+    {
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/retained-lifecycle-red/nexus_h743_dma_test.gz",
+      "gzip_sha256": "e81226406c94a72f0eb30ba3b2ab16aa37dd02a71f3d4c1369e3a8e6eeaaa044",
+      "original_sha256": "c6eb21da6676ab90a94d43018d8bcdd9d23dc6e0b90bf42cb54fd19b5001ada8",
+      "original_bytes": 3345440,
+      "full_decompression_CRC_SHA_checked": true
+    },
+    {
+      "path": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/retained-lifecycle-red/nexus_h743_receive_test.gz",
+      "gzip_sha256": "9d93007a54d34b02de70e70987e447b43d10830b8e5700d23f4e15f4d6bf54e9",
+      "original_sha256": "46a09a3538b936f5730cfef94882a9255395667e7950b171949d2a6d4c6be5eb",
+      "original_bytes": 3504808,
+      "full_decompression_CRC_SHA_checked": true
+    }
+  ],
+  "preservation_proof": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/preservation-proof.json",
+    "sha256": "45aed63b6b4291f533099c5ca8d8488c2c7dd6c1df318a530dd717e42e3b023b"
+  },
+  "compile_inputs": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/selected-compile-inputs.json",
+    "sha256": "ea120671489ce7fea23baa3bc03ba2d382652b6175d7d6af2d772a34ed48c93a"
+  },
+  "strict_style10": {
+    "report": "/dev/shm/nexus-h743-uart-runtime-builds-20261018-r1/lifecycle-final-style.json",
+    "sha256": "856de49affc7f9ed9648bed69675087a43bdb912cbeb5ca436cc176a3c42ceac",
+    "actual_exit": 0
+  },
+  "actual_discovery": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/final-discovery-proof.json",
+    "sha256": "142eb1ea01df307f43aa4d51ad6f62ae639b22fc2cac9834d3beb67571bca45a",
+    "XML_identity_exact_cases": 420
+  },
+  "actual_resources": {
+    "feature_allocated_before_delta_archive": 3682304,
+    "build_allocated": 227602432,
+    "feature_cap": 4194304,
+    "build_cap": 234881024,
+    "memory_events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "max_measured_child_RSS_KiB": 624244,
+    "all_children_joined": true
+  },
+  "boundaries": [
+    "Prior408 packet remains historical, superseded by this exactsource420 runtime tuple.",
+    "No ARM/installedSDK/HIL/OCI/process-family qualification; no ordinaryUARTstate or hotIRQ growth.",
+    "Only observed domainlosses become sticky; transient unobserved pulses not detected.",
+    "Fork kill/reap is parent disposition, not providercleanup."
+  ]
+}

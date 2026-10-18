@@ -83,15 +83,10 @@ static void observe_tc(nx_stm32h743_uart_state_t* p, nx_time_us_t now) {
                       NX_H743_READ(&p->registers->CR1) & ~TX_SOURCES);
     }
 }
-static void service(void* context) {
-    nx_stm32h743_uart_state_t* p = context;
-    if (!task_context() || p == NULL)
-        return;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
+bool nx_stm32h743_uart_tx_prepare_settle_locked(nx_stm32h743_uart_state_t* p) {
     nx_uart_tx_request_t* request = p->active;
     if (request == NULL) {
-        nx_arch_irq_restore(guard);
-        return;
+        return false;
     }
     nx_time_us_t now = nx_time_now_us();
     observe_tc(p, now);
@@ -104,24 +99,35 @@ static void service(void* context) {
                            NX_H743_READ(&p->registers->CR1) & ~TX_SOURCES,
                            TX_SOURCES)) {
             (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
-            nx_arch_irq_restore(guard);
-            return;
+            return false;
         }
-        nx_result_t terminal = p->terminal;
-        size_t transferred = p->tx_position;
-        p->active = NULL;
-        nx_request_settle(&request->base, terminal, transferred);
+        return true;
     } else if (p->terminal != NX_SUCCESS &&
                nx_deadline_expired(p->drain_deadline, now)) {
         (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
     }
+    return false;
+}
+void nx_stm32h743_uart_tx_settle_locked(nx_stm32h743_uart_state_t* p) {
+    nx_uart_tx_request_t* request = p->active;
+    if (request == NULL)
+        return;
+    nx_result_t terminal = p->terminal;
+    size_t transferred = p->tx_position;
+    p->active = NULL;
+    nx_request_settle(&request->base, terminal, transferred);
+}
+static void service(void* context) {
+    nx_stm32h743_uart_state_t* p = context;
+    if (!task_context() || p == NULL)
+        return;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (nx_stm32h743_uart_tx_prepare_settle_locked(p))
+        nx_stm32h743_uart_tx_settle_locked(p);
     nx_arch_irq_restore(guard);
 }
-static nx_result_t start(void* context, nx_uart_tx_request_t* request,
-                         bool admitted) {
-    nx_stm32h743_uart_state_t* p = context;
-    if (!task_context())
-        return NX_ERROR_CONTEXT;
+nx_result_t nx_stm32h743_uart_tx_validate(nx_stm32h743_uart_state_t* p,
+                                          nx_uart_tx_request_t* request) {
     if (p == NULL || request == NULL || !span(request, sizeof(*request)) ||
         !span(request->data, request->length))
         return NX_ERROR_INVALID;
@@ -129,17 +135,18 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         protected_span(p, request->data, request->length) ||
         overlap(request, sizeof(*request), request->data, request->length))
         return NX_ERROR_INVALID;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    return NX_SUCCESS;
+}
+nx_result_t nx_stm32h743_uart_tx_start_locked(nx_stm32h743_uart_state_t* p,
+                                              nx_uart_tx_request_t* request,
+                                              bool admitted) {
     if (!p->initialized || p->closing) {
-        nx_arch_irq_restore(guard);
         return NX_ERROR_STATE;
     }
     if (p->active != NULL) {
-        nx_arch_irq_restore(guard);
         return NX_ERROR_BUSY;
     }
     if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        nx_arch_irq_restore(guard);
         return NX_ERROR_TIMEOUT;
     }
     nx_result_t result =
@@ -158,6 +165,18 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         if ((NX_H743_READ(&p->registers->CR1) & USART_CR1_TXEIE_TXFNFIE) == 0U)
             begin_drain(p, NX_ERROR_IO, nx_time_now_us());
     }
+    return result;
+}
+static nx_result_t start(void* context, nx_uart_tx_request_t* request,
+                         bool admitted) {
+    nx_stm32h743_uart_state_t* p = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    nx_result_t result = nx_stm32h743_uart_tx_validate(p, request);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    result = nx_stm32h743_uart_tx_start_locked(p, request, admitted);
     nx_arch_irq_restore(guard);
     return result;
 }
@@ -170,19 +189,13 @@ static nx_result_t start_admitted(void* p, nx_uart_tx_request_t* request) {
         return NX_ERROR_STATE;
     return start(p, request, true);
 }
-static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
-    nx_stm32h743_uart_state_t* p = context;
-    if (!task_context())
-        return NX_ERROR_CONTEXT;
-    if (p == NULL || request == NULL)
-        return NX_ERROR_INVALID;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
+nx_result_t nx_stm32h743_uart_tx_cancel_locked(nx_stm32h743_uart_state_t* p,
+                                               nx_uart_tx_request_t* request) {
     if (p->active != request) {
         nx_result_t result =
             nx_request_state(&request->base) == NX_REQUEST_SETTLED
                 ? NX_SUCCESS
                 : NX_ERROR_STATE;
-        nx_arch_irq_restore(guard);
         return result;
     }
     nx_time_us_t now = nx_time_now_us();
@@ -190,8 +203,18 @@ static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
     if (!p->tx_complete) {
         begin_drain(p, NX_ERROR_CANCELLED, now);
     }
-    nx_arch_irq_restore(guard);
     return NX_SUCCESS;
+}
+static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
+    nx_stm32h743_uart_state_t* p = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (p == NULL || request == NULL)
+        return NX_ERROR_INVALID;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    nx_result_t result = nx_stm32h743_uart_tx_cancel_locked(p, request);
+    nx_arch_irq_restore(guard);
+    return result;
 }
 void nx_stm32h743_uart_transmit_irq(nx_stm32h743_uart_state_t* p,
                                     uint32_t status) {

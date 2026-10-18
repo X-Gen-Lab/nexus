@@ -311,6 +311,28 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* port,
                                          uint32_t poll_limit);
 /** \brief Move at most one byte each direction and latch TC/error facts. */
 void nx_stm32h743_uart_irq(nx_stm32h743_uart_state_t* port);
+/** \brief Pure shared TX argument/alias validation; no admission or MMIO. */
+nx_result_t nx_stm32h743_uart_tx_validate(nx_stm32h743_uart_state_t* port,
+                                          nx_uart_tx_request_t* request);
+/** \brief Shared admission; validated arguments and saved interrupt mask held.
+ */
+nx_result_t nx_stm32h743_uart_tx_start_locked(nx_stm32h743_uart_state_t* port,
+                                              nx_uart_tx_request_t* request,
+                                              bool admitted);
+/** \brief Shared cancellation; non-NULL validated port/request and saved mask
+ * held. */
+nx_result_t nx_stm32h743_uart_tx_cancel_locked(nx_stm32h743_uart_state_t* port,
+                                               nx_uart_tx_request_t* request);
+/** \brief Prove wire and UART-source drain without releasing the request.
+ * Caller holds its saved mask. True is valid only in this critical section,
+ * with no intervening UART mutation. Modes recheck their domain before settle.
+ */
+bool nx_stm32h743_uart_tx_prepare_settle_locked(
+    nx_stm32h743_uart_state_t* port);
+/** \brief Final request access after successful preparation in the same mask.
+ * Caller has proved its mode lifetime. Ordinary UART adds no dynamic guard. */
+void nx_stm32h743_uart_tx_settle_locked(nx_stm32h743_uart_state_t* port);
+
 /**
  * \brief Shared real-TC IRQ transmission; never reads RDR or RX status flags.
  * \note Selected provider holds the saved interrupt mask and initialized port.
