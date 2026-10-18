@@ -86,7 +86,8 @@ class StyleGateTests(unittest.TestCase):
         hooks = yaml.safe_load(hook_path.read_text())
         for repository in hooks["repos"]:
             repository["hooks"] = [hook for hook in repository["hooks"]
-                                   if hook["id"] != "nexus-tdd-gate"]
+                                   if hook["id"] not in (
+                                       "nexus-tdd-gate", "nexus-workflow-lint")]
         hook_path.write_text(yaml.safe_dump(hooks, sort_keys=False))
         (self.root / ".clang-format-dirs").write_text(
             "src\n!vendors\n!ext\n!build\n[extensions]\n.c\n.h\n.inc\n"

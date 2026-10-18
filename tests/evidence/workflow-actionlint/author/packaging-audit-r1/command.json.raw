@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "/tmp/nexus-workflow-actionlint-20261018-r1/verify_delivery_r1.py"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "stage": "final-transport-readonly-verification-r1",
+  "started_ns": 1792305315617251682,
+  "finished_ns": 1792305315681569800,
+  "duration_seconds": 0.06431969099867274,
+  "timeout_seconds": 240.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/tmp/nexus-workflow-actionlint-20261018-r1/runs/final-transport-readonly-verification-r1.attempts/1792305315617202618-c4c854251ba8441189854c94f1c27f81/stdout.txt",
+    "bytes": 575,
+    "sha256": "c9f437f4521783dcc48fe8f9b60f21e8e02c855155faf3b4ef2614fcfff3cee8"
+  },
+  "stderr": {
+    "path": "/tmp/nexus-workflow-actionlint-20261018-r1/runs/final-transport-readonly-verification-r1.attempts/1792305315617202618-c4c854251ba8441189854c94f1c27f81/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/tmp/nexus-workflow-actionlint-20261018-r1/runs/final-transport-readonly-verification-r1.attempts/1792305315617202618-c4c854251ba8441189854c94f1c27f81/receipt.json"
+}

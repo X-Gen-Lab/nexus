@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import zipfile
 from pathlib import Path
 import tempfile
@@ -427,6 +428,111 @@ class BuildDeliveryTests(unittest.TestCase):
         artifact.write_bytes(b"changed")
         with self.assertRaises(EvidenceError):
             qualification.verify_provenance(recorded)
+
+
+
+class ActionlintPreparationTests(unittest.TestCase):
+    """Verify the real prepared binary offline without a network fixture."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="actionlint-prepare-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.lock = self.root / "dependencies/actionlint.lock.json"
+        self.lock.parent.mkdir()
+        self.lock.write_bytes((dependencies.ROOT /
+                               dependencies.ACTIONLINT_LOCK).read_bytes())
+        self.prefix = Path(os.environ.get(
+            "NEXUS_ACTIONLINT_TEST_PREFIX",
+            dependencies.ROOT / ".venv/nexus-actionlint"))
+
+    def test_four_official_hosts_share_one_lock_and_normalized_modes(self):
+        hosts = (("Linux", "x86_64", "linux_amd64"),
+                 ("Darwin", "x86_64", "darwin_amd64"),
+                 ("Darwin", "arm64", "darwin_arm64"),
+                 ("Windows", "AMD64", "windows_amd64"))
+        for system, machine, expected in hosts:
+            with self.subTest(host=expected), \
+                    patch("platform.system", return_value=system), \
+                    patch("platform.machine", return_value=machine):
+                lock, asset = dependencies.actionlint_asset(self.lock)
+                self.assertEqual(asset["platform"], expected)
+                self.assertIn("/v" + lock["version"] + "/", asset["url"])
+                self.assertEqual(asset["executable"]["mode"], 0o755)
+                self.assertEqual(asset["notice"]["mode"], 0o644)
+
+    def test_prepared_prefix_reuse_is_strictly_offline(self):
+        executable = dependencies.verify_actionlint(self.prefix, self.lock)
+        with patch.object(cache, "fetch", side_effect=AssertionError("network")):
+            receipt = dependencies.install_actionlint(
+                self.prefix, self.root / "cache", root=self.root)
+        self.assertEqual(receipt["version"], "1.7.12")
+        self.assertTrue(executable.is_file())
+
+    def test_unknown_prefix_is_preserved_and_never_fetches(self):
+        prefix = self.root / "unknown"
+        prefix.mkdir()
+        marker = prefix / "preserve"
+        marker.write_bytes(b"unknown user file")
+        with patch.object(cache, "fetch", side_effect=AssertionError("network")):
+            with self.assertRaisesRegex(EvidenceError, "prepare"):
+                dependencies.install_actionlint(
+                    prefix, self.root / "cache", root=self.root)
+        self.assertEqual(marker.read_bytes(), b"unknown user file")
+        self.assertEqual(list(prefix.iterdir()), [marker])
+
+    def test_changed_binary_notice_mode_and_receipt_fail_offline(self):
+        prefix = self.root / "prefix"
+        shutil.copytree(self.prefix, prefix)
+        _, asset = dependencies.actionlint_asset(self.lock)
+        for name in (asset["executable"]["member"], "LICENSE.txt", "receipt.json"):
+            path = prefix / name
+            before = path.read_bytes()
+            path.write_bytes(before + b"corrupt")
+            with self.subTest(member=name):
+                with self.assertRaises(EvidenceError):
+                    dependencies.verify_actionlint(prefix, self.lock)
+            path.write_bytes(before)
+        if os.name != "nt":
+            executable = prefix / asset["executable"]["member"]
+            executable.chmod(0o644)
+            with self.assertRaises(EvidenceError):
+                dependencies.verify_actionlint(prefix, self.lock)
+
+    def test_lock_mismatch_and_unsupported_host_fail_closed(self):
+        data = json.loads(self.lock.read_text())
+        data["version"] = "0.0.0"
+        self.lock.write_text(json.dumps(data))
+        with self.assertRaisesRegex(EvidenceError, "lock"):
+            dependencies.verify_actionlint(self.prefix, self.lock)
+        with patch("platform.system", return_value="FreeBSD"):
+            with self.assertRaises(EvidenceError):
+                dependencies.actionlint_asset(self.lock)
+
+    def test_digest_mismatch_archive_never_executes_or_publishes(self):
+        payload = self.root / "wrong.tar.gz"
+        payload.write_bytes(b"wrong official archive bytes")
+        prefix = self.root / "new-prefix"
+        from tools.dev import process
+        with patch.object(cache, "fetch", return_value=payload), \
+                patch.object(process, "run") as execute:
+            with self.assertRaises(EvidenceError):
+                dependencies.install_actionlint(
+                    prefix, self.root / "cache", root=self.root)
+        execute.assert_not_called()
+        self.assertFalse(prefix.exists())
+
+    def test_cache_and_prefix_overlap_never_creates_unknown_directory(self):
+        prefix = self.root / "new-prefix"
+        with self.assertRaisesRegex(EvidenceError, "overlap"):
+            dependencies.install_actionlint(prefix, prefix, root=self.root)
+        self.assertFalse(prefix.exists())
+
+    def test_symlink_prefix_does_not_touch_its_target(self):
+        alias = self.root / "alias"
+        alias.symlink_to(self.prefix, target_is_directory=True)
+        with self.assertRaisesRegex(EvidenceError, "symlink"):
+            dependencies.verify_actionlint(alias, self.lock)
 
 
 if __name__ == "__main__":

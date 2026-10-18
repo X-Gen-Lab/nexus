@@ -1,0 +1,62 @@
+{
+  "status": "Root integration instructions; not executed by author against Main",
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "python": "/workspace/nexus-build-system-20261012/.venv/bin/python",
+  "prefix": "/tmp/nexus-io-validation-20261018/.venv/nexus-actionlint",
+  "cache": "/tmp/nexus-io-validation-20261018/build/cache/downloads",
+  "lock_sha256": "0bf30ff8d5dd4062d63f897c27f3e7225c673447855e977a0560e121cd2872d5",
+  "archive": {
+    "path": "/tmp/nexus-actionlint-assets-20261018-r1/actionlint_1.7.12_linux_amd64.tar.gz",
+    "bytes": 2353908,
+    "sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+  },
+  "executable": {
+    "member": "actionlint",
+    "bytes": 6074530,
+    "sha256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4",
+    "mode": 493
+  },
+  "notice": {
+    "member": "LICENSE.txt",
+    "bytes": 1067,
+    "sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22",
+    "mode": 420
+  },
+  "commands": [
+    [
+      "/workspace/nexus-build-system-20261012/.venv/bin/python",
+      "tools/dev/cache.py",
+      "put",
+      "--file",
+      "/tmp/nexus-actionlint-assets-20261018-r1/actionlint_1.7.12_linux_amd64.tar.gz",
+      "--cache",
+      "/tmp/nexus-io-validation-20261018/build/cache/downloads",
+      "--sha256",
+      "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+    ],
+    [
+      "/workspace/nexus-build-system-20261012/.venv/bin/python",
+      "tools/dev/dependencies.py",
+      "actionlint-prepare",
+      "--root",
+      "/tmp/nexus-io-validation-20261018",
+      "--install-dir",
+      "/tmp/nexus-io-validation-20261018/.venv/nexus-actionlint",
+      "--cache",
+      "/tmp/nexus-io-validation-20261018/build/cache/downloads"
+    ],
+    [
+      "/workspace/nexus-build-system-20261012/.venv/bin/python",
+      "tools/dev/dev.py",
+      "doctor",
+      "--target",
+      "workflows"
+    ]
+  ],
+  "notes": [
+    "Apply canonical14source first; explicit prepare reuses cache.fetch verified hit and never needs network after cache.put.",
+    "Main .venv was observed as a real directory, not a symlink; prefix did not exist. Recheck before Root preparation.",
+    "No pip install, requirements, environment.lock, recipe or OCI changes are required for these three commands. Existing PyYAML6.0.3 and exact TDD three-pin hook environment remain authorities.",
+    "Hook/defaultdoctor use Main/.venv/nexus-actionlint; the author TMP prepared prefix is not silently reused."
+  ]
+}

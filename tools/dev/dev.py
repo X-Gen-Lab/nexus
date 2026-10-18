@@ -109,9 +109,13 @@ def doctor(environment, native):
     """Diagnose explicit target requirements; tools-only remains available."""
     parser = argparse.ArgumentParser(prog="dev.py doctor")
     parser.add_argument("--target",
-                        choices=("tools", "native", "arm", "candidate", "docs"),
+                        choices=("tools", "native", "arm", "candidate", "docs",
+                                 "workflows"),
                         default="tools")
     args, remaining = parser.parse_known_args(native)
+    if args.target == "workflows":
+        return execute([sys.executable, "scripts/ci/lint_workflows.py",
+                        "--doctor"] + remaining, environment)
     if args.target == "docs":
         return execute([sys.executable, "tools/documentation/cli.py", "doctor"]
                        + remaining, environment)

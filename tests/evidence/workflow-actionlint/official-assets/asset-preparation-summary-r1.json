@@ -1,0 +1,87 @@
+{
+  "kind": "official actionlint fixed upstream asset identity preparation only",
+  "status": "prepared-not-installed-not-implemented",
+  "version": "1.7.12",
+  "tag": "v1.7.12",
+  "commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+  "release_page": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+  "release_api": "https://api.github.com/repos/rhysd/actionlint/releases/303326868",
+  "published_at": "2026-03-30T17:49:21Z",
+  "platforms": 4,
+  "archive_members_stream_verified": 44,
+  "archives_actual_total_bytes": 9353003,
+  "assets": [
+    {
+      "platform": "linux_amd64",
+      "archive_bytes": 2353908,
+      "archive_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "executable_bytes": 6074530,
+      "executable_sha256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4"
+    },
+    {
+      "platform": "darwin_amd64",
+      "archive_bytes": 2355828,
+      "archive_sha256": "5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644",
+      "executable_bytes": 6120448,
+      "executable_sha256": "d1f7cee75ae2873609bd9567b4600bebc5315a5e733e73202987a44fafdd53b2"
+    },
+    {
+      "platform": "darwin_arm64",
+      "archive_bytes": 2164202,
+      "archive_sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+      "executable_bytes": 5829842,
+      "executable_sha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388"
+    },
+    {
+      "platform": "windows_amd64",
+      "archive_bytes": 2479065,
+      "archive_sha256": "6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9",
+      "executable_bytes": 6432768,
+      "executable_sha256": "54ca21be3de4c7cfa26914aa8b61bd76bf573ef3caac5f80d110558cdf241718"
+    }
+  ],
+  "license": "MIT",
+  "same_license_bytes": 1067,
+  "same_license_sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22",
+  "signature_verified": false,
+  "linux_version_actual_exit": 0,
+  "linux_version_stdout": "1.7.12\ninstalled by downloading from release page\nbuilt with go1.26.1 compiler for linux/amd64\n",
+  "command_actual_exits": {
+    "archive-inspection": 0,
+    "darwin-amd64-download": 0,
+    "darwin-arm64-download": 0,
+    "linux-amd64-download": 0,
+    "linux-version": 0,
+    "official-checksums": 0,
+    "release-list": 0,
+    "selected-release": 0,
+    "tag-reference": 0,
+    "windows-amd64-download": 0,
+    "metadata-package": 0
+  },
+  "other_platform_execution": false,
+  "raw_retention": "original-metadata-and-receipts.zip retains originalAPI/checksums/44member identities/notices/helper sources and original10 actual command stdout/stderr/attempt receipts/guards (73 members); metadata-package-process.zip retains actual packaging command evidence separately. Full report/map are lossless gzip of original TMP JSON. No full binary/archive copied to persistent storage.",
+  "no_source_index_main_hooks_locks_installer_shared_venv_changes": true,
+  "only_executable_operation": "Verified Linux -version in dedicatedTMP. No workflow, local-uses, installer, SDK, OCI or qualification execution.",
+  "future_implementation_notes": [
+    "Keep parent index selection for capture; sanitize child Git directory/worktree/index/config redirect variables before isolated tool invocation.",
+    "Do not claim missing/deleted local action metadata necessarily fatal until actual selected-version probes are authorized and run.",
+    "Independent plan review recommends no environment.lock.json reference-only modification. Standalone actionlint lock is shared authority; adding it still changes source/provenance lock inventory."
+  ],
+  "prepublication_guard": {
+    "observed_ns": 1792301273745720449,
+    "tmp_free": 449335296,
+    "persistent_free": 85950464,
+    "memory_available": 2061824000,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "task_tmp_allocated": 16015360,
+    "task_persistent_allocated": 0
+  }
+}

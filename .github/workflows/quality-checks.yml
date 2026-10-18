@@ -26,8 +26,12 @@ jobs:
           python-version: '3.11'
       - name: Install locked commit tools
         run: python scripts/setup/install_dev_tools.py --skip-hooks
+      - name: Prepare the existing workflow YAML dependency
+        run: .venv/bin/python -m pip install -r dependencies/workflow-tools.txt
+      - name: Check the complete staged workflow DSL offline
+        run: .venv/bin/python scripts/ci/lint_workflows.py --staged
       - name: Test commit automation boundaries
-        run: .venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message
+        run: .venv/bin/python -m unittest scripts.ci.test_format_tool scripts.ci.test_comment_style scripts.ci.test_install_dev_tools scripts.ci.test_style_gate scripts.ci.test_commit_message scripts.ci.test_lint_workflows
       - name: Obtain the trusted comparison commit
         shell: bash
         run: |
@@ -49,6 +53,7 @@ jobs:
           require-dependencies: 'false'
           artifacts: |
             build/quality/style-gate.json
+            build/quality/workflow-lint/
           tools: |
             python=python3
       - name: Retain the executed style report
@@ -58,6 +63,7 @@ jobs:
           name: required-commit-style
           path: |
             build/quality/style-gate.json
+            build/quality/workflow-lint/
             build/job-identities/commit-style/
           retention-days: 30
           include-hidden-files: true

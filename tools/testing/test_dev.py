@@ -50,6 +50,14 @@ class DeveloperCommandTests(unittest.TestCase):
             output = "14.2.0\n"
         return subprocess.CompletedProcess(command, 0, output, "")
 
+    def test_workflow_doctor_does_not_require_cmake_or_sdk(self):
+        with patch.object(dev, "execute", return_value=0) as execute, \
+                patch.object(dev, "workspace_identity") as identity:
+            self.assertEqual(dev.main(["doctor", "--target", "workflows"]), 0)
+        identity.assert_not_called()
+        self.assertEqual(execute.call_args.args[0][1:3],
+                         ["scripts/ci/lint_workflows.py", "--doctor"])
+
     def test_doctor_rejects_python_without_stdlib_toml(self):
         with patch.object(dev.sys, "version_info", (3, 10, 14)), \
                 patch.object(dev.subprocess, "run", side_effect=self.probe), \

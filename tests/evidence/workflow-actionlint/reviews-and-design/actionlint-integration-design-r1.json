@@ -1,0 +1,125 @@
+{
+  "kind": "read-only-actionlint-integration-design",
+  "created_utc": "2026-10-18T05:18:55.324229+00:00",
+  "analyst": "/root/style_control_chars",
+  "status": "proposal-only-no-implementation-authorization",
+  "activity": "Read installer/cache/locks/doctor/hooks/CI/tests, all11 workflow DSL documents and2 composite metadata files. No production/source/index/Main edits, installs, downloads, network, tests/builds or actionlint execution. Only this plan is written.",
+  "gap": {
+    "reported_trigger": "Root real HTTP422 dispatch at19cf: jobs.qualify.env.E uses runner.temp.",
+    "bad_workflow_sha256": "6402393134b489732549c67306c7b2e82825dac08236a4ac39b0730df2ca4a28",
+    "why_local_checks_missed": "YAML BaseLoader checks structure; bash -n checks run scripts after expression substitution. Neither evaluates GHA context availability at job.env. Shell fixtures directly supply E. Action-pin and required-results checks enforce different repository policies.",
+    "latest_fix_observed": "Current software-qualification.yml SHA0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c removes job E and derives it from RUNNER_TEMP in reproduce/collect shell. New targeted regression test_platform_ci.py SHA30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2. This analysis reran neither.",
+    "policy": "Keep targeted regression, pin/required-results/identity/events/permissions/publication/shell tests. Do not grow a hand-maintained full GA grammar from its small allowlist."
+  },
+  "recommendation": {
+    "route": "Reuse tools/dev/dependencies.py install_ccache pattern and tools/dev/cache.py.fetch for official rhysd/actionlint release assets. Add small actionlint-prepare/verify operation and one asset lock, not another installer framework, dependency graph, Go toolchain, Docker/remote lint Action or parser.",
+    "ecosystem_package": "A verified portable binary-wheel wrapper could reuse pip, but none is established by inspected local locks. Offline analysis cannot approve a guessed package/version/platform/hash. A wrapper downloading/building at lint time fails the requested offline boundary. Existing maintained binary preparation is the concrete repository-supported choice.",
+    "pin_status": "Exact upstream release and real supported-host asset hashes require approved metadata preparation before implementation. No latest URL, invented checksum, unverified package version or install-ready lock claim.",
+    "authority": "NEW dependencies/actionlint.lock.json owns version/assets. environment.lock.json references the workflow-tool lock without another independent version list. Installer/doctor/hook/CI share it.",
+    "host_only": "Keep actionlint out of firmware/SDK/runtime/qualified OCI tuples."
+  },
+  "platform_and_hashes": {
+    "hosts": "Required Linux x86_64 for current ubuntu-24.04 CI. Before claiming existing developer portability, review official macOS x86_64+arm64 and Windows x86_64 assets. Linux arm64 only when explicitly supported/verified; no implied Windows arm64/32-bit support. Unknown host fails, never skips or builds from source.",
+    "release_metadata": [
+      "exact upstream release/tag/provenance URL",
+      "license/notice inventory without unperformed signature claim"
+    ],
+    "asset_metadata": [
+      "normalized OS/arch",
+      "official filename/HTTPS URL/archive format",
+      "archive bytes+SHA256",
+      "executable member including Windows.exe",
+      "extracted executable SHA256 and notice identities",
+      "actual pinned -version expectation"
+    ],
+    "install": "Use existing bounded HTTPS content-addressed cache. Verify archive, safe regular members/extraction bounds, executable SHA before -version; preserve notices and receipt; publish atomically. Existing installs verified/idempotent; unknown/corrupt prefixes fail. Owned .venv/bin/actionlint or .venv/Scripts/actionlint.exe, no arbitrary PATH shadow.",
+    "offline": "Only explicit preparation fetches. Hook/doctor/lint only verify and execute installed fixed SHA, failing actionable if absent. No commit-time network or auto-download."
+  },
+  "exact_index_input": [
+    "Capture complete NUL index mode/blob/stage/path records and digest; reject unmerged entries. Read actionlint lock from staged blob, so a worktree-old pin cannot certify staged-new policy.",
+    "Materialize actual captured Git blobs: ALL staged .github/workflows/*.yml and *.yaml, ALL indexed action.yml/action.yaml metadata anywhere in the repository, plus staged .github/actionlint.yaml/yml if present. This covers current reusable/composite input/output definitions without a second manually maintained call graph.",
+    "Use standalone temp project outside checkout, preserve relative paths, reject unsafe/symlink/gitlink metadata. If actionlint requires Git root discovery, create only minimal empty temp Git metadata, never clone. Prevent project/config/local-action lookup from walking back to real checkout.",
+    "Invoke verified binary from temp root with explicit complete workflow argv. actionlint owns local reusable/action resolution. Missing/deleted staged metadata must fail, never read the good unstaged worktree copy. Workflow/composite scripts are not executed.",
+    "Record full index digest, selected path/mode/OID/content map, staged lock, binary hash, argv/raw/actual exit. Re-read full index after execution and reject changes. Zero workflows, unavailable blob, mismatched tool/config or invocation failure cannot pass.",
+    "Driver --staged must enforce this when called directly, independently of pre-commit stashing or TDD fallback. Hook pass_filenames:false/always_run:true; no subset selection. CI uses same full-index mode on clean checkout."
+  ],
+  "tool_execution": {
+    "argv": [
+      "<verified-owned-actionlint>",
+      "-shellcheck=",
+      "-pyflakes=",
+      "-no-color",
+      "<all staged workflow paths>"
+    ],
+    "scope": "Explicitly disable optional analyzer discovery so host shellcheck/pyflakes cannot change DSL validation. No blanket ignore/debt config. Existing Bash/analyzer tests remain separate.",
+    "config": "Only staged project config in isolated root; explicitly select it when present. Test ambient/worktree configuration cannot alter results. Current Ubuntu labels require no custom runner table.",
+    "receipt": "Maintained tools.dev.process.run with explicit timeout, original stdout/stderr and actual exit propagation. Missing tool is failure, not skip."
+  },
+  "integration": {
+    "installer": "install_dev_tools.py retains current2 pip packages and --skip-hooks/.venv/hook migration contracts, then calls shared binary preparation/verification. Do not pretend an external binary is pip metadata.",
+    "doctor": "Add narrow --target workflows using same verifier. Do not add actionlint to native/arm/candidate or installed SDK requirements.",
+    "hook": "One local nexus-workflow-syntax entry: python scripts/ci/lint_workflows.py --staged; language:python, pass_filenames:false, always_run:true, require_serial:true; before expensive gates.",
+    "CI": "Run same check after tool installation in existing quality-checks.yml commit-style. Preserve existing required graph/CI30, permissions/events/publication semantics. Existing setup-build already calls dev installer for Tool Contracts. Keep identity/upload adjacency and retain lint raw/receipt in that job.",
+    "suites": "Reuse existing unittest ownership: test_platform_ci workflow integration, test_build_delivery external preparation, test_install_dev_tools installer and test_dev doctor. No new framework."
+  },
+  "minimal_file_window": [
+    "NEW dependencies/actionlint.lock.json",
+    "dependencies/environment.lock.json: reference only",
+    "tools/dev/dependencies.py: shared prepare/verify",
+    "tools/testing/test_build_delivery.py: archive/cache/host/identity tests",
+    "scripts/setup/install_dev_tools.py and scripts/ci/test_install_dev_tools.py",
+    "NEW scripts/ci/lint_workflows.py: thin index snapshot and actual lint",
+    ".github/workflows/test_platform_ci.py: real pinned tool and staged closure tests",
+    "tools/dev/dev.py and tools/testing/test_dev.py: workflows doctor",
+    ".pre-commit-config.yaml: mandatory full-index hook",
+    ".github/workflows/quality-checks.yml: existing commit-style step/evidence",
+    "tools/dev/README.md: hosts/offline/install/doctor/index scope"
+  ],
+  "leave_unchanged": [
+    "development-tools.txt/workflow-tools.txt pip pins and cp311/cp312 wheel JSON/hash requirements",
+    "build-recipe.lock.json, generated Dockerfile, observed OCI and compiler IDs",
+    "actions.lock.json: no new remote Action",
+    "ci.yml/release.yml, check_required_jobs result/skip logic and protected policy/profile hashes",
+    "SDK packaging/runtime/toolchain tuples"
+  ],
+  "planned_real_validation": {
+    "not_run_here": true,
+    "RED": "After verified asset preparation, real pinned actionlint on retained exact bad workflow SHA64023931... with local metadata in isolated snapshot must exit nonzero and diagnose unavailable runner context at job.env.E. Capture actual raw/exit/input/tool identity. No dispatch/token/API/remote runner needed; not a mock, missing-tool failure or regex string ban.",
+    "GREEN": "Same complete module unchanged against published3-line fix SHA0c962200..., then actual full11-workflow staged closure must exit0/zero findings. Valid step-level runner.temp must still pass. Preserve bad bytes/RED evidence; do not claim planned RED as executed.",
+    "staged_counterexamples": [
+      "bad staged workflow + good unstaged worktree rejects",
+      "good staged workflow + bad unstaged worktree passes input lint and preserves both",
+      "bad staged reusable input/type/required-call metadata + good unstaged YAML rejects",
+      "bad staged local composite/action input metadata + good unstaged action.yml rejects",
+      "staged referenced metadata deletion cannot fall back to worktree",
+      "staged config/lock mismatch, unmerged index and index mutation reject",
+      "new/renamed/deleted workflows, yml+yaml, spaces, zero files, timeout/nonzero propagation"
+    ],
+    "installer_checks": "Tiny real local archive fixtures: safe extraction, cache hit/corruption, unknown host, binary mismatch, existing-prefix/idempotence and offline missing-asset failures. No network in tests required.",
+    "coverage": "Prove real actionlint resolves local reusable/composite metadata from temp staged root. If selected version lacks a composite-internals check, disclose limit rather than claim coverage or add a parallel GA grammar.",
+    "completion": "Run existing complete installer/dependency/doctor/workflow suites and ordinary full-index hooks; no skips/filters/debt/policy-hash changes."
+  },
+  "all_workflows_assessment": {
+    "workflows": 11,
+    "job_definitions_including_reusable_callers": 30,
+    "actionlint_installed": false,
+    "actual_full_lint_pass_claim": false,
+    "static": "All DSL parsed/read: finite matrices, ubuntu-latest/ubuntu-24.04 runners, literal local calls, declared inputs/step IDs. Newly observed3-line fix removes definite context blocker. No additional definite DSL blocker identified read-only; actual selected pinned lint over complete staged closure is still required.",
+    "valid_runner_use": "docs-build.yml uses runner.temp in step with.tools; location, not token text, caused failure.",
+    "limits": "Static workflow DSL only, not remote action availability/service execution, permission enforcement, arbitrary composite implementation validation, shell behavior, evidence identity or required CI policy."
+  },
+  "current_workflow_hashes": {
+    "build-matrix.yml": "2c6ade80e5e0c4986b89f02445d6a34421da6a34d297fc27dcd0e9349df63ddb",
+    "ci.yml": "d7e7f2309f3a16c709f0992d81dee28fa544e69c3b799fd998e4213f33143192",
+    "dependency-maintenance.yml": "7c6c6cde8ad1fa70eae1efd6819663cf5a1b91b131ec61ca36b7db3830360f82",
+    "docs-build.yml": "5e6d86b98f7ae866250753a46ad98a0a2b8bb805e8dc859303e97f4c2f92796d",
+    "docs-publish.yml": "02821fdc987ac59d85c29d66396f92da4981fe62b7c2494c2e49e1f86d052fcb",
+    "enterprise-tools.yml": "433949b9de2989bf2e398cac5db83262ea775dcd777e1e61db54d66f25a58a79",
+    "performance.yml": "26eddc2c2afd747addb52028746027119bc30abc0fa6726d87dc2c07829cd018",
+    "quality-checks.yml": "ff308167d1d29064fb19600be4319e09023e735b653ce7ff0b85b3d1dd97a800",
+    "release.yml": "92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2",
+    "security.yml": "313c6ed1e716409fc77af68cceff68925ec267912e3da02fc9d3088652f73f75",
+    "software-qualification.yml": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c"
+  },
+  "next_authorized_scope": "None beyond this analysis. Upstream asset selection/verification and implementation await Root approval; no tools prepared or production changes made."
+}

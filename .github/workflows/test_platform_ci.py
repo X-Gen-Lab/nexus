@@ -216,6 +216,35 @@ class WorkflowContracts(unittest.TestCase):
                         count += 1
         self.assertGreaterEqual(count, 10)
 
+    def test_workflow_dsl_hook_and_existing_quality_job_share_the_tool(self):
+        configuration = yaml.safe_load(
+            (ROOT / '.pre-commit-config.yaml').read_text())
+        hooks = {hook['id']: hook for repo in configuration['repos']
+                 for hook in repo['hooks']}
+        hook = hooks['nexus-workflow-lint']
+        self.assertEqual(hook['entry'],
+                         'python scripts/ci/lint_workflows.py --staged')
+        self.assertEqual(hook['additional_dependencies'],
+                         hooks['nexus-tdd-gate']['additional_dependencies'])
+        expected = []
+        for name in ('development-tools.txt', 'workflow-tools.txt'):
+            expected += [line.strip() for line in
+                         (ROOT / 'dependencies' / name).read_text().splitlines()
+                         if line.strip() and not line.startswith('#')]
+        self.assertEqual(hook['additional_dependencies'], expected)
+        self.assertTrue(hook['always_run'])
+        self.assertFalse(hook['pass_filenames'])
+        self.assertTrue(hook['require_serial'])
+        document = workflow('quality-checks.yml')
+        self.assertEqual(set(document['jobs']),
+                         {'commit-style', 'static-analysis'})
+        steps = document['jobs']['commit-style']['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertIn('-r dependencies/workflow-tools.txt', commands)
+        self.assertIn('scripts/ci/lint_workflows.py --staged', commands)
+        self.assertIn('scripts.ci.test_lint_workflows', commands)
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+
     def test_actual_workflows_and_shell_blocks_parse(self):
         count = 0
         for path in (ROOT / '.github/workflows').glob('*.yml'):
