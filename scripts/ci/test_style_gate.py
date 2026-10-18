@@ -30,6 +30,39 @@ int main(void) {
 """
 
 
+class TextHygieneTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.path = Path(directory.name) / "notes.txt"
+
+    def test_rejects_hidden_ascii_controls_with_lf_line_numbers(self):
+        controls = [value for value in range(1, 32)
+                    if value not in {9, 10, 13}] + [127]
+        for value in controls:
+            with self.subTest(codepoint=f"U+{value:04X}"):
+                self.path.write_bytes(b"First line\nBrief " + bytes([value])
+                                      + b" text\n")
+                self.assertEqual(gate.check_text(self.path, "notes.txt"), [
+                    f"notes.txt:2: ASCII control U+{value:04X}",
+                ])
+
+    def test_utf8_text_with_tabs_and_lf_passes(self):
+        self.path.write_bytes("中文\ttext\n第二行\n".encode("utf-8"))
+        self.assertEqual(gate.check_text(self.path, "notes.txt"), [])
+
+    def test_existing_nul_and_cr_diagnostics_are_preserved(self):
+        self.path.write_bytes(b"Text\0\n")
+        with self.assertRaisesRegex(
+            ValueError, "^Text file contains NUL bytes: notes[.]txt$",
+        ):
+            gate.check_text(self.path, "notes.txt")
+        self.path.write_bytes(b"Text\r\n")
+        self.assertEqual(gate.check_text(self.path, "notes.txt"), [
+            "notes.txt: use LF line endings",
+        ])
+
+
 class StyleGateTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
@@ -256,6 +289,21 @@ class StyleGateTests(unittest.TestCase):
         result = self.check("assembly.toml")
         self.assertTrue(any("LF line endings" in error
                             for error in result["errors"]))
+
+    def test_staged_ascii_controls_follow_maintained_text_selection(self):
+        maintained = ["notes.md", "notes.rst", "notes.toml", "notes.txt"]
+        ignored = ["capture.log", "capture.bin", "vendors/notes.txt"]
+        for name in maintained + ignored + ["untracked.txt"]:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"First line\nBrief \x08 text\n")
+        self.git("add", "--", *maintained, *ignored)
+        result, report = self.staged_check()
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(report["selected_files"], sorted(maintained + ignored))
+        self.assertEqual(report["errors"], [
+            f"{name}:2: ASCII control U+0008" for name in sorted(maintained)
+        ])
 
     def test_new_source_with_comment_violation_is_rejected(self):
         (self.root / "src/new.c").write_bytes(GOOD + b"// forbidden\n")

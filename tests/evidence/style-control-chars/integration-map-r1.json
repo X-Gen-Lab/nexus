@@ -1,0 +1,298 @@
+{
+  "kind": "reviewed-style-source-and-evidence-ready-for-later-normal-main-hook",
+  "source_count": 2,
+  "files": [
+    {
+      "path": "scripts/ci/style_gate.py",
+      "bytes": 16106,
+      "sha256": "fbff5470007f7218d0d3b7ed3f54e63bedfb595a6558a98a8fbe18fda00940a3",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/scripts/ci/style_gate.py",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/files/scripts/ci/style_gate.py",
+      "origin": "frozen reviewed production style source"
+    },
+    {
+      "path": "scripts/ci/test_style_gate.py",
+      "bytes": 23216,
+      "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/scripts/ci/test_style_gate.py",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/files/scripts/ci/test_style_gate.py",
+      "origin": "frozen reviewed production style source"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/after.json",
+      "bytes": 5236,
+      "sha256": "0e1bfbca25400d9d361d0a3656d82a1ca6f0039b6e09248e6d9bf45cb67103c5",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/after.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/after.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/before.json",
+      "bytes": 5114,
+      "sha256": "7ee59a873f8201155520978f627c681e72a8e21dcf66cabc914ab12d7d7c90d6",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/before.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/before.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/change.patch",
+      "bytes": 4024,
+      "sha256": "b4bcc4367c2b3c3a8e351245fcf0cc25e0edb1ecc61ddb0848fb63b9e2d9bf9a",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/change.patch",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/change.patch",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/receipt.json",
+      "bytes": 1143,
+      "sha256": "299095db59c9cc5e1ef6da20819704b51af6b663e675c7174efcc8c0d540bab8",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/receipt.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/receipt.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stderr.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stderr.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stderr.txt",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stdout.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stdout.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stdout.txt",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/diff-check.command.json",
+      "bytes": 1320,
+      "sha256": "4a881cf4bae87d8c84ff21e31a4e9daede8e7e3293ed4c28d3579e2f4f317fcb",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/diff-check.command.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.command.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/diff-check.log.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/diff-check.log.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.log",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/green-source.json",
+      "bytes": 284,
+      "sha256": "44c5decf33e956600fc3626070ee45c14f15aeec932a080394cc05ef9aa8b1d2",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/green-source.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green-source.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/receipt.json",
+      "bytes": 1145,
+      "sha256": "4017acec528fe551764eda265bdc80ef12db0202be5aeb10fbaf94c52d5497e9",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/receipt.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/receipt.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stderr.txt.raw",
+      "bytes": 5416,
+      "sha256": "ac46a76d89ca5fe6c073d206f1d37019426bbc8756774c0e1074ca6aedcafc6e",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stderr.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stderr.txt",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stdout.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stdout.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stdout.txt",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/green.command.json",
+      "bytes": 1317,
+      "sha256": "fa79855678ba2d137da8f72a9981cf6960a22fdfa11363aa38332980649d6ffd",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/green.command.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.command.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/green.log.raw",
+      "bytes": 5416,
+      "sha256": "ac46a76d89ca5fe6c073d206f1d37019426bbc8756774c0e1074ca6aedcafc6e",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/green.log.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.log",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red-source/scripts/ci/style_gate.py.raw",
+      "bytes": 15779,
+      "sha256": "39ee6a0bc0d435b905dd0ab35576ecdd3b78237ee7158669c5172585bf75d002",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red-source/scripts/ci/style_gate.py.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red-source/scripts/ci/style_gate.py",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red-source/scripts/ci/test_style_gate.py.raw",
+      "bytes": 23216,
+      "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red-source/scripts/ci/test_style_gate.py.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red-source/scripts/ci/test_style_gate.py",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red-source.json",
+      "bytes": 284,
+      "sha256": "9af926fe43fd3aa826be6c3f659ddda7b9be474dcb5904afe18879dd43c44ff0",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red-source.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red-source.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/receipt.json",
+      "bytes": 1141,
+      "sha256": "86d190585107df70739869dfafd5b51f4c8f2a289654029bf8fed85cd42cc47c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/receipt.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/receipt.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stderr.txt.raw",
+      "bytes": 34937,
+      "sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stderr.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stderr.txt",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stdout.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stdout.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stdout.txt",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red.command.json",
+      "bytes": 1311,
+      "sha256": "6891e5b4593d293ca8ef00093b76d47fd48f91a351b4628fa1299209f22f667f",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red.command.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.command.json",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/red.log.raw",
+      "bytes": 34937,
+      "sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/red.log.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.log",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/run_module.py.raw",
+      "bytes": 859,
+      "sha256": "860330d481e9c116d1b79d07018c2d360d373cb8325f3226dfada5ab008863c7",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/run_module.py.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/run_module.py",
+      "origin": "immutable real RED/GREEN evidence; historical source text raw only"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/manifest.json",
+      "bytes": 8578,
+      "sha256": "fbc94b8fe5be3b6ae018a81b26e99597790045bc02401f0732bf4feaae45e0fe",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/manifest.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/manifest.json",
+      "origin": "author manifest or independent review"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/independent-review-r1.json",
+      "bytes": 7663,
+      "sha256": "5ba5b093210e8cce08851c9d158d9a96cc06b25f996c742caf47f8e36a778c21",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/independent-review-r1.json",
+      "original": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/independent-review-r1.json",
+      "origin": "author manifest or independent review"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-full-preview.json",
+      "bytes": 306704,
+      "sha256": "f21caef665dfada93944a1f10a37856456ff0fa5a0cef9cf5390293a6cdef839",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-full-preview.json",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/proposed-style-preview-r1.json",
+      "origin": "read-only proposed-code full-tree preview, not installed main gate"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/command.txt.raw",
+      "bytes": 90,
+      "sha256": "343bc4325e1be9e20ca7040162b95ea77f0d4e60dec2c3febfaee95679a83e42",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/command.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/command.txt",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/command.command.json",
+      "bytes": 1373,
+      "sha256": "64a11f49a9805154cd4a40a32bc62ec647945053b8bde3a123e6d9d5048aa1cb",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/command.command.json",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/command.command.json",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/source-after.json",
+      "bytes": 353,
+      "sha256": "aa1df4bee6fbda02c80f1983da121c1b0b918d64f2c0d667a98c545b1d5dba15",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/source-after.json",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/source-after.json",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/summary.json",
+      "bytes": 519,
+      "sha256": "f345d41443c7b6ac4bd97a59477594839455d098cffae27f1693e47a77e25d5a",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/summary.json",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/summary.json",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/source-before.json",
+      "bytes": 353,
+      "sha256": "aa1df4bee6fbda02c80f1983da121c1b0b918d64f2c0d667a98c545b1d5dba15",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/source-before.json",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/source-before.json",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/stdout.txt.raw",
+      "bytes": 90,
+      "sha256": "343bc4325e1be9e20ca7040162b95ea77f0d4e60dec2c3febfaee95679a83e42",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/stdout.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/stdout.txt",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/receipt.json",
+      "bytes": 1182,
+      "sha256": "59dd7fd992fef0358eece9d1162e69e31dfac2eb6af1132d694dd1a2487a64e8",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/receipt.json",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/receipt.json",
+      "origin": "actual read-only preview process evidence"
+    },
+    {
+      "path": "tests/evidence/style-control-chars/root-preview-command/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/stderr.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/prepared-integration-r1/files/tests/evidence/style-control-chars/root-preview-command/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/stderr.txt.raw",
+      "original": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/stderr.txt",
+      "origin": "actual read-only preview process evidence"
+    }
+  ],
+  "file_count": 36,
+  "bytes": 509106,
+  "scope": "Not applied to main; no frozen debt rebaseline, same text scope/exclusions, no device ABI/runtime cost",
+  "review_sha256": "5ba5b093210e8cce08851c9d158d9a96cc06b25f996c742caf47f8e36a778c21"
+}

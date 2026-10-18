@@ -1,0 +1,27 @@
+"""Run the complete style unittest module with retained process receipts."""
+
+import os
+from pathlib import Path
+import sys
+
+ROOT = Path("/tmp/nexus-h743-fixed-hsi-s0-20261018")
+EVIDENCE = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+from tools.dev.process import run
+
+
+phase = sys.argv[1]
+if phase not in {"red", "green"}:
+    raise ValueError("Expected red or green")
+environment = dict(os.environ)
+environment["NEXUS_BUILD_JOBS"] = "1"
+environment["CTEST_PARALLEL_LEVEL"] = "1"
+result = run(
+    [sys.executable, "-m", "unittest", "-v", "scripts.ci.test_style_gate"],
+    cwd=ROOT, env=environment, log=EVIDENCE / (phase + ".log"),
+    timeout=300, stage="style-control-chars-" + phase,
+)
+print(result.stdout, end="")
+print(result.stderr, end="", file=sys.stderr)
+print("Process receipt:", result.receipt_path)
+sys.exit(result.returncode)

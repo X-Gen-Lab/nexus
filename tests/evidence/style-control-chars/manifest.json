@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "feature": "style-control-chars",
+  "source_root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "authoring_base": "fc93be77d64dcd160886cb3b4c9c23ccbb943b59",
+  "reviewed_main_base": "7e2dbe92a5328d23f00b2d07c49f45a763ae8bbb",
+  "base_source": {
+    "scripts/ci/style_gate.py": {
+      "bytes": 15779,
+      "sha256": "39ee6a0bc0d435b905dd0ab35576ecdd3b78237ee7158669c5172585bf75d002"
+    },
+    "scripts/ci/test_style_gate.py": {
+      "bytes": 20994,
+      "sha256": "b1b41b48d0e14a13d1425010a7e62727ea3eccc71d9b58617e07c6638992fdbc"
+    }
+  },
+  "final_source": {
+    "scripts/ci/style_gate.py": {
+      "bytes": 16106,
+      "sha256": "fbff5470007f7218d0d3b7ed3f54e63bedfb595a6558a98a8fbe18fda00940a3"
+    },
+    "scripts/ci/test_style_gate.py": {
+      "bytes": 23216,
+      "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6"
+    }
+  },
+  "red_production_unchanged": true,
+  "regressions_unchanged_red_to_green": true,
+  "runs": {
+    "red": {
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-m",
+        "unittest",
+        "-v",
+        "scripts.ci.test_style_gate"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "timeout_seconds": 300.0,
+      "exit_code": 1,
+      "tests": 33,
+      "duration_reported_seconds": 5.68,
+      "failures": 30,
+      "skips": 0,
+      "receipt_path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/receipt.json",
+      "stdout": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stderr.txt",
+        "bytes": 34937,
+        "sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9"
+      }
+    },
+    "green": {
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-m",
+        "unittest",
+        "-v",
+        "scripts.ci.test_style_gate"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "timeout_seconds": 300.0,
+      "exit_code": 0,
+      "tests": 33,
+      "duration_reported_seconds": 5.558,
+      "failures": 0,
+      "skips": 0,
+      "receipt_path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/receipt.json",
+      "stdout": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stderr.txt",
+        "bytes": 5416,
+        "sha256": "ac46a76d89ca5fe6c073d206f1d37019426bbc8756774c0e1074ca6aedcafc6e"
+      }
+    }
+  },
+  "red_reason": "The staged gate returned success for backspace in maintained text, and all 29 forbidden-ASCII subtests lacked the required ASCII diagnostic (some controls caused false splitlines-based trailing-whitespace errors). Existing NUL/CR and valid UTF-8/TAB/LF cases passed.",
+  "policy": "Reject U+0001..U+001F except TAB/LF; CR retains its existing LF line-ending error, and NUL retains its existing ValueError. Reject ASCII DEL U+007F because it is another nonprinting ASCII control that can silently corrupt authored prose. No Unicode category, bidi, suffix, exclusion or selection policy change.",
+  "selection_regression": "The real staged CLI rejects 0x08 in .md/.rst/.toml/.txt and preserves ignored .log/.bin, vendor exclusion, and untracked-file boundaries.",
+  "unchanged_protected_files": 28,
+  "protected_before": "before.json",
+  "protected_after": "after.json",
+  "index_sha256_unchanged": "80a6c715a2e02f1330e2b86baab92b620ce28e6a83e6a80709ccd44998e33d16",
+  "scope": "Complete scripts.ci.test_style_gate module only; no hardware, firmware, SDK or full-repository qualification claim. No source index staging, commit, push, debt rebaseline, or main tree write.",
+  "artifacts": {
+    "after.json": {
+      "bytes": 5236,
+      "sha256": "0e1bfbca25400d9d361d0a3656d82a1ca6f0039b6e09248e6d9bf45cb67103c5"
+    },
+    "before.json": {
+      "bytes": 5114,
+      "sha256": "7ee59a873f8201155520978f627c681e72a8e21dcf66cabc914ab12d7d7c90d6"
+    },
+    "change.patch": {
+      "bytes": 4024,
+      "sha256": "b4bcc4367c2b3c3a8e351245fcf0cc25e0edb1ecc61ddb0848fb63b9e2d9bf9a"
+    },
+    "diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/receipt.json": {
+      "bytes": 1143,
+      "sha256": "299095db59c9cc5e1ef6da20819704b51af6b663e675c7174efcc8c0d540bab8"
+    },
+    "diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diff-check.command.json": {
+      "bytes": 1320,
+      "sha256": "4a881cf4bae87d8c84ff21e31a4e9daede8e7e3293ed4c28d3579e2f4f317fcb"
+    },
+    "diff-check.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "files/scripts/ci/style_gate.py": {
+      "bytes": 16106,
+      "sha256": "fbff5470007f7218d0d3b7ed3f54e63bedfb595a6558a98a8fbe18fda00940a3"
+    },
+    "files/scripts/ci/test_style_gate.py": {
+      "bytes": 23216,
+      "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6"
+    },
+    "green-source.json": {
+      "bytes": 284,
+      "sha256": "44c5decf33e956600fc3626070ee45c14f15aeec932a080394cc05ef9aa8b1d2"
+    },
+    "green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/receipt.json": {
+      "bytes": 1145,
+      "sha256": "4017acec528fe551764eda265bdc80ef12db0202be5aeb10fbaf94c52d5497e9"
+    },
+    "green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stderr.txt": {
+      "bytes": 5416,
+      "sha256": "ac46a76d89ca5fe6c073d206f1d37019426bbc8756774c0e1074ca6aedcafc6e"
+    },
+    "green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "green.command.json": {
+      "bytes": 1317,
+      "sha256": "fa79855678ba2d137da8f72a9981cf6960a22fdfa11363aa38332980649d6ffd"
+    },
+    "green.log": {
+      "bytes": 5416,
+      "sha256": "ac46a76d89ca5fe6c073d206f1d37019426bbc8756774c0e1074ca6aedcafc6e"
+    },
+    "red-source/scripts/ci/style_gate.py": {
+      "bytes": 15779,
+      "sha256": "39ee6a0bc0d435b905dd0ab35576ecdd3b78237ee7158669c5172585bf75d002"
+    },
+    "red-source/scripts/ci/test_style_gate.py": {
+      "bytes": 23216,
+      "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6"
+    },
+    "red-source.json": {
+      "bytes": 284,
+      "sha256": "9af926fe43fd3aa826be6c3f659ddda7b9be474dcb5904afe18879dd43c44ff0"
+    },
+    "red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/receipt.json": {
+      "bytes": 1141,
+      "sha256": "86d190585107df70739869dfafd5b51f4c8f2a289654029bf8fed85cd42cc47c"
+    },
+    "red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stderr.txt": {
+      "bytes": 34937,
+      "sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9"
+    },
+    "red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "red.command.json": {
+      "bytes": 1311,
+      "sha256": "6891e5b4593d293ca8ef00093b76d47fd48f91a351b4628fa1299209f22f667f"
+    },
+    "red.log": {
+      "bytes": 34937,
+      "sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9"
+    },
+    "run_module.py": {
+      "bytes": 859,
+      "sha256": "860330d481e9c116d1b79d07018c2d360d373cb8325f3226dfada5ab008863c7"
+    }
+  }
+}
