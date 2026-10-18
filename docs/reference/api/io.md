@@ -9,7 +9,7 @@ source_language: en
 
 These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records.
 
-The Native model controls in `model.h` and `spi_dma_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider.
+The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h` support host tests. They do not establish MCU hardware support or device discovery. Optional interfaces describe selected contracts; their presence does not imply support on every provider.
 
 (adc_8h)=
 
@@ -155,6 +155,14 @@ The Native model controls in `model.h` and `spi_dma_model.h` support host tests.
 :project: nexus
 ```
 
+(lptim_8h)=
+
+## lptim.h
+
+```{doxygenfile} lptim.h
+:project: nexus
+```
+
 (mdio_8h)=
 
 ## mdio.h
@@ -192,6 +200,22 @@ The Native model controls in `model.h` and `spi_dma_model.h` support host tests.
 ## pwm_group.h
 
 ```{doxygenfile} pwm_group.h
+:project: nexus
+```
+
+(rtc_8h)=
+
+## rtc.h
+
+```{doxygenfile} rtc.h
+:project: nexus
+```
+
+(rtc__lptim__model_8h)=
+
+## rtc_lptim_model.h
+
+```{doxygenfile} rtc_lptim_model.h
 :project: nexus
 ```
 

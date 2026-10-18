@@ -2,11 +2,14 @@
 """Verify independent consumers of an existing publishable source SDK prefix."""
 import argparse
 import json
+import re
+import shlex
 import os
 from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tomllib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
@@ -31,7 +34,9 @@ SELECTED_CONSUMERS = (
     ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
     ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
     ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
-    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"))
+    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"),
+    ("native time pair", "native-time-pair", "native-time-pair"),
+    ("native time empty", "native-time-empty", "native-time-empty"))
 
 
 def clean_environment():
@@ -169,7 +174,8 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '__has_include("stm32u575_provider.h") || '
         '__has_include("stm32f103_provider.h") || '
         '__has_include("gd32f303_provider.h") || '
-        '__has_include("stm32g474_provider.h")\n'
+        '__has_include("stm32g474_provider.h") || '
+        '__has_include("rtc_lptim_provider.h")\n'
         '#error Provider implementation leaked into the product\n#endif\n'
         'static nx_uart_tx_request_t request;\n'
         'static uint8_t data[2] = {0x12U, 0x34U};\n')
@@ -257,7 +263,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32g474_pwm_shared.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
         '__has_include("gd32f470_eth_frames.h") || '
-        '__has_include("stm32g474_provider.h")\n'
+        '__has_include("stm32g474_provider.h") || '
+        '__has_include("rtc_lptim_provider.h")\n'
         '#error Private provider leaked into product source\n#endif\n'
         '_Static_assert(1, "Public source include isolation");\n')
     command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
@@ -265,9 +272,116 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
                f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
                "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
                f"-DNEXUS_ASSEMBLY_FILE={assembly}",
-               f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}",
                "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
+    authored = tomllib.loads(assembly.read_text())
+    if authored["backend"] != "native":
+        command.append(f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}")
     return source, build, command
+
+
+def check_native_time_image(sdk, source, build, config, commands, run_checked):
+    """Observe this Linux host fixture, not MCU RAM or a general ELF loader.
+
+    Canonical C executes real table methods and checks the entire face/ops
+    spans against live /proc/self/maps. nm records only selected retained
+    software objects. Neither symbol type nor ELF section flags prove runtime
+    read-only mappings, and this observation never claims total RAM or HIL.
+    """
+    resolved = json.loads((config / "resolved.json").read_text())
+    if (resolved.get("soc_family") != "native" or
+            resolved.get("backend") != "native" or
+            resolved.get("cpu", {}).get("arch") != "native"):
+        raise ValueError("Native observation requires the actual Native domain")
+    verification = sdk / "cmake/package/verification/io_evolution"
+    main = file_identity(source / "main.c")
+    matches = []
+    for profile in ("pair", "empty"):
+        canonical = verification / "consumers" / ("native-time-" + profile + ".c")
+        if canonical.is_file() and file_identity(canonical)["sha256"] == main["sha256"]:
+            matches.append(profile)
+    if len(matches) != 1:
+        raise ValueError("Native consumer differs from the installed canonical C scenario")
+    profile = matches[0]
+    assembly = verification / ("native-time-" + profile + ".toml")
+    authored = tomllib.loads(assembly.read_text())
+    expected = {(kind, name): item for kind in ("rtc", "lptim")
+                for name, item in authored.get(kind, {}).items()}
+    actual = resolved.get("controllers", [])
+    if (not isinstance(actual, list) or len(actual) != len(expected) or
+            {(item.get("kind"), item.get("id")) for item in actual} != set(expected)):
+        raise ValueError("Native selected controller identities differ from the canonical assembly")
+    for item in actual:
+        want = expected[(item["kind"], item["id"])]
+        if item.get("mode") != want["mode"] or (
+                item["kind"] == "lptim" and item.get("tick_hz") != want["tick_hz"]):
+            raise ValueError("Native selected mode/rate differs from the canonical assembly")
+    for entry in commands:
+        file = Path(entry["file"]).resolve()
+        if file not in {source / "main.c", source / "private_headers.c", config / "bindings.c"}:
+            continue
+        argv = entry.get("arguments") or shlex.split(entry["command"])
+        if argv.count("-c") != 1:
+            raise ValueError("Native compile row does not identify one actual source")
+        selected = Path(argv[argv.index("-c") + 1])
+        if not selected.is_absolute():
+            selected = Path(entry["directory"]) / selected
+        if selected.resolve() != file:
+            raise ValueError("Native compile row source and -c argument disagree")
+        if file.parent == source and any(value in " ".join(argv)
+                for value in ("/io/native", "/io/private")):
+            raise ValueError("Private Native state leaked into the public consumer")
+    if sum(Path(entry["file"]).resolve() == config / "bindings.c" for entry in commands) != 1:
+        raise ValueError("Native generated bindings have no unique compile row")
+    image = build / "bin/installed_selected"
+    with image.open("rb") as stream:
+        header = stream.read(20)
+    if len(header) != 20 or header[:6] != b"\x7fELF\x02\x01" or header[18:20] != b"\x3e\x00":
+        raise ValueError("Native observation supports only actual little-endian x86_64 ELF64")
+    inputs = {
+        "elf": image, "resolved": config / "resolved.json",
+        "bindings": config / "bindings.c", "compile_commands": build / "compile_commands.json",
+        "canonical_source": verification / "consumers" / ("native-time-" + profile + ".c"),
+        "assembly": assembly, "sdk_manifest": sdk / ".nexus-source-sdk.json",
+        "public_source": source / "main.c", "private_probe": source / "private_headers.c",
+    }
+    before = {name: file_identity(path) for name, path in inputs.items()}
+    runtime = run_checked([str(image)])
+    if runtime.returncode:
+        raise ValueError("Native canonical runtime failed")
+    observed = run_checked(["nm", "-S", "--defined-only", "--format=posix", str(image)])
+    if observed.returncode or len(observed.stdout) > 4 * 1024 * 1024:
+        raise ValueError("Native symbol observation failed or exceeded its bound")
+    symbols = {}
+    for line in observed.stdout.splitlines():
+        fields = line.split()
+        if not fields:
+            continue
+        name = fields[0]
+        if not (name.startswith("s_nx_port_") or name in {
+                "nx_native_rtc_ops", "nx_native_lptim_ops",
+                "nx_native_time_clock_read", "s_nx_native_time_clock"}):
+            continue
+        if (len(fields) != 4 or name in symbols or
+                not re.fullmatch(r"[0-9a-fA-F]+", fields[2]) or
+                not re.fullmatch(r"[0-9a-fA-F]+", fields[3])):
+            raise ValueError("Native selected symbol identity is ambiguous")
+        symbols[name] = {"type": fields[1], "address": int(fields[2], 16),
+                         "size": int(fields[3], 16)}
+    states = {"s_nx_port_" + name.replace("-", "_") for _, name in expected}
+    required = set(states)
+    if expected:
+        required.update(("nx_native_rtc_ops", "nx_native_lptim_ops",
+                         "nx_native_time_clock_read", "s_nx_native_time_clock"))
+    if set(symbols) != required or any(item["size"] <= 0 for item in symbols.values()):
+        raise ValueError("Native selected provider retention differs from the resolved selection")
+    if before != {name: file_identity(path) for name, path in inputs.items()}:
+        raise ValueError("Native observation inputs changed during execution")
+    return {"kind": "native-time-host-observation", "status": "passed",
+            "physical_status": "not_executed", **before,
+            "selected_state_count": len(states),
+            "selected_state_bytes": sum(symbols[name]["size"] for name in states),
+            "symbols": symbols,
+            "qualification": "This Linux x86_64 canonical runtime and selected symbol subset only; not total RAM, MCU or hardware qualification."}
 
 
 def check_selected_image(sdk, source, build, run_checked):
@@ -284,6 +398,10 @@ def check_selected_image(sdk, source, build, run_checked):
             any(value in entry["command"] for entry in products for value in
                 ("/vendors/", "/soc/", "-DSTM32", "-DGD32"))):
         raise ValueError("Selected consumer private inputs leaked into product")
+    config = Path((build / "resolved-config.txt").read_text())
+    resolved = json.loads((config / "resolved.json").read_text())
+    if resolved.get("backend") == "native":
+        return check_native_time_image(sdk, source, build, config, commands, run_checked)
     artifacts = {suffix: file_identity(build / "bin" /
                                       ("installed_selected." + suffix))
                  for suffix in ("elf", "bin", "map")}

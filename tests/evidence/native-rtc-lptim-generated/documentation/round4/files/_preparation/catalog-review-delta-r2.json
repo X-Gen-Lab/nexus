@@ -1,0 +1,390 @@
+{
+  "kind": "fresh_r2_changed_catalogs_preserving_all_old_reuse_values",
+  "reviewed": false,
+  "observed_ns": 1792291791717255530,
+  "catalogs": [
+    {
+      "path": "docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po",
+      "before_sha256": "65e020eab7da723fef33e255872e6b8a7ca545583bab09de356aa599dca29379",
+      "after_sha256": "e0addec00e1fb0346468df3d36aed2c761b61c4427aa80713e22ddcdf27395f0",
+      "source_sha256": "47d5d3f9ddcc6184ab7b3ea301f5a733812361b4268b690b02a087fe97daa607",
+      "pot_sha256": "04073a306d2104eaeecdf5b50b5594fb0ddebaf412fed342cda3b6bf4b18ac53",
+      "required": 46,
+      "reused_values": 43,
+      "reused_value_digest": "2beee4c26822ed7eeb777ce6797c7c7ea5d4456008f4945f6aa3087b7317da11",
+      "added": [
+        {
+          "msgid": "Construction is an internal integration boundary. Generated Platform preparation constructs fresh owner storage once, copies the selected Core clock face without invoking its time reader, and opens admission. Later starts of the constructed owner use explicit private reopen. External products use public and generated headers, not private provider constructors. The RTC initially stays unset until an explicit public set.",
+          "msgstr": "Construction is an internal integration boundary. Generated Platform preparation constructs fresh owner storage once, copies the selected Core clock face without invoking its time reader, and opens admission. Later starts of the constructed owner use explicit private reopen. External products use public and generated headers, not private provider constructors. The RTC initially stays unset until an explicit public set."
+        },
+        {
+          "msgid": "The Native behavior and explicit private reopen described here build on separately recorded manual evidence. The phase3 manifest does not record a rerun of those manual programs.",
+          "msgstr": "The Native behavior and explicit private reopen described here build on separately recorded manual evidence. The phase3 manifest does not record a rerun of those manual programs."
+        },
+        {
+          "msgid": "Phase3 development evidence binds the frozen dirty-source tuple identified by source-and-execution manifest SHA-256 `85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f`. It records configuration tests, generated pair/empty programs and focused installed development SDK consumers. It does not inherit main-branch qualification or establish a clean publishable SDK, complete SDK matrix, repeatability, whole-repository CI or physical results.",
+          "msgstr": "Phase3 development evidence binds the frozen dirty-source tuple identified by source-and-execution manifest SHA-256 `85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f`. It records configuration tests, generated pair/empty programs and focused installed development SDK consumers. It does not inherit main-branch qualification or establish a clean publishable SDK, complete SDK matrix, repeatability, whole-repository CI or physical results."
+        }
+      ],
+      "removed": [
+        "Construction is an internal integration boundary. Generated Platform preparation constructs fresh owner storage once, copies the selected Core clock face without reading it, and opens admission. Later starts of the constructed owner use explicit private reopen. External products use public and generated headers, not private provider constructors. The RTC initially stays unset until an explicit public set.",
+        "Development evidence binds the frozen dirty-source IO36 phase3 tuple, identified by source-and-execution manifest SHA-256 `85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f`. It includes manual Native behavior/reopen, configuration tests, generated pair/empty programs and focused installed development SDK consumers. It does not inherit main-branch qualification or establish a clean publishable SDK, complete SDK matrix, repeatability, whole-repository CI or physical results."
+      ],
+      "reviewed": "false",
+      "before_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po",
+      "before_sha256": "b34749871e95069ddf29d38b57fdd00a260fc10b072d6938723425bbd1f3c68d",
+      "after_sha256": "4b315f34e621dc76710ac3879192102c48f640c3e40adfac754b0c8fc2c9a4c3",
+      "source_sha256": "47d5d3f9ddcc6184ab7b3ea301f5a733812361b4268b690b02a087fe97daa607",
+      "pot_sha256": "04073a306d2104eaeecdf5b50b5594fb0ddebaf412fed342cda3b6bf4b18ac53",
+      "required": 46,
+      "reused_values": 43,
+      "reused_value_digest": "54ebd10c2cd3d10312165721582bc863ca1ecb232a2924124a1b6aa8daba0db2",
+      "added": [
+        {
+          "msgid": "Construction is an internal integration boundary. Generated Platform preparation constructs fresh owner storage once, copies the selected Core clock face without invoking its time reader, and opens admission. Later starts of the constructed owner use explicit private reopen. External products use public and generated headers, not private provider constructors. The RTC initially stays unset until an explicit public set.",
+          "msgstr": "构造属于内部接入边界。生成的 Platform 准备流程只对全新 owner 存储构造一次，复制所选 Core 时钟接口面而不调用其时间读取函数，并开放准入。已构造 owner 后续启动使用显式私有重新开放。外部产品使用公共头文件和生成头文件，不使用私有 provider 构造函数。RTC 初始保持未设置，直到显式调用公共 set。"
+        },
+        {
+          "msgid": "The Native behavior and explicit private reopen described here build on separately recorded manual evidence. The phase3 manifest does not record a rerun of those manual programs.",
+          "msgstr": "本文描述的 Native 行为与显式私有重新开放以另行记录的手工验证证据为基础。phase3 manifest 不记录这些手工程序的重新执行。"
+        },
+        {
+          "msgid": "Phase3 development evidence binds the frozen dirty-source tuple identified by source-and-execution manifest SHA-256 `85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f`. It records configuration tests, generated pair/empty programs and focused installed development SDK consumers. It does not inherit main-branch qualification or establish a clean publishable SDK, complete SDK matrix, repeatability, whole-repository CI or physical results.",
+          "msgstr": "phase3 开发证据绑定已冻结的含未提交修改源码元组，其 source-and-execution manifest SHA-256 为 `85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f`。它记录配置测试、生成的 pair／empty 程序和聚焦的已安装开发 SDK consumer。它不继承 main 分支验证资格，也不建立干净的可发布 SDK、完整 SDK 矩阵、重复复现、全仓库 CI 或物理结果。"
+        }
+      ],
+      "removed": [
+        "Construction is an internal integration boundary. Generated Platform preparation constructs fresh owner storage once, copies the selected Core clock face without reading it, and opens admission. Later starts of the constructed owner use explicit private reopen. External products use public and generated headers, not private provider constructors. The RTC initially stays unset until an explicit public set.",
+        "Development evidence binds the frozen dirty-source IO36 phase3 tuple, identified by source-and-execution manifest SHA-256 `85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f`. It includes manual Native behavior/reopen, configuration tests, generated pair/empty programs and focused installed development SDK consumers. It does not inherit main-branch qualification or establish a clean publishable SDK, complete SDK matrix, repeatability, whole-repository CI or physical results."
+      ],
+      "reviewed": "false",
+      "before_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256": "b5ac8a29dcde2f6b1ea6aae71108a93a163194bc4b7873875fe90974a633e46e",
+      "after_sha256": "5a425b8a6fd22c38f57967a915b5f91417846357cc6dbec7d4a37e62b77d9993",
+      "source_sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+      "pot_sha256": "f04dbc93e537727ff09cbca6cda42576d0b771b021cc59f23f97740908747d0f",
+      "required": 481,
+      "reused_values": 446,
+      "reused_value_digest": "994ddadeb034606f4e61423ac679da3bc3c3407831605bd1b8ce17eb3c3406fc",
+      "added": [
+        {
+          "msgid": "`native (MODEL; physical=false)` 行只投影当前 resolver 实际选择并生成的 Native 软件模型，不声明物理外设数量、引脚、IRQ、Board 路线或实板能力；对应路线与 Board 列因此为空。未选择的主机模型库存不进入本表。",
+          "msgstr": "Rows marked `native (MODEL; physical=false)` project only Native software models actually selected and generated by the current resolver. They establish no physical peripheral counts, pins, IRQs, Board routes or board capability; their route and Board columns are therefore empty. Unselected host-model inventory is omitted."
+        },
+        {
+          "msgid": "native (MODEL; physical=false)",
+          "msgstr": "native (MODEL; physical=false)"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`"
+        },
+        {
+          "msgid": "`io/native/adc.c`",
+          "msgstr": "`io/native/adc.c`"
+        },
+        {
+          "msgid": "`io/native/exti.c`",
+          "msgstr": "`io/native/exti.c`"
+        },
+        {
+          "msgid": "FLASH0",
+          "msgstr": "FLASH0"
+        },
+        {
+          "msgid": "poll-byte",
+          "msgstr": "poll-byte"
+        },
+        {
+          "msgid": "`io/native/flash.c`",
+          "msgstr": "`io/native/flash.c`"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-gpio.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-gpio.toml`"
+        },
+        {
+          "msgid": "`io/native/gpio.c`",
+          "msgstr": "`io/native/gpio.c`"
+        },
+        {
+          "msgid": "`io/native/i2c.c`",
+          "msgstr": "`io/native/i2c.c`"
+        },
+        {
+          "msgid": "`io/native/watchdog.c`",
+          "msgstr": "`io/native/watchdog.c`"
+        },
+        {
+          "msgid": "LPTIM0",
+          "msgstr": "LPTIM0"
+        },
+        {
+          "msgid": "lptim",
+          "msgstr": "lptim"
+        },
+        {
+          "msgid": "counter16-oneshot",
+          "msgstr": "counter16-oneshot"
+        },
+        {
+          "msgid": "`cmake/package/verification/io_evolution/native-time-pair.toml`",
+          "msgstr": "`cmake/package/verification/io_evolution/native-time-pair.toml`"
+        },
+        {
+          "msgid": "`io/native/rtc_lptim.c`",
+          "msgstr": "`io/native/rtc_lptim.c`"
+        },
+        {
+          "msgid": "LPTIM1",
+          "msgstr": "LPTIM1"
+        },
+        {
+          "msgid": "PWM0",
+          "msgstr": "PWM0"
+        },
+        {
+          "msgid": "`io/native/timer.c`",
+          "msgstr": "`io/native/timer.c`"
+        },
+        {
+          "msgid": "RTC0",
+          "msgstr": "RTC0"
+        },
+        {
+          "msgid": "rtc",
+          "msgstr": "rtc"
+        },
+        {
+          "msgid": "calendar-alarm",
+          "msgstr": "calendar-alarm"
+        },
+        {
+          "msgid": "RTC1",
+          "msgstr": "RTC1"
+        },
+        {
+          "msgid": "async-model",
+          "msgstr": "async-model"
+        },
+        {
+          "msgid": "`tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml`",
+          "msgstr": "`tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml`"
+        },
+        {
+          "msgid": "`io/src/spi_dma_sequence.c`",
+          "msgstr": "`io/src/spi_dma_sequence.c`"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-spi.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-spi.toml`"
+        },
+        {
+          "msgid": "`io/native/spi.c`",
+          "msgstr": "`io/native/spi.c`"
+        },
+        {
+          "msgid": "UART0",
+          "msgstr": "UART0"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-uart.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-uart.toml`"
+        },
+        {
+          "msgid": "`io/native/uart.c`",
+          "msgstr": "`io/native/uart.c`"
+        },
+        {
+          "msgid": "`tests/contracts/io_evolution_assembly/native-uart9n1.toml`",
+          "msgstr": "`tests/contracts/io_evolution_assembly/native-uart9n1.toml`"
+        },
+        {
+          "msgid": "`io/native/uart_word.c`",
+          "msgstr": "`io/native/uart_word.c`"
+        },
+        {
+          "msgid": "UART1",
+          "msgstr": "UART1"
+        }
+      ],
+      "removed": [],
+      "reviewed": "false",
+      "before_source": "exact Git blob at 3b2199861e5f01e2ba7c831cb54905b30b703858"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256": "0a4b9f6f296394d15b7173ca7db586087d6e1e2156e5f2a875c1707ae5ecba36",
+      "after_sha256": "faf0278225ef4c338de189dfc541eca2445a1068aac7c0c9d581d77e7d8579ee",
+      "source_sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+      "pot_sha256": "f04dbc93e537727ff09cbca6cda42576d0b771b021cc59f23f97740908747d0f",
+      "required": 481,
+      "reused_values": 446,
+      "reused_value_digest": "3d3616611f21b429aa67e5caea3c1883c4f5b8093b0b607959056e2e9741e37e",
+      "added": [
+        {
+          "msgid": "`native (MODEL; physical=false)` 行只投影当前 resolver 实际选择并生成的 Native 软件模型，不声明物理外设数量、引脚、IRQ、Board 路线或实板能力；对应路线与 Board 列因此为空。未选择的主机模型库存不进入本表。",
+          "msgstr": "`native (MODEL; physical=false)` 行只投影当前 resolver 实际选择并生成的 Native 软件模型，不声明物理外设数量、引脚、IRQ、Board 路线或实板能力；对应路线与 Board 列因此为空。未选择的主机模型库存不进入本表。"
+        },
+        {
+          "msgid": "native (MODEL; physical=false)",
+          "msgstr": "native (MODEL; physical=false)"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`"
+        },
+        {
+          "msgid": "`io/native/adc.c`",
+          "msgstr": "`io/native/adc.c`"
+        },
+        {
+          "msgid": "`io/native/exti.c`",
+          "msgstr": "`io/native/exti.c`"
+        },
+        {
+          "msgid": "FLASH0",
+          "msgstr": "FLASH0"
+        },
+        {
+          "msgid": "poll-byte",
+          "msgstr": "poll-byte"
+        },
+        {
+          "msgid": "`io/native/flash.c`",
+          "msgstr": "`io/native/flash.c`"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-gpio.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-gpio.toml`"
+        },
+        {
+          "msgid": "`io/native/gpio.c`",
+          "msgstr": "`io/native/gpio.c`"
+        },
+        {
+          "msgid": "`io/native/i2c.c`",
+          "msgstr": "`io/native/i2c.c`"
+        },
+        {
+          "msgid": "`io/native/watchdog.c`",
+          "msgstr": "`io/native/watchdog.c`"
+        },
+        {
+          "msgid": "LPTIM0",
+          "msgstr": "LPTIM0"
+        },
+        {
+          "msgid": "lptim",
+          "msgstr": "lptim"
+        },
+        {
+          "msgid": "counter16-oneshot",
+          "msgstr": "counter16-oneshot"
+        },
+        {
+          "msgid": "`cmake/package/verification/io_evolution/native-time-pair.toml`",
+          "msgstr": "`cmake/package/verification/io_evolution/native-time-pair.toml`"
+        },
+        {
+          "msgid": "`io/native/rtc_lptim.c`",
+          "msgstr": "`io/native/rtc_lptim.c`"
+        },
+        {
+          "msgid": "LPTIM1",
+          "msgstr": "LPTIM1"
+        },
+        {
+          "msgid": "PWM0",
+          "msgstr": "PWM0"
+        },
+        {
+          "msgid": "`io/native/timer.c`",
+          "msgstr": "`io/native/timer.c`"
+        },
+        {
+          "msgid": "RTC0",
+          "msgstr": "RTC0"
+        },
+        {
+          "msgid": "rtc",
+          "msgstr": "rtc"
+        },
+        {
+          "msgid": "calendar-alarm",
+          "msgstr": "calendar-alarm"
+        },
+        {
+          "msgid": "RTC1",
+          "msgstr": "RTC1"
+        },
+        {
+          "msgid": "async-model",
+          "msgstr": "async-model"
+        },
+        {
+          "msgid": "`tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml`",
+          "msgstr": "`tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml`"
+        },
+        {
+          "msgid": "`io/src/spi_dma_sequence.c`",
+          "msgstr": "`io/src/spi_dma_sequence.c`"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-spi.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-spi.toml`"
+        },
+        {
+          "msgid": "`io/native/spi.c`",
+          "msgstr": "`io/native/spi.c`"
+        },
+        {
+          "msgid": "UART0",
+          "msgstr": "UART0"
+        },
+        {
+          "msgid": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-uart.toml`",
+          "msgstr": "`tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-uart.toml`"
+        },
+        {
+          "msgid": "`io/native/uart.c`",
+          "msgstr": "`io/native/uart.c`"
+        },
+        {
+          "msgid": "`tests/contracts/io_evolution_assembly/native-uart9n1.toml`",
+          "msgstr": "`tests/contracts/io_evolution_assembly/native-uart9n1.toml`"
+        },
+        {
+          "msgid": "`io/native/uart_word.c`",
+          "msgstr": "`io/native/uart_word.c`"
+        },
+        {
+          "msgid": "UART1",
+          "msgstr": "UART1"
+        }
+      ],
+      "removed": [],
+      "reviewed": "false",
+      "before_source": "exact Git blob at 3b2199861e5f01e2ba7c831cb54905b30b703858"
+    }
+  ],
+  "gallery_english_correction": {
+    "path": "docs/locale/en/LC_MESSAGES/assets/diagrams/README.po",
+    "before_sha256": "04936b6daed66685e767edebb1379366aef442064d941469a511a1adcbb21f89",
+    "after_sha256": "d278dd24e7006af959ac30833a3e231f3d863b6ed3fe5b1dce17faab10bc5c52",
+    "changes": [
+      {
+        "msgid": "本图册保留15类必需视图、两张补充图与本轮 I/O 架构视图 FIG-16， 另加入 IO-24 的 FIG-17/18 目标图源和 IO-36 的 FIG-21 Native 装配／生命周期图。主图登记见 {download}`图清单 <diagram-index.csv>`，维护规则见 [图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份， 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。",
+        "before": "This gallery retains 15 required views, two supplemental views and the IO-16 architecture view, and adds the IO-24 FIG-17/18 target diagrams and IO-36 FIG-21 Native assembly/lifecycle diagram. The {download}`diagram inventory <diagram-index.csv>` lists primary diagrams; the [diagram standard](../../design/documentation-standards.md) governs maintenance. Current/reference/target identities are explicit. Source files, successful rendering and software flows do not establish hardware or external publication results.",
+        "msgstr": "This gallery retains 15 required views, two supplemental views and the FIG-16 I/O architecture view, and adds the IO-24 FIG-17/18 target diagrams and IO-36 FIG-21 Native assembly/lifecycle diagram. The {download}`diagram inventory <diagram-index.csv>` lists primary diagrams; the [diagram standard](../../design/documentation-standards.md) governs maintenance. Current/reference/target identities are explicit. Source files, successful rendering and software flows do not establish hardware or external publication results."
+      }
+    ],
+    "other_values_unchanged": 122
+  }
+}

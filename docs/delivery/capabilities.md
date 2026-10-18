@@ -14,6 +14,10 @@
   中已初始化的导出定义；注释、字符串、声明和相似前缀不算定义。这是有限源码
   一致性证据，不替代编译、执行或物理测量。空白列明确没有该类证据。
 
+`native (MODEL; physical=false)` 行只投影当前 resolver 实际选择并生成的 Native
+软件模型，不声明物理外设数量、引脚、IRQ、Board 路线或实板能力；对应路线与
+Board 列因此为空。未选择的主机模型库存不进入本表。
+
 表格不从旧候选继承新 HEAD 的软件资格，也不推断物理结果。三板实物未连接，HIL
 保持 `not_executed`。精确模式限制及所有权合同见[支持范围](support.md)。
 
@@ -216,4 +220,23 @@ python tools/maintenance/capabilities.py --write
 | stm32u575 | USART1 | uart | irq-fifo-bytes | `usart1-pa9-pa10` | `stm32u575-nucleo-zi-q` | `cmake/package/verification/io_evolution/u575-uart-fifo.toml` | `soc/stm32u575/drivers/uart_fifo.c` |
 | stm32u575 | USART1 | uart | irq-fifo-rtscts-bytes | `usart1-pa9-pa10-pa11-pa12-rtscts` | `stm32u575zi-rtscts-reference` | `cmake/package/verification/io_evolution/u575-uart-rtscts.toml` | `soc/stm32u575/drivers/uart_rtscts.c` |
 | stm32u575 | USART2 | uart | irq-bytes | `usart2-pa2-pa3` | `stm32u575-nucleo-zi-q` | `tests/contracts/u575_assembly/mainstream-freertos.toml`, `tests/contracts/u575_assembly/mainstream.toml` | `soc/stm32u575/drivers/uart.c` |
+| native (MODEL; physical=false) | ADC0 | adc | low-rate-scan | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/adc.c` |
+| native (MODEL; physical=false) | EXTI6 | exti | edge-event | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/exti.c` |
+| native (MODEL; physical=false) | FLASH0 | flash | poll-byte | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/flash.c` |
+| native (MODEL; physical=false) | GPIOA | gpio | output | — | — | `tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-gpio.toml` | `io/native/gpio.c` |
+| native (MODEL; physical=false) | I2C0 | i2c | poll-messages | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/i2c.c` |
+| native (MODEL; physical=false) | I2C1 | i2c | poll-messages | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/i2c.c` |
+| native (MODEL; physical=false) | IWDG | watchdog | independent | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/watchdog.c` |
+| native (MODEL; physical=false) | LPTIM0 | lptim | counter16-oneshot | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `io/native/rtc_lptim.c` |
+| native (MODEL; physical=false) | LPTIM1 | lptim | counter16-oneshot | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `io/native/rtc_lptim.c` |
+| native (MODEL; physical=false) | PWM0 | pwm | fixed-pwm | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/timer.c` |
+| native (MODEL; physical=false) | RTC0 | rtc | calendar-alarm | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `io/native/rtc_lptim.c` |
+| native (MODEL; physical=false) | RTC1 | rtc | calendar-alarm | — | — | `cmake/package/verification/io_evolution/native-time-pair.toml` | `io/native/rtc_lptim.c` |
+| native (MODEL; physical=false) | SPI0 | spi | async-model | — | — | `tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml` | `io/src/spi_dma_sequence.c` |
+| native (MODEL; physical=false) | SPI0 | spi | short-poll | — | — | `tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-spi.toml` | `io/native/spi.c` |
+| native (MODEL; physical=false) | SPI1 | spi | async-model | — | — | `tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml` | `io/src/spi_dma_sequence.c` |
+| native (MODEL; physical=false) | SPI1 | spi | short-poll | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/spi.c` |
+| native (MODEL; physical=false) | UART0 | uart | irq-byte-event | — | — | `tests/contracts/native_assembly/multi.toml`, `tools/configure/assemblies/native-uart.toml` | `io/native/uart.c` |
+| native (MODEL; physical=false) | UART0 | uart | irq-words | — | — | `tests/contracts/io_evolution_assembly/native-uart9n1.toml` | `io/native/uart_word.c` |
+| native (MODEL; physical=false) | UART1 | uart | irq-byte-event | — | — | `tests/contracts/native_assembly/multi.toml` | `io/native/uart.c` |
 <!-- nexus-capabilities:end -->

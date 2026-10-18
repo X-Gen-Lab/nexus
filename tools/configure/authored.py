@@ -2,6 +2,8 @@
 import tomllib
 
 INSTANCE_FIELDS = {
+    "rtc": {"binding", "mode"},
+    "lptim": {"binding", "mode", "tick_hz"},
     "adc_group": {"binding", "mode", "channels", "sample_times",
                   "reference_mv", "exclusive", "silicon_profile", "trigger",
                   "period_us", "watchdog", "irq"},
@@ -252,6 +254,10 @@ def editor_schema():
         "additionalProperties": False}
     for kind, fields in INSTANCE_FIELDS.items():
         properties[kind] = {"type": "object", "additionalProperties": record(fields, {"binding", "mode"})}
+        if kind == "lptim":
+            properties[kind]["additionalProperties"]["required"].append("tick_hz")
+            properties[kind]["additionalProperties"]["properties"]["tick_hz"] = {
+                "type": "integer", "minimum": 1, "maximum": 4294967295}
         if kind == "can_fd":
             filter_fields = {"id", "mask", "format", "fifo"}
             filters = record(filter_fields, filter_fields)

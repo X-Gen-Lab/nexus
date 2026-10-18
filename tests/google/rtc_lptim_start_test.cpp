@@ -1,7 +1,9 @@
 /**
  * \file            rtc_lptim_start_test.cpp
- * \brief           Explicit reopen preserves static owners and never reuses
- * epochs \author          Nexus Team \version         1.0.0 \date 2026-10-18
+ * \brief           Reopen preserves static owners and unique epochs
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-18
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "rtc_lptim_provider.h"

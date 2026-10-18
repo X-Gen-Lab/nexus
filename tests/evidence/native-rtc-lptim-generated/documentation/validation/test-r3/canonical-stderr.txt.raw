@@ -1,0 +1,8 @@
+..................................................................................................................................................................................................Legacy docs entry forwards to: tools/dev/dev.py docs build; all legacy targets perform the same strict build.
+...........................................................................................................................Publication verification rejected: Duplicate JSON key: schema_version
+....Publication verification rejected: Publication record must stay outside public
+.......
+----------------------------------------------------------------------
+Ran 328 tests in 22.260s
+
+OK

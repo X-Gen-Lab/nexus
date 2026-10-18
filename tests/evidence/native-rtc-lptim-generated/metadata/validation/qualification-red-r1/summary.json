@@ -1,0 +1,7 @@
+{
+  "module": "test_qualification_plan.py",
+  "actual_exit": 1,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-red-r1/command.attempts/1792291351321307504-8286764f395347d29898d106c1f30f1a/receipt.json",
+  "source_unchanged": true,
+  "scope": "Whole metadata unit module; no preset build/runtime qualification or full suite"
+}

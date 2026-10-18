@@ -1,0 +1,657 @@
+{
+  "schema": 1,
+  "kind": "physical-factory-fixture-cmake-fix",
+  "classification": "Fixture-only regression correction after actual whole-main link failure; no production API/driver changes",
+  "own_root": "/tmp/nexus-io36-native-20261018",
+  "main_root_untouched": "/tmp/nexus-io-validation-20261018",
+  "source": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/files/tests/google/physical_platform_factory.cmake",
+    "bytes": 7810,
+    "sha256": "d3953632ea93bd2c97727fcf51d1403ddcd73d494552c0c013a3275f2919d42d"
+  },
+  "source_before": {
+    "path": "/tmp/nexus-io36-native-20261018/tests/google/physical_platform_factory.cmake",
+    "bytes": 6542,
+    "sha256": "c27b9c00e0beb6f8dbd2072ae0901018cb7531a67e7d7c31ef16acc19ac92f9f"
+  },
+  "base_identity": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/base-identity-r1.json",
+    "bytes": 24093,
+    "sha256": "7225150dee032ecd2dc3133f74147126185d675cf5e061881b9b78aba8526f26"
+  },
+  "diff": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/source.diff.raw",
+    "bytes": 2979,
+    "sha256": "78eb93d0b6a9a2f4a6fea9725e81bfab50d95f03cd07f6626178ebbdd508b5a1"
+  },
+  "root_actual_RED": {
+    "command_origin": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/build.command.json",
+    "raw_origin": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/build.txt",
+    "command": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/root-actual-red/command.json",
+      "bytes": 1342,
+      "sha256": "09647e9394133729ab9b0db822793af6caa738d65d10f3686585c20b00d699ef"
+    },
+    "receipt": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/root-actual-red/receipt.json",
+      "bytes": 1180,
+      "sha256": "8c90256a58e91fa1a640a557b65c1feec41ac6b160a114b3cbfb4efa125aca4e"
+    },
+    "raw": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/root-actual-red/build.raw",
+      "bytes": 31204,
+      "sha256": "cd74d5f8c3d3f4233d998183e603b3636f044f2a69a055a8a3a3ad40a9919302"
+    },
+    "qualification": false
+  },
+  "own_actual_RED_then_GREEN": true,
+  "stages": [
+    {
+      "stage": "build-green-r1",
+      "exit_code": 0,
+      "started_ns": 1792294900518794355,
+      "finished_ns": 1792294902490907959,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/command.attempts/1792294900518693703-5a72cc23abf14bd3af3bed97b4b50634/receipt.json",
+        "bytes": 1369,
+        "sha256": "75120399faffe29907e445ee862f0758e00fdc99b9e94bbf9ec36bd937bb31dc"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/command.command.json",
+        "bytes": 1589,
+        "sha256": "75f93b0cea355292aa4e8d324f6c6d3ba28af42b9b21c70108cfabd4298ea4ab"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/command.raw",
+        "bytes": 685,
+        "sha256": "f10a7e33468bde648ce29bee1934139eec3d3ce8ad5ae30cbf044cadb21d0a6d"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/summary.json",
+        "bytes": 489,
+        "sha256": "7dc6854823e0918f291dcd194f8ea5deef031721890b9d3926df9a0595617624"
+      }
+    },
+    {
+      "stage": "build-red-r1",
+      "exit_code": 1,
+      "started_ns": 1792294670016156953,
+      "finished_ns": 1792294679624013776,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/command.attempts/1792294670016037983-93dcbb6c71ba440c97427d18a5aed5ed/receipt.json",
+        "bytes": 1392,
+        "sha256": "83dc2cc3127fb6e3442735e0236e1887a9a0f804294b583bfbdd6150cbcf25d6"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/command.command.json",
+        "bytes": 1610,
+        "sha256": "beb62df785961fe1217911735e8ccbcd16efcddd05ef988761e2f2a711c441a8"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/command.raw",
+        "bytes": 9190,
+        "sha256": "70427a850a3e3fa9e8ba8894ca253d16042c1e75a988bd7f5e24f278c5d189aa"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "84895292d7618a517a62a7487653b473970125537f273884227830bbe467ada9"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "84895292d7618a517a62a7487653b473970125537f273884227830bbe467ada9"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/summary.json",
+        "bytes": 484,
+        "sha256": "65c0812e0d95e1fc399ccd708a3f421d4e86996299372273eecb7016510256a4"
+      }
+    },
+    {
+      "stage": "configure-green-r1",
+      "exit_code": 0,
+      "started_ns": 1792294781037015649,
+      "finished_ns": 1792294803024344307,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/command.attempts/1792294781036885733-8c31c8182c2141b3bb40657eb69abb74/receipt.json",
+        "bytes": 1240,
+        "sha256": "ce822398df758f1a5db68ff383002150c336f90402e7554f60886c9a0180b0be"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/command.command.json",
+        "bytes": 1464,
+        "sha256": "3f12f5cc66fa521537999ec105ecf4398cb1c5e0168476fcf5e03e12bbad246c"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/command.raw",
+        "bytes": 931,
+        "sha256": "11996da616e1a32454d61f5a0c51c6127f9507e71fab7752d4c7d4886389bae5"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/summary.json",
+        "bytes": 496,
+        "sha256": "69c6fe19ba9d9d332239ff34c20eb17f7ebc9b9e9ae1852d5591bd8932ffe999"
+      }
+    },
+    {
+      "stage": "configure-red-r1",
+      "exit_code": 0,
+      "started_ns": 1792294613409859621,
+      "finished_ns": 1792294637840281280,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/command.attempts/1792294613409726741-c18f905dc05946b6973806326ee1cbc3/receipt.json",
+        "bytes": 1237,
+        "sha256": "eb8b0dca7b892172b7dcac50273077ecdbfd7d9a3fe499ee46fe90422b2e3b74"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/command.command.json",
+        "bytes": 1459,
+        "sha256": "4887ce4b8517a538166751f7651db6ba29722bcb76c733f26e930f58dcd27b74"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/command.raw",
+        "bytes": 931,
+        "sha256": "1394e0702532080f94f2353610406c0c26064147d638b80c9f450a63ec908857"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "84895292d7618a517a62a7487653b473970125537f273884227830bbe467ada9"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "84895292d7618a517a62a7487653b473970125537f273884227830bbe467ada9"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/summary.json",
+        "bytes": 489,
+        "sha256": "f9387db15721c18ccccc8079ac64d970faeabfa5a5dfc00a06dc08e84db06497"
+      }
+    },
+    {
+      "stage": "gd32-discovery-r1",
+      "exit_code": 0,
+      "started_ns": 1792294920183534870,
+      "finished_ns": 1792294920187485902,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/command.attempts/1792294920183398855-6a0b7c32f73841d296a78af92b9d0c9c/receipt.json",
+        "bytes": 1231,
+        "sha256": "daaf9431ccfd5dfd6b2ce6ba511e4f54dfa2da613f3bf4162bb02f220376b926"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/command.command.json",
+        "bytes": 1454,
+        "sha256": "4697348bf995f346ae78ed272b01c56a06b982d6ba98a3dbc3ac05d040946ba5"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/command.raw",
+        "bytes": 2129,
+        "sha256": "6bf27f73bb4ea15b3bf90a30f73bed3b0cd6c036f44edd87c2f1cc8113290e4f"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/summary.json",
+        "bytes": 495,
+        "sha256": "e67d2dfa9c4771b488e1dabe8ca59dc278678b0e8b06f5b2b7a3d7cf12074230"
+      }
+    },
+    {
+      "stage": "gd32-runtime-r1",
+      "exit_code": 0,
+      "started_ns": 1792294920716547968,
+      "finished_ns": 1792294920749146453,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/command.attempts/1792294920716320565-0275059b077849c5944043d517657683/receipt.json",
+        "bytes": 1414,
+        "sha256": "7c04a2a784db516baa58b4c234e79d1185c7119b958a0b048f3639c0be56147f"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/command.command.json",
+        "bytes": 1635,
+        "sha256": "4696ef2b0c0bb5b8f818a6c6021594af12cc33cd53cc719888d406f172c09563"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/command.raw",
+        "bytes": 6314,
+        "sha256": "0d571832033c48deac730205d2fcd63efe78a6a66620e6be687fb835d146235a"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/summary.json",
+        "bytes": 491,
+        "sha256": "519f207feddef71340996d59fddb7aeadf7587e4c6420c4080601e23c1774466"
+      }
+    },
+    {
+      "stage": "graph-red-r1",
+      "exit_code": 0,
+      "started_ns": 1792294650834097841,
+      "finished_ns": 1792294650866888639,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/command.attempts/1792294650833967334-026657fdedb14710a4a6d45271b8b136/receipt.json",
+        "bytes": 1319,
+        "sha256": "407defb22c23607611c13e2792848996e77cd5cb5cf39f04f30bc430699d46cd"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/command.command.json",
+        "bytes": 1537,
+        "sha256": "fa1dcb55e7fbc47249fc1d4857fe13da4b590cdee7a4e5df74361dd455c112fe"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/command.raw",
+        "bytes": 146,
+        "sha256": "cbe0db159c029f0a607473f40e9b20192eaa3799f4a055f8d8f88b6f640eda4e"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "84895292d7618a517a62a7487653b473970125537f273884227830bbe467ada9"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "84895292d7618a517a62a7487653b473970125537f273884227830bbe467ada9"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/summary.json",
+        "bytes": 481,
+        "sha256": "1ca3bb88662da3b987a4dea9ed419c0f28f9062a4740b63da77e3f8d6cd3d04a"
+      }
+    },
+    {
+      "stage": "stm32-discovery-r1",
+      "exit_code": 0,
+      "started_ns": 1792294919932585602,
+      "finished_ns": 1792294919936451095,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/command.attempts/1792294919932483638-2527416c9fab4fd88a2813cd5c7e1e21/receipt.json",
+        "bytes": 1237,
+        "sha256": "639d268753b0a058aa6e82b2f3b9479900597901248fee70fe3a8a545bbc42dc"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/command.command.json",
+        "bytes": 1461,
+        "sha256": "320354dd8e9a157b1e985d05ba9754161b25cb4018cf75ec911630eba79e36a8"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/command.raw",
+        "bytes": 2129,
+        "sha256": "6bf27f73bb4ea15b3bf90a30f73bed3b0cd6c036f44edd87c2f1cc8113290e4f"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/summary.json",
+        "bytes": 497,
+        "sha256": "ad54245c6984828b4ee0945ad10d6fd1b8ba59d7a546bbdaa6f6e69fcbfa3e7f"
+      }
+    },
+    {
+      "stage": "stm32-runtime-r1",
+      "exit_code": 0,
+      "started_ns": 1792294920435926011,
+      "finished_ns": 1792294920452240387,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/command.attempts/1792294920435822385-4af84e0245454d688f909968e8a043ce/receipt.json",
+        "bytes": 1419,
+        "sha256": "c615ab4fc8f58e0a0cd40d54a8490bc8f3103d482955fe9422f2d595165c3766"
+      },
+      "command": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/command.command.json",
+        "bytes": 1641,
+        "sha256": "e431b65cb2a41b74aba983e28c532837528a8dda056389d09243be3d3ee6a983"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/command.raw",
+        "bytes": 6314,
+        "sha256": "82262b08288b4ad9a855964506c6eb0d23f05c6ad9eddeb54d93e9973157dcc2"
+      },
+      "before_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/source-index-before.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "after_guard": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/source-index-after.json",
+        "bytes": 14356,
+        "sha256": "8c4dfcd77cb1778649612ca4e1d8414ed7492999d4480219c2b5040ce607cd06"
+      },
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/summary.json",
+        "bytes": 493,
+        "sha256": "04782f18196fc9ef310beaee234264b24eb2c13b99d8eb4a007ebdc02d5f17e7"
+      }
+    }
+  ],
+  "programs": [
+    {
+      "family": "stm32",
+      "program": {
+        "path": "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_stm32_physical_platform_factory_test",
+        "bytes": 2866136,
+        "sha256": "59ef4b9b709f722f1933e1bb94f54c15dd57afc0052532decc434363a22a6ee5"
+      },
+      "xml": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/result.xml",
+        "bytes": 9771,
+        "sha256": "4c2e7ec9fab577ff92a92d5847c78fc194f57d102aacff46b222d6dfa69b5933"
+      },
+      "discovery_matches_xml": true,
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "disabled": 0,
+      "cases": [
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/1"
+      ],
+      "immutable_elf_bundle": false
+    },
+    {
+      "family": "gd32",
+      "program": {
+        "path": "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_gd32_physical_platform_factory_test",
+        "bytes": 2879280,
+        "sha256": "0d9bdf56b00f28682e5f0d0bdb8dead81c6f8d071456777868b2c625f3bf77ec"
+      },
+      "xml": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/result.xml",
+        "bytes": 9771,
+        "sha256": "eb9ac88c0dad8ab6ffff5c7fd1c80ea1dc081554de76abeb38e936390fc7f55a"
+      },
+      "discovery_matches_xml": true,
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "disabled": 0,
+      "cases": [
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/1",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/0",
+        "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/1"
+      ],
+      "immutable_elf_bundle": false
+    }
+  ],
+  "actual_programs": 2,
+  "actual_cases": 60,
+  "actual_failed_errors_skips_disabled": 0,
+  "actual_generated_export_headers": [
+    {
+      "family": "stm32",
+      "header": {
+        "path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/physical-platform-stm32-empty/nexus_factory.h",
+        "bytes": 20378,
+        "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+      },
+      "function_count": 52,
+      "symbols": [
+        "nx_factory_adc",
+        "nx_factory_adc_capability",
+        "nx_factory_adc_group",
+        "nx_factory_adc_group_capability",
+        "nx_factory_advanced_pwm",
+        "nx_factory_advanced_pwm_capability",
+        "nx_factory_can",
+        "nx_factory_can_capability",
+        "nx_factory_can_fd",
+        "nx_factory_can_fd_capability",
+        "nx_factory_encoder",
+        "nx_factory_encoder_capability",
+        "nx_factory_eth",
+        "nx_factory_eth_capability",
+        "nx_factory_eth_frames",
+        "nx_factory_eth_frames_capability",
+        "nx_factory_exti",
+        "nx_factory_exti_capability",
+        "nx_factory_flash",
+        "nx_factory_flash_capability",
+        "nx_factory_gpio",
+        "nx_factory_gpio_capability",
+        "nx_factory_i2c",
+        "nx_factory_i2c_capability",
+        "nx_factory_i2c_device",
+        "nx_factory_i2c_device_capability",
+        "nx_factory_lptim",
+        "nx_factory_lptim_capability",
+        "nx_factory_mdio",
+        "nx_factory_mdio_capability",
+        "nx_factory_pwm",
+        "nx_factory_pwm_adc",
+        "nx_factory_pwm_adc_capability",
+        "nx_factory_pwm_capability",
+        "nx_factory_pwm_group",
+        "nx_factory_pwm_group_capability",
+        "nx_factory_rtc",
+        "nx_factory_rtc_capability",
+        "nx_factory_spi",
+        "nx_factory_spi_capability",
+        "nx_factory_spi_device",
+        "nx_factory_spi_device_capability",
+        "nx_factory_timer_capture",
+        "nx_factory_timer_capture_capability",
+        "nx_factory_uart",
+        "nx_factory_uart_capability",
+        "nx_factory_usb_device",
+        "nx_factory_usb_device_capability",
+        "nx_factory_usb_endpoint",
+        "nx_factory_usb_endpoint_capability",
+        "nx_factory_watchdog",
+        "nx_factory_watchdog_capability"
+      ],
+      "not_a_function": "nx_factory_io_capability_t"
+    },
+    {
+      "family": "gd32",
+      "header": {
+        "path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/physical-platform-gd32-empty/nexus_factory.h",
+        "bytes": 20378,
+        "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+      },
+      "function_count": 52,
+      "symbols": [
+        "nx_factory_adc",
+        "nx_factory_adc_capability",
+        "nx_factory_adc_group",
+        "nx_factory_adc_group_capability",
+        "nx_factory_advanced_pwm",
+        "nx_factory_advanced_pwm_capability",
+        "nx_factory_can",
+        "nx_factory_can_capability",
+        "nx_factory_can_fd",
+        "nx_factory_can_fd_capability",
+        "nx_factory_encoder",
+        "nx_factory_encoder_capability",
+        "nx_factory_eth",
+        "nx_factory_eth_capability",
+        "nx_factory_eth_frames",
+        "nx_factory_eth_frames_capability",
+        "nx_factory_exti",
+        "nx_factory_exti_capability",
+        "nx_factory_flash",
+        "nx_factory_flash_capability",
+        "nx_factory_gpio",
+        "nx_factory_gpio_capability",
+        "nx_factory_i2c",
+        "nx_factory_i2c_capability",
+        "nx_factory_i2c_device",
+        "nx_factory_i2c_device_capability",
+        "nx_factory_lptim",
+        "nx_factory_lptim_capability",
+        "nx_factory_mdio",
+        "nx_factory_mdio_capability",
+        "nx_factory_pwm",
+        "nx_factory_pwm_adc",
+        "nx_factory_pwm_adc_capability",
+        "nx_factory_pwm_capability",
+        "nx_factory_pwm_group",
+        "nx_factory_pwm_group_capability",
+        "nx_factory_rtc",
+        "nx_factory_rtc_capability",
+        "nx_factory_spi",
+        "nx_factory_spi_capability",
+        "nx_factory_spi_device",
+        "nx_factory_spi_device_capability",
+        "nx_factory_timer_capture",
+        "nx_factory_timer_capture_capability",
+        "nx_factory_uart",
+        "nx_factory_uart_capability",
+        "nx_factory_usb_device",
+        "nx_factory_usb_device_capability",
+        "nx_factory_usb_endpoint",
+        "nx_factory_usb_endpoint_capability",
+        "nx_factory_watchdog",
+        "nx_factory_watchdog_capability"
+      ],
+      "not_a_function": "nx_factory_io_capability_t"
+    }
+  ],
+  "actual_compile_commands": {
+    "path": "/tmp/nexus-io36-native-20261018/build/native-debug/compile_commands.json",
+    "bytes": 2668360,
+    "sha256": "1c9f0b065e967f1fbc5b4a943be34db9f6496e993ed60b3cc7fc0d75019096ab"
+  },
+  "empty_compile_rows": [
+    {
+      "family": "stm32",
+      "file": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/physical-platform-stm32-empty/bindings.c",
+      "command_sha256": "1871dd3dd61de9208eb28eab3dac7d12b00b631de1e70049aa398cce72c848bd",
+      "all_actual_factory_exports_namespaced": true,
+      "function_count": 52
+    },
+    {
+      "family": "gd32",
+      "file": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/physical-platform-gd32-empty/bindings.c",
+      "command_sha256": "90c81565c3e5bd3f63487f21da5582ed4125cca2863dc415030145d48cfab52b",
+      "all_actual_factory_exports_namespaced": true,
+      "function_count": 52
+    }
+  ],
+  "before_archive": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/before-fixture-inputs.tar.gz",
+    "bytes": 66982,
+    "sha256": "b5068b3fdba6b182ec5f27e77a1e75ef397d2d883d01db10235ec90e9bff86dc"
+  },
+  "before_archive_all_36_members_verified": true,
+  "protected_authored_input_count": 68,
+  "protected_fixture_input_count": 19,
+  "protected_authored_and_fixture_bytes_unchanged": true,
+  "own_index_exact_and_semantic_unchanged": true,
+  "main_authorized_source_still_baseline": true,
+  "original_Google_body_and_model_unchanged": true,
+  "lifecycle_namespace_rules_unchanged": true,
+  "source_count": 1,
+  "TMP_build_allocated_growth_bytes": 13803520,
+  "TMP_growth_limit_bytes": 104857600,
+  "persistent_limit_bytes": 819200,
+  "scope": "Two exact complete physical-platform-factory Native test programs only. Source/index guards cover listed inputs, not a whole independent source snapshot. ELF files are mutable TMP artifacts recorded by identity, not archived. No full-repository requalification, installed SDK, ARM or physical hardware claim. Failed main r4 remains failed.",
+  "setup_notes": [
+    "Ninja dry graph ran successfully but indicated pending CMake regeneration; it was not represented as a full leaf build plan.",
+    "Read-only parser exploration rejected a naive match of capability typedef/multiline arguments before changing source; these were not executed CMake or production RED.",
+    "All 9 actual commands used maintained process.run; both full targets were built without filtering; -k 0 only on RED observed both link failures."
+  ]
+}

@@ -486,8 +486,14 @@ class CanDomainIR:
 
 
 @dataclass(frozen=True)
+class LptimOptions:
+    """Fixed declared source units, independent of the Core deadline clock."""
+    tick_hz: int
+
+
+@dataclass(frozen=True)
 class NoOptions:
-    """Flash and watchdog have no authored construction options."""
+    """Flash, watchdog and raw RTC have no authored construction options."""
 
 
 @dataclass(frozen=True)
@@ -529,7 +535,7 @@ ControllerOptions = (GpioOptions | UartOptions | SpiOptions | I2cOptions |
                      UsbDeviceOptions | EthernetOptions | EthernetFramesOptions |
                      TimerCaptureOptions |
                      AdvancedPwmOptions | PwmAdcOptions | CanFdOptions |
-                     AdcGroupOptions | NoOptions)
+                     AdcGroupOptions | LptimOptions | NoOptions)
 
 
 def mode_options(values):
@@ -622,7 +628,9 @@ def mode_options(values):
                           StreamProfileIR.from_validated(
                               values["stream_resolution"])
                           if "stream_resolution" in values else None)
-    if kind in {"flash", "watchdog"}:
+    if kind == "lptim":
+        return LptimOptions(values["tick_hz"])
+    if kind in {"flash", "watchdog", "rtc"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")
 

@@ -124,6 +124,9 @@ def derive(rows, properties, providers, sdk_required):
         identities.add(identity)
         if family not in providers:
             raise ValueError("No maintained provider contract: " + family)
+        if family == "native" and (row.get("implementation") != "MODEL" or
+                                   row.get("physical_qualified") is not False):
+            raise ValueError("Native work package requires unqualified MODEL provenance")
         sources, fixtures = set(row["exports"]), set(row["fixtures"])
         if bool(sources) != bool(fixtures):
             raise ValueError("Selected source requires a resolver fixture: " + identity)
@@ -139,7 +142,7 @@ def derive(rows, properties, providers, sdk_required):
                     and sources.intersection(property_row["production_sources"])):
                 matching.append(copy.deepcopy(property_row))
                 mapped.add(property_row["id"])
-        packages.append({
+        package = {
             "identity": identity, "family": family,
             "controller": row["controller"], "kind": kind, "mode": mode,
             "provider": copy.deepcopy(providers[family]),
@@ -153,7 +156,11 @@ def derive(rows, properties, providers, sdk_required):
             "contract_status": "reviewed_bounded" if matching else "not_catalogued",
             "reviewed_properties": sorted(matching, key=lambda item: item["id"]),
             "software_status": "not_executed", "hardware_status": "not_executed",
-        })
+        }
+        if family == "native":
+            package.update(implementation=row["implementation"],
+                           physical_qualified=row["physical_qualified"])
+        packages.append(package)
     if not packages:
         raise ValueError("No maintained mode work packages")
     unmapped = sorted((copy.deepcopy(row) for row in properties
@@ -198,7 +205,7 @@ def provider_contracts():
                              for role, path in item.git_dependencies],
         "import_lock": item.import_lock,
         "dependency_identity_status": "declared_unverified",
-    } for item in descriptor.families() if item.family != "native"}
+    } for item in descriptor.families()}
 
 
 def collect(root=ROOT):

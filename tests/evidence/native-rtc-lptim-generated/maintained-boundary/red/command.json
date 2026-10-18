@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/testing",
+    "-p",
+    "test_sdk_verification_call.py",
+    "-v"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "original-module-red-r1",
+  "started_ns": 1792290177713888835,
+  "finished_ns": 1792290179433423173,
+  "duration_seconds": 1.7195358499993745,
+  "timeout_seconds": 600.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.attempts/1792290177713775094-f995d04914844a0794aaf84dfc21fa69/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.attempts/1792290177713775094-f995d04914844a0794aaf84dfc21fa69/stderr.txt",
+    "bytes": 19353,
+    "sha256": "f254907f4d024f5fb4627935dbc3a2061cd7fc861b82ca55dd9121c821cdf03e"
+  }
+}

@@ -17,6 +17,16 @@ def constructor(item, result, board_bindings, routes, devices):
     face = f"&s_nx_face_{name}"
     definitions = []
     stop = []
+    if kind in {"rtc", "lptim"}:
+        extra = f", {item.options.tick_hz}u" if kind == "lptim" else ""
+        return Construction(
+            state_type=f"nx_native_{kind}_state_t", definitions=[],
+            initialize=(f"(s_nx_port_{name}.constructed ? "
+                        f"nx_native_{kind}_start({state}) : "
+                        f"nx_native_{kind}_construct({state}, "
+                        f"&s_nx_native_time_clock{extra}))"),
+            stop=[f"nx_{kind}_port_stop({face})"],
+            retain_on_failed_init=False)
     if kind == "gpio":
         mask = item["mask"] or sum(1 << int(pin["pin"][2:])
                                    for pin in item["pins"])

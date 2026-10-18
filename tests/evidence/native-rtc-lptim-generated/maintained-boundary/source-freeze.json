@@ -1,0 +1,107 @@
+{
+  "kind": "IO36-phase3-normal-testing-boundary-followup",
+  "git_baseline": "3b2199861e5f01e2ba7c831cb54905b30b703858",
+  "root": "/tmp/nexus-io36-native-20261018",
+  "changed_source": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/files/tools/testing/test_sdk_verification_call.py",
+    "size": 38547,
+    "sha256": "664b5d1d4ea503bfbfddd561121c1b8883ccb57bd2c8d24f1374d14a7b0bc925"
+  },
+  "published_source": {
+    "path": "/tmp/nexus-io36-native-20261018/tools/testing/test_sdk_verification_call.py",
+    "size": 38547,
+    "sha256": "664b5d1d4ea503bfbfddd561121c1b8883ccb57bd2c8d24f1374d14a7b0bc925"
+  },
+  "before_source": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/base-test-source.py",
+    "size": 29319,
+    "sha256": "bd77ff4d6ac3ffbf72ff3f322376a313656898431548870170a4a993776cf91d"
+  },
+  "phase3_26_unchanged": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/source-and-execution-freeze-r1.json",
+    "size": 31464,
+    "sha256": "85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f"
+  },
+  "production_changes": false,
+  "matrix": {
+    "preserved_ARM_selected": 16,
+    "added_Native_selected": 2,
+    "total_selected": 18,
+    "build_roots": 31,
+    "images": 34,
+    "preserved_ARM_retention_checks": 26,
+    "Native_host_program_executions": 4,
+    "Native_selected_nm_checks": 2
+  },
+  "scope": "Real unified SDK verifier CLI and input templates; external CMake/build/SDK validation/host runtime/nm process ports are test doubles. No production verifier mocked; this module does not execute synthetic ELF bytes or establish proc/physical qualification. Actual canonical Native C Linux proc qualification remains independently bound to unchanged phase3 integration.",
+  "RED": {
+    "discovered_run": 21,
+    "actual_exit": 1,
+    "failures": 19,
+    "errors": 1,
+    "reason": "Old external selected TOML fixture has no backend; real prepare_selected_consumer raises KeyError, then old 16/29/32 all-ARM assertions require Native-aware expansion",
+    "summary": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/summary.json",
+      "size": 387,
+      "sha256": "13b6acbb63154c596583e786ae9607714821a3b4748a7f16344b3f54b2b4451c"
+    },
+    "receipt": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.attempts/1792290177713775094-f995d04914844a0794aaf84dfc21fa69/receipt.json",
+      "size": 1314,
+      "sha256": "e1038b993e60a998223f1054f8c796b00e25eca91e0160bdda3ba0038c4ffad0"
+    },
+    "raw": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.txt",
+      "size": 19353,
+      "sha256": "f254907f4d024f5fb4627935dbc3a2061cd7fc861b82ca55dd9121c821cdf03e"
+    }
+  },
+  "GREEN": {
+    "discovered_run": 23,
+    "actual_exit": 0,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "summary": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/summary.json",
+      "size": 388,
+      "sha256": "e1712a09ed94b390ad76d010694192e4ddafcf53e62df8383a3181caef661496"
+    },
+    "receipt": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/command.attempts/1792290244910494728-06a9e7624b2241f79a11fb959e7605d4/receipt.json",
+      "size": 1315,
+      "sha256": "acfe5f2564dccc7bbde9dd402947d79e0f08450ef4d7263601bc9fe13760eca0"
+    },
+    "raw": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/command.txt",
+      "size": 4312,
+      "sha256": "dc543e9584744c69cd0c291a459c6e362d5622bc8ab5f2c417c4e90dcbd053d0"
+    }
+  },
+  "changes": [
+    "Minimal explicit baremetal backend in old ARM external configuration fixtures; no production fallback",
+    "Copy two exact canonical Native TOML and C source inputs from checkout into installed mock SDK",
+    "Model actual Native host executable path/header, real source compile arguments, resolved domain and generated compile row; do not create fake ARM byproducts for Native",
+    "Model only external runtime/nm ports with nonzero failures and exact four states/two ops/clock observations",
+    "Expand complete expected matrix by two; retain exact sixteen ARM artifact assertions and old failure-root counts",
+    "Add Native nonzero runtime/nm/private Native include/missing owner rejection and empty state/ops/clock-face/clock-function leak subcases",
+    "Preserve all original21 tests (one accurate default-count rename), add2 complete methods"
+  ],
+  "old_test_count": 21,
+  "new_test_count": 23,
+  "test_rename": {
+    "test_default_retains_three_four_job_and_twenty_six_two_job_builds": "test_default_retains_three_four_job_and_twenty_eight_two_job_builds"
+  },
+  "remaining": [
+    "Independent follow-up review",
+    "Root normal complete commit/CI gates",
+    "Clean publishable complete installed SDK matrix",
+    "SoC physical RTC/LPTIM and HIL not_executed"
+  ],
+  "no_stage_commit_main_changes": true,
+  "patch": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/one-test-file.patch",
+    "size": 19452,
+    "sha256": "29944f36de96570a0169f0c2380bf182e1f09bb9807c1a7f89cb81ba9fd04cc3"
+  }
+}

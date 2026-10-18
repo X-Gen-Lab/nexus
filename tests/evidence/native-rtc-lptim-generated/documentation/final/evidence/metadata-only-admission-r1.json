@@ -1,0 +1,87 @@
+{
+  "kind": "root_exact_approved_metadata_only_admission",
+  "source_review_approved_by": "/root",
+  "canonical_page_sha256": "47d5d3f9ddcc6184ab7b3ea301f5a733812361b4268b690b02a087fe97daa607",
+  "canonical_DOT_sha256": "a478c4831bea8666baab18e1fd91213108d935062e8eaef6aa55ae732fdf492f",
+  "labels_increment_sha256": "aa69f8e4fa17dc89d69e7d0c0c6612b1666062c6328fe30f6f724e48c992b7b6",
+  "independent_translation_review": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/independent-catalog-review-r2.json",
+    "sha256": "fe8d94bf354827bf7b515bf14af26156b8c6c1b0efabd5f8fcfe61f7a51682dd"
+  },
+  "review_packet_sha256": "634988b15d74d45b2c53f85986e4fa41d92ca8b04889e69f7e65d58ddf78ded0",
+  "files": [
+    {
+      "path": "docs/locale/en/LC_MESSAGES/assets/diagrams/README.po",
+      "before_sha256": "d278dd24e7006af959ac30833a3e231f3d863b6ed3fe5b1dce17faab10bc5c52",
+      "after_sha256": "76b510698716f257349d318f5b57d3c54bae52a02f8e1626929251592883ad97",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 67788
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256": "5a425b8a6fd22c38f57967a915b5f91417846357cc6dbec7d4a37e62b77d9993",
+      "after_sha256": "dd33e905611ef1a079085bfd8509f3b51a37c43d0f0e005b2d270d24920f8e84",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 110117
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po",
+      "before_sha256": "e0addec00e1fb0346468df3d36aed2c761b61c4427aa80713e22ddcdf27395f0",
+      "after_sha256": "11e98d8addc2c8c35ed326a2807452f37276ed26809a27bf7e470eb3e4e2e29b",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 36108
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/reference/api/io.po",
+      "before_sha256": "75a45058e7f89959ac0f63540af32164ab87869e0a4dbe77cc8c38f954e11453",
+      "after_sha256": "249568bc1a0f6a879ff5ca7bc5f4cc0604e9d144ce4aa0cf1a7edc7c8de70da5",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 274289
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/assets/diagrams/README.po",
+      "before_sha256": "6173e776827b00eb22239e3b93c87ccda2397ce74115e3b2ff3819d8b552ed96",
+      "after_sha256": "6aad7736023a3e201519a97538b3454adcf83a6cdb415077ecc02bc34a8229b6",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 62503
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256": "faf0278225ef4c338de189dfc541eca2445a1068aac7c0c9d581d77e7d8579ee",
+      "after_sha256": "180b64b14e9ddd87a059cf5eec8b25a03fa0b3616d16c90244663ce423eb69e5",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 109845
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/index.po",
+      "before_sha256": "5ef6792e40334f7eac596bda5d55862a02018936d15c8f07ff022a937c04f44e",
+      "after_sha256": "ec361c2e6ca24d4c66d3c2d520c357d2956cff2e0fd269acc925a13c21cdf7db",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 2220
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po",
+      "before_sha256": "4b315f34e621dc76710ac3879192102c48f640c3e40adfac754b0c8fc2c9a4c3",
+      "after_sha256": "92a3cc21e7c206cf12e53eb8effcde8b8dc1f3c2aa7292a9849ad8c5aef1e76f",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 34977
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po",
+      "before_sha256": "46fbeae5c56243d699c3413ee676665855283192d100383f2538333fb56d1dc7",
+      "after_sha256": "a6f17cf6b8d5e94e002420bde400a95ab8c9794d11bc469f5dd2bbdc1ae01f2a",
+      "only_change": "X-Nexus-Reviewed false -> true",
+      "size": 273848
+    },
+    {
+      "path": "docs/assets/diagrams/diagram-index.csv",
+      "before_sha256": "d34b904e67072c38df7b3336b35568d6f8ed07169349300722c6e7d1b08921d2",
+      "after_sha256": "1698a2e7cc056c10c642baa8e17ca084ecc87a50e5ec029fbea6f886ccaeefe4",
+      "only_change": "FIG-21 review_status pending -> source_reviewed; render_status stays rendered",
+      "size": 5125
+    }
+  ],
+  "complete_final_files_persisted_before_ownROOT_apply": true,
+  "not_visual_or_HIL_admission": true,
+  "observed_ns": 1792292167740458000
+}

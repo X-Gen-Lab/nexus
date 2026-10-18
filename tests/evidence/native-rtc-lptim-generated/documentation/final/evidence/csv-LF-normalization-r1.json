@@ -1,0 +1,27 @@
+{
+  "kind": "Root_authorized_CSV_wholefile_CRLF_to_LF_only_after_r2_process_join",
+  "path": "docs/assets/diagrams/diagram-index.csv",
+  "before_sha256": "1698a2e7cc056c10c642baa8e17ca084ecc87a50e5ec029fbea6f886ccaeefe4",
+  "after_sha256": "e90ab61defcd5268851fd16b51b0ce40b3ca2e0c35f3ce31d1111fbbdc4a1404",
+  "before_size": 5125,
+  "after_size": 5105,
+  "CRLF_records": 20,
+  "parsed_rows_identical": true,
+  "FIG21_review_status": "source_reviewed",
+  "other21files_unchanged": true,
+  "actual_r2_complete_check": 0,
+  "actual_r2_complete_test": {
+    "suite": "documentation",
+    "discovered": 328,
+    "executed": 328,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "expected_failures": 0,
+    "unexpected_successes": 0,
+    "status": "passed"
+  },
+  "r2_not_inherited_as_r3": true,
+  "persistent_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/final/normalized/files/docs/assets/diagrams/diagram-index.csv",
+  "observed_ns": 1792292287968015436
+}

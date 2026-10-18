@@ -1,0 +1,7 @@
+{
+  "module": "tools/testing/test_work_packages.py",
+  "actual_exit": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-work-packages-r1/validation/green-r1/command.attempts/1792293443280189716-722658d510e2440391454d13f9e63629/receipt.json",
+  "source_and_index_unchanged": true,
+  "scope": "Complete work-package unit module only; no build/filter/main hook or qualification"
+}

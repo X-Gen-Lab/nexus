@@ -1,0 +1,9 @@
+{
+  "actual_returncode": 0,
+  "source_identity_unchanged": true,
+  "canonical_command_receipt": "/tmp/nexus-io36-docs-validation-20261018-r1/check-r3.attempts/1792292302918300568-2426b88ac8394a4581b04cbce048b99a/receipt.json",
+  "wrapper_error": null,
+  "max_completed_child_ru_maxrss_kib": 46868,
+  "validation_storage_bytes": 69398641,
+  "root_documentation_attempts_bytes": 0
+}

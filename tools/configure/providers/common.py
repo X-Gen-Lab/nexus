@@ -96,6 +96,8 @@ class ModeTraits:
 
 
 _MODE_TRAITS = MappingProxyType({
+    ("rtc", "calendar-alarm"): ModeTraits(),
+    ("lptim", "counter16-oneshot"): ModeTraits(),
     ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),
     ("adc_group", "injected-sequence"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
@@ -261,6 +263,7 @@ def validate_selection(selection, route, provider, ram_size):
     """One maintained mode has one bounded, explicit configuration contract."""
     kind = route["kind"]
     fields = {
+        "rtc": set(), "lptim": {"tick_hz"},
         "adc_group": {"channels", "sample_times", "reference_mv", "exclusive",
                       "silicon_profile", "trigger", "period_us", "watchdog",
                       "irq_priority", "calls_os"},
@@ -294,6 +297,8 @@ def validate_selection(selection, route, provider, ram_size):
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")
+    if kind == "lptim":
+        integer(selection.get("tick_hz"), 1, UINT32_MAX, "LPTIM tick_hz")
     if kind in {"timer_capture", "advanced_pwm"}:
         try:
             from .. import timer_advanced

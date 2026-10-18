@@ -63,7 +63,7 @@ ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
 IDENTIFIER = re.compile(r"[A-Za-z][A-Za-z0-9_-]{0,63}")
 PIN = physical_facts.GPIO_PIN
-KINDS = {"gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
+KINDS = {"rtc", "lptim", "gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti",
          "pwm", "adc", "can", "usb_device", "eth", "eth_frames",
          "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group"}
 C_KEYWORDS = set("auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while _Alignas _Alignof _Atomic _Bool _Complex _Generic _Imaginary _Noreturn _Static_assert _Thread_local main".split())

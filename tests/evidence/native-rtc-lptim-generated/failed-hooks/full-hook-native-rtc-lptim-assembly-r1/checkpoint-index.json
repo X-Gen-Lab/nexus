@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "kind": "failed-hook-durable-checkpoint-index",
+  "qualification": false,
+  "created_ns": 1792290970938339728,
+  "parent_commit_session": 55068,
+  "parent_stage": "native-rtc-lptim-assembly-full-commit-r1",
+  "parent_reported_commit_exit": 1,
+  "source_tree_reported_by_parent": "3596017ea4a47e79a2f3adb088a69d1351ad7156",
+  "source_commit_observed_readonly": "7e2dbe92a5328d23f00b2d07c49f45a763ae8bbb",
+  "round_started_ns": 1792290582999683355,
+  "root_observed_readonly": "/tmp/nexus-io-validation-20261018",
+  "archives": [
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-rtc-lptim-assembly-r1/batch-0001.tar.gz",
+      "bytes": 2150,
+      "sha256": "5912ba8855a23efb5b9dad90ff7ac5eddbd007dd9b5498cd7d9b10bc51aee89c"
+    }
+  ],
+  "catalog": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-rtc-lptim-assembly-r1/catalog.jsonl",
+    "bytes": 573,
+    "sha256": "7e91a3e14c87594ba59717acc9e0a2a3a88c50ff306fc86dc1092f8f1abd8597"
+  },
+  "summary": {
+    "archives": 1,
+    "compressed_bytes": 2150,
+    "archived_unique_source_paths": 4,
+    "terminal_commands": 1,
+    "terminal_exit_codes": [
+      1
+    ],
+    "google_programs": 0,
+    "google_cases": 0,
+    "google_XML_not_executed": true,
+    "tool_suite": "testing",
+    "tool_methods_discovered_and_executed": 991,
+    "tool_subtest_failures": 6,
+    "tool_errors": 0,
+    "tool_skipped": 0,
+    "later_tool_suites_not_executed": [
+      "configure",
+      "ci",
+      "workflows"
+    ],
+    "failure_contracts": [
+      "test_maintenance.CapabilityDocumentationTests.test_redistributed_references_preserve_selected_source_provenance: Native pair four controller rows absent",
+      "test_qualification_plan.QualificationPlanTests.test_redistributed_io_references_have_one_qualified_preset: pair and empty exact preset absent"
+    ],
+    "all_archive_byte_SHA_member_SHA_mode_mtime_gzip_CRC_EOF_verified": true,
+    "all_fresh_terminal_receipts_completed_withdrawal_complete": true,
+    "monitor_stop": {
+      "kind": "monitor_stopped",
+      "batches": 1,
+      "checkpointed_paths": 4,
+      "pending_process_receipts": [],
+      "reason": "parent_stop",
+      "persistent_allocated": 28672,
+      "qualification": false
+    }
+  },
+  "exclusions": [
+    "No old manual302/5230 result or XML is admitted to this failed round.",
+    "No fresh tools-testing JSON was published after full-suite rejection; raw stderr is the actual failure record.",
+    "No source/index/tool mutation or tests/builds were performed by monitor.",
+    "Commit/index objects, parent total PTY output, ELF/BIN/map/objects/source/dependencies outside checkpoint."
+  ],
+  "members": {
+    "build/native-debug/tdd/tools-testing.attempts/1792290582999647361-2a915d56c9f948b0b5906de3c88c33ce/receipt.json": {
+      "path": "build/native-debug/tdd/tools-testing.attempts/1792290582999647361-2a915d56c9f948b0b5906de3c88c33ce/receipt.json",
+      "bytes": 1265,
+      "mode": 384,
+      "mtime_ns": 1792290831436831216,
+      "ctime_ns": 1792290831436831216,
+      "dev": 33,
+      "ino": 1171206,
+      "sha256": "34ce2aa51b66a1386e76193d81183f47837e22f1f955705f90545fe77e8e91fd",
+      "archive": "batch-0001.tar.gz"
+    },
+    "build/native-debug/tdd/tools-testing.attempts/1792290582999647361-2a915d56c9f948b0b5906de3c88c33ce/stderr.txt": {
+      "path": "build/native-debug/tdd/tools-testing.attempts/1792290582999647361-2a915d56c9f948b0b5906de3c88c33ce/stderr.txt",
+      "bytes": 6337,
+      "mode": 384,
+      "mtime_ns": 1792290831389953889,
+      "ctime_ns": 1792290831389953889,
+      "dev": 33,
+      "ino": 1052709,
+      "sha256": "ddbbddc88307a514d5ad72a8548deaf6cabae9f2837ed4917c042afdc7a36e3e",
+      "archive": "batch-0001.tar.gz"
+    },
+    "build/native-debug/tdd/tools-testing.attempts/1792290582999647361-2a915d56c9f948b0b5906de3c88c33ce/stdout.txt": {
+      "path": "build/native-debug/tdd/tools-testing.attempts/1792290582999647361-2a915d56c9f948b0b5906de3c88c33ce/stdout.txt",
+      "bytes": 523,
+      "mode": 384,
+      "mtime_ns": 1792290831389953889,
+      "ctime_ns": 1792290831389953889,
+      "dev": 33,
+      "ino": 1052708,
+      "sha256": "5b34acfa85c72b3a23a898546274d2ef4ee80933fca362a0c869b82a8c627a19",
+      "archive": "batch-0001.tar.gz"
+    },
+    "build/native-debug/tdd/tools-testing.command.json": {
+      "path": "build/native-debug/tdd/tools-testing.command.json",
+      "bytes": 1435,
+      "mode": 384,
+      "mtime_ns": 1792290831437031448,
+      "ctime_ns": 1792290831437031448,
+      "dev": 33,
+      "ino": 1171207,
+      "sha256": "67710100da2a241594d47c4fd4c5ea3f09e54b5ef29b1f91e73aabe211d648af",
+      "archive": "batch-0001.tar.gz"
+    }
+  }
+}

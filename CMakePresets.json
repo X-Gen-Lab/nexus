@@ -1303,6 +1303,28 @@
                 "NEXUS_IO_EVOLUTION_FIXTURE_MAIN": "${sourceDir}/tests/contracts/io_evolution_assembly/controller_main.c",
                 "NEXUS_IO_EVOLUTION_FIXTURE_DEFINITIONS": "NX_FIXTURE_ETH_FRAMES"
             }
+        },
+        {
+            "name": "fixture-io-evolution-native-time-pair",
+            "inherits": "native-release",
+            "displayName": "Native RTC/LPTIM pair software model; physical unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-native-time-pair",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/native-time-pair.toml",
+                "NEXUS_BUILD_TESTS": "ON",
+                "NEXUS_BUILD_WORKLOAD": "OFF"
+            }
+        },
+        {
+            "name": "fixture-io-evolution-native-time-empty",
+            "inherits": "native-release",
+            "displayName": "Native RTC/LPTIM empty software model; physical unqualified",
+            "binaryDir": "${sourceDir}/build/fixture-io-evolution-native-time-empty",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/native-time-empty.toml",
+                "NEXUS_BUILD_TESTS": "ON",
+                "NEXUS_BUILD_WORKLOAD": "OFF"
+            }
         }
     ],
     "buildPresets": [
@@ -1864,6 +1886,20 @@
             "configurePreset": "fixture-io-evolution-gd470-eth-frames",
             "targets": [
                 "io_evolution_fixture"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-native-time-pair",
+            "configurePreset": "fixture-io-evolution-native-time-pair",
+            "targets": [
+                "nexus_rtc_lptim_pair_generated_test"
+            ]
+        },
+        {
+            "name": "fixture-io-evolution-native-time-empty",
+            "configurePreset": "fixture-io-evolution-native-time-empty",
+            "targets": [
+                "nexus_rtc_lptim_empty_generated_test"
             ]
         }
     ],

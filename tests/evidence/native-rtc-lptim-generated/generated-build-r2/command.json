@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "tools/dev/dev.py",
+    "build",
+    "--preset",
+    "native-debug",
+    "--target",
+    "nexus_rtc_lptim_pair_generated_test",
+    "nexus_rtc_lptim_empty_generated_test",
+    "--parallel",
+    "1"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "generated-build-r2",
+  "started_ns": 1792289398401161400,
+  "finished_ns": 1792289421597440714,
+  "duration_seconds": 23.196280667000792,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r2/command.attempts/1792289398401033046-5488c1ba0be146b9b638f1294b080578/stdout.txt",
+    "bytes": 3461,
+    "sha256": "fc6a25a4bde12d15c49d6d9bde2b012b630cb51afa280035ec1b1a6e1d15d143"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r2/command.attempts/1792289398401033046-5488c1ba0be146b9b638f1294b080578/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "focused-maintained-test-fixture-update",
+  "streams": [
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.attempts/1792290177713775094-f995d04914844a0794aaf84dfc21fa69/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/maintained-boundary/red/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.attempts/1792290177713775094-f995d04914844a0794aaf84dfc21fa69/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/maintained-boundary/red/stderr.txt.raw",
+      "sha256": "f254907f4d024f5fb4627935dbc3a2061cd7fc861b82ca55dd9121c821cdf03e"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/command.attempts/1792290244910494728-06a9e7624b2241f79a11fb959e7605d4/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/maintained-boundary/green/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/command.attempts/1792290244910494728-06a9e7624b2241f79a11fb959e7605d4/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/maintained-boundary/green/stderr.txt.raw",
+      "sha256": "dc543e9584744c69cd0c291a459c6e362d5622bc8ab5f2c417c4e90dcbd053d0"
+    }
+  ],
+  "scope": "Original21 whole module RED against phase3 production, then external fixture update with23whole GREEN. The two added negative coverage methods were first GREEN; no production behavior added by this followup. Full current main gates remain separate."
+}

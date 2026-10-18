@@ -62,7 +62,8 @@ class SelectedContract:
     """Nominal public units and limits of one validated static identity.
 
     Limits are integers, existing C expressions, or None (not described).
-    unit_bytes=None means a per-request width, not a zero-sized payload. A
+    unit_bytes=None means no fixed byte width; typed units may be non-byte
+    counts or per-request words, never a zero-sized payload. A
     descriptor, message and hardware segment retain distinct count bounds.
     """
     id: str
@@ -259,6 +260,10 @@ def describe(item, endpoint=None, *, public_class=None):
         fail("Selected endpoint differs from its actual controller")
     kind = item.kind
     limits = {}
+    if kind == "rtc":
+        limits.update(unit="occurrences", max_transfer_units=1)
+    elif kind == "lptim":
+        limits.update(unit="ticks", max_transfer_units=65536)
     if kind in {"uart", "spi", "i2c", "can", "can_fd", "eth", "eth_frames",
                 "usb_device"}:
         limits.update(unit="bytes", unit_bytes=1, word_bits=(8,))

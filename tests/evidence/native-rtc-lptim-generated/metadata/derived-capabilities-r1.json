@@ -1,0 +1,323 @@
+{
+  "kind": "derived-source-only-capability-matrix",
+  "source_document_sha256": "aa3bfdc094e5de3cf0652d1eaa892fdc40423f8ba7e909a173992c0858dcc87b",
+  "derived_document": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/docs/delivery/capabilities.md",
+    "size": 58534,
+    "sha256": "4434a8b8433e5189eb936a87de04214ec0fddd7498218398890e079f7f22f344"
+  },
+  "borrowed_ROOT_document_unmodified": true,
+  "MCU_rows_byte_and_value_equal": true,
+  "MCU_row_count": 191,
+  "selected_Native_model_row_count": 19,
+  "model_rows": [
+    {
+      "family": "native",
+      "controller": "ADC0",
+      "kind": "adc",
+      "mode": "low-rate-scan",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/adc.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "EXTI6",
+      "kind": "exti",
+      "mode": "edge-event",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/exti.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "FLASH0",
+      "kind": "flash",
+      "mode": "poll-byte",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/flash.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "GPIOA",
+      "kind": "gpio",
+      "mode": "output",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml",
+        "tools/configure/assemblies/native-gpio.toml"
+      ],
+      "exports": [
+        "io/native/gpio.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "I2C0",
+      "kind": "i2c",
+      "mode": "poll-messages",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/i2c.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "I2C1",
+      "kind": "i2c",
+      "mode": "poll-messages",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/i2c.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "IWDG",
+      "kind": "watchdog",
+      "mode": "independent",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/watchdog.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "LPTIM0",
+      "kind": "lptim",
+      "mode": "counter16-oneshot",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "cmake/package/verification/io_evolution/native-time-pair.toml"
+      ],
+      "exports": [
+        "io/native/rtc_lptim.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "LPTIM1",
+      "kind": "lptim",
+      "mode": "counter16-oneshot",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "cmake/package/verification/io_evolution/native-time-pair.toml"
+      ],
+      "exports": [
+        "io/native/rtc_lptim.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "PWM0",
+      "kind": "pwm",
+      "mode": "fixed-pwm",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/timer.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "RTC0",
+      "kind": "rtc",
+      "mode": "calendar-alarm",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "cmake/package/verification/io_evolution/native-time-pair.toml"
+      ],
+      "exports": [
+        "io/native/rtc_lptim.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "RTC1",
+      "kind": "rtc",
+      "mode": "calendar-alarm",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "cmake/package/verification/io_evolution/native-time-pair.toml"
+      ],
+      "exports": [
+        "io/native/rtc_lptim.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "SPI0",
+      "kind": "spi",
+      "mode": "async-model",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml"
+      ],
+      "exports": [
+        "io/src/spi_dma_sequence.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "SPI0",
+      "kind": "spi",
+      "mode": "short-poll",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml",
+        "tools/configure/assemblies/native-spi.toml"
+      ],
+      "exports": [
+        "io/native/spi.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "SPI1",
+      "kind": "spi",
+      "mode": "async-model",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/io_evolution_assembly/native-spi-dma-transaction.toml"
+      ],
+      "exports": [
+        "io/src/spi_dma_sequence.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "SPI1",
+      "kind": "spi",
+      "mode": "short-poll",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/spi.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "UART0",
+      "kind": "uart",
+      "mode": "irq-byte-event",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml",
+        "tools/configure/assemblies/native-uart.toml"
+      ],
+      "exports": [
+        "io/native/uart.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "UART0",
+      "kind": "uart",
+      "mode": "irq-words",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/io_evolution_assembly/native-uart9n1.toml"
+      ],
+      "exports": [
+        "io/native/uart_word.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    },
+    {
+      "family": "native",
+      "controller": "UART1",
+      "kind": "uart",
+      "mode": "irq-byte-event",
+      "routes": [],
+      "boards": [],
+      "fixtures": [
+        "tests/contracts/native_assembly/multi.toml"
+      ],
+      "exports": [
+        "io/native/uart.c"
+      ],
+      "implementation": "MODEL",
+      "physical_qualified": false
+    }
+  ],
+  "qualification": "Source provenance only; no preset execution, physical, HIL, MCU or total RAM claim"
+}

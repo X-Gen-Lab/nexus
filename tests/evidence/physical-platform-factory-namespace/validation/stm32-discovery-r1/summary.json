@@ -1,0 +1,9 @@
+{
+  "stage": "stm32-discovery-r1",
+  "actual_exit": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/command.attempts/1792294919932483638-2527416c9fab4fd88a2813cd5c7e1e21/receipt.json",
+  "source_index_guard_stable": true,
+  "build_allocated_growth_bytes": 13803520,
+  "TMP_increment_limit": 104857600,
+  "scope": "Exact two full Native fixture targets/programs only; no full repository/ARM/HIL qualification"
+}

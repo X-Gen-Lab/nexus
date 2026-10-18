@@ -1,0 +1,122 @@
+{
+  "native-debug/compile_commands.json": {
+    "size": 2667952,
+    "sha256": "0f46c437f1b16ca85cbbc47a19d851392a692324537b2d1d75642c43b12b21b6",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/compile_commands.json"
+  },
+  "development-sdk-manifest.json": {
+    "size": 799051,
+    "sha256": "ecaecf0c98c51e904c3251d1a875986fe3fcd45ddb17026f4fe3219fcb803f2b",
+    "original_path": "/tmp/nexus io36 native development SDK 20261018/share/nexus/src/.nexus-source-sdk.json"
+  },
+  "google/pair/ELF-identity.json": {
+    "size": 206,
+    "sha256": "d98f106302ad1d23d3a3f7c08cb686f2d8ec77cd3f9821ff9d3965bb1b5a9f4a",
+    "original_path": "metadata-only: Google ELF remains TMP"
+  },
+  "google/pair/bindings.c": {
+    "size": 20741,
+    "sha256": "2140489a7fa26ac9d044aaa7b1323da22863af4f929b21facafe2c99d76ea73a",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-pair/bindings.c"
+  },
+  "installed/pair/bindings.c": {
+    "size": 20741,
+    "sha256": "2140489a7fa26ac9d044aaa7b1323da22863af4f929b21facafe2c99d76ea73a",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time pair build/nexus-sdk/generated/bindings.c"
+  },
+  "google/pair/nexus_bindings.h": {
+    "size": 3008,
+    "sha256": "bc4b977e8ca406483da685c58fa11477d67cb794c427883b27f1e14ebbb70e68",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-pair/nexus_bindings.h"
+  },
+  "installed/pair/nexus_bindings.h": {
+    "size": 3008,
+    "sha256": "bc4b977e8ca406483da685c58fa11477d67cb794c427883b27f1e14ebbb70e68",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time pair build/nexus-sdk/generated/nexus_bindings.h"
+  },
+  "google/pair/nexus_factory.h": {
+    "size": 20500,
+    "sha256": "a2863f56ac5293775859cd1b23f605673bbfb5c4baf21f18feb3867898a44b95",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-pair/nexus_factory.h"
+  },
+  "installed/pair/nexus_factory.h": {
+    "size": 20500,
+    "sha256": "a2863f56ac5293775859cd1b23f605673bbfb5c4baf21f18feb3867898a44b95",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time pair build/nexus-sdk/generated/nexus_factory.h"
+  },
+  "google/pair/resolved.json": {
+    "size": 13956,
+    "sha256": "514bfab060a0a797869e9026cd5a3f0fceae9a0fed301d562d2a596d82875131",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-pair/resolved.json"
+  },
+  "installed/pair/resolved.json": {
+    "size": 14092,
+    "sha256": "f0293877bae2287c7b0c1378cc0977c7155a04947e177b2913cac2e980f63d5d",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time pair build/nexus-sdk/generated/resolved.json"
+  },
+  "installed/pair/installed_selected": {
+    "size": 36904,
+    "sha256": "9e2f8762ddd7b08a9af929b8faa06e3a07f676fd34388c87b2281b15cb80515f",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time pair build/bin/installed_selected"
+  },
+  "installed/pair/compile_commands.json": {
+    "size": 104348,
+    "sha256": "f19133a8bf49044569e9c48f94b9cf774f14dec96b5cd11eed0099f3812651fc",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time pair build/compile_commands.json"
+  },
+  "google/empty/ELF-identity.json": {
+    "size": 207,
+    "sha256": "b698aab89d29488a55ef02a5b404ea206cf238a66835dad8857369046922bc63",
+    "original_path": "metadata-only: Google ELF remains TMP"
+  },
+  "google/empty/bindings.c": {
+    "size": 15080,
+    "sha256": "75a805493f5861d0fcdb480d23fe6f18ba438da49979d9ae924e3b7d4fec2a18",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-empty/bindings.c"
+  },
+  "installed/empty/bindings.c": {
+    "size": 15080,
+    "sha256": "75a805493f5861d0fcdb480d23fe6f18ba438da49979d9ae924e3b7d4fec2a18",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time empty build/nexus-sdk/generated/bindings.c"
+  },
+  "google/empty/nexus_bindings.h": {
+    "size": 2472,
+    "sha256": "8ca2688310acd8e6239e22671fef654339c82791cbcc680f7adea39d5243e74d",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-empty/nexus_bindings.h"
+  },
+  "installed/empty/nexus_bindings.h": {
+    "size": 2472,
+    "sha256": "8ca2688310acd8e6239e22671fef654339c82791cbcc680f7adea39d5243e74d",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time empty build/nexus-sdk/generated/nexus_bindings.h"
+  },
+  "google/empty/nexus_factory.h": {
+    "size": 20378,
+    "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-empty/nexus_factory.h"
+  },
+  "installed/empty/nexus_factory.h": {
+    "size": 20378,
+    "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time empty build/nexus-sdk/generated/nexus_factory.h"
+  },
+  "google/empty/resolved.json": {
+    "size": 11546,
+    "sha256": "b0761fbb27b40500df5f81a46c5ac9d20cccc55b3cfc1eb2f5003657ebb1a3d3",
+    "original_path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-empty/resolved.json"
+  },
+  "installed/empty/resolved.json": {
+    "size": 11682,
+    "sha256": "07d4098ab6eb30b8025cfb06ca7e11accf6978b488e5457c1efe39ee447c2fbf",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time empty build/nexus-sdk/generated/resolved.json"
+  },
+  "installed/empty/installed_selected": {
+    "size": 20264,
+    "sha256": "54113e3754499ba2939c738a98067622a4006eb60f7119cd3d0b7fcc961e002c",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time empty build/bin/installed_selected"
+  },
+  "installed/empty/compile_commands.json": {
+    "size": 104554,
+    "sha256": "ae6a1715bbe4ec54a0e094e531d9e68bdca5623b7a3298b41d280f26d8886352",
+    "original_path": "/tmp/nexus io36 native selected consumers 20261018/selected native time empty build/compile_commands.json"
+  }
+}

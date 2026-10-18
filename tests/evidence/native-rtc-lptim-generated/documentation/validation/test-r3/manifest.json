@@ -1,0 +1,89 @@
+{
+  "kind": "retained_actual_full_cli_validation_small_evidence",
+  "phase": "test-r3",
+  "actual_returncode": 0,
+  "source_identity": {
+    "root": "/tmp/nexus-io36-native-20261018",
+    "commit": "3b2199861e5f01e2ba7c831cb54905b30b703858",
+    "tree": "84296783964c24a9cffb1f7ad24bf40a67744c86",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.2.202603_rel)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (c8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (8f922cd)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (624374f)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (fee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (f5929f4)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (a1996ee)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (2552682)"
+    ],
+    "working_tree_sha256": "a11d5b528d20dd2de4ee0795e17a80f84db6e602a52a2a6e3f89c5fe41764a40"
+  },
+  "production_guard": {
+    "files": 44,
+    "docs_files": 22,
+    "index_sha256": "6244b752dba159412507a46c33a0a81c4db0167b83f700e158f08242ad940aea",
+    "final_map_sha256": "a0c307bc6f360596ee4df2cd36b78925bba2271373b9bf90cfe587364c9e3d28"
+  },
+  "report": {
+    "suite": "documentation",
+    "discovered": 328,
+    "executed": 328,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "expected_failures": 0,
+    "unexpected_successes": 0,
+    "status": "passed"
+  },
+  "files": {
+    "test-r3-execution.json": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3-execution.json",
+      "size": 5092,
+      "sha256": "1c7d71f515e1412bf3940f72ce8a56029e0254ec27b3ad79ba4066a7a7d7d83e"
+    },
+    "test-r3.command.json": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3.command.json",
+      "size": 1421,
+      "sha256": "adfb0a0398036f04bd11f08f52cb5591be37b676e5dd1ab6c9cabfb34f242e24"
+    },
+    "test-r3.log": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3.log",
+      "size": 884,
+      "sha256": "aa5120f12ab1e810b18a8b88b4f42859c7870685875d24a5063fd74fa0517895"
+    },
+    "test-r3-report.json": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3-report.json",
+      "size": 196,
+      "sha256": "80396e929bccc6e57eacba4fe84ee576ab659f4a66b393cef214b46a82ebd20f"
+    },
+    "test-r3-wrapper.raw": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3-wrapper.raw",
+      "size": 380,
+      "sha256": "cd9e35925f0fd06912e4d4047f0767ea61905b5ffb05b31d1f16e5e71d488399"
+    },
+    "canonical-receipt.json": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3.attempts/1792292323063289095-4c3a9bfb2e7c4a318154a94d1ae6f9f4/receipt.json",
+      "size": 1270,
+      "sha256": "aecc671ed22bae54f56600b85b6ecc90f3939c2577ad901b1950378dd54fd0a7"
+    },
+    "canonical-stderr.txt": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3.attempts/1792292323063289095-4c3a9bfb2e7c4a318154a94d1ae6f9f4/stderr.txt",
+      "size": 688,
+      "sha256": "2301c3bb7a875028c02109dbb45661cab3a9e6739e7791f259dbb32816947802"
+    },
+    "canonical-stdout.txt": {
+      "original": "/tmp/nexus-io36-docs-validation-20261018-r1/test-r3.attempts/1792292323063289095-4c3a9bfb2e7c4a318154a94d1ae6f9f4/stdout.txt",
+      "size": 196,
+      "sha256": "80396e929bccc6e57eacba4fe84ee576ab659f4a66b393cef214b46a82ebd20f"
+    }
+  },
+  "scope": "Actual dirty development ownROOT validation. No clean candidate/physical/visual/offline-package claim; raw r2 history does not qualify r3."
+}

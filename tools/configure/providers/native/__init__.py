@@ -26,6 +26,8 @@ SPI_REQUIRES_ENDPOINT = False
 _FIXED_DMA = MappingProxyType({})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ("rtc", "calendar-alarm"): "rtc",
+    ("lptim", "counter16-oneshot"): "lptim",
     ('gpio', 'input'): 'gpio',
     ('gpio', 'output'): 'gpio',
     ('uart', 'irq-byte-event'): 'uart',

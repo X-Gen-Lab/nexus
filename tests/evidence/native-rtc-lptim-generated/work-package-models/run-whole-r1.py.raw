@@ -1,0 +1,54 @@
+"""Run one complete owned work-package module with maintained process evidence."""
+from pathlib import Path
+import hashlib
+import json
+import os
+import subprocess
+import sys
+R = Path('/tmp/nexus-io36-native-20261018')
+B = Path(__file__).resolve().parent
+V = Path('/workspace/nexus-build-system-20261012/.venv/bin')
+base = json.loads((B / 'base-identity-r1.json').read_text())
+assert len(sys.argv) == 2
+stage = sys.argv[1]
+assert stage.replace('-', '').isalnum()
+D = B / 'validation' / stage
+D.mkdir(parents=True, exist_ok=False)
+def identity(path):
+    data = path.read_bytes()
+    return {'bytes': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+def state():
+    protected = {name: identity(R / name) for name in base['protected_authored_inputs']}
+    assert protected == base['protected_authored_inputs']
+    index = identity(R / '.git/index')
+    assert index == base['index']
+    semantic = hashlib.sha256(subprocess.check_output(
+        ['git', '--no-optional-locks', 'ls-files', '--stage', '-z'], cwd=R,
+        env=dict(os.environ, GIT_OPTIONAL_LOCKS='0'))).hexdigest()
+    assert semantic == base['index_semantics_sha256']
+    return {'owned_sources': {name: identity(R / name) for name in base['authorized_source_paths']},
+            'protected_authored_inputs': protected, 'index': index,
+            'index_semantics_sha256': semantic}
+before = state()
+(D / 'source-and-index-before.json').write_text(json.dumps(before, indent=2) + '\n')
+env = dict(os.environ)
+assert not env.get('SKIP') and not env.get('NEXUS_SKIP_TDD')
+env.update(PATH=str(V) + os.pathsep + env.get('PATH', ''), PYTHONDONTWRITEBYTECODE='1',
+           NEXUS_BUILD_JOBS='1', CMAKE_BUILD_PARALLEL_LEVEL='1', GIT_OPTIONAL_LOCKS='0')
+sys.path.insert(0, str(R))
+from tools.dev import process
+result = process.run([str(V / 'python'), '-B', '-m', 'unittest', 'discover',
+    '-s', 'tools/testing', '-p', 'test_work_packages.py', '-v'], cwd=R, env=env,
+    timeout=600, stage=stage, log=D / 'command.raw')
+after = state()
+(D / 'source-and-index-after.json').write_text(json.dumps(after, indent=2) + '\n')
+summary = {'module': 'tools/testing/test_work_packages.py', 'actual_exit': result.returncode,
+           'receipt': str(result.receipt_path), 'source_and_index_unchanged': before == after,
+           'scope': 'Complete work-package unit module only; no build/filter/main hook or qualification'}
+(D / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+print(json.dumps(summary), flush=True)
+print(result.stdout[-1000:], flush=True)
+print(result.stderr[-12000:], file=sys.stderr, flush=True)
+assert before == after
+assert sum(p.stat().st_size for p in B.rglob('*') if p.is_file()) <= base['budget_bytes']
+raise SystemExit(result.returncode)

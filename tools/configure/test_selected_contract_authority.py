@@ -27,6 +27,9 @@ class SelectedContractAuthorityTests(unittest.TestCase):
     def test_seven_canonical_inputs_keep_selected_mechanisms(self):
         root = "cmake/package/verification/io_evolution/"
         choices = (
+            ("native-time-pair", {"rtc", "lptim"},
+             "nx_native_lptim_construct("),
+            ("native-time-empty", set(), "nx_platform_start_impl("),
             ("h743-high-empty", set(),
              "nx_stm32h743_pll384_system_start("),
             ("h743-high-uart", {"gpio", "uart"},

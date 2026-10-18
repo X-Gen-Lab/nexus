@@ -1,0 +1,421 @@
+{
+  "schema_version": 1,
+  "kind": "independent_exact_incremental_IO36_round4_catalog_translation_review",
+  "reviewer": "/root/style_control_chars",
+  "observed_ns": 1792292093710534891,
+  "result": "passed_translation_delta_only",
+  "blocker_count": 0,
+  "blockers": [],
+  "scope": "Read-only review of the exact 77 round4 translation delta entries and prior-review preservation. Prior unchanged 323-entry prose was not semantically re-read. Root separately owns canonical-source, capability projection, DOT and label review. No metadata flag was edited.",
+  "inputs": {
+    "packet": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/review-packet-r2.json",
+      "sha256": "634988b15d74d45b2c53f85986e4fa41d92ca8b04889e69f7e65d58ddf78ded0"
+    },
+    "delta": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/catalog-review-delta-r2.json",
+      "sha256": "8e933fcce04ceb786145a6a717a5968b78a345fc2b9f67396911ef9ca339a52b"
+    },
+    "inherited_packet": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/_preparation/review-packet-r1.json",
+      "sha256": "64646fe17cdad9e63b872274ba359e1158e8aececd55b8c37a7f27f400d0f756"
+    },
+    "inherited_translation_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/independent-catalog-review-r1.json",
+      "sha256": "acfbe5d40cdfd88e3236a05424b5b0ff4aaa7efbce0c7be83ce2d93967f58775"
+    },
+    "inherited_translation_delta": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/_preparation/catalog-review-delta-r1.json",
+      "sha256": "c8ba9e63c6fddb15bcea8c82571a84c5c1380d770bbe2d8527d2c296e06ae99c"
+    },
+    "production_guard_sha256_verified": "e9ba44895888044e056c26fd135e2342f88427b731c7d970f4eeda91c438829b",
+    "all_22_packet_durable_artifact_identities_reverified": true
+  },
+  "manually_reviewed_delta_count": 77,
+  "RTC_new_pairs_count": 6,
+  "capabilities_new_pairs_count": 70,
+  "gallery_corrected_pairs_count": 1,
+  "manual_review_method": "Read all three added RTC explanation msgid/msgstr pairs in each language, all 35 added capabilities msgid/msgstr pairs in each language, and the sole corrected gallery English pair. Exact identity translations were read with equality verification, including all paths, controller names, interface names and mode tokens. Reuse/hash audits do not replace this reading.",
+  "incremental_catalog_audits": [
+    {
+      "path": "docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po",
+      "before_sha256_verified": "65e020eab7da723fef33e255872e6b8a7ca545583bab09de356aa599dca29379",
+      "before_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po",
+      "after_sha256": "e0addec00e1fb0346468df3d36aed2c761b61c4427aa80713e22ddcdf27395f0",
+      "manually_reviewed_added_count": 3,
+      "manually_reviewed_added_ordinals": [
+        1,
+        2,
+        3
+      ],
+      "ordered_added_msgid_msgstr_digest": "4dba6696548c3e37a6b413b455ce7ceb3b21039026c1e730268de201ab5c9771",
+      "unchanged_reused_value_count": 43,
+      "reused_value_digest_verified": "2beee4c26822ed7eeb777ce6797c7c7ea5d4456008f4945f6aa3087b7317da11",
+      "removed_key_count": 2,
+      "old_reuse_values_preserved_exactly": true,
+      "unexpected_key_or_translation_changes": 0
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po",
+      "before_sha256_verified": "b34749871e95069ddf29d38b57fdd00a260fc10b072d6938723425bbd1f3c68d",
+      "before_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po",
+      "after_sha256": "4b315f34e621dc76710ac3879192102c48f640c3e40adfac754b0c8fc2c9a4c3",
+      "manually_reviewed_added_count": 3,
+      "manually_reviewed_added_ordinals": [
+        1,
+        2,
+        3
+      ],
+      "ordered_added_msgid_msgstr_digest": "0ef6ab600017f165277c03ba0a6d52336609b43507cc8ff193a399b60b0a73c7",
+      "unchanged_reused_value_count": 43,
+      "reused_value_digest_verified": "54ebd10c2cd3d10312165721582bc863ca1ecb232a2924124a1b6aa8daba0db2",
+      "removed_key_count": 2,
+      "old_reuse_values_preserved_exactly": true,
+      "unexpected_key_or_translation_changes": 0
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256_verified": "b5ac8a29dcde2f6b1ea6aae71108a93a163194bc4b7873875fe90974a633e46e",
+      "before_source": "3b2199861e5f01e2ba7c831cb54905b30b703858:docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "after_sha256": "5a425b8a6fd22c38f57967a915b5f91417846357cc6dbec7d4a37e62b77d9993",
+      "manually_reviewed_added_count": 35,
+      "manually_reviewed_added_ordinals": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "ordered_added_msgid_msgstr_digest": "33e7e02fa9f9701015e87d351320a1ef42d8d24c9d99c624c4f8d708e4e8144e",
+      "unchanged_reused_value_count": 446,
+      "reused_value_digest_verified": "994ddadeb034606f4e61423ac679da3bc3c3407831605bd1b8ce17eb3c3406fc",
+      "removed_key_count": 0,
+      "old_reuse_values_preserved_exactly": true,
+      "unexpected_key_or_translation_changes": 0
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256_verified": "0a4b9f6f296394d15b7173ca7db586087d6e1e2156e5f2a875c1707ae5ecba36",
+      "before_source": "3b2199861e5f01e2ba7c831cb54905b30b703858:docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "after_sha256": "faf0278225ef4c338de189dfc541eca2445a1068aac7c0c9d581d77e7d8579ee",
+      "manually_reviewed_added_count": 35,
+      "manually_reviewed_added_ordinals": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35
+      ],
+      "ordered_added_msgid_msgstr_digest": "946a6fbbd866167917052f583a3b9267b8e8ed143d15ab4731a32fe8274bc826",
+      "unchanged_reused_value_count": 446,
+      "reused_value_digest_verified": "3d3616611f21b429aa67e5caea3c1883c4f5b8093b0b607959056e2e9741e37e",
+      "removed_key_count": 0,
+      "old_reuse_values_preserved_exactly": true,
+      "unexpected_key_or_translation_changes": 0
+    }
+  ],
+  "gallery_correction": {
+    "path": "docs/locale/en/LC_MESSAGES/assets/diagrams/README.po",
+    "before_sha256_verified": "04936b6daed66685e767edebb1379366aef442064d941469a511a1adcbb21f89",
+    "after_sha256": "d278dd24e7006af959ac30833a3e231f3d863b6ed3fe5b1dce17faab10bc5c52",
+    "reviewed_delta_count": 1,
+    "unchanged_other_values": 122,
+    "prior_blocker": "GALLERY-EN-01",
+    "prior_blocker_closed": true,
+    "actual_msgstr_matches_prior_exact_required_msgstr": true,
+    "only_replacement": "the IO-16 architecture view -> the FIG-16 I/O architecture view",
+    "msgid_sha256": "e7881a199715c0410612871f422a403d13e1dc084d878bf7a4f15b0c5e97dce2",
+    "corrected_msgstr_sha256": "bcabdd815526f36452676cc2f0fbc09df24ab5d41d30126a0bbaa24513efa126"
+  },
+  "inherited_323_entry_review_preservation": {
+    "retained_identical_msgid_msgstr_pairs": 318,
+    "retired_old_pairs": 4,
+    "corrected_gallery_pairs": 1,
+    "unexpected_changes": 0,
+    "retirement_reason": "Two superseded English msgids per RTC language catalog: constructor time-reader clarification and the split manual/phase3 evidence statement. All four removals exactly match the provided delta.",
+    "per_catalog": [
+      {
+        "path": "docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po",
+        "previous_reviewed_delta_count": 45,
+        "retained_msgid_msgstr_identical": 43,
+        "retired_keys": 2,
+        "corrected_values": 0
+      },
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po",
+        "previous_reviewed_delta_count": 45,
+        "retained_msgid_msgstr_identical": 43,
+        "retired_keys": 2,
+        "corrected_values": 0
+      },
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/index.po",
+        "previous_reviewed_delta_count": 1,
+        "retained_msgid_msgstr_identical": 1,
+        "retired_keys": 0,
+        "corrected_values": 0
+      },
+      {
+        "path": "docs/locale/en/LC_MESSAGES/assets/diagrams/README.po",
+        "previous_reviewed_delta_count": 8,
+        "retained_msgid_msgstr_identical": 7,
+        "retired_keys": 0,
+        "corrected_values": 1
+      },
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/assets/diagrams/README.po",
+        "previous_reviewed_delta_count": 8,
+        "retained_msgid_msgstr_identical": 8,
+        "retired_keys": 0,
+        "corrected_values": 0
+      },
+      {
+        "path": "docs/locale/en/LC_MESSAGES/reference/api/io.po",
+        "previous_reviewed_delta_count": 108,
+        "retained_msgid_msgstr_identical": 108,
+        "retired_keys": 0,
+        "corrected_values": 0
+      },
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po",
+        "previous_reviewed_delta_count": 108,
+        "retained_msgid_msgstr_identical": 108,
+        "retired_keys": 0,
+        "corrected_values": 0
+      }
+    ],
+    "unchanged_whole_catalogs": [
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/index.po",
+        "sha256": "5ef6792e40334f7eac596bda5d55862a02018936d15c8f07ff022a937c04f44e"
+      },
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/assets/diagrams/README.po",
+        "sha256": "6173e776827b00eb22239e3b93c87ccda2397ce74115e3b2ff3819d8b552ed96"
+      },
+      {
+        "path": "docs/locale/en/LC_MESSAGES/reference/api/io.po",
+        "sha256": "75a45058e7f89959ac0f63540af32164ab87869e0a4dbe77cc8c38f954e11453"
+      },
+      {
+        "path": "docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po",
+        "sha256": "46fbeae5c56243d699c3413ee676665855283192d100383f2538333fb56d1dc7"
+      }
+    ],
+    "current_union_of_prior_retained_and_fresh_reviewed_pairs": 395,
+    "old_API_1387_per_language_preservation": "Both entire API catalogs retain the exact previously reviewed hashes, so the previously verified 1387 reused entries per language and all 108 reviewed additions per language remain unchanged."
+  },
+  "catalog_required_message_count": 4295,
+  "catalog_count": 9,
+  "catalog_audits": [
+    {
+      "path": "docs/locale/en/LC_MESSAGES/assets/diagrams/README.po",
+      "bytes": 67789,
+      "sha256": "d278dd24e7006af959ac30833a3e231f3d863b6ed3fe5b1dce17faab10bc5c52",
+      "source_sha256": "53797cbe3d96545a9daf6d4fe3c695106e48e0c94b7349b65cffe6c4c420d86d",
+      "actual_POT_sha256": "026546dccf57502f24ad79655b84a8914bd15997fc7f554f66f54180cd86f021",
+      "required_messages": 123,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 110118,
+      "sha256": "5a425b8a6fd22c38f57967a915b5f91417846357cc6dbec7d4a37e62b77d9993",
+      "source_sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+      "actual_POT_sha256": "f04dbc93e537727ff09cbca6cda42576d0b771b021cc59f23f97740908747d0f",
+      "required_messages": 481,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po",
+      "bytes": 36109,
+      "sha256": "e0addec00e1fb0346468df3d36aed2c761b61c4427aa80713e22ddcdf27395f0",
+      "source_sha256": "47d5d3f9ddcc6184ab7b3ea301f5a733812361b4268b690b02a087fe97daa607",
+      "actual_POT_sha256": "04073a306d2104eaeecdf5b50b5594fb0ddebaf412fed342cda3b6bf4b18ac53",
+      "required_messages": 46,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/reference/api/io.po",
+      "bytes": 274290,
+      "sha256": "75a45058e7f89959ac0f63540af32164ab87869e0a4dbe77cc8c38f954e11453",
+      "source_sha256": "64675cb7e32c2720191e8e100185d6a9a408a7832b0157d5bbf4551d3d069e75",
+      "actual_POT_sha256": "af9fe8669a8158194b37899a6290793193641b4f3aeb2f8a3e032cddc3a792d4",
+      "required_messages": 1495,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/assets/diagrams/README.po",
+      "bytes": 62504,
+      "sha256": "6173e776827b00eb22239e3b93c87ccda2397ce74115e3b2ff3819d8b552ed96",
+      "source_sha256": "53797cbe3d96545a9daf6d4fe3c695106e48e0c94b7349b65cffe6c4c420d86d",
+      "actual_POT_sha256": "026546dccf57502f24ad79655b84a8914bd15997fc7f554f66f54180cd86f021",
+      "required_messages": 123,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 109846,
+      "sha256": "faf0278225ef4c338de189dfc541eca2445a1068aac7c0c9d581d77e7d8579ee",
+      "source_sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+      "actual_POT_sha256": "f04dbc93e537727ff09cbca6cda42576d0b771b021cc59f23f97740908747d0f",
+      "required_messages": 481,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/index.po",
+      "bytes": 2221,
+      "sha256": "5ef6792e40334f7eac596bda5d55862a02018936d15c8f07ff022a937c04f44e",
+      "source_sha256": "9c157806ac67c47c47647b738dcf235fb78c690a1e8af5f0ab2df6a4550a6c91",
+      "actual_POT_sha256": "b01d53786c2c119ed96e2d03e757955ff429ef3d45ddf6e625f83e0c6271dace",
+      "required_messages": 5,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po",
+      "bytes": 34978,
+      "sha256": "4b315f34e621dc76710ac3879192102c48f640c3e40adfac754b0c8fc2c9a4c3",
+      "source_sha256": "47d5d3f9ddcc6184ab7b3ea301f5a733812361b4268b690b02a087fe97daa607",
+      "actual_POT_sha256": "04073a306d2104eaeecdf5b50b5594fb0ddebaf412fed342cda3b6bf4b18ac53",
+      "required_messages": 46,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po",
+      "bytes": 273849,
+      "sha256": "46fbeae5c56243d699c3413ee676665855283192d100383f2538333fb56d1dc7",
+      "source_sha256": "64675cb7e32c2720191e8e100185d6a9a408a7832b0157d5bbf4551d3d069e75",
+      "actual_POT_sha256": "af9fe8669a8158194b37899a6290793193641b4f3aeb2f8a3e032cddc3a792d4",
+      "required_messages": 1495,
+      "required_key_set_exact": true,
+      "empty_fuzzy_obsolete_duplicate_plural_entries": 0,
+      "X-Nexus-Reviewed_observed": "false"
+    }
+  ],
+  "whole_POT_read_only_membership_audit": {
+    "old_POT_root": "/tmp/nexus-io36-docs-validation-20261018-r1/extract-r1/gettext",
+    "new_POT_root": "/tmp/nexus-io36-docs-validation-20261018-r1/extract-r2/gettext",
+    "same_POT_path_membership": 116,
+    "identical_ordered_msgid_sets": 114,
+    "changed_ordered_msgid_sets_only": [
+      "delivery/capabilities.pot",
+      "explanation/rtc-lptim.pot"
+    ],
+    "semantic_re_read_of_unchanged_entries": false
+  },
+  "translation_semantics": [
+    "Constructor wording accurately distinguishes copying the Core clock descriptor from invoking its time reader; Chinese says 不调用其时间读取函数. Fresh-owner construct-once and later explicit private reopen remain unchanged.",
+    "Manual Native behavior/reopen evidence is explicitly separate. The phase3 manifest is not claimed to record a rerun of those manual programs. Its exact 85e01921... manifest hash is unchanged, and configuration/generated pair-empty/focused development SDK execution remains within the stated scope.",
+    "Neither language inherits main qualification or claims a clean publishable SDK, full SDK matrix, repeatability, whole-repository CI or physical results.",
+    "Capabilities prose accurately restricts native (MODEL; physical=false) rows to software models actually selected/generated by the current resolver. It explicitly denies physical peripheral counts, pins, IRQs, Board routes and board capability, explains empty route/Board columns and excludes unselected inventory.",
+    "All 34 other added capabilities keys per language are technical identifiers, mode strings or source/fixture paths and are preserved exactly. Software RTC0/RTC1 and LPTIM0/LPTIM1 identifiers are not translated into physical-instance claims.",
+    "Gallery figure identity is restored to FIG-16, and every other gallery value remains exact. No newly reviewed pair changes units, public symbols, borrowing/SETTLED contracts or hardware evidence boundaries."
+  ],
+  "prior_authoritative_staged_headers_unchanged": [
+    {
+      "path": "io/include/nexus/io/rtc.h",
+      "sha256": "ca78e6b19288f146faf54aff21872441f7a0ff1a97a3f3858ec148609a8d61a3",
+      "unchanged_from_prior_authority_review": true
+    },
+    {
+      "path": "io/include/nexus/io/lptim.h",
+      "sha256": "45ff02a0517ccac94cbd94c3415565029da858167adc750c2919a29162f0c0a1",
+      "unchanged_from_prior_authority_review": true
+    },
+    {
+      "path": "io/include/nexus/io/native/rtc_lptim_model.h",
+      "sha256": "525857d06fdce60a471d91edc9a48691906f3b406c42feeb877434b1570dd126",
+      "unchanged_from_prior_authority_review": true
+    },
+    {
+      "path": "io/native/rtc_lptim_provider.h",
+      "sha256": "8a8b864041df71a47e6a9e60d1a443ee27dbffe5ecb2e031aefca4461e675493",
+      "unchanged_from_prior_authority_review": true
+    }
+  ],
+  "metadata_status": "All nine current catalogs still have X-Nexus-Reviewed=false. This translation-only finding is bound to the exact hashes above; Root must finish its independent canonical/diagram review before deciding metadata admission. No future changed bytes are pre-approved.",
+  "not_performed": [
+    "PO/source/metadata/index/main modifications",
+    "tests or builds",
+    "new gettext extraction or diagram rendering",
+    "network or cloning",
+    "hardware or complete-source qualification"
+  ],
+  "written_artifact_scope": "Only round4/independent-catalog-review-r2.json was written. Existing style code, H743 WIP, round3 files and reports were untouched."
+}

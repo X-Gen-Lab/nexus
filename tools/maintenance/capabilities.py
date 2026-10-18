@@ -81,7 +81,8 @@ def collect(root=ROOT):
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
     shared_sources = (set((root / "soc/common").glob("*.c"))
-                      | set((root / "io/src").glob("*.c")))
+                      | set((root / "io/src").glob("*.c"))
+                      | set((root / "io/native").glob("*.c")))
     for source in sorted(shared_sources):
         for symbol in source_ops(source, root):
             if symbol in exports:
@@ -113,7 +114,9 @@ def collect(root=ROOT):
     for fixture in fixture_paths:
         result = configure.resolve(fixture, root)
         if result["soc_family"] == "native":
-            continue
+            provider = configure.maintained(result["soc_family"])
+            if provider.MODEL is not True or result["physical_qualified"] is not False:
+                raise ValueError("Native source provenance requires an unqualified MODEL")
         source = c_code(bindings.emit(result)[1])
         for item in result["controllers"]:
             name = bindings.symbol(item["id"])
@@ -146,6 +149,18 @@ def collect(root=ROOT):
                            "fixtures": sorted(selected[key]["fixtures"]),
                            "exports": sorted(selected[key]["exports"])}
                     rows.append(row)
+    # Host models have no physical SoC/Board inventory here. Project only
+    # controllers actually selected by the same resolver/face-to-ops path.
+    # Empty assemblies therefore cannot manufacture a model capability row.
+    for key in sorted(selected):
+        family, controller, kind, mode = key
+        if family != "native":
+            continue
+        rows.append({"family": family, "controller": controller,
+                     "kind": kind, "mode": mode, "routes": [], "boards": [],
+                     "fixtures": sorted(selected[key]["fixtures"]),
+                     "exports": sorted(selected[key]["exports"]),
+                     "implementation": "MODEL", "physical_qualified": False})
     known = {(row["family"], row["controller"], row["kind"], row["mode"])
              for row in rows}
     if selected.keys() - known:
@@ -161,6 +176,10 @@ def render(rows):
              "| --- | --- | --- | --- | --- | --- | --- | --- |"]
     for row in rows:
         cells = [row[key] for key in ("family", "controller", "kind", "mode")]
+        if row.get("implementation") == "MODEL":
+            if row.get("physical_qualified") is not False:
+                raise ValueError("Model rows cannot assert physical qualification")
+            cells[0] += " (MODEL; physical=false)"
         for key in ("routes", "boards", "fixtures", "exports"):
             cells.append(", ".join(f"`{value}`" for value in row[key]) or "—")
         lines.append("| " + " | ".join(cells) + " |")

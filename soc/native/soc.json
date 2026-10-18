@@ -160,6 +160,38 @@
         "PA8",
         "PA9"
       ]
+    },
+    "RTC0": {
+      "kind": "rtc",
+      "modes": [
+        "calendar-alarm"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "RTC1": {
+      "kind": "rtc",
+      "modes": [
+        "calendar-alarm"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "LPTIM0": {
+      "kind": "lptim",
+      "modes": [
+        "counter16-oneshot"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "LPTIM1": {
+      "kind": "lptim",
+      "modes": [
+        "counter16-oneshot"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "irq": {

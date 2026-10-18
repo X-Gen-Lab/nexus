@@ -65,7 +65,21 @@ class FamilyDescriptor:
 
 
 _DESCRIPTORS = MappingProxyType({
-    "native": FamilyDescriptor("native"),
+    "native": FamilyDescriptor("native", owned_payload=(
+        'io/include/nexus/io/rtc.h',
+        'io/include/nexus/io/lptim.h',
+        'io/include/nexus/io/native/rtc_lptim_model.h',
+        'io/native/rtc_lptim_provider.h',
+        'io/native/rtc_lptim.c',
+        'io/private/rtc_lptim_internal.h',
+        'io/src/rtc.c',
+        'io/src/lptim.c',
+        'boards/native_reference/board.json',
+        'cmake/package/verification/io_evolution/native-time-pair.toml',
+        'cmake/package/verification/io_evolution/native-time-empty.toml',
+        'cmake/package/verification/io_evolution/consumers/native-time-pair.c',
+        'cmake/package/verification/io_evolution/consumers/native-time-empty.c',
+    )),
     "stm32f103": FamilyDescriptor("stm32f103", (
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_f1", "stm32f1_cmsis"),

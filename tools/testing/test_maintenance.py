@@ -49,6 +49,40 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
         self.assertEqual(spi["boards"], [])
 
+    def test_native_selected_models_preserve_real_ops_and_no_physical_claim(self):
+        rows = capabilities.collect(ROOT)
+        selected = [row for row in rows if row["family"] == "native"]
+        self.assertTrue(selected, "Selected Native models require source provenance")
+        fixture = "cmake/package/verification/io_evolution/native-time-pair.toml"
+        for controller, kind, mode in (
+                ("RTC0", "rtc", "calendar-alarm"),
+                ("RTC1", "rtc", "calendar-alarm"),
+                ("LPTIM0", "lptim", "counter16-oneshot"),
+                ("LPTIM1", "lptim", "counter16-oneshot")):
+            with self.subTest(controller=controller):
+                values = [row for row in selected if
+                          (row["controller"], row["kind"], row["mode"]) ==
+                          (controller, kind, mode)]
+                self.assertEqual(len(values), 1)
+                row = values[0]
+                self.assertEqual(row["implementation"], "MODEL")
+                self.assertIs(row["physical_qualified"], False)
+                self.assertEqual(row["routes"], [])
+                self.assertEqual(row["boards"], [])
+                self.assertEqual(row["exports"], ["io/native/rtc_lptim.c"])
+                self.assertIn(fixture, row["fixtures"])
+        empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
+        self.assertFalse(any(empty in row["fixtures"] for row in rows),
+                         "Empty selection must not invent provider evidence")
+        for row in selected:
+            self.assertEqual(row["implementation"], "MODEL")
+            self.assertIs(row["physical_qualified"], False)
+            self.assertTrue(row["fixtures"])
+            self.assertTrue(row["exports"])
+        rendered = capabilities.render(selected)
+        self.assertIn("native (MODEL; physical=false)", rendered)
+        self.assertNotIn("| native |", rendered)
+
     def test_checked_document_matches_facts_and_selected_implementation(self):
         expected = capabilities.render(capabilities.collect(ROOT))
         document = (ROOT / capabilities.DOCUMENT).read_text()

@@ -163,7 +163,9 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "boards/gd470-eth-frames/board.json", "consumers/ethernet-frames.c",
         "h743-uart-rtscts.toml", "u575-uart-rtscts.toml",
         "g474-pwm-shared.toml", "boards/g474-pwm-shared/board.json",
-        "consumers/g474-pwm-shared.c"))
+        "consumers/g474-pwm-shared.c",
+        "native-time-pair.toml", "native-time-empty.toml",
+        "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
 REQUIRED_FILES += ("tools/configure/selected_contracts.py",
                    *IO_EVOLUTION_VERIFICATION_FILES)
 REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
@@ -538,7 +540,8 @@ def dependency_entries(root, dependency):
 
 def selected(name):
     # Only reviewed public smoke programs and their canonical software-reference
-    # inputs belong in this namespace. Host models and private products do not.
+    # inputs belong in this namespace, including the explicit Native time pair.
+    # Arbitrary host tests and private products do not.
     if name.startswith("cmake/package/verification/io_evolution/"):
         return name in IO_EVOLUTION_VERIFICATION_FILES
     # Historical audit archives belong to the repository, not the source SDK.

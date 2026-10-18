@@ -231,6 +231,58 @@
         "low-rate-scan"
       ],
       "source": "Explicit host behavior model; no physical wiring, timing, persistence or analog qualification"
+    },
+    {
+      "id": "rtc0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "RTC0",
+      "kind": "rtc",
+      "pins": [],
+      "modes": [
+        "calendar-alarm"
+      ],
+      "source": "Maintained Native host model; no physical IRQ, DMA or PCB claim"
+    },
+    {
+      "id": "rtc1",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "RTC1",
+      "kind": "rtc",
+      "pins": [],
+      "modes": [
+        "calendar-alarm"
+      ],
+      "source": "Maintained Native host model; no physical IRQ, DMA or PCB claim"
+    },
+    {
+      "id": "lptim0",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "LPTIM0",
+      "kind": "lptim",
+      "pins": [],
+      "modes": [
+        "counter16-oneshot"
+      ],
+      "source": "Maintained Native host model; no physical IRQ, DMA or PCB claim"
+    },
+    {
+      "id": "lptim1",
+      "variants": [
+        "NATIVE_MODEL"
+      ],
+      "controller": "LPTIM1",
+      "kind": "lptim",
+      "pins": [],
+      "modes": [
+        "counter16-oneshot"
+      ],
+      "source": "Maintained Native host model; no physical IRQ, DMA or PCB claim"
     }
   ]
 }

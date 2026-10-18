@@ -15,7 +15,7 @@ except ImportError:
 
 FACTORY_ABI_EPOCH = 1
 
-KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group", "eth_frames")
+KINDS = ("gpio", "uart", "spi", "i2c", "flash", "watchdog", "exti", "pwm", "adc", "can", "usb_device", "eth", "timer_capture", "advanced_pwm", "pwm_group", "encoder", "pwm_adc", "can_fd", "adc_group", "eth_frames", "rtc", "lptim")
 
 
 def symbol(name):
@@ -213,7 +213,7 @@ def emit_capabilities(result):
         '/**',
         ' * \\brief Readonly bounds of the selected provider/mode.',
         ' * \\note Zero units/messages means no bound described, not unlimited.',
-        ' * Zero unit_bytes means per-request word width; see typed traits.',
+        ' * Zero unit_bytes means no fixed byte width; the typed face defines units.',
         ' * For I2C, units bounds each message; unit_bytes is the payload unit.',
         ' * For enhanced SPI, max_messages bounds segments, never I2C messages.',
         ' * For Flash, unit_bytes constrains destination offset and length;',

@@ -1831,6 +1831,42 @@
         "fixture-io-evolution-gd470-eth-frames"
       ],
       "timeout_s": 7200
+    },
+    {
+      "name": "configure-fixture-io-evolution-native-time-pair",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-time-pair"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-fixture-io-evolution-native-time-pair",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-time-pair"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "configure-fixture-io-evolution-native-time-empty",
+      "checker": "configure",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-time-empty"
+      ],
+      "timeout_s": 7200
+    },
+    {
+      "name": "build-fixture-io-evolution-native-time-empty",
+      "checker": "build",
+      "args": [
+        "--preset",
+        "fixture-io-evolution-native-time-empty"
+      ],
+      "timeout_s": 7200
     }
   ]
 }

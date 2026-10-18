@@ -1,0 +1,218 @@
+{
+  "kind": "round4_IO36_exact_source_and_translation_delta_pending_root_review",
+  "observed_ns": 1792291848740289576,
+  "root": "/tmp/nexus-io36-native-20261018",
+  "inherited_round3_packet_sha256": "64646fe17cdad9e63b872274ba359e1158e8aececd55b8c37a7f27f400d0f756",
+  "inherited_translation_review_sha256": "acfbe5d40cdfd88e3236a05424b5b0ff4aaa7efbce0c7be83ce2d93967f58775",
+  "production_guard": {
+    "files": 44,
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/ownership-before.json",
+    "sha256": "e9ba44895888044e056c26fd135e2342f88427b731c7d970f4eeda91c438829b"
+  },
+  "docs_files": {
+    "docs/assets/diagrams/README.md": {
+      "size": 23782,
+      "sha256": "53797cbe3d96545a9daf6d4fe3c695106e48e0c94b7349b65cffe6c4c420d86d",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/assets/diagrams/README.md"
+    },
+    "docs/assets/diagrams/diagram-index.csv": {
+      "size": 5117,
+      "sha256": "d34b904e67072c38df7b3336b35568d6f8ed07169349300722c6e7d1b08921d2",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/assets/diagrams/diagram-index.csv"
+    },
+    "docs/assets/diagrams/labels.json": {
+      "size": 145569,
+      "sha256": "0fd73c2ece746de5b1c4b7fb88242a0527edc9dfe5fb3f77ae5abdfe26b69dc8",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/labels.json"
+    },
+    "docs/assets/diagrams/localized/en/rtc-lptim-lifecycle.dot": {
+      "size": 6286,
+      "sha256": "a478c4831bea8666baab18e1fd91213108d935062e8eaef6aa55ae732fdf492f",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/localized/en/rtc-lptim-lifecycle.dot"
+    },
+    "docs/assets/diagrams/localized/en/rtc-lptim-lifecycle.svg": {
+      "size": 298773,
+      "sha256": "720b4380e34b9660c70bafcc14aaae24d38622715262345321259c9ba969329b",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/localized/en/rtc-lptim-lifecycle.svg"
+    },
+    "docs/assets/diagrams/localized/zh_CN/rtc-lptim-lifecycle.dot": {
+      "size": 6214,
+      "sha256": "d5f81886a5c5feeec444f9f5234f282e42d2b4dba4fa4bb4e50921cbaa6c0177",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/localized/zh_CN/rtc-lptim-lifecycle.dot"
+    },
+    "docs/assets/diagrams/localized/zh_CN/rtc-lptim-lifecycle.svg": {
+      "size": 683977,
+      "sha256": "94fc3386c3decf4904d0f2d33d8949a4863548dfb04881f6f76bb2f43361c8c9",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/localized/zh_CN/rtc-lptim-lifecycle.svg"
+    },
+    "docs/assets/diagrams/rtc-lptim-lifecycle.dot": {
+      "size": 6286,
+      "sha256": "a478c4831bea8666baab18e1fd91213108d935062e8eaef6aa55ae732fdf492f",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/rtc-lptim-lifecycle.dot"
+    },
+    "docs/assets/diagrams/rtc-lptim-lifecycle.svg": {
+      "size": 298773,
+      "sha256": "720b4380e34b9660c70bafcc14aaae24d38622715262345321259c9ba969329b",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/assets/diagrams/rtc-lptim-lifecycle.svg"
+    },
+    "docs/delivery/capabilities.md": {
+      "size": 58807,
+      "sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/delivery/capabilities.md"
+    },
+    "docs/explanation/index.md": {
+      "size": 1101,
+      "sha256": "9c157806ac67c47c47647b738dcf235fb78c690a1e8af5f0ab2df6a4550a6c91",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/explanation/index.md"
+    },
+    "docs/explanation/rtc-lptim.md": {
+      "size": 14978,
+      "sha256": "47d5d3f9ddcc6184ab7b3ea301f5a733812361b4268b690b02a087fe97daa607",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/explanation/rtc-lptim.md"
+    },
+    "docs/locale/en/LC_MESSAGES/assets/diagrams/README.po": {
+      "size": 67789,
+      "sha256": "d278dd24e7006af959ac30833a3e231f3d863b6ed3fe5b1dce17faab10bc5c52",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/locale/en/LC_MESSAGES/assets/diagrams/README.po"
+    },
+    "docs/locale/en/LC_MESSAGES/delivery/capabilities.po": {
+      "size": 110118,
+      "sha256": "5a425b8a6fd22c38f57967a915b5f91417846357cc6dbec7d4a37e62b77d9993",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/locale/en/LC_MESSAGES/delivery/capabilities.po"
+    },
+    "docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po": {
+      "size": 36109,
+      "sha256": "e0addec00e1fb0346468df3d36aed2c761b61c4427aa80713e22ddcdf27395f0",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/locale/en/LC_MESSAGES/explanation/rtc-lptim.po"
+    },
+    "docs/locale/en/LC_MESSAGES/reference/api/io.po": {
+      "size": 274290,
+      "sha256": "75a45058e7f89959ac0f63540af32164ab87869e0a4dbe77cc8c38f954e11453",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/en/LC_MESSAGES/reference/api/io.po"
+    },
+    "docs/locale/zh_CN/LC_MESSAGES/assets/diagrams/README.po": {
+      "size": 62504,
+      "sha256": "6173e776827b00eb22239e3b93c87ccda2397ce74115e3b2ff3819d8b552ed96",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/zh_CN/LC_MESSAGES/assets/diagrams/README.po"
+    },
+    "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po": {
+      "size": 109846,
+      "sha256": "faf0278225ef4c338de189dfc541eca2445a1068aac7c0c9d581d77e7d8579ee",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po"
+    },
+    "docs/locale/zh_CN/LC_MESSAGES/explanation/index.po": {
+      "size": 2221,
+      "sha256": "5ef6792e40334f7eac596bda5d55862a02018936d15c8f07ff022a937c04f44e",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/zh_CN/LC_MESSAGES/explanation/index.po"
+    },
+    "docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po": {
+      "size": 34978,
+      "sha256": "4b315f34e621dc76710ac3879192102c48f640c3e40adfac754b0c8fc2c9a4c3",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/docs/locale/zh_CN/LC_MESSAGES/explanation/rtc-lptim.po"
+    },
+    "docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po": {
+      "size": 273849,
+      "sha256": "46fbeae5c56243d699c3413ee676665855283192d100383f2538333fb56d1dc7",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po"
+    },
+    "docs/reference/api/io.md": {
+      "size": 4150,
+      "sha256": "64675cb7e32c2720191e8e100185d6a9a408a7832b0157d5bbf4551d3d069e75",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round3/files/docs/reference/api/io.md"
+    }
+  },
+  "docs_file_count": 22,
+  "changed_text_patch": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/exact-text-delta-r2.patch",
+    "sha256": "3f8610840208764d8c1a5cf319c059c9c656766504ce7df10331cbff8c527ed8"
+  },
+  "catalog_delta": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/catalog-review-delta-r2.json",
+    "sha256": "8e933fcce04ceb786145a6a717a5968b78a345fc2b9f67396911ef9ca339a52b"
+  },
+  "diagram_labels": {
+    "count": 59,
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/labels-rtc-lptim.increment-r2.json",
+    "sha256": "aa69f8e4fa17dc89d69e7d0c0c6612b1666062c6328fe30f6f724e48c992b7b6"
+  },
+  "actual_fresh_extraction": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/extraction-result-r2.json",
+    "sha256": "602bfb9d3598d73e218da386b11773ab2f8a48b7094d97b6c621a4616099c3c0",
+    "actual_exit": 0,
+    "pages": 116,
+    "POTs": 116
+  },
+  "whole_POT_delta_sha256": "4b366ce41115f982e25a102c1c0e91d83e27e0c1064c2a00d9ec19cef3ff7e5d",
+  "actual_render": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-docs/round4/files/_preparation/render-actual-r2.json",
+    "sha256": "d45fd5d3db22523aaa2d3d356ddff68485e80b4320bb7c2eae86c053e429d5ff",
+    "actual_exit": 0
+  },
+  "source_scan_errors": 0,
+  "full_translation_status_rows": 232,
+  "original_or_reviewed": 223,
+  "metadata_false_only": [
+    {
+      "docname": "assets/diagrams/README",
+      "language": "en",
+      "required": 123,
+      "sha256": "d278dd24e7006af959ac30833a3e231f3d863b6ed3fe5b1dce17faab10bc5c52"
+    },
+    {
+      "docname": "assets/diagrams/README",
+      "language": "zh_CN",
+      "required": 123,
+      "sha256": "6173e776827b00eb22239e3b93c87ccda2397ce74115e3b2ff3819d8b552ed96"
+    },
+    {
+      "docname": "delivery/capabilities",
+      "language": "en",
+      "required": 481,
+      "sha256": "5a425b8a6fd22c38f57967a915b5f91417846357cc6dbec7d4a37e62b77d9993"
+    },
+    {
+      "docname": "delivery/capabilities",
+      "language": "zh_CN",
+      "required": 481,
+      "sha256": "faf0278225ef4c338de189dfc541eca2445a1068aac7c0c9d581d77e7d8579ee"
+    },
+    {
+      "docname": "explanation/index",
+      "language": "zh_CN",
+      "required": 5,
+      "sha256": "5ef6792e40334f7eac596bda5d55862a02018936d15c8f07ff022a937c04f44e"
+    },
+    {
+      "docname": "explanation/rtc-lptim",
+      "language": "en",
+      "required": 46,
+      "sha256": "e0addec00e1fb0346468df3d36aed2c761b61c4427aa80713e22ddcdf27395f0"
+    },
+    {
+      "docname": "explanation/rtc-lptim",
+      "language": "zh_CN",
+      "required": 46,
+      "sha256": "4b315f34e621dc76710ac3879192102c48f640c3e40adfac754b0c8fc2c9a4c3"
+    },
+    {
+      "docname": "reference/api/io",
+      "language": "en",
+      "required": 1495,
+      "sha256": "75a45058e7f89959ac0f63540af32164ab87869e0a4dbe77cc8c38f954e11453"
+    },
+    {
+      "docname": "reference/api/io",
+      "language": "zh_CN",
+      "required": 1495,
+      "sha256": "46fbeae5c56243d699c3413ee676665855283192d100383f2538333fb56d1dc7"
+    }
+  ],
+  "source_semantic_review": "pending Root focused correction review; FIG21 registry source review remains pending",
+  "translation_review": "pending Root focused delta approval; all nine changed catalogs false",
+  "historical_docs_suite": "Complete328/328 actual0 before metadata6/r4 changes only; retained validation/test-r1, not inherited qualification",
+  "strict_HTML": "not executed",
+  "visual": "not executed",
+  "HIL": "not executed",
+  "persistent_budget": 6000000,
+  "TMP_validation_budget": 350000000
+}

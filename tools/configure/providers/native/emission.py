@@ -23,6 +23,8 @@ def includes(result):
     source = []
     source += ['#include "nexus/io/native/model.h"',
                '#include "provider.h"']
+    if any(item.kind in {"rtc", "lptim"} for item in result.controllers):
+        source.append('#include "rtc_lptim_provider.h"')
     if any(item.mode == "irq-words" for item in result.controllers):
         source.append('#include "uart_word_provider.h"')
     if any(item.interface_kind == "spi_dma_transaction" for item in result.controllers):
@@ -63,8 +65,16 @@ def has_dma(result):
 
 
 def state_declarations(result):
-    del result
-    return []
+    if not any(item.kind in {"rtc", "lptim"} for item in result.controllers):
+        return []
+    return [
+        '/** \\brief Selected-only adapter; Core time never advances a model. */',
+        'static nx_time_us_t nx_native_time_clock_read(void* context) {',
+        '    (void)context;',
+        '    return nx_time_now_us();', '}',
+        'static const nx_clock_t s_nx_native_time_clock = {',
+        '    nx_native_time_clock_read, NULL', '};',
+    ]
 
 
 def shared_irqs(result):

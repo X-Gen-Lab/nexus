@@ -3,9 +3,6 @@ file(GLOB_RECURSE physical_factory_codegen CONFIGURE_DEPENDS
     "${NEXUS_SOURCE_DIR}/tools/configure/*.py")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     ${physical_factory_codegen})
-set(physical_kinds gpio uart spi i2c flash watchdog exti pwm adc can usb_device
-    eth timer_capture advanced_pwm pwm_group encoder spi_device i2c_device
-    usb_endpoint mdio pwm_adc can_fd adc_group eth_frames)
 foreach(physical_family stm32 gd32)
     set(physical_official)
     if(physical_family STREQUAL "stm32")
@@ -52,10 +49,32 @@ foreach(physical_family stm32 gd32)
                 nx_platform_stop=nx_empty_platform_stop
                 nx_platform_start_diagnosed=nx_empty_platform_start_diagnosed
                 nx_platform_stop_diagnosed=nx_empty_platform_stop_diagnosed)
-            foreach(kind IN LISTS physical_kinds)
-                target_compile_definitions(${physical_object} PRIVATE
-                    nx_factory_${kind}=nx_empty_factory_${kind}
-                    nx_factory_${kind}_capability=nx_empty_factory_${kind}_capability)
+            # Generated exports start with a const Nexus return type and the
+            # factory name followed by '('. Arguments may continue on a new
+            # line. Reject any other export spelling instead of missing it.
+            file(READ "${physical_bundle}/nexus_factory.h" physical_factory_header)
+            set(physical_factory_pattern
+                "const nx_[a-z0-9_]+_t[*] (nx_factory_[a-z0-9_]+)[(]")
+            string(REGEX MATCHALL "${physical_factory_pattern}"
+                physical_factory_declarations "${physical_factory_header}")
+            string(REGEX MATCHALL "nx_factory_[A-Za-z0-9_]+[ \t\r\n]*[(]"
+                physical_factory_references "${physical_factory_header}")
+            list(LENGTH physical_factory_declarations physical_factory_count)
+            list(LENGTH physical_factory_references physical_factory_reference_count)
+            if(physical_factory_count EQUAL 0 OR
+                    NOT physical_factory_count EQUAL physical_factory_reference_count)
+                message(FATAL_ERROR "Unexpected generated factory export declarations")
+            endif()
+            set(physical_factory_symbols)
+            foreach(declaration IN LISTS physical_factory_declarations)
+                string(REGEX MATCH "${physical_factory_pattern}"
+                    physical_factory_match "${declaration}")
+                list(APPEND physical_factory_symbols "${CMAKE_MATCH_1}")
+            endforeach()
+            list(REMOVE_DUPLICATES physical_factory_symbols)
+            foreach(symbol IN LISTS physical_factory_symbols)
+                string(REGEX REPLACE "^nx_" "nx_empty_" renamed "${symbol}")
+                target_compile_definitions(${physical_object} PRIVATE "${symbol}=${renamed}")
             endforeach()
         else()
             set(physical_gpio_bundle "${physical_bundle}")

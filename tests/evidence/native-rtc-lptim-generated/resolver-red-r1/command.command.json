@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/configure",
+    "-p",
+    "test_rtc_lptim.py",
+    "-v"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "resolver-red-r1",
+  "started_ns": 1792288782099221111,
+  "finished_ns": 1792288782364286744,
+  "duration_seconds": 0.2650669149998066,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-red-r1/command.attempts/1792288782099124075-a09fa7407d5547ddb5269df5e71ab43d/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-red-r1/command.attempts/1792288782099124075-a09fa7407d5547ddb5269df5e71ab43d/stderr.txt",
+    "bytes": 91232,
+    "sha256": "2f1ff44db93b8dae75c7447f9e2b1548b0d60befc06cfa4b90da5c64784df8d8"
+  },
+  "attempt_receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-red-r1/command.attempts/1792288782099124075-a09fa7407d5547ddb5269df5e71ab43d/receipt.json"
+}

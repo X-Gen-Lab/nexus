@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/testing",
+    "-p",
+    "test_sdk_verification_call.py",
+    "-v"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "updated-module-green-r1",
+  "started_ns": 1792290244910949743,
+  "finished_ns": 1792290248033687434,
+  "duration_seconds": 3.122738620999371,
+  "timeout_seconds": 600.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/command.attempts/1792290244910494728-06a9e7624b2241f79a11fb959e7605d4/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/updated-module-green-r1/command.attempts/1792290244910494728-06a9e7624b2241f79a11fb959e7605d4/stderr.txt",
+    "bytes": 4312,
+    "sha256": "dc543e9584744c69cd0c291a459c6e362d5622bc8ab5f2c417c4e90dcbd053d0"
+  }
+}

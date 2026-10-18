@@ -6,11 +6,13 @@ import contextlib
 import importlib.util
 import io
 import json
+import shlex
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from unittest import mock
 
@@ -116,13 +118,21 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "u575-uart-rtscts", "g474-pwm-shared"):
             file = verification / (name + ".toml")
             file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text("# canonical installed test input: " + name)
+            file.write_text('backend = "baremetal"\n# canonical installed test input: ' + name)
         for name in ("h743-high", "u575-uart-gpdma", "g474-can-fd",
                      "g474-pwm-adc", "g474-adc-group", "uart-fifo",
                      "ethernet-frames", "g474-pwm-shared"):
             file = verification / "consumers" / (name + ".c")
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("/* installed public smoke: " + name + " */\n")
+        # These two real canonical files are SUT inputs. Their actual C
+        # execution/proc mapping checks are qualified by the separate installed
+        # integration; this suite models only external process ports.
+        for profile in ("pair", "empty"):
+            stem = "native-time-" + profile
+            for relative in (stem + ".toml", "consumers/" + stem + ".c"):
+                shutil.copyfile(ROOT / "cmake/package/verification/io_evolution" /
+                                relative, verification / relative)
         specification = importlib.util.spec_from_file_location(
             "nexus_consumer_parallel_contract",
             ROOT / "cmake/package/verify_consumers.py")
@@ -137,6 +147,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         command = [str(argument) for argument in command]
         self.commands.append(command)
         code = 0
+        stdout = "external fixture\n"
         if command[0] == "cmake" and "-S" in command:
             source = Path(command[command.index("-S") + 1])
             build = Path(command[command.index("-B") + 1])
@@ -145,9 +156,11 @@ class SDKConsumerParallelTests(unittest.TestCase):
             products = [path for path in (source / "main.c", source / "main.cpp",
                                          source / "private_headers.c")
                         if path.exists()]
-            (build / "compile_commands.json").write_text(json.dumps([
-                {"file": str(path), "command": "cc -c " + str(path)}
-                for path in products]))
+            rows = [{"file": str(path), "directory": str(build),
+                     "arguments": ["cc", "-c", str(path)],
+                     "command": "cc -c " + shlex.quote(str(path))}
+                    for path in products]
+            (build / "compile_commands.json").write_text(json.dumps(rows))
             config = build / "configuration"
             config.mkdir()
             (config / "bindings.c").write_text("/* external CMake fixture */")
@@ -160,7 +173,41 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 (binary / (name + ".resources.json")).write_text(
                     '{"status":"passed"}')
                 (binary / (name + ".elf")).write_bytes(b"test double")
-            if source.name.startswith("selected "):
+            assembly_arg = next((arg.split("=", 1)[1] for arg in command
+                                 if arg.startswith("-DNEXUS_ASSEMBLY_FILE=")), None)
+            native = (source.name.startswith("selected ") and assembly_arg is not None
+                      and tomllib.loads(Path(assembly_arg).read_text())["backend"] == "native")
+            if native:
+                authored = tomllib.loads(Path(assembly_arg).read_text())
+                controllers = []
+                for kind in ("rtc", "lptim"):
+                    for name, item in authored.get(kind, {}).items():
+                        controller = {"kind": kind, "id": name, "mode": item["mode"]}
+                        if kind == "lptim":
+                            controller["tick_hz"] = item["tick_hz"]
+                        controllers.append(controller)
+                (config / "resolved.json").write_text(json.dumps({
+                    "backend": "native", "soc_family": "native",
+                    "cpu": {"arch": "native"}, "controllers": controllers}))
+                # Minimal ELF64 format input; the external invocation below is
+                # a process test double, never a claim to execute these bytes.
+                header = bytearray(64)
+                header[:6] = b"\x7fELF\x02\x01"
+                header[18:20] = (62).to_bytes(2, "little")
+                (binary / "installed_selected").write_bytes(header)
+                rows.append({"file": str(config / "bindings.c"),
+                             "directory": str(build),
+                             "arguments": ["cc", "-c", str(config / "bindings.c")],
+                             "command": "cc -c " + shlex.quote(str(config / "bindings.c"))})
+                if self.selected_fault == "native_private_include":
+                    rows[0]["arguments"].insert(1, "-I" + str(self.sdk / "io/native"))
+                    rows[0]["command"] = shlex.join(rows[0]["arguments"])
+                (build / "compile_commands.json").write_text(json.dumps(rows))
+                # Native owns no ARM byproducts. Their absence is asserted by
+                # the full-matrix oracle after the real verifier returns.
+                for name in ("installed_selected.elf", "installed_selected.resources.json"):
+                    (binary / name).unlink()
+            elif source.name.startswith("selected "):
                 import hashlib
                 def identity(path):
                     return {"path": str(path), "size": path.stat().st_size,
@@ -205,6 +252,35 @@ class SDKConsumerParallelTests(unittest.TestCase):
             if (Path(command[2]).name == "selected g474 shared pwm build"
                     and self.selected_fault == "shared_pwm_build"):
                 code = 48
+        elif command[0] == "nm":
+            build = Path(command[-1]).parents[1]
+            profile = "empty" if "native time empty" in build.name else "pair"
+            if profile == "pair":
+                stdout = ("nx_native_rtc_ops D 2000 30\n"
+                          "nx_native_lptim_ops D 2030 28\n"
+                          "nx_native_time_clock_read t 1000 5\n"
+                          "s_nx_native_time_clock d 2060 10\n"
+                          "s_nx_port_calendar_a b 3000 40\n"
+                          "s_nx_port_calendar_b b 3040 40\n"
+                          "s_nx_port_counter_a b 3080 38\n"
+                          "s_nx_port_counter_b b 30b8 38\n")
+                if self.selected_fault == "native_missing_state":
+                    stdout = "\n".join(line for line in stdout.splitlines()
+                                         if not line.startswith("s_nx_port_counter_b "))
+            else:
+                stdout = ""
+                extras = {
+                    "empty_state": "s_nx_port_calendar_a b 3000 40\n",
+                    "empty_ops": "nx_native_rtc_ops D 2000 30\n",
+                    "empty_clock_face": "s_nx_native_time_clock d 2060 10\n",
+                    "empty_clock_read": "nx_native_time_clock_read t 1000 5\n",
+                }
+                stdout = extras.get(self.selected_fault, stdout)
+            if self.selected_fault == "native_nm":
+                code = 50
+        elif len(command) == 1 and Path(command[0]).name == "installed_selected":
+            if self.selected_fault == "native_runtime":
+                code = 49
         elif any(argument.endswith("retention.py") for argument in command):
             failed = ("selected " in command[command.index("--elf") + 1]
                       and self.selected_fault == "retention")
@@ -236,7 +312,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         elif any(argument.endswith("package_source_sdk.py")
                  for argument in command):
             code = 9 if self.failed_sdk else 0
-        return subprocess.CompletedProcess(command, code, "external fixture\n", "")
+        return subprocess.CompletedProcess(command, code, stdout, "")
 
     def execute(self, extra=()):
         with mock.patch.object(self.consumer.subprocess, "run",
@@ -265,15 +341,16 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 "selected g474 adc injected timer", "selected h743 fifo",
                 "selected u575 fifo", "selected f407 frames",
                 "selected gd470 frames", "selected h743 rtscts",
-                "selected u575 rtscts", "selected g474 shared pwm"}
+                "selected u575 rtscts", "selected g474 shared pwm",
+                "selected native time pair", "selected native time empty"}
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 29)
+        self.assertEqual(len(builds), 31)
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 32)
+                             for command in builds), 34)
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 29)
+        self.assertEqual(len(configurations), 31)
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
@@ -282,8 +359,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(len(retention), 26)
         native = [command for command in self.commands if len(command) == 1]
         self.assertEqual({Path(command[0]).name for command in native},
-                         {"installed_c", "installed_cpp"})
-        self.assertEqual(len(native), 2)
+                         {"installed_c", "installed_cpp", "installed_selected"})
+        self.assertEqual(len(native), 4)
+        self.assertEqual({Path(command[0]).parents[1].name for command in native
+                          if Path(command[0]).name == "installed_selected"},
+                         {"selected native time pair build", "selected native time empty build"})
+        nm = [command for command in self.commands if command[0] == "nm"]
+        self.assertEqual(len(nm), 2)
+        self.assertEqual({Path(command[-1]).parents[1].name for command in nm},
+                         {"selected native time pair build", "selected native time empty build"})
         self.assertIn("--verify", self.commands[0])
 
     def test_explicit_one_bounds_every_build_without_reducing_the_matrix(self):
@@ -294,23 +378,23 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["physical_status"], "not_executed")
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["1"] * 29)
+                          for command in self.builds()], ["1"] * 31)
 
-    def test_default_retains_three_four_job_and_twenty_six_two_job_builds(self):
+    def test_default_retains_three_four_job_and_twenty_eight_two_job_builds(self):
         status, report = self.execute()
         self.assertEqual(status, 0)
         self.assertEqual(report["source_revision"], "a" * 40)
         self.assertEqual(report["source_tree"], "b" * 40)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["4"] * 3 + ["2"] * 26)
+                          for command in self.builds()], ["4"] * 3 + ["2"] * 28)
 
     def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
         status, _ = self.execute(("--parallel", "3"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["3"] * 29)
+                          for command in self.builds()], ["3"] * 31)
 
     def test_selected_inputs_and_public_smokes_come_only_from_installed_sdk(self):
         status, report = self.execute(("--parallel", "1"))
@@ -319,7 +403,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           if command[0] == "cmake" and "-S" in command
                           and Path(command[command.index("-S") + 1]).name.startswith(
                               "selected ")]
-        self.assertEqual(len(configurations), 16)
+        self.assertEqual(len(configurations), 18)
         inputs = set()
         for command in configurations:
             assembly = Path(next(argument.split("=", 1)[1] for argument in command
@@ -332,12 +416,21 @@ class SDKConsumerParallelTests(unittest.TestCase):
             self.assertFalse(any("ALLOW_SOURCE_SDK_FIXTURE" in arg for arg in command))
             source = Path(command[command.index("-S") + 1])
             smoke = (source / "main.c").read_text()
-            self.assertTrue(smoke.startswith("/* installed public smoke: "))
+            if assembly.stem.startswith("native-time-"):
+                canonical = assembly.parent / "consumers" / (assembly.stem + ".c")
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertFalse(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+                if assembly.stem.endswith("pair"):
+                    self.assertIn('/proc/self/maps', smoke)
+                    self.assertIn('readonly_mapping(a->ops, sizeof(*a->ops))', smoke)
+            else:
+                self.assertTrue(smoke.startswith("/* installed public smoke: "))
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             private_guard = (source / "private_headers.c").read_text()
             for name in ("stm32h7xx.h", "stm32u5xx.h", "stm32g4xx.h",
                          "stm32f4xx.h", "gd32f4xx.h",
                          "stm32f407_eth_frames.h", "gd32f470_eth_frames.h",
-                         "stm32g474_pwm_shared.h"):
+                         "stm32g474_pwm_shared.h", "rtc_lptim_provider.h"):
                 self.assertIn('__has_include("' + name + '")', private_guard)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
         self.assertEqual(inputs, {
@@ -349,10 +442,27 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "g474-adc-group-injected-timer.toml", "h743-uart-fifo.toml",
             "u575-uart-fifo.toml", "f407zg-eth-frames.toml",
             "gd470-eth-frames.toml", "h743-uart-rtscts.toml",
-            "u575-uart-rtscts.toml", "g474-pwm-shared.toml"})
-        self.assertEqual(len(report["selected_images"]), 16)
-        for image in report["selected_images"]:
+            "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
+            "native-time-pair.toml", "native-time-empty.toml"})
+        self.assertEqual(len(report["selected_images"]), 18)
+        arm_images = [image for image in report["selected_images"]
+                      if not image["name"].startswith("native time ")]
+        self.assertEqual(len(arm_images), 16)
+        for image in arm_images:
             self.assertEqual(set(image["artifacts"]), {"elf", "bin", "map"})
+        native_images = [image for image in report["selected_images"]
+                         if image["name"].startswith("native time ")]
+        self.assertEqual([image["selected_state_count"] for image in native_images], [4, 0])
+        self.assertEqual([image["selected_state_bytes"] for image in native_images], [240, 0])
+        for image in native_images:
+            self.assertEqual(image["kind"], "native-time-host-observation")
+            self.assertEqual(image["status"], "passed")
+            self.assertNotIn("artifacts", image)
+            self.assertNotIn("resources", image)
+            binary = Path(image["elf"]["path"])
+            self.assertEqual(binary.name, "installed_selected")
+            for suffix in ("elf", "bin", "map", "resources.json"):
+                self.assertFalse(binary.with_name(binary.name + "." + suffix).exists())
 
     def test_a_new_consumer_build_failure_is_terminal(self):
         self.selected_fault = "build"
@@ -420,7 +530,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
                          "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
                          "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
-                         "consumers/g474-pwm-shared.c"):
+                         "consumers/g474-pwm-shared.c", "native-time-pair.toml",
+                         "native-time-empty.toml", "consumers/native-time-pair.c",
+                         "consumers/native-time-empty.c"):
             with self.subTest(relative=relative):
                 file = directory / relative
                 original = file.read_bytes()
@@ -508,6 +620,41 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     self.assertEqual(report["commands"][-1]["exit_code"], 48)
                 else:
                     self.assertIn("retention", report["error"])
+
+    def test_native_runtime_nm_private_state_and_missing_owner_fail_closed(self):
+        for fault in ("native_runtime", "native_nm", "native_private_include",
+                      "native_missing_state"):
+            with self.subTest(fault=fault):
+                self.selected_fault = fault
+                before = len(self.builds())
+                with contextlib.redirect_stderr(io.StringIO()):
+                    status, report = self.execute(("--parallel", "1"))
+                self.assertEqual(status, 1)
+                self.assertEqual(report["status"], "failed")
+                self.assertEqual(len(self.builds()) - before, 30)
+                self.assertEqual(len(report["selected_images"]), 16)
+                self.assertEqual(Path(self.builds()[-1][2]).name,
+                                 "selected native time pair build")
+                if fault in ("native_runtime", "native_nm"):
+                    self.assertEqual(report["commands"][-1]["exit_code"],
+                                     49 if fault == "native_runtime" else 50)
+                else:
+                    self.assertIn("Native", report["error"])
+
+    def test_empty_native_state_ops_and_both_clock_objects_are_absent(self):
+        for fault in ("empty_state", "empty_ops", "empty_clock_face", "empty_clock_read"):
+            with self.subTest(fault=fault):
+                self.selected_fault = fault
+                before = len(self.builds())
+                with contextlib.redirect_stderr(io.StringIO()):
+                    status, report = self.execute(("--parallel", "1"))
+                self.assertEqual(status, 1)
+                self.assertEqual(report["status"], "failed")
+                self.assertEqual(len(self.builds()) - before, 31)
+                self.assertEqual(len(report["selected_images"]), 17)
+                self.assertEqual(Path(self.builds()[-1][2]).name,
+                                 "selected native time empty build")
+                self.assertIn("retention", report["error"])
 
     def test_invalid_budget_rejects_before_any_output_or_external_command(self):
         for value in ("0", "-1", "01", "+1", "1.5", "True", "", " 1"):

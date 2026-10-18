@@ -96,6 +96,56 @@ class QualificationPlanTests(unittest.TestCase):
                                  ["configure", "build"])
         validate_plan(self.plan)
 
+    def test_native_time_presets_keep_real_host_targets_and_execution_boundaries(self):
+        presets = load_json(ROOT / "CMakePresets.json")
+        configurations = presets["configurePresets"]
+        builds = presets["buildPresets"]
+        for profile in ("pair", "empty"):
+            with self.subTest(profile=profile):
+                name = "fixture-io-evolution-native-time-" + profile
+                selected = [item for item in configurations if item["name"] == name]
+                self.assertEqual(len(selected), 1)
+                preset = selected[0]
+                self.assertEqual(preset["inherits"], "native-release")
+                variables = preset["cacheVariables"]
+                self.assertEqual(variables["NEXUS_ASSEMBLY_FILE"],
+                    "${sourceDir}/cmake/package/verification/io_evolution/" +
+                    "native-time-" + profile + ".toml")
+                self.assertNotIn("CMAKE_TOOLCHAIN_FILE", variables)
+                self.assertNotIn("toolchainFile", preset)
+                self.assertNotIn("NEXUS_IO_EVOLUTION_FIXTURE", variables)
+                self.assertNotEqual(variables.get("NEXUS_BUILD_TESTS"), "OFF")
+                selected_builds = [item for item in builds if item["name"] == name]
+                self.assertEqual(len(selected_builds), 1)
+                self.assertEqual(selected_builds[0]["configurePreset"], name)
+                self.assertEqual(selected_builds[0]["targets"],
+                    ["nexus_rtc_lptim_" + profile + "_generated_test"])
+                stages = [stage for stage in self.stages
+                          if stage["args"] == ["--preset", name]]
+                self.assertEqual([stage["checker"] for stage in stages],
+                                 ["configure", "build"])
+                self.assertTrue(all("status" not in stage for stage in stages),
+                                "Planned stages are not execution evidence")
+        self.assertEqual(CHECKERS["native_contracts"],
+                         ("scripts/ci/native_contracts.py",))
+        self.assertEqual(CHECKERS["sdk_consumers"],
+                         ("cmake/package/verify_consumers.py",))
+        for preset in ("native-debug", "native-release", "native-asan", "native-tsan"):
+            selected = [stage for stage in self.stages
+                        if stage["checker"] == "native_contracts" and
+                        stage["args"] == ["--preset", preset]]
+            self.assertEqual(len(selected), 1)
+        self.assertEqual(sum(stage["checker"] == "sdk_consumers"
+                             for stage in self.stages), 1)
+        sdk_checker = (ROOT / "cmake/package/verify_consumers.py").read_text()
+        self.assertIn('run_checked([str(image)])', sdk_checker)
+        self.assertIn('"nm", "-S", "--defined-only", "--format=posix"', sdk_checker)
+        canonical = (ROOT / "cmake/package/verification/io_evolution/consumers/"
+                     "native-time-pair.c").read_text()
+        self.assertIn('"/proc/self/maps"', canonical)
+        self.assertIn('readonly_mapping(a->ops, sizeof(*a->ops))', canonical)
+        validate_plan(self.plan)
+
     def test_redistributed_io_references_have_one_qualified_preset(self):
         directory = ROOT / "cmake/package/verification/io_evolution"
         fixtures = sorted(directory.glob("*.toml"))

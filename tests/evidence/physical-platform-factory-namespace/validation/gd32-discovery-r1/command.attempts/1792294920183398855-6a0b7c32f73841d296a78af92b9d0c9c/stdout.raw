@@ -1,0 +1,32 @@
+Running main() from gmock_main.cc
+EmptyAndGPIO/PhysicalPlatformFactory.
+  UnprivilegedColdStartHasNoOuterEffects/0  # GetParam() = false
+  UnprivilegedColdStartHasNoOuterEffects/1  # GetParam() = true
+  UnprivilegedUntouchedStopHasNoOuterEffects/0  # GetParam() = false
+  UnprivilegedUntouchedStopHasNoOuterEffects/1  # GetParam() = true
+  UnprivilegedStopRetainsStartedSession/0  # GetParam() = false
+  UnprivilegedStopRetainsStartedSession/1  # GetParam() = true
+  UnprivilegedCleanupRetryRetainsOuterLease/0  # GetParam() = false
+  UnprivilegedCleanupRetryRetainsOuterLease/1  # GetParam() = true
+  IncomingMaskRejectsAndRemainsSaved/0  # GetParam() = false
+  IncomingMaskRejectsAndRemainsSaved/1  # GetParam() = true
+  BasePreflightRejectsBeforeAnyOuterLease/0  # GetParam() = false
+  BasePreflightRejectsBeforeAnyOuterLease/1  # GetParam() = true
+  PrivilegedOwnerCanRestartActualSelectedGraph/0  # GetParam() = false
+  PrivilegedOwnerCanRestartActualSelectedGraph/1  # GetParam() = true
+  PoweredForeignOutputOrAfRejectsWithoutEffects/0  # GetParam() = false
+  PoweredForeignOutputOrAfRejectsWithoutEffects/1  # GetParam() = true
+  PoweredSelectedLockRejectsWithoutStealingPin/0  # GetParam() = false
+  PoweredSelectedLockRejectsWithoutStealingPin/1  # GetParam() = true
+  UnpoweredForeignPinOnlyRollsBackAddedGate/0  # GetParam() = false
+  UnpoweredForeignPinOnlyRollsBackAddedGate/1  # GetParam() = true
+  ResetInputAndAnalogPreserveSharedNeighborFields/0  # GetParam() = false
+  ResetInputAndAnalogPreserveSharedNeighborFields/1  # GetParam() = true
+  FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/0  # GetParam() = false
+  FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/1  # GetParam() = true
+  DiagnosedPreflightFailureHasNoOuterEffects/0  # GetParam() = false
+  DiagnosedPreflightFailureHasNoOuterEffects/1  # GetParam() = true
+  DiagnosedSystemStopFailureRetainsSession/0  # GetParam() = false
+  DiagnosedSystemStopFailureRetainsSession/1  # GetParam() = true
+  DiagnosedResourceStopFailureRetainsPinLease/0  # GetParam() = false
+  DiagnosedResourceStopFailureRetainsPinLease/1  # GetParam() = true

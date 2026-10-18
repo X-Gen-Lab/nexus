@@ -1,7 +1,7 @@
 # Nexus 平台图册
 
 本图册保留15类必需视图、两张补充图与本轮 I/O 架构视图 FIG-16，
-另加入 IO-24 的 FIG-17/18 目标图源。主图登记见
+另加入 IO-24 的 FIG-17/18 目标图源和 IO-36 的 FIG-21 Native 装配／生命周期图。主图登记见
 [图清单](diagram-index.csv)，维护规则见
 [图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份，
 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。
@@ -12,10 +12,10 @@ FIG-16 描述 `c4249e98` 基线之后的 I/O 增量机制，其具体源码链�
 文档工具的实际结果另见执行记录。图源为可编辑 DOT，输出为本地 SVG；标签、
 线型和文字共同表达关系，不只依赖颜色。
 
-20个图源按合同各派生中文与英文视图；新增 FIG-17/18 的渲染与审查须分别取得
+21个图源按合同各派生中文与英文视图；新增 FIG-17/18 的渲染与审查须分别取得
 实际记录。页面按所选语言使用本地SVG。节点、箭头、属性与
 范围仍由同一canonical DOT维护；`labels.json`只维护完整标签译文，不能改变拓扑。
-全部40组语言DOT/SVG应与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
+全部42组语言DOT/SVG应与原图配对检查；缺失译文、陈旧输出和非法资源使门禁失败。
 SVG采用Graphviz Cairo字形路径输出，使离线读者无需安装中文字体；每图附title、
 desc和正文alt/caption。生成主机需要锁定Graphviz、Cairo及Noto Sans CJK SC，
 最终工具身份与自动检查结果由文档交付记录绑定。源码语义、实际浏览器桌面/窄屏/
@@ -265,3 +265,25 @@ RAM 排空环；无法证明恢复则留在不返回 RAM fail-stop，不暗示�
 [原文档系统目标图](documentation-target.svg)和[DOT图源](documentation-target.dot)
 保留原规划的构建输入关系；其target身份只表示方案来源，不建立当前工具、公开
 部署、SDK或实板资格。现行交付与恢复按FIG-12及实际执行记录判定。
+
+## FIG-21 Native RTC/LPTIM 装配、借用与重新开放
+
+**身份：current；虚线硬件分支为 target。范围：所选 Native 日历／有限计数实例，
+普通 TOML 经现有 IR／provider／factory／Platform 装配，显式生命周期与真实排空。**
+
+![Native RTC/LPTIM 的构建期装配、运行调用、最终访问和私有重新开放](rtc-lptim-lifecycle.svg)
+
+构建边、运行调用和请求源推进均有独立标签。factory 只返回已有接口面；生成的
+Platform 首次准备构造一次，后续对已构造 owner 调用私有 start。stop 先关闭准入，
+撤源失败仍保留请求和 owner；私有 start 优先拒绝保留责任。真实撤源并完成外部 join
+后，重新开放先推进代次再开放准入，保留日历、速率、时钟与外部故障。模型推进不
+发布请求结果。虚线硬件适配需要独立 SoC／时钟／备份域／IRQ／STOP／VBAT 合同，
+不表示已有物理驱动或 HIL 通过。
+
+依据：[RTC/LPTIM 说明](../../explanation/rtc-lptim.md)、
+[公共 RTC](../../../io/include/nexus/io/rtc.h)、
+[公共 LPTIM](../../../io/include/nexus/io/lptim.h)、
+[Native 实现](../../../io/native/rtc_lptim.c)、
+[Native 装配](../../../tools/configure/providers/native/bindings.py)。
+[可编辑 DOT](rtc-lptim-lifecycle.dot)；实施关联：IO-36。软件开发证据与 main／SDK／
+候选／实板资格分别判断，不能从该图或渲染成功推断。

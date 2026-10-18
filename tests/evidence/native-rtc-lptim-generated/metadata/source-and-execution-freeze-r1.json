@@ -1,0 +1,281 @@
+{
+  "kind": "IO36-selected-model-provenance-and-qualification-plan-metadata-followup",
+  "git_baseline": "3b2199861e5f01e2ba7c831cb54905b30b703858",
+  "own_root": "/tmp/nexus-io36-native-20261018",
+  "source_files": {
+    "CMakePresets.json": {
+      "persistent": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/CMakePresets.json",
+        "size": 91804,
+        "sha256": "8ab6e801c0b7e783439b4be1ed5d39650fefecf279cf1d12945e7cced26c2a2c"
+      },
+      "actual": {
+        "path": "/tmp/nexus-io36-native-20261018/CMakePresets.json",
+        "size": 91804,
+        "sha256": "8ab6e801c0b7e783439b4be1ed5d39650fefecf279cf1d12945e7cced26c2a2c"
+      },
+      "before": {
+        "size": 90203,
+        "sha256": "2b222e8dcf277022fef04d1c1cab0d431f5942592d1136c04f3994c63d28a6a8"
+      }
+    },
+    "docs/delivery/capabilities.md": {
+      "persistent": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/docs/delivery/capabilities.md",
+        "size": 58534,
+        "sha256": "4434a8b8433e5189eb936a87de04214ec0fddd7498218398890e079f7f22f344"
+      },
+      "actual": {
+        "path": "/tmp/nexus-io36-native-20261018/docs/delivery/capabilities.md",
+        "size": 58534,
+        "sha256": "4434a8b8433e5189eb936a87de04214ec0fddd7498218398890e079f7f22f344"
+      },
+      "before": null
+    },
+    "tools/dev/plans/software.json": {
+      "persistent": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/tools/dev/plans/software.json",
+        "size": 51855,
+        "sha256": "0de33ee1b30f629473e7fb334d4561e28dbb349139f76fe896a506944e800874"
+      },
+      "actual": {
+        "path": "/tmp/nexus-io36-native-20261018/tools/dev/plans/software.json",
+        "size": 51855,
+        "sha256": "0de33ee1b30f629473e7fb334d4561e28dbb349139f76fe896a506944e800874"
+      },
+      "before": {
+        "size": 50967,
+        "sha256": "f33bde27177d8f0fbbddae9fa496589468c2016c8f775482ca975225ceefcf44"
+      }
+    },
+    "tools/maintenance/capabilities.py": {
+      "persistent": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/tools/maintenance/capabilities.py",
+        "size": 11449,
+        "sha256": "040096ad70b549e6caaa0a4bed73aebaa6de9375a0709a77360e59a79d9bbcdc"
+      },
+      "actual": {
+        "path": "/tmp/nexus-io36-native-20261018/tools/maintenance/capabilities.py",
+        "size": 11449,
+        "sha256": "040096ad70b549e6caaa0a4bed73aebaa6de9375a0709a77360e59a79d9bbcdc"
+      },
+      "before": {
+        "size": 10211,
+        "sha256": "1e50fe502964ea7140796b55c154ab39b1e462437a9fa908b9859e5b71628dcc"
+      }
+    },
+    "tools/testing/test_maintenance.py": {
+      "persistent": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/tools/testing/test_maintenance.py",
+        "size": 14135,
+        "sha256": "9aba8f6bcb401350b7e6c06949cafa3a65afa3a81e0a46736ed47ca4ea1c2ceb"
+      },
+      "actual": {
+        "path": "/tmp/nexus-io36-native-20261018/tools/testing/test_maintenance.py",
+        "size": 14135,
+        "sha256": "9aba8f6bcb401350b7e6c06949cafa3a65afa3a81e0a46736ed47ca4ea1c2ceb"
+      },
+      "before": {
+        "size": 12198,
+        "sha256": "728f61f4e9177e1b9d1dbd092872571a2be81ed88e021a196aa69152acaafa9f"
+      }
+    },
+    "tools/testing/test_qualification_plan.py": {
+      "persistent": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/files/tools/testing/test_qualification_plan.py",
+        "size": 9298,
+        "sha256": "c92f356ddedbd11b5016ca7a7e7cb344e39f72cd75b9a5eab29a72e38d26756b"
+      },
+      "actual": {
+        "path": "/tmp/nexus-io36-native-20261018/tools/testing/test_qualification_plan.py",
+        "size": 9298,
+        "sha256": "c92f356ddedbd11b5016ca7a7e7cb344e39f72cd75b9a5eab29a72e38d26756b"
+      },
+      "before": {
+        "size": 6147,
+        "sha256": "67ae3a75175421d1b2d38d593261d9c0277e158be5bd7de5634048d81f21345d"
+      }
+    }
+  },
+  "source_count": 6,
+  "authorship": "Five non-doc paths authored by IO36; derived capabilities full text created only persistent, then docs sole writer applied exact bytes to borrowed ROOT",
+  "immutable_phase3": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/source-and-execution-freeze-r1.json",
+    "size": 31464,
+    "sha256": "85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f"
+  },
+  "immutable_boundary_followup": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/source-and-execution-freeze-r1.json",
+    "size": 5606,
+    "sha256": "47e99bbbf17a1cacc915c44fc8f236cc76a89db9a53c1d7bfd6c4e9eb1b26075"
+  },
+  "actual_stages": {
+    "maintenance-green-r1": {
+      "actual_exit": 0,
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-green-r1/summary.json",
+        "size": 388,
+        "sha256": "82d613b3da27fba18c12af1f722ff72c2ccccc5e7fe19b20a53ac3ff11d9b1cd"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-green-r1/command.attempts/1792291483367308925-8aaf3b95bf4b428780ccd1eab07c9b07/receipt.json",
+        "size": 1282,
+        "sha256": "1d1f200b879d5c664df02327033268fdfbf6ec0e084bc5797108011284b553f4"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-green-r1/command.txt",
+        "size": 2703,
+        "sha256": "973e680ff6af5a212c1494723d6567a0523800f732f03e91a4ce5288e20236e5"
+      }
+    },
+    "maintenance-red-r1": {
+      "actual_exit": 1,
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-red-r1/summary.json",
+        "size": 386,
+        "sha256": "d9151fd96687be7d196d8ca83789294e8550521d3dcb51ad4c8aad81b21937bb"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-red-r1/command.attempts/1792291302591120280-387b9a0dce42417d8034d14fbb303df4/receipt.json",
+        "size": 1276,
+        "sha256": "58cc2ed9b927f90471dacddfb33273eb9be2eac93a7398e8d731a6c0a51ae34a"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-red-r1/command.txt",
+        "size": 6932,
+        "sha256": "534931245c261b1ed2b94d01bd343dd267479b497aebf409e44448837836c09f"
+      }
+    },
+    "qualification-green-r1": {
+      "actual_exit": 0,
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-green-r1/summary.json",
+        "size": 397,
+        "sha256": "105ce3b4a9cbb8c030c96918ad2540ded149134f7ec49f88d69467cc6a73443c"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-green-r1/command.attempts/1792291378618632128-1895655d26d94b1aa8b00668b6ad9419/receipt.json",
+        "size": 1297,
+        "sha256": "ec3490b9281175e9f3f981c89cf5456f9c644937b11fdf5268a97ccfb0604722"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-green-r1/command.txt",
+        "size": 1576,
+        "sha256": "3d74a53c112ce4e56dea125be446ddca49984d9908b6cd58b975951fcc88a0ae"
+      }
+    },
+    "qualification-green-r2": {
+      "actual_exit": 0,
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-green-r2/summary.json",
+        "size": 397,
+        "sha256": "93161c6caa28d6c6c1bc2c44a93af2f4ae3301dbd522dc978294b0291d0fb947"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-green-r2/command.attempts/1792291543451734787-0187f4cec65b4508b12618463ccf5f68/receipt.json",
+        "size": 1296,
+        "sha256": "da167633eece7f6954047f95e3aff1517afd344269e78bccc1e547f36522a56e"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-green-r2/command.txt",
+        "size": 1576,
+        "sha256": "06cf3c72c42cffc0f43ad141d6d348e5adaf33f180b7bf885957c5e872aee680"
+      }
+    },
+    "qualification-red-r1": {
+      "actual_exit": 1,
+      "summary": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-red-r1/summary.json",
+        "size": 395,
+        "sha256": "70caf9de6af7b7df2db8261e7a0131d3d44857c58033cea32886ce12175de4a1"
+      },
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-red-r1/command.attempts/1792291351321307504-8286764f395347d29898d106c1f30f1a/receipt.json",
+        "size": 1291,
+        "sha256": "14da734f021d1ecabd8301c37d36b85d2361eadc3b9f73ee2746c571dd7d05d3"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/qualification-red-r1/command.txt",
+        "size": 4921,
+        "sha256": "2159088e0fe1abcde0604a94ed287dd2dbd5757c570e5c8772eaa0d10f0db5a2"
+      }
+    }
+  },
+  "actual_summary": {
+    "maintenance": "complete16 RED5fail -> complete16 GREEN0fail/error/skip",
+    "qualification_plan": "complete8 RED4fail -> complete8 GREEN0fail/error/skip",
+    "modules_only": true,
+    "full_991_tool_domain": false,
+    "Google_executed_by_this_followup": false,
+    "new_presets_executed": false
+  },
+  "model_provenance": {
+    "source": "Actual resolver selection -> emitted immutable face -> exact initialized exported ops -> io/native or existing shared source",
+    "Native_unselected_physical_inventory_omitted": true,
+    "MODEL_provider_checked": true,
+    "physical_qualified": false,
+    "no_invented_PCB_or_physical_route": true,
+    "selected_Native_rows": 19,
+    "MCU_rows": 191,
+    "MCU_row_values_and_render_bytes_unchanged": true,
+    "derivation": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/derived-capabilities-r1.json",
+      "size": 7940,
+      "sha256": "00682c9f4f00161720a1e11621e3e0898ec26de836ccde5515420542a2364c3e"
+    }
+  },
+  "qualification_plan": {
+    "presets": [
+      "fixture-io-evolution-native-time-pair",
+      "fixture-io-evolution-native-time-empty"
+    ],
+    "inherits": "native-release",
+    "no_ARM_toolchain": true,
+    "exact_build_targets": [
+      "nexus_rtc_lptim_pair_generated_test",
+      "nexus_rtc_lptim_empty_generated_test"
+    ],
+    "existing_presets_entries_unchanged": true,
+    "existing_software_stages_unchanged": true,
+    "new_stages": 4,
+    "new_stages_are_plan_only_not_passed": true,
+    "preserved_actual_execution_boundaries": [
+      "native_contracts full whole programs for all4Native profiles",
+      "unified sdk_consumers real host runtime + nm selected retention and canonical C Linux proc readonly checks"
+    ]
+  },
+  "format_history": "Qualification-green-r1 actual0 used semantically identical presets but transient indent2; restored original wholefile indent4 without changing original entries, then finalqualification-green-r2 actual0. All actual receipts preserved.",
+  "patches": [
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/patches/tools/maintenance/capabilities.py.patch",
+      "size": 3132,
+      "sha256": "031490f4b60afdb17235a2f12240d35eaac4b2436850eaad247f37ab6bca8cdc"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/patches/tools/testing/test_maintenance.py.patch",
+      "size": 2641,
+      "sha256": "8c1d3dccec102e4da5461636b63d3042adaf858779a36719a4949eacc77a8d30"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/patches/CMakePresets.json.patch",
+      "size": 2352,
+      "sha256": "3254ea91ce4b5d45daab3c73f9c105e93d2dbd71811b34acc5d97801e2e9a442"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/patches/tools/dev/plans/software.json.patch",
+      "size": 1353,
+      "sha256": "55f840be0eb6c34ee8582a9aeeaf77451d3d77df18ec9a50eeb291ef15a142ef"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/patches/tools/testing/test_qualification_plan.py.patch",
+      "size": 3841,
+      "sha256": "b165bbfdf0235f993981077f216fa9c2940c65af80ff8782a82fa619ded25f83"
+    }
+  ],
+  "remaining": [
+    "Independent source/evidence review",
+    "Root complete normal testing/tool/Google/commit gates fresh after integration",
+    "Clean installed SDK complete matrix and physical providers/HIL independent scope"
+  ],
+  "no_main_stage_commit_push": true
+}
