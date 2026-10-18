@@ -1,0 +1,402 @@
+{
+ "schema_version": 1,
+ "kind": "read-only corrective-slice design; not implementation authorization or remote qualification",
+ "created_utc": "2026-10-18T05:50:24.662406+00:00",
+ "root": "/tmp/nexus-io-validation-20261018",
+ "source_before": {
+  "head": "a07bc6eecd8ef0d85a6882249c7a481a4f69dc28",
+  "head_tree": "663571602feb3fff66aaafcb89cdbcef42c7508a",
+  "index_sha256": "876be1b88e5a004c7218b0efb7118c9b065b01c93292d2903edabf4d5e5ebe56",
+  "status_bytes": 3608,
+  "status_sha256": "f1c619d8a4ece8f96d1be5b22e7b91684201f0a5482ea96831bb5f200885b0d0",
+  "context": "Main has separately authorized staged work under active full gates; this analysis does not edit it."
+ },
+ "failure_observation": {
+  "run_id": 39100437609,
+  "source_commit": "a07bc6eecd8ef0d85a6882249c7a481a4f69dc28",
+  "retained_job_log": "/workspace/nexus-io-recovery-20261018/validation/remote-qualification-dispatch-a07bc6ee-r1/connector-completed-job-log.json",
+  "log_sha256": "d410f6d02c59fb5a86b1063d3d3c6b82da78408f452671141c353ffc3e7786ed",
+  "exact_line": "2026-10-18T05:40:28.2814089Z Consumer transport rejected: Exactly thirteen empty git-init consumer fixtures required",
+  "not_inspected_artifact": {
+   "id": 12126402331,
+   "reported_bytes": 38130613,
+   "downloaded": false
+  },
+  "qualification": "Actual run failed. A log showing clean SDK package verification and later transport rejection is not a fully admitted SDK qualification or an offline OCI result."
+ },
+ "root_cause": {
+  "producer": "cmake/package/verify_consumers.py:19 SELECTED_CONSUMERS and main():485-549 contain current 3 base roots +5 families*2 backends +18 selected roots. Each root runs git init through the real preparation functions.",
+  "transport": "tools/release/transport.py:21 FIXTURES separately hardcodes the earlier 13 roots; git_metadata():132-175 requires exact set equality and therefore correctly rejects a different set under its stale policy.",
+  "test_gap": ".github/workflows/test_release.py duplicates the same old13 in both SDK workflow external-port fixture and ConsumerTransportTests.fixture. It proves strict handling of that old synthetic set, not compatibility with the current producer.",
+  "manual_gap": "tools/release/README.md still states exactly thirteen. Producer boundary tests in tools/testing/test_sdk_verification_call.py already require 31 builds/18 selected roots but never exercise transport with that actual matrix.",
+  "confirmed_static_matrix_only": {
+   "base_roots": 3,
+   "modern_roots": 10,
+   "selected_roots": 18,
+   "total_roots": 31,
+   "images": 34,
+   "native_images": 4,
+   "arm_images": 30
+  },
+  "exact_git_roots": [
+   "native source/.git",
+   "stm32 source/.git",
+   "gd32 source/.git",
+   "h743 baremetal source/.git",
+   "h743 freertos source/.git",
+   "u575 baremetal source/.git",
+   "u575 freertos source/.git",
+   "f103 baremetal source/.git",
+   "f103 freertos source/.git",
+   "gd303 baremetal source/.git",
+   "gd303 freertos source/.git",
+   "g474 baremetal source/.git",
+   "g474 freertos source/.git",
+   "selected h743 high source/.git",
+   "selected u575 gpdma source/.git",
+   "selected g474 fd normal source/.git",
+   "selected g474 fd loopback source/.git",
+   "selected g474 pwm adc source/.git",
+   "selected g474 adc regular software source/.git",
+   "selected g474 adc regular timer source/.git",
+   "selected g474 adc injected software source/.git",
+   "selected g474 adc injected timer source/.git",
+   "selected h743 fifo source/.git",
+   "selected u575 fifo source/.git",
+   "selected f407 frames source/.git",
+   "selected gd470 frames source/.git",
+   "selected h743 rtscts source/.git",
+   "selected u575 rtscts source/.git",
+   "selected g474 shared pwm source/.git",
+   "selected native time pair source/.git",
+   "selected native time empty source/.git"
+  ],
+  "exact_image_paths": [
+   "native build/bin/installed_c",
+   "native build/bin/installed_cpp",
+   "stm32 build/bin/installed_c.elf",
+   "stm32 build/bin/installed_cpp.elf",
+   "gd32 build/bin/installed_c.elf",
+   "gd32 build/bin/installed_cpp.elf",
+   "h743 baremetal build/bin/installed_modern.elf",
+   "h743 freertos build/bin/installed_modern.elf",
+   "u575 baremetal build/bin/installed_modern.elf",
+   "u575 freertos build/bin/installed_modern.elf",
+   "f103 baremetal build/bin/installed_modern.elf",
+   "f103 freertos build/bin/installed_modern.elf",
+   "gd303 baremetal build/bin/installed_modern.elf",
+   "gd303 freertos build/bin/installed_modern.elf",
+   "g474 baremetal build/bin/installed_modern.elf",
+   "g474 freertos build/bin/installed_modern.elf",
+   "selected h743 high build/bin/installed_selected.elf",
+   "selected u575 gpdma build/bin/installed_selected.elf",
+   "selected g474 fd normal build/bin/installed_selected.elf",
+   "selected g474 fd loopback build/bin/installed_selected.elf",
+   "selected g474 pwm adc build/bin/installed_selected.elf",
+   "selected g474 adc regular software build/bin/installed_selected.elf",
+   "selected g474 adc regular timer build/bin/installed_selected.elf",
+   "selected g474 adc injected software build/bin/installed_selected.elf",
+   "selected g474 adc injected timer build/bin/installed_selected.elf",
+   "selected h743 fifo build/bin/installed_selected.elf",
+   "selected u575 fifo build/bin/installed_selected.elf",
+   "selected f407 frames build/bin/installed_selected.elf",
+   "selected gd470 frames build/bin/installed_selected.elf",
+   "selected h743 rtscts build/bin/installed_selected.elf",
+   "selected u575 rtscts build/bin/installed_selected.elf",
+   "selected g474 shared pwm build/bin/installed_selected.elf",
+   "selected native time pair build/bin/installed_selected",
+   "selected native time empty build/bin/installed_selected"
+  ],
+  "selected_source_records": [
+   [
+    "h743 high",
+    "h743-high-peripherals",
+    "h743-high"
+   ],
+   [
+    "u575 gpdma",
+    "u575-uart-gpdma",
+    "u575-uart-gpdma"
+   ],
+   [
+    "g474 fd normal",
+    "g474-can-fd-normal",
+    "g474-can-fd"
+   ],
+   [
+    "g474 fd loopback",
+    "g474-can-fd-loopback",
+    "g474-can-fd"
+   ],
+   [
+    "g474 pwm adc",
+    "g474-pwm-adc",
+    "g474-pwm-adc"
+   ],
+   [
+    "g474 adc regular software",
+    "g474-adc-group-regular-software",
+    "g474-adc-group"
+   ],
+   [
+    "g474 adc regular timer",
+    "g474-adc-group-regular-timer",
+    "g474-adc-group"
+   ],
+   [
+    "g474 adc injected software",
+    "g474-adc-group-injected-software",
+    "g474-adc-group"
+   ],
+   [
+    "g474 adc injected timer",
+    "g474-adc-group-injected-timer",
+    "g474-adc-group"
+   ],
+   [
+    "h743 fifo",
+    "h743-uart-fifo",
+    "uart-fifo"
+   ],
+   [
+    "u575 fifo",
+    "u575-uart-fifo",
+    "uart-fifo"
+   ],
+   [
+    "f407 frames",
+    "f407zg-eth-frames",
+    "ethernet-frames"
+   ],
+   [
+    "gd470 frames",
+    "gd470-eth-frames",
+    "ethernet-frames"
+   ],
+   [
+    "h743 rtscts",
+    "h743-uart-rtscts",
+    "uart-fifo"
+   ],
+   [
+    "u575 rtscts",
+    "u575-uart-rtscts",
+    "uart-fifo"
+   ],
+   [
+    "g474 shared pwm",
+    "g474-pwm-shared",
+    "g474-pwm-shared"
+   ],
+   [
+    "native time pair",
+    "native-time-pair",
+    "native-time-pair"
+   ],
+   [
+    "native time empty",
+    "native-time-empty",
+    "native-time-empty"
+   ]
+  ]
+ },
+ "preferred_minimum_architecture": {
+  "choice": "Keep one stdlib-only immutable consumer plan inside existing standalone tools/release/transport.py; producer consumes it one-way. No new registry, consumer namespace, source graph, or reflection over reports.",
+  "rationale": "release.yml:121 and249 extract exactly one versioned transport.py via git show into RUNNER_TEMP. Defining its pure data/API there preserves that standalone closure and separate builder/source identity, while avoiding additional extracted modules or hidden cwd imports. The module already ships by default because SDK selects tools/ recursively.",
+  "authority": "Move base tuples, reviewed modern family/backend tuples and SELECTED_CONSUMERS tuples into this single source definition. Provide pure tuple-returning projections for exact source-root/git-root/build/image paths and selected assembly/smoke inputs. No IO, subprocess, filesystem discovery or producer import in plan construction. Producer reuses those records in all three main loops; existing SELECTED_CONSUMERS may remain a compatibility alias to the imported tuple, not another list.",
+  "transport_dependency_direction": "Producer inserts repository/installed SDK root already; it can import tools.release.transport from its own verified source. Transport never imports verify_consumers or loads a raw-output-supplied module. Its git-show standalone pack/verify/attach entry remains self-contained apart from existing explicit source policy loading in attach.",
+  "producer_dependency_closure": "Add tools/release/transport.py to package_source_sdk.py REQUIRED_FILES. Merely being exported by default is insufficient: deleting this newly necessary module and rehashing SDK manifest must still fail verification as incomplete.",
+  "strict_policy": "Current pack uses a fixed reviewed plan ID and schema2 manifest, computes expected roots/images from trusted code, and requires exact roots plus every expected image path with nonzero original identity. Any report or manifest root/image list is only a claim checked against this plan and actual raw/archive inventory, never an authorization source. Exact selected records/assembly names remain checked; same-count replacement is rejected.",
+  "image_boundary": "Base Native C/C++ executables have no .elf suffix; STM32/GD32 C/C++ do. Modern roots use installed_modern.elf; selected Native time pair/empty use installed_selected without suffix and other selected roots use installed_selected.elf. Do not count .bin/.map as more executable images. All expected paths must be regular nonempty originals retained in full raw inventory; transport does not replace actual compile/runtime/resource/retention checks.",
+  "source_identity_boundary": "Keep original source_revision/source_tree and raw command logs unmodified. Expected commit remains explicit; builder commit/workflow/run/attempt/helper identity remain distinct. A matrix ID proves neither clean checkout nor execution; actual workflow/job identities and source-SDK verifier remain authoritative for those facts.",
+  "tradeoff": "The data belongs conceptually to SDK qualification, although stored in transport to retain the existing single-file builder contract. A future separate pure module would be reasonable only with an explicitly bound multi-file standalone extraction closure and required SDK payload, not an opportunistic sibling import in this patch."
+ },
+ "proposed_file_window": [
+  {
+   "path": "tools/release/transport.py",
+   "change": "Pure immutable canonical plan/projections; exact current31 roots+34 images; explicit new manifest schema/policy; retain pack+verify Git/content rules. Add bounded gzip EOF verification only if real regression proves current gap."
+  },
+  {
+   "path": "cmake/package/verify_consumers.py",
+   "change": "Import that plan from its own verified root; drive base/modern/selected loops and path preparation from one definition. Preserve all real commands, failure behavior, original source identities and selected retention/runtime checks; no report patch-up."
+  },
+  {
+   "path": "cmake/package/package_source_sdk.py",
+   "change": "Make transport.py an explicit required module of installed producer. No new dependency downloads or source graph."
+  },
+  {
+   "path": ".github/workflows/test_release.py",
+   "change": "Eliminate both independent old13 fixture lists. Real git-init31 roots and exact34 synthetic image port outputs; integration with maintained producer plan, standalone extracted helper, pack/verify/stage/job identity; preserve old negatives and add below cases."
+  },
+  {
+   "path": "tools/release/README.md",
+   "change": "Replace stale13 statement with current plan-derived exact semantics,31/34 dimensional distinction, schema2/current versus frozen historical schema1, original raw bytes and software-only qualification limits."
+  }
+ ],
+ "window_limits": "Five files initially. No workflow YAML change is needed for preferred self-contained choice. Existing full producer and package tests should pass unchanged; if a new direct rehashed-omission test requires tests/contracts/test_source_sdk.py or a shared-plan assertion requires tools/testing/test_sdk_verification_call.py, request a narrow explicit test-only extension instead of weakening those modules or hiding a sixth file.",
+ "historical_policy": {
+  "old": "Original manifest schema1 / git_metadata=thirteen_unborn_init_fixtures and original helper/source/run identities remain frozen. Do not rewrite old archives, verification.json, manifests or receipts to claim new matrix execution.",
+  "new": "Current pack must only produce and current verifier only qualify explicitly schema2/current fixed policy with exact current expected sets. It must reject missing/unknown schema/policy and old13 raw output for new source. No number-based fallback, report-selected profile, optional --allow-incomplete or implicit historical detection.",
+  "recovery": "Existing historical13 evidence may be read/verified with its original hash-pinned helper as historical bytes, retaining original source identity and scope. No legacy reader is required in this corrective patch. If future product needs one, add an explicit historical-only mode/profile bound to known old policy/helper; never permit it to qualify current source."
+ },
+ "preserve_all_security_contracts": [
+  "pack and verify both validate the exact entire Git root set, then inspect every file/directory whose path includes a .git component. A file named .git is not an allowed gitdir escape.",
+  "Allow only empty git-init skeleton directories and HEAD/config/description/info/exclude plus direct hooks/*.sample; reject object/history/ref data, logs, index, worktrees/commondir, nested/unknown .git roots and active hooks.",
+  "Config has only four original core defaults, no remotes/includes/credential/hookPath; HEAD is unborn, description exact default bytes, excludes comments only, Git metadata size bound retained.",
+  "Owned fresh separated output; canonical no-symlink paths; no file hardlinks/special members; member/file/byte bounds, safe names and duplicate JSON/member rejection retained.",
+  "Every original raw file, empty directory, mode, size and SHA retained and archive-compared. verification.json top-level copy must equal original raw archive report bytes. Outer Actions mode normalization must not change original archived file mode.",
+  "Second raw scan must match first after pack. No pruning logs, repairing consumer metadata, deleting .git, moving raw under checkout, rewriting status/source commit, or inventing successful raw commands.",
+  "Source/builder/version/tag/workflow/run/attempt validation and release asset closure remain unchanged. No workflow dispatch, artifact release publication or remote permission expansion is part of this patch."
+ ],
+ "real_TDD_sequence_for_author": [
+  {
+   "step": 1,
+   "action": "Persist exact before files/index/HEAD and old helper policy. Add tests-only current31 real Git-init+34 image fixtures via maintained producer projections or a real dry preparation external port. Existing transport must actually reject at stale13 gate. This is transport RED, not new SDK execution."
+  },
+  {
+   "step": 2,
+   "action": "Add same-count replacement, each missing root, extra root and nested/unknown .git negatives. Add each missing expected image, renamed/zero image and fabricated report list negatives. Do not only assert counts or compare producer and transport to a third duplicated list."
+  },
+  {
+   "step": 3,
+   "action": "Minimal shared-plan production change, full transport/release module GREEN with preserved prior assertions. Actual preparation callbacks and real git init continue, while CMake/build execution remains clearly external fixture ports in tool tests."
+  },
+  {
+   "step": 4,
+   "action": "Repeat Git contamination cases through verify, not only pack: rearchive config remote/include/credential/hookPath, index, history/object/ref/log, active hook, unknown/nested .git and recompute outer archive identity. Must still reject original-policy violations."
+  },
+  {
+   "step": 5,
+   "action": "Test every image/path category and selected18 metadata/canonical input identity, complete original file/mode bytes across stage/job identity, standalone helper copied to unrelated RUNNER_TEMP, and distinct source/builder commit records."
+  },
+  {
+   "step": 6,
+   "action": "Require new SDK dependency in package tests and prove rehashed omission still fails. Run full relevant producer tests, release tests, source-SDK contract suite with actual no-skip receipts as authorized; no producer commands removed/parallel budget altered."
+  },
+  {
+   "step": 7,
+   "action": "New exact committed source must rerun actual clean remote qualification. Preserve failed run39100437609 and artifact separately; only newly successful complete SDK+transport+observed OCI/offline build receipts can qualify their own source. Static31/34 and local fixtures are not those results."
+  }
+ ],
+ "gzip_crc_followup": {
+  "confirmed_source_fact": "Current verify consumes tarfile.open(...r:gz) member iteration and does not explicitly drain the gzip stream to EOF/trailer. Existing test_release.py lacks CRC-only/truncated-trailer cases. This analysis executed no exploit/regression, so it does not assert that a particular archive layout was admitted incorrectly.",
+  "test": "Fresh pack fixture, corrupt only gzip CRC/ISIZE or truncate trailer and recompute manifest.archive SHA/size so the negative does not merely hit the outer byte identity gate. Preserve actual RED/GREEN; if existing runtime already rejects a case, record real GREEN rather than fabricate RED.",
+  "conditional_fix": "If real RED demonstrates missing full-stream validation, within transport use a streaming gzip reader through validated tar EOF then bounded drain to real gzip EOF/trailer. Bound total expanded tar bytes as well as payload bytes/member count, reject trailing/concatenated unexpected content, and retain every existing size/SHA/mode inventory check. No unbounded read() or claim that SHA validates CRC."
+ },
+ "cost_exit_and_non_goals": {
+  "firmware_cost": "No firmware runtime or storage changes; host SDK/release tooling only. One pure tuple plan and stdlib import; no network/service/worker.",
+  "local_test_cost": "Synthetic31 git-init roots plus small image external-port fixtures; use fresh TMP directories, jobs1 and canonical process receipts under Root budget. No local full SDK/Docker/ARM rebuild until explicitly authorized.",
+  "exit": "One shared plan used by producer+standalone transport; exact current roots/images and all Git corruption negatives enforced in pack/verify; required installed dependency; real tests/full source guards and independent review; normal commit/CI. Remote full qualification remains separate.",
+  "not_goals": [
+   "accept arbitrary .git or fixture counts",
+   "trust report as whitelist",
+   "rename failed evidence passed",
+   "change 30 required CI jobs or release/main gates",
+   "new workflow/credentials/permissions",
+   "download failed artifact during this analysis",
+   "declare physical/HIL or complete42-task delivery"
+  ]
+ },
+ "independent_readonly_review": {
+  "agent": "/root/io24_delivery_docs/browser_driver_review",
+  "scope": "Transport security, release fixture tests and standalone builder execution; pure source reads only. Confirms preferred dependency direction has no identified startup/security blocker; exact counts/schema are not execution proof. No tests, imports, writes or downloads."
+ },
+ "inputs": {
+  "tools/release/transport.py": {
+   "sha256": "0e3c9ab5722f0d58b82500e5b2718a955df055adc656832dd3ac89c1d5f1cf96",
+   "bytes": 16919,
+   "head_blob": "75b41577f25146c3326a66aaafadb74793654688",
+   "worktree_blob": "75b41577f25146c3326a66aaafadb74793654688"
+  },
+  "tools/release/delivery.py": {
+   "sha256": "ef57d25139886c497fe12352acf9d3ed49415d4088d7f9f1b8694f75fded0be8",
+   "bytes": 24180,
+   "head_blob": "11fa1f00d4f83e9931ca54225864a3fc991f7082",
+   "worktree_blob": "11fa1f00d4f83e9931ca54225864a3fc991f7082"
+  },
+  "tools/release/README.md": {
+   "sha256": "8e1a6b524cb58d4bd856e6feaece7364b7d0886c866db25eeaaf604f2d44ae72",
+   "bytes": 5172,
+   "head_blob": "ebd9be68c141d9e7859d61ccaa0e81634adfdd5a",
+   "worktree_blob": "ebd9be68c141d9e7859d61ccaa0e81634adfdd5a"
+  },
+  "cmake/package/verify_consumers.py": {
+   "sha256": "19ce976ca80079240ca5ef723710ffc52945eba34917b0ee736d505810c9b87d",
+   "bytes": 31585,
+   "head_blob": "90f032d7da9cfbbd7c128de9d1b4db767f18e257",
+   "worktree_blob": "90f032d7da9cfbbd7c128de9d1b4db767f18e257"
+  },
+  "cmake/package/package_source_sdk.py": {
+   "sha256": "ae715c4da9c6c418ce3ff423367d85d61fc0946b1234f82d3e6a2fbfc5e025f7",
+   "bytes": 50650,
+   "head_blob": "d7c90f5bd0be95e4a81b535848dbb91040a779ea",
+   "worktree_blob": "d7c90f5bd0be95e4a81b535848dbb91040a779ea"
+  },
+  "cmake/package/README.md": {
+   "sha256": "338c007155bf68d44cf6b5504a5bce695e382be90965c07f1ffc7ee069c992b4",
+   "bytes": 5820,
+   "head_blob": "90698b08a865c801f844e85c31af81cbef47fc82",
+   "worktree_blob": "90698b08a865c801f844e85c31af81cbef47fc82"
+  },
+  ".github/workflows/test_release.py": {
+   "sha256": "4d171a2b962813639b3754a7365d89b57d96c6c05e120e1b1b2e0b7ad4a95af0",
+   "bytes": 56959,
+   "head_blob": "ef72c8eb171eb697ba39eb047e2351365cf0d14f",
+   "worktree_blob": "ef72c8eb171eb697ba39eb047e2351365cf0d14f"
+  },
+  ".github/workflows/release.yml": {
+   "sha256": "92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2",
+   "bytes": 11948,
+   "head_blob": "37682fbba843ded4709b488fb55a398f4e521e66",
+   "worktree_blob": "37682fbba843ded4709b488fb55a398f4e521e66"
+  },
+  ".github/workflows/software-qualification.yml": {
+   "sha256": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c",
+   "bytes": 15588,
+   "head_blob": "1a4ebb00d6e3be01f2e2067b4a4fd91600fdfd14",
+   "worktree_blob": "1a4ebb00d6e3be01f2e2067b4a4fd91600fdfd14"
+  },
+  "tools/testing/test_sdk_verification_call.py": {
+   "sha256": "664b5d1d4ea503bfbfddd561121c1b8883ccb57bd2c8d24f1374d14a7b0bc925",
+   "bytes": 38547,
+   "head_blob": "567d4ecb791e5b6dd1d3b7b622d94576b200f146",
+   "worktree_blob": "567d4ecb791e5b6dd1d3b7b622d94576b200f146"
+  },
+  "tests/contracts/test_source_sdk.py": {
+   "sha256": "ac336f46b7b1558f14f8bb3e4421701a4c1a98b67485aab52e377df8be619126",
+   "bytes": 109798,
+   "head_blob": "8a421a05a3e62aeecbcacb5fd8bc4c6df5365b1a",
+   "worktree_blob": "8a421a05a3e62aeecbcacb5fd8bc4c6df5365b1a"
+  },
+  "tools/maintenance/job_identity.py": {
+   "sha256": "5316c45e6ea7fb35f5f1c6d19f1faaade80c3283274e441a0996876260da024e",
+   "bytes": 14752,
+   "head_blob": "08f361deb493c8c59043feddbbed9b8e0d62a404",
+   "worktree_blob": "08f361deb493c8c59043feddbbed9b8e0d62a404"
+  },
+  "dependencies/platform-compatibility.json": {
+   "sha256": "6deaf49d165ca8c9f7da9f0659124cf5a8d59ddcb7804cb8a4e3b82c039e1a57",
+   "bytes": 585,
+   "head_blob": "01c9f163695f8e71c41453be4981f6fdebca44e8",
+   "worktree_blob": "01c9f163695f8e71c41453be4981f6fdebca44e8"
+  }
+ },
+ "read_only_status": {
+  "source_edits": false,
+  "index_edits": false,
+  "tests_or_builds": false,
+  "producer_execution": false,
+  "downloads": false,
+  "remote_dispatch_or_messages": false,
+  "author_root_assigned": false
+ },
+ "source_after": {
+  "head": "a07bc6eecd8ef0d85a6882249c7a481a4f69dc28",
+  "head_tree": "663571602feb3fff66aaafcb89cdbcef42c7508a",
+  "index_sha256": "876be1b88e5a004c7218b0efb7118c9b065b01c93292d2903edabf4d5e5ebe56",
+  "status_bytes": 3608,
+  "status_sha256": "f1c619d8a4ece8f96d1be5b22e7b91684201f0a5482ea96831bb5f200885b0d0",
+  "context": "Main has separately authorized staged work under active full gates; this analysis does not edit it."
+ },
+ "source_snapshot_unchanged_during_report_seal": true
+}

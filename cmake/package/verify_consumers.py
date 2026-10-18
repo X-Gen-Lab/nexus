@@ -14,29 +14,10 @@ import tomllib
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
 from tools.evidence.common import file_identity  # noqa: E402
+from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
+                                     SELECTED_CONSUMERS)  # noqa: E402
 
 
-SELECTED_CONSUMERS = (
-    ("h743 high", "h743-high-peripherals", "h743-high"),
-    ("u575 gpdma", "u575-uart-gpdma", "u575-uart-gpdma"),
-    ("g474 fd normal", "g474-can-fd-normal", "g474-can-fd"),
-    ("g474 fd loopback", "g474-can-fd-loopback", "g474-can-fd"),
-    ("g474 pwm adc", "g474-pwm-adc", "g474-pwm-adc"),
-    ("g474 adc regular software", "g474-adc-group-regular-software",
-     "g474-adc-group"),
-    ("g474 adc regular timer", "g474-adc-group-regular-timer", "g474-adc-group"),
-    ("g474 adc injected software", "g474-adc-group-injected-software",
-     "g474-adc-group"),
-    ("g474 adc injected timer", "g474-adc-group-injected-timer", "g474-adc-group"),
-    ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
-    ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
-    ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
-    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
-    ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
-    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
-    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"),
-    ("native time pair", "native-time-pair", "native-time-pair"),
-    ("native time empty", "native-time-empty", "native-time-empty"))
 
 
 def clean_environment():
@@ -482,8 +463,7 @@ def main(argv=None):
             raise ValueError("Formal consumer verification requires a publishable committed source SDK")
         report["source_revision"] = identity["source_revision"]
         report["source_tree"] = identity["source_tree"]
-        for name, arm, chip in (("native", False, "native"),
-                                ("stm32", True, "stm32"), ("gd32", True, "gd32")):
+        for name, arm, chip in BASE_CONSUMERS:
             source, build, command = prepare_consumer(prefix, output, name,
                 run_checked, arm=arm, chip=chip, expected_revision=identity["source_revision"])
             run_checked(command)
@@ -505,35 +485,34 @@ def main(argv=None):
             else:
                 for application in ("installed_c", "installed_cpp"):
                     run_checked([str(build / "bin" / application)])
-        for family in ("h743", "u575", "f103", "gd303", "g474"):
-            for backend in ("baremetal", "freertos"):
-                source, build, command = prepare_modern_consumer(
-                    prefix, output, family, backend, run_checked,
-                    expected_revision=identity["source_revision"])
-                run_checked(command)
-                run_checked(["cmake", "--build", str(build), "--parallel",
-                             str(args.parallel) if args.parallel is not None else "2",
-                             "--target", "installed_modern"])
-                commands = json.loads((build / "compile_commands.json").read_text())
-                products = [entry for entry in commands
-                            if Path(entry["file"]).resolve() == source / "main.c"]
-                if len(products) != 1 or any(value in products[0]["command"]
-                        for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
-                    raise ValueError("Modern consumer private inputs leaked into product")
-                image = build / "bin/installed_modern.elf"
-                resources = json.loads(
-                    (build / "bin/installed_modern.resources.json").read_text())
-                if resources["status"] != "passed" or image.stat().st_size == 0:
-                    raise ValueError("Modern consumer linked resource binding failed")
-                config = Path((build / "resolved-config.txt").read_text())
-                retention_path = build / "provider-retention.json"
-                run_checked([sys.executable, "-B",
-                    str(sdk / "tools/measurement/retention.py"),
-                    "--elf", str(image), "--bindings", str(config / "bindings.c"),
-                    "--resolved", str(config / "resolved.json"),
-                    "--output", str(retention_path)])
-                if json.loads(retention_path.read_text())["status"] != "passed":
-                    raise ValueError("Modern consumer provider retention failed")
+        for family, backend in MODERN_CONSUMERS:
+            source, build, command = prepare_modern_consumer(
+                prefix, output, family, backend, run_checked,
+                expected_revision=identity["source_revision"])
+            run_checked(command)
+            run_checked(["cmake", "--build", str(build), "--parallel",
+                         str(args.parallel) if args.parallel is not None else "2",
+                         "--target", "installed_modern"])
+            commands = json.loads((build / "compile_commands.json").read_text())
+            products = [entry for entry in commands
+                        if Path(entry["file"]).resolve() == source / "main.c"]
+            if len(products) != 1 or any(value in products[0]["command"]
+                    for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
+                raise ValueError("Modern consumer private inputs leaked into product")
+            image = build / "bin/installed_modern.elf"
+            resources = json.loads(
+                (build / "bin/installed_modern.resources.json").read_text())
+            if resources["status"] != "passed" or image.stat().st_size == 0:
+                raise ValueError("Modern consumer linked resource binding failed")
+            config = Path((build / "resolved-config.txt").read_text())
+            retention_path = build / "provider-retention.json"
+            run_checked([sys.executable, "-B",
+                str(sdk / "tools/measurement/retention.py"),
+                "--elf", str(image), "--bindings", str(config / "bindings.c"),
+                "--resolved", str(config / "resolved.json"),
+                "--output", str(retention_path)])
+            if json.loads(retention_path.read_text())["status"] != "passed":
+                raise ValueError("Modern consumer provider retention failed")
         for name, assembly, smoke in SELECTED_CONSUMERS:
             source, build, command = prepare_selected_consumer(
                 prefix, output, name, assembly, smoke, run_checked,

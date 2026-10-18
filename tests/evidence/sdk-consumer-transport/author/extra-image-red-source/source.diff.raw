@@ -1,0 +1,720 @@
+diff --git a/.github/workflows/test_release.py b/.github/workflows/test_release.py
+index ef72c8eb171eb697ba39eb047e2351365cf0d14f..99d6ad74229af6c0b99642779a8739935f1a4728 100644
+--- a/.github/workflows/test_release.py
++++ b/.github/workflows/test_release.py
+@@ -82,10 +82,11 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
+                 "p.add_argument('--output');a=p.parse_args();o=Path(a.output)\n"
+                 "o.mkdir(parents=True)\n"
+                 "(o/'.nexus-sdk-consumer-check').write_text('owned SDK consumer verification\\n')\n"
+-                "for n in ('native','stm32','gd32','h743 baremetal','h743 freertos',"
+-                "'u575 baremetal','u575 freertos','f103 baremetal','f103 freertos',"
+-                "'gd303 baremetal','gd303 freertos','g474 baremetal','g474 freertos'):\n"
+-                " m.prepare_consumer(Path(a.prefix),o,n,lambda c: subprocess.run(c,check=True,capture_output=True),version='0.1.0')\n"
++                "from tools.release.transport import consumer_layout\n"
++                "for source,build,images in consumer_layout():\n"
++                " m.prepare_consumer(Path(a.prefix),o,source.removesuffix(' source'),lambda c: subprocess.run(c,check=True,capture_output=True),version='0.1.0')\n"
++                " for image in images:\n"
++                "  p=o/image;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'ELF external build port fixture')\n"
+                 "(o/'command-00.log').write_text('passed consumer command\\n')\n"
+                 f"(o/'verification.json').write_text(json.dumps({{'kind': 'source_sdk_consumer_verification', 'status': 'passed', 'source_revision': {COMMIT!r}, 'physical_status': 'not_executed', 'commands': [{{'argv': ['git','init'], 'exit_code': 0, 'log': 'command-00.log'}}]}}))\n")
+             (source / "tools").mkdir()
+@@ -305,13 +306,16 @@ class ConsumerTransportTests(unittest.TestCase):
+         raw.mkdir()
+         (raw / ".nexus-sdk-consumer-check").write_text(
+             "owned SDK consumer verification\n")
+-        for name in ("native", "stm32", "gd32", "h743 baremetal",
+-                     "h743 freertos", "u575 baremetal", "u575 freertos",
+-                     "f103 baremetal", "f103 freertos", "gd303 baremetal",
+-                     "gd303 freertos", "g474 baremetal", "g474 freertos"):
+-            prepare_consumer(base / "prefix", raw, name,
+-                lambda command: subprocess.run(command, check=True,
+-                    capture_output=True), version="0.1.0")
++        from tools.release.transport import consumer_layout
++        for source, _, images in consumer_layout():
++            prepare_consumer(base / "prefix", raw,
++                source.removesuffix(" source"), lambda command: subprocess.run(
++                    command, check=True, capture_output=True), version="0.1.0")
++            # Only Git/transport execute here; firmware bytes are external ports.
++            for image in images:
++                target = raw / image
++                target.parent.mkdir(parents=True, exist_ok=True)
++                target.write_bytes(b"\x7fELF synthetic transport image\n")
+         (raw / "command-00.log").write_bytes(b"actual consumer output\n")
+         (raw / "verification.json").write_text(json.dumps({
+             "kind": "source_sdk_consumer_verification", "status": "passed",
+@@ -365,9 +369,180 @@ class ConsumerTransportTests(unittest.TestCase):
+         original = {path.relative_to(raw).as_posix(): path.read_bytes()
+                     for path in raw.rglob("*") if path.is_file()}
+         self.assertEqual(restored, original)
+-        self.assertEqual(len(list(raw.rglob(".git"))), 13)
++        self.assertEqual(len(list(raw.rglob(".git"))), 31)
+         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
+-        self.assertEqual(manifest["git_metadata"], "thirteen_unborn_init_fixtures")
++        self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
++        self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
++        self.assertEqual(manifest["consumer_images"], sorted(transport.IMAGES))
++
++    def test_complete_current_consumer_matrix_crosses_transport(self):
++        from tools.release import transport
++        base, raw = self.fixture()
++        manifest = transport.pack(raw, base / "transport", COMMIT)
++        self.assertEqual(manifest["schema_version"], 2)
++        self.assertEqual(len(list(raw.rglob(".git"))), 31)
++        images = [path for path in raw.glob("* build/bin/*") if path.is_file()]
++        self.assertEqual(len(images), 34)
++        transport.verify(base / "transport", COMMIT)
++
++    def test_each_current_root_and_image_is_required(self):
++        from tools.release import transport
++        base, raw = self.fixture()
++        for name in sorted(transport.FIXTURES | transport.IMAGES):
++            with self.subTest(name=name):
++                target = raw / name
++                saved = base / "withdrawn"
++                target.rename(saved)
++                try:
++                    with self.assertRaisesRegex(ValueError, "Exact current"):
++                        transport.pack(raw, base / "transport", COMMIT)
++                finally:
++                    saved.rename(target)
++
++    def test_equal_count_root_substitution_and_report_claim_cannot_authorize_it(self):
++        from tools.release import transport
++        for change in ("replace", "extra", "zero-image", "extra-image"):
++            with self.subTest(change=change):
++                base, raw = self.fixture()
++                if change == "zero-image":
++                    (raw / "selected native time pair build/bin/installed_selected").write_bytes(b"")
++                elif change == "extra-image":
++                    (raw / "stm32 build/bin/unreviewed.elf").write_bytes(
++                        b"\x7fELF unreviewed fixture")
++                else:
++                    original = raw / "selected g474 shared pwm source"
++                    if change == "replace":
++                        original.rename(raw / "unreviewed source")
++                    else:
++                        consumer_module().prepare_consumer(base / "prefix", raw,
++                            "unreviewed", lambda command: subprocess.run(
++                                command, check=True, capture_output=True),
++                            version="0.1.0")
++                report_path = raw / "verification.json"
++                report = json.loads(report_path.read_text())
++                report["consumer_roots"] = ["unreviewed source/.git"]
++                report["consumer_images"] = ["unreviewed build/bin/image"]
++                report_path.write_text(json.dumps(report))
++                with self.assertRaisesRegex(ValueError, "Exact current"):
++                    transport.pack(raw, base / "transport", COMMIT)
++
++    def test_old_thirteen_roots_are_not_a_current_fallback(self):
++        from tools.release import transport
++        base, raw = self.fixture()
++        for name, _, _ in consumer_module().SELECTED_CONSUMERS:
++            shutil.rmtree(raw / ("selected " + name + " source"))
++            shutil.rmtree(raw / ("selected " + name + " build"))
++        self.assertEqual(len(list(raw.rglob(".git"))), 13)
++        with self.assertRaisesRegex(ValueError, "Exact current"):
++            transport.pack(raw, base / "transport", COMMIT)
++
++    def test_schema_and_manifest_claims_cannot_reduce_or_expand_the_plan(self):
++        from tools.release import transport
++        for change in ("legacy", "missing-schema", "policy", "roots", "images"):
++            with self.subTest(change=change):
++                base, raw = self.fixture()
++                output = base / "transport"
++                transport.pack(raw, output, COMMIT)
++                path = output / "consumer-raw-manifest.json"
++                manifest = json.loads(path.read_text())
++                if change == "legacy":
++                    manifest["schema_version"] = 1
++                    manifest["git_metadata"] = "thirteen_unborn_init_fixtures"
++                elif change == "missing-schema":
++                    del manifest["schema_version"]
++                else:
++                    key = "consumer_" + change
++                    manifest[key] = "invented" if change == "policy" else []
++                path.write_text(json.dumps(manifest))
++                with self.assertRaisesRegex(ValueError, "policy claim"):
++                    transport.verify(output, COMMIT)
++
++    def test_standalone_extracted_transport_has_no_checkout_import_dependency(self):
++        from tools.release import transport
++        base, raw = self.fixture()
++        helper = base / "standalone.py"
++        helper.write_bytes((ROOT / "tools/release/transport.py").read_bytes())
++        environment = dict(os.environ)
++        environment.pop("PYTHONPATH", None)
++        result = subprocess.run([sys.executable, "-B", str(helper), "pack",
++            "--raw", str(raw), "--output", str(base / "transport"),
++            "--expected-commit", COMMIT], cwd=base, env=environment,
++            capture_output=True, text=True, timeout=20)
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        transport.verify(base / "transport", COMMIT)
++
++    def test_rehashed_archive_git_state_and_missing_image_are_still_rejected(self):
++        from tools.release import transport
++        contamination = (("config", b"[remote \"origin\"]\nurl=secret\n"),
++                         ("index", b"tracked index"),
++                         ("objects/ab/object", b"history"),
++                         ("refs/heads/main", b"a" * 40),
++                         ("logs/HEAD", b"history"),
++                         ("commondir", b"../foreign"),
++                         ("hooks/pre-commit", b"active hook"),
++                         ("image", None))
++        for relative, data in contamination:
++            with self.subTest(relative=relative):
++                base, raw = self.fixture()
++                output = base / "transport"
++                transport.pack(raw, output, COMMIT)
++                name = ("selected native time empty build/bin/installed_selected"
++                        if relative == "image" else "native source/.git/" + relative)
++                manifest_path = output / "consumer-raw-manifest.json"
++                manifest = json.loads(manifest_path.read_text())
++                original = output / "consumer-raw.tar.gz"
++                rewritten = base / "changed.tar.gz"
++                replaced = False
++                with tarfile.open(original) as source:
++                    with tarfile.open(rewritten, "w:gz") as archive:
++                        for member in source:
++                            if member.name == name:
++                                replaced = True
++                                if data is None:
++                                    continue
++                                member.size = len(data)
++                                import io
++                                archive.addfile(member, io.BytesIO(data))
++                            else:
++                                archive.addfile(member, source.extractfile(member)
++                                                if member.isfile() else None)
++                        if not replaced:
++                            member = tarfile.TarInfo(name)
++                            member.size, member.mode = len(data), 0o600
++                            import io
++                            archive.addfile(member, io.BytesIO(data))
++                rewritten.replace(original)
++                if data is None:
++                    del manifest["files"][name]
++                else:
++                    manifest["files"][name] = {"size": len(data),
++                        "sha256": hashlib.sha256(data).hexdigest(),
++                        "mode": manifest["files"].get(name, {}).get("mode", 0o600)}
++                manifest["archive"] = transport.byte_identity(original)
++                manifest_path.write_text(json.dumps(manifest))
++                with self.assertRaises(ValueError):
++                    transport.verify(output, COMMIT)
++
++    def test_gzip_trailer_is_verified_even_with_rehashed_archive_identity(self):
++        from tools.release import transport
++        for change in ("crc", "size", "truncated"):
++            with self.subTest(change=change):
++                base, raw = self.fixture()
++                output = base / "transport"
++                transport.pack(raw, output, COMMIT)
++                archive = output / "consumer-raw.tar.gz"
++                data = bytearray(archive.read_bytes())
++                if change == "truncated":
++                    data = data[:-5]
++                else:
++                    data[-8 if change == "crc" else -4] ^= 1
++                archive.write_bytes(data)
++                manifest_path = output / "consumer-raw-manifest.json"
++                manifest = json.loads(manifest_path.read_text())
++                manifest["archive"] = transport.byte_identity(archive)
++                manifest_path.write_text(json.dumps(manifest))
++                with self.assertRaises((ValueError, OSError, EOFError)):
++                    transport.verify(output, COMMIT)
+ 
+     def test_missing_each_new_consumer_fixture_is_rejected(self):
+         from tools.release import transport
+@@ -376,7 +551,7 @@ class ConsumerTransportTests(unittest.TestCase):
+                 with self.subTest(family=family, backend=backend):
+                     base, raw = self.fixture()
+                     shutil.rmtree(raw / (family + " " + backend + " source"))
+-                    with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
++                    with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+                         transport.pack(raw, base / "transport", COMMIT)
+ 
+     def test_legacy_seven_consumer_set_is_not_a_current_transport_fallback(self):
+@@ -385,7 +560,9 @@ class ConsumerTransportTests(unittest.TestCase):
+         for family in ("f103", "gd303", "g474"):
+             for backend in ("baremetal", "freertos"):
+                 shutil.rmtree(raw / (family + " " + backend + " source"))
+-        with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
++        for name, _, _ in consumer_module().SELECTED_CONSUMERS:
++            shutil.rmtree(raw / ("selected " + name + " source"))
++        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+             transport.pack(raw, base / "transport", COMMIT)
+ 
+     def test_unreviewed_consumer_root_is_rejected(self):
+@@ -394,7 +571,7 @@ class ConsumerTransportTests(unittest.TestCase):
+         consumer_module().prepare_consumer(base / "prefix", raw,
+             "unreviewed baremetal", lambda command: subprocess.run(command,
+                 check=True, capture_output=True), version="0.1.0")
+-        with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
++        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+             transport.pack(raw, base / "transport", COMMIT)
+ 
+     def test_manifest_cannot_describe_seven_fixtures_for_current_raw_bytes(self):
+diff --git a/cmake/package/package_source_sdk.py b/cmake/package/package_source_sdk.py
+index d7c90f5bd0be95e4a81b535848dbb91040a779ea..5c979dc7f11acadff83f605072d2af0673b6d574 100644
+--- a/cmake/package/package_source_sdk.py
++++ b/cmake/package/package_source_sdk.py
+@@ -365,7 +365,8 @@ REQUIRED_FILES += tuple(
+ # observers complete as well; a rehashed map alone cannot prove their presence.
+ REQUIRED_FILES += (
+     "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+-    "cmake/package/verify_consumers.py", "components/CMakeLists.txt",
++    "cmake/package/verify_consumers.py", "tools/release/transport.py",
++    "components/CMakeLists.txt",
+     "os/wait.c", "os/baremetal/notify.c", "os/native/native.c",
+     "os/include/nexus/os/wait.h", "os/include/nexus/os/baremetal.h",
+     "os/native/include/nexus/os/native.h",
+diff --git a/cmake/package/verify_consumers.py b/cmake/package/verify_consumers.py
+index 90f032d7da9cfbbd7c128de9d1b4db767f18e257..261b096c838f2d2bf5323da1c7626b1be0e967c9 100644
+--- a/cmake/package/verify_consumers.py
++++ b/cmake/package/verify_consumers.py
+@@ -14,29 +14,10 @@ import tomllib
+ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+ from tools.configure.metadata import load_policy  # noqa: E402
+ from tools.evidence.common import file_identity  # noqa: E402
++from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
++                                     SELECTED_CONSUMERS)  # noqa: E402
+ 
+ 
+-SELECTED_CONSUMERS = (
+-    ("h743 high", "h743-high-peripherals", "h743-high"),
+-    ("u575 gpdma", "u575-uart-gpdma", "u575-uart-gpdma"),
+-    ("g474 fd normal", "g474-can-fd-normal", "g474-can-fd"),
+-    ("g474 fd loopback", "g474-can-fd-loopback", "g474-can-fd"),
+-    ("g474 pwm adc", "g474-pwm-adc", "g474-pwm-adc"),
+-    ("g474 adc regular software", "g474-adc-group-regular-software",
+-     "g474-adc-group"),
+-    ("g474 adc regular timer", "g474-adc-group-regular-timer", "g474-adc-group"),
+-    ("g474 adc injected software", "g474-adc-group-injected-software",
+-     "g474-adc-group"),
+-    ("g474 adc injected timer", "g474-adc-group-injected-timer", "g474-adc-group"),
+-    ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
+-    ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
+-    ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
+-    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
+-    ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
+-    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
+-    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"),
+-    ("native time pair", "native-time-pair", "native-time-pair"),
+-    ("native time empty", "native-time-empty", "native-time-empty"))
+ 
+ 
+ def clean_environment():
+@@ -482,8 +463,7 @@ def main(argv=None):
+             raise ValueError("Formal consumer verification requires a publishable committed source SDK")
+         report["source_revision"] = identity["source_revision"]
+         report["source_tree"] = identity["source_tree"]
+-        for name, arm, chip in (("native", False, "native"),
+-                                ("stm32", True, "stm32"), ("gd32", True, "gd32")):
++        for name, arm, chip in BASE_CONSUMERS:
+             source, build, command = prepare_consumer(prefix, output, name,
+                 run_checked, arm=arm, chip=chip, expected_revision=identity["source_revision"])
+             run_checked(command)
+@@ -505,35 +485,34 @@ def main(argv=None):
+             else:
+                 for application in ("installed_c", "installed_cpp"):
+                     run_checked([str(build / "bin" / application)])
+-        for family in ("h743", "u575", "f103", "gd303", "g474"):
+-            for backend in ("baremetal", "freertos"):
+-                source, build, command = prepare_modern_consumer(
+-                    prefix, output, family, backend, run_checked,
+-                    expected_revision=identity["source_revision"])
+-                run_checked(command)
+-                run_checked(["cmake", "--build", str(build), "--parallel",
+-                             str(args.parallel) if args.parallel is not None else "2",
+-                             "--target", "installed_modern"])
+-                commands = json.loads((build / "compile_commands.json").read_text())
+-                products = [entry for entry in commands
+-                            if Path(entry["file"]).resolve() == source / "main.c"]
+-                if len(products) != 1 or any(value in products[0]["command"]
+-                        for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
+-                    raise ValueError("Modern consumer private inputs leaked into product")
+-                image = build / "bin/installed_modern.elf"
+-                resources = json.loads(
+-                    (build / "bin/installed_modern.resources.json").read_text())
+-                if resources["status"] != "passed" or image.stat().st_size == 0:
+-                    raise ValueError("Modern consumer linked resource binding failed")
+-                config = Path((build / "resolved-config.txt").read_text())
+-                retention_path = build / "provider-retention.json"
+-                run_checked([sys.executable, "-B",
+-                    str(sdk / "tools/measurement/retention.py"),
+-                    "--elf", str(image), "--bindings", str(config / "bindings.c"),
+-                    "--resolved", str(config / "resolved.json"),
+-                    "--output", str(retention_path)])
+-                if json.loads(retention_path.read_text())["status"] != "passed":
+-                    raise ValueError("Modern consumer provider retention failed")
++        for family, backend in MODERN_CONSUMERS:
++            source, build, command = prepare_modern_consumer(
++                prefix, output, family, backend, run_checked,
++                expected_revision=identity["source_revision"])
++            run_checked(command)
++            run_checked(["cmake", "--build", str(build), "--parallel",
++                         str(args.parallel) if args.parallel is not None else "2",
++                         "--target", "installed_modern"])
++            commands = json.loads((build / "compile_commands.json").read_text())
++            products = [entry for entry in commands
++                        if Path(entry["file"]).resolve() == source / "main.c"]
++            if len(products) != 1 or any(value in products[0]["command"]
++                    for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
++                raise ValueError("Modern consumer private inputs leaked into product")
++            image = build / "bin/installed_modern.elf"
++            resources = json.loads(
++                (build / "bin/installed_modern.resources.json").read_text())
++            if resources["status"] != "passed" or image.stat().st_size == 0:
++                raise ValueError("Modern consumer linked resource binding failed")
++            config = Path((build / "resolved-config.txt").read_text())
++            retention_path = build / "provider-retention.json"
++            run_checked([sys.executable, "-B",
++                str(sdk / "tools/measurement/retention.py"),
++                "--elf", str(image), "--bindings", str(config / "bindings.c"),
++                "--resolved", str(config / "resolved.json"),
++                "--output", str(retention_path)])
++            if json.loads(retention_path.read_text())["status"] != "passed":
++                raise ValueError("Modern consumer provider retention failed")
+         for name, assembly, smoke in SELECTED_CONSUMERS:
+             source, build, command = prepare_selected_consumer(
+                 prefix, output, name, assembly, smoke, run_checked,
+diff --git a/tests/contracts/test_source_sdk.py b/tests/contracts/test_source_sdk.py
+index 8a421a05a3e62aeecbcacb5fd8bc4c6df5365b1a..777b1f66705d8902c358daee293dd7f1d5a18c09 100644
+--- a/tests/contracts/test_source_sdk.py
++++ b/tests/contracts/test_source_sdk.py
+@@ -142,6 +142,52 @@ class SourceSDKSelectionTests(unittest.TestCase):
+         self.assertIn("tools/configure/selected_contracts.py",
+                       source_sdk.REQUIRED_FILES)
+ 
++    def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
++        import hashlib
++        required = "tools/release/transport.py"
++        self.assertIn(required, source_sdk.REQUIRED_FILES)
++        with tempfile.TemporaryDirectory(prefix="SDK required plan ") as value:
++            root = Path(value) / "prefix/share/nexus/src"
++            root.mkdir(parents=True)
++            # Filesystem/manifest admission only, not a usable SDK or build.
++            payload = b"required-source fixture\n"
++            files = {}
++            for name in source_sdk.REQUIRED_FILES:
++                target = root / name
++                target.parent.mkdir(parents=True, exist_ok=True)
++                target.write_bytes(payload)
++                files[name] = hashlib.sha256(payload).hexdigest()
++            prefix = root.parents[2]
++            exports = {}
++            for name in ("lib/cmake/Nexus/NexusConfig.cmake",
++                         "lib/cmake/Nexus/NexusConfigVersion.cmake"):
++                target = prefix / name
++                target.parent.mkdir(parents=True, exist_ok=True)
++                target.write_bytes(payload)
++                exports[name] = hashlib.sha256(payload).hexdigest()
++            identity = {"schema": 1, "kind": "nexus-installed-source-sdk",
++                "source_revision": "a" * 40, "source_tree": "b" * 40,
++                "publishable": True, "source_dirty": False,
++                "files_sha256": files, "dependencies": [],
++                "reviewed_imports": [], "package_files_sha256": exports,
++                "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"]}
++
++            def write_identity():
++                identity["snapshot_sha256"] = source_sdk.digest(json.dumps(
++                    files, sort_keys=True, separators=(",", ":")).encode())
++                (root / source_sdk.MANIFEST).write_text(json.dumps(identity))
++
++            write_identity()
++            with self.assertRaisesRegex(source_sdk.SDKError,
++                                        "dependency commit identities"):
++                source_sdk.verify(root)
++            (root / required).unlink()
++            del files[required]
++            write_identity()
++            with self.assertRaisesRegex(source_sdk.SDKError,
++                                        "missing required sources/licenses"):
++                source_sdk.verify(root)
++
+     def test_portable_io_verification_inputs_and_public_smokes_are_required(self):
+         directory = "cmake/package/verification/io_evolution/"
+         names = {
+@@ -1283,7 +1329,8 @@ class SourceSDKTests(unittest.TestCase):
+                      "tools/dev/presets.py", "tools/dev/process.py",
+                      "tools/dev/cache.py", "tools/dev/dependencies.py",
+                      "tools/dev/qualification.py", "tools/evidence/store.py",
+-                     "tools/evidence/environment.py", "tools/evidence/recipe.py"):
++                     "tools/evidence/environment.py", "tools/evidence/recipe.py",
++                     "tools/release/transport.py"):
+             with self.subTest(name=name):
+                 target = self.sdk / name
+                 old_source = target.read_bytes()
+diff --git a/tools/release/README.md b/tools/release/README.md
+index ebd9be68c141d9e7859d61ccaa0e81634adfdd5a..5d2de53a9beb30cbf52f7ba7a78f3f5e9c5ab855 100644
+--- a/tools/release/README.md
++++ b/tools/release/README.md
+@@ -31,14 +31,35 @@ signature does not establish a different SDK source commit by itself.
+ 
+ ## Raw evidence and publication
+ 
+-Strict consumer output includes exactly thirteen unborn Git fixtures: Native,
+-STM32F407 and GD32F470, plus H743, U575, F103, GD303 and G474 with each of the
+-baremetal and FreeRTOS backends. Missing or additional fixture roots are rejected;
+-the historical seven-consumer set is not a current fallback. Transport archives
+-retain their original bytes, file modes and empty directories, then verify the
+-complete inventory before crossing the artifact identity boundary. The outer
+-artifact contains an inert archive, manifest and original consumer report.
+-Verification rejects unsafe paths, links, extra files and changed bytes.
++The immutable consumer plan in `transport.py` is shared by the installed SDK
++producer and the standalone versioned transport. Its current exact selection
++has 31 independent consumer roots and 34 executable images: three C/C++ base
++roots, ten MCU/backend roots and eighteen selected-feature roots. Native time
++pair/empty executables are host observations; MCU images are linked software
++evidence. These counts do not establish physical execution.
++
++New transport manifests use schema `2` and policy `nexus-sdk-consumers-v2`.
++Packing and verification require every exact plan root and nonempty image;
++missing, additional or same-count substituted Git roots fail. Report/manifest
++claims cannot authorize another selection. Each consumer's `.git` is only an
++unborn `git init` fixture isolating the SDK from its parent's source identity.
++History, remotes, an index, active hooks and foreign Git metadata remain refused.
++The SDK requires the complete shared plan module even after a rehashed omission.
++
++Archives retain all original raw bytes, file modes and empty directories, verify
++the complete inventory and consume the gzip stream through its CRC/size trailer
++before crossing the artifact identity boundary. The outer artifact contains an
++inert archive, manifest and original consumer report. Unsafe paths, links,
++duplicate entries, trailing compressed content and changed bytes fail. Transport
++does not rewrite a failed report or establish that a recorded command executed;
++actual source, job and builder identities retain that separate responsibility.
++
++Historical schema-1 thirteen-root archives keep their original bytes, source and
++hash-pinned helper for read-only recovery. Current packing and verification do
++not accept them as a fallback or migrate them into current qualification. The
++earlier seven-root set is likewise not a current selection. A repaired transport
++does not qualify a previously failed SDK or offline-build run; new committed
++source needs its own complete successful execution.
+ 
+ Local evidence storage is handled by `tools/evidence/store.py`. Its `copy`
+ operation preserves an independent content-addressed archive, reads every safe
+diff --git a/tools/release/transport.py b/tools/release/transport.py
+index 75b41577f25146c3326a66aaafadb74793654688..c61efe6a1dd109f6494e6a5874ae8ee47f336ca8 100644
+--- a/tools/release/transport.py
++++ b/tools/release/transport.py
+@@ -11,6 +11,7 @@ import re
+ import stat
+ import sys
+ import tarfile
++import zlib
+ 
+ MAX_FILES = 100000
+ MAX_BYTES = 1024 * 1024 * 1024
+@@ -18,10 +19,56 @@ RAW_OWNER = ".nexus-sdk-consumer-check"
+ OWNER = ".nexus-sdk-consumer-transport"
+ ARCHIVE = "consumer-raw.tar.gz"
+ MANIFEST = "consumer-raw-manifest.json"
+-FIXTURES = {name + " source/.git" for name in (
+-    "native", "stm32", "gd32", "h743 baremetal", "h743 freertos",
+-    "u575 baremetal", "u575 freertos", "f103 baremetal", "f103 freertos",
+-    "gd303 baremetal", "gd303 freertos", "g474 baremetal", "g474 freertos")}
++# The producer and standalone transport share this reviewed immutable plan.
++# A report may describe these identities, never authorize another fixture set.
++CONSUMER_POLICY = "nexus-sdk-consumers-v2"
++BASE_CONSUMERS = (("native", False, "native"),
++                  ("stm32", True, "stm32"), ("gd32", True, "gd32"))
++MODERN_CONSUMERS = tuple((family, backend)
++    for family in ("h743", "u575", "f103", "gd303", "g474")
++    for backend in ("baremetal", "freertos"))
++SELECTED_CONSUMERS = (
++    ("h743 high", "h743-high-peripherals", "h743-high"),
++    ("u575 gpdma", "u575-uart-gpdma", "u575-uart-gpdma"),
++    ("g474 fd normal", "g474-can-fd-normal", "g474-can-fd"),
++    ("g474 fd loopback", "g474-can-fd-loopback", "g474-can-fd"),
++    ("g474 pwm adc", "g474-pwm-adc", "g474-pwm-adc"),
++    ("g474 adc regular software", "g474-adc-group-regular-software",
++     "g474-adc-group"),
++    ("g474 adc regular timer", "g474-adc-group-regular-timer", "g474-adc-group"),
++    ("g474 adc injected software", "g474-adc-group-injected-software",
++     "g474-adc-group"),
++    ("g474 adc injected timer", "g474-adc-group-injected-timer", "g474-adc-group"),
++    ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
++    ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
++    ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
++    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
++    ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
++    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
++    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"),
++    ("native time pair", "native-time-pair", "native-time-pair"),
++    ("native time empty", "native-time-empty", "native-time-empty"))
++
++
++
++def consumer_layout():
++    """Return exact source/build roots and executable paths, without IO."""
++    rows = [(name, ("installed_c", "installed_cpp"), arm)
++            for name, arm, _ in BASE_CONSUMERS]
++    rows += [(family + " " + backend, ("installed_modern",), True)
++             for family, backend in MODERN_CONSUMERS]
++    rows += [("selected " + name, ("installed_selected",),
++              not name.startswith("native time "))
++             for name, _, _ in SELECTED_CONSUMERS]
++    return tuple((name + " source", name + " build",
++                  tuple(name + " build/bin/" + target + (".elf" if arm else "")
++                        for target in targets))
++                 for name, targets, arm in rows)
++
++
++FIXTURES = frozenset(source + "/.git" for source, _, _ in consumer_layout())
++IMAGES = frozenset(image for _, _, images in consumer_layout() for image in images)
++
+ 
+ 
+ def commit(value):
+@@ -132,7 +179,7 @@ def report(data, expected_commit, files):
+ def git_metadata(files, directories, contents):
+     observed = {entry for entry in directories if entry.endswith("/.git")}
+     if observed != FIXTURES:
+-        raise ValueError("Exactly thirteen empty git-init consumer fixtures required")
++        raise ValueError("Exact current consumer git-init fixtures required")
+     allowed_dirs = {"", "branches", "hooks", "info", "objects",
+                     "objects/info", "objects/pack", "refs", "refs/heads", "refs/tags"}
+     for entry in [*directories, *files]:
+@@ -175,6 +222,41 @@ def git_metadata(files, directories, contents):
+             raise ValueError("Git fixture excludes must remain comments")
+ 
+ 
++def consumer_images(files, directories):
++    """Require the trusted plan, independently of report or manifest claims."""
++    roots = {entry for entry in directories if "/" not in entry and
++             entry.endswith((" source", " build"))}
++    expected = {entry for source, build, _ in consumer_layout()
++                for entry in (source, build)}
++    if roots != expected or any(image not in files or files[image]["size"] <= 0
++                                for image in IMAGES):
++        raise ValueError("Exact current consumer roots and images required")
++
++
++def verify_gzip(archive):
++    """Consume one bounded gzip member through its actual CRC/size trailer."""
++    decoder = zlib.decompressobj(16 + zlib.MAX_WBITS)
++    total = 0
++    # Tar headers, bounded names/PAX records and padding also consume space.
++    limit = MAX_BYTES + (MAX_FILES + 1) * 4096
++    try:
++        with archive.open("rb") as stream:
++            while chunk := stream.read(65536):
++                while chunk:
++                    data = decoder.decompress(chunk, 65536)
++                    total += len(data)
++                    if total > limit:
++                        raise ValueError("Expanded transport archive exceeds its bound")
++                    if decoder.eof:
++                        if decoder.unused_data or stream.read(1):
++                            raise ValueError("Unexpected trailing gzip content")
++                        return
++                    chunk = decoder.unconsumed_tail
++    except zlib.error as error:
++        raise ValueError("Transport gzip CRC/size validation failed") from error
++    raise ValueError("Truncated transport gzip stream")
++
++
+ def verify(output, expected_commit):
+     output = path(output)
+     files, directories = scan(output)
+@@ -186,14 +268,20 @@ def verify(output, expected_commit):
+             manifest.get("source_commit") != commit(expected_commit) or
+             manifest.get("archive") != byte_identity(output / ARCHIVE)):
+         raise ValueError("Transport archive identity changed")
+-    if manifest.get("git_metadata") != "thirteen_unborn_init_fixtures":
+-        raise ValueError("Transport Git fixture inventory claim changed")
++    if (manifest.get("schema_version") != 2 or
++            manifest.get("consumer_policy") != CONSUMER_POLICY or
++            manifest.get("git_metadata") != "current_unborn_init_fixtures" or
++            manifest.get("consumer_roots") != sorted(FIXTURES) or
++            manifest.get("consumer_images") != sorted(IMAGES) or
++            manifest.get("raw_bytes_pruned") is not False):
++        raise ValueError("Transport current consumer policy claim changed")
+     expected, expected_dirs = manifest["files"], manifest["directories"]
+     if (not isinstance(expected, dict) or not isinstance(expected_dirs, list) or
+             len(expected) + len(expected_dirs) > MAX_FILES or
+             len(set(expected_dirs)) != len(expected_dirs) or
+             set(expected) & set(expected_dirs)):
+         raise ValueError("Invalid transport manifest inventory")
++    verify_gzip(output / ARCHIVE)
+     seen, observed, observed_dirs, metadata, total = set(), {}, [], {}, 0
+     with tarfile.open(output / ARCHIVE, "r:gz") as archive:
+         for member in archive:
+@@ -219,6 +307,7 @@ def verify(output, expected_commit):
+     if observed != expected or sorted(observed_dirs) != sorted(expected_dirs):
+         raise ValueError("Transport archive differs from complete raw inventory")
+     git_metadata(expected, expected_dirs, metadata.__getitem__)
++    consumer_images(expected, expected_dirs)
+     report(read(output / "verification.json"), expected_commit, expected)
+     if byte_identity(output / "verification.json") != {
+             key: value for key, value in expected.get("verification.json", {}).items()
+@@ -237,6 +326,7 @@ def pack(raw, output, expected_commit):
+         raise ValueError("Raw consumer output lacks its ownership marker")
+     report(read(raw / "verification.json"), expected_commit, files)
+     git_metadata(files, directories, lambda entry: (raw / entry).read_bytes())
++    consumer_images(files, directories)
+     output.mkdir(parents=True)
+     (output / OWNER).write_text("owned SDK consumer transport\n")
+     with (output / ARCHIVE).open("xb") as target:
+@@ -253,10 +343,12 @@ def pack(raw, output, expected_commit):
+                         archive.addfile(member)
+     (output / "verification.json").write_bytes((raw / "verification.json").read_bytes())
+     (output / "verification.json").chmod(files["verification.json"]["mode"])
+-    write(output / MANIFEST, {"schema_version": 1,
++    write(output / MANIFEST, {"schema_version": 2,
+         "kind": "source_sdk_consumer_transport", "source_commit": expected_commit,
+         "archive": byte_identity(output / ARCHIVE), "files": files,
+-        "directories": directories, "git_metadata": "thirteen_unborn_init_fixtures",
++        "directories": directories, "git_metadata": "current_unborn_init_fixtures",
++        "consumer_policy": CONSUMER_POLICY, "consumer_roots": sorted(FIXTURES),
++        "consumer_images": sorted(IMAGES),
+         "raw_bytes_pruned": False})
+     if scan(raw) != (files, directories):
+         raise ValueError("Raw consumer bytes changed during transport")
+diff --git a/tools/testing/test_sdk_verification_call.py b/tools/testing/test_sdk_verification_call.py
+index 567d4ecb791e5b6dd1d3b7b622d94576b200f146..e380f1f541784f187e010a50f311451a135f9324 100644
+--- a/tools/testing/test_sdk_verification_call.py
++++ b/tools/testing/test_sdk_verification_call.py
+@@ -328,21 +328,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
+                 if command[0] == "cmake" and "--build" in command]
+ 
+     def assert_complete_matrix(self):
++        from tools.release.transport import consumer_layout
+         builds = self.builds()
+-        expected = {"native", "stm32", "gd32"} | {
+-            family + " " + backend
+-            for family in ("h743", "u575", "f103", "gd303", "g474")
+-            for backend in ("baremetal", "freertos")} | {
+-                "selected h743 high", "selected u575 gpdma",
+-                "selected g474 fd normal", "selected g474 fd loopback",
+-                "selected g474 pwm adc", "selected g474 adc regular software",
+-                "selected g474 adc regular timer",
+-                "selected g474 adc injected software",
+-                "selected g474 adc injected timer", "selected h743 fifo",
+-                "selected u575 fifo", "selected f407 frames",
+-                "selected gd470 frames", "selected h743 rtscts",
+-                "selected u575 rtscts", "selected g474 shared pwm",
+-                "selected native time pair", "selected native time empty"}
++        expected = {build.removesuffix(" build")
++                    for _, build, _ in consumer_layout()}
+         self.assertEqual({Path(command[2]).name.removesuffix(" build")
+                           for command in builds}, expected)
+         self.assertEqual(len(builds), 31)
+@@ -370,6 +359,17 @@ class SDKConsumerParallelTests(unittest.TestCase):
+                          {"selected native time pair build", "selected native time empty build"})
+         self.assertIn("--verify", self.commands[0])
+ 
++    def test_producer_uses_the_standalone_transport_plan_without_a_copy(self):
++        from tools.release import transport
++        for name in ("BASE_CONSUMERS", "MODERN_CONSUMERS", "SELECTED_CONSUMERS"):
++            self.assertIs(getattr(self.consumer, name), getattr(transport, name))
++        status, _ = self.execute(("--parallel", "1"))
++        self.assertEqual(status, 0)
++        self.assert_complete_matrix()
++        sources = {path.name for path in self.output.glob("* source")}
++        self.assertEqual(sources, {source for source, _, _ in
++                                   transport.consumer_layout()})
++
+     def test_explicit_one_bounds_every_build_without_reducing_the_matrix(self):
+         with mock.patch.dict("os.environ", {"CMAKE_BUILD_PARALLEL_LEVEL": "99"}):
+             status, report = self.execute(("--parallel", "1"))

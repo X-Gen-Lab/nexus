@@ -142,6 +142,52 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertIn("tools/configure/selected_contracts.py",
                       source_sdk.REQUIRED_FILES)
 
+    def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
+        import hashlib
+        required = "tools/release/transport.py"
+        self.assertIn(required, source_sdk.REQUIRED_FILES)
+        with tempfile.TemporaryDirectory(prefix="SDK required plan ") as value:
+            root = Path(value) / "prefix/share/nexus/src"
+            root.mkdir(parents=True)
+            # Filesystem/manifest admission only, not a usable SDK or build.
+            payload = b"required-source fixture\n"
+            files = {}
+            for name in source_sdk.REQUIRED_FILES:
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(payload)
+                files[name] = hashlib.sha256(payload).hexdigest()
+            prefix = root.parents[2]
+            exports = {}
+            for name in ("lib/cmake/Nexus/NexusConfig.cmake",
+                         "lib/cmake/Nexus/NexusConfigVersion.cmake"):
+                target = prefix / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(payload)
+                exports[name] = hashlib.sha256(payload).hexdigest()
+            identity = {"schema": 1, "kind": "nexus-installed-source-sdk",
+                "source_revision": "a" * 40, "source_tree": "b" * 40,
+                "publishable": True, "source_dirty": False,
+                "files_sha256": files, "dependencies": [],
+                "reviewed_imports": [], "package_files_sha256": exports,
+                "toolchains_lock_sha256": files["dependencies/toolchains.lock.json"]}
+
+            def write_identity():
+                identity["snapshot_sha256"] = source_sdk.digest(json.dumps(
+                    files, sort_keys=True, separators=(",", ":")).encode())
+                (root / source_sdk.MANIFEST).write_text(json.dumps(identity))
+
+            write_identity()
+            with self.assertRaisesRegex(source_sdk.SDKError,
+                                        "dependency commit identities"):
+                source_sdk.verify(root)
+            (root / required).unlink()
+            del files[required]
+            write_identity()
+            with self.assertRaisesRegex(source_sdk.SDKError,
+                                        "missing required sources/licenses"):
+                source_sdk.verify(root)
+
     def test_portable_io_verification_inputs_and_public_smokes_are_required(self):
         directory = "cmake/package/verification/io_evolution/"
         names = {
@@ -1283,7 +1329,8 @@ class SourceSDKTests(unittest.TestCase):
                      "tools/dev/presets.py", "tools/dev/process.py",
                      "tools/dev/cache.py", "tools/dev/dependencies.py",
                      "tools/dev/qualification.py", "tools/evidence/store.py",
-                     "tools/evidence/environment.py", "tools/evidence/recipe.py"):
+                     "tools/evidence/environment.py", "tools/evidence/recipe.py",
+                     "tools/release/transport.py"):
             with self.subTest(name=name):
                 target = self.sdk / name
                 old_source = target.read_bytes()

@@ -11,6 +11,7 @@ import re
 import stat
 import sys
 import tarfile
+import zlib
 
 MAX_FILES = 100000
 MAX_BYTES = 1024 * 1024 * 1024
@@ -18,10 +19,53 @@ RAW_OWNER = ".nexus-sdk-consumer-check"
 OWNER = ".nexus-sdk-consumer-transport"
 ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
-FIXTURES = {name + " source/.git" for name in (
-    "native", "stm32", "gd32", "h743 baremetal", "h743 freertos",
-    "u575 baremetal", "u575 freertos", "f103 baremetal", "f103 freertos",
-    "gd303 baremetal", "gd303 freertos", "g474 baremetal", "g474 freertos")}
+# The producer and standalone transport share this reviewed immutable plan.
+# A report may describe these identities, never authorize another fixture set.
+CONSUMER_POLICY = "nexus-sdk-consumers-v2"
+BASE_CONSUMERS = (("native", False, "native"),
+                  ("stm32", True, "stm32"), ("gd32", True, "gd32"))
+MODERN_CONSUMERS = tuple((family, backend)
+    for family in ("h743", "u575", "f103", "gd303", "g474")
+    for backend in ("baremetal", "freertos"))
+SELECTED_CONSUMERS = (
+    ("h743 high", "h743-high-peripherals", "h743-high"),
+    ("u575 gpdma", "u575-uart-gpdma", "u575-uart-gpdma"),
+    ("g474 fd normal", "g474-can-fd-normal", "g474-can-fd"),
+    ("g474 fd loopback", "g474-can-fd-loopback", "g474-can-fd"),
+    ("g474 pwm adc", "g474-pwm-adc", "g474-pwm-adc"),
+    ("g474 adc regular software", "g474-adc-group-regular-software",
+     "g474-adc-group"),
+    ("g474 adc regular timer", "g474-adc-group-regular-timer", "g474-adc-group"),
+    ("g474 adc injected software", "g474-adc-group-injected-software",
+     "g474-adc-group"),
+    ("g474 adc injected timer", "g474-adc-group-injected-timer", "g474-adc-group"),
+    ("h743 fifo", "h743-uart-fifo", "uart-fifo"),
+    ("u575 fifo", "u575-uart-fifo", "uart-fifo"),
+    ("f407 frames", "f407zg-eth-frames", "ethernet-frames"),
+    ("gd470 frames", "gd470-eth-frames", "ethernet-frames"),
+    ("h743 rtscts", "h743-uart-rtscts", "uart-fifo"),
+    ("u575 rtscts", "u575-uart-rtscts", "uart-fifo"),
+    ("g474 shared pwm", "g474-pwm-shared", "g474-pwm-shared"),
+    ("native time pair", "native-time-pair", "native-time-pair"),
+    ("native time empty", "native-time-empty", "native-time-empty"))
+
+def consumer_layout():
+    """Return exact source/build roots and executable paths, without IO."""
+    rows = [(name, ("installed_c", "installed_cpp"), arm)
+            for name, arm, _ in BASE_CONSUMERS]
+    rows += [(family + " " + backend, ("installed_modern",), True)
+             for family, backend in MODERN_CONSUMERS]
+    rows += [("selected " + name, ("installed_selected",),
+              not name.startswith("native time "))
+             for name, _, _ in SELECTED_CONSUMERS]
+    return tuple((name + " source", name + " build",
+                  tuple(name + " build/bin/" + target + (".elf" if arm else "")
+                        for target in targets))
+                 for name, targets, arm in rows)
+
+
+FIXTURES = frozenset(source + "/.git" for source, _, _ in consumer_layout())
+IMAGES = frozenset(image for _, _, images in consumer_layout() for image in images)
 
 
 def commit(value):
@@ -132,7 +176,7 @@ def report(data, expected_commit, files):
 def git_metadata(files, directories, contents):
     observed = {entry for entry in directories if entry.endswith("/.git")}
     if observed != FIXTURES:
-        raise ValueError("Exactly thirteen empty git-init consumer fixtures required")
+        raise ValueError("Exact current consumer git-init fixtures required")
     allowed_dirs = {"", "branches", "hooks", "info", "objects",
                     "objects/info", "objects/pack", "refs", "refs/heads", "refs/tags"}
     for entry in [*directories, *files]:
@@ -175,6 +219,45 @@ def git_metadata(files, directories, contents):
             raise ValueError("Git fixture excludes must remain comments")
 
 
+def consumer_images(files, directories):
+    """Require the trusted plan, independently of report or manifest claims."""
+    roots = {entry for entry in directories if "/" not in entry and
+             entry.endswith((" source", " build"))}
+    expected = {entry for source, build, _ in consumer_layout()
+                for entry in (source, build)}
+    bins = {build + "/bin" for _, build, _ in consumer_layout()}
+    observed = {entry for entry in files
+                if PurePosixPath(entry).parent.as_posix() in bins and
+                PurePosixPath(entry).suffix in {"", ".elf"}}
+    if roots != expected or observed != IMAGES or any(
+            files[image]["size"] <= 0 for image in IMAGES):
+        raise ValueError("Exact current consumer roots and images required")
+
+
+def verify_gzip(archive):
+    """Consume one bounded gzip member through its actual CRC/size trailer."""
+    decoder = zlib.decompressobj(16 + zlib.MAX_WBITS)
+    total = 0
+    # Tar headers, bounded names/PAX records and padding also consume space.
+    limit = MAX_BYTES + (MAX_FILES + 1) * 4096
+    try:
+        with archive.open("rb") as stream:
+            while chunk := stream.read(65536):
+                while chunk:
+                    data = decoder.decompress(chunk, 65536)
+                    total += len(data)
+                    if total > limit:
+                        raise ValueError("Expanded transport archive exceeds its bound")
+                    if decoder.eof:
+                        if decoder.unused_data or stream.read(1):
+                            raise ValueError("Unexpected trailing gzip content")
+                        return
+                    chunk = decoder.unconsumed_tail
+    except zlib.error as error:
+        raise ValueError("Transport gzip CRC/size validation failed") from error
+    raise ValueError("Truncated transport gzip stream")
+
+
 def verify(output, expected_commit):
     output = path(output)
     files, directories = scan(output)
@@ -186,14 +269,21 @@ def verify(output, expected_commit):
             manifest.get("source_commit") != commit(expected_commit) or
             manifest.get("archive") != byte_identity(output / ARCHIVE)):
         raise ValueError("Transport archive identity changed")
-    if manifest.get("git_metadata") != "thirteen_unborn_init_fixtures":
-        raise ValueError("Transport Git fixture inventory claim changed")
+    if (type(manifest.get("schema_version")) is not int or
+            manifest.get("schema_version") != 2 or
+            manifest.get("consumer_policy") != CONSUMER_POLICY or
+            manifest.get("git_metadata") != "current_unborn_init_fixtures" or
+            manifest.get("consumer_roots") != sorted(FIXTURES) or
+            manifest.get("consumer_images") != sorted(IMAGES) or
+            manifest.get("raw_bytes_pruned") is not False):
+        raise ValueError("Transport current consumer policy claim changed")
     expected, expected_dirs = manifest["files"], manifest["directories"]
     if (not isinstance(expected, dict) or not isinstance(expected_dirs, list) or
             len(expected) + len(expected_dirs) > MAX_FILES or
             len(set(expected_dirs)) != len(expected_dirs) or
             set(expected) & set(expected_dirs)):
         raise ValueError("Invalid transport manifest inventory")
+    verify_gzip(output / ARCHIVE)
     seen, observed, observed_dirs, metadata, total = set(), {}, [], {}, 0
     with tarfile.open(output / ARCHIVE, "r:gz") as archive:
         for member in archive:
@@ -216,9 +306,17 @@ def verify(output, expected_commit):
                     metadata[entry] = archive.extractfile(member).read()
             else:
                 raise ValueError("Unexpected or nonregular transport archive entry")
+        # tarfile stops at the first end marker. The remaining gzip payload
+        # must be zero padding, never a hidden second TAR or unlisted bytes.
+        # next() may consume a malformed header before treating it as EOF.
+        archive.fileobj.seek(archive.offset)
+        while tail := archive.fileobj.read(65536):
+            if any(tail):
+                raise ValueError("Nonzero content after transport TAR end")
     if observed != expected or sorted(observed_dirs) != sorted(expected_dirs):
         raise ValueError("Transport archive differs from complete raw inventory")
     git_metadata(expected, expected_dirs, metadata.__getitem__)
+    consumer_images(expected, expected_dirs)
     report(read(output / "verification.json"), expected_commit, expected)
     if byte_identity(output / "verification.json") != {
             key: value for key, value in expected.get("verification.json", {}).items()
@@ -237,6 +335,7 @@ def pack(raw, output, expected_commit):
         raise ValueError("Raw consumer output lacks its ownership marker")
     report(read(raw / "verification.json"), expected_commit, files)
     git_metadata(files, directories, lambda entry: (raw / entry).read_bytes())
+    consumer_images(files, directories)
     output.mkdir(parents=True)
     (output / OWNER).write_text("owned SDK consumer transport\n")
     with (output / ARCHIVE).open("xb") as target:
@@ -253,10 +352,12 @@ def pack(raw, output, expected_commit):
                         archive.addfile(member)
     (output / "verification.json").write_bytes((raw / "verification.json").read_bytes())
     (output / "verification.json").chmod(files["verification.json"]["mode"])
-    write(output / MANIFEST, {"schema_version": 1,
+    write(output / MANIFEST, {"schema_version": 2,
         "kind": "source_sdk_consumer_transport", "source_commit": expected_commit,
         "archive": byte_identity(output / ARCHIVE), "files": files,
-        "directories": directories, "git_metadata": "thirteen_unborn_init_fixtures",
+        "directories": directories, "git_metadata": "current_unborn_init_fixtures",
+        "consumer_policy": CONSUMER_POLICY, "consumer_roots": sorted(FIXTURES),
+        "consumer_images": sorted(IMAGES),
         "raw_bytes_pruned": False})
     if scan(raw) != (files, directories):
         raise ValueError("Raw consumer bytes changed during transport")

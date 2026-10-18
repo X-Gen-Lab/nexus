@@ -365,7 +365,8 @@ REQUIRED_FILES += tuple(
 # observers complete as well; a rehashed map alone cannot prove their presence.
 REQUIRED_FILES += (
     "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
-    "cmake/package/verify_consumers.py", "components/CMakeLists.txt",
+    "cmake/package/verify_consumers.py", "tools/release/transport.py",
+    "components/CMakeLists.txt",
     "os/wait.c", "os/baremetal/notify.c", "os/native/native.c",
     "os/include/nexus/os/wait.h", "os/include/nexus/os/baremetal.h",
     "os/native/include/nexus/os/native.h",

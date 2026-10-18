@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    ".github/workflows",
+    "-p",
+    "test_release.py",
+    "-v"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "release-first-green-r1",
+  "started_ns": 1792304202445957470,
+  "finished_ns": 1792304235727826495,
+  "duration_seconds": 33.281870426999376,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/stderr.txt",
+    "bytes": 7050,
+    "sha256": "448dd51a3e7de810127167259da2f5e2aa719b0ec251f08c1130543c294cd7ab"
+  },
+  "attempt_receipt": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/receipt.json"
+}

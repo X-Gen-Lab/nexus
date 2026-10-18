@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/testing",
+    "-p",
+    "test_sdk_verification_call.py",
+    "-v"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "producer-whole-module-final-r2",
+  "started_ns": 1792304768315086789,
+  "finished_ns": 1792304771289942752,
+  "duration_seconds": 2.974857695000537,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/stderr.txt",
+    "bytes": 4501,
+    "sha256": "a77947cbe17f396fed579de8bec03d77ee406860bab40ebff617a4ae4adb69ef"
+  }
+}

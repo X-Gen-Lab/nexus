@@ -1,0 +1,889 @@
+{
+  "kind": "complete frozen r3 SDK consumer transport integration map",
+  "source_count": 7,
+  "files": [
+    {
+      "path": "tools/release/transport.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/files/tools/release/transport.py",
+      "bytes": 22112,
+      "sha256": "87c45d19dfa6a17496ca7974d4b1f70a7b4de306ea19e339e20c727ab1756764",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": "cmake/package/verify_consumers.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/cmake/package/verify_consumers.py",
+      "bytes": 30252,
+      "sha256": "8f1db6316f90bc3ea40961c1a4e3884f8d56b97cf4c2049d1194a119284adbd0",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/cmake/package/package_source_sdk.py",
+      "bytes": 50684,
+      "sha256": "8a7cc46345f6c368868d97573d5ea0802eae4959e7b5dcf94a8976c5bd833152",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": ".github/workflows/test_release.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/files/.github/workflows/test_release.py",
+      "bytes": 69892,
+      "sha256": "9b2398d9e3eda4dad88f4e842921003bd0eb28a0882d251260259413f70bfa47",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": "tools/release/README.md",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/release/README.md",
+      "bytes": 6620,
+      "sha256": "2f1a86f050222e5295c6208f9e595f9022a8091d31ea36e4a37c8422b71fa482",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": "tests/contracts/test_source_sdk.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tests/contracts/test_source_sdk.py",
+      "bytes": 112227,
+      "sha256": "99a2e394f953f6350d09be33140fc0af09ddc17dbd3d666349a22f08aed0a3ad",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": "tools/testing/test_sdk_verification_call.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/testing/test_sdk_verification_call.py",
+      "bytes": 38454,
+      "sha256": "6818734a2cca5a42c2fe55fdf639ef659955fd4310aa7cba878d6be504e9691d",
+      "origin": "final r3 frozen source"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/RESTORE.md.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/RESTORE.md",
+      "bytes": 736,
+      "sha256": "b96cfc7f8fd975cd6212b430e749024c5aebc2aa79adf8792eeb3f5dee69a780",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/.github/workflows/test_release.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/.github/workflows/test_release.py",
+      "bytes": 56959,
+      "sha256": "4d171a2b962813639b3754a7365d89b57d96c6c05e120e1b1b2e0b7ad4a95af0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/cmake/package/package_source_sdk.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/cmake/package/package_source_sdk.py",
+      "bytes": 50650,
+      "sha256": "ae715c4da9c6c418ce3ff423367d85d61fc0946b1234f82d3e6a2fbfc5e025f7",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/cmake/package/verify_consumers.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/cmake/package/verify_consumers.py",
+      "bytes": 31585,
+      "sha256": "19ce976ca80079240ca5ef723710ffc52945eba34917b0ee736d505810c9b87d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/index.raw.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/index.raw.gz",
+      "bytes": 731806,
+      "sha256": "d68b21672dc36b126dbb09da2cc474d12d7a1ce4bfa8fdfb19a97baa932ade7f",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/tests/contracts/test_source_sdk.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tests/contracts/test_source_sdk.py",
+      "bytes": 109798,
+      "sha256": "ac336f46b7b1558f14f8bb3e4421701a4c1a98b67485aab52e377df8be619126",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/tools/release/README.md.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tools/release/README.md",
+      "bytes": 5172,
+      "sha256": "8e1a6b524cb58d4bd856e6feaece7364b7d0886c866db25eeaaf604f2d44ae72",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/tools/release/transport.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tools/release/transport.py",
+      "bytes": 16919,
+      "sha256": "0e3c9ab5722f0d58b82500e5b2718a955df055adc656832dd3ac89c1d5f1cf96",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before/tools/testing/test_sdk_verification_call.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tools/testing/test_sdk_verification_call.py",
+      "bytes": 38547,
+      "sha256": "664b5d1d4ea503bfbfddd561121c1b8883ccb57bd2c8d24f1374d14a7b0bc925",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/before.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before.json",
+      "bytes": 2844,
+      "sha256": "8b159fc03bdce89c47f910f26737065f6e0a9d23af3c6bf2d67ce6081b416052",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/completed-handoff-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/completed-handoff-r1.json",
+      "bytes": 11104,
+      "sha256": "2c0de6ae2e5d9c46e70ce21d2b0e6ba74a360c1417d7d3b7a5fc3282b16d713e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/receipt.json",
+      "bytes": 1315,
+      "sha256": "16ce0bcd02e75e3e1bd31ca0e48335150281dbbc2fe15f0fc6c1be66d64c23a0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/stderr.txt",
+      "bytes": 4501,
+      "sha256": "a77947cbe17f396fed579de8bec03d77ee406860bab40ebff617a4ae4adb69ef",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.attempts/1792304768314975221-daecd5e29c9d43a5b5064179cf8cda66/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r2/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.command.json",
+      "bytes": 1537,
+      "sha256": "44305c0a370cb49d8256d7c487970d1a7d4903e31e703a7cf9c61c56718d220d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r2/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/command.raw",
+      "bytes": 4501,
+      "sha256": "a77947cbe17f396fed579de8bec03d77ee406860bab40ebff617a4ae4adb69ef",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r2/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r2/result.json",
+      "bytes": 3714,
+      "sha256": "99b93bbdc92d7c43ea85bdbfe701dc6d36e4472175c3d27534c2e45ad8a7302a",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-extra-image-red-r1/command.attempts/1792304383193989801-03e365faabe343509caa8f9a2276285e/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-extra-image-red-r1/command.attempts/1792304383193989801-03e365faabe343509caa8f9a2276285e/receipt.json",
+      "bytes": 1294,
+      "sha256": "b6853138a6f2a2bf0d95ac47f510e698873cc9e2e63015a42891a7276e629290",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-extra-image-red-r1/command.attempts/1792304383193989801-03e365faabe343509caa8f9a2276285e/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-extra-image-red-r1/command.attempts/1792304383193989801-03e365faabe343509caa8f9a2276285e/stderr.txt",
+      "bytes": 7992,
+      "sha256": "c614901302e3f06ba8f260be0f48599f9bb92abcc86011a51aa3bab6f91b4dd0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-extra-image-red-r1/command.attempts/1792304383193989801-03e365faabe343509caa8f9a2276285e/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-extra-image-red-r1/command.attempts/1792304383193989801-03e365faabe343509caa8f9a2276285e/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-extra-image-red-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-extra-image-red-r1/command.command.json",
+      "bytes": 1512,
+      "sha256": "0b9c0e702927559b4f7bc37ecf0f6f5c4ad8096ef4f17394c73847f4c89518a2",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-extra-image-red-r1/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-extra-image-red-r1/command.raw",
+      "bytes": 7992,
+      "sha256": "c614901302e3f06ba8f260be0f48599f9bb92abcc86011a51aa3bab6f91b4dd0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-extra-image-red-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-extra-image-red-r1/result.json",
+      "bytes": 3710,
+      "sha256": "24006c9151a6d1f13016722bf5d84cc2949cd8313c3a7713aa95729fd01c4bd8",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r1/command.attempts/1792304570031459713-100e71e365fb4acbb239fa817562acc7/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r1/command.attempts/1792304570031459713-100e71e365fb4acbb239fa817562acc7/receipt.json",
+      "bytes": 1282,
+      "sha256": "a0e0ad718e1ef7a45e2d4993c51dd7facf88cdfb2bea83de9c6d6d2996a879d3",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r1/command.attempts/1792304570031459713-100e71e365fb4acbb239fa817562acc7/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r1/command.attempts/1792304570031459713-100e71e365fb4acbb239fa817562acc7/stderr.txt",
+      "bytes": 7217,
+      "sha256": "b553516a513508c4c8127a7ff01496408eababc47ea625e69c7d20d33fd6f2c0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r1/command.attempts/1792304570031459713-100e71e365fb4acbb239fa817562acc7/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r1/command.attempts/1792304570031459713-100e71e365fb4acbb239fa817562acc7/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r1/command.command.json",
+      "bytes": 1496,
+      "sha256": "bf439c06b21450cc51ee63ddc96a2e475d2611aa39289eddcb5ab669bdd7029e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r1/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r1/command.raw",
+      "bytes": 7217,
+      "sha256": "b553516a513508c4c8127a7ff01496408eababc47ea625e69c7d20d33fd6f2c0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r1/result.json",
+      "bytes": 3706,
+      "sha256": "919648439799001fd18e9a2746cfbcb16582f74f7c0fc969501341f3227fb5d7",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r2/command.attempts/1792304704720872115-466375c774d64283a390f7c514586ac4/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r2/command.attempts/1792304704720872115-466375c774d64283a390f7c514586ac4/receipt.json",
+      "bytes": 1281,
+      "sha256": "a4e7901cc78dc4fb3831e198530ef98c56d029311ba7b7557916c6a300d8b061",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r2/command.attempts/1792304704720872115-466375c774d64283a390f7c514586ac4/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r2/command.attempts/1792304704720872115-466375c774d64283a390f7c514586ac4/stderr.txt",
+      "bytes": 7217,
+      "sha256": "02e5ce9e9043539c7952c9790a324cb90c0525e359fe1908ff50c297739e7b71",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r2/command.attempts/1792304704720872115-466375c774d64283a390f7c514586ac4/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r2/command.attempts/1792304704720872115-466375c774d64283a390f7c514586ac4/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r2/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r2/command.command.json",
+      "bytes": 1495,
+      "sha256": "bcb40ce7c3c983733eee23245ea46862cb0bad90df3827b409f880920a97fb89",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r2/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r2/command.raw",
+      "bytes": 7217,
+      "sha256": "02e5ce9e9043539c7952c9790a324cb90c0525e359fe1908ff50c297739e7b71",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r2/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r2/result.json",
+      "bytes": 3706,
+      "sha256": "3860e7a49e35c6846f210578b4320b14669c62bed42cb642d680ebd8523e8180",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/receipt.json",
+      "bytes": 1282,
+      "sha256": "c8b2db6f5039037d8fc9c5d974089854baa75570e60a535878338531b1ff2147",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/stderr.txt",
+      "bytes": 7050,
+      "sha256": "448dd51a3e7de810127167259da2f5e2aa719b0ec251f08c1130543c294cd7ab",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.attempts/1792304202445847524-11cc3a89f8d344df98dd1e583c6a6413/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-first-green-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.command.json",
+      "bytes": 1496,
+      "sha256": "721b64156a4aff871828053b8e2a37d3a68f5cb122786e2da43debf9e385c9d4",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-first-green-r1/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/command.raw",
+      "bytes": 7050,
+      "sha256": "448dd51a3e7de810127167259da2f5e2aa719b0ec251f08c1130543c294cd7ab",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-first-green-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-first-green-r1/result.json",
+      "bytes": 3706,
+      "sha256": "413ebe06960a34edf10e12ff07299b56527821144788e4e30e259aea3f88d4e2",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tar-tail-red-r1/command.attempts/1792304489791811832-ab7b36e722a44a6fb82ede2f492a11ca/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tar-tail-red-r1/command.attempts/1792304489791811832-ab7b36e722a44a6fb82ede2f492a11ca/receipt.json",
+      "bytes": 1285,
+      "sha256": "1d95f5f6bb56f43055dfd8be8b2b1819cb4635a6f2b41ca9daf15f57c011bd05",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tar-tail-red-r1/command.attempts/1792304489791811832-ab7b36e722a44a6fb82ede2f492a11ca/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tar-tail-red-r1/command.attempts/1792304489791811832-ab7b36e722a44a6fb82ede2f492a11ca/stderr.txt",
+      "bytes": 10684,
+      "sha256": "a045841ab2305a48bc2c7a6c61caf88443daedb99301ad7ae7ebb8d287de80d8",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tar-tail-red-r1/command.attempts/1792304489791811832-ab7b36e722a44a6fb82ede2f492a11ca/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tar-tail-red-r1/command.attempts/1792304489791811832-ab7b36e722a44a6fb82ede2f492a11ca/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tar-tail-red-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tar-tail-red-r1/command.command.json",
+      "bytes": 1500,
+      "sha256": "84bf8d3ee973748385982157856696fa6085864e98736e37240a12e8276731f4",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tar-tail-red-r1/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tar-tail-red-r1/command.raw",
+      "bytes": 10684,
+      "sha256": "a045841ab2305a48bc2c7a6c61caf88443daedb99301ad7ae7ebb8d287de80d8",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tar-tail-red-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tar-tail-red-r1/result.json",
+      "bytes": 3707,
+      "sha256": "68b3c1522f088d5aa815642a7c106b99bbb507e132d10f5c52a6ea5526681925",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tests-only-red-r1/command.attempts/1792303984001877884-00daa3b6490848a09e5451ad0b54e5da/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tests-only-red-r1/command.attempts/1792303984001877884-00daa3b6490848a09e5451ad0b54e5da/receipt.json",
+      "bytes": 1290,
+      "sha256": "77359c4d614c68cf1b28e3c730718e7a4b480a3dfa34a90790fd529b7d027b77",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tests-only-red-r1/command.attempts/1792303984001877884-00daa3b6490848a09e5451ad0b54e5da/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tests-only-red-r1/command.attempts/1792303984001877884-00daa3b6490848a09e5451ad0b54e5da/stderr.txt",
+      "bytes": 9888,
+      "sha256": "7a5f2428dda9fba9bf7cffca3d45262730ccf9ec17ec5c77025ce026c1b0045e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tests-only-red-r1/command.attempts/1792303984001877884-00daa3b6490848a09e5451ad0b54e5da/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tests-only-red-r1/command.attempts/1792303984001877884-00daa3b6490848a09e5451ad0b54e5da/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tests-only-red-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tests-only-red-r1/command.command.json",
+      "bytes": 1507,
+      "sha256": "197638403ae1a0c6fa45f3ff6287b322e660a9b11a677aeb95a919657c2cc24e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tests-only-red-r1/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tests-only-red-r1/command.raw",
+      "bytes": 9888,
+      "sha256": "7a5f2428dda9fba9bf7cffca3d45262730ccf9ec17ec5c77025ce026c1b0045e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-tests-only-red-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-tests-only-red-r1/result.json",
+      "bytes": 3709,
+      "sha256": "3051d8acf3ebbaff7fa8800c9f511c97f5dd322bbe86ce67d5ece74b1fad13d8",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r2/command.attempts/1792304805866682656-76d381d7ac584634bd0ec3edc3b02118/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r2/command.attempts/1792304805866682656-76d381d7ac584634bd0ec3edc3b02118/receipt.json",
+      "bytes": 1600,
+      "sha256": "8e5a6133e4396392c33027ddfbe7ff93184d9db8fd5548afa50b4357c205424d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r2/command.attempts/1792304805866682656-76d381d7ac584634bd0ec3edc3b02118/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r2/command.attempts/1792304805866682656-76d381d7ac584634bd0ec3edc3b02118/stderr.txt",
+      "bytes": 3436,
+      "sha256": "b2b185a45c26ea4545d81e4d149a78c34ca44ce55fb323d15d46934bc39251a5",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r2/command.attempts/1792304805866682656-76d381d7ac584634bd0ec3edc3b02118/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r2/command.attempts/1792304805866682656-76d381d7ac584634bd0ec3edc3b02118/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r2/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r2/command.command.json",
+      "bytes": 1827,
+      "sha256": "83d47c95d03643a072c8a54293b87f9adc01294a8353f5155382029016e659e8",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r2/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r2/command.raw",
+      "bytes": 3436,
+      "sha256": "b2b185a45c26ea4545d81e4d149a78c34ca44ce55fb323d15d46934bc39251a5",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r2/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r2/result.json",
+      "bytes": 3719,
+      "sha256": "64c71ddea91613b1ab41c4ea875b656a708fb13a16d011f52c30fc9574536a85",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-r1/command.attempts/1792304323559094505-473a09834cb7422695d4b1fb1e72fdea/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-r1/command.attempts/1792304323559094505-473a09834cb7422695d4b1fb1e72fdea/receipt.json",
+      "bytes": 1582,
+      "sha256": "752dfbc21cf47d0fe6183a5ca3273b6b04c642a207e5f1d9ff8c7c7c75cb26d0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-r1/command.attempts/1792304323559094505-473a09834cb7422695d4b1fb1e72fdea/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-r1/command.attempts/1792304323559094505-473a09834cb7422695d4b1fb1e72fdea/stderr.txt",
+      "bytes": 3436,
+      "sha256": "a070e52f86f7967d9a4d8700cc07945dc269d2c949a08604e3bdd4a541771e7e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-r1/command.attempts/1792304323559094505-473a09834cb7422695d4b1fb1e72fdea/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-r1/command.attempts/1792304323559094505-473a09834cb7422695d4b1fb1e72fdea/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-r1/command.command.json",
+      "bytes": 1803,
+      "sha256": "0b20cad166fabf6f0b8fd17bb29052781959b3dd7d9acf0e74eaa0cbfe86cf08",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-r1/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-r1/command.raw",
+      "bytes": 3436,
+      "sha256": "a070e52f86f7967d9a4d8700cc07945dc269d2c949a08604e3bdd4a541771e7e",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-r1/result.json",
+      "bytes": 3713,
+      "sha256": "2c7f098a024381e0b26496d0b3f95e1138a91c234dcfc5b196e82d7431f52190",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/extra-image-red-source/files.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/extra-image-red-source/files.json",
+      "bytes": 748,
+      "sha256": "b544e03669a0b5fa3ea5bbf6a07c2102332ccdb0a20b3fd5e33264fe71a342f4",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/extra-image-red-source/source.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/extra-image-red-source/source.diff",
+      "bytes": 42115,
+      "sha256": "af3054ec0834e7573a787dc4c7f0817954589d60cf97cf76bd159a82ebbbc79f",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/.github/workflows/test_release.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/.github/workflows/test_release.py",
+      "bytes": 68453,
+      "sha256": "7ca08248b5cb824a219844147a7e9266514d28102da75b0b1c8a07dcb12360bf",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/cmake/package/package_source_sdk.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/cmake/package/package_source_sdk.py",
+      "bytes": 50684,
+      "sha256": "8a7cc46345f6c368868d97573d5ea0802eae4959e7b5dcf94a8976c5bd833152",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/cmake/package/verify_consumers.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/cmake/package/verify_consumers.py",
+      "bytes": 30252,
+      "sha256": "8f1db6316f90bc3ea40961c1a4e3884f8d56b97cf4c2049d1194a119284adbd0",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/tests/contracts/test_source_sdk.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tests/contracts/test_source_sdk.py",
+      "bytes": 112227,
+      "sha256": "99a2e394f953f6350d09be33140fc0af09ddc17dbd3d666349a22f08aed0a3ad",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/tools/release/README.md.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/release/README.md",
+      "bytes": 6620,
+      "sha256": "2f1a86f050222e5295c6208f9e595f9022a8091d31ea36e4a37c8422b71fa482",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/tools/release/transport.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/release/transport.py",
+      "bytes": 21992,
+      "sha256": "496a523b6a2b2c8a1bc3e832df4a5aa9ce318d817b43509cdcd95ad9b325c5d6",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/files/tools/testing/test_sdk_verification_call.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/testing/test_sdk_verification_call.py",
+      "bytes": 38454,
+      "sha256": "6818734a2cca5a42c2fe55fdf639ef659955fd4310aa7cba878d6be504e9691d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/source-freeze-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/source-freeze-r1.json",
+      "bytes": 3383,
+      "sha256": "15235e3f24762ac93a6c17cbc6860844b78088dacef506df1dd484c274f907e3",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final/source.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/source.diff",
+      "bytes": 45067,
+      "sha256": "db4c94a3e1dd840f2519e668b63ca0613596d1105aa84383373901ea1aa3140d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r2/files/.github/workflows/test_release.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r2/files/.github/workflows/test_release.py",
+      "bytes": 69094,
+      "sha256": "6e99d3c7ee0aab3982c51738cc3137b2450107c9965740697f50afcba1c0c18b",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r2/source-freeze-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r2/source-freeze-r2.json",
+      "bytes": 3557,
+      "sha256": "82096f53a7d420070cc957a7d86639fa628562692367e36bcae9155b2f708f20",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r2/source.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r2/source.diff",
+      "bytes": 45717,
+      "sha256": "d185670e0197fa32ed36f4635ce1baf1d2ccf77995fad8b5987fd226df02b10a",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/index-preservation.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/index-preservation.json",
+      "bytes": 676,
+      "sha256": "6e957678223e3aeec42fc49339b828dd801705384c52dccf0d99ab50fee61835",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/run_command.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/run_command.py",
+      "bytes": 1192,
+      "sha256": "500e0a008112109bce8229e7e9211ed23ac2d12543d24e190d0adce7859dc008",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/tar-tail-red-source/files.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/tar-tail-red-source/files.json",
+      "bytes": 748,
+      "sha256": "529760340bb758011d0bfc135544427937d5b2bc4f798fa5f2c5151a2d23bb26",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/tar-tail-red-source/source.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/tar-tail-red-source/source.diff",
+      "bytes": 43238,
+      "sha256": "69c347360d926796eccdc378db1cde3f06d86651e5258fdd565af897cc4dd8d4",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/tests-only-red/identity.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/tests-only-red/identity.json",
+      "bytes": 655,
+      "sha256": "3697b26e0d9ae4edef7badc03687002f83547ed778a44d202471306f22214789",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/tests-only-red/test_release.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/tests-only-red/test_release.py",
+      "bytes": 59809,
+      "sha256": "9d91d05339d6414f8551dc7db3dcdc84b0fefaf2450df95387da37064521a45c",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r3/command.attempts/1792305208426327275-993c843973f24518a971c6f9f9e95432/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r3/command.attempts/1792305208426327275-993c843973f24518a971c6f9f9e95432/receipt.json",
+      "bytes": 1316,
+      "sha256": "ad78ed118d6a781dcda261565c99941d42ffba1565ae6c924d186dbe2c5a167a",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r3/command.attempts/1792305208426327275-993c843973f24518a971c6f9f9e95432/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r3/command.attempts/1792305208426327275-993c843973f24518a971c6f9f9e95432/stderr.txt",
+      "bytes": 4501,
+      "sha256": "16552e2302ed42b8b955a8728afbaff02ca24e9be087c89edc9733061d49de22",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r3/command.attempts/1792305208426327275-993c843973f24518a971c6f9f9e95432/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r3/command.attempts/1792305208426327275-993c843973f24518a971c6f9f9e95432/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r3/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r3/command.command.json",
+      "bytes": 1538,
+      "sha256": "ba03e2168410b47445364e62d83d72545c52625893cd6363cd99cab4407960c6",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r3/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r3/command.raw",
+      "bytes": 4501,
+      "sha256": "16552e2302ed42b8b955a8728afbaff02ca24e9be087c89edc9733061d49de22",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/producer-whole-module-final-r3/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/producer-whole-module-final-r3/result.json",
+      "bytes": 3714,
+      "sha256": "87a01e4537f10205f83fa1bfdb0e434c4be5dbe1249c3706047dd685c594a945",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r3/command.attempts/1792305150978282008-817c58b659d343519c8b405ec7c9828f/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r3/command.attempts/1792305150978282008-817c58b659d343519c8b405ec7c9828f/receipt.json",
+      "bytes": 1282,
+      "sha256": "bd46d9d4ef3cec1cac338dc9dfef485f90161f2981fcfc6077fe6d28d3938454",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r3/command.attempts/1792305150978282008-817c58b659d343519c8b405ec7c9828f/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r3/command.attempts/1792305150978282008-817c58b659d343519c8b405ec7c9828f/stderr.txt",
+      "bytes": 7217,
+      "sha256": "3ad7daf22c9ba7e4d04b3cd8a004c6fb2a399997a243dcaa404e437b096f326d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r3/command.attempts/1792305150978282008-817c58b659d343519c8b405ec7c9828f/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r3/command.attempts/1792305150978282008-817c58b659d343519c8b405ec7c9828f/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r3/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r3/command.command.json",
+      "bytes": 1496,
+      "sha256": "03c6d10757f3f4d46153f809574f7ae650e38b42ba604eaad84c4b3b9bd447d2",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r3/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r3/command.raw",
+      "bytes": 7217,
+      "sha256": "3ad7daf22c9ba7e4d04b3cd8a004c6fb2a399997a243dcaa404e437b096f326d",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-final-green-r3/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-final-green-r3/result.json",
+      "bytes": 3706,
+      "sha256": "a82ff45807fb753942344cdae52119d603e3bf56bcf450f7ee42a4fea80e92d4",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-invalid-header-red-r3/command.attempts/1792305073710095151-7fbf7feb0b7840469c2d72f086617574/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-invalid-header-red-r3/command.attempts/1792305073710095151-7fbf7feb0b7840469c2d72f086617574/receipt.json",
+      "bytes": 1301,
+      "sha256": "f18d8c26ca6d4fe1457af5037067f7e0958d563479c1c0b04643fa45a8b8eaec",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-invalid-header-red-r3/command.attempts/1792305073710095151-7fbf7feb0b7840469c2d72f086617574/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-invalid-header-red-r3/command.attempts/1792305073710095151-7fbf7feb0b7840469c2d72f086617574/stderr.txt",
+      "bytes": 9148,
+      "sha256": "b4d2ae5baa04ecda3f6f0945dcbfe6b838256e63521c9499c8749ad4daec0636",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-invalid-header-red-r3/command.attempts/1792305073710095151-7fbf7feb0b7840469c2d72f086617574/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-invalid-header-red-r3/command.attempts/1792305073710095151-7fbf7feb0b7840469c2d72f086617574/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-invalid-header-red-r3/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-invalid-header-red-r3/command.command.json",
+      "bytes": 1522,
+      "sha256": "c016a74425220b6e6b2290ce60abc47dc0658d2d6f3532c6d9bd6b5fa4c719d9",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-invalid-header-red-r3/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-invalid-header-red-r3/command.raw",
+      "bytes": 9148,
+      "sha256": "b4d2ae5baa04ecda3f6f0945dcbfe6b838256e63521c9499c8749ad4daec0636",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/release-invalid-header-red-r3/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/release-invalid-header-red-r3/result.json",
+      "bytes": 3713,
+      "sha256": "31c1768a915403c809d37a49d67c3ab75975383db384147f04d85ffebb6f00d7",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r3/command.attempts/1792305274906290928-4cc08381fcab4e1dbbcd448a2696c9c7/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r3/command.attempts/1792305274906290928-4cc08381fcab4e1dbbcd448a2696c9c7/receipt.json",
+      "bytes": 1600,
+      "sha256": "b103b74a9bc21e31152fc5cac0fc6044f0d12e8f51e8eade72bcc4037cb702af",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r3/command.attempts/1792305274906290928-4cc08381fcab4e1dbbcd448a2696c9c7/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r3/command.attempts/1792305274906290928-4cc08381fcab4e1dbbcd448a2696c9c7/stderr.txt",
+      "bytes": 3436,
+      "sha256": "7e0d237116b6d1a20bbe9a2b55397c529744276d5b6c9c8876f078b765b2049a",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r3/command.attempts/1792305274906290928-4cc08381fcab4e1dbbcd448a2696c9c7/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r3/command.attempts/1792305274906290928-4cc08381fcab4e1dbbcd448a2696c9c7/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r3/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r3/command.command.json",
+      "bytes": 1827,
+      "sha256": "4a0f05bb49bf922da00c73380e2e7774990c8436be460fa36ea27520c442652b",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r3/command.raw.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r3/command.raw",
+      "bytes": 3436,
+      "sha256": "7e0d237116b6d1a20bbe9a2b55397c529744276d5b6c9c8876f078b765b2049a",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/executions/source-sdk-selection-class-final-r3/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/executions/source-sdk-selection-class-final-r3/result.json",
+      "bytes": 3719,
+      "sha256": "7d17fcd2da2c4823445b622104af4bf5eef933ddd3f823369b0d6ba0bbdd19c4",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r3/after-r2.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/after-r2.diff",
+      "bytes": 2310,
+      "sha256": "60f1c67ad0cf6d9e6946c5ac3c2337f3d5a3f9497475c516cee45da36596dd56",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r3/files/.github/workflows/test_release.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/files/.github/workflows/test_release.py",
+      "bytes": 69892,
+      "sha256": "9b2398d9e3eda4dad88f4e842921003bd0eb28a0882d251260259413f70bfa47",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r3/files/tools/release/transport.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/files/tools/release/transport.py",
+      "bytes": 22112,
+      "sha256": "87c45d19dfa6a17496ca7974d4b1f70a7b4de306ea19e339e20c727ab1756764",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/final-r3/source-freeze-r3.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/source-freeze-r3.json",
+      "bytes": 3606,
+      "sha256": "a8e9fd659e71cb43da0d1262457e450c3e3aec3b03c576c6d4ee6892f241db29",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/invalid-header-red-source/files.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/invalid-header-red-source/files.json",
+      "bytes": 748,
+      "sha256": "79748d4fea1ae60167c0988926a2b33a80df87ab8016c34b3bddc163de1e3df1",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/invalid-header-red-source/test-after-r2.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/invalid-header-red-source/test-after-r2.diff",
+      "bytes": 1705,
+      "sha256": "c52cbdccae7a46455bac5492ae2a5334af3d7be546a757259f6f36e0f9ff0445",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/completed-handoff-r3.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/completed-handoff-r3.json",
+      "bytes": 4217,
+      "sha256": "706a4d25ee88245f5ec62ed1cf51161ea6301547439e1bfd26ecdb686ce104bb",
+      "origin": "original author evidence; raw suffix keeps historical code outside active checks"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/evidence-manifest-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/evidence-manifest-r1.json",
+      "bytes": 16390,
+      "sha256": "6b26e02b393ca98fbc2846b1606be6751ed05c7b5e0c18b6f422e576116c4b44",
+      "origin": "original immutable author inventory"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/author/evidence-delta-r3.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/evidence-delta-r3.json",
+      "bytes": 5525,
+      "sha256": "ff65808fac9b74213febe2cdb35634b8cf7cd1aa3ae80fe0a3731f62abdfdd10",
+      "origin": "original immutable author inventory"
+    },
+    {
+      "path": "tests/evidence/sdk-consumer-transport/original-design-plan-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/sdk-consumer-transport-next-slice-readonly-r1.json",
+      "bytes": 23988,
+      "sha256": "7c7b795a70b76f7baca740f6c4598eee37bd8defbc6124dd0515bd8fd6a009d4",
+      "origin": "approved exact plan"
+    }
+  ],
+  "scope": "exact source and original raw evidence; fresh Root normal complete gates and remote SDK verification pending"
+}

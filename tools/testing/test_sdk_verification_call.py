@@ -328,21 +328,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if command[0] == "cmake" and "--build" in command]
 
     def assert_complete_matrix(self):
+        from tools.release.transport import consumer_layout
         builds = self.builds()
-        expected = {"native", "stm32", "gd32"} | {
-            family + " " + backend
-            for family in ("h743", "u575", "f103", "gd303", "g474")
-            for backend in ("baremetal", "freertos")} | {
-                "selected h743 high", "selected u575 gpdma",
-                "selected g474 fd normal", "selected g474 fd loopback",
-                "selected g474 pwm adc", "selected g474 adc regular software",
-                "selected g474 adc regular timer",
-                "selected g474 adc injected software",
-                "selected g474 adc injected timer", "selected h743 fifo",
-                "selected u575 fifo", "selected f407 frames",
-                "selected gd470 frames", "selected h743 rtscts",
-                "selected u575 rtscts", "selected g474 shared pwm",
-                "selected native time pair", "selected native time empty"}
+        expected = {build.removesuffix(" build")
+                    for _, build, _ in consumer_layout()}
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
         self.assertEqual(len(builds), 31)
@@ -369,6 +358,17 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual({Path(command[-1]).parents[1].name for command in nm},
                          {"selected native time pair build", "selected native time empty build"})
         self.assertIn("--verify", self.commands[0])
+
+    def test_producer_uses_the_standalone_transport_plan_without_a_copy(self):
+        from tools.release import transport
+        for name in ("BASE_CONSUMERS", "MODERN_CONSUMERS", "SELECTED_CONSUMERS"):
+            self.assertIs(getattr(self.consumer, name), getattr(transport, name))
+        status, _ = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 0)
+        self.assert_complete_matrix()
+        sources = {path.name for path in self.output.glob("* source")}
+        self.assertEqual(sources, {source for source, _, _ in
+                                   transport.consumer_layout()})
 
     def test_explicit_one_bounds_every_build_without_reducing_the_matrix(self):
         with mock.patch.dict("os.environ", {"CMAKE_BUILD_PARALLEL_LEVEL": "99"}):
