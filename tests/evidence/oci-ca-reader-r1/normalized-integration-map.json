@@ -1,0 +1,167 @@
+{
+  "kind": "complete independently reviewed public CA permission defect package",
+  "source_count": 3,
+  "files": [
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/baseline-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/baseline-r1.json",
+      "bytes": 4055,
+      "sha256": "8bf0fd806bcba08ce59e070e016bdb6384a7e40881b353b4737502fbdf1e8398",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/before/tools/dev/Dockerfile.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/before/tools/dev/Dockerfile",
+      "bytes": 1512,
+      "sha256": "8f46b8f2390368f99048a1049a977fa5d71deb5ba09da5164a57847ec2a5d158",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/before/tools/evidence/recipe.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/before/tools/evidence/recipe.py",
+      "bytes": 8579,
+      "sha256": "cb23a98c99e1da1c40186c3cb67b6026189a7e31d21c7b834d1ccd30b820d6c5",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/before/tools/testing/test_build_recipe.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/before/tools/testing/test_build_recipe.py",
+      "bytes": 4537,
+      "sha256": "439d07621516cc451e1abf3ff461424295eea8f7726216613f63d4ad8e31f11a",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/execution-evidence-map-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/execution-evidence-map-r1.json.gz",
+      "bytes": 2658,
+      "sha256": "3189e487c6d2e8356189fb94b5619c5ab32d5810101bb83ac2ecb10b8ee00141",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/execution-evidence-r1.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/execution-evidence-r1.tar.gz",
+      "bytes": 11933,
+      "sha256": "2d7fb320406c23c7f60d3c2c87ab881a257f5f0b6f801420033da337c3cc9a2f",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/execution-summary-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/execution-summary-r1.json",
+      "bytes": 16531,
+      "sha256": "1ecba925a8a7af8ec08b5eea135d42e9c1ce56c16c79851a63a70ffe1124802a",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tools/dev/Dockerfile",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/files/tools/dev/Dockerfile",
+      "bytes": 1532,
+      "sha256": "660622762566bc84c3706cd4d3167c8ebfb654a1bad22c6a604235c10a56b929",
+      "origin": "final_canonical_source"
+    },
+    {
+      "path": "tools/evidence/recipe.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/files/tools/evidence/recipe.py",
+      "bytes": 8599,
+      "sha256": "27bd86e5bef6213c4919ed0a0097cbf4f4a1718ecb6f0ba19f8e5a7e8c53c067",
+      "origin": "final_canonical_source"
+    },
+    {
+      "path": "tools/testing/test_build_recipe.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/files/tools/testing/test_build_recipe.py",
+      "bytes": 6216,
+      "sha256": "774f3b718f5f8b4912ee6682e65ed231590e6ad8896426b78a4b0b0d7affbf56",
+      "origin": "final_canonical_source"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/history/test-red-r1.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/history/test-red-r1.py.raw",
+      "bytes": 6118,
+      "sha256": "e12d42433f875bc62f5f42e02a496cf3f9b49ed5117346513949de9ccc0c80a5",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/history/test-red-r2.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/history/test-red-r2.py.raw",
+      "bytes": 6195,
+      "sha256": "2a956753d18c3611605c6158f3477cc5d05b770ecfce56ab2d4c1647b94879b7",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/packaging-originals-map-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/packaging-originals-map-r1.json",
+      "bytes": 1920,
+      "sha256": "bb6ed04e1c722e808c643773f2a1d1f7fc65c2b8a0f2a212916764d7b9078635",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/packaging-originals-r1.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/packaging-originals-r1.tar.gz",
+      "bytes": 2222,
+      "sha256": "5441423b01d21c8d259a4b4497b0aa69dd5d3bdc3bb91b83546f4673511662d3",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/red-source-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/red-source-r1.json",
+      "bytes": 1683,
+      "sha256": "1e0227d212690bd86a541274e54d1697d79a2397dc0a01395ad9bdac08bb2d9a",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/source-freeze-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/source-freeze-r1.json",
+      "bytes": 2971,
+      "sha256": "1601c62fc01578636a943643cad450757081eb7b2d3092fdcc0d25eb91ad9e14",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/source.diff",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/source.diff",
+      "bytes": 5356,
+      "sha256": "1f5cc367f1b0ecf151ffe3f4e11d15126ae25dcb78742b9482fb30b6dc0e0aad",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/support/derive.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/support/derive.py.raw",
+      "bytes": 741,
+      "sha256": "179c92d4abda0032cc272d2d5c537947d2e664fb660de4c4a3eee75aa3d6bf40",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/support/run.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/support/run.py.raw",
+      "bytes": 2103,
+      "sha256": "345d168377a635dfc1c1595c53a14b44c09150fb3ef63187a8a0a3d454cd3604",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/support/verify_final.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/support/verify_final.py.raw",
+      "bytes": 3231,
+      "sha256": "31b18bc09bcb401c19b96b737635780098f189f35f4cb084171fdaddeb8bfdfc",
+      "origin": "history_or_evidence"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/manifest-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/manifest-r1.json",
+      "bytes": 5855,
+      "sha256": "f5c30a375f3c8fc6793acc70b40b777eb34b837d88c81c4abfb792eab5e149d4",
+      "origin": "original enclosing author metadata"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/author/completed-handoff-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1/completed-handoff-r1.json",
+      "bytes": 5614,
+      "sha256": "313eb69a0da3dddff48c89ad7260ea7ef49f269dc36b6b6212c5a45573021269",
+      "origin": "original enclosing author metadata"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader-r1/remote/completed-failed-job-log.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/remote-qualification-dispatch-6d235058-r1/connector-completed-job-log.json",
+      "bytes": 120201,
+      "sha256": "f2ec4b47fadce2841169b2add355eb3fa1e59b303bdca71401eb163add4dd7e0",
+      "origin": "original actual remote OCI RED; SDK stage success does not qualify whole failed job"
+    }
+  ]
+}

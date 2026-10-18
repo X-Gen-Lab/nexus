@@ -1,0 +1,78 @@
+{
+  "kind": "independent_oci_public_ca_reader_code_and_actual_evidence_review",
+  "status": "PASS",
+  "open_blockers": [],
+  "base_commit": "6d235058ca8bf3d26cd7cf2c48ecf15f21c2c119",
+  "author_root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "source_count": 3,
+  "source_sha256": {
+    "tools/evidence/recipe.py": "27bd86e5bef6213c4919ed0a0097cbf4f4a1718ecb6f0ba19f8e5a7e8c53c067",
+    "tools/dev/Dockerfile": "660622762566bc84c3706cd4d3167c8ebfb654a1bad22c6a604235c10a56b929",
+    "tools/testing/test_build_recipe.py": "774f3b718f5f8b4912ee6682e65ed231590e6ad8896426b78a4b0b0d7affbf56"
+  },
+  "manifest_sha256": "f5c30a375f3c8fc6793acc70b40b777eb34b837d88c81c4abfb792eab5e149d4",
+  "freeze_sha256": "1601c62fc01578636a943643cad450757081eb7b2d3092fdcc0d25eb91ad9e14",
+  "handoff_sha256": "313eb69a0da3dddff48c89ad7260ea7ef49f269dc36b6b6212c5a45573021269",
+  "mapped_leaf_files_verified": 20,
+  "enclosing_files_verified": 2,
+  "source_change_proved": "Generator and derived Dockerfile each change exactly two required proxy_ca secret mounts by adding mode=0444; all other production bytes exact. No key, CA content, TLS, APT sandbox, package lock, frontend or OCI identity changes.",
+  "security_reasoning": "The mounted object is the public CA bundle. BuildKit default0400 prevents the sandboxed APT reader from opening it; mode0444 grants every UID read while granting no UID write. Both required mounts remain ephemeral secrets; no CA COPY, persistent ENV certificate setting, TLS verification disable or sandbox-user override is introduced.",
+  "regressions": {
+    "whole_methods": 8,
+    "accepted_red_exit": 1,
+    "accepted_red_subfailures": 2,
+    "red_errors": 0,
+    "green_exit": 0,
+    "green_failures_errors_skips": 0,
+    "same_final_test_sha256": "774f3b718f5f8b4912ee6682e65ed231590e6ad8896426b78a4b0b0d7affbf56",
+    "six_original_method_bodies_byte_exact": true,
+    "three_red_histories_preserved": true,
+    "normal_recipe_verify_exit": 0,
+    "maintained_three_source_text_index_check_exit": 0,
+    "packaging_exit": 0,
+    "actual_process_commands_checked": 11,
+    "no_filters_or_test_source_rewrite_between_accepted_red_green": true
+  },
+  "archives_verified": [
+    {
+      "path": "execution-evidence-r1.tar.gz",
+      "sha256": "2d7fb320406c23c7f60d3c2c87ab881a257f5f0b6f801420033da337c3cc9a2f",
+      "members": 55,
+      "original_bytes_size_mode_and_full_gzip_crc_eof_verified": true
+    },
+    {
+      "path": "packaging-originals-r1.tar.gz",
+      "sha256": "5441423b01d21c8d259a4b4497b0aa69dd5d3bdc3bb91b83546f4673511662d3",
+      "members": 6,
+      "original_bytes_size_mode_and_full_gzip_crc_eof_verified": true
+    }
+  ],
+  "baseline_index_sha256": "d5601605374374a347d740eaacdda38a6e4759d73307c87d4eaebfc39b60e550",
+  "original_old_untracked_files_unchanged": 11,
+  "locked_inputs_unchanged": [
+    "dependencies/build-recipe.lock.json",
+    "dependencies/environment.lock.json",
+    "dependencies/python-tools-linux-cp312.txt"
+  ],
+  "remote_red": {
+    "run_id": 39106146065,
+    "job_id": 117612285952,
+    "stage": 8,
+    "log_path": "/workspace/nexus-io-recovery-20261018/validation/remote-qualification-dispatch-6d235058-r1/connector-completed-job-log.json",
+    "log_sha256": "f2ec4b47fadce2841169b2add355eb3fa1e59b303bdca71401eb163add4dd7e0",
+    "observed_error": "Could not load certificates from /run/secrets/proxy_ca (CaInfo option): Permission denied",
+    "apt_build_container_exit": 100,
+    "github_shell_step_exit": 1,
+    "release_file_error_interpretation": "The later repository Release-file diagnostics do not prove the snapshot is absent when the preceding CA open failed."
+  },
+  "qualification_limits": {
+    "reviewer_ran_tests": false,
+    "reviewer_changed_source_or_index": false,
+    "reviewer_executed_docker_or_downloads": false,
+    "new_oci_bytes_proved": false,
+    "offline_double_build_proved": false,
+    "future_complete_remote_run_still_required": true,
+    "historical_observed_image_identity_unchanged": true
+  },
+  "max_self_rusage_kib": 40404
+}
