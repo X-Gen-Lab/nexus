@@ -5,7 +5,7 @@ import json
 import re
 import shlex
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 import sys
@@ -13,7 +13,7 @@ import tomllib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
-from tools.evidence.common import file_identity  # noqa: E402
+from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
                                      SELECTED_CONSUMERS)  # noqa: E402
 
@@ -207,10 +207,18 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     """Reuse installed canonical inputs through a separate public C project."""
     sdk = prefix / "share/nexus/src"
     verification = sdk / "cmake/package/verification/io_evolution"
-    assembly = verification / (assembly_name + ".toml")
-    smoke = verification / "consumers" / (smoke_name + ".c")
-    if not assembly.is_file() or not smoke.is_file():
-        raise ValueError("Installed selected-consumer input is missing")
+    relative = PurePosixPath(assembly_name)
+    if (relative.is_absolute() or ".." in relative.parts or
+            "\\" in assembly_name or str(relative) != assembly_name or
+            relative.suffix != ".toml"):
+        raise ValueError("Selected consumer requires a canonical SDK-relative TOML")
+    assembly = regular_file(sdk / assembly_name)
+    if not re.fullmatch(r"[a-z0-9-]+", smoke_name):
+        raise ValueError("Selected consumer smoke name is invalid")
+    smoke = regular_file(verification / "consumers" / (smoke_name + ".c"))
+    authored = tomllib.loads(assembly.read_text())
+    if type(authored.get("schema")) is not int or authored["schema"] != 2:
+        raise ValueError("Selected consumer requires assembly schema 2")
     source = directory / ("selected " + name + " source")
     build = directory / ("selected " + name + " build")
     source.mkdir()
@@ -234,6 +242,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '#error Vendor SDK leaked into product source\n#endif\n'
         '#if __has_include("stm32h743_clock.h") || '
         '__has_include("stm32h743_provider.h") || '
+        '__has_include("stm32h743_spi_dma.h") || '
         '__has_include("stm32h743_uart_rtscts.h") || '
         '__has_include("stm32u575_uart_gpdma.h") || '
         '__has_include("stm32u575_provider.h") || '
@@ -254,7 +263,6 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
                "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
                f"-DNEXUS_ASSEMBLY_FILE={assembly}",
                "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
-    authored = tomllib.loads(assembly.read_text())
     if authored["backend"] != "native":
         command.append(f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}")
     return source, build, command
@@ -522,9 +530,7 @@ def main(argv=None):
                          str(args.parallel) if args.parallel is not None else "2",
                          "--target", "installed_selected"])
             image = check_selected_image(sdk, source, build, run_checked)
-            image.update({"name": name, "assembly": str(
-                sdk / "cmake/package/verification/io_evolution" /
-                (assembly + ".toml"))})
+            image.update({"name": name, "assembly": str(sdk / assembly)})
             report["selected_images"].append(image)
         report["status"] = "passed"
     except (OSError, ValueError, subprocess.TimeoutExpired, KeyError) as error:

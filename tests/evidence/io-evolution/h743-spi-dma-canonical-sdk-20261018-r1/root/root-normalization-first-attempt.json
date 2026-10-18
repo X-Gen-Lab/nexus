@@ -1,0 +1,5 @@
+{
+  "actual_tool_exit": 1,
+  "reason": "First Root adapter correctly rejected author evidence under validation/ because it expected canonical source count30 outside tests/evidence. No Main writes/stage occurred. Final adapter explicitly maps348 evidence-only targets into tests/evidence, retains each original_target and original author map, keeps source30+deletions3 unchanged.",
+  "qualification": false
+}

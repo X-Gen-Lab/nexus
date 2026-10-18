@@ -1,6 +1,7 @@
 # Normally generated, exact baremetal/cache-off SPI and UART shared owners.
 foreach(variant spi-dma spi-dma-uart-tx spi-dma-uart-rx)
-    set(authored "${NEXUS_SOURCE_DIR}/tests/contracts/h743_assembly/${variant}.toml")
+    set(authored
+        "${NEXUS_SOURCE_DIR}/tools/configure/assemblies/h743-${variant}.toml")
     set(bundle "${CMAKE_CURRENT_BINARY_DIR}/h743-${variant}-factory")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B
         "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"

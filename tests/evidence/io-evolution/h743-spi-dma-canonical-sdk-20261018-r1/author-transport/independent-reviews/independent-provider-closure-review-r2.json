@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "kind": "independent-D3-provider-project-two-source-closure-review",
+  "decision": "PASS",
+  "reviewed_at": "2026-10-18T09:51:11.051284+00:00",
+  "open_blockers": [],
+  "scope": "Only explicit project admission, hardlink and complete owned-project snapshot boundaries in two exact provider files; remaining D3 integration source/qualification is outside this narrow PASS. No tests/build/source/index/Main mutation by reviewer.",
+  "original_closure": {
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-closure-r1.json",
+    "bytes": 4082,
+    "sha256": "4131d38a06c3893454cdece74b453395299e30d8441957d8433305f3f3e7f61e",
+    "immutable_TDD_sources": [
+      {
+        "path": "scripts/ci/provider_assemblies.py",
+        "bytes": 21604,
+        "sha256": "99b0122ff51b2d9f6c271d4ee975b264588a43340f0e776282de505ac2923910"
+      },
+      {
+        "path": "scripts/ci/test_provider_assemblies.py",
+        "bytes": 24360,
+        "sha256": "10c619d5b47b7cd418d8c07a751e467703dff981fae8d32e5fa52facc0e03024"
+      }
+    ]
+  },
+  "latest_reviewed_same_AST_sources": [
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "bytes": 21639,
+      "sha256": "b0e81591848a37fc04e71e80c9823113a40192561305fc543f57e176751f039d"
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "bytes": 24377,
+      "sha256": "1fda7ef85e0ca971775a31e68627848ea9c820a78ed1295299090f596875512c"
+    }
+  ],
+  "prior_report_unchanged": {
+    "path": "/dev/shm/nexus-h743-d3-provider-entry-early-review-20261018-r1/independent-early-review-r1.json",
+    "sha256": "b30967fd46eb85867045c88d90436e9e95764f1a89350a3c95150c2e47d4ba67"
+  },
+  "algorithm": [
+    "Local owned_file delegates existing regular/nonempty/symlink checks and adds st_nlink==1 for every authored fixture and selected/default project CMakeLists. Generic evidence common code is unchanged.",
+    "Hardlinked canonical originals and aliases cannot count as separate executions, and a hardlinked project CMake entry cannot authorize another source graph.",
+    "Owned project inventory is separated from the historical suffix-filtered broad source tree. All project regular files, including empty files and every suffix/extensionless name, are included; any symlink file or subtree is rejected; nested owned project hardlinks are rejected too.",
+    ".git metadata is excluded, while existing explicit authored/navigation/dependency/tool input snapshots remain. This inventories the selected original project without inferring a second source graph.",
+    "Existing canonical/schema2/native-exclusion/dotdot/duplicate/project containment/fresh-output contracts remain. Repeated --project is rejected before run; actual -S still points to the caller-selected owned project."
+  ],
+  "preservation": {
+    "original35_test_AST_unchanged": true,
+    "earlier49_test_AST_unchanged": true,
+    "new_methods": 4,
+    "current_methods": 53,
+    "old49_passed_in_actual_RED": true,
+    "RED_GREEN_identical_tests": true,
+    "RED_GREEN_identical_discovery": true,
+    "existing_old_two_file_test_bodies_not_replaced": true
+  },
+  "actual_TDD": {
+    "RED": {
+      "run": 53,
+      "actual_exit": 1,
+      "failing_methods": 4,
+      "subtest_inclusive_failures": 9,
+      "errors": 0,
+      "skips": 0
+    },
+    "GREEN": {
+      "run": 53,
+      "actual_exit": 0,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "final_format_same_AST_rerun": {
+      "run": 53,
+      "actual_exit": 0,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    "cases": [
+      "Hardlink original alone, alias alone and original+alias.",
+      "Hardlinked project CMakeLists.",
+      "Stale main.cpp, selected.inc, template.in and extensionless build-options.",
+      "Symlink project directory hiding an external template."
+    ],
+    "stages": [
+      {
+        "stage": "red",
+        "report": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.json",
+        "report_sha256": "aa3f618ef447c108b8bfcb599d7a23445f5a2ba726ebed39bf0948a59ca2e1d6",
+        "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/receipt.json",
+        "receipt_sha256": "e6248fa5d9238a66648c94acba09b7db4313172f1acc22ed8c54669f11f61c7e",
+        "actual_exit": 1,
+        "run": 53,
+        "failures": 9,
+        "errors": 0,
+        "skip": 0,
+        "head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+        "index_sha256": "ea8e7dabc7e416be334e5045ac770374bd2ec5e77f1f3d56f79c5576cf8d55a2",
+        "whole_source_before_after_equal": true,
+        "peak_child_RSS_KiB": 32172
+      },
+      {
+        "stage": "green",
+        "report": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.json",
+        "report_sha256": "36a7b29784281362cfb23d0d2dcb6597ece7eb5e5c93542e009b167d95a404fb",
+        "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/receipt.json",
+        "receipt_sha256": "3ecb3b033811cf958f13e3fdb3f2f4b7a4a89c5df8c7a37e5cf1ed98cbab268e",
+        "actual_exit": 0,
+        "run": 53,
+        "failures": 0,
+        "errors": 0,
+        "skip": 0,
+        "head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+        "index_sha256": "ea8e7dabc7e416be334e5045ac770374bd2ec5e77f1f3d56f79c5576cf8d55a2",
+        "whole_source_before_after_equal": true,
+        "peak_child_RSS_KiB": 32172
+      },
+      {
+        "stage": "final",
+        "report": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.json",
+        "report_sha256": "36a7b29784281362cfb23d0d2dcb6597ece7eb5e5c93542e009b167d95a404fb",
+        "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/receipt.json",
+        "receipt_sha256": "7c356b1207b5ec9e093d7be81980efdfa4639ecedf344a3f84e2c1914b8f2057",
+        "actual_exit": 0,
+        "run": 53,
+        "failures": 0,
+        "errors": 0,
+        "skip": 0,
+        "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+        "index_sha256": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+        "whole_source_before_after_equal": true,
+        "peak_child_RSS_KiB": 32152
+      }
+    ],
+    "all14_closure_evidence_leaf_SHA_verified": true,
+    "all6_source_ZIP_CRC_and_complete_before_member_size_SHA_verified": true,
+    "all_actual_receipts_stdout_stderr_SHA_and_stable_withdrawal_verified": true,
+    "runner_whole_stdlib_unittest_loadTestsFromModule_no_filters_or_skip_acceptance": true
+  },
+  "source_binding": {
+    "initial_TDD_base": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+    "final_complete53_base": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+    "final_input_manifest_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+    "original_green_to_final_change": "Only split implicit adjacent error-string literal and a TemporaryDirectory call line wrap; full two-file AST equal independently verified. Old99b012/10c619 actual TDD remains immutable; final b0e815/1fda7e has its own full53 actual GREEN evidence.",
+    "latest_author_two_sources_equal_final53_before_snapshot": true,
+    "seal_navigation": "A first report seal correctly rejected current bytes that differed from the original99/10 tuple. No report was written; the final sources and separate fresh53 execution were then explicitly bound rather than relabeling old evidence."
+  },
+  "not_established": [
+    "Review of the other D3 source paths",
+    "Actual H74329 ARM matrices or installedSDK34roots/37images",
+    "Remote workflow/API/artifact qualification",
+    "Physical MCU/HIL behavior",
+    "Protection from malicious concurrent filesystem writers beyond the ordinary quiescent-source contract"
+  ],
+  "next": "Bind this two-file closure in the later complete D3 freeze/code/evidence review and ordinary full-index gates. No new source change or test rerun requested by this review."
+}

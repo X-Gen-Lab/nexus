@@ -188,6 +188,10 @@ _DESCRIPTORS = MappingProxyType({
     "stm32h743": FamilyDescriptor("stm32h743", (
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
+            "tools/configure/assemblies/h743-spi-dma.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+            "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
             "cmake/platform/H743FlashRam.cmake",
             "cmake/platform/H743StackUsage.cmake",
             "tools/measurement/h743_flash_ram.py",

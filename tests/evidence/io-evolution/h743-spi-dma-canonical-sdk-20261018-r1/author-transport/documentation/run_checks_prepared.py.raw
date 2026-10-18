@@ -1,0 +1,44 @@
+import pathlib,hashlib,json,os,sys,subprocess,resource
+ROOT=pathlib.Path('/tmp/nexus-h743-fixed-hsi-s0-20261018')
+OUT=pathlib.Path('/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1')
+PREFIX=pathlib.Path('/tmp/nexus-recovery-docs-tools-20261018-r1')
+sys.path.insert(0,str(ROOT))
+from tools.dev import process
+from tools.documentation import check,install,sphinx_ext
+from tools.evidence.identity import observe_git_source
+
+def sha(p):
+ with pathlib.Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def metrics():
+ cg=pathlib.Path('/sys/fs/cgroup');s=os.statvfs('/workspace')
+ return {'current':int((cg/'memory.current').read_text()),'max':int((cg/'memory.max').read_text()),'events':dict(line.split() for line in (cg/'memory.events').read_text().splitlines()),'tmp_allocated':sum(p.lstat().st_blocks*512 for p in OUT.rglob('*'))+OUT.stat().st_blocks*512,'persistent_free':s.f_bavail*s.f_frsize}
+def guard():
+ m=metrics();assert m['max']-m['current']>=600*1024*1024,m;assert m['tmp_allocated']<=64*1024*1024,m;assert m['persistent_free']>=64*1024*1024,m;return m
+page='''import json,pathlib,sys
+root=pathlib.Path('/tmp/nexus-h743-fixed-hsi-s0-20261018');sys.path.insert(0,str(root))
+from tools.documentation import check,sphinx_ext
+out=pathlib.Path('/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1')
+report=check.validate_translations(root,pot_root=out/'gettext',critical_pages=['delivery/capabilities','design/provider-assemblies'],languages=('en','zh_CN'))
+(out/'page-translation-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')
+print(json.dumps(report,ensure_ascii=False));raise SystemExit(bool(report['errors']))
+'''
+(OUT/'page_gate.py').write_text(page)
+record={'kind':'fresh_target_page_bilingual_and_complete_source_check_not_html_build','phases':[],'source_before':observe_git_source(ROOT),'before':guard()}
+index=pathlib.Path(subprocess.check_output(['git','rev-parse','--git-path','index'],cwd=ROOT,text=True).strip());index=index if index.is_absolute() else ROOT/index
+record['index_before_sha256']=sha(index)
+env=install.environment(PREFIX);env.update({'PYTHONDONTWRITEBYTECODE':'1','PYTHONNOUSERSITE':'1','TMPDIR':str(OUT/'scratch')});(OUT/'scratch').mkdir(exist_ok=True)
+try:
+ for stage,argv in [('page',[str(PREFIX/'venv/bin/python'),'-B',str(OUT/'page_gate.py')]),('full-source',[str(PREFIX/'venv/bin/python'),'-B',str(ROOT/'tools/documentation/cli.py'),'check','--full','--tool-prefix',str(PREFIX),'--report',str(OUT/'full-source-check.json')])]:
+  before=guard();r=process.run(argv,cwd=ROOT,env=env,log=OUT/(stage+'.raw'),timeout=600,stage='d3-canonical-docs-'+stage)
+  record['phases'].append({'stage':stage,'returncode':r.returncode,'receipt':str(r.receipt_path),'before':before,'after':metrics()})
+  if r.returncode:raise RuntimeError(f'{stage} actual exit {r.returncode}')
+  guard()
+ record['source_after']=observe_git_source(ROOT);record['index_after_sha256']=sha(index)
+ assert record['source_before']==record['source_after']
+ assert record['index_before_sha256']==record['index_after_sha256']
+ record.update({'status':'passed','after':guard(),'max_completed_child_rusage_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss})
+except BaseException as exc:
+ record.update({'status':'failed','error':repr(exc),'after':metrics()});raise
+finally:
+ (OUT/'checks-execution.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n')
+ print(json.dumps(record,ensure_ascii=False))

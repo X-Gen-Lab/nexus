@@ -1,0 +1,3067 @@
+{
+  "schema": 1,
+  "status": "frozen_transport_bytes_not_qualification",
+  "source_operation_count": 33,
+  "write_source_file_count": 30,
+  "delete_source_count": 3,
+  "file_count": 378,
+  "evidence_file_count": 348,
+  "source_freeze": {
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-source33-and-execution-freeze-r1.json",
+    "sha256": "50a7fc913098dea0185602eb528b8002fbd66b4eaf05e27ff825b3d2f7fa7751"
+  },
+  "files": [
+    {
+      "target": "tools/configure/assemblies/h743-spi-dma.toml",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/assemblies/h743-spi-dma.toml",
+      "bytes": 491,
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "bytes": 653,
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "bytes": 646,
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+      "bytes": 3790,
+      "sha256": "b29f077131d982231651312590ef284ac08f830204163fc54acbd05088298677",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "scripts/ci/provider_assemblies.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/scripts/ci/provider_assemblies.py",
+      "bytes": 21639,
+      "sha256": "b0e81591848a37fc04e71e80c9823113a40192561305fc543f57e176751f039d",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "scripts/ci/test_provider_assemblies.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/scripts/ci/test_provider_assemblies.py",
+      "bytes": 24377,
+      "sha256": "1fda7ef85e0ca971775a31e68627848ea9c820a78ed1295299090f596875512c",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tests/contracts/h743_assembly/CMakeLists.txt",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tests/contracts/h743_assembly/CMakeLists.txt",
+      "bytes": 2356,
+      "sha256": "5855fa1ef59bab32bea058270f3cf8125bfd6ce4b6d45ef1ae018cd1d87da089",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/providers/stm32h743/test_spi_dma.py",
+      "bytes": 10441,
+      "sha256": "23ab8551db93ed9f9abbe7c3237288df27d2172c9422ed9e113814288e13517b",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tests/google/h743_spi_dma_factory.cmake",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tests/google/h743_spi_dma_factory.cmake",
+      "bytes": 2819,
+      "sha256": "0b25363754762494540c0909f31d90f402d307ac2dce1a3d62bdafe712e614b8",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/configure/test_selected_contract_authority.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/test_selected_contract_authority.py",
+      "bytes": 16528,
+      "sha256": "7414c6b41b359db93950d5b3c4a0da0c7f402a3399a2d92a7d907205e5795996",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "cmake/package/verify_consumers.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/cmake/package/verify_consumers.py",
+      "bytes": 30692,
+      "sha256": "85e3d40faeb41390fbdd7a95ba9cd2b5992ed69502dab5e7c9cecff3858070f8",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "cmake/package/package_source_sdk.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/cmake/package/package_source_sdk.py",
+      "bytes": 50720,
+      "sha256": "83eb8409230869dd1c2adc045a16f2456c8358919697680b33779eb743bc74fe",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/configure/providers/descriptor.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/providers/descriptor.py",
+      "bytes": 14976,
+      "sha256": "7cbdc5fa99324212c0035fa811c7ca4a99c0ba03d3e256ad0cae75b80097eedb",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/release/transport.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/release/transport.py",
+      "bytes": 23414,
+      "sha256": "1e7c2fb763895046dbaebe60fd4fcf7047508e5156b21dc223c63a3324f7e0ec",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tests/contracts/test_device_sdk_payload.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tests/contracts/test_device_sdk_payload.py",
+      "bytes": 24646,
+      "sha256": "ac5e3ca3d8d85bb891244a7f65f0a3618db441463a8fa17b6d73dc4da2b06498",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/testing/test_sdk_verification_call.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/testing/test_sdk_verification_call.py",
+      "bytes": 44471,
+      "sha256": "9410229a460138e502b10d2798528fadbd31aa5a1b7d00a6abc2f904052f3e33",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": ".github/workflows/test_release.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/.github/workflows/test_release.py",
+      "bytes": 71120,
+      "sha256": "a53120a076aee2ec87ee615a6de5890478ea0f0574f3cf40daa627b87292cbcb",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/dev/plans/software.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/dev/plans/software.json",
+      "bytes": 52192,
+      "sha256": "37ca63d9b233cc62da16699275394b848c5c7528ea5a9b2606434c7e79aa0f9f",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/testing/test_qualification_plan.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/testing/test_qualification_plan.py",
+      "bytes": 9911,
+      "sha256": "d8d1baa45a0aa3a04d1f17a91db353c67024e564e48c0833654560c7e44a402e",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/testing/test_work_packages.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/testing/test_work_packages.py",
+      "bytes": 23013,
+      "sha256": "b856eaa730efadcfe7ec0b92bc480263bf6d186085eefc2848dd35b1b13efff8",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": ".github/workflows/build-matrix.yml",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/.github/workflows/build-matrix.yml",
+      "bytes": 18623,
+      "sha256": "10e52ea538c9c30822d5e0cbfc928f093d97bc2fe78da8c70d163d2136616d04",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": ".github/workflows/test_platform_ci.py",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/.github/workflows/test_platform_ci.py",
+      "bytes": 70701,
+      "sha256": "45ed33110b8cc8b3d952b5ad859d6e68faa7e63a7f2ddf0972d2ced016c16930",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "docs/design/provider-assemblies.md",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/design/provider-assemblies.md",
+      "bytes": 5646,
+      "sha256": "1bbfb23bf0714762926565a85b492ce1cf8846cf203e31ec420de01b7585aafa",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/approved/docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "bytes": 13381,
+      "sha256": "05ddbc7acbdf19dea8d6f76be24de20fafa89dc21eea7b94786414a92eaf2b35",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "docs/delivery/capabilities.md",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/delivery/capabilities.md",
+      "bytes": 59203,
+      "sha256": "e19b3aadefcf745f753099205d52c1a424eed71f6c8d6ff12f7dee42083a0264",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/approved/docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 121940,
+      "sha256": "045618f04b580e4d5e095a6be8b4c8ee121afd15842bb9505f6cc93b3badbe56",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/approved/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 121668,
+      "sha256": "0bad0a10366e797c06a45e1d64a11f8de4a4f87a696addb5ebe4fe09a109b525",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "tools/release/README.md",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/tools/release/README.md",
+      "bytes": 7002,
+      "sha256": "a92860b63e1476820c2d6480c4c23e94eb86370cfa20780c880558296dca5752",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "soc/stm32h743/README.md",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/soc/stm32h743/README.md",
+      "bytes": 36026,
+      "sha256": "4bce41176f2c7419ba7d280f985b250203b386d0b6783c315cc0ecea358cfc89",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "docs/design/io-evolution-execution.csv",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/design/io-evolution-execution.csv",
+      "bytes": 11042,
+      "sha256": "c99c5f99a48b429cd8b2da36cab1271d977cff7d5cd37ceef0deefd3805b874f",
+      "mode": 384,
+      "role": "source"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/before33-and-index.tar.gz",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/before33-and-index.tar.gz",
+      "bytes": 919198,
+      "sha256": "22fbea18d838b6023e2fdb1927922b579983f4f1bce70d075762d0899758c54d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/before33.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/before33.json",
+      "bytes": 13052,
+      "sha256": "0869f846014a6ba72dbe81b333c6407f03236b686c07da2e393299cd05c3e32f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.after-source.json",
+      "bytes": 6314,
+      "sha256": "80c0ba379fcc79a125e9819509596e1b8964e9b63214730fafd7e14dff624c40",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.after-source.zip",
+      "bytes": 2229,
+      "sha256": "44c27cec25722dfc6b57d3e5e8c41386d185a0b4bde3e1fc1606e0e6c00ab7a1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/receipt.json",
+      "bytes": 1328,
+      "sha256": "58b27901944ea3585b2572aa554bc27a6c3f738ab2c26ad36deb1115c08b0709",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/stderr.txt",
+      "bytes": 10489,
+      "sha256": "89e56b1a1ae83a0f38e42fd0155fa64b1d7e17488cd118a7ccf7f55f01174135",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.before-source.json",
+      "bytes": 6314,
+      "sha256": "80c0ba379fcc79a125e9819509596e1b8964e9b63214730fafd7e14dff624c40",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.before-source.zip",
+      "bytes": 173854,
+      "sha256": "c1a1c467914a06cfefa61b17229f6878bbe5d74420e680160dded83210ded720",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.command.json",
+      "bytes": 1501,
+      "sha256": "2ab1e1bc83ebf524861201b7b685a1d50de25e59ec9b70903178b99ba19c4745",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.json",
+      "bytes": 6031,
+      "sha256": "2dd95fa9f129a806a8a6bedc1193e586e623a58c3d95e7ca475083adaf333db6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.raw",
+      "bytes": 10489,
+      "sha256": "89e56b1a1ae83a0f38e42fd0155fa64b1d7e17488cd118a7ccf7f55f01174135",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-first-red.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.result.json",
+      "bytes": 656,
+      "sha256": "9468b29d0ae56738492444cfd24f212c49756c6af15c09d655b546ee3e3f4d0b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.after-source.json",
+      "bytes": 6314,
+      "sha256": "440175bb6c8c15e9078993fc8ef99b4b81a5dd23358b1fa60265ca90af3fb8ff",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.after-source.zip",
+      "bytes": 2229,
+      "sha256": "d9e3c776a17cd86f6b792b0b3bc366050553cc4f947542ec6f320f515cf80eef",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.attempts/1792316856784583786-3d4c18dd6a9f4e5e865274b1b444d12a/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.attempts/1792316856784583786-3d4c18dd6a9f4e5e865274b1b444d12a/receipt.json",
+      "bytes": 1311,
+      "sha256": "7413c989c60eeb14c7d93e3e715a5c59c14ec9450dd7d620314593ab02816833",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.attempts/1792316856784583786-3d4c18dd6a9f4e5e865274b1b444d12a/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.attempts/1792316856784583786-3d4c18dd6a9f4e5e865274b1b444d12a/stderr.txt",
+      "bytes": 8995,
+      "sha256": "eb8fba66a3e2edcb83a6b7deabbcee9d71f02b571d1d0df5e9906b2bf7c17689",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.attempts/1792316856784583786-3d4c18dd6a9f4e5e865274b1b444d12a/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.attempts/1792316856784583786-3d4c18dd6a9f4e5e865274b1b444d12a/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.before-source.json",
+      "bytes": 6314,
+      "sha256": "440175bb6c8c15e9078993fc8ef99b4b81a5dd23358b1fa60265ca90af3fb8ff",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.before-source.zip",
+      "bytes": 174016,
+      "sha256": "f4ed0e3e84679b3ee011e08af8f0eecf180b698381dcf6b4cfa4ad36cd8ba5d0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.command.json",
+      "bytes": 1480,
+      "sha256": "784c58e60b0d176e05d06c64f776f0f2bd300f35f863596f92b5e05275a66325",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.json",
+      "bytes": 5789,
+      "sha256": "509f0528f5217afab9300aa5ac590bb1f009e2d98760354d9c414339e5595e4f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.raw",
+      "bytes": 8995,
+      "sha256": "eb8fba66a3e2edcb83a6b7deabbcee9d71f02b571d1d0df5e9906b2bf7c17689",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-green.result.json",
+      "bytes": 648,
+      "sha256": "669fff4b16362067c26e0d7ec2b2a0a6e166bf41514f86d490b7a83daba9636c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-canonical-project-red-green-closure-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-red-green-closure-r1.json",
+      "bytes": 677,
+      "sha256": "a4100c298283e4017408355cb016baf6454fe8ab14f54b9d7486a7169ccfa10e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/ci-transport-baseline52-before.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-transport-baseline52-before.zip",
+      "bytes": 18029,
+      "sha256": "11c5f6beae92233f122ecbc4aa7d7a2da98231388a706a51fa9ad550d97e9734",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/delivery-summary-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/delivery-summary-r1.json",
+      "bytes": 5111,
+      "sha256": "106cebaf02efe118a7addf8390554da9ff50df205f516498a614afd09b757173",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.after-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.after-source.zip",
+      "bytes": 2227,
+      "sha256": "3013f197f5e91c5963b405b0a95b8c6397dfee783a9c343774795c169b159d33",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.attempts/1792318326352466545-2663d0a3aaee4128ac4043bbf134cada/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.attempts/1792318326352466545-2663d0a3aaee4128ac4043bbf134cada/receipt.json",
+      "bytes": 1178,
+      "sha256": "25bcd4cacf6d9a04f61d5059881519d2f54cdd68aefdbfa82589623b67de82cd",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.attempts/1792318326352466545-2663d0a3aaee4128ac4043bbf134cada/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.attempts/1792318326352466545-2663d0a3aaee4128ac4043bbf134cada/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.attempts/1792318326352466545-2663d0a3aaee4128ac4043bbf134cada/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.attempts/1792318326352466545-2663d0a3aaee4128ac4043bbf134cada/stdout.txt",
+      "bytes": 53,
+      "sha256": "6a40a037dc979a24446c1e47618bf18350cf5a2928f1abb1516529684212deb8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.before-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.before-source.zip",
+      "bytes": 174024,
+      "sha256": "eb0a0ddad10dfffcd257bba385f0cd22e39c01942ba3f6868c34c57454b5c61c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.command.json",
+      "bytes": 1355,
+      "sha256": "2c6a90af29cd34c6f7340211c76ae074d7ec9474b5c44f7ed72656b24c6d0be1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.raw",
+      "bytes": 53,
+      "sha256": "6a40a037dc979a24446c1e47618bf18350cf5a2928f1abb1516529684212deb8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-content-final-r1.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-content-final-r1.result.json",
+      "bytes": 595,
+      "sha256": "af0ea66c6a051393b99ef0b6dec4928fa410d4ab814aad33197b42a774b8538b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-comments.attempts/1792318327666726902-0c05935b1d254ceda2826b9e3b231b06/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-comments.attempts/1792318327666726902-0c05935b1d254ceda2826b9e3b231b06/receipt.json",
+      "bytes": 1266,
+      "sha256": "7ff1124cc5aa3e9d427336869de21b75d8cb6926e8c23a2c0c46cce34cad2f41",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-comments.attempts/1792318327666726902-0c05935b1d254ceda2826b9e3b231b06/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-comments.attempts/1792318327666726902-0c05935b1d254ceda2826b9e3b231b06/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-comments.attempts/1792318327666726902-0c05935b1d254ceda2826b9e3b231b06/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-comments.attempts/1792318327666726902-0c05935b1d254ceda2826b9e3b231b06/stdout.txt",
+      "bytes": 706,
+      "sha256": "a79375f01c50895d5d061dc41b48b874338c749bed7f2acbaf918064de20f17a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-comments.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-comments.command.json",
+      "bytes": 1441,
+      "sha256": "bf10b6032f2ae4bb20ae0c2103324076b7fd767475348bde44743caa8aa71dd6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-comments.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-comments.raw",
+      "bytes": 706,
+      "sha256": "a79375f01c50895d5d061dc41b48b874338c749bed7f2acbaf918064de20f17a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-format.attempts/1792318327551477979-dfe25e09530840b6a02b580ce481028c/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-format.attempts/1792318327551477979-dfe25e09530840b6a02b580ce481028c/receipt.json",
+      "bytes": 1257,
+      "sha256": "6851695645b73bb7d4da2c0ff32ab3d3a0aa7fe72d408667ed4eca2cb74336ed",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-format.attempts/1792318327551477979-dfe25e09530840b6a02b580ce481028c/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-format.attempts/1792318327551477979-dfe25e09530840b6a02b580ce481028c/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-format.attempts/1792318327551477979-dfe25e09530840b6a02b580ce481028c/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-format.attempts/1792318327551477979-dfe25e09530840b6a02b580ce481028c/stdout.txt",
+      "bytes": 160,
+      "sha256": "1010eacf63db1d008d34c508bcffa3dd823ede165447583fcd38c7c9034f3304",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-format.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-format.command.json",
+      "bytes": 1430,
+      "sha256": "484ce06128ccb8aa265c8e7c920090d1203ad74eae9a56431f1a6e48b09fad01",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-new-c-format.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-new-c-format.raw",
+      "bytes": 160,
+      "sha256": "1010eacf63db1d008d34c508bcffa3dd823ede165447583fcd38c7c9034f3304",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-subcommands-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-subcommands-r1.json",
+      "bytes": 3453,
+      "sha256": "24e78848e32e9fde7a929023da52ff442a96b54d18dc6c4d447717c6ddc36f62",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-text30.attempts/1792318327731648804-6fe08a7a3fc74d8aa4de3189e0e48769/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-text30.attempts/1792318327731648804-6fe08a7a3fc74d8aa4de3189e0e48769/receipt.json",
+      "bytes": 1140,
+      "sha256": "b2f5cdd88746bb36c09e8506d0ed83ba70b8f6c220574e638b9e15afe0cd3a26",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-text30.attempts/1792318327731648804-6fe08a7a3fc74d8aa4de3189e0e48769/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-text30.attempts/1792318327731648804-6fe08a7a3fc74d8aa4de3189e0e48769/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-text30.attempts/1792318327731648804-6fe08a7a3fc74d8aa4de3189e0e48769/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-text30.attempts/1792318327731648804-6fe08a7a3fc74d8aa4de3189e0e48769/stdout.txt",
+      "bytes": 12,
+      "sha256": "56d5136db933e6f8b8891bd27c8ccf8a8763eb697accdf865eae02ece8bf95f9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-text30.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-text30.command.json",
+      "bytes": 1307,
+      "sha256": "db78932956dbd2e7c33e4154c89c6688d4b1d1d54c11dd07b15c4aa5de282c85",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-text30.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-text30.raw",
+      "bytes": 12,
+      "sha256": "56d5136db933e6f8b8891bd27c8ccf8a8763eb697accdf865eae02ece8bf95f9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-tracked26.attempts/1792318326380774785-9e0e5654f9a641c1b5f3e7fee12a53de/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-tracked26.attempts/1792318326380774785-9e0e5654f9a641c1b5f3e7fee12a53de/receipt.json",
+      "bytes": 2445,
+      "sha256": "659893a55a34b06c778b8a5a3517eb74efa781f4b2f978b9ba0d206060b869f2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-tracked26.attempts/1792318326380774785-9e0e5654f9a641c1b5f3e7fee12a53de/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-tracked26.attempts/1792318326380774785-9e0e5654f9a641c1b5f3e7fee12a53de/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-tracked26.attempts/1792318326380774785-9e0e5654f9a641c1b5f3e7fee12a53de/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-tracked26.attempts/1792318326380774785-9e0e5654f9a641c1b5f3e7fee12a53de/stdout.txt",
+      "bytes": 88,
+      "sha256": "278ffb72220546a0cafa07a489168f888e18a24beeed88ef60f703bbbba8c6f2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-tracked26.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-tracked26.command.json",
+      "bytes": 2615,
+      "sha256": "34d09fda4d0e3d601706de9c30c5834668b5cdc6a9a90c4af959fb739f5f5371",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-tracked26.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-tracked26.json",
+      "bytes": 3055,
+      "sha256": "2b3425c1981f1478c189d40aa43a8fa0693a4228105a48f3d095bb87aecf4c5b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-style-tracked26.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-style-tracked26.raw",
+      "bytes": 88,
+      "sha256": "278ffb72220546a0cafa07a489168f888e18a24beeed88ef60f703bbbba8c6f2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/development-text30.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/development-text30.json",
+      "bytes": 5388,
+      "sha256": "630e9d551e77a208ccacdfa32e1ea55c645c7608e8b4e1f6b1eed89d2beefca9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/docs-catalog-independent-review-false-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/docs-catalog-independent-review-false-r1.json",
+      "bytes": 2374,
+      "sha256": "088bc2de379117ab792a14bcfa99ce5392a2519f2e628a399d4aefbc5ba288a5",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/docs-reviewed-metadata-only-delta-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/docs-reviewed-metadata-only-delta-r1.json",
+      "bytes": 1204,
+      "sha256": "840884cfaa6321ef1a4fda1f57bc70774855146da3abfc99a76ab5db7747d477",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/execution-evidence-final-r1-map.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/execution-evidence-final-r1-map.json",
+      "bytes": 88740,
+      "sha256": "b6ec285b284b238bbde8c25ab124b4095339519b403a11e647fa2a1068741955",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/execution-evidence-final-r1.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/execution-evidence-final-r1.zip",
+      "bytes": 1085434,
+      "sha256": "5bbb2fc2a1ea13887ab6592463497d67f47e1a98d68eeabd47f84bdaecba7390",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-authoritative-results-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-authoritative-results-r1.json",
+      "bytes": 5971,
+      "sha256": "7769f0c5d81aee0b4cc6f360f61c410459af5defaa331108b367ed8931d7a07d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.after-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.after-source.zip",
+      "bytes": 2227,
+      "sha256": "7d0e5a840d03ffc432edeacf0dde8b3878af9e0c1a17c20d9cf59d532d8b6b5f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.attempts/1792317383077046597-34f318bb83c940aaaa2e9bb9ef14df90/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.attempts/1792317383077046597-34f318bb83c940aaaa2e9bb9ef14df90/receipt.json",
+      "bytes": 1287,
+      "sha256": "c1b53a30a99f6c5697a4770e3a65ab6a4dfdd8066b632f47c0081fee26575654",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.attempts/1792317383077046597-34f318bb83c940aaaa2e9bb9ef14df90/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.attempts/1792317383077046597-34f318bb83c940aaaa2e9bb9ef14df90/stderr.txt",
+      "bytes": 8995,
+      "sha256": "636264f2a2fbb9413c2f7bad131463bcb49dbf572c79016a99c7bbb806499d39",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.attempts/1792317383077046597-34f318bb83c940aaaa2e9bb9ef14df90/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.attempts/1792317383077046597-34f318bb83c940aaaa2e9bb9ef14df90/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.before-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.before-source.zip",
+      "bytes": 174024,
+      "sha256": "928666e4f6689490ad79bdc15e6578a80f10a37a2a65579f19f7e90f270094b3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.command.json",
+      "bytes": 1450,
+      "sha256": "52eff2c289594b244ca55c41cc82d33a55aeafc6326eb7696ea1e89eeb3905f9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.json",
+      "bytes": 5789,
+      "sha256": "509f0528f5217afab9300aa5ac590bb1f009e2d98760354d9c414339e5595e4f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.raw",
+      "bytes": 8995,
+      "sha256": "636264f2a2fbb9413c2f7bad131463bcb49dbf572c79016a99c7bbb806499d39",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-ci54-r2.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-ci54-r2.result.json",
+      "bytes": 730,
+      "sha256": "39af6ea0588023c844a255f4e12537e0c668ff34e4cf0a264e9b2ac6b6db0fe1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-modules-progress-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-modules-progress-r1.json",
+      "bytes": 1091,
+      "sha256": "aa99692bdf80640df5b4ef9792adca29a66f1e78e021d46cc3e0128b053517d8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.after-source.zip",
+      "bytes": 2226,
+      "sha256": "8ba81af6c7cba2490c6e285444f859c3eebaf1071ca2622dff7316b94a3ed8cf",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.attempts/1792316984072761602-8cb30fe45ade480baf96ed668c0e527f/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.attempts/1792316984072761602-8cb30fe45ade480baf96ed668c0e527f/receipt.json",
+      "bytes": 1301,
+      "sha256": "91f7c779284bb668b48fd067738eeb2cd2f8a3a6633a5bee87a8fa516a3922f5",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.attempts/1792316984072761602-8cb30fe45ade480baf96ed668c0e527f/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.attempts/1792316984072761602-8cb30fe45ade480baf96ed668c0e527f/stderr.txt",
+      "bytes": 2743,
+      "sha256": "6d7ea8e859200a835882c47e5c9ee236c8e851fba7f1c243d95b40e46115ba59",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.attempts/1792316984072761602-8cb30fe45ade480baf96ed668c0e527f/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.attempts/1792316984072761602-8cb30fe45ade480baf96ed668c0e527f/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.before-source.zip",
+      "bytes": 174023,
+      "sha256": "eeae6963699b14bb21de67ab416f0d1c89dc1d741cb3098b696fde6be20c4b15",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.command.json",
+      "bytes": 1466,
+      "sha256": "682ba6b80fea92d71c1a73b0ac3f34d634e725a40c60644f9d496c8400a822ae",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.json",
+      "bytes": 1813,
+      "sha256": "da96aad4f4ec49523c96300de324ba55c88c87c6173ed4d3429cb95c0285eb3d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.raw",
+      "bytes": 2743,
+      "sha256": "6d7ea8e859200a835882c47e5c9ee236c8e851fba7f1c243d95b40e46115ba59",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-payload15.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-payload15.result.json",
+      "bytes": 739,
+      "sha256": "0e86f4a344b6a85ccf1c048b5384ba46b485584c1908a1a5197e47eb48130f04",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.after-source.zip",
+      "bytes": 2226,
+      "sha256": "91e056eb0e4175153dc59cfcfd48bbec2a7f272d5084913587cbe610ebfdf6d1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/receipt.json",
+      "bytes": 1301,
+      "sha256": "7c356b1207b5ec9e093d7be81980efdfa4639ecedf344a3f84e2c1914b8f2057",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/stderr.txt",
+      "bytes": 8000,
+      "sha256": "b23ad1132a9b8f67bbb94a5589a585578bd4d4b3abf84e49590c9f9039602f06",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.attempts/1792316981572267307-206e973de412412fb6ea33d79bb045a6/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.before-source.zip",
+      "bytes": 174023,
+      "sha256": "d48483114eae68ffd2134f6e82b92e1adb6ce189741fa69f2be049ddb513dd28",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.command.json",
+      "bytes": 1467,
+      "sha256": "fcf372d4ed766bdcd0716147441f20940c50a870e5fbe13f36d6f16c2c207e30",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.json",
+      "bytes": 5208,
+      "sha256": "36a7b29784281362cfb23d0d2dcb6597ece7eb5e5c93542e009b167d95a404fb",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.raw",
+      "bytes": 8000,
+      "sha256": "b23ad1132a9b8f67bbb94a5589a585578bd4d4b3abf84e49590c9f9039602f06",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-provider53.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-provider53.result.json",
+      "bytes": 737,
+      "sha256": "11c203971aa243931175d9f32fc08b9daf2e8fee2e53f507541fe2aa9e37b1d7",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.after-source.zip",
+      "bytes": 2226,
+      "sha256": "d525478dae9cfb0ecc0f78e6803f78169e3175a60be55682ee371ace7da1dc1d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.attempts/1792317042446223878-6e8878603cce42f980e978067985558c/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.attempts/1792317042446223878-6e8878603cce42f980e978067985558c/receipt.json",
+      "bytes": 1320,
+      "sha256": "7c1cb496ddd345fee062d4e40a1095c3435bbc5065733e3136d277a8d676369f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.attempts/1792317042446223878-6e8878603cce42f980e978067985558c/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.attempts/1792317042446223878-6e8878603cce42f980e978067985558c/stderr.txt",
+      "bytes": 1512,
+      "sha256": "0d43284b3984e2a227082c35d9e64e05419bf8f8d5aec93748415f8d9cd860a3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.attempts/1792317042446223878-6e8878603cce42f980e978067985558c/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.attempts/1792317042446223878-6e8878603cce42f980e978067985558c/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.before-source.zip",
+      "bytes": 174023,
+      "sha256": "00944fddd493721f0676bf9a149c638e47d2439aeb4b93c17cd1dd96333a6db6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.command.json",
+      "bytes": 1490,
+      "sha256": "5093b1b78a6bb319e81daacf93fc20cb351abf6dbee1d59b2ce7403256d767b3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.json",
+      "bytes": 1049,
+      "sha256": "503a8d96f12c29ddc8dbac10d89c8ae7fff47b3816072ea6c55a6f17de74e963",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.raw",
+      "bytes": 1512,
+      "sha256": "0d43284b3984e2a227082c35d9e64e05419bf8f8d5aec93748415f8d9cd860a3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-qualification8.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-qualification8.result.json",
+      "bytes": 747,
+      "sha256": "91efbd4253e18ddf5a584a7726392ceb74d84d001a419327a96f4d17543c72b8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.after-source.zip",
+      "bytes": 2226,
+      "sha256": "d525478dae9cfb0ecc0f78e6803f78169e3175a60be55682ee371ace7da1dc1d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.attempts/1792316999131639108-8dbcf898aed4498d97c2b08df6a9dc1c/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.attempts/1792316999131639108-8dbcf898aed4498d97c2b08df6a9dc1c/receipt.json",
+      "bytes": 1291,
+      "sha256": "0c252a5f73cdc4757c202e87f6d6ac0618b1c62a73808d6e6305ac1ddc850eca",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.attempts/1792316999131639108-8dbcf898aed4498d97c2b08df6a9dc1c/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.attempts/1792316999131639108-8dbcf898aed4498d97c2b08df6a9dc1c/stderr.txt",
+      "bytes": 7681,
+      "sha256": "ebd234c188cdc2796f1a46a22df0927bf1848281d36f4d1ecd7a21a4cddbb384",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.attempts/1792316999131639108-8dbcf898aed4498d97c2b08df6a9dc1c/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.attempts/1792316999131639108-8dbcf898aed4498d97c2b08df6a9dc1c/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.before-source.zip",
+      "bytes": 174023,
+      "sha256": "2f978b2acbc2f326dfce518e2cde563a27f85ef590b31b18e07c99ea80c50707",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.command.json",
+      "bytes": 1456,
+      "sha256": "b7d2c3568a3cb8fce76b5f00eaa59011789838630d21d14fefd5f5e844a63f61",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.json",
+      "bytes": 4915,
+      "sha256": "ef55a60685cd872478c2dcf879c674387ea14a6fc454f772cf832791a104398f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.raw",
+      "bytes": 7681,
+      "sha256": "ebd234c188cdc2796f1a46a22df0927bf1848281d36f4d1ecd7a21a4cddbb384",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-release44.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-release44.result.json",
+      "bytes": 730,
+      "sha256": "62d45a14e55ca4f426169a5d0f15e11b693af8077be3b8e77441bc7bb24b40d2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.after-source.zip",
+      "bytes": 2226,
+      "sha256": "290a880cea31a3bad92bba740a7ddd0de462440d2a467bd35827f5d2a1795b0f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.attempts/1792316995340938739-0bbb681fc0814ef091127c52f6b9662a/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.attempts/1792316995340938739-0bbb681fc0814ef091127c52f6b9662a/receipt.json",
+      "bytes": 1286,
+      "sha256": "e0b263d60e4a63b4b5a73dec2186b76bf89fd06879e694921404b6747b5c0256",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.attempts/1792316995340938739-0bbb681fc0814ef091127c52f6b9662a/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.attempts/1792316995340938739-0bbb681fc0814ef091127c52f6b9662a/stderr.txt",
+      "bytes": 4957,
+      "sha256": "ddaef1ba29719bd28e1a70c5df07e715375df3158a3d54a8b9bec88d81d99eed",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.attempts/1792316995340938739-0bbb681fc0814ef091127c52f6b9662a/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.attempts/1792316995340938739-0bbb681fc0814ef091127c52f6b9662a/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.before-source.zip",
+      "bytes": 174023,
+      "sha256": "4e6cdbd8388abc165cb0531ceba19a8cf9f3a05ec7abed5922ae5376d965ba4c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.command.json",
+      "bytes": 1447,
+      "sha256": "aea44e19dc4036f960e11377bc139115f37b30e895b62d40cbe42090df5034fc",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.json",
+      "bytes": 3243,
+      "sha256": "2b5bea83798387f5d1f6085305987d836630e7b1c932bf214c39ca23e895c12d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.raw",
+      "bytes": 4957,
+      "sha256": "ddaef1ba29719bd28e1a70c5df07e715375df3158a3d54a8b9bec88d81d99eed",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-sdk28.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-sdk28.result.json",
+      "bytes": 732,
+      "sha256": "e27d9b644a9d386a9f9e1bfb3860f652bd058809f6296ab8580da12f7c099f73",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.after-source.zip",
+      "bytes": 2226,
+      "sha256": "33fc7ce4083339d980a8eaa0ad85d895660ae55577956ab7812eaf5bdab6cfb6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.attempts/1792316983040393117-f51cfeae355a437e89c3c6ab73726830/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.attempts/1792316983040393117-f51cfeae355a437e89c3c6ab73726830/receipt.json",
+      "bytes": 1314,
+      "sha256": "29872214de38e3fc4bae8d3d769e4e49f931ca0049f8be0f76371577b69268c0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.attempts/1792316983040393117-f51cfeae355a437e89c3c6ab73726830/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.attempts/1792316983040393117-f51cfeae355a437e89c3c6ab73726830/stderr.txt",
+      "bytes": 3321,
+      "sha256": "4e19e818058efb26a553b21a4461635346605345ff3f92ab95f1f56143824b85",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.attempts/1792316983040393117-f51cfeae355a437e89c3c6ab73726830/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.attempts/1792316983040393117-f51cfeae355a437e89c3c6ab73726830/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.before-source.zip",
+      "bytes": 174023,
+      "sha256": "064551c6be3a5b8b0b805603090d486ea14922e1169d2acadac1224704caaaf2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.command.json",
+      "bytes": 1480,
+      "sha256": "42fd131d5cb162354e98ad96a189a0f33fd63a27e54afa068c729977e215156a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.json",
+      "bytes": 2257,
+      "sha256": "ea8425f3bc1422ea25851d35a03e910d8258424d2b0186fcd606a60b0e70c80f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.raw",
+      "bytes": 3321,
+      "sha256": "4e19e818058efb26a553b21a4461635346605345ff3f92ab95f1f56143824b85",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-selected18.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-selected18.result.json",
+      "bytes": 750,
+      "sha256": "550f74d2fecf66200c11a5c1e2004a0d63286596c1d8d4ead933f122800c370b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.after-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.after-source.zip",
+      "bytes": 2226,
+      "sha256": "91e056eb0e4175153dc59cfcfd48bbec2a7f272d5084913587cbe610ebfdf6d1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.attempts/1792316982304538127-41f9c4ab10594a43a67ca37d255441fd/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.attempts/1792316982304538127-41f9c4ab10594a43a67ca37d255441fd/receipt.json",
+      "bytes": 1318,
+      "sha256": "5c8b40e6f9322ba030100fe01e148128d70c357bda489ee2e23a08bc236d878a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.attempts/1792316982304538127-41f9c4ab10594a43a67ca37d255441fd/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.attempts/1792316982304538127-41f9c4ab10594a43a67ca37d255441fd/stderr.txt",
+      "bytes": 1425,
+      "sha256": "f0298e47eb683d6242cb7df1d71717167977876b290b45a48322301a2cc0c902",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.attempts/1792316982304538127-41f9c4ab10594a43a67ca37d255441fd/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.attempts/1792316982304538127-41f9c4ab10594a43a67ca37d255441fd/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.before-source.zip",
+      "bytes": 174023,
+      "sha256": "064551c6be3a5b8b0b805603090d486ea14922e1169d2acadac1224704caaaf2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.command.json",
+      "bytes": 1485,
+      "sha256": "95af372efab8e7bea8d1677467ae61f4643745f39add558a83cb9cdd8ae556cc",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.json",
+      "bytes": 1043,
+      "sha256": "84cb656091936887f830d7810b588a55311bec94f84d306c35d360fb5345f6ed",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.raw",
+      "bytes": 1425,
+      "sha256": "f0298e47eb683d6242cb7df1d71717167977876b290b45a48322301a2cc0c902",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-spi_config9.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-spi_config9.result.json",
+      "bytes": 752,
+      "sha256": "ac082cfad2674f3e7b7de9a2ccbda544f12c1f4cac558e10285bcee334a07eb6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.after-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.after-source.zip",
+      "bytes": 2227,
+      "sha256": "5564c673f8f11bc1939eac820e8889f10441d0e91299f99295bd76fb86a8db14",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.attempts/1792317253038322022-3fd45e236ea34f9fa91069656bce2a3a/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.attempts/1792317253038322022-3fd45e236ea34f9fa91069656bce2a3a/receipt.json",
+      "bytes": 1329,
+      "sha256": "b195d7e264e3be4dc787d382a05975900608a56fb771179f4fcd7f616866eb6c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.attempts/1792317253038322022-3fd45e236ea34f9fa91069656bce2a3a/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.attempts/1792317253038322022-3fd45e236ea34f9fa91069656bce2a3a/stderr.txt",
+      "bytes": 4164,
+      "sha256": "79b0d31b0b37772ca506a5e728b801d53a0f515c1e0ae68c76cd10334c65deab",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.attempts/1792317253038322022-3fd45e236ea34f9fa91069656bce2a3a/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.attempts/1792317253038322022-3fd45e236ea34f9fa91069656bce2a3a/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.before-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.before-source.zip",
+      "bytes": 174024,
+      "sha256": "a5a15587298cbbbd178a07406f544daabfdaef766a584a95c7d17c4398883f58",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.command.json",
+      "bytes": 1503,
+      "sha256": "dd774c6c307594f575901898f74fb74ba4ab66185d3c7197ba54c98ff8e405a0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.json",
+      "bytes": 2756,
+      "sha256": "b8f73f90c26c2f9d1b2d609195605e53e77dfe5fedb15cd024481011ea96f895",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.raw",
+      "bytes": 4164,
+      "sha256": "79b0d31b0b37772ca506a5e728b801d53a0f515c1e0ae68c76cd10334c65deab",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24-r2.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24-r2.result.json",
+      "bytes": 750,
+      "sha256": "5856facfc810f6a87fe070d11f7b1f202b85944aa0801ca5d4c566ebc1b846bf",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.after-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.after-source.zip",
+      "bytes": 2227,
+      "sha256": "c3fc8194a3532d422378d89b1bdf2af86707ed74421f0c5e8d7dff1eeababd9a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/receipt.json",
+      "bytes": 1317,
+      "sha256": "85d795f4579aa9586ef8fb97fa38a9e0fcbe1fcea66a2464511e52b24a73843f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/stderr.txt",
+      "bytes": 4164,
+      "sha256": "6a61191a63280c709c3417fd77508727768b77c3c9166bf3d3cbd5511dada61c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.before-source.json",
+      "bytes": 6314,
+      "sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.before-source.zip",
+      "bytes": 174023,
+      "sha256": "00944fddd493721f0676bf9a149c638e47d2439aeb4b93c17cd1dd96333a6db6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.command.json",
+      "bytes": 1488,
+      "sha256": "e852e2abc8e4dca0a984e2e4f574ec4d6a70ff3f03d3bb74e9f2fe1efa108e9a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.json",
+      "bytes": 2756,
+      "sha256": "b8f73f90c26c2f9d1b2d609195605e53e77dfe5fedb15cd024481011ea96f895",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.raw",
+      "bytes": 4164,
+      "sha256": "6a61191a63280c709c3417fd77508727768b77c3c9166bf3d3cbd5511dada61c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-python-work_packages24.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.result.json",
+      "bytes": 744,
+      "sha256": "f97582f3fbac453ee188f2f15cc66e991ed2869d3514f747c1c107ba7aafb55e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-source33-and-execution-freeze-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-source33-and-execution-freeze-r1.json",
+      "bytes": 15017,
+      "sha256": "50a7fc913098dea0185602eb528b8002fbd66b4eaf05e27ff825b3d2f7fa7751",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-pre-spawn-resource-failure-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-pre-spawn-resource-failure-r1.json",
+      "bytes": 524,
+      "sha256": "4383825e119f57e68a9bf5232f325f84907b2aa6c82b4c6d5bca3fd5b3a23e7e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.after-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.after-source.zip",
+      "bytes": 2227,
+      "sha256": "5525b60b52acf42d5e6e2954c965b216685765b6a86aba28b275935d7de7e1e4",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.attempts/1792318029173894821-7953afea29404aacb6c92786b2b4269f/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.attempts/1792318029173894821-7953afea29404aacb6c92786b2b4269f/receipt.json",
+      "bytes": 2644,
+      "sha256": "f5699b39a2c4ff1fa631493b2e34dd5d7d317c68ffc43aab2f8d66e9548cc5dc",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.attempts/1792318029173894821-7953afea29404aacb6c92786b2b4269f/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.attempts/1792318029173894821-7953afea29404aacb6c92786b2b4269f/stderr.txt",
+      "bytes": 281,
+      "sha256": "3bfa06fc32a9e59a5dba754851fa204611699142133e271c27f99cafdfbd073d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.attempts/1792318029173894821-7953afea29404aacb6c92786b2b4269f/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.attempts/1792318029173894821-7953afea29404aacb6c92786b2b4269f/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.before-source.json",
+      "bytes": 6314,
+      "sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.before-source.zip",
+      "bytes": 174024,
+      "sha256": "a3c590a205051b0c6b70e4ca81820f93beede782dc04214c0dd98c548ab91a60",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.command.json",
+      "bytes": 2803,
+      "sha256": "e0dcbdd4aa5df69ed438f6f8ce19ad90b6bbdfb06be5c89ceb5f9d37c558261d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.json",
+      "bytes": 356,
+      "sha256": "0141b8910ad48b5158cd5dc22c30753ab57e8ef94cb737d2905d77f11431c562",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.raw",
+      "bytes": 281,
+      "sha256": "3bfa06fc32a9e59a5dba754851fa204611699142133e271c27f99cafdfbd073d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/final-style30-r2.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-style30-r2.result.json",
+      "bytes": 2095,
+      "sha256": "5404c50098fea09076fb949b711dc8a39a289a1ce3e1e835bbb126ba91a23cf3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.attempts/1792315126708662730-f0e7321e7d8742c78ecdac1a8006539b/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.attempts/1792315126708662730-f0e7321e7d8742c78ecdac1a8006539b/receipt.json",
+      "bytes": 1288,
+      "sha256": "2b840cfe95dc1f165ca1bb7a3550657a118ebc37219dab89e65ef21d6ba31f8a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.attempts/1792315126708662730-f0e7321e7d8742c78ecdac1a8006539b/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.attempts/1792315126708662730-f0e7321e7d8742c78ecdac1a8006539b/stderr.txt",
+      "bytes": 1512,
+      "sha256": "12b237dd4319b7e6bdec39b96739640ab905cd9cac276f86a7f382ca9b69e627",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.attempts/1792315126708662730-f0e7321e7d8742c78ecdac1a8006539b/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.attempts/1792315126708662730-f0e7321e7d8742c78ecdac1a8006539b/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.command.json",
+      "bytes": 1450,
+      "sha256": "733f95e6c13d7ed59cf97b7053eefd88d7df16f17aececc2bade95c111d5dea6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.json",
+      "bytes": 1049,
+      "sha256": "503a8d96f12c29ddc8dbac10d89c8ae7fff47b3816072ea6c55a6f17de74e963",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.raw",
+      "bytes": 1512,
+      "sha256": "12b237dd4319b7e6bdec39b96739640ab905cd9cac276f86a7f382ca9b69e627",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-green.result.json",
+      "bytes": 637,
+      "sha256": "6a6cb9f28cc0cc52f88c9cfddb65793d6c0e8d4193a0eecf90306a1d76a9fcab",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/receipt.json",
+      "bytes": 1280,
+      "sha256": "d8c00ce20af8a754ea5a1d6193646ce0eb590540508299fecf022b00f9a0e66a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/stderr.txt",
+      "bytes": 2550,
+      "sha256": "2e8e0380d207fd369596fa4bc3a69c2e59689ab092fae423466e8f6640e0c42e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.command.json",
+      "bytes": 1440,
+      "sha256": "69962c7640b11707f7cb7339c95426f3668b395e181b5146f5c1f54804043fac",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.json",
+      "bytes": 1191,
+      "sha256": "430b0c2c7ca360417ee5c4a5e58c4b1a8ccd32bec8e1178c988534ef618ee3c3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.raw",
+      "bytes": 2550,
+      "sha256": "2e8e0380d207fd369596fa4bc3a69c2e59689ab092fae423466e8f6640e0c42e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/formal-h74329-red.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.result.json",
+      "bytes": 633,
+      "sha256": "eb827dfaec29734b13b2d0c3796adf1c898216177a2f37c2425a2c856bdb4a8d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/owned-submodule-registration-readonly-preflight-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/owned-submodule-registration-readonly-preflight-r1.json",
+      "bytes": 3634,
+      "sha256": "a352e34a146b8d5eca581503f7cd12176e44607c0b79fc8ff2f2b963912f343f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-closure-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-closure-r1.json",
+      "bytes": 4082,
+      "sha256": "4131d38a06c3893454cdece74b453395299e30d8441957d8433305f3f3e7f61e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.after-source.json",
+      "bytes": 6314,
+      "sha256": "249d90e8862295aeb6589e998778fc9e58d0cf05f6f657767ecfdd47a0804976",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.after-source.zip",
+      "bytes": 2236,
+      "sha256": "183f56bbb42aeb0b8092f62b3d48d24177c432177a1eda143cd2d3e27e430200",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/receipt.json",
+      "bytes": 1357,
+      "sha256": "3ecb3b033811cf958f13e3fdb3f2f4b7a4a89c5df8c7a37e5cf1ed98cbab268e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/stderr.txt",
+      "bytes": 8000,
+      "sha256": "42fe7923e9db4adb87131780ac40f0b2ab93caee62e7f0f3677ec7c02c3dcebf",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.before-source.json",
+      "bytes": 6314,
+      "sha256": "249d90e8862295aeb6589e998778fc9e58d0cf05f6f657767ecfdd47a0804976",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.before-source.zip",
+      "bytes": 171983,
+      "sha256": "4e8b2b79e94a082d0bea42bdd7cd591ca8c00d28d78c5d6a2350a7c0816d5ca9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.command.json",
+      "bytes": 1537,
+      "sha256": "8dc74c05576d6052d6b602f6741b172d4e9a768a71b48ef6af410b1aeb19d9ca",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.json",
+      "bytes": 5208,
+      "sha256": "36a7b29784281362cfb23d0d2dcb6597ece7eb5e5c93542e009b167d95a404fb",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.raw",
+      "bytes": 8000,
+      "sha256": "42fe7923e9db4adb87131780ac40f0b2ab93caee62e7f0f3677ec7c02c3dcebf",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.result.json",
+      "bytes": 671,
+      "sha256": "6e28dfa764a1bc355f56d41572dd442fc2af6b26b11e8cd829b0f4efc6b09c51",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.after-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.after-source.json",
+      "bytes": 6314,
+      "sha256": "87a0041239c1bfe39695b746891e7026f50f8831b1286caf2a50ec7d8798e08d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.after-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.after-source.zip",
+      "bytes": 2236,
+      "sha256": "61dd0a989cafd58dcd4a233576fb3c3b93a8c20da17488e8fac8c68225aa11b4",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/receipt.json",
+      "bytes": 1350,
+      "sha256": "e6248fa5d9238a66648c94acba09b7db4313172f1acc22ed8c54669f11f61c7e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/stderr.txt",
+      "bytes": 15768,
+      "sha256": "90571c64ab046e825950bb42beb729b0240ed17dd66fdc77657152bdc2c90fa8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.before-source.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.before-source.json",
+      "bytes": 6314,
+      "sha256": "87a0041239c1bfe39695b746891e7026f50f8831b1286caf2a50ec7d8798e08d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.before-source.zip",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.before-source.zip",
+      "bytes": 171749,
+      "sha256": "d0f203aa82638e2c27b87a48da3382913ecf95ed1e92e5607abf99dc1da62c69",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.command.json",
+      "bytes": 1528,
+      "sha256": "431b230e932d97d957f144e7910322d3ecded74d253e991ee63d75ab4faff6c5",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.json",
+      "bytes": 6427,
+      "sha256": "aa3f618ef447c108b8bfcb599d7a23445f5a2ba726ebed39bf0948a59ca2e1d6",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.raw",
+      "bytes": 15768,
+      "sha256": "90571c64ab046e825950bb42beb729b0240ed17dd66fdc77657152bdc2c90fa8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-hardlink-owned-project-red.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.result.json",
+      "bytes": 667,
+      "sha256": "6d7af9773c11ac7d97bf38c08745b70647c35683b860540c23c5f4bb7d56f9f5",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red-source.tar.gz",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red-source.tar.gz",
+      "bytes": 9598,
+      "sha256": "5d67a20d03b80c7f6de870d15e16dc57f7149d276ed63b099cc49179fb84aff8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.attempts/1792314639058577459-48b5364fb2944940ad692105fe6dc27a/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.attempts/1792314639058577459-48b5364fb2944940ad692105fe6dc27a/receipt.json",
+      "bytes": 1314,
+      "sha256": "a182e8255f5cc4b371fc1b506aac34d2155959ffc59b2612364299be0549fef8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.attempts/1792314639058577459-48b5364fb2944940ad692105fe6dc27a/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.attempts/1792314639058577459-48b5364fb2944940ad692105fe6dc27a/stderr.txt",
+      "bytes": 14275,
+      "sha256": "fdb7e0793ff64f00a9d60ca4bf26b900aa39a3d87e9a6755629dfe23be863e93",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.attempts/1792314639058577459-48b5364fb2944940ad692105fe6dc27a/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.attempts/1792314639058577459-48b5364fb2944940ad692105fe6dc27a/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.command.json",
+      "bytes": 1483,
+      "sha256": "a67372d541fda394a1511a9d0026a988567ffb96f86a53a599828dc3482e6e40",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.json",
+      "bytes": 5664,
+      "sha256": "380393a39ff545706b95f33a592f96e1de4560db587d85e27ecbd0291d91f76f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.raw",
+      "bytes": 14275,
+      "sha256": "fdb7e0793ff64f00a9d60ca4bf26b900aa39a3d87e9a6755629dfe23be863e93",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-first-red.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-first-red.result.json",
+      "bytes": 649,
+      "sha256": "c1f1b2d51d568f659057017c1c505f8a0e96bc569d6cb8b9208cefed8a7df534",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.attempts/1792314685235700186-b3b10b7cc5d847fe93d628c9f288485d/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.attempts/1792314685235700186-b3b10b7cc5d847fe93d628c9f288485d/receipt.json",
+      "bytes": 1309,
+      "sha256": "586f0f3355c8c21e884db3e70df4ee9ee7ba6da0e00678056e12e485f642de29",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.attempts/1792314685235700186-b3b10b7cc5d847fe93d628c9f288485d/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.attempts/1792314685235700186-b3b10b7cc5d847fe93d628c9f288485d/stderr.txt",
+      "bytes": 6968,
+      "sha256": "4c7aa3061b3e5de1034287a0e21c99ab2bf1ab08a4c31878f4d46e2e7f6cd162",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.attempts/1792314685235700186-b3b10b7cc5d847fe93d628c9f288485d/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.attempts/1792314685235700186-b3b10b7cc5d847fe93d628c9f288485d/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.command.json",
+      "bytes": 1477,
+      "sha256": "b5475f5911131915020535a6aeaeb1928293afa4746b6dcbeb2338bc2681a150",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.json",
+      "bytes": 4554,
+      "sha256": "5824ac978fad99fb394ae78834a48ab3162db081b1a56ab25cd56cb5e5fcd4bc",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.raw",
+      "bytes": 6968,
+      "sha256": "4c7aa3061b3e5de1034287a0e21c99ab2bf1ab08a4c31878f4d46e2e7f6cd162",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/provider-project-green-r1.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-project-green-r1.result.json",
+      "bytes": 647,
+      "sha256": "0714e2ba5a8a29633474b2058b1c5e15f9f904cf6174da60e4740fe0326dfdf0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.attempts/1792315262825237351-ee7ff0e9020644d2b3b2d82bbffd0cc5/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.attempts/1792315262825237351-ee7ff0e9020644d2b3b2d82bbffd0cc5/receipt.json",
+      "bytes": 1307,
+      "sha256": "68bf2892792659d1efa252183c9317ffc25bdd7ff4aaa25ce966fd9875f64022",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.attempts/1792315262825237351-ee7ff0e9020644d2b3b2d82bbffd0cc5/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.attempts/1792315262825237351-ee7ff0e9020644d2b3b2d82bbffd0cc5/stderr.txt",
+      "bytes": 7681,
+      "sha256": "38f8bd6bebbba7632c04dc9b09701eaa78943a08413c8ee2cff2893d312d9d38",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.attempts/1792315262825237351-ee7ff0e9020644d2b3b2d82bbffd0cc5/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.attempts/1792315262825237351-ee7ff0e9020644d2b3b2d82bbffd0cc5/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.command.json",
+      "bytes": 1476,
+      "sha256": "f08bbfa6ab1f6a93a4ce3bd7f0bce07f29e7995e7fbaf8e804327359709325ad",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.json",
+      "bytes": 4915,
+      "sha256": "ef55a60685cd872478c2dcf879c674387ea14a6fc454f772cf832791a104398f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.raw",
+      "bytes": 7681,
+      "sha256": "38f8bd6bebbba7632c04dc9b09701eaa78943a08413c8ee2cff2893d312d9d38",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/release-transport-green-r1.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/release-transport-green-r1.result.json",
+      "bytes": 644,
+      "sha256": "aecb92db0564d78d80aa1cc3b33b1f965c6811869a188169ccbae02c9abefc7c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/receipt.json",
+      "bytes": 1330,
+      "sha256": "2448a5a7b1c5fc581738ec53ee9b479e4746f980a4c37b0237b5e47aa5d04644",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/stderr.txt",
+      "bytes": 4779,
+      "sha256": "357402e79349b5c5ba70dc8ad1d8bea0ba82c09a869b957d6dcfb503221e8ad8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.command.json",
+      "bytes": 1502,
+      "sha256": "1a3bd56d0a327f991dacdfdc4c9ee2986d3b651d4e8f70a13aa1d72983d9af35",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.json",
+      "bytes": 3131,
+      "sha256": "18e67bec3360ace9b7b3f335e6c176c167b0212524e68a39d788f49e3f8f897b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.raw",
+      "bytes": 4779,
+      "sha256": "357402e79349b5c5ba70dc8ad1d8bea0ba82c09a869b957d6dcfb503221e8ad8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-boundaries-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.result.json",
+      "bytes": 660,
+      "sha256": "c47753a86aa45a9e6ade469a9ed6e8c3f8f2cae90c68ea1fe8003c6014b7853d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.attempts/1792314981280236056-aa1e0ca5e37742bcb1571416d89c3231/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.attempts/1792314981280236056-aa1e0ca5e37742bcb1571416d89c3231/receipt.json",
+      "bytes": 1317,
+      "sha256": "3dee30af7d078a092e7eeaeda22b67b054e55cd247bf7e1bef20a02d9db74c05",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.attempts/1792314981280236056-aa1e0ca5e37742bcb1571416d89c3231/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.attempts/1792314981280236056-aa1e0ca5e37742bcb1571416d89c3231/stderr.txt",
+      "bytes": 5536,
+      "sha256": "a91b16988f9f2aa3b4b55145ef153c02e4d30b93a5af4002be1e2d9ab9231ab1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.attempts/1792314981280236056-aa1e0ca5e37742bcb1571416d89c3231/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.attempts/1792314981280236056-aa1e0ca5e37742bcb1571416d89c3231/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.command.json",
+      "bytes": 1486,
+      "sha256": "99f0793da81215fd9c1a160efbbace100e47bcb7780a06f9ef0ff798337b8c78",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.json",
+      "bytes": 3132,
+      "sha256": "6e02394353fc9a4a2f0adacc20e4d117ec26b53f34d60eb759e4509764715e00",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.raw",
+      "bytes": 5536,
+      "sha256": "a91b16988f9f2aa3b4b55145ef153c02e4d30b93a5af4002be1e2d9ab9231ab1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r1.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r1.result.json",
+      "bytes": 654,
+      "sha256": "f9b462cd354083d8d2c6975fd7b7efb90abed5665a2032b6096ab926c27ac3a0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.attempts/1792315035387133967-94b9bcbdd83c479c9844c10dbdf6c043/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.attempts/1792315035387133967-94b9bcbdd83c479c9844c10dbdf6c043/receipt.json",
+      "bytes": 1318,
+      "sha256": "f99c913588443e752e8fc865d3e42acf3c7b8a30a7b6e37e30c5cc99dea4e9f0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.attempts/1792315035387133967-94b9bcbdd83c479c9844c10dbdf6c043/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.attempts/1792315035387133967-94b9bcbdd83c479c9844c10dbdf6c043/stderr.txt",
+      "bytes": 4587,
+      "sha256": "4118bc93940d0d57f46ca137b91ad8901444d4f9a5b8e121113f2690ac8567ea",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.attempts/1792315035387133967-94b9bcbdd83c479c9844c10dbdf6c043/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.attempts/1792315035387133967-94b9bcbdd83c479c9844c10dbdf6c043/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.command.json",
+      "bytes": 1487,
+      "sha256": "4c2b10007ff5bd0f994575aad6785eae42d1bf3161bbaa5a6eedaca591ea8dd1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.json",
+      "bytes": 3012,
+      "sha256": "904f1b5d3b45db8667e496a8c98a733c2f0c40a4ec0a87ef79d76f17478f840c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.raw",
+      "bytes": 4587,
+      "sha256": "4118bc93940d0d57f46ca137b91ad8901444d4f9a5b8e121113f2690ac8567ea",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-green-r2.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-green-r2.result.json",
+      "bytes": 654,
+      "sha256": "122e72966c2930a94de5ac331e344af2f2575b3cc4cf2ffd71bca1771a53dd2b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.attempts/1792314947364376766-1d97a635b65d4764aef28fdf4857558c/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.attempts/1792314947364376766-1d97a635b65d4764aef28fdf4857558c/receipt.json",
+      "bytes": 1298,
+      "sha256": "439177b07deddf29c30a06d424aea9a27f3025f53e258c7e35a6b84bfafb8d09",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.attempts/1792314947364376766-1d97a635b65d4764aef28fdf4857558c/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.attempts/1792314947364376766-1d97a635b65d4764aef28fdf4857558c/stderr.txt",
+      "bytes": 17530,
+      "sha256": "e7cfffa1de042c0faf6703800aaf5b6aa5a5b5361312771289c7a971653f2e39",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.attempts/1792314947364376766-1d97a635b65d4764aef28fdf4857558c/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.attempts/1792314947364376766-1d97a635b65d4764aef28fdf4857558c/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.command.json",
+      "bytes": 1462,
+      "sha256": "bc9969ec5ae5e177bc56272a8af6645d451b3042a77047955ad4199627d9b53a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.json",
+      "bytes": 4512,
+      "sha256": "bd541a9e29c2dec3c6cd350f99b8f12c60b37b62fd167b72e1ac7a1e86b82f50",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.raw",
+      "bytes": 17530,
+      "sha256": "e7cfffa1de042c0faf6703800aaf5b6aa5a5b5361312771289c7a971653f2e39",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-consumer-plan-red.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-plan-red.result.json",
+      "bytes": 644,
+      "sha256": "34b11aaf32d578347c144246c746a641296ecb42fdad3a9bb48d5662798badc3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/receipt.json",
+      "bytes": 1322,
+      "sha256": "5af851213f42fc0a2ef619f465ef65499fd5c9655251404ef921ecf79c3449ad",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/stderr.txt",
+      "bytes": 4957,
+      "sha256": "229ed12ee8837b7007e0fdffab66568485bf6dae3701393adc10d2cdd0dfa6e4",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.command.json",
+      "bytes": 1492,
+      "sha256": "123bb0bef5e08a96532b13bcd0d6f2a1fd5fce8b5c0d448bf1278da73d809f3b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.json",
+      "bytes": 3243,
+      "sha256": "2b5bea83798387f5d1f6085305987d836630e7b1c932bf214c39ca23e895c12d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.raw",
+      "bytes": 4957,
+      "sha256": "229ed12ee8837b7007e0fdffab66568485bf6dae3701393adc10d2cdd0dfa6e4",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-new-failure-ports-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.result.json",
+      "bytes": 656,
+      "sha256": "0ca382193942df5b1d285f493cf438d3d3c8370e7a2f7e5e94dcd6febf2cdb46",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.attempts/1792314743586785984-edeab0ea9f80400cb10f01c13e924904/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.attempts/1792314743586785984-edeab0ea9f80400cb10f01c13e924904/receipt.json",
+      "bytes": 1298,
+      "sha256": "1df236f06fb1de43193316f0c7f4cc5822d68396d37a5da366c80d41ff4e7659",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.attempts/1792314743586785984-edeab0ea9f80400cb10f01c13e924904/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.attempts/1792314743586785984-edeab0ea9f80400cb10f01c13e924904/stderr.txt",
+      "bytes": 18199,
+      "sha256": "010c1b5f6c9d7d04da48d50d12b0722b5dea35551a74aeb2be86264bcdd0416c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.attempts/1792314743586785984-edeab0ea9f80400cb10f01c13e924904/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.attempts/1792314743586785984-edeab0ea9f80400cb10f01c13e924904/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.command.json",
+      "bytes": 1462,
+      "sha256": "c6a3d067392bbb9ed73bb478b7b0cf9ad0cf5511c620c99a5abe15167e695251",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.json",
+      "bytes": 2598,
+      "sha256": "4bfe306d9fa6bde0f64b6875b43e58ad30df26c71277c46ae36151bd66cad0e8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.raw",
+      "bytes": 18199,
+      "sha256": "010c1b5f6c9d7d04da48d50d12b0722b5dea35551a74aeb2be86264bcdd0416c",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-first-red.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-first-red.result.json",
+      "bytes": 643,
+      "sha256": "4d7ee6f51bde441c89e2bbfafc51b0f08038da8f1573b12bb38a1ffc9d49a41f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.attempts/1792314844960979656-295a6f432d8146959fbb121a00e597f4/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.attempts/1792314844960979656-295a6f432d8146959fbb121a00e597f4/receipt.json",
+      "bytes": 1292,
+      "sha256": "370b889b0fbbefc9c2a9fa7610cb4aa90047181a769a8cd5950db0f169501eae",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.attempts/1792314844960979656-295a6f432d8146959fbb121a00e597f4/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.attempts/1792314844960979656-295a6f432d8146959fbb121a00e597f4/stderr.txt",
+      "bytes": 2743,
+      "sha256": "159c4e802bb7c7c49ec04009d0433455839a264c9debf6723b10a98aa4f208ec",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.attempts/1792314844960979656-295a6f432d8146959fbb121a00e597f4/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.attempts/1792314844960979656-295a6f432d8146959fbb121a00e597f4/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.command.json",
+      "bytes": 1455,
+      "sha256": "f60bcf0afbe87f9be733218428737217119e7eb65a6cd0003238259aeeaf3c2e",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.json",
+      "bytes": 1813,
+      "sha256": "da96aad4f4ec49523c96300de324ba55c88c87c6173ed4d3429cb95c0285eb3d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.raw",
+      "bytes": 2743,
+      "sha256": "159c4e802bb7c7c49ec04009d0433455839a264c9debf6723b10a98aa4f208ec",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/sdk-payload-green-r1.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-payload-green-r1.result.json",
+      "bytes": 641,
+      "sha256": "f503c794bf192d7648409cca1b55fd2e7fa91461711bbdf108325315a6c24a43",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.attempts/1792315190981187015-ce9efe8947ea42c8aad059fd06106b16/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.attempts/1792315190981187015-ce9efe8947ea42c8aad059fd06106b16/receipt.json",
+      "bytes": 1318,
+      "sha256": "3ce25e21a4cf85708029ff0d783609bb7662e0770ffeb15abc9fc88231b5a75d",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.attempts/1792315190981187015-ce9efe8947ea42c8aad059fd06106b16/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.attempts/1792315190981187015-ce9efe8947ea42c8aad059fd06106b16/stderr.txt",
+      "bytes": 3321,
+      "sha256": "7a288106de02afe60c78afffb78a6699b7cf01cc01511cd7175f4261420ab1ff",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.attempts/1792315190981187015-ce9efe8947ea42c8aad059fd06106b16/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.attempts/1792315190981187015-ce9efe8947ea42c8aad059fd06106b16/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.command.json",
+      "bytes": 1485,
+      "sha256": "ed8b791f1d39e5c356fc9fe936068452280e50fbf106a803685c8a2cdaf46694",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.json",
+      "bytes": 2257,
+      "sha256": "ea8425f3bc1422ea25851d35a03e910d8258424d2b0186fcd606a60b0e70c80f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.raw",
+      "bytes": 3321,
+      "sha256": "7a288106de02afe60c78afffb78a6699b7cf01cc01511cd7175f4261420ab1ff",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/selected-contracts-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/selected-contracts-green.result.json",
+      "bytes": 658,
+      "sha256": "bc9c17acd612dee892d06081fe7729eaade487808de03a29fdeeb61f85211287",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/source33-operations-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/source33-operations-r1.json",
+      "bytes": 11385,
+      "sha256": "417b43575507a77e15bebe4901a31bf7e87eff2f58a569c4624f108dacc68c8a",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/receipt.json",
+      "bytes": 1286,
+      "sha256": "7d4b5615ff99b49166ccc2bff5cfbc11968057cb5307dfc6e81d7e46b081bc99",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/stderr.txt",
+      "bytes": 1425,
+      "sha256": "6deae8b094413fd3bd9199f0bba32f2ad59d371d2a49efcc9040d3312bd39e45",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.command.json",
+      "bytes": 1445,
+      "sha256": "aba974cf0cf11bb642c0e0ba27befe03c4e6c6eaffda77cb1fdc5b7a6cb63cd9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.json",
+      "bytes": 1043,
+      "sha256": "84cb656091936887f830d7810b588a55311bec94f84d306c35d360fb5345f6ed",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.raw",
+      "bytes": 1425,
+      "sha256": "6deae8b094413fd3bd9199f0bba32f2ad59d371d2a49efcc9040d3312bd39e45",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/spi-config-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.result.json",
+      "bytes": 642,
+      "sha256": "68f5f47e5a2e675520a16adbe9ce3729e3b45904bd0ac6245bf6a59361db9441",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/stable-review-source-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/stable-review-source-r1.json",
+      "bytes": 11390,
+      "sha256": "4e8eed460d026820e20131dd3508275915d5836e370dcb7924a6a86584cc0119",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-final-first-guard-failure-addendum-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-final-first-guard-failure-addendum-r1.json",
+      "bytes": 747,
+      "sha256": "9e9d85950aede5e4401f6603edab3b7e67a26985bd03a6b31bbb9f03b1337bf1",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.attempts/1792315352856075789-32406c5429f24bb4b9b667946ab4f4a0/receipt.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.attempts/1792315352856075789-32406c5429f24bb4b9b667946ab4f4a0/receipt.json",
+      "bytes": 1282,
+      "sha256": "cc1f31804cbc37b130d4abf898be3d4ab12725b6a1856e7d8435c5604f209429",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.attempts/1792315352856075789-32406c5429f24bb4b9b667946ab4f4a0/stderr.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.attempts/1792315352856075789-32406c5429f24bb4b9b667946ab4f4a0/stderr.txt",
+      "bytes": 4164,
+      "sha256": "824ad8f81923f169501aa8db5bd3a5eb30de3afe71c35b45a00399c41bd2ef16",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.attempts/1792315352856075789-32406c5429f24bb4b9b667946ab4f4a0/stdout.txt.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.attempts/1792315352856075789-32406c5429f24bb4b9b667946ab4f4a0/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.command.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.command.json",
+      "bytes": 1444,
+      "sha256": "7c95c58243b791edc703cc1527f68d3cf5b48dd94e155f440edf1de53da15c51",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.json",
+      "bytes": 2756,
+      "sha256": "b8f73f90c26c2f9d1b2d609195605e53e77dfe5fedb15cd024481011ea96f895",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.raw.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.raw",
+      "bytes": 4164,
+      "sha256": "824ad8f81923f169501aa8db5bd3a5eb30de3afe71c35b45a00399c41bd2ef16",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/author/work-packages-green.result.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/work-packages-green.result.json",
+      "bytes": 632,
+      "sha256": "9c995ea60c03c33b5a1b88efdff18e44cf12dacc89db3cb4f64d4cd76092afe4",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/checks-evidence-map-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/checks-evidence-map-r1.json",
+      "bytes": 6050,
+      "sha256": "f8e63440246190c24e22334d5852f02e1a612e957d1543ac3900c63da969503b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/checks-evidence-r1.tar.gz",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/checks-evidence-r1.tar.gz",
+      "bytes": 15727,
+      "sha256": "0f4be7d04a26969feced87148f28601bd3db22fe6cb727bb8972478867074aeb",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/drafts/docs/design/io-evolution-execution.csv.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/drafts/docs/design/io-evolution-execution.csv",
+      "bytes": 11042,
+      "sha256": "c99c5f99a48b429cd8b2da36cab1271d977cff7d5cd37ceef0deefd3805b874f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/drafts/docs/design/provider-assemblies.md.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/drafts/docs/design/provider-assemblies.md",
+      "bytes": 5646,
+      "sha256": "1bbfb23bf0714762926565a85b492ce1cf8846cf203e31ec420de01b7585aafa",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/drafts/soc/stm32h743/README.md.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/drafts/soc/stm32h743/README.md",
+      "bytes": 36026,
+      "sha256": "4bce41176f2c7419ba7d280f985b250203b386d0b6783c315cc0ecea358cfc89",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/drafts/tools/release/README.md.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/drafts/tools/release/README.md",
+      "bytes": 7002,
+      "sha256": "a92860b63e1476820c2d6480c4c23e94eb86370cfa20780c880558296dca5752",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/extraction-evidence-map-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/extraction-evidence-map-r1.json",
+      "bytes": 8581,
+      "sha256": "db377f86785b7af6d8c289340f942c072eb0cd13f0e3f7edf99e07c71f232609",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/extraction-evidence-r1.tar.gz",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/extraction-evidence-r1.tar.gz",
+      "bytes": 26002,
+      "sha256": "6b0c01c2cdceb8497117fd4fe2541993931373e4696f6eac288d8dd8fc79c152",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/files/docs/locale/en/LC_MESSAGES/delivery/capabilities.po.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 121941,
+      "sha256": "59720bed9324e771a8c840da6e12363799b670c58f8fd7d1a0e78b7b3387f84f",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/files/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 121669,
+      "sha256": "d6c1ba0a6ba236dff62a6e42a3cb95f15474a1619e90cec52c37006ab54b8d77",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/files/docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "bytes": 13382,
+      "sha256": "7d5bf3a945831c039b522ba6ee07b7faf8e9705b8b9dc7323c3717eed4013963",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/final-source8-approved-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/final-source8-approved-r1.json",
+      "bytes": 7703,
+      "sha256": "814a586e4d8a4e08bf913eef59352d9c7898407aa3453e3ca456509e8630b073",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/handoff-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/handoff-r1.json",
+      "bytes": 1425,
+      "sha256": "321f831f615bc336e98e590b30c555b34150e8ccecec5177775271426e883fa0",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/merge_catalogs.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/merge_catalogs.py",
+      "bytes": 4524,
+      "sha256": "e766d40252fa38b3c90ec75c7c77fac13de824d360d6c311ed6e03c23f0d846b",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/pre-extract-source8.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/pre-extract-source8.json",
+      "bytes": 1901,
+      "sha256": "41b150e9003f494f375c856cd302b6b329c409809f646b9153967f4fd9e297c5",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/run_checks_prepared.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/run_checks_prepared.py",
+      "bytes": 3482,
+      "sha256": "aa4541a0d39caef890e0c07e605313e99e2d65d10a926a74e37ea6e68f01fad8",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/run_extract_prepared.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/run_extract_prepared.py",
+      "bytes": 4604,
+      "sha256": "b0bcbb067d46ad7c4cea1638cc9fbad2326bb0ed5ffa49febc702a4a1803e300",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/seal_extraction.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/seal_extraction.py",
+      "bytes": 2548,
+      "sha256": "ca947f414d4eab86f45efc9e350583807fd007c37377e38149256c3ce0adebce",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/seal_final_checks.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/seal_final_checks.py",
+      "bytes": 5048,
+      "sha256": "470c86b29ece950a30a10da8c7854a6872a06b84fb2a5de4bcd17edbd5b749cc",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/source8-false-catalog-freeze-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/source8-false-catalog-freeze-r1.json",
+      "bytes": 2530,
+      "sha256": "1c944b2d8eca8639771705f9037b7ec2c031bf2c67c7cf43b54af64ba7e571be",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/text-apply-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/text-apply-r1.json",
+      "bytes": 1615,
+      "sha256": "2e1d2c56acae0bbbe1d8e569b24d6c0126d0b954d5e3f335bee72ecfc9a047ff",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/documentation/text-drafts-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/text-drafts-r1.json",
+      "bytes": 1629,
+      "sha256": "25c5652227a40113c4181e4db706c698a6922bc45b658cae2cf5cb527eddd335",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/executed-helpers/seal-execution-r1.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/seal-execution-r1.py",
+      "bytes": 5071,
+      "sha256": "379fb2cd6242c65c74ae23e7a1486e4438ff06d7d9533fcbe7777274f06172e9",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/executed-helpers/seal-delivery-r1.py.raw",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/seal-delivery-r1.py",
+      "bytes": 9040,
+      "sha256": "24cc2452de683f4b6a320fe326f389c34805e3d36e75d47382339ff9211c84e3",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/independent-reviews/nexus-h743-d3-translation-independent-review-20261018-r1.json",
+      "durable_source": "/dev/shm/nexus-h743-d3-translation-independent-review-20261018-r1.json",
+      "bytes": 15616,
+      "sha256": "0ed115cb36962edf9075374e5767e8aae45b6955053159ea9d7c4e0318d04dad",
+      "mode": 384,
+      "role": "evidence"
+    },
+    {
+      "target": "validation/h743-spi-dma-canonical-sdk-d3-r1/independent-reviews/independent-provider-closure-review-r2.json",
+      "durable_source": "/dev/shm/nexus-h743-d3-provider-entry-early-review-20261018-r1/independent-provider-closure-review-r2.json",
+      "bytes": 8144,
+      "sha256": "56bd61c435419ff9d282e530c883a4360f6e408fd07c76d16217920dc1d07966",
+      "mode": 384,
+      "role": "evidence"
+    }
+  ],
+  "deletions": [
+    {
+      "target": "tests/contracts/h743_assembly/spi-dma.toml",
+      "operation": "delete",
+      "expected_before_sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2",
+      "expected_before_bytes": 491
+    },
+    {
+      "target": "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "operation": "delete",
+      "expected_before_sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f",
+      "expected_before_bytes": 653
+    },
+    {
+      "target": "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "operation": "delete",
+      "expected_before_sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6",
+      "expected_before_bytes": 646
+    }
+  ],
+  "transport_rules": [
+    "files contains source30 and all selected loose evidence; source_operations total33 includes3explicit deletions.",
+    "All evidence original bytes unchanged; historical code/stdout/text targets have .raw suffix, structured JSON/ZIP/GZ unchanged.",
+    "This enclosing manifest is not self-listed; Parent must also retain this original map and final independent review.",
+    "No duplicate target/escape/symlink; each physical source identity directly verified.",
+    "Native matched8 ELF bytes retained original execution domain, volatile;3ARM ELF/BIN/map included execution ZIP."
+  ],
+  "qualification": false
+}

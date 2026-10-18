@@ -1,0 +1,10 @@
+{
+  "classification": "whole24_actual0_but_outer_guard1_serialized_index_changed_no_source_or_stage_change",
+  "before_index_sha256": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+  "after_index_sha256": "9633596fbfac4c65093930be645f055e91327fd6fe07908ae8e50d7b29f29046",
+  "33_source_identities_unchanged": true,
+  "head_unchanged": true,
+  "current_cached_diff_actual_returncode": 0,
+  "cause_boundary": "Independent reviewer reports one default git status --short during this interval; statcache refresh is plausible. No attribution stronger than actual receipts; old outer1 is preserved.",
+  "next": "fresh complete24 and54 with current serialized index; all independent read-only git callers use --no-optional-locks."
+}

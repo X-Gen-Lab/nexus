@@ -1,0 +1,84 @@
+{
+  "kind": "independent-final-byte-path-review-root-D3-catalogue-amendment-map",
+  "reviewed_at_utc": "2026-10-18T10:52:23.991309+00:00",
+  "result": "PASS_EXACT_MAP_FOR_REVIEWED_APPEND_HELPER_ONLY",
+  "map": {
+    "path": "/dev/shm/nexus-d3-catalogue-amendment-main-20261018-r1/normalized-amendment.json",
+    "bytes": 14404,
+    "sha256": "9a08d25665bec4aced2f7ed356758bbe6d8d6085daafbcfe7d0372e1d3fab979",
+    "rows": 28,
+    "source_rows": 2,
+    "evidence_rows": 26,
+    "summed_payload_bytes": 209067
+  },
+  "bound_base": {
+    "root": "/tmp/nexus-io-validation-20261018",
+    "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+    "original_staged_tree": "486d32f18033cc1ef4c25cc2715636d36df6b91e",
+    "base_manifest_sha256": "b0bdaa42c2ef9200e11b8258192e6f5f27e7e55541a1891ab5f30f0b60161852",
+    "original_operations": 392,
+    "original_write_rows": 389,
+    "original_approved_deletes": 3
+  },
+  "independent_checks": [
+    "All28 current durable source regular files read; absolute/nonsymlink source and ancestor constraints, exact byte count/SHA, and declared permission modes where present pass. Sum209067B and row count28 match.",
+    "Every target is canonical relative with no parent traversal or .git component. Exactly two targets lie outside the permitted new evidence prefix, and they are the approved catalogue.json/test_matrix.py paths.",
+    "Author original normalized transport SHA5f2277262d8fd8b720c335828fce055da83db60ccf52404bc75fb5a61aba5b9b remains unchanged and is itself included. All15 author rows match every original non-path field. Both source paths stay exact; exactly13 evidence targets change only the explicitly declared prefix, with original_author_target preserved.",
+    "The13 Root rows are exclusively evidence under the permitted prefix: original author map, final source peer report, failed full-hook ZIP/member map, completed dd parent run metadata, original failure audit, blocked/PASS helper reports, Root normalizer raw, and four unexecuted helper versions as .py.raw.",
+    "Full union of old389 writes/3deletes, new28 rows and reserved normalized-amendment.json/independent-review.json targets has422 exact/casefold unique paths, with no file/ancestor conflicts. No original row/deletion is overwritten by the new targets.",
+    "Live Main HEAD remains dd839d29; cached changed-name set is exactly original392, unstaged diff and untracked-file list empty. All389 existing written worktree bytes/count/SHA and staged blob bytes match original complete manifest; original three approved deletion paths remain absent and unindexed.",
+    "Read-only git ls-files --stage -z returned22837 stage0 entries. Independently serialized Git tree bytes and SHA1 in Python, without executing git write-tree or writing any Git objects; computed staged tree is exactly486d32f18033cc1ef4c25cc2715636d36df6b91e.",
+    "Only read-only Git commands used, each with --no-optional-locks. No source/index/refs mutation, helper execution, stage, test, build, commit or push was performed."
+  ],
+  "source_and_helper_authority": {
+    "source2_review": {
+      "path": "/dev/shm/nexus-h743-d3-catalogue-amendment-independent-review-20261018-r1.json",
+      "bytes": 10795,
+      "sha256": "9e260308f11e74a7e00a97c3ba276855fbc0a9efb9ab5db127f10f00dbbbae83",
+      "scope": "Exactly two source bodies plus owned matrix7 genuine RED errors2/same-tests GREEN0, retained first869 PATH failure1, fresh complete869 GREEN0 and two text files style0. Not Main full hook success."
+    },
+    "append_helper": {
+      "path": "/dev/shm/nexus-d3-catalogue-amendment-main-20261018-r1/append-reviewed-catalogue-r4.py",
+      "bytes": 7973,
+      "sha256": "650b21df5514782e8bf2e01c3ebeafb977f45662c40b27ecc3605ccc2299a074"
+    },
+    "helper_static_PASS_report_sha256": "b258317d2c28ac5a2aef4fcb62ff98df679b7c2f8d6cbbe366ca5f2b49a1022a",
+    "helper_original_BLOCKED_report_sha256": "e054de4f79bdef146cc7190a665b88511d963d4e2227eb705e7df6c766745f28",
+    "source_pair_sha256": [
+      "151de3f45a55bd2b27878349b15e193df0d72115acbab23b43aed62801295dcf",
+      "cb17f06f36356cc842811d451fcee46078c75ff50474c2efc017f7d9c0b2e854"
+    ]
+  },
+  "historical_evidence_boundary": {
+    "failed_full_hook_zip_sha256": "1969c93339bf34543fe89e1d1ebcfe4138e0aee1f81c68c0d8aa55855ea5c3d2",
+    "failed_zip_review": "Previously independently checked18-member CRC/bytes/SHA/permissions/original-byte equality and nested9-row checkpoints. Current exact ZIP/map hashes still match. Original commit1 and configure867 catalogue error remain FAILED.",
+    "parent_ci_run": {
+      "run_id": 39116535698,
+      "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+      "status": "completed",
+      "conclusion": "success",
+      "sha256": "2a27caeeea6ada8bd6906e052fc9bd1baf1c9bb64375aba7975ae82033f9c8d7",
+      "meaning": "Saved API metadata for old dd parent run; prior archived jobs list30completed/success. No fresh amended-source CI or independent remote query claimed."
+    },
+    "normalizer_and_old_helpers": "Transported as historical raw evidence; exact output mapping independently computed instead of trusting normalizer execution. r1/r2/r3 helpers retain their blocked/superseded history."
+  },
+  "expected_next_actual_state": {
+    "operation": "Root invokes reviewed r4 with exact map SHA and this independently hashed review, fixed fresh output, writers paused.",
+    "added_write_rows": 30,
+    "explanation": "28 mapped rows plus enclosing map and this review.",
+    "final_write_rows": 419,
+    "approved_delete_rows": 3,
+    "final_staged_operations": 422,
+    "source_operations": 35,
+    "written_source_paths": 32,
+    "normal_gate": "Fresh full ordinary hook execution still required. No actual append or hook outcome is inferred."
+  },
+  "blockers": [],
+  "qualification": {
+    "final_map_pass": true,
+    "actual_append_executed": false,
+    "fresh_main_full_hook_pass": false,
+    "commit_push_ff_pass": false,
+    "new_arm_sdk_offline_oci_hil_qualification": false
+  }
+}

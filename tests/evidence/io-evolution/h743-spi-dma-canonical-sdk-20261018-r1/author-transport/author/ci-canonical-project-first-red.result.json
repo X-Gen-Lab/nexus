@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    ".github/workflows/test_platform_ci.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.json"
+  ],
+  "actual_returncode": 1,
+  "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/ci-canonical-project-first-red.attempts/1792316797311612186-d2b404e98b604d78959283dd24b3c319/receipt.json",
+  "child_maxrss_KiB": 34320,
+  "headroom_after": 1798242304,
+  "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+}

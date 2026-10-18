@@ -1,0 +1,69 @@
+{
+  "actual_results": {
+    "configure_green_first_attempt": "complete869/2 environment errors: CMake absent from inherited PATH, actual1; raw retained, not GREEN",
+    "configure_green_r2": "same source complete869/0fail/error/skip, actual0 after child-only existing CMake/Ninja PATH preparation",
+    "matrix_green": "same tests complete7/0fail/error/skip, actual0",
+    "matrix_red": "complete7/2 missing-catalogue errors, actual1, no skips",
+    "style": "both whole files actual0"
+  },
+  "all_owned_children_joined": true,
+  "budget": {
+    "attempted_over_cap_write": false,
+    "execution_domain_cap": 33554432,
+    "explicit_parent_revised_feature_allocated_cap": 163840,
+    "initial_feature_allocated_cap": 131072,
+    "new_generated_ir_observation": "raw newly generated IR observation compressed byte-exactly to .json.gz with original identity; original bytes preserved",
+    "no_old_evidence_removed_repacked_or_overwritten": true,
+    "observed_stop_allocated": 131072,
+    "reason": "retaining all original evidence and losslessly verified37-member archive while adding final normalized mapping and handoff metadata"
+  },
+  "execution_archive": {
+    "bytes": 35329,
+    "mode": 384,
+    "path": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/execution-evidence-r1.zip",
+    "sha256": "c04d8bd1034a71f1e63810c2b1c369f97984720f1ab4268d0ab77938a353b7e1"
+  },
+  "execution_member_map": {
+    "bytes": 12876,
+    "mode": 384,
+    "path": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/execution-evidence-map-r1.json",
+    "sha256": "1053edca3f4a7f40a0ddb89b98d6d91d089971b0e5314d70411a359b14ebca21"
+  },
+  "expected_original_tests": {
+    "new_full_suite": 869,
+    "new_module": 7,
+    "old_full_suite": 867,
+    "original_module": 5
+  },
+  "feature": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1",
+  "final_normalized_map": "normalized-transport-r1.json",
+  "main_source_or_index_written": false,
+  "original_d3_source33_exact_unchanged": true,
+  "qualification_clarification": {
+    "catalogue_only_explicit_three_sorted_additions": true,
+    "freeze_environment_boolean": "production_or_test_source_changed_after_matrix_red:false in first freeze refers to executable Python/test bytes; the catalogue production metadata is the explicitly recorded expected edit between RED and GREEN. No assertion that all source35 bytes equal the RED tuple is intended.",
+    "matrix_py_unchanged": true,
+    "test_matrix_red_green_byte_identical": true
+  },
+  "schema": 1,
+  "scope": [
+    "Only owned-root catalogue metadata and test expectations changed.",
+    "Main still needs peer review, exact integration and complete normal hooks.",
+    "No new ARM, SDK, runtime, performance, reproducibility or physical qualification."
+  ],
+  "source_freeze": {
+    "bytes": 9522,
+    "mode": 384,
+    "path": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/final-source2-and-execution-freeze-r1.json",
+    "sha256": "4be216ece66e4cf34ed72cf9d2fc1c0a1823b2209287646c1055e8df344fd1b2"
+  },
+  "source_map": {
+    "bytes": 741,
+    "mode": 384,
+    "path": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/source2-map.json",
+    "sha256": "fed654cfc1b3627f772b4b9d9620ba7c8147214aa50f562f0efb95131b01d880"
+  },
+  "source_operation_count": 2,
+  "staged_committed_pushed": false,
+  "status": "frozen_complete_configure_green_ready_for_independent_review_not_main_admission"
+}

@@ -33,12 +33,14 @@ signature does not establish a different SDK source commit by itself.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-has 31 independent consumer roots and 34 executable images: three C/C++ base
-roots, ten MCU/backend roots and eighteen selected-feature roots. Native time
-pair/empty executables are host observations; MCU images are linked software
-evidence. These counts do not establish physical execution.
+has 34 independent consumer roots and 37 executable images: three C/C++ base
+roots, ten MCU/backend roots and twenty-one selected-feature roots. Four images
+execute as Native programs; 33 MCU images are linked software evidence. The
+29 generic retention checks cover ten MCU/backend and nineteen selected-feature
+images; base image resource checks are a separate scope. These counts describe
+the required plan, not an execution result or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v2`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v3`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -54,6 +56,10 @@ inert archive, manifest and original consumer report. Unsafe paths, links,
 duplicate entries, trailing compressed content and changed bytes fail. Transport
 does not rewrite a failed report or establish that a recorded command executed;
 actual source, job and builder identities retain that separate responsibility.
+
+Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
+source, bytes and hash-pinned helper. The current policy does not accept it as
+a fallback or rewrite it as the 34-root/37-image selection.
 
 Historical schema-1 thirteen-root archives keep their original bytes, source and
 hash-pinned helper for read-only recovery. Current packing and verification do

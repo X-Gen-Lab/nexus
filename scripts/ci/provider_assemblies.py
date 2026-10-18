@@ -19,6 +19,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -35,23 +36,51 @@ from tools.measurement import resources, retention
 from tools.measurement.elf import Elf32
 
 
-def validate_fixtures(root, assemblies, *, family=None):
+def source_path(root, value):
+    """Reject lexical aliases before resolving an explicit owned input."""
+    path = Path(value)
+    if ".." in path.parts:
+        raise EvidenceError("source path cannot contain parent aliases")
+    return path if path.is_absolute() else root / path
+
+
+
+def owned_file(path, *, nonempty=True):
+    """Keep authored selections and owned project files free of aliases."""
+    path = regular_file(path, nonempty=nonempty)
+    if path.stat().st_nlink != 1:
+        raise EvidenceError("owned input hardlinks are not accepted")
+    return path
+
+def validate_fixtures(root, assemblies, *, family=None, project=None):
     """Resolve each explicit, owned firmware fixture once, without mutation."""
     root = root.resolve()
     if not assemblies:
         raise EvidenceError("provider fixture matrix must be nonempty")
+    selected_project = None
+    if project is not None:
+        selected_project = source_path(root, project)
+        if not selected_project.is_relative_to(root / "tests/contracts"):
+            raise EvidenceError("project must be an owned tests/contracts directory")
+        owned_file(selected_project / "CMakeLists.txt")
     rows, seen = [], set()
     for value in assemblies:
-        path = Path(value)
-        if not path.is_absolute():
-            path = root / path
-        path = regular_file(path)
-        if path.suffix != ".toml" or not path.is_relative_to(root / "tests/contracts"):
-            raise EvidenceError("fixture must be an owned tests/contracts TOML")
+        path = owned_file(source_path(root, value))
+        contract = path.is_relative_to(root / "tests/contracts")
+        canonical = path.parent == root / "tools/configure/assemblies"
+        if path.suffix != ".toml" or not (
+                contract or (selected_project is not None and canonical)):
+            raise EvidenceError("fixture must be an owned tests/contracts TOML "
+                                "or explicit canonical input")
         if path in seen:
             raise EvidenceError("duplicate fixture cannot count as another execution")
         seen.add(path)
-        regular_file(path.parent / "CMakeLists.txt")
+        actual_project = selected_project or path.parent
+        owned_file(actual_project / "CMakeLists.txt")
+        if selected_project is not None:
+            authored = tomllib.loads(path.read_text(encoding="utf-8"))
+            if type(authored.get("schema")) is not int or authored["schema"] != 2:
+                raise EvidenceError("explicit project requires assembly schema 2")
         navigation = {}
         resolved = resolve_ir(path, root, input_paths=navigation).to_dict()
         if resolved["cpu"]["arch"] == "native" or resolved["backend"] == "native":
@@ -59,12 +88,15 @@ def validate_fixtures(root, assemblies, *, family=None):
         if family is not None and resolved["soc_family"] != family:
             raise EvidenceError("fixture family differs from requested family")
         inputs = [arch_compile.digest(Path(file)) for file in navigation.values()]
-        rows.append({"assembly": str(path), "resolved": resolved, "inputs": inputs})
+        rows.append({"assembly": str(path), "project": str(actual_project),
+                     "resolved": resolved, "inputs": inputs})
     return rows
 
 
 def fresh_output(path, root):
     path = Path(path).absolute()
+    if ".." in path.parts:
+        raise EvidenceError("output path cannot contain parent aliases")
     if any(item.is_symlink() for item in [path, *path.parents]):
         raise EvidenceError("output path must not be a symlink")
     root = root.resolve()
@@ -275,8 +307,11 @@ def source_inputs(root, fixtures):
     directories = {root / name for name in (
         "arch", "core", "io", "os", "soc", "boards", "components", "cmake",
         "tools/configure", "tools/measurement", "tools/evidence", "dependencies")}
+    projects = set()
     for fixture in fixtures:
         directories.add(Path(fixture["assembly"]).parent)
+        projects.add(Path(fixture.get("project",
+                                      Path(fixture["assembly"]).parent)))
         directories.update(root / item["path"] for item in
                            fixture["resolved"]["source_dependencies"])
         paths.update(Path(item["path"]) for item in fixture["inputs"])
@@ -284,6 +319,16 @@ def source_inputs(root, fixtures):
         paths.update(path for path in directory.rglob("*") if path.is_file()
             and (path.suffix in {".c", ".h", ".S", ".s", ".cmake", ".py", ".json", ".toml", ".ld"}
                  or path.name == "CMakeLists.txt") and ".git" not in path.parts)
+    # An owned CMake project may consume templates or extensionless inputs.
+    # Snapshot its complete file tree rather than infer a second source graph.
+    for project in sorted(projects):
+        for path in project.rglob("*"):
+            if ".git" in path.parts:
+                continue
+            if path.is_symlink():
+                raise EvidenceError("owned project symlinks are not accepted")
+            if path.is_file():
+                paths.add(owned_file(path, nonempty=False))
     # Empty C/header inputs are valid, including locked vendor placeholders.
     # Keep their zero-byte identities in the closure; artifacts stay nonempty.
     return [arch_compile.digest(regular_file(path, nonempty=False))
@@ -296,7 +341,8 @@ def verify_snapshot(root, fixtures, original):
         raise EvidenceError("maintained source input snapshot changed during matrix")
 
 
-def run(root, assemblies, compiler, output, *, family=None, parallel=2):
+def run(root, assemblies, compiler, output, *, family=None, parallel=2,
+        project=None):
     root = root.resolve()
     output = fresh_output(output, root)
     report = {"schema_version": 1, "kind": "selected_provider_assembly_matrix",
@@ -312,7 +358,8 @@ def run(root, assemblies, compiler, output, *, family=None, parallel=2):
             raise EvidenceError("Git environment overrides cannot qualify source identity")
         if type(parallel) is not int or not 1 <= parallel <= 16:
             raise EvidenceError("parallel count must be 1..16")
-        fixtures = validate_fixtures(root, assemblies, family=family)
+        fixtures = validate_fixtures(root, assemblies, family=family,
+                                     project=project)
         report["source_before"] = git_source(root)
         report["source_inputs"] = source_inputs(root, fixtures)
         tools = arch_compile.tools(compiler)
@@ -329,7 +376,7 @@ def run(root, assemblies, compiler, output, *, family=None, parallel=2):
         for index, fixture in enumerate(fixtures):
             path = Path(fixture["assembly"])
             build = output / f"{index:03d}-{path.parent.name}-{path.stem}"
-            recorder.execute([tools["cmake"], "-S", str(path.parent), "-B", str(build),
+            recorder.execute([tools["cmake"], "-S", fixture["project"], "-B", str(build),
                 "-G", "Ninja", "-DCMAKE_MAKE_PROGRAM=" + tools["ninja"],
                 "-DCMAKE_TOOLCHAIN_FILE=" + str(root / "cmake/toolchains/arm-gcc.cmake"),
                 "-DPython3_EXECUTABLE=" + tools["python"],
@@ -341,6 +388,8 @@ def run(root, assemblies, compiler, output, *, family=None, parallel=2):
                                             f"fixture-{index}-dependencies")
             row = inspect(build, fixture, Path(tools["gcc"]), root=root)
             row["assembly"] = arch_compile.digest(path)
+            row["project"] = arch_compile.digest(
+                Path(fixture["project"]) / "CMakeLists.txt")
             row["compiler_dependencies"] = [arch_compile.digest(path) for path in
                                             dependency_paths(dependencies, build)]
             report["fixtures"].append(row)
@@ -368,14 +417,18 @@ def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--fixture", type=Path, action="append", required=True)
+    parser.add_argument("--project", type=Path, action="append")
     parser.add_argument("--family")
     parser.add_argument("--compiler", default="arm-none-eabi-gcc")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--parallel", type=int, default=2)
     args = parser.parse_args(arguments)
+    if args.project is not None and len(args.project) != 1:
+        parser.error("project must be supplied exactly once")
     try:
         return run(args.root, args.fixture, args.compiler, args.output,
-                   family=args.family, parallel=args.parallel)
+                   family=args.family, parallel=args.parallel,
+                   project=args.project[0] if args.project else None)
     except (OSError, ValueError) as error:
         print("Provider assembly gate rejected: " + str(error), file=sys.stderr)
         return 1

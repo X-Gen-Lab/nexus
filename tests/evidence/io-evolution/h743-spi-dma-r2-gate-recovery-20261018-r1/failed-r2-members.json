@@ -1,0 +1,114 @@
+{
+  "kind": "complete-original-actual-r2-failed-commit-evidence",
+  "actual_commit_exit": 1,
+  "full_testing_executed": 1044,
+  "full_testing_failures": 1,
+  "source35_unchanged": true,
+  "files": [
+    {
+      "name": "failed-r2-command/command.attempts/1792320773545710469-0a3137653976412e98c00a9d15fdd3e2/receipt.json",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/command.attempts/1792320773545710469-0a3137653976412e98c00a9d15fdd3e2/receipt.json",
+      "bytes": 1273,
+      "sha256": "346724366e441145a9e45a76f7cc27c586044a1cb5a44c5839f491b81e43a07c",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/command.attempts/1792320773545710469-0a3137653976412e98c00a9d15fdd3e2/stderr.txt",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/command.attempts/1792320773545710469-0a3137653976412e98c00a9d15fdd3e2/stderr.txt",
+      "bytes": 998,
+      "sha256": "3b0e02c61a918ee2cd4d9fbbb12160dbfe5c00a15b48482c8cb9a323a73e717b",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/command.attempts/1792320773545710469-0a3137653976412e98c00a9d15fdd3e2/stdout.txt",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/command.attempts/1792320773545710469-0a3137653976412e98c00a9d15fdd3e2/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/command.command.json",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/command.command.json",
+      "bytes": 1482,
+      "sha256": "0fb61a8f281772c8733776e7d7d20d38980a05e1c8b7f2dfe64a896d81fc049b",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/command.txt",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/command.txt",
+      "bytes": 998,
+      "sha256": "3b0e02c61a918ee2cd4d9fbbb12160dbfe5c00a15b48482c8cb9a323a73e717b",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/source-after.json",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/source-after.json",
+      "bytes": 353,
+      "sha256": "aa1df4bee6fbda02c80f1983da121c1b0b918d64f2c0d667a98c545b1d5dba15",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/source-before.json",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/source-before.json",
+      "bytes": 353,
+      "sha256": "aa1df4bee6fbda02c80f1983da121c1b0b918d64f2c0d667a98c545b1d5dba15",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-command/summary.json",
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r2/summary.json",
+      "bytes": 575,
+      "sha256": "6d5fb74c58510c86591fa7ddbdb88f163f74949594ed0546f2a876112ba60394",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/STOP",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/STOP",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/adaptation.json",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/adaptation.json",
+      "bytes": 555,
+      "sha256": "ffbb43ab0d6268444e91e3f3fbcef2ceaae85a8b384d7ba583b173a32e983346",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/batch-0001.tar.gz",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/batch-0001.tar.gz",
+      "bytes": 2037,
+      "sha256": "b63eed247109a66433a2e5b3ac1dc2deb66ab46498928269ed742c5c63a80d48",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/catalog.jsonl",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/catalog.jsonl",
+      "bytes": 539,
+      "sha256": "fe211faf8a3674086575cbe8068bcf49f044705a6fc0013aae7aa23cde084ce0",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/checkpoint-index.json",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/checkpoint-index.json",
+      "bytes": 1282,
+      "sha256": "cd809bfb8467a7503eb9da6b94a14d94b57b0a0c1a154cf151b34d671f2a2e2a",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/monitor.py",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/monitor.py",
+      "bytes": 12320,
+      "sha256": "9a208bd4710fde9ced1687482899dc2d2b449371dcb6abbf5467ac6678ef44a1",
+      "mode": 384
+    },
+    {
+      "name": "failed-r2-checkpoint/start.json",
+      "path": "/dev/shm/nexus-full-hook-d3-canonical-sdk-20261018-r2/start.json",
+      "bytes": 424,
+      "sha256": "3e6c22ee16a3e1ff472a65449c1ea7dc80a70fe1ad1111d14444465d018c1a80",
+      "mode": 384
+    }
+  ]
+}

@@ -374,6 +374,96 @@ class WorkflowContracts(unittest.TestCase):
         self.assertNotIn('cmake --build', commands)
         self.assertNotIn('NEXUS_BACKEND', commands)
 
+    def test_h743_provider_stage_binds_three_canonical_inputs_to_one_project(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        expected = {
+            'fixture': 'h743_assembly',
+            'project': 'tests/contracts/h743_assembly',
+            'assemblies': (
+                'tools/configure/assemblies/h743-spi-dma.toml\n'
+                'tools/configure/assemblies/h743-spi-dma-uart-tx.toml\n'
+                'tools/configure/assemblies/h743-spi-dma-uart-rx.toml\n')}
+        self.assertEqual(job['strategy']['matrix'].get('include'), [expected])
+        canonical = expected['assemblies'].splitlines()
+        original = sorted((ROOT / expected['project']).glob('*.toml'))
+        self.assertEqual(len(original), 26)
+        selected = original + [ROOT / value for value in canonical]
+        self.assertEqual(len(selected), 29)
+        self.assertEqual(len(set(selected)), 29)
+        self.assertTrue(all(path.is_file() for path in selected))
+        step = next(step for step in job['steps'] if step.get('name') ==
+                    'Link and audit each authored software assembly')
+        self.assertEqual(step['env']['PROVIDER_PROJECT'], '${{ matrix.project }}')
+        self.assertEqual(step['env']['PROVIDER_ASSEMBLIES'],
+                         '${{ matrix.assemblies }}')
+        self.assertEqual(step['run'].count('scripts/ci/provider_assemblies.py'), 1)
+        self.assertIn('arguments+=(--project "$PROVIDER_PROJECT")', step['run'])
+        self.assertIn('IFS= read -r assembly', step['run'])
+
+    def test_provider_shell_passes_exact_h74329_and_legacy_inputs_once(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        step = next(step for step in job['steps'] if step.get('name') ==
+                    'Link and audit each authored software assembly')
+        canonical = [
+            'tools/configure/assemblies/h743-spi-dma.toml',
+            'tools/configure/assemblies/h743-spi-dma-uart-tx.toml',
+            'tools/configure/assemblies/h743-spi-dma-uart-rx.toml']
+        for family in ('h743_assembly', 'gd32_assembly'):
+            with self.subTest(family=family), tempfile.TemporaryDirectory() as name:
+                root = Path(name) / 'repository with spaces'
+                project = root / 'tests/contracts' / family
+                project.mkdir(parents=True)
+                fixture_names = sorted(path.name for path in
+                    (ROOT / 'tests/contracts' / family).glob('*.toml'))
+                for fixture in fixture_names:
+                    (project / fixture).write_text('authored fixture port\n')
+                for relative in canonical:
+                    path = root / relative
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text('canonical fixture port\n')
+                tool = root / '.venv/bin/python'
+                tool.parent.mkdir(parents=True)
+                tool.write_text(
+                    '#!' + sys.executable + '\n'
+                    'import json,os,sys\n'
+                    'with open(os.environ["RECORDED_PROVIDER_ARGS"], "a") as f:\n'
+                    '    f.write(json.dumps(sys.argv[1:]) + "\\n")\n')
+                tool.chmod(0o700)
+                record = root / 'actual-arguments.jsonl'
+                selected_project = ('tests/contracts/h743_assembly'
+                                    if family == 'h743_assembly' else '')
+                env = dict(os.environ, FIXTURE=family,
+                           GITHUB_WORKSPACE=str(root),
+                           PROVIDER_PROJECT=selected_project,
+                           PROVIDER_ASSEMBLIES=('\n'.join(canonical)
+                               if family == 'h743_assembly' else ''),
+                           RECORDED_PROVIDER_ARGS=str(record))
+                result = subprocess.run(
+                    ['bash', '-euo', 'pipefail', '-c', step['run']],
+                    cwd=root, env=env, capture_output=True, text=True, timeout=30)
+                self.assertEqual(result.returncode, 0,
+                                 result.stdout + result.stderr)
+                calls = [json.loads(line)
+                         for line in record.read_text().splitlines()]
+                self.assertEqual(len(calls), 1)
+                argv = calls[0]
+                self.assertEqual(argv[0], 'scripts/ci/provider_assemblies.py')
+                self.assertEqual(argv[argv.index('--root') + 1], str(root))
+                actual = [argv[i + 1] for i, value in enumerate(argv)
+                          if value == '--fixture']
+                expected = ['tests/contracts/' + family + '/' + name
+                            for name in fixture_names]
+                if family == 'h743_assembly':
+                    expected += canonical
+                    self.assertEqual(len(actual), 29)
+                    self.assertEqual(argv.count('--project'), 1)
+                    self.assertEqual(argv[argv.index('--project') + 1],
+                                     selected_project)
+                else:
+                    self.assertNotIn('--project', argv)
+                self.assertEqual(actual, expected)
+
+
     def test_cpu_runtime_matrix_executes_real_kernel_links_and_keeps_evidence(self):
         job = workflow('build-matrix.yml')['jobs']['arch']
         commands = '\n'.join(step.get('run', '') for step in job['steps'])

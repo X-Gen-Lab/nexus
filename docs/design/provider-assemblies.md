@@ -14,14 +14,42 @@ python scripts/ci/provider_assemblies.py \
     --output build/provider-assemblies/usb-stm32
 ```
 
-Repeat `--fixture` for a reviewed list of authored TOMLs. Each file must be in
-`tests/contracts`, have its maintained sibling `CMakeLists.txt`, and resolve to
-an MCU configuration. The optional family assertion compares the actual
-resolver result. Different backends require distinct maintained authored TOMLs;
-there is no independent OS override in this gate. CMake builds each fixture's
-default target graph using `NEXUS_SOURCE_ROOT` and `NEXUS_ASSEMBLY_FILE`.
-The selected source root must be the checkout that owns the executed gate and
-its imported tools; tools from a different source checkout are refused.
+Repeat `--fixture` for a reviewed list of authored TOMLs. Without `--project`,
+each TOML must remain in `tests/contracts` with its maintained sibling
+`CMakeLists.txt`. An explicit `--project` instead binds the whole invocation to
+one existing CMake project under the checkout's `tests/contracts`; its TOMLs
+may be owned contract fixtures or canonical schema-2 assemblies directly in
+`tools/configure/assemblies`. Each selection must resolve to an MCU configuration.
+The gate does not discover a project from the family or silently change modes.
+
+For the three public H743 SPI4 DMA assemblies, run the existing H743 project
+from the repository root with the maintained ARM compiler on `PATH`:
+
+```sh
+python scripts/ci/provider_assemblies.py \
+    --project tests/contracts/h743_assembly \
+    --fixture tools/configure/assemblies/h743-spi-dma.toml \
+    --fixture tools/configure/assemblies/h743-spi-dma-uart-tx.toml \
+    --fixture tools/configure/assemblies/h743-spi-dma-uart-rx.toml \
+    --family stm32h743 \
+    --compiler arm-none-eabi-gcc \
+    --output build/provider-assemblies/h743-spi-dma
+```
+
+The output must be fresh; success requires every selected firmware build,
+resource report and retained provider method to pass. The command links ARM
+software and preserves its report and raw output; it does not execute the MCU.
+The complete H743 provider stage selects the existing 26 contract assemblies
+plus these three canonical assemblies through the same project. A narrow
+three-fixture invocation is not the complete 29-fixture stage.
+
+The optional family assertion compares the actual resolver result. Different
+backends require distinct maintained authored TOMLs; there is no independent
+OS override. CMake builds the selected project's default target graph using
+`NEXUS_SOURCE_ROOT` and `NEXUS_ASSEMBLY_FILE`. Native selections, outside or
+symlinked projects, duplicate fixtures and repeated project selection are
+refused. The selected source root must own the executed gate and its imported
+tools; tools from another checkout are refused.
 
 The output directory must be absent. Existing evidence, symlink destinations
 and source directories are refused. Every actual command records its argv,
@@ -50,7 +78,10 @@ The actual compiler database and Ninja dependency log bind compiled sources,
 generated headers, selected vendor headers and compiler-provided headers to
 file identities. Maintained graph/configuration sources and selected locked
 SDK input bytes are snapshotted before execution and verified afterward. The
-matrix rejects source, Git revision, tool or artifact changes. A dirty checkout
+explicit project, its CMake inputs and the selected authored assemblies are
+part of that snapshot. Changing the project's source or any declared assembly
+invalidates the evidence. The matrix rejects source, Git revision, tool or
+artifact changes. A dirty checkout
 may provide explicitly identified development evidence; it cannot qualify a
 clean release candidate through this gate alone.
 

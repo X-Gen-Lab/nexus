@@ -1,0 +1,143 @@
+test_command_environment_does_not_inherit_test_filters (d3_whole_module.ActualCommandRecording.test_command_environment_does_not_inherit_test_filters) ... ok
+test_missing_tool_keeps_failed_command_record (d3_whole_module.ActualCommandRecording.test_missing_tool_keeps_failed_command_record) ... ok
+test_nonzero_real_tool_is_not_a_pass (d3_whole_module.ActualCommandRecording.test_nonzero_real_tool_is_not_a_pass) ... ok
+test_successful_parent_cannot_leave_artifact_writer_running (d3_whole_module.ActualCommandRecording.test_successful_parent_cannot_leave_artifact_writer_running) ... ok
+test_timeout_retains_actual_output_and_terminates (d3_whole_module.ActualCommandRecording.test_timeout_retains_actual_output_and_terminates) ... ok
+test_actual_empty_compiler_dependency_remains_recorded (d3_whole_module.EmptySourceInputs.test_actual_empty_compiler_dependency_remains_recorded) ... ok
+test_declared_missing_input_is_still_rejected (d3_whole_module.EmptySourceInputs.test_declared_missing_input_is_still_rejected) ... ok
+test_empty_firmware_artifact_is_still_rejected (d3_whole_module.EmptySourceInputs.test_empty_firmware_artifact_is_still_rejected) ... ok
+test_empty_locked_vendor_source_is_not_dropped (d3_whole_module.EmptySourceInputs.test_empty_locked_vendor_source_is_not_dropped) ... ok
+test_empty_source_and_header_remain_in_the_input_closure (d3_whole_module.EmptySourceInputs.test_empty_source_and_header_remain_in_the_input_closure) ... ok
+test_empty_source_content_change_is_rejected (d3_whole_module.EmptySourceInputs.test_empty_source_content_change_is_rejected) ... ok
+test_missing_compiler_dependency_is_still_rejected (d3_whole_module.EmptySourceInputs.test_missing_compiler_dependency_is_still_rejected) ... ok
+test_removed_empty_source_is_not_an_unchanged_snapshot (d3_whole_module.EmptySourceInputs.test_removed_empty_source_is_not_an_unchanged_snapshot) ... ok
+test_symlink_cannot_substitute_for_an_empty_input (d3_whole_module.EmptySourceInputs.test_symlink_cannot_substitute_for_an_empty_input) ... ok
+test_symlink_compiler_dependency_is_still_rejected (d3_whole_module.EmptySourceInputs.test_symlink_compiler_dependency_is_still_rejected) ... ok
+test_canonical_duplicate_is_not_another_execution (d3_whole_module.ExplicitProjectAdmission.test_canonical_duplicate_is_not_another_execution) ... ERROR
+test_canonical_input_uses_the_explicit_owned_project (d3_whole_module.ExplicitProjectAdmission.test_canonical_input_uses_the_explicit_owned_project) ... ERROR
+test_canonical_input_without_project_remains_rejected (d3_whole_module.ExplicitProjectAdmission.test_canonical_input_without_project_remains_rejected) ... ok
+test_dotdot_fixture_alias_cannot_count_as_an_execution (d3_whole_module.ExplicitProjectAdmission.test_dotdot_fixture_alias_cannot_count_as_an_execution) ... ERROR
+test_dotdot_output_is_refused_before_creating_any_directory (d3_whole_module.ExplicitProjectAdmission.test_dotdot_output_is_refused_before_creating_any_directory) ... FAIL
+test_explicit_canonical_input_requires_schema_two (d3_whole_module.ExplicitProjectAdmission.test_explicit_canonical_input_requires_schema_two) ... ERROR
+test_explicit_project_files_belong_to_the_stale_input_guard (d3_whole_module.ExplicitProjectAdmission.test_explicit_project_files_belong_to_the_stale_input_guard) ... FAIL
+test_external_fixture_is_rejected_with_an_owned_project (d3_whole_module.ExplicitProjectAdmission.test_external_fixture_is_rejected_with_an_owned_project) ... ERROR
+test_external_project_cannot_select_a_source_graph (d3_whole_module.ExplicitProjectAdmission.test_external_project_cannot_select_a_source_graph) ... ERROR
+test_legacy_input_can_use_an_explicit_owned_project (d3_whole_module.ExplicitProjectAdmission.test_legacy_input_can_use_an_explicit_owned_project) ... ERROR
+test_missing_and_symlink_project_are_rejected (d3_whole_module.ExplicitProjectAdmission.test_missing_and_symlink_project_are_rejected) ... ERROR
+test_native_canonical_is_not_an_arm_fixture (d3_whole_module.ExplicitProjectAdmission.test_native_canonical_is_not_an_arm_fixture) ... ERROR
+test_duplicate_input_is_not_two_executions (d3_whole_module.FixtureAdmission.test_duplicate_input_is_not_two_executions) ... ok
+test_empty_matrix_is_a_failure (d3_whole_module.FixtureAdmission.test_empty_matrix_is_a_failure) ... ok
+test_family_filter_must_match_resolved_authority (d3_whole_module.FixtureAdmission.test_family_filter_must_match_resolved_authority) ... ok
+test_model_only_directory_is_not_an_assembly_graph (d3_whole_module.FixtureAdmission.test_model_only_directory_is_not_an_assembly_graph) ... ok
+test_real_authored_input_is_resolved_without_rewriting (d3_whole_module.FixtureAdmission.test_real_authored_input_is_resolved_without_rewriting) ... ok
+test_symlink_input_is_refused_before_resolution (d3_whole_module.FixtureAdmission.test_symlink_input_is_refused_before_resolution) ... ok
+test_unowned_external_fixture_is_refused (d3_whole_module.FixtureAdmission.test_unowned_external_fixture_is_refused) ... ok
+test_alternate_source_root_cannot_qualify_current_tool_code (d3_whole_module.OutputAdmission.test_alternate_source_root_cannot_qualify_current_tool_code) ... ok
+test_budget_failure_is_never_admitted (d3_whole_module.OutputAdmission.test_budget_failure_is_never_admitted) ... ok
+test_empty_retention_rejects_retained_concrete_provider (d3_whole_module.OutputAdmission.test_empty_retention_rejects_retained_concrete_provider) ... ok
+test_existing_output_is_not_fresh_execution (d3_whole_module.OutputAdmission.test_existing_output_is_not_fresh_execution) ... ok
+test_imported_compiler_identity_helper_is_a_snapshotted_input (d3_whole_module.OutputAdmission.test_imported_compiler_identity_helper_is_a_snapshotted_input) ... ok
+test_new_source_file_cannot_escape_snapshot_verification (d3_whole_module.OutputAdmission.test_new_source_file_cannot_escape_snapshot_verification) ... ok
+test_ninja_dependency_report_requires_actual_valid_objects (d3_whole_module.OutputAdmission.test_ninja_dependency_report_requires_actual_valid_objects) ... ok
+test_output_cannot_live_inside_an_authored_fixture (d3_whole_module.OutputAdmission.test_output_cannot_live_inside_an_authored_fixture) ... ok
+test_positive_status_with_violations_is_not_a_budget_pass (d3_whole_module.OutputAdmission.test_positive_status_with_violations_is_not_a_budget_pass) ... ok
+test_stale_source_identity_is_rejected (d3_whole_module.OutputAdmission.test_stale_source_identity_is_rejected) ... ok
+test_symlink_output_cannot_overwrite_other_evidence (d3_whole_module.OutputAdmission.test_symlink_output_cannot_overwrite_other_evidence) ... ok
+test_wrong_built_configuration_is_rejected (d3_whole_module.OutputAdmission.test_wrong_built_configuration_is_rejected) ... ok
+test_wrong_built_family_is_rejected_even_if_hash_is_claimed_equal (d3_whole_module.OutputAdmission.test_wrong_built_family_is_rejected_even_if_hash_is_claimed_equal) ... ok
+
+======================================================================
+ERROR: test_canonical_duplicate_is_not_another_execution (d3_whole_module.ExplicitProjectAdmission.test_canonical_duplicate_is_not_another_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 111, in test_canonical_duplicate_is_not_another_execution
+    gate.validate_fixtures(ROOT, [self.assembly, self.assembly],
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_canonical_input_uses_the_explicit_owned_project (d3_whole_module.ExplicitProjectAdmission.test_canonical_input_uses_the_explicit_owned_project)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 72, in test_canonical_input_uses_the_explicit_owned_project
+    rows = gate.validate_fixtures(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_dotdot_fixture_alias_cannot_count_as_an_execution (d3_whole_module.ExplicitProjectAdmission.test_dotdot_fixture_alias_cannot_count_as_an_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 107, in test_dotdot_fixture_alias_cannot_count_as_an_execution
+    gate.validate_fixtures(ROOT, [alias], project=self.project)
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_explicit_canonical_input_requires_schema_two (d3_whole_module.ExplicitProjectAdmission.test_explicit_canonical_input_requires_schema_two)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 132, in test_explicit_canonical_input_requires_schema_two
+    gate.validate_fixtures(ROOT, [Path(stream.name)],
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_external_fixture_is_rejected_with_an_owned_project (d3_whole_module.ExplicitProjectAdmission.test_external_fixture_is_rejected_with_an_owned_project)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 119, in test_external_fixture_is_rejected_with_an_owned_project
+    gate.validate_fixtures(ROOT, [source], project=self.project)
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_external_project_cannot_select_a_source_graph (d3_whole_module.ExplicitProjectAdmission.test_external_project_cannot_select_a_source_graph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 92, in test_external_project_cannot_select_a_source_graph
+    gate.validate_fixtures(ROOT, [self.assembly], project=project)
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_legacy_input_can_use_an_explicit_owned_project (d3_whole_module.ExplicitProjectAdmission.test_legacy_input_can_use_an_explicit_owned_project)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 84, in test_legacy_input_can_use_an_explicit_owned_project
+    rows = gate.validate_fixtures(ROOT, [USB], project=USB.parent)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_missing_and_symlink_project_are_rejected (d3_whole_module.ExplicitProjectAdmission.test_missing_and_symlink_project_are_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 98, in test_missing_and_symlink_project_are_rejected
+    gate.validate_fixtures(ROOT, [self.assembly], project=project)
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+ERROR: test_native_canonical_is_not_an_arm_fixture (d3_whole_module.ExplicitProjectAdmission.test_native_canonical_is_not_an_arm_fixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 124, in test_native_canonical_is_not_an_arm_fixture
+    gate.validate_fixtures(ROOT, [source], project=self.project)
+TypeError: validate_fixtures() got an unexpected keyword argument 'project'
+
+======================================================================
+FAIL: test_dotdot_output_is_refused_before_creating_any_directory (d3_whole_module.ExplicitProjectAdmission.test_dotdot_output_is_refused_before_creating_any_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 157, in test_dotdot_output_is_refused_before_creating_any_directory
+    with self.assertRaisesRegex(EvidenceError, "path|source"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: EvidenceError not raised
+
+======================================================================
+FAIL: test_explicit_project_files_belong_to_the_stale_input_guard (d3_whole_module.ExplicitProjectAdmission.test_explicit_project_files_belong_to_the_stale_input_guard)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/test_provider_assemblies.py", line 148, in test_explicit_project_files_belong_to_the_stale_input_guard
+    self.assertIn(str(main), {row["path"] for row in before})
+AssertionError: '/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/tmp/tmp0w7yma7p/tests/contracts/explicit/main.c' not found in {'/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/arch_compile.py', '/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/tmp/tmp0w7yma7p/CMakeLists.txt', '/tmp/nexus-h743-fixed-hsi-s0-20261018/scripts/ci/provider_assemblies.py'}
+
+----------------------------------------------------------------------
+Ran 47 tests in 0.355s
+
+FAILED (failures=2, errors=9)

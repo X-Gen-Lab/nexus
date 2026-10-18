@@ -77,6 +77,36 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         self.assertTrue(all(not row.physical_qualified for row in rows))
         self.assertTrue(all(row.review_sources for row in rows))
 
+    def test_canonical_h743_spi_dma_keeps_exact_faces_lanes_and_mechanism(self):
+        root = "tools/configure/assemblies/"
+        variants = {"h743-spi-dma": None,
+                    "h743-spi-dma-uart-tx": (0, 46),
+                    "h743-spi-dma-uart-rx": (1, 45)}
+        self.assertEqual({path.stem for path in
+                          (configure.ROOT / root).glob("h743-spi-dma*.toml")},
+                         set(variants))
+        for name, uart in variants.items():
+            with self.subTest(assembly=name):
+                result, records = self.selected(root + name + ".toml")
+                self.assertEqual({row.public_class for row in records},
+                                 {"spi", "spi_device"} |
+                                 ({"uart"} if uart is not None else set()))
+                self.assertEqual({(row.lane, row.request)
+                                  for row in result.dma_topology.lanes},
+                                 {(2, 83), (3, 84)} |
+                                 ({uart} if uart is not None else set()))
+                body = bindings.emit(result)[1]
+                self.assertIn("nx_stm32h743_spi_dma_initialize(", body)
+                self.assertIn("&nx_stm32h743_spi_dma_endpoint_ops", body)
+                for row in records:
+                    self.assertFalse(row.physical_qualified)
+                spi = next(row for row in records if row.public_class == "spi")
+                self.assertEqual((spi.unit, spi.word_bits, spi.dma_engines,
+                                  spi.cache_line_bytes),
+                                 ("bytes", (8,), ("DMA1",), 0))
+                with self.assertRaises(FrozenInstanceError):
+                    spi.unit = "words"
+
     def test_unrouted_f407ve_ethernet_is_not_inherited_from_the_zg_route(self):
         rows = self.compiler().catalogue(configure.ROOT)
         ethernet = {row.part: row for row in rows

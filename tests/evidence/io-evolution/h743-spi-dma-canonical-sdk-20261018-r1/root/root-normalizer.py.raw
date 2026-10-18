@@ -1,0 +1,28 @@
+"""Root transport normalization; every authored byte and operation remains explicit."""
+from pathlib import Path,PurePosixPath
+import hashlib,json
+out=Path(__file__).resolve().parent;b=Path('/dev/shm/nexus-h743-spi-dma-d3-20261018-r1');auth=b/'normalized-transport-r1.json'
+def sha(p):
+ with p.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+assert sha(auth)=='5305d4ea564f2d2663830a3f1a90ada086dbe9a75482969c82216c82ded75d1b'
+j=json.loads(auth.read_text());assert len(j['files'])==378 and j['source_operation_count']==33
+rows=[]
+for a in j['files']:
+ q=Path(a['durable_source']);assert q.is_file() and not any(p.is_symlink() for p in (q,*q.parents)) and q.stat().st_size==a['bytes'] and sha(q)==a['sha256']
+ target=a['target']
+ if a['role'] != 'source':
+  assert target.startswith('validation/h743-spi-dma-canonical-sdk-d3-r1/')
+  target='tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/author-transport/'+target.removeprefix('validation/h743-spi-dma-canonical-sdk-d3-r1/')
+ rows.append({'path':target,'original_author_target':a['target'],'durable_source':str(q),'bytes':a['bytes'],'sha256':a['sha256'],'origin':'Exact completed author transport bytes; canonical source30 targets unchanged. Evidence-only validation prefix explicitly relocated into tests/evidence; historical text retains .raw suffix.'})
+prefix='tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root'
+extra=[(auth,'original-author-transport.json'),(b/'completed-handoff-r1.json','original-author-handoff.json'),(Path('/dev/shm/nexus-d3-root-provenance-20261018-r1/root-prior-evidence.zip'),'root-prior-evidence.zip'),(Path('/dev/shm/nexus-d3-root-provenance-20261018-r1/members.json'),'root-prior-evidence-members.json'),(Path('/dev/shm/nexus-d3-root-provenance-20261018-r1/result.json'),'root-prior-evidence-preservation.json')]
+extra += [(Path('/dev/shm/nexus-h743-spi-dma-d3-independent-review-20261018-r1.json'),'original-D3-independent-review.json'),(out/'normalize.py','root-normalizer.py.raw'),(out/'normalize-before-evidence-prefix.py','root-normalizer-first-rejected.py.raw'),(out/'normalization-first-attempt-observation.json','root-normalization-first-attempt.json')]
+for p,name in extra:
+ assert p.is_file() and not any(v.is_symlink() for v in (p,*p.parents));rows.append({'path':prefix+'/'+name,'durable_source':str(p),'bytes':p.stat().st_size,'sha256':sha(p),'origin':'Preserved original author enclosing metadata or complete previous-source Root execution provenance; no inherited latest-source qualification.'})
+deletions=[{'path':r['target'],'bytes':r['expected_before_bytes'],'sha256':r['expected_before_sha256']} for r in j['deletions']]
+assert len(deletions)==3 and len(rows)==387 and sum(not r['path'].startswith('tests/evidence/') for r in rows)==30
+allnames=[r['path'] for r in rows+deletions];assert len(set(n.casefold() for n in allnames))==len(allnames)
+for name in allnames:
+ p=PurePosixPath(name);assert not p.is_absolute() and '..' not in p.parts and '.git' not in p.parts and str(p)==name
+result={'kind':'complete-root-normalized-D3-delivery','source_count':33,'written_source_count':30,'deleted_source_count':3,'files':rows,'deletions':deletions,'original_author_manifest_sha256':sha(auth),'file_count':len(rows)+len(deletions),'scope':'All33 canonical operations plus every378 authored transport target unchanged, original enclosing author map/handoff and complete Root prior-evidence ZIP. Independent final review and this map are appended by controlled integration. Fresh complete normal commit gates pending. SDK34/37 and integrated29 remain not qualified; physical HIL not executed.'}
+p=out/'normalized-inputs.json';p.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'path':str(p),'sha256':sha(p),'written_files':len(rows),'deletions':len(deletions),'source_operations':33,'payload_bytes':sum(r['bytes'] for r in rows)}))

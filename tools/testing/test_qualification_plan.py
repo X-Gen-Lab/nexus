@@ -76,6 +76,16 @@ class QualificationPlanTests(unittest.TestCase):
                 expected = {"{root}/" + path.relative_to(ROOT).as_posix()
                             for path in (ROOT / "tests/contracts" /
                                          directory).glob("*.toml")}
+                if directory == "h743_assembly":
+                    expected |= {
+                        "{root}/tools/configure/assemblies/h743-" + name + ".toml"
+                        for name in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx")}
+                    self.assertEqual(len(expected), 29)
+                    projects = [stage["args"][index + 1]
+                                for index, value in enumerate(stage["args"])
+                                if value == "--project"]
+                    self.assertEqual(projects,
+                        ["{root}/tests/contracts/h743_assembly"])
                 self.assertTrue(expected)
                 self.assertEqual(len(fixtures), len(set(fixtures)),
                                  "Duplicate fixture is not another execution")

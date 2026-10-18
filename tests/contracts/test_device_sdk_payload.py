@@ -19,6 +19,21 @@ from tools.configure.providers import descriptor
 
 
 class DeviceSDKPayloadTests(unittest.TestCase):
+    def test_h743_spi_canonical_inputs_and_shared_smoke_are_required(self):
+        names = ["tools/configure/assemblies/h743-" + variant + ".toml"
+                 for variant in ("spi-dma", "spi-dma-uart-tx",
+                                 "spi-dma-uart-rx")]
+        smoke = ("cmake/package/verification/io_evolution/consumers/"
+                 "h743-spi-dma.c")
+        for name in [*names, smoke]:
+            with self.subTest(path=name):
+                self.assertIn(name, descriptor.maintained("stm32h743").owned_payload)
+                self.assertIn(name, sdk.REQUIRED_FILES)
+                self.assertTrue(sdk.selected(name))
+        self.assertIn(smoke, sdk.IO_EVOLUTION_VERIFICATION_FILES)
+        for name in names:
+            self.assertNotIn(name, sdk.IO_EVOLUTION_VERIFICATION_FILES)
+
     def test_native_time_payload_and_selected_consumers_are_explicit(self):
         payload = {
             "io/include/nexus/io/rtc.h", "io/include/nexus/io/lptim.h",
@@ -31,7 +46,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         for profile in ("pair", "empty"):
             payload.update((base + "native-time-" + profile + ".toml",
                             base + "consumers/native-time-" + profile + ".c"))
-            self.assertIn(("native time " + profile, "native-time-" + profile,
+            self.assertIn(("native time " + profile, base + "native-time-" + profile + ".toml",
                            "native-time-" + profile), consumers.SELECTED_CONSUMERS)
         self.assertFalse(payload - set(descriptor.maintained("native").owned_payload))
         self.assertFalse(payload - set(sdk.REQUIRED_FILES))
@@ -55,7 +70,8 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                     shutil.copyfile(ROOT / relative, target)
                 source, _, command = consumers.prepare_selected_consumer(
                     prefix, root, "native time " + profile,
-                    "native-time-" + profile, "native-time-" + profile,
+                    (canonical / ("native-time-" + profile + ".toml")).as_posix(),
+                    "native-time-" + profile,
                     lambda argv: None, expected_revision="a" * 40)
                 self.assertFalse(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
                 self.assertIn('rtc_lptim_provider.h',
@@ -175,7 +191,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                     self.assertTrue((ROOT / name).is_file())
                     self.assertIn(name, sdk.REQUIRED_FILES)
                     self.assertTrue(sdk.selected(name))
-                self.assertIn((stem + " rtscts", stem + "-uart-rtscts",
+                self.assertIn((stem + " rtscts", assembly,
                                "uart-fifo"), consumers.SELECTED_CONSUMERS)
 
     def test_shared_pwm_reference_is_an_explicit_public_sdk_consumer(self):
@@ -188,9 +204,9 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                 self.assertTrue((ROOT / name).is_file())
                 self.assertIn(name, sdk.REQUIRED_FILES)
                 self.assertTrue(sdk.selected(name))
-        self.assertIn(("g474 shared pwm", "g474-pwm-shared",
+        self.assertIn(("g474 shared pwm", directory + "g474-pwm-shared.toml",
                        "g474-pwm-shared"), consumers.SELECTED_CONSUMERS)
-        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 18)
+        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 21)
         board = json.loads((ROOT / directory /
                             "boards/g474-pwm-shared/board.json").read_text())
         self.assertIsNone(board["physical_pcb_revision"])
@@ -261,6 +277,12 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             "cmake/package/verification/io_evolution/consumers/g474-pwm-shared.c",
         }
         names.update(descriptor.maintained("native").owned_payload)
+        names.update({
+            "tools/configure/assemblies/h743-spi-dma.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+            "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+        })
         names.update(
             "vendors/gigadevice/gd32f30x/Firmware/"
             "GD32F30x_standard_peripheral/Include/gd32f30x_" + kind + ".h"

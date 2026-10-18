@@ -1,0 +1,356 @@
+{
+  "root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "base_head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+  "approved_paths": [
+    "tests/contracts/h743_assembly/spi-dma.toml",
+    "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+    "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+    "tools/configure/assemblies/h743-spi-dma.toml",
+    "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+    "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+    "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+    "scripts/ci/provider_assemblies.py",
+    "scripts/ci/test_provider_assemblies.py",
+    "tests/contracts/h743_assembly/CMakeLists.txt",
+    "tools/configure/providers/stm32h743/test_spi_dma.py",
+    "tests/google/h743_spi_dma_factory.cmake",
+    "tools/configure/test_selected_contract_authority.py",
+    "cmake/package/verify_consumers.py",
+    "cmake/package/package_source_sdk.py",
+    "tools/configure/providers/descriptor.py",
+    "tools/release/transport.py",
+    "tests/contracts/test_device_sdk_payload.py",
+    "tools/testing/test_sdk_verification_call.py",
+    ".github/workflows/test_release.py",
+    "tools/dev/plans/software.json",
+    "tools/testing/test_qualification_plan.py",
+    "tools/testing/test_work_packages.py",
+    ".github/workflows/build-matrix.yml",
+    ".github/workflows/test_platform_ci.py",
+    "docs/design/provider-assemblies.md",
+    "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+    "docs/delivery/capabilities.md",
+    "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+    "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+    "tools/release/README.md",
+    "soc/stm32h743/README.md",
+    "docs/design/io-evolution-execution.csv"
+  ],
+  "before": [
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma.toml",
+      "bytes": 491,
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2",
+      "mode": 384
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "bytes": 653,
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f",
+      "mode": 384
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "bytes": 646,
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6",
+      "mode": 384
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma.toml",
+      "state": "absent"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "state": "absent"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "state": "absent"
+    },
+    {
+      "path": "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+      "state": "absent"
+    },
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "bytes": 18981,
+      "sha256": "6f096ac4828324f1a7728614fed09d3e048c3d68ac68f9511e43ed95bfb15eaf",
+      "mode": 384
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "bytes": 14442,
+      "sha256": "a6b2b6315c55fc99e7403331732569428e7e4cf0696f401663e2b4baf8aeaf48",
+      "mode": 384
+    },
+    {
+      "path": "tests/contracts/h743_assembly/CMakeLists.txt",
+      "bytes": 2067,
+      "sha256": "b9826b9c5390a952405171a81bd772596018a3a2e71dff57980e432d4b1e3884",
+      "mode": 384
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "bytes": 10419,
+      "sha256": "458788d4571c13a42da739f4acd38b3bc2c80d5e7c01206bd25ff4d544ffb502",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory.cmake",
+      "bytes": 2809,
+      "sha256": "044171a031dadcacd97318869babe7d8fb78c2617b1d403ef60971645c620700",
+      "mode": 384
+    },
+    {
+      "path": "tools/configure/test_selected_contract_authority.py",
+      "bytes": 14793,
+      "sha256": "2d0a24ab6d11852adff8b2dd22bb9a16965363767d4cf369aa10d726e37b72e4",
+      "mode": 384
+    },
+    {
+      "path": "cmake/package/verify_consumers.py",
+      "bytes": 30252,
+      "sha256": "8f1db6316f90bc3ea40961c1a4e3884f8d56b97cf4c2049d1194a119284adbd0",
+      "mode": 384
+    },
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "bytes": 50684,
+      "sha256": "8a7cc46345f6c368868d97573d5ea0802eae4959e7b5dcf94a8976c5bd833152",
+      "mode": 384
+    },
+    {
+      "path": "tools/configure/providers/descriptor.py",
+      "bytes": 14700,
+      "sha256": "0b24c9d6ee1a58a987685a3ab4570888b2bb163c98bfd5b3aed6e4d76106b638",
+      "mode": 384
+    },
+    {
+      "path": "tools/release/transport.py",
+      "bytes": 22112,
+      "sha256": "87c45d19dfa6a17496ca7974d4b1f70a7b4de306ea19e339e20c727ab1756764",
+      "mode": 384
+    },
+    {
+      "path": "tests/contracts/test_device_sdk_payload.py",
+      "bytes": 23450,
+      "sha256": "cdf1fe127b9b665e73deb54986f466d4d93dea34eeb281fa975725b76977da2a",
+      "mode": 384
+    },
+    {
+      "path": "tools/testing/test_sdk_verification_call.py",
+      "bytes": 38454,
+      "sha256": "6818734a2cca5a42c2fe55fdf639ef659955fd4310aa7cba878d6be504e9691d",
+      "mode": 384
+    },
+    {
+      "path": ".github/workflows/test_release.py",
+      "bytes": 69892,
+      "sha256": "9b2398d9e3eda4dad88f4e842921003bd0eb28a0882d251260259413f70bfa47",
+      "mode": 384
+    },
+    {
+      "path": "tools/dev/plans/software.json",
+      "bytes": 52117,
+      "sha256": "7b6d07c3ee965fa9a325b0790986632c28ad0d64b88fbaf6e090d13d0cfb4b8e",
+      "mode": 384
+    },
+    {
+      "path": "tools/testing/test_qualification_plan.py",
+      "bytes": 9298,
+      "sha256": "c92f356ddedbd11b5016ca7a7e7cb344e39f72cd75b9a5eab29a72e38d26756b",
+      "mode": 384
+    },
+    {
+      "path": "tools/testing/test_work_packages.py",
+      "bytes": 23007,
+      "sha256": "3e5ef331113708a65ff0080f7cba8b622976e0db9e8a242fff2868dc33819c6b",
+      "mode": 384
+    },
+    {
+      "path": ".github/workflows/build-matrix.yml",
+      "bytes": 17893,
+      "sha256": "2c6ade80e5e0c4986b89f02445d6a34421da6a34d297fc27dcd0e9349df63ddb",
+      "mode": 384
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "bytes": 60127,
+      "sha256": "12cad2d97f6a30d687c28ca9ee221180a2c266a8634e9cad6a52c6b04790bc8e",
+      "mode": 384
+    },
+    {
+      "path": "docs/design/provider-assemblies.md",
+      "bytes": 4021,
+      "sha256": "4e1a6c63d2706a67bfc04919810d43dd4a4da0ae9b3c7b9231604e683d77455b",
+      "mode": 384
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "bytes": 7549,
+      "sha256": "bb53e8f8a0015ffb11a76cd5e9392def02ab41295a0aa2d9a8d46bea3a28ca92",
+      "mode": 384
+    },
+    {
+      "path": "docs/delivery/capabilities.md",
+      "bytes": 59193,
+      "sha256": "3ce2824667281bef8c6136cab183183f4f00929f3a6a2e86acdae4dabab206e2",
+      "mode": 384
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119737,
+      "sha256": "6a05770c9916846d3c24d24ee11589a7e4167b87ca422816c861265184013768",
+      "mode": 384
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119465,
+      "sha256": "b313c57e1d5fbd665caff8fa0eec8a514909743cc7f586f9d37cbab1a1a36bd4",
+      "mode": 384
+    },
+    {
+      "path": "tools/release/README.md",
+      "bytes": 6620,
+      "sha256": "2f1a86f050222e5295c6208f9e595f9022a8091d31ea36e4a37c8422b71fa482",
+      "mode": 384
+    },
+    {
+      "path": "soc/stm32h743/README.md",
+      "bytes": 32745,
+      "sha256": "ec4bdcdb5e73ca50c2348dc2e6be361f57be1ff26113a432f82b4bfbacdecaec",
+      "mode": 384
+    },
+    {
+      "path": "docs/design/io-evolution-execution.csv",
+      "bytes": 11038,
+      "sha256": "b62cafcae16b39221023b53d9fef248ea4d32d2b27a6a7658807a38d1ac8e098",
+      "mode": 384
+    }
+  ],
+  "index_sha256": "ea8e7dabc7e416be334e5045ac770374bd2ec5e77f1f3d56f79c5576cf8d55a2",
+  "index_bytes": 3666195,
+  "archive_members": {
+    "files/tests/contracts/h743_assembly/spi-dma.toml": {
+      "bytes": 491,
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2"
+    },
+    "files/tests/contracts/h743_assembly/spi-dma-uart-tx.toml": {
+      "bytes": 653,
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f"
+    },
+    "files/tests/contracts/h743_assembly/spi-dma-uart-rx.toml": {
+      "bytes": 646,
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6"
+    },
+    "files/scripts/ci/provider_assemblies.py": {
+      "bytes": 18981,
+      "sha256": "6f096ac4828324f1a7728614fed09d3e048c3d68ac68f9511e43ed95bfb15eaf"
+    },
+    "files/scripts/ci/test_provider_assemblies.py": {
+      "bytes": 14442,
+      "sha256": "a6b2b6315c55fc99e7403331732569428e7e4cf0696f401663e2b4baf8aeaf48"
+    },
+    "files/tests/contracts/h743_assembly/CMakeLists.txt": {
+      "bytes": 2067,
+      "sha256": "b9826b9c5390a952405171a81bd772596018a3a2e71dff57980e432d4b1e3884"
+    },
+    "files/tools/configure/providers/stm32h743/test_spi_dma.py": {
+      "bytes": 10419,
+      "sha256": "458788d4571c13a42da739f4acd38b3bc2c80d5e7c01206bd25ff4d544ffb502"
+    },
+    "files/tests/google/h743_spi_dma_factory.cmake": {
+      "bytes": 2809,
+      "sha256": "044171a031dadcacd97318869babe7d8fb78c2617b1d403ef60971645c620700"
+    },
+    "files/tools/configure/test_selected_contract_authority.py": {
+      "bytes": 14793,
+      "sha256": "2d0a24ab6d11852adff8b2dd22bb9a16965363767d4cf369aa10d726e37b72e4"
+    },
+    "files/cmake/package/verify_consumers.py": {
+      "bytes": 30252,
+      "sha256": "8f1db6316f90bc3ea40961c1a4e3884f8d56b97cf4c2049d1194a119284adbd0"
+    },
+    "files/cmake/package/package_source_sdk.py": {
+      "bytes": 50684,
+      "sha256": "8a7cc46345f6c368868d97573d5ea0802eae4959e7b5dcf94a8976c5bd833152"
+    },
+    "files/tools/configure/providers/descriptor.py": {
+      "bytes": 14700,
+      "sha256": "0b24c9d6ee1a58a987685a3ab4570888b2bb163c98bfd5b3aed6e4d76106b638"
+    },
+    "files/tools/release/transport.py": {
+      "bytes": 22112,
+      "sha256": "87c45d19dfa6a17496ca7974d4b1f70a7b4de306ea19e339e20c727ab1756764"
+    },
+    "files/tests/contracts/test_device_sdk_payload.py": {
+      "bytes": 23450,
+      "sha256": "cdf1fe127b9b665e73deb54986f466d4d93dea34eeb281fa975725b76977da2a"
+    },
+    "files/tools/testing/test_sdk_verification_call.py": {
+      "bytes": 38454,
+      "sha256": "6818734a2cca5a42c2fe55fdf639ef659955fd4310aa7cba878d6be504e9691d"
+    },
+    "files/.github/workflows/test_release.py": {
+      "bytes": 69892,
+      "sha256": "9b2398d9e3eda4dad88f4e842921003bd0eb28a0882d251260259413f70bfa47"
+    },
+    "files/tools/dev/plans/software.json": {
+      "bytes": 52117,
+      "sha256": "7b6d07c3ee965fa9a325b0790986632c28ad0d64b88fbaf6e090d13d0cfb4b8e"
+    },
+    "files/tools/testing/test_qualification_plan.py": {
+      "bytes": 9298,
+      "sha256": "c92f356ddedbd11b5016ca7a7e7cb344e39f72cd75b9a5eab29a72e38d26756b"
+    },
+    "files/tools/testing/test_work_packages.py": {
+      "bytes": 23007,
+      "sha256": "3e5ef331113708a65ff0080f7cba8b622976e0db9e8a242fff2868dc33819c6b"
+    },
+    "files/.github/workflows/build-matrix.yml": {
+      "bytes": 17893,
+      "sha256": "2c6ade80e5e0c4986b89f02445d6a34421da6a34d297fc27dcd0e9349df63ddb"
+    },
+    "files/.github/workflows/test_platform_ci.py": {
+      "bytes": 60127,
+      "sha256": "12cad2d97f6a30d687c28ca9ee221180a2c266a8634e9cad6a52c6b04790bc8e"
+    },
+    "files/docs/design/provider-assemblies.md": {
+      "bytes": 4021,
+      "sha256": "4e1a6c63d2706a67bfc04919810d43dd4a4da0ae9b3c7b9231604e683d77455b"
+    },
+    "files/docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po": {
+      "bytes": 7549,
+      "sha256": "bb53e8f8a0015ffb11a76cd5e9392def02ab41295a0aa2d9a8d46bea3a28ca92"
+    },
+    "files/docs/delivery/capabilities.md": {
+      "bytes": 59193,
+      "sha256": "3ce2824667281bef8c6136cab183183f4f00929f3a6a2e86acdae4dabab206e2"
+    },
+    "files/docs/locale/en/LC_MESSAGES/delivery/capabilities.po": {
+      "bytes": 119737,
+      "sha256": "6a05770c9916846d3c24d24ee11589a7e4167b87ca422816c861265184013768"
+    },
+    "files/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po": {
+      "bytes": 119465,
+      "sha256": "b313c57e1d5fbd665caff8fa0eec8a514909743cc7f586f9d37cbab1a1a36bd4"
+    },
+    "files/tools/release/README.md": {
+      "bytes": 6620,
+      "sha256": "2f1a86f050222e5295c6208f9e595f9022a8091d31ea36e4a37c8422b71fa482"
+    },
+    "files/soc/stm32h743/README.md": {
+      "bytes": 32745,
+      "sha256": "ec4bdcdb5e73ca50c2348dc2e6be361f57be1ff26113a432f82b4bfbacdecaec"
+    },
+    "files/docs/design/io-evolution-execution.csv": {
+      "bytes": 11038,
+      "sha256": "b62cafcae16b39221023b53d9fef248ea4d32d2b27a6a7658807a38d1ac8e098"
+    },
+    "git/index.raw": {
+      "bytes": 3666195,
+      "sha256": "ea8e7dabc7e416be334e5045ac770374bd2ec5e77f1f3d56f79c5576cf8d55a2"
+    }
+  },
+  "root_old_evidence": "Preserved in original own root and Root full PAX package; not reinterpreted as D3 execution."
+}

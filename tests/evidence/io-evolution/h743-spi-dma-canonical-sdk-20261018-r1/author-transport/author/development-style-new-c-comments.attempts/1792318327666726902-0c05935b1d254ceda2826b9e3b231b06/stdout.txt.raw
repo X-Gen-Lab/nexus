@@ -1,0 +1,21 @@
+{
+  "checked_files": 1,
+  "failing_diagnostics": 0,
+  "files": {
+    "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c": {
+      "baseline_status": "new_or_unlisted_strict",
+      "diagnostics": [],
+      "failures": [],
+      "rules": {},
+      "source_sha256": "b29f077131d982231651312590ef284ac08f830204163fc54acbd05088298677"
+    }
+  },
+  "limitations": [
+    "Mechanical comment syntax and header fields only; no authorship verification.",
+    "No proof of ownership, ISR safety, deadlines, API coverage or contract correctness.",
+    "Baseline authenticity and changes require the separate review/CI policy."
+  ],
+  "ruleset_version": 1,
+  "schema_version": 1,
+  "status": "passed"
+}

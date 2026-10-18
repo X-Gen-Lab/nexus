@@ -12,12 +12,12 @@ from tools.configure.providers.common import ConfigurationError
 
 
 ROOT = Path(__file__).resolve().parents[4]
-FIXTURES = ROOT / "tests/contracts/h743_assembly"
+FIXTURES = ROOT / "tools/configure/assemblies"
 
 
 class H743SpiDmaConfiguration(unittest.TestCase):
     def source(self, directory, name="spi-dma", transform=None):
-        source = (FIXTURES / (name + ".toml")).read_text()
+        source = (FIXTURES / ("h743-" + name + ".toml")).read_text()
         source = source.replace(
             '../../../boards/stm32h743zi_hsi_reference',
             str(ROOT / "boards/stm32h743zi_hsi_reference"))
@@ -61,7 +61,7 @@ class H743SpiDmaConfiguration(unittest.TestCase):
                               ("spi-dma-uart-tx", (0, 46)),
                               ("spi-dma-uart-rx", (1, 45))):
             with self.subTest(fixture=fixture):
-                result = configure.resolve_ir(FIXTURES / (fixture + ".toml"))
+                result = configure.resolve_ir(FIXTURES / ("h743-" + fixture + ".toml"))
                 lanes = {(x.lane, x.request) for x in result.dma_topology.lanes}
                 self.assertEqual({(2, 83), (3, 84)} |
                                  ({uart} if uart is not None else set()), lanes)
@@ -94,7 +94,7 @@ class H743SpiDmaConfiguration(unittest.TestCase):
             self.assertIn("soc/stm32h743/routes.json", paths)
 
     def test_traits_do_not_claim_cache_or_enhanced_interfaces(self):
-        result = configure.resolve_ir(FIXTURES / "spi-dma.toml")
+        result = configure.resolve_ir(FIXTURES / "h743-spi-dma.toml")
         item = result.controllers[0]
         for endpoint in (None, result.devices[0]):
             record = selected_contracts.describe(item, endpoint)

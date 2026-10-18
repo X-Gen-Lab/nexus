@@ -1,0 +1,55 @@
+{
+  "files": [
+    {
+      "path": "docs/design/provider-assemblies.md",
+      "bytes": 5646,
+      "sha256": "1bbfb23bf0714762926565a85b492ce1cf8846cf203e31ec420de01b7585aafa"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "bytes": 7549,
+      "sha256": "bb53e8f8a0015ffb11a76cd5e9392def02ab41295a0aa2d9a8d46bea3a28ca92"
+    },
+    {
+      "path": "docs/delivery/capabilities.md",
+      "bytes": 59203,
+      "sha256": "e19b3aadefcf745f753099205d52c1a424eed71f6c8d6ff12f7dee42083a0264"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119737,
+      "sha256": "6a05770c9916846d3c24d24ee11589a7e4167b87ca422816c861265184013768"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119465,
+      "sha256": "b313c57e1d5fbd665caff8fa0eec8a514909743cc7f586f9d37cbab1a1a36bd4"
+    },
+    {
+      "path": "tools/release/README.md",
+      "bytes": 7002,
+      "sha256": "a92860b63e1476820c2d6480c4c23e94eb86370cfa20780c880558296dca5752"
+    },
+    {
+      "path": "soc/stm32h743/README.md",
+      "bytes": 36026,
+      "sha256": "4bce41176f2c7419ba7d280f985b250203b386d0b6783c315cc0ecea358cfc89"
+    },
+    {
+      "path": "docs/design/io-evolution-execution.csv",
+      "bytes": 11042,
+      "sha256": "c99c5f99a48b429cd8b2da36cab1271d977cff7d5cd37ceef0deefd3805b874f"
+    }
+  ],
+  "capabilities_write": {
+    "actual_exit": 0,
+    "actual_command": [
+      "/workspace/nexus-build-system-20261012/.venv/bin/python",
+      "-B",
+      "tools/maintenance/capabilities.py",
+      "--write"
+    ],
+    "actual_stdout": "Capability document matches facts and selected definitions; physical HIL is not assessed\nResolved 3 TOML examples; 2 explicit fragments\n",
+    "receipt_scope": "actual exec PTY session1959 completed0; not a fabricated process.run receipt"
+  }
+}

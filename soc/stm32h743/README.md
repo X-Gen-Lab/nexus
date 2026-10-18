@@ -292,6 +292,38 @@ outside this platform repository. Modes not listed are rejected at configuration
 | IWDG1 | Explicit irreversible start/feed, no window mode, observed debug-freeze and latched reset facts; LSI timing envelope remains unknown(0/0), enabled-state queries return UNSUPPORTED while preserving enabled responsibility |
 | FLASH | Full2MiB,16physical128KiB sectors, two1MiB banks,32-byte ECC flashwords, explicit erase-aligned consumer regions; no product partition |
 
+### Public finite SPI4 DMA assemblies
+
+The canonical `tools/configure/assemblies/h743-spi-dma.toml`,
+`h743-spi-dma-uart-tx.toml` and `h743-spi-dma-uart-rx.toml` select the same
+STM32H743ZIT6 software reference: baremetal, fixed HSI64/default trim, Cache
+off, DEV_ID `0x450`, REV_ID `0x2003` (V), SPI4 mode 0 and 8-bit frames.
+PE12/PE13/PE14 use AF5; PE11 is the explicit active-low GPIO chip select.
+These software Board routes do not establish PCB wiring or electrical timing.
+
+Each request borrows non-overlapping TX/RX byte spans in selected initialized
+AXI memory, with a length of 1..65535 bytes. RX uses DMA1 Stream2, DMAMUX1
+request83 and IRQ13; TX uses Stream3, request84 and IRQ14. SPI4 uses IRQ84.
+The three handlers use priority5 with `calls_os = false`. The optional USART3
+TX Stream0 or RX Stream1 selections use independent resources; the existing
+shared DMA1 gate remains owned until all selected users release it.
+
+The public typed factory returns the existing SPI bus and endpoint faces. The
+same public C11 consumer is selected by the existing H743 CMake project and the
+installed SDK plan; it does not expose private constructors or MMIO. Preparation,
+submit, cancel, service and stop retain the existing borrow/drain contract:
+DMA completion alone does not release the request. A refused withdrawal or
+clock/state mismatch retains the caller storage and recovery responsibility.
+
+This selection is finite full-duplex SPI, not a continuous UART duplex mode.
+It does not admit Cache on, high-clock profiles, other backends, 16-bit frames,
+fixed dummy buffers or multisegment transfers. Configuration, model execution,
+ARM linking, installed SDK consumption and physical HIL are separate evidence;
+publishing these assemblies does not prove those executions. HIL remains
+`not_executed`.
+
+### SPI4 polling
+
 SPI4 polling requires actual DEV_ID `0x450`, REV_ID `0x2003` (V) and
 HSITRIM `0x40`, including fixed-HSI profiles. Non-V cold admission returns
 `UNSUPPORTED` before reading the V-only HSICFGR layout; foreign V trim returns
@@ -429,6 +461,27 @@ ADC提供PA3/INP15的16位单次采样，包含稳压等待、偏移与线性校
 保留这些标志，停止和重启不隐式同时切换；每次退出深度掉电均重新校准。ADC的
 Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不得超过VDDA；16位数据格式
 不代表已测量有效精度。
+
+公开的三个规范装配位于 `tools/configure/assemblies`：
+`h743-spi-dma.toml`、`h743-spi-dma-uart-tx.toml` 和
+`h743-spi-dma-uart-rx.toml`。它们仅选择 STM32H743ZIT6、裸机、固定 HSI64／
+出厂 trim、缓存关闭、DEV_ID 0x450、V 修订 0x2003、SPI4 mode 0 和 8 位帧。
+PE12／13／14 使用 AF5，PE11 是显式低有效 GPIO 片选；软件参考路由不证明
+PCB 接线或电气时序。
+
+每个请求借用已选且已初始化 AXI 内存中互不重叠的 TX／RX 字节区间，长度为
+1..65535 字节。RX 使用 DMA1 Stream2／DMAMUX1 request83／IRQ13，TX 使用
+Stream3／request84／IRQ14，SPI4 使用 IRQ84；三条 IRQ 均为优先级 5、
+`calls_os = false`。可选 USART3 TX Stream0 或 RX Stream1 使用独立资源，
+所有选定使用者退出前仍保留共享 DMA1 时钟门责任。
+
+静态 factory 返回已有 SPI 总线和端点接口；既有 H743 CMake 工程与安装 SDK
+计划复用同一公共 C11 consumer，不暴露私有构造器或 MMIO。DMA 完成不等于
+归还请求；撤回失败或时钟／状态不符时继续保留调用者存储和恢复责任。这里是
+有限全双工 SPI，不是连续 UART 双向模式；不扩大为缓存开启、高频、其他后端、
+16 位帧、固定 dummy 缓冲区或多段传输。配置、模型执行、ARM 链接、安装 SDK
+消费与实板 HIL 各自需要独立证据，公开装配不代替这些执行，HIL 仍为
+`not_executed`。
 
 SPI4 轮询在固定 HSI 配置下同样只准入 DEV_ID 0x450、REV_ID 0x2003（V）
 和 HSITRIM 0x40。先判实际修订，再读取 V 专用 HSICFGR；冷态非 V 返回

@@ -1,0 +1,64 @@
+{
+  "kind": "reviewed-evidence-only-recovery-of-actual-full-gate-r2-failure",
+  "base_manifest_sha256": "5d9c63f8a29014b705f1c068630e96d49246d5354d4f0699f3307b374e9d6842",
+  "source_files_changed": 0,
+  "files": [
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-catalogue-correction-20261018-r1/root/completed-parent-ci-run.json",
+      "durable_source": "/dev/shm/nexus-d3-r2-gate-recovery-20261018-r1/normalized-parent-ci-run.json",
+      "bytes": 15645,
+      "sha256": "240b6a6c18f25866af5474916da55a11d2f7d7879ff4abcc76317c5bff37e965",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/original-parent-ci-run.json.raw",
+      "durable_source": "/dev/shm/nexus-remote-ci-dd839d29-completed-20261018-r1/run-completed.json",
+      "bytes": 13486,
+      "sha256": "2a27caeeea6ada8bd6906e052fc9bd1baf1c9bb64375aba7975ae82033f9c8d7",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/complete-failed-r2.zip",
+      "durable_source": "/dev/shm/nexus-d3-r2-gate-recovery-20261018-r1/complete-failed-r2.zip",
+      "bytes": 14280,
+      "sha256": "5afd93489baebc9a68ed4d8cf566ce5cc7729b283f11224c5296a21c5deaca03",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/failed-r2-members.json",
+      "durable_source": "/dev/shm/nexus-d3-r2-gate-recovery-20261018-r1/failed-r2-members.json",
+      "bytes": 5076,
+      "sha256": "c1b7e53bd128533603f92644a25164588f5262bbb80206d54fc310a60755c5d1",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/classification-and-prepared-temp.json",
+      "durable_source": "/dev/shm/nexus-d3-r2-gate-recovery-20261018-r1/classification-and-prepared-temp.json",
+      "bytes": 1051,
+      "sha256": "40100a46fba0663658bcab5f301e6066a4a06bc4f23bc0ee492f9fcf90a307a3",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/recover-evidence-r1.py.raw",
+      "durable_source": "/dev/shm/nexus-d3-r2-gate-recovery-20261018-r1/recover-evidence-r1.py",
+      "bytes": 6537,
+      "sha256": "b146cce6a307214a04c2c9dea5df8ded01209acc832bdae2fe097f992396f0ee",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/previous-complete-inputs.json",
+      "durable_source": "/dev/shm/nexus-d3-catalogue-amendment-integration-20261018-r1/complete-inputs.json",
+      "bytes": 303490,
+      "sha256": "5d9c63f8a29014b705f1c068630e96d49246d5354d4f0699f3307b374e9d6842",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-r2-gate-recovery-20261018-r1/previous-complete-main-applied.json",
+      "durable_source": "/dev/shm/nexus-d3-catalogue-amendment-integration-20261018-r1/complete-main-applied.json",
+      "bytes": 408,
+      "sha256": "0d2c1eb652af7e0bf48420d64ae48932cef71d1462c4befc892ba024289b2995",
+      "origin": "Exact original retained evidence, or explicitly LF-normalized semantic-equivalent API copy with original raw retained"
+    }
+  ],
+  "qualification": "both original failures retained; prepared fresh r3 TMPDIR, actual whole normal hooks pending"
+}

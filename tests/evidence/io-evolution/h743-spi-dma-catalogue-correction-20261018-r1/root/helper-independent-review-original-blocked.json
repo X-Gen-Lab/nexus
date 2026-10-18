@@ -1,0 +1,93 @@
+{
+  "kind": "independent-static-review-root-d3-catalogue-append-helper",
+  "reviewed_at_utc": "2026-10-18T10:42:20.932579+00:00",
+  "result": "BLOCKED_HELPER_R2_PENDING_NARROW_R3",
+  "scope": "Read-only source inspection of integration helper r2 and small preserved failure archive. Helper was not executed; no Main source/index/Git mutation, test or compilation performed. Not source-amendment, admission, commit, push or qualification approval.",
+  "inputs": {
+    "helper": {
+      "path": "/dev/shm/nexus-d3-catalogue-amendment-main-20261018-r1/append-reviewed-catalogue-r2.py",
+      "bytes": 6858,
+      "sha256": "755d7eab86bd6b33709a4ff152df1c2f05427ed1a715bb4703ae389dae2e7bc7"
+    },
+    "base_manifest": {
+      "path": "/dev/shm/nexus-d3-main-integration-20261018-r1/complete-inputs.json",
+      "sha256": "b0bdaa42c2ef9200e11b8258192e6f5f27e7e55541a1891ab5f30f0b60161852",
+      "file_count": 392,
+      "write_rows": 389,
+      "deleted_rows": 3,
+      "source_count": 33
+    },
+    "bound_main": "/tmp/nexus-io-validation-20261018",
+    "bound_head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+    "bound_staged_tree": "486d32f18033cc1ef4c25cc2715636d36df6b91e",
+    "amendment_manifest": "Not supplied/finalized at review time; no amendment-source approval inferred.",
+    "failed_zip": {
+      "path": "/dev/shm/nexus-d3-catalogue-amendment-main-20261018-r1/failed-full-hook-and-parent-ci.zip",
+      "bytes": 19752,
+      "sha256": "1969c93339bf34543fe89e1d1ebcfe4138e0aee1f81c68c0d8aa55855ea5c3d2",
+      "members": 18
+    },
+    "failed_zip_map": {
+      "bytes": 5887,
+      "sha256": "e7dea0e31097a938657400c85d806bde63ec6b45c1cc7b3def3565a3aef1d89e"
+    }
+  },
+  "positive_static_findings": [
+    "Pinned original manifest SHA, HEAD and staged tree precede Main writes. Exact staged-name set covers 389 written paths plus three approved deletions; old written worktree and index bytes are checked against the manifest before and after append.",
+    "Deletion rows are read from HEAD and checked by byte length/SHA rather than requiring nonexistent durable_source. No new deletion is introduced.",
+    "Only the two named existing source paths and one fixed evidence prefix can be appended; old-row/deletion exact-path collisions are rejected. Explicit git add appends the listed paths; no reset, stash, force checkout, broad add, hook bypass, commit, push or GC command is present.",
+    "Full serialized index gzip is read back and both overwritten source preimages are copied before the Main write loop. Index bytes are rechecked before that loop.",
+    "Successful postflight requires all original and new staged/worktree bytes plus approved deletions; receipt retains normal_gate=pending and explicitly retains the failed first full hook. Final source_count35/written32/deleted3 is arithmetically correct for the intended two-source amendment."
+  ],
+  "blocking_findings": [
+    {
+      "id": "P1-WRITE-ORDER",
+      "lines": [
+        112,
+        115,
+        116
+      ],
+      "finding": "Existing source is opened with wb, and therefore truncated, before verified(durable_source,row) is evaluated. If a previously checked source is missing, changed or unreadable at this second read, validation raises after Main has already lost its prior bytes. Backups permit recovery but this is avoidable modification on a rejected input.",
+      "minimal_delta": "Verify and cache immutable bytes for every incoming row during the entire preflight, before any Main mutation. After backups, write only these cached bytes. Keep all existing pre/post identity checks. Do not reopen a target with wb before the data to write is fully available."
+    },
+    {
+      "id": "P1-INVOCATION-IDENTITY",
+      "lines": [
+        22,
+        30,
+        47,
+        65,
+        85,
+        95,
+        99
+      ],
+      "finding": "The sole intended external output and semantic Git environment constraints are not enforced. Arbitrary --output can alias Main or input storage; inherited GIT_DIR/GIT_WORK_TREE/GIT_INDEX_FILE/GIT_CONFIG* can redirect the repository/index/config selected by otherwise pinned checks. This is a pending scoped invocation contract, not a claim that such an override was observed.",
+      "minimal_delta": "Hardbind --output to /dev/shm/nexus-d3-catalogue-amendment-integration-20261018-r1; require absolute canonical path and nonsymlink ancestors; exclude Main/gitdir and input path aliases. Before any Git call reject semantic GIT_* and GIT_CONFIG* overrides; the reported ambient GIT_PAGER may be explicitly allowed. Reject optimized Python via an explicit if sys.flags.optimize: raise, since assert cannot guard its own removal."
+    }
+  ],
+  "additional_narrow_guard": {
+    "finding": "Casefold uniqueness is checked within the amendment only, not against the original full manifest/deletions. Current fixed source names and prefix appear disjoint; enforce the union before future invocation rather than depend on observation.",
+    "delta": "Check exact and casefold uniqueness of oldrows+deleted+newrows, plus no file/ancestor conflicts among new target paths. The reviewed amendment map must also bind file modes/regular-file type and accepted source/evidence rows; no final map was available here."
+  },
+  "failed_archive_independent_checks": {
+    "zip_crc": "PASS all18 members",
+    "exact_inventory": "PASS members.json plus exact17 map rows, unique names",
+    "member_sha_size_mode_original_bytes": "PASS all17 mapped rows and map bytes; ZIP permissions compared as stat.S_IMODE",
+    "nested_checkpoints": "Both gzip tar streams opened read-only; exact manifests plus9 total regular rows; each row size/SHA/mode checked. Two actual command receipts: testing0/configure1.",
+    "actual_full_commit": "Receipt completed exit1/child1; raw stderr shows format, docs and action-lint passed; TDD gate stopped in configure after testing. No commit-success inference.",
+    "actual_testing": "Raw report executed1044, skipped0, failures0, errors0, status passed.",
+    "actual_configure": "Raw stderr Ran867; failures0/errors1, exact maintained-matrix catalogue mismatch lists h743-spi-dma, h743-spi-dma-uart-tx and h743-spi-dma-uart-rx TOML references. This is genuine full-gate failure, retained.",
+    "parent_ci": "Archived jobs-completed JSON contains30 jobs, all completed/success. This is preserved prior dd parent CI evidence; no fresh D3 or amendment CI inference. No independent remote request performed.",
+    "limits": "Outer source-before/source-after JSON only lists three UART-related hashes; it is not a complete392 source/index proof. The current392 Main bytes/index were not revalidated by this static helper review."
+  },
+  "next_required": "Preserve r2 and original failure evidence; inspect narrow r3 guard delta, then independently review the finalized two-source amendment/TDD manifest. Only a separately recorded actual append and fresh ordinary full hooks can establish integration/admission success.",
+  "qualification": {
+    "helper_executed": false,
+    "main_mutated": false,
+    "tests_run": false,
+    "source_amendment_pass": false,
+    "full_hook_pass": false,
+    "commit_or_push_pass": false,
+    "h743_sdk_oci_offline_hil_qualification": false
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "scope": "Independent read of all new message pairs and unchanged-value proof for every reused pair; fresh actual POT/whole catalog metadata and exact required sets. No Sphinx/render/MCU qualification.",
+  "status": "passed_pending_reviewed_flag_only_after_ff_write_lease",
+  "catalogs": [
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "source_sha256": "1bbfb23bf0714762926565a85b492ce1cf8846cf203e31ec420de01b7585aafa",
+      "pot_sha256": "b905e483be058d38d8580ab2e84e18624118ddbe7d05b73547e5886d40631dac",
+      "reviewed_false_sha256": "7d5bf3a945831c039b522ba6ee07b7faf8e9705b8b9dc7323c3717eed4013963",
+      "required": 13,
+      "unchanged_existing_pairs": 8,
+      "new_semantically_reviewed_pairs": 5,
+      "metadata_language": "zh_CN",
+      "fuzzy": false
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "source_sha256": "e19b3aadefcf745f753099205d52c1a424eed71f6c8d6ff12f7dee42083a0264",
+      "pot_sha256": "0a00dd68ebca6a616fddc8ad4ef3a3adedac907efb51163195e07747d25a5562",
+      "reviewed_false_sha256": "59720bed9324e771a8c840da6e12363799b670c58f8fd7d1a0e78b7b3387f84f",
+      "required": 483,
+      "unchanged_existing_pairs": 480,
+      "new_semantically_reviewed_pairs": 3,
+      "metadata_language": "en",
+      "fuzzy": false
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "source_sha256": "e19b3aadefcf745f753099205d52c1a424eed71f6c8d6ff12f7dee42083a0264",
+      "pot_sha256": "0a00dd68ebca6a616fddc8ad4ef3a3adedac907efb51163195e07747d25a5562",
+      "reviewed_false_sha256": "d6c1ba0a6ba236dff62a6e42a3cb95f15474a1619e90cec52c37006ab54b8d77",
+      "required": 483,
+      "unchanged_existing_pairs": 480,
+      "new_semantically_reviewed_pairs": 3,
+      "metadata_language": "zh_CN",
+      "fuzzy": false
+    }
+  ],
+  "semantic_findings": [],
+  "review_notes": [
+    "Provider 5 new translated paragraphs preserve explicit project ownership/schema2, exact29 vs narrow3, MCU-only software linking and dirty-development qualification boundary.",
+    "Capabilities 3 new message IDs per locale are exact canonical path lists; symbols and path bytes unchanged in translation.",
+    "Existing 8/480/480 msgstr values are byte-for-byte identical to before33 catalog message values."
+  ],
+  "source_writer_executed": false
+}

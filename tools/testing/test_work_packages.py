@@ -368,9 +368,9 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertEqual(selected["selected_ops_sources"], sources)
         self.assertEqual(selected["sdk_required_sources"], sources)
         self.assertEqual(selected["resolver_fixtures"], [
-            "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
-            "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
-            "tests/contracts/h743_assembly/spi-dma.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+            "tools/configure/assemblies/h743-spi-dma.toml",
         ])
         self.assertEqual(selected["implementation_status"], "source_selected")
         self.assertEqual(selected["software_status"], "not_executed")

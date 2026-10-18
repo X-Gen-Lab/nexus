@@ -1,0 +1,28 @@
+{
+  "module": "tools/configure/test_selected_contract_authority.py",
+  "discovered": [
+    "d3_whole_module.ExistingConsumerAuthorityTests.test_capability_class_cannot_invent_a_face_for_another_kind",
+    "d3_whole_module.ExistingConsumerAuthorityTests.test_factory_metadata_requires_an_implemented_provider_mode",
+    "d3_whole_module.ExistingConsumerAuthorityTests.test_factory_model_flag_cannot_disagree_with_its_actual_provider",
+    "d3_whole_module.ExistingConsumerAuthorityTests.test_selected_compiler_is_a_real_configuration_dependency",
+    "d3_whole_module.SelectedContractAuthorityTests.test_caller_authored_observation_or_workaround_claim_is_rejected",
+    "d3_whole_module.SelectedContractAuthorityTests.test_canonical_h743_spi_dma_keeps_exact_faces_lanes_and_mechanism",
+    "d3_whole_module.SelectedContractAuthorityTests.test_catalogue_has_eight_exact_parts_without_family_inference",
+    "d3_whole_module.SelectedContractAuthorityTests.test_coupled_adc_and_fd_do_not_acquire_ordinary_subface_traits",
+    "d3_whole_module.SelectedContractAuthorityTests.test_current_u575_gpdma_remains_bytes_with_exact_named_engine",
+    "d3_whole_module.SelectedContractAuthorityTests.test_dma_segment_count_is_words_not_the_parent_byte_limit",
+    "d3_whole_module.SelectedContractAuthorityTests.test_existing_high_clock_policy_is_v_only_and_explicitly_scoped",
+    "d3_whole_module.SelectedContractAuthorityTests.test_nine_bit_words_keep_nominal_units_and_frozen_projection",
+    "d3_whole_module.SelectedContractAuthorityTests.test_polling_endpoint_width_does_not_change_the_byte_controller",
+    "d3_whole_module.SelectedContractAuthorityTests.test_reviewed_gpio_route_cannot_release_the_oscillator_pad",
+    "d3_whole_module.SelectedContractAuthorityTests.test_selected_endpoint_ceiling_is_its_authored_device_ceiling",
+    "d3_whole_module.SelectedContractAuthorityTests.test_seven_canonical_inputs_keep_selected_mechanisms",
+    "d3_whole_module.SelectedContractAuthorityTests.test_spi_segment_count_does_not_become_an_i2c_message_count",
+    "d3_whole_module.SelectedContractAuthorityTests.test_unrouted_f407ve_ethernet_is_not_inherited_from_the_zg_route"
+  ],
+  "run": 18,
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "successful": true
+}

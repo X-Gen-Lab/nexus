@@ -419,6 +419,13 @@ jobs:
           - u575_assembly
           - multi_controller_assembly
           - mainstream_assembly
+        include:
+          - fixture: h743_assembly
+            project: tests/contracts/h743_assembly
+            assemblies: |
+              tools/configure/assemblies/h743-spi-dma.toml
+              tools/configure/assemblies/h743-spi-dma-uart-tx.toml
+              tools/configure/assemblies/h743-spi-dma-uart-rx.toml
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -431,12 +438,22 @@ jobs:
       - name: Link and audit each authored software assembly
         env:
           FIXTURE: ${{ matrix.fixture }}
+          PROVIDER_PROJECT: ${{ matrix.project }}
+          PROVIDER_ASSEMBLIES: ${{ matrix.assemblies }}
         run: |
           fixture="tests/contracts/$FIXTURE"
           arguments=()
+          if [ -n "$PROVIDER_PROJECT" ]; then
+            arguments+=(--project "$PROVIDER_PROJECT")
+          fi
           for assembly in "$fixture"/*.toml; do
             arguments+=(--fixture "$assembly")
           done
+          while IFS= read -r assembly; do
+            if [ -n "$assembly" ]; then
+              arguments+=(--fixture "$assembly")
+            fi
+          done <<< "$PROVIDER_ASSEMBLIES"
           .venv/bin/python scripts/ci/provider_assemblies.py \
             --root "$GITHUB_WORKSPACE" \
             --compiler arm-none-eabi-gcc \

@@ -1,0 +1,103 @@
+{
+  "actual_suite_failure": {
+    "attempt_receipt": {
+      "bytes": 1272,
+      "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-configure.attempts/1792319640345543205-77e7dc6590e140fc93e93402de7ddc76/receipt.json",
+      "sha256": "9385f96f627eac278d4d4c348c0e7e3f74dd3572aae6d88e5c25aef5e373590a"
+    },
+    "command_receipt": {
+      "bytes": 1444,
+      "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-configure.command.json",
+      "sha256": "658227f398c43fe5b201a6bc0b4eb6d6269bf72605d55f7794d917b93536d4d8"
+    },
+    "discovered": 867,
+    "errors": 1,
+    "exception": "ValueError",
+    "executed": 867,
+    "expected_report_missing": true,
+    "failures": 0,
+    "message": "Assembly catalogue differs from maintained TOML references: ['h743-spi-dma-uart-rx.toml', 'h743-spi-dma-uart-tx.toml', 'h743-spi-dma.toml']",
+    "report_missing_reason": "maintained run_tool_tests rejects nonpassing suite before writing successful JSON",
+    "returncode": 1,
+    "skipped": 0,
+    "stderr": {
+      "bytes": 2219,
+      "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-configure.txt",
+      "sha256": "257783380d5fbf4e359f8bdbc54ae4b5ec839aae208f86f53d8e7ad609ed62ea"
+    },
+    "suite": "configure",
+    "test": "test_matrix.MaintainedMatrixTests.test_explicit_references_resolve_without_claiming_physical_support"
+  },
+  "classification": "D3 integration metadata omission; not tool availability, resource failure, or environment failure",
+  "limitations": [
+    "Original D3 focused Python253 and independent review did not execute complete configure catalogue boundary. Their narrower historical evidence is preserved, not relabelled as full-suite success.",
+    "This audit did not mutate Main or execute tests. A separate newly authorized owned-root amendment records subsequent TDD."
+  ],
+  "minimal_fix_proposal": {
+    "catalogue": "Explicitly add only the three sorted canonical file names. Preserve schema, exact-set, uniqueness and unknown-file rejection.",
+    "expectations": "Narrowly admit only the exact three H743 baremetal SPI4 dma selections and optional USART3 dma-tx/rx-dma-idle, assert actual IR routes/pins/streams/endpoint/clock and no physical qualification. Retain all other H743 and U575 constraints.",
+    "not_needed": [
+      "matrix.py production changes",
+      "configuration fallback",
+      "directory-derived expected list",
+      "broader family SPI allowance",
+      "qualification upgrades"
+    ],
+    "paths": [
+      "tools/configure/assemblies/catalogue.json",
+      "tools/configure/test_matrix.py"
+    ],
+    "regressions": "Complete test_matrix module with a new exact-three positive and omission/duplicate/unknown catalogue negatives, genuine RED before catalogue repair, same tests GREEN, then complete configure suite."
+  },
+  "observed_head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+  "observed_main_index_sha256": "367bdf65232b565b249414e18f06ab541ed730e56b63a9b38b85f4d3fc700a98",
+  "original_full_commit": {
+    "no_commit": true,
+    "returncode": 1,
+    "summary": {
+      "bytes": 575,
+      "path": "/dev/shm/nexus-root-maintained-command-evidence-20261018-r1/h743-spi-dma-canonical-sdk-full-commit-r1/summary.json",
+      "sha256": "41bff4d95d43b2bfd19a84f230b67a493b58472ee28107540ec4bc853a394577"
+    }
+  },
+  "review_mode": "read_only_no_test_or_build_execution_in_main",
+  "root_cause": "Three newly canonical authored TOMLs are absent from the explicit catalogue; matrix.py exact-set validation correctly rejects them.",
+  "schema": 1,
+  "secondary_static_finding": {
+    "file": "tools/configure/test_matrix.py",
+    "finding": "H743/U575 blanket selected-kind subset {gpio,uart} would subsequently reject the three intentional SPI selections. This masked follow-on was identified by source inspection, not claimed as separately executed in the original Main run."
+  },
+  "source_bindings": [
+    {
+      "bytes": 1779,
+      "path": "/tmp/nexus-io-validation-20261018/tools/configure/assemblies/catalogue.json",
+      "sha256": "cc0a4d65a91adfd3d8ad4a3f6b655a82dd7a617257df4692f15aafcbab73c477"
+    },
+    {
+      "bytes": 2437,
+      "path": "/tmp/nexus-io-validation-20261018/tools/configure/test_matrix.py",
+      "sha256": "8281e178905874d7f7bfdc187028ce68008afd67e01120b2457b89e91c303a0b"
+    },
+    {
+      "bytes": 5944,
+      "path": "/tmp/nexus-io-validation-20261018/tools/configure/matrix.py",
+      "sha256": "df62295a26adf9d6f67a3e3339704bf7f96b9c19256fa826f3cb24df4c900ff2"
+    },
+    {
+      "bytes": 491,
+      "path": "/tmp/nexus-io-validation-20261018/tools/configure/assemblies/h743-spi-dma.toml",
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2"
+    },
+    {
+      "bytes": 653,
+      "path": "/tmp/nexus-io-validation-20261018/tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f"
+    },
+    {
+      "bytes": 646,
+      "path": "/tmp/nexus-io-validation-20261018/tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6"
+    }
+  ],
+  "staged_binding": "Each of the six inspected files was independently compared byte-for-byte to git show :path; all matched. Git reads used --no-optional-locks."
+}

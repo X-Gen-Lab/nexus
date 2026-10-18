@@ -118,13 +118,20 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "u575-uart-rtscts", "g474-pwm-shared"):
             file = verification / (name + ".toml")
             file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text('backend = "baremetal"\n# canonical installed test input: ' + name)
+            file.write_text('schema = 2\nbackend = "baremetal"\n# canonical installed test input: ' + name)
         for name in ("h743-high", "u575-uart-gpdma", "g474-can-fd",
                      "g474-pwm-adc", "g474-adc-group", "uart-fifo",
                      "ethernet-frames", "g474-pwm-shared"):
             file = verification / "consumers" / (name + ".c")
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("/* installed public smoke: " + name + " */\n")
+        for variant in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx"):
+            relative = Path("tools/configure/assemblies") / ("h743-" + variant + ".toml")
+            target = self.sdk / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / relative, target)
+        shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+                        verification / "consumers/h743-spi-dma.c")
         # These two real canonical files are SUT inputs. Their actual C
         # execution/proc mapping checks are qualified by the separate installed
         # integration; this suite models only external process ports.
@@ -312,6 +319,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
         elif any(argument.endswith("package_source_sdk.py")
                  for argument in command):
             code = 9 if self.failed_sdk else 0
+        if self.selected_fault and self.selected_fault.startswith("spi:"):
+            _, operation, label = self.selected_fault.split(":", 2)
+            if operation == "build" and command[0] == "cmake" and "--build" in command:
+                if Path(command[command.index("--build") + 1]).name == "selected " + label + " build":
+                    code = 51
+            if operation == "retention" and any(x.endswith("retention.py") for x in command):
+                image = Path(command[command.index("--elf") + 1])
+                if image.parents[1].name == "selected " + label + " build":
+                    code = 52
         return subprocess.CompletedProcess(command, code, stdout, "")
 
     def execute(self, extra=()):
@@ -334,18 +350,18 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     for _, build, _ in consumer_layout()}
         self.assertEqual({Path(command[2]).name.removesuffix(" build")
                           for command in builds}, expected)
-        self.assertEqual(len(builds), 31)
+        self.assertEqual(len(builds), 34)
         self.assertEqual(sum(len(command) - command.index("--target") - 1
-                             for command in builds), 34)
+                             for command in builds), 37)
         configurations = [command for command in self.commands
                           if command[0] == "cmake" and "-S" in command]
-        self.assertEqual(len(configurations), 31)
+        self.assertEqual(len(configurations), 34)
         for command in configurations:
             self.assertIn("-DNEXUS_EXPECTED_SOURCE_REVISION=" + "a" * 40,
                           command)
         retention = [command for command in self.commands
                      if any(arg.endswith("retention.py") for arg in command)]
-        self.assertEqual(len(retention), 26)
+        self.assertEqual(len(retention), 29)
         native = [command for command in self.commands if len(command) == 1]
         self.assertEqual({Path(command[0]).name for command in native},
                          {"installed_c", "installed_cpp", "installed_selected"})
@@ -370,6 +386,77 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(sources, {source for source, _, _ in
                                    transport.consumer_layout()})
 
+    def test_spi_inputs_are_explicit_canonical_paths_with_one_smoke(self):
+        for label, variant in (("h743 spi dma", "spi-dma"),
+                               ("h743 spi dma uart tx", "spi-dma-uart-tx"),
+                               ("h743 spi dma uart rx", "spi-dma-uart-rx")):
+            with self.subTest(variant=variant):
+                self.assertIn((label, "tools/configure/assemblies/h743-" +
+                               variant + ".toml", "h743-spi-dma"),
+                              self.consumer.SELECTED_CONSUMERS)
+        self.assertTrue(all(Path(path).suffix == ".toml" and
+                            not Path(path).is_absolute() and
+                            ".." not in Path(path).parts
+                            for _, path, _ in self.consumer.SELECTED_CONSUMERS))
+
+    def test_missing_each_spi_input_is_terminal_without_directory_fallback(self):
+        for variant in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx"):
+            with self.subTest(variant=variant):
+                path = self.sdk / "tools/configure/assemblies" / (
+                    "h743-" + variant + ".toml")
+                original = path.read_bytes()
+                path.unlink()
+                # A same-stem legacy-directory decoy must not replace it.
+                decoy = self.sdk / "cmake/package/verification/io_evolution" / path.name
+                decoy.write_bytes(original)
+                with contextlib.redirect_stderr(io.StringIO()):
+                    status, report = self.execute(("--parallel", "1"))
+                self.assertEqual(status, 1)
+                self.assertEqual(report["status"], "failed")
+                path.write_bytes(original)
+                decoy.unlink()
+
+    def test_sdk_relative_inputs_reject_alias_schema_and_symlink_before_output(self):
+        relative = "tools/configure/assemblies/h743-spi-dma.toml"
+        path = self.sdk / relative
+        original = path.read_bytes()
+        directory = self.directory / "invalid selected inputs"
+        directory.mkdir()
+        alias = path.with_name("alias.toml")
+        alias.symlink_to(path)
+        cases = [str(path), "./" + relative,
+                 "tools/configure/assemblies/../assemblies/h743-spi-dma.toml",
+                 "tools/configure/assemblies/alias.toml"]
+        for source in cases:
+            with self.subTest(source=source), self.assertRaises(ValueError):
+                self.consumer.prepare_selected_consumer(
+                    self.prefix, directory, "invalid", source, "h743-spi-dma",
+                    lambda argv: None, expected_revision="a" * 40)
+            self.assertFalse((directory / "selected invalid source").exists())
+        for schema in ("1", "true", "2.0"):
+            with self.subTest(schema=schema):
+                path.write_bytes(original.replace(b"schema = 2",
+                                                  ("schema = " + schema).encode()))
+                with self.assertRaisesRegex(ValueError, "schema 2"):
+                    self.consumer.prepare_selected_consumer(
+                        self.prefix, directory, "invalid", relative,
+                        "h743-spi-dma", lambda argv: None,
+                        expected_revision="a" * 40)
+                self.assertFalse((directory / "selected invalid source").exists())
+        path.write_bytes(original)
+
+    def test_each_spi_build_and_retention_failure_terminates_the_matrix(self):
+        for label in ("h743 spi dma", "h743 spi dma uart tx", "h743 spi dma uart rx"):
+            for operation, exit_code in (("build", 51), ("retention", 52)):
+                with self.subTest(label=label, operation=operation):
+                    self.selected_fault = "spi:" + operation + ":" + label
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        status, report = self.execute(("--parallel", "1"))
+                    self.assertEqual(status, 1)
+                    self.assertEqual(report["status"], "failed")
+                    self.assertNotIn(label, {row["name"] for row in report["selected_images"]})
+                    self.assertEqual(report["commands"][-1]["exit_code"], exit_code)
+
     def test_explicit_one_bounds_every_build_without_reducing_the_matrix(self):
         with mock.patch.dict("os.environ", {"CMAKE_BUILD_PARALLEL_LEVEL": "99"}):
             status, report = self.execute(("--parallel", "1"))
@@ -378,23 +465,23 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["physical_status"], "not_executed")
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["1"] * 31)
+                          for command in self.builds()], ["1"] * 34)
 
-    def test_default_retains_three_four_job_and_twenty_eight_two_job_builds(self):
+    def test_default_retains_three_four_job_and_thirty_one_two_job_builds(self):
         status, report = self.execute()
         self.assertEqual(status, 0)
         self.assertEqual(report["source_revision"], "a" * 40)
         self.assertEqual(report["source_tree"], "b" * 40)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["4"] * 3 + ["2"] * 28)
+                          for command in self.builds()], ["4"] * 3 + ["2"] * 31)
 
     def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
         status, _ = self.execute(("--parallel", "3"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
-                          for command in self.builds()], ["3"] * 31)
+                          for command in self.builds()], ["3"] * 34)
 
     def test_selected_inputs_and_public_smokes_come_only_from_installed_sdk(self):
         status, report = self.execute(("--parallel", "1"))
@@ -403,13 +490,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           if command[0] == "cmake" and "-S" in command
                           and Path(command[command.index("-S") + 1]).name.startswith(
                               "selected ")]
-        self.assertEqual(len(configurations), 18)
+        self.assertEqual(len(configurations), 21)
         inputs = set()
         for command in configurations:
             assembly = Path(next(argument.split("=", 1)[1] for argument in command
                                  if argument.startswith("-DNEXUS_ASSEMBLY_FILE=")))
-            self.assertEqual(assembly.parent,
-                             self.sdk / "cmake/package/verification/io_evolution")
+            expected_parent = (self.sdk / "tools/configure/assemblies"
+                               if assembly.name.startswith("h743-spi-dma") else
+                               self.sdk / "cmake/package/verification/io_evolution")
+            self.assertEqual(assembly.parent, expected_parent)
             inputs.add(assembly.name)
             self.assertIn("-DNEXUS_BUILD_TESTS=OFF", command)
             self.assertIn("-DNEXUS_BUILD_WORKLOAD=OFF", command)
@@ -423,6 +512,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if assembly.stem.endswith("pair"):
                     self.assertIn('/proc/self/maps', smoke)
                     self.assertIn('readonly_mapping(a->ops, sizeof(*a->ops))', smoke)
+            elif assembly.name.startswith("h743-spi-dma"):
+                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c"
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             else:
                 self.assertTrue(smoke.startswith("/* installed public smoke: "))
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
@@ -430,7 +523,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
             for name in ("stm32h7xx.h", "stm32u5xx.h", "stm32g4xx.h",
                          "stm32f4xx.h", "gd32f4xx.h",
                          "stm32f407_eth_frames.h", "gd32f470_eth_frames.h",
-                         "stm32g474_pwm_shared.h", "rtc_lptim_provider.h"):
+                         "stm32g474_pwm_shared.h", "rtc_lptim_provider.h",
+                         "stm32h743_spi_dma.h"):
                 self.assertIn('__has_include("' + name + '")', private_guard)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
         self.assertEqual(inputs, {
@@ -443,11 +537,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "u575-uart-fifo.toml", "f407zg-eth-frames.toml",
             "gd470-eth-frames.toml", "h743-uart-rtscts.toml",
             "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
-            "native-time-pair.toml", "native-time-empty.toml"})
-        self.assertEqual(len(report["selected_images"]), 18)
+            "native-time-pair.toml", "native-time-empty.toml",
+            "h743-spi-dma.toml", "h743-spi-dma-uart-tx.toml",
+            "h743-spi-dma-uart-rx.toml"})
+        self.assertEqual(len(report["selected_images"]), 21)
         arm_images = [image for image in report["selected_images"]
                       if not image["name"].startswith("native time ")]
-        self.assertEqual(len(arm_images), 16)
+        self.assertEqual(len(arm_images), 19)
         for image in arm_images:
             self.assertEqual(set(image["artifacts"]), {"elf", "bin", "map"})
         native_images = [image for image in report["selected_images"]
@@ -576,7 +672,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
         directory = self.directory / "private isolation inputs"
         directory.mkdir()
         source, _, _ = self.consumer.prepare_selected_consumer(
-            self.prefix, directory, "h743 rtscts", "h743-uart-rtscts",
+            self.prefix, directory, "h743 rtscts",
+            "cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
             "uart-fifo", lambda command: None, expected_revision="a" * 40)
         probe = (source / "private_headers.c").read_text()
         for family in ("stm32h743", "stm32u575"):

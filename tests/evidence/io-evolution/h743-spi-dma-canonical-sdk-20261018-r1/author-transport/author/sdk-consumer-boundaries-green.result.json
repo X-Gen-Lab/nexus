@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "tools/testing/test_sdk_verification_call.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.json"
+  ],
+  "actual_returncode": 0,
+  "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-consumer-boundaries-green.attempts/1792315197156615522-ec7083e4ca5f483e8bb71d986bb65e92/receipt.json",
+  "child_maxrss_KiB": 46616,
+  "headroom_after": 3508027392,
+  "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+}
