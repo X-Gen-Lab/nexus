@@ -1,0 +1,13 @@
+....F......................................
+======================================================================
+FAIL: test_checkout_cleanup_preserves_bound_early_failure_evidence (complete_module_0.SoftwareQualificationContracts.test_checkout_cleanup_preserves_bound_early_failure_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py", line 757, in test_checkout_cleanup_preserves_bound_early_failure_evidence
+    self.assertTrue((early / 'request.raw').is_file())
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 43 tests in 3.047s
+
+FAILED (failures=1)

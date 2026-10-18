@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execute-whole.raw",
+    "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/run-identity-red-r1/result.json",
+    "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "run-identity-red-r1",
+  "started_ns": 1792297158139848118,
+  "finished_ns": 1792297161314914806,
+  "duration_seconds": 3.1750685709994286,
+  "timeout_seconds": 600.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/run-identity-red-r1/command.attempts/1792297158139520073-6f042779c1cf476a81b38702ee007b2f/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/run-identity-red-r1/command.attempts/1792297158139520073-6f042779c1cf476a81b38702ee007b2f/stderr.txt",
+    "bytes": 759,
+    "sha256": "6367e6e16c2185a2d0f1ce9d8eea49668de595b094d4b6b8f332798acb625b59"
+  }
+}

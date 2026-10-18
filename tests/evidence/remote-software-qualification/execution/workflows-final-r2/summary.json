@@ -1,0 +1,9 @@
+{
+  "phase": "workflows-final-r2",
+  "exit_code": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/workflows-final-r2/command.attempts/1792297476642715041-01e967bbd34848aeb1577b04a0d29ff9/receipt.json",
+  "guards_stable": true,
+  "persistent_allocated_bytes": 950272,
+  "TMP_live_allocated_bytes": 0,
+  "child_max_rss_KiB": 33176
+}

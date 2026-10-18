@@ -1,0 +1,9 @@
+{
+  "phase": "resources-green-r1",
+  "exit_code": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/resources-green-r1/command.attempts/1792297365429690836-b3941980d51c4c25843a65f1f419beb0/receipt.json",
+  "guards_stable": true,
+  "persistent_allocated_bytes": 794624,
+  "TMP_live_allocated_bytes": 0,
+  "child_max_rss_KiB": 26508
+}

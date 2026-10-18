@@ -1,0 +1,481 @@
+{
+  "schema": 1,
+  "kind": "independent-read-only-remote-software-qualification-code-and-evidence-review",
+  "reviewer": "/root/io24_checker_review_r2",
+  "reviewed_utc": "2026-10-18T04:35:21.219270+00:00",
+  "decision": "BLOCKED_ON_POST_REPRODUCTION_HOST_IDENTITY_CONFIGURATION_NAVIGATION",
+  "qualification": false,
+  "authority": {
+    "plan": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/remote-qualification-preparation-r1/implementation-plan-r1.md",
+      "bytes": 11868,
+      "sha256": "5f47af4cca7be31dbc59df75f53969ea3d551b9c31fd2b6e57de6ec20cac8125"
+    },
+    "plan_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/remote-qualification-plan-independent-review-r1.json",
+      "bytes": 15944,
+      "sha256": "884b2f6d50897b21254e7f50e855032da5ab365abe01c7214d83a6beb98c44cf"
+    },
+    "freeze": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/source-and-execution-freeze-r1.json",
+      "bytes": 16524,
+      "sha256": "d5ca1eeeecd3a35787446354e5c6bfbd5787d6ee32b75c77d261a2e49642ea2b"
+    },
+    "transport_map": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/integration-manifest-r1.json",
+      "bytes": 65328,
+      "sha256": "64516d25c42a9b09af41812b168d566459da013bada8dc7f950cd861e2a4134d"
+    },
+    "sources": [
+      {
+        "expected_path": ".github/workflows/software-qualification.yml",
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/resources-fix/.github/workflows/software-qualification.yml",
+        "bytes": 14559,
+        "sha256": "a08be90d97b1ffa627dad8797b4f56a98b00102f60dce5ba44dd5453c9874d75"
+      },
+      {
+        "expected_path": ".github/workflows/performance.yml",
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/first-production/.github/workflows/performance.yml",
+        "bytes": 3593,
+        "sha256": "26eddc2c2afd747addb52028746027119bc30abc0fa6726d87dc2c07829cd018"
+      },
+      {
+        "expected_path": ".github/workflows/test_platform_ci.py",
+        "durable_source": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/final-tests/.github/workflows/test_platform_ci.py",
+        "bytes": 51425,
+        "sha256": "150f335987fb53d485928c323b46a3108d06d6b66fe464c0fab79643f02a2b63"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "id": "REMOTE-QUALIFICATION-CONTAINER-RESOLVED-HOST-IDENTITY",
+      "priority": "P1",
+      "status": "OPEN_SOURCE_CHAIN_REQUIRES_ACTUAL_REGRESSION",
+      "classification": "Concrete success-path integration liveness/admission gap; no remote execution or new regression has been run by this reviewer.",
+      "workflow_binding": {
+        "path": ".github/workflows/software-qualification.yml",
+        "sha256": "a08be90d97b1ffa627dad8797b4f56a98b00102f60dce5ba44dd5453c9874d75",
+        "lines": "202-213, 261-278",
+        "selection": "build/software-qualification/ recursively, including reproduction-runs/**/build/generated/resolved.json"
+      },
+      "mechanism": [
+        "tools/evidence/reproduce.py:407-418 creates separate source mount names /inputs/sdk-a/share/nexus/src and /other/sdk-b/share/nexus/src, with corresponding independent host output directories below Q/reproduction-runs/.",
+        "reproduce.py:281-312 substitutes those container mount paths into the real configure/build argv. tools/configure/configure.py:498-510 and1289-1290 write actual input absolute paths unchanged into generated/input_paths.json.",
+        "After containers exit, host output still contains generated/resolved.json and input_paths.json; their absolute input navigation is the container namespace, not the host source snapshot path. ELF/BIN validation in reproduce.py does not rewrite that navigation.",
+        "The identity step recursively selects Q. tools/maintenance/job_identity.py:208-216 interprets every selected resolved.json as a live host configuration and calls _configuration; identity.py:169-185 opens each input_paths absolute file via file_identity.",
+        "The hosted runner does not acquire the container target mounts /inputs/sdk-a/... or /other/sdk-b/...; successful actual offline reproduction therefore leaves selected resolved inputs unavailable to host identity. capture(result=success) rejects, so a fully successful intended run cannot complete its identity/upload admission."
+      ],
+      "not_caused_by": "Input injection, OCI iidfile regex or formal engine ELF/BIN equality. The existing identity validator is correctly fail closed; the new workflow selected container-namespace live configuration as host-namespace evidence.",
+      "required_TDD": "Before changing code, exercise the actual maintained job_identity.capture or _configuration with a canonical generated resolved/input_paths fixture referring to the actual independent container path namespace and host retained source bytes. The existing whole test_platform_ci module must exhibit the genuine success-collection failure. Do not mock that configuration/identity implementation.",
+      "minimal_direction": "Reuse existing store/transport to seal the complete unchanged reproduction input/output/raw tree as opaque retained bytes, and bind/upload that verified transport closure rather than recursively asking the host validator to reopen container-only paths. Keep original resolved/input_paths and all raw bytes unchanged. Choose exact owned artifacts, retain failure evidence and all source/configuration identities; no identity/reproduce/storage weakening or alternate pass marker.",
+      "source_hashes": {
+        "tools/maintenance/job_identity.py": {
+          "path": "/tmp/nexus-io36-native-20261018/tools/maintenance/job_identity.py",
+          "bytes": 14752,
+          "sha256": "5316c45e6ea7fb35f5f1c6d19f1faaade80c3283274e441a0996876260da024e"
+        },
+        "tools/evidence/identity.py": {
+          "path": "/tmp/nexus-io36-native-20261018/tools/evidence/identity.py",
+          "bytes": 9251,
+          "sha256": "28fc5515187689e46c7370b4843cfce030cd16b138df9026fb1f998cf9de836e"
+        },
+        "tools/evidence/reproduce.py": {
+          "path": "/tmp/nexus-io36-native-20261018/tools/evidence/reproduce.py",
+          "bytes": 32866,
+          "sha256": "aaa431bfbfe1bae2b4453a2ec166cac05865856399ff409e33e3e9d33708887a"
+        },
+        "tools/configure/configure.py": {
+          "path": "/tmp/nexus-io36-native-20261018/tools/configure/configure.py",
+          "bytes": 71177,
+          "sha256": "08056a918a76a8b0005291953f91b0f439eef65e6b066aa3ab76e6b9211529ae"
+        }
+      },
+      "notification": "Sent exact source chain to Root and author before report. Existing45/78/85 actual GREEN is preserved and does not cover this chained success path."
+    }
+  ],
+  "other_source_findings": {
+    "minimal_three_file_scope": "One reusable workflow, one explicit existing-performance dispatch bridge and extensions to the existing workflow test module. No firmware/runtime changes or additional build/configuration framework.",
+    "B_equals_T": "Early request enforces canonical40lowerhex expected==GITHUB_SHA==NEXUS_WORKFLOW_SHA. Context record includes repository/event/ref/workflow_ref/run/attempt. Checkout uses context SHA, full history, no submodules/credential persistence. Source guard checks actual HEAD, clean Git status, canonical contained tracked regular TOML with no symlink ancestors and exact workload enum; then delegates delivery.guard.",
+    "input_injection": "Inputs are transferred through job env, parsed as Python data and quoted shell argv. No input expression is interpolated into run code. Traversal/absolute/backslash/symlink/dirty/workload/malformed SHA cases are covered by actual extracted-guard executions. This is intended for the local reviewed caller at the same commit, not an attestation of arbitrary foreign callers.",
+    "isolation": "Parsed BaseLoader confirms the entire prior profiles job except its explicit selector is identical, schedule identical and read permissions identical. qualification-only selects only the local reusable; scheduled/default manual profiles retain existing three rows and every step/pin. CI and release policy bytes remain protected and unchanged.",
+    "permissions": "workflow_call only, contents:read, no inherited secrets or publishing/attestation/deployment/package writes. All referenced existing checkout/setup/upload actions are pinned as before. New concurrency serializes the same SHA without cancelling earlier execution.",
+    "resources": "Runner Docker/tool/CA/amd64 and >=10GiB planning headroom observation is before online setup. It does not bypass or reduce engine physical storage admission, alter driver/locks, prune caches or claim a measured remote peak.",
+    "SDK_and_OCI_CLI": "Full maintained SDK prepare/package/verify/complete consumer/strict transport/stage CLI arguments and outside-checkout prefixes match current implementations. Existing recipe verify, tiny requirements-only Docker context, ephemeral trusted CA secret, actual image ID seal/verify/load and OCI/full-ARM portable exports use maintained CLIs without old-lock edits or fabricated image success.",
+    "offline_CLI": "Two maintained reproduce.py invocations only, --prepare-spec then actual --spec/--report. No custom Docker run, storage override, --qualification, development fixture or candidate sealing. Formal source/SDK/toolchain/ELF/BIN proof remains owned by the existing engine.",
+    "early_failure": "Fresh RUNNER_TEMP run/attempt-specific request/context logs survive workspace checkout cleanup. Invalid request/unvalidated checkout produces explicit identity_available:false/qualified:false metadata, not a forged ci_job_identity. After validated checkout, unavailable identity import fails and cannot claim ready; valid failed checkout uses actual maintained failed-job capture.",
+    "archive_failure": "Collect is always-run, copies original setup evidence first, uses existing generic store only for available failed partial paths, never strict passed consumer transport. A failed archive command propagates nonzero and cannot create build/delivery or passed identity. Upload is always hidden-inclusive, 30-day retention, missing-files error. It cannot repair the open post-reproduction closure blocker."
+  },
+  "iidfile_candidate_independent_narrow_execution": {
+    "authorization": "Root explicitly authorized executing only the actual extracted iidfile Python heredoc against small real temporary files, no Docker or large suite.",
+    "extracted_code_sha256": "559a4902dbbe74dea89204e51c88a966c0061591fdca998c5a9f0f21df965042",
+    "actual_code": "import os, re\nfrom pathlib import Path\nraw = (Path(os.environ['RUNNER_TEMP']) / 'nexus-image-id').read_text()\nif not re.fullmatch('sha256:[0-9a-f]{64}\\\\n?', raw):\n    raise SystemExit('One exact actual image config ID required')\nprint(raw.rstrip('\\n'))\n",
+    "samples": [
+      {
+        "raw": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "actual_exit": 0,
+        "stdout": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+        "stderr": ""
+      },
+      {
+        "raw": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+        "actual_exit": 0,
+        "stdout": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+        "stderr": ""
+      },
+      {
+        "raw": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\n",
+        "actual_exit": 1,
+        "stdout": "",
+        "stderr": "One exact actual image config ID required\n"
+      },
+      {
+        "raw": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\nextra\n",
+        "actual_exit": 1,
+        "stdout": "",
+        "stderr": "One exact actual image config ID required\n"
+      }
+    ],
+    "conclusion": "The suspected escaping defect is disproved. Python string decoding produces the intended optional real LF regex. No production change is warranted for that candidate. These are reviewer spot executions recorded here, not whole-module TDD receipts or remote qualification."
+  },
+  "TDD_and_evidence": {
+    "strict_initial_RED": {
+      "phase": "platform-red-r2",
+      "whole_tests": 39,
+      "failures": 8,
+      "errors": 0,
+      "skips": 0,
+      "exit": 1,
+      "test_sha256": "e7df3bef7c1aa605e010810eb8737f3d6f092199e7e714097be9edde3b6f1e07",
+      "same_tests_first_GREEN": true
+    },
+    "initial_RED_history": "platform-red-r1 has7 assertion failures+1 test-shape TypeError; preserved, corrected in tests-only r2 before production. Not all8 are labelled genuine contract RED for r1.",
+    "run_attempt_TDD": "After initial39GREEN, whole43 actual1 assertion failure on checkout-cleanup/run-attempt early evidence, then same43GREEN after minimal run/attempt retention fix and explicit fixture directory contract.",
+    "resources_TDD": "Whole43 actual1 assertion failure on resource observation after online setup; moved unchanged observation before setup, same43GREEN.",
+    "postimplementation_coverage": "External SDK/Docker failure ports, actual failed-job identity, backslash path, partial-archive failure and absent identity tool were added/strengthened after initial GREEN. Their first actual outcomes were GREEN, not retroactive RED.",
+    "ARM_PATH_history": "First nine-boundary attempt ran85 with12 skips and was correctly rejected exit1. Only external PATH gained the existing hash-locked ARM14 toolchain; same nine modules then85/0skip, and final same-source85/0skip. No source/lock change or skip relaxation.",
+    "final_counts": {
+      "final-platform-r1": {
+        "discovered": 45,
+        "executed": 45,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "workflows-final-r2": {
+        "suite": "workflows",
+        "discovered": 78,
+        "executed": 78,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "final-related-boundaries-r1": {
+        "discovered": 85,
+        "executed": 85,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      }
+    },
+    "full_final_module_paths": [
+      ".github/workflows/test_platform_ci.py",
+      "tools/testing/run_tool_tests.py --suite workflows",
+      "tools/testing/test_build_recipe.py",
+      "tools/testing/test_reproduction_boundary.py",
+      "tools/testing/test_reproduction_storage.py",
+      "tools/testing/test_reproduction_consumer.py",
+      "tools/testing/test_git_environment.py",
+      "tests/contracts/test_repro_execution.py",
+      "tests/contracts/test_evidence_candidate.py",
+      "tests/contracts/test_evidence_scope_proof.py",
+      "tools/testing/test_sdk_verification_call.py"
+    ],
+    "phases": [
+      {
+        "phase": "final-platform-r1",
+        "receipt": "execution/final-platform-r1/command.attempts/1792297450443874570-e5b6d872f4cd47ea924d23e2c4bca73d/receipt.json",
+        "result": "execution/final-platform-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 45,
+          "executed": 45,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "final-related-boundaries-r1",
+        "receipt": "execution/final-related-boundaries-r1/command.attempts/1792297512912651515-35d5428346d0471d8be2ca8eebdd0b92/receipt.json",
+        "result": "execution/final-related-boundaries-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 85,
+          "executed": 85,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "platform-boundaries-r1",
+        "receipt": "execution/platform-boundaries-r1/command.attempts/1792297099297328897-6d839d5891444b3a828a43c74e22cd24/receipt.json",
+        "result": "execution/platform-boundaries-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 42,
+          "executed": 42,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "platform-green-r1",
+        "receipt": "execution/platform-green-r1/command.attempts/1792297031729510551-8394f96fe1fa4127b9ee77b117042262/receipt.json",
+        "result": "execution/platform-green-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 39,
+          "executed": 39,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "platform-red-r1",
+        "receipt": "execution/platform-red-r1/command.attempts/1792296931214684668-ea79e2022c7f46c9bd8ef59777f20d0e/receipt.json",
+        "result": "execution/platform-red-r1/result.json",
+        "actual_exit": 1,
+        "counts": {
+          "discovered": 39,
+          "executed": 39,
+          "failures": 7,
+          "errors": 1,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "platform-red-r2",
+        "receipt": "execution/platform-red-r2/command.attempts/1792296946312281118-ead4a24ebbb445109eb1959360a87357/receipt.json",
+        "result": "execution/platform-red-r2/result.json",
+        "actual_exit": 1,
+        "counts": {
+          "discovered": 39,
+          "executed": 39,
+          "failures": 8,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "related-boundaries-r1",
+        "receipt": "execution/related-boundaries-r1/command.attempts/1792297243057519641-52235eb7894f46b59b94daf81fd61779/receipt.json",
+        "result": "execution/related-boundaries-r1/result.json",
+        "actual_exit": 1,
+        "counts": {
+          "discovered": 85,
+          "executed": 85,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 12,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "related-boundaries-r2",
+        "receipt": "execution/related-boundaries-r2/command.attempts/1792297283069191105-0acbac11f07540a0b8be2703edcdcde9/receipt.json",
+        "result": "execution/related-boundaries-r2/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 85,
+          "executed": 85,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "resources-green-r1",
+        "receipt": "execution/resources-green-r1/command.attempts/1792297365429690836-b3941980d51c4c25843a65f1f419beb0/receipt.json",
+        "result": "execution/resources-green-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 43,
+          "executed": 43,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "resources-red-r1",
+        "receipt": "execution/resources-red-r1/command.attempts/1792297325218042885-eb1c124b89a844a7ba3c4164e3bd11da/receipt.json",
+        "result": "execution/resources-red-r1/result.json",
+        "actual_exit": 1,
+        "counts": {
+          "discovered": 43,
+          "executed": 43,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "run-identity-green-r1",
+        "receipt": "execution/run-identity-green-r1/command.attempts/1792297178204441188-8f2f1692223a474bbc1dd2aa56933248/receipt.json",
+        "result": "execution/run-identity-green-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "discovered": 43,
+          "executed": 43,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "run-identity-red-r1",
+        "receipt": "execution/run-identity-red-r1/command.attempts/1792297158139520073-6f042779c1cf476a81b38702ee007b2f/receipt.json",
+        "result": "execution/run-identity-red-r1/result.json",
+        "actual_exit": 1,
+        "counts": {
+          "discovered": 43,
+          "executed": 43,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0
+        }
+      },
+      {
+        "phase": "workflows-final-r1",
+        "receipt": "execution/workflows-final-r1/command.attempts/1792297394772453180-234cfad086fe45ea9280203540b6d5fc/receipt.json",
+        "result": "execution/workflows-final-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "suite": "workflows",
+          "discovered": 76,
+          "executed": 76,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0,
+          "status": "passed"
+        }
+      },
+      {
+        "phase": "workflows-final-r2",
+        "receipt": "execution/workflows-final-r2/command.attempts/1792297476642715041-01e967bbd34848aeb1577b04a0d29ff9/receipt.json",
+        "result": "execution/workflows-final-r2/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "suite": "workflows",
+          "discovered": 78,
+          "executed": 78,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0,
+          "status": "passed"
+        }
+      },
+      {
+        "phase": "workflows-green-r1",
+        "receipt": "execution/workflows-green-r1/command.attempts/1792297206715736697-325bc7d7eab244f8a9a52958b14c9dfb/receipt.json",
+        "result": "execution/workflows-green-r1/result.json",
+        "actual_exit": 0,
+        "counts": {
+          "suite": "workflows",
+          "discovered": 76,
+          "executed": 76,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "expected_failures": 0,
+          "unexpected_successes": 0,
+          "status": "passed"
+        }
+      }
+    ],
+    "checks": "All15 command and attempt receipts agree fieldwise; actual child returns equal reported outcomes, completed withdrawal/stability=true and no retained withdrawn processes. Each stdout/stderr SHA and combined raw copy verified. Result values equal frozen counts and result mtime lies inside actual receipt interval. All final commands have the same exact three source identities and unchanged before/after guards. Whole-module helper loads each listed module completely, rejects skipped/expected-failure/zero/missing executions; no test filter or shard.",
+    "source_preservation": "All32 original method/function source segments in existing classes are byte-identical;31 original test methods retained. Removing only the new class and two baseline constants makes the old module AST identical. Strict39RED and first39GREEN test bytes identical.",
+    "guard_scope": "All15 selected source/protected/index/status before/after guards equal; only authorized three Git-visible source paths differ from baseline (initial tests-only RED changes only test_platform_ci.py). Eight protected authorities and current own index bytes verified. This is selected local development evidence, not clean final-source qualification or complete compiler closure.",
+    "recorded_index": {
+      "bytes": 3350564,
+      "sha256": "9144d61700cb775043ff6e9d30eacdcc8ca41834fb5f7ac4a94ce00131bc36ca"
+    },
+    "semantic_index_sha256": "78707d6b81d9eebbf31471321a0673a2c5f272a679ae3574e57dc3a519bd3bb3",
+    "resources": {
+      "authorized_feature_allocated_cap_bytes": 1572864,
+      "initial_cap_bytes": 1048576,
+      "cap_increase": "Root explicitly authorized +512KiB before final freeze; raw/guards were not deleted or shortened.",
+      "TMP_fixture_limit_bytes": 26214400,
+      "max_measured_child_RSS_KiB": 44788,
+      "TMP_allocations_at_all_joins": [
+        0
+      ],
+      "TMP_peak_limitation": "Only live owned temporary allocations at command joins were counted, not continuous filesystem peak; small fixtures were removed by unittest cleanup. No source/SDK/image/ELF bulk copy was made.",
+      "no_ELF_or_large_generation_copied": true
+    }
+  },
+  "transport_review": {
+    "file_rows": 158,
+    "maintained_source_rows": 3,
+    "historical_evidence_rows": 155,
+    "payload_bytes": 651537,
+    "all_file_sizes_SHA256_and_regular_no_symlink_paths": true,
+    "sources_metadata_rows": 3,
+    "sources_already_inside_files": true,
+    "unique_sources_plus_files_union": 158,
+    "integrator_instruction": "sources is duplicate metadata for the exact same three source rows already present in files. All expected_path/durable_source/bytes/SHA values match; do not concatenate as161 outputs. Root may create a separate normalized map with source_count=3 and unique158 rows; preserve original author map unchanged.",
+    "paths": "Every expected path is canonical relative POSIX, unique including casefold, no escape/dot/.git/NUL/backslash/drive. Every durable source is regular with no symlink or symlink ancestor, and all158 exact sizes/SHA values match. Historical code/text leaves use raw extensions; no historical Python/YAML is added as active source. JSON remains ordinary evidence hygiene input.",
+    "note": "The original map is self-identified externally by its SHA. It is not rewritten by this review, and this transport integrity pass cannot close the runtime artifact-selection blocker."
+  },
+  "scope_limits": [
+    "No real Docker build/seal/load, complete SDK matrix, offline build, workflow dispatch, remote artifact API admission or network preparation was executed in this feature review.",
+    "The valid all-ones model OCI ID is only a unit external-port value; local tool/model counts do not establish a real image or remote qualification.",
+    "Future final B=T must be normally committed, independently reviewed, pushed and explicitly authorized for remote dispatch. Existing e6/local dirty execution cannot qualify that future commit.",
+    "No candidate, release, HIL/physical USB/timing, reproducibility or full current-source software qualification is claimed.",
+    "The author may add iidfile coverage as a new test-only delta; this report binds only immutable d5ca freeze and its final45/78/85 source tuple, not later source/test bytes."
+  ],
+  "review_actions": {
+    "source_index_original_packets_modified": false,
+    "large_test_suite_Docker_build_network_or_dispatch_executed": false,
+    "only_new_output": "/workspace/nexus-io-recovery-20261018/validation/remote-software-qualification-code-independent-review-r1.json",
+    "exception": "Only the explicitly authorized narrow iidfile heredoc spot-execution was run; all other code/receipts/transport review was read-only."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "phase": "resources-red-r1",
+  "exit_code": 1,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/resources-red-r1/command.attempts/1792297325218042885-eb1c124b89a844a7ba3c4164e3bd11da/receipt.json",
+  "guards_stable": true,
+  "persistent_allocated_bytes": 745472,
+  "TMP_live_allocated_bytes": 0,
+  "child_max_rss_KiB": 26604
+}

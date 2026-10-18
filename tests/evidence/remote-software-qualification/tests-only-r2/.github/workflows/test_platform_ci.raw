@@ -1,0 +1,732 @@
+"""Exercise workflow syntax and the real CTest admission used by the CLI."""
+import configparser
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+
+import yaml
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def workflow(name):
+    # BaseLoader preserves Actions' `on` key independently of YAML 1.1 booleans.
+    return yaml.load((ROOT / '.github/workflows' / name).read_text(), Loader=yaml.BaseLoader)
+
+
+def selects_branch(event, branch):
+    # The maintained CI policy uses literals and prefix/** only. This does not
+    # emulate arbitrary Actions globs, path selection or GitHub run execution.
+    if not event:
+        return True
+    if 'branches-ignore' in event:
+        raise AssertionError('CI must not hide stacked PR bases')
+    branches = event.get('branches')
+    if branches is None:
+        return True
+    for pattern in branches:
+        if pattern.endswith('/**'):
+            if branch.startswith(pattern[:-2]):
+                return True
+        elif '*' in pattern or '?' in pattern or pattern.startswith('!'):
+            raise AssertionError('Unexpected maintained branch pattern')
+        elif branch == pattern:
+            return True
+    return False
+
+
+class WorkflowContracts(unittest.TestCase):
+    def test_feature_pushes_select_the_actual_workflow(self):
+        event = workflow('ci.yml')['on']['push']
+        cases = [('main', True), ('develop', True), ('codex/task', True),
+                 ('codex/team/task', True), ('feat/io-evolution-20261017', True),
+                 ('feat/industrial-platform', True), ('feat/team/task', True),
+                 ('feature/task', False), ('docs-delivery', False)]
+        for branch, expected in cases:
+            with self.subTest(branch=branch):
+                self.assertEqual(selects_branch(event, branch), expected)
+        self.assertEqual(set(event['branches']),
+                         {'main', 'develop', 'codex/**', 'feat/**'})
+
+    def test_pull_requests_admit_stacked_and_other_base_branches(self):
+        event = workflow('ci.yml')['on']['pull_request']
+        for base in ('main', 'develop', 'feat/industrial-platform',
+                     'feat/io-evolution-20261017', 'maintenance/next'):
+            with self.subTest(base=base):
+                self.assertTrue(selects_branch(event, base))
+        # Actions evaluates PR branch filters against the base, not head.
+        # No path/base exclusion may prevent the aggregate status from running.
+        self.assertFalse(event)
+
+    def test_broader_ci_does_not_gain_a_privileged_event_or_permissions(self):
+        document = workflow('ci.yml')
+        self.assertEqual(set(document['on']),
+                         {'push', 'pull_request', 'workflow_dispatch', 'schedule'})
+        self.assertEqual(document['permissions'],
+                         {'contents': 'read', 'pull-requests': 'read'})
+        self.assertEqual(document['jobs']['docs']['permissions'],
+                         {'contents': 'read'})
+        self.assertEqual(document['on']['schedule'], [{'cron': '0 2 * * *'}])
+        self.assertEqual(document['jobs']['status-check']['if'], 'always()')
+
+    def test_dependency_review_is_weekly_read_only_and_source_bound(self):
+        document = workflow('dependency-maintenance.yml')
+        self.assertEqual(document['on']['schedule'][0]['cron'], '0 3 * * 1')
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        steps = document['jobs']['observe']['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertIn('dependency_proposals.py --observe-upstream', commands)
+        self.assertNotIn('git push', commands)
+        self.assertIn('compatibility.py', commands)
+        upload = next(i for i, step in enumerate(steps) if step.get(
+            'uses', '').startswith('actions/upload-artifact@'))
+        seal = steps[upload - 1]
+        self.assertEqual(seal['uses'], './.github/actions/record-identity')
+        self.assertEqual(seal['with']['require-dependencies'], 'true')
+        self.assertEqual(steps[upload]['with']['retention-days'], '30')
+
+    def test_docs_preview_has_no_deployment_permissions(self):
+        document = workflow('docs-build.yml')
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        caller = workflow('ci.yml')['jobs']['docs']
+        self.assertEqual(caller['permissions'], {'contents': 'read'})
+        self.assertNotIn('secrets', caller)
+        self.assertEqual(set(document['jobs']), {'build'})
+        steps = document['jobs']['build']['steps']
+        checkout = next(step for step in steps if step.get('uses', '').startswith(
+            'actions/checkout@'))
+        self.assertEqual(checkout['with']['submodules'], 'recursive')
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertIn('tools/documentation/install.py', commands)
+        self.assertIn('tools/dev/dev.py docs test', commands)
+        self.assertIn('tools/dev/dev.py docs check', commands)
+        self.assertIn('tools/dev/dev.py docs build', commands)
+        self.assertIn('tools/dev/dev.py docs package', commands)
+        self.assertIn('--output "$RUNNER_TEMP/nexus-documentation-package"',
+                      commands)
+        self.assertIn('shutil.copytree(source, staging)', commands)
+        self.assertIn('delivery.verify', commands)
+        self.assertNotIn('sudo apt-get', commands)
+
+    def test_docs_tests_reuse_the_prepared_nondefault_tool_prefix(self):
+        steps = workflow('docs-build.yml')['jobs']['build']['steps']
+        prepared = next(step['run'] for step in steps
+                        if 'tools/documentation/install.py' in step.get('run', ''))
+        execute = next(step['run'] for step in steps
+                       if 'tools/dev/dev.py docs test' in step.get('run', ''))
+        prepared_arguments = shlex.split(prepared.replace('\\\n', ' '))
+        test_arguments = shlex.split(execute.replace('\\\n', ' '))
+        prefix = prepared_arguments[prepared_arguments.index('--prefix') + 1]
+        self.assertEqual(prefix, '$RUNNER_TEMP/nexus-docs-tools')
+        self.assertEqual(test_arguments[0], prefix + '/venv/bin/python')
+        self.assertIn('--tool-prefix', test_arguments)
+        self.assertEqual(test_arguments[test_arguments.index('--tool-prefix') + 1],
+                         prefix)
+        self.assertFalse(any('pages' in step.get('uses', '') for step in steps))
+
+    def test_docs_preview_only_uploads_successful_bound_outputs(self):
+        steps = workflow('docs-build.yml')['jobs']['build']['steps']
+        index = next(index for index, step in enumerate(steps) if step.get(
+            'uses', '').startswith('actions/upload-artifact@'))
+        upload = steps[index]
+        self.assertEqual(upload['if'], 'success()')
+        self.assertEqual(upload['with']['if-no-files-found'], 'error')
+        seal = steps[index - 1]
+        self.assertEqual(seal.get('uses'), './.github/actions/record-identity')
+        self.assertEqual(seal['if'], 'success()')
+        self.assertEqual(seal['with']['artifacts'].splitlines(), [
+            'build/documentation/', 'build/documentation-package/',
+            'build/documentation-check.json', 'build/documentation-tests.json'])
+        self.assertEqual(seal['with']['output'], 'build/docs-job-identity')
+        self.assertEqual(seal['with']['require-dependencies'], 'false')
+        self.assertIn('build/docs-job-identity/', upload['with']['path'])
+
+    def test_docs_publish_only_consumes_verified_trusted_branch_payload(self):
+        document = workflow('docs-publish.yml')
+        self.assertEqual(document['on']['push']['branches'], ['docs-delivery'])
+        self.assertNotIn('pull_request', document['on'])
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        validate = document['jobs']['validate']
+        self.assertEqual(validate['permissions'], {'contents': 'read'})
+        commands = '\n'.join(step.get('run', '') for step in validate['steps'])
+        self.assertIn('python3 verifier/verify_documentation.py public publication.json', commands)
+        self.assertNotIn('pip install', commands)
+        self.assertNotIn('tools/dev/dev.py', commands)
+        upload = next(step for step in validate['steps'] if step.get(
+            'uses', '').startswith('actions/upload-pages-artifact@'))
+        self.assertEqual(upload['if'], 'success()')
+        self.assertEqual(upload['with']['path'], 'public')
+        deploy = document['jobs']['deploy']
+        self.assertEqual(deploy['needs'], 'validate')
+        self.assertEqual(deploy['permissions'], {'pages': 'write', 'id-token': 'write'})
+        self.assertEqual(deploy['environment']['name'], 'nexus-documentation')
+        self.assertFalse(any(step.get('uses', '').startswith('actions/checkout@')
+                             or 'run' in step for step in deploy['steps']))
+
+    def test_docs_publish_upload_preserves_hidden_payload_identities(self):
+        steps = workflow('docs-publish.yml')['jobs']['validate']['steps']
+        upload = next(step for step in steps if step.get(
+            'uses', '').startswith('actions/upload-pages-artifact@'))
+        # Output ownership markers and .nojekyll are verified public bytes.
+        # The pinned Pages uploader otherwise excludes every hidden path.
+        self.assertEqual(upload['with'].get('include-hidden-files'), 'true')
+
+    def test_source_sdk_attests_only_a_successful_observed_manifest(self):
+        job = workflow('release.yml')['jobs']['source-sdk']
+        self.assertEqual(job.get('permissions', {}).get('id-token'), 'write')
+        self.assertEqual(job.get('permissions', {}).get('attestations'), 'write')
+        attestations = [step for step in job['steps'] if step.get(
+            'uses', '').startswith('actions/attest-build-provenance@')]
+        self.assertEqual(len(attestations), 1)
+        self.assertEqual(attestations[0]['if'], 'success()')
+        self.assertEqual(attestations[0]['with']['subject-path'],
+                         'build/job-identities/source-sdk/identity.json')
+
+    def test_every_software_upload_is_bound_to_observed_job_identity(self):
+        count = 0
+        for name in ('build-matrix.yml', 'enterprise-tools.yml',
+                     'quality-checks.yml', 'performance.yml', 'release.yml'):
+            for job in workflow(name)['jobs'].values():
+                steps = job.get('steps', [])
+                for index, upload in enumerate(steps):
+                    if not upload.get('uses', '').startswith(
+                            'actions/upload-artifact@'):
+                        continue
+                    with self.subTest(workflow=name, upload=upload['name']):
+                        self.assertGreater(index, 0)
+                        seal = steps[index - 1]
+                        self.assertEqual(seal.get('uses'),
+                                         './.github/actions/record-identity')
+                        self.assertEqual(seal['if'], 'always()')
+                        self.assertEqual(seal['with']['result'],
+                                         '${{ job.status }}')
+                        self.assertIn(seal['with']['output'],
+                                      upload['with']['path'])
+                        self.assertEqual(upload['with']['include-hidden-files'],
+                                         'true')
+                        self.assertGreaterEqual(
+                            int(upload['with']['retention-days']), 30)
+                        count += 1
+        self.assertGreaterEqual(count, 10)
+
+    def test_actual_workflows_and_shell_blocks_parse(self):
+        count = 0
+        for path in (ROOT / '.github/workflows').glob('*.yml'):
+            document = workflow(path.name)
+            self.assertIn('on', document, path.name)
+            self.assertIsInstance(document['jobs'], dict)
+            for job in document['jobs'].values():
+                for item in job.get('steps', []):
+                    self.assertNotEqual('run' in item, 'uses' in item, path.name)
+                    if 'run' in item:
+                        script = re.sub(r'\$\{\{.*?\}\}', 'workflow-value', item['run'])
+                        result = subprocess.run(['bash', '-n'], input=script,
+                                                capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 0, path.name + ': ' + result.stderr)
+                        count += 1
+        self.assertGreater(count, 20)
+
+    def test_six_selected_board_backend_link_profiles_have_actual_presets(self):
+        jobs = workflow('build-matrix.yml')['jobs']
+        selected = set(jobs['arm']['strategy']['matrix']['preset'])
+        self.assertEqual(selected, {
+            'stm32-qiming-baremetal', 'stm32-qiming-freertos',
+            'stm32-sky-baremetal', 'stm32-sky-freertos',
+            'gd32-liangshan-baremetal', 'gd32-liangshan-freertos'})
+        presets = json.loads((ROOT / 'CMakePresets.json').read_text())
+        configured = {p['name'] for p in presets['configurePresets']}
+        self.assertLessEqual(selected, configured)
+        native = set(jobs['native']['strategy']['matrix']['preset'])
+        self.assertEqual(native, {'native-debug', 'native-release', 'native-asan',
+                                  'native-tsan'})
+        self.assertLessEqual(native, configured)
+        for name in ('arm', 'native'):
+            commands = '\n'.join(s.get('run', '') for s in jobs[name]['steps'])
+            self.assertIn('tools/dev/dev.py configure', commands)
+            self.assertIn('tools/dev/dev.py build', commands)
+            self.assertNotIn('kconfig', commands.lower())
+
+    def test_actions_initializer_uses_recursive_pinned_gitlinks(self):
+        action = yaml.load((ROOT / '.github/actions/setup-build/action.yml').read_text(),
+                           Loader=yaml.BaseLoader)
+        commands = '\n'.join(s.get('run', '') for s in action['runs']['steps'])
+        self.assertIn('tools/dev/dependencies.py prepare', commands)
+        self.assertIn('--scope preset --preset', commands)
+        self.assertIn('--allow-network', commands)
+        from tools.dev import dependencies
+        self.assertTrue(dependencies.required_submodules('native'))
+        self.assertIn('scripts/ci/install_arm_toolchain.py', commands)
+        self.assertNotIn('apt-get', commands)
+
+    def test_actions_initializer_covers_every_declared_gitlink(self):
+        modules = configparser.ConfigParser()
+        modules.read(ROOT / '.gitmodules')
+        expected = {modules[section]['path'] for section in modules.sections()}
+        self.assertTrue(expected)
+        action = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
+                           .read_text(), Loader=yaml.BaseLoader)
+        commands = [step['run'].strip() for step in action['runs']['steps']
+                    if 'tools/dev/dependencies.py prepare' in step.get('run', '')]
+        self.assertEqual(len(commands), 1)
+        arguments = shlex.split(commands[0].replace('\\\n', ' '))
+        self.assertIn('--scope', arguments)
+        self.assertIn('preset', arguments)
+        self.assertIn('--report', arguments)
+        from tools.dev import dependencies
+        # Native models require every declared dependency; an ARM job binds its
+        # explicitly selected recursive closure through the preparation receipt.
+        self.assertEqual(set(dependencies.required_submodules('native')), expected)
+
+    def test_native_executes_complete_ctest_and_google_plan_once(self):
+        native = workflow('build-matrix.yml')['jobs']['native']
+        commands = '\n'.join(step.get('run', '') for step in native['steps'])
+        self.assertEqual(commands.count('scripts/ci/native_contracts.py'), 1)
+        self.assertNotIn('scripts/ci/tdd_gate.py', commands)
+        self.assertNotIn('tools/dev/dev.py test', commands)
+        self.assertIn('--preset "${{ matrix.preset }}"', commands)
+        evidence = [step for step in native['steps']
+                    if step.get('name') == 'Preserve execution evidence'][0]
+        self.assertIn('/tdd/', evidence['with']['path'])
+        self.assertIn('/google-contracts.json', evidence['with']['path'])
+
+    def test_tooling_runs_google_report_and_hil_preparation_boundaries(self):
+        tools = workflow('enterprise-tools.yml')['jobs']['tooling']
+        commands = '\n'.join(step.get('run', '') for step in tools['steps'])
+        self.assertIn('tools/testing/run_tool_tests.py --suite testing', commands)
+        self.assertIn('tools-testing.json', commands)
+        self.assertEqual(commands.count('--suite configure'), 1)
+        self.assertIn('tools.hil.prepare', commands)
+
+    def test_tool_contracts_have_one_automatic_workflow_caller(self):
+        events = workflow('enterprise-tools.yml')['on']
+        self.assertEqual(set(events), {'workflow_call', 'workflow_dispatch'})
+        # Maintained work branches must retain pre-PR checks.
+        ci_events = workflow('ci.yml')['on']
+        self.assertEqual(set(ci_events['push']['branches']),
+                         {'main', 'develop', 'codex/**', 'feat/**'})
+        self.assertIn('pull_request', ci_events)
+
+    def test_each_arm_link_retains_an_unbound_hil_work_plan(self):
+        arm = workflow('build-matrix.yml')['jobs']['arm']
+        commands = '\n'.join(step.get('run', '') for step in arm['steps'])
+        self.assertIn('tools/hil/prepare.py', commands)
+        evidence = [step for step in arm['steps']
+                    if step.get('name') == 'Preserve linked software evidence'][0]
+        self.assertIn('/hil-preparation.json', evidence['with']['path'])
+
+    def test_advanced_fixture_loop_uses_the_authored_toml_set(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertIn('"$fixture"/*.toml', commands)
+        self.assertNotIn('"$fixture"/*.json', commands)
+
+    def test_all_arm_provider_fixtures_use_the_source_bound_audit_gate(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        selected = set(job['strategy']['matrix'].get('fixture', []))
+        self.assertEqual(selected, {
+            'stm32_assembly', 'gd32_assembly', 'can_assembly', 'usb_assembly',
+            'ethernet_assembly', 'timer_assembly', 'g474_assembly',
+            'h743_assembly', 'u575_assembly',
+            'multi_controller_assembly', 'mainstream_assembly'})
+        for name in selected:
+            self.assertTrue(list((ROOT / 'tests/contracts' / name).glob('*.toml')))
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/provider_assemblies.py'), 1)
+        self.assertIn('arguments+=(--fixture "$assembly")', commands)
+        self.assertIn('"${arguments[@]}"', commands)
+        self.assertIn('--compiler arm-none-eabi-gcc', commands)
+        self.assertNotIn('cmake --build', commands)
+        self.assertNotIn('NEXUS_BACKEND', commands)
+
+    def test_cpu_runtime_matrix_executes_real_kernel_links_and_keeps_evidence(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/cortex_runtime.py'), 1)
+        self.assertIn('--output build/cortex-runtime', commands)
+        evidence = [step for step in job['steps']
+                    if step.get('name') == 'Preserve compiler evidence'][0]
+        self.assertIn('build/cortex-runtime/', evidence['with']['path'])
+
+    def test_cold_cache_instruction_gate_runs_and_preserves_actual_evidence(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/cache_control_compile.py'), 1)
+        self.assertIn('--output build/cache-control', commands)
+        for name in ('Preserve compiler evidence',
+                     'Bind the upload to observed execution identity'):
+            step = next(item for item in job['steps'] if item.get('name') == name)
+            values = '\n'.join(str(value) for value in step['with'].values())
+            self.assertIn('build/cache-control/', values)
+
+    def test_os_cost_and_profile_gates_retain_actual_execution_artifacts(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        evidence = next(step for step in job['steps']
+                        if step.get('name') == 'Preserve compiler evidence')
+        for name in ('os_profiles', 'os_wait_cost', 'os_resources'):
+            self.assertEqual(commands.count('scripts/ci/' + name + '.py'), 1)
+            directory = 'build/' + name.replace('_', '-')
+            self.assertIn('--output ' + directory, commands)
+            self.assertIn(directory + '/', evidence['with']['path'])
+        native = workflow('build-matrix.yml')['jobs']['native']
+        execute = next(step for step in native['steps']
+                       if 'scripts/ci/native_contracts.py' in step.get('run', ''))
+        self.assertEqual(execute['env']['TSAN_OPTIONS'], 'halt_on_error=1')
+
+    def test_u575_pair_links_both_images_and_mutates_actual_elfs(self):
+        job = workflow('build-matrix.yml')['jobs']['arch']
+        steps = job['steps']
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertEqual(commands.count('scripts/ci/u575_trustzone.py'), 1)
+        self.assertIn('--output build/u575-trustzone', commands)
+        mutation = next(step for step in steps if
+                        'tests/contracts/u575_trustzone' in step.get('run', ''))
+        self.assertEqual(mutation['env']['NEXUS_U575_PAIR_BUILD'],
+                         'build/u575-trustzone')
+        self.assertIn("-p 'test_*.py'", mutation['run'])
+        for name in ('Preserve compiler evidence',
+                     'Bind the upload to observed execution identity'):
+            step = next(item for item in steps if item.get('name') == name)
+            values = '\n'.join(str(value) for value in step['with'].values())
+            self.assertIn('build/u575-trustzone/', values)
+
+    def test_optional_os_security_has_actual_link_gates_and_artifacts(self):
+        job = workflow('build-matrix.yml')['jobs']['os-security']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        evidence = next(step for step in job['steps']
+                        if step.get('name') == 'Preserve security link evidence')
+        for name in ('os_mpu', 'os_secure_runtime'):
+            directory = 'build/' + name.replace('_', '-')
+            self.assertEqual(commands.count('scripts/ci/' + name + '.py'), 1)
+            self.assertIn('--output ' + directory, commands)
+            self.assertIn(directory + '/', evidence['with']['path'])
+            execute = next(step for step in job['steps']
+                           if 'scripts/ci/' + name + '.py' in
+                           step.get('run', ''))
+            self.assertIn('--compiler arm-none-eabi-gcc', execute['run'])
+
+    def test_threadx_matrix_uses_locked_kernel_and_retains_execution(self):
+        job = workflow('build-matrix.yml')['jobs']['threadx']
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        self.assertEqual(commands.count('scripts/ci/os_threadx.py'), 1)
+        self.assertIn('--compiler arm-none-eabi-gcc', commands)
+        self.assertIn('--output build/os-threadx', commands)
+        evidence = next(step for step in job['steps']
+                        if step.get('name') == 'Preserve ThreadX execution')
+        self.assertIn('build/os-threadx/', evidence['with']['path'])
+        identity = next(step for step in job['steps']
+                        if step.get('uses') ==
+                        './.github/actions/record-identity')
+        self.assertEqual(identity['with']['require-dependencies'], 'true')
+        self.assertIn('build/os-threadx/', identity['with']['artifacts'])
+        setup = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
+                          .read_text(), Loader=yaml.BaseLoader)
+        initialization = '\n'.join(step.get('run', '')
+                                   for step in setup['runs']['steps'])
+        self.assertIn('tools/dev/dependencies.py prepare', initialization)
+        from tools.dev import dependencies
+        self.assertIn('ext/threadx', dependencies.required_submodules('native'))
+
+
+PROFILE_BASELINE_SHA = '921ef15385b75a0a9e91dc4be22db7362dcf0f342cfd473008222c431d15d715'
+POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'd7e7f2309f3a16c709f0992d81dee28fa544e69c3b799fd998e4213f33143192', '.github/workflows/release.yml': '92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2'}
+
+
+class SoftwareQualificationContracts(unittest.TestCase):
+    def document(self):
+        path = ROOT / '.github/workflows/software-qualification.yml'
+        self.assertTrue(path.is_file(), 'Explicit nonpublishing reusable workflow required')
+        return workflow(path.name)
+
+    def steps(self):
+        return self.document()['jobs']['qualify']['steps']
+
+    def step(self, identifier):
+        return next(step for step in self.steps() if step.get('id') == identifier)
+
+    def fixture(self, parent):
+        root = parent / 'source with spaces'
+        root.mkdir()
+        assembly = root / 'tools/configure/assemblies/space board.toml'
+        assembly.parent.mkdir(parents=True)
+        assembly.write_text('schema = 2\n')
+        (root / '.gitignore').write_text('build/\n')
+        subprocess.run(['git', 'init', '-q', str(root)], check=True)
+        self.commit(root)
+        return root
+
+    def commit(self, root):
+        subprocess.run(['git', '-C', str(root), 'add', '.'], check=True)
+        subprocess.run(['git', '-C', str(root), '-c', 'user.name=Fixture',
+                        '-c', 'user.email=fixture@example.invalid',
+                        'commit', '-qm', 'tracked fixture'], check=True)
+
+    def environment(self, root, parent):
+        commit = subprocess.check_output(['git', '-C', str(root), 'rev-parse',
+                                          'HEAD'], text=True).strip()
+        return dict(os.environ, GITHUB_WORKSPACE=str(root), RUNNER_TEMP=str(parent),
+                    GITHUB_SHA=commit, NEXUS_WORKFLOW_SHA=commit,
+                    NEXUS_EXPECTED_COMMIT=commit,
+                    NEXUS_QUALIFICATION_ASSEMBLY=
+                        'tools/configure/assemblies/space board.toml',
+                    NEXUS_QUALIFICATION_WORKLOAD='gpio',
+                    GITHUB_OUTPUT=str(parent / 'outputs'),
+                    GITHUB_REPOSITORY='fixture/nexus',
+                    GITHUB_WORKFLOW_REF='fixture/nexus/performance.yml@refs/heads/test',
+                    GITHUB_EVENT_NAME='workflow_dispatch', GITHUB_REF='refs/heads/test',
+                    GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='1')
+
+    def execute(self, identifier, root, env):
+        script = self.step(identifier)['run']
+        # Relocate the real maintained guard CLI, not its implementation.
+        script = script.replace('python3 tools/release/delivery.py',
+                                shlex.quote(sys.executable) + ' ' +
+                                shlex.quote(str(ROOT / 'tools/release/delivery.py')))
+        return subprocess.run(['bash', '-euo', 'pipefail', '-c', script],
+                              cwd=root, env=env, capture_output=True, text=True)
+
+    def test_default_profiles_and_required_policies_are_preserved(self):
+        import hashlib
+        document = workflow('performance.yml')
+        self.assertIsInstance(document['on']['workflow_dispatch'], dict,
+                              'Explicit dispatch mode input required')
+        mode = document['on']['workflow_dispatch']['inputs']['mode']
+        self.assertEqual(mode['default'], 'profiles')
+        self.assertEqual(mode['options'], ['profiles', 'qualification-only'])
+        self.assertEqual(document['on']['schedule'], [{'cron': '0 2 * * 1'}])
+        profile = dict(document['jobs']['profiles'])
+        self.assertEqual(profile.pop('if'),
+                         "github.event_name == 'schedule' || inputs.mode == 'profiles'")
+        canonical = json.dumps(profile, sort_keys=True, separators=(',', ':')).encode()
+        self.assertEqual(hashlib.sha256(canonical).hexdigest(), PROFILE_BASELINE_SHA)
+        caller = document['jobs']['qualification']
+        self.assertEqual(caller['if'],
+                         "github.event_name == 'workflow_dispatch' && inputs.mode == 'qualification-only'")
+        self.assertEqual(caller['uses'], './.github/workflows/software-qualification.yml')
+        self.assertNotIn('secrets', caller)
+        for name, expected in POLICY_BASELINE_SHAS.items():
+            self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), expected)
+
+    def test_reusable_is_readonly_same_source_and_has_no_publication(self):
+        document = self.document()
+        self.assertEqual(set(document['on']), {'workflow_call'})
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        self.assertEqual(set(document['jobs']), {'qualify'})
+        checkout = self.step('checkout')
+        self.assertEqual(checkout['with']['ref'], '${{ github.sha }}')
+        self.assertEqual(checkout['with']['persist-credentials'], 'false')
+        self.assertEqual(checkout['with']['fetch-depth'], '0')
+        for name in ('expected_commit', 'qualification_assembly', 'qualification_workload'):
+            self.assertEqual(document['on']['workflow_call']['inputs'][name]['required'], 'true')
+        uses = '\n'.join(step.get('uses', '') for step in self.steps())
+        self.assertNotIn('attest', uses)
+        self.assertNotIn('secrets', document)
+        script = '\n'.join(step.get('run', '') for step in self.steps())
+        self.assertNotIn('docker run ', script)
+        self.assertNotIn('--development-fixture', script)
+        self.assertNotIn('candidate.py', script)
+        self.assertNotIn('${{ inputs.', script)
+
+    def test_request_guard_rejects_all_sha_mismatches_without_identity(self):
+        self.document()
+        variants = [('NEXUS_EXPECTED_COMMIT', ''),
+                    ('NEXUS_EXPECTED_COMMIT', 'A' * 40),
+                    ('NEXUS_EXPECTED_COMMIT', '$(touch injected)'),
+                    ('GITHUB_SHA', '1' * 40), ('NEXUS_WORKFLOW_SHA', '2' * 40)]
+        for key, value in variants:
+            with self.subTest(key=key, value=value), tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                env = self.environment(root, parent)
+                env[key] = value
+                result = self.execute('request', root, env)
+                self.assertNotEqual(result.returncode, 0)
+                reason = parent / 'nexus-qualification-early/identity-unavailable.json'
+                self.assertTrue(reason.is_file())
+                self.assertEqual(json.loads(reason.read_text())['identity_available'], False)
+                self.assertFalse((root / 'injected').exists())
+                self.assertFalse(list(root.rglob('identity.json')))
+                self.assertFalse((parent / 'nexus-source-sdk').exists())
+
+    def test_source_guard_accepts_tracked_spaces_and_records_exact_tuple(self):
+        self.document()
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            self.assertEqual(self.execute('request', root, env).returncode, 0)
+            result = self.execute('source', root, env)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            receipt = json.loads((root / 'build/software-qualification/source.json').read_text())
+            self.assertEqual(receipt['commit'], env['NEXUS_EXPECTED_COMMIT'])
+            self.assertEqual(receipt['assembly'], env['NEXUS_QUALIFICATION_ASSEMBLY'])
+            self.assertEqual(receipt['workload'], 'gpio')
+            self.assertIn('validated=true', (parent / 'outputs').read_text())
+
+    def test_source_guard_rejects_head_dirty_path_and_workload(self):
+        self.document()
+        for kind in ('head', 'dirty', 'alias', 'absolute', 'symlink', 'untracked', 'workload'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                env = self.environment(root, parent)
+                if kind == 'head':
+                    env['NEXUS_EXPECTED_COMMIT'] = '3' * 40
+                elif kind == 'dirty':
+                    (root / '.gitignore').write_text('changed\n')
+                elif kind == 'alias':
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = 'tools/configure/assemblies/../assemblies/space board.toml'
+                elif kind == 'absolute':
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = str(root / env['NEXUS_QUALIFICATION_ASSEMBLY'])
+                elif kind == 'symlink':
+                    link = root / 'tools/configure/assemblies/link.toml'
+                    link.symlink_to('space board.toml')
+                    self.commit(root)
+                    env = self.environment(root, parent)
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = 'tools/configure/assemblies/link.toml'
+                elif kind == 'untracked':
+                    (root / 'tools/configure/assemblies/new.toml').write_text('schema=2\n')
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = 'tools/configure/assemblies/new.toml'
+                else:
+                    env['NEXUS_QUALIFICATION_WORKLOAD'] = '$(touch injected)'
+                result = self.execute('source', root, env)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse((parent / 'outputs').exists())
+                self.assertFalse((root / 'injected').exists())
+                self.assertFalse(list(root.rglob('identity.json')))
+
+    def test_complete_sdk_and_actual_observed_image_delegation(self):
+        sdk = self.step('sdk')['run']
+        for command in ('dependencies.py prepare --scope sdk',
+                        'package_source_sdk.py', 'verify_consumers.py',
+                        'transport.py pack', 'delivery.py stage'):
+            self.assertIn(command, sdk)
+        self.assertIn('--parallel 1', sdk)
+        self.assertIn('$RUNNER_TEMP/nexus-source-sdk', sdk)
+        self.assertNotIn('--development-fixture', sdk)
+        image = self.step('image')['run']
+        for command in ('recipe.py verify', 'docker build', 'container.py seal',
+                        'container.py verify', 'container.py load'):
+            self.assertIn(command, image)
+        self.assertLess(image.index('container.py seal'), image.index('container.py load'))
+        self.assertIn('--secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt', image)
+        self.assertIn('dependencies/python-tools-linux-cp312.txt', image)
+        self.assertIn('sha256:[0-9a-f]{64}', image)
+        formal = self.step('reproduce')['run']
+        self.assertEqual(formal.count('tools/evidence/reproduce.py'), 2)
+        self.assertIn('--prepare-spec', formal)
+        self.assertIn('--workload "$NEXUS_QUALIFICATION_WORKLOAD"', formal)
+        self.assertNotIn('--docker', formal)
+        self.assertNotIn('--qualification', formal)
+
+    def test_setup_failure_preserves_raw_and_does_not_create_identity(self):
+        self.document()
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            env['NEXUS_EXPECTED_COMMIT'] = 'bad'
+            self.assertNotEqual(self.execute('request', root, env).returncode, 0)
+            env.update(NEXUS_CHECKOUT_VALIDATED='', NEXUS_JOB_RESULT='failure')
+            self.assertEqual(self.execute('collect', root, env).returncode, 0)
+            self.assertEqual(self.execute('readiness', root, env).returncode, 0)
+            evidence = root / 'build/software-qualification'
+            self.assertTrue((evidence / 'setup/identity-unavailable.json').is_file())
+            self.assertTrue((evidence / 'setup/request.raw').is_file())
+            self.assertFalse(list(root.rglob('identity.json')))
+            self.assertNotIn('ready=true', (parent / 'outputs').read_text()
+                             if (parent / 'outputs').exists() else '')
+
+    def test_identity_and_failure_upload_are_explicit_and_exact(self):
+        steps = self.steps()
+        identity = self.step('identity')
+        self.assertEqual(identity['uses'], './.github/actions/record-identity')
+        self.assertEqual(identity['if'], "always() && steps.readiness.outputs.ready == 'true'")
+        self.assertEqual(identity['with']['result'], '${{ job.status }}')
+        self.assertEqual(identity['with']['require-dependencies'], 'true')
+        upload = self.step('upload')
+        self.assertEqual(upload['if'], 'always()')
+        self.assertEqual(upload['with']['include-hidden-files'], 'true')
+        self.assertEqual(upload['with']['if-no-files-found'], 'error')
+        self.assertEqual(upload['with']['retention-days'], '30')
+        self.assertEqual(steps[steps.index(upload) - 1], identity)
+        self.assertIn(identity['with']['output'], upload['with']['path'])
+        self.assertEqual(self.step('collect')['if'], 'always()')
+        collect = self.step('collect')['run']
+        self.assertIn('tools/evidence/store.py export', collect)
+        self.assertNotIn('transport.py pack', collect)
+        self.assertIn('NEXUS_JOB_RESULT', collect)
+
+
+class CTestAdmission(unittest.TestCase):
+    def execute_fixture(self, kind):
+        self.assertIsNotNone(shutil.which('cmake'))
+        self.assertIsNotNone(shutil.which('ctest'))
+        with tempfile.TemporaryDirectory(prefix='nexus real ctest ') as temporary:
+            root = Path(temporary)
+            for relative in ('tools/dev/dev.py', 'tools/dev/process.py',
+                             'tools/dev/presets.py', 'tools/dev/provenance.py',
+                             'tools/dev/qualification.py',
+                             'tools/evidence/common.py', 'tools/evidence/identity.py',
+                             'scripts/validation/junit.py'):
+                output = root / relative
+                output.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(ROOT / relative, output)
+            presets = {
+                'version': 6,
+                'configurePresets': [{'name': 'fixture', 'generator': 'Unix Makefiles',
+                                      'binaryDir': '${sourceDir}/build/fixture'}],
+                'testPresets': [{'name': 'fixture', 'configurePreset': 'fixture',
+                                 'execution': {'noTestsAction': 'error'}}]}
+            (root / 'CMakePresets.json').write_text(json.dumps(presets))
+            cmake = 'cmake_minimum_required(VERSION 3.31)\nproject(admission NONE)\nenable_testing()\n'
+            if kind != 'empty':
+                exit_code = {'pass': 0, 'failure': 1, 'skip': 7}[kind]
+                cmake += f'add_test(NAME contract COMMAND "{sys.executable}" -c "raise SystemExit({exit_code})")\n'
+                if kind == 'skip':
+                    cmake += 'set_tests_properties(contract PROPERTIES SKIP_RETURN_CODE 7)\n'
+            (root / 'CMakeLists.txt').write_text(cmake)
+            configured = subprocess.run(['cmake', '--preset', 'fixture'], cwd=root,
+                                        capture_output=True, text=True, timeout=30)
+            self.assertEqual(configured.returncode, 0, configured.stdout + configured.stderr)
+            report = root / 'build/fixture/ctest-results.xml'
+            # A stale success must never admit a later failed/empty test run.
+            report.write_text('<testsuite tests="1"><testcase name="stale"/></testsuite>')
+            os.utime(report, (1, 1))
+            result = subprocess.run([sys.executable, root / 'tools/dev/dev.py',
+                                     'test', '--preset', 'fixture'], cwd=root,
+                                    capture_output=True, text=True, timeout=30)
+            return result, report.read_text() if report.exists() else ''
+
+    def test_real_success_requires_fresh_test_execution(self):
+        result, report = self.execute_fixture('pass')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('contract', report)
+        self.assertNotIn('stale', report)
+
+    def test_failed_ctest_cannot_reuse_stale_success(self):
+        result, report = self.execute_fixture('failure')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('stale', report)
+
+    def test_zero_tests_fail(self):
+        result, report = self.execute_fixture('empty')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('stale', report)
+
+    def test_all_skipped_does_not_establish_execution(self):
+        result, report = self.execute_fixture('skip')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('stale', report)
+        self.assertIn('skipped', report)
+
+
+if __name__ == '__main__':
+    unittest.main()

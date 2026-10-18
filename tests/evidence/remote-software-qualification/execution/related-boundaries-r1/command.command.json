@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execute-whole.raw",
+    "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/related-boundaries-r1/result.json",
+    "/tmp/nexus-io36-native-20261018/tools/testing/test_build_recipe.py",
+    "/tmp/nexus-io36-native-20261018/tools/testing/test_reproduction_boundary.py",
+    "/tmp/nexus-io36-native-20261018/tools/testing/test_reproduction_storage.py",
+    "/tmp/nexus-io36-native-20261018/tools/testing/test_reproduction_consumer.py",
+    "/tmp/nexus-io36-native-20261018/tools/testing/test_git_environment.py",
+    "/tmp/nexus-io36-native-20261018/tests/contracts/test_repro_execution.py",
+    "/tmp/nexus-io36-native-20261018/tests/contracts/test_evidence_candidate.py",
+    "/tmp/nexus-io36-native-20261018/tests/contracts/test_evidence_scope_proof.py",
+    "/tmp/nexus-io36-native-20261018/tools/testing/test_sdk_verification_call.py"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "related-boundaries-r1",
+  "started_ns": 1792297243057626712,
+  "finished_ns": 1792297261234901655,
+  "duration_seconds": 18.177275734000432,
+  "timeout_seconds": 600.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/related-boundaries-r1/command.attempts/1792297243057519641-52235eb7894f46b59b94daf81fd61779/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/related-boundaries-r1/command.attempts/1792297243057519641-52235eb7894f46b59b94daf81fd61779/stderr.txt",
+    "bytes": 265,
+    "sha256": "f614bd945e27c3e13ee499484a0dfc04fce35a0b3912099d331a8de99d8ed026"
+  },
+  "attempt_receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/related-boundaries-r1/command.attempts/1792297243057519641-52235eb7894f46b59b94daf81fd61779/receipt.json"
+}
