@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "command": [
+    "git",
+    "-c",
+    "gc.auto=0",
+    "-c",
+    "maintenance.auto=false",
+    "commit",
+    "-m",
+    "feat(io): deliver finite H743 SPI DMA assembly and reset containment"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "stage": "h743-spi-dma-composite-full-commit-r1",
+  "started_ns": 1792312870200863740,
+  "finished_ns": 1792313449800667839,
+  "duration_seconds": 579.5998057420002,
+  "timeout_seconds": 7200.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/h743-spi-dma-composite-full-commit-r1/command.attempts/1792312870200793464-2794334a63e2410a84b062967a45bc8d/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/h743-spi-dma-composite-full-commit-r1/command.attempts/1792312870200793464-2794334a63e2410a84b062967a45bc8d/stderr.txt",
+    "bytes": 2777,
+    "sha256": "ed535134bef8b8e55dec8e4f3ed5b74a2feb6211dec528d8d4229f003ee06c1c"
+  }
+}

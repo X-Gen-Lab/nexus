@@ -24,7 +24,7 @@ ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = True
 DMA_VECTOR = "Stream"
-DMA_TOPOLOGY = (frozenset((1,)), range(2), range(45, 47))
+DMA_TOPOLOGY = (frozenset((1,)), range(4), frozenset((45, 46, 83, 84)))
 DMA_MEMORY_ENGINES = ("DMA1", "DMA2", "BDMA", "MDMA")
 CONDITIONAL_PACKAGE_PADS = ("PC2_C", "PC3_C")
 CLOCK_PROFILES = MappingProxyType({**{
@@ -44,7 +44,8 @@ _MODES = MappingProxyType({
     ("uart", "irq-fifo-bytes"): "uart_fifo",
     ("uart", "irq-fifo-rtscts-bytes"): "uart_rtscts",
     ("uart", "rx-dma-idle"): "uart_receive",
-    ("spi", "short-poll"): "spi", ("pwm", "fixed-pwm"): "pwm",
+    ("spi", "short-poll"): "spi", ("spi", "dma"): "spi_dma",
+    ("pwm", "fixed-pwm"): "pwm",
     ("exti", "edge-event"): "exti",
     ("watchdog", "independent"): "watchdog",
     ("i2c", "poll-messages"): "i2c",
@@ -106,6 +107,10 @@ def validate_selection(selection, route):
         if route["controller"] != "SPI4" or actual != expected:
             common.fail("H743 SPI4 requires exact PE12/13/14 AF5")
         common.integer(selection.get("max_hz"), *LIMITS["spi_hz"], "SPI rate")
+        if selection["mode"] == "dma" and (
+                selection.get("irq_priority") != 5 or
+                selection.get("calls_os", False)):
+            common.fail("H743 SPI DMA requires priority5/calls_os=false")
     elif kind == "pwm":
         expected = (("PA6", "ch1", 2),)
         actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
@@ -146,7 +151,9 @@ def validate_selection(selection, route):
 def validate_dma(route, mode, normalize):
     expected = ({"dma-tx": ("DMA1:stream0:channel46",),
                  "rx-dma-idle": ("DMA1:stream1:channel45",)}.get(mode)
-                if route["controller"] == "USART3" else None)
+                if route["controller"] == "USART3" else
+                ("DMA1:stream2:channel83", "DMA1:stream3:channel84")
+                if route["controller"] == "SPI4" and mode == "dma" else None)
     common.validate_dma(route, mode, expected, "stm32h743", normalize)
 
 

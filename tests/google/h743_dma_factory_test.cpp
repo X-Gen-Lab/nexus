@@ -145,3 +145,68 @@ TEST_F(H743DmaFactory, DmaGateEnableRefusalReportsIoBeforePinMutation) {
     EXPECT_FALSE(g_nx_stm32h743_system.started);
     EXPECT_EQ(1U, g_h743_model.cache_disable_calls);
 }
+
+TEST_F(H743DmaFactory, HeldSharedDmaResetRejectsBeforeSystemAndGateEffects) {
+    for (uint32_t reset : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                           static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)}) {
+        for (bool gate : {false, true}) {
+            if (gate)
+                RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+            else
+                RCC->AHB1ENR &= ~(uint32_t)RCC_AHB1ENR_DMA1EN;
+            RCC->AHB1RSTR |= reset;
+            const unsigned writes = g_h743_model.writes;
+            const unsigned caches = g_h743_model.cache_enable_calls;
+            const auto result = nx_platform_start();
+            EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+            EXPECT_EQ(NX_SUCCESS, result.cleanup);
+            EXPECT_EQ(0U, result.remaining_effects);
+            EXPECT_EQ(writes, g_h743_model.writes);
+            EXPECT_EQ(caches, g_h743_model.cache_enable_calls);
+            EXPECT_FALSE(g_nx_stm32h743_system.started);
+            EXPECT_FALSE(g_h743_model.irq_enabled[DMA1_Stream0_IRQn]);
+            EXPECT_FALSE(g_h743_model.irq_enabled[USART3_IRQn]);
+            EXPECT_NE(0U, RCC->AHB1RSTR & reset);
+            EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+            RCC->AHB1RSTR &= ~(uint32_t)reset;
+            Start();
+            EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+            EXPECT_EQ(gate, (RCC->AHB1ENR & RCC_AHB1ENR_DMA1EN) != 0U);
+        }
+    }
+}
+
+namespace {
+unsigned reset_after_gate_events;
+uint32_t reset_after_gate_mask;
+void HoldResetAfterDmaGate(volatile uint32_t* reg, uint32_t value) {
+    if (reg == &RCC->AHB1ENR && (value & RCC_AHB1ENR_DMA1EN) != 0U) {
+        RCC->AHB1RSTR |= reset_after_gate_mask;
+        ++reset_after_gate_events;
+    }
+}
+} /* namespace */
+TEST_F(H743DmaFactory, ResetAppearingAfterGateRejectsBeforePinLease) {
+    for (uint32_t reset : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                           static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)}) {
+        reset_after_gate_mask = reset;
+        reset_after_gate_events = 0U;
+        const unsigned gpio_writes = g_h743_model.gpio_writes;
+        g_h743_dma_after_write = HoldResetAfterDmaGate;
+        const auto result = nx_platform_start();
+        g_h743_dma_after_write = nullptr;
+        EXPECT_EQ(1U, reset_after_gate_events);
+        EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(gpio_writes, g_h743_model.gpio_writes);
+        EXPECT_FALSE(g_nx_stm32h743_system.started);
+        EXPECT_NE(0U, RCC->AHB1RSTR & reset);
+        EXPECT_EQ(0U, RCC->AHB1ENR & RCC_AHB1ENR_DMA1EN);
+        EXPECT_FALSE(g_h743_model.irq_enabled[USART3_IRQn]);
+        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+        RCC->AHB1RSTR &= ~reset;
+        Start();
+        EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+    }
+}

@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "source_count": 4,
+  "target_count": 26,
+  "files": [
+    {
+      "target": "soc/stm32h743/drivers/spi_dma.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/soc/stm32h743/drivers/spi_dma.c",
+      "bytes": 32063,
+      "sha256": "81ce62f3c95843ab2751c2057d4ed164c52933701460e5a9a5788538d9cb8db4",
+      "role": "source"
+    },
+    {
+      "target": "tests/google/h743_spi_dma_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_test.cpp",
+      "bytes": 47180,
+      "sha256": "3877b23e6de8d31c858248c6905d36278e4cc79c99c658e2181e7b59e6d0e0c9",
+      "role": "source"
+    },
+    {
+      "target": "tests/google/h743_spi_dma_model.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_model.cpp",
+      "bytes": 15423,
+      "sha256": "b7843de9243c7430870835a482136620333f85e74ce6d8a4baf6a6229fcb04fd",
+      "role": "source"
+    },
+    {
+      "target": "tests/google/h743_spi_dma_model.h",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_model.h",
+      "bytes": 4391,
+      "sha256": "b4b242f899e015a33581e94880df55e84d483f05ca53e14963f0f4a206ea8bed",
+      "role": "source"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/actual-execution-evidence-map.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/actual-execution-evidence-map.json",
+      "bytes": 12717,
+      "sha256": "b8b96da642019d9ed2d62bcb9966e208d6fb66fb0e33005e111a0548ca98552f",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/actual-execution-evidence.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/actual-execution-evidence.tar.gz",
+      "bytes": 18637,
+      "sha256": "3fe903c139dbdfbf46e86e0fd0e8e59e5daab9b6928bcede737ccba44311d268",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/authoritative-red-test-model-sources.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/authoritative-red-test-model-sources.tar.gz",
+      "bytes": 12647,
+      "sha256": "b3a5470ec424f4ed3d780db900be7379858064454cc7b9df584b99edb50bed47",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/authoritative-whole53-red.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/authoritative-whole53-red.json",
+      "bytes": 4780,
+      "sha256": "18fd13cec97b4f7e5306fb848bb773a0c2f849a40337e1839b679f19ba7409a1",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/baseline.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/baseline.json",
+      "bytes": 2107,
+      "sha256": "14bf1884fa92f44a3b86e5fc15ded93f0d5b87be7d8c367e5270c16addc88f68",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/before/soc/stm32h743/drivers/spi_dma.c.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/before/soc/stm32h743/drivers/spi_dma.c.raw",
+      "bytes": 31696,
+      "sha256": "ed920bc6ed9194049059b2d84f1352df667893f76716a2653f5a1e5a664d6ebc",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/before/tests/google/h743_spi_dma_model.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/before/tests/google/h743_spi_dma_model.cpp.raw",
+      "bytes": 13688,
+      "sha256": "bfbd9dc4a9a22d11a31a51e8922792f090118f6bac8b6deed6b7f8b8fb9154d4",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/before/tests/google/h743_spi_dma_model.h.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/before/tests/google/h743_spi_dma_model.h.raw",
+      "bytes": 4299,
+      "sha256": "2ca1a328b052b8c28287f8f1a30208e2eaeb86a462eab6c5c48b31f9a7a19cd7",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/before/tests/google/h743_spi_dma_test.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/before/tests/google/h743_spi_dma_test.cpp.raw",
+      "bytes": 37709,
+      "sha256": "074891001eb03560adb89eb97832bc3625e163d6edafd9ccc93ccbea2d0de4e7",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/compile-setup-classification-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/compile-setup-classification-r1.json",
+      "bytes": 518,
+      "sha256": "f2f5580b2c95b7173298875e4578be7030260b43c8f1a0e475cd9e24602edf29",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/delivery-result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/delivery-result.json",
+      "bytes": 14588,
+      "sha256": "d3c7589b4d4386ad58072dfe38d52adc2322fae4cf6867c87f783eec5888ca31",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/files/soc/stm32h743/drivers/spi_dma.c.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/soc/stm32h743/drivers/spi_dma.c",
+      "bytes": 32063,
+      "sha256": "81ce62f3c95843ab2751c2057d4ed164c52933701460e5a9a5788538d9cb8db4",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/files/tests/google/h743_spi_dma_model.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_model.cpp",
+      "bytes": 15423,
+      "sha256": "b7843de9243c7430870835a482136620333f85e74ce6d8a4baf6a6229fcb04fd",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/files/tests/google/h743_spi_dma_model.h.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_model.h",
+      "bytes": 4391,
+      "sha256": "b4b242f899e015a33581e94880df55e84d483f05ca53e14963f0f4a206ea8bed",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/files/tests/google/h743_spi_dma_test.cpp.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_test.cpp",
+      "bytes": 47180,
+      "sha256": "3877b23e6de8d31c858248c6905d36278e4cc79c99c658e2181e7b59e6d0e0c9",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/initial-resource-block-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/initial-resource-block-r1.json",
+      "bytes": 582,
+      "sha256": "6b6452f875c4fcb88017575cd67455a1209a838c8be7fed2bff384c8bbe8d8a2",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/preservation.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/preservation.json",
+      "bytes": 982,
+      "sha256": "75f16c19c8eec0c3100ef272dc90e6ca3b51ca19f31d1cdd607516fc9447d41a",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/source.diff.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/source.diff",
+      "bytes": 16748,
+      "sha256": "8cbe64f3f228395823d7674a01bdfb43fdcf4f9306b17cb9f527bd55814eacb6",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/tests-first-compile-setup-r1.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/tests-first-compile-setup-r1.tar.gz",
+      "bytes": 12627,
+      "sha256": "507087cce82f7ceb1bf617f3aa303eec7f79fc550ed82e9c07f8b9536a73643f",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/tests-first-source-freeze-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/tests-first-source-freeze-r2.json",
+      "bytes": 1661,
+      "sha256": "c559bb2a18262ac66fa47e86a80264dc8ea7a8627209287d0b4ce486da739f8e",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/tests-first-source-freeze.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/tests-first-source-freeze.json",
+      "bytes": 1651,
+      "sha256": "a92783e027c41a3f5a76a99cd3c8d47c8932d0a4e2bc07952fc331d544ac4506",
+      "role": "evidence"
+    },
+    {
+      "target": "tests/evidence/h743-spi-dma-runtime-domain-r1/author/manifest.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/manifest.json",
+      "bytes": 8621,
+      "sha256": "df91fc43b99435bc691887c747d4e9d9ff6eee4c6fac74bc631d43ef68136559",
+      "role": "evidence"
+    }
+  ],
+  "qualification": "Native focused author delivery; Root independent review and normal full hooks pending"
+}

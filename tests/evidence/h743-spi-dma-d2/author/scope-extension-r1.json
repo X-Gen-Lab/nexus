@@ -1,0 +1,22 @@
+{
+  "Root_authorization": "two append-only existing UART factory tests and generic H743 DMA shared-reset guard; persistent cap2MiB",
+  "added_authorized_paths": [
+    "tests/google/h743_dma_factory_test.cpp",
+    "tests/google/h743_receive_factory_test.cpp"
+  ],
+  "before": [
+    {
+      "path": "tests/google/h743_dma_factory_test.cpp",
+      "before_sha256": "3156a198056b311c4f32f5adb515dfefbc9ed77d111c3b1964f293adf8307201",
+      "before_gzip_sha256": "b86f0ed2fb48b342ada54d0d2a70b5daad79af4518347c6824ee5b26caa361d5"
+    },
+    {
+      "path": "tests/google/h743_receive_factory_test.cpp",
+      "before_sha256": "b88b1e7e4756417fb91a53ee969476294db091f7c891d54886414fde50c95c08",
+      "before_gzip_sha256": "9b90cf580deb26dcd3c8c577c71e45463c99756ce10a07a141f8c44372ff3db8"
+    }
+  ],
+  "index_sha256_before_write": "6118ba170e0c57e390afdab7a39b02af0fb6cc4ea0ce7b30bac9511cee9665f7",
+  "identical_full_index_snapshot_reused": "index-before.gz",
+  "exact_index_decompression_match_observed_now": true
+}

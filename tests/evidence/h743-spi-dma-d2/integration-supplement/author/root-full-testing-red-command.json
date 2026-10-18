@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "command": [
+    "/tmp/nexus-io-precommit-recovery-20261018/repopn8mbo77/py_env-python3.12/bin/python",
+    "-B",
+    "tools/testing/run_tool_tests.py",
+    "--suite",
+    "testing",
+    "--report",
+    "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-testing.json"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "stage": "tools-testing",
+  "started_ns": 1792310238438052454,
+  "finished_ns": 1792310514847675080,
+  "duration_seconds": 276.40962331599803,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-testing.attempts/1792310238438012704-848c5db1e06e45eeaa3b7f19aaf57436/stdout.txt",
+    "bytes": 597,
+    "sha256": "61a7a552967f7a2e48fb840688544f11c89f4900dffc539250af0eec65274b97"
+  },
+  "stderr": {
+    "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-testing.attempts/1792310238438012704-848c5db1e06e45eeaa3b7f19aaf57436/stderr.txt",
+    "bytes": 4065,
+    "sha256": "8fa70fc10f7bde7b866b7a1f2868f1014b071d143ae21a5d9fefff22e9a18bff"
+  },
+  "attempt_receipt": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-testing.attempts/1792310238438012704-848c5db1e06e45eeaa3b7f19aaf57436/receipt.json"
+}

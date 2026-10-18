@@ -1,0 +1,21 @@
+{
+  "kind": "immutable D2 integration supplement manifest",
+  "source_freeze": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/source-freeze.json",
+    "sha256": "10854d7bb29f09fa3cb922411dc327c49d0313c55bbf39ba4445c85081bd05ff"
+  },
+  "report": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/report.json",
+    "sha256": "d61fdc5d18e2898bd100315db4ef74ad5b62a416e4d87a01bd00fea471d4db68"
+  },
+  "source_patch": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/source2.patch",
+    "sha256": "f5a6fd8f65701b1e95223023d676eacbcb87ea5742ae76586d056e252d5e136d"
+  },
+  "persistent_allocated_before_manifest": 151552,
+  "persistent_cap_allocated": 196608,
+  "original_full_index_is_external_verified_reuse": true,
+  "original_D2_34_frozen": true,
+  "all_children_joined": true,
+  "no_future_writes_planned": true
+}

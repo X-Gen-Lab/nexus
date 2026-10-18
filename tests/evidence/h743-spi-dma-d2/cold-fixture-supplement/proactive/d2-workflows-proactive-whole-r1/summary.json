@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "tools/testing/run_tool_tests.py",
+    "--suite",
+    "workflows",
+    "--report",
+    "/dev/shm/nexus-d2-workflows-proactive-whole-20261018-r1.json"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "returncode": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/validation/commands/d2-workflows-proactive-whole-r1/command.attempts/1792311908845849926-dead201d4f8f4446bf95e93ff54b5da1/receipt.json",
+  "source_unchanged": true,
+  "qualification": "actual command only; inspect scope and reports"
+}

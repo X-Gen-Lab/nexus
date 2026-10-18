@@ -1,0 +1,1341 @@
+{
+  "kind": "complete-reviewed-clean-main-integration",
+  "base_head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "file_count": 190,
+  "source_count": 29,
+  "files": [
+    {
+      "path": "soc/stm32h743/soc.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/soc/stm32h743/soc.json",
+      "bytes": 12100,
+      "sha256": "0081007fb36935f8b31617c1cb906911c01993f76edeb25048b9737bbd3a322b",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "soc/stm32h743/routes.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/soc/stm32h743/routes.json",
+      "bytes": 7152,
+      "sha256": "17ce31cc5847f43f0d1a509730755218df94945ac0db5271303b62692b162b02",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/__init__.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/providers/stm32h743/__init__.py",
+      "bytes": 8867,
+      "sha256": "67596ee84ec9fcedf5f4aa282224022184da846027169dabbf5497323b7d8201",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/configure.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/configure.py",
+      "bytes": 71465,
+      "sha256": "78e49af3c9b307f2816b1fefa6a363de29a8e9bdba507323e485781228860095",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/bindings.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/providers/stm32h743/bindings.py",
+      "bytes": 23564,
+      "sha256": "e3cb39f32c034d8e63299a790452fc19cd2f603806321beff22bbe11053c01c7",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/emission.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/providers/stm32h743/emission.py",
+      "bytes": 16920,
+      "sha256": "4af4158ab7d5e0c9b2683ee0a956a48c0d73a4ea857e4889cbe3b36989bcbe28",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/preflight.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/preflight.py",
+      "bytes": 19445,
+      "sha256": "d700d84eb351fda8bc08230de6db4b31b265bb80ddb101e1de3ff7857bc4adf5",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/selected_contracts.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/selected_contracts.py",
+      "bytes": 19196,
+      "sha256": "562eb823b37aeda2d2b4b4d10fc88f41d20c62981e79ab5eb5d0011f3b7c8951",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "soc/stm32h743/CMakeLists.txt",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/soc/stm32h743/CMakeLists.txt",
+      "bytes": 6365,
+      "sha256": "78ebc75a1fcd827315569f08bb22e71cf2727f34a985aee38ad127d4cafa5345",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/providers/descriptor.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/providers/descriptor.py",
+      "bytes": 14700,
+      "sha256": "0b24c9d6ee1a58a987685a3ab4570888b2bb163c98bfd5b3aed6e4d76106b638",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/providers/stm32h743/test_spi_dma.py",
+      "bytes": 10419,
+      "sha256": "458788d4571c13a42da739f4acd38b3bc2c80d5e7c01206bd25ff4d544ffb502",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/frozen-unchanged/tools/configure/providers/stm32h743/test_provider.py.raw",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/tools/configure/providers/stm32h743/test_provider.py",
+      "bytes": 2751,
+      "sha256": "d038cf20cc52c921830a3f34799332f7bdcf29fa42603ae6ae817575a574e031",
+      "origin": "exact frozen unchanged dependency; evidence only"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/test_peripherals.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tools/configure/providers/stm32h743/test_peripherals.py",
+      "bytes": 7409,
+      "sha256": "5580e5009c4a1ab502b7ff4074a439eb4c8ac3cb80886b77750b8e80b77a83ee",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/frozen-unchanged/tools/configure/test_selected_contract_authority.py.raw",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/tools/configure/test_selected_contract_authority.py",
+      "bytes": 14793,
+      "sha256": "2d0a24ab6d11852adff8b2dd22bb9a16965363767d4cf369aa10d726e37b72e4",
+      "origin": "exact frozen unchanged dependency; evidence only"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/frozen-unchanged/tools/configure/test_io_traits.py.raw",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/tools/configure/test_io_traits.py",
+      "bytes": 9677,
+      "sha256": "916ae39d26fe70a942e59bbc9631cc22999691f70bf4e604348fcb3e4f20da9b",
+      "origin": "exact frozen unchanged dependency; evidence only"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/frozen-unchanged/tools/configure/test_dma_topology.py.raw",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/tools/configure/test_dma_topology.py",
+      "bytes": 7206,
+      "sha256": "d484b824b9b6a7e822427cb060aa209d5880b75d3783439fbf9375154b4d78c9",
+      "origin": "exact frozen unchanged dependency; evidence only"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/frozen-unchanged/tools/configure/test_bundle_transaction.py.raw",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/tools/configure/test_bundle_transaction.py",
+      "bytes": 14627,
+      "sha256": "2302ecf8f7756426905eb59079899c9a69055d156b6c7a57d9401d455834bee6",
+      "origin": "exact frozen unchanged dependency; evidence only"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory_model.h",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_spi_dma_factory_model.h",
+      "bytes": 3086,
+      "sha256": "d5d5a27fc073145791b09ca632b31ff1a4acc858fdf9e1466713f0cd73486f6f",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory_model.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_spi_dma_factory_model.cpp",
+      "bytes": 6586,
+      "sha256": "7dd22dda3c6f1531cba07926d4ec84c55371ea1d652fa007cd358a4d8f77369b",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_spi_dma_factory_test.cpp",
+      "bytes": 22848,
+      "sha256": "de19434f4ce7b73200161186d17c22c11faaad79ebdd3bde1aafe02181ea6f7d",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory.cmake",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_spi_dma_factory.cmake",
+      "bytes": 2809,
+      "sha256": "044171a031dadcacd97318869babe7d8fb78c2617b1d403ef60971645c620700",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/CMakeLists.txt",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/CMakeLists.txt",
+      "bytes": 28181,
+      "sha256": "033e55acd033c7c9d3e118949f760e3c87e1e3043fbd52bf84dc30de3aa9da1e",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma.toml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/contracts/h743_assembly/spi-dma.toml",
+      "bytes": 491,
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "bytes": 653,
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "bytes": 646,
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/h743_dma_factory_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_dma_factory_test.cpp",
+      "bytes": 8704,
+      "sha256": "43af3c2f7e21638488bfc46029fa206fd51e5919e255a90f400615fc79e265a2",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/h743_receive_factory_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_receive_factory_test.cpp",
+      "bytes": 8649,
+      "sha256": "4e3bb9ecc1d3e0f41f834fdde88e209093685a0bcdd81be8360bfa9a233dedae",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "soc/stm32h743/drivers/uart_dma.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/soc/stm32h743/drivers/uart_dma.c",
+      "bytes": 20760,
+      "sha256": "50ff17898e78e394e96c0fde0c5ccd1a60d11dc993867155150b7e37574028e1",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/google/h743_dma_model.h",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/google/h743_dma_model.h",
+      "bytes": 1382,
+      "sha256": "f6b4fdc4fa93ce8f17ca861b0876de0f3a25517cdf2f7b523d7dac6256a8b8ba",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "docs/delivery/capabilities.md",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/docs/delivery/capabilities.md",
+      "bytes": 59193,
+      "sha256": "3ce2824667281bef8c6136cab183183f4f00929f3a6a2e86acdae4dabab206e2",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119465,
+      "sha256": "b313c57e1d5fbd665caff8fa0eec8a514909743cc7f586f9d37cbab1a1a36bd4",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119737,
+      "sha256": "6a05770c9916846d3c24d24ee11589a7e4167b87ca422816c861265184013768",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/CMakeLists.txt",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/contracts/h743_assembly/CMakeLists.txt",
+      "bytes": 2067,
+      "sha256": "b9826b9c5390a952405171a81bd772596018a3a2e71dff57980e432d4b1e3884",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/main.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/files/tests/contracts/h743_assembly/main.c",
+      "bytes": 3454,
+      "sha256": "73966a4cf27a89e17528e0cb3fee150d84229d51ca90205b1116458ebfd9b83a",
+      "origin": "independently reviewed D2 source"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/actual-reset-admission-red.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/actual-reset-admission-red.json",
+      "bytes": 1787,
+      "sha256": "a24103dfb1742df64d486e369c065803c36ee75deaebbb8a22464d613e95645c",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/actual-stage-index-interim.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/actual-stage-index-interim.json",
+      "bytes": 15060,
+      "sha256": "8f7682bc97591f04419a8cb4c97674f6f375d19c74eb505a663f90934a004fbb",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/docs__delivery__capabilities.md.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/docs__delivery__capabilities.md.gz",
+      "bytes": 6465,
+      "sha256": "6c293d3d408e6de543d667140d735e3dc05d1ea4996d65a86fa81df04a0c73cd",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/docs__locale__en__LC_MESSAGES__delivery__capabilities.po.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/docs__locale__en__LC_MESSAGES__delivery__capabilities.po.gz",
+      "bytes": 9106,
+      "sha256": "2248c73b6c4d0a7770e21b3c4e9525ee2585e30ad2720afd3b89fa3e05823094",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/docs__locale__zh_CN__LC_MESSAGES__delivery__capabilities.po.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/docs__locale__zh_CN__LC_MESSAGES__delivery__capabilities.po.gz",
+      "bytes": 8341,
+      "sha256": "bce76b0366a121391bf199c5318942ac3fe86bb520dc9d46f67e9fe30a5f1273",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/soc__stm32h743__CMakeLists.txt.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/soc__stm32h743__CMakeLists.txt.gz",
+      "bytes": 1912,
+      "sha256": "f091a481bf2d365a66654aa85f39493cfe5ae8ed4bf4c9ef339f67173a4297d7",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/soc__stm32h743__drivers__uart_dma.c.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/soc__stm32h743__drivers__uart_dma.c.gz",
+      "bytes": 4379,
+      "sha256": "5c030339b306095aa884fad520aad661fcbfaccc10d1c61486903573cff6972c",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/soc__stm32h743__routes.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/soc__stm32h743__routes.json.gz",
+      "bytes": 1294,
+      "sha256": "ab09c46ea034fb4bcae21b6c32f7b58425540f402c036744cf1e2698f98b07e9",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/soc__stm32h743__soc.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/soc__stm32h743__soc.json.gz",
+      "bytes": 2546,
+      "sha256": "16dc1e2c25fda9d00a672e5e9f3f1257110aa7a4ef71e0aefe1d97315e5b079c",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tests__contracts__h743_assembly__CMakeLists.txt.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tests__contracts__h743_assembly__CMakeLists.txt.gz",
+      "bytes": 833,
+      "sha256": "7f19e8236de714cc459f3695273e13f68102d0b888c19b4c16797e38908be016",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tests__contracts__h743_assembly__main.c.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tests__contracts__h743_assembly__main.c.gz",
+      "bytes": 1312,
+      "sha256": "90267c6b761be1648b885cfe329a53b69650bedf1f729f418bb3b74dc4ff878e",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tests__google__CMakeLists.txt.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tests__google__CMakeLists.txt.gz",
+      "bytes": 4583,
+      "sha256": "1388df625de7feb7ea16048cd01ed12086411ff28cb9e5131d1a980e31448462",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tests__google__h743_dma_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tests__google__h743_dma_factory_test.cpp.gz",
+      "bytes": 1712,
+      "sha256": "b86f0ed2fb48b342ada54d0d2a70b5daad79af4518347c6824ee5b26caa361d5",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tests__google__h743_dma_model.h.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tests__google__h743_dma_model.h.gz",
+      "bytes": 483,
+      "sha256": "854b352521c408b8821e64b3ae3bf4c229245969da95e83eff9067e3fa0483c8",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tests__google__h743_receive_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tests__google__h743_receive_factory_test.cpp.gz",
+      "bytes": 1641,
+      "sha256": "9b90cf580deb26dcd3c8c577c71e45463c99756ce10a07a141f8c44372ff3db8",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__configure.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__configure.py.gz",
+      "bytes": 18741,
+      "sha256": "8a53996003890b34a360fcf2817c37b8a9da4f0a0ef7de1e33874e61f98c0e1b",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__preflight.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__preflight.py.gz",
+      "bytes": 4228,
+      "sha256": "ed5c202498f123b99fea434b17a7c50c353b6ceba9acf2fc57bb876c495897d9",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__providers__descriptor.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__providers__descriptor.py.gz",
+      "bytes": 2875,
+      "sha256": "c81988e9b22f5a4ef192d434348788a2d8ed0abab85f00bfba1766099c3c0a23",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__providers__stm32h743____init__.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__providers__stm32h743____init__.py.gz",
+      "bytes": 2888,
+      "sha256": "97a6f523fded448910b5faa380527e5c9b5d7837bfaaeb226386469c572589dc",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__providers__stm32h743__bindings.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__providers__stm32h743__bindings.py.gz",
+      "bytes": 4150,
+      "sha256": "bb1cd4354d5ea6c0e029ee4378a284cec6db53bb6cb0dca7fdced47a5a7ffcff",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__providers__stm32h743__emission.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__providers__stm32h743__emission.py.gz",
+      "bytes": 3256,
+      "sha256": "0f3d267602b9e708e0c793d42b5a56317bfe4d0d513e791ceb003edf869986f5",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__providers__stm32h743__test_peripherals.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__providers__stm32h743__test_peripherals.py.gz",
+      "bytes": 1919,
+      "sha256": "bf8467e4dcfff3e4957c3c36d21750b15b8e9297d48dcf37f4ea27af262c70d8",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__providers__stm32h743__test_provider.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__providers__stm32h743__test_provider.py.gz",
+      "bytes": 855,
+      "sha256": "9ed6c0b0973666f668fd93ad66f036ecf32e8a051dc3137f0e372cc95569951b",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__selected_contracts.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__selected_contracts.py.gz",
+      "bytes": 5383,
+      "sha256": "06602f3b5871b7f9a7cd81948d303d3727ec66832c43351fd0ef410f7dfba0e1",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__test_bundle_transaction.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__test_bundle_transaction.py.gz",
+      "bytes": 3441,
+      "sha256": "16f0559b3f4f11f3975939b437dc6d97dcf7acb56b3b13a17b4193539df8b5e9",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__test_dma_topology.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__test_dma_topology.py.gz",
+      "bytes": 1703,
+      "sha256": "e46008247dfbbe6e181762af6148f091a2a5a0668a6e3a5ed562827bfc77bdfc",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__test_io_traits.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__test_io_traits.py.gz",
+      "bytes": 2539,
+      "sha256": "1be8a9d797dcd34ea94570c5ac67c848e90c132eff88b6367814ff6caa1e5ff7",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before/tools__configure__test_selected_contract_authority.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before/tools__configure__test_selected_contract_authority.py.gz",
+      "bytes": 3890,
+      "sha256": "ab375004db087a05dba92ffffd37aac9799538f14b39a892f386032ca48abd8b",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before-dma2-reset-regressions.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before-dma2-reset-regressions.zip",
+      "bytes": 20090,
+      "sha256": "066360e9ccbcbc1bf070be27e0c516ab09685a032a36e930aa79602dda0948e5",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/before-tc-irq-regressions.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/before-tc-irq-regressions.zip",
+      "bytes": 5347,
+      "sha256": "f5a3ec892f3e974daebe42b015a5e0dbbe7849f67742ae8d8b19c5b220180d29",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/bootstrap.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/bootstrap.json",
+      "bytes": 18526,
+      "sha256": "dfe60b00edc525930104359c1583a2ac585941a20c2454ee43fb53fea4b221cb",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/bundle-module-launcher-setup-correction.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/bundle-module-launcher-setup-correction.json",
+      "bytes": 316,
+      "sha256": "0dace73744a9ea4a8006ff6d7b7656f407155cbe49b19ff83608f9621c1140d6",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/comment-only-correction.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/comment-only-correction.json",
+      "bytes": 1389,
+      "sha256": "7294d5eabced5802d9f8ef7332da0ce71aba3dfa88d40474d312ddfec4ba3d6f",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/compiled-r2-test-before-fixture-hardening.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/compiled-r2-test-before-fixture-hardening.cpp.gz",
+      "bytes": 3625,
+      "sha256": "df590ab83d3d17f588de10492609b350d739c35708db70f5fa5c1ce90d85cdb2",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/delivery.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/delivery.json",
+      "bytes": 5982,
+      "sha256": "28eb2c8e1dddb29b636e1ccbe0627fdd28eaedf90f587056a30022ecde5a2e8e",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/derived-capabilities-write.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/derived-capabilities-write.json",
+      "bytes": 601,
+      "sha256": "9d96e069f1af6283f7fd3facdcf49d50d58e2e9e33322d721bbf01c75795c1f6",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/dma2-actual-red-source.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/dma2-actual-red-source.zip",
+      "bytes": 72921,
+      "sha256": "a205409239bef3d047e18579c2d5b99deeccbb173fac5535665e973abb9ba03b",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/dma2-regression-compile-setup-correction.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/dma2-regression-compile-setup-correction.json",
+      "bytes": 820,
+      "sha256": "8c640122aab7bd45dc992ab4f5d6f5770c0591d246d1a30126d6400fb68f1397",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/final-evidence.tar.xz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/final-evidence.tar.xz",
+      "bytes": 103480,
+      "sha256": "953756a3c6f7d389183647bf0599f49a821ad5de0fba8172f5437339f7fdd5ed",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/final-whole-targets.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/final-whole-targets.json",
+      "bytes": 507,
+      "sha256": "c0b165bd7b2dc1f810510cc73d24b7be531107dc550db19c62f9af22b0efd94d",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/first-factory-compile-source/h743_spi_dma_factory_model.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/first-factory-compile-source/h743_spi_dma_factory_model.cpp.gz",
+      "bytes": 1813,
+      "sha256": "5370490455db954a2a50fc84f50ffed8cfcc40b48658e6fe721054d888c7dd14",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/first-factory-compile-source/h743_spi_dma_factory_model.h.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/first-factory-compile-source/h743_spi_dma_factory_model.h.gz",
+      "bytes": 846,
+      "sha256": "4784be0e0969b9bc0d475dafa26aaf18e68a78d054e0d29715e70eb9540b178b",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/first-factory-compile-source/h743_spi_dma_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/first-factory-compile-source/h743_spi_dma_factory_test.cpp.gz",
+      "bytes": 3573,
+      "sha256": "7950ccc7dab76a3c968e8dcfe2a0266fb5e92f5fa2f0a850961bc17920481498",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/first-runtime-red-source.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/first-runtime-red-source.zip",
+      "bytes": 67586,
+      "sha256": "23fcf84873e607c5e1f2510d97651640d79186ab397104ded89d52d8a95593dc",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/index-before.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/index-before.gz",
+      "bytes": 736624,
+      "sha256": "efa3e7d0b169658ee4528795e0f6636591a0ea7a9ea0ec69288c238b6e02e1aa",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/manifest.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/manifest.json",
+      "bytes": 1089,
+      "sha256": "c5e5be151b6fb15dd0cba0b141af25b1088c1c3869677220be8dbc6c6f1a8798",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/obsolete-negative-policy-correction.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/obsolete-negative-policy-correction.json",
+      "bytes": 462,
+      "sha256": "305a3060f9af410e25528b894ea2d7eb86577f8eda7197d3c17f18f5a169b098",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/pre-comment400-h743_dma_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/pre-comment400-h743_dma_factory_test.cpp.gz",
+      "bytes": 2197,
+      "sha256": "ade6eb5b5cfd0b5c7ea91c7c603e5a497e3fc06589e2cd069b514e373f3423ba",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/pre-comment400-h743_receive_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/pre-comment400-h743_receive_factory_test.cpp.gz",
+      "bytes": 2134,
+      "sha256": "412cf1e064ad2e8dfe1520d561a6d58a92f712674be54ab4f65bf4e001f5dab5",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/pre-comment400-h743_spi_dma_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/pre-comment400-h743_spi_dma_factory_test.cpp.gz",
+      "bytes": 5205,
+      "sha256": "b25612bfb2ced30b2e9f951d449e3da358cc4348f4e9baedfc200b1208e4f96f",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/pre-native-source-freeze.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/pre-native-source-freeze.json",
+      "bytes": 3433,
+      "sha256": "3a641d66359a1f3ad25ba54b5eefbabf817b0df4f3b4fa2414843b0a80de25a1",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/pre-uart-postenable-h743_dma_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/pre-uart-postenable-h743_dma_factory_test.cpp.gz",
+      "bytes": 1924,
+      "sha256": "99e4ffa57473b60f1f678bbe86e5022fc6dc3c40666cda10c1634bcfa4137e02",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/pre-uart-postenable-h743_receive_factory_test.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/pre-uart-postenable-h743_receive_factory_test.cpp.gz",
+      "bytes": 1853,
+      "sha256": "cb1b551a36bdbe9ab4e69eaba35fd7fca63652131ad0c84eda258c1b82b1fc48",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/reset16-red-delta-source.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/reset16-red-delta-source.zip",
+      "bytes": 15396,
+      "sha256": "d1bddb24fc7144f7260aca62e47881c37b64e0f5082ddc27f8a7fdfa4aad54ca",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/run_arm5.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/run_arm5.py",
+      "bytes": 4697,
+      "sha256": "cf96d145c96fcc5ebccffb84bae79337b872e93aa7a0ef64edc8100e8bb0b019",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/run_arm5_r2.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/run_arm5_r2.py",
+      "bytes": 4767,
+      "sha256": "e5279877639e7467b992476d09b51f31d512e9bdb9f462fc8141af62b28e8677",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/run_arm_postcheck.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/run_arm_postcheck.py",
+      "bytes": 9034,
+      "sha256": "b52a06579c1e2d0b51d5fe360416012072be1fce7de618a09cbb46bd445c431f",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/run_python_module.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/run_python_module.py",
+      "bytes": 5452,
+      "sha256": "ed4416cef0d4b32975f1103be60d2e519e6422986e029e737f17e3cf7d1af435",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/run_python_module_any.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/run_python_module_any.py",
+      "bytes": 5686,
+      "sha256": "e8ece7de4a47abffe0f1775741dd9075cbae85f431c5dff2c18299e27f143017",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/run_stage.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/run_stage.py",
+      "bytes": 6219,
+      "sha256": "c4d40455c362b764362588d450803899465f8a80be16c6cbe8020e791a677c54",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/scope-extension-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/scope-extension-r1.json",
+      "bytes": 1012,
+      "sha256": "5d56ca7a177b9d55b40885fb196b9cc52ac36dd9e6098af8a20f38d057df9784",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/scope-extension-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/scope-extension-r2.json",
+      "bytes": 1426,
+      "sha256": "6791be7b3aa828e2b3a0e850a1b53c73098a1a45fdd2f0b000d3ebfb5119e69d",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/scope-extension-r3.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/scope-extension-r3.json",
+      "bytes": 441,
+      "sha256": "a446b9e9fc6f78070bf52ee8f9e5104e817ad503ea6d8206f869f8b1ab069121",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/scope-extension-r4.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/scope-extension-r4.json",
+      "bytes": 867,
+      "sha256": "0f0a732eed9c32cc548229ceae63c93fecf0ac154be44ee0e25f1f3906321c46",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/sealed-evidence-map.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/sealed-evidence-map.json",
+      "bytes": 3361,
+      "sha256": "5e51ecad26cb7a4206004f144ae2b262c9f595e2d42445a7a2a8234e654f885c",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/source-freeze-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/source-freeze-r1.json",
+      "bytes": 7323,
+      "sha256": "b47e3d12c40209ce5587ebf13360383df244251a51687b110eda870648f3b60e",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/source-freeze-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/source-freeze-r2.json",
+      "bytes": 7687,
+      "sha256": "246cb4de76e54fc993bceeecd3ce674936e566f14d51b80eb8610c6bdaeb98bf",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/tc-restore-readback-coverage.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/tc-restore-readback-coverage.json",
+      "bytes": 375,
+      "sha256": "73d1d61eb13ff533576c5effda9f04d49ec38397ee7f59b274563cae22a81bbd",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/tc19-actual-red-source.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/tc19-actual-red-source.zip",
+      "bytes": 81233,
+      "sha256": "585019505e1df6f8911e62adec6dcbb5cf85b9807f0c757ef700cf8f794b5db8",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/tc19-green-test-before-restore-coverage.cpp.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/tc19-green-test-before-restore-coverage.cpp.gz",
+      "bytes": 5181,
+      "sha256": "90e2024117f66ed33256f74f5973cc96006993e80cd5e6af7a66a1cb8d382068",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/uart-post-enable-coverage-source.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/uart-post-enable-coverage-source.json",
+      "bytes": 799,
+      "sha256": "c0a7e346e44cca5bacfc6be45e4e8d959bae23a6ac7e6e1f5534efa16b88b437",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/author/uart-reset-red-delta-source.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/uart-reset-red-delta-source.zip",
+      "bytes": 12246,
+      "sha256": "473215f5f6c08676e47ec431fe42bde39d86d8907e88e934e2928ccbfdf626a2",
+      "origin": "original author metadata, before-bytes and actual focused raw evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/docs/catalog-apply.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-d2-capabilities-r1/catalog-apply.json",
+      "bytes": 4506,
+      "sha256": "1c8be2f4119c63e399dcfbda0a4ec683d0dd5c73d825bfa601b892916c492ef5",
+      "origin": "actual canonical gettext and bilingual catalog evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/docs/completed-handoff.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-d2-capabilities-r1/completed-handoff.json",
+      "bytes": 5150,
+      "sha256": "fb47db784c2611f9cdd737a998e702134d6d4374537301cd0b3627ae8e4da529",
+      "origin": "actual canonical gettext and bilingual catalog evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/docs/final-evidence.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-d2-capabilities-r1/final-evidence.tar.gz",
+      "bytes": 27919,
+      "sha256": "c34144dd08e7ffabbb8ced24fdb20f5fa776257e3c04b36dc3932dc9849c7baa",
+      "origin": "actual canonical gettext and bilingual catalog evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/docs/prepared-evidence.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-d2-capabilities-r1/prepared-evidence.tar.gz",
+      "bytes": 46474,
+      "sha256": "e55c570de84e990a1aba303a4b5a3cbac7bd1e33026d99348f29b2dcaecd2cf3",
+      "origin": "actual canonical gettext and bilingual catalog evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/docs/prepared-review-and-metadata.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-d2-capabilities-r1/prepared-review-and-metadata.json",
+      "bytes": 14650,
+      "sha256": "ee6b5d28eec5a12aba2d6a1bbbd4ea06189f7cf70b25df7acbf1ff13ff1dd796",
+      "origin": "actual canonical gettext and bilingual catalog evidence"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/review/h743-d2-capabilities-catalog-independent-review-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-d2-capabilities-catalog-independent-review-r1.json",
+      "bytes": 1055,
+      "sha256": "6a627abf5c5000669957d0c5b2eea0c42df1c8c2020fc992de8e46fd5441fe8c",
+      "origin": "reviewed concrete plan or catalog peer review"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/review/h743-spi-dma-d2-implementation-plan-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-d2-implementation-plan-r1.json",
+      "bytes": 30775,
+      "sha256": "425e4de3ad54f7bcf0bb85ddf1ba09dafee0ec7160a527b5e1fdc55878aa6e5d",
+      "origin": "reviewed concrete plan or catalog peer review"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/Native15_actual400.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/final34-whole-summary.json",
+      "bytes": 10211,
+      "sha256": "34071bf61259f9b58db653300e2994c5c996e5b34984da16964814954e8bf071",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/Native15_matching_ELF_retention.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/final15-ELF-retention.json",
+      "bytes": 6418,
+      "sha256": "49062b7b5978aa2afa91e617d4ab3ecfd0d3718ddc0039c55c694f0ff34b60d6",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/Python7_actual85.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/final34-python-summary.json",
+      "bytes": 1907,
+      "sha256": "350f423ff00761bd5d636c729d8c40d0be1ee5062b4a4a8581655767496eb004",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/payload_unit14.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/d2-device-payload-whole/receipt.json",
+      "bytes": 6728,
+      "sha256": "61cb2743b95c12a6bb7f6eab41d78479bd34699b059f83fed13cc6f977f73329",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/style.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/final34-style/receipt.json",
+      "bytes": 3869,
+      "sha256": "efbef8281b5e406eda263c8575aeb68fa3c785a4703a8d3671956844d91ba202",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/ARM5_normal.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d2-arm-r2/report.json",
+      "bytes": 730955,
+      "sha256": "4bd05737f037c16fe1b3cb5bb93a06e639ebadf7037ed50bbbef71bd0e7fe1c2",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/ARM5_actual_wrapper.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/final-arm5-r2/receipt.json",
+      "bytes": 10355,
+      "sha256": "c95bc843ce4d46ac1cdef6ff0a949ce186deae9d2b52275f271e15027e501ece",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/ARM5_independent_postcheck.json",
+      "durable_source": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/arm5-independent-postcheck.json",
+      "bytes": 12931,
+      "sha256": "fc531edc64ca06a86983973f87312e6076cb10ce7fd85dcf2374350251eb25cb",
+      "origin": "exact actual focused raw/report leaf, independently reviewed"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/actual-leaves/ARM5_failed_partial_r1.json",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d2-arm-r1/report.json",
+      "bytes": 595420,
+      "sha256": "7bfd67cc1ee1d79cfdc30ed40f7d9c16700d1c6e044e3f96809b20dba553c7a9",
+      "origin": "preserved first ARM attempt: three succeeded before fourth fixture failure; not full pass"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/STOP",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/STOP",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0001.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0001.tar.gz",
+      "bytes": 1919,
+      "sha256": "433cb79d81b0d8c611c28b72c0dbe1519f98f1010918ca945331f832b88f8a17",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0002.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0002.tar.gz",
+      "bytes": 1555,
+      "sha256": "cccfe4e030f8ad3ea2d8e0c97ed22d67065e918c2436ef11b31c15e6d556cd75",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0003.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0003.tar.gz",
+      "bytes": 1535,
+      "sha256": "72695aa4d0019d7ddfaa08badf3cea7ee5af13923bb6937b3851da8b1bde9316",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0004.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0004.tar.gz",
+      "bytes": 1493,
+      "sha256": "94ad78c6a401aa060ab4bd53a494c1b606b52a4485e928f8800b6c8a2e21bb9a",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0005.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0005.tar.gz",
+      "bytes": 2607,
+      "sha256": "baccc290e14782b85b23d1612bb226116137a412de4544f1e1878d13535ea5a5",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0006.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0006.tar.gz",
+      "bytes": 22306,
+      "sha256": "ed824c7557c687c0a1b347889cffcba582f164d2977d4f27198d50a49dede873",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0007.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0007.tar.gz",
+      "bytes": 22937,
+      "sha256": "1cd40286276da38deb9309f4c07ad45f611bf9e7c75db5b3991f9d1af706ba3b",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0008.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0008.tar.gz",
+      "bytes": 18648,
+      "sha256": "a36b21b35ff7833f840857482018da6deb2c59aa06496b36e66521b70345b9a3",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0009.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0009.tar.gz",
+      "bytes": 21544,
+      "sha256": "15428efcd9a7f69519a0ac7a2e7583f85e210c22c8679a9621d5ae0f7c59023e",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0010.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0010.tar.gz",
+      "bytes": 23152,
+      "sha256": "c3cf8a95886e38e9fc6fbf344f5cd0bb07b13a814b4cf848a2c7bc182e2b92a7",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0011.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0011.tar.gz",
+      "bytes": 23733,
+      "sha256": "ca994eb6fdeb6a253e50cc89f24db9a7dd49c6a7c7568038960652a0e28d5279",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0012.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0012.tar.gz",
+      "bytes": 38806,
+      "sha256": "99b2490248e21394d6e01dd1f0577eac584564dca181cdb248f465b950176252",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0013.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0013.tar.gz",
+      "bytes": 38490,
+      "sha256": "f9456a0c7a41e192dc1d92e0249a7b971f27df7c0bfd6725cce71eb9f80bcbc1",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0014.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0014.tar.gz",
+      "bytes": 31561,
+      "sha256": "e4a2b0d6e2b8568b4fbb1594b53f2b8928b63b9b631bc7801e9d97ebb30e121a",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0015.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0015.tar.gz",
+      "bytes": 38846,
+      "sha256": "be716070e3d7895a54596aa9a4ad3621a110cf60edd82b9be9496bacc3937b11",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0016.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0016.tar.gz",
+      "bytes": 46274,
+      "sha256": "439921fc69d7166b9770e7d1a358296608fbaab6969ddcb631c2c03bf1436ebb",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0017.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0017.tar.gz",
+      "bytes": 33491,
+      "sha256": "89065534766a13ea4a5d86318867eb1d60e6afc167bcc566b7485b9148d8292a",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0018.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0018.tar.gz",
+      "bytes": 26507,
+      "sha256": "fa0fc77f85e94acb95923cd58c42086f16951d58be7a2bf322282f2504984505",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0019.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0019.tar.gz",
+      "bytes": 81049,
+      "sha256": "0cc82b810c041a619e682b009fd153bbeda718eca787d10d56a83adc2f41ec8b",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0020.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0020.tar.gz",
+      "bytes": 11200,
+      "sha256": "9b9d040f0c2ed26c3cc7904b4329a0e7719c55fa9566880d843e13462b3d5800",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0021.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0021.tar.gz",
+      "bytes": 26926,
+      "sha256": "5b5ae0f82747cbf95685d22dd2294a7264f2941fcab72bcf4f186c19b17aa734",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0022.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0022.tar.gz",
+      "bytes": 21085,
+      "sha256": "f89326769999f69aef9844e64f93bc7eb18cf6959fc966eddb9c9d0beece82c8",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0023.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0023.tar.gz",
+      "bytes": 21865,
+      "sha256": "5ac82a877bf94c1b6726dd38112d5045b404eace0feb240ee66e47a3ba103895",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0024.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0024.tar.gz",
+      "bytes": 23317,
+      "sha256": "a352f98fac1afcdfc7210685e75e4f0bd6a65656bbab1d7bec31667e5d4fee0a",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0025.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0025.tar.gz",
+      "bytes": 21779,
+      "sha256": "106d4427888847539d16fe914187f64a2be983a5f3c939835b69d137eb8ac72a",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0026.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0026.tar.gz",
+      "bytes": 30336,
+      "sha256": "b71a6241b2cf55b018633a42838823a953ae3779ba23a7997dc9b6eacd77e5dd",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0027.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0027.tar.gz",
+      "bytes": 50271,
+      "sha256": "8f94425a96eb84c7c4a7aea8eb09ead2cc4a6cfd46a97f25c0f59789677b1459",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0028.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0028.tar.gz",
+      "bytes": 34414,
+      "sha256": "c724f042823ed4375d98012f81ed1394e44e766cda231cc901794d8e31009ae3",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0029.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0029.tar.gz",
+      "bytes": 37612,
+      "sha256": "83d5c40f71bfeae51e10accf10f62845c387c526997a65f789e852e0af920d14",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0030.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0030.tar.gz",
+      "bytes": 40500,
+      "sha256": "5a0411c00973d0c20dc54dc03ae697cc7a269c23c4eec304ee7f59644f6329ac",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0031.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0031.tar.gz",
+      "bytes": 38207,
+      "sha256": "8592a204321827d1e832f59ef516afed20a4a6b7e477c43571fe887651b4e43e",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0032.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0032.tar.gz",
+      "bytes": 34176,
+      "sha256": "a866229f490b029ac6319a40c1d9a4ddbea59bb8d336abadbff22b735d683ad7",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/batch-0033.tar.gz",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/batch-0033.tar.gz",
+      "bytes": 422920,
+      "sha256": "b6f61f878fc51a451a2f7073ea084053d3f7d8140d72457ee529a9f719da2888",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/catalog.jsonl",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/catalog.jsonl",
+      "bytes": 13571,
+      "sha256": "df163b6e35e26abc628f134d4650ec998871a14263e9988896a00b0aace1b3bd",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/checkpoint-index.json",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/checkpoint-index.json",
+      "bytes": 8118,
+      "sha256": "ccb628b33b0398c91d91d2137174dd5e6ac27888f0c78ac4790ddcd437e19e7a",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/monitor-template.py.raw",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/monitor-template.py",
+      "bytes": 11943,
+      "sha256": "cec7e00a1ac49a49f2ac85ed935e49e0f6cc523f8525c06252035c447285fce9",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/monitor.py.raw",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/monitor.py",
+      "bytes": 11958,
+      "sha256": "8f134673e8ab3e55ef5032097b224c802e4ad94d76ff44287d02e628805e50d7",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/start.json",
+      "durable_source": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/start.json",
+      "bytes": 411,
+      "sha256": "9c303a311f98f3debfcbcef78844d481c82cb44250f8799fb5295956d5b0a413",
+      "origin": "original sealed complete 474b3da3 normal hook checkpoints; published durability pending this commit"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/full-gate-oci-ca-reader-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/full-gate-oci-ca-reader-r1.json",
+      "bytes": 155410,
+      "sha256": "46fa76810dac52bf168cda69671c82dba9db3fd921b3c3b1be0d4f4c766591aa",
+      "origin": "actual full normal gate or checkpoint storage plan"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/oci-ca-reader-checkpoint-storage-plan-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/oci-ca-reader-checkpoint-storage-plan-r1.json",
+      "bytes": 666,
+      "sha256": "89eab902ca3e2d19ad51ef2eca04b972c86ff25a986ac6d56846fe578b189112",
+      "origin": "actual full normal gate or checkpoint storage plan"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/receipt.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/receipt.json",
+      "bytes": 1329,
+      "sha256": "9c257955cb12fe7a083fccec8849e1eea4d93b3cde43d926bdcb2699c9adffd4",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/stderr.txt",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/stderr.txt",
+      "bytes": 436,
+      "sha256": "e11aa741cc229d48790502c94492dbb1ed754f61d47d10cea5cbf5690ae81250",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/stdout.txt",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/stdout.txt",
+      "bytes": 2014,
+      "sha256": "14556ab95d8240fb6ef816da88c34686cd38c9cc122b7abf0d83ee2aa3e6c8ac",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/command.command.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.command.json",
+      "bytes": 1523,
+      "sha256": "12cf8a539510f6cdc6f0e2e2c88d1a8123216070fff1d6a87867e659cdddb32a",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/command.txt",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.txt",
+      "bytes": 2450,
+      "sha256": "08efb521c5e0c7f7d4c1af2defddaa8ba735fcc81aac4c48355a9ef58dde89ef",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/source-after.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/source-after.json",
+      "bytes": 353,
+      "sha256": "aa1df4bee6fbda02c80f1983da121c1b0b918d64f2c0d667a98c545b1d5dba15",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/source-before.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/source-before.json",
+      "bytes": 353,
+      "sha256": "aa1df4bee6fbda02c80f1983da121c1b0b918d64f2c0d667a98c545b1d5dba15",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/commands/oci-ca-reader-full-commit-r1/summary.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/summary.json",
+      "bytes": 657,
+      "sha256": "7a6a48fd56390aa43d4839edd7c7ac9610efb29f970bd536fe1996c9a4ae2eaa",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/after-remote.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/after-remote.stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/after-remote.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/after-remote.stdout.raw",
+      "bytes": 79,
+      "sha256": "116b7c958e8f8db5bb5ef12047997820cf8c6e42fe1165704b1d84474c869030",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/after-status.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/after-status.stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/after-status.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/after-status.stdout.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/before-remote.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/before-remote.stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/before-remote.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/before-remote.stdout.raw",
+      "bytes": 79,
+      "sha256": "4f86bb8fe4b6302b0d20bcbb55707296fdf4a7689d1c7127f5ed704bf7b5c383",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/before-status.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/before-status.stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/before-status.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/before-status.stdout.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/head.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/head.stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/head.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/head.stdout.raw",
+      "bytes": 41,
+      "sha256": "d32b836848cae760eb0fc735551901a4995bbef57d5fb5e7818c5ea19103c374",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/progress.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/progress.json",
+      "bytes": 2471,
+      "sha256": "24d1e2e832388578cd3250eaa26ec0f97fb068d56bef84fcb17a4945fefa67ba",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/push.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/push.stderr.raw",
+      "bytes": 100,
+      "sha256": "602b6fe87b52a03f45e95b4a0ca5f2fde9eb2ae99d41e4fc544dffe1d0e71794",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/push.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/push.stdout.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/result.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/result.json",
+      "bytes": 3465,
+      "sha256": "037d6382c5bd5a0b0e7348d2a124d45640336a83fb3f996ab5a6213400eb01f6",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/tree.stderr.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/tree.stderr.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/publish-474b3da3-direct-r1/tree.stdout.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/tree.stdout.raw",
+      "bytes": 41,
+      "sha256": "27a51b73ffed5938c8dbb88313162545eb1c2efec87e2cbc655aefeadb081594",
+      "origin": "actual normal commit parent receipts or ordinary push proof"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/main-before-index.gz",
+      "durable_source": "/dev/shm/nexus-h743-d2-main-package-20261018-r1/before-main-index.gz",
+      "bytes": 754387,
+      "sha256": "1751e0d215f7dc3a2d1fa6b5875579b7251afb74e72323930b545455dfd88463",
+      "origin": "complete actual pre-integration index; source before-bytes preserved separately by Root integration"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/review/h743-spi-dma-d2-code-independent-review-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-d2-code-independent-review-r1.json",
+      "bytes": 46668,
+      "sha256": "ba5be46e936583e200410ca3cd5511e3e4cf2d282195edb4ee1f42139cf790b5",
+      "origin": "review evidence bound to exact prepared sources"
+    },
+    {
+      "path": "tests/evidence/h743-spi-dma-d2/normalized-transport.json",
+      "durable_source": "/dev/shm/nexus-h743-d2-main-package-20261018-r1/normalized-transport.json",
+      "bytes": 78317,
+      "sha256": "2e5555ce17a466b09d5d17cff1ecf6329c33b971fa4fe5ac6f736e40d78727d3",
+      "origin": "exact complete transport map"
+    }
+  ],
+  "review_sha256": "ba5be46e936583e200410ca3cd5511e3e4cf2d282195edb4ee1f42139cf790b5",
+  "transport_map_sha256": "2e5555ce17a466b09d5d17cff1ecf6329c33b971fa4fe5ac6f736e40d78727d3",
+  "qualification": "fresh complete normal hooks pending"
+}

@@ -1,0 +1,27 @@
+{
+  "kind": "D2 cold preflight fixture schema supplement one-source freeze",
+  "source": {
+    "path": "tools/configure/test_cold_preflight.py",
+    "bytes": 7228,
+    "sha256": "eac1c6e993d63de786bded1e1762235b42ed6608666a89a20840b66a64b1b392"
+  },
+  "before": {
+    "path": "tools/configure/test_cold_preflight.py",
+    "bytes": 7125,
+    "sha256": "2e424096d57678860ac34c11e07454f4d5f3e1d160d9f75650f4053033f62ff3",
+    "same_as_actual_Main_and_its_HEAD": true
+  },
+  "index_sha256": "6118ba170e0c57e390afdab7a39b02af0fb6cc4ea0ce7b30bac9511cee9665f7",
+  "original_D2_34_plus_integration2_sources_unchanged": true,
+  "old_test_assertions_and_body_preservation": "Remove only added explicit import and dma_topology=DmaTopologyIR(()) keyword; reconstructs entire original file byte-for-byte.",
+  "production_preflight_unchanged": true,
+  "schema_not_relaxed": true,
+  "full_index_snapshot_reused": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/index-before.gz",
+    "gzip_sha256": "efa3e7d0b169658ee4528795e0f6636591a0ea7a9ea0ec69288c238b6e02e1aa",
+    "uncompressed_bytes": 3535332,
+    "current_sha256": "6118ba170e0c57e390afdab7a39b02af0fb6cc4ea0ce7b30bac9511cee9665f7",
+    "full_bytes_equal": true
+  },
+  "source_patch_sha256": "ed03ca9578c4c2fe16f15a947b4479e2592b75f52101d77373647d00492abe76"
+}

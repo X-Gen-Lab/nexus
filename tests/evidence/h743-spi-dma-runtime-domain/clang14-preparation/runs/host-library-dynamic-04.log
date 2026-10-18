@@ -1,0 +1,39 @@
+
+Dynamic section at offset 0xedbe0 contains 36 entries:
+  Tag        Type                         Name/Value
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+ 0x000000000000000e (SONAME)             Library soname: [libm.so.6]
+ 0x000000000000000c (INIT)               0x11000
+ 0x000000000000000d (FINI)               0x8ddc8
+ 0x0000000000000019 (INIT_ARRAY)         0xeebd0
+ 0x000000000000001b (INIT_ARRAYSZ)       8 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0xeebd8
+ 0x000000000000001c (FINI_ARRAYSZ)       8 (bytes)
+ 0x0000000000000004 (HASH)               0x328
+ 0x000000006ffffef5 (GNU_HASH)           0x2758
+ 0x0000000000000005 (STRTAB)             0xca80
+ 0x0000000000000006 (SYMTAB)             0x4f38
+ 0x000000000000000a (STRSZ)              11061 (bytes)
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000070000000 (DT_X86_64_PLT)      0x11020
+ 0x0000000070000001 (DT_X86_64_PLTSZ)    0x260
+ 0x0000000070000003 (DT_X86_64_PLTENT)   0x10
+ 0x0000000000000003 (PLTGOT)             0xeee70
+ 0x0000000000000002 (PLTRELSZ)           888 (bytes)
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000017 (JMPREL)             0x10410
+ 0x0000000000000007 (RELA)               0x10320
+ 0x0000000000000008 (RELASZ)             240 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x000000006ffffffc (VERDEF)             0x10000
+ 0x000000006ffffffd (VERDEFNUM)          19
+ 0x000000000000001e (FLAGS)              BIND_NOW STATIC_TLS
+ 0x000000006ffffffb (FLAGS_1)            Flags: NOW
+ 0x000000006ffffffe (VERNEED)            0x102a0
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x000000006ffffff0 (VERSYM)             0xf5b6
+ 0x0000000000000024 (RELR)               0x10788
+ 0x0000000000000023 (RELRSZ)             24 (bytes)
+ 0x0000000000000025 (RELRENT)            8 (bytes)
+ 0x0000000000000000 (NULL)               0x0

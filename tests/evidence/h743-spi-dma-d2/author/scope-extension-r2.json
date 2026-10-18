@@ -1,0 +1,37 @@
+{
+  "added_authorized_paths": [
+    "soc/stm32h743/drivers/uart_dma.c",
+    "tests/google/h743_dma_model.h",
+    "docs/delivery/capabilities.md",
+    "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po"
+  ],
+  "before": [
+    {
+      "path": "soc/stm32h743/drivers/uart_dma.c",
+      "bytes": 19457,
+      "sha256": "97c0967cf020199fea8f941ff8c9cae2064a7f70008d6a83b7e3a1fadd122716",
+      "gzip_sha256": "5c030339b306095aa884fad520aad661fcbfaccc10d1c61486903573cff6972c"
+    },
+    {
+      "path": "tests/google/h743_dma_model.h",
+      "bytes": 1317,
+      "sha256": "24c545adada0f8b4a5418864132fa2891c6ed3039ce0a1c2330991ce5a695e56",
+      "gzip_sha256": "854b352521c408b8821e64b3ae3bf4c229245969da95e83eff9067e3fa0483c8"
+    },
+    {
+      "path": "docs/delivery/capabilities.md",
+      "bytes": 58807,
+      "sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+      "gzip_sha256": "6c293d3d408e6de543d667140d735e3dc05d1ea4996d65a86fa81df04a0c73cd"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 109845,
+      "sha256": "180b64b14e9ddd87a059cf5eec8b25a03fa0b3616d16c90244663ce423eb69e5",
+      "gzip_sha256": "bce76b0366a121391bf199c5318942ac3fe86bb520dc9d46f67e9fe30a5f1273"
+    }
+  ],
+  "index_sha256": "6118ba170e0c57e390afdab7a39b02af0fb6cc4ea0ce7b30bac9511cee9665f7",
+  "reused_exact_index_before": true,
+  "allocated_cap": 2097152
+}

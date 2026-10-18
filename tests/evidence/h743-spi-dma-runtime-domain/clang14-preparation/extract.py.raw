@@ -1,0 +1,174 @@
+from pathlib import Path, PurePosixPath
+from email.parser import BytesParser
+import gzip
+import hashlib
+import io
+import json
+import os
+import posixpath
+import stat
+import sys
+import tarfile
+import zipfile
+
+sys.path.insert(0, '/dev/shm/nexus-clang14-required-20261018-r1')
+from run import PREFIX, guard
+
+
+def digest(path):
+    value = hashlib.sha256()
+    with path.open('rb') as stream:
+        while chunk := stream.read(1024 * 1024):
+            value.update(chunk)
+    return value.hexdigest()
+
+
+def safe_name(value):
+    if value.startswith('./'):
+        value = value[2:]
+    value = value.rstrip('/')
+    if not value or value == '.':
+        return ''
+    parts = PurePosixPath(value)
+    assert not parts.is_absolute() and '..' not in parts.parts
+    assert parts.as_posix() == value and '\\' not in value
+    assert all(ord(c) >= 32 for c in value)
+    return value
+
+
+wheel = PREFIX / 'downloads' / ('clang_tidy-14.0.6-py2.py3-none-'
+    'manylinux_2_17_x86_64.manylinux2014_x86_64.whl')
+assert wheel.stat().st_size == 31382107
+assert digest(wheel) == 'c9ffcb91f17ee920fdd7a83f30484f3cb4c183f7b490d092373e4a6f2c82729d'
+unpacked = PREFIX / 'unpacked'
+assert not unpacked.exists()
+wheel_rows = []
+guard('wheel-safe-extract-before')
+with zipfile.ZipFile(wheel) as archive:
+    infos = archive.infolist()
+    assert len(infos) == 9
+    assert len({item.filename for item in infos}) == 9
+    assert sum(item.file_size for item in infos) == 89429097
+    for item in infos:
+        name = safe_name(item.filename)
+        assert name and not item.is_dir()
+        mode = item.external_attr >> 16
+        assert stat.S_IFMT(mode) in (0, stat.S_IFREG)
+    metadata_name = 'clang_tidy-14.0.6.dist-info/METADATA'
+    metadata = BytesParser().parsebytes(archive.read(metadata_name))
+    assert metadata['Name'] == 'clang-tidy' and metadata['Version'] == '14.0.6'
+    for item in infos:
+        target = unpacked / item.filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        value = hashlib.sha256()
+        count = 0
+        with archive.open(item) as source, target.open('xb') as output:
+            while chunk := source.read(65536):
+                count += len(chunk)
+                assert count <= item.file_size
+                value.update(chunk)
+                output.write(chunk)
+        assert count == item.file_size
+        mode = 0o755 if item.filename.endswith('/bin/clang-tidy') else 0o644
+        target.chmod(mode)
+        wheel_rows.append({'path': item.filename, 'bytes': count,
+                           'sha256': value.hexdigest(), 'mode': mode,
+                           'zip_crc32': f'{item.CRC:08x}'})
+assert digest(unpacked / 'clang_tidy/data/bin/clang-tidy') == (
+    'c3768c0ff3bbc60a6314289f9492077f7b825243f824a62634b82396ff088e4f')
+guard('wheel-safe-extract-after')
+
+package = PREFIX / 'downloads/libclang-common-14-dev_14.0.6-12_all.deb'
+assert package.stat().st_size == 889680
+assert digest(package) == '838781bfc798bcbdca68516db6546cf83677078efa57851bb957c19e265de7c6'
+data = package.read_bytes()
+assert data[:8] == b'!<arch>\n'
+position = 8
+parts = {}
+while position < len(data):
+    header = data[position:position + 60]
+    assert len(header) == 60 and header[58:] == b'`\n'
+    name = header[:16].decode().strip().rstrip('/')
+    size = int(header[48:58])
+    assert name not in parts and size >= 0
+    position += 60
+    parts[name] = data[position:position + size]
+    assert len(parts[name]) == size
+    position += size + size % 2
+assert position == len(data)
+assert parts.pop('debian-binary') == b'2.0\n'
+assert set(parts) == {'control.tar.xz', 'data.tar.xz'}
+with tarfile.open(fileobj=io.BytesIO(parts['control.tar.xz']), mode='r:xz') as archive:
+    items = archive.getmembers()
+    assert all(safe_name(item.name) in ('', 'control', 'md5sums') and
+               (item.isdir() or item.isfile()) for item in items)
+    control_item = next(item for item in items if safe_name(item.name) == 'control')
+    control = archive.extractfile(control_item).read().decode()
+    fields = BytesParser().parsebytes(control.encode())
+    assert fields['Package'] == 'libclang-common-14-dev'
+    assert fields['Version'] == '1:14.0.6-12' or fields['Version'] == '14.0.6-12'
+    assert fields['Architecture'] == 'all'
+    (PREFIX / 'resource-deb-control.txt').write_text(control)
+resource = PREFIX / 'resources'
+assert not resource.exists()
+resource_rows = []
+guard('resource-safe-extract-before')
+with tarfile.open(fileobj=io.BytesIO(parts['data.tar.xz']), mode='r:xz') as archive:
+    items = archive.getmembers()
+    names = [safe_name(item.name) for item in items]
+    assert len(names) == len(set(names))
+    assert all(item.isdir() or item.isfile() or item.issym() for item in items)
+    assert sum(item.size for item in items if item.isfile()) == 20224648
+    assert sum(item.isfile() for item in items) == 177
+    for item, name in zip(items, names):
+        if item.issym():
+            assert not item.linkname.startswith('/') and '\\' not in item.linkname
+            target = posixpath.normpath(posixpath.join(posixpath.dirname(name), item.linkname))
+            assert target != '..' and not target.startswith('../')
+            assert target in names
+    # Symlinks are created only after every regular file; no extraction path
+    # can traverse an archive-created link while writing payload bytes.
+    for item, name in zip(items, names):
+        target = resource / name
+        if item.isdir():
+            target.mkdir(parents=True, exist_ok=True)
+        elif item.isfile():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            value = hashlib.sha256()
+            count = 0
+            with archive.extractfile(item) as source, target.open('xb') as output:
+                while chunk := source.read(65536):
+                    count += len(chunk)
+                    assert count <= item.size
+                    value.update(chunk)
+                    output.write(chunk)
+            assert count == item.size
+            target.chmod(item.mode & 0o777)
+            resource_rows.append({'path': name, 'bytes': count,
+                                  'sha256': value.hexdigest(),
+                                  'mode': item.mode & 0o777})
+    for item, name in zip(items, names):
+        if item.issym():
+            target = resource / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.symlink_to(item.linkname)
+            assert target.resolve().is_relative_to(resource.resolve())
+            resource_rows.append({'path': name, 'link': item.linkname})
+resource_dir = resource / 'usr/lib/llvm-14/lib/clang/14.0.6'
+assert (resource_dir / 'include/stddef.h').is_file()
+assert (resource_dir / 'include/stdint.h').is_file()
+link = unpacked / 'clang_tidy/data/lib/clang/14.0.6'
+link.parent.mkdir(parents=True, exist_ok=True)
+assert not link.exists()
+link.symlink_to(os.path.relpath(resource_dir, link.parent))
+assert link.resolve() == resource_dir.resolve()
+result = {'wheel_members': wheel_rows, 'resource_members': resource_rows,
+          'resource_dir': str(resource_dir), 'default_resource_link': str(link),
+          'resource_link_target': os.readlink(link),
+          'metadata_requires_dist': metadata.get_all('Requires-Dist', []),
+          'guard': guard('resource-safe-extract-after')}
+(PREFIX / 'extraction-map.json').write_text(json.dumps(result, indent=2) + '\n')
+print(json.dumps({'wheel_regular_members': len(wheel_rows),
+                  'resource_members': len(resource_rows),
+                  'binary': str(unpacked / 'clang_tidy/data/bin/clang-tidy'),
+                  'resource_dir': str(resource_dir), 'guard': result['guard']}))

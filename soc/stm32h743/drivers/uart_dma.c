@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/cache.h"
+#include "nexus/core/fault.h"
 #include "stm32h743_dma.h"
 #ifndef NX_H743_SILICON_ID
 #define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
@@ -18,6 +19,9 @@
     (NVIC_GetEnableIRQ((IRQn_Type)(irq)) == 0U &&                              \
      NVIC_GetPendingIRQ((IRQn_Type)(irq)) == 0U &&                             \
      NVIC_GetActive((IRQn_Type)(irq)) == 0U)
+#endif
+#ifndef NX_H743_IRQ_ENABLED
+#define NX_H743_IRQ_ENABLED(irq) (NVIC_GetEnableIRQ((IRQn_Type)(irq)) != 0U)
 #endif
 #ifndef NX_H743_DMA_CLEAN
 #define NX_H743_DMA_CLEAN(address, bytes) nx_arch_dcache_clean(address, bytes)
@@ -57,6 +61,25 @@ static bool checked(volatile uint32_t* reg, uint32_t value, uint32_t mask) {
     NX_H743_WRITE(reg, value);
     nx_arch_dsb();
     return (NX_H743_READ(reg) & mask) == (value & mask);
+}
+/** \brief Refused peripheral withdrawal keeps the loan behind real NVIC
+ * isolation. */
+static void withdraw_uart_sources(nx_stm32h743_uart_dma_state_t* s) {
+    if (checked(&s->uart.registers->CR1,
+                NX_H743_READ(&s->uart.registers->CR1) & ~TX_SOURCES,
+                TX_SOURCES))
+        return;
+    (void)nx_request_transition(&s->uart.active->base, NX_REQUEST_QUARANTINED);
+    (void)NX_H743_IRQ_CONTROL(USART3_IRQn, false, 5U);
+    nx_arch_dsb();
+    nx_arch_isb();
+    if (!NX_H743_IRQ_ENABLED(USART3_IRQn))
+        return;
+    (void)nx_arch_irq_save();
+    nx_arch_dsb();
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
 }
 static bool cached(void) {
     return (NX_H743_READ(&g_nx_stm32h743_system.core->CCR) & SCB_CCR_DC_Msk) !=
@@ -136,7 +159,9 @@ static void observe(nx_stm32h743_uart_dma_state_t* s, nx_time_us_t now) {
     if (detached && (untouched || (NX_H743_READ(&uart->registers->ISR) &
                                    USART_ISR_TC) != 0U))
         uart->tx_complete = true;
-    if (!uart->tx_complete)
+    if (uart->tx_complete)
+        withdraw_uart_sources(s);
+    else
         (void)checked(&uart->registers->CR1,
                       (NX_H743_READ(&uart->registers->CR1) & ~TX_SOURCES) |
                           USART_CR1_TCIE,
@@ -170,6 +195,15 @@ static void service(void* context) {
             checked(&s->uart.registers->CR1,
                     NX_H743_READ(&s->uart.registers->CR1) & ~TX_SOURCES,
                     TX_SOURCES);
+        if (sources && !NX_H743_IRQ_ENABLED(USART3_IRQn)) {
+            sources = NX_H743_IRQ_CONTROL(USART3_IRQn, true, 5U) == NX_SUCCESS;
+            nx_arch_dsb();
+            nx_arch_isb();
+            sources = NX_H743_IRQ_ENABLED(USART3_IRQn) && sources;
+            if (!sources)
+                (void)nx_request_transition(&request->base,
+                                            NX_REQUEST_QUARANTINED);
+        }
         if (sources) {
             if ((flags(s) & DMA_ERRORS) != 0U && s->uart.terminal == NX_SUCCESS)
                 s->uart.terminal = NX_ERROR_IO;

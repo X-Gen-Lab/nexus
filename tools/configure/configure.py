@@ -747,6 +747,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                 fail(f"Unsupported mode {mode} for {selection['binding']}; "
                      f"allowed: {', '.join(route['modes'])}")
             validate_selection(selection, route, provider, ram["size"])
+            if (family == "stm32h743" and route["kind"] == "spi" and
+                    mode == "dma" and (backend != "baremetal" or
+                    assembly["clock_profile"] != "hsi64-fixed-cache-off")):
+                fail("H743 SPI DMA requires baremetal/fixed HSI64/cache-off")
             if mode in uart_formats.FIFO_MODES and assembly["clock_profile"] != (
                     "hsi64-fixed-cache-off"
                     if family == "stm32h743" else "msis4"):

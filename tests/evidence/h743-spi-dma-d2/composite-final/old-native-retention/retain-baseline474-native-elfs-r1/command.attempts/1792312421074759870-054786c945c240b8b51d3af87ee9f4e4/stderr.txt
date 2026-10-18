@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/dev/shm/nexus-main-native-elf-retention-20261018-r1/preserve.py", line 28, in <module>
+    used=sum(p.stat().st_blocks*512 for p in O.iterdir() if p.is_file());assert used<CAP
+                                                                                ^^^^^^^^
+AssertionError

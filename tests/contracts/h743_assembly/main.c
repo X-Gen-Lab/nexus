@@ -60,14 +60,18 @@ int main(void) {
     (void)nx_flash_port_geometry(nx_factory_flash(NX_FLASH_ID_STORAGE));
 #endif
 #ifdef NX_H743_IO_FIXTURE
+#ifdef NX_H743_GPIO_FIXTURE
     const nx_gpio_port_t* led = nx_factory_gpio(NX_GPIO_ID_LED);
+#endif
     const nx_uart_port_t* console = nx_factory_uart(NX_UART_ID_CONSOLE);
 #ifdef NX_H743_RX_FIXTURE
     (void)nx_stream_initialize(&s_rx_stream, s_rx_slots, 2U);
     (void)nx_uart_port_rx_start(console, &s_rx_stream);
 #endif
     nx_request_initialize(&s_request.base);
+#ifdef NX_H743_GPIO_FIXTURE
     (void)nx_gpio_port_write(led, 1U << 0U, 0U);
+#endif
     (void)nx_uart_tx_prepare(&s_request, s_data, sizeof(s_data),
                              nx_deadline_after(nx_time_now_us(), 1000U));
     (void)nx_uart_port_submit(console, &s_request);

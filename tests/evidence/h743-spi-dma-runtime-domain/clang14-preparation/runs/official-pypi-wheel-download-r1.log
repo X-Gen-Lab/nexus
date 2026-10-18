@@ -1,0 +1,5 @@
+Collecting clang-tidy==14.0.6 (from -r /dev/shm/nexus-clang14-required-20261018-r1/wheel-requirement.txt (line 1))
+  Downloading clang_tidy-14.0.6-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (31.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 31.4/31.4 MB 75.4 MB/s eta 0:00:00
+Saved ./downloads/clang_tidy-14.0.6-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+Successfully downloaded clang-tidy

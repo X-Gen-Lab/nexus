@@ -1,0 +1,2 @@
+{"kind": "batch_sealed", "batch": 1, "path": "/dev/shm/nexus-full-hook-h743-spi-dma-d2-r1/batch-0001.tar.gz", "bytes": 2252, "sha256": "96d71564eabcdd657f7531ad26da360c8d6e123090a0c80ef9ef1e605f61e6fc", "files": 4, "observed_commands": 1, "actual_exit_codes": [1], "all_member_sha_gzip_crc_and_original_recheck": true, "checkpoint_allocated": 32768}
+{"kind": "monitor_stopped", "batches": 1, "checkpointed_paths": 4, "pending_process_receipts": [], "reason": "parent_stop", "checkpoint_allocated": 36864, "qualification": false}

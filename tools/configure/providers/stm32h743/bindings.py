@@ -7,6 +7,92 @@ except ImportError:
 from ..common import Construction, controller_ir, fail, kernel_policy_constant
 
 
+def spi_dma_constructor(item, result, board_bindings, routes, devices):
+    """One exact static owner; Platform already holds its gates and pads."""
+    try:
+        from ...emission import dma_regions
+    except ImportError:
+        from emission import dma_regions
+    name = item.id.replace("-", "_")
+    state = "s_nx_port_" + name
+    children = [child for child in devices if child.controller == item.id]
+    if len(children) != 1:
+        fail("H743 SPI DMA requires one exact PE11 endpoint")
+    child = children[0]
+    binding = board_bindings[child["cs_binding"]]
+    pins = routes[binding["route"]]["pins"]
+    if (len(pins) != 1 or pins[0]["pin"] != "PE11" or
+            binding.get("initial") != 2048 or binding.get("mask") != 2048 or
+            child.get("mode", 0) != 0 or child.driver != "spi-endpoint"):
+        fail("H743 SPI DMA requires mode0 and PE11 initial-high CS")
+    rate = child.get("max_hz", item.options.max_hz)
+    if (type(rate) is not int or not 253907 <= rate <= item.options.max_hz or
+            item.options.max_hz * 256 < 65000000):
+        fail("H743 SPI DMA rate is outside its hardware divider")
+    memory = [region for region in result["memory"]
+              if region["id"] == "axi-sram" and region["linker"]]
+    region_lines, count = dma_regions(name, {"memory": memory}, engine="DMA1")
+    if count != 1:
+        fail("H743 SPI DMA requires initialized AXI SRAM only")
+    child_name = child.id.replace("-", "_")
+    cs = "s_nx_cs_" + child_name
+    cs_face = "s_nx_cs_face_" + child_name
+    endpoint = "s_nx_endpoint_" + child_name
+    face = "s_nx_device_face_" + child_name
+    definitions = region_lines + [
+        f"static nx_stm32h743_gpio_state_t {cs};",
+        f"static const nx_gpio_port_t {cs_face} = {{ &nx_stm32h743_gpio_ops, &{cs} }};",
+        f"static nx_stm32h743_spi_dma_endpoint_t {endpoint};",
+        f"static const nx_spi_endpoint_t {face} = {{ &nx_stm32h743_spi_dma_endpoint_ops, &{endpoint} }};",
+        f"const nx_spi_endpoint_t* const nx_device_{child_name} = &{face};",
+        f"static nx_result_t prepare_{name}(void) {{",
+        f"    if ({state}.retained || {state}.initialized || {state}.active != NULL || {cs}.retained || {cs}.initialized) {{ return NX_ERROR_BUSY; }}",
+        f"    {state}.wire.registers = SPI4;",
+        f"    {state}.wire.reset = &RCC->APB2RSTR;",
+        f"    {state}.wire.reset_mask = RCC_APB2RSTR_SPI4RST;",
+        f"    {state}.wire.clock_hz = 64000000u;",
+        f"    {state}.dma = DMA1;",
+        f"    {state}.rx = DMA1_Stream2;",
+        f"    {state}.tx = DMA1_Stream3;",
+        f"    {state}.rx_mux = DMAMUX1_Channel2;",
+        f"    {state}.tx_mux = DMAMUX1_Channel3;",
+        f"    {state}.regions = s_nx_dma_regions_{name};",
+        f"    {state}.region_count = 1u;",
+        f"    {state}.face = &s_nx_face_{name};",
+        f"    {cs}.registers = GPIOE;",
+        f"    {cs}.mask = 2048u;",
+        f"    {cs}.output = true;",
+        f"    {endpoint}.wire.port = &{state}.wire;",
+        f"    {endpoint}.wire.cs = &{cs};",
+        f"    {endpoint}.wire.cs_mask = 2048u;",
+        f"    {endpoint}.wire.frequency_hz = {rate}u;",
+        f"    {endpoint}.wire.mode = 0u;",
+        f"    {endpoint}.dma = &{state};",
+        f"    {endpoint}.face = &{face};",
+        f"    {endpoint}.cs_face = &{cs_face};",
+        f"    nx_result_t status = nx_stm32h743_gpio_initialize(&{cs}, 2048u);",
+        "    if (status != NX_SUCCESS) { return status; }"]
+    for pin in (12, 13, 14):
+        definitions += [
+            f"    status = nx_stm32h743_pin_alternate(GPIOE, {pin}u, 5u);",
+            "    if (status != NX_SUCCESS) { return status; }"]
+    definitions += [
+        f"    return nx_stm32h743_spi_dma_initialize(&{state});", "}",
+        f"static nx_result_t stop_{name}(void) {{",
+        f"    nx_result_t status = nx_spi_port_stop(&s_nx_face_{name});",
+        "    if (status != NX_SUCCESS) { return status; }",
+        f"    return nx_stm32h743_gpio_stop(&{cs}, 2048u);", "}"]
+    for vector, call in (
+            ("DMA1_Stream2", f"nx_stm32h743_spi_dma_irq(&{state}, true)"),
+            ("DMA1_Stream3", f"nx_stm32h743_spi_dma_irq(&{state}, false)"),
+            ("SPI4", f"nx_stm32h743_spi_dma_wire_irq(&{state})")):
+        definitions += [f"void {vector}_IRQHandler(void);",
+                        r"/** \brief Selected bounded observer; task owns final withdrawal. */",
+                        f"void {vector}_IRQHandler(void) {{ {call}; }}"]
+    return Construction("nx_stm32h743_spi_dma_state_t", definitions,
+                        f"prepare_{name}()", [f"stop_{name}()"], True)
+
+
 def constructor(item, result, board_bindings, routes, devices):
     """Construct only the exact GPIOB/byte USART3 implementation."""
     from . import mode_implementation, validate_selection
@@ -15,6 +101,8 @@ def constructor(item, result, board_bindings, routes, devices):
         fail("H743 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
     implementation = mode_implementation(item.kind, item.mode)
+    if implementation == "spi_dma":
+        return spi_dma_constructor(item, result, board_bindings, routes, devices)
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     definitions = []

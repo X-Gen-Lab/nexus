@@ -1,0 +1,20 @@
+Package: libclang-common-14-dev
+Source: llvm-toolchain-14
+Version: 1:14.0.6-12
+Architecture: all
+Maintainer: LLVM Packaging Team <pkg-llvm-team@lists.alioth.debian.org>
+Installed-Size: 19869
+Depends: libllvm14 (>= 1:14.0.6-12)
+Recommends: libclang-rt-14-dev (>= 1:14.0.6-10~exp4)
+Section: libdevel
+Priority: optional
+Homepage: https://www.llvm.org/
+Description: Clang library - Common development package
+ Clang project is a C, C++, Objective C and Objective C++ front-end
+ based on the LLVM compiler. Its goal is to offer a replacement to the
+ GNU Compiler Collection (GCC).
+ .
+ Clang implements all of the ISO C++ 1998, 11, 14 and 17 standards and also
+ provides most of the support of C++20.
+ .
+ This package contains the Clang generic headers.

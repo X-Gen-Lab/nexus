@@ -1,0 +1,23 @@
+{
+  "head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "staged_tree": "c7dbf82f615e003a3c717230c7f059a2edb0179f",
+  "index_sha256": "4b4839ab81cb80af6540244a57827982f4ac612a62440183374debf364ee938f",
+  "files": [
+    {
+      "path": "tools/dev/plans/software.json",
+      "bytes": 51855,
+      "sha256": "0de33ee1b30f629473e7fb334d4561e28dbb349139f76fe896a506944e800874"
+    },
+    {
+      "path": "tools/testing/test_work_packages.py",
+      "bytes": 21909,
+      "sha256": "b522238cbffc04f8c70f8bf81efbad011e3b965efa2bc386d81f061f51551672"
+    },
+    {
+      "path": "tests/evidence/oci-ca-reader/main-normal-gate/start.json",
+      "bytes": 411,
+      "sha256": "9c303a311f98f3debfcbcef78844d481c82cb44250f8799fb5295956d5b0a413"
+    }
+  ],
+  "semantics": "Complete before bytes retained; controlled append, not automatic rollback"
+}

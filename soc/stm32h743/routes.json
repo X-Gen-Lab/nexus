@@ -100,9 +100,16 @@
         }
       ],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma"
       ],
-      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL.",
+      "mode_dma": {
+        "dma": [
+          "DMA1:stream2:channel83",
+          "DMA1:stream3:channel84"
+        ]
+      }
     },
     {
       "id": "tim3-pa6",

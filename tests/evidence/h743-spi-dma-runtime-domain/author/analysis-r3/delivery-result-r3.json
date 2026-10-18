@@ -1,0 +1,181 @@
+{
+  "kind": "behavior_preserving_required_clang_refactor_delivery",
+  "parent_r2_manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/portability-r2/manifest-r2.json",
+    "bytes": 5375,
+    "sha256": "d34f606343877e749bcc3a7faeeee9dac99b3642d6a5004c176ecbc37aab08e5",
+    "mode": 384
+  },
+  "source_head": "6d235058ca8bf3d26cd7cf2c48ecf15f21c2c119",
+  "index_sha256": "eeaba96786bdc159febb0347c1081f8ef891be3558dc7a99d575b4d771305d38",
+  "composed_sources": [
+    {
+      "path": "soc/stm32h743/drivers/spi_dma.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/files/soc/stm32h743/drivers/spi_dma.c",
+      "bytes": 32424,
+      "sha256": "51a0f80f4719dc301ee7c30d30e7abfe586fa437af6d5b1a7c4944885bf317bb",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_test.cpp",
+      "bytes": 47180,
+      "sha256": "3877b23e6de8d31c858248c6905d36278e4cc79c99c658e2181e7b59e6d0e0c9",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/portability-r2/files/tests/google/h743_spi_dma_model.cpp",
+      "bytes": 15459,
+      "sha256": "9f2e79c4b6ad03d67ba4e2078252b7f9d4239dbfd6e6b30e2aead3a409988ee4",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.h",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_model.h",
+      "bytes": 4391,
+      "sha256": "b4b242f899e015a33581e94880df55e84d483f05ca53e14963f0f4a206ea8bed",
+      "mode": 384
+    }
+  ],
+  "only_changed_source": "soc/stm32h743/drivers/spi_dma.c",
+  "tests_and_other_sources_byte_identical": true,
+  "diagnostic_TDD": {
+    "original_TU_actual_returncode": 1,
+    "original_diagnostics": 4,
+    "clone": 1,
+    "null_flow": 3,
+    "normal_API_crash_claimed": false,
+    "whole_required_clang_actual_returncode": 0,
+    "contexts": 831,
+    "invocations": 831,
+    "zero_exits": 831,
+    "policy_unchanged": true,
+    "tool_handoff": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/tool-handoff.json",
+      "bytes": 814,
+      "sha256": "307b9bc1f96b78527e8a48cff5475acfea29688cc33cfed942031b7f45b8ce55",
+      "mode": 384
+    },
+    "report": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/required-clang-whole831.txt",
+      "bytes": 773885,
+      "sha256": "63bafa431b6c9c49750da35f1ab1aa12cb9bb013b54329078a81b705a5e7cf2c",
+      "mode": 384
+    }
+  },
+  "runtime": {
+    "debug": {
+      "build": 0,
+      "runtime": 0,
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0,
+      "xml": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/debug-r3.xml",
+        "bytes": 28002,
+        "sha256": "08f40e21f3db27686c905a3ddc5bf6a7fe8ca3f5b3adf31c68a5ee9d37742b5c",
+        "mode": 384
+      },
+      "elf": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/debug-matching-r3.elf",
+        "bytes": 2928856,
+        "sha256": "6905a5b5644287117ffe16da6cc50184472b5eacec2c39c737898c681372a80a",
+        "mode": 448
+      }
+    },
+    "asan": {
+      "build": 0,
+      "runtime": 0,
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "disabled": 0,
+      "skipped": 0,
+      "xml": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/asan-r3.xml",
+        "bytes": 28002,
+        "sha256": "1c054eee8cd2727e2bba47ee177c7bafc5f31150ca1735239d237fa7e2970393",
+        "mode": 384
+      },
+      "elf": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/asan-matching-r3.elf",
+        "bytes": 5780304,
+        "sha256": "a0d25e253198846c1b784f375ee98d9556f0fe227ae1dd7c01d2c81b65194b22",
+        "mode": 448
+      }
+    },
+    "strict_style": {
+      "actual_returncode": 0,
+      "files": 4,
+      "report": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/strict-style-four-r3.json",
+        "bytes": 2049,
+        "sha256": "b8039ca2d72d99fe52e9c1ac0d4caa556f73d4d41178fe114e5d72e9aa246067",
+        "mode": 384
+      }
+    }
+  },
+  "preservation": [
+    "Existing initialized/live/busy/pins/deadline/divider MMIO order retained.",
+    "Request/endpoint local snapshots prove only request-dependent active phases; configure_stream uses proved borrowed request.",
+    "STOP_RX..FINISH still supports NULL-active cold rollback.",
+    "Tail drain check reads current owner.active after FINISH; no stale snapshot access after SETTLED.",
+    "No new fault/taint/IRQ policy, state or ABI. No private-stage corruption presented as normal public API.",
+    "Original r1/r2 manifests/results/source/raw remain immutable; new retained-r2-ASAN path preserves exact old ELF bytes before original build-path reuse."
+  ],
+  "evidence": {
+    "actual_clang_contexts": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/captured-actual-clang-contexts.tar.gz",
+      "bytes": 182266,
+      "sha256": "c12a8c64cdb196649317a84b2d6617ff346600bc20f3fdca6b138a75a7415aba",
+      "mode": 384
+    },
+    "context_DB_files": 833,
+    "all_831_actual_per_context_DBs_captured_before_tool_cleanup": true,
+    "raw_archive": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/actual-r3-execution-evidence.tar.gz",
+      "bytes": 43104,
+      "sha256": "4f96c161c6d2ff29c89cd3387b77d7e8d1173d6f35f40d75aa88d0c3c9e5b0d4",
+      "mode": 384
+    },
+    "raw_members": 65,
+    "CRC_SHA_size_mode_verified": true,
+    "actual_command_count": 9,
+    "actual_returncodes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "all_children_joined": true
+  },
+  "retained_r2_asan": {
+    "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/retained-r2-asan.elf",
+    "bytes": 5781136,
+    "sha256": "8d984815945d0018ef53273488d05f20e9ca3f407c547f5c7c3057b45d952431",
+    "mode": 448
+  },
+  "resource_observation": {
+    "memory_current": 14809808896,
+    "memory_max": 17179869184,
+    "headroom": 2370060288,
+    "persistent_free": 68235264,
+    "persistent_alloc": 987136,
+    "tmp_alloc": 97394688,
+    "build_alloc": 92442624,
+    "oom": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "limits": [
+    "Focused dirty independent6d+four-source overlay only; no clean Main/remote CI success/ARM/SDK/HIL/WCET qualification.",
+    "Root independent review and normal complete Main gates remain pending.",
+    "Current original build paths may contain r3 bytes; old r2 bytes remain at exact new retained path documented before reuse."
+  ]
+}

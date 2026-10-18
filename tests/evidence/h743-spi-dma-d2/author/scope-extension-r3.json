@@ -1,0 +1,13 @@
+{
+  "added_authorized_paths": [
+    "docs/locale/en/LC_MESSAGES/delivery/capabilities.po"
+  ],
+  "before": {
+    "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+    "bytes": 110117,
+    "sha256": "dd33e905611ef1a079085bfd8509f3b51a37c43d0f0e005b2d270d24920f8e84",
+    "gzip_sha256": "2248c73b6c4d0a7770e21b3c4e9525ee2585e30ad2720afd3b89fa3e05823094"
+  },
+  "index_before_reused_byte_exact": true,
+  "allocated_cap": 2097152
+}

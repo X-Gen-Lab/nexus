@@ -435,9 +435,12 @@
     "SPI4": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma"
       ],
-      "irq": [],
+      "irq": [
+        "SPI4"
+      ],
       "pins": [
         "PE12",
         "PE13",

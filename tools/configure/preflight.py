@@ -51,6 +51,11 @@ def _modern_selected(result):
     gpio_register = "AHB4ENR" if h7 else "AHB2ENR1"
     source = []
     pads = {}
+    if h7 and result.dma_topology.lanes:
+        # A shared reset is another owner's observable responsibility, even
+        # when its clock is off and stream reads would look reset-like.
+        source += _reject(
+            "(NX_H743_READ(&RCC->AHB1RSTR) & (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0u")
     for item in result.controllers:
         allowed = {"gpio", "uart", "spi", "pwm", "exti", "watchdog",
                    "adc", "i2c", "flash"}
@@ -65,6 +70,18 @@ def _modern_selected(result):
             if item.kind == "spi":
                 source += _reject(
                     "(NX_H743_READ(&RCC->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) != 0u")
+                if item.mode == "dma":
+                    try:
+                        from .providers.stm32h743.emission import dma_admission_conditions
+                    except ImportError:
+                        from providers.stm32h743.emission import dma_admission_conditions
+                    for irq in ("DMA1_Stream2", "DMA1_Stream3", "SPI4"):
+                        source += _reject(f"!NX_H743_IRQ_AVAILABLE({irq}_IRQn)")
+                    source += [
+                        "    if ((NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u) {"]
+                    source += _reject(" || ".join(dma_admission_conditions(
+                        result, spi_only=True)), indent=8)
+                    source.append("    }")
         if h7 and item.kind == "exti":
             line = int(item.controller.removeprefix("EXTI"))
             source += _reject(

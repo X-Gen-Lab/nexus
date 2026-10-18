@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "command": [
+    "git",
+    "-c",
+    "gc.auto=0",
+    "-c",
+    "maintenance.auto=false",
+    "-c",
+    "user.name=Nexus Maintenance",
+    "-c",
+    "user.email=nexus-maintenance@local.invalid",
+    "commit",
+    "-m",
+    "fix(tooling): expose public CA to sandboxed build clients"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "returncode": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.attempts/1792308676688122398-30552ec3c3fc470c8637f14dc83a454b/receipt.json",
+  "source_unchanged": true,
+  "qualification": "actual command only; inspect scope and reports"
+}

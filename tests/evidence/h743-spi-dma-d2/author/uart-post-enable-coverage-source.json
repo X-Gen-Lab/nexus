@@ -1,0 +1,16 @@
+[
+  {
+    "path": "tests/google/h743_dma_factory_test.cpp",
+    "before": "fb748dfb4567fee585ea010b767d784bb5ecdeeb58c71597e46cf5c963351ce7",
+    "after": "52b1a5dcb169ce99c6be7a21ebba2aeeb50fdd3d9c365e989fda846e29e0cc1f",
+    "old_complete_prefix_preserved": true,
+    "classification": "additional external hardware-leaf coverage on already-fixed production; first result not predetermined"
+  },
+  {
+    "path": "tests/google/h743_receive_factory_test.cpp",
+    "before": "7ce526d4282ccfce284d4d35a04f7b09e0a96138d840e339a04010375e7102be",
+    "after": "c44c413ddf1018f15927784d909c5ffe95129bff3f1eabf07065af3192aec546",
+    "old_complete_prefix_preserved": true,
+    "classification": "additional external hardware-leaf coverage on already-fixed production; first result not predetermined"
+  }
+]

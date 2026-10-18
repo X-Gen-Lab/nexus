@@ -1,0 +1,10 @@
+{"preserved": 50, "allocated": 60141568}
+{"preserved": 100, "allocated": 146423808}
+{"preserved": 150, "allocated": 222072832}
+{"preserved": 200, "allocated": 304627712}
+{"preserved": 250, "allocated": 381124608}
+Traceback (most recent call last):
+  File "/dev/shm/nexus-main-native-elf-retention-20261018-r1/preserve.py", line 28, in <module>
+    used=sum(p.stat().st_blocks*512 for p in O.iterdir() if p.is_file());assert used<CAP
+                                                                                ^^^^^^^^
+AssertionError

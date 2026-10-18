@@ -1,0 +1,4057 @@
+{
+  "kind": "actual-normal-complete-index-commit-gates",
+  "head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "tree": "7389de4ce9453da1b305c1f8e829dd91be807581",
+  "observed_at": "2026-10-18T07:40:16.646790+00:00",
+  "worktree_clean": true,
+  "staged_files_verified": 25,
+  "programs": 306,
+  "google_test_cases": 5364,
+  "tool_tests": 2368,
+  "tool_suites": [
+    {
+      "suite": "testing",
+      "discovered": 1009,
+      "executed": 1009,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    {
+      "suite": "configure",
+      "discovered": 857,
+      "executed": 857,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    {
+      "suite": "ci",
+      "discovered": 412,
+      "executed": 412,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    {
+      "suite": "workflows",
+      "discovered": 90,
+      "executed": 90,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    }
+  ],
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "normal_hooks": "actual ordinary git commit exit0; full raw retained; no bypass/filter/shard",
+  "execution_report": {
+    "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/execution.json",
+    "bytes": 949199,
+    "sha256": "80b39bcb38a621397b226b5c7a3dacc3cbae3e42aa7a7bfe948bf488f6e4b95f"
+  },
+  "outer_receipt": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/oci-ca-reader-full-commit-r1/command.command.json",
+    "bytes": 1523,
+    "sha256": "12cf8a539510f6cdc6f0e2e2c88d1a8123216070fff1d6a87867e659cdddb32a"
+  },
+  "io_property_report": {
+    "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/io-property-report.json",
+    "bytes": 8290455,
+    "sha256": "1df1d2c7a6c0076f0a980e7412bc525929a6413abf2b476bb9ea36c3c01669c0"
+  },
+  "executed_programs": [
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_adc_format_test",
+        "bytes": 2272240,
+        "sha256": "7d17f0d71ee4ca5fa8d27fb2c9b5fdb9eb914a785b58d1d84e8eaa6f92c83bd6"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-0.xml",
+        "bytes": 2126,
+        "sha256": "393917ddf49a721f84c3146207947357c522b0d17640eb392da025350f46f6ba"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_adc_group_test",
+        "bytes": 2516784,
+        "sha256": "fbadd71ec7c4f63932a842fa36df636458acb6261561c4d31ec0215794bf4ffb"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-1.xml",
+        "bytes": 2383,
+        "sha256": "f8815a4c03dc5734575aca3298feae006792ac0920f93cbabbcca2764c0f2629"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_both_test",
+        "bytes": 2666776,
+        "sha256": "baba2ac0d65f1945411389700b4edccb9969401dda1ca5294be2e672d7a6048c"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-2.xml",
+        "bytes": 4902,
+        "sha256": "34c1c305534f0fdb5e8136b635239179cbab3631442a4ec774a3078812ba92c7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_control_m7_test",
+        "bytes": 3021168,
+        "sha256": "126f7247cb4a750b0d6589ed4216a7787a765334644853ea3db6c3f24aaf0488"
+      },
+      "cases": 32,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-3.xml",
+        "bytes": 8898,
+        "sha256": "23018870f38a5d3ece3ad5e5ac164b92ade78e325ccb4eb742965289e78200cc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_control_unsupported_test",
+        "bytes": 2916456,
+        "sha256": "38d47f5c1f881615584dd1c822a16aa354b2ffa8617c6af2abd9b90a6dbef29f"
+      },
+      "cases": 32,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-4.xml",
+        "bytes": 8892,
+        "sha256": "3071cca21f540c4faa222004575d4916396a0ad96ef3903afa789f5864b6623e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_data_test",
+        "bytes": 2665752,
+        "sha256": "ebd682442e6bd1b05d919b3de18dc61acbdfc8392e0a6bd2fbe169dc66f85bd6"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-5.xml",
+        "bytes": 4902,
+        "sha256": "1bc469e87e0cfee3d0fe930d6e5cd971a1053ece24c34707365fb1e3e87843b3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_instruction_test",
+        "bytes": 2659928,
+        "sha256": "e93e8870cffbb32cad713a028f18dc3403c8817abd3f0f8d1bfd889a9f3d1f0d"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-6.xml",
+        "bytes": 4902,
+        "sha256": "22c8b239807296b7e64365d672797f7be85dc7dfe30094e2dc99aedbda295c71"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_none_test",
+        "bytes": 2478336,
+        "sha256": "317cc6a4dc9cd593a15fbd77bb64ecdbd2156153dabc5bdfcb954cc3cc69523d"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-7.xml",
+        "bytes": 4902,
+        "sha256": "5516cbe3c44bfef52e64324ea47ae91f73024f1f6fa3bfb7ba51b39201be8a73"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m0_test",
+        "bytes": 2612472,
+        "sha256": "23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-8.xml",
+        "bytes": 3604,
+        "sha256": "736456d8fe8046ab40d08a314f8f293363f77cb837595945c75ac3ea72056b4e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m0plus_test",
+        "bytes": 2612472,
+        "sha256": "23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-9.xml",
+        "bytes": 3604,
+        "sha256": "f8a3a03fd5b6098f82869f3a9869f737c77c1bdd46776c78df4c1f94b010d6a7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m23_test",
+        "bytes": 2612472,
+        "sha256": "23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-10.xml",
+        "bytes": 3604,
+        "sha256": "c79611a0f48d8d9c47e53f13188f66f2ecedc4a60138ac586cc73c86b33acc83"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m33_test",
+        "bytes": 2625208,
+        "sha256": "67de9a99b62f75ea1a6d9b3f0f5f3391e8f93bdddbec88a0a36659248b66b9cb"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-11.xml",
+        "bytes": 4102,
+        "sha256": "df269c054f2ce3cb3ec33dfcdf533836d2b0059c78e9297ea77985511c088a9d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m3_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-12.xml",
+        "bytes": 5124,
+        "sha256": "9a6a9b9705ad29c7ec4a8f1b2ce5e9b7979778f845841e1e3cab45689210a5df"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m4_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-13.xml",
+        "bytes": 5124,
+        "sha256": "80bcb1ff38d57658b699f549fc20f12df88abaab0b9f4ec49413eac3ed2cc373"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m55_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-14.xml",
+        "bytes": 5124,
+        "sha256": "418590f91ab9b167a89bf2a432a33b892bcc89da1d4c89f6a64b0907d55978e4"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m7_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-15.xml",
+        "bytes": 5124,
+        "sha256": "4d13ee8cfc2a92fbfb77e8871d2dea4834b167f1ac5cdb3d11958b3e719edacc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m85_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-16.xml",
+        "bytes": 5124,
+        "sha256": "a51bc64cd952cab2241913fd415e41c5f5bc8fcabae92bc749175e0fbea228a7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_mpu_v0_test",
+        "bytes": 2669976,
+        "sha256": "657e3b3f08697da3873b88a4564480a885698fdf0d9b9f59c0eb992c714e1cd2"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-17.xml",
+        "bytes": 4154,
+        "sha256": "2d23ee5625529267fc3a63cdd5170f839a24e6fbc8616f6131ec88907a103cf5"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_mpu_v7_test",
+        "bytes": 2814736,
+        "sha256": "7691784e583543647319b228c79feb4fadcdb59df321fe3c3242ea543f7650e6"
+      },
+      "cases": 22,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-18.xml",
+        "bytes": 5943,
+        "sha256": "505a4c31f9432516fd32bf60f98c3edef279b809165eeadbf9ce9d467e60b141"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_mpu_v8_test",
+        "bytes": 2868912,
+        "sha256": "8405bba7eb827eb5ef8ba031403392d21850272815efd50e8874e1960eac2ed4"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-19.xml",
+        "bytes": 7498,
+        "sha256": "f8f8edf4f764349ff20f8eba54530b485ad39f3e2311503ef55fad2b3bbc9105"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_native_mechanism_test",
+        "bytes": 2235304,
+        "sha256": "4c6006e4017a65c97ccb9aa82c23ce1faaa23d476197987d63fd4a0d9b685e36"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-20.xml",
+        "bytes": 1130,
+        "sha256": "dab9c4f52060b11c0aa707cb2e959126caef1b69244131710be3c00a63de5f7a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_native_test",
+        "bytes": 2354416,
+        "sha256": "d137c77c18271faf5defdd514d2cb7e496163534122943c770e616cbf1072e37"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-21.xml",
+        "bytes": 2302,
+        "sha256": "bc3be4525afeca6facada6e2b6c88f2be450ae33d399a9638fc6f454c1ef9339"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_native_test",
+        "bytes": 2367528,
+        "sha256": "7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-22.xml",
+        "bytes": 604,
+        "sha256": "299df65a7808221ca5a8cd9031ca1fd3dd942974670953d7a56108148bc9bab7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_nonsecure_test",
+        "bytes": 2367528,
+        "sha256": "7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-23.xml",
+        "bytes": 604,
+        "sha256": "d0ab5ffe92fd45716259ffd8af3faf8a9dff4fd1dc7a25a4b47a3356ccc0d317"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_secure-no-sau_test",
+        "bytes": 2663336,
+        "sha256": "049c6c0d77a3b030069ea2696ae214eeb01998471fe59a6f33b1119c14b3a75b"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-24.xml",
+        "bytes": 3214,
+        "sha256": "48cc698808c43c2036c356d99d9262fd86c545fb95a92f5ee658bed7402fbcbc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_secure_test",
+        "bytes": 2663336,
+        "sha256": "049c6c0d77a3b030069ea2696ae214eeb01998471fe59a6f33b1119c14b3a75b"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-25.xml",
+        "bytes": 3214,
+        "sha256": "68d33a3dce4808938f9cde148cf7391f31a8079157a029f837cd1233b0bdc486"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_single_test",
+        "bytes": 2367528,
+        "sha256": "7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-26.xml",
+        "bytes": 604,
+        "sha256": "e2c95ce2ea7e624d684f55739ed6c8496551f73f015b476ef4f98872d3458b17"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_nonsecure_test",
+        "bytes": 2484472,
+        "sha256": "e9a6f176c7ab444cce4f7d4c544ab113d29a22b64523627fb8b46ab18e18d625"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-27.xml",
+        "bytes": 2132,
+        "sha256": "b22d12b7c93a6e85a203a064aa1c6d027ec81798953cc8af0d460b59911cc7a6"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_secure-no-sau_test",
+        "bytes": 2484472,
+        "sha256": "dce4c958c6bacafc9aca8efe0a5330e96fa7a610bb93b36e0ff34ce6025c1405"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-28.xml",
+        "bytes": 2132,
+        "sha256": "fd419cd58f323d9c4f5ce83e7bed51d85207850b69e3c737aa308083176d130c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_secure_test",
+        "bytes": 2805944,
+        "sha256": "aff1144057a2a9d8422fd0b564920dce4504708f4c2337793e8d1b12c807c8ab"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-29.xml",
+        "bytes": 3937,
+        "sha256": "8ed5fec518c9e8f50a9e263e212cb5f4600cbff122330a7349e06d904f522dae"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_single_test",
+        "bytes": 2484512,
+        "sha256": "919cb1b7a8d2f5b1352fb3301b7bd917b3aad29b56065600c71fa3f1a407c713"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-30.xml",
+        "bytes": 2132,
+        "sha256": "817c53c1b87a3b62316d6eee23fbc90a03f48ea1d741b6bc6503257984b5f1a4"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_sleep_test",
+        "bytes": 2712288,
+        "sha256": "91cef5b52336f8ead5311360261b5977bbcc657f321113c241cceb123fda80a5"
+      },
+      "cases": 10,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-31.xml",
+        "bytes": 2745,
+        "sha256": "5c1e3bfa2174b82544733148277054a838c8c33ecc9e3709b015cdf9119604cf"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_atomic_m0_test",
+        "bytes": 2732240,
+        "sha256": "259b116e2c1fff4e1837f027717abc64850fe23930f5f13d9df335714efd59cd"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-32.xml",
+        "bytes": 2711,
+        "sha256": "49517801ff38e04c3ebce7f6834fb9240d4ecd81474f632c326a68f1d0264e54"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_atomic_native_test",
+        "bytes": 2277000,
+        "sha256": "f23833c440244936c1f73630c5add497569a01694358805eb36d365720000d5f"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-33.xml",
+        "bytes": 1654,
+        "sha256": "7b0232971bc2fd07f2f5a62e217aa950bc19adac378b3a57708891408312bd18"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_can_controller_test",
+        "bytes": 2567872,
+        "sha256": "b6d47b09f003c140c43c40661f17665d799b653a30c9c98f742337da1c435c42"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-34.xml",
+        "bytes": 8277,
+        "sha256": "3210777fd6eec999a2253eb24f20bd07cc18adb4466a2b3a2f43f98ed7f52081"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_can_fd_contract_test",
+        "bytes": 2254904,
+        "sha256": "7a8be1db37718eb818c67a48f5b03a3c361b838e6c0d39068c0f70425dc4b04f"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-35.xml",
+        "bytes": 1664,
+        "sha256": "0323f531437e91f07212749d6b23d5b5bc1f34e73caaae1c989357b18ca72337"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_clock_domain_test",
+        "bytes": 2394648,
+        "sha256": "15ddbefac60cf262e443adaa8b14770ae21ff5e8dea105c41b6dcaa9c1453f13"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-36.xml",
+        "bytes": 4646,
+        "sha256": "a8333652200565b399f4aa4ad9501382096d815f2053b97bab61f77c01b71485"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_common_ethernet_frames_test",
+        "bytes": 2889064,
+        "sha256": "e816954b7ccf2d388ae1328516d0d83806b3f69a080f74f3175be5ec0c9ee6a0"
+      },
+      "cases": 29,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-37.xml",
+        "bytes": 8433,
+        "sha256": "fc7429fe1972897d027e4664860653e5377f53e3c057c109e3b027c208d3153b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_cycle_probe_disabled_test",
+        "bytes": 2209872,
+        "sha256": "8a79424237330f7bcc18ff36e78a22b4d0fc51a3f2e124069fce8ea52db2eda1"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-38.xml",
+        "bytes": 876,
+        "sha256": "becda87b558d2ba8cecec901f76de6081ef51155aa72cc0ac9817a7e2176ea9b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_cycle_probe_native_test",
+        "bytes": 2233808,
+        "sha256": "439036da31a799c5d28c3ec9c85220ddc27a9855e5132434b07e56735b116e4c"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-39.xml",
+        "bytes": 592,
+        "sha256": "92a82bd6700d3cd45fc2d1dc67e22314422714ad05644004bc46c4a5689753ca"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_cycle_probe_test",
+        "bytes": 2775088,
+        "sha256": "710d9bbf9e0a99541887ef8e22ae29f7ffa6111d1abb3fc3d3f2ca63594b2311"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-40.xml",
+        "bytes": 4504,
+        "sha256": "68d4daac83a1ddb1d3a4ce2b3f30e8095f6495ddb7c8cd3bc18577278e4af9b0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_dp83848_test",
+        "bytes": 2656800,
+        "sha256": "5b000a6dd9fd2c65f9939d664d83f5d9a7004557322a6c25db3cbc5a94881b41"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-41.xml",
+        "bytes": 2296,
+        "sha256": "6c2749912224578b7195cd5e595f99bab17a7dfd108d0b812e8ac54a2f95a403"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_api_test",
+        "bytes": 2438072,
+        "sha256": "fc7c7c91b1b2df696defeeaa6e84ce9b751c6f416f6374228c0d5dc5691db86e"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-42.xml",
+        "bytes": 1102,
+        "sha256": "5dd2a1da450b049bf23f4ca0bc742786464a8a04275f168132bcab7ca6fc20fb"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_frames_api_test",
+        "bytes": 2511824,
+        "sha256": "5ca71ffe6f460698331bfdd2feb1493f7e2493d101f4e248a5a1267dbe710740"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-43.xml",
+        "bytes": 1445,
+        "sha256": "e808170ce958023770c2f13f21152bea4ed08b03996af8e0170a08edc7d06f61"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_frames_native_test",
+        "bytes": 2453072,
+        "sha256": "9fca73696373071f7a3c275cd661bf2e89dabd1d05f8fef3fd96a933302b4bf4"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-44.xml",
+        "bytes": 2335,
+        "sha256": "963df1b02c61510fa5489b2a3fa328e4cba341b936d55e20585fc5507cbbddfd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_mac_test",
+        "bytes": 2610784,
+        "sha256": "e9ce0cde7a85202e8eb9be7ef1983602baae9b60b8bf400f3b72075d242a7b50"
+      },
+      "cases": 35,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-45.xml",
+        "bytes": 9423,
+        "sha256": "c4935f81df75935961208e858a49621d64394642893efe343f3d76bacafa5e42"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_native_test",
+        "bytes": 2349872,
+        "sha256": "31954806e2608c025427cca6e65bce666892fc3c15b0306684c45a40f13d78e1"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-46.xml",
+        "bytes": 2208,
+        "sha256": "1f31454c7f1c9a83e37fb23547c5aa364bcf1a5592d5ead71b2406da34bec2a1"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_raw_errata_test",
+        "bytes": 2282744,
+        "sha256": "ac42881dc8a733479ca6302268d926c6690fb5a0916f7a8443fbbb6945d8cd24"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-47.xml",
+        "bytes": 867,
+        "sha256": "82df5672723939a4d0bbed1f3372d2a9b131ccf9fbc9804ac90623c989a1a884"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_f103_devices_factory_test",
+        "bytes": 2349848,
+        "sha256": "7c858eeb0b9ce86055f28cfb5deb28205e31044bd62998baf9feea903b3a4eab"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-48.xml",
+        "bytes": 1169,
+        "sha256": "a50b589bdb6a28ecbb354444f84ecfa94ea303c66d08a84b6538aff7acf088b8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_flash_provenance_test",
+        "bytes": 2466368,
+        "sha256": "c3513fb46f0d9378d413f13d2b34b97f5afc9e75ac8d7e8fa490be08bd8441ef"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-49.xml",
+        "bytes": 1141,
+        "sha256": "27ea950e987e8ca80bc3cc57d7af52b3a80c460cdc9931848139e3709460eaf7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_baseline_context_test",
+        "bytes": 4881464,
+        "sha256": "307cd58d8cfb333df4151cfe5df50fda8e3591e3fec8269ad6dfe24af829ade5"
+      },
+      "cases": 105,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-50.xml",
+        "bytes": 36047,
+        "sha256": "8e57e8e87b1fbc843f56087735faa1a81c6fe005fbb991caf295bea4f8e22e19"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_context_test",
+        "bytes": 4975736,
+        "sha256": "87e0af97e65ad1100127dc7eaf2cffe60a146cab9c4f30d5fd98c976ca859f59"
+      },
+      "cases": 107,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-51.xml",
+        "bytes": 36594,
+        "sha256": "bc118c929c32029f61fb754b2fe094cd254bd383bb20bcc745fc5fd7bd5b6525"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_failstop_test",
+        "bytes": 2315552,
+        "sha256": "0e02bed0bc65619ef3118f37f595cce1e9a26e3c644a92a81bab7033c6586d1a"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-52.xml",
+        "bytes": 2513,
+        "sha256": "e4090d3698745d1a939ccd45f645cf8a49adb9d89a874e5591fec3e4c49be14a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_m23_context_test",
+        "bytes": 4880720,
+        "sha256": "1b338f6d127ca602b92331b01609aad54cdaa0a0bf0574fb79aba7152f81241e"
+      },
+      "cases": 105,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-53.xml",
+        "bytes": 36047,
+        "sha256": "37f7571a8ad4b6dda5c6b4903a82627a5ff25434d3d16f5a76a57d4612fe82ba"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_guard_v7_test",
+        "bytes": 2479056,
+        "sha256": "dadcdb0c6439a25372c47eacef88111c946edc045d5e1dc2ccdadaec26601eeb"
+      },
+      "cases": 21,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-54.xml",
+        "bytes": 6866,
+        "sha256": "829a0046eb4891373e8e7718af21c8d612d828163fcccd5cdbd422182dabdd99"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_guard_v8_ns_test",
+        "bytes": 2484256,
+        "sha256": "8e038ebc85ebacafa1e79d0214094aee0d453ce783eb6caa2df90705a1adce77"
+      },
+      "cases": 22,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-55.xml",
+        "bytes": 7139,
+        "sha256": "f19da040a20d3641ebb648e8a26a45231e2a069aeff80730fbed9523720ff56d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_guard_v8_single_test",
+        "bytes": 2484256,
+        "sha256": "118f338140916b7afcd1e5427f6aabcb85c7e1c6bb5a7096a8b7e00195457c80"
+      },
+      "cases": 22,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-56.xml",
+        "bytes": 7139,
+        "sha256": "9c1e177c24991a4b670b47d86fbd878a3801842b34a2dcb209ec2abe562cc269"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_m3_test",
+        "bytes": 2732856,
+        "sha256": "9e69832a5a697855647b49a5171175406284841b4d60518528b5f071686bbee2"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-57.xml",
+        "bytes": 4674,
+        "sha256": "f30164c29e4c7a6d4d1c9145326b54806f8d9c959027d7f621007b4d115d3165"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_m4_test",
+        "bytes": 2732856,
+        "sha256": "788009d162ecede6bf0bb3f3861b3e779d3d39ed67a14f1f38cf234a6cf60c89"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-58.xml",
+        "bytes": 4674,
+        "sha256": "7f4f32682fc3bf4401d498d15543b2f0bd1e4eeec9e82e30922552aa6fbed63a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_v8_ns_test",
+        "bytes": 2689600,
+        "sha256": "f5a2bb558a91701c1f87636064bc3f1a74039e7b3b1fb4ec1b714caa061400b0"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-59.xml",
+        "bytes": 4126,
+        "sha256": "1cf8a70139fba95162e07aa5932b00b87291217c284c884cbd1a437ff5351b92"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_v8_single_test",
+        "bytes": 2689600,
+        "sha256": "2b0c3ed2db5f3ffb1d24155ef516538bfb3ad688fbe431e40df908f7f5bc2a2c"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-60.xml",
+        "bytes": 4126,
+        "sha256": "6a77348ec16138d93b699f16e98d602daa22467b1da465814f15ca50f37e9639"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_v7_test",
+        "bytes": 2958584,
+        "sha256": "c49af2725e0d6b735d7d67da1d1c298f5d172a728818110ce1cd3a6feefd38ba"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-61.xml",
+        "bytes": 9303,
+        "sha256": "66618e22a87315a1e0f8a754d5d205f2542e3a354d6905b9216154344af2b328"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_v8_test",
+        "bytes": 2981784,
+        "sha256": "697fd352b647720ceabbeef654bb151214d2d35fc0153b074e365e1a192b6a09"
+      },
+      "cases": 31,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-62.xml",
+        "bytes": 9562,
+        "sha256": "3bbe225060c8f4c1b30864676b366b651b7684c8262f5f435427320002f04389"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_notifications_disabled_test",
+        "bytes": 4804888,
+        "sha256": "78e1dcc9e1a346eaa07be490d8c7c27ba37196d9f8d3e2868dd8f06319a42b9b"
+      },
+      "cases": 103,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-63.xml",
+        "bytes": 35539,
+        "sha256": "4234e1759f911f8220d267308e4d4fdf2fa51e2e9c8f9eb80ddd6d9c65c2f5ce"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_prestart_test",
+        "bytes": 2343360,
+        "sha256": "ccba51057f6972de309f59aac164e6c57d2ee1c0f7fafd13892f660f4c32ab92"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-64.xml",
+        "bytes": 623,
+        "sha256": "1739084bae84fd26208a878a56a57fc84423d98a1ebdcd03246a64040311158a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_priority8_context_test",
+        "bytes": 4975864,
+        "sha256": "0cca531e955da67e1e5c2648e720b16124f608abd136ef066518a4543b493bf8"
+      },
+      "cases": 107,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-65.xml",
+        "bytes": 36594,
+        "sha256": "b999534e41d66150356fa8c423b6c8234081fb66546796153898e3262a31ed41"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_services_kernel_test",
+        "bytes": 2184600,
+        "sha256": "d3e65fc487099fbf4723429183fd56d8ffb4296d515735a0c5ae4a93f9bd0877"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-66.xml",
+        "bytes": 3928,
+        "sha256": "21fea003cb7a9ffbc696651122f3caf4a44ca3d2212f7fd6317a6d69a442bec8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_stack_test",
+        "bytes": 2766192,
+        "sha256": "b6ef40c5d36f1b87988650f9ab7089267de48cc103546157d92d11be87402921"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-67.xml",
+        "bytes": 2167,
+        "sha256": "0ed2e3b1e1bba49ecd2cc4b8ee5c9a5bfa17bd01343fe50df670ef966cc577a8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_v8_context_test",
+        "bytes": 4975872,
+        "sha256": "a0bf36a378b2a1325d03c0a8cf999bcbcd30361ffe191b0cf6c8e7d370d85dde"
+      },
+      "cases": 107,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-68.xml",
+        "bytes": 36594,
+        "sha256": "f8af076dd4cf3dd72a2472e5760924d482956d2e67b6bdc716532b355a42b576"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_acquisition_factory_test",
+        "bytes": 2459728,
+        "sha256": "5761f8b2c33d998827f7a37507e51fa69ccfaeb38772af22df34659f2e041694"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-69.xml",
+        "bytes": 2866,
+        "sha256": "0d5734c1d00061f48729aea54b86116bbe39c9e18ee64baa3add3c9f85df0263"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_acquisition_test",
+        "bytes": 2848416,
+        "sha256": "5e92903c613559b103171f83af409a7ccc85b44af5ae3c5747d6ca9b33909d8f"
+      },
+      "cases": 43,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-70.xml",
+        "bytes": 12038,
+        "sha256": "46560e3460ead652645d16e8b5923058f03d8a87185a9ecd34851ba2ce93ac25"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_injected_software_factory_test",
+        "bytes": 2595400,
+        "sha256": "7546d769081578efef74ff21d8cf5875236d36669e3c2105a5584ae9b91d377b"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-71.xml",
+        "bytes": 5017,
+        "sha256": "2dfbf28053679b4ead4727f9529bb632aa370e043206e36612656d2e675f594a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_injected_timer_factory_test",
+        "bytes": 2596560,
+        "sha256": "0b406f164e39cdc5fc736f6fcab69b3074aa2342a5df83455f2618e969e07a81"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-72.xml",
+        "bytes": 5017,
+        "sha256": "411dacd8e60393b8b7f3c5e15fabaaade92f554989b4c803696ce51ed9e7b3a0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_regular_software_factory_test",
+        "bytes": 2595144,
+        "sha256": "9569bffdf73dc7c2d2ce88065cfcbd1de9f13728e01cabadd8c1823d161c30c4"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-73.xml",
+        "bytes": 5017,
+        "sha256": "87c76377da2f0ce041643100ce7d445f99d628a1b4342e3725767ddbd51a7be1"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_regular_timer_factory_test",
+        "bytes": 2596224,
+        "sha256": "dae330f0d64cbe8e84dc3301adf27ed049ec0f2925d1cbb72e48d959b86c46f9"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-74.xml",
+        "bytes": 5017,
+        "sha256": "bf3f5ef9c9319e6a834c2203b30e9485280cd58da55fb24a15cb4b9d49ea2287"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_test",
+        "bytes": 2970000,
+        "sha256": "b4e4712dd7ba218c35bf1fb3750df30138a62935c5856e5edcf5543f2791adeb"
+      },
+      "cases": 55,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-75.xml",
+        "bytes": 14981,
+        "sha256": "1f7afee1e4ef275d1c74c6e7079281747e5cce8eb1783293e8eb83f293ceb419"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_capture_factory_test",
+        "bytes": 2380880,
+        "sha256": "03002279226e9d81e0fca7bdac0906b0f2b71c7dd577d9296dac47217b0cd19e"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-76.xml",
+        "bytes": 2497,
+        "sha256": "e08f1cabfb641cf06f02f8ce4362e64088da3ae8ffd90728acb41b1b03b5999f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_control_factory_test",
+        "bytes": 2618328,
+        "sha256": "4c30808b77f62e5096d6b7eab4d8c94336949e93f8bdcf9933a2d3e4e04abaf0"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-77.xml",
+        "bytes": 4997,
+        "sha256": "2e4f5026b43f9ac31b1c8f22669f0e63b92d2023d7d4e1a26c97b90816ec5827"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_encoder_factory_test",
+        "bytes": 2370032,
+        "sha256": "539219010fbeb252f940df37688672efb7b0b5159c0f52f64b0bb98f68568e98"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-78.xml",
+        "bytes": 2229,
+        "sha256": "5e7c2f889d2619d1b33f32dee8d3f73b1bccbcafa5b4a96cf3e301a8c03b9210"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_exti_test",
+        "bytes": 2691424,
+        "sha256": "0fa74c4f755bd809ca776a03be280348dff3955bc0f2f20fc382ab06af74d574"
+      },
+      "cases": 25,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-79.xml",
+        "bytes": 6948,
+        "sha256": "6263d4597ad75618673bb2992c8db160099ef81c07903accea14840912739c56"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_factory_test",
+        "bytes": 2542752,
+        "sha256": "b87349412980426df8ac1ba996d9661edcc38ef2d4969eb7d52e208c7924db43"
+      },
+      "cases": 21,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-80.xml",
+        "bytes": 5884,
+        "sha256": "db1b2137857f20575d61d5d5678b3459e0dea1643e41021c1eb233de8e402d94"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_fdcan_factory_test",
+        "bytes": 2552576,
+        "sha256": "161362869b340a0588116d3a1ff6bf348e17da0d801c1a68a1f18bc031a9e208"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-81.xml",
+        "bytes": 1700,
+        "sha256": "0a278277cde0ca277d491468d4c73771bea0fc7e672f0777ef8f2c1a6a536510"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_fdcan_normal_factory_test",
+        "bytes": 2552616,
+        "sha256": "fe9a89254253f8c8cf7da8605c46a573a9373ad425fab1ef8407faac1c13d3aa"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-82.xml",
+        "bytes": 1700,
+        "sha256": "65bfb20f1c69230015abdf4db5f8863e60861c090a4ca4eec49d81ac894f484d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_fdcan_test",
+        "bytes": 2869576,
+        "sha256": "78d9bd59769d7a1763dab235da05abe96497e1931a6b3866be6016145fdaa3c7"
+      },
+      "cases": 24,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-83.xml",
+        "bytes": 6648,
+        "sha256": "e9c1314bcaf1a51184301d6351adabb2b2e68d5d630cb577e6734b167bd0c3fc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_i2c_long_factory_test",
+        "bytes": 2630352,
+        "sha256": "dc51abdc1f0ef73a7600c55313f50744e9815673856ff0bf787dbe9b7139d3f8"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-84.xml",
+        "bytes": 1450,
+        "sha256": "2f6b6c2b209ed4aa41ab987a376e0cd0851f91452c3ed304b5b5407b6f91b11b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_i2c_v2_test",
+        "bytes": 2565312,
+        "sha256": "8a1972a073762eb489864d6d06fcc2a30a0ea3a68b56b0d16f18497405d5416e"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-85.xml",
+        "bytes": 3377,
+        "sha256": "18b9f2f1ca58a1f35c60e9131b123c8d23140852695bef08e8709ba04f910dc2"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_mainstream_test",
+        "bytes": 2373200,
+        "sha256": "19039e0e118d4c96bf08e4dfea83d96dcb4a8191c58d7d43b741baa0b297007f"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-86.xml",
+        "bytes": 1650,
+        "sha256": "f74582af0b61c04900c6b3fa6c7588fda326f692a1162e6e7687936e5565bbbd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_peripheral_factory_test",
+        "bytes": 2373344,
+        "sha256": "fded0ea58adbec8a5b5551c700babd4855376bb824ed1f80c3cc143937a68e27"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-87.xml",
+        "bytes": 1732,
+        "sha256": "76d4d271113185cba517e0e93fbbc002bdf708e59513b6ef3cfbbf3fd293668f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_provider_test",
+        "bytes": 2732296,
+        "sha256": "d866c80e5ef3aab2a67ddffdab189917f74f8e13e510a3cbe4d6b5fa09eba409"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-88.xml",
+        "bytes": 8113,
+        "sha256": "8695d7a6dc0e754983a9440dcf8aaad6e01d020ee7f612bc6599cc3ccc5f08ae"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_adc_factory_test",
+        "bytes": 2666208,
+        "sha256": "1db96aedbd8aa7e678ca2afda5324df569f9286256ea801f11dedbe8d2b9fa0f"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-89.xml",
+        "bytes": 3931,
+        "sha256": "bde8689737b31036faa6256e6da377675801edb53dcca1cb0b2759651c6bd616"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_adc_test",
+        "bytes": 3006456,
+        "sha256": "dac08fa2ad9fb5e1741173d4062c9ee7f097235c9dd67991b1414a3a3475080c"
+      },
+      "cases": 33,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-90.xml",
+        "bytes": 10115,
+        "sha256": "c441d95edbf68c8bb24a87380e74165bcddea32e500e0627ea1ca410aca9860b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_factory_test",
+        "bytes": 2346792,
+        "sha256": "b9ae87b7f93c7ff59a71e397c8e19b78561fa4643b65a1b3b6f4b926df385c3f"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-91.xml",
+        "bytes": 1665,
+        "sha256": "3d3b82a1e2edd0d7e2dbe2c13b69dbd082a40d750a6c262ef740a3c1371b63bd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_group_test",
+        "bytes": 2552680,
+        "sha256": "6da9fc272097f9e954bc194bf8048f6ef03ce5c27d1aecd9aae03ba2660d03fe"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-92.xml",
+        "bytes": 4380,
+        "sha256": "f02f5ecc2f3fcccd80032b2f9a0522b3dc74067984614e8ff30e7305fa5d5f58"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_shared_factory_test",
+        "bytes": 2674688,
+        "sha256": "d6506e952026d248b75fa632cb66ee2783ae7798ccab52751db20223d2b40d65"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-93.xml",
+        "bytes": 3978,
+        "sha256": "c6ba1b33316b5dd449a94dbdf2c7e76744e1e5889e07fc61d489a4c7caf550bc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_shared_test",
+        "bytes": 2645592,
+        "sha256": "e876ff179c0c1c75e2b779533ae52b92de3b3448d0a0e610f9e5e25b596daffe"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-94.xml",
+        "bytes": 5685,
+        "sha256": "19d8bf4fcfd0bda7ca1d476562c694cf7f6b9cba434fb7826791991671f30415"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_test",
+        "bytes": 2386296,
+        "sha256": "73aed454ed758ea93098e7df204fe4439c29818a2dcef6abcb2023a7c9e68360"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-95.xml",
+        "bytes": 3606,
+        "sha256": "b9425640f8f869ee7af7833bf4e34601eb1e494589bb7f1a1755befcb789739c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_spi_test",
+        "bytes": 2693968,
+        "sha256": "43162ee4e751ddaadf7bf631a505654a1ccb5d4ba04edceafef78db2282eef74"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-96.xml",
+        "bytes": 4883,
+        "sha256": "d199dcb41086411c94cffabd573f52403217bde69236bb024a3658fb6549ba1b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_system_test",
+        "bytes": 3048800,
+        "sha256": "64d681008dfc9fc3fe6e14271d14db0e445c8676ccb59ee3a01fdf02688e84b1"
+      },
+      "cases": 40,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-97.xml",
+        "bytes": 10859,
+        "sha256": "c4f146611dd79f3f88642cc17f3c61cfb7842111bf42a342961ced6bba4739a4"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_timer_modes_test",
+        "bytes": 2665376,
+        "sha256": "9081d6b98ec067475fab0d6200f368f6576527cd9dadbfac91497003739ab8f9"
+      },
+      "cases": 21,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-98.xml",
+        "bytes": 6142,
+        "sha256": "56968c1515577ffbfe14e446ff80b6f7854b6074689b921100f6f7070ee75dd8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_watchdog_test",
+        "bytes": 2364544,
+        "sha256": "8165fc7d78bd5116d788ec86f6630d23bc608dc26d5f8ec94a84e2ba8be1616c"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-99.xml",
+        "bytes": 3768,
+        "sha256": "f0579a04b14541ce525a3e1b6380fedc71753c9909a00e7a0c64f9d02920b70f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd303_devices_factory_test",
+        "bytes": 2363216,
+        "sha256": "2100570716fc03e65628c187c6df006e7c56d00d63ec140b0e10d2ba5ffd6269"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-100.xml",
+        "bytes": 1169,
+        "sha256": "ba0ebc185db44b6014f9a218327ebcf5128b8ec891dc30f38cb946e97ccf70a3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_adc_initialize_test",
+        "bytes": 2703984,
+        "sha256": "cd46ad6a7617af2804c6ff9505ad12a9924bafb92c6a6e76a2f0e09062b33a2c"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-101.xml",
+        "bytes": 4734,
+        "sha256": "75db1ab0b73e1e4eadcd93f3c4a5f5d4a1c3bbecbcb9abc95be777a094ff3fee"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_adc_stream_test",
+        "bytes": 2568408,
+        "sha256": "a30fa76c13b4124e62617abd51b360732c41167ca86a3338e4be956ec8142f37"
+      },
+      "cases": 25,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-102.xml",
+        "bytes": 7229,
+        "sha256": "fc7693bd89fbb9fc6e0da2882c471bbefa84300015104598b0cb9942c5866236"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_arch_test",
+        "bytes": 2856280,
+        "sha256": "72a111c368e2fc9675b66fd067a1b0f658fca601efa0ae3f3a2dbdccc926e0c4"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-103.xml",
+        "bytes": 2631,
+        "sha256": "865b73a4f321d645b184353656867c15ce82cea67f7db0ba9a3f05f2f35028ea"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_can_factory_test",
+        "bytes": 3072168,
+        "sha256": "b415c2b14b5e8e2a5afa0de583297c56373c7f2eecac08ec336645828ba46ba8"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-104.xml",
+        "bytes": 2442,
+        "sha256": "9217885428ec454510f492769bdefa8b377cd3ceed6f896a5111f2df56320904"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_can_test",
+        "bytes": 2361792,
+        "sha256": "e17692df7a203620debd7da98380cd38f85c0eb2745352d0e13b2ba57c015229"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-105.xml",
+        "bytes": 2373,
+        "sha256": "5e3dd22a294140478c74a90b38bd6f153b6d5c350cc6bc4c65f0610a3cbb67e0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_eth_factory_test",
+        "bytes": 3264568,
+        "sha256": "f248ac85608448f9a0f0d1962c9362fb210521260dc590a45a55f3c849e9c7c5"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-106.xml",
+        "bytes": 4957,
+        "sha256": "3a09cc2e7b9b0ea1cb65ae12a7eb68e56463d4ab969a5c8da9d12750558df6c6"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_eth_frames_factory_test",
+        "bytes": 2617680,
+        "sha256": "5ff30887665440d18d5a9b9aa19d23beab7038c8f2a0ab7bbed60b63fc2d29f8"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-107.xml",
+        "bytes": 2054,
+        "sha256": "ab594b0160a6ec32928dbfbe38e8f1f0cc2240dcfd1f7ffc089b9afa33bc083f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_ethernet_frames_test",
+        "bytes": 2938296,
+        "sha256": "4bd95eb17fc418e03b9711a18ef7d224df62e9d3fc9d64d5cb98c611b75ff4cc"
+      },
+      "cases": 34,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-108.xml",
+        "bytes": 9830,
+        "sha256": "5b4841a658ba58b8564cd9adfdcaa7012851fa771f2342bdc8113df194c57426"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_ethernet_raw_errata_test",
+        "bytes": 2293424,
+        "sha256": "544f8061dcf4877e0595cbfeb02bdb5290b095230da0f91b2c838b823d5d6f4b"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-109.xml",
+        "bytes": 867,
+        "sha256": "a7a6f7f761fb39fd10778d78cd80d15f47ca6974b9445768480cb8b24d1a6b4a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_ethernet_test",
+        "bytes": 2622584,
+        "sha256": "ce5f9f943ea16e17a63e0e9d0f0aa8ab1ded795b581f9cd0625452449812d127"
+      },
+      "cases": 36,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-110.xml",
+        "bytes": 9690,
+        "sha256": "653a2eea26d7f8f0dcfeb8a1ab2285561d2f85f1f645a8a9d357901b0a82ebb7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_exti_test",
+        "bytes": 2659520,
+        "sha256": "5ac1ff0d138fe5ba1948866951dc13ffbdc71f7f69a4da4c71a07405136f0f24"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-111.xml",
+        "bytes": 5551,
+        "sha256": "149b1dd912ac5d33a950a602db2c6fe259770606cf970dd1284ac7457d1cf204"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_flash_fault_test",
+        "bytes": 2289752,
+        "sha256": "b42689ec34b2d2348a0aaabb70deeb60ee4f811e0f5c6aa663f4b82f1001d6ba"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-112.xml",
+        "bytes": 1297,
+        "sha256": "010fe2cf131b1c19a6cd2a5ef566608562b11b0a24ad939ab9e1b1ebf6881533"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_flash_program_test",
+        "bytes": 2467240,
+        "sha256": "7f9a762ef409108590b511fb729e67082a983c15ba013269bdee0e19971ca772"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-113.xml",
+        "bytes": 5241,
+        "sha256": "676f72f16c771f7793b659fbb70a1942594a69f97af9505cbd8145177aec856a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_async_test",
+        "bytes": 2744040,
+        "sha256": "1dc83f1fd13b8f5e7bc53b8d1dfd5988aeca7017907f21c27f3138537e13dc0f"
+      },
+      "cases": 25,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-114.xml",
+        "bytes": 7241,
+        "sha256": "498f8496540875c136df56dee4cd01828aaef13017e9282705bb3849f1fa476c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_pair_factory_test",
+        "bytes": 2818136,
+        "sha256": "a79f1c6af59eb96b6a476b510650dd5187765671b4383ff0a592ab699a6b0b7c"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-115.xml",
+        "bytes": 5212,
+        "sha256": "15b5e00ba60c9f61e80563e7593825353516ab003d47aa87fdf728d022e86dd7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_pair_irq_factory_test",
+        "bytes": 2804048,
+        "sha256": "3c2047fbdf2b2d89b2fffe78ab5ffb7b3df01e0501938777f45620690109e51e"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-116.xml",
+        "bytes": 4950,
+        "sha256": "865f969b70a593b025bbe6d9d00be0eb0b70b89cc8e1b693797fbef54c3dd3d0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_register_test",
+        "bytes": 2631968,
+        "sha256": "ec17b596be2f5309f3148f7ebc3f7d02aef3bcce3437d04537a7022a0ad8582f"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-117.xml",
+        "bytes": 4745,
+        "sha256": "651327f6050ce6d2119c6da60685c4bcdff1f481baf8e88cee67409cc727a087"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_memory_boot_both_test",
+        "bytes": 2240184,
+        "sha256": "ded3e4f5cc0a62c018dd3ce429929d95e02bd1bbbaf2a27e7fe741906fe08510"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-118.xml",
+        "bytes": 1394,
+        "sha256": "85ca7257ca2430d2df076654adb9c1b0780d6aa295be1ddea59e964709d8d2e1"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_memory_boot_default_test",
+        "bytes": 2231824,
+        "sha256": "3a018296988e343daf1929186b131269bf415b7f2b2b1171777cff53e770d649"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-119.xml",
+        "bytes": 1394,
+        "sha256": "fa68358c5a48ae55ee7a701bf45cbf0810c4c00e5fdeb7cd90d9e1f6f9a98649"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_memory_test",
+        "bytes": 2296792,
+        "sha256": "a903d362df31c96e77de3cb4b4a2861b28ef4ca560a3f6ebd71b970f34a4d212"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-120.xml",
+        "bytes": 3438,
+        "sha256": "08cfa929c4653531067c1a47f26829fc045803353c12dbf21c4d2432b8ee08fc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_multi_controller_factory_test",
+        "bytes": 3331808,
+        "sha256": "3e0ef01a1794a893fd952c33e1259523408ae6304d261f8887e6f600999ae227"
+      },
+      "cases": 31,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-121.xml",
+        "bytes": 8958,
+        "sha256": "9a0bd6b60108d571c724492a275252e2f2fc77a308a0b9b4bb2dca6ca4b4c64f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_multi_test",
+        "bytes": 2500984,
+        "sha256": "db0eafaadbd2b42585b069f054277bd9b6f968ebb4ff94227c0bc427f4e9c915"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-122.xml",
+        "bytes": 3261,
+        "sha256": "f9962439ef397e27498de0767e40fb30ce6595513df9b8ae923ef82792761b5d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_physical_platform_factory_test",
+        "bytes": 2883552,
+        "sha256": "adff2f434b4e9a5797cec159ebbd021b1d258f6ad641f7133856daaa4c3dcc2f"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-123.xml",
+        "bytes": 9828,
+        "sha256": "6e42d312ceddbbc991474fbfc98088181f1e96d6eead6092567a10597d0f8177"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_single_spi_factory_test",
+        "bytes": 2508280,
+        "sha256": "e3e8fac1c639bee17c1e6f2356df573cdb80a508b6e293f3cfefce25001ecf84"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-124.xml",
+        "bytes": 1154,
+        "sha256": "bec9b5263749add3dba5316ec51288309fbde007455ae0ae887768247811c71a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_dma_owner_test",
+        "bytes": 2612648,
+        "sha256": "5cd30b60f15ca7ade771334a8380b8c2a2271e1da119f36f1fac844c032a7587"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-125.xml",
+        "bytes": 3894,
+        "sha256": "bff7ca86d873c466dacb156db12c16698c627c347fc39a7c2f628b7734e0cde8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_dma_sequence_test",
+        "bytes": 2399992,
+        "sha256": "adca867136361270ea53c05899614c13681098f95c970c08a3a2ea96f3d97ec4"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-126.xml",
+        "bytes": 2604,
+        "sha256": "95ab6b6e024411d6fdc4fc869472cc7af0d80902ec2e5decf85ffd59dc050bd2"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_dma_test",
+        "bytes": 2653136,
+        "sha256": "3da5b5ba89549a22d0a7ff85a3ed91854e23f273380a84b180a71eec83306d32"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-127.xml",
+        "bytes": 4303,
+        "sha256": "9b3fb75ec1b5650b51f001d538c1aefde812ac2b2865c620e85efe17805d239b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_transaction_test",
+        "bytes": 2338840,
+        "sha256": "857611a185809bf561ebd3542aa0b48956a4b804682bebadfaf76b428da897a7"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-128.xml",
+        "bytes": 1712,
+        "sha256": "9972f67fb25a0dea3fddd78ab761d21d71364f3f252054bbc95441106863ee53"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_system_transaction_test",
+        "bytes": 2510072,
+        "sha256": "4cb3d0ab78a737e393d12123136a2f0c225ad6836a8b6dfc0d77907e06e51f74"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-129.xml",
+        "bytes": 3571,
+        "sha256": "526312161215f25f505f0ed868f307f038fa952883942289be6148f13d78383b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_timebase_contract_test",
+        "bytes": 3171584,
+        "sha256": "8dcbb3e8a7bf5747b2c829c60f64e0fbb3bfd9c78d674bae9f790897c9201b89"
+      },
+      "cases": 26,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-130.xml",
+        "bytes": 7391,
+        "sha256": "6001826f1bab02c8864c135ad2cca60db315acfc78bec19fb8c1704179e7d1e8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_timer_factory_test",
+        "bytes": 3086456,
+        "sha256": "8be48882467fff98332cd578d16b948db293baf4ca5fbea5d0159da87f7c4ebf"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-131.xml",
+        "bytes": 7735,
+        "sha256": "be76adcd93ee934f5929683470eb8568109b217142bad567378177b00a5ff696"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_dma_test",
+        "bytes": 2377992,
+        "sha256": "e5cbc980747c2f04fd238eb435f328d7481022df7955b36830bcc8cd43bc7703"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-132.xml",
+        "bytes": 2703,
+        "sha256": "f3e861f2b0810e4833f8c51acbd40084efcd238d224446304ccbea39089de43e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_formats_test",
+        "bytes": 2628480,
+        "sha256": "f2df26f0380f637e2699e586f3881421eb81cb09b8a5d6598e214f324d425195"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-133.xml",
+        "bytes": 8538,
+        "sha256": "0cc329d546508977d738c488df18c4f64bcd0b513ff937d76f5a07104df74e0e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_receive_test",
+        "bytes": 3114288,
+        "sha256": "b98612b5d8af9c8536f2539e197ca768553cc5832a606fbbb68215fd6e679d3a"
+      },
+      "cases": 38,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-134.xml",
+        "bytes": 10870,
+        "sha256": "776ca48829bb8b12f3a562a6594121073b0cd0f1a5bb52ca92698cdd95860cfe"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_stream_test",
+        "bytes": 2584944,
+        "sha256": "5ee34d6ba096a51d9b1e7e82190bd58a6781715ec67a733198f5d25ea5c46bad"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-135.xml",
+        "bytes": 2757,
+        "sha256": "678530ce792a588e71c78ad2de33b4a47a13f0fcf39940b9714df5459dd34ff9"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_usb_factory_test",
+        "bytes": 3003992,
+        "sha256": "c1714e5da208a07f338bc9b8379f839d6a78ce6966d71c1a546878c8cda49747"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-136.xml",
+        "bytes": 3482,
+        "sha256": "76b0db2aa8bd8dcdc77219fbe97568c681e4da93a4ce6ffd2b03d867b23d2c68"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_exti_test",
+        "bytes": 2501856,
+        "sha256": "f6d369eb3faeed17f60c56ce8f977508d0ba48aaca99ad7343ec79bb1091627e"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-137.xml",
+        "bytes": 1896,
+        "sha256": "64b26e1e9d71e3906831ef2072e3cf3d8fa435041a2037b8968fa198c752da2e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_factory_test",
+        "bytes": 2382888,
+        "sha256": "23402e7abc68bb749afff3da3b7b60045c36a565db1ffbf8ca7c6dc8281dc2f1"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-138.xml",
+        "bytes": 1917,
+        "sha256": "46111a78d75b4592ef4c9329696749c8c02f0d988bd0fdcbffbb4975924689b2"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_provider_test",
+        "bytes": 2613072,
+        "sha256": "1e9f966b8060fbb6cf910ee16f80dda12629c3efa03119f7ef72187b1134909f"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-139.xml",
+        "bytes": 4918,
+        "sha256": "bf6557c9462c2c6ae5b00a9f2cac99aefdb12ea3504a4b35f011f383cca021f5"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_spi_factory_test",
+        "bytes": 2357744,
+        "sha256": "75714c385d002a92cb39a4b8ad0ca646510e568a085d3cc2171e347552c0c345"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-140.xml",
+        "bytes": 1430,
+        "sha256": "0cf9e0c46e5fdc38d7a35b7cf48f3a99eae8bc84572761b2fd7cefb513f6dd0d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_spi_test",
+        "bytes": 2395056,
+        "sha256": "be4b533d5b41a8313343d356bca16445148270b5015cfe2531c1db1773ec6e14"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-141.xml",
+        "bytes": 3192,
+        "sha256": "4130f5cda59e20b251507cf10d253a0f6eb85eb62f814f97977bbd8d372c9e7f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_system_test",
+        "bytes": 2532176,
+        "sha256": "9fb8579df694777ce2a7fee895023948275bfbc24ee3c67a178c6f7c5464c88f"
+      },
+      "cases": 23,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-142.xml",
+        "bytes": 6361,
+        "sha256": "37981d5dbeaf756961e9f90e5e89711a09ee9f10fdf7d3cfa71c7afdaf8dc971"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_transport_test",
+        "bytes": 2365840,
+        "sha256": "3be99f59695f391aa9cb714c63c8d324e7ecf712690d4a6f43bb059b72b1eb39"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-143.xml",
+        "bytes": 2164,
+        "sha256": "a80f489a6f3f993755285e9f9893d9dc276258fea1defc069e69ba667d9638ac"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_watchdog_test",
+        "bytes": 2417960,
+        "sha256": "22ffc8e88d629274beef210397b20e9657f081f510859196159c09e81e493f65"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-144.xml",
+        "bytes": 4093,
+        "sha256": "018eb958261f37c3f2fecf2680cc30d35e015161e4fd77c3e4e1cde1ea2de2d2"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_clock_sleep_test",
+        "bytes": 2386000,
+        "sha256": "99157c7e781517596517247775c445cae34ae4dcb36b56565fac37cfb2ad869d"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-145.xml",
+        "bytes": 5457,
+        "sha256": "21ebc833ea1a72284411d5e7956f5927ed9bb6c27f3880b7ac7c4bed40815e9b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_i2c_multi_controller_test",
+        "bytes": 2544056,
+        "sha256": "5fd34593d90a9dc8865b3189d1007820d409d9065f849b4a21c894f67c0dc3fa"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-146.xml",
+        "bytes": 4145,
+        "sha256": "77cbc3d98966bc0b06fcd8b0ab369797aea132a9325756205a7c29498600d15c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_lowpower_integration_test",
+        "bytes": 2279344,
+        "sha256": "7dfc3918f94ec0706bc3884d68acb587f8d25d72c45cbdbc5e310c8327a263c8"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-147.xml",
+        "bytes": 1174,
+        "sha256": "ed5a1f9cf62365f34371c131c0a5cee3a55790c60dfdbfa1190b3a15b88fa656"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_lowpower_test",
+        "bytes": 2289448,
+        "sha256": "76a3eed40262a29043fad3addc5a381b3f66d7255584a5a9d4bf36d153e165d3"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-148.xml",
+        "bytes": 1923,
+        "sha256": "380d08e695421cf760c1493c293cd5bf11f26a4de66cf4daaecdc3c8233244dc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_spi_multi_controller_test",
+        "bytes": 2504008,
+        "sha256": "7558dcd6b1b08916b992e03767be8962ae243c656a7dd18dfb60955d67ef707b"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-149.xml",
+        "bytes": 3633,
+        "sha256": "38c104004606bf1a84455c2e08a58b74eb9f6f2f801c436a5b566c57c6f12e6d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_timer_advanced_test",
+        "bytes": 2896336,
+        "sha256": "d1a6509e07e0ca0655ed0eedcacedc9957ba5ce88125fc00c7bb90a7b0cc1bc9"
+      },
+      "cases": 55,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-150.xml",
+        "bytes": 14983,
+        "sha256": "b20caac39853c73e05840cbfa7ec49b09aec09bea85b93477844c86e0e93fd5a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_uart_multi_controller_test",
+        "bytes": 2483456,
+        "sha256": "2f97b99a697962badb83d5bd41fefec335c1e2dc0d2711fcc4e907b996a4e4e3"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-151.xml",
+        "bytes": 3322,
+        "sha256": "42debb6b7ae0572aa4ca1b555d005d5f31297e007b9f92fc1d3929dc8a463213"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_usb_clock_test",
+        "bytes": 2352008,
+        "sha256": "0a9dfd2fe773270097573aa0fd99d741f365d334b149c556e266cb6c128cfb13"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-152.xml",
+        "bytes": 4365,
+        "sha256": "74d77b4ef47bcb7edbdc561acf45fa53ffae08f7219c4caf3ae83f96de9a7dcd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_usb_device_test",
+        "bytes": 2406712,
+        "sha256": "53d58f831b6522b2b6c711b606f9e8eb5c5e4033e18d04dcaabb0f2bb280e2bc"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-153.xml",
+        "bytes": 2131,
+        "sha256": "911cef090d5ea9b9ad2ab03f67cf994f5d2352e453495777b87cbfa3f6d84a10"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_generic_i2c_async_test",
+        "bytes": 2735904,
+        "sha256": "5218f16c8c397e9d4a9c907ad8effadd45094549423a7b5bb46b36d16f91fe3d"
+      },
+      "cases": 26,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-154.xml",
+        "bytes": 7498,
+        "sha256": "3dd542f936b4e8a3792ace81d285b747ce1e381149fb1d8882d55cfc38e2b484"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_clock_test",
+        "bytes": 2601544,
+        "sha256": "802d4e90d33811c0842db0c2d6dc4daaed9ed9a8903ad080016508d1508a540e"
+      },
+      "cases": 38,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-155.xml",
+        "bytes": 10322,
+        "sha256": "f4aa303f09100eae7daad8213d1d4ae9bb8a101512c87a14c88ba672548a35ec"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_conversion_test",
+        "bytes": 3419248,
+        "sha256": "762828f9343bc92cc5974382279baeab8cfd9670cde2cda662218d42a1714c80"
+      },
+      "cases": 39,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-156.xml",
+        "bytes": 11012,
+        "sha256": "55447c4399bf666fa22ec3bff0f445365cb60588807ef48069b2eb88f9f77997"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_dma_factory_test",
+        "bytes": 2438568,
+        "sha256": "805ef172c632e41d89cc46505b00636699182b9ab92db1cd63d85cee1730c4e3"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-157.xml",
+        "bytes": 2472,
+        "sha256": "58d702a85b38927082336d4578cb31d0ddcd273ccfbca306d4642bee80620683"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_dma_test",
+        "bytes": 2989608,
+        "sha256": "94d978df8898ab03d83f82f518ea75d862662a973273d4506baff962e9a2cc55"
+      },
+      "cases": 35,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-158.xml",
+        "bytes": 9515,
+        "sha256": "aa5a30076602ac6e537621efb99be18cc7ae31d679baf359c93600ae8b508586"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_factory_test",
+        "bytes": 2491824,
+        "sha256": "5db991165f254db640a1b989d2337592042d1b7f18ea4c929b03e5f9768a4d6f"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-159.xml",
+        "bytes": 4252,
+        "sha256": "7aa8d38dc650891f41e4a54c3fa7264077786614112f6d95b9e006d471670f90"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_execution_test",
+        "bytes": 3038736,
+        "sha256": "e9868ab7e7740b18dc65f0b3ae7828dd382e1fb2a9cf9beed864a6ea95950eb4"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-160.xml",
+        "bytes": 4274,
+        "sha256": "80d172bbcbc425be8b80e0c66ce9ff68eea25b25315f78b99b33435554c6ee70"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_image_admission_test",
+        "bytes": 2898904,
+        "sha256": "3d02ffb1e1a2944eef619885ecbd74cf3858014140116470242932ab3ac94b78"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-161.xml",
+        "bytes": 5407,
+        "sha256": "0bdd057e44d63ac1be064875745b7a083779064513c334dac261eb67f92675ec"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_mpu_test",
+        "bytes": 3382760,
+        "sha256": "c0cedda9500dd357ef5e79f294c082a90a471c0987fed0a0dd64a59a89bb9727"
+      },
+      "cases": 22,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-162.xml",
+        "bytes": 6254,
+        "sha256": "e8244002e59f301ba0704d5e2ba9c04f68ffc75904d247a5162e18311d2fb20b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_ram_closure_test",
+        "bytes": 3728760,
+        "sha256": "cb623afebaca5804778ca5aa303bf0e185476c7a66b1c2c0556a441c1e1c8df9"
+      },
+      "cases": 52,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-163.xml",
+        "bytes": 14888,
+        "sha256": "8833ef05c6d535925c00bfcf6ae643547575d52e39a0fe862fc6fc6a7e4c9818"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_ram_generated_test",
+        "bytes": 3095976,
+        "sha256": "e26eea8eaa884dbcba181b37c46b74e57fe3bf8abdf95f008f23bbdc7166c36f"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-164.xml",
+        "bytes": 2026,
+        "sha256": "1dff7775423d58e0588cb85ae5c9b1033ac65460d43c628f2bee77a2dbed119d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_ram_test",
+        "bytes": 2816272,
+        "sha256": "b4743ee4faeb53fe46ef843a94a7896249700cd6db3bce04f7aee2ae0c5236d2"
+      },
+      "cases": 21,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-165.xml",
+        "bytes": 5923,
+        "sha256": "31a4e09f590b56f7e34a294d4e9ffcde6097237361c018c92c8c6dd3bfbe2880"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_high_factory_test",
+        "bytes": 3129936,
+        "sha256": "96f30779ebb004e7949ea5a18649e35f9fab095dd58099e72d82ed14f50299d6"
+      },
+      "cases": 10,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-166.xml",
+        "bytes": 3025,
+        "sha256": "439fdf88ed3bf3b14a3c45845a3f3e00e7779b4588003dcab984d20c3703853c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_high_kernel_test",
+        "bytes": 3176488,
+        "sha256": "b9e35aea363996f10839bf0015162532b2dfd05a5fcf7152289fa05ebf83ad27"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-167.xml",
+        "bytes": 9339,
+        "sha256": "7955a559817a43d4bdf1d28dd5ee4f29c50ce2f78720545180acef062387ceb5"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_high_system_test",
+        "bytes": 2447280,
+        "sha256": "cc8605a1da529cac30277c7d61ec628ecfb57f9a09833a49e284180ddb8b7202"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-168.xml",
+        "bytes": 5444,
+        "sha256": "5aa04309c6e676c6e5cb8cf6ba5cde883287372b8be0fcf8270ea916fc8da9d8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_i2c_long_factory_test",
+        "bytes": 3299232,
+        "sha256": "dcd7fed1269931b604b24883d778056d95baca95528585580f6dfddd8b5244d8"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-169.xml",
+        "bytes": 1450,
+        "sha256": "c8ae6555693496a6af9c66d33ae9c28b4c8f5f902dd1cf557d4b8517aca04a40"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_i2c_v2_test",
+        "bytes": 2665928,
+        "sha256": "7835f23885c05f3576ea2ac038a507698305b2078bd88a985b348cb127bfb2b7"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-170.xml",
+        "bytes": 5502,
+        "sha256": "10bb393d2ce17af6ddbfbf165271a369eb734ad159032895f5d92237fca2b63b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_memory_test",
+        "bytes": 2267856,
+        "sha256": "2c1e61fa7959f745819a5f0326dbe7a86b779f941a2cb53e5a6646ed94e8cc16"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-171.xml",
+        "bytes": 2353,
+        "sha256": "07baf5e0d30f6dceb072f8d4d17674f1d8bf92efc717cb12600e74eacdaba818"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_peripheral_factory_test",
+        "bytes": 3123472,
+        "sha256": "c395c6edac4232e5d62fc47e3a7fe0892c522a0aa1e1965280a3905941ef2c91"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-172.xml",
+        "bytes": 3962,
+        "sha256": "0564333c71bf2a9d2ca1ce25f00b146ed4a81d80ded5741c9f5efc110aa8ae99"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_peripheral_test",
+        "bytes": 3068880,
+        "sha256": "d05a74af0b8cacc8f304520c03f01c0033327a704fd44b5836e00dc548c824ed"
+      },
+      "cases": 49,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-173.xml",
+        "bytes": 13824,
+        "sha256": "7e6ebbc76424557d48b6826f39b0db925312d6ae8d715e4b58e1935d7c42a627"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_provider_test",
+        "bytes": 2768792,
+        "sha256": "21b75336f30fbf4c8be733f32c52cd8e50082a5b581fa8ab76986e855331827e"
+      },
+      "cases": 29,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-174.xml",
+        "bytes": 7858,
+        "sha256": "11c263cf7f6aa87c55ed599e30d31e1ca1ecd8bf1d1c6224fa01a8c1e0ef22c8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_receive_factory_test",
+        "bytes": 2454680,
+        "sha256": "3b52a742bfd2e1b51410f3bb698f418a54a7c82dd5e85b133c0e14f97625a481"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-175.xml",
+        "bytes": 2253,
+        "sha256": "20b9cb4aa4c76fbb893de85be3f79ecd4bb8d59cf41f19ee822743116b903d1a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_receive_test",
+        "bytes": 3069896,
+        "sha256": "c4d57829bffa4054372582eb900ceb8aac77180d189be589749617c2483809e9"
+      },
+      "cases": 31,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-176.xml",
+        "bytes": 8815,
+        "sha256": "f4b974d016592bdbb3ee62fdeb565fc50c4908f14121e0d8bd2092e0901cd65b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_spi_dma_test",
+        "bytes": 2869816,
+        "sha256": "54ac1fe4bce873e69aaa594419342f2ba411d66031661faaca10231bbb4b2074"
+      },
+      "cases": 47,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-177.xml",
+        "bytes": 24891,
+        "sha256": "b19937986faf702c9cce899ff29ac643e72fb8626c2436b6d0c6ef729a1b4c65"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_spi_wire_test",
+        "bytes": 2692688,
+        "sha256": "b4c5eb388f0b072400ac258b0760c8f015d1d8bfd5c76b18ec7f888cf1e2e1f0"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-178.xml",
+        "bytes": 7466,
+        "sha256": "e36a8b388532d2ce2bf9f8c4176ebabe67b964eac2eca913e4010252a8daee49"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_system_test",
+        "bytes": 2785560,
+        "sha256": "a393d5644660f9123e63db80a9bd0cf964615f62a2654387d8e2ea024ba6e5c2"
+      },
+      "cases": 47,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-179.xml",
+        "bytes": 12642,
+        "sha256": "f56fad22d9f0fe5228a5c4c743df261efd8f21d18777f9a9d4a9a49225382f6a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_fifo_factory_test",
+        "bytes": 2491192,
+        "sha256": "5f3926b8d0d320f64ef9f8ea0113265c4191c239aa2417fd896660eaa1a047c1"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-180.xml",
+        "bytes": 2844,
+        "sha256": "a4d164552aefb199387ba9d2bb7de3888fa6d9323a05bb2f3a6006ff3cfeb52a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_fifo_test",
+        "bytes": 3003592,
+        "sha256": "c62fb8781b10956f00f1fa5c9dee409e94902d66d1b1473ae1e4d17bb258af77"
+      },
+      "cases": 45,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-181.xml",
+        "bytes": 12213,
+        "sha256": "e28618bf5ae70d358a96996bf73990c728203f85fc475ea497e5a1093ef86be8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_rtscts_factory_test",
+        "bytes": 2525544,
+        "sha256": "d9cbe60a4e70241294f248ebc9945c5dc08bfc9edeac20bd38dbc2a48dc61757"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-182.xml",
+        "bytes": 3469,
+        "sha256": "9910cc7d88932d7d679723198cae3483d2d2380468291d714c4d3ffa88bc9b6c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_rtscts_test",
+        "bytes": 2966120,
+        "sha256": "67ea73bc9be90463982aea63cef71502aff2b1d6729aff02eb577c8cc996f1a5"
+      },
+      "cases": 38,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-183.xml",
+        "bytes": 10606,
+        "sha256": "27d80ce49c96a5ef95271a73cc0aac7bb8d32df3b744ba4c199af16f56d240b9"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_hardware_contract_test",
+        "bytes": 2767384,
+        "sha256": "891255c494035e4f3b86951bd2ffd2f632c2f8f323ee70267c936ca008deec1b"
+      },
+      "cases": 27,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-184.xml",
+        "bytes": 8079,
+        "sha256": "ed5b8bea88a3e32b64274fc4e499357c231f9e831732b814c350218bac017350"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_i2c_bus_clear_test",
+        "bytes": 3080064,
+        "sha256": "9c48ff79512bbf36aa4b22b2c081bba23ae888c576688ead1ca6cec41b5b23e7"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-185.xml",
+        "bytes": 7718,
+        "sha256": "bc90e1cd39af64c4c23c6ad60633fa8519beb03fde60df77f0683d0e984d6bfc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_io_observation_contract_test",
+        "bytes": 2402456,
+        "sha256": "ae00efbf4f0f7ce457959277b6c64eb0420a582681f6d8f847a5ad972ee1fe8e"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-186.xml",
+        "bytes": 2891,
+        "sha256": "6e42a6c199a8773fbd9d5db9bc5750592d52e6f653833f892908c95a3cce4b91"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_io_observer_test",
+        "bytes": 2842224,
+        "sha256": "866873b1d09edc600697241f13643ec10c593a35142eb5bdb7817600f2dbf035"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-187.xml",
+        "bytes": 4752,
+        "sha256": "97e10ccd3f54cf4c8a9a18c1180abe662ab65b71eaa65e89ebe831b0e4bda693"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_io_state_machine_test",
+        "bytes": 2750576,
+        "sha256": "b6574d65695b343f23da16cc6df348f5742a81dec3a46fa10dcb0663c33858cf"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-188.xml",
+        "bytes": 2410,
+        "sha256": "2a152a51b6d0028298437169fb7c2f403a65539bffadfc1fda6fe5ace8b23ae3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_irq_wake_gd32_test",
+        "bytes": 2363736,
+        "sha256": "c400de7c19aa97016f7cbbc925ece949bbcd60c4869c6803d79469bea7017af0"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-189.xml",
+        "bytes": 1381,
+        "sha256": "5ce9a2e40bc1f167e924e5b448fb2026546944548fd209cb6f28d2c65313dfe7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_irq_wake_provider_test",
+        "bytes": 2707816,
+        "sha256": "e5a1a0030a4e149bc90f7e33fc6cd9a1c66108d0b2db38d7f3d8862322c66207"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-190.xml",
+        "bytes": 2969,
+        "sha256": "eaa4bbaa97b02ee5595ed271c99eb18e6b89b1e35ffb7fcace19eeff117801da"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_irq_wake_stm32_test",
+        "bytes": 2332896,
+        "sha256": "ed3d95571d7fc8c4f322d6e260230221a16154ac6060d234c813b8ffcb6d6c1e"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-191.xml",
+        "bytes": 850,
+        "sha256": "16751b6dc514d877b9e5bad83a3e0dbb6eb4b3e6fc06e2365bcdc762b7d7b53e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_legacy_devices_test",
+        "bytes": 2729224,
+        "sha256": "bf68fe239ae78038cc987d2c719f413253a5dfd47e04dcf636a3342581e253e8"
+      },
+      "cases": 33,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-192.xml",
+        "bytes": 9458,
+        "sha256": "f70406a1e57ed346cb30ffb3f9458fa3d9471ca5e63c6495ac48d2f44d43b4cd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_legacy_gd32_watchdog_test",
+        "bytes": 2476496,
+        "sha256": "10582f9da80c3d7cadb67fa501170883ed505c0d8721cfc8d595cd7370b3258a"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-193.xml",
+        "bytes": 3317,
+        "sha256": "3dac01fb6803d2a876d971e69ff859eef307a2d15d3e83d1160cc6f0611de601"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_legacy_stm32_watchdog_test",
+        "bytes": 2480024,
+        "sha256": "954fde89d936eb1d3c991117428d842d07382f7a498fac16108c1cf1a4c60ba1"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-194.xml",
+        "bytes": 3595,
+        "sha256": "1b62cdd0d63056da07fd963b80d6db4b211eb91b39661bd6a29d683ce87aac51"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_async_test",
+        "bytes": 2422240,
+        "sha256": "3615cb3950e4b6befff6abcb9f7b800f9f1a663c47cf5a796892aa222b9c6dcc"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-195.xml",
+        "bytes": 2169,
+        "sha256": "9f2b80e9a5be586a829db15ee315d07071dfbfdcbe4f7821b1bfcd8984c8e75e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_factory_test",
+        "bytes": 2708568,
+        "sha256": "aaab9f916746e26effb3104afe755fd5522b9cd896c5d4fe030820821303b484"
+      },
+      "cases": 16,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-196.xml",
+        "bytes": 4601,
+        "sha256": "04fe5519b89d05e5cc6c28b91b8d185de0a6056e338a86ec803884df3f155afc"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_instances_test",
+        "bytes": 2925240,
+        "sha256": "657d3187ed7c2fa8249e679b22c3120a36db4a35bbcb1d89e68bf8dae529bb10"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-197.xml",
+        "bytes": 5143,
+        "sha256": "7cc4d841d9836253808aa7515ba87d567041451f49bb1ad8663f74fe0bb6e3ac"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_spi_dma_factory_test",
+        "bytes": 2402176,
+        "sha256": "56e7b75c5ac3900bd83a0c1966d48ccc95f42a284695d92584df82101aad0f9a"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-198.xml",
+        "bytes": 1736,
+        "sha256": "a0f2f2f4abf28d636d6f2ae809705860079618a5eaaa8fd1bef3d9860ef203fe"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_spi_dma_owner_test",
+        "bytes": 2439168,
+        "sha256": "0ec1be9eda446a8e6da87f126e80ff2f905b7df136c39d4cf50a04f976e41671"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-199.xml",
+        "bytes": 3380,
+        "sha256": "ac777e602737a1916469efd608fc4565942e30b0b7d0163d421db49876b02135"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_diagnostic_native_test",
+        "bytes": 2265208,
+        "sha256": "1fdcab062d35e7b805c60ebdc38aa86cc5617198134847d1bbfe744148d6ce67"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-200.xml",
+        "bytes": 1025,
+        "sha256": "5d7beaa9db20bf6ca63507a31bc6a15d34f16d02b90481f59a4a0f8bb7db9ac7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_diagnostic_test",
+        "bytes": 2312736,
+        "sha256": "50240ae5c3798cb9344b93f498d4407d6d031849d6d53ddab7bbb7f3e8b7814b"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-201.xml",
+        "bytes": 4025,
+        "sha256": "ded9db5167b1ccbe5230696940df79b159dd8dd9f981a417831f6e2279c2c184"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_lowpower_test",
+        "bytes": 3316456,
+        "sha256": "6be9bba70dff544f9d4604cedbc2f28fed0c319b65f7cb10885b800a8a68edb7"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-202.xml",
+        "bytes": 5348,
+        "sha256": "e189c46d2f743fad83957e270701252c2117c29e62fad650c1e78e02a2bb1dd1"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_secure_context_test",
+        "bytes": 3040296,
+        "sha256": "11a3fb8f18a646d3cb5359d3fa7c5c5afa95f7f27fc1d5c45bef052ff92fdd74"
+      },
+      "cases": 26,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-203.xml",
+        "bytes": 7214,
+        "sha256": "bb57522304aab49092b0422c909b273499021c2adb4dd04545e352d0f973fd25"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_secure_fp_context_test",
+        "bytes": 3027456,
+        "sha256": "7c586bae9e8f313148d999eec3eff3abc2802b4781c0eb6443b6f4a67852d79a"
+      },
+      "cases": 26,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-204.xml",
+        "bytes": 7220,
+        "sha256": "d93b183ac041c90efc9503fde86f237f710bf12c46f6f6086342029a0c5cab1e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_wait_test",
+        "bytes": 3103928,
+        "sha256": "adf75599c8e9ce6e6732a1709347f509c71a608161f0464dc977fc26ab44b54d"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-205.xml",
+        "bytes": 8332,
+        "sha256": "22fff0306154ad04eb091255595ffb73e54b5fd31a40f97df2449772a3aa91ed"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_owner_mock_test",
+        "bytes": 2754256,
+        "sha256": "9d098a245102d1b80fd576f469f19c0644c6899ca52764be0b58bbc334980175"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-206.xml",
+        "bytes": 1596,
+        "sha256": "e8a7dead32c7ce32d7f62928803de596af4f44643c401d51717fc6a2680f5c28"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_polymorphic_io_test",
+        "bytes": 2642552,
+        "sha256": "21cf589f5262be9c88a6674b4132ab8ef9854d71be3feb79e878f9b9e9eabb17"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-207.xml",
+        "bytes": 1372,
+        "sha256": "f19d576bae6e1bdcfc5dd2b1706a391f239f8dadbb107f832fa87c05852aaa84"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_realtime_metadata_test",
+        "bytes": 2704032,
+        "sha256": "cd4ce3a2f0a35e893a88c85979dcc024628fb0e75290958020a22ab7ddc2b55f"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-208.xml",
+        "bytes": 2312,
+        "sha256": "7ccf77cf52a017a15c0b4556ebf434abe4f8a9ea7f36d6fe4cfb67c46320b0d4"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_empty_generated_test",
+        "bytes": 2229712,
+        "sha256": "70aafd98df3899486ff11207a8c6588ea5754f4c6fb1231f85f51bff68df3d1a"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-209.xml",
+        "bytes": 605,
+        "sha256": "dd0a6672c2877b0cfb69b07337400387434b460dd402f39fdc927b6db2539386"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_final_access_test",
+        "bytes": 2297528,
+        "sha256": "a4ede7794beb49723aeee2ee9892aa9e4267cb620ea79d4f560864a863435ff2"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-210.xml",
+        "bytes": 900,
+        "sha256": "c3bce50319d97ee9dc9ac1cdb052f74376f58638948f1afb0b6c8619e60184cb"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_pair_generated_test",
+        "bytes": 2267696,
+        "sha256": "45b3f6dc732a21e1bdab5f03bb07f6a9db106d498ae11733086b50535246fe5c"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-211.xml",
+        "bytes": 605,
+        "sha256": "0dc43e0d6bf2254a93bf1d3dbe9809ffbd7de71cc7e68c3c872384d226bfc945"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_start_test",
+        "bytes": 2498792,
+        "sha256": "fccc63eb340bd7fa5cf80d53cbe62309c89987db502d4ae25da299638c7e70ca"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-212.xml",
+        "bytes": 2739,
+        "sha256": "d9cf9f5bd2865c2495d02c8da972d1cb4a95e838794b85fd5a69c0d27d98544f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_test",
+        "bytes": 2877152,
+        "sha256": "4d242ad46f1dc8e7508ff52daf382a090bdddceea51833ddfc34f3a31125e483"
+      },
+      "cases": 27,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-213.xml",
+        "bytes": 7554,
+        "sha256": "4adb6a551373e8b88072481d7452fe15f5e81e34e9c3556efff5b8943f3b9693"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_silicon_admission_test",
+        "bytes": 2533672,
+        "sha256": "47846351382998ebd8e8f86644a9a9d3acdbeb18e077131897c0bfcbece73f17"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-214.xml",
+        "bytes": 3443,
+        "sha256": "e9b5d3a4fce3654eb120a19e289f2bd150bf0a21eb53f085cf9be77928460d66"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_async_owner_mock_test",
+        "bytes": 2790888,
+        "sha256": "7dde51d548f912229f7dc3a43f822f89749cffe3f28418e40fc4bca00ebb32ef"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-215.xml",
+        "bytes": 2073,
+        "sha256": "0129577f468e3c33464f4f8892a1d70fd3f022786dfa8d0ff593667abfd3ce23"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_dma_owner_test",
+        "bytes": 2880000,
+        "sha256": "a65ee88a1e57c6394c0ddcdd06f848281707ba0aeaddecfef481aab8b1d96860"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-216.xml",
+        "bytes": 3784,
+        "sha256": "cc2f36fbd5f5688e6bd59fda94cef108bfe12db02a7db8b185dd80f5d7256021"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_dma_owner_wait_test",
+        "bytes": 2396936,
+        "sha256": "e99871d1c81bdcd499bdbbb4bc7d79c832c10e82877418ca64e6d8e21f596859"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-217.xml",
+        "bytes": 1153,
+        "sha256": "c18a911de2e87e866da3b65b98635047f367c3062d61a8fd9cb8b8acce03319e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_dma_transaction_test",
+        "bytes": 2649992,
+        "sha256": "7be2ba0f94277a3b4ac819176001de50aeaba3ab02d4e3725a5c6177dab45827"
+      },
+      "cases": 15,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-218.xml",
+        "bytes": 4372,
+        "sha256": "47dfa7e78827b4644623830b92d6bb6f72249a79c3605bbbb134b4adb7936fc9"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_transaction_test",
+        "bytes": 2547112,
+        "sha256": "fd80ce87b23c738f386a18c7bc73d13b0a14cec01190effed1f2678c317d9858"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-219.xml",
+        "bytes": 2425,
+        "sha256": "fea2785bf7aebda22278f08bbcf004c5a20ffed3434c53a4968e350bc8211bfd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stack_observation_test",
+        "bytes": 2234216,
+        "sha256": "787588cb29b920c7be8dbc6a4c7eeef417e9a344af42d918d95feea20f9a033d"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-220.xml",
+        "bytes": 1130,
+        "sha256": "53bb53d026adfa3db3fe4ac56ef42de2685daeb4f7be770f7b761b7552d4d092"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_adc_stream_test",
+        "bytes": 2579008,
+        "sha256": "2bcffcffdc71d0a741f1daf658711ce98937bbf0d18bc7d8bdddfe3c5c087d3f"
+      },
+      "cases": 26,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-221.xml",
+        "bytes": 7581,
+        "sha256": "3a4e617416d8d3d7b18ceb81de270e679a3762d4ad093711985d61f58ca27d02"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_can_factory_test",
+        "bytes": 3077048,
+        "sha256": "ab95a19c2336c5ae36b77dff68e45a01f410d7a368cbbf51193380716652802e"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-222.xml",
+        "bytes": 2442,
+        "sha256": "ece2ec18d620e57f1b864c8c4b6725a0f98644f14a4eb8fa445487284b7c94f7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_can_test",
+        "bytes": 2364304,
+        "sha256": "7ca277cb054c612a94c9cdba31f99b8b135e2f69c59d0614ceff1441f80ebfbc"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-223.xml",
+        "bytes": 2373,
+        "sha256": "36c41341b1253b2c426163e46526dbc4ca44dd7a64e05cf9a754e26b3c669b54"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_eth_factory_test",
+        "bytes": 3267800,
+        "sha256": "c605b7e87139ec6e9d2f69b0c1817ed55482b0656aae2dba2c306beac095bdfa"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-224.xml",
+        "bytes": 4957,
+        "sha256": "fa775db6e72c9035dce4424a9c751236de5c80ac5833f4073b27c5c19148995d"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_eth_frames_factory_test",
+        "bytes": 2572168,
+        "sha256": "a60445047418c561e6fc1c2c740ef2e6070daab5a77e8a3493c06396de61c1e5"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-225.xml",
+        "bytes": 2054,
+        "sha256": "32b83dcb74bef2d967aa3c20d163f13c7bdd2202b71e5c7b1eab5ffcdee1edb8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_ethernet_frames_test",
+        "bytes": 2938280,
+        "sha256": "e0c63d6b0f0cbcddd3a925e649a8f06c24d1b15ebb964e05ae99632f95d7348d"
+      },
+      "cases": 34,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-226.xml",
+        "bytes": 9830,
+        "sha256": "02028f3dacbb3a4b9a853558fe95a3698c53043ebd12eaaad3a4507061e2b948"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_ethernet_raw_errata_test",
+        "bytes": 2293848,
+        "sha256": "8ac1ff8939cfad2426349515f8ab15f9c13f5eda3ceb3118943dd42602f7793a"
+      },
+      "cases": 2,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-227.xml",
+        "bytes": 867,
+        "sha256": "88b05eaf9977bec321ac0829230f6b8abadb6f8d37743c45063bf89cb708b399"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_ethernet_test",
+        "bytes": 2623008,
+        "sha256": "8a14274abb30d752033c8cad319a157599d4ac6927f2fe3f662487cf8f518992"
+      },
+      "cases": 36,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-228.xml",
+        "bytes": 9690,
+        "sha256": "589372f4ae4dbe48259b2d14deff286528294317777c9ab2cad5754124dda6f8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_exti_test",
+        "bytes": 2421536,
+        "sha256": "a900275c85ed714a0091249f2aa3f7885522831468f11cbbf47ab1ec7ebf4f40"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-229.xml",
+        "bytes": 3692,
+        "sha256": "b13c83ce2b856d44d3f612429e60f9a0a16a9f0ad8e1ef20725979367a13917a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_flash_program_test",
+        "bytes": 2461272,
+        "sha256": "f1de052e1090218cafb1f0cb6895ba685907801b625f7859e1905f43623d32e0"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-230.xml",
+        "bytes": 5235,
+        "sha256": "4f2994992945f29572d2a2f78741ee706f28e0b74378830d7494387e5bdab53f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_hal_reference",
+        "bytes": 2276656,
+        "sha256": "3499b7d5f11d0d3031153c4c526f9e007abff8c8ba72372c0e176a4b5d7f9651"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-231.xml",
+        "bytes": 1456,
+        "sha256": "13995a36f9e4722c24b63934858a356835de1d65ea2043b7999be9e16ce292a6"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_async_test",
+        "bytes": 2734472,
+        "sha256": "5ef6ee6543e267d057f17e61e8759aba8d0837b17236369c478ec34dea320377"
+      },
+      "cases": 24,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-232.xml",
+        "bytes": 6974,
+        "sha256": "66586f42ae8515ca4ebf0f2664069a9a3d8dc001da2828986ed33a158942545e"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_pair_factory_test",
+        "bytes": 2813568,
+        "sha256": "9c8bea9cda9860261b69dc2d84129783f89a9d66adeb36c42535a5aaef95dfbd"
+      },
+      "cases": 18,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-233.xml",
+        "bytes": 5212,
+        "sha256": "3833a88f0285d1cbdecbeb2a6f37d6618a4f5043417b9eb87dc13036cd2197c3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_pair_irq_factory_test",
+        "bytes": 2804032,
+        "sha256": "f831c56f37a63688ed6a8166f2ba2a2ec0dc0092e1e6f3316a27caffcf406977"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-234.xml",
+        "bytes": 4950,
+        "sha256": "9b070a38db00b4b75ab0ab5bbe84fa4c9c50d38487e8ecb6abb908cb8374d779"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_register_test",
+        "bytes": 2632328,
+        "sha256": "7c940189a25cd180e2a1a7e83c7cb8adc466f312a4cc7126d7334dc7c3807a65"
+      },
+      "cases": 17,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-235.xml",
+        "bytes": 5007,
+        "sha256": "a52605c955b70820e718e8744e6785d6bd49579a97495711486417d98940dcd3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_boot_ccm_test",
+        "bytes": 2235784,
+        "sha256": "3777c8d663ac8bed5d90b22323cc8b20083026234bed346e9d440f94d802249a"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-236.xml",
+        "bytes": 1110,
+        "sha256": "2e6ec116eaa612b5cca210daf6125aae59f55edcd71d64a74d695e635cb10b58"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_boot_default_test",
+        "bytes": 2226192,
+        "sha256": "b2d805f43619a1fa1398f353b17b4348bdd12c67c70d7c2edf5219163afd8f54"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-237.xml",
+        "bytes": 1110,
+        "sha256": "b9b6a61735306c0be6772b353f3d66345a88ed92c5bf4edcb24209f0f056a706"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_boot_invalid_test",
+        "bytes": 2219720,
+        "sha256": "0628f06bcbfcb49980b3ff37316624319bcb56ac5c7658ff98a6e706605d4238"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-238.xml",
+        "bytes": 1110,
+        "sha256": "4855be72f49a57b60273c682c8bc22dba17c6a8cc357ed4d23dc38b64f92ffc0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_test",
+        "bytes": 2280864,
+        "sha256": "41be4a39e3b3b709c7faec47e5db075dcdad9b4e69c28a3cee4b3660e916960e"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-239.xml",
+        "bytes": 2783,
+        "sha256": "16665492c6fd398c99098c0706b312ef1f0518e7cbed1033201959eeeceabec0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_multi_controller_factory_test",
+        "bytes": 3295992,
+        "sha256": "cc8710ff4e8930bc80bbb8fdd56b5b747f61d58e284706b14a1ef6a160813200"
+      },
+      "cases": 31,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-240.xml",
+        "bytes": 8958,
+        "sha256": "3d83b42274dfb83847dcac384905337564a60ae9e0c5fd2792692703813c090f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_official_test",
+        "bytes": 2422224,
+        "sha256": "6df4d39fbc02b9577a6b63350dc6b12aced0f528a936b09a8baf9b903ab3bbe8"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-241.xml",
+        "bytes": 3530,
+        "sha256": "c3908b1c913cb7fe7b66b9ac071f18a2fd426ff2346070d34dba4bd9b78d91e3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_physical_platform_factory_test",
+        "bytes": 2866160,
+        "sha256": "50260ec5557d2a90ecc38842f951ff37249f3779867962188b25a4d899883e08"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-242.xml",
+        "bytes": 9828,
+        "sha256": "d0414f8a7054bebd7353cbb5de03f03b7bdd40d1dbd5e85bcf59302965739e37"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_single_spi_factory_test",
+        "bytes": 2474072,
+        "sha256": "2b2a92052523499dd9f2d82c21dc3e45b6a3901e052affa6de391dcf9db7e74a"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-243.xml",
+        "bytes": 1154,
+        "sha256": "e9d58bc36e3ee00196992b12e2772696de569e4f4361c8fe7816b429d6a653cf"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_dma_owner_test",
+        "bytes": 2613352,
+        "sha256": "02e64f794279135d9b0957d6c425b0ba7d1670840ceca72735f840b0940738cd"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-244.xml",
+        "bytes": 3894,
+        "sha256": "53c25162783a8cfff9174e11c1defabf068beccdd153e17125c980837a60d426"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_dma_sequence_test",
+        "bytes": 2394304,
+        "sha256": "693d4adc2857fb41ed4d1f3625f0a46e355824ee6fc2e4da53081f3031286d69"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-245.xml",
+        "bytes": 2604,
+        "sha256": "121776e00edcf868170ceb3a65ead3b3b7f3bb42877c49068b24deb5bf7a4989"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_dma_test",
+        "bytes": 2406832,
+        "sha256": "c9b05e26022394f48953458e2aebcb419c9c627463278f51db1e0e4837a33cbe"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-246.xml",
+        "bytes": 3258,
+        "sha256": "e06cf4cc4bb19d76000897189a149b1c7cf87d69ddf42035b07cde46dc012335"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_transaction_test",
+        "bytes": 2339952,
+        "sha256": "ca0f722829d68a025f480c7a5eb621a411bc70b24aca858a72492c1d8da43ee4"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-247.xml",
+        "bytes": 1712,
+        "sha256": "7fdd5abda8cca15e65c5942e42ed9b3530124aaf77238d512ef2a73c521e2331"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_system_transaction_test",
+        "bytes": 3088584,
+        "sha256": "ab7938efddeb40630723fcf8de16e3d113903afb0aeb696f996bf86ac7eac3b0"
+      },
+      "cases": 32,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-248.xml",
+        "bytes": 9097,
+        "sha256": "4429b3fe54298f2d1504e1af2889fffc840e5f3244b2cca4d5ac89b0ad5489e6"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_timer_factory_test",
+        "bytes": 3090560,
+        "sha256": "45e114c1a2c0dd0a02436fd3d8f1d05485256abe8b9e3af01cde4109751c28cb"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-249.xml",
+        "bytes": 7735,
+        "sha256": "b12a4a66581a50a2a4a51c9cfab97745c4dc5723f7d12a98efa16a91603db14a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_dma_test",
+        "bytes": 2371016,
+        "sha256": "a2ceaf4761b51f97c657da07a64557a74f8f0e26e4378d51b35c8c99cec4ebd1"
+      },
+      "cases": 10,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-250.xml",
+        "bytes": 2976,
+        "sha256": "2fe0f4773ccc33742d14825cb48ef79c0ff767ce5d7f46642e13cdc5112ff674"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_formats_test",
+        "bytes": 2581416,
+        "sha256": "4addc89aade56e18ebcfeaf099095c6631958812e08075dd52a728be0279c046"
+      },
+      "cases": 26,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-251.xml",
+        "bytes": 7752,
+        "sha256": "00ea01817307af39959ecf307a40a266c9a8ed033242ecf2838afc4d9aff2eba"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_receive_test",
+        "bytes": 3076816,
+        "sha256": "690811c0ae0358bb67af15bce2589c1d4e48c08e5647c63edc57350f7e2da8f0"
+      },
+      "cases": 36,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-252.xml",
+        "bytes": 10393,
+        "sha256": "99486d86d22d76a67e3c6725ba94cadcb7487449c565df479f233f9fb1364af6"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_stream_test",
+        "bytes": 2335416,
+        "sha256": "b3da31f3b9b2c8d835a0343faae18d83a2d3b11475031cbbac3f8acc30ef5555"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-253.xml",
+        "bytes": 1859,
+        "sha256": "2201d715799bcaea0c6eb48a1d8011b308515f8454afaed1706d0d26af83c741"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_usb_factory_test",
+        "bytes": 3021448,
+        "sha256": "194572b6e9eab118b4f39d5a906122d0fd5b50ea3d17c0bebcfc9cde91577b72"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-254.xml",
+        "bytes": 3752,
+        "sha256": "56c1cc9fd2bee0d186ec3c5283c6e15f4b8a332e6da111287946c3f757136a77"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_watchdog_test",
+        "bytes": 2276616,
+        "sha256": "9d7c546ccd6cd4fd0b96020b974c891611dc3bab1b9c7feb9d4deab9bcb6d6a6"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-255.xml",
+        "bytes": 1636,
+        "sha256": "b282b96b1edd4f0df95e960a47d8425a7bb0e7868f61b4966cffee370c4eb383"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_exti_test",
+        "bytes": 2637248,
+        "sha256": "3afa3918a90ecb9d9ca72a1725e9b9363e9660e136eddaf40084d96bbb8aaf90"
+      },
+      "cases": 21,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-256.xml",
+        "bytes": 5829,
+        "sha256": "b1056497147c89c4296481db33818b8a26899dc43b576258824f28723c8f9215"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_provider_test",
+        "bytes": 2667184,
+        "sha256": "f11bf1a51b6116f8520da354069fed0ae535306cbd35b5d79999f913188ea031"
+      },
+      "cases": 27,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-257.xml",
+        "bytes": 7341,
+        "sha256": "71ef47822d7a3e61361718d94ef724be0e8ac0f0c5404e0d27f69b812094d077"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_spi_test",
+        "bytes": 2527552,
+        "sha256": "e645d4b6e1d75d6e96404dffe2c9a01b161d1ca3696e8c41491393eb57cb9f87"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-258.xml",
+        "bytes": 3169,
+        "sha256": "c372c02fa64bebd005a80f470d0be6aa7ba1c15e572d44f914357894da727897"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_system_test",
+        "bytes": 2699400,
+        "sha256": "6cbbc7f0b87096a0b799cee65fbadb3c4d8119aecd70edd498709f7d740e6cdd"
+      },
+      "cases": 24,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-259.xml",
+        "bytes": 6526,
+        "sha256": "2801a7c6d35a9119fd9263790e5a3525c015b80cd126ec412672dee1f0c11ffb"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_transport_test",
+        "bytes": 2367160,
+        "sha256": "34c5152c76464553ec0f2d61174e81fd4c403d922a85761aed1c37d450b6b36b"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-260.xml",
+        "bytes": 2164,
+        "sha256": "f58b175deb91b69aa87231e0035ee016e78722c6cec58b7b1284db5f045b2c00"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_watchdog_test",
+        "bytes": 2465480,
+        "sha256": "018f85818609d1dee2c8aaa094fea3f3d654894c27d781ce6d5407bddb952cc6"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-261.xml",
+        "bytes": 5671,
+        "sha256": "910358cf215899f661e2266aa157cb5b808e518f5cb4c6bdc9c3a4d134dd9079"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_clock_sleep_test",
+        "bytes": 2382944,
+        "sha256": "c72293562473651534178320a241936feb27b6cd673d9a1c0f72fb692dc73955"
+      },
+      "cases": 19,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-262.xml",
+        "bytes": 5195,
+        "sha256": "cc0f7e57cd09278e62b762cfb3961dc5265a408cc6a80bafe171fdbe28790bb3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_i2c_multi_controller_test",
+        "bytes": 2545096,
+        "sha256": "e7770a44900145e08b499ef9d72527c08b95032651bdc93f6782bf5300216ff7"
+      },
+      "cases": 14,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-263.xml",
+        "bytes": 4145,
+        "sha256": "4f80e85cc432389a3bf2c8653e78ff1db0e47c4d2bc858e496e04ff146fa8ac1"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_lowpower_integration_test",
+        "bytes": 2279296,
+        "sha256": "fab6865d1bbe489eb76b91dcf894b6d630e83981c63df5bb8c834592a344d5aa"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-264.xml",
+        "bytes": 1174,
+        "sha256": "951d4985e1e48cea02c337d7fe2a4d3300e376edead515bf92f0281c320f05e8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_lowpower_test",
+        "bytes": 2291736,
+        "sha256": "9a3a3c7db5a87e18eee0def1f26ce8445fadd510b6c9edfbb4df9878b5f43a21"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-265.xml",
+        "bytes": 1923,
+        "sha256": "f2a7fb9f6d3e9612612f5303ec314aad268d04ff3ceb7b120bc46a1d624d95c9"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_spi_multi_controller_test",
+        "bytes": 2522904,
+        "sha256": "dd3c5edb4b0061ff709d8a8e86dbc2a143de813df52f30f86de2209114f092a4"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-266.xml",
+        "bytes": 3912,
+        "sha256": "7e044b0c7cd66f3111c3e2b9cf8b75005f43222426d8b766c1d99f92ccf8a5c7"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_timer_advanced_test",
+        "bytes": 2893856,
+        "sha256": "a62fb0ce6afb05f6c7341d0e85bba0f0c9918ed209c82e67a1207052dfa5d7fd"
+      },
+      "cases": 55,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-267.xml",
+        "bytes": 14983,
+        "sha256": "c465a16b1ac6067b41e464e1bb640075fcee3c5274ba6b6db31b4aa6430ec813"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_uart_multi_controller_test",
+        "bytes": 2480608,
+        "sha256": "56e945e42e3a847fe6a16c437db7544d232f59dbe738a033382a4d91be5d9d51"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-268.xml",
+        "bytes": 3322,
+        "sha256": "8888bc5e168714e6645feca8fd26e9065ba43831726cc40253e3c632411d4cfd"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_usb_clock_test",
+        "bytes": 2308336,
+        "sha256": "03d070f737a89edba2b02d4cb7daa5b7d96fdb161a1fc08d59e3ce4ba39edf35"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-269.xml",
+        "bytes": 3095,
+        "sha256": "2909445bea3bbc0df865f3fde7a38d126951f280c67080312f80e62c417188c2"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_usb_device_test",
+        "bytes": 2406584,
+        "sha256": "896bc49816c3f16564a00061d9f100f01f2be23cc5d330f086afe254bae95118"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-270.xml",
+        "bytes": 2131,
+        "sha256": "742e213d1c8bf3f522c9243c8545d19a60afefb5f6ae37576435ad2e04cf71aa"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stream_profile_test",
+        "bytes": 2708216,
+        "sha256": "7dd1d09104999839ddefe7be19d872973e1bd33911abc9d399a11b2851346a34"
+      },
+      "cases": 12,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-271.xml",
+        "bytes": 3504,
+        "sha256": "ea9b7c71d9e75ec28987525455583fffc8bb040bb54b7cf6cba61760ea1913b3"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stream_storage_test",
+        "bytes": 2270096,
+        "sha256": "bf70a5c38b110ccb24f31cae2e24f4f376507cb7389e176b484333f33291885f"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-272.xml",
+        "bytes": 1881,
+        "sha256": "9935ef7c7efb121825d8863b81d69aac553aee948d6d98088170b4cb8b5c0c82"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_bootstrap_test",
+        "bytes": 2384352,
+        "sha256": "31054f6a460456ee0f7bef8cedb3f6ee12d624f00cd6553cd6f0c742e8123f63"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-273.xml",
+        "bytes": 2439,
+        "sha256": "8773b4097f72bd1dddbd3ec37f30accf87f02b56c3ffbb934c65d4e1924027a1"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_irq_primask_test",
+        "bytes": 2301216,
+        "sha256": "d0238b7201a499bd79f7c2e67fb933286f288bcd9fa1be6141137709090929c9"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-274.xml",
+        "bytes": 1128,
+        "sha256": "18289a692ca675094ad414f8b364d0105913bdd59099ffcee121589cf9457dbf"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_irq_test",
+        "bytes": 2313280,
+        "sha256": "6c562bc4a94f6ed1e331e35d45f9c48a9411d120d94a7f9648e78566a0b91595"
+      },
+      "cases": 5,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-275.xml",
+        "bytes": 1562,
+        "sha256": "ff5239fc582d7879d37428927e2477e2a0622eb1b55c13266b06d26d7b30d55b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_kernel_test",
+        "bytes": 2921360,
+        "sha256": "27dc620829de851afc47e1daf656b46f14717162b8b8314c6f6961e2f56e8d74"
+      },
+      "cases": 35,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-276.xml",
+        "bytes": 10275,
+        "sha256": "0eb1369a89ef793fde42c2a2c9da7658dcf605e852d7ea43d59b9ed34884ec89"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_linux_port_test",
+        "bytes": 2501472,
+        "sha256": "e0e690d4b0c67d30c05b334db9a76e1e84057a6ef5c5440a212238d293fb84cc"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-277.xml",
+        "bytes": 1950,
+        "sha256": "ce24d424beb8bd72e26b99756b0c72c1b85c61a199f3d268e4897ccc5ace541c"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_m4_external_test",
+        "bytes": 2645536,
+        "sha256": "cd76fcbe0f97c4e7071f1d84cbedda309173d0f3f343e6add1edd5cdefd008d6"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-278.xml",
+        "bytes": 1154,
+        "sha256": "d168e5132a931aa2010939d3699462c64eaf214b9c95938cc9dfeca937aba63b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_m4_primask_test",
+        "bytes": 2333568,
+        "sha256": "04473b2d0eda835de5d26a2fb75838c2d405d6d5923e29e3dd513592768d3df7"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-279.xml",
+        "bytes": 601,
+        "sha256": "3b6e4bc12bae58dc2521cea45f93d8aeccd0ff8985591c2a085536c174bb9a54"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_m4_test",
+        "bytes": 2333552,
+        "sha256": "eea8eb2d81c3c9f2aa82ffef5b3d9371cf0aa30a3a3a9d78c1ae7bc2614ae15b"
+      },
+      "cases": 1,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-280.xml",
+        "bytes": 584,
+        "sha256": "bbcd5fe80da5103a70dad736a3f2e4d24bd21cfe866bb6aa54cb5da5d4f0c654"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_timebase_lowpower_test",
+        "bytes": 2598432,
+        "sha256": "40717d91c41932eab6fd6373c557fd6f86b0815958f5993d9cdbbb4c073334ba"
+      },
+      "cases": 23,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-281.xml",
+        "bytes": 6524,
+        "sha256": "9530d02ff40ebef7c430c0b17e36f38b3a4fd1d39b448484becd5985e4c22a15"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_devices_test",
+        "bytes": 2756528,
+        "sha256": "d7e773f7508245c7e719fe62aef584a07ebc3255e279375f3b5629b03a9fcdcb"
+      },
+      "cases": 40,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-282.xml",
+        "bytes": 11440,
+        "sha256": "4f84f10b6f55378c64d68075427a2932edfad27f52207cadac3e983b61484cbe"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_factory_test",
+        "bytes": 2435272,
+        "sha256": "89681f8f34ebf0ef94bf7ae8f7937672424fa5ba1d913cd2ec5fa8ffa62729fc"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-283.xml",
+        "bytes": 3770,
+        "sha256": "9ed36b94f24e7f819a3faafa9f064d9eba7df8288a3d9fd8a0dfb76d09ddd4ea"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_i2c_long_factory_test",
+        "bytes": 2674544,
+        "sha256": "dad922932161f482cf32206e543937b40a49730376aa99ae23c89abdd253d909"
+      },
+      "cases": 4,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-284.xml",
+        "bytes": 1447,
+        "sha256": "ec17764ba3d7cef1c50a16961546dd06efe142326b3edd5867d072bfe55de2b0"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_mainstream_factory_test",
+        "bytes": 2411768,
+        "sha256": "a0ca43ce22049eecb6ea73d6af5b037d9ca2630afda3db1cb3bb4cca183c280c"
+      },
+      "cases": 6,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-285.xml",
+        "bytes": 1984,
+        "sha256": "4f70bb4123a797484c13d29ca0d4d96dfd75dd3ffde0a67ba09c4f7fdda64fd8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_mainstream_test",
+        "bytes": 2690040,
+        "sha256": "87895794a9f82859a28d6c8069f8cdeb961f14548d89d644da0be71cc7c686db"
+      },
+      "cases": 21,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-286.xml",
+        "bytes": 5937,
+        "sha256": "2e204f3701e33d1ceab49cedd748d8e9cb62867b00eb8f0c2adc9697ce594513"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_peripheral_factory_test",
+        "bytes": 2482608,
+        "sha256": "d02b95d27c3607dbf946da77464df9df78c2a79e901a6764dd15b149ccc9dac1"
+      },
+      "cases": 7,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-287.xml",
+        "bytes": 2298,
+        "sha256": "eebf7598c1b743c5b0eadaf1ce544186907368a15e5139ae00cc0f2a206333ba"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_provider_test",
+        "bytes": 2755320,
+        "sha256": "113304c67e0f04f0ecc1ef48b80376ace12931266cbf2e707916b4ebb3fb00bf"
+      },
+      "cases": 30,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-288.xml",
+        "bytes": 8131,
+        "sha256": "58d1174e130234c48e5c505cb8cfdc8c1f1cc65954b27b3e581cdf88c9547554"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_secure_batch_test",
+        "bytes": 2505616,
+        "sha256": "5708ecac31048f5f9840fb2a226342bb2dd2348ba5dd67b29eed0882c137c11e"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-289.xml",
+        "bytes": 2908,
+        "sha256": "39d2feca0a5f53ebc47d170d4b85974c3fc1d0afe3136e3ee5b5f843eb391ece"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_security_test",
+        "bytes": 2840424,
+        "sha256": "9aabe2f90ae71c73332e4a7b4beb97f93785b101df954aae968dc79be3fb2ce9"
+      },
+      "cases": 32,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-290.xml",
+        "bytes": 8752,
+        "sha256": "fc5aa4766199442514452f7d697724a7a2b28b7ea56145866516e16dc4a8a362"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_system_test",
+        "bytes": 2522464,
+        "sha256": "9f8cb42f59bbe7fab083238b10bcf409608d45e296bcfb2e7eb726faa883d983"
+      },
+      "cases": 23,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-291.xml",
+        "bytes": 6293,
+        "sha256": "0962d9b69c105fef23f224e79c27606277cc46421fa00d674e4a9176f343f42f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_fifo_factory_test",
+        "bytes": 2466744,
+        "sha256": "549669e702e3518caf9d410b27c1ed2f32f9ef35d461e6ad1e61e831cf3f6c5c"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-292.xml",
+        "bytes": 2844,
+        "sha256": "c28fa2fd2d7dff0c0c737f03f180135dd02eb46a8f79c218db379570d569146a"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_fifo_test",
+        "bytes": 2984840,
+        "sha256": "54d9e7ca3537059a9c84d3d0797aebc31f8b387b0698618e676379d618560414"
+      },
+      "cases": 45,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-293.xml",
+        "bytes": 12210,
+        "sha256": "a3502ee24902206b3223fcd8cd5c2dcb8b673939a289ee8c6c2bab87353a6e6f"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_gpdma_factory_test",
+        "bytes": 2454568,
+        "sha256": "d4876a07ec62a804e7c3d172e434aecc3b7f9be2ed786c3675ef76341243fa9f"
+      },
+      "cases": 8,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-294.xml",
+        "bytes": 2579,
+        "sha256": "d7004c277f8661c68110356209a7cb42e97d242f819b9c50b5d48cf6e0fe33f8"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_gpdma_test",
+        "bytes": 2964856,
+        "sha256": "402193f75cda25c40c96192941cd38b13c9ed5c31c55c26b47b34e6ea379dac9"
+      },
+      "cases": 40,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-295.xml",
+        "bytes": 10921,
+        "sha256": "21b08483ae21db0864ada1499ef1fe0d31ef9eec890fe7af676a9ca39292b710"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_rtscts_factory_test",
+        "bytes": 2499976,
+        "sha256": "056eae8b6462c86843db248b49c34267082067600ee6348039fc7d7349c377fb"
+      },
+      "cases": 11,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-296.xml",
+        "bytes": 3469,
+        "sha256": "d8bbf8461c7979294faf169542506f53c5cb7703a0093d371268d99035c80e29"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_rtscts_test",
+        "bytes": 2944296,
+        "sha256": "a2f3cf934de2468e53aa6be195c5be42683800475402be366c75c421958b655f"
+      },
+      "cases": 38,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-297.xml",
+        "bytes": 10606,
+        "sha256": "c25ed1ec46c081935927e213dfabff86580c24d706f0f4df37741f49ba8410db"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_formats_test",
+        "bytes": 2324696,
+        "sha256": "2e7e31d0acbd7e1b63eb027f09854008f731d53c8e662ea2c098d2442c836143"
+      },
+      "cases": 9,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-298.xml",
+        "bytes": 2783,
+        "sha256": "dbad24e9e5a04c4001e7f89960afd5823322e1661623acadee989779c3aa4785"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_owner_mock_test",
+        "bytes": 2536968,
+        "sha256": "d85c25ffb13a1f14f1a2e3c5ebcec315ee52157bbf251dc217c97af02d883599"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-299.xml",
+        "bytes": 1130,
+        "sha256": "a75195781b6aac65b2db705922c9ab78326087c2e6c06ef042e4d49167c2ec9b"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_rs485_test",
+        "bytes": 3009896,
+        "sha256": "88f0ad005ee16ad92fa09e077d273d0789e6c9dcd6322fe3299c3ed502138d2b"
+      },
+      "cases": 13,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-300.xml",
+        "bytes": 3908,
+        "sha256": "cc06a83867312fb2ed66b290f3e201e2bb4a3e7a4380871e0714a5501a8e9a86"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_v1_channel_dma_test",
+        "bytes": 2622096,
+        "sha256": "53d7cb34af4b4676f7d606b22c3443826d6481e31fd89cef21d25f1c896f0f76"
+      },
+      "cases": 20,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-301.xml",
+        "bytes": 5682,
+        "sha256": "bea7eafc13264b0eb6cd62ecc707f2fc273fde7524147b47b3ecea972f62bc15"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_usb_device_test",
+        "bytes": 2873992,
+        "sha256": "2fca1762d1e5880df3b49613e8d37476e4b527a81d41409668cac32c5d649afc"
+      },
+      "cases": 53,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-302.xml",
+        "bytes": 14183,
+        "sha256": "50c92aa9ebce3f4e0da15014acbd966ef5db9c9e750504e0322f1f48d0826f72"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_user_io_broker_test",
+        "bytes": 2995696,
+        "sha256": "f28b95671ba9d37127868534fd677d5995aff487f06013af47d52ab9ce14e12a"
+      },
+      "cases": 28,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-303.xml",
+        "bytes": 7683,
+        "sha256": "9f02a649be1ac780938d4702247cfe891c817c0b341b21351bfdd41c0119d5ee"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_workload_gd303_test",
+        "bytes": 2758568,
+        "sha256": "0d6a962280de283dc0c57075f840c634f5fb16f45f479e507ade52e634a38104"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-304.xml",
+        "bytes": 1121,
+        "sha256": "e3aa54afae16818a27e289fd8215b08dc6ee82c359ae9658d3d3ed83d7cb4b86"
+      }
+    },
+    {
+      "binary": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_workload_uart3_test",
+        "bytes": 2758520,
+        "sha256": "10d2c5ca2b38e96acf2c2ab0b1a7c103c5e63309926f1d35d72e59b717011e62"
+      },
+      "cases": 3,
+      "report": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/google-305.xml",
+        "bytes": 1121,
+        "sha256": "73ea53687873e7a9e8f432c7a8d32e162022fdcdd63893b7683925600ce91133"
+      }
+    }
+  ],
+  "scope": "Complete staged ordinary commit hooks for public CA permissions; exact resulting source and fresh full host tools/Google execution. No OCI rebuild, SDK, ARM, offline or HIL upgrade."
+}

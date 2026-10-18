@@ -1,0 +1,31 @@
+"""Preserve complete matching old Native ELF bytes before normal rebuild."""
+from pathlib import Path
+import gzip,hashlib,json,os,stat,time
+O=Path(__file__).resolve().parent
+P=Path('/workspace/nexus-io-recovery-20261018/validation/full-gate-oci-ca-reader-r1.json')
+proof=json.loads(P.read_text());assert proof['head']=='474b3da3e7e60bf73c573f073465036c8db6437f'
+CAP=384*1024**2
+rows=[]
+def digest(path):
+ with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+def guard():
+ m=Path('/sys/fs/cgroup');assert int((m/'memory.max').read_text())-int((m/'memory.current').read_text())>=900*1024**2
+ assert os.statvfs('/workspace').f_bavail*os.statvfs('/workspace').f_frsize>=64*1024**2
+for i,entry in enumerate(proof['executed_programs']):
+ guard();row=entry['binary'];p=Path(row['path']);st=p.stat();assert p.is_file() and not p.is_symlink();assert st.st_size==row['bytes'] and digest(p)==row['sha256']
+ target=O/(row['sha256']+'.elf.gz')
+ if not target.exists():
+  with target.open('xb') as raw:
+   with gzip.GzipFile(filename='',fileobj=raw,mode='wb',compresslevel=6,mtime=0) as out:
+    with p.open('rb') as source:
+     while data:=source.read(1024*1024):out.write(data)
+  h=hashlib.sha256();size=0
+  with gzip.open(target,'rb') as source:
+   while data:=source.read(1024*1024):h.update(data);size+=len(data)
+  assert (size,h.hexdigest())==(row['bytes'],row['sha256'])
+ assert p.stat()==st and digest(p)==row['sha256']
+ rows.append({'original':row,'original_mode':stat.S_IMODE(st.st_mode),'gzip':str(target),'gzip_bytes':target.stat().st_size,'gzip_sha256':digest(target),'complete_decompressed_SHA_CRC_verified':True})
+ used=sum(p.stat().st_blocks*512 for p in O.iterdir() if p.is_file());assert used<CAP
+ if (i+1)%50==0:print(json.dumps({'preserved':i+1,'allocated':used}),flush=True)
+result={'kind':'complete matching baseline Native executable preservation before normal in-place rebuild','source_head':proof['head'],'original_full_gate_sha256':digest(P),'programs':len(rows),'uncompressed_bytes':sum(r['original']['bytes'] for r in rows),'gzip_bytes':sum(r['gzip_bytes'] for r in rows),'unique_blob_count':len(set(r['gzip'] for r in rows)),'allocated_cap':CAP,'files':rows,'source_ELFs_not_modified':True,'storage':'volatile executable tmpfs retained originals; not GitHub publication or a new execution/qualification'}
+p=O/'retention.json';p.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'report':str(p),'sha256':digest(p),'programs':len(rows),'gzip_bytes':result['gzip_bytes'],'unique_blobs':result['unique_blob_count']}),flush=True)

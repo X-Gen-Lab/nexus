@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "kind": "independent_h743_dma_runtime_reset_domain_audit",
+  "decision": "OBSERVED_RESET_FAULT_CONTAINMENT_GAP_REQUIRES_SEPARATELY_AUTHORIZED_TDD",
+  "source_root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+  "scope": "Read-only runtime review of existing SPI DMA D1 and UART TX/RX DMA. No new behavior/test/qualification execution; no D2 or Main modification.",
+  "sources": [
+    {
+      "path": "soc/stm32h743/drivers/spi_dma.c",
+      "bytes": 31696,
+      "sha256": "ed920bc6ed9194049059b2d84f1352df667893f76716a2653f5a1e5a664d6ebc"
+    },
+    {
+      "path": "soc/stm32h743/drivers/uart_dma.c",
+      "bytes": 19457,
+      "sha256": "97c0967cf020199fea8f941ff8c9cae2064a7f70008d6a83b7e3a1fadd122716"
+    },
+    {
+      "path": "soc/stm32h743/drivers/uart_receive.c",
+      "bytes": 22820,
+      "sha256": "be5b12984ddf4483cf38dad713c2e04efb52d984b354a7bafb935b8ecc8694ed"
+    },
+    {
+      "path": "soc/stm32h743/drivers/spi_wire.c",
+      "bytes": 10313,
+      "sha256": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9"
+    },
+    {
+      "path": "soc/stm32h743/drivers/uart.c",
+      "bytes": 19015,
+      "sha256": "62bac00a24ccf38e7b5a863796c7439cd94a0fe6f78f7a4737c0b6a2940b0511"
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "bytes": 2635,
+      "sha256": "da0924272fc1ff39ba49088f5842e7e7208c9bd0cb46a0f7b4c947dd018bae6c"
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_dma.h",
+      "bytes": 1896,
+      "sha256": "b9a71e31f6c71dc42feabd4cdba299d58bae5f6c0e9607c4ac8b59d0f4152395"
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_uart_receive.h",
+      "bytes": 2266,
+      "sha256": "cdd3f2e291766b85249cfff8fb4a9ec02976a521c11738d95c0c2892bbaac2b8"
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_provider.h",
+      "bytes": 13407,
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61"
+    }
+  ],
+  "spi_d1_binding": "Current spi_dma.c SHAed920bc6ed9194049059b2d84f1352df667893f76716a2653f5a1e5a664d6ebc equals the frozen D1 final files/ entry; final-source-freeze.json in D1 manifest has SHAbb812f45a61ad671c199868c3544d39baeec523b67c5e1eef0988397ab2ca240. It is the final47 body, not the earlier45-body freeze11e846.",
+  "official": {
+    "path": "/tmp/nexus-h743-spi-s0-2-official-20261018/rm0433-attempt2.txt",
+    "bytes": 17551278,
+    "sha256": "7b142be592dfa60b2e977691f8c26cf05709fe73d194f6accebbed8df9499949",
+    "revision_observed": "RM0433 Rev 9",
+    "section": "8.7.29",
+    "bit_definition_page": 433,
+    "lines": "27210..27220",
+    "fact": "DMA1RST and DMA2RST each reset the shared DMAMUX1 along with its named DMA engine; set/reset by software."
+  },
+  "findings": [
+    {
+      "id": "RUNTIME-SPI-DMA-RESET",
+      "classification": "Concrete source omission; runtime manifestation not executed by reviewer",
+      "anchors": [
+        "soc/stm32h743/drivers/spi_dma.c:108 live",
+        "soc/stm32h743/drivers/spi_dma.c:249 irq_domain",
+        "soc/stm32h743/drivers/spi_dma.c:302 submit",
+        "soc/stm32h743/drivers/spi_dma.c:415 service",
+        "soc/stm32h743/drivers/spi_dma.c:754 DMA IRQ /779 wire IRQ"
+      ],
+      "fact": "live and irq_domain observe DMA1EN, other gates/cache/System facts, but neither reads AHB1RSTR. submit/service and both owned IRQ paths therefore have no DMA reset-domain rejection before DMA/mux probes. Existing tainted logic already quarantines and isolates on observed gate/cache invalidity.",
+      "consequence": "After reset is asserted during a borrow, reset-cleared EN/count/flags/mux cannot be treated as observations of the original transfer's successful withdrawal. Cold preflight alone cannot detect a later asserted reset.",
+      "narrow_fix": "Subject to Root authorization, add the reset-domain level read to live and irq_domain before any DMA/mux probes. Reuse existing s->tainted, first-cause terminal and owned-vector isolation; retain request, endpoint, CS/clock ownership and active state. Do not clear shared reset bits or infer recovery after deassertion."
+    },
+    {
+      "id": "RUNTIME-UART-DMA-DOMAIN",
+      "classification": "Concrete source omission; broader than reset-only because no common runtime DMA gate guard exists",
+      "anchors": [
+        "soc/stm32h743/drivers/uart_dma.c:104 observe /153 service /196 start",
+        "soc/stm32h743/drivers/uart_dma.c:331 DMA IRQ /342 USART IRQ /351 stop",
+        "soc/stm32h743/drivers/uart_receive.c:123 observe /185 arm /262 finish /320 service",
+        "soc/stm32h743/drivers/uart_receive.c:331 rx_start /363 rx_stop /442 stop /512 DMA IRQ /523 USART IRQ"
+      ],
+      "fact": "AHB1ENR DMA1EN is checked only in the two initialize functions at uart_dma.c431 and uart_receive.c488. Runtime TX submit checks cached/initialized/retained state; runtime TX observe/service/IRQ have no DMA gate/reset validity test. RX start/arm/finish check cache at some boundaries but service/IRQs and detach read DMA/NDTR without DMA gate/reset qualification. Delegation to ordinary uart_ops does not supply that guard.",
+      "consequence": "RX finish derives length=capacity-NDTR after detach and may publish/abort a producer loan. A reset-cleared NDTR is not an established prefix of the pre-reset transfer. A candidate test is: real active RX, externally assert held reset, request stop; old logic can evaluate reset values as drain facts. This is a source-derived candidate, not an actual RED or proven hardware trace.",
+      "state_constraint": "TX has no independent sticky domain-taint field; terminal must preserve first-latched cancel/timeout/error. RX quarantined is currently a retryable withdrawal flag and is cleared by finish/arm. Do not repurpose these into a permanent taint without a reviewed semantic change, or set PREPARING/PROCESSING to fictitious work. A mode-private taint bit may be the smallest honest solution; Root must authorize any private-state change. Shared ordinary UART state/public faces need not grow."
+    },
+    {
+      "id": "SHARED-DMAMUX-RESET",
+      "classification": "Official reset-domain fact affecting both cold and runtime plans",
+      "anchors": [
+        "RM0433 Rev9 section8.7.29 page433, text27210..27220",
+        "soc/stm32h743/private/stm32h743_spi_dma.h:19",
+        "soc/stm32h743/private/stm32h743_dma.h:26"
+      ],
+      "fact": "DMA1RST resets DMA1 and DMAMUX1; DMA2RST resets DMA2 and DMAMUX1. A DMA1 path depends on its engine and its DMAMUX1 selector. Holding DMA2RST can invalidate that selector while DMA1EN remains set.",
+      "recommendation": "Use an explicitly reviewed effective reset mask covering DMA1RST|DMA2RST for DMA1+DMAMUX1 operation, unless a narrower official silicon-specific fact is supplied. This is one RCC read and one mask; do not add a fictional independent DMAMUX1 enable/reset owner. Root must decide any extension of the current D2 cold-check task; no D2 source is changed here."
+    },
+    {
+      "id": "SPI-WIRE-RESET-CLARIFICATION",
+      "classification": "Adjacent source fact; not an instruction to expand this batch",
+      "anchors": [
+        "soc/stm32h743/drivers/spi_wire.c:93 clock_ready",
+        "soc/stm32h743/drivers/spi_wire.c:120 reset"
+      ],
+      "fact": "clock_ready checks identity/trim/System, APB2ENR and selector, but does not read APB2RSTR. reset() checks the two reset writes it owns during cleanup. That checked cleanup operation is distinct from a live reset-domain guard. Do not claim SPI peripheral runtime reset is already independently observed; broader SPI/USART reset review stays separate."
+    }
+  ],
+  "contract_assessment": {
+    "valid_use": "Trusted constructors and exclusive owners require stable clocks/reset/cache. A foreign runtime MMIO reset violates that external ownership precondition; this audit does not invent a legal second reset owner or say valid application calls may reset a borrowed controller.",
+    "why_gap_still_matters": "The provider already promises defensive containment of observed invalid gates/cache, and drain/release relies on live hardware facts. A held, observable reset invalidates those facts just as an observed gate loss does. Continuing to interpret its reset values as transfer proof is a real missing containment branch under that failure model, rather than a request for arbitrary fault-history detection.",
+    "observation_limit": "Only held or actually observed reset levels can be detected. An assert/deassert pulse entirely between observations is not claimed detectable. Once invalidity is observed, software must latch it; deassertion alone does not restore the interrupted transfer's provenance.",
+    "recovery": "No automatic DMA/DMAMUX reset/deassertion, request settlement, RX publication/abort, buffer zeroing or clock-lease release. Stop/cancel remain controls, not borrow revocation. Permanent taint may require an explicitly separate product/owner fail-stop or destructive recovery contract.",
+    "physical_model": "A software clear-EN request differs from observed EN0. Do not fabricate normal DMA EN0 plus all valid completion facts with uncommitted memory. The reset-domain regression can instead count/reject any DMA/mux access while reset is asserted and prove no settlement/publication; it need not invent bus behavior while the domain is reset."
+  },
+  "next_batch_proposal": {
+    "authorization": "Proposal only. Root must explicitly extend scope after the current D2 task; no sources or tests were authored.",
+    "spi_minimal_paths": [
+      "soc/stm32h743/drivers/spi_dma.c",
+      "tests/google/h743_spi_dma_test.cpp",
+      "tests/google/h743_spi_dma_model.cpp",
+      "tests/google/h743_spi_dma_model.h only if a new independent access counter is needed"
+    ],
+    "uart_separate_paths": [
+      "soc/stm32h743/drivers/uart_dma.c",
+      "soc/stm32h743/drivers/uart_receive.c",
+      "soc/stm32h743/private/stm32h743_dma.h and stm32h743_uart_receive.h only for explicitly approved mode-private taint",
+      "tests/google/h743_dma_test.cpp",
+      "tests/google/h743_receive_test.cpp",
+      "tests/google/h743_dma_model.cpp",
+      "tests/google/h743_dma_model.h"
+    ],
+    "model_boundary": "Prefer the existing per-DMA external port over edits to global h743_model. Observe actual RCC level and addressed stream/mux ranges, never SUT flags or internal stage. Do not grow a generic DMA framework, dispatch layer, pool or registry.",
+    "tests": [
+      "Initialize a real legal instance, then assert held DMA1RST before submit/rx_start: STATE rejection, no borrowed request/block, no DMA/mux probes or writes.",
+      "Borrow normally, then assert each effective reset bit during a live SPI/TX/RX operation; service and owned IRQ must latch taint/Q before peripheral probes, retain loans/leases and perform only allowed owned-NVIC isolation.",
+      "After that observation, clear the external reset level: repeated service/cancel/stop must not settle/publish/abort/reserve again or release the retained owner merely because zero registers now look idle.",
+      "Inject reset through the existing unmasked cache hook; recheck after TX pre-clean and RX post-invalidation, before further DMA access or final publication. Preserve first cause if cancellation/timeout was already latched.",
+      "Preserve peer-lane/vector flags and shared reset bits. Guard failures must not write AHB1RSTR or adopt a foreign reset owner.",
+      "Execute complete affected existing programs first RED then minimal fix GREEN, keep all old assertions. Recompute MMIO bounds on the final tuple; cold-program actualRED results are not runtime-branch evidence."
+    ]
+  },
+  "cost_tradeoff": {
+    "cold_only": "One initialization check is cheapest but leaves post-admission resets unobserved; it is not a runtime proof.",
+    "runtime": "One AHB1RSTR read per live/IRQ entry can check both bits; existing DMA1EN read is retained. No per-byte indirection is needed. Cache maintenance temporarily unmasks execution, so post-maintenance re-observation is a distinct required boundary.",
+    "accounting": "SPI can reuse its existing private taint with no state growth. UART may need mode-only sticky state, and its gate guard is newly required. Exact flash/state/MMIO/cycle cost must be measured after implementation; this report makes no WCET or hardware guarantee."
+  },
+  "validation_status": "No runtime tests, builds, tool installation, network, Main/index mutation, D2 edits or new qualification were performed. Root-reported cold test failures are not reused as runtime proof.",
+  "reviewer_report_budget_bytes": 16384
+}

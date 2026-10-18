@@ -1,0 +1,42 @@
+{
+  "kind": "verified-completed-normal-hook-file-checkpoints",
+  "head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "parent_exit": 1,
+  "start": {
+    "scope": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd",
+    "round_started_ns": 1792311303397327788,
+    "parent_commit_session": null,
+    "parent_stage": "h743-spi-dma-d2-full-commit-r2",
+    "parent_reported_index_tree": "b6927e587b3571cb890b2b883204fd14fce771f3",
+    "budget": 3145728,
+    "interval_seconds": 20,
+    "maximum_seconds": 10800,
+    "qualification": false,
+    "modifies_root_or_index": false
+  },
+  "archives": [
+    {
+      "path": "/dev/shm/nexus-full-hook-h743-spi-dma-d2-r2/batch-0001.tar.gz",
+      "bytes": 1912,
+      "sha256": "8d0144c279170dd8edd2ab59b464e06429e3d8ef1d732c75aef1360651ef2fb8",
+      "files": 5
+    },
+    {
+      "path": "/dev/shm/nexus-full-hook-h743-spi-dma-d2-r2/batch-0002.tar.gz",
+      "bytes": 1822,
+      "sha256": "9f1829c9df60b8d78b47f35852b402a82cc21bbb5139d272354e134e25e3bfc5",
+      "files": 4
+    }
+  ],
+  "archive_bytes": 3734,
+  "member_occurrences": 9,
+  "actual_terminal_commands": 2,
+  "actual_exit_counts": {
+    "0": 1,
+    "1": 1
+  },
+  "all_member_sha_gzip_crc_mode_pax_mtime_verified": true,
+  "monitor_pending_receipts": [],
+  "storage": "volatile",
+  "scope": "Volatile tmpfs raw/report checkpoint; subsequent GitHub publication pending.  Independent source-bound full gate review is recorded separately; no ARM/SDK/offline/HIL qualification."
+}

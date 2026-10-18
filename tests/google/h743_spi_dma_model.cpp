@@ -35,11 +35,30 @@ static bool clocked(volatile uint32_t* p) {
         return (g_h743_model.rcc.AHB1ENR & RCC_AHB1ENR_DMA1EN) != 0U;
     return true;
 }
+/** \brief Reset ownership is independent of the still-enabled bus gate. */
+static bool reset_domain_access(volatile uint32_t* p) {
+    auto& m = g_h743_spi_dma_model;
+    return (g_h743_model.rcc.AHB1RSTR &
+            (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0U &&
+           (within(p, &m.dma, sizeof(m.dma)) ||
+            within(p, m.streams, sizeof(m.streams)) ||
+            within(p, m.mux, sizeof(m.mux)));
+}
+static bool held_in_reset(volatile uint32_t* p) {
+    auto& m = g_h743_spi_dma_model;
+    uint32_t reset = g_h743_model.rcc.AHB1RSTR;
+    return ((reset & RCC_AHB1RSTR_DMA1RST) != 0U &&
+            (within(p, &m.dma, sizeof(m.dma)) ||
+             within(p, m.streams, sizeof(m.streams)))) ||
+           ((reset & (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0U &&
+            within(p, m.mux, sizeof(m.mux)));
+}
 static void fifo_status() {
     auto& m = g_h743_spi_dma_model;
     m.spi.SR &= ~(uint32_t)(NX_STM32H743_SPI_FIFO_LEVELS | SPI_SR_TXP);
     if (m.rx_count != 0U)
-        m.spi.SR |= SPI_SR_RXP | ((m.rx_count % 4U) << SPI_SR_RXPLVL_Pos);
+        m.spi.SR |= static_cast<uint32_t>(
+            SPI_SR_RXP | ((m.rx_count % 4U) << SPI_SR_RXPLVL_Pos));
     if (m.rx_count >= 4U)
         m.spi.SR |= SPI_SR_RXWNE;
     if (m.tx_count < 8U)
@@ -77,9 +96,28 @@ void nx_h743_spi_dma_model_reset(void) {
     m.spi.SR = SPI_SR_TXP;
     g_h743_model.spi = &m.spi;
 }
+/** \brief External reset event; SPI and NVIC are independent domains.
+ * \note These cases inject before any pending RX memory transaction. No
+ * outstanding-bus reset completion or subsequent electrical behavior is
+ * modeled.
+ */
+void nx_h743_spi_dma_model_assert_reset(uint32_t mask) {
+    auto& m = g_h743_spi_dma_model;
+    g_h743_model.rcc.AHB1RSTR |= mask;
+    if ((mask & RCC_AHB1RSTR_DMA1RST) != 0U) {
+        std::memset(&m.dma, 0, sizeof(m.dma));
+        std::memset(m.streams, 0, sizeof(m.streams));
+        for (auto& stream : m.streams)
+            stream.FCR = 0x21U;
+    }
+    if ((mask & (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0U)
+        std::memset(m.mux, 0, sizeof(m.mux));
+}
 uint32_t nx_h743_spi_dma_model_read(volatile uint32_t* reg) {
     auto& m = g_h743_spi_dma_model;
     ++m.reads;
+    if (reset_domain_access(reg))
+        ++m.reset_domain_accesses;
     if (!clocked(reg)) {
         ++m.gated_accesses;
         return 0U;
@@ -101,6 +139,10 @@ uint32_t nx_h743_spi_dma_model_read(volatile uint32_t* reg) {
 void nx_h743_spi_dma_model_write(volatile uint32_t* reg, uint32_t value) {
     auto& m = g_h743_spi_dma_model;
     ++m.writes;
+    if (reset_domain_access(reg))
+        ++m.reset_domain_accesses;
+    if (held_in_reset(reg))
+        return;
     if (!clocked(reg)) {
         ++m.gated_accesses;
         return;

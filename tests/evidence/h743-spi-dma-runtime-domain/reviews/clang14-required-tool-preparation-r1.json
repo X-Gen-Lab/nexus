@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "kind": "actual_clang14_required_analyzer_tool_preparation",
+  "status": "prepared_and_probed",
+  "prefix": "/dev/shm/nexus-clang14-required-20261018-r1",
+  "executable": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy",
+    "resolved_path": "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy",
+    "bytes": 89411744,
+    "sha256": "c3768c0ff3bbc60a6314289f9492077f7b825243f824a62634b82396ff088e4f"
+  },
+  "resource_dir": "/dev/shm/nexus-clang14-required-20261018-r1/resources/usr/lib/llvm-14/lib/clang/14.0.6",
+  "resource_default_link": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/lib/clang/14.0.6",
+    "target": "../../../../../resources/usr/lib/llvm-14/lib/clang/14.0.6"
+  },
+  "environment": {
+    "invoke": "Use exact executable path for maintained quality_tools.py --tool. No wrapper, PATH replacement or resource override is needed; default lookup uses the owned relative link.",
+    "LD_LIBRARY_PATH": null,
+    "LD_PRELOAD": null,
+    "CPATH": null,
+    "C_INCLUDE_PATH": null,
+    "CPLUS_INCLUDE_PATH": null
+  },
+  "authority": "Root explicitly authorized these exact2asset versions/hashes from historical inventory for this toolprep. Repository CI selects clang-tidy-14 and formatter14.0.6/same series; neither asset is misrepresented as a new repository lock or signature.",
+  "wheel": {
+    "name": "clang-tidy",
+    "version": "14.0.6",
+    "metadata_url": "https://pypi.org/pypi/clang-tidy/14.0.6/json",
+    "actual_asset_url": "https://files.pythonhosted.org/packages/51/04/1c819a031744d25581600a4ab5b8ccb7e13728d0a4fdac6ec61c6ea85405/clang_tidy-14.0.6-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+    "archive": {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/downloads/clang_tidy-14.0.6-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 31382107,
+      "sha256": "c9ffcb91f17ee920fdd7a83f30484f3cb4c183f7b490d092373e4a6f2c82729d"
+    },
+    "metadata": {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/upstream-pypi.json",
+      "bytes": 12062,
+      "sha256": "fccf7fcf0d950cd7661b4e3af35b2bdd6c19936a362d325382e404a371dbc9e9"
+    },
+    "regular_files": 9,
+    "directories": 5,
+    "expanded_bytes": 89429097,
+    "integrity": "All9regular ZIP payloads fully streamed through CRC; paths/type/unique-name checks passed."
+  },
+  "resource_deb": {
+    "package": "libclang-common-14-dev",
+    "version": "14.0.6-12",
+    "actual_official_url": "https://deb.debian.org/debian/pool/main/l/llvm-toolchain-14/libclang-common-14-dev_14.0.6-12_all.deb",
+    "archive": {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/downloads/libclang-common-14-dev_14.0.6-12_all.deb",
+      "bytes": 889680,
+      "sha256": "838781bfc798bcbdca68516db6546cf83677078efa57851bb957c19e265de7c6"
+    },
+    "control": {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/resource-deb-control.txt",
+      "bytes": 748,
+      "sha256": "ccb008c17fb5622daf4489d50530a4ebe0c8169e9e3621eb8e69a24430e0b66d"
+    },
+    "regular_files": 177,
+    "directories": 23,
+    "contained_relative_links": 6,
+    "expanded_bytes": 20224648,
+    "integrity": "Exact approved SHA and both XZ integrity trailers; validated paths, regular writes before links. Two contained optional compiler-runtime lib links are dangling in upstream header-only package; no runtime was needed or fabricated."
+  },
+  "notices": [
+    {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy-14.0.6.dist-info/LICENSE.md",
+      "bytes": 10273,
+      "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68"
+    },
+    {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy-14.0.6.dist-info/COPYING.md",
+      "bytes": 899,
+      "sha256": "272ff22ee13e20e82c16b0d2c03bcefbc00800e3f09ae03bce52e2a367ddfaa1"
+    },
+    {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/resources/usr/share/doc/libclang-common-14-dev/copyright",
+      "bytes": 6897,
+      "sha256": "dc2a171c75ca72818f7f4312602f27cb0e4bf6d010a86e7073a3797cb228ddff"
+    }
+  ],
+  "full_archive_member_map": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/extraction-map.json",
+    "bytes": 40847,
+    "sha256": "6a51465cc4b8616a49744480666c99c13ef3d9025650cc956e94cb20d9c0a3fd"
+  },
+  "elf_closure": {
+    "host_dependencies": [
+      {
+        "soname": "ld-linux-x86-64.so.2",
+        "path": "/lib64/ld-linux-x86-64.so.2",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "bytes": 225672,
+        "sha256": "438c546d8e8cc48496bf3a95f753051afd9db66a629a74e31a9ded71586b56e0",
+        "needed": []
+      },
+      {
+        "soname": "libc.so.6",
+        "path": "/lib/x86_64-linux-gnu/libc.so.6",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+        "bytes": 1995216,
+        "sha256": "fa430b8f298f817a266046af84a77533185ad6fc4406c7d3787b5a0a0c207826",
+        "needed": [
+          "ld-linux-x86-64.so.2"
+        ]
+      },
+      {
+        "soname": "libdl.so.2",
+        "path": "/lib/x86_64-linux-gnu/libdl.so.2",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+        "bytes": 14408,
+        "sha256": "295fa521a03cd2faa99974f378c9e23dd622021ec7d32bcad4f8ea61aec8a872",
+        "needed": [
+          "libc.so.6"
+        ]
+      },
+      {
+        "soname": "libgcc_s.so.1",
+        "path": "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+        "bytes": 182856,
+        "sha256": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af",
+        "needed": [
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ]
+      },
+      {
+        "soname": "libm.so.6",
+        "path": "/lib/x86_64-linux-gnu/libm.so.6",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+        "bytes": 977112,
+        "sha256": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3",
+        "needed": [
+          "libc.so.6",
+          "ld-linux-x86-64.so.2"
+        ]
+      },
+      {
+        "soname": "libpthread.so.0",
+        "path": "/lib/x86_64-linux-gnu/libpthread.so.0",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+        "bytes": 14408,
+        "sha256": "85e21f7dba0394411d00959176fd18b470e575b0b05f1f4f41e5636802ce0500",
+        "needed": [
+          "libc.so.6"
+        ]
+      },
+      {
+        "soname": "librt.so.1",
+        "path": "/lib/x86_64-linux-gnu/librt.so.1",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/librt.so.1",
+        "bytes": 14552,
+        "sha256": "7b7b84d1aedda0e0b2bdfc68844362782132180b8f02be1300e21e77572e514b",
+        "needed": [
+          "libc.so.6"
+        ]
+      },
+      {
+        "soname": "libstdc++.so.6",
+        "path": "/lib/x86_64-linux-gnu/libstdc++.so.6",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+        "bytes": 2497768,
+        "sha256": "972bb2a18b71140dab0240f8a1f68ab3fb1d56bcd4c4f824a91b70888faf5a00",
+        "needed": [
+          "libm.so.6",
+          "libc.so.6",
+          "ld-linux-x86-64.so.2",
+          "libgcc_s.so.1"
+        ]
+      },
+      {
+        "soname": "libz.so.1",
+        "path": "/lib/x86_64-linux-gnu/libz.so.1",
+        "resolved_path": "/usr/lib/x86_64-linux-gnu/libz.so.1.3.1",
+        "bytes": 125376,
+        "sha256": "85590dd58edf5445e18bc7193e5ebc01ac5841f1ae187e97705a662e90c6421e",
+        "needed": [
+          "libc.so.6"
+        ]
+      }
+    ],
+    "all_dt_needed_resolved": true,
+    "package_versions": "libc6:amd64\t2.41-12+deb13u3\nlibgcc-s1:amd64\t14.2.0-19\nlibstdc++6:amd64\t14.2.0-19\nzlib1g:amd64\t1:1.3.dfsg+really1.3.1-1+b1\n",
+    "glibc_version": "glibc 2.41",
+    "added_system_dependencies": false,
+    "full_observation": {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/closure-observation.json",
+      "bytes": 5138,
+      "sha256": "ef2b7afdf7d8552bc50fa7e0f933ce4894d099ab8cf184f5ab4113182ba5cccf"
+    }
+  },
+  "actual_version": "LLVM (http://llvm.org/):\n  LLVM version 14.0.6\n  Optimized build.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: znver3\n",
+  "probes": {
+    "version_actual_exit": 0,
+    "readelf_actual_exit": 0,
+    "ldd_actual_exit": 0,
+    "default_builtin_headers_actual_exit": 0,
+    "repository_required_profile_headers_actual_exit": 0,
+    "source": {
+      "path": "/dev/shm/nexus-clang14-required-20261018-r1/header_probe.c",
+      "resolved_path": "/dev/shm/nexus-clang14-required-20261018-r1/header_probe.c",
+      "bytes": 499,
+      "sha256": "530b8daf9ffbd0fd94f59a4a3724c2f2e166274749336217f5df84dd57b95f5f"
+    },
+    "quality_driver": {
+      "path": "/tmp/nexus-io-validation-20261018/scripts/ci/quality_tools.py",
+      "resolved_path": "/tmp/nexus-io-validation-20261018/scripts/ci/quality_tools.py",
+      "bytes": 29471,
+      "sha256": "41c0fe762aa8f9db1b93b39ea235e6ef7138e3586550943244e83d0de4eb5f55"
+    },
+    "checks": "-*,clang-analyzer-*,bugprone-*,cert-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-clang-analyzer-optin.performance.Padding,-bugprone-easily-swappable-parameters,-bugprone-macro-parentheses,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp",
+    "raw_receipts": "runs/<label>.command.json in the prefix; command inventory binds every exact argv/cwd/exit and original stdout/stderr path/bytes/SHA."
+  },
+  "original_command_inventory": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/command-inventory.json",
+    "bytes": 38555,
+    "sha256": "351d1f58606232adff140fc2a239692ca0a09db4653194e2dd9af170d01f05be"
+  },
+  "actual_completed_commands": 22,
+  "setup_failures": [
+    {
+      "label": "safe-stream-extraction-r1",
+      "actual_exit": 1,
+      "reason": "Preflight initially assumed historical9regular files meant9total ZIPentries. Actual14=9regular+5safe directories; rejected before payload writes. Original script/raw kept; r2 sameapprovedSHA safely extracted0. Not Clang behaviorRED."
+    }
+  ],
+  "metadata_history": "First verbose20,038-byte report draft was rejected by the16KiB guard before any persistent write. This compact report binds full raw observations/inventory in the owned temporary prefix; no original bytes moved/deleted or budget shifted.",
+  "scope": "Tool preparation only. No production TU/831-context gate run by preparer, source/index/policy/depslock change, system installation, shared-venv installation or oldcache/evidence deletion. OldTU real ClangRED then normal fresh831 fixed-profile complete gate remain required from io24_checker_review_r2. Temporary execshm tool/raw paths are not durable qualification.",
+  "guards": {
+    "time_ns": 1792310163971607582,
+    "label": "compact-tuple-before",
+    "allocated": 142848000,
+    "shm_free": 8767172608,
+    "tmp_free": 248958976,
+    "persistent_free": 69062656,
+    "memory_available": 2395447296,
+    "events": {
+      "low": "0",
+      "high": "0",
+      "max": "3388",
+      "oom": "0",
+      "oom_kill": "0",
+      "oom_group_kill": "0"
+    }
+  },
+  "caps": {
+    "all_new_temporary_bytes": 167772160,
+    "persistent_metadata_bytes": 16384,
+    "per_step_memory_headroom_bytes": 943718400
+  }
+}

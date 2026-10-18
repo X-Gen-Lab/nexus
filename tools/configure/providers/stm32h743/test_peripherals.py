@@ -123,7 +123,7 @@ class H743PeripheralCapabilityTests(unittest.TestCase):
                 self.assertEqual(stm32h743.mode_implementation(kind, mode), kind)
 
     def test_unimplemented_modes_are_not_inferred_from_chip_potential(self):
-        for kind, mode in (("spi", "dma"), ("pwm", "advanced"),
+        for kind, mode in (("spi", "dma-linked"), ("pwm", "advanced"),
                            ("exti", "debounce"), ("watchdog", "window")):
             with self.subTest(kind=kind):
                 with self.assertRaises(ConfigurationError):

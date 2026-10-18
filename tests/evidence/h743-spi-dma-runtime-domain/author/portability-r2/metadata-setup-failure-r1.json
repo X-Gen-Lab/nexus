@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/seal-controlled-r2.py"
+  ],
+  "actual_returncode": 1,
+  "classification": "metadata_script_parse_failure_before_body_not_test_RED",
+  "stderr": "SyntaxError: closing parenthesis ')' does not match opening parenthesis '['",
+  "preserved_original_script": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/seal-controlled-r2.py",
+  "correction": "Remove one unmatched parenthesis only; use distinct attempt2 script, original preserved.",
+  "source_or_test_change": false
+}

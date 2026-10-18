@@ -203,6 +203,8 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32h743/drivers/uart_fifo.c",
             "soc/stm32h743/drivers/uart_rtscts.c",
             "soc/stm32h743/drivers/spi.c",
+            "soc/stm32h743/drivers/spi_dma.c",
+            "soc/stm32h743/private/stm32h743_spi_dma.h",
             "soc/stm32h743/drivers/spi_wire.c",
             "soc/stm32h743/private/stm32h743_spi_wire.h",
             "soc/stm32h743/drivers/pwm.c",
@@ -232,6 +234,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32h743/power_boot.S",
             "soc/stm32h743/private/boot_registers.h",
             "boards/stm32h743_nucleo_zi2/board.json",
+            "boards/stm32h743zi_hsi_reference/board.json",
             "boards/stm32h743zi_rtscts_reference/board.json")),
     "stm32u575": FamilyDescriptor("stm32u575", (
         ("cmsis_core", "cmsis5"),

@@ -355,7 +355,26 @@ class CurrentWorkPackageTests(unittest.TestCase):
         models = [row for row in report["work_packages"] if row["family"] == "native"]
         physical = [row for row in report["work_packages"] if row["family"] != "native"]
         self.assertEqual(len(models), 19)
-        self.assertEqual(len(physical), 191)
+        self.assertEqual(len(physical), 192)
+        spi = [row for row in physical
+               if row["identity"] == "stm32h743.SPI4.dma"]
+        self.assertEqual(len(spi), 1)
+        selected = spi[0]
+        self.assertEqual((selected["family"], selected["controller"],
+                          selected["kind"], selected["mode"]),
+                         ("stm32h743", "SPI4", "spi", "dma"))
+        self.assertEqual(selected["provider_implementation"], "spi_dma")
+        sources = ["soc/stm32h743/drivers/spi_dma.c"]
+        self.assertEqual(selected["selected_ops_sources"], sources)
+        self.assertEqual(selected["sdk_required_sources"], sources)
+        self.assertEqual(selected["resolver_fixtures"], [
+            "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+            "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+            "tests/contracts/h743_assembly/spi-dma.toml",
+        ])
+        self.assertEqual(selected["implementation_status"], "source_selected")
+        self.assertEqual(selected["software_status"], "not_executed")
+        self.assertEqual(selected["hardware_status"], "not_executed")
         expected = {
             "identity", "family", "controller", "kind", "mode", "provider",
             "reviewed_routes", "declared_boards", "resolver_fixtures",

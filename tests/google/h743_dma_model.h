@@ -21,6 +21,7 @@ void nx_h743_dma_model_reset(void);
 void nx_h743_dma_model_write(volatile uint32_t* reg, uint32_t value);
 nx_arch_result_t nx_h743_dma_model_clean(uintptr_t address, size_t bytes);
 nx_arch_result_t nx_h743_dma_model_invalidate(uintptr_t address, size_t bytes);
+#define NX_H743_IRQ_ENABLED(irq) g_h743_model.irq_enabled[(irq)]
 #undef NX_H743_WRITE
 #define NX_H743_WRITE(reg, value) nx_h743_dma_model_write((reg), (value))
 #define NX_H743_DMA_CLEAN(address, bytes)                                      \

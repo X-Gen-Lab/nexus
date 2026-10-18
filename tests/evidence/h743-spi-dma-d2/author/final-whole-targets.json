@@ -1,0 +1,17 @@
+[
+  "nexus_h743_spi_dma_factory_test",
+  "nexus_h743_spi_dma_uart_tx_factory_test",
+  "nexus_h743_spi_dma_uart_rx_factory_test",
+  "nexus_h743_dma_test",
+  "nexus_h743_dma_factory_test",
+  "nexus_h743_receive_test",
+  "nexus_h743_receive_factory_test",
+  "nexus_h743_clock_test",
+  "nexus_h743_high_factory_test",
+  "nexus_h743_high_kernel_test",
+  "nexus_h743_peripheral_factory_test",
+  "nexus_h743_peripheral_test",
+  "nexus_h743_spi_dma_test",
+  "nexus_h743_spi_wire_test",
+  "nexus_h743_system_test"
+]

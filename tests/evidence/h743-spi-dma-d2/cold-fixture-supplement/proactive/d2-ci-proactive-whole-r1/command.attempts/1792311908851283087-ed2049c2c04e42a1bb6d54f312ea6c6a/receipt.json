@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "tools/testing/run_tool_tests.py",
+    "--suite",
+    "ci",
+    "--report",
+    "/dev/shm/nexus-d2-ci-proactive-whole-20261018-r1.json"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "stage": "d2-ci-proactive-whole-r1",
+  "started_ns": 1792311908851350569,
+  "finished_ns": 1792311927537350386,
+  "duration_seconds": 18.686000798999885,
+  "timeout_seconds": 600.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/d2-ci-proactive-whole-r1/command.attempts/1792311908851283087-ed2049c2c04e42a1bb6d54f312ea6c6a/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/d2-ci-proactive-whole-r1/command.attempts/1792311908851283087-ed2049c2c04e42a1bb6d54f312ea6c6a/stderr.txt",
+    "bytes": 560,
+    "sha256": "79e5933d64e47e4da74ca893c37da638367c418e05024b85c910713078325698"
+  }
+}

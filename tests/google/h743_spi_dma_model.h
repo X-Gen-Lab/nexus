@@ -28,6 +28,7 @@ typedef struct {
     unsigned resets;
     unsigned ordering_errors;
     unsigned gated_accesses;
+    unsigned reset_domain_accesses;
     unsigned reads;
     unsigned writes;
     unsigned maximum_irq_reads;
@@ -63,6 +64,7 @@ typedef struct {
 } nx_h743_spi_dma_model_t;
 extern nx_h743_spi_dma_model_t g_h743_spi_dma_model;
 void nx_h743_spi_dma_model_reset(void);
+void nx_h743_spi_dma_model_assert_reset(uint32_t mask);
 uint32_t nx_h743_spi_dma_model_read(volatile uint32_t* reg);
 void nx_h743_spi_dma_model_write(volatile uint32_t* reg, uint32_t value);
 uint8_t nx_h743_spi_dma_model_read8(volatile uint32_t* reg);

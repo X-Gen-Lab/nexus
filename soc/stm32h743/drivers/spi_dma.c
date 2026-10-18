@@ -109,10 +109,12 @@ static nx_result_t live(nx_stm32h743_spi_dma_state_t* s) {
     nx_stm32h743_system_t* system = &g_nx_stm32h743_system;
     if (system->rcc == NULL || system->timer == NULL || system->core == NULL)
         return NX_ERROR_STATE;
-    /* Gate reads precede all peripheral probes; the caller owns shared gates.
-     */
+    /* Reset and gate reads precede peripheral probes. DMA2 also resets the
+     * shared DMAMUX1, independently of the still-enabled DMA1 gate. */
     RCC_TypeDef* r = system->rcc;
-    if ((NX_H743_READ(&r->AHB1ENR) & RCC_AHB1ENR_DMA1EN) == 0U ||
+    if ((NX_H743_READ(&r->AHB1RSTR) &
+         (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0U ||
+        (NX_H743_READ(&r->AHB1ENR) & RCC_AHB1ENR_DMA1EN) == 0U ||
         (NX_H743_READ(&r->AHB4ENR) & RCC_AHB4ENR_GPIOEEN) == 0U ||
         (NX_H743_READ(&r->APB1LENR) & RCC_APB1LENR_TIM2EN) == 0U ||
         (NX_H743_READ(&system->core->CCR) & SCB_CCR_DC_Msk) != 0U ||
@@ -245,12 +247,14 @@ static bool protected(nx_stm32h743_spi_dma_state_t* s,
                    sizeof(nx_stm32h743_spi_dma_endpoint_ops));
 #undef ALIASES
 }
-/** \brief Gated IRQ observations cannot prove source withdrawal. */
+/** \brief Reset or gated IRQ observations cannot prove source withdrawal. */
 static bool irq_domain(nx_stm32h743_spi_dma_state_t* s) {
     nx_stm32h743_system_t* system = &g_nx_stm32h743_system;
     bool ready =
         system->started && system->rcc != NULL && system->core != NULL &&
         system->core_hz == 64000000U && system->timer_error == NX_SUCCESS &&
+        (NX_H743_READ(&system->rcc->AHB1RSTR) &
+         (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) == 0U &&
         (NX_H743_READ(&system->rcc->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0U &&
         (NX_H743_READ(&system->rcc->APB2ENR) & RCC_APB2ENR_SPI4EN) != 0U &&
         (NX_H743_READ(&system->core->CCR) & SCB_CCR_DC_Msk) == 0U;
@@ -297,33 +301,33 @@ static nx_result_t submit(void* raw, nx_spi_request_t* request, bool admitted) {
         return result;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     uint32_t divisor = 0U, baud = 0U;
-    if (!s->initialized || s->tainted || !e->wire.cs->initialized)
-        result = NX_ERROR_STATE;
-    else if (live(s) != NX_SUCCESS) {
-        result = NX_ERROR_STATE;
-        if (s->active != NULL) {
-            s->tainted = true;
-            draining(s, NX_ERROR_STATE);
-            quarantine(s);
-            for (unsigned n = 0U; n < 3U; ++n)
-                if ((s->irq_owned & (1U << n)) != 0U)
-                    isolate(s, n);
+    result = NX_ERROR_STATE;
+    if (s->initialized && !s->tainted && e->wire.cs->initialized) {
+        if (live(s) != NX_SUCCESS) {
+            if (s->active != NULL) {
+                s->tainted = true;
+                draining(s, NX_ERROR_STATE);
+                quarantine(s);
+                for (unsigned n = 0U; n < 3U; ++n)
+                    if ((s->irq_owned & (1U << n)) != 0U)
+                        isolate(s, n);
+            }
+        } else if (s->active != NULL || s->stage != IDLE ||
+                   s->wire.held_cs != NULL ||
+                   (NX_H743_READ(&s->rx->CR) & DMA_SxCR_EN) != 0U ||
+                   (NX_H743_READ(&s->tx->CR) & DMA_SxCR_EN) != 0U)
+            result = NX_ERROR_BUSY;
+        else if (nx_stm32h743_spi_wire_pins_ready() &&
+                 nx_stm32h743_spi_wire_cs_driven(e->wire.cs, e->wire.cs_mask) &&
+                 (NX_H743_READ(&e->wire.cs->registers->ODR) &
+                  e->wire.cs_mask) == e->wire.cs_mask) {
+            if (nx_deadline_expired(request->base.deadline, nx_time_now_us()))
+                result = NX_ERROR_TIMEOUT;
+            else
+                result = nx_stm32h743_spi_wire_divider(
+                    64000000U, e->wire.frequency_hz, &divisor, &baud);
         }
-    } else if (s->active != NULL || s->stage != IDLE ||
-               s->wire.held_cs != NULL ||
-               (NX_H743_READ(&s->rx->CR) & DMA_SxCR_EN) != 0U ||
-               (NX_H743_READ(&s->tx->CR) & DMA_SxCR_EN) != 0U)
-        result = NX_ERROR_BUSY;
-    else if (!nx_stm32h743_spi_wire_pins_ready() ||
-             !nx_stm32h743_spi_wire_cs_driven(e->wire.cs, e->wire.cs_mask) ||
-             (NX_H743_READ(&e->wire.cs->registers->ODR) & e->wire.cs_mask) !=
-                 e->wire.cs_mask)
-        result = NX_ERROR_STATE;
-    else if (nx_deadline_expired(request->base.deadline, nx_time_now_us()))
-        result = NX_ERROR_TIMEOUT;
-    else
-        result = nx_stm32h743_spi_wire_divider(64000000U, e->wire.frequency_hz,
-                                               &divisor, &baud);
+    }
     if (result == NX_SUCCESS)
         result = admitted
                      ? nx_request_transition(&request->base, NX_REQUEST_ACTIVE)
@@ -370,7 +374,8 @@ static nx_result_t cancel(void* raw, nx_spi_request_t* request) {
     nx_arch_irq_restore(guard);
     return result;
 }
-static bool configure_stream(nx_stm32h743_spi_dma_state_t* s, bool receive) {
+static bool configure_stream(nx_stm32h743_spi_dma_state_t* s,
+                             const nx_spi_request_t* request, bool receive) {
     DMA_Stream_TypeDef* stream = receive ? s->rx : s->tx;
     if ((NX_H743_READ(&stream->CR) & DMA_SxCR_EN) != 0U)
         return false;
@@ -381,11 +386,10 @@ static bool configure_stream(nx_stm32h743_spi_dma_state_t* s, bool receive) {
                            UINT32_MAX);
     bool storage =
         checked(&stream->M0AR,
-                NX_H743_SPI_DMA_ADDRESS(receive ? (const void*)s->active->rx
-                                                : (const void*)s->active->tx),
+                NX_H743_SPI_DMA_ADDRESS(receive ? (const void*)request->rx
+                                                : (const void*)request->tx),
                 UINT32_MAX);
-    bool count =
-        checked(&stream->NDTR, (uint32_t)s->active->length, UINT32_MAX);
+    bool count = checked(&stream->NDTR, (uint32_t)request->length, UINT32_MAX);
     bool fifo = checked(&stream->FCR, 0U, 0x87U);
     bool control =
         checked(&stream->CR,
@@ -419,6 +423,8 @@ static void service(void* raw) {
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     if (s->tainted || live(s) != NX_SUCCESS) {
         s->tainted = true;
+        if (s->terminal == NX_SUCCESS)
+            s->terminal = NX_ERROR_STATE;
         quarantine(s);
         for (unsigned n = 0U; n < 3U; ++n)
             if ((s->irq_owned & (1U << n)) != 0U)
@@ -426,9 +432,11 @@ static void service(void* raw) {
         nx_arch_irq_restore(guard);
         return;
     }
+    nx_spi_request_t* request = s->active;
+    const nx_stm32h743_spi_dma_endpoint_t* endpoint = s->endpoint;
     nx_time_us_t now = nx_time_now_us();
-    if (s->active != NULL && s->stage < STOP_RX &&
-        nx_deadline_expired(s->active->base.deadline, now))
+    if (request != NULL && s->stage < STOP_RX &&
+        nx_deadline_expired(request->base.deadline, now))
         draining(s, NX_ERROR_TIMEOUT);
     bool good = true;
     SPI_TypeDef* spi = s->wire.registers;
@@ -436,9 +444,11 @@ static void service(void* raw) {
         case IDLE:
             break;
         case CONFIG_SPI: {
+            if (request == NULL || endpoint == NULL)
+                break;
             uint32_t divisor = 0U, baud = 0U;
             good = nx_stm32h743_spi_wire_divider(64000000U,
-                                                 s->endpoint->wire.frequency_hz,
+                                                 endpoint->wire.frequency_hz,
                                                  &divisor, &baud) == NX_SUCCESS;
             good = checked(&spi->CFG1,
                            NX_STM32H743_SPI_BYTE_CONFIG |
@@ -449,23 +459,26 @@ static void service(void* raw) {
                            SPI_CFG2_MASTER | SPI_CFG2_SSM | SPI_CFG2_AFCNTR,
                            UINT32_MAX) &&
                    good;
-            good =
-                checked(&spi->CR2, (uint32_t)s->active->length, UINT32_MAX) &&
-                good;
+            good = checked(&spi->CR2, (uint32_t)request->length, UINT32_MAX) &&
+                   good;
             good = checked(&spi->CR1, SPI_CR1_SSI, UINT32_MAX) && good;
             if (good)
                 ++s->stage;
             break;
         }
         case CONFIG_RX:
-            good = configure_stream(s, true);
-            if (good)
-                ++s->stage;
+            if (request != NULL) {
+                good = configure_stream(s, request, true);
+                if (good)
+                    ++s->stage;
+            }
             break;
         case CONFIG_TX:
-            good = configure_stream(s, false);
-            if (good)
-                ++s->stage;
+            if (request != NULL) {
+                good = configure_stream(s, request, false);
+                if (good)
+                    ++s->stage;
+            }
             break;
         case START_IRQ:
             for (unsigned n = 0U; n < 3U; ++n) {
@@ -501,11 +514,13 @@ static void service(void* raw) {
                 ++s->stage;
             break;
         case START_SPE: {
+            if (endpoint == NULL)
+                break;
             good = nx_stm32h743_spi_wire_sck_alternate() == NX_SUCCESS;
             if (good) {
-                s->wire.held_cs = s->endpoint->wire.cs;
-                s->wire.held_cs_mask = s->endpoint->wire.cs_mask;
-                good = nx_gpio_port_write(s->endpoint->cs_face, 0U,
+                s->wire.held_cs = endpoint->wire.cs;
+                s->wire.held_cs_mask = endpoint->wire.cs_mask;
+                good = nx_gpio_port_write(endpoint->cs_face, 0U,
                                           s->wire.held_cs_mask) == NX_SUCCESS;
             }
             if (good)
@@ -643,7 +658,6 @@ static void service(void* raw) {
                 ++s->stage;
             break;
         case FINISH: {
-            nx_spi_request_t* request = s->active;
             nx_result_t result = s->terminal;
             size_t count =
                 request != NULL && result == NX_SUCCESS ? request->length : 0U;

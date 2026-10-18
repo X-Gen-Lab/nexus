@@ -1,0 +1,1176 @@
+{
+  "wheel_members": [
+    {
+      "path": "clang_tidy/__init__.py",
+      "bytes": 585,
+      "sha256": "818d9ea4ca563f751b560cc51d0848368541098099c67e943d2ffae97137c911",
+      "mode": 420,
+      "zip_crc32": "69a824bf"
+    },
+    {
+      "path": "clang_tidy/data/bin/clang-tidy",
+      "bytes": 89411744,
+      "sha256": "c3768c0ff3bbc60a6314289f9492077f7b825243f824a62634b82396ff088e4f",
+      "mode": 493,
+      "zip_crc32": "ca17a695"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/WHEEL",
+      "bytes": 217,
+      "sha256": "167c6f13bca2df46e75108e96e8e0687a4a6eab563979292eee89a0c14433fb1",
+      "mode": 420,
+      "zip_crc32": "4f86af90"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/COPYING.md",
+      "bytes": 899,
+      "sha256": "272ff22ee13e20e82c16b0d2c03bcefbc00800e3f09ae03bce52e2a367ddfaa1",
+      "mode": 420,
+      "zip_crc32": "d6239491"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/LICENSE.md",
+      "bytes": 10273,
+      "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+      "mode": 420,
+      "zip_crc32": "a8f69cea"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/RECORD",
+      "bytes": 782,
+      "sha256": "db98619d1dff2aa9e348875ad0e87696963fe4f2829823f7e0da44c394cb3827",
+      "mode": 420,
+      "zip_crc32": "8b53e4c6"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/entry_points.txt",
+      "bytes": 53,
+      "sha256": "54947e975c2a2c615193226e9065b4b15aa80c917a4065bdaed98891eec39e7d",
+      "mode": 420,
+      "zip_crc32": "a2ac6379"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/METADATA",
+      "bytes": 4533,
+      "sha256": "6cf1e3c697930653ee2760eb87573953f494390f59e93324505bb3e96d536648",
+      "mode": 420,
+      "zip_crc32": "d0b0af45"
+    },
+    {
+      "path": "clang_tidy-14.0.6.dist-info/top_level.txt",
+      "bytes": 11,
+      "sha256": "bf649d624bdc4b43ab311320d7d778dbe0d9b7a5c0c14d7590b511062b735e79",
+      "mode": 420,
+      "zip_crc32": "4f50fcd7"
+    }
+  ],
+  "resource_members": [
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_builtin_vars.h",
+      "bytes": 4892,
+      "sha256": "32d445ec643c5802efbd54d41e4e8bff952436586d992fc0f91258238cb6e115",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_cmath.h",
+      "bytes": 18493,
+      "sha256": "e44c1e33315864e0906e901d76257ed1c17c4ffc25cb944e4223248e59adb815",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_complex_builtins.h",
+      "bytes": 9581,
+      "sha256": "2030f2976a00a8894b1434d72c2108210a60b6726550c97e8f78c09445bccce9",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_device_functions.h",
+      "bytes": 58044,
+      "sha256": "8727b2ade382ad78728a4c3e3583b100782f46bd0adda3a129db17e3ccc08687",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_intrinsics.h",
+      "bytes": 23474,
+      "sha256": "b745a469f18e45b90ef865e1ac4eb85bfb103f40a9470de38e41fea43b96bebb",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_libdevice_declares.h",
+      "bytes": 22396,
+      "sha256": "31094b702f0843b6db1d86749dc43cfdc505a5d7358b5ad6bdc35a7e8ecbd2d3",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_math.h",
+      "bytes": 16366,
+      "sha256": "4dccae4b397bc1bcd7070a64c0490603536bf0e5d6790689fd5ef4edddc38cf2",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_math_forward_declares.h",
+      "bytes": 8469,
+      "sha256": "e8a11354786957de82d0887958cec963ee614d953dcbd1cfcee2376cda9fef64",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_runtime_wrapper.h",
+      "bytes": 18029,
+      "sha256": "c9caa8175918bfbcf82062730e900fb9b4aa699fe4271ef7abbd7e0fb5548c73",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_cuda_texture_intrinsics.h",
+      "bytes": 32576,
+      "sha256": "aebacbbe22a87b70608ad15fb88d2be5e8356b2b5e03f5589e2fcf515e1efcf8",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_hip_cmath.h",
+      "bytes": 26967,
+      "sha256": "b209edd7a6fce5f50ee425bef2d90c8fd3e22809c7caaf7845d9e1689d2431ec",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_hip_libdevice_declares.h",
+      "bytes": 20064,
+      "sha256": "95e7d5f1687514fa656188af9686485be4cf2103d335404f09a67f8504900aa9",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_hip_math.h",
+      "bytes": 32939,
+      "sha256": "4eff79c5880f95b97375f2e2830f46bfd8b47d540c501e9b72fd7fcf010dbe56",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__clang_hip_runtime_wrapper.h",
+      "bytes": 4020,
+      "sha256": "77397944873bfbf577e0102af1215ae5ad06c3dc43e6c42d34ce0e95def51a98",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__stddef_max_align_t.h",
+      "bytes": 857,
+      "sha256": "b38b5b55e82e831eb0895d9ad96c10e492c2165cab82e7b402e5fb2d1b5757ff",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__wmmintrin_aes.h",
+      "bytes": 5269,
+      "sha256": "c72344a1e5874d3af7049ecdccae91304cc5c2b619776947434e49904f5f03a1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/__wmmintrin_pclmul.h",
+      "bytes": 2060,
+      "sha256": "66059711dd3727e3faea6c1adbc095132d033e80625b614c6a7c1cfbff764829",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/adxintrin.h",
+      "bytes": 2378,
+      "sha256": "0248c049a99ce1f41f9dad222fd256937ec0c633579e6b150e03ed41b959dd46",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/altivec.h",
+      "bytes": 693839,
+      "sha256": "789e414448387d2cbd2123916a3a75148be22294ab5cee371229bf5c9667ed08",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ammintrin.h",
+      "bytes": 7723,
+      "sha256": "0f8570e296b827cf320d6ca93fd36f5d66e4a543843a3a2d70b088cdd8a60270",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/amxintrin.h",
+      "bytes": 20278,
+      "sha256": "38abaa8426670abd2f12addd4d475ca7709e918e55f46d91c6eaa88cdaf4f879",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm64intr.h",
+      "bytes": 993,
+      "sha256": "183845bfa6f0bae53748d5706568fe3d8830c5c720823152eacb107e7c234046",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_acle.h",
+      "bytes": 25101,
+      "sha256": "b7e3dbff31aaff13a4b90b882d5fbc93ea54178d9aa9dadaa62a72f01343c673",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_bf16.h",
+      "bytes": 548,
+      "sha256": "87f7bc1cb7aa53a85347bd4e1855cccd45599408bb106e66515519c1033a6a3d",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_cde.h",
+      "bytes": 33450,
+      "sha256": "486e75376c1cd42b4579d342fe776591520a50b1a8ae4b9ed005d7a895fdf490",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_cmse.h",
+      "bytes": 6357,
+      "sha256": "75b8a5a66726f8c4e8fc329b7b98b21977e2033ce2c95f362d624d0cc6d8a773",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_fp16.h",
+      "bytes": 17374,
+      "sha256": "a131b149df314ffddfa96b0376f0f89d713317f8a317c37088ee7ad25cd0e5df",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_mve.h",
+      "bytes": 1554929,
+      "sha256": "8e6fa1bb91c0e5403e6f6152380b4ff318833028b0d4e9c91911e4dd107bd762",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_neon.h",
+      "bytes": 2547903,
+      "sha256": "bc0e6a33aa70a86118afcae2a6e6cd8c36a193b6c1ede4a0acae693460dbd5ee",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/arm_sve.h",
+      "bytes": 1585739,
+      "sha256": "8ef0f410a0d9d999b4d2e1a75130a6529e2a647849093d216b080f6247e953b1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/armintr.h",
+      "bytes": 843,
+      "sha256": "6bc077ccfe4c9f230f37a1b7803ca1706850d288a18d505323a520eebab57311",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx2intrin.h",
+      "bytes": 39256,
+      "sha256": "517b9188dcac8ea60d8e74214e28aa57d7a6569acb2963a345d4e8ae56ca55a5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512bf16intrin.h",
+      "bytes": 10697,
+      "sha256": "be243418a7e1ae50e6b8a5e04ec3a274af8e6c742889eba4bca0a37904f5935e",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512bitalgintrin.h",
+      "bytes": 2466,
+      "sha256": "4cf4247cf89ece88e236778aa9fa149e7c01efcc11b132e728cb9d590220a9ff",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512bwintrin.h",
+      "bytes": 77075,
+      "sha256": "aba9e2dce5935ebdecb67683d99987dfc9e61657266a05e64fedb8215b37f7d5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512cdintrin.h",
+      "bytes": 4214,
+      "sha256": "39215eb1f52701128679459904e8f1bc884a091d5087f2f9b99c1f411105a30c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512dqintrin.h",
+      "bytes": 60163,
+      "sha256": "09e10a063b92865aabdfcb0ff3cb9fb95d8b5d425f1b37d3bd7b95c11c778bd0",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512erintrin.h",
+      "bytes": 12115,
+      "sha256": "93dbca3038b63ecad8b043cc6fdb1caf226b9c509e41b2876987a2aa1524540b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512fintrin.h",
+      "bytes": 391265,
+      "sha256": "0ce01c09d6e03c780c278f1fabde254be2ac736666950bb6a6fe2c34218dfdab",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512fp16intrin.h",
+      "bytes": 160576,
+      "sha256": "1b04496bc2046e3b0f93ad140274ff7a2f68a62f2162383f910ed801642b0f08",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512ifmaintrin.h",
+      "bytes": 2547,
+      "sha256": "8dcddd4041c61382b482f84edcfca3e9c8a1c2dea27d8f55c8d0edcad56b9196",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512ifmavlintrin.h",
+      "bytes": 4543,
+      "sha256": "853d09ad4f6244dda31121a23192ab2b784e4eb433766224196a2d6c9d5ed16b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512pfintrin.h",
+      "bytes": 4634,
+      "sha256": "72a3fcc690edd406b03815f4b0d6869095d5a4b48acb840a4f3a36a024f568d1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vbmi2intrin.h",
+      "bytes": 13485,
+      "sha256": "daa3a070fe341724b71b5ecfcb92b7619c27f3df53120d790a91d903c15a1188",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vbmiintrin.h",
+      "bytes": 3808,
+      "sha256": "3e0ac7257f76c7e9fbb0f7ff17e9a4ef3fb67a2b35e5ab4f557f161382e85886",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vbmivlintrin.h",
+      "bytes": 7107,
+      "sha256": "052e0dafeaa4f8b21d8987d43203c6e1e4ff26998b5c73dab75d8ad1a9346d04",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlbf16intrin.h",
+      "bytes": 20031,
+      "sha256": "c57e235b1cf69e1081d6de3e5ac209496f58f37348d9aa136753f35e99bcdf3c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlbitalgintrin.h",
+      "bytes": 4333,
+      "sha256": "f75e040aa83f3207c1e2e5dc74bfea5c2b460419837b9d23e03132d2bb10e2ad",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlbwintrin.h",
+      "bytes": 113156,
+      "sha256": "658a19f1ff2f8520ed5ff166a9c5946c5944f34942d0a873c653ddfc07063c6a",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlcdintrin.h",
+      "bytes": 7842,
+      "sha256": "7a594d1213fb4d4bd03afc97777635478eeefa9a4482ab66e028da0eeaa21546",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vldqintrin.h",
+      "bytes": 47527,
+      "sha256": "5de928fa70495242cc7c919d52f2b2752e3340b7fa76396a5983f2b9e93da2a6",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlfp16intrin.h",
+      "bytes": 87537,
+      "sha256": "74262bc7ff27a5b202974b2f34900044253d0979651aceec69b0e079bf5c6796",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlintrin.h",
+      "bytes": 330495,
+      "sha256": "083852480fceb056abf671ccb8af33f2a31918f8493f076387e0e2388d7c4983",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlvbmi2intrin.h",
+      "bytes": 26339,
+      "sha256": "531b952aff1d364027f36cba7e4fed472948d759b07b24a0441f1ff5f377ec4b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlvnniintrin.h",
+      "bytes": 13424,
+      "sha256": "662d553e83076618f1d9d5a9dd269456e936bb015d97a3f7b43609b19cbae928",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vlvp2intersectintrin.h",
+      "bytes": 4550,
+      "sha256": "d4fbb66dd2c96bc5d69c82feeb83593bf16bde3ad96080d482e0ac93c99618bd",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vnniintrin.h",
+      "bytes": 4316,
+      "sha256": "888e4841151e80a6bbd0489afb4ffa6f113138eaff5d0426429c7f5eb5a1feb2",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vp2intersectintrin.h",
+      "bytes": 2974,
+      "sha256": "fafa6d348c54be9c20184a059c56f845e2a0ce8437bfec2839fbae1d47ae6567",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vpopcntdqintrin.h",
+      "bytes": 2043,
+      "sha256": "b22579086ee72cb395bcfc465045731c88a58e4c1d89a06044c2361f7e396e2a",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avx512vpopcntdqvlintrin.h",
+      "bytes": 3390,
+      "sha256": "36700850c5e2d6b8b03b1b2305001547e0060fcb3fe713f35d49203245a7801d",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avxintrin.h",
+      "bytes": 198178,
+      "sha256": "6da4f1037cc117d3109393b90d121a22d96aa478b110a827836869a00e96c262",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/avxvnniintrin.h",
+      "bytes": 10674,
+      "sha256": "f51dc5ed1f31668bbbe18e5d3d72004ecf495dcb192c9be4849893e9e907b666",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/bmi2intrin.h",
+      "bytes": 2306,
+      "sha256": "d41471efae0a8c792df0237998ac2f67d4f0ea8ce17794631b06e6af5f474464",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/bmiintrin.h",
+      "bytes": 14353,
+      "sha256": "a2bf0aa6f86368e8b0e576c3b13c31adbeef11b09a26762da277f19a6db66e59",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/builtins.h",
+      "bytes": 741,
+      "sha256": "883d4b1d51b7e47e625c6203bb3aeb34df23d76ef343ae08e0a83c96e8fea11d",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cet.h",
+      "bytes": 1527,
+      "sha256": "23568727f480e5701af3f7371d38680952e33264d9f184843353b87f583a2a9a",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cetintrin.h",
+      "bytes": 3106,
+      "sha256": "0e32e8d26ed8a09edcff2af25c06224b55766d00357b4b3f0de14aa800dab382",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cldemoteintrin.h",
+      "bytes": 1207,
+      "sha256": "bc5d9530ed13a5fc22ddc26f72f695d225053462bf06783a95a3532e0fcebe0c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/clflushoptintrin.h",
+      "bytes": 861,
+      "sha256": "a644bb07c277d120eacb81acdeb1ae300fe53fe0e7f5c65bcf41632a1bfb0ba9",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/clwbintrin.h",
+      "bytes": 1229,
+      "sha256": "c014c43c1fc700e529fa5f0df8504af8c03bf21609ded625526ada7a1833ca08",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/clzerointrin.h",
+      "bytes": 1157,
+      "sha256": "c9fb936daa06fe83f074d2c9dfcd4e27ee0e072beabb228f00c9d2e7bd00b7b5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cpuid.h",
+      "bytes": 10877,
+      "sha256": "b96a01f8a2a413c32e97317900e1c38685b9dfe67e2df43d16404626dbe8d57e",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/crc32intrin.h",
+      "bytes": 3347,
+      "sha256": "0f73e381b39e4718f70159158faa3da510769bb16120ec23f35bdcff14d34cb1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cuda_wrappers/algorithm",
+      "bytes": 4612,
+      "sha256": "051d51f39814a419de6dd4bbd8c964a30fd6ff68a60f96158e0af7ee2ca12c6e",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cuda_wrappers/complex",
+      "bytes": 3618,
+      "sha256": "fd4be2fd14eb31ba883593b450f7587af2914c0faf76073fa8c8d4a507822a7c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/cuda_wrappers/new",
+      "bytes": 3665,
+      "sha256": "5a04f8a86e6b9018066ebfd85b7323c11ea9d17cae9923637246b6e46c850a73",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/emmintrin.h",
+      "bytes": 185279,
+      "sha256": "a665be275453aa0249afbe88f004ae3ebe50499447a46c18aa772d361a036113",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/enqcmdintrin.h",
+      "bytes": 2167,
+      "sha256": "024a79176d11b3646aa6d3648c61cead39086228178ed1138990bd861c0818f5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/f16cintrin.h",
+      "bytes": 5505,
+      "sha256": "374419abf5ca0b8f960c54c7a032c053f28256033beda32bc9650efbca9ffa9b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/float.h",
+      "bytes": 5306,
+      "sha256": "ca4059bf322ef6cbc7a87ee7fa06d4bdfe72ee0996c65ce765f9329281d42714",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/fma4intrin.h",
+      "bytes": 6986,
+      "sha256": "c605b5d80947d945b925ca0ed79adc98c190ddc2b4e82fcee284caffe5288361",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/fmaintrin.h",
+      "bytes": 6996,
+      "sha256": "fc6d0d5f3e22548c28903624797e6e059470fe3e6354aef595ca723f30e88b39",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/fxsrintrin.h",
+      "bytes": 2890,
+      "sha256": "892f1f63664e34c69497333eae7495f217db9ad0b4975d13c4967faec481ce04",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/gfniintrin.h",
+      "bytes": 7537,
+      "sha256": "a19d55f6000f1ee9c984c5e5c6d6a9de3383bfe00cf119f6b56dfc69265a16ca",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/hexagon_circ_brev_intrinsics.h",
+      "bytes": 15966,
+      "sha256": "a1e5a7d54a47697707d54edf31b6c3eef0c3593cff2a15bb9319238b08d54be7",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/hexagon_protos.h",
+      "bytes": 383410,
+      "sha256": "0b130e0b52feb7074551b2389648a0fdc790784bb875e4f21fe47c9b0899fc8b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/hexagon_types.h",
+      "bytes": 133459,
+      "sha256": "260b7090ef4ec87a49cc2908ffccff518e663304e430ca65604d0bf8a153d5aa",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/hresetintrin.h",
+      "bytes": 1393,
+      "sha256": "abe290f4198d18356cd012bde91a8a265f9e22d4d5e7bacb94add7f70d83c415",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/htmintrin.h",
+      "bytes": 6283,
+      "sha256": "8f422a3313386d8767bfb89955928e32687e5dbd0698c8451f52969b21ca4e2f",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/htmxlintrin.h",
+      "bytes": 9225,
+      "sha256": "d42ffa98cdceb028ed7497e5245711d5667540b70f865697ffa5a1d42155807a",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/hvx_hexagon_protos.h",
+      "bytes": 260359,
+      "sha256": "38f764f7484f660ff47258110a9e0917446ba61213d81f0ec8f5510d3140fae6",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ia32intrin.h",
+      "bytes": 12813,
+      "sha256": "8beb43407d1cea53462bbab7f8daacd263c0f1e5301b1236c23d490cdbc95866",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/immintrin.h",
+      "bytes": 19739,
+      "sha256": "d4121b71f93de25f0763b70abfebe9c6c7a43e2cf69d82746ca30869a3517ef5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/intrin.h",
+      "bytes": 29602,
+      "sha256": "b6b3528b132d6ad06b84799e5fe5c9f7b30896f003554ff2702ae7281f214b8d",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/inttypes.h",
+      "bytes": 2347,
+      "sha256": "373d60f9ca19cc62d885dd500c79516998833b399ad18547f28b00b6d4496114",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/invpcidintrin.h",
+      "bytes": 764,
+      "sha256": "70f32ed90521d7135aa2b96e6fef366e9793ad99caf6fb5e0ec188be1fa6b7ed",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/iso646.h",
+      "bytes": 656,
+      "sha256": "174b578786a20e17b3371283d05dc956ab7bfe87a9f092fd21370bb8430dfa05",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/keylockerintrin.h",
+      "bytes": 18387,
+      "sha256": "29a0a1423ee4caf64710240488d1ba2a8b1fe7292ee8ccd5be895aec74c592be",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/limits.h",
+      "bytes": 3533,
+      "sha256": "17014ed6f4ed72ac41981fce8a6bb9446cf74b0a2d0e67a150eb1c9e2bd239e8",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/lwpintrin.h",
+      "bytes": 5115,
+      "sha256": "485b84552e9163bd7362e6353d5b2a5a3bce9c45d385d0c3224ad1ec543e790c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/lzcntintrin.h",
+      "bytes": 3252,
+      "sha256": "1fffe056b3a6edbb765ae6e7d652610cc27841ef434241dd5b87a265f2063041",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/mm3dnow.h",
+      "bytes": 4608,
+      "sha256": "78298363b72430c100430018ca0f04309325960ed9921cb720bc8bec01dfe8b7",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/mm_malloc.h",
+      "bytes": 1851,
+      "sha256": "b9ef78daed70707484b4efe497c810413d90b6d1e48b51a3475252c76cb7ce7a",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/mmintrin.h",
+      "bytes": 57322,
+      "sha256": "f8c73b05f44507b207c8de8d858330567026375869b54dc053c4ecdc0c255082",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/module.modulemap",
+      "bytes": 3414,
+      "sha256": "5af4b05c0f5d521c6da2fdd21976c09a6edc04eb9d5e75cae19db91f48bed665",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/movdirintrin.h",
+      "bytes": 1612,
+      "sha256": "ae4691076535aefa2a2c465e13e3873d29e1dcf7a6d12faf5f631a54ae7c77f8",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/msa.h",
+      "bytes": 25615,
+      "sha256": "1283e2b1437a068ce0d0d287b541df50badb5ea1781d79c173db7a672c0e0d80",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/mwaitxintrin.h",
+      "bytes": 1095,
+      "sha256": "d7b56ad5a48440cd079a62691fb59c4a0c121721b69700467201f19c54770207",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/nmmintrin.h",
+      "bytes": 709,
+      "sha256": "cd7b51a1c33c7e7d710f070315e7bc034757ea6be9e6804864cf159c79f48d54",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/opencl-c-base.h",
+      "bytes": 30019,
+      "sha256": "7125be2fdcd839ba4b1810aaf4220c5377f66176eb98fc3c5ad4719ef0bfef6c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/opencl-c.h",
+      "bytes": 980563,
+      "sha256": "d7612c769726f9e27d555afebaf9f31a25df20ae127914963d72119b7f742f9a",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/__clang_openmp_device_functions.h",
+      "bytes": 2630,
+      "sha256": "31fe2fbe3783c81ec8831ba49340206a6d3198b9caa9c0f24218ff21817252d7",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/cmath",
+      "bytes": 5252,
+      "sha256": "052989456d879273582078395cd708e0dfed787d98cc715bca0c26f1eec0a15d",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/complex",
+      "bytes": 1802,
+      "sha256": "c1448d113395586b11c357506f9a8dc207acf5e464b446995ba3dae5ae16e8d8",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/complex.h",
+      "bytes": 898,
+      "sha256": "5e0c4bd3e1165deaf1c557fa7fb9959772d476204507a42205099febd2232152",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/complex_cmath.h",
+      "bytes": 12423,
+      "sha256": "397e350fe772f3b478a70c13cb9762596ad5dc3e950e289a4273721f1d09d3f1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/math.h",
+      "bytes": 2054,
+      "sha256": "74e192fa76f1648fc3081232fb4ebd6700ef92cde3a76ca4da30205ceea75277",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/openmp_wrappers/new",
+      "bytes": 1384,
+      "sha256": "ce2afbaeb8220e9e74997967f3921008d73bd50ff225a747cdce6b692bd8237b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/pconfigintrin.h",
+      "bytes": 1216,
+      "sha256": "c8090603fa18cca9af372a25de032695bc782e6480520a9da880907dc7f31679",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/pkuintrin.h",
+      "bytes": 934,
+      "sha256": "d103441f018b003a07117ad8ae662294cb59c9b457196d85d8ac4287f1c0d01b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/pmmintrin.h",
+      "bytes": 10466,
+      "sha256": "e38056bfb8920abe1135af56a866feed8820c32028ad8ead0a10b08ea2cb7bc6",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/popcntintrin.h",
+      "bytes": 1859,
+      "sha256": "365a73b4a5fea8527395067862c7837665569e72605d6d2b5f42b282c5813e93",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/emmintrin.h",
+      "bytes": 68152,
+      "sha256": "38c9a0d8cad2535d68e9c67fc5babea56db286650b98c522f8eb0c17b4105e66",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/mm_malloc.h",
+      "bytes": 1244,
+      "sha256": "aacb4ac133956d185cac903dd37cf98d9514186e1bb7263c5f8189cf18d0c715",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/mmintrin.h",
+      "bytes": 44037,
+      "sha256": "50d7130117c8431527e530877189459f54f65f324cd7ab786d123d6313a45ae5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/pmmintrin.h",
+      "bytes": 5304,
+      "sha256": "91b3a43ed0c4f626562e48fa0e2774aa2ce674776e13f363ad957892e774338c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/smmintrin.h",
+      "bytes": 3803,
+      "sha256": "94b3c9d011c708830d11ba4392a0d747583d519a69a5cfe78150d7a454e9e850",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/tmmintrin.h",
+      "bytes": 16213,
+      "sha256": "a44746cdbbed9fed82066c3a9aa17151d405d1d4d0db87eda46a5f9f3e840a48",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ppc_wrappers/xmmintrin.h",
+      "bytes": 60627,
+      "sha256": "0e5fcb2f83f82577f2052b55f368eaf651c53ebc29afbd66d550a69ad83ff2de",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/prfchwintrin.h",
+      "bytes": 2109,
+      "sha256": "b2ad360a08f5c1cbb809eba2a70a7808bb46e85f41659af116744afdf6b0719b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/profile/InstrProfData.inc",
+      "bytes": 34141,
+      "sha256": "20fbadd3da9f192c4d881a6f171033d4e45e2da71be67edef5f8ef13c1f96971",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/ptwriteintrin.h",
+      "bytes": 1076,
+      "sha256": "549e44eef926d5bb1333c87d32d977270649a8fd7c7161093db600e472d23039",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/rdseedintrin.h",
+      "bytes": 1189,
+      "sha256": "fb7aa4969a9ca50caece4ea9be95eefdd5dcf8ac3c9c4696861743cb9479ecab",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/riscv_vector.h",
+      "bytes": 8305354,
+      "sha256": "293fdff65e2fe73977b3185959a15a36b2ff6912f2ee7621fa63b1465bee075b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/rtmintrin.h",
+      "bytes": 1266,
+      "sha256": "a130ec303b55d026c87ed9551ed476c70dc47e82c31a7c9bd0acd4de7ba14662",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/s390intrin.h",
+      "bytes": 604,
+      "sha256": "2c8bfec677cd371893070d06f06e2ed9a6657c8e7d1dbafb2d8e3054dd8fe7c5",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/serializeintrin.h",
+      "bytes": 881,
+      "sha256": "dd29ae159d83161dd61d6bfcd6a7a37aa3f5930f814e8d12bf15ae131a0c6ac6",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/sgxintrin.h",
+      "bytes": 1816,
+      "sha256": "0e8dc78c7311b9dda1499587ac5eaa3e1c485b9c7df0fc54225b8425db5ae964",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/shaintrin.h",
+      "bytes": 1911,
+      "sha256": "5bfb66ca7e812946262fadeb6ec3c7050a3c8a913f56213ff705c5a4ef7cad16",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/smmintrin.h",
+      "bytes": 98555,
+      "sha256": "3b7594b0700f1eec947abdce937a4462d50b273f3379c69b63602e5aac7b9395",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stdalign.h",
+      "bytes": 583,
+      "sha256": "8b0ea0e92e3bde9dbd328d80064892a0d507fdc755cfddfa1a32a0d97ade02bc",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stdarg.h",
+      "bytes": 1115,
+      "sha256": "60ada523abc30f63724d197f7cb1010381af5222c87217b9fc36d506a8c75c2f",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stdatomic.h",
+      "bytes": 7986,
+      "sha256": "3708a91b3a1946d0b5f4261180290421e5865b8419ab4829bb0e7e72a2bf190c",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stdbool.h",
+      "bytes": 897,
+      "sha256": "e154b96ac8d4c87de843ec14fab496cbb0021bbb6c7265cab444d1de1f6f97ee",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stddef.h",
+      "bytes": 3589,
+      "sha256": "ce3e030f5445b76e3f53926e48f9b9359c2bd4696de12a98a5779b3c88a34948",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stdint.h",
+      "bytes": 29742,
+      "sha256": "fcef13274bbb7bc7996c24133212c0de35c79bc3372c779a3f1dbc2428b63ac3",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/stdnoreturn.h",
+      "bytes": 510,
+      "sha256": "9e2f80639ced7a91b2d32283bb8e7d740678aa50e07d600eb8450ef16d8786a2",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/tbmintrin.h",
+      "bytes": 3225,
+      "sha256": "1a6e123306b23b889bf7064170539ebf9446d76cb22f260cdca080cb35fe3ce1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/tgmath.h",
+      "bytes": 30389,
+      "sha256": "7aa69dc82ec404a51295498cc4cb07d0441e5dcd891819247c14ccb3f9745e3b",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/tmmintrin.h",
+      "bytes": 30217,
+      "sha256": "87893ce77440b461783573e4fd1e9b4d96aaa50c5ba12e27c22ce62cf4b1c323",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/tsxldtrkintrin.h",
+      "bytes": 2015,
+      "sha256": "c833bd7383b431a0b1bf65c864deef445a25fb7db2c924b4b83272957f2ceb51",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/uintrintrin.h",
+      "bytes": 5071,
+      "sha256": "8f7d78333cdf75a2fe5d16ed312616888fe88b994291511ee903c540a7aba1e0",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/unwind.h",
+      "bytes": 11225,
+      "sha256": "a6d46cedd37729c582f6d023417e0a8e30b8b054494400221a1cf0807e67fd30",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/vadefs.h",
+      "bytes": 1420,
+      "sha256": "e338a8bbdbc40a9662d76a0a395313cf17a9541a0fadf3cf8bfa6ee6fa3db4ec",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/vaesintrin.h",
+      "bytes": 2516,
+      "sha256": "9253f942a6a9a83ab653cb46495c97081702834f812071b9e20d0408fa402968",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/varargs.h",
+      "bytes": 477,
+      "sha256": "5b76a3f4536cb24d2448f34442c92dfca8cb437fe1438054a8f9be1819f5089f",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/vecintrin.h",
+      "bytes": 369479,
+      "sha256": "c088ca3a1889389bb15f817b28fc0a6586113080bcab7d21276118156bdcd024",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/vpclmulqdqintrin.h",
+      "bytes": 1086,
+      "sha256": "db240ad56ccfc14a7e29862b50c1214b1be5666cccecde1401d28afe075a606f",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/waitpkgintrin.h",
+      "bytes": 1357,
+      "sha256": "8b036e6a2c20dca74fbc38b898dc32a36dc46bdb4c0a5a71d691096ca04f6ca3",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/wasm_simd128.h",
+      "bytes": 73167,
+      "sha256": "56255e6b58005ab9f7e17f14ebc55fd2d62c9d157b6a606b86d48f1ea96928c1",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/wbnoinvdintrin.h",
+      "bytes": 749,
+      "sha256": "e22b8221209e1aeed8de50e81c6bfe84b378a8b92bdf018aea601bf1d3c4ac22",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/wmmintrin.h",
+      "bytes": 659,
+      "sha256": "eb4f03593063aa1c27cc306474814e3c3caeb6644379415e1104d299288a3231",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/x86gprintrin.h",
+      "bytes": 1296,
+      "sha256": "74544cea441ca883adb9c9e1dcc153839061db4889da3f1f5a47e912594d35d9",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/x86intrin.h",
+      "bytes": 1713,
+      "sha256": "95a534a9d5ad22e3c9fd6716318df906b7595cf3b9d5603eb80428989031ecf6",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xmmintrin.h",
+      "bytes": 108928,
+      "sha256": "ad4db2043c2d995df3a63d6ae449820a395dfd605240515fa802ebaa5c63f406",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xopintrin.h",
+      "bytes": 20434,
+      "sha256": "dea8859bff1b74ad2ec860136168e907907dcbf793aab0bb8c0e6e8984db10ac",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xray/xray_interface.h",
+      "bytes": 5225,
+      "sha256": "83d85011c9d936caad5bfef7d1fe234828482ecfd3a941f24509e553a1475c36",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xray/xray_log_interface.h",
+      "bytes": 15991,
+      "sha256": "3efcbcfea596d61511f4e68ddb1932db502edb4a008e0f26d2cf4e7c15154711",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xray/xray_records.h",
+      "bytes": 3941,
+      "sha256": "2baf8d0f8097eee53eb5740196e0d33f0be75f8249ac32e2ca1fb2aa37c456db",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xsavecintrin.h",
+      "bytes": 1010,
+      "sha256": "a029ecaf4048c4e743be464267dd5c4e24bce1733930fad455c104b6671d10af",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xsaveintrin.h",
+      "bytes": 1678,
+      "sha256": "bb5b08b5b929d0a34b88230c7f5633071a05d17f0680332a30c4e1b607c3c164",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xsaveoptintrin.h",
+      "bytes": 1026,
+      "sha256": "3dee1885dff4d101804c273d87f98cdf37a5e0975d936a3683ffbe1d10ffda7e",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xsavesintrin.h",
+      "bytes": 1268,
+      "sha256": "cf3692a69c4c96e0b4c0d291c6aa09cba851dff1d82f8b266d08fee7bdeaa5ea",
+      "mode": 420
+    },
+    {
+      "path": "usr/lib/llvm-14/lib/clang/14.0.6/include/xtestintrin.h",
+      "bytes": 873,
+      "sha256": "05e7c974641109d1214f9016c3939787e2912e6990fd20bf5886fcca4c40e699",
+      "mode": 420
+    },
+    {
+      "path": "usr/share/doc/libclang-common-14-dev/NEWS.Debian.gz",
+      "bytes": 265,
+      "sha256": "2ddb3e4a25a0df4972609ad5b83faa95f14500388591e096ca9ff4d7965ca3b3",
+      "mode": 420
+    },
+    {
+      "path": "usr/share/doc/libclang-common-14-dev/changelog.Debian.gz",
+      "bytes": 26335,
+      "sha256": "14fad9f3c94b6b2683078dc96f798f9cdbebbe8390ed27132405ed85e692f69f",
+      "mode": 420
+    },
+    {
+      "path": "usr/share/doc/libclang-common-14-dev/copyright",
+      "bytes": 6897,
+      "sha256": "dc2a171c75ca72818f7f4312602f27cb0e4bf6d010a86e7073a3797cb228ddff",
+      "mode": 420
+    },
+    {
+      "path": "usr/include/clang/14/include",
+      "link": "../../../lib/llvm-14/lib/clang/14.0.6/include"
+    },
+    {
+      "path": "usr/include/clang/14.0.6/include",
+      "link": "../../../lib/llvm-14/lib/clang/14.0.6/include"
+    },
+    {
+      "path": "usr/lib/clang/14/include",
+      "link": "../../llvm-14/lib/clang/14.0.6/include"
+    },
+    {
+      "path": "usr/lib/clang/14/lib",
+      "link": "../../llvm-14/lib/clang/14.0.6/lib"
+    },
+    {
+      "path": "usr/lib/clang/14.0.6/include",
+      "link": "../../llvm-14/lib/clang/14.0.6/include"
+    },
+    {
+      "path": "usr/lib/clang/14.0.6/lib",
+      "link": "../../llvm-14/lib/clang/14.0.6/lib"
+    }
+  ],
+  "resource_dir": "/dev/shm/nexus-clang14-required-20261018-r1/resources/usr/lib/llvm-14/lib/clang/14.0.6",
+  "default_resource_link": "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/lib/clang/14.0.6",
+  "resource_link_target": "../../../../../resources/usr/lib/llvm-14/lib/clang/14.0.6",
+  "metadata_requires_dist": [],
+  "guard": {
+    "time_ns": 1792309909485991639,
+    "label": "resource-safe-extract-after",
+    "allocated": 142491648,
+    "shm_free": 8779993088,
+    "tmp_free": 248958976,
+    "persistent_free": 69177344,
+    "memory_available": 2381803520,
+    "events": {
+      "low": "0",
+      "high": "0",
+      "max": "3388",
+      "oom": "0",
+      "oom_kill": "0",
+      "oom_group_kill": "0"
+    }
+  }
+}

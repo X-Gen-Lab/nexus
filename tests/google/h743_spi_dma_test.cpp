@@ -38,6 +38,27 @@ struct ChildTrace {
     volatile unsigned service_reads;
     volatile unsigned service_writes;
 };
+struct ResetTrace {
+    volatile bool observed;
+    volatile bool model_valid;
+    volatile bool borrowed;
+    volatile bool retained;
+    volatile bool tainted;
+    volatile bool isolated;
+    volatile bool foreign_preserved;
+    volatile unsigned state;
+    volatile unsigned final_state;
+    volatile unsigned result;
+    volatile unsigned second_state;
+    volatile unsigned terminal;
+    volatile unsigned stop_result;
+    volatile unsigned reset_accesses;
+    volatile unsigned reset_bits;
+    volatile unsigned irq_reads;
+    volatile unsigned irq_writes;
+    volatile unsigned service_reads;
+    volatile unsigned service_writes;
+};
 static testing::MockFunction<void()>* s_enable_observer;
 static ChildTrace* s_child;
 static nx_stm32h743_spi_dma_state_t* s_child_owner;
@@ -334,6 +355,163 @@ class H743SpiDma : public testing::Test {
             EXPECT_TRUE(WIFSIGNALED(status));
         }
         trace->~ChildTrace();
+        EXPECT_EQ(0, munmap(trace, 4096U));
+    }
+    void ResetChild(uint32_t reset_mask, unsigned scenario, int irq = 0) {
+        auto* trace = static_cast<ResetTrace*>(
+            mmap(nullptr, 4096U, PROT_READ | PROT_WRITE,
+                 MAP_SHARED | MAP_ANONYMOUS, -1, 0));
+        ASSERT_NE(MAP_FAILED, trace);
+        new (trace) ResetTrace{};
+        pid_t pid = fork();
+        ASSERT_GE(pid, 0);
+        if (pid == 0) {
+            auto& m = g_h743_spi_dma_model;
+            /* Independently check that DMA2 reset leaves DMA1 alive, but
+             * resets its shared request mux. A DMA1 reset restores both. */
+            m.streams[2].NDTR = 7U;
+            m.mux[2].CCR = 45U;
+            nx_h743_spi_dma_model_assert_reset(RCC_AHB1RSTR_DMA2RST);
+            bool model_valid =
+                nx_h743_spi_dma_model_read(&m.streams[2].NDTR) == 7U &&
+                nx_h743_spi_dma_model_read(&m.mux[2].CCR) == 0U;
+            nx_h743_spi_dma_model_write(&m.streams[2].NDTR, 8U);
+            nx_h743_spi_dma_model_write(&m.mux[2].CCR, 99U);
+            model_valid =
+                model_valid && m.streams[2].NDTR == 8U && m.mux[2].CCR == 0U;
+            nx_h743_spi_dma_model_assert_reset(RCC_AHB1RSTR_DMA1RST);
+            model_valid = model_valid && m.streams[2].NDTR == 0U &&
+                          m.streams[2].FCR == 0x21U;
+            g_h743_model.rcc.AHB1RSTR = 0U;
+            trace->model_valid = model_valid;
+            if (nx_stm32h743_spi_dma_initialize(owner) != NX_SUCCESS ||
+                nx_spi_request_prepare(request, tx->data(), rx->data(), 8U,
+                                       2000000U) != NX_SUCCESS)
+                _exit(10);
+            nx_spi_request_t second{};
+            nx_request_initialize(&second.base);
+            if (scenario != 0U) {
+                if (nx_spi_endpoint_submit(endpoint, request) != NX_SUCCESS)
+                    _exit(11);
+                Launch();
+                if (m.starts != 1U || owner->active != request || m.rx_pending)
+                    _exit(12);
+            }
+            if (scenario == 5U &&
+                nx_spi_port_cancel(port, request) != NX_SUCCESS)
+                _exit(13);
+            if (irq == 13 || irq == 14)
+                nx_h743_spi_dma_model_error(irq == 13);
+            if (irq == 84)
+                m.spi.SR |= SPI_SR_OVR;
+            g_h743_model.irq_enabled[12] = true;
+            g_h743_model.irq_pending[12] = true;
+            nx_h743_spi_dma_model_assert_reset(reset_mask);
+            m.reset_domain_accesses = 0U;
+            if (scenario == 0U) {
+                trace->result = static_cast<unsigned>(
+                    nx_spi_endpoint_submit(endpoint, request));
+            } else if (scenario == 4U) {
+                if (nx_spi_request_prepare(&second, tx->data(), rx->data(), 1U,
+                                           2000000U) != NX_SUCCESS)
+                    _exit(14);
+                trace->result = static_cast<unsigned>(
+                    nx_spi_endpoint_submit(endpoint, &second));
+                trace->second_state =
+                    static_cast<unsigned>(nx_request_state(&second.base));
+            } else if (irq != 0) {
+                g_h743_model.irq_active[irq] = true;
+                m.exception = static_cast<unsigned>(irq + 16);
+                unsigned reads = m.reads, writes = m.writes;
+                if (irq == 84)
+                    nx_stm32h743_spi_dma_wire_irq(owner);
+                else
+                    nx_stm32h743_spi_dma_irq(owner, irq == 13);
+                trace->irq_reads = m.reads - reads;
+                trace->irq_writes = m.writes - writes;
+                m.exception = 0U;
+                g_h743_model.irq_active[irq] = false;
+            } else {
+                Service();
+            }
+            trace->state =
+                static_cast<unsigned>(nx_request_state(&request->base));
+            trace->reset_bits = g_h743_model.rcc.AHB1RSTR;
+            trace->reset_accesses = m.reset_domain_accesses;
+            trace->isolated = !g_h743_model.irq_enabled[13] &&
+                              !g_h743_model.irq_enabled[14] &&
+                              !g_h743_model.irq_enabled[84];
+            g_h743_model.rcc.AHB1RSTR &= ~reset_mask;
+            if (scenario != 0U) {
+                for (unsigned n = 0U; n < 12U; ++n)
+                    Service();
+                (void)nx_spi_port_cancel(port, request);
+                trace->stop_result =
+                    static_cast<unsigned>(nx_spi_port_stop(port));
+            }
+            trace->borrowed = owner->active == request;
+            trace->retained = owner->retained;
+            trace->tainted = owner->tainted;
+            trace->final_state =
+                static_cast<unsigned>(nx_request_state(&request->base));
+            trace->terminal = static_cast<unsigned>(owner->terminal);
+            trace->foreign_preserved =
+                g_h743_model.irq_enabled[12] && g_h743_model.irq_pending[12];
+            trace->service_reads = max_service_reads;
+            trace->service_writes = max_service_writes;
+            __atomic_store_n(&trace->observed, true, __ATOMIC_RELEASE);
+            for (;;)
+                pause();
+        }
+        int status = 0;
+        bool exited = false;
+        for (unsigned n = 0U;
+             n < 300U && !__atomic_load_n(&trace->observed, __ATOMIC_ACQUIRE);
+             ++n) {
+            if (waitpid(pid, &status, WNOHANG) == pid) {
+                exited = true;
+                break;
+            }
+            usleep(1000U);
+        }
+        EXPECT_FALSE(exited) << status;
+        EXPECT_TRUE(trace->observed);
+        EXPECT_TRUE(trace->model_valid);
+        EXPECT_EQ(reset_mask, trace->reset_bits);
+        EXPECT_EQ(0U, trace->reset_accesses);
+        EXPECT_TRUE(trace->foreign_preserved);
+        EXPECT_TRUE(trace->retained);
+        if (scenario == 0U) {
+            EXPECT_EQ(static_cast<unsigned>(NX_ERROR_STATE), trace->result);
+            EXPECT_FALSE(trace->borrowed);
+            EXPECT_EQ(static_cast<unsigned>(NX_REQUEST_READY), trace->state);
+        } else {
+            EXPECT_TRUE(trace->borrowed);
+            EXPECT_TRUE(trace->tainted);
+            EXPECT_TRUE(trace->isolated);
+            EXPECT_EQ(static_cast<unsigned>(NX_REQUEST_QUARANTINED),
+                      trace->state);
+            EXPECT_EQ(trace->state, trace->final_state);
+            EXPECT_EQ(static_cast<unsigned>(scenario == 5U ? NX_ERROR_CANCELLED
+                                                           : NX_ERROR_STATE),
+                      trace->terminal);
+            EXPECT_EQ(static_cast<unsigned>(NX_ERROR_BUSY), trace->stop_result);
+        }
+        if (scenario == 4U) {
+            EXPECT_EQ(static_cast<unsigned>(NX_ERROR_STATE), trace->result);
+            EXPECT_EQ(static_cast<unsigned>(NX_REQUEST_READY),
+                      trace->second_state);
+        }
+        EXPECT_LE(trace->irq_reads, 16U);
+        EXPECT_LE(trace->irq_writes, 8U);
+        EXPECT_LE(trace->service_reads, 64U);
+        EXPECT_LE(trace->service_writes, 16U);
+        if (!exited) {
+            EXPECT_EQ(0, kill(pid, SIGKILL));
+            EXPECT_EQ(pid, waitpid(pid, &status, 0));
+            EXPECT_TRUE(WIFSIGNALED(status));
+        }
+        trace->~ResetTrace();
         EXPECT_EQ(0, munmap(trace, 4096U));
     }
     void TearDown() override {
@@ -951,4 +1129,35 @@ TEST_F(H743SpiDma, ExternalTransferErrorWaitsForPendingMemoryCommit) {
     Pump();
     EXPECT_EQ(1U, g_h743_spi_dma_model.memory_commits);
     Settled(NX_ERROR_IO, 0U);
+}
+TEST_F(H743SpiDma, ResetBeforeSubmissionRejectsWithoutBorrow) {
+    for (uint32_t mask : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                          static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)})
+        ResetChild(mask, 0U);
+}
+TEST_F(H743SpiDma, ObservedResetDuringServiceRemainsTaintedAfterRestoration) {
+    for (uint32_t mask : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                          static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)})
+        ResetChild(mask, 1U);
+}
+TEST_F(H743SpiDma, OwnedDmaIrqsRejectResetDomainBeforeSourceProbes) {
+    for (uint32_t mask : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                          static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)})
+        for (int irq : {13, 14})
+            ResetChild(mask, 2U, irq);
+}
+TEST_F(H743SpiDma, OwnedWireIrqRejectsObservedDmaResetDomain) {
+    for (uint32_t mask : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                          static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)})
+        ResetChild(mask, 3U, 84);
+}
+TEST_F(H743SpiDma, SecondSubmitLatchesResetWithoutBorrowingSecondRequest) {
+    for (uint32_t mask : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                          static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)})
+        ResetChild(mask, 4U);
+}
+TEST_F(H743SpiDma, ObservedResetPreservesEarlierCancellationCause) {
+    for (uint32_t mask : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
+                          static_cast<uint32_t>(RCC_AHB1RSTR_DMA2RST)})
+        ResetChild(mask, 5U);
 }

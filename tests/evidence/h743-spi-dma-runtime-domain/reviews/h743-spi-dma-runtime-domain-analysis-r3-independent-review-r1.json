@@ -1,0 +1,438 @@
+{
+  "schema_version": 1,
+  "kind": "independent_read_only_spi_dma_required_clang_r3_review",
+  "reviewed_at": "2026-10-18T08:21:21.099Z",
+  "status": "PASS",
+  "open_blockers": [],
+  "scope": "One-production-source R3 refactor composed with reviewed R1 reset containment, R2 model-width correction and byte-identical complete 53-case program. Read-only source/existing evidence review; no tests, analyzers, builds, provider or ELF execution.",
+  "reviewer_role": "Reviewer previously prepared the separately authorized Clang14 tuple; R3 source and executions were authored by a different agent. Tool preparation is not provider qualification.",
+  "packet": {
+    "manifest": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/manifest-r3.json",
+      "bytes": 5750,
+      "sha256": "3f26aa8a711c3c2c0f31939b01f6f7654833626d268a24ab52ce72de485b7e7f"
+    },
+    "delivery": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/delivery-result-r3.json",
+      "bytes": 7102,
+      "sha256": "a9fb378dc5aed164e803649b1891050a553f5ef38fe4a23278fa2b57ff77797c"
+    },
+    "transport": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/transport-increment-r3.json",
+      "bytes": 5309,
+      "sha256": "5a7adc0dab352e816f5bcba19aa16ef7020a3206e83a2515a4200e36c1b06545"
+    },
+    "before_driver": {
+      "bytes": 32063,
+      "sha256": "81ce62f3c95843ab2751c2057d4ed164c52933701460e5a9a5788538d9cb8db4"
+    },
+    "after_driver": {
+      "bytes": 32424,
+      "sha256": "51a0f80f4719dc301ee7c30d30e7abfe586fa437af6d5b1a7c4944885bf317bb"
+    },
+    "exact_diff": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/source-from-r2.diff.raw",
+      "bytes": 7522,
+      "sha256": "5de6f046198086af717a32c63b4bcdcb2710f54228ba5d36b7865f3f1bc8fe44"
+    },
+    "composed_sources": [
+      {
+        "path": "soc/stm32h743/drivers/spi_dma.c",
+        "bytes": 32424,
+        "sha256": "51a0f80f4719dc301ee7c30d30e7abfe586fa437af6d5b1a7c4944885bf317bb"
+      },
+      {
+        "path": "tests/google/h743_spi_dma_test.cpp",
+        "bytes": 47180,
+        "sha256": "3877b23e6de8d31c858248c6905d36278e4cc79c99c658e2181e7b59e6d0e0c9"
+      },
+      {
+        "path": "tests/google/h743_spi_dma_model.cpp",
+        "bytes": 15459,
+        "sha256": "9f2e79c4b6ad03d67ba4e2078252b7f9d4239dbfd6e6b30e2aead3a409988ee4"
+      },
+      {
+        "path": "tests/google/h743_spi_dma_model.h",
+        "bytes": 4391,
+        "sha256": "b4b242f899e015a33581e94880df55e84d483f05ca53e14963f0f4a206ea8bed"
+      }
+    ]
+  },
+  "prior_reviews": [
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-runtime-domain-independent-review-r1.json",
+      "bytes": 13626,
+      "sha256": "5a863288195b65fa5d8382fe144f9a8cca3f2301bf4f4651f36cc73c75e6faf5",
+      "status": "PASS",
+      "scope": "R1 reset containment"
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-runtime-domain-portability-r2-independent-review-r1.json",
+      "bytes": 16483,
+      "sha256": "165a82d4c8d33645aafeaea3c1cd3fc56393fe6a0b657c75580867ddcadc7be1",
+      "status": "PASS",
+      "scope": "R2 model uint32_t correction"
+    }
+  ],
+  "semantic_review": [
+    {
+      "area": "submit short-circuit/MMIO order",
+      "lines": "303-343",
+      "finding": "Default STATE with positive initialized/non-tainted/CS-initialized nesting preserves the former negative rejection chain. live() still precedes active/stage/held-CS and RX/TX EN probes; pins readiness, CS drive and ODR remain ordered before deadline and divider. Negated OR to positive AND preserves short-circuit observations. Busy/error precedence, active-domain failure taint/draining/quarantine/isolation and request admission order remain unchanged."
+    },
+    {
+      "area": "borrowed snapshot and programming",
+      "lines": "377-401,423-481,516-538",
+      "finding": "request and endpoint are captured once under the existing saved IRQ guard after domain checking. Only CONFIG_SPI, CONFIG_RX/TX and START_SPE locally require their nonnull request/endpoint. configure_stream receives that proved request. For valid lifecycles, PAR/M0AR/NDTR/FCR/CR/DMAMUX writes, masks, readbacks, barriers and stage increments retain exact order/values. No owner, ABI, state layout, enum or ops table is added."
+    },
+    {
+      "area": "cold NULL rollback",
+      "lines": "569-677,690-706",
+      "finding": "No blanket active==NULL return was added. All STOP_RX through FINISH cleanup remains valid for a retained partial initialize with NULL request/endpoint. The unchanged PartialInitializeRetainsRetryResponsibility case and its stop-only TearDown exercise this, passing in both complete fresh runs."
+    },
+    {
+      "area": "withdrawal and first cause",
+      "lines": "153-188,423-434,569-659",
+      "finding": "The first-terminal-cause latch, sticky reset/cache-domain containment, owned IRQ isolation, RX disable then TX disable then SPI stop/quiet/drain/disable/detach/address clear/IRQ clean/CS release/SCK handoff/reset sequence remain unchanged outside the exact refactor hunks. No synthetic fault, taint, IRQ, successful recovery or hidden release policy was added."
+    },
+    {
+      "area": "SETTLED final access",
+      "lines": "660-688",
+      "finding": "FINISH derives count from the borrowed request, clears owner active/endpoint and wire activity, then performs final nx_request_settle. No later request dereference occurs. The post-switch drain test uses current s->active rather than the stale local snapshot. The unchanged SettledRequestAndBuffersAreNeverTouchedAgain test protects request/TX/RX pages before later service/IRQ/model calls and passes in both runs."
+    },
+    {
+      "area": "invariant limits",
+      "lines": "446-481,516-518",
+      "finding": "Nonnull gates only admit local request-dependent active-phase work. Missing private references do not invent a terminal cause, stage advance, settlement, cleanup success, release or fault policy. Old analyzer assumptions did not prove a valid public-lifecycle crash; R3 expresses the existing invariant without making private corruption a supported public operation."
+    },
+    {
+      "area": "assertion preservation",
+      "finding": "All three other source files match the reviewed R2 tuple byte-for-byte; all 53 case identities/order and the full test source hash remain unchanged. No test assertion, warning flag, sanitizer flag, model protocol or scope was weakened. All original R1 21 and R2 10 manifest leaves remain exact."
+    }
+  ],
+  "evidence_classification": {
+    "original_TU": "Actual completed exit1 with the approved real Linux Clang14 binary and fresh actual DB context: one branch-clone plus three core.NullDereference errors. Diagnostic RED, not tool setup failure or demonstrated public API crash. Local old source is R1/R2 driver81ce62..., distinct from historical remote pre-R1 drivered920....",
+    "final_whole": "Unmodified maintained quality_tools.py tidy completed exit0 in795.435652943s. All831 owned contexts from the actual1658-entry DB have exact matching one-row captured projections, invocations and exit0. No filter, new ignore, debt/baseline update or analyzer policy/scope removal.",
+    "runtime": "Fresh complete same53 Debug and ASAN/UBSAN programs each actual0; zero failures/errors/skips/disabled. XML mtimes lie within actual execution windows, and case identity equals R2. All seven ASAN target compilation rows retain address,undefined sanitizers, Werror and Wconversion; sanitizer CMake flag remains ON. Matching ELF bytes contain ASAN/UBSAN symbol names.",
+    "history": "R1 runtime RED and R2 compile RED stay separate immutable evidence; their old passes are not substituted for R3. Exact r2 ASAN ELF and four old complete DB/cache snapshots were independently rehashed at retained paths before accepting build-path reuse.",
+    "style": "Actual complete four-source strict style exit0; source hashes match composed tuple; zero errors and zero legacy format/comment bypass."
+  },
+  "verified_evidence": {
+    "manifest_leaves": 11,
+    "composed_four_own_sources_exact": true,
+    "source_only_r3_delta": true,
+    "source_before_sha256": "81ce62f3c95843ab2751c2057d4ed164c52933701460e5a9a5788538d9cb8db4",
+    "source_after_sha256": "51a0f80f4719dc301ee7c30d30e7abfe586fa437af6d5b1a7c4944885bf317bb",
+    "own_head": "6d235058ca8bf3d26cd7cf2c48ecf15f21c2c119",
+    "index": {
+      "path": "/tmp/nexus-io36-native-20261018/.git/index",
+      "bytes": 3572109,
+      "sha256": "eeaba96786bdc159febb0347c1081f8ef891be3558dc7a99d575b4d771305d38",
+      "mode": 384
+    },
+    "transport_targets": 13,
+    "transport_source_count": 1,
+    "archives": {
+      "actual-r3-execution-evidence.tar.gz": {
+        "identity": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/actual-r3-execution-evidence.tar.gz",
+          "bytes": 43104,
+          "sha256": "4f96c161c6d2ff29c89cd3387b77d7e8d1173d6f35f40d75aa88d0c3c9e5b0d4",
+          "mode": 384
+        },
+        "payload_members": 65,
+        "map_members": 1,
+        "total_members": 66,
+        "expanded_member_bytes": 1000991,
+        "full_gzip_tar_stream_bytes": 1116160,
+        "member_SHA_size_mode_paths_pass": true
+      },
+      "captured-actual-clang-contexts.tar.gz": {
+        "identity": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/captured-actual-clang-contexts.tar.gz",
+          "bytes": 182266,
+          "sha256": "c12a8c64cdb196649317a84b2d6617ff346600bc20f3fdca6b138a75a7415aba",
+          "mode": 384
+        },
+        "payload_members": 833,
+        "map_members": 1,
+        "total_members": 834,
+        "expanded_member_bytes": 5660066,
+        "full_gzip_tar_stream_bytes": 7157760,
+        "member_SHA_size_mode_paths_pass": true
+      }
+    },
+    "receipts": [
+      {
+        "stage": "asan-whole53-r3",
+        "exit_code": 0,
+        "duration_seconds": 0.4665371579976636,
+        "started_ns": 1792310372927623000,
+        "finished_ns": 1792310373394159400,
+        "command": [
+          "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build/bin/nexus_h743_spi_dma_test",
+          "--gtest_output=xml:/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/asan-r3.xml"
+        ],
+        "receipt_sha256": "dbcca8a4019fbae9c4dd22d5e992ba0d7af3a980f04d7d44b1bd1596c0ae4080"
+      },
+      {
+        "stage": "build-asan-r3",
+        "exit_code": 0,
+        "duration_seconds": 1.1711416720027046,
+        "started_ns": 1792310348938110000,
+        "finished_ns": 1792310350109251000,
+        "command": [
+          "cmake",
+          "--build",
+          "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build",
+          "--target",
+          "nexus_h743_spi_dma_test",
+          "--parallel",
+          "1"
+        ],
+        "receipt_sha256": "012d3c01d952b96fc4dc6459eaf2d7466555fd74caba70c2b773949d2c88fd9a"
+      },
+      {
+        "stage": "build-debug-r3",
+        "exit_code": 0,
+        "duration_seconds": 0.6686494690002291,
+        "started_ns": 1792310332678077700,
+        "finished_ns": 1792310333346726000,
+        "command": [
+          "cmake",
+          "--build",
+          "/tmp/nexus-io36-native-20261018/build/native-debug",
+          "--target",
+          "nexus_h743_spi_dma_test",
+          "--parallel",
+          "1"
+        ],
+        "receipt_sha256": "87f0f4938e3452e5e7f6d0c801b1378abf9acbc011b12cf00f38ecb4f70669ad"
+      },
+      {
+        "stage": "configure-r3-baseline",
+        "exit_code": 0,
+        "duration_seconds": 17.20512410200172,
+        "started_ns": 1792310203134036000,
+        "finished_ns": 1792310220339159600,
+        "command": [
+          "cmake",
+          "--preset",
+          "native-debug"
+        ],
+        "receipt_sha256": "091aa7f9688ca484473e64d1d3f9b0e99b5f1abd9e74b5404485c2d2be8514da"
+      },
+      {
+        "stage": "debug-whole53-r3",
+        "exit_code": 0,
+        "duration_seconds": 0.21543234700220637,
+        "started_ns": 1792310348414194000,
+        "finished_ns": 1792310348629625300,
+        "command": [
+          "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_h743_spi_dma_test",
+          "--gtest_output=xml:/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/debug-r3.xml"
+        ],
+        "receipt_sha256": "f9708cf64a2909a87847ae32b8d5625a5bdc8512103142cd5033fd2d4636ca85"
+      },
+      {
+        "stage": "format-production-r3",
+        "exit_code": 0,
+        "duration_seconds": 0.06457616699844948,
+        "started_ns": 1792310332421215500,
+        "finished_ns": 1792310332485791000,
+        "command": [
+          "/workspace/nexus-build-system-20261012/.venv/bin/clang-format",
+          "-i",
+          "soc/stm32h743/drivers/spi_dma.c"
+        ],
+        "receipt_sha256": "67106a5f11f5e3fe8aa22c6dc9a5d8c01dfc4a0f61777dbcd624453defbabdcb"
+      },
+      {
+        "stage": "required-clang-original-TU-r3",
+        "exit_code": 1,
+        "duration_seconds": 3.3262922629983223,
+        "started_ns": 1792310232470614300,
+        "finished_ns": 1792310235796905700,
+        "command": [
+          "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy",
+          "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c",
+          "-p",
+          "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/actual-tu-context",
+          "--checks=-*,clang-analyzer-*,bugprone-*,cert-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-clang-analyzer-optin.performance.Padding,-bugprone-easily-swappable-parameters,-bugprone-macro-parentheses,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp",
+          "--warnings-as-errors=*",
+          "--header-filter=/tmp/nexus-io36-native-20261018/(core|io|os|components|arch|boards|soc|tools)/.*"
+        ],
+        "receipt_sha256": "5f272b1e36a2736b9dd41bd25be56f58ae06294a9300b8c6906abfe6f5409faa"
+      },
+      {
+        "stage": "required-clang-whole831-r3",
+        "exit_code": 0,
+        "duration_seconds": 795.4356529430006,
+        "started_ns": 1792310373695384800,
+        "finished_ns": 1792311169131036700,
+        "command": [
+          "/workspace/nexus-build-system-20261012/.venv/bin/python",
+          "scripts/ci/quality_tools.py",
+          "tidy",
+          "--build-dir",
+          "build/native-debug",
+          "--tool",
+          "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy",
+          "--report",
+          "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/required-clang-whole831.txt"
+        ],
+        "receipt_sha256": "d8a4f93c03dabcbf6c9d8390e3c3247dad18e24cddebf4b49eb4bd4061d809c6"
+      },
+      {
+        "stage": "strict-style-four-r3",
+        "exit_code": 0,
+        "duration_seconds": 1.3704138889988826,
+        "started_ns": 1792310506954687700,
+        "finished_ns": 1792310508325100800,
+        "command": [
+          "/workspace/nexus-build-system-20261012/.venv/bin/python",
+          "scripts/ci/style_gate.py",
+          "soc/stm32h743/drivers/spi_dma.c",
+          "tests/google/h743_spi_dma_test.cpp",
+          "tests/google/h743_spi_dma_model.cpp",
+          "tests/google/h743_spi_dma_model.h",
+          "--report",
+          "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/strict-style-four-r3.json"
+        ],
+        "receipt_sha256": "a7d4687998e92399323b5b26e280fe827c0fdce26d4c300c0db64e83469daa78"
+      }
+    ],
+    "diagnostics": [
+      "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c:305:9: error: repeated branch in conditional chain [bugprone-branch-clone,-warnings-as-errors]",
+      "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c:388:64: error: Access to field 'rx' results in a dereference of a null pointer (loaded from field 'active') [clang-analyzer-core.NullDereference,-warnings-as-errors]",
+      "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c:389:64: error: Access to field 'tx' results in a dereference of a null pointer (loaded from field 'active') [clang-analyzer-core.NullDereference,-warnings-as-errors]",
+      "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c:459:46: error: Access to field 'length' results in a dereference of a null pointer (loaded from field 'active') [clang-analyzer-core.NullDereference,-warnings-as-errors]"
+    ],
+    "actual_compile_DB_rows": 1658,
+    "owned_contexts": 831,
+    "per_context_DBs": 831,
+    "invocations": 831,
+    "exit0": 831,
+    "runtime": [
+      {
+        "profile": "debug",
+        "tests": 53,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "case_identity_sha256": "872bdba37c56253b1e6e649366a3c401bd0a5cbb1435ba256cf24cc1e0dda4c4",
+        "xml_sha256": "08f40e21f3db27686c905a3ddc5bf6a7fe8ca3f5b3adf31c68a5ee9d37742b5c",
+        "elf": {
+          "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/debug-matching-r3.elf",
+          "bytes": 2928856,
+          "sha256": "6905a5b5644287117ffe16da6cc50184472b5eacec2c39c737898c681372a80a",
+          "mode": 448
+        }
+      },
+      {
+        "profile": "asan",
+        "tests": 53,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "disabled": 0,
+        "case_identity_sha256": "872bdba37c56253b1e6e649366a3c401bd0a5cbb1435ba256cf24cc1e0dda4c4",
+        "xml_sha256": "1c054eee8cd2727e2bba47ee177c7bafc5f31150ca1735239d237fa7e2970393",
+        "elf": {
+          "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/asan-matching-r3.elf",
+          "bytes": 5780304,
+          "sha256": "a0d25e253198846c1b784f375ee98d9556f0fe227ae1dd7c01d2c81b65194b22",
+          "mode": 448
+        }
+      }
+    ],
+    "whole_required_report_sha256": "63bafa431b6c9c49750da35f1ab1aa12cb9bb013b54329078a81b705a5e7cf2c",
+    "quality_driver": {
+      "path": "/tmp/nexus-io36-native-20261018/scripts/ci/quality_tools.py",
+      "bytes": 29471,
+      "sha256": "41c0fe762aa8f9db1b93b39ea235e6ef7138e3586550943244e83d0de4eb5f55",
+      "mode": 384
+    },
+    "retained_r2_asan": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/retained-r2-asan.elf",
+      "bytes": 5781136,
+      "sha256": "8d984815945d0018ef53273488d05f20e9ca3f407c547f5c7c3057b45d952431",
+      "mode": 448
+    },
+    "resource_max_sampled_memory": 15069827072,
+    "resource_min_before_headroom": 2143301632,
+    "resources_records": 9,
+    "style_four_pass": true,
+    "r2_cache_DB_snapshots_exact": true,
+    "raw_payload_original_TMP_matches": 65,
+    "captured_DB_limit": "Normal quality_tools cleans original per-invocation temporary DB paths. All 833 captured payload DB files match the embedded map; all 831 projections/master/full actual source DB and exact reported invocations were independently compared. No claim that cleaned original per-context paths still exist."
+  },
+  "additional_bindings": {
+    "actual_source_DB": {
+      "archive_member": "captured-actual-clang-contexts.tar.gz!actual-source-compile_commands.json",
+      "bytes": 2699635,
+      "sha256": "7ac213708914d4b5d01ae874bb17e39b9adc43ad3c61135a941f0f509251064f",
+      "current_own_DB_exact": true
+    },
+    "tool": {
+      "manifest": "/workspace/nexus-io-recovery-20261018/validation/clang14-required-tool-preparation-r1.json",
+      "bytes": 11331,
+      "sha256": "5b2e4fa0ef5ad051f0329b629b4faed781b38849da0eab454cfd2f97c75b4fcf",
+      "binary_sha256": "c3768c0ff3bbc60a6314289f9492077f7b825243f824a62634b82396ff088e4f",
+      "actual_version": "LLVM14.0.6",
+      "current_binary_manifest_hashes_verified": true
+    },
+    "retained_r2": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/analysis-r3/r2-retention-and-before-r1.json",
+      "bytes": 5372,
+      "sha256": "c4e0279f614ae9e9d4278e0e041603bb978681f8c109154ca690590dcb018bd6"
+    },
+    "fresh_XML_mtimes": {
+      "debug_ns": 1792310348597308200,
+      "asan_ns": 1792310373345328000,
+      "each_within_actual_run": true
+    },
+    "ASAN_target_rows": 7,
+    "index_before_after": "eeaba96786bdc159febb0347c1081f8ef891be3558dc7a99d575b4d771305d38"
+  },
+  "CI_identity_boundary": {
+    "prior_audit": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/ci-required-clang-failure-audit-6d235058-r1.json",
+      "bytes": 11001,
+      "sha256": "6103ad91e1357ae932a2435c2db82d7c97827da169eccdc1941391d9dfae2b32"
+    },
+    "requested_head": "6d235058ca8bf3d26cd7cf2c48ecf15f21c2c119",
+    "actual_PR_merge_checkout": "583494cf1b763a8615ec438f1feb19f05700eec9",
+    "observed_tree": "a5f4c3b9f9a75f0574c09e9be822e1b79b2b4e55",
+    "author_base": "6d235058ca8bf3d26cd7cf2c48ecf15f21c2c119",
+    "limitation": "Historical audit reports equal PR-merge/head trees, not exact-head checkout. R3 executes only the separate dirty author base plus four-source overlay. Its actual Linux binary SHA differs from historical Ubuntu CI binary despite same14.0.6 series. No new remote or Main success claim."
+  },
+  "transport_review": {
+    "targets": 13,
+    "sources": 1,
+    "all_bytes_hashes_exact": true,
+    "unique_canonical_casefold_targets": true,
+    "historical_source_suffixes": "Raw before/authored source transport copies end .raw. All evidence targets remain under tests/evidence/, and only canonical final driver is active source. Whole archives were read/CRC-checked without extraction into maintained selection or rewriting.",
+    "count_precision": "65 raw payloads plus1map =66 tar members;833 DB payloads (master+831projections+actual full source DB) plus1map =834 members."
+  },
+  "review_actions": {
+    "tests": 0,
+    "analyzers": 0,
+    "builds": 0,
+    "provider_or_ELF_execution": 0,
+    "git_commands": 0,
+    "network": 0,
+    "source_index_Main_authorroot_mutation": 0,
+    "tool_prefix_mutation": 0,
+    "feature_mutation": 0,
+    "persistent_write": "This new global validation report only.",
+    "metadata_history": "An initial orchestrator structuredClone reference failed before any shell command, file write or report construction. Corrected JSON-only clone used for this report; no evidence or source altered."
+  },
+  "limits": [
+    "No ARM compile/link/execution, installed SDK consumer, hardware/reset-abort, HIL, WCET, cache-on or alternate SPI/DMA binding qualification.",
+    "Compile DB/context observations and current matching ELF bytes are bounded evidence, not a complete immutable dependency/toolchain closure.",
+    "Temporary matching tool/ELF/raw paths are not durable candidate qualification. Fresh complete normal Main hooks remain required after Root integration.",
+    "Concurrent separate D2/append/Main batch outcomes are outside this narrow R3 review; no unseen source/map is pre-approved."
+  ]
+}

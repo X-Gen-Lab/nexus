@@ -1250,7 +1250,13 @@
         "--fixture",
         "{root}/tests/contracts/h743_assembly/rx32-freertos.toml",
         "--fixture",
-        "{root}/tests/contracts/h743_assembly/rx32.toml"
+        "{root}/tests/contracts/h743_assembly/rx32.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/spi-dma.toml"
       ],
       "timeout_s": 7200
     },

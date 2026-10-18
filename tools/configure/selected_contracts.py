@@ -234,6 +234,9 @@ def _format(item, provider, shape):
     policy = "none"
     if dma:
         policy = "domain_cache_line" if line else "provider_domain"
+    if item.provider == "stm32h743" and kind == "spi" and item.mode == "dma":
+        # This exact provider admits cache-off only; physical CPU line stays32.
+        line, policy = 0, "provider_domain"
     return dict(fields=fields, abort_scope=abort, continuity=continuity,
                 timestamp_source=source, dma_policy=policy,
                 cache_line_bytes=line)
@@ -376,6 +379,15 @@ def silicon_policy(result, item=None):
     Ordinary profiles have no completed rule through this projection. Returning
     None never authorizes an unknown revision or executes a hardware check.
     """
+    if (item is not None and item in result.controllers and
+            item.provider == "stm32h743" and item.kind == "spi" and
+            item.mode == "dma"):
+        if (result.backend != "baremetal" or
+                result["clock_profile"] != "hsi64-fixed-cache-off"):
+            fail("Selected SPI DMA silicon expectation requires its exact profile")
+        return SiliconPolicy(result["part"], result.soc_family,
+                             "spi4-dma-hsi64-cacheoff-dev450-v2003-trim64",
+                             (0x2003,), "selected_spi_dma_mode")
     if item is not None:
         if item not in result.controllers or item.kind != "adc_group":
             fail("Selected silicon profile belongs to no ADC group owner")

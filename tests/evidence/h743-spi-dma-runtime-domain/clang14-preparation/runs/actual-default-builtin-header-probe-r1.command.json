@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "command": [
+    "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy",
+    "--checks=-*,clang-analyzer-*",
+    "--warnings-as-errors=*",
+    "/dev/shm/nexus-clang14-required-20261018-r1/header_probe.c",
+    "--",
+    "-std=c11",
+    "-H"
+  ],
+  "cwd": "/dev/shm/nexus-clang14-required-20261018-r1",
+  "stage": "actual-default-builtin-header-probe-r1",
+  "started_ns": 1792309973609962967,
+  "finished_ns": 1792309973625947051,
+  "duration_seconds": 0.015985245001502335,
+  "timeout_seconds": 300.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/runs/actual-default-builtin-header-probe-r1.attempts/1792309973609923768-719134eb73d445f3abd09b70d36ddf2d/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/runs/actual-default-builtin-header-probe-r1.attempts/1792309973609923768-719134eb73d445f3abd09b70d36ddf2d/stderr.txt",
+    "bytes": 1917,
+    "sha256": "b9532ea8bf85213c98aefda866175d07e43332a175acea0fd97ff73ae540fa54"
+  },
+  "attempt_receipt": "/dev/shm/nexus-clang14-required-20261018-r1/runs/actual-default-builtin-header-probe-r1.attempts/1792309973609923768-719134eb73d445f3abd09b70d36ddf2d/receipt.json"
+}

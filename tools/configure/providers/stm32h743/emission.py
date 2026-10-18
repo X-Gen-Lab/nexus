@@ -26,8 +26,12 @@ def includes(result):
     if any(item.kind == "uart" and item.mode == "irq-fifo-rtscts-bytes"
            for item in result.controllers):
         source.append('#include "stm32h743_uart_rtscts.h"')
-    if _dma(result):
+    if any(item.kind == "uart" and item.mode in ("dma-tx", "rx-dma-idle")
+           for item in result.controllers):
         source.append('#include "stm32h743_dma.h"')
+    if any(item.kind == "spi" and item.mode == "dma"
+           for item in result.controllers):
+        source.append('#include "stm32h743_spi_dma.h"')
     if any(item.kind == "uart" and item.mode == "rx-dma-idle"
            for item in result.controllers):
         source.append('#include "stm32h743_uart_receive.h"')
@@ -75,8 +79,28 @@ def _uart(result):
 
 
 def _dma(result):
-    return any(item.kind == "uart" and item.mode in ("dma-tx", "rx-dma-idle")
+    return any((item.kind == "uart" and item.mode in ("dma-tx", "rx-dma-idle")) or
+               (item.kind == "spi" and item.mode == "dma")
                for item in result.controllers)
+
+
+def dma_admission_conditions(result, *, spi_only=False):
+    """Project already validated lanes; never infer another physical owner."""
+    conditions = []
+    for lane in result.dma_topology.lanes:
+        if spi_only and lane.controller != "SPI4":
+            continue
+        stream = f"DMA1_Stream{lane.lane}"
+        conditions += [f"NX_H743_READ(&{stream}->CR) != 0u",
+                       f"NX_H743_READ(&DMAMUX1_Channel{lane.lane}->CCR) != 0u",
+                       f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane.lane}_IRQn)"]
+        if lane.controller == "SPI4":
+            for field in ("NDTR", "PAR", "M0AR", "M1AR"):
+                conditions.append(f"NX_H743_READ(&{stream}->{field}) != 0u")
+            mask = 0x003d0000 if lane.lane == 2 else 0x0f400000
+            conditions += [f"(NX_H743_READ(&{stream}->FCR) & 0x87u) != 1u",
+                           f"(NX_H743_READ(&DMA1->LISR) & {mask}u) != 0u"]
+    return conditions
 
 
 def _extra_gates(result):
@@ -199,14 +223,11 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
     if _uart(result):
         source += ['    s_nx_uart_clocks_added = ~NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_USART3EN;']
     if _dma(result):
-        lane = 1 if any(item.kind == "uart" and item.mode == "rx-dma-idle"
-                        for item in result.controllers) else 0
         source += ['    s_nx_dma_clocks_added = ~NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN;',
                    '    NX_H743_WRITE(&RCC->AHB1ENR, NX_H743_READ(&RCC->AHB1ENR) | RCC_AHB1ENR_DMA1EN);',
                    '    nx_arch_dsb();',
                    '    const bool dma_clock_ready = (NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u;',
-                   f'    if (!dma_clock_ready || NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u ||',
-                   f'        NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u || !NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)) {{',
+                   '    if (!dma_clock_ready || (NX_H743_READ(&RCC->AHB1RSTR) & (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0u || ' + ' || '.join(dma_admission_conditions(result)) + ') {',
                    '        result.primary = dma_clock_ready ? NX_ERROR_BUSY : NX_ERROR_IO;',
                    f'        result.cleanup = {cleanup};',
                    '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',

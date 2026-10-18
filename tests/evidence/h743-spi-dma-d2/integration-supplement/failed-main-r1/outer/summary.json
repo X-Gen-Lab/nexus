@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "command": [
+    "git",
+    "-c",
+    "gc.auto=0",
+    "-c",
+    "maintenance.auto=false",
+    "commit",
+    "-m",
+    "feat(io): assemble finite H743 SPI DMA endpoints"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "returncode": 1,
+  "receipt": "/workspace/nexus-io-recovery-20261018/validation/commands/h743-spi-dma-d2-full-commit-r1/command.attempts/1792310226835096747-c713ee1076284b87a043b01625f48610/receipt.json",
+  "source_unchanged": true,
+  "qualification": "actual command only; inspect scope and reports"
+}

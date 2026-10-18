@@ -1,0 +1,76 @@
+{
+  "kind": "readonly_r3_required_clang_refactor_plan",
+  "source_token": "pending Root approval; no source/configuration/test/analyzer/install execution performed",
+  "source_root": "/tmp/nexus-io36-native-20261018",
+  "paths": [
+    "soc/stm32h743/drivers/spi_dma.c",
+    "tests/google/h743_spi_dma_test.cpp"
+  ],
+  "frozen_outside_window": [
+    "tests/google/h743_spi_dma_model.cpp at9f2e79c4b6ad03d67ba4e2078252b7f9d4239dbfd6e6b30e2aead3a409988ee4",
+    "tests/google/h743_spi_dma_model.h",
+    "private/public provider state, ops/ABI, CMake, quality_tools and required profile"
+  ],
+  "audit": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/ci-required-clang-failure-audit-6d235058-r1.json",
+    "bytes": 11001,
+    "sha256": "6103ad91e1357ae932a2435c2db82d7c97827da169eccdc1941391d9dfae2b32"
+  },
+  "actual_trace": {
+    "path": "/dev/shm/nexus-ci-clang-failure-audit-6d235058-r1/failed-context-830-original.txt",
+    "bytes": 35705,
+    "sha256": "9e8d587c2da41db049f6a166302ccf018c7d100741d517cb6b7b49845680ba17"
+  },
+  "observed_DB": {
+    "identity": {
+      "path": "/tmp/nexus-io36-native-20261018/build/native-debug/compile_commands.json",
+      "bytes": 2699635,
+      "sha256": "7ac213708914d4b5d01ae874bb17e39b9adc43ad3c61135a941f0f509251064f"
+    },
+    "selected_contexts": 831,
+    "last_context": {
+      "directory": "/tmp/nexus-io36-native-20261018/build/native-debug",
+      "file": "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c",
+      "command": "/usr/bin/cc -DSTM32H743xx -I/tmp/nexus-io36-native-20261018/soc/stm32h743/private -I/tmp/nexus-io36-native-20261018/build/native-debug/generated -I/tmp/nexus-io36-native-20261018/io/include -I/tmp/nexus-io36-native-20261018/core/include -I/tmp/nexus-io36-native-20261018/arch/include -isystem /tmp/nexus-io36-native-20261018/vendors/st/cmsis_device_h7/Include -isystem /tmp/nexus-io36-native-20261018/vendors/arm/CMSIS_5/CMSIS/Core/Include -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -include/tmp/nexus-io36-native-20261018/tests/google/h743_spi_dma_model.h -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -o tests/contracts/google/CMakeFiles/nexus_h743_spi_dma_test.dir/__/__/soc/stm32h743/drivers/spi_dma.c.o -c /tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c",
+      "output": "tests/contracts/google/CMakeFiles/nexus_h743_spi_dma_test.dir/__/__/soc/stm32h743/drivers/spi_dma.c.o"
+    },
+    "scope": "real maintained quality_tools.commands authority; this read is not a new configure or analyzer execution"
+  },
+  "tools": {
+    "probed_names": {
+      "clang-tidy-14": null,
+      "clang-tidy": null
+    },
+    "version": null,
+    "availability": "No executable found at current PATH or explicit /usr/bin and own/.venv/shared venv candidates. Root delegated controlled existing-tool/cache discovery to style owner; no installation in this plan.",
+    "required": "clang-tidy14 actual version/path/identity must be recorded before a local analyzer pass; missing tool is a blocker, not GREEN"
+  },
+  "finding_scope": "CI one branch-clone and three null-flow diagnostics are real required-gate failures. Trace assumes active=NULL independently of CONFIG phase. No valid public API crash was demonstrated; no private fault/taint/isolation strategy is authorized by this round.",
+  "refactor": [
+    "Submit: result defaults to STATE. Nest init/non-taint/CS-initialized, live-domain handling, busy test, pin/CS electrical readiness, deadline and divider without duplicate STATE assignment branches. Preserve exact old short-circuit MMIO order and existing live-failure containment. No early pin/SPI access or merged observation that changes ordering.",
+    "Service: capture nx_spi_request_t* request and endpoint pointer once under the existing saved IRQ state. Only CONFIG and active-start work require their explicit nonnull preconditions. For valid public lifecycles these are snapshots of the same already borrowed objects; do not reread mutable owner.active inside configure_stream.",
+    "configure_stream receives the proved request snapshot and reads its rx/tx/length. CONFIG_SPI uses the same request length and endpoint frequency; START_SPE uses proved endpoint CS face/mask. Keep the exact peripheral writes, readbacks, barriers and stage increments.",
+    "A local nonnull phase gate only admits active-phase work; it does not create new taint, reason, IRQ/fatal, stage advance, settlement, ownership release or successful recovery for impossible private states. No added private-state-corruption test is represented as a normal API. If eliminating diagnostics requires a new invalid-invariant fallback policy rather than this valid-lifecycle proof, stop and obtain an explicit contract/oracle authorization.",
+    "STOP_RX through FINISH remain valid with request and endpoint NULL for cold retained rollback. Do not add a blanket service return when active==NULL, and do not push cleanup phases behind the active-phase gate.",
+    "FINISH may clear owner.active and settle. The outer post-switch drain check must still consult current owner.active, not the stale local snapshot. Never access a request through the snapshot after release SETTLED. Preserve all existing final-access, cancellation, first-cause, sticky-domain and IRQ isolation behavior."
+  ],
+  "TDD": [
+    "Preserve current two complete before sources and exact index identity (existing full original-index bytes still match). Bind a fresh normal configure and its true complete DB; require positive full context count, expected831 if source graph unchanged.",
+    "With actual clang14 available, reproduce the failed TU using its real DB entry projected with maintained compilation_entry, original unchanged TIDY_CHECKS/warnings-as-errors/header filter. Retain complete argv, compiler entry, version, source and actual diagnostic RED. No invented vanished remote temp path or flags.",
+    "Implement only the phase/snapshot/default-result refactor. Prefer all53 existing GoogleTest methods/assertions byte-identical; existing PartialInitializeRetainsRetryResponsibility plus its real stop-only TearDown already traverses NULL-active rollback. Do not create a fake private stage to make RED.",
+    "Run complete unchanged maintained required clang invocation: python scripts/ci/quality_tools.py tidy --build-dir build/native-debug --tool <actualclang14> --report <freshpath>. Every actual831 context must finish successfully; no selected-TU pass substitutes for this whole gate, no profile/baseline exclusions, tool errors, zero scope, skips or missing work.",
+    "Rebuild and run complete same53 Debug and ASAN/UBSAN programs with fresh XML, actual0, no filter/shard or lowered warnings/sanitizers. Preserve model9f2e, header, all old53 methods; whole changed-file strict style. Any first-GREEN added valid-lifecycle coverage remains first-GREEN, not behavior RED.",
+    "Bind final source/DB/compiler/tool/report/XML/raw/ELFs and complete child joins. Root independent review and normal complete Main hooks remain required; no inherited ARM/SDK/HIL/remote success or normal-path crash claim."
+  ],
+  "retention_and_resources": {
+    "approved_TMP_cap_bytes": 134217728,
+    "persistent_overall_cap_bytes": 1048576,
+    "current_persistent_feature_alloc_approx": 561152,
+    "old_cap": "80MiB historical admission stays unchanged for r2; r3 has new explicit128MiB authorization",
+    "method": "Before reusing ASAN build, copy its exact r2 ELF5,781,136B to a fresh uniquely retained path and preserve full actual ASAN DB/cache bytes plus hashes. Append a new immutable retention addendum identifying original observed path and retained same-SHA bytes; never rewrite r2 manifest/results or any r1/r2 source/raw/archive. Debugr2 matching ELF already retained separately. Only after that may new output use the build tree. No deletion or relocation of old evidence.",
+    "reason": "Fresh complete separate ASAN build is measured around62MiB and could exceed128MiB with current82.8MB retained; reuse the existing real CMake graph after explicit byte preservation, without changing sanitizers/toolchain/dependencies.",
+    "budget": "Allow preserved r2ASANELF+DB/cache, r3 debug/ASAN matched ELFs,831 projected DBs and report/logs. Guard persistent free64MiB, cgroup headroom600MiB and precompiler900MiB, jobs1. Tool installation/extraction budget is Root-managed separately and must not silently consume or bypass this128MiB cap.",
+    "no_build_started": true
+  },
+  "decision_needed": "Approve the narrow source token after plan and actual clang14 provisioning. No new invariant fault behavior is proposed or authorized."
+}

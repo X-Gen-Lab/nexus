@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "/dev/shm/nexus-clang14-required-20261018-r1/extract.py"
+  ],
+  "cwd": "/dev/shm/nexus-clang14-required-20261018-r1",
+  "stage": "safe-stream-extraction-r1",
+  "started_ns": 1792309840132424855,
+  "finished_ns": 1792309840246836449,
+  "duration_seconds": 0.11441369699969073,
+  "timeout_seconds": 300.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/runs/safe-stream-extraction-r1.attempts/1792309840132349021-4ff98ad8cfc7414b9db31603cf54d752/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/runs/safe-stream-extraction-r1.attempts/1792309840132349021-4ff98ad8cfc7414b9db31603cf54d752/stderr.txt",
+    "bytes": 190,
+    "sha256": "2d187e505e688bca448ae8cce935f1c6b1520f9c3e6610c2f706c37f9c8aca75"
+  },
+  "attempt_receipt": "/dev/shm/nexus-clang14-required-20261018-r1/runs/safe-stream-extraction-r1.attempts/1792309840132349021-4ff98ad8cfc7414b9db31603cf54d752/receipt.json"
+}

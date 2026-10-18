@@ -1,0 +1,19 @@
+{
+  "kind": "sealed D2 final artifact index",
+  "source34_sha256": "246cb4de76e54fc993bceeecd3ce674936e566f14d51b80eb8610c6bdaeb98bf",
+  "map_sha256": "5e51ecad26cb7a4206004f144ae2b262c9f595e2d42445a7a2a8234e654f885c",
+  "delivery_sha256": "28eb2c8e1dddb29b636e1ccbe0627fdd28eaedf90f587056a30022ecde5a2e8e",
+  "raw_archive_sha256": "953756a3c6f7d389183647bf0599f49a821ad5de0fba8172f5437339f7fdd5ed",
+  "raw_members": 398,
+  "persistent_feature_cap": 2359296,
+  "unique_inode_allocation_before_manifest": 2306048,
+  "regular_file_allocation_before_manifest": 2207744,
+  "allocation_definition": "st_blocks*512 counted once by (st_dev,st_ino), including files/directories; regular files separately labelled",
+  "new_TMP_file_block_allocation": 104738816,
+  "new_TMP_cap": 104857600,
+  "new_TMP_definition": "current own build regular file blocks minus exact bootstrap baseline plus both explicit ARM output trees and owned fixture temp; no unrelated trees counted",
+  "workspace_free": 69677056,
+  "source_index_stable": true,
+  "all_owned_children_joined": true,
+  "qualification": false
+}
