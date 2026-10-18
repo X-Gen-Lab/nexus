@@ -83,14 +83,18 @@ nx_result_t nx_stm32h743_flash_ram_initialize(
  * \brief Release a prepared workspace only after both banks and owners join.
  * \param[in,out] execution: The exact workspace associated with its port.
  * \return SUCCESS on release or an empty zeroed workspace, BUSY while retained,
- *         or STATE for a stale owner. An empty stop never releases another
- *         physical controller's prepared workspace.
- * \note Does not change VTOR, protection, clocks or another workspace.
+ *         or STATE for a stale owner, missing core or changed live VTOR. An
+ *         empty stop never releases another controller's prepared workspace.
+ * \note Refusal retains the owner and workspace. Does not change VTOR,
+ *       protection, clocks or another workspace.
  */
 nx_result_t
 nx_stm32h743_flash_ram_stop(nx_stm32h743_flash_ram_workspace_t* execution);
 /** \brief Reobserve raw CPU/protection before any command staging or borrow.
- * \note This is private cold-context admission, never a runtime registry.
+ * \note Each prepared pulse rechecks a live core and the saved original VTOR
+ *       before staging, hardware writes or bridge entry. Rejection retains
+ *       ownership. Existing CPU/context and busy errors precede this vector
+ *       gate. This is private cold-context admission, never a runtime registry.
  */
 nx_result_t
 nx_stm32h743_flash_ram_admission(const nx_stm32h743_flash_state_t* port);

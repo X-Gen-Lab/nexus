@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "kind": "focused-development-tdd",
+  "baseline_commit": "3b2199861e5f01e2ba7c831cb54905b30b703858",
+  "scope": "H743 prepared Flash admission and stop; real production C with external register/CPU model",
+  "red_to_green": {
+    "red": {
+      "returncode": 1,
+      "tests": 6,
+      "failures": 3,
+      "skipped": 0,
+      "all_run_completed": true,
+      "sources": {
+        "soc/stm32h743/drivers/flash_ram_owner.c": "7d7e20bf8e5347b06e0983fe5796f93c48c2dd6ea9d535a9f0715cf83eadb5ee",
+        "soc/stm32h743/private/stm32h743_flash_ram.h": "624ed12c523edc293c5501a2e71a55d593b370e4a73264dee1b4145f3e07543b",
+        "tests/google/h743_flash_ram_generated_test.cpp": "1d93d9dc40e4de29520847581ab30617665f83440214f5520193d66b7fc893fa"
+      },
+      "case_results": {
+        "NormalLookupIsColdAndStartCopiesSelectedFlash": "passed",
+        "FailedPrepareAndBusyStopPreserveOrderedCleanup": "passed",
+        "NormalPulsesAndRestartKeepTheOriginalCpuContext": "passed",
+        "ChangedLiveVtorRejectsProgramBeforeStaging": "failed",
+        "ChangedLiveVtorRejectsEraseBeforeStaging": "failed",
+        "MissingCoreRefusesAdmissionAndRetainsStopOwner": "failed"
+      }
+    },
+    "green": {
+      "returncode": 0,
+      "tests": 6,
+      "failures": 0,
+      "skipped": 0,
+      "all_run_completed": true,
+      "sources": {
+        "soc/stm32h743/drivers/flash_ram_owner.c": "12247423eb8391750a50c13d28922f46a661f0b103de98a0a5fce9c595eb833e",
+        "soc/stm32h743/private/stm32h743_flash_ram.h": "dbde77b867d72ea806da3ec749542af7d4b62c9d98584a8cd0818ecd30bce290",
+        "tests/google/h743_flash_ram_generated_test.cpp": "1d93d9dc40e4de29520847581ab30617665f83440214f5520193d66b7fc893fa"
+      },
+      "case_results": {
+        "NormalLookupIsColdAndStartCopiesSelectedFlash": "passed",
+        "FailedPrepareAndBusyStopPreserveOrderedCleanup": "passed",
+        "NormalPulsesAndRestartKeepTheOriginalCpuContext": "passed",
+        "ChangedLiveVtorRejectsProgramBeforeStaging": "passed",
+        "ChangedLiveVtorRejectsEraseBeforeStaging": "passed",
+        "MissingCoreRefusesAdmissionAndRetainsStopOwner": "passed"
+      }
+    }
+  },
+  "red_failures": [
+    "Stale live VTOR accepted program and erase with command effects",
+    "Missing core accepted admission and faulted during actual stop"
+  ],
+  "unchanged_test_between_red_and_green": true,
+  "source_contract": "CPU/context and busy precedence retained; reject before command staging; stop refusal retains owner",
+  "excluded_qualifications": [
+    "full repository gate",
+    "ARM linking",
+    "clean SDK",
+    "offline reproducibility",
+    "physical HIL"
+  ],
+  "artifacts": {
+    "green.command.json": {
+      "bytes": 1289,
+      "sha256": "7df575c831a60ecaec27a85569f5f768f71010ca9ff7d503b20a79b732b60b26"
+    },
+    "green.stderr.txt.raw": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "green.stdout.txt.raw": {
+      "bytes": 1369,
+      "sha256": "8c8eaada9d8f8bdd9c5ae4aab3b8af17704dc3376b7c6db0757be9ef6d0c14a8"
+    },
+    "green.xml": {
+      "bytes": 2026,
+      "sha256": "d004366389702e83242d779e878a56b77fb2334f5ea91dafb3ad96ac4ade2884"
+    },
+    "red.command.json": {
+      "bytes": 1282,
+      "sha256": "d05b4e5c55a328b8244d7dea0b1f791cc51a4c9ee03d1cb9673295750a258931"
+    },
+    "red.stderr.txt.raw": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "red.stdout.txt.raw": {
+      "bytes": 10239,
+      "sha256": "b5c8cc1c41d994aa1a0cd752b966518ddadb9a942579d42fc36ffee2665596f8"
+    },
+    "red.xml": {
+      "bytes": 20685,
+      "sha256": "123454a6106bd3c4146d03763dc692cef1a62c7230a9a8af04f01bad0d184b39"
+    }
+  }
+}

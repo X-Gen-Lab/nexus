@@ -241,9 +241,13 @@ nx_stm32h743_flash_ram_admission(const nx_stm32h743_flash_state_t* port) {
         port->execution->system != &g_nx_stm32h743_system ||
         !port->execution->prepared)
         return NX_ERROR_STATE;
-    return port->execution->active ||
-                   port->execution->guard.remaining_effects != 0U || !idle(port)
-               ? NX_ERROR_BUSY
+    if (port->execution->active ||
+        port->execution->guard.remaining_effects != 0U || !idle(port))
+        return NX_ERROR_BUSY;
+    const nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+    return s->core == NULL ||
+                   NX_H743_READ(&s->core->VTOR) != port->execution->saved_vtor
+               ? NX_ERROR_STATE
                : NX_SUCCESS;
 }
 
@@ -269,7 +273,8 @@ nx_stm32h743_flash_ram_stop(nx_stm32h743_flash_ram_workspace_t* execution) {
     if (execution->active || !idle(execution->port) ||
         execution->guard.remaining_effects != 0U)
         return NX_ERROR_BUSY;
-    if (NX_H743_READ(&execution->system->core->VTOR) != execution->saved_vtor)
+    if (execution->system->core == NULL ||
+        NX_H743_READ(&execution->system->core->VTOR) != execution->saved_vtor)
         return NX_ERROR_STATE;
     execution->port->execution = NULL;
     execution->prepared = false;

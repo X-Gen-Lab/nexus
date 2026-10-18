@@ -95,6 +95,43 @@ class H743FlashRamGenerated : public testing::Test {
             }
         }
     }
+    struct CommandSnapshot {
+        std::array<unsigned char, sizeof(nx_stm32h743_flash_ram_workspace_t)>
+            execution;
+        std::array<unsigned char, sizeof(nx_stm32h743_flash_state_t)> port;
+        std::array<unsigned char, sizeof(FLASH_TypeDef)> registers;
+        uint32_t writes;
+        unsigned stores;
+        unsigned bridges;
+        unsigned vtor_writes;
+    };
+    CommandSnapshot CaptureCommandState() {
+        const auto& cpu = nexus_test::h743_ram::cpu;
+        CommandSnapshot saved{};
+        std::memcpy(saved.execution.data(), cpu.execution,
+                    saved.execution.size());
+        std::memcpy(saved.port.data(), cpu.owner_port, saved.port.size());
+        std::memcpy(saved.registers.data(), &g_h743_model.flash,
+                    saved.registers.size());
+        saved.writes = g_h743_model.writes;
+        saved.stores = g_h743_model.flash_store_count;
+        saved.bridges = cpu.bridge_entries;
+        saved.vtor_writes = cpu.vtor_writes;
+        return saved;
+    }
+    void ExpectNoCommandEffects(const CommandSnapshot& saved) {
+        const auto& cpu = nexus_test::h743_ram::cpu;
+        EXPECT_EQ(0, std::memcmp(saved.execution.data(), cpu.execution,
+                                 saved.execution.size()));
+        EXPECT_EQ(0, std::memcmp(saved.port.data(), cpu.owner_port,
+                                 saved.port.size()));
+        EXPECT_EQ(0, std::memcmp(saved.registers.data(), &g_h743_model.flash,
+                                 saved.registers.size()));
+        EXPECT_EQ(saved.writes, g_h743_model.writes);
+        EXPECT_EQ(saved.stores, g_h743_model.flash_store_count);
+        EXPECT_EQ(saved.bridges, cpu.bridge_entries);
+        EXPECT_EQ(saved.vtor_writes, cpu.vtor_writes);
+    }
     void Start() {
         const auto result = nx_platform_start();
         ASSERT_EQ(NX_SUCCESS, result.primary);
@@ -174,4 +211,81 @@ TEST_F(H743FlashRamGenerated, NormalPulsesAndRestartKeepTheOriginalCpuContext) {
     /* This is generated C/provider integration against a CPU port. The real
      * stack register transitions and FP-opcode absence still require the
      * separately linked ARM checker tests and the actual production ELF. */
+}
+
+TEST_F(H743FlashRamGenerated, ChangedLiveVtorRejectsProgramBeforeStaging) {
+    ASSERT_NO_FATAL_FAILURE(Start());
+    auto& cpu = nexus_test::h743_ram::cpu;
+    ASSERT_NE(nullptr, cpu.execution);
+    ASSERT_NE(nullptr, cpu.owner_port);
+    const auto* flash = nx_factory_flash(NX_FLASH_ID_STORAGE);
+    ASSERT_NE(nullptr, flash);
+    std::array<uint8_t, 32U> data{};
+    data.fill(0x5aU);
+    const auto before = CaptureCommandState();
+    const uint32_t saved_vtor = cpu.execution->saved_vtor;
+    const uint32_t foreign_vtor = saved_vtor + 1024U;
+    /* This is an external CPU-state change after cold preparation, not a
+     * replacement for admission or the actual generated Flash operation. */
+    g_h743_model.core->VTOR = foreign_vtor;
+    const nx_result_t result =
+        nx_flash_port_program(flash, 131072U, data.data(), data.size(), 10000U);
+    EXPECT_EQ(NX_ERROR_STATE, result);
+    EXPECT_EQ(foreign_vtor, g_h743_model.core->VTOR);
+    ExpectNoCommandEffects(before);
+    g_h743_model.core->VTOR = saved_vtor;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_ram_admission(cpu.owner_port));
+}
+TEST_F(H743FlashRamGenerated, ChangedLiveVtorRejectsEraseBeforeStaging) {
+    ASSERT_NO_FATAL_FAILURE(Start());
+    auto& cpu = nexus_test::h743_ram::cpu;
+    ASSERT_NE(nullptr, cpu.execution);
+    ASSERT_NE(nullptr, cpu.owner_port);
+    const auto* flash = nx_factory_flash(NX_FLASH_ID_STORAGE);
+    ASSERT_NE(nullptr, flash);
+    const auto before = CaptureCommandState();
+    const uint32_t saved_vtor = cpu.execution->saved_vtor;
+    const uint32_t foreign_vtor = saved_vtor + 1024U;
+    g_h743_model.core->VTOR = foreign_vtor;
+    const nx_result_t result =
+        nx_flash_port_erase(flash, 131072U, 131072U, 10000U);
+    EXPECT_EQ(NX_ERROR_STATE, result);
+    EXPECT_EQ(foreign_vtor, g_h743_model.core->VTOR);
+    ExpectNoCommandEffects(before);
+    g_h743_model.core->VTOR = saved_vtor;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_ram_admission(cpu.owner_port));
+}
+TEST_F(H743FlashRamGenerated, MissingCoreRefusesAdmissionAndRetainsStopOwner) {
+    ASSERT_NO_FATAL_FAILURE(Start());
+    ASSERT_NE(nullptr, nexus_test::h743_ram::cpu.execution);
+    ASSERT_NE(nullptr, nexus_test::h743_ram::cpu.owner_port);
+    /* Isolate the old null dereference while preserving the complete program
+     * run. Child assertions must affect its real exit status. No SUT state is
+     * reset to manufacture cleanup; only the external core binding is restored.
+     */
+    EXPECT_EXIT(
+        {
+            auto& cpu = nexus_test::h743_ram::cpu;
+            auto* const core = g_nx_stm32h743_system.core;
+            const auto before = CaptureCommandState();
+            g_nx_stm32h743_system.core = nullptr;
+            EXPECT_EQ(NX_ERROR_STATE,
+                      nx_stm32h743_flash_ram_admission(cpu.owner_port));
+            EXPECT_EQ(nullptr, g_nx_stm32h743_system.core);
+            EXPECT_TRUE(g_nx_stm32h743_system.started);
+            EXPECT_EQ(NX_ERROR_STATE,
+                      nx_stm32h743_flash_ram_stop(cpu.execution));
+            EXPECT_EQ(nullptr, g_nx_stm32h743_system.core);
+            EXPECT_TRUE(g_nx_stm32h743_system.started);
+            ExpectNoCommandEffects(before);
+            g_nx_stm32h743_system.core = core;
+            EXPECT_EQ(NX_SUCCESS, nx_stm32h743_flash_ram_stop(cpu.execution));
+            EXPECT_EQ(nullptr, cpu.owner_port->execution);
+            EXPECT_FALSE(cpu.execution->prepared);
+            EXPECT_EQ(NX_SUCCESS, nx_platform_stop());
+            EXPECT_FALSE(g_nx_stm32h743_system.started);
+            std::_Exit(testing::Test::HasFailure() ? EXIT_FAILURE
+                                                   : EXIT_SUCCESS);
+        },
+        testing::ExitedWithCode(EXIT_SUCCESS), "");
 }
