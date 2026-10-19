@@ -69,6 +69,10 @@ python cmake/package/verify_consumers.py     --prefix /tmp/nexus-source-sdk --ou
 Check `verification.json`, every recorded exit code, Native runtime results, MCU
 ELF/BIN/map and resource reports. MCU linking does not execute hardware. The
 verifier's output is owned; an unrelated existing directory rejects replacement.
+The SDK prefix and output must be canonical paths without symlink aliases, and
+neither may contain the other. A rejected path leaves SDK bytes and previous
+reports untouched; read the failure diagnostic on stderr. An admitted owned
+output is cleared before the next attempt.
 Remove only outputs you created after retaining required evidence.
 
 ## Choose a product assembly

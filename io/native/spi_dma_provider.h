@@ -18,6 +18,7 @@ typedef struct {
     size_t shifted;
     size_t fail_after;
     nx_result_t terminal_result;
+    uint32_t wake_publishers;
     uint8_t word_bits;
     uint8_t memory_flags;
     bool opened;
@@ -37,7 +38,7 @@ typedef struct nx_native_spi_dma_endpoint_state {
 /**
  * \brief           Open fresh or completely stopped model controller storage.
  * \note            Task-only, external lifecycle users joined. Rejects live
- *                  state instead of clearing any retained request or CS.
+ *                  state instead of clearing a request, CS or wake publisher.
  */
 nx_result_t nx_native_spi_dma_initialize(nx_native_spi_dma_state_t* state);
 extern const nx_spi_dma_sequence_backend_t nx_native_spi_dma_sequence_backend;

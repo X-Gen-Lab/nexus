@@ -9,6 +9,12 @@
 #include "stm32u575_secure_batch.h"
 #include <string.h>
 
+/* A region large enough for the message can also fit a complete reply;
+ * each object's offset is still checked independently before subtraction. */
+_Static_assert(sizeof(nx_stm32u575_secure_batch_message_t) >=
+                   sizeof(nx_stm32u575_secure_batch_reply_t),
+               "Secure batch message must not be smaller than its reply");
+
 static bool span(const void* pointer, size_t bytes) {
     return pointer != NULL && bytes != 0U &&
            (uintptr_t)pointer <= UINTPTR_MAX - bytes;
@@ -181,7 +187,6 @@ bool nx_stm32u575_secure_batch_ns_spans(
         input % _Alignof(nx_stm32u575_secure_batch_message_t) != 0U ||
         output % _Alignof(nx_stm32u575_secure_batch_reply_t) != 0U ||
         input < ram_base || output < ram_base || sizeof(*message) > ram_bytes ||
-        sizeof(*reply) > ram_bytes ||
         input - ram_base > ram_bytes - sizeof(*message) ||
         output - ram_base > ram_bytes - sizeof(*reply) ||
         overlap(message, sizeof(*message), reply, sizeof(*reply)))

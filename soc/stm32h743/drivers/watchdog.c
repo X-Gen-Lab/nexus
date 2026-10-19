@@ -137,17 +137,15 @@ static nx_result_t enable(void* context, uint32_t timeout, bool freeze,
     }
     uint32_t old_prescaler = NX_H743_READ(&p->registers->PR) & 7U;
     uint32_t old_divisor = old_prescaler > 6U ? 256U : 4U << old_prescaler;
-    /* RM0433 IWDG1: CCCC starts at reset0xFFF, not an inactive RLR. */
-    uint32_t old_count = 4096U;
     p->state.enabled = true;
     p->state.irreversible = true;
     p->state.debug_freeze = freeze;
-    /* A failed update can leave either old/new prescaler and reload. */
+    /* RM0433 IWDG1: CCCC starts at reset0xFFF, not an inactive RLR.
+     * A failed update can retain either prescaler/reload. The selected count
+     * is already <=4096, so these are the shortest/longest count bounds. */
     nx_watchdog_state_t shortest = {0};
-    bounds(&shortest, old_divisor < divisor ? old_divisor : divisor,
-           old_count < count ? old_count : count);
-    bounds(&p->state, old_divisor > divisor ? old_divisor : divisor,
-           old_count > count ? old_count : count);
+    bounds(&shortest, old_divisor < divisor ? old_divisor : divisor, count);
+    bounds(&p->state, old_divisor > divisor ? old_divisor : divisor, 4096U);
     p->state.minimum_timeout_us = shortest.minimum_timeout_us;
     /* The start command has no readable acknowledgement or undo. Publish its
      * conservative responsibility before exposing it to the peripheral. */

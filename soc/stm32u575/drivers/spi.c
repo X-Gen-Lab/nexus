@@ -50,6 +50,22 @@ static bool protected(const nx_stm32u575_spi_endpoint_state_t* e,
            overlap(data, size, e->cs, sizeof(*e->cs)) ||
            overlap(data, size, e->cs->registers, sizeof(*e->cs->registers));
 }
+/** \brief Check loans after endpoint pointers and complete spans are valid. */
+static bool disjoint_transfer(const nx_stm32u575_spi_endpoint_state_t* e,
+                              const uint8_t* tx, uint8_t* rx, size_t length,
+                              size_t* transferred) {
+    if (protected(e, transferred, sizeof(*transferred)))
+        return false;
+    if (tx != NULL && (protected(e, tx, length) ||
+                       overlap(transferred, sizeof(*transferred), tx, length)))
+        return false;
+    if (rx != NULL && (protected(e, rx, length) ||
+                       overlap(transferred, sizeof(*transferred), rx, length)))
+        return false;
+    /* Exact in-place full duplex is valid; partial overlap is not. */
+    return tx == NULL || rx == NULL || tx == rx ||
+           !overlap(tx, length, rx, length);
+}
 /** \brief U5 reset stops its FIFO shifter; verify both reset edges and idle. */
 static nx_result_t reset(nx_stm32u575_spi_state_t* p) {
     NX_U575_WRITE(p->reset, NX_U575_READ(p->reset) | p->reset_mask);
@@ -135,22 +151,16 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
     if (!task_context())
         return NX_ERROR_CONTEXT;
     if (e == NULL || !valid(e->port) || e->cs == NULL ||
-        e->cs->registers == NULL || !span(transferred, sizeof(*transferred)) ||
-        length == 0U || (tx == NULL && rx == NULL) ||
-        (tx != NULL && !span(tx, length)) ||
-        (rx != NULL && !span(rx, length)) || e->mode > 3U ||
-        e->frequency_hz == 0U || e->cs_mask == 0U ||
+        e->cs->registers == NULL)
+        return NX_ERROR_INVALID;
+    if (!span(transferred, sizeof(*transferred)) || length == 0U ||
+        (tx == NULL && rx == NULL) || (tx != NULL && !span(tx, length)) ||
+        (rx != NULL && !span(rx, length)))
+        return NX_ERROR_INVALID;
+    if (e->mode > 3U || e->frequency_hz == 0U || e->cs_mask == 0U ||
         (e->cs_mask & ~e->cs->mask) != 0U || !e->cs->output)
         return NX_ERROR_INVALID;
-    if (protected(e, transferred, sizeof(*transferred)) ||
-        (tx != NULL &&
-         (protected(e, tx, length) ||
-          overlap(transferred, sizeof(*transferred), tx, length))) ||
-        (rx != NULL &&
-         (protected(e, rx, length) ||
-          overlap(transferred, sizeof(*transferred), rx, length))) ||
-        (tx != NULL && rx != NULL && tx != rx &&
-         overlap(tx, length, rx, length)))
+    if (!disjoint_transfer(e, tx, rx, length, transferred))
         return NX_ERROR_INVALID;
     *transferred = 0U;
     nx_stm32u575_spi_state_t* p = e->port;

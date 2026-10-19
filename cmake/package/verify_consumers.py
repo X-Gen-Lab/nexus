@@ -445,15 +445,18 @@ def main(argv=None):
               "prefix": str(prefix), "status": "failed",
               "physical_status": "not_executed", "commands": records,
               "selected_images": []}
+    output_prepared = False
     try:
-        if prefix.resolve() != prefix or output.resolve() != output or output.is_relative_to(prefix):
-            raise ValueError("Consumer output must be canonical and outside the SDK")
+        if (prefix.resolve() != prefix or output.resolve() != output or
+                output.is_relative_to(prefix) or prefix.is_relative_to(output)):
+            raise ValueError("Consumer SDK and output must be canonical and disjoint")
         if output.exists():
             if not (output / ".nexus-sdk-consumer-check").is_file():
                 raise ValueError("Existing output is not an owned consumer verification bundle")
             shutil.rmtree(output)
         output.mkdir(parents=True)
         (output / ".nexus-sdk-consumer-check").write_text("owned SDK consumer verification\n")
+        output_prepared = True
         def run_checked(command):
             result = subprocess.run(command, capture_output=True, text=True,
                                     env=clean_environment(), timeout=180)
@@ -538,7 +541,8 @@ def main(argv=None):
     except (OSError, ValueError, subprocess.TimeoutExpired, KeyError) as error:
         report["error"] = str(error)
         print(f"Source SDK consumers rejected: {error}", file=sys.stderr)
-    if output.is_dir() and (output / ".nexus-sdk-consumer-check").is_file():
+    if (output_prepared and output.is_dir() and
+            (output / ".nexus-sdk-consumer-check").is_file()):
         (output / "verification.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     return 0 if report["status"] == "passed" else 1
 

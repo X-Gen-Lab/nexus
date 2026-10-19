@@ -81,6 +81,38 @@ class NativeSPIDMAOwner : public testing::Test {
                                  return NX_ERROR_IO;
                              },
                              false};
+    unsigned publication_calls = 0U;
+    uint32_t publication_maximum = 0U;
+    bool nested_publication = false;
+    nx_result_t publication_initialize = NX_ERROR_STATE;
+    nx_result_t publication_bind = NX_ERROR_STATE;
+    nx_result_t publication_stop = NX_ERROR_STATE;
+    const nx_irq_wake_t publishing{
+        this,
+        [](void* context) {
+            auto* self = static_cast<NativeSPIDMAOwner*>(context);
+            if (self->hardware[0].wake_publishers > self->publication_maximum) {
+                self->publication_maximum = self->hardware[0].wake_publishers;
+            }
+            (void)nx_bus_owner_service(&self->owner);
+            if (self->nested_publication &&
+                nx_request_state(&self->outer) == NX_REQUEST_ACTIVE) {
+                self->nested_publication = false;
+                nx_native_spi_dma_model_step(&self->port);
+                nx_native_spi_dma_model_step(&self->port);
+            }
+            if (nx_request_state(&self->outer) == NX_REQUEST_SETTLED) {
+                ++self->publication_calls;
+                self->publication_initialize =
+                    nx_native_spi_dma_initialize(&self->hardware[0]);
+                self->publication_bind = nx_spi_dma_owner_attach_wake(
+                    &self->binding, &self->wake, 0U);
+                self->publication_stop =
+                    nx_spi_dma_transaction_stop(&self->port);
+            }
+            return NX_ERROR_IO;
+        },
+        false};
     void SetUp() override {
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
         handoff = nullptr;
@@ -334,7 +366,59 @@ TEST_F(NativeSPIDMAOwner, FailedHintsNeverReplacePeriodicAuthoritativeService) {
     EXPECT_GE(hints, 2U);
     EXPECT_EQ(rx[0], tx[0]);
     EXPECT_EQ(rx[1], tx[1]);
+    EXPECT_EQ(hardware[0].wake_publishers, 0U);
     EXPECT_EQ(nx_spi_dma_owner_attach_wake(&binding, nullptr, 0U), NX_SUCCESS);
+}
+TEST_F(NativeSPIDMAOwner, SettledRequestCannotReclaimActiveWakePublication) {
+    ASSERT_EQ(nx_spi_dma_owner_attach_wake(&binding, &publishing, 0U),
+              NX_SUCCESS);
+    ASSERT_NO_FATAL_FAILURE(Start());
+    ASSERT_NO_FATAL_FAILURE(Finish());
+    EXPECT_EQ(publication_calls, 1U);
+    EXPECT_EQ(publication_initialize, NX_ERROR_BUSY);
+    EXPECT_EQ(publication_bind, NX_ERROR_BUSY);
+    EXPECT_EQ(publication_stop, NX_ERROR_BUSY);
+    EXPECT_FALSE(sequence[0].stopped);
+    EXPECT_EQ(hardware[0].wake, &publishing);
+    EXPECT_EQ(hardware[0].wake_publishers, 0U);
+    EXPECT_EQ(nx_spi_dma_transaction_stop(&port), NX_SUCCESS);
+}
+TEST_F(NativeSPIDMAOwner, NestedWakePublicationsAllJoinBeforeStop) {
+    nested_publication = true;
+    ASSERT_EQ(nx_spi_dma_owner_attach_wake(&binding, &publishing, 0U),
+              NX_SUCCESS);
+    ASSERT_NO_FATAL_FAILURE(Start());
+    ASSERT_NO_FATAL_FAILURE(Finish());
+    EXPECT_EQ(publication_calls, 2U);
+    EXPECT_EQ(publication_maximum, 2U);
+    EXPECT_EQ(publication_initialize, NX_ERROR_BUSY);
+    EXPECT_EQ(publication_bind, NX_ERROR_BUSY);
+    EXPECT_EQ(publication_stop, NX_ERROR_BUSY);
+    EXPECT_FALSE(sequence[0].stopped);
+    EXPECT_EQ(hardware[0].wake, &publishing);
+    EXPECT_EQ(hardware[0].wake_publishers, 0U);
+    EXPECT_EQ(nx_spi_dma_transaction_stop(&port), NX_SUCCESS);
+}
+TEST_F(NativeSPIDMAOwner, SaturatedWakePublicationRetainsJoinResponsibility) {
+    ASSERT_EQ(nx_spi_dma_owner_attach_wake(&binding, &wake, 0U), NX_SUCCESS);
+    ASSERT_NO_FATAL_FAILURE(Start());
+    /* Synthetic existing publishers cannot wrap or be cleared by stop. */
+    hardware[0].wake_publishers = UINT32_MAX;
+    Finish();
+    EXPECT_EQ(outer.result, NX_SUCCESS);
+    EXPECT_EQ(outer.transferred, 2U);
+    EXPECT_EQ(hints, 0U);
+    EXPECT_EQ(hardware[0].wake_publishers, UINT32_MAX);
+    EXPECT_EQ(nx_native_spi_dma_initialize(&hardware[0]), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_spi_dma_owner_attach_wake(&binding, nullptr, 0U),
+              NX_ERROR_BUSY);
+    EXPECT_EQ(nx_spi_dma_transaction_stop(&port), NX_ERROR_BUSY);
+    EXPECT_FALSE(sequence[0].stopped);
+    EXPECT_EQ(hardware[0].wake, &wake);
+    EXPECT_EQ(hardware[0].wake_publishers, UINT32_MAX);
+    /* Join the synthetic publishers only; production never clears a count. */
+    hardware[0].wake_publishers = 0U;
+    EXPECT_EQ(nx_spi_dma_transaction_stop(&port), NX_SUCCESS);
 }
 TEST_F(NativeSPIDMAOwner, DeadlineDrainsRatherThanReplayingUncompletedSegment) {
     ASSERT_NO_FATAL_FAILURE(Start());

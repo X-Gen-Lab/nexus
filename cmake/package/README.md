@@ -94,7 +94,10 @@ python cmake/package/verify_consumers.py \
 `verification.json` and per-command logs retain actual arguments and exit codes.
 This command fails for development fixtures, missing tools, any compile/run/link
 failure, leaked private includes or failed ELF resource/configuration binding.
-An old owned verification directory is invalidated before a new attempt.
+The SDK prefix and verification output must be canonical paths without symlink
+aliases, and neither may contain the other. Admission failure leaves both SDK
+bytes and any previous report untouched and writes its diagnostic to stderr.
+Only an admitted owned verification directory is invalidated for a new attempt.
 
 The package includes the repository formatter and comment-policy files. Git
 commit hooks and whole-checkout lint workflows remain repository maintenance
