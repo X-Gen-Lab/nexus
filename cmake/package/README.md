@@ -91,6 +91,12 @@ python cmake/package/verify_consumers.py \
   --prefix /relocated/nexus-sdk --output build/installed-sdk-check
 ```
 
+`--parallel N` is the total consumer job budget (default: `2`). Independent
+consumers may configure, build and verify concurrently; each compiler build uses
+one job. `--parallel 1` retains serial execution. Each consumer still performs
+fresh installed-source verification. A failure cancels and joins all started
+work before the final failed report is written.
+
 `verification.json` and per-command logs retain actual arguments and exit codes.
 This command fails for development fixtures, missing tools, any compile/run/link
 failure, leaked private includes or failed ELF resource/configuration binding.

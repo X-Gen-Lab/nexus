@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """Verify independent consumers of an existing publishable source SDK prefix."""
 import argparse
+import concurrent.futures
 import json
 import re
 import shlex
 import os
 from pathlib import Path, PurePosixPath
 import shutil
-import subprocess
+import signal
 import sys
 import tomllib
+import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
+from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
                                      SELECTED_CONSUMERS)  # noqa: E402
@@ -436,118 +439,298 @@ def positive_parallel(value):
     return count
 
 
+def verify_consumer(kind, specification, prefix, output, identity, run_checked):
+    """Execute one complete independent chain from the shared transport plan."""
+    sdk = prefix / "share/nexus/src"
+    if kind == "base":
+        name, arm, chip = specification
+        source, build, command = prepare_consumer(
+            prefix, output, name, run_checked, arm=arm, chip=chip,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_c", "installed_cpp"])
+        commands = json.loads((build / "compile_commands.json").read_text())
+        for entry in commands:
+            if Path(entry["file"]).name not in {"main.c", "main.cpp"}:
+                continue
+            if any(value in entry["command"] for value in
+                   ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470")):
+                raise ValueError(
+                    "Private implementation input leaked into product source")
+        if arm:
+            for application in ("installed_c", "installed_cpp"):
+                resources = json.loads((build / "bin" /
+                    (application + ".resources.json")).read_text())
+                if resources["status"] != "passed":
+                    raise ValueError(
+                        "MCU consumer resource/configuration binding failed")
+        else:
+            for application in ("installed_c", "installed_cpp"):
+                run_checked([str(build / "bin" / application)])
+    elif kind == "modern":
+        family, backend = specification
+        source, build, command = prepare_modern_consumer(
+            prefix, output, family, backend, run_checked,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_modern"])
+        commands = json.loads((build / "compile_commands.json").read_text())
+        products = [entry for entry in commands
+                    if Path(entry["file"]).resolve() == source / "main.c"]
+        if len(products) != 1 or any(value in products[0]["command"]
+                for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
+            raise ValueError("Modern consumer private inputs leaked into product")
+        image = build / "bin/installed_modern.elf"
+        resources = json.loads(
+            (build / "bin/installed_modern.resources.json").read_text())
+        if resources["status"] != "passed" or image.stat().st_size == 0:
+            raise ValueError("Modern consumer linked resource binding failed")
+        config = Path((build / "resolved-config.txt").read_text())
+        retention_path = build / "provider-retention.json"
+        run_checked([sys.executable, "-B",
+            str(sdk / "tools/measurement/retention.py"),
+            "--elf", str(image), "--bindings", str(config / "bindings.c"),
+            "--resolved", str(config / "resolved.json"),
+            "--output", str(retention_path)])
+        if json.loads(retention_path.read_text())["status"] != "passed":
+            raise ValueError("Modern consumer provider retention failed")
+    else:
+        name, assembly, smoke = specification
+        source, build, command = prepare_selected_consumer(
+            prefix, output, name, assembly, smoke, run_checked,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_selected"])
+        image = check_selected_image(sdk, source, build, run_checked)
+        image.update({"name": name, "assembly": str(sdk / assembly)})
+        return image
+    return None
+
+
+class ConsumerCancelled(Exception):
+    """A peer already failed; this chain must stop without replacing its cause."""
+
+
+class ConsumerCommandError(ValueError):
+    """Retain a real command failure, separately from coordinator cancellation."""
+
+    def __init__(self, record, output):
+        self.exit_code = record["exit_code"]
+        if (self.exit_code == 130 and
+                isinstance(record.get("child_returncode"), int) and
+                record["child_returncode"] > 0):
+            self.exit_code = record["child_returncode"]
+        super().__init__(f"Consumer command failed; see {output / record['log']}")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prefix", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--parallel", type=positive_parallel,
-                        help="Build jobs per consumer (default: 4 base, 2 modern)")
+    parser.add_argument("--parallel", type=positive_parallel, default=2,
+                        help="Total concurrent consumer jobs (default: 2); "
+                             "each build uses one job")
     args = parser.parse_args(argv)
     prefix, output = args.prefix.absolute(), args.output.absolute()
     records = []
     report = {"schema_version": 1, "kind": "source_sdk_consumer_verification",
               "prefix": str(prefix), "status": "failed",
               "physical_status": "not_executed", "commands": records,
-              "selected_images": []}
+              "selected_images": [], "parallel_jobs": args.parallel}
     output_prepared = False
+    cancel = threading.Event()
+    failure_lock = threading.Lock()
+    failures = []
+
+    def remember_failure(index, error):
+        failure = {"consumer_index": index, "error": str(error),
+                   "exit_code": getattr(error, "exit_code", None)}
+        with failure_lock:
+            failures.append(failure)
+            cancel.set()
+        return failure
+
+    def command_runner(index, commands):
+        def run_checked(command):
+            if cancel.is_set():
+                raise ConsumerCancelled("Consumer cancelled after an earlier failure")
+            phase = len(commands)
+            log = output / f"command-{index:02d}-{phase:02d}.log"
+            environment = clean_environment()
+            # The worker owns one global job, including nested configure/check
+            # tools. NEXUS_BUILD_JOBS takes precedence in the shared runner.
+            environment.update(NEXUS_BUILD_JOBS="1",
+                               CMAKE_BUILD_PARALLEL_LEVEL="1",
+                               CTEST_PARALLEL_LEVEL="1")
+            result = process.run(command, cwd=Path.cwd(), env=environment,
+                                 log=log, timeout=180,
+                                 stage="source-sdk-consumer",
+                                 cancel_event=cancel)
+            receipt = json.loads(result.receipt_path.read_text())
+            record = {"argv": [str(value) for value in command],
+                      "exit_code": result.returncode, "log": log.name,
+                      "consumer_index": index, "phase_index": phase,
+                      "allocated_jobs": 1,
+                      "receipt": str(result.receipt_path.relative_to(output)),
+                      **{key: receipt[key] for key in (
+                          "started_ns", "finished_ns", "duration_seconds",
+                          "outcome", "child_returncode", "withdrawal_complete")}}
+            commands.append(record)
+            if result.returncode:
+                if (result.returncode == 130 and cancel.is_set() and
+                        not (receipt.get("child_returncode") is not None and
+                             receipt["child_returncode"] > 0)):
+                    raise ConsumerCancelled(
+                        "Running consumer withdrawn after an earlier failure")
+                raise ConsumerCommandError(record, output)
+            if not receipt["withdrawal_complete"]:
+                raise ValueError("Consumer process withdrawal was incomplete")
+            return result
+        return run_checked
+
     try:
         if (prefix.resolve() != prefix or output.resolve() != output or
                 output.is_relative_to(prefix) or prefix.is_relative_to(output)):
             raise ValueError("Consumer SDK and output must be canonical and disjoint")
         if output.exists():
             if not (output / ".nexus-sdk-consumer-check").is_file():
-                raise ValueError("Existing output is not an owned consumer verification bundle")
+                raise ValueError(
+                    "Existing output is not an owned consumer verification bundle")
             shutil.rmtree(output)
         output.mkdir(parents=True)
-        (output / ".nexus-sdk-consumer-check").write_text("owned SDK consumer verification\n")
+        (output / ".nexus-sdk-consumer-check").write_text(
+            "owned SDK consumer verification\n")
         output_prepared = True
-        def run_checked(command):
-            result = subprocess.run(command, capture_output=True, text=True,
-                                    env=clean_environment(), timeout=180)
-            index = len(records)
-            log = output / f"command-{index:02d}.log"
-            log.write_text(result.stdout + result.stderr)
-            records.append({"argv": [str(value) for value in command],
-                            "exit_code": result.returncode, "log": log.name})
-            if result.returncode:
-                raise ValueError(f"Consumer command {index} failed; see {log}")
-            return result
         sdk = prefix / "share/nexus/src"
-        run_checked([sys.executable, "-B", str(sdk / "cmake/package/package_source_sdk.py"),
-                     "--verify", str(sdk)])
+        command_runner(0, records)([
+            sys.executable, "-B", str(sdk / "cmake/package/package_source_sdk.py"),
+            "--verify", str(sdk)])
         identity = json.loads((sdk / ".nexus-source-sdk.json").read_text())
         if identity["publishable"] is not True or identity["source_dirty"]:
-            raise ValueError("Formal consumer verification requires a publishable committed source SDK")
+            raise ValueError(
+                "Formal consumer verification requires a publishable committed "
+                "source SDK")
         report["source_revision"] = identity["source_revision"]
         report["source_tree"] = identity["source_tree"]
-        for name, arm, chip in BASE_CONSUMERS:
-            source, build, command = prepare_consumer(prefix, output, name,
-                run_checked, arm=arm, chip=chip, expected_revision=identity["source_revision"])
-            run_checked(command)
-            run_checked(["cmake", "--build", str(build), "--parallel",
-                         str(args.parallel) if args.parallel is not None else "4",
-                         "--target", "installed_c", "installed_cpp"])
-            commands = json.loads((build / "compile_commands.json").read_text())
-            for entry in commands:
-                if Path(entry["file"]).name not in {"main.c", "main.cpp"}:
-                    continue
-                if any(value in entry["command"] for value in
-                       ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470")):
-                    raise ValueError("Private implementation input leaked into product source")
-            if arm:
-                for application in ("installed_c", "installed_cpp"):
-                    resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
-                    if resources["status"] != "passed":
-                        raise ValueError("MCU consumer resource/configuration binding failed")
-            else:
-                for application in ("installed_c", "installed_cpp"):
-                    run_checked([str(build / "bin" / application)])
-        for family, backend in MODERN_CONSUMERS:
-            source, build, command = prepare_modern_consumer(
-                prefix, output, family, backend, run_checked,
-                expected_revision=identity["source_revision"])
-            run_checked(command)
-            run_checked(["cmake", "--build", str(build), "--parallel",
-                         str(args.parallel) if args.parallel is not None else "2",
-                         "--target", "installed_modern"])
-            commands = json.loads((build / "compile_commands.json").read_text())
-            products = [entry for entry in commands
-                        if Path(entry["file"]).resolve() == source / "main.c"]
-            if len(products) != 1 or any(value in products[0]["command"]
-                    for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
-                raise ValueError("Modern consumer private inputs leaked into product")
-            image = build / "bin/installed_modern.elf"
-            resources = json.loads(
-                (build / "bin/installed_modern.resources.json").read_text())
-            if resources["status"] != "passed" or image.stat().st_size == 0:
-                raise ValueError("Modern consumer linked resource binding failed")
-            config = Path((build / "resolved-config.txt").read_text())
-            retention_path = build / "provider-retention.json"
-            run_checked([sys.executable, "-B",
-                str(sdk / "tools/measurement/retention.py"),
-                "--elf", str(image), "--bindings", str(config / "bindings.c"),
-                "--resolved", str(config / "resolved.json"),
-                "--output", str(retention_path)])
-            if json.loads(retention_path.read_text())["status"] != "passed":
-                raise ValueError("Modern consumer provider retention failed")
-        for name, assembly, smoke in SELECTED_CONSUMERS:
-            source, build, command = prepare_selected_consumer(
-                prefix, output, name, assembly, smoke, run_checked,
-                expected_revision=identity["source_revision"])
-            run_checked(command)
-            run_checked(["cmake", "--build", str(build), "--parallel",
-                         str(args.parallel) if args.parallel is not None else "2",
-                         "--target", "installed_selected"])
-            image = check_selected_image(sdk, source, build, run_checked)
-            image.update({"name": name, "assembly": str(sdk / assembly)})
-            report["selected_images"].append(image)
+        # The maintained transport tuples remain the sole plan authority.
+        plan = ([("base", specification) for specification in BASE_CONSUMERS] +
+                [("modern", specification) for specification in MODERN_CONSUMERS] +
+                [("selected", specification) for specification in SELECTED_CONSUMERS])
+        results = [None] * len(plan)
+        local_records = [[] for _ in plan]
+        workers = min(args.parallel, len(plan))
+        report["consumer_workers"] = workers
+
+        def work(position):
+            kind, specification = plan[position]
+            name = (specification[0] + " " + specification[1]
+                    if kind == "modern" else
+                    ("selected " if kind == "selected" else "") + specification[0])
+            outcome = {"consumer_index": position + 1, "name": name,
+                       "status": "cancelled"}
+            try:
+                if cancel.is_set():
+                    raise ConsumerCancelled("Consumer cancelled before admission")
+                image = verify_consumer(kind, specification, prefix, output,
+                                        identity, command_runner(
+                                            position + 1, local_records[position]))
+                outcome["status"] = "passed"
+                if image is not None:
+                    outcome["selected_image"] = image
+            except ConsumerCancelled as error:
+                outcome["error"] = str(error)
+            except Exception as error:
+                outcome["status"] = "failed"
+                outcome["failure"] = remember_failure(position + 1, error)
+            return outcome
+
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
+        started = {}
+        pending = set()
+        next_position = 0
+        interrupted = False
+        previous_handlers = {}
+
+        def interrupt(signum, frame):
+            nonlocal interrupted
+            del signum, frame
+            # Raising here could interrupt shutdown itself before its report.
+            interrupted = True
+            cancel.set()
+
+        # Signals reach only the coordinator; set cancellation before waiting
+        # for workers so every started process tree can be withdrawn and joined.
+        if threading.current_thread() is threading.main_thread():
+            for signum in (signal.SIGINT, signal.SIGTERM):
+                previous_handlers[signum] = signal.signal(signum, interrupt)
+        try:
+            while (next_position < len(plan) and len(pending) < workers and
+                   not cancel.is_set()):
+                future = executor.submit(work, next_position)
+                started[future] = next_position
+                pending.add(future)
+                next_position += 1
+            while pending:
+                completed, pending = concurrent.futures.wait(
+                    pending, return_when=concurrent.futures.FIRST_COMPLETED)
+                for future in completed:
+                    results[started[future]] = future.result()
+                while (next_position < len(plan) and len(pending) < workers and
+                       not cancel.is_set()):
+                    future = executor.submit(work, next_position)
+                    started[future] = next_position
+                    pending.add(future)
+                    next_position += 1
+        except KeyboardInterrupt:
+            interrupted = True
+            cancel.set()
+        finally:
+            # Unexpected coordinator errors must also release running children.
+            if pending or failures:
+                cancel.set()
+            executor.shutdown(wait=True, cancel_futures=True)
+            for future, position in started.items():
+                if future.cancelled():
+                    results[position] = {"consumer_index": position + 1,
+                                         "status": "cancelled"}
+                else:
+                    results[position] = future.result()
+            for signum, handler in previous_handlers.items():
+                signal.signal(signum, handler)
+            for commands in local_records:
+                records.extend(commands)
+            report["consumers"] = [item if item is not None else {
+                "consumer_index": index + 1, "status": "not_started"}
+                for index, item in enumerate(results)]
+            report["selected_images"] = [item["selected_image"] for item in results
+                if item is not None and "selected_image" in item]
+        if interrupted:
+            error = ValueError("Consumer verification interrupted")
+            error.exit_code = 130
+            remember_failure(0, error)
+        if failures:
+            report["failures"] = failures
+            report["first_failure"] = failures[0]
+            raise ValueError(failures[0]["error"])
+        if len(results) != len(plan) or any(
+                item is None or item["status"] != "passed" for item in results):
+            raise ValueError("Consumer plan was not completely joined and verified")
         report["status"] = "passed"
-    except (OSError, ValueError, subprocess.TimeoutExpired, KeyError) as error:
-        report["error"] = str(error)
-        print(f"Source SDK consumers rejected: {error}", file=sys.stderr)
+    except Exception as error:
+        if not failures:
+            remember_failure(0, error)
+        report["failures"] = failures
+        report["first_failure"] = failures[0]
+        report["error"] = failures[0]["error"]
+        print(f"Source SDK consumers rejected: {report['error']}",
+              file=sys.stderr)
     if (output_prepared and output.is_dir() and
             (output / ".nexus-sdk-consumer-check").is_file()):
-        (output / "verification.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+        (output / "verification.json").write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n")
     return 0 if report["status"] == "passed" else 1
 
 

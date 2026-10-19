@@ -133,7 +133,7 @@ static bool chain_withdraw(nx_stm32u575_uart_gpdma_state_t* s) {
     return true;
 }
 
-#define NX_U575_GPDMA_MAX_BYTES (3U * UINT16_MAX)
+#define NX_U575_GPDMA_MAX_BYTES ((size_t)3U * UINT16_MAX)
 #define NX_U575_GPDMA_PROTECTED(s, data, bytes)                                \
     chain_protected((s), (data), (bytes))
 #define NX_U575_GPDMA_LAYOUT_VALID(s)     chain_layout(s)

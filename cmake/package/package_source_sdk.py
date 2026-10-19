@@ -780,6 +780,10 @@ def verify(root):
     files = identity["files_sha256"]
     if not isinstance(files, dict) or not files:
         raise SDKError("Source SDK requires a complete file identity")
+    # Missing mandatory names already disqualify the manifest. Reject before
+    # reading payload bytes; accepted manifests still undergo every check below.
+    if any(name not in files for name in REQUIRED_FILES):
+        raise SDKError("Installed source SDK is missing required sources/licenses")
     for name, expected in files.items():
         if not isinstance(expected, str) or not HEX64.fullmatch(expected):
             raise SDKError("Invalid source SDK file digest")
@@ -790,8 +794,6 @@ def verify(root):
     actual = {path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file() or path.is_symlink()}
     if actual != set(files) | {MANIFEST}:
         raise SDKError("Installed source SDK has missing or additional files")
-    if any(name not in files for name in REQUIRED_FILES):
-        raise SDKError("Installed source SDK is missing required sources/licenses")
     if identity["snapshot_sha256"] != digest(json.dumps(files, sort_keys=True, separators=(",", ":")).encode()):
         raise SDKError("Source snapshot file-map identity changed")
     if identity["toolchains_lock_sha256"] != files["dependencies/toolchains.lock.json"]:

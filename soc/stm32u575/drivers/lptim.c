@@ -66,9 +66,10 @@ static bool live(const nx_stm32u575_lptim_state_t* s, bool gate) {
     uint32_t ranges = NX_U575_READ(&r->ICSCR1);
     uint32_t range =
         (ranges & RCC_ICSCR1_MSIRGSEL) == 0U
-            ? (NX_U575_READ(&r->CSR) & RCC_CSR_MSISSRANGE) >>
+            ? (NX_U575_READ(&r->CSR) & (uint32_t)RCC_CSR_MSISSRANGE) >>
                   RCC_CSR_MSISSRANGE_Pos
-            : (ranges & RCC_ICSCR1_MSISRANGE) >> RCC_ICSCR1_MSISRANGE_Pos;
+            : (ranges & (uint32_t)RCC_ICSCR1_MSISRANGE) >>
+                  RCC_ICSCR1_MSISRANGE_Pos;
     return system->started && system->core_hz == 4000000U &&
            system->timer_error == NX_SUCCESS && range == 4U &&
            (NX_U575_READ(&r->CR) & (RCC_CR_MSISON | RCC_CR_MSISRDY)) ==

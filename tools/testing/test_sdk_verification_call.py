@@ -3,20 +3,30 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
+import os
+import signal
 import shlex
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import tomllib
 import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+from tools.dev import process as maintained_process
+
+ACTUAL_PROCESS_RUN = maintained_process.run
 
 
 class SDKVerificationCallTests(unittest.TestCase):
@@ -449,13 +459,41 @@ class SDKConsumerParallelTests(unittest.TestCase):
         return subprocess.CompletedProcess(command, code, stdout, "")
 
     def execute(self, extra=()):
-        with mock.patch.object(self.consumer.subprocess, "run",
-                               side_effect=self.external_process):
+        with mock.patch.object(subprocess, "run",
+                               side_effect=self.external_process), \
+                mock.patch.object(maintained_process, "run",
+                                  side_effect=self.external_run):
             status = self.consumer.main([
                 "--prefix", str(self.prefix), "--output", str(self.output),
                 *extra])
         report = json.loads((self.output / "verification.json").read_text())
         return status, report
+
+    def external_run(self, command, **options):
+        """Model only the external port, including its retained receipt shape."""
+        started = time.time_ns()
+        result = self.external_process(command)
+        log = Path(options["log"])
+        attempt = log.parent / (log.stem + ".attempts") / "external-fixture"
+        attempt.mkdir(parents=True)
+        def identity(name, text):
+            path = attempt / name
+            path.write_text(text)
+            return {"path": str(path), "bytes": path.stat().st_size,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+        receipt = {"schema": 1, "command": [str(item) for item in command],
+            "cwd": str(options["cwd"]), "stage": options.get("stage", "fixture"),
+            "started_ns": started, "finished_ns": time.time_ns(),
+            "duration_seconds": (time.time_ns() - started) / 1e9,
+            "exit_code": result.returncode, "child_returncode": result.returncode,
+            "outcome": "completed", "withdrawal_complete": True,
+            "withdrawal_stable": True, "withdrawn_processes": [],
+            "stdout": identity("stdout.txt", result.stdout),
+            "stderr": identity("stderr.txt", result.stderr)}
+        result.receipt_path = attempt / "receipt.json"
+        result.receipt_path.write_text(json.dumps(receipt))
+        log.write_text(result.stdout + result.stderr)
+        return result
 
     def builds(self):
         return [command for command in self.commands
@@ -628,7 +666,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                           for command in self.builds()],
                          ["1"] * (13 + len(self.SELECTED_INPUTS)))
 
-    def test_default_retains_legacy_and_selected_build_budgets(self):
+    def test_default_uses_two_consumers_with_one_job_per_build(self):
         status, report = self.execute()
         self.assertEqual(status, 0)
         self.assertEqual(report["source_revision"], "a" * 40)
@@ -636,15 +674,19 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["4"] * 3 + ["2"] * (10 + len(self.SELECTED_INPUTS)))
+                         ["1"] * (13 + len(self.SELECTED_INPUTS)))
+        self.assertEqual(report["parallel_jobs"], 2)
+        self.assertEqual(report["consumer_workers"], 2)
 
-    def test_positive_budget_is_applied_to_every_modern_and_legacy_build(self):
-        status, _ = self.execute(("--parallel", "3"))
+    def test_positive_budget_bounds_consumers_without_nested_build_jobs(self):
+        status, report = self.execute(("--parallel", "3"))
         self.assertEqual(status, 0)
         self.assert_complete_matrix()
         self.assertEqual([command[command.index("--parallel") + 1]
                           for command in self.builds()],
-                         ["3"] * (13 + len(self.SELECTED_INPUTS)))
+                         ["1"] * (13 + len(self.SELECTED_INPUTS)))
+        self.assertEqual(report["parallel_jobs"], 3)
+        self.assertEqual(report["consumer_workers"], 3)
 
     def test_selected_inputs_and_public_smokes_come_only_from_installed_sdk(self):
         status, report = self.execute(("--parallel", "1"))
@@ -924,10 +966,45 @@ class SDKConsumerParallelTests(unittest.TestCase):
                                  "selected native time empty build")
                 self.assertIn("retention", report["error"])
 
+    def test_shutdown_signals_join_and_publish_a_failed_report(self):
+        from concurrent.futures import ThreadPoolExecutor
+        actual_shutdown = ThreadPoolExecutor.shutdown
+        for selected in (signal.SIGINT, signal.SIGTERM):
+            with self.subTest(signal=selected):
+                previous = {item: signal.getsignal(item)
+                            for item in (signal.SIGINT, signal.SIGTERM)}
+                delivered = []
+                escaped = None
+                def shutdown(executor, *arguments, **options):
+                    delivered.append(selected)
+                    try:
+                        os.kill(os.getpid(), selected)
+                    finally:
+                        actual_shutdown(executor, *arguments, **options)
+                try:
+                    with mock.patch.object(ThreadPoolExecutor, "shutdown",
+                                           shutdown):
+                        try:
+                            status, report = self.execute(("--parallel", "2"))
+                        except KeyboardInterrupt as error:
+                            escaped = error
+                finally:
+                    for signum, handler in previous.items():
+                        signal.signal(signum, handler)
+                self.assertEqual(delivered, [selected])
+                self.assertIsNone(escaped,
+                    "signal escaped while joining owned consumer workers")
+                self.assertEqual(status, 1)
+                self.assertEqual(report["status"], "failed")
+                self.assertEqual(report["first_failure"]["exit_code"], 130)
+                self.assertTrue(all(row["withdrawal_complete"]
+                                    for row in report["commands"]))
+
     def test_invalid_budget_rejects_before_any_output_or_external_command(self):
         for value in ("0", "-1", "01", "+1", "1.5", "True", "", " 1"):
             with self.subTest(value=value), mock.patch.object(
-                    self.consumer.subprocess, "run") as command:
+                    subprocess, "run") as command, \
+                    mock.patch.object(maintained_process, "run") as maintained:
                 errors = io.StringIO()
                 with contextlib.redirect_stderr(errors), self.assertRaises(
                         SystemExit) as failure:
@@ -938,6 +1015,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 self.assertIn("positive integer", errors.getvalue())
                 self.assertFalse(self.output.exists())
                 command.assert_not_called()
+                maintained.assert_not_called()
 
     def test_explicit_budget_preserves_a_real_subprocess_failure(self):
         self.failed_build = True
@@ -956,6 +1034,326 @@ class SDKConsumerParallelTests(unittest.TestCase):
         self.assertEqual(report["status"], "failed")
         self.assertEqual(self.builds(), [])
         self.assertEqual(report["commands"][-1]["exit_code"], 9)
+
+
+class SDKConsumerWorkerPoolTests(unittest.TestCase):
+    """Run real owned subprocesses behind the external CMake/SDK port."""
+
+    SHIM = r'''
+import importlib.util
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+payload = json.loads(sys.argv[1])
+command = payload['command']
+workspace = Path(payload['workspace'])
+root = Path(payload['root'])
+sys.path.insert(0, str(root))
+
+def event(phase):
+    row = {'phase': phase, 'time_ns': time.monotonic_ns(), 'pid': os.getpid(),
+           'argv': command, 'nexus_jobs': os.environ.get('NEXUS_BUILD_JOBS'),
+           'cmake_jobs': os.environ.get('CMAKE_BUILD_PARALLEL_LEVEL')}
+    descriptor = os.open(workspace / 'events.jsonl',
+                         os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+    try:
+        os.write(descriptor, (json.dumps(row) + '\n').encode())
+    finally:
+        os.close(descriptor)
+
+def wait_for(predicate, timeout=3):
+    deadline = time.monotonic() + timeout
+    while not predicate():
+        if time.monotonic() >= deadline:
+            print('independent consumer did not reach rendezvous', flush=True)
+            raise SystemExit(91)
+        time.sleep(0.01)
+
+event('start')
+try:
+    configure = command[0] == 'cmake' and '-S' in command
+    label = Path(command[command.index('-S') + 1]).name if configure else ''
+    mode = payload['mode']
+    if mode == 'overlap' and configure:
+        first = ('native source', 'stm32 source', 'gd32 source')[:payload['jobs']]
+        if label in first:
+            (workspace / ('ready-' + label)).write_text(str(os.getpid()))
+            wait_for(lambda: all((workspace / ('ready-' + name)).exists()
+                                 for name in first))
+    if mode == 'fail-peer' and configure:
+        if label == 'native source':
+            child = subprocess.Popen([sys.executable, '-c',
+                'import os,sys,time;from pathlib import Path;'
+                'Path(sys.argv[1]).write_text(str(os.getpid()));time.sleep(30)',
+                str(workspace / 'grandchild.pid')])
+            (workspace / 'blocked.pid').write_text(str(os.getpid()))
+            wait_for(lambda: (workspace / 'grandchild.pid').exists())
+            print('blocked consumer parent and grandchild', flush=True)
+            time.sleep(30)
+        elif label == 'stm32 source':
+            wait_for(lambda: (workspace / 'grandchild.pid').exists())
+            print('actual peer failure 42', flush=True)
+            raise SystemExit(42)
+    if (mode == 'two-failures' and configure and
+            label in ('native source', 'stm32 source')):
+        raise SystemExit(42 if label == 'native source' else 43)
+    if mode in ('timeout', 'interrupt') and configure and label == 'native source':
+        (workspace / 'blocked.pid').write_text(str(os.getpid()))
+        print('actual blocked command before ' + mode, flush=True)
+        time.sleep(30)
+    if (mode == 'validation' and
+            any(item.endswith('retention.py') for item in command)):
+        image = Path(command[command.index('--elf') + 1])
+        if image.parents[1].name == 'h743 baremetal build':
+            (workspace / 'validation-ready').write_text(str(os.getpid()))
+            wait_for(lambda: (workspace / 'validation-release').exists(), 5)
+    specification = importlib.util.spec_from_file_location(
+        'external_sdk_fixture', root / 'tools/testing/test_sdk_verification_call.py')
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    fixture = module.SDKConsumerParallelTests()
+    fixture.sdk = Path(payload['sdk'])
+    fixture.commands = []
+    fixture.failed_build = False
+    fixture.failed_sdk = False
+    fixture.selected_fault = payload.get('fault')
+    result = fixture.external_process(command)
+    if mode == 'validation' and (workspace / 'validation-ready').exists():
+        if any(item.endswith('retention.py') for item in command):
+            image = Path(command[command.index('--elf') + 1])
+            if image.parents[1].name == 'h743 baremetal build':
+                Path(command[command.index('--output') + 1]).write_text(
+                    json.dumps({'status': 'failed'}))
+    print(result.stdout, end='', flush=True)
+    print(result.stderr, end='', file=sys.stderr, flush=True)
+    raise SystemExit(result.returncode)
+finally:
+    event('end')
+'''
+
+    def setUp(self):
+        self.fixture = SDKConsumerParallelTests()
+        self.fixture.setUp()
+        self.addCleanup(self.fixture.doCleanups)
+        self.directory = self.fixture.directory
+        self.output = self.fixture.output
+        self.shim = self.directory / 'external_sdk_process.py'
+        self.shim.write_text(self.SHIM)
+        self.lock = threading.Lock()
+
+    def real_execute(self, *, mode='overlap', jobs=2, fault=None):
+        completed_failures = threading.Barrier(2)
+        def external(command, **options):
+            command = [str(argument) for argument in command]
+            with self.lock:
+                index = len(self.fixture.commands)
+                self.fixture.commands.append(command)
+            log = options.get('log', self.directory / f'old-port-{index}.log')
+            payload = {'command': command, 'root': str(ROOT),
+                'sdk': str(self.fixture.sdk), 'workspace': str(self.directory),
+                'mode': mode, 'jobs': jobs, 'fault': fault}
+            actual = [sys.executable, str(self.shim), json.dumps(payload)]
+            selected = (command[0] == 'cmake' and '-S' in command and
+                Path(command[command.index('-S') + 1]).name == 'native source')
+            if mode == 'launch' and selected:
+                actual = [str(self.directory / 'missing-external-tool')]
+            timeout = 0.2 if mode == 'timeout' and selected else 8
+            result = ACTUAL_PROCESS_RUN(actual,
+                cwd=options.get('cwd', ROOT),
+                env=options.get('env', os.environ.copy()), log=log,
+                timeout=timeout, stage=options.get('stage', 'external-sdk-fixture'),
+                cancel_event=options.get('cancel_event'))
+            if mode == 'two-failures' and result.returncode in (42, 43):
+                completed_failures.wait(timeout=5)
+            return result
+        with mock.patch.object(subprocess, 'run',
+                               side_effect=external), \
+                mock.patch.object(maintained_process, 'run',
+                                  side_effect=external), \
+                mock.patch.dict(os.environ, {'NEXUS_BUILD_JOBS': '99',
+                    'CMAKE_BUILD_PARALLEL_LEVEL': '99'}), \
+                contextlib.redirect_stderr(io.StringIO()):
+            status = self.fixture.consumer.main([
+                '--prefix', str(self.fixture.prefix), '--output', str(self.output),
+                '--parallel', str(jobs)])
+        return status, json.loads((self.output / 'verification.json').read_text())
+
+    def events(self):
+        return [json.loads(line) for line in
+                (self.directory / 'events.jsonl').read_text().splitlines()]
+
+    def assert_complete_execution(self, jobs):
+        status, report = self.real_execute(jobs=jobs)
+        self.assertEqual(status, 0, report)
+        self.fixture.assert_complete_matrix()
+        active, peak = set(), 0
+        for event in sorted(self.events(), key=lambda row: row['time_ns']):
+            self.assertEqual(event['nexus_jobs'], '1')
+            self.assertEqual(event['cmake_jobs'], '1')
+            if event['phase'] == 'start':
+                active.add(event['pid'])
+                peak = max(peak, len(active))
+            else:
+                active.remove(event['pid'])
+            self.assertLessEqual(len(active), jobs)
+        self.assertEqual(peak, jobs)
+        self.assertEqual(active, set())
+        self.assertEqual(report['status'], 'passed')
+        self.assertEqual(report['parallel_jobs'], jobs)
+        self.assertEqual(report['consumer_workers'], jobs)
+        self.assertEqual(len(report['consumers']), 41)
+        self.assertTrue(all(row['status'] == 'passed'
+                            for row in report['consumers']))
+        self.assertEqual([row['name'] for row in report['selected_images']],
+                         [name for name, _, _ in
+                          self.fixture.consumer.SELECTED_CONSUMERS])
+        keys = [(row['consumer_index'], row['phase_index'])
+                for row in report['commands']]
+        self.assertEqual(keys, sorted(keys))
+        self.assertEqual(len(keys), len(set(keys)))
+        logs = [row['log'] for row in report['commands']]
+        self.assertEqual(len(logs), len(set(logs)))
+        for row in report['commands']:
+            self.assertEqual(row['allocated_jobs'], 1)
+            self.assertEqual(row['log'], 'command-{:02d}-{:02d}.log'.format(
+                row['consumer_index'], row['phase_index']))
+            receipt = json.loads((self.output / row['receipt']).read_text())
+            self.assertEqual(receipt['exit_code'], row['exit_code'])
+            self.assertEqual(receipt['outcome'], 'completed')
+            self.assertTrue(receipt['withdrawal_complete'])
+            for stream in ('stdout', 'stderr'):
+                identity = receipt[stream]
+                path = Path(identity['path'])
+                self.assertEqual(path.stat().st_size, identity['bytes'])
+                self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(),
+                                 identity['sha256'])
+
+    def test_two_independent_chains_overlap_with_one_global_job_budget(self):
+        self.assert_complete_execution(2)
+
+    def test_three_independent_chains_overlap_without_nested_job_expansion(self):
+        self.assert_complete_execution(3)
+
+    def assert_withdrawn(self, pid):
+        path = Path('/proc') / str(pid) / 'stat'
+        if path.exists():
+            state = path.read_text().rsplit(')', 1)[1].split()[0]
+            self.assertIn(state, ('Z', 'X'), 'owned process remains executable')
+
+    def test_first_failure_cancels_and_joins_peer_parent_and_grandchild(self):
+        started = time.monotonic()
+        status, report = self.real_execute(mode='fail-peer')
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'failed')
+        self.assertLess(time.monotonic() - started, 6)
+        self.assertEqual(report['first_failure']['exit_code'], 42)
+        self.assertEqual({row['exit_code'] for row in report['commands']
+                          if row['exit_code']}, {42, 130})
+        self.assertFalse(any('gd32 source' in ' '.join(event['argv'])
+                             for event in self.events()))
+        self.assertEqual(sum(row['status'] != 'not_started'
+                             for row in report['consumers']), 2)
+        for name in ('blocked.pid', 'grandchild.pid'):
+            self.assert_withdrawn(int((self.directory / name).read_text()))
+        peer = next(row for row in report['commands'] if row['exit_code'] == 130)
+        receipt = json.loads((self.output / peer['receipt']).read_text())
+        self.assertEqual(receipt['outcome'], 'cancelled')
+        self.assertTrue(receipt['withdrawal_complete'])
+        self.assertGreaterEqual(len(receipt['withdrawn_processes']), 2)
+        self.assertIn('blocked consumer parent and grandchild',
+                      (self.output / peer['log']).read_text())
+
+    def test_actual_timeout_and_launch_failure_retain_truthful_results(self):
+        for mode, code, outcome in (('timeout', 124, 'timed_out'),
+                                     ('launch', 127, 'launch_failed')):
+            with self.subTest(mode=mode):
+                status, report = self.real_execute(mode=mode, jobs=1)
+                self.assertEqual(status, 1)
+                self.assertEqual(report['status'], 'failed')
+                row = report['commands'][-1]
+                self.assertEqual(row['exit_code'], code)
+                self.assertEqual(report['first_failure']['exit_code'], code)
+                receipt = json.loads((self.output / row['receipt']).read_text())
+                self.assertEqual(receipt['outcome'], outcome)
+                self.assertTrue(receipt['withdrawal_complete'])
+                if mode == 'timeout':
+                    self.assert_withdrawn(int(
+                        (self.directory / 'blocked.pid').read_text()))
+
+    def test_two_completed_failures_are_both_retained_before_cancellation(self):
+        status, report = self.real_execute(mode='two-failures')
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'failed')
+        self.assertEqual({row['exit_code'] for row in report['failures']},
+                         {42, 43})
+        self.assertIn(report['first_failure']['exit_code'], (42, 43))
+        self.assertFalse(any('gd32 source' in ' '.join(event['argv'])
+                             for event in self.events()))
+        failed = [row for row in report['commands'] if row['exit_code']]
+        self.assertEqual({row['exit_code'] for row in failed}, {42, 43})
+        for row in failed:
+            receipt = json.loads((self.output / row['receipt']).read_text())
+            self.assertEqual(receipt['child_returncode'], row['exit_code'])
+            self.assertEqual(receipt['outcome'], 'completed')
+            self.assertTrue(receipt['withdrawal_complete'])
+
+    def test_sigint_cancels_real_workers_before_final_failed_report(self):
+        delivered = threading.Event()
+        def interrupt():
+            deadline = time.monotonic() + 5
+            while not (self.directory / 'blocked.pid').exists():
+                if time.monotonic() >= deadline:
+                    return
+                time.sleep(0.01)
+            delivered.set()
+            os.kill(os.getpid(), signal.SIGINT)
+        notifier = threading.Thread(target=interrupt)
+        notifier.start()
+        try:
+            status, report = self.real_execute(mode='interrupt')
+        finally:
+            notifier.join(timeout=6)
+        self.assertTrue(delivered.is_set())
+        self.assertFalse(notifier.is_alive())
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'failed')
+        self.assertEqual(report['first_failure']['exit_code'], 130)
+        self.assertTrue(all(row['withdrawal_complete']
+                            for row in report['commands']))
+        self.assert_withdrawn(int((self.directory / 'blocked.pid').read_text()))
+
+    def test_pass_is_withheld_until_blocked_validation_rejects_and_joins(self):
+        result = []
+        errors = []
+        def execute():
+            try:
+                result.append(self.real_execute(mode='validation'))
+            except BaseException as error:
+                errors.append(error)
+        worker = threading.Thread(target=execute)
+        worker.start()
+        try:
+            deadline = time.monotonic() + 5
+            while not (self.directory / 'validation-ready').exists():
+                if not worker.is_alive() or time.monotonic() >= deadline:
+                    self.fail('retention validation did not reach its barrier')
+                time.sleep(0.01)
+            self.assertTrue(worker.is_alive())
+            self.assertFalse((self.output / 'verification.json').exists())
+        finally:
+            (self.directory / 'validation-release').write_text('release')
+            worker.join(timeout=8)
+        self.assertFalse(worker.is_alive())
+        self.assertEqual(errors, [])
+        status, report = result[0]
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'failed')
+        failed = [row for row in report['consumers'] if row['status'] == 'failed']
+        self.assertTrue(any(row['name'] == 'h743 baremetal' for row in failed))
 
 
 if __name__ == "__main__":
