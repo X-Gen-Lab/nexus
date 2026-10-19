@@ -2,6 +2,7 @@
 from pathlib import Path
 import tempfile
 import unittest
+import unittest.mock as mock
 
 from tools.configure import bindings, configure
 from tools.configure.providers.common import ConfigurationError
@@ -70,7 +71,6 @@ class LegacyDevicesTests(unittest.TestCase):
             self.assertIn(prefix + f"gd32f30x_{unit}.h", payload)
 
     def test_physical_flash_factory_rejects_missing_exact_provider_contract(self):
-        from unittest import mock
         from tools.configure import factory
         result = configure.resolve(self.fixture("f103"), ROOT)
         provider = maintained("stm32f103")

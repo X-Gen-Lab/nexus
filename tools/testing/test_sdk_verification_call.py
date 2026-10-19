@@ -90,6 +90,80 @@ class SDKVerificationCallTests(unittest.TestCase):
         self.assertEqual((self.source.parent / "count").read_text(), "3")
 
 
+class SDKConsumerOutputAdmissionTests(unittest.TestCase):
+    """Reject invalid roots before deleting SDK bytes or publishing reports."""
+
+    def setUp(self):
+        specification = importlib.util.spec_from_file_location(
+            "nexus_consumer_output_admission",
+            ROOT / "cmake/package/verify_consumers.py")
+        self.consumer = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(self.consumer)
+
+    def snapshot(self, root):
+        return {path.relative_to(root).as_posix():
+                ("symlink", str(path.readlink())) if path.is_symlink() else
+                ("file", path.read_bytes())
+                for path in root.rglob("*")
+                if path.is_symlink() or path.is_file()}
+
+    def fixture(self, root):
+        prefix = root / "SDK prefix"
+        sdk = prefix / "share/nexus/src"
+        sdk.mkdir(parents=True)
+        (sdk / "payload").write_bytes(b"preserve exact SDK bytes\x00\xff")
+        (sdk / ".nexus-source-sdk.json").write_text(
+            '{"source_revision":"fixture","publishable":true}\n')
+        return prefix
+
+    def reject_unchanged(self, root, prefix, output):
+        before = self.snapshot(root)
+        errors = io.StringIO()
+        with contextlib.redirect_stderr(errors):
+            result = self.consumer.main([
+                "--prefix", str(prefix), "--output", str(output)])
+        self.assertEqual(result, 1)
+        self.assertEqual(self.snapshot(root), before,
+                         "invalid output admission changed retained SDK bytes")
+        self.assertIn("canonical and disjoint", errors.getvalue())
+
+    def test_owned_ancestor_equal_and_nested_output_preserve_sdk(self):
+        for relation in ("ancestor", "equal", "nested"):
+            with self.subTest(relation=relation), tempfile.TemporaryDirectory(
+                    prefix="SDK output containment ") as temporary:
+                root = Path(temporary)
+                prefix = self.fixture(root)
+                output = {"ancestor": root, "equal": prefix,
+                          "nested": prefix / "results"}[relation]
+                output.mkdir(exist_ok=True)
+                (output / ".nexus-sdk-consumer-check").write_text(
+                    "owned SDK consumer verification\n")
+                self.reject_unchanged(root, prefix, output)
+
+    def test_output_alias_cannot_write_report_into_owned_ancestor(self):
+        with tempfile.TemporaryDirectory(prefix="SDK output alias ") as temporary:
+            root = Path(temporary)
+            prefix = self.fixture(root)
+            (root / ".nexus-sdk-consumer-check").write_text(
+                "owned SDK consumer verification\n")
+            output = root / "aliased output"
+            output.symlink_to(root, target_is_directory=True)
+            self.reject_unchanged(root, prefix, output)
+
+    def test_prefix_alias_cannot_replace_a_preexisting_output_report(self):
+        with tempfile.TemporaryDirectory(prefix="SDK prefix alias ") as temporary:
+            root = Path(temporary)
+            prefix = self.fixture(root)
+            alias = root / "aliased SDK"
+            alias.symlink_to(prefix, target_is_directory=True)
+            output = root / "consumer results"
+            output.mkdir()
+            (output / ".nexus-sdk-consumer-check").write_text(
+                "owned SDK consumer verification\n")
+            (output / "verification.json").write_bytes(b"retained prior failure\n")
+            self.reject_unchanged(root, alias, output)
+
+
 class SDKConsumerParallelTests(unittest.TestCase):
     """Real CLI and templates; external CMake/SDK processes are test doubles."""
 

@@ -41,7 +41,8 @@ nx_result_t nx_native_spi_dma_initialize(nx_native_spi_dma_state_t* state) {
         return NX_ERROR_CONTEXT;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
-    if (state->active != NULL || state->selected != NULL) {
+    if (state->active != NULL || state->selected != NULL ||
+        state->wake_publishers != 0U) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
@@ -147,7 +148,7 @@ static void step(nx_native_spi_dma_state_t* state,
         return;
     }
     nx_spi_request_t* phase = state->active;
-    const nx_irq_wake_t* wake = state->wake;
+    const nx_irq_wake_t* wake = NULL;
     bool notify = false;
     if (!state->opened || phase == NULL) {
         nx_arch_irq_restore(saved);
@@ -183,9 +184,17 @@ static void step(nx_native_spi_dma_state_t* state,
         }
         ++state->shifted;
     }
+    /* Count every captured sink until its callback has completely returned. */
+    if (notify && state->wake != NULL && state->wake_publishers != UINT32_MAX) {
+        wake = state->wake;
+        ++state->wake_publishers;
+    }
     nx_arch_irq_restore(saved);
-    if (notify) {
+    if (wake != NULL) {
         (void)nx_irq_wake_signal(wake);
+        saved = nx_arch_irq_save();
+        --state->wake_publishers;
+        nx_arch_irq_restore(saved);
     }
 }
 void nx_native_spi_dma_model_step(const nx_spi_dma_transaction_port_t* port) {
@@ -294,6 +303,11 @@ static nx_result_t stop(void* context) {
         return NX_ERROR_INVALID;
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (state->wake_publishers != 0U) {
+        state->stopping = true;
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
     if (!state->opened) {
         nx_arch_irq_restore(saved);
         return NX_SUCCESS;
@@ -307,7 +321,7 @@ static nx_result_t stop(void* context) {
     }
     saved = nx_arch_irq_save();
     if (state->active != NULL || state->selected != NULL || !state->wire_idle ||
-        state->hold_drain) {
+        state->hold_drain || state->wake_publishers != 0U) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
@@ -351,6 +365,10 @@ nx_native_spi_dma_owner_attach_wake(const nx_spi_dma_transaction_port_t* port,
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     nx_native_spi_dma_state_t* state = model_state(port);
+    if (state != NULL && state->wake_publishers != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
     if (state == NULL || !state->opened || state->stopping) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_STATE;

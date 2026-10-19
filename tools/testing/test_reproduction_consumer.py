@@ -9,10 +9,10 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.evidence.common import EvidenceError
+from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
+                                   verify_file_identity)
 from tools.evidence import consumer
 from tools.evidence import reproduce
-from tools.evidence.common import atomic_json, command, file_identity, verify_file_identity
 from tools.evidence.inputs import tree_identity
 from tools.evidence.inputs import records_identity
 from tools.evidence import proof
