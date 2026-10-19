@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest import mock
+import unittest.mock as mock
 
 from tools.evidence.common import EvidenceError
 try:
@@ -204,14 +204,18 @@ class StorageTests(unittest.TestCase):
         query.assert_not_called()
 
     def test_cancelled_create_cleans_named_daemon_workload_and_retains_receipt(self):
-        with tempfile.TemporaryDirectory() as directory:
-            with self.assertRaises(KeyboardInterrupt):
-                self.probe(directory, free=(5000, 5000),
-                           create=KeyboardInterrupt())
-            report = json.loads((Path(directory) / "probe/preflight.json").read_text())
-        self.assertEqual(report["status"], "cancelled")
-        self.assertEqual(len(self.executions), 2)
-        self.assertEqual(report["cleanup"]["exit_code"], 0)
+        for cancellation in (KeyboardInterrupt(), SystemExit(23)):
+            with self.subTest(cancellation=type(cancellation).__name__), \
+                    tempfile.TemporaryDirectory() as directory:
+                with self.assertRaises(type(cancellation)) as caught:
+                    self.probe(directory, free=(5000, 5000),
+                               create=cancellation)
+                report = json.loads((Path(directory) /
+                    "probe/preflight.json").read_text())
+                self.assertIs(caught.exception, cancellation)
+                self.assertEqual(report["status"], "cancelled")
+                self.assertEqual(len(self.executions), 2)
+                self.assertEqual(report["cleanup"]["exit_code"], 0)
 
     def test_probe_failed_cleanup_or_racing_free_space_is_never_admitted(self):
         for options in ({"cleanup": 1}, {"free": (5000, 5100, 5000)},
@@ -221,13 +225,35 @@ class StorageTests(unittest.TestCase):
                 self.assertEqual(result["status"], "failed")
 
     def test_cancelled_probe_retains_cleanup_exception_and_original_cancellation(self):
+        for cleanup in (EvidenceError("cleanup unavailable"),
+                        KeyboardInterrupt(), SystemExit(31)):
+            with self.subTest(cleanup=type(cleanup).__name__), \
+                    tempfile.TemporaryDirectory() as directory:
+                cancellation = KeyboardInterrupt()
+                with self.assertRaises(KeyboardInterrupt) as caught:
+                    self.probe(directory, free=(5000,), create=cancellation,
+                               cleanup=cleanup)
+                report = json.loads((Path(directory) /
+                    "probe/preflight.json").read_text())
+                self.assertIs(caught.exception, cancellation)
+                self.assertEqual(report["status"], "cancelled")
+                self.assertEqual(report["cleanup_failure"],
+                    str(cleanup) or type(cleanup).__name__)
+                self.assertIn("named storage probe cleanup did not complete",
+                              cancellation.__notes__)
+
+    def test_unexpected_probe_failure_rethrows_after_cleanup_and_receipt(self):
         with tempfile.TemporaryDirectory() as directory:
-            with self.assertRaises(KeyboardInterrupt):
-                self.probe(directory, free=(5000,), create=KeyboardInterrupt(),
-                           cleanup=EvidenceError("cleanup unavailable"))
-            report = json.loads((Path(directory) / "probe/preflight.json").read_text())
-        self.assertEqual(report["status"], "cancelled")
-        self.assertEqual(report["cleanup_failure"], "cleanup unavailable")
+            failure = RuntimeError("runner defect")
+            with self.assertRaises(RuntimeError) as caught:
+                self.probe(directory, free=(5000, 5000), create=failure)
+            report = json.loads((Path(directory) /
+                "probe/preflight.json").read_text())
+        self.assertIs(caught.exception, failure)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["failure"], "runner defect")
+        self.assertEqual(report["cleanup"]["exit_code"], 0)
+        self.assertEqual(len(self.executions), 2)
 
 
 if __name__ == "__main__":

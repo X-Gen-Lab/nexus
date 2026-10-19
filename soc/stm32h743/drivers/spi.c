@@ -52,6 +52,22 @@ static bool protected(const nx_stm32h743_spi_endpoint_state_t* e,
            overlap(data, size, e->cs, sizeof(*e->cs)) ||
            overlap(data, size, e->cs->registers, sizeof(*e->cs->registers));
 }
+/** \brief Check loans after endpoint pointers and complete spans are valid. */
+static bool disjoint_transfer(const nx_stm32h743_spi_endpoint_state_t* e,
+                              const uint8_t* tx, uint8_t* rx, size_t length,
+                              size_t* transferred) {
+    if (protected(e, transferred, sizeof(*transferred)))
+        return false;
+    if (tx != NULL && (protected(e, tx, length) ||
+                       overlap(transferred, sizeof(*transferred), tx, length)))
+        return false;
+    if (rx != NULL && (protected(e, rx, length) ||
+                       overlap(transferred, sizeof(*transferred), rx, length)))
+        return false;
+    /* Exact in-place full duplex is valid; partial overlap is not. */
+    return tx == NULL || rx == NULL || tx == rx ||
+           !overlap(tx, length, rx, length);
+}
 /** \brief H743 V3 reset stops its FIFO shifter; verify both reset edges and
  * idle. */
 static nx_result_t reset(nx_stm32h743_spi_state_t* p) {
@@ -145,6 +161,13 @@ nx_result_t nx_stm32h743_spi_initialize(nx_stm32h743_spi_state_t* p) {
     p->initialized = true;
     return NX_SUCCESS;
 }
+/**
+ * \brief Poll a finite transfer while retaining its wire and CS responsibility.
+ *
+ * Storage validation precedes output or hardware writes. Started paths reset
+ * the shifter before releasing CS; failed withdrawal parks with this frame
+ * and the caller's storage retained, even after its deadline expires.
+ */
 static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
                             size_t length, nx_time_us_t deadline,
                             size_t* transferred) {
@@ -152,22 +175,16 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
     if (!task_context())
         return NX_ERROR_CONTEXT;
     if (e == NULL || !valid(e->port) || e->cs == NULL ||
-        e->cs->registers == NULL || !span(transferred, sizeof(*transferred)) ||
-        length == 0U || (tx == NULL && rx == NULL) ||
-        (tx != NULL && !span(tx, length)) ||
-        (rx != NULL && !span(rx, length)) || e->mode > 3U ||
-        e->frequency_hz == 0U || e->cs_mask == 0U ||
+        e->cs->registers == NULL)
+        return NX_ERROR_INVALID;
+    if (!span(transferred, sizeof(*transferred)) || length == 0U ||
+        (tx == NULL && rx == NULL) || (tx != NULL && !span(tx, length)) ||
+        (rx != NULL && !span(rx, length)))
+        return NX_ERROR_INVALID;
+    if (e->mode > 3U || e->frequency_hz == 0U || e->cs_mask == 0U ||
         (e->cs_mask & ~e->cs->mask) != 0U || !e->cs->output)
         return NX_ERROR_INVALID;
-    if (protected(e, transferred, sizeof(*transferred)) ||
-        (tx != NULL &&
-         (protected(e, tx, length) ||
-          overlap(transferred, sizeof(*transferred), tx, length))) ||
-        (rx != NULL &&
-         (protected(e, rx, length) ||
-          overlap(transferred, sizeof(*transferred), rx, length))) ||
-        (tx != NULL && rx != NULL && tx != rx &&
-         overlap(tx, length, rx, length)))
+    if (!disjoint_transfer(e, tx, rx, length, transferred))
         return NX_ERROR_INVALID;
     *transferred = 0U;
     nx_stm32h743_spi_state_t* p = e->port;
@@ -191,6 +208,8 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
     }
     if ((uint64_t)p->clock_hz > (uint64_t)e->frequency_hz * divisor)
         return NX_ERROR_UNSUPPORTED;
+    /* Own the controller before programming it, but assert CS only after
+     * configuration readback succeeds. CSTART follows observed CS assertion. */
     p->active = true;
     uint32_t config = SPI_CFG2_MASTER | SPI_CFG2_SSM | SPI_CFG2_AFCNTR |
                       ((e->mode & 1U) != 0U ? SPI_CFG2_CPHA : 0U) |
@@ -242,6 +261,8 @@ static nx_result_t transfer(void* context, const uint8_t* tx, uint8_t* rx,
     if (result == NX_SUCCESS)
         result = wait(p, SPI_SR_EOT | SPI_SR_TXC | FIFO_LEVELS,
                       SPI_SR_EOT | SPI_SR_TXC, deadline);
+    /* EOT/TXC are not sufficient for the erratum's final trailing edge.
+     * The quiet guard and reset still run on an expired request deadline. */
     if ((NX_H743_READ(&p->registers->SR) & SPI_SR_EOT) != 0U)
         finish_clock(p, divisor);
     if (result != NX_SUCCESS)

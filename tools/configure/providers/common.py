@@ -180,6 +180,8 @@ def validate_clock_profiles(soc, provider):
 
 def resolve_interrupts(cpu, irq, backend, provider):
     """Bind logical IRQ range and syscall policy to a maintained kernel port."""
+    # CPU bundle generation imports factory, which imports these shared checks.
+    # Delay this dependency until provider modules have completed initialization.
     try:
         from .. import cpu as profiles
     except ImportError:

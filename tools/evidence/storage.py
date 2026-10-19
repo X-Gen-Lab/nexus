@@ -285,6 +285,8 @@ def probe(image, *, output, runner, docker="docker", requested_concurrency=1,
                         output / "cleanup.log", timeout_s=30)
                     report["after_cleanup_free_bytes"] = free_space(root)
                 except BaseException as cleanup_error:
+                    # Cancellation also needs a receipt. Preserve an earlier
+                    # failure as primary while retaining this cleanup failure.
                     report["cleanup_failure"] = str(cleanup_error) or type(cleanup_error).__name__
                     if original is not None:
                         original.add_note("named storage probe cleanup did not complete")
@@ -307,6 +309,8 @@ def probe(image, *, output, runner, docker="docker", requested_concurrency=1,
             report["limitations"].append("Observed create/cleanup sample; external "
                 "filesystem pressure below tolerance cannot be excluded.")
     except BaseException as error:
+        # Record cancellation before finally writes the receipt, then rethrow
+        # it below. Catching Exception alone would omit its cancelled status.
         report["failure"] = str(error) or type(error).__name__
         if not isinstance(error, Exception):
             report["status"] = "cancelled"

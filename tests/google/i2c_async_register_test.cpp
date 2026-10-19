@@ -1,7 +1,9 @@
 /**
  * \file            i2c_async_register_test.cpp
- * \brief           Real V1 asynchronous register algorithms and borrowed
- * storage \author          Nexus Team \version         1.0.0 \date 2026-10-11
+ * \brief           Real V1 asynchronous registers and borrowed storage
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "i2c_v1_async.h"
@@ -46,6 +48,20 @@ class I2CAsyncRegisters : public testing::Test {
     nx_i2c_request_t request = {};
     uint8_t bytes[4] = {};
     nx_i2c_message_t message = {bytes, 1U, true};
+    nx_result_t stop_from_wake_result = NX_SUCCESS;
+    /* The provider may retain this wake beyond TestBody after a fatal ASSERT.
+     * Keep its callback and context alive until TearDown has joined it. */
+    const nx_irq_wake_t stop_from_wake = {
+        this,
+        [](void* raw) -> nx_result_t {
+            auto* fixture = static_cast<I2CAsyncRegisters*>(raw);
+            fixture->registers[0] &= ~((1U << 8U) | (1U << 9U));
+            fixture->registers[6] = 0U;
+            nx_i2c_port_service(&fixture->bus);
+            fixture->stop_from_wake_result = nx_i2c_port_stop(&fixture->bus);
+            return NX_SUCCESS;
+        },
+        false};
 
     nx_result_t Initialize() {
 #if defined(NX_I2C_TEST_STM32)
@@ -181,30 +197,16 @@ TEST_F(I2CAsyncRegisters, FailedVectorWithdrawalRetainsLiveState) {
     state.stop_irqs = nullptr;
 }
 TEST_F(I2CAsyncRegisters, PublisherMustJoinBeforeStopReturnsBorrowedWake) {
-    struct Context {
-        nx_i2c_v1_state_t* state;
-        const nx_i2c_port_t* bus;
-        nx_result_t stopped;
-    } context = {&state, &bus, NX_SUCCESS};
-    const nx_irq_wake_t wake = {&context,
-                                [](void* raw) -> nx_result_t {
-                                    auto* c = static_cast<Context*>(raw);
-                                    c->state->registers[0] &=
-                                        ~((1U << 8U) | (1U << 9U));
-                                    c->state->registers[6] = 0U;
-                                    nx_i2c_port_service(c->bus);
-                                    c->stopped = nx_i2c_port_stop(c->bus);
-                                    return NX_SUCCESS;
-                                },
-                                false};
-    state.wake = &wake;
+    state.wake = &stop_from_wake;
     ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 1000U),
               NX_SUCCESS);
     ASSERT_EQ(nx_i2c_endpoint_submit(&endpoint, &request), NX_SUCCESS);
     registers[5] = 1U << 10U;
     nx_i2c_v1_irq(&state);
-    EXPECT_EQ(context.stopped, NX_ERROR_BUSY);
-    EXPECT_EQ(state.wake, &wake);
+    EXPECT_EQ(stop_from_wake_result, NX_ERROR_BUSY);
+    EXPECT_EQ(state.wake, &stop_from_wake);
+    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
+    EXPECT_EQ(state.wake, nullptr);
 }
 #endif
 

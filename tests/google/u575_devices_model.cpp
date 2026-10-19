@@ -53,17 +53,8 @@ extern "C" uint32_t nx_u575_devices_read(volatile uint32_t* reg) {
         i2c_next();
     return value;
 }
-extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
-    if (reg == g_u575_model.ignore_write) {
-        ++g_u575_model.writes;
-        return;
-    }
-    if (reg == &g_u575_model.rcc.CR) {
-        if ((value & RCC_CR_HSION) != 0U && !g_u575_hsi_hold_on)
-            value |= RCC_CR_HSIRDY;
-        if ((value & RCC_CR_HSION) == 0U && !g_u575_hsi_hold_off)
-            value &= ~static_cast<uint32_t>(RCC_CR_HSIRDY);
-    }
+/** \brief Model key sequencing, W1C status and physical page erase latency. */
+static bool write_flash(volatile uint32_t* reg, uint32_t value) {
     if (g_u575_physical_flash != nullptr) {
         if (reg == &g_u575_physical_flash->NSKEYR) {
             if (flash_key == 0x45670123U && value == 0xcdef89abU)
@@ -75,12 +66,12 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
             *reg &= ~(g_u575_flash_hold_eop_clear
                           ? value & ~static_cast<uint32_t>(FLASH_NSSR_EOP)
                           : value);
-            return;
+            return true;
         }
         if (reg == &g_u575_physical_flash->NSCR &&
             (value & FLASH_NSCR_STRT) != 0U) {
             if (g_u575_flash_ignore_start)
-                return;
+                return true;
             g_u575_flash_erase = value;
             const uint32_t page =
                 ((value & static_cast<uint32_t>(FLASH_NSCR_PNB)) >>
@@ -93,6 +84,11 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
             flash_busy = 3U;
         }
     }
+    return false;
+}
+/** \brief Model reset, W1C status and regulator/calibration/enable handshakes.
+ */
+static bool write_adc(volatile uint32_t* reg, uint32_t& value) {
     if (g_u575_adc != nullptr) {
         if (reg == &g_u575_model.rcc.AHB3RSTR &&
             (value & RCC_AHB3RSTR_ADC4RST) != 0U &&
@@ -103,11 +99,11 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
         if (reg == &g_u575_adc->ISR) {
             if (reg != g_u575_model.ignore_write)
                 *reg &= ~value;
-            return;
+            return true;
         }
         if (reg == &g_u575_adc->CR && reg != g_u575_model.ignore_write) {
             if ((value & ADC_CR_ADCAL) != 0U && g_u575_adc_refuse_calibration)
-                return;
+                return true;
             if ((value & ADC_CR_ADVREGEN) != 0U)
                 g_u575_adc->ISR |= ADC_ISR_LDORDY;
             if ((value & ADC_CR_ADEN) != 0U)
@@ -116,11 +112,10 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
                 value &= ~static_cast<uint32_t>(ADC_CR_ADSTP | ADC_CR_ADSTART);
         }
     }
-    if (reg == &g_u575_exti.RPR1 || reg == &g_u575_exti.FPR1) {
-        if (reg != g_u575_model.ignore_write)
-            *reg &= ~value;
-        return;
-    }
+    return false;
+}
+/** \brief Reset FIFO state and acknowledge selected SPI status flags. */
+static void write_spi(volatile uint32_t* reg, uint32_t value) {
     if (g_u575_spi != nullptr) {
         if (reg == &g_u575_model.rcc.APB2RSTR &&
             (value & RCC_APB2RSTR_SPI1RST) != 0U &&
@@ -134,6 +129,9 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
         if (reg == &g_u575_spi->IFCR)
             g_u575_spi->SR &= ~value;
     }
+}
+/** \brief Model reset, transfer byte count and hardware completion flags. */
+static void write_i2c(volatile uint32_t* reg, uint32_t value) {
     if (g_u575_i2c != nullptr) {
         if (reg == &g_u575_model.rcc.APB1RSTR1 &&
             (value & RCC_APB1RSTR1_I2C1RST) != 0U &&
@@ -153,6 +151,9 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
         if (reg == &g_u575_i2c->txdr && i2c_remaining != 0U)
             i2c_next();
     }
+}
+/** \brief Model timer reset, update generation and W0C status. */
+static bool write_pwm(volatile uint32_t* reg, uint32_t value) {
     if (g_u575_pwm != nullptr) {
         if (reg == &g_u575_model.rcc.APB1RSTR1 &&
             (value & RCC_APB1RSTR1_TIM3RST) != 0U &&
@@ -163,9 +164,42 @@ extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
         if (reg == &g_u575_pwm->SR) {
             if (reg != g_u575_model.ignore_write)
                 *reg &= value;
-            return;
+            return true;
         }
     }
+    return false;
+}
+/**
+ * \brief Apply peripheral MMIO side effects before the common register write.
+ *
+ * Refused writes have no effects. A leaf returns true only when it fully
+ * consumes a write, such as W1C/W0C status or an injected command refusal.
+ * Other leaves preserve the dispatcher order and final common write.
+ */
+extern "C" void nx_u575_devices_write(volatile uint32_t* reg, uint32_t value) {
+    if (reg == g_u575_model.ignore_write) {
+        ++g_u575_model.writes;
+        return;
+    }
+    if (reg == &g_u575_model.rcc.CR) {
+        if ((value & RCC_CR_HSION) != 0U && !g_u575_hsi_hold_on)
+            value |= RCC_CR_HSIRDY;
+        if ((value & RCC_CR_HSION) == 0U && !g_u575_hsi_hold_off)
+            value &= ~static_cast<uint32_t>(RCC_CR_HSIRDY);
+    }
+    if (write_flash(reg, value))
+        return;
+    if (write_adc(reg, value))
+        return;
+    if (reg == &g_u575_exti.RPR1 || reg == &g_u575_exti.FPR1) {
+        if (reg != g_u575_model.ignore_write)
+            *reg &= ~value;
+        return;
+    }
+    write_spi(reg, value);
+    write_i2c(reg, value);
+    if (write_pwm(reg, value))
+        return;
     nx_u575_model_write(reg, value);
 }
 extern "C" void nx_u575_flash_program32(volatile uint8_t* address,
