@@ -68,8 +68,16 @@ def validate_selection(selection, route):
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
     if kind == "lptim":
-        from . import lptim
-        lptim.validate(selection, route)
+        if (route["controller"] != "LPTIM2" or route["pins"] or
+                selection["mode"] != "irq-counter16-oneshot"):
+            common.fail(
+                "U575 LPTIM requires the exact internal LPTIM2 IRQ one-shot")
+        common.integer(selection.get("tick_hz"), 1000000, 1000000,
+                       "U575 LPTIM RUN tick")
+        common.integer(selection.get("irq_priority"), 5, 5,
+                       "U575 LPTIM IRQ priority")
+        if selection.get("calls_os", False) is not False:
+            common.fail("U575 LPTIM IRQ never calls a scheduler")
         return
     if kind == "uart":
         expected = _SERIAL_PINS.get(route["controller"])

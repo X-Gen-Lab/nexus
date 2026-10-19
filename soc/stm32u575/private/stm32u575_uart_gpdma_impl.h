@@ -6,6 +6,9 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#ifndef NX_STM32U575_UART_GPDMA_IMPL_H
+#define NX_STM32U575_UART_GPDMA_IMPL_H
+
 #include "stm32u575_uart_gpdma.h"
 #include <limits.h>
 
@@ -659,6 +662,7 @@ static nx_result_t stop(void* context) {
 nx_result_t
 nx_stm32u575_uart_gpdma_initialize(nx_stm32u575_uart_gpdma_state_t* s,
                                    uint32_t clock, uint32_t limit) {
+    /* Cold validation acquires no clocks, references or IRQ ownership. */
     if (!task_context())
         return NX_ERROR_CONTEXT;
     if (s == NULL || s->facts == NULL || limit == 0U ||
@@ -713,6 +717,8 @@ nx_stm32u575_uart_gpdma_initialize(nx_stm32u575_uart_gpdma_state_t* s,
     const uint32_t divisor = (clock + u->baud / 2U) / u->baud;
     if (divisor < 16U || divisor > UINT16_MAX)
         return NX_ERROR_UNSUPPORTED;
+    /* Every effect acquired below stays tracked until stop proves withdrawal;
+     * a setup error alone never releases the retained owner. */
     s->effects = 0U;
     s->clock_added = false;
     s->observed_flags = 0U;
@@ -756,6 +762,7 @@ nx_stm32u575_uart_gpdma_initialize(nx_stm32u575_uart_gpdma_state_t* s,
     u->wake_publishers = 0U;
     u->tx_position = 0U;
     u->tx_complete = false;
+    /* Record UART ownership before the first fallible peripheral write. */
     s->effects |= EFFECT_UART;
     bool valid = checked(&u->registers->CR2, 0U, UINT32_MAX) &&
                  checked(&u->registers->CR3, USART_CR3_EIE, UINT32_MAX) &&
@@ -778,6 +785,8 @@ nx_stm32u575_uart_gpdma_initialize(nx_stm32u575_uart_gpdma_state_t* s,
         if ((NX_U575_READ(&u->registers->ISR) &
              (USART_ISR_TEACK | USART_ISR_REACK)) ==
             (USART_ISR_TEACK | USART_ISR_REACK)) {
+            /* ACKs precede notification. Record each IRQ attachment before its
+             * fallible enable so partial progress uses the same stop path. */
             s->effects |= EFFECT_DMA_IRQ;
             result = NX_U575_IRQ_CONTROL(facts->irq, true, facts->priority);
             if (result != NX_SUCCESS)
@@ -792,7 +801,10 @@ nx_stm32u575_uart_gpdma_initialize(nx_stm32u575_uart_gpdma_state_t* s,
     }
     result = NX_ERROR_TIMEOUT;
 failed:
+    /* A refused stop keeps partial effects retained for an explicit retry. */
     u->closing = true;
     (void)stop(s);
     return result;
 }
+
+#endif /* NX_STM32U575_UART_GPDMA_IMPL_H */

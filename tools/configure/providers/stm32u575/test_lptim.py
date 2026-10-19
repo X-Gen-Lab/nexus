@@ -1,16 +1,44 @@
 """Exact U575 pinless RUN timer uses the ordinary typed static factory."""
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
 import bindings
 import configure as gate
+import dependencies
 import factory
 
 
 class U575LptimTests(unittest.TestCase):
     def setUp(self):
         self.assembly = gate.ROOT / 'tools/configure/assemblies/u575-lptim-run.toml'
+
+    def test_executed_selected_provider_code_is_bound_before_emission(self):
+        root = gate.ROOT
+        provider = root / 'tools/configure/providers/stm32u575'
+        paths, _ = dependencies.snapshot(mode='platform', family='stm32u575')
+        executed = set()
+
+        def observe(frame, event, argument):
+            if event != 'call':
+                return
+            path = Path(frame.f_code.co_filename)
+            if (path.is_relative_to(provider) and
+                    not path.name.startswith('test_')):
+                executed.add(path.relative_to(root).as_posix())
+
+        previous = sys.getprofile()
+        sys.setprofile(observe)
+        try:
+            result = gate.resolve_ir(self.assembly)
+            bindings.emit(result)
+            factory.emit(result)
+        finally:
+            sys.setprofile(previous)
+        self.assertTrue(executed)
+        self.assertEqual(executed - paths.keys(), set(),
+                         'Executed provider code escaped generator identity')
 
     def test_exact_irq_mode_resolves_and_constructs_static_public_face(self):
         result = gate.resolve_ir(self.assembly)

@@ -90,6 +90,7 @@ class H743SpiDma : public testing::Test {
     nx_spi_request_t* request = nullptr;
     Payload* tx = nullptr;
     Payload* rx = nullptr;
+    testing::StrictMock<testing::MockFunction<void()>> cache_observer;
     unsigned max_service_reads = 0U;
     unsigned max_service_writes = 0U;
     void SetUp() override {
@@ -522,6 +523,9 @@ class H743SpiDma : public testing::Test {
         EXPECT_EQ(0, munmap(trace, 4096U));
     }
     void TearDown() override {
+        g_h743_spi_dma_model.cache_observer = nullptr;
+        g_h743_spi_dma_model.enable_observer = nullptr;
+        s_enable_observer = nullptr;
         if (memory == nullptr)
             return;
         if (owner->active != nullptr) {
@@ -689,9 +693,8 @@ TEST_F(H743SpiDma, CancellationDuringCleanCannotReleasePreparingLoan) {
     g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
     Prepare(32U);
-    testing::StrictMock<testing::MockFunction<void()>> observer;
-    s_enable_observer = &observer;
-    EXPECT_CALL(observer, Call()).WillOnce([this]() {
+    s_enable_observer = &cache_observer;
+    EXPECT_CALL(cache_observer, Call()).WillOnce([this]() {
         EXPECT_EQ(request, owner->active);
         EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request->base));
         EXPECT_EQ(NX_SUCCESS, nx_spi_port_cancel(port, request));
@@ -751,9 +754,8 @@ TEST_F(H743SpiDma, FinalInvalidateCannotReleaseStorageDuringReentrantControl) {
     Prepare(32U);
     ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
     Launch();
-    testing::StrictMock<testing::MockFunction<void()>> observer;
-    s_enable_observer = &observer;
-    EXPECT_CALL(observer, Call()).WillOnce([this]() {
+    s_enable_observer = &cache_observer;
+    EXPECT_CALL(cache_observer, Call()).WillOnce([this]() {
         EXPECT_EQ(request, owner->active);
         EXPECT_FALSE(nx_arch_irq_is_masked());
         EXPECT_EQ(0U, owner->rx->CR | owner->tx->CR);
