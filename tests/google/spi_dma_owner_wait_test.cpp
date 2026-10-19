@@ -185,13 +185,15 @@ class SPIDMAOwnerWait : public testing::Test {
                 std::abort();
             }
         }
-        if (sequence.backend != nullptr &&
-            nx_spi_dma_transaction_stop(&port) != NX_SUCCESS) {
-            std::abort();
-        }
+        /* Join captured wake callbacks before reclaiming their provider sink.
+         */
         publisher_stop.store(true, std::memory_order_release);
         if (publisher.joinable()) {
             publisher.join();
+        }
+        if (sequence.backend != nullptr &&
+            nx_spi_dma_transaction_stop(&port) != NX_SUCCESS) {
+            std::abort();
         }
         for (auto& task : producer_threads) {
             if (task.joinable()) {
