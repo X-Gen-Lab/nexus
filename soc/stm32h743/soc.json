@@ -405,6 +405,7 @@
         "irq-bytes",
         "dma-tx",
         "rx-dma-idle",
+        "rx-dma-continuous",
         "irq-fifo-bytes",
         "irq-fifo-rtscts-bytes"
       ],

@@ -1,0 +1,1081 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 40f10a97880fe76172a69e7d71b2619d648c3d2b3c27f5abc722f60fa3f26b18\n"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
+msgid "I/O 增量实施台账"
+msgstr "I/O evolution implementation ledger"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:15
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:21
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:24
+msgid "本表包含 42 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 42 original records; this is only the source row count."
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:32
+msgid "IO-01"
+msgstr "IO-01"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "原字段"
+msgstr "Original field"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "原值"
+msgstr "Original value"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`task_id`"
+msgstr "`task_id`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`phase`"
+msgstr "`phase`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "P0"
+msgstr "P0"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`area`"
+msgstr "`area`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "capabilities"
+msgstr "capabilities"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`task`"
+msgstr "`task`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Single authority for exact provider and mode support"
+msgstr "Single authority for exact provider and mode support"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/selected_contracts.py;tools/configure/io_traits.py;tools/configure/factory.py;tools/maintenance/work_packages.py;docs/delivery/capabilities.md"
+msgstr ""
+"tools/configure/selected_contracts.py;tools/configure/io_traits.py;tools/configure/factory.py;tools/maintenance/work_packages.py;docs/delivery/capabilities.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Existing catalogue plus selected metadata; document exact boundaries"
+msgstr "Existing catalogue plus selected metadata; document exact boundaries"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "implemented"
+msgstr "implemented"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`software_status`"
+msgstr "`software_status`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "not_qualified"
+msgstr "not_qualified"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "not_executed"
+msgstr "not_executed"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "`maintenance_owner`"
+msgstr "`maintenance_owner`"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Codex"
+msgstr "Codex"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:48
+msgid "IO-02"
+msgstr "IO-02"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "traits"
+msgstr "traits"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Optional immutable typed I/O traits"
+msgstr "Optional immutable typed I/O traits"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "tools/configure/io_traits.py;tools/configure/factory.py"
+msgstr "tools/configure/io_traits.py;tools/configure/factory.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Capability switch controls all emitted readonly trait objects"
+msgstr "Capability switch controls all emitted readonly trait objects"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:64
+msgid "IO-03"
+msgstr "IO-03"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "silicon"
+msgstr "silicon"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Observed silicon identity and revision admission"
+msgstr "Observed silicon identity and revision admission"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "core/include/nexus/core/silicon.h;core/src/silicon.c"
+msgstr "core/include/nexus/core/silicon.h;core/src/silicon.c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"Exact documents and revision policy; unknown is explicit; factory stays cold"
+msgstr ""
+"Exact documents and revision policy; unknown is explicit; factory stays cold"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "in_progress"
+msgstr "in_progress"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:80
+msgid "IO-04"
+msgstr "IO-04"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "lifecycle"
+msgstr "lifecycle"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Admission cancellation drain epochs and quarantine regression matrix"
+msgstr "Admission cancellation drain epochs and quarantine regression matrix"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"core/src/request.c;tests/google/io_state_machine_test.cpp;tests/google/spi_dma_owner_wait_test.cpp"
+msgstr ""
+"core/src/request.c;tests/google/io_state_machine_test.cpp;tests/google/spi_dma_owner_wait_test.cpp"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Fresh complete no-skip software gate for this iteration"
+msgstr "Fresh complete no-skip software gate for this iteration"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:96
+msgid "IO-05"
+msgstr "IO-05"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "budgets"
+msgstr "budgets"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Bounded IRQ and service execution observation"
+msgstr "Bounded IRQ and service execution observation"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py"
+msgstr ""
+"io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Optional probes compile out; explicit service and IRQ budgets"
+msgstr "Optional probes compile out; explicit service and IRQ budgets"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:112
+msgid "IO-06"
+msgstr "IO-06"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "stream"
+msgstr "stream"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Rate block hold-time loss and backpressure budgets"
+msgstr "Rate block hold-time loss and backpressure budgets"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c"
+msgstr ""
+"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Actual selected-provider configuration validates stream budget"
+msgstr "Actual selected-provider configuration validates stream budget"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:128
+msgid "IO-07"
+msgstr "IO-07"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "hil"
+msgstr "hil"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Board fixtures and fault-injection station preparation"
+msgstr "Board fixtures and fault-injection station preparation"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "tools/hil;tools/testing/test_hil_io_protocols.py"
+msgstr "tools/hil;tools/testing/test_hil_io_protocols.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Prepare software tooling; physical tests remain not_executed"
+msgstr "Prepare software tooling; physical tests remain not_executed"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:144
+msgid "IO-08"
+msgstr "IO-08"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "measurement"
+msgstr "measurement"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Linked resource and runtime cost comparison"
+msgstr "Linked resource and runtime cost comparison"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "tools/measurement;tests/contracts/uart_rx_compact_assembly"
+msgstr "tools/measurement;tests/contracts/uart_rx_compact_assembly"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Fresh exact ELF comparison; no inferred physical timing or energy"
+msgstr "Fresh exact ELF comparison; no inferred physical timing or energy"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:160
+msgid "IO-09"
+msgstr "IO-09"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "P1"
+msgstr "P1"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "resources"
+msgstr "resources"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Hierarchical controller base channel resource claims"
+msgstr "Hierarchical controller base channel resource claims"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
+msgstr ""
+"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"Compatible shared base plus channels requires one actual hardware owner"
+msgstr ""
+"Compatible shared base plus channels requires one actual hardware owner"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:176
+msgid "IO-10"
+msgstr "IO-10"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Physical peripheral identity and mutually exclusive personalities"
+msgstr "Physical peripheral identity and mutually exclusive personalities"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json"
+msgstr ""
+"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Canonical aliases and personality conflicts rejected"
+msgstr "Canonical aliases and personality conflicts rejected"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:192
+msgid "IO-11"
+msgstr "IO-11"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "events"
+msgstr "events"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Typed hardware event graph and startup ordering"
+msgstr "Typed hardware event graph and startup ordering"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "tools/configure/trigger_graph.py"
+msgstr "tools/configure/trigger_graph.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"Validate event cycles with owned stop gates; emit selected reviewed routes"
+msgstr ""
+"Validate event cycles with owned stop gates; emit selected reviewed routes"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:208
+msgid "IO-12"
+msgstr "IO-12"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "dma"
+msgstr "dma"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Selected DMA engines lanes requests and reachability"
+msgstr "Selected DMA engines lanes requests and reachability"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "tools/configure/dma_topology.py"
+msgstr "tools/configure/dma_topology.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Exact provider tuples; reject physical lane collisions"
+msgstr "Exact provider tuples; reject physical lane collisions"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:224
+msgid "IO-13"
+msgstr "IO-13"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Descriptor ownership placement cache and chain cancellation"
+msgstr "Descriptor ownership placement cache and chain cancellation"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Static validation plus actual linked-list provider drain and loans"
+msgstr "Static validation plus actual linked-list provider drain and loans"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:240
+msgid "IO-14"
+msgstr "IO-14"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "uart"
+msgstr "uart"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Explicit line formats flow control and independent nine-bit I/O"
+msgstr "Explicit line formats flow control and independent nine-bit I/O"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "io/include/nexus/io/uart_word.h"
+msgstr "io/include/nexus/io/uart_word.h"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Native and exact STM32/GD32 register paths; compact byte default"
+msgstr "Native and exact STM32/GD32 register paths; compact byte default"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:256
+msgid "IO-15"
+msgstr "IO-15"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Bounded FIFO IRQ service and concurrent stream load"
+msgstr "Bounded FIFO IRQ service and concurrent stream load"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
+"fifo.md"
+msgstr ""
+"io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
+"fifo.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Bounded batch and IRQ latency observations on exact providers"
+msgstr "Bounded batch and IRQ latency observations on exact providers"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:272
+msgid "IO-16"
+msgstr "IO-16"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "spi"
+msgstr "spi"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Whole-CS segments dummy cycles and 8/16-bit words"
+msgstr "Whole-CS segments dummy cycles and 8/16-bit words"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c"
+msgstr ""
+"io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Native STM32F407 GD32F470 polling then async DMA loan and drain"
+msgstr "Native STM32F407 GD32F470 polling then async DMA loan and drain"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:288
+msgid "IO-17"
+msgstr "IO-17"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "i2c"
+msgstr "i2c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Kernel-clock timing and long-message reload"
+msgstr "Kernel-clock timing and long-message reload"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/common/i2c_v2.c;tools/configure/i2c_timing.py;tools/configure/i2c_timing_selection.py;tests/google/i2c_v2_long_factory_test.cpp"
+msgstr ""
+"soc/common/i2c_v2.c;tools/configure/i2c_timing.py;tools/configure/i2c_timing_selection.py;tests/google/i2c_v2_long_factory_test.cpp"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Reviewed electrical timing inputs; preserve message START and STOP"
+msgstr "Reviewed electrical timing inputs; preserve message START and STOP"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:304
+msgid "IO-18"
+msgstr "IO-18"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "adc"
+msgstr "adc"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Explicit sample formats groups triggers and provenance"
+msgstr "Explicit sample formats groups triggers and provenance"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-"
+"group.md"
+msgstr ""
+"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-"
+"group.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Integer storage metadata and actual provider group support"
+msgstr "Integer storage metadata and actual provider group support"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:320
+msgid "IO-19"
+msgstr "IO-19"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "pwm"
+msgstr "pwm"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Atomic multi-channel shadow commit and break fault handling"
+msgstr "Atomic multi-channel shadow commit and break fault handling"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
+msgstr ""
+"io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Single timer owner; no automatic restart after break"
+msgstr "Single timer owner; no automatic restart after break"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:336
+msgid "IO-20"
+msgstr "IO-20"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "capture"
+msgstr "capture"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Counter widths filters encoders and overcapture"
+msgstr "Counter widths filters encoders and overcapture"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c"
+msgstr ""
+"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Wrap-safe capture and reviewed encoder modes on real providers"
+msgstr "Wrap-safe capture and reviewed encoder modes on real providers"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:352
+msgid "IO-21"
+msgstr "IO-21"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "timestamps"
+msgstr "timestamps"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Timestamp source domain epoch frequency and uncertainty"
+msgstr "Timestamp source domain epoch frequency and uncertainty"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
+"frames.md"
+msgstr ""
+"io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
+"frames.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"Reject incompatible domains and distinguish observation from event time"
+msgstr ""
+"Reject incompatible domains and distinguish observation from event time"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:368
+msgid "IO-22"
+msgstr "IO-22"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "diagnostics"
+msgstr "diagnostics"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Optional state recovery ownership and checked service entry"
+msgstr "Optional state recovery ownership and checked service entry"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "io/src/observation.c"
+msgstr "io/src/observation.c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Checked dispatch is distinct from I/O progress or settlement"
+msgstr "Checked dispatch is distinct from I/O progress or settlement"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:384
+msgid "IO-23"
+msgstr "IO-23"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "memory"
+msgstr "memory"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Remove unused TX DMA fields from RX-only providers"
+msgstr "Remove unused TX DMA fields from RX-only providers"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
+msgstr ""
+"soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Fresh linked RAM measurements and duplex lifecycle regression"
+msgstr "Fresh linked RAM measurements and duplex lifecycle regression"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:400
+msgid "IO-24"
+msgstr "IO-24"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "flash"
+msgstr "flash"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Busy-bank pulse RAM closure cache ECC and watchdog contract"
+msgstr "Busy-bank pulse RAM closure cache ECC and watchdog contract"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"Uncancellable pulse and complete execution closure verified per profile"
+msgstr ""
+"Uncancellable pulse and complete execution closure verified per profile"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:416
+msgid "IO-25"
+msgstr "IO-25"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "providers"
+msgstr "providers"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Reuse reviewed peripheral IP generations and official HAL/LL"
+msgstr "Reuse reviewed peripheral IP generations and official HAL/LL"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py"
+msgstr ""
+"soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Private implementation sharing with exact per-family facts"
+msgstr "Private implementation sharing with exact per-family facts"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:432
+msgid "IO-26"
+msgstr "IO-26"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "h743"
+msgstr "h743"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Cold PLL voltage latency and kernel-clock profiles"
+msgstr "Cold PLL voltage latency and kernel-clock profiles"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
+"clock.md"
+msgstr ""
+"soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
+"clock.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Readback rollback and exact reference identity"
+msgstr "Readback rollback and exact reference identity"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:448
+msgid "IO-27"
+msgstr "IO-27"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "UART continuous duplex DMA and SPI DMA with cache"
+msgstr "UART continuous duplex DMA and SPI DMA with cache"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Selected SRAM reachability and held-buffer protection"
+msgstr "Selected SRAM reachability and held-buffer protection"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:464
+msgid "IO-28"
+msgstr "IO-28"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "u575"
+msgstr "u575"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Finite GPDMA provider and USART errata handling"
+msgstr "Finite GPDMA provider and USART errata handling"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
+"gpdma.md"
+msgstr ""
+"soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
+"gpdma.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Actual GPDMA drain and exact ES0499 workarounds; TZEN0 first"
+msgstr "Actual GPDMA drain and exact ES0499 workarounds; TZEN0 first"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:480
+msgid "IO-29"
+msgstr "IO-29"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "g474"
+msgstr "g474"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Synchronous PWM ADC trigger and comparator break reference"
+msgstr "Synchronous PWM ADC trigger and comparator break reference"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
+"adc.md"
+msgstr ""
+"io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
+"adc.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Generic control capture mechanisms; product algorithms external"
+msgstr "Generic control capture mechanisms; product algorithms external"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:496
+msgid "IO-30"
+msgstr "IO-30"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "P2"
+msgstr "P2"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "power"
+msgstr "power"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Optional runtime clock and power transitions"
+msgstr "Optional runtime clock and power transitions"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-"
+"domain-sleep.md"
+msgstr ""
+"tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-"
+"domain-sleep.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Active I/O leases rollback and monotonic deadline continuity"
+msgstr "Active I/O leases rollback and monotonic deadline continuity"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:512
+msgid "IO-31"
+msgstr "IO-31"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "pinctrl"
+msgstr "pinctrl"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Explicit default sleep safe levels wake and retention"
+msgstr "Explicit default sleep safe levels wake and retention"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
+"pin-states.md"
+msgstr ""
+"io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
+"pin-states.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "No invented board wiring; selected reviewed state only"
+msgstr "No invented board wiring; selected reviewed state only"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:528
+msgid "IO-32"
+msgstr "IO-32"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "LPDMA autonomous Stop2 and LPBAM reference"
+msgstr "LPDMA autonomous Stop2 and LPBAM reference"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "soc/stm32u575"
+msgstr "soc/stm32u575"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Selected low-power peripheral SRAM4 and wake/stop ownership"
+msgstr "Selected low-power peripheral SRAM4 and wake/stop ownership"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "pending"
+msgstr "pending"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:544
+msgid "IO-33"
+msgstr "IO-33"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "canfd"
+msgstr "canfd"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "CAN FD payload timing BRS ESI and message RAM"
+msgstr "CAN FD payload timing BRS ESI and message RAM"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
+"fd.md"
+msgstr ""
+"io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
+"fd.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Classic CAN remains compact; exact FDCAN provider required"
+msgstr "Classic CAN remains compact; exact FDCAN provider required"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:560
+msgid "IO-34"
+msgstr "IO-34"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "ethernet"
+msgstr "ethernet"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "VLAN scatter gather frame loans and hardware timestamps"
+msgstr "VLAN scatter gather frame loans and hardware timestamps"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
+"frames.md"
+msgstr ""
+"io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
+"frames.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Actual hardware descriptor ownership and truthful global abort"
+msgstr "Actual hardware descriptor ownership and truthful global abort"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:576
+msgid "IO-35"
+msgstr "IO-35"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "usb"
+msgstr "usb"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Optional class adapters and exact PHY endpoint capabilities"
+msgstr "Optional class adapters and exact PHY endpoint capabilities"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "io/src/usb_device_controller.c;io/native/usb_device.c;components"
+msgstr "io/src/usb_device_controller.c;io/native/usb_device.c;components"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Control reset ACK ZLP and device mode before additional USB modes"
+msgstr "Control reset ACK ZLP and device mode before additional USB modes"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:592
+msgid "IO-36"
+msgstr "IO-36"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "time"
+msgstr "time"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "RTC LPTIM alarms wrap backup and reset domains"
+msgstr "RTC LPTIM alarms wrap backup and reset domains"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Wall-clock and monotonic domains remain separate"
+msgstr "Wall-clock and monotonic domains remain separate"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:608
+msgid "IO-37"
+msgstr "IO-37"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "storage"
+msgstr "storage"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "SDMMC and serial memory block command mapped interfaces"
+msgstr "SDMMC and serial memory block command mapped interfaces"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "io;soc"
+msgstr "io;soc"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "XIP cache DMA loans and erase ownership are explicit"
+msgstr "XIP cache DMA loans and erase ownership are explicit"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:624
+msgid "IO-38"
+msgstr "IO-38"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "i3c"
+msgstr "i3c"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Bounded discovery IBI and hot-join caller storage"
+msgstr "Bounded discovery IBI and hot-join caller storage"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "No implicit factory discovery; exact peripheral reference required"
+msgstr "No implicit factory discovery; exact peripheral reference required"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:640
+msgid "IO-39"
+msgstr "IO-39"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "security"
+msgstr "security"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "TrustZone peripheral broker and attribution"
+msgstr "TrustZone peripheral broker and attribution"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "core;arch;soc"
+msgstr "core;arch;soc"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Principal and memory validation; copied and borrowed data distinct"
+msgstr "Principal and memory validation; copied and borrowed data distinct"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:656
+msgid "IO-40"
+msgstr "IO-40"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "multicore"
+msgstr "multicore"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "AMP resource partition and epoch-safe IPC"
+msgstr "AMP resource partition and epoch-safe IPC"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "core;arch"
+msgstr "core;arch"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Unique hardware owner and explicit remote reset/cache contract"
+msgstr "Unique hardware owner and explicit remote reset/cache contract"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:672
+msgid "IO-41"
+msgstr "IO-41"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "audio"
+msgstr "audio"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "I2S SAI PDM framing and continuous DMA loans"
+msgstr "I2S SAI PDM framing and continuous DMA loans"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Frame-slot format and bounded underrun; optional external codec"
+msgstr "Frame-slot format and bounded underrun; optional external codec"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:688
+msgid "IO-42"
+msgstr "IO-42"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "multimedia"
+msgstr "multimedia"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Camera display accelerator planar and strided buffers"
+msgstr "Camera display accelerator planar and strided buffers"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Frame completion backpressure external memory and 2D DMA ownership"
+msgstr "Frame completion backpressure external memory and 2D DMA ownership"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:11
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-"
+"execution.csv`；SHA-256：`b2a4ab6aeb5f989a750d11c0382bb73139efb841e76a6a3227b4f4c0fbe610a0`。"
+msgstr ""
+"This page is derived from the original CSV; it is not a new status "
+"authority, execution record or software qualification. Original IDs, order "
+"and all fields come from {download}`original ledger <../../design/io-"
+"evolution-execution.csv>`. Source: `docs/design/io-evolution-execution.csv`;"
+" SHA-256: "
+"`b2a4ab6aeb5f989a750d11c0382bb73139efb841e76a6a3227b4f4c0fbe610a0`."
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"chain.toml"
+msgstr ""
+"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"chain.toml"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"ram.md"
+msgstr ""
+"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"ram.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
+"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
+"on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+msgstr ""
+"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
+"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
+"on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp"
+msgstr ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp"

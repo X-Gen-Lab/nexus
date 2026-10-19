@@ -117,8 +117,9 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_stm32h743_gpio_stop(&{state}, {item.options.initial}u)"
     elif item.kind == "uart":
         options = item.options
-        receive = item.mode == "rx-dma-idle"
-        dma = item.mode in ("dma-tx", "rx-dma-idle")
+        continuous = item.mode == "rx-dma-continuous"
+        receive = item.mode in ("rx-dma-idle", "rx-dma-continuous")
+        dma = item.mode in ("dma-tx", "rx-dma-idle", "rx-dma-continuous")
         fifo = item.mode in uart_formats.FIFO_MODES
         flow = item.mode == uart_formats.RTSCTS_MODE
         owner = state
@@ -138,8 +139,9 @@ def constructor(item, result, board_bindings, routes, devices):
             except ImportError:
                 from emission import dma_regions
             # Reachability does not authorize unselected, uninitialized RAM.
+            allowed_memory = {"axi-sram"} if continuous else {"axi-sram", "sram1"}
             memory = [region for region in result["memory"]
-                      if region["id"] in {"axi-sram", "sram1"} and region["linker"]]
+                      if region["id"] in allowed_memory and region["linker"]]
             region_lines, region_count = dma_regions(name, {"memory": memory},
                                                        engine="DMA1")
             if region_count != len(memory) or not 1 <= region_count <= 2:
@@ -171,7 +173,8 @@ def constructor(item, result, board_bindings, routes, devices):
         elif dma:
             lane = 1 if receive else 0
             member = "rx" if receive else "tx"
-            initialize = "uart_receive" if receive else "uart_dma"
+            initialize = ("uart_continuous" if continuous else
+                          "uart_receive" if receive else "uart_dma")
             definitions += [f"    {owner}.dma = DMA1;",
                             f"    {owner}.{member} = DMA1_Stream{lane};",
                             f"    {owner}.mux = DMAMUX1_Channel{lane};",
@@ -180,7 +183,8 @@ def constructor(item, result, board_bindings, routes, devices):
                             f"    return nx_stm32h743_{initialize}_initialize(&{owner}, {clock}u, 1000000u);"]
         else:
             definitions += [f"    return nx_stm32h743_uart_initialize(&{state}, {clock}u, 1000000u);"]
-        handler = ("uart_receive_uart" if receive else
+        handler = ("uart_continuous_uart" if continuous else
+                   "uart_receive_uart" if receive else
                    "uart_dma_uart" if dma else implementation if fifo else "uart")
         brief = ("Selected bounded FIFO RX/TX budgets." if fifo else
                  "One selected controller, at most one TX/RX byte.")
@@ -188,7 +192,8 @@ def constructor(item, result, board_bindings, routes, devices):
                         "/** \\brief " + brief + " */",
                         f"void USART3_IRQHandler(void) {{ nx_stm32h743_{handler}_irq(&{owner}); }}"]
         if dma:
-            dma_handler = "uart_receive_dma" if receive else "uart_dma"
+            dma_handler = ("uart_continuous_dma" if continuous else
+                           "uart_receive_dma" if receive else "uart_dma")
             definitions += [f"void DMA1_Stream{lane}_IRQHandler(void);",
                             r"/** \brief Selected DMA1 terminal observation. */",
                             f"void DMA1_Stream{lane}_IRQHandler(void) {{ nx_stm32h743_{dma_handler}_irq(&{owner}); }}"]

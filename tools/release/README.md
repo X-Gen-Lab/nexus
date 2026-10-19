@@ -33,14 +33,14 @@ signature does not establish a different SDK source commit by itself.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-has 34 independent consumer roots and 37 executable images: three C/C++ base
-roots, ten MCU/backend roots and twenty-one selected-feature roots. Four images
-execute as Native programs; 33 MCU images are linked software evidence. The
-29 generic retention checks cover ten MCU/backend and nineteen selected-feature
+has 41 independent consumer roots and 44 executable images: three C/C++ base
+roots, ten MCU/backend roots and twenty-eight selected-feature roots. Four images
+execute as Native programs; 40 MCU images are linked software evidence. The
+36 generic retention checks cover ten MCU/backend and twenty-six selected-feature
 images; base image resource checks are a separate scope. These counts describe
 the required plan, not an execution result or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v3`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v4`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -59,7 +59,13 @@ actual source, job and builder identities retain that separate responsibility.
 
 Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
 source, bytes and hash-pinned helper. The current policy does not accept it as
-a fallback or rewrite it as the 34-root/37-image selection.
+a fallback or rewrite it as the 41-root/44-image selection. Earlier policy-v3
+34-root/37-image and 36-root/39-image plans also retain their exact historical
+source identities; neither is the current plan or a fallback. Five newly selected
+features extend the 23-feature, 36-root plan: H743 SPI DMA Cache on, U575 finite
+UART hardware-chain TX, U575 LPTIM2 RUN one-shot, and H743 continuous UART RX
+with Cache off and Cache on. The explicit exact plan, rather than an old count
+or the policy label alone, determines current admission.
 
 Historical schema-1 thirteen-root archives keep their original bytes, source and
 hash-pinned helper for read-only recovery. Current packing and verification do

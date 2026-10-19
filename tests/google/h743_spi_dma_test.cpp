@@ -257,8 +257,10 @@ class H743SpiDma : public testing::Test {
         if (pid == 0) {
             s_child = trace;
             s_child_owner = owner;
+            if (scenario == 5U)
+                g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
             Init();
-            Prepare(4U);
+            Prepare(scenario == 5U ? 32U : 4U);
             g_h743_spi_dma_model.ignore_start = scenario == 0U;
             if (nx_spi_endpoint_submit(endpoint, request) != NX_SUCCESS)
                 _exit(3);
@@ -275,6 +277,11 @@ class H743SpiDma : public testing::Test {
                 g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
                 Service();
                 g_h743_model.core->CCR &= ~(uint32_t)SCB_CCR_DC_Msk;
+            }
+            if (scenario == 5U) {
+                g_h743_model.core->CCR &= ~(uint32_t)SCB_CCR_DC_Msk;
+                Service();
+                g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
             }
             if (scenario == 3U) {
                 nx_h743_spi_dma_model_error(true);
@@ -619,6 +626,196 @@ TEST_F(H743SpiDma, RequestCopiesActualCallerDataAndWholeCs) {
     for (unsigned n = 0U; n < 4U; ++n)
         EXPECT_EQ(static_cast<uint8_t>(~(*tx)[n]), (*rx)[n]);
     EXPECT_EQ(4U, g_h743_spi_dma_model.frames);
+}
+TEST_F(H743SpiDma, WholeCacheLinesUseMemoryBusAndInvalidateAfterDrain) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    Prepare(32U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    EXPECT_EQ(1U, g_h743_spi_dma_model.cache_cleans);
+    EXPECT_EQ(1U, g_h743_spi_dma_model.cache_invalidates);
+    Launch();
+    Pump();
+    Settled(NX_SUCCESS, 32U);
+    EXPECT_EQ(2U, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+    for (unsigned n = 0U; n < 32U; ++n)
+        EXPECT_EQ(static_cast<uint8_t>(~(*tx)[n]), (*rx)[n]);
+}
+TEST_F(H743SpiDma, CacheLineAdmissionRejectsBeforeMaintenanceOrHardware) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    const unsigned writes = g_h743_spi_dma_model.writes;
+    for (size_t length : {1U, 31U, 33U, 65535U}) {
+        Prepare(length);
+        EXPECT_EQ(NX_ERROR_INVALID, nx_spi_endpoint_submit(endpoint, request));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request->base));
+    }
+    Prepare(32U);
+    request->tx = tx->data() + 1U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_spi_endpoint_submit(endpoint, request));
+    request->tx = tx->data();
+    request->rx = rx->data() + 1U;
+    EXPECT_EQ(NX_ERROR_INVALID, nx_spi_endpoint_submit(endpoint, request));
+    request->rx = rx->data();
+    request->tx = reinterpret_cast<const uint8_t*>(0x20000000U);
+    EXPECT_EQ(NX_ERROR_PERMISSION, nx_spi_endpoint_submit(endpoint, request));
+    request->tx = tx->data();
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_spi_endpoint_submit_memory(endpoint, request,
+                                            NX_SPI_MEMORY_TX_FIXED));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_spi_endpoint_submit_memory(endpoint, request,
+                                            NX_SPI_MEMORY_RX_FIXED));
+    EXPECT_EQ(writes, g_h743_spi_dma_model.writes);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_cleans);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_EQ(nullptr, owner->active);
+}
+TEST_F(H743SpiDma, MaximumWholeLineRequestHasNoRoundedAdjacentAccess) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    (*rx)[65504U] = 0x5aU;
+    Prepare(65504U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    Launch();
+    Pump();
+    Settled(NX_SUCCESS, 65504U);
+    EXPECT_EQ(static_cast<uint8_t>(~(*tx)[65503U]), (*rx)[65503U]);
+    EXPECT_EQ(0x5aU, (*rx)[65504U]);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, CancellationDuringCleanCannotReleasePreparingLoan) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    Prepare(32U);
+    testing::StrictMock<testing::MockFunction<void()>> observer;
+    s_enable_observer = &observer;
+    EXPECT_CALL(observer, Call()).WillOnce([this]() {
+        EXPECT_EQ(request, owner->active);
+        EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request->base));
+        EXPECT_EQ(NX_SUCCESS, nx_spi_port_cancel(port, request));
+        Service();
+        EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request->base));
+        EXPECT_EQ(0U, owner->rx->CR | owner->tx->CR);
+        EXPECT_FALSE(nx_arch_irq_is_masked());
+        g_h743_spi_dma_model.cache_observer = nullptr;
+    });
+    g_h743_spi_dma_model.cache_observer = []() { s_enable_observer->Call(); };
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    g_h743_spi_dma_model.cache_observer = nullptr;
+    s_enable_observer = nullptr;
+    Pump();
+    Settled(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.starts);
+    EXPECT_EQ(2U, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, CleanFailureIsAcceptedAndDrainsWithoutDmaStart) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    g_h743_spi_dma_model.refuse_clean = true;
+    Prepare(32U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request->base));
+    Pump();
+    Settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.starts);
+    EXPECT_EQ(1U, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, CacheInvalidateFailureRetainsUntilActualRetry) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    Prepare(32U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    Launch();
+    g_h743_spi_dma_model.refuse_invalidate = true;
+    Pump(1000U);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request->base));
+    EXPECT_EQ(request, owner->active);
+    EXPECT_EQ(0U, owner->rx->CR | owner->tx->CR);
+    EXPECT_EQ(0U, owner->rx->M0AR | owner->tx->M0AR);
+    EXPECT_FALSE(g_h743_model.irq_enabled[13]);
+    EXPECT_FALSE(g_h743_model.irq_enabled[14]);
+    EXPECT_FALSE(g_h743_model.irq_enabled[84]);
+    g_h743_spi_dma_model.refuse_invalidate = false;
+    Pump();
+    Settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(static_cast<uint8_t>(~(*tx)[31U]), (*rx)[31U]);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, FinalInvalidateCannotReleaseStorageDuringReentrantControl) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    Prepare(32U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    Launch();
+    testing::StrictMock<testing::MockFunction<void()>> observer;
+    s_enable_observer = &observer;
+    EXPECT_CALL(observer, Call()).WillOnce([this]() {
+        EXPECT_EQ(request, owner->active);
+        EXPECT_FALSE(nx_arch_irq_is_masked());
+        EXPECT_EQ(0U, owner->rx->CR | owner->tx->CR);
+        EXPECT_EQ(0U, owner->rx->M0AR | owner->tx->M0AR);
+        EXPECT_FALSE(g_h743_model.irq_enabled[13]);
+        EXPECT_FALSE(g_h743_model.irq_enabled[14]);
+        EXPECT_FALSE(g_h743_model.irq_enabled[84]);
+        EXPECT_EQ(NX_SUCCESS, nx_spi_port_cancel(port, request));
+        Service();
+        EXPECT_EQ(NX_ERROR_BUSY, nx_spi_port_stop(port));
+        EXPECT_NE(NX_REQUEST_SETTLED, nx_request_state(&request->base));
+    });
+    g_h743_spi_dma_model.cache_observer = []() { s_enable_observer->Call(); };
+    Pump();
+    g_h743_spi_dma_model.cache_observer = nullptr;
+    s_enable_observer = nullptr;
+    Settled(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(2U, g_h743_spi_dma_model.cache_invalidates);
+    const unsigned invalidates = g_h743_spi_dma_model.cache_invalidates;
+    Service();
+    Dispatch();
+    EXPECT_EQ(invalidates, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, PreDmaInvalidateFailureNeverStartsOrRevokesTheLoan) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    g_h743_spi_dma_model.refuse_invalidate = true;
+    Prepare(32U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    Pump(1000U);
+    EXPECT_EQ(request, owner->active);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request->base));
+    EXPECT_EQ(0U, g_h743_spi_dma_model.starts);
+    g_h743_spi_dma_model.refuse_invalidate = false;
+    Pump();
+    Settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, CachedCancelDoesNotInvalidateAnOutstandingBusWrite) {
+    g_h743_model.core->CCR |= SCB_CCR_DC_Msk;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_dma_initialize(owner));
+    Prepare(32U);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_endpoint_submit(endpoint, request));
+    g_h743_spi_dma_model.hold_rx_commit = true;
+    Launch();
+    for (unsigned n = 0U; n < 20U && !g_h743_spi_dma_model.rx_pending; ++n)
+        nx_h743_spi_dma_model_step();
+    ASSERT_TRUE(g_h743_spi_dma_model.rx_pending);
+    ASSERT_EQ(NX_SUCCESS, nx_spi_port_cancel(port, request));
+    Pump(200U);
+    EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request->base));
+    EXPECT_EQ(1U, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_NE(0U, owner->rx->CR & DMA_SxCR_EN);
+    g_h743_spi_dma_model.hold_rx_commit = false;
+    Pump();
+    Settled(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(2U, g_h743_spi_dma_model.cache_invalidates);
+    EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
+}
+TEST_F(H743SpiDma, CacheModeLossCannotBeRepairedByRestoringTheBit) {
+    Child(5U);
 }
 TEST_F(H743SpiDma, OneAndMaximumByteCountsRemainFinite) {
     Start(65535U);

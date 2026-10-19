@@ -21,7 +21,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v3"
+CONSUMER_POLICY = "nexus-sdk-consumers-v4"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -88,6 +88,21 @@ SELECTED_CONSUMERS = (
     ("h743 spi dma",
      "tools/configure/assemblies/h743-spi-dma.toml",
      "h743-spi-dma"),
+    ("h743 spi dma cache on",
+     "tools/configure/assemblies/h743-spi-dma-cache-on.toml",
+     "h743-spi-dma"),
+    ("u575 uart chain",
+     "tools/configure/assemblies/u575-uart-chain.toml",
+     "u575-uart-gpdma"),
+    ("u575 lptim run",
+     "tools/configure/assemblies/u575-lptim-run.toml",
+     "u575-lptim"),
+    ("h743 uart continuous",
+     "tools/configure/assemblies/h743-uart-continuous.toml",
+     "h743-uart-continuous"),
+    ("h743 uart continuous cache on",
+     "tools/configure/assemblies/h743-uart-continuous-cache-on.toml",
+     "h743-uart-continuous"),
     ("h743 spi dma uart tx",
      "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
      "h743-spi-dma"),

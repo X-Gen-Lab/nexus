@@ -59,8 +59,24 @@ def _modern_selected(result):
     for item in result.controllers:
         allowed = {"gpio", "uart", "spi", "pwm", "exti", "watchdog",
                    "adc", "i2c", "flash"}
+        if not h7:
+            allowed.add("lptim")
         if item.kind not in allowed:
             fail("New SoC cold profile has no maintained controller admission")
+        if not h7 and item.kind == "lptim":
+            source += _reject(
+                "(NX_U575_READ(&RCC->APB1RSTR2) & RCC_APB1RSTR2_LPTIM2RST) != 0u || "
+                "(NX_U575_READ(&RCC->CCIPR1) & RCC_CCIPR1_LPTIM2SEL) != 0u || "
+                "!NX_U575_IRQ_AVAILABLE(LPTIM2_IRQn)")
+            # A disabled gate cannot establish cold peripheral ownership.
+            # The constructor repeats admission after acquiring only its gate.
+            source.append("    if ((NX_U575_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPTIM2EN) != 0u) {")
+            conditions = [f"NX_U575_READ(&LPTIM2->{name}) != 0u" for name in
+                          ("CR", "CFGR", "CFGR2", "DIER", "ISR", "CCMR1",
+                           "RCR", "CNT", "CCR1", "CCR2")]
+            conditions.append("NX_U575_READ(&LPTIM2->ARR) != 1u")
+            source += _reject(" || ".join(conditions), indent=8)
+            source.append("    }")
         if h7 and item.kind in {"spi", "pwm"}:
             register = "APB2ENR" if item.kind == "spi" else "APB1LENR"
             reset = "APB2RSTR" if item.kind == "spi" else "APB1LRSTR"
@@ -116,11 +132,11 @@ def _modern_selected(result):
                               f"RCC_{gate_register}_{uart}EN) != 0u")
             source += _reject(f"(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u")
             source += _reject(f"!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)")
-            if not h7 and item.get("mode") == "dma-tx":
+            if not h7 and item.get("mode") in {"dma-tx", "dma-chain-tx"}:
                 source += _reject(
                     "!NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)")
-            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle"}:
-                lane = 1 if item.get("mode") == "rx-dma-idle" else 0
+            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle", "rx-dma-continuous"}:
+                lane = 0 if item.get("mode") == "dma-tx" else 1
                 source += _reject(
                     f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)")
                 source.append(

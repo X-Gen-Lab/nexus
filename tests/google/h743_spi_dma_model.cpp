@@ -75,7 +75,15 @@ static void finish_rx_commit() {
     auto& m = g_h743_spi_dma_model;
     if (!m.rx_pending || m.hold_rx_commit)
         return;
-    *reinterpret_cast<uint8_t*>(m.pending_rx_address) = m.pending_rx_value;
+    if ((g_h743_model.core->CCR & SCB_CCR_DC_Msk) != 0U) {
+        if (m.pending_rx_address < m.cache_rx_address ||
+            m.pending_rx_address - m.cache_rx_address >= m.cache_rx_bytes)
+            ++m.cache_errors;
+        else
+            m.cache_rx[m.pending_rx_address - m.cache_rx_address] =
+                m.pending_rx_value;
+    } else
+        *reinterpret_cast<uint8_t*>(m.pending_rx_address) = m.pending_rx_value;
     ++m.memory_commits;
     m.rx_pending = false;
     --m.streams[2].NDTR;
@@ -287,6 +295,13 @@ void nx_h743_spi_dma_model_step(void) {
         /* NDTR accounts DMA writes into FIFO, not completed wire frames. */
         uintptr_t address = tx.M0AR + m.initial[1] - tx.NDTR;
         uint8_t value = *reinterpret_cast<uint8_t*>(address);
+        if ((g_h743_model.core->CCR & SCB_CCR_DC_Msk) != 0U) {
+            if (address < m.cache_tx_address ||
+                address - m.cache_tx_address >= m.cache_tx_bytes)
+                ++m.cache_errors;
+            else
+                value = m.cache_tx[address - m.cache_tx_address];
+        }
         if (m.cpu_pending && address == m.pending_cpu_address)
             value = m.old_cpu_value;
         m.tx_fifo[m.tx_count++] = value;
@@ -415,5 +430,47 @@ void nx_h743_spi_dma_model_cpu_store(uint8_t* target, uint8_t value) {
         reinterpret_cast<uintptr_t>(target);
     g_h743_spi_dma_model.old_cpu_value = *target;
     *target = value;
+}
+nx_arch_result_t nx_h743_spi_dma_model_clean(uintptr_t address, size_t bytes) {
+    auto& m = g_h743_spi_dma_model;
+    ++m.cache_cleans;
+    if (nx_arch_irq_is_masked() || (address % 32U) != 0U || bytes == 0U ||
+        bytes % 32U != 0U || bytes > sizeof(m.cache_tx) ||
+        (m.streams[2].CR & DMA_SxCR_EN) != 0U ||
+        (m.streams[3].CR & DMA_SxCR_EN) != 0U) {
+        ++m.cache_errors;
+        return NX_ARCH_INVALID;
+    }
+    if (m.cache_observer != nullptr)
+        m.cache_observer();
+    if (m.refuse_clean)
+        return NX_ARCH_UNSUPPORTED;
+    m.cache_tx_address = address;
+    m.cache_tx_bytes = bytes;
+    std::memcpy(m.cache_tx, reinterpret_cast<const void*>(address), bytes);
+    return NX_ARCH_OK;
+}
+nx_arch_result_t nx_h743_spi_dma_model_invalidate(uintptr_t address,
+                                                  size_t bytes) {
+    auto& m = g_h743_spi_dma_model;
+    ++m.cache_invalidates;
+    if (nx_arch_irq_is_masked() || (address % 32U) != 0U || bytes == 0U ||
+        bytes % 32U != 0U || bytes > sizeof(m.cache_rx) || m.rx_pending ||
+        (m.streams[2].CR & DMA_SxCR_EN) != 0U ||
+        (m.streams[3].CR & DMA_SxCR_EN) != 0U) {
+        ++m.cache_errors;
+        return NX_ARCH_INVALID;
+    }
+    if (m.cache_observer != nullptr)
+        m.cache_observer();
+    if (m.refuse_invalidate)
+        return NX_ARCH_UNSUPPORTED;
+    if (m.cache_rx_address != address || m.cache_rx_bytes != bytes) {
+        m.cache_rx_address = address;
+        m.cache_rx_bytes = bytes;
+        std::memset(m.cache_rx, 0xa5, bytes);
+    }
+    std::memcpy(reinterpret_cast<void*>(address), m.cache_rx, bytes);
+    return NX_ARCH_OK;
 }
 }

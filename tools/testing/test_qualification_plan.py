@@ -3,6 +3,7 @@
 from pathlib import Path
 import unittest
 
+from scripts.ci import provider_assemblies
 from tools.dev.qualification import CHECKERS, validate_plan
 from tools.evidence.common import load_json
 
@@ -79,19 +80,48 @@ class QualificationPlanTests(unittest.TestCase):
                 if directory == "h743_assembly":
                     expected |= {
                         "{root}/tools/configure/assemblies/h743-" + name + ".toml"
-                        for name in ("spi-dma", "spi-dma-uart-tx", "spi-dma-uart-rx")}
-                    self.assertEqual(len(expected), 29)
+                        for name in ("spi-dma", "spi-dma-cache-on",
+                                     "spi-dma-uart-tx", "spi-dma-uart-rx",
+                                     "uart-continuous", "uart-continuous-cache-on")}
+                    self.assertEqual(len(expected), 32)
                     projects = [stage["args"][index + 1]
                                 for index, value in enumerate(stage["args"])
                                 if value == "--project"]
                     self.assertEqual(projects,
                         ["{root}/tests/contracts/h743_assembly"])
+                if directory == "u575_assembly":
+                    expected |= {
+                        "{root}/tools/configure/assemblies/u575-" + name + ".toml"
+                        for name in ("uart-chain", "lptim-run")}
+                    self.assertEqual(len(expected), 12)
                 self.assertTrue(expected)
                 self.assertEqual(len(fixtures), len(set(fixtures)),
                                  "Duplicate fixture is not another execution")
                 self.assertEqual(set(fixtures), expected,
                                  "New fixture omitted from formal software plan")
         validate_plan(self.plan)
+
+    def test_canonical_provider_inputs_use_executable_owned_projects(self):
+        for directory, family in (("h743_assembly", "stm32h743"),
+                                  ("u575_assembly", "stm32u575")):
+            with self.subTest(directory=directory):
+                stage, = [item for item in self.stages
+                          if item["name"] == "providers-" + directory]
+                args = stage["args"]
+                paths = [Path(args[i + 1].replace("{root}", str(ROOT)))
+                         for i, value in enumerate(args)
+                         if value == "--fixture" and args[i + 1].startswith(
+                             "{root}/tools/configure/assemblies/")]
+                projects = [Path(args[i + 1].replace("{root}", str(ROOT)))
+                            for i, value in enumerate(args) if value == "--project"]
+                self.assertTrue(paths)
+                self.assertLessEqual(len(projects), 1)
+                rows = provider_assemblies.validate_fixtures(
+                    ROOT, paths, family=family,
+                    project=projects[0] if projects else None)
+                self.assertEqual(len(rows), len(paths))
+                self.assertEqual({row["project"] for row in rows},
+                                 {str(ROOT / "tests/contracts" / directory)})
 
 
     def test_named_pin_state_canonical_has_one_real_arm_checker_stage(self):

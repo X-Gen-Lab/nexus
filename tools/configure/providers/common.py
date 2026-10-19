@@ -98,6 +98,7 @@ class ModeTraits:
 _MODE_TRAITS = MappingProxyType({
     ("rtc", "calendar-alarm"): ModeTraits(),
     ("lptim", "counter16-oneshot"): ModeTraits(),
+    ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
     ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),
     ("adc_group", "injected-sequence"): ModeTraits(irq=True),
     ("pwm_adc", "finite-regular-dma"): ModeTraits(irq=True, rx_dma=True),
@@ -121,6 +122,7 @@ _MODE_TRAITS = MappingProxyType({
     ("uart", "irq-fifo-rtscts-bytes"): ModeTraits(irq=True),
     ("uart", "irq-blocks"): ModeTraits(irq=True, block_stream=True),
     ("uart", "dma-tx"): ModeTraits(irq=True, tx_dma=True),
+    ("uart", "dma-chain-tx"): ModeTraits(irq=True, tx_dma=True),
     ("uart", "rx-dma-idle"): ModeTraits(
         irq=True, block_stream=True, rx_dma=True),
     ("uart", "dma-duplex"): ModeTraits(
@@ -297,6 +299,8 @@ def validate_selection(selection, route, provider, ram_size):
         "pwm": {"period_ticks", "duty_ticks", "tick_hz"},
         "adc": {"channels", "sample_times", "reference_mv", "timeout_ms", "irq_priority", "calls_os", "stream"},
     }
+    if kind == "lptim" and selection["mode"] == "irq-counter16-oneshot":
+        fields["lptim"] |= {"irq_priority", "calls_os"}
     unknown = selection.keys() - {"id", "binding", "mode"} - fields.get(kind, set())
     if kind not in fields or unknown:
         fail(f"Unsupported {kind} configuration fields: {sorted(unknown)}")

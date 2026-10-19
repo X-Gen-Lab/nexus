@@ -378,7 +378,7 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 36)
+        self.assertEqual(len(list(raw.rglob(".git"))), 41)
         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
         self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
         self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
@@ -389,8 +389,10 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(len(list(raw.rglob(".git"))), 36)
-        self.assertEqual(len(manifest["consumer_images"]), 39)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v4")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v4")
+        self.assertEqual(len(list(raw.rglob(".git"))), 41)
+        self.assertEqual(len(manifest["consumer_images"]), 44)
         auxiliary = "stm32 build/bin/installed_c.bin"
         self.assertIn(auxiliary, manifest["files"])
         self.assertNotIn(auxiliary, manifest["consumer_images"])
@@ -627,27 +629,52 @@ class ConsumerTransportTests(unittest.TestCase):
     def test_previous_thirty_one_roots_cannot_replace_the_current_plan(self):
         from tools.release import transport
         base, raw = self.fixture()
-        for label in ("h743 spi dma", "h743 spi dma uart tx", "h743 spi dma uart rx",
-                      "h743 runtime clock", "g474 pin states"):
+        for label in ("h743 spi dma", "h743 spi dma uart tx",
+                      "h743 spi dma uart rx",
+                      "h743 runtime clock", "g474 pin states",
+                      "h743 spi dma cache on", "u575 uart chain",
+                      "u575 lptim run",
+                      "h743 uart continuous", "h743 uart continuous cache on"):
             shutil.rmtree(raw / ("selected " + label + " source"))
             shutil.rmtree(raw / ("selected " + label + " build"))
         self.assertEqual(len(list(raw.rglob(".git"))), 31)
         with self.assertRaisesRegex(ValueError, "Exact current consumer"):
             transport.pack(raw, base / "transport", COMMIT)
 
-    def test_schema_two_previous_policy_is_not_a_current_fallback(self):
+    def test_previous_thirty_six_roots_cannot_replace_the_current_plan(self):
         from tools.release import transport
         base, raw = self.fixture()
-        packed = base / "transport"
-        transport.pack(raw, packed, COMMIT)
-        path = packed / transport.MANIFEST
-        manifest = json.loads(path.read_text())
-        self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v3")
-        manifest["consumer_policy"] = "nexus-sdk-consumers-v2"
-        path.write_text(json.dumps(manifest))
-        with self.assertRaises(ValueError):
-            transport.verify(packed, COMMIT)
+        for label in ("h743 spi dma cache on", "u575 uart chain",
+                      "u575 lptim run",
+                      "h743 uart continuous", "h743 uart continuous cache on"):
+            shutil.rmtree(raw / ("selected " + label + " source"))
+            shutil.rmtree(raw / ("selected " + label + " build"))
+        self.assertEqual(len(list(raw.rglob(".git"))), 36)
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_schema_two_previous_policy_is_not_a_current_fallback(self):
+        from tools.release import transport
+        for policy in ("nexus-sdk-consumers-v2", "nexus-sdk-consumers-v3"):
+            with self.subTest(policy=policy):
+                base, raw = self.fixture()
+                packed = base / "transport"
+                transport.pack(raw, packed, COMMIT)
+                path = packed / transport.MANIFEST
+                manifest = json.loads(path.read_text())
+                self.assertEqual(manifest["schema_version"], 2)
+                archive = packed / transport.ARCHIVE
+                archive.write_bytes(gzip.compress(
+                    gzip.decompress(archive.read_bytes()), mtime=1))
+                self.assertNotEqual(manifest["archive"],
+                                    transport.byte_identity(archive))
+                # Rehashing valid raw bytes cannot authorize an old plan policy.
+                manifest["archive"] = transport.byte_identity(archive)
+                manifest["consumer_policy"] = policy
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError,
+                                            "current consumer policy"):
+                    transport.verify(packed, COMMIT)
 
     def test_unreviewed_consumer_root_is_rejected(self):
         from tools.release import transport

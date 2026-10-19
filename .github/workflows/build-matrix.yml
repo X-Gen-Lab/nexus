@@ -463,9 +463,17 @@ jobs:
             project: tests/contracts/h743_assembly
             assemblies: |
               tools/configure/assemblies/h743-spi-dma.toml
+              tools/configure/assemblies/h743-spi-dma-cache-on.toml
               tools/configure/assemblies/h743-spi-dma-uart-tx.toml
               tools/configure/assemblies/h743-spi-dma-uart-rx.toml
               tools/configure/assemblies/h743-spi-dma-runtime-clock.toml
+              tools/configure/assemblies/h743-uart-continuous.toml
+              tools/configure/assemblies/h743-uart-continuous-cache-on.toml
+          - fixture: u575_assembly
+            project: tests/contracts/u575_assembly
+            assemblies: |
+              tools/configure/assemblies/u575-uart-chain.toml
+              tools/configure/assemblies/u575-lptim-run.toml
           - fixture: pin_state_fixture
             project: tests/contracts/pin_state_fixture
             assemblies: |

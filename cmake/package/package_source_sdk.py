@@ -146,6 +146,7 @@ MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
+        "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
         "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
         "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",

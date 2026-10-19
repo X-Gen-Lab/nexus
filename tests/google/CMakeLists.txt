@@ -576,3 +576,6 @@ include(h743_spi_dma.cmake)
 
 include(h743_spi_dma_factory.cmake)
 include("${CMAKE_CURRENT_SOURCE_DIR}/h743_runtime_clock.cmake")
+include(u575_lptim.cmake)
+include(u575_uart_chain.cmake)
+include(h743_uart_continuous.cmake)

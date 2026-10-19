@@ -2,6 +2,19 @@
   "schema_version": 1,
   "routes": [
     {
+      "id": "lptim2-internal-pclk1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "LPTIM2",
+      "kind": "lptim",
+      "pins": [],
+      "modes": [
+        "irq-counter16-oneshot"
+      ],
+      "source": "RM0456 Rev7 chapter58: fixed RUN internal PCLK1/4, ARR1..FFFF and UE one-shot completion; pinned official CMSIS LPTIM2 IRQ68/APB1ENR2 gate/APB1RSTR2 reset/CCIPR1 selector. No Stop/VBAT or physical qualification."
+    },
+    {
       "id": "gpio-pc7",
       "variants": [
         "STM32U575ZIT6Q"
@@ -43,10 +56,14 @@
       "modes": [
         "irq-bytes",
         "dma-tx",
+        "dma-chain-tx",
         "irq-fifo-bytes"
       ],
       "source": "Official ST Nucleo BSP ed50f1d2d4940e4efe23104027b8008ce79037f5 PA9/PA10 AF7 USART1 VCP; CMSIS U575 IRQ61. UM2861 SB32/SB34ON,SB24/SB26/SB31/SB33OFF; actual wiring unknown.",
       "mode_dma": {
+        "dma-chain-tx": [
+          "GPDMA1:channel0:request25"
+        ],
         "dma-tx": [
           "GPDMA1:channel0:request25"
         ]

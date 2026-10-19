@@ -113,8 +113,8 @@ class H743SpiDmaConfiguration(unittest.TestCase):
         self.assertIsNone(selected_contracts.silicon_policy(result))
 
     def test_other_clocks_and_backends_are_rejected_only_for_dma(self):
-        for profile in ("hsi32-fixed-cache-off", "hsi64-fixed-cache-on",
-                        "hsi32-fixed-cache-on", "hsi64-pll384-cache-off"):
+        for profile in ("hsi32-fixed-cache-off", "hsi32-fixed-cache-on",
+                        "hsi64-pll384-cache-off"):
             with self.subTest(profile=profile):
                 self.reject(lambda text, p=profile: text.replace(
                     "hsi64-fixed-cache-off", p))
@@ -131,6 +131,25 @@ class H743SpiDmaConfiguration(unittest.TestCase):
                     "hsi64-fixed-cache-off", profile))
                 self.assertEqual("short-poll", configure.resolve_ir(
                     source).controllers[0].mode)
+
+    def test_cache_on_profile_derives_complete_line_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = self.source(directory, transform=lambda text: text.replace(
+                "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"))
+            result = configure.resolve_ir(source)
+            item = result.controllers[0]
+            for endpoint in (None, result.devices[0]):
+                record = selected_contracts.describe(item, endpoint)
+                self.assertEqual((32, 32, "domain_cache_line", "65504"),
+                                 (record.buffer_alignment,
+                                  record.cache_line_bytes, record.dma_policy,
+                                  record.max_transfer_units))
+            policy = selected_contracts.silicon_policy(result, item)
+            self.assertIn("cacheon", policy.profile)
+            output = Path(directory) / "generated"
+            configure.configure(source, output)
+            body = (output / "bindings.c").read_text()
+            self.assertIn("nx_stm32h743_spi_dma_initialize", body)
 
     def test_irq_endpoint_and_unknown_options_reject(self):
         for priority in (0, 4, 6, 15):

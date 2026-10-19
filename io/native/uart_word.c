@@ -121,7 +121,12 @@ void nx_native_uart_word_irq(nx_native_uart_word_state_t* state) {
     }
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     if (state->active != NULL && state->terminal == NX_SUCCESS && !state->tc) {
-        if (state->position < state->active->words) {
+        if (nx_deadline_expired(state->active->base.deadline,
+                                nx_time_now_us())) {
+            state->terminal = NX_ERROR_TIMEOUT;
+            (void)nx_request_transition(&state->active->base,
+                                        NX_REQUEST_DRAINING);
+        } else if (state->position < state->active->words) {
             uint16_t word = state->active->data[state->position++];
             if (state->log != NULL) {
                 if (state->logged == state->log_capacity) {

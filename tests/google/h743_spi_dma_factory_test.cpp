@@ -69,6 +69,7 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
 #endif
 class H743SpiDmaFactory : public testing::Test {
   protected:
+    static constexpr size_t payload_bytes = H743_SPI_DMA_CACHE_ON ? 32U : 8U;
     uint8_t* memory = nullptr;
     nx_spi_request_t request{};
     nx_uart_tx_request_t uart_request{};
@@ -172,7 +173,8 @@ class H743SpiDmaFactory : public testing::Test {
         for (unsigned n = 0U; n < count; ++n)
             Tick();
     }
-    void Submit(size_t count = 8U, nx_time_us_t deadline = 1000000U) {
+    void Submit(size_t count = payload_bytes,
+                nx_time_us_t deadline = 1000000U) {
         ASSERT_EQ(NX_SUCCESS,
                   nx_spi_request_prepare(&request, memory, memory + 0x1000U,
                                          count, deadline));
@@ -224,6 +226,7 @@ class H743SpiDmaFactory : public testing::Test {
         EXPECT_EQ(nullptr, Owner()->active);
         EXPECT_EQ(0U, g_h743_spi_dma_model.gated_accesses);
         EXPECT_EQ(0U, g_h743_spi_dma_factory_model.model_errors);
+        EXPECT_EQ(0U, g_h743_spi_dma_model.cache_errors);
         EXPECT_EQ(0, munmap(memory, 0x80000U));
     }
 };
@@ -238,7 +241,8 @@ TEST_F(H743SpiDmaFactory, PureLookupHasNoHardwareEffects) {
 TEST_F(H743SpiDmaFactory, ActualSystemAdmitsCanonicalFacesAndAxiOnly) {
     Start();
     EXPECT_EQ(64000000U, g_nx_stm32h743_system.core_hz);
-    EXPECT_EQ(0U, g_h743_model.core->CCR & SCB_CCR_DC_Msk);
+    EXPECT_EQ(H743_SPI_DMA_CACHE_ON != 0,
+              (g_h743_model.core->CCR & SCB_CCR_DC_Msk) != 0U);
     EXPECT_EQ(1U, Owner()->region_count);
     EXPECT_EQ(0x24000000U, Owner()->regions[0].begin);
     EXPECT_EQ(0x80000U, Owner()->regions[0].size);
@@ -256,8 +260,8 @@ TEST_F(H743SpiDmaFactory, PublicRequestUsesRealPayloadAndGeneratedVectors) {
     Start();
     Submit();
     Pump();
-    Check(NX_SUCCESS, 8U);
-    for (unsigned n = 0U; n < 8U; ++n)
+    Check(NX_SUCCESS, payload_bytes);
+    for (size_t n = 0U; n < payload_bytes; ++n)
         EXPECT_EQ(static_cast<uint8_t>(memory[n] ^ 0xffU), memory[0x1000U + n]);
     EXPECT_EQ(0U, g_h743_spi_dma_model.eot_clears_in_irq);
 }
@@ -280,7 +284,7 @@ TEST_F(H743SpiDmaFactory, IncomingMaskPreventsExternalIrqDelivery) {
     EXPECT_TRUE(g_h743_model.irq_pending[13]);
     nx_arch_irq_restore(saved);
     Pump();
-    Check(NX_SUCCESS, 8U);
+    Check(NX_SUCCESS, payload_bytes);
 }
 TEST_F(H743SpiDmaFactory, SharedDmaResetCannotGrantColdOwnership) {
     for (uint32_t reset : {static_cast<uint32_t>(RCC_AHB1RSTR_DMA1RST),
@@ -377,7 +381,7 @@ TEST_F(H743SpiDmaFactory, CsRefusalRetainsPinsGateAndSystemForRetry) {
     Start();
     Submit();
     g_h743_model.spi_hold_cs_high = true;
-    Pump(300U);
+    Pump(1000U);
     EXPECT_EQ(&request, Owner()->active);
     EXPECT_EQ(NX_ERROR_BUSY, nx_platform_stop());
     EXPECT_TRUE(g_nx_stm32h743_system.started);
@@ -412,7 +416,7 @@ TEST_F(H743SpiDmaFactory, PreexistingSharedGateAndNeighborArePreserved) {
     Start();
     Submit();
     Pump();
-    Check(NX_SUCCESS, 8U);
+    Check(NX_SUCCESS, payload_bytes);
     Stop();
     EXPECT_EQ(DMA_SxCR_EN, foreign.CR);
     EXPECT_EQ(0x24007000U, foreign.M0AR);

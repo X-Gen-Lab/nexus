@@ -80,6 +80,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
     def test_canonical_h743_spi_dma_keeps_exact_faces_lanes_and_mechanism(self):
         root = "tools/configure/assemblies/"
         variants = {"h743-spi-dma": None,
+                    "h743-spi-dma-cache-on": None,
                     "h743-spi-dma-runtime-clock": None,
                     "h743-spi-dma-uart-tx": (0, 46),
                     "h743-spi-dma-uart-rx": (1, 45)}
@@ -104,7 +105,8 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                 spi = next(row for row in records if row.public_class == "spi")
                 self.assertEqual((spi.unit, spi.word_bits, spi.dma_engines,
                                   spi.cache_line_bytes),
-                                 ("bytes", (8,), ("DMA1",), 0))
+                                 ("bytes", (8,), ("DMA1",),
+                                  32 if name.endswith("cache-on") else 0))
                 with self.assertRaises(FrozenInstanceError):
                     spi.unit = "words"
 

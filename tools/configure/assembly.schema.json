@@ -1109,6 +1109,22 @@
           "binding": {
             "type": "string"
           },
+          "irq": {
+            "additionalProperties": false,
+            "properties": {
+              "calls_os": {
+                "type": "boolean"
+              },
+              "priority": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "priority"
+            ],
+            "type": "object"
+          },
           "mode": {
             "type": "string"
           },

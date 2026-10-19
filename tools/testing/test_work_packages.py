@@ -355,7 +355,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         models = [row for row in report["work_packages"] if row["family"] == "native"]
         physical = [row for row in report["work_packages"] if row["family"] != "native"]
         self.assertEqual(len(models), 19)
-        self.assertEqual(len(physical), 193)
+        self.assertEqual(len(physical), 196)
         spi = [row for row in physical
                if row["identity"] == "stm32h743.SPI4.dma"]
         self.assertEqual(len(spi), 1)
@@ -368,6 +368,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertEqual(selected["selected_ops_sources"], sources)
         self.assertEqual(selected["sdk_required_sources"], sources)
         self.assertEqual(selected["resolver_fixtures"], [
+            "tools/configure/assemblies/h743-spi-dma-cache-on.toml",
             "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
             "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
@@ -395,6 +396,25 @@ class CurrentWorkPackageTests(unittest.TestCase):
         self.assertEqual(pin["hardware_status"], "not_executed")
         self.assertFalse(report["software_qualification"])
         self.assertFalse(report["physical_qualification"])
+        modes = {row["identity"]: row for row in physical}
+        selected_modes = (
+            ("stm32h743.USART3.rx-dma-continuous", "uart_continuous", "uart_continuous", [
+                "tools/configure/assemblies/h743-uart-continuous-cache-on.toml",
+                "tools/configure/assemblies/h743-uart-continuous.toml"]),
+            ("stm32u575.USART1.dma-chain-tx", "uart_chain", "uart_dma_chain", [
+                "tools/configure/assemblies/u575-uart-chain.toml"]),
+            ("stm32u575.LPTIM2.irq-counter16-oneshot", "lptim", "lptim", [
+                "tools/configure/assemblies/u575-lptim-run.toml"]),
+        )
+        for identity, implementation, source_name, fixtures in selected_modes:
+            with self.subTest(mode=identity):
+                row = modes[identity]
+                family = identity.split(".")[0]
+                sources = [f"soc/{family}/drivers/{source_name}.c"]
+                self.assertEqual(row["provider_implementation"], implementation)
+                self.assertEqual(row["selected_ops_sources"], sources)
+                self.assertEqual(row["sdk_required_sources"], sources)
+                self.assertEqual(row["resolver_fixtures"], fixtures)
         expected = {
             "identity", "family", "controller", "kind", "mode", "provider",
             "reviewed_routes", "declared_boards", "resolver_fixtures",

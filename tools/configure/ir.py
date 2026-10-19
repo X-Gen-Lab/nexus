@@ -245,12 +245,14 @@ class UartOptions:
     frame: UartFrameOptions | None = None
     stream_profile: StreamProfileIR | None = None
     fifo: UartFifoOptions | None = None
+    dma_cache_line_bytes: int = 0
 
 
 @dataclass(frozen=True)
 class SpiOptions:
     max_hz: int
     irq: IrqOptions | None
+    dma_cache_line_bytes: int = 0
 
 
 @dataclass(frozen=True)
@@ -505,6 +507,7 @@ class CanDomainIR:
 class LptimOptions:
     """Fixed declared source units, independent of the Core deadline clock."""
     tick_hz: int
+    irq: IrqOptions | None = None
 
 
 @dataclass(frozen=True)
@@ -629,9 +632,11 @@ def mode_options(values):
                                values["stream_resolution"])
                            if "stream_resolution" in values else None,
                            UartFifoOptions(**values["fifo"])
-                           if "fifo" in values else None)
+                           if "fifo" in values else None,
+                           values.get("dma_cache_line_bytes", 0))
     if kind == "spi":
-        return SpiOptions(values.get("max_hz", 1000000), irq)
+        return SpiOptions(values.get("max_hz", 1000000), irq,
+                          values.get("dma_cache_line_bytes", 0))
     if kind == "i2c":
         return I2cOptions(values.get("max_hz", 100000), irq,
                          I2cTimingSelectionIR.from_validated(
@@ -650,7 +655,7 @@ def mode_options(values):
                               values["stream_resolution"])
                           if "stream_resolution" in values else None)
     if kind == "lptim":
-        return LptimOptions(values["tick_hz"])
+        return LptimOptions(values["tick_hz"], irq)
     if kind in {"flash", "watchdog", "rtc"}:
         return NoOptions()
     raise ValueError(f"Unmaintained controller decision: {kind}")

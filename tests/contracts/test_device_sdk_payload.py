@@ -46,6 +46,50 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         for name in names:
             self.assertNotIn(name, sdk.IO_EVOLUTION_VERIFICATION_FILES)
 
+    def test_latest_selected_inputs_survive_the_owned_sdk_payload(self):
+        rows = (
+            ("stm32h743", "h743 spi dma cache on",
+             "h743-spi-dma-cache-on", "h743-spi-dma"),
+            ("stm32h743", "h743 uart continuous",
+             "h743-uart-continuous", "h743-uart-continuous"),
+            ("stm32h743", "h743 uart continuous cache on",
+             "h743-uart-continuous-cache-on", "h743-uart-continuous"),
+            ("stm32u575", "u575 uart chain",
+             "u575-uart-chain", "u575-uart-gpdma"),
+            ("stm32u575", "u575 lptim run", "u575-lptim-run", "u575-lptim"),
+        )
+        for family, label, stem, smoke in rows:
+            with self.subTest(consumer=label), \
+                    tempfile.TemporaryDirectory(prefix="SDK ") as value:
+                canonical = "tools/configure/assemblies/" + stem + ".toml"
+                template = ("cmake/package/verification/io_evolution/consumers/"
+                            + smoke + ".c")
+                self.assertIn((label, canonical, smoke),
+                              consumers.SELECTED_CONSUMERS)
+                self.assertIn(canonical,
+                              descriptor.maintained(family).owned_payload)
+                self.assertTrue(template in sdk.IO_EVOLUTION_VERIFICATION_FILES,
+                                template)
+                directory = Path(value)
+                prefix = directory / "prefix with spaces"
+                installed = prefix / "share/nexus/src"
+                for name in (canonical, template):
+                    self.assertTrue((ROOT / name).is_file(), name)
+                    self.assertIn(name, sdk.REQUIRED_FILES)
+                    self.assertTrue(sdk.selected(name), name)
+                for name in (canonical, template,
+                             "dependencies/platform-compatibility.json"):
+                    destination = installed / name
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(ROOT / name, destination)
+                source, _, command = consumers.prepare_selected_consumer(
+                    prefix, directory, label, canonical, smoke,
+                    lambda argv: None, expected_revision="b" * 40)
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 (installed / template).read_bytes())
+                self.assertIn("-DNEXUS_ASSEMBLY_FILE=" +
+                              str(installed / canonical), command)
+
     def test_named_pin_state_sdk_payload_and_canonical_plan_are_explicit(self):
         canonical = "tools/configure/assemblies/g474-pin-states.toml"
         directory = "cmake/package/verification/io_evolution/"
@@ -268,7 +312,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                 self.assertTrue(sdk.selected(name))
         self.assertIn(("g474 shared pwm", directory + "g474-pwm-shared.toml",
                        "g474-pwm-shared"), consumers.SELECTED_CONSUMERS)
-        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 23)
+        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 28)
         board = json.loads((ROOT / directory /
                             "boards/g474-pwm-shared/board.json").read_text())
         self.assertIsNone(board["physical_pcb_revision"])

@@ -3,7 +3,8 @@
 This provider targets exact STM32U575ZIT6Q and the source-reviewed NUCLEO-U575ZI-Q
 MB1549 reference. The maintained slice is CPU startup, reset-like MSIS 4 MHz,
 reserved TIM2, exact-package GPIOA through GPIOH, USART1 PA9/PA10 and USART2
-PA2/PA3 AF7 IRQ bytes, optional finite USART1 GPDMA TX with independent IRQ RX,
+PA2/PA3 AF7 IRQ bytes, optional finite single-block or hardware-chain USART1
+GPDMA TX with independent IRQ RX,
 and an explicitly enabled independent watchdog. The default linker RAM
 is SRAM1 192 KiB. It does not allocate storage or create tasks, workers or runtime
 registries. The typed factory returns existing readonly faces; instances own
@@ -14,7 +15,8 @@ The selected finite peripheral extension adds SPI1, I2C1, ADC4, TIM3 CH1,
 EXTI0/1 and physical Flash. These reference selections keep TZEN0, MSIS4MHz,
 static typed factory objects and caller execution. Those six selections add no
 DMA engine, task, runtime registry or automatic clock adoption. The separate
-USART1 `dma-tx` selection owns its exact GPDMA channel. The official U5 LL
+USART1 `dma-tx` and `dma-chain-tx` selections each own the same exclusive GPDMA
+channel and cannot coexist. The official U5 LL
 headers are private, hash-locked CubeU5 v1.9.0 inputs; readonly configuration
 queries, encodings and selected register operations are reused without HAL
 handles, vendor IRQ callbacks, HAL ticks or a second transfer owner.
@@ -129,8 +131,41 @@ Current development checks passed40 real-provider model cases,8 generated
 factory cases and the normal ARM configure/build with linked resource and
 provider-retention checks. They do not establish a clean-source full-gate
 candidate, physical erratum qualification or measured cycles. HIL is
-`not_executed`. USART2 DMA, RX DMA, linked lists, continuous streaming,
+`not_executed`. USART2 DMA, RX DMA, continuous streaming,
 low-power/autonomous operation and a TrustZone broker remain unselected.
+
+### Optional USART1 finite hardware-chain TX
+
+The single authored [chain assembly](../../tools/configure/assemblies/u575-uart-chain.toml)
+selects `dma-chain-tx` on the same TZEN0/MSIS4 USART1 route. It uses the existing
+public `nx_uart_tx_request_t`: one contiguous SRAM1 payload, not a scatter/gather
+list. The provider admits at most 196605 bytes, additionally constrained by the
+actual accessible SRAM1 span and exclusion of all private/control/ring storage.
+The first block is programmed directly; up to two subsequent 65535-byte blocks
+are fetched by hardware without service rearming. The last item terminates with
+`CLLR=0`, and `TCEM=LAST` suppresses intermediate transfer-complete events.
+
+One selected 24-byte mutable array contains two packed 12-byte nodes. Its
+32-byte alignment keeps the whole array within one 64 KiB `CLBAR` window.
+Immutable typed IR describes that placement and capacity; cold initialization
+and admission check actual linked SRAM1 addresses. Requests, full payloads and
+private nodes remain owned through link fetch, channel/FIFO/IRQ drain and
+independent USART wire completion. Refused link/source detachment retains the
+request for explicit retry. The provider clears hardware link/source references
+and private node addresses only after the shared finite engine proves drain.
+
+The private [construction contract](private/stm32u575_uart_gpdma_chain.h) and
+compile-time common algorithm preserve single-block state and ordinary UART
+costs. This mode adds no worker, allocation, transfer forwarding layer or
+receiver UE cycle. It does not enable circular DMA, noncontiguous segments,
+RX DMA, LPDMA, autonomous Stop2 or TrustZone. Host bus models and real ARM
+link/retention checks remain separate evidence; physical HIL is `not_executed`.
+
+中文：`dma-chain-tx` 复用公开 UART request，发送一段连续 SRAM1 数据，最多三个
+硬件 block。两个后续节点共 24 字节，整个数组按 32 字节对齐，实际链接地址须在
+同一个 64 KiB 窗口。首块后由 GPDMA 实际读取节点，不需要 service 逐段重臂。
+取消、超时或一次完成中断都不撤销借用；必须排空链读取、DMA、IRQ 和串口线上活动。
+该精确模式不代表通用 scatter/gather、循环链、低功耗自主传输或实板资格。
 
 ### Optional USART1 bounded hardware FIFO bytes
 
@@ -310,8 +345,9 @@ Optional DWT CYCCNT is disabled until its exact U575 implementation is reviewed;
 a Cortex-M33 architecture string does not authorize a cycle-counter capability.
 SoC ICACHE/DCACHE peripherals are disabled; their existence does not declare SCB
 cache lines. GPDMA1 and LPDMA1 have distinct physical bus paths and linked-list
-semantics. Only the exact finite USART1/GPDMA1 TX selection above is maintained;
-LPDMA1, linked-list descriptors and RX DMA are not selected. SRAM2/3/4, backup
+semantics. Only the exact finite single-block and hardware-chain USART1/GPDMA1
+TX selections above are maintained; LPDMA1, circular linked lists and RX DMA
+are not selected. SRAM2/3/4, backup
 SRAM and Secure aliases are outside this maintained DMA source domain.
 Secure and NonSecure aliases never count as two physical capacities.
 

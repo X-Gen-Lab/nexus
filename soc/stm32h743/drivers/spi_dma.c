@@ -6,6 +6,7 @@
  * \date            2026-10-18
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/arch/cache.h"
 #include "nexus/core/fault.h"
 #include "stm32h743_spi_dma.h"
 #include <limits.h>
@@ -19,6 +20,10 @@
 #endif
 #ifndef NX_H743_SPI_DMA_ADDRESS
 #define NX_H743_SPI_DMA_ADDRESS(p) ((uint32_t)(uintptr_t)(p))
+#endif
+#ifndef NX_H743_SPI_DMA_CLEAN
+#define NX_H743_SPI_DMA_CLEAN(p, n)      nx_arch_dcache_clean((p), (n))
+#define NX_H743_SPI_DMA_INVALIDATE(p, n) nx_arch_dcache_invalidate((p), (n))
 #endif
 #ifndef NX_H743_SPI_DMA_IRQ_ENABLED
 #define NX_H743_SPI_DMA_IRQ_ENABLED(n) (NVIC_GetEnableIRQ((IRQn_Type)(n)) != 0U)
@@ -70,6 +75,7 @@ enum {
     RELEASE_CS,
     HANDOFF_SCK,
     RESET_SPI,
+    INVALIDATE_RX,
     FINISH
 };
 static bool task(void) {
@@ -105,6 +111,10 @@ static bool binding(const nx_stm32h743_spi_dma_state_t* s) {
            s->tx_mux == NX_H743_SPI_DMA_TX_MUX && s->face != NULL &&
            s->face->ops == &nx_stm32h743_spi_dma_ops && s->face->context == s;
 }
+static bool cache_matches(const nx_stm32h743_spi_dma_state_t* s) {
+    return ((NX_H743_READ(&g_nx_stm32h743_system.core->CCR) & SCB_CCR_DC_Msk) !=
+            0U) == s->cached;
+}
 static nx_result_t live(nx_stm32h743_spi_dma_state_t* s) {
     nx_stm32h743_system_t* system = &g_nx_stm32h743_system;
     if (system->rcc == NULL || system->timer == NULL || system->core == NULL)
@@ -117,8 +127,8 @@ static nx_result_t live(nx_stm32h743_spi_dma_state_t* s) {
         (NX_H743_READ(&r->AHB1ENR) & RCC_AHB1ENR_DMA1EN) == 0U ||
         (NX_H743_READ(&r->AHB4ENR) & RCC_AHB4ENR_GPIOEEN) == 0U ||
         (NX_H743_READ(&r->APB1LENR) & RCC_APB1LENR_TIM2EN) == 0U ||
-        (NX_H743_READ(&system->core->CCR) & SCB_CCR_DC_Msk) != 0U ||
-        system->timer_error != NX_SUCCESS || system->core_hz != 64000000U)
+        !cache_matches(s) || system->timer_error != NX_SUCCESS ||
+        system->core_hz != 64000000U)
         return NX_ERROR_STATE;
     nx_result_t ready = nx_stm32h743_spi_wire_clock_ready(&s->wire);
     if (ready != NX_SUCCESS)
@@ -257,7 +267,7 @@ static bool irq_domain(nx_stm32h743_spi_dma_state_t* s) {
          (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) == 0U &&
         (NX_H743_READ(&system->rcc->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0U &&
         (NX_H743_READ(&system->rcc->APB2ENR) & RCC_APB2ENR_SPI4EN) != 0U &&
-        (NX_H743_READ(&system->core->CCR) & SCB_CCR_DC_Msk) == 0U;
+        cache_matches(s);
     if (ready && !s->tainted)
         return true;
     s->tainted = true;
@@ -283,6 +293,7 @@ static nx_result_t submit(void* raw, nx_spi_request_t* request, bool admitted) {
         e->cs_face->context != e->wire.cs || e->wire.mode != 0U ||
         e->wire.cs_mask != (1U << 11U) || request->length == 0U ||
         request->length > UINT16_MAX ||
+        (s->cached && request->length % 32U != 0U) ||
         protected(s, e, request, sizeof(*request)) ||
         protected(s, e, request->tx, request->length) ||
         protected(s, e, request->rx, request->length) ||
@@ -290,13 +301,13 @@ static nx_result_t submit(void* raw, nx_spi_request_t* request, bool admitted) {
         overlap(request, sizeof(*request), request->rx, request->length) ||
         overlap(request->tx, request->length, request->rx, request->length))
         return NX_ERROR_INVALID;
-    nx_result_t result =
-        nx_dma_buffer_validate(s->regions, s->region_count, request->tx,
-                               request->length, 1U, NX_DMA_TO_DEVICE);
+    nx_result_t result = nx_dma_buffer_validate(
+        s->regions, s->region_count, request->tx, request->length,
+        s->cached ? 32U : 1U, NX_DMA_TO_DEVICE);
     if (result == NX_SUCCESS)
-        result =
-            nx_dma_buffer_validate(s->regions, s->region_count, request->rx,
-                                   request->length, 1U, NX_DMA_FROM_DEVICE);
+        result = nx_dma_buffer_validate(
+            s->regions, s->region_count, request->rx, request->length,
+            s->cached ? 32U : 1U, NX_DMA_FROM_DEVICE);
     if (result != NX_SUCCESS)
         return result;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
@@ -341,8 +352,25 @@ static nx_result_t submit(void* raw, nx_spi_request_t* request, bool admitted) {
         s->stage = CONFIG_SPI;
         s->cstart_attempted = false;
         s->wire.active = true;
+        s->preparing = s->cached;
     }
     nx_arch_irq_restore(guard);
+    if (result == NX_SUCCESS && s->cached) {
+        /* Admission starts the whole-line loan before either CPU access.
+         * Cancellation may latch a cause, but service cannot detach while
+         * this bounded maintenance runs with the incoming IRQ mask restored. */
+        nx_arch_result_t clean =
+            NX_H743_SPI_DMA_CLEAN((uintptr_t)request->tx, request->length);
+        nx_arch_result_t invalidate =
+            clean == NX_ARCH_OK ? NX_H743_SPI_DMA_INVALIDATE(
+                                      (uintptr_t)request->rx, request->length)
+                                : clean;
+        guard = nx_arch_irq_save();
+        s->preparing = false;
+        if (clean != NX_ARCH_OK || invalidate != NX_ARCH_OK)
+            draining(s, NX_ERROR_IO);
+        nx_arch_irq_restore(guard);
+    }
     return result;
 }
 static nx_result_t ordinary(void* e, nx_spi_request_t* r) {
@@ -418,7 +446,7 @@ static bool clear_address(DMA_Stream_TypeDef* stream) {
 }
 static void service(void* raw) {
     nx_stm32h743_spi_dma_state_t* s = raw;
-    if (s == NULL || !task() || !s->retained)
+    if (s == NULL || !task() || !s->retained || s->preparing)
         return;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     if (s->tainted || live(s) != NX_SUCCESS) {
@@ -657,6 +685,24 @@ static void service(void* raw) {
             if (good)
                 ++s->stage;
             break;
+        case INVALIDATE_RX:
+            if (request != NULL && s->cached) {
+                /* Both engines, wire, vectors and addresses are detached.
+                 * A failed invalidate still retains the complete RX loan;
+                 * retry cannot report SETTLED until CPU visibility is real. */
+                s->preparing = true;
+                nx_arch_irq_restore(guard);
+                nx_arch_result_t invalidate = NX_H743_SPI_DMA_INVALIDATE(
+                    (uintptr_t)request->rx, request->length);
+                guard = nx_arch_irq_save();
+                s->preparing = false;
+                good = invalidate == NX_ARCH_OK;
+                if (!good)
+                    quarantine(s);
+            }
+            if (good)
+                ++s->stage;
+            break;
         case FINISH: {
             nx_result_t result = s->terminal;
             size_t count =
@@ -721,6 +767,10 @@ nx_result_t nx_stm32h743_spi_dma_initialize(nx_stm32h743_spi_dma_state_t* s) {
         return NX_ERROR_BUSY;
     if (g_nx_stm32h743_system.rcc == NULL || !binding(s) || !regions(s))
         return NX_ERROR_INVALID;
+    if (g_nx_stm32h743_system.core == NULL)
+        return NX_ERROR_STATE;
+    s->cached =
+        (NX_H743_READ(&g_nx_stm32h743_system.core->CCR) & SCB_CCR_DC_Msk) != 0U;
     nx_result_t ready = live(s);
     if (ready != NX_SUCCESS)
         return ready;

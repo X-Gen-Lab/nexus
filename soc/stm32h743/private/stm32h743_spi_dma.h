@@ -46,6 +46,8 @@ typedef struct {
     bool initialized;
     bool cstart_attempted;
     bool tainted;
+    bool cached;
+    bool preparing;
 } nx_stm32h743_spi_dma_state_t;
 /** \brief One caller-owned CS and byte-format binding, no hidden DMA cells. */
 struct nx_stm32h743_spi_dma_endpoint {
@@ -57,9 +59,12 @@ struct nx_stm32h743_spi_dma_endpoint {
 extern const nx_spi_ops_t nx_stm32h743_spi_dma_ops;
 extern const nx_spi_endpoint_ops_t nx_stm32h743_spi_dma_endpoint_ops;
 /**
- * \brief Admit cold exact V/trim64/cache-off SPI4 and its two DMA1 streams.
+ * \brief Admit cold exact V/trim64/HSI64 SPI4 and its two DMA1 streams.
  * \return SUCCESS or error; retained preserves partial cleanup responsibility.
  * \note Task-only. Static construction/lookup do not call this hardware API.
+ *       Cache state remains fixed through successful stop. Cache-on requests
+ *       borrow exclusive complete32-byte lines in initialized AXI SRAM until
+ *       SETTLED, including pre-DMA clean/invalidate and post-drain invalidate.
  */
 nx_result_t
 nx_stm32h743_spi_dma_initialize(nx_stm32h743_spi_dma_state_t* state);

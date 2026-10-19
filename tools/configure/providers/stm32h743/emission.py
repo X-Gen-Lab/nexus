@@ -35,6 +35,9 @@ def includes(result):
     if any(item.kind == "uart" and item.mode == "rx-dma-idle"
            for item in result.controllers):
         source.append('#include "stm32h743_uart_receive.h"')
+    if any(item.kind == "uart" and item.mode == "rx-dma-continuous"
+           for item in result.controllers):
+        source.append('#include "stm32h743_uart_continuous.h"')
     return source + ['void _init(void);', 'void _fini(void);',
                     r'/** \brief C runtime hooks; constructors use .init_array. */',
                     'void _init(void) {}', 'void _fini(void) {}']
@@ -79,7 +82,8 @@ def _uart(result):
 
 
 def _dma(result):
-    return any((item.kind == "uart" and item.mode in ("dma-tx", "rx-dma-idle")) or
+    return any((item.kind == "uart" and item.mode in
+                ("dma-tx", "rx-dma-idle", "rx-dma-continuous")) or
                (item.kind == "spi" and item.mode == "dma")
                for item in result.controllers)
 

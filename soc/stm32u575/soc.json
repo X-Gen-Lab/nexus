@@ -421,6 +421,20 @@
     }
   },
   "controllers": {
+    "LPTIM2": {
+      "kind": "lptim",
+      "modes": [
+        "irq-counter16-oneshot"
+      ],
+      "irq": [
+        "LPTIM2_IRQn"
+      ],
+      "irq_numbers": [
+        68
+      ],
+      "clock_hz": 4000000,
+      "pins": []
+    },
     "GPIOC": {
       "kind": "gpio",
       "modes": [
@@ -450,6 +464,7 @@
       "modes": [
         "irq-bytes",
         "dma-tx",
+        "dma-chain-tx",
         "irq-fifo-bytes",
         "irq-fifo-rtscts-bytes"
       ],

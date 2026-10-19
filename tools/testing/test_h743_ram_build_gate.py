@@ -78,14 +78,14 @@ class H743RamBuildGateTests(unittest.TestCase):
         self.assertTrue(path.is_file(), "normal selected ARM build omitted its audit report")
         return json.loads(path.read_text())
 
-    def invoke(self, *, report=None, commands=None, extra=()):
+    def invoke(self, *, report=None, commands=None, elf=None, extra=()):
         self.assertTrue(CLI.is_file(), "maintained H743 post-link CLI is missing")
         build = self.selected()
         compiler = shutil.which("arm-none-eabi-objdump")
         self.assertTrue(compiler)
         output = report or self.root / (self.id().rsplit(".", 1)[-1] + ".json")
         argv = [sys.executable, "-B", str(CLI),
-                "--elf", str(build / "bin/io_evolution_fixture.elf"),
+                "--elf", str(elf or build / "bin/io_evolution_fixture.elf"),
                 "--resolved", str(build / "generated/resolved.json"),
                 "--compile-commands", str(commands or build / "compile_commands.json"),
                 "--objdump", compiler, "--report", str(output), *extra]
@@ -101,6 +101,7 @@ class H743RamBuildGateTests(unittest.TestCase):
                 self.assertEqual(profile, report["clock_profile"])
                 self.assertFalse(report["qualification"])
                 self.assertEqual(4, len(report["stack_usage"]))
+                self.assertEqual("passed", report["ram_layout"]["status"])
                 self.assertEqual("passed", report["cpu_bridge"]["status"])
                 self.assertEqual("passed", report["static_closure"]["status"])
                 self.assertEqual("not_proved", report["cpu_bridge"]["callee_body"])
@@ -112,6 +113,26 @@ class H743RamBuildGateTests(unittest.TestCase):
         elf = (build / "bin/io_evolution_fixture.elf").read_bytes()
         from tools.measurement.elf import Elf32
         self.assertNotIn("nx_stm32h743_flash_ram_enter", Elf32(elf).symbols)
+
+    def test_real_image_guard_record_must_match_its_linked_endpoints(self):
+        from tools.measurement.elf import Elf32
+        original = (self.selected() / "bin/io_evolution_fixture.elf").read_bytes()
+        image = Elf32(original)
+        address = image.symbol("g_nx_stm32h743_flash_image")
+        load, = [row for row in image.loads
+                 if row["virtual"] <= address < address + 16 <=
+                 row["virtual"] + row["files"]]
+        offset = load["offset"] + address - load["virtual"]
+        changed = bytearray(original)
+        changed[offset] ^= 4
+        path = self.root / "changed-image-guard.elf"
+        path.write_bytes(changed)
+        result, output = self.invoke(elf=path)
+        self.assertNotEqual(0, result.returncode,
+                            "actual firmware guard bytes need layout admission")
+        report = json.loads(output.read_text())
+        self.assertEqual("failed", report["status"])
+        self.assertIn("image guard record", report["failure"])
 
     def test_deleting_report_reexecutes_the_normal_link_audit(self):
         build = self.selected()

@@ -43,29 +43,30 @@ def selects_branch(event, branch):
 
 
 class WorkflowContracts(unittest.TestCase):
-    def test_feature_pushes_select_the_actual_workflow(self):
+    def test_pushes_select_only_primary_branches(self):
         event = workflow('ci.yml')['on']['push']
-        cases = [('main', True), ('develop', True), ('codex/task', True),
-                 ('codex/team/task', True), ('feat/io-evolution-20261017', True),
-                 ('feat/industrial-platform', True), ('feat/team/task', True),
+        cases = [('main', True), ('develop', True), ('codex/task', False),
+                 ('codex/team/task', False), ('feat/io-evolution-20261017', False),
+                 ('feat/industrial-platform', False), ('feat/team/task', False),
+                 ('fix/task', False), ('fix/team/task', False),
                  ('feature/task', False), ('docs-delivery', False)]
         for branch, expected in cases:
             with self.subTest(branch=branch):
                 self.assertEqual(selects_branch(event, branch), expected)
-        self.assertEqual(set(event['branches']),
-                         {'main', 'develop', 'codex/**', 'feat/**'})
+        self.assertEqual(set(event['branches']), {'main', 'develop'})
 
     def test_pull_requests_admit_stacked_and_other_base_branches(self):
         event = workflow('ci.yml')['on']['pull_request']
         for base in ('main', 'develop', 'feat/industrial-platform',
-                     'feat/io-evolution-20261017', 'maintenance/next'):
+                     'feat/io-evolution-20261017', 'codex/task', 'fix/task',
+                     'maintenance/next'):
             with self.subTest(base=base):
                 self.assertTrue(selects_branch(event, base))
         # Actions evaluates PR branch filters against the base, not head.
         # No path/base exclusion may prevent the aggregate status from running.
         self.assertFalse(event)
 
-    def test_broader_ci_does_not_gain_a_privileged_event_or_permissions(self):
+    def test_ci_keeps_pr_manual_schedule_and_readonly_permissions(self):
         document = workflow('ci.yml')
         self.assertEqual(set(document['on']),
                          {'push', 'pull_request', 'workflow_dispatch', 'schedule'})
@@ -389,11 +390,20 @@ class WorkflowContracts(unittest.TestCase):
     def test_tool_contracts_have_one_automatic_workflow_caller(self):
         events = workflow('enterprise-tools.yml')['on']
         self.assertEqual(set(events), {'workflow_call', 'workflow_dispatch'})
-        # Maintained work branches must retain pre-PR checks.
+        # Work branches enter automatic CI through their unrestricted PR.
         ci_events = workflow('ci.yml')['on']
         self.assertEqual(set(ci_events['push']['branches']),
-                         {'main', 'develop', 'codex/**', 'feat/**'})
+                         {'main', 'develop'})
         self.assertIn('pull_request', ci_events)
+        callers = []
+        for path in (ROOT / '.github/workflows').glob('*.yml'):
+            document = workflow(path.name)
+            if set(document['on']) & {'push', 'pull_request', 'schedule'}:
+                callers += [(path.name, name)
+                            for name, job in document['jobs'].items()
+                            if job.get('uses') ==
+                            './.github/workflows/enterprise-tools.yml']
+        self.assertEqual(callers, [('ci.yml', 'tool-contracts')])
 
     def test_each_arm_link_retains_an_unbound_hil_work_plan(self):
         arm = workflow('build-matrix.yml')['jobs']['arm']
@@ -427,24 +437,27 @@ class WorkflowContracts(unittest.TestCase):
         self.assertNotIn('cmake --build', commands)
         self.assertNotIn('NEXUS_BACKEND', commands)
 
-    def test_h743_provider_stage_binds_three_canonical_inputs_to_one_project(self):
+    def test_h743_provider_stage_binds_canonical_inputs_to_one_project(self):
         job = workflow('build-matrix.yml')['jobs']['controller-routes']
         expected = {
             'fixture': 'h743_assembly',
             'project': 'tests/contracts/h743_assembly',
             'assemblies': (
                 'tools/configure/assemblies/h743-spi-dma.toml\n'
+                'tools/configure/assemblies/h743-spi-dma-cache-on.toml\n'
                 'tools/configure/assemblies/h743-spi-dma-uart-tx.toml\n'
                 'tools/configure/assemblies/h743-spi-dma-uart-rx.toml\n'
-                'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml\n')}
+                'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml\n'
+                'tools/configure/assemblies/h743-uart-continuous.toml\n'
+                'tools/configure/assemblies/h743-uart-continuous-cache-on.toml\n')}
         self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
                           if row.get('fixture') == 'h743_assembly'], [expected])
         canonical = expected['assemblies'].splitlines()
         original = sorted((ROOT / expected['project']).glob('*.toml'))
         self.assertEqual(len(original), 26)
         selected = original + [ROOT / value for value in canonical]
-        self.assertEqual(len(selected), 30)
-        self.assertEqual(len(set(selected)), 30)
+        self.assertEqual(len(selected), 33)
+        self.assertEqual(len(set(selected)), 33)
         self.assertTrue(all(path.is_file() for path in selected))
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
@@ -455,16 +468,42 @@ class WorkflowContracts(unittest.TestCase):
         self.assertIn('arguments+=(--project "$PROVIDER_PROJECT")', step['run'])
         self.assertIn('IFS= read -r assembly', step['run'])
 
-    def test_provider_shell_passes_exact_h74329_and_legacy_inputs_once(self):
+    def test_u575_provider_stage_admits_chain_and_lptim_canonical_inputs(self):
+        job = workflow('build-matrix.yml')['jobs']['controller-routes']
+        expected = {
+            'fixture': 'u575_assembly',
+            'project': 'tests/contracts/u575_assembly',
+            'assemblies': (
+                'tools/configure/assemblies/u575-uart-chain.toml\n'
+                'tools/configure/assemblies/u575-lptim-run.toml\n')}
+        self.assertEqual([row for row in job['strategy']['matrix'].get('include', [])
+                          if row.get('fixture') == 'u575_assembly'], [expected])
+        original = sorted((ROOT / expected['project']).glob('*.toml'))
+        self.assertEqual(len(original), 10)
+        selected = original + [ROOT / value for value in
+                               expected['assemblies'].splitlines()]
+        self.assertEqual(len(selected), 12)
+        self.assertEqual(len(set(selected)), 12)
+        self.assertTrue(all(path.is_file() for path in selected))
+
+    def test_provider_shell_passes_each_authored_and_canonical_input_once(self):
         job = workflow('build-matrix.yml')['jobs']['controller-routes']
         step = next(step for step in job['steps'] if step.get('name') ==
                     'Link and audit each authored software assembly')
-        canonical = [
-            'tools/configure/assemblies/h743-spi-dma.toml',
-            'tools/configure/assemblies/h743-spi-dma-uart-tx.toml',
-            'tools/configure/assemblies/h743-spi-dma-uart-rx.toml',
-            'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml']
-        for family in ('h743_assembly', 'gd32_assembly'):
+        selections = {
+            'h743_assembly': [
+                'tools/configure/assemblies/h743-spi-dma.toml',
+                'tools/configure/assemblies/h743-spi-dma-cache-on.toml',
+                'tools/configure/assemblies/h743-spi-dma-uart-tx.toml',
+                'tools/configure/assemblies/h743-spi-dma-uart-rx.toml',
+                'tools/configure/assemblies/h743-spi-dma-runtime-clock.toml',
+                'tools/configure/assemblies/h743-uart-continuous.toml',
+                'tools/configure/assemblies/h743-uart-continuous-cache-on.toml'],
+            'u575_assembly': [
+                'tools/configure/assemblies/u575-uart-chain.toml',
+                'tools/configure/assemblies/u575-lptim-run.toml'],
+            'gd32_assembly': []}
+        for family, canonical in selections.items():
             with self.subTest(family=family), tempfile.TemporaryDirectory() as name:
                 root = Path(name) / 'repository with spaces'
                 project = root / 'tests/contracts' / family
@@ -486,13 +525,12 @@ class WorkflowContracts(unittest.TestCase):
                     '    f.write(json.dumps(sys.argv[1:]) + "\\n")\n')
                 tool.chmod(0o700)
                 record = root / 'actual-arguments.jsonl'
-                selected_project = ('tests/contracts/h743_assembly'
-                                    if family == 'h743_assembly' else '')
+                selected_project = ('tests/contracts/' + family
+                                    if canonical else '')
                 env = dict(os.environ, FIXTURE=family,
                            GITHUB_WORKSPACE=str(root),
                            PROVIDER_PROJECT=selected_project,
-                           PROVIDER_ASSEMBLIES=('\n'.join(canonical)
-                               if family == 'h743_assembly' else ''),
+                           PROVIDER_ASSEMBLIES='\n'.join(canonical),
                            RECORDED_PROVIDER_ARGS=str(record))
                 result = subprocess.run(
                     ['bash', '-euo', 'pipefail', '-c', step['run']],
@@ -509,9 +547,10 @@ class WorkflowContracts(unittest.TestCase):
                           if value == '--fixture']
                 expected = ['tests/contracts/' + family + '/' + name
                             for name in fixture_names]
-                if family == 'h743_assembly':
+                if canonical:
                     expected += canonical
-                    self.assertEqual(len(actual), 30)
+                    self.assertEqual(len(actual),
+                                     33 if family == 'h743_assembly' else 12)
                     self.assertEqual(argv.count('--project'), 1)
                     self.assertEqual(argv[argv.index('--project') + 1],
                                      selected_project)
@@ -751,7 +790,7 @@ print('{"status":"fixture-only"}')
 
 
 PROFILE_BASELINE_SHA = '921ef15385b75a0a9e91dc4be22db7362dcf0f342cfd473008222c431d15d715'
-POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'd7e7f2309f3a16c709f0992d81dee28fa544e69c3b799fd998e4213f33143192', '.github/workflows/release.yml': '92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2'}
+POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e', '.github/workflows/release.yml': '92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2'}
 
 
 class SoftwareQualificationContracts(unittest.TestCase):

@@ -21,7 +21,8 @@ from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
     load_json, parse_json, regular_file, run_adapter, separate_outputs)
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.elf import Elf32
-from tools.measurement.flash_execution import verify_h743_cpu_bridge
+from tools.measurement.flash_execution import (verify_h743_cpu_bridge,
+    verify_h743_ram_layout)
 from tools.measurement.flash_ram_static import verify_h743_ram_static
 from tools.measurement.resources import (input_protection_paths,
     resolved_float_abi, validate_elf_configuration)
@@ -233,6 +234,7 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
         _require(0 < len(raw) <= 16 * 1024 * 1024, "objdump size is invalid")
         observations = {"elf_sha256": file_identity(elf_path)["sha256"],
                         "objdump": raw}
+        layout = verify_h743_ram_layout(elf, observations)
         cpu = verify_h743_cpu_bridge(elf, observations)
         static = verify_h743_ram_static(elf, observations, [
             {"source": str(row["source"]), "raw": row["su"].read_bytes()}
@@ -254,7 +256,7 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
                              "arguments": row["arguments"]} for row in selected],
             "objdump_execution": load_json(outputs["objdump_receipt"]),
             "compiler_execution": load_json(outputs["compiler_receipt"]),
-            "cpu_bridge": cpu, "static_closure": static,
+            "ram_layout": layout, "cpu_bridge": cpu, "static_closure": static,
             "physical_execution": "not_executed",
             "limits": ["conditional CPU/AAPCS and static RAM residency/frame checks",
                        "C data ownership, Flash-read and MPU/device protocol not proved",

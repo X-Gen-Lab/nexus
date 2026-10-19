@@ -12,6 +12,7 @@ import matrix
 
 H743_SPI_DMA_REFERENCES = {
     "tools/configure/assemblies/h743-spi-dma.toml": None,
+    "tools/configure/assemblies/h743-spi-dma-cache-on.toml": None,
     "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml": None,
     "tools/configure/assemblies/h743-spi-dma-uart-tx.toml": "dma-tx",
     "tools/configure/assemblies/h743-spi-dma-uart-rx.toml": "rx-dma-idle",
@@ -67,6 +68,12 @@ class MaintainedMatrixTests(unittest.TestCase):
                                   for entry in item["selected"]},
                                  {("spi", "SPI4", "dma")} |
                                  ({("uart", "USART3", mode)} if mode else set()))
+            elif item["assembly"] == "tools/configure/assemblies/u575-lptim-run.toml":
+                self.assertEqual((item["family"], item["backend"], item["scope"]),
+                                 ("stm32u575", "baremetal", "public_reference"))
+                self.assertEqual([(entry["kind"], entry["controller"], entry["mode"])
+                                  for entry in item["selected"]],
+                                 [("lptim", "LPTIM2", "irq-counter16-oneshot")])
             elif item["family"] in {"stm32h743", "stm32u575"}:
                 self.assertTrue({entry["kind"] for entry in item["selected"]}.issubset(
                     {"gpio", "uart"}))
@@ -107,7 +114,8 @@ class MaintainedMatrixTests(unittest.TestCase):
                                   ir["clock_profile"]),
                                  ("stm32h743zi-hsi-reference", "stm32h743",
                                   "STM32H743ZIT6", "baremetal",
-                                  "hsi64-fixed-cache-off"))
+                                  "hsi64-fixed-cache-on" if path.endswith(
+                                      "cache-on.toml") else "hsi64-fixed-cache-off"))
                 self.assertFalse(ir["physical_qualified"])
                 controllers = {item.id: item for item in ir.controllers}
                 self.assertEqual(set(controllers), {"bus4"} |

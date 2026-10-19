@@ -11,11 +11,18 @@ def _gpdma_uart(item, result, state, name, capacity):
     """One selected finite-TX extension; ordinary byte state stays unchanged."""
     options, irq = item.options, result["irq"]
     facts = "s_nx_uart_gpdma_" + name
+    chain = item.mode == "dma-chain-tx"
+    provider = "uart_chain" if chain else "uart_gpdma"
+    node = "s_nx_uart_chain_nodes_" + name
     definitions = [f"static uint8_t s_nx_rx_{name}[{capacity}];",
-        f"static const nx_stm32u575_uart_gpdma_facts_t {facts} = {{",
+        *([f"_Alignas(32) static nx_stm32u575_uart_chain_node_t {node}[2];"]
+          if chain else []),
+        f"static const nx_stm32u575_uart_{'chain' if chain else 'gpdma'}_facts_t {facts} = {{",
+        *(["    .base = {"] if chain else []),
         "    .engine = GPDMA1, .channel = GPDMA1_Channel0,",
         "    .irq = GPDMA1_Channel0_IRQn, .request = 25u,",
-        f"    .priority = {options.irq.priority}u }};",
+        f"    .priority = {options.irq.priority}u" +
+        (f" }}, .nodes = {node} }};" if chain else " };"),
         f"static nx_result_t prepare_{name}(void) {{",
         f"    if ({state}.uart.retained || {state}.uart.initialized || {state}.uart.active != NULL || {state}.uart.wake != NULL || {state}.uart.wake_publishers != 0u) {{ return NX_ERROR_BUSY; }}",
         f"    {state}.uart.registers = USART1;",
@@ -26,18 +33,18 @@ def _gpdma_uart(item, result, state, name, capacity):
         f"    {state}.uart.profile = NX_UART_RX_BYTES;",
         f"    {state}.uart.irq_policy = (nx_irq_policy_t){{ {kernel_policy_constant(result)}, {irq['external_count']}u, {irq['priority_bits']}u, {irq['syscall_priority'] or 0}u }};",
         f"    {state}.dma_irq_policy = {state}.uart.irq_policy;",
-        f"    {state}.facts = &{facts};",
+        f"    {state}.facts = &{facts}" + (".base;" if chain else ";"),
         "    nx_result_t status = nx_stm32u575_usart1_pins_prepare();",
         "    if (status != NX_SUCCESS) { return status; }",
-        f"    return nx_stm32u575_uart_gpdma_initialize(&{state}, 4000000u, 1000000u);",
+        f"    return nx_stm32u575_{provider}_initialize(&{state}, 4000000u, 1000000u);",
         "}", "void USART1_IRQHandler(void);",
         r"/** \brief One selected RX-byte and independent USART wire fact source. */",
         "void USART1_IRQHandler(void) { "
-        f"nx_stm32u575_uart_gpdma_uart_irq(&{state}); }}",
+        f"nx_stm32u575_{provider}_uart_irq(&{state}); }}",
         "void GPDMA1_Channel0_IRQHandler(void);",
         r"/** \brief One exact GPDMA1 channel; no request settlement in IRQ. */",
         "void GPDMA1_Channel0_IRQHandler(void) { "
-        f"nx_stm32u575_uart_gpdma_irq(&{state}); }}"]
+        f"nx_stm32u575_{provider}_irq(&{state}); }}"]
     return Construction(state_type="nx_stm32u575_uart_gpdma_state_t",
         definitions=definitions, initialize=f"prepare_{name}()",
         stop=[f"nx_uart_port_stop(&s_nx_face_{name})"],
@@ -48,6 +55,9 @@ def constructor(item, result, board_bindings, routes, devices):
     """Construct the selected exact static provider and cold resource leases."""
     from . import mode_implementation, validate_selection
     item = controller_ir(item, "stm32u575")
+    if item.kind == "lptim":
+        from . import lptim
+        return lptim.constructor(item, result)
     if item.provider != "stm32u575":
         fail("U575 constructor cannot reinterpret a foreign provider decision")
     validate_selection(item, item)
@@ -69,7 +79,7 @@ def constructor(item, result, board_bindings, routes, devices):
         capacity = options.rx_capacity
         if type(capacity) is not int or not 1 <= capacity <= 4096:
             raise ValueError("U575 USART requires an explicit bounded byte ring")
-        if item.mode == "dma-tx":
+        if item.mode in {"dma-tx", "dma-chain-tx"}:
             return _gpdma_uart(item, result, state, name, capacity)
         fifo = item.mode in uart_formats.FIFO_MODES
         flow = item.mode == uart_formats.RTSCTS_MODE

@@ -207,8 +207,53 @@ stream without restarting the controller.
 The owner calls service to publish and arm the next free block. Restart gaps
 are possible, and borrowed blocks are never overwritten. This is neither
 circular DMA nor continuous no-gap reception; no byte-exact loss count is
-inferred. Additional H7 DMA engines, RX continuous/double-buffer modes and
-physical cache coherence remain separate acceptance scopes.
+inferred. This finite selection does not inherit the separate double-buffer
+mode below. Additional H7 DMA engines and physical cache coherence remain
+separate acceptance scopes.
+
+## Optional continuous DMA receive
+
+`h743-uart-continuous.toml` and `h743-uart-continuous-cache-on.toml` select
+`rx-dma-continuous`: exact STM32H743ZIT6 V, fixed HSI64/default trim,
+baremetal, USART3 PD8/PD9, DMA1 Stream1/request45 and priority5 IRQs that do
+not call an OS. TX remains independent finite IRQ transmission. This mode
+does not provide continuous TX DMA or a general DMA duplex provider.
+
+The caller supplies at least three equal, nonoverlapping initialized AXI SRAM
+blocks. Cache-off admits 32..65535 bytes per block; Cache-on requires aligned,
+exclusive whole32-byte lines, 32..65504 bytes. Two posted producer loans remain
+FILLING behind M0AR/M1AR. A completed target is replaced with a FREE third loan
+without disabling DBM/CIRC. Service proves the inactive address detached before
+post-DMA invalidation and FIFO publication. The IRQ only latches completion and
+masks TC until service; it never performs long cache work or publishes payload.
+The [posted-loan diagram](../../docs/assets/diagrams/continuous-stream.svg)
+illustrates the shared principle using its explicitly labeled F407 reference;
+H743 additionally owns the cache and correlated deadline checks described here.
+
+A sticky TC and one-bit CT cannot count missed wraps. The provider therefore
+checks an absolute replacement deadline before and after target replacement.
+USART PRESC1/OVER16/8N1 and TIM2 PSC63 use the same HSI clock: actual BRR,
+not a nominal baud or host clock, establishes the ratio. Eight BRR clocks per
+byte conservatively replace the ideal ten-bit frame assumption. The bound
+subtracts20 bytes for the16-byte FIFO, RDR, shift and direct-beat boundary,
+rounded upward, plus two timer ticks; FIFO bytes already counted by NDTR are
+intentionally deducted again. TIM2 internal/upcounting mode, ARR, DIER,
+overflow vector, clock/reset and UART/cache configuration are checked.
+This is a fail-closed software admission bound, not a measured service latency.
+
+No FREE replacement stops production and records one loss boundary without
+overwriting READY/held buffers. A late or uncertain bank history discards the
+unproved producer bytes. IDLE closes the current producer and publishes only a
+proved drained prefix. Both require an explicit caller restart after successful
+RX stop, consumer join and stream reinitialization; there is no automatic rearm.
+Actual EN readback, rather than the disable write or an old TC, establishes
+memory drain under RM0433 Rev9 section15.3.19. Cache operations run outside the
+IRQ mask; preparation/processing guards retain every loan through recursive
+control calls and failed maintenance. Observed clock, timer, reset or cache
+violations permanently taint the retained lifetime even if registers return.
+Software models, ordinary ARM links and SDK consumption establish separate
+development evidence; physical throughput, cache coherence, latency and HIL
+remain `not_executed`.
 
 ## Optional bounded hardware FIFO bytes
 
@@ -295,14 +340,24 @@ outside this platform repository. Modes not listed are rejected at configuration
 ### Public finite SPI4 DMA assemblies
 
 The canonical `tools/configure/assemblies/h743-spi-dma.toml`,
-`h743-spi-dma-uart-tx.toml` and `h743-spi-dma-uart-rx.toml` select the same
-STM32H743ZIT6 software reference: baremetal, fixed HSI64/default trim, Cache
-off, DEV_ID `0x450`, REV_ID `0x2003` (V), SPI4 mode 0 and 8-bit frames.
+`h743-spi-dma-uart-tx.toml` and `h743-spi-dma-uart-rx.toml` select Cache off;
+`h743-spi-dma-cache-on.toml` selects Cache on. All use the same STM32H743ZIT6
+software reference: baremetal, fixed HSI64/default trim, DEV_ID `0x450`,
+REV_ID `0x2003` (V), SPI4 mode 0 and 8-bit frames.
 PE12/PE13/PE14 use AF5; PE11 is the explicit active-low GPIO chip select.
 These software Board routes do not establish PCB wiring or electrical timing.
 
 Each request borrows non-overlapping TX/RX byte spans in selected initialized
-AXI memory, with a length of 1..65535 bytes. RX uses DMA1 Stream2, DMAMUX1
+AXI memory. Cache-off requests admit 1..65535 bytes; Cache-on requests require
+32-byte-aligned addresses and lengths of 32..65504 bytes divisible by32. Every
+TX/RX line is exclusively borrowed, including padding; the provider never rounds
+into adjacent storage. Accepted requests clean TX and invalidate RX before DMA,
+then invalidate RX again after memory, wire, IRQ and address withdrawal. Cache
+maintenance runs with the incoming interrupt mask restored, while a preparation
+guard prevents recursive service from releasing the loan. A refused final
+invalidate keeps the request quarantined until a successful retry. Cache state
+must remain fixed through successful stop; an observed change permanently
+taints the retained owner. RX uses DMA1 Stream2, DMAMUX1
 request83 and IRQ13; TX uses Stream3, request84 and IRQ14. SPI4 uses IRQ84.
 The three handlers use priority5 with `calls_os = false`. The optional USART3
 TX Stream0 or RX Stream1 selections use independent resources; the existing
@@ -316,7 +371,7 @@ DMA completion alone does not release the request. A refused withdrawal or
 clock/state mismatch retains the caller storage and recovery responsibility.
 
 This selection is finite full-duplex SPI, not a continuous UART duplex mode.
-It does not admit Cache on, high-clock profiles, other backends, 16-bit frames,
+It does not admit high-clock profiles, other backends, 16-bit frames,
 fixed dummy buffers or multisegment transfers. Configuration, model execution,
 ARM linking, installed SDK consumption and physical HIL are separate evidence;
 publishing these assemblies does not prove those executions. HIL remains
@@ -456,21 +511,60 @@ DATA并清零BSS，NOINIT由调用者初始化；DMA只准入已初始化的AXI/
 检查SRAM1时钟。Cache打开时仍要求独占完整32字节行。已有有限RX正常模式以owner
 service发布和重启，背压期间不会覆盖已借出的block，重启间隙仍然存在，不能宣称无缝连续。
 
+独立的 `rx-dma-continuous` 使用 `h743-uart-continuous.toml` 与
+`h743-uart-continuous-cache-on.toml`，只准入 STM32H743ZIT6 V、固定 HSI64／
+出厂 trim、裸机、USART3 PD8／PD9、DMA1 Stream1／request45 及优先级5的非 OS
+IRQ。TX 仍是独立有限 IRQ 发送，不是连续 TX DMA 或通用 DMA 双向实现。
+调用者提供至少三个已初始化 AXI SRAM 中等长、互不重叠的 block；缓存关闭时每块
+32..65535 字节，缓存开启时为完整独占32字节行，地址对齐、长度32..65504且为32
+的倍数。两个 posted producer loan 始终以 FILLING 留在 M0AR／M1AR，service
+用空闲第三块替换非活动地址，DBM／CIRC 保持运行。证明旧地址已脱离两个硬件
+target 后，才进行 post-DMA invalidate 并按 FIFO 发布。IRQ 只记录完成事实并
+屏蔽 TC，等待 service；不在 IRQ 中进行长缓存维护或发布 payload。
+[posted loan 图](../../docs/assets/diagrams/continuous-stream.svg) 明确以 F407 为
+参考说明共用原则，H743 另加本节的缓存和同源时限约束。
+
+TC 粘滞位和单比特 CT 不能计算漏掉的循环次数，因此目标替换前后都检查绝对时限。
+USART PRESC1／OVER16／8N1 与 TIM2 PSC63 来自同一 HSI；实际 BRR 建立比例，
+不使用名义 baud 或主机时间。按每字节至少8个 BRR 时钟保守估计，不假设理想10位
+帧间隔；再扣除20字节和2个 timer tick。20字节上界覆盖16字节 FIFO、RDR、shift
+及 direct beat 边界并向上取整；已经计入 NDTR 的 FIFO 部分仍重复扣除以保守。
+TIM2 内部向上计数模式、ARR、DIER、溢出 IRQ、时钟／复位和 UART／缓存配置均
+检查。这是无法证明即停止的软件准入界限，不是已测 service 延迟。
+
+没有 FREE 替换块时停止生产并记录一个丢失边界，不覆盖 READY 或消费者持有的块；
+迟服务或无法证明的 bank 历史丢弃未证明的 producer 数据。IDLE 关闭本次 producer，
+只发布实际排空的有效前缀。成功 RX stop、消费者全部归还并重新初始化 stream 后，
+由调用者显式重启，不自动重臂。RM0433 Rev9 15.3.19 的实际 EN 读回为0建立内存
+排空依据，写 EN=0 的请求和旧 TC 都不能替代。缓存维护恢复调用者中断掩码执行，
+准备／处理门控保证递归控制和维护失败期间仍保留全部借用。观察到时钟、timer、
+复位或缓存破坏后，该保留生命周期永久 tainted，恢复寄存器不能解锁。模型、普通
+ARM 链接和 SDK 消费分别建立开发证据，实际吞吐、缓存一致性、延迟与 HIL 仍为
+`not_executed`。
+
 ADC提供PA3/INP15的16位单次采样，包含稳压等待、偏移与线性校准，以及不同硅片cut的
 官方LL boost编码；旧cut只保留实际BOOST位，屏蔽编码中保留且读回为零的位。校准完成必须观察到全部六个线性校准握手标志，控制寄存器写入
 保留这些标志，停止和重启不隐式同时切换；每次退出深度掉电均重新校准。ADC的
 Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不得超过VDDA；16位数据格式
 不代表已测量有效精度。
 
-公开的三个规范装配位于 `tools/configure/assemblies`：
+公开规范装配位于 `tools/configure/assemblies`：
 `h743-spi-dma.toml`、`h743-spi-dma-uart-tx.toml` 和
-`h743-spi-dma-uart-rx.toml`。它们仅选择 STM32H743ZIT6、裸机、固定 HSI64／
-出厂 trim、缓存关闭、DEV_ID 0x450、V 修订 0x2003、SPI4 mode 0 和 8 位帧。
+`h743-spi-dma-uart-rx.toml` 选择缓存关闭，`h743-spi-dma-cache-on.toml`
+选择缓存开启。它们仅选择 STM32H743ZIT6、裸机、固定 HSI64／出厂 trim、
+DEV_ID 0x450、V 修订 0x2003、SPI4 mode 0 和 8 位帧。
 PE12／13／14 使用 AF5，PE11 是显式低有效 GPIO 片选；软件参考路由不证明
 PCB 接线或电气时序。
 
 每个请求借用已选且已初始化 AXI 内存中互不重叠的 TX／RX 字节区间，长度为
-1..65535 字节。RX 使用 DMA1 Stream2／DMAMUX1 request83／IRQ13，TX 使用
+缓存关闭时为 1..65535 字节；缓存开启时，地址必须按 32 字节对齐，长度为
+32..65504 字节且必须是 32 的倍数。TX／RX 的完整缓存行均被独占借用，包括
+填充字节；驱动不会向相邻存储取整。请求接受后，在 DMA 前 clean TX、invalidate
+RX，在内存、线上、IRQ 和地址全部撤回后再次 invalidate RX。缓存维护在恢复
+调用者中断掩码后执行，准备阶段的门控禁止递归 service 提前归还借用。最终
+invalidate 失败时请求继续隔离，实际重试成功后才可 SETTLED。缓存状态必须保持
+至成功停止；一旦观察到变化，保留责任的 owner 永久 tainted。
+RX 使用 DMA1 Stream2／DMAMUX1 request83／IRQ13，TX 使用
 Stream3／request84／IRQ14，SPI4 使用 IRQ84；三条 IRQ 均为优先级 5、
 `calls_os = false`。可选 USART3 TX Stream0 或 RX Stream1 使用独立资源，
 所有选定使用者退出前仍保留共享 DMA1 时钟门责任。
@@ -478,7 +572,7 @@ Stream3／request84／IRQ14，SPI4 使用 IRQ84；三条 IRQ 均为优先级 5�
 静态 factory 返回已有 SPI 总线和端点接口；既有 H743 CMake 工程与安装 SDK
 计划复用同一公共 C11 consumer，不暴露私有构造器或 MMIO。DMA 完成不等于
 归还请求；撤回失败或时钟／状态不符时继续保留调用者存储和恢复责任。这里是
-有限全双工 SPI，不是连续 UART 双向模式；不扩大为缓存开启、高频、其他后端、
+有限全双工 SPI，不是连续 UART 双向模式；不扩大为高频、其他后端、
 16 位帧、固定 dummy 缓冲区或多段传输。配置、模型执行、ARM 链接、安装 SDK
 消费与实板 HIL 各自需要独立证据，公开装配不代替这些执行，HIL 仍为
 `not_executed`。

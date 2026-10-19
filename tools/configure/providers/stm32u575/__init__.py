@@ -36,11 +36,13 @@ LIMITS = MappingProxyType({"uart_baud": (62, 250000),
                            "pwm_period": 65535, "timer_hz": 4000000})
 ADC_PIN_CHANNELS = MappingProxyType({("ADC4", "PC0"): 1})
 _MODES = MappingProxyType({
+    ("lptim", "irq-counter16-oneshot"): "lptim",
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
     ("uart", "irq-fifo-bytes"): "uart_fifo",
     ("uart", "irq-fifo-rtscts-bytes"): "uart_rtscts",
     ("uart", "dma-tx"): "uart_gpdma",
+    ("uart", "dma-chain-tx"): "uart_chain",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi", ("i2c", "poll-messages"): "i2c",
     ("adc", "single-shot"): "adc", ("pwm", "fixed-pwm"): "pwm",
@@ -65,6 +67,10 @@ def validate_selection(selection, route):
     """Accept only the actual fixed provider and reviewed route, not SKU potential."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
+    if kind == "lptim":
+        from . import lptim
+        lptim.validate(selection, route)
+        return
     if kind == "uart":
         expected = _SERIAL_PINS.get(route["controller"])
         if selection["mode"] == "irq-fifo-rtscts-bytes":
@@ -75,7 +81,7 @@ def validate_selection(selection, route):
                        for pin in route["pins"])
         if expected is None or actual != expected:
             common.fail("USART requires the exact controller and ordered AF7 pads for its selected mode")
-        if selection["mode"] == "dma-tx" and (
+        if selection["mode"] in {"dma-tx", "dma-chain-tx"} and (
                 route["controller"] != "USART1" or
                 selection.get("frame") not in (None, {
                     "data_bits": 8, "parity": "none", "stop_bits": 1,
@@ -166,7 +172,7 @@ def validate_selection(selection, route):
 def validate_dma(route, mode, normalize):
     expected = (("GPDMA1:channel0:request25",) if
                 route["kind"] == "uart" and route["controller"] == "USART1"
-                and mode == "dma-tx" else None)
+                and mode in {"dma-tx", "dma-chain-tx"} else None)
     common.validate_dma(route, mode, expected, "stm32u575", normalize)
 
 
@@ -181,6 +187,19 @@ def dma_physical_key(resource):
     """Canonical channel ownership excludes the independently checked request."""
     validate_dma_resource(resource)
     return "dma:GPDMA1:channel0"
+
+
+def dma_chain_plan(item):
+    """Symbolic private storage facts; actual linked addresses are checked cold."""
+    if item.get("mode") != "dma-chain-tx":
+        return None
+    if (item.get("kind") != "uart" or item.get("controller") != "USART1" or
+            tuple(item.get("dma", ())) != ("GPDMA1:channel0:request25",)):
+        common.fail("U575 chain requires exact USART1 GPDMA1 channel0/request25")
+    return {"owner": item["id"], "engine": "GPDMA1", "lane": 0,
+            "node_capacity": 2, "node_bytes": 12, "alignment": 32,
+            "window_bytes": 65536, "region": "SRAM1", "block_bytes": 65535,
+            "maximum_bytes": 196605, "finite": True}
 
 
 def dma_irq(dma):

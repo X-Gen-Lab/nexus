@@ -18,6 +18,10 @@ if("dma" IN_LIST h7_fixture_spi_modes)
     set(h7_fixture_main
         "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/h743-spi-dma.c")
 endif()
+if("rx-dma-continuous" IN_LIST h7_fixture_uart_modes)
+    set(h7_fixture_main
+        "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/h743-uart-continuous.c")
+endif()
 if(NEXUS_RUNTIME_POWER)
     set(h7_fixture_main
         "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c")

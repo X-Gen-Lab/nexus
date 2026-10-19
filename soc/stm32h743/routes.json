@@ -44,14 +44,18 @@
         "irq-bytes",
         "dma-tx",
         "rx-dma-idle",
+        "rx-dma-continuous",
         "irq-fifo-bytes"
       ],
-      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown. RM0433 DMA1 stream0/DMAMUX1 channel0, USART3_TX request46; official ST H7 HAL v1.11.5 DMA request table. RX normal blocks: RM0433 Rev9 sections15.3.15/15.3.16, DMA1 stream1/DMAMUX1 channel1 USART3_RX request45; official ST H7 HAL v1.11.5 request table. Owner-service restart gaps possible; no circular/continuous claim.",
+      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown. RM0433 DMA1 stream0/DMAMUX1 channel0, USART3_TX request46; official ST H7 HAL v1.11.5 DMA request table. RX normal blocks: RM0433 Rev9 sections15.3.15/15.3.16, DMA1 stream1/DMAMUX1 channel1 USART3_RX request45; official ST H7 HAL v1.11.5 request table. rx-dma-idle has owner-service restart gaps. The separate rx-dma-continuous selection uses reviewed DMA1 Stream1 DBM/CT and posted-buffer replacement with a same-clock bounded replacement deadline; hardware and loss qualification remain unexecuted.",
       "mode_dma": {
         "dma-tx": [
           "DMA1:stream0:channel46"
         ],
         "rx-dma-idle": [
+          "DMA1:stream1:channel45"
+        ],
+        "rx-dma-continuous": [
           "DMA1:stream1:channel45"
         ]
       }

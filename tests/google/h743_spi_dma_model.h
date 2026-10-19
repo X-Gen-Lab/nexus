@@ -6,6 +6,7 @@
 #ifndef NX_H743_SPI_DMA_MODEL_H
 #define NX_H743_SPI_DMA_MODEL_H
 #include "h743_model.h"
+#include "nexus/arch/cache.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,6 +38,18 @@ typedef struct {
     unsigned dmbs;
     unsigned memory_commits;
     unsigned eot_clears_in_irq;
+    unsigned cache_cleans;
+    unsigned cache_invalidates;
+    unsigned cache_errors;
+    bool refuse_clean;
+    bool refuse_invalidate;
+    uintptr_t cache_tx_address;
+    uintptr_t cache_rx_address;
+    size_t cache_tx_bytes;
+    size_t cache_rx_bytes;
+    uint8_t cache_tx[65536];
+    uint8_t cache_rx[65536];
+    void (*cache_observer)(void);
     unsigned exception;
     unsigned faults;
     bool suspend_pending;
@@ -82,22 +95,28 @@ void nx_h743_spi_dma_model_dsb(void);
 void nx_h743_spi_dma_model_dmb(void);
 void nx_h743_spi_dma_model_cpu_store(uint8_t* target, uint8_t value);
 uint32_t nx_h743_spi_dma_model_address(const void* address);
+nx_arch_result_t nx_h743_spi_dma_model_clean(uintptr_t address, size_t bytes);
+nx_arch_result_t nx_h743_spi_dma_model_invalidate(uintptr_t address,
+                                                  size_t bytes);
 #ifdef __cplusplus
 }
 #endif
 #undef NX_H743_READ
 #undef NX_H743_WRITE
 #undef NX_H743_SPI_READ8
-#define NX_H743_READ(reg)                nx_h743_spi_dma_model_read(reg)
-#define NX_H743_WRITE(reg, value)        nx_h743_spi_dma_model_write((reg), (value))
-#define NX_H743_SPI_READ8(reg)           nx_h743_spi_dma_model_read8(reg)
-#define NX_H743_SPI_DMA1                 (&g_h743_spi_dma_model.dma)
-#define NX_H743_SPI_DMA_RX               (&g_h743_spi_dma_model.streams[2])
-#define NX_H743_SPI_DMA_TX               (&g_h743_spi_dma_model.streams[3])
-#define NX_H743_SPI_DMA_RX_MUX           (&g_h743_spi_dma_model.mux[2])
-#define NX_H743_SPI_DMA_TX_MUX           (&g_h743_spi_dma_model.mux[3])
-#define NX_H743_SPI4                     (&g_h743_spi_dma_model.spi)
-#define NX_H743_SPI_DMA_ADDRESS(p)       nx_h743_spi_dma_model_address(p)
+#define NX_H743_READ(reg)           nx_h743_spi_dma_model_read(reg)
+#define NX_H743_WRITE(reg, value)   nx_h743_spi_dma_model_write((reg), (value))
+#define NX_H743_SPI_READ8(reg)      nx_h743_spi_dma_model_read8(reg)
+#define NX_H743_SPI_DMA1            (&g_h743_spi_dma_model.dma)
+#define NX_H743_SPI_DMA_RX          (&g_h743_spi_dma_model.streams[2])
+#define NX_H743_SPI_DMA_TX          (&g_h743_spi_dma_model.streams[3])
+#define NX_H743_SPI_DMA_RX_MUX      (&g_h743_spi_dma_model.mux[2])
+#define NX_H743_SPI_DMA_TX_MUX      (&g_h743_spi_dma_model.mux[3])
+#define NX_H743_SPI4                (&g_h743_spi_dma_model.spi)
+#define NX_H743_SPI_DMA_ADDRESS(p)  nx_h743_spi_dma_model_address(p)
+#define NX_H743_SPI_DMA_CLEAN(p, n) nx_h743_spi_dma_model_clean((p), (n))
+#define NX_H743_SPI_DMA_INVALIDATE(p, n)                                       \
+    nx_h743_spi_dma_model_invalidate((p), (n))
 #define NX_H743_SPI_DMA_IRQ_ENABLED(irq) nx_h743_spi_dma_model_enabled(irq)
 #define NX_H743_SPI_DMA_IRQ_PENDING(irq) nx_h743_spi_dma_model_pending(irq)
 #define NX_H743_SPI_DMA_IRQ_ACTIVE(irq)  nx_h743_spi_dma_model_active(irq)

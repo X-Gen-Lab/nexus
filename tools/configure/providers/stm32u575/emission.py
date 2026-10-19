@@ -21,6 +21,11 @@ def includes(result):
     selected = ['#include "stm32u575_uart_gpdma.h"'] if any(
         item.kind == "uart" and item.mode == "dma-tx"
         for item in result.controllers) else []
+    if any(item.kind == "lptim" for item in result.controllers):
+        selected.append('#include "stm32u575_lptim.h"')
+    if any(item.kind == "uart" and item.mode == "dma-chain-tx"
+           for item in result.controllers):
+        selected.append('#include "stm32u575_uart_gpdma_chain.h"')
     if any(item.kind == "uart" and item.mode == "irq-fifo-bytes"
            for item in result.controllers):
         selected.append('#include "stm32u575_uart_fifo.h"')

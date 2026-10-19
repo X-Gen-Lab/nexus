@@ -112,6 +112,44 @@ class StatusTests(unittest.TestCase):
         self.assertIn("a\\|b", view)
         self.assertIn("&lt;tag&gt;", view)
 
+    def test_current_io_ledger_is_generated_and_checked_without_promotion(self):
+        fields = ("task_id", "priority", "phase", "task", "dependencies",
+                  "implementation_status", "validation_status",
+                  "software_status", "hardware_status", "exit_condition",
+                  "evidence_paths", "owner")
+        for filename, _, _ in status.SPECIFICATIONS:
+            row = dict.fromkeys(fields, "")
+            row.update(task_id="TASK-01", priority="P1", phase="D1",
+                       task="Original task", implementation_status="implemented",
+                       validation_status="passed", owner="codex")
+            path = self.root / "docs/design" / filename
+            with path.open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=fields)
+                writer.writeheader()
+                writer.writerow(row)
+        source = self.root / "docs/design/io-evolution-execution.csv"
+        source.write_text(
+            "task_id,task,implementation_status,software_status,hardware_status,exit_condition\n"
+            "IO-19,Retain failed drain,in_progress,not_qualified,not_executed,Exact source and image\n")
+        original = source.read_bytes()
+        status.generate(self.root)
+        output = self.root / "docs/status/ledgers/io-evolution.md"
+        self.assertTrue(output.is_file(),
+                        "current I/O ledger is missing from default generation")
+        rendered = output.read_text()
+        for value in ("IO-19", "in_progress", "not_qualified", "not_executed",
+                      "Exact source and image", status.digest(source)):
+            self.assertIn(value, rendered)
+        self.assertEqual(source.read_bytes(), original)
+        self.assertEqual(status.generate(self.root, check=True)["status"],
+                         "passed")
+        output.write_text(rendered.replace("not_qualified", "passed"))
+        report = status.generate(self.root, check=True)
+        self.assertEqual(report["status"], "failed")
+        self.assertIn("io-evolution.md", " ".join(report["errors"]))
+        self.assertEqual(source.read_bytes(), original)
+        self.assertIn("passed", output.read_text())
+
 
 class AuthorityMappingTests(unittest.TestCase):
     def setUp(self):

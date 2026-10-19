@@ -7,10 +7,13 @@
     "gd32-f303-freertos-empty.toml",
     "gd32-f303-freertos-io.toml",
     "gd32-f303-freertos-spi-watchdog.toml",
+    "h743-spi-dma-cache-on.toml",
     "h743-spi-dma-runtime-clock.toml",
     "h743-spi-dma-uart-rx.toml",
     "h743-spi-dma-uart-tx.toml",
     "h743-spi-dma.toml",
+    "h743-uart-continuous-cache-on.toml",
+    "h743-uart-continuous.toml",
     "liangshan-baremetal-empty.toml",
     "liangshan-baremetal-gpio.toml",
     "liangshan-baremetal-spi.toml",
@@ -56,7 +59,9 @@
     "stm32-f103-exti.toml",
     "stm32-f103-freertos.toml",
     "stm32-f103-spi.toml",
-    "stm32-f103-watchdog.toml"
+    "stm32-f103-watchdog.toml",
+    "u575-lptim-run.toml",
+    "u575-uart-chain.toml"
   ],
   "schema_version": 1
 }

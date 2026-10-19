@@ -766,8 +766,17 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     clock=assembly["clock_profile"])
             if (family == "stm32h743" and route["kind"] == "spi" and
                     mode == "dma" and (backend != "baremetal" or
-                    assembly["clock_profile"] != "hsi64-fixed-cache-off")):
-                fail("H743 SPI DMA requires baremetal/fixed HSI64/cache-off")
+                    assembly["clock_profile"] not in {
+                        "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"})):
+                fail("H743 SPI DMA requires baremetal/fixed HSI64")
+            if (family == "stm32h743" and route["kind"] == "uart" and
+                    mode == "rx-dma-continuous" and (backend != "baremetal" or
+                    assembly["clock_profile"] not in {
+                        "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"})):
+                fail("H743 continuous UART requires baremetal/fixed HSI64")
+            if (family == "stm32u575" and route["kind"] == "lptim" and
+                    (backend != "baremetal" or assembly["clock_profile"] != "msis4")):
+                fail("U575 LPTIM requires baremetal/fixed MSIS4")
             if mode in uart_formats.FIFO_MODES and assembly["clock_profile"] != (
                     "hsi64-fixed-cache-off"
                     if family == "stm32h743" else "msis4"):
@@ -858,6 +867,13 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                              **({"stream_resolution": resolved_stream}
                                 if resolved_stream is not None else {}),
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
+            if family == "stm32h743" and (
+                    (route["kind"] == "spi" and mode == "dma") or
+                    (route["kind"] == "uart" and mode == "rx-dma-continuous")):
+                # Derived from the validated CPU profile, never an authored
+                # escape hatch for provider-owned cache admission.
+                selected[-1]["dma_cache_line_bytes"] = (
+                    32 if provider.cache_mask(assembly["clock_profile"]) else 0)
             if route["kind"] == "can_fd":
                 selected[-1]["message_ram_words"] = hardware["message_ram_words"]
             if route["kind"] == "adc_group":

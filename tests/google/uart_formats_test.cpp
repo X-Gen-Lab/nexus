@@ -170,3 +170,49 @@ TEST_F(UartWord, ReadRejectsDestinationAliasingTheActivePayload) {
     nx_uart_word_port_service(&port);
     EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
 }
+
+TEST_F(UartWord, WireTcObservationFixesDeadlineResultBeforeLaterService) {
+    for (bool late_tc : {false, true}) {
+        const nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 10U);
+        ASSERT_EQ(nx_uart_word_tx_prepare(&request, payload, 1U, deadline),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
+        nx_native_uart_word_irq(&state);
+        if (!late_tc)
+            nx_native_uart_word_irq(&state);
+        ASSERT_EQ(nx_native_clock_advance(11U), NX_SUCCESS);
+        if (late_tc)
+            nx_native_uart_word_irq(&state);
+        nx_uart_word_port_service(&port);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, late_tc ? NX_ERROR_TIMEOUT : NX_SUCCESS);
+        EXPECT_EQ(request.base.transferred, 1U);
+        EXPECT_EQ(state.active, nullptr);
+    }
+}
+
+TEST_F(UartWord, IrqExpiryStopsLoadingWithoutReplacingEarlierCancellation) {
+    ASSERT_EQ(nx_uart_word_tx_prepare(&request, payload, 1U, 20U), NX_SUCCESS);
+    ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(11U), NX_SUCCESS);
+    nx_native_uart_word_irq(&state);
+    EXPECT_EQ(state.logged, 0U);
+    nx_uart_word_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_TIMEOUT);
+    EXPECT_EQ(request.base.transferred, 0U);
+
+    const nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 10U);
+    ASSERT_EQ(nx_uart_word_tx_prepare(&request, payload, 1U, deadline),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_uart_word_port_submit(&port, &request), NX_SUCCESS);
+    nx_native_uart_word_irq(&state);
+    ASSERT_EQ(nx_uart_word_port_cancel(&port, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(11U), NX_SUCCESS);
+    nx_native_uart_word_irq(&state);
+    nx_uart_word_port_service(&port);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(request.base.transferred, 1U);
+    EXPECT_EQ(state.active, nullptr);
+}

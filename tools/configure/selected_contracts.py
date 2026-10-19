@@ -235,9 +235,11 @@ def _format(item, provider, shape):
     policy = "none"
     if dma:
         policy = "domain_cache_line" if line else "provider_domain"
-    if item.provider == "stm32h743" and kind == "spi" and item.mode == "dma":
-        # This exact provider admits cache-off only; physical CPU line stays32.
-        line, policy = 0, "provider_domain"
+    if item.provider == "stm32h743" and (
+            (kind == "spi" and item.mode == "dma") or
+            (kind == "uart" and item.mode == "rx-dma-continuous")):
+        line = options.dma_cache_line_bytes
+        policy = "domain_cache_line" if line else "provider_domain"
     return dict(fields=fields, abort_scope=abort, continuity=continuity,
                 timestamp_source=source, dma_policy=policy,
                 cache_line_bytes=line)
@@ -273,6 +275,15 @@ def describe(item, endpoint=None, *, public_class=None):
         limits.update(unit="bytes", unit_bytes=1, word_bits=(8,))
     if kind in {"uart", "spi"} and shape.dma:
         limits["max_transfer_units"] = "UINT16_MAX"
+    if item.provider == "stm32u575" and kind == "uart" and item.mode == "dma-chain-tx":
+        limits["max_transfer_units"] = 196605
+    if item.provider == "stm32h743" and kind == "uart" and item.mode == "rx-dma-continuous":
+        # This public request is IRQ TX; the separate RX block loan has the
+        # provider's 16-bit NDTR and optional complete-cache-line restrictions.
+        limits["max_transfer_units"] = "UINT32_MAX"
+    if (item.provider == "stm32h743" and kind == "spi" and shape.dma and
+            item.options.dma_cache_line_bytes):
+        limits.update(buffer_alignment=32, max_transfer_units="65504")
     if kind == "spi" and not shape.dma and not provider.MODEL:
         limits["max_transfer_units"] = 256
     elif kind == "i2c" and not provider.MODEL:
@@ -384,10 +395,12 @@ def silicon_policy(result, item=None):
             item.provider == "stm32h743" and item.kind == "spi" and
             item.mode == "dma"):
         if (result.backend != "baremetal" or
-                result["clock_profile"] != "hsi64-fixed-cache-off"):
+                result["clock_profile"] not in {
+                    "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"}):
             fail("Selected SPI DMA silicon expectation requires its exact profile")
+        cache = "on" if result["clock_profile"].endswith("-cache-on") else "off"
         return SiliconPolicy(result["part"], result.soc_family,
-                             "spi4-dma-hsi64-cacheoff-dev450-v2003-trim64",
+                             f"spi4-dma-hsi64-cache{cache}-dev450-v2003-trim64",
                              (0x2003,), "selected_spi_dma_mode")
     if item is not None:
         if item not in result.controllers or item.kind != "adc_group":

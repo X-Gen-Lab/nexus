@@ -283,6 +283,37 @@ def _layout(program):
     return facts
 
 
+def verify_h743_ram_layout(elf, observations):
+    """Bind the cold owner's copy/guard symbols to actual linked LOAD bytes.
+
+    The normal link must check the whole workspace, copied pod, physical load
+    and immutable image guard, independently of the smaller CPU bridge layout.
+    This establishes their ELF relationships, not execution of cold copying or
+    device protocol, arbitrary data access, timing or hardware qualification.
+    """
+    _require(isinstance(observations, dict) and observations.get("elf_sha256")
+             == hashlib.sha256(elf.data).hexdigest(),
+             "RAM layout ELF hash mismatch")
+    program = _Program(elf, observations)
+    facts = _layout(program)
+    workspace = (facts["workspace"], facts["workspace_end"])
+    return {
+        "status": "passed", "qualification": False,
+        "elf_sha256": hashlib.sha256(elf.data).hexdigest(),
+        "code_range": facts["code"], "load_range": facts["load"],
+        "workspace_range": workspace,
+        "vector_range": (facts["vector_start"], facts["vector_end"]),
+        "stack_range": (facts["stack_start"], facts["stack_end"]),
+        "copied_bytes": facts["end"] - facts["start"],
+        "workspace_bytes": workspace[1] - workspace[0],
+        "static_ram_bytes": interval_bytes([facts["code"], workspace]),
+        "physical_execution": "not_executed",
+        "limits": ["ELF layout and bytes, not runtime copy execution",
+                   "C data ownership and MPU/device protocol remain separate",
+                   "no measured stack, timing or hardware qualification"],
+    }
+
+
 def _closure(program, facts, observations):
     roots = {}
     for group in ("cold_roots", "ram_roots"):

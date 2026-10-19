@@ -29,16 +29,34 @@ class DmaLaneIR:
 
 
 @dataclass(frozen=True)
+class DmaChainIR:
+    owner: str
+    engine: str
+    lane: int
+    node_capacity: int
+    node_bytes: int
+    alignment: int
+    window_bytes: int
+    region: str
+    block_bytes: int
+    maximum_bytes: int
+    finite: bool
+
+
+@dataclass(frozen=True)
 class DmaTopologyIR:
     lanes: tuple[DmaLaneIR, ...]
+    chains: tuple[DmaChainIR, ...] = ()
 
     @classmethod
     def from_validated(cls, values):
         """Freeze tuples checked against the selected provider topology."""
-        return cls(tuple(DmaLaneIR(**item) for item in values["lanes"]))
+        return cls(tuple(DmaLaneIR(**item) for item in values["lanes"]),
+                   tuple(DmaChainIR(**item) for item in values.get("chains", ())))
 
     def to_dict(self):
-        return {"lanes": [asdict(item) for item in self.lanes]}
+        return {"lanes": [asdict(item) for item in self.lanes],
+                "chains": [asdict(item) for item in self.chains]}
 
 
 @dataclass(frozen=True)
@@ -82,8 +100,12 @@ class DmaDescriptorPlanIR:
 
 def resolve_selected(selected, provider):
     """Project validated provider tuples without reinterpreting aliases."""
-    lanes, occupied = [], set()
+    lanes, chains, occupied = [], [], set()
     for item in selected:
+        chain_hook = getattr(provider, "dma_chain_plan", None)
+        chain = chain_hook(item) if callable(chain_hook) else None
+        if chain is not None:
+            chains.append(DmaChainIR(**chain))
         for path in item.get("dma", ()):
             identifier(path, "DMA route")
             engine, lane, request = provider.validate_dma_resource(
@@ -113,7 +135,7 @@ def resolve_selected(selected, provider):
                                    identifier(item["controller"],
                                               "DMA peripheral"),
                                    engine_name, lane, request, physical))
-    return DmaTopologyIR(tuple(lanes))
+    return DmaTopologyIR(tuple(lanes), tuple(chains))
 
 
 def _power(value, context, zero=False):

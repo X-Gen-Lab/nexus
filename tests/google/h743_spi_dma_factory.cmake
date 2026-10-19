@@ -1,5 +1,5 @@
-# Normally generated, exact baremetal/cache-off SPI and UART shared owners.
-foreach(variant spi-dma spi-dma-uart-tx spi-dma-uart-rx)
+# Normally generated exact SPI Cache modes and independent UART shared owners.
+foreach(variant spi-dma spi-dma-cache-on spi-dma-uart-tx spi-dma-uart-rx)
     set(authored
         "${NEXUS_SOURCE_DIR}/tools/configure/assemblies/h743-${variant}.toml")
     set(bundle "${CMAKE_CURRENT_BINARY_DIR}/h743-${variant}-factory")
@@ -22,6 +22,10 @@ foreach(variant spi-dma spi-dma-uart-tx spi-dma-uart-rx)
     string(REPLACE "-" "_" suffix "${variant}")
     set(target "nexus_h743_${suffix}_factory_test")
     set(uart_mode -1)
+    set(cache_on 0)
+    if(variant STREQUAL "spi-dma-cache-on")
+        set(cache_on 1)
+    endif()
     set(uart_sources)
     if(variant STREQUAL "spi-dma-uart-tx")
         set(uart_mode 0)
@@ -47,7 +51,7 @@ foreach(variant spi-dma spi-dma-uart-tx spi-dma-uart-rx)
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
         "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
     target_compile_definitions(${target} PRIVATE STM32H743xx
-        D2_UART_MODE=${uart_mode}
+        D2_UART_MODE=${uart_mode} H743_SPI_DMA_CACHE_ON=${cache_on}
         _init=nx_h743_d2_${suffix}_init _fini=nx_h743_d2_${suffix}_fini)
     target_compile_options(${target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_spi_dma_factory_model.h")

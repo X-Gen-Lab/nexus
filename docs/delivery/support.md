@@ -15,8 +15,8 @@
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
 | GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
 | STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；SRAM1/2 96 KiB 与单独计数的 CCM 32 KiB；HSE24/170 MHz、TIM2；封装 GPIO、六 UART IRQ bytes、SPI1/2 轮询、TIM3/4 CH1 PWM、IWDG、EXTI0/1；独立软件夹具增加 ADC1 单次／有限 TIM6-DMA block、I2C1 polling 与物理 Flash；裸机／FreeRTOS 静态 factory | 52 个封装 GPIO 不等于 PCB 接线；PF0/PF1、PG10 保留；ADC DMA 仅选 SRAM1/2，不开放 CCM alias；无 UART/SPI DMA、连续 ADC 或自动 AF 选择；PCB／电气／HIL 未观察 |
-| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 Flash；裸机／FreeRTOS 静态装配 | PCB／供电／硅片 revision／Cache 一致性未观察；RX block 有 service/rearm 间隙；不含连续／双缓冲 RX、其他 DMA 引擎或运行状态接管；Flash 仅 Cache off；软件资格按精确源码独立记录 |
-| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置 | Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1 与物理 Flash；裸机／FreeRTOS 静态装配 | PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 VDDA/ASV；不开放 DMA、通用双域 factory 或其他 RAM 放置 |
+| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA 与 USART3 连续双缓冲 RX（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考 | PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-bank 替换时限与显式 loss/stop；新增 DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache on 要求独占完整 32-byte lines；无其他 DMA 引擎或运行状态接管；Flash 仅 Cache off；软件资格按精确源码独立记录 |
+| STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置 | Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；USART1 另可显式选择有限 GPDMA TX、有限硬件链 TX 或有界 FIFO IRQ bytes；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1、物理 Flash 和无引脚 LPTIM2 RUN 单次计数；基础装配为裸机／FreeRTOS，新增模式按各自精确配置验收 | PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 SG／循环链；LPTIM2 仅裸机 RUN；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 RAM 放置 |
 | STM32U575 独立 TZEN=1 双域参考 | 外部预先配置 option bytes；两个 Runtime 镜像、冷启动 SAU／MPU／SRAM 归属 owner、真实 CMSE SG；单一非特权 NonSecure Thread 通过同步复制消息访问受限 PC7 GPIO | 未执行实板隔离验收；无 OS、通用双域 factory、NS 任务身份、异步借用／跨域 DMA 或产品镜像认证；不改变上列 TZEN=0 默认装配 |
 | STM32F103RBT6 / NUCLEO-F103RB 来源参考配置 | Cortex-M3，无 FPU；128 KiB Flash、20 KiB SRAM；HSI8、16-bit TIM2；GPIO、USART2 IRQ bytes／有限 DMA TX／duplex RX blocks、SPI1 polling、I2C1 IRQ 消息、PA0 ADC1、PA6 TIM3 CH1 PWM、EXTI0/1、IWDG 与物理 Flash；裸机／FreeRTOS 静态装配 | 正常启动仅核工厂 Flash 密度 128 KiB；ES096 2.2.2 限制正常固件读取 DBGMCU，设备组／修订未观察，料号／封装为配置声明；PCB／VCP 焊桥／引脚负载／HSI 精度未观察；PA5 LED/SPI 与 PA6 SPI/PWM 冲突须拒绝；I2C priority0 不调用内核；RX 有间隙；无 SPI/I2C DMA 或其他 F1 型号支持 |
 | GD32F303RCT6 / 芯片软件参考 | Cortex-M4F；256 KiB Flash、48 KiB SRAM；IRC8M、TIMER1/TIMER4 硬件级联时间域；GPIO、USART0 IRQ bytes／有限 DMA TX／duplex RX blocks、SPI0 polling、I2C0 IRQ 消息、PA0 ADC0、PA6 TIMER2 CH0 PWM、EXTI0/1、FWDGT 与物理 FMC；裸机／FreeRTOS 静态装配 | 无已审 PCB、LED、晶振、串口适配器或 connector 接线；I2C priority0 不调用内核；RX 有间隙；无 SPI/I2C DMA 或其他 F30x 型号支持；级联传播及电气须实测 |
@@ -98,7 +98,8 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 
 | 可选机制 | 精确范围与当前边界 |
 |---|---|
-| Raw Ethernet / MDIO / DP83848 | Native/ST/GD normal chained descriptor、RMII、14–1514-byte untagged Ethernet II、caller-owned RX loan；ETH/MDIO face 共用一个 MAC context；ST ZG/GD ZG 软件夹具已有 factory 与裸机/FreeRTOS ELF；无协议栈、PTP、checksum offload、VLAN、jumbo |
+| 原有 Raw Ethernet `eth` / MDIO / DP83848 | Native/ST/GD normal chained descriptor、RMII、14–1514-byte untagged Ethernet II、caller-owned RX loan；ETH/MDIO face 共用一个 MAC context；ST ZG/GD ZG 软件夹具已有 factory 与裸机/FreeRTOS ELF；该 face 不提供 SG、VLAN 或硬件时间戳；无协议栈、checksum offload、jumbo |
+| 增强 Ethernet `eth_frames` / MDIO | F407／GD470 精确 RMII 参考及 Native 模型；`rmii-vlan-sg-ptp` 选择独立状态、八字 descriptor、完整 SG frame loan、单个带内 VLAN C-tag 和 MAC 硬件事件时间戳；裸机软件夹具与独立开发证据；不能与原有 `eth` 同时占用一个 MAC；无 tag 插入／剥离、checksum offload、jumbo、网络时间同步或协议栈；实板未执行 |
 | Input capture | STM TIM4 CH1 / GD TIMER3 CH0，PB6 AF2、16-bit modulo count、caller event ring；软件观测时间不是 edge aperture；装配接入独立验收 |
 | Complementary PWM / break | STM TIM1 / GD TIMER0，PA8/PB13/PB12 AF1；不可变精确 deadtime 与 BKIN，禁止自动重启；没有功率级安全资格 |
 | User I/O broker | 特权 kernel 调用的 scalar GPIO read/set-reset、真实 principal/pin/copy/unpin 窄端口；U575 独立无 OS 参考接入同步 CMSE gateway；无通用 SVC、多任务 userspace transport 或异步用户 DMA |
@@ -106,7 +107,7 @@ ESD；它与 CAN1/USART1 flow-control 的资源冲突必须拒绝。详见
 参考 Board 默认不声明 Ethernet PHY/REFCLK/reset 接线。启明 ZG 可选 RMII 来源
 涉及 PG11/13/14，因此不授权 VE100 封装；天空星和梁山派无 reviewed PHY 路线。
 协议、电缆、PHY power/reset、产品 MAC 地址和恢复策略留在外部。详见
-[Ethernet](../design/ethernet.md)、[高级 timer](../design/timer-advanced.md)、
+[Ethernet](../design/ethernet.md)、[增强帧合同](../design/ethernet-frames.md)、[高级 timer](../design/timer-advanced.md)、
 [用户 I/O broker](../design/user-io-broker.md) 与 [G474](../design/stm32g474.md)。
 
 G474 的封装 GPIO、六个 UART、SPI1/2、IWDG 与 PA0/PA1 EXTI 分别具有明确的
@@ -135,9 +136,48 @@ Cache off 每块／每笔为 1..65535 bytes，Cache on 地址和长度必须按 
 长度最多 65504 bytes，调用者独占完整 cache line。TX 在 clean 后启动；RX 在 DMA
 前及排空后 invalidate，稳定剩余计数和维护完成后才发布完整块或 IDLE prefix。
 引用、通道、DMAR 或 cache 维护未排空都保留借用；消费者持有块时保留 stream 与
-平台依赖。owner service 发布并重新接纳下一块，可能出现间隙；不提供 circular、
-continuous、双缓冲 RX、其他 DMA engine、未选 RAM 放置或运行中变频。Cache
+平台依赖。这两个有限模式由 owner service 发布并重新接纳下一块，可能出现间隙；
+它们不提供 circular 或双缓冲 RX，也不扩大其他 DMA engine、RAM 放置或运行中变频。Cache
 配置在平台生命周期内固定，全部 provider 排空后才能关闭时基及 Cache。
+
+独立 `rx-dma-continuous` 模式限定 H743 V、HSI64、裸机和已初始化 AXI SRAM，
+使用 USART3、DMA1 Stream1/request45 与 DBM/CIRC 两个硬件 target。调用者提供
+至少三个等长、互不重叠的块；Cache off 长度为 32..65535，Cache on 为独占且对齐的
+完整 32-byte lines、32..65504 bytes。task service 在同源 BRR/TIM2 算出的保守
+`replace_by` 之前替换 inactive bank，再完成 Cache 维护并发布；IRQ 不执行 Cache
+维护。超过时限、CT 不明确、Cache 失败或无 FREE 块会显式报告 loss、停止生产并保留
+借用，直到真实排空；不覆盖旧块或自动重臂。IDLE 结束本次 producer 并发布已排空的
+prefix，调用者须显式重新初始化 stream 再 start。TX 仍为独立有限 IRQ，不构成
+DMA duplex；开发模型与链接不代表连续无损吞吐、时限或 HIL 资格。
+
+H743 SPI4 的独立有限 `dma` 模式选择 DEV_ID `0x450`、REV_ID `0x2003`（V）、
+HSI64 默认 trim、Cache off/on 和裸机。PE12/PE13/PE14 AF5 与 PE11 active-low CS
+是软件路线；DMA1 Stream2/3 分别负责 RX/TX，只接纳已初始化 AXI SRAM 中互不重叠的
+TX/RX span；Cache off 为 1..65535 bytes，Cache on 的地址和长度须为独占完整
+32-byte lines，长度为 32..65504 bytes。可与独立 USART3 Stream0 TX 或 Stream1 RX
+配置组合；不开放 PLL384、FreeRTOS、16-bit、固定 dummy/discard 或多段传输。精确约束见
+[H743 provider 合同](../../soc/stm32h743/README.md)。
+
+U575 USART1 的 `dma-tx` 选择 GPDMA1 channel0/request25、TZEN0、MSIS4、8N1 和
+Cache off，只接纳非安全 SRAM1 中 1..65535 bytes；USART1 RX 仍使用 IRQ byte ring。
+DMAT 按 ES0499 保持到 UART 完整停止证明 UE／ACK、两路 IRQ 与 publisher 完整撤回，
+不能用 DMA TCF 代替 UART 线上 TC 或最终借用排空。独立 `irq-fifo-bytes` 模式有
+显式阈值与每次 IRQ RX/TX 字节预算，不与 GPDMA 混用。两个模式均不扩大 USART2、
+TrustZone 或低功耗范围；见 [有限 GPDMA](../design/u575-uart-gpdma.md)和
+[FIFO IRQ 合同](../design/uart-fifo.md)。
+
+独立 `dma-chain-tx` 复用同一 USART1、GPDMA1 channel0/request25 和 IRQ-byte RX。
+一次请求仍借用连续 SRAM1 span，协议上限 196605 bytes，还须完整落入可达 RAM 且与
+所有 live state／ring／facts／nodes 不重叠；最多三块，每块最多 65535 bytes。
+两个 packed 12-byte 私有节点组成 24-byte 数组，整个数组按 32 bytes 对齐并位于
+同一 64 KiB CLBAR 窗口；节点与 payload 均保留到 fetch／channel／IRQ 排空及独立
+UART TC 已观察。它不开放 SG、循环链、RX DMA 或低功耗自主运行。
+
+独立无引脚 LPTIM2 `irq-counter16-oneshot` 选择 TZEN0、MSIS4、裸机、PCLK1/4
+名义 1 MHz 与 IRQ68 priority5/calls_os=false。单次接受 2..65536 ticks，1 tick
+因硬件 ARR 必须大于 reset CCR0 而返回 UNSUPPORTED；跨时钟写同步、update completion 与撤源
+排空分别观察。它不取得外部引脚或 DMA，不提供 Stop、backup、VBAT 连续性或物理
+计时精度证明；参考 Board 未观察 PCB／硅片修订。
 
 U575 的 TZEN0 Platform 维护所选 GPIO、USART1/2 IRQ bytes、IWDG 与上述六类有限外设；GPIOH 只接纳 PH0/PH1/PH3。
 PG2..PG15 还要求外部电源 owner 已建立 VDDIO2、PWR clock 和 IO2SV；平台不打开

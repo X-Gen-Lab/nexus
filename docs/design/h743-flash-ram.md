@@ -100,13 +100,23 @@ matching literal is insufficient. Firmware remains C11; test machinery does not
 become a firmware dependency.
 
 The normal firmware link for a selected H743 Flash assembly now invokes the
-automatic RAM audit. It checks the actual CPU-bridge instructions, RAM direct
-control-flow and literal residency, and a conservative private-stack bound based
-on emitted compiler `.su` frame records and exception reserve. These checks retain
-explicit C/ABI preconditions; arbitrary C data-pointer access, MMIO effects and
-MPU/drain ordering still require provider models and source review. They establish
-neither a complete formal execution-closure proof nor measured stack, timing or
-physical behavior.
+automatic RAM audit. It checks the complete copied pod and workspace against the
+actual ELF sections and LOAD segments: the RX run range has one matching Flash
+load range, their bytes agree, and the vector, stack and workspace extents are
+disjoint from the pod and wholly in writable RAM. The immutable Flash image guard
+must contain the actual linked endpoints and cover every file-backed LOAD. These
+checks are part of the normal link, rather than only synthetic checker fixtures.
+Changing a guard byte in a real firmware ELF is rejected by the same audit.
+
+The audit also checks the actual CPU-bridge instructions, RAM direct control-flow
+and literal residency, and a conservative private-stack bound based on emitted
+compiler `.su` frame records and exception reserve. Its layout report separates
+copied bytes, workspace bytes and their combined static RAM extent; alignment
+outside those extents remains part of the ordinary image resource report. These
+checks retain explicit C/ABI preconditions; arbitrary C data-pointer access, MMIO
+effects and MPU/drain ordering still require provider models and source review.
+They establish neither a complete formal execution-closure proof nor measured
+stack, timing or physical behavior.
 
 ## Protect the CPU from Code-domain speculation
 
