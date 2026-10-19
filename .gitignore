@@ -85,7 +85,6 @@ desktop.ini
 # Archives
 *.zip
 *.tar.gz
-!dependencies/source/googletest-1.16.0.tar.gz
 *.rar
 
 # Sphinx

@@ -56,6 +56,14 @@ SOURCE_DEPENDENCIES = (
                      "LICENSE.md", "dependencies/stm32u5-hal.lock.json"),
 )
 
+# Runtime/source-SDK closure deliberately excludes host-only test frameworks.
+HOST_TEST_DEPENDENCIES = (
+    SourceDependency("googletest", "ext/googletest",
+                     "https://github.com/google/googletest.git", "LICENSE",
+                     "dependencies/googletest.lock.json"),
+)
+ALL_SOURCE_DEPENDENCIES = SOURCE_DEPENDENCIES + HOST_TEST_DEPENDENCIES
+
 
 def declared_modules(data):
     """Reject missing/duplicate/unregistered paths and unreviewed origins."""
@@ -74,7 +82,7 @@ def declared_modules(data):
         if section != 'submodule "' + path + '"' or path in paths:
             raise ValueError("Duplicate or mismatched source module declaration")
         paths[path] = url
-    expected = {item.path: item.origin for item in SOURCE_DEPENDENCIES}
+    expected = {item.path: item.origin for item in ALL_SOURCE_DEPENDENCIES}
     if paths != expected:
         raise ValueError("Unregistered, missing or changed source dependency requires catalogue review")
     return paths

@@ -81,9 +81,11 @@ These commands delegate to `dependencies.py` and `qualification.py`; they do not
 establish a second build graph. Cache commands delegate to `cache.py`.
 
 Preset preparation records the assembly/Board bytes and every selected recursive
-Gitlink. Native models require all seven catalogue roots and their nested sources
-(nine initialized modules in the current checkout). ARM preparation requires CMSIS,
-the chosen STM32 family when applicable, and the selected scheduler closure.
+Gitlink. Native models require all registered runtime and host-test roots,
+recursively.
+ARM preparation requires CMSIS, the chosen STM32 family when applicable, and the
+selected scheduler closure. SDK and candidate preparation use only registered
+runtime sources; the host-only `ext/googletest` submodule is not required.
 CI's ARM identity binds this receipt to the explicit matrix preset and every
 uploaded resolved configuration. It rechecks current pins, nested sources and
 dirty files before and after capture, and uploads the original receipt.

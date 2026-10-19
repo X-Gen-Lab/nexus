@@ -255,7 +255,11 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)))
 
     def test_test_framework_payload_is_not_a_firmware_sdk_dependency(self):
-        for name in ("dependencies/source/googletest-1.16.0.tar.gz",
+        for name in ("ext/googletest/googletest/src/gtest-all.cc",
+                     "ext/googletest/googlemock/src/gmock-all.cc",
+                     "ext/googletest/LICENSE",
+                     "cmake/testing/GoogleTest.cmake",
+                     "dependencies/source/googletest-1.16.0.tar.gz",
                      "dependencies/source/googletest-LICENSE.txt",
                      "tests/contracts/factory_test.cpp"):
             with self.subTest(name=name):
@@ -554,10 +558,10 @@ class SourceSDKDependencySnapshotTests(unittest.TestCase):
         self.environment = {key: value for key, value in os.environ.items()
                             if not key.startswith("GIT_")}
         self.git(self.root, "init", "--quiet")
-        from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+        from tools.maintenance.source_catalogue import ALL_SOURCE_DEPENDENCIES
         (self.root / ".gitmodules").write_text("".join(
             f'[submodule "{item.path}"]\npath = {item.path}\nurl = {item.origin}\n'
-            for item in SOURCE_DEPENDENCIES))
+            for item in ALL_SOURCE_DEPENDENCIES))
         (self.root / "baseline").write_text("committed source baseline\n")
         self.git(self.root, "add", ".")
         self.commit(self.root, "committed baseline without new dependency")

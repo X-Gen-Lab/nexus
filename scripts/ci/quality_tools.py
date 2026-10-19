@@ -611,8 +611,13 @@ def analyze_context(kind, root, tool, index, context, directory, cancel_event,
             external = external_system_headers(root, entry)
             output.write("External system header exclusions: " + json.dumps(external) + "\n")
             output.write("External header ownership rule: exact header files in this configuration's SYSTEM paths under vendors/ or ext/ only; owned headers and implementation files remain checked.\n")
-            exclusions = sorted({path for header in external for path in
-                                 (header["path"], header["canonical_path"])})
+            # Cppcheck 2.13 reports project headers relative to its working
+            # directory even when the compilation entry uses absolute paths.
+            # Match only exact aliases of the same reviewed foreign headers;
+            # basename globs could hide an unrelated first-party header.
+            exclusions = sorted({alias for header in external for path in
+                                 (header["path"], header["canonical_path"])
+                                 for alias in (path, str(Path(path).relative_to(root)))})
             argv = [tool, "--project=" + str(database), *observed, *forced,
                     "--enable=warning,performance,portability",
                     "--check-level=exhaustive", "--error-exitcode=2", "--xml",

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: d37e971f4a6718cd5027c2b654b037e4b026c1de532c557cd8aa82db551a3be1\n"
+"X-Nexus-Source-SHA256: 4b69d8a8ef4429aaa37d3b47959f98de9b4ca7afd1d270c75ce3927f6d1d0a9b\n"
 
 msgid "Build system maintenance contract"
 msgstr "构建系统维护合同"
@@ -260,9 +260,6 @@ msgstr "Host 2.52.0；记录 OCI 产物 2.47.3"
 msgid "GoogleTest/GoogleMock"
 msgstr "GoogleTest/GoogleMock"
 
-msgid "1.16.0, pinned commit and archive SHA-256"
-msgstr "1.16.0，锁定 commit 和 archive SHA-256"
-
 msgid "Host-only framework; final full-source execution separately recorded"
 msgstr "仅主机框架；最终 full-source 执行另行记录"
 
@@ -398,3 +395,9 @@ msgstr ""
 "tool-support-observations.json` 中记录 scope。当前 locked closure 与最终源码 receipt "
 "索引在 delivery result index。台账的配置、目标、workflow、delivery、transport "
 "报告保留原始执行、失败尝试和源码 scope。整个构建系统维护的物理 HIL 保持 `not_executed`。"
+
+
+msgid ""
+"1.16.0, pinned Git submodule `ext/googletest` and matching lock commit"
+msgstr ""
+"1.16.0，锁定 Git 子模块 `ext/googletest`，与依赖锁中的 commit 一致"

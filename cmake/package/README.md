@@ -102,8 +102,9 @@ tools; they are not installed into the consumer's Git repository by `find_packag
 
 The source SDK includes authored TOML readers, typed resolution and factory
 generation, maintained default assemblies and dependency provenance locks.
-GoogleTest/GoogleMock source archives, licenses and contract binaries belong to
-host repository development and are excluded from the firmware SDK payload.
+The pinned `ext/googletest` Git submodule, its licenses and contract binaries
+belong to host repository development and are excluded from the firmware SDK
+payload.
 Configuring a firmware consumer never downloads a test dependency. A consumer
 that needs platform development tests uses the complete repository checkout;
 the installed source SDK explicitly excludes those contract targets.

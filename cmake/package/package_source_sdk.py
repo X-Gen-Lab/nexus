@@ -554,7 +554,7 @@ def selected(name):
         return False
     # Host test frameworks never become firmware source dependencies. Their
     # reviewed lock stays in the SDK provenance, without host-only payloads.
-    if name.startswith("dependencies/source/"):
+    if name.startswith(("dependencies/source/", "cmake/testing/")):
         return False
     return (name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
             or any(name.startswith(directory + "/")

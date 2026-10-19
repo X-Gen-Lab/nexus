@@ -333,6 +333,38 @@ class BuildDeliveryTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             dependencies.required_submodules("arm", "unknown", "baremetal")
 
+    def test_native_requires_google_source_without_exporting_it_to_firmware(self):
+        self.assertIn("ext/googletest",
+                      dependencies.required_submodules("native"))
+        for scope in ("sdk", "candidate"):
+            with self.subTest(scope=scope):
+                selected = dependencies.required_submodules(scope)
+                self.assertIn("vendors/st/stm32f4_hal", selected)
+                self.assertNotIn("ext/googletest", selected)
+        for family in dependencies.FAMILY_MODULE:
+            for backend in ("baremetal", "freertos", "threadx"):
+                with self.subTest(family=family, backend=backend):
+                    self.assertNotIn("ext/googletest",
+                        dependencies.required_submodules("arm", family, backend))
+
+    def test_catalogue_approves_google_origin_and_rejects_origin_changes(self):
+        from tools.maintenance import source_catalogue
+        declaration = "".join(
+            '[submodule "' + item.path + '"]\n path = ' + item.path +
+            '\n url = ' + item.origin + '\n'
+            for item in source_catalogue.SOURCE_DEPENDENCIES)
+        google = ('[submodule "ext/googletest"]\n path = ext/googletest\n'
+                  ' url = https://github.com/google/googletest.git\n')
+        declared = source_catalogue.declared_modules(
+            (declaration + google).encode())
+        self.assertEqual(declared["ext/googletest"],
+                         "https://github.com/google/googletest.git")
+        with self.assertRaises(ValueError):
+            source_catalogue.declared_modules(declaration.encode())
+        with self.assertRaises(ValueError):
+            source_catalogue.declared_modules((declaration + google.replace(
+                "google/googletest.git", "unreviewed/googletest.git")).encode())
+
     def test_f407_scoped_prepare_includes_actual_official_ll_dependency(self):
         expected = ("vendors/arm/CMSIS_5", "vendors/st/cmsis_device_f4",
                     "vendors/st/stm32f4_hal")

@@ -425,7 +425,7 @@ E1–E6描述工程验收领域，不是另一套排期或任务真源。唯一�
 
 GoogleTest 承担断言、fixture 和边界场景；GoogleMock 只替代硬件、时间、通知和执行器等依赖端口。测试实际调用 Nexus 的公共 API，不能把被测 provider、factory 或 owner 整体 mock 掉，再用期望调用证明自身正确。优先检查不同实例的隔离、零副作用拒绝、资源冲突、deadline、取消后的排空和最终发布顺序。正常路径和失败路径共同确定合同，不要求为了数字重复实现细节。
 
-框架源以 `dependencies/googletest.lock.json` 固定准确版本、commit、archive SHA256 和许可；主机测试只从仓库内归档解压，没有 configure-time 下载或网络回退。`tests/google/CMakeLists.txt` 启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime 或测试框架依赖。
+框架源通过 Git 子模块 `ext/googletest` 引入，`dependencies/googletest.lock.json` 与 Gitlink 固定同一版本和准确 commit；当前为 1.16.0、`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。依赖准备显式执行，CMake 只使用已准备的本地源码，不下载、不回退到系统框架；缺失、版本不符或子模块工作区有修改即失败。`tests/google/CMakeLists.txt` 启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime 或测试框架依赖。许可与 notice 随锁定的子模块源码保留。
 
 统一执行入口为：
 

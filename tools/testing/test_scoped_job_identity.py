@@ -12,7 +12,9 @@ from tools.dev.dependencies import prepare_preset
 from tools.evidence.common import EvidenceError, file_identity
 from tools.evidence.identity import canonical_digest
 from tools.maintenance.job_identity import capture
-from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+from tools.maintenance.source_catalogue import (
+    ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES,
+)
 
 
 class SelectedIdentityTests(unittest.TestCase):
@@ -50,7 +52,7 @@ class SelectedIdentityTests(unittest.TestCase):
         (self.root / 'dependencies').mkdir()
         (self.root / 'dependencies/fixture.lock.json').write_text('{}\n')
         declarations = []
-        for item in SOURCE_DEPENDENCIES:
+        for item in ALL_SOURCE_DEPENDENCIES:
             declarations.append('[submodule "' + item.path + '"]\n path = '
                                 + item.path + '\n url = ' + item.origin + '\n')
             (self.root / item.path).mkdir(parents=True)
@@ -67,7 +69,7 @@ class SelectedIdentityTests(unittest.TestCase):
                 'cacheVariables': {'NEXUS_ASSEMBLY_FILE':
                                    '${sourceDir}/assembly.toml'}}]}))
         self.git(self.root, 'add', '.')
-        for item in SOURCE_DEPENDENCIES:
+        for item in ALL_SOURCE_DEPENDENCIES:
             sha = self.freertos_sha if item.path == 'ext/freertos' else self.module_sha
             self.git(self.root, 'update-index', '--add', '--cacheinfo',
                      '160000', sha, item.path)
@@ -207,6 +209,9 @@ class SelectedIdentityTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             prepare_preset(self.root, 'fixture')
         self.initialize(*(item.path for item in SOURCE_DEPENDENCIES))
+        with self.assertRaisesRegex(EvidenceError, 'ext/googletest'):
+            prepare_preset(self.root, 'fixture')
+        self.initialize('ext/googletest')
         self.refresh_receipt()
         self.write_configuration()
         record = self.capture()
@@ -214,7 +219,7 @@ class SelectedIdentityTests(unittest.TestCase):
         self.assertTrue(record['selected_dependencies_complete'])
         self.assertEqual(record['dependency_scope']['scope'], 'native')
         self.assertGreater(len(record['dependency_scope']['recursive_submodules']),
-                           len(SOURCE_DEPENDENCIES))
+                           len(ALL_SOURCE_DEPENDENCIES))
 
     def test_valid_baremetal_receipt_cannot_bind_freertos_preset_configuration(self):
         (self.root / 'other.toml').write_text(

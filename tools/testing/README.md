@@ -1,9 +1,13 @@
 # Host TDD execution
 
 New public C API and provider behavior uses GoogleTest and GoogleMock. Firmware
-remains C11. The framework is pinned by `dependencies/googletest.lock.json` and
-extracted from the local archive only for Native tests; configuration never
-downloads dependencies.
+remains C11. The framework is the `ext/googletest` Git submodule, pinned by
+`dependencies/googletest.lock.json` and the matching Gitlink. Prepare it explicitly
+with `python tools/dev/dev.py prepare --scope native --allow-network` or
+`git submodule update --init --recursive ext/googletest` before running Native
+tests. Configuration uses only this local source, rejects missing, modified or
+incorrectly pinned checkouts, and never downloads dependencies. Firmware and
+source SDK consumers do not require the host test submodule.
 
 Run the same check locally and in CI:
 
@@ -11,19 +15,19 @@ Run the same check locally and in CI:
 python scripts/ci/tdd_gate.py --all --preset native-debug
 ```
 
-The gate executes the configuration and reporting tool tests, builds the explicit
-`nexus_google_contracts` target, discovers all cases in each binary, then runs them
-without filters or shards. Fresh XML must contain completed, passing cases and
-the same number of cases as discovery. Empty, stale, skipped, failed and partial
+The gate executes the four complete tool domains (`testing`, `configure`, `ci`
+and `workflows`), builds the explicit `nexus_google_contracts` target, discovers
+all cases in each binary, then runs them without filters or shards. Fresh XML
+must contain completed, passing cases and the same number of cases as discovery. Empty, stale, skipped, failed and partial
 runs cannot establish acceptance. Raw commands and results are in
 `build/<preset>/tdd/`; `execution.json` is a development execution record.
 
 The pre-commit hook calls the same gate for behavioral changes, including every
-`tools/` and `scripts/` path. The local baseline executes configuration/reporting
-tool tests and all GoogleTest contracts; other tool suites run in their explicit
-CTest/CI entries. It checks relevant staged source against unstaged or untracked
-behavior before and after execution and requires the exact Git index tree to
-remain unchanged. A late source or staging change rejects the new summary. Git's
+`tools/` and `scripts/` path. The local baseline executes those four complete
+tool domains and all GoogleTest contracts. Longer SDK/contract and FreeRTOS tool
+suites run in their explicit CI domains. The gate checks relevant staged source
+against unstaged or untracked behavior before and after execution and requires
+the exact Git index tree to remain unchanged. A late source or staging change rejects the new summary. Git's
 pre-commit runner temporarily stashes tracked unstaged edits before hooks execute.
 It loads the current `.pre-commit-config.yaml`, so an already installed hook reads
 new gate definitions without reinstalling. CI executes the gate independently.

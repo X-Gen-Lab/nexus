@@ -825,7 +825,7 @@ class RequiredAnalysisTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'system include'):
                     quality_tools.cppcheck_compilation_entry(entry)
 
-    def header_scope_case(self, header, *, system=True):
+    def header_scope_case(self, header, *, system=True, relative_diagnostic=False):
         header.parent.mkdir(parents=True, exist_ok=True)
         if not header.exists():
             header.write_text('extern int first, last;\n'
@@ -836,12 +836,13 @@ class RequiredAnalysisTests(unittest.TestCase):
                                str(header.parent), '-c', str(self.source)]}
         (self.build / 'compile_commands.json').write_text(json.dumps([entry]))
         tool = self.root / 'header-ownership-analyzer'
+        diagnostic = header.relative_to(self.root) if relative_diagnostic else header
         tool.write_text(
             f'#!{sys.executable}\nimport sys\n'
             "if '--version' in sys.argv: print('header ownership fixture'); sys.exit(0)\n"
-            f"if {'--suppress=*:' + str(header)!r} in sys.argv: sys.exit(0)\n"
+            f"if {'--suppress=*:' + str(diagnostic)!r} in sys.argv: sys.exit(0)\n"
             "print('<results><errors><error id=\"comparePointers\" severity=\"error\">')\n"
-            f"print('<location file=\"{header}\" line=\"2\"/></error></errors></results>')\n"
+            f"print('<location file=\"{diagnostic}\" line=\"2\"/></error></errors></results>')\n"
             'sys.exit(2)\n')
         tool.chmod(0o700)
         return run('cppcheck', self.root, self.build, str(tool), self.report)
@@ -851,6 +852,14 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(self.header_scope_case(header), 0, self.report.read_text())
         self.assertIn('External system header exclusions:', self.report.read_text())
         self.assertIn(str(header), self.report.read_text())
+
+    def test_external_system_header_project_relative_diagnostic_is_matched(self):
+        header = self.root / 'vendors/fixture/include/header.h'
+        self.assertEqual(self.header_scope_case(header, relative_diagnostic=True),
+                         0, self.report.read_text())
+        self.assertIn('--suppress=*:vendors/fixture/include/header.h',
+                      self.report.read_text())
+        self.assertNotIn('--suppress=*:*/header.h', self.report.read_text())
 
     def test_owned_headers_are_checked_even_with_system_include_flags(self):
         for system in (False, True):

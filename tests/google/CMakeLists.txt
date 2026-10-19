@@ -1,33 +1,9 @@
 # Host-only framework: firmware and source-SDK consumers never enter this tree.
-enable_language(CXX)
 if(CMAKE_CROSSCOMPILING OR NOT NEXUS_SOC_FAMILY STREQUAL "native")
     message(FATAL_ERROR "GoogleTest/GoogleMock require the Native test profile")
 endif()
-
-file(READ "${NEXUS_SOURCE_DIR}/dependencies/googletest.lock.json" google_lock)
-string(JSON google_archive GET "${google_lock}" archive)
-string(JSON google_commit GET "${google_lock}" commit)
-string(JSON google_sha256 GET "${google_lock}" sha256)
-set(google_archive "${NEXUS_SOURCE_DIR}/${google_archive}")
-if(NOT EXISTS "${google_archive}")
-    message(FATAL_ERROR "Missing pinned GoogleTest archive; no network fallback")
-endif()
-file(SHA256 "${google_archive}" google_actual)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/dependencies/googletest.lock.json" "${google_archive}")
-if(NOT google_actual STREQUAL google_sha256)
-    message(FATAL_ERROR "GoogleTest archive differs from the source lock")
-endif()
-set(google_root "${CMAKE_BINARY_DIR}/_deps/googletest-${google_commit}")
-# A fresh extraction prevents a previously edited dependency from being reused.
-file(REMOVE_RECURSE "${google_root}")
-file(ARCHIVE_EXTRACT INPUT "${google_archive}"
-    DESTINATION "${CMAKE_BINARY_DIR}/_deps")
-set(INSTALL_GTEST OFF CACHE BOOL "GoogleTest is test-only" FORCE)
-set(BUILD_GMOCK ON CACHE BOOL "GoogleMock contract tests" FORCE)
-set(gtest_force_shared_crt ON CACHE BOOL "Host MSVC runtime" FORCE)
-add_subdirectory("${google_root}" "${CMAKE_BINARY_DIR}/_deps/google-build"
-    EXCLUDE_FROM_ALL)
+include("${NEXUS_SOURCE_DIR}/cmake/testing/GoogleTest.cmake")
+nexus_host_google_test()
 
 # Preserve complete host DWARF without repeating uncompressed framework debug
 # sections in every contract executable. Firmware never enters this directory.

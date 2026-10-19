@@ -23,10 +23,13 @@ from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
                                    file_identity, load_json, regular_file, separate_outputs)
 
 ROOT = Path(__file__).resolve().parents[2]
-from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+from tools.maintenance.source_catalogue import (
+    ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES,
+)
 from tools.configure.providers import descriptor
 
-MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
+MODULES = tuple(dependency.path for dependency in ALL_SOURCE_DEPENDENCIES)
+RUNTIME_MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
 FAMILY_MODULE = {item.family: tuple(path for _, path in item.git_dependencies)
                  for item in descriptor.families() if item.family != "native"}
 
@@ -36,8 +39,9 @@ def required_submodules(scope: str, family: str | None = None,
     if scope in ("native", "sdk", "candidate"):
         if scope == "native" and family not in (None, "native"):
             raise EvidenceError("Native dependencies cannot select a hardware family")
-        # Native model tests deliberately compile all maintained vendor headers.
-        return MODULES
+        # Native models compile all maintained vendor headers and host tests.
+        # Firmware/source-SDK exports do not acquire the host test framework.
+        return MODULES if scope == "native" else RUNTIME_MODULES
     if scope != "arm" or family not in FAMILY_MODULE or backend not in ("baremetal", "freertos", "threadx"):
         raise EvidenceError("unsupported dependency scope/family/backend")
     # The family descriptor owns its approved Git dependencies. The imported

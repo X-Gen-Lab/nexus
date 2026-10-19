@@ -48,3 +48,6 @@
 [submodule "vendors/st/stm32u5_hal"]
 	path = vendors/st/stm32u5_hal
 	url = https://github.com/STMicroelectronics/stm32u5xx_hal_driver.git
+[submodule "ext/googletest"]
+	path = ext/googletest
+	url = https://github.com/google/googletest.git
