@@ -333,6 +333,59 @@ class WorkflowContracts(unittest.TestCase):
         self.assertEqual(commands.count('--suite configure'), 1)
         self.assertIn('tools.hil.prepare', commands)
 
+    def test_mode_independent_suites_have_one_reported_tool_owner(self):
+        tools = workflow('enterprise-tools.yml')['jobs']['tooling']
+        commands = '\n'.join(step.get('run', '') for step in tools['steps'])
+        selected = re.findall(r'--suite\s+(\w+)', commands)
+        self.assertCountEqual(selected, [
+            'testing', 'configure', 'ci', 'workflows', 'contracts', 'freertos'])
+        self.assertNotIn('unittest discover -s tests/contracts', commands)
+        seal = next(step for step in tools['steps']
+                    if step.get('uses') == './.github/actions/record-identity')
+        upload = next(step for step in tools['steps'] if step.get(
+            'uses', '').startswith('actions/upload-artifact@'))
+        for suite in ('contracts', 'freertos'):
+            report = f'build/quality/tools-{suite}.json'
+            with self.subTest(suite=suite):
+                self.assertIn('--report ' + report, commands)
+                self.assertIn(report, seal['with']['artifacts'].splitlines())
+                self.assertIn(report, upload['with']['path'].splitlines())
+
+    def test_static_analysis_uses_the_explicit_worker_budget(self):
+        steps = workflow('quality-checks.yml')['jobs']['static-analysis']['steps']
+        selected = [step['run'] for step in steps
+                    if 'scripts/ci/quality_tools.py' in step.get('run', '')]
+        self.assertEqual(len(selected), 2)
+        for command in selected:
+            arguments = shlex.split(command)
+            with self.subTest(command=command):
+                self.assertIn('--parallel', arguments)
+                self.assertEqual(arguments[arguments.index('--parallel') + 1],
+                                 '2')
+
+    def test_arm_cache_restores_only_untrusted_archive_bytes(self):
+        action = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
+                           .read_text(), Loader=yaml.BaseLoader)
+        steps = action['runs']['steps']
+        cached = [step for step in steps if step.get('uses', '').startswith(
+            'actions/cache@')]
+        self.assertEqual(len(cached), 1)
+        cache = cached[0]
+        self.assertRegex(cache['uses'], r'^actions/cache@[0-9a-f]{40}$')
+        self.assertEqual(cache['with']['path'],
+                         '${{ runner.temp }}/nexus-arm-archives')
+        self.assertNotIn('restore-keys', cache['with'])
+        for identity in ('runner.os', 'runner.arch',
+                         'steps.arm-archive.outputs.sha256'):
+            self.assertIn('${{ ' + identity + ' }}', cache['with']['key'])
+        installer = next(step for step in steps if
+                         'scripts/ci/install_arm_toolchain.py' in
+                         step.get('run', ''))
+        self.assertEqual(installer['if'], "inputs.arm == 'true'")
+        self.assertIn('--cache-dir "$RUNNER_TEMP/nexus-arm-archives"',
+                      installer['run'])
+        self.assertLess(steps.index(cache), steps.index(installer))
+
     def test_tool_contracts_have_one_automatic_workflow_caller(self):
         events = workflow('enterprise-tools.yml')['on']
         self.assertEqual(set(events), {'workflow_call', 'workflow_dispatch'})

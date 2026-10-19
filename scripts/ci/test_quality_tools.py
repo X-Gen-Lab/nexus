@@ -40,6 +40,243 @@ class RequiredAnalysisTests(unittest.TestCase):
         self.assertEqual(run("tidy", self.root, self.build, self.tool(0), self.report), 0)
         self.assertIn("Exit code: 0", self.report.read_text())
 
+    def test_equivalent_output_entries_have_one_analysis_context(self):
+        entries = [
+            {"file": str(self.source), "directory": str(self.root),
+             "arguments": ["cc", "-DFEATURE=1", "-c", str(self.source),
+                           "-o", "first.o", "-MMD", "-MF", "first.d", "-MT", "first.o"]},
+            {"file": str(self.source), "directory": str(self.root),
+             "command": shlex.join(["cc", "-DFEATURE=1", "-c", str(self.source),
+                                    "-o", "second.o", "-MD", "-MFsecond.d", "-MQsecond.o"])},
+        ]
+        (self.build / "compile_commands.json").write_text(json.dumps(entries))
+        tool = self.root / "counting-analyzer"
+        count = self.root / "invocations.jsonl"
+        tool.write_text(
+            f"#!{sys.executable}\nimport json,sys\n"
+            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+            f"with open({str(count)!r}, 'a') as stream: stream.write(json.dumps(sys.argv) + '\\n')\n")
+        tool.chmod(0o700)
+        self.assertEqual(run("tidy", self.root, self.build, str(tool), self.report), 0)
+        self.assertEqual(len(count.read_text().splitlines()), 1)
+        self.assertIn('Unique analysis contexts: 1', self.report.read_text())
+        self.assertIn('"compilation_indexes": [0, 1]', self.report.read_text())
+        self.assertEqual(json.loads((self.build / "compile_commands.json").read_text()), entries)
+
+    def test_context_identity_preserves_every_semantic_argument_and_order(self):
+        base = {"file": str(self.source), "directory": str(self.root),
+                "arguments": ["cc", "-c", str(self.source)]}
+        flags = (['-D', 'FEATURE=1'], ['-U', 'FEATURE'], ['-mcpu=cortex-m4'],
+                 ['-mfloat-abi=soft'], ['-std=c99'], ['-x', 'c++'], ['-I', 'first'],
+                 ['-isystem', 'system'], ['-include', 'forced.h'], ['--sysroot=/sdk'],
+                 ['-target', 'arm-none-eabi'], ['-pthread'], ['-O2'],
+                 ['-Xclang', '-unknown-option'])
+        entries = [base, *[{**base, "arguments": ["cc", *part, "-c", str(self.source)]}
+                           for part in flags]]
+        entries.extend([{**base, "arguments": ["cc", '-I', 'first', '-I', 'second', '-c', str(self.source)]},
+                        {**base, "arguments": ["cc", '-I', 'second', '-I', 'first', '-c', str(self.source)]},
+                        {**base, "arguments": ["clang", '-c', str(self.source)]},
+                        {**base, "directory": str(self.build)}])
+        contexts = quality_tools.analysis_contexts(entries)
+        self.assertEqual(len(contexts), len(entries))
+
+    def test_context_option_values_are_not_treated_as_output_flags(self):
+        base = {"file": str(self.source), "directory": str(self.root)}
+        entries = [{**base, "arguments": ['cc', '-D', value, '-c', str(self.source), '-o', 'out.o']}
+                   for value in ('-oone', '-otwo', '-MFone', '-MFtwo')]
+        self.assertEqual(len(quality_tools.analysis_contexts(entries)), 4)
+
+    def test_unknown_option_grammar_is_retained_without_deduplication(self):
+        base = {'file': str(self.source), 'directory': str(self.root)}
+        entries = [{**base, 'arguments': ['cc', '-unknown-mode', '-o', output,
+                                         '-c', str(self.source)]}
+                   for output in ('first.o', 'second.o')]
+        self.assertEqual(len(quality_tools.analysis_contexts(entries)), 2)
+        for entry in entries:
+            self.assertEqual(quality_tools.analysis_arguments(entry), entry['arguments'])
+
+    def test_compiler_and_known_launcher_prefixes_are_never_output_options(self):
+        base = {'file': str(self.source), 'directory': str(self.root)}
+        for launcher in ([], ['ccache'], ['sccache'], ['distcc']):
+            with self.subTest(launcher=launcher):
+                entries = [{**base, 'arguments': [*launcher, compiler, '-c',
+                                                 str(self.source), '-o', 'out.o']}
+                           for compiler in ('-MFfirst-gcc', '-MFsecond-gcc')]
+                self.assertEqual(len(quality_tools.analysis_contexts(entries)), 2)
+                for entry in entries:
+                    self.assertEqual(quality_tools.analysis_arguments(entry),
+                                     [*entry['arguments'][:len(launcher) + 1], str(self.source)])
+
+    def test_unknown_compiler_or_launcher_keeps_the_complete_argv(self):
+        base = {'file': str(self.source), 'directory': str(self.root)}
+        for prefix in (['unknown-compiler'], ['env', 'cc'],
+                       ['ccache', 'unknown-compiler']):
+            with self.subTest(prefix=prefix):
+                entries = [{**base, 'arguments': [*prefix, '-c', str(self.source),
+                                                 '-o', output]}
+                           for output in ('first.o', 'second.o')]
+                self.assertEqual(len(quality_tools.analysis_contexts(entries)), 2)
+                for entry in entries:
+                    self.assertEqual(quality_tools.analysis_arguments(entry), entry['arguments'])
+
+    def test_precompiled_header_operands_remain_distinct_contexts(self):
+        base = {'file': str(self.source), 'directory': str(self.root)}
+        for option in ('-include-pch', '-include-pth'):
+            with self.subTest(option=option):
+                entries = [{**base, 'arguments': ['clang', option, header,
+                                                 '-c', str(self.source), '-o', 'out.o']}
+                           for header in ('-MFfirst.pch', '-MFsecond.pch')]
+                self.assertEqual(len(quality_tools.analysis_contexts(entries)), 2)
+                for entry in entries:
+                    self.assertIn(entry['arguments'][2], quality_tools.analysis_arguments(entry))
+
+    def test_unknown_include_family_options_do_not_guess_operand_grammar(self):
+        base = {'file': str(self.source), 'directory': str(self.root)}
+        for option in ('-include-new-mode', '-isystem-new-mode'):
+            with self.subTest(option=option):
+                entries = [{**base, 'arguments': ['clang', option, '-MF' + value,
+                                                 '-c', str(self.source), '-o', 'out.o']}
+                           for value in ('first', 'second')]
+                self.assertEqual(len(quality_tools.analysis_contexts(entries)), 2)
+                for entry in entries:
+                    self.assertEqual(quality_tools.analysis_arguments(entry), entry['arguments'])
+
+    def test_query_preserves_output_like_option_operands(self):
+        argv = ['cc', '-I', '-oheaders', '-isystem', '-MFheaders',
+                '-D', '-oMACRO', '-include', str(self.source),
+                '-c', str(self.source), '-o', 'discard.o']
+        entry = {'file': str(self.source), 'directory': str(self.root),
+                 'arguments': argv}
+        _, query = compiler_query(entry)
+        self.assertEqual(query, ['cc', *argv[1:9], '-x', 'c', '-E', '-dM', '-'])
+
+    def test_query_uses_language_at_translation_unit_not_trailing_language(self):
+        entry = {'file': str(self.source), 'directory': str(self.root),
+                 'arguments': ['cc', '-x', 'c++', '-c', str(self.source), '-x', 'c']}
+        _, query = compiler_query(entry)
+        self.assertEqual(query, ['cc', '-x', 'c++', '-E', '-dM', '-'])
+
+    def test_query_language_none_restores_translation_unit_extension(self):
+        entry = {'file': str(self.source), 'directory': str(self.root),
+                 'arguments': ['cc', '-x', 'c++', '-x', 'none', '-c', str(self.source)]}
+        _, query = compiler_query(entry)
+        self.assertEqual(query, ['cc', '-x', 'c', '-E', '-dM', '-'])
+
+    def test_invalid_execution_budgets_fail_before_analyzer_launch(self):
+        tool = self.tool(0)
+        for budget in (0, -1, '2.0'):
+            with self.subTest(parallel=budget):
+                self.assertEqual(run('tidy', self.root, self.build, tool,
+                                     self.report, parallel=budget), 1)
+        for budget in (0, -1, float('inf'), float('nan')):
+            with self.subTest(timeout=budget):
+                self.assertEqual(run('tidy', self.root, self.build, tool,
+                                     self.report, timeout=budget), 1)
+
+    def test_parallel_execution_is_bounded_and_reports_are_deterministic(self):
+        sources = [self.source.with_name(f"sample{index}.c") for index in range(4)]
+        for source in sources:
+            source.write_text('int sample(void) { return 1; }\n')
+        self.database(sources)
+        tool = self.root / 'concurrent-analyzer'
+        activity = self.root / 'activity.jsonl'
+        tool.write_text(
+            f'#!{sys.executable}\nimport json,pathlib,sys,time\n'
+            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+            f"with open({str(activity)!r}, 'a') as stream: stream.write(json.dumps(['start', time.monotonic()])+'\\n')\n"
+            "source = pathlib.Path(sys.argv[1]); index = int(source.stem.removeprefix('sample'))\n"
+            "source.with_name('ready' + str(index)).touch()\n"
+            "partner = source.with_name('ready' + str(index ^ 1)); deadline = time.monotonic() + 5\n"
+            "while not partner.exists():\n"
+            " if time.monotonic() >= deadline: sys.exit(9)\n"
+            " time.sleep(0.005)\n"
+            "print(sys.argv[1])\n"
+            f"with open({str(activity)!r}, 'a') as stream: stream.write(json.dumps(['end', time.monotonic()])+'\\n')\n")
+        tool.chmod(0o700)
+        self.assertEqual(run('tidy', self.root, self.build, str(tool), self.report,
+                             parallel=2), 0, self.report.read_text())
+        active = maximum = 0
+        for event, _ in sorted((json.loads(line) for line in activity.read_text().splitlines()), key=lambda item: item[1]):
+            active += 1 if event == 'start' else -1
+            maximum = max(maximum, active)
+        self.assertEqual(active, 0)
+        self.assertEqual(maximum, 2)
+        report = self.report.read_text()
+        invocation_sources = [json.loads(line[len('Invocation: '):])[1]
+                              for line in report.splitlines() if line.startswith('Invocation: ')
+                              and '--version' not in line]
+        self.assertEqual(invocation_sources, list(map(str, sources)))
+
+    def test_parallel_timeout_keeps_failure_and_other_context_results(self):
+        other = self.source.with_name('other.c')
+        other.write_text('int other;\n')
+        self.database([self.source, other])
+        tool = self.root / 'timeout-analyzer'
+        tool.write_text(
+            f'#!{sys.executable}\nimport sys,time\n'
+            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+            f"if sys.argv[1] == {str(self.source)!r}: time.sleep(30)\n"
+            "print('other-context-result')\n")
+        tool.chmod(0o700)
+        self.assertEqual(run('tidy', self.root, self.build, str(tool), self.report,
+                             parallel=2, timeout=0.2), 1)
+        report = self.report.read_text()
+        self.assertIn('Exit code: 124', report)
+        self.assertIn('other-context-result', report)
+
+    def test_sigterm_cancels_active_trees_without_launching_queued_commands(self):
+        import signal
+        import time
+        sources = [self.source.with_name(f'cancel{index}.c') for index in range(4)]
+        for source in sources:
+            source.write_text('int cancellation_fixture;\n')
+        self.database(sources)
+        tool = self.root / 'cancel-analyzer'
+        tool.write_text(
+            f'#!{sys.executable}\nimport pathlib,subprocess,sys,time,os\n'
+            "if '--version' in sys.argv: print('fixture'); sys.exit(0)\n"
+            "source = pathlib.Path(sys.argv[1])\n"
+            "parent = source.with_suffix('.parent.pid'); child = source.with_suffix('.child.pid')\n"
+            "parent.write_text(str(os.getpid()))\n"
+            "code = 'import os,pathlib,time; pathlib.Path(' + repr(str(child)) + ').write_text(str(os.getpid())); time.sleep(30)'\n"
+            "subprocess.Popen([sys.executable, '-c', code])\n"
+            "while not child.exists(): time.sleep(0.005)\n"
+            "source.with_suffix('.ready').touch()\ntime.sleep(30)\n")
+        tool.chmod(0o700)
+        command = [sys.executable, str(Path(quality_tools.__file__).resolve()),
+                   'tidy', '--root', str(self.root), '--build-dir', str(self.build),
+                   '--tool', str(tool), '--report', str(self.report), '--parallel', '2']
+        launched = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        identities = []
+        try:
+            deadline = time.monotonic() + 5
+            while (len(list(self.source.parent.glob('cancel*.ready'))) < 2
+                   and launched.poll() is None and time.monotonic() < deadline):
+                time.sleep(0.01)
+            self.assertEqual(len(list(self.source.parent.glob('cancel*.ready'))), 2)
+            if Path('/proc/self/stat').is_file():
+                identities = [quality_tools.process._linux_process(int(path.read_text()))
+                              for path in self.source.parent.glob('cancel*.pid')]
+            launched.send_signal(signal.SIGTERM)
+            out, err = launched.communicate(timeout=8)
+            self.assertEqual(launched.returncode, 130, out + err)
+            receipts = list(self.report.parent.glob('analysis.contexts/run-*/*/analysis.command.json'))
+            records = [json.loads(path.read_text()) for path in receipts]
+            self.assertEqual(len(records), 4)
+            self.assertTrue(all(record['outcome'] == 'cancelled' for record in records))
+            self.assertTrue(all(record['withdrawal_complete'] for record in records))
+            self.assertEqual(sum(record['child_returncode'] is not None for record in records), 2)
+            self.assertEqual(len(list(self.source.parent.glob('cancel*.ready'))), 2)
+        finally:
+            if launched.poll() is None:
+                launched.kill()
+                launched.communicate(timeout=5)
+            for identity in identities:
+                if identity is not None:
+                    current = quality_tools.process._linux_process(identity['pid'])
+                    if current is not None and current['start_time'] == identity['start_time'] and current['state'] not in ('Z', 'X'):
+                        os.kill(identity['pid'], signal.SIGKILL)
+
     def test_diagnostic_exit_fails(self):
         self.assertEqual(run("cppcheck", self.root, self.build, self.tool(2), self.report), 1)
         self.assertIn("Exit code: 2", self.report.read_text())
@@ -439,6 +676,7 @@ class RequiredAnalysisTests(unittest.TestCase):
     def test_cppcheck_unprojected_preprocessor_forms_fail_closed(self):
         for flags in (['-imacros', 'macros.h'], ['-imacrosmacros.h'],
                       ['-include-pch', 'cache.pch'],
+                      ['-include-pth', 'cache.pth'],
                       ['-Xpreprocessor', '-include', '-Xpreprocessor', 'forced.h'],
                       ['-Wp,-include,forced.h']):
             with self.subTest(flags=flags):

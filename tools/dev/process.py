@@ -1,5 +1,6 @@
 """Bounded subprocess execution with retained attempt-level evidence."""
 
+import contextlib
 import hashlib
 import json
 import os
@@ -258,7 +259,8 @@ def _write_json(path, record):
         temporary.unlink(missing_ok=True)
 
 
-def run(command, *, cwd, env, log=None, timeout=None, stage="command"):
+def run(command, *, cwd, env, log=None, timeout=None, stage="command",
+        input=None, cancel_event=None):
     """Execute with cancellation deferred until cleanup and receipts finish."""
     state = {"withdrawing": False}
     previous = {}
@@ -275,13 +277,15 @@ def run(command, *, cwd, env, log=None, timeout=None, stage="command"):
             signal.signal(signum, cancel)
     try:
         return _run(command, cwd=cwd, env=env, log=log, timeout=timeout,
-                    stage=stage, state=state)
+                    stage=stage, state=state, input=input,
+                    cancel_event=cancel_event)
     finally:
         for signum, handler in previous.items():
             signal.signal(signum, handler)
 
 
-def _run(command, *, cwd, env, log, timeout, stage, state):
+def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
+         cancel_event=None):
     """Return actual results and preserve every failure across later retries.
 
     A timeout returns 124 after process-tree withdrawal; cancellation returns
@@ -291,6 +295,8 @@ def _run(command, *, cwd, env, log, timeout, stage, state):
     command = [os.fspath(item) for item in command]
     if not command or any("\0" in item for item in command):
         raise ValueError("Execution requires a nonempty valid argument vector")
+    if input is not None and not isinstance(input, bytes):
+        raise ValueError("Execution input must be bytes")
     env = execution_environment(env)
     timeout = command_timeout(env) if timeout is None else float(timeout)
     if not 0 < timeout < float("inf"):
@@ -309,6 +315,9 @@ def _run(command, *, cwd, env, log, timeout, stage, state):
         attempt = attempt_root / (str(time.time_ns()) + "-" + uuid.uuid4().hex)
         attempt.mkdir(parents=True, exist_ok=False)
     stdout_path, stderr_path = attempt / "stdout.txt", attempt / "stderr.txt"
+    stdin_path = attempt / "stdin.bin" if input is not None else None
+    if stdin_path is not None:
+        stdin_path.write_bytes(input)
     started_ns, started = time.time_ns(), time.monotonic()
     outcome, returncode, process = "completed", 127, None
     withdrawn = []
@@ -319,6 +328,8 @@ def _run(command, *, cwd, env, log, timeout, stage, state):
         "exit_code": None, "timeout_seconds": timeout,
         "stdout_path": str(stdout_path), "stderr_path": str(stderr_path),
     }
+    if stdin_path is not None:
+        started_record["stdin"] = _identity(stdin_path)
     # A parent deadline can kill this runner. Retain a truthful started receipt
     # before launching its child; an interrupted attempt cannot look completed.
     _write_json(attempt / "receipt.json", started_record)
@@ -327,13 +338,32 @@ def _run(command, *, cwd, env, log, timeout, stage, state):
         if receipt_view.is_symlink():
             raise ValueError("Execution receipt cannot overwrite a symlink")
         _write_json(receipt_view, started_record)
-    with stdout_path.open("wb") as stdout, stderr_path.open("wb") as stderr:
+    with stdout_path.open("wb") as stdout, stderr_path.open("wb") as stderr, \
+            (stdin_path.open("rb") if stdin_path is not None else
+             contextlib.nullcontext(None)) as stdin:
         try:
+            if cancel_event is not None and cancel_event.is_set():
+                raise KeyboardInterrupt
             settings = ({"start_new_session": True} if os.name == "posix" else
                         {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP})
             process = subprocess.Popen(command, cwd=cwd, env=env,
-                                       stdout=stdout, stderr=stderr, **settings)
-            returncode = process.wait(timeout=timeout)
+                                       stdin=stdin, stdout=stdout,
+                                       stderr=stderr, **settings)
+            if cancel_event is None:
+                returncode = process.wait(timeout=timeout)
+            else:
+                deadline = time.monotonic() + timeout
+                while True:
+                    if cancel_event.is_set():
+                        raise KeyboardInterrupt
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        raise subprocess.TimeoutExpired(command, timeout)
+                    try:
+                        returncode = process.wait(timeout=min(0.05, remaining))
+                        break
+                    except subprocess.TimeoutExpired:
+                        continue
         except subprocess.TimeoutExpired:
             outcome, returncode = "timed_out", 124
             state["withdrawing"] = True
@@ -364,6 +394,8 @@ def _run(command, *, cwd, env, log, timeout, stage, state):
         "build_parallelism": int(env["CMAKE_BUILD_PARALLEL_LEVEL"]),
         "stdout": _identity(stdout_path), "stderr": _identity(stderr_path),
     }
+    if stdin_path is not None:
+        record["stdin"] = _identity(stdin_path)
     _write_json(attempt / "receipt.json", record)
     out = stdout_path.read_text(errors="replace")
     err = stderr_path.read_text(errors="replace")

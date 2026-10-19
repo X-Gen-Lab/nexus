@@ -11,13 +11,17 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 SUITES = {"testing": "tools/testing", "configure": "tools/configure",
           "ci": "scripts/ci", "workflows": ".github/workflows"}
+# Ordinary commits retain the four existing complete domains above. Full CI
+# additionally owns relocated SDK/build contracts and the kernel-source overlay.
+CI_SUITES = {**SUITES, "contracts": "tests/contracts",
+             "freertos": "os/freertos"}
 
 
 def execute(suite):
     """Return actual runner counts; loading or skipping tests is not a pass."""
-    if suite not in SUITES:
+    if suite not in CI_SUITES:
         raise ValueError("Unknown maintained tool scope")
-    return execute_directory(ROOT / SUITES[suite], suite)
+    return execute_directory(ROOT / CI_SUITES[suite], suite)
 
 
 def execute_directory(directory, suite):
@@ -41,7 +45,7 @@ def execute_directory(directory, suite):
 
 def main(arguments=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", choices=tuple(SUITES), required=True)
+    parser.add_argument("--suite", choices=tuple(CI_SUITES), required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(arguments)
     args.report.unlink(missing_ok=True)

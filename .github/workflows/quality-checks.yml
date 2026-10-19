@@ -89,10 +89,10 @@ jobs:
       - name: Test analyzer execution policy
         run: .venv/bin/python -m unittest discover -s scripts/ci -p 'test_quality_tools.py' -v
       - name: Run required clang analyzer
-        run: .venv/bin/python scripts/ci/quality_tools.py tidy --build-dir build/native-debug --tool clang-tidy-14 --report build/quality/clang-tidy.txt
+        run: .venv/bin/python scripts/ci/quality_tools.py tidy --build-dir build/native-debug --tool clang-tidy-14 --parallel 2 --report build/quality/clang-tidy.txt
       - name: Run required cppcheck
         if: '!cancelled()'
-        run: .venv/bin/python scripts/ci/quality_tools.py cppcheck --build-dir build/native-debug --tool cppcheck --report build/quality/cppcheck.txt
+        run: .venv/bin/python scripts/ci/quality_tools.py cppcheck --build-dir build/native-debug --tool cppcheck --parallel 2 --report build/quality/cppcheck.txt
       - name: Bind the upload to observed execution identity
         if: always()
         uses: ./.github/actions/record-identity

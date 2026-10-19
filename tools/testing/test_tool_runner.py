@@ -41,6 +41,59 @@ class ToolRunnerTests(unittest.TestCase):
             self.assertEqual(result["executed"], 1)
             self.assertEqual(Path(discover.call_args.args[0]), ROOT / directory)
 
+    def test_ci_only_domains_discover_their_complete_maintained_directories(self):
+        for scope, directory in (("contracts", "tests/contracts"),
+                                 ("freertos", "os/freertos")):
+            tests = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
+            with patch("unittest.TestLoader.discover", return_value=tests) as discover, \
+                    redirect_stderr(io.StringIO()):
+                result = execute(scope)
+            self.assertEqual(result["executed"], 1)
+            self.assertEqual(Path(discover.call_args.args[0]), ROOT / directory)
+            self.assertNotIn(scope, run_tool_tests.SUITES)
+
+    def test_ci_only_domain_uses_real_cli_and_fresh_nonzero_report(self):
+        with tempfile.TemporaryDirectory(prefix="tool domain ") as name:
+            root = Path(name)
+            tests = root / "os/freertos"
+            tests.mkdir(parents=True)
+            (tests / "test_fixture.py").write_text(
+                "import unittest\n"
+                "class Domain(unittest.TestCase):\n"
+                "    def test_complete(self):\n"
+                "        self.assertEqual(2 + 2, 4)\n")
+            runner = root / "tools/testing/run_tool_tests.py"
+            runner.parent.mkdir(parents=True)
+            shutil.copyfile(ROOT / "tools/testing/run_tool_tests.py", runner)
+            report = root / "execution.json"
+            report.write_text('{"stale": true}\n')
+            command = [sys.executable, "-B", str(runner), "--suite",
+                       "freertos", "--report", str(report)]
+            completed = subprocess.run(command, capture_output=True,
+                                       text=True, timeout=30, check=False)
+            self.assertEqual(completed.returncode, 0,
+                             completed.stdout + completed.stderr)
+            self.assertEqual(json.loads(report.read_text()), {
+                "suite": "freertos", "discovered": 1, "executed": 1,
+                "skipped": 0, "failures": 0, "errors": 0,
+                "expected_failures": 0, "unexpected_successes": 0,
+                "status": "passed"})
+
+    def test_ci_only_domain_skip_cannot_reuse_a_previous_success(self):
+        def skipped():
+            raise unittest.SkipTest("fixture")
+
+        tests = unittest.TestSuite([unittest.FunctionTestCase(skipped)])
+        with tempfile.TemporaryDirectory() as name:
+            report = Path(name) / "execution.json"
+            report.write_text('{"status": "passed"}\n')
+            with patch("unittest.TestLoader.discover", return_value=tests), \
+                    redirect_stderr(io.StringIO()):
+                result = run_tool_tests.main([
+                    "--suite", "contracts", "--report", str(report)])
+            self.assertEqual(result, 1)
+            self.assertFalse(report.exists())
+
     def test_actual_execution_reports_nonzero_count(self):
         fixture = unittest.TestSuite([unittest.FunctionTestCase(lambda: None)])
         record = self.run_fixture(fixture)

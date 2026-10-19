@@ -40,7 +40,8 @@ jobs:
       - name: Execute tamper, budget, HIL and relocated SDK boundaries
         run: |
           mkdir -p build/quality
-          .venv/bin/python -m unittest discover -s tests/contracts -p 'test_*.py' -v             2>&1 | tee build/quality/tool-contracts.log
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite contracts --report build/quality/tools-contracts.json 2>&1 | tee build/quality/tool-contracts.log
+          .venv/bin/python -B tools/testing/run_tool_tests.py --suite freertos --report build/quality/tools-freertos.json
         env:
           NEXUS_ARM_GCC: arm-none-eabi-gcc
       - name: Execute commit and analyzer orchestration boundaries
@@ -62,6 +63,8 @@ jobs:
           require-dependencies: 'true'
           artifacts: |
             build/quality/tool-contracts.log
+            build/quality/tools-contracts.json
+            build/quality/tools-freertos.json
             build/quality/tools-configure.json
             build/quality/tools-testing.json
             build/quality/tools-ci.json
@@ -77,6 +80,8 @@ jobs:
           name: tool-contracts
           path: |
             build/quality/tool-contracts.log
+            build/quality/tools-contracts.json
+            build/quality/tools-freertos.json
             build/quality/tools-configure.json
             build/quality/tools-testing.json
             build/quality/tools-ci.json

@@ -238,6 +238,67 @@ class PresetResolutionTests(unittest.TestCase):
             else:
                 self.assertEqual(selected["environment"]["CONFIG_ENV"], "overridden")
 class ProcessExecutionTests(unittest.TestCase):
+    def test_binary_stdin_is_observed_and_retained(self):
+        from tools.dev.process import run
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            supplied = b"compiler input\x00\xff\n"
+            result = run([sys.executable, "-c",
+                          "import sys; sys.stdout.buffer.write(sys.stdin.buffer.read())"],
+                         cwd=root, env={}, log=root / "stdin.txt", timeout=5,
+                         input=supplied)
+            self.assertEqual(result.returncode, 0)
+            record = json.loads((root / "stdin.command.json").read_text())
+            self.assertEqual(Path(record["stdin"]["path"]).read_bytes(), supplied)
+            self.assertEqual(record["stdin"]["bytes"], len(supplied))
+            self.assertEqual(Path(record["stdout"]["path"]).read_bytes(), supplied)
+
+    def test_shared_cancellation_withdraws_thread_owned_descendants(self):
+        import concurrent.futures
+        import threading
+        from tools.dev.process import run
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            event = threading.Event()
+            ready = root / "ready"
+            child = "import time; time.sleep(30)"
+            code = ("import pathlib,subprocess,sys,time; "
+                    f"subprocess.Popen([sys.executable,'-c',{child!r}]); "
+                    f"pathlib.Path({str(ready)!r}).write_text('ready'); "
+                    "time.sleep(30)")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(run, [sys.executable, "-c", code],
+                                     cwd=root, env={}, log=root / "cancel.txt",
+                                     timeout=20, cancel_event=event)
+                deadline = time.monotonic() + 5
+                while not ready.exists() and not future.done() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                self.assertTrue(ready.exists())
+                event.set()
+                self.assertEqual(future.result(timeout=5).returncode, 130)
+            record = json.loads((root / "cancel.command.json").read_text())
+            self.assertEqual(record["outcome"], "cancelled")
+            self.assertTrue(record["withdrawal_complete"])
+            if Path("/proc/self/stat").is_file():
+                self.assertGreaterEqual(len(record["withdrawn_processes"]), 2)
+
+    def test_preexisting_cancellation_never_launches_child(self):
+        import threading
+        from tools.dev.process import run
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            event = threading.Event()
+            event.set()
+            marker = root / "launched"
+            result = run([sys.executable, "-c",
+                          f"from pathlib import Path; Path({str(marker)!r}).touch()"],
+                         cwd=root, env={}, log=root / "pre-cancel.txt", timeout=5,
+                         cancel_event=event)
+            self.assertEqual(result.returncode, 130)
+            self.assertFalse(marker.exists())
+            record = json.loads((root / "pre-cancel.command.json").read_text())
+            self.assertIsNone(record["child_returncode"])
+
     def test_environment_parallelism_is_bounded_and_explicit(self):
         from tools.dev.process import execution_environment
         self.assertEqual(execution_environment({})[
