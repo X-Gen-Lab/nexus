@@ -220,6 +220,36 @@ known NVIC/system window. Wrapping spans and invalid output alignment reject
 before writes. The caller still supplies live, accessible, correctly typed
 storage and observes its lifetime obligations.
 
+## Run finite concurrent acquisition
+
+The external `nexus-examples` application `apps/uart_fifo_acquisition` uses the
+public UART face to receive while a finite TX request remains borrowed. Its
+caller-owned capture, service timestamps and request storage have fixed bounds.
+Only acquire-observed SETTLED permits the next payload and sequence. Closing the
+traffic window requests cancellation and continues drain; an expired drain or
+broken clock retains storage. Platform cleanup starts only from cold or actually
+closed traffic, retries BUSY/IO within an explicit attempt budget and never uses
+a clock after Platform withdrawal. Cleanup exhaustion is not a successful join.
+
+The optional platform-owned fixture at
+`tests/contracts/uart_fifo_acquisition` links that external application against
+the two exact FIFO references. It produces reference and instrumented images;
+private provider includes remain inside the fixture. The instrumented image
+wraps the selected IRQ dependency with one raw cycle probe. A station may supply
+separately reviewed, bounded dispatch markers; no pin or marker is selected by
+default. The ordinary reference excludes the wrapper and probe. Linked proof
+must read the actual vector and follow its strong stub through the wrapper to
+exactly one real provider dispatch with the selected state argument.
+
+`tools/hil/uart_fifo.py` retains device/wire captures and declared conversion
+parameters. It rejects inconsistent sessions, counts, lengths and source
+identities. Four-column IRQ CSV yields only unverified candidate intervals,
+without `samples.irq_latency`: an independent assertion source, dispatch
+association, complete capture window and calibration still require review and
+the existing SOC-55 admission. Raw DWT spans and wrapper duration cannot supply
+unobserved IRQ arrival latency. No parser, model or link check establishes
+physical execution.
+
 ## Assess cost and evidence separately
 
 Only the selected owner adds a const-profile link to the ordinary UART prefix;

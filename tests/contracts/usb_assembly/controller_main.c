@@ -6,10 +6,12 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/components/usb_acm.h"
 #include "nexus/components/usb_control.h"
 #include "nexus/components/usb_descriptors.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
+static nx_usb_acm_t s_nx_acm;
 static nx_usb_control_t s_nx_control;
 static nx_usb_control_request_t s_nx_reply;
 static nx_usb_request_t s_nx_request;
@@ -26,8 +28,10 @@ int main(void) {
         nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN);
     const nx_usb_device_profile_t* profile =
         nx_factory_usb_profile(NX_USB_DEVICE_ID_FS);
+    const nx_usb_acm_state_t initial = {{115200U, 0U, 0U, 8U}, 0U, 0U};
     if (nx_usb_profile_validate(profile) != NX_SUCCESS ||
-        nx_usb_control_initialize(&s_nx_control, profile) != NX_SUCCESS) {
+        nx_usb_control_initialize(&s_nx_control, profile) != NX_SUCCESS ||
+        nx_usb_acm_initialize(&s_nx_acm, profile, 0U, &initial) != NX_SUCCESS) {
         return (int)NX_ERROR_INVALID;
     }
     /* Structural fixture bytes are external to the common adapter. */
@@ -53,8 +57,24 @@ int main(void) {
         (void)nx_usb_control_cancel(&s_nx_control, &s_nx_reply, state.epoch);
         (void)nx_usb_control_step(&s_nx_control);
     }
+    nx_usb_control_snapshot_t control = {0};
+    if (nx_usb_control_snapshot(&s_nx_control, &control) == NX_SUCCESS &&
+        !control.outer_active) {
+        /* Link coverage only; the class dispatcher and policy stay external. */
+        (void)nx_usb_acm_begin(&s_nx_acm, state.epoch, deadline);
+        (void)nx_usb_acm_step(&s_nx_acm);
+        nx_usb_acm_pending_t pending = {0};
+        if (nx_usb_acm_pending(&s_nx_acm, &pending) == NX_SUCCESS) {
+            (void)nx_usb_acm_approve(&s_nx_acm, pending.epoch, false);
+        }
+        (void)nx_usb_acm_cancel(&s_nx_acm, state.epoch);
+        (void)nx_usb_acm_step(&s_nx_acm);
+    }
     nx_result_t stopped = nx_platform_stop();
     /* Global stop remains the explicit owner decision, never adapter policy. */
     (void)nx_usb_control_step(&s_nx_control);
+    (void)nx_usb_acm_step(&s_nx_acm);
+    nx_usb_acm_snapshot_t snapshot = {0};
+    (void)nx_usb_acm_snapshot(&s_nx_acm, &snapshot);
     return (int)stopped;
 }

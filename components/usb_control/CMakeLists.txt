@@ -11,3 +11,11 @@ target_include_directories(nexus_usb_control PUBLIC
 target_link_libraries(nexus_usb_control PUBLIC Nexus::IO
     PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
 add_library(Nexus::USBControl ALIAS nexus_usb_control)
+
+# Explicit optional ACM control intent; unreferenced archive retains no instance.
+add_library(nexus_usb_acm STATIC src/usb_acm.c)
+target_include_directories(nexus_usb_acm PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(nexus_usb_acm PUBLIC Nexus::USBControl
+    PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+add_library(Nexus::USBACM ALIAS nexus_usb_acm)

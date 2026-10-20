@@ -251,6 +251,17 @@ This page makes no measured cost, stack high-water, throughput or WCET claim.
 
 Synthetic checker fixtures establish only their checker behavior. Host register
 models do not measure the real branch predictor, bus contention or IRQ latency.
+The production transaction now returns through one noinline RAM function,
+`nx_stm32h743_flash_ram_return`, which preserves the captured VTOR and outcome
+in its call arguments. Both-bank drain, remaining guard effects, target LOCK
+and original-vector readback retain their original order. The normal ELF audit
+requires every returning transaction path to pass that boundary, with no later
+callee or explicit store. A finite constant analysis also rejects recoverable
+physical-Flash data reads, including literal-loaded pointers and call results.
+These are bounded defect checks. Differing constants at control-flow joins
+become unknown. Unknown pointer operands, the return gate's own MMIO/protection
+protocol and the correctness of its VTOR argument remain unproved; a passing
+report does not establish the complete production closure.
 If the checker cannot prove part of the production control flow, the missing
 proof remains an open exit. The [IO-01–42 ledger](io-evolution-execution.csv)
 remains the implementation-status authority; actual execution counts and source

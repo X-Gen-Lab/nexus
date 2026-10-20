@@ -88,6 +88,87 @@ class H743FlashRamPulse : public testing::Test {
         }));
     }
 };
+TEST_F(H743FlashRamPulse, ReturnGateUsesTheCapturedVectorAndPreservesResult) {
+    const uint32_t original = cpu.original_vtor;
+    execution.saved_vtor = original + 1024U;
+    g_h743_model.flash.CR1 = 0U;
+    EXPECT_CALL(hardware, Trigger(testing::_, testing::_, testing::_)).Times(0);
+    EXPECT_EQ(NX_ERROR_TIMEOUT, nx_stm32h743_flash_ram_return(
+                                    &execution, original, NX_ERROR_TIMEOUT));
+    EXPECT_EQ(original, g_h743_model.core->VTOR);
+    EXPECT_EQ(static_cast<uint32_t>(FLASH_CR_PSIZE_1 | FLASH_CR_LOCK),
+              g_h743_model.flash.CR1);
+    EXPECT_EQ(1U, cpu.vtor_writes);
+    EXPECT_EQ(0U, g_h743_model.flash_store_count);
+    EXPECT_TRUE(execution.active);
+    EXPECT_TRUE(port.active);
+    EXPECT_TRUE(PrivateStack());
+    EXPECT_EQ(1U, cpu.primask);
+}
+TEST_F(H743FlashRamPulse, ReturnGateRejectsTheOtherBanksPendingWrite) {
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        g_h743_model.flash.SR2 = FLASH_SR_WBNE;
+        EXPECT_CALL(hardware, Terminal(NX_H743_FLASH_RAM_FAULT_DRAIN))
+            .WillOnce([&] {
+                nexus_test::RecordTerminalObservation(
+                    execution.active && port.active && PrivateStack() &&
+                    cpu.primask == 1U && cpu.vtor_writes == 0U &&
+                    g_h743_model.core->VTOR == ram_vector_address &&
+                    (g_h743_model.flash.SR2 & FLASH_SR_WBNE) != 0U);
+            });
+        (void)nx_stm32h743_flash_ram_return(&execution, cpu.original_vtor,
+                                            NX_ERROR_IO);
+    }));
+}
+TEST_F(H743FlashRamPulse, ReturnGateRetainsProtectionBeforeVectorWithdrawal) {
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        execution.guard.remaining_effects = NX_H743_FLASH_MPU_EFFECT_CONTROL;
+        EXPECT_CALL(hardware, Terminal(NX_H743_FLASH_RAM_FAULT_EXCEPTION))
+            .WillOnce([&] {
+                nexus_test::RecordTerminalObservation(
+                    execution.active && port.active && PrivateStack() &&
+                    cpu.primask == 1U && cpu.vtor_writes == 0U &&
+                    g_h743_model.core->VTOR == ram_vector_address &&
+                    execution.guard.remaining_effects ==
+                        NX_H743_FLASH_MPU_EFFECT_CONTROL);
+            });
+        (void)nx_stm32h743_flash_ram_return(&execution, cpu.original_vtor,
+                                            NX_ERROR_IO);
+    }));
+}
+TEST_F(H743FlashRamPulse, ReturnGateRefusedLockKeepsTheRamVector) {
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        g_h743_model.flash.CR1 = 0U;
+        cpu.reject_lock = true;
+        EXPECT_CALL(hardware, Terminal(NX_H743_FLASH_RAM_FAULT_LOCK))
+            .WillOnce([&] {
+                nexus_test::RecordTerminalObservation(
+                    execution.active && port.active && PrivateStack() &&
+                    cpu.primask == 1U && cpu.vtor_writes == 0U &&
+                    g_h743_model.core->VTOR == ram_vector_address &&
+                    (g_h743_model.flash.CR1 & FLASH_CR_LOCK) == 0U);
+            });
+        (void)nx_stm32h743_flash_ram_return(&execution, cpu.original_vtor,
+                                            NX_ERROR_IO);
+    }));
+}
+TEST_F(H743FlashRamPulse, ReturnGateRefusedVectorReadbackRetainsTheOwner) {
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+        cpu.refuse_vtor_restore = true;
+        EXPECT_CALL(hardware, Terminal(NX_H743_FLASH_RAM_FAULT_EXCEPTION))
+            .WillOnce([&] {
+                nexus_test::RecordTerminalObservation(
+                    execution.active && port.active && PrivateStack() &&
+                    cpu.primask == 1U && cpu.vtor_writes == 1U &&
+                    cpu.refused_writes == 1U &&
+                    g_h743_model.core->VTOR == ram_vector_address &&
+                    g_h743_model.flash.CR1 ==
+                        (FLASH_CR_PSIZE_1 | FLASH_CR_LOCK));
+            });
+        (void)nx_stm32h743_flash_ram_return(&execution, cpu.original_vtor,
+                                            NX_ERROR_IO);
+    }));
+}
 TEST_F(H743FlashRamPulse, AllEightStoresUseTheMaskedRamVectorAndStack) {
     EXPECT_CALL(hardware, Trigger(true, true, true)).Times(8);
     ASSERT_EQ(NX_SUCCESS, nx_stm32h743_flash_ram_pulse(&execution));
@@ -967,12 +1048,16 @@ TEST_F(H743FlashRamOwner, CustomOriginalNmiOrHardfaultIsNotSilentlyReplaced) {
 TEST_F(H743FlashRamOwner, RefusedPrivateVtorPublicationNeverTriggersFlash) {
     ASSERT_NO_FATAL_FAILURE(Prepare());
     cpu.refuse_vtor_publish = true;
+    g_h743_model.flash.CR1 = FLASH_CR_PSIZE_1;
     std::array<uint8_t, 32U> input{};
     input.fill(0x5aU);
     EXPECT_EQ(NX_ERROR_IO, nx_flash_port_program(&face, 131072U, input.data(),
                                                  input.size(), 10000U));
     EXPECT_GT(cpu.refused_writes, 0U);
     EXPECT_EQ(0U, g_h743_model.flash_store_count);
+    EXPECT_EQ(static_cast<uint32_t>(FLASH_CR_PSIZE_1 | FLASH_CR_LOCK),
+              g_h743_model.flash.CR1);
+    EXPECT_EQ(0U, execution.guard.remaining_effects);
     EXPECT_EQ(cpu.original_vtor, g_h743_model.core->VTOR);
     EXPECT_EQ(0U, cpu.primask);
     EXPECT_FALSE(execution.active);

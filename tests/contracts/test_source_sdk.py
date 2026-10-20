@@ -35,8 +35,10 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "components/usb_control/CMakeLists.txt",
             "components/usb_control/include/nexus/components/usb_control.h",
             "components/usb_control/include/nexus/components/usb_descriptors.h",
+            "components/usb_control/include/nexus/components/usb_acm.h",
             "components/usb_control/src/usb_control.c",
             "components/usb_control/src/usb_descriptors.c",
+            "components/usb_control/src/usb_acm.c",
             "io/include/nexus/io/usb_profile.h",
             "io/src/usb_profile.c",
             "tools/configure/usb_profiles.py",
@@ -178,15 +180,22 @@ class SourceSDKSelectionTests(unittest.TestCase):
 
     def test_consumer_plan_is_required_even_after_a_rehashed_omission(self):
         import hashlib
-        required = "tools/release/transport.py"
-        self.assertIn(required, source_sdk.REQUIRED_FILES)
+        required = (
+            "tools/release/transport.py",
+            "components/usb_control/include/nexus/components/usb_acm.h",
+            "components/usb_control/src/usb_acm.c",
+        )
+        self.assertIn(required[0], source_sdk.REQUIRED_FILES)
         with tempfile.TemporaryDirectory(prefix="SDK required plan ") as value:
             root = Path(value) / "prefix/share/nexus/src"
             root.mkdir(parents=True)
             # Filesystem/manifest admission only, not a usable SDK or build.
             payload = b"required-source fixture\n"
             files = {}
-            for name in source_sdk.REQUIRED_FILES:
+            # Explicit names keep new omissions executable against the old
+            # production list; deriving the fixture only from REQUIRED_FILES
+            # would otherwise never create a newly missing source.
+            for name in sorted(set(source_sdk.REQUIRED_FILES) | set(required)):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(payload)
@@ -215,12 +224,20 @@ class SourceSDKSelectionTests(unittest.TestCase):
             with self.assertRaisesRegex(source_sdk.SDKError,
                                         "dependency commit identities"):
                 source_sdk.verify(root)
-            (root / required).unlink()
-            del files[required]
-            write_identity()
-            with self.assertRaisesRegex(source_sdk.SDKError,
-                                        "missing required sources/licenses"):
-                source_sdk.verify(root)
+            for name in required:
+                with self.subTest(name=name):
+                    original = files.pop(name)
+                    (root / name).unlink()
+                    try:
+                        write_identity()
+                        with self.assertRaisesRegex(
+                                source_sdk.SDKError,
+                                "missing required sources/licenses"):
+                            source_sdk.verify(root)
+                    finally:
+                        (root / name).write_bytes(payload)
+                        files[name] = original
+                        write_identity()
 
     def test_portable_io_verification_inputs_and_public_smokes_are_required(self):
         directory = "cmake/package/verification/io_evolution/"
@@ -1360,6 +1377,8 @@ class SourceSDKTests(unittest.TestCase):
         old_identity = identity.read_bytes()
         for name in ("arch/CMakeLists.txt", "os/wait.c",
                      "components/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
+                     "components/usb_control/include/nexus/components/usb_acm.h",
+                     "components/usb_control/src/usb_acm.c",
                      "tools/measurement/resources.py", "tools/evidence/common.py",
                      "cmake/platform/TargetPolicy.cmake",
                      "tools/configure/bundle.py", "tools/configure/dependencies.py",

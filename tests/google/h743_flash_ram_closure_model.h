@@ -33,6 +33,9 @@ nx_result_t
 nx_stm32h743_flash_ram_stop(nx_stm32h743_flash_ram_workspace_t* execution);
 nx_result_t nx_stm32h743_flash_ram_transaction(
     nx_stm32h743_flash_ram_workspace_t* execution);
+nx_result_t
+nx_stm32h743_flash_ram_return(nx_stm32h743_flash_ram_workspace_t* execution,
+                              uint32_t original, nx_result_t result);
 void nx_stm32h743_flash_ram_nmi(void);
 void nx_stm32h743_flash_ram_hardfault(void);
 nx_stm32h743_flash_ram_workspace_t* nx_h743_flash_ram_closure_current(void);
