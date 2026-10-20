@@ -372,3 +372,9 @@ __nx_flash_ram_workspace_end:
 .section .data.fixture,"aw",%progbits
 .global initialized_data
 initialized_data: .word 0x2468ace0
+
+#ifdef EXTERNAL_CPU_BRIDGE
+function nx_stm32h743_flash_ram_terminal, .nx_flash_ram.terminal
+1: b 1b
+endfunction nx_stm32h743_flash_ram_terminal
+#endif

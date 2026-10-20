@@ -58,3 +58,9 @@ belong to their original source and are not inherited here.
 `retention-package.json` retains the actual failed R2 complete-index tool run and the public-component ABI audit correction. The unchanged parser now discovers convention-owned component headers as exact inputs; unknown layouts/providers, mutable tables and wrong linked methods still reject. Six new cases produced real RED before the minimal change; all 108 relevant cases then passed without skips. Production U575 sources and earlier ARM ELF identities are unchanged. R2 did not reach GoogleTest execution and is not acceptance.
 
 `configuration-package.json` retains the R3 failed configuration domain and its exact repairs: the explicit copy reference catalogue, type-exact default SRAM1 plus unselected SRAM4 CI inventory, and the disposable hook fixture's real status-module dependency. Actual targeted RED/GREEN, default-environment failure and pinned retry are preserved. Complete primary configure 922, CI 485 and workflows 117 passed without skips. This is a pre-commit development phase; the ordinary whole-index gate reruns independently. Source before/final copies are referenced by hash and Git location instead of duplicated in the archive.
+
+`final-gate-package.json` preserves actual ordinary commit R4 for clean successor
+`be919138` / tree `b83e4079`:6178 Google cases across344 executables and2832
+tool cases passed, with fresh execution receipts and zero skips. It also binds
+the passed124-page EN/ZH development site. Earlier failed attempts are not reused
+as acceptance, and these counts do not qualify subsequent source increments.

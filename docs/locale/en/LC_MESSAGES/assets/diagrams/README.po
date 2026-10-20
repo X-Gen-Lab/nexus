@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 253aba32390fa7c2ac73931c840f03e61cbb7dd9fba23e8c8a98278957aecf3d\n"
+"X-Nexus-Source-SHA256: 76d50a15d082d2b547ea2ec1a8016d3884e4b992582d4c494d99b9c6979b0640\n"
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:1
 msgid "Nexus 平台图册"
@@ -1018,65 +1018,6 @@ msgstr ""
 msgid "FIG-17 H743 Flash RAM 边界目标设计"
 msgstr "FIG-17 Target H743 Flash RAM boundary design"
 
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:224
-msgid ""
-"**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／Cache off；源已集成，生产 ELF 闭包 "
-"与完整软件退出尚未完成，实板 HIL 未执行。**"
-msgstr ""
-"**Identity: target. Scope: selected STM32H743ZIT6 V/cache-off only; source "
-"is integrated, production-ELF closure and complete software exits remain "
-"open, and physical HIL is not executed.**"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:227
-msgid ""
-"![FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU "
-"bridge、RAM VTOR 与 MPU guard 的完整退出尚未完成](h743-flash-ram-architecture.svg)"
-msgstr ""
-"![FIG-17 target: cold factory, explicit preparation and direct calls are "
-"separate; complete exits for the CPU bridge, RAM VTOR and MPU guard within "
-"one private Flash owner remain open](h743-flash-ram-architecture.svg)"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:227
-msgid ""
-"FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU bridge、RAM "
-"VTOR 与 MPU guard 的完整退出尚未完成"
-msgstr ""
-"FIG-17 target: cold factory, explicit preparation and direct calls are "
-"separate; complete exits for the CPU bridge, RAM VTOR and MPU guard within "
-"one private Flash owner remain open"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:229
-msgid ""
-"构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；运行边分别表达查找、调用、 复制结果与真实 MMIO 观测。factory "
-"仅返回既有 face。忙区间内全部执行、输入、 向量、栈及诊断必须留在已准入 RAM；guard 只约束 CPU。虚线所示其他 bus master "
-"撤回／join 由外部维护调用者负责，不表示平台创建 worker 或已停止硬件。"
-msgstr ""
-"Build edges show one TOML and immutable IR selecting lifecycle and face "
-"objects; runtime edges separately label lookup, calls, copied results and "
-"actual MMIO observations. The factory returns existing faces only. All "
-"execution, input, vectors, stack and diagnostics during the busy interval "
-"must remain in admitted RAM; the guard constrains CPU accesses only. The "
-"dashed withdrawal/join precondition for other bus masters belongs to the "
-"external maintenance caller. It creates no platform worker and does not "
-"prove hardware has stopped."
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:234
-msgid ""
-"目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、 [既有 H743 provider "
-"范围](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32h743/README.md)、 {download}`IO-24 原始退出条件 <../../design/io-"
-"evolution-execution.csv>`。 {download}`可编辑 DOT <h743-flash-ram-"
-"architecture.dot>`。新增图的渲染、语义独立审查、双语 输出检查、实际浏览器与软件／实板资格须分别记录，不能从草稿存在推断。"
-msgstr ""
-"Target basis: [RAM maintenance target contract](../../design/h743-flash-"
-"ram.md), [existing H743 provider scope](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md), and "
-"{download}`IO-24 original exit condition <../../design/io-evolution-"
-"execution.csv>`. {download}`Editable DOT <h743-flash-ram-architecture.dot>`."
-" Rendering, independent semantic review, bilingual output checks, actual "
-"browser review and software/hardware qualification for the new figures "
-"require separate records; none can be inferred from the draft."
-
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:240
 msgid "FIG-18 RAM 维护结清目标设计"
 msgstr "FIG-18 Target RAM maintenance settlement design"
@@ -1089,61 +1030,6 @@ msgstr ""
 "**Identity: target. Scope: selected V/cache-off synchronous physical pulse; "
 "these are protocol stages, not a new public request enum or a bounded "
 "return-time proof.**"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:245
-msgid ""
-"![FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy"
-" 无返回边](h743-flash-ram-lifecycle.svg)"
-msgstr ""
-"![FIG-18 target: deadline expiry retains protection and real drain; return "
-"requires both-bank idle, LOCK and exact restoration proofs; permanent busy "
-"has no return edge](h743-flash-ram-lifecycle.svg)"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:245
-msgid ""
-"FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy "
-"无返回边"
-msgstr ""
-"FIG-18 target: deadline expiry retains protection and real drain; return "
-"requires both-bank idle, LOCK and exact restoration proofs; permanent busy "
-"has no return edge"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:247
-msgid ""
-"每条边表示有条件的控制流。触发前已有临时效果的拒绝必须先证明回退；触发后 TIMEOUT 只锁存结果，不撤销脉冲，也不返回 Flash "
-"handler。双 Bank 真实空闲后， 仍须证明 LOCK、TIM2 时间域／epoch 及精确 MPU／VTOR 恢复；CPU bridge "
-"的精确恢复由实际 ARM 指令流另行证明。永久 busy 持续留在 RAM 排空环；无法证明恢复则留在不返回 RAM fail-"
-"stop，不暗示自动复位或喂狗。 所有返回的 RAM 路径，包括触发前 VTOR 发布拒绝和 guard／deadline 拒绝，都必须 "
-"先通过共同返回门：双 Bank 空闲、guard 无保留效果、完整保存的目标控制值与 LOCK 已读回证明；必要时先锁定空闲目标，再恢复 VTOR。"
-msgstr ""
-"Each edge is guarded control flow. Pre-trigger rejection after temporary "
-"effects must first prove rollback. After trigger TIMEOUT latches a result "
-"only; it neither cancels the pulse nor returns to a Flash handler. Actual "
-"both-bank idle still requires LOCK, the TIM2 domain/epoch and exact MPU/VTOR"
-" restoration proofs; exact CPU-bridge restoration is proved separately "
-"against actual ARM instructions. Permanent busy remains in the RAM drain "
-"loop; unproved restoration remains in nonreturning RAM fail-stop, without "
-"implying automatic reset or watchdog service. Every returning RAM path, "
-"including pre-trigger VTOR-publication refusal and guard/deadline refusal, "
-"must first pass the common return gate: both banks idle, no retained guard "
-"effects and readback proof of the complete saved target-control value with "
-"LOCK. Lock the idle target first if necessary, then restore VTOR."
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:255
-msgid ""
-"目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、 [Arch "
-"合同](../../design/arch-contracts.md)、 "
-"[当前软件与物理资格边界](../../delivery/qualification.md)。 {download}`可编辑 DOT "
-"<h743-flash-ram-lifecycle.dot>`。图中返回条件仍需实际 生产 ELF、真实 provider 测试与物理 station "
-"分别建立证据。"
-msgstr ""
-"Target basis: [RAM maintenance target contract](../../design/h743-flash-"
-"ram.md), [Arch contract](../../design/arch-contracts.md), and [current "
-"software and physical qualification "
-"boundaries](../../delivery/qualification.md). {download}`Editable DOT "
-"<h743-flash-ram-lifecycle.dot>`. The return conditions still require "
-"separate actual production-ELF, real provider-test and physical-station "
-"evidence."
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:261
 msgid "补充视图"
@@ -1397,3 +1283,154 @@ msgstr ""
 "controller owner. This diagram does not expand the USB protocol phases; "
 "see the [USB FS device contract](../../design/usb-device.md) for the "
 "exact boundaries."
+
+
+#: assets/diagrams/README.md
+msgid "![FIG-17 target：单一固定 workspace owner；汇编入口保护捕获值，C RAM 阶段与独立汇编返回门分工明确](h743-flash-ram-architecture.svg)"
+msgstr "![FIG-17 target: one owner with a fixed workspace; assembly entry protects captures; the C RAM phase and independent assembly return gate have distinct responsibilities](h743-flash-ram-architecture.svg)"
+
+#: assets/diagrams/README.md
+msgid "![FIG-18 target：所有返回的 C RAM 路径汇入独立汇编门；超时保留责任，永久 busy 或无法证明恢复均无返回](h743-flash-ram-lifecycle.svg)"
+msgstr "![FIG-18 target: every returning C RAM path converges on the independent assembly gate; timeout retains responsibility; permanent busy or unproved restoration cannot return](h743-flash-ram-lifecycle.svg)"
+
+#: assets/diagrams/README.md
+msgid "**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／三个 Cache-off 配置； 选定的显式操作数及汇编协议证明已实现，IO-24 原始完整退出与候选资格仍开放，实板 HIL 未执行。**"
+msgstr "**Identity: target. Scope: selected STM32H743ZIT6 V / three Cache-off profiles only; selected explicit-operand and assembly protocol proofs are implemented. The original complete IO-24 exit and candidate qualification remain open; physical HIL is not executed.**"
+
+#: assets/diagrams/README.md
+msgid "FIG-17 target：单一固定 workspace owner；汇编入口保护捕获值，C RAM 阶段与独立汇编返回门分工明确"
+msgstr "FIG-17 target: one owner with a fixed workspace; assembly entry protects captures; the C RAM phase and independent assembly return gate have distinct responsibilities"
+
+#: assets/diagrams/README.md
+msgid "FIG-18 target：所有返回的 C RAM 路径汇入独立汇编门；超时保留责任，永久 busy 或无法证明恢复均无返回"
+msgstr "FIG-18 target: every returning C RAM path converges on the independent assembly gate; timeout retains responsibility; permanent busy or unproved restoration cannot return"
+
+#: assets/diagrams/README.md
+msgid "构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；factory 仅返回既有不可变 face， 显式 Platform start／stop 负责准备及保留失败清理。普通 provider 验证固定物理绑定； 单一生成 workspace 保存命令、诊断与 selector 效果账本。汇编入口保存调用者 CPU 状态， 在 r8-r11 中独立保护 MPU 捕获值，然后以私有 MSP 调用 C RAM 阶段。C 阶段发布私有 VTOR， 安装 guard，发出最多一次脉冲，真实排空并恢复 MPU；独立汇编返回门核对硬件与受保护捕获值， 恢复链接器确定的 VTOR 并证明读回后，汇编桥才恢复调用者 CPU 状态。guard 只约束 CPU； 其他 bus master 的撤回／join、调用者栈预留及恢复策略仍由外部调用者按合同保证。"
+msgstr "Build edges show one TOML and immutable IR selecting lifecycle and face objects. The factory returns an existing immutable face; explicit Platform start/stop prepares bytes and retains failed cleanup. Ordinary provider admission validates the fixed physical binding. One generated workspace holds the command, diagnostics and selector-effect ledger. Assembly entry saves caller CPU state and independently protects MPU captures in r8-r11 before calling the C RAM phase on private MSP. The C phase publishes private VTOR, installs the guard, issues at most one pulse, actually drains both banks and restores MPU. The independent assembly return gate checks hardware against protected captures, restores linker-known VTOR and proves readback; only then does the assembly bridge restore caller CPU state. The guard constrains the CPU only. The external caller must still satisfy the contract for other bus-master withdrawal/join, caller-stack reserve and recovery policy."
+
+#: assets/diagrams/README.md
+msgid "每条边表示有条件的控制流。汇编入口、C 阶段及汇编返回门共用一份内嵌 selector 效果账本： 写 RNR 前登记，精确恢复并读回后清除；独立 MPU 捕获值保存在 r8-r11，C 阶段不得改写。 触发前已有临时效果的拒绝必须先证明回退；触发后 TIMEOUT 只锁存结果，不撤销脉冲，也不返回 Flash handler。C 阶段在有效 TIM2 epoch 下真实排空双 Bank，证明 LOCK 并恢复 MPU，仍保留 私有 VTOR 与私有 MSP。所有返回的 C 路径都必须经过独立汇编门：读回双 Bank 空闲、 零保留效果、精确保存的目标控制值与 LOCK，并对照受保护捕获值证明 MPU；随后恢复 链接器确定的 g_pfnVectors，执行屏障并证明 VTOR 读回。只有此后汇编桥才恢复 CPU 并返回。 永久 busy 持续留在 RAM 排空环；捕获、清理或返回条件无法证明则进入不返回 RAM 终止路径， 不暗示自动复位或喂狗。"
+msgstr "Each edge is guarded control flow. Assembly entry, the C phase and the assembly return gate share one embedded selector-effect ledger: record before an RNR write; clear only after exact restoration and readback. Independent MPU captures stay in r8-r11, which the C phase must not modify. Pre-trigger rejection after temporary effects must first prove rollback. After trigger, TIMEOUT latches a result; it neither cancels the pulse nor returns to a Flash handler. The C phase actually drains both banks under a valid TIM2 epoch, proves LOCK and restores MPU while retaining private VTOR and private MSP. Every returning C path must pass the independent assembly gate: read back both-bank idle, zero retained effects and the exact saved target-control value with LOCK; prove MPU against protected captures; then restore linker-known g_pfnVectors, execute barriers and prove VTOR readback. Only then does the assembly bridge restore CPU state and return. Permanent busy stays in the RAM drain loop. Unproved capture, cleanup or return conditions enter the nonreturning RAM terminal, without implying automatic reset or watchdog service."
+
+#: assets/diagrams/README.md
+msgid "目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、 [Arch 合同](../../design/arch-contracts.md)、 [当前软件与物理资格边界](../../delivery/qualification.md)。 {download}`可编辑 DOT <h743-flash-ram-lifecycle.dot>`。选定显式操作数及汇编协议的软件证明 受合同中的编译器、调用者与所有权前提约束；IO-24 原始完整退出、候选资格及物理 station 证据仍开放。"
+msgstr "Target basis: [RAM maintenance target contract](../../design/h743-flash-ram.md), [Arch contract](../../design/arch-contracts.md), and [current software and physical qualification boundaries](../../delivery/qualification.md). {download}`Editable DOT <h743-flash-ram-lifecycle.dot>`. The software proof of selected explicit operands and assembly protocol depends on the contract's compiler, caller and ownership preconditions. The original complete IO-24 exit, candidate qualification and physical-station evidence remain open."
+
+#: assets/diagrams/README.md
+msgid "目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、 [既有 H743 provider 范围](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md)、 {download}`IO-24 原始退出条件 <../../design/io-evolution-execution.csv>`。 {download}`可编辑 DOT <h743-flash-ram-architecture.dot>`。图的渲染、独立语义审查与双语输出检查 只建立各自范围的文档证据；软件候选与实板资格仍分别判断。"
+msgstr "Target basis: [RAM maintenance target contract](../../design/h743-flash-ram.md), [existing H743 provider scope](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md), and {download}`Original IO-24 exit conditions <../../design/io-evolution-execution.csv>`. {download}`Editable DOT <h743-flash-ram-architecture.dot>`. Rendering, independent semantic review and bilingual-output checks establish documentation evidence within their respective scopes. Software-candidate and physical qualification remain separate judgments."
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:224
+#~ msgid ""
+#~ "**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／Cache off；源已集成，生产 ELF 闭包 "
+#~ "与完整软件退出尚未完成，实板 HIL 未执行。**"
+#~ msgstr ""
+#~ "**Identity: target. Scope: selected STM32H743ZIT6 V/cache-off only; source "
+#~ "is integrated, production-ELF closure and complete software exits remain "
+#~ "open, and physical HIL is not executed.**"
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:227
+#~ msgid ""
+#~ "![FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU "
+#~ "bridge、RAM VTOR 与 MPU guard 的完整退出尚未完成](h743-flash-ram-architecture.svg)"
+#~ msgstr ""
+#~ "![FIG-17 target: cold factory, explicit preparation and direct calls are "
+#~ "separate; complete exits for the CPU bridge, RAM VTOR and MPU guard within "
+#~ "one private Flash owner remain open](h743-flash-ram-architecture.svg)"
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:227
+#~ msgid ""
+#~ "FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU bridge、RAM "
+#~ "VTOR 与 MPU guard 的完整退出尚未完成"
+#~ msgstr ""
+#~ "FIG-17 target: cold factory, explicit preparation and direct calls are "
+#~ "separate; complete exits for the CPU bridge, RAM VTOR and MPU guard within "
+#~ "one private Flash owner remain open"
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:229
+#~ msgid ""
+#~ "构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；运行边分别表达查找、调用、 复制结果与真实 MMIO 观测。factory "
+#~ "仅返回既有 face。忙区间内全部执行、输入、 向量、栈及诊断必须留在已准入 RAM；guard 只约束 CPU。虚线所示其他 bus master "
+#~ "撤回／join 由外部维护调用者负责，不表示平台创建 worker 或已停止硬件。"
+#~ msgstr ""
+#~ "Build edges show one TOML and immutable IR selecting lifecycle and face "
+#~ "objects; runtime edges separately label lookup, calls, copied results and "
+#~ "actual MMIO observations. The factory returns existing faces only. All "
+#~ "execution, input, vectors, stack and diagnostics during the busy interval "
+#~ "must remain in admitted RAM; the guard constrains CPU accesses only. The "
+#~ "dashed withdrawal/join precondition for other bus masters belongs to the "
+#~ "external maintenance caller. It creates no platform worker and does not "
+#~ "prove hardware has stopped."
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:234
+#~ msgid ""
+#~ "目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、 [既有 H743 provider "
+#~ "范围](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+#~ "SOURCE/soc/stm32h743/README.md)、 {download}`IO-24 原始退出条件 <../../design/io-"
+#~ "evolution-execution.csv>`。 {download}`可编辑 DOT <h743-flash-ram-"
+#~ "architecture.dot>`。新增图的渲染、语义独立审查、双语 输出检查、实际浏览器与软件／实板资格须分别记录，不能从草稿存在推断。"
+#~ msgstr ""
+#~ "Target basis: [RAM maintenance target contract](../../design/h743-flash-"
+#~ "ram.md), [existing H743 provider scope](https://github.com/X-Gen-"
+#~ "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md), and "
+#~ "{download}`IO-24 original exit condition <../../design/io-evolution-"
+#~ "execution.csv>`. {download}`Editable DOT <h743-flash-ram-architecture.dot>`."
+#~ " Rendering, independent semantic review, bilingual output checks, actual "
+#~ "browser review and software/hardware qualification for the new figures "
+#~ "require separate records; none can be inferred from the draft."
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:245
+#~ msgid ""
+#~ "![FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy"
+#~ " 无返回边](h743-flash-ram-lifecycle.svg)"
+#~ msgstr ""
+#~ "![FIG-18 target: deadline expiry retains protection and real drain; return "
+#~ "requires both-bank idle, LOCK and exact restoration proofs; permanent busy "
+#~ "has no return edge](h743-flash-ram-lifecycle.svg)"
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:245
+#~ msgid ""
+#~ "FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy "
+#~ "无返回边"
+#~ msgstr ""
+#~ "FIG-18 target: deadline expiry retains protection and real drain; return "
+#~ "requires both-bank idle, LOCK and exact restoration proofs; permanent busy "
+#~ "has no return edge"
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:247
+#~ msgid ""
+#~ "每条边表示有条件的控制流。触发前已有临时效果的拒绝必须先证明回退；触发后 TIMEOUT 只锁存结果，不撤销脉冲，也不返回 Flash "
+#~ "handler。双 Bank 真实空闲后， 仍须证明 LOCK、TIM2 时间域／epoch 及精确 MPU／VTOR 恢复；CPU bridge "
+#~ "的精确恢复由实际 ARM 指令流另行证明。永久 busy 持续留在 RAM 排空环；无法证明恢复则留在不返回 RAM fail-"
+#~ "stop，不暗示自动复位或喂狗。 所有返回的 RAM 路径，包括触发前 VTOR 发布拒绝和 guard／deadline 拒绝，都必须 "
+#~ "先通过共同返回门：双 Bank 空闲、guard 无保留效果、完整保存的目标控制值与 LOCK 已读回证明；必要时先锁定空闲目标，再恢复 VTOR。"
+#~ msgstr ""
+#~ "Each edge is guarded control flow. Pre-trigger rejection after temporary "
+#~ "effects must first prove rollback. After trigger TIMEOUT latches a result "
+#~ "only; it neither cancels the pulse nor returns to a Flash handler. Actual "
+#~ "both-bank idle still requires LOCK, the TIM2 domain/epoch and exact MPU/VTOR"
+#~ " restoration proofs; exact CPU-bridge restoration is proved separately "
+#~ "against actual ARM instructions. Permanent busy remains in the RAM drain "
+#~ "loop; unproved restoration remains in nonreturning RAM fail-stop, without "
+#~ "implying automatic reset or watchdog service. Every returning RAM path, "
+#~ "including pre-trigger VTOR-publication refusal and guard/deadline refusal, "
+#~ "must first pass the common return gate: both banks idle, no retained guard "
+#~ "effects and readback proof of the complete saved target-control value with "
+#~ "LOCK. Lock the idle target first if necessary, then restore VTOR."
+
+#~ #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/assets/diagrams/README.md:255
+#~ msgid ""
+#~ "目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、 [Arch "
+#~ "合同](../../design/arch-contracts.md)、 "
+#~ "[当前软件与物理资格边界](../../delivery/qualification.md)。 {download}`可编辑 DOT "
+#~ "<h743-flash-ram-lifecycle.dot>`。图中返回条件仍需实际 生产 ELF、真实 provider 测试与物理 station "
+#~ "分别建立证据。"
+#~ msgstr ""
+#~ "Target basis: [RAM maintenance target contract](../../design/h743-flash-"
+#~ "ram.md), [Arch contract](../../design/arch-contracts.md), and [current "
+#~ "software and physical qualification "
+#~ "boundaries](../../delivery/qualification.md). {download}`Editable DOT "
+#~ "<h743-flash-ram-lifecycle.dot>`. The return conditions still require "
+#~ "separate actual production-ELF, real provider-test and physical-station "
+#~ "evidence."

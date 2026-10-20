@@ -1,64 +1,57 @@
-// FIG-18 target IO-24 protocol; stages are not a public request enum.
-// Scope: selected STM32H743ZIT6 V / Cache off only; no physical execution.
-// Every visible edge is guarded control flow, not ownership release by timeout.
-// Only the final proved restoration path returns to ordinary Flash code.
+// FIG-18: actual selected C / assembly protocol; not a public request enum.
+// All returning C paths converge on the independent assembly gate.
+// Protected r8-r11 survive C; a single embedded ledger tracks selector effects.
+// Original complete IO-24 exit / candidate qualification open; physical HIL not executed.
 digraph h743FlashRamLifecycle {
-    graph [label="FIG-18 RAM 维护结清目标设计\\ndeadline 到期仍保留保护；永久 busy 不返回",
-           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
-           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.5,
-           newrank=true];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=11, margin="0.16,0.10"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=9, arrowsize=0.8];
-    admission [label="普通 provider 准入\\n校验输入、deadline、布局与实际上下文"];
-    reject [label="返回拒绝\\n无保留临时效果，未触发物理脉冲",
-            fillcolor="#f8fafc"];
-    bridge [label="进入仅负责 CPU 的 RAM bridge\\n保存 MSP / PSP / CONTROL / PRIMASK"];
-    vectors [label="RAM 事务发布私有 VTOR\\n安装 MPU guard 前证明读回"];
-    scan [label="在 RAM 扫描全部 16 个 RASR.EN\\n保存 selector 与选定描述符／CTRL"];
-    guard [label="安装并证明 Code 域 MPU guard\\nXN 与 Strongly-ordered、AP001；CTRL7；DSB / ISB"];
-    rollback [label="触发前：证明双 Bank 空闲\\n恢复全部已取得 MPU／selector 效果"];
-    trigger [label="仅触发已校验物理脉冲\\n编程 store 或擦除 START"];
-    drain [label="保持 RAM 执行，保留 guard 与工作区\\n观测双 Bank BSY / QW / WBNE 与有效 TIM2 epoch"];
-    expiry [label="触发后锁存 TIMEOUT\\n不取消、不清 busy、不返回"];
-    lock [label="双 Bank 实际空闲\\n证明目标 LOCK 与所需屏障"];
-    restoreMpu [label="精确恢复／读回 MPU 状态\\n仅限 Flash 实际空闲时"];
-    returnGate [label="共同 RAM 返回门：每条返回路径\\n双 Bank 空闲、效果为零、精确 (保存控制值 | LOCK) 已证明"];
-    restoreVectors [label="RAM 事务恢复原 VTOR\\n仍在私有 MSP 下证明精确读回"];
-    restoreCpu [label="CPU bridge 精确恢复调用者状态\\nMSP / PSP / CONTROL / PRIMASK"];
-    result [label="向普通代码返回已结清结果\\nIO 优先；否则锁存的 TIMEOUT；否则 SUCCESS",
-            fillcolor="#f8fafc"];
-    failstop [label="不返回的 RAM fail-stop\\n保留未证明责任；无隐藏复位／喂狗",
-              style="rounded,bold,filled", fillcolor="#fff7ed"];
+    graph [label="FIG-18 RAM 维护结清目标设计\n选定 V 修订／Cache off；超时保留责任", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.40, ranksep=0.50, newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=9, arrowsize=0.8];
+    admission [label="普通 provider 准入\n验证固定绑定、输入、截止时间、布局及上下文"];
+    reject [label="返回拒绝结果\n无保留的临时效果或物理触发", fillcolor="#f8fafc"];
+    bridge [label="汇编入口：保存调用者 CPU 状态\n私有 MSP；r8-r11 保存 MPU CTRL／RNR／RBAR／RASR"];
+    vectors [label="C RAM 阶段发布私有 VTOR\n安装 MPU guard 前证明读回"];
+    scan [label="C RAM 阶段：扫描全部 16 个 RASR.EN\n保存选定 guard 状态；跟踪每次 selector 效果"];
+    guard [label="安装并证明 Code 域 MPU guard\nXN ＋ Strongly-ordered ＋ AP001；CTRL7；DSB／ISB"];
+    rollback [label="触发前：证明双 Bank 空闲\n恢复并读回每项已取得的 MPU／selector 效果"];
+    trigger [label="最多发出一次已验证的物理脉冲\n八次暂存字读取／写入，或擦除 START"];
+    drain [label="C RAM 阶段保留 guard 与 workspace\n在有效 TIM2 epoch 下轮询双 Bank BSY／QW／WBNE"];
+    expiry [label="触发后锁存 TIMEOUT\n不取消、不清 busy、不返回"];
+    lock [label="双 Bank 实际空闲\n证明目标 LOCK 及所需屏障"];
+    restoreMpu [label="C RAM 阶段恢复并读回 MPU\n仍保留私有 VTOR 与私有 MSP"];
+    returnGate [label="独立汇编门：所有返回的 C 路径\n读回双 Bank 空闲、零效果、精确 saved CR | LOCK\n对照 r8-r11 保护的捕获值证明 MPU"];
+    restoreVectors [label="汇编门恢复链接器确定的 g_pfnVectors\nDSB／ISB；证明 VTOR 精确读回"];
+    restoreCpu [label="汇编桥恢复调用者精确状态\nMSP／PSP／CONTROL／PRIMASK 及被调用者保存寄存器"];
+    result [label="向普通代码返回已结清结果\nIO 优先；其次锁存的 TIMEOUT；否则 SUCCESS", fillcolor="#f8fafc"];
+    ledger [label="selector 账本：入口、C 阶段及汇编门\n写 RNR 前登记；精确恢复并读回后清除", shape=note, fillcolor="#f8fafc"];
+    failstop [label="不返回的 RAM 终止路径\n保留无法证明的责任；无隐式复位／喂狗", style="rounded,bold,filled", fillcolor="#fff7ed"];
     admission -> reject [label="无效；未取得效果"];
     admission -> bridge [label="已准入并暂存命令"];
-    bridge -> vectors [label="私有 MSP 已建立"];
-    vectors -> scan [label="私有向量值已读回"];
-    vectors -> returnGate [label="触发前发布被拒绝"];
-    scan -> guard [label="支持的禁用 MPU；无已启用外来 region"];
-    scan -> rollback [label="触发前取得 selector 效果后拒绝"];
-    guard -> trigger [label="安装与读回已证明"];
-    guard -> rollback [label="安装被拒绝或最后发起前 deadline 到期"];
-    rollback -> returnGate [label="回退与空闲已证明；结果为拒绝"];
-    rollback -> failstop [label="无法证明回退或空闲"];
-    trigger -> drain [label="脉冲可能活动；锁存硬件错误"];
-    drain -> drain [label="任一 busy 位仍存在；包括永久 busy"];
-    drain -> expiry [label="绝对 deadline 到期"];
-    expiry -> drain [label="锁存结果并继续真实轮询"];
+    bridge -> vectors [label="捕获／selector 恢复已证明"];
+    bridge -> failstop [label="捕获或 selector 恢复拒绝"];
+    vectors -> scan [label="已读回私有 VTOR"];
+    vectors -> returnGate [label="触发前发布拒绝"];
+    scan -> guard [label="支持的禁用 MPU；无启用的外部 region"];
+    scan -> rollback [label="取得 selector 效果后触发前拒绝"];
+    guard -> trigger [label="guard 及发出前最终截止时间已证明"];
+    guard -> rollback [label="guard／截止时间拒绝"];
+    rollback -> returnGate [label="回退及空闲已证明；拒绝结果"];
+    rollback -> failstop [label="回退或空闲无法证明"];
+    trigger -> drain [label="脉冲可能活跃；锁存错误"];
+    drain -> drain [label="任一 busy 位仍置位；包括永久 busy"];
+    drain -> expiry [label="绝对截止时间到期"];
+    expiry -> drain [label="继续真实轮询"];
     drain -> failstop [label="epoch 丢失／耗尽或无法证明"];
-    drain -> lock [label="全部实际 busy 位已撤销"];
-    lock -> restoreMpu [label="LOCK 与有效时间域观测已证明"];
-    lock -> failstop [label="无法证明 LOCK"];
-    restoreMpu -> returnGate [label="精确撤回 guard 已证明"];
-    restoreMpu -> failstop [label="无法证明恢复"];
-    returnGate -> restoreVectors [label="全部返回条件已读回；必要时锁定空闲目标"];
-    returnGate -> failstop [label="存在 busy／保留效果，或无法证明完整目标 LOCK"];
-    restoreVectors -> restoreCpu [label="原 VTOR 已精确读回"];
-    restoreVectors -> failstop [label="无法证明 VTOR 恢复"];
-    restoreCpu -> result [label="脉冲后恢复已证明"];
-    restoreCpu -> reject [label="触发前回退与恢复已证明"];
-    // failstop has deliberately no outgoing edge. A process-test watchdog
-    // may observe nonreturn, but it cannot manufacture hardware settlement.
+    drain -> lock [label="全部实际 busy 位已撤回"];
+    lock -> restoreMpu [label="LOCK 及时间观测已证明"];
+    lock -> failstop [label="LOCK 无法证明"];
+    restoreMpu -> returnGate [label="guard 精确撤回已证明"];
+    restoreMpu -> failstop [label="恢复无法证明"];
+    returnGate -> restoreVectors [label="独立硬件检查已证明"];
+    returnGate -> failstop [label="任一返回条件无法证明"];
+    restoreVectors -> restoreCpu [label="已精确读回固定 VTOR"];
+    restoreVectors -> failstop [label="VTOR 恢复无法证明"];
+    restoreCpu -> result [label="触发后的结清已证明"];
+    restoreCpu -> reject [label="触发前回退／恢复已证明"];
+    ledger -> scan [label="单一内嵌账本，无第二 owner", style=dotted, arrowhead=none];
+    // failstop deliberately has no outgoing edge; no timeout releases ownership.
 }

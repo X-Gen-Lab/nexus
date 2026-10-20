@@ -11,6 +11,7 @@ typedef unsigned int word_t;
 unsigned char g_nx_stm32h743_flash_ram_workspace[1800]
     __attribute__((section(".bss.workspace"), aligned(1024)));
 volatile word_t diagnostic;
+const word_t g_pfnVectors[166] = {0};
 void Reset_Handler(void) {
     for (;;) {
     }
@@ -313,3 +314,10 @@ RAM void UnusedRamEntry(void) {
 #endif
 __asm__(".section .outside,\"a\",%progbits\n"
         ".balign 4\n.global outside_literal\noutside_literal: .word 0\n");
+
+/* Only the CPU/MMIO boundary symbol; this fixture never executes a device. */
+RAM __attribute__((noreturn)) void
+nx_stm32h743_flash_ram_terminal(void* workspace, word_t reason) {
+    (void)workspace;
+    RamTerminal(reason);
+}

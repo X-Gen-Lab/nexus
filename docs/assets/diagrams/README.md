@@ -231,42 +231,47 @@ preposted producer和普通producer不得混用。旧块在两个hardware target
 
 ## FIG-17 H743 Flash RAM 边界目标设计
 
-**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／Cache off；源已集成，生产 ELF 闭包
-与完整软件退出尚未完成，实板 HIL 未执行。**
+**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／三个 Cache-off 配置；
+选定的显式操作数及汇编协议证明已实现，IO-24 原始完整退出与候选资格仍开放，实板 HIL 未执行。**
 
-![FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU bridge、RAM VTOR 与 MPU guard 的完整退出尚未完成](h743-flash-ram-architecture.svg)
+![FIG-17 target：单一固定 workspace owner；汇编入口保护捕获值，C RAM 阶段与独立汇编返回门分工明确](h743-flash-ram-architecture.svg)
 
-构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；运行边分别表达查找、调用、
-复制结果与真实 MMIO 观测。factory 仅返回既有 face。忙区间内全部执行、输入、
-向量、栈及诊断必须留在已准入 RAM；guard 只约束 CPU。虚线所示其他 bus master
-撤回／join 由外部维护调用者负责，不表示平台创建 worker 或已停止硬件。
+构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；factory 仅返回既有不可变 face，
+显式 Platform start／stop 负责准备及保留失败清理。普通 provider 验证固定物理绑定；
+单一生成 workspace 保存命令、诊断与 selector 效果账本。汇编入口保存调用者 CPU 状态，
+在 r8-r11 中独立保护 MPU 捕获值，然后以私有 MSP 调用 C RAM 阶段。C 阶段发布私有 VTOR，
+安装 guard，发出最多一次脉冲，真实排空并恢复 MPU；独立汇编返回门核对硬件与受保护捕获值，
+恢复链接器确定的 VTOR 并证明读回后，汇编桥才恢复调用者 CPU 状态。guard 只约束 CPU；
+其他 bus master 的撤回／join、调用者栈预留及恢复策略仍由外部调用者按合同保证。
 
 目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
 [既有 H743 provider 范围](../../../soc/stm32h743/README.md)、
 [IO-24 原始退出条件](../../design/io-evolution-execution.csv)。
-[可编辑 DOT](h743-flash-ram-architecture.dot)。新增图的渲染、语义独立审查、双语
-输出检查、实际浏览器与软件／实板资格须分别记录，不能从草稿存在推断。
+[可编辑 DOT](h743-flash-ram-architecture.dot)。图的渲染、独立语义审查与双语输出检查
+只建立各自范围的文档证据；软件候选与实板资格仍分别判断。
 
 ## FIG-18 RAM 维护结清目标设计
 
 **身份：target。范围：选定 V 修订／Cache off 的同步物理脉冲；这是协议阶段，
 不新增公共 request enum，不证明有界返回时间。**
 
-![FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy 无返回边](h743-flash-ram-lifecycle.svg)
+![FIG-18 target：所有返回的 C RAM 路径汇入独立汇编门；超时保留责任，永久 busy 或无法证明恢复均无返回](h743-flash-ram-lifecycle.svg)
 
-每条边表示有条件的控制流。触发前已有临时效果的拒绝必须先证明回退；触发后
-TIMEOUT 只锁存结果，不撤销脉冲，也不返回 Flash handler。双 Bank 真实空闲后，
-仍须证明 LOCK、TIM2 时间域／epoch 及精确 MPU／VTOR 恢复；CPU bridge 的精确恢复由实际 ARM 指令流另行证明。永久 busy 持续留在
-RAM 排空环；无法证明恢复则留在不返回 RAM fail-stop，不暗示自动复位或喂狗。
-所有返回的 RAM 路径，包括触发前 VTOR 发布拒绝和 guard／deadline 拒绝，都必须
-先通过共同返回门：双 Bank 空闲、guard 无保留效果、完整保存的目标控制值与 LOCK
-已读回证明；必要时先锁定空闲目标，再恢复 VTOR。
+每条边表示有条件的控制流。汇编入口、C 阶段及汇编返回门共用一份内嵌 selector 效果账本：
+写 RNR 前登记，精确恢复并读回后清除；独立 MPU 捕获值保存在 r8-r11，C 阶段不得改写。
+触发前已有临时效果的拒绝必须先证明回退；触发后 TIMEOUT 只锁存结果，不撤销脉冲，也不返回
+Flash handler。C 阶段在有效 TIM2 epoch 下真实排空双 Bank，证明 LOCK 并恢复 MPU，仍保留
+私有 VTOR 与私有 MSP。所有返回的 C 路径都必须经过独立汇编门：读回双 Bank 空闲、
+零保留效果、精确保存的目标控制值与 LOCK，并对照受保护捕获值证明 MPU；随后恢复
+链接器确定的 g_pfnVectors，执行屏障并证明 VTOR 读回。只有此后汇编桥才恢复 CPU 并返回。
+永久 busy 持续留在 RAM 排空环；捕获、清理或返回条件无法证明则进入不返回 RAM 终止路径，
+不暗示自动复位或喂狗。
 
 目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
 [Arch 合同](../../design/arch-contracts.md)、
 [当前软件与物理资格边界](../../delivery/qualification.md)。
-[可编辑 DOT](h743-flash-ram-lifecycle.dot)。图中返回条件仍需实际
-生产 ELF、真实 provider 测试与物理 station 分别建立证据。
+[可编辑 DOT](h743-flash-ram-lifecycle.dot)。选定显式操作数及汇编协议的软件证明
+受合同中的编译器、调用者与所有权前提约束；IO-24 原始完整退出、候选资格及物理 station 证据仍开放。
 
 ## 补充视图
 

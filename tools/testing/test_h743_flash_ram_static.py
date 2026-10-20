@@ -398,10 +398,14 @@ class H743RamConstantFlowTests(unittest.TestCase):
             (target, ["7346", "1a68", "7047"])])
         self.assertTrue(report["unresolved_read_sites"])
 
-    def test_post_index_writeback_does_not_leave_the_old_base_constant(self):
-        report = self.analyze([(0x24001000, [
-            "40f20003", "c0f60003", "43f8040b", "1a68", "7047"])])
-        self.assertTrue(report["unresolved_read_sites"])
+    def test_post_index_writeback_preserves_the_updated_flash_address(self):
+        # Start four bytes below Flash. STR post-index advances r3 into Flash;
+        # forgetting writeback, or retaining the old base, must not hide LDR.
+        with self.assertRaisesRegex(EvidenceError,
+                                    "constant-address Flash data read"):
+            self.analyze([(0x24001000, [
+                "40f20003", "c0f60003", "043b", "43f8040b", "1a68",
+                "7047"])])
 
 
 if __name__ == "__main__":

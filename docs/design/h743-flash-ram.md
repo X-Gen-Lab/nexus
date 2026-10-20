@@ -9,14 +9,13 @@ source_language: en
 
 # H743 Flash maintenance from a private RAM execution pod
 
-This page specifies the **target IO-24 design** for synchronous program and
-erase operations on the selected STM32H743ZIT6 V/cache-off software reference.
-It explains the private execution boundary, retained ownership and the proof
-required before returning to ordinary Flash code. This development batch has
-connected selected-only RAM code, a generated workspace, the CPU bridge and the
-MPU transaction to the ordinary provider. Actual production-ELF closure and the
-complete software exit remain open. The figures retain their **target** identity
-until their implementation and evidence exits are satisfied. Physical HIL is
+This page specifies the selected STM32H743ZIT6 V/cache-off RAM maintenance
+boundary for synchronous program and erase. The ordinary selected link requires
+explicit data-operand closure and a byte-checked assembly return gate before an
+image is admitted. These checks retain the caller, C/ABI and external-owner
+preconditions below. The figures keep their **target IO-24** identity until the
+original implementation and evidence exits are satisfied. This page does not
+establish a software candidate or physical qualification. Physical HIL is
 `not_executed`.
 
 The public Flash face still exposes physical geometry and synchronous operations.
@@ -61,6 +60,16 @@ The [public Flash contract](../../io/include/nexus/io/flash.h) requires one
 execution owner and no concurrent program/erase calls. The external caller owns
 that scheduling; an active-state check does not provide a hidden concurrent lock.
 
+The generated Platform owns exactly one existing private Flash workspace and
+its embedded MPU guard. Public consumers select Flash in the authored TOML,
+obtain the immutable face through `nx_factory_flash`, and use the ordinary
+Platform start/stop lifecycle for preparation and cleanup. They do not supply a
+workspace or include private SDK types. Cold construction rejects a foreign
+workspace before copying or publishing ownership; admission, external-buffer
+checks and cleanup retain the same fixed binding. The physical binding also
+requires the official FLASH, TIM2 and SCB identities and the unswapped physical
+Flash base. This adds no RAM storage, allocator or runtime registry.
+
 ## Prepare bytes and context before making Flash busy
 
 Cold preparation must validate the selected load/run ranges, copy the audited
@@ -84,14 +93,25 @@ The final call must re-observe actual privileged Thread context, masks, Cache
 state and floating-point state; successful cold preparation alone does not prove
 the later call context. Entry requires PRIMASK, BASEPRI and FAULTMASK to be zero;
 an IRQ call or live lazy FP context is inadmissible. The deadline must be finite
-in the current System TIM2 domain; `NX_DEADLINE_NEVER` is unsupported. The bridge
-must preserve distinct MSP and PSP, CONTROL including FPCA, and incoming PRIMASK.
-The assembly bridge changes only CPU stack/mask state: it establishes the private
-MSP and calls the RAM transaction. That transaction publishes and reads back RAM
-VTOR before the MPU guard can become active. After actual drain and protection
-restoration it restores and reads back VTOR; only then can the bridge restore
-the caller's exact CPU state. Every transitional NMI/HardFault path and exception
-frame must have a proved owner and sufficient actual stack reserve.
+in the existing System TIM2 domain; `NX_DEADLINE_NEVER` is unsupported. The bridge
+preserves distinct MSP and PSP, CONTROL including FPCA, and incoming PRIMASK.
+Before C runs, it captures incoming MPU CTRL, RNR and region15 RBAR/RASR in
+r8-r11, with selector ownership and verified rollback. Selected C instructions
+must not write those capture registers. The C transaction publishes and reads
+back RAM VTOR before guard installation. After C cleanup, the assembly gate
+checks hardware against the protected captures and restores the linker-known
+original vector; only then may the bridge restore the caller's exact CPU state.
+
+At bridge entry, the caller must own at least 260 readable/writable bytes below
+the incoming MSP and below the active Thread stack pointer: 36 bytes for saved
+registers plus a conservative 224 bytes for two nested extended exception frames
+and alignment. This reserve is additional to ordinary provider C frames. It
+covers transitions before private MSP/RAM VTOR take ownership and after they
+withdraw. The private-stack ELF bound separately includes its exception reserve;
+it does not prove an arbitrary incoming application stack extent. Original
+NMI/HardFault aliases must retain the admitted nonreturning default behavior.
+During the RAM window, both handlers name the fixed workspace directly and
+remain in the nonreturning RAM diagnostic path.
 
 The source/ELF closure must include actual instructions, veneers, literals,
 direct and indirect calls, handlers, terminal paths and compiler-generated
@@ -108,24 +128,28 @@ must contain the actual linked endpoints and cover every file-backed LOAD. These
 checks are part of the normal link, rather than only synthetic checker fixtures.
 Changing a guard byte in a real firmware ELF is rejected by the same audit.
 
-The audit also checks the actual CPU-bridge instructions, RAM direct control-flow
-and literal residency, and a conservative private-stack bound based on emitted
-compiler `.su` frame records and exception reserve. Its layout report separates
-copied bytes, workspace bytes and their combined static RAM extent; alignment
-outside those extents remains part of the ordinary image resource report. These
-checks retain explicit C/ABI preconditions; arbitrary C data-pointer access, MMIO
-effects and MPU/drain ordering still require provider models and source review.
-The stack-address analysis follows the actual register inputs and outputs of
-direct RAM calls, including fixed push/pop slots and stack-passed arguments.
-Register-offset SP loads fail closed because their runtime offsets do not
-identify a fixed stack slot.
-It rejects an explicit spill of a stack-derived pointer instead of forgetting
-its origin. This conservative boundary can reject otherwise valid C; it does
-not establish general pointer ownership or C memory safety. A mutation of a
-real production callee must be rejected when its returned stack address reaches
-a caller's store, even when the ELF layout and frame extents still match.
-They establish neither a complete formal execution-closure proof nor measured
-stack, timing or physical behavior.
+The audit decodes actual CPU-bridge, return-gate and programming-leaf bytes,
+RAM direct control flow and literal residency. Every selected explicit read and
+store must resolve to the exact owned workspace/System fields, an allowed MMIO
+register and width, a proved stack slot or an in-pod literal. Unknown operands
+are rejected. Staged commands, source words and saved command fields cannot be
+rewritten by RAM C code. The sole dynamic write base is isolated in the checked
+programming leaf: each invocation performs eight fixed staged-word reads and
+eight ascending 32-bit stores, with no read through the destination. A bounded
+call/CFG analysis permits at most one such invocation per transaction and rejects
+positive-count cycles.
+
+The conservative private-stack bound uses emitted compiler `.su` records and
+exception reserve. Register/stack/call joins preserve finite alternatives,
+including Unknown; exhausted alternative or operand-product bounds reject the
+image. Stack-address analysis follows actual direct-call inputs and outputs,
+fixed push/pop slots and stack-passed arguments. Register-offset SP loads and
+explicit spills of stack-derived pointers fail closed. The layout report
+separates copied bytes, workspace bytes and their combined static RAM extent;
+alignment outside those extents belongs to the ordinary resource report. These
+are selected byte/address and protocol checks under explicit compiler AAPCS,
+C object-lifetime and exclusive-ownership preconditions. They do not establish
+general C memory safety, measured stack use, timing or physical behavior.
 
 ## Protect the CPU from Code-domain speculation
 
@@ -161,12 +185,17 @@ stores and is therefore unsuitable for the unified program/erase path. AP001
 also permits explicit reads: the independently audited RAM graph must exclude
 them. This is not a blanket no-bus-access permission check.
 
-The owner saves the exact incoming CTRL, RNR and selected RBAR/RASR before their
-first possible effect. RBAR readback includes the selected region number; the
-base field must be checked according to the real register semantics. Disabled
-descriptor fields need not be zero and must survive restoration. Readback and
-DSB/ISB must prove region/control installation before any program store or erase
-START. The policy remains active in NMI/HardFault through HFNMIENA. No ordinary
+The owner saves the exact observed CTRL and RNR before the first selector
+write. After selecting region15 and observing that selection, it captures the
+corresponding RBAR/RASR before the first descriptor write. The bridge's independent r8-r11 captures prevent the
+final return gate from treating mutable guard state as its own integrity proof.
+RBAR readback includes the selected region number, so base comparisons mask the
+real register fields. Disabled descriptor fields need not be zero and must
+survive restoration. Readback and DSB/ISB prove guard installation before any
+program store or erase START. HFNMIENA retains that policy in NMI/HardFault.
+The final assembly gate independently checks restored CTRL, selected descriptor
+and selector against its captures. Every temporary selector effect is recorded
+before a write and cleared only after exact restore/readback. No ordinary
 Flash-resident Arch or vendor MPU helper may be called during this window.
 
 ## A deadline expires; a physical pulse does not cancel
@@ -177,13 +206,13 @@ FIG-18 shows protocol stages, not a new public request enum. Every arrow is a
 guarded control-flow transition. The returning path requires the following
 sequence; the terminal path has no edge back to ordinary code.
 
-1. Reject invalid input or a deadline already expired before trigger. If any
-   pre-trigger temporary selector/protection effect was acquired, prove rollback
-   while both banks are idle. Every returning RAM path, including rejected vector
-   publication and pre-trigger guard/deadline refusal, must pass the common RAM
-   return gate: both banks idle, zero retained guard effects and the exact saved
-   target control plus LOCK proved. Lock the idle target if necessary before
-   restoring VTOR; an unproved condition enters RAM fail-stop.
+1. Reject invalid input or a deadline already expired before trigger. Prove
+   rollback of every acquired pre-trigger selector/protection effect while both
+   banks are idle. Every C transaction return, including rejected vector
+   publication and guard/deadline refusal, reaches the assembly gate on private
+   MSP. It proves both banks idle, zero retained guard effects, the exact saved
+   target control plus LOCK, and restored MPU hardware before restoring VTOR.
+   An unproved condition enters RAM fail-stop.
 2. Stage a validated command and input, enter the RAM bridge, install RAM vectors
    and prove the MPU guard before starting the physical operation.
 3. Perform only the explicit validated program stores or erase START. Observe
@@ -192,22 +221,22 @@ sequence; the terminal path has no edge back to ordinary code.
    actual RAM polling. Do not clear busy bits, withdraw protection, release
    storage or jump to a Flash error handler to manufacture settlement.
 5. After both banks are actually idle, prove target LOCK, complete the required
-   barrier and restore/read back MPU state. The RAM transaction must pass the
-   same common return gate used for pre-trigger refusals, then restore/read back
-   VTOR before the CPU bridge restores the exact caller context and returns to
-   ordinary code.
+   barrier and restore/read back MPU state in C. The assembly return gate then
+   independently checks that hardware against the protected captures, restores
+   and reads back linker-known `g_pfnVectors`, and completes DSB/ISB. The bridge
+   may restore the exact caller context and return to ordinary code only after
+   this gate succeeds.
 6. Report the settled result. Hardware failure reports `IO`; otherwise a latched
    expiry reports `TIMEOUT`, and successful completion reports `SUCCESS`.
 
 Permanently busy hardware never reaches the returning path. It remains in the
 RAM drain path with protection and storage retained. Unprovable lock, protection,
 vector or time-domain state likewise takes a nonreturning RAM fail-stop path.
-The CPU-only bridge has no invented runtime readback or failure dispatcher:
-its exact restoration must be proved against the actual ARM instructions and
-admitted incoming context before software exit. A host watchdog may observe and
-terminate its isolated test process; that is not device drain or product
-recovery. This design promises no
-hidden reset, watchdog service, RTOS progress or bounded wall-time return.
+The bridge, its protected captures and the final hardware gate are checked from
+actual ARM bytes; a named C return function or a zero software ledger alone
+cannot authorize return. A host watchdog may observe and terminate its isolated
+test process; that is not device drain or product recovery. This design promises
+no hidden reset, watchdog service, RTOS progress or bounded wall-time return.
 
 The selected deadline uses the existing TIM2 domain and epoch. Any wrap extension
 must have an actual supported service/pulse bound; one pending UIF cannot count
@@ -251,26 +280,23 @@ This page makes no measured cost, stack high-water, throughput or WCET claim.
 
 Synthetic checker fixtures establish only their checker behavior. Host register
 models do not measure the real branch predictor, bus contention or IRQ latency.
-The production transaction now returns through one noinline RAM function,
-`nx_stm32h743_flash_ram_return`, which preserves the captured VTOR and outcome
-in its call arguments. Both-bank drain, remaining guard effects, target LOCK
-and original-vector readback retain their original order. The normal ELF audit
-requires every returning transaction path to pass that boundary, with no later
-callee or explicit store. A finite constant analysis also rejects recoverable
-physical-Flash data reads, including literal-loaded pointers and call results.
-These are bounded defect checks. Finite may-constant alternatives, including
-unknown values, are retained through control-flow, stack and call joins.
-Exceeding the finite alternative or operand-product bounds rejects the image.
-Unknown pointer operands, the return gate's own MMIO/protection
-protocol and the correctness of its VTOR argument remain unproved; a passing
-report does not establish the complete production closure.
-If the checker cannot prove part of the production control flow, the missing
-proof remains an open exit. The [IO-01–42 ledger](io-evolution-execution.csv)
-remains the implementation-status authority; actual execution counts and source
-identities belong in delivery evidence rather than this design contract.
+The physical RAM functions and exception entries name the existing generated
+workspace, existing System epoch and official MMIO identities directly. The
+assembly return gate consumes the C result and protected MPU captures; it checks
+drain, LOCK, restored protection and the fixed original vector before caller
+restoration. Byte-defined checks reject missing/reordered reads, comparisons,
+barriers or failure branches rather than trusting a function name or argument.
+
+A passing selected audit establishes its bounded explicit-operand and return
+protocol proof under the stated caller, compiler and ownership preconditions.
+It is not a general C interpreter, speculative-bus measurement or hardware
+qualification. Missing production proof remains an open exit. The
+[IO-01–42 ledger](io-evolution-execution.csv) remains the implementation-status
+authority; per-profile execution, source identities, SDK checks and remaining
+software-candidate obligations belong in delivery evidence.
 
 The implementation is split between [cold preparation and admission](../../soc/stm32h743/drivers/flash_ram_owner.c),
-the [CPU-only bridge](../../soc/stm32h743/drivers/flash_ram_enter.S),
+the [CPU bridge and assembly return gate](../../soc/stm32h743/drivers/flash_ram_enter.S),
 [RAM vector publication](../../soc/stm32h743/drivers/flash_ram_transaction.c),
 the [MPU transaction](../../soc/stm32h743/drivers/flash_mpu.c) and
 [physical pulse/time observations](../../soc/stm32h743/drivers/flash_ram.c).

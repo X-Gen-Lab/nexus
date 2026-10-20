@@ -24,12 +24,14 @@ typedef enum {
 } nx_stm32h743_flash_mpu_fault_t;
 /**
  * \brief Private sidecar, not a public authored safe-execution assertion.
- * \note Save the exact observed values before the first possible effect.
+ * \note Save CTRL and RNR before the first selector write. After selecting
+ *       region15 and reading it back, save RBAR/RASR before descriptor writes.
  *       remaining_effects is cleared only after matching hardware readback.
  *       This type has no default instance, registry, callback or heap owner.
- *       The selected workspace embeds one exact guard subobject. An internal
- *       disjoint sidecar is also admitted after whole-span alias validation.
- *       No arbitrary overlapping subobject is accepted; sizeof is not cost.
+ *       Physical maintenance uses only the generated workspace's exact
+ *       embedded guard. A foreign sidecar is not a physical binding. Host
+ *       register models may exercise disjoint-span validation separately;
+ *       that does not extend selected firmware storage. sizeof is not cost.
  */
 typedef struct nx_stm32h743_flash_mpu_state {
     uint32_t saved_control;
@@ -44,8 +46,8 @@ typedef struct nx_stm32h743_flash_mpu_state {
 /**
  * \brief Complete one internal RAM maintenance transaction under MPU guard.
  * \param[in,out] execution: Already-admitted private RAM command, MSP and VTOR.
- * \param[in,out] guard: The exact embedded guard or a disjoint selected RAM
- *       sidecar, initially without effects.
+ * \param[in,out] guard: The generated workspace's exact embedded guard,
+ *       initially without effects. Public consumers never supply this type.
  * \param[in] deadline: Absolute time in the existing System TIM2/epoch domain.
  * \return SUCCESS, IO or TIMEOUT only after both physical banks are really
  *       BSY/QW/WBNE-clear, the target is LOCKed, and all MPU state is restored.
@@ -60,10 +62,12 @@ typedef struct nx_stm32h743_flash_mpu_state {
  *       or authorize return. RAM polling continues until actual idle. Permanent
  *       busy therefore does not return. An unprovable LOCK/MPU restore parks
  *       in RAM with effects retained; no reset/watchdog/RTOS policy is invoked.
- *       An internal return still uses the private RAM caller; the independently
- *       checked bridge restores VTOR/CPU only after this success-to-return
- *       proof. The caller must independently withdraw/join other bus masters;
- *       this guard controls CPU accesses only. Source implementation alone
+ *       An internal return still uses the private RAM caller. The byte-checked
+ *       assembly gate observes restored hardware against protected incoming
+ *       captures, restores linker-known VTOR, and then permits the bridge to
+ *       restore caller CPU state. The caller must independently withdraw/join
+ *       other bus masters; this guard controls CPU accesses only.
+ *       Source implementation alone
  *       does not establish installed RAM closure or hardware qualification.
  */
 nx_result_t nx_stm32h743_flash_ram_guarded_transaction(

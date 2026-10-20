@@ -76,6 +76,7 @@ static __attribute__((always_inline)) inline uintptr_t executing_pc(void) {
 #define NX_H743_FLASH_MPU_PC() executing_pc()
 #endif
 
+#if defined(NX_H743_MODEL)
 static NX_H743_MPU_RAM bool span_valid(uintptr_t first, size_t bytes) {
     return bytes != 0U && bytes <= UINTPTR_MAX - first;
 }
@@ -94,17 +95,26 @@ static NX_H743_MPU_RAM bool axi_span(uintptr_t first, size_t bytes) {
 static NX_H743_MPU_RAM bool
 aliases_object(const nx_stm32h743_flash_mpu_state_t* guard, uintptr_t cpu_guard,
                const void* object, size_t bytes) {
+    NX_H743_RAM_GUARD(guard);
     return overlap((uintptr_t)guard, sizeof(*guard), (uintptr_t)object,
                    bytes) ||
            overlap(cpu_guard, sizeof(*guard), NX_H743_FLASH_RAM_ADDRESS(object),
                    bytes);
 }
 
+#endif
+
 /** \brief Validate both host/CPU extents before the sidecar's first read. */
 static NX_H743_MPU_RAM bool
 control_storage(const nx_stm32h743_flash_ram_workspace_t* execution,
                 const nx_stm32h743_flash_mpu_state_t* guard,
                 const MPU_Type* registers) {
+    NX_H743_RAM_BIND(execution);
+#if !defined(NX_H743_MODEL)
+    return execution == &g_nx_stm32h743_flash_ram_workspace &&
+           guard == &g_nx_stm32h743_flash_ram_workspace.guard &&
+           registers == MPU;
+#else
     if (execution == NULL || guard == NULL || registers == NULL ||
         !span_valid((uintptr_t)execution, sizeof(*execution)) ||
         !span_valid((uintptr_t)guard, sizeof(*guard)) ||
@@ -126,34 +136,37 @@ control_storage(const nx_stm32h743_flash_ram_workspace_t* execution,
          cpu_guard != cpu_execution +
                           offsetof(nx_stm32h743_flash_ram_workspace_t, guard)))
         return false;
-    if (execution->port == NULL || execution->system == NULL ||
-        execution->port->registers == NULL ||
-        execution->system->timer == NULL || execution->system->core == NULL)
+    if (execution->port == NULL || NX_H743_RAM_SYSTEM(execution) == NULL ||
+        NX_H743_RAM_FLASH(execution) == NULL ||
+        NX_H743_RAM_TIMER(execution) == NULL ||
+        NX_H743_RAM_CORE(execution) == NULL)
         return false;
     /* All are already-admitted private bindings. The sidecar may not overwrite
      * their backing objects even when a host address map is non-identity. */
     if (aliases_object(guard, cpu_guard, execution->port,
                        sizeof(*execution->port)) ||
-        aliases_object(guard, cpu_guard, execution->system,
-                       sizeof(*execution->system)) ||
-        aliases_object(guard, cpu_guard, execution->port->registers,
-                       sizeof(*execution->port->registers)) ||
-        aliases_object(guard, cpu_guard, execution->system->timer,
-                       sizeof(*execution->system->timer)) ||
-        aliases_object(guard, cpu_guard, execution->system->core,
-                       sizeof(*execution->system->core)) ||
+        aliases_object(guard, cpu_guard, NX_H743_RAM_SYSTEM(execution),
+                       sizeof(*NX_H743_RAM_SYSTEM(execution))) ||
+        aliases_object(guard, cpu_guard, NX_H743_RAM_FLASH(execution),
+                       sizeof(*NX_H743_RAM_FLASH(execution))) ||
+        aliases_object(guard, cpu_guard, NX_H743_RAM_TIMER(execution),
+                       sizeof(*NX_H743_RAM_TIMER(execution))) ||
+        aliases_object(guard, cpu_guard, NX_H743_RAM_CORE(execution),
+                       sizeof(*NX_H743_RAM_CORE(execution))) ||
         aliases_object(guard, cpu_guard, registers, sizeof(*registers)))
         return false;
     const uintptr_t first = NX_H743_FLASH_RAM_SYMBOL(__nx_flash_ram_start);
     const uintptr_t last = NX_H743_FLASH_RAM_SYMBOL(__nx_flash_ram_end);
     return first < last && axi_span(first, last - first) &&
            !overlap(cpu_guard, sizeof(*guard), first, last - first);
+#endif
 }
 
 static NX_H743_MPU_RAM bool
 both_idle(const nx_stm32h743_flash_ram_workspace_t* execution) {
-    return ((NX_H743_FLASH_MPU_READ(&execution->port->registers->SR1) |
-             NX_H743_FLASH_MPU_READ(&execution->port->registers->SR2)) &
+    NX_H743_RAM_BIND(execution);
+    return ((NX_H743_FLASH_MPU_READ(&NX_H743_RAM_FLASH(execution)->SR1) |
+             NX_H743_FLASH_MPU_READ(&NX_H743_RAM_FLASH(execution)->SR2)) &
             NX_H743_MPU_BUSY) == 0U;
 }
 
@@ -161,9 +174,13 @@ static NX_H743_MPU_RAM _Noreturn void
 retain(nx_stm32h743_flash_ram_workspace_t* execution,
        nx_stm32h743_flash_mpu_state_t* guard,
        nx_stm32h743_flash_mpu_fault_t reason) {
+    NX_H743_RAM_GUARD(guard);
+    NX_H743_RAM_BIND(execution);
     guard->fault = reason;
     execution->active = true;
+#if defined(NX_H743_MODEL)
     execution->port->active = true;
+#endif
     NX_H743_FLASH_MPU_DSB();
     NX_H743_FLASH_MPU_ISB();
     NX_H743_FLASH_MPU_MODEL_TERMINAL(execution, guard);
@@ -175,6 +192,8 @@ retain(nx_stm32h743_flash_ram_workspace_t* execution,
 static NX_H743_MPU_RAM bool select_region(MPU_Type* registers,
                                           nx_stm32h743_flash_mpu_state_t* guard,
                                           uint32_t region) {
+    NX_H743_RAM_GUARD(guard);
+    NX_H743_RAM_MPU(registers);
     guard->remaining_effects |= NX_H743_FLASH_MPU_EFFECT_SELECTOR;
     NX_H743_FLASH_MPU_WRITE(&registers->RNR, region);
     return NX_H743_FLASH_MPU_READ(&registers->RNR) == region;
@@ -183,6 +202,9 @@ static NX_H743_MPU_RAM bool select_region(MPU_Type* registers,
 static NX_H743_MPU_RAM void
 restore_selector(nx_stm32h743_flash_ram_workspace_t* execution,
                  nx_stm32h743_flash_mpu_state_t* guard, MPU_Type* registers) {
+    NX_H743_RAM_GUARD(guard);
+    NX_H743_RAM_MPU(registers);
+    NX_H743_RAM_BIND(execution);
     if ((guard->remaining_effects & NX_H743_FLASH_MPU_EFFECT_SELECTOR) == 0U)
         return;
     NX_H743_FLASH_MPU_WRITE(&registers->RNR, guard->saved_selector);
@@ -195,11 +217,14 @@ restore_selector(nx_stm32h743_flash_ram_workspace_t* execution,
 static NX_H743_MPU_RAM void
 restore_policy(nx_stm32h743_flash_ram_workspace_t* execution,
                nx_stm32h743_flash_mpu_state_t* guard, MPU_Type* registers) {
+    NX_H743_RAM_GUARD(guard);
+    NX_H743_RAM_MPU(registers);
+    NX_H743_RAM_BIND(execution);
     if (!both_idle(execution))
         retain(execution, guard, NX_H743_FLASH_MPU_FAULT_RESTORE);
     const volatile uint32_t* control = execution->bank == 0U
-                                           ? &execution->port->registers->CR1
-                                           : &execution->port->registers->CR2;
+                                           ? &NX_H743_RAM_FLASH(execution)->CR1
+                                           : &NX_H743_RAM_FLASH(execution)->CR2;
     if (NX_H743_FLASH_MPU_READ(control) !=
         (execution->saved_control | FLASH_CR_LOCK))
         retain(execution, guard, NX_H743_FLASH_MPU_FAULT_LOCK);
@@ -232,6 +257,9 @@ restore_policy(nx_stm32h743_flash_ram_workspace_t* execution,
 static NX_H743_MPU_RAM nx_result_t
 rollback(nx_stm32h743_flash_ram_workspace_t* execution,
          nx_stm32h743_flash_mpu_state_t* guard, MPU_Type* registers) {
+    NX_H743_RAM_GUARD(guard);
+    NX_H743_RAM_MPU(registers);
+    NX_H743_RAM_BIND(execution);
     if (!both_idle(execution))
         retain(execution, guard, NX_H743_FLASH_MPU_FAULT_RESTORE);
     if (!nx_stm32h743_flash_ram_lock(execution))
@@ -243,6 +271,13 @@ rollback(nx_stm32h743_flash_ram_workspace_t* execution,
 NX_H743_MPU_RAM nx_result_t nx_stm32h743_flash_ram_guarded_transaction(
     nx_stm32h743_flash_ram_workspace_t* execution,
     nx_stm32h743_flash_mpu_state_t* guard, nx_time_us_t deadline) {
+#if !defined(NX_H743_MODEL)
+    if (execution != &g_nx_stm32h743_flash_ram_workspace ||
+        guard != &g_nx_stm32h743_flash_ram_workspace.guard)
+        return NX_ERROR_INVALID;
+#endif
+    NX_H743_RAM_BIND(execution);
+    NX_H743_RAM_GUARD(guard);
     MPU_Type* registers = NX_H743_FLASH_MPU_REGISTERS();
     if (!control_storage(execution, guard, registers))
         return NX_ERROR_INVALID;
@@ -260,17 +295,17 @@ NX_H743_MPU_RAM nx_result_t nx_stm32h743_flash_ram_guarded_transaction(
     if ((NX_H743_FLASH_RAM_CONTROL() & 2U) != 0U || stack < first ||
         stack - first >= sizeof(execution->stack) || pc < code_first ||
         pc >= code_last ||
-        NX_H743_FLASH_MPU_READ(&execution->system->core->VTOR) !=
+        NX_H743_FLASH_MPU_READ(&NX_H743_RAM_CORE(execution)->VTOR) !=
             NX_H743_FLASH_RAM_ADDRESS(execution->vectors))
         return NX_ERROR_STATE;
-    if ((NX_H743_FLASH_MPU_READ(&execution->system->core->CCR) &
+    if ((NX_H743_FLASH_MPU_READ(&NX_H743_RAM_CORE(execution)->CCR) &
          (SCB_CCR_IC_Msk | SCB_CCR_DC_Msk)) != 0U)
         return NX_ERROR_UNSUPPORTED;
     if ((NX_H743_FLASH_RAM_FPCCR() & 1U) != 0U)
         return NX_ERROR_CONTEXT;
     if (!execution->prepared || !execution->active ||
-        !execution->port->active || !execution->system->started ||
-        execution->bank > 1U || guard->remaining_effects != 0U)
+        !NX_H743_RAM_SYSTEM(execution)->started || execution->bank > 1U ||
+        guard->remaining_effects != 0U)
         return NX_ERROR_STATE;
     const nx_result_t context = nx_stm32h743_flash_ram_context(execution);
     if (context != NX_SUCCESS)
