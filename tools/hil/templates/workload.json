@@ -1215,6 +1215,271 @@
           "unit": "ns"
         }
       }
+    },
+    {
+      "id": "h743_spi_cache",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "mode_registers": null,
+        "wire_capture": null,
+        "memory_capture": null,
+        "lifecycle_events": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_selected_mode": null,
+        "observed_silicon_clock": null,
+        "independent_control_channel": null,
+        "reviewed_memory_and_wiring": null,
+        "retained_loans_until_drain": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "trials": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "h743_rx_continuous",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "mode_registers": null,
+        "wire_capture": null,
+        "memory_capture": null,
+        "lifecycle_events": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_selected_mode": null,
+        "observed_silicon_clock": null,
+        "independent_control_channel": null,
+        "reviewed_memory_and_wiring": null,
+        "retained_loans_until_drain": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "trials": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "u575_tx_chain",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "mode_registers": null,
+        "wire_capture": null,
+        "memory_capture": null,
+        "lifecycle_events": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_selected_mode": null,
+        "observed_silicon_clock": null,
+        "independent_control_channel": null,
+        "reviewed_memory_and_wiring": null,
+        "retained_loans_until_drain": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "trials": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "u575_lptim_run",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "mode_registers": null,
+        "wire_capture": null,
+        "memory_capture": null,
+        "lifecycle_events": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_selected_mode": null,
+        "observed_silicon_clock": null,
+        "independent_control_channel": null,
+        "reviewed_memory_and_wiring": null,
+        "retained_loans_until_drain": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "trials": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
+    },
+    {
+      "id": "h743_duplex_continuous",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "mode_registers": null,
+        "wire_capture": null,
+        "memory_capture": null,
+        "lifecycle_events": null
+      },
+      "instruments": {
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "calibrated_timer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_selected_mode": null,
+        "observed_silicon_clock": null,
+        "independent_control_channel": null,
+        "reviewed_memory_and_wiring": null,
+        "retained_loans_until_drain": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "trials": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        }
+      }
     }
   ]
 }

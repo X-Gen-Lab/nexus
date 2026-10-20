@@ -231,6 +231,20 @@ class H743FlashRamStaticTests(unittest.TestCase):
             with self.subTest(mutation=mutation):
                 self.rejected(mutation, "stack-derived store")
 
+    def test_callee_stack_output_cannot_become_an_untracked_store_base(self):
+        self.accepted()
+        for mutation in ("BAD_CALLEE_STACK_RETURN", "BAD_CALLEE_SPILL_RETURN",
+                         "BAD_CALLEE_NONRETURN_STORE"):
+            with self.subTest(mutation=mutation):
+                self.rejected(mutation, "stack-derived (store|pointer spill)")
+
+    def test_actual_callee_output_replaces_callers_register_provenance(self):
+        self.accepted(mutation="VALID_CALLEE_CLEARS_STACK_ARGUMENT")
+
+    def test_register_offset_sp_load_cannot_forget_stack_passed_pointer(self):
+        self.accepted()
+        self.rejected("BAD_SP_REGISTER_LOAD_ARGUMENT", "indexed SP load")
+
     def test_a_ram_literal_pc_veneer_is_not_a_reviewed_return(self):
         self.accepted()
         self.rejected("BAD_VENEER", "veneer|PC write")

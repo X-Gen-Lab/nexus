@@ -54,6 +54,23 @@ power equipment. Numeric limits and instruments remain unbound until reviewed.
 G474/H743/U575 software-reference fixtures deliberately reject physical station
 admission; a future physical fixture needs separately reviewed tooling integration.
 
+The [selected-mode HIL contracts](../design/selected-mode-hil.md) add exact
+preparation for H743 Cache-enabled SPI4 DMA, continuous USART3 RX with IRQ TX,
+and separately selected finite TX-DMA/continuous RX duplex, plus U575 finite
+USART1 hardware-chain TX and LPTIM2 RUN one-shots. Select their maintained
+assemblies and keep independent mode, wire, memory and lifecycle observations.
+These protocols retain the software-reference fixture boundary above; a valid
+plan or synthetic parser test does not supply a physical station result.
+
+ThreadX preparation uses [independent acquisition contracts](../../tools/hil/threadx.md)
+for tasks, IRQ wake, context, stack, deadlines, lifecycle and fail-stop. Select
+one of the three maintained M4 Boards for a physical plan; Native establishes
+host software behavior only. Generate the OS plan from the exact resolved
+ThreadX configuration with `tools/hil/os_acceptance.py plan`. These seven cases
+do not inherit FreeRTOS low-power acceptance contracts. Their plans remain
+`prepared_unbound` / `not_executed` until real equipment supplies the required
+observations and the full station admission succeeds.
+
 ## Execute only a real reviewed station
 
 Bind observed PCB/part/UID, probe, stable serial path, wiring and supply to the exact

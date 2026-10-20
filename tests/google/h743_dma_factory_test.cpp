@@ -67,11 +67,28 @@ TEST_F(H743DmaFactory, PureFactoryReturnsTheOneRealDmaFaceWithoutMmio) {
 TEST_F(H743DmaFactory, StaticProjectionContainsOnlyInitializedAxiSram) {
     Start();
     auto* state = static_cast<nx_stm32h743_uart_dma_state_t*>(Port()->context);
-    ASSERT_EQ(1U, state->region_count);
-    EXPECT_EQ(0x24000000U, state->regions[0].begin);
-    EXPECT_EQ(524288U, state->regions[0].size);
+    ASSERT_EQ(1U, state->transmit.region_count);
+    EXPECT_EQ(0x24000000U, state->transmit.regions[0].begin);
+    EXPECT_EQ(524288U, state->transmit.regions[0].size);
     EXPECT_NE(0U, g_h743_model.core->CCR & SCB_CCR_DC_Msk);
     EXPECT_EQ(1U, g_h743_model.cache_enable_calls);
+}
+TEST_F(H743DmaFactory, DrainedFiniteTransferAllowsACompletePlatformRestart) {
+    for (unsigned run = 0U; run < 2U; ++run) {
+        Start();
+        Submit();
+        g_h743_dma_stream.NDTR = 0U;
+        g_h743_dma_stream.CR &= ~(uint32_t)DMA_SxCR_EN;
+        g_h743_dma_registers.LISR |= DMA_LISR_TCIF0;
+        DMA1_Stream0_IRQHandler();
+        USART3->ISR |= USART_ISR_TC;
+        USART3_IRQHandler();
+        nx_uart_port_service(Port());
+        ASSERT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
+        ASSERT_EQ(NX_SUCCESS, request.base.result);
+        ASSERT_EQ(NX_SUCCESS, nx_platform_stop());
+        EXPECT_FALSE(g_nx_stm32h743_system.started);
+    }
 }
 TEST_F(H743DmaFactory, DmaDrainFailureRetainsCacheTimebaseAndGate) {
     Start();

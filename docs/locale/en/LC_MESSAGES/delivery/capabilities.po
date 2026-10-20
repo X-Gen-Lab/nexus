@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: de93fb4014ce3d252a543cc0f4a382fe27ca1d45d3ab8c59205be436fbaa33ff\n"
+"X-Nexus-Source-SHA256: da37ea0f0c331befeb0652e9f0d4993e74e639133b4e83f95c777adc155b0847\n"
 
 #: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -2850,3 +2850,16 @@ msgstr "`tools/configure/assemblies/u575-uart-chain.toml`"
 #: ../../nexus-quality-20261019/docs/delivery/capabilities.md:0
 msgid "`soc/stm32u575/drivers/uart_dma_chain.c`"
 msgstr "`soc/stm32u575/drivers/uart_dma_chain.c`"
+
+
+msgid ""
+"`tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml`, "
+"`tools/configure/assemblies/h743-uart-duplex-continuous.toml`"
+msgstr ""
+"`tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml`, "
+"`tools/configure/assemblies/h743-uart-duplex-continuous.toml`"
+
+msgid ""
+"`soc/stm32h743/drivers/uart_duplex.c`"
+msgstr ""
+"`soc/stm32h743/drivers/uart_duplex.c`"

@@ -38,6 +38,9 @@ def includes(result):
     if any(item.kind == "uart" and item.mode == "rx-dma-continuous"
            for item in result.controllers):
         source.append('#include "stm32h743_uart_continuous.h"')
+    if any(item.kind == "uart" and item.mode == "dma-duplex-continuous"
+           for item in result.controllers):
+        source.append('#include "stm32h743_uart_duplex.h"')
     return source + ['void _init(void);', 'void _fini(void);',
                     r'/** \brief C runtime hooks; constructors use .init_array. */',
                     'void _init(void) {}', 'void _fini(void) {}']
@@ -83,7 +86,8 @@ def _uart(result):
 
 def _dma(result):
     return any((item.kind == "uart" and item.mode in
-                ("dma-tx", "rx-dma-idle", "rx-dma-continuous")) or
+                ("dma-tx", "rx-dma-idle", "rx-dma-continuous",
+                 "dma-duplex-continuous")) or
                (item.kind == "spi" and item.mode == "dma")
                for item in result.controllers)
 
@@ -91,6 +95,8 @@ def _dma(result):
 def dma_admission_conditions(result, *, spi_only=False):
     """Project already validated lanes; never infer another physical owner."""
     conditions = []
+    duplex = any(item.kind == "uart" and item.mode == "dma-duplex-continuous"
+                 for item in result.controllers)
     for lane in result.dma_topology.lanes:
         if spi_only and lane.controller != "SPI4":
             continue
@@ -98,10 +104,11 @@ def dma_admission_conditions(result, *, spi_only=False):
         conditions += [f"NX_H743_READ(&{stream}->CR) != 0u",
                        f"NX_H743_READ(&DMAMUX1_Channel{lane.lane}->CCR) != 0u",
                        f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane.lane}_IRQn)"]
-        if lane.controller == "SPI4":
+        if lane.controller == "SPI4" or (duplex and lane.controller == "USART3"):
             for field in ("NDTR", "PAR", "M0AR", "M1AR"):
                 conditions.append(f"NX_H743_READ(&{stream}->{field}) != 0u")
-            mask = 0x003d0000 if lane.lane == 2 else 0x0f400000
+            mask = (0x0000003d, 0x00000f40,
+                    0x003d0000, 0x0f400000)[lane.lane]
             conditions += [f"(NX_H743_READ(&{stream}->FCR) & 0x87u) != 1u",
                            f"(NX_H743_READ(&DMA1->LISR) & {mask}u) != 0u"]
     return conditions

@@ -8,7 +8,7 @@ add_library(nexus_io STATIC
     src/dma.c src/stream.c src/wake.c src/i2c_bus_clear.c src/adc_observer.c
     src/uart_rs485.c src/stream_budget.c src/can.c src/can_fd.c
     src/ethernet.c src/ethernet_frames.c src/mdio.c
-    src/usb_device.c src/timer_capture.c src/advanced_pwm.c src/observation.c
+    src/usb_device.c src/usb_profile.c src/timer_capture.c src/advanced_pwm.c src/observation.c
     src/pwm_group.c src/pwm_adc.c src/stream_profile.c src/encoder.c
     src/rtc.c src/lptim.c src/pin_state.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")

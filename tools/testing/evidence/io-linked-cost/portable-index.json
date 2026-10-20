@@ -1,0 +1,89 @@
+{
+  "packages": {
+    "io05": {
+      "archive": {
+        "bytes": 1065851,
+        "relative_path": "store/cb4c864fc660ab4239c5addca0361f25b5ef4ca74c79bd9a67839254bcf5fe5d.tar.gz",
+        "sha256": "cb4c864fc660ab4239c5addca0361f25b5ef4ca74c79bd9a67839254bcf5fe5d"
+      },
+      "independent_reviews": [
+        {
+          "archive_member_path": "payload/independent-static-review.json",
+          "sha256": "8a7bb094cb37fa4eae106a5b7e603be70731e9fe02c89ba6752d433bc33aae87"
+        }
+      ],
+      "member_manifest": {
+        "bytes": 226476,
+        "relative_path": "io05.members.json",
+        "sha256": "f80e21bdfb821a01e3d0e95b4539d006dc44d3642476af2d452d0ab6eefac0ab"
+      },
+      "package": {
+        "bytes": 502,
+        "relative_path": "io05.package.json",
+        "sha256": "ea5e2fe9f069ef54a67675979197834253de04450bc799e0c99016f6a5c2599b"
+      },
+      "payload_bytes": 6322620,
+      "payload_files": 828,
+      "summary": {
+        "archive_member_path": "payload/final-summary.json",
+        "restore_relative_path": "final-summary.json",
+        "sha256": "262473f0b2994bf7cb35bca20916e99ec7d69dcff2f4649cdf5d37e96e639987"
+      },
+      "verified": {
+        "bytes": 151,
+        "relative_path": "io05.portable-verify.json",
+        "sha256": "3872a1c832f966eb10b3f82c8a77a40299a5fed6c6bf7f5ba2396b881326c09a"
+      },
+      "verify_command_receipt": {
+        "bytes": 1619,
+        "relative_path": "commands/io05-portable-verify.command.json",
+        "sha256": "b1e89e78b35ab908883eb138658edc9e67b83b32f665c37d6fac3f9fadc7c9d0"
+      }
+    },
+    "io08": {
+      "archive": {
+        "bytes": 787724,
+        "relative_path": "store/777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651.tar.gz",
+        "sha256": "777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651"
+      },
+      "independent_reviews": [
+        {
+          "archive_member_path": "payload/root-independent-review.json",
+          "sha256": "7a0f737762dda51d95062bfd9b64b05925bde99cee619577ea305568fb556031"
+        }
+      ],
+      "member_manifest": {
+        "bytes": 135522,
+        "relative_path": "io08.members.json",
+        "sha256": "553522e7dc36b9c151e8caa8e49393169961751a80f1e5ccb0a46dca23593706"
+      },
+      "package": {
+        "bytes": 501,
+        "relative_path": "io08.package.json",
+        "sha256": "7f6c8182d62ec7d42b392183e0d7a941fe806ec5f87d48c4ce0f3786917e4bb2"
+      },
+      "payload_bytes": 5056309,
+      "payload_files": 567,
+      "summary": {
+        "archive_member_path": "payload/verification.json",
+        "restore_relative_path": "verification.json",
+        "sha256": "0e51b1366c5c425d3a3de52faecab8f4ad0dc4934042eadc33e208121dbf5182"
+      },
+      "verified": {
+        "bytes": 151,
+        "relative_path": "io08.portable-verify.json",
+        "sha256": "18007b6446c6eb178a5ff226439b48e78912cf5aa135808745ff8f938fbcdd6c"
+      },
+      "verify_command_receipt": {
+        "bytes": 1620,
+        "relative_path": "commands/io08-portable-verify.command.json",
+        "sha256": "dd8549520f23625cd4636bca2a371148d69e64e2a9919e935d9ca6e749dbe91b"
+      }
+    }
+  },
+  "restore_after_transport": "python -B tools/evidence/store.py restore --package <package.relative_path> --archive <archive.relative_path> --destination /tmp/<new-absent-directory> --report /tmp/<label>-restore.json",
+  "scope": "Original software link-cost evidence; no physical runtime/cycles measured. Navigation only; native envelopes remain unchanged.",
+  "source_commit": "bacdc5b8a5d64baebb92517e770d0abac28421b8",
+  "transport_rule": "Keep original package envelopes byte-for-byte, including historical archive.path; --archive supplies current navigation while preserving expected SHA/size. Keep relative package/archive/manifest layout. Reports stay outside source and restore destination; destination must not exist. Manifest paths are payload-relative; tar members use payload/. ",
+  "verify_after_transport": "python -B tools/evidence/store.py verify --package <package.relative_path> --archive <archive.relative_path> --report /tmp/<label>-verify.json"
+}

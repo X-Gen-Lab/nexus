@@ -65,7 +65,7 @@ class HilMeasurementTests(unittest.TestCase):
         self.addCleanup(service.stop)
         now = datetime.now(timezone.utc)
         raw = {
-            "schema_version": 1, "kind": "physical_hil_measurements",
+            "schema_version": 2, "kind": "physical_hil_measurements",
             "started_utc": (now - timedelta(seconds=2)).isoformat(),
             "finished_utc": (now - timedelta(seconds=1)).isoformat(),
             "station_id": admission["station_id"],
@@ -81,7 +81,7 @@ class HilMeasurementTests(unittest.TestCase):
         instrument = self.root / "instrument.txt"
         instrument.write_text("synthetic calibration model, not an instrument")
         context = {
-            "schema_version": 1, "kind": "hil_acquisition_context",
+            "schema_version": 2, "kind": "hil_acquisition_context",
             "admission_sha256": raw["admission_sha256"],
             "workload": file_identity(workload), "cpu_clock_hz": 168000000,
             "load": "synthetic validator-only load", "executor": "model loop",
@@ -104,7 +104,7 @@ class HilMeasurementTests(unittest.TestCase):
                 ("irq_latency", "us", "logic_analyzer", [1, 8, 3]),
                 ("throughput", "bytes_per_s", "wire_byte_counter",
                  [3000, 2000, 4000])):
-            trace = {"schema_version": 1, "kind": "physical_hil_trace",
+            trace = {"schema_version": 2, "kind": "physical_hil_trace",
                      "metric": metric, "unit": unit, "method": method,
                      "admission_sha256": raw["admission_sha256"],
                      "context_sha256": raw["context"]["sha256"],
@@ -122,6 +122,7 @@ class HilMeasurementTests(unittest.TestCase):
                     "backend": "baremetal", "controllers": []}
         plan = measurement_plan(fixture, resolved)
         self.assertEqual(plan["physical_status"], "not_executed")
+        self.assertEqual(plan["measurement_schema_version"], 2)
         self.assertEqual({item["id"] for item in plan["measurements"]}, {
             "cycles", "irq_latency", "service_interval", "stack_used_peak",
             "throughput", "loss", "duration"})
@@ -261,7 +262,9 @@ class HilMeasurementTests(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             validate_measurements(original, admission)
 
-    def all_metrics_record(self):
+    def incomplete_cycle_record(self):
+        # A deliberate scalar-only DWT input for migration/rejection tests.
+        # dwt_record completes it with the maintained schema-2 raw facts.
         admission, raw = self.record()
         methods = {
             "cycles": ("cycles", "dwt_snapshot", 100),
@@ -294,7 +297,7 @@ class HilMeasurementTests(unittest.TestCase):
         raw["context"] = file_identity(path)
         raw["traces"] = []
         for name, (unit, method, value) in methods.items():
-            trace = {"schema_version": 1, "kind": "physical_hil_trace",
+            trace = {"schema_version": 2, "kind": "physical_hil_trace",
                      "metric": name, "unit": unit, "method": method,
                      "admission_sha256": raw["admission_sha256"],
                      "context_sha256": raw["context"]["sha256"],
@@ -305,7 +308,7 @@ class HilMeasurementTests(unittest.TestCase):
         return admission, raw
 
     def test_seven_metrics_derive_values_with_discrete_capacity_limits(self):
-        admission, original = self.all_metrics_record()
+        admission, original = self.dwt_record()
         result = validate_measurements(original, admission)
         self.assertEqual(len(result["metrics"]), 7)
         for name, invalid in (("cycles", 1001), ("cycles", 1.5),
@@ -333,6 +336,245 @@ class HilMeasurementTests(unittest.TestCase):
             raw = {**original, "context": file_identity(path)}
             with self.subTest(metric=name), self.assertRaises(EvidenceError):
                 validate_measurements(raw, admission)
+
+    def dwt_record(self):
+        admission, raw = self.incomplete_cycle_record()
+        context_path = Path(raw["context"]["path"])
+        context = json.loads(context_path.read_text())
+        conditions = context["measurements"]["cycles"]
+        conditions.pop("maximum_interval_cycles")
+        clock_path = self.root / "reference-clock.json"
+        atomic_json(clock_path, {
+            "schema_version": 1, "kind": "physical_hil_reference_clock",
+            "admission_sha256": raw["admission_sha256"],
+            "role": "reference_capture",
+            "clock_source": "external_instrument_oscillator",
+            "instrument_id": "synthetic_capture_clock",
+            "domain": 2, "epoch": 1, "ticks_per_second": 1000000,
+            "first_tick": 0, "last_tick": 2 ** 64 - 1,
+            "uncertainty_ticks": 0, "cycle_domain": 1, "cycle_epoch": 1,
+            "cpu_clock_lower_hz": 166000000,
+            "cpu_clock_upper_hz": 170000000})
+        conditions.update(
+            cycle_domain=1, cycle_epoch=1,
+            reference={"domain": 2, "epoch": 1,
+                       "ticks_per_second": 1000000,
+                       "method": "logic_analyzer",
+                       "instrument": file_identity(clock_path)})
+        atomic_json(context_path, context)
+        raw["context"] = file_identity(context_path)
+        for index, identity in enumerate(raw["traces"]):
+            path = Path(identity["path"])
+            trace = json.loads(path.read_text())
+            trace["context_sha256"] = raw["context"]["sha256"]
+            if trace["metric"] == "cycles":
+                begin = {
+                    "counter": 42, "cycle_domain": 1, "cycle_epoch": 1,
+                    "cpu_clock_hz": 168000000, "demcr": 1 << 24,
+                    "dwt_control": 1,
+                    "reference": {"ticks": 1000, "domain": 2, "epoch": 1,
+                                  "ticks_per_second": 1000000,
+                                  "uncertainty_ticks": 1,
+                                  "uncertainty_known": True}}
+                end = copy.deepcopy(begin)
+                end["counter"] = 142
+                end["reference"]["ticks"] = 1001
+                trace["samples"] = [{"sequence": 0, "begin": begin,
+                                     "end": end}]
+            atomic_json(path, trace)
+            raw["traces"][index] = file_identity(path)
+        return admission, raw
+
+    def rewrite_cycles(self, raw, change):
+        path = self.root / "cycles.json"
+        trace = json.loads(path.read_text())
+        change(trace["samples"][0])
+        atomic_json(path, trace)
+        for index, identity in enumerate(raw["traces"]):
+            if identity["path"] == str(path):
+                raw["traces"][index] = file_identity(path)
+                return
+        self.fail("cycle trace is not part of the actual run")
+
+    def rewrite_reference_clock(self, raw, change):
+        path = self.root / "reference-clock.json"
+        clock = json.loads(path.read_text())
+        change(clock)
+        atomic_json(path, clock)
+        context_path = Path(raw["context"]["path"])
+        context = json.loads(context_path.read_text())
+        context["measurements"]["cycles"]["reference"]["instrument"] = (
+            file_identity(path))
+        atomic_json(context_path, context)
+        raw["context"] = file_identity(context_path)
+        for trace_index, identity in enumerate(raw["traces"]):
+            trace_path = Path(identity["path"])
+            trace = json.loads(trace_path.read_text())
+            trace["context_sha256"] = raw["context"]["sha256"]
+            atomic_json(trace_path, trace)
+            raw["traces"][trace_index] = file_identity(trace_path)
+
+    def test_dwt_scalar_without_endpoints_cannot_qualify_elapsed_cycles(self):
+        admission, raw = self.incomplete_cycle_record()
+        with self.assertRaises(EvidenceError):
+            validate_measurements(raw, admission)
+
+    def test_dwt_delta_is_derived_from_endpoints_across_numerical_wrap(self):
+        admission, raw = self.dwt_record()
+        self.rewrite_cycles(raw, lambda sample: (
+            sample["begin"].update(counter=0xfffffff0),
+            sample["end"].update(counter=84)))
+        result = validate_measurements(raw, admission)
+        self.assertEqual(100, result["metrics"]["cycles"]["maximum"])
+        self.assertEqual(100, result["metrics"]["cycles"]["minimum"])
+
+    def test_dwt_epoch_rate_enable_and_reference_changes_fail_closed(self):
+        changes = (
+            lambda sample: sample["end"].update(cycle_domain=2),
+            lambda sample: sample["end"].update(cycle_epoch=2),
+            lambda sample: sample["end"].update(cpu_clock_hz=84000000),
+            lambda sample: sample["end"].update(dwt_control=0),
+            lambda sample: sample["end"].update(dwt_control=1 | (1 << 25)),
+            lambda sample: sample["end"].update(demcr=0),
+            lambda sample: sample["end"]["reference"].update(epoch=2),
+            lambda sample: sample["end"]["reference"].update(ticks_per_second=1),
+            lambda sample: sample["end"]["reference"].update(
+                uncertainty_known=False),
+            lambda sample: sample["end"]["reference"].update(ticks=999))
+        for index, change in enumerate(changes):
+            with self.subTest(change=index):
+                admission, raw = self.dwt_record()
+                self.rewrite_cycles(raw, change)
+                with self.assertRaises(EvidenceError):
+                    validate_measurements(raw, admission)
+
+    def test_dwt_reset_or_stall_cannot_look_like_a_short_continuous_interval(self):
+        admission, raw = self.dwt_record()
+        def change(sample):
+            sample["begin"].update(counter=1000)
+            sample["end"].update(counter=1001)
+            sample["begin"]["reference"].update(uncertainty_ticks=0)
+            sample["end"]["reference"].update(ticks=1010,
+                                              uncertainty_ticks=0)
+        self.rewrite_cycles(raw, change)
+        with self.assertRaises(EvidenceError):
+            validate_measurements(raw, admission)
+
+    def test_dwt_reference_bound_must_exclude_an_entire_counter_period(self):
+        for elapsed, uncertainty in ((30000000, 0), (1, 30000000),
+                                     (2 ** 64 - 1, 0)):
+            with self.subTest(elapsed=elapsed, uncertainty=uncertainty):
+                admission, raw = self.dwt_record()
+                def change(sample):
+                    first = 0 if elapsed == 2 ** 64 - 1 else 40000000
+                    sample["begin"]["reference"].update(
+                        ticks=first, uncertainty_ticks=uncertainty)
+                    sample["end"]["reference"].update(
+                        ticks=first + elapsed, uncertainty_ticks=0)
+                self.rewrite_cycles(raw, change)
+                with self.assertRaises(EvidenceError):
+                    validate_measurements(raw, admission)
+
+    def test_dwt_nominal_rate_cannot_prove_wrap_exclusion_without_a_cpu_bound(self):
+        admission, raw = self.dwt_record()
+        def change(sample):
+            sample["begin"]["reference"].update(
+                ticks=40000000, uncertainty_ticks=15000000)
+            sample["end"]["reference"].update(ticks=50000000,
+                                              uncertainty_ticks=0)
+        self.rewrite_cycles(raw, change)
+        # Synthetic counterexample: the nominal upper fits one period while
+        # an allowed 200MHz clock exceeds it. Wide reference error permits
+        # residue100, so checking consistency alone cannot exclude that wrap.
+        self.assertLess(25000000 * 168000000 // 1000000 + 1, 2 ** 32)
+        self.assertGreaterEqual(25000000 * 200000000 // 1000000 + 1, 2 ** 32)
+        self.rewrite_reference_clock(raw,
+                                     lambda clock: clock.pop("cpu_clock_upper_hz"))
+        with self.assertRaises(EvidenceError):
+            validate_measurements(raw, admission)
+
+    def test_dwt_complete_cpu_envelope_must_exclude_the_counter_period(self):
+        admission, raw = self.dwt_record()
+        def change(sample):
+            sample["begin"]["reference"].update(
+                ticks=40000000, uncertainty_ticks=15000000)
+            sample["end"]["reference"].update(ticks=50000000,
+                                              uncertainty_ticks=0)
+        self.rewrite_cycles(raw, change)
+        self.rewrite_reference_clock(raw, lambda clock: clock.update(
+            cpu_clock_lower_hz=150000000, cpu_clock_upper_hz=200000000))
+        with self.assertRaisesRegex(EvidenceError, "ambiguous wrap"):
+            validate_measurements(raw, admission)
+
+    def test_dwt_cpu_calibration_rejects_unknown_reversed_and_foreign_epochs(self):
+        changes = (
+            lambda clock: clock.update(cpu_clock_lower_hz=0),
+            lambda clock: clock.update(cpu_clock_upper_hz=0),
+            lambda clock: clock.update(cpu_clock_lower_hz=200000000,
+                                       cpu_clock_upper_hz=150000000),
+            lambda clock: clock.update(cpu_clock_upper_hz=2 ** 32),
+            lambda clock: clock.update(cpu_clock_lower_hz=True),
+            lambda clock: clock.update(cpu_clock_upper_hz=170000000.0),
+            lambda clock: clock.update(cpu_clock_lower_hz=None),
+            lambda clock: clock.update(cpu_clock_lower_hz=169000000),
+            lambda clock: clock.update(cpu_clock_upper_hz=160000000),
+            lambda clock: clock.update(cycle_domain=2),
+            lambda clock: clock.update(cycle_epoch=2),
+            lambda clock: clock.pop("cpu_clock_lower_hz"))
+        for index, change in enumerate(changes):
+            admission, raw = self.dwt_record()
+            self.rewrite_reference_clock(raw, change)
+            with self.subTest(change=index), self.assertRaises(EvidenceError):
+                validate_measurements(raw, admission)
+
+    def test_dwt_uses_both_calibrated_frequency_edges_instead_of_nominal_hz(self):
+        for cycles in (1660, 1700):
+            admission, raw = self.dwt_record()
+            def change(sample):
+                sample["begin"]["reference"].update(uncertainty_ticks=0)
+                sample["end"].update(counter=42 + cycles)
+                sample["end"]["reference"].update(ticks=1010,
+                                                  uncertainty_ticks=0)
+            self.rewrite_cycles(raw, change)
+            with self.subTest(cycles=cycles):
+                result = validate_measurements(raw, admission)
+                self.assertEqual(cycles, result["metrics"]["cycles"]["maximum"])
+
+    def test_dwt_reported_values_and_missing_endpoint_are_not_measurements(self):
+        for change in (lambda sample: sample.update(value=1),
+                       lambda sample: sample.pop("end")):
+            admission, raw = self.dwt_record()
+            self.rewrite_cycles(raw, change)
+            with self.assertRaises(EvidenceError):
+                validate_measurements(raw, admission)
+
+    def test_dwt_reference_requires_bound_capture_owner_and_calibration_facts(self):
+        changes = (lambda clock: clock.update(role="cpu_counter"),
+                   lambda clock: clock.update(clock_source="cpu_pll"),
+                   lambda clock: clock.update(admission_sha256="0" * 64),
+                   lambda clock: clock.update(epoch=2),
+                   lambda clock: clock.update(first_tick=1001),
+                   lambda clock: clock.update(uncertainty_ticks=2))
+        for index, change in enumerate(changes):
+            admission, raw = self.dwt_record()
+            self.rewrite_reference_clock(raw, change)
+            with self.subTest(change=index), self.assertRaises(EvidenceError):
+                validate_measurements(raw, admission)
+
+    def test_schema_one_records_are_not_reinterpreted_as_current_measurements(self):
+        admission, raw = self.dwt_record()
+        raw["schema_version"] = 1
+        with self.assertRaises(EvidenceError):
+            validate_measurements(raw, admission)
+
+    def test_dwt_budget_uses_derived_cycles_rather_than_an_asserted_value(self):
+        admission, raw = self.dwt_record()
+        def change(sample):
+            sample["end"].update(counter=10043)
+            sample["end"]["reference"].update(ticks=1060)
+        self.rewrite_cycles(raw, change)
+        with self.assertRaisesRegex(EvidenceError, "budget failed: cycles"):
+            validate_measurements(raw, admission)
 
     def test_extreme_smoke_metrics_raise_evidence_errors(self):
         admission, _ = self.fixture.prepared()

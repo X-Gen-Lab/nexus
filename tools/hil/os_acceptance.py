@@ -17,6 +17,7 @@ from tools.evidence.common import (
 from tools.evidence.identity import canonical_digest, resolved_identity
 from tools.hil.admit import admit, require
 from tools.hil.measure import _freshness, _identity_paths
+from tools.hil import threadx
 
 CASES = {
     "irq_wake": "OS49: capture IRQ latch and actual resumed-task timestamps",
@@ -55,15 +56,18 @@ def os_plan(resolved):
     require(isinstance(resolved, dict), "resolved OS build required")
     for key in ("board", "part"):
         identifier(resolved.get(key), key)
-    require(resolved.get("backend") in ("native", "baremetal", "freertos"),
+    require(resolved.get("backend") in
+            ("native", "baremetal", "freertos", "threadx"),
             "maintained OS backend required")
-    return {"schema_version": 1, "kind": "os_hil_plan",
+    is_threadx = resolved["backend"] == "threadx"
+    selected = threadx.CASES if is_threadx else CASES
+    report = {"schema_version": 1, "kind": "os_hil_plan",
             "status": "prepared_unbound", "physical_status": "not_executed",
             "board": resolved["board"], "part": resolved["part"],
             "backend": resolved["backend"],
             "cases": [{"id": name, "definition": definition, "budget": None,
                        "status": "not_executed"}
-                      for name, definition in CASES.items()],
+                      for name, definition in selected.items()],
             "prerequisites": [
                 "review exact part/PCB, clock, IRQ priority and selected ABI",
                 "retain admission, firmware, workload and instrument identities",
@@ -74,20 +78,51 @@ def os_plan(resolved):
                 "product owns safe outputs and non-destructive failure fixture",
             ],
             "limits": "An unbound plan never qualifies hardware or a release"}
+    if is_threadx:
+        report["backend_contract"] = threadx.contract(resolved)
+        native = resolved["cpu"]["arch"] == "native"
+        report["scope"] = ("host_software_only" if native else
+                           "physical_m4_preparation")
+        for case in report["cases"]:
+            case["availability"] = "software_only" if native else "selected"
+        report["prerequisites"] = [
+            "retain ThreadX workload, kernel/CPU ABI and instrument identities",
+            "review task, IRQ, deadline, lifecycle and fail-stop budgets",
+            "record each thread priority, preemption threshold and time slice",
+            "record ISR-safe service sources and selected logical IRQ ceiling",
+            "capture integer/selected FP banks and every thread/MSP stack peak",
+            "retain assert/overflow observer, incoming masks and live loans",
+            "no ThreadX tickless/low-power physical contract is maintained",
+            "Native results establish host software behavior only",
+        ]
+    return report
+
+
+def _budgets(backend):
+    if backend != "threadx":
+        return BUDGETS
+    return {"task": ("minimum_iterations", "os_task_iterations",
+                     "minimum", "count"),
+            **{name: value for name, value in BUDGETS.items()
+               if name != "low_power"}}
 
 
 def _context(identity, admission):
     context = load_json(verify_file_identity(identity))
+    resolved, _ = resolved_identity(verify_file_identity(admission["resolved"]))
+    is_threadx = resolved.get("backend") == "threadx"
+    extra = {"backend_contract", "tasks", "os_irqs"} if is_threadx else set()
     fields(context, {"schema_version", "kind", "admission_sha256", "features",
                      "workload", "instrument", "load", "executor",
-                     "irq_priorities", "cpu_clock_hz", "requirements", "stack_names"})
+                     "irq_priorities", "cpu_clock_hz", "requirements", "stack_names"}
+           | extra)
     require(type(context["schema_version"]) is int and
             context["schema_version"] == 1 and
             context["kind"] == "os_hil_context" and
             context["admission_sha256"] == canonical_digest(admission),
             "OS context must bind the exact admission")
     from tools.hil.workloads import admitted_workload
-    admitted_workload(context["workload"], admission)
+    workload = admitted_workload(context["workload"], admission)
     verify_file_identity(context["instrument"])
     for key in ("load", "executor"):
         require(isinstance(context[key], str) and
@@ -110,22 +145,24 @@ def _context(identity, admission):
     fields(features, {"fpu", "mve"})
     require(all(type(value) is bool for value in features.values()),
             "explicit FP/MVE observations required")
-    resolved = load_json(verify_file_identity(admission["resolved"]))
     cpu = resolved.get("cpu", {})
     require(cpu.get("arch") not in (None, "native") and
             features == {"fpu": cpu.get("fpu") != "none",
                          "mve": cpu.get("mve") != "none"},
             "OS observed register features differ from admitted CPU ABI")
     requirements = context["requirements"]
-    fields(requirements, set(BUDGETS))
-    for case, (key, metric, bound, unit) in BUDGETS.items():
+    budgets = _budgets(resolved.get("backend"))
+    fields(requirements, set(budgets))
+    for case, (key, metric, bound, unit) in budgets.items():
         fields(requirements[case], {key})
         value = _integer(requirements[case][key], "reviewed " + key,
-                         positive=case == "lifecycle")
+                         positive=bound == "minimum")
         budget = admission.get("budgets", {}).get(metric)
         require(isinstance(budget, dict) and budget.get("unit") == unit and
                 type(budget.get(bound)) is int and budget[bound] == value,
                 "OS limit is not bound to reviewed station budget: " + metric)
+    if is_threadx:
+        threadx.validate_context(context, resolved, workload)
     return context
 
 
@@ -263,6 +300,8 @@ def validate_os_run(raw, admission, *, now=None, maximum_age_s=86400):
             raw["resolved_sha256"] == admission["resolved"]["sha256"],
             "OS firmware/configuration/admission identity mismatch")
     context = _context(raw["context"], admission)
+    is_threadx = context.get("backend_contract", {}).get("backend") == "threadx"
+    selected = threadx.CASES if is_threadx else CASES
     cases = {}
     for identity in _enumeration(raw["traces"], "OS traces"):
         trace = load_json(verify_file_identity(identity))
@@ -272,11 +311,17 @@ def validate_os_run(raw, admission, *, now=None, maximum_age_s=86400):
                 trace.get("context_sha256") == raw["context"]["sha256"],
                 "OS trace context identity mismatch")
         name = trace.get("case")
-        require(isinstance(name, str) and name in CASES and name not in cases,
+        require(isinstance(name, str) and name in selected and name not in cases,
                 "missing/repeated/unreviewed OS case")
         payload = {key: value for key, value in trace.items() if key not in
                    ("schema_version", "kind", "case", "context_sha256")}
-        if name in ("irq_wake", "deadline", "low_power"):
+        if is_threadx and name == "task":
+            result = threadx.task_trace(payload, context)
+        elif is_threadx and name == "irq_wake":
+            result = _timing(threadx.irq_trace(payload, context), name, context)
+        elif is_threadx and name == "fail_stop":
+            result = _fail_stop(threadx.fail_stop_trace(payload), context)
+        elif name in ("irq_wake", "deadline", "low_power"):
             result = _timing(payload, name, context)
         elif name == "context":
             result = _registers(payload, context)
@@ -287,11 +332,15 @@ def validate_os_run(raw, admission, *, now=None, maximum_age_s=86400):
         else:
             result = _fail_stop(payload, context)
         cases[name] = {**result, "raw": identity}
-    require(set(cases) == set(CASES), "OS case enumeration incomplete")
-    return {"status": "passed",
+    require(set(cases) == set(selected), "OS case enumeration incomplete")
+    result = {"status": "passed",
             "physical_status": "qualified_for_recorded_os_cases",
             "cases": cases, "context": raw["context"],
             "limits": "Recorded load/register patterns are not WCET or a release"}
+    if is_threadx:
+        result["backend"] = "threadx"
+        result["backend_contract"] = context["backend_contract"]
+    return result
 
 
 def main(argv=None):

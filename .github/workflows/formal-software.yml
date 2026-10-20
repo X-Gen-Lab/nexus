@@ -1,0 +1,231 @@
+name: Formal Software Plan
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Exact main SHA; must equal the source and workflow commit
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: formal-software-${{ inputs.expected_commit }}
+  cancel-in-progress: false
+
+jobs:
+  formal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+      NEXUS_WORKFLOW_SHA: ${{ github.workflow_sha }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      NEXUS_BUILD_JOBS: '2'
+      CMAKE_BUILD_PARALLEL_LEVEL: '2'
+      CTEST_PARALLEL_LEVEL: '1'
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+      TSAN_OPTIONS: halt_on_error=1
+    steps:
+      - name: Require manual main and the exact source and workflow SHA
+        id: request
+        env:
+          F: ${{ runner.temp }}/formal
+        run: |
+          echo "F=$F" >> "$GITHUB_ENV"
+          mkdir "$F"
+          exec > >(tee "$F/request.raw") 2>&1
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          names = ('GITHUB_EVENT_NAME', 'GITHUB_REF', 'GITHUB_SHA',
+                   'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT',
+                   'NEXUS_EXPECTED_COMMIT', 'NEXUS_WORKFLOW_SHA')
+          context = {name: os.environ.get(name, '') for name in names}
+          expected = context['NEXUS_EXPECTED_COMMIT']
+          accepted = (context['GITHUB_EVENT_NAME'] == 'workflow_dispatch' and
+              context['GITHUB_REF'] == 'refs/heads/main' and
+              re.fullmatch('[0-9a-f]{40}', expected) is not None and
+              expected == context['GITHUB_SHA'] == context['NEXUS_WORKFLOW_SHA'])
+          (Path(os.environ['F']) / 'request.json').write_text(json.dumps({
+              'context': context, 'accepted': accepted,
+              'software_qualified': False, 'physical_status': 'not_executed'},
+              indent=2) + '\n')
+          if not accepted:
+              raise SystemExit('Manual main and identical exact SHA required')
+          PY
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        id: checkout
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          submodules: false
+          persist-credentials: false
+      - name: Verify the actual clean checkout before preparation
+        id: source
+        run: |
+          exec > >(tee "$F/source.raw") 2>&1
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          def git(*args):
+              return subprocess.check_output(['git', *args], text=True).strip()
+          source = {'commit': git('rev-parse', 'HEAD'),
+                    'tree': git('rev-parse', 'HEAD^{tree}'),
+                    'dirty': bool(git('status', '--porcelain', '--untracked-files=all'))}
+          (Path(os.environ['F']) / 'source.json').write_text(
+              json.dumps(source, indent=2) + '\n')
+          if source['commit'] != os.environ['NEXUS_EXPECTED_COMMIT'] or source['dirty']:
+              raise SystemExit('Actual checkout must be exact and clean')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write('validated=true\n')
+          PY
+      - uses: ./.github/actions/setup-build
+        id: setup
+        with:
+          preset: native-debug
+          arm: 'true'
+      - name: Install the existing analyzers for the unchanged plan
+        id: analyzers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy-14 cppcheck
+          echo /usr/lib/llvm-14/bin >> "$GITHUB_PATH"
+      - name: Observe available resources and reject reused build outputs
+        id: resources
+        run: |
+          exec > >(tee "$F/resources.raw") 2>&1
+          uname -a
+          df -B1 "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
+          free -b
+          .venv/bin/python - <<'PY'
+          import os
+          from pathlib import Path
+          from tools.dev.presets import binary_directory
+          from tools.evidence.common import load_json
+          root = Path(os.environ['GITHUB_WORKSPACE'])
+          plan = load_json(root / 'tools/dev/plans/software.json')
+          presets = {stage['args'][stage['args'].index('--preset') + 1]
+                     for stage in plan['stages'] if '--preset' in stage['args']}
+          if any(binary_directory(root, preset).exists() for preset in presets):
+              raise SystemExit('Formal execution requires fresh preset build roots')
+          if (Path(os.environ['F']) / 'software').exists():
+              raise SystemExit('Formal plan output must be new')
+          PY
+      - name: Execute the complete maintained software plan once
+        id: software
+        run: |
+          .venv/bin/python - <<'PY'
+          import os, sys
+          from pathlib import Path
+          from tools.dev.process import run
+          root = Path(os.environ['GITHUB_WORKSPACE'])
+          result = run([sys.executable, '-B', 'tools/dev/qualification.py',
+              '--root', str(root), '--plan', 'tools/dev/plans/software.json',
+              '--output', str(Path(os.environ['F']) / 'software')],
+              cwd=root, env=os.environ.copy(), timeout=18000,
+              log=root / 'build/quality/formal-software.raw', stage='formal-software')
+          print(result.stdout, end='')
+          print(result.stderr, end='', file=sys.stderr)
+          raise SystemExit(result.returncode)
+          PY
+      - name: Preserve the complete temporary output with the existing verifier
+        id: formal_archive
+        if: always() && steps.source.outputs.validated == 'true'
+        run: >-
+          python3 -B tools/evidence/store.py export
+          --source "$F" --store build/formal-transfer/store
+          --report build/formal-transfer/formal-package.json
+      - name: Bind the original build tree and temporary-output archive
+        id: identity
+        if: always() && steps.source.outputs.validated == 'true'
+        uses: ./.github/actions/record-identity
+        with:
+          job: formal-software
+          result: ${{ job.status }}
+          expected-commit: ${{ inputs.expected_commit }}
+          output: build/job-identities/formal-software
+          require-dependencies: 'true'
+          artifacts: build/
+          tools: |
+            python=python3
+            cmake=cmake
+            native=cc
+            native-cxx=c++
+            compiler=arm-none-eabi-gcc
+            tidy=clang-tidy
+            cppcheck=cppcheck
+      - name: Preserve the complete build tree and observed job identity
+        id: build_archive
+        if: always() && steps.source.outputs.validated == 'true'
+        run: >-
+          python3 -B tools/evidence/store.py export
+          --source build --store "$RUNNER_TEMP/formal-build-store"
+          --report "$RUNNER_TEMP/formal-build-package.json"
+      - name: Record actual execution and preservation outcomes
+        id: diagnostics
+        if: always()
+        env:
+          NEXUS_FORMAL_STEPS: ${{ toJSON(steps) }}
+          NEXUS_FORMAL_RESULT: ${{ job.status }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          steps = json.loads(os.environ['NEXUS_FORMAL_STEPS'])
+          names = ('request', 'checkout', 'source', 'setup', 'analyzers',
+                   'resources', 'software', 'formal_archive', 'identity', 'build_archive')
+          record = {'job_result_before_upload': os.environ['NEXUS_FORMAL_RESULT'],
+              'steps': {name: {key: steps.get(name, {}).get(key)
+                        for key in ('outcome', 'conclusion')} for name in names},
+              'software_qualified': False, 'physical_status': 'not_executed',
+              'scope': 'plan orchestration only; candidate qualification is separate'}
+          (Path(os.environ['RUNNER_TEMP']) / 'formal-diagnostics.json').write_text(
+              json.dumps(record, indent=2) + '\n')
+          PY
+      - name: Retain the complete verified archive
+        id: archive_upload
+        if: always() && steps.build_archive.outcome == 'success'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: formal-software-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/formal-build-store/
+            ${{ runner.temp }}/formal-build-package.json
+          compression-level: 0
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve original trees if verified archiving did not complete
+        id: fallback_upload
+        if: >-
+          always() && (steps.formal_archive.outcome != 'success' ||
+          steps.build_archive.outcome != 'success' || steps.archive_upload.outcome != 'success')
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: formal-software-unqualified-raw-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/formal/
+            build/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain execution diagnostics independently
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: formal-software-diagnostics-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/formal-diagnostics.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      # A complete executed plan is not a software candidate or physical HIL.
+      # Cancellation uploads are best effort; archive verification and actual
+      # GitHub upload/run outcomes must be checked before evidence is admitted.

@@ -1,0 +1,57 @@
+{
+  "kind": "portable_usb_control_evidence_navigation",
+  "source_commit": "bacdc5b8a5d64baebb92517e770d0abac28421b8",
+  "archive": {
+    "relative_path": "store/0d596aa1e8076567975755eabb9bcf82e8821bce69577e57a59784daeeed01d2.tar.gz",
+    "bytes": 4091834,
+    "sha256": "0d596aa1e8076567975755eabb9bcf82e8821bce69577e57a59784daeeed01d2"
+  },
+  "io35.package.json": {
+    "relative_path": "io35.package.json",
+    "bytes": 506,
+    "sha256": "248720800a55cf2c50043a45f663e7ab42fbb953608c0c342e9fd90618e3ac6a"
+  },
+  "io35.verify.json": {
+    "relative_path": "io35.verify.json",
+    "bytes": 153,
+    "sha256": "14264a23683b4870f03cce3ef2651988c3ab45d8a384a236737d30fb35a96250"
+  },
+  "io35.portable-verify.json": {
+    "relative_path": "io35.portable-verify.json",
+    "bytes": 153,
+    "sha256": "14264a23683b4870f03cce3ef2651988c3ab45d8a384a236737d30fb35a96250"
+  },
+  "io35.members.json": {
+    "relative_path": "io35.members.json",
+    "bytes": 780610,
+    "sha256": "27974648250de7e0b2f8615c1fd4b234911382067659a02631c68a0d781cb8cb"
+  },
+  "payload_files": 2088,
+  "payload_bytes": 21537902,
+  "source_recovery_manifest": "payload/final-source/manifest.json",
+  "final_summary_member": "payload/evidence/io35-epoch-fix/delivery.json",
+  "original_draft_manifest_member": "payload/draft-provenance/original-draft/manifest.json",
+  "original_roots": {
+    "io35-real-tdd": {
+      "original": "/tmp/nexus-execution-20261020/io35-real-tdd",
+      "archive_prefix": "payload/evidence/io35-real-tdd",
+      "restore_relative_prefix": "evidence/io35-real-tdd"
+    },
+    "io35-arm-initial": {
+      "original": "/tmp/nexus-io35-arm-20261020",
+      "archive_prefix": "payload/evidence/io35-arm-initial",
+      "restore_relative_prefix": "evidence/io35-arm-initial"
+    },
+    "io35-epoch-fix": {
+      "original": "/tmp/nexus-io35-epoch-fix-20261020",
+      "archive_prefix": "payload/evidence/io35-epoch-fix",
+      "restore_relative_prefix": "evidence/io35-epoch-fix"
+    }
+  },
+  "transport_rule": "Keep original native package envelope byte-for-byte, including historical archive.path; use --archive for current transport navigation. Member manifest paths are payload-relative and tar member names use payload/. Inner absolute paths and failures remain unchanged.",
+  "verify_after_transport": "python -B tools/evidence/store.py verify --package <io35.package.json> --archive <store/archive.tar.gz> --report /tmp/usb-control-verify.json",
+  "restore_after_transport": "python -B tools/evidence/store.py restore --package <io35.package.json> --archive <store/archive.tar.gz> --destination /tmp/usb-control-restored-NEW --report /tmp/usb-control-restore.json",
+  "scope": "Byte/member closure only; original reports preserve software-development scope. No physical or clean-SDK promotion.",
+  "source_dirty": true,
+  "source_basis": "Base HEAD; final-source/manifest.json plus targeted delta identifies actual dirty development sources; not clean bacdc qualification"
+}

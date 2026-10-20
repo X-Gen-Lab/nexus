@@ -23,7 +23,9 @@ from tools.measurement.resources import measure
 SOFTWARE_REFERENCE_TARGETS = (
     ("stm32g474re-hse24-reference", "STM32G474RET6"),
     ("stm32h743-nucleo-zi2", "STM32H743ZIT6"),
+    ("stm32h743zi-hsi-reference", "STM32H743ZIT6"),
     ("stm32u575-nucleo-zi-q", "STM32U575ZIT6Q"),
+    ("stm32u575zi-lptim-reference", "STM32U575ZIT6Q"),
 )
 
 

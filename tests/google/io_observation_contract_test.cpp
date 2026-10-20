@@ -116,6 +116,131 @@ TEST(IOTimestamp, AliasedResultCannotRewriteAnInput) {
     EXPECT_EQ(last.ticks, 20U);
 }
 
+TEST(IOTimestampBudget, OnlyTheCompleteErrorIntervalCanMeetTheLimit) {
+    auto first = event(100U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    auto last = event(110U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    first.uncertainty_ticks = 2U;
+    last.uncertainty_ticks = 3U;
+    nx_io_timestamp_budget_result_t result{};
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, 15U, &result), NX_SUCCESS);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_WITHIN);
+    EXPECT_EQ(result.lower_ticks, 5U);
+    EXPECT_EQ(result.upper_ticks, 15U);
+    EXPECT_EQ(result.delta.ticks, 10U);
+    EXPECT_EQ(result.delta.ticks_per_second, 1000000U);
+}
+
+TEST(IOTimestampBudget, ErrorOverlapIsUnknownRatherThanAPassedOrFailedBudget) {
+    auto first = event(100U, NX_IO_TIMESTAMP_SERVICE_OBSERVATION);
+    auto last = event(110U, NX_IO_TIMESTAMP_SERVICE_OBSERVATION);
+    last.uncertainty_ticks = 4U;
+    nx_io_timestamp_budget_result_t result{};
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, 6U, &result), NX_SUCCESS);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_UNKNOWN);
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, 5U, &result), NX_SUCCESS);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_EXCEEDED);
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, 14U, &result), NX_SUCCESS);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_WITHIN);
+}
+
+TEST(IOTimestampBudget, MissingAnErrorBoundCannotFabricateAnExactMeasurement) {
+    auto first = event(100U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    auto last = event(110U, NX_IO_TIMESTAMP_SERVICE_OBSERVATION);
+    last.uncertainty_known = false;
+    last.uncertainty_ticks = UINT64_MAX;
+    nx_io_timestamp_budget_result_t result{};
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, 1U, &result), NX_SUCCESS);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_UNKNOWN);
+    EXPECT_FALSE(result.delta.uncertainty_known);
+    EXPECT_EQ(result.lower_ticks, 0U);
+    EXPECT_EQ(result.upper_ticks, 0U);
+}
+
+TEST(IOTimestampBudget, ExtendedTicksKeepWrapsWithoutExtendingRawDwtSnapshots) {
+    auto first = event(UINT32_MAX - 10U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    auto last = event(first.ticks + (UINT64_C(1) << 34U) + 30U,
+                      NX_IO_TIMESTAMP_SERVICE_OBSERVATION);
+    nx_io_timestamp_budget_result_t result{};
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, UINT64_MAX, &result),
+              NX_SUCCESS);
+    EXPECT_EQ(result.delta.ticks, (UINT64_C(1) << 34U) + 30U);
+    EXPECT_EQ(result.lower_ticks, result.delta.ticks);
+    EXPECT_EQ(result.upper_ticks, result.delta.ticks);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_WITHIN);
+}
+
+TEST(IOTimestampBudget, APhysicalDurationLowerBoundNeverUnderflows) {
+    auto first = event(10U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    auto last = event(11U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    first.uncertainty_ticks = 5U;
+    nx_io_timestamp_budget_result_t result{};
+    ASSERT_EQ(nx_io_timestamp_budget(&first, &last, 0U, &result), NX_SUCCESS);
+    EXPECT_EQ(result.lower_ticks, 0U);
+    EXPECT_EQ(result.upper_ticks, 6U);
+    EXPECT_EQ(result.verdict, NX_IO_TIMESTAMP_BUDGET_UNKNOWN);
+}
+
+TEST(IOTimestampBudget, OverflowDoesNotBecomeASmallDurationOrOverwriteOutput) {
+    auto first = event(0U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    auto last = event(UINT64_MAX, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    last.uncertainty_ticks = 1U;
+    nx_io_timestamp_budget_result_t result{};
+    result.lower_ticks = 777U;
+    EXPECT_EQ(nx_io_timestamp_budget(&first, &last, UINT64_MAX, &result),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(result.lower_ticks, 777U);
+    first.uncertainty_ticks = UINT64_MAX;
+    EXPECT_EQ(nx_io_timestamp_budget(&first, &last, 0U, &result),
+              NX_ERROR_EXHAUSTED);
+    EXPECT_EQ(result.lower_ticks, 777U);
+}
+
+TEST(IOTimestampBudget,
+     ChangedDomainsEpochsRatesOrReverseTimeCannotBeCompared) {
+    auto first = event(10U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    const auto original = event(20U, NX_IO_TIMESTAMP_SERVICE_OBSERVATION);
+    for (unsigned index = 0U; index != 4U; ++index) {
+        auto last = original;
+        if (index == 0U)
+            last.domain = 2U;
+        else if (index == 1U)
+            last.epoch = 2U;
+        else if (index == 2U)
+            last.ticks_per_second = 1000U;
+        else
+            last.ticks = 9U;
+        nx_io_timestamp_budget_result_t result{};
+        result.lower_ticks = 777U;
+        EXPECT_EQ(nx_io_timestamp_budget(&first, &last, 0U, &result),
+                  NX_ERROR_STATE);
+        EXPECT_EQ(result.lower_ticks, 777U);
+    }
+}
+
+TEST(IOTimestampBudget, UnknownZeroRateAndAliasedStorageRetainNoResult) {
+    auto first = event(10U, NX_IO_TIMESTAMP_UNKNOWN);
+    auto last = event(20U, NX_IO_TIMESTAMP_IRQ_OBSERVATION);
+    nx_io_timestamp_budget_result_t result{};
+    result.lower_ticks = 777U;
+    EXPECT_EQ(nx_io_timestamp_budget(&first, &last, 100U, &result),
+              NX_ERROR_UNSUPPORTED);
+    first.source = NX_IO_TIMESTAMP_HARDWARE_EVENT;
+    first.ticks_per_second = 0U;
+    EXPECT_EQ(nx_io_timestamp_budget(&first, &last, 100U, &result),
+              NX_ERROR_INVALID);
+    first.ticks_per_second = 1000000U;
+    EXPECT_EQ(nx_io_timestamp_budget(nullptr, &last, 0U, &result),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_io_timestamp_budget(&first, &last, 0U, nullptr),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_io_timestamp_budget(
+                  &first, &last, 0U,
+                  reinterpret_cast<nx_io_timestamp_budget_result_t*>(&first)),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(first.ticks, 10U);
+    EXPECT_EQ(result.lower_ticks, 777U);
+}
+
 class ServicePort {
   public:
     MOCK_METHOD(void, Service, ());

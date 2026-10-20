@@ -173,6 +173,15 @@ Failed drain retains the corresponding storage and responsibility. Actual linked
 ELF comparisons determine Flash and RAM savings; host `sizeof` expectations alone
 do not establish MCU costs or an unchanged instruction path.
 
+The separate H743 `dma-duplex-continuous` selection combines continuous RX
+with finite TX DMA on one USART3 owner. Its exact V/HSI64/baremetal reference
+uses AXI SRAM with Cache off or on; requests and the complete RX pool remain
+disjoint and borrowed through their respective drain. The existing
+`rx-dma-continuous` selection retains IRQ TX. See the
+[H743 provider contract](../../soc/stm32h743/README.md#selected-continuous-rx-and-finite-tx-dma-duplex)
+for the three-vector, cold-restart and retained-taint boundaries. Neither
+selection expands to RTOS, PLL384 or D2 RAM.
+
 The synchronous whole-CS interface validates every segment and data span before
 hardware use. A null TX pointer
 means repeated dummy words, a null RX pointer means discard, and both may be null
@@ -316,6 +325,12 @@ and a representable uncertainty bound. It does not synchronize clocks, convert
 time domains, access a hardware clock or prove that two facts refer to causally
 paired events. Unknown uncertainty is different from a known zero bound.
 
+The optional timestamp budget evaluator consumes these same facts in O(1)
+work. It reports `WITHIN` only when the complete error interval fits the
+inclusive maximum, `EXCEEDED` only when its lower bound exceeds that maximum,
+and `UNKNOWN` otherwise. A successful comparison does not by itself mean
+within budget. The public timestamp contract owns the exact units and errors.
+
 Checked UART/SPI/I2C service reports an invalid face or an absent service method.
 `SUCCESS` establishes one dispatch only. It does not establish progress, health,
 SETTLED, wire completion or permission to reclaim storage. The ordinary service
@@ -330,6 +345,13 @@ a pure typed getter for that sidecar. Unselected macros evaluate no arguments,
 create no sidecar and add no provider state or operations-table fields. The
 optional library is linked only when selected; linked ELF checks establish the
 actual default and selected cost.
+
+The exact F407 Qiming USART1 and GD470 Liangshan USART0 word references now
+have linked probe-off/on evidence. OFF retains none of the optional observer's
+sidecar, probe/counter helpers, probe getter or observed-service symbols; ON
+brackets exactly one original provider IRQ dispatch. Their original provider
+state sizes remain unchanged. The links also retain the explicit service
+wrapper; they are not runtime I/O captures.
 
 A readable counter pair is a raw modulo-2^32 difference, including probe cost
 and preemption. Multiple wraps, reset and clock-epoch continuity are unknown;
@@ -348,6 +370,15 @@ once even when observation is unavailable. Observation failure never stops
 drain or releases a QUARANTINED borrow. Consumers must prove private state and
 borrowed storage disjoint from the optional observer. Raw probe samples cannot
 be promoted to validated timing budgets without independent continuity proof.
+
+The [HIL measurement protocol](../../tools/hil/README.md) uses schema 2 for
+measurement runs, contexts and traces. Cycle measurements require actual DWT
+endpoints, a live owner/epoch, admitted independent capture-clock facts and a
+CPU-frequency envelope covering that counter epoch and capture interval. This
+envelope must include actual oscillator tolerance, calibration and drift. A
+nominal rate or authored wrap limit cannot replace it. This does not change the separate
+SoC, OS or selected-mode raw protocols. IO-05 is implemented within this selected
+software scope; physical execution remains `not_executed`.
 
 ## Prepare exact HIL protocols without promoting software facts
 
@@ -380,6 +411,43 @@ measured in an actual linked image. Segment validation depends on descriptor
 count, and silicon-policy validation depends on rule count. Do not infer cycles,
 worst-case latency or zero memory growth from an interface diagram.
 
+The following static observations bind clean source
+`bacdc5b8a5d64baebb92517e770d0abac28421b8`, baremetal and `-Os`, with zero heap
+and a reserved 2048-byte MSP. The metadata reference selects Qiming
+STM32F407ZGT6, HSE8/PLL168, UART1 IRQ bytes at 115200 baud with a 32-byte RX ring.
+B enables traits but permits garbage collection; C uses the same compiled
+objects and explicitly retains the traits getter. A disables traits and also
+links to 8012 Flash bytes, but its different comparison profile is rejected by
+the strict A/B comparison; equal totals do not override that rejection.
+
+| Exact link treatment | Flash load / footprint bytes | Reserved SRAM bytes, including MSP |
+| --- | --- | --- |
+| F407 byte UART traits, B→C | 8012→8052 (+40) | 2256→2256 (+0) |
+| F407 word UART whole probe selection, OFF→ON | 7636→8356 (+720) | 2248→2288 (+40) |
+| GD470 word UART whole probe selection, OFF→ON | 9228→9952 (+724) | 2220→2260 (+40) |
+
+The metadata delta is one 24-byte readonly trait record and its 16-byte getter;
+it adds no reserved SRAM and leaves the ordinary UART producer objects
+unchanged. It does not establish whole-system runtime equivalence. The word
+references use 9N1, 115200 baud, 32-word RX and priority 5; F407 uses HSE8/PLL168,
+GD470 HXTAL25/PLL200. Their 40-byte SRAM delta is a 36-byte sidecar plus four
+bytes of alignment padding. Provider state remains 56/48 bytes, and face/ops
+stay readonly.
+
+Probe ON includes the sidecar/getter/snapshot fixture and an explicitly retained
+service wrapper. These are whole optional-selection costs; the actual comparison
+profiles differ, so they are neither a strict same-profile comparison nor an
+isolated pure-IRQ cost. No I/O traffic was run. IRQ/service duration, arrival
+latency, WCET, energy and physical HIL remain unmeasured or not executed.
+
+The original command receipts, raw logs, ELF/map artifacts, independent reviews
+and failed attempts are retained once under
+`tools/testing/evidence/io-linked-cost/`. Its `portable-index.json` identifies
+each unchanged package envelope, member manifest and compact archive. Use the
+existing evidence-store verify/restore commands with the indexed archive path;
+these records describe the pinned source above, not qualification of a later
+commit.
+
 | Evidence | What it establishes | What it does not establish |
 | --- | --- | --- |
 | Metadata and resolver tests | Rejection and generated-plan behavior for supplied facts | New hardware execution or a reviewed PCB route |
@@ -394,16 +462,20 @@ control algorithms and recovery policy remain in external consumer projects.
 
 ## Work that is still a separate implementation
 
-The ledger retains the exits for real linked-list DMA, continuous high-throughput
-H743 paths, U575 low-power autonomous execution, broader or continuous
+The ledger retains the exits for broader linked-list DMA selections, broader
+high-throughput H743 configurations, U575 low-power autonomous execution, broader or continuous
 synchronized control groups, advanced Ethernet/USB, external storage, TrustZone
 services, multicore transport, audio and frame devices. A public type, validated
 topology or model does not complete these exits. Each mode needs its own provider, reviewed route,
 failure and ownership tests, ARM/SDK checks, resource costs and physical evidence
-where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), the
+where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), its separate
+[hardware-chain TX selection](../../soc/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx), the
 [joint PWM/ADC window](pwm-adc.md) and selected [G474 CAN FD modes](can-fd.md) now
 have specific software paths; those selections do not complete the broader exits
-or establish external wiring, measured performance or HIL.
+or establish external wiring, measured performance or HIL. The finite chain
+implements actual hardware node fetch and descriptor/payload drain for one
+contiguous SRAM1 source. It does not select noncontiguous scatter/gather,
+circular chains, RX DMA or autonomous low-power execution.
 
 Use [platform integration contracts](integration-contracts.md),
 [the lifecycle matrix](io-lifecycle-matrix.md),

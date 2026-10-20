@@ -347,6 +347,14 @@ The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h
 :project: nexus
 ```
 
+(usb__profile_8h)=
+
+## usb_profile.h
+
+```{doxygenfile} usb_profile.h
+:project: nexus
+```
+
 (wake_8h)=
 
 ## wake.h

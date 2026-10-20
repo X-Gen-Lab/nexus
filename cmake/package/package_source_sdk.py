@@ -48,6 +48,14 @@ REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
 OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
                     stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
+    'io/include/nexus/io/usb_profile.h',
+    'io/src/usb_profile.c',
+    'tools/configure/usb_profiles.py',
+    'components/usb_control/CMakeLists.txt',
+    'components/usb_control/include/nexus/components/usb_control.h',
+    'components/usb_control/include/nexus/components/usb_descriptors.h',
+    'components/usb_control/src/usb_control.c',
+    'components/usb_control/src/usb_descriptors.c',
     "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
     "arch/include/nexus/arch/arch.h", "arch/cortex_m/nx_arch_cortex_m.c",
@@ -147,6 +155,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
         "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
+        "consumers/h743-uart-duplex-continuous.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
         "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
         "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",

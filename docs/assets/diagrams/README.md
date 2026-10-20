@@ -212,6 +212,13 @@ preposted producer和普通producer不得混用。旧块在两个hardware target
 通过 face 直接进入 provider。硅片准入、traits 和时间戳辅助均显式可选；准入结果
 不自动启动硬件，checked service 不证明请求已经结束。应用拥有执行推进与停机。
 
+可选 USB EP0 packetizer 沿同一显式调用路径组合包层 face：应用拥有 outer request，
+调用者提供 adapter 存储，组件维护两个固定 inner packet 槽；provider 保留已准入
+包的临时借用。ROM profile
+只是生成的只读选定事实。inner DATA ACK、outer STATUS ACK 与地址提交分别观察，
+借用不随 epoch 更新或取消而撤销；OUT0 恢复需外部 controller owner 授权。
+本图不展开 USB 协议阶段，精确边界见 [USB FS device 合同](../../design/usb-device.md)。
+
 依据：[本轮 I/O 架构](../../design/io-evolution.md)、
 [typed IR](../../../tools/configure/ir.py)、
 [选定 traits](../../../tools/configure/io_traits.py)、

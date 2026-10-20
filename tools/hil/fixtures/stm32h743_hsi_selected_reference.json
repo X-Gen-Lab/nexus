@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "scope": "software_reference",
+  "board": "stm32h743zi-hsi-reference",
+  "part": "STM32H743ZIT6",
+  "transport": "swd",
+  "probe_interfaces": [
+    "external-reviewed"
+  ],
+  "serial": {
+    "controller": "USART3",
+    "tx": "PD8",
+    "rx": "PD9",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": [
+    "probe_identity",
+    "flash_readback",
+    "reset",
+    "uart_echo"
+  ],
+  "physical_status": "not_executed",
+  "pending_qualification": [
+    {
+      "id": "selected_mode_station_review",
+      "fixture": "Software-only HSI64/V2003 selected-mode contract. No actual PCB, peer, SPI4 PE12/13/14 AF5 or PE11 CS wiring, probe, power, UID, HSI trim/cache or external USART3 control channel is observed. SPI-only configurations have no selected console. A separately reviewed physical fixture and tooling change are required; this fixture cannot admit a station.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "selected_mode_capture",
+      "fixture": "Independent exact SPI cache DMA, continuous RX off/on with IRQ TX, or separately selected finite DMA TX plus continuous DMA RX protocols require actual instruments, observed cache maintenance, DMA/wire/IRQ drain, caller loans and correlated time domains. These software preparations infer no physical result, dynamic clock or deep sleep qualification.",
+      "budget": null,
+      "unit": "ns"
+    }
+  ]
+}

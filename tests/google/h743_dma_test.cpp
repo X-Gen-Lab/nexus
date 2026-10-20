@@ -51,13 +51,13 @@ class H743Dma : public testing::Test {
         state.uart.irq = USART3_IRQn;
         state.uart.profile = NX_UART_RX_BYTES;
         state.uart.irq_policy = {NX_IRQ_KERNEL_NONE, 150, 4, 0};
-        state.dma = &g_h743_dma_registers;
-        state.tx = &g_h743_dma_stream;
-        state.mux = &g_h743_dma_mux;
+        state.transmit.dma = &g_h743_dma_registers;
+        state.transmit.tx = &g_h743_dma_stream;
+        state.transmit.mux = &g_h743_dma_mux;
         regions[0] = {reinterpret_cast<uintptr_t>(bytes), sizeof(bytes),
                       NX_DMA_MEMORY_READ};
-        state.regions = regions;
-        state.region_count = 1;
+        state.transmit.regions = regions;
+        state.transmit.region_count = 1;
         nx_request_initialize(&request.base);
     }
     void Start(bool cached = false) {
@@ -161,12 +161,12 @@ TEST_F(H743Dma, CacheCleanOwnsExactLinesOutsideIrqMaskBeforeEnablingDma) {
     EXPECT_CALL(boundary, Clean(reinterpret_cast<uintptr_t>(bytes), 64))
         .WillOnce(testing::Invoke([&](uintptr_t, size_t) {
             EXPECT_EQ(NX_REQUEST_ACTIVE, nx_request_state(&request.base));
-            EXPECT_TRUE(state.preparing);
+            EXPECT_TRUE(state.transmit.preparing);
             EXPECT_EQ(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
             return NX_ARCH_OK;
         }));
     ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
-    EXPECT_FALSE(state.preparing);
+    EXPECT_FALSE(state.transmit.preparing);
     EXPECT_NE(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
 }
 TEST_F(H743Dma, PartialCacheLineRejectsBeforeBorrowOrMaintenance) {
@@ -373,27 +373,27 @@ TEST_F(H743Dma, RxBytesRemainIndependentWhileDmaBorrowsTransmitMemory) {
 TEST_F(H743Dma, RxOutputCannotOverwriteDmaExtensionState) {
     Start();
     size_t count = 0;
-    auto* output = reinterpret_cast<uint8_t*>(&state.region_count);
+    auto* output = reinterpret_cast<uint8_t*>(&state.transmit.region_count);
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_uart_port_read_bytes(&port, output, 1, &count));
-    EXPECT_EQ(1U, state.region_count);
+    EXPECT_EQ(1U, state.transmit.region_count);
 }
 TEST_F(H743Dma, PendingForeignDmaIrqRejectsBeforeAnyEffect) {
     g_h743_model.irq_pending[DMA1_Stream0_IRQn] = true;
     EXPECT_EQ(NX_ERROR_BUSY,
               nx_stm32h743_uart_dma_initialize(&state, 64000000, 8));
     EXPECT_EQ(0U, g_h743_model.writes);
-    EXPECT_FALSE(state.retained);
+    EXPECT_FALSE(state.transmit.retained);
 }
 TEST_F(H743Dma, StopRefusalRetainsMuxClockAndStaticOwnershipForRetry) {
     Start();
     g_h743_model.hold_irq_off = true;
     EXPECT_EQ(NX_ERROR_IO, nx_uart_port_stop(&port));
-    EXPECT_TRUE(state.retained);
+    EXPECT_TRUE(state.transmit.retained);
     EXPECT_EQ(46U, g_h743_dma_mux.CCR);
     g_h743_model.hold_irq_off = false;
     EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
-    EXPECT_FALSE(state.retained);
+    EXPECT_FALSE(state.transmit.retained);
     EXPECT_FALSE(state.uart.retained);
     EXPECT_EQ(0U, g_h743_dma_mux.CCR);
     EXPECT_FALSE(g_h743_model.irq_enabled[DMA1_Stream0_IRQn]);
@@ -433,8 +433,8 @@ TEST_F(H743Dma,
     EXPECT_EQ(NX_ERROR_IO, request.base.result);
 }
 TEST_F(H743Dma, RxStorageCannotOverlapTheDmaExtension) {
-    state.uart.rx_storage = &state.region_count;
-    state.uart.rx_capacity = sizeof(state.region_count);
+    state.uart.rx_storage = &state.transmit.region_count;
+    state.uart.rx_capacity = sizeof(state.transmit.region_count);
     EXPECT_EQ(NX_ERROR_INVALID,
               nx_stm32h743_uart_dma_initialize(&state, 64000000, 8));
     EXPECT_EQ(0U, g_h743_model.writes);
@@ -614,7 +614,7 @@ TEST_P(H743DmaDomain, RejectsBeforeBorrowWithoutAnyDmaProbe) {
         Isolated();
         Restore();
         EXPECT_EQ(NX_ERROR_STATE, nx_uart_port_submit(&port, &request));
-        EXPECT_TRUE(state.retained);
+        EXPECT_TRUE(state.transmit.retained);
     });
 }
 TEST_P(H743DmaDomain, ServiceLossStaysQuarantinedAfterExternalRestore) {
@@ -634,7 +634,7 @@ TEST_P(H743DmaDomain, ServiceLossStaysQuarantinedAfterExternalRestore) {
             EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_stop(&port));
         }
         EXPECT_EQ(&request, state.uart.active);
-        EXPECT_TRUE(state.retained);
+        EXPECT_TRUE(state.transmit.retained);
         Isolated();
     });
 }
@@ -790,8 +790,9 @@ static bool initialization_boundary_seen;
 static bool initialization_irq_delivered;
 static void LoseDomainBeforeModeRetention(void* owner) {
     auto* state = static_cast<nx_stm32h743_uart_dma_state_t*>(owner);
-    if (!state->uart.initialized || !state->uart.retained || state->retained ||
-        !g_h743_model.irq_enabled[USART3_IRQn] || nx_arch_irq_is_masked()) {
+    if (!state->uart.initialized || !state->uart.retained ||
+        state->transmit.retained || !g_h743_model.irq_enabled[USART3_IRQn] ||
+        nx_arch_irq_is_masked()) {
         g_h743_model.before_irq_save = LoseDomainBeforeModeRetention;
         return;
     }
@@ -812,8 +813,8 @@ TEST_P(H743DmaDomain, InitializationCannotForgetAnIrqObservedDomainLoss) {
                   nx_stm32h743_uart_dma_initialize(&state, 64000000U, 8U));
         EXPECT_TRUE(initialization_boundary_seen);
         EXPECT_TRUE(initialization_irq_delivered);
-        EXPECT_TRUE(state.domain_lost);
-        EXPECT_TRUE(state.retained);
+        EXPECT_TRUE(state.transmit.domain_lost);
+        EXPECT_TRUE(state.transmit.retained);
         EXPECT_TRUE(state.uart.retained);
         EXPECT_TRUE(state.uart.initialized);
         EXPECT_EQ(0U, g_h743_dma_stream.CR);
@@ -821,8 +822,8 @@ TEST_P(H743DmaDomain, InitializationCannotForgetAnIrqObservedDomainLoss) {
         Isolated();
         nx_uart_port_service(&port);
         EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_stop(&port));
-        EXPECT_TRUE(state.domain_lost);
-        EXPECT_TRUE(state.retained);
+        EXPECT_TRUE(state.transmit.domain_lost);
+        EXPECT_TRUE(state.transmit.retained);
         EXPECT_TRUE(state.uart.retained);
         Isolated();
     });

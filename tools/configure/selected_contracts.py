@@ -237,7 +237,8 @@ def _format(item, provider, shape):
         policy = "domain_cache_line" if line else "provider_domain"
     if item.provider == "stm32h743" and (
             (kind == "spi" and item.mode == "dma") or
-            (kind == "uart" and item.mode == "rx-dma-continuous")):
+            (kind == "uart" and item.mode in
+             ("rx-dma-continuous", "dma-duplex-continuous"))):
         line = options.dma_cache_line_bytes
         policy = "domain_cache_line" if line else "provider_domain"
     return dict(fields=fields, abort_scope=abort, continuity=continuity,
@@ -281,6 +282,10 @@ def describe(item, endpoint=None, *, public_class=None):
         # This public request is IRQ TX; the separate RX block loan has the
         # provider's 16-bit NDTR and optional complete-cache-line restrictions.
         limits["max_transfer_units"] = "UINT32_MAX"
+    if (item.provider == "stm32h743" and kind == "uart" and
+            item.mode == "dma-duplex-continuous" and
+            item.options.dma_cache_line_bytes):
+        limits.update(buffer_alignment=32, max_transfer_units="65504")
     if (item.provider == "stm32h743" and kind == "spi" and shape.dma and
             item.options.dma_cache_line_bytes):
         limits.update(buffer_alignment=32, max_transfer_units="65504")

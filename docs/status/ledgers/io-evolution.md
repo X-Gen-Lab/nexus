@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b2a4ab6aeb5f989a750d11c0382bb73139efb841e76a6a3227b4f4c0fbe610a0`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -71,7 +71,7 @@ source_language: zh_CN
 | `task` | Observed silicon identity and revision admission |
 | `implementation_paths` | core/include/nexus/core/silicon.h;core/src/silicon.c |
 | `exit_condition` | Exact documents and revision policy; unknown is explicit; factory stays cold |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -87,7 +87,7 @@ source_language: zh_CN
 | `task` | Admission cancellation drain epochs and quarantine regression matrix |
 | `implementation_paths` | core/src/request.c;tests/google/io_state_machine_test.cpp;tests/google/spi_dma_owner_wait_test.cpp |
 | `exit_condition` | Fresh complete no-skip software gate for this iteration |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -103,7 +103,7 @@ source_language: zh_CN
 | `task` | Bounded IRQ and service execution observation |
 | `implementation_paths` | io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py |
 | `exit_condition` | Optional probes compile out; explicit service and IRQ budgets |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -151,7 +151,7 @@ source_language: zh_CN
 | `task` | Linked resource and runtime cost comparison |
 | `implementation_paths` | tools/measurement;tests/contracts/uart_rx_compact_assembly |
 | `exit_condition` | Fresh exact ELF comparison; no inferred physical timing or energy |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -199,7 +199,7 @@ source_language: zh_CN
 | `task` | Typed hardware event graph and startup ordering |
 | `implementation_paths` | tools/configure/trigger_graph.py |
 | `exit_condition` | Validate event cycles with owned stop gates; emit selected reviewed routes |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -215,7 +215,7 @@ source_language: zh_CN
 | `task` | Selected DMA engines lanes requests and reachability |
 | `implementation_paths` | tools/configure/dma_topology.py |
 | `exit_condition` | Exact provider tuples; reject physical lane collisions |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -231,7 +231,7 @@ source_language: zh_CN
 | `task` | Descriptor ownership placement cache and chain cancellation |
 | `implementation_paths` | tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-chain.toml |
 | `exit_condition` | Static validation plus actual linked-list provider drain and loans |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -247,7 +247,7 @@ source_language: zh_CN
 | `task` | Explicit line formats flow control and independent nine-bit I/O |
 | `implementation_paths` | io/include/nexus/io/uart_word.h |
 | `exit_condition` | Native and exact STM32/GD32 register paths; compact byte default |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -375,7 +375,7 @@ source_language: zh_CN
 | `task` | Optional state recovery ownership and checked service entry |
 | `implementation_paths` | io/src/observation.c |
 | `exit_condition` | Checked dispatch is distinct from I/O progress or settlement |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -423,7 +423,7 @@ source_language: zh_CN
 | `task` | Reuse reviewed peripheral IP generations and official HAL/LL |
 | `implementation_paths` | soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py |
 | `exit_condition` | Private implementation sharing with exact per-family facts |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -453,9 +453,9 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | h743 |
 | `task` | UART continuous duplex DMA and SPI DMA with cache |
-| `implementation_paths` | soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml |
+| `implementation_paths` | soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml |
 | `exit_condition` | Selected SRAM reachability and held-buffer protection |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |

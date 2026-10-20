@@ -283,6 +283,13 @@ HIL或签名后的晋升使用同hashartifact，不重新构建一个名称相�
 
 只有独立重建比较完成才可声明可复现。固定container加hash、一次成功build或源码归档deterministic都不够。
 
+普通可重定位 source SDK 的验收证明搬移后能够配置、构建、链接和运行，不保证任意
+安装路径生成相同 ELF。未配置 path mapping 时，故障位置的 `__FILE__` 字符串可以
+包含 SDK 绝对路径；路径长度和链接对齐会影响 Flash 字节数。因此不同 SDK 前缀下的
+静态成本差值不能直接解释为资源优化。当前 C11 固件的正式复现工具为源码、consumer
+和构建目录设置 `-ffile-prefix-map`，并比较两次实际 ELF/BIN；仍须执行该流程才能声明
+逐字节可复现。
+
 ## 10. 证据模型与失败传播
 
 使用一个版本化结果schema，表达run身份、planned/executed checks、exit/status、raw-log/artifact引用、qualified scope与limitations。完整compile database、map和log存为artifact，manifest引用，避免每个profile重复嵌套相同大文件。

@@ -16,6 +16,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
+| [选定模式 HIL 合同](selected-mode-hil.md) | H743 SPI Cache／连续 RX／UART DMA 双向、U575 UART 硬件链／RUN LPTIM 的精确采集协议；准备和原始记录校验不建立实板资格 |
 | [H743 V 修订高速时钟参考](h743-high-clock.md) | 已审 V 修订 HSI／PLL384 冷态生命周期、不可变时钟域与外设内核合同；软件证据与待验证硬件边界 |
 | [H743 Flash RAM 维护设计](h743-flash-ram.md) | 选定 V／Cache off 的私有 CPU bridge、RAM VTOR、MPU 保护与真实排空；生产 ELF 闭包及完整软件退出尚未完成 |
 | [有限 PWM/ADC 联合采样](pwm-adc.md) | 单 owner、两次预热、TIM1 触发的 regular ADC DMA、排空与冷态恢复；软件参考/HIL 边界 |
@@ -43,7 +44,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
 | [STM32G474 接入](stm32g474.md) | 精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI |
-| [STM32H743 接入](../../soc/stm32h743/README.md) | 四种固定 HSI/cache 配置、冷态 cache 所有权、USART3 DMA TX 与有限 RX DMA block；不代表连续 RX |
+| [STM32H743 接入](../../soc/stm32h743/README.md) | 四种固定 HSI/cache 配置及冷态 cache 所有权；独立 V／HSI64／裸机参考增加 SPI4 有限 DMA、USART3 连续 RX／IRQ TX，以及显式有限 TX DMA／连续 RX 双向模式 |
 | [U575 双域参考合同](u575-trustzone-contract.md) | 独立 Secure/NS Runtime、冷态归属封存、固定 NS world 与同步 GPIO；无 RTOS/factory/async/HIL 扩大承诺 |
 | [SoC 完善与 55 项台账](soc-refinement.md) | 实现范围、原始退出条件、软件机制与实板验收分列 |
 | [I2C 总线恢复](i2c-bus-clear.md) | 调用者独占 GPIO、有限时序与失败后继续清理的合同 |
@@ -77,7 +78,11 @@ G474／H743／U575 增量按各文档的精确配置、完整镜像与 SDK 退�
 物理 Flash、单次 ADC 与固定 PWM；GD303 另维护 EXTI 和硬件级联 timebase。
 G474 的既有 GPIO/UART/SPI/PWM/IWDG/EXTI 之外，选入 bulb ADC 单次／有限 TIM6
 DMA、I2C1 和 ECC Flash。H743 的固定 HSI/cache 支持有限 TX DMA 或有 rearm
-间隙的 RX block，可显式初始化 D2 SRAM1；另有七类有限外设的软件夹具。U575
+间隙的 RX block，可显式初始化 D2 SRAM1；独立 V／HSI64／裸机参考在 Cache off/on
+下增加 SPI4 有限 DMA 和 USART3 连续双缓冲 RX。`rx-dma-continuous` 保留独立 IRQ
+TX；另选 `dma-duplex-continuous` 才增加有限 TX DMA。新双向模式只接入 AXI SRAM，
+RX 使用至少三个等长 block，不能推导为 FreeRTOS、PLL384 或 D2 SRAM 支持；另有
+七类有限外设的软件夹具。U575
 TZEN0 增加 SPI/I2C/ADC/PWM/EXTI/Flash，外部电源与安全状态准入仍适用。
 独立无 OS 的 TZEN1 GPIO 参考可复制最多八条命令到 Secure slot，再由调用者逐步
 推进；不保留 NS 指针，不代表通用双域 factory、NS RTOS 或异步借用。

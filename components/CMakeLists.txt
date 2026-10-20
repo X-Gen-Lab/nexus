@@ -57,3 +57,5 @@ add_subdirectory(dp83848)
 
 add_subdirectory(clock_domain)
 add_subdirectory(user_io_broker)
+
+add_subdirectory(usb_control)

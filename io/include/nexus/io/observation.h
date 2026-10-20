@@ -76,6 +76,46 @@ nx_result_t nx_io_timestamp_elapsed(const nx_io_timestamp_t* first,
                                     const nx_io_timestamp_t* last,
                                     nx_io_timestamp_delta_t* out);
 
+/** \brief A timing bound can straddle a budget without proving either side. */
+typedef enum {
+    NX_IO_TIMESTAMP_BUDGET_UNKNOWN = 0,
+    NX_IO_TIMESTAMP_BUDGET_WITHIN,
+    NX_IO_TIMESTAMP_BUDGET_EXCEEDED
+} nx_io_timestamp_budget_verdict_t;
+
+/**
+ * \brief Inclusive interval and budget comparison in the stated tick domain.
+ * \note lower/upper are usable only when delta.uncertainty_known is true.
+ *       Otherwise both are zero and verdict is UNKNOWN, never an exact zero.
+ */
+typedef struct {
+    nx_io_timestamp_delta_t delta;
+    uint64_t lower_ticks;
+    uint64_t upper_ticks;
+    nx_io_timestamp_budget_verdict_t verdict;
+} nx_io_timestamp_budget_result_t;
+
+/**
+ * \brief           Compare a complete timing-error interval with a budget.
+ * \param[in]       first: Stable aligned extended timestamp, causally paired.
+ * \param[in]       last: Stable aligned fact in the same domain/epoch/rate.
+ * \param[in]       maximum_ticks: Inclusive maximum, in the stated tick units.
+ * \param[out]      out: Distinct aligned result, unchanged on rejection.
+ * \return          SUCCESS, INVALID/UNSUPPORTED/STATE as elapsed, or EXHAUSTED
+ *                  when the uncertainty sum or upper bound cannot fit.
+ * \note            Pure O(1) Task/IRQ work with no clock access or retention.
+ *                  WITHIN requires upper <= maximum; EXCEEDED requires
+ *                  lower > maximum. An overlapping or unknown error interval
+ *                  gives UNKNOWN. SUCCESS alone does not mean within budget.
+ *                  The existing timestamp-owner/provenance contract applies:
+ *                  this does not extend raw DWT, validate epoch continuity,
+ *                  synchronize sampling, establish IRQ arrival or prove WCET.
+ */
+nx_result_t nx_io_timestamp_budget(const nx_io_timestamp_t* first,
+                                   const nx_io_timestamp_t* last,
+                                   uint64_t maximum_ticks,
+                                   nx_io_timestamp_budget_result_t* out);
+
 /**
  * \brief           Dispatch the selected UART service or explain its absence.
  * \param[in]       port: Live immutable face and initialized provider state.

@@ -134,6 +134,34 @@ class H743RamBuildGateTests(unittest.TestCase):
         self.assertEqual("failed", report["status"])
         self.assertIn("image guard record", report["failure"])
 
+    def test_real_callee_cannot_hide_a_stack_address_from_its_caller(self):
+        from tools.measurement.elf import Elf32
+        original = (self.selected() / "bin/io_evolution_fixture.elf").read_bytes()
+        image = Elf32(original)
+        symbol, = [row for row in image.defined_symbols if row["name"] ==
+                   "nx_stm32h743_flash_ram_lock" and row["type"] == 2]
+        address = symbol["value"] & ~1
+        section = image.sections[symbol["section"]]
+        offset = section["offset"] + address - section["address"]
+        self.assertGreaterEqual(symbol["size"], 6)
+        self.assertEqual(0, symbol["size"] % 2)
+        changed = bytearray(original)
+        # Real Thumb bytes: mov r4,sp; movs r0,#1; bx lr. The linked callee
+        # now returns a stack-derived nonvolatile value to the real caller.
+        # NOP padding preserves symbol/layout/SU extents, so a CFG/stack-only
+        # checker cannot reject this through an unrelated layout failure.
+        changed[offset:offset + symbol["size"]] = (
+            b"\x6c\x46\x01\x20\x70\x47" +
+            b"\x00\xbf" * ((symbol["size"] - 6) // 2))
+        path = self.root / "changed-callee-stack-address.elf"
+        path.write_bytes(changed)
+        result, output = self.invoke(elf=path)
+        self.assertNotEqual(0, result.returncode,
+                            "actual callee output must reach caller analysis")
+        report = json.loads(output.read_text())
+        self.assertEqual("failed", report["status"])
+        self.assertIn("stack-derived store", report["failure"])
+
     def test_deleting_report_reexecutes_the_normal_link_audit(self):
         build = self.selected()
         previous = self.report()

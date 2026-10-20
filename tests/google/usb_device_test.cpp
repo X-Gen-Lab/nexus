@@ -161,6 +161,91 @@ TEST_F(UsbDevice, NewSetupInvalidatesOldControlBeforeReusingStorage) {
     EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
     EXPECT_GT(model.controller.snapshot.epoch, epoch);
 }
+TEST_F(UsbDevice, SetupDecisionCannotStallAnAlreadyPublishedNewEpoch) {
+    const uint8_t old_setup[8] = {0, 1, 0, 0, 0, 0, 1, 0};
+    ReceiveSetup(old_setup);
+    auto out = Port(1);
+    uint64_t old_epoch = model.controller.snapshot.epoch;
+    ASSERT_EQ(
+        nx_usb_out_prepare(&request, bytes, 1, NX_USB_DATA, old_epoch, 200),
+        NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    const uint8_t data[1] = {42};
+    ASSERT_EQ(nx_native_usb_receive(&model, 0, data, 1, false), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 0, false), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(request.base.result, NX_SUCCESS);
+    nx_usb_device_state_t cached = {};
+    ASSERT_EQ(nx_usb_device_state(&device, &cached), NX_SUCCESS);
+    ASSERT_EQ(cached.epoch, old_epoch);
+    ASSERT_TRUE(cached.control_pending);
+
+    /* A real SETUP IRQ can run after this cached decision. Its normal progress
+     * already clears setup_pending, so that flag cannot substitute for epoch.
+     */
+    const uint8_t next_setup[8] = {0x80, 6, 0, 1, 0, 0, 4, 0};
+    ReceiveSetup(next_setup);
+    ASSERT_GT(model.controller.snapshot.epoch, cached.epoch);
+    ASSERT_FALSE(model.controller.setup_pending);
+    ASSERT_EQ(endpoints[0].request, nullptr);
+    ASSERT_EQ(endpoints[1].request, nullptr);
+    uint32_t before = model.hardware.registers[0x900U / 4U];
+    ASSERT_EQ(before & ((1U << 31U) | (1U << 21U)), 0U);
+    ASSERT_FALSE(endpoints[0].halted);
+    ASSERT_FALSE(endpoints[1].halted);
+    const nx_usb_setup_decision_port_t decision = {
+        &nx_usb_fs_setup_decision_ops, &model.controller};
+    size_t reads = model.hardware.mmio_reads;
+    size_t writes = model.hardware.mmio_writes;
+    EXPECT_EQ(nx_usb_setup_reject(&decision, cached.epoch), NX_ERROR_STATE);
+    EXPECT_EQ(model.hardware.mmio_reads, reads);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(model.hardware.registers[0x900U / 4U], before);
+    EXPECT_FALSE(endpoints[0].halted);
+    EXPECT_FALSE(endpoints[1].halted);
+    EXPECT_TRUE(model.controller.snapshot.control_pending);
+
+    ASSERT_EQ(nx_usb_setup_reject(&decision, model.controller.snapshot.epoch),
+              NX_SUCCESS);
+    EXPECT_GT(model.hardware.mmio_reads, reads);
+    EXPECT_GT(model.hardware.mmio_writes, writes);
+    EXPECT_NE(model.hardware.registers[0x900U / 4U] & (1U << 21U), 0U);
+    EXPECT_TRUE(endpoints[0].halted);
+    EXPECT_FALSE(endpoints[1].halted);
+}
+TEST_F(UsbDevice, SetupDecisionCannotRevokeAnActiveControlOutLoan) {
+    const uint8_t setup[8] = {0, 1, 0, 0, 0, 0, 1, 0};
+    ReceiveSetup(setup);
+    auto out = Port(1);
+    uint64_t epoch = model.controller.snapshot.epoch;
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 1, NX_USB_DATA, epoch, 200),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    ASSERT_EQ(endpoints[0].request, nullptr);
+    ASSERT_EQ(endpoints[1].request, &request);
+    uint32_t before = model.hardware.registers[0x900U / 4U];
+    const nx_usb_setup_decision_port_t decision = {
+        &nx_usb_fs_setup_decision_ops, &model.controller};
+    size_t writes = model.hardware.mmio_writes;
+    EXPECT_EQ(nx_usb_setup_reject(&decision, epoch), NX_ERROR_BUSY);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(model.hardware.registers[0x900U / 4U], before);
+    EXPECT_EQ(endpoints[1].request, &request);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(request.out, bytes);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    EXPECT_FALSE(endpoints[0].halted);
+    EXPECT_FALSE(model.hardware.out_zero_disable_requested);
+
+    /* Only the explicit controller owner requests the independent full-stop
+     * proof. The rejected decision never cancels or releases the OUT0 loan. */
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(endpoints[1].request, nullptr);
+    EXPECT_EQ(model.hardware.consumers, 0U);
+}
 TEST_F(UsbDevice, AddressChangesOnlyAfterMatchingStatusInAcknowledgement) {
     const uint8_t setup[8] = {0, 5, 7, 0, 0, 0, 0, 0};
     ReceiveSetup(setup);

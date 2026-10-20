@@ -8,7 +8,12 @@
  */
 #include "drv_usb_regs.h"
 #include "gd32f470_usb_device.h"
+#include "nexus/io/usb_profile.h"
 #include <stddef.h>
+_Static_assert(USBFS_MAX_EP_COUNT == NX_USB_FS_ENDPOINT_NUMBERS &&
+                   USBFS_MAX_FIFO_WORDLEN == NX_USB_FS_FIFO_WORDS &&
+                   USBFS_MAX_PACKET_SIZE == NX_USB_FS_MAX_PACKET,
+               "Selected public FS profile must match the locked SDK");
 _Static_assert(
     offsetof(usb_gr, GAHBCS) == 8U && offsetof(usb_gr, GUSBCS) == 12U &&
         offsetof(usb_gr, GRSTCTL) == 16U && offsetof(usb_gr, GINTF) == 20U &&

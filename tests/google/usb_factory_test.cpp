@@ -275,6 +275,35 @@ TEST_F(UsbFactory, PureFactoryDoesNotStartAndControllerIsNotAnEndpoint) {
     EXPECT_EQ(bulk->ops, &nx_usb_fs_endpoint_ops);
     EXPECT_FALSE(state->snapshot.started);
 }
+TEST_F(UsbFactory, SelectedUsbProfileIsPureExactAndDistinctFromGenericCaps) {
+    EXPECT_CALL(ports, Start()).Times(0);
+    const nx_usb_device_profile_t* profile =
+        nx_factory_usb_profile(NX_USB_DEVICE_ID_FS);
+    ASSERT_NE(profile, nullptr);
+    EXPECT_EQ(profile, nx_factory_usb_profile(NX_USB_DEVICE_ID_FS));
+    EXPECT_EQ(nx_factory_usb_profile(NX_USB_DEVICE_ID_COUNT), nullptr);
+    EXPECT_EQ(nx_usb_profile_validate(profile), NX_SUCCESS);
+    EXPECT_EQ(profile->port, face);
+    EXPECT_EQ(profile->setup_decision.ops, &nx_usb_fs_setup_decision_ops);
+    EXPECT_EQ(profile->setup_decision.context, face->context);
+    EXPECT_EQ(profile->endpoint_count, 4U);
+    EXPECT_EQ(profile->phy_clock_hz, 48000000U);
+    EXPECT_EQ(profile->fifo_words, 320U);
+    EXPECT_EQ(profile->rx_fifo_words, 96U);
+    EXPECT_EQ(profile->endpoint_numbers, 4U);
+    EXPECT_EQ(profile->role, NX_USB_PROFILE_DEVICE);
+    EXPECT_EQ(profile->speed, NX_USB_PROFILE_FULL_SPEED);
+    EXPECT_EQ(profile->phy, NX_USB_PROFILE_INTERNAL_FS);
+    EXPECT_EQ(profile->engine, NX_USB_PROFILE_PIO);
+    const nx_usb_endpoint_profile_t* selected =
+        nx_usb_profile_endpoint(profile, 1U, true);
+    ASSERT_NE(selected, nullptr);
+    EXPECT_EQ(selected->port, bulk);
+    EXPECT_EQ(selected->max_packet, 64U);
+    EXPECT_EQ(selected->transfer, NX_USB_PROFILE_BULK);
+    EXPECT_EQ(nx_usb_profile_endpoint(profile, 2U, true), nullptr);
+    EXPECT_FALSE(state->snapshot.started);
+}
 TEST_F(UsbFactory, CapabilityDescribesExactlyOneSelectedPioPacket) {
     const nx_factory_io_capability_t* capability =
         nx_factory_usb_endpoint_capability(NX_USB_ENDPOINT_ID_BULK_IN);

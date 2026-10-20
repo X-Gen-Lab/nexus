@@ -1,0 +1,262 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "/tmp/nexus-quality-20261019/.venv/bin/python",
+        "-B",
+        "/tmp/nexus-quality-20261019/tools/evidence/store.py",
+        "export",
+        "--source",
+        "/tmp/nexus-io08-cost-20261020",
+        "--store",
+        "/tmp/nexus-linked-cost-packages-20261020/store",
+        "--report",
+        "/tmp/nexus-linked-cost-packages-20261020/io08.package.json"
+      ],
+      "exit_code": 0,
+      "receipt": {
+        "bytes": 1476,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/commands/io08-export.command.json",
+        "sha256": "6e46eb980c2c55b2c2e0f8c76f65fb8a681110a77926d1c4d85d482ad1ba3093"
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-quality-20261019/.venv/bin/python",
+        "-B",
+        "/tmp/nexus-quality-20261019/tools/evidence/store.py",
+        "verify",
+        "--package",
+        "/tmp/nexus-linked-cost-packages-20261020/io08.package.json",
+        "--report",
+        "/tmp/nexus-linked-cost-packages-20261020/io08.verify.json"
+      ],
+      "exit_code": 0,
+      "receipt": {
+        "bytes": 1437,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/commands/io08-verify.command.json",
+        "sha256": "11278e817781943c1b327e4da66a728783ee656122b15c877a5d45e56fe85c23"
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-quality-20261019/.venv/bin/python",
+        "-B",
+        "/tmp/nexus-quality-20261019/tools/evidence/store.py",
+        "export",
+        "--source",
+        "/tmp/nexus-io05-probe-cost-20261020",
+        "--store",
+        "/tmp/nexus-linked-cost-packages-20261020/store",
+        "--report",
+        "/tmp/nexus-linked-cost-packages-20261020/io05.package.json"
+      ],
+      "exit_code": 0,
+      "receipt": {
+        "bytes": 1481,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/commands/io05-export.command.json",
+        "sha256": "1657d9235736c2172fd21c79e7c6af75a7feb556190cd123a041384da228c4d8"
+      }
+    },
+    {
+      "argv": [
+        "/tmp/nexus-quality-20261019/.venv/bin/python",
+        "-B",
+        "/tmp/nexus-quality-20261019/tools/evidence/store.py",
+        "verify",
+        "--package",
+        "/tmp/nexus-linked-cost-packages-20261020/io05.package.json",
+        "--report",
+        "/tmp/nexus-linked-cost-packages-20261020/io05.verify.json"
+      ],
+      "exit_code": 0,
+      "receipt": {
+        "bytes": 1436,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/commands/io05-verify.command.json",
+        "sha256": "47e098a2c708c9137cea6e4996834ae073b0a2d43d1f116aac955038a4b3b02c"
+      }
+    }
+  ],
+  "cycles_status": "not_measured",
+  "entries": {
+    "io05": {
+      "archive": {
+        "bytes": 1065851,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/store/cb4c864fc660ab4239c5addca0361f25b5ef4ca74c79bd9a67839254bcf5fe5d.tar.gz",
+        "sha256": "cb4c864fc660ab4239c5addca0361f25b5ef4ca74c79bd9a67839254bcf5fe5d"
+      },
+      "archive_relative_path": "store/cb4c864fc660ab4239c5addca0361f25b5ef4ca74c79bd9a67839254bcf5fe5d.tar.gz",
+      "directory_entries": 542,
+      "files": 828,
+      "independent_review_members": [
+        {
+          "archive_member_path": "payload/independent-static-review.json",
+          "kind": "file",
+          "mode": 384,
+          "path": "independent-static-review.json",
+          "restore_relative_path": "independent-static-review.json",
+          "sha256": "8a7bb094cb37fa4eae106a5b7e603be70731e9fe02c89ba6752d433bc33aae87",
+          "size": 17631
+        }
+      ],
+      "manifest": {
+        "bytes": 226476,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/io05.members.json",
+        "sha256": "f80e21bdfb821a01e3d0e95b4539d006dc44d3642476af2d452d0ab6eefac0ab"
+      },
+      "manifest_relative_path": "io05.members.json",
+      "manifest_sha256": "f80e21bdfb821a01e3d0e95b4539d006dc44d3642476af2d452d0ab6eefac0ab",
+      "package": {
+        "bytes": 502,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/io05.package.json",
+        "sha256": "ea5e2fe9f069ef54a67675979197834253de04450bc799e0c99016f6a5c2599b"
+      },
+      "package_relative_path": "io05.package.json",
+      "payload_bytes": 6322620,
+      "portable_verify_command_receipt": {
+        "bytes": 1619,
+        "relative_path": "commands/io05-portable-verify.command.json",
+        "sha256": "b1e89e78b35ab908883eb138658edc9e67b83b32f665c37d6fac3f9fadc7c9d0"
+      },
+      "portable_verify_report": {
+        "bytes": 151,
+        "relative_path": "io05.portable-verify.json",
+        "sha256": "3872a1c832f966eb10b3f82c8a77a40299a5fed6c6bf7f5ba2396b881326c09a"
+      },
+      "relocation_rule": "Preserve this original native package envelope byte-for-byte; supply the transported archive with store.py --archive. Do not rewrite archive.path or inner historical paths.",
+      "scope": "IO05 F407/F470 optional probe selection link cost",
+      "source_directory": "/tmp/nexus-io05-probe-cost-20261020",
+      "summary_member": {
+        "archive_member_path": "payload/final-summary.json",
+        "kind": "file",
+        "mode": 384,
+        "path": "final-summary.json",
+        "restore_relative_path": "final-summary.json",
+        "sha256": "262473f0b2994bf7cb35bca20916e99ec7d69dcff2f4649cdf5d37e96e639987",
+        "size": 26527
+      },
+      "under_5_MiB_archive": true,
+      "verify_report": {
+        "bytes": 151,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/io05.verify.json",
+        "sha256": "3872a1c832f966eb10b3f82c8a77a40299a5fed6c6bf7f5ba2396b881326c09a"
+      }
+    },
+    "io08": {
+      "archive": {
+        "bytes": 787724,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/store/777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651.tar.gz",
+        "sha256": "777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651"
+      },
+      "archive_relative_path": "store/777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651.tar.gz",
+      "directory_entries": 360,
+      "files": 567,
+      "independent_review_members": [
+        {
+          "archive_member_path": "payload/root-independent-review.json",
+          "kind": "file",
+          "mode": 384,
+          "path": "root-independent-review.json",
+          "restore_relative_path": "root-independent-review.json",
+          "sha256": "7a0f737762dda51d95062bfd9b64b05925bde99cee619577ea305568fb556031",
+          "size": 2223
+        }
+      ],
+      "manifest": {
+        "bytes": 135522,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/io08.members.json",
+        "sha256": "553522e7dc36b9c151e8caa8e49393169961751a80f1e5ccb0a46dca23593706"
+      },
+      "manifest_relative_path": "io08.members.json",
+      "manifest_sha256": "553522e7dc36b9c151e8caa8e49393169961751a80f1e5ccb0a46dca23593706",
+      "package": {
+        "bytes": 501,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/io08.package.json",
+        "sha256": "7f6c8182d62ec7d42b392183e0d7a941fe806ec5f87d48c4ce0f3786917e4bb2"
+      },
+      "package_relative_path": "io08.package.json",
+      "payload_bytes": 5056309,
+      "portable_verify_command_receipt": {
+        "bytes": 1620,
+        "relative_path": "commands/io08-portable-verify.command.json",
+        "sha256": "dd8549520f23625cd4636bca2a371148d69e64e2a9919e935d9ca6e749dbe91b"
+      },
+      "portable_verify_report": {
+        "bytes": 151,
+        "relative_path": "io08.portable-verify.json",
+        "sha256": "18007b6446c6eb178a5ff226439b48e78912cf5aa135808745ff8f938fbcdd6c"
+      },
+      "relocation_rule": "Preserve this original native package envelope byte-for-byte; supply the transported archive with store.py --archive. Do not rewrite archive.path or inner historical paths.",
+      "scope": "IO08 controlled optional-traits link treatment",
+      "source_directory": "/tmp/nexus-io08-cost-20261020",
+      "summary_member": {
+        "archive_member_path": "payload/verification.json",
+        "kind": "file",
+        "mode": 384,
+        "path": "verification.json",
+        "restore_relative_path": "verification.json",
+        "sha256": "0e51b1366c5c425d3a3de52faecab8f4ad0dc4934042eadc33e208121dbf5182",
+        "size": 105681
+      },
+      "under_5_MiB_archive": true,
+      "verify_report": {
+        "bytes": 151,
+        "path": "/tmp/nexus-linked-cost-packages-20261020/io08.verify.json",
+        "sha256": "18007b6446c6eb178a5ff226439b48e78912cf5aa135808745ff8f938fbcdd6c"
+      }
+    }
+  },
+  "inner_report_limit": "Archive verification binds original bytes, member closure, modes, hashes and counts. Inner reports retain original scope and historical absolute navigation; do not modify them to fake qualification or rerun consistency.",
+  "memory_after": {
+    "current": 16716808192,
+    "events": {
+      "high": 0,
+      "low": 0,
+      "max": 31486,
+      "oom": 61,
+      "oom_group_kill": 0,
+      "oom_kill": 10
+    }
+  },
+  "memory_before": {
+    "current": 16711880704,
+    "events": {
+      "high": 0,
+      "low": 0,
+      "max": 31486,
+      "oom": 61,
+      "oom_group_kill": 0,
+      "oom_kill": 10
+    }
+  },
+  "original_directories_preserved": true,
+  "physical_status": "not_executed",
+  "purpose": "Portable navigation for two unchanged native evidence-store envelopes; archive verification is not inner-cost qualification.",
+  "restore_after_relocation_argv_template": [
+    "python",
+    "-B",
+    "tools/evidence/store.py",
+    "restore",
+    "--package",
+    "tools/testing/evidence/io-linked-cost/{label}.package.json",
+    "--archive",
+    "tools/testing/evidence/io-linked-cost/{archive_relative_path}",
+    "--destination",
+    "/tmp/nexus-linked-cost-restored-{label}-NEW",
+    "--report",
+    "/tmp/nexus-linked-cost-restored-{label}-receipt.json"
+  ],
+  "source_commit": "bacdc5b8a5d64baebb92517e770d0abac28421b8",
+  "verify_after_relocation_argv_template": [
+    "python",
+    "-B",
+    "tools/evidence/store.py",
+    "verify",
+    "--package",
+    "tools/testing/evidence/io-linked-cost/{label}.package.json",
+    "--archive",
+    "tools/testing/evidence/io-linked-cost/{archive_relative_path}",
+    "--report",
+    "/tmp/nexus-linked-cost-verify-{label}.json"
+  ]
+}

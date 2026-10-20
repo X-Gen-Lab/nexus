@@ -911,30 +911,15 @@ static nx_result_t cancel(void* context, nx_usb_request_t* r) {
     nx_usb_controller_irq(ep->controller);
     return NX_SUCCESS;
 }
-/** \brief Stall is a proved idle endpoint operation, never hidden cancellation.
- */
-static nx_result_t stall(void* context, bool value) {
-    nx_usb_endpoint_t* ep = context;
-    if (ep == NULL || ep->controller == NULL) {
-        return NX_ERROR_INVALID;
-    }
-    if (!task_context()) {
-        return NX_ERROR_CONTEXT;
-    }
-    nx_arch_irq_state_t saved = nx_arch_irq_save();
+/** \brief Caller holds the existing local IRQ guard; no hidden cancellation. */
+static nx_result_t stall_locked(nx_usb_endpoint_t* ep, bool value) {
     nx_usb_controller_t* c = ep->controller;
-    if (!c->snapshot.started || c->snapshot.closing) {
-        nx_arch_irq_restore(saved);
-        return NX_ERROR_STATE;
-    }
     if (ep->request != NULL) {
-        nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
     uint32_t offset = ep_offset(ep);
     uint32_t control = NX_USB_READ(c->registers, offset);
     if ((ep->in || ep->number != 0U) && (control & ENABLE) != 0U) {
-        nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
     control = value ? control | STALL : control & ~STALL;
@@ -948,8 +933,57 @@ static nx_result_t stall(void* context, bool value) {
     if (accepted) {
         ep->halted = value;
     }
-    nx_arch_irq_restore(saved);
     return accepted ? NX_SUCCESS : NX_ERROR_IO;
+}
+/** \brief Preserve the old unversioned endpoint operation and its table ABI. */
+static nx_result_t stall(void* context, bool value) {
+    nx_usb_endpoint_t* ep = context;
+    if (ep == NULL || ep->controller == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_usb_controller_t* c = ep->controller;
+    nx_result_t result = !c->snapshot.started || c->snapshot.closing
+                             ? NX_ERROR_STATE
+                             : stall_locked(ep, value);
+    nx_arch_irq_restore(saved);
+    return result;
+}
+/** \brief Bind software-epoch validation and STALL in one serialization point.
+ */
+static nx_result_t reject_setup(void* context, uint64_t epoch) {
+    nx_usb_controller_t* c = context;
+    if (c == NULL || epoch == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (!c->snapshot.started || c->snapshot.closing ||
+        !c->snapshot.control_pending || c->setup_pending || c->reset_pending ||
+        c->snapshot.epoch != epoch || c->snapshot.setup.epoch != epoch) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_STATE;
+    }
+    nx_usb_endpoint_t* in = endpoint(c, 0U, true);
+    nx_usb_endpoint_t* out = endpoint(c, 0U, false);
+    nx_result_t result;
+    if (in == NULL || out == NULL) {
+        result = NX_ERROR_INVALID;
+    } else if (in->request != NULL || out->request != NULL) {
+        result = NX_ERROR_BUSY;
+    } else {
+        /* A not-yet-collected physical SETUP is still handled by the normal
+         * IRQ receive/clear-halt sequence after this guard. No bus timing or
+         * wire-level atomicity is inferred from the software epoch check. */
+        result = stall_locked(in, true);
+    }
+    nx_arch_irq_restore(saved);
+    return result;
 }
 /** \brief Independent monotonic timeout service, including after
  * unplug/suspend. */
@@ -1193,3 +1227,6 @@ const nx_usb_device_ops_t nx_usb_fs_device_ops = {.service = service,
                                                   .address = address,
                                                   .attach_wake = attach_wake,
                                                   .stop = stop};
+
+const nx_usb_setup_decision_ops_t nx_usb_fs_setup_decision_ops = {
+    .reject = reject_setup};

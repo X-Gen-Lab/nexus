@@ -206,12 +206,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("u575 lptim run", "u575-lptim-run", "u575-lptim"),
         ("h743 uart continuous", "h743-uart-continuous", "h743-uart-continuous"),
         ("h743 uart continuous cache on", "h743-uart-continuous-cache-on", "h743-uart-continuous"),
+        ("h743 uart duplex continuous", "h743-uart-duplex-continuous", "h743-uart-duplex-continuous"),
+        ("h743 uart duplex continuous cache on", "h743-uart-duplex-continuous-cache-on", "h743-uart-duplex-continuous"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
         "u575-uart-chain", "h743-spi-dma-uart-tx", "h743-spi-dma-uart-rx",
         "g474-pin-states", "u575-lptim-run", "h743-uart-continuous",
-        "h743-uart-continuous-cache-on"})
+        "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
+        "h743-uart-duplex-continuous-cache-on"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -254,7 +257,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         verification / "consumers/h743-spi-dma.c")
         shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
                         verification / "consumers/pin-states.c")
-        for stem in ("u575-lptim", "h743-uart-continuous"):
+        for stem in ("u575-lptim", "h743-uart-continuous",
+                     "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
             shutil.copyfile(ROOT / relative, self.sdk / relative)
         runtime_smoke = ROOT / "cmake/package/verification/io_evolution/consumers/h743-runtime-clock.c"
@@ -644,7 +648,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
         for label in ("h743 spi dma", "h743 spi dma cache on",
                       "h743 spi dma uart tx", "h743 spi dma uart rx",
                       "u575 uart chain", "u575 lptim run",
-                      "h743 uart continuous", "h743 uart continuous cache on"):
+                      "h743 uart continuous", "h743 uart continuous cache on",
+                      "h743 uart duplex continuous",
+                      "h743 uart duplex continuous cache on"):
             for operation, exit_code in (("build", 51), ("retention", 52)):
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
@@ -729,8 +735,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 self.assertIn("nx_factory_pin_state", smoke)
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.stem in {"u575-lptim-run", "h743-uart-continuous",
-                                   "h743-uart-continuous-cache-on"}:
+                                   "h743-uart-continuous-cache-on",
+                                   "h743-uart-duplex-continuous",
+                                   "h743-uart-duplex-continuous-cache-on"}:
                 stem = ("u575-lptim" if assembly.stem == "u575-lptim-run"
+                        else "h743-uart-duplex-continuous" if
+                        assembly.stem.startswith("h743-uart-duplex-")
                         else "h743-uart-continuous")
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
@@ -748,7 +758,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "pin_state_impl.h", "stm32u575_lptim.h",
                          "stm32u575_uart_gpdma_chain.h",
                          "stm32u575_uart_gpdma_impl.h",
-                         "stm32h743_uart_continuous.h"):
+                         "stm32h743_uart_continuous.h",
+                         "stm32h743_uart_duplex.h",
+                         "stm32h743_uart_continuous_impl.h",
+                         "stm32h743_uart_dma_parts.h"):
                 self.assertIn('__has_include("' + name + '")', private_guard)
             self.assertNotIn(str(ROOT), (source / "CMakeLists.txt").read_text())
         self.assertEqual(inputs, {stem + ".toml" for _, stem, _
@@ -1205,7 +1218,7 @@ finally:
         self.assertEqual(report['status'], 'passed')
         self.assertEqual(report['parallel_jobs'], jobs)
         self.assertEqual(report['consumer_workers'], jobs)
-        self.assertEqual(len(report['consumers']), 41)
+        self.assertEqual(len(report['consumers']), 43)
         self.assertTrue(all(row['status'] == 'passed'
                             for row in report['consumers']))
         self.assertEqual([row['name'] for row in report['selected_images']],

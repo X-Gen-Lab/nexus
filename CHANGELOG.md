@@ -22,6 +22,17 @@ schema `2` remain separate, unchanged identities.
 - Optional caller-owned cold lifecycle diagnostics and a read-only mode review
   work-package view derived from existing authorities. The view does not execute
   tests or grant software or physical qualification.
+- Explicit H743 V-revision, HSI64, baremetal AXI-SRAM reference selections for
+  finite SPI DMA and continuous UART RX with Cache off/on. UART RX can retain
+  independent IRQ TX or explicitly select finite DMA TX with a shared UART owner.
+- U575 TZEN0 finite USART1 GPDMA hardware-chain TX and LPTIM2 RUN one-shot
+  references. These do not enable autonomous STOP operation or arbitrary chains.
+- Pure caller-owned timestamp budget comparison with known uncertainty bounds
+  and separate WITHIN, EXCEEDED and UNKNOWN results. Raw DWT snapshots do not
+  acquire an elapsed-time or clock-continuity guarantee.
+- Software HIL preparation for the five selected I/O modes and seven independent
+  ThreadX acceptance protocols. Reference fixtures remain unbound and cannot
+  authorize a physical station.
 
 ### Changed
 
@@ -29,6 +40,29 @@ schema `2` remain separate, unchanged identities.
   static definitions, initialization and failed-init cleanup responsibility.
 - Current Source SDK consumers request exact version `0.2.0`; old SDK and
   qualification records keep their original source and version.
+- Host-only GoogleTest and GoogleMock use the pinned `ext/googletest` Git
+  submodule. Firmware and its installed source SDK exclude the host framework.
+- Source SDK consumer policy v5 requires 43 independent roots and 46 images,
+  including two explicit H743 DMA-duplex configurations. These are required-plan
+  counts; execution results bind a particular source and uploaded evidence.
+- Measurement schema 2 requires raw DWT endpoints, a continuous counter epoch,
+  and an independent admitted reference with CPU-frequency and timing-error
+  bounds. Older scalar assertions cannot qualify new measurements.
+- A manual, exact-main-SHA workflow executes the complete software plan with
+  bounded deadlines and preserves both original output trees. Running this
+  entry and sealing a software candidate remain separate validation steps.
+
+### Fixed
+
+- H743 TX/RX domain-loss paths retain loans and stop peripheral accesses after
+  isolation. RX publication requires a final live-domain observation.
+- Successful H743 UART stop restores its owned cold registers for restart;
+  refused drain or restoration retains resources and prevents false success.
+- The limited H743 Flash ELF auditor follows actual callee register and stack
+  argument provenance and rejects unsupported SP register-offset loads. Full
+  production execution closure remains a separate, unfinished proof scope.
+- Provider-required public consumers must also belong to the source SDK's
+  reviewed export selection.
 
 ### Verification and limitations
 
