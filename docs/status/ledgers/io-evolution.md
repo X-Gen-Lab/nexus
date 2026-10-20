@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`784f2ed5c8e9eb8da7c9d31457d09b4252a95e54aa4bdec6baab93f98cf8e0c9`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b2b71c0640011d1c0f2c2b558cd63291870881a07d55686ecfeaf64fe5decdcc`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -71,7 +71,7 @@ source_language: zh_CN
 | `task` | Observed silicon identity and revision admission |
 | `implementation_paths` | core/include/nexus/core/silicon.h;core/src/silicon.c |
 | `exit_condition` | Exact documents and revision policy; unknown is explicit; factory stays cold |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -199,7 +199,7 @@ source_language: zh_CN
 | `task` | Typed hardware event graph and startup ordering |
 | `implementation_paths` | tools/configure/trigger_graph.py |
 | `exit_condition` | Validate event cycles with owned stop gates; emit selected reviewed routes |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -215,7 +215,7 @@ source_language: zh_CN
 | `task` | Selected DMA engines lanes requests and reachability |
 | `implementation_paths` | tools/configure/dma_topology.py |
 | `exit_condition` | Exact provider tuples; reject physical lane collisions |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -247,7 +247,7 @@ source_language: zh_CN
 | `task` | Explicit line formats flow control and independent nine-bit I/O |
 | `implementation_paths` | io/include/nexus/io/uart_word.h |
 | `exit_condition` | Native and exact STM32/GD32 register paths; compact byte default |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -375,7 +375,7 @@ source_language: zh_CN
 | `task` | Optional state recovery ownership and checked service entry |
 | `implementation_paths` | io/src/observation.c |
 | `exit_condition` | Checked dispatch is distinct from I/O progress or settlement |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -423,7 +423,7 @@ source_language: zh_CN
 | `task` | Reuse reviewed peripheral IP generations and official HAL/LL |
 | `implementation_paths` | soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py |
 | `exit_condition` | Private implementation sharing with exact per-family facts |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
