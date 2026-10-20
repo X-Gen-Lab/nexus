@@ -173,6 +173,15 @@ Failed drain retains the corresponding storage and responsibility. Actual linked
 ELF comparisons determine Flash and RAM savings; host `sizeof` expectations alone
 do not establish MCU costs or an unchanged instruction path.
 
+The separate H743 `dma-duplex-continuous` selection combines continuous RX
+with finite TX DMA on one USART3 owner. Its exact V/HSI64/baremetal reference
+uses AXI SRAM with Cache off or on; requests and the complete RX pool remain
+disjoint and borrowed through their respective drain. The existing
+`rx-dma-continuous` selection retains IRQ TX. See the
+[H743 provider contract](../../soc/stm32h743/README.md#selected-continuous-rx-and-finite-tx-dma-duplex)
+for the three-vector, cold-restart and retained-taint boundaries. Neither
+selection expands to RTOS, PLL384 or D2 RAM.
+
 The synchronous whole-CS interface validates every segment and data span before
 hardware use. A null TX pointer
 means repeated dummy words, a null RX pointer means discard, and both may be null
@@ -316,6 +325,12 @@ and a representable uncertainty bound. It does not synchronize clocks, convert
 time domains, access a hardware clock or prove that two facts refer to causally
 paired events. Unknown uncertainty is different from a known zero bound.
 
+The optional timestamp budget evaluator consumes these same facts in O(1)
+work. It reports `WITHIN` only when the complete error interval fits the
+inclusive maximum, `EXCEEDED` only when its lower bound exceeds that maximum,
+and `UNKNOWN` otherwise. A successful comparison does not by itself mean
+within budget. The public timestamp contract owns the exact units and errors.
+
 Checked UART/SPI/I2C service reports an invalid face or an absent service method.
 `SUCCESS` establishes one dispatch only. It does not establish progress, health,
 SETTLED, wire completion or permission to reclaim storage. The ordinary service
@@ -348,6 +363,15 @@ once even when observation is unavailable. Observation failure never stops
 drain or releases a QUARANTINED borrow. Consumers must prove private state and
 borrowed storage disjoint from the optional observer. Raw probe samples cannot
 be promoted to validated timing budgets without independent continuity proof.
+
+The [HIL measurement protocol](../../tools/hil/README.md) uses schema 2 for
+measurement runs, contexts and traces. Cycle measurements require actual DWT
+endpoints, a live owner/epoch, admitted independent capture-clock facts and a
+CPU-frequency envelope covering that counter epoch and capture interval. This
+envelope must include actual oscillator tolerance, calibration and drift. A
+nominal rate or authored wrap limit cannot replace it. This does not change the separate
+SoC, OS or selected-mode raw protocols. IO-05 remains `in_progress` and physical
+execution remains `not_executed`.
 
 ## Prepare exact HIL protocols without promoting software facts
 
@@ -394,16 +418,20 @@ control algorithms and recovery policy remain in external consumer projects.
 
 ## Work that is still a separate implementation
 
-The ledger retains the exits for real linked-list DMA, continuous high-throughput
-H743 paths, U575 low-power autonomous execution, broader or continuous
+The ledger retains the exits for broader linked-list DMA selections, broader
+high-throughput H743 configurations, U575 low-power autonomous execution, broader or continuous
 synchronized control groups, advanced Ethernet/USB, external storage, TrustZone
 services, multicore transport, audio and frame devices. A public type, validated
 topology or model does not complete these exits. Each mode needs its own provider, reviewed route,
 failure and ownership tests, ARM/SDK checks, resource costs and physical evidence
-where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), the
+where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), its separate
+[hardware-chain TX selection](../../soc/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx), the
 [joint PWM/ADC window](pwm-adc.md) and selected [G474 CAN FD modes](can-fd.md) now
 have specific software paths; those selections do not complete the broader exits
-or establish external wiring, measured performance or HIL.
+or establish external wiring, measured performance or HIL. The finite chain
+implements actual hardware node fetch and descriptor/payload drain for one
+contiguous SRAM1 source. It does not select noncontiguous scatter/gather,
+circular chains, RX DMA or autonomous low-power execution.
 
 Use [platform integration contracts](integration-contracts.md),
 [the lifecycle matrix](io-lifecycle-matrix.md),

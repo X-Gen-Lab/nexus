@@ -16,6 +16,8 @@ typedef struct {
     DMA_TypeDef dma;
     DMA_Stream_TypeDef rx;
     DMAMUX_Channel_TypeDef mux;
+    DMA_Stream_TypeDef tx;
+    DMAMUX_Channel_TypeDef tx_mux;
     uint8_t bus[0x80000];
     uint8_t input[65536];
     size_t input_count;
@@ -39,8 +41,21 @@ typedef struct {
     unsigned frames;
     unsigned commits;
     unsigned exception;
+    size_t tx_initial;
+    size_t tx_count;
+    unsigned tx_frame_cycles;
+    uint8_t output[65536];
+    uint8_t tx_byte;
+    bool tx_pending;
+    bool hold_tx_en;
+    bool hold_tx_wire;
+    unsigned clean_calls;
+    bool tainted;
+    unsigned accesses_after_isolation;
+    void (*write_observer)(volatile uint32_t* reg, uint32_t value);
     volatile uint32_t* refuse_write;
     void (*cache_observer)(void);
+    void (*clean_observer)(void);
 } nx_h743_uart_continuous_model_t;
 extern nx_h743_uart_continuous_model_t g_h743_uart_continuous_model;
 uint32_t nx_h743_uart_continuous_model_read(volatile uint32_t* reg);
@@ -51,6 +66,8 @@ void nx_h743_uart_continuous_model_feed(const uint8_t* data, size_t bytes);
 bool nx_h743_uart_continuous_model_level(int irq);
 nx_arch_result_t nx_h743_uart_continuous_model_invalidate(uintptr_t address,
                                                           size_t bytes);
+nx_arch_result_t nx_h743_uart_continuous_model_clean(uintptr_t address,
+                                                     size_t bytes);
 #ifdef __cplusplus
 }
 #endif
@@ -60,14 +77,19 @@ nx_arch_result_t nx_h743_uart_continuous_model_invalidate(uintptr_t address,
 #define NX_H743_WRITE(p, v) nx_h743_uart_continuous_model_write((p), (v))
 #define NX_H743_DMA_INVALIDATE(p, n)                                           \
     nx_h743_uart_continuous_model_invalidate((p), (n))
+#define NX_H743_DMA_CLEAN(p, n)  nx_h743_uart_continuous_model_clean((p), (n))
 #define NX_H743_IRQ_ENABLED(irq) g_h743_model.irq_enabled[(irq)]
 #undef DMA1
 #undef DMA1_Stream1
+#undef DMA1_Stream0
 #undef DMAMUX1_Channel1
+#undef DMAMUX1_Channel0
 #undef USART3
 #define DMA1             (&g_h743_uart_continuous_model.dma)
 #define DMA1_Stream1     (&g_h743_uart_continuous_model.rx)
+#define DMA1_Stream0     (&g_h743_uart_continuous_model.tx)
 #define DMAMUX1_Channel1 (&g_h743_uart_continuous_model.mux)
+#define DMAMUX1_Channel0 (&g_h743_uart_continuous_model.tx_mux)
 #define USART3           (&g_h743_uart_continuous_model.uart)
 #undef RCC
 #undef FLASH

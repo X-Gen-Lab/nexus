@@ -24,6 +24,7 @@ from tools.hil.acquire import (
 from tools.hil.admit import admit, require
 from tools.hil.measure import _freshness
 from tools.hil.prepare import preparation_plan as fixture_plan
+from tools.hil import selected_modes
 
 
 def _case(title, kinds, hardware, stimulus, observations, assertions, metrics,
@@ -169,12 +170,15 @@ CASES = MappingProxyType({
         {"duration": ("s", "positive"), "stale_accesses": ("count", "zero"),
          "context_mismatches": ("count", "zero"), "irq_latency": ("us", "budget"),
          "service_interval": ("us", "budget"), "stack_used_peak": ("bytes", "budget")}),
+    **selected_modes.soc_definitions(_case),
 })
 
 MAX_VALUE = 2 ** 64 - 1
 
 
 def _selection(case_id, definition, resolved, controllers=None):
+    if case_id in selected_modes.SCENARIOS:
+        return selected_modes.selection(case_id, resolved, controllers)
     selected = resolved["controllers"] if controllers is None else controllers
     kinds = {item["kind"] for item in selected}
     gaps = [group for group in definition["required_kinds"]
@@ -189,8 +193,10 @@ def _selection(case_id, definition, resolved, controllers=None):
 
 
 def preparation_plan(fixture, resolved):
-    """Make all nineteen obligations explicit, without operating equipment."""
-    base = fixture_plan(fixture, resolved)
+    """Make generic and exact-mode obligations explicit without equipment."""
+    base = (selected_modes.preparation_base(fixture, resolved)
+            if selected_modes.has_selected(resolved) else
+            fixture_plan(fixture, resolved))
     cases = []
     for case_id, definition in CASES.items():
         availability, gaps = _selection(case_id, definition, resolved)
@@ -262,7 +268,10 @@ def validate_protocol(protocol, fixture, resolved):
     case_id = protocol["case_id"]
     require(isinstance(case_id, str) and case_id in CASES, "unknown SoC HIL case")
     definition = CASES[case_id]
-    fixture_plan(fixture, resolved)
+    if protocol["case_id"] in selected_modes.SCENARIOS:
+        selected_modes.preparation_base(fixture, resolved)
+    else:
+        fixture_plan(fixture, resolved)
     require(all(protocol[key] == resolved[key] for key in ("board", "part", "backend")),
             "SoC protocol fixture/build identity mismatch")
     ids = protocol["controller_ids"]
@@ -563,6 +572,11 @@ def validate_record(raw, admission, *, now=None):
     expected_modes = {name: {key: controllers[name][key] for key in ("kind", "mode")}
                       for name in protocol["controller_ids"]}
     require(context["mode_scope"] == expected_modes, "SoC captured mode scope mismatch")
+    mode_results = None
+    if raw["case_id"] in selected_modes.SCENARIOS:
+        mode_results = selected_modes.validate_observations(raw["case_id"],
+            raw["observations"], resolved, protocol, session, raw["protocol"],
+            raw["context"])
     fields(context["methods"], set(definition["metrics"]))
     for conditions in context["methods"].values():
         fields(conditions, {"instrument", "method", "resolution", "window_s"})
@@ -610,6 +624,9 @@ def validate_record(raw, admission, *, now=None):
             if metric == "stack_used_peak":
                 require(value <= context["stack_capacity_bytes"],
                         "SoC stack peak exceeds actual capacity")
+            if mode_results is not None:
+                require(value == mode_results[metric],
+                        "selected-mode metric differs from parsed raw observations")
             values.append(value)
         counts[metric] = len(values)
         extrema[metric] = {"minimum": min(values), "maximum": max(values)}

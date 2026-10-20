@@ -82,8 +82,10 @@ class QualificationPlanTests(unittest.TestCase):
                         "{root}/tools/configure/assemblies/h743-" + name + ".toml"
                         for name in ("spi-dma", "spi-dma-cache-on",
                                      "spi-dma-uart-tx", "spi-dma-uart-rx",
-                                     "uart-continuous", "uart-continuous-cache-on")}
-                    self.assertEqual(len(expected), 32)
+                                     "uart-continuous", "uart-continuous-cache-on",
+                                     "uart-duplex-continuous",
+                                     "uart-duplex-continuous-cache-on")}
+                    self.assertEqual(len(expected), 34)
                     projects = [stage["args"][index + 1]
                                 for index, value in enumerate(stage["args"])
                                 if value == "--project"]

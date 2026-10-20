@@ -770,7 +770,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                         "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"})):
                 fail("H743 SPI DMA requires baremetal/fixed HSI64")
             if (family == "stm32h743" and route["kind"] == "uart" and
-                    mode == "rx-dma-continuous" and (backend != "baremetal" or
+                    mode in ("rx-dma-continuous", "dma-duplex-continuous") and (backend != "baremetal" or
                     assembly["clock_profile"] not in {
                         "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"})):
                 fail("H743 continuous UART requires baremetal/fixed HSI64")
@@ -869,7 +869,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                              **({"can_irqs": hardware["irq"]} if route["kind"] == "can" else {})})
             if family == "stm32h743" and (
                     (route["kind"] == "spi" and mode == "dma") or
-                    (route["kind"] == "uart" and mode == "rx-dma-continuous")):
+                    (route["kind"] == "uart" and mode in
+                     ("rx-dma-continuous", "dma-duplex-continuous"))):
                 # Derived from the validated CPU profile, never an authored
                 # escape hatch for provider-owned cache admission.
                 selected[-1]["dma_cache_line_bytes"] = (

@@ -21,6 +21,7 @@ from tools.hil.admit import require
 from tools.hil.measure import _identity_paths
 from tools.hil.prepare import preparation_plan
 from tools.configure.providers.common import ConfigurationError, mode_traits
+from tools.hil import selected_modes, threadx
 
 
 def _definition(work_item, kinds, stimulus, observations, instruments, safety,
@@ -263,6 +264,7 @@ WORKLOADS = MappingProxyType({
          "passive_loads_outputs_disconnected", "external_rearm_policy"),
         {"commits": "count", "break_cases": "count",
          "unsafe_restart_count": "count", "commit_skew": "ns"}),
+    **selected_modes.workload_definitions(_definition),
 })
 
 MAX_VALUE = 2 ** 64 - 1
@@ -271,6 +273,7 @@ WORK_AMOUNTS = frozenset({"duration", "iterations", "power_cut_cases",
                           "frame_count", "packet_count", "edge_count",
                           "break_cases", "received_words", "segments_exercised",
                           "message_count", "commits"})
+WORK_AMOUNTS = WORK_AMOUNTS | {"trials"}
 TASK_CASES = frozenset({"m4f_context", "stack_peaks", "lifecycle_endurance",
                         "tickless_timer", "fail_stop"})
 
@@ -361,8 +364,14 @@ def _selected_protocol(name, controller):
 
 def _selection(name, definition, resolved):
     """Selected configuration is distinct from chip or fixture capabilities."""
-    if resolved["backend"] == "native":
+    cpu = resolved.get("cpu_profile") or resolved.get("cpu", {})
+    if resolved["backend"] == "native" or cpu.get("arch") == "native":
         return "unsupported", ["physical_target_required"]
+    if name in threadx.WORKLOAD_CASES:
+        return threadx.selection(name, resolved)
+    if name in selected_modes.WORKLOAD_NAMES:
+        return selected_modes.selection(selected_modes.WORKLOAD_NAMES[name],
+                                        resolved)
     if name in TASK_CASES and resolved["backend"] != "freertos":
         return "unsupported", ["freertos_task_workload_required"]
     if name == "m4f_context":
@@ -390,9 +399,14 @@ def _selection(name, definition, resolved):
 
 def workload_plan(fixture: dict, resolved: dict, workload: dict | None = None):
     """Prepare maintained obligations; no plan establishes station readiness."""
-    base = preparation_plan(fixture, resolved)
-    require(resolved.get("backend") in ("native", "baremetal", "freertos"),
+    base = (selected_modes.preparation_base(fixture, resolved)
+            if selected_modes.has_selected(resolved) else
+            preparation_plan(fixture, resolved))
+    require(resolved.get("backend") in
+            ("native", "baremetal", "freertos", "threadx"),
             "maintained workload backend required")
+    if resolved["backend"] == "threadx":
+        threadx.contract(resolved)
     controllers = resolved["controllers"]
     require(isinstance(controllers, list), "selected controllers required")
     ids = [identifier(item["id"], "selected controller")
@@ -403,7 +417,8 @@ def workload_plan(fixture: dict, resolved: dict, workload: dict | None = None):
     protocols = ({item["id"]: item for item in reviewed["cases"]}
                  if reviewed else {})
     cases = []
-    for name, definition in WORKLOADS.items():
+    definitions = _definitions(resolved)
+    for name, definition in definitions.items():
         availability, gaps = _selection(name, definition, resolved)
         protocol = protocols.get(name)
         cases.append({
@@ -434,6 +449,11 @@ def workload_plan(fixture: dict, resolved: dict, workload: dict | None = None):
 def _text(value, label):
     require(isinstance(value, str) and 0 < len(value.strip()) <= 4096,
             "nonempty bounded " + label + " description required")
+
+
+def _definitions(resolved):
+    return ({**WORKLOADS, **threadx.workload_definitions(_definition)}
+            if resolved["backend"] == "threadx" else WORKLOADS)
 
 
 def _descriptions(value, names, label):
@@ -483,7 +503,8 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
             workload["part"] == plan["part"],
             "workload fixture/build Board or part mismatch")
     cases = workload["cases"]
-    require(isinstance(cases, list) and 0 < len(cases) <= len(WORKLOADS),
+    definitions = _definitions(resolved)
+    require(isinstance(cases, list) and 0 < len(cases) <= len(definitions),
             "nonempty bounded workload cases required")
     selected = {item["id"]: item for item in resolved["controllers"]}
     available = {item["id"]: item for item in plan["cases"]}
@@ -492,12 +513,12 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
         fields(case, {"id", "bindings", "stimulus", "raw_observations",
                       "instruments", "safety", "limits"})
         name = identifier(case["id"], "workload case")
-        require(name in WORKLOADS and name not in seen,
+        require(name in definitions and name not in seen,
                 "unknown or repeated workload case")
         seen.add(name)
         require(available[name]["availability"] == "selected",
                 "workload case requires explicit supported build selection")
-        definition = WORKLOADS[name]
+        definition = definitions[name]
         bindings = case["bindings"]
         require(isinstance(bindings, list) and len(bindings) <= len(selected),
                 "bounded selected workload bindings required")
@@ -520,6 +541,10 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
             require(any(_selected_io_protocol(name, selected[value], resolved)
                         for value in bound_ids),
                     "workload must bind its actual selected typed protocol")
+        if name in selected_modes.WORKLOAD_NAMES:
+            require(selected_modes.selection(selected_modes.WORKLOAD_NAMES[name],
+                    resolved, [selected[value] for value in bound_ids])[0] ==
+                    "selected", "workload must bind its exact selected mode")
         _text(case["stimulus"], "stimulus")
         _descriptions(case["raw_observations"], definition["raw_observations"],
                       "raw acquisition")
@@ -528,6 +553,11 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
         for instrument in case["instruments"].values():
             verify_file_identity(instrument)
         _limits(case["limits"], definition["metric_units"])
+        if name in selected_modes.WORKLOAD_NAMES:
+            errors = case["limits"]["protocol_errors"]
+            require(type(errors["maximum"]) is int and
+                    errors["maximum"] == errors.get("minimum", 0) == 0,
+                    "selected-mode protocol errors must remain zero")
     return copy.deepcopy(workload)
 
 

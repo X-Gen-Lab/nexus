@@ -117,12 +117,18 @@ def constructor(item, result, board_bindings, routes, devices):
         stop = f"nx_stm32h743_gpio_stop(&{state}, {item.options.initial}u)"
     elif item.kind == "uart":
         options = item.options
-        continuous = item.mode == "rx-dma-continuous"
-        receive = item.mode in ("rx-dma-idle", "rx-dma-continuous")
-        dma = item.mode in ("dma-tx", "rx-dma-idle", "rx-dma-continuous")
+        duplex = item.mode == "dma-duplex-continuous"
+        continuous = item.mode in ("rx-dma-continuous", "dma-duplex-continuous")
+        receive = item.mode in ("rx-dma-idle", "rx-dma-continuous",
+                               "dma-duplex-continuous")
+        dma = item.mode in ("dma-tx", "rx-dma-idle", "rx-dma-continuous",
+                           "dma-duplex-continuous")
         fifo = item.mode in uart_formats.FIFO_MODES
         flow = item.mode == uart_formats.RTSCTS_MODE
         owner = state
+        if duplex:
+            state += ".receive"
+        rx_owner = state
         if dma or fifo:
             state += ".uart"
         if fifo:
@@ -173,17 +179,26 @@ def constructor(item, result, board_bindings, routes, devices):
         elif dma:
             lane = 1 if receive else 0
             member = "rx" if receive else "tx"
-            initialize = ("uart_continuous" if continuous else
+            resource_owner = rx_owner if receive else owner + ".transmit"
+            initialize = ("uart_duplex" if duplex else
+                          "uart_continuous" if continuous else
                           "uart_receive" if receive else "uart_dma")
-            definitions += [f"    {owner}.dma = DMA1;",
-                            f"    {owner}.{member} = DMA1_Stream{lane};",
-                            f"    {owner}.mux = DMAMUX1_Channel{lane};",
-                            f"    {owner}.regions = s_nx_dma_regions_{name};",
-                            f"    {owner}.region_count = {region_count}u;",
-                            f"    return nx_stm32h743_{initialize}_initialize(&{owner}, {clock}u, 1000000u);"]
+            definitions += [f"    {resource_owner}.dma = DMA1;",
+                            f"    {resource_owner}.{member} = DMA1_Stream{lane};",
+                            f"    {resource_owner}.mux = DMAMUX1_Channel{lane};",
+                            f"    {resource_owner}.regions = s_nx_dma_regions_{name};",
+                            f"    {resource_owner}.region_count = {region_count}u;"]
+            if duplex:
+                definitions += [f"    {owner}.transmit.dma = DMA1;",
+                                f"    {owner}.transmit.tx = DMA1_Stream0;",
+                                f"    {owner}.transmit.mux = DMAMUX1_Channel0;",
+                                f"    {owner}.transmit.regions = s_nx_dma_regions_{name};",
+                                f"    {owner}.transmit.region_count = {region_count}u;"]
+            definitions += [f"    return nx_stm32h743_{initialize}_initialize(&{owner}, {clock}u, 1000000u);"]
         else:
             definitions += [f"    return nx_stm32h743_uart_initialize(&{state}, {clock}u, 1000000u);"]
-        handler = ("uart_continuous_uart" if continuous else
+        handler = ("uart_duplex_uart" if duplex else
+                   "uart_continuous_uart" if continuous else
                    "uart_receive_uart" if receive else
                    "uart_dma_uart" if dma else implementation if fifo else "uart")
         brief = ("Selected bounded FIFO RX/TX budgets." if fifo else
@@ -192,11 +207,16 @@ def constructor(item, result, board_bindings, routes, devices):
                         "/** \\brief " + brief + " */",
                         f"void USART3_IRQHandler(void) {{ nx_stm32h743_{handler}_irq(&{owner}); }}"]
         if dma:
-            dma_handler = ("uart_continuous_dma" if continuous else
+            dma_handler = ("uart_duplex_receive" if duplex else
+                           "uart_continuous_dma" if continuous else
                            "uart_receive_dma" if receive else "uart_dma")
             definitions += [f"void DMA1_Stream{lane}_IRQHandler(void);",
                             r"/** \brief Selected DMA1 terminal observation. */",
                             f"void DMA1_Stream{lane}_IRQHandler(void) {{ nx_stm32h743_{dma_handler}_irq(&{owner}); }}"]
+            if duplex:
+                definitions += ["void DMA1_Stream0_IRQHandler(void);",
+                                r"/** \brief Independent selected TX DMA terminal observation. */",
+                                f"void DMA1_Stream0_IRQHandler(void) {{ nx_stm32h743_uart_duplex_dma_irq(&{owner}); }}"]
         stop = f"nx_uart_port_stop(&s_nx_face_{name})"
     elif item.kind == "spi":
         children = [child for child in devices if child["controller"] == item.id]

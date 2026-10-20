@@ -7498,3 +7498,61 @@ msgstr "一个静态拥有的 provider；不执行发现，也不按寄存器分
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:194
 msgid "Immutable face; provider storage and plans outlive every use."
 msgstr "不可变公共接口对象；provider 存储与计划的生命周期须覆盖每次使用。"
+
+
+msgid ""
+"A timing bound can straddle a budget without proving either side."
+msgstr ""
+"时序界限可能跨越预算，无法证明满足预算或超出预算。"
+
+msgid ""
+"Compare a complete timing-error interval with a budget."
+msgstr ""
+"将完整时序误差区间与预算比较。"
+
+msgid ""
+"Pure O(1) Task/IRQ work with no clock access or retention. WITHIN "
+"requires upper <= maximum; EXCEEDED requires lower > maximum. An "
+"overlapping or unknown error interval gives UNKNOWN. SUCCESS alone does "
+"not mean within budget. The existing timestamp-owner/provenance contract"
+" applies: this does not extend raw DWT, validate epoch continuity, "
+"synchronize sampling, establish IRQ arrival or prove WCET."
+msgstr ""
+"纯 O(1) Task／IRQ 操作，不访问时钟、不保留引用。WITHIN 要求 upper <= maximum；EXCEEDED 要求 "
+"lower > maximum。当 lower <= maximum < upper，或误差界未知时，结果为 UNKNOWN。SUCCESS "
+"本身不表示满足预算。既有时间戳 owner／来源合同仍适用：本函数不扩展原始 DWT、不验证 epoch 连续性、不同步采样、不建立 IRQ "
+"到达时刻，也不证明 WCET。"
+
+msgid ""
+"[in] Stable aligned extended timestamp, causally paired."
+msgstr ""
+"[in] 稳定且对齐的扩展时间戳，须与另一事实构成因果配对。"
+
+msgid ""
+"[in] Stable aligned fact in the same domain/epoch/rate."
+msgstr ""
+"[in] 同一 domain／epoch／rate 内稳定且对齐的事实。"
+
+msgid ""
+"[in] Inclusive maximum, in the stated tick units."
+msgstr ""
+"[in] 包含边界的最大值，单位为声明的 tick。"
+
+msgid ""
+"SUCCESS, INVALID/UNSUPPORTED/STATE as elapsed, or EXHAUSTED when the "
+"uncertainty sum or upper bound cannot fit."
+msgstr ""
+"与 elapsed 相同的 SUCCESS、INVALID／UNSUPPORTED／STATE；不确定度之和或上界不可表示时返回 "
+"EXHAUSTED。"
+
+msgid ""
+"Inclusive interval and budget comparison in the stated tick domain."
+msgstr ""
+"在声明的 tick 域内比较包含边界的区间与预算。"
+
+msgid ""
+"lower/upper are usable only when delta.uncertainty_known is true. "
+"Otherwise both are zero and verdict is UNKNOWN, never an exact zero."
+msgstr ""
+"仅当 delta.uncertainty_known 为 true 时 lower／upper 才可使用。否则两者均为零，verdict 为 "
+"UNKNOWN，绝不表示精确的零。"

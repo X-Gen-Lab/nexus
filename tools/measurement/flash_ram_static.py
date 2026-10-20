@@ -48,6 +48,8 @@ class _Op:
     it_count: int = 0
     writes_lr: bool = False
     stack_store: tuple = ()
+    stack_values: tuple = ()
+    stack_load: tuple = ()
     writes: tuple = ()
     reads: tuple = ()
     store_bases: tuple = ()
@@ -113,13 +115,18 @@ def _decode(address, encoded, *, bridge):
                        writes=((h >> 8) & 7,))
         if h & 0xf000 == 0x9000:
             return _Op(stack_store=((h & 255) * 4, 4) if not h & 0x800 else (),
+                       stack_values=((h >> 8) & 7,) if not h & 0x800 else (),
+                       stack_load=((h & 255) * 4, 4, ((h >> 8) & 7,))
+                       if h & 0x800 else (),
                        writes=((h >> 8) & 7,) if h & 0x800 else ())
         if h & 0xf000 == 0x5000:
             load = (h >> 9) & 7 not in (0, 1, 2)
             return _Op(writes=(h & 7,) if load else (),
+                       reads=((h >> 3) & 7, (h >> 6) & 7) if load else (),
                        store_bases=() if load else ((h >> 3) & 7, (h >> 6) & 7))
         if h & 0xf000 in (0x6000, 0x7000, 0x8000):
             return _Op(writes=(h & 7,) if h & 0x800 else (),
+                       reads=((h >> 3) & 7,) if h & 0x800 else (),
                        store_bases=() if h & 0x800 else ((h >> 3) & 7,))
         if h & 0xf000 == 0xa000:
             return _Op(writes=((h >> 8) & 7,),
@@ -154,6 +161,7 @@ def _decode(address, encoded, *, bridge):
             _require(h & 255, "empty integer multiple transfer")
             return _Op(writes=tuple(i for i in range(8) if h & (1 << i))
                        if h & 0x800 else (),
+                       reads=((h >> 8) & 7,) if h & 0x800 else (),
                        store_bases=() if h & 0x800 else ((h >> 8) & 7,))
         if h & 0xf000 == 0xd000 and (h >> 8) & 15 < 14:
             return _Op("conditional", address + 4 + _signed((h & 255) * 2, 9))
@@ -219,10 +227,16 @@ def _decode(address, encoded, *, bridge):
             _destination(k >> 12)
             _require(h & 15 != 15, "unsupported PC-based memory instruction")
             size = {0xf8c0: 4, 0xf880: 1, 0xf8a0: 2}.get(h & 0xfff0)
+            load_size = {0xf8d0: 4, 0xf890: 1, 0xf8b0: 2,
+                         0xf990: 1, 0xf9b0: 2}.get(h & 0xfff0)
             return _Op(writes_lr=k >> 12 == 14 and bool(h & 16),
                        stack_store=(k & 4095, size)
                        if h & 15 == 13 and size else (),
+                       stack_values=(k >> 12,) if h & 15 == 13 and size else (),
+                       stack_load=(k & 4095, load_size, (k >> 12,))
+                       if h & 15 == 13 and load_size else (),
                        writes=(k >> 12,) if h & 16 else (),
+                       reads=(h & 15,) if h & 16 and h & 15 != 13 else (),
                        store_bases=() if h & 16 or h & 15 == 13 else (h & 15,))
         if h & 0xfff0 in (0xf850, 0xf840, 0xf810, 0xf800, 0xf830, 0xf820):
             _destination(k >> 12)
@@ -233,15 +247,24 @@ def _decode(address, encoded, *, bridge):
             else:
                 _require(h & 15 != 13 or h & 16,
                          "unknown indexed SP store footprint")
+                # Rm names a runtime offset, not an immediate stack slot.
+                _require(h & 15 != 13,
+                         "unknown indexed SP load footprint")
                 _require(k & 0xfc0 == 0 and k & 15 not in (13, 15),
                          "unsupported register-offset transfer")
             size = {0xf840: 4, 0xf800: 1, 0xf820: 2}.get(h & 0xfff0)
+            load_size = {0xf850: 4, 0xf810: 1, 0xf830: 2}.get(h & 0xfff0)
             offset = (k & 255) * (1 if k & 0x200 else -1)
             return _Op(writes_lr=(k >> 12 == 14 and bool(h & 16)) or
                        (h & 15 == 14 and bool(k & 0x800 and k & 0x100)),
                        stack_store=(offset, size)
                        if h & 15 == 13 and size else (),
+                       stack_values=(k >> 12,) if h & 15 == 13 and size else (),
+                       stack_load=(offset, load_size, (k >> 12,))
+                       if h & 15 == 13 and load_size else (),
                        writes=(k >> 12,) if h & 16 else (),
+                       reads=(h & 15,) + ((k & 15,) if not k & 0x800 else ())
+                       if h & 16 and h & 15 != 13 else (),
                        store_bases=() if h & 16 or h & 15 == 13 else
                        (h & 15,) + ((k & 15,) if not k & 0x800 else ()))
         if h & 0xffe0 in (0xe9c0, 0xe940):
@@ -253,7 +276,13 @@ def _decode(address, encoded, *, bridge):
                        14 in (k >> 12, (k >> 8) & 15),
                        stack_store=((k & 255) * (4 if h & 128 else -4), 8)
                        if h & 15 == 13 and not h & 16 else (),
+                       stack_values=(k >> 12, (k >> 8) & 15)
+                       if h & 15 == 13 and not h & 16 else (),
+                       stack_load=((k & 255) * (4 if h & 128 else -4), 8,
+                                   (k >> 12, (k >> 8) & 15))
+                       if h & 15 == 13 and h & 16 else (),
                        writes=(k >> 12, (k >> 8) & 15) if h & 16 else (),
+                       reads=(h & 15,) if h & 16 and h & 15 != 13 else (),
                        store_bases=() if h & 16 or h & 15 == 13 else (h & 15,))
         if h & 0xfe00 in (0xea00, 0xeb00):
             op = (h >> 5) & 15
@@ -339,18 +368,22 @@ def _normalized(name):
     return re.sub(r"\.(isra|constprop|part|clone)\.\d+", r".\1", name)
 
 
-def _walk(code, start, calls, may_return, *, ordinary_c):
+def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
+          entry_tainted=(13,), entry_stack=()):
     """Bound SP paths and check returns under the C memory/ABI obligations.
 
-    Track register copies/arithmetic of SP, MSP and PSP conservatively. This
-    finite provenance blocks known stack-address stores; it is not arbitrary
-    pointer-alias, interprocedural argument or spilled-value analysis.
+    Track register copies/arithmetic of SP, MSP and PSP conservatively.
+    Follow actual call inputs and outputs instead of carrying stale volatile
+    register provenance across BL. Fixed push/pop slots preserve their taint;
+    explicit stack-pointer spills fail closed. This remains a conservative
+    stack-pointer analysis, not arbitrary C object/pointer ownership.
     """
-    pending, seen, depths = [(start, 0, True, (), (13,))], set(), {}
-    maximum, returned = 0, False
+    pending = [(start, 0, True, (), entry_tainted, ())]
+    seen, depths = set(), {}
+    maximum, returned, output = 0, False, set()
     while pending:
-        address, depth, lr, saved, tainted = pending.pop()
-        state = address, depth, lr, saved, tainted
+        address, depth, lr, saved, tainted, stacked = pending.pop()
+        state = address, depth, lr, saved, tainted, stacked
         if state in seen:
             continue
         _require(len(seen) < 20000, "CFG state bound exceeded")
@@ -367,7 +400,6 @@ def _walk(code, start, calls, may_return, *, ordinary_c):
         changed = set(tainted).difference(op.writes)
         if derived:
             changed.update(op.writes)
-        changed = tuple(sorted(changed))
         following = address + len(bytes.fromhex(instruction["encoding"]))
         slots, after = dict(saved), depth + op.delta
         restored = lr and not op.writes_lr
@@ -375,29 +407,53 @@ def _walk(code, start, calls, may_return, *, ordinary_c):
         maximum = max(maximum, after)
         if op.stack_store:
             offset, size = op.stack_store
+            _require(not any(reg in tainted for reg in op.stack_values),
+                     "stack-derived pointer spill is not an owned value")
             _require(0 <= offset and offset + size <= depth,
                      "explicit SP store leaves owned frame")
             first = -depth + offset
             _require(not any(first < slot + 4 and slot < first + size
                              for slot in slots),
                      "explicit SP store overlaps saved LR")
+        if op.stack_load:
+            offset, size, registers = op.stack_load
+            # AAPCS can place arguments beyond this function's own frame.
+            # Their stack-pointer provenance comes from the real caller,
+            # including arguments emitted with PUSH rather than STR.
+            if any(-depth + offset <= slot < -depth + offset + size
+                   for slot in (*stacked, *entry_stack)):
+                changed.update(registers)
+        stack_taint = set(stacked)
         if op.kind == "push":
             for index, register in enumerate(op.registers):
+                slot = -after + index * 4
+                if register in tainted:
+                    stack_taint.update(range(slot, slot + 4))
+                else:
+                    stack_taint.difference_update(range(slot, slot + 4))
                 if register == 14:
-                    slots[-after + index * 4] = lr
+                    slots[slot] = lr
         if op.kind == "pop":
             for index, register in enumerate(op.registers):
+                slot = -depth + index * 4
+                changed.discard(register)
+                if any(byte in stack_taint for byte in range(slot, slot + 4)):
+                    changed.add(register)
                 if register in (14, 15):
-                    value = slots.get(-depth + index * 4, False)
+                    value = slots.get(slot, False)
                     _require(value, "unknown indirect stack return")
                     restored = value
         slots = tuple(sorted((offset, value) for offset, value in slots.items()
                              if offset >= -after))
+        stack_taint = tuple(sorted(slot for slot in stack_taint
+                                   if slot >= -after))
+        changed = tuple(sorted(changed))
         next_nodes = []
         if op.kind == "return" or op.kind == "pop" and 15 in op.registers:
             _require(after == 0 and restored,
                      "unknown indirect return or live frame")
             returned = True
+            output.update(changed)
         elif op.kind in ("call", "branch", "conditional"):
             callee = calls.get(address)
             if callee is not None:
@@ -406,22 +462,33 @@ def _walk(code, start, calls, may_return, *, ordinary_c):
                 if op.kind != "call":
                     _require(after == 0 and restored,
                              "tailcall retains an SP frame")
+                arguments = tuple(sorted(
+                    slot + after for slot in (*stack_taint, *entry_stack)
+                    if slot >= -after))
+                # A nonreturning callee still executes stores and can retain
+                # a pointer. Check its real inputs before discarding the edge.
+                callee_output = transfer(callee, changed, arguments)
                 if may_return[callee]:
                     if op.kind == "call":
                         next_nodes.append(
-                            (following, after, False, slots, changed))
+                            (following, after, False, slots, callee_output,
+                             stack_taint))
                     else:
                         returned = True
+                        output.update(callee_output)
             else:
-                next_nodes.append((op.target, after, restored, slots, changed))
+                next_nodes.append((op.target, after, restored, slots, changed,
+                                   stack_taint))
             if op.kind == "conditional":
-                next_nodes.append((following, after, restored, slots, changed))
+                next_nodes.append((following, after, restored, slots, changed,
+                                   stack_taint))
         else:
-            next_nodes.append((following, after, restored, slots, changed))
+            next_nodes.append((following, after, restored, slots, changed,
+                               stack_taint))
         if conditional:
-            next_nodes.append((following, depth, lr, saved, tainted))
+            next_nodes.append((following, depth, lr, saved, tainted, stacked))
         pending.extend(next_nodes)
-    return maximum, returned
+    return maximum, returned, tuple(sorted(output))
 
 
 def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
@@ -531,12 +598,26 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
              bridge.get("private_frame_bytes") == 0,
              "actual bridge private frame proof missing")
     records = _stack_records(stack_usage)
-    reports, bounds, may_return = [], {}, {}
+    reports, bounds, may_return, summaries = [], {}, {}, {}
+    def summarize(index, tainted, stack=()):
+        # The call graph above is acyclic. Summaries are keyed by the actual
+        # finite register provenance at a call site, never caller assertions.
+        tainted = tuple(sorted(set(tainted) | {13}))
+        key = index, tainted, stack
+        if key not in summaries:
+            _require(len(summaries) < 20000, "call provenance bound exceeded")
+            function = functions[index]
+            summaries[key] = _walk(
+                function["code"], function["symbol"]["value"] & ~1,
+                function["calls"], may_return,
+                ordinary_c=function["symbol"]["name"] != PREFIX + "enter",
+                transfer=lambda child, incoming, arguments: summarize(
+                    child, incoming, arguments)[2],
+                entry_tainted=tainted, entry_stack=stack)
+        return summaries[key]
     for index in order:
         function, symbol = functions[index], functions[index]["symbol"]
-        peak, returns = _walk(function["code"], symbol["value"] & ~1,
-                              function["calls"], may_return,
-                              ordinary_c=symbol["name"] != PREFIX + "enter")
+        peak, returns, _ = summarize(index, (13,))
         source = None
         if symbol["name"] == PREFIX + "enter":
             frame = bridge["private_frame_bytes"]
@@ -585,7 +666,7 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
                 "compiler AAPCS compliance for C callees and frame records",
                 "C memory ownership prevents untracked saved-return aliases"],
             "limits": ["no C data-pointer/Flash-read or MPU protocol proof",
-                       "stack-address taint is intrafunction/register-only",
+                       "stack-pointer spills fail closed; no general alias proof",
                        "no CPU execution, timing or hardware qualification",
                        "SU identities are not signed build attestation",
                        "tail chains retain caller frame conservatively"]}

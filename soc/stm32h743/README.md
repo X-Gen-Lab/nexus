@@ -255,6 +255,55 @@ Software models, ordinary ARM links and SDK consumption establish separate
 development evidence; physical throughput, cache coherence, latency and HIL
 remain `not_executed`.
 
+## Selected continuous RX and finite TX DMA duplex
+
+The separate `dma-duplex-continuous` mode is authored by
+[`h743-uart-duplex-continuous.toml`](../../tools/configure/assemblies/h743-uart-duplex-continuous.toml)
+and its
+[`cache-on` counterpart](../../tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml).
+It selects the exact V/HSI64/default-trim/baremetal reference above, USART3
+PD8/PD9 AF7 and priority5 with `calls_os = false`. The existing
+`rx-dma-continuous` mode keeps its independent IRQ transmitter.
+
+| Selected lane | Engine | DMAMUX1 | Request | Vector |
+| --- | --- | --- | --- | --- |
+| Finite TX | DMA1 Stream0 | Channel0 | 46 | DMA1 Stream0 IRQ |
+| Continuous RX | DMA1 Stream1 | Channel1 | 45 | DMA1 Stream1 IRQ |
+| USART wire/IDLE/error | USART3 | — | — | USART3 IRQ |
+
+One immutable public UART face owns one UART context, the existing RX owner
+and an appended TX DMA extension. RX-only storage stays unchanged. Both
+personalities share the RX loan algorithm; the existing `dma-tx` selection and this
+duplex selection share the finite TX DMA algorithm. Temporary private call
+views add no registry, persistent dispatch object, buffer pool or worker.
+The typed factory returns only the existing static face without hardware work.
+
+Both directions use selected initialized AXI SRAM at
+`0x24000000..0x24080000`. TX borrows 1..65535 bytes with cache off; cache-on TX
+borrows aligned complete exclusive32-byte lines, 32..65504 bytes. All TX payload
+lines are disjoint from the entire live RX pool, stream, slots, request, owner
+and wake storage. RX retains the two-target/spare, held-block protection,
+replacement deadline and explicit loss-stop rules above. Products supply every
+buffer and consumer; no copy, split-transfer or memory-domain fallback is used.
+
+TX clean and RX maintenance run outside ISR and the saved interrupt mask.
+Cancellation during maintenance retains its request. DMA terminal count alone
+does not release TX: source/engine/IRQ withdrawal and actual final wire TC must
+also hold. RX stop leaves the independent TX responsibility active. Platform
+stop joins RX loans and TX memory/wire, then restores only the owned lane
+registers/FIFO settings and UART divider to their cold values before releasing
+gates and caches. Successful stop permits another normal Platform start.
+A refused restoration retains the remaining owner and returns a failure for
+retry. No shared DMA-domain reset is used.
+
+Observed clock, timer, reset or cache loss permanently taints this retained
+lifetime and isolates all three vectors. Later I/O register access, producer
+publication and loan return stop; restoring register values does not authorize
+recovery. Request and producer storage remain quarantined. Native/model,
+normal ARM resources, SDK consumption and physical station results have separate
+evidence. Physical duplex throughput, cache coherency and timing remain
+`not_executed`; this selection does not extend to PLL384, RTOS backends or D2 RAM.
+
 ## Optional bounded hardware FIFO bytes
 
 The separate `irq-fifo-bytes` selection uses USART3 PD8/PD9 AF7, 8N1, priority 5
@@ -488,6 +537,32 @@ Nexus remains the single transfer, time, IRQ and shutdown owner.
 
 ## 中文范围说明
 
+新增显式 `dma-duplex-continuous`，使用
+`h743-uart-duplex-continuous.toml` 和 `h743-uart-duplex-continuous-cache-on.toml`。
+精确范围是 STM32H743ZIT6 V、固定 HSI64／默认用户 trim（HSITRIM=0x40）、裸机、USART3 PD8／PD9
+AF7、优先级5且 `calls_os = false`。原 `rx-dma-continuous` 保留 IRQ TX。
+TX 使用 DMA1 Stream0／DMAMUX1 Channel0／request46；连续 RX 使用 Stream1／
+Channel1／request45；USART3 另观察线上 TC、IDLE 和错误。三个向量属于同一个
+静态 UART owner 和不可变公共 face，RX-only 状态不增加 TX 字段。RX 和有限 TX
+算法分别共用，临时私有调用视图不保存注册表、持久转发对象、块池或 worker。
+
+双向 payload 限于已选择初始化的 AXI SRAM `0x24000000..0x24080000`。
+TX 缓存关闭时允许1..65535字节；开启时需要完整独占32字节行，地址对齐、长度
+32..65504且为32的倍数。TX 与整个 RX pool、stream、slots、request、owner 和
+wake 存储互不重叠，不能用 Flash 常量冒充 DMA payload。RX 沿用下文两个 target
+和替换块、持有块不覆写、有界替换时限及丢失后停止合同。所有存储和 consumer
+由产品提供；不会隐式复制、分段传输或退回其他内存域。
+
+TX clean 和 RX 缓存维护在恢复中断掩码后执行，维护期间取消仍保留借用。
+DMA TC 不能替代真实线上 TC；源、引擎和 IRQ 排空后才能归还 TX request。
+RX stop 保留独立 TX 责任；Platform stop 排空两向及消费者，再恢复自己持有的
+lane 寄存器／FIFO 设置和 UART 分频，最后释放时钟与缓存。成功 stop 后可正常
+再次 start；恢复写入失败保留剩余 owner 供重试，不复位共享 DMA 域。
+时钟、timer、复位或 cache 失效会永久 taint 本次保留生命周期并隔离三个向量，
+停止后续 I/O MMIO、producer 发布和归还借用。恢复寄存器不能自动解除隔离。
+模型、普通 ARM／SDK 消费与实板证据分开；双向吞吐、缓存一致性和时序实板状态
+仍为 `not_executed`，不扩展 PLL384、RTOS 或 D2 RAM 范围。
+
 新增 `hsi64-pll384-cache-off` 仅准入 DEV_ID `0x450`、REV_ID `0x2003`（V）。
 `0x1003` 无法区分 Y/W，`0x2001`（X）及未知修订均拒绝，不自动回退。
 该冷启动配置的名义 CPU/HCLK/APB 为 384/192/96 MHz，TIM2/TIM3 为 192 MHz；
@@ -513,7 +588,7 @@ service发布和重启，背压期间不会覆盖已借出的block，重启间�
 
 独立的 `rx-dma-continuous` 使用 `h743-uart-continuous.toml` 与
 `h743-uart-continuous-cache-on.toml`，只准入 STM32H743ZIT6 V、固定 HSI64／
-出厂 trim、裸机、USART3 PD8／PD9、DMA1 Stream1／request45 及优先级5的非 OS
+默认用户 trim（HSITRIM=0x40）、裸机、USART3 PD8／PD9、DMA1 Stream1／request45 及优先级5的非 OS
 IRQ。TX 仍是独立有限 IRQ 发送，不是连续 TX DMA 或通用 DMA 双向实现。
 调用者提供至少三个已初始化 AXI SRAM 中等长、互不重叠的 block；缓存关闭时每块
 32..65535 字节，缓存开启时为完整独占32字节行，地址对齐、长度32..65504且为32
@@ -551,7 +626,7 @@ Board supply_mv必须明确为2400..3300mV，参考电压必须至少2.0V且不�
 公开规范装配位于 `tools/configure/assemblies`：
 `h743-spi-dma.toml`、`h743-spi-dma-uart-tx.toml` 和
 `h743-spi-dma-uart-rx.toml` 选择缓存关闭，`h743-spi-dma-cache-on.toml`
-选择缓存开启。它们仅选择 STM32H743ZIT6、裸机、固定 HSI64／出厂 trim、
+选择缓存开启。它们仅选择 STM32H743ZIT6、裸机、固定 HSI64／默认用户 trim（HSITRIM=0x40）、
 DEV_ID 0x450、V 修订 0x2003、SPI4 mode 0 和 8 位帧。
 PE12／13／14 使用 AF5，PE11 是显式低有效 GPIO 片选；软件参考路由不证明
 PCB 接线或电气时序。

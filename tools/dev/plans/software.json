@@ -1283,7 +1283,11 @@
         "--fixture",
         "{root}/tools/configure/assemblies/h743-uart-continuous-cache-on.toml",
         "--fixture",
-        "{root}/tools/configure/assemblies/h743-uart-continuous.toml"
+        "{root}/tools/configure/assemblies/h743-uart-continuous.toml",
+        "--fixture",
+        "{root}/tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml",
+        "--fixture",
+        "{root}/tools/configure/assemblies/h743-uart-duplex-continuous.toml"
       ],
       "timeout_s": 7200
     },

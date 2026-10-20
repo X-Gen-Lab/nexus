@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-refinement-execution.csv)。
-源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`e4496e72ba53be176407804fffa805ef5b12f9da1e0949d2f3e8a20292d27e8b`。
+源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`775c626d571c734c924a53fdf5a7eb49490d7f3c07e135ce8b589d4afda0da0c`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -685,7 +685,7 @@ source_language: zh_CN
 | `hardware_status` | not_applicable |
 | `implementation_paths` | .github/workflows |
 | `evidence_paths` | pending |
-| `exit_condition` | current connector cannot inspect branch protection; no fake CODEOWNERS |
+| `exit_condition` | 2026-10-20 GET confirms main unprotected and empty effective rules and rulesets; actual main protection PUT returns 403 Resource not accessible by integration; readback confirms enforcement absent; no fake CODEOWNERS |
 | `owner` | codex |
 
 (status-platform-refinement-io-45)=
@@ -714,8 +714,8 @@ source_language: zh_CN
 | `software_status` | targeted_passed |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/maintenance/dependency_proposals.py;.github/workflows/dependency-maintenance.yml |
-| `evidence_paths` | tools/testing/evidence/source-compatibility |
-| `exit_condition` | weekly read-only workflow defined; actual schedule pending default-branch workflow; upgrades require exact evidence |
+| `evidence_paths` | tools/testing/evidence/source-compatibility;https://github.com/X-Gen-Lab/nexus/actions/runs/39221613405 |
+| `exit_condition` | weekly read-only schedule executed successfully on main 2730b0acec456fe0c2dd03dccd3b6fb35400e1b4; upgrades require exact evidence |
 | `owner` | codex |
 
 (status-platform-refinement-io-47)=

@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 40f10a97880fe76172a69e7d71b2619d648c3d2b3c27f5abc722f60fa3f26b18\n"
+"X-Nexus-Source-SHA256: 4d6863604c453cb4f7d9fb80ecaac0dfc8b886f6865d4ee2b98ea17dd4e3f804\n"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
@@ -1033,49 +1033,44 @@ msgstr "Camera display accelerator planar and strided buffers"
 msgid "Frame completion backpressure external memory and 2D DMA ownership"
 msgstr "Frame completion backpressure external memory and 2D DMA ownership"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:11
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"chain.toml"
+msgstr ""
+"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"chain.toml"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"ram.md"
+msgstr ""
+"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"ram.md"
+
+#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp"
+msgstr ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp"
+
+
 msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-"
-"execution.csv`；SHA-256：`b2a4ab6aeb5f989a750d11c0382bb73139efb841e76a6a3227b4f4c0fbe610a0`。"
+"<../../design/io-evolution-execution.csv>`。 "
+"源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`784f2ed5c8e9eb8da7c9d31457d09b4252a95e54aa4bdec6baab93f98cf8e0c9`。"
 msgstr ""
 "This page is derived from the original CSV; it is not a new status "
-"authority, execution record or software qualification. Original IDs, order "
-"and all fields come from {download}`original ledger <../../design/io-"
-"evolution-execution.csv>`. Source: `docs/design/io-evolution-execution.csv`;"
-" SHA-256: "
-"`b2a4ab6aeb5f989a750d11c0382bb73139efb841e76a6a3227b4f4c0fbe610a0`."
+"authority, execution record or software qualification. Original IDs, "
+"order and all fields come from {download}`original ledger "
+"<../../design/io-evolution-execution.csv>`. Source: "
+"`docs/design/io-evolution-execution.csv`; SHA-256: "
+"`784f2ed5c8e9eb8da7c9d31457d09b4252a95e54aa4bdec6baab93f98cf8e0c9`."
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
-"chain.toml"
+"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
 msgstr ""
-"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
-"chain.toml"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
-"ram.md"
-msgstr ""
-"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
-"ram.md"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
-"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
-"on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
-msgstr ""
-"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
-"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
-"on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
-"run.toml;tests/google/u575_lptim_test.cpp"
-msgstr ""
-"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
-"run.toml;tests/google/u575_lptim_test.cpp"
+"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"

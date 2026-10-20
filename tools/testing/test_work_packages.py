@@ -298,6 +298,22 @@ class WorkPackageCommandTests(unittest.TestCase):
 
 
 class CurrentWorkPackageTests(unittest.TestCase):
+    def test_h743_duplex_canonical_inputs_run_in_the_existing_provider_stage(self):
+        plan = json.loads((ROOT / "tools/dev/plans/software.json").read_text())
+        stages = [stage for stage in plan["stages"]
+                  if stage["name"] == "providers-h743_assembly"]
+        self.assertEqual(1, len(stages))
+        stage = stages[0]
+        self.assertEqual("provider_assemblies", stage["checker"])
+        args = stage["args"]
+        fixtures = [value for index, value in enumerate(args)
+                    if index != 0 and args[index - 1] == "--fixture"]
+        for name in ("h743-uart-duplex-continuous.toml",
+                     "h743-uart-duplex-continuous-cache-on.toml"):
+            with self.subTest(assembly=name):
+                self.assertEqual(1, fixtures.count(
+                    "{root}/tools/configure/assemblies/" + name))
+
     def test_installed_cmake_python_package_cannot_shadow_sdk_authority(self):
         installed = ModuleType("cmake")
         installed.__path__ = []
@@ -355,7 +371,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         models = [row for row in report["work_packages"] if row["family"] == "native"]
         physical = [row for row in report["work_packages"] if row["family"] != "native"]
         self.assertEqual(len(models), 19)
-        self.assertEqual(len(physical), 196)
+        self.assertEqual(len(physical), 197)
         spi = [row for row in physical
                if row["identity"] == "stm32h743.SPI4.dma"]
         self.assertEqual(len(spi), 1)
@@ -401,6 +417,9 @@ class CurrentWorkPackageTests(unittest.TestCase):
             ("stm32h743.USART3.rx-dma-continuous", "uart_continuous", "uart_continuous", [
                 "tools/configure/assemblies/h743-uart-continuous-cache-on.toml",
                 "tools/configure/assemblies/h743-uart-continuous.toml"]),
+            ("stm32h743.USART3.dma-duplex-continuous", "uart_duplex", "uart_duplex", [
+                "tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml",
+                "tools/configure/assemblies/h743-uart-duplex-continuous.toml"]),
             ("stm32u575.USART1.dma-chain-tx", "uart_chain", "uart_dma_chain", [
                 "tools/configure/assemblies/u575-uart-chain.toml"]),
             ("stm32u575.LPTIM2.irq-counter16-oneshot", "lptim", "lptim", [

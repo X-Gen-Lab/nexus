@@ -362,6 +362,10 @@ static nx_result_t stop(void* context) {
     nx_result_t irq = NX_H743_IRQ_CONTROL(p->irq, false, 5U);
     if (irq != NX_SUCCESS)
         return irq;
+    /* UE/ACK and the wire are already withdrawn. Return the owned divider to
+     * its cold value before releasing the UART lease for a later start. */
+    if (!write_checked(&p->registers->BRR, 0U, UINT32_MAX))
+        return NX_ERROR_IO;
     guard = nx_arch_irq_save();
     if (p->active != NULL || p->wake_publishers != 0U) {
         nx_arch_irq_restore(guard);

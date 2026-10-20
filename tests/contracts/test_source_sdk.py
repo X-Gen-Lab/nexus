@@ -30,6 +30,18 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_provider_canonical_smokes_are_not_omitted_from_sdk_selection(self):
+        prefix = "cmake/package/verification/io_evolution/"
+        smokes = {name for descriptor in source_sdk.provider_descriptors.families()
+                  for name in descriptor.owned_payload
+                  if name.startswith(prefix)}
+        self.assertTrue(smokes, "Reviewed provider consumer closure is empty")
+        for name in sorted(smokes):
+            with self.subTest(name=name):
+                self.assertIn(name, source_sdk.REQUIRED_FILES)
+                self.assertTrue(source_sdk.selected(name),
+                                "Required consumer omitted from SDK: " + name)
+
     def test_official_f4_required_payload_has_the_reviewed_eleven_files(self):
         lock_path = ROOT / "dependencies/stm32f4-hal.lock.json"
         lock = json.loads(lock_path.read_text())
@@ -80,7 +92,11 @@ class SourceSDKSelectionTests(unittest.TestCase):
                           "private/stm32h743_flash_ram_layout.h",
                           "private/stm32h743_flash_mpu.h",
                           "drivers/uart_fifo.c",
-                          "private/stm32h743_uart_fifo.h"),
+                          "private/stm32h743_uart_fifo.h",
+                          "drivers/uart_duplex.c",
+                          "private/stm32h743_uart_duplex.h",
+                          "private/stm32h743_uart_continuous_impl.h",
+                          "private/stm32h743_uart_dma_parts.h"),
             "stm32u575": ("drivers/uart_fifo.c",
                           "private/stm32u575_uart_fifo.h"),
             "stm32f407": ("drivers/ethernet_frames.c",

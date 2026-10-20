@@ -135,16 +135,19 @@ def _modern_selected(result):
             if not h7 and item.get("mode") in {"dma-tx", "dma-chain-tx"}:
                 source += _reject(
                     "!NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)")
-            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle", "rx-dma-continuous"}:
-                lane = 0 if item.get("mode") == "dma-tx" else 1
-                source += _reject(
-                    f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)")
+            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle", "rx-dma-continuous", "dma-duplex-continuous"}:
+                lanes = ((0, 1) if item.get("mode") == "dma-duplex-continuous"
+                         else (0,) if item.get("mode") == "dma-tx" else (1,))
+                for lane in lanes:
+                    source += _reject(
+                        f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)")
                 source.append(
                     "    if ((NX_H743_READ(&RCC->AHB1ENR) & "
                     "RCC_AHB1ENR_DMA1EN) != 0u) {")
-                source += _reject(
-                    f"NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u || "
-                    f"NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u", indent=8)
+                for lane in lanes:
+                    source += _reject(
+                        f"NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u || "
+                        f"NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u", indent=8)
                 source.append("    }")
         elif not h7 and item.kind in {"spi", "pwm", "i2c", "adc"}:
             register = ("APB2ENR" if item.controller == "SPI1" else

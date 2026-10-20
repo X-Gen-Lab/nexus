@@ -1390,6 +1390,193 @@ class SoftwareQualificationContracts(unittest.TestCase):
         self.assertIn('NEXUS_JOB_RESULT', collect)
 
 
+class FormalSoftwareWorkflow(unittest.TestCase):
+    """Keep the manual plan entry finite, complete and separate from release."""
+
+    def document(self):
+        return workflow('formal-software.yml')
+
+    def step(self, identifier):
+        return next(step for step in self.document()['jobs']['formal']['steps']
+                    if step.get('id') == identifier)
+
+    def python_body(self, identifier):
+        script = self.step(identifier)['run']
+        return script.split("<<'PY'\n", 1)[1].rsplit('\nPY', 1)[0]
+
+    def test_dispatch_is_explicit_read_only_and_source_bound(self):
+        document = self.document()
+        self.assertEqual(set(document['on']), {'workflow_dispatch'})
+        inputs = document['on']['workflow_dispatch']['inputs']
+        self.assertEqual(set(inputs), {'expected_commit'})
+        self.assertEqual(inputs['expected_commit']['required'], 'true')
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        self.assertEqual(document['concurrency']['cancel-in-progress'], 'false')
+        steps = document['jobs']['formal']['steps']
+        self.assertEqual(steps[0]['id'], 'request')
+        self.assertEqual(self.step('request')['env']['F'],
+                         '${{ runner.temp }}/formal')
+        self.assertIn('echo "F=$F" >> "$GITHUB_ENV"',
+                      self.step('request')['run'])
+        checkout = self.step('checkout')
+        self.assertEqual(checkout['with']['ref'], '${{ github.sha }}')
+        self.assertEqual(checkout['with']['fetch-depth'], '0')
+        self.assertEqual(checkout['with']['persist-credentials'], 'false')
+        self.assertNotIn('${{ inputs.', self.step('request')['run'])
+
+    def test_actual_guard_rejects_wrong_event_branch_and_sha(self):
+        source = self.python_body('request')
+        good = {'GITHUB_EVENT_NAME': 'workflow_dispatch',
+                'GITHUB_REF': 'refs/heads/main', 'GITHUB_SHA': 'a' * 40,
+                'NEXUS_WORKFLOW_SHA': 'a' * 40,
+                'NEXUS_EXPECTED_COMMIT': 'a' * 40}
+        cases = [({}, 0), ({'GITHUB_EVENT_NAME': 'push'}, 1),
+                 ({'GITHUB_REF': 'refs/heads/feature'}, 1),
+                 ({'NEXUS_EXPECTED_COMMIT': 'short'}, 1),
+                 ({'NEXUS_EXPECTED_COMMIT': 'b' * 40}, 1),
+                 ({'NEXUS_WORKFLOW_SHA': 'b' * 40}, 1)]
+        for changed, expected in cases:
+            with self.subTest(changed=changed), tempfile.TemporaryDirectory() as directory:
+                env = {**os.environ, **good, **changed, 'F': directory}
+                result = subprocess.run([sys.executable, '-B', '-c', source],
+                                        env=env, capture_output=True, timeout=10)
+                self.assertEqual(result.returncode, expected, result.stderr)
+                record = json.loads((Path(directory) / 'request.json').read_text())
+                self.assertEqual(record['accepted'], expected == 0)
+                self.assertFalse(record['software_qualified'])
+
+    def test_setup_reuses_complete_native_dependencies_and_existing_analyzers(self):
+        job = self.document()['jobs']['formal']
+        self.assertEqual(job['runs-on'], 'ubuntu-24.04')
+        self.assertEqual(job['timeout-minutes'], '360')
+        self.assertEqual(job['env']['NEXUS_BUILD_JOBS'], '2')
+        self.assertEqual(job['env']['CMAKE_BUILD_PARALLEL_LEVEL'], '2')
+        self.assertEqual(job['env']['CTEST_PARALLEL_LEVEL'], '1')
+        self.assertNotIn('NEXUS_COMMAND_TIMEOUT', job['env'])
+        setup = self.step('setup')
+        self.assertEqual(setup['uses'], './.github/actions/setup-build')
+        self.assertEqual(setup['with'], {'preset': 'native-debug', 'arm': 'true'})
+        analyzers = self.step('analyzers')['run']
+        self.assertIn('sudo apt-get install -y clang-tidy-14 cppcheck', analyzers)
+        self.assertIn('echo /usr/lib/llvm-14/bin >> "$GITHUB_PATH"', analyzers)
+        resources = self.step('resources')['run']
+        self.assertIn('binary_directory(root, preset).exists()', resources)
+        self.assertIn('df -B1 "$GITHUB_WORKSPACE" "$RUNNER_TEMP"', resources)
+
+    def test_plan_uses_original_bytes_and_propagates_actual_failures(self):
+        from unittest.mock import patch
+        from tools.dev import process
+        body = self.python_body('software')
+        real_run = process.run
+        for code in (0, 17, 124, 130):
+            with self.subTest(exit_code=code), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                observed = []
+
+                def execute(argv, **kwargs):
+                    observed.append((argv, kwargs))
+                    return real_run([sys.executable, '-c',
+                                     "print('actual child receipt'); raise SystemExit(" +
+                                     str(code) + ')'], cwd=root,
+                                    env=os.environ.copy(),
+                                    log=root / 'actual.raw', timeout=10,
+                                    stage='formal-workflow-contract')
+
+                environment = {'GITHUB_WORKSPACE': str(root),
+                               'F': str(root / 'formal'),
+                               'NEXUS_COMMAND_TIMEOUT': '11'}
+                with patch.dict(os.environ, environment), \
+                        patch('tools.dev.process.run', side_effect=execute), \
+                        self.assertRaises(SystemExit) as stopped:
+                    exec(compile(body, '<formal-software-step>', 'exec'), {})
+                self.assertEqual(stopped.exception.code, code)
+                self.assertEqual(len(observed), 1)
+                argv, kwargs = observed[0]
+                self.assertEqual(argv, [sys.executable, '-B', 'tools/dev/qualification.py',
+                    '--root', str(root), '--plan', 'tools/dev/plans/software.json',
+                    '--output', str(root / 'formal/software')])
+                self.assertEqual(kwargs['timeout'], 18000)
+                self.assertEqual(kwargs['cwd'], root)
+                self.assertEqual(kwargs['stage'], 'formal-software')
+                self.assertEqual(kwargs['env'].get('NEXUS_COMMAND_TIMEOUT'), '11')
+                receipt = json.loads((root / 'actual.command.json').read_text())
+                self.assertEqual(receipt['exit_code'], code)
+                self.assertEqual(receipt['child_returncode'], code)
+
+    def test_archives_preserve_both_complete_trees_without_recursive_copy(self):
+        formal = self.step('formal_archive')
+        build = self.step('build_archive')
+        for step in (formal, build):
+            self.assertEqual(step['if'], "always() && steps.source.outputs.validated == 'true'")
+            self.assertNotIn('continue-on-error', step)
+            self.assertIn('tools/evidence/store.py export', step['run'])
+        self.assertIn('--source "$F" --store build/formal-transfer/store', formal['run'])
+        self.assertIn('--source build --store "$RUNNER_TEMP/formal-build-store"', build['run'])
+        identity = self.step('identity')
+        self.assertEqual(identity['uses'], './.github/actions/record-identity')
+        self.assertEqual(identity['with']['artifacts'], 'build/')
+        self.assertEqual(identity['with']['result'], '${{ job.status }}')
+        self.assertEqual(identity['with']['require-dependencies'], 'true')
+        self.assertIn('tidy=clang-tidy', identity['with']['tools'])
+        steps = self.document()['jobs']['formal']['steps']
+        self.assertLess(steps.index(formal), steps.index(identity))
+        self.assertLess(steps.index(identity), steps.index(build))
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertNotIn('shutil.copytree', commands)
+        self.assertNotIn('qualification_transfer.py', commands)
+        self.assertNotIn('candidate.py', commands)
+
+    def test_failure_and_cancel_preserve_unqualified_diagnostics_and_fallback(self):
+        diagnostics = self.step('diagnostics')
+        self.assertEqual(diagnostics['if'], 'always()')
+        self.assertIn("'software_qualified': False", diagnostics['run'])
+        self.assertIn("'physical_status': 'not_executed'", diagnostics['run'])
+        fallback = self.step('fallback_upload')
+        self.assertIn('always()', fallback['if'])
+        self.assertIn("steps.formal_archive.outcome != 'success'", fallback['if'])
+        self.assertIn("steps.build_archive.outcome != 'success'", fallback['if'])
+        self.assertEqual(fallback['with']['path'].splitlines(),
+                         ['${{ runner.temp }}/formal/', 'build/'])
+        upload = self.step('archive_upload')
+        self.assertEqual(upload['if'], "always() && steps.build_archive.outcome == 'success'")
+        self.assertEqual(upload['with']['compression-level'], '0')
+        for step in self.document()['jobs']['formal']['steps']:
+            if step.get('uses', '').startswith('actions/upload-artifact@'):
+                self.assertEqual(step['with']['include-hidden-files'], 'true')
+                self.assertEqual(step['with']['if-no-files-found'], 'error')
+                self.assertEqual(step['with']['retention-days'], '30')
+                self.assertNotIn('continue-on-error', step)
+
+    def test_upload_failure_or_cancel_selects_complete_raw_fallback(self):
+        condition = self.step('fallback_upload')['if']
+        prefix, alternatives = condition.split('&&', 1)
+        self.assertEqual(prefix.strip(), 'always()')
+        terms = alternatives.strip().removeprefix('(').removesuffix(')').split('||')
+        selectors = []
+        for term in terms:
+            match = re.fullmatch(r"steps\.(\w+)\.outcome != 'success'", term.strip())
+            self.assertIsNotNone(match, 'Unsupported maintained fallback condition')
+            selectors.append(match.group(1))
+        for outcome, expected in (('success', False), ('failure', True),
+                                  ('cancelled', True), ('skipped', True)):
+            with self.subTest(archive_upload=outcome):
+                state = {'formal_archive': 'success', 'build_archive': 'success',
+                         'archive_upload': outcome}
+                selected = any(state[name] != 'success' for name in selectors)
+                self.assertEqual(selected, expected)
+
+    def test_no_report_cache_restore_or_qualification_promotion(self):
+        document = self.document()
+        steps = document['jobs']['formal']['steps']
+        self.assertFalse(any('download-artifact@' in step.get('uses', '') or
+                             'actions/cache@' in step.get('uses', '') for step in steps))
+        commands = '\n'.join(step.get('run', '') for step in steps)
+        self.assertNotIn('git push', commands)
+        self.assertNotIn('gh release', commands)
+        self.assertNotIn('--require-candidate', commands)
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+
+
 class CTestAdmission(unittest.TestCase):
     def execute_fixture(self, kind):
         self.assertIsNotNone(shutil.which('cmake'))

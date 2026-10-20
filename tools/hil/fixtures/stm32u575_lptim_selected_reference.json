@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "hil_fixture",
+  "scope": "software_reference",
+  "board": "stm32u575zi-lptim-reference",
+  "part": "STM32U575ZIT6Q",
+  "transport": "swd",
+  "probe_interfaces": ["external-reviewed"],
+  "serial": {
+    "controller": "USART1",
+    "tx": "PA9",
+    "rx": "PA10",
+    "baudrate": 115200,
+    "electrical_mode": "ttl_3v3"
+  },
+  "required_tests": ["probe_identity", "flash_readback", "reset", "uart_echo"],
+  "physical_status": "not_executed",
+  "pending_qualification": [
+    {
+      "id": "selected_mode_station_review",
+      "fixture": "Software-only pinless LPTIM2 RUN reference. No UART is selected and the described future control channel is unbound. Actual PCB, calibrated timing instrument, probe, power, UID and preboot TZEN0/SWAP_BANK0 must be observed without option-byte modification. A separately reviewed physical fixture and tooling change are required; this fixture cannot admit a station.",
+      "budget": null,
+      "unit": "count"
+    },
+    {
+      "id": "lptim_run_capture",
+      "fixture": "Observe exact MSIS4/PCLK1 4MHz, prescaler4, 1MHz RUN ticks, IRQ68 priority5/calls_os=false, 2..65536 ticks, enable/disable synchronization, full-period UE, deadline/quarantine and reset/drain. No RTC, backup, Stop or autonomous continuity is claimed; all physical cases remain not executed.",
+      "budget": null,
+      "unit": "ns"
+    }
+  ]
+}

@@ -50,6 +50,21 @@ source defaults do not observe these facts. U575 preboot option state must be
 observed without modifying option bytes. DMA, cache, TrustZone, dynamic clocks,
 deep STOP and running-state handoff are outside these reference fixtures.
 
+Five additional exact-mode contracts prepare H743 SPI4 cache DMA, H743
+continuous RX with cache off/on and IRQ TX, independently selected H743 finite
+DMA TX plus continuous DMA RX, U575 finite USART1 hardware TX chains, and U575
+LPTIM2 RUN one-shots. Duplex uses its own nine-scenario protocol and both lane
+identities; it inherits no earlier RX-only result. Its RX sampling window does
+not claim continuous reception for the entire maximum-length TX. Model-only
+cache-clean cancellation stays outside physical HIL obligations. The independent
+raw parsers are integrated into
+the existing SoC acquisition/validation path. Additional software-reference
+Board/part pairs remain rejected by physical station admission. SPI-only and
+pinless timer plans explicitly leave their control channel unbound. See
+[selected-mode HIL contracts](../../docs/design/selected-mode-hil.md) for exact
+stimuli, raw fields, boundary obligations and scope. All new plans remain
+`prepared_unbound` / `not_executed`; parser tests do not qualify hardware.
+
 
 `measure.py plan` generates seven generic acquisition cases bound to an exact
 fixture and resolved build. It requires no station or equipment and leaves all
@@ -82,7 +97,7 @@ python tools/hil/measure.py validate \
     --report station/measurement-validation.json
 ```
 
-A measurement run is a strict schema-1 `physical_hil_measurements` object with
+A measurement run is a strict schema-2 `physical_hil_measurements` object with
 `started_utc`, `finished_utc` (UTC offsets required), `station_id`, `board`, `part`,
 `chip_uid`, `elf_sha256`, `resolved_sha256`, `admission_sha256`, `context` and
 `traces`. The admission digest is the canonical JSON digest supplied by
@@ -90,13 +105,13 @@ A measurement run is a strict schema-1 `physical_hil_measurements` object with
 file identity object: `{path, sha256, size}`. Every identity names retained,
 nonempty regular bytes; changing those bytes invalidates the record.
 
-The context artifact is a strict schema-1 `hil_acquisition_context` object:
+The context artifact is a strict schema-2 `hil_acquisition_context` object:
 
 | Field | Required observation |
 |---|---|
 | `admission_sha256` | Canonical digest of the unchanged admission |
 | `workload` | File identity of the actual workload and its parameters |
-| `cpu_clock_hz` | Observed positive CPU clock, including clock changes |
+| `cpu_clock_hz` | Positive declared CPU rate; cycle measurements check it against the admitted frequency envelope |
 | `load` | Load and interference description; identify any untested conditions |
 | `executor` | Owner/service executor, priorities and scheduling conditions |
 | `irq_priorities` | Named IRQ logical priorities, integer 0..255; nonempty for IRQ latency |
@@ -110,7 +125,7 @@ trace, so a trace cannot be reused with changed workload/acquisition conditions.
 
 | Metric | Unit | Maintained methods | Additional context |
 |---|---|---|---|
-| `cycles` | `cycles` | `dwt_snapshot` | `counter_bits: 32`, positive `maximum_interval_cycles < 2^32`; enable/calibrate DWT and exclude ambiguous wrap |
+| `cycles` | `cycles` | `dwt_snapshot` | `counter_bits: 32`, nonzero `cycle_domain`/`cycle_epoch`, and the independent `reference` contract below |
 | `irq_latency` | `us` | `logic_analyzer`, `hardware_timer` | Actual IRQ priorities, clock/load and capture resolution |
 | `service_interval` | `us` | `monotonic_timestamp` | Keep the required owner/service executor running; retain scheduling conditions |
 | `stack_used_peak` | `bytes` | `freertos_high_water`, `stack_watermark` | Positive integer `stack_capacity_bytes`; convert RTOS words to bytes before recording |
@@ -118,15 +133,72 @@ trace, so a trace cannot be reused with changed workload/acquisition conditions.
 | `loss` | `count` | `receiver_event_counter` | Positive integer `expected_events`; retain event sequence and missing-event accounting |
 | `duration` | `s` | `monotonic_timestamp` | Retain the actual elapsed workload interval and monotonic-clock calibration |
 
-Each trace is a strict schema-1 `physical_hil_trace` object with `metric`, `unit`,
-`method`, `admission_sha256`, `context_sha256` and `samples`. Samples are objects
-`{sequence, value}`: sequence starts at zero and is contiguous; values are finite,
-nonnegative and bounded by unsigned 64-bit range. Cycles, bytes of stack use and
-lost-event counts require integers and must also stay within their context bound.
+Each trace is a strict schema-2 `physical_hil_trace` object with `metric`, `unit`,
+`method`, `admission_sha256`, `context_sha256` and `samples`. Non-cycle samples
+are objects `{sequence, value}`: sequence starts at zero and is contiguous;
+values are finite, nonnegative and bounded by unsigned 64-bit range. Stack use
+and lost-event counts require integers and stay within their context bound.
 A trace contains 1..100000 samples; a run contains 1..7 unique maintained metrics,
 exactly matching the admission's budgets. The validator derives minimum, maximum,
 mean and count from the retained samples; it never trusts supplied statistics.
 Every sample must satisfy the corresponding lower and upper budget.
+
+Cycle samples contain `{sequence, begin, end}` and reject a supplied `value`.
+Each endpoint contains exactly `counter`, `cycle_domain`, `cycle_epoch`,
+`cpu_clock_hz`, `demcr`, `dwt_control` and `reference`. Counter/register values
+are unsigned 32-bit integers. Both endpoints must show TRCENA and CYCCNTENA,
+no NOCYCCNT, and the context's unchanged counter domain, epoch and declared rate.
+The declared rate is not an exact measurement of an oscillator's frequency.
+The actual counter owner must advance its epoch on reset, withdrawal or clock
+change. The raw cycle probe does not provide that owner or manufacture an epoch.
+
+The cycle context's `reference` contains `domain`, `epoch`,
+`ticks_per_second`, `method: "logic_analyzer"` and `instrument` (file identity).
+This instrument artifact must be a retained schema-1
+`physical_hil_reference_clock` record with the following fields:
+
+| Reference-clock field | Required fact |
+|---|---|
+| `admission_sha256` | The current admission digest |
+| `role` / `clock_source` | `reference_capture` / `external_instrument_oscillator` |
+| `instrument_id` | The actual external capture equipment identity |
+| `domain`, `epoch`, `ticks_per_second` | The context's nonzero reference identity and rate; counter and reference domains differ |
+| `cycle_domain`, `cycle_epoch` | The CPU counter owner and epoch covered by the frequency calibration |
+| `cpu_clock_lower_hz`, `cpu_clock_upper_hz` | Positive inclusive CPU-frequency bounds for that entire counter epoch and capture interval; lower <= declared CPU rate <= upper, each at most `2^32-1` |
+| `first_tick`, `last_tick` | Nonempty inclusive capture window in extended unsigned 64-bit ticks |
+| `uncertainty_ticks` | Calibrated minimum required endpoint uncertainty bound, in reference ticks |
+
+Every endpoint's `reference` contains `ticks`, `domain`, `epoch`,
+`ticks_per_second`, `uncertainty_ticks` and `uncertainty_known: true`.
+Its identity/rate must match the admitted reference. Its complete error interval
+must lie inside the capture window, and its error cannot understate the retained
+clock calibration. The error must include capture pairing, sampling skew,
+quantization, reference-clock accuracy and calibration over the observed
+interval. The separate CPU-frequency envelope must include CPU oscillator
+tolerance, calibration error and drift for the recorded conditions. Missing,
+reversed or foreign-epoch frequency bounds are inadmissible. A nominal HSI/MSIS
+or PLL setting cannot supply a measured exact CPU-frequency bound.
+An MCU timestamp without live status/epoch, an arbitrary domain number or a
+host arrival timestamp cannot substitute for these acquisition facts.
+
+For a nondecreasing reference delta `d`, summed error `u`, admitted CPU rates
+`c_min`/`c_max` and reference rate `r`, the validator computes cycle bounds:
+`lower = max(0, floor(max(0, d-u)*c_min/r)-1)` and
+`upper = ceil((d+u)*c_max/r)+1`. The extra cycle covers counter sampling phase.
+All calculations use integers and reject overflowing reference bounds.
+`upper` must be strictly below `2^32`. Only then can the endpoint residue
+`(end.counter-begin.counter) mod 2^32` be admitted; it must also lie in that
+reference interval. Numerical wrap is allowed; an ambiguous full period,
+epoch/rate change, unavailable counter or unknown error is rejected.
+The retired `maximum_interval_cycles` declaration is not accepted as evidence.
+
+Schema-1 measurement runs, contexts and traces remain historical inputs for
+their original source/helpers; the current parser rejects them. The measurement
+plan advertises `measurement_schema_version: 2` while remaining unbound.
+This version change does not change the separate SoC, OS or selected-mode raw
+protocols. A structured identity file establishes metadata consistency, not the
+physical truth of its clock owner, continuity or independence. A real station
+must capture and review those facts before any physical measurement claim.
 
 Validation rebuilds admission from unchanged station, fixture, ELF, resolved
 configuration and resource evidence. Records older than 24 hours, future records,
@@ -146,7 +218,7 @@ records test tooling and never establish qualification for the three boards.
 
 ## Reviewed acquisition adapters
 
-`workloads.py plan` supplies twenty-five explicit acquisition protocols for station
+`workloads.py plan` supplies thirty explicit acquisition protocols for station
 binding; clock/reset/GPIO/watchdog; UART/SPI/DMA; I2C; ADC/PWM/EXTI; Flash power
 loss; concurrent load; M4F context; time/deadlines; all task/MSP peaks; lifecycle
 endurance; tickless timer-port wake; and fail-stop/external safe outputs. Separate
@@ -194,10 +266,14 @@ wrong controller bindings, absent instrument bytes or unreviewed limits. This
 check runs before acquisition equipment operations. It validates authored
 obligations, not the truth of an instrument description or physical observation.
 
-ThreadX workload preparation currently fails closed: these OS acquisition cases
-have a FreeRTOS physical contract and are not inherited by another backend.
-ThreadX software/model results do not qualify a ThreadX station. Likewise, the
-new peripheral protocols describe station-owned stimuli and retained raw bytes;
+ThreadX has its own seven task, IRQ-wake, context, stack, deadline, lifecycle and
+fail-stop observation contracts. Its maintained M4 preparation covers the three
+first-release Boards; Native remains host software only. These independent
+protocols do not inherit FreeRTOS low-power acceptance contracts. See the
+[ThreadX acquisition contract](threadx.md) for exact backend, task, IRQ and raw
+record requirements. Plans remain `prepared_unbound` / `not_executed`; no real
+ThreadX station result is supplied. Likewise, the new peripheral protocols
+describe station-owned stimuli and retained raw bytes;
 they do not add automatic CAN peers, USB hosts, Ethernet links or waveform
 instrument drivers. The existing validator qualifies only its recorded smoke,
 metric and OS scope, not every declared protocol.
@@ -292,8 +368,9 @@ exercise POSIX software mechanics only; no first-party board has been operated.
 
 `soc_acceptance.py` covers SOC-37–55 from the
 [SoC execution ledger](../../docs/design/soc-refinement-execution.csv). Its nineteen
-cases specify hardware, stimulation, raw observations, invariant assertions,
-metric units, safety actions and physical exits. Planning does not operate
+ledger cases and five separately selected mode cases specify hardware,
+stimulation, raw observations, invariant assertions, metric units, safety actions
+and physical exits. Planning does not operate
 instruments, fill numeric limits or establish station readiness.
 
 ```sh

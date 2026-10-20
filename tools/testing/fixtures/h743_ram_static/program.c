@@ -141,8 +141,64 @@ RAM word_t RamLeaf(word_t value) {
 #endif
     return lane[0] + 1U;
 }
+#if defined(BAD_CALLEE_STACK_RETURN) || defined(BAD_CALLEE_SPILL_RETURN) ||    \
+    defined(BAD_CALLEE_NONRETURN_STORE) ||                                     \
+    defined(VALID_CALLEE_CLEARS_STACK_ARGUMENT)
+#ifdef BAD_CALLEE_SPILL_RETURN
+RAM word_t RamPointer(word_t value) {
+    volatile word_t lane[2];
+    word_t address;
+    lane[0] = value;
+    __asm__ volatile("mov %0,sp\nstr %0,[sp]\nldr %0,[sp]"
+                     : "=r"(address)
+                     :
+                     : "memory");
+    return address;
+}
+#else
+RAM __attribute__((naked)) word_t RamPointer(word_t value) {
+#ifdef BAD_CALLEE_STACK_RETURN
+    __asm__ volatile("mov r0,sp\nbx lr");
+#elif defined(BAD_CALLEE_NONRETURN_STORE)
+    __asm__ volatile("str r1,[r0]\n1: b 1b");
+#else
+    __asm__ volatile("ldr r0,1f\nbx lr\n.balign 4\n"
+                     "1: .word diagnostic\n");
+#endif
+}
+#endif
+#endif
+#ifdef BAD_SP_REGISTER_LOAD_ARGUMENT
+RAM __attribute__((naked)) word_t RamIndexedArgument(word_t value) {
+    __asm__ volatile("mov.w r12,#0\nldr.w r0,[sp,r12]\n"
+                     "str r1,[r0]\nbx lr");
+}
+RAM word_t RamPushStackArgument(word_t value) {
+    word_t result = RamLeaf(value);
+    /* The compiler preserves incoming r4 in its aligned frame. */
+    __asm__ volatile("bl RamIndexedArgument" ::
+                         : "r0", "r1", "r2", "r3", "r4", "r12", "lr", "memory");
+    return result;
+}
+#endif
 RAM word_t RamNested(word_t value) {
     word_t result = RamLeaf(value);
+#ifdef BAD_SP_REGISTER_LOAD_ARGUMENT
+    __asm__ volatile("mov r4,sp\nbl RamPushStackArgument" ::
+                         : "r0", "r1", "r2", "r3", "r4", "r12", "lr", "memory");
+#endif
+#if defined(BAD_CALLEE_STACK_RETURN) || defined(BAD_CALLEE_SPILL_RETURN)
+    __asm__ volatile("bl RamPointer\nstr r1,[r0]" ::
+                         : "r0", "r1", "r2", "r3", "r12", "lr", "memory");
+#endif
+#ifdef BAD_CALLEE_NONRETURN_STORE
+    __asm__ volatile("mov r0,sp\nbl RamPointer" ::
+                         : "r0", "r1", "r2", "r3", "r12", "lr", "memory");
+#endif
+#ifdef VALID_CALLEE_CLEARS_STACK_ARGUMENT
+    __asm__ volatile("mov r0,sp\nbl RamPointer\nstr r1,[r0]" ::
+                         : "r0", "r1", "r2", "r3", "r12", "lr", "memory");
+#endif
 #ifdef BAD_C_CALL_SP_ALIGNMENT
     __asm__ volatile("add sp,#4\nbl RamLeaf\nsub sp,#4" ::: "memory");
 #endif

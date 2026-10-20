@@ -14,6 +14,8 @@
     "h743-spi-dma.toml",
     "h743-uart-continuous-cache-on.toml",
     "h743-uart-continuous.toml",
+    "h743-uart-duplex-continuous-cache-on.toml",
+    "h743-uart-duplex-continuous.toml",
     "liangshan-baremetal-empty.toml",
     "liangshan-baremetal-gpio.toml",
     "liangshan-baremetal-spi.toml",

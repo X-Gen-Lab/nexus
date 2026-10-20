@@ -15,7 +15,7 @@
 | STM32F407VET6 / 天空星青春版 | Cortex-M4F；512 KiB Flash；主 SRAM 128 KiB、CCM 64 KiB；独立 Board 资源 | 相同类别的实际 PCB／电气／HIL 验收 |
 | GD32F470ZGT6 / 梁山派 | Cortex-M4F；1 MiB Flash；主 SRAM 192 KiB、ADDSRAM 256 KiB、TCM 64 KiB；25 MHz 声明输入、200 MHz profile；可选 USB 独立 48 MHz owner | 未观察 PCB/晶振/电气；默认 linker 只用主 SRAM；实际 USB clock/PHY 仍未测量 |
 | STM32G474RET6 / MB1367 来源参考配置 | Cortex-M4F；512 KiB Flash；SRAM1/2 96 KiB 与单独计数的 CCM 32 KiB；HSE24/170 MHz、TIM2；封装 GPIO、六 UART IRQ bytes、SPI1/2 轮询、TIM3/4 CH1 PWM、IWDG、EXTI0/1；独立软件夹具增加 ADC1 单次／有限 TIM6-DMA block、I2C1 polling 与物理 Flash；裸机／FreeRTOS 静态 factory | 52 个封装 GPIO 不等于 PCB 接线；PF0/PF1、PG10 保留；ADC DMA 仅选 SRAM1/2，不开放 CCM alias；无 UART/SPI DMA、连续 ADC 或自动 AF 选择；PCB／电气／HIL 未观察 |
-| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA 与 USART3 连续双缓冲 RX（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考 | PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-bank 替换时限与显式 loss/stop；新增 DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache on 要求独占完整 32-byte lines；无其他 DMA 引擎或运行状态接管；Flash 仅 Cache off；软件资格按精确源码独立记录 |
+| STM32H743ZIT6 / NUCLEO-H743ZI2 来源参考配置 | Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA、USART3 连续双缓冲 RX，以及显式有限 TX DMA／连续 RX 双向模式（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考 | PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-bank 替换时限与显式 loss/stop；新增 DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache on 要求独占完整 32-byte lines；无其他 DMA 引擎或运行状态接管；Flash 仅 Cache off；软件资格按精确源码独立记录 |
 | STM32U575ZIT6Q / NUCLEO-U575ZI-Q 单状态参考配置 | Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；USART1 另可显式选择有限 GPDMA TX、有限硬件链 TX 或有界 FIFO IRQ bytes；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1、物理 Flash 和无引脚 LPTIM2 RUN 单次计数；基础装配为裸机／FreeRTOS，新增模式按各自精确配置验收 | PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 SG／循环链；LPTIM2 仅裸机 RUN；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 RAM 放置 |
 | STM32U575 独立 TZEN=1 双域参考 | 外部预先配置 option bytes；两个 Runtime 镜像、冷启动 SAU／MPU／SRAM 归属 owner、真实 CMSE SG；单一非特权 NonSecure Thread 通过同步复制消息访问受限 PC7 GPIO | 未执行实板隔离验收；无 OS、通用双域 factory、NS 任务身份、异步借用／跨域 DMA 或产品镜像认证；不改变上列 TZEN=0 默认装配 |
 | STM32F103RBT6 / NUCLEO-F103RB 来源参考配置 | Cortex-M3，无 FPU；128 KiB Flash、20 KiB SRAM；HSI8、16-bit TIM2；GPIO、USART2 IRQ bytes／有限 DMA TX／duplex RX blocks、SPI1 polling、I2C1 IRQ 消息、PA0 ADC1、PA6 TIM3 CH1 PWM、EXTI0/1、IWDG 与物理 Flash；裸机／FreeRTOS 静态装配 | 正常启动仅核工厂 Flash 密度 128 KiB；ES096 2.2.2 限制正常固件读取 DBGMCU，设备组／修订未观察，料号／封装为配置声明；PCB／VCP 焊桥／引脚负载／HSI 精度未观察；PA5 LED/SPI 与 PA6 SPI/PWM 冲突须拒绝；I2C priority0 不调用内核；RX 有间隙；无 SPI/I2C DMA 或其他 F1 型号支持 |
@@ -150,6 +150,15 @@ Cache off 每块／每笔为 1..65535 bytes，Cache on 地址和长度必须按 
 prefix，调用者须显式重新初始化 stream 再 start。TX 仍为独立有限 IRQ，不构成
 DMA duplex；开发模型与链接不代表连续无损吞吐、时限或 HIL 资格。
 
+另选 `dma-duplex-continuous` 才在上述精确 V／HSI64／裸机／AXI 参考中增加有限
+TX DMA，使用 DMA1 Stream0/request46；RX 仍使用 Stream1/request45。三路向量
+分别承担 TX DMA、RX DMA 与 USART 责任，TX 请求／payload 与完整 RX pool、slots
+及控制存储必须互不重叠。Cache on 的 TX 为独占且对齐的完整 32-byte lines，长度
+32..65504 bytes；Cache off 为 1..65535 bytes。DMA TC、线上 TC 和借用排空分别
+观察；取消不撤销借用，失败保留 QUARANTINED。成功停止可再次正常启动；冷态恢复
+失败保留责任，时钟／timer／cache 失效会永久 taint 当前保留生命周期。该模式不扩大
+RTOS、PLL384、D2 SRAM 或物理吞吐／Cache 一致性资格。
+
 H743 SPI4 的独立有限 `dma` 模式选择 DEV_ID `0x450`、REV_ID `0x2003`（V）、
 HSI64 默认 trim、Cache off/on 和裸机。PE12/PE13/PE14 AF5 与 PE11 active-low CS
 是软件路线；DMA1 Stream2/3 分别负责 RX/TX，只接纳已初始化 AXI SRAM 中互不重叠的
@@ -275,8 +284,9 @@ UART 的 `irq-blocks` 保留独立 IRQ 接收实现；`rx-dma-idle` 使用有限
 `dma-duplex-continuous`。块由调用者提供，消费者 acquire 后保持不可变，直到匹配
 epoch 的 release。连续模式必须预留两个硬件目标及替换块；替换地址读回、目标银行
 和新错误检查成立后才能发布旧块。没有替换块就停止，不覆写消费者借用。
-仅接收模式使用独立只读方法表，不保留 TX DMA 方法与对应链接代码；当前共享
-接收状态布局仍包含 TX DMA 基类字段，不能宣称冷态字段开销为零。RTS/CTS 并不代替
+仅接收模式使用独立只读方法表，不保留 TX DMA 方法与对应链接代码，也不嵌入
+TX DMA extension；只有 duplex 实例单独选入该扩展。实际 RAM／Flash 成本仍由同源
+linked ELF 测量，不能推导零生命周期开销。RTS/CTS 并不代替
 容量和排空合同；RS485 的 DE 引脚、极性及 setup/hold 时间由外部工程明确提供，
 到达真实 UART TC 后才开始 hold 并撤销 DE。详见
 [UART DMA 与 RS485](../design/uart-dma-rs485.md)。

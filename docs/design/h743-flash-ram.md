@@ -115,6 +115,15 @@ copied bytes, workspace bytes and their combined static RAM extent; alignment
 outside those extents remains part of the ordinary image resource report. These
 checks retain explicit C/ABI preconditions; arbitrary C data-pointer access, MMIO
 effects and MPU/drain ordering still require provider models and source review.
+The stack-address analysis follows the actual register inputs and outputs of
+direct RAM calls, including fixed push/pop slots and stack-passed arguments.
+Register-offset SP loads fail closed because their runtime offsets do not
+identify a fixed stack slot.
+It rejects an explicit spill of a stack-derived pointer instead of forgetting
+its origin. This conservative boundary can reject otherwise valid C; it does
+not establish general pointer ownership or C memory safety. A mutation of a
+real production callee must be rejected when its returned stack address reaches
+a caller's store, even when the ELF layout and frame extents still match.
 They establish neither a complete formal execution-closure proof nor measured
 stack, timing or physical behavior.
 

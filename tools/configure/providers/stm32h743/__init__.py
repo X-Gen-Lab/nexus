@@ -45,6 +45,7 @@ _MODES = MappingProxyType({
     ("uart", "irq-fifo-rtscts-bytes"): "uart_rtscts",
     ("uart", "rx-dma-idle"): "uart_receive",
     ("uart", "rx-dma-continuous"): "uart_continuous",
+    ("uart", "dma-duplex-continuous"): "uart_duplex",
     ("spi", "short-poll"): "spi", ("spi", "dma"): "spi_dma",
     ("pwm", "fixed-pwm"): "pwm",
     ("exti", "edge-event"): "exti",
@@ -85,12 +86,13 @@ def validate_selection(selection, route):
         if not 16 <= divisor <= 0xffff:
             common.fail("USART baud differs from the actual PRESC1 divider")
         profile = ("blocks" if selection["mode"] in
-                   ("rx-dma-idle", "rx-dma-continuous") else "bytes")
+                   ("rx-dma-idle", "rx-dma-continuous",
+                    "dma-duplex-continuous") else "bytes")
         if selection["rx_profile"] != profile:
             common.fail(f"H743 selected USART provider requires {profile} reception")
         if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
             common.fail("H743 USART provider implements IRQ priority5 only")
-        if selection["mode"] == "rx-dma-continuous" and selection.get("calls_os", False):
+        if selection["mode"] in ("rx-dma-continuous", "dma-duplex-continuous") and selection.get("calls_os", False):
             common.fail("H743 continuous RX requires calls_os=false")
     elif kind == "gpio":
         permitted = {"GPIOB": {"PB0"}, "GPIOE": {"PE11"}}
@@ -155,7 +157,9 @@ def validate_selection(selection, route):
 def validate_dma(route, mode, normalize):
     expected = ({"dma-tx": ("DMA1:stream0:channel46",),
                  "rx-dma-idle": ("DMA1:stream1:channel45",),
-                 "rx-dma-continuous": ("DMA1:stream1:channel45",)}.get(mode)
+                 "rx-dma-continuous": ("DMA1:stream1:channel45",),
+                 "dma-duplex-continuous": ("DMA1:stream0:channel46",
+                                           "DMA1:stream1:channel45")}.get(mode)
                 if route["controller"] == "USART3" else
                 ("DMA1:stream2:channel83", "DMA1:stream3:channel84")
                 if route["controller"] == "SPI4" and mode == "dma" else None)

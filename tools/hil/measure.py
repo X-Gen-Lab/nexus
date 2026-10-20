@@ -33,6 +33,7 @@ METRICS = {
 MAX_TRACES = len(METRICS)
 MAX_SAMPLES = 100000
 MAX_OBSERVATION = 2 ** 64 - 1
+MEASUREMENT_SCHEMA = 2
 
 
 def measurement_plan(fixture: dict, resolved: dict) -> dict:
@@ -43,6 +44,7 @@ def measurement_plan(fixture: dict, resolved: dict) -> dict:
             "measurement fixture/build Board mismatch")
     return {
         "schema_version": 1, "kind": "hil_measurement_plan",
+        "measurement_schema_version": MEASUREMENT_SCHEMA,
         "status": "prepared_unbound", "physical_status": "not_executed",
         "board": fixture["board"], "part": fixture["part"],
         "backend": resolved["backend"],
@@ -53,7 +55,7 @@ def measurement_plan(fixture: dict, resolved: dict) -> dict:
         ],
         "conditions": [
             "bind reviewed station, workload, firmware and numeric budgets",
-            "measure DWT only when enabled; record frequency and wrap bounds",
+            "bind DWT endpoints/epoch and an independent admitted capture clock",
             "record IRQ priorities, load and capture resolution",
             "keep required executor running while measuring service intervals",
             "report peak stack use from actual watermark",
@@ -88,6 +90,122 @@ def _positive_number(value, label: str) -> None:
             and math.isfinite(value), "positive bounded " + label + " required")
 
 
+def _integer(value, minimum, maximum, label):
+    require(type(value) is int and minimum <= value <= maximum,
+            "invalid " + label)
+
+
+def _reference_clock(reference, admission_digest, cycle_domain, cycle_epoch,
+                     declared_cpu_hz):
+    """Check an admitted external acquisition role, not a named MCU domain.
+
+    These retained physical facts must come from the real station. Metadata
+    consistency does not prove that an oscillator is physically independent.
+    """
+    fields(reference, {"domain", "epoch", "ticks_per_second", "method",
+                       "instrument"})
+    for key in ("domain", "epoch"):
+        _integer(reference[key], 1, 2 ** 32 - 1, "reference " + key)
+    _integer(reference["ticks_per_second"], 1, MAX_OBSERVATION,
+             "reference rate")
+    require(reference["method"] == "logic_analyzer",
+            "DWT reference requires the external capture clock role")
+    clock = load_json(verify_file_identity(reference["instrument"]))
+    fields(clock, {"schema_version", "kind", "admission_sha256", "role",
+                   "clock_source", "instrument_id", "domain", "epoch",
+                   "ticks_per_second", "first_tick", "last_tick",
+                   "uncertainty_ticks", "cycle_domain", "cycle_epoch",
+                   "cpu_clock_lower_hz", "cpu_clock_upper_hz"})
+    require(type(clock["schema_version"]) is int and
+            clock["schema_version"] == 1 and
+            clock["kind"] == "physical_hil_reference_clock" and
+            clock["admission_sha256"] == admission_digest and
+            clock["role"] == "reference_capture" and
+            clock["clock_source"] == "external_instrument_oscillator",
+            "unadmitted independent reference-clock acquisition facts")
+    identifier(clock["instrument_id"], "reference instrument identity")
+    for key, expected in (("cycle_domain", cycle_domain),
+                          ("cycle_epoch", cycle_epoch)):
+        _integer(clock[key], 1, 2 ** 32 - 1, "CPU frequency " + key)
+        require(clock[key] == expected,
+                "CPU frequency calibration belongs to another counter epoch")
+    _integer(clock["cpu_clock_lower_hz"], 1, 2 ** 32 - 1,
+             "CPU frequency lower bound")
+    _integer(clock["cpu_clock_upper_hz"], clock["cpu_clock_lower_hz"],
+             2 ** 32 - 1, "CPU frequency upper bound")
+    require(clock["cpu_clock_lower_hz"] <= declared_cpu_hz <=
+            clock["cpu_clock_upper_hz"],
+            "declared CPU rate is outside the admitted frequency envelope")
+    for key in ("domain", "epoch", "ticks_per_second"):
+        require(type(clock[key]) is int and clock[key] == reference[key],
+                "reference clock owner differs from acquisition context")
+    for key in ("first_tick", "last_tick", "uncertainty_ticks"):
+        _integer(clock[key], 0, MAX_OBSERVATION, "reference " + key)
+    require(clock["first_tick"] < clock["last_tick"],
+            "reference capture interval is empty or reversed")
+    return clock
+
+
+def _cycle_sample(sample, conditions, context):
+    """Derive one sub-period cycle interval from actual paired endpoints."""
+    fields(sample, {"sequence", "begin", "end"})
+    reference = conditions["reference"]
+    clock = conditions["_validated_reference_clock"]
+    points = []
+    for name in ("begin", "end"):
+        point = sample[name]
+        fields(point, {"counter", "cycle_domain", "cycle_epoch",
+                       "cpu_clock_hz", "demcr", "dwt_control", "reference"})
+        for key in ("counter", "demcr", "dwt_control"):
+            _integer(point[key], 0, 2 ** 32 - 1, "DWT " + key)
+        require(type(point["cycle_domain"]) is int and
+                point["cycle_domain"] == conditions["cycle_domain"] and
+                type(point["cycle_epoch"]) is int and
+                point["cycle_epoch"] == conditions["cycle_epoch"] and
+                type(point["cpu_clock_hz"]) is int and
+                point["cpu_clock_hz"] == context["cpu_clock_hz"],
+                "DWT counter identity or declared CPU rate changed")
+        require(point["demcr"] & (1 << 24) and
+                point["dwt_control"] & 1 and
+                not point["dwt_control"] & (1 << 25),
+                "DWT endpoint counter is unavailable")
+        stamp = point["reference"]
+        fields(stamp, {"ticks", "domain", "epoch", "ticks_per_second",
+                       "uncertainty_ticks", "uncertainty_known"})
+        for key in ("domain", "epoch", "ticks_per_second"):
+            require(type(stamp[key]) is int and stamp[key] == reference[key],
+                    "DWT reference epoch or rate changed")
+        _integer(stamp["ticks"], clock["first_tick"], clock["last_tick"],
+                 "reference capture ticks")
+        _integer(stamp["uncertainty_ticks"], clock["uncertainty_ticks"],
+                 MAX_OBSERVATION, "reference capture uncertainty")
+        require(stamp["uncertainty_known"] is True,
+                "unknown reference error cannot qualify a cycle interval")
+        require(stamp["uncertainty_ticks"] <= stamp["ticks"] - clock["first_tick"]
+                and stamp["uncertainty_ticks"] <=
+                clock["last_tick"] - stamp["ticks"],
+                "reference error interval leaves the admitted capture window")
+        points.append((point, stamp))
+    first, last = points[0][1], points[1][1]
+    require(last["ticks"] >= first["ticks"], "reversed DWT reference interval")
+    ticks = last["ticks"] - first["ticks"]
+    error = first["uncertainty_ticks"] + last["uncertainty_ticks"]
+    require(error <= MAX_OBSERVATION and ticks <= MAX_OBSERVATION - error,
+            "DWT reference bound overflow")
+    rate = reference["ticks_per_second"]
+    # Integer bounds include one counter tick for sampling phase. Reference
+    # uncertainty must already include capture pairing, skew and calibration.
+    minimum_cycles = max(0, ticks - error) * clock["cpu_clock_lower_hz"] // rate
+    maximum_cycles = ((ticks + error) * clock["cpu_clock_upper_hz"] + rate - 1) // rate
+    lower, upper = max(0, minimum_cycles - 1), maximum_cycles + 1
+    require(upper < 2 ** 32,
+            "DWT reference interval does not exclude ambiguous wrap")
+    value = (points[1][0]["counter"] - points[0][0]["counter"]) & 0xffffffff
+    require(lower <= value <= upper,
+            "DWT endpoints disagree with the admitted reference interval")
+    return value
+
+
 def _context(identity: dict, admission_digest: str, budgets: dict,
              admission: dict) -> dict:
     """Bind load and acquisition conditions separately from statistics."""
@@ -96,7 +214,7 @@ def _context(identity: dict, admission_digest: str, budgets: dict,
                      "cpu_clock_hz", "load", "executor", "irq_priorities",
                      "measurements"})
     require(type(context["schema_version"]) is int and
-            context["schema_version"] == 1 and
+            context["schema_version"] == MEASUREMENT_SCHEMA and
             context["kind"] == "hil_acquisition_context" and
             context["admission_sha256"] == admission_digest,
             "acquisition context is not bound to admission")
@@ -104,7 +222,7 @@ def _context(identity: dict, admission_digest: str, budgets: dict,
     admitted_workload(context["workload"], admission)
     require(type(context["cpu_clock_hz"]) is int and
             0 < context["cpu_clock_hz"] <= 2 ** 32 - 1,
-            "observed CPU clock required")
+            "positive declared CPU clock rate required")
     for key in ("load", "executor"):
         require(isinstance(context[key], str) and
                 0 < len(context[key].strip()) <= 4096,
@@ -121,7 +239,8 @@ def _context(identity: dict, admission_digest: str, budgets: dict,
     require(isinstance(measurements, dict) and
             set(measurements) == set(budgets),
             "acquisition enumeration differs from reviewed budgets")
-    extras = {"cycles": {"counter_bits", "maximum_interval_cycles"},
+    extras = {"cycles": {"counter_bits", "cycle_domain", "cycle_epoch",
+                          "reference"},
               "stack_used_peak": {"stack_capacity_bytes"},
               "loss": {"expected_events"}}
     for name, conditions in measurements.items():
@@ -137,9 +256,15 @@ def _context(identity: dict, admission_digest: str, budgets: dict,
             require(type(conditions["counter_bits"]) is int and
                     conditions["counter_bits"] == 32,
                     "Cortex-M DWT requires a 32-bit counter")
-            maximum = conditions["maximum_interval_cycles"]
-            require(type(maximum) is int and 0 < maximum < 2 ** 32,
-                    "DWT interval must exclude ambiguous wrap")
+            for key in ("cycle_domain", "cycle_epoch"):
+                _integer(conditions[key], 1, 2 ** 32 - 1, "DWT " + key)
+            clock = _reference_clock(
+                conditions["reference"], admission_digest,
+                conditions["cycle_domain"], conditions["cycle_epoch"],
+                context["cpu_clock_hz"])
+            require(conditions["cycle_domain"] != clock["domain"],
+                    "DWT counter cannot serve as its own independent reference")
+            conditions["_validated_reference_clock"] = clock
         elif name in ("stack_used_peak", "loss"):
             key = ("stack_capacity_bytes" if name == "stack_used_peak"
                    else "expected_events")
@@ -156,7 +281,7 @@ def _trace(identity: dict, admission_digest: str, context_identity: dict,
     fields(trace, {"schema_version", "kind", "metric", "unit", "method",
                    "admission_sha256", "context_sha256", "samples"})
     require(type(trace["schema_version"]) is int and
-            trace["schema_version"] == 1
+            trace["schema_version"] == MEASUREMENT_SCHEMA
             and trace["kind"] == "physical_hil_trace",
             "physical measurement trace required")
     name = trace["metric"]
@@ -173,8 +298,7 @@ def _trace(identity: dict, admission_digest: str, context_identity: dict,
             context["measurements"][name]["method"],
             "trace acquisition method differs from bound context")
     conditions = context["measurements"][name]
-    limits = {"cycles": "maximum_interval_cycles",
-              "stack_used_peak": "stack_capacity_bytes",
+    limits = {"stack_used_peak": "stack_capacity_bytes",
               "loss": "expected_events"}
     upper = conditions.get(limits.get(name), MAX_OBSERVATION)
     samples = trace["samples"]
@@ -182,11 +306,14 @@ def _trace(identity: dict, admission_digest: str, context_identity: dict,
             "measurement trace is empty or exceeds bounded sample count")
     values = []
     for sequence, sample in enumerate(samples):
-        fields(sample, {"sequence", "value"})
+        if name == "cycles":
+            value = _cycle_sample(sample, conditions, context)
+        else:
+            fields(sample, {"sequence", "value"})
+            value = sample["value"]
         require(type(sample["sequence"]) is int and
                 sample["sequence"] == sequence,
                 "measurement samples missing, repeated or out of order")
-        value = sample["value"]
         require(type(value) in (int, float) and
                 0 <= value <= upper and math.isfinite(value)
                 and (not integer_only or type(value) is int),
@@ -209,7 +336,7 @@ def validate_measurements(raw: dict, admission: dict, *,
                  "station_id", "board", "part", "chip_uid", "elf_sha256",
                  "resolved_sha256", "admission_sha256", "context", "traces"})
     require(type(raw["schema_version"]) is int and
-            raw["schema_version"] == 1 and
+            raw["schema_version"] == MEASUREMENT_SCHEMA and
             raw["kind"] == "physical_hil_measurements",
             "physical measurement record required")
     require(admission.get("kind") == "hil_admission" and
@@ -252,8 +379,8 @@ def validate_measurements(raw: dict, admission: dict, *,
         "status": "passed",
         "physical_status": "qualified_for_recorded_measurements",
         "metrics": metrics, "context": raw["context"],
-        "limits": ("Recorded samples do not prove WCET, unobserved load "
-                   "or product release"),
+            "limits": ("Recorded samples do not prove physical clock-owner "
+                   "truth, independence, WCET, unobserved load or release"),
     }
 
 
@@ -320,11 +447,13 @@ def main(argv=None) -> int:
             if args.report.resolve() in protected:
                 parser.exit(1, "measurement report would overwrite inputs\n")
             report = validate_measurements(raw, admission)
-            report.update(schema_version=1, kind="hil_measurement_validation",
+            report.update(schema_version=MEASUREMENT_SCHEMA,
+                          kind="hil_measurement_validation",
                           admission=file_identity(args.admission),
                           raw_evidence=file_identity(args.raw_evidence))
     except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:
-        report = {"schema_version": 1, "kind": "hil_measurement_validation",
+        report = {"schema_version": MEASUREMENT_SCHEMA,
+                  "kind": "hil_measurement_validation",
                   "status": "failed", "physical_status": "not_executed",
                   "failure": str(error)}
     atomic_json(args.report, report)

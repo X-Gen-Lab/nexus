@@ -80,6 +80,24 @@ needs network access. Candidate plans must end with the owned candidate verifier
 These commands delegate to `dependencies.py` and `qualification.py`; they do not
 establish a second build graph. Cache commands delegate to `cache.py`.
 
+The manual `formal-software.yml` workflow runs the complete maintained software
+plan on a fresh `main` checkout. The requested commit must equal both the source
+and workflow SHA:
+
+```sh
+gh workflow run formal-software.yml --repo X-Gen-Lab/nexus --ref main \
+  -f expected_commit=<exact-main-SHA>
+```
+
+It reuses the existing tools and plan runner with two build jobs. An explicit
+five-hour outer deadline leaves time within the six-hour job to preserve
+failure/cancellation diagnostics; each stage retains its original deadline.
+The complete temporary output and `build/` tree are archived with the existing
+byte verifier and retained for 30 days. Failed archiving uploads unqualified raw
+trees instead; cancellation uploads are best effort. Download and verify the
+archives and actual job result before admitting evidence. An executed plan
+remains separate from SDK/offline candidate qualification and physical HIL.
+
 Preset preparation records the assembly/Board bytes and every selected recursive
 Gitlink. Native models require all registered runtime and host-test roots,
 recursively.
