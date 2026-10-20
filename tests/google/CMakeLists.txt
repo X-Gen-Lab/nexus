@@ -525,6 +525,7 @@ include(threadx.cmake)
 include(i2c_multi_controller.cmake)
 
 include(user_io_broker.cmake)
+include(user_io_async.cmake)
 
 include(failstop.cmake)
 
@@ -586,3 +587,8 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/mapped_storage.cmake")
 include(amp_ipc.cmake)
 include(stm32f407_handoff.cmake)
 include(frame_stream.cmake)
+
+include(u575_retained_time.cmake)
+include(u575_stop2.cmake)
+
+include(i3c_controller.cmake)

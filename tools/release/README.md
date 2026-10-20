@@ -33,14 +33,14 @@ signature does not establish a different SDK source commit by itself.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-has 43 independent consumer roots and 46 executable images: three C/C++ base
-roots, ten MCU/backend roots and thirty selected-feature roots. Four images
-execute as Native programs; 42 MCU images are linked software evidence. The
-38 generic retention checks cover ten MCU/backend and twenty-eight selected-feature
+has 46 independent consumer roots and 49 executable images: three C/C++ base
+roots, ten MCU/backend roots and thirty-three selected-feature roots. Four images
+execute as Native programs; 45 MCU images are linked software evidence. The
+41 generic retention checks cover ten MCU/backend and thirty-one selected-feature
 images; base image resource checks are a separate scope. These counts describe
 the required plan, not an execution result or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v5`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v6`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -59,7 +59,7 @@ actual source, job and builder identities retain that separate responsibility.
 
 Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
 source, bytes and hash-pinned helper. The current policy does not accept it as
-a fallback or rewrite it as the 43-root/46-image selection. Earlier policy-v3
+a fallback or rewrite it as the 46-root/49-image selection. Earlier policy-v3
 34-root/37-image and 36-root/39-image plans also retain their exact historical
 source identities; neither is the current plan or a fallback. Historical policy-v4
 has 28 selected features, 41 roots and 44 images: H743 SPI DMA Cache on, U575 finite
@@ -67,6 +67,12 @@ UART hardware-chain TX, U575 LPTIM2 RUN one-shot, and H743 continuous UART RX
 with Cache off and Cache on extended its preceding 23-feature plan. Policy-v5
 adds explicit H743 UART continuous DMA duplex with Cache off and Cache on;
 policy-v4 evidence retains its own source and helper and cannot satisfy this plan.
+The preceding policy-v5 plan has 44 roots and 47 images after adding the U575
+RTC RUN consumer. Policy-v6 adds two independent consumers using the maintained
+U575 baremetal empty assembly: retained time links `Nexus::U575RetainedTime`,
+and the bounded Stop2 owner links `Nexus::U575Stop2`. Their public C11 sources
+remain separate from the mutually exclusive RTC RUN factory. These are required
+software link checks; they do not execute Stop2 or establish physical wake timing.
 The explicit exact plan, rather than an old count
 or the policy label alone, determines current admission.
 

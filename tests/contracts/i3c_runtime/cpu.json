@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "cpu": {
+    "arch": "cortex-m33",
+    "fpu": "none",
+    "float_abi": "soft",
+    "dwt_cyccnt": true,
+    "mpu_version": 8,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none",
+    "dsp": true
+  },
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 480
+  },
+  "clock_hz": 48000000
+}

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ff7358f49a5769c88fbd21dbb9e9950ec686df733d7d3e8ebd142551f2ce5e6e\n"
+"X-Nexus-Source-SHA256: ddd75d3a0db00d1b9a416bbf7234eebd1f19f4708a9f047e70e0c8b12e3d6043\n"
 
 msgid "SoC refinement and physical acceptance"
 msgstr "SoC 完善与物理验收"
@@ -534,12 +534,8 @@ msgstr ""
 msgid "35"
 msgstr "35"
 
-msgid ""
-"Not implemented. Existing F407/F470 shallow Sleep does not supply a deep-"
-"STOP continuous RTC/LPTIM domain, retention proof or wake restoration."
-msgstr ""
-"未实现。F407/F470 shallow Sleep不提供deep-STOP continuous RTC/LPTIM "
-"domain、retention proof或wake restoration。"
+msgid "Partial exact U575 TZEN0 baremetal software reference: independent retained RTC elapsed clock, explicit WUT owner, closed/joined RUN domain, verified wake access profile and retained failed-drain effects. Default Core TIM2 deadlines are invalid after stop. LPDMA/LPBAM, physical retention/accuracy/current/wake acceptance and the full original exit remain open."
+msgstr "精确 U575 TZEN0 baremetal 的部分软件参考：独立保留 RTC 经过时间时钟、显式 WUT owner、已关闭／join 的 RUN domain、经验证的唤醒访问配置及失败排空后保留的效果。默认 Core TIM2 deadline 在停止后失效。LPDMA/LPBAM、物理保留／精度／电流／唤醒验收和完整原始退出条件仍开放。"
 
 msgid "36"
 msgstr "36"
@@ -603,13 +599,11 @@ msgstr "有界 pre-RAM LDO；HSI32/64、Cache off/on；有限 UART TX DMA 或 RX
 msgid "Unselected supply/PLL or DMA modes and running-state handoff; Flash requires Cache off; the DMA2D component has no TOML/factory route"
 msgstr "未选择供电／PLL 或 DMA 模式及运行态交接；Flash 要求 Cache off；DMA2D 组件没有 TOML/factory route"
 
-# Reviewed bounded-scope prose correction; unchanged messages retained.
-msgid "Externally established TZEN0/SWAP0, MSIS4, Cache off, TIM2, GPIO/UART/IWDG and finite SPI1/I2C1/ADC4/PWM/EXTI/Flash; separate finite USART1 GPDMA TX/hardware-chain TX, LPTIM2 RUN and prepared-LSE RTC AlarmA RUN references; ADC supply admission is external"
-msgstr "外部已建立 TZEN0/SWAP0、MSIS4、Cache off、TIM2、GPIO/UART/IWDG 和有限 SPI1/I2C1/ADC4/PWM/EXTI/Flash；独立有限 USART1 GPDMA TX／硬件链 TX、LPTIM2 RUN 和预备 LSE RTC AlarmA RUN 参考；ADC 供电准入由外部负责"
+msgid "Externally established TZEN0/SWAP0, MSIS4, Cache off, TIM2, GPIO/UART/IWDG and finite SPI1/I2C1/ADC4/PWM/EXTI/Flash; separate finite USART1 GPDMA TX/hardware-chain TX, LPTIM2 RUN and prepared-LSE RTC AlarmA RUN references; independent retained RTC elapsed clock and explicit WUT/Stop2 component with joined RUN owners; ADC supply admission is external"
+msgstr "外部建立 TZEN0/SWAP0、MSIS4、Cache off、TIM2、GPIO/UART/IWDG 和有限 SPI1/I2C1/ADC4/PWM/EXTI/Flash；另有有限 USART1 GPDMA TX／硬件链 TX、LPTIM2 RUN 与预备 LSE RTC AlarmA RUN 参考；独立保留 RTC 经过时间时钟，以及要求 RUN owners join 的显式 WUT/Stop2 组件；ADC 供电准入由外部负责"
 
-# Reviewed bounded-scope prose correction; unchanged messages retained.
-msgid "Option-byte changes, RX DMA, LPDMA/autonomous low power, other RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; RTC RUN does not establish Stop2 or VBAT continuity"
-msgstr "option-byte 修改、RX DMA、LPDMA／自主低功耗、其他 RAM 放置和运行态交接；TZEN0 装配没有 TrustZone transport；RTC RUN 不建立 Stop2 或 VBAT 连续性"
+msgid "Option-byte changes, RX DMA, LPDMA/autonomous low power, other RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; AlarmA remains RUN-only; the selected Stop2 software subset does not establish physical residency, VBAT continuity or the full SOC-35 exit"
+msgstr "option-byte 修改、RX DMA、LPDMA／自主低功耗、其他 RAM 放置和运行态交接；TZEN0 装配没有 TrustZone transport；AlarmA 保持 RUN-only；选定 Stop2 软件子集不建立物理驻留、VBAT 连续性或完整 SOC-35 退出资格"
 
 # Reviewed bounded-scope prose correction; unchanged messages retained.
 msgid "F407 CCM is CPU-only and rejected as a DMA buffer. H743 memory facts describe DMA1/DMA2, BDMA and MDMA separately. The implemented finite USART3 DMA1 TX/RX lanes admit selected, initialized AXI SRAM or explicitly budgeted D2 SRAM1; unselected domains, TCM and an unready SRAM1 gate are rejected. MDMA reachability to TCM does not authorize a driver, cache protocol or linker placement. U575 has separate finite USART1 GPDMA TX and hardware-chain TX selections in SRAM1. The finite chain implements real node fetch and drain; it does not provide generic scatter/gather, circular/RX chains, LPDMA or security-crossing DMA. Its synchronous CPU gateway does not authorize DMA buffers or asynchronous storage loans. Legacy `dma` facts and explicit `dma_engines` are alternative authored forms; contradictory inputs are rejected rather than repaired."
@@ -626,3 +620,6 @@ msgstr "精确 F407VET6/ZGT6 裸机部分参考：显式 ClockDomain owner barri
 # Reviewed bounded-scope prose correction; unchanged messages retained.
 msgid "The remaining software work for SOC-33–35 requires coordinated ownership rather than another profile label. The exact F407 masked handoff now implements outgoing owner/state admission and the terminal transfer. Incoming-image integration, current-source qualification and physical execution remain separate; broader running-state adoption still needs its own image/resource and FP/IRQ/cache/RAM contract. External products retain loader authentication, partition and recovery policy. Dynamic frequency changes need actual consumer quiescence, ordered electrical changes, bounded rollback, OS timing adaptation and an explicit continuous time contract. Deep STOP additionally needs an exact RTC/LPTIM reference, wake/retention admission, elapsed-time reconstruction and consumer restoration; ordinary shallow-sleep preparation does not establish it."
 msgstr "SOC-33–35 剩余软件需要协同ownership，不是再加profile名。精确 F407 屏蔽交接现已实现 outgoing owner/state 准入与 terminal transfer。Incoming-image 接入、当前源码资格及物理执行仍分别记录；更广运行态接管仍需独立 image/resource 与 FP/IRQ/cache/RAM 合同。外部产品仍拥有loader authentication、partition和recovery。动态调频需要consumer quiescence、有序电气变化、有界rollback、OS timing adaptation和明确continuous time。Deep STOP额外需要精确RTC/LPTIM参考、wake/retention admission、elapsed-time reconstruction和consumer restoration；普通shallow准备不能建立这些能力。"
+
+msgid "The [U575 retained-clock and Stop2 reference](u575-retained-time.md) adds an independent RTC elapsed domain and an explicit masked WUT/Stop2 owner, with closed/joined RUN owners, verified MSIS4 access restoration and real cleanup. This is an exact TZEN0 baremetal software subset. Default Core TIM2 deadlines remain invalid after stop. LPDMA/LPBAM, physical retention/accuracy/current/wake acceptance and the full SOC-35 exit remain open."
+msgstr "[U575 保留时钟与 Stop2 参考](u575-retained-time.md)增加独立 RTC 经过时间域与显式屏蔽的 WUT/Stop2 owner，要求 RUN owners 关闭／join，验证 MSIS4 访问配置恢复并真实清理。这是精确 TZEN0 baremetal 软件子集。默认 Core TIM2 deadline 在停止后仍然失效。LPDMA/LPBAM、物理保留／精度／电流／唤醒验收及完整 SOC-35 退出条件仍开放。"

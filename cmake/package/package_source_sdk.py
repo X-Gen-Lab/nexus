@@ -158,7 +158,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
         "consumers/f407-handoff.c",
         "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
-        "consumers/u575-rtc.c",
+        "consumers/u575-rtc.c", "consumers/u575-retained-time.c", "consumers/u575-stop2.c", "consumers/user-io-async.c",
         "consumers/h743-uart-duplex-continuous.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
         "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
@@ -360,10 +360,34 @@ REQUIRED_FILES += (
     "soc/stm32f407/private/stm32f407_handoff_hw.h",
     "cmake/package/verification/io_evolution/consumers/f407-handoff.c")
 REQUIRED_FILES += (
+    "components/user_io_broker/include/nexus/components/user_io_async.h",
+    "components/user_io_broker/include/nexus/components/user_io_async_storage.h",
+    "components/user_io_broker/src/user_io_async.c",
+    "cmake/package/verification/io_evolution/consumers/user-io-async.c")
+REQUIRED_FILES += (
+    "components/stm32u575_retained_time/CMakeLists.txt",
+    "components/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h",
+    "components/stm32u575_retained_time/private/retained_time.h",
+    "components/stm32u575_retained_time/src/stm32u575_retained_time.c",
+    "soc/stm32u575/private/stm32u575_rtc_calendar.h",
+    "cmake/package/verification/io_evolution/consumers/u575-retained-time.c")
+REQUIRED_FILES += (
+    "components/stm32u575_stop2/CMakeLists.txt",
+    "components/stm32u575_stop2/README.md",
+    "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
+    "soc/stm32u575/stop2.c",
+    "soc/stm32u575/private/stm32u575_stop2_hw.h",
+    "cmake/package/verification/io_evolution/consumers/u575-stop2.c")
+REQUIRED_FILES += (
     "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
     "components/frame_dma2d/CMakeLists.txt",
     "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
     "components/frame_dma2d/src/h743_frame_dma2d.c")
+REQUIRED_FILES += (
+    "components/i3c_controller/CMakeLists.txt",
+    "components/i3c_controller/src/i3c_controller.c",
+    "components/i3c_controller/include/nexus/components/i3c_controller.h",
+    "components/i3c_controller/include/nexus/components/i3c_controller_storage.h")
 for _component, _include, _private in (
         ("clock_domain", "nexus/components/clock_domain.h", "clock_domain_impl.h"),
         ("user_io_broker", "nexus/components/user_io_broker.h", "user_io_broker_impl.h"),

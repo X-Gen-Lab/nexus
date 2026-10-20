@@ -37,6 +37,36 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertEqual(omitted, [],
                          "Required public SDK programs cannot be excluded by selection")
 
+    def test_async_and_retained_owner_public_closure_is_required(self):
+        required = {
+            "components/user_io_broker/CMakeLists.txt",
+            "components/user_io_broker/include/nexus/components/user_io_async.h",
+            "components/user_io_broker/include/nexus/components/"
+            "user_io_async_storage.h",
+            "components/user_io_broker/src/user_io_async.c",
+            "components/stm32u575_retained_time/CMakeLists.txt",
+            "components/stm32u575_retained_time/include/nexus/components/"
+            "stm32u575_retained_time.h",
+            "components/stm32u575_retained_time/private/retained_time.h",
+            "components/stm32u575_retained_time/src/stm32u575_retained_time.c",
+            "soc/stm32u575/private/stm32u575_rtc_calendar.h",
+            "components/stm32u575_stop2/CMakeLists.txt",
+            "components/stm32u575_stop2/include/nexus/components/"
+            "stm32u575_stop2.h",
+            "soc/stm32u575/stop2.c",
+            "soc/stm32u575/private/stm32u575_stop2_hw.h",
+        }
+        required.update("cmake/package/verification/io_evolution/consumers/"
+                        + name + ".c" for name in (
+                            "user-io-async", "u575-retained-time", "u575-stop2"))
+        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
+                         sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in sorted(required):
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(source_sdk.selected(name),
+                                "Required public closure omitted: " + name)
+
     def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
         required = {
             "components/usb_control/CMakeLists.txt",
@@ -376,7 +406,13 @@ class SourceSDKSelectionTests(unittest.TestCase):
                                  expected)
                 self.assertIn("Nexus::MappedStorage", cmake)
                 self.assertIn("Nexus::AMPIPC", cmake)
-                self.assertIn("nx_amp_ipc_send(nullptr", code)
+                self.assertIn("Nexus::UserIoBroker", cmake)
+                self.assertIn('"nexus/components/user_io_async_storage.h"',
+                              code)
+                self.assertIn(
+                    "nx_user_io_async_construct(nullptr, nullptr, 0U, nullptr) "
+                    "!= NX_ERROR_INVALID", code)
+                self.assertIn("nx_amp_ipc_construct(nullptr, nullptr) != NX_ERROR_INVALID", code)
 
     def test_optional_frame_blitter_is_consumed_only_by_h743_projects(self):
         for family in ("h743", "u575", "f103", "gd303", "g474"):
@@ -995,7 +1031,9 @@ class SourceSDKTests(unittest.TestCase):
     def run_ok(cls, arguments, **kwargs):
         result = cls.run_process(arguments, **kwargs)
         if result.returncode:
-            raise AssertionError(result.stdout + result.stderr)
+            raise AssertionError(
+                f"Command failed (exit {result.returncode}): {arguments!r}\n"
+                + result.stdout + result.stderr)
         return result
 
     def verify(self):

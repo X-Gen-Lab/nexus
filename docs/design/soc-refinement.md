@@ -35,11 +35,18 @@ Flash handoff, U575 prepared-LSE RTC RUN polling and frame contracts with an
 optional exact H743 RGB565 DMA2D component. Their public targets do not establish
 unselected hardware providers, full original exits or physical qualification.
 
+The [U575 retained-clock and Stop2 reference](u575-retained-time.md) adds an
+independent RTC elapsed domain and an explicit masked WUT/Stop2 owner, with
+closed/joined RUN owners, verified MSIS4 access restoration and real cleanup.
+This is an exact TZEN0 baremetal software subset. Default Core TIM2 deadlines
+remain invalid after stop. LPDMA/LPBAM, physical retention/accuracy/current/wake
+acceptance and the full SOC-35 exit remain open.
+
 | Reference | Maintained execution contract | Explicitly excluded |
 |---|---|---|
 | G474 / MB1367 and acquisition fixture | HSE24/170 MHz, TIM2, GPIO/UART/SPI/PWM/IWDG/EXTI; selected ADC1 bulb shots or finite TIM6 normal DMA at exact 2.5–50 kHz rates, polling I2C1 and physical ECC Flash; baremetal/FreeRTOS | Continuous ADC, UART/SPI DMA, other unselected controllers and ThreadX; fixture routes are not observed Board wiring |
 | H743 / NUCLEO and peripheral fixture | Bounded pre-RAM LDO; HSI32/64 with Cache off/on; finite UART TX DMA or RX DMA-IDLE; explicit initialized D2 SRAM1; finite SPI4/I2C1/ADC1/PWM/EXTI/IWDG1/Flash; separate V/HSI64 baremetal AXI continuous RX/duplex selections and optional V D-Cache-off AXI RGB565 DMA2D component | Unselected supply/PLL or DMA modes and running-state handoff; Flash requires Cache off; the DMA2D component has no TOML/factory route |
-| U575 / platform and peripheral fixture | Externally established TZEN0/SWAP0, MSIS4, Cache off, TIM2, GPIO/UART/IWDG and finite SPI1/I2C1/ADC4/PWM/EXTI/Flash; separate finite USART1 GPDMA TX/hardware-chain TX, LPTIM2 RUN and prepared-LSE RTC AlarmA RUN references; ADC supply admission is external | Option-byte changes, RX DMA, LPDMA/autonomous low power, other RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; RTC RUN does not establish Stop2 or VBAT continuity |
+| U575 / platform and peripheral fixture | Externally established TZEN0/SWAP0, MSIS4, Cache off, TIM2, GPIO/UART/IWDG and finite SPI1/I2C1/ADC4/PWM/EXTI/Flash; separate finite USART1 GPDMA TX/hardware-chain TX, LPTIM2 RUN and prepared-LSE RTC AlarmA RUN references; independent retained RTC elapsed clock and explicit WUT/Stop2 component with joined RUN owners; ADC supply admission is external | Option-byte changes, RX DMA, LPDMA/autonomous low power, other RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; AlarmA remains RUN-only; the selected Stop2 software subset does not establish physical residency, VBAT continuity or the full SOC-35 exit |
 | U575, separate dual-world reference | TZEN1 cold attribution owner, Secure/NS Runtime, real CMSE; scalar GPIO and cooperative jobs of up to eight copied PC7 commands in one Secure slot | General dual-world factory, NS RTOS/task identities, retained NS pointers or asynchronous loans, cross-domain DMA, loader authentication and physical isolation qualification |
 
 These are source-reviewed Board references. Their physical PCB revisions,
@@ -230,7 +237,7 @@ the first non-M4 target decision; it does not complete every conditional feature
 | 32 | H743 fixed cache ownership, finite USART3 DMA1 TX/RX-IDLE in selected AXI/SRAM1, separate V/HSI64 baremetal continuous RX/duplex in AXI, and an optional exact V D-Cache-off RGB565 DMA2D component; U575 finite USART1 GPDMA TX/hardware-chain TX in SRAM1 and CPU attribution mechanisms. Other unselected engines/modes and security-crossing DMA remain absent; physical coherency is unverified. |
 | 33 | Partial exact F407VET6/ZGT6 baremetal reference: explicit ClockDomain owner barrier, masked Flash vector/MSP/PC admission and nonreturning ARM tail transfer. Unknown/live RTOS or active-FP state, H743/cache handoff and other entry modes reject; full original exits and physical handoff remain open. The U575 cold world transition does not enlarge this subset. |
 | 34 | Not implemented. H743's four profiles are cold configurations, with no running frequency transition, consumer reclocking or deadline-domain conversion. |
-| 35 | Not implemented. Existing F407/F470 shallow Sleep does not supply a deep-STOP continuous RTC/LPTIM domain, retention proof or wake restoration. |
+| 35 | Partial exact U575 TZEN0 baremetal software reference: independent retained RTC elapsed clock, explicit WUT owner, closed/joined RUN domain, verified wake access profile and retained failed-drain effects. Default Core TIM2 deadlines are invalid after stop. LPDMA/LPBAM, physical retention/accuracy/current/wake acceptance and the full original exit remain open. |
 | 36 | Partial synchronous U575 reference only: Secure/NS images, cold attribution owner, single unprivileged NS Thread and copied GPIO gateway. No dual-world platform factory, NS RTOS, multitask identity, mutable address space, asynchronous borrow/drain or HIL isolation qualification. |
 
 Implementing rejection of an unsupported configuration is a valid defensive

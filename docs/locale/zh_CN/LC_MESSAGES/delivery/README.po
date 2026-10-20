@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ebd4d235da1cf9a1184bcf07da03d80806625615d257bfa623ebda5afa878b1a\n"
+"X-Nexus-Source-SHA256: 796c5bcb63f07515b1cde5c6d8618089993034dff29299648e89d31007dad11c\n"
 
 msgid "当前平台交付"
 msgstr "当前平台交付"
@@ -213,5 +213,5 @@ msgid "[SoC refinement and physical acceptance](../design/soc-refinement.md)"
 msgstr "[SoC 完善与物理验收](../design/soc-refinement.md)"
 
 # Reviewed bounded-scope prose correction; unchanged messages retained.
-msgid "历史 SoC 扩展基线固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件 候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`。当前有限 F407 屏蔽 Flash 尾跳不代表通用运行态接管；DVFS 和深 STOP 连续计时仍未实现，55 项 原始退出条件保持不变。"
-msgstr "历史 SoC 扩展基线固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件 候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`。当前有限 F407 屏蔽 Flash 尾跳不代表通用运行态接管；DVFS 和深 STOP 连续计时仍未实现，55 项 原始退出条件保持不变。"
+msgid "历史 SoC 扩展基线固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件 候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`。当前有限 F407 屏蔽 Flash 尾跳不代表通用运行态接管；SOC-34 的 DVFS 仍未实现。SOC-35 已增加 [U575 保留时钟与 Stop2](../design/u575-retained-time.md)的有界软件子集，使用独立 RTC 时间域与显式 WUT/Stop2 owner；LPDMA/LPBAM 尚未实现，物理保留、精度、功耗及 唤醒验收仍未执行。SOC-35 完整退出仍开放；全部 55 项原始退出条件保持不变。"
+msgstr "历史 SoC 扩展基线固定源码 `98270512` 已完成全部 Native 契约、工具和配置测试、121 个 ARM 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件 候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`。当前有限 F407 屏蔽 Flash 尾跳不代表通用运行态接管；SOC-34 的 DVFS 仍未实现。SOC-35 已增加 [U575 保留时钟与 Stop2](../design/u575-retained-time.md)的有界软件子集，使用独立 RTC 时间域与显式 WUT/Stop2 owner；LPDMA/LPBAM 尚未实现，物理保留、精度、功耗及 唤醒验收仍未执行。SOC-35 完整退出仍开放；全部 55 项原始退出条件保持不变。"

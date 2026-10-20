@@ -28,6 +28,8 @@ void nx_u575_rtc_model_reset(void) {
     std::memset(&g_u575_rtc_model, 0, sizeof(g_u575_rtc_model));
     std::memset(&g_nx_stm32u575_system, 0, sizeof(g_nx_stm32u575_system));
     auto& m = g_u575_rtc_model;
+    m.rcc.CR = RCC_CR_MSISON | RCC_CR_MSISRDY;
+    m.rcc.CSR = 4U << RCC_CSR_MSISSRANGE_Pos;
     m.rcc.AHB3ENR = RCC_AHB3ENR_PWREN;
     m.rcc.APB3ENR = RCC_APB3ENR_RTCAPBEN;
     m.rcc.BDCR = RCC_BDCR_LSEON | RCC_BDCR_LSERDY | RCC_BDCR_RTCSEL_0 |
@@ -57,6 +59,9 @@ void nx_u575_rtc_model_step(uint64_t us) {
 uint32_t nx_u575_rtc_model_read(volatile uint32_t* reg) {
     auto& m = g_u575_rtc_model;
     ++m.reads;
+    if ((uintptr_t)reg >= (uintptr_t)&m.rtc &&
+        (uintptr_t)reg < (uintptr_t)&m.rtc + sizeof(m.rtc))
+        ++m.rtc_reads;
     if (reg == &m.rtc.SSR || reg == &m.rtc.TR || reg == &m.rtc.DR) {
         ++m.calendar_reads;
         if (m.unstable_calendar || m.calendar_race_reads != 0U) {

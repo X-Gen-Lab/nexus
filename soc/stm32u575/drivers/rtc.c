@@ -8,6 +8,7 @@
  */
 #include "rtc_lptim_internal.h"
 #include "stm32u575_rtc.h"
+#include "stm32u575_rtc_calendar.h"
 #include "stm32u5xx_ll_rtc.h"
 _Static_assert(RTC_IRQn == 2 && offsetof(RTC_TypeDef, ALRMAR) == 0x40U &&
                    offsetof(RTC_TypeDef, SCR) == 0x5cU &&
@@ -71,7 +72,7 @@ static bool prepared(const nx_stm32u575_rtc_state_t* s) {
     RCC_TypeDef* r = system->rcc;
     uint32_t backup = NX_U575_READ(&r->BDCR);
     return (NX_U575_READ(&r->AHB3ENR) & RCC_AHB3ENR_PWREN) != 0U &&
-           (NX_U575_READ(&r->APB3ENR) & RCC_APB3ENR_RTCAPBEN) != 0U &&
+           nx_stm32u575_rtc_access(r) &&
            /* ES0499 Rev12 2.2.3/16 affect revision X. This reference does
             * not qualify a revision, so admit only drive codes 10/11 in crystal
             * mode. */
@@ -96,43 +97,15 @@ static bool live(const nx_stm32u575_rtc_state_t* s) {
              RTC_ICSR_SHPF | RTC_ICSR_RECALPF)) == 0U &&
            NX_U575_RTC_IRQ_QUIET();
 }
-/** \brief Decode each BCD digit before calendar range validation. */
-static bool bcd(uint32_t value, uint8_t* out) {
-    if ((value & 15U) > 9U || (value >> 4U) > 9U)
-        return false;
-    *out = (uint8_t)((value >> 4U) * 10U + (value & 15U));
-    return true;
-}
-/** \brief ES0499 Rev12 2.19.3: bypass shadows and repeat complete tuples. */
+/** \brief Reuse the same validated tuple as the independent clock owner. */
 static nx_result_t calendar(const nx_stm32u575_rtc_state_t* s,
                             nx_rtc_calendar_t* out) {
-    RTC_TypeDef* p = s->registers;
-    for (unsigned n = 0U; n < 8U; ++n) {
-        uint32_t subsecond = NX_U575_READ(&p->SSR);
-        uint32_t time = NX_U575_READ(&p->TR);
-        uint32_t date = NX_U575_READ(&p->DR);
-        uint32_t next_subsecond = NX_U575_READ(&p->SSR);
-        uint32_t next_time = NX_U575_READ(&p->TR);
-        uint32_t next_date = NX_U575_READ(&p->DR);
-        if (subsecond != next_subsecond || time != next_time ||
-            date != next_date)
-            continue;
-        nx_rtc_calendar_t value = {0};
-        value.weekday = (uint8_t)((date >> 13U) & 7U);
-        if (subsecond > 255U || (time & ~UINT32_C(0x003f7f7f)) != 0U ||
-            (date & ~UINT32_C(0x00ffff3f)) != 0U ||
-            !bcd((time >> 16U) & 63U, &value.hour) ||
-            !bcd((time >> 8U) & 127U, &value.minute) ||
-            !bcd(time & 127U, &value.second) ||
-            !bcd((date >> 16U) & 255U, &value.year) ||
-            !bcd((date >> 8U) & 31U, &value.month) ||
-            !bcd(date & 63U, &value.day) ||
-            nx_rtc_calendar_validate(&value) != NX_SUCCESS)
-            return NX_ERROR_STATE;
-        *out = value;
-        return NX_SUCCESS;
-    }
-    return NX_ERROR_BUSY;
+    nx_stm32u575_rtc_tuple_t tuple;
+    nx_result_t result = nx_stm32u575_rtc_tuple_read(
+        s->registers, g_nx_stm32u575_system.rcc, &tuple);
+    if (result == NX_SUCCESS)
+        *out = tuple.calendar;
+    return result;
 }
 nx_result_t nx_stm32u575_rtc_preflight(void) {
     if (!task())

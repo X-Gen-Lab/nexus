@@ -209,13 +209,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("h743 uart continuous cache on", "h743-uart-continuous-cache-on", "h743-uart-continuous"),
         ("h743 uart duplex continuous", "h743-uart-duplex-continuous", "h743-uart-duplex-continuous"),
         ("h743 uart duplex continuous cache on", "h743-uart-duplex-continuous-cache-on", "h743-uart-duplex-continuous"),
+        ("u575 retained time", "nucleo-u575-baremetal-empty", "u575-retained-time"),
+        ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
         "u575-uart-chain", "h743-spi-dma-uart-tx", "h743-spi-dma-uart-rx",
         "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
-        "h743-uart-duplex-continuous-cache-on"})
+        "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -258,7 +260,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         verification / "consumers/h743-spi-dma.c")
         shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
                         verification / "consumers/pin-states.c")
-        for stem in ("u575-lptim", "u575-rtc", "h743-uart-continuous",
+        for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
+                     "u575-stop2", "h743-uart-continuous",
                      "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
             shutil.copyfile(ROOT / relative, self.sdk / relative)
@@ -572,6 +575,32 @@ class SDKConsumerParallelTests(unittest.TestCase):
                             ".." not in Path(path).parts
                             for _, path, _ in self.consumer.SELECTED_CONSUMERS))
 
+    def test_retained_and_stop2_smokes_link_explicit_public_components(self):
+        assembly = "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml"
+        for label, smoke, library in (
+                ("u575 retained time", "u575-retained-time",
+                 "Nexus::U575RetainedTime"),
+                ("u575 stop2", "u575-stop2", "Nexus::U575Stop2")):
+            with self.subTest(smoke=smoke):
+                directory = self.directory / smoke
+                directory.mkdir()
+                source, _, command = self.consumer.prepare_selected_consumer(
+                    self.prefix, directory, label, assembly, smoke,
+                    lambda argv: None, expected_revision="a" * 40)
+                canonical = (self.sdk / "cmake/package/verification/io_evolution/consumers" /
+                             (smoke + ".c"))
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 canonical.read_bytes())
+                project = (source / "CMakeLists.txt").read_text()
+                self.assertIn("LIBRARIES " + library + ")", project)
+                self.assertIn("set(CMAKE_C_STANDARD 11)", project)
+                self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)
+                self.assertIn("set(CMAKE_C_EXTENSIONS OFF)", project)
+                self.assertIn("-DNEXUS_ASSEMBLY_FILE=" +
+                              str(self.sdk / assembly), command)
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg
+                                    for arg in command))
+
     def test_runtime_clock_uses_canonical_input_and_public_lifecycle_smoke(self):
         self.assertIn(("h743 runtime clock",
                        "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
@@ -651,7 +680,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                       "u575 uart chain", "u575 lptim run", "u575 rtc run",
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
-                      "h743 uart duplex continuous cache on"):
+                      "h743 uart duplex continuous cache on",
+                      "u575 retained time", "u575 stop2"):
             for operation, exit_code in (("build", 51), ("retention", 52)):
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
@@ -730,6 +760,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.stem == "nucleo-u575-baremetal-empty":
+                stem = ("u575-retained-time" if source.name ==
+                        "selected u575 retained time source" else "u575-stop2")
+                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.name == "g474-pin-states.toml":
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/pin-states.c"
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
@@ -758,6 +794,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "stm32g474_pwm_shared.h", "rtc_lptim_provider.h",
                          "stm32h743_spi_dma.h", "stm32g474_pin_state.h",
                          "pin_state_impl.h", "stm32u575_lptim.h", "stm32u575_rtc.h",
+                         "retained_time.h", "stm32u575_rtc_calendar.h",
+                         "stm32u575_stop2_hw.h",
                          "stm32u575_uart_gpdma_chain.h",
                          "stm32u575_uart_gpdma_impl.h",
                          "stm32h743_uart_continuous.h",
@@ -854,7 +892,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
                          "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
                          "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
-                         "consumers/g474-pwm-shared.c", "native-time-pair.toml",
+                         "consumers/g474-pwm-shared.c", "consumers/u575-retained-time.c",
+                         "consumers/u575-stop2.c", "native-time-pair.toml",
                          "native-time-empty.toml", "consumers/native-time-pair.c",
                          "consumers/native-time-empty.c"):
             with self.subTest(relative=relative):
@@ -1220,7 +1259,8 @@ finally:
         self.assertEqual(report['status'], 'passed')
         self.assertEqual(report['parallel_jobs'], jobs)
         self.assertEqual(report['consumer_workers'], jobs)
-        self.assertEqual(len(report['consumers']), 44)
+        self.assertEqual(len(report['consumers']),
+                         13 + len(self.fixture.SELECTED_INPUTS))
         self.assertTrue(all(row['status'] == 'passed'
                             for row in report['consumers']))
         self.assertEqual([row['name'] for row in report['selected_images']],

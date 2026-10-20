@@ -14,7 +14,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |
 | [内容与图示标准](documentation-standards.md) | 清晰表达、规范用语、事实/资格、示例、架构图和独立审查约束 |
 | [页面模板](documentation-templates.md) | tutorial/how-to/reference/explanation/status必需问题 |
-| [当前与目标参考图](../assets/diagrams/README.md) | 20 对本地 DOT/SVG：18 张编号主图与 2 张补充图；新增 target 图的渲染与审查另行记录 |
+| [当前与目标参考图](../assets/diagrams/README.md) | 本地 DOT/SVG 主图与两张补充图；主图以图清单为准，current/reference/target 身份、渲染与审查分别记录 |
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
@@ -38,11 +38,13 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |
 | [ThreadX 配置与接入](threadx.md) | 官方真实 Linux/M4 内核、独立 typed policy、bootstrap、静态对象与精确支持范围 |
 | [浅睡眠 timebase](timebase-lowpower.md) | 显式 FreeRTOS selector、固定 clock/compare alarm、量化 phase、失败保留与物理边界 |
+| [U575 保留时钟与 Stop2](u575-retained-time.md) | TZEN0 独立 RTC 时间域、显式 WUT owner、RUN 屏障与失败保留排空；LPDMA 和物理退出仍开放 |
 | [Classic CAN](classic-can.md) | 三邮箱、共享 filter domain、controller-local abort/recovery 与 Board 电气 handoff |
 | [USB FS device](usb-device.md) | PIO packet/endpoint 所有权、独立 48 MHz owner、control epoch 与完整停止 |
 | [Raw Ethernet / MDIO](ethernet.md) | caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置 |
 | [高级 timer](timer-advanced.md) | capture 事件、complementary PWM/deadtime/break；共享资源与实际安全边界 |
-| [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO、可信 principal/pin/copy；U575 同步参考 transport 另见双域合同 |
+| [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO 与 copied UART TX；可信 principal/copy/session authority；U575 同步参考 transport 另见双域合同 |
+| [I3C controller 核心](i3c-controller.md) | 单活动有限 SDR/DAA/CCC 与复制 IBI/hot-join；H563 仅编译参考，无物理 provider |
 | [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
 | [STM32G474 接入](stm32g474.md) | 精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI |
@@ -90,8 +92,10 @@ TZEN0 增加 SPI/I2C/ADC/PWM/EXTI/Flash，外部电源与安全状态准入仍�
 推进；不保留 NS 指针，不代表通用双域 factory、NS RTOS 或异步借用。
 ECC `program_flags`、fresh-erase 来源与逐脉冲完成责任见公共 Flash 合同；当前源
 实现和最终集成资格分别记录，不继承历史执行计数。
-SOC-33 的有限软件增量见上述边界页，完整退出仍开放；SOC-34/35 仍未实现，
-RTC RUN 不建立深 STOP 连续计时；
+SOC-33 的有限软件增量见上述边界页，完整退出仍开放；SOC-34 运行态变频仍未实现。
+SOC-35 新增 [U575 保留时间参考](u575-retained-time.md)的有界软件子集：独立 RTC
+时间域、显式 WUT/Stop2 owner 与失败保留排空；默认 Core TIM2 停止后旧 deadline
+失效。LPDMA/LPBAM、物理保留/精度/功耗/唤醒验收及完整退出仍开放；
 SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、

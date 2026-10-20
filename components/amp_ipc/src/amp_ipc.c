@@ -10,7 +10,7 @@
 
 _Static_assert(sizeof(nx_amp_word_t) == NX_AMP_IPC_UNIT, "word isolation");
 _Static_assert(sizeof(nx_amp_record_t) == NX_AMP_IPC_UNIT, "record isolation");
-_Static_assert(sizeof(nx_amp_wire_slot_t) == 4U * NX_AMP_IPC_UNIT,
+_Static_assert(sizeof(nx_amp_wire_slot_t) == (size_t)4U * NX_AMP_IPC_UNIT,
                "slot isolation");
 
 typedef struct {

@@ -53,7 +53,7 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         'add_executable(parent_plain parent.c)\n'
         'nexus_add_firmware(installed_c SOURCES main.c)\n'
         'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES '
-        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC'
+        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker'
         + (' Nexus::STM32F407Handoff' if arm and chip == "stm32" else '') + ')\n'
         'target_compile_options(installed_cpp PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>")\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
@@ -88,6 +88,8 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         '#include "nexus/components/mapped_storage.h"\n'
         '#include "nexus/components/mapped_storage_owner.h"\n'
         '#include "nexus/components/amp_ipc_storage.h"\n'
+        '#include "nexus/components/i3c_controller_storage.h"\n'
+        '#include "nexus/components/user_io_async_storage.h"\n'
         + ('#include "nexus/components/stm32f407_handoff.h"\n' if handoff else '')
         + '#include <cstring>\n' + code.replace(
             ' nx_platform_start_result_t result',
@@ -95,7 +97,10 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             ' if (nx_log_init(nullptr, sink, NX_LOG_INFO) != NX_ERROR_INVALID) return 3;\n'
             ' if (nx_bmp280_compensate(nullptr, 0, 0, nullptr) != NX_ERROR_INVALID) return 4;\n'
             ' if (nx_mapped_storage_stop(nullptr) != NX_ERROR_INVALID) return 5;\n'
-            ' if (nx_amp_ipc_send(nullptr, 0, 0, nullptr) != NX_ERROR_INVALID) return 6;\n'
+            ' if (nx_amp_ipc_construct(nullptr, nullptr) != NX_ERROR_INVALID) return 6;\n'
+            ' if (nx_i3c_controller_construct(nullptr, nullptr) != NX_ERROR_INVALID) return 9;\n'
+            ' if (nx_user_io_async_construct(nullptr, nullptr, 0U, nullptr) '
+            '!= NX_ERROR_INVALID) return 10;\n'
             + (' if (nx_stm32f407_handoff_initialize(0) != NX_ERROR_INVALID) return 8;\n'
                if handoff else '') + ' nx_platform_start_result_t result'))
     arguments = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
@@ -245,12 +250,19 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
     version = load_policy(sdk)["semantic_version"]
+    library = {"u575-retained-time": "Nexus::U575RetainedTime",
+               "u575-stop2": "Nexus::U575Stop2"}.get(smoke_name)
+    component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
         'project(installed_selected_consumer LANGUAGES C ASM)\n'
+        'set(CMAKE_C_STANDARD 11)\n'
+        'set(CMAKE_C_STANDARD_REQUIRED ON)\n'
+        'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
-        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c)\n'
+        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c'
+        f'{component})\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
@@ -276,6 +288,9 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32u575_uart_rtscts.h") || '
         '__has_include("stm32u575_lptim.h") || '
         '__has_include("stm32u575_rtc.h") || '
+        '__has_include("retained_time.h") || '
+        '__has_include("stm32u575_rtc_calendar.h") || '
+        '__has_include("stm32u575_stop2_hw.h") || '
         '__has_include("stm32g474_fdcan.h") || '
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '

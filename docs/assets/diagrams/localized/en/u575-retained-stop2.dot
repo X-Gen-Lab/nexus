@@ -1,0 +1,40 @@
+// FIG-24: current exact software ownership and lifecycle; open exits are dashed.
+// Basis: retained_time API/source and Stop2 API/source; no automatic enrollment.
+digraph u575RetainedStop2 {
+ graph [label="FIG-24 Current retained-clock / Stop2 software\nExact TZEN0 reference; physical and autonomous exits remain open", rankdir=TB,
+        labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];
+ node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
+ edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+ subgraph cluster_ownership {
+  label="Ownership: explicitly assembled and serialized"; color="#94a3b8";
+  boot [label="External boot / Board\nValid crystal LSE + calendar / PC13 silence\nNo concurrent source or clock-profile writer", fillcolor="#fff7ed"];
+  clock [label="Caller-owned retained storage\nIndependent nx_clock_t / identity / generation\nRead-only coherent tuple helper"];
+  sleep [label="Exact Stop2 owner\nDelegated WUT + RTC IRQ only\nOwn RCC / PWR additions and restoration"];
+  run [label="RUN owners / ClockDomain\nClose admission; end Core deadlines; stop Platform\nJoin producers / observers; release drained leases"];
+  tim2 [label="Default Core TIM2\nOld domain invalid after stop\nFresh restart has a new epoch", fillcolor="#f8fafc"];
+  boot -> clock [label="supplies preserved source; no source writes", style=dashed];
+  sleep -> clock [label="supplies stable wake identity; checks generation"];
+  run -> sleep [label="exact enrolled barrier; no implicit drain"];
+  run -> tim2 [label="stopping invalidates old Core deadlines"];
+ }
+ subgraph cluster_lifecycle {
+  label="Wake lifecycle: hardware effects remain owned until real drain"; color="#94a3b8";
+  quiet [label="QUIET\nBound live retained clock\nVerified source + RUN access profile"];
+  armed [label="ARMED / WFI\nWUTWF observed / WPR relocked\nPRIMASK held; WFI is not residency proof"];
+  drain [label="DRAIN\nVerify RUN profile before clock read\nWithdraw WUT / RTC IRQ / added gates"];
+  held [label="RETAINED EFFECTS\nDomain stays closed / storage stays live\nNo failed cleanup revokes ownership", fillcolor="#fff7ed"];
+  tainted [label="TAINTED CLOCK\nChecked sample reports failure\nClock face faults and parks; no stale return", fillcolor="#fee2e2"];
+  quiet -> armed [label="arm after source / barrier admission"];
+  armed -> drain [label="wake or failed setup"];
+  drain -> quiet [label="drain / restoration complete; same live clock epoch"];
+  drain -> held [label="drain / restoration fails"];
+  held -> drain [label="recover: retry drain; no WFI"];
+  clock -> tainted [label="clock read sees source / profile / elapsed bound invalid"];
+  drain -> tainted [label="hardware isolated; clock epoch remains invalid"];
+ }
+ clock -> quiet [style=invis, weight=100, minlen=1];
+ open [label="Open exits: require separate implementation and physical proof\nLPDMA / LPBAM + SRAM4/domain admission\nStop2 retention / current / latency / oscillator accuracy", style="rounded,dashed,filled", fillcolor="#f8fafc"];
+ drain -> open [label="software mechanism alone does not establish these exits", style=dashed];
+ held -> open [style=invis, weight=100];
+ tainted -> open [style=invis, weight=100];
+}

@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`990fae704bf16353dabb5e0dc8c62946da4629844e7d7376c474c9cb36d67e46`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2e076d5338632fdac196fdc3d34fc5cdda0fd0745f8512a2b0f687b1cd91532a`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -629,9 +629,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | i3c |
 | `task` | Bounded discovery IBI and hot-join caller storage |
-| `implementation_paths` | io;soc |
+| `implementation_paths` | components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md |
 | `exit_condition` | No implicit factory discovery; exact peripheral reference required |
-| `implementation_status` | pending |
+| `implementation_status` | in_progress |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -645,9 +645,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | security |
 | `task` | TrustZone peripheral broker and attribution |
-| `implementation_paths` | core;arch;soc |
+| `implementation_paths` | components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone |
 | `exit_condition` | Principal and memory validation; copied and borrowed data distinct |
-| `implementation_status` | pending |
+| `implementation_status` | in_progress |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |

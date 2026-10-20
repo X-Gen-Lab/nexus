@@ -1,0 +1,78 @@
+# Exact extracted messages; independent review recorded separately.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 264852200ead062ce6b95dcb4f12a9c6b89bb5b1d2bd2e391e34e5731806c698\n"
+
+msgid "Bounded I3C controller core"
+msgstr "有界 I3C controller 核心"
+
+msgid "This contract explains how an external controller port uses the optional `Nexus::I3CController` C11 core for explicit discovery, finite SDR transfers and copied IBI/hot-join events. The core has no hardware provider for a currently supported Nexus chip. STM32H563 is a compile-only reference, with physical initialization, wire drain, reset proof and PCB routing still unimplemented."
+msgstr "本合同说明外部 controller port 如何使用可选 `Nexus::I3CController` C11 核心执行显式发现、有限 SDR 传输和复制的 IBI/hot-join 事件。该核心没有适用于当前 Nexus 所支持芯片的硬件 provider。STM32H563 仅作编译参考，物理初始化、wire 排空、reset 证明和 PCB 路由仍未实现。"
+
+msgid "The public contracts are [request and endpoint API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/include/nexus/components/i3c_controller.h) and [caller storage and port contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/include/nexus/components/i3c_controller_storage.h). The caller supplies one controller object, a PID/address policy table, target state records, an event ring, request metadata, payloads, a monotonic clock and one immutable hardware operations table. There are no workers, object pools, implicit discovery or OS locks. One serialized thread executor calls every API; these APIs do not establish concurrent or IRQ access safety. Every hardware leaf and injected clock callback must be non-reentrant and must not call the core, invoke application code or mutate retained core storage."
+msgstr "公共合同为[request 与 endpoint API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/include/nexus/components/i3c_controller.h)以及[调用方存储与 port 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/include/nexus/components/i3c_controller_storage.h)。调用方提供一个 controller 对象、PID/address 策略表、target 状态记录、event ring、request 元数据、payload、单调时钟和一个不可变硬件 operations 表。没有 worker、object pool、隐式发现或 OS lock。唯一串行 thread executor 调用每个 API；这些 API 不建立并发或 IRQ 访问安全。每个硬件 leaf 和注入时钟回调必须不可重入，且不得调用核心、调用应用代码或修改保留的核心存储。"
+
+msgid "![FIG-26: current bounded I3C core; labeled arrows separate synchronous port calls, borrowed request lifetime and required whole-bus proofs](../assets/diagrams/i3c-core-lifecycle.svg)"
+msgstr "![FIG-26：当前有界 I3C 核心；标注箭头区分同步 port 调用、request 借用生命周期与必需的整总线证明](../assets/diagrams/i3c-core-lifecycle.svg)"
+
+msgid "FIG-26: current bounded I3C core; labeled arrows separate synchronous port calls, borrowed request lifetime and required whole-bus proofs"
+msgstr "FIG-26：当前有界 I3C 核心；标注箭头区分同步 port 调用、request 借用生命周期与必需的整总线证明"
+
+msgid "FIG-26 describes the [current implementation](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/src/i3c_controller.c). Solid arrows label software calls, copied observations or retained state; dashed arrows label required external proofs. The hardware port is an injected contract, not an implemented H563 provider. There is one active request and no software transfer queue; the bounded FIFO work belongs to the external controller port."
+msgstr "FIG-26 描述[当前实现](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/i3c_controller/src/i3c_controller.c)。实线箭头标注软件调用、复制的观察或保留状态；虚线箭头标注必需的外部证明。硬件 port 是注入合同，不是已实现的 H563 provider。只有一个活动 request，没有软件传输队列；有界 FIFO 工作属于外部 controller port。"
+
+msgid "Assembly and operation"
+msgstr "装配与操作"
+
+msgid "The existing component graph exposes an optional static library. External CPU Runtime consumers select the component explicitly; the Runtime does not generate a SoC, Board, physical instance or factory. A future physical typed factory may return an existing controller object; it must not discover a target or substitute an endpoint for a controller. Caller-authored 48-bit PIDs and conservative dynamic addresses are policy, not runtime names or factory IDs."
+msgstr "既有组件图提供可选静态库。外部 CPU Runtime consumer 显式选择该组件；Runtime 不生成 SoC、Board、物理实例或 factory。未来物理 typed factory 可以返回既有 controller 对象，不得发现 target 或以 endpoint 替代 controller。调用方编写的 48 位 PID 与保守动态地址属于策略，不是 runtime 名称或 factory ID。"
+
+msgid "Construction validates representable, aligned and separate controller, target, event and policy storage, duplicate PIDs/addresses, every required port leaf and a service batch of 1..8 B before claiming hardware. Rejection retains no storage or hardware ownership. The port must uniquely claim the controller, IRQs, clock and pins. Successful claim also asserts an independently established baseline proof that every target dynamic address is invalidated, including targets that stayed powered across MCU reset. The caller establishes that proof before construction; a missing proof rejects without attempting reset or retaining ownership. Its context and supplied storage must outlive every observer. The caller must keep complete port/clock context spans separate from all request, payload and output storage; the core has no declared context extents with which to prove those aliases."
+msgstr "构造在 claim 硬件前检查 controller、target、event 和策略存储可表示、对齐且互不重叠，检查重复 PID/address、全部必需 port leaf，以及 1..8 B service batch。拒绝不保留存储或硬件所有权。Port 必须唯一 claim controller、IRQ、clock 和 pin。成功 claim 还声明已独立建立基线证明：每个 target 动态地址均已失效，包括 MCU reset 期间仍保持供电的 target。调用方在构造前建立该证明；缺失证明时拒绝，不尝试 reset 或保留所有权。其 context 与提供的存储必须存活至每个 observer 退出。调用方必须使完整 port/clock context 范围与全部 request、payload 和输出存储分离；核心没有声明的 context 范围可用于证明这些别名。"
+
+msgid "Initialize unused request metadata with `nx_request_initialize`, then prepare an explicit DISCOVER, PRIVATE or supported CCC request. Use an absolute deadline in the injected clock domain; `NX_DEADLINE_NEVER` is explicit."
+msgstr "以 `nx_request_initialize` 初始化未使用的 request 元数据，然后准备显式 DISCOVER、PRIVATE 或受支持 CCC request。使用注入时钟域中的绝对 deadline；`NX_DEADLINE_NEVER` 必须显式指定。"
+
+msgid "Submit the request. A rejection leaves the caller's request and output ticket unborrowed and unchanged by admission. Successful admission borrows request metadata and payload; TX data remain immutable."
+msgstr "提交 request。拒绝使调用方 request 和输出 ticket 保持未借用且接纳不修改它们。成功接纳借用 request 元数据与 payload；TX 数据保持不可变。"
+
+msgid "Call `nx_i3c_service` from the same executor. One call performs one aggregate FIFO/event observation with at most the selected batch capacity, or one quiescence proof. The port cannot retain command/span pointers or call the application. `transferred` counts bytes handed to/from the FIFO, not proven target side effects; errors never trigger replay."
+msgstr "从同一 executor 调用 `nx_i3c_service`。每次调用执行一次聚合 FIFO/event 观察，最多使用所选 batch 容量，或执行一次静止证明。Port 不得保留 command/span 指针或调用应用。`transferred` 统计交给／取自 FIFO 的字节，不代表已证明的 target 效果；错误绝不触发重放。"
+
+msgid "Read results only after acquire-observing SETTLED. Cancellation and timeout request withdrawal and preserve the borrow. Frame completion first enters DRAINING. Only actual wire, FIFO, IRQ and port-observer quiescence permits the core to detach all references and release-publish SETTLED as its final request access. Failed proof enters QUARANTINED; keep request and payload alive and continue explicit recovery/service."
+msgstr "仅在以 acquire 观察 SETTLED 后读取结果。取消与超时请求撤回，并保留借用。Frame 完成先进入 DRAINING。只有实际 wire、FIFO、IRQ 和 port-observer 静止，才允许核心撤回全部引用，并以 release 发布 SETTLED 作为对 request 的最后访问。证明失败进入 QUARANTINED；保持 request 和 payload 存活，并继续显式恢复／service。"
+
+msgid "PRIVATE transfers contain 1..65535 B. The CCC whitelist permits ENEC/DISEC writes and direct GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS reads with their defined lengths. Address mutation, HDR, controller handoff and legacy I2C are excluded. The core does not interpret product registers or own external recovery policy."
+msgstr "PRIVATE 传输包含 1..65535 B。CCC 白名单允许 ENEC/DISEC 写入和直接 GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS 读取，使用其规定长度。地址修改、HDR、controller handoff 和 legacy I2C 均不在范围内。核心不解释产品寄存器，也不拥有外部恢复策略。"
+
+msgid "Discovery identities and reset"
+msgstr "发现身份与 reset"
+
+msgid "DISCOVER is finite and explicit. Each observed PID must match the authored table. Before requesting an assignment, the core increments that target's nonwrapping epoch and records its address as tentative. Only the subsequent hardware assignment acknowledgement confirms the endpoint. An observation can acknowledge the preceding target and announce the next identity; the core confirms first. Unknown, duplicate or malformed identities and incomplete assignments fault admission. Epoch exhaustion rejects a new incarnation rather than wrapping."
+msgstr "DISCOVER 有限且显式。每个观察到的 PID 必须匹配调用方编写的表。在请求分配前，核心递增该 target 不回绕的 epoch，并将其地址记录为 tentative。只有后续硬件 assignment acknowledgement 才确认 endpoint。一次观察可以确认前一个 target 并通告下一个身份；核心先处理确认。未知、重复或格式错误的身份和未完成分配会使接纳 fault。Epoch 耗尽拒绝新 incarnation，不回绕。"
+
+msgid "A partial DAA failure, cancellation, deadline, controller reset or failed drain must retain every confirmed and tentative dynamic address. It must not clear the table or reuse an address that may still be held by a target. Closed admission is required for `nx_i3c_reset`. Its external port proof must establish both wire/ FIFO/IRQ/observer quiescence and invalidation of **every target's dynamic address**. A peripheral reset or FIFO flush alone cannot return SUCCESS. A failed proof retains all requests and records. Successful proof invalidates endpoint records while preserving their epoch counters; old endpoint and cancellation identities cannot address a later incarnation. Reopen requires an idle, unfaulted controller."
+msgstr "部分 DAA 失败、取消、deadline、controller reset 或排空失败都必须保留每个 confirmed 和 tentative 动态地址，不得清表或复用仍可能由 target 持有的地址。`nx_i3c_reset` 要求关闭接纳。其外部 port 证明必须同时建立 wire/FIFO/IRQ/observer 静止，以及**每个 target 动态地址**均失效。仅外设 reset 或 FIFO flush 不能返回 SUCCESS。证明失败保留全部 request 和记录。证明成功使 endpoint 记录失效，同时保留其 epoch 计数；旧 endpoint 与取消身份不能操作后续 incarnation。Reopen 要求 controller idle 且未 fault。"
+
+msgid "Copied events and shutdown"
+msgstr "复制事件与停机"
+
+msgid "IBI data contain at most four copied bytes. The confirmed BCR must advertise IBI capability in bit1; bit2 requires 1..4 B including the mandatory data byte (MDB), otherwise the event contains zero data bytes. Accepted IBI events carry the exact confirmed endpoint epoch. Unknown-address, tentative, unadvertised, malformed or oversized IBI observations increase a saturating rejection counter. A hot-join event has no endpoint and requests caller-controlled discovery; it never creates an object or starts work. The caller chooses the positive ring capacity and consumes events explicitly. Overflow drops only the new event, preserves queued events and increments a saturating overflow counter. There is no timestamp or loss-free delivery claim."
+msgstr "IBI 数据最多包含四个复制字节。Confirmed BCR 的 bit1 必须声明 IBI 能力；bit2 要求 1..4 B（包括 mandatory data byte，MDB），否则事件包含零数据字节。已接受 IBI 事件携带精确 confirmed endpoint epoch。未知地址、tentative、未声明能力、格式错误或超长 IBI 观察递增饱和 rejection 计数。Hot-join 事件不带 endpoint，只请求调用方控制的 discovery；它绝不创建对象或启动工作。调用方选择正数 ring 容量并显式消费事件。溢出只丢弃新事件，保留已排队事件并递增饱和 overflow 计数。不承诺 timestamp 或无丢失交付。"
+
+msgid "Close prevents admission while keeping active loans, address records and events. Stop closes and withdraws active work, returns BUSY while requests or events remain, and returns STATE while faulted or assigned/tentative addresses remain. In that state, the caller must explicitly obtain the whole-bus reset proof before final stop; final proven quiescence then permits release of the physical claim. The controller storage is a permanent identity/tombstone after stop and cannot be reconstructed; it and copied ticket/endpoint storage must remain valid until external controls have joined. Product code owns scheduling, service frequency, recovery decisions and the final shutdown sequence."
+msgstr "Close 阻止接纳并保留活动借用、地址记录和事件。Stop 执行 close 并撤回活动工作，仍有 request 或 event 时返回 BUSY，faulted 或仍有 assigned/tentative 地址时返回 STATE。在该状态下，调用方必须在最终 stop 前显式取得整总线 reset 证明；随后已证明的最终静止才允许 release 物理 claim。Stop 后 controller 存储保留为永久 identity/tombstone，不得重建；它和已复制 ticket/endpoint 存储必须保持有效，直到外部 control 已 join。产品代码拥有调度、service 频率、恢复决定和最终停机顺序。"
+
+msgid "Construction checks duplicate identities/addresses in O(target_count²). DAA and IBI lookups scan the explicit target count; ring operations are O(1). Each service pump handles at most the selected 1..8 B batch, one IBI and one hot-join observation. Caller storage grows with target count, event capacity and exact request/payload sizes. These are software bounds, not measured wire latency."
+msgstr "构造以 O(target_count²) 检查重复身份／地址。DAA 和 IBI 查找扫描显式 target 数；ring 操作为 O(1)。每次 service pump 最多处理所选 1..8 B batch、一个 IBI 与一个 hot-join 观察。调用方存储随 target 数、event 容量和精确 request/payload 大小增长。这些是软件边界，不是 wire 延迟测量。"
+
+msgid "STM32H563 compile reference and evidence boundary"
+msgstr "STM32H563 编译参考与证据边界"
+
+msgid "The [compact source and execution evidence](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/evidence/i3c-controller/README.md) retains the pinned official facts, exact source identities and raw development records. H563 has one I3C1 peripheral; its control/status FIFOs contain two words each and TX/RX FIFOs eight bytes each. The hardware target table has at most four IBI slots. ES0565 Rev 8 requires `NOARBH=0` and the documented SDA pull-up preparation for 1 ms before controller enable. These facts constrain a future port; they do not provide a reviewed quiescence or all-target reset algorithm."
+msgstr "[紧凑源码与执行证据](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/evidence/i3c-controller/README.md)保留固定的官方事实、精确源码身份和原始开发记录。H563 有一个 I3C1 外设；control/status FIFO 各含两个 word，TX/RX FIFO 各为八个字节。硬件 target 表最多有四个 IBI slot。ES0565 Rev 8 要求 `NOARBH=0`，并在 enable controller 前按文档准备 SDA pull-up 1 ms。这些事实约束未来 port，不提供已审查的静止或全部 target reset 算法。"
+
+msgid "The public Cortex-M33 Runtime consumer checks C11/API/link closure only. Compiling pinned CMSIS/HAL/LL declarations does not establish a physical implementation, full H5 family support, a board route, voltage/timing qualification, full-speed operation or real IBI timestamps. Currently supported Nexus chips lack I3C, and no existing SoC capability is changed. Physical HIL remains `not_executed`."
+msgstr "公共 Cortex-M33 Runtime consumer 仅检查 C11/API/link 闭包。编译固定 CMSIS/HAL/LL 声明不建立物理实现、完整 H5 家族支持、Board 路由、电压／时序资格、全速运行或真实 IBI timestamp。当前 Nexus 支持芯片没有 I3C，且不修改任何既有 SoC 能力。物理 HIL 保持 `not_executed`。"
+
+msgid "Host GoogleTest/GoogleMock cases exercise the actual C core while mocking only hardware and clock leaves. Development RED/GREEN execution logs bind source hashes and raw results; the ordinary complete-index gates, SDK closure and ARM consumer must run after integration. Development execution does not establish a clean software candidate, reproducibility or physical qualification. The original {download}`IO-38 <io-evolution-execution.csv>` exit remains open and unchanged."
+msgstr "Host GoogleTest/GoogleMock 用例执行真实 C 核心，只模拟硬件与时钟 leaf。开发 RED/GREEN 执行日志绑定源码摘要和原始结果；集成后必须运行普通完整 index gate、SDK 闭包和 ARM consumer。开发执行不建立 clean 软件候选、可复现性或物理资格。原始 {download}`IO-38 <io-evolution-execution.csv>` 退出保持开放且不变。"

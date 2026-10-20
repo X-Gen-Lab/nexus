@@ -412,3 +412,15 @@ TEST_F(U575Rtc, BypassedLseIsOutsideExactCrystalReference) {
     EXPECT_EQ(0, std::memcmp(&before, &state, sizeof(state)));
     EXPECT_EQ(0U, g_u575_rtc_model.writes);
 }
+
+TEST_F(U575Rtc, UnqualifiedApbProfileRejectsBeforeCalendarTuple) {
+    open();
+    nx_rtc_snapshot_t out{};
+    out.calendar.year = 73U;
+    g_u575_rtc_model.calendar_reads = 0U;
+    g_u575_rtc_model.rcc.CFGR2 = RCC_CFGR2_HPRE;
+    EXPECT_EQ(NX_ERROR_STATE, nx_rtc_port_read(&port, &out));
+    EXPECT_EQ(73U, out.calendar.year);
+    EXPECT_EQ(0U, g_u575_rtc_model.calendar_reads);
+    EXPECT_EQ(0U, g_u575_rtc_model.writes);
+}

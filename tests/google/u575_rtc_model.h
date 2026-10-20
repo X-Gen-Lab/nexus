@@ -11,6 +11,7 @@ extern "C" {
 #endif
 typedef struct {
     RTC_TypeDef rtc;
+    FLASH_TypeDef flash;
     PWR_TypeDef power;
     RCC_TypeDef rcc;
     nx_time_us_t now;
@@ -19,6 +20,7 @@ typedef struct {
     uint32_t forbidden_writes;
     uint32_t reads;
     uint32_t calendar_reads;
+    uint32_t rtc_reads;
     uint32_t calendar_race_reads;
     uint32_t protected_write_refusals;
     uint32_t wpr_unlocks;
@@ -45,8 +47,10 @@ void nx_u575_rtc_model_write(volatile uint32_t* reg, uint32_t value);
 #ifdef __cplusplus
 }
 #endif
-#define NX_U575_RTC     (&g_u575_rtc_model.rtc)
-#define NX_U575_RTC_PWR (&g_u575_rtc_model.power)
+#define NX_U575_RETAINED_RCC   (&g_u575_rtc_model.rcc)
+#define NX_U575_RETAINED_FLASH (&g_u575_rtc_model.flash)
+#define NX_U575_RTC            (&g_u575_rtc_model.rtc)
+#define NX_U575_RTC_PWR        (&g_u575_rtc_model.power)
 #define NX_U575_RTC_IRQ_QUIET()                                                \
     (!g_u575_rtc_model.irq_enabled && !g_u575_rtc_model.irq_pending &&         \
      !g_u575_rtc_model.irq_active)
