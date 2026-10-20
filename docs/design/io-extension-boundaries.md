@@ -22,7 +22,7 @@ software development results do not establish a clean software candidate.
 | AMP epoch/cache core | `Nexus::AMPIPC` | Explicit unidirectional lanes, caller-owned shared records and hardware ports |
 | Running-image tail handoff | `Nexus::STM32F407Handoff` | Exact STM32F407VET6/ZGT6 baremetal Platform only |
 | Retained RTC AlarmA | Normal U575 Platform/factory; `u575-rtc-run.toml` | TZEN=0, MSIS4, baremetal, prepared retained LSE calendar, RUN polling |
-| Frame layouts and DMA2D | `Nexus::IO`; optional `Nexus::H743FrameDMA2D` | Common frame contracts; exact H743 V, D-Cache off, RGB565 M2M in AXI SRAM |
+| Frame layouts and DMA2D | `Nexus::IO`; optional `Nexus::H743FrameDMA2D` | Common frame contracts; exact H743 V, D-Cache off, RGB565 copy or fixed ARGB8888-to-RGB565 PFC in AXI SRAM |
 
 Optional component targets are linked explicitly through
 `nexus_add_firmware(... LIBRARIES ...)`. They do not create factory entries or
@@ -157,7 +157,7 @@ detaching and settling. Failed disable/clear/restore retains quarantine. Foreign
 clock/configuration drift permanently retains responsibility for external
 recovery. This mode provides no Stop2, LPDMA, VBAT-continuity or wake qualification.
 
-### Complete frames and H743 RGB565 DMA2D
+### Complete frames and fixed H743 DMA2D formats
 
 The [frame contract](../../io/include/nexus/io/frame_stream.h) binds a copied,
 checked layout to an existing `nx_stream` pool. Audio layouts retain full stored
@@ -170,20 +170,51 @@ IRQ and peripheral detachment facts and exact control identity/epoch.
 
 The [DMA2D component](../../components/frame_dma2d/include/nexus/components/frame_dma2d.h)
 has one caller-owned executor and no queue. It admits exact H743 V ID `0x20030450`,
-D-Cache off, exclusive cold DMA2D and RGB565 memory-to-memory transfers with even
-byte/stride values and hardware pixel/line bounds. Both surfaces must occupy AXI
-SRAM `[0x24000000,0x24080000)`. Destination writes cannot overlap any source-pool
-slot's full capacity, including frame tails and other free slots.
-Acceptance borrows request, live source-frame loan
-and destination; rejection leaves the original source loan with the caller.
+D-Cache off and exclusive cold DMA2D. The two request formats are RGB565 copy
+(the zero value) and fixed ARGB8888-to-RGB565 pixel format conversion (PFC).
+Unknown formats are rejected; CLUT, blending, other formats and IRQ operation
+remain unsupported. Both surfaces must occupy AXI SRAM
+`[0x24000000,0x24080000)`. No Board connection or physical result is inferred.
+
+`x` and `width_bytes` always count source bytes. Source addresses, x, widths and
+strides align to two bytes for RGB565 or four for ARGB8888. ARGB8888 input on
+this little-endian MCU stores B, G, R, A bytes; RGB565 discards alpha with no
+channel or byte swap. Output addresses and strides align to two bytes; output
+row bytes equal `width_bytes / source_pixel_bytes * 2`. Destination stride and
+capacity remain bytes. With `LOM=0`, foreground and output offsets count their
+own format's pixels: source padding divided by four for PFC or two for copy,
+and output padding divided by two. Each pixel gap is at most `0x3fff`; bits
+15:14 are ignored in pixel mode despite the 16-bit register field (RM0433 Rev9,
+sections 18.5.5 and 18.5.20). Width is at
+most `0x3fff` pixels and height at most `0xffff` rows. Successful request results
+report output bytes without stride padding. Arithmetic, AXI spans and hardware
+bounds are checked before acceptance.
+
+Destination writes and every ownership control must be disjoint from every
+source-pool slot's full capacity, including frame tails and other free slots.
+Admission scans the bounded pool in O(n), comparing seven fixed controls per
+slot. Acceptance borrows the request, exact live source-frame loan and output;
+the selected source slot remains immutable through final access. Rejection
+leaves the original source loan with its caller. Submit `SUCCESS` means
+ACCEPTED, including a subsequent setup/readback failure; such a failure keeps
+all borrows until service proves drain. The first observed failure remains
+latched across cancellation and recoverable cache/IRQ guard restoration.
+
 Successful completion requires TC and START-clear. Cancel/error drain instead
-requires START/CLUT/IRQ withdrawal without requiring TC. The provider releases
-the loan only after this proof and clearing FGMAR/OMAR/NLR.
-Cancel/deadline starts ABORT without reasserting START;
-failed proof retains every borrow in quarantine. Continued service can recover
-real drain. Stop closes admission, starts withdrawal and returns `BUSY` for active
-work. The caller continues service and retries stop, which resets the controller
-and withdraws its owned gate.
+requires START/CLUT/IRQ withdrawal without requiring TC. START and ABORT writes
+preserve the selected mode. START is a read/set bit: writing zero has no
+effect. ABORT requests hardware withdrawal without reasserting a previously
+cleared START. The provider releases the loan only after the hardware proof
+and clearing FGMAR/OMAR/NLR. Failed proof retains every borrow in quarantine;
+continued service can recover an actual drain. If an active owner observes its
+required RCC gate off or DMA2D reset asserted, transfer history is uncertain
+and quarantine is permanent: restoring registers to zero cannot revoke the
+borrow, and service, stop or reinitialization cannot reclaim it. An unobserved
+reset pulse is not detectable; exclusive gate/reset ownership remains a
+mandatory precondition. System-level recovery stays external. Stop closes
+admission and returns `BUSY` for active work; only after all loans settle does
+it reset the controller and withdraw its owned gate. These software and ELF
+checks establish no PFC throughput, latency or HIL result.
 
 ## Validation and remaining exits
 

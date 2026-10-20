@@ -578,9 +578,6 @@ msgstr "Error before transfer; success never returns."
 msgid "frame_dma2d.h"
 msgstr "frame_dma2d.h"
 
-msgid "Explicit optional H743 RGB565 framed DMA2D owner."
-msgstr "Explicit optional H743 RGB565 framed DMA2D owner."
-
 msgid "Exact opaque storage reservation for one optional owner."
 msgstr "Exact opaque storage reservation for one optional owner."
 
@@ -592,9 +589,6 @@ msgstr "Explicit exclusive physical resource; no runtime resource registry."
 
 msgid "Acquire cold DMA2D and its dedicated RCC gate/reset bit."
 msgstr "Acquire cold DMA2D and its dedicated RCC gate/reset bit."
-
-msgid "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only M2M RGB565, pixel offsets, no CLUT/PFC/blending/IRQ is supported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
-msgstr "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only M2M RGB565, pixel offsets, no CLUT/PFC/blending/IRQ is supported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
 
 msgid "[inout] Fresh zero storage exclusively owned by caller."
 msgstr "[inout] Fresh zero storage exclusively owned by caller."
@@ -611,9 +605,6 @@ msgstr "SUCCESS, INVALID, BUSY for foreign gate/reset/IRQ ownership, UNSUPPORTED
 msgid "One caller-owned request; rectangle coordinates are bytes."
 msgstr "One caller-owned request; rectangle coordinates are bytes."
 
-msgid "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. Width, offsets and strides obey RGB565 alignment. Destination cannot overlap a full-capacity source-pool slot. Task-only admission checks known pool extents in O(n)."
-msgstr "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. Width, offsets and strides obey RGB565 alignment. Destination cannot overlap a full-capacity source-pool slot. Task-only admission checks known pool extents in O(n)."
-
 msgid "One-executor task-only operations; each service call is bounded."
 msgstr "One-executor task-only operations; each service call is bounded."
 
@@ -622,9 +613,6 @@ msgstr "Immutable face; state is separate caller-owned private storage."
 
 msgid "Cold configuration for exact H743 V with D-Cache disabled."
 msgstr "Cold configuration for exact H743 V with D-Cache disabled."
-
-msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after quarantine; actual drain can still settle the request."
-msgstr "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after quarantine; actual drain can still settle the request."
 
 msgid "stm32u575_retained_time.h"
 msgstr "stm32u575_retained_time.h"
@@ -1307,3 +1295,29 @@ msgstr "Admission and software sleep observations, not the final result."
 msgid "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
 msgstr "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
 
+msgid "Explicit optional H743 RGB565 copy and fixed PFC owner."
+msgstr "Explicit optional H743 RGB565 copy and fixed PFC owner."
+
+msgid "Exact source-to-RGB565 operations; unknown values are unsupported."
+msgstr "Exact source-to-RGB565 operations; unknown values are unsupported."
+
+msgid "RGB565 source and output; zero preserves the copy operation."
+msgstr "RGB565 source and output; zero preserves the copy operation."
+
+msgid "ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian MCU."
+msgstr "ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian MCU."
+
+msgid "Alpha is discarded; no blending, channel/byte swap or CLUT load."
+msgstr "Alpha is discarded; no blending, channel/byte swap or CLUT load."
+
+msgid "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported. Offsets count each side's pixels (LOM=0), not bytes. CLUT/blending/other formats/IRQ are unsupported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
+msgstr "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported. Offsets count each side's pixels (LOM=0), not bytes. CLUT/blending/other formats/IRQ are unsupported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
+
+msgid "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. x/width_bytes are source bytes, not output bytes or pixels. Source address/x/width/stride align to 2 for RGB565 or 4 for ARGB8888. Destination is RGB565, aligned to 2 bytes. Destination row bytes are width_bytes/source_pixel_bytes*2; destination_stride/capacity are bytes. LOM=0 pixel gaps are at most 0x3fff on each side; width at most 0x3fff pixels, height at most 0xffff rows. Success reports output bytes, excluding stride padding, through nx_request_result. Destination cannot overlap a full-capacity source-pool slot. Every control is disjoint from every slot's full capacity. The selected source slot is immutable through final access. Task-only admission checks known pool extents in O(n)."
+msgstr "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. x/width_bytes are source bytes, not output bytes or pixels. Source address/x/width/stride align to 2 for RGB565 or 4 for ARGB8888. Destination is RGB565, aligned to 2 bytes. Destination row bytes are width_bytes/source_pixel_bytes*2; destination_stride/capacity are bytes. LOM=0 pixel gaps are at most 0x3fff on each side; width at most 0x3fff pixels, height at most 0xffff rows. Success reports output bytes, excluding stride padding, through nx_request_result. Destination cannot overlap a full-capacity source-pool slot. Every control is disjoint from every slot's full capacity. The selected source slot is immutable through final access. Task-only admission checks known pool extents in O(n)."
+
+msgid "Submit SUCCESS means ACCEPTED, including a later setup/readback error. Accepted failures retain every borrow until service proves final drain. The first observed failure is retained across cancel/guard restoration."
+msgstr "Submit SUCCESS means ACCEPTED, including a later setup/readback error. Accepted failures retain every borrow until service proves final drain. The first observed failure is retained across cancel/guard restoration."
+
+msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."
+msgstr "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."

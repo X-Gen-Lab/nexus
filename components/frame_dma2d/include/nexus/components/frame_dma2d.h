@@ -1,6 +1,6 @@
 /**
  * \file            frame_dma2d.h
- * \brief           Explicit optional H743 RGB565 framed DMA2D owner
+ * \brief           Explicit optional H743 RGB565 copy and fixed PFC owner
  * \author          Nexus Team
  */
 #ifndef NEXUS_COMPONENTS_FRAME_DMA2D_H
@@ -10,6 +10,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** \brief Exact source-to-RGB565 operations; unknown values are unsupported. */
+typedef enum nx_frame_blit_format {
+    /** \brief RGB565 source and output; zero preserves the copy operation. */
+    NX_FRAME_BLIT_RGB565 = 0,
+    /** \brief ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian
+     * MCU. \note Alpha is discarded; no blending, channel/byte swap or CLUT
+     * load.
+     */
+    NX_FRAME_BLIT_ARGB8888_TO_RGB565 = 1
+} nx_frame_blit_format_t;
 
 /**
  * \brief           One caller-owned request; rectangle coordinates are bytes.
@@ -21,8 +32,16 @@ extern "C" {
  *                  released only after final DMA access. Rejection leaves the
  *                  original loan with its caller. Do not separately release,
  *                  mutate or reuse accepted controls, source or destination.
- *                  Width, offsets and strides obey RGB565 alignment.
- *                  Destination cannot overlap a full-capacity source-pool slot.
+ *                  x/width_bytes are source bytes, not output bytes or pixels.
+ *                  Source address/x/width/stride align to 2 for RGB565 or 4
+ *                  for ARGB8888. Destination is RGB565, aligned to 2 bytes.
+ *                  Destination row bytes are width_bytes/source_pixel_bytes*2;
+ *                  destination_stride/capacity are bytes. LOM=0 pixel gaps
+ *                  are at most 0x3fff on each side; width at most 0x3fff
+ * pixels, height at most 0xffff rows. Success reports output bytes, excluding
+ * stride padding, through nx_request_result. Destination cannot overlap a
+ * full-capacity source-pool slot. Every control is disjoint from every slot's
+ * full capacity. The selected source slot is immutable through final access.
  *                  Task-only admission checks known pool extents in O(n).
  */
 typedef struct {
@@ -36,9 +55,14 @@ typedef struct {
     uint8_t* destination;
     size_t destination_stride;
     size_t destination_capacity;
+    nx_frame_blit_format_t format;
 } nx_frame_blit_request_t;
 
-/** \brief One-executor task-only operations; each service call is bounded. */
+/** \brief One-executor task-only operations; each service call is bounded.
+ * \note Submit SUCCESS means ACCEPTED, including a later setup/readback error.
+ *       Accepted failures retain every borrow until service proves final drain.
+ *       The first observed failure is retained across cancel/guard restoration.
+ */
 typedef struct {
     nx_result_t (*submit)(void* context, nx_frame_blit_request_t* request,
                           nx_time_us_t now);
@@ -61,7 +85,12 @@ typedef enum { NX_H743_FRAME_DMA2D_CONTROLLER = 1 } nx_h743_frame_resource_t;
  * \note            abort_observations bounds failed service observations before
  *                  quarantine. It is a software progress budget, not a measured
  *                  bus/DMA timing bound. The same executor continues service
- *                  after quarantine; actual drain can still settle the request.
+ *                  after recoverable quarantine; actual drain can settle it.
+ *                  Observed active RCC gate loss or reset assertion instead
+ *                  permanently retains all borrows. Restoring registers cannot
+ *                  prove that lost transfer history; no API reclaims it. An
+ *                  unobserved reset pulse is undetectable, so exclusive RCC
+ *                  ownership remains mandatory. System recovery is external.
  */
 typedef struct {
     nx_h743_frame_resource_t resource;
@@ -103,8 +132,10 @@ extern const nx_frame_blitter_ops_t nx_h743_frame_dma2d_ops;
  * outside this component. Never change Cache/RCC/reset/MPU or clock domain
  * before stop. All payloads must be wholly in AXI SRAM [0x24000000,
  *                  0x24080000); source/destination overlap is rejected. Only
- *                  M2M RGB565, pixel offsets, no CLUT/PFC/blending/IRQ is
- * supported. No pins, Board route, scheduler, queue or worker is created.
+ *                  RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported.
+ *                  Offsets count each side's pixels (LOM=0), not bytes.
+ *                  CLUT/blending/other formats/IRQ are unsupported. No pins,
+ *                  Board route, scheduler, queue or worker is created.
  *                  Initialization IO errors retain cleanup ownership; call
  * stop. A successful stop detaches every source then withdraws only its RCC
  * gate. Repeated stop performs no hardware accesses.

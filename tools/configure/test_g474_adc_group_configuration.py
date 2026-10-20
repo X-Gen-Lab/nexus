@@ -4,6 +4,8 @@ These whole-resolver cases require separate actual generated Platform and
 private provider GoogleTests. A source-record digest is not HIL qualification.
 """
 from dataclasses import FrozenInstanceError
+import hashlib
+import json
 from pathlib import Path
 import re
 import tempfile
@@ -52,6 +54,34 @@ class G474ADCGroupConfiguration(unittest.TestCase):
                     self.assertEqual({row.public_class for row in records},
                                      {"adc_group"})
                     self.assertFalse(result["physical_qualified"])
+
+    def test_legacy_json_adc_group_binds_the_validated_route_review(self):
+        fixture = self.fixture()
+        assembly = {
+            "schema_version": 1,
+            "board_package": str(fixture.parent / "boards/g474-adc-group"),
+            "backend": "baremetal", "clock_profile": "hse24-pll170",
+            "controllers": [{
+                "id": "samples", "binding": "samples",
+                "mode": "regular-sequence-dma", "channels": [2, 1],
+                "sample_times": [0, 0], "reference_mv": 3300,
+                "exclusive": True, "silicon_profile": "g474-adc-group-x",
+                "trigger": "software", "irq_priority": 5, "calls_os": False}],
+            "devices": [], "memory_budgets": {"main_stack_bytes": 2048},
+            "layout": None}
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "assembly.json"
+            path.write_text(json.dumps(assembly))
+            result = configure.resolve_ir(path, configure.ROOT)
+        item, = result.controllers
+        self.assertEqual((item.kind, item.controller, item.options.channels),
+                         ("adc_group", "ADC1", (2, 1)))
+        policy = selected_contracts.silicon_policy(result, item)
+        review, = (entry for entry in result["inputs"]
+                   if entry["sha256"] == policy.review_sha256)
+        review_bytes = (configure.ROOT / review["path"]).read_bytes()
+        self.assertEqual(hashlib.sha256(review_bytes).hexdigest(),
+                         policy.review_sha256)
 
     def test_named_cuts_freeze_layout_and_required_algorithms(self):
         for cut, revision, repeat, required, applied in (

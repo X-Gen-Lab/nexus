@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "portable_evidence",
+  "archive": {
+    "path": "/tmp/nexus-h743-dma2d-pfc-20261020/evidence-store/f82ecec509a3c76e1dbb82b4382c67302652125813baa6bcf051a240f4e48265.tar.gz",
+    "sha256": "f82ecec509a3c76e1dbb82b4382c67302652125813baa6bcf051a240f4e48265",
+    "size": 1213308
+  },
+  "manifest_sha256": "ddd3a6af4a94f23740a49b392bc386bb0e390ae35506983c13eebe4b6add8df1",
+  "files": 161,
+  "bytes": 4544255,
+  "signature_status": "unsigned",
+  "product_promotion": false
+}

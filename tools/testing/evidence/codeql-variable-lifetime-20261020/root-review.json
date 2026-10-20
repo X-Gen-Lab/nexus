@@ -1,0 +1,56 @@
+{
+  "status": "approved_source_for_integration",
+  "manifest_sha256": "81f29af6a2fa545c9f1fce856740897e943dd3474b47823e3fa0bb024b94470c",
+  "patch_sha256": "145943abb3238fe8ea0db05b165678af2a4f41fcdcb914b2ecfe08c0d128b4e3",
+  "base_head": "578235b2c6a01a5b33d38babf280c1a304521fb4",
+  "files": [
+    {
+      "path": "tools/configure/configure.py",
+      "before": {
+        "path": "/tmp/nexus-quality-20261019/tools/configure/configure.py",
+        "sha256": "7500bc5d2cdfa83ff435cbcc23b2ade16d499c56cbdb907a953e394251fa4b41",
+        "bytes": 74054
+      },
+      "final": {
+        "path": "/tmp/nexus-codeql-variable-lifetime-20261020/final/tools/configure/configure.py",
+        "sha256": "80370b5489fae4a19f1216337bd759599d5a8b7a4dd148b6223d87ce5fe435fb",
+        "bytes": 74259
+      }
+    },
+    {
+      "path": "tools/configure/test_g474_adc_group_configuration.py",
+      "before": {
+        "path": "/tmp/nexus-quality-20261019/tools/configure/test_g474_adc_group_configuration.py",
+        "sha256": "c43919e6affff3a758d0c5e3008b2ad3451c6ac7c7f29f06c27acfa188c18855",
+        "bytes": 11008
+      },
+      "final": {
+        "path": "/tmp/nexus-codeql-variable-lifetime-20261020/final/tools/configure/test_g474_adc_group_configuration.py",
+        "sha256": "e377754644478b8c802e6625fb3eafee5a403cb8456e1e1c333775d3cd2ec551",
+        "bytes": 12572
+      }
+    },
+    {
+      "path": "tools/measurement/retention.py",
+      "before": {
+        "path": "/tmp/nexus-quality-20261019/tools/measurement/retention.py",
+        "sha256": "3bf7970bb6fe297e92179e40edcb8ce3a90a466e7959bf39f42dfadbda96b2cd",
+        "bytes": 27717
+      },
+      "final": {
+        "path": "/tmp/nexus-codeql-variable-lifetime-20261020/final/tools/measurement/retention.py",
+        "sha256": "5d8df145ab59fe12e62404cb127830c5e84f9e059608cc6d7f321c4681b55f03",
+        "bytes": 27727
+      }
+    }
+  ],
+  "checks": [
+    "ADC review/digest/path are one immutable cached tuple loaded only from actual validated adc_group route; no authored_kind prescan or None digest bypass.",
+    "Existing referenced-silicon input path remains bound from the same tuple; invalid family/route/fact data still reject before bundle publication.",
+    "Regression resolves a real legacy schema1 JSON without authored_kind, checks typed ADC1/channels and exact referenced input bytes; original13 plus new1 real RED/GREEN retained.",
+    "Retention uses the same immutable explicit resolved_path condition before definition/use and keeps all CPU ABI/configuration and input checks. Legacy mode still omits configuration evidence.",
+    "No unrelated imports, warning suppression, ownership API changes, registry or report substitution."
+  ],
+  "actual_focused_history": "Author reports14 ADC and90 existing retention/ABI GREEN with real pinned ARM; primary and final remote CodeQL/full-gate acceptance remain separate.",
+  "qualification": false
+}

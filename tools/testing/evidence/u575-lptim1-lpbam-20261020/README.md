@@ -80,3 +80,13 @@ workflow cases, all passing without skips. The collection includes source
 phase bindings, original failed and corrected style receipts, exact SDK
 artifacts, public compilation evidence and independent reviews. These focused
 results do not substitute for the subsequent ordinary complete-index gate.
+
+The later `final-gate-package.json` and its single `raw/d74786b4…` archive retain
+the actual ordinary gate that produced commit `578235b2`: 6,207 Google cases in
+346 binaries and 2,867 tool cases (1,335 testing, 925 configure, 485 CI and 122
+workflows), all passing without skips. The final bilingual site has 125 pages
+per language and 28 canonical diagrams with 56 localized renditions. Its
+original identity remains parent `71bd3c32` plus the recorded dirty working
+hash; it is not relabelled as a clean build of `578235b2`. The archive preserves
+all command receipts, raw reports and the 94-file freeze-to-commit comparison.
+These results belong to that commit, not later PFC or MPU changes.

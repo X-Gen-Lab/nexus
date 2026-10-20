@@ -429,8 +429,12 @@ class SourceSDKSelectionTests(unittest.TestCase):
                     code = (source / "main.c").read_text()
                     expected = family == "h743"
                     self.assertEqual("Nexus::H743FrameDMA2D" in cmake, expected)
-                    self.assertEqual("nx_h743_frame_dma2d_initialize(NULL" in code,
-                                     expected)
+                    for public_contract in (
+                            '#include "nexus/components/frame_dma2d.h"',
+                            "nx_h743_frame_dma2d_initialize(",
+                            "NX_FRAME_BLIT_ARGB8888_TO_RGB565"):
+                        self.assertEqual(public_contract in code, expected,
+                                         public_contract)
 
     def test_exposed_io_core_clock_and_provider_closures_are_required(self):
         required = {

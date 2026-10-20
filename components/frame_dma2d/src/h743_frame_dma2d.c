@@ -1,6 +1,6 @@
 /**
  * \file            h743_frame_dma2d.c
- * \brief           Exact H743 framed RGB565 M2M ownership and final access
+ * \brief           Exact H743 framed RGB565 copy/PFC and final access
  * \author          Nexus Team
  * \version         1.0.0
  * \date            2026-10-20
@@ -89,13 +89,23 @@ static bool load(void* storage, owner_t* owner) {
            owner->face->context == storage;
 }
 
-/** \brief All gate/reset checks precede any DMA2D register probe. */
-static bool live(void) {
-    return (NX_H743_FRAME_READ(&NX_H743_FRAME_RCC->AHB3ENR) &
-            RCC_AHB3ENR_DMA2DEN) != 0U &&
-           (NX_H743_FRAME_READ(&NX_H743_FRAME_RCC->AHB3RSTR) &
-            RCC_AHB3RSTR_DMA2DRST) == 0U &&
-           (NX_H743_FRAME_READ(&NX_H743_FRAME_CORE->CCR) & SCB_CCR_DC_Msk) ==
+/** \brief Resource-history loss cannot be repaired by zeroed DMA registers. */
+static bool live(owner_t* owner) {
+    /* Reuse readiness as a permanent latch while an accepted loan exists.
+     * No further MMIO or API can infer final master access after this loss. */
+    if (owner->active != NULL && !owner->ready) {
+        return false;
+    }
+    if ((NX_H743_FRAME_READ(&NX_H743_FRAME_RCC->AHB3ENR) &
+         RCC_AHB3ENR_DMA2DEN) == 0U ||
+        (NX_H743_FRAME_READ(&NX_H743_FRAME_RCC->AHB3RSTR) &
+         RCC_AHB3RSTR_DMA2DRST) != 0U) {
+        if (owner->active != NULL) {
+            owner->ready = false;
+        }
+        return false;
+    }
+    return (NX_H743_FRAME_READ(&NX_H743_FRAME_CORE->CCR) & SCB_CCR_DC_Msk) ==
                0U &&
            NX_H743_FRAME_IRQ_QUIET();
 }
@@ -159,6 +169,14 @@ static bool controls_disjoint(const owner_t* owner, const void* storage,
                     stream->slots[i].data, stream->slots[i].capacity)) {
             return false;
         }
+        /* A free slot may be reused independently. No control can borrow
+         * bytes from any pool capacity, including immutable frame tails. */
+        for (size_t j = 0U; j < sizeof(controls) / sizeof(controls[0]); ++j) {
+            if (overlap(controls[j], sizes[j], stream->slots[i].data,
+                        stream->slots[i].capacity)) {
+                return false;
+            }
+        }
     }
     return !overlap(storage, sizeof(nx_h743_frame_dma2d_storage_t), request,
                     sizeof(*request)) &&
@@ -167,36 +185,58 @@ static bool controls_disjoint(const owner_t* owner, const void* storage,
            !overlap(request, sizeof(*request), loan, sizeof(*loan));
 }
 
-/** \brief Validate exact RGB565 rows and both complete AXI access intervals. */
+/** \brief A fixed format selects its source bytes; output is always RGB565. */
+static size_t source_pixel_bytes(const nx_frame_blit_request_t* request) {
+    return request->format == NX_FRAME_BLIT_ARGB8888_TO_RGB565 ? 4U : 2U;
+}
+
+static uint32_t mode(const nx_frame_blit_request_t* request) {
+    return request->format == NX_FRAME_BLIT_ARGB8888_TO_RGB565 ? DMA2D_CR_MODE_0
+                                                               : 0U;
+}
+
+/** \brief Validate both exact pixel geometries and complete AXI intervals. */
 static nx_result_t validate(const owner_t* owner, const void* storage,
                             const nx_frame_blit_request_t* request,
                             nx_frame_dma_view_t* source,
                             size_t* destination_span) {
-    if (request == NULL || request->source == NULL ||
-        request->width_bytes == 0U || request->width_bytes % 2U != 0U ||
-        request->width_bytes / 2U > 0x3FFFU || request->rows == 0U ||
-        request->rows > 0xFFFFU || request->destination == NULL ||
+    if (request == NULL || request->source == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    if (request->format != NX_FRAME_BLIT_RGB565 &&
+        request->format != NX_FRAME_BLIT_ARGB8888_TO_RGB565) {
+        return NX_ERROR_UNSUPPORTED;
+    }
+    size_t input_pixel = source_pixel_bytes(request);
+    size_t pixels = request->width_bytes / input_pixel;
+    size_t output_row = pixels * 2U;
+    if (request->width_bytes == 0U ||
+        request->width_bytes % input_pixel != 0U ||
+        request->x % input_pixel != 0U || pixels > 0x3FFFU ||
+        request->rows == 0U || request->rows > 0xFFFFU ||
+        request->destination == NULL ||
         (uintptr_t)request->destination % 2U != 0U ||
-        request->destination_stride < request->width_bytes ||
+        request->destination_stride < output_row ||
         request->destination_stride % 2U != 0U ||
-        (request->destination_stride - request->width_bytes) / 2U > 0xFFFFU ||
+        (request->destination_stride - output_row) / 2U > 0x3FFFU ||
         request->rows - 1U > SIZE_MAX / request->destination_stride) {
         return NX_ERROR_INVALID;
     }
     size_t tail = (request->rows - 1U) * request->destination_stride;
-    if (request->width_bytes > SIZE_MAX - tail ||
-        tail + request->width_bytes > request->destination_capacity) {
+    if (output_row > SIZE_MAX - tail ||
+        tail + output_row > request->destination_capacity) {
         return NX_ERROR_INVALID;
     }
-    *destination_span = tail + request->width_bytes;
+    *destination_span = tail + output_row;
     nx_result_t result = nx_frame_dma_view(
         request->source, request->plane, request->x, request->y,
         request->width_bytes, request->rows, source);
     if (result != NX_SUCCESS) {
         return result;
     }
-    if ((uintptr_t)source->data % 2U != 0U || source->stride % 2U != 0U ||
-        (source->stride - source->row_bytes) / 2U > 0xFFFFU ||
+    if ((uintptr_t)source->data % input_pixel != 0U ||
+        source->stride % input_pixel != 0U ||
+        (source->stride - source->row_bytes) / input_pixel > 0x3FFFU ||
         overlap(request->source->block.data, request->source->block.length,
                 request->destination, *destination_span) ||
         !controls_disjoint(owner, storage, request, *destination_span)) {
@@ -206,8 +246,9 @@ static nx_result_t validate(const owner_t* owner, const void* storage,
                                            .size = 0x80000U,
                                            .permissions = NX_DMA_MEMORY_READ |
                                                           NX_DMA_MEMORY_WRITE};
-    result = nx_dma_buffer_validate(&domain, 1U, source->data,
-                                    source->span_bytes, 2U, NX_DMA_TO_DEVICE);
+    result =
+        nx_dma_buffer_validate(&domain, 1U, source->data, source->span_bytes,
+                               input_pixel, NX_DMA_TO_DEVICE);
     return result != NX_SUCCESS
                ? result
                : nx_dma_buffer_validate(&domain, 1U, request->destination,
@@ -215,14 +256,22 @@ static nx_result_t validate(const owner_t* owner, const void* storage,
                                         NX_DMA_FROM_DEVICE);
 }
 
-/** \brief ABORT never reasserts START if hardware cleared it between reads. */
+/** \brief Preserve the first software-observed failure across guard changes. */
+static void record_failure(owner_t* owner, nx_result_t result) {
+    if (owner->result == NX_SUCCESS) {
+        owner->result = (uint8_t)result;
+    }
+}
+
+/** \brief START is read/set; its zero write neither cancels nor retriggers. */
 static void begin_drain(owner_t* owner, nx_result_t result) {
+    record_failure(owner, result);
     if (!owner->draining) {
         owner->draining = true;
-        owner->result = (uint8_t)result;
         owner->remaining = owner->abort_limit;
         (void)nx_request_transition(&owner->active->base, NX_REQUEST_DRAINING);
-        NX_H743_FRAME_WRITE(&NX_H743_FRAME_REGS->CR, DMA2D_CR_ABORT);
+        NX_H743_FRAME_WRITE(&NX_H743_FRAME_REGS->CR,
+                            mode(owner->active) | DMA2D_CR_ABORT);
         nx_arch_dsb();
     }
 }
@@ -272,7 +321,8 @@ static nx_result_t settle(void* storage, owner_t* owner) {
     }
     nx_result_t result = (nx_result_t)owner->result;
     size_t bytes = result == NX_SUCCESS
-                       ? owner->source.row_bytes * owner->source.rows
+                       ? owner->source.row_bytes / source_pixel_bytes(request) *
+                             2U * owner->source.rows
                        : 0U;
     owner->active = NULL;
     owner->source = (nx_frame_dma_view_t){0};
@@ -294,7 +344,8 @@ static nx_result_t service(void* storage, nx_time_us_t now) {
     if (owner.stopped || owner.active == NULL) {
         return NX_SUCCESS;
     }
-    if (!live()) {
+    if (!live(&owner)) {
+        record_failure(&owner, NX_ERROR_IO);
         owner.guard_lost = true;
         quarantine(&owner);
         save(storage, &owner);
@@ -302,7 +353,6 @@ static nx_result_t service(void* storage, nx_time_us_t now) {
     }
     if (owner.guard_lost) {
         begin_drain(&owner, NX_ERROR_IO);
-        owner.result = NX_ERROR_IO;
         owner.guard_lost = false;
     }
     uint32_t flags = NX_H743_FRAME_READ(&NX_H743_FRAME_REGS->ISR);
@@ -342,30 +392,29 @@ static nx_result_t service(void* storage, nx_time_us_t now) {
     return settle(storage, &owner);
 }
 
-/** \brief Configure through documented HAL DMA2D M2M RGB565 register semantics.
- */
+/** \brief LOM=0: foreground/output offsets count their own format pixels. */
 static bool configure(const nx_frame_blit_request_t* request,
                       const nx_frame_dma_view_t* source) {
     DMA2D_TypeDef* dma = NX_H743_FRAME_REGS;
-    return checked(&dma->CR, 0U, UINT32_MAX) &&
+    size_t input_pixel = source_pixel_bytes(request);
+    size_t pixels = source->row_bytes / input_pixel;
+    return checked(&dma->CR, mode(request), UINT32_MAX) &&
            checked(&dma->FGMAR, (uint32_t)(uintptr_t)source->data,
                    UINT32_MAX) &&
-           checked(&dma->FGOR,
-                   (uint32_t)((source->stride - source->row_bytes) / 2U),
-                   DMA2D_FGOR_LO) &&
-           checked(&dma->FGPFCCR, 2U, UINT32_MAX) &&
+           checked(
+               &dma->FGOR,
+               (uint32_t)((source->stride - source->row_bytes) / input_pixel),
+               DMA2D_FGOR_LO) &&
+           checked(&dma->FGPFCCR, input_pixel == 4U ? 0U : 2U, UINT32_MAX) &&
            checked(&dma->BGPFCCR, 0U, UINT32_MAX) &&
            checked(&dma->OPFCCR, 2U, UINT32_MAX) &&
            checked(&dma->OMAR, (uint32_t)(uintptr_t)request->destination,
                    UINT32_MAX) &&
-           checked(
-               &dma->OOR,
-               (uint32_t)((request->destination_stride - request->width_bytes) /
-                          2U),
-               DMA2D_OOR_LO) &&
+           checked(&dma->OOR,
+                   (uint32_t)((request->destination_stride - pixels * 2U) / 2U),
+                   DMA2D_OOR_LO) &&
            checked(&dma->NLR,
-                   (uint32_t)((request->width_bytes / 2U) << 16U) |
-                       (uint32_t)request->rows,
+                   (uint32_t)(pixels << 16U) | (uint32_t)request->rows,
                    DMA2D_NLR_PL | DMA2D_NLR_NL);
 }
 
@@ -382,8 +431,8 @@ static nx_result_t submit(void* storage, nx_frame_blit_request_t* request,
     if (owner.active != NULL) {
         return NX_ERROR_BUSY;
     }
-    if (!live() || (NX_H743_FRAME_READ(&NX_H743_FRAME_REGS->CR) &
-                    (DMA2D_CR_START | FRAME_IRQS)) != 0U) {
+    if (!live(&owner) || (NX_H743_FRAME_READ(&NX_H743_FRAME_REGS->CR) &
+                          (DMA2D_CR_START | FRAME_IRQS)) != 0U) {
         return NX_ERROR_STATE;
     }
     if (request == NULL ||
@@ -424,7 +473,8 @@ static nx_result_t submit(void* storage, nx_frame_blit_request_t* request,
             begin_drain(&owner, NX_ERROR_IO);
             quarantine(&owner);
         } else {
-            NX_H743_FRAME_WRITE(&NX_H743_FRAME_REGS->CR, DMA2D_CR_START);
+            NX_H743_FRAME_WRITE(&NX_H743_FRAME_REGS->CR,
+                                mode(request) | DMA2D_CR_START);
             nx_arch_dsb();
             if ((NX_H743_FRAME_READ(&NX_H743_FRAME_REGS->CR) &
                  DMA2D_CR_START) == 0U &&
@@ -446,7 +496,8 @@ static nx_result_t cancel(void* storage, nx_frame_blit_request_t* request) {
     if (!load(storage, &owner) || request == NULL || owner.active != request) {
         return NX_ERROR_STATE;
     }
-    if (!live()) {
+    if (!live(&owner)) {
+        record_failure(&owner, NX_ERROR_IO);
         owner.guard_lost = true;
         quarantine(&owner);
     } else {
@@ -469,9 +520,10 @@ static nx_result_t stop(void* storage) {
     }
     owner.stopping = true;
     if (owner.active != NULL) {
-        if (live()) {
+        if (live(&owner)) {
             begin_drain(&owner, NX_ERROR_CANCELLED);
         } else {
+            record_failure(&owner, NX_ERROR_IO);
             owner.guard_lost = true;
             quarantine(&owner);
         }
@@ -537,8 +589,8 @@ nx_h743_frame_dma2d_initialize(nx_h743_frame_dma2d_storage_t* storage,
     if (!clock_set(true) || !reset()) {
         return NX_ERROR_IO;
     }
-    if (!live() || (NX_H743_FRAME_READ(&NX_H743_FRAME_REGS->CR) &
-                    (DMA2D_CR_START | FRAME_IRQS)) != 0U) {
+    if (!live(&owner) || (NX_H743_FRAME_READ(&NX_H743_FRAME_REGS->CR) &
+                          (DMA2D_CR_START | FRAME_IRQS)) != 0U) {
         return NX_ERROR_IO;
     }
     owner.ready = true;

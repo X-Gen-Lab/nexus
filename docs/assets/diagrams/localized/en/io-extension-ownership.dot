@@ -15,7 +15,7 @@ digraph ioExtensionOwnership {
     amp [label="AMPIPC\nLane + boot epochs + sequence\nOffer / ACK cache lines"];
     handoff [label="STM32F407Handoff\nExisting ClockDomain barrier\nMasked Flash-vector tail"];
     rtc [label="U575 retained RTC\nOne AlarmA request\nRUN polling / prepared LSE"];
-    frame [label="FrameStream + H743 DMA2D\nComplete source-frame loan\nRGB565 AXI M2M / D-Cache off"];
+    frame [label="FrameStream + H743 V DMA2D\nComplete source-frame loan\nRGB565 copy / fixed ARGB8888 → RGB565 PFC\nAXI SRAM / D-Cache off\nNo CLUT or blending"];
     storage [label="Caller storage\nRequests / payloads / slots / shared records", fillcolor="#f8fafc"];
     proof [label="External proofs\nJoined consumers / old-epoch access impossible\nClock users drained / valid backup domain", fillcolor="#fff7ed"];
     ports [label="Explicit AMP ports\nUnique role claim / persistent boot history\nCoherent control ordering / cache operations", fillcolor="#f8fafc"];

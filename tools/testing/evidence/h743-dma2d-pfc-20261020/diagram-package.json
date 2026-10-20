@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-h743-dma2d-pfc-diagram-20261020/evidence-store/223c5ecd7a0952d0e78a865e1a0bff6a5c6dad4b95a7ce8672cc05930038b9d8.tar.gz",
+    "sha256": "223c5ecd7a0952d0e78a865e1a0bff6a5c6dad4b95a7ce8672cc05930038b9d8",
+    "size": 969711
+  },
+  "bytes": 2912165,
+  "files": 23,
+  "kind": "portable_evidence",
+  "manifest_sha256": "fb479f8c9a8950399cae86479f0cae889d95bfa9f134c09d9268419e588b0468",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

@@ -708,14 +708,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             claim("irq:" + irq, "threadx", "kernel",
                   "ThreadX " + irq_profile["kernel_port"])
     selected = []
-    adc_group_review = None
-    if any(item.get("authored_kind") == "adc_group"
-           for item in assembly["controllers"]):
-        if family != "stm32g474":
-            fail("ADC group has no maintained provider")
-        adc_group_path = contained_file(root, soc.get("adc_group_review", ""))
-        adc_group_review = read(adc_group_path)
-        adc_group_digest = hashlib.sha256(snapshots[adc_group_path]).hexdigest()
+    adc_group_contract = None
     instance_ids = []
     irq_owners = {}
     for selection in sequence(assembly["controllers"], "selected controllers"):
@@ -878,6 +871,17 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             if route["kind"] == "can_fd":
                 selected[-1]["message_ram_words"] = hardware["message_ram_words"]
             if route["kind"] == "adc_group":
+                if family != "stm32g474":
+                    fail("ADC group has no maintained provider")
+                if adc_group_contract is None:
+                    adc_group_path = contained_file(
+                        root, soc.get("adc_group_review", ""))
+                    review = read(adc_group_path)
+                    adc_group_contract = (
+                        review, hashlib.sha256(
+                            snapshots[adc_group_path]).hexdigest(),
+                        adc_group_path)
+                adc_group_review, adc_group_digest, _ = adc_group_contract
                 try:
                     from .providers.stm32g474 import adc_group
                 except ImportError:
@@ -1036,8 +1040,8 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("SPI requires at least one reviewed CS endpoint")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
-    if adc_group_review is not None:
-        inputs.append(adc_group_path)
+    if adc_group_contract is not None:
+        inputs.append(adc_group_contract[2])
     if reference_path is not None:
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):

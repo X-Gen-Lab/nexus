@@ -10,9 +10,11 @@
 extern "C" {
 #include "nexus/components/frame_dma2d.h"
 }
+#include <cstdlib>
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <new>
 #include <sys/mman.h>
 
 DMA2D_TypeDef g_frame_dma2d;
@@ -28,11 +30,14 @@ struct Hardware {
     bool irq_quiet = true;
     bool refuse_abort = false;
     bool refuse_detach = false;
+    bool lost_transfer_history = false;
     void write_register(volatile uint32_t* p, uint32_t value) {
         if (p == &g_frame_dma2d.IFCR) {
             g_frame_dma2d.ISR &= ~value;
         } else if (p == &g_frame_rcc.AHB3RSTR &&
                    (value & RCC_AHB3RSTR_DMA2DRST) != 0U) {
+            lost_transfer_history = lost_transfer_history ||
+                                    (g_frame_dma2d.CR & DMA2D_CR_START) != 0U;
             std::memset(&g_frame_dma2d, 0, sizeof(g_frame_dma2d));
             *p = value;
         } else if (p == &g_frame_dma2d.CR && (value & DMA2D_CR_ABORT) != 0U &&
@@ -79,11 +84,11 @@ class H743Frame : public testing::Test {
         std::memset(&g_frame_debug, 0, sizeof(g_frame_debug));
         g_frame_debug.IDCODE = 0x20030450U;
         mapping =
-            mmap(source, 8192U, PROT_READ | PROT_WRITE,
+            mmap(source, 0x80000U, PROT_READ | PROT_WRITE,
                  MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
         ASSERT_NE(mapping, MAP_FAILED);
         ASSERT_EQ(mapping, source);
-        std::memset(mapping, 0, 8192U);
+        std::memset(mapping, 0, 0x80000U);
         slot.data = source;
         slot.capacity = 64U;
         ASSERT_EQ(nx_stream_initialize(&stream, &slot, 1U), NX_SUCCESS);
@@ -112,9 +117,32 @@ class H743Frame : public testing::Test {
     }
     void TearDown() override {
         if (mapping != MAP_FAILED) {
-            EXPECT_EQ(munmap(mapping, 8192U), 0);
+            EXPECT_EQ(munmap(mapping, 0x80000U), 0);
         }
         hardware = nullptr;
+    }
+    void reframe(size_t row_bytes, size_t stride, size_t rows,
+                 size_t capacity) {
+        if (loan.owner != nullptr) {
+            nx_dma_drain_facts_t proof = {loan.block.length, 0U, true, true,
+                                          true};
+            ASSERT_EQ(nx_frame_dma_release(&framed, &loan, &proof), NX_SUCCESS);
+        }
+        slot.capacity = capacity;
+        ASSERT_EQ(nx_stream_initialize(&stream, &slot, 1U), NX_SUCCESS);
+        const nx_frame_plane_t plane = {0U, row_bytes, stride, rows};
+        nx_frame_layout_t layout = {};
+        ASSERT_EQ(nx_frame_layout_planar(&plane, 1U, &layout), NX_SUCCESS);
+        ASSERT_EQ(nx_frame_stream_initialize(&framed, &stream, &layout),
+                  NX_SUCCESS);
+        nx_stream_fill_t fill = {};
+        ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+        ASSERT_EQ(nx_frame_stream_publish(&framed, &fill, 0U), NX_SUCCESS);
+        ASSERT_EQ(nx_frame_stream_acquire(&framed, &loan), NX_SUCCESS);
+    }
+    void release_unsubmitted() {
+        nx_dma_drain_facts_t proof = {loan.block.length, 0U, true, true, true};
+        ASSERT_EQ(nx_frame_dma_release(&framed, &loan, &proof), NX_SUCCESS);
     }
     void initialize() {
         ASSERT_EQ(nx_h743_frame_dma2d_initialize(&storage, &face, &config),
@@ -128,19 +156,83 @@ class H743Frame : public testing::Test {
         /* The external engine advances only when the test injects completion.
          * This copies from the programmed hardware descriptors, not requests.
          */
-        const auto width = (g_frame_dma2d.NLR >> 16U) * 2U;
+        const auto pixels = g_frame_dma2d.NLR >> 16U;
+        const bool pfc = (g_frame_dma2d.CR & DMA2D_CR_MODE) == DMA2D_CR_MODE_0;
+        const auto input_pixel = pfc ? 4U : 2U;
+        const auto width = pixels * 2U;
         const auto rows = g_frame_dma2d.NLR & 0xFFFFU;
         auto* src = reinterpret_cast<const uint8_t*>(
             static_cast<uintptr_t>(g_frame_dma2d.FGMAR));
         auto* dst = reinterpret_cast<uint8_t*>(
             static_cast<uintptr_t>(g_frame_dma2d.OMAR));
         for (unsigned row = 0U; row < rows; ++row) {
-            std::memcpy(dst, src, width);
-            src += width + g_frame_dma2d.FGOR * 2U;
+            if (pfc) {
+                for (unsigned pixel = 0U; pixel < pixels; ++pixel) {
+                    const auto* argb = src + pixel * 4U;
+                    const auto rgb = static_cast<uint16_t>(
+                        ((argb[2] >> 3U) << 11U) | ((argb[1] >> 2U) << 5U) |
+                        (argb[0] >> 3U));
+                    dst[pixel * 2U] = static_cast<uint8_t>(rgb & 255U);
+                    dst[pixel * 2U + 1U] = static_cast<uint8_t>(rgb >> 8U);
+                }
+            } else {
+                std::memcpy(dst, src, width);
+            }
+            src += (pixels + g_frame_dma2d.FGOR) * input_pixel;
             dst += width + g_frame_dma2d.OOR * 2U;
         }
-        g_frame_dma2d.CR &= ~static_cast<uint32_t>(DMA2D_CR_START);
+        g_frame_dma2d.CR &=
+            ~static_cast<uint32_t>(DMA2D_CR_START | DMA2D_CR_ABORT);
         g_frame_dma2d.ISR |= DMA2D_ISR_TCIF;
+    }
+    void expect_destructive_loss(bool asserted_reset) {
+        const std::string previous = ::testing::FLAGS_gtest_death_test_style;
+        ::testing::FLAGS_gtest_death_test_style = "threadsafe";
+        ASSERT_EXIT(
+            {
+                if (nx_h743_frame_dma2d_initialize(&storage, &face, &config) !=
+                    NX_SUCCESS)
+                    std::_Exit(10);
+                request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+                request.x = 0U;
+                request.width_bytes = 8U;
+                if (face.ops->submit(face.context, &request, 1U) != NX_SUCCESS)
+                    std::_Exit(11);
+                if (!asserted_reset)
+                    g_frame_rcc.AHB3ENR = 0U;
+                /* The external reset really erases START and register history.
+                 * No independent observation of earlier bus-master access is
+                 * supplied by this hardware fault model. */
+                hw.write_register(&g_frame_rcc.AHB3RSTR, RCC_AHB3RSTR_DMA2DRST);
+                if (!asserted_reset)
+                    hw.write_register(&g_frame_rcc.AHB3RSTR, 0U);
+                if (g_frame_dma2d.CR != 0U || !hw.lost_transfer_history)
+                    std::_Exit(12);
+                if (face.ops->service(face.context, 2U) != NX_ERROR_BUSY ||
+                    nx_request_state(&request.base) != NX_REQUEST_QUARANTINED)
+                    std::_Exit(13);
+                g_frame_rcc.AHB3RSTR = 0U;
+                g_frame_rcc.AHB3ENR = RCC_AHB3ENR_DMA2DEN;
+                EXPECT_CALL(hw, read(_)).Times(0);
+                EXPECT_CALL(hw, write(_, _)).Times(0);
+                if (face.ops->service(face.context, 3U) != NX_ERROR_BUSY ||
+                    nx_request_state(&request.base) != NX_REQUEST_QUARANTINED ||
+                    slot.state != NX_STREAM_SLOT_BORROWED ||
+                    loan.owner != &framed)
+                    std::_Exit(17);
+                if (face.ops->cancel(face.context, &request) != NX_SUCCESS ||
+                    face.ops->stop(face.context) != NX_ERROR_BUSY ||
+                    nx_request_prepare(&request.base, 200U) != NX_ERROR_STATE ||
+                    nx_h743_frame_dma2d_initialize(&storage, &face, &config) !=
+                        NX_ERROR_STATE)
+                    std::_Exit(18);
+                if (!testing::Mock::VerifyAndClearExpectations(&hw))
+                    std::_Exit(19);
+                /* A permanent borrow never returns into fixture reclamation. */
+                std::_Exit(0);
+            },
+            testing::ExitedWithCode(0), "");
+        ::testing::FLAGS_gtest_death_test_style = previous;
     }
     void expect_settled(nx_result_t expected, size_t transferred) {
         ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
@@ -386,6 +478,394 @@ TEST_F(H743Frame, StopIsIdempotentAndDoesNotTouchASuccessorOwner) {
     nx_dma_drain_facts_t proof = {32U, 0U, true, true, true};
     EXPECT_EQ(nx_frame_dma_release(&framed, &loan, &proof), NX_SUCCESS);
 }
+
+TEST_F(H743Frame, PfcUsesDistinctPixelUnitsAndIgnoresArgbAlpha) {
+    initialize();
+    request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    request.x = 0U;
+    request.width_bytes = 8U;
+    const uint8_t first[] = {0U, 0U, 255U, 0U, 0U, 255U, 0U, 255U};
+    const uint8_t second[] = {255U, 0U, 0U, 127U, 255U, 255U, 255U, 1U};
+    std::memcpy(source + 12U, first, sizeof(first));
+    std::memcpy(source + 24U, second, sizeof(second));
+    ASSERT_EQ(face.ops->submit(face.context, &request, 1U), NX_SUCCESS);
+    EXPECT_EQ(g_frame_dma2d.CR, DMA2D_CR_MODE_0 | DMA2D_CR_START);
+    EXPECT_EQ(g_frame_dma2d.FGMAR, 0x2400000CU);
+    EXPECT_EQ(g_frame_dma2d.FGOR, 1U);
+    EXPECT_EQ(g_frame_dma2d.OOR, 2U);
+    EXPECT_EQ(g_frame_dma2d.NLR, (2U << 16U) | 2U);
+    EXPECT_EQ(g_frame_dma2d.FGPFCCR, 0U);
+    EXPECT_EQ(g_frame_dma2d.OPFCCR, 2U);
+    complete();
+    ASSERT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    expect_settled(NX_SUCCESS, 8U);
+    const uint8_t output_first[] = {0U, 248U, 224U, 7U};
+    const uint8_t output_second[] = {31U, 0U, 255U, 255U};
+    EXPECT_EQ(std::memcmp(destination, output_first, sizeof(output_first)), 0);
+    EXPECT_EQ(
+        std::memcmp(destination + 8U, output_second, sizeof(output_second)), 0);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, RejectsUnknownFormatBeforeAdmissionOrRegisterEffects) {
+    initialize();
+    /* Malformed C API bytes avoid a C++ out-of-range enum conversion. */
+    std::memset(&request.format, 0xff, sizeof(request.format));
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U),
+              NX_ERROR_UNSUPPORTED);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    if (nx_request_state(&request.base) == NX_REQUEST_ACTIVE) {
+        EXPECT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+        EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    } else {
+        nx_dma_drain_facts_t proof = {32U, 0U, true, true, true};
+        EXPECT_EQ(nx_frame_dma_release(&framed, &loan, &proof), NX_SUCCESS);
+    }
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, GuardRecoveryPreservesTheFirstObservedCancellation) {
+    initialize();
+    submit();
+    hw.refuse_abort = true;
+    ASSERT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+    g_frame_core.CCR = SCB_CCR_DC_Msk;
+    EXPECT_EQ(face.ops->service(face.context, 2U), NX_ERROR_BUSY);
+    g_frame_core.CCR = 0U;
+    g_frame_dma2d.CR = 0U;
+    hw.refuse_abort = false;
+    ASSERT_EQ(face.ops->service(face.context, 3U), NX_SUCCESS);
+    expect_settled(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, PixelOffsetHighIgnoredBitsAreRejectedForExistingCopy) {
+    initialize();
+    request.destination = reinterpret_cast<uint8_t*>(0x24070000U);
+    request.destination_stride = 0x4000U * 2U + request.width_bytes;
+    request.destination_capacity =
+        request.destination_stride + request.width_bytes;
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    if (nx_request_state(&request.base) == NX_REQUEST_ACTIVE) {
+        EXPECT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+        EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    } else {
+        nx_dma_drain_facts_t proof = {32U, 0U, true, true, true};
+        EXPECT_EQ(nx_frame_dma_release(&framed, &loan, &proof), NX_SUCCESS);
+    }
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, BothFormatsBoundEachPixelGapToFourteenBits) {
+    initialize();
+    for (const auto format :
+         {NX_FRAME_BLIT_RGB565, NX_FRAME_BLIT_ARGB8888_TO_RGB565}) {
+        const size_t input_pixel = format == NX_FRAME_BLIT_RGB565 ? 2U : 4U;
+        for (const bool foreground : {false, true}) {
+            for (const size_t gap : {0x3fffU, 0x4000U}) {
+                SCOPED_TRACE(testing::Message()
+                             << format << ',' << foreground << ',' << gap);
+                const size_t width = input_pixel * 2U;
+                const size_t source_stride =
+                    width + (foreground ? gap * input_pixel : 0U);
+                reframe(width, source_stride, 2U, source_stride + width);
+                ASSERT_EQ(nx_request_prepare(&request.base, 100U), NX_SUCCESS);
+                request.format = format;
+                request.x = request.y = 0U;
+                request.width_bytes = width;
+                request.rows = 2U;
+                request.destination = reinterpret_cast<uint8_t*>(0x24070000U);
+                request.destination_stride = 4U + (foreground ? 0U : gap * 2U);
+                request.destination_capacity = request.destination_stride + 4U;
+                const auto expected =
+                    gap == 0x3fffU ? NX_SUCCESS : NX_ERROR_INVALID;
+                EXPECT_EQ(face.ops->submit(face.context, &request, 1U),
+                          expected);
+                if (nx_request_state(&request.base) != NX_REQUEST_READY) {
+                    EXPECT_EQ(g_frame_dma2d.FGOR, foreground ? gap : 0U);
+                    EXPECT_EQ(g_frame_dma2d.OOR, foreground ? 0U : gap);
+                    EXPECT_EQ(face.ops->cancel(face.context, &request),
+                              NX_SUCCESS);
+                    EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+                }
+            }
+        }
+    }
+    if (loan.owner != nullptr)
+        release_unsubmitted();
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, PfcRejectsSourcePixelMisalignmentAndShortOutputBeforeWrites) {
+    initialize();
+    request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    request.x = 2U;
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    request.x = 0U;
+    request.width_bytes = 6U;
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    request.width_bytes = 8U;
+    request.destination_capacity = 11U;
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    request.destination_capacity = 12U;
+    request.destination_stride = 3U;
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    request.destination_stride = SIZE_MAX - 1U;
+    request.destination_capacity = SIZE_MAX;
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    release_unsubmitted();
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame,
+       PfcRejectsMisalignedSourceStrideAndFullCapacityDestinationAlias) {
+    initialize();
+    reframe(8U, 10U, 3U, 64U);
+    request.y = 0U;
+    request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    request.x = 0U;
+    request.width_bytes = 8U;
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    reframe(8U, 12U, 3U, 64U);
+    request.destination = source + 48U;
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, &request, 1U), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    release_unsubmitted();
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, PfcAbortPreservesModeAndNeverReassertsStart) {
+    initialize();
+    request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    request.x = 0U;
+    request.width_bytes = 8U;
+    ASSERT_EQ(face.ops->submit(face.context, &request, 1U), NX_SUCCESS);
+    hw.refuse_abort = true;
+    EXPECT_CALL(hw, write(_, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(hw, write(&g_frame_dma2d.CR, DMA2D_CR_MODE_0 | DMA2D_CR_ABORT))
+        .Times(1);
+    EXPECT_CALL(hw, write(&g_frame_dma2d.CR, DMA2D_CR_START)).Times(0);
+    EXPECT_CALL(hw, write(&g_frame_dma2d.CR, DMA2D_CR_MODE_0 | DMA2D_CR_START))
+        .Times(0);
+    ASSERT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+    EXPECT_EQ(face.ops->service(face.context, 2U), NX_ERROR_BUSY);
+    EXPECT_EQ(face.ops->service(face.context, 3U), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(face.ops->stop(face.context), NX_ERROR_BUSY);
+    nx_stream_fill_t fill = {};
+    EXPECT_EQ(nx_stream_reserve(&stream, &fill), NX_ERROR_OVERFLOW);
+    hw.refuse_abort = false;
+    g_frame_dma2d.CR = DMA2D_CR_MODE_0;
+    EXPECT_EQ(face.ops->service(face.context, 4U), NX_SUCCESS);
+    expect_settled(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, PfcSetupReadbackFailureIsAcceptedAndNeverStarts) {
+    initialize();
+    request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    request.x = 0U;
+    request.width_bytes = 8U;
+    ON_CALL(hw, read(&g_frame_dma2d.FGPFCCR))
+        .WillByDefault(testing::Return(2U));
+    EXPECT_CALL(hw, write(_, _)).Times(testing::AnyNumber());
+    EXPECT_CALL(hw, write(&g_frame_dma2d.CR, DMA2D_CR_MODE_0 | DMA2D_CR_START))
+        .Times(0);
+    EXPECT_CALL(hw, write(&g_frame_dma2d.CR, DMA2D_CR_MODE_0 | DMA2D_CR_ABORT))
+        .Times(1);
+    ASSERT_EQ(face.ops->submit(face.context, &request, 1U), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
+    EXPECT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+    EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    expect_settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, PfcNoTcOrClutObservationCanSubstituteForFinalMasterDrain) {
+    initialize();
+    request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    request.x = 0U;
+    request.width_bytes = 8U;
+    submit();
+    g_frame_dma2d.ISR = DMA2D_ISR_TCIF;
+    EXPECT_EQ(face.ops->service(face.context, 2U), NX_ERROR_BUSY);
+    hw.refuse_abort = true;
+    EXPECT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+    g_frame_dma2d.CR = DMA2D_CR_MODE_0;
+    g_frame_dma2d.FGPFCCR = DMA2D_FGPFCCR_START;
+    EXPECT_EQ(face.ops->service(face.context, 3U), NX_ERROR_BUSY);
+    EXPECT_EQ(slot.state, NX_STREAM_SLOT_BORROWED);
+    g_frame_dma2d.FGPFCCR = 0U;
+    EXPECT_EQ(face.ops->service(face.context, 4U), NX_SUCCESS);
+    expect_settled(NX_ERROR_CANCELLED, 0U);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, GuardFailureObservedBeforeCancellationRemainsFirst) {
+    initialize();
+    submit();
+    g_frame_core.CCR = SCB_CCR_DC_Msk;
+    EXPECT_EQ(face.ops->service(face.context, 2U), NX_ERROR_BUSY);
+    g_frame_core.CCR = 0U;
+    EXPECT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+    EXPECT_EQ(face.ops->service(face.context, 3U), NX_SUCCESS);
+    expect_settled(NX_ERROR_IO, 0U);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, RejectsRequestControlInTheDeclaredPoolCapacityTail) {
+    initialize();
+    reframe(8U, 12U, 3U, 512U);
+    release_unsubmitted();
+    nx_stream_fill_t fill = {};
+    ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+    auto* alias = reinterpret_cast<nx_frame_blit_request_t*>(source + 128U);
+    ::new (alias) nx_frame_blit_request_t(request);
+    ASSERT_EQ(nx_frame_stream_publish(&framed, &fill, 0U), NX_SUCCESS);
+    ASSERT_EQ(nx_frame_stream_acquire(&framed, &loan), NX_SUCCESS);
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, alias, 1U), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&alias->base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    if (nx_request_state(&alias->base) != NX_REQUEST_READY) {
+        EXPECT_EQ(face.ops->cancel(face.context, alias), NX_SUCCESS);
+        EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    } else
+        release_unsubmitted();
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, RejectsOwnerControlInTheDeclaredPoolCapacityTail) {
+    release_unsubmitted();
+    auto* alias =
+        reinterpret_cast<nx_h743_frame_dma2d_storage_t*>(source + 128U);
+    ::new (alias) nx_h743_frame_dma2d_storage_t{};
+    const nx_frame_blitter_t alias_face = {&nx_h743_frame_dma2d_ops, alias};
+    ASSERT_EQ(nx_h743_frame_dma2d_initialize(alias, &alias_face, &config),
+              NX_SUCCESS);
+    reframe(8U, 12U, 3U, 512U);
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(alias_face.ops->submit(alias_face.context, &request, 1U),
+              NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    if (nx_request_state(&request.base) != NX_REQUEST_READY) {
+        EXPECT_EQ(alias_face.ops->cancel(alias_face.context, &request),
+                  NX_SUCCESS);
+        EXPECT_EQ(alias_face.ops->service(alias_face.context, 2U), NX_SUCCESS);
+    } else
+        release_unsubmitted();
+    EXPECT_EQ(alias_face.ops->stop(alias_face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, RejectsRequestControlInAnotherFreePoolSlot) {
+    initialize();
+    release_unsubmitted();
+    nx_stream_slot_t slots[2] = {};
+    slots[0].data = source;
+    slots[0].capacity = 64U;
+    slots[1].data = source + 8192U;
+    slots[1].capacity = 512U;
+    ASSERT_EQ(nx_stream_initialize(&stream, slots, 2U), NX_SUCCESS);
+    const nx_frame_plane_t plane = {0U, 8U, 12U, 3U};
+    nx_frame_layout_t layout = {};
+    ASSERT_EQ(nx_frame_layout_planar(&plane, 1U, &layout), NX_SUCCESS);
+    ASSERT_EQ(nx_frame_stream_initialize(&framed, &stream, &layout),
+              NX_SUCCESS);
+    auto* alias =
+        reinterpret_cast<nx_frame_blit_request_t*>(slots[1].data + 128U);
+    ::new (alias) nx_frame_blit_request_t(request);
+    nx_stream_fill_t fill = {};
+    ASSERT_EQ(nx_stream_reserve(&stream, &fill), NX_SUCCESS);
+    ASSERT_EQ(nx_frame_stream_publish(&framed, &fill, 0U), NX_SUCCESS);
+    ASSERT_EQ(nx_frame_stream_acquire(&framed, &loan), NX_SUCCESS);
+    EXPECT_CALL(hw, write(_, _)).Times(0);
+    EXPECT_EQ(face.ops->submit(face.context, alias, 1U), NX_ERROR_INVALID);
+    EXPECT_EQ(nx_request_state(&alias->base), NX_REQUEST_READY);
+    testing::Mock::VerifyAndClearExpectations(&hw);
+    if (nx_request_state(&alias->base) != NX_REQUEST_READY) {
+        EXPECT_EQ(face.ops->cancel(face.context, alias), NX_SUCCESS);
+        EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    } else
+        release_unsubmitted();
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
+TEST_F(H743Frame, PfcSettledRequestCanBecomeUnreadableBeforeFurtherService) {
+    initialize();
+    void* page = mmap(nullptr, 4096U, PROT_READ | PROT_WRITE,
+                      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    ASSERT_NE(page, MAP_FAILED);
+    auto* isolated = static_cast<nx_frame_blit_request_t*>(page);
+    ::new (isolated) nx_frame_blit_request_t(request);
+    isolated->format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+    isolated->x = 0U;
+    isolated->width_bytes = 8U;
+    ASSERT_EQ(face.ops->submit(face.context, isolated, 1U), NX_SUCCESS);
+    complete();
+    ASSERT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+    ASSERT_EQ(nx_request_state(&isolated->base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(mprotect(page, 4096U, PROT_NONE), 0);
+    EXPECT_EQ(face.ops->service(face.context, 3U), NX_SUCCESS);
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+    EXPECT_EQ(munmap(page, 4096U), 0);
+}
+
+TEST_F(H743Frame, ObservedActiveResetPermanentlyQuarantinesErasedHistory) {
+    expect_destructive_loss(true);
+}
+
+TEST_F(H743Frame, ObservedActiveGateLossNeverRecoversFromZeroedRegisters) {
+    expect_destructive_loss(false);
+}
+
+TEST_F(H743Frame, PfcDimensionsUsePixelWidthAndSixteenBitLineCount) {
+    initialize();
+    for (const bool width_boundary : {false, true}) {
+        for (const bool above : {false, true}) {
+            SCOPED_TRACE(testing::Message() << width_boundary << ',' << above);
+            const size_t pixels =
+                width_boundary ? (above ? 0x4000U : 0x3fffU) : 1U;
+            const size_t rows =
+                width_boundary ? 1U : (above ? 0x10000U : 0xffffU);
+            const size_t input_row = pixels * 4U;
+            reframe(input_row, input_row, rows, input_row * rows);
+            ASSERT_EQ(nx_request_prepare(&request.base, 100U), NX_SUCCESS);
+            request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;
+            request.x = request.y = 0U;
+            request.width_bytes = input_row;
+            request.rows = rows;
+            request.destination = reinterpret_cast<uint8_t*>(0x24040000U);
+            request.destination_stride = pixels * 2U;
+            request.destination_capacity = pixels * 2U * rows;
+            EXPECT_EQ(face.ops->submit(face.context, &request, 1U),
+                      above ? NX_ERROR_INVALID : NX_SUCCESS);
+            if (nx_request_state(&request.base) != NX_REQUEST_READY) {
+                EXPECT_EQ(g_frame_dma2d.NLR, (pixels << 16U) | rows);
+                EXPECT_EQ(face.ops->cancel(face.context, &request), NX_SUCCESS);
+                EXPECT_EQ(face.ops->service(face.context, 2U), NX_SUCCESS);
+            }
+        }
+    }
+    if (loan.owner != nullptr)
+        release_unsubmitted();
+    EXPECT_EQ(face.ops->stop(face.context), NX_SUCCESS);
+}
+
 } /* namespace */
 
 extern "C" uint32_t nx_frame_model_read(volatile uint32_t* reg) {

@@ -506,12 +506,12 @@ def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT):
         abi = resolved_float_abi(resolved, require_cpu=True)
         inputs = resolved_input_files(resolved_path, resolved)
     elf = Elf32(elf_path.read_bytes(), float_abi=abi)
-    if resolved is not None:
+    if resolved_path is not None:
         validate_elf_configuration(elf, resolved)
     report = inspect_provider_retention(elf, bindings_path.read_text(), root=root)
     report["elf"] = file_identity(elf_path)
     report["bindings"] = file_identity(bindings_path)
-    if resolved is not None:
+    if resolved_path is not None:
         report["resolved"] = config
         report["configuration_inputs"] = inputs
     return report

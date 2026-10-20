@@ -150,6 +150,10 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
         f'nexus_add_firmware(installed_modern SOURCES main.c{kernel})\n'
+        + ('set_target_properties(installed_modern PROPERTIES C_STANDARD 11 '
+           'C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)\n'
+           'nexus_target_warnings(installed_modern STRICT)\n'
+           if family == "h743" else '') +
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
@@ -189,7 +193,20 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
             'static void task_entry(void* context) {\n'
             '    (void)context;\n    for (;;) {}\n}\n')
     if family == "h743":
-        code += '#include "nexus/components/frame_dma2d.h"\n'
+        code += (
+            '#include "nexus/components/frame_dma2d.h"\n'
+            'static nx_h743_frame_dma2d_storage_t frame_storage;\n'
+            'static const nx_frame_blitter_t frame_blitter = {\n'
+            '    &nx_h743_frame_dma2d_ops, &frame_storage};\n'
+            'static const nx_h743_frame_dma2d_config_t frame_configuration = {\n'
+            '    NX_H743_FRAME_DMA2D_CONTROLLER, 4U};\n'
+            'static nx_stream_slot_t frame_slot;\n'
+            'static nx_stream_t frame_queue;\n'
+            'static nx_frame_stream_t frame_stream;\n'
+            'static nx_frame_dma_loan_t frame_source;\n'
+            'static nx_frame_blit_request_t frame_request;\n'
+            'static uint32_t frame_pixels[24];\n'
+            'static uint16_t frame_output[48];\n')
     code += (
         'int main(void) {\n'
         '    nx_platform_start_result_t start = nx_platform_start();\n'
@@ -204,8 +221,41 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '    (void)nx_uart_port_cancel(console, &request);\n'
         '    nx_uart_port_service(console);\n')
     if family == "h743":
-        code += ('    if (nx_h743_frame_dma2d_initialize(NULL, NULL, NULL) != '
-                 'NX_ERROR_INVALID) return 9;\n')
+        code += (
+            '    /* Public link reference only: no physical DMA/timing result. */\n'
+            '    const nx_frame_plane_t frame_plane = {0U, 16U, 24U, 4U};\n'
+            '    nx_frame_layout_t frame_layout;\n'
+            '    frame_slot.data = (uint8_t*)frame_pixels;\n'
+            '    frame_slot.capacity = sizeof(frame_pixels);\n'
+            '    if (nx_frame_layout_planar(&frame_plane, 1U, &frame_layout) != NX_SUCCESS ||\n'
+            '        nx_stream_initialize(&frame_queue, &frame_slot, 1U) != NX_SUCCESS ||\n'
+            '        nx_frame_stream_initialize(&frame_stream, &frame_queue, &frame_layout) != NX_SUCCESS ||\n'
+            '        nx_h743_frame_dma2d_initialize(&frame_storage, &frame_blitter,\n'
+            '                                      &frame_configuration) != NX_SUCCESS) return 9;\n'
+            '    nx_stream_fill_t frame_fill;\n'
+            '    if (nx_stream_reserve(&frame_queue, &frame_fill) != NX_SUCCESS ||\n'
+            '        nx_frame_stream_publish(&frame_stream, &frame_fill, 0U) != NX_SUCCESS ||\n'
+            '        nx_frame_stream_acquire(&frame_stream, &frame_source) != NX_SUCCESS) return 10;\n'
+            '    nx_request_initialize(&frame_request.base);\n'
+            '    if (nx_request_prepare(&frame_request.base, NX_DEADLINE_NEVER) != NX_SUCCESS) return 11;\n'
+            '    frame_request.source = &frame_source;\n'
+            '    frame_request.width_bytes = 16U;\n'
+            '    frame_request.rows = 4U;\n'
+            '    frame_request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;\n'
+            '    frame_request.destination = (uint8_t*)frame_output;\n'
+            '    frame_request.destination_stride = 24U;\n'
+            '    frame_request.destination_capacity = sizeof(frame_output);\n'
+            '    if (frame_blitter.ops->submit(frame_blitter.context, &frame_request,\n'
+            '                                  nx_time_now_us()) == NX_SUCCESS) {\n'
+            '        (void)frame_blitter.ops->service(frame_blitter.context, nx_time_now_us());\n'
+            '        (void)frame_blitter.ops->cancel(frame_blitter.context, &frame_request);\n'
+            '        (void)frame_blitter.ops->service(frame_blitter.context, nx_time_now_us());\n'
+            '    } else {\n'
+            '        const nx_dma_drain_facts_t unsubmitted = {frame_layout.bytes, 0U, true, true, true};\n'
+            '        (void)nx_frame_dma_release(&frame_stream, &frame_source, &unsubmitted);\n'
+            '    }\n'
+            '    /* Quarantine retains all static storage; this image is never run. */\n'
+            '    (void)frame_blitter.ops->stop(frame_blitter.context);\n')
     if backend == "freertos":
         code += (
             '    /* Link the actual kernel; software qualification never runs it. */\n'

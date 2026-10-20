@@ -15,7 +15,7 @@ digraph ioExtensionOwnership {
     amp [label="AMPIPC\nlane + boot epoch + sequence\noffer／ACK cache line"];
     handoff [label="STM32F407Handoff\n既有 ClockDomain barrier\n屏蔽中断 Flash 向量尾跳"];
     rtc [label="U575 保留 RTC\n单个 AlarmA 请求\nRUN 轮询／预先准备 LSE"];
-    frame [label="FrameStream + H743 DMA2D\n完整源帧借用\nRGB565 AXI M2M／D-Cache off"];
+    frame [label="FrameStream + H743 V DMA2D\n完整源帧借用\nRGB565 复制／固定 ARGB8888 → RGB565 PFC\nAXI SRAM／D-Cache off\n无 CLUT 或 blending"];
     storage [label="调用方存储\nrequest／payload／slot／共享记录", fillcolor="#f8fafc"];
     proof [label="外部证明\nconsumer 已 join／旧 epoch 无法再访问\n时钟用户已排空／有效 backup domain", fillcolor="#fff7ed"];
     ports [label="显式 AMP 端口\n唯一角色 claim／持久 boot 历史\n一致性 control 顺序／cache 操作", fillcolor="#f8fafc"];

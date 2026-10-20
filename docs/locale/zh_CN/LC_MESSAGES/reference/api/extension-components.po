@@ -578,9 +578,6 @@ msgstr "移交前可能返回错误；成功时永不返回。"
 msgid "frame_dma2d.h"
 msgstr "frame_dma2d.h"
 
-msgid "Explicit optional H743 RGB565 framed DMA2D owner."
-msgstr "显式可选的 H743 RGB565 帧式 DMA2D 所有者。"
-
 msgid "Exact opaque storage reservation for one optional owner."
 msgstr "为一个可选所有者保留的精确不透明存储。"
 
@@ -592,9 +589,6 @@ msgstr "显式独占的物理资源；没有运行时资源注册表。"
 
 msgid "Acquire cold DMA2D and its dedicated RCC gate/reset bit."
 msgstr "取得未启用的 DMA2D 及其专用 RCC 门控／复位位。"
-
-msgid "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only M2M RGB565, pixel offsets, no CLUT/PFC/blending/IRQ is supported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
-msgstr "特权、未屏蔽中断的任务，由唯一执行者串行调用。调用方须显式排除其他所有 DMA2D 所有者，包括 HAL、中断处理程序及本组件以外的资源选择。停止前不得更改缓存、RCC、复位、MPU 或时钟域。全部载荷必须完整位于 AXI SRAM [0x24000000, 0x24080000)；源与目标重叠时拒绝。仅支持 M2M RGB565 和像素偏移，不支持 CLUT、PFC、混合或 IRQ。不创建引脚、板级路由、调度器、队列或工作线程。初始化发生 IO 错误时保留清理所有权；须调用 stop。成功停止会先分离全部源，再撤回其自身的 RCC 门控。重复停止不访问硬件。"
 
 msgid "[inout] Fresh zero storage exclusively owned by caller."
 msgstr "[inout] 调用方独占的全新零初始化存储。"
@@ -611,9 +605,6 @@ msgstr "SUCCESS、INVALID；外部占有门控／复位／IRQ 时为 BUSY；非 
 msgid "One caller-owned request; rectangle coordinates are bytes."
 msgstr "调用方拥有的单个请求；矩形坐标以字节为单位。"
 
-msgid "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. Width, offsets and strides obey RGB565 alignment. Destination cannot overlap a full-capacity source-pool slot. Task-only admission checks known pool extents in O(n)."
-msgstr "使用常规请求辅助函数初始化／准备 base。ACCEPTED 借用此对象、精确的源借用控制及目标跨度，直至以 acquire 观察 SETTLED。接受时，源借用的所有权转移给此所有者；仅在 DMA 最后访问后才释放。拒绝时，原借用仍归调用方。不得另行释放、修改或复用已接受的控制、源或目标。宽度、偏移和步长须满足 RGB565 对齐。目标不得与源池中任一槽位的完整容量范围重叠。仅任务上下文的接纳检查以 O(n) 检查已知池范围。"
-
 msgid "One-executor task-only operations; each service call is bounded."
 msgstr "仅由单个执行者在任务上下文调用；每次 service 调用都有界。"
 
@@ -622,9 +613,6 @@ msgstr "不可变接口；状态位于调用方拥有的独立私有存储中。
 
 msgid "Cold configuration for exact H743 V with D-Cache disabled."
 msgstr "适用于关闭 D-Cache 的精确 H743 V 修订的初始配置。"
-
-msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after quarantine; actual drain can still settle the request."
-msgstr "abort_observations 限定进入隔离前允许失败的 service 观察次数。这是软件推进预算，不是测得的总线／DMA 时序上限。隔离后由同一执行者继续 service；实际排空仍可使请求结算。"
 
 msgid "stm32u575_retained_time.h"
 msgstr "stm32u575_retained_time.h"
@@ -1307,3 +1295,29 @@ msgstr "准入与软件睡眠观察，不是最终结果。"
 msgid "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
 msgstr "即使后续设置失败，accepted 仍借用 request/tuple/workspace。dma_wake 表示 pending IRQ114；wait_executed 仅证明执行过 WFI。"
 
+msgid "Explicit optional H743 RGB565 copy and fixed PFC owner."
+msgstr "显式可选的 H743 RGB565 复制与固定 PFC owner。"
+
+msgid "Exact source-to-RGB565 operations; unknown values are unsupported."
+msgstr "精确的源到 RGB565 操作；未知值不受支持。"
+
+msgid "RGB565 source and output; zero preserves the copy operation."
+msgstr "源和输出均为 RGB565；零值保留复制操作。"
+
+msgid "ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian MCU."
+msgstr "ARGB8888 到 RGB565；在此小端 MCU 上输入字节顺序为 B、G、R、A。"
+
+msgid "Alpha is discarded; no blending, channel/byte swap or CLUT load."
+msgstr "丢弃 alpha；不进行混合、通道／字节交换或 CLUT 加载。"
+
+msgid "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported. Offsets count each side's pixels (LOM=0), not bytes. CLUT/blending/other formats/IRQ are unsupported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
+msgstr "在未屏蔽中断的特权任务中，由单个执行者串行调用。调用方明确排除所有其他 DMA2D owner，包括 HAL、IRQ 处理器及组件外的资源选择。stop 前不得改变 Cache／RCC／复位／MPU 或时钟域。所有载荷必须完整位于 AXI SRAM [0x24000000, 0x24080000)；拒绝源／目标重叠。仅支持 RGB565 M2M 或固定 ARGB8888 到 RGB565 PFC。偏移按每侧自身的像素计数（LOM=0），不按字节计数。不支持 CLUT／混合／其他格式／IRQ。不创建引脚、Board 路由、调度器、队列或工作线程。初始化 IO 错误保留清理所有权；应调用 stop。成功 stop 会脱离每个源，随后仅撤回自己的 RCC 时钟门。重复 stop 不访问硬件。"
+
+msgid "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. x/width_bytes are source bytes, not output bytes or pixels. Source address/x/width/stride align to 2 for RGB565 or 4 for ARGB8888. Destination is RGB565, aligned to 2 bytes. Destination row bytes are width_bytes/source_pixel_bytes*2; destination_stride/capacity are bytes. LOM=0 pixel gaps are at most 0x3fff on each side; width at most 0x3fff pixels, height at most 0xffff rows. Success reports output bytes, excluding stride padding, through nx_request_result. Destination cannot overlap a full-capacity source-pool slot. Every control is disjoint from every slot's full capacity. The selected source slot is immutable through final access. Task-only admission checks known pool extents in O(n)."
+msgstr "使用普通请求辅助函数初始化／准备 base。ACCEPTED 借用本对象、精确源借用控制体与目标区间，直到 acquire 观察到 SETTLED。接纳时源借用所有权转移给此 owner；只有最终 DMA 访问结束后才释放。拒绝时原借用仍归调用方。不得单独释放、修改或复用已接纳的控制体、源或目标。x／width_bytes 是源字节数，不是输出字节数或像素数。RGB565 的源地址／x／宽度／步幅按 2 字节对齐，ARGB8888 则按 4 字节对齐。目标为 RGB565，按 2 字节对齐。目标行字节数为 width_bytes/source_pixel_bytes*2；destination_stride/capacity 以字节计。LOM=0 时每侧像素间隙最多为 0x3fff；宽度最多为 0x3fff 像素，高度最多为 0xffff 行。成功时通过 nx_request_result 报告输出字节数，不含步幅填充。目标不能与源池槽的完整容量重叠。每个控制体必须与每个槽的完整容量互不重叠。选中的源槽直到最终访问结束都保持不可变。仅限任务的接纳以 O(n) 检查已知池区间。"
+
+msgid "Submit SUCCESS means ACCEPTED, including a later setup/readback error. Accepted failures retain every borrow until service proves final drain. The first observed failure is retained across cancel/guard restoration."
+msgstr "Submit 返回 SUCCESS 表示 ACCEPTED，包括后续设置／读回错误。已接纳的失败保留全部借用，直到 service 证明最终排空。最先观察到的失败在取消／守卫恢复后仍被保留。"
+
+msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."
+msgstr "abort_observations 限定进入隔离前 service 失败观察的次数。它是软件进展预算，不是实测的总线／DMA 时间界限。同一执行者在可恢复隔离后继续 service；实际排空可使请求结算。若观察到活动期间 RCC 时钟门丢失或复位被置位，则永久保留全部借用。恢复寄存器不能证明已丢失的传输历史；没有 API 能回收它。未被观察到的复位脉冲无法检测，因此仍必须独占 RCC 所有权。系统恢复由外部负责。"
