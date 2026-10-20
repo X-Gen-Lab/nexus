@@ -67,9 +67,11 @@ def validate_profile(resolved):
         raise EvidenceError("U575 single-state MSIS4MHz profile required")
     expected_memory = [{"id": "sram1", "origin": 0x20000000,
         "size": 196608, "linker": True,
-        "dma_engines": {"GPDMA1": True, "LPDMA1": False}}]
+        "dma_engines": {"GPDMA1": True, "LPDMA1": False}},
+        {"id": "sram4", "origin": 0x28000000, "size": 16384,
+         "linker": False, "dma_engines": {"GPDMA1": True, "LPDMA1": True}}]
     if not exact_profile(resolved.get("memory"), expected_memory):
-        raise EvidenceError("U575 default physical SRAM1 profile differs")
+        raise EvidenceError("U575 default physical memory profile differs")
     allowed = {("gpio", "GPIO" + bank, mode)
                for bank in "ABCDEFGH" for mode in ("input", "output")}
     allowed.update({("uart", "USART1", "irq-bytes"),

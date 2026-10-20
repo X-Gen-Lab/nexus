@@ -99,7 +99,20 @@ static bool source(const nx_stm32u575_retained_time_owner_t* owner) {
                            ? 0U
                            : (RTC_CR_WUCKSEL | RTC_CR_WUTE | RTC_CR_WUTIE);
     uint32_t flags = owner->wake_owner == NULL ? 0U : RTC_SR_WUTF;
-    return (NX_U575_READ(&p->CR) & ~allowed) == RTC_CR_BYPSHAD &&
+    if (owner->alarm_a_copy) {
+        allowed |= RTC_CR_ALRAE;
+        flags |= RTC_SR_ALRAF;
+    }
+    uint32_t cr = NX_U575_READ(&p->CR);
+    if (owner->alarm_a_copy) {
+        uint32_t alarm = NX_U575_READ(&p->ALRMAR);
+        uint32_t fixed = RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK3 |
+                         RTC_ALRMAR_MSK4;
+        if (NX_U575_READ(&p->ALRMASSR) != 0U ||
+            (alarm != fixed && (alarm != 0U || (cr & RTC_CR_ALRAE) != 0U)))
+            return false;
+    }
+    return (cr & ~allowed) == RTC_CR_BYPSHAD &&
            (NX_U575_READ(&p->SR) & ~flags) == 0U &&
            NX_U575_READ(&p->PRER) == 0x007f00ffU &&
            NX_U575_READ(&p->CALR) == 0U &&
@@ -129,9 +142,9 @@ static bool microseconds(uint64_t ticks, nx_time_us_t* value) {
     *value = seconds * 1000000U + fraction;
     return true;
 }
-nx_result_t nx_stm32u575_retained_time_initialize(
-    nx_stm32u575_retained_time_storage_t* storage,
-    const nx_stm32u575_retained_time_config_t* config, nx_clock_t* clock) {
+static nx_result_t initialize(nx_stm32u575_retained_time_storage_t* storage,
+                              const nx_stm32u575_retained_time_config_t* config,
+                              nx_clock_t* clock, bool alarm_a_copy) {
     if (!context(true))
         return NX_ERROR_CONTEXT;
     if (!owner_span(storage) ||
@@ -141,6 +154,7 @@ nx_result_t nx_stm32u575_retained_time_initialize(
         nx_time_overlap(config, sizeof(*config), clock, sizeof(*clock)) ||
         config->resource != NX_U575_RETAINED_TIME_RTC ||
         config->max_gap_seconds == 0U || config->max_gap_seconds > 86400U ||
+        (alarm_a_copy && config->wake_owner == NULL) ||
         (config->wake_owner != NULL &&
          !external(storage, config->wake_owner, 1U, 1U)))
         return NX_ERROR_INVALID;
@@ -162,11 +176,15 @@ nx_result_t nx_stm32u575_retained_time_initialize(
     nx_stm32u575_retained_time_owner_t fresh;
     memset(&fresh, 0, sizeof(fresh));
     fresh.wake_owner = config->wake_owner;
+    fresh.alarm_a_copy = alarm_a_copy;
     fresh.max_gap_ticks = config->max_gap_seconds * 256U;
     if ((NX_U575_READ(&NX_U575_RTC->CR) &
          (RTC_CR_ALRAE | RTC_CR_ALRAIE | RTC_CR_ALRBE | RTC_CR_ALRBIE |
           RTC_CR_WUTE | RTC_CR_WUTIE)) != 0U ||
         NX_U575_READ(&NX_U575_RTC->SR) != 0U || !NX_U575_RTC_IRQ_QUIET())
+        return NX_ERROR_BUSY;
+    if (alarm_a_copy && (NX_U575_READ(&NX_U575_RTC->ALRMAR) != 0U ||
+                         NX_U575_READ(&NX_U575_RTC->ALRMASSR) != 0U))
         return NX_ERROR_BUSY;
     if (!source(&fresh))
         return NX_ERROR_STATE;
@@ -182,6 +200,16 @@ nx_result_t nx_stm32u575_retained_time_initialize(
     store(storage, &fresh);
     *clock = (nx_clock_t){nx_stm32u575_retained_time_now, storage};
     return NX_SUCCESS;
+}
+nx_result_t nx_stm32u575_retained_time_initialize(
+    nx_stm32u575_retained_time_storage_t* storage,
+    const nx_stm32u575_retained_time_config_t* config, nx_clock_t* clock) {
+    return initialize(storage, config, clock, false);
+}
+nx_result_t nx_stm32u575_retained_time_initialize_alarm_a_copy(
+    nx_stm32u575_retained_time_storage_t* storage,
+    const nx_stm32u575_retained_time_config_t* config, nx_clock_t* clock) {
+    return initialize(storage, config, clock, true);
 }
 nx_result_t nx_stm32u575_retained_time_sample(
     nx_stm32u575_retained_time_storage_t* storage,
@@ -230,9 +258,9 @@ failed:
     store(storage, &owner);
     return result;
 }
-nx_result_t nx_stm32u575_retained_time_validate_wake(
-    nx_stm32u575_retained_time_storage_t* storage, const void* wake_owner,
-    uint64_t generation) {
+static nx_result_t validate_wake(nx_stm32u575_retained_time_storage_t* storage,
+                                 const void* wake_owner, uint64_t generation,
+                                 bool require_alarm_a_copy) {
     if (!context(false))
         return NX_ERROR_CONTEXT;
     if (!owner_span(storage) || !external(storage, wake_owner, 1U, 1U) ||
@@ -240,7 +268,8 @@ nx_result_t nx_stm32u575_retained_time_validate_wake(
         return NX_ERROR_INVALID;
     nx_stm32u575_retained_time_owner_t owner = load(storage);
     if (!known(&owner) || !owner.opened || owner.tainted ||
-        owner.wake_owner != wake_owner || owner.generation != generation)
+        owner.wake_owner != wake_owner || owner.generation != generation ||
+        (require_alarm_a_copy && !owner.alarm_a_copy))
         return NX_ERROR_STATE;
     if (!source(&owner)) {
         owner.tainted = true;
@@ -248,6 +277,16 @@ nx_result_t nx_stm32u575_retained_time_validate_wake(
         return NX_ERROR_STATE;
     }
     return NX_SUCCESS;
+}
+nx_result_t nx_stm32u575_retained_time_validate_wake(
+    nx_stm32u575_retained_time_storage_t* storage, const void* wake_owner,
+    uint64_t generation) {
+    return validate_wake(storage, wake_owner, generation, false);
+}
+nx_result_t nx_stm32u575_retained_time_validate_alarm_a_copy(
+    nx_stm32u575_retained_time_storage_t* storage, const void* wake_owner,
+    uint64_t generation) {
+    return validate_wake(storage, wake_owner, generation, true);
 }
 nx_time_us_t nx_stm32u575_retained_time_now(void* context_raw) {
     nx_stm32u575_retained_time_storage_t* storage = context_raw;

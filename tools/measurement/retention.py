@@ -124,7 +124,10 @@ def provider_initializers(path, source, root):
 def source_contracts(root=ROOT):
     """Read public ABI and provider initializers without a mode registry."""
     faces, layouts, providers, inputs = {}, {}, {}, []
-    for path in sorted((root / "io/include/nexus/io").glob("*.h")):
+    public_headers = set((root / "io/include/nexus/io").glob("*.h"))
+    public_headers.update((root / "components").glob(
+        "*/include/nexus/components/*.h"))
+    for path in sorted(public_headers):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
         inputs.append(file_identity(path))

@@ -38,7 +38,8 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |
 | [ThreadX 配置与接入](threadx.md) | 官方真实 Linux/M4 内核、独立 typed policy、bootstrap、静态对象与精确支持范围 |
 | [浅睡眠 timebase](timebase-lowpower.md) | 显式 FreeRTOS selector、固定 clock/compare alarm、量化 phase、失败保留与物理边界 |
-| [U575 保留时钟与 Stop2](u575-retained-time.md) | TZEN0 独立 RTC 时间域、显式 WUT owner、RUN 屏障与失败保留排空；LPDMA 和物理退出仍开放 |
+| [U575 保留时钟与 Stop2](u575-retained-time.md) | TZEN0 独立 RTC 时间域、显式 WUT owner、RUN 屏障与失败保留排空；通用 LPBAM 和物理退出仍开放 |
+| [U575 SRAM4 复制与 Stop2](u575-stop2-copy.md) | 精确 LPDMA1ch0、两块有限字节复制、AlarmA14 与 WUT 逃逸；全部 RTC/DMA/IRQ/门控/时钟退出后结清，完整 LPBAM 和物理退出仍开放 |
 | [Classic CAN](classic-can.md) | 三邮箱、共享 filter domain、controller-local abort/recovery 与 Board 电气 handoff |
 | [USB FS device](usb-device.md) | PIO packet/endpoint 所有权、独立 48 MHz owner、control epoch 与完整停止 |
 | [Raw Ethernet / MDIO](ethernet.md) | caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置 |
@@ -95,7 +96,8 @@ ECC `program_flags`、fresh-erase 来源与逐脉冲完成责任见公共 Flash 
 SOC-33 的有限软件增量见上述边界页，完整退出仍开放；SOC-34 运行态变频仍未实现。
 SOC-35 新增 [U575 保留时间参考](u575-retained-time.md)的有界软件子集：独立 RTC
 时间域、显式 WUT/Stop2 owner 与失败保留排空；默认 Core TIM2 停止后旧 deadline
-失效。LPDMA/LPBAM、物理保留/精度/功耗/唤醒验收及完整退出仍开放；
+失效。另有同一 owner 的选定 [SRAM4/LPDMA 有限复制](u575-stop2-copy.md)；通用外设
+LPBAM、物理复制/保留/精度/功耗/唤醒验收及完整退出仍开放；
 SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、

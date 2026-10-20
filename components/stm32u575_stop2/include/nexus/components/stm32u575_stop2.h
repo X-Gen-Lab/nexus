@@ -52,17 +52,15 @@ nx_clock_domain_t* nx_stm32u575_stop2_domain(void);
  *                  Enrollment is never automatic.
  *                  End Core TIM2 deadlines; TIM2 is not read or restarted.
  *                  The independent RTC clock stays outside this RUN domain.
- *                  Requires MSIS4/equal buses, quiet gates, all SRAM retained,
- *                  caches/debug/MPU/SysTick/other IRQ and EXTI sources off.
- *                  Reading SysTick CTRL consumes COUNTFLAG on rejection too.
- *                  Exclusive RTC: bound calendar reader and this WUT writer.
- *                  Boot supplies valid retained LSE calendar and DBP=1. Only
- *                  WUT is written; WPR is unlocked then relocked each phase.
- *                  Exclude NMI/HardFault, debugger, watchdogs, other masters
- *                  and asynchronous configuration writers externally. Zero
- *                  gates cannot prove those obligations. Binding is trusted
- *                  assembly identity, never hardware authentication.
- *                  WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2
+ *                  Requires MSIS4/MSIK4/equal buses, quiet gates, all SRAM
+ * retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading
+ * SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound
+ * calendar reader and this WUT writer. Boot supplies valid retained LSE
+ * calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each
+ * phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and
+ * asynchronous configuration writers externally. Zero gates cannot prove those
+ * obligations. Binding is trusted assembly identity, never hardware
+ * authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2
  *                  ticks. RTC samples resolve 3906.25us; short wakes may show
  *                  zero elapsed. Retained max_gap_seconds must cover sleep,
  *                  arm/drain execution and externally bounded wake latency.
@@ -70,12 +68,11 @@ nx_clock_domain_t* nx_stm32u575_stop2_domain(void);
  *                  A missed sample gap taints the independent clock epoch.
  *                  wait_executed proves WFI ran, never physical residency.
  *                  All returns preserve masks. Success requires observed WUT,
- *                  IRQ and added gate withdrawal plus MSIS4/Range4 restore.
- *                  Failed drain retains ownership. Keep admission closed and
- *                  related objects alive; call recover before any restart.
- *                  No failure revokes a loan. Restarting Platform creates a
- *                  new TIM2 epoch; no old deadline survives that lifecycle.
- *                  RTOS Tick compensation and LPBAM remain unsupported.
+ *                  IRQ and added gate withdrawal plus MSIS4/MSIK4/Range4
+ * restore. Failed drain retains ownership. Keep admission closed and related
+ * objects alive; call recover before any restart. No failure revokes a loan.
+ * Restarting Platform creates a new TIM2 epoch; no old deadline survives that
+ * lifecycle. RTOS Tick compensation and LPBAM remain unsupported.
  */
 nx_stm32u575_stop2_result_t nx_stm32u575_stop2_enter(nx_clock_barrier_t owners,
                                                      uint32_t wake_ticks,

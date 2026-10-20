@@ -157,6 +157,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
         "consumers/f407-handoff.c",
+        "consumers/u575-lpdma-copy.c",
         "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
         "consumers/u575-rtc.c", "consumers/u575-retained-time.c", "consumers/u575-stop2.c", "consumers/user-io-async.c",
         "consumers/h743-uart-duplex-continuous.c",

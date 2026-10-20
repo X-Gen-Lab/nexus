@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2e076d5338632fdac196fdc3d34fc5cdda0fd0745f8512a2b0f687b1cd91532a`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1d8501d18b0c6834b445cc339ca9e2291f9323947c8ed02b5f649f076b227f61`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -533,9 +533,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | u575 |
 | `task` | LPDMA autonomous Stop2 and LPBAM reference |
-| `implementation_paths` | soc/stm32u575 |
+| `implementation_paths` | soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
 | `exit_condition` | Selected low-power peripheral SRAM4 and wake/stop ownership |
-| `implementation_status` | pending |
+| `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |

@@ -258,8 +258,10 @@ and original-vector readback retain their original order. The normal ELF audit
 requires every returning transaction path to pass that boundary, with no later
 callee or explicit store. A finite constant analysis also rejects recoverable
 physical-Flash data reads, including literal-loaded pointers and call results.
-These are bounded defect checks. Differing constants at control-flow joins
-become unknown. Unknown pointer operands, the return gate's own MMIO/protection
+These are bounded defect checks. Finite may-constant alternatives, including
+unknown values, are retained through control-flow, stack and call joins.
+Exceeding the finite alternative or operand-product bounds rejects the image.
+Unknown pointer operands, the return gate's own MMIO/protection
 protocol and the correctness of its VTOR argument remain unproved; a passing
 report does not establish the complete production closure.
 If the checker cannot prove part of the production control flow, the missing

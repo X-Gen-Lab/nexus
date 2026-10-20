@@ -195,6 +195,17 @@ class H743RamBuildGateTests(unittest.TestCase):
         self.assertIn("constant-address Flash data read",
                       json.loads(output.read_text())["failure"])
 
+    def test_real_busy_window_join_cannot_forget_a_flash_read(self):
+        # Both paths join at LDR r2,[r3]. Visiting r3=0 first must not erase
+        # the other path's r3=0x08000000; the terminal remains nonreturning.
+        result, output = self.mutate_function(
+            "nx_stm32h743_flash_ram_terminal",
+            bytes.fromhex("022901d0002303e040f20003c0f600031a68fee7"),
+            "terminal-joined-flash-read")
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("constant-address Flash data read",
+                      json.loads(output.read_text())["failure"])
+
     def test_real_transaction_cannot_return_before_its_ram_gate(self):
         # BX LR is a canonical AAPCS return with no frame. It must still be
         # refused when it bypasses the actual selected transaction gate.

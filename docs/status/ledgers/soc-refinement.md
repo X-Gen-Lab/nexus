@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/soc-refinement-execution.csv)。
-源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`7e275d999282421433bb32b5eb5556e4891e7384678d5cc032a97b3475137af5`。
+源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`3e5cfc2893bb55c359f7e1bd63ddf842d5af8b12fc0fb97aa3a851a9816950c1`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -618,8 +618,8 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
-| `implementation_paths` | components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp |
+| `implementation_paths` | components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md |
 | `exit_condition` | Exact RTC LPTIM retention wake recovery precision and power physically verified |
 | `owner` | codex |
 

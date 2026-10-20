@@ -92,6 +92,25 @@ nx_result_t nx_stm32u575_retained_time_initialize(
     nx_stm32u575_retained_time_storage_t* storage,
     const nx_stm32u575_retained_time_config_t* config, nx_clock_t* clock);
 /**
+ * \brief Open the fixed AlarmA-copy delegate for the same concrete Stop2 owner.
+ * \param[in,out] storage: Same fresh or fully stopped and joined storage.
+ * \param[in] config: Same immutable configuration with non-NULL wake_owner.
+ * \param[out] clock: Separate writable face, unchanged on every rejection.
+ * \return Same initialization results; no hardware writes occur.
+ * \note All ordinary initialization preconditions remain required. Unlike the
+ *       WUT-only initializer, this explicitly delegates fixed AlarmA compare
+ *       registers, ALRAE and ALRAF/CALRAF to the same serialized wake owner.
+ *       ALRAIE and automatic flag clearing stay forbidden. The fixed profile
+ *       masks all calendar fields and compares no subseconds, producing its
+ *       first event on a seconds increment. Both alarm registers start zero.
+ *       The delegate preserves the calendar/source and owns complete producer
+ *       withdrawal before any compound copy settlement. No AlarmA factory,
+ *       arbitrary alarm scheduler or second RTC writer is admitted.
+ */
+nx_result_t nx_stm32u575_retained_time_initialize_alarm_a_copy(
+    nx_stm32u575_retained_time_storage_t* storage,
+    const nx_stm32u575_retained_time_config_t* config, nx_clock_t* clock);
+/**
  * \brief Observe a bounded coherent tuple and extend the independent domain.
  * \param[in,out] storage: Same serialized privileged Thread owner.
  * \param[out] snapshot: Separate aligned writable output, unchanged on failure.
@@ -114,6 +133,19 @@ nx_result_t nx_stm32u575_retained_time_sample(
  * inferred.
  */
 nx_result_t nx_stm32u575_retained_time_validate_wake(
+    nx_stm32u575_retained_time_storage_t* storage, const void* wake_owner,
+    uint64_t generation);
+/**
+ * \brief Validate the exact opt-in AlarmA-copy owner and live clock generation.
+ * \param[in,out] storage: Same live serialized clock owner.
+ * \param[in] wake_owner: Exact stable identity from opt-in initialization.
+ * \param[in] generation: Nonzero generation obtained from a successful sample.
+ * \return SUCCESS, INVALID, STATE or CONTEXT; no hardware writes occur.
+ * \note Same Thread/PRIMASK boundary as validate_wake. An ordinary WUT-only
+ *       clock cannot authorize AlarmA. Wrong identity/generation/mode rejects
+ *       without taint; observed source or fixed-profile drift taints the epoch.
+ */
+nx_result_t nx_stm32u575_retained_time_validate_alarm_a_copy(
     nx_stm32u575_retained_time_storage_t* storage, const void* wake_owner,
     uint64_t generation);
 /**

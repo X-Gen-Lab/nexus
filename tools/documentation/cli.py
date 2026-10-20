@@ -174,6 +174,22 @@ def run_tests(root, report, tool_prefix=None):
         raise
 
 
+def _check_status_views(root, report):
+    """Admit maintained views from their source, even when output is missing."""
+    from tools.documentation import status
+    page = root / "docs/index.md"
+    current = (page.is_file()
+               and check.metadata(page.read_text()).get("id") == "index")
+    inputs = [root / "docs/status/ledgers"] + [
+        root / "docs/design" / filename
+        for filename, _, _ in status.SPECIFICATIONS]
+    if current or any(path.exists() or path.is_symlink() for path in inputs):
+        for result in (status.generate(root, check=True),
+                       status.check_mapping(root)):
+            report["errors"].extend(result["errors"])
+        report["status"] = "failed" if report["errors"] else "passed"
+
+
 def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
     """Build fresh XML and HTML; no previous success can survive a failure."""
     from tools.documentation import install
@@ -198,6 +214,7 @@ def build(root, destination, *, language="all", tool_prefix=None, timeout=600):
                 "qualification": False}
     try:
         report = check.scan(root)
+        _check_status_views(root, report)
         _record(workspace / "source-check.json", report)
         if report["errors"]:
             raise ValueError("documentation source check failed: " + "\n".join(report["errors"]))
@@ -321,10 +338,7 @@ def main(arguments=None, *, root=ROOT):
                 locked = json.loads((root / "dependencies/docs-tools.lock.json").read_text())
                 install.validate_lock(locked)
                 install.verify_requirements(root / "dependencies/docs-python-linux-cp312.txt", locked)
-            if (root / "docs/status/ledgers").is_dir():
-                from tools.documentation import status
-                for result in (status.generate(root, check=True), status.check_mapping(root)):
-                    report["errors"].extend(result["errors"])
+            _check_status_views(root, report)
             if args.full:
                 from tools.documentation import diagrams, install
                 diagram_report = diagrams.check(root,

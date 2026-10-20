@@ -74,6 +74,7 @@ class StyleGateTests(unittest.TestCase):
             "scripts/ci/check_commit_message.py", "scripts/tools/format.py",
             "scripts/setup/install_dev_tools.py",
             "tools/documentation/cli.py", "tools/documentation/check.py",
+            "tools/documentation/status.py",
             "tools/dev/process.py", "tools/evidence/identity.py",
             "tools/evidence/common.py",
         ):

@@ -31,7 +31,7 @@ bool hold_wut_disable, hold_wut_ready, hold_flag_clear, hold_irq_clear;
 bool hold_restore, source_fault, wrong_binding, change_generation;
 bool unexpected_wake, corrupt_wake_clock, protected_locked;
 uint32_t key;
-bool unstable_calendar, drift_after_wait, late_flag;
+bool unstable_calendar, drift_after_wait, late_flag, corrupt_wake_msik;
 uint32_t subsecond_reads, calendar_reads_after_wait, rtc_accesses_after_wait;
 #ifdef NX_U575_STOP2_COMBINED
 nx_clock_t clock_face{};
@@ -53,7 +53,8 @@ class U575Stop2 : public ::testing::Test {
         hold_irq_clear = hold_restore = source_fault = wrong_binding = false;
         change_generation = unexpected_wake = corrupt_wake_clock = false;
         protected_locked = true;
-        unstable_calendar = drift_after_wait = late_flag = false;
+        unstable_calendar = drift_after_wait = late_flag = corrupt_wake_msik =
+            false;
         subsecond_reads = calendar_reads_after_wait = rtc_accesses_after_wait =
             0;
         put(A(RCC->BDCR), RCC_BDCR_LSEON | RCC_BDCR_LSERDY | RCC_BDCR_RTCSEL_0 |
@@ -63,7 +64,8 @@ class U575Stop2 : public ::testing::Test {
         put(A(RTC->DR), 0x0000c101U);
         g_nx_stm32u575_system = {};
         put(A(RCC->CR), RCC_CR_MSISON | RCC_CR_MSISRDY);
-        put(A(RCC->CSR), 4U << RCC_CSR_MSISSRANGE_Pos);
+        put(A(RCC->CSR),
+            (4U << RCC_CSR_MSISSRANGE_Pos) | (4U << RCC_CSR_MSIKSRANGE_Pos));
         put(A(RCC->AHB1ENR), RCC_AHB1ENR_FLASHEN | RCC_AHB1ENR_SRAM1EN);
         put(A(RCC->AHB3ENR), RCC_AHB3ENR_PWREN);
         put(A(RCC->APB3ENR), RCC_APB3ENR_RTCAPBEN);
@@ -95,6 +97,9 @@ class U575Stop2 : public ::testing::Test {
         hold_wut_disable = hold_wut_ready = hold_flag_clear = false;
         hold_irq_clear = hold_restore = false;
         put(A(RCC->CFGR1), 0U);
+        put(A(RCC->CSR),
+            (4U << RCC_CSR_MSISSRANGE_Pos) | (4U << RCC_CSR_MSIKSRANGE_Pos));
+        put(A(RCC->ICSCR1), 0U);
         (void)nx_stm32u575_stop2_recover(barrier, 8);
         nx_arch_irq_restore(mask);
 #ifdef NX_U575_STOP2_COMBINED
@@ -288,6 +293,33 @@ TEST_F(U575Stop2, FailedGateRestoreRetainsRecoveryResponsibility) {
     EXPECT_NE(r.remaining_effects, 0U);
     hold_restore = false;
     EXPECT_EQ(nx_stm32u575_stop2_recover(barrier, 8).remaining_effects, 0U);
+}
+TEST_F(U575Stop2,
+       RejectsUnsupportedMsikRangesFromBothSelectorsBeforeHardwareEffects) {
+    for (bool selected : {false, true}) {
+        SCOPED_TRACE(selected);
+        /* CSR code0 is reserved; ICSCR1 code0 is 48MHz (above Range4). */
+        put(A(RCC->CSR), 4U << RCC_CSR_MSISSRANGE_Pos);
+        put(A(RCC->ICSCR1),
+            selected ? RCC_ICSCR1_MSIRGSEL | (4U << RCC_ICSCR1_MSISRANGE_Pos)
+                     : 0U);
+        auto result = enter();
+        EXPECT_EQ(NX_ERROR_UNSUPPORTED, result.primary);
+        EXPECT_TRUE(writes.empty());
+        EXPECT_EQ(0U, waits);
+    }
+}
+TEST_F(U575Stop2, ChangedMsikWakeRangeCannotAuthorizeRtcDrain) {
+    corrupt_wake_msik = true;
+    auto result = enter();
+    EXPECT_EQ(NX_ERROR_IO, result.primary);
+    EXPECT_EQ(NX_ERROR_IO, result.cleanup);
+    EXPECT_NE(0U, result.remaining_effects);
+    EXPECT_EQ(0U, rtc_accesses_after_wait);
+    put(A(RCC->CSR),
+        (4U << RCC_CSR_MSISSRANGE_Pos) | (4U << RCC_CSR_MSIKSRANGE_Pos));
+    EXPECT_EQ(0U, nx_stm32u575_stop2_recover(barrier, 8U).remaining_effects);
+    EXPECT_EQ(1U, waits);
 }
 TEST_F(U575Stop2, Range1IsRejectedBeforeAnyHardwareEffect) {
     /* RM0456 10.10.4: VOS=11 is Range1; the selected profile is VOS=00. */
@@ -491,6 +523,9 @@ extern "C" void nx_u575_stop2_wait(void) {
     put(A(RCC->CR), get(A(RCC->CR)) | RCC_CR_MSIKON | RCC_CR_MSIKRDY);
     if (corrupt_wake_clock)
         put(A(RCC->CFGR1), RCC_CFGR1_STOPWUCK);
+    if (corrupt_wake_msik)
+        put(A(RCC->CSR),
+            get(A(RCC->CSR)) & ~static_cast<uint32_t>(RCC_CSR_MSIKSRANGE));
     /* Both counters share LSE: eight RTC/16 WUT ticks equal one
      * retained256Hz calendar tick. This models a nominal WUTR+1 wake. */
     uint32_t calendar_ticks =

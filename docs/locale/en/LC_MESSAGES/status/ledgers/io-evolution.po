@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a0d1e1dbdedfd66dd3c81fad071fba9661d3515886fe1007ce5f9e339f947654\n"
+"X-Nexus-Source-SHA256: 08d9440d0467b03c741bca2fc89cbd8fd0e12714cc4224f8e58a53a23f5c8927\n"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
@@ -820,16 +820,8 @@ msgid "LPDMA autonomous Stop2 and LPBAM reference"
 msgstr "LPDMA autonomous Stop2 and LPBAM reference"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "soc/stm32u575"
-msgstr "soc/stm32u575"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Selected low-power peripheral SRAM4 and wake/stop ownership"
 msgstr "Selected low-power peripheral SRAM4 and wake/stop ownership"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "pending"
-msgstr "pending"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:544
@@ -1062,11 +1054,18 @@ msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/go
 msgid "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
 msgstr "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2e076d5338632fdac196fdc3d34fc5cdda0fd0745f8512a2b0f687b1cd91532a`。"
-msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from {download}`original ledger <../../design/io-evolution-execution.csv>`. Source: `docs/design/io-evolution-execution.csv`; SHA-256: `2e076d5338632fdac196fdc3d34fc5cdda0fd0745f8512a2b0f687b1cd91532a`."
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1d8501d18b0c6834b445cc339ca9e2291f9323947c8ed02b5f649f076b227f61`。"
+msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from {download}`original ledger <../../design/io-evolution-execution.csv>`. Source: `docs/design/io-evolution-execution.csv`; SHA-256: `1d8501d18b0c6834b445cc339ca9e2291f9323947c8ed02b5f649f076b227f61`."
 
 msgid "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
 msgstr "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
 
 msgid "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
 msgstr "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
+
+
+msgid "partial_exact_reference_implemented"
+msgstr "partial_exact_reference_implemented"
+
+msgid "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+msgstr "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"

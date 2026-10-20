@@ -55,8 +55,9 @@ cooperative job。静态 factory 按模式保留精确状态和资源，不生�
 代码执行资格。实板未接入，物理 HIL 均为 `not_executed`。当前有限 F407 屏蔽
 Flash 尾跳不代表通用运行态接管；SOC-34 的 DVFS 仍未实现。SOC-35 已增加
 [U575 保留时钟与 Stop2](../design/u575-retained-time.md)的有界软件子集，使用独立
-RTC 时间域与显式 WUT/Stop2 owner；LPDMA/LPBAM 尚未实现，物理保留、精度、功耗及
-唤醒验收仍未执行。SOC-35 完整退出仍开放；全部 55 项原始退出条件保持不变。
+RTC 时间域与显式 WUT/Stop2 owner；另有同一 owner 的选定
+[SRAM4/LPDMA 有限复制](../design/u575-stop2-copy.md)。通用外设 LPBAM 尚未实现，
+物理复制、保留、精度、功耗及唤醒验收仍未执行。SOC-35 完整退出仍开放；全部 55 项原始退出条件保持不变。
 
 既有构建系统交付绑定 `cc6a065c`，完整结果单独记录在构建结果索引，不能继承
 上面的历史 SoC 执行身份。该版本的八个候选使用 H743 HSI64／Cache off 和 U575

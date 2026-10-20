@@ -251,7 +251,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     run_checked(["git", "init", "--quiet", str(source)])
     version = load_policy(sdk)["semantic_version"]
     library = {"u575-retained-time": "Nexus::U575RetainedTime",
-               "u575-stop2": "Nexus::U575Stop2"}.get(smoke_name)
+               "u575-stop2": "Nexus::U575Stop2",
+               "u575-lpdma-copy": "Nexus::U575Stop2Copy"}.get(smoke_name)
     component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
@@ -291,6 +292,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("retained_time.h") || '
         '__has_include("stm32u575_rtc_calendar.h") || '
         '__has_include("stm32u575_stop2_hw.h") || '
+        '__has_include("stm32u575_lpdma_copy_hw.h") || '
+        '__has_include("stm32u575_lpdma_copy_internal.h") || '
         '__has_include("stm32g474_fdcan.h") || '
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '

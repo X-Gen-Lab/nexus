@@ -33,6 +33,38 @@ class Result(dict):
 
 
 class U575ProviderTests(unittest.TestCase):
+    def test_autonomous_copy_source_sdk_contract_is_complete(self):
+        import importlib.util
+        from tools.configure.providers import descriptor
+        spec = importlib.util.spec_from_file_location(
+            "nexus_copy_sdk_contract", Path(__file__).resolve().parents[4] /
+            "cmake/package/package_source_sdk.py")
+        sdk = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(sdk)
+        paths = (
+            "components/stm32u575_stop2/CMakeLists.txt",
+            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
+            "soc/stm32u575/stop2.c",
+            "soc/stm32u575/private/stm32u575_stop2_hw.h",
+            "cmake/package/verification/io_evolution/consumers/u575-stop2.c",
+            "components/stm32u575_lpdma_copy/CMakeLists.txt",
+            "components/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h",
+            "components/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h",
+            "soc/stm32u575/drivers/lpdma_copy.c",
+            "soc/stm32u575/private/stm32u575_lpdma_copy_hw.h",
+            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h",
+            "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c",
+        )
+        payload = descriptor.maintained("stm32u575").owned_payload
+        for name in paths:
+            with self.subTest(path=name, contract="owned payload"):
+                self.assertIn(name, payload)
+            with self.subTest(path=name, contract="required payload"):
+                self.assertIn(name, sdk.REQUIRED_FILES)
+            with self.subTest(path=name, contract="selected payload"):
+                self.assertTrue(sdk.selected(name))
+
     def setUp(self):
         self.provider = importlib.import_module(
             "tools.configure.providers.stm32u575")
@@ -97,6 +129,14 @@ class U575ProviderTests(unittest.TestCase):
         self.assertNotIn("PC4", variant["pins"])
         self.assertEqual(variant["memory"][0]["size"], 196608)
         self.assertEqual(variant["flash"]["erase_blocks"], [8192] * 256)
+
+    def test_selected_sram4_initializer_remains_in_required_sdk_payload(self):
+        from tools.configure.providers import descriptor
+        payload = descriptor.maintained("stm32u575").owned_payload
+        for name in ("soc/stm32u575/memory_init.c",
+                     "soc/stm32u575/private/stm32u575_memory_init.h"):
+            with self.subTest(path=name):
+                self.assertIn(name, payload)
 
     def test_reference_board_does_not_invent_hse_or_physical_qualification(self):
         board = json.loads((ROOT / "boards/stm32u575_nucleo_zi_q/"

@@ -15,5 +15,6 @@ typedef struct {
     uint32_t magic;
     bool opened;
     bool tainted;
+    bool alarm_a_copy;
 } nx_stm32u575_retained_time_owner_t;
 #endif

@@ -89,11 +89,27 @@ These public headers describe framed data, explicit owners, retained clocks and 
 :project: nexus
 ```
 
+(stm32u575__lpdma__copy_8h)=
+
+## stm32u575_lpdma_copy.h
+
+```{doxygenfile} stm32u575_lpdma_copy.h
+:project: nexus
+```
+
 (stm32u575__stop2_8h)=
 
 ## stm32u575_stop2.h
 
 ```{doxygenfile} stm32u575_stop2.h
+:project: nexus
+```
+
+(stm32u575__stop2__copy_8h)=
+
+## stm32u575_stop2_copy.h
+
+```{doxygenfile} stm32u575_stop2_copy.h
 :project: nexus
 ```
 

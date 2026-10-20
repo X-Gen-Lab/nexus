@@ -592,3 +592,8 @@ include(u575_retained_time.cmake)
 include(u575_stop2.cmake)
 
 include(i3c_controller.cmake)
+
+include(u575_memory.cmake)
+
+include(u575_lpdma_copy.cmake)
+include(u575_stop2_copy.cmake)

@@ -4,7 +4,8 @@
 另加入 IO-24 的 FIG-17/18 目标图源、IO-36 的 FIG-21 Native 装配／生命周期图，
 以及 IO-31 的 FIG-22 G474 命名 GPIO 状态／所有权图。FIG-23–26 依次描述
 五项有界软件机制的所有权、U575 保留时钟与 Stop2 所有权及状态、
-UART TX 复制代理的 kernel 所有权与退出、I3C 核心借用与整总线证明。主图登记见
+UART TX 复制代理的 kernel 所有权与退出、I3C 核心借用与整总线证明。
+FIG-27 另述同一 Stop2 owner 的选定 SRAM4/LPDMA 有限复制及复合退出。主图登记见
 [图清单](diagram-index.csv)，维护规则见
 [图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份，
 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。

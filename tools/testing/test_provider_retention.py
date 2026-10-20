@@ -141,6 +141,116 @@ def file_symbol_elf():
     return data
 
 
+class ComponentPublicContractsTests(unittest.TestCase):
+    """Component faces use the same strict public and linked-byte contract."""
+
+    def tree(self, directory, *, tagged=False):
+        root = Path(directory)
+        base = root / "io/include/nexus/io/base.h"
+        header = root / "components/probe/include/nexus/components/probe.h"
+        source = root / "soc/reviewed/drivers/probe.c"
+        metadata = header.with_name("metadata.h")
+        face = ("struct nx_component_probe { const nx_component_probe_ops_t* ops; "
+                "void* context; };\n" if tagged else
+                "typedef struct { const nx_component_probe_ops_t* ops; "
+                "void* context; } nx_component_probe_t;\n")
+        for path, text in (
+                (base, "typedef struct { int (*ready)(void*); } nx_base_ops_t;\n"),
+                (header, "typedef struct { int (*start)(void*); "
+                 "int (*stop)(void*); } nx_component_probe_ops_t;\n" + face),
+                (metadata, "typedef unsigned int nx_component_metadata_t;\n"),
+                (source, "const nx_base_ops_t nx_base_ops = {0};\n"
+                 "const nx_component_probe_ops_t nx_component_probe_ops = {"
+                 ".start = real_start, .stop = real_stop};\n")):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        return root, header, source, metadata
+
+    def test_component_public_face_layout_provider_and_all_header_inputs(self):
+        from tools.evidence.common import file_identity
+        for tagged in (False, True):
+            with self.subTest(tagged=tagged), tempfile.TemporaryDirectory() as directory:
+                root, header, source, metadata = self.tree(directory, tagged=tagged)
+                faces, layouts, providers, inputs = source_contracts(root)
+                self.assertEqual(faces["nx_component_probe_t"],
+                                 "nx_component_probe_ops_t")
+                self.assertEqual(layouts["nx_component_probe_ops_t"], ["start", "stop"])
+                self.assertEqual(providers["nx_component_probe_ops"], {
+                    "type": "nx_component_probe_ops_t",
+                    "fields": {"start": "real_start", "stop": "real_stop"},
+                    "source": file_identity(source)})
+                self.assertIn(file_identity(header), inputs)
+                self.assertIn(file_identity(metadata), inputs)
+                metadata.write_text("typedef unsigned long nx_component_metadata_t;\n")
+                self.assertIn(file_identity(metadata), source_contracts(root)[3])
+
+    def test_actual_soc_component_operations_use_the_public_component_header(self):
+        from tools.evidence.common import file_identity
+        faces, layouts, providers, inputs = source_contracts()
+        self.assertEqual(faces["nx_stm32u575_lpdma_copy_t"],
+                         "nx_stm32u575_lpdma_copy_ops_t")
+        self.assertEqual(layouts["nx_stm32u575_lpdma_copy_ops_t"],
+                         ["cancel", "service", "stop"])
+        self.assertEqual(set(providers["nx_stm32u575_lpdma_copy_ops"]["fields"]),
+                         {"cancel", "service", "stop"})
+        root = Path(__file__).resolve().parents[2]
+        self.assertIn(file_identity(root / "components/stm32u575_lpdma_copy/include/"
+                                    "nexus/components/stm32u575_lpdma_copy.h"), inputs)
+
+    def test_duplicate_component_operations_and_face_types_are_rejected(self):
+        for declaration, message in (
+                ("typedef struct { int (*ready)(void*); } nx_base_ops_t;\n", "layout"),
+                ("typedef struct { const nx_component_probe_ops_t* ops; "
+                 "void* context; } nx_component_probe_t;\n", "duplicate public face")):
+            with self.subTest(message=message), tempfile.TemporaryDirectory() as directory:
+                root, header, _, _ = self.tree(directory)
+                header.with_name("duplicate.h").write_text(declaration)
+                with self.assertRaisesRegex(EvidenceError, message):
+                    source_contracts(root)
+
+    def test_component_operations_with_data_fields_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, header, _, _ = self.tree(directory)
+            header.write_text(header.read_text().replace(
+                "} nx_component_probe_ops_t;", "int state; } nx_component_probe_ops_t;"))
+            with self.assertRaisesRegex(EvidenceError, "public operations layout"):
+                source_contracts(root)
+
+    def test_unknown_component_provider_type_is_still_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source, _ = self.tree(directory)
+            source.write_text(source.read_text().replace(
+                "nx_component_probe_ops_t nx_component_probe_ops",
+                "nx_unreviewed_ops_t nx_component_probe_ops"))
+            with self.assertRaisesRegex(EvidenceError, "unsupported concrete"):
+                source_contracts(root)
+
+    def test_component_linked_method_bytes_are_still_audited(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _, _ = self.tree(directory)
+            elf = image()
+            elf.defined_symbols[0]["name"] = "s_nx_face_component"
+            elf.defined_symbols[2].update(name="nx_component_probe_ops", size=8)
+            elf.defined_symbols[6]["name"] = "real_start"
+            elf.defined_symbols[7]["name"] = "real_stop"
+            struct.pack_into("<2I", elf.data, 16, 0x08002001, 0x08002011)
+            bindings = ("static const nx_component_probe_t s_nx_face_component = {"
+                        "&nx_component_probe_ops, &s_nx_port_bus};\n")
+            result = inspect_provider_retention(elf, bindings, root=root)
+            self.assertEqual(result["method_count"], 2)
+            self.assertEqual(result["tables"][0]["slots"], ["start", "stop"])
+            for pointer, message in ((0, "initialized method"),
+                                     (0x08002001, "another function")):
+                with self.subTest(pointer=pointer):
+                    struct.pack_into("<I", elf.data, 20, pointer)
+                    with self.assertRaisesRegex(EvidenceError, message):
+                        inspect_provider_retention(elf, bindings, root=root)
+            struct.pack_into("<I", elf.data, 20, 0x08002011)
+            elf.defined_symbols[2]["size"] = 12
+            with self.assertRaisesRegex(EvidenceError, "layout differs"):
+                inspect_provider_retention(elf, bindings, root=root)
+
+
 class ProviderRetentionTests(unittest.TestCase):
     def test_shared_can_provider_uses_actual_source_and_public_face(self):
         faces, layouts, providers, _ = source_contracts()

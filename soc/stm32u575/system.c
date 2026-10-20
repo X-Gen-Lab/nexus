@@ -9,6 +9,9 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "stm32u575_system.h"
+#if defined(NEXUS_MEMORY_SRAM4) && NEXUS_MEMORY_SRAM4 == 1
+#include "stm32u575_memory_init.h"
+#endif
 #ifndef NX_U575_MODEL
 nx_stm32u575_system_t g_nx_stm32u575_system = {.rcc = RCC,
                                                .flash = FLASH,
@@ -59,6 +62,15 @@ void SystemInit(void) {
     NX_U575_CPU_GROUP(3U);
     nx_arch_dsb();
     nx_arch_isb();
+#if defined(NEXUS_MEMORY_SRAM4) && NEXUS_MEMORY_SRAM4 == 1
+    /* Only linker constants and the reset SRAM1 stack exist. A failed SRAM4
+     * image or prepared run gate cannot reach primary RAM or constructors. */
+    if (!nx_stm32u575_memory_boot()) {
+        (void)nx_arch_irq_save();
+        for (;;) {
+        }
+    }
+#endif
 }
 nx_result_t nx_stm32u575_validate_identity(void) {
     uint32_t options = NX_U575_FLASH_OPTIONS();

@@ -15,7 +15,8 @@ def select(regions, budgets, family, part, *, obj, integer, fail):
         family == "gd32f470" and part == "GD32F470ZGT6") else
         {"ccm"} if family == "stm32f407" and part in {
             "STM32F407VET6", "STM32F407ZGT6"} else
-        {"sram1"} if family == "stm32h743" and part == "STM32H743ZIT6"
+        {"sram1"} if family == "stm32h743" and part == "STM32H743ZIT6" else
+        {"sram4"} if family == "stm32u575" and part == "STM32U575ZIT6Q"
         else set())
     for name, choice in choices.items():
         if name not in maintained or name not in available:
@@ -61,7 +62,7 @@ def resource_budget(result):
 def selections(result):
     selected = {region["id"] for region in result["memory"] if region["linker"]}
     return [("NEXUS_MEMORY_" + name.upper(), int(name in selected))
-            for name in ("addsram", "tcm", "ccm", "sram1")]
+            for name in ("addsram", "tcm", "ccm", "sram1", "sram4")]
 
 
 def header_lines(result):

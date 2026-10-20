@@ -299,6 +299,18 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
 
 
 class ConsumerTransportTests(unittest.TestCase):
+    def test_lpdma_copy_has_exact_v7_consumer_identity(self):
+        from tools.release import transport
+        row = ("u575 lpdma copy",
+               "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
+               "u575-lpdma-copy")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v7")
+        self.assertEqual(transport.SELECTED_CONSUMERS[-1], row)
+        self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
+        self.assertIn("selected u575 lpdma copy source/.git", transport.FIXTURES)
+        self.assertIn("selected u575 lpdma copy build/bin/installed_selected.elf",
+                      transport.IMAGES)
+
     def test_h743_duplex_modes_have_exact_independent_consumer_identities(self):
         from tools.release import transport
         expected = {
@@ -311,7 +323,7 @@ class ConsumerTransportTests(unittest.TestCase):
         }
         self.assertTrue(expected.issubset(set(transport.SELECTED_CONSUMERS)),
                         expected - set(transport.SELECTED_CONSUMERS))
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v6")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v7")
         for name, _, _ in expected:
             self.assertIn("selected " + name + " source/.git",
                           transport.FIXTURES)
@@ -397,7 +409,7 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 46)
+        self.assertEqual(len(list(raw.rglob(".git"))), 47)
         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
         self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
         self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
@@ -408,10 +420,10 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v6")
-        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v6")
-        self.assertEqual(len(list(raw.rglob(".git"))), 46)
-        self.assertEqual(len(manifest["consumer_images"]), 49)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v7")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v7")
+        self.assertEqual(len(list(raw.rglob(".git"))), 47)
+        self.assertEqual(len(manifest["consumer_images"]), 50)
         auxiliary = "stm32 build/bin/installed_c.bin"
         self.assertIn(auxiliary, manifest["files"])
         self.assertNotIn(auxiliary, manifest["consumer_images"])
@@ -656,7 +668,7 @@ class ConsumerTransportTests(unittest.TestCase):
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on", "u575 rtc run",
-                      "u575 retained time", "u575 stop2"):
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy"):
             shutil.rmtree(raw / ("selected " + label + " source"))
             shutil.rmtree(raw / ("selected " + label + " build"))
         self.assertEqual(len(list(raw.rglob(".git"))), 31)
@@ -671,7 +683,7 @@ class ConsumerTransportTests(unittest.TestCase):
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on", "u575 rtc run",
-                      "u575 retained time", "u575 stop2"):
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy"):
             shutil.rmtree(raw / ("selected " + label + " source"))
             shutil.rmtree(raw / ("selected " + label + " build"))
         self.assertEqual(len(list(raw.rglob(".git"))), 36)
@@ -681,7 +693,8 @@ class ConsumerTransportTests(unittest.TestCase):
     def test_schema_two_previous_policy_is_not_a_current_fallback(self):
         from tools.release import transport
         for policy in ("nexus-sdk-consumers-v2", "nexus-sdk-consumers-v3",
-                       "nexus-sdk-consumers-v4", "nexus-sdk-consumers-v5"):
+                       "nexus-sdk-consumers-v4", "nexus-sdk-consumers-v5",
+                       "nexus-sdk-consumers-v6"):
             with self.subTest(policy=policy):
                 base, raw = self.fixture()
                 packed = base / "transport"

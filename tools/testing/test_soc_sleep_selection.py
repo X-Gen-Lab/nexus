@@ -157,6 +157,66 @@ endif()
         for path in private_imports | sdk_imports:
             self.assertTrue(Path(path).is_dir(), path)
 
+    def configure_u575_variant(self, variants):
+        """Use real optional target definitions, with interface-only SDK ports."""
+        with tempfile.TemporaryDirectory(prefix="nexus-u575-owner-cmake-") as name:
+            source = Path(name)
+            (source / "main.c").write_text("int main(void) { return 0; }\n")
+            libraries = " ".join("Nexus::" + variant for variant in variants)
+            (source / "CMakeLists.txt").write_text(f'''\
+cmake_minimum_required(VERSION 3.31)
+project(u575_owner_selection LANGUAGES C)
+set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
+set(NEXUS_SOC_FAMILY stm32u575)
+set(NEXUS_BACKEND baremetal)
+set(NEXUS_ARCH_SECURITY_STATE 0)
+set(NEXUS_EXACT_PART STM32U575ZIT6Q)
+set(NEXUS_MEMORY_SRAM4 1)
+function(nexus_apply_target_policy target)
+endfunction()
+foreach(component U575RetainedTime U575LpdmaCopy ClockDomain Arch)
+    add_library(Nexus::${{component}} INTERFACE IMPORTED)
+endforeach()
+add_library(nexus_build_options INTERFACE)
+add_library(nexus_owned_warnings INTERFACE)
+add_subdirectory("{(ROOT / 'components/stm32u575_stop2').as_posix()}" owner)
+add_executable(consumer main.c)
+target_link_libraries(consumer PRIVATE {libraries})
+foreach(name nexus_stm32u575_stop2 nexus_stm32u575_stop2_copy)
+    if(TARGET ${{name}})
+        foreach(property SOURCES COMPILE_DEFINITIONS LINK_LIBRARIES EXCLUDE_FROM_ALL INTERFACE_NEXUS_U575_STOP2_MODE)
+            get_target_property(value ${{name}} ${{property}})
+            file(APPEND "${{CMAKE_BINARY_DIR}}/properties.txt" "${{name}}.${{property}}=${{value}}\n")
+        endforeach()
+    endif()
+endforeach()
+''', encoding="utf-8")
+            cmake = shutil.which("cmake") or str(ROOT / ".venv/bin/cmake")
+            process = subprocess.run(
+                [cmake, "-S", str(source), "-B", str(source / "build"), "-G", "Ninja"],
+                capture_output=True, text=True, check=False, timeout=60)
+            properties = source / "build/properties.txt"
+            return process, (properties.read_text() if properties.exists() else "")
+
+    def test_u575_copy_is_an_explicit_fixed_variant_of_the_same_owner(self):
+        process, text = self.configure_u575_variant(("U575Stop2Copy",))
+        self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+        properties = dict(line.split("=", 1) for line in text.splitlines())
+        original = "nexus_stm32u575_stop2."
+        selected = "nexus_stm32u575_stop2_copy."
+        self.assertEqual(properties[original + "SOURCES"], properties[selected + "SOURCES"])
+        self.assertNotIn("NEXUS_U575_STOP2_COPY", properties[original + "COMPILE_DEFINITIONS"])
+        self.assertIn("NEXUS_U575_STOP2_COPY", properties[selected + "COMPILE_DEFINITIONS"])
+        self.assertNotIn("Nexus::U575LpdmaCopy", properties[original + "LINK_LIBRARIES"])
+        self.assertIn("Nexus::U575LpdmaCopy", properties[selected + "LINK_LIBRARIES"])
+        self.assertEqual("TRUE", properties[original + "EXCLUDE_FROM_ALL"])
+        self.assertEqual("TRUE", properties[selected + "EXCLUDE_FROM_ALL"])
+
+    def test_u575_wut_and_copy_physical_owners_cannot_be_linked_together(self):
+        process, _ = self.configure_u575_variant(("U575Stop2", "U575Stop2Copy"))
+        self.assertNotEqual(process.returncode, 0)
+        self.assertIn("NEXUS_U575_STOP2_MODE", process.stdout + process.stderr)
+
     def test_stm32_external_selection_uses_private_checked_sdk_paths(self):
         self.assert_selected_private_imports("stm32f407")
 

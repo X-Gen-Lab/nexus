@@ -30,6 +30,65 @@ class U575ReferenceGateTests(unittest.TestCase):
     def test_exact_reference_profile_is_accepted_without_physical_claim(self):
         self.gate.validate_profile(self.profile)
 
+    def test_real_resolver_default_memory_includes_unselected_sram4(self):
+        from tools.configure import configure
+        for backend, leaf in (("baremetal", "io.toml"),
+                              ("freertos", "io-freertos.toml")):
+            with self.subTest(backend=backend):
+                result = configure.resolve_ir(
+                    ROOT / "tests/contracts/u575_assembly" / leaf).to_dict()
+                self.assertEqual(result["memory"], [
+                    {"id": "sram1", "origin": 0x20000000, "size": 196608,
+                     "dma_engines": {"GPDMA1": True, "LPDMA1": False},
+                     "linker": True},
+                    {"id": "sram4", "origin": 0x28000000, "size": 16384,
+                     "dma_engines": {"GPDMA1": True, "LPDMA1": True},
+                     "linker": False}])
+                self.assertEqual(result["cpu"]["mpu_regions"], 8)
+                self.assertEqual(result["backend"], backend)
+                self.assertFalse(result["physical_qualified"])
+                self.gate.validate_profile(result)
+
+    def test_real_selected_sram4_reference_cannot_enter_default_image_gate(self):
+        from tools.configure import configure
+        result = configure.resolve_ir(ROOT / "tools/configure/assemblies/"
+                                      "u575-lpdma-copy-stop2.toml").to_dict()
+        self.assertTrue(result["memory"][1]["linker"])
+        with self.assertRaisesRegex(EvidenceError, "memory|SRAM"):
+            self.gate.validate_profile(result)
+
+    def test_real_default_sram4_geometry_types_engines_and_exact_inventory(self):
+        from tools.configure import configure
+        baseline = configure.resolve_ir(
+            ROOT / "tests/contracts/u575_assembly/io.toml").to_dict()
+        self.gate.validate_profile(baseline)
+        for field, value in (("id", "other"), ("origin", 0x28000004),
+                             ("origin", float(0x28000000)), ("origin", True),
+                             ("size", 16380), ("size", 16384.0),
+                             ("linker", True), ("linker", 0),
+                             ("dma_engines", {"GPDMA1": True, "LPDMA1": False}),
+                             ("dma_engines", {"GPDMA1": 1, "LPDMA1": True}),
+                             ("dma_engines", {"GPDMA1": True, "LPDMA1": 1}),
+                             ("dma_engines", {"LPDMA1": True}),
+                             ("dma_engines", {"GPDMA1": True, "LPDMA1": True,
+                                              "UNKNOWN": False})):
+            with self.subTest(field=field, value=value):
+                forged = copy.deepcopy(baseline)
+                forged["memory"][1][field] = value
+                with self.assertRaises(EvidenceError):
+                    self.gate.validate_profile(forged)
+        for memory in (baseline["memory"][:1], baseline["memory"][::-1],
+                       baseline["memory"] + [baseline["memory"][1]]):
+            with self.subTest(memory=memory):
+                forged = copy.deepcopy(baseline)
+                forged["memory"] = copy.deepcopy(memory)
+                with self.assertRaises(EvidenceError):
+                    self.gate.validate_profile(forged)
+        forged = copy.deepcopy(baseline)
+        forged["cpu"]["mpu_regions"] = 16
+        with self.assertRaises(EvidenceError):
+            self.gate.validate_profile(forged)
+
     def test_foreign_part_or_cpu_only_fixture_is_rejected(self):
         for field, value in (("part", "STM32U575ZIT6"),
                              ("soc_family", "cpu-runtime"),

@@ -10,10 +10,12 @@
 #include "nexus/core/fault.h"
 #include "retained_time.h"
 #include "u575_rtc_model.h"
-#include <csignal>
+#include <atomic>
+#include <chrono>
 #include <cstring>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <thread>
 #include <unistd.h>
 using testing::StrictMock;
 class FaultObserver {
@@ -21,7 +23,7 @@ class FaultObserver {
     MOCK_METHOD(void, observe, (nx_fault_domain_t, nx_result_t));
 };
 static FaultObserver* observer;
-static volatile sig_atomic_t observed_fault;
+static std::atomic<bool> observed_fault;
 extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
                                  const char*, unsigned) {
     if (observer != nullptr)
@@ -303,17 +305,23 @@ TEST_F(U575RetainedTime,
     EXPECT_FALSE(nx_arch_irq_is_masked());
 }
 TEST_F(U575RetainedTime, ReturningFaultObserverCannotResumeDeadlineConsumers) {
+    GTEST_FLAG_SET(death_test_style, "threadsafe");
     open();
     EXPECT_EXIT(
         {
-            observed_fault = 0;
-            std::signal(SIGALRM, [](int) { _exit(observed_fault ? 17 : 18); });
-            alarm(1);
+            observed_fault.store(false, std::memory_order_relaxed);
+            /* TSan defers SIGALRM while the terminal fault loop executes.
+             * A child-only watchdog preserves the nonreturn assertion. */
+            std::thread([] {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                _exit(observed_fault.load(std::memory_order_acquire) ? 17 : 18);
+            }).detach();
             StrictMock<FaultObserver> fault;
             observer = &fault;
             EXPECT_CALL(fault, observe(NX_FAULT_PLATFORM, NX_ERROR_STATE))
                 .WillOnce([](nx_fault_domain_t, nx_result_t) {
-                    observed_fault = nx_arch_irq_is_masked() ? 1 : 0;
+                    observed_fault.store(nx_arch_irq_is_masked(),
+                                         std::memory_order_release);
                 });
             g_u575_rtc_model.rtc.PRER = 0U;
             (void)clock.read(clock.context);
@@ -377,4 +385,128 @@ TEST_F(U575RetainedTime, ApbDividerDriftTaintsBeforeReadingCalendar) {
     g_u575_rtc_model.rcc.CFGR2 = 0U;
     EXPECT_EQ(NX_ERROR_STATE,
               nx_stm32u575_retained_time_sample(&storage, &out));
+}
+
+TEST_F(U575RetainedTime, AlarmCopyOptInRequiresBoundOwnerAndColdRegisters) {
+    auto before = storage;
+    g_u575_rtc_model.rtc.ALRMAR = 0U;
+    g_u575_rtc_model.rtc.ALRMASSR = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                  &storage, &config, &clock));
+    config.wake_owner = &config;
+    g_u575_rtc_model.rtc.ALRMAR = RTC_ALRMAR_MSK1;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                                 &storage, &config, &clock));
+    g_u575_rtc_model.rtc.ALRMAR = 0U;
+    g_u575_rtc_model.rtc.ALRMASSR = 1U;
+    EXPECT_EQ(NX_ERROR_BUSY, nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                                 &storage, &config, &clock));
+    EXPECT_EQ(0, std::memcmp(&storage, &before, sizeof(storage)));
+    EXPECT_EQ(nullptr, clock.read);
+    EXPECT_EQ(0U, g_u575_rtc_model.writes);
+}
+TEST_F(U575RetainedTime, AlarmCopyAllowsOnlyFixedCompareAndTheSameWakeOwner) {
+    config.wake_owner = &config;
+    g_u575_rtc_model.rtc.ALRMAR = 0U;
+    g_u575_rtc_model.rtc.ALRMASSR = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                              &storage, &config, &clock));
+    auto first = sample();
+    g_u575_rtc_model.rtc.ALRMAR =
+        RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK4;
+    g_u575_rtc_model.rtc.CR |= RTC_CR_ALRAE | RTC_CR_WUTE | RTC_CR_WUTIE;
+    g_u575_rtc_model.rtc.SR |= RTC_SR_ALRAF | RTC_SR_WUTF;
+    g_u575_rtc_model.irq_enabled = true;
+    g_u575_rtc_model.irq_pending = true;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_retained_time_validate_alarm_a_copy(
+                              &storage, &config, first.generation));
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_retained_time_validate_alarm_a_copy(
+                                  &storage, &clock, first.generation));
+    EXPECT_EQ(first.generation, sample().generation);
+    EXPECT_EQ(0U, g_u575_rtc_model.writes);
+}
+TEST_F(U575RetainedTime, OrdinaryWutClockCannotAuthorizeOrUpgradeAlarmCopy) {
+    config.wake_owner = &config;
+    open();
+    auto first = sample();
+    auto before = storage;
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_retained_time_validate_alarm_a_copy(
+                                  &storage, &config, first.generation));
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                  &storage, &config, &clock));
+    EXPECT_EQ(0, std::memcmp(&storage, &before, sizeof(storage)));
+    EXPECT_EQ(NX_SUCCESS, nx_stm32u575_retained_time_validate_wake(
+                              &storage, &config, first.generation));
+}
+TEST_F(U575RetainedTime, AlarmCopyProfileDriftPermanentlyTaintsTheEpoch) {
+    for (unsigned variant = 0U; variant < 4U; ++variant) {
+        SCOPED_TRACE(variant);
+        nx_u575_rtc_model_reset();
+        nx_stm32u575_retained_time_storage_t local{};
+        nx_clock_t face{};
+        config.wake_owner = &config;
+        g_u575_rtc_model.rtc.ALRMAR = 0U;
+        g_u575_rtc_model.rtc.ALRMASSR = 0U;
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                      &local, &config, &face));
+        g_u575_rtc_model.rtc.ALRMAR = RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 |
+                                      RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK4;
+        g_u575_rtc_model.rtc.CR |= RTC_CR_ALRAE;
+        if (variant == 0U)
+            g_u575_rtc_model.rtc.CR |= RTC_CR_ALRAIE;
+        else if (variant == 1U)
+            g_u575_rtc_model.rtc.CR |= RTC_CR_ALRAFCLR;
+        else if (variant == 2U)
+            g_u575_rtc_model.rtc.ALRMAR &=
+                ~static_cast<uint32_t>(RTC_ALRMAR_MSK1);
+        else
+            g_u575_rtc_model.rtc.ALRMASSR = 1U;
+        nx_stm32u575_retained_time_snapshot_t out{};
+        out.now = 77U;
+        EXPECT_EQ(NX_ERROR_STATE,
+                  nx_stm32u575_retained_time_sample(&local, &out));
+        EXPECT_EQ(77U, out.now);
+        g_u575_rtc_model.rtc.CR = RTC_CR_BYPSHAD;
+        g_u575_rtc_model.rtc.ALRMAR = 0U;
+        g_u575_rtc_model.rtc.ALRMASSR = 0U;
+        EXPECT_EQ(NX_ERROR_STATE,
+                  nx_stm32u575_retained_time_sample(&local, &out));
+        ASSERT_EQ(NX_SUCCESS, nx_stm32u575_retained_time_stop(&local));
+    }
+}
+TEST_F(U575RetainedTime, LegacyReopenDropsAlarmCopyPermissionAndOldGeneration) {
+    config.wake_owner = &config;
+    g_u575_rtc_model.rtc.ALRMAR = 0U;
+    g_u575_rtc_model.rtc.ALRMASSR = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                              &storage, &config, &clock));
+    auto first = sample();
+    ASSERT_EQ(NX_SUCCESS, nx_stm32u575_retained_time_stop(&storage));
+    open();
+    auto next = sample();
+    EXPECT_GT(next.generation, first.generation);
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_retained_time_validate_alarm_a_copy(
+                                  &storage, &config, next.generation));
+    EXPECT_EQ(NX_ERROR_STATE, nx_stm32u575_retained_time_validate_alarm_a_copy(
+                                  &storage, &config, first.generation));
+    EXPECT_EQ(next.generation, sample().generation);
+}
+TEST_F(U575RetainedTime, AlarmCopyAdmissionRejectsAliasAndUnsafeAccessFirst) {
+    config.wake_owner = &config;
+    g_u575_rtc_model.rtc.ALRMAR = 0U;
+    g_u575_rtc_model.rtc.ALRMASSR = 0U;
+    EXPECT_EQ(NX_ERROR_INVALID,
+              nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                  reinterpret_cast<nx_stm32u575_retained_time_storage_t*>(
+                      &g_u575_rtc_model.rtc),
+                  &config, &clock));
+    g_u575_rtc_model.rcc.APB3ENR = 0U;
+    EXPECT_EQ(NX_ERROR_STATE,
+              nx_stm32u575_retained_time_initialize_alarm_a_copy(
+                  &storage, &config, &clock));
+    EXPECT_EQ(0U, g_u575_rtc_model.rtc_reads);
+    EXPECT_EQ(0U, g_u575_rtc_model.writes);
 }

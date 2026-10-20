@@ -30,10 +30,11 @@ static inline bool nx_stm32u575_rtc_bcd(uint32_t value, uint8_t* out) {
 static inline bool nx_stm32u575_rtc_access(RCC_TypeDef* r) {
     uint32_t selection = NX_U575_READ(&r->ICSCR1);
     uint32_t range =
-        (selection & RCC_ICSCR1_MSIRGSEL) == 0U
-            ? (NX_U575_READ(&r->CSR) & RCC_CSR_MSISSRANGE) >>
-                  RCC_CSR_MSISSRANGE_Pos
-            : (selection & RCC_ICSCR1_MSISRANGE) >> RCC_ICSCR1_MSISRANGE_Pos;
+        (uint32_t)((selection & RCC_ICSCR1_MSIRGSEL) == 0U
+                       ? (NX_U575_READ(&r->CSR) & RCC_CSR_MSISSRANGE) >>
+                             RCC_CSR_MSISSRANGE_Pos
+                       : (selection & RCC_ICSCR1_MSISRANGE) >>
+                             RCC_ICSCR1_MSISRANGE_Pos);
     uint32_t cr = NX_U575_READ(&r->CR);
     uint32_t allowed =
         RCC_CR_MSISON | RCC_CR_MSISRDY | RCC_CR_MSIKON | RCC_CR_MSIKRDY;

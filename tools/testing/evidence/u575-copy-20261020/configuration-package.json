@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "portable_evidence",
+  "archive": {
+    "path": "/tmp/nexus-quality-20261019/tools/testing/evidence/u575-copy-20261020/raw/5d36f67fbca161417976871ea3c241ccd6142dcde27c02ece9656f39e6651b40.tar.gz",
+    "sha256": "5d36f67fbca161417976871ea3c241ccd6142dcde27c02ece9656f39e6651b40",
+    "size": 19730
+  },
+  "manifest_sha256": "9ec7bc8263d7b2a20ba554123fe93b68fba62302fb0655b16872e48fc2e0f749",
+  "files": 44,
+  "bytes": 90807,
+  "signature_status": "unsigned",
+  "product_promotion": false
+}

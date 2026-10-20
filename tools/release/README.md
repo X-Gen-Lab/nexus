@@ -33,14 +33,14 @@ signature does not establish a different SDK source commit by itself.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-has 46 independent consumer roots and 49 executable images: three C/C++ base
-roots, ten MCU/backend roots and thirty-three selected-feature roots. Four images
-execute as Native programs; 45 MCU images are linked software evidence. The
-41 generic retention checks cover ten MCU/backend and thirty-one selected-feature
+has 47 independent consumer roots and 50 executable images: three C/C++ base
+roots, ten MCU/backend roots and thirty-four selected-feature roots. Four images
+execute as Native programs; 46 MCU images are linked software evidence. The
+42 generic retention checks cover ten MCU/backend and thirty-two selected-feature
 images; base image resource checks are a separate scope. These counts describe
 the required plan, not an execution result or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v6`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v7`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -59,7 +59,7 @@ actual source, job and builder identities retain that separate responsibility.
 
 Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
 source, bytes and hash-pinned helper. The current policy does not accept it as
-a fallback or rewrite it as the 46-root/49-image selection. Earlier policy-v3
+a fallback or rewrite it as the 47-root/50-image selection. Earlier policy-v3
 34-root/37-image and 36-root/39-image plans also retain their exact historical
 source identities; neither is the current plan or a fallback. Historical policy-v4
 has 28 selected features, 41 roots and 44 images: H743 SPI DMA Cache on, U575 finite
@@ -73,8 +73,15 @@ U575 baremetal empty assembly: retained time links `Nexus::U575RetainedTime`,
 and the bounded Stop2 owner links `Nexus::U575Stop2`. Their public C11 sources
 remain separate from the mutually exclusive RTC RUN factory. These are required
 software link checks; they do not execute Stop2 or establish physical wake timing.
-The explicit exact plan, rather than an old count
-or the policy label alone, determines current admission.
+That historical policy-v6 selection has 46 roots and 49 images.
+
+Policy-v7 adds the optional finite U575 SRAM4 copy consumer through
+`tools/configure/assemblies/u575-lpdma-copy-stop2.toml` and the public C11
+`u575-lpdma-copy` smoke, which links `Nexus::U575Stop2Copy`. It uses the same
+Stop2 owner for the bounded copy. This required link check does not record an
+executed full installed consumer matrix or a physical copy result. The explicit
+exact plan, rather than an old count or the policy label alone, determines
+current admission.
 
 Historical schema-1 thirteen-root archives keep their original bytes, source and
 hash-pinned helper for read-only recovery. Current packing and verification do

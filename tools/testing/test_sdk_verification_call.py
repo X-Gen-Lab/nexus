@@ -211,13 +211,15 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("h743 uart duplex continuous cache on", "h743-uart-duplex-continuous-cache-on", "h743-uart-duplex-continuous"),
         ("u575 retained time", "nucleo-u575-baremetal-empty", "u575-retained-time"),
         ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2"),
+        ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
         "u575-uart-chain", "h743-spi-dma-uart-tx", "h743-spi-dma-uart-rx",
         "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
-        "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty"})
+        "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty",
+        "u575-lpdma-copy-stop2"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -261,7 +263,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
                         verification / "consumers/pin-states.c")
         for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
-                     "u575-stop2", "h743-uart-continuous",
+                     "u575-stop2", "u575-lpdma-copy", "h743-uart-continuous",
                      "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
             shutil.copyfile(ROOT / relative, self.sdk / relative)
@@ -576,11 +578,14 @@ class SDKConsumerParallelTests(unittest.TestCase):
                             for _, path, _ in self.consumer.SELECTED_CONSUMERS))
 
     def test_retained_and_stop2_smokes_link_explicit_public_components(self):
-        assembly = "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml"
-        for label, smoke, library in (
-                ("u575 retained time", "u575-retained-time",
-                 "Nexus::U575RetainedTime"),
-                ("u575 stop2", "u575-stop2", "Nexus::U575Stop2")):
+        for label, stem, smoke, library in (
+                ("u575 retained time", "nucleo-u575-baremetal-empty",
+                 "u575-retained-time", "Nexus::U575RetainedTime"),
+                ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2",
+                 "Nexus::U575Stop2"),
+                ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy",
+                 "Nexus::U575Stop2Copy")):
+            assembly = "tools/configure/assemblies/" + stem + ".toml"
             with self.subTest(smoke=smoke):
                 directory = self.directory / smoke
                 directory.mkdir()
@@ -681,7 +686,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on",
-                      "u575 retained time", "u575 stop2"):
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy"):
             for operation, exit_code in (("build", 51), ("retention", 52)):
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
@@ -766,6 +771,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.stem == "u575-lpdma-copy-stop2":
+                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.name == "g474-pin-states.toml":
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/pin-states.c"
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
@@ -796,6 +805,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "pin_state_impl.h", "stm32u575_lptim.h", "stm32u575_rtc.h",
                          "retained_time.h", "stm32u575_rtc_calendar.h",
                          "stm32u575_stop2_hw.h",
+                         "stm32u575_lpdma_copy_hw.h",
+                         "stm32u575_lpdma_copy_internal.h",
                          "stm32u575_uart_gpdma_chain.h",
                          "stm32u575_uart_gpdma_impl.h",
                          "stm32h743_uart_continuous.h",

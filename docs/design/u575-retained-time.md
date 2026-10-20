@@ -15,14 +15,16 @@ provide LPBAM or prove physical Stop2 continuity. The original
 exits remain open; physical HIL is `not_executed`.
 
 (fig-24-u575-retained-stop2)=
-![FIG-24: current explicit retained-clock and Stop2 ownership, wake effects and failure retention; dashed autonomous and physical exits remain open](../assets/diagrams/u575-retained-stop2.svg)
+![FIG-24: current WUT-only retained-clock and Stop2 ownership, wake effects and failure retention; autonomous copy is outside this figure and physical exits remain open](../assets/diagrams/u575-retained-stop2.svg)
 
-FIG-24 separates the independent RTC domain from the drained RUN domain. Solid
-arrows name current calls, admission or cleanup transitions; dashed arrows name
-external source premises and open exits. Hardware drain does not repair a
-tainted clock. The separately selected Stop2 owner supplies WUT and restoration;
-the read-only clock component alone supplies neither. No arrow establishes
-physical residency, automatic enrollment or LPDMA support.
+FIG-24 describes the WUT-only reference, separate from the explicitly selected
+[finite SRAM4 copy](u575-stop2-copy.md) in FIG-27. It separates the independent
+RTC domain from the drained RUN domain. Solid arrows name current calls,
+admission or cleanup transitions; dashed arrows name external source premises
+and exits outside this WUT-only scope. Hardware drain does not repair a tainted
+clock. The separately selected Stop2 owner supplies WUT and restoration; the
+read-only clock component alone supplies neither. No arrow establishes physical
+residency or automatic enrollment.
 
 ## Select one RTC owner
 
@@ -193,8 +195,8 @@ it never executes WFI and checks the access profile before RTC operations.
 Hardware isolation can finish while the clock remains tainted. After real drain
 and all clock-user joins, clock stop/reopen may establish a new generation;
 old deadlines stay invalid. Reopen RUN admission and restart Platform only after
-no effects remain, creating a fresh Core TIM2 epoch. This selected software
-reference does not provide RTOS Tick compensation, LPDMA/LPBAM, Standby, VBAT
+no effects remain, creating a fresh Core TIM2 epoch. This WUT-only
+sequence does not provide RTOS Tick compensation, LPDMA/LPBAM, Standby, VBAT
 continuity or physical retention/power/latency qualification.
 
 ## Source basis and verification limits

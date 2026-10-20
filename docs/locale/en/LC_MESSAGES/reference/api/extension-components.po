@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 9e69d997f48facd01bc2cfeaef3125c7c08aac039721bc02505f06b68abfa899\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 781bdc5b95aeb5cc4556e4c49ff5f754d0081f68dfeeacf158d023f5155c6c0e\nX-Nexus-Reviewed: true\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "Extension and lifecycle APIs"
@@ -760,8 +760,6 @@ msgstr "Pure lookup; all platform/product RUN owners enroll explicitly."
 msgid "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
 msgstr "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
 
-msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
-msgstr "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
 
 msgid "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
 msgstr "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
@@ -1014,3 +1012,199 @@ msgstr "All port/clock callbacks are non-reentrant: no core calls, application c
 
 msgid "Exact caller capacities; separate static controller and target data."
 msgstr "Exact caller capacities; separate static controller and target data."
+
+msgid "Open the fixed AlarmA-copy delegate for the same concrete Stop2 owner."
+msgstr "Open the fixed AlarmA-copy delegate for the same concrete Stop2 owner."
+
+msgid "All ordinary initialization preconditions remain required. Unlike the WUT-only initializer, this explicitly delegates fixed AlarmA compare registers, ALRAE and ALRAF/CALRAF to the same serialized wake owner. ALRAIE and automatic flag clearing stay forbidden. The fixed profile masks all calendar fields and compares no subseconds, producing its first event on a seconds increment. Both alarm registers start zero. The delegate preserves the calendar/source and owns complete producer withdrawal before any compound copy settlement. No AlarmA factory, arbitrary alarm scheduler or second RTC writer is admitted."
+msgstr "All ordinary initialization preconditions remain required. Unlike the WUT-only initializer, this explicitly delegates fixed AlarmA compare registers, ALRAE and ALRAF/CALRAF to the same serialized wake owner. ALRAIE and automatic flag clearing stay forbidden. The fixed profile masks all calendar fields and compares no subseconds, producing its first event on a seconds increment. Both alarm registers start zero. The delegate preserves the calendar/source and owns complete producer withdrawal before any compound copy settlement. No AlarmA factory, arbitrary alarm scheduler or second RTC writer is admitted."
+
+msgid "[inout] Same fresh or fully stopped and joined storage."
+msgstr "[inout] Same fresh or fully stopped and joined storage."
+
+msgid "[in] Same immutable configuration with non-NULL wake_owner."
+msgstr "[in] Same immutable configuration with non-NULL wake_owner."
+
+msgid "[out] Separate writable face, unchanged on every rejection."
+msgstr "[out] Separate writable face, unchanged on every rejection."
+
+msgid "Same initialization results; no hardware writes occur."
+msgstr "Same initialization results; no hardware writes occur."
+
+msgid "Validate the exact opt-in AlarmA-copy owner and live clock generation."
+msgstr "Validate the exact opt-in AlarmA-copy owner and live clock generation."
+
+msgid "Same Thread/PRIMASK boundary as validate_wake. An ordinary WUT-only clock cannot authorize AlarmA. Wrong identity/generation/mode rejects without taint; observed source or fixed-profile drift taints the epoch."
+msgstr "Same Thread/PRIMASK boundary as validate_wake. An ordinary WUT-only clock cannot authorize AlarmA. Wrong identity/generation/mode rejects without taint; observed source or fixed-profile drift taints the epoch."
+
+msgid "[inout] Same live serialized clock owner."
+msgstr "[inout] Same live serialized clock owner."
+
+msgid "[in] Exact stable identity from opt-in initialization."
+msgstr "[in] Exact stable identity from opt-in initialization."
+
+msgid "[in] Nonzero generation obtained from a successful sample."
+msgstr "[in] Nonzero generation obtained from a successful sample."
+
+msgid "SUCCESS, INVALID, STATE or CONTEXT; no hardware writes occur."
+msgstr "SUCCESS, INVALID, STATE or CONTEXT; no hardware writes occur."
+
+msgid "stm32u575_lpdma_copy.h"
+msgstr "stm32u575_lpdma_copy.h"
+
+msgid "Exact U575 SRAM4 finite autonomous copy receiver."
+msgstr "Exact U575 SRAM4 finite autonomous copy receiver."
+
+msgid "Construct one serialized privileged Thread owner without MMIO writes."
+msgstr "Construct one serialized privileged Thread owner without MMIO writes."
+
+msgid "Exact STM32U575ZIT6Q TZEN0/MSIS4/MSIK4/equal buses/Range4 and selected SRAM4 only. LPDMA1EN/SRAM4EN and power/retention belong to selected startup; every channel and vector must initially be quiet. The run-gate owner keeps both gates and exclusive hardware configuration stable through stop and joins; no other LPDMA channel may start. This component owns only fixed sleep/autonomous bits and preserves unrelated RTC bits. SRAM4EN and power/retention preconditions belong to startup and the combined sleep owner. This component never repairs lost RAM by changing SRAM4PD/PDS and never disables the caller's SRAM4EN."
+msgstr "Exact STM32U575ZIT6Q TZEN0/MSIS4/MSIK4/equal buses/Range4 and selected SRAM4 only. LPDMA1EN/SRAM4EN and power/retention belong to selected startup; every channel and vector must initially be quiet. The run-gate owner keeps both gates and exclusive hardware configuration stable through stop and joins; no other LPDMA channel may start. This component owns only fixed sleep/autonomous bits and preserves unrelated RTC bits. SRAM4EN and power/retention preconditions belong to startup and the combined sleep owner. This component never repairs lost RAM by changing SRAM4PD/PDS and never disables the caller's SRAM4EN."
+
+msgid "[inout] Fresh zero or clean stopped and externally joined."
+msgstr "[inout] Fresh zero or clean stopped and externally joined."
+
+msgid "[in] Separate immutable clock/owner binding."
+msgstr "[in] Separate immutable clock/owner binding."
+
+msgid "[out] Separate writable immutable face, unchanged on failure."
+msgstr "[out] Separate writable immutable face, unchanged on failure."
+
+msgid "Prepare copied metadata in an unborrowed request, without MMIO."
+msgstr "Prepare copied metadata in an unborrowed request, without MMIO."
+
+msgid "Rejecting a span, alias, wrap or state leaves every request byte unchanged. Preparation does not borrow or write any buffer/workspace. Old Core TIM2 deadlines are never translated into this domain."
+msgstr "Rejecting a span, alias, wrap or state leaves every request byte unchanged. Preparation does not borrow or write any buffer/workspace. Old Core TIM2 deadlines are never translated into this domain."
+
+msgid "[inout] Initialized READY or consumed SETTLED, fully joined."
+msgstr "[inout] Initialized READY or consumed SETTLED, fully joined."
+
+msgid "[in] Separate successful retained clock sample."
+msgstr "[in] Separate successful retained clock sample."
+
+msgid "[in] Borrowed immutable bytes wholly inside nonsecure SRAM4."
+msgstr "[in] Borrowed immutable bytes wholly inside nonsecure SRAM4."
+
+msgid "[out] Separate borrowed writable SRAM4 span."
+msgstr "[out] Separate borrowed writable SRAM4 span."
+
+msgid "[in] At least two bytes; both full extents must fit SRAM4."
+msgstr "[in] At least two bytes; both full extents must fit SRAM4."
+
+msgid "[inout] Separate aligned 24-byte SRAM4 LLI workspace."
+msgstr "[inout] Separate aligned 24-byte SRAM4 LLI workspace."
+
+msgid "[in] Absolute microseconds in that domain, or NEVER."
+msgstr "[in] Absolute microseconds in that domain, or NEVER."
+
+msgid "Latch cancellation of the exact active identity without release."
+msgstr "Latch cancellation of the exact active identity without release."
+
+msgid "Late cancellation after observed channel completion rejects STATE. Cancellation before unobserved completion fixes the first failure. DMA drain alone cannot release an AlarmA/WUT/clock restoration loan."
+msgstr "Late cancellation after observed channel completion rejects STATE. Cancellation before unobserved completion fixes the first failure. DMA drain alone cannot release an AlarmA/WUT/clock restoration loan."
+
+msgid "[in] Immutable face of the initialized physical receiver."
+msgstr "[in] Immutable face of the initialized physical receiver."
+
+msgid "[inout] Exact active request, retained through SETTLED."
+msgstr "[inout] Exact active request, retained through SETTLED."
+
+msgid "Observe and perform bounded DMA withdrawal; never publish SETTLED."
+msgstr "Observe and perform bounded DMA withdrawal; never publish SETTLED."
+
+msgid "Positive finite per-phase observation budget, not a time estimate. BUSY retains request, both buffers and workspace, even after DMA idle. Only the concrete Stop2 owner can release after the entire RTC/IRQ/ DMA/clock/gate chain is restored. Unknown profile performs no DMA MMIO. An externally asserted LPDMA reset observed while borrowed leaves an uncertain loan permanently quarantined; reset-default IDLE cannot prove earlier master accesses joined. No software force release exists. Preserve incoming masks; while borrowed the concrete Stop2 boundary requires PRIMASK1, BASEPRI/FAULTMASK0 until complete recovery."
+msgstr "Positive finite per-phase observation budget, not a time estimate. BUSY retains request, both buffers and workspace, even after DMA idle. Only the concrete Stop2 owner can release after the entire RTC/IRQ/ DMA/clock/gate chain is restored. Unknown profile performs no DMA MMIO. An externally asserted LPDMA reset observed while borrowed leaves an uncertain loan permanently quarantined; reset-default IDLE cannot prove earlier master accesses joined. No software force release exists. Preserve incoming masks; while borrowed the concrete Stop2 boundary requires PRIMASK1, BASEPRI/FAULTMASK0 until complete recovery."
+
+msgid "[in] Positive observation budget for each drain phase."
+msgstr "[in] Positive observation budget for each drain phase."
+
+msgid "Close admission, retaining all live loans until compound recovery."
+msgstr "Close admission, retaining all live loans until compound recovery."
+
+msgid "Keep every related object alive and RUN admission closed on BUSY. Repeated clean stop is safe after external publishers have joined. No Stop2 residency, LPBAM peripheral, physical copy or HIL result is implied by the public type or successful software execution."
+msgstr "Keep every related object alive and RUN admission closed on BUSY. Repeated clean stop is safe after external publishers have joined. No Stop2 residency, LPBAM peripheral, physical copy or HIL result is implied by the public type or successful software execution."
+
+msgid "Exact physical implementation identity, not arbitrary callbacks."
+msgstr "Exact physical implementation identity, not arbitrary callbacks."
+
+msgid "Zero-initialized caller owner; never copy, reset or reconstruct live."
+msgstr "Zero-initialized caller owner; never copy, reset or reconstruct live."
+
+msgid "Keep this storage, every copied face and bound clock alive until stop succeeds and all external observers have joined. One exact ch0 owner exists; there is no allocation, queue, worker or factory lookup. One privileged Thread serializes every lifecycle/control operation. No ISR, concurrent producer or unjoined delayed cancellation command may use request pointers across prepare/reuse."
+msgstr "Keep this storage, every copied face and bound clock alive until stop succeeds and all external observers have joined. One exact ch0 owner exists; there is no allocation, queue, worker or factory lookup. One privileged Thread serializes every lifecycle/control operation. No ISR, concurrent producer or unjoined delayed cancellation command may use request pointers across prepare/reuse."
+
+msgid "One generated full next LLI; raw caller instructions are not used."
+msgstr "One generated full next LLI; raw caller instructions are not used."
+
+msgid "Entire 24-byte extent must be four-byte aligned in selected SRAM4. Provider overwrites all words only after admission. Keep it immutable and disjoint from both buffers and all request/control storage while borrowed. A NOINIT section never establishes descriptor construction."
+msgstr "Entire 24-byte extent must be four-byte aligned in selected SRAM4. Provider overwrites all words only after admission. Keep it immutable and disjoint from both buffers and all request/control storage while borrowed. A NOINIT section never establishes descriptor construction."
+
+msgid "Explicit same-owner clock binding; copied only on initialization."
+msgstr "Explicit same-owner clock binding; copied only on initialization."
+
+msgid "clock is the live opt-in AlarmA-copy retained clock. wake_owner is the stable concrete Stop2 owner identity. Identity equality is trusted assembly binding, never hardware authentication. No RTC writer exists in this component."
+msgstr "clock is the live opt-in AlarmA-copy retained clock. wake_owner is the stable concrete Stop2 owner identity. Identity equality is trusted assembly binding, never hardware authentication. No RTC writer exists in this component."
+
+msgid "One finite two-block copy in the independent retained time domain."
+msgstr "One finite two-block copy in the independent retained time domain."
+
+msgid "Initialize base before prepare. Prepared metadata is caller immutable from ACCEPTED until acquire-observed SETTLED and external joins. source/destination/whole workspace must be disjoint exact nonsecure SRAM4 spans, not CPU-visible SRAM1 or secure aliases. length is at least two bytes; byte-width incremented transfers preserve exact byte count."
+msgstr "Initialize base before prepare. Prepared metadata is caller immutable from ACCEPTED until acquire-observed SETTLED and external joins. source/destination/whole workspace must be disjoint exact nonsecure SRAM4 spans, not CPU-visible SRAM1 or secure aliases. length is at least two bytes; byte-width incremented transfers preserve exact byte count."
+
+msgid "Shared readonly methods; public service never releases the chain."
+msgstr "Shared readonly methods; public service never releases the chain."
+
+msgid "Immutable typed face; copied faces still name the exact live owner."
+msgstr "Immutable typed face; copied faces still name the exact live owner."
+
+msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/MSIK4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/MSIK4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+msgstr "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/MSIK4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/MSIK4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+
+msgid "stm32u575_stop2_copy.h"
+msgstr "stm32u575_stop2_copy.h"
+
+msgid "Exact same-owner U575 Stop2 finite SRAM4 copy boundary."
+msgstr "Exact same-owner U575 Stop2 finite SRAM4 copy boundary."
+
+msgid "Cross Stop2 with one finite AlarmA-triggered SRAM4 copy."
+msgstr "Cross Stop2 with one finite AlarmA-triggered SRAM4 copy."
+
+msgid "All masked-MSP-Thread and stopped/joined RUN preconditions of enter remain required. The clock uses the explicit AlarmA-copy initializer and this owner's wake identity. Selected startup provides nonsecure SRAM4 and prepared LPDMA1 access; unrelated channels and masters are quiet. The receiver validates the actual binding and registers. No caller callback or gate mask authorizes exceptions."
+msgstr "All masked-MSP-Thread and stopped/joined RUN preconditions of enter remain required. The clock uses the explicit AlarmA-copy initializer and this owner's wake identity. Selected startup provides nonsecure SRAM4 and prepared LPDMA1 access; unrelated channels and masters are quiet. The receiver validates the actual binding and registers. No caller callback or gate mask authorizes exceptions."
+
+msgid "All calendar mask bits are set; ALRMASSR=0, ALRAIE=0 and ALRAFCLR=0. The receiver is ready before ALRAE enables the next whole-second event on trigger14. ALRAF and DMA pending remain intact while the producer is enabled. WUT is an independent escape. The receiver owns its generated second LLI and LPDMA1 channel0 IRQ114 wake vector. wait_executed proves WFI, never physical residency."
+msgstr "All calendar mask bits are set; ALRMASSR=0, ALRAIE=0 and ALRAFCLR=0. The receiver is ready before ALRAE enables the next whole-second event on trigger14. ALRAF and DMA pending remain intact while the producer is enabled. WUT is an independent escape. The receiver owns its generated second LLI and LPDMA1 channel0 IRQ114 wake vector. wait_executed proves WFI, never physical residency."
+
+msgid "Rejection leaves the new request unborrowed. Once accepted, setup failure retains every copy reference until RTC/WUT producer, DMA master/reset, IRQ, gate and clock restoration are independently quiet. Keep both owners, clock, buffers, workspace and RUN barrier live and closed. Preserve PRIMASK=1 through retained recovery. recover retries the same compound chain without WFI. An observed external LPDMA reset permanently quarantines the chain: quiet reset values and deassertion cannot prove the prior master's final access. Only an externally established system reset ends that responsibility. A tainted clock may settle an error after hardware drain, never a successful fresh elapsed time. No old TIM2 deadline, RTOS compensation, peripheral LPBAM plan or physical copy result is established."
+msgstr "Rejection leaves the new request unborrowed. Once accepted, setup failure retains every copy reference until RTC/WUT producer, DMA master/reset, IRQ, gate and clock restoration are independently quiet. Keep both owners, clock, buffers, workspace and RUN barrier live and closed. Preserve PRIMASK=1 through retained recovery. recover retries the same compound chain without WFI. An observed external LPDMA reset permanently quarantines the chain: quiet reset values and deassertion cannot prove the prior master's final access. Only an externally established system reset ends that responsibility. A tainted clock may settle an error after hardware drain, never a successful fresh elapsed time. No old TIM2 deadline, RTOS compensation, peripheral LPBAM plan or physical copy result is established."
+
+msgid "Link only Nexus::U575Stop2Copy for this mode. It owns the same static RUN domain and WUT/recover symbols as Nexus::U575Stop2; linking both alternatives is rejected. WUT-only enter remains available, but rejects every retained copy loan. Keep PRIMASK=1 until complete recovery."
+msgstr "Link only Nexus::U575Stop2Copy for this mode. It owns the same static RUN domain and WUT/recover symbols as Nexus::U575Stop2; linking both alternatives is rejected. WUT-only enter remains available, but rejects every retained copy loan. Keep PRIMASK=1 until complete recovery."
+
+msgid "[in] Exact closed, drained RUN-domain barrier."
+msgstr "[in] Exact closed, drained RUN-domain barrier."
+
+msgid "[in] Immutable initialized LPDMA1/channel0 face."
+msgstr "[in] Immutable initialized LPDMA1/channel0 face."
+
+msgid "[inout] Prepared READY copy in the bound retained domain."
+msgstr "[inout] Prepared READY copy in the bound retained domain."
+
+msgid "[in] 4096..65536 RTC/16 ticks, nominal 2..32 s."
+msgstr "[in] 4096..65536 RTC/16 ticks, nominal 2..32 s."
+
+msgid "[in] Positive observation budget for each phase."
+msgstr "[in] Positive observation budget for each phase."
+
+msgid "Admission, transition, cleanup and retained effects."
+msgstr "Admission, transition, cleanup and retained effects."
+
+msgid "Separate copy admission and exact Stop2 transition observations."
+msgstr "Separate copy admission and exact Stop2 transition observations."
+
+msgid "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
+msgstr "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
+
+# Retained prior translation; replaced by the current public-header note.
+#~ msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+#~ msgstr "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."

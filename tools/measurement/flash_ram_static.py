@@ -15,6 +15,7 @@ from __future__ import annotations
 from bisect import bisect_left
 from dataclasses import dataclass
 import hashlib
+from itertools import product
 from pathlib import Path
 import re
 
@@ -616,14 +617,62 @@ def _constant_effect(address, encoded, op, values, literal):
     return tuple(after), accesses
 
 
+MAX_CONSTANT_ALTERNATIVES = 32
+UNKNOWN_CONSTANT = frozenset({None})
+
+
+def _constant_union(left, right):
+    result = left | right
+    _require(len(result) <= MAX_CONSTANT_ALTERNATIVES,
+             "constant alternative bound exceeded")
+    return result
+
+
+def _constant_alternatives(address, encoded, op, values, literal):
+    """Lift the byte-defined scalar effects over finite may-value sets.
+
+    Unknown remains an explicit alternative, so it cannot erase a known Flash
+    address at a join. Exhausting either bound rejects instead of widening away
+    an address. This still does not prove a pointer loaded from unknown memory.
+    """
+    inputs = tuple(sorted(set(op.reads)))
+    combinations = 1
+    for register in inputs:
+        combinations *= len(values[register])
+    _require(combinations <= 4096, "constant operand product bound exceeded")
+    # Prefer a known representative so an unlisted writeback that clears its
+    # base is distinguishable from an unchanged Unknown register.
+    representative = [next((x for x in choices if x is not None), None)
+                      for choices in values]
+    outputs = [set() for _ in values]
+    observed = set()
+    for alternatives in product(*(values[index] for index in inputs)):
+        incoming = representative[:]
+        for index, value in zip(inputs, alternatives):
+            incoming[index] = value
+        after, accesses = _constant_effect(address, encoded, op,
+                                           incoming, literal)
+        observed.update(accesses)
+        for index, value in enumerate(after):
+            if (index in inputs or index in op.writes or
+                    value != incoming[index]):
+                outputs[index].add(value)
+            else:
+                outputs[index].update(values[index])
+    result = tuple(frozenset(choices) for choices in outputs)
+    _require(all(len(choices) <= MAX_CONSTANT_ALTERNATIVES for choices in result),
+             "constant alternative bound exceeded")
+    return result, observed
+
+
 def _constant_memory(elf, functions, order, may_return):
-    """Finite constant lattice; differing incoming values join to Unknown.
+    """Bounded may-constant sets retain every incoming alternative at joins.
 
     Unknown pointer reads are retained explicitly. Passing this detector does
     not establish that all RAM data addresses or device effects are safe.
     """
     summaries, observed = {}, set()
-    unknown = (None,) * 16
+    unknown = (UNKNOWN_CONSTANT,) * 16
 
     def literal(address, size):
         matches = [row for row in elf.loads
@@ -635,7 +684,7 @@ def _constant_memory(elf, functions, order, may_return):
         return int.from_bytes(elf.data[offset:offset + size], "little")
 
     def join(left, right):
-        return tuple(a if a == b else None for a, b in zip(left, right))
+        return tuple(_constant_union(a, b) for a, b in zip(left, right))
 
     def walk(index, incoming, argument_stack=()):
         key = index, incoming, argument_stack
@@ -655,9 +704,11 @@ def _constant_memory(elf, functions, order, may_return):
                 old_values, old_depth, old_slots = state
                 _require(old_depth == depth, "constant flow SP mismatch")
                 values = join(values, old_values)
-                current = dict(slots)
-                slots = tuple((slot, value) for slot, value in old_slots
-                              if current.get(slot) == value)
+                current, previous = dict(slots), dict(old_slots)
+                slots = tuple((slot, _constant_union(
+                    current.get(slot, UNKNOWN_CONSTANT),
+                    previous.get(slot, UNKNOWN_CONSTANT)))
+                    for slot in sorted(current.keys() | previous.keys()))
                 if (values, depth, slots) == state:
                     continue
             states[address] = values, depth, slots
@@ -665,8 +716,8 @@ def _constant_memory(elf, functions, order, may_return):
             _require(steps < 40000, "constant CFG bound exceeded")
             instruction, op, conditional = code[address]
             encoded = bytes.fromhex(instruction["encoding"])
-            after, accesses = _constant_effect(address, encoded, op,
-                                               values, literal)
+            after, accesses = _constant_alternatives(
+                address, encoded, op, values, literal)
             observed.update(accesses)
             after = list(after)
             stack = dict(slots)
@@ -679,26 +730,26 @@ def _constant_memory(elf, functions, order, may_return):
                         del stack[slot]
                 if size == 4 and len(op.stack_values) == 1:
                     value = values[op.stack_values[0]]
-                    if value is not None:
-                        stack[-depth + offset] = value
+                    stack[-depth + offset] = value
             if op.stack_load:
                 offset, size, registers = op.stack_load
                 arguments = dict(argument_stack)
                 if (size, len(registers)) in ((4, 1), (8, 2)):
                     for n, register in enumerate(registers):
                         slot = -depth + offset + n * 4
-                        after[register] = stack.get(slot, arguments.get(slot))
+                        after[register] = stack.get(
+                            slot, arguments.get(slot, UNKNOWN_CONSTANT))
             if op.kind == "push":
                 for n, register in enumerate(op.registers):
                     slot = -new_depth + n * 4
                     for previous in tuple(stack):
                         if slot < previous + 4 and previous < slot + 4:
                             del stack[previous]
-                    if values[register] is not None:
-                        stack[slot] = values[register]
+                    stack[slot] = values[register]
             elif op.kind == "pop":
                 for n, register in enumerate(op.registers):
-                    after[register] = stack.get(-depth + n * 4)
+                    after[register] = stack.get(-depth + n * 4,
+                                                UNKNOWN_CONSTANT)
             stack = tuple(sorted((slot, value) for slot, value in stack.items()
                                  if slot >= -new_depth))
             after = tuple(after)
@@ -713,12 +764,12 @@ def _constant_memory(elf, functions, order, may_return):
                                  for slot, value in stack if slot >= -new_depth)
                     incoming = list(after)
                     if op.kind == "call":
-                        incoming[14] = None
+                        incoming[14] = UNKNOWN_CONSTANT
                     result = walk(child, tuple(incoming), args)
                     if may_return[child]:
                         if op.kind == "call":
                             result = list(result)
-                            result[14] = None
+                            result[14] = UNKNOWN_CONSTANT
                             next_nodes.append((following, tuple(result),
                                                new_depth, stack))
                         else:
@@ -738,13 +789,16 @@ def _constant_memory(elf, functions, order, may_return):
 
     for index in order:
         walk(index, unknown)
-    return {"status": "checked", "scope": "constant-address defect detector",
+    return {"status": "checked",
+            "scope": "finite-alternative constant-address defect detector",
             "read_sites": len({row[0] for row in observed}),
             "unresolved_read_sites": sorted({address for address, value, width
                                                in observed if value is None}),
             "all_data_operands": "not_proved",
             "device_protocol": "not_proved",
-            "limits": ["differing CFG constants join to Unknown",
+            "alternative_limit": MAX_CONSTANT_ALTERNATIVES,
+            "limits": ["finite constant alternatives and operand products "
+                       "fail closed",
                        "pointer-loaded and unresolved operands remain unproved",
                        "physical Flash range only; no alias/speculation proof"]}
 

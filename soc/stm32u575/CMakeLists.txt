@@ -90,9 +90,15 @@ else()
 endif()
 set(NEXUS_STARTUP_SOURCE
     "${u5_device}/Source/Templates/gcc/startup_stm32u575xx.s" PARENT_SCOPE)
-set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c" PARENT_SCOPE)
+set(u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c")
+set(u5_system_definitions STM32U575xx)
+if(NEXUS_MEMORY_SRAM4)
+    list(APPEND u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")
+    list(APPEND u5_system_definitions NEXUS_MEMORY_SRAM4=1)
+endif()
+set(NEXUS_SYSTEM_SOURCE ${u5_system_sources} PARENT_SCOPE)
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/private" PARENT_SCOPE)
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${u5_device}/Include" "${u5_cmsis}"
     PARENT_SCOPE)
-set(NEXUS_SYSTEM_COMPILE_DEFINITIONS STM32U575xx PARENT_SCOPE)
+set(NEXUS_SYSTEM_COMPILE_DEFINITIONS ${u5_system_definitions} PARENT_SCOPE)
