@@ -30,6 +30,24 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
+        required = {
+            "components/usb_control/CMakeLists.txt",
+            "components/usb_control/include/nexus/components/usb_control.h",
+            "components/usb_control/include/nexus/components/usb_descriptors.h",
+            "components/usb_control/src/usb_control.c",
+            "components/usb_control/src/usb_descriptors.c",
+            "io/include/nexus/io/usb_profile.h",
+            "io/src/usb_profile.c",
+            "tools/configure/usb_profiles.py",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(source_sdk.selected(name))
+
     def test_provider_canonical_smokes_are_not_omitted_from_sdk_selection(self):
         prefix = "cmake/package/verification/io_evolution/"
         smokes = {name for descriptor in source_sdk.provider_descriptors.families()

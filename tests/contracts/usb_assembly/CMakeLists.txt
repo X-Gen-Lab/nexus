@@ -8,6 +8,8 @@ set(NEXUS_BUILD_TESTS OFF CACHE BOOL "No host tests in ARM fixture")
 set(NEXUS_BUILD_WORKLOAD OFF CACHE BOOL "External explicit fixture main")
 add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus-sdk)
 nexus_add_firmware(usb_controller_fixture SOURCES controller_main.c)
+target_link_libraries(usb_controller_fixture PRIVATE
+    Nexus::USBControl Nexus::USBDescriptors)
 find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
 get_target_property(fixture_config Nexus::Platform NEXUS_CONFIG_DIR)
 add_custom_command(TARGET usb_controller_fixture POST_BUILD

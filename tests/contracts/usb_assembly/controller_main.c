@@ -6,8 +6,12 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/components/usb_control.h"
+#include "nexus/components/usb_descriptors.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
+static nx_usb_control_t s_nx_control;
+static nx_usb_control_request_t s_nx_reply;
 static nx_usb_request_t s_nx_request;
 static uint8_t s_nx_packet[8];
 static nx_usb_event_t s_nx_events[2];
@@ -20,8 +24,18 @@ int main(void) {
         nx_factory_usb_device(NX_USB_DEVICE_ID_FS);
     const nx_usb_endpoint_port_t* endpoint =
         nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN);
+    const nx_usb_device_profile_t* profile =
+        nx_factory_usb_profile(NX_USB_DEVICE_ID_FS);
+    if (nx_usb_profile_validate(profile) != NX_SUCCESS ||
+        nx_usb_control_initialize(&s_nx_control, profile) != NX_SUCCESS) {
+        return (int)NX_ERROR_INVALID;
+    }
+    /* Structural fixture bytes are external to the common adapter. */
+    const uint8_t descriptor[] = {4U, 3U, 9U, 4U};
+    const nx_usb_descriptor_view_t view = {descriptor, sizeof(descriptor)};
+    (void)nx_usb_descriptor_validate(profile, &view);
     size_t count = 0U;
-    nx_usb_device_state_t state;
+    nx_usb_device_state_t state = {0};
     nx_request_initialize(&s_nx_request.base);
     nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 1000U);
     (void)nx_usb_in_prepare(&s_nx_request, s_nx_packet, sizeof(s_nx_packet),
@@ -31,5 +45,16 @@ int main(void) {
     (void)nx_usb_device_service(device);
     (void)nx_usb_device_read_events(device, s_nx_events, 2U, &count);
     (void)nx_usb_device_state(device, &state);
-    return (int)nx_platform_stop();
+    nx_request_initialize(&s_nx_reply.base);
+    if (nx_usb_control_status_prepare(&s_nx_reply, state.epoch, deadline) ==
+            NX_SUCCESS &&
+        nx_usb_control_begin(&s_nx_control, &s_nx_reply) == NX_SUCCESS) {
+        (void)nx_usb_control_step(&s_nx_control);
+        (void)nx_usb_control_cancel(&s_nx_control, &s_nx_reply, state.epoch);
+        (void)nx_usb_control_step(&s_nx_control);
+    }
+    nx_result_t stopped = nx_platform_stop();
+    /* Global stop remains the explicit owner decision, never adapter policy. */
+    (void)nx_usb_control_step(&s_nx_control);
+    return (int)stopped;
 }

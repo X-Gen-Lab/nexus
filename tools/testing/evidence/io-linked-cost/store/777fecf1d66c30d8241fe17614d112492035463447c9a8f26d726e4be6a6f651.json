@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-linked-cost-packages-20261020/store/777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651.tar.gz",
+    "sha256": "777fecf1d66c30d8241fe17614d112492035463447c9a8f26d726e4be6a6f651",
+    "size": 787724
+  },
+  "bytes": 5056309,
+  "files": 567,
+  "kind": "portable_evidence",
+  "manifest_sha256": "553522e7dc36b9c151e8caa8e49393169961751a80f1e5ccb0a46dca23593706",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

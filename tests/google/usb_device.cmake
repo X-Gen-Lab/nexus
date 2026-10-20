@@ -34,3 +34,8 @@ foreach(usb_family stm32f407 gd32f470)
             "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
     endif()
 endforeach()
+
+nexus_google_test(nexus_usb_control_test SOURCES usb_control_test.cpp
+    LIBRARIES Nexus::USBControl Nexus::NativeModel Nexus::Arch)
+nexus_google_test(nexus_usb_descriptor_test SOURCES usb_descriptor_test.cpp
+    LIBRARIES Nexus::USBDescriptors)

@@ -6,9 +6,14 @@
  * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/io/usb_profile.h"
 #include "stm32f407_usb_device.h"
 #include "stm32f407xx.h"
 #include <stddef.h>
+_Static_assert(USB_OTG_FS_MAX_IN_ENDPOINTS == NX_USB_FS_ENDPOINT_NUMBERS &&
+                   USB_OTG_FS_MAX_OUT_ENDPOINTS == NX_USB_FS_ENDPOINT_NUMBERS &&
+                   USB_OTG_FS_TOTAL_FIFO_SIZE / 4U == NX_USB_FS_FIFO_WORDS,
+               "Selected public FS profile must match the locked SDK");
 _Static_assert(offsetof(USB_OTG_GlobalTypeDef, GAHBCFG) == 8U &&
                    offsetof(USB_OTG_GlobalTypeDef, GUSBCFG) == 12U &&
                    offsetof(USB_OTG_GlobalTypeDef, GRSTCTL) == 16U &&

@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b2b71c0640011d1c0f2c2b558cd63291870881a07d55686ecfeaf64fe5decdcc`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -103,7 +103,7 @@ source_language: zh_CN
 | `task` | Bounded IRQ and service execution observation |
 | `implementation_paths` | io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py |
 | `exit_condition` | Optional probes compile out; explicit service and IRQ budgets |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -151,7 +151,7 @@ source_language: zh_CN
 | `task` | Linked resource and runtime cost comparison |
 | `implementation_paths` | tools/measurement;tests/contracts/uart_rx_compact_assembly |
 | `exit_condition` | Fresh exact ELF comparison; no inferred physical timing or energy |
-| `implementation_status` | in_progress |
+| `implementation_status` | implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |

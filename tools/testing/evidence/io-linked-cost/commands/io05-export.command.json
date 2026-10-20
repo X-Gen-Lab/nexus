@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "command": [
+    "/tmp/nexus-quality-20261019/.venv/bin/python",
+    "-B",
+    "/tmp/nexus-quality-20261019/tools/evidence/store.py",
+    "export",
+    "--source",
+    "/tmp/nexus-io05-probe-cost-20261020",
+    "--store",
+    "/tmp/nexus-linked-cost-packages-20261020/store",
+    "--report",
+    "/tmp/nexus-linked-cost-packages-20261020/io05.package.json"
+  ],
+  "cwd": "/tmp/nexus-quality-20261019",
+  "stage": "linked-cost-io05-export",
+  "started_ns": 1792489385206481185,
+  "finished_ns": 1792489386323764971,
+  "duration_seconds": 1.117285558997537,
+  "timeout_seconds": 300.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/tmp/nexus-linked-cost-packages-20261020/commands/io05-export.attempts/1792489385206432181-237200706a0046d49f3da0d637a74351/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/tmp/nexus-linked-cost-packages-20261020/commands/io05-export.attempts/1792489385206432181-237200706a0046d49f3da0d637a74351/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/tmp/nexus-linked-cost-packages-20261020/commands/io05-export.attempts/1792489385206432181-237200706a0046d49f3da0d637a74351/receipt.json"
+}

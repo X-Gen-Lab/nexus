@@ -11,7 +11,7 @@ COMMON = (
     "providers/descriptor",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
     "selected_contracts",
-    "enhanced_endpoints", "uart_formats", "stream_profiles",
+    "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
 )
 PLATFORM = (
     "configure", "authored", "bindings", "emission", "can", "memory", "contracts",

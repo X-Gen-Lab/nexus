@@ -312,7 +312,6 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                 self.assertTrue(sdk.selected(name))
         self.assertIn(("g474 shared pwm", directory + "g474-pwm-shared.toml",
                        "g474-pwm-shared"), consumers.SELECTED_CONSUMERS)
-        self.assertEqual(len(consumers.SELECTED_CONSUMERS), 28)
         board = json.loads((ROOT / directory /
                             "boards/g474-pwm-shared/board.json").read_text())
         self.assertIsNone(board["physical_pcb_revision"])

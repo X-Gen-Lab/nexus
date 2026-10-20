@@ -79,6 +79,7 @@ nx_result_t nx_native_usb_initialize(nx_native_usb_device_t* model) {
 /** \brief Pop external RX status and then expose its FIFO words. */
 uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
     nx_native_usb_hardware_t* hw = (nx_native_usb_hardware_t*)base;
+    ++hw->mmio_reads;
     if (offset == 0x10U) {
         ++hw->reset_reads;
     }
@@ -110,6 +111,7 @@ uint32_t nx_native_usb_read(uintptr_t base, uint32_t offset) {
  * acknowledgements. */
 void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
     nx_native_usb_hardware_t* hw = (nx_native_usb_hardware_t*)base;
+    ++hw->mmio_writes;
     if (offset >= 0x1000U) {
         unsigned ep = offset / 0x1000U - 1U;
         if (ep < 4U && hw->tx_count[ep] < 16U) {

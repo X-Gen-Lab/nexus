@@ -4,7 +4,7 @@ try:
     from .ir import ConfigurationIR
     from . import io_traits, selected_contracts
     from . import enhanced_endpoints
-    from . import stream_profiles, uart_formats
+    from . import stream_profiles, uart_formats, usb_profiles
 except ImportError:
     from ir import ConfigurationIR
     import io_traits
@@ -12,6 +12,7 @@ except ImportError:
     import enhanced_endpoints
     import stream_profiles
     import uart_formats
+    import usb_profiles
 
 FACTORY_ABI_EPOCH = 1
 
@@ -135,6 +136,9 @@ def emit(result):
         endpoint_header, endpoint_source = enhanced_endpoints.emit_traits(result)
         header.extend(endpoint_header)
         source.extend(endpoint_source)
+        usb_header, usb_source = usb_profiles.emit(result)
+        header.extend(usb_header)
+        source.extend(usb_source)
     owner_header, owner_source = enhanced_endpoints.emit_owner_factory(result)
     header.extend(owner_header)
     source.extend(owner_source)

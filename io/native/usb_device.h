@@ -21,6 +21,9 @@ typedef struct {
     size_t rx_word;
     uint32_t consumers;
     uint32_t reset_reads;
+    /** \brief Native accessor calls; no MCU controller state is added. */
+    size_t mmio_reads;
+    size_t mmio_writes;
     void (*on_interrupt_enable)(void*);
     void* interrupt_context;
     void (*on_source_disable)(void*);

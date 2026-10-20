@@ -121,6 +121,22 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(usb__control_8h)=
+
+## usb_control.h
+
+```{doxygenfile} usb_control.h
+:project: nexus
+```
+
+(usb__descriptors_8h)=
+
+## usb_descriptors.h
+
+```{doxygenfile} usb_descriptors.h
+:project: nexus
+```
+
 (user__io__broker_8h)=
 
 ## user_io_broker.h

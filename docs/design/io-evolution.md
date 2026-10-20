@@ -346,6 +346,13 @@ create no sidecar and add no provider state or operations-table fields. The
 optional library is linked only when selected; linked ELF checks establish the
 actual default and selected cost.
 
+The exact F407 Qiming USART1 and GD470 Liangshan USART0 word references now
+have linked probe-off/on evidence. OFF retains none of the optional observer's
+sidecar, probe/counter helpers, probe getter or observed-service symbols; ON
+brackets exactly one original provider IRQ dispatch. Their original provider
+state sizes remain unchanged. The links also retain the explicit service
+wrapper; they are not runtime I/O captures.
+
 A readable counter pair is a raw modulo-2^32 difference, including probe cost
 and preemption. Multiple wraps, reset and clock-epoch continuity are unknown;
 `elapsed_known` is always false. The probe neither enables nor resets DWT.
@@ -370,8 +377,8 @@ endpoints, a live owner/epoch, admitted independent capture-clock facts and a
 CPU-frequency envelope covering that counter epoch and capture interval. This
 envelope must include actual oscillator tolerance, calibration and drift. A
 nominal rate or authored wrap limit cannot replace it. This does not change the separate
-SoC, OS or selected-mode raw protocols. IO-05 remains `in_progress` and physical
-execution remains `not_executed`.
+SoC, OS or selected-mode raw protocols. IO-05 is implemented within this selected
+software scope; physical execution remains `not_executed`.
 
 ## Prepare exact HIL protocols without promoting software facts
 
@@ -403,6 +410,43 @@ their selected provider state, buffers and code still cost space and must be
 measured in an actual linked image. Segment validation depends on descriptor
 count, and silicon-policy validation depends on rule count. Do not infer cycles,
 worst-case latency or zero memory growth from an interface diagram.
+
+The following static observations bind clean source
+`bacdc5b8a5d64baebb92517e770d0abac28421b8`, baremetal and `-Os`, with zero heap
+and a reserved 2048-byte MSP. The metadata reference selects Qiming
+STM32F407ZGT6, HSE8/PLL168, UART1 IRQ bytes at 115200 baud with a 32-byte RX ring.
+B enables traits but permits garbage collection; C uses the same compiled
+objects and explicitly retains the traits getter. A disables traits and also
+links to 8012 Flash bytes, but its different comparison profile is rejected by
+the strict A/B comparison; equal totals do not override that rejection.
+
+| Exact link treatment | Flash load / footprint bytes | Reserved SRAM bytes, including MSP |
+| --- | --- | --- |
+| F407 byte UART traits, B→C | 8012→8052 (+40) | 2256→2256 (+0) |
+| F407 word UART whole probe selection, OFF→ON | 7636→8356 (+720) | 2248→2288 (+40) |
+| GD470 word UART whole probe selection, OFF→ON | 9228→9952 (+724) | 2220→2260 (+40) |
+
+The metadata delta is one 24-byte readonly trait record and its 16-byte getter;
+it adds no reserved SRAM and leaves the ordinary UART producer objects
+unchanged. It does not establish whole-system runtime equivalence. The word
+references use 9N1, 115200 baud, 32-word RX and priority 5; F407 uses HSE8/PLL168,
+GD470 HXTAL25/PLL200. Their 40-byte SRAM delta is a 36-byte sidecar plus four
+bytes of alignment padding. Provider state remains 56/48 bytes, and face/ops
+stay readonly.
+
+Probe ON includes the sidecar/getter/snapshot fixture and an explicitly retained
+service wrapper. These are whole optional-selection costs; the actual comparison
+profiles differ, so they are neither a strict same-profile comparison nor an
+isolated pure-IRQ cost. No I/O traffic was run. IRQ/service duration, arrival
+latency, WCET, energy and physical HIL remain unmeasured or not executed.
+
+The original command receipts, raw logs, ELF/map artifacts, independent reviews
+and failed attempts are retained once under
+`tools/testing/evidence/io-linked-cost/`. Its `portable-index.json` identifies
+each unchanged package envelope, member manifest and compact archive. Use the
+existing evidence-store verify/restore commands with the indexed archive path;
+these records describe the pinned source above, not qualification of a later
+commit.
 
 | Evidence | What it establishes | What it does not establish |
 | --- | --- | --- |
