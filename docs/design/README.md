@@ -40,6 +40,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [浅睡眠 timebase](timebase-lowpower.md) | 显式 FreeRTOS selector、固定 clock/compare alarm、量化 phase、失败保留与物理边界 |
 | [U575 保留时钟与 Stop2](u575-retained-time.md) | TZEN0 独立 RTC 时间域、显式 WUT owner、RUN 屏障与失败保留排空；通用 LPBAM 和物理退出仍开放 |
 | [U575 SRAM4 复制与 Stop2](u575-stop2-copy.md) | 精确 LPDMA1ch0、两块有限字节复制、AlarmA14 与 WUT 逃逸；全部 RTC/DMA/IRQ/门控/时钟退出后结清，完整 LPBAM 和物理退出仍开放 |
+| [U575 LPTIM1 单组 LPBAM 与 Stop2](u575-lptim1-lpbam.md) | 精确 SRAM4→LPTIM1 CCR1/RCR/ARR、REQ13/BREQ1/DREQ0 与显式 start/stop；同一 owner 复合退出，无 pin route，原 IO-32/SOC-35 退出仍开放 |
 | [Classic CAN](classic-can.md) | 三邮箱、共享 filter domain、controller-local abort/recovery 与 Board 电气 handoff |
 | [USB FS device](usb-device.md) | PIO packet/endpoint 所有权、独立 48 MHz owner、control epoch 与完整停止 |
 | [Raw Ethernet / MDIO](ethernet.md) | caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置 |
@@ -103,6 +104,11 @@ SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、
 构建发布1；维护责任由Codex全部承担，无需实名人员。远程branch protection状态
 须通过GitHub独立核实，不能从本地角色文件推断。
+
+另有独立选定的 [LPTIM1 单组 LPBAM](u575-lptim1-lpbam.md)：一组 SRAM4
+CCR1/RCR=0/ARR 经 LPDMA1 channel0 更新专用 LPTIM1。它沿用同一 concrete
+Stop2 owner，公开 start/stop 保留部分启动失败的归还责任；通用 LPBAM、引脚路线与
+实板验收不由该软件切片建立，原 IO-32/SOC-35 退出条件不变。
 
 行为变更采用 RED → GREEN → REFACTOR；主机 GoogleTest/GoogleMock 测试真实生产
 provider、factory 与 owner，配置工具用 Python unittest。commit hook 和 CI 执行同一

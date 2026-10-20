@@ -212,6 +212,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("u575 retained time", "nucleo-u575-baremetal-empty", "u575-retained-time"),
         ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2"),
         ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy"),
+        ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2", "u575-lptim1-lpbam"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
@@ -219,7 +220,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
         "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty",
-        "u575-lpdma-copy-stop2"})
+        "u575-lpdma-copy-stop2", "u575-lptim1-lpbam-stop2"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -263,7 +264,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
         shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
                         verification / "consumers/pin-states.c")
         for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
-                     "u575-stop2", "u575-lpdma-copy", "h743-uart-continuous",
+                     "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam",
+                     "h743-uart-continuous",
                      "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
             shutil.copyfile(ROOT / relative, self.sdk / relative)
@@ -584,7 +586,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2",
                  "Nexus::U575Stop2"),
                 ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy",
-                 "Nexus::U575Stop2Copy")):
+                 "Nexus::U575Stop2Copy"),
+                ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2",
+                 "u575-lptim1-lpbam", "Nexus::U575Stop2Lptim1")):
             assembly = "tools/configure/assemblies/" + stem + ".toml"
             with self.subTest(smoke=smoke):
                 directory = self.directory / smoke
@@ -771,8 +775,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.stem == "u575-lpdma-copy-stop2":
-                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+            elif assembly.stem in {"u575-lpdma-copy-stop2",
+                                   "u575-lptim1-lpbam-stop2"}:
+                stem = ("u575-lpdma-copy" if assembly.stem ==
+                        "u575-lpdma-copy-stop2" else "u575-lptim1-lpbam")
+                canonical = (self.sdk /
+                    "cmake/package/verification/io_evolution/consumers" /
+                    (stem + ".c"))
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.name == "g474-pin-states.toml":
@@ -807,6 +816,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "stm32u575_stop2_hw.h",
                          "stm32u575_lpdma_copy_hw.h",
                          "stm32u575_lpdma_copy_internal.h",
+                         "stm32u575_lptim1_profile.h",
+                         "stm32u575_lpdma_lptim1_internal.h",
                          "stm32u575_uart_gpdma_chain.h",
                          "stm32u575_uart_gpdma_impl.h",
                          "stm32h743_uart_continuous.h",
@@ -904,7 +915,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
                          "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
                          "consumers/g474-pwm-shared.c", "consumers/u575-retained-time.c",
-                         "consumers/u575-stop2.c", "native-time-pair.toml",
+                         "consumers/u575-stop2.c",
+                         "consumers/u575-lptim1-lpbam.c", "native-time-pair.toml",
                          "native-time-empty.toml", "consumers/native-time-pair.c",
                          "consumers/native-time-empty.c"):
             with self.subTest(relative=relative):

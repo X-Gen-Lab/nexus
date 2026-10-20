@@ -54,3 +54,22 @@ proved, and the private stack bound is344B. Both recipe failures and their exact
 corrections remain visible; production sources were unchanged. This is one
 development consumer, not a complete clean-source matrix or physical IO-24 exit.
 The following ordinary complete-index hook must execute independently.
+
+## Completed ordinary source gate
+
+Commit `71bd3c32d459e18e034c15c54a6b00e372526513`, tree
+`840c81d0c3776032bc6bd364df4bef33849d3a21`, subsequently completed
+the unchanged ordinary pre-commit and commit-msg hooks: 6,182 Google cases in
+345 executables and 2,855 tool cases (1,331 testing, 922 configure, 485 CI,
+117 workflows), zero skips/failures/errors. `final-gate-package.json` and its
+verified `store/` archive retain the fresh raw results, exact command receipts,
+freeze and original bilingual report. Earlier preparation/pending statements
+above describe their original phase.
+
+The R2 site is the original dirty-parent development build with index tree
+840c, not a relabelled clean-commit publication. Its 124 pages and 27/54
+canonical/localized diagrams passed the maintained checks. Full generated
+R1/R2 site/workspace copies were independently archived, restored and compared
+before reclaiming only those four owned generated directories; package
+identities are in `final-gate-completion.json`. These results do not establish
+physical HIL, the full clean-source SDK matrix or product qualification.

@@ -1,0 +1,829 @@
+{
+  "commit": "71bd3c32d459e18e034c15c54a6b00e372526513",
+  "documentation_packages": [
+    {
+      "actual_independent_restore": {
+        "archive_sha256": "3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026",
+        "bytes": 74931740,
+        "destination": "/tmp/nexus-h743-final-gate-evidence-20261020/h743-independent-1x9yucck/restored",
+        "files": 2339,
+        "status": "verified"
+      },
+      "empty_files": 0,
+      "name": "r1_site",
+      "package": {
+        "archive": {
+          "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026.tar.gz",
+          "sha256": "3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026",
+          "size": 13291623
+        },
+        "bytes": 74931740,
+        "files": 2339,
+        "kind": "portable_evidence",
+        "manifest_sha256": "1f596bb3d4744b137f644b4ae87fc27231687fba549fe70f2235f0f77f702363",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "package_file": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026.json",
+        "sha256": "7faf99acc93af00c30149be3f4e060efedaa3b85f94b0b1e466b59e2c0f56f04",
+        "size": 509
+      },
+      "restored_inventory_exact": true,
+      "restored_root_mode_exact": true,
+      "source": "/dev/shm/nexus-h743-full-final-docs-20261020",
+      "source_bytes": 74931740,
+      "source_files": 2339,
+      "source_inventory": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/r1_site-source-inventory.json",
+        "sha256": "972b3337f3ef90c456db1b1074cc289c466ad62d88e12256e4b3679ddd4ea030",
+        "size": 475854
+      },
+      "source_inventory_before_equals_after": true,
+      "source_root_mode": 448,
+      "temporary_owned_restore_released_after_verification": true,
+      "verify": {
+        "archive_sha256": "3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026",
+        "bytes": 74931740,
+        "files": 2339,
+        "status": "verified"
+      }
+    },
+    {
+      "actual_independent_restore": {
+        "archive_sha256": "efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69",
+        "bytes": 94073085,
+        "destination": "/tmp/nexus-h743-final-gate-evidence-20261020/h743-independent-cqp_17xt/restored",
+        "files": 2502,
+        "status": "verified"
+      },
+      "empty_files": 3,
+      "name": "r1_workspace",
+      "package": {
+        "archive": {
+          "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69.tar.gz",
+          "sha256": "efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69",
+          "size": 13835124
+        },
+        "bytes": 94073085,
+        "files": 2502,
+        "kind": "portable_evidence",
+        "manifest_sha256": "93a7dddc56c6e02b5866a5432593b0aa64b9c4fe45f2c9b2b7331b650dd727ca",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "package_file": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69.json",
+        "sha256": "812fe459fa68fa0e724e71e5d474fce589fd59c2f4e9804a57e86d28d657956d",
+        "size": 509
+      },
+      "restored_inventory_exact": true,
+      "restored_root_mode_exact": true,
+      "source": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f",
+      "source_bytes": 94073085,
+      "source_files": 2502,
+      "source_inventory": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/r1_workspace-source-inventory.json",
+        "sha256": "481810a70d83bc1526f9d047705836da923d5f337fc8053da8d2c6004b470ea3",
+        "size": 518458
+      },
+      "source_inventory_before_equals_after": true,
+      "source_root_mode": 448,
+      "temporary_owned_restore_released_after_verification": true,
+      "verify": {
+        "archive_sha256": "efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69",
+        "bytes": 94073085,
+        "files": 2502,
+        "status": "verified"
+      }
+    },
+    {
+      "actual_independent_restore": {
+        "archive_sha256": "e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139",
+        "bytes": 74931740,
+        "destination": "/tmp/nexus-h743-final-gate-evidence-20261020/h743-independent-gd9ohxr8/restored",
+        "files": 2339,
+        "status": "verified"
+      },
+      "empty_files": 0,
+      "name": "r2_site",
+      "package": {
+        "archive": {
+          "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139.tar.gz",
+          "sha256": "e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139",
+          "size": 13291592
+        },
+        "bytes": 74931740,
+        "files": 2339,
+        "kind": "portable_evidence",
+        "manifest_sha256": "ad612ad711ab4d83992a0b98a7812a2e8ae2a18868ab21c1f2a6e9eb664023bf",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "package_file": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139.json",
+        "sha256": "722c7c28f21ce6b5e682ff273bf1a3d8920ac351e6c3589be690a7b7d4a3b69e",
+        "size": 509
+      },
+      "restored_inventory_exact": true,
+      "restored_root_mode_exact": true,
+      "source": "/dev/shm/nexus-h743-full-final-docs-r2-20261020",
+      "source_bytes": 74931740,
+      "source_files": 2339,
+      "source_inventory": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/r2_site-source-inventory.json",
+        "sha256": "01cfe4577210b6259d48ecebae4fc4bd4dd42fc4968f1d06f7074190116d2925",
+        "size": 475854
+      },
+      "source_inventory_before_equals_after": true,
+      "source_root_mode": 448,
+      "temporary_owned_restore_released_after_verification": true,
+      "verify": {
+        "archive_sha256": "e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139",
+        "bytes": 74931740,
+        "files": 2339,
+        "status": "verified"
+      }
+    },
+    {
+      "actual_independent_restore": {
+        "archive_sha256": "5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17",
+        "bytes": 94073105,
+        "destination": "/tmp/nexus-h743-final-gate-evidence-20261020/h743-independent-0ky28tkh/restored",
+        "files": 2502,
+        "status": "verified"
+      },
+      "empty_files": 3,
+      "name": "r2_workspace",
+      "package": {
+        "archive": {
+          "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17.tar.gz",
+          "sha256": "5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17",
+          "size": 13834023
+        },
+        "bytes": 94073105,
+        "files": 2502,
+        "kind": "portable_evidence",
+        "manifest_sha256": "b98f234160305f7696a1f63187939136a5f3d901051ea05c9ba4a7495524151c",
+        "product_promotion": false,
+        "schema_version": 1,
+        "signature_status": "unsigned"
+      },
+      "package_file": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17.json",
+        "sha256": "9f10ace432193bff1691d9559dd630107adad21979cd496bfc218fe334a3409f",
+        "size": 509
+      },
+      "restored_inventory_exact": true,
+      "restored_root_mode_exact": true,
+      "source": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032",
+      "source_bytes": 94073105,
+      "source_files": 2502,
+      "source_inventory": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/r2_workspace-source-inventory.json",
+        "sha256": "f21d12b1ec4421c6e9202205beb79a77606a9036f36c6525798f2fc9e51996b5",
+        "size": 518458
+      },
+      "source_inventory_before_equals_after": true,
+      "source_root_mode": 448,
+      "temporary_owned_restore_released_after_verification": true,
+      "verify": {
+        "archive_sha256": "5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17",
+        "bytes": 94073105,
+        "files": 2502,
+        "status": "verified"
+      }
+    }
+  ],
+  "documents": [
+    {
+      "api_xml": 532,
+      "commands": [
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/bin/doxygen",
+            "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/Doxyfile"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 0.6203459489915986,
+          "exit_code": 0,
+          "finished_ns": 1792526260154153756,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/doxygen.attempts/1792526259533757912-c04375648c9942938e428aedcdeef29c/receipt.json",
+            "sha256": "315ce04d2353e86bea4a1a513dcf4243f4d35d00f373f72e7a526df44806b247",
+            "size": 1125
+          },
+          "schema": 1,
+          "stage": "documentation-doxygen",
+          "started_ns": 1792526259533809219,
+          "stderr": {
+            "bytes": 0,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/doxygen.attempts/1792526259533757912-c04375648c9942938e428aedcdeef29c/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 0,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/doxygen.attempts/1792526259533757912-c04375648c9942938e428aedcdeef29c/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        },
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/venv/bin/python",
+            "-m",
+            "sphinx",
+            "-n",
+            "-W",
+            "--keep-going",
+            "-c",
+            "/tmp/nexus-quality-20261019/docs/sphinx",
+            "-d",
+            "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/doctrees",
+            "-b",
+            "gettext",
+            "/tmp/nexus-quality-20261019/docs",
+            "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/gettext"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 18.888101740012644,
+          "exit_code": 0,
+          "finished_ns": 1792526279043147441,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/gettext.attempts/1792526260155010949-30f4187ad37845a2a6b52563ac422b93/receipt.json",
+            "sha256": "d9b062d9ee4c931f36712821ad6c79d617bbb9662e4d30ebf006018811f09a9a",
+            "size": 1411
+          },
+          "schema": 1,
+          "stage": "documentation-gettext",
+          "started_ns": 1792526260155047604,
+          "stderr": {
+            "bytes": 293,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/gettext.attempts/1792526260155010949-30f4187ad37845a2a6b52563ac422b93/stderr.txt",
+            "sha256": "64976453effa840f283d52cf90423b4758d9adce2e83039a502ccc4fcc0c5f3f"
+          },
+          "stdout": {
+            "bytes": 21050,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/gettext.attempts/1792526260155010949-30f4187ad37845a2a6b52563ac422b93/stdout.txt",
+            "sha256": "07b3eb0c080d67281e36623b31a2ef9b88b4324c8d7892d8780d31e907447b71"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        },
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/venv/bin/python",
+            "-m",
+            "sphinx",
+            "-n",
+            "-W",
+            "--keep-going",
+            "-c",
+            "/tmp/nexus-quality-20261019/docs/sphinx",
+            "-d",
+            "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/doctrees",
+            "-E",
+            "-b",
+            "html",
+            "-D",
+            "language=en",
+            "/tmp/nexus-quality-20261019/docs",
+            "/dev/shm/nexus-h743-full-final-docs-20261020/en"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 35.35381713800598,
+          "exit_code": 0,
+          "finished_ns": 1792526314993942474,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/html-en.attempts/1792526279640058806-f5badd4881234692a7ad5fda8a8a0f74/receipt.json",
+            "sha256": "7242e2be999aa38c0c17f1b16da9995a6718cf52cc2da7ef0e0d77b329494129",
+            "size": 1421
+          },
+          "schema": 1,
+          "stage": "documentation-html-en",
+          "started_ns": 1792526279640126217,
+          "stderr": {
+            "bytes": 293,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/html-en.attempts/1792526279640058806-f5badd4881234692a7ad5fda8a8a0f74/stderr.txt",
+            "sha256": "64976453effa840f283d52cf90423b4758d9adce2e83039a502ccc4fcc0c5f3f"
+          },
+          "stdout": {
+            "bytes": 32213,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/html-en.attempts/1792526279640058806-f5badd4881234692a7ad5fda8a8a0f74/stdout.txt",
+            "sha256": "b371115b3bce2cd0b4a6cd453709cc00c4fc556b3a223c639695e36536051828"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        },
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/venv/bin/python",
+            "-m",
+            "sphinx",
+            "-n",
+            "-W",
+            "--keep-going",
+            "-c",
+            "/tmp/nexus-quality-20261019/docs/sphinx",
+            "-d",
+            "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/doctrees",
+            "-E",
+            "-b",
+            "html",
+            "-D",
+            "language=zh_CN",
+            "/tmp/nexus-quality-20261019/docs",
+            "/dev/shm/nexus-h743-full-final-docs-20261020/zh_CN"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 43.533747587003745,
+          "exit_code": 0,
+          "finished_ns": 1792526358528546531,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/html-zh_CN.attempts/1792526314994767768-1c7e92e0bb1948768ac9a776a208bff6/receipt.json",
+            "sha256": "5f99fb7742710445425bd781f42b02455c85f62410d9b20346c124c1c828cf09",
+            "size": 1437
+          },
+          "schema": 1,
+          "stage": "documentation-html-zh_CN",
+          "started_ns": 1792526314994801128,
+          "stderr": {
+            "bytes": 293,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/html-zh_CN.attempts/1792526314994767768-1c7e92e0bb1948768ac9a776a208bff6/stderr.txt",
+            "sha256": "64976453effa840f283d52cf90423b4758d9adce2e83039a502ccc4fcc0c5f3f"
+          },
+          "stdout": {
+            "bytes": 40653,
+            "path": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f/html-zh_CN.attempts/1792526314994767768-1c7e92e0bb1948768ac9a776a208bff6/stdout.txt",
+            "sha256": "30ad96ba539a9acd96e8ed0fc19c2e534cba83a85d78c9f077364f0d4a6ae51b"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        }
+      ],
+      "frozen_index_tree": "1303c321b21dc5dc274baf79a68315011769013d",
+      "page_locales": 248,
+      "pages": 124,
+      "phase": "r1",
+      "physical_status": "not_executed",
+      "pot": 124,
+      "source": {
+        "commit": "be919138b2270ee754eb06c1a379b1bff9b4cacb",
+        "dirty": true,
+        "root": "/tmp/nexus-quality-20261019",
+        "submodules": [
+          " dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (V11.1.0)",
+          " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+          " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+          " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+          " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+          " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (5.9.0-dev-178-g55b19837f)",
+          " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+          " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+          " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+          " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+          " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+          " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+          " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+          " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+          " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+          " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+        ],
+        "tree": "b83e4079066fdf34a9a5bb5f1d7789349ffaedac",
+        "working_tree_sha256": "94d45991a97dc243985c4dc62ced5b66b2fc32b147dd3f69cf2257ff37ddb45a"
+      },
+      "source_phase": "original precommit dirty workingtree, not clean committed71bd site",
+      "source_qualification": false
+    },
+    {
+      "api_xml": 532,
+      "commands": [
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/bin/doxygen",
+            "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/Doxyfile"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 0.6159111500019208,
+          "exit_code": 0,
+          "finished_ns": 1792526604930465181,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/doxygen.attempts/1792526604314506028-39b37bc21f584355b61e47640c078102/receipt.json",
+            "sha256": "b099e6c723cc0213a3cfc36b60421b4828c36e59b70cf853fad752d2fc86ac9e",
+            "size": 1125
+          },
+          "schema": 1,
+          "stage": "documentation-doxygen",
+          "started_ns": 1792526604314555362,
+          "stderr": {
+            "bytes": 0,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/doxygen.attempts/1792526604314506028-39b37bc21f584355b61e47640c078102/stderr.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 0,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/doxygen.attempts/1792526604314506028-39b37bc21f584355b61e47640c078102/stdout.txt",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        },
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/venv/bin/python",
+            "-m",
+            "sphinx",
+            "-n",
+            "-W",
+            "--keep-going",
+            "-c",
+            "/tmp/nexus-quality-20261019/docs/sphinx",
+            "-d",
+            "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/doctrees",
+            "-b",
+            "gettext",
+            "/tmp/nexus-quality-20261019/docs",
+            "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/gettext"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 19.22966991001158,
+          "exit_code": 0,
+          "finished_ns": 1792526624160827865,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/gettext.attempts/1792526604931123653-2d9c18b0987740bbbf65a31d1ccf7740/receipt.json",
+            "sha256": "38ead48c79a30e494165ffaa7517c47cc1923af6ff6a8fccf25e6da948d77265",
+            "size": 1410
+          },
+          "schema": 1,
+          "stage": "documentation-gettext",
+          "started_ns": 1792526604931159317,
+          "stderr": {
+            "bytes": 293,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/gettext.attempts/1792526604931123653-2d9c18b0987740bbbf65a31d1ccf7740/stderr.txt",
+            "sha256": "64976453effa840f283d52cf90423b4758d9adce2e83039a502ccc4fcc0c5f3f"
+          },
+          "stdout": {
+            "bytes": 21050,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/gettext.attempts/1792526604931123653-2d9c18b0987740bbbf65a31d1ccf7740/stdout.txt",
+            "sha256": "6ef8fa165e6fbe14a7583d8f22a9698cc4704bd470c9a626c487f1ea81f9588a"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        },
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/venv/bin/python",
+            "-m",
+            "sphinx",
+            "-n",
+            "-W",
+            "--keep-going",
+            "-c",
+            "/tmp/nexus-quality-20261019/docs/sphinx",
+            "-d",
+            "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/doctrees",
+            "-E",
+            "-b",
+            "html",
+            "-D",
+            "language=en",
+            "/tmp/nexus-quality-20261019/docs",
+            "/dev/shm/nexus-h743-full-final-docs-r2-20261020/en"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 37.37349568901118,
+          "exit_code": 0,
+          "finished_ns": 1792526662110042503,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/html-en.attempts/1792526624736480324-1d3e5b0bf71244118e0e39f3b78d4d6e/receipt.json",
+            "sha256": "7067a9b5364b9ab10b8ea6f9ecdfbdeed85fdb2ae6a656695f5d766d11586b0e",
+            "size": 1424
+          },
+          "schema": 1,
+          "stage": "documentation-html-en",
+          "started_ns": 1792526624736547956,
+          "stderr": {
+            "bytes": 293,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/html-en.attempts/1792526624736480324-1d3e5b0bf71244118e0e39f3b78d4d6e/stderr.txt",
+            "sha256": "64976453effa840f283d52cf90423b4758d9adce2e83039a502ccc4fcc0c5f3f"
+          },
+          "stdout": {
+            "bytes": 32216,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/html-en.attempts/1792526624736480324-1d3e5b0bf71244118e0e39f3b78d4d6e/stdout.txt",
+            "sha256": "c642640c0df34f6d64e02f67ead57004c657eead141709db559a9c802b215af2"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        },
+        {
+          "build_parallelism": 2,
+          "child_returncode": 0,
+          "command": [
+            "/tmp/nexus-quality-doc-tools/venv/bin/python",
+            "-m",
+            "sphinx",
+            "-n",
+            "-W",
+            "--keep-going",
+            "-c",
+            "/tmp/nexus-quality-20261019/docs/sphinx",
+            "-d",
+            "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/doctrees",
+            "-E",
+            "-b",
+            "html",
+            "-D",
+            "language=zh_CN",
+            "/tmp/nexus-quality-20261019/docs",
+            "/dev/shm/nexus-h743-full-final-docs-r2-20261020/zh_CN"
+          ],
+          "cwd": "/tmp/nexus-quality-20261019",
+          "duration_seconds": 49.47631067101611,
+          "exit_code": 0,
+          "finished_ns": 1792526711587132068,
+          "outcome": "completed",
+          "receipt": {
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/html-zh_CN.attempts/1792526662110787426-df59611bd09346eea7593fa67d18c448/receipt.json",
+            "sha256": "befa7524827c89d1d0505a660616555eedf5b3655daf5220ded92d2decc6892e",
+            "size": 1439
+          },
+          "schema": 1,
+          "stage": "documentation-html-zh_CN",
+          "started_ns": 1792526662110822739,
+          "stderr": {
+            "bytes": 293,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/html-zh_CN.attempts/1792526662110787426-df59611bd09346eea7593fa67d18c448/stderr.txt",
+            "sha256": "64976453effa840f283d52cf90423b4758d9adce2e83039a502ccc4fcc0c5f3f"
+          },
+          "stdout": {
+            "bytes": 40656,
+            "path": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032/html-zh_CN.attempts/1792526662110787426-df59611bd09346eea7593fa67d18c448/stdout.txt",
+            "sha256": "28fdaff97c7a81a271fc4101124fdcb830e3f189efc47ab4d56f77b18f09a2c1"
+          },
+          "timeout_seconds": 900.0,
+          "withdrawal_complete": true,
+          "withdrawal_stable": true,
+          "withdrawn_processes": []
+        }
+      ],
+      "frozen_index_tree": "840c81d0c3776032bc6bd364df4bef33849d3a21",
+      "page_locales": 248,
+      "pages": 124,
+      "phase": "r2",
+      "physical_status": "not_executed",
+      "pot": 124,
+      "source": {
+        "commit": "be919138b2270ee754eb06c1a379b1bff9b4cacb",
+        "dirty": true,
+        "root": "/tmp/nexus-quality-20261019",
+        "submodules": [
+          " dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (V11.1.0)",
+          " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+          " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+          " 6910c9d9165801d8827d628cb72eb7ea9dd538c5 ext/googletest (release-1.8.0-3518-g6910c9d9)",
+          " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.0.202601_pre-232-g93387b0a)",
+          " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (5.9.0-dev-178-g55b19837f)",
+          " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (v4.3.5-1-gc8e9a4a)",
+          " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (v2.6.11-1-g3c77349)",
+          " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (v1.2.6-1-g626ee41)",
+          " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (v1.10.7)",
+          " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (v1.4.3)",
+          " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (v1.1.10-17-gfee494a)",
+          " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (v1.8.5)",
+          " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (v1.2.7)",
+          " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (v1.11.6)",
+          " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (v1.6.3)"
+        ],
+        "tree": "b83e4079066fdf34a9a5bb5f1d7789349ffaedac",
+        "working_tree_sha256": "ae369cbcbc2666a47164e22e28fbbe3230869b8327c97881523b00525fa45233"
+      },
+      "source_phase": "original precommit dirty workingtree, not clean committed71bd site",
+      "source_qualification": false
+    }
+  ],
+  "finished_ns": 1792528239887787571,
+  "git_cache_write_disclosed": true,
+  "index_tree": "840c81d0c3776032bc6bd364df4bef33849d3a21",
+  "kind": "h743_frozen_index_gate_and_docs_preservation",
+  "limits": [
+    "Original precommit dirty-parent R1/R2 site metadata preserved, not relabeled clean71bd builds.",
+    "Normal whole-index gate binds frozen840c; subsequent LP source/index changes do not inherit or negate it.",
+    "All packages are maintained-store unsigned byte evidence, not a product release or physical qualification.",
+    "Only four explicitly owned generated docs/workspace directories were retired after actual store verify and fresh independent restore; no source/Git/vendor/buildobject retirement."
+  ],
+  "normal_gate": {
+    "commands": 696,
+    "google_cases": 6182,
+    "google_programs": 345,
+    "retained_zero_byte_files": 693,
+    "tool_breakdown": [
+      {
+        "discovered": 1331,
+        "errors": 0,
+        "executed": 1331,
+        "expected_failures": 0,
+        "failures": 0,
+        "skipped": 0,
+        "status": "passed",
+        "suite": "testing",
+        "unexpected_successes": 0
+      },
+      {
+        "discovered": 922,
+        "errors": 0,
+        "executed": 922,
+        "expected_failures": 0,
+        "failures": 0,
+        "skipped": 0,
+        "status": "passed",
+        "suite": "configure",
+        "unexpected_successes": 0
+      },
+      {
+        "discovered": 485,
+        "errors": 0,
+        "executed": 485,
+        "expected_failures": 0,
+        "failures": 0,
+        "skipped": 0,
+        "status": "passed",
+        "suite": "ci",
+        "unexpected_successes": 0
+      },
+      {
+        "discovered": 117,
+        "errors": 0,
+        "executed": 117,
+        "expected_failures": 0,
+        "failures": 0,
+        "skipped": 0,
+        "status": "passed",
+        "suite": "workflows",
+        "unexpected_successes": 0
+      }
+    ],
+    "tool_methods": 2855
+  },
+  "physical_status": "not_executed",
+  "qualification": false,
+  "raw_gate_package": {
+    "archive": {
+      "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/fdfed8c20184c0a4c91bf31eb129d1ec84f41bf077e3d1ff1b8aa5b336f646de.tar.gz",
+      "sha256": "fdfed8c20184c0a4c91bf31eb129d1ec84f41bf077e3d1ff1b8aa5b336f646de",
+      "size": 2669720
+    },
+    "bytes": 23398570,
+    "files": 3890,
+    "kind": "portable_evidence",
+    "manifest_sha256": "f4813ed8dde73fd8fc50bb5b5feb8730a61b4ccbbac98fa81297d1e50758ec88",
+    "product_promotion": false,
+    "schema_version": 1,
+    "signature_status": "unsigned"
+  },
+  "raw_gate_package_file": {
+    "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/fdfed8c20184c0a4c91bf31eb129d1ec84f41bf077e3d1ff1b8aa5b336f646de.json",
+    "sha256": "438f298a84038f35069a632816630390a807fbef594ee0329ed95441d4736ec6",
+    "size": 508
+  },
+  "raw_gate_restore": {
+    "archive_sha256": "fdfed8c20184c0a4c91bf31eb129d1ec84f41bf077e3d1ff1b8aa5b336f646de",
+    "bytes": 23398570,
+    "destination": "/tmp/nexus-h743-final-gate-evidence-20261020/h743-gate-independent-vrfg28f8/gate",
+    "files": 3890,
+    "status": "verified"
+  },
+  "raw_gate_source_inventory": {
+    "path": "/tmp/nexus-h743-final-gate-evidence-20261020/gate-source-inventory.json",
+    "sha256": "ef4a50701d1c0db12e5437a72664907e507ac033bdc021b05f3a28b292c45ed1",
+    "size": 1293718
+  },
+  "raw_gate_verify": {
+    "archive_sha256": "fdfed8c20184c0a4c91bf31eb129d1ec84f41bf077e3d1ff1b8aa5b336f646de",
+    "bytes": 23398570,
+    "files": 3890,
+    "status": "verified"
+  },
+  "retirement": [
+    {
+      "all_source_bytes_preserved": true,
+      "archive": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026.tar.gz",
+        "sha256": "3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026",
+        "size": 13291623
+      },
+      "finished_ns": 1792528232355052269,
+      "name": "r1_site",
+      "physical_status": "not_executed",
+      "preserved_package": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/3d31fd54a8a5c076767be3bdfa60b7bda5f84a18419469f2850709d9ffcb9026.json",
+        "sha256": "7faf99acc93af00c30149be3f4e060efedaa3b85f94b0b1e466b59e2c0f56f04",
+        "size": 509
+      },
+      "source": "/dev/shm/nexus-h743-full-final-docs-20261020",
+      "source_inventory_unchanged_before_retirement": true,
+      "started_ns": 1792528232341875620,
+      "status": "retired_exact_owned_generated_directory"
+    },
+    {
+      "all_source_bytes_preserved": true,
+      "archive": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69.tar.gz",
+        "sha256": "efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69",
+        "size": 13835124
+      },
+      "finished_ns": 1792528233272810459,
+      "name": "r1_workspace",
+      "physical_status": "not_executed",
+      "preserved_package": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/efeeb94ac96f97dc3fe34f181703a694a7d8a65cc518a324c35d53cd32ebbf69.json",
+        "sha256": "812fe459fa68fa0e724e71e5d474fce589fd59c2f4e9804a57e86d28d657956d",
+        "size": 509
+      },
+      "source": "/dev/shm/documentation-attempts/017368e637904faf9790fb39e4268f8f",
+      "source_inventory_unchanged_before_retirement": true,
+      "started_ns": 1792528233257995912,
+      "status": "retired_exact_owned_generated_directory"
+    },
+    {
+      "all_source_bytes_preserved": true,
+      "archive": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139.tar.gz",
+        "sha256": "e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139",
+        "size": 13291592
+      },
+      "finished_ns": 1792528234131298143,
+      "name": "r2_site",
+      "physical_status": "not_executed",
+      "preserved_package": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/e8e9a454e7e562cbeb09fad1f9082c275d820e567d6bd802a7925c568a63a139.json",
+        "sha256": "722c7c28f21ce6b5e682ff273bf1a3d8920ac351e6c3589be690a7b7d4a3b69e",
+        "size": 509
+      },
+      "source": "/dev/shm/nexus-h743-full-final-docs-r2-20261020",
+      "source_inventory_unchanged_before_retirement": true,
+      "started_ns": 1792528234117915365,
+      "status": "retired_exact_owned_generated_directory"
+    },
+    {
+      "all_source_bytes_preserved": true,
+      "archive": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17.tar.gz",
+        "sha256": "5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17",
+        "size": 13834023
+      },
+      "finished_ns": 1792528235051452971,
+      "name": "r2_workspace",
+      "physical_status": "not_executed",
+      "preserved_package": {
+        "path": "/tmp/nexus-h743-final-gate-evidence-20261020/store/5a67d38493c5ccfafa2f5955950e5467a059041e947e601f0b7445f1e844dc17.json",
+        "sha256": "9f10ace432193bff1691d9559dd630107adad21979cd496bfc218fe334a3409f",
+        "size": 509
+      },
+      "source": "/dev/shm/documentation-attempts/84af937766c94701af61b7b242070032",
+      "source_inventory_unchanged_before_retirement": true,
+      "started_ns": 1792528235038278887,
+      "status": "retired_exact_owned_generated_directory"
+    }
+  ],
+  "schema_version": 1,
+  "status": "passed"
+}

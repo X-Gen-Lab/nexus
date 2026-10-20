@@ -45,11 +45,20 @@ remain invalid after stop. General peripheral LPBAM, physical
 copy/retention/accuracy/current/wake acceptance and the full IO-32/SOC-35 exits
 remain open.
 
+A further [single-tuple LPTIM1 LPBAM selection](u575-lptim1-lpbam.md)
+uses the same concrete Stop2 owner as a compile-time alternative to WUT-only
+and SRAM4-copy modes. It updates one fixed SRAM4 CCR1/RCR=0/ARR tuple through
+LPDMA1 channel0 request13/BREQ1/DREQ0, with explicit start/stop and retained
+partial-failure effects. RUN LPTIM2 must be disabled and joined; it is not the
+Stop2 producer. No pin route or physical result is established, and the original
+IO-32/SOC-35 exits remain open.
+
 | Reference | Maintained execution contract | Explicitly excluded |
 |---|---|---|
 | G474 / MB1367 and acquisition fixture | HSE24/170 MHz, TIM2, GPIO/UART/SPI/PWM/IWDG/EXTI; selected ADC1 bulb shots or finite TIM6 normal DMA at exact 2.5–50 kHz rates, polling I2C1 and physical ECC Flash; baremetal/FreeRTOS | Continuous ADC, UART/SPI DMA, other unselected controllers and ThreadX; fixture routes are not observed Board wiring |
 | H743 / NUCLEO and peripheral fixture | Bounded pre-RAM LDO; HSI32/64 with Cache off/on; finite UART TX DMA or RX DMA-IDLE; explicit initialized D2 SRAM1; finite SPI4/I2C1/ADC1/PWM/EXTI/IWDG1/Flash; separate V/HSI64 baremetal AXI continuous RX/duplex selections and optional V D-Cache-off AXI RGB565 DMA2D component | Unselected supply/PLL or DMA modes and running-state handoff; Flash requires Cache off; the DMA2D component has no TOML/factory route |
 | U575 / platform and peripheral fixture | Externally established TZEN0/SWAP0, MSIS4, Cache off, TIM2, GPIO/UART/IWDG and finite SPI1/I2C1/ADC4/PWM/EXTI/Flash; separate finite USART1 GPDMA TX/hardware-chain TX, LPTIM2 RUN and prepared-LSE RTC AlarmA RUN references; independent retained RTC elapsed clock and explicit WUT/Stop2 owner with joined RUN owners; separately selected [finite SRAM4/LPDMA1 channel-0 copy](u575-stop2-copy.md) under that same Stop2 owner, with AlarmA14, WUT escape and MSIS4/MSIK4; ADC supply admission is external | Option-byte changes, RX DMA, general peripheral LPBAM, unselected RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; RTC AlarmA RUN and same-owner Stop2-copy modes are mutually exclusive; selected software subsets do not establish physical copy/residency, VBAT continuity or the full IO-32/SOC-35 exits |
+| U575 / single-tuple LPTIM1 Stop2 | Exact TZEN0 baremetal [LPTIM1 LPBAM](u575-lptim1-lpbam.md); one 12 B SRAM4 tuple and separate 48 B two-LLI workspace; selected ARM32 receiver owner is 104 B, including a 16 B start-effects ledger; existing SRAM4-copy owner remains 88 B | Repeated/general LPBAM, GPIO routing, complete waveform playback and physical HIL; no extra owner storage in unselected default images; original IO-32/SOC-35 exits remain open |
 | U575, separate dual-world reference | TZEN1 cold attribution owner, Secure/NS Runtime, real CMSE; scalar GPIO and cooperative jobs of up to eight copied PC7 commands in one Secure slot | General dual-world factory, NS RTOS/task identities, retained NS pointers or asynchronous loans, cross-domain DMA, loader authentication and physical isolation qualification |
 
 These are source-reviewed Board references. Their physical PCB revisions,

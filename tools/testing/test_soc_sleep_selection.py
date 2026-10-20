@@ -18,6 +18,10 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SocSleepSelectionTests(unittest.TestCase):
+    # The configure-only fixture can bind an owned, regular-file source view.
+    # Ordinary repository execution always uses ROOT for both fixture families.
+    u575_root = ROOT
+
     def configure_properties(self, family, selected, *, lto=True,
                              launcher="scope-launcher;--contract"):
         """Keep the checked SDK variable inside the port's child scope only."""
@@ -159,6 +163,9 @@ endif()
 
     def configure_u575_variant(self, variants):
         """Use real optional target definitions, with interface-only SDK ports."""
+        root = self.u575_root
+        copy_component = root / "components/stm32u575_lpdma_copy"
+        lptim_component = root / "components/stm32u575_lpdma_lptim1"
         with tempfile.TemporaryDirectory(prefix="nexus-u575-owner-cmake-") as name:
             source = Path(name)
             (source / "main.c").write_text("int main(void) { return 0; }\n")
@@ -166,7 +173,7 @@ endif()
             (source / "CMakeLists.txt").write_text(f'''\
 cmake_minimum_required(VERSION 3.31)
 project(u575_owner_selection LANGUAGES C)
-set(NEXUS_SOURCE_DIR "{ROOT.as_posix()}")
+set(NEXUS_SOURCE_DIR "{root.as_posix()}")
 set(NEXUS_SOC_FAMILY stm32u575)
 set(NEXUS_BACKEND baremetal)
 set(NEXUS_ARCH_SECURITY_STATE 0)
@@ -174,17 +181,26 @@ set(NEXUS_EXACT_PART STM32U575ZIT6Q)
 set(NEXUS_MEMORY_SRAM4 1)
 function(nexus_apply_target_policy target)
 endfunction()
-foreach(component U575RetainedTime U575LpdmaCopy ClockDomain Arch)
+foreach(component U575RetainedTime ClockDomain Arch IO)
     add_library(Nexus::${{component}} INTERFACE IMPORTED)
 endforeach()
 add_library(nexus_build_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
-add_subdirectory("{(ROOT / 'components/stm32u575_stop2').as_posix()}" owner)
+add_subdirectory("{copy_component.as_posix()}" copy_receiver)
+if(EXISTS "{lptim_component.as_posix()}/CMakeLists.txt")
+    add_subdirectory("{lptim_component.as_posix()}" lptim_receiver)
+endif()
+add_subdirectory("{(root / 'components/stm32u575_stop2').as_posix()}" owner)
 add_executable(consumer main.c)
 target_link_libraries(consumer PRIVATE {libraries})
-foreach(name nexus_stm32u575_stop2 nexus_stm32u575_stop2_copy)
+foreach(name nexus_stm32u575_stop2 nexus_stm32u575_stop2_copy
+        nexus_stm32u575_stop2_lptim1 nexus_stm32u575_lpdma_copy
+        nexus_stm32u575_lpdma_lptim1)
     if(TARGET ${{name}})
-        foreach(property SOURCES COMPILE_DEFINITIONS LINK_LIBRARIES EXCLUDE_FROM_ALL INTERFACE_NEXUS_U575_STOP2_MODE)
+        foreach(property SOURCES COMPILE_DEFINITIONS LINK_LIBRARIES
+                INCLUDE_DIRECTORIES INTERFACE_INCLUDE_DIRECTORIES
+                EXCLUDE_FROM_ALL INTERFACE_NEXUS_U575_STOP2_MODE
+                INTERFACE_NEXUS_U575_LPDMA_MODE)
             get_target_property(value ${{name}} ${{property}})
             file(APPEND "${{CMAKE_BINARY_DIR}}/properties.txt" "${{name}}.${{property}}=${{value}}\n")
         endforeach()
@@ -216,6 +232,69 @@ endforeach()
         process, _ = self.configure_u575_variant(("U575Stop2", "U575Stop2Copy"))
         self.assertNotEqual(process.returncode, 0)
         self.assertIn("NEXUS_U575_STOP2_MODE", process.stdout + process.stderr)
+
+    def test_u575_lptim1_is_a_private_fixed_profile_of_the_same_owner(self):
+        process, text = self.configure_u575_variant(("U575Stop2Lptim1",))
+        self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+        properties = dict(line.split("=", 1) for line in text.splitlines())
+        original = "nexus_stm32u575_stop2."
+        selected = "nexus_stm32u575_stop2_lptim1."
+        receiver = "nexus_stm32u575_lpdma_lptim1."
+        self.assertEqual(properties[original + "SOURCES"],
+                         properties[selected + "SOURCES"])
+        self.assertEqual(properties[selected + "SOURCES"],
+                         (self.u575_root / "soc/stm32u575/stop2.c").as_posix())
+        self.assertNotIn("NEXUS_U575_STOP2_LPTIM1",
+                         properties[original + "COMPILE_DEFINITIONS"])
+        for target in (selected, receiver):
+            self.assertEqual(
+                set(properties[target + "COMPILE_DEFINITIONS"].split(";")),
+                {"STM32U575xx", "NEXUS_U575_STOP2_LPTIM1"})
+            self.assertEqual(properties[target + "EXCLUDE_FROM_ALL"], "TRUE")
+        self.assertEqual(
+            set(properties[receiver + "SOURCES"].split(";")),
+            {(self.u575_root / "soc/stm32u575/drivers" / unit).as_posix()
+             for unit in ("lpdma_copy.c", "lpdma_lptim1.c")})
+        private = (self.u575_root /
+                   "components/stm32u575_lpdma_lptim1/private").as_posix()
+        for target in (selected, receiver):
+            self.assertIn(private,
+                          properties[target + "INCLUDE_DIRECTORIES"].split(";"))
+            self.assertNotIn(
+                private, properties[target +
+                                    "INTERFACE_INCLUDE_DIRECTORIES"].split(";"))
+        self.assertTrue((self.u575_root / "soc/stm32u575/private" /
+                         "stm32u575_lptim1_profile.h").is_file())
+        self.assertIn("Nexus::U575LpdmaLptim1",
+                      properties[selected + "LINK_LIBRARIES"].split(";"))
+        self.assertNotIn("Nexus::U575LpdmaCopy",
+                         properties[selected + "LINK_LIBRARIES"].split(";"))
+        for target, mode in (
+                (selected, "INTERFACE_NEXUS_U575_STOP2_MODE"),
+                (receiver, "INTERFACE_NEXUS_U575_LPDMA_MODE")):
+            self.assertEqual(properties[target + mode], "lptim1")
+        self.assertEqual(properties["nexus_stm32u575_lpdma_copy." +
+                                    "INTERFACE_NEXUS_U575_LPDMA_MODE"], "copy")
+
+    def assert_u575_mode_conflict(self, variants, property_name):
+        process, _ = self.configure_u575_variant(variants)
+        diagnostic = " ".join((process.stdout + process.stderr).split())
+        self.assertNotEqual(process.returncode, 0, diagnostic)
+        self.assertIn("INTERFACE_" + property_name, diagnostic)
+        self.assertIn("does not agree", diagnostic)
+        self.assertNotIn("was not found", diagnostic)
+
+    def test_u575_wut_and_lptim1_owners_reject_shared_image(self):
+        self.assert_u575_mode_conflict(
+            ("U575Stop2", "U575Stop2Lptim1"), "NEXUS_U575_STOP2_MODE")
+
+    def test_u575_copy_and_lptim1_owners_reject_shared_image(self):
+        self.assert_u575_mode_conflict(
+            ("U575Stop2Copy", "U575Stop2Lptim1"), "NEXUS_U575_STOP2_MODE")
+
+    def test_u575_copy_and_lptim1_receivers_cannot_be_linked_together(self):
+        self.assert_u575_mode_conflict(
+            ("U575LpdmaCopy", "U575LpdmaLptim1"), "NEXUS_U575_LPDMA_MODE")
 
     def test_stm32_external_selection_uses_private_checked_sdk_paths(self):
         self.assert_selected_private_imports("stm32f407")

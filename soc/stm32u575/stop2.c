@@ -8,7 +8,17 @@
  */
 #include "clock_domain_impl.h"
 #include "nexus/components/stm32u575_stop2.h"
-#ifdef NEXUS_U575_STOP2_COPY
+#ifdef NEXUS_U575_STOP2_LPTIM1
+#define NEXUS_U575_STOP2_COPY
+#include "nexus/components/stm32u575_stop2_lptim1.h"
+#include "stm32u575_lpdma_lptim1_internal.h"
+/* The selected peripheral reference reuses this concrete owner and domain;
+ * no second hardware owner or runtime dispatch is introduced. */
+typedef nx_stm32u575_stop2_lptim1_result_t nx_stm32u575_stop2_copy_result_t;
+#define nx_stm32u575_stop2_copy_enter nx_stm32u575_stop2_lptim1_enter
+#define nx_stm32u575_retained_time_validate_alarm_a_copy                       \
+    nx_stm32u575_retained_time_validate_wake
+#elif defined(NEXUS_U575_STOP2_COPY)
 #include "nexus/components/stm32u575_stop2_copy.h"
 #include "stm32u575_lpdma_copy_internal.h"
 #endif
@@ -129,12 +139,30 @@ static bool copy_access_gates(void) {
     uint32_t main =
         RCC_AHB3ENR_PWREN | RCC_AHB3ENR_SRAM4EN | RCC_AHB3ENR_LPDMA1EN;
     uint32_t reset = NX_STOP_READ(RCC->AHB3RSTR) & RCC_AHB3RSTR_LPDMA1RST;
+    uint32_t apb3 = RCC_APB3ENR_RTCAPBEN;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    /* A retained owned reset is retryable only after the receiver's DMA final
+     * access proof. An externally asserted reset still quarantines the loan. */
+    uint32_t peripheral_reset =
+        NX_STOP_READ(RCC->APB3RSTR) & RCC_APB3RSTR_LPTIM1RST;
+    if (peripheral_reset != 0U &&
+        !nx_stm32u575_lpdma_lptim1_reset_owned(&s_owner.copy))
+        reset |= peripheral_reset;
+    apb3 |= RCC_APB3ENR_LPTIM1EN;
+#endif
     if (s_owner.request != NULL && reset != 0U)
         s_owner.copy_reset_seen = true;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    uint32_t lse = RCC_BDCR_LSEON | RCC_BDCR_LSERDY | RCC_BDCR_LSESYSEN |
+                   RCC_BDCR_LSESYSRDY;
+    if ((NX_STOP_READ(RCC->CCIPR3) & RCC_CCIPR3_LPTIM1SEL) !=
+            RCC_CCIPR3_LPTIM1SEL ||
+        (NX_STOP_READ(RCC->BDCR) & lse) != lse)
+        return false;
+#endif
     return !(s_owner.request != NULL && s_owner.copy_reset_seen) &&
            (NX_STOP_READ(RCC->AHB3ENR) & main) == main &&
-           (NX_STOP_READ(RCC->APB3ENR) & RCC_APB3ENR_RTCAPBEN) != 0U &&
-           reset == 0U;
+           (NX_STOP_READ(RCC->APB3ENR) & apb3) == apb3 && reset == 0U;
 }
 #endif
 /** \brief Never infer safe RTC access from an unknown wake clock. */
@@ -153,12 +181,22 @@ static bool wait_profile(uint32_t limit) {
 static nx_result_t preflight(bool alarm_copy) {
     uint32_t ahb3 = RCC_AHB3ENR_PWREN | RCC_AHB3ENR_SRAM4EN;
     uint32_t autonomous = RCC_SRDAMR_RTCAPBAMEN;
+    uint32_t apb3 = RCC_APB3ENR_RTCAPBEN;
+    uint32_t kernel = 0U;
 #ifdef NEXUS_U575_STOP2_COPY
     if (alarm_copy) {
         if (!copy_access_gates())
             return NX_ERROR_STATE;
         ahb3 |= RCC_AHB3ENR_LPDMA1EN;
         autonomous |= RCC_SRDAMR_LPDMA1AMEN | RCC_SRDAMR_SRAM4AMEN;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+        /* Only this selected compound path admits the public receiver's
+         * retained LPTIM1 gate and exact LSE kernel selection. WUT-only entry
+         * keeps the original cold RUN exclusion. */
+        apb3 |= RCC_APB3ENR_LPTIM1EN;
+        autonomous |= RCC_SRDAMR_LPTIM1AMEN;
+        kernel = RCC_CCIPR3_LPTIM1SEL;
+#endif
     }
 #else
     (void)alarm_copy;
@@ -191,10 +229,10 @@ static nx_result_t preflight(bool alarm_copy) {
         (NX_STOP_READ(RCC->AHB3ENR) & RCC_AHB3ENR_PWREN) == 0U ||
         NX_STOP_READ(RCC->APB1ENR1) != 0U ||
         NX_STOP_READ(RCC->APB1ENR2) != 0U || NX_STOP_READ(RCC->APB2ENR) != 0U ||
-        NX_STOP_READ(RCC->APB3ENR) != RCC_APB3ENR_RTCAPBEN ||
+        NX_STOP_READ(RCC->APB3ENR) != apb3 ||
         (NX_STOP_READ(RCC->SRDAMR) & ~autonomous) != 0U ||
         NX_STOP_READ(RCC->CCIPR1) != 0U || NX_STOP_READ(RCC->CCIPR2) != 0U ||
-        NX_STOP_READ(RCC->CCIPR3) != 0U || NX_STOP_READ(RCC->CIER) != 0U ||
+        NX_STOP_READ(RCC->CCIPR3) != kernel || NX_STOP_READ(RCC->CIER) != 0U ||
         (NX_STOP_READ(PWR->DBPR) & PWR_DBPR_DBP) == 0U ||
         NX_STOP_READ(PWR->WUCR1) != 0U || NX_STOP_READ(PWR->WUCR2) != 0U ||
         NX_STOP_READ(PWR->WUCR3) != 0U || NX_STOP_READ(PWR->WUSR) != 0U ||
@@ -423,9 +461,11 @@ _Static_assert(LPDMA1_Channel0_IRQn == 114,
 #define COPY_LOAN_EFFECT 2U
 #define COPY_IRQ_WORD    (114U / 32U)
 #define COPY_IRQ_BIT     (1U << (114U % 32U))
-#define ALARM_BITS       (RTC_CR_ALRAE | RTC_CR_ALRAIE | RTC_CR_ALRAFCLR)
+#ifndef NEXUS_U575_STOP2_LPTIM1
+#define ALARM_BITS (RTC_CR_ALRAE | RTC_CR_ALRAIE | RTC_CR_ALRAFCLR)
 #define ALARM_MASK                                                             \
     (RTC_ALRMAR_MSK1 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK4)
+#endif
 /** \brief Persist the first boundary failure across masked recovery attempts.
  */
 static void copy_failure(nx_result_t cause) {
@@ -441,13 +481,31 @@ static void copy_vectors_off(void) {
 }
 /** \brief Disable the trigger producer before any DMA suspend/reset attempt. */
 static nx_result_t copy_producers_off(uint32_t limit) {
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    /* Withdraw and observe the actual peripheral request before touching WUT
+     * or suspending DMA. A failed producer proof retains the whole loan. */
+    nx_result_t withdrawn = nx_stm32u575_lpdma_lptim1_producer_withdraw(
+        &s_owner.copy, s_owner.copy_cause, limit);
+    if (withdrawn != NX_SUCCESS)
+        return withdrawn;
+#endif
     unlock();
     uint32_t cr = NX_STOP_READ(RTC->CR) &
+#ifdef NEXUS_U575_STOP2_LPTIM1
+                  ~(uint32_t)(RTC_CR_WUTE | RTC_CR_WUTIE);
+#else
                   ~(uint32_t)(RTC_CR_WUTE | RTC_CR_WUTIE | ALARM_BITS);
+#endif
     nx_result_t result = NX_ERROR_IO;
     if (write_checked(&RTC->CR, cr)) {
         result = NX_ERROR_TIMEOUT;
         if (wait_bits(&RTC->ICSR, RTC_ICSR_WUTWF, RTC_ICSR_WUTWF, limit)) {
+#ifdef NEXUS_U575_STOP2_LPTIM1
+            NX_STOP_WRITE(RTC->SCR, RTC_SCR_CWUTF);
+            nx_arch_dsb();
+            if (wait_bits(&RTC->SR, RTC_SR_WUTF, 0U, limit))
+                result = NX_SUCCESS;
+#else
             NX_STOP_WRITE(RTC->SCR, RTC_SCR_CWUTF | RTC_SCR_CALRAF);
             nx_arch_dsb();
             if (wait_bits(&RTC->SR, RTC_SR_WUTF | RTC_SR_ALRAF, 0U, limit)) {
@@ -456,6 +514,7 @@ static nx_result_t copy_producers_off(uint32_t limit) {
                              ? NX_SUCCESS
                              : NX_ERROR_IO;
             }
+#endif
         }
     }
     lock();
@@ -519,6 +578,7 @@ static nx_result_t drain_copy(uint32_t limit) {
     /* Successful release is the final request/workspace/buffer access. */
     return result;
 }
+#ifndef NEXUS_U575_STOP2_LPTIM1
 /** \brief Program only the fixed calendar compare while ALRAE is observed off.
  */
 static nx_result_t program_alarm(uint32_t limit) {
@@ -530,6 +590,7 @@ static nx_result_t program_alarm(uint32_t limit) {
     return wait_bits(&RTC->SR, RTC_SR_ALRAF, 0U, limit) ? NX_SUCCESS
                                                         : NX_ERROR_TIMEOUT;
 }
+#endif
 nx_stm32u575_stop2_copy_result_t
 nx_stm32u575_stop2_copy_enter(nx_clock_barrier_t owners,
                               const nx_stm32u575_lpdma_copy_t* copy,
@@ -552,10 +613,12 @@ nx_stm32u575_stop2_copy_enter(nx_clock_barrier_t owners,
     r->primary = preflight(true);
     if (r->primary != NX_SUCCESS)
         return result;
+#ifndef NEXUS_U575_STOP2_LPTIM1
     if (NX_STOP_READ(RTC->ALRMAR) != 0U || NX_STOP_READ(RTC->ALRMASSR) != 0U) {
         r->primary = NX_ERROR_BUSY;
         return result;
     }
+#endif
     r->primary = nx_stm32u575_retained_time_sample(s_owner.clock, &r->before);
     if (r->primary != NX_SUCCESS)
         return result;
@@ -573,7 +636,11 @@ nx_stm32u575_stop2_copy_enter(nx_clock_barrier_t owners,
     s_owner.sleep_gate = NX_STOP_READ(RCC->APB3SMENR);
     s_owner.autonomous_gate = NX_STOP_READ(RCC->SRDAMR);
     s_owner.msi = NX_STOP_READ(RCC->CR);
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    r->primary = nx_stm32u575_lpdma_copy_arm(copy, request, poll_limit);
+#else
     r->primary = nx_stm32u575_lpdma_copy_arm(copy, request);
+#endif
     if (r->primary != NX_SUCCESS)
         return result;
     result.accepted = true;
@@ -595,9 +662,13 @@ nx_stm32u575_stop2_copy_enter(nx_clock_barrier_t owners,
         goto cleanup_copy;
     }
     unlock();
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    r->primary = program_wakeup(escape_ticks, poll_limit);
+#else
     r->primary = program_alarm(poll_limit);
     if (r->primary == NX_SUCCESS)
         r->primary = program_wakeup(escape_ticks, poll_limit);
+#endif
     lock();
     if (r->primary != NX_SUCCESS)
         goto cleanup_copy;
@@ -609,6 +680,12 @@ nx_stm32u575_stop2_copy_enter(nx_clock_barrier_t owners,
         r->primary = NX_ERROR_IO;
         goto cleanup_copy;
     }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    r->primary =
+        nx_stm32u575_lpdma_lptim1_producer_start(&s_owner.copy, poll_limit);
+    if (r->primary != NX_SUCCESS)
+        goto cleanup_copy;
+#else
     unlock();
     bool armed = write_checked(&RTC->CR, NX_STOP_READ(RTC->CR) | RTC_CR_ALRAE);
     lock();
@@ -616,6 +693,7 @@ nx_stm32u575_stop2_copy_enter(nx_clock_barrier_t owners,
         r->primary = NX_ERROR_IO;
         goto cleanup_copy;
     }
+#endif
     /* No producer flag, channel flag or pending vector is cleared from this
      * point until the observed wake and explicit producer withdrawal. */
     r->wait_executed = true;

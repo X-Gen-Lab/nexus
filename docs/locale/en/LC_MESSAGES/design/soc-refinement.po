@@ -1,6 +1,6 @@
-# Complete extracted English identity messages; changed prose review pending.
+# Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Language: en\nContent-Type: text/plain; charset=UTF-8\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a0e0f8008dd1fd41b701c3caaa8f5864ed9f622198e72ef55a8deacd13d2364a\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4fb5b8c9d09850d18310a09b8018f16bd5e37e578da4509590be3be70768eaf7\n"
 
 msgid "SoC refinement and physical acceptance"
 msgstr "SoC refinement and physical acceptance"
@@ -22,6 +22,9 @@ msgstr "The [five bounded I/O increments](io-extension-boundaries.md) add common
 
 msgid "The [U575 retained-clock and Stop2 reference](u575-retained-time.md) adds an independent RTC elapsed domain and an explicit masked WUT/Stop2 owner, with closed/joined RUN owners, verified MSIS4/MSIK4 access restoration and real cleanup. The same owner has a separately selected [finite SRAM4/LPDMA1 channel-0 copy](u575-stop2-copy.md), using AlarmA trigger 14 and independent WUT escape. These are exact TZEN0 baremetal software subsets. Default Core TIM2 deadlines remain invalid after stop. General peripheral LPBAM, physical copy/retention/accuracy/current/wake acceptance and the full IO-32/SOC-35 exits remain open."
 msgstr "The [U575 retained-clock and Stop2 reference](u575-retained-time.md) adds an independent RTC elapsed domain and an explicit masked WUT/Stop2 owner, with closed/joined RUN owners, verified MSIS4/MSIK4 access restoration and real cleanup. The same owner has a separately selected [finite SRAM4/LPDMA1 channel-0 copy](u575-stop2-copy.md), using AlarmA trigger 14 and independent WUT escape. These are exact TZEN0 baremetal software subsets. Default Core TIM2 deadlines remain invalid after stop. General peripheral LPBAM, physical copy/retention/accuracy/current/wake acceptance and the full IO-32/SOC-35 exits remain open."
+
+msgid "A further [single-tuple LPTIM1 LPBAM selection](u575-lptim1-lpbam.md) uses the same concrete Stop2 owner as a compile-time alternative to WUT-only and SRAM4-copy modes. It updates one fixed SRAM4 CCR1/RCR=0/ARR tuple through LPDMA1 channel0 request13/BREQ1/DREQ0, with explicit start/stop and retained partial-failure effects. RUN LPTIM2 must be disabled and joined; it is not the Stop2 producer. No pin route or physical result is established, and the original IO-32/SOC-35 exits remain open."
+msgstr "A further [single-tuple LPTIM1 LPBAM selection](u575-lptim1-lpbam.md) uses the same concrete Stop2 owner as a compile-time alternative to WUT-only and SRAM4-copy modes. It updates one fixed SRAM4 CCR1/RCR=0/ARR tuple through LPDMA1 channel0 request13/BREQ1/DREQ0, with explicit start/stop and retained partial-failure effects. RUN LPTIM2 must be disabled and joined; it is not the Stop2 producer. No pin route or physical result is established, and the original IO-32/SOC-35 exits remain open."
 
 msgid "Reference"
 msgstr "Reference"
@@ -58,6 +61,15 @@ msgstr "Externally established TZEN0/SWAP0, MSIS4, Cache off, TIM2, GPIO/UART/IW
 
 msgid "Option-byte changes, RX DMA, general peripheral LPBAM, unselected RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; RTC AlarmA RUN and same-owner Stop2-copy modes are mutually exclusive; selected software subsets do not establish physical copy/residency, VBAT continuity or the full IO-32/SOC-35 exits"
 msgstr "Option-byte changes, RX DMA, general peripheral LPBAM, unselected RAM placement and running-state handoff; TZEN0 assembly has no TrustZone transport; RTC AlarmA RUN and same-owner Stop2-copy modes are mutually exclusive; selected software subsets do not establish physical copy/residency, VBAT continuity or the full IO-32/SOC-35 exits"
+
+msgid "U575 / single-tuple LPTIM1 Stop2"
+msgstr "U575 / single-tuple LPTIM1 Stop2"
+
+msgid "Exact TZEN0 baremetal [LPTIM1 LPBAM](u575-lptim1-lpbam.md); one 12 B SRAM4 tuple and separate 48 B two-LLI workspace; selected ARM32 receiver owner is 104 B, including a 16 B start-effects ledger; existing SRAM4-copy owner remains 88 B"
+msgstr "Exact TZEN0 baremetal [LPTIM1 LPBAM](u575-lptim1-lpbam.md); one 12 B SRAM4 tuple and separate 48 B two-LLI workspace; selected ARM32 receiver owner is 104 B, including a 16 B start-effects ledger; existing SRAM4-copy owner remains 88 B"
+
+msgid "Repeated/general LPBAM, GPIO routing, complete waveform playback and physical HIL; no extra owner storage in unselected default images; original IO-32/SOC-35 exits remain open"
+msgstr "Repeated/general LPBAM, GPIO routing, complete waveform playback and physical HIL; no extra owner storage in unselected default images; original IO-32/SOC-35 exits remain open"
 
 msgid "U575, separate dual-world reference"
 msgstr "U575, separate dual-world reference"
@@ -262,3 +274,4 @@ msgstr "SOC-36 still needs a separately reviewed dual-world configuration/factor
 
 msgid "Physical equipment is currently disconnected. SOC-37–55 have executable tooling and station-binding obligations; their physical exit status remains `not_executed`. See [HIL authoring and commands](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)."
 msgstr "Physical equipment is currently disconnected. SOC-37–55 have executable tooling and station-binding obligations; their physical exit status remains `not_executed`. See [HIL authoring and commands](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)."
+

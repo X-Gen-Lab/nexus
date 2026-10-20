@@ -21,7 +21,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v7"
+CONSUMER_POLICY = "nexus-sdk-consumers-v8"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -130,6 +130,9 @@ SELECTED_CONSUMERS = (
     ("u575 lpdma copy",
      "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
      "u575-lpdma-copy"),
+    ("u575 lptim1 lpbam",
+     "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
+     "u575-lptim1-lpbam"),
 )
 
 def consumer_layout():

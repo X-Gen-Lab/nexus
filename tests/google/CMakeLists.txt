@@ -597,3 +597,5 @@ include(u575_memory.cmake)
 
 include(u575_lpdma_copy.cmake)
 include(u575_stop2_copy.cmake)
+
+include(u575_lptim1_lpbam.cmake)

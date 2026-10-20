@@ -482,6 +482,16 @@ copy uses the same concrete Stop2 owner for AlarmA14, independent WUT escape and
 compound RTC/DMA/IRQ/gate/clock final release; general peripheral LPBAM and the
 full IO-32/SOC-35 exits remain open.
 
+The dedicated [single-tuple LPTIM1 LPBAM reference](u575-lptim1-lpbam.md)
+adds one finite SRAM4 CCR1/RCR=0/ARR update under that same concrete Stop2 owner.
+The first word uses hardware request13 with BREQ1 and reserved DREQ0; two fixed
+continuation LLIs write RCR and ARR last. Explicit start/stop retains partial
+preparation and failed-drain responsibility. Fresh write-OK and all final-access
+proofs are necessary for success; success establishes synchronized register
+writes, not complete waveform playback. There is no GPIO route or physical HIL
+result, and general peripheral LPBAM and the original IO-32/SOC-35 exits remain
+open.
+
 Use [platform integration contracts](integration-contracts.md),
 [the lifecycle matrix](io-lifecycle-matrix.md),
 [software qualification](../reference/platforms/qualification.md) and

@@ -55,3 +55,27 @@ if(TARGET Nexus::U575LpdmaCopy)
         COMPATIBLE_INTERFACE_STRING NEXUS_U575_STOP2_MODE)
     add_library(Nexus::U575Stop2Copy ALIAS nexus_stm32u575_stop2_copy)
 endif()
+
+if(TARGET Nexus::U575LpdmaLptim1)
+    add_library(nexus_stm32u575_stop2_lptim1 STATIC EXCLUDE_FROM_ALL
+        "${NEXUS_SOURCE_DIR}/soc/stm32u575/stop2.c")
+    nexus_apply_target_policy(nexus_stm32u575_stop2_lptim1)
+    target_include_directories(nexus_stm32u575_stop2_lptim1 PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/include" PRIVATE
+        "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+        "${NEXUS_SOURCE_DIR}/components/clock_domain/private"
+        "${NEXUS_SOURCE_DIR}/components/stm32u575_lpdma_lptim1/private")
+    target_include_directories(nexus_stm32u575_stop2_lptim1 SYSTEM PRIVATE
+        "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
+        "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    target_link_libraries(nexus_stm32u575_stop2_lptim1 PUBLIC
+        Nexus::U575LpdmaLptim1 Nexus::U575RetainedTime Nexus::ClockDomain
+        PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
+    target_compile_definitions(nexus_stm32u575_stop2_lptim1 PRIVATE
+        STM32U575xx NEXUS_U575_STOP2_LPTIM1)
+    set_property(TARGET nexus_stm32u575_stop2_lptim1 PROPERTY
+        INTERFACE_NEXUS_U575_STOP2_MODE lptim1)
+    set_property(TARGET nexus_stm32u575_stop2_lptim1 APPEND PROPERTY
+        COMPATIBLE_INTERFACE_STRING NEXUS_U575_STOP2_MODE)
+    add_library(Nexus::U575Stop2Lptim1 ALIAS nexus_stm32u575_stop2_lptim1)
+endif()

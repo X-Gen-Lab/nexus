@@ -67,6 +67,7 @@ add_subdirectory(frame_dma2d)
 
 add_subdirectory(stm32u575_retained_time)
 add_subdirectory(stm32u575_lpdma_copy)
+add_subdirectory(stm32u575_lpdma_lptim1)
 add_subdirectory(stm32u575_stop2)
 
 add_subdirectory(i3c_controller)

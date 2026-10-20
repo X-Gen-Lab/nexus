@@ -1,0 +1,136 @@
+# Exact messages independently reviewed; approval bound by companion receipt.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 2666c9a57178946b858e8706a939e1e204f360dffc15f32f63050da96012ed42\n"
+
+msgid "U575 single-tuple LPTIM1 LPBAM across Stop2"
+msgstr "U575 跨 Stop2 的 LPTIM1 单组 LPBAM"
+
+msgid "This reference targets STM32U575ZIT6Q TZEN0 baremetal: one fixed SRAM4 tuple updates LPTIM1 CCR1, RCR and ARR through LPDMA1 channel0 while the same concrete Stop2 owner controls sleep and final release. General LPBAM and the original {download}`IO-32 <io-evolution-execution.csv>` and {download}`SOC-35 <soc-refinement-execution.csv>` exits remain open. Board output routing is unknown; physical HIL is `not_executed`."
+msgstr "本参考适用于 STM32U575ZIT6Q TZEN0 baremetal：一组固定 SRAM4 tuple 通过 LPDMA1 channel0 更新 LPTIM1 CCR1、RCR 和 ARR，同一 concrete Stop2 owner 负责睡眠与最终归还。通用 LPBAM 以及原 {download}`IO-32 <io-evolution-execution.csv>`、{download}`SOC-35 <soc-refinement-execution.csv>` 退出仍开放。Board 输出路线未知；物理 HIL 为 `not_executed`。"
+
+msgid "ES0499 section 2.17.3 warns that modifying an interrupt bit in DIER clears its corresponding status flag. Success therefore captures fresh kernel write acknowledgements before producer withdrawal changes DIER. The software model conservatively permits any DIER write to clear all three write-OK flags; this is a defensive test envelope, not a silicon measurement."
+msgstr "ES0499 第 2.17.3 节指出，修改 DIER 中的中断位会清除对应状态标志。因此成功必须在撤源改写 DIER 之前锁存新鲜的内核写入确认。软件模型保守地允许任意 DIER 写入清除全部三个 write-OK 标志；这是防御性测试边界，不是硅片测量结果。"
+
+msgid "Link `Nexus::U575Stop2Lptim1`; it brings `Nexus::U575LpdmaLptim1` and retained time. WUT-only, SRAM4-copy and LPTIM1 are mutually exclusive compile-time modes of the same static Stop2 owner and RUN ClockDomain. Default images select none of the new targets. No heap, worker, queue, dynamic MMIO plan, runtime registry or new factory is introduced; vendor types remain private."
+msgstr "链接 `Nexus::U575Stop2Lptim1`，它引入 `Nexus::U575LpdmaLptim1` 和保留时间组件。WUT-only、SRAM4-copy 与 LPTIM1 是同一静态 Stop2 owner 和 RUN ClockDomain 的互斥编译期模式。默认镜像不选入任何新目标。该参考不引入堆、worker、队列、动态 MMIO 计划、运行时注册表或新 factory；vendor types 保持私有。"
+
+msgid "![FIG-28: selected single-tuple LPTIM1 reference; success proof precedes producer withdrawal and compound release; physical exits remain open](../assets/diagrams/u575-lptim1-lpbam.svg)"
+msgstr "![FIG-28：选定的 LPTIM1 单组参考；成功证明先于撤源和复合归还；物理退出仍开放](../assets/diagrams/u575-lptim1-lpbam.svg)"
+
+msgid "FIG-28: selected single-tuple LPTIM1 reference; success proof precedes producer withdrawal and compound release; physical exits remain open"
+msgstr "FIG-28：选定的 LPTIM1 单组参考；成功证明先于撤源和复合归还；物理退出仍开放"
+
+msgid "FIG-28 separates calls, hardware requests and final-access proofs. The {ref}`figure contract <fig-28-u575-lptim1-lpbam>` is separate from WUT-only FIG-24 and memory-copy FIG-27; no arrow establishes a pin route or physical Stop2 residency."
+msgstr "FIG-28 区分调用、硬件请求和最终访问证明。{ref}`图示合同 <fig-28-u575-lptim1-lpbam>` 与 WUT-only FIG-24、内存复制 FIG-27 分开；任何箭头都不建立引脚路线或物理 Stop2 驻留。"
+
+msgid "Prepare the exact owners"
+msgstr "准备精确 owner"
+
+msgid "Select the maintained [assembly](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml). Its selected SRAM4/LPDMA1 reset startup and the externally prepared LSE RTC provenance remain required. Keep the 16 KiB nonsecure SRAM4 window at `0x28000000..0x28003fff` powered and retained, with SRAM4EN and LPDMA1EN live through every join. Runtime recovery must not rescue lost SRAM4 by changing its power-down fields."
+msgstr "选用维护的 [assembly](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml)。仍须满足其选定 SRAM4/LPDMA1 reset startup 和外部准备的 LSE RTC 来源合同。在每次 join 完成前，必须保持 `0x28000000..0x28003fff` 的 16 KiB nonsecure SRAM4 供电与保留，并保持 SRAM4EN、LPDMA1EN 有效。运行时恢复不得通过修改掉电字段来补救已丢失的 SRAM4。"
+
+msgid "The existing [retained-clock and Stop2 profile](u575-retained-time.md) requires TZEN0, unswapped Flash, effective MSIS4/MSIK4, equal buses, true Range4 and caches off. All LPDMA channels/vectors start quiet; no other channel may run. The whole LPTIM1 controller is exclusive, initially reset/cold, with its access gate off and kernel mux at reset. No external timer writer, IRQ user or reset may share it. RUN LPTIM2 must already be disabled and joined."
+msgstr "既有 [保留时钟与 Stop2 profile](u575-retained-time.md) 要求 TZEN0、未交换 Flash、有效 MSIS4/MSIK4、各总线频率相同、真实 Range4 和 caches off。所有 LPDMA channel/vector 初始必须静默，其他 channel 不得运行。整个 LPTIM1 控制器必须独占且初始处于 reset/cold 状态，访问门控关闭、kernel mux 为 reset 值。外部 timer writer、IRQ user 或 reset 不得共享它。RUN LPTIM2 必须已禁用并 join。"
+
+msgid "Use the [receiver API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h) and [Stop2 API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h) as declaration authorities. One privileged Thread serializes calls; copied faces retain the same physical identity. No ISR or concurrent writer controls these objects. Keep every owner, clock and face alive through stop and joins."
+msgstr "以 [receiver API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h) 和 [Stop2 API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h) 为声明权威。由一个 privileged Thread 串行调用；复制的 face 保留相同物理身份。ISR 或并发 writer 不得控制这些对象。所有 owner、clock 和 face 都须保持有效，直至 stop 与 join 完成。"
+
+msgid "Storage and the single-tuple bound"
+msgstr "存储与单组限制"
+
+msgid "Selected object"
+msgstr "选定对象"
+
+msgid "Exact cost or constraint"
+msgstr "精确成本或约束"
+
+msgid "Immutable SRAM4 tuple"
+msgstr "不可变 SRAM4 tuple"
+
+msgid "12 B, four-byte aligned; `CCR1<ARR`, `RCR=0`, `1023<=ARR<=65535`"
+msgstr "12 B，4 字节对齐；`CCR1<ARR`、`RCR=0`、`1023<=ARR<=65535`"
+
+msgid "Generated continuation workspace"
+msgstr "生成的 continuation workspace"
+
+msgid "Separate 48 B, four-byte aligned; exactly two LLIs"
+msgstr "独立 48 B，4 字节对齐；恰好两个 LLI"
+
+msgid "Caller-owned ARM32 receiver"
+msgstr "调用者拥有的 ARM32 receiver"
+
+msgid "104 B, including the added 16 B start-effects ledger"
+msgstr "104 B，包含新增的 16 B start-effects 账本"
+
+msgid "Existing SRAM4-copy receiver"
+msgstr "既有 SRAM4-copy receiver"
+
+msgid "Unchanged at 88 B ARM32; no new ledger in that mode"
+msgstr "ARM32 保持 88 B 不变；该模式不增加新账本"
+
+msgid "Shared LPTIM1 ops table"
+msgstr "共享 LPTIM1 ops 表"
+
+msgid "16 B read-only on ARM32; no per-instance copy"
+msgstr "ARM32 下为 16 B 只读；不为每个实例复制"
+
+msgid "The full tuple and workspace extents must be disjoint SRAM4 spans, separate from request, owner, face, clock, snapshot and other control storage. Callers provide no destination, raw DMA instruction or tuple count. A second tuple would need proof that each preceding asynchronous register write was accepted before reuse; a large ARR cannot bound arbitrary bridge delay. Repetition is outside this API. Host64 receiver storage is 136 B; old copy remains 120 B."
+msgstr "完整 tuple 和 workspace 范围必须是互不重叠的 SRAM4 区段，并与 request、owner、face、clock、snapshot 及其他控制存储分开。调用者不提供目的地址、原始 DMA 指令或 tuple 数量。第二组 tuple 需要证明每个前序异步寄存器写入均在复用前被接受；较大的 ARR 不能约束任意 bridge 延迟。重复更新不属于本 API。Host64 receiver storage 为 136 B；旧 copy 保持 120 B。"
+
+msgid "Start, borrow and execute"
+msgstr "启动、借用与执行"
+
+msgid "Initialize ordinary retained time with `wake_owner=nx_stm32u575_stop2_identity()`, then initialize Stop2 and the receiver. No AlarmA-copy initializer is used. Receiver initialization is pure; explicit public `start` prepares access in unmasked privileged Thread."
+msgstr "使用普通保留时间初始化器，设置 `wake_owner=nx_stm32u575_stop2_identity()`，再初始化 Stop2 和 receiver。不使用 AlarmA-copy 初始化器。Receiver 初始化无副作用；显式公开 `start` 在未屏蔽的 privileged Thread 中准备访问。"
+
+msgid "Start acquires LPTIM1EN, LPTIM1SEL=LSE and only a needed LSESYSEN, observing LSESYSRDY while preserving oscillator/calendar provenance. It writes no timer register. Partial failure retains its ledger and physical reservation; keep storage live and call public `stop` until restoration succeeds. Products need no private RCC preparation writes."
+msgstr "Start 获取 LPTIM1EN、LPTIM1SEL=LSE 和仅在需要时新增的 LSESYSEN，并观察 LSESYSRDY，保持 oscillator/calendar 来源不变。它不写 timer register。部分失败保留账本和物理预留；必须保持存储有效，并调用公开 `stop`，直到恢复成功。产品无需私有 RCC 准备写入。"
+
+msgid "Initialize the request base, take a successful retained sample and prepare metadata with the tuple, workspace and an absolute retained-domain deadline or NEVER. Prepare neither borrows nor touches tuple/workspace; keep tuple contents unchanged. Value admission occurs before ACCEPTED. Rejection changes no request byte and retains no new reference; old TIM2 deadlines are never converted."
+msgstr "初始化 request base，取得一次成功的 retained sample，然后以 tuple、workspace 和保留时间域中的绝对 deadline 或 NEVER 准备元数据。Prepare 不借用或访问 tuple/workspace；须保持 tuple 内容不变。值准入检查发生在 ACCEPTED 之前。拒绝不改变 request 的任何字节，也不保留新引用；旧 TIM2 deadline 从不转换。"
+
+msgid "Close and drain the exact RUN barrier, disable/join LPTIM2 and stop Platform. Enter with privileged MSP Thread, CONTROL0, PRIMASK1 and BASEPRI/FAULTMASK0; keep masks and RUN admission closed through recovery. Use 4096..65536 RTC/16 escape ticks and a positive per-phase `poll_limit`. ACCEPTED borrows request, tuple and the full workspace until acquire-observed SETTLED and external observer joins, even if later setup fails."
+msgstr "关闭并排空精确 RUN barrier，禁用/join LPTIM2 并停止 Platform。以 privileged MSP Thread、CONTROL0、PRIMASK1 和 BASEPRI/FAULTMASK0 进入；恢复期间保持掩码及 RUN 准入关闭。使用 4096..65536 个 RTC/16 escape ticks，以及正数的每阶段 `poll_limit`。即使后续设置失败，ACCEPTED 仍借用 request、tuple 和完整 workspace，直至 acquire 观察到 SETTLED 且外部 observer join 完成。"
+
+msgid "After observed CR.ENABLE, a new successful retained sample anchors a bounded wait for at least two additional 256 Hz RTC ticks, checking the request deadline. An arbitrarily short first tick still leaves one full 128-LSE-cycle interval, exceeding two counter cycles. Poll counts alone prove no time. PRELOAD1, one CC1E setup and initial CCR1=0/RCR=0/ARR=1023 require fresh CMP1OK/REPOK/ARROK; those initial flags must then be cleared and observed clear before DMA."
+msgstr "观察到 CR.ENABLE 后，新的成功 retained sample 作为有界等待的起点；至少再等待两个 256 Hz RTC tick，并检查 request deadline。即使第一个 tick 间隔任意短，仍包含一个完整的 128 LSE cycle 间隔，超过两个 counter cycle。轮询次数本身不能证明经过时间。PRELOAD1、一次 CC1E 设置以及初始 CCR1=0/RCR=0/ARR=1023 写入要求新的 CMP1OK/REPOK/ARROK；这些初始标志随后必须被清除并确认清除，才能启动 DMA。"
+
+msgid "The first 32-bit CCR1 write waits for request13 `lptim1_ue_dma` with BREQ1, SWREQ0 and reserved DREQ0. Two generated software-requested LLIs write RCR then ARR last, using fixed noncontiguous destinations and no destination increment. ARR's acknowledged APB write clears UE; the final link is zero and completion is at the last LLI. WUT escapes independently; no AlarmA register or GPIO is configured. Success means synchronized register writes, not a full PWM period."
+msgstr "首个 32 位 CCR1 写入等待 request13 `lptim1_ue_dma`，使用 BREQ1、SWREQ0 和保留位 DREQ0。两个生成的软件请求 LLI 依次写 RCR，最后写 ARR，目的地址固定且不连续，也不递增。ARR 的 APB 写入应答清除 UE；末链为零，完成发生在最后一个 LLI。WUT 独立提供逃逸唤醒；不配置 AlarmA register 或 GPIO。成功表示寄存器写入已同步，不代表播放完整 PWM 周期。"
+
+msgid "Prove success, isolate and join"
+msgstr "证明成功、隔离与 join"
+
+msgid "Success latches both finite DMA completion and fresh CMP1OK/REPOK/ARROK before UEDE0 or any DIER withdrawal write can clear those flags. A quiet flag after DIER is not that proof. Each admission and completed owned isolation clears the saved proof within the existing 16 B ledger. Error or partial cancellation need no write-OK for unissued writes; master isolation and owned reset can terminate such a request with error."
+msgstr "成功须在 UEDE0 或任何 DIER 撤源写入可能清除标志之前，锁存有限 DMA 完成与新鲜 CMP1OK/REPOK/ARROK。DIER 写入后标志安静不是该证明。每次准入及完成的自有隔离都会在既有 16 B 账本内清除保存的证明。错误或部分取消无需为未发出的写入取得 write-OK；master 隔离和自有 reset 可以错误终止此类请求。"
+
+msgid "Without a terminal DMA state or prior failure, public `service` returns BUSY and leaves UEDE enabled so the pending hardware request can still occur. A pending IRQ is only a hint. If concrete Stop2 cleanup cannot prove completion, it retains the loan and records an error for explicit recovery."
+msgstr "若尚无 DMA 终态或既有失败，公开 `service` 返回 BUSY 并保持 UEDE 启用，使待发生的硬件请求仍可推进。pending IRQ 只是提示。若具体 Stop2 清理不能证明完成，会保留借用并记录错误，供显式恢复使用。"
+
+msgid "After finite DMA completion, an incomplete bounded fresh write-OK proof latches `NX_ERROR_IO` and returns BUSY while retaining producer and loan on that call. The next public `service` or concrete `recover` takes the error drain path even if those flags never arrive. This is failure to prove kernel receipt, not an elapsed deadline inferred from poll counts."
+msgstr "有限 DMA 完成后，有界的新鲜 write-OK 证明若不完整，会锁存 `NX_ERROR_IO` 并返回 BUSY，本次调用仍保留生产源和借用。下一次公开 `service` 或具体 `recover` 即使始终没有这些标志，也会沿错误排空路径推进。这表示未能证明内核接收，不是从轮询次数推断 deadline 已到。"
+
+msgid "WUT, deadline, cancel and recovery errors enter the first-failure ledger before producer withdrawal. A TC arriving between that decision and the DIER write may increase the observed transfer prefix; it cannot upgrade the terminal error to success. Public `service` never publishes SETTLED; the same concrete Stop2 owner must complete its final detach."
+msgstr "WUT、deadline、cancel 和恢复错误须在撤源前进入首次失败账本。该决定与 DIER 写入之间到达的 TC 可以增加已观察的传输前缀，但不能将终态错误升级为成功。公开 `service` 从不发布 SETTLED；同一具体 Stop2 owner 必须完成最终引用撤除。"
+
+msgid "With a valid access profile, withdraw UEDE and observe fresh DIEROK before another DIER write, then require suspend/SUSPF/idle for an enabled DMA channel or observed idle for an already completed channel. Prove full-word RESET and the entire CCR equal to zero. Clear channel addresses, links, flags and IRQ references before resetting exclusively owned LPTIM1 through RCC. Never clear CR.ENABLE: ES0499 section 2.17.1 requires reset shutdown. Preserve unrelated gates, mux fields and RTC/LSE provenance; owned reset must not erase any external controller state."
+msgstr "在有效访问配置下，先撤回 UEDE 并观察新鲜 DIEROK，再进行下一次 DIER 写入；对于仍启用的 DMA 通道须取得 suspend/SUSPF/idle，对已完成通道须观察 idle。证明 full-word RESET 与完整 CCR 为零。在通过 RCC reset 独占的 LPTIM1 前，清除通道地址、链接、标志和 IRQ 引用。绝不清 CR.ENABLE：ES0499 第 2.17.1 节要求使用 reset 关闭。保留无关门控、mux 字段及 RTC/LSE 来源；自有 reset 不得擦除任何外部控制器状态。"
+
+msgid "Unknown access profiles permit no RTC/LPTIM/DMA MMIO and retain effects and storage. Concrete Stop2 recovery retries without WFI. Owned reset failure is retryable only after DMA final-access proof; observed external DMA or LPTIM reset during an active loan permanently quarantines it until actual external system reset. Deassertion or quiet reset defaults cannot release that loan."
+msgstr "访问 profile 未知时，不允许 RTC/LPTIM/DMA MMIO，并保留效果与存储。Concrete Stop2 recovery 重试时不执行 WFI。只有 DMA 最终访问已被证明之后，自有 reset 失败才可重试；活动借用期间观察到外部 DMA 或 LPTIM reset，会将借用永久隔离，直至实际外部系统 reset。撤销 reset 或静默 reset 默认值不能归还该借用。"
+
+msgid "Cancel/deadline never revoke storage. Only after peripheral, DMA, IRQ, loan gates, RTC/WUT, power and clock restoration does Stop2 detach references and release-publish SETTLED as its final request access. Public-start claims remain reserved until joined public `stop` restores them, including stop requested during a loan. Reopen RUN and restart Platform only after all effects drain; old Core TIM2 deadlines remain invalid."
+msgstr "Cancel/deadline 从不撤销存储借用。只有 peripheral、DMA、IRQ、借用 gate、RTC/WUT、power 和 clock 都恢复后，Stop2 才移除引用，并以 release 发布 SETTLED，作为其最后一次 request 访问。公开 start 的 claim 保留到 joined public `stop` 归还它们，即使 stop 是在借用期间请求的。所有效果排空后才可重新开放 RUN 并重启 Platform；旧 Core TIM2 deadline 仍然无效。"
+
+msgid "Sources and verification boundary"
+msgstr "来源与验证边界"
+
+msgid "[Production receiver](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/lpdma_copy.c) and [concrete Stop2](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/stop2.c) share invariants through typed compile-time profiles; the two public request/ops types remain distinct. The [maintained public C11 consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c) is the source integration reference. Expanded SDK v8 remains a plan; historical v7 copy results do not qualify this selection. Full integrated gates, relocated SDK, offline reproducibility and candidate acceptance require their own evidence."
+msgstr "[生产 receiver](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/lpdma_copy.c) 与 [concrete Stop2](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/stop2.c) 通过 typed 编译期 profile 共享不变式；两种公共 request/ops 类型保持独立。[维护的公开 C11 consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c) 是源码集成参考。扩展 SDK v8 仍是计划；历史 v7 copy 结果不为该选择建立资格。完整集成门禁、搬移 SDK、离线复现和候选准入都需要各自的证据。"
+
+msgid "Focused production-C GoogleTest models pass 24 cases in debug and 24 with Os, including conservative DIER flag loss, early service, missing acknowledgements, partial cancellation, late TC and proof reuse. Legacy memory-copy receiver31 and coupled17 cases remain green. A selective strict C11 Cortex-M33 development relink recompiles the receiver and Stop2 units and reuses the pinned startup, public consumer and unchanged dependency libraries. These checks establish no complete SDK or candidate qualification."
+msgstr "有针对性的真实生产 C GoogleTest 模型在 debug 和 Os 下各通过 24 项，覆盖保守 DIER 清旗、早期 service、确认缺失、部分取消、晚到 TC 和证明复用。既有 memory-copy receiver31 与 coupled17 项保持通过。选择性严格 C11 Cortex-M33 开发重链接重新编译 receiver 和 Stop2 单元，复用固定的 startup、公共 consumer 与未变依赖库。这些检查不建立完整 SDK 或候选资格。"
+
+msgid "RM0456 Rev7 anchors are sections 18.3.3/Table148 (request13), 18.3.4/Table149 (BREQ), 18.8.11 (reserved DREQ), 58.4.11/13 (write-OK/enable delay), 58.4.20–21 (CCR1→RCR→ARR/UEDE), 58.5 (LPTIM2 disabled before Stop2), 58.7.8 (DIEROK), and 11.8.48–49 (LSE mux/system gate). ES0499 Rev12 sections 2.17.1–3 govern reset, repeat/APB constraints and DIER flags; RCR0 and LSE≤PCLK exclude the odd-repeat profile. Physical waveform, retention, residency, accuracy, wake and power checks remain `not_executed`; no original IO-32/SOC-35 exit is promoted."
+msgstr "RM0456 Rev7 来源为第 18.3.3 节/Table148（request13）、18.3.4 节/Table149（BREQ）、18.8.11 节（保留位 DREQ）、58.4.11/13 节（write-OK/enable 延迟）、58.4.20–21 节（CCR1→RCR→ARR/UEDE）、58.5 节（Stop2 前禁用 LPTIM2）、58.7.8 节（DIEROK）和 11.8.48–49 节（LSE mux/system gate）。ES0499 Rev12 第 2.17.1–3 节规定 reset、repeat/APB 约束和 DIER flag；RCR0 与 LSE≤PCLK 排除奇数 repeat profile。物理波形、保留、驻留、精度、唤醒与功耗检查仍为 `not_executed`；不提升任何原 IO-32/SOC-35 退出状态。"
+

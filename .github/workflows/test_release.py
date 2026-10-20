@@ -299,17 +299,110 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
 
 
 class ConsumerTransportTests(unittest.TestCase):
-    def test_lpdma_copy_has_exact_v7_consumer_identity(self):
+    def test_lpdma_copy_identity_survives_current_policy(self):
         from tools.release import transport
         row = ("u575 lpdma copy",
                "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
                "u575-lpdma-copy")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v7")
-        self.assertEqual(transport.SELECTED_CONSUMERS[-1], row)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v8")
+        self.assertIn(row, transport.SELECTED_CONSUMERS)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected u575 lpdma copy source/.git", transport.FIXTURES)
         self.assertIn("selected u575 lpdma copy build/bin/installed_selected.elf",
                       transport.IMAGES)
+
+    def test_lptim1_lpbam_has_exact_current_v8_consumer_identity(self):
+        from tools.release import transport
+        row = ("u575 lptim1 lpbam",
+               "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
+               "u575-lptim1-lpbam")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v8")
+        self.assertEqual(transport.SELECTED_CONSUMERS[-1], row)
+        self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
+        self.assertEqual(consumer_module().SELECTED_CONSUMERS[-1], row)
+        self.assertIn("selected u575 lptim1 lpbam source/.git",
+                      transport.FIXTURES)
+        self.assertIn("selected u575 lptim1 lpbam "
+                      "build/bin/installed_selected.elf", transport.IMAGES)
+
+    def test_lptim1_selected_template_preserves_public_c11_source(self):
+        module = consumer_module()
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            prefix = base / "prefix"
+            sdk = prefix / "share/nexus/src"
+            assembly = "tools/configure/assemblies/" \
+                       "u575-lptim1-lpbam-stop2.toml"
+            smoke = "cmake/package/verification/io_evolution/consumers/" \
+                    "u575-lptim1-lpbam.c"
+            for relative in (assembly, smoke):
+                destination = sdk / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, destination)
+            write_policy(sdk)
+            source, _, command = module.prepare_selected_consumer(
+                prefix, base, "u575 lptim1 lpbam", assembly,
+                "u575-lptim1-lpbam", lambda argv: subprocess.run(
+                    argv, check=True, capture_output=True),
+                expected_revision=COMMIT)
+            self.assertEqual((source / "main.c").read_bytes(),
+                             (ROOT / smoke).read_bytes())
+            cmake = (source / "CMakeLists.txt").read_text()
+            self.assertIn("set(CMAKE_C_STANDARD 11)", cmake)
+            self.assertIn("Nexus::U575Stop2Lptim1", cmake)
+            self.assertIn("stm32u575_lpdma_lptim1_internal.h",
+                          (source / "private_headers.c").read_text())
+            # Preparing an actual template returns a configure command;
+            # this transport boundary test never executes that command.
+            self.assertIn("-DNEXUS_ASSEMBLY_FILE=" + str(sdk / assembly),
+                          command)
+
+    def test_missing_lptim1_raw_consumer_root_is_rejected(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        shutil.rmtree(raw / "selected u575 lptim1 lpbam source")
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_rehashed_transport_missing_lptim1_image_is_rejected(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        output = base / "transport"
+        transport.pack(raw, output, COMMIT)
+        image = "selected u575 lptim1 lpbam " \
+                "build/bin/installed_selected.elf"
+        original = output / transport.ARCHIVE
+        rewritten = base / "without-lptim1.tar.gz"
+        removed = False
+        with tarfile.open(original) as source:
+            with tarfile.open(rewritten, "w:gz") as archive:
+                for member in source:
+                    if member.name == image:
+                        removed = True
+                        continue
+                    archive.addfile(member, source.extractfile(member)
+                                    if member.isfile() else None)
+        self.assertTrue(removed)
+        rewritten.replace(original)
+        manifest_path = output / transport.MANIFEST
+        manifest = json.loads(manifest_path.read_text())
+        del manifest["files"][image]
+        manifest["archive"] = transport.byte_identity(original)
+        manifest_path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError,
+                                    "Exact current consumer roots and images"):
+            transport.verify(output, COMMIT)
+
+    def test_complete_previous_v7_matrix_is_not_a_current_v8_fallback(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for suffix in ("source", "build"):
+            shutil.rmtree(raw / ("selected u575 lptim1 lpbam " + suffix))
+        self.assertEqual(len(list(raw.rglob(".git"))), 47)
+        self.assertEqual(sum((raw / image).is_file()
+                             for image in transport.IMAGES), 50)
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+            transport.pack(raw, base / "transport", COMMIT)
 
     def test_h743_duplex_modes_have_exact_independent_consumer_identities(self):
         from tools.release import transport
@@ -323,7 +416,7 @@ class ConsumerTransportTests(unittest.TestCase):
         }
         self.assertTrue(expected.issubset(set(transport.SELECTED_CONSUMERS)),
                         expected - set(transport.SELECTED_CONSUMERS))
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v7")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v8")
         for name, _, _ in expected:
             self.assertIn("selected " + name + " source/.git",
                           transport.FIXTURES)
@@ -409,7 +502,7 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 47)
+        self.assertEqual(len(list(raw.rglob(".git"))), 48)
         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
         self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
         self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
@@ -420,10 +513,10 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v7")
-        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v7")
-        self.assertEqual(len(list(raw.rglob(".git"))), 47)
-        self.assertEqual(len(manifest["consumer_images"]), 50)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v8")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v8")
+        self.assertEqual(len(list(raw.rglob(".git"))), 48)
+        self.assertEqual(len(manifest["consumer_images"]), 51)
         auxiliary = "stm32 build/bin/installed_c.bin"
         self.assertIn(auxiliary, manifest["files"])
         self.assertNotIn(auxiliary, manifest["consumer_images"])
@@ -668,7 +761,8 @@ class ConsumerTransportTests(unittest.TestCase):
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on", "u575 rtc run",
-                      "u575 retained time", "u575 stop2", "u575 lpdma copy"):
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
+                      "u575 lptim1 lpbam"):
             shutil.rmtree(raw / ("selected " + label + " source"))
             shutil.rmtree(raw / ("selected " + label + " build"))
         self.assertEqual(len(list(raw.rglob(".git"))), 31)
@@ -683,7 +777,8 @@ class ConsumerTransportTests(unittest.TestCase):
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on", "u575 rtc run",
-                      "u575 retained time", "u575 stop2", "u575 lpdma copy"):
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
+                      "u575 lptim1 lpbam"):
             shutil.rmtree(raw / ("selected " + label + " source"))
             shutil.rmtree(raw / ("selected " + label + " build"))
         self.assertEqual(len(list(raw.rglob(".git"))), 36)
@@ -694,7 +789,7 @@ class ConsumerTransportTests(unittest.TestCase):
         from tools.release import transport
         for policy in ("nexus-sdk-consumers-v2", "nexus-sdk-consumers-v3",
                        "nexus-sdk-consumers-v4", "nexus-sdk-consumers-v5",
-                       "nexus-sdk-consumers-v6"):
+                       "nexus-sdk-consumers-v6", "nexus-sdk-consumers-v7"):
             with self.subTest(policy=policy):
                 base, raw = self.fixture()
                 packed = base / "transport"

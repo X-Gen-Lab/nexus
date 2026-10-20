@@ -23,3 +23,7 @@ target_compile_definitions(nexus_stm32u575_lpdma_copy PRIVATE STM32U575xx)
 target_link_libraries(nexus_stm32u575_lpdma_copy PUBLIC Nexus::U575RetainedTime
     PRIVATE Nexus::IO Nexus::Arch nexus_build_options nexus_owned_warnings)
 add_library(Nexus::U575LpdmaCopy ALIAS nexus_stm32u575_lpdma_copy)
+set_property(TARGET nexus_stm32u575_lpdma_copy PROPERTY
+    INTERFACE_NEXUS_U575_LPDMA_MODE copy)
+set_property(TARGET nexus_stm32u575_lpdma_copy APPEND PROPERTY
+    COMPATIBLE_INTERFACE_STRING NEXUS_U575_LPDMA_MODE)

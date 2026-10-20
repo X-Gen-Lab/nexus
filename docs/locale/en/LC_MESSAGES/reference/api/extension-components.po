@@ -1,5 +1,6 @@
+# Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 781bdc5b95aeb5cc4556e4c49ff5f754d0081f68dfeeacf158d023f5155c6c0e\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: cda9b127b1e6cedbc053743cb44a7f6dc59737ab19c58489cd60617393130eff\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "Extension and lifecycle APIs"
@@ -760,7 +761,6 @@ msgstr "Pure lookup; all platform/product RUN owners enroll explicitly."
 msgid "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
 msgstr "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
 
-
 msgid "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
 msgstr "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
 
@@ -1205,6 +1205,105 @@ msgstr "Separate copy admission and exact Stop2 transition observations."
 msgid "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
 msgstr "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
 
-# Retained prior translation; replaced by the current public-header note.
-#~ msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
-#~ msgstr "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+msgid "stm32u575_lpdma_lptim1.h"
+msgstr "stm32u575_lpdma_lptim1.h"
+
+msgid "Exact U575 finite LPTIM1 autonomous register update."
+msgstr "Exact U575 finite LPTIM1 autonomous register update."
+
+msgid "Bind one pure owner; no MMIO writes, allocation or worker."
+msgstr "Bind one pure owner; no MMIO writes, allocation or worker."
+
+msgid "Exact STM32U575ZIT6Q TZEN0, MSIS4/MSIK4/equal buses/Range4, caches off. Selected SRAM4/LPDMA1 startup and retained LSE RTC access remain live. LPDMA0 and the entire LPTIM1 controller are exclusive; no other channel, timer writer, IRQ user or external reset exists. Config/face/control storage must be separate. Rejection retains no new reference."
+msgstr "Exact STM32U575ZIT6Q TZEN0, MSIS4/MSIK4/equal buses/Range4, caches off. Selected SRAM4/LPDMA1 startup and retained LSE RTC access remain live. LPDMA0 and the entire LPTIM1 controller are exclusive; no other channel, timer writer, IRQ user or external reset exists. Config/face/control storage must be separate. Rejection retains no new reference."
+
+msgid "Explicitly prepare cold LPTIM1 access gates and LSE kernel."
+msgstr "Explicitly prepare cold LPTIM1 access gates and LSE kernel."
+
+msgid "Unmasked privileged Thread, positive per-phase poll budget. Owns only LPTIM1EN, LPTIM1SEL and added LSESYSEN, preserving RTC/LSE provenance. LPTIM1 must be reset/cold and initially unclocked with reset mux. A failed preparation can retain effects; keep owner live and call stop until it succeeds. It never starts the timer or borrows a request."
+msgstr "Unmasked privileged Thread, positive per-phase poll budget. Owns only LPTIM1EN, LPTIM1SEL and added LSESYSEN, preserving RTC/LSE provenance. LPTIM1 must be reset/cold and initially unclocked with reset mux. A failed preparation can retain effects; keep owner live and call stop until it succeeds. It never starts the timer or borrows a request."
+
+msgid "Prepare one SRAM4 tuple without borrowing or writing data/LLIs."
+msgstr "Prepare one SRAM4 tuple without borrowing or writing data/LLIs."
+
+msgid "Tuple contents remain unchanged from prepare through settlement. Invalid/aliased/wrapping spans leave every request byte unchanged. Deadline is absolute retained microseconds or NEVER; no TIM2 conversion."
+msgstr "Tuple contents remain unchanged from prepare through settlement. Invalid/aliased/wrapping spans leave every request byte unchanged. Deadline is absolute retained microseconds or NEVER; no TIM2 conversion."
+
+msgid "Request withdrawal without revoking any borrowed storage."
+msgstr "Request withdrawal without revoking any borrowed storage."
+
+msgid "Masked privileged MSP Thread through compound recovery. Late cancel after observed DMA completion rejects STATE. First failure persists."
+msgstr "Masked privileged MSP Thread through compound recovery. Late cancel after observed DMA completion rejects STATE. First failure persists."
+
+msgid "Bounded producer/master isolation, never independent settlement."
+msgstr "Bounded producer/master isolation, never independent settlement."
+
+msgid "Producer UEDE withdrawal precedes DMA suspend/reset/idle. All final peripheral/IRQ references and Stop2 restoration precede final release. Unknown clock/access profile permits no peripheral MMIO; external DMA or LPTIM reset during a loan permanently quarantines that loan."
+msgstr "Producer UEDE withdrawal precedes DMA suspend/reset/idle. All final peripheral/IRQ references and Stop2 restoration precede final release. Unknown clock/access profile permits no peripheral MMIO; external DMA or LPTIM reset during a loan permanently quarantines that loan."
+
+msgid "Close admission and restore owned start effects after compound join."
+msgstr "Close admission and restore owned start effects after compound join."
+
+msgid "Positive per-phase observation budget is not elapsed time. BUSY keeps all effects/storage alive; recover through the concrete Stop2 owner. A fresh final write-OK proof means synchronized register writes, never physical Stop2 residency, output playback, board routing or HIL."
+msgstr "Positive per-phase observation budget is not elapsed time. BUSY keeps all effects/storage alive; recover through the concrete Stop2 owner. A fresh final write-OK proof means synchronized register writes, never physical Stop2 residency, output playback, board routing or HIL."
+
+msgid "One caller-owned immutable register tuple, in exact SRAM4."
+msgstr "One caller-owned immutable register tuple, in exact SRAM4."
+
+msgid "CCR1 < ARR, RCR=0 and 1023<=ARR<=65535. There is exactly one tuple; repeated updates need a separate write-OK proof and are not admitted. No GPIO route or physical waveform playback is established."
+msgstr "CCR1 < ARR, RCR=0 and 1023<=ARR<=65535. There is exactly one tuple; repeated updates need a separate write-OK proof and are not admitted. No GPIO route or physical waveform playback is established."
+
+msgid "Exactly two generated continuation LLIs; never caller instructions."
+msgstr "Exactly two generated continuation LLIs; never caller instructions."
+
+msgid "Entire aligned 48-byte extent is separate nonsecure SRAM4. The owner writes all words only after ACCEPTED; keep immutable until SETTLED."
+msgstr "Entire aligned 48-byte extent is separate nonsecure SRAM4. The owner writes all words only after ACCEPTED; keep immutable until SETTLED."
+
+msgid "Zero caller storage, never copy/reset/reconstruct a live owner."
+msgstr "Zero caller storage, never copy/reset/reconstruct a live owner."
+
+msgid "One privileged Thread serializes all calls; no ISR/concurrent writer. Keep owner, clock and every face alive through stop and observer joins."
+msgstr "One privileged Thread serializes all calls; no ISR/concurrent writer. Keep owner, clock and every face alive through stop and observer joins."
+
+msgid "Explicit live retained-clock and same concrete Stop2 binding."
+msgstr "Explicit live retained-clock and same concrete Stop2 binding."
+
+msgid "Use the ordinary retained-clock initializer with wake_owner equal to nx_stm32u575_stop2_identity(). No AlarmA-copy opt-in is required."
+msgstr "Use the ordinary retained-clock initializer with wake_owner equal to nx_stm32u575_stop2_identity(). No AlarmA-copy opt-in is required."
+
+msgid "Prepared metadata; all fields are provider-controlled after prepare."
+msgstr "Prepared metadata; all fields are provider-controlled after prepare."
+
+msgid "Initialize base first. ACCEPTED borrows request, tuple and workspace until acquire-observed SETTLED and external joins. Cancel/deadline do not revoke a borrow. CPU control storage must be separate from SRAM4 data/LLIs. Never mutate or reprepare while borrowed."
+msgstr "Initialize base first. ACCEPTED borrows request, tuple and workspace until acquire-observed SETTLED and external joins. Cancel/deadline do not revoke a borrow. CPU control storage must be separate from SRAM4 data/LLIs. Never mutate or reprepare while borrowed."
+
+msgid "Shared immutable methods; service never publishes SETTLED."
+msgstr "Shared immutable methods; service never publishes SETTLED."
+
+msgid "Copied immutable faces retain the exact physical owner identity."
+msgstr "Copied immutable faces retain the exact physical owner identity."
+
+msgid "stm32u575_stop2_lptim1.h"
+msgstr "stm32u575_stop2_lptim1.h"
+
+msgid "Same concrete Stop2 owner and finite LPTIM1 LPBAM boundary."
+msgstr "Same concrete Stop2 owner and finite LPTIM1 LPBAM boundary."
+
+msgid "One finite hardware-requested LPTIM1 tuple across Stop2."
+msgstr "One finite hardware-requested LPTIM1 tuple across Stop2."
+
+msgid "Link only Nexus::U575Stop2Lptim1; WUT/copy alternatives are exclusive. Same static owner, RUN ClockDomain and recovery. Ordinary retained time uses this wake identity; explicitly start the dedicated receiver first. Closed/drained exact RUN barrier, stopped Platform, privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0 remain required. Keep masks and RUN admission closed through all retained recovery."
+msgstr "Link only Nexus::U575Stop2Lptim1; WUT/copy alternatives are exclusive. Same static owner, RUN ClockDomain and recovery. Ordinary retained time uses this wake identity; explicitly start the dedicated receiver first. Closed/drained exact RUN barrier, stopped Platform, privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0 remain required. Keep masks and RUN admission closed through all retained recovery."
+
+msgid "LPTIM1 LSE/preload/CC1E, initial ARR1023/RCR0; request13/BREQ1 gates CCR1, two generated software-requested LLIs write RCR and ARR last. No AlarmA trigger. WUT escapes at 4096..65536 RTC/16 ticks. Positive poll_limit bounds observations, not WFI duration or physical response."
+msgstr "LPTIM1 LSE/preload/CC1E, initial ARR1023/RCR0; request13/BREQ1 gates CCR1, two generated software-requested LLIs write RCR and ARR last. No AlarmA trigger. WUT escapes at 4096..65536 RTC/16 ticks. Positive poll_limit bounds observations, not WFI duration or physical response."
+
+msgid "UEDE withdrawal/DIEROK precede DMA suspend/reset/idle and reference detach. Fresh write-OK gates success. Owned RCC reset disables LPTIM1 per ES0499. All peripheral/IRQ/gate/clock restoration precedes SETTLED; start access gates stay until joined public stop. Cancel/deadline never revoke storage. Unknown profile permits no peripheral MMIO. External peripheral reset permanently quarantines an active loan until system reset. Recovery never runs WFI. No GPIO/Board route, output playback, physical residency, timing/power or HIL result is implied."
+msgstr "UEDE withdrawal/DIEROK precede DMA suspend/reset/idle and reference detach. Fresh write-OK gates success. Owned RCC reset disables LPTIM1 per ES0499. All peripheral/IRQ/gate/clock restoration precedes SETTLED; start access gates stay until joined public stop. Cancel/deadline never revoke storage. Unknown profile permits no peripheral MMIO. External peripheral reset permanently quarantines an active loan until system reset. Recovery never runs WFI. No GPIO/Board route, output playback, physical residency, timing/power or HIL result is implied."
+
+msgid "Admission and software sleep observations, not the final result."
+msgstr "Admission and software sleep observations, not the final result."
+
+msgid "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
+msgstr "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
+

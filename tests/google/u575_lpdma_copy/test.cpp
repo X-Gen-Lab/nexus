@@ -642,3 +642,18 @@ TEST_F(LpdmaCopy,
         },
         testing::ExitedWithCode(0), "");
 }
+
+TEST(LpdmaCopyBoundary, MemoryCopyContinuesToRejectPeripheralDestination) {
+    nx_stm32u575_lpdma_copy_request_t request{};
+    nx_stm32u575_retained_time_storage_t clock{};
+    nx_stm32u575_retained_time_snapshot_t sample{&clock, 1U, 0U, 0U};
+    nx_request_initialize(&request.base);
+    EXPECT_EQ(NX_ERROR_PERMISSION,
+              nx_stm32u575_lpdma_copy_request_prepare(
+                  &request, &sample,
+                  reinterpret_cast<const void*>(SRAM4_BASE_NS + 0x100U),
+                  reinterpret_cast<void*>(LPTIM1_BASE_NS + 0x14U), 12U,
+                  reinterpret_cast<nx_stm32u575_lpdma_copy_workspace_t*>(
+                      SRAM4_BASE_NS + 0x300U),
+                  NX_DEADLINE_NEVER));
+}

@@ -9,7 +9,13 @@
 #include "nexus/arch/arch.h"
 #include "nexus/io/dma.h"
 #include "stm32u575_lpdma_copy_hw.h"
+#ifdef NEXUS_U575_STOP2_LPTIM1
+#include "stm32u575_lpdma_lptim1_internal.h"
+#define nx_stm32u575_retained_time_validate_alarm_a_copy                       \
+    nx_stm32u575_retained_time_validate_wake
+#else
 #include "stm32u575_lpdma_copy_internal.h"
+#endif
 #include "stm32u5xx_ll_dma.h"
 #include <string.h>
 nx_result_t nx_stm32u575_retained_time_validate_alarm_a_copy(
@@ -32,14 +38,46 @@ _Static_assert(LL_LPDMA1_TRIGGER_RTC_ALRA_TRG == 14U,
     (DMA_CCR_TCIE | DMA_CCR_DTEIE | DMA_CCR_ULEIE | DMA_CCR_USEIE |            \
      DMA_CCR_TOIE)
 #define SLEEP_BITS (RCC_AHB3SMENR_LPDMA1SMEN | RCC_AHB3SMENR_SRAM4SMEN)
-#define AUTO_BITS  (RCC_SRDAMR_LPDMA1AMEN | RCC_SRDAMR_SRAM4AMEN)
+#ifdef NEXUS_U575_STOP2_LPTIM1
+#define AUTO_BITS                                                              \
+    (RCC_SRDAMR_LPDMA1AMEN | RCC_SRDAMR_SRAM4AMEN | RCC_SRDAMR_LPTIM1AMEN)
+#else
+#define AUTO_BITS (RCC_SRDAMR_LPDMA1AMEN | RCC_SRDAMR_SRAM4AMEN)
+#endif
 #define UPDATE_BITS                                                            \
     (DMA_CLLR_UT1 | DMA_CLLR_UT2 | DMA_CLLR_UB1 | DMA_CLLR_USA |               \
      DMA_CLLR_UDA | DMA_CLLR_ULL)
+#ifdef NEXUS_U575_STOP2_LPTIM1
+_Static_assert(sizeof(nx_stm32u575_lptim1_tuple_t) == 12U &&
+                   offsetof(nx_stm32u575_lptim1_tuple_t, rcr) == 4U &&
+                   offsetof(nx_stm32u575_lptim1_tuple_t, arr) == 8U &&
+                   sizeof(nx_stm32u575_lpdma_lptim1_workspace_t) == 48U &&
+                   LL_LPDMA1_REQUEST_LPTIM1_UE == 13U && LPTIM1_IRQn == 67 &&
+                   offsetof(LPTIM_TypeDef, CCR1) == 0x14U &&
+                   offsetof(LPTIM_TypeDef, RCR) == 0x28U &&
+                   offsetof(LPTIM_TypeDef, ARR) == 0x18U,
+               "unreviewed U575 LPTIM1 route/layout");
+#define DATA_BITS  (DMA_CTR1_SINC | DMA_CTR1_SDW_LOG2_1 | DMA_CTR1_DDW_LOG2_1)
+#define FINAL_BITS (DMA_CTR2_SWREQ | DMA_CTR2_TCEM)
+#define FIRST_BITS (13U | DMA_CTR2_BREQ | DMA_CTR2_TCEM)
+typedef struct {
+    uint32_t sleep;
+    bool effects, ready, source_added, gate_added, dirty, producer,
+        reset_asserted, dier_pending, enabled, write_ok;
+} peripheral_t;
+_Static_assert(sizeof(peripheral_t) == 16U, "fixed LPTIM1 profile ledger");
+#define REQUEST_SOURCE(request)      ((request)->tuple)
+#define REQUEST_DESTINATION(request) ((request)->private_destination)
+#define REQUEST_LENGTH(request)      ((request)->private_length)
+#else
 #define DATA_BITS  (DMA_CTR1_SINC | DMA_CTR1_DINC)
 #define FINAL_BITS (DMA_CTR2_SWREQ | DMA_CTR2_TCEM)
 #define FIRST_BITS                                                             \
     (FINAL_BITS | DMA_CTR2_TRIGPOL_0 | (14U << DMA_CTR2_TRIGSEL_Pos))
+#define REQUEST_SOURCE(request)      ((request)->source)
+#define REQUEST_DESTINATION(request) ((request)->destination)
+#define REQUEST_LENGTH(request)      ((request)->length)
+#endif
 typedef struct {
     const void* self;
     nx_stm32u575_retained_time_storage_t* clock;
@@ -53,13 +91,16 @@ typedef struct {
     nx_time_us_t deadline;
     uint32_t sleep, autonomous, privilege;
     nx_result_t failure;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    peripheral_t peripheral;
+#endif
     bool opened, closing, configured, reset_done, drained, completed, failed,
         reset_uncertain;
 } owner_t;
 _Static_assert(sizeof(owner_t) == NX_U575_LPDMA_COPY_STORAGE_BYTES &&
                    _Alignof(owner_t) ==
                        _Alignof(nx_stm32u575_lpdma_copy_storage_t),
-               "copy owner ABI");
+               "selected receiver owner ABI");
 /* One fixed physical-role reservation, never a pool or name registry. */
 static nx_stm32u575_lpdma_copy_storage_t* claim;
 static bool span(const void* p, size_t bytes, size_t alignment) {
@@ -82,6 +123,12 @@ static bool context(bool masked) {
 }
 static bool profile(owner_t* owner) {
     bool reset = (NX_LPDMA_READ(RCC->AHB3RSTR) & RCC_AHB3RSTR_LPDMA1RST) != 0U;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    bool peripheral_reset =
+        (NX_LPDMA_READ(RCC->APB3RSTR) & RCC_APB3RSTR_LPTIM1RST) != 0U;
+    if (owner != NULL && peripheral_reset && !owner->peripheral.reset_asserted)
+        owner->reset_uncertain = true;
+#endif
     if (owner != NULL && reset)
         owner->reset_uncertain = true;
     /* External reset is outside the exclusive-owner contract. Reset-default
@@ -185,13 +232,26 @@ static nx_result_t buffers(const void* source, void* destination, size_t length,
                            const void* control, size_t control_bytes) {
     static const nx_dma_memory_region_t region = {
         SRAM4_BASE_NS, SRAM4_SIZE, NX_DMA_MEMORY_READ | NX_DMA_MEMORY_WRITE};
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (length != sizeof(nx_stm32u575_lptim1_tuple_t) ||
+        destination != (void*)&LPTIM1->CCR1 ||
+        !span(control, control_bytes, 1U))
+#else
     if (length < 2U || !span(control, control_bytes, 1U))
+#endif
         return NX_ERROR_INVALID;
-    nx_result_t result = nx_dma_buffer_validate(&region, 1U, source, length, 1U,
+    nx_result_t result = nx_dma_buffer_validate(&region, 1U, source, length,
+#ifdef NEXUS_U575_STOP2_LPTIM1
+                                                4U,
+#else
+                                                1U,
+#endif
                                                 NX_DMA_TO_DEVICE);
+#ifndef NEXUS_U575_STOP2_LPTIM1
     if (result == NX_SUCCESS)
         result = nx_dma_buffer_validate(&region, 1U, destination, length, 1U,
                                         NX_DMA_FROM_DEVICE);
+#endif
     if (result == NX_SUCCESS)
         result = nx_dma_buffer_validate(
             &region, 1U, workspace, sizeof(*workspace), 4U, NX_DMA_TO_DEVICE);
@@ -217,21 +277,28 @@ static nx_result_t request_valid(const nx_stm32u575_lpdma_copy_t* copy,
     if (request->identity != request ||
         nx_request_state(&request->base) != NX_REQUEST_READY)
         return NX_ERROR_STATE;
-    nx_result_t result =
-        buffers(request->source, request->destination, request->length,
-                request->workspace, request, sizeof(*request));
+    nx_result_t result = buffers(
+        REQUEST_SOURCE(request), REQUEST_DESTINATION(request),
+        REQUEST_LENGTH(request), request->workspace, request, sizeof(*request));
     if (result != NX_SUCCESS)
         return result;
     const void* controls[] = {copy, copy->context, owner->clock};
     size_t sizes[] = {sizeof(*copy), sizeof(nx_stm32u575_lpdma_copy_storage_t),
                       sizeof(*owner->clock)};
     for (size_t n = 0U; n < 3U; ++n) {
-        result = buffers(request->source, request->destination, request->length,
-                         request->workspace, controls[n], sizes[n]);
+        result = buffers(REQUEST_SOURCE(request), REQUEST_DESTINATION(request),
+                         REQUEST_LENGTH(request), request->workspace,
+                         controls[n], sizes[n]);
         if (result != NX_SUCCESS ||
             overlap(request, sizeof(*request), controls[n], sizes[n]))
             return NX_ERROR_INVALID;
     }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (request->tuple->rcr != 0U || request->tuple->arr < 1023U ||
+        request->tuple->arr > 65535U ||
+        request->tuple->ccr1 >= request->tuple->arr)
+        return NX_ERROR_INVALID;
+#endif
     return request->clock_identity != owner->clock ||
                    request->clock_generation != owner->generation
                ? NX_ERROR_STATE
@@ -259,6 +326,10 @@ static nx_result_t held(const nx_stm32u575_lpdma_copy_t* copy, owner_t* owner) {
     save(copy, owner);
     return NX_ERROR_BUSY;
 }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+static nx_result_t observe(owner_t* owner);
+#include "stm32u575_lptim1_profile.h"
+#endif
 nx_result_t nx_stm32u575_lpdma_copy_initialize(
     nx_stm32u575_lpdma_copy_storage_t* storage,
     const nx_stm32u575_lpdma_copy_config_t* config,
@@ -321,6 +392,7 @@ nx_result_t nx_stm32u575_lpdma_copy_initialize(
     copy->context = storage;
     return NX_SUCCESS;
 }
+#ifndef NEXUS_U575_STOP2_LPTIM1
 nx_result_t nx_stm32u575_lpdma_copy_request_prepare(
     nx_stm32u575_lpdma_copy_request_t* request,
     const nx_stm32u575_retained_time_snapshot_t* domain, const void* source,
@@ -360,6 +432,7 @@ nx_result_t nx_stm32u575_lpdma_copy_request_prepare(
     request->clock_generation = domain->generation;
     return NX_SUCCESS;
 }
+#endif
 nx_result_t nx_stm32u575_lpdma_copy_validate_ready(
     const nx_stm32u575_lpdma_copy_t* copy,
     nx_stm32u575_lpdma_copy_request_t* request,
@@ -382,6 +455,10 @@ nx_result_t nx_stm32u575_lpdma_copy_validate_ready(
         return NX_ERROR_STATE;
     if (!baseline())
         return NX_ERROR_BUSY;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (!owner.peripheral.ready || !lptim_access(&owner) || !lptim_cold())
+        return NX_ERROR_STATE;
+#endif
     nx_stm32u575_retained_time_snapshot_t sample;
     result = clock_valid(&owner, &sample);
     if (result == NX_SUCCESS && request->base.deadline != NX_DEADLINE_NEVER &&
@@ -389,9 +466,16 @@ nx_result_t nx_stm32u575_lpdma_copy_validate_ready(
         result = NX_ERROR_TIMEOUT;
     return result;
 }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+nx_result_t
+nx_stm32u575_lpdma_lptim1_arm(const nx_stm32u575_lpdma_lptim1_t* copy,
+                              nx_stm32u575_lpdma_lptim1_request_t* request,
+                              uint32_t poll_limit) {
+#else
 nx_result_t
 nx_stm32u575_lpdma_copy_arm(const nx_stm32u575_lpdma_copy_t* copy,
                             nx_stm32u575_lpdma_copy_request_t* request) {
+#endif
     owner_t owner;
     nx_result_t result = load(copy, &owner);
     if (result != NX_SUCCESS)
@@ -404,11 +488,16 @@ nx_stm32u575_lpdma_copy_arm(const nx_stm32u575_lpdma_copy_t* copy,
     if (result != NX_SUCCESS)
         return result;
     owner.request = request;
-    owner.source = request->source;
-    owner.destination = request->destination;
+    owner.source = REQUEST_SOURCE(request);
+    owner.destination = REQUEST_DESTINATION(request);
     owner.workspace = request->workspace;
-    owner.length = request->length;
+    owner.length = REQUEST_LENGTH(request);
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    owner.first = 4U;
+    owner.peripheral.write_ok = false;
+#else
     owner.first = owner.length / 2U;
+#endif
     owner.deadline = request->base.deadline;
     owner.transferred = 0U;
     owner.failed = owner.completed = owner.reset_done = owner.drained =
@@ -417,6 +506,9 @@ nx_stm32u575_lpdma_copy_arm(const nx_stm32u575_lpdma_copy_t* copy,
     owner.sleep = NX_LPDMA_READ(RCC->AHB3SMENR) & SLEEP_BITS;
     owner.autonomous = NX_LPDMA_READ(RCC->SRDAMR) & AUTO_BITS;
     owner.privilege = NX_LPDMA_READ(LPDMA1->PRIVCFGR) & DMA_PRIVCFGR_PRIV0;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    lptim_descriptors(&owner);
+#else
     uint32_t* words = owner.workspace->private_words;
     words[0] = DATA_BITS;
     words[1] = FINAL_BITS;
@@ -424,8 +516,12 @@ nx_stm32u575_lpdma_copy_arm(const nx_stm32u575_lpdma_copy_t* copy,
     words[3] = (uint32_t)((uintptr_t)owner.source + owner.first);
     words[4] = (uint32_t)((uintptr_t)owner.destination + owner.first);
     words[5] = 0U;
+#endif
     nx_arch_dsb();
     bool programmed =
+#ifdef NEXUS_U575_STOP2_LPTIM1
+        lptim_prepare(&owner, poll_limit) &&
+#endif
         update(&RCC->AHB3SMENR, SLEEP_BITS, SLEEP_BITS) &&
         update(&RCC->SRDAMR, AUTO_BITS, AUTO_BITS) &&
         update(&LPDMA1->PRIVCFGR, DMA_PRIVCFGR_PRIV0, DMA_PRIVCFGR_PRIV0) &&
@@ -480,7 +576,11 @@ static nx_result_t observe(owner_t* owner) {
             NX_LPDMA_READ(LPDMA1_Channel0->CSAR) ==
                 (uint32_t)((uintptr_t)owner->source + owner->length) &&
             NX_LPDMA_READ(LPDMA1_Channel0->CDAR) ==
+#ifdef NEXUS_U575_STOP2_LPTIM1
+                (uint32_t)(uintptr_t)&LPTIM1->ARR)
+#else
                 (uint32_t)((uintptr_t)owner->destination + owner->length))
+#endif
             owner->completed = true;
         else
             fail(owner, NX_ERROR_IO);
@@ -518,6 +618,11 @@ nx_result_t nx_stm32u575_lpdma_copy_drain(const nx_stm32u575_lpdma_copy_t* copy,
         nx_arch_dsb();
         return held(copy, &owner);
     }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (!lptim_access(&owner) ||
+        lptim_withdraw(&owner, poll_limit) != NX_SUCCESS)
+        return held(copy, &owner);
+#endif
     if (owner.drained) {
         save(copy, &owner);
         return NX_SUCCESS;
@@ -538,6 +643,17 @@ nx_result_t nx_stm32u575_lpdma_copy_drain(const nx_stm32u575_lpdma_copy_t* copy,
                 return held(copy, &owner);
         } else if ((NX_LPDMA_READ(LPDMA1_Channel0->CSR) & DMA_CSR_IDLEF) == 0U)
             return held(copy, &owner);
+#ifdef NEXUS_U575_STOP2_LPTIM1
+        uint32_t source = NX_LPDMA_READ(LPDMA1_Channel0->CSAR);
+        uintptr_t first = (uintptr_t)owner.source;
+        if ((uintptr_t)source >= first &&
+            (uintptr_t)source - first <= owner.length)
+            owner.transferred = ((uintptr_t)source - first) / 4U * 4U;
+        else {
+            owner.transferred = 0U;
+            fail(&owner, NX_ERROR_STATE);
+        }
+#else
         uint32_t destination = NX_LPDMA_READ(LPDMA1_Channel0->CDAR);
         uintptr_t first = (uintptr_t)owner.destination;
         if ((uintptr_t)destination >= first &&
@@ -547,6 +663,7 @@ nx_result_t nx_stm32u575_lpdma_copy_drain(const nx_stm32u575_lpdma_copy_t* copy,
             owner.transferred = 0U;
             fail(&owner, NX_ERROR_STATE);
         }
+#endif
         NX_LPDMA_WRITE(LPDMA1_Channel0->CCR, DMA_CCR_RESET);
         nx_arch_dsb();
         /* RESET is write-only, not an acknowledgement bit. This full-word
@@ -570,6 +687,10 @@ nx_result_t nx_stm32u575_lpdma_copy_drain(const nx_stm32u575_lpdma_copy_t* copy,
                    poll_limit) ||
         !vector_quiet(IRQ_BIT))
         return held(copy, &owner);
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (!lptim_isolate(&owner))
+        return held(copy, &owner);
+#endif
     if (!update(&LPDMA1->PRIVCFGR, DMA_PRIVCFGR_PRIV0, owner.privilege) ||
         !update(&RCC->AHB3SMENR, SLEEP_BITS, owner.sleep) ||
         !update(&RCC->SRDAMR, AUTO_BITS, owner.autonomous))
@@ -597,6 +718,13 @@ nx_result_t nx_stm32u575_lpdma_copy_validate_sleep(
         save(copy, &owner);
         return NX_ERROR_STATE;
     }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (!lptim_access(&owner) || !owner.peripheral.enabled ||
+        NX_LPDMA_READ(LPTIM1->DIER) != 0U ||
+        NX_LPDMA_READ(LPTIM1->CFGR) != LPTIM_CFGR_PRELOAD ||
+        NX_LPDMA_READ(LPTIM1->CCMR1) != LPTIM_CCMR1_CC1E)
+        return NX_ERROR_STATE;
+#endif
     uint32_t control = NX_LPDMA_READ(LPDMA1_Channel0->CCR);
     uint32_t transfer = NX_LPDMA_READ(LPDMA1_Channel0->CTR2);
     if ((control & ~(uint32_t)DMA_CCR_EN) != INTERRUPTS ||
@@ -625,6 +753,12 @@ nx_stm32u575_lpdma_copy_release(const nx_stm32u575_lpdma_copy_t* copy,
         save(copy, &owner);
         return NX_ERROR_BUSY;
     }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (!lptim_access(&owner) || !lptim_cold() || !lptim_vector_quiet() ||
+        (NX_LPDMA_READ(RCC->APB3SMENR) & RCC_APB3SMENR_LPTIM1SMEN) !=
+            owner.peripheral.sleep)
+        return NX_ERROR_BUSY;
+#endif
     if (!registers_clear() || !vector_quiet(IRQ_BIT) ||
         (NX_LPDMA_READ(RCC->AHB3SMENR) & SLEEP_BITS) != owner.sleep ||
         (NX_LPDMA_READ(RCC->SRDAMR) & AUTO_BITS) != owner.autonomous ||
@@ -657,10 +791,12 @@ nx_stm32u575_lpdma_copy_release(const nx_stm32u575_lpdma_copy_t* copy,
     owner.destination = NULL;
     owner.workspace = NULL;
     owner.configured = owner.reset_done = owner.drained = false;
+#ifndef NEXUS_U575_STOP2_LPTIM1
     if (owner.closing) {
         owner.opened = false;
         claim = NULL;
     }
+#endif
     save(copy, &owner);
     nx_request_settle(&request->base, terminal, transferred);
     return NX_SUCCESS;
@@ -718,15 +854,26 @@ static nx_result_t stop(void* context_pointer, uint32_t poll_limit) {
         (void)service(context_pointer, poll_limit);
         return NX_ERROR_BUSY;
     }
-    owner.opened = false;
     owner.closing = true;
+#ifdef NEXUS_U575_STOP2_LPTIM1
+    if (!profile(&owner) || !lptim_stop_access(&owner, poll_limit)) {
+        save(&copy, &owner);
+        return NX_ERROR_BUSY;
+    }
+#endif
+    owner.opened = false;
     if (claim == context_pointer)
         claim = NULL;
     save(&copy, &owner);
     return NX_SUCCESS;
 }
+#ifdef NEXUS_U575_STOP2_LPTIM1
+const nx_stm32u575_lpdma_lptim1_ops_t nx_stm32u575_lpdma_lptim1_ops = {
+    cancel, service, stop, start};
+#else
 const nx_stm32u575_lpdma_copy_ops_t nx_stm32u575_lpdma_copy_ops = {
     cancel, service, stop};
+#endif
 nx_result_t
 nx_stm32u575_lpdma_copy_cancel(const nx_stm32u575_lpdma_copy_t* copy,
                                nx_stm32u575_lpdma_copy_request_t* request) {

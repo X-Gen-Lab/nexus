@@ -10,6 +10,8 @@ FIG-27 另述同一 Stop2 owner 的选定 SRAM4/LPDMA 有限复制及复合退�
 [图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份，
 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。
 
+FIG-28 另述单组 LPTIM1 tuple 的选定 LPBAM 参考，以及同一 Stop2 owner 的有序最终访问证明。
+
 原15类主图及两张补充图的代码依据保持`0111c8d3b9c7b37d258b9c401070305b13b6f3a1`。
 FIG-16 描述 `c4249e98` 基线之后的 I/O 增量机制，其具体源码链接和执行状态见
 [本轮架构说明](../../design/io-evolution.md)与42项台账，不能继承原候选资格。
@@ -314,3 +316,20 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 
 依据：[GPIO pin-state 说明](../../explanation/gpio-pin-states.md)、[公共接口](../../../io/include/nexus/io/pin_state.h)、[G474 provider](../../../soc/stm32g474/drivers/pin_state.c)、[冷态租约生成](../../../tools/configure/gpio_phase.py)。
 [可编辑 DOT](gpio-pin-states.dot)；实施关联：IO-31。
+
+(fig-28-u575-lptim1-lpbam)=
+## FIG-28 U575 LPTIM1 单 tuple 与 Stop2 有序退出
+
+**身份：reference。范围：STM32U575ZIT6Q／TZEN0／baremetal／SRAM4／LPDMA1 channel0；仅一组固定 LPTIM1 CCR1／RCR0／ARR tuple，内部输出未路由。**
+
+成功所需的三个新鲜 write-OK 须在任何 DIER 撤源写入之前锁存；后续不依赖标志存活。有限 DMA 完成但确认缺失时，首轮保留生产源与借用并锁存 IO；下一次 service／recover 带入该失败再撤源，晚到 TC 不会升级成功。该软件参考已通过有针对性的 RED／GREEN 模型与选定 M33 开发重链接；渲染与翻译检查不建立候选或物理资格。
+
+![FIG-28：启动账本与活动借用分开；成功 write-OK、撤源、DMA 最终访问、外设复位和全部恢复后才最终 SETTLED](u575-lptim1-lpbam.svg)
+
+实线标明必要顺序或分支，虚线标明保留责任与恢复。纯初始化之后显式公共 start 取得冷态独占 LPTIM1 的 gate、LSE mux 与按需 LSESYS；部分失败的启动账本保留至公共 stop 证明恢复。新 ARM owner 为 104 B，其中新增 16 B 账本；原 SRAM4 copy owner 仍为 88 B。
+
+ACCEPTED 借用 request、12 B tuple 与完整 48 B LLI 工作区。ENABLE 后至少再过两个保留 RTC tick；初始新鲜写 OK 先证明再清旗。硬件请求 13／BREQ1／保留位 DREQ0 写 CCR1，两个 SWREQ continuation LLI 依次写 RCR0、最后写 ARR；成功还须三个新鲜 write-OK。没有重复 tuple 模式；RUN LPTIM2 须预先关闭并 join。
+
+cancel／deadline 不撤销存储。UEDE0／DIEROK 证明先于 DMA suspend／reset／idle 及引用撤除；随后通过自有 RCC reset 关闭 LPTIM1，绝不清 ENABLE。全部 RTC／IRQ／loan gate／电源／时钟与引用恢复后才最终 SETTLED；acquire 观察与外部 observer join 后，joined 公共 stop 另行归还启动 access claims。未知 profile 禁止 RTC／DMA／LPTIM MMIO；recover 不再 WFI。自有 reset 仅在 DMA 最终访问证明后可重试；活动借用期间观察到的外部 reset 永久隔离，安静默认值不能证明 join。
+
+依据：[单 tuple 参考合同](../../design/u575-lptim1-lpbam.md)、[公共 receiver](../../../components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)、[公共 Stop2 face](../../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)、[私有 LPTIM1 profile](../../../soc/stm32u575/private/stm32u575_lptim1_profile.h)。[可编辑 DOT](u575-lptim1-lpbam.dot)；实施关联：IO-32／SOC-35。图不表示引脚路由、完整 PWM 周期播放或物理／HIL 执行；原完整退出条件仍开放。

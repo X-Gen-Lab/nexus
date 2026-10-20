@@ -26,6 +26,14 @@ clock. The separately selected Stop2 owner supplies WUT and restoration; the
 read-only clock component alone supplies neither. No arrow establishes physical
 residency or automatic enrollment.
 
+The separate [single-tuple LPTIM1 LPBAM selection](u575-lptim1-lpbam.md)
+uses the ordinary retained-clock initializer with
+`wake_owner=nx_stm32u575_stop2_identity()`, the same concrete Stop2 owner and no
+AlarmA-copy opt-in. Its public receiver start/stop owns LPTIM1 access preparation
+and restoration; a partial start failure retains its effects until joined stop
+proves their release. This does not change the read-only clock contract or the
+WUT-only scope of FIG-24.
+
 ## Select one RTC owner
 
 Use the public

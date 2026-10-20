@@ -1,0 +1,12 @@
+schema = 2
+board = "stm32u575_nucleo_zi_q"
+backend = "baremetal"
+clock = "msis4"
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 4096
+
+[memory.regions.sram4]
+limit_bytes = 512

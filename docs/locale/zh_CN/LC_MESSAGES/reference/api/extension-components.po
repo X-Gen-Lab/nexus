@@ -1,5 +1,6 @@
+# Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 781bdc5b95aeb5cc4556e4c49ff5f754d0081f68dfeeacf158d023f5155c6c0e\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: cda9b127b1e6cedbc053743cb44a7f6dc59737ab19c58489cd60617393130eff\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "扩展与生命周期 API"
@@ -760,7 +761,6 @@ msgstr "纯查询；全部平台／产品 RUN 所有者均须显式登记。"
 msgid "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
 msgstr "在 PRIMASK=1 时配置 WUT、跨越 Stop2、恢复并排空。"
 
-
 msgid "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
 msgstr "[in] 2..65536 个 RTC/16 节拍，标称 488.28125us。"
 
@@ -1205,6 +1205,105 @@ msgstr "分别观察复制接纳及精确 Stop2 转换。"
 msgid "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
 msgstr "accepted 表示请求、缓冲区及工作区已被借用，包括后续 RTC/电源配置失败的情况。只有以 acquire 观察到请求 SETTLED 后，才能读取最终复制结果及计数。transition 描述边界；dma_wake 记录所观察到的 ch0 NVIC pending。"
 
-# Retained prior translation; replaced by the current public-header note.
-#~ msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
-#~ msgstr "仅适用于精确 STM32U575ZIT6Q TZEN0 裸机。特权 MSP Thread，CONTROL=0、PRIMASK=1、BASEPRI=FAULTMASK=0；不得已启动调度器。关闭 RUN 接纳、停止 Platform/System，并汇合全部生产者、IRQ、DMA、观察者及截止时间使用者。仅在实际排空后释放租约；没有剩余使用者时才传入已关闭屏障。登记从不自动进行。结束 Core TIM2 截止时间；不读取或重新启动 TIM2。独立 RTC 时钟位于此 RUN 域之外。要求 MSIS4／等总线频率、静默门控、全部 SRAM 保留，并关闭缓存、调试、MPU、SysTick、其他 IRQ 及 EXTI 源。拒绝时读取 SysTick CTRL 也会消耗 COUNTFLAG。独占 RTC：绑定的日历读取者及此 WUT 写入者。启动代码提供有效的保留 LSE 日历及 DBP=1。仅写入 WUT；每阶段先解锁 WPR 再重新锁定。外部须排除 NMI/HardFault、调试器、看门狗、其他主设备及异步配置写入者。门控值为零不能证明这些义务已满足。绑定是可信装配身份，不是硬件认证。WUTR=wake_ticks-1；首次 WUTF 位于 WUTR 至 WUTR+2 个节拍之间。RTC 采样分辨率为 3906.25us；短唤醒可能显示零经过时间。保留时钟的 max_gap_seconds 必须覆盖睡眠、配置／排空执行及外部有界唤醒延迟。如果硬件唤醒失败，WFI 没有 CPU 时长上限。错过采样间隔会污染独立时钟纪元。wait_executed 仅证明执行了 WFI，不证明物理驻留。全部返回路径均保留屏蔽状态。成功要求观察到 WUT、IRQ 及所加门控均已撤回，并恢复 MSIS4/Range4。排空失败时保留所有权。保持接纳关闭及相关对象存活；任何重启前均须调用 recover。任何失败都不撤销借用。重新启动 Platform 会创建新的 TIM2 纪元；旧截止时间均不能跨越该生命周期。仍不支持 RTOS Tick 补偿及 LPBAM。"
+msgid "stm32u575_lpdma_lptim1.h"
+msgstr "stm32u575_lpdma_lptim1.h"
+
+msgid "Exact U575 finite LPTIM1 autonomous register update."
+msgstr "精确 U575 的有限 LPTIM1 自主寄存器更新。"
+
+msgid "Bind one pure owner; no MMIO writes, allocation or worker."
+msgstr "绑定一个无副作用的 owner；不写 MMIO、不分配，也无 worker。"
+
+msgid "Exact STM32U575ZIT6Q TZEN0, MSIS4/MSIK4/equal buses/Range4, caches off. Selected SRAM4/LPDMA1 startup and retained LSE RTC access remain live. LPDMA0 and the entire LPTIM1 controller are exclusive; no other channel, timer writer, IRQ user or external reset exists. Config/face/control storage must be separate. Rejection retains no new reference."
+msgstr "精确 STM32U575ZIT6Q TZEN0、MSIS4/MSIK4、各总线频率相同、Range4、caches off。选定 SRAM4/LPDMA1 startup 和保留 LSE RTC 访问须保持有效。LPDMA0 和整个 LPTIM1 控制器必须独占；不得存在其他 channel、timer writer、IRQ user 或外部 reset。Config/face/control storage 必须分开。拒绝不保留新引用。"
+
+msgid "Explicitly prepare cold LPTIM1 access gates and LSE kernel."
+msgstr "显式准备冷态 LPTIM1 访问门控与 LSE kernel。"
+
+msgid "Unmasked privileged Thread, positive per-phase poll budget. Owns only LPTIM1EN, LPTIM1SEL and added LSESYSEN, preserving RTC/LSE provenance. LPTIM1 must be reset/cold and initially unclocked with reset mux. A failed preparation can retain effects; keep owner live and call stop until it succeeds. It never starts the timer or borrows a request."
+msgstr "未屏蔽的 privileged Thread，每阶段轮询预算为正数。仅拥有 LPTIM1EN、LPTIM1SEL 和新增的 LSESYSEN，保持 RTC/LSE 来源不变。LPTIM1 必须处于 reset/cold 状态，初始无时钟且 mux 为 reset 值。准备失败可能保留效果；须保持 owner 有效，并调用 stop 直至成功。它从不启动 timer，也不借用 request。"
+
+msgid "Prepare one SRAM4 tuple without borrowing or writing data/LLIs."
+msgstr "准备一组 SRAM4 tuple，不借用或写入 data/LLI。"
+
+msgid "Tuple contents remain unchanged from prepare through settlement. Invalid/aliased/wrapping spans leave every request byte unchanged. Deadline is absolute retained microseconds or NEVER; no TIM2 conversion."
+msgstr "Tuple 内容须从 prepare 到 settlement 保持不变。无效、重叠或回绕的区段不改变 request 的任何字节。Deadline 是保留时间域的绝对微秒值或 NEVER；不转换 TIM2 时间。"
+
+msgid "Request withdrawal without revoking any borrowed storage."
+msgstr "请求撤源，不撤销任何被借用的存储。"
+
+msgid "Masked privileged MSP Thread through compound recovery. Late cancel after observed DMA completion rejects STATE. First failure persists."
+msgstr "复合恢复全程使用屏蔽的 privileged MSP Thread。观察到 DMA 完成之后的迟到 cancel 被以 STATE 拒绝。首次失败保留。"
+
+msgid "Bounded producer/master isolation, never independent settlement."
+msgstr "有界隔离 producer/master，从不独立 settlement。"
+
+msgid "Producer UEDE withdrawal precedes DMA suspend/reset/idle. All final peripheral/IRQ references and Stop2 restoration precede final release. Unknown clock/access profile permits no peripheral MMIO; external DMA or LPTIM reset during a loan permanently quarantines that loan."
+msgstr "Producer UEDE 撤源先于 DMA suspend/reset/idle。全部最终 peripheral/IRQ 引用与 Stop2 恢复先于最终归还。Clock/access profile 未知时不允许 peripheral MMIO；借用期间的外部 DMA 或 LPTIM reset 将该借用永久隔离。"
+
+msgid "Close admission and restore owned start effects after compound join."
+msgstr "关闭准入，并在复合 join 后恢复自有 start 效果。"
+
+msgid "Positive per-phase observation budget is not elapsed time. BUSY keeps all effects/storage alive; recover through the concrete Stop2 owner. A fresh final write-OK proof means synchronized register writes, never physical Stop2 residency, output playback, board routing or HIL."
+msgstr "正数的每阶段观察预算不代表经过时间。BUSY 保持全部效果和存储有效；通过 concrete Stop2 owner 恢复。新的最终 write-OK 证明表示寄存器写入已同步，绝不代表物理 Stop2 驻留、输出播放、Board 路线或 HIL。"
+
+msgid "One caller-owned immutable register tuple, in exact SRAM4."
+msgstr "调用者拥有且不可变的一组寄存器 tuple，位于精确 SRAM4 中。"
+
+msgid "CCR1 < ARR, RCR=0 and 1023<=ARR<=65535. There is exactly one tuple; repeated updates need a separate write-OK proof and are not admitted. No GPIO route or physical waveform playback is established."
+msgstr "CCR1 < ARR、RCR=0 且 1023<=ARR<=65535。恰好一组 tuple；重复更新需要单独的 write-OK 证明，本参考不准入。该参考不建立 GPIO 路线或物理波形播放。"
+
+msgid "Exactly two generated continuation LLIs; never caller instructions."
+msgstr "恰好两个生成的 continuation LLI；绝不是调用者指令。"
+
+msgid "Entire aligned 48-byte extent is separate nonsecure SRAM4. The owner writes all words only after ACCEPTED; keep immutable until SETTLED."
+msgstr "整个对齐的 48 字节范围是独立的 nonsecure SRAM4。Owner 仅在 ACCEPTED 之后写入所有字；直到 SETTLED 都须保持不可变。"
+
+msgid "Zero caller storage, never copy/reset/reconstruct a live owner."
+msgstr "调用者存储须预先清零，不得复制、reset 或重建活动 owner。"
+
+msgid "One privileged Thread serializes all calls; no ISR/concurrent writer. Keep owner, clock and every face alive through stop and observer joins."
+msgstr "由一个 privileged Thread 串行调用全部方法；不得有 ISR 或并发 writer。Owner、clock 和每个 face 必须保持有效，直至 stop 与 observer join 完成。"
+
+msgid "Explicit live retained-clock and same concrete Stop2 binding."
+msgstr "显式绑定有效的 retained-clock 和同一 concrete Stop2。"
+
+msgid "Use the ordinary retained-clock initializer with wake_owner equal to nx_stm32u575_stop2_identity(). No AlarmA-copy opt-in is required."
+msgstr "使用普通 retained-clock 初始化器，wake_owner 等于 nx_stm32u575_stop2_identity()。无需 AlarmA-copy opt-in。"
+
+msgid "Prepared metadata; all fields are provider-controlled after prepare."
+msgstr "准备好的元数据；prepare 之后所有字段由 provider 控制。"
+
+msgid "Initialize base first. ACCEPTED borrows request, tuple and workspace until acquire-observed SETTLED and external joins. Cancel/deadline do not revoke a borrow. CPU control storage must be separate from SRAM4 data/LLIs. Never mutate or reprepare while borrowed."
+msgstr "先初始化 base。ACCEPTED 借用 request、tuple 和 workspace，直到 acquire 观察到 SETTLED 且外部 join 完成。Cancel/deadline 不撤销借用。CPU control storage 必须与 SRAM4 data/LLI 分开。借用期间不得修改或重新 prepare。"
+
+msgid "Shared immutable methods; service never publishes SETTLED."
+msgstr "共享不可变方法；service 从不发布 SETTLED。"
+
+msgid "Copied immutable faces retain the exact physical owner identity."
+msgstr "复制的不可变 face 保留精确物理 owner 身份。"
+
+msgid "stm32u575_stop2_lptim1.h"
+msgstr "stm32u575_stop2_lptim1.h"
+
+msgid "Same concrete Stop2 owner and finite LPTIM1 LPBAM boundary."
+msgstr "同一 concrete Stop2 owner 和有限 LPTIM1 LPBAM 边界。"
+
+msgid "One finite hardware-requested LPTIM1 tuple across Stop2."
+msgstr "跨 Stop2 的一组有限硬件请求 LPTIM1 tuple。"
+
+msgid "Link only Nexus::U575Stop2Lptim1; WUT/copy alternatives are exclusive. Same static owner, RUN ClockDomain and recovery. Ordinary retained time uses this wake identity; explicitly start the dedicated receiver first. Closed/drained exact RUN barrier, stopped Platform, privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0 remain required. Keep masks and RUN admission closed through all retained recovery."
+msgstr "仅链接 Nexus::U575Stop2Lptim1；WUT/copy 备选互斥。沿用同一 static owner、RUN ClockDomain 和 recovery。普通 retained time 使用此 wake identity；须先显式启动专用 receiver。仍须满足关闭并排空的精确 RUN barrier、已停止的 Platform、privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0。全部保留恢复期间须维持掩码及 RUN 准入关闭。"
+
+msgid "LPTIM1 LSE/preload/CC1E, initial ARR1023/RCR0; request13/BREQ1 gates CCR1, two generated software-requested LLIs write RCR and ARR last. No AlarmA trigger. WUT escapes at 4096..65536 RTC/16 ticks. Positive poll_limit bounds observations, not WFI duration or physical response."
+msgstr "LPTIM1 LSE/preload/CC1E，初始 ARR1023/RCR0；request13/BREQ1 门控 CCR1，两个生成的软件请求 LLI 写 RCR，最后写 ARR。无 AlarmA trigger。WUT 在 4096..65536 个 RTC/16 tick 时提供逃逸唤醒。正数 poll_limit 约束观察次数，不约束 WFI 时长或物理响应。"
+
+msgid "UEDE withdrawal/DIEROK precede DMA suspend/reset/idle and reference detach. Fresh write-OK gates success. Owned RCC reset disables LPTIM1 per ES0499. All peripheral/IRQ/gate/clock restoration precedes SETTLED; start access gates stay until joined public stop. Cancel/deadline never revoke storage. Unknown profile permits no peripheral MMIO. External peripheral reset permanently quarantines an active loan until system reset. Recovery never runs WFI. No GPIO/Board route, output playback, physical residency, timing/power or HIL result is implied."
+msgstr "UEDE 撤源/DIEROK 先于 DMA suspend/reset/idle 和引用移除。新的 write-OK 是成功的必要条件。自有 RCC reset 按 ES0499 关闭 LPTIM1。全部 peripheral/IRQ/gate/clock 恢复先于 SETTLED；start access gate 保留至 joined public stop。Cancel/deadline 从不撤销存储借用。Profile 未知时不允许 peripheral MMIO。外部 peripheral reset 将活动借用永久隔离，直至系统 reset。Recovery 从不执行 WFI。该参考不暗示 GPIO/Board 路线、输出播放、物理驻留、timing/power 或 HIL 结果。"
+
+msgid "Admission and software sleep observations, not the final result."
+msgstr "准入与软件睡眠观察，不是最终结果。"
+
+msgid "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
+msgstr "即使后续设置失败，accepted 仍借用 request/tuple/workspace。dma_wake 表示 pending IRQ114；wait_executed 仅证明执行过 WFI。"
+
