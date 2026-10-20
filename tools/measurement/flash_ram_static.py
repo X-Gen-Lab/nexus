@@ -3,8 +3,11 @@
 Every instruction comes from ELF-validated bytes; printed mnemonics carry no
 meaning here. This finite classifier checks direct control/literal closure,
 canonical returns and a static frame bound under explicit C memory and compiler
-ABI obligations. It does not prove arbitrary pointer ownership, Flash-data
-access, MPU ordering, timing, CPU execution or hardware behavior.
+ABI obligations. A finite constant analysis detects recoverable physical-Flash
+reads;
+unresolved C pointers remain unproved. Optional production gate dominance does
+not prove the gate's MPU/drain/VTOR semantics. Neither check proves arbitrary
+pointer ownership, timing, CPU execution or hardware behavior.
 """
 
 from __future__ import annotations
@@ -369,7 +372,7 @@ def _normalized(name):
 
 
 def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
-          entry_tainted=(13,), entry_stack=()):
+          entry_tainted=(13,), entry_stack=(), required_return=None):
     """Bound SP paths and check returns under the C memory/ABI obligations.
 
     Track register copies/arithmetic of SP, MSP and PSP conservatively.
@@ -378,12 +381,12 @@ def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
     explicit stack-pointer spills fail closed. This remains a conservative
     stack-pointer analysis, not arbitrary C object/pointer ownership.
     """
-    pending = [(start, 0, True, (), entry_tainted, ())]
+    pending = [(start, 0, True, (), entry_tainted, (), False)]
     seen, depths = set(), {}
     maximum, returned, output = 0, False, set()
     while pending:
-        address, depth, lr, saved, tainted, stacked = pending.pop()
-        state = address, depth, lr, saved, tainted, stacked
+        address, depth, lr, saved, tainted, stacked, passed_gate = pending.pop()
+        state = address, depth, lr, saved, tainted, stacked, passed_gate
         if state in seen:
             continue
         _require(len(seen) < 20000, "CFG state bound exceeded")
@@ -394,6 +397,9 @@ def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
                  "dynamic/unbounded SP loop")
         depths[address] = depth
         instruction, op, conditional = code[address]
+        _require(not passed_gate or not (
+            op.store_bases or op.stack_store or op.kind == "push"),
+                 "transaction store follows its mandatory RAM gate")
         _require(not any(register in tainted for register in op.store_bases),
                  "stack-derived store through a register address")
         derived = any(register in tainted for register in op.reads)
@@ -452,11 +458,15 @@ def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
         if op.kind == "return" or op.kind == "pop" and 15 in op.registers:
             _require(after == 0 and restored,
                      "unknown indirect return or live frame")
+            _require(required_return is None or passed_gate,
+                     "transaction return bypasses its mandatory RAM gate")
             returned = True
             output.update(changed)
         elif op.kind in ("call", "branch", "conditional"):
             callee = calls.get(address)
             if callee is not None:
+                _require(not passed_gate,
+                         "transaction call follows its mandatory RAM gate")
                 _require(op.kind != "call" or not ordinary_c or after % 8 == 0,
                          "ordinary C call violates 8-byte SP alignment")
                 if op.kind != "call":
@@ -468,30 +478,278 @@ def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
                 # A nonreturning callee still executes stores and can retain
                 # a pointer. Check its real inputs before discarding the edge.
                 callee_output = transfer(callee, changed, arguments)
+                after_gate = passed_gate or callee == required_return
                 if may_return[callee]:
                     if op.kind == "call":
                         next_nodes.append(
                             (following, after, False, slots, callee_output,
-                             stack_taint))
+                             stack_taint, after_gate))
                     else:
+                        _require(required_return is None or after_gate,
+                                 "transaction tail bypasses its mandatory RAM gate")
                         returned = True
                         output.update(callee_output)
             else:
                 next_nodes.append((op.target, after, restored, slots, changed,
-                                   stack_taint))
+                                   stack_taint, passed_gate))
             if op.kind == "conditional":
                 next_nodes.append((following, after, restored, slots, changed,
-                                   stack_taint))
+                                   stack_taint, passed_gate))
         else:
             next_nodes.append((following, after, restored, slots, changed,
-                               stack_taint))
+                               stack_taint, passed_gate))
         if conditional:
-            next_nodes.append((following, depth, lr, saved, tainted, stacked))
+            next_nodes.append((following, depth, lr, saved, tainted, stacked,
+                               passed_gate))
         pending.extend(next_nodes)
     return maximum, returned, tuple(sorted(output))
 
 
-def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
+
+def _constant_effect(address, encoded, op, values, literal):
+    """Exact constants only; Unknown never becomes a permission for a read.
+
+    This is a defect detector for statically recoverable physical-Flash reads,
+    not an allowlist for unresolved C pointers. Operand widths and writeback
+    come from the same admitted bytes, never mnemonic or stack-taint inputs.
+    """
+    h = int.from_bytes(encoded[:2], "little")
+    k = int.from_bytes(encoded[2:], "little") if len(encoded) == 4 else 0
+    after = [None if i in op.writes else value
+             for i, value in enumerate(values)]
+    accesses = []
+
+    def memory(load, rn, offset, width, *, rm=None, shift=0, writeback=False,
+               pre=True):
+        base = values[rn]
+        index = 0 if rm is None else values[rm]
+        effective = None
+        if base is not None and index is not None:
+            displacement = offset + (index << shift)
+            effective = (base + displacement if pre else base) & 0xffffffff
+        if load:
+            _require(effective is None or not (
+                effective < 0x08200000 and 0x08000000 < effective + width),
+                "constant-address Flash data read")
+            accesses.append((address, effective, width))
+        if writeback:
+            after[rn] = None
+
+    if op.literal:
+        after[op.writes[0]] = literal(*op.literal)
+    if len(encoded) == 2:
+        if h & 0xf800 == 0x2000:
+            after[(h >> 8) & 7] = h & 255
+        elif h & 0xf800 in (0x3000, 0x3800):
+            rd = (h >> 8) & 7
+            if values[rd] is not None:
+                after[rd] = (values[rd] + (h & 255) *
+                             (1 if h & 0xf800 == 0x3000 else -1)) & 0xffffffff
+        elif h & 0xff00 == 0x4600:
+            after[(h & 7) | ((h >> 4) & 8)] = values[(h >> 3) & 15]
+        elif h & 0xf000 == 0x5000:
+            mode = (h >> 9) & 7
+            memory(mode >= 3, (h >> 3) & 7, 0,
+                   (4, 2, 1, 1, 4, 2, 1, 2)[mode], rm=(h >> 6) & 7)
+        elif h & 0xf000 in (0x6000, 0x7000, 0x8000):
+            width = {0x6000: 4, 0x7000: 1, 0x8000: 2}[h & 0xf000]
+            memory(bool(h & 0x800), (h >> 3) & 7,
+                   ((h >> 6) & 31) * width, width)
+        elif h & 0xf000 == 0xc000:
+            regs = tuple(i for i in range(8) if h & (1 << i))
+            memory(bool(h & 0x800), (h >> 8) & 7, 0, 4 * len(regs),
+                   writeback=True)
+    else:
+        if h & 0xfbf0 in (0xf240, 0xf2c0):
+            rd = (k >> 8) & 15
+            immediate = ((h & 15) << 12 | ((h >> 10) & 1) << 11 |
+                         ((k >> 12) & 7) << 8 | (k & 255))
+            if h & 0xfbf0 == 0xf240:
+                after[rd] = immediate
+            elif values[rd] is not None:
+                after[rd] = (values[rd] & 65535) | immediate << 16
+        elif h & 0xfa00 == 0xf000 and not k & 0x8000:
+            operation, rd, rn = (h >> 5) & 15, (k >> 8) & 15, h & 15
+            immediate = _expanded((((h >> 10) & 1) << 11 |
+                                   ((k >> 12) & 7) << 8 | (k & 255)))
+            if rn == 15 and operation == 2 and rd != 15:
+                after[rd] = immediate
+            elif rn != 15 and rd != 15 and values[rn] is not None:
+                value = values[rn]
+                if operation == 8:
+                    after[rd] = (value + immediate) & 0xffffffff
+                elif operation == 13:
+                    after[rd] = (value - immediate) & 0xffffffff
+                elif operation == 0:
+                    after[rd] = value & immediate
+                elif operation == 1:
+                    after[rd] = value & ~immediate & 0xffffffff
+                elif operation == 2:
+                    after[rd] = value | immediate
+        elif h & 0xfbf0 in (0xf200, 0xf2a0):
+            rd, rn = (k >> 8) & 15, h & 15
+            immediate = (((h >> 10) & 1) << 11 |
+                         ((k >> 12) & 7) << 8 | (k & 255))
+            if values[rn] is not None:
+                after[rd] = (values[rn] + immediate *
+                             (-1 if h & 0xa0 else 1)) & 0xffffffff
+        elif h & 0xfff0 in (0xf8d0, 0xf8c0, 0xf890, 0xf880, 0xf8b0,
+                            0xf8a0, 0xf990, 0xf9b0):
+            width = {0xf8d0: 4, 0xf8c0: 4, 0xf890: 1, 0xf880: 1,
+                     0xf8b0: 2, 0xf8a0: 2, 0xf990: 1,
+                     0xf9b0: 2}[h & 0xfff0]
+            memory(bool(h & 16), h & 15, k & 4095, width)
+        elif h & 0xfff0 in (0xf850, 0xf840, 0xf810, 0xf800, 0xf830, 0xf820):
+            width = {0xf850: 4, 0xf840: 4, 0xf810: 1, 0xf800: 1,
+                     0xf830: 2, 0xf820: 2}[h & 0xfff0]
+            if k & 0x800:
+                memory(bool(h & 16), h & 15,
+                       (k & 255) * (1 if k & 0x200 else -1), width,
+                       pre=bool(k & 0x400), writeback=bool(k & 0x100))
+            else:
+                memory(bool(h & 16), h & 15, 0, width,
+                       rm=k & 15, shift=(k >> 4) & 3)
+        elif h & 0xffe0 in (0xe9c0, 0xe940):
+            memory(bool(h & 16), h & 15,
+                   (k & 255) * (4 if h & 128 else -4), 8,
+                   pre=bool(h & 0x100), writeback=bool(h & 32))
+    return tuple(after), accesses
+
+
+def _constant_memory(elf, functions, order, may_return):
+    """Finite constant lattice; differing incoming values join to Unknown.
+
+    Unknown pointer reads are retained explicitly. Passing this detector does
+    not establish that all RAM data addresses or device effects are safe.
+    """
+    summaries, observed = {}, set()
+    unknown = (None,) * 16
+
+    def literal(address, size):
+        matches = [row for row in elf.loads
+                   if row["virtual"] <= address < address + size <=
+                   row["virtual"] + row["files"]]
+        _require(len(matches) == 1, "literal has no unique ELF bytes")
+        row = matches[0]
+        offset = row["offset"] + address - row["virtual"]
+        return int.from_bytes(elf.data[offset:offset + size], "little")
+
+    def join(left, right):
+        return tuple(a if a == b else None for a, b in zip(left, right))
+
+    def walk(index, incoming, argument_stack=()):
+        key = index, incoming, argument_stack
+        if key in summaries:
+            return summaries[key]
+        _require(len(summaries) < 20000, "constant call bound exceeded")
+        summaries[key] = unknown
+        function = functions[index]
+        code = function["code"]
+        start = function["symbol"]["value"] & ~1
+        states, queue, outputs = {}, [(start, incoming, 0, ())], None
+        steps = 0
+        while queue:
+            address, values, depth, slots = queue.pop()
+            state = states.get(address)
+            if state is not None:
+                old_values, old_depth, old_slots = state
+                _require(old_depth == depth, "constant flow SP mismatch")
+                values = join(values, old_values)
+                current = dict(slots)
+                slots = tuple((slot, value) for slot, value in old_slots
+                              if current.get(slot) == value)
+                if (values, depth, slots) == state:
+                    continue
+            states[address] = values, depth, slots
+            steps += 1
+            _require(steps < 40000, "constant CFG bound exceeded")
+            instruction, op, conditional = code[address]
+            encoded = bytes.fromhex(instruction["encoding"])
+            after, accesses = _constant_effect(address, encoded, op,
+                                               values, literal)
+            observed.update(accesses)
+            after = list(after)
+            stack = dict(slots)
+            new_depth = depth + op.delta
+            if op.stack_store:
+                offset, size = op.stack_store
+                first = -depth + offset
+                for slot in tuple(stack):
+                    if first < slot + 4 and slot < first + size:
+                        del stack[slot]
+                if size == 4 and len(op.stack_values) == 1:
+                    value = values[op.stack_values[0]]
+                    if value is not None:
+                        stack[-depth + offset] = value
+            if op.stack_load:
+                offset, size, registers = op.stack_load
+                arguments = dict(argument_stack)
+                if (size, len(registers)) in ((4, 1), (8, 2)):
+                    for n, register in enumerate(registers):
+                        slot = -depth + offset + n * 4
+                        after[register] = stack.get(slot, arguments.get(slot))
+            if op.kind == "push":
+                for n, register in enumerate(op.registers):
+                    slot = -new_depth + n * 4
+                    for previous in tuple(stack):
+                        if slot < previous + 4 and previous < slot + 4:
+                            del stack[previous]
+                    if values[register] is not None:
+                        stack[slot] = values[register]
+            elif op.kind == "pop":
+                for n, register in enumerate(op.registers):
+                    after[register] = stack.get(-depth + n * 4)
+            stack = tuple(sorted((slot, value) for slot, value in stack.items()
+                                 if slot >= -new_depth))
+            after = tuple(after)
+            following = address + len(encoded)
+            next_nodes = []
+            if op.kind == "return" or op.kind == "pop" and 15 in op.registers:
+                outputs = after if outputs is None else join(outputs, after)
+            elif op.kind in ("call", "branch", "conditional"):
+                child = function["calls"].get(address)
+                if child is not None:
+                    args = tuple((slot + new_depth, value)
+                                 for slot, value in stack if slot >= -new_depth)
+                    incoming = list(after)
+                    if op.kind == "call":
+                        incoming[14] = None
+                    result = walk(child, tuple(incoming), args)
+                    if may_return[child]:
+                        if op.kind == "call":
+                            result = list(result)
+                            result[14] = None
+                            next_nodes.append((following, tuple(result),
+                                               new_depth, stack))
+                        else:
+                            outputs = result if outputs is None else join(
+                                outputs, result)
+                else:
+                    next_nodes.append((op.target, after, new_depth, stack))
+                if op.kind == "conditional":
+                    next_nodes.append((following, after, new_depth, stack))
+            else:
+                next_nodes.append((following, after, new_depth, stack))
+            if conditional:
+                next_nodes.append((following, values, depth, slots))
+            queue.extend(next_nodes)
+        summaries[key] = outputs if outputs is not None else unknown
+        return summaries[key]
+
+    for index in order:
+        walk(index, unknown)
+    return {"status": "checked", "scope": "constant-address defect detector",
+            "read_sites": len({row[0] for row in observed}),
+            "unresolved_read_sites": sorted({address for address, value, width
+                                               in observed if value is None}),
+            "all_data_operands": "not_proved",
+            "device_protocol": "not_proved",
+            "limits": ["differing CFG constants join to Unknown",
+                       "pointer-loaded and unresolved operands remain unproved",
+                       "physical Flash range only; no alias/speculation proof"]}
+
+def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
+                           return_gate=None):
     """Validate every RAM function and sum Thread/NMI/HardFault frame bounds.
 
     SU source bytes are identified and matched, not attested compiler history.
@@ -563,6 +821,9 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
                       ("enter", "transaction", "nmi", "hardfault"))
     _require(isinstance(roots, (tuple, list)) and len(roots) <= 32,
              "bounded mandatory root names required")
+    if return_gate is not None:
+        _require(return_gate == PREFIX + "return", "unknown RAM return gate")
+        mandatory += (return_gate,)
     for name in (*mandatory, *roots):
         _require(isinstance(name, str) and len(names.get(name, ())) == 1,
                  "missing or ambiguous mandatory RAM root")
@@ -613,7 +874,10 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
                 ordinary_c=function["symbol"]["name"] != PREFIX + "enter",
                 transfer=lambda child, incoming, arguments: summarize(
                     child, incoming, arguments)[2],
-                entry_tainted=tainted, entry_stack=stack)
+                entry_tainted=tainted, entry_stack=stack,
+                required_return=(names[return_gate][0] if return_gate is not None
+                                 and function["symbol"]["name"] ==
+                                 PREFIX + "transaction" else None))
         return summaries[key]
     for index in order:
         function, symbol = functions[index], functions[index]["symbol"]
@@ -644,6 +908,7 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
                         "address": symbol["value"] & ~1, "frame_bytes": frame,
                         "encoded_frame_bytes": peak, "chain_bytes": bound,
                         "may_return": returns})
+    memory = _constant_memory(elf, functions, order, may_return)
     nmi, hardfault = names[PREFIX + "nmi"][0], names[PREFIX + "hardfault"][0]
     _require(not may_return[nmi] and not may_return[hardfault],
              "NMI/HardFault has an actual return path; nonreturn required")
@@ -661,6 +926,12 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=()):
             "stack_required_bytes": required,
             "stack_available_bytes": available,
             "functions": reports, "edges": edges,
+            "constant_memory": memory,
+            "return_gate": {"status": "checked" if return_gate else "not_requested",
+                            "name": return_gate,
+                            "scope": "transaction return-path dominance; no "
+                                     "further calls or explicit stores",
+                            "device_protocol": "not_proved"},
             "stack_sources": records,
             "assumptions": [
                 "compiler AAPCS compliance for C callees and frame records",

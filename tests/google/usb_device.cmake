@@ -39,3 +39,5 @@ nexus_google_test(nexus_usb_control_test SOURCES usb_control_test.cpp
     LIBRARIES Nexus::USBControl Nexus::NativeModel Nexus::Arch)
 nexus_google_test(nexus_usb_descriptor_test SOURCES usb_descriptor_test.cpp
     LIBRARIES Nexus::USBDescriptors)
+nexus_google_test(nexus_usb_acm_test SOURCES usb_acm_test.cpp
+    LIBRARIES Nexus::USBACM Nexus::NativeModel Nexus::Arch)

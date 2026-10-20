@@ -6,8 +6,9 @@ EP0 control、显式选择的 EP1–EP3 bulk IN/OUT、SETUP/reset/suspend/resume
 STALL、SET_ADDRESS、取消与退出。DCD 的一次 request 仍是一个不超过 MPS 的包。
 可选 `Nexus::USBControl` 组合 EP0 多包 DATA、必要 ZLP 与 STATUS；独立的
 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。
-具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供；
-没有具体 CDC/HID 类栈，也不增加 Host、HS、DMA、ISO 或 remote wake 支持。
+具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。
+可选 `Nexus::USBACM` 只组合下述 CDC ACM 控制子集；没有数据泵或完整 CDC/HID 类栈，
+也不增加 Host、HS、DMA、ISO 或 remote wake 支持。
 
 ## 对象、资源与时钟
 
@@ -146,6 +147,52 @@ endpoint face 在此期间保持有效；一个 outer 结束也不替调用者 j
 outer 借用。只有外部 controller owner 能授权 `nx_usb_device_stop`；adapter
 不自动停止共享 controller，不用 reset 或重初始化冒充排空。owner 执行实际完整停止
 后仍须继续 step，以 acquire packet 终态并结束旧 outer；缺少证明时继续保留存储。
+
+## 可选 CDC ACM 控制子集
+
+`nexus/components/usb_acm.h` 使用调用者零初始化、自然对齐的 `nx_usb_acm_t`，
+其中包含一个既有 EP0 packetizer、一个 outer request 和七个 wire bytes。
+调用者显式提供 communication interface number、初始 line coding 和控制意图；
+不创建实例池、任务、数据泵、UART 绑定或新的 controller/endpoint face。provider
+仍共享只读 ops；未引用 `Nexus::USBACM` 不保留类实例或 archive 代码。
+外部 dispatcher 独占安排 EP0 使用，并先处理标准请求和其他 interface/class。
+class-specific descriptor、capability 宣告、configuration readiness 和应用授权
+继续由外部工程负责；通用 descriptor helper 不验证 ACM 类语义。外部若宣告相关
+class capability，必须补足其全部必需的请求／notification 合同，不能仅凭这个
+控制子集声称完整 CDC 合规。
+
+仅支持 `SET_LINE_CODING`、`GET_LINE_CODING`、`SET_CONTROL_LINE_STATE` 和
+`SEND_BREAK`。`bmRequestType` 必须分别是 OUT `0x21` 或 GET 的 IN `0xa1`，
+`wIndex` 必须完整等于选定 interface number；line coding 的 `wValue` 为零且
+`wLength` 恰为 `7`，control-line 与 break 的 `wLength` 为零，control-line
+只允许 DTR/RTS 两位。未知或字段不符的请求通过已有 software-epoch guarded
+reject 明确 STALL；如果 guarded reject 返回 BUSY/STATE/IO 等错误，不能声称
+拒绝已经执行。外部不应将其他合法类请求误派给这个窄子集。
+
+`SET_LINE_CODING` 先接收七字节暂存到 DATA_READY，
+`nx_usb_acm_pending` 仅复制值供外部检查。线编码的共享格式检查只接受非零 rate、
+stop bits `0..2`、parity `0..4` 与 data bits `5/6/7/8/16`；实际 UART 能力与
+产品策略可更窄。short DATA 或非法字段不能获批，但仍可显式拒绝。
+control-line/break 请求在获批前不准入 STATUS。所有 mutation 都必须由同一
+序列化特权 Task 显式 `nx_usb_acm_approve`；true 仅准许后续 STATUS，不提前
+修改 committed 状态或应用物理线路。审批包含在原绝对 monotonic deadline 内。
+
+只有对应 outer acquire SUCCESS、即真实 STATUS ACK 后，组件才提交批准的
+软件意图并更新 `committed_epoch`。新 SETUP/reset/cancel 按既有 packetizer
+规则排空，不撤销借用；未获得 outer SUCCESS 的终态不提交。cancel 成功只请求
+排空：若撤回 endpoint 前，对应 STATUS 仍获真实 ACK，outer acquire SUCCESS
+仍提交已批准的原 epoch 意图。已经 acquire 的 STATUS ACK 不被后来的 SETUP/reset、closing
+或 state 读取失败撤销，紧接的 GET 返回已提交的新 line coding。reset 后是否恢复
+初始类状态是外部 owner 的独立策略。每次 `nx_usb_acm_step` 最多推进一次既有
+packetizer，保持每步最多一次 service、一次 state 读取及一次 packet 动作；
+外部仍须在取消、超时、suspend 和停机期间继续推进并保留所有 storage。
+OUT0 quarantine 仍须外部 controller owner 授权真实完整停止，组件不自动 stop。
+
+外部在每次 step 后、派发下一请求前读取 snapshot，按新的 `committed_epoch`
+应用 UART 参数、DTR/RTS 或 break，并独立处理应用失败与恢复；snapshot 不是事件队列，
+软件提交不证明外设已应用。`SEND_BREAK` 仅记录 `0`（停止）、`0xffff`（无限期）或
+有限毫秒意图，不建计时器、不自动清除，也不证明物理 break。控制子集不提供 bulk
+数据搬运、serial-state notification、完整 CDC 枚举、其他类或物理资格。
 
 ## 取消、失败与完整停止
 

@@ -32,22 +32,12 @@ busy(const nx_stm32h743_flash_ram_workspace_t* execution) {
             NX_H743_BUSY) != 0U;
 }
 
-NX_H743_RAM nx_result_t nx_stm32h743_flash_ram_transaction(
-    nx_stm32h743_flash_ram_workspace_t* execution) {
-    const uint32_t original = execution->saved_vtor;
-    const uint32_t private_vector = (uint32_t)NX_H743_FLASH_RAM_VTOR(execution);
-    if (busy(execution))
-        nx_stm32h743_flash_ram_terminal(execution,
-                                        NX_H743_FLASH_RAM_FAULT_DRAIN);
-    NX_H743_WRITE(&execution->system->core->VTOR, private_vector);
-    NX_H743_FLASH_RAM_BARRIER();
-    nx_result_t result = NX_ERROR_IO;
-    if (NX_H743_READ(&execution->system->core->VTOR) == private_vector) {
-        result = nx_stm32h743_flash_ram_context(execution);
-        if (result == NX_SUCCESS)
-            result = nx_stm32h743_flash_ram_guarded_transaction(
-                execution, &execution->guard, execution->deadline);
-    }
+/* One RAM boundary closes every returning transaction, including refusals
+ * before a physical pulse. Keep the captured vector/result in the call ABI
+ * so extracting this tail does not reread mutable command state. */
+NX_H743_RAM nx_result_t
+nx_stm32h743_flash_ram_return(nx_stm32h743_flash_ram_workspace_t* execution,
+                              uint32_t original, nx_result_t result) {
     if (busy(execution))
         nx_stm32h743_flash_ram_terminal(execution,
                                         NX_H743_FLASH_RAM_FAULT_DRAIN);
@@ -72,6 +62,25 @@ NX_H743_RAM nx_result_t nx_stm32h743_flash_ram_transaction(
         nx_stm32h743_flash_ram_terminal(execution,
                                         NX_H743_FLASH_RAM_FAULT_EXCEPTION);
     return result;
+}
+
+NX_H743_RAM nx_result_t nx_stm32h743_flash_ram_transaction(
+    nx_stm32h743_flash_ram_workspace_t* execution) {
+    const uint32_t original = execution->saved_vtor;
+    const uint32_t private_vector = (uint32_t)NX_H743_FLASH_RAM_VTOR(execution);
+    if (busy(execution))
+        nx_stm32h743_flash_ram_terminal(execution,
+                                        NX_H743_FLASH_RAM_FAULT_DRAIN);
+    NX_H743_WRITE(&execution->system->core->VTOR, private_vector);
+    NX_H743_FLASH_RAM_BARRIER();
+    nx_result_t result = NX_ERROR_IO;
+    if (NX_H743_READ(&execution->system->core->VTOR) == private_vector) {
+        result = nx_stm32h743_flash_ram_context(execution);
+        if (result == NX_SUCCESS)
+            result = nx_stm32h743_flash_ram_guarded_transaction(
+                execution, &execution->guard, execution->deadline);
+    }
+    return nx_stm32h743_flash_ram_return(execution, original, result);
 }
 
 static NX_H743_RAM _Noreturn void exception(uint32_t number) {

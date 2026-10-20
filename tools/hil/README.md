@@ -66,6 +66,20 @@ stimuli, raw fields, boundary obligations and scope. All new plans remain
 `prepared_unbound` / `not_executed`; parser tests do not qualify hardware.
 
 
+
+The opt-in UART FIFO workload uses public example code and a separate internal
+[reference/instrumented fixture](../../tests/contracts/uart_fifo_acquisition/README.md).
+`uart_fifo.py` parses post-join device exports, complete raw wire bytes and
+four-column IRQ CSV through the normal platform tool entry point. It does not
+operate equipment or admit a station. The CSV yields unverified arithmetic
+candidates only: both origin labels retain
+`irq_capture.measurement_status=not_executed`, with no `samples.irq_latency`.
+Caller rate/window parameters are retained, not observed calibration. Real IRQ
+assertion/dispatch association, bidirectional overlap, complete capture/loss and
+clock facts still require the existing full SOC-55 contract. Software-reference
+Boards remain unadmittable; physical HIL stays `not_executed`.
+
+
 `measure.py plan` generates seven generic acquisition cases bound to an exact
 fixture and resolved build. It requires no station or equipment and leaves all
 budgets null. A plan always remains `prepared_unbound` / `not_executed`.

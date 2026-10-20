@@ -245,6 +245,21 @@ class H743FlashRamStaticTests(unittest.TestCase):
         self.accepted()
         self.rejected("BAD_SP_REGISTER_LOAD_ARGUMENT", "indexed SP load")
 
+    def test_recoverable_flash_data_addresses_are_not_ram_literal_permissions(self):
+        self.accepted(mutation="VALID_FLASH_CONSTANT_ONLY")
+        for mutation in ("BAD_FLASH_DATA_READ", "BAD_FLASH_DATA_LITERAL",
+                         "BAD_FLASH_READ_PARTIAL_BOUNDARY",
+                         "BAD_FLASH_READ_CALL_RETURN"):
+            with self.subTest(mutation=mutation):
+                self.rejected(mutation, "constant-address Flash data read")
+
+    def test_constant_detection_does_not_promote_unresolved_c_data_operands(self):
+        _, report = self.accepted(mutation="VALID_UNKNOWN_DATA_READ")
+        memory = report["constant_memory"]
+        self.assertEqual("not_proved", memory["all_data_operands"])
+        self.assertEqual("not_proved", memory["device_protocol"])
+        self.assertTrue(memory["unresolved_read_sites"])
+
     def test_a_ram_literal_pc_veneer_is_not_a_reviewed_return(self):
         self.accepted()
         self.rejected("BAD_VENEER", "veneer|PC write")
@@ -305,6 +320,65 @@ class H743FlashRamStaticTests(unittest.TestCase):
         edited["objdump"] = edited["objdump"].replace(b"b508", b"bf00", 1)
         with self.assertRaisesRegex(EvidenceError, "bytes differ"):
             self.verify((image[0], edited, image[2]))
+
+
+class H743RamConstantFlowTests(unittest.TestCase):
+    """Decoder/dataflow boundaries only; no CPU or device qualification."""
+
+    def analyze(self, blocks):
+        module = importlib.import_module(MODULE)
+        functions, starts = {}, {}
+        for index, (start, encodings) in enumerate(blocks):
+            code, address = {}, start
+            for encoded in encodings:
+                raw = bytes.fromhex(encoded)
+                op = module._decode(address, raw, bridge=False)
+                code[address] = {"encoding": encoded}, op, False
+                address += len(raw)
+            functions[index] = {
+                "symbol": {"value": start | 1, "name": "constant_fixture"},
+                "code": code, "calls": {}}
+            starts[start] = index
+        for function in functions.values():
+            for address, (row, op, conditional) in function["code"].items():
+                if op.kind == "call":
+                    function["calls"][address] = starts[op.target]
+        return module._constant_memory(
+            None, functions, list(reversed(range(len(blocks)))),
+            {index: True for index in functions})
+
+    def test_partial_stack_store_invalidates_the_whole_overlapping_word(self):
+        report = self.analyze([(0x24001000, [
+            "81b0", "40f20003", "c0f60003", "0093", "0022",
+            "8df80120", "009b", "1a68", "01b0", "7047"])])
+        self.assertTrue(report["unresolved_read_sites"])
+
+    def test_narrow_stack_load_does_not_restore_a_full_word_constant(self):
+        report = self.analyze([(0x24001000, [
+            "81b0", "40f20003", "c0f60003", "0093",
+            "9df80030", "1a68", "01b0", "7047"])])
+        self.assertTrue(report["unresolved_read_sites"])
+
+    def test_bl_replaces_the_callers_lr_constant_before_callee_analysis(self):
+        start, target = 0x24001000, 0x24002000
+        address = start + 10
+        displacement = (target - address - 4) & 0x1ffffff
+        sign = displacement >> 24
+        j1 = 1 ^ ((displacement >> 23) & 1) ^ sign
+        j2 = 1 ^ ((displacement >> 22) & 1) ^ sign
+        high = 0xf000 | sign << 10 | ((displacement >> 12) & 1023)
+        low = 0xd000 | j1 << 13 | j2 << 11 | ((displacement >> 1) & 2047)
+        call = (high.to_bytes(2, "little") +
+                low.to_bytes(2, "little")).hex()
+        report = self.analyze([
+            (start, ["10b5", "40f2000e", "c0f6000e", call, "10bd"]),
+            (target, ["7346", "1a68", "7047"])])
+        self.assertTrue(report["unresolved_read_sites"])
+
+    def test_post_index_writeback_does_not_leave_the_old_base_constant(self):
+        report = self.analyze([(0x24001000, [
+            "40f20003", "c0f60003", "43f8040b", "1a68", "7047"])])
+        self.assertTrue(report["unresolved_read_sites"])
 
 
 if __name__ == "__main__":

@@ -121,6 +121,14 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(usb__acm_8h)=
+
+## usb_acm.h
+
+```{doxygenfile} usb_acm.h
+:project: nexus
+```
+
 (usb__control_8h)=
 
 ## usb_control.h

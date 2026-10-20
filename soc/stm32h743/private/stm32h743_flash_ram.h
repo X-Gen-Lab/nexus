@@ -144,6 +144,20 @@ nx_stm32h743_flash_ram_pulse_outcome_t nx_stm32h743_flash_ram_pulse_until_idle(
     nx_stm32h743_flash_ram_workspace_t* execution, nx_time_us_t deadline,
     bool* timed_out);
 /**
+ * \brief Close the RAM transaction before allowing its CPU bridge to return.
+ * \param[in,out] execution: Exact active command on the retained private MSP.
+ * \param[in] original: Incoming VTOR captured before RAM vector publication.
+ * \param[in] result: Transaction outcome preserved after successful cleanup.
+ * \return The supplied result only after both banks are idle, guard effects
+ *         are zero, target LOCK is proved and original VTOR is read back.
+ * \note The caller retains masks, stack, workspace and controller ownership.
+ *       An unproved condition stays in the existing nonreturning RAM terminal
+ *       path. This private boundary does not release the command or CPU state.
+ */
+nx_result_t
+nx_stm32h743_flash_ram_return(nx_stm32h743_flash_ram_workspace_t* execution,
+                              uint32_t original, nx_result_t result);
+/**
  * \brief Run the fully protected transaction after the real MSP bridge.
  * \param[in,out] execution: Exact prepared command with a finite absolute
  *        deadline. The bridge already owns private MSP and PRIMASK.

@@ -18,6 +18,11 @@ void Reset_Handler(void) {
 __attribute__((noinline)) word_t Flash_Helper(word_t value) {
     return value + 7U;
 }
+#ifdef BAD_FLASH_READ_CALL_RETURN
+RAM word_t RamConstantPointer(void) {
+    return 0x08000000U;
+}
+#endif
 RAM word_t RamLeaf(word_t value) {
 #ifdef DYNAMIC_STACK
     volatile word_t* lane = __builtin_alloca(value * sizeof(word_t));
@@ -27,6 +32,29 @@ RAM word_t RamLeaf(word_t value) {
     volatile word_t lane[4];
 #endif
     lane[0] = value;
+#ifdef VALID_UNKNOWN_DATA_READ
+    /* An unresolved argument is deliberately not an owned-address proof. */
+    lane[0] = *(const volatile word_t*)(unsigned long)value;
+#endif
+#ifdef BAD_FLASH_DATA_READ
+    __asm__ volatile("movw r3,#0\nmovt r3,#0x0800\nldr r2,[r3]" ::
+                         : "r2", "r3", "memory");
+#endif
+#ifdef BAD_FLASH_DATA_LITERAL
+    __asm__ volatile("ldr r3,1f\nldr r2,[r3]\nb 2f\n.balign 4\n"
+                     "1: .word 0x08000000\n2:" ::
+                         : "r2", "r3", "memory");
+#endif
+#ifdef BAD_FLASH_READ_PARTIAL_BOUNDARY
+    __asm__ volatile("movw r3,#0xfffe\nmovt r3,#0x07ff\nldr r2,[r3]" ::
+                         : "r2", "r3", "memory");
+#endif
+#ifdef BAD_FLASH_READ_CALL_RETURN
+    lane[0] = *(volatile word_t*)(unsigned long)RamConstantPointer();
+#endif
+#ifdef VALID_FLASH_CONSTANT_ONLY
+    __asm__ volatile("movw r3,#0\nmovt r3,#0x0800" ::: "r3");
+#endif
 #ifdef VALID_SP_FRAME_STORES
     __asm__ volatile("str r0,[sp,#12]\nstrh.w r0,[sp,#14]\n"
                      "strb.w r0,[sp,#15]" ::

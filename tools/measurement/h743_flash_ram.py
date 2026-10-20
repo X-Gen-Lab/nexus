@@ -238,7 +238,8 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
         cpu = verify_h743_cpu_bridge(elf, observations)
         static = verify_h743_ram_static(elf, observations, [
             {"source": str(row["source"]), "raw": row["su"].read_bytes()}
-            for row in selected])
+            for row in selected],
+            return_gate="nx_stm32h743_flash_ram_return")
         _require(before == [file_identity(path) for path in protected],
                  "an audit input changed during execution")
         report = {

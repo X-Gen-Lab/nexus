@@ -105,6 +105,12 @@ class H743RamBuildGateTests(unittest.TestCase):
                 self.assertEqual("passed", report["cpu_bridge"]["status"])
                 self.assertEqual("passed", report["static_closure"]["status"])
                 self.assertEqual("not_proved", report["cpu_bridge"]["callee_body"])
+                closure = report["static_closure"]
+                self.assertEqual("checked", closure["return_gate"]["status"])
+                self.assertEqual("not_proved",
+                                 closure["return_gate"]["device_protocol"])
+                self.assertEqual("not_proved",
+                                 closure["constant_memory"]["all_data_operands"])
 
     def test_unselected_build_has_no_pod_audit_or_stack_usage_cost(self):
         build = self.projects["unselected"]
@@ -161,6 +167,43 @@ class H743RamBuildGateTests(unittest.TestCase):
         report = json.loads(output.read_text())
         self.assertEqual("failed", report["status"])
         self.assertIn("stack-derived store", report["failure"])
+
+    def mutate_function(self, name, prefix, label):
+        from tools.measurement.elf import Elf32
+        original = (self.selected() / "bin/io_evolution_fixture.elf").read_bytes()
+        image = Elf32(original)
+        symbol, = [row for row in image.defined_symbols
+                   if row["name"] == name and row["type"] == 2]
+        section = image.sections[symbol["section"]]
+        start = (symbol["value"] & ~1) - section["address"] + section["offset"]
+        self.assertGreaterEqual(symbol["size"], len(prefix))
+        self.assertEqual(0, (symbol["size"] - len(prefix)) % 2)
+        changed = bytearray(original)
+        changed[start:start + symbol["size"]] = (
+            prefix + b"\x00\xbf" * ((symbol["size"] - len(prefix)) // 2))
+        path = self.root / (label + ".elf")
+        path.write_bytes(changed)
+        return self.invoke(elf=path)
+
+    def test_real_busy_window_terminal_cannot_explicitly_read_flash(self):
+        # MOVW/MOVT r3,0x08000000; LDR r2,[r3]; RAM self-loop.
+        # Same function/layout/SU sizes and nonreturning exception graph.
+        result, output = self.mutate_function(
+            "nx_stm32h743_flash_ram_terminal",
+            bytes.fromhex("40f20003c0f600031a68fee7"), "terminal-flash-read")
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("constant-address Flash data read",
+                      json.loads(output.read_text())["failure"])
+
+    def test_real_transaction_cannot_return_before_its_ram_gate(self):
+        # BX LR is a canonical AAPCS return with no frame. It must still be
+        # refused when it bypasses the actual selected transaction gate.
+        result, output = self.mutate_function(
+            "nx_stm32h743_flash_ram_transaction", b"\x70\x47",
+            "transaction-early-return")
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("mandatory RAM gate",
+                      json.loads(output.read_text())["failure"])
 
     def test_deleting_report_reexecutes_the_normal_link_audit(self):
         build = self.selected()
