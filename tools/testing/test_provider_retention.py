@@ -719,5 +719,355 @@ static const nx_pwm_port_t s_nx_face_right = {
                                  'nx_test_ref_t')
 
 
+def mpu_gpio_image():
+    """External ELF bytes for the selected five-domain normal firmware ABI."""
+    data = bytearray(0x8000)
+    flash, ram, svc, user = 0x08000000, 0x20000000, 0x08006000, 0x08006100
+    sections = [
+        {"name": ".text", "kind": 1, "flags": 6, "address": flash,
+         "offset": 0, "size": 0x6000},
+        {"name": ".syscalls", "kind": 1, "flags": 6, "address": svc,
+         "offset": 0x6000, "size": 46},
+        {"name": ".user_text", "kind": 1, "flags": 6, "address": user,
+         "offset": 0x6100, "size": 64},
+        {"name": ".data", "kind": 1, "flags": 3, "address": ram,
+         "offset": 0x7000, "size": 284},
+        {"name": ".bss", "kind": 8, "flags": 3, "address": ram + 0x200,
+         "offset": 0x7200, "size": 0x1000},
+        {"name": ".nx_mpu_user_data", "kind": 1, "flags": 3,
+         "address": ram + 0x2000, "offset": 0x7400, "size": 32},
+        {"name": ".nx_mpu_user_bss", "kind": 8, "flags": 3,
+         "address": ram + 0x2020, "offset": 0x7500, "size": 1024},
+    ]
+    elf = SimpleNamespace(data=data, sections=sections, defined_symbols=[],
+                          entry=flash + 0x301, loads=[])
+    for section in sections:
+        elf.loads.append({"virtual": section["address"],
+                          "physical": (flash + 0x5000 if section["name"] == ".data"
+                                       else flash + 0x5200 if section["name"] ==
+                                       ".nx_mpu_user_data" else section["address"]),
+                          "offset": section["offset"],
+                          "files": 0 if section["kind"] == 8 else section["size"],
+                          "memory": section["size"],
+                          "flags": 6 if section["flags"] & 1 else 5})
+    def symbol(name, address, size=0, section=0xfff1, kind=0, binding=1,
+               file=None):
+        value = {"name": name, "value": address, "size": size,
+                 "section": section, "type": kind, "binding": binding,
+                 "file": file}
+        elf.defined_symbols.append(value)
+        return value
+    def function(name, address, body=b'\x70\x47', section=0, binding=1,
+                 file=None):
+        symbol(name, address | 1, len(body), section, 2, binding, file)
+        offset = sections[section]["offset"] + address - sections[section]["address"]
+        data[offset:offset + len(body)] = body
+    def wide_branch(address, target, link=False):
+        displacement = (target - address - 4) & 0x1ffffff
+        sign = displacement >> 24
+        first = 0xf000 | sign << 10 | (displacement >> 12 & 0x3ff)
+        second = ((0xd000 if link else 0x9000) |
+                  ((~(displacement >> 23 ^ sign) & 1) << 13) |
+                  ((~(displacement >> 22 ^ sign) & 1) << 11) |
+                  (displacement >> 1 & 0x7ff))
+        return struct.pack('<HH', first, second)
+    domains = {"privileged_flash": (flash, svc),
+               "syscall_flash": (svc, user),
+               "user_flash": (user, user + 0x400),
+               "privileged_ram": (ram, ram + 0x2000),
+               "user_ram": (ram + 0x2000, ram + 0x2800)}
+    for name, (start, end) in domains.items():
+        symbol('__nexus_' + name + '_start__', start)
+        symbol('__nexus_' + name + '_end__', end)
+    for name, domain in (("privileged_functions", "privileged_flash"),
+                         ("syscalls_flash", "syscall_flash"),
+                         ("unprivileged_flash", "user_flash"),
+                         ("privileged_sram", "privileged_ram")):
+        symbol('__' + name + '_start__', domains[domain][0])
+        symbol('__' + name + '_end__', domains[domain][1] - 1)
+    symbol('__nexus_mpu_gpio_task_size', 864)
+    symbol('__nexus_mpu_gpio_control_size', 24)
+    for name, address in (("__nx_mpu_user_data_start", ram + 0x2000),
+                          ("__nx_mpu_user_data_end", ram + 0x2020),
+                          ("__nx_mpu_user_data_load", flash + 0x5200),
+                          ("__nx_mpu_user_bss_start", ram + 0x2020),
+                          ("__nx_mpu_user_bss_end", ram + 0x2420),
+                          ("_estack", ram + 0x2000)):
+        symbol(name, address)
+    for name, address, size, section in (
+            ("nx_freertos_mpu_gpio_binding", flash + 0x100, 12, 0),
+            ("grant", flash + 0x110, 12, 0),
+            ("nx_binding_led", flash + 0x120, 4, 0),
+            ("s_nx_face_led", flash + 0x124, 8, 0),
+            ("nx_stm32u575_gpio_ops", flash + 0x12c, 12, 0),
+            ("control", ram + 0x200, 24, 4),
+            ("task", ram + 0x218, 864, 4),
+            ("s_nx_port_led", ram + 0x600, 12, 4),
+            ("uxSystemCallImplementations", ram, 284, 3)):
+        symbol(name, address, size, section, 1)
+    struct.pack_into('<3I', data, 0x100, ram + 0x200, ram + 0x218,
+                     flash + 0x110)
+    struct.pack_into('<3I', data, 0x110, flash + 0x120, 0, 128)
+    struct.pack_into('<6I', data, 0x120, flash + 0x124,
+                     flash + 0x12c, ram + 0x600,
+                     flash + 0x201, flash + 0x211, flash + 0x221)
+    for index, name in enumerate(("write", "read", "toggle")):
+        function(name, flash + 0x200 + 16 * index, binding=0, file='gpio.c')
+    required = ('nx_freertos_mpu_gpio_open', 'nx_freertos_mpu_gpio_close',
+                'nx_freertos_mpu_gpio_join', 'nx_freertos_mpu_gpio_write',
+                'nx_freertos_mpu_task_start', 'nx_freertos_mpu_task_delete',
+                'nx_freertos_mpu_layout', 'nx_stm32u575_gpio_mpu_validate',
+                'nx_factory_gpio', 'nx_gpio_port_write',
+                'nx_stm32u575_mpu_user_initialize',
+                'nx_stm32u575_validate_identity', 'nx_arch_irq_save',
+                'nx_arch_dsb', 'nx_arch_isb',
+                'MPU_vTaskDelayImpl', 'MPU_xTaskGetTickCountImpl',
+                'MPU_NexusGpioWriteImpl', 'vSystemCallEnter', 'vSystemCallExit',
+                'xTaskGetCurrentTaskHandle', 'xTaskCreateRestrictedStatic',
+                'vTaskDelete')
+    for index, name in enumerate(required):
+        function(name, flash + 0x400 + 4 * index)
+    addresses = {s['name']: s['value'] & ~1 for s in elf.defined_symbols
+                 if s['type'] == 2}
+    veneers = (("nx_freertos_user_delay", "MPU_vTaskDelay", 6),
+               ("nx_freertos_user_ticks", "MPU_xTaskGetTickCount", 13),
+               ("nx_freertos_user_gpio_write", "MPU_NexusGpioWrite", 70))
+    for index, (wrapper, veneer, slot) in enumerate(veneers):
+        va = svc + 20 * index
+        if index < 2:
+            body = bytes.fromhex('01b4eff3148010f0010f01bc01d1')
+            body += wide_branch(va + 14, addresses[veneer + 'Impl'])
+            body += struct.pack('<H', 0xdf00 | slot)
+        else:
+            body = bytes.fromhex('46df0e207047')
+        function(veneer, va, body, 1)
+        function(wrapper, user + 4 * index,
+                 wide_branch(user + 4 * index, va), 2)
+        struct.pack_into('<I', data, 0x7000 + 4 * slot,
+                         addresses[veneer + 'Impl'] | 1)
+    # Actual normal startup shape: stack setup; SystemInit before primary RAM;
+    # identity success guard; masked park on failure; then user initializer.
+    reset, system, boot = flash + 0x300, flash + 0x800, flash + 0x900
+    function('Reset_Handler', reset, bytes.fromhex('dff834d0') +
+             wide_branch(reset + 4, system, True) + bytes.fromhex('00217047'),
+             binding=2)
+    struct.pack_into('<I', data, 0x338, ram + 0x2000)
+    struct.pack_into('<2I', data, 0, ram + 0x2000, reset | 1)
+    body = bytearray.fromhex(
+        '10b5124cd4f8883043f47003c4f88830'
+        '0000000000000000'
+        '4ff00063a360e2680b4b22f4e0621204120c1343e360'
+        '000000000000000000000000'
+        '10b100000000fee7000000000028f8d010bd'
+        '00ed00e00003fa05')
+    for offset, target in ((16, addresses['nx_arch_dsb']),
+                           (20, addresses['nx_arch_isb']),
+                           (46, addresses['nx_arch_dsb']),
+                           (50, addresses['nx_arch_isb']),
+                           (54, addresses['nx_stm32u575_validate_identity']),
+                           (60, addresses['nx_arch_irq_save']), (66, boot)):
+        body[offset:offset + 4] = wide_branch(system + offset, target, True)
+    function('SystemInit', system, bytes(body))
+    body = bytearray.fromhex(
+        '30b5094d91b001ac0fcd0fc40fcd0fc40fcd0fc4'
+        '95e8070084e8070001a80000000011b030bd00bf00550008')
+    body[30:34] = wide_branch(boot + 30,
+        addresses['nx_stm32u575_mpu_user_initialize'], True)
+    function('nx_stm32u575_mpu_user_boot', boot, bytes(body))
+    plan = [word for name in domains for word in domains[name]]
+    plan += [flash + 0x5200, ram + 0x2000, ram + 0x2020,
+             ram + 0x2020, ram + 0x2420]
+    struct.pack_into('<15I', data, 0x5500, *plan)
+    resolved = {"soc_family": "stm32u575", "part": "STM32U575ZIT6Q",
+                "backend": "freertos", "clock_profile": "msis4",
+                "cpu": {"arch": "cortex-m33", "float_abi": "hard", "mpu_version": 8,
+                        "mpu_regions": 8, "security": "single"},
+                "cpu_profile": {"definitions": {"NEXUS_ARCH_SECURITY_STATE": 0}},
+                "kernel_profile": {"user_io": "gpio-write",
+                                   "memory_protection": True,
+                                   "kernel_port": "GCC/ARM_CM33_NTZ/non_secure",
+                                   "security_model": "single",
+                                   "tick_source": "systick", "tickless": False},
+                "layout": {"origin": flash, "size": 2097152},
+                "memory": [{"id": "sram1", "origin": ram,
+                            "size": 196608, "linker": True}],
+                "memory_budgets": {"mpu": {
+                    "privileged_flash_bytes": 24576, "syscall_flash_bytes": 256,
+                    "user_flash_bytes": 1024, "privileged_ram_bytes": 8192,
+                    "user_ram_bytes": 2048}},
+                "controllers": [{"kind": "gpio", "id": "led", "binding": "led0",
+                                 "controller": "GPIOC", "mask": 128,
+                                 "mode": "output", "route": "gpio-pc7"}]}
+    bindings = ('static const nx_gpio_port_t s_nx_face_led = '
+                '{&nx_stm32u575_gpio_ops, &s_nx_port_led};')
+    return elf, resolved, bindings
+
+
+class U575MpuGpioRetentionTests(unittest.TestCase):
+    """Exercise the existing resolved inspector with external ELF/config bytes."""
+
+    def setUp(self):
+        self.elf, self.resolved, self.bindings = mpu_gpio_image()
+
+    def symbol(self, name):
+        return next(s for s in self.elf.defined_symbols if s['name'] == name)
+
+    def inspect(self):
+        from unittest.mock import patch
+        from tools.measurement import retention
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            elf_path, bindings_path = root / 'image.elf', root / 'bindings.c'
+            elf_path.write_bytes(self.elf.data)
+            bindings_path.write_text(self.bindings)
+            with patch.object(retention, 'Elf32', return_value=self.elf), \
+                    patch.object(retention, 'resolved_identity',
+                                 return_value=(self.resolved, {})), \
+                    patch.object(retention, 'resolved_input_files', return_value=[]), \
+                    patch.object(retention, 'validate_elf_configuration'):
+                return retention.inspect_files(elf_path, bindings_path,
+                                               resolved_path=root / 'resolved.json')
+
+    def rejected(self):
+        with self.assertRaises(EvidenceError):
+            self.inspect()
+
+    def test_selected_normal_layout_is_checked_without_fixed_user_entry(self):
+        report = self.inspect()
+        self.assertIn('mpu_gpio', report)
+        result = report['mpu_gpio']
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['task_bytes'], 864)
+        self.assertEqual(result['control_bytes'], 24)
+
+    def test_unselected_profile_preserves_existing_retention_scope(self):
+        self.resolved['kernel_profile']['user_io'] = 'none'
+        self.assertNotIn('mpu_gpio', self.inspect())
+
+    def test_wrong_profile_and_missing_reservations_fail_closed(self):
+        for path, value in ((('part',), 'STM32U585ZIT6Q'),
+                            (('cpu', 'mpu_regions'), 16),
+                            (('cpu_profile', 'definitions',
+                              'NEXUS_ARCH_SECURITY_STATE'), 1),
+                            (('memory_budgets', 'mpu'), None)):
+            with self.subTest(path=path):
+                self.setUp()
+                node = self.resolved
+                for key in path[:-1]:
+                    node = node[key]
+                node[path[-1]] = value
+                self.rejected()
+
+    def test_domain_end_alias_and_entire_function_extent_are_checked(self):
+        for name, change in (('__nexus_user_flash_end__', 32),
+                             ('__syscalls_flash_end__', 1),
+                             ('nx_freertos_user_delay', 0x400)):
+            with self.subTest(name=name):
+                self.setUp()
+                self.symbol(name)['value'] += change
+                self.rejected()
+        self.setUp()
+        self.symbol('nx_freertos_user_delay')['size'] = 0x401
+        self.rejected()
+
+    def test_wrapper_branch_veneer_svc_and_fallback_are_real_bytes(self):
+        for offset in (0x6100, 0x6012, 0x6026, 0x6028, 0x602a):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset] ^= 1
+                self.rejected()
+
+    def test_table_has_exact_slots_and_initial_loaded_thumb_implementations(self):
+        for slot, pointer in ((0, 0x08000401), (6, 0), (13, 0x08006101),
+                              (70, 0x0800043c)):
+            with self.subTest(slot=slot):
+                self.setUp()
+                struct.pack_into('<I', self.elf.data, 0x7000 + slot * 4, pointer)
+                self.rejected()
+        self.setUp()
+        self.symbol('uxSystemCallImplementations')['size'] = 280
+        self.rejected()
+
+    def test_full_readonly_binding_chain_and_gpio_grant_are_checked(self):
+        for offset, value in ((0x108, 0x20000200), (0x110, 0x08006100),
+                              (0x118, 0x100), (0x120, 0x08006100)):
+            with self.subTest(offset=offset):
+                self.setUp()
+                struct.pack_into('<I', self.elf.data, offset, value)
+                self.rejected()
+
+    def test_compiled_abi_facts_and_full_protected_objects_are_required(self):
+        for name, key, value in (('__nexus_mpu_gpio_task_size', 'section', 0),
+                                 ('__nexus_mpu_gpio_control_size', 'value', 0),
+                                 ('task', 'size', 8),
+                                 ('control', 'value', 0x20002000),
+                                 ('task', 'value', 0x20000200)):
+            with self.subTest(name=name, key=key):
+                self.setUp()
+                self.symbol(name)[key] = value
+                self.rejected()
+
+    def test_protected_gateway_factory_provider_and_boot_cannot_enter_user_flash(self):
+        for name in ('nx_factory_gpio', 'nx_gpio_port_write',
+                     'nx_freertos_mpu_gpio_open',
+                     'nx_stm32u575_mpu_user_initialize',
+                     'nx_stm32u575_gpio_mpu_validate', 'write'):
+            with self.subTest(name=name):
+                self.setUp()
+                self.symbol(name).update(value=0x08006121, section=2)
+                self.rejected()
+
+    def test_user_data_load_and_noload_bss_must_match_complete_bounds(self):
+        for mutation in ('load', 'bss', 'end', 'physical'):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                if mutation == 'load':
+                    self.symbol('__nx_mpu_user_data_load')['value'] = 0x08006100
+                elif mutation == 'bss':
+                    self.elf.sections[6]['kind'] = 1
+                elif mutation == 'end':
+                    self.symbol('__nx_mpu_user_data_end')['value'] += 32
+                else:
+                    self.elf.loads[5]['physical'] = 0x08006100
+                self.rejected()
+
+    def test_reset_boot_call_and_identity_failure_guard_are_required(self):
+        for offset in (0x304, 0x836, 0x83a, 0x840, 0x842, 0x91e):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset] ^= 1
+                self.rejected()
+
+    def test_missing_duplicate_or_weak_authority_proof_is_rejected(self):
+        for mutation in ('missing', 'duplicate', 'weak', 'load'):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                binding = self.symbol('nx_freertos_mpu_gpio_binding')
+                if mutation == 'missing':
+                    self.elf.defined_symbols.remove(binding)
+                elif mutation == 'duplicate':
+                    self.elf.defined_symbols.append(dict(binding))
+                elif mutation == 'weak':
+                    binding['binding'] = 2
+                else:
+                    self.elf.loads[0]['memory'] = 0x108
+                    self.elf.loads[0]['files'] = 0x108
+                self.rejected()
+
+
+    def test_early_return_cannot_fake_startup_call_reachability(self):
+        for offset in (0x800, 0x900):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset:offset + 2] = bytes.fromhex('7047')
+                self.rejected()
+
+    def test_reset_stack_and_actual_user_initializer_plan_are_checked(self):
+        for offset in (0, 0x338, 0x928, 0x5500, 0x552c):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset] ^= 32
+                self.rejected()
+
 if __name__ == "__main__":
     unittest.main()

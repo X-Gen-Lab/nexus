@@ -647,15 +647,44 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
     budgets = obj(assembly["memory_budgets"], {"main_stack_bytes"},
-                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions"},
+                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions", "mpu"},
                   "memory budgets")
     for name, value in budgets.items():
-        if name == "regions":
+        if name in {"regions", "mpu"}:
             continue
         integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
     if budgets["main_stack_bytes"] % 8:
         fail("Main stack must have 8-byte alignment")
     ram = next(region for region in variant["memory"] if region["linker"])
+    gpio_user = (backend == "freertos" and
+                 kernel_profile.user_io == "gpio-write")
+    if gpio_user and (family != "stm32u575" or part != "STM32U575ZIT6Q" or
+                      assembly["clock_profile"] != "msis4" or
+                      assembly["layout"] is not None or "power" in assembly):
+        fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
+    if ("mpu" in budgets) != gpio_user:
+        fail("Explicit protected MPU reservations require GPIO user I/O")
+    if gpio_user:
+        fields = {"privileged_flash_bytes", "user_flash_bytes",
+                  "syscall_flash_bytes", "privileged_ram_bytes",
+                  "user_ram_bytes"}
+        reservations = obj(budgets["mpu"], fields, (), "MPU reservations")
+        for name, value in reservations.items():
+            integer(value, 32, UINT32_MAX, "MPU reservation " + name)
+            if value % 32:
+                fail("MPU reservations require exact 32-byte granules")
+        if (sum(reservations[name] for name in (
+                "privileged_flash_bytes", "user_flash_bytes",
+                "syscall_flash_bytes")) > variant["flash"]["size"] or
+                reservations["privileged_ram_bytes"] +
+                reservations["user_ram_bytes"] > ram["size"]):
+            fail("MPU reservations exceed physical Flash/SRAM1")
+        if (budgets.get("regions") or budgets["main_stack_bytes"] +
+                budgets.get("libc_heap_bytes", 0) >=
+                reservations["privileged_ram_bytes"] or
+                budgets.get("static_ram_bytes", ram["size"]) >
+                reservations["privileged_ram_bytes"]):
+            fail("MPU privileged reservations cannot cover optional RAM or exhaust MSP")
     if budgets["main_stack_bytes"] + budgets.get("libc_heap_bytes", 0) >= ram["size"]:
         fail("Reserved stack/heap exhaust default RAM")
     if budgets.get("static_ram_bytes", ram["size"]) > ram["size"]:
@@ -1038,6 +1067,12 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("I2C requires at least one explicit address endpoint")
         if controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and not children:
             fail("SPI requires at least one reviewed CS endpoint")
+    if gpio_user and (len(selected) != 1 or
+            selected[0]["kind"] != "gpio" or
+            selected[0]["controller"] != "GPIOC" or
+            selected[0]["mode"] != "output" or
+            selected[0]["mask"] != 0x80):
+        fail("GPIO user I/O requires the single exact PC7 output binding")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
     if adc_group_contract is not None:

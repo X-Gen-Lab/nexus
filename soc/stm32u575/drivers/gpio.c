@@ -7,6 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32u575_provider.h"
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+#include "stm32u575_gpio_mpu.h"
+#endif
 static nx_result_t write(void* context, uint32_t set, uint32_t reset) {
     nx_stm32u575_gpio_state_t* p = context;
     if (!nx_arch_is_privileged())
@@ -204,3 +207,34 @@ nx_result_t nx_stm32u575_pin_alternate(GPIO_TypeDef* gpio, unsigned pin,
     return result;
 }
 const nx_gpio_ops_t nx_stm32u575_gpio_ops = {write, read, toggle};
+
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+#ifndef NX_U575_MPU_GPIO_PORT
+#define NX_U575_MPU_GPIO_PORT GPIOC
+#endif
+bool nx_stm32u575_gpio_mpu_validate(
+    const nx_gpio_port_t* port, uint32_t mask,
+    const nx_stm32u575_gpio_mpu_bounds_t* bounds) {
+    if (port == NULL || bounds == NULL || port->ops != &nx_stm32u575_gpio_ops) {
+        return false;
+    }
+    const nx_stm32u575_gpio_state_t* state = port->context;
+    uintptr_t first = (uintptr_t)state;
+    if (first % _Alignof(nx_stm32u575_gpio_state_t) != 0U ||
+        first < bounds->ram_begin || first >= bounds->ram_end ||
+        sizeof(*state) > bounds->ram_end - first) {
+        return false;
+    }
+    uintptr_t last = first + sizeof(*state);
+    if ((first < bounds->task_end && bounds->task_begin < last) ||
+        (first < bounds->control_end && bounds->control_begin < last)) {
+        return false;
+    }
+    /* This selected profile owns only the existing GPIOC PC7 output. Exact
+     * ops identity and complete storage checks precede every private field
+     * read; the final bounded method performs one BSRR store, with no OS. */
+    return state->registers == NX_U575_MPU_GPIO_PORT && state->mask == 0x80U &&
+           state->initialized && state->output && state->retained &&
+           mask == 0x80U;
+}
+#endif

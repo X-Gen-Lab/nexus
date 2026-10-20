@@ -104,6 +104,12 @@
               },
               "trace": {
                 "type": "boolean"
+              },
+              "user_io": {
+                "enum": [
+                  "none",
+                  "gpio-write"
+                ]
               }
             },
             "type": "object"
@@ -1158,6 +1164,49 @@
           "minimum": 0,
           "type": "integer"
         },
+        "mpu": {
+          "additionalProperties": false,
+          "properties": {
+            "privileged_flash_bytes": {
+              "maximum": 4294967295,
+              "minimum": 32,
+              "multipleOf": 32,
+              "type": "integer"
+            },
+            "privileged_ram_bytes": {
+              "maximum": 4294967295,
+              "minimum": 32,
+              "multipleOf": 32,
+              "type": "integer"
+            },
+            "syscall_flash_bytes": {
+              "maximum": 4294967295,
+              "minimum": 32,
+              "multipleOf": 32,
+              "type": "integer"
+            },
+            "user_flash_bytes": {
+              "maximum": 4294967295,
+              "minimum": 32,
+              "multipleOf": 32,
+              "type": "integer"
+            },
+            "user_ram_bytes": {
+              "maximum": 4294967295,
+              "minimum": 32,
+              "multipleOf": 32,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "privileged_flash_bytes",
+            "privileged_ram_bytes",
+            "syscall_flash_bytes",
+            "user_flash_bytes",
+            "user_ram_bytes"
+          ],
+          "type": "object"
+        },
         "regions": {
           "additionalProperties": {
             "additionalProperties": false,
@@ -1289,6 +1338,12 @@
             },
             "trace": {
               "type": "boolean"
+            },
+            "user_io": {
+              "enum": [
+                "none",
+                "gpio-write"
+              ]
             }
           },
           "type": "object"

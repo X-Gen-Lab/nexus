@@ -123,6 +123,14 @@ nx_result_t nx_freertos_mpu_task_start(nx_freertos_mpu_task_t* task,
     if (task->handle != NULL) {
         return NX_ERROR_BUSY;
     }
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+    if (task->gpio_pinned != 0U || task->closing != 0U) {
+        return NX_ERROR_BUSY;
+    }
+    if (task->epoch == UINT64_MAX) {
+        return NX_ERROR_OVERFLOW;
+    }
+#endif
     uintptr_t stack = (uintptr_t)config->stack;
     uintptr_t entry = (uintptr_t)config->entry & ~(uintptr_t)1U;
     if (config->entry == NULL || !contains(layout.user_flash, entry, 2) ||
@@ -200,7 +208,16 @@ nx_result_t nx_freertos_mpu_task_start(nx_freertos_mpu_task_t* task,
         handle == NULL) {
         return NX_ERROR_IO;
     }
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+    /* Publish a new incarnation only after the real static kernel admission.
+     * A task that runs before publication has no GPIO authority yet. */
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    ++task->epoch;
     task->handle = handle;
+    nx_arch_irq_restore(saved);
+#else
+    task->handle = handle;
+#endif
     return NX_SUCCESS;
 }
 
@@ -218,7 +235,30 @@ nx_result_t nx_freertos_mpu_task_delete(nx_freertos_mpu_task_t* task) {
     if (task->handle == NULL || task->handle == xTaskGetCurrentTaskHandle()) {
         return NX_ERROR_STATE;
     }
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    if (task->gpio_pinned != 0U) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_BUSY;
+    }
+    if (task->closing != 0U || task->epoch == 0U ||
+        task->handle != (TaskHandle_t)&task->control) {
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_STATE;
+    }
+    TaskHandle_t handle = task->handle;
+    task->closing = 1U;
+    nx_arch_irq_restore(saved);
+    /* The closed marker prevents opening a grant while the kernel removes
+     * scheduler references. Kernel deletion is never called under our guard. */
+    vTaskDelete(handle);
+    saved = nx_arch_irq_save();
+    task->handle = NULL;
+    task->closing = 0U;
+    nx_arch_irq_restore(saved);
+#else
     vTaskDelete(task->handle);
     task->handle = NULL;
+#endif
     return NX_SUCCESS;
 }

@@ -65,6 +65,7 @@
     "u575-lpdma-copy-stop2.toml",
     "u575-lptim-run.toml",
     "u575-lptim1-lpbam-stop2.toml",
+    "u575-mpu-gpio-write.toml",
     "u575-rtc-run.toml",
     "u575-uart-chain.toml"
   ],

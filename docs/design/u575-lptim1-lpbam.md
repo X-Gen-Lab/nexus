@@ -166,9 +166,11 @@ old Core TIM2 deadlines remain invalid.
 [concrete Stop2](../../soc/stm32u575/stop2.c) share invariants through typed
 compile-time profiles; the two public request/ops types remain distinct. The
 [maintained public C11 consumer](../../cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c)
-is the source integration reference. Expanded SDK v8 remains a plan; historical
-v7 copy results do not qualify this selection. Full integrated gates, relocated
-SDK, offline reproducibility and candidate acceptance require their own evidence.
+is the source integration reference. The complete installed-SDK consumer plan is
+defined by the [maintained transport policy](../../tools/release/transport.py);
+historical v7/v8 results do not qualify additions. Full integrated gates,
+relocated SDK, offline reproducibility and candidate acceptance require their
+own evidence.
 
 Focused production-C GoogleTest models pass 24 cases in debug and 24 with Os,
 including conservative DIER flag loss, early service, missing

@@ -1,0 +1,369 @@
+{
+  "kind": "github_readback_projection",
+  "head": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+  "endpoint": "https://api.github.com/repos/X-Gen-Lab/nexus/commits/b031911584800898f1cdc29a7d96afd0f8335b2b/check-runs?per_page=100",
+  "total": 36,
+  "checks": [
+    {
+      "id": 118909101106,
+      "name": "CI Status",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:56:04Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118899613236,
+      "name": "CodeQL",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 57789,
+      "completed_at": "2026-10-20T21:34:22Z",
+      "annotations_count": 86
+    },
+    {
+      "id": 118898852758,
+      "name": "Build & Test / ARM link and budgets (stm32-qiming-baremetal)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:37:05Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852739,
+      "name": "Build & Test / Provider assembly audits (can_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:35:48Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852596,
+      "name": "Build & Test / Provider assembly audits (stm32_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:37:06Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852575,
+      "name": "Build & Test / Provider assembly audits (gd32_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:37:39Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852549,
+      "name": "Build & Test / Provider assembly audits (mainstream_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:12Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852531,
+      "name": "Build & Test / Provider assembly audits (timer_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:42Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852527,
+      "name": "Build & Test / Provider assembly audits (usb_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:19Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852522,
+      "name": "Build & Test / Provider assembly audits (u575_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:34:56Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852514,
+      "name": "Build & Test / Provider assembly audits (pin_state_fixture)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:34:46Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852513,
+      "name": "Build & Test / Provider assembly audits (h743_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:15Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852505,
+      "name": "Build & Test / Native contracts (native-asan)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:52:07Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898852497,
+      "name": "Build & Test / Provider assembly audits (multi_controller_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:35:39Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852496,
+      "name": "Build & Test / ARM link and budgets (stm32-sky-freertos)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:01Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852482,
+      "name": "Build & Test / Provider assembly audits (g474_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:02Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852478,
+      "name": "Build & Test / Provider assembly audits (ethernet_assembly)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:34:15Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852468,
+      "name": "Build & Test / ARM link and budgets (gd32-liangshan-freertos)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:33:51Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852429,
+      "name": "Build & Test / ARM link and budgets (stm32-qiming-freertos)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:33:50Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852424,
+      "name": "Build & Test / ThreadX kernel and lifecycle software contracts",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:37:43Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852413,
+      "name": "Build & Test / ARM link and budgets (gd32-liangshan-baremetal)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:33:46Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852348,
+      "name": "Build & Test / ARM link and budgets (stm32-sky-baremetal)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:33:48Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852341,
+      "name": "Build & Test / Native contracts (native-debug)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:45:05Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898852330,
+      "name": "Build & Test / Native contracts (native-release)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:41:21Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898852260,
+      "name": "Build & Test / Cortex-M compiler and runtime contracts",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:43:59Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852226,
+      "name": "Build & Test / Native contracts (native-tsan)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:46:39Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898852214,
+      "name": "Documentation / Build Docs",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:36:47Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898852209,
+      "name": "Code Quality / Required static analysis",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:55:46Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898852132,
+      "name": "Tool Contracts / Configuration, evidence and SDK failure boundaries",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:55:47Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852119,
+      "name": "Build & Test / Optional MPU and TrustZone software contracts",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:37:08Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898852068,
+      "name": "Code Quality / Required commit style checks",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:34:26Z",
+      "annotations_count": 0
+    },
+    {
+      "id": 118898657569,
+      "name": "Detect Changes",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:32:34Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898656817,
+      "name": "Audit resolved Python dependencies",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:32:41Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898656771,
+      "name": "Secret scan",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:32:49Z",
+      "annotations_count": 1
+    },
+    {
+      "id": 118898656539,
+      "name": "CodeQL analysis (python)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T21:34:23Z",
+      "annotations_count": 2
+    },
+    {
+      "id": 118898656201,
+      "name": "CodeQL analysis (cpp)",
+      "head_sha": "b031911584800898f1cdc29a7d96afd0f8335b2b",
+      "status": "completed",
+      "conclusion": "success",
+      "app_id": 15368,
+      "completed_at": "2026-10-20T22:05:54Z",
+      "annotations_count": 3
+    }
+  ],
+  "qualification": "Only this historical commit. Not qualification for dirty MPU or next source."
+}

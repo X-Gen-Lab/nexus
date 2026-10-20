@@ -23,7 +23,7 @@ _STANDARD = {"tick_source": "systick", "tick_hz": 1000,
              "runtime_stats": False, "tickless": False,
              "memory_protection": False, "system_call_stack_words": 128,
              "security_model": "single", "secure_idle_stack_bytes": 128,
-             "lowpower_port": "custom"}
+             "lowpower_port": "custom", "user_io": "none"}
 PROFILES = MappingProxyType({
     "standard": MappingProxyType(_STANDARD),
     "minimal": MappingProxyType({**_STANDARD, "max_priorities": 4,
@@ -109,6 +109,15 @@ def resolve(choices, cpu, clock_hz):
     protected = options["memory_protection"]
     if protected and security == "split":
         fail("MPU and split-security kernel combination is not maintained")
+    user_io = options["user_io"]
+    if not isinstance(user_io, str) or user_io not in {"none", "gpio-write"}:
+        fail("Unsupported user I/O policy")
+    if user_io == "gpio-write" and (
+            not protected or security != "single" or
+            cpu.arch != "cortex-m33" or cpu["cpu"]["security"] != "single" or
+            cpu.definitions["NEXUS_CPU_MPU_REGIONS"] != 8 or
+            options["tickless"] or options["tick_source"] != "systick"):
+        fail("GPIO user I/O requires the exact single-world MPU-v2 M33 profile")
     if options["system_call_stack_words"] % 2:
         fail("System call stack must have 8-byte alignment")
     if protected:
@@ -162,6 +171,7 @@ def resolve(choices, cpu, clock_hz):
         "NEXUS_OS_TICKLESS": int(options["tickless"]),
         "NEXUS_OS_TIMEBASE_LOWPOWER": int(lowpower_port == "timebase"),
         "NEXUS_OS_MEMORY_PROTECTION": int(protected),
+        "NEXUS_OS_MPU_GPIO": int(user_io == "gpio-write"),
         "NEXUS_OS_SYSTEM_CALL_STACK_WORDS": options["system_call_stack_words"],
         "NEXUS_OS_TRUSTZONE": int(security == "split"),
         "NEXUS_OS_SECURE_IDLE_STACK_BYTES": options["secure_idle_stack_bytes"],
@@ -235,5 +245,6 @@ def editor_schema():
     properties["tick_source"] = {"enum": ["external", "systick"]}
     properties["security_model"] = {"enum": ["single", "split"]}
     properties["lowpower_port"] = {"enum": list(lowpower.PORTS)}
+    properties["user_io"] = {"enum": ["none", "gpio-write"]}
     return {"type": "object", "properties": properties,
             "additionalProperties": False}

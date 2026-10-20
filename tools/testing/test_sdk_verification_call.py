@@ -213,6 +213,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2"),
         ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy"),
         ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2", "u575-lptim1-lpbam"),
+        ("u575 mpu gpio", "u575-mpu-gpio-write", "u575-mpu-gpio"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
@@ -220,7 +221,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
         "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
         "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty",
-        "u575-lpdma-copy-stop2", "u575-lptim1-lpbam-stop2"})
+        "u575-lpdma-copy-stop2", "u575-lptim1-lpbam-stop2",
+        "u575-mpu-gpio-write"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -265,6 +267,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         verification / "consumers/pin-states.c")
         for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
                      "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam",
+                     "u575-mpu-gpio",
                      "h743-uart-continuous",
                      "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
@@ -588,7 +591,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy",
                  "Nexus::U575Stop2Copy"),
                 ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2",
-                 "u575-lptim1-lpbam", "Nexus::U575Stop2Lptim1")):
+                 "u575-lptim1-lpbam", "Nexus::U575Stop2Lptim1"),
+                ("u575 mpu gpio", "u575-mpu-gpio-write",
+                 "u575-mpu-gpio", "Nexus::U575MpuGpio")):
             assembly = "tools/configure/assemblies/" + stem + ".toml"
             with self.subTest(smoke=smoke):
                 directory = self.directory / smoke
@@ -690,7 +695,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on",
-                      "u575 retained time", "u575 stop2", "u575 lpdma copy"):
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
+                      "u575 lptim1 lpbam", "u575 mpu gpio"):
             for operation, exit_code in (("build", 51), ("retention", 52)):
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
@@ -776,9 +782,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.stem in {"u575-lpdma-copy-stop2",
-                                   "u575-lptim1-lpbam-stop2"}:
+                                   "u575-lptim1-lpbam-stop2", "u575-mpu-gpio-write"}:
                 stem = ("u575-lpdma-copy" if assembly.stem ==
-                        "u575-lpdma-copy-stop2" else "u575-lptim1-lpbam")
+                        "u575-lpdma-copy-stop2" else "u575-lptim1-lpbam" if
+                        assembly.stem == "u575-lptim1-lpbam-stop2" else "u575-mpu-gpio")
                 canonical = (self.sdk /
                     "cmake/package/verification/io_evolution/consumers" /
                     (stem + ".c"))

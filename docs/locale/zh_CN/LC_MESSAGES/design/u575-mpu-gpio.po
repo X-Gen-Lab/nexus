@@ -1,0 +1,128 @@
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: a29ad3d6f7d46ce681af5b980c7b5424527b1064e2900f8a8446b0439e97ee91\n"
+
+msgid "U575 MPU-v2 scalar GPIO WRITE authority"
+msgstr "U575 MPU-v2 scalar GPIO WRITE authority"
+
+msgid "This implementation reference selects STM32U575ZIT6Q TZEN0, MSIS4, one security world, FreeRTOS MPU-wrapper-v2 and the actual Cortex-M33 eight-region port. One protected task may WRITE GPIOC PC7 through one immutable grant. Software evidence now includes real C host models, a normal M33 reset link and one relocated development-SDK consumer with the maintained static ELF gate. Runtime MPU exception behavior and electrical HIL are not executed. It establishes no M7 MPU support or general user-device gateway."
+msgstr "本实施参考选择 STM32U575ZIT6Q TZEN0、MSIS4、单一 security world、FreeRTOS MPU-wrapper-v2 及实际 Cortex-M33 八 region port。一个受保护 task 可通过一个不可变 grant WRITE GPIOC PC7。软件证据现包括真实 C host 模型、normal M33 reset 链接，以及经过维护静态 ELF gate 的单个搬移 development-SDK consumer。未执行 runtime MPU 异常行为及电气 HIL。它不建立 M7 MPU 支持或通用 user-device gateway。"
+
+msgid "Link the selected `Nexus::U575MpuGpio` target through the maintained [assembly](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/u575-mpu-gpio-write.toml). The ordinary profile keeps the pinned 70-entry syscall numbering and delay/tick services. Only `user_io=\"gpio-write\"` selects the 71-entry derivation, new slot 70 and protected task pin/epoch fields. Resource claims apply only to measured compiled contexts and actual images; the [source-bound evidence](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/u575-mpu-gpio-20261020/README.md) keeps selected/default scope and historical phases explicit."
+msgstr "通过维护的[装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/u575-mpu-gpio-write.toml) 链接所选 `Nexus::U575MpuGpio` target。普通 profile 保留锁定的 70 项 syscall 编号及 delay/tick 服务。仅 `user_io=\"gpio-write\"` 选择 71 项派生、新 slot70 及受保护 task 的 pin/epoch 字段。资源结论仅适用于实际测量的编译上下文和镜像；[源码绑定证据](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 明确区分 selected/default 范围与历史阶段。"
+
+msgid "![FIG-29: exact protected task, immutable authority and one guarded BSRR effect; close/join precede task deletion; software links do not establish runtime isolation](../assets/diagrams/u575-mpu-gpio.svg)"
+msgstr "![FIG-29：精确受保护 task、不可变 authority 及一次 guard 内 BSRR 效果；task delete 前先 close/join；软件链接不建立 runtime 隔离](../assets/diagrams/u575-mpu-gpio.svg)"
+
+msgid "FIG-29: exact protected task, immutable authority and one guarded BSRR effect; close/join precede task deletion; software links do not establish runtime isolation"
+msgstr "FIG-29：精确受保护 task、不可变 authority 及一次 guard 内 BSRR 效果；task delete 前先 close/join；软件链接不建立 runtime 隔离"
+
+msgid "The {ref}`figure contract <fig-29-u575-mpu-gpio>` distinguishes actual calls, protected authority, saved-mask exclusion and lifecycle responsibility. No arrow creates a worker, dynamic handle registry, user MMIO mapping or asynchronous request protocol."
+msgstr "{ref}`图合同 <fig-29-u575-mpu-gpio>` 区分实际调用、受保护 authority、保存掩码后的排除边界及生命周期责任。任何箭头均不创建 worker、动态 handle registry、user MMIO 映射或异步 request 协议。"
+
+msgid "Five explicit memory domains"
+msgstr "五个显式内存域"
+
+msgid "The maintained normal memory generator accepts five explicit, nonempty, 32-byte-aligned reservations. Their Flash and RAM sums may be less than the physical capacity; the remaining tail stays unassigned, rather than becoming user memory. Overflow, overlap, malformed sizes and insufficient privileged MSP/static budget are rejected before generation. These are software reference reservations, not a product partition policy."
+msgstr "维护的 normal memory generator 接受五个显式、非空、32 B 对齐的预留区。其 Flash 和 RAM 总量可小于物理容量；余下尾部保持未分配，不成为 user memory。溢出、重叠、非法大小及不足的 privileged MSP/static 预算在生成前被拒绝。这些是软件参考预留，不是产品分区政策。"
+
+msgid "Domain"
+msgstr "域"
+
+msgid "Reference reservation"
+msgstr "参考预留"
+
+msgid "Contents and access"
+msgstr "内容与访问"
+
+msgid "Privileged Flash"
+msgstr "Privileged Flash"
+
+msgid "24 KiB"
+msgstr "24 KiB"
+
+msgid "Vectors, ordinary code/rodata, kernel, public I/O helpers and concrete provider; user execution forbidden"
+msgstr "向量、普通 code/rodata、kernel、公共 I/O helper 及具体 provider；禁止 user 执行"
+
+msgid "Syscall Flash"
+msgstr "Syscall Flash"
+
+msgid "256 B"
+msgstr "256 B"
+
+msgid "Real pinned FreeRTOS veneers, including selected SVC70; narrow user-executable entry region"
+msgstr "真实锁定的 FreeRTOS veneer，包括选定 SVC70；窄 user 可执行入口区"
+
+msgid "User Flash"
+msgstr "User Flash"
+
+msgid "1 KiB"
+msgstr "1 KiB"
+
+msgid "Explicit user entry and all three Nexus user wrappers; executable, read-only"
+msgstr "显式 user entry 与全部三个 Nexus user wrapper；可执行、只读"
+
+msgid "Privileged RAM"
+msgstr "Privileged RAM"
+
+msgid "8 KiB"
+msgstr "8 KiB"
+
+msgid "Kernel/TCB, protected syscall stack, authority, provider state and MSP"
+msgstr "Kernel/TCB、受保护 syscall stack、authority、provider state 与 MSP"
+
+msgid "User RAM"
+msgstr "User RAM"
+
+msgid "2 KiB"
+msgstr "2 KiB"
+
+msgid "Explicit user stack and user DATA/BSS; data mappings are XN"
+msgstr "显式 user stack 与 user DATA/BSS；数据映射为 XN"
+
+msgid "The actual reset path must validate the exact part/security identity before copying user DATA and zeroing user BSS from the strong linker spans. The new bounded initializer validates every range before any store. Ordinary vendor startup still initializes privileged DATA/BSS; no runtime linker or pathname-based partition substitutes for this normal graph. The assembly does not select SRAM4 or the baremetal Stop2 owners."
+msgstr "实际 reset 路径须先验证精确 part/security 身份，再依据强 linker span 复制 user DATA 并清零 user BSS。新的有界 initializer 在任何 store 前核验全部范围。普通 vendor startup 仍初始化 privileged DATA/BSS；不使用 runtime linker 或按源码路径划分来代替这个 normal graph。该装配不选择 SRAM4 或 baremetal Stop2 owner。"
+
+msgid "Bind the one trusted authority"
+msgstr "绑定唯一可信 authority"
+
+msgid "Use the declarations in the [authority header](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/include/nexus/os/freertos_mpu_gpio.h), [protected task header](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/include/nexus/os/freertos_mpu.h) and [user entry header](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/include/nexus/os/freertos_user.h). Define exactly one immutable `nx_freertos_mpu_gpio_binding` in privileged Flash. It names a disjoint privileged-RAM task/control pair and a read-only grant. The grant names the read-only generated `nx_binding_led` pointer slot, logical LED device and mask `0x80`; it never accepts a user pointer as authority."
+msgstr "声明以 [authority 头文件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/include/nexus/os/freertos_mpu_gpio.h)、[protected task 头文件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/include/nexus/os/freertos_mpu.h) 及 [user entry 头文件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/os/freertos/include/nexus/os/freertos_user.h) 为准。在 privileged Flash 定义恰好一个不可变 `nx_freertos_mpu_gpio_binding`。它指定互不重叠的 privileged-RAM task/control 及只读 grant。grant 指定只读生成的 `nx_binding_led` pointer slot、逻辑 LED device 及 mask `0x80`；绝不接受 user pointer 作为 authority。"
+
+msgid "Before reading nested fields, the implementation checks full object extents, alignment and the five linked ranges: binding, grant, pointer slot, face and ops must fit privileged Flash; task, control and the complete concrete provider context must fit disjoint privileged RAM. The SoC validator requires the actual initialized GPIOC PC7 output provider and exact ops identity. Metadata bounds do not themselves prove every instruction's MPU permissions: the final normal ELF must also place the complete helper/provider function extents in privileged Flash."
+msgstr "读取嵌套字段前，实现核验完整对象范围、对齐和五个 linked range：binding、grant、pointer slot、face 及 ops 必须完整位于 privileged Flash；task、control 和完整具体 provider context 必须位于互不重叠的 privileged RAM。SoC validator 要求实际已初始化的 GPIOC PC7 output provider 及精确 ops 身份。仅元数据范围不能证明每条指令的 MPU 权限：最终 normal ELF 还须将完整 helper/provider 函数范围置于 privileged Flash。"
+
+msgid "One privileged lifecycle owner serializes task start/delete and authority open/close/join. Binding, grant, task metadata, control and provider remain valid for the linked image lifetime; open through join also forbids GPIO stop or reconfiguration. Only cold startup zero-initializes the metadata. The task's monotonic epoch survives deletion; join clears only the captured task epoch. Task-epoch wrap rejects rather than reusing an incarnation. NMI, HardFault, DMA and another security world never write these objects."
+msgstr "一个 privileged lifecycle owner 串行执行 task start/delete 及 authority open/close/join。binding、grant、task metadata、control 和 provider 在 linked image 整个寿命内有效；从 open 到 join 还禁止 GPIO stop 或重配置。仅 cold startup 对元数据清零。task 的单调 epoch 在删除后保留；join 只清除所捕获的 task epoch。task epoch 溢出即拒绝，不重用代次。NMI、HardFault、DMA 及另一个 security world 绝不写这些对象。"
+
+msgid "Enter through the real protected port"
+msgstr "通过真实 protected port 进入"
+
+msgid "Start the statically provided restricted task, then open the fixed authority before allowing its user calls. Open checks the actual live task handle equals its selected static TCB and snapshots that task epoch while pinning deletion. There is no caller-provided principal, lookup table or borrowed pointer argument."
+msgstr "启动静态提供的 restricted task，然后在允许 user 调用前 open 固定 authority。open 核验实际 live task handle 等于选定 static TCB，快照其 task epoch，并 pin 住删除。没有调用方提供的 principal、查找表或借用 pointer 参数。"
+
+msgid "The user calls `nx_freertos_user_gpio_write(device, set, reset)`. Its real veneer enters SVC70 through the pinned protected call stack/origin checks. The dispatcher obtains the actual `xTaskGetCurrentTaskHandle()` before entering the saved-mask boundary, then rechecks open phase, live TCB/epoch, device and grant through the single real `nx_gpio_port_write()` effect. The selected provider performs exactly one bounded BSRR write. No kernel API, wait, allocation or product callback runs inside that effect boundary; the scalar result returns in R0."
+msgstr "user 调用 `nx_freertos_user_gpio_write(device, set, reset)`。其真实 veneer 经锁定的 protected call stack/origin 核验进入 SVC70。dispatcher 在进入保存掩码的边界前取得实际 `xTaskGetCurrentTaskHandle()`，再于单次真实 `nx_gpio_port_write()` 效果期间复核 open phase、live TCB/epoch、device 和 grant。所选 provider 恰好执行一次有界 BSRR 写入。该效果边界内不调用 kernel API、等待、分配或产品 callback；scalar 结果在 R0 返回。"
+
+msgid "Unknown device, wrong current task or bits outside `0x80` return PERMISSION. Zero combined masks or overlapping set/reset return INVALID; closed/stale incarnations return STATE; invalid privileged metadata returns INVALID; an unsupported context returns CONTEXT. These rejections perform no GPIO effect. READ, toggle, arbitrary pointers, user MMIO, DMA, IRQ and copied/asynchronous I/O are outside this API. Delay and tick-read remain separate services 6 and 13; the final ELF must prove all three Nexus user entries and their actual veneers are in the permitted execution regions."
+msgstr "未知 device、错误 current task 或 `0x80` 之外的位返回 PERMISSION。合并 mask 为零或 set/reset 重叠返回 INVALID；closed/陈旧代次返回 STATE；非法 privileged 元数据返回 INVALID；不支持的上下文返回 CONTEXT。这些拒绝均不产生 GPIO 效果。READ、toggle、任意 pointer、user MMIO、DMA、IRQ 及 copied/异步 I/O 均不属于本 API。delay 与 tick-read 仍是独立服务 6 和 13；最终 ELF 须证明全部三个 Nexus user 入口及其实际 veneer 位于允许执行的 region。"
+
+msgid "Lifecycle controls require privileged Thread and a scheduler that is running or not yet started, never suspended. FAULTMASK and BASEPRI must be zero except the selected port's canonical bootstrap BASEPRI before scheduler start. Service requires a running scheduler and zero BASEPRI. Incoming PRIMASK is saved and restored. This single-core exclusion is insufficient for an unmodeled writer; products must preserve the exact single-owner assumptions."
+msgstr "生命周期控制要求 privileged Thread，scheduler 为 running 或尚未启动，绝不能 suspended。FAULTMASK 和 BASEPRI 必须为零，仅 scheduler 启动前允许所选 port 的规范 bootstrap BASEPRI。service 要求 scheduler running 且 BASEPRI 为零。incoming PRIMASK 被保存和恢复。该单核排除不能约束未建模的 writer；产品须保持精确 single-owner 前提。"
+
+msgid "Close, join and delete explicitly"
+msgstr "显式 close、join 和 delete"
+
+msgid "Close revokes new effects but retains the task pin. Join requires closed state and the same live incarnation, enters the saved-mask exclusion, removes the pin and detaches the authority's handle/task epoch. No scalar effect can straddle that single-core boundary. Join does not delete the task, stop GPIO or reset the task lifetime epoch. A failed close/join retains the obligation and storage."
+msgstr "close 撤回新效果但保留 task pin。join 要求 closed 状态和同一 live 代次，进入保存掩码的排除边界、移除 pin 并分离 authority 的 handle/task epoch。任何 scalar 效果都不能跨越该单核边界。join 不删除 task、停止 GPIO 或复位 task lifetime epoch。失败的 close/join 保留责任与存储。"
+
+msgid "Task deletion while pinned returns BUSY. After join, the lifecycle owner may delete the other task; self-delete is rejected. A protected closing marker is set before the real kernel deletion outside the IRQ guard, preventing reopen during deletion. The owner then clears the handle under a second guard while preserving the task epoch. Products still own user quiescence, task stack lifetime, scheduler startup, safe outputs and eventual provider/platform stop."
+msgstr "task 有 pin 时删除返回 BUSY。join 后，lifecycle owner 可删除另一个 task；拒绝自删。在 IRQ guard 外实际 kernel delete 之前，先设置受保护 closing marker，阻止删除期间 reopen。随后 owner 在第二个 guard 内清除 handle，保留 task epoch。产品仍负责 user quiescence、task stack 寿命、scheduler 启动、安全输出及最终 provider/platform stop。"
+
+msgid "Evidence and remaining exits"
+msgstr "证据及剩余退出"
+
+msgid "Executable tests preceded production changes and exposed actual authority, task, provider-context and startup failures. The reviewed removal of an unexposed control counter retains the actual task epoch: its final model result is a behavior-preserving refactor GREEN, not a new behavioral RED. The maintained Native CMake target runs the final cases. Configuration and pinned-port checks retain default and unsupported-profile coverage. The [public consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c) uses the normal firmware graph, including real reset startup. The [source-bound evidence](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/u575-mpu-gpio-20261020/README.md) records exact source phases, raw execution, compiled ABI facts, resources and the single relocated development-SDK consumer; it does not claim the complete current SDK transport plan passed."
+msgstr "可执行测试先于生产修改，并暴露实际 authority、task、provider-context 和 startup 缺陷。经审查移除未暴露的 control counter 后，实际 task epoch 得以保留：最终模型结果是保持行为的 refactor GREEN，不是新的行为 RED。维护的 Native CMake target 执行最终全部用例。配置及锁定 port 检查保留默认与不支持 profile 的覆盖。[公共 consumer](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c) 使用包含真实 reset startup 的 normal firmware graph。[源码绑定证据](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 记录精确源码阶段、原始执行、已编译 ABI 事实、资源及单个搬移 development-SDK consumer；不宣称完整当前 SDK transport plan 已通过。"
+
+msgid "The selected ELF gate checks complete five-domain ranges, immutable authority pointers, protected objects, compiled task/control sizes, actual slots 6/13/70, three user wrappers and real veneers. Its explicit supported GNU Os startup shape checks actual reset/identity/user-initialization calls and DATA/BSS bounds; unrecognized shapes fail closed. These static layout, opcode and call facts do not execute protected SVC entry/exit. Runtime MPU faults, task switching, actual PC7 output, interrupt latency and HIL are not executed. The general IO-39/SOC-36 exits, other devices, multiple tasks/grants and M7 MPU remain open; a typed interface or host model does not close them."
+msgstr "选定 ELF gate 检查完整五域范围、不可变 authority 指针、受保护对象、已编译 task/control 大小、实际 slot6/13/70、三个 user wrapper 及真实 veneer。其明确支持的 GNU Os startup 形状核对实际 reset/identity/user-initialization 调用及 DATA/BSS 边界；不认识的形状一律拒绝。这些静态 layout、opcode 和调用事实不执行 protected SVC entry/exit。未执行 runtime MPU fault、task switching、实际 PC7 output、interrupt latency 及 HIL。完整 IO-39/SOC-36 退出、其他 device、多 task/grant 及 M7 MPU 仍开放；typed interface 或 host model 不能关闭这些退出。"

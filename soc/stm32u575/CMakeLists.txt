@@ -68,6 +68,10 @@ if(u5_i2c_modes)
 endif()
 if(u5_sources)
     add_library(nexus_soc_stm32u575 STATIC ${u5_sources})
+    if(NEXUS_OS_MPU_GPIO)
+        target_compile_definitions(nexus_soc_stm32u575 PRIVATE
+            NEXUS_OS_MPU_GPIO=1u)
+    endif()
     target_link_libraries(nexus_soc_stm32u575 PUBLIC nexus_io
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32u575 PRIVATE
@@ -92,6 +96,10 @@ set(NEXUS_STARTUP_SOURCE
     "${u5_device}/Source/Templates/gcc/startup_stm32u575xx.s" PARENT_SCOPE)
 set(u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c")
 set(u5_system_definitions STM32U575xx)
+if(NEXUS_OS_MPU_GPIO)
+    list(APPEND u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/mpu_user_init.c")
+    list(APPEND u5_system_definitions NEXUS_OS_MPU_GPIO=1u)
+endif()
 if(NEXUS_MEMORY_SRAM4)
     list(APPEND u5_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")
     list(APPEND u5_system_definitions NEXUS_MEMORY_SRAM4=1)

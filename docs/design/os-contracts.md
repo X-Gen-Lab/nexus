@@ -176,8 +176,11 @@ gateway。调用方在 privileged RAM 提供 TCB/context/syscall stack，在 use
 且 XN 数据授权，拒绝 MMIO、privileged RAM、越界、重叠或非法 context。默认普通代码、
 数据和 provider 均 privileged；只有显式 user text/data 可进入用户区。
 
-公开 user 服务只有无指针的 delay/tick-read，经真实 MPU veneer/SVC；没有泛用用户
-对象池、I/O handle、任意指针系统调用或隐式升权。受维护软件组合为 M3、M4 integer/
+默认公开 user 服务为无指针的 delay/tick-read，经真实 MPU veneer/SVC。独立选定的
+[U575 MPU-v2 scalar GPIO WRITE](u575-mpu-gpio.md) 增加单任务、只读固定 PC7 grant
+与真实 slot70；它不建立泛用用户对象池、I/O handle、任意指针调用或隐式升权。
+该精确增量已有 host 软件模型、normal M33 reset 链接与单个搬移 development SDK consumer 的静态 ELF 证明；源码阶段与资源记录见[证据说明](../../tools/testing/evidence/u575-mpu-gpio-20261020/README.md)，不建立完整 SDK、runtime MPU 隔离或物理资格。
+受维护基础软件组合为 M3、M4 integer/
 FP、M23、M33 integer/FP、M55 integer-MVE、M85 float-MVE 及明确 16-region 事实。
 Native、M0/M0+、M7 kernel MPU 和 MPU+split 当前 fail closed。基础 Arch/普通 OS 对
 这些 CPU 的支持仍独立存在。用户任务不是可 join wrapper，必须永久运行；单 privileged

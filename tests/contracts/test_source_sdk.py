@@ -67,6 +67,30 @@ class SourceSDKSelectionTests(unittest.TestCase):
                 self.assertTrue(source_sdk.selected(name),
                                 "Required public closure omitted: " + name)
 
+    def test_selected_u575_mpu_gpio_assembly_is_explicitly_catalogued(self):
+        catalogue = json.loads((source_sdk.SOURCE_ROOT /
+            "tools/configure/assemblies/catalogue.json").read_text())
+        self.assertEqual(catalogue["assemblies"].count("u575-mpu-gpio-write.toml"), 1)
+
+    def test_selected_u575_mpu_gpio_public_closure_is_required(self):
+        required = {
+            "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
+            "os/freertos/mpu/gpio.c",
+            "soc/stm32u575/private/stm32u575_gpio_mpu.h",
+            "soc/stm32u575/mpu_user_init.c",
+            "soc/stm32u575/private/stm32u575_mpu_user_init.h",
+            "tools/configure/assemblies/u575-mpu-gpio-write.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name))
+        payload = source_sdk.provider_descriptors.maintained("stm32u575").owned_payload
+        self.assertTrue((required - {"os/freertos/include/nexus/os/freertos_mpu_gpio.h",
+                                    "os/freertos/mpu/gpio.c"}).issubset(set(payload)))
+
     def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
         required = {
             "components/usb_control/CMakeLists.txt",
@@ -221,6 +245,13 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "tools/release/transport.py",
             "components/usb_control/include/nexus/components/usb_acm.h",
             "components/usb_control/src/usb_acm.c",
+            "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
+            "os/freertos/mpu/gpio.c",
+            "soc/stm32u575/private/stm32u575_gpio_mpu.h",
+            "soc/stm32u575/mpu_user_init.c",
+            "soc/stm32u575/private/stm32u575_mpu_user_init.h",
+            "tools/configure/assemblies/u575-mpu-gpio-write.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
         )
         self.assertIn(required[0], source_sdk.REQUIRED_FILES)
         with tempfile.TemporaryDirectory(prefix="SDK required plan ") as value:

@@ -333,3 +333,18 @@ ACCEPTED 借用 request、12 B tuple 与完整 48 B LLI 工作区。ENABLE 后�
 cancel／deadline 不撤销存储。UEDE0／DIEROK 证明先于 DMA suspend／reset／idle 及引用撤除；随后通过自有 RCC reset 关闭 LPTIM1，绝不清 ENABLE。全部 RTC／IRQ／loan gate／电源／时钟与引用恢复后才最终 SETTLED；acquire 观察与外部 observer join 后，joined 公共 stop 另行归还启动 access claims。未知 profile 禁止 RTC／DMA／LPTIM MMIO；recover 不再 WFI。自有 reset 仅在 DMA 最终访问证明后可重试；活动借用期间观察到的外部 reset 永久隔离，安静默认值不能证明 join。
 
 依据：[单 tuple 参考合同](../../design/u575-lptim1-lpbam.md)、[公共 receiver](../../../components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)、[公共 Stop2 face](../../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)、[私有 LPTIM1 profile](../../../soc/stm32u575/private/stm32u575_lptim1_profile.h)。[可编辑 DOT](u575-lptim1-lpbam.dot)；实施关联：IO-32／SOC-35。图不表示引脚路由、完整 PWM 周期播放或物理／HIL 执行；原完整退出条件仍开放。
+
+(fig-29-u575-mpu-gpio)=
+## FIG-29 U575 MPU-v2 单任务 scalar GPIO WRITE authority
+
+**身份：reference。范围：STM32U575ZIT6Q／TZEN0／MSIS4／CM33 MPU-v2／八个 MPU region；单任务、只读固定 PC7 WRITE grant。**
+
+![FIG-29：真实 SVC70、可信 current TCB 与只读绑定、掩码边界内一次 BSRR；close／join 后才删除任务](u575-mpu-gpio.svg)
+
+五个显式 normal memory region 保护普通代码、provider、TCB 与 authority；只有窄 syscall region 和显式 user text 可由 user 执行，外设 MMIO 不映射给 user。真实 reset 路径在核对完整范围后初始化 user DATA/BSS。维护的 selected 静态 ELF gate 核对三个 Nexus user 入口、真实 veneer 与完整 privileged helper/provider 指令范围；受支持的 GNU Os 启动形状之外一律拒绝。
+
+实线标记实际调用、权限核验或返回，虚线标记唯一 privileged owner 的装配与生命周期职责。open 绑定实际 static TCB 与单调 epoch 并阻止删除；scalar 调用只在最终 guard 中核对仍有效的 task、device 与 PC7 mask 后执行一次 BSRR。未知 device／越权 mask／错误 task、两 mask 均为零或 set/reset 重叠、closed／陈旧代次与错误上下文均无 GPIO 效果；无 registry、worker、指针传参或异步 request。
+
+close 撤回准入，join 在同一单核掩码排除边界解除 pin；随后由外部 owner 删除另一任务。closing marker 覆盖实际 kernel delete，task epoch 不复位，溢出拒绝。图不代替产品的 user quiescence、栈寿命、scheduler、安全输出或 provider stop 责任。
+
+依据：[精确实施合同](../../design/u575-mpu-gpio.md)、[公共 authority](../../../os/freertos/include/nexus/os/freertos_mpu_gpio.h)、[派发与生命周期](../../../os/freertos/mpu/gpio.c)、[真实 GPIO provider](../../../soc/stm32u575/drivers/gpio.c)、[normal memory generator](../../../tools/configure/memory.py)。[可编辑 DOT](u575-mpu-gpio.dot)。维护的 Native host 模型、normal M33 reset 链接及单个搬移 development SDK consumer 已实际通过；[源码绑定证据](../../../tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 分开记录阶段、ABI 与资源。软件模型及静态 layout／opcode／selected 入口及受支持 startup 调用目标 不证明真实 MPU 隔离或物理 HIL，也不建立 M7、完整 SDK plan 或 IO-39／SOC-36 原退出资格。

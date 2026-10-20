@@ -38,7 +38,7 @@ INSTANCE_FIELDS = {
 INSTANCE_FIELDS["eth_frames"] = set(INSTANCE_FIELDS["eth"])
 KINDS = set(INSTANCE_FIELDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
-                 "flash_load_limit_bytes", "regions"}
+                 "flash_load_limit_bytes", "regions", "mpu"}
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
@@ -240,6 +240,13 @@ def editor_schema():
     properties["memory"]["properties"]["regions"]["additionalProperties"][
         "properties"]["limit_bytes"] = {"type": "integer", "minimum": 4,
                                         "multipleOf": 4}
+    mpu_fields = {"privileged_flash_bytes", "user_flash_bytes",
+                  "syscall_flash_bytes", "privileged_ram_bytes",
+                  "user_ram_bytes"}
+    properties["memory"]["properties"]["mpu"] = record(mpu_fields, mpu_fields)
+    properties["memory"]["properties"]["mpu"]["properties"] = {
+        name: {"type": "integer", "minimum": 32, "maximum": 0xffffffff,
+               "multipleOf": 32} for name in sorted(mpu_fields)}
     properties["can_domain"] = record({"split", "filters"}, {"split", "filters"})
     filter_fields = {"controller", "bank", "id", "mask", "format", "fifo",
                      "remote", "match_remote"}

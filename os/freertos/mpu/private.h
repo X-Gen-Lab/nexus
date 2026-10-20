@@ -31,6 +31,11 @@ extern "C" {
 /** \brief Read actual external linker bounds and MPU_TYPE without mutation. */
 nx_result_t
 nx_freertos_mpu_layout(nx_freertos_mpu_layout_t* layout) PRIVILEGED_FUNCTION;
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+/** \brief Fixed scalar service; entered only by the real MPU syscall table. */
+nx_result_t nx_freertos_mpu_gpio_write(uint32_t device, uint32_t set,
+                                       uint32_t reset) PRIVILEGED_FUNCTION;
+#endif
 #ifdef __cplusplus
 }
 #endif

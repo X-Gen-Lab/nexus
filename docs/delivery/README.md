@@ -62,8 +62,9 @@ RTC 时间域与显式 WUT/Stop2 owner；另有同一 owner 的选定
 另有独立选定的 [LPTIM1 单组 LPBAM 软件参考](../design/u575-lptim1-lpbam.md)，
 由同一 concrete Stop2 owner 管理固定 SRAM4 CCR1/RCR=0/ARR 更新及显式 start/stop
 的部分失败恢复。它不建立引脚路线、完整波形播放或实板资格；物理 HIL 仍为
-`not_executed`，原 IO-32/SOC-35 退出条件不变。扩展 SDK v8 是计划范围，不继承
-历史 v7 的执行结果；本页不宣称新参考已取得完整 SDK、离线复现或软件候选资格。
+`not_executed`，原 IO-32/SOC-35 退出条件不变。完整 SDK 消费计划由
+[维护的 transport policy](../../tools/release/transport.py) 定义；历史 v7/v8 执行记录
+不能覆盖新增选择。本页不宣称新增选择已取得完整 SDK、离线复现或软件候选资格。
 
 既有构建系统交付绑定 `cc6a065c`，完整结果单独记录在构建结果索引，不能继承
 上面的历史 SoC 执行身份。该版本的八个候选使用 H743 HSI64／Cache off 和 U575

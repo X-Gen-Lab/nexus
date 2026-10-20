@@ -36,6 +36,7 @@ ENABLE_PREPROCESSING   = YES
 MACRO_EXPANSION        = YES
 EXPAND_ONLY_PREDEF     = YES
 PREDEFINED            = "PRIVILEGED_FUNCTION=" \
-                        "NX_FREERTOS_USER_CODE="
+                        "NX_FREERTOS_USER_CODE=" \
+                        "NEXUS_OS_MPU_GPIO=1"
 SEARCH_INCLUDES        = NO
 HAVE_DOT               = NO

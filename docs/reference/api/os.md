@@ -49,6 +49,14 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(freertos__mpu__gpio_8h)=
+
+## freertos_mpu_gpio.h
+
+```{doxygenfile} freertos_mpu_gpio.h
+:project: nexus
+```
+
 (freertos__stack_8h)=
 
 ## freertos_stack.h

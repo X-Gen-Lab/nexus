@@ -303,7 +303,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     library = {"u575-retained-time": "Nexus::U575RetainedTime",
                "u575-stop2": "Nexus::U575Stop2",
                "u575-lpdma-copy": "Nexus::U575Stop2Copy",
-               "u575-lptim1-lpbam": "Nexus::U575Stop2Lptim1"}.get(smoke_name)
+               "u575-lptim1-lpbam": "Nexus::U575Stop2Lptim1",
+               "u575-mpu-gpio": "Nexus::U575MpuGpio"}.get(smoke_name)
     component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
@@ -339,6 +340,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32u575_provider.h") || '
         '__has_include("stm32u575_uart_rtscts.h") || '
         '__has_include("stm32u575_lptim.h") || '
+        '__has_include("stm32u575_gpio_mpu.h") || '
+        '__has_include("stm32u575_mpu_user_init.h") || '
         '__has_include("stm32u575_rtc.h") || '
         '__has_include("retained_time.h") || '
         '__has_include("stm32u575_rtc_calendar.h") || '

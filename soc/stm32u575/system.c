@@ -9,6 +9,9 @@
 #include "nexus/core/fault.h"
 #include "nexus/core/time.h"
 #include "stm32u575_system.h"
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+#include "stm32u575_mpu_user_init.h"
+#endif
 #if defined(NEXUS_MEMORY_SRAM4) && NEXUS_MEMORY_SRAM4 == 1
 #include "stm32u575_memory_init.h"
 #endif
@@ -62,6 +65,16 @@ void SystemInit(void) {
     NX_U575_CPU_GROUP(3U);
     nx_arch_dsb();
     nx_arch_isb();
+#if defined(NEXUS_OS_MPU_GPIO) && NEXUS_OS_MPU_GPIO == 1
+    /* User DATA/BSS are separate reservations. The vendor reset code later
+     * initializes privileged primary RAM through its unchanged ABI. */
+    if (nx_stm32u575_validate_identity() != NX_SUCCESS ||
+        !nx_stm32u575_mpu_user_boot()) {
+        (void)nx_arch_irq_save();
+        for (;;) {
+        }
+    }
+#endif
 #if defined(NEXUS_MEMORY_SRAM4) && NEXUS_MEMORY_SRAM4 == 1
     /* Only linker constants and the reset SRAM1 stack exist. A failed SRAM4
      * image or prepared run gate cannot reach primary RAM or constructors. */
