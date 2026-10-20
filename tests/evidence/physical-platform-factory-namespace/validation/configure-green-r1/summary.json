@@ -1,0 +1,9 @@
+{
+  "stage": "configure-green-r1",
+  "actual_exit": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/command.attempts/1792294781036885733-8c31c8182c2141b3bb40657eb69abb74/receipt.json",
+  "source_index_guard_stable": true,
+  "build_allocated_growth_bytes": 8052736,
+  "TMP_increment_limit": 104857600,
+  "scope": "Exact two full Native fixture targets/programs only; no full repository/ARM/HIL qualification"
+}

@@ -1,0 +1,11 @@
+{
+  "kind": "tests-only-before-actual-RED",
+  "new_methods": 4,
+  "whole_methods": 24,
+  "source": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-work-packages-r1/files/tools/testing/test_work_packages.py",
+  "identity": {
+    "bytes": 21909,
+    "sha256": "b522238cbffc04f8c70f8bf81efbad011e3b965efa2bc386d81f061f51551672"
+  },
+  "production_unchanged": true
+}

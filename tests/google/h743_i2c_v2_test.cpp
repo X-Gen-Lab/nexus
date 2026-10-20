@@ -16,8 +16,10 @@
 namespace {
 nx_i2c_v2_state_t* current;
 bool stalled;
+bool stall_after_write;
 bool reset_refused;
 uint32_t injected;
+size_t inject_after;
 size_t remaining;
 std::vector<uint32_t> controls;
 std::vector<uint8_t> bytes;
@@ -66,12 +68,20 @@ extern "C" void nx_test_i2c_v2_write(volatile uint32_t* reg, uint32_t value) {
         bytes.push_back(static_cast<uint8_t>(value));
         --remaining;
         r->isr &= ~(1U << 1);
+        if (stall_after_write) {
+            stalled = true;
+        }
     }
 }
 extern "C" void nx_test_i2c_v2_poll(nx_i2c_v2_state_t* p) {
     auto* r = p->registers;
     if (stalled)
         return;
+    if (bytes.size() >= inject_after) {
+        r->isr |= 1U << 4U;
+        inject_after = SIZE_MAX;
+        return;
+    }
     if (injected != 0U) {
         r->isr |= injected;
         injected = 0;
@@ -113,8 +123,10 @@ class H743I2cV2 : public testing::Test {
         current = &state;
         faults = &fault_mock;
         stalled = false;
+        stall_after_write = false;
         reset_refused = false;
         injected = 0;
+        inject_after = SIZE_MAX;
         remaining = 0;
         controls.clear();
         bytes.clear();
@@ -173,6 +185,21 @@ TEST_F(H743I2cV2, WriteReadUsesRepeatedStartAndOneFinalStop) {
     EXPECT_EQ(0U, registers.isr & (1U << 15));
     EXPECT_FALSE(state.active);
 }
+TEST_F(H743I2cV2, TxdrProgressDoesNotProveWireAckWhenTheBusStalls) {
+    Start();
+    stall_after_write = true;
+    uint8_t value = 0xA5U;
+    nx_i2c_message_t message{&value, 1U, false};
+    nx_i2c_long_endpoint_t long_device{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    size_t progress = 0U;
+    EXPECT_EQ(nx_i2c_long_endpoint_transaction(&long_device, &message, 1U,
+                                               10000U, &progress),
+              NX_ERROR_TIMEOUT);
+    EXPECT_EQ(progress, 1U);
+    EXPECT_EQ(bytes.size(), 1U);
+    EXPECT_TRUE(state.fault);
+    EXPECT_EQ(registers.cr1, 0U);
+}
 TEST_F(H743I2cV2, TwoHundredFiftySixBytesReloadWithoutRestart) {
     Start();
     uint8_t tx[256] = {};
@@ -184,6 +211,104 @@ TEST_F(H743I2cV2, TwoHundredFiftySixBytesReloadWithoutRestart) {
     ASSERT_EQ(2U, controls.size());
     EXPECT_NE(0U, controls[0] & (1U << 24));
     EXPECT_EQ(0U, controls[1] & (1U << 13));
+}
+TEST_F(H743I2cV2, OptionalLongMessagesReloadWithoutAdditionalAddressPhases) {
+    Start();
+    nx_i2c_long_endpoint_t extended{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    for (size_t length : {257U, 510U, 511U, 65535U}) {
+        controls.clear();
+        bytes.clear();
+        std::vector<uint8_t> payload(length, 0x39U);
+        nx_i2c_message_t message{payload.data(), payload.size(), false};
+        size_t done = 0U;
+        ASSERT_EQ(NX_SUCCESS, nx_i2c_long_endpoint_transaction(
+                                  &extended, &message, 1U, 10000000U, &done));
+        EXPECT_EQ(length, done);
+        EXPECT_EQ(length, bytes.size());
+        ASSERT_EQ((length + 254U) / 255U, controls.size());
+        for (size_t i = 0U; i < controls.size(); ++i) {
+            EXPECT_EQ(i == 0U, (controls[i] & (1U << 13U)) != 0U);
+            EXPECT_EQ(i + 1U != controls.size(),
+                      (controls[i] & (1U << 24U)) != 0U);
+            EXPECT_EQ(i + 1U == controls.size(),
+                      (controls[i] & (1U << 25U)) != 0U);
+            EXPECT_EQ(0xa0U, controls[i] & 0x3ffU);
+        }
+    }
+}
+TEST_F(H743I2cV2, LongReadReloadPreservesErratumOneByteRuleAndRepeatedStart) {
+    state.receive_reload_one = true;
+    Start();
+    nx_i2c_long_endpoint_t extended{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    uint8_t address = 0x10U;
+    uint8_t rx[257] = {};
+    nx_i2c_message_t messages[] = {{&address, 1U, false},
+                                   {rx, sizeof(rx), true}};
+    size_t done = 0U;
+    ASSERT_EQ(NX_SUCCESS, nx_i2c_long_endpoint_transaction(
+                              &extended, messages, 2U, 1000000U, &done));
+    EXPECT_EQ(258U, done);
+    ASSERT_EQ(258U, controls.size());
+    for (size_t i = 1U; i < controls.size(); ++i) {
+        EXPECT_EQ(1U, (controls[i] >> 16U) & 255U);
+        EXPECT_EQ(i == 1U, (controls[i] & (1U << 13U)) != 0U);
+        EXPECT_NE(0U, controls[i] & (1U << 10U));
+        EXPECT_EQ(0x5aU, rx[i - 1U]);
+    }
+}
+TEST_F(H743I2cV2, ExtendedBoundsNeverRelaxTheOriginalSmallApi) {
+    Start();
+    uint8_t payload[257] = {};
+    nx_i2c_message_t message{payload, sizeof(payload), false};
+    size_t done = 0U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED, nx_i2c_endpoint_transaction(
+                                        &device, &message, 1U, 10000U, &done));
+    EXPECT_TRUE(controls.empty());
+    EXPECT_FALSE(state.active);
+}
+TEST_F(H743I2cV2, ExtendedAliasingAndOversizedMessagesRejectWithoutHardware) {
+    Start();
+    nx_i2c_long_endpoint_t extended{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    std::vector<uint8_t> payload(65536U);
+    nx_i2c_message_t message{payload.data(), payload.size(), false};
+    size_t done = 0U;
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_long_endpoint_transaction(&extended, &message, 1U, 10000U,
+                                               &done));
+    message = {reinterpret_cast<uint8_t*>(&message), sizeof(message), true};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_long_endpoint_transaction(
+                                    &extended, &message, 1U, 10000U, &done));
+    EXPECT_TRUE(controls.empty());
+}
+TEST_F(H743I2cV2, NackAtReloadReturnsExactPrefixWithoutRestartOrReplay) {
+    Start();
+    nx_i2c_long_endpoint_t extended{&nx_i2c_v2_long_endpoint_ops, &endpoint};
+    uint8_t payload[511] = {};
+    nx_i2c_message_t message{payload, sizeof(payload), false};
+    inject_after = 255U;
+    size_t done = 0U;
+    EXPECT_EQ(NX_ERROR_NACK, nx_i2c_long_endpoint_transaction(
+                                 &extended, &message, 1U, 1000000U, &done));
+    EXPECT_EQ(255U, done);
+    EXPECT_EQ(255U, bytes.size());
+    ASSERT_EQ(1U, controls.size());
+    EXPECT_FALSE(state.active);
+    EXPECT_TRUE(state.fault);
+    EXPECT_EQ(NX_ERROR_STATE, nx_i2c_long_endpoint_transaction(
+                                  &extended, &message, 1U, 1000000U, &done));
+    EXPECT_EQ(255U, bytes.size());
+}
+TEST_F(H743I2cV2, ExtendedDescriptorAdmissionChecksOverflowAndMutability) {
+    uint8_t payload[300] = {};
+    nx_i2c_message_t messages[] = {{payload, sizeof(payload), false},
+                                   {payload + 1U, 257U, true}};
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_long_messages_validate(messages, 2U));
+    messages[1].read = false;
+    EXPECT_EQ(NX_SUCCESS, nx_i2c_long_messages_validate(messages, 2U));
+    messages[0].data = reinterpret_cast<uint8_t*>(UINTPTR_MAX - 100U);
+    EXPECT_EQ(NX_ERROR_INVALID, nx_i2c_long_messages_validate(messages, 1U));
+    EXPECT_EQ(NX_ERROR_UNSUPPORTED,
+              nx_i2c_long_messages_validate(messages, 9U));
 }
 TEST_F(H743I2cV2, TwoHundredFiftySixByteReceptionKeepsOneReadDirection) {
     Start();

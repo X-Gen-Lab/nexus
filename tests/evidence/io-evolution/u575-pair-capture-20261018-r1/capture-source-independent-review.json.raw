@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_u575_pair_capture_independent_source_review",
+  "reviewer": "/root/io24_delivery_docs/browser_driver_review",
+  "review_date_utc": "2026-10-18",
+  "scope": "Read-only independent static review of the frozen eight-source U575 pair evidence, opt-in producer capture, CMake File API closure and CI integration. Not a full-packet raw evidence review.",
+  "freeze": {
+    "path": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final-source-freeze-r1.json",
+    "sha256": "4844f2af9e41f2a26f42a2af360b801bf02af689b98ae2bfd0cee391c6288392",
+    "source_count": 8,
+    "head": "678245a3a981f17777d97220c8af63840a754596",
+    "source_tree": "cbe1042b0683582b80c180f4235cbc539030b284",
+    "source_dirty": true
+  },
+  "reviewed_source_files": [
+    {
+      "path": "tools/evidence/u575_pair.py",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/tools/evidence/u575_pair.py",
+      "bytes": 44156,
+      "sha256": "41df8c286fc35b313490f5959e1fd9e87d4b448bf61efaff84ee8ad9ccb0333f",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": "tools/testing/test_u575_pair_evidence.py",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/tools/testing/test_u575_pair_evidence.py",
+      "bytes": 42646,
+      "sha256": "39ebf2c6707e3680ba7e90cf37132e8ae6fc22cd28cd2e2b18aa966618f8fe61",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": "tests/contracts/u575_trustzone/test_gate.py",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/before/tests/contracts/u575_trustzone/test_gate.py",
+      "bytes": 10349,
+      "sha256": "3b3b843c88d7aaf4eedca001ac26e824db4e883dcef9e3f970289f5959311d94",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": "tests/contracts/u575_trustzone/README.md",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/before/tests/contracts/u575_trustzone/README.md",
+      "bytes": 10974,
+      "sha256": "d8f2b8f116a5bc292be558accd6006f6e396c8b7a73b1d06425a516327eca4c5",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": ".github/workflows/build-matrix.yml",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/.github/workflows/build-matrix.yml",
+      "bytes": 20687,
+      "sha256": "2f9c7a87731c4d1f9dabfecd3177321745e227a96c01c4fece3f885186855bc6",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": "scripts/ci/u575_trustzone.py",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/scripts/ci/u575_trustzone.py",
+      "bytes": 29010,
+      "sha256": "81cbbb30339f418956f085a3211262d0ac33586212355d86457cfa50cc7fae3b",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": "scripts/ci/test_u575_pair_context.py",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/scripts/ci/test_u575_pair_context.py",
+      "bytes": 13267,
+      "sha256": "518e3b4cf4c104f5fb661049863563515a10b4f8ddd6807c10c37223a6ee3728",
+      "observed_bytes_sha256_match": true
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "frozen_copy": "/dev/shm/nexus-u575-pair-capture-CI-20261018-r1/final/.github/workflows/test_platform_ci.py",
+      "bytes": 76202,
+      "sha256": "638185c3262718743a09feab7afaf5672fcf35fab924a18f3f3c458864fb4540",
+      "observed_bytes_sha256_match": true
+    }
+  ],
+  "conclusion": {
+    "source_semantics": "No confirmed blocking source defect identified in the frozen scope.",
+    "qualification": "No runtime, ARM, package, restore, hardware or product qualification is granted by this review.",
+    "full_packet_independent_review": "Separate Root-appointed review remains required."
+  },
+  "closed_findings": [
+    {
+      "id": "local_map_load_authorization",
+      "status": "closed_in_reviewed_source",
+      "resolution": "The producer and offline builder permit local LOAD inputs only from actually emitted compile-database outputs, STATIC_LIBRARY artifacts reachable from the actual stage ELF target in the fresh codemodel-v2 dependency graph, and the exact NonSecure secure-import object. Unrelated local LOAD files are rejected; no second hardcoded local library registry is introduced."
+    },
+    {
+      "id": "external_library_after_to_inventory_mix",
+      "status": "closed_in_reviewed_source",
+      "resolution": "The three ABI-selected external libraries are independently selected, copied and identity-locked before configure/build. Original and retained library observations are compared after build. Final selected inventory rows are bound to the complete after observation, and offline reconstruction checks before/after size, SHA256 and mode relationships."
+    },
+    {
+      "id": "typed_report_identity_overwrite",
+      "status": "closed_in_reviewed_source",
+      "resolution": "Retained history cannot replace a selected typed report identity with different size or SHA256 before the selected row is updated."
+    },
+    {
+      "id": "metadata_read_budget_order",
+      "status": "closed_in_reviewed_source",
+      "resolution": "The metadata cache cumulative-size budget is checked before reading the next metadata member."
+    },
+    {
+      "id": "context_then_report_rewrite",
+      "status": "closed_in_reviewed_source",
+      "resolution": "The original successful report is published once, the context is validated and published last, and the successful opt-in path does not rewrite that report after context publication."
+    }
+  ],
+  "additional_source_observations": [
+    "The CMake graph parser binds the index and every used JSON reply to the exact stage reply directory; rejects unsafe reply names, duplicate IDs/reply filenames, missing dependencies, dependency cycles, depth overflow and artifact escapes; requires the exact stage executable image and derives reachable static artifacts.",
+    "Capture retains the exact visited File API reply identities. Offline rebuilding requires the same complete visited set and recomputes the same allowed local/external LOAD union from retained data.",
+    "All seven tools are captured and compared before/after. Only explicitly pinned live nm and objdump readers may inspect retained ELF/import bytes; archived commands, compilers and paths remain data.",
+    "CI requests capture before configure, seals under RUNNER_TEMP, performs independently anchored verification, and only then copies the opaque archive and outer manifest to the upload tree. Verification failure does not publish that verified-artifact tree; always-on raw evidence and execution identity remain preserved.",
+    "Archive bounds and strict typed role/member union remain intact in the reviewed source. The outer manifest SHA256 remains the caller-supplied offline trust anchor; self-rehashing does not establish builder authenticity."
+  ],
+  "execution_boundary": {
+    "reviewer_executed_tests": false,
+    "reviewer_imported_project_modules_or_helpers": false,
+    "reviewer_executed_build_or_arm_tools": false,
+    "reviewer_executed_seal_verify_or_restore": false,
+    "reviewer_used_browser_or_network": false,
+    "reviewer_modified_frozen_or_repository_source": false,
+    "review_actions": "Exact source reads and stdlib size/SHA256 checks only. This report is the only newly written file.",
+    "author_reported_results": "The author reported whole70/21/57, text8 and workflow DSL success with source guards. Those are author evidence, not reviewer reruns or independent runtime validation.",
+    "new_actual_arm_file_api_packet": "not_executed",
+    "new_complete_independent_restore": "not_executed",
+    "software_qualification": "unsigned_not_qualified",
+    "physical_validation": "not_executed"
+  }
+}

@@ -31,11 +31,32 @@ runs:
         .venv/bin/python tools/dev/dependencies.py prepare \
           --scope preset --preset "${{ inputs.preset }}" --allow-network \
           --report build/setup-dependencies.json
+    - name: Identify the locked ARM archive
+      id: arm-archive
+      if: inputs.arm == 'true'
+      shell: bash
+      run: |
+        .venv/bin/python - <<'PY'
+        import os
+        from pathlib import Path
+        from scripts.ci.install_arm_toolchain import load_lock
+        entry = load_lock(Path('dependencies/toolchains.lock.json'))
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+            output.write(f"sha256={entry['sha256']}\n")
+        PY
+    - name: Cache the original locked ARM archive
+      if: inputs.arm == 'true'
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ${{ runner.temp }}/nexus-arm-archives
+        key: arm-gnu-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.arm-archive.outputs.sha256 }}
     - name: Install the locked ARM compiler
       if: inputs.arm == 'true'
       shell: bash
       run: |
-        .venv/bin/python scripts/ci/install_arm_toolchain.py --install-dir "$RUNNER_TEMP/nexus-arm-toolchain"
+        .venv/bin/python scripts/ci/install_arm_toolchain.py \
+          --install-dir "$RUNNER_TEMP/nexus-arm-toolchain" \
+          --cache-dir "$RUNNER_TEMP/nexus-arm-archives"
         echo "$RUNNER_TEMP/nexus-arm-toolchain/bin" >> "$GITHUB_PATH"
     # Runner compiler checks provide fast feedback. Formal reproducibility
     # uses the measured OCI environment, not the runner's mutable host packages.

@@ -1,0 +1,202 @@
+{
+  "status": "design only; implementation not authorized or started",
+  "scope": {
+    "profile": "hsi64-fixed-cache-off",
+    "backend": "baremetal",
+    "silicon": "DEV450/REV2003/default HSITRIM64",
+    "spi": "SPI4 finite 8-bit, mode0, one whole-CS request",
+    "rx": {
+      "engine": "DMA1",
+      "stream": 2,
+      "dmamux_channel": 2,
+      "request": 83,
+      "irq": 13
+    },
+    "tx": {
+      "engine": "DMA1",
+      "stream": 3,
+      "dmamux_channel": 3,
+      "request": 84,
+      "irq": 14
+    },
+    "spi_irq": 84,
+    "priority": 5,
+    "calls_os": false,
+    "dma_payload_region": [
+      603979776,
+      604504064
+    ],
+    "units": "bytes 1..65535"
+  },
+  "plan": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r1/PLAN.md",
+    "sha256": "e72b80701c2515b5720b1236077484c11a4f1735ce848ea35567a37e8911fb39",
+    "bytes": 23587
+  },
+  "read_only_inputs": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r1/read-only-inputs.json",
+    "sha256": "17f3a47c6219063bfa4df8516c381b3ed77fe9d2e7f27dded51ac2fa63c22a7f"
+  },
+  "source_before_after_stable": [
+    {
+      "relative": "io/include/nexus/io/spi.h",
+      "sha256": "8f85493062d7b0dc126277efe142ae89d1ed0ab96cffe192a16ed1a42287be6a",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "io/include/nexus/io/dma.h",
+      "sha256": "a0cc4203b5558300e303eb8b1691bfeda76863c46cb28ab530d7028fa7c6f73b",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "core/include/nexus/core/request.h",
+      "sha256": "c27686b1fc578d88e1f4638c3939c1409171ba6267e59e4c64eb72449ffb7e55",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "io/private/spi_dma_sequence.h",
+      "sha256": "23360aaf8a003dcdbe2036f796ee2d18d9f3e1d68530374c76f2c0abfebfc10b",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "io/src/spi_dma_sequence.c",
+      "sha256": "8998f0d3bf1f56a8800c25ea404e57c47ff062d73e92379ffaa25a9ff04de1bf",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "io/src/spi.c",
+      "sha256": "933d438eee528cb00aa24aaf4c2d974ec18d47facc57d9c54a791d5c76161a5f",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/providers/stm32h743/__init__.py",
+      "sha256": "fa5dc6a0fe34d4d7e9e89544888bce340e3f2748b2f9dac8ad0a82a2f3d4818c",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/providers/stm32h743/bindings.py",
+      "sha256": "8211df2a6f05c83bcbac31ecd7187b9dac5aac502384302b2e229d3486d18395",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/providers/descriptor.py",
+      "sha256": "b6ca758c3b4b4911b9437142489029b123c9209577b0a0d470e71baf7695eaf2",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/selected_contracts.py",
+      "sha256": "f369488f7644f89bc0ccaeac886a3c03bb217b0bdccd1926d3953288ff20b0b6",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/factory.py",
+      "sha256": "020363a1e39ed4c5f141d64d88555afc5cbcecba724e01a7b2ce5d1aca2ba129",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/ir.py",
+      "sha256": "e8d494015cb24d1fd685ff53db0a83cb7aafed9c60d216dfa3cb7def99c2fe08",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/configure.py",
+      "sha256": "c937cd349cfc0ad7eae84957ae8b46f1fb5c4addb043a6ee305f196b06f98dbe",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tools/configure/authored.py",
+      "sha256": "64b73a2fedcdc8e1cd7ba40448ec94aebc21d7b0eae595d036dcc868b9281839",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "soc/stm32h743/soc.json",
+      "sha256": "11be37f2f42aaeb598c011df34cca8069d38b0edbdf60d2b8bd9784af245c7fa",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "soc/stm32h743/CMakeLists.txt",
+      "sha256": "9089a0e089fc6d3a96c230b4ef48f3a3218e11cffac4c9b8cbdfb1999ea95996",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "boards/stm32h743zi_hsi_reference/board.json",
+      "sha256": "c64c2417658067bae417e1906c92f656780884246ae2ada5ce0d78f2b47a492f",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tests/google/CMakeLists.txt",
+      "sha256": "1c855ad6b5ddb13788f5f992ec5ebb35e10f4d2708f7b813f2911d99de29ebbb",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "tests/google/h743.cmake",
+      "sha256": "19219a4c8b6faf141ab17cdbec57185631e4e8cb52e34f600d8b2b10e86240a4",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "cmake/package/package_source_sdk.py",
+      "sha256": "2a5d5b5e337135cd138d1a1e29aeafd3e7d17e20ab522211b79828e088ee56fe",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "cmake/package/verify_consumers.py",
+      "sha256": "ee63757c945696caa3c9e4c6f188d058bd16e82af0d0022820336a97ff887a96",
+      "root": "main read-only, includes current staged RTC work"
+    },
+    {
+      "relative": "soc/stm32h743/drivers/spi.c",
+      "sha256": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0",
+      "root": "own frozen S0.4 source"
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_provider.h",
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "root": "own frozen S0.4 source"
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_clock.h",
+      "sha256": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+      "root": "own frozen S0.4 source"
+    }
+  ],
+  "matching_s0_elf_count": 8,
+  "matching_s0_elf_bytes": 24057376,
+  "s0_freeze_unchanged": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/manifest.json",
+    "sha256": "38b87a219f8c2b8434bfe81b7b7b166822ce326782dde67d9aa92075fe09fac9"
+  },
+  "delivery_slices": [
+    "W1 shared bounded wire leaves in real unchanged polling, no ordinary state growth",
+    "D1 complete private finite DMA/public API Native contract, no catalog admission yet",
+    "D2 exact TOML/typed IR/factory/IRQ assembly and execution",
+    "D3 fixed-caller-cells completion if needed; exact ARM pair + clean installed SDK before final mode delivery"
+  ],
+  "resource_strategy": {
+    "reuse_existing_own_root_only_after_root_new_integrated_commit": true,
+    "no_clone": true,
+    "protect_eight_retained_elfs_no_overwrite": true,
+    "future_persistent_compressed_elf_optional_requires_root_budget_bytes": [
+      8388608,
+      16777216
+    ],
+    "compile_parallel": 1,
+    "planned_native_headroom_bytes": 629145600,
+    "planned_arm_headroom_bytes": 314572800,
+    "planned_arm_output_free_bytes": 134217728,
+    "suggested_sdk_output_free_bytes": 1288490188,
+    "current_workspace_free": 71749632,
+    "current_tmp_free": 767533056
+  },
+  "not_performed": [
+    "No B1 production edits",
+    "No configuration/build/compiler/test execution",
+    "No SDK/ARM/HIL",
+    "No S0 source/index/ref/stage/commit mutation",
+    "No archive/copy of existing matching ELF"
+  ],
+  "open_preimplementation_choices": [
+    "Root accepts W1 helper window and exact new baseline before any production write.",
+    "A future cache-on mode must carry selected cache facts into IR/traits; B1 mode gate is cache-off only.",
+    "SDK output budget must be measured/reserved separately; present TMP free is not asserted sufficient."
+  ]
+}

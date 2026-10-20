@@ -1,0 +1,50 @@
+import gzip,hashlib,json,stat,tarfile
+from pathlib import Path
+F=Path('/dev/shm/nexus-qualification-transport-feature-20261018-r1')
+D=Path('/dev/shm/nexus-qualification-transport-normalized-20261018-r1')
+R=Path('/dev/shm/nexus-qualification-transport-20261018-r1')
+
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb') as s:
+  while b:=s.read(65536):h.update(b)
+ return h.hexdigest()
+def sig(p):
+ s=p.stat(follow_symlinks=False)
+ assert stat.S_ISREG(s.st_mode) and s.st_nlink==1,str(p)
+ return [s.st_dev,s.st_ino,s.st_mode,s.st_size,s.st_mtime_ns,s.st_ctime_ns]
+def frozen():
+ paths=list(F.rglob('*'));assert not any(p.is_symlink() for p in paths)
+ return {str(p.relative_to(F)):sig(p) for p in paths if p.is_file()}
+start=frozen()
+parent=F/'r2/transport-map-r2.json';plan=json.loads(parent.read_text());index=sha(R/'.git/index')
+assert index==plan['expected_index_sha256']
+files=[]
+for x in plan['files']:
+ p=Path(x['source']);assert sha(p)==x['sha256'] and sha(R/x['relative_path'])==x['sha256']
+ files.append({'path':x['relative_path'],'durable_source':str(p),'bytes':x['bytes'],'sha256':x['sha256'],'mode':x['mode'],'origin':'final canonical source from r2 frozen map; volatile prepared bytes'})
+archives=[]
+for rel in sorted(start):
+ p=F/rel;digest=sha(p)
+ suffix='' if rel.endswith('.gz') else '.raw'
+ files.append({'path':'tests/evidence/qualification-artifact-transport/'+rel+suffix,'durable_source':str(p),'bytes':p.stat().st_size,'sha256':digest,'mode':p.stat().st_mode&0o777,'origin':'complete frozen feature leaf '+rel})
+ if rel.endswith('.gz'):
+  expanded=0
+  with gzip.open(p,'rb') as s:
+   while b:=s.read(65536):expanded+=len(b)
+  item={'origin':rel,'bytes':p.stat().st_size,'sha256':digest,'gzip_crc_eof':'actual_pass','expanded_bytes':expanded}
+  if rel.endswith('.tar.gz'):
+   count=0
+   with tarfile.open(p,'r|gz') as t:
+    for m in t:
+     assert m.isfile();count+=1;t.members.clear()
+   item['tar_regular_members']=count
+  archives.append(item)
+assert len({x['path'] for x in files})==len(files)
+assert frozen()==start and sha(R/'.git/index')==index
+out={'schema_version':1,'source_count':5,'file_count':len(files),'evidence_file_count':len(start),'total_mapped_bytes':sum(x['bytes'] for x in files),'files':files,'parent_map':{'path':str(parent),'sha256':sha(parent)},'persistence':'All durable_source fields are prepared volatile exec-shm bytes. Field name is import compatibility only; durability requires Root normal commit and push.','qualification':'not_qualified','scope':'No Main/source/index writes, no external private SAS logs, wheels, OCI images or ELF closures. All frozen feature leaves included; text targets append.raw, gzip archives retain.gz.','regular_leaves_before_after_equal':True,'index_sha256_before_after':index,'archive_checks':archives}
+p=D/'normalized-map-r1.json';assert not p.exists();p.write_text(json.dumps(out,indent=2,sort_keys=True)+'\n')
+summary={'map':{'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p)},'source_count':5,'file_count':len(files),'evidence_file_count':len(start),'total_mapped_bytes':out['total_mapped_bytes'],'source_files':files[:5],'archive_checks':archives,'feature_regular_leaves_unchanged':True,'own_index_unchanged':True,'allocated_regular_file_bytes':sum(x.stat().st_blocks*512 for x in D.rglob('*') if x.is_file())}
+p=D/'summary-r1.json';assert not p.exists();p.write_text(json.dumps(summary,indent=2,sort_keys=True)+'\n')
+assert sum(x.stat().st_blocks*512 for x in D.rglob('*') if x.is_file())<=524288
+print(json.dumps(summary))

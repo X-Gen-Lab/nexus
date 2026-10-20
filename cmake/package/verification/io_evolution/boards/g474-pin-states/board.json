@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474re-pin-states-software-reference",
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "UM2505 Rev7 MB1367 C04/C05 source-reference",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "bindings": [
+    {
+      "id": "state-a5",
+      "controller": "GPIOA",
+      "route": "gpio-pa5",
+      "initial": 0,
+      "mask": 32,
+      "pin_states": {
+        "default": {
+          "mode": "output",
+          "pull": "none",
+          "output_type": "push-pull",
+          "speed": "low",
+          "level": 0
+        },
+        "sleep": {
+          "mode": "analog",
+          "pull": "none"
+        }
+      }
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "Software reference only: physical PCB revision, external loading, output safety and HIL are not observed.",
+    "DEFAULT and SLEEP are explicit software pad configurations, not low-power mode or wake guarantees."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/user_manual/um2505-stm32g4-nucleo64-boards-mb1367-stmicroelectronics.pdf",
+      "scope": "UM2505 Rev7 section7.5.1 p22 default X3 crystal24MHz SB25/SB26ON,SB24/SB28OFF,SB27OFF,C56/C59ON6.8pF. LD2 PA5activehigh SB6ON. VCP LPUART1 PA2/PA3AF12 SB17/SB23ON,SB18/SB22/SB13/SB19OFF. Source PDF SHA25635549bd8805ed884ce0e0eeceb9ce94097ecba2a7d95560e6d1109fb119fd3d4; actual Board not inspected."
+    },
+    {
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-g4",
+      "tree": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+      "scope": "Actual G474 register layout/masks/startup/IRQ range102; no actual PCB or PHY qualification."
+    }
+  ]
+}

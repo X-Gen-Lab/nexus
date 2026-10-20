@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "kind": "read-only exact D2 production-integration implementation plan; not implementation authorization or qualification",
+  "created_utc": "2026-10-18T06:20:12.626570+00:00",
+  "inputs": {
+    "preflight": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-d2-preflight-readonly-r1.json",
+    "preflight_sha256": "d275f6d6ba31e3f5b8bda514db40ee24e900ba8386e8a05369542513fa15ae5e",
+    "D1_feature": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d1",
+    "D1_freeze_sha256": "bb812f45a61ad671c199868c3544d39baeec523b67c5e1eef0988397ab2ca240",
+    "D1_manifest_sha256": "2e9ca72ec317eb437f5e168fedf8d4f828290f31dba7bb197caaf87d3b0afe18",
+    "D1_review_sha256": "6c954d0c938fe6838f1601bd5b9dcdb6e4169f0e0f0fa70ad1e9961541730745",
+    "D1_status": "private Native47+old215 and Python7/23 passed/independently reviewed; no D2/generated production ARM/installed SDK/HIL qualification"
+  },
+  "scope": {
+    "part": "STM32H743ZIT6",
+    "provider": "stm32h743",
+    "controller": "SPI4",
+    "mode": "dma",
+    "backend": "baremetal",
+    "clock": "hsi64-fixed-cache-off",
+    "runtime_identity": {
+      "DEV_ID": 1104,
+      "REV_ID": 8195,
+      "HSITRIM": 64
+    },
+    "endpoint": "one spi-endpoint, mode0/8bit; PE11 active-low initially high; PE12 SCK/PE13 MISO/PE14 MOSI AF5",
+    "RX": {
+      "engine": 1,
+      "stream": 2,
+      "DMAMUX_channel": 2,
+      "request": 83,
+      "irq": 13,
+      "exception": 29
+    },
+    "TX": {
+      "engine": 1,
+      "stream": 3,
+      "DMAMUX_channel": 3,
+      "request": 84,
+      "irq": 14,
+      "exception": 30
+    },
+    "wire_irq": 84,
+    "wire_exception": 100,
+    "priority": 5,
+    "calls_os": false,
+    "transfer": "finite full-duplex bytes1..65535, two non-NULL nonoverlapping caller AXI SRAM spans [0x24000000,0x24080000), alignment1; descriptor stable CPU RAM need not be AXI",
+    "rate": "max_hz253907..16000000, controller and endpoint integer max_hz*256>=65000000; nominal64MHz, reviewed65MHz divider envelope, existing same-source quiet ratio unchanged",
+    "coexistence": [
+      {
+        "UART_mode": "dma-tx",
+        "stream": 0,
+        "request": 46,
+        "DMA_irq": 11
+      },
+      {
+        "UART_mode": "rx-dma-idle",
+        "stream": 1,
+        "request": 45,
+        "DMA_irq": 12
+      }
+    ],
+    "UART_rule": "USART3 peripheral IRQ39; each UART mode is a separate existing configuration, not two USART3 controllers or added duplex UART. Distinct physical stream0 OR1 plus SPI2/3.",
+    "not_in_scope": [
+      "HSI32/high/dynamic clock, cache-on, new SPI mode under FreeRTOS/ThreadX",
+      "word16/modes1..3/fixed or NULL payload/SRAM1 or TCM SPI buffers",
+      "enhanced transaction/sequence/wake/worker/queue/continuous APIs",
+      "new PCB wiring, attached-device fitting or physical qualification"
+    ]
+  },
+  "invariants": [
+    "Existing public SPI/endpoint types, frozen IR, mode traits and typed factory. No heap, worker, name registry, object pool, mandatory OS lock, extra public forwarding layer or ordinary polling state field.",
+    "TOML -> one validated immutable IR/resource graph/DMA topology -> atomic bundle. CMake resolved modes alone choose source TUs; descriptor is mandatory SDK/dependency payload, not a second source-build graph.",
+    "Pure declaration/construction/lookup does zero MMIO. prepare/initialize explicitly acquire actual hardware under existing assembly leases; readable zero hardware never authorizes a foreign takeover.",
+    "One assembly s_nx_dma_clocks_added contribution for DMA1+DMAMUX1, shared by all selected UART/SPI owners. No per-SPI gate owner/refcount registry and no DMA1/global DMAMUX reset.",
+    "Freeze D1 driver/header/model/tests/helper and prior UART/polling bodies. Generated IRQ wrappers delegate only, without their own W1C, task service or blocking drain."
+  ],
+  "production_windows": [
+    {
+      "path": "soc/stm32h743/soc.json",
+      "change": "Only add SPI4 dma mode and SPI4 peripheral IRQ fact. Polling traits remain non-IRQ; this does not create a polling handler."
+    },
+    {
+      "path": "soc/stm32h743/routes.json",
+      "change": "Extend only existing SPI4 PE12/13/14 AF5 route; ordered mode_dma[dma]=[DMA1:stream2:channel83,DMA1:stream3:channel84]. channel83 means request83, never DMAMUX channel83."
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/__init__.py",
+      "change": "spi/dma -> spi_dma; parser engine1/lanes0..3/explicit request set{45,46,83,84}; exact ordered controller/mode validate_dma tuples remain required. SPI dma priority5/calls_os=false; preserve UART tuples and polling checks."
+    },
+    {
+      "path": "tools/configure/configure.py",
+      "change": "Existing context-aware selection point after validate_selection: only H743 spi/dma requires baremetal+exact hsi64-fixed-cache-off. Preserve all unrelated backend/profile policies; no new authored overrides/schema keys."
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/bindings.py",
+      "change": "Separate dma branch before ordinary polling body; emit dedicated D1 owner/one AXI region/private CS GPIO face/D1 endpoint; canonical reciprocal face pointers, exact two stream handlers+SPI4 handler, bounded reverse cleanup. CS high and AF5 ready before D1 initialize, unlike existing polling prepare order."
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/emission.py",
+      "change": "Recognize new mode for shared DMA lease. Include spi_dma.h only selected; UART dma.h only UART DMA. Check every selected lane under one proven gate before any pin snapshot. Keep reversible masked GPIO and shared lease rollback."
+    },
+    {
+      "path": "tools/configure/preflight.py",
+      "change": "Always inspect selected IRQ13/14/84 availability; selected DMA/mux registers only when DMA1 gate is on. After gate acquisition all selected lanes checked again before pins. No mutation/clear of foreign flags, IRQs, unselected lanes or pads."
+    },
+    {
+      "path": "tools/configure/selected_contracts.py",
+      "change": "Narrow H743 spi/dma to bytes/1, alignment1, maxUINT16_MAX, DMA1 and provider_domain/cache_line_bytes0. CPU physical cacheline32 stays unchanged. Existing optional silicon_policy(result,item) may describe this selected SPI V/default-trim expectation only; global fixed-clock None, high and ADC policies preserved. No new C ABI or policy enum."
+    },
+    {
+      "path": "soc/stm32h743/CMakeLists.txt",
+      "change": "SPI removed from unconditional kind->driver loop; spi.c for short-poll only, spi_dma.c for dma only, spi_wire.c once for any SPI. Reuse ControllerModes resolved authority and current private official LL dependency."
+    },
+    {
+      "path": "tools/configure/providers/descriptor.py",
+      "change": "Append frozen D1 c/h and existing HSI reference Board to H743 owned_payload only. Patch current published base; preserve Native RTC/other families. Aggregation already makes payload mandatory, no duplicate per-source build list."
+    }
+  ],
+  "unchanged_paths_or_contracts": [
+    "io public SPI/request headers and factory ABI/epoch",
+    "tools/configure/ir.py, assembly schema and editor schema",
+    "tools/configure/factory.py, dma_topology.py, resource_graph.py and bundle authority",
+    "soc/stm32h743/drivers/spi_dma.c and private/stm32h743_spi_dma.h",
+    "soc/stm32h743/drivers/spi.c, spi_wire.c and private wire/provider headers",
+    "all existing UART drivers and their cache/backend/model/test behavior",
+    "D1 whole47 and W1/S0 whole215 C/C++ bodies/models; additional meaningful tests belong new files"
+  ],
+  "generated_binding": {
+    "state": "nx_stm32h743_spi_dma_state_t, embedded wire SPI4/APB2RSTR/SPI4RST/64MHz; DMA1 streams2/3 mux2/3; .face=&canonical nx_spi_port_t; regions exactly one AXI RW3 entry. Fields assigned at explicit prepare, never by factory lookup.",
+    "endpoint": "nx_stm32h743_spi_dma_endpoint_t embedded wire.port=&owner.wire, PE11 CS pointer/mask, mode0/frequency; .dma=&owner, .face=&canonical nx_spi_endpoint_t, .cs_face=&one static const private nx_gpio_port_t. Public class spi_device, not spi_dma_transaction.",
+    "CS_lease": "one static private GPIO state PE11 and const GPIO face under SPI constructor; existing Board masked pin lease includes CS. No runtime factory lookup or product/PCB policy.",
+    "memory": "SPI table AXI only. Enabling global SRAM1 for existing UART is allowed and never broadens SPI admission/table. Explicit unsupported SPI-specific memory keys rejected, not silently replaced.",
+    "capabilities_false": "no optional capability/trait objects. Selected SPI DMA still needs its runtime state/endpoint and AXI table; empty/polling have none of these new objects.",
+    "lookups": "normal static IDs/controller and endpoint pure lookup with zero reads/writes; ports unusable until successful Platform start."
+  },
+  "cold_start_order": [
+    "1. Existing privilege/task/IRQ-mask guard and read-only preflight. Always check selected vectors; inspect powered pads/peripherals only when their gates prove observable. Reject foreign SPI4 gate/reset/kernel mux. Do not probe DMA/DMAMUX behind gateoff.",
+    "2. Existing System starts fixed HSI64/cacheoff/TIM2. Do not tighten general System for unrelated peripherals. D1 performs actual exactDEV450/REV2003/defaulttrim admission; authored policy cannot observe silicon. Non-V/trim failure after System start must unwind actual effects honestly.",
+    "3. Acquire exclusive SPI4/selected GPIO gates and ONE added-bit shared DMA1EN lease; DSB+readback before any DMA probe. No separate DMAMUX1EN or global DMA reset.",
+    "4. Check ALL selected lanes after shared gate on, before pin snapshot/controller prepare. UART0/1 retain existing CR/mux cold predicates. SPI2/3 require D1 full idle CR/NDTR/PAR/M0AR/M1AR/FCR/mux/owned-flag conditions. Every selected IRQ checked, not the last chosen lane. Rejection rolls back only newly added gates, with readback.",
+    "5. Admit every selected bank/pad/LCKR before capturing any pin lease, then capture selected fields including PE11. Later foreign pad cannot authorize restoring an earlier unadmitted pin.",
+    "6. SPI prepare binds static state/endpoint/CS; initializes CS high and readback, routes PE12/13/14 AF5, THEN calls D1 initialize (requires AF5 already ready). D1 owns SCK idle/reset and three IRQ effects; no duplicated wire state machine.",
+    "7. Existing retain_on_failed_init and initialized-index include partial constructor before prepare. Stop unclaimed D1 does zero hardware writes; if CS had an actual partial effect its cleanup still runs. Partial D1 init drains genuinely or preserves responsibility/remaining effects."
+  ],
+  "stop_and_shared_lifetime": [
+    "D1 stop with active loan returns BUSY, without implicit cancel. Caller explicitly cancels/continues bounded service and retries stop; Platform must not copy older UART auto-cancel expectations into D1.",
+    "No active loan but retained D1 stop advances bounded cleanup across calls; only actual SUCCESS decrements Platform initialized index. Do not use synchronous polling drain/finish_clock/retain_and_park on async service.",
+    "If either SPI or UART remains borrowed/draining/QUARANTINED, no shared DMA1 gate/System/time/cache/pin release. Observed cache/clock taint is sticky; restoring a bit cannot restore coherence or revoke a loan.",
+    "After all selected controllers join, existing masked GPIO restore uses readbacks. D1 selected CS-high/SCK handoff/reset precedes Board restore; restored original mode is not promised to keep a product safe output.",
+    "Then clear only assembly-added DMA1EN. Failed withdrawal retains contribution/System for actual retry; pre-existing gate stays enabled. Unselected stream/mux/flags and unrelated pre-existing DMA activity are preserved. Never reset all DMA1.",
+    "Release other gates and System last. Keep original primary/cleanup/remaining-effects/diagnostics and request first terminal cause. SETTLED remains provider final access."
+  ],
+  "TDD_slices": [
+    {
+      "id": "D2-A exact resolver",
+      "first_RED": "New whole Python test_spi_dma module against baseline unsupported mode: exact positive selection must actually fail before implementation. Config/link failures are not runtime driver RED.",
+      "cases": [
+        "exact ordered RX2/83 TX3/84; swapped/one missing/wrong stream/request/engine/IRQ/pad reject",
+        "priority!=5 or calls_os=true; mode1/2/3 or multiple/invalid CS endpoint; max_hz250000 or endpoint253906 reject;253907 legal",
+        "HSI32/high/cache-on/valid Freertos or ThreadX settings reject only new mode; old UART/polling configurations remain valid",
+        "duplicate SPI4 controller, pins, IRQ13/14/84 or physical lane despite different selector reject; UART0 OR1 plus SPI2/3 accepted",
+        "immutable existing SpiOptions/IrqOptions and DMA topology/claims; no new IR/schema ABI",
+        "actual valid atomic bundle then invalid mutation: nonzero configure withdraws stale output and preserves no mixed old bindings/identity; input_paths tracks every new source/fact"
+      ],
+      "minimal_GREEN": "facts/mode validators/context guard/narrow selected contracts; type shape only, not runtime qualification"
+    },
+    {
+      "id": "D2-B generated SPI-only",
+      "first_RED": "Write complete Google factory program/declarations and authored literal fixture first. Maintained configure may first fail unsupported/config, then link may expose missing wiring; preserve truthful classification. First runtime GREEN is coverage if no behavior RED occurred; never manufacture a bad SUT.",
+      "cases": [
+        "pure typed factory controller+endpoint identity zeroMMIO, real D1 ops/context, optional traits enabled/disabled boundaries",
+        "foreign selected DMA address/mux/flags/IRQ: gate-on cold rejection no effects; gate-off hidden config revealed only after proven gate acquisition and rejected before pin snapshot",
+        "foreign SPI gate/reset/mux/locked or powered pads; later-pad rollback cannot overwrite unadmitted fields",
+        "actual legal System start then nonV/changedtrim D1 admission error; real reverse cleanup or retained effects with held CS/gate/pin/vector write and genuine retry",
+        "normal Platform/System/generated bindings + public request + actual caller bytes + generated DMA2/3/SPI4 vectors, direction-separated completion, EOT/quiet/CS/SCK/reset",
+        "cancel/deadline/firstcause, pre-CSTART accepted failure versus attempted refused start, pending EN1 commit, IRQ level containment and final SETTLED/late-vector no access",
+        "active stop BUSY retains System/gates; explicit cancel+service+bounded repeated stop joins; partial init responsibility retained"
+      ],
+      "minimal_GREEN": "dedicated construction/handlers, shared gate/all-lane checks and selected production CMake; no D1 protocol rewrite"
+    },
+    {
+      "id": "D2-C0 mixed existing UART TX",
+      "first_cases": [
+        "separate cacheoff literal fixture, UART stream0/request46/IRQ11 and USART IRQ39 versus SPI2/3/84",
+        "actual UART DMA payload fetch and independent final-character USART TC, simultaneous SPI bytes, true first causes and independent completion",
+        "one shared DMA1 contribution and single TIM2 time domain; one owner blocked keeps other/System/gate borrowed",
+        "W1C/IRQ/cancel of one owner leaves neighbor flags/bytes unchanged; unselected stream1 config and pre-existing gate preserved",
+        "SPI stop then UART continues and reverse-order init/stop responsibilities; gate clear refusal remains real retained effect"
+      ],
+      "model": "new external shim/router/UART leaves, frozen D1/old UART models not edited; first all-green model coverage stated honestly"
+    },
+    {
+      "id": "D2-C1 mixed existing UART RX",
+      "first_cases": [
+        "independent UART rx-dma-idle stream1/request45 fixture and opposite controller order, not USART3 duplex",
+        "separate real RDR/pending-memory cell: software disable retains EN1 until current write completes, independent of SPI pending cell",
+        "finite RX block/return ownership and flags survive SPI stop; UART block/drain loan retains shared System/gate, then genuine return/stop retry",
+        "cold all-lane/vector/pad tests select1/2/3, ensuring no single-lane short-circuit"
+      ],
+      "model": "extend only new UART hardware leaf after C0; no continuous-RX claim or change to old UART provider policy"
+    },
+    {
+      "id": "D2-D normal ARM/installed SDK",
+      "first_cases": [
+        "mandatory payload omission/rehash rejection, public-only SDK includes and private-header isolation",
+        "normal production CMake empty/polling/selected/mixed TU retention and resource assertions"
+      ],
+      "exit": "Root publishes clean source then actual normal gates/ARM linking/installed SDK builds with exact identities. No D1 or host result inherited as D2 ARM/SDK/HIL."
+    }
+  ],
+  "exact_test_paths": {
+    "new_python": [
+      "tools/configure/providers/stm32h743/test_spi_dma.py"
+    ],
+    "existing_python_hunks": [
+      "tools/configure/providers/stm32h743/test_provider.py",
+      "tools/configure/providers/stm32h743/test_peripherals.py",
+      "tools/configure/test_selected_contract_authority.py",
+      "tools/configure/test_io_traits.py",
+      "tools/configure/test_dma_topology.py",
+      "tools/configure/test_bundle_transaction.py"
+    ],
+    "old_negative_policy_change": "Only current unimplemented-mode spi/dma subcase changes to genuinely unsupported spi/dma-linked or circular, preserving rejection intent; add exact new positives/unsupported-context negatives. Explicitly record policy change, never call this old Python body byte-preserved.",
+    "new_google": [
+      "tests/google/h743_spi_dma_factory_model.h",
+      "tests/google/h743_spi_dma_factory_model.cpp",
+      "tests/google/h743_spi_dma_factory_test.cpp",
+      "tests/google/h743_spi_dma_factory.cmake"
+    ],
+    "registration": "tests/google/CMakeLists.txt one new include; frozen D1 h743_spi_dma.cmake unchanged",
+    "authored": [
+      "tests/contracts/h743_assembly/spi-dma.toml",
+      "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "tests/contracts/h743_assembly/spi-dma-uart-rx.toml"
+    ],
+    "whole_targets": "Three separate authored tuples using same complete factory test body with literal expected UART kind/lane/request/order. No Cartesian clock/cache/OS expansion, filters, skips or expected values inferred from SUT registers. Actual XML/discovery counts derived after execution.",
+    "old_wholes": "D147 and W1/S0 seven215 plus relevant existing H743 UART DMA/receive/cache/factory whole programs; preserve old source/assertions, execute fresh at final tuple."
+  },
+  "external_model_design": {
+    "layout": "new factory shim maps shared DMA1 and four distinct streams0..3/mux0..3 from frozen D1 model; SPI object remains D1, independent USART3 register object. Do not include/link old h743_dma_factory_model.h or h743_dma_model.cpp in mixed target: old alias0/1 would hide physical conflicts.",
+    "dispatch": "One final NX_H743_READ/WRITE/NX_PLATFORM_REGISTER_WRITE router, direct named UART leaf or frozen D1 function, one write only and no macro recursion. D1 model_level supports ONLY13/14/84 and treats other non13 asTX3; new separate UART11/12/39 level handling required.",
+    "UART_TX": "stream0 EN/request46+USART DMAT, real low-address payload fetch/NDTR/TC0, separate final-shift TC; no teardown ISR|=TC. Pending/enable refusals and W1C are external hardware only.",
+    "UART_RX": "separate stream1 RDR/pending write/stop responsibility, no sharing SPI pending address/hold; pending memory makes actual EN stay1 until commit under RM. No invented EN0 followed by indefinite uncommitted write or CPU DSB as DMA flush.",
+    "time": "each tick calls frozen D1 model_step once (already increments TIM2 before gate check), then UART leaf without another tick. UART does not require SPI4 gate.",
+    "bus_and_memory": "register gating truly hides peripherals; literal mmap low AXI valid RAM and C++17 placement-new objects; do not dereference old fake DMA addresses or truncate 64-bit host pointer. D1 CPU publication/release barrier and EN0 completion semantics unchanged.",
+    "proof": "external level->pending/ISER/IABR delivery/re-pend, real generated IRQ wrappers, real data and pin/quiet observers; no SUT-stage oracle. New model self-checks before any provider-failure interpretation. Child kill is parent process disposal, never provider cleanup. Old cache-on UART whole remains separate unchanged."
+  },
+  "projection_and_admission": {
+    "DMA_policy": "provider_domain/cache_line_bytes0/alignment1 only selected H743 spi/dma under exact validated cacheoff; physical Cortex-M7 cacheline32 remains CPU fact. Existing UART32/cache-on policies untouched.",
+    "silicon_policy": "Optional selected_contracts.silicon_policy(result,item) returns existing SiliconPolicy only for actual selected SPI dma item with profile describing DEV450/REV2003/defaulttrim64; reviewed_revision_ids=(0x2003,), unknown_revision=reject, physical=false. No caller-authored workaround or observation claim. Leave result-global fixed-clock policy None and high/ADC existing semantics.",
+    "runtime": "D1 initialize exact guard and W1 live guard remain actual authority. NonV cold UNSUPPORTED, trim/clock STATE; submit nonSUCCESS has zero new references/effects. Accepted launch failures remain asynchronous IO/Q and borrowed. Config cannot observe trim/revision and never asserts hardware proved.",
+    "IRQ": "three strong wrappers own only13/14/84; D1 SPI IRQ latches/masks but never clears IFCR EOT/SUSP evidence. Bounded NVIC isolation is distinct from final pending/active join; unisolatable source retains masked nonreturn fault boundary, not normal ISR WCET.",
+    "lifetime": "trusted static constructor owns actual PE11 and AF5 pins/gates until successful stop, no register coincidence takeover; only actual observed cache/gate/clock violations taint sticky, not full between-service history detection."
+  },
+  "ARM_and_link_checks": {
+    "explicit_inputs": "normal provider_assemblies --parallel1 explicit empty+polling+new SPI-only+mixedTX+mixedRX tuples; no inferred profiles. Root source/index frozen and dependency/tool lock identity must match before/after.",
+    "empty": "no retained D1 owner/endpoint/region/ops/strong DMA2/3/SPI4 handlers or driver objects; startup weak aliases may remain.",
+    "polling": "ordinary spi.c+wire.c only, no D1 TU/state/ops/strong vectors; no ordinary state growth.",
+    "selected": "spi_dma.c+wire.c once, GPIO plus one owner/endpoint/AXI table, three exact strong vectors/pointers/relocations; no ordinary spi.c absent genuine selected polling mode.",
+    "mixed": "actual existing UART selected TU and distinct static owners/regions/IRQs with single shared gate lease. No host model/GTest/C++ or unselected-driver objects.",
+    "cost": "real ARM Flash LOAD and RAM allocated interval unions, state sizes and buffer placement from same source/tool/dependency tuple; compare empty/polling/selected costs. No zero-Flash-cost inference or ARM ABI from Native sizeof."
+  },
+  "SDK_separate_window": {
+    "canonical_new": [
+      "cmake/package/verification/io_evolution/h743-spi-dma.toml",
+      "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c"
+    ],
+    "existing_hunks": [
+      "cmake/package/verify_consumers.py",
+      "cmake/package/package_source_sdk.py",
+      "tests/contracts/test_device_sdk_payload.py",
+      "tests/contracts/test_source_sdk.py",
+      "tools/testing/test_sdk_verification_call.py",
+      "tools/configure/test_selected_contract_authority.py"
+    ],
+    "specific_changes": "One canonical baremetal/fixed64 SPI consumer; explicit SELECTED_CONSUMERS and IO_EVOLUTION_VERIFICATION_FILES updates with whole-set assertions, preserving current Native RTC and other additions. Descriptor-owned D1 c/h and original HSI Board mandatory. Rehashed omission of each file must fail. Private-header probes include spi_dma.h and wire.h. Consumer includes public Nexus only and references selected factory/SPI/endpoint/traits plus actual AXI payload symbols.",
+    "actual_execution": "Root single writer coordinates shared SDK files. After clean commit, complete SDK Python modules and normal installed-prefix cross-compiler consumer, real ELF retention/source/dependency metadata. Installed build does not run MCU or establish physical I/O. No direct replacement of formal clean-source requirements."
+  },
+  "acceptance_partitions": {
+    "configuration": "full actual unittest modules/fresh XML+raw, immutable IR/claims/bundle rejection and stale-output withdrawal",
+    "Native": "three new generated whole programs and unchanged47/215/relevant UART whole, actual source/ELF/XML/returncode, model/setup versus production RED classified",
+    "ARM": "normal CMake compile/link and exact static resources/handler/buffer placement, no execution claim",
+    "installed_SDK": "public-only consumer from current clean installed source package/toolchain; mandatory omissions/private includes reject; separate from dev-source ARM",
+    "HIL": "not_executed; actual board/CS device/pulls/supply/temperature/identity/timing/traffic/cancel/IRQ latency remain unavailable. Do not update physical ledger or certification from software."
+  },
+  "capacity_and_safety": {
+    "current_task": "only this <=48KiB report. No source/index/build/configure/download/install/large archive; frozen D1 ownROOT and evidence untouched.",
+    "future_adoption": "Wait Root published D1 commit and safe ordinary switch/adopt of existing ownROOT. No clone/reset/stash/clean, no old fullfile copied over current RTC/style/factory. New D2 overlays/evidence separate; Root alone stages/commits.",
+    "persistent_estimate": "about1..1.5MiB complete changed/new text before+after and compressed small proof, requires new explicit Root quota; no ELF allowance implied",
+    "TMP_estimate": "about50..100MiB incremental for three new programs and retained artifacts; current own native build exists. New independent quota needed; never borrow remaining D1 budget silently.",
+    "RAM_estimate": "jobs1 only, D1 test TU maxRSS327108KiB is reference not an upper guarantee; cgroup headroom>=600MiB and output FS>=200MiB plus projected products, OOM0 before/after. Root current resource estimates are not permanent guarantees. Stop on enlarged closure or resource failure.",
+    "ELF_protection": "retain D1 final-eight-retention.json matching binaries and build/d1-retained-* plus S0/W1 logs/archives unchanged. New D2 build/bin overwrite only after old matching retained copies verified; new artifacts get fresh names.",
+    "review": "independent source/hardware-model and evidence review before integration; any new source/API/IR/state requirement gets exact hunk request rather than widening this plan."
+  },
+  "observation": {
+    "root": "/tmp/nexus-io-validation-20261018",
+    "identity_before_report": {
+      "head": "38271c0d1749ce3f2225ee4de5ddc8b1cc0bc96b",
+      "index_sha256": "e4620c354b24f0cc7e1eac5aee58297860cb5e7459da59c9ef0100685d7b4d11",
+      "status_sha256": "1d64c76e9badd2c733f7232ac7735baa7c3d50dc249e5b0b58caa191967d82ad",
+      "status_line_count": 117
+    },
+    "source_sha256": {
+      "soc/stm32h743/soc.json": "11be37f2f42aaeb598c011df34cca8069d38b0edbdf60d2b8bd9784af245c7fa",
+      "soc/stm32h743/routes.json": "d243047b47d68cfa1abf52811acbb43abb6d1824177239d90412a0ea6d331127",
+      "soc/stm32h743/CMakeLists.txt": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+      "boards/stm32h743zi_hsi_reference/board.json": "c64c2417658067bae417e1906c92f656780884246ae2ada5ce0d78f2b47a492f",
+      "tools/configure/providers/stm32h743/__init__.py": "fa5dc6a0fe34d4d7e9e89544888bce340e3f2748b2f9dac8ad0a82a2f3d4818c",
+      "tools/configure/providers/stm32h743/bindings.py": "d90c63ecb774f3c272b688882d312c41e0e5ab5486fa5a2f26ce07060e1f8d0b",
+      "tools/configure/providers/stm32h743/emission.py": "657c3e95eb3f30c827a3492fc2e68e8a45e48fd633387885e3c9ebf56e12dd82",
+      "tools/configure/configure.py": "08056a918a76a8b0005291953f91b0f439eef65e6b066aa3ab76e6b9211529ae",
+      "tools/configure/preflight.py": "a22125a630e2e4449c4ae045846f4472bdcd33c5d4654c2476a7ecbefb86ba78",
+      "tools/configure/selected_contracts.py": "da31d3da3944a43d518404865d017bfe61afd7c8fb23937067ec21f4c807f74e",
+      "tools/configure/ir.py": "95987bacfc03e3b1f24f3d486b350dc495d0c55b2111ae59981226612fdf28c6",
+      "tools/configure/bindings.py": "fe98c0de85a91d918621b6bc41fc0fa50e60b62c1ccb5f4c0f2ebf20ac1907dd",
+      "tools/configure/dma_topology.py": "27f1f00e1c6ca5a849c4ba28b4323db6c32bb4905d9169a5f64f2972d693e784",
+      "tools/configure/providers/descriptor.py": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+      "tools/configure/providers/stm32h743/test_peripherals.py": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
+      "tests/google/h743_dma_factory_model.h": "06b20b9e57b4fefc59f5cdad0deb99bbb5c26e8355f56392d254fc0661d5f1ec",
+      "tests/google/h743_factory_model.h": "689c41cac18dac2ed754f730c5bc0f98f6aa971b0d8e09f5a0f00b146b3f9a47",
+      "tests/google/h743_dma_model.h": "24c545adada0f8b4a5418864132fa2891c6ed3039ce0a1c2330991ce5a695e56",
+      "cmake/package/package_source_sdk.py": "ae715c4da9c6c418ce3ff423367d85d61fc0946b1234f82d3e6a2fbfc5e025f7",
+      "cmake/package/verify_consumers.py": "19ce976ca80079240ca5ef723710ffc52945eba34917b0ee736d505810c9b87d",
+      "tests/contracts/test_device_sdk_payload.py": "cdf1fe127b9b665e73deb54986f466d4d93dea34eeb281fa975725b76977da2a"
+    },
+    "meaning": "Current provider source plus frozen D1 read only; does not attest clean candidate, fixed entire-read interval, compiler or runtime support. Main D1 integration may change its own source/index independently.",
+    "identity_after_report": {
+      "head": "38271c0d1749ce3f2225ee4de5ddc8b1cc0bc96b",
+      "index_sha256": "e4620c354b24f0cc7e1eac5aee58297860cb5e7459da59c9ef0100685d7b4d11",
+      "status_sha256": "1d64c76e9badd2c733f7232ac7735baa7c3d50dc249e5b0b58caa191967d82ad",
+      "status_line_count": 117
+    },
+    "listed_source_hashes_stable_during_report_write": true
+  },
+  "setup_notes": [
+    "Exploratory SDK searches first tried nonexistent tools/distribution paths; exact maintained paths corrected to cmake/package and tests/contracts; no tests/builds run.",
+    "First in-memory expanded plan59236B exceeded49152 cap and assert refused before output file creation. This shorter final report replaces no historical file and is not production RED."
+  ]
+}

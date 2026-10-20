@@ -141,12 +141,27 @@ def comparison_profile(resolved, profiles):
 
 def decode_function(elf, name, raw):
     """Check objdump raw Thumb encodings against the selected ELF bytes."""
-    symbols = [item for item in elf.defined_symbols
+    symbols = [(index, item) for index, item in enumerate(elf.defined_symbols)
                if item["name"] == name and item["type"] == 2]
-    if (len(symbols) != 1 or not symbols[0]["size"] or
-            not symbols[0]["value"] & 1):
+    if (len(symbols) != 1 or not symbols[0][1]["size"] or
+            not symbols[0][1]["value"] & 1):
         raise EvidenceError("unique nonempty Thumb function required: " + name)
-    symbol = symbols[0]
+    return decode_symbol(elf, symbols[0][0], raw)
+
+
+def decode_symbol(elf, index, raw):
+    """Validate one actual defined-symbol index, retaining duplicate locals.
+
+    A local name is scoped by its ELF symbol identity, not a process-wide
+    registry. The index selects the existing parsed entry; callers cannot
+    provide replacement address, size, section or source-file claims.
+    """
+    if (type(index) is not int or not 0 <= index < len(elf.defined_symbols)):
+        raise EvidenceError("actual ELF defined-symbol index required")
+    symbol = elf.defined_symbols[index]
+    name = symbol["name"]
+    if symbol["type"] != 2 or not symbol["size"] or not symbol["value"] & 1:
+        raise EvidenceError("nonempty Thumb function symbol required: " + name)
     if symbol["section"] >= len(elf.sections):
         raise EvidenceError("function section is not file-backed")
     section = elf.sections[symbol["section"]]

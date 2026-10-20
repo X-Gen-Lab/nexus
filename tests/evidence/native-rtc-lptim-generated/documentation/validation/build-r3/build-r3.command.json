@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "command": [
+    "/tmp/nexus-recovery-docs-tools-20261018-r1/venv/bin/python",
+    "-B",
+    "/tmp/nexus-io36-native-20261018/tools/documentation/cli.py",
+    "build",
+    "--tool-prefix",
+    "/tmp/nexus-recovery-docs-tools-20261018-r1",
+    "--language",
+    "all",
+    "--output",
+    "/tmp/nexus-io36-docs-validation-20261018-r1/build-r3",
+    "--timeout",
+    "900"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "io36-docs-build-r3",
+  "started_ns": 1792292369070674079,
+  "finished_ns": 1792292460934992414,
+  "duration_seconds": 91.86431972800165,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/tmp/nexus-io36-docs-validation-20261018-r1/build-r3.attempts/1792292369070613287-d123f04cc74b4af4936d4f112bd8ebfc/stdout.txt",
+    "bytes": 82513,
+    "sha256": "bd7e77f2b23da21f0c7be9cea7635161c9edc3dc85aa21607faf7d2048c7974d"
+  },
+  "stderr": {
+    "path": "/tmp/nexus-io36-docs-validation-20261018-r1/build-r3.attempts/1792292369070613287-d123f04cc74b4af4936d4f112bd8ebfc/stderr.txt",
+    "bytes": 921,
+    "sha256": "f65543e3ca37b284157138b2d84d3cb7f49b33788d0b40190ec8f36b84255a8f"
+  },
+  "attempt_receipt": "/tmp/nexus-io36-docs-validation-20261018-r1/build-r3.attempts/1792292369070613287-d123f04cc74b4af4936d4f112bd8ebfc/receipt.json"
+}

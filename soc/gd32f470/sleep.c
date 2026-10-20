@@ -31,7 +31,8 @@ static bool fixed_run(void) {
            (RCU_CFG0 & bus_mask) == bus &&
            (FMC_WS & FMC_WC_WSCNT) == WS_WSCNT_7 &&
            (RCU_PLLSSCTL & RCU_PLLSSCTL_SSCGON) == 0U &&
-           (RCU_CFG1 & RCU_CFG1_TIMERSEL) == 0U;
+           (RCU_CFG1 & RCU_CFG1_TIMERSEL) == 0U &&
+           (RCU_APB1SPEN & RCU_APB1SPEN_TIMER1SPEN) != 0U;
 }
 
 nx_result_t nx_gd32f470_sleep(nx_clock_barrier_t barrier,

@@ -1,0 +1,43 @@
+{
+  "kind": "actionlint-official-assets-r1-metadata-freeze",
+  "version": "1.7.12",
+  "files": [
+    {
+      "relative": "actionlint-lock-draft-r1.json",
+      "bytes": 5006,
+      "sha256": "fbf317d11c8ec341fcaa0ba278c4ff540be789cd9fc202e9e07c6a22aaf19a7b"
+    },
+    {
+      "relative": "asset-preparation-summary-r1.json",
+      "bytes": 4013,
+      "sha256": "fd95c924fde15dcccbcff31c76922a26016a1bc75db7d927c70e4a113747c3f8"
+    },
+    {
+      "relative": "completion-r1.json",
+      "bytes": 703,
+      "sha256": "dc2ca7dca840c305611fbd22659db2acdb69bb74b9bb59e74c0435f19fddba06"
+    },
+    {
+      "relative": "metadata-package-process.zip",
+      "bytes": 3972,
+      "sha256": "8739f0e0228a303f3d15a5f240df7e70a92e41d48ee4ec16d08784910be27e92"
+    },
+    {
+      "relative": "original-metadata-and-receipts.zip",
+      "bytes": 61845,
+      "sha256": "ebbc31150d9c191912f75d984ee0146c807b450335fbbe25a03f8731f7bf9943"
+    },
+    {
+      "relative": "preparation-report-r1.json.gz",
+      "bytes": 3887,
+      "sha256": "6733bb689aa6b6ba64bf0db2a56b6651ae940b4e4b9724143761d3b0a378c627"
+    },
+    {
+      "relative": "transport-map-r1.json.gz",
+      "bytes": 3589,
+      "sha256": "51ecb7424fc8ab9752d1afc33ee67ce3d99e537ee2ebc2382517cdaacdbc21fc"
+    }
+  ],
+  "archives_and_executables_retained_only_at": "/tmp/nexus-actionlint-assets-20261018-r1",
+  "no_asset_installation": true
+}

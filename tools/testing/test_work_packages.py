@@ -116,6 +116,52 @@ class WorkPackageDerivationTests(unittest.TestCase):
         self.assertEqual((self.rows, self.properties, self.providers), baseline)
 
 
+    def test_native_model_metadata_is_preserved_without_execution(self):
+        row = copy.deepcopy(self.rows[0])
+        row.update(family="native", controller="RTC0", kind="rtc",
+                   mode="calendar-alarm", routes=[], boards=[],
+                   implementation="MODEL", physical_qualified=False)
+        providers = {"native": copy.deepcopy(self.providers["example"])}
+        before = copy.deepcopy((row, providers))
+        report = work_packages.derive([row], [], providers, {self.source})
+        package = report["work_packages"][0]
+        self.assertEqual(package["implementation"], "MODEL")
+        self.assertIs(package["physical_qualified"], False)
+        self.assertEqual(package["reviewed_routes"], [])
+        self.assertEqual(package["declared_boards"], [])
+        self.assertEqual(package["software_status"], "not_executed")
+        self.assertEqual(package["hardware_status"], "not_executed")
+        self.assertFalse(report["software_qualification"])
+        self.assertFalse(report["physical_qualification"])
+        self.assertEqual((row, providers), before)
+
+    def test_invalid_native_model_or_physical_markers_fail_closed(self):
+        row = copy.deepcopy(self.rows[0])
+        row.update(family="native", controller="RTC0", kind="rtc",
+                   mode="calendar-alarm", routes=[], boards=[],
+                   implementation="MODEL", physical_qualified=False)
+        providers = {"native": copy.deepcopy(self.providers["example"])}
+        mutations = [("physical_qualified", True),
+                     ("physical_qualified", 0),
+                     ("physical_qualified", None),
+                     ("physical_qualified", "false"),
+                     ("implementation", "hardware"),
+                     ("implementation", None)]
+        for field, value in mutations:
+            invalid = copy.deepcopy(row)
+            invalid[field] = value
+            before = copy.deepcopy((invalid, providers))
+            with self.subTest(field=field, value=value):
+                with self.assertRaisesRegex(ValueError, "MODEL"):
+                    work_packages.derive([invalid], [], providers, {self.source})
+                self.assertEqual((invalid, providers), before)
+        for field in ("implementation", "physical_qualified"):
+            invalid = copy.deepcopy(row)
+            del invalid[field]
+            with self.subTest(missing=field), self.assertRaisesRegex(ValueError, "MODEL"):
+                work_packages.derive([invalid], [], providers, {self.source})
+
+
 class WorkPackageCatalogueTests(unittest.TestCase):
     def setUp(self):
         self.storage = tempfile.TemporaryDirectory()
@@ -286,6 +332,140 @@ class CurrentWorkPackageTests(unittest.TestCase):
             self.assertEqual(row["hardware_status"], "not_executed")
         self.assertFalse(report["software_qualification"])
         self.assertFalse(report["physical_qualification"])
+
+
+    def test_native_descriptor_uses_current_fact_and_dependency_contract(self):
+        from tools.configure.providers import descriptor
+        family = descriptor.maintained("native")
+        contracts = work_packages.provider_contracts()
+        self.assertIn("native", contracts)
+        self.assertEqual(contracts["native"], {
+            "configuration_modules": list(family.configuration_modules),
+            "fact_files": list(family.fact_files),
+            "git_dependencies": [{"role": role, "path": path}
+                                 for role, path in family.git_dependencies],
+            "import_lock": family.import_lock,
+            "dependency_identity_status": "declared_unverified",
+        })
+        self.assertEqual(contracts["native"]["git_dependencies"], [])
+        self.assertIsNone(contracts["native"]["import_lock"])
+
+    def test_actual_native_models_keep_sources_sdk_fixtures_and_mcu_shape(self):
+        report = work_packages.collect(ROOT)
+        models = [row for row in report["work_packages"] if row["family"] == "native"]
+        physical = [row for row in report["work_packages"] if row["family"] != "native"]
+        self.assertEqual(len(models), 19)
+        self.assertEqual(len(physical), 196)
+        spi = [row for row in physical
+               if row["identity"] == "stm32h743.SPI4.dma"]
+        self.assertEqual(len(spi), 1)
+        selected = spi[0]
+        self.assertEqual((selected["family"], selected["controller"],
+                          selected["kind"], selected["mode"]),
+                         ("stm32h743", "SPI4", "spi", "dma"))
+        self.assertEqual(selected["provider_implementation"], "spi_dma")
+        sources = ["soc/stm32h743/drivers/spi_dma.c"]
+        self.assertEqual(selected["selected_ops_sources"], sources)
+        self.assertEqual(selected["sdk_required_sources"], sources)
+        self.assertEqual(selected["resolver_fixtures"], [
+            "tools/configure/assemblies/h743-spi-dma-cache-on.toml",
+            "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+            "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+            "tools/configure/assemblies/h743-spi-dma.toml",
+        ])
+        self.assertEqual(selected["implementation_status"], "source_selected")
+        self.assertEqual(selected["software_status"], "not_executed")
+        self.assertEqual(selected["hardware_status"], "not_executed")
+        pins = [row for row in physical
+                if row["identity"] == "stm32g474.GPIOA.named-states"]
+        self.assertEqual(len(pins), 1)
+        pin = pins[0]
+        self.assertEqual((pin["family"], pin["controller"], pin["kind"],
+                          pin["mode"], pin["provider_implementation"]),
+                         ("stm32g474", "GPIOA", "gpio", "named-states",
+                          "pin_state"))
+        self.assertEqual(pin["reviewed_routes"], ["gpio-pa5"])
+        source = ["soc/stm32g474/drivers/pin_state.c"]
+        self.assertEqual(pin["selected_ops_sources"], source)
+        self.assertEqual(pin["sdk_required_sources"], source)
+        self.assertEqual(pin["resolver_fixtures"],
+                         ["tools/configure/assemblies/g474-pin-states.toml"])
+        self.assertEqual(pin["implementation_status"], "source_selected")
+        self.assertEqual(pin["software_status"], "not_executed")
+        self.assertEqual(pin["hardware_status"], "not_executed")
+        self.assertFalse(report["software_qualification"])
+        self.assertFalse(report["physical_qualification"])
+        modes = {row["identity"]: row for row in physical}
+        selected_modes = (
+            ("stm32h743.USART3.rx-dma-continuous", "uart_continuous", "uart_continuous", [
+                "tools/configure/assemblies/h743-uart-continuous-cache-on.toml",
+                "tools/configure/assemblies/h743-uart-continuous.toml"]),
+            ("stm32u575.USART1.dma-chain-tx", "uart_chain", "uart_dma_chain", [
+                "tools/configure/assemblies/u575-uart-chain.toml"]),
+            ("stm32u575.LPTIM2.irq-counter16-oneshot", "lptim", "lptim", [
+                "tools/configure/assemblies/u575-lptim-run.toml"]),
+        )
+        for identity, implementation, source_name, fixtures in selected_modes:
+            with self.subTest(mode=identity):
+                row = modes[identity]
+                family = identity.split(".")[0]
+                sources = [f"soc/{family}/drivers/{source_name}.c"]
+                self.assertEqual(row["provider_implementation"], implementation)
+                self.assertEqual(row["selected_ops_sources"], sources)
+                self.assertEqual(row["sdk_required_sources"], sources)
+                self.assertEqual(row["resolver_fixtures"], fixtures)
+        expected = {
+            "identity", "family", "controller", "kind", "mode", "provider",
+            "reviewed_routes", "declared_boards", "resolver_fixtures",
+            "selected_ops_sources", "sdk_required_sources", "implementation_status",
+            "contract_status", "reviewed_properties", "software_status",
+            "hardware_status", "provider_implementation",
+        }
+        for row in physical:
+            with self.subTest(MCU=row["identity"]):
+                self.assertEqual(set(row), expected)
+                self.assertEqual(row["software_status"], "not_executed")
+                self.assertEqual(row["hardware_status"], "not_executed")
+        for row in models:
+            with self.subTest(model=row["identity"]):
+                self.assertEqual(set(row), expected | {"implementation", "physical_qualified"})
+                self.assertEqual(row["implementation"], "MODEL")
+                self.assertIs(row["physical_qualified"], False)
+                self.assertEqual(row["reviewed_routes"], [])
+                self.assertEqual(row["declared_boards"], [])
+                self.assertTrue(row["selected_ops_sources"])
+                self.assertEqual(row["sdk_required_sources"], row["selected_ops_sources"])
+                self.assertTrue(row["resolver_fixtures"])
+                self.assertEqual(row["implementation_status"], "source_selected")
+                self.assertEqual(row["software_status"], "not_executed")
+                self.assertEqual(row["hardware_status"], "not_executed")
+                self.assertEqual(row["provider"], work_packages.provider_contracts()["native"])
+        fixture = "cmake/package/verification/io_evolution/native-time-pair.toml"
+        for controller, kind, mode in (("RTC0", "rtc", "calendar-alarm"),
+                                       ("RTC1", "rtc", "calendar-alarm"),
+                                       ("LPTIM0", "lptim", "counter16-oneshot"),
+                                       ("LPTIM1", "lptim", "counter16-oneshot")):
+            with self.subTest(controller=controller):
+                values = [row for row in models if
+                          (row["controller"], row["kind"], row["mode"]) ==
+                          (controller, kind, mode)]
+                self.assertEqual(len(values), 1)
+                self.assertEqual(values[0]["selected_ops_sources"], ["io/native/rtc_lptim.c"])
+                self.assertIn(fixture, values[0]["resolver_fixtures"])
+                self.assertIn(values[0]["provider_implementation"], {"rtc", "lptim"})
+        inputs = {row["path"] for row in report["authority_inputs"]}
+        self.assertTrue({"soc/native/soc.json", "soc/native/routes.json",
+                         "tools/configure/providers/native/__init__.py",
+                         "tools/configure/providers/native/bindings.py",
+                         "tools/configure/providers/native/emission.py",
+                         "io/native/rtc_lptim.c", fixture} <= inputs)
+        empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
+        self.assertFalse(any(empty in row["resolver_fixtures"] for row in models))
+        self.assertFalse(report["software_qualification"])
+        self.assertFalse(report["physical_qualification"])
+        self.assertEqual(report["summary"]["software_executed"], 0)
+        self.assertEqual(report["summary"]["hardware_executed"], 0)
 
 
 if __name__ == "__main__":

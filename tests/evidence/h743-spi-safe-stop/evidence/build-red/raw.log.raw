@@ -1,0 +1,71 @@
++ /tmp/nexus-io-validation-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_h743_peripheral_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/70] Building CXX object _deps/google-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[2/70] Building C object core/CMakeFiles/nexus_core.dir/src/time.c.o
+[3/70] Building C object core/CMakeFiles/nexus_core.dir/src/request.c.o
+[4/70] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[5/70] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[6/70] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[7/70] Building C object core/CMakeFiles/nexus_core.dir/src/silicon.c.o
+[8/70] Building C object arch/CMakeFiles/nexus_arch.dir/native/nx_arch_native.c.o
+[9/70] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.o
+[10/70] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache_control.c.o
+[11/70] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.o
+[12/70] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.o
+[13/70] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_nonsecure.c.o
+[14/70] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.o
+[15/70] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[16/70] Linking CXX static library lib/libgtest.a
+[17/70] Linking C static library lib/libnexus_core.a
+[18/70] Linking C static library lib/libnexus_arch.a
+[19/70] Building C object io/CMakeFiles/nexus_io.dir/src/gpio.c.o
+[20/70] Building C object io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[21/70] Building C object io/CMakeFiles/nexus_io.dir/src/uart_word.c.o
+[22/70] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[23/70] Building C object io/CMakeFiles/nexus_io.dir/src/spi_transaction.c.o
+[24/70] Building C object io/CMakeFiles/nexus_io.dir/src/spi_dma_transaction.c.o
+[25/70] Building C object io/CMakeFiles/nexus_io.dir/src/spi_dma_sequence.c.o
+[26/70] Building C object io/CMakeFiles/nexus_io.dir/src/spi_dma_owner_binding.c.o
+[27/70] Building C object io/CMakeFiles/nexus_io.dir/src/i2c.c.o
+[28/70] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_long.c.o
+[29/70] Building C object io/CMakeFiles/nexus_io.dir/src/flash.c.o
+[30/70] Building C object io/CMakeFiles/nexus_io.dir/src/watchdog.c.o
+[31/70] Building C object io/CMakeFiles/nexus_io.dir/src/exti.c.o
+[32/70] Building C object io/CMakeFiles/nexus_io.dir/src/timer.c.o
+[33/70] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[34/70] Building C object io/CMakeFiles/nexus_io.dir/src/adc_format.c.o
+[35/70] Building C object io/CMakeFiles/nexus_io.dir/src/adc_group.c.o
+[36/70] Building C object io/CMakeFiles/nexus_io.dir/src/flash_region.c.o
+[37/70] Building C object io/CMakeFiles/nexus_io.dir/src/dma.c.o
+[38/70] Building C object io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[39/70] Building C object io/CMakeFiles/nexus_io.dir/src/wake.c.o
+[40/70] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
+[41/70] Building C object io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+[42/70] Building C object io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+[43/70] Building C object io/CMakeFiles/nexus_io.dir/src/stream_budget.c.o
+[44/70] Building C object io/CMakeFiles/nexus_io.dir/src/can.c.o
+[45/70] Building C object io/CMakeFiles/nexus_io.dir/src/can_fd.c.o
+[46/70] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+[47/70] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet_frames.c.o
+[48/70] Building C object io/CMakeFiles/nexus_io.dir/src/mdio.c.o
+[49/70] Building C object io/CMakeFiles/nexus_io.dir/src/usb_device.c.o
+[50/70] Building C object io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+[51/70] Building C object io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.o
+[52/70] Building C object io/CMakeFiles/nexus_io.dir/src/observation.c.o
+[53/70] Building C object io/CMakeFiles/nexus_io.dir/src/pwm_group.c.o
+[54/70] Building C object io/CMakeFiles/nexus_io.dir/src/pwm_adc.c.o
+[55/70] Building C object io/CMakeFiles/nexus_io.dir/src/stream_profile.c.o
+[56/70] Building C object io/CMakeFiles/nexus_io.dir/src/encoder.c.o
+[57/70] Linking CXX static library lib/libgmock.a
+[58/70] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[59/70] Linking C static library lib/libnexus_io.a
+[60/70] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/h743_peripheral_test.cpp.o
+[61/70] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/h743_model.cpp.o
+[62/70] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/system.c.o
+[63/70] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/gpio.c.o
+[64/70] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/pwm.c.o
+[65/70] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/exti.c.o
+[66/70] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/watchdog.c.o
+[67/70] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/spi.c.o
+[68/70] Linking CXX static library lib/libgmock_main.a
+[69/70] Linking CXX executable bin/nexus_h743_peripheral_test

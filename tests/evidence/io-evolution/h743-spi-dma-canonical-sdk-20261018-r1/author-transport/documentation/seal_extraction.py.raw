@@ -1,0 +1,41 @@
+import gzip,hashlib,json,tarfile
+from pathlib import Path
+D=Path('/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1');O=Path('/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1')
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb') as s:
+  while b:=s.read(65536):h.update(b)
+ return h.hexdigest()
+def e(p):return {'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p),'mode':p.stat().st_mode&0o777}
+selected=[]
+for name in ['execution.json','Doxyfile','catalog-merge-review.json','gettext/delivery/capabilities.pot','gettext/design/provider-assemblies.pot']:
+ selected.append(('outputs/'+name,O/name))
+for stage in ['doxygen','gettext','merge']:
+ for p in O.glob(stage+'*'):
+  if p.is_file():selected.append(('outputs/'+p.name,p))
+  elif p.name==stage+'.attempts':
+   for leaf in p.rglob('*'):
+    if leaf.is_file():selected.append(('outputs/'+str(leaf.relative_to(O)),leaf))
+for name in ['text-drafts-r1.json','text-apply-r1.json','pre-extract-source8.json','source8-false-catalog-freeze-r1.json','run_extract_prepared.py','merge_catalogs.py','seal_extraction.py']:
+ selected.append(('author/'+name,D/name))
+assert len({n for n,p in selected})==len(selected)
+records={n:e(p) for n,p in selected};archive=D/'extraction-evidence-r1.tar.gz';assert not archive.exists()
+with archive.open('xb') as raw,gzip.GzipFile(fileobj=raw,mode='wb',filename='',mtime=0) as z,tarfile.open(fileobj=z,mode='w|') as t:
+ for n,p in selected:
+  info=t.gettarinfo(str(p),arcname=n)
+  with p.open('rb') as s:t.addfile(info,s)
+seen=set()
+with tarfile.open(archive,'r|gz') as t:
+ for m in t:
+  assert m.isfile() and m.name in records and m.name not in seen
+  x=records[m.name];assert m.size==x['bytes'] and m.mode&0o777==x['mode']
+  h=hashlib.sha256()
+  with t.extractfile(m) as s:
+   while b:=s.read(65536):h.update(b)
+  assert h.hexdigest()==x['sha256'];seen.add(m.name);t.members.clear()
+assert seen==set(records)
+with gzip.open(archive,'rb') as s:
+ while s.read(65536):pass
+p=D/'extraction-evidence-map-r1.json';assert not p.exists();p.write_text(json.dumps({'archive':e(archive),'member_count':len(records),'members':records,'actual_checks':'complete gzipCRC/EOF plus each member SHA/size/mode passed','scope':'fresh API+two target POT developer extraction; Sphinx additionally emitted3ancestor index POT; noHTML/SDK/ARM/HIL qualification'},indent=2)+'\n')
+allocated=sum(p.stat().st_blocks*512 for p in D.rglob('*') if p.is_file());assert allocated<=1048576,allocated
+print(json.dumps({'archive':e(archive),'map':e(p),'members':len(records),'allocated':allocated}))

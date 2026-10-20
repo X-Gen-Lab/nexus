@@ -1,0 +1,9 @@
+{
+  "kind": "tests-first freeze; no production fix",
+  "source": {
+    "tests/google/h743_peripheral_test.cpp": "20b8b5760883953257ff196ebee5800262ae6fd6476e9f5e23ccc09555dd798f",
+    "tests/google/h743_model.h": "be12033076e61463a44c3e0ba073c89a0bdd68c892c7cb3f201c562f7871912a",
+    "tests/google/h743_model.cpp": "78da0fa3470285ecfa69c805860b2eb2e9c1818d1b7a91b83d0b5c537da86548"
+  },
+  "production_spi_sha256": "9cddd3444f868f41e05afa7984090da96a8889461d28042ab892e646fa41b1b1"
+}

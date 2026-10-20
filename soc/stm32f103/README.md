@@ -33,6 +33,25 @@ checked on the actual Board. The physical PCB revision and bridge population
 remain unknown. No external oscillator is assumed. Nominal HSI8 frequency and
 serial baud retain the datasheet tolerance; no calibrated measurement is claimed.
 
+Standalone startup reads the factory Flash-size halfword at `0x1FFFF7E0` and
+requires 128 KiB for the declared STM32F103RBT6 target. RM0008 Rev21 section30.1.1
+permits this CPU read. ES096 Rev15 section2.2.2 states that normal software
+cannot read `DBGMCU_IDCODE` or `DBGMCU_CR`; it reads zero outside debug mode.
+Startup therefore does not use debug visibility as admission. Device group and
+silicon revision remain unobserved, and matching density does not prove the
+orderable part, package or Board. A strict revision policy cannot accept an
+unavailable debug read as revision A, accept an assembly literal as an
+observation, or infer permission from a newer-looking code.
+
+The same ES096 limitation excludes ordinary-firmware `DBGMCU_CR` access.
+IWDG enable supports `debug_freeze=false`; a request for `true` returns
+`UNSUPPORTED` after context and output validation, before any hardware access
+or activation. Enable, feed, state and failed-preparation cleanup never read
+or write debug control. The reported false is the supported CPU configuration,
+not an observation of a debugger's setting. An external debugger owns its own
+freeze setup; this provider neither adopts nor clears that setup. The HAL/LL
+debug freeze macros directly access `DBGMCU_CR` and do not remove this erratum.
+
 ## Clock and ownership
 
 Cold admission rejects a foreign clock profile, timer, vector, USART gate,

@@ -1,0 +1,552 @@
+{
+  "schema": 1,
+  "kind": "independent-read-only-physical-factory-fixture-review",
+  "reviewed_utc": "2026-10-18T03:46:55.857696+00:00",
+  "reviewer": "/root/io24_checker_review_r2",
+  "decision": "PASS_WITH_BOUNDED_SCOPE",
+  "blockers": [],
+  "authority": {
+    "freeze": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/source-and-execution-freeze-r1.json",
+      "bytes": 34234,
+      "sha256": "4906a0982a9de814f57469427adb0b49273c41fbb212248797286884b172d8fd"
+    },
+    "integration_map": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/integration-manifest-r1.json",
+      "bytes": 56788,
+      "sha256": "a6e0791bdc0cb7b597ce5d1b27cc3f0f42d4f4e9b85141af45db77239a1fb3a2"
+    },
+    "source": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/files/tests/google/physical_platform_factory.cmake",
+      "bytes": 7810,
+      "sha256": "d3953632ea93bd2c97727fcf51d1403ddcd73d494552c0c013a3275f2919d42d"
+    },
+    "before_source": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/before/tests/google/physical_platform_factory.cmake",
+      "bytes": 6542,
+      "sha256": "c27b9c00e0beb6f8dbd2072ae0901018cb7531a67e7d7c31ef16acc19ac92f9f"
+    },
+    "diff": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/source.diff.raw",
+      "bytes": 2979,
+      "sha256": "78eb93d0b6a9a2f4a6fea9725e81bfab50d95f03cd07f6626178ebbdd508b5a1"
+    }
+  },
+  "source_review": {
+    "problem": "Each Native fixture executable links empty and GPIO generated binding objects. The obsolete explicit kinds list omitted RTC/LPTIM, leaving four duplicate public factory exports in each executable.",
+    "minimal_scope": "Only tests/google/physical_platform_factory.cmake changes. Removes the duplicated hard-coded kinds list and derives names from the actual generated nexus_factory.h for empty OBJECT PRIVATE compile definitions. GPIO OBJECT/export names and production factory emission remain unchanged.",
+    "exact_function_recognition": "The narrow canonical pattern requires const nx_<type>_t* followed by a lowercase nx_factory_<name> and literal opening parenthesis. It ends at the parenthesis, so multiline argument declarations remain supported and semicolons in later declarations cannot split a match. nx_factory_io_capability_t is a return type without the required following parenthesis and is not renamed.",
+    "observed_names": {
+      "stm32": 52,
+      "gd32": 52,
+      "included": [
+        "nx_factory_rtc",
+        "nx_factory_rtc_capability",
+        "nx_factory_lptim",
+        "nx_factory_lptim_capability"
+      ],
+      "type_not_renamed": "nx_factory_io_capability_t"
+    },
+    "fail_closed_source_checks": [
+      "Unreadable/missing generated header fails the CMake file(READ).",
+      "No recognized function declarations explicitly produces FATAL_ERROR.",
+      "A recognizable factory call/declaration token with noncanonical return spelling, capitalization or spacing increases the broad reference count without the narrow declaration count and produces FATAL_ERROR.",
+      "Duplicate recognized declarations are deduplicated only for identical macro definitions; declaration/reference counting happens first."
+    ],
+    "parser_scope_limit": "This is a lexical consistency guard for the maintained generator output, not a general C parser or a validation boundary for arbitrary adversarial headers. Malformed-header/empty-header paths were inspected statically; this review did not execute mutation tests or CMake.",
+    "namespace": "For each exact symbol, nx_ becomes nx_empty_. Definitions are PRIVATE to the empty object. Existing _init/_fini and nx_platform_{start,stop,*_diagnosed} namespace rules are byte-preserved. No new production API, runtime dispatch, provider state, registry, allocation or lifecycle behavior.",
+    "preserved_test_sources": {
+      "tests/google/physical_platform_factory_model.h": {
+        "path": "/tmp/nexus-io36-native-20261018/tests/google/physical_platform_factory_model.h",
+        "bytes": 953,
+        "sha256": "7916529689c1f1d7eaeddb7d8990d57635e118e437d08d46ca02bcd1a5351cc1"
+      },
+      "tests/google/physical_platform_factory_test.cpp": {
+        "path": "/tmp/nexus-io36-native-20261018/tests/google/physical_platform_factory_test.cpp",
+        "bytes": 16254,
+        "sha256": "bd6f8f0d86004ee07bc79fd4dd3dce80ef2643fd852d6576fc48e2ea4bb6545b"
+      }
+    },
+    "preserved_production_authorities": {
+      "tools/configure/factory.py": {
+        "path": "/tmp/nexus-io36-native-20261018/tools/configure/factory.py",
+        "bytes": 12939,
+        "sha256": "79ba27366a74cdf522a2e80b8d31da905901fe8c4f3e7bfe287040c021e296d0"
+      },
+      "tools/configure/providers/native/emission.py": {
+        "path": "/tmp/nexus-io36-native-20261018/tools/configure/providers/native/emission.py",
+        "bytes": 3405,
+        "sha256": "2ecd0b91e4bf64455f09fa38b251249b85fa3d71253871bc6b54b6ebf383dec1"
+      }
+    }
+  },
+  "actual_tdd": {
+    "root_failure": {
+      "exit_code": 1,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/root-actual-red/receipt.json",
+        "bytes": 1180,
+        "sha256": "8c90256a58e91fa1a640a557b65c1feec41ac6b160a114b3cbfb4efa125aca4e"
+      },
+      "raw": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/root-actual-red/build.raw",
+        "bytes": 31204,
+        "sha256": "cd74d5f8c3d3f4233d998183e603b3636f044f2a69a055a8a3a3ad40a9919302"
+      },
+      "observation": "Both physical-platform-factory link steps report multiple definitions of RTC, LPTIM and both capability getters. Original whole-main gate remains failed; this focused repair does not retroactively qualify it."
+    },
+    "own_failure": {
+      "configure_exit": 0,
+      "build_exit": 1,
+      "both_targets": "nexus_stm32_physical_platform_factory_test nexus_gd32_physical_platform_factory_test",
+      "observations": "Both target objects compile, then both link steps fail on the same four duplicate definitions. -k 0 was used only for this genuine RED to observe both failures."
+    },
+    "green": {
+      "configure_exit": 0,
+      "build_exit": 0,
+      "build_observation": "Normal maintained build recompiles only the two empty binding objects and links both complete executables successfully; no filter/shard/skip.",
+      "programs": [
+        {
+          "family": "stm32",
+          "program": {
+            "path": "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_stm32_physical_platform_factory_test",
+            "bytes": 2866136,
+            "sha256": "59ef4b9b709f722f1933e1bb94f54c15dd57afc0052532decc434363a22a6ee5"
+          },
+          "xml": {
+            "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/result.xml",
+            "bytes": 9771,
+            "sha256": "4c2e7ec9fab577ff92a92d5847c78fc194f57d102aacff46b222d6dfa69b5933"
+          },
+          "discovery_matches_xml": true,
+          "tests": 30,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "disabled": 0,
+          "cases": [
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/1"
+          ],
+          "immutable_elf_bundle": false,
+          "fresh_xml_mtime_ns": 1792294920451654975
+        },
+        {
+          "family": "gd32",
+          "program": {
+            "path": "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_gd32_physical_platform_factory_test",
+            "bytes": 2879280,
+            "sha256": "0d9bdf56b00f28682e5f0d0bdb8dead81c6f8d071456777868b2c625f3bf77ec"
+          },
+          "xml": {
+            "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/result.xml",
+            "bytes": 9771,
+            "sha256": "eb9ac88c0dad8ab6ffff5c7fd1c80ea1dc081554de76abeb38e936390fc7f55a"
+          },
+          "discovery_matches_xml": true,
+          "tests": 30,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "disabled": 0,
+          "cases": [
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedColdStartHasNoOuterEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedUntouchedStopHasNoOuterEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedStopRetainsStartedSession/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnprivilegedCleanupRetryRetainsOuterLease/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.IncomingMaskRejectsAndRemainsSaved/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.BasePreflightRejectsBeforeAnyOuterLease/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PrivilegedOwnerCanRestartActualSelectedGraph/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredForeignOutputOrAfRejectsWithoutEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.PoweredSelectedLockRejectsWithoutStealingPin/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.UnpoweredForeignPinOnlyRollsBackAddedGate/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.ResetInputAndAnalogPreserveSharedNeighborFields/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.FailedGlobalAnalogWithdrawalRetainsPinGateAndStopRetry/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedPreflightFailureHasNoOuterEffects/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedSystemStopFailureRetainsSession/1",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/0",
+            "EmptyAndGPIO/PhysicalPlatformFactory.DiagnosedResourceStopFailureRetainsPinLease/1"
+          ],
+          "immutable_elf_bundle": false,
+          "fresh_xml_mtime_ns": 1792294920734716656
+        }
+      ],
+      "program_count": 2,
+      "case_count": 60,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "disabled": 0,
+      "all_case_status": "run/completed",
+      "discovery_matches_fresh_XML": true
+    },
+    "commands": [
+      {
+        "stage": "build-green-r1",
+        "exit_code": 0,
+        "started_ns": 1792294900518794355,
+        "finished_ns": 1792294902490907959,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/command.attempts/1792294900518693703-5a72cc23abf14bd3af3bed97b4b50634/receipt.json",
+          "bytes": 1369,
+          "sha256": "75120399faffe29907e445ee862f0758e00fdc99b9e94bbf9ec36bd937bb31dc"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-green-r1/command.raw",
+          "bytes": 685,
+          "sha256": "f10a7e33468bde648ce29bee1934139eec3d3ce8ad5ae30cbf044cadb21d0a6d"
+        }
+      },
+      {
+        "stage": "build-red-r1",
+        "exit_code": 1,
+        "started_ns": 1792294670016156953,
+        "finished_ns": 1792294679624013776,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/command.attempts/1792294670016037983-93dcbb6c71ba440c97427d18a5aed5ed/receipt.json",
+          "bytes": 1392,
+          "sha256": "83dc2cc3127fb6e3442735e0236e1887a9a0f804294b583bfbdd6150cbcf25d6"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/command.raw",
+          "bytes": 9190,
+          "sha256": "70427a850a3e3fa9e8ba8894ca253d16042c1e75a988bd7f5e24f278c5d189aa"
+        }
+      },
+      {
+        "stage": "configure-green-r1",
+        "exit_code": 0,
+        "started_ns": 1792294781037015649,
+        "finished_ns": 1792294803024344307,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/command.attempts/1792294781036885733-8c31c8182c2141b3bb40657eb69abb74/receipt.json",
+          "bytes": 1240,
+          "sha256": "ce822398df758f1a5db68ff383002150c336f90402e7554f60886c9a0180b0be"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-green-r1/command.raw",
+          "bytes": 931,
+          "sha256": "11996da616e1a32454d61f5a0c51c6127f9507e71fab7752d4c7d4886389bae5"
+        }
+      },
+      {
+        "stage": "configure-red-r1",
+        "exit_code": 0,
+        "started_ns": 1792294613409859621,
+        "finished_ns": 1792294637840281280,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/command.attempts/1792294613409726741-c18f905dc05946b6973806326ee1cbc3/receipt.json",
+          "bytes": 1237,
+          "sha256": "eb8b0dca7b892172b7dcac50273077ecdbfd7d9a3fe499ee46fe90422b2e3b74"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/configure-red-r1/command.raw",
+          "bytes": 931,
+          "sha256": "1394e0702532080f94f2353610406c0c26064147d638b80c9f450a63ec908857"
+        }
+      },
+      {
+        "stage": "gd32-discovery-r1",
+        "exit_code": 0,
+        "started_ns": 1792294920183534870,
+        "finished_ns": 1792294920187485902,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/command.attempts/1792294920183398855-6a0b7c32f73841d296a78af92b9d0c9c/receipt.json",
+          "bytes": 1231,
+          "sha256": "daaf9431ccfd5dfd6b2ce6ba511e4f54dfa2da613f3bf4162bb02f220376b926"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-discovery-r1/command.raw",
+          "bytes": 2129,
+          "sha256": "6bf27f73bb4ea15b3bf90a30f73bed3b0cd6c036f44edd87c2f1cc8113290e4f"
+        }
+      },
+      {
+        "stage": "gd32-runtime-r1",
+        "exit_code": 0,
+        "started_ns": 1792294920716547968,
+        "finished_ns": 1792294920749146453,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/command.attempts/1792294920716320565-0275059b077849c5944043d517657683/receipt.json",
+          "bytes": 1414,
+          "sha256": "7c04a2a784db516baa58b4c234e79d1185c7119b958a0b048f3639c0be56147f"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/gd32-runtime-r1/command.raw",
+          "bytes": 6314,
+          "sha256": "0d571832033c48deac730205d2fcd63efe78a6a66620e6be687fb835d146235a"
+        }
+      },
+      {
+        "stage": "graph-red-r1",
+        "exit_code": 0,
+        "started_ns": 1792294650834097841,
+        "finished_ns": 1792294650866888639,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/command.attempts/1792294650833967334-026657fdedb14710a4a6d45271b8b136/receipt.json",
+          "bytes": 1319,
+          "sha256": "407defb22c23607611c13e2792848996e77cd5cb5cf39f04f30bc430699d46cd"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/command.raw",
+          "bytes": 146,
+          "sha256": "cbe0db159c029f0a607473f40e9b20192eaa3799f4a055f8d8f88b6f640eda4e"
+        }
+      },
+      {
+        "stage": "stm32-discovery-r1",
+        "exit_code": 0,
+        "started_ns": 1792294919932585602,
+        "finished_ns": 1792294919936451095,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/command.attempts/1792294919932483638-2527416c9fab4fd88a2813cd5c7e1e21/receipt.json",
+          "bytes": 1237,
+          "sha256": "639d268753b0a058aa6e82b2f3b9479900597901248fee70fe3a8a545bbc42dc"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-discovery-r1/command.raw",
+          "bytes": 2129,
+          "sha256": "6bf27f73bb4ea15b3bf90a30f73bed3b0cd6c036f44edd87c2f1cc8113290e4f"
+        }
+      },
+      {
+        "stage": "stm32-runtime-r1",
+        "exit_code": 0,
+        "started_ns": 1792294920435926011,
+        "finished_ns": 1792294920452240387,
+        "receipt": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/command.attempts/1792294920435822385-4af84e0245454d688f909968e8a043ce/receipt.json",
+          "bytes": 1419,
+          "sha256": "c615ab4fc8f58e0a0cd40d54a8490bc8f3103d482955fe9422f2d595165c3766"
+        },
+        "raw": {
+          "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/stm32-runtime-r1/command.raw",
+          "bytes": 6314,
+          "sha256": "82262b08288b4ad9a855964506c6eb0d23f05c6ad9eddeb54d93e9973157dcc2"
+        }
+      }
+    ],
+    "receipt_binding": "Read all 9 maintained command/attempt receipts. Command payload fields equal attempt receipts; exits/child returns agree, all outcomes completed, stdout/stderr identities verify, raw copies equal actual stdout. Runtime XML mtime lies within each actual execution interval; XML names/order match complete discovery and recorded cases. Executables were stream-hashed against recorded identities and were not executed by the reviewer.",
+    "ELF_preservation_limit": "The two ELF files are mutable TMP artifacts, not an immutable durable ELF bundle. Their actual bytes matched both recorded identities during this review. No candidate qualification follows."
+  },
+  "independent_integrity_checks": {
+    "freeze_path_identities_verified": 68,
+    "freeze_before_source_exception": "The old own-root source identity intentionally names a subsequently modified path; verified instead against durable before source and archive, and against unchanged main CMake baseline.",
+    "transport_files": 87,
+    "maintained_source_count": 1,
+    "historical_evidence_count": 86,
+    "transport_checks": "Every declared durable_source exists and matches length/SHA; target paths are unique, relative, contain no parent escape/backslash. Only the maintained CMake retains .cmake; historical .py/.cmake/.txt/.log leaves map to .raw as declared. No evidence payload is executed.",
+    "before_archive": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/before-fixture-inputs.tar.gz",
+      "bytes": 66982,
+      "sha256": "b5068b3fdba6b182ec5f27e77a1e75ef397d2d883d01db10235ec90e9bff86dc"
+    },
+    "archive_members": 36,
+    "archive_checks": "Streamed complete gzip/tar to EOF and checked every regular unique member against the recorded length/SHA map, with exact set equality; no extraction or archive mutation.",
+    "protected_authored_inputs": 68,
+    "protected_fixture_inputs": 19,
+    "protection_scope": "All listed current bytes match the base manifest; all nine before/after guards match each other and original protected maps. These are selected inputs, not a complete compiler dependency closure.",
+    "own_index": {
+      "path": "/tmp/nexus-io36-native-20261018/.git/index",
+      "bytes": 3277970,
+      "sha256": "6244b752dba159412507a46c33a0a81c4db0167b83f700e158f08242ad940aea"
+    },
+    "recorded_index_semantics_sha256": "56ba6d02cb622a354c9b539a47c3a5e71df7b4f3b7aea672f1e069d81acbdcd3",
+    "index_statement": "All historical guards record the same exact index bytes and semantic digest. Current exact index bytes still match; semantic digest was not independently recomputed because identical bytes suffice for this unchanged-index check.",
+    "generated_headers": [
+      {
+        "family": "stm32",
+        "header": {
+          "path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/physical-platform-stm32-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        "function_count": 52,
+        "symbols": [
+          "nx_factory_adc",
+          "nx_factory_adc_capability",
+          "nx_factory_adc_group",
+          "nx_factory_adc_group_capability",
+          "nx_factory_advanced_pwm",
+          "nx_factory_advanced_pwm_capability",
+          "nx_factory_can",
+          "nx_factory_can_capability",
+          "nx_factory_can_fd",
+          "nx_factory_can_fd_capability",
+          "nx_factory_encoder",
+          "nx_factory_encoder_capability",
+          "nx_factory_eth",
+          "nx_factory_eth_capability",
+          "nx_factory_eth_frames",
+          "nx_factory_eth_frames_capability",
+          "nx_factory_exti",
+          "nx_factory_exti_capability",
+          "nx_factory_flash",
+          "nx_factory_flash_capability",
+          "nx_factory_gpio",
+          "nx_factory_gpio_capability",
+          "nx_factory_i2c",
+          "nx_factory_i2c_capability",
+          "nx_factory_i2c_device",
+          "nx_factory_i2c_device_capability",
+          "nx_factory_lptim",
+          "nx_factory_lptim_capability",
+          "nx_factory_mdio",
+          "nx_factory_mdio_capability",
+          "nx_factory_pwm",
+          "nx_factory_pwm_adc",
+          "nx_factory_pwm_adc_capability",
+          "nx_factory_pwm_capability",
+          "nx_factory_pwm_group",
+          "nx_factory_pwm_group_capability",
+          "nx_factory_rtc",
+          "nx_factory_rtc_capability",
+          "nx_factory_spi",
+          "nx_factory_spi_capability",
+          "nx_factory_spi_device",
+          "nx_factory_spi_device_capability",
+          "nx_factory_timer_capture",
+          "nx_factory_timer_capture_capability",
+          "nx_factory_uart",
+          "nx_factory_uart_capability",
+          "nx_factory_usb_device",
+          "nx_factory_usb_device_capability",
+          "nx_factory_usb_endpoint",
+          "nx_factory_usb_endpoint_capability",
+          "nx_factory_watchdog",
+          "nx_factory_watchdog_capability"
+        ],
+        "not_a_function": "nx_factory_io_capability_t"
+      },
+      {
+        "family": "gd32",
+        "header": {
+          "path": "/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/physical-platform-gd32-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        "function_count": 52,
+        "symbols": [
+          "nx_factory_adc",
+          "nx_factory_adc_capability",
+          "nx_factory_adc_group",
+          "nx_factory_adc_group_capability",
+          "nx_factory_advanced_pwm",
+          "nx_factory_advanced_pwm_capability",
+          "nx_factory_can",
+          "nx_factory_can_capability",
+          "nx_factory_can_fd",
+          "nx_factory_can_fd_capability",
+          "nx_factory_encoder",
+          "nx_factory_encoder_capability",
+          "nx_factory_eth",
+          "nx_factory_eth_capability",
+          "nx_factory_eth_frames",
+          "nx_factory_eth_frames_capability",
+          "nx_factory_exti",
+          "nx_factory_exti_capability",
+          "nx_factory_flash",
+          "nx_factory_flash_capability",
+          "nx_factory_gpio",
+          "nx_factory_gpio_capability",
+          "nx_factory_i2c",
+          "nx_factory_i2c_capability",
+          "nx_factory_i2c_device",
+          "nx_factory_i2c_device_capability",
+          "nx_factory_lptim",
+          "nx_factory_lptim_capability",
+          "nx_factory_mdio",
+          "nx_factory_mdio_capability",
+          "nx_factory_pwm",
+          "nx_factory_pwm_adc",
+          "nx_factory_pwm_adc_capability",
+          "nx_factory_pwm_capability",
+          "nx_factory_pwm_group",
+          "nx_factory_pwm_group_capability",
+          "nx_factory_rtc",
+          "nx_factory_rtc_capability",
+          "nx_factory_spi",
+          "nx_factory_spi_capability",
+          "nx_factory_spi_device",
+          "nx_factory_spi_device_capability",
+          "nx_factory_timer_capture",
+          "nx_factory_timer_capture_capability",
+          "nx_factory_uart",
+          "nx_factory_uart_capability",
+          "nx_factory_usb_device",
+          "nx_factory_usb_device_capability",
+          "nx_factory_usb_endpoint",
+          "nx_factory_usb_endpoint_capability",
+          "nx_factory_watchdog",
+          "nx_factory_watchdog_capability"
+        ],
+        "not_a_function": "nx_factory_io_capability_t"
+      }
+    ],
+    "compile_database": {
+      "path": "/tmp/nexus-io36-native-20261018/build/native-debug/compile_commands.json",
+      "bytes": 2668360,
+      "sha256": "1c9f0b065e967f1fbc5b4a943be34db9f6496e993ed60b3cc7fc0d75019096ab"
+    },
+    "compile_row_checks": "Read actual DB. Each exact empty bindings.c row has precisely all 52 expected nx_factory_ macro renames, including RTC/LPTIM, with recorded command SHA. No capability typedef macro; corresponding GPIO row has no factory rename. Header bytes match recorded identities.",
+    "main_CMake_baseline_at_review": {
+      "path": "/tmp/nexus-io-validation-20261018/tests/google/physical_platform_factory.cmake",
+      "bytes": 6542,
+      "sha256": "c27b9c00e0beb6f8dbd2072ae0901018cb7531a67e7d7c31ef16acc19ac92f9f"
+    }
+  },
+  "reviewer_execution": {
+    "tests_builds_configure_run": false,
+    "implementation_functions_executed": false,
+    "source_or_index_modified": false,
+    "only_new_output": "/workspace/nexus-io-recovery-20261018/validation/native-time-fixture-independent-review-r1.json",
+    "method": "Targeted source/diff review plus read-only SHA/receipt/XML/archive/DB consistency checks. No subprocess runs of CMake, compilers or test executables."
+  },
+  "remaining_scope": [
+    "Root must integrate the exact one source file and run fresh normal complete hooks.",
+    "No installed SDK, ARM firmware, physical hardware, whole-repository requalification, reproducibility or clean candidate claim from this focused fixture repair.",
+    "No production RTC/LPTIM capability on STM32/GD32 is established by renaming their empty factory getters in host fixtures."
+  ]
+}

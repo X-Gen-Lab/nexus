@@ -1,0 +1,67 @@
+{
+  "kind": "maintained command",
+  "qualification": false,
+  "stage": "build-fixed-factory",
+  "command": [
+    "/tmp/nexus-io-validation-20261018/.venv/bin/python",
+    "tools/dev/dev.py",
+    "build",
+    "--preset",
+    "native-debug",
+    "--target",
+    "nexus_h743_peripheral_factory_test",
+    "--parallel",
+    "1"
+  ],
+  "cwd": "/tmp/nexus-h743-spi-safe-stop-20261018",
+  "started_ns": 1792289024461336634,
+  "ended_ns": 1792289036656704449,
+  "exit_code": 0,
+  "timed_out": false,
+  "before": {
+    "source": {
+      "soc/stm32h743/drivers/spi.c": "9cddd3444f868f41e05afa7984090da96a8889461d28042ab892e646fa41b1b1",
+      "soc/stm32h743/private/stm32h743_provider.h": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+      "tests/google/h743_peripheral_test.cpp": "80074d225d9c7a6b540a32bbe7b5d6f7988b3b67919d4bc8457e7a629e440e20",
+      "tests/google/h743_high_kernel_test.cpp": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+      "soc/stm32h743/system.c": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e",
+      "soc/stm32h743/private/stm32h743_system.h": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+      "tests/google/h743_model.cpp": "dd4162ee2aca3922b5ada815454cf516fc28a276ea479f027e7e07facddfa986",
+      "tests/google/h743_system_test.cpp": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+      "soc/stm32h743/clock.c": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac",
+      "soc/stm32h743/private/stm32h743_clock.h": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+      "tests/google/h743_clock_test.cpp": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+      "tests/google/h743_clock_model.cpp": "0af041077359739156c079657f91fd188adccccd76d00426883563e42f9c30fe",
+      "tests/google/h743_clock_model.h": "d5ead9ce82852231a06833ef4e9f48fc362efe3b7fb68d30d95e5122fa822ea6"
+    },
+    "tmp_free": 1390161920,
+    "memory_current": 13924524032,
+    "memory_max": 17179869184,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "after": {
+    "source": {
+      "soc/stm32h743/drivers/spi.c": "9cddd3444f868f41e05afa7984090da96a8889461d28042ab892e646fa41b1b1",
+      "soc/stm32h743/private/stm32h743_provider.h": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+      "tests/google/h743_peripheral_test.cpp": "80074d225d9c7a6b540a32bbe7b5d6f7988b3b67919d4bc8457e7a629e440e20",
+      "tests/google/h743_high_kernel_test.cpp": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+      "soc/stm32h743/system.c": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e",
+      "soc/stm32h743/private/stm32h743_system.h": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+      "tests/google/h743_model.cpp": "dd4162ee2aca3922b5ada815454cf516fc28a276ea479f027e7e07facddfa986",
+      "tests/google/h743_system_test.cpp": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+      "soc/stm32h743/clock.c": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac",
+      "soc/stm32h743/private/stm32h743_clock.h": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+      "tests/google/h743_clock_test.cpp": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+      "tests/google/h743_clock_model.cpp": "0af041077359739156c079657f91fd188adccccd76d00426883563e42f9c30fe",
+      "tests/google/h743_clock_model.h": "d5ead9ce82852231a06833ef4e9f48fc362efe3b7fb68d30d95e5122fa822ea6"
+    },
+    "tmp_free": 1380196352,
+    "memory_current": 13934923776,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "source_stable": true,
+  "children_maxrss_kib": 297272,
+  "raw_sha256": "32fe960acdaa0ca4382937601cfbe1ad6d1c6125a8dd355bc254452e7cd9e18f"
+}

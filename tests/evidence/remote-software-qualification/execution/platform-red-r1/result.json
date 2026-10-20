@@ -1,0 +1,9 @@
+{
+  "discovered": 39,
+  "executed": 39,
+  "failures": 7,
+  "errors": 1,
+  "skipped": 0,
+  "expected_failures": 0,
+  "unexpected_successes": 0
+}

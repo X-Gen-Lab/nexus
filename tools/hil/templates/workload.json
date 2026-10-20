@@ -997,6 +997,224 @@
           "unit": "count"
         }
       }
+    },
+    {
+      "id": "uart_word_wire",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "word_values_bit8": null,
+        "nine_bit_wire_waveform": null,
+        "tx_load_tc_settlement": null,
+        "cancel_quarantine_late_tc": null,
+        "fresh_rx_epoch": null
+      },
+      "instruments": {
+        "native_word_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "reviewed_nine_bit_peer": null,
+        "separate_control_console": null,
+        "reviewed_voltage_routes": null,
+        "no_reclaim_before_settlement": null
+      },
+      "limits": {
+        "received_words": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "word_errors": {
+          "maximum": null,
+          "unit": "count"
+        },
+        "stop_lateness": {
+          "maximum": null,
+          "unit": "us"
+        }
+      }
+    },
+    {
+      "id": "spi_dma_whole_cs_segments",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "cs_sck_mosi_miso_segments": null,
+        "fixed_dummy_discard_cells": null,
+        "dma_en_count_irq_wire_idle": null,
+        "cancel_timeout_each_segment": null,
+        "cs_release_settlement_order": null
+      },
+      "instruments": {
+        "reviewed_spi_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_enhanced_endpoint": null,
+        "reviewed_cs_routes": null,
+        "legal_dma_memory": null,
+        "isolated_fault_injection": null,
+        "no_reclaim_before_settlement": null
+      },
+      "limits": {
+        "segments_exercised": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "maximum": null,
+          "unit": "count"
+        },
+        "wire_completion_latency": {
+          "maximum": null,
+          "unit": "us"
+        }
+      }
+    },
+    {
+      "id": "i2c_v2_long_timing",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "scl_sda_start_tcr_stop": null,
+        "ack_nack_wire_counts": null,
+        "measured_clock_rise_fall_voltage": null,
+        "timingr_cr1_readback": null,
+        "register_progress_separate_from_wire_ack": null,
+        "failed_abort_no_replay": null
+      },
+      "instruments": {
+        "oscilloscope": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "reviewed_i2c_peer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "authored_timing_envelope": null,
+        "analog_filter_on_digital_filter_zero": null,
+        "measured_pullups_voltage": null,
+        "isolated_fault_injection": null
+      },
+      "limits": {
+        "message_count": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "protocol_errors": {
+          "maximum": null,
+          "unit": "count"
+        },
+        "rise_time": {
+          "maximum": null,
+          "unit": "ns"
+        }
+      }
+    },
+    {
+      "id": "pwm_group_comp_break",
+      "bindings": [],
+      "stimulus": null,
+      "raw_observations": {
+        "pwm_trigger_common_timebase": null,
+        "udis_shadow_commits": null,
+        "fresh_uif_no_bootstrap_trigger": null,
+        "comparator_break_latch": null,
+        "tim1_syscfg_gate_reset": null,
+        "close_irq_join": null
+      },
+      "instruments": {
+        "reference_source": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "oscilloscope": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "logic_analyzer": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        },
+        "debug_probe": {
+          "path": null,
+          "sha256": null,
+          "size": null
+        }
+      },
+      "safety": {
+        "exact_group_comparator_route": null,
+        "analog_input_limits": null,
+        "passive_loads_outputs_disconnected": null,
+        "external_rearm_policy": null
+      },
+      "limits": {
+        "commits": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "break_cases": {
+          "minimum": null,
+          "maximum": null,
+          "unit": "count"
+        },
+        "unsafe_restart_count": {
+          "maximum": null,
+          "unit": "count"
+        },
+        "commit_skew": {
+          "maximum": null,
+          "unit": "ns"
+        }
+      }
     }
   ]
 }

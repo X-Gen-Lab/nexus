@@ -10,6 +10,13 @@
 #include "gd32f4xx_dma.h"
 #include "gd32f4xx_usart.h"
 #include "private/system.h"
+/* Keep the selected RX-only IRQ local while duplex shares the same body. */
+#if defined(__GNUC__) || defined(__clang__)
+#define NX_UART_RX_FACTS_INLINE static inline __attribute__((always_inline))
+#else
+#define NX_UART_RX_FACTS_INLINE static inline
+#endif
+
 #ifndef NX_GD32_UART_RX_DMA_DISABLE
 #define NX_GD32_UART_RX_DMA_DISABLE(mask)                                      \
     (DMA_CH2CTL(DMA1) &= ~(uint32_t)(mask))
@@ -49,16 +56,16 @@
 #define RX_PRIORITY         (1U << 17U)
 #define RX_IRQ              DMA1_Channel2_IRQn
 #define TX_DMA_IRQ          DMA1_Channel7_IRQn
-#define UART_IRQ(s)         ((s)->transmit.uart.controller->irq)
-#define UART_CR1(s)         USART_CTL0((s)->transmit.uart.controller->registers)
-#define UART_CR3(s)         USART_CTL2((s)->transmit.uart.controller->registers)
-#define UART_STATUS(s)      USART_STAT0((s)->transmit.uart.controller->registers)
-#define UART_DATA(s)        USART_DATA((s)->transmit.uart.controller->registers)
+#define UART_IRQ(s)         ((s)->uart.controller->irq)
+#define UART_CR1(s)         USART_CTL0((s)->uart.controller->registers)
+#define UART_CR3(s)         USART_CTL2((s)->uart.controller->registers)
+#define UART_STATUS(s)      USART_STAT0((s)->uart.controller->registers)
+#define UART_DATA(s)        USART_DATA((s)->uart.controller->registers)
 #ifndef NX_GD32_UART_RECEIVE_DATA
 #define NX_GD32_UART_RECEIVE_DATA(uart) USART_DATA(uart)
 #endif
 #define UART_READ_DATA(s)                                                      \
-    NX_GD32_UART_RECEIVE_DATA(((s)->transmit.uart.controller->registers))
+    NX_GD32_UART_RECEIVE_DATA(((s)->uart.controller->registers))
 #define UART_DMAR   USART_CTL2_DENR
 #define UART_IDLEIE USART_CTL0_IDLEIE
 #define UART_PEIE   USART_CTL0_PERRIE
@@ -79,26 +86,16 @@
         NVIC_DisableIRQ(RX_IRQ);                                               \
         NVIC_ClearPendingIRQ(RX_IRQ);                                          \
     } while (0)
-#define TX_CANCEL_TC(state, status)                                            \
-    do {                                                                       \
-        if ((state)->transmit.aborting &&                                      \
-            (state)->transmit.uart.active != NULL &&                           \
-            ((status)&USART_STAT0_TC) != 0U) {                                 \
-            (state)->transmit.uart.tc = true;                                  \
-            UART_CR1(state) &= ~(uint32_t)USART_CTL0_TCIE;                     \
-        }                                                                      \
-    } while (0)
-
 /** \brief Validate fixed cold facts before either independent constructor. */
-static nx_result_t prepare_initialize(nx_gd32_uart_receive_state_t* state) {
-    if (state == NULL || state->transmit.regions == NULL ||
-        state->transmit.region_count == 0U) {
+nx_result_t nx_gd32_uart_receive_prepare(nx_gd32_uart_receive_state_t* state) {
+    if (state == NULL || state->resources.regions == NULL ||
+        state->resources.region_count == 0U) {
         return NX_ERROR_INVALID;
     }
     if (nx_gd32_in_isr() || nx_gd32_irq_masked()) {
         return NX_ERROR_CONTEXT;
     }
-    if (state->transmit.uart.initialized) {
+    if (state->uart.initialized) {
         return NX_ERROR_STATE;
     }
     if ((DMA_CH2CTL(DMA1) & DMA_CHXCTL_CHEN) != 0U) {
@@ -108,8 +105,8 @@ static nx_result_t prepare_initialize(nx_gd32_uart_receive_state_t* state) {
 }
 
 /** \brief Per-instance receive metadata is reset only after successful init. */
-static void finish_initialize(nx_gd32_uart_receive_state_t* state,
-                              unsigned priority) {
+void nx_gd32_uart_receive_finish_initialize(nx_gd32_uart_receive_state_t* state,
+                                            unsigned priority) {
     state->stream = NULL;
     state->loans = 0U;
     state->pending = false;
@@ -123,27 +120,13 @@ static void finish_initialize(nx_gd32_uart_receive_state_t* state,
 /** \brief Explicit selected cold constructor; no runtime TX mode branch. */
 nx_result_t nx_gd32_uart_receive_initialize(nx_gd32_uart_receive_state_t* state,
                                             uint32_t baud, unsigned priority) {
-    nx_result_t result = prepare_initialize(state);
+    nx_result_t result = nx_gd32_uart_receive_prepare(state);
     if (result == NX_SUCCESS) {
         result = nx_gd32_uart_initialize_at(
-            &state->transmit.uart, &nx_gd32_usart0_controller, baud,
-            NX_UART_RX_BLOCKS, NULL, 0U, priority);
+            &state->uart, &nx_gd32_usart0_controller, baud, NX_UART_RX_BLOCKS,
+            NULL, 0U, priority);
         if (result == NX_SUCCESS) {
-            finish_initialize(state, priority);
-        }
-    }
-    return result;
-}
-
-/** \brief Explicit selected cold constructor; no runtime TX mode branch. */
-nx_result_t nx_gd32_uart_duplex_initialize(nx_gd32_uart_receive_state_t* state,
-                                           uint32_t baud, unsigned priority) {
-    nx_result_t result = prepare_initialize(state);
-    if (result == NX_SUCCESS) {
-        result = nx_gd32_uart_dma_initialize(
-            &state->transmit, baud, NX_UART_RX_BLOCKS, NULL, 0U, priority);
-        if (result == NX_SUCCESS) {
-            finish_initialize(state, priority);
+            nx_gd32_uart_receive_finish_initialize(state, priority);
         }
     }
     return result;
@@ -298,7 +281,8 @@ static bool overlaps_pool(const nx_stream_t* stream, const void* pointer,
 
 /** \brief Validate every future target before loan or MMIO admission. */
 static nx_result_t validate_stream(const nx_gd32_uart_receive_state_t* state,
-                                   const nx_stream_t* stream) {
+                                   const nx_stream_t* stream,
+                                   size_t owner_size) {
     if (stream == NULL || stream->slots == NULL || stream->count == 0U ||
         (state->continuous && stream->count < 3U)) {
         return NX_ERROR_INVALID;
@@ -311,16 +295,15 @@ static nx_result_t validate_stream(const nx_gd32_uart_receive_state_t* state,
             return NX_ERROR_INVALID;
         }
         nx_result_t result = nx_dma_buffer_validate(
-            state->transmit.regions, state->transmit.region_count, slot->data,
+            state->resources.regions, state->resources.region_count, slot->data,
             slot->capacity, 1U, NX_DMA_FROM_DEVICE);
         if (result != NX_SUCCESS) {
             return result;
         }
         uintptr_t data = (uintptr_t)slot->data;
         uintptr_t control = (uintptr_t)state;
-        if (sizeof(*state) > UINTPTR_MAX - control ||
-            (data < control + sizeof(*state) &&
-             control < data + slot->capacity)) {
+        if (owner_size > UINTPTR_MAX - control ||
+            (data < control + owner_size && control < data + slot->capacity)) {
             return NX_ERROR_INVALID;
         }
     }
@@ -337,27 +320,28 @@ static void clear_stream(nx_gd32_uart_receive_state_t* state) {
 }
 
 /** \brief Failed admission leaves hardware unchanged and retains no payload. */
-static nx_result_t rx_start(void* context, nx_stream_t* stream) {
-    nx_gd32_uart_receive_state_t* state = context;
+nx_result_t nx_gd32_uart_receive_start(nx_gd32_uart_receive_state_t* state,
+                                       nx_stream_t* stream, size_t owner_size) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
     if (IN_ISR() || MASKED()) {
         return NX_ERROR_CONTEXT;
     }
-    if (!state->transmit.uart.initialized || state->stopping) {
+    if (!state->uart.initialized || state->stopping) {
         return NX_ERROR_STATE;
     }
     if (state->stream != NULL || (RX_CONTROL(state) & RX_ENABLE) != 0U) {
         return NX_ERROR_BUSY;
     }
-    nx_result_t result = validate_stream(state, stream);
+    nx_result_t result = validate_stream(state, stream, owner_size);
     if (result != NX_SUCCESS) {
         return result;
     }
-    nx_uart_tx_request_t* transmit = state->transmit.uart.active;
+    nx_uart_tx_request_t* transmit = state->uart.active;
     if (transmit != NULL &&
-        overlaps_pool(stream, transmit->data, transmit->length)) {
+        (overlaps_pool(stream, transmit, sizeof(*transmit)) ||
+         overlaps_pool(stream, transmit->data, transmit->length))) {
         return NX_ERROR_INVALID;
     }
     uint64_t required_epochs = state->continuous ? 2U : 1U;
@@ -393,7 +377,7 @@ static nx_result_t rx_start(void* context, nx_stream_t* stream) {
 }
 
 /** \brief Close receiver sources before publishing a final useful prefix. */
-static nx_result_t rx_stop(void* context) {
+nx_result_t nx_gd32_uart_receive_stop(void* context) {
     nx_gd32_uart_receive_state_t* state = context;
     if (state == NULL) {
         return NX_ERROR_INVALID;
@@ -401,7 +385,7 @@ static nx_result_t rx_stop(void* context) {
     if (IN_ISR() || MASKED()) {
         return NX_ERROR_CONTEXT;
     }
-    if (!state->transmit.uart.initialized) {
+    if (!state->uart.initialized) {
         return NX_ERROR_STATE;
     }
     GUARD_TYPE saved = GUARD_ENTER();
@@ -423,7 +407,7 @@ static nx_result_t rx_stop(void* context) {
 }
 
 /** \brief Bounded receive progress is independent of the selected TX path. */
-static void service_receive(nx_gd32_uart_receive_state_t* state) {
+void nx_gd32_uart_receive_service(nx_gd32_uart_receive_state_t* state) {
     GUARD_TYPE saved = GUARD_ENTER();
     if (state->pending && !quiescent(state)) {
         detach(state);
@@ -455,13 +439,12 @@ static void service_receive(nx_gd32_uart_receive_state_t* state) {
 /** \brief Direct selected IRQ TX service followed by bounded RX progress. */
 static void irq_service(void* context) {
     nx_gd32_uart_receive_state_t* state = context;
-    if (state == NULL || !state->transmit.uart.initialized || IN_ISR() ||
-        MASKED()) {
+    if (state == NULL || !state->uart.initialized || IN_ISR() || MASKED()) {
         return;
     }
     /* An IRQ-TX abort resets the shared USART. Drain RX first, even when
      * its DMA refuses EN withdrawal; reset cannot revoke a DMA buffer loan. */
-    nx_gd32_uart_state_t* uart = &state->transmit.uart;
+    nx_gd32_uart_state_t* uart = &state->uart;
     nx_uart_tx_request_t* request = uart->active;
     if (request != NULL && !uart->tc &&
         (uart->terminal != NX_SUCCESS ||
@@ -485,24 +468,12 @@ static void irq_service(void* context) {
         GUARD_LEAVE(reset_saved);
     }
     nx_gd32_uart_service(context);
-    service_receive(state);
-}
-
-/** \brief Direct selected nx_gd32_uart_dma_service service followed by bounded
- * RX progress. */
-static void duplex_service(void* context) {
-    nx_gd32_uart_receive_state_t* state = context;
-    if (state == NULL || !state->transmit.uart.initialized || IN_ISR() ||
-        MASKED()) {
-        return;
-    }
-    nx_gd32_uart_dma_service(context);
-    service_receive(state);
+    nx_gd32_uart_receive_service(state);
 }
 
 /** \brief Selected receive control checks are shared by TX and validators. */
-static nx_result_t validate_receive(nx_gd32_uart_receive_state_t* state,
-                                    const nx_uart_tx_request_t* request) {
+nx_result_t nx_gd32_uart_receive_validate(nx_gd32_uart_receive_state_t* state,
+                                          const nx_uart_tx_request_t* request) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
@@ -513,7 +484,8 @@ static nx_result_t validate_receive(nx_gd32_uart_receive_state_t* state,
         return NX_ERROR_STATE;
     }
     if (request != NULL && state->stream != NULL &&
-        overlaps_pool(state->stream, request->data, request->length)) {
+        (overlaps_pool(state->stream, request, sizeof(*request)) ||
+         overlaps_pool(state->stream, request->data, request->length))) {
         return NX_ERROR_INVALID;
     }
     return NX_SUCCESS;
@@ -522,7 +494,7 @@ static nx_result_t validate_receive(nx_gd32_uart_receive_state_t* state,
 /** \brief Direct selected IRQ-TX entry; no runtime transmit provider selection.
  */
 static nx_result_t irq_submit(void* context, nx_uart_tx_request_t* request) {
-    nx_result_t result = validate_receive(context, request);
+    nx_result_t result = nx_gd32_uart_receive_validate(context, request);
     return result == NX_SUCCESS ? nx_gd32_uart_submit(context, request)
                                 : result;
 }
@@ -531,7 +503,7 @@ static nx_result_t irq_submit(void* context, nx_uart_tx_request_t* request) {
  */
 static nx_result_t irq_start_admitted(void* context,
                                       nx_uart_tx_request_t* request) {
-    nx_result_t result = validate_receive(context, request);
+    nx_result_t result = nx_gd32_uart_receive_validate(context, request);
     return result == NX_SUCCESS ? nx_gd32_uart_start_admitted(context, request)
                                 : result;
 }
@@ -547,66 +519,28 @@ static nx_result_t irq_stop(void* context) {
         return NX_ERROR_CONTEXT;
     }
     state->stopping = true;
-    nx_result_t result = rx_stop(state);
+    nx_result_t result = nx_gd32_uart_receive_stop(state);
     if (result == NX_SUCCESS) {
         result = nx_gd32_uart_stop(context);
         if (result == NX_SUCCESS) {
-            RX_VECTOR_STOP();
-        }
-    }
-    return result;
-}
-
-/** \brief Direct selected TX-DMA entry; no runtime transmit provider selection.
- */
-static nx_result_t duplex_submit(void* context, nx_uart_tx_request_t* request) {
-    nx_result_t result = validate_receive(context, request);
-    return result == NX_SUCCESS ? nx_gd32_uart_dma_submit(context, request)
-                                : result;
-}
-
-/** \brief Direct selected TX-DMA entry; no runtime transmit provider selection.
- */
-static nx_result_t duplex_start_admitted(void* context,
-                                         nx_uart_tx_request_t* request) {
-    nx_result_t result = validate_receive(context, request);
-    return result == NX_SUCCESS
-               ? nx_gd32_uart_dma_start_admitted(context, request)
-               : result;
-}
-
-/** \brief Join RX and consumer loans before selected TX-DMA/clock withdrawal.
- */
-static nx_result_t duplex_stop(void* context) {
-    nx_gd32_uart_receive_state_t* state = context;
-    if (state == NULL) {
-        return NX_ERROR_INVALID;
-    }
-    if (IN_ISR() || MASKED()) {
-        return NX_ERROR_CONTEXT;
-    }
-    state->stopping = true;
-    nx_result_t result = rx_stop(state);
-    if (result == NX_SUCCESS) {
-        result = nx_gd32_uart_dma_stop(context);
-        if (result == NX_SUCCESS) {
-            RX_VECTOR_STOP();
+            nx_gd32_uart_receive_vector_stop();
         }
     }
     return result;
 }
 
 /** \brief Every actual publisher is validated before borrowing the sink. */
-static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
-                               uint8_t syscall_ceiling, bool duplex) {
-    nx_gd32_uart_receive_state_t* state = context;
+nx_result_t
+nx_gd32_uart_receive_attach_wake(nx_gd32_uart_receive_state_t* state,
+                                 const nx_irq_wake_t* wake,
+                                 uint8_t syscall_ceiling, bool duplex) {
     if (state == NULL) {
         return NX_ERROR_INVALID;
     }
     if (IN_ISR() || MASKED()) {
         return NX_ERROR_CONTEXT;
     }
-    if (!state->transmit.uart.initialized || state->stopping) {
+    if (!state->uart.initialized || state->stopping) {
         return NX_ERROR_STATE;
     }
     GUARD_TYPE saved = GUARD_ENTER();
@@ -618,7 +552,7 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
         result = WAKE_VALIDATE(wake, TX_DMA_IRQ, syscall_ceiling);
     }
     if (result == NX_SUCCESS) {
-        state->transmit.uart.wake = wake;
+        state->uart.wake = wake;
     }
     GUARD_LEAVE(saved);
     return result;
@@ -627,22 +561,12 @@ static nx_result_t attach_wake(void* context, const nx_irq_wake_t* wake,
 /** \brief Selected IRQ-only transmit has two actual receive publishers. */
 static nx_result_t irq_attach_wake(void* context, const nx_irq_wake_t* wake,
                                    uint8_t ceiling) {
-    return attach_wake(context, wake, ceiling, false);
+    return nx_gd32_uart_receive_attach_wake(context, wake, ceiling, false);
 }
 
-/** \brief Selected duplex additionally validates its real TX-DMA publisher. */
-static nx_result_t duplex_attach_wake(void* context, const nx_irq_wake_t* wake,
-                                      uint8_t ceiling) {
-    return attach_wake(context, wake, ceiling, true);
-}
-
-/** \brief Independent UART wire facts never read a live DMA receive payload. */
-void nx_gd32_uart_receive_irq(nx_gd32_uart_receive_state_t* state) {
-    if (state == NULL || !state->transmit.uart.initialized) {
-        return;
-    }
-    GUARD_TYPE saved = GUARD_ENTER();
-    uint32_t status = UART_STATUS(state);
+/** \brief RX-only facts do not inspect the separately selected TX extension. */
+NX_UART_RX_FACTS_INLINE bool
+receive_irq_facts(nx_gd32_uart_receive_state_t* state, uint32_t status) {
     bool notify = false;
     if (state->stream != NULL && state->loans != 0U &&
         (status & (UART_IDLE | UART_ERRORS)) != 0U) {
@@ -655,28 +579,27 @@ void nx_gd32_uart_receive_irq(nx_gd32_uart_receive_state_t* state) {
         (void)finish(state);
         notify = true;
     }
-    notify = TX_IRQ(&state->transmit.uart, status) || notify;
-    const nx_irq_wake_t* wake = state->transmit.uart.wake;
-    GUARD_LEAVE(saved);
-    if (notify) {
-        (void)nx_irq_wake_signal(wake);
-    }
+    return notify;
 }
 
-/** \brief Selected duplex vector observes its independent wire-drain fact. */
-void nx_gd32_uart_duplex_irq(nx_gd32_uart_receive_state_t* state) {
-    if (state == NULL || !state->transmit.uart.initialized) {
+/** \brief Duplex uses the same RX facts without cloning its source algorithm.
+ */
+bool nx_gd32_uart_receive_irq_facts(nx_gd32_uart_receive_state_t* state,
+                                    uint32_t status) {
+    return receive_irq_facts(state, status);
+}
+
+/** \brief One guard and one wake cover independent RX and IRQ-TX facts. */
+void nx_gd32_uart_receive_irq(nx_gd32_uart_receive_state_t* state) {
+    if (state == NULL || !state->uart.initialized) {
         return;
     }
     GUARD_TYPE saved = GUARD_ENTER();
     uint32_t status = UART_STATUS(state);
-    bool notify = state->transmit.aborting &&
-                  state->transmit.uart.active != NULL &&
-                  (status & USART_STAT0_TC) != 0U;
-    TX_CANCEL_TC(state, status);
-    const nx_irq_wake_t* wake = state->transmit.uart.wake;
+    bool notify = receive_irq_facts(state, status);
+    notify = TX_IRQ(&state->uart, status) || notify;
+    const nx_irq_wake_t* wake = state->uart.wake;
     GUARD_LEAVE(saved);
-    nx_gd32_uart_receive_irq(state);
     if (notify) {
         (void)nx_irq_wake_signal(wake);
     }
@@ -746,8 +669,8 @@ static void rotate(nx_gd32_uart_receive_state_t* state, uint32_t flags) {
 
 /** \brief DMA memory completion is independent of transmitter wire TC. */
 void nx_gd32_uart_receive_dma_irq(nx_gd32_uart_receive_state_t* state) {
-    if (state == NULL || !state->transmit.uart.initialized ||
-        state->stream == NULL || state->loans == 0U) {
+    if (state == NULL || !state->uart.initialized || state->stream == NULL ||
+        state->loans == 0U) {
         return;
     }
     GUARD_TYPE saved = GUARD_ENTER();
@@ -765,7 +688,7 @@ void nx_gd32_uart_receive_dma_irq(nx_gd32_uart_receive_state_t* state) {
     if ((flags & 0x2DU) == 0U) {
         acknowledge(state, flags);
     }
-    const nx_irq_wake_t* wake = state->transmit.uart.wake;
+    const nx_irq_wake_t* wake = state->uart.wake;
     GUARD_LEAVE(saved);
     if ((flags & 0x2DU) != 0U) {
         (void)nx_irq_wake_signal(wake);
@@ -773,6 +696,12 @@ void nx_gd32_uart_receive_dma_irq(nx_gd32_uart_receive_state_t* state) {
 }
 
 /** \brief Immutable selected table allows section GC without LTO. */
+/** \brief Selected RX-only context uses its exact compact control extent. */
+static nx_result_t rx_start(void* context, nx_stream_t* stream) {
+    return nx_gd32_uart_receive_start(context, stream,
+                                      sizeof(nx_gd32_uart_receive_state_t));
+}
+
 const nx_uart_ops_t nx_gd32_uart_receive_ops = {
     .submit = irq_submit,
     .start_admitted = irq_start_admitted,
@@ -781,35 +710,19 @@ const nx_uart_ops_t nx_gd32_uart_receive_ops = {
     .stop = irq_stop,
     .attach_wake = irq_attach_wake,
     .rx_start = rx_start,
-    .rx_stop = rx_stop,
+    .rx_stop = nx_gd32_uart_receive_stop,
 };
 
 /** \brief Pure checks match this exact immutable selected transport table. */
 nx_result_t
 nx_gd32_uart_receive_tx_validate(void* context,
                                  const nx_uart_tx_request_t* request) {
-    nx_result_t result = validate_receive(context, request);
+    nx_result_t result = nx_gd32_uart_receive_validate(context, request);
     return result == NX_SUCCESS ? nx_gd32_uart_tx_validate(context, request)
                                 : result;
 }
 
-/** \brief Immutable selected table allows section GC without LTO. */
-const nx_uart_ops_t nx_gd32_uart_duplex_ops = {
-    .submit = duplex_submit,
-    .start_admitted = duplex_start_admitted,
-    .cancel = nx_gd32_uart_dma_cancel,
-    .service = duplex_service,
-    .stop = duplex_stop,
-    .attach_wake = duplex_attach_wake,
-    .rx_start = rx_start,
-    .rx_stop = rx_stop,
-};
-
-/** \brief Pure checks match this exact immutable selected transport table. */
-nx_result_t
-nx_gd32_uart_duplex_tx_validate(void* context,
-                                const nx_uart_tx_request_t* request) {
-    nx_result_t result = validate_receive(context, request);
-    return result == NX_SUCCESS ? nx_gd32_uart_dma_tx_validate(context, request)
-                                : result;
+/** \brief Exact RX publisher withdrawal shared with the duplex owner. */
+void nx_gd32_uart_receive_vector_stop(void) {
+    RX_VECTOR_STOP();
 }

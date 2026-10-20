@@ -1,0 +1,80 @@
+
+TEST_F(H743Spi, FiniteCompletionBeforeSuspendPreservesTimeoutAndCompleteRx) {
+  ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+  g_h743_model.hold_spi_progress = true;
+  g_h743_model.spi_idle_before_suspend_status = SPI_SR_EOT | SPI_SR_TXC;
+  EXPECT_EXIT(
+      {
+        alarm(2U);
+        EXPECT_CALL(faults, Observe()).Times(0);
+        uint8_t tx = 0x35U;
+        uint8_t rx[2]{};
+        rx[0] = 0xaaU;
+        rx[1] = 0xbbU;
+        size_t count = 99U;
+        const nx_result_t result =
+            nx_spi_endpoint_transfer(&device, &tx, rx, 1U, 3U, &count);
+        const bool complete =
+            result == NX_ERROR_TIMEOUT && count == 1U &&
+            rx[0] == uint8_t(~tx) && rx[1] == 0xbbU && state.fault &&
+            state.retained && !state.active && state.held_cs == nullptr &&
+            (cs.registers->ODR & cs.mask) == cs.mask &&
+            ((g_h743_model.gpio_e.MODER >> 24U) & 3U) == 1U &&
+            registers.CR1 == 0U &&
+            g_h743_model.spi_idle_before_suspend_events == 1U &&
+            g_h743_model.spi_completed_suspensions == 0U &&
+            g_h743_model.spi_reset_assertions == 1U &&
+            g_h743_model.spi_reset_order_errors == 0U &&
+            g_h743_model.spi_selected_control_losses == 0U &&
+            !g_h743_model.spi_tail_truncated;
+        std::_Exit(complete ? 0 : 1);
+      },
+      testing::ExitedWithCode(0), "");
+}
+TEST_F(H743Spi, FiniteCompletionBeforeSuspendPermitsIdleStop) {
+  ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+  /* Existing owner encounters its finite frame still active on idle stop;
+   * the peripheral completes normally before its CSUSP write is applied. */
+  registers.CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
+  registers.CR2 = 1U;
+  registers.CFG2 = SPI_CFG2_MASTER | SPI_CFG2_SSM | SPI_CFG2_AFCNTR;
+  registers.SR = SPI_SR_TXP;
+  g_h743_model.spi_sent = 1U;
+  g_h743_model.spi_received = 1U;
+  g_h743_model.spi_idle_before_suspend_status = SPI_SR_EOT | SPI_SR_TXC;
+  EXPECT_EQ(NX_SUCCESS, nx_spi_port_stop(&face));
+  EXPECT_FALSE(state.retained);
+  EXPECT_FALSE(state.initialized);
+  EXPECT_EQ(1U, g_h743_model.spi_idle_before_suspend_events);
+  EXPECT_EQ(0U, g_h743_model.spi_completed_suspensions);
+  EXPECT_EQ(1U, g_h743_model.spi_reset_assertions);
+  EXPECT_EQ(0U, g_h743_model.spi_reset_order_errors);
+  EXPECT_FALSE(g_h743_model.spi_tail_truncated);
+}
+TEST_F(H743Spi, UnprovedIdleStatusCannotReturnOrResetTheBorrowedFrame) {
+  ASSERT_EQ(NX_SUCCESS, nx_stm32h743_spi_initialize(&state));
+  for (unsigned scenario = 0U; scenario < 3U; ++scenario) {
+    SCOPED_TRACE(scenario);
+    EXPECT_TRUE(nexus_test::ObserveTerminal([&] {
+      g_h743_model.hold_spi_progress = true;
+      g_h743_model.spi_idle_before_suspend_status =
+          scenario == 0U ? (SPI_SR_EOT | SPI_SR_TXC)
+                         : (scenario == 1U ? SPI_SR_EOT : SPI_SR_TXC);
+      g_h743_model.spi_zero_tsize_before_suspend = scenario == 0U;
+      EXPECT_CALL(faults, Observe()).WillOnce([&] {
+        nexus_test::RecordTerminalObservation(
+            nx_arch_irq_is_masked() && state.active && state.retained &&
+            state.fault && state.held_cs == &cs &&
+            (registers.CR1 & SPI_CR1_SPE) != 0U &&
+            (registers.CR1 & SPI_CR1_CSTART) == 0U &&
+            (registers.SR & SPI_SR_SUSP) == 0U &&
+            (cs.registers->ODR & cs.mask) == 0U &&
+            g_h743_model.spi_idle_before_suspend_events == 1U &&
+            g_h743_model.spi_reset_assertions == 0U);
+      });
+      uint8_t tx = 0x35U;
+      size_t count = 99U;
+      (void)nx_spi_endpoint_transfer(&device, &tx, nullptr, 1U, 3U, &count);
+    }));
+  }
+}

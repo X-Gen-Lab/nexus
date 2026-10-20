@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "/dev/shm/nexus-qualification-transport-feature-20261018-r1/actionlint_driver.py"
+  ],
+  "cwd": "/dev/shm/nexus-qualification-transport-20261018-r1",
+  "stage": "actionlint-r1",
+  "started_ns": 1792312926565795403,
+  "finished_ns": 1792312926630279791,
+  "duration_seconds": 0.06448522899881937,
+  "timeout_seconds": 180.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/actionlint-r1.attempts/1792312926565737596-fd3aa4e5b84b49719034ba2547417e67/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/actionlint-r1.attempts/1792312926565737596-fd3aa4e5b84b49719034ba2547417e67/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/actionlint-r1.attempts/1792312926565737596-fd3aa4e5b84b49719034ba2547417e67/receipt.json"
+}

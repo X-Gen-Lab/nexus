@@ -9,9 +9,11 @@ msgstr ""
 "X-Nexus-Reviewed: true\n"
 "X-Nexus-Source-SHA256: bc74e6fe204936dd37b0425ca3384dd9de8200a2e8ac2c3d62f27142c1d07a39\n"
 
+#: ../../../../docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
 msgstr "源码旁的权威合同"
 
+#: ../../../../docs/explanation/source-map.md:10
 msgid ""
 "The layer README files remain canonical beside their implementation. The "
 "following inclusions read those exact files rather than copying a second "
@@ -19,12 +21,15 @@ msgid ""
 msgstr ""
 "各层 README 与实现相邻，保持其权威合同身份。以下引用直接读取这些文件，不复制第二份合同。相对源码链接绑定到本站的源码 revision。"
 
+#: ../../../../docs/explanation/source-map.md:14
 msgid "Core"
 msgstr "Core"
 
+#: ../../../../core/README.md:2
 msgid "Core contracts"
 msgstr "Core 合同"
 
+#: ../../../../core/README.md:4
 msgid ""
 "C11 caller-owned request admission, stable control identities, completion "
 "state and monotonic absolute deadlines. No devices, OS scheduler, allocation"
@@ -33,6 +38,7 @@ msgstr ""
 "C11 调用者拥有的请求准入、稳定控制身份、完成状态和绝对单调截止时间。不包含设备、OS 调度器、分配或全局登记表。公共接口位于 "
 "`include/nexus/core`。"
 
+#: ../../../../core/README.md:8
 msgid ""
 "REJECTED retains no references. An accepted chain borrows request and "
 "buffers until acquire-observed SETTLED. SETTLED is its last request access. "
@@ -45,6 +51,7 @@ msgstr ""
 "SETTLED。SETTLED 的发布是其对请求的最后一次访问。取消／超时绝不撤销借用；排空失败后仍保持 QUARANTINED "
 "存储有效。生产者等待锁存状态，由唯一执行者推进操作。队列适配器拥有外层请求，并按需要使用显式内层提供者元数据。"
 
+#: ../../../../core/README.md:14
 msgid ""
 "`tests/contracts/core_contract_test.c` executes publication, admission, "
 "wrapping time arithmetic and terminal-state invariants. Host results do not "
@@ -53,12 +60,15 @@ msgstr ""
 "`tests/contracts/core_contract_test.c` 实际验证发布、准入、回绕时间运算和终态不变量。主机结果不能证明 MCU "
 "中断顺序或最坏执行时间。"
 
+#: ../../../../docs/explanation/source-map.md:21
 msgid "Arch"
 msgstr "Arch"
 
+#: ../../../../arch/README.md:2
 msgid "CPU-local primitives"
 msgstr "CPU 本地原语"
 
+#: ../../../../arch/README.md:4
 msgid ""
 "`Nexus::Arch` exposes saved interrupt masks, exact exception identity, "
 "current privilege, ordering barriers and an optional already-enabled DWT "
@@ -80,6 +90,7 @@ msgstr ""
 "runtime 装配为全部九核选择 Core/Arch 及可选 OS 软件，不创建 SoC、Board、startup 或 factory。详见 "
 "[CPU 合同](/design/arch-contracts.md)和 [runtime 装配示例](/delivery/cortex-m.md)。"
 
+#: ../../../../arch/README.md:16
 msgid ""
 "Save/restore tokens on the same CPU/thread in strict reverse order. Cortex-M"
 " preserves incoming PRIMASK and does not overwrite BASEPRI/FAULTMASK where "
@@ -94,6 +105,7 @@ msgstr ""
 "保持未屏蔽，且不得访问这些受保护元数据。元数据临界区必须短小：不得阻塞、分配、大量复制、调用内核或用户回调。已保存的 Arch token "
 "不是内核临界区 token，也不是 SMP 锁。"
 
+#: ../../../../arch/README.md:24
 msgid ""
 "Mask/context queries let blocking I/O reject contexts that prevent its "
 "progress. The read-only mask snapshot distinguishes PRIMASK, BASEPRI and "
@@ -118,6 +130,7 @@ msgstr ""
 "能力和特权访问；能力禁用时不产生 DWT 读取。快照不启用或复位计数器，也不是单调截止时间；回绕／频率限制见头文件。已审查能力是明确 CPU "
 "事实，绝不能通过探测任意寄存器或启用可选单元来推断。"
 
+#: ../../../../arch/README.md:38
 msgid ""
 "`sleep.h` exposes two explicit shallow-sleep operations. The masked "
 "`nx_arch_wait_for_interrupt()` requires privileged Thread mode, PRIMASK=1, "
@@ -144,6 +157,7 @@ msgstr ""
 "CPU、单安全状态的发布域，排除 NMI/HardFault、DMA、SMP 和另一安全世界发布者。Native "
 "返回不支持。编译器／模型证据不建立具体定时器、时钟连续性、物理功耗行为或唤醒延迟资格。"
 
+#: ../../../../arch/README.md:53
 msgid ""
 "`cache.h` exposes distinct data clean, invalidate, combined maintenance and "
 "instruction synchronization. Every range must own complete reviewed 32-byte "
@@ -176,6 +190,7 @@ msgstr ""
 "v8 base/limit/MAIR 编码器。单区域编程要求已屏蔽的特权 Thread 及关闭的 MPU；写入前检查实际 TYPE 边界与字段。CTRL"
 " 和进入时 RNR 保持不变。内存策略和后续 enable 属于调用者。可选 M0+ MPU 使用 CMSIS 确认的 v7 格式寄存器。"
 
+#: ../../../../arch/README.md:73
 msgid ""
 "`security.h` identifies the reviewed image state and encodes explicit SAU "
 "regions. Only a Secure compiler/profile with reviewed SAU regions can "
@@ -190,6 +205,7 @@ msgstr ""
 "网关或另一安全世界别名。NonSecure 和单域镜像在不访问 SAU MMIO "
 "的情况下返回不支持。IDAU、重叠规则、内存权限与网关策略位于这些机制之外。"
 
+#: ../../../../arch/README.md:80
 msgid ""
 "`nonsecure.h` supplies an instantaneous Secure Thread observation of a "
 "complete span using the actual CMSE NonSecure unprivileged read or "
@@ -204,6 +220,7 @@ msgstr ""
 "IDAU 已建立属性，则不需要可编程 SAU。Native、单状态和 NonSecure 镜像不跨域，直接返回不支持。成功不表示 "
 "pin、复制、鉴权、排除 MMIO，或冻结映射、DMA 和总线防火墙策略。SoC 与网关所有者必须在访问内存或执行操作之前，分别建立这些条件。"
 
+#: ../../../../arch/README.md:88
 msgid ""
 "`features.h` reports immutable reviewed cache/MPU/DWT/security/SAU "
 "capabilities, not enabled state or hardware qualification. Native exposes "
@@ -229,6 +246,7 @@ msgstr ""
 "调用者。NMI、HardFault、其他核、DMA 和另一安全世界位于互斥域之外。其他维护核使用编译器无锁 RMW；exclusive "
 "重试不建立固定周期上限。发布前初始化字，并保持其生命周期直到每个读者／写者停止。"
 
+#: ../../../../arch/README.md:103
 msgid ""
 "Native models recursive exclusion and C11 fences; it does not model real "
 "NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore "
@@ -250,24 +268,11 @@ msgstr ""
 "`core_cm0plus/7/23/33/55/85.h`、`mpu_armv7/8.h`、`cachel1_armv7.h` "
 "建立维护范围内的寄存器布局。实际 IRQ 延迟、特权转换、DMA／缓存一致性与 CPU 时序需要 HIL。"
 
+#: ../../../../docs/explanation/source-map.md:28 ../../../../io/README.md:2
 msgid "Typed I/O"
 msgstr "类型化 I/O"
 
-msgid ""
-"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-"interfaces. Each selected instance has an immutable face with two pointers: "
-"shared read-only methods and a pointer to private provider state. Generated "
-"faces live in read-only storage; their state and selected buffers are "
-"private static objects in the generated translation unit. Manually assembled"
-" providers use storage supplied by their explicit constructor owner. A "
-"32-bit target spends eight bytes of Flash per face; mutable state and exact-"
-"capacity buffers are separate. Method pointers are shared per provider and "
-"mode rather than repeated in every mutable instance."
-msgstr ""
-"GPIO、UART、SPI、I2C、Flash、watchdog、EXTI、PWM、ADC 提供 C11 "
-"接口。每个选定实例包含不可变接口面，持有两个指针：共享只读方法及私有提供者状态指针。生成接口面位于只读存储；状态及选定缓冲区是生成翻译单元中的私有静态对象。手工装配提供者使用显式构造所有者提供的存储。32"
-" 位目标的每个接口面占用八字节 Flash；可变状态和准确容量缓冲区单独计算。方法指针按提供者及模式共享，不在每个可变实例中重复。"
-
+#: ../../../../io/README.md:17
 msgid ""
 "Public operations check the face and dispatch its exact context. Different "
 "provider tables can coexist in one image without redefining public symbols. "
@@ -280,6 +285,7 @@ msgstr ""
 "`NX_ERROR_UNSUPPORTED`；非法接口面在访问提供者前拒绝。方法必须保持公共操作的执行、截止时间、缓冲区所有权和失败合同。提供者头文件、寄存器布局与"
 " SDK 类型保持私有。"
 
+#: ../../../../io/README.md:24
 msgid ""
 "Generated typed factory IDs select instances and distinguish SPI/I2C "
 "controllers from their child endpoints. Lookup returns a static identity. "
@@ -293,6 +299,7 @@ msgstr ""
 "启动、请求准入、service、恢复和停止均保持显式；查找不初始化硬件、不分配、不搜索名称、不加锁。提供者存储存在时接口面仍有效，因此停止要求调用者和 "
 "IRQ 静止，不能承诺指针已被撤销。"
 
+#: ../../../../io/README.md:31
 msgid ""
 "Stream reserve, publish, acquire, release, abort and stop access constant "
 "metadata independent of block count. Stop checks an outstanding-block count;"
@@ -306,6 +313,7 @@ msgstr ""
 "outstanding-block 计数；filling、ready、borrowed 块均保持计数，直到已证明 abort 或匹配 "
 "release。它不在中断屏蔽期间扫描块数组或撤销借用。存储重叠验证仍为冷装配操作，其工作量随块数增长。该复杂度合同不建立物理 IRQ 延迟或周期资格。"
 
+#: ../../../../io/README.md:39
 msgid ""
 "Default paths need no OS locks or hidden tasks. Requests and transfer "
 "buffers remain caller-owned; generated provider buffers are assembly-owned "
@@ -319,6 +327,7 @@ msgstr ""
 "TC、已加载字节及请求释放；只有错误的 RX 事件绝不虚构数据。SPI 与 I2C 保持有界轮询合同，控制器恢复绝不重放失败事务。Flash "
 "暴露物理几何；产品提供显式受限区域。"
 
+#: ../../../../io/README.md:46
 msgid ""
 "The Native model owns independent state per instance. Its explicit default "
 "fixtures support focused tests; generated assemblies use separate state and "
@@ -330,12 +339,15 @@ msgstr ""
 "Native 模型为每实例保留独立状态。其显式默认夹具用于聚焦测试；生成装配使用独立状态和缓冲区。Native 行为、生产寄存器故障模型及 ARM "
 "链接夹具建立软件证据。Board 事实授权已审查物理路由；仅软件夹具不建立 PCB 连通性或物理时序。"
 
+#: ../../../../docs/explanation/source-map.md:35
 msgid "OS adapters"
 msgstr "OS 适配器"
 
+#: ../../../../os/README.md:2
 msgid "Optional OS adapters"
 msgstr "可选 OS 适配器"
 
+#: ../../../../os/README.md:4
 msgid ""
 "Thin wait/wake and per-object storage contracts. Baremetal has no scheduler;"
 " Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and "
@@ -345,6 +357,7 @@ msgstr ""
 "轻量 wait/wake 与每对象存储合同。裸机没有调度器；Native 使用 POSIX 线程；FreeRTOS 使用调用者选择的显式静态 "
 "TCB、栈及队列存储。不使用通用最大对象池、隐藏执行任务、默认定时器 daemon，也不让设备依赖 OS。"
 
+#: ../../../../os/README.md:9
 msgid ""
 "Notifications are hints: arm/recheck the authoritative request predicate. "
 "Kernel ISR operations validate the selected syscall ceiling. Native task "
@@ -359,6 +372,7 @@ msgstr ""
 "包装函数发布完成并挂起，等待外部删除；ThreadX 包装函数进入内核完成路径。唯一外部生命周期所有者必须成功 join，才能回收包装状态、TCB "
 "或栈存储。只有完成提示不能证明内核引用已撤离。应用拥有调度器启动、执行任务、队列深度、公平性及停机推进。"
 
+#: ../../../../os/README.md:17
 msgid ""
 "The real FreeRTOS POSIX scheduler fixture validates host task/queue "
 "lifecycle. The default privileged runtime selects exact pinned kernel "
@@ -376,6 +390,7 @@ msgstr ""
 "端口，加入保持 PRIMASK 的勘误 837070 防护；锁定厂商文件保持不变。主机执行不建立 MCU 异常优先级、FP/MVE "
 "上下文切换、栈高水位或时序资格。"
 
+#: ../../../../os/README.md:26
 msgid ""
 "Running APIs require privileged, unmasked Thread mode. Before scheduler "
 "start, the pinned Baseline ports may retain PRIMASK=1 and Mainline ports "
@@ -392,6 +407,7 @@ msgstr ""
 "bootstrap 与运行／挂起任务。Baseline IRQ 唤醒使用 PRIMASK 内核合同；Mainline IRQ "
 "唤醒检查实现边界、优先级位宽及系统调用阈值。"
 
+#: ../../../../os/README.md:34
 msgid ""
 "Armv8-M supports explicit NTZ, Secure-only, and Nonsecure standalone build "
 "modes. The selected NTZ kernels do not allocate Secure task contexts or "
@@ -412,6 +428,7 @@ msgstr ""
 "服务。必须提供调用者自有受保护元数据及已审查用户链接区域；不暴露通用用户对象池或特权 I/O API。M0/M0+、M7 MPU 以及 MPU "
 "与分裂安全状态组合均被拒绝。选择可选隔离配置前必须查看 OS 合同及当前矩阵。"
 
+#: ../../../../os/README.md:45
 msgid ""
 "Explicit split mode instead selects the real TrustZone-aware Nonsecure ports"
 " and a separately linked Secure baremetal Runtime with "
@@ -435,6 +452,7 @@ msgstr ""
 "SOURCE/os/freertos/secure/README.md)。双镜像链接与主机租约测试不建立物理属性、上下文保持、栈峰值或对抗恶意 NS "
 "内核的隔离资格。"
 
+#: ../../../../os/README.md:57
 msgid ""
 "The first scheduler start requires cold privileged Thread/MSP state with "
 "FPCA clear; applications must not leave active FP context before bootstrap. "
@@ -452,6 +470,7 @@ msgstr ""
 " 事实；显式 Nonsecure 使用 BC/B8。生成的 `NEXUS_CPU_SECURE_ONLY` 宏选择该端口编码，不向单世界镜像授予 "
 "Secure 访问权限。"
 
+#: ../../../../os/README.md:66
 msgid ""
 "M55/M85 use their actual MVE-aware exception/context ports. The kernel's "
 "`configENABLE_FPU` switch activates the shared coprocessor register bank and"
@@ -468,6 +487,7 @@ msgstr ""
 "调用约定编译。共享上半寄存器由端口保存；完整下半寄存器与 VPR "
 "保持依赖硬件扩展异常帧，仍属于物理上下文切换验收。此构建合同不建立该行为资格，也不保证跨世界载荷保持。"
 
+#: ../../../../os/README.md:75
 msgid ""
 "The host fixture keeps the pinned kernel and POSIX port unchanged, and uses "
 "`tests/contracts/os_freertos_runtime/posix_event.c` as its owned event "
@@ -483,9 +503,11 @@ msgstr ""
 "之前取消条件变量等待中的 pthread；上游事件支持没有取消清理，可能使已退出线程的 mutex 保持锁定。自有等待在返回与取消时均解锁，避免重复任务"
 " join 死锁。该主机修正不改变 MCU 后端，也不建立 MCU 调度器资格。"
 
+#: ../../../../os/README.md:83
 msgid "Maintained execution contracts"
 msgstr "维护范围内的执行合同"
 
+#: ../../../../os/README.md:85
 msgid ""
 "See [OS contracts](/design/os-contracts.md), [delivery "
 "scope](/delivery/os.md) and the {download}`OS01-OS55 execution ledger "
@@ -498,6 +520,7 @@ msgstr ""
 "execution.csv>`。新内核准入遵守[后端接入合同](/design/os-backend-"
 "integration.md)及主动执行探针；探针通过不登记另一个已支持 RTOS。"
 
+#: ../../../../os/README.md:92
 msgid ""
 "Finite notification deadlines are checked even after a coalesced sequence "
 "hint; continuous unrelated wakes cannot extend a wait. The public predicate "
@@ -509,6 +532,7 @@ msgstr ""
 "即使序列提示已合并，仍检查有限通知截止时间；持续无关唤醒不能延长等待。超时后公共谓词获得最后一次观察机会，因此观察到真实完成仍可返回成功。队列操作保持立即尝试语义，只在阻塞时消耗绝对预算。`NX_DEADLINE_NEVER`"
 " 使用真正无超时的主机等待。"
 
+#: ../../../../os/README.md:98
 msgid ""
 "Task creation validates the selected port's startup frame and alignment "
 "before kernel mutation. Startup minimum and measured runtime stack budget "
@@ -520,6 +544,7 @@ msgstr ""
 "任务创建在修改内核之前验证选定端口的启动帧与对齐。启动最小栈和实测运行期栈预算保持区分。每个返回型任务由唯一外部生命周期所有者 "
 "join。不得在适配器背后取消或 detach Native 任务。永久任务及直接通知是显式可选路径，分别具有存储及接收者／索引合同。"
 
+#: ../../../../os/README.md:104
 msgid ""
 "Closable queues use separate caller-owned controls and per-operation waiter "
 "storage; raw queues retain their minimal native blocking implementation. "
@@ -531,6 +556,7 @@ msgstr ""
 "可关闭队列使用独立、调用者拥有的控制及每操作等待者存储；原始队列保留最小原生阻塞实现。停机必须关闭准入、保持 owner 推进、完成并排空并 join "
 "生产者、join owner、使硬件 IRQ 发布者静止，最后才能销毁通知、队列与 guard 存储。外部 UART owner 示例展示该流程。"
 
+#: ../../../../os/README.md:110
 msgid ""
 "The optional tickless path needs an explicitly bound timer port and a "
 "continuous clock; without it, normal Tick remains active. Diagnostics use "
@@ -543,12 +569,15 @@ msgstr ""
 "空操作接收端。跟踪、低功耗及任务隔离不表示物理资格。`tools/hil/os_acceptance.py` 只准备或验证保留的 OS "
 "硬件记录，不操作设备；全部尚未执行的物理用例保持 `not_executed`。"
 
+#: ../../../../docs/explanation/source-map.md:42
 msgid "Components"
 msgstr "组件"
 
+#: ../../../../components/README.md:2
 msgid "Optional common components"
 msgstr "可选通用组件"
 
+#: ../../../../components/README.md:4
 msgid ""
 "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART "
 "owner, BMP280 core and SPI transport, instance-level Log, two-bank commit-"
@@ -559,6 +588,7 @@ msgstr ""
 "显式 CMake 目标组合窄端口：有界 BusOwner、SPI/UART owner、BMP280 核心与 SPI 传输、实例级 Log、双 bank"
 " 最后提交标记 Storage、物理 Flash 区域及 Native 文件适配器、纯 Modbus RTU 解析。未被引用组件代码不进入固件镜像。"
 
+#: ../../../../components/README.md:9
 msgid ""
 "Owners have one executor, exact slot capacity, stable cancellation epochs "
 "and caller-owned operations. Initialization links unused slots before "
@@ -579,6 +609,7 @@ msgstr ""
 "head 索引，不增加逐槽存储。达到最后 epoch 的槽永久退役，不使用重复身份重新绑定。UART 显式内层提供者请求使 owner "
 "仅在自身最后一次访问之后释放外层请求。设备及协议不选择 Board 引脚、产品寄存器、默认执行任务或全局查找。产品供给传输、授权、区域、任务策略及预算。"
 
+#: ../../../../components/README.md:21
 msgid ""
 "Meaningful regressions in `tests/contracts` cover concurrent producers, late"
 " cancel/TC, failure quarantine, interrupted persistence and protocol "
@@ -588,9 +619,11 @@ msgstr ""
 "`tests/contracts` 中的有效回归覆盖并发生产者、延后取消／TC、失败隔离保留、持久化中断及协议畸形输入。持久主机文件不建立物理 "
 "Flash 断电资格。"
 
+#: ../../../../docs/explanation/source-map.md:49
 msgid "Exact SoC implementations"
 msgstr "准确 SoC 实现"
 
+#: ../../../../docs/explanation/source-map.md:51
 msgid ""
 "The private implementation boundaries and reference configurations are "
 "maintained in [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
@@ -620,3 +653,40 @@ msgstr ""
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md) 和 "
 "[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/soc/stm32u575/README.md) 维护。这些链接绑定当前站点源码版本。"
+
+#: ../../../../io/README.md:4
+msgid ""
+"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
+"interfaces. The optional [GPIO pin-state contract](/explanation/gpio-pin-"
+"states.md) adds an explicit selected face for authored DEFAULT/SLEEP images."
+" Its generated instance ID and runtime selection enum remain separate; "
+"lookup never acquires pad ownership or starts a power transition. Each "
+"selected instance has an immutable face with two pointers: shared read-only "
+"methods and a pointer to private provider state. Generated faces live in "
+"read-only storage; their state and selected buffers are private static "
+"objects in the generated translation unit. Manually assembled providers use "
+"storage supplied by their explicit constructor owner. A 32-bit target spends"
+" eight bytes of Flash per face; mutable state and exact-capacity buffers are"
+" separate. Method pointers are shared per provider and mode rather than "
+"repeated in every mutable instance."
+msgstr ""
+"GPIO、UART、SPI、I2C、Flash、watchdog、EXTI、PWM、ADC 提供 C11 接口。可选的 [GPIO "
+"引脚状态合同](/explanation/gpio-pin-states.md) 为显式编写的 DEFAULT/SLEEP 图像增加选定接口面。生成实例"
+" ID 与运行时选择枚举保持分离；查找既不取得 pad "
+"所有权，也不启动电源转换。每个选定实例包含不可变接口面，持有两个指针：共享只读方法及私有提供者状态指针。生成接口面位于只读存储；状态及选定缓冲区是生成翻译单元中的私有静态对象。手工装配提供者使用显式构造所有者提供的存储。32"
+" 位目标的每个接口面占用八字节 Flash；可变状态和准确容量缓冲区单独计算。方法指针按提供者及模式共享，不在每个可变实例中重复。"
+
+#~ msgid ""
+#~ "GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
+#~ "interfaces. Each selected instance has an immutable face with two pointers: "
+#~ "shared read-only methods and a pointer to private provider state. Generated "
+#~ "faces live in read-only storage; their state and selected buffers are "
+#~ "private static objects in the generated translation unit. Manually assembled"
+#~ " providers use storage supplied by their explicit constructor owner. A "
+#~ "32-bit target spends eight bytes of Flash per face; mutable state and exact-"
+#~ "capacity buffers are separate. Method pointers are shared per provider and "
+#~ "mode rather than repeated in every mutable instance."
+#~ msgstr ""
+#~ "GPIO、UART、SPI、I2C、Flash、watchdog、EXTI、PWM、ADC 提供 C11 "
+#~ "接口。每个选定实例包含不可变接口面，持有两个指针：共享只读方法及私有提供者状态指针。生成接口面位于只读存储；状态及选定缓冲区是生成翻译单元中的私有静态对象。手工装配提供者使用显式构造所有者提供的存储。32"
+#~ " 位目标的每个接口面占用八字节 Flash；可变状态和准确容量缓冲区单独计算。方法指针按提供者及模式共享，不在每个可变实例中重复。"

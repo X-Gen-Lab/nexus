@@ -1,0 +1,20 @@
+{
+  "production_red": {
+    "stage": "whole-usb-red-r1",
+    "tests": 47,
+    "failures": 3,
+    "skipped": 0,
+    "baseline_core_sha256": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3",
+    "failed_cases": [
+      "ResetKeepsAdmissionClosedUntilAddressZeroIsObserved",
+      "ResetClearsSelectedBulkHaltOnlyAfterHardwareReadback",
+      "SetupKeepsControlAdmissionBlockedUntilBothStallsAreClear"
+    ]
+  },
+  "fixture_fact": "RefusedAddressAndStallClearsPreserveSelectedHardwareBits passed; external MMIO dropped writes, not production RED.",
+  "nonbehavioral_failures": {
+    "configure-red-r1": "cmake absent from PATH; reused already installed pinned tool path without installation",
+    "build-red-r1": "Two new uint8_t range initializer narrowing warnings fixed in new tests only; not production RED."
+  },
+  "qualification": false
+}

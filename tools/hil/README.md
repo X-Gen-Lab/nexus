@@ -146,7 +146,7 @@ records test tooling and never establish qualification for the three boards.
 
 ## Reviewed acquisition adapters
 
-`workloads.py plan` supplies twenty-one explicit acquisition protocols for station
+`workloads.py plan` supplies twenty-five explicit acquisition protocols for station
 binding; clock/reset/GPIO/watchdog; UART/SPI/DMA; I2C; ADC/PWM/EXTI; Flash power
 loss; concurrent load; M4F context; time/deadlines; all task/MSP peaks; lifecycle
 endurance; tickless timer-port wake; and fail-stop/external safe outputs. Separate
@@ -158,6 +158,19 @@ selecting a UART alone does not install RTS/CTS, DE wiring or a transceiver.
 station. Budgets, instrument identities, wiring and safety steps must come from
 the actual station owner. Missing selected controllers/modes stay
 `requires_selection`; unsupported CPU/backend cases stay `unsupported`.
+
+The four typed I/O protocols select exact resolved faces: `uart_word_wire`
+requires an IRQ 9N1 word port and a native nine-bit peer that preserves bit 8;
+`spi_dma_whole_cs_segments` requires a same-controller enhanced DMA endpoint;
+`i2c_v2_long_timing` requires a selected long endpoint and the authored
+G474/H743/U575 analog-filter-on, digital-filter-zero timing projection;
+`pwm_group_comp_break` requires the generated exclusive TIM1/COMP1 route.
+Generic SPI, I2C or advanced PWM selection cannot substitute for these faces.
+Each protocol retains waveform, drain and instrument obligations with null
+limits until reviewed. They remain `not_executed`. A word-only assembly cannot
+use the eight-bit smoke adapter: supply a separately selected and reviewed 8N1
+control console before full workload or station admission. The offline mode
+selector alone establishes neither that console nor physical readiness.
 
 ```sh
 python tools/hil/workloads.py plan \
@@ -250,6 +263,12 @@ audit paths; they do not operate the three boards or establish physical support.
 The first-party `serial_echo.py` adapter opens only the admitted stable
 `/dev/serial/by-id/...` identity. It verifies the character device across open,
 uses `TIOCEXCL`, restores original terminal settings, and configures 115200 8N1.
+Admission requires that exact byte frame without flow control; omitted legacy
+frame metadata retains the defined 8N1 default. A word face, 7E2 or another
+explicit frame is rejected before equipment access. Testing 9N1 requires a
+reviewed nine-bit peer and waveform capture, with any eight-bit diagnostic
+console kept separate from the tested wire. A USB 8N1 echo cannot qualify
+nine-bit data or framing.
 After a bounded quiet drain it sends a random public 32-byte challenge and
 retains exact TX/RX/drain bytes plus host monotonic event timestamps. Partial
 writes/reads share one finite capture deadline. Wrong/incomplete echo, excessive

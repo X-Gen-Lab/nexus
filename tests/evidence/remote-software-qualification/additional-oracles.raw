@@ -1,0 +1,94 @@
+    def command_port(self, root, parent):
+        port = root / '.venv/bin/python'
+        port.parent.mkdir(parents=True)
+        port.write_text('#!' + sys.executable + '\n' +
+                        'import json,os,sys\n' +
+                        'with open(os.environ["PORT_LOG"], "a") as f:\n' +
+                        ' f.write(json.dumps(sys.argv[1:])+"\\n")\n' +
+                        'if sys.argv[1]==os.environ.get("FAIL_PORT"):\n' +
+                        ' print("external port failed",file=sys.stderr);sys.exit(37)\n')
+        port.chmod(0o700)
+        return dict(PORT_LOG=str(parent / 'ports.jsonl'),
+                    Q=str(root / 'build/software-qualification'))
+
+    def test_sdk_external_failure_keeps_exit_raw_and_stops_later_commands(self):
+        self.document()
+        for failed in ('tools/dev/dependencies.py', 'cmake/package/verify_consumers.py'):
+            with self.subTest(failed=failed), tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                env = self.environment(root, parent)
+                env.update(self.command_port(root, parent), FAIL_PORT=failed)
+                Path(env['Q']).mkdir(parents=True)
+                result = self.execute('sdk', root, env)
+                self.assertEqual(result.returncode, 37)
+                calls = [json.loads(line) for line in (parent / 'ports.jsonl').read_text().splitlines()]
+                self.assertEqual(calls[-1][0], failed)
+                self.assertFalse(any('transport.py' in call[0] for call in calls))
+                self.assertIn('external port failed', (Path(env['Q']) / 'sdk.raw').read_text())
+                self.assertFalse(list(root.rglob('identity.json')))
+
+    def test_image_ports_and_invalid_iid_keep_real_validator_fail_closed(self):
+        self.document()
+        for outcome in ('docker-failure', 'bad-id', 'valid-model-id'):
+            with self.subTest(outcome=outcome), tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                env = self.environment(root, parent)
+                env.update(self.command_port(root, parent))
+                Path(env['Q']).mkdir(parents=True)
+                requirements = root / 'dependencies/python-tools-linux-cp312.txt'
+                requirements.parent.mkdir()
+                requirements.write_text('model context only\n')
+                binary = parent / 'ports'
+                binary.mkdir()
+                docker = binary / 'docker'
+                docker.write_text('#!' + sys.executable + '\n' +
+                    'import os,sys\nfrom pathlib import Path\n' +
+                    'if os.environ["IMAGE_PORT_OUTCOME"]=="docker-failure":\n' +
+                    ' print("model Docker failed",file=sys.stderr);sys.exit(41)\n' +
+                    'p=Path(sys.argv[sys.argv.index("--iidfile")+1])\n' +
+                    'p.write_text("bad\\n" if os.environ["IMAGE_PORT_OUTCOME"]=="bad-id" else "sha256:"+"1"*64+"\\n")\n')
+                docker.chmod(0o700)
+                env.update(PATH=str(binary) + os.pathsep + env['PATH'],
+                           IMAGE_PORT_OUTCOME=outcome)
+                result = self.execute('image', root, env)
+                calls = [json.loads(line) for line in (parent / 'ports.jsonl').read_text().splitlines()]
+                sealed = any(call[:2] == ['tools/evidence/container.py', 'seal'] for call in calls)
+                if outcome == 'valid-model-id':
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertTrue(sealed)
+                    self.assertEqual([call[1] for call in calls
+                                      if call[0] == 'tools/evidence/container.py'],
+                                     ['seal', 'verify', 'load'])
+                else:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertFalse(sealed)
+                    if outcome == 'docker-failure':
+                        self.assertEqual(result.returncode, 41)
+                context = parent / 'nexus-oci-context'
+                self.assertEqual([str(p.relative_to(context)) for p in context.rglob('*')
+                                  if p.is_file()], ['dependencies/python-tools-linux-cp312.txt'])
+                self.assertFalse(list(root.rglob('identity.json')))
+
+    def test_failed_validated_checkout_uses_actual_failed_job_identity(self):
+        self.document()
+        from tools.maintenance.job_identity import capture
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            evidence = root / 'build/software-qualification'
+            evidence.mkdir(parents=True)
+            (evidence / 'failure.raw').write_text('actual fixture failure bytes\n')
+            record = capture(root=root, job='qualification-fixture', result='failure',
+                             expected_commit=env['NEXUS_EXPECTED_COMMIT'],
+                             artifacts=[evidence], tools={'python': sys.executable},
+                             output=root / 'build/identity')
+            self.assertEqual(record['kind'], 'ci_job_identity')
+            self.assertEqual(record['job_result'], 'failure')
+            self.assertEqual(record['source']['commit'], env['NEXUS_EXPECTED_COMMIT'])
+            self.assertEqual(record['qualification'], 'not_a_software_candidate')
+            self.assertEqual(record['artifacts'][0]['relative_path'],
+                             'build/software-qualification/failure.raw')
+

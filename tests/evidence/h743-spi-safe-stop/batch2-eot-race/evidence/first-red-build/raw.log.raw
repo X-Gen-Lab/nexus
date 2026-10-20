@@ -1,0 +1,22 @@
++ /tmp/nexus-io-validation-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_h743_peripheral_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Found Python3: /tmp/nexus-io-validation-20261018/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /tmp/nexus-io-validation-20261018/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /tmp/nexus-h743-spi-safe-stop-20261018/build/native-debug/generated/resolved.json
+-- Configuring done (20.6s)
+-- Generating done (0.3s)
+-- Build files have been written to: /tmp/nexus-h743-spi-safe-stop-20261018/build/native-debug
+[0/4] Re-checking globbed directories...
+[1/12] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/h743_peripheral_test.cpp.o
+[2/12] Building CXX object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/h743_model.cpp.o
+[3/12] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/system.c.o
+[4/12] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/gpio.c.o
+[5/12] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/pwm.c.o
+[6/12] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/exti.c.o
+[7/12] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/watchdog.c.o
+[8/12] Building C object tests/contracts/google/CMakeFiles/nexus_h743_peripheral_test.dir/__/__/soc/stm32h743/drivers/spi.c.o
+[9/12] Linking CXX executable bin/nexus_h743_peripheral_test

@@ -1,0 +1,267 @@
+{
+  "kind": "frozen_source_for_independent_read_only_review_not_execution_qualification",
+  "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+  "index_sha256": "9633596fbfac4c65093930be645f055e91327fd6fe07908ae8e50d7b29f29046",
+  "authorized_source_paths": 33,
+  "actual_file_count": 30,
+  "deletions": 3,
+  "sources": [
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma.toml",
+      "operation": "delete",
+      "state": "absent"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "operation": "delete",
+      "state": "absent"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "operation": "delete",
+      "state": "absent"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma.toml",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/assemblies/h743-spi-dma.toml",
+      "bytes": 491,
+      "mode": 384,
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "bytes": 653,
+      "mode": 384,
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "bytes": 646,
+      "mode": 384,
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6"
+    },
+    {
+      "path": "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+      "bytes": 3790,
+      "mode": 384,
+      "sha256": "b29f077131d982231651312590ef284ac08f830204163fc54acbd05088298677"
+    },
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/scripts/ci/provider_assemblies.py",
+      "bytes": 21639,
+      "mode": 384,
+      "sha256": "b0e81591848a37fc04e71e80c9823113a40192561305fc543f57e176751f039d"
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/scripts/ci/test_provider_assemblies.py",
+      "bytes": 24377,
+      "mode": 384,
+      "sha256": "1fda7ef85e0ca971775a31e68627848ea9c820a78ed1295299090f596875512c"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/CMakeLists.txt",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tests/contracts/h743_assembly/CMakeLists.txt",
+      "bytes": 2356,
+      "mode": 384,
+      "sha256": "5855fa1ef59bab32bea058270f3cf8125bfd6ce4b6d45ef1ae018cd1d87da089"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/providers/stm32h743/test_spi_dma.py",
+      "bytes": 10441,
+      "mode": 384,
+      "sha256": "23ab8551db93ed9f9abbe7c3237288df27d2172c9422ed9e113814288e13517b"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory.cmake",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tests/google/h743_spi_dma_factory.cmake",
+      "bytes": 2819,
+      "mode": 384,
+      "sha256": "0b25363754762494540c0909f31d90f402d307ac2dce1a3d62bdafe712e614b8"
+    },
+    {
+      "path": "tools/configure/test_selected_contract_authority.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/test_selected_contract_authority.py",
+      "bytes": 16528,
+      "mode": 384,
+      "sha256": "7414c6b41b359db93950d5b3c4a0da0c7f402a3399a2d92a7d907205e5795996"
+    },
+    {
+      "path": "cmake/package/verify_consumers.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/cmake/package/verify_consumers.py",
+      "bytes": 30692,
+      "mode": 384,
+      "sha256": "85e3d40faeb41390fbdd7a95ba9cd2b5992ed69502dab5e7c9cecff3858070f8"
+    },
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/cmake/package/package_source_sdk.py",
+      "bytes": 50720,
+      "mode": 384,
+      "sha256": "83eb8409230869dd1c2adc045a16f2456c8358919697680b33779eb743bc74fe"
+    },
+    {
+      "path": "tools/configure/providers/descriptor.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/configure/providers/descriptor.py",
+      "bytes": 14976,
+      "mode": 384,
+      "sha256": "7cbdc5fa99324212c0035fa811c7ca4a99c0ba03d3e256ad0cae75b80097eedb"
+    },
+    {
+      "path": "tools/release/transport.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/release/transport.py",
+      "bytes": 23414,
+      "mode": 384,
+      "sha256": "1e7c2fb763895046dbaebe60fd4fcf7047508e5156b21dc223c63a3324f7e0ec"
+    },
+    {
+      "path": "tests/contracts/test_device_sdk_payload.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tests/contracts/test_device_sdk_payload.py",
+      "bytes": 24646,
+      "mode": 384,
+      "sha256": "ac5e3ca3d8d85bb891244a7f65f0a3618db441463a8fa17b6d73dc4da2b06498"
+    },
+    {
+      "path": "tools/testing/test_sdk_verification_call.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/testing/test_sdk_verification_call.py",
+      "bytes": 44471,
+      "mode": 384,
+      "sha256": "9410229a460138e502b10d2798528fadbd31aa5a1b7d00a6abc2f904052f3e33"
+    },
+    {
+      "path": ".github/workflows/test_release.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/.github/workflows/test_release.py",
+      "bytes": 71120,
+      "mode": 384,
+      "sha256": "a53120a076aee2ec87ee615a6de5890478ea0f0574f3cf40daa627b87292cbcb"
+    },
+    {
+      "path": "tools/dev/plans/software.json",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/dev/plans/software.json",
+      "bytes": 52192,
+      "mode": 384,
+      "sha256": "37ca63d9b233cc62da16699275394b848c5c7528ea5a9b2606434c7e79aa0f9f"
+    },
+    {
+      "path": "tools/testing/test_qualification_plan.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/testing/test_qualification_plan.py",
+      "bytes": 9911,
+      "mode": 384,
+      "sha256": "d8d1baa45a0aa3a04d1f17a91db353c67024e564e48c0833654560c7e44a402e"
+    },
+    {
+      "path": "tools/testing/test_work_packages.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/tools/testing/test_work_packages.py",
+      "bytes": 23013,
+      "mode": 384,
+      "sha256": "b856eaa730efadcfe7ec0b92bc480263bf6d186085eefc2848dd35b1b13efff8"
+    },
+    {
+      "path": ".github/workflows/build-matrix.yml",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/.github/workflows/build-matrix.yml",
+      "bytes": 18623,
+      "mode": 384,
+      "sha256": "10e52ea538c9c30822d5e0cbfc928f093d97bc2fe78da8c70d163d2136616d04"
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/review-source-r1/.github/workflows/test_platform_ci.py",
+      "bytes": 70701,
+      "mode": 384,
+      "sha256": "45ed33110b8cc8b3d952b5ad859d6e68faa7e63a7f2ddf0972d2ced016c16930"
+    },
+    {
+      "path": "docs/design/provider-assemblies.md",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/design/provider-assemblies.md",
+      "bytes": 5646,
+      "mode": 384,
+      "sha256": "1bbfb23bf0714762926565a85b492ce1cf8846cf203e31ec420de01b7585aafa"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/approved/docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "bytes": 13381,
+      "mode": 384,
+      "sha256": "05ddbc7acbdf19dea8d6f76be24de20fafa89dc21eea7b94786414a92eaf2b35"
+    },
+    {
+      "path": "docs/delivery/capabilities.md",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/delivery/capabilities.md",
+      "bytes": 59203,
+      "mode": 384,
+      "sha256": "e19b3aadefcf745f753099205d52c1a424eed71f6c8d6ff12f7dee42083a0264"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/approved/docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 121940,
+      "mode": 384,
+      "sha256": "045618f04b580e4d5e095a6be8b4c8ee121afd15842bb9505f6cc93b3badbe56"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/approved/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 121668,
+      "mode": 384,
+      "sha256": "0bad0a10366e797c06a45e1d64a11f8de4a4f87a696addb5ebe4fe09a109b525"
+    },
+    {
+      "path": "tools/release/README.md",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/tools/release/README.md",
+      "bytes": 7002,
+      "mode": 384,
+      "sha256": "a92860b63e1476820c2d6480c4c23e94eb86370cfa20780c880558296dca5752"
+    },
+    {
+      "path": "soc/stm32h743/README.md",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/soc/stm32h743/README.md",
+      "bytes": 36026,
+      "mode": 384,
+      "sha256": "4bce41176f2c7419ba7d280f985b250203b386d0b6783c315cc0ecea358cfc89"
+    },
+    {
+      "path": "docs/design/io-evolution-execution.csv",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/files/docs/design/io-evolution-execution.csv",
+      "bytes": 11042,
+      "mode": 384,
+      "sha256": "c99c5f99a48b429cd8b2da36cab1271d977cff7d5cd37ceef0deefd3805b874f"
+    }
+  ],
+  "source_writers_frozen": true,
+  "remaining": "Final Python whole modules running; Native/ARM focused execution not yet done; full cleanSDK34/37 not authorized or executed."
+}

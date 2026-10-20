@@ -1,0 +1,21 @@
+{
+  "source_operation_count": 2,
+  "sources": [
+    {
+      "target": "tools/configure/assemblies/catalogue.json",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/files/tools/configure/assemblies/catalogue.json",
+      "bytes": 1870,
+      "sha256": "151de3f45a55bd2b27878349b15e193df0d72115acbab23b43aed62801295dcf",
+      "mode": 384
+    },
+    {
+      "target": "tools/configure/test_matrix.py",
+      "operation": "write",
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/files/tools/configure/test_matrix.py",
+      "bytes": 7332,
+      "sha256": "cb17f06f36356cc842811d451fcee46078c75ff50474c2efc017f7d9c0b2e854",
+      "mode": 384
+    }
+  ]
+}

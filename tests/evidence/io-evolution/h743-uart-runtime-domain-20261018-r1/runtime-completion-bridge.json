@@ -1,0 +1,36 @@
+{
+  "classification": "Append-only completion of 39 omitted original runtime leaves. No reexecution/source/index/oldarchive changes.",
+  "base_r1_handoff": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/completed-handoff-r1.json",
+    "sha256": "37ed79723d02646309ededf548fec1c2554d02b21dc9f4a4e73f27b3af782ef8"
+  },
+  "base_r2_handoff": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/completed-handoff-r2.json",
+    "sha256": "2913f73cfa978e5fa733e9f7007981016e02f6b8f42bc34c18170c6537973581"
+  },
+  "supplement_manifest": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/runtime-receipts-supplement-r1/manifest.json",
+    "sha256": "fd89aa3ddf6fba7565c08719766cc624dd1a75f33fe6664992ffc366c164b50b",
+    "leaves": 39,
+    "actual_runs": 13
+  },
+  "supplement_archive": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/runtime-receipts-supplement-r1/original-runtime-receipts.zip",
+    "sha256": "301b10f83d47ac47989bf6f0eae06fc33534863cf3af3ca5895cb686c1f98f31",
+    "bytes": 37846,
+    "members": 40,
+    "full_member_SHA_CRC_readback": true
+  },
+  "source_freeze_sha256": "d2565120f5cb2d470f1fccfff5cefb46c66f81dd43f64ba0ffc9278bbf1ebe4e",
+  "index_sha256": "56f0b6f8ef5eb2045c54ed54060080162028558cf104bbe3d77c5218b0a3152d",
+  "existing_final_actual_totals": {
+    "Debug": 276,
+    "ASAN": 144,
+    "programs": 9,
+    "case_executions": 420,
+    "failures": 0
+  },
+  "feature_allocated_before_bridge": 3952640,
+  "forecast_feature_allocated_with_bridge": 3960832,
+  "build_allocated_unchanged": 227602432
+}

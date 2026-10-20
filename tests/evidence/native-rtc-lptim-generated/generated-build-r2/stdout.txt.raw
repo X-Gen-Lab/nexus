@@ -1,0 +1,23 @@
++ /tmp/nexus-io36-native-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_rtc_lptim_pair_generated_test nexus_rtc_lptim_empty_generated_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Found Python3: /tmp/nexus-io36-native-20261018/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /tmp/nexus-io36-native-20261018/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /tmp/nexus-io36-native-20261018/build/native-debug/generated/resolved.json
+-- Configuring done (21.5s)
+-- Generating done (0.4s)
+-- Build files have been written to: /tmp/nexus-io36-native-20261018/build/native-debug
+[0/4] Re-checking globbed directories...
+[1/11] Building CXX object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/rtc_lptim_generated_test.cpp.o
+[2/11] Building C object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-pair.c.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-pair.c.o 
+/usr/bin/cc -Dmain=nx_native_time_consumer -I/tmp/nexus-io36-native-20261018/build/native-debug/tests/contracts/google/native-time-pair -I/tmp/nexus-io36-native-20261018/io/native -I/tmp/nexus-io36-native-20261018/build/native-debug/generated -I/tmp/nexus-io36-native-20261018/io/include -I/tmp/nexus-io36-native-20261018/core/include -I/tmp/nexus-io36-native-20261018/arch/include -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /tmp/nexus-io36-native-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c11 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -Wstrict-prototypes -Wmissing-prototypes -MD -MT tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-pair.c.o -MF tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-pair.c.o.d -o tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-pair.c.o -c /tmp/nexus-io36-native-20261018/cmake/package/verification/io_evolution/consumers/native-time-pair.c
+<command-line>: error: no previous prototype for ‘nx_native_time_consumer’ [-Werror=missing-prototypes]
+/tmp/nexus-io36-native-20261018/cmake/package/verification/io_evolution/consumers/native-time-pair.c:83:5: note: in expansion of macro ‘main’
+   83 | int main(void) {
+      |     ^~~~
+cc1: all warnings being treated as errors
+ninja: build stopped: subcommand failed.

@@ -1,0 +1,21 @@
+schema = 2
+board_package = "../../../boards/stm32u575zi_lptim_reference"
+backend = "baremetal"
+clock = "msis4"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 8192
+flash_load_limit_bytes = 32768
+
+[lptim.counter]
+binding = "lptim2"
+mode = "irq-counter16-oneshot"
+tick_hz = 1000000
+[lptim.counter.irq]
+priority = 5
+calls_os = false

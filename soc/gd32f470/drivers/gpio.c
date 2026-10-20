@@ -51,7 +51,19 @@ nx_result_t nx_gd32_gpio_write(void* context, uint32_t set, uint32_t reset) {
 /** \brief           Return one authorized input-register snapshot. */
 nx_result_t nx_gd32_gpio_read(const void* context, uint32_t* value) {
     const nx_gd32_gpio_state_t* port = context;
-    if (!port || !value || !port->mask) {
+    if (!port || !value || !port->mask || port->registers == 0U) {
+        return NX_ERROR_INVALID;
+    }
+    /* The SDK bank includes BC at 0x28 and TG at 0x2c.
+     * Reject output aliases before any input observation or output store. */
+    const uintptr_t output = (uintptr_t)value;
+    const uintptr_t state = (uintptr_t)port;
+    const uintptr_t bank = (uintptr_t)port->registers;
+    if (output % _Alignof(uint32_t) != 0U ||
+        output > UINTPTR_MAX - sizeof(*value) ||
+        state > UINTPTR_MAX - sizeof(*port) || bank > UINTPTR_MAX - 0x30U ||
+        (output < state + sizeof(*port) && state < output + sizeof(*value)) ||
+        (output < bank + 0x30U && bank < output + sizeof(*value))) {
         return NX_ERROR_INVALID;
     }
     *value = GPIO_ISTAT(port->registers) & port->mask;

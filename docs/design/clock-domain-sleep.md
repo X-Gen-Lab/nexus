@@ -49,3 +49,48 @@ Google 测试使用真实生产 domain、真实 Native 排他、两家真实 SDK
 non-head token 真实失败回归、GREEN、ASan/UBSan、strict ARM 和身份见
 `tools/testing/evidence/clock-domain-iteration/manifest.json`。这不是 clean release、
 整机零 RAM/双离线重建或 physical HIL/WCET/功耗资格；这些由后续平台集成/工位证据建立。
+
+## H743 SPI4 的运行期暂停与恢复
+
+通用静态装配与运行期访问关系见[运行时访问补充图](../assets/diagrams/platform-runtime.svg)。
+
+IO-30 的当前纵切是 H743 V 修订 `0x2003`、默认 HSI trim64、固定 HSI64 MHz、
+Cache off、baremetal 的单个 SPI4 finite-DMA 控制器。维护装配
+`tools/configure/assemblies/h743-spi-dma-runtime-clock.toml` 显式选择：
+
+<!-- nexus-toml-fragment: omitted board/backend/controller sections; only the power selection is shown -->
+```toml
+[power]
+mode = "fixed-run"
+controllers = ["bus4"]
+```
+
+解析器拒绝其他 controller、endpoint 别名、空或重复列表、未知字段、其他 clock/cache
+配置及 OS。该选择只生成一个私有 domain 和一个生命周期 lease；不选 `[power]` 的
+装配没有这组状态和运行期接口。现有 ClockDomain 组件仍为唯一借用机制，不新增驱动
+ops、公开 provider storage、后台任务或逐请求转发层。
+
+生成的 `nx_platform_runtime_domain()` 只返回静态身份，不初始化硬件。Platform 启动
+在第一个外设资源写入前获取 lease。即使请求已 acquire-observed SETTLED，初始化的
+provider、IRQ、DMA、CS、引脚和外围 gate 仍承担责任，因此该 lease 继续保留。
+`nx_platform_runtime_pause()` 关闭接纳并复用真实 stop 路径；active 请求返回 BUSY，
+调用者必须继续真实 cancel/service 和重试。DMA EN、地址与 mux、owned IRQ、线上完成、
+CS/SCK、引脚快照以及自有 gate 的撤回全部证明后，才能 release 并通过 quiescent。
+地址、CS、引脚或 gate 拒绝恢复时保持 lease 和清理责任，不以清零内存假装停止。
+
+唯一生命周期 owner 必须先 join submitters、controls 和 observers，再在 privileged、
+unmasked Thread 串行调用 pause/resume。close 不会自动阻止已初始化 endpoint 的提交，
+因此这不是并发的全局 suspend。`nx_platform_runtime_resume()` 只有在排空后提升 admission
+epoch，再重新获取 lease 和恢复原控制器；部分失败分别返回 primary、cleanup 和
+remaining-effects，原责任只能由实际 pause 或全局 stop 完成。旧 barrier 不能批准新 epoch。
+
+pause/resume 保持 System 与 TIM2 的 CEN、分频及 overflow owner，不切换 Core deadline
+时域。暂停期间到期的原绝对 deadline 在恢复后仍然到期。全局 `nx_platform_stop()` 仍是
+另一条全消费者停止路径，不能拿它替代运行期暂停或继承其重启前的 deadline。本切片没有
+改变 PLL、供电、Flash latency、内核 Tick，也没有实现 WFI、deep STOP、DVFS、GPIO
+sleep/wake 电气策略或其他板卡的时钟能力。
+
+新增 Google 程序连接正常生成的同一装配、真实 H743 System/SPI/GPIO/DMA/ClockDomain
+和外部 MMIO/IRQ 模型。它检查跨 SETTLED 的 lease、pending RX commit、失败重试、实际
+门控与引脚撤回，以及暂停期间 TIM2 的 pending wrap。软件模型执行和后续 Debug/ASan
+结果不构成 MCU、功耗、WCET、clean SDK 或物理 HIL 资格；IO-30 的完整退出条件仍待验收。

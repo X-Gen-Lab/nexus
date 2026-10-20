@@ -1,0 +1,88 @@
+Running main() from gmock_main.cc
+[==========] Running 38 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 16 tests from H743Clock
+[ RUN      ] H743Clock.ReviewedRevisionVUsesItsFactoryTrimWithoutWrites
+[       OK ] H743Clock.ReviewedRevisionVUsesItsFactoryTrimWithoutWrites (0 ms)
+[ RUN      ] H743Clock.AmbiguousYwAndUnreviewedXCannotAcquireTheHighClockOwner
+[       OK ] H743Clock.AmbiguousYwAndUnreviewedXCannotAcquireTheHighClockOwner (0 ms)
+[ RUN      ] H743Clock.UnknownRevisionOrDeviceGroupCannotUseARevisionThreshold
+[       OK ] H743Clock.UnknownRevisionOrDeviceGroupCannotUseARevisionThreshold (0 ms)
+[ RUN      ] H743Clock.ForeignUserTrimIsRejectedInsteadOfSilentlyRecalibrated
+[       OK ] H743Clock.ForeignUserTrimIsRejectedInsteadOfSilentlyRecalibrated (0 ms)
+[ RUN      ] H743Clock.ReadOnlyFactoryCalibrationIsPreservedOutsideUserTrim
+[       OK ] H743Clock.ReadOnlyFactoryCalibrationIsPreservedOutsideUserTrim (0 ms)
+[ RUN      ] H743Clock.ForeignClockAndDividerCannotBeAdopted
+[       OK ] H743Clock.ForeignClockAndDividerCannotBeAdopted (0 ms)
+[ RUN      ] H743Clock.RequestedAndActualVoltageMustBothBeReadyVos3
+[       OK ] H743Clock.RequestedAndActualVoltageMustBothBeReadyVos3 (0 ms)
+[ RUN      ] H743Clock.SharedFlashTimingMustStillHaveItsColdResetOwner
+[       OK ] H743Clock.SharedFlashTimingMustStillHaveItsColdResetOwner (0 ms)
+[ RUN      ] H743Clock.BothFlashBanksMustHaveNoQueuedOrActivePhysicalPulse
+[       OK ] H743Clock.BothFlashBanksMustHaveNoQueuedOrActivePhysicalPulse (0 ms)
+[ RUN      ] H743Clock.ArmedPulseControlsRejectEvenWithIdleStatus
+[       OK ] H743Clock.ArmedPulseControlsRejectEvenWithIdleStatus (0 ms)
+[ RUN      ] H743Clock.SysTickCounterOrPendingPublicationRefutesTheColdContract
+[       OK ] H743Clock.SysTickCounterOrPendingPublicationRefutesTheColdContract (0 ms)
+[ RUN      ] H743Clock.DiagnosticNeverConsumesAnUnownedSysTickCountFlag
+[       OK ] H743Clock.DiagnosticNeverConsumesAnUnownedSysTickCountFlag (0 ms)
+[ RUN      ] H743Clock.ExistingPeripheralClocksRejectBeforeAnyClockWrite
+[       OK ] H743Clock.ExistingPeripheralClocksRejectBeforeAnyClockWrite (0 ms)
+[ RUN      ] H743Clock.ForeignPllConfigurationAndFractionCannotBeAdopted
+[       OK ] H743Clock.ForeignPllConfigurationAndFractionCannotBeAdopted (0 ms)
+[ RUN      ] H743Clock.ExistingSystemOrCacheOwnerRejectsWithoutAdoption
+[       OK ] H743Clock.ExistingSystemOrCacheOwnerRejectsWithoutAdoption (0 ms)
+[ RUN      ] H743Clock.InvalidContextAndStateNeverAccessPeripheralMmio
+[       OK ] H743Clock.InvalidContextAndStateNeverAccessPeripheralMmio (0 ms)
+[----------] 16 tests from H743Clock (0 ms total)
+
+[----------] 22 tests from H743PllOwner
+[ RUN      ] H743PllOwner.SafeOrderEstablishesExactCpuBusAndIntegerPllWithoutUsers
+[       OK ] H743PllOwner.SafeOrderEstablishesExactCpuBusAndIntegerPllWithoutUsers (0 ms)
+[ RUN      ] H743PllOwner.PrescalersSettleIndependentlyBeforePllProgramming
+[       OK ] H743PllOwner.PrescalersSettleIndependentlyBeforePllProgramming (0 ms)
+[ RUN      ] H743PllOwner.StopProvesHsiBeforeRemovingPllFlashAndVoltageProtection
+[       OK ] H743PllOwner.StopProvesHsiBeforeRemovingPllFlashAndVoltageProtection (0 ms)
+[ RUN      ] H743PllOwner.ReleasedOwnerDoesNotTouchAChangedLaterClockOwner
+[       OK ] H743PllOwner.ReleasedOwnerDoesNotTouchAChangedLaterClockOwner (0 ms)
+[ RUN      ] H743PllOwner.ZeroBudgetAndUnprivilegedAdmissionHaveNoMmioEffects
+[       OK ] H743PllOwner.ZeroBudgetAndUnprivilegedAdmissionHaveNoMmioEffects (0 ms)
+[ RUN      ] H743PllOwner.ExistingOwnerCannotBeInitializedAgain
+[       OK ] H743PllOwner.ExistingOwnerCannotBeInitializedAgain (0 ms)
+[ RUN      ] H743PllOwner.ForeignTrimIsNotRepairedDuringStart
+[       OK ] H743PllOwner.ForeignTrimIsNotRepairedDuringStart (0 ms)
+[ RUN      ] H743PllOwner.HiddenOverdriveIsRejectedAfterAcquiringItsReadableGate
+[       OK ] H743PllOwner.HiddenOverdriveIsRejectedAfterAcquiringItsReadableGate (0 ms)
+[ RUN      ] H743PllOwner.GateRefusalHasNoVoltageOrClockEffects
+[       OK ] H743PllOwner.GateRefusalHasNoVoltageOrClockEffects (0 ms)
+[ RUN      ] H743PllOwner.UnprovedVoltageRaiseRollsBackBeforeAnyPllSwitch
+[       OK ] H743PllOwner.UnprovedVoltageRaiseRollsBackBeforeAnyPllSwitch (0 ms)
+[ RUN      ] H743PllOwner.FlashReadbackRefusalCannotProceedToAnIncreasedClock
+[       OK ] H743PllOwner.FlashReadbackRefusalCannotProceedToAnIncreasedClock (0 ms)
+[ RUN      ] H743PllOwner.PrescalerRefusalCannotExposePllFrequency
+[       OK ] H743PllOwner.PrescalerRefusalCannotExposePllFrequency (0 ms)
+[ RUN      ] H743PllOwner.PllReadyTimeoutRestoresAllAcquiredState
+[       OK ] H743PllOwner.PllReadyTimeoutRestoresAllAcquiredState (0 ms)
+[ RUN      ] H743PllOwner.SwitchTimeoutUsesObservedHsiInsteadOfAssumingPll
+[       OK ] H743PllOwner.SwitchTimeoutUsesObservedHsiInsteadOfAssumingPll (0 ms)
+[ RUN      ] H743PllOwner.FailedCleanupRetainsSafetyProtectionsAndCanBeRetried
+[       OK ] H743PllOwner.FailedCleanupRetainsSafetyProtectionsAndCanBeRetried (0 ms)
+[ RUN      ] H743PllOwner.RefusedHsiSwitchCannotRemovePllOrSafetyProtection
+[       OK ] H743PllOwner.RefusedHsiSwitchCannotRemovePllOrSafetyProtection (0 ms)
+[ RUN      ] H743PllOwner.PllReleaseRefusalRetainsVoltageAndFlashUntilRetry
+[       OK ] H743PllOwner.PllReleaseRefusalRetainsVoltageAndFlashUntilRetry (0 ms)
+[ RUN      ] H743PllOwner.RefusedFlashRestoreRetainsVoltageAndOwnership
+[       OK ] H743PllOwner.RefusedFlashRestoreRetainsVoltageAndOwnership (0 ms)
+[ RUN      ] H743PllOwner.LiveTimebaseMustJoinBeforeClockStop
+[       OK ] H743PllOwner.LiveTimebaseMustJoinBeforeClockStop (0 ms)
+[ RUN      ] H743PllOwner.ForeignPeripheralGateMustJoinBeforeClockStop
+[       OK ] H743PllOwner.ForeignPeripheralGateMustJoinBeforeClockStop (0 ms)
+[ RUN      ] H743PllOwner.BothFlashBanksMustJoinBeforeChangingTheClockOrAcr
+[       OK ] H743PllOwner.BothFlashBanksMustJoinBeforeChangingTheClockOrAcr (0 ms)
+[ RUN      ] H743PllOwner.VoltageRestoreTimeoutKeepsTheLastEffectForRetry
+[       OK ] H743PllOwner.VoltageRestoreTimeoutKeepsTheLastEffectForRetry (0 ms)
+[----------] 22 tests from H743PllOwner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 38 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 38 tests.

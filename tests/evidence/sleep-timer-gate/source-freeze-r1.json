@@ -1,0 +1,24 @@
+{
+  "head": "ce4bc5bb45eaa92a368017492f5e840ce8e5a3b2",
+  "sources": [
+    {
+      "path": "soc/stm32f407/sleep.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/soc/stm32f407/sleep.c",
+      "sha256": "46ff30d8daed46d8974c23dcb9afb00c3cf48812109e584772552f559a1653bc",
+      "bytes": 3843
+    },
+    {
+      "path": "soc/gd32f470/sleep.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/soc/gd32f470/sleep.c",
+      "sha256": "9bc1732c1cac5fffd976cd3ca8a40d5a86efc874283dbb5b0495946307874fbc",
+      "bytes": 3878
+    },
+    {
+      "path": "tests/google/clock_sleep_soc_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/tests/google/clock_sleep_soc_test.cpp",
+      "sha256": "12966b51c1a92043185822db25b8456d23b377a9dd11a1b32e9af3a28fb08796",
+      "bytes": 11829
+    }
+  ],
+  "scope": "Only TIM2/TIMER1 shallow sleep clock gate admission; no dynamic clock/Stop/HIL qualification"
+}

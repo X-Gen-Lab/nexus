@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "tools/testing/test_qualification_plan.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.json"
+  ],
+  "actual_returncode": 1,
+  "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/formal-h74329-red.attempts/1792315092709927505-fda63297868b4d49bbdb1475d892aca6/receipt.json",
+  "child_maxrss_KiB": 20472,
+  "headroom_after": 3668021248,
+  "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+}

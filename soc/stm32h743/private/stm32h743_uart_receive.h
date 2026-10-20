@@ -37,6 +37,9 @@ typedef struct {
     bool stopping;
     bool quarantined;
     bool gap_error;
+    /** \brief Observed gate/reset loss; permanent while ownership is retained.
+     */
+    bool domain_lost;
 } nx_stm32h743_uart_receive_state_t;
 extern const nx_uart_ops_t nx_stm32h743_uart_receive_ops;
 /**

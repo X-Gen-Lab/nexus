@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "scripts/ci/test_provider_assemblies.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.json"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "stage": "provider-hardlink-owned-project-red",
+  "started_ns": 1792316350495578459,
+  "finished_ns": 1792316351312598461,
+  "duration_seconds": 0.8170215540012578,
+  "timeout_seconds": 7200.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.attempts/1792316350495531078-f403e285bd89429f8636d7d0335eacb5/stderr.txt",
+    "bytes": 15768,
+    "sha256": "90571c64ab046e825950bb42beb729b0240ed17dd66fdc77657152bdc2c90fa8"
+  }
+}

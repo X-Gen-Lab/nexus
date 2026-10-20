@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "command": [
+    "ldd",
+    "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy"
+  ],
+  "cwd": "/dev/shm/nexus-clang14-required-20261018-r1",
+  "stage": "elf-dependency-resolution-r1",
+  "started_ns": 1792309917561263265,
+  "finished_ns": 1792309917569321147,
+  "duration_seconds": 0.008058351999352453,
+  "timeout_seconds": 300.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/runs/elf-dependency-resolution-r1.attempts/1792309917561222784-18086027478244f1a03969dbf5e35f11/stdout.txt",
+    "bytes": 658,
+    "sha256": "2ceda4ebe7d601afe3ed64284ad34448294bea7016976a9af732dc796d2ab753"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-clang14-required-20261018-r1/runs/elf-dependency-resolution-r1.attempts/1792309917561222784-18086027478244f1a03969dbf5e35f11/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

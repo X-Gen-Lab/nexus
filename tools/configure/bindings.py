@@ -2,13 +2,19 @@
 try:
     from .providers import maintained
     from .ir import ConfigurationIR
-    from .factory import interface_type, public_header
-    from . import gpio_phase
+    from .factory import interface_type, public_header, controller_class
+    from . import gpio_phase, runtime_power
+    from . import enhanced_endpoints
+    from . import stream_profiles, uart_formats
 except ImportError:
     from providers import maintained
     from ir import ConfigurationIR
-    from factory import interface_type, public_header
+    from factory import interface_type, public_header, controller_class
     import gpio_phase
+    import runtime_power
+    import enhanced_endpoints
+    import stream_profiles
+    import uart_formats
 
 
 def symbol(name):
@@ -46,6 +52,7 @@ def emit(result):
     provider = maintained(result["soc_family"])
     if not isinstance(result, ConfigurationIR):
         result = ConfigurationIR.from_validated(result)
+    runtime = result.runtime_power is not None
     selections = result.controllers
     context_guard = "nx_arch_in_isr() || nx_arch_irq_is_masked()"
     if not provider.MODEL:
@@ -57,9 +64,16 @@ def emit(result):
               ' * \\author          Nexus Team', ' */',
               '#ifndef NEXUS_BINDINGS_H', '#define NEXUS_BINDINGS_H',
               '#include "nexus/core/status.h"']
-    for kind in sorted({item["kind"] for item in selections}):
+    if uart_formats.probed(result):
+        header.insert(-1, '#include "nexus_config.h"')
+    for kind in sorted({controller_class(item) for item in selections}):
         header.append(f'#include "nexus/io/{public_header(kind)}.h"')
-    if any(item.kind == "eth" for item in selections):
+    for kind in sorted({enhanced_endpoints.class_name(item)
+                        for item in result.devices} &
+                       {"spi_transaction_device", "i2c_long_device",
+                        "spi_dma_transaction_device"}):
+        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
+    if any(item.kind in {"eth", "eth_frames"} for item in selections):
         header.append('#include "nexus/io/mdio.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif', 'typedef struct {', '    nx_result_t primary;',
                '    nx_result_t cleanup;', '    uint32_t remaining_effects;',
@@ -103,37 +117,73 @@ def emit(result):
                ' * Context and ownership rules match nx_platform_stop.',
                ' */',
                'nx_result_t nx_platform_stop_diagnosed(nx_platform_diagnostic_t* diagnostic);']
+    if runtime:
+        header.extend(runtime_power.header())
     source = ['/**', ' * \\file            bindings.c',
               ' * \\brief           Generated fixed typed hardware construction.',
               ' * \\author          Nexus Team', ' * \\version         1.0.0',
               ' * \\date            2026-10-09',
               ' * \\copyright       Copyright (c) 2026 Nexus Team', ' */',
-              '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus_config.h"',
+              '#include "nexus_bindings.h"', '#include "nexus_factory.h"',
               '#include "nexus/arch/arch.h"']
     source += ["#ifndef NX_PLATFORM_REGISTER_WRITE",
                "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (uint32_t)(value))",
                "#endif", "#ifndef NX_PLATFORM_PRIORITY_WRITE",
                "#define NX_PLATFORM_PRIORITY_WRITE(reg, value) ((reg) = (uint8_t)(value))",
                "#endif"]
+    if uart_formats.probed(result):
+        source.append('#include "nexus/io/cycle_probe.h"')
+        source += [f"NX_IO_IRQ_PROBE_DECLARE({item.controller})"
+                   for item in uart_formats.probed(result)]
     source.extend(provider.includes(result))
     source += ['static bool s_nx_platform_started;', 'static size_t s_nx_platform_initialized;']
     source.extend(provider.state_declarations(result))
+    if runtime:
+        source.extend(runtime_power.state())
     initialize = []
+    initialization_indices = []
     retained_initialization = []
     stop = []
     pin_snapshots = {}
-    for item in selections:
+    shared_members = {member.id: owner for owner in result.pwm_shared_owners
+                      for member in owner.members}
+    physical_constructed = set()
+    if shared_members:
+        try:
+            from .providers.stm32g474 import pwm_shared
+        except ImportError:
+            from providers.stm32g474 import pwm_shared
+    for selection_index, item in enumerate(selections):
         name = symbol(item.id)
-        exported_type = interface_type(item.kind, "port")
+        exported_type = interface_type(controller_class(item), "port")
         header += ['/** \\brief Fixed static identity; lifecycle stays explicit. */',
                    f'extern const {exported_type}* const nx_binding_{name};']
+        if item.id in shared_members:
+            owner = shared_members[item.id]
+            physical = pwm_shared.state_symbol(owner)
+            if physical not in physical_constructed:
+                construction = pwm_shared.constructor(owner)
+                source.append(f'static {construction.state_type} {physical};')
+                source.extend(construction.definitions)
+                initialize.append(construction.initialize)
+                initialization_indices.append(selection_index)
+                retained_initialization.append(construction.retain_on_failed_init)
+                stop.extend((len(initialize), expression)
+                            for expression in construction.stop)
+                physical_constructed.add(physical)
+            source.extend(pwm_shared.face(item, owner))
+            continue
         construction = provider.constructor(item, result, result["board_bindings"],
                                             result["routes"], result.devices)
-        source += [f'static {construction.state_type} s_nx_port_{name};',
+        source += [f'static {construction.state_type} s_nx_port_{name};']
+        source.extend(construction.face_definitions)
+        face_context = construction.face_context or f"&s_nx_port_{name}"
+        source += [
                    f'static const {exported_type} s_nx_face_{name} = {{',
-                   f'    &{provider.operations(item)}, &s_nx_port_{name}', '};',
+                   f'    &{provider.operations(item)}, {face_context}', '};',
                    f'const {exported_type}* const nx_binding_{name} = &s_nx_face_{name};']
+        source.extend(stream_profiles.emit_instance(item))
         source.extend(provider.instance_declarations(item, result))
         source.extend(construction.definitions)
         header.extend(construction.exports)
@@ -142,18 +192,26 @@ def emit(result):
                                      construction.pin_snapshots,
                                      pin_snapshots)
         initialize.append(construction.initialize)
+        initialization_indices.append(selection_index)
         retained_initialization.append(construction.retain_on_failed_init)
         stop.extend((len(initialize), expression)
                     for expression in construction.stop)
     for device in result.devices:
         kind = device.kind
-        class_name = "usb_endpoint" if kind == "usb_device" else kind + "_device"
+        class_name = enhanced_endpoints.class_name(device)
         header.append(f'extern const {interface_type(class_name, "endpoint")}* const nx_device_{symbol(device.id)};')
     source.extend(provider.shared_irqs(result))
     # All constructor arrays precede their shared cold lease functions.
     # Reuse those static slots directly; no pointer registry is emitted.
     source.extend(gpio_phase.declarations(result, pin_snapshots))
     source.extend(diagnostic_helpers())
+    if runtime:
+        source += ['static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup);',
+                   'static nx_platform_start_result_t nx_runtime_start_system(nx_platform_diagnostic_t* diagnostic) {',
+                   '    (void)diagnostic;',
+                   '    nx_platform_start_result_t result = { NX_SUCCESS, NX_SUCCESS, 0u };']
+        source.extend(provider.start_system(result))
+        source += ['    return result;', '}']
     source += ['/** \\brief Stop only the initialized selected interfaces. */',
                'nx_result_t nx_platform_stop(void) {',
                '    return nx_platform_stop_impl(NULL, false);', '}',
@@ -165,22 +223,40 @@ def emit(result):
                'static nx_result_t nx_platform_stop_impl(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
                '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_CONTEXT, SIZE_MAX);',
                f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}']
+    if runtime:
+        source += ['    nx_result_t io = nx_platform_stop_io(diagnostic, cleanup);',
+                   '    if (io != NX_SUCCESS) { return io; }']
+        source.extend(provider.stop_system(result, resources=False,
+            system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
+        source += ['    s_nx_platform_started = false;',
+                   '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
+                   '    return NX_SUCCESS;', '}',
+                   '/** \\brief One I/O withdrawal body, also used by runtime pause. */',
+                   'static nx_result_t nx_platform_stop_io(nx_platform_diagnostic_t* diagnostic, bool cleanup) {',
+                   '    nx_result_t closed = nx_runtime_close();',
+                   '    if (closed != NX_SUCCESS) { return closed; }',
+                   '    if (s_nx_runtime_lease.owner == NULL) { return nx_runtime_release(); }']
     for index in range(len(initialize), 0, -1):
         source.append(f'    if (s_nx_platform_initialized >= {index}u) {{')
         source.append(
             '        nx_platform_diagnostic_phase(diagnostic, cleanup, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {index - 1}u);')
+            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index - 1]}u);')
         for counter, (_, expression) in enumerate(entry for entry in stop if entry[0] == index):
             source += [f'        nx_result_t status_{counter} = {expression};',
                        f'        if (status_{counter} != NX_SUCCESS) {{ return status_{counter}; }}']
         source += [f'        s_nx_platform_initialized = {index - 1}u;', '    }']
     source.append('    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
-    source.extend(provider.stop_system(
-        result, system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
-    source += ['    s_nx_platform_started = false;',
-               '    s_nx_platform_initialized = 0u;',
-               '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
-               '    return NX_SUCCESS;', '}']
+    if runtime:
+        source.extend(provider.stop_resources(result))
+        source += ['    return nx_runtime_release();', '}']
+        source.extend(runtime_power.runtime_functions(result, context_guard, initialize))
+    else:
+        source.extend(provider.stop_system(
+            result, system_phase='nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX)'))
+        source += ['    s_nx_platform_started = false;',
+                   '    s_nx_platform_initialized = 0u;',
+                   '    nx_platform_diagnostic_phase(diagnostic, cleanup, NX_PLATFORM_PHASE_NONE, SIZE_MAX);',
+                   '    return NX_SUCCESS;', '}']
     source += ['/** \\brief Start explicit hardware only; rollback retains error facts. */',
                'nx_platform_start_result_t nx_platform_start(void) {',
                '    return nx_platform_start_impl(NULL);', '}',
@@ -203,7 +279,21 @@ def emit(result):
                '        result.primary = NX_ERROR_CONTEXT; return result; }',
                '    if (s_nx_platform_started) { result.primary = NX_ERROR_STATE; return result; }']
     source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_SYSTEM, SIZE_MAX);')
-    source.extend(provider.start_system(result))
+    if runtime:
+        source += ['    if (s_nx_runtime_domain.initialized && s_nx_runtime_domain.closing) {',
+                   '        result.primary = nx_runtime_reopen();',
+                   '        if (result.primary != NX_SUCCESS) { return result; }', '    }',
+                   '    result.primary = nx_runtime_acquire();',
+                   '    if (result.primary != NX_SUCCESS) { return result; }',
+                   '    result = nx_runtime_start_system(diagnostic);',
+                   '    if (result.primary != NX_SUCCESS) {',
+                   '        if (result.remaining_effects == 0u) {',
+                   '            nx_result_t cleanup = nx_runtime_close();',
+                   '            if (cleanup == NX_SUCCESS) { cleanup = nx_runtime_release(); }',
+                   '            if (cleanup != NX_SUCCESS) { result.cleanup = cleanup; result.remaining_effects = 1u; }',
+                   '        }', '        return result;', '    }']
+    else:
+        source.extend(provider.start_system(result))
     source.append("    s_nx_platform_started = true;")
     source.append('    nx_platform_diagnostic_phase(diagnostic, false, NX_PLATFORM_PHASE_RESOURCES, SIZE_MAX);')
     source.extend(provider.start_resources(
@@ -211,7 +301,7 @@ def emit(result):
     for index, expression in enumerate(initialize):
         source.append(
             '    nx_platform_diagnostic_phase(diagnostic, false, '
-            f'NX_PLATFORM_PHASE_CONTROLLER, {index}u);')
+            f'NX_PLATFORM_PHASE_CONTROLLER, {initialization_indices[index]}u);')
         if retained_initialization[index]:
             # Cold failure may retain live hardware; include that instance
             # in reverse cleanup before attempting initialization.

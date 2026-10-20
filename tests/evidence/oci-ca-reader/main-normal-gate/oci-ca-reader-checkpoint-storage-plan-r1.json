@@ -1,0 +1,10 @@
+{
+  "monitor_template": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/monitor-template.py",
+  "monitor_sha256": "cec7e00a1ac49a49f2ac85ed935e49e0f6cc523f8525c06252035c447285fce9",
+  "same_completed_receipt_and_archive_checks": true,
+  "storage": "new volatile executable tmpfs only; original persistent/evidence paths untouched",
+  "publication": "Retain every sealed archive and full proof in next D2 implementation commit and verify GitHub commit identity before any durability claim",
+  "budget": 3145728,
+  "formal_resource_floors_unchanged": true,
+  "reason": "Keep normal complete per-commit gates and preserve all old sources/logs/ELFs near persistent floor."
+}

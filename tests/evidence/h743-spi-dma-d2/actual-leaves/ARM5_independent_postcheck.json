@@ -1,0 +1,362 @@
+{
+  "kind": "D2 independent successful ARM5 linked-byte postcheck",
+  "actual_status": "passed",
+  "qualification": false,
+  "source_freeze_sha256": "246cb4de76e54fc993bceeecd3ce674936e566f14d51b80eb8610c6bdaeb98bf",
+  "normal_report_sha256": "4bd05737f037c16fe1b3cb5bb93a06e639ebadf7037ed50bbbef71bd0e7fe1c2",
+  "normal_commands": 22,
+  "rows": [
+    {
+      "assembly": {
+        "bytes": 267,
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/tests/contracts/h743_assembly/empty.toml",
+        "sha256": "87c5cff0210ff1cd5daa17917fd1b9d5e04d24a337f4384387231c1e2694612e"
+      },
+      "elf": {
+        "bytes": 17712,
+        "path": "/dev/shm/nexus-h743-spi-dma-d2-arm-r2/000-h743_assembly-empty/bin/h743_assembly.elf",
+        "sha256": "92057acc6f112b978c92275409024fd0b6bd8c3915d2bce01ce0e58b4afa3d81"
+      },
+      "metrics": {
+        "flash_load_bytes": 2926,
+        "axi_allocated_union_bytes_including_reserved_stack": 2104
+      },
+      "faces": 0,
+      "methods": 0,
+      "driver_translation_units": [],
+      "linked_SPI_faces": {},
+      "actual_vector_words": {},
+      "linked_AXI_region_words": null,
+      "binding_writable_objects": {
+        "s_nx_platform_started": 1
+      }
+    },
+    {
+      "assembly": {
+        "bytes": 1063,
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/tests/contracts/h743_assembly/peripherals.toml",
+        "sha256": "8b5e875314f499e925bd8a43a51fac2d40b55db496652026b49ab8752e539978"
+      },
+      "elf": {
+        "bytes": 54024,
+        "path": "/dev/shm/nexus-h743-spi-dma-d2-arm-r2/001-h743_assembly-peripherals/bin/h743_assembly.elf",
+        "sha256": "882c87a3fcffd5cb17e462fad89a48751a9d3d533c2fccf107bf978373ddd17e"
+      },
+      "metrics": {
+        "flash_load_bytes": 26568,
+        "axi_allocated_union_bytes_including_reserved_stack": 6920
+      },
+      "faces": 9,
+      "methods": 24,
+      "driver_translation_units": [
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/gpio.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/pwm.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/exti.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/watchdog.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/adc.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/i2c.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_wire.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash_execution.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash_ram_enter.S",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash_ram.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash_ram_owner.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash_ram_transaction.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/flash_mpu.c"
+      ],
+      "linked_SPI_faces": {},
+      "actual_vector_words": {},
+      "linked_AXI_region_words": null,
+      "binding_writable_objects": {
+        "s_nx_platform_initialized": 4,
+        "s_nx_port_watchdog0": 40,
+        "s_nx_cs_device4": 12,
+        "s_nx_port_wave3": 44,
+        "s_nx_port_sensor": 36,
+        "s_nx_platform_started": 1,
+        "s_nx_gpioe_lease": 32,
+        "s_nx_gpio_clocks_added": 4,
+        "s_nx_extra_apb4enr_added": 4,
+        "s_nx_extra_ahb1enr_added": 4,
+        "s_nx_gpiob_lease": 32,
+        "s_nx_gpioa_lease": 32,
+        "s_nx_extra_apb1lenr_added": 4,
+        "s_nx_extra_apb2enr_added": 4,
+        "s_nx_flash_timing": 8,
+        "s_nx_port_edge0": 56,
+        "s_nx_events_edge0": 64,
+        "s_nx_port_storage": 24,
+        "s_nx_port_bus1": 28,
+        "s_nx_idle_wave3": 12,
+        "s_nx_port_bus4": 32,
+        "s_nx_endpoint_device4": 20,
+        "s_nx_endpoint_device1": 8
+      }
+    },
+    {
+      "assembly": {
+        "bytes": 491,
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/tests/contracts/h743_assembly/spi-dma.toml",
+        "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2"
+      },
+      "elf": {
+        "bytes": 35236,
+        "path": "/dev/shm/nexus-h743-spi-dma-d2-arm-r2/002-h743_assembly-spi-dma/bin/h743_assembly.elf",
+        "sha256": "8854391e26bde55399f85d7a3de99237829a9a15e2f1bb800dfc104504e54185"
+      },
+      "metrics": {
+        "flash_load_bytes": 12592,
+        "axi_allocated_union_bytes_including_reserved_stack": 2320
+      },
+      "faces": 2,
+      "methods": 8,
+      "driver_translation_units": [
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/gpio.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_wire.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_dma.c"
+      ],
+      "linked_SPI_faces": {
+        "s_nx_face_bus4": {
+          "ops": "nx_stm32h743_spi_dma_ops",
+          "context": "s_nx_port_bus4",
+          "actual_words": [
+            134230244,
+            603979872
+          ]
+        },
+        "s_nx_device_face_device4": {
+          "ops": "nx_stm32h743_spi_dma_endpoint_ops",
+          "context": "s_nx_endpoint_device4",
+          "actual_words": [
+            134230224,
+            603979824
+          ]
+        }
+      },
+      "actual_vector_words": {
+        "13": {
+          "handler": "DMA1_Stream2_IRQHandler",
+          "word": 134222257
+        },
+        "14": {
+          "handler": "DMA1_Stream3_IRQHandler",
+          "word": 134222269
+        },
+        "84": {
+          "handler": "SPI4_IRQHandler",
+          "word": 134222281
+        }
+      },
+      "linked_AXI_region_words": [
+        603979776,
+        524288,
+        3
+      ],
+      "binding_writable_objects": {
+        "s_nx_cs_device4": 12,
+        "s_nx_gpioe_lease": 32,
+        "s_nx_dma_clocks_added": 4,
+        "s_nx_gpio_clocks_added": 4,
+        "s_nx_extra_apb2enr_added": 4,
+        "s_nx_platform_initialized": 4,
+        "s_nx_platform_started": 1,
+        "s_nx_endpoint_device4": 32,
+        "s_nx_port_bus4": 120
+      }
+    },
+    {
+      "assembly": {
+        "bytes": 653,
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+        "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f"
+      },
+      "elf": {
+        "bytes": 42460,
+        "path": "/dev/shm/nexus-h743-spi-dma-d2-arm-r2/003-h743_assembly-spi-dma-uart-tx/bin/h743_assembly.elf",
+        "sha256": "314156719b081e90cf709b0e76b8e126b1215fe0ebd20b5ac4ea119d4bde116f"
+      },
+      "metrics": {
+        "flash_load_bytes": 20228,
+        "axi_allocated_union_bytes_including_reserved_stack": 2608
+      },
+      "faces": 3,
+      "methods": 15,
+      "driver_translation_units": [
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/gpio.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/uart.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/uart_dma.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_wire.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_dma.c"
+      ],
+      "linked_SPI_faces": {
+        "s_nx_face_bus4": {
+          "ops": "nx_stm32h743_spi_dma_ops",
+          "context": "s_nx_port_bus4",
+          "actual_words": [
+            134237792,
+            603980128
+          ]
+        },
+        "s_nx_device_face_device4": {
+          "ops": "nx_stm32h743_spi_dma_endpoint_ops",
+          "context": "s_nx_endpoint_device4",
+          "actual_words": [
+            134237772,
+            603980080
+          ]
+        }
+      },
+      "actual_vector_words": {
+        "13": {
+          "handler": "DMA1_Stream2_IRQHandler",
+          "word": 134223357
+        },
+        "14": {
+          "handler": "DMA1_Stream3_IRQHandler",
+          "word": 134223369
+        },
+        "84": {
+          "handler": "SPI4_IRQHandler",
+          "word": 134223381
+        },
+        "39": {
+          "handler": "USART3_IRQHandler",
+          "word": 134223393
+        },
+        "11": {
+          "handler": "DMA1_Stream0_IRQHandler",
+          "word": 134223405
+        }
+      },
+      "linked_AXI_region_words": [
+        603979776,
+        524288,
+        3
+      ],
+      "binding_writable_objects": {
+        "s_nx_platform_initialized": 4,
+        "s_nx_cs_device4": 12,
+        "s_nx_platform_started": 1,
+        "s_nx_gpioe_lease": 32,
+        "s_nx_extra_apb2enr_added": 4,
+        "s_nx_gpiod_lease": 32,
+        "s_nx_dma_clocks_added": 4,
+        "s_nx_uart_clocks_added": 4,
+        "s_nx_gpio_clocks_added": 4,
+        "s_nx_port_bus4": 120,
+        "s_nx_endpoint_device4": 32,
+        "s_nx_port_console": 112,
+        "s_nx_rx_console": 64
+      }
+    },
+    {
+      "assembly": {
+        "bytes": 646,
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+        "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6"
+      },
+      "elf": {
+        "bytes": 47464,
+        "path": "/dev/shm/nexus-h743-spi-dma-d2-arm-r2/004-h743_assembly-spi-dma-uart-rx/bin/h743_assembly.elf",
+        "sha256": "d59e772c075ad01b6eba68a8d24a4e1686f5a0c06c97f29c1e4efb1ae4e977f1"
+      },
+      "metrics": {
+        "flash_load_bytes": 21268,
+        "axi_allocated_union_bytes_including_reserved_stack": 2804
+      },
+      "faces": 3,
+      "methods": 16,
+      "driver_translation_units": [
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/gpio.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/uart.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/uart_receive.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_wire.c",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/drivers/spi_dma.c"
+      ],
+      "linked_SPI_faces": {
+        "s_nx_face_bus4": {
+          "ops": "nx_stm32h743_spi_dma_ops",
+          "context": "s_nx_port_bus4",
+          "actual_words": [
+            134238796,
+            603980352
+          ]
+        },
+        "s_nx_device_face_device4": {
+          "ops": "nx_stm32h743_spi_dma_endpoint_ops",
+          "context": "s_nx_endpoint_device4",
+          "actual_words": [
+            134238776,
+            603980304
+          ]
+        }
+      },
+      "actual_vector_words": {
+        "13": {
+          "handler": "DMA1_Stream2_IRQHandler",
+          "word": 134223377
+        },
+        "14": {
+          "handler": "DMA1_Stream3_IRQHandler",
+          "word": 134223389
+        },
+        "84": {
+          "handler": "SPI4_IRQHandler",
+          "word": 134223401
+        },
+        "39": {
+          "handler": "USART3_IRQHandler",
+          "word": 134223413
+        },
+        "12": {
+          "handler": "DMA1_Stream1_IRQHandler",
+          "word": 134223425
+        }
+      },
+      "linked_AXI_region_words": [
+        603979776,
+        524288,
+        3
+      ],
+      "binding_writable_objects": {
+        "s_nx_platform_initialized": 4,
+        "s_nx_cs_device4": 12,
+        "s_nx_platform_started": 1,
+        "s_nx_gpioe_lease": 32,
+        "s_nx_extra_apb2enr_added": 4,
+        "s_nx_gpiod_lease": 32,
+        "s_nx_dma_clocks_added": 4,
+        "s_nx_uart_clocks_added": 4,
+        "s_nx_gpio_clocks_added": 4,
+        "s_nx_port_bus4": 120,
+        "s_nx_endpoint_device4": 32,
+        "s_nx_port_console": 144
+      }
+    }
+  ],
+  "exact_prior_ABI_comparisons": [
+    {
+      "assembly": "empty.toml",
+      "baseline_ELF_sha256": "231911571b547da197907df6a444b31de0759607f2ddbb5c32cb9863d85e1166",
+      "same_authored_tuple_and_compiler": true,
+      "all_retained_writable_symbol_names_and_sizes_equal": true,
+      "flash_LOAD_delta": 0,
+      "AXI_reserved_delta": 0
+    },
+    {
+      "assembly": "peripherals.toml",
+      "baseline_ELF_sha256": "6e945eb46e5bf45d38bcab20e5d2e04f3ce9dbd8dba3ad0fa585aac9be4d13c3",
+      "same_authored_tuple_and_compiler": true,
+      "all_retained_writable_symbol_names_and_sizes_equal": true,
+      "flash_LOAD_delta": -8,
+      "AXI_reserved_delta": 0
+    }
+  ],
+  "limitations": [
+    "ARM link/resource/retention only; no target runtime, HIL, measured cycles or stack high-water",
+    "RAM reports allocated/reserved linked intervals including the explicit main stack, not total physical RAM or measured occupancy",
+    "Different selected fixtures have different peripherals; differences are not an isolated marginal driver benchmark",
+    "Installed clean SDK belongs to separate D3; cold shared reset and TC fixes do not close runtime-domain loss audit"
+  ]
+}

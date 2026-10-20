@@ -1,0 +1,54 @@
+// FIG-17 target IO-24 design; not completed code or physical qualification.
+// Scope: selected STM32H743ZIT6 V / Cache off only.
+// Basis: docs/design/h743-flash-ram.md target contract and IO-24 ledger.
+// Edges are explicitly lookup, call, copy, protection or caller preconditions.
+// This diagram introduces no second physical owner or background executor.
+digraph h743FlashRamArchitecture {
+    graph [label="FIG-17 Target H743 Flash RAM boundary\nSelected V / Cache off; complete software and ELF exits open",
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
+           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.6,
+           newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
+    build [label="One authored TOML + reviewed facts\nImmutable IR; selected-only bundle and CMake"];
+    app [label="External maintenance caller\nOwn scheduling, bus-master joins and recovery policy",
+         fillcolor="#f8fafc"];
+    factory [label="Cold typed factory\nReturn an existing immutable Flash face"];
+    face [label="Flash face\nShared read-only ops + private context"];
+    lifecycle [label="Explicit Platform lifecycle\nPrepare selected bytes; retain failed cleanup"];
+    subgraph clusterOwner {
+        label="One private H743 Flash controller owner: target design";
+        color="#64748b"; fontname="Noto Sans CJK SC";
+        provider [label="Flash provider\nValidate operation, region, aliases and call context"];
+        prepare [label="Cold RAM preparation\nValidate LOAD / RUN; copy and prove readiness"];
+        bridge [label="CPU-only RAM bridge\nPreserve CPU state; install private MSP"];
+        pod [label="Entire busy transaction in AXI RAM\nPublish / restore VTOR; retain input and diagnostics"];
+        guard [label="Private MPU guard in RAM\nCode XN + Strongly-ordered; AP001; CTRL7"];
+        prepare -> bridge [label="supplies proved code and private RAM"];
+        provider -> bridge [label="direct call after final admission"];
+        bridge -> pod [label="calls with private MSP; transaction owns VTOR"];
+        pod -> guard [label="installs before trigger; restores after drain"];
+    }
+    flash [label="Actual Flash controller / both banks\nProgram stores or erase START; observe drain and LOCK",
+           fillcolor="#f8fafc"];
+    time [label="Existing System TIM2 domain and epoch\nProve wrap service; never invent lost time",
+          fillcolor="#f8fafc"];
+    build -> lifecycle [label="emits selected preparation / cleanup"];
+    build -> face [label="emits static face and shared ops reference"];
+    app -> factory [label="looks up typed Flash identity"];
+    factory -> face [label="returns existing reference; no preparation"];
+    app -> lifecycle [label="explicit start / stop call"];
+    lifecycle -> prepare [label="calls preparation before use"];
+    app -> face [label="direct synchronous I/O call"];
+    face -> provider [label="ops(context, ...) call"];
+    app -> provider [label="precondition: quiesce and join other masters",
+                     style=dashed];
+    pod -> flash [label="validated writes / actual status observations",
+                  dir=both];
+    pod -> time [label="same-domain deadline and epoch observations",
+                 dir=both];
+    // No return edge bypasses drain, LOCK or restoration; see FIG-18.
+}

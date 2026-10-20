@@ -55,9 +55,7 @@ typedef struct {
     DBGMCU_TypeDef* debug;
     nx_watchdog_state_t state;
     uint32_t poll_limit;
-    uint32_t saved_debug;
     bool lsi_owned;
-    bool debug_owned;
     bool preparation_retained;
 } nx_stm32f103_watchdog_state_t;
 extern const nx_watchdog_ops_t nx_stm32f103_watchdog_ops;

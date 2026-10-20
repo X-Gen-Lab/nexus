@@ -91,11 +91,12 @@ TEST_F(F103System, WrongDensityRejectsBeforeEffects) {
               nx_stm32f103_system_start(&g_nx_stm32f103_system, 8).primary);
     EXPECT_EQ(0U, g_f103_model.writes);
 }
-TEST_F(F103System, WrongDeviceRejectsBeforeEffects) {
-    g_f103_model.device_id = 0x412;
-    EXPECT_EQ(NX_ERROR_IO,
-              nx_stm32f103_system_start(&g_nx_stm32f103_system, 8).primary);
-    EXPECT_EQ(0U, g_f103_model.writes);
+TEST_F(F103System, DebugOnlyGroupIsNotAStandaloneAdmissionSource) {
+    g_f103_model.device_id = 0x412U;
+    EXPECT_EQ(NX_SUCCESS,
+              nx_stm32f103_system_start(&g_nx_stm32f103_system, 8U).primary);
+    EXPECT_EQ(0U, g_f103_model.device_id_reads);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f103_system_stop(&g_nx_stm32f103_system, 8U));
 }
 TEST_F(F103System, ZeroBudgetRejectsBeforeEffects) {
     EXPECT_EQ(NX_ERROR_INVALID,
@@ -214,5 +215,51 @@ extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t result,
                                  const char* file, unsigned line) {
     if (fault_boundary != nullptr) {
         fault_boundary->Observe(domain, result, file, line);
+    }
+}
+
+/* ES096 2.2.2: standalone startup cannot depend on debug visibility.
+ * Factory size is an observation; an exact part remains a build declaration. */
+TEST_F(F103System, StandaloneZeroDebugIdDoesNotBlockDensityAdmittedStartup) {
+    g_f103_model.device_id = 0U;
+    const auto result = nx_stm32f103_system_start(&g_nx_stm32f103_system, 8U);
+    ASSERT_EQ(NX_SUCCESS, result.primary);
+    EXPECT_EQ(NX_SUCCESS, result.cleanup);
+    EXPECT_TRUE(g_nx_stm32f103_system.started);
+    EXPECT_EQ(8000000U, g_nx_stm32f103_system.core_hz);
+    EXPECT_EQ(7U, g_f103_model.timer.PSC);
+    EXPECT_EQ(65535U, g_f103_model.timer.ARR);
+    EXPECT_EQ(0U, g_f103_model.device_id_reads);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32f103_system_stop(&g_nx_stm32f103_system, 8U));
+}
+TEST_F(F103System, DebugVisibilityCannotAuthenticateAnOrderablePart) {
+    /* Exact part/package remains a separately declared build/Board fact. A
+     * debug-only electronic view is not normal standalone admission. */
+    for (uint16_t observed : {uint16_t{0U}, uint16_t{0x410U}, uint16_t{0x412U},
+                              uint16_t{UINT16_MAX}}) {
+        nx_f103_model_reset();
+        g_f103_model.device_id = observed;
+        ASSERT_EQ(
+            NX_SUCCESS,
+            nx_stm32f103_system_start(&g_nx_stm32f103_system, 8U).primary);
+        EXPECT_EQ(0U, g_f103_model.device_id_reads);
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_stm32f103_system_stop(&g_nx_stm32f103_system, 8U));
+    }
+}
+TEST_F(F103System, MissingDensityCannotBeFilledFromDeclaredTargetCapacity) {
+    for (uint16_t kib :
+         {uint16_t{0U}, uint16_t{64U}, uint16_t{256U}, uint16_t{UINT16_MAX}}) {
+        nx_f103_model_reset();
+        g_f103_model.device_id = 0U;
+        g_f103_model.flash_kib = kib;
+        const auto result =
+            nx_stm32f103_system_start(&g_nx_stm32f103_system, 8U);
+        EXPECT_EQ(NX_ERROR_IO, result.primary);
+        EXPECT_EQ(NX_SUCCESS, result.cleanup);
+        EXPECT_EQ(0U, result.remaining_effects);
+        EXPECT_EQ(0U, g_f103_model.writes);
+        EXPECT_EQ(0U, g_f103_model.device_id_reads);
+        EXPECT_FALSE(g_nx_stm32f103_system.started);
     }
 }

@@ -1,0 +1,159 @@
+{
+  "kind": "independent-source-and-actual-evidence-review-D3-two-file-catalogue-amendment",
+  "reviewed_at_utc": "2026-10-18T10:49:11.205785+00:00",
+  "result": "PASS_TWO_SOURCE_AMENDMENT_AND_OWNED_EXECUTION_ONLY",
+  "scope": "Read-only comparison with dd839d29 original text/AST, final immutable source map, original33 freeze, actual command/attempt/raw records and small37-member archive. No tests/build/helper execution, Main source/index mutation, staging, commit or push.",
+  "base_head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+  "frozen_sources": [
+    {
+      "path": "tools/configure/assemblies/catalogue.json",
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/files/tools/configure/assemblies/catalogue.json",
+      "bytes": 1870,
+      "mode": 384,
+      "sha256": "151de3f45a55bd2b27878349b15e193df0d72115acbab23b43aed62801295dcf",
+      "old_bytes": 1779,
+      "old_sha256": "cc0a4d65a91adfd3d8ad4a3f6b655a82dd7a617257df4692f15aafcbab73c477"
+    },
+    {
+      "path": "tools/configure/test_matrix.py",
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/files/tools/configure/test_matrix.py",
+      "bytes": 7332,
+      "mode": 384,
+      "sha256": "cb17f06f36356cc842811d451fcee46078c75ff50474c2efc017f7d9c0b2e854",
+      "old_bytes": 2437,
+      "old_sha256": "8281e178905874d7f7bfdc187028ce68008afd67e01120b2457b89e91c303a0b"
+    }
+  ],
+  "binding": {
+    "feature": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1",
+    "final_source2_freeze": {
+      "file": "final-source2-and-execution-freeze-r1.json",
+      "bytes": 9522,
+      "sha256": "4be216ece66e4cf34ed72cf9d2fc1c0a1823b2209287646c1055e8df344fd1b2"
+    },
+    "normalized_map": {
+      "file": "normalized-transport-r1.json",
+      "bytes": 6437,
+      "sha256": "5f2277262d8fd8b720c335828fce055da83db60ccf52404bc75fb5a61aba5b9b",
+      "rows": 15,
+      "sources": 2,
+      "evidence": 13
+    },
+    "completed_handoff": {
+      "file": "completed-handoff-r1.json",
+      "bytes": 3408,
+      "sha256": "b4933f681e72cf4b61d11d83f32d8058a153877d4b5e7f39accc7867fe7112b5"
+    },
+    "source_map": {
+      "file": "source2-map.json",
+      "bytes": 741,
+      "sha256": "fed654cfc1b3627f772b4b9d9620ba7c8147214aa50f562f0efb95131b01d880"
+    },
+    "original33_final_freeze_sha256": "50a7fc913098dea0185602eb528b8002fbd66b4eaf05e27ff825b3d2f7fa7751",
+    "original33_independent_review_sha256": "28270c19ddc5c871b8233818577e0579a9c9f6f5ae886e19affbd089eb65da90"
+  },
+  "source_review": {
+    "catalogue": "Exactly three sorted unique names added: h743-spi-dma-uart-rx.toml, h743-spi-dma-uart-tx.toml, h743-spi-dma.toml. All original entries/order and non-assemblies JSON fields remain identical. No resolver/selection/fallback policy change.",
+    "tests": "Complete original5 methods retained, new total7. Four original method ASTs exactly match dd839d29. The remaining old method retains every original assertion expression and inserts only an exact canonical-three H743 SPI branch before the original generic H743/U575 gpio-or-uart restriction.",
+    "new_positive_boundary": "Exact three public references must be physical_status not_executed/physical_qualified false, STM32H743ZIT6 baremetal hsi64-fixed-cache-off, SPI4 DMA on PE12/13/14 AF5 and DMA1 streams2/3 channels83/84, finite mode0 spi-endpoint, 1MHz and non-OS IRQ5; only optional USART3 dma-tx or rx-dma-idle with PD8/9 AF7 and distinct streams0/1 channels46/45.",
+    "new_negative_boundary": "Temporary catalogues explicitly test missing canonical SPI entry, duplicate entry and unknown reference rejection. Production matrix.py remains byte-identical to dd839d29; original U575/other H743 restriction is preserved.",
+    "architecture": "Only catalogue metadata and tests change. Original static factory/immutable IR/typed interfaces, external-product boundary, single build graph, strict profile/payload handling and partial qualification boundaries remain as previously reviewed.",
+    "original33_identity": "All33 baseline snapshot rows equal the exact original frozen source_operations; deletes remain absent. Every actual stage before/after contains equal original33/head/index snapshots. Live owned source33+two current source bytes and serialized index SHA9633596fbfac4c65093930be645f055e91327fd6fe07908ae8e50d7b29f29046 were independently reread and matched."
+  },
+  "actual_evidence": {
+    "execution_root": "/dev/shm/nexus-h743-d3-catalogue-amendment-execution-20261018-r1",
+    "matrix_red": {
+      "actual_exit": 1,
+      "executed": 7,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0,
+      "summary_sha256": "18c1dd29afeaa331ac6a98ad5a949502c4b02adda2d1f674a001240c3e995c66",
+      "command_sha256": "8e7dbda9e5b48d31c4c65b0e41b61e38500ba620fb402c8f6e212d2cca7c9c24",
+      "receipt_sha256": "54227f6aea30995cf7e553401a4959a42246404b473c82372fceb8e65ed9ee2d",
+      "classification": "Genuine metadata rejection, not setup errors: old catalogue plus final7332B test body causes two resolve_catalogue ValueErrors listing exactly missing three canonical names."
+    },
+    "matrix_green": {
+      "actual_exit": 0,
+      "executed": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "summary_sha256": "072b12d86145e65d015af0a6f3fd1b0c7c60be0a5fa5b13d5c4bdb2ea23ee3fc",
+      "command_sha256": "14f80804b553f9c392c8970bd655d11733694e1078411d51e4af05186ee4a75c",
+      "receipt_sha256": "087950c1eb78cfce06598d160d10e54c0037531c428643170d24d0d304a261d8",
+      "same_test_bytes": "cb17f06f36356cc842811d451fcee46078c75ff50474c2efc017f7d9c0b2e854"
+    },
+    "configure_first": {
+      "actual_exit": 1,
+      "executed": 869,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0,
+      "summary_sha256": "78857fb73c12b5ef7f26538ecb56ae7032f380c058752a9895d1f47b7c67e0cc",
+      "classification": "Preserved non-GREEN environment failure: two FileNotFoundError cmake errors. Same final source tuple; not production regression RED or source assertion failure."
+    },
+    "configure_fresh_r2": {
+      "actual_exit": 0,
+      "executed": 869,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "summary_sha256": "e33d1de88afa89cf2f5471d5caec6b831537052c20e81e6caa1c235ddb988169",
+      "command_sha256": "f0ed06b125cd99c5d4ae4cef67a0f272a1d9f1c103829fc79802c131b34dcf14",
+      "receipt_sha256": "3497ccf781b02cf2eb7fb1eac79cd4b9dca12aa510134adcc78db885eed7e7b3",
+      "complete_report_sha256": "ba8a710fb29ba4dbaabea1c511c57741b54f5d3c716aa092e4864546f6c85e95",
+      "environment_delta": "Existing /workspace/nexus-build-system-20261012/.venv/bin prepended to child PATH for CMake/Ninja; production/test Python bytes unchanged. Runner source, actual attempt and final raw stderr inspected."
+    },
+    "style": {
+      "actual_exit": 0,
+      "text_files_selected": 2,
+      "source_files_checked": 0,
+      "summary_sha256": "3b7c99c65058e01e480692975b8c06ebea95574166637f93f285327911723888",
+      "receipt_sha256": "402101e4f8ffb82f9640b2ba050845cd2f63fa501045f49a4a8407f0bdcc6ff8",
+      "meaning": "Both intended JSON/Python files selected; text/style gate passed. Do not describe this as two C/C++ formatting checks."
+    },
+    "receipt_checks": "All five stage summaries before==after. Command and terminal attempt outcome completed/exit/child/cwd/argv match. Both raw stdout/stderr length/SHA rehashed and matched command/attempt references. Whole-module runner loads test_matrix without filtering; count records and raw7/869 endings read. No reviewer test rerun.",
+    "resources": "Recorded no resource violations; completed-child ru_maxrss is not simultaneous family peak. Handoff records old128KiB cap reached without over-cap write and explicit Root160KiB revision; no history rewritten. Resource claims were inspected as records, not independently remeasured during past execution."
+  },
+  "artifact_checks": {
+    "archive": {
+      "file": "execution-evidence-r1.zip",
+      "bytes": 35329,
+      "sha256": "c04d8bd1034a71f1e63810c2b1c369f97984720f1ab4268d0ab77938a353b7e1",
+      "members": 37
+    },
+    "archive_map": {
+      "file": "execution-evidence-map-r1.json",
+      "bytes": 12876,
+      "sha256": "1053edca3f4a7f40a0ddb89b98d6d91d089971b0e5314d70411a359b14ebca21"
+    },
+    "independent_archive_verification": "PASS CRC, exact unique member inventory, all37 member bytes/SHA/permissions and equality to original_path bytes. Includes genuine RED, failed PATH attempt and fresh success; none reclassified.",
+    "normalized_transport": "All15 durable source rows independently checked bytes/SHA/mode and nonsymlink ancestors; all target names relative/canonical/unique/casefold-unique, no target file/ancestor conflicts.",
+    "saved_ir": "Gzip CRC/decompression and original80770B SHAbb26ff280fa1ed4ce26a381a89107863bdd0cc6deea18105b15e0c12ffdf42c5 checked. Parsed saved three IRs have expected profiles/pins/lanes/endpoint/physical false. They are saved observations, not a fresh reviewer configure execution.",
+    "configuration_hashes": [
+      "e82f77f60e176660ef386a601d56d9c139f3d1c785852edfa394f2439126261b",
+      "58d1e993c116f510ff213ad39ffbef297fb5d6c368977f42511cc23935b2ae4c",
+      "c3218ad44f7dafce847d0f706721daaeb7cdea69224b3219388d192df6da19b3"
+    ]
+  },
+  "nonblocking_metadata_clarifications": [
+    "Freeze production_or_test_source_changed_after_matrix_red=false is overbroad if interpreted to include catalogue data. Untouched handoff explicitly clarifies it means executable Python/test bytes; actual RED/GREEN tuples explicitly bind the expected catalogue edit. No claim all35 source bytes equal RED is accepted.",
+    "Freeze initial feature cap131072 is historical. Handoff records Root explicit revised cap163840 and stopped-at-cap state. No approval is inferred from elapsed time or rewritten old receipts.",
+    "Author normalized map uses docs/delivery/evidence/... prefix and has no base_head. It is not directly accepted by Root r4 append helper fixed tests/evidence/... prefix. Root will preserve this map and create a separately hashed explicit evidence-prefix relocation map; that integration map/actual append has not been reviewed here."
+  ],
+  "blockers": [],
+  "qualification": {
+    "source2_review_pass": true,
+    "owned_complete_configure869_pass": true,
+    "owned_matrix7_green_pass": true,
+    "original_full_commit_r1": "FAILED preserved; configure867 one metadata error",
+    "root_actual_append": "PENDING",
+    "fresh_main_complete_normal_hooks": "PENDING",
+    "commit_push_ff": "PENDING",
+    "previous33_native_arm_evidence": "Historical scope preserved, not relabelled execution of amended35 tuple",
+    "new_arm_sdk_offline_oci_hil": "No new qualification"
+  }
+}

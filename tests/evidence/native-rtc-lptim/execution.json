@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "kind": "manual-native-rtc-lptim-focused-tdd",
+  "actual_feature_git_base": "3b2199861e5f01e2ba7c831cb54905b30b703858",
+  "phase1_freeze_sha256": "675761b772dd4abe093cb73b5ab43425482cd931615724fe281337d5d83040ca",
+  "phase2_freeze_sha256": "a2026941f3f395e7c7d374a05cb1cc24f3a798709bb5b7dcd21589b524e06999",
+  "source": {
+    "io/CMakeLists.txt": {
+      "size": 4345,
+      "sha256": "396e79e6224bd8be571fbbb204b487dd7a2b8f715495cd85cef88b6db9f783f1"
+    },
+    "io/include/nexus/io/lptim.h": {
+      "size": 6026,
+      "sha256": "45ff02a0517ccac94cbd94c3415565029da858167adc750c2919a29162f0c0a1"
+    },
+    "io/include/nexus/io/native/rtc_lptim_model.h": {
+      "size": 2598,
+      "sha256": "525857d06fdce60a471d91edc9a48691906f3b406c42feeb877434b1570dd126"
+    },
+    "io/include/nexus/io/rtc.h": {
+      "size": 7782,
+      "sha256": "ca78e6b19288f146faf54aff21872441f7a0ff1a97a3f3858ec148609a8d61a3"
+    },
+    "io/native/rtc_lptim.c": {
+      "size": 21160,
+      "sha256": "9df0c529946893b825b7f113f5a86535e9ada984c1050867049edcb8f8c26240"
+    },
+    "io/native/rtc_lptim_provider.h": {
+      "size": 4070,
+      "sha256": "8a8b864041df71a47e6a9e60d1a443ee27dbffe5ecb2e031aefca4461e675493"
+    },
+    "io/private/rtc_lptim_internal.h": {
+      "size": 1288,
+      "sha256": "9f8d424d24effc1cb26df2a5fbf16fac1288317f97ca7ae3c6f3ae487fcf0562"
+    },
+    "io/src/lptim.c": {
+      "size": 4376,
+      "sha256": "400cb9109865a3f4f8afd9449987f0d2ed8126b7da44f02ca17cd4aaed3d1fad"
+    },
+    "io/src/rtc.c": {
+      "size": 6105,
+      "sha256": "2e6df76a4b16a495267eaf1a82d6e4128764ec34c26faa520b098f59d787ff4e"
+    },
+    "tests/google/CMakeLists.txt": {
+      "size": 28086,
+      "sha256": "1c855ad6b5ddb13788f5f992ec5ebb35e10f4d2708f7b813f2911d99de29ebbb"
+    },
+    "tests/google/rtc_lptim.cmake": {
+      "size": 586,
+      "sha256": "aefbfe2c308f816bc3d5ae04d486d263449659d169c050c282ffdd499eddccad"
+    },
+    "tests/google/rtc_lptim_final_access_test.cpp": {
+      "size": 5161,
+      "sha256": "884996a67f0bc547cb0b298fb802b9378e1484172fc4ed8524b351cf337d26b3"
+    },
+    "tests/google/rtc_lptim_test.cpp": {
+      "size": 29473,
+      "sha256": "7d0b08f2d077cdb78b12384f1814f2d257077aac08dd499ce52332bcc1b928e6"
+    },
+    "tests/google/rtc_lptim_start_test.cpp": {
+      "size": 14498,
+      "sha256": "936178036efd18853e7e9e09d58fdcef729ae689194cf2daf525539ffbdef1c2"
+    }
+  },
+  "executions": [
+    {
+      "label": "phase1-batch1-build-red-r1",
+      "actual_exit": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "tools/dev/dev.py",
+        "build",
+        "--preset",
+        "native-debug",
+        "--target",
+        "nexus_rtc_lptim_test",
+        "nexus_rtc_lptim_final_access_test",
+        "--parallel",
+        "1"
+      ],
+      "started_ns": 1792287138076149959,
+      "finished_ns": 1792287154661909924,
+      "original_receipt_sha256": "2232838d54271e6a23e52d5196ac2317dd9f055f992d122bbdb6f3afc936b2ad"
+    },
+    {
+      "label": "phase1-batch1-runtime-main-green-r1",
+      "actual_exit": 0,
+      "command": [
+        "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/validation/batch1-runtime-main-green-r1/result.xml"
+      ],
+      "started_ns": 1792287396035639561,
+      "finished_ns": 1792287396043941477,
+      "original_receipt_sha256": "8047867d834c618673d6a399af56e637ca03a9bdfc895853f220ebea9dd9529b"
+    },
+    {
+      "label": "phase1-batch1-runtime-final-access-green-r1",
+      "actual_exit": 0,
+      "command": [
+        "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_final_access_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/validation/batch1-runtime-final-access-green-r1/result.xml"
+      ],
+      "started_ns": 1792287402800123649,
+      "finished_ns": 1792287402804189664,
+      "original_receipt_sha256": "eaafd7cf59d6ef3325cdd7abe7c185ad633848c2f6674b7dbea59c4a308b4ccc"
+    },
+    {
+      "label": "phase2-build-red-r1",
+      "actual_exit": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "tools/dev/dev.py",
+        "build",
+        "--preset",
+        "native-debug",
+        "--target",
+        "nexus_rtc_lptim_start_test",
+        "--parallel",
+        "1"
+      ],
+      "started_ns": 1792288006129160508,
+      "finished_ns": 1792288009106497237,
+      "original_receipt_sha256": "75addbab50037044901b42f8e95aec5514a0fd285f106a93033a64fa1bb316c0"
+    },
+    {
+      "label": "phase2-runtime-main-green-r1",
+      "actual_exit": 0,
+      "command": [
+        "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/batch2/validation/runtime-main-green-r1/result.xml"
+      ],
+      "started_ns": 1792288128950539167,
+      "finished_ns": 1792288128954611262,
+      "original_receipt_sha256": "f5355598767828f1f97a5fb6710a509506cfdc0c99fd6145e7e5c05f1a139ebd"
+    },
+    {
+      "label": "phase2-runtime-final-access-green-r1",
+      "actual_exit": 0,
+      "command": [
+        "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_final_access_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/batch2/validation/runtime-final-access-green-r1/result.xml"
+      ],
+      "started_ns": 1792288128962702524,
+      "finished_ns": 1792288128966536149,
+      "original_receipt_sha256": "8b58eab1b44bfd4452637edfc3612562fd8ccde2d0f9f1059a22d7c18e7b6ad0"
+    },
+    {
+      "label": "phase2-runtime-start-green-r1",
+      "actual_exit": 0,
+      "command": [
+        "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_start_test",
+        "--gtest_filter=*",
+        "--gtest_repeat=1",
+        "--gtest_also_run_disabled_tests",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/batch2/validation/runtime-start-green-r1/result.xml"
+      ],
+      "started_ns": 1792288128956485630,
+      "finished_ns": 1792288128960527448,
+      "original_receipt_sha256": "4836aba5c03b489fc380cc3bc2d2e33cf3790a28ed72c40b6fb0f76c1d5c471e"
+    }
+  ],
+  "final_tests": 38,
+  "final_program_counts": [
+    27,
+    2,
+    9
+  ],
+  "notes": [
+    "No production behavior existed before genuine missing-API link RED. Both test CPPs compiled; only main27 linker was actually attempted and failed.",
+    "Original29 source assertions passed unchanged with first production. Then only RTC active-foreign PROT_NONE oracle was strengthened; this additional coverage passed first run, not a fabricated behavior RED.",
+    "Two namespace line comments failed mechanical style, then became block comments; all failures/raws retained and final10 sources pass.",
+    "Reconstructed/lost previous WIP and historical tests establish no qualification."
+  ],
+  "scope": [
+    "Public typed C11 RTC/LPTIM interfaces and caller-owned Native providers; explicit private reopen.",
+    "Missing-API link failures are actual API RED, not runtime test failures. Both original C++ test files compiled; only the first program linked and failed in phase1 RED.",
+    "Final three complete programs pass with zero failures, errors, skips or disabled tests.",
+    "Factory/configuration/SDK/SoC hardware and physical HIL are not established by this focused evidence.",
+    "No full main-branch gate result is asserted by this record."
+  ]
+}

@@ -1,0 +1,96 @@
+from pathlib import Path
+import gzip,hashlib,json,os,shutil,sys,tarfile
+sys.path.insert(0,'/tmp/nexus-workflow-actionlint-20261018-r1')
+from author import ROOT,TMP,OUT,guard
+sys.path.insert(0,str(ROOT))
+from tools.dev import process
+from scripts.ci import style_gate
+sha=lambda b:hashlib.sha256(b).hexdigest()
+freeze=json.loads((OUT/'source-freeze-r3.json').read_text())
+for row in freeze['sources']:
+ data=(ROOT/row['path']).read_bytes()
+ assert sha(data)==row['after']['sha256'] and (OUT/row['transport']).read_bytes()==data
+baseline=json.loads((OUT/'baseline.json').read_text())
+assert (ROOT/'.git/index').read_bytes()==gzip.decompress((OUT/'before/index.gz').read_bytes())
+for row in baseline['unrelated_untracked']:
+ data=(ROOT/row['path']).read_bytes();assert sha(data)==row['sha256'] and len(data)==row['bytes']
+env={key:value for key,value in os.environ.items() if not key.startswith('GIT_')}|{'GIT_CONFIG_NOSYSTEM':'1','GIT_CONFIG_GLOBAL':os.devnull,'GIT_CONFIG_SYSTEM':os.devnull,'GIT_OPTIONAL_LOCKS':'0','GIT_NO_REPLACE_OBJECTS':'1','GIT_NO_LAZY_FETCH':'1'}
+def actual(label,args,cwd):
+ result=process.run(['git',*args],cwd=cwd,env=env,log=TMP/'audit'/(label+'.log'),timeout=30,stage=label)
+ assert result.returncode==0,(label,result.stderr)
+ receipt=json.loads((TMP/'audit'/(label+'.command.json')).read_text())
+ return Path(receipt['stdout']['path']).read_bytes()
+records=actual('final-author-full-index',['ls-files','--stage','-z'],ROOT)
+assert sha(records)==baseline['full_index_records_sha256']
+(TMP/'final-fixture-index-r3.raw').write_bytes(actual('final-style-fixture-index',['ls-files','--stage','-z'],TMP/'final-fixture'))
+tracked_changes=actual('final-author-tracked-changes',['diff','--name-only','-z'],ROOT)
+assert set(tracked_changes.decode().strip('\0').split('\0'))<={row['path'] for row in freeze['sources']}
+actual('final-author-untracked-names',['ls-files','--others','--exclude-standard','-z'],ROOT)
+index_rows={}
+for row in records.split(b'\0'):
+ if row:
+  meta,name=row.split(b'\t',1);index_rows[name.decode()]=meta.split()
+owned=[]
+for path in style_gate.formatting.find_source_files(ROOT,ROOT/'.clang-format-dirs'):
+ name=str(path.relative_to(ROOT));data=path.read_bytes();copy=(TMP/'final-fixture'/name).read_bytes();assert data==copy
+ oid=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+ assert oid==index_rows[name][1].decode()
+ owned.append({'path':name,'bytes':len(data),'sha256':sha(data),'index_oid':oid})
+(TMP/'style-owned-inputs-r3.json.gz').write_bytes(gzip.compress((json.dumps(owned,indent=2)+'\n').encode(),mtime=0))
+commands=[]
+for path in sorted((TMP/'runs').glob('*.command.json')):
+ if path.name.startswith('package-execution-r1'):continue
+ record=json.loads(path.read_text());assert record['outcome']!='running'
+ commands.append({'receipt':str(path.relative_to(TMP)),**record})
+(OUT/'command-summary-r1.json.gz').write_bytes(gzip.compress((json.dumps(commands,indent=2)+'\n').encode(),mtime=0))
+root=Path('/tmp/nexus-io-validation-20261018');python='/workspace/nexus-build-system-20261012/.venv/bin/python'
+archive=Path('/tmp/nexus-actionlint-assets-20261018-r1/actionlint_1.7.12_linux_amd64.tar.gz');prefix=root/'.venv/nexus-actionlint';cache=root/'build/cache/downloads'
+lock=(ROOT/'dependencies/actionlint.lock.json').read_bytes()
+preparation={'status':'Root integration instructions; not executed by author against Main','cwd':str(root),'python':python,'prefix':str(prefix),'cache':str(cache),'lock_sha256':sha(lock),'archive':{'path':str(archive),'bytes':archive.stat().st_size,'sha256':sha(archive.read_bytes())},'executable':{'member':'actionlint','bytes':6074530,'sha256':'c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4','mode':493},'notice':{'member':'LICENSE.txt','bytes':1067,'sha256':'03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22','mode':420},'commands':[[python,'tools/dev/cache.py','put','--file',str(archive),'--cache',str(cache),'--sha256','8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8'],[python,'tools/dev/dependencies.py','actionlint-prepare','--root',str(root),'--install-dir',str(prefix),'--cache',str(cache)],[python,'tools/dev/dev.py','doctor','--target','workflows']],'notes':['Apply canonical14source first; explicit prepare reuses cache.fetch verified hit and never needs network after cache.put.','Main .venv was observed as a real directory, not a symlink; prefix did not exist. Recheck before Root preparation.','No pip install, requirements, environment.lock, recipe or OCI changes are required for these three commands. Existing PyYAML6.0.3 and exact TDD three-pin hook environment remain authorities.','Hook/defaultdoctor use Main/.venv/nexus-actionlint; the author TMP prepared prefix is not silently reused.']}
+(OUT/'root-integration-preparation-r1.json').write_text(json.dumps(preparation,indent=2)+'\n')
+classifications={
+'integration-red':'29 methods: new prepare call missing1 failure and new doctor route1 error; old assertions passed.',
+'driver-real-red':'First24:6 failures includes one incorrect numeric-to-string assumption; corrected tests and rerun retained separately.',
+'driver-real-red-r2':'Corrected24:5 presence/containment failures; early nested fixture artifacts were automatically cleaned; whole-module raw retained.',
+'driver-real-red-retained':'Accepted initial24-method presence RED:5 failures/0errors; nested original tool raw and input snapshots retained.',
+'boundary-red':'71 methods:2 failures(case-directory alias/hardlink output) and1 error(cache/prefix overlap reached actual prepare then failed publish); all original raw retained.',
+'workflow-integration-red':'48 methods:1 new missing-hook integration error plus4 old CTest setup failures from missing cmake PATH; not wholly production RED.',
+'local-path-red':'31 methods:2 real WorkflowError errors rejecting valid root/trailing-slash local actions; same whole module GREEN after narrow fix.',
+'review-gap-real-red':'35 methods:5 output/blob behavior failures plus2 fixture-subcase path-reuse errors; not the accepted clean8-failure RED.',
+'review-gap-real-red-r2':'Accepted review-gap RED:36 methods/8 failures/0errors; index/worktree output alias and pre-read size/closure boundary; same whole module GREEN.',
+'replacement-real-red':'Accepted exact-object RED:37 methods/1 failure/0errors; bad indexed workflow hidden by real refs/replace. Same whole module GREEN.',
+'offline-root-real-red':'38 methods/3 subtest failures from real partial/promisor configurations; first coverage of fail-closed root contract.',
+'offline-root-real-red-r2':'Accepted ordinary-root contract RED:38 methods/3 subtest failures/0errors, with byte-preservation and actual-Git-spy assertions; same module GREEN.',
+'whole-ci':'400 methods:2 failures/1error from cold shared hook environment missing pip.__main__; setup failure, not production RED. Prepared Root tuple rerun400/0.',
+'final-strict-style':'Fixture setup lacked core; not behavior RED.',
+'final-strict-style-r2':'Fixture setup lacked empty boards directory; not behavior RED.',
+'installed-git-no-lazy-probe':'Local file-only capability proof on Git2.52.0; no clone/external network. Not production behavior RED.'}
+checks={}
+for label,name,expected in [('testing','whole-testing-final.json',1006),('configure','whole-configure.json',857),('ci','whole-ci-final-bound-r3.json',412),('workflows','whole-workflows.json',81)]:
+ report=json.loads((TMP/name).read_text());assert report['executed']==expected and report['status']=='passed' and not report['skipped']
+ checks[label]=report
+style=json.loads((TMP/'strict-style.json').read_text());assert style['status']=='passed' and not style['errors'] and style['source_files_checked']==926 and style['text_files_selected']==14
+summary={'schema_version':1,'base_commit':freeze['base_commit'],'final_source_freeze_sha256':sha((OUT/'source-freeze-r3.json').read_bytes()),'source_count':14,'checks':checks,'final_driver_methods':38,'final_full_workflows':11,'strict_style':{'source_files_checked':926,'text_files_selected':14,'status':'passed','legacy_format_files':style['legacy_format_files'],'legacy_comment_files':style['legacy_comment_files']},'classifications':classifications,'binding_limits':['testing1006/configure857/workflows81 ran before the last CI-driver-only exact-object/offline-root hardening. Their tool production sources/tests are unchanged; Root explicitly accepted no duplicate heavy run and will execute the full final tuple in mandatory normal commit hooks.','FinalCI412, complete driver38, full11 DSL lint and strict style926+14 executed finalr3 source bytes; no skips, filters, shards, debt rebaseline or actual-repository hook bypass.','The Root-independent asset/probe packages remain unchanged. Execution snapshots preserve content, not reconstructible full Git index/modes.','No source SDK, remote dispatch, firmware, compiler/OCI tuple preservation, physical hardware or IO27/IO30 completion claim.'],'actual_repo_index_unchanged':True,'unrelated11_unchanged':True,'guards':guard()}
+(OUT/'execution-summary-r1.json').write_text(json.dumps(summary,indent=2)+'\n')
+allowed_dirs={'runs','test-evidence','replace-probe','lazy-git-probe','audit','tool-prefix'}
+files=[]
+for path in TMP.rglob('*'):
+ if not path.is_file():continue
+ rel=path.relative_to(TMP);parts=rel.parts
+ if '__pycache__' in parts:continue
+ if len(parts)>1 and parts[0] not in allowed_dirs and not parts[0].startswith('final-full11'):continue
+ if parts[0]=='tool-prefix' and path.name=='actionlint':continue
+ if parts[0]=='runs' and parts[1].startswith('package-execution-r1'):continue
+ assert not path.is_symlink()
+ files.append(path)
+rows=[{'member':str(path.relative_to(TMP)),'original_path':str(path),'bytes':path.stat().st_size,'sha256':sha(path.read_bytes()),'mode':path.stat().st_mode&0o777} for path in sorted(files)]
+archive=OUT/'execution-evidence-r1.tar.gz';assert not archive.exists()
+with tarfile.open(archive,'w:gz') as output:
+ for row in rows:output.add(TMP/row['member'],arcname=row['member'],recursive=False)
+with tarfile.open(archive,'r:gz') as content:
+ members=content.getmembers();assert len(members)==len(rows)
+ for item,row in zip(members,rows):
+  data=content.extractfile(item).read();assert item.name==row['member'] and item.isfile() and len(data)==row['bytes'] and sha(data)==row['sha256'] and item.mode==row['mode']
+(OUT/'execution-evidence-map-r1.json.gz').write_bytes(gzip.compress((json.dumps(rows,indent=2)+'\n').encode(),mtime=0))
+print(json.dumps({'archive_bytes':archive.stat().st_size,'archive_sha256':sha(archive.read_bytes()),'members':len(rows),'commands':len(commands),'persistent_allocated':sum(p.stat().st_blocks*512 for p in OUT.rglob('*') if p.is_file()),'guards':guard()}))
+assert sum(p.stat().st_blocks*512 for p in OUT.rglob('*') if p.is_file())<=2*1024**2

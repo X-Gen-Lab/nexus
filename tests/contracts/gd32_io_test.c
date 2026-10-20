@@ -88,7 +88,7 @@ static void gpio_cases(void) {
 /** \brief           Exercise true TC, rejected borrow, failed abort and late
  * IRQ. */
 static void uart_cases(void) {
-    nx_gd32_uart_state_t port;
+    nx_gd32_uart_state_t port = {0};
     s_uart_irq_state = &port;
     const nx_uart_port_t port_api = {&nx_gd32_uart_ops, &port};
     (void)port_api;
@@ -99,7 +99,7 @@ static void uart_cases(void) {
                                   6u) == NX_ERROR_INVALID);
     CHECK(nx_gd32_uart_initialize(&port, 115200u, NX_UART_RX_EVENTS, queue, 2u,
                                   6u) == NX_SUCCESS);
-    nx_gd32_uart_state_t duplicate;
+    nx_gd32_uart_state_t duplicate = {0};
     const nx_uart_port_t duplicate_api = {&nx_gd32_uart_ops, &duplicate};
     (void)duplicate_api;
     CHECK(nx_gd32_uart_initialize(&duplicate, 115200u, NX_UART_RX_EVENTS, queue,

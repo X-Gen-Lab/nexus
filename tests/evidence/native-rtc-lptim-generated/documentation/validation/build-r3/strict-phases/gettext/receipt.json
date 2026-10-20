@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "command": [
+    "/tmp/nexus-recovery-docs-tools-20261018-r1/venv/bin/python",
+    "-m",
+    "sphinx",
+    "-n",
+    "-W",
+    "--keep-going",
+    "-c",
+    "/tmp/nexus-io36-native-20261018/docs/sphinx",
+    "-d",
+    "/tmp/nexus-io36-native-20261018/build/documentation-attempts/34baefbbab8c4195aec0687be71997b0/doctrees",
+    "-b",
+    "gettext",
+    "/tmp/nexus-io36-native-20261018/docs",
+    "/tmp/nexus-io36-native-20261018/build/documentation-attempts/34baefbbab8c4195aec0687be71997b0/gettext"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "documentation-gettext",
+  "started_ns": 1792292379848547698,
+  "finished_ns": 1792292395298906606,
+  "duration_seconds": 15.4503601790002,
+  "timeout_seconds": 900.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 2,
+  "stdout": {
+    "path": "/tmp/nexus-io36-native-20261018/build/documentation-attempts/34baefbbab8c4195aec0687be71997b0/gettext.attempts/1792292379848502941-5dde3ccf463d4522ab9c2e7906f57fd4/stdout.txt",
+    "bytes": 19708,
+    "sha256": "08cec7ca9a3fefdf98c38195ff1a569368ef5e3302856ea985504ceae34868cb"
+  },
+  "stderr": {
+    "path": "/tmp/nexus-io36-native-20261018/build/documentation-attempts/34baefbbab8c4195aec0687be71997b0/gettext.attempts/1792292379848502941-5dde3ccf463d4522ab9c2e7906f57fd4/stderr.txt",
+    "bytes": 307,
+    "sha256": "21ab56a675eba50c9f2a56d9e0fc64371f7e88e6cb1b70698144894ac7e84c71"
+  }
+}

@@ -1,0 +1,693 @@
+{
+  "kind": "Independent read-only SDK consumer transport source and evidence review",
+  "reviewer": "/root/io24_ram_impl_r2",
+  "decision": "PASS_EXACT_R3_HOST_TOOLING_BATCH",
+  "open_blockers": [],
+  "qualification_boundary": "Ready for Root integration/full gates of this host-tooling change. This does not qualify a new SDK/ARM/OCI/offline/HIL run, and does not turn failed a07 qualification into a pass.",
+  "bound_inputs": {
+    "plan": {
+      "bytes": 23988,
+      "sha256": "7c7b795a70b76f7baca740f6c4598eee37bd8defbc6124dd0515bd8fd6a009d4"
+    },
+    "source_freeze": {
+      "bytes": 3606,
+      "sha256": "a8e9fd659e71cb43da0d1262457e450c3e3aec3b03c576c6d4ee6892f241db29"
+    },
+    "handoff": {
+      "bytes": 4217,
+      "sha256": "706a4d25ee88245f5ec62ed1cf51161ea6301547439e1bfd26ecdb686ce104bb"
+    },
+    "original_handoff": {
+      "bytes": 11104,
+      "sha256": "2c0de6ae2e5d9c46e70ce21d2b0e6ba74a360c1417d7d3b7a5fc3282b16d713e"
+    },
+    "original_evidence_manifest": {
+      "bytes": 16390,
+      "sha256": "6b26e02b393ca98fbc2846b1606be6751ed05c7b5e0c18b6f422e576116c4b44"
+    },
+    "evidence_extension": {
+      "bytes": 5525,
+      "sha256": "ff65808fac9b74213febe2cdb35634b8cf7cd1aa3ae80fe0a3731f62abdfdd10"
+    },
+    "base_commit": "38271c0d1749ce3f2225ee4de5ddc8b1cc0bc96b",
+    "index": {
+      "bytes": 3516583,
+      "sha256": "85fe752015f12be5ca7345e4a13c22fb17e17f9d44ee23764ffda80664b79b44"
+    }
+  },
+  "final_seven_sources": {
+    "tools/release/transport.py": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/files/tools/release/transport.py",
+      "sha256": "87c45d19dfa6a17496ca7974d4b1f70a7b4de306ea19e339e20c727ab1756764",
+      "size": 22112,
+      "mode": 384,
+      "before_sha256": "0e3c9ab5722f0d58b82500e5b2718a955df055adc656832dd3ac89c1d5f1cf96"
+    },
+    "cmake/package/verify_consumers.py": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/cmake/package/verify_consumers.py",
+      "sha256": "8f1db6316f90bc3ea40961c1a4e3884f8d56b97cf4c2049d1194a119284adbd0",
+      "size": 30252,
+      "mode": 384,
+      "before_sha256": "19ce976ca80079240ca5ef723710ffc52945eba34917b0ee736d505810c9b87d"
+    },
+    "cmake/package/package_source_sdk.py": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/cmake/package/package_source_sdk.py",
+      "sha256": "8a7cc46345f6c368868d97573d5ea0802eae4959e7b5dcf94a8976c5bd833152",
+      "size": 50684,
+      "mode": 384,
+      "before_sha256": "ae715c4da9c6c418ce3ff423367d85d61fc0946b1234f82d3e6a2fbfc5e025f7"
+    },
+    ".github/workflows/test_release.py": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/files/.github/workflows/test_release.py",
+      "sha256": "9b2398d9e3eda4dad88f4e842921003bd0eb28a0882d251260259413f70bfa47",
+      "size": 69892,
+      "mode": 384,
+      "before_sha256": "4d171a2b962813639b3754a7365d89b57d96c6c05e120e1b1b2e0b7ad4a95af0"
+    },
+    "tools/release/README.md": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/release/README.md",
+      "sha256": "2f1a86f050222e5295c6208f9e595f9022a8091d31ea36e4a37c8422b71fa482",
+      "size": 6620,
+      "mode": 384,
+      "before_sha256": "8e1a6b524cb58d4bd856e6feaece7364b7d0886c866db25eeaaf604f2d44ae72"
+    },
+    "tests/contracts/test_source_sdk.py": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tests/contracts/test_source_sdk.py",
+      "sha256": "99a2e394f953f6350d09be33140fc0af09ddc17dbd3d666349a22f08aed0a3ad",
+      "size": 112227,
+      "mode": 384,
+      "before_sha256": "ac336f46b7b1558f14f8bb3e4421701a4c1a98b67485aab52e377df8be619126"
+    },
+    "tools/testing/test_sdk_verification_call.py": {
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final/files/tools/testing/test_sdk_verification_call.py",
+      "sha256": "6818734a2cca5a42c2fe55fdf639ef659955fd4310aa7cba878d6be504e9691d",
+      "size": 38454,
+      "mode": 384,
+      "before_sha256": "664b5d1d4ea503bfbfddd561121c1b8883ccb57bd2c8d24f1374d14a7b0bc925"
+    }
+  },
+  "before_source_and_index": {
+    "all_seven_match_base_blobs": true,
+    "full_index_gzip_CRC_EOF_size_SHA_checked": true,
+    "before_index_compressed": {
+      "bytes": 731806,
+      "sha256": "d68b21672dc36b126dbb09da2cc474d12d7a1ce4bfa8fdfb19a97baa932ade7f"
+    },
+    "index_before_after_identical": true,
+    "only_seven_tracked_behavior_paths_changed": [
+      ".github/workflows/test_release.py",
+      "cmake/package/package_source_sdk.py",
+      "cmake/package/verify_consumers.py",
+      "tests/contracts/test_source_sdk.py",
+      "tools/release/README.md",
+      "tools/release/transport.py",
+      "tools/testing/test_sdk_verification_call.py"
+    ],
+    "no_untracked_behavior": true
+  },
+  "architecture_review": [
+    "One immutable stdlib-only canonical plan lives in existing standalone transport.py. Producer imports BASE/MODERN/SELECTED tuples from its verified source root; old selected18 values are byte-semantic equivalents, not a second registry.",
+    "consumer_layout is pure in-memory projection returning nested tuples; exact Git roots and image paths are frozen sets. Pack and verify compute the trusted plan, rather than accepting report/manifest lists as authorization.",
+    "Producer base/modern/selected loops retain original commands, order, toolchain selection, source identity, build parallel argument and resource/retention/runtime checks. No producer execution was removed.",
+    "Standalone pack/verify has only stdlib imports; attach retains its existing explicit source policy import. Transport does not import consumer builder or arbitrary raw-output modules.",
+    "Current schema_version is strictly int2; policy is nexus-sdk-consumers-v2; exact root/image claims and raw_bytes_pruned=False are mandatory. Historical schema1/old13 stays frozen and is rejected as a current fallback.",
+    "Existing strict Git skeleton checks remain: exact root set, only unborn HEAD/core defaults/comment excludes/default description/sample hooks and empty allowed subdirectories; files named .git, history/index/refs/logs/remotes/active hooks/foreign metadata remain rejected.",
+    "No symlink/hardlink/special member, safe-name, duplicate JSON/member, nonempty owned fresh-separated output, MAX_FILES/MAX_BYTES and original raw byte/SHA/file-mode inventory checks were weakened.",
+    "Original verification.json bytes equal the raw archive member; source and builder/run/workflow/helper identities remain separate. Transport validates claims and retains logs; it does not prove a command actually ran.",
+    "package_source_sdk.py adds transport.py explicitly to REQUIRED_FILES. Real SDK verify rejects its rehashed omission before later dependency admission; default export alone is not used as proof.",
+    "No CI required-job set, workflow YAML, release gate, source policy, SDK locks, tool/dependency identity or firmware source changed."
+  ],
+  "exact_matrix": {
+    "roots": 31,
+    "images": 34,
+    "base_roots": 3,
+    "modern_roots": 10,
+    "selected_roots": 18,
+    "ARM_images": 30,
+    "Native_images": 4,
+    "source_roots": [
+      "native source/.git",
+      "stm32 source/.git",
+      "gd32 source/.git",
+      "h743 baremetal source/.git",
+      "h743 freertos source/.git",
+      "u575 baremetal source/.git",
+      "u575 freertos source/.git",
+      "f103 baremetal source/.git",
+      "f103 freertos source/.git",
+      "gd303 baremetal source/.git",
+      "gd303 freertos source/.git",
+      "g474 baremetal source/.git",
+      "g474 freertos source/.git",
+      "selected h743 high source/.git",
+      "selected u575 gpdma source/.git",
+      "selected g474 fd normal source/.git",
+      "selected g474 fd loopback source/.git",
+      "selected g474 pwm adc source/.git",
+      "selected g474 adc regular software source/.git",
+      "selected g474 adc regular timer source/.git",
+      "selected g474 adc injected software source/.git",
+      "selected g474 adc injected timer source/.git",
+      "selected h743 fifo source/.git",
+      "selected u575 fifo source/.git",
+      "selected f407 frames source/.git",
+      "selected gd470 frames source/.git",
+      "selected h743 rtscts source/.git",
+      "selected u575 rtscts source/.git",
+      "selected g474 shared pwm source/.git",
+      "selected native time pair source/.git",
+      "selected native time empty source/.git"
+    ],
+    "image_paths": [
+      "native build/bin/installed_c",
+      "native build/bin/installed_cpp",
+      "stm32 build/bin/installed_c.elf",
+      "stm32 build/bin/installed_cpp.elf",
+      "gd32 build/bin/installed_c.elf",
+      "gd32 build/bin/installed_cpp.elf",
+      "h743 baremetal build/bin/installed_modern.elf",
+      "h743 freertos build/bin/installed_modern.elf",
+      "u575 baremetal build/bin/installed_modern.elf",
+      "u575 freertos build/bin/installed_modern.elf",
+      "f103 baremetal build/bin/installed_modern.elf",
+      "f103 freertos build/bin/installed_modern.elf",
+      "gd303 baremetal build/bin/installed_modern.elf",
+      "gd303 freertos build/bin/installed_modern.elf",
+      "g474 baremetal build/bin/installed_modern.elf",
+      "g474 freertos build/bin/installed_modern.elf",
+      "selected h743 high build/bin/installed_selected.elf",
+      "selected u575 gpdma build/bin/installed_selected.elf",
+      "selected g474 fd normal build/bin/installed_selected.elf",
+      "selected g474 fd loopback build/bin/installed_selected.elf",
+      "selected g474 pwm adc build/bin/installed_selected.elf",
+      "selected g474 adc regular software build/bin/installed_selected.elf",
+      "selected g474 adc regular timer build/bin/installed_selected.elf",
+      "selected g474 adc injected software build/bin/installed_selected.elf",
+      "selected g474 adc injected timer build/bin/installed_selected.elf",
+      "selected h743 fifo build/bin/installed_selected.elf",
+      "selected u575 fifo build/bin/installed_selected.elf",
+      "selected f407 frames build/bin/installed_selected.elf",
+      "selected gd470 frames build/bin/installed_selected.elf",
+      "selected h743 rtscts build/bin/installed_selected.elf",
+      "selected u575 rtscts build/bin/installed_selected.elf",
+      "selected g474 shared pwm build/bin/installed_selected.elf",
+      "selected native time pair build/bin/installed_selected",
+      "selected native time empty build/bin/installed_selected"
+    ],
+    "auxiliary_semantics": "Only direct reviewed build/bin entries with suffix empty or .elf form the exact executable set. Other inventoried auxiliary .bin/.map/.resources.json/FlashRAM raw/json outputs are preserved, not counted as extra executable images. No claim that each bin contains only34 files or that arbitrary file formats are inspected."
+  },
+  "gzip_and_TAR_review": {
+    "actual_CRC_ISIZE_truncation_RED": true,
+    "bounded_gzip": "zlib single-member reader uses65536-byte compressed chunks and65536 max output per iteration; expanded bytes <=MAX_BYTES+(MAX_FILES+1)*4096; validates actual CRC/ISIZE/trailer EOF and rejects unused_data or subsequent compressed bytes. No unbounded whole archive decompression in production.",
+    "TAR_inventory": "Existing bounded complete safe regular-member inventory compares sizes/SHA/file modes; no extraction or execution of payload.",
+    "TAR_tail": "After iteration seek(archive.offset) rewinds to last valid member end, including a malformed/truncated header that TarFile.next may already have consumed as EOF. Remaining reads are bounded65536 and must all be zero padding.",
+    "closed_R3_blocker": "Actual whole42 admitted bad512B end-header and short nonzero end-header under r2: two subtest failures, zero fixture errors. Minimal seek/comment change closes this in same42 plus final24/19.",
+    "other_adversarial_coverage": "RehashedCRC/ISIZE/truncation; compressed garbage/concatenation; same-member nonzero tail/second TAR; legal zero padding; bounded expansion. Gzip compressed trailing/concat originally already rejected by first fix and is coverage, not fabricated RED.",
+    "generic_store_limit": "No claim to change or broadly qualify tools/evidence/store.py; this is the selected consumer transport boundary."
+  },
+  "closed_findings_and_history": {
+    "original35": "Original production + tests-only35: old33 passed, new31/34 positive failed at stale13 gate (one error); three rehashedCRC/ISIZE/truncation subcases admitted (three failures). All raw and original-source identities retained.",
+    "extra_image41": "Actual unknown additional .elf in reviewed bin admitted; full41 RED one failure, then exact executable-set fix.",
+    "tar_tail41": "Actual nonzero same-gzip TAR tail and float2.0 schema plus remaining extra-image case failed. A second-TAR variable-shadow AttributeError was a fixture error, preserved and not counted as production RED; corrected fixture later passed.",
+    "r2_85": "r2 same-source42+24+19 all passed as historical coverage, then was held from final review due newly found consumed-header gap. Not falsely reused as final r3 qualification.",
+    "r3_badheader42": "Two actual bad/short end-header failures, zero errors; one seek line plus invariant comment; final r3 three scopes all pass."
+  },
+  "actual_executions": [
+    {
+      "stage": "release-tests-only-red-r1",
+      "tests": 35,
+      "exit_code": 1,
+      "failure_subcases": [
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='crc')",
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='size')",
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='truncated')"
+      ],
+      "error_subcases": [
+        "test_complete_current_consumer_matrix_crosses_transport (test_release.ConsumerTransportTests.test_complete_current_consumer_matrix_crosses_transport)"
+      ],
+      "result": {
+        "bytes": 3709,
+        "sha256": "3051d8acf3ebbaff7fa8800c9f511c97f5dd322bbe86ce67d5ece74b1fad13d8"
+      },
+      "receipt": {
+        "bytes": 1507,
+        "sha256": "197638403ae1a0c6fa45f3ff6287b322e660a9b11a677aeb95a919657c2cc24e"
+      },
+      "attempt_receipt": {
+        "bytes": 1290,
+        "sha256": "77359c4d614c68cf1b28e3c730718e7a4b480a3dfa34a90790fd529b7d027b77"
+      },
+      "raw": {
+        "bytes": 9888,
+        "sha256": "7a5f2428dda9fba9bf7cffca3d45262730ccf9ec17ec5c77025ce026c1b0045e"
+      },
+      "working_tree_sha256": "dfeda284e03e1653a7ff5014f15e8ec7df0cbf9bb76b686f50d63f0e9ce91637",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 33072
+    },
+    {
+      "stage": "release-first-green-r1",
+      "tests": 41,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3706,
+        "sha256": "413ebe06960a34edf10e12ff07299b56527821144788e4e30e259aea3f88d4e2"
+      },
+      "receipt": {
+        "bytes": 1496,
+        "sha256": "721b64156a4aff871828053b8e2a37d3a68f5cb122786e2da43debf9e385c9d4"
+      },
+      "attempt_receipt": {
+        "bytes": 1282,
+        "sha256": "c8b2db6f5039037d8fc9c5d974089854baa75570e60a535878338531b1ff2147"
+      },
+      "raw": {
+        "bytes": 7050,
+        "sha256": "448dd51a3e7de810127167259da2f5e2aa719b0ec251f08c1130543c294cd7ab"
+      },
+      "working_tree_sha256": "b9558cdbb5cd3c3b014e56aa95abdaf712f9b94b55bdc80a29ab94a3f77389bf",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 35936
+    },
+    {
+      "stage": "source-sdk-selection-class-r1",
+      "tests": 19,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3713,
+        "sha256": "2c7f098a024381e0b26496d0b3f95e1138a91c234dcfc5b196e82d7431f52190"
+      },
+      "receipt": {
+        "bytes": 1803,
+        "sha256": "0b20cad166fabf6f0b8fd17bb29052781959b3dd7d9acf0e74eaa0cbfe86cf08"
+      },
+      "attempt_receipt": {
+        "bytes": 1582,
+        "sha256": "752dfbc21cf47d0fe6183a5ca3273b6b04c642a207e5f1d9ff8c7c7c75cb26d0"
+      },
+      "raw": {
+        "bytes": 3436,
+        "sha256": "a070e52f86f7967d9a4d8700cc07945dc269d2c949a08604e3bdd4a541771e7e"
+      },
+      "working_tree_sha256": "b76dd5e3216a13582dd21d72fbef4fa902dc703fb9a7b63bf76c1593cd43715b",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 28880
+    },
+    {
+      "stage": "release-extra-image-red-r1",
+      "tests": 41,
+      "exit_code": 1,
+      "failure_subcases": [
+        "test_equal_count_root_substitution_and_report_claim_cannot_authorize_it (test_release.ConsumerTransportTests.test_equal_count_root_substitution_and_report_claim_cannot_authorize_it) (change='extra-image')"
+      ],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3710,
+        "sha256": "24006c9151a6d1f13016722bf5d84cc2949cd8313c3a7713aa95729fd01c4bd8"
+      },
+      "receipt": {
+        "bytes": 1512,
+        "sha256": "0b9c0e702927559b4f7bc37ecf0f6f5c4ad8096ef4f17394c73847f4c89518a2"
+      },
+      "attempt_receipt": {
+        "bytes": 1294,
+        "sha256": "b6853138a6f2a2bf0d95ac47f510e698873cc9e2e63015a42891a7276e629290"
+      },
+      "raw": {
+        "bytes": 7992,
+        "sha256": "c614901302e3f06ba8f260be0f48599f9bb92abcc86011a51aa3bab6f91b4dd0"
+      },
+      "working_tree_sha256": "2d4dbe9faa17761812155fd6a46a9f1506f3ff5b772a4fc9f32bcb0499a226c6",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 35728
+    },
+    {
+      "stage": "release-tar-tail-red-r1",
+      "tests": 41,
+      "exit_code": 1,
+      "failure_subcases": [
+        "test_equal_count_root_substitution_and_report_claim_cannot_authorize_it (test_release.ConsumerTransportTests.test_equal_count_root_substitution_and_report_claim_cannot_authorize_it) (change='extra-image')",
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='tar-tail')",
+        "test_schema_and_manifest_claims_cannot_reduce_or_expand_the_plan (test_release.ConsumerTransportTests.test_schema_and_manifest_claims_cannot_reduce_or_expand_the_plan) (change='float-schema')"
+      ],
+      "error_subcases": [
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='second-tar')"
+      ],
+      "result": {
+        "bytes": 3707,
+        "sha256": "68b3c1522f088d5aa815642a7c106b99bbb507e132d10f5c52a6ea5526681925"
+      },
+      "receipt": {
+        "bytes": 1500,
+        "sha256": "84bf8d3ee973748385982157856696fa6085864e98736e37240a12e8276731f4"
+      },
+      "attempt_receipt": {
+        "bytes": 1285,
+        "sha256": "1d95f5f6bb56f43055dfd8be8b2b1819cb4635a6f2b41ca9daf15f57c011bd05"
+      },
+      "raw": {
+        "bytes": 10684,
+        "sha256": "a045841ab2305a48bc2c7a6c61caf88443daedb99301ad7ae7ebb8d287de80d8"
+      },
+      "working_tree_sha256": "396a1dc25c7471cf014142cc1c9749f0a97522310422f83f2e7faa8cc1bbb3bd",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 38868
+    },
+    {
+      "stage": "release-final-green-r1",
+      "tests": 42,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3706,
+        "sha256": "919648439799001fd18e9a2746cfbcb16582f74f7c0fc969501341f3227fb5d7"
+      },
+      "receipt": {
+        "bytes": 1496,
+        "sha256": "bf439c06b21450cc51ee63ddc96a2e475d2611aa39289eddcb5ab669bdd7029e"
+      },
+      "attempt_receipt": {
+        "bytes": 1282,
+        "sha256": "a0e0ad718e1ef7a45e2d4993c51dd7facf88cdfb2bea83de9c6d6d2996a879d3"
+      },
+      "raw": {
+        "bytes": 7217,
+        "sha256": "b553516a513508c4c8127a7ff01496408eababc47ea625e69c7d20d33fd6f2c0"
+      },
+      "working_tree_sha256": "0410ef4d788ccc63f58b05efe2f1a65861f33601e5843620938974d0b7a44d1e",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 39000
+    },
+    {
+      "stage": "release-final-green-r2",
+      "tests": 42,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3706,
+        "sha256": "3860e7a49e35c6846f210578b4320b14669c62bed42cb642d680ebd8523e8180"
+      },
+      "receipt": {
+        "bytes": 1495,
+        "sha256": "bcb40ce7c3c983733eee23245ea46862cb0bad90df3827b409f880920a97fb89"
+      },
+      "attempt_receipt": {
+        "bytes": 1281,
+        "sha256": "a4e7901cc78dc4fb3831e198530ef98c56d029311ba7b7557916c6a300d8b061"
+      },
+      "raw": {
+        "bytes": 7217,
+        "sha256": "02e5ce9e9043539c7952c9790a324cb90c0525e359fe1908ff50c297739e7b71"
+      },
+      "working_tree_sha256": "677307aa67b953ebefc01a3a4bec3391374e5434b412b0b7bc849240cfc03278",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 39628
+    },
+    {
+      "stage": "producer-whole-module-final-r2",
+      "tests": 24,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3714,
+        "sha256": "99b93bbdc92d7c43ea85bdbfe701dc6d36e4472175c3d27534c2e45ad8a7302a"
+      },
+      "receipt": {
+        "bytes": 1537,
+        "sha256": "44305c0a370cb49d8256d7c487970d1a7d4903e31e703a7cf9c61c56718d220d"
+      },
+      "attempt_receipt": {
+        "bytes": 1315,
+        "sha256": "16ce0bcd02e75e3e1bd31ca0e48335150281dbbc2fe15f0fc6c1be66d64c23a0"
+      },
+      "raw": {
+        "bytes": 4501,
+        "sha256": "a77947cbe17f396fed579de8bec03d77ee406860bab40ebff617a4ae4adb69ef"
+      },
+      "working_tree_sha256": "677307aa67b953ebefc01a3a4bec3391374e5434b412b0b7bc849240cfc03278",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 44612
+    },
+    {
+      "stage": "source-sdk-selection-class-final-r2",
+      "tests": 19,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3719,
+        "sha256": "64c71ddea91613b1ab41c4ea875b656a708fb13a16d011f52c30fc9574536a85"
+      },
+      "receipt": {
+        "bytes": 1827,
+        "sha256": "83d47c95d03643a072c8a54293b87f9adc01294a8353f5155382029016e659e8"
+      },
+      "attempt_receipt": {
+        "bytes": 1600,
+        "sha256": "8e5a6133e4396392c33027ddfbe7ff93184d9db8fd5548afa50b4357c205424d"
+      },
+      "raw": {
+        "bytes": 3436,
+        "sha256": "b2b185a45c26ea4545d81e4d149a78c34ca44ce55fb323d15d46934bc39251a5"
+      },
+      "working_tree_sha256": "677307aa67b953ebefc01a3a4bec3391374e5434b412b0b7bc849240cfc03278",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 28876
+    },
+    {
+      "stage": "release-invalid-header-red-r3",
+      "tests": 42,
+      "exit_code": 1,
+      "failure_subcases": [
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='invalid-end-header')",
+        "test_gzip_trailer_is_verified_even_with_rehashed_archive_identity (test_release.ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity) (change='short-end-header')"
+      ],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3713,
+        "sha256": "31c1768a915403c809d37a49d67c3ab75975383db384147f04d85ffebb6f00d7"
+      },
+      "receipt": {
+        "bytes": 1522,
+        "sha256": "c016a74425220b6e6b2290ce60abc47dc0658d2d6f3532c6d9bd6b5fa4c719d9"
+      },
+      "attempt_receipt": {
+        "bytes": 1301,
+        "sha256": "f18d8c26ca6d4fe1457af5037067f7e0958d563479c1c0b04643fa45a8b8eaec"
+      },
+      "raw": {
+        "bytes": 9148,
+        "sha256": "b4d2ae5baa04ecda3f6f0945dcbfe6b838256e63521c9499c8749ad4daec0636"
+      },
+      "working_tree_sha256": "863766a68f762dd324ca8a834949ba63d61aa36d0204801f9114d2db480bd1f8",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 39964
+    },
+    {
+      "stage": "release-final-green-r3",
+      "tests": 42,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3706,
+        "sha256": "a82ff45807fb753942344cdae52119d603e3bf56bcf450f7ee42a4fea80e92d4"
+      },
+      "receipt": {
+        "bytes": 1496,
+        "sha256": "03c6d10757f3f4d46153f809574f7ae650e38b42ba604eaad84c4b3b9bd447d2"
+      },
+      "attempt_receipt": {
+        "bytes": 1282,
+        "sha256": "bd46d9d4ef3cec1cac338dc9dfef485f90161f2981fcfc6077fe6d28d3938454"
+      },
+      "raw": {
+        "bytes": 7217,
+        "sha256": "3ad7daf22c9ba7e4d04b3cd8a004c6fb2a399997a243dcaa404e437b096f326d"
+      },
+      "working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 40484
+    },
+    {
+      "stage": "producer-whole-module-final-r3",
+      "tests": 24,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3714,
+        "sha256": "87a01e4537f10205f83fa1bfdb0e434c4be5dbe1249c3706047dd685c594a945"
+      },
+      "receipt": {
+        "bytes": 1538,
+        "sha256": "ba03e2168410b47445364e62d83d72545c52625893cd6363cd99cab4407960c6"
+      },
+      "attempt_receipt": {
+        "bytes": 1316,
+        "sha256": "ad78ed118d6a781dcda261565c99941d42ffba1565ae6c924d186dbe2c5a167a"
+      },
+      "raw": {
+        "bytes": 4501,
+        "sha256": "16552e2302ed42b8b955a8728afbaff02ca24e9be087c89edc9733061d49de22"
+      },
+      "working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 44484
+    },
+    {
+      "stage": "source-sdk-selection-class-final-r3",
+      "tests": 19,
+      "exit_code": 0,
+      "failure_subcases": [],
+      "error_subcases": [],
+      "result": {
+        "bytes": 3719,
+        "sha256": "7d17fcd2da2c4823445b622104af4bf5eef933ddd3f823369b0d6ba0bbdd19c4"
+      },
+      "receipt": {
+        "bytes": 1827,
+        "sha256": "4a0f05bb49bf922da00c73380e2e7774990c8436be460fa36ea27520c442652b"
+      },
+      "attempt_receipt": {
+        "bytes": 1600,
+        "sha256": "b103b74a9bc21e31152fc5cac0fc6044f0d12e8f51e8eade72bcc4037cb702af"
+      },
+      "raw": {
+        "bytes": 3436,
+        "sha256": "7e0d237116b6d1a20bbe9a2b55397c529744276d5b6c9c8876f078b765b2049a"
+      },
+      "working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+      "source_before_after_equal": true,
+      "terminal_withdrawal_complete": true,
+      "max_completed_child_rss_kib": 28900
+    }
+  ],
+  "final_result": {
+    "release_whole_module": 42,
+    "producer_whole_module": 24,
+    "SourceSDKSelection_whole_class": 19,
+    "total": 85,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "all_three_same_working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+    "maintained_process_completed_and_withdrawal_complete": true,
+    "receipt_stream_SHA_and_raw_bytes_verified": true,
+    "fresh_actual_attempts": true,
+    "JUnit": "Stdlib unittest verbose raw and maintained attempt receipts; no JUnit invented."
+  },
+  "old_test_preservation": {
+    ".github/workflows/test_release.py": {
+      "before": 33,
+      "after": 42,
+      "removed": [],
+      "added": [
+        "ConsumerTransportTests.test_complete_current_consumer_matrix_crosses_transport",
+        "ConsumerTransportTests.test_each_current_root_and_image_is_required",
+        "ConsumerTransportTests.test_equal_count_root_substitution_and_report_claim_cannot_authorize_it",
+        "ConsumerTransportTests.test_gzip_trailer_is_verified_even_with_rehashed_archive_identity",
+        "ConsumerTransportTests.test_old_thirteen_roots_are_not_a_current_fallback",
+        "ConsumerTransportTests.test_rehashed_archive_git_state_and_missing_image_are_still_rejected",
+        "ConsumerTransportTests.test_schema_and_manifest_claims_cannot_reduce_or_expand_the_plan",
+        "ConsumerTransportTests.test_standalone_extracted_transport_has_no_checkout_import_dependency",
+        "ConsumerTransportTests.test_zero_tar_padding_is_valid_but_gzip_expansion_is_bounded"
+      ],
+      "changed_existing": [
+        "SDKWorkflowExecutionTests.test_actual_workflow_prepares_outside_checkout_then_stages_verified_bytes",
+        "ConsumerTransportTests.test_real_consumer_git_metadata_survives_transport_and_identity_boundary",
+        "ConsumerTransportTests.test_missing_each_new_consumer_fixture_is_rejected",
+        "ConsumerTransportTests.test_legacy_seven_consumer_set_is_not_a_current_transport_fallback",
+        "ConsumerTransportTests.test_unreviewed_consumer_root_is_rejected"
+      ]
+    },
+    "tools/testing/test_sdk_verification_call.py": {
+      "before": 23,
+      "after": 24,
+      "removed": [],
+      "added": [
+        "SDKConsumerParallelTests.test_producer_uses_the_standalone_transport_plan_without_a_copy"
+      ],
+      "changed_existing": []
+    },
+    "tests/contracts/test_source_sdk.py": {
+      "before": 92,
+      "after": 93,
+      "removed": [],
+      "added": [
+        "SourceSDKSelectionTests.test_consumer_plan_is_required_even_after_a_rehashed_omission"
+      ],
+      "changed_existing": [
+        "SourceSDKTests.test_rehashed_default_target_source_omissions_reject"
+      ]
+    }
+  },
+  "reviewed_test_growth": "No old test method removed. Five release methods change only reviewed matrix fixture/root-count/message growth; producer old23 bodies unchanged and its expected-set helper derives shared plan plus explicit31 count. SourceSDK old92 methods retained; one existing omission loop gains transport.py and one new real rehashed-omission method is added.",
+  "evidence_review": {
+    "original_leaves_verified": 85,
+    "extension_leaves_verified": 31,
+    "all116_original_bytes_size_SHA_verified": true,
+    "no_original_overwritten": true,
+    "nine_original_and_four_r3_phase_results_and_outer_inner_receipts_verified": true,
+    "source_stable_each_attempt": true,
+    "original_index_and_all_before_sources_retained": true,
+    "resource_claims": "Completed-child RUSAGE is not simultaneous-family peak; TMP current0 is not peak. OOM counters remain0. Author caps2.5MiB; review adds only this independent global report."
+  },
+  "unexecuted_and_followup": [
+    "Reviewer executed no tests, commands under test, package/build, binary, SDK, ARM, OCI, Docker, network dispatch or physical HIL.",
+    "Entire tests/contracts/test_source_sdk.py (93 current methods) was not locally executed; only complete SourceSDKSelection class19 was authorized/executed. Existing remote contracts job must execute whole module after integration.",
+    "Root normal complete testing/configure/CI/workflows and Google gates remain required and are not inherited from85 scoped methods.",
+    "New committed source requires fresh clean installed-SDK + transport + observed OCI/offline success before qualification; old failed run39100437609 is not upgraded."
+  ],
+  "readonly_guards": {
+    "source_index_before_after_same": true,
+    "protected_unchanged_sources": {
+      ".github/workflows/release.yml": {
+        "bytes": 11948,
+        "sha256": "92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2"
+      },
+      ".github/workflows/software-qualification.yml": {
+        "bytes": 15588,
+        "sha256": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c"
+      },
+      "tools/release/delivery.py": {
+        "bytes": 24180,
+        "sha256": "ef57d25139886c497fe12352acf9d3ed49415d4088d7f9f1b8694f75fded0be8"
+      },
+      "tools/maintenance/job_identity.py": {
+        "bytes": 14752,
+        "sha256": "5316c45e6ea7fb35f5f1c6d19f1faaade80c3283274e441a0996876260da024e"
+      },
+      "tools/configure/metadata.py": {
+        "bytes": 5036,
+        "sha256": "7ec12432a54dbc98d5ef833b93fabe754c1f6eab0ec4b25c9e407986c1d2e193"
+      },
+      "dependencies/platform-compatibility.json": {
+        "bytes": 585,
+        "sha256": "6deaf49d165ca8c9f7da9f0659124cf5a8d59ddcb7804cb8a4e3b82c039e1a57"
+      }
+    },
+    "writes": "Only this new validation report. No feature/author/Main/source/index mutation or staging.",
+    "stdlib_read": "Read actual Python3.12 TarFile.next source for consumed-header EOF semantics; no runtime exploit/probe by reviewer.",
+    "SELF_maxrss_kib": 29620
+  }
+}

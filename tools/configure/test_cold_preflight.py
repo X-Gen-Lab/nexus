@@ -5,6 +5,7 @@ import tempfile
 import unittest
 
 from tools.configure import bindings, configure as gate, preflight
+from tools.configure.dma_topology import DmaTopologyIR
 
 
 class AdmissionInput(dict):
@@ -59,6 +60,7 @@ class ColdPreflightGenerationTests(unittest.TestCase):
             item = AdmissionInput(id="console", kind="uart", controller=controller,
                                   pins=[{"pin": pin} for pin in pins])
             result = AdmissionInput(soc_family=family, controllers=(item,), devices=(),
+                dma_topology=DmaTopologyIR(()),
                 claims=[{"key": "irq:" + controller, "owner": "console"}])
             with self.subTest(family=family):
                 source = "\n".join(preflight.emit(result))

@@ -1,0 +1,122 @@
+{
+  "kind": "D2 synthetic cold input typed-schema fixture correction",
+  "Root_error": {
+    "command_receipt": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-configure.command.json",
+    "sha256": "af67532ac46d5b95f7867414c123c85ffde51ea025263a606c9fc283a873d47f",
+    "immutable_stderr": {
+      "path": "/tmp/nexus-io-validation-20261018/build/native-debug/tdd/tools-configure.attempts/1792311575217814745-93ee7dfa556346078d183a42988683be/stderr.txt",
+      "bytes": 2451,
+      "sha256": "b6e3b644e56a305293083d77e15099fc6ed1546130f1eab841efca3be0ddbe4a"
+    },
+    "actual_exit": 1,
+    "executed": 866,
+    "errors": 1,
+    "skipped": 0
+  },
+  "classification": "Root full configure866 actualERROR1 is a synthetic AdmissionInput missing required immutable typed dma_topology. Not runtime RED. Real resolve_ir already supplies the field.",
+  "change": "Import DmaTopologyIR and provide DmaTopologyIR(()) to the minimal no-DMA synthetic result. No production fallback/get/default or typed IR relaxation; all old no-DMA/pin/IRQ assertions unchanged.",
+  "actual_whole_module": {
+    "module": "tools.configure.test_cold_preflight",
+    "discovered": 8,
+    "executed": 8,
+    "subtests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "expected_failures": 0,
+    "unexpected_successes": 0,
+    "source_before": "eac1c6e993d63de786bded1e1762235b42ed6608666a89a20840b66a64b1b392",
+    "source_after": "eac1c6e993d63de786bded1e1762235b42ed6608666a89a20840b66a64b1b392",
+    "self_maxrss_KiB": 23712,
+    "actual_exit": 0,
+    "whole_module_no_filter": true
+  },
+  "strict_single_Python_style": {
+    "schema_version": 1,
+    "status": "passed",
+    "base_ref": "HEAD",
+    "debt_source_ref": "HEAD",
+    "full_source_check": false,
+    "selection_scope": "paths",
+    "input_files": [
+      "tools/configure/test_cold_preflight.py"
+    ],
+    "selected_files": [
+      "tools/configure/test_cold_preflight.py"
+    ],
+    "source_files_checked": 0,
+    "text_files_selected": 1,
+    "legacy_format_files": 0,
+    "legacy_comment_files": 0,
+    "tool_version": "clang-format version 14.0.6 (https://github.com/ssciwr/clang-format-wheel e79d44a98fc6eeb3e9751220e441da03812564c1)",
+    "records": [],
+    "errors": [],
+    "limits": [
+      "Mechanical comment rules do not prove API contract semantics.",
+      "Unchanged sealed debt is reported, not declared style-conformant."
+    ]
+  },
+  "all_children_joined": true,
+  "new_archive": {
+    "path": "/dev/shm/nexus-h743-d2-cold-fixture-supplement-20261018-r1/whole-and-style-evidence.tar.gz",
+    "bytes": 2318,
+    "sha256": "f6269d930087cd50991b22b39ed8e6c1e7c4ce89c10772031bbd9c2ea77fa06d",
+    "members": [
+      {
+        "path": "execution.json",
+        "bytes": 1523,
+        "sha256": "7d055cd33f78fd61399b760a7f11f795032112b3aa7f6a81bd0b29d0962adf7e"
+      },
+      {
+        "path": "style.json",
+        "bytes": 744,
+        "sha256": "99b092be7564f955b97b8b0813c4cbcdadab56500972a93a999149dda7ab1758"
+      },
+      {
+        "path": "style.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "style.stdout",
+        "bytes": 88,
+        "sha256": "278ffb72220546a0cafa07a489168f888e18a24beeed88ef60f703bbbba8c6f2"
+      },
+      {
+        "path": "whole.json",
+        "bytes": 466,
+        "sha256": "649a26c7c5a5b1c81e8ee9748e7f6e231c36b1ab980fb11620291c519d1a9184"
+      },
+      {
+        "path": "whole.py",
+        "bytes": 1297,
+        "sha256": "2c71994d80741e9bcf0e7d32a434f6083598b237fa62bef78de38d9f5d275af3"
+      },
+      {
+        "path": "whole.stderr",
+        "bytes": 1714,
+        "sha256": "d4c41be8ff88f7a10093735b8ac115de35da6a2f75a6b7f51f50ad00d5d3c575"
+      },
+      {
+        "path": "whole.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "all_SHA_readback": true
+  },
+  "source_freeze_sha256": "0f7ac89de6c07f5d0153e58625dffeeb878a7b253c6e2f767365d3522ca616ea",
+  "budgets": {
+    "feature_volatile_cap_allocated": 98304,
+    "test_TMP_cap_allocated": 4194304,
+    "actual_TMP_final_allocated": 24576,
+    "no_exact_execution_peak_claim": true,
+    "memory_events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "RSS_max_KiB": 39464,
+    "workspace_writes": false
+  },
+  "limits": [
+    "Only full cold_preflight module8 and strict single-Python style were executed after correction; complete configure866/full normal rerun belongs Root.",
+    "No source/index/Main mutation outside owned one test file; original D2 34+supplement2 freeze unchanged; no C++/ARM/SDK/HIL activity."
+  ]
+}

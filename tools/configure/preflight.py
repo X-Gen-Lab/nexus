@@ -51,11 +51,32 @@ def _modern_selected(result):
     gpio_register = "AHB4ENR" if h7 else "AHB2ENR1"
     source = []
     pads = {}
+    if h7 and result.dma_topology.lanes:
+        # A shared reset is another owner's observable responsibility, even
+        # when its clock is off and stream reads would look reset-like.
+        source += _reject(
+            "(NX_H743_READ(&RCC->AHB1RSTR) & (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) != 0u")
     for item in result.controllers:
         allowed = {"gpio", "uart", "spi", "pwm", "exti", "watchdog",
                    "adc", "i2c", "flash"}
+        if not h7:
+            allowed.add("lptim")
         if item.kind not in allowed:
             fail("New SoC cold profile has no maintained controller admission")
+        if not h7 and item.kind == "lptim":
+            source += _reject(
+                "(NX_U575_READ(&RCC->APB1RSTR2) & RCC_APB1RSTR2_LPTIM2RST) != 0u || "
+                "(NX_U575_READ(&RCC->CCIPR1) & RCC_CCIPR1_LPTIM2SEL) != 0u || "
+                "!NX_U575_IRQ_AVAILABLE(LPTIM2_IRQn)")
+            # A disabled gate cannot establish cold peripheral ownership.
+            # The constructor repeats admission after acquiring only its gate.
+            source.append("    if ((NX_U575_READ(&RCC->APB1ENR2) & RCC_APB1ENR2_LPTIM2EN) != 0u) {")
+            conditions = [f"NX_U575_READ(&LPTIM2->{name}) != 0u" for name in
+                          ("CR", "CFGR", "CFGR2", "DIER", "ISR", "CCMR1",
+                           "RCR", "CNT", "CCR1", "CCR2")]
+            conditions.append("NX_U575_READ(&LPTIM2->ARR) != 1u")
+            source += _reject(" || ".join(conditions), indent=8)
+            source.append("    }")
         if h7 and item.kind in {"spi", "pwm"}:
             register = "APB2ENR" if item.kind == "spi" else "APB1LENR"
             reset = "APB2RSTR" if item.kind == "spi" else "APB1LRSTR"
@@ -65,6 +86,18 @@ def _modern_selected(result):
             if item.kind == "spi":
                 source += _reject(
                     "(NX_H743_READ(&RCC->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) != 0u")
+                if item.mode == "dma":
+                    try:
+                        from .providers.stm32h743.emission import dma_admission_conditions
+                    except ImportError:
+                        from providers.stm32h743.emission import dma_admission_conditions
+                    for irq in ("DMA1_Stream2", "DMA1_Stream3", "SPI4"):
+                        source += _reject(f"!NX_H743_IRQ_AVAILABLE({irq}_IRQn)")
+                    source += [
+                        "    if ((NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u) {"]
+                    source += _reject(" || ".join(dma_admission_conditions(
+                        result, spi_only=True)), indent=8)
+                    source.append("    }")
         if h7 and item.kind == "exti":
             line = int(item.controller.removeprefix("EXTI"))
             source += _reject(
@@ -99,8 +132,11 @@ def _modern_selected(result):
                               f"RCC_{gate_register}_{uart}EN) != 0u")
             source += _reject(f"(NX_{hook}_READ(&RCC->{mux_register}) & {mux}) != 0u")
             source += _reject(f"!NX_{hook}_IRQ_AVAILABLE((IRQn_Type){uart}_IRQn)")
-            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle"}:
-                lane = 1 if item.get("mode") == "rx-dma-idle" else 0
+            if not h7 and item.get("mode") in {"dma-tx", "dma-chain-tx"}:
+                source += _reject(
+                    "!NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)")
+            if h7 and item.get("mode") in {"dma-tx", "rx-dma-idle", "rx-dma-continuous"}:
+                lane = 0 if item.get("mode") == "dma-tx" else 1
                 source += _reject(
                     f"!NX_H743_IRQ_AVAILABLE(DMA1_Stream{lane}_IRQn)")
                 source.append(
@@ -195,7 +231,12 @@ def selected(result):
                 if item.kind == "i2c":
                     source += _reject(
                         "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u")
-            if item.kind == "adc":
+            if item.kind == "can_fd":
+                source += _reject(
+                    "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_FDCANEN) != 0u || "
+                    "(NX_G474_READ(&RCC->APB1RSTR1) & RCC_APB1RSTR1_FDCANRST) != 0u || "
+                    "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_FDCANSEL) != 0u")
+            if item.kind in {"adc", "pwm_adc", "adc_group"}:
                 source += _reject(
                     "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != 0u")
                 source += _reject(
@@ -205,6 +246,32 @@ def selected(result):
                 if item.mode == "trigger-dma":
                     source += _reject(
                         "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_TIM6EN) != 0u")
+                if item.kind == "adc_group":
+                    source += _reject("!NX_G474_IRQ_AVAILABLE(ADC1_2_IRQn)")
+                    if item.options.trigger == "tim6-trgo":
+                        source += _reject(
+                            "(NX_G474_READ(&RCC->APB1ENR1) & "
+                            "RCC_APB1ENR1_TIM6EN) != 0u || "
+                            "(NX_G474_READ(&RCC->APB1RSTR1) & "
+                            "RCC_APB1RSTR1_TIM6RST) != 0u")
+                    if item.mode == "regular-sequence-dma":
+                        source += _reject(
+                            "!NX_G474_IRQ_AVAILABLE(DMA1_Channel1_IRQn)")
+                        source += [
+                            "    if ((NX_G474_READ(&RCC->AHB1ENR) & "
+                            "RCC_AHB1ENR_DMA1EN) != 0u) {"]
+                        source += _reject(
+                            "NX_G474_READ(&DMA1_Channel1->CCR) != 0u || "
+                            "NX_G474_READ(&DMA1_Channel1->CNDTR) != 0u || "
+                            "NX_G474_READ(&DMA1_Channel1->CPAR) != 0u || "
+                            "NX_G474_READ(&DMA1_Channel1->CMAR) != 0u",
+                            indent=8)
+                        source += ["    }"]
+                if item.kind == "pwm_adc":
+                    source += _reject(
+                        "(NX_G474_READ(&RCC->AHB1ENR) & "
+                        "(RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMAMUX1EN)) != 0u || "
+                        "(NX_G474_READ(&RCC->APB2ENR) & RCC_APB2ENR_TIM15EN) != 0u")
         for item in result.controllers:
             if item.kind == "flash":
                 source += _reject(
@@ -235,13 +302,17 @@ def selected(result):
                 clocks.add(("RCC->AHB2ENR", "RCC_AHB2ENR_OTGFSEN") if
                            family == "stm32f407" else
                            ("RCU_AHB2EN", "RCU_AHB2EN_USBFSEN"))
-            elif item.kind == "eth":
+            elif item.kind in {"eth", "eth_frames"}:
                 clocks.add(("RCC->AHB1ENR", "RCC_AHB1ENR_ETHMACEN | "
                             "RCC_AHB1ENR_ETHMACTXEN | "
                             "RCC_AHB1ENR_ETHMACRXEN") if
                            family == "stm32f407" else
                            ("RCU_AHB1EN", "RCU_AHB1EN_ENETEN | "
                             "RCU_AHB1EN_ENETTXEN | RCU_AHB1EN_ENETRXEN"))
+                if item.kind == "eth_frames":
+                    clocks.add(("RCC->AHB1ENR", "RCC_AHB1ENR_ETHMACPTPEN") if
+                               family == "stm32f407" else
+                               ("RCU_AHB1EN", "RCU_AHB1EN_ENETPTPEN"))
             elif item.kind == "exti":
                 line = int(item["pins"][0]["pin"][2:])
                 registers = ("EXTI->IMR | EXTI->EMR | EXTI->PR" if

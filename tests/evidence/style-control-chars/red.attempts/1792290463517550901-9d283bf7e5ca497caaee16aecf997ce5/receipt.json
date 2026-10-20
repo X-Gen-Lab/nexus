@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-m",
+    "unittest",
+    "-v",
+    "scripts.ci.test_style_gate"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "stage": "style-control-chars-red",
+  "started_ns": 1792290463517678903,
+  "finished_ns": 1792290469388032189,
+  "duration_seconds": 5.8703552879997005,
+  "timeout_seconds": 300.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/stderr.txt",
+    "bytes": 34937,
+    "sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9"
+  }
+}

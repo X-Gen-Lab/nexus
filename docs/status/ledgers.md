@@ -8,7 +8,7 @@ source_language: zh_CN
 (status-ledgers)=
 # 原台账、退出条件与派生视图
 
-下面的页面来自七份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、
+下面的页面来自八份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、
 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 SHA-256 可核对。
 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。
 
@@ -19,6 +19,7 @@ ledgers/next-generation
 ledgers/factory-platform
 ledgers/os
 ledgers/platform-refinement
+ledgers/io-evolution
 ledgers/soc-refinement
 ledgers/build-system
 ledgers/documentation-system
@@ -32,6 +33,11 @@ ledgers/documentation-system
 - `implemented_tooling` 只表示工装实现，物理未执行仍为 `not_executed`。
 - `not_implemented`、`not_executed`、失败和有条件扩展保持原值。
 - 不同专项重复覆盖同一机制，不能相加数量或计算全项目完成百分比。
+
+`platform-refinement` 保留较早的 60 项完善记录；`io-evolution` 是当前 42 项增量
+台账。两份台账复用 `IO-` 编号，但来源、任务和退出条件不同，必须同时注明 CSV
+或派生页面，不能按编号合并状态。增量台账的 `not_qualified` 保持原值；生成视图
+不执行测试，也不提升软件或物理资格。
 
 旧“48 项 OS 清单”已继续扩展。现有原 CSV 的编号为 OS01–OS55；其中 OS49–OS55
 是物理工装／真实验收项，原状态均保留。构建系统的 48 项是另一个独立台账。

@@ -1,0 +1,23 @@
+{
+  "added_authorized_paths": [
+    "tests/contracts/h743_assembly/CMakeLists.txt",
+    "tests/contracts/h743_assembly/main.c"
+  ],
+  "before": [
+    {
+      "path": "tests/contracts/h743_assembly/CMakeLists.txt",
+      "bytes": 1944,
+      "sha256": "32275392c2942d02ecd29a5ceccd803985122d62984c5a19bc8e25b11c26371b",
+      "gzip_sha256": "7f19e8236de714cc459f3695273e13f68102d0b888c19b4c16797e38908be016"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/main.c",
+      "bytes": 3384,
+      "sha256": "1c7011305350cb559b18579eefaed2ce41ef592dad8550f34934e1be07119e0e",
+      "gzip_sha256": "90267c6b761be1648b885cfe329a53b69650bedf1f729f418bb3b74dc4ff878e"
+    }
+  ],
+  "classification": "ARM fixture compile setup coupling: UART must not imply a selected GPIO; no production DMA RED",
+  "index_before_reused_byte_exact": true,
+  "allocated_cap": 2359296
+}

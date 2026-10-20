@@ -59,7 +59,8 @@
     "UART0": {
       "kind": "uart",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "irq-words"
       ],
       "irq": [],
       "pins": [
@@ -70,7 +71,8 @@
     "SPI0": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "irq": [],
       "pins": []
@@ -78,7 +80,8 @@
     "UART1": {
       "kind": "uart",
       "modes": [
-        "irq-byte-event"
+        "irq-byte-event",
+        "irq-words"
       ],
       "irq": [],
       "pins": [
@@ -89,7 +92,8 @@
     "SPI1": {
       "kind": "spi",
       "modes": [
-        "short-poll"
+        "short-poll",
+        "async-model"
       ],
       "irq": [],
       "pins": []
@@ -156,6 +160,38 @@
         "PA8",
         "PA9"
       ]
+    },
+    "RTC0": {
+      "kind": "rtc",
+      "modes": [
+        "calendar-alarm"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "RTC1": {
+      "kind": "rtc",
+      "modes": [
+        "calendar-alarm"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "LPTIM0": {
+      "kind": "lptim",
+      "modes": [
+        "counter16-oneshot"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "LPTIM1": {
+      "kind": "lptim",
+      "modes": [
+        "counter16-oneshot"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "irq": {

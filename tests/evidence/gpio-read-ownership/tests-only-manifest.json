@@ -1,0 +1,10 @@
+{
+  "tests/google/stm32_official_test.cpp": {
+    "bytes": 10099,
+    "sha256": "15d53e9c4b3320bf4129385d2ca0d594ced36cc5455d9f970ada90f1fd20ff4f"
+  },
+  "tests/google/gd32_multi_test.cpp": {
+    "bytes": 17961,
+    "sha256": "69aa40bd5d015edb253849c1abcd71bddc0b966c88715dbe1034a61b0d9e285a"
+  }
+}

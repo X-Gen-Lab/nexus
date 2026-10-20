@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 60f7325a76e1022845c466cd5c7383e6f690ab25d070f8b16d4688f457748858\n"
+"X-Nexus-Source-SHA256: ee3da86fda9c4abe6ad41349d1e16076a36ad5965a4b03d867b6feec3d95a1f1\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:1
 msgid "下一代平台工程运行手册"
@@ -1505,45 +1505,9 @@ msgstr ""
 "的公共 API，不能把被测 provider、factory 或 owner 整体 mock "
 "掉，再用期望调用证明自身正确。优先检查不同实例的隔离、零副作用拒绝、资源冲突、deadline、取消后的排空和最终发布顺序。正常路径和失败路径共同确定合同，不要求为了数字重复实现细节。"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:397
-msgid ""
-"框架源以 `dependencies/googletest.lock.json` 固定准确版本、commit、archive SHA256 "
-"和许可；主机测试只从仓库内归档解压，没有 configure-time 下载或网络回退。`tests/google/CMakeLists.txt` 启用"
-" C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime "
-"或测试框架依赖。"
-msgstr ""
-"框架源以 `dependencies/googletest.lock.json` 固定准确版本、commit、archive SHA256 "
-"和许可；主机测试只从仓库内归档解压，没有 configure-time 下载或网络回退。`tests/google/CMakeLists.txt` 启用"
-" C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime "
-"或测试框架依赖。"
-
 #: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:399
 msgid "统一执行入口为："
 msgstr "统一执行入口为："
-
-#: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:406
-msgid ""
-"第一条命令运行测试报告检查器的工具测试，配置并构建 "
-"`nexus_google_contracts`，从各二进制发现完整用例，随后执行不带筛选的实际测试。它移除环境中的 GoogleTest "
-"filter/shard 设置，删除旧 XML，拒绝零用例、未执行、跳过、失败、过期报告和发现数不符，并在 `build/<preset>/tdd/` "
-"保存原始输出、GoogleTest XML 和汇总。第二条命令执行完整的现有 CTest 模型与工具回归；两者的证据职责不同。"
-msgstr ""
-"第一条命令运行测试报告检查器的工具测试，配置并构建 "
-"`nexus_google_contracts`，从各二进制发现完整用例，随后执行不带筛选的实际测试。它移除环境中的 GoogleTest "
-"filter/shard 设置，删除旧 XML，拒绝零用例、未执行、跳过、失败、过期报告和发现数不符，并在 `build/<preset>/tdd/` "
-"保存原始输出、GoogleTest XML 和汇总。第二条命令执行完整的现有 CTest 模型与工具回归；两者的证据职责不同。"
-
-#: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:408
-msgid ""
-"已安装的 pre-commit hook 对生产、测试、配置和构建行为变更执行同一 GoogleTest gate；只改说明文档无需重建。hook "
-"在执行前后检查未暂存／未跟踪的行为改动，并比较起止 `git write-"
-"tree`，要求暂存区内容完全一致。执行过程中修改或重新暂存源码会拒绝验收，不生成新的汇总，避免工作区修复或并发编辑误认证即将提交的源码。CI 独立执行"
-" gate，不依赖贡献者本地是否安装或运行 hook。`--no-verify`、`SKIP`、禁用测试或手写 XML 不构成有效验收。"
-msgstr ""
-"已安装的 pre-commit hook 对生产、测试、配置和构建行为变更执行同一 GoogleTest gate；只改说明文档无需重建。hook "
-"在执行前后检查未暂存／未跟踪的行为改动，并比较起止 `git write-"
-"tree`，要求暂存区内容完全一致。执行过程中修改或重新暂存源码会拒绝验收，不生成新的汇总，避免工作区修复或并发编辑误认证即将提交的源码。CI 独立执行"
-" gate，不依赖贡献者本地是否安装或运行 hook。`--no-verify`、`SKIP`、禁用测试或手写 XML 不构成有效验收。"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:410
 msgid ""
@@ -1554,3 +1518,224 @@ msgstr ""
 "每项行为变更的评审说明包含失败测试名称、RED 命令及实际失败原因、GREEN "
 "命令和相关场景覆盖。代码评审检查测试是否先定义了可观察合同。自动化能够证明真实执行、报告完整性和当前源码验证，无法机械证明所有开发者历史上遵守了测试先行顺序；因此不能把一个绿灯当作"
 " TDD 流程全部合规。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:167
+msgid "6.4 下载缓存只复用锁定的工具归档"
+msgstr "6.4 下载缓存只复用锁定的工具归档"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:171
+msgid ""
+"缓存不包含验收结论。每次验证仍实际执行检查，生成本次源码和工具身份对应的新报告；旧 "
+"JUnit、分析报告和成功收条不能作为缓存命中的成功结果。正式离线构建与双 clean build 的要求保持不变。"
+msgstr ""
+"缓存不包含验收结论。每次验证仍实际执行检查，生成本次源码和工具身份对应的新报告；旧 "
+"JUnit、分析报告和成功收条不能作为缓存命中的成功结果。正式离线构建与双 clean build 的要求保持不变。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:213
+msgid ""
+"完整提交前先执行便宜预检：格式与注释、输入/schema、catalogue/preset/实例选择一致性、生成代码及受影响 target "
+"的编译链接。先消除这些确定性错误，再冻结同一个功能增量，执行普通完整暂存快照门禁。预检不删除完整门禁中的检查，不使用 filter、shard、SKIP"
+" 或 hook bypass 换取通过。"
+msgstr ""
+"完整提交前先执行便宜预检：格式与注释、输入/schema、catalogue/preset/实例选择一致性、生成代码及受影响 target "
+"的编译链接。先消除这些确定性错误，再冻结同一个功能增量，执行普通完整暂存快照门禁。预检不删除完整门禁中的检查，不使用 filter、shard、SKIP"
+" 或 hook bypass 换取通过。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:225
+msgid "模式无关的完整边界合同与 FreeRTOS 工具套件分别使用以下入口；它们的报告独立，不计作 Native sanitizer 覆盖："
+msgstr "模式无关的完整边界合同与 FreeRTOS 工具套件分别使用以下入口；它们的报告独立，不计作 Native sanitizer 覆盖："
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:295
+msgid ""
+"计时报告分别记录端到端墙钟、并行任务累计运行时间和父子命令关系。嵌套子命令不与父命令重复相加；排队、准备、构建、测试、分析及失败重跑分别标明范围。对未计时的编辑、分析或等待不推算百分比，不把"
+" runner 分钟称为用户等待时间；提速结论需同输入与同条件的实际前后执行。"
+msgstr ""
+"计时报告分别记录端到端墙钟、并行任务累计运行时间和父子命令关系。嵌套子命令不与父命令重复相加；排队、准备、构建、测试、分析及失败重跑分别标明范围。对未计时的编辑、分析或等待不推算百分比，不把"
+" runner 分钟称为用户等待时间；提速结论需同输入与同条件的实际前后执行。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:297
+msgid ""
+"关键源码、输入 "
+"manifest、原始失败输出和最终执行收条放在持久位置。临时目录用于可再生构建缓存，不能成为唯一可恢复的交付记录。证据只保存一份可校验原件并引用；普通迭代不再建立平行状态页、运输副本或新证据框架。"
+msgstr ""
+"关键源码、输入 "
+"manifest、原始失败输出和最终执行收条放在持久位置。临时目录用于可再生构建缓存，不能成为唯一可恢复的交付记录。证据只保存一份可校验原件并引用；普通迭代不再建立平行状态页、运输副本或新证据框架。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:313
+msgid ""
+"按完整功能增量提交：实现、配置/实例、支持清单、相关回归、双语合同及唯一证据附件一起收敛。开发期间执行聚焦的 RED/GREEN "
+"和便宜预检，收敛后只对冻结输入执行一次普通完整门禁；若随后修改行为，相关验证重新执行。不要为了提交数量把紧密关联的修复、清单或日志拆成反复触发全门禁的附属提交，也不要合并无关功能来掩盖评审边界。"
+msgstr ""
+"按完整功能增量提交：实现、配置/实例、支持清单、相关回归、双语合同及唯一证据附件一起收敛。开发期间执行聚焦的 RED/GREEN "
+"和便宜预检，收敛后只对冻结输入执行一次普通完整门禁；若随后修改行为，相关验证重新执行。不要为了提交数量把紧密关联的修复、清单或日志拆成反复触发全门禁的附属提交，也不要合并无关功能来掩盖评审边界。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:366
+msgid ""
+"静态分析只对相同的真实编译上下文去重：同一规范源码、工作目录、编译器和完整有序语义参数。只剥除已明确识别的输出文件与依赖文件生成参数；宏、include"
+" "
+"搜索顺序、CPU/ABI、语言标准、优化或插桩不同的条目分别保留，不能只按源码路径合并。报告同时记录原始条目、去重后上下文与代表条目的对应关系；去重改变调度，不改变规则、诊断或失败传播。"
+msgstr ""
+"静态分析只对相同的真实编译上下文去重：同一规范源码、工作目录、编译器和完整有序语义参数。只剥除已明确识别的输出文件与依赖文件生成参数；宏、include"
+" "
+"搜索顺序、CPU/ABI、语言标准、优化或插桩不同的条目分别保留，不能只按源码路径合并。报告同时记录原始条目、去重后上下文与代表条目的对应关系；去重改变调度，不改变规则、诊断或失败传播。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:368
+msgid ""
+"分析并行度必须有正整数上限，按可用内存与 runner 容量选择；默认串行，CI 可显式使用 `--parallel "
+"2`。各子进程使用独立输出，全部退出后再汇总；任一执行失败或诊断越界仍失败。超时或取消必须停止并回收已启动进程，不能留下后台分析，也不能把空报告当成功。并行执行时间与任务累计时间分别报告。"
+msgstr ""
+"分析并行度必须有正整数上限，按可用内存与 runner 容量选择；默认串行，CI 可显式使用 `--parallel "
+"2`。各子进程使用独立输出，全部退出后再汇总；任一执行失败或诊断越界仍失败。超时或取消必须停止并回收已启动进程，不能留下后台分析，也不能把空报告当成功。并行执行时间与任务累计时间分别报告。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:437
+msgid ""
+"第一条命令运行提交门禁的四个完整工具域，配置并构建 "
+"`nexus_google_contracts`，从各二进制发现完整用例，随后执行不带筛选的实际测试。它移除环境中的 GoogleTest "
+"filter/shard 设置，删除旧 XML，拒绝零用例、未执行、跳过、失败、过期报告和发现数不符，并在 `build/<preset>/tdd/` "
+"保存原始输出、GoogleTest XML 和汇总。第二条命令执行该 Native preset 的全部 CTest 编译相关模型与 "
+"GoogleTest 回归；模式无关工具合同在显式 CI 工具域执行，不再由每个 Native preset 重复运行。两者不能互相替代。"
+msgstr ""
+"第一条命令运行提交门禁的四个完整工具域，配置并构建 "
+"`nexus_google_contracts`，从各二进制发现完整用例，随后执行不带筛选的实际测试。它移除环境中的 GoogleTest "
+"filter/shard 设置，删除旧 XML，拒绝零用例、未执行、跳过、失败、过期报告和发现数不符，并在 `build/<preset>/tdd/` "
+"保存原始输出、GoogleTest XML 和汇总。第二条命令执行该 Native preset 的全部 CTest 编译相关模型与 "
+"GoogleTest 回归；模式无关工具合同在显式 CI 工具域执行，不再由每个 Native preset 重复运行。两者不能互相替代。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:443
+msgid "16.1 测试保留、合并与删除"
+msgstr "16.1 测试保留、合并与删除"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:445
+msgid ""
+"测试的价值由可观察合同、独立故障路径和历史缺陷决定，不由文件数或断言数决定。保留正常、边界、拒绝、故障与恢复中有独立风险的场景；硬件模型、ARM "
+"链接和真实 HIL 验证不同事实，即使调用相同 API 也不因此重复。"
+msgstr ""
+"测试的价值由可观察合同、独立故障路径和历史缺陷决定，不由文件数或断言数决定。保留正常、边界、拒绝、故障与恢复中有独立风险的场景；硬件模型、ARM "
+"链接和真实 HIL 验证不同事实，即使调用相同 API 也不因此重复。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "决策"
+msgstr "决策"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "必须满足的条件"
+msgstr "必须满足的条件"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "保留"
+msgstr "保留"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "能指出合同或故障回归、受测生产路径、独立 oracle，以及失败能阻止的具体缺陷"
+msgstr "能指出合同或故障回归、受测生产路径、独立 oracle，以及失败能阻止的具体缺陷"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "合并"
+msgstr "合并"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "输入、执行上下文、故障注入和可观察断言等价；评审映射原用例身份到替代用例，保留独立合同场景与诊断，避免一个失败遮住后续场景"
+msgstr "输入、执行上下文、故障注入和可观察断言等价；评审映射原用例身份到替代用例，保留独立合同场景与诊断，避免一个失败遮住后续场景"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "删除"
+msgstr "删除"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:0
+msgid "已失效行为明确移除，或完整等价场景由维护中的测试接替；评审记录旧用例身份、原因及替代用例/合同，执行替代套件并确认注册完整"
+msgstr "已失效行为明确移除，或完整等价场景由维护中的测试接替；评审记录旧用例身份、原因及替代用例/合同，执行替代套件并确认注册完整"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:453
+msgid ""
+"独立 oracle "
+"来自公开合同、准确数据手册事实或预先固定的错误/输出；不能调用被测解析器计算期望值，再用同一结果证明解析器正确。生成代码要通过实际编译链接或行为验证，不能只检查生成器与自己构造的模板相同。"
+msgstr ""
+"独立 oracle "
+"来自公开合同、准确数据手册事实或预先固定的错误/输出；不能调用被测解析器计算期望值，再用同一结果证明解析器正确。生成代码要通过实际编译链接或行为验证，不能只检查生成器与自己构造的模板相同。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:455
+msgid ""
+"删除只证明测试调用自身、重复常量/实现分支、既无合同结果也无必要副作用/顺序的调用断言，或机械固定当前条数的自证断言。若它们还承担失败传播、枚举完整性或实际构建职责，先补足该合同再删除；报告检查器仍须拒绝零执行、失败、跳过及发现/执行不符。不得以数量变少为优化成果，或用放宽断言、跳过用例、扩大"
+" mock 边界维持绿灯。"
+msgstr ""
+"删除只证明测试调用自身、重复常量/实现分支、既无合同结果也无必要副作用/顺序的调用断言，或机械固定当前条数的自证断言。若它们还承担失败传播、枚举完整性或实际构建职责，先补足该合同再删除；报告检查器仍须拒绝零执行、失败、跳过及发现/执行不符。不得以数量变少为优化成果，或用放宽断言、跳过用例、扩大"
+" mock 边界维持绿灯。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:457
+msgid ""
+"复用一次重型 fixture "
+"或将等价输入参数化时，每个合同场景仍独立枚举、可定位失败，并保持所需状态隔离。只复用不可变输入和已证明无残留的准备步骤；涉及冷启动、失败污染、借用或恢复的场景不能共享未经重置的实例。测试删除和执行域迁移属于行为变更，按同一"
+" TDD、评审与完整门禁约束验收。"
+msgstr ""
+"复用一次重型 fixture "
+"或将等价输入参数化时，每个合同场景仍独立枚举、可定位失败，并保持所需状态隔离。只复用不可变输入和已证明无残留的准备步骤；涉及冷启动、失败污染、借用或恢复的场景不能共享未经重置的实例。测试删除和执行域迁移属于行为变更，按同一"
+" TDD、评审与完整门禁约束验收。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:169
+msgid ""
+"工具准备可以缓存归档；每次命中仍按环境锁中的 SHA-256 "
+"核对完整归档字节，校验通过后才解压。缓存键包含锁定归档身份，不能用分支名、版本字符串或旧安装目录代替内容校验。下载失败采用有限次数和超时重试；临时文件校验完成后才原子发布，耗尽预算返回非零，不能改源、降版本或跳过校验。"
+msgstr ""
+"工具准备可以缓存归档；每次命中仍按环境锁中的 SHA-256 "
+"核对完整归档字节，校验通过后才解压。缓存键包含锁定归档身份，不能用分支名、版本字符串或旧安装目录代替内容校验。下载失败采用有限次数和超时重试；临时文件校验完成后才原子发布，耗尽预算返回非零，不能改源、降版本或跳过校验。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:223
+msgid ""
+"普通提交继续执行 testing、configure、ci、workflows 四个完整工具域及 GoogleTest "
+"gate；耗时较长的迁移、SDK/HIL 边界合同由显式 CI "
+"工具域执行，不重复加入提交门禁。工具报告按明确的域记录实际发现/执行、skip、error 与计数；GoogleTest "
+"报告保留用例身份。域迁移审查另行核对原模块/用例集合及替代映射，并验证旧注册移除、新位置非零执行以及必需 CI 依赖，不能留下无人执行的套件。"
+msgstr ""
+"普通提交继续执行 testing、configure、ci、workflows 四个完整工具域及 GoogleTest "
+"gate；耗时较长的迁移、SDK/HIL 边界合同由显式 CI "
+"工具域执行，不重复加入提交门禁。工具报告按明确的域记录实际发现/执行、skip、error 与计数；GoogleTest "
+"报告保留用例身份。域迁移审查另行核对原模块/用例集合及替代映射，并验证旧注册移除、新位置非零执行以及必需 CI 依赖，不能留下无人执行的套件。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:221
+msgid ""
+"执行按验证对象分域。Native Debug、Release、ASan/UBSan、TSan 的 CTest 保留全部编译相关 C 模型和 "
+"GoogleTest 程序；这些模式的编译选项与运行时检查不同，不能相互替代。与父模式无关的 Python、固定 profile 的 SDK 子构建及 "
+"FreeRTOS 工具合同，在显式 CI 工具域完整执行一次，不能在四个 Native preset "
+"中重复注册，也不能因此删除用例。若子构建确实消费父模式，必须在计划中记录该传递并保留所需矩阵。"
+msgstr ""
+"执行按验证对象分域。Native Debug、Release、ASan/UBSan、TSan 的 CTest 保留全部编译相关 C 模型和 "
+"GoogleTest 程序；这些模式的编译选项与运行时检查不同，不能相互替代。与父模式无关的 Python、固定 profile 的 SDK 子构建及 "
+"FreeRTOS 工具合同，在显式 CI 工具域完整执行一次，不能在四个 Native preset "
+"中重复注册，也不能因此删除用例。若子构建确实消费父模式，必须在计划中记录该传递并保留所需矩阵。"
+
+#: ../../../nexus-quality-20261019/docs/design/engineering-handbook.md:439
+msgid ""
+"已安装的 pre-commit hook 对生产、测试、配置和构建行为变更执行同一 GoogleTest gate；只改说明文档无需重建。hook "
+"在执行前后检查未暂存／未跟踪的行为改动，并比较起止 `git write-"
+"tree`，要求暂存区内容完全一致。执行过程中修改或重新暂存源码会拒绝验收，不生成新的汇总，避免工作区修复或并发编辑误认证即将提交的源码。CI 通过完整"
+" Native 计划和显式工具域独立验证相应合同，不依赖贡献者本地是否安装或运行 hook。`--no-verify`、`SKIP`、禁用测试或手写 "
+"XML 不构成有效验收。"
+msgstr ""
+"已安装的 pre-commit hook 对生产、测试、配置和构建行为变更执行同一 GoogleTest gate；只改说明文档无需重建。hook "
+"在执行前后检查未暂存／未跟踪的行为改动，并比较起止 `git write-"
+"tree`，要求暂存区内容完全一致。执行过程中修改或重新暂存源码会拒绝验收，不生成新的汇总，避免工作区修复或并发编辑误认证即将提交的源码。CI 通过完整"
+" Native 计划和显式工具域独立验证相应合同，不依赖贡献者本地是否安装或运行 hook。`--no-verify`、`SKIP`、禁用测试或手写 "
+"XML 不构成有效验收。"
+
+msgid ""
+"框架源通过 Git 子模块 `ext/googletest` 引入，`dependencies/googletest.lock.json` 与 "
+"Gitlink 固定同一版本和准确 commit；当前为 "
+"1.16.0、`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。依赖准备显式执行，CMake "
+"只使用已准备的本地源码，不下载、不回退到系统框架；缺失、版本不符或子模块工作区有修改即失败。`tests/google/CMakeLists.txt` "
+"启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime "
+"或测试框架依赖。许可与 notice 随锁定的子模块源码保留。"
+msgstr ""
+"框架源通过 Git 子模块 `ext/googletest` 引入，`dependencies/googletest.lock.json` 与 "
+"Gitlink 固定同一版本和准确 commit；当前为 "
+"1.16.0、`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。依赖准备显式执行，CMake "
+"只使用已准备的本地源码，不下载、不回退到系统框架；缺失、版本不符或子模块工作区有修改即失败。`tests/google/CMakeLists.txt` "
+"启用 C++17，并保持依赖在 Native 测试树内。ARM、关闭测试的构建和 source SDK 消费者不获得 C++ runtime "
+"或测试框架依赖。许可与 notice 随锁定的子模块源码保留。"
+
+#: ../../nexus-quality-20261019/docs/design/engineering-handbook.md:167
+msgid ""
+"主平台 CI 对每个 `pull_request` 执行适用的完整检查域；`push` 只跟踪 `main` 和 `develop`，避免同一 "
+"feature 提交同时触发 push／PR 两套完整流水线。手工和定时入口 继续保留。事件去重不删减 PR 检查、模式矩阵或正式候选验收。"
+msgstr ""
+"主平台 CI 对每个 `pull_request` 执行适用的完整检查域；`push` 只跟踪 `main` 和 `develop`，避免同一 "
+"feature 提交同时触发 push／PR 两套完整流水线。手工和定时入口 继续保留。事件去重不删减 PR 检查、模式矩阵或正式候选验收。"

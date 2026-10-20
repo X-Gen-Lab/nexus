@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "stm32u575zi-lptim-reference",
+  "soc": "STM32U575ZIT6Q",
+  "soc_family": "stm32u575",
+  "source_revision": "RM0456 Rev7 chapter58 LPTIM2 PCLK1 RUN software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "lptim2",
+      "controller": "LPTIM2",
+      "route": "lptim2-internal-pclk1"
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only internal timer reference; physical PCB and silicon revision unobserved.",
+    "RUN only, no Stop, autonomous, backup or VBAT continuity; no physical HIL executed."
+  ],
+  "provenance": [
+    {
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-u5",
+      "tree": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+      "scope": "LPTIM2 APB1ENR2 gate/APB1RSTR2 reset, CCIPR1 selector and IRQ68; RM0456 Rev7 58.4 and 58.7 define synchronization and UE completion."
+    }
+  ]
+}

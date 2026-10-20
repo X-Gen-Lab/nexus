@@ -1,5 +1,9 @@
 """Static provider wiring and family system lifecycle emission."""
 from . import bindings
+try:
+    from ... import enhanced_endpoints
+except ImportError:
+    import enhanced_endpoints
 
 
 def implementation(item):
@@ -9,15 +13,22 @@ def implementation(item):
 
 def operations(item):
     """Name the actual readonly table; shared algorithms keep one identity."""
+    if item.interface_kind == "spi_dma_transaction":
+        return "nx_spi_dma_sequence_port_ops"
     selected = implementation(item)
     return f"nx_native_{selected}_ops"
 
 
 def includes(result):
-    del result
     source = []
     source += ['#include "nexus/io/native/model.h"',
                '#include "provider.h"']
+    if any(item.kind in {"rtc", "lptim"} for item in result.controllers):
+        source.append('#include "rtc_lptim_provider.h"')
+    if any(item.mode == "irq-words" for item in result.controllers):
+        source.append('#include "uart_word_provider.h"')
+    if any(item.interface_kind == "spi_dma_transaction" for item in result.controllers):
+        source.append('#include "spi_dma_provider.h"')
     return source
 
 
@@ -29,16 +40,22 @@ def instance_declarations(item, result):
             if device["controller"] != item["id"]:
                 continue
             child_name = device["id"].replace("-", "_")
+            if item.interface_kind == "spi_dma_transaction":
+                name = item.id.replace("-", "_")
+                source += [f"static nx_native_spi_dma_endpoint_state_t s_nx_endpoint_{child_name} = {{ .controller = &s_nx_port_{name} }};"]
+                source += enhanced_endpoints.face(device, f"s_nx_endpoint_{child_name}",
+                                                 "nx_spi_dma_sequence_endpoint_ops")
+                continue
             initializer = ""
             if kind == "i2c":
                 name = item.id.replace("-", "_")
                 initializer = f" = {{ .port = &s_nx_port_{name}, .address = {device['address']}u }}"
             if "model_bytes" in device:
                 source.append(f'static uint8_t s_nx_model_{child_name}[{device["model_bytes"]}];')
-            source += [f'static nx_native_{kind}_endpoint_state_t s_nx_endpoint_{child_name}{initializer};',
-                       f'static const nx_{kind}_endpoint_t s_nx_device_face_{child_name} = {{',
-                       f'    &nx_native_{kind}_endpoint_ops, &s_nx_endpoint_{child_name}', '};',
-                       f'const nx_{kind}_endpoint_t* const nx_device_{child_name} = &s_nx_device_face_{child_name};']
+            source += [f'static nx_native_{kind}_endpoint_state_t s_nx_endpoint_{child_name}{initializer};']
+            source += enhanced_endpoints.face(
+                device, f"s_nx_endpoint_{child_name}",
+                f"nx_native_{kind}_endpoint_ops", "native")
     return source
 
 
@@ -48,8 +65,16 @@ def has_dma(result):
 
 
 def state_declarations(result):
-    del result
-    return []
+    if not any(item.kind in {"rtc", "lptim"} for item in result.controllers):
+        return []
+    return [
+        '/** \\brief Selected-only adapter; Core time never advances a model. */',
+        'static nx_time_us_t nx_native_time_clock_read(void* context) {',
+        '    (void)context;',
+        '    return nx_time_now_us();', '}',
+        'static const nx_clock_t s_nx_native_time_clock = {',
+        '    nx_native_time_clock_read, NULL', '};',
+    ]
 
 
 def shared_irqs(result):

@@ -1,0 +1,64 @@
+// FIG-18 target IO-24 protocol; stages are not a public request enum.
+// Scope: selected STM32H743ZIT6 V / Cache off only; no physical execution.
+// Every visible edge is guarded control flow, not ownership release by timeout.
+// Only the final proved restoration path returns to ordinary Flash code.
+digraph h743FlashRamLifecycle {
+    graph [label="FIG-18 Target RAM maintenance settlement\nDeadline expiry retains protection; permanent busy cannot return",
+           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
+           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.5,
+           newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=11, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=9, arrowsize=0.8];
+    admission [label="Ordinary provider admission\nValidate input, deadline, layout and actual context"];
+    reject [label="Return rejection\nNo retained temporary effects or physical trigger",
+            fillcolor="#f8fafc"];
+    bridge [label="Enter CPU-only RAM bridge\nPreserve MSP / PSP / CONTROL / PRIMASK"];
+    vectors [label="RAM transaction publishes private VTOR\nProve readback before installing MPU guard"];
+    scan [label="In RAM: scan all 16 RASR.EN\nSave selector and selected descriptor / CTRL"];
+    guard [label="Install and prove Code-domain MPU guard\nXN + Strongly-ordered + AP001; CTRL7; DSB / ISB"];
+    rollback [label="Before trigger: prove both banks idle\nRestore every acquired MPU / selector effect"];
+    trigger [label="Trigger only the validated physical pulse\nProgram stores or erase START"];
+    drain [label="Remain in RAM; retain guard and workspace\nObserve both-bank BSY / QW / WBNE and valid TIM2 epoch"];
+    expiry [label="Latch TIMEOUT after trigger\nDo not cancel, clear busy or return"];
+    lock [label="Both banks actually idle\nProve target LOCK and required barriers"];
+    restoreMpu [label="Restore / read back exact MPU state\nOnly while Flash is actually idle"];
+    returnGate [label="Common RAM return gate: every returning path\nBoth banks idle; effects zero; exact (saved control | LOCK) proved"];
+    restoreVectors [label="RAM transaction restores original VTOR\nProve exact readback while on private MSP"];
+    restoreCpu [label="CPU bridge restores exact caller state\nMSP / PSP / CONTROL / PRIMASK"];
+    result [label="Return settled result to ordinary code\nIO; else latched TIMEOUT; else SUCCESS",
+            fillcolor="#f8fafc"];
+    failstop [label="Nonreturning RAM fail-stop\nRetain unproved responsibility; no hidden reset / watchdog feed",
+              style="rounded,bold,filled", fillcolor="#fff7ed"];
+    admission -> reject [label="invalid; no acquired effects"];
+    admission -> bridge [label="admitted and command staged"];
+    bridge -> vectors [label="private MSP established"];
+    vectors -> scan [label="private vector value read back"];
+    vectors -> returnGate [label="pre-trigger publication refused"];
+    scan -> guard [label="supported disabled MPU; no enabled foreign region"];
+    scan -> rollback [label="pre-trigger refusal after selector effect"];
+    guard -> trigger [label="installation and readback proved"];
+    guard -> rollback [label="installation refused or last pre-issue deadline expired"];
+    rollback -> returnGate [label="rollback and idle proved; rejection result"];
+    rollback -> failstop [label="rollback or idle cannot be proved"];
+    trigger -> drain [label="pulse may be active; latch hardware errors"];
+    drain -> drain [label="any busy bit remains; including permanent busy"];
+    drain -> expiry [label="absolute deadline expires"];
+    expiry -> drain [label="continue real polling with result latched"];
+    drain -> failstop [label="epoch lost / exhausted or proof unavailable"];
+    drain -> lock [label="all actual busy bits withdrawn"];
+    lock -> restoreMpu [label="LOCK and valid time-domain observations proved"];
+    lock -> failstop [label="LOCK cannot be proved"];
+    restoreMpu -> returnGate [label="exact guard withdrawal proved"];
+    restoreMpu -> failstop [label="restoration cannot be proved"];
+    returnGate -> restoreVectors [label="all return conditions read back; lock idle target if needed"];
+    returnGate -> failstop [label="busy, retained effects or exact target LOCK cannot be proved"];
+    restoreVectors -> restoreCpu [label="exact original VTOR read back"];
+    restoreVectors -> failstop [label="VTOR restoration cannot be proved"];
+    restoreCpu -> result [label="post-pulse restoration proved"];
+    restoreCpu -> reject [label="pre-trigger rollback and restoration proved"];
+    // failstop has deliberately no outgoing edge. A process-test watchdog
+    // may observe nonreturn, but it cannot manufacture hardware settlement.
+}

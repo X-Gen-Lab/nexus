@@ -1,0 +1,20 @@
+{
+  "kind": "actionlint-probes-r1-freeze",
+  "files": [
+    {
+      "relative": "original-probes.tar.gz",
+      "bytes": 158750,
+      "sha256": "b280a27ada3ac9f0580bf66b61560d3a64c47b1b2e879bd6e61965b863e8b24a"
+    },
+    {
+      "relative": "original-transport-map-r1.json.gz",
+      "bytes": 16858,
+      "sha256": "b996bf17084d32e9fee0773e4d35bc2eb1d48ae10f1d121bdf04e332fe2969fb"
+    },
+    {
+      "relative": "probe-report-r1.json",
+      "bytes": 38742,
+      "sha256": "6c3e45c0330be6b529c65f92e36d5aca57ac6d6d9fb96ba408735a1f4634805b"
+    }
+  ]
+}

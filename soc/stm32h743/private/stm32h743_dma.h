@@ -28,6 +28,9 @@ typedef struct {
     bool dma_complete;
     bool draining;
     bool cached;
+    /** \brief Observed gate/reset loss; permanent while ownership is retained.
+     */
+    bool domain_lost;
 } nx_stm32h743_uart_dma_state_t;
 extern const nx_uart_ops_t nx_stm32h743_uart_dma_ops;
 /**

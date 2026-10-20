@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="10" failures="0" disabled="0" errors="0" time="0.014" timestamp="2026-10-18T01:59:44.766" name="AllTests">
+  <testsuite name="H743HighFactory" tests="10" failures="0" disabled="0" skipped="0" errors="0" time="0.014" timestamp="2026-10-18T01:59:44.766">
+    <testcase name="ColdTypedLookupDoesNotReadOrWriteHardware" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="78" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.766" classname="H743HighFactory" />
+    <testcase name="NormalGenerationStartsDistinctDomainsAndAllProviders" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="89" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.766" classname="H743HighFactory" />
+    <testcase name="GeneratedUartIrqSettlesOnlyAfterWireTc" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="116" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.767" classname="H743HighFactory" />
+    <testcase name="GeneratedSpiUsesBoundedDividerAndFullTailDrain" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="131" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.767" classname="H743HighFactory" />
+    <testcase name="GeneratedFlashUsesPhysicalWordPathWithoutRetuning" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="143" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.767" classname="H743HighFactory" />
+    <testcase name="AmbiguousOrUnreviewedRevisionRejectsBeforeAnyEffects" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="159" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.768" classname="H743HighFactory" />
+    <testcase name="FailedTimerSetupRollsBackSystemThenJointClock" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="171" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.768" classname="H743HighFactory" />
+    <testcase name="FailedSystemStopRetainsActualPllClockForRetry" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="185" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.768" classname="H743HighFactory" />
+    <testcase name="FailedClockStopRetainsProtectionAfterSystemStops" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="197" status="run" result="completed" time="0.011" timestamp="2026-10-18T01:59:44.768" classname="H743HighFactory" />
+    <testcase name="StopStartReusesTheSameStaticTypedFaces" file="/tmp/nexus-h743-spi-safe-stop-20261018/tests/google/h743_high_factory_test.cpp" line="211" status="run" result="completed" time="0." timestamp="2026-10-18T01:59:44.780" classname="H743HighFactory" />
+  </testsuite>
+</testsuites>

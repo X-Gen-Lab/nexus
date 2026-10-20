@@ -171,3 +171,243 @@ msgstr "An explicitly injected clock; its context outlives all borrowers."
 
 msgid "State for extending one 32-bit free-running hardware counter."
 msgstr "State for extending one 32-bit free-running hardware counter."
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "The weak default returns and has no state or side effects. A product may supply one strong implementation, bounded and allocation-free in every calling task/ISR/masked context. No functioning kernel, clock, stack, transport or peripheral may be assumed after corruption. This is best-effort observation, not stack repair, safe outputs or reset proof. The hook must not acquire OS locks, reenter the provider, change incoming masks, mutate accepted requests or release retained storage. If it returns, the terminal caller still parks. A product may perform a separately reviewed non-returning recovery action. No retained event, registry or worker is implicit."
+msgstr "The weak default returns and has no state or side effects. A product may supply one strong implementation, bounded and allocation-free in every calling task/ISR/masked context. No functioning kernel, clock, stack, transport or peripheral may be assumed after corruption. This is best-effort observation, not stack repair, safe outputs or reset proof. The hook must not acquire OS locks, reenter the provider, change incoming masks, mutate accepted requests or release retained storage. If it returns, the terminal caller still parks. A product may perform a separately reviewed non-returning recovery action. No retained event, registry or worker is implicit."
+
+msgid "[in] Actual reporting path, not a severity assessment."
+msgstr "[in] Actual reporting path, not a severity assessment."
+
+msgid "[in] Observed failure, never permission to reclaim loans."
+msgstr "[in] Observed failure, never permission to reclaim loans."
+
+msgid "[in] Static source literal or NULL; do not retain or read untrusted dynamic memory. No task name is dereferenced."
+msgstr "[in] Static source literal or NULL; do not retain or read untrusted dynamic memory. No task name is dereferenced."
+
+msgid "[in] Diagnostic location, zero when unavailable."
+msgstr "[in] Diagnostic location, zero when unavailable."
+
+msgid "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout."
+msgstr "Use these attributes on variable definitions, before the type, one variable per declaration. They are not function or instruction attributes. Each use has an independent input section for garbage collection of unused storage. DATA copies its initializer from Flash at reset. BSS is zeroed at reset. NOINIT is neither copied nor cleared; initialize it before reading. Power-loss retention is not promised. BSS/NOINIT reject nonzero initializers. Storage is word aligned and subject to explicit ELF budgets. Unselected use is a compile error. TCM is CPU-only data: never DMA or executable storage. CCM is also CPU-only data; placement never grants bus-master access. ADDSRAM DMA requires provider address, alignment and ownership validation. Ordinary storage, the main MSP and unselected images keep their existing layout."
+
+msgid "Task-only. Never use initialization to revoke a live borrow."
+msgstr "Task-only. Never use initialization to revoke a live borrow."
+
+msgid "[out] Fresh storage, not visible to a provider/observer."
+msgstr "[out] Fresh storage, not visible to a provider/observer."
+
+msgid "Single owner, task-only; failure creates no borrow."
+msgstr "Single owner, task-only; failure creates no borrow."
+
+msgid "[inout] Storage with no remaining observers or adapter loans."
+msgstr "[inout] Storage with no remaining observers or adapter loans."
+
+msgid "[in] Absolute transfer deadline, including queue time."
+msgstr "[in] Absolute transfer deadline, including queue time."
+
+msgid "NX_SUCCESS; invalid pointer or borrowed state is rejected."
+msgstr "NX_SUCCESS; invalid pointer or borrowed state is rejected."
+
+msgid "Task/IRQ bounded; SETTLED guarantees provider's final access has occurred, not that separate adapter observers exited."
+msgstr "Task/IRQ bounded; SETTLED guarantees provider's final access has occurred, not that separate adapter observers exited."
+
+msgid "[in] Initialized storage kept alive by the caller."
+msgstr "[in] Initialized storage kept alive by the caller."
+
+msgid "Current state, or QUARANTINED for NULL."
+msgstr "Current state, or QUARANTINED for NULL."
+
+msgid "One serialized execution owner; validate hardware/buffers first. Multi-producer adapters hold their metadata guard across admission; concurrent admissions are unsupported."
+msgstr "One serialized execution owner; validate hardware/buffers first. Multi-producer adapters hold their metadata guard across admission; concurrent admissions are unsupported."
+
+msgid "[inout] READY request; caller owns storage until SETTLED."
+msgstr "[inout] READY request; caller owns storage until SETTLED."
+
+msgid "[in] QUEUED for adapter or ACTIVE for direct provider."
+msgstr "[in] QUEUED for adapter or ACTIVE for direct provider."
+
+msgid "NX_SUCCESS means ACCEPTED. Any failure means REJECTED with zero retained references, payload access or residual effects."
+msgstr "NX_SUCCESS means ACCEPTED. Any failure means REJECTED with zero retained references, payload access or residual effects."
+
+msgid "Execution owner; short task/IRQ metadata operation."
+msgstr "Execution owner; short task/IRQ metadata operation."
+
+msgid "[inout] Admitted request owned by the executor."
+msgstr "[inout] Admitted request owned by the executor."
+
+msgid "[in] ACTIVE, DRAINING or QUARANTINED."
+msgstr "[in] ACTIVE, DRAINING or QUARANTINED."
+
+msgid "NX_SUCCESS or NX_ERROR_STATE for an illegal transition."
+msgstr "NX_SUCCESS or NX_ERROR_STATE for an illegal transition."
+
+msgid "Detach active/queued references and capture any static wake target first. No hardware/IRQ/deferred observer may access request or payload afterwards. Cancel/timeout alone do not satisfy this requirement. A failed drain stays QUARANTINED."
+msgstr "Detach active/queued references and capture any static wake target first. No hardware/IRQ/deferred observer may access request or payload afterwards. Cancel/timeout alone do not satisfy this requirement. A failed drain stays QUARANTINED."
+
+msgid "[inout] Borrowed storage after all sources have drained."
+msgstr "[inout] Borrowed storage after all sources have drained."
+
+msgid "[in] Final transfer result, not admission status."
+msgstr "[in] Final transfer result, not admission status."
+
+msgid "[in] Valid transferred bytes/samples."
+msgstr "[in] Valid transferred bytes/samples."
+
+msgid "[in] Live request storage with no concurrent reuse."
+msgstr "[in] Live request storage with no concurrent reuse."
+
+msgid "[out] Final operation result."
+msgstr "[out] Final operation result."
+
+msgid "[out] Valid byte/sample count."
+msgstr "[out] Valid byte/sample count."
+
+msgid "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
+msgstr "NX_SUCCESS, NX_ERROR_BUSY while borrowed or invalid arguments."
+
+msgid "[inout] Zero-initialized, unbound adapter-owned slot."
+msgstr "[inout] Zero-initialized, unbound adapter-owned slot."
+
+msgid "[in] Live storage to bind; binding itself is not admission."
+msgstr "[in] Live storage to bind; binding itself is not admission."
+
+msgid "[out] Nonzero identity for later control commands."
+msgstr "[out] Nonzero identity for later control commands."
+
+msgid "NX_SUCCESS, BUSY, INVALID or EXHAUSTED; no identity repeats."
+msgstr "NX_SUCCESS, BUSY, INVALID or EXHAUSTED; no identity repeats."
+
+msgid "[in] Stable slot protected by adapter synchronization."
+msgstr "[in] Stable slot protected by adapter synchronization."
+
+msgid "[in] Incarnation named by the command."
+msgstr "[in] Incarnation named by the command."
+
+msgid "Live request only for a matching bound incarnation; else NULL."
+msgstr "Live request only for a matching bound incarnation; else NULL."
+
+msgid "[inout] Stable slot whose commands/observers have exited."
+msgstr "[inout] Stable slot whose commands/observers have exited."
+
+msgid "[in] Incarnation to release."
+msgstr "[in] Incarnation to release."
+
+msgid "NX_SUCCESS, STATE for stale identity, BUSY while borrowed."
+msgstr "NX_SUCCESS, STATE for stale identity, BUSY while borrowed."
+
+msgid "Fields are private to helpers/providers while borrowed. Initialize before first use. One owner prepares/submits and consumes results. GCC/Clang lock-free 32-bit atomic access publishes state; fields are read only after acquire SETTLED."
+msgstr "Fields are private to helpers/providers while borrowed. Initialize before first use. One owner prepares/submits and consumes results. GCC/Clang lock-free 32-bit atomic access publishes state; fields are read only after acquire SETTLED."
+
+msgid "The slot, not a possibly freed request, is targeted by cross- task commands. Serialize bind/lookup/release in the adapter. Keep slot and command storage until command acknowledgement; epoch exhaustion rejects rebinding rather than reusing IDs."
+msgstr "The slot, not a possibly freed request, is targeted by cross- task commands. Serialize bind/lookup/release in the adapter. Keep slot and command storage until command acknowledgement; epoch exhaustion rejects rebinding rather than reusing IDs."
+
+msgid "[inout] Fresh zero/detached sidecar, distinct control."
+msgstr "[inout] Fresh zero/detached sidecar, distinct control."
+
+msgid "[in] Stable caller slot, protected by caller exclusion."
+msgstr "[in] Stable caller slot, protected by caller exclusion."
+
+msgid "[in] Nonzero exact slot incarnation, never regenerated."
+msgstr "[in] Nonzero exact slot incarnation, never regenerated."
+
+msgid "SUCCESS or INVALID/STATE, no retained reference on rejection."
+msgstr "SUCCESS or INVALID/STATE, no retained reference on rejection."
+
+msgid "Borrowed state exposes no speculative result/count. NULL slot, stale epoch and overlap reject before request access. This neither services hardware nor interprets deadline as borrow release. Caller guarantees binding storage lifetime. Output is disjoint from the complete descriptor and borrowed buffers; only the common request span is checked here."
+msgstr "Borrowed state exposes no speculative result/count. NULL slot, stale epoch and overlap reject before request access. This neither services hardware nor interprets deadline as borrow release. Caller guarantees binding storage lifetime. Output is disjoint from the complete descriptor and borrowed buffers; only the common request span is checked here."
+
+msgid "[inout] Bound sidecar under caller serialization."
+msgstr "[inout] Bound sidecar under caller serialization."
+
+msgid "[in] Same monotonic domain as the request deadline."
+msgstr "[in] Same monotonic domain as the request deadline."
+
+msgid "[out] Distinct output, unchanged on error."
+msgstr "[out] Distinct output, unchanged on error."
+
+msgid "Caller-serialized; allowed while request is quarantined. It is not request settlement, slot release or destruction."
+msgstr "Caller-serialized; allowed while request is quarantined. It is not request settlement, slot release or destruction."
+
+msgid "[inout] Live sidecar after all its readers have exited."
+msgstr "[inout] Live sidecar after all its readers have exited."
+
+msgid "One serialized observer; no Arch/OS/SoC dependency or lock. Caller excludes slot bind/release, request prepare/reuse and concurrent observer calls during sample. Stable slot stays alive until detach; observing never acquires/releases a loan."
+msgstr "One serialized observer; no Arch/OS/SoC dependency or lock. Caller excludes slot bind/release, request prepare/reuse and concurrent observer calls during sample. Stable slot stays alive until detach; observing never acquires/releases a loan."
+
+msgid "Caller ensures this region is quiescent and painting had no live frames. No Arch/OS dependency or internal mask occurs. Work is at most bytes reads. Unwritten reservations or writes equal to paint can hide usage; this is not overflow detection. MSP qualification needs independently established boot paint and a quiescent sampling point. The span excludes current SP, all active frames and exception-stack reservation. It never paints or claims to read the physical MSP register."
+msgstr "Caller ensures this region is quiescent and painting had no live frames. No Arch/OS dependency or internal mask occurs. Work is at most bytes reads. Unwritten reservations or writes equal to paint can hide usage; this is not overflow detection. MSP qualification needs independently established boot paint and a quiescent sampling point. The span excludes current SP, all active frames and exception-stack reservation. It never paints or claims to read the physical MSP register."
+
+msgid "[in] Live downward-growing stack region, caller-provenance."
+msgstr "[in] Live downward-growing stack region, caller-provenance."
+
+msgid "[in] Original positive painted region capacity in bytes."
+msgstr "[in] Original positive painted region capacity in bytes."
+
+msgid "[in] Exact fill used before the region became active."
+msgstr "[in] Exact fill used before the region became active."
+
+msgid "[out] Distinct output, unchanged on invalid span or alias."
+msgstr "[out] Distinct output, unchanged on invalid span or alias."
+
+msgid "SUCCESS or INVALID, without allocation or retained pointers."
+msgstr "SUCCESS or INVALID, without allocation or retained pointers."
+
+msgid "Physical providers require successful platform startup and a privileged task/configurable IRQ; NMI/HardFault callers are unsupported. No OS, allocation or wait. Physical clocks return zero outside a successfully started live epoch; zero alone cannot prove readiness. Startup status is authoritative. All consumers join before clock withdrawal. Stop/restart or a clock change invalidates every old deadline, even if a new epoch has the same numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled restart. An observed hardware overflow acknowledgement failure ends the live epoch and is terminal, even when finite source isolation succeeds. The provider retains ownership, masks interrupts, calls nx_fault_observe and parks if the observer returns. It never resumes deadline consumers with invalid zero time. Observation neither releases loans nor proves safe outputs; products own separately reviewed non-returning recovery. Ordinary shutdown still requires every consumer and optional low-power owner joined first."
+msgstr "Physical providers require successful platform startup and a privileged task/configurable IRQ; NMI/HardFault callers are unsupported. No OS, allocation or wait. Physical clocks return zero outside a successfully started live epoch; zero alone cannot prove readiness. Startup status is authoritative. All consumers join before clock withdrawal. Stop/restart or a clock change invalidates every old deadline, even if a new epoch has the same numerical value. UINT64_MAX is reserved; clock exhaustion requires controlled restart. An observed hardware overflow acknowledgement failure ends the live epoch and is terminal, even when finite source isolation succeeds. The provider retains ownership, masks interrupts, calls nx_fault_observe and parks if the observer returns. It never resumes deadline consumers with invalid zero time. Observation neither releases loans nor proves safe outputs; products own separately reviewed non-returning recovery. Ordinary shutdown still requires every consumer and optional low-power owner joined first."
+
+msgid "Microseconds since domain initialization."
+msgstr "Microseconds since domain initialization."
+
+msgid "[in] Absolute time or NX_DEADLINE_NEVER."
+msgstr "[in] Absolute time or NX_DEADLINE_NEVER."
+
+msgid "[in] Snapshot in the same clock domain."
+msgstr "[in] Snapshot in the same clock domain."
+
+msgid "True when a finite deadline has expired, including equality."
+msgstr "True when a finite deadline has expired, including equality."
+
+msgid "[in] Current finite time."
+msgstr "[in] Current finite time."
+
+msgid "[in] Relative duration in microseconds."
+msgstr "[in] Relative duration in microseconds."
+
+msgid "Absolute deadline, saturating at NX_DEADLINE_NEVER."
+msgstr "Absolute deadline, saturating at NX_DEADLINE_NEVER."
+
+msgid "Single execution owner. Reset creates a new clock domain; do not reuse outstanding deadlines after reset/clock change."
+msgstr "Single execution owner. Reset creates a new clock domain; do not reuse outstanding deadlines after reset/clock change."
+
+msgid "[out] Caller-owned extension state."
+msgstr "[out] Caller-owned extension state."
+
+msgid "[in] First hardware snapshot."
+msgstr "[in] First hardware snapshot."
+
+msgid "[in] Nonzero stable counter frequency."
+msgstr "[in] Nonzero stable counter frequency."
+
+msgid "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
+msgstr "NX_SUCCESS, or NX_ERROR_INVALID for invalid arguments."
+
+msgid "Observe at least once per 2^32 ticks, even when idle. Multiple missed wraps cannot be detected from two snapshots. Counter must continue through waits; frequency cannot change."
+msgstr "Observe at least once per 2^32 ticks, even when idle. Multiple missed wraps cannot be detected from two snapshots. Counter must continue through waits; frequency cannot change."
+
+msgid "[inout] Initialized, single-owner extension state."
+msgstr "[inout] Initialized, single-owner extension state."
+
+msgid "[in] Current counter snapshot."
+msgstr "[in] Current counter snapshot."
+
+msgid "[out] Extended elapsed microseconds."
+msgstr "[out] Extended elapsed microseconds."
+
+msgid "NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED."
+msgstr "NX_SUCCESS, NX_ERROR_STATE or NX_ERROR_EXHAUSTED."
+
+msgid "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."
+msgstr "SUCCESS, STATE for stale/released identity, INVALID for invalid arguments or IO for reversed time. Counters saturate without epoch reuse."

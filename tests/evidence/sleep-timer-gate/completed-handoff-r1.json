@@ -1,0 +1,296 @@
+{
+  "kind": "bounded-development-TDD-software-correction",
+  "status": "implemented and scoped validation passed; independent review pending",
+  "created_ns": 1792298751376140340,
+  "own_root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "head": "ce4bc5bb45eaa92a368017492f5e840ce8e5a3b2",
+  "branch": "feat/sleep-timebase-admission-20261018",
+  "index_sha256": "9812cdded4af7887e8f20fd3964a753509dbb9e127248c4ea3eac9ff54f4a1e9",
+  "source_freeze": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/source-freeze-r1.json",
+    "bytes": 1048,
+    "sha256": "895135c28eb81adeb93a6f07d812b9cde592b60585f6a93c879163013c311f4c"
+  },
+  "source_diff": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/source.diff",
+    "bytes": 4840,
+    "sha256": "4c1d7f68a8adbf7738c6de58bc147275c8afe9b085e62c4d128a4d9cc5bacfc1"
+  },
+  "change": "Readonly shallow-sleep admission requires the selected monotonic TIM2/TIMER1 Sleep clock gate. Missing gate rejects UNSUPPORTED under the final mask, leaves slept=false, restores mask, and performs no WFI or resource mutation. It never repairs clocks.",
+  "red": {
+    "source": {
+      "root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "commit": "ce4bc5bb45eaa92a368017492f5e840ce8e5a3b2",
+      "tree": "a09e3f4e2a61b61110ea58ebaf3c59f70d70b86f",
+      "dirty": true,
+      "submodules": [
+        "-dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos",
+        "-93387b0a60382a29579bbad5045c68328e3751df ext/threadx",
+        "-55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5",
+        "-c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1",
+        "-3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4",
+        "-626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4",
+        "-8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7",
+        "-624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5",
+        "-fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal",
+        "-b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal",
+        "-f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal",
+        "-a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal",
+        "-2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal"
+      ],
+      "working_tree_sha256": "40fc2fd42ec5f4c3d3cb6a1aba9dc3221e89d1c56e9c311c5e5f4e07ad9c5759"
+    },
+    "programs": [
+      {
+        "binary": "nexus_stm32f407_clock_sleep_test",
+        "exit_code": 1,
+        "tests": 19,
+        "passed": 17,
+        "skipped": 0,
+        "binary_sha256": "1d012912a14a8090e0649638be77a7ddf09aa3ce2bdff5ca0f975650f2aae8d2",
+        "xml_sha256": "489caae75476572310cccb9aa94eee8ddfb552886de0143cd918f64a1fc21e18"
+      },
+      {
+        "binary": "nexus_gd32f470_clock_sleep_test",
+        "exit_code": 1,
+        "tests": 20,
+        "passed": 18,
+        "skipped": 0,
+        "binary_sha256": "02896d5d49e7feb29c6679e41e9ebfa7e98e95b8cae113a401c238a2e6838cf6",
+        "xml_sha256": "b01e890bb899d5a6d2fcbb14172d65101b5bb544dba1c5ad5d414cde4da7e54d"
+      }
+    ],
+    "expected_failed_cases": [
+      "DisabledTimerSleepClockRejectsWithoutRepair",
+      "TimerSleepClockAtFinalMaskBoundaryIsRechecked"
+    ],
+    "total_discovered": 39,
+    "actual_failed_cases": 4,
+    "preexisting_passed": 35,
+    "skipped": 0,
+    "meaning": "Actual complete production-provider execution incorrectly reaches WFI before fix. Tests-only baseline explicitly enables the documented Sleep gate; all old assertions retained."
+  },
+  "green": {
+    "source": {
+      "root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "commit": "ce4bc5bb45eaa92a368017492f5e840ce8e5a3b2",
+      "tree": "a09e3f4e2a61b61110ea58ebaf3c59f70d70b86f",
+      "dirty": true,
+      "submodules": [
+        "-dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos",
+        "-93387b0a60382a29579bbad5045c68328e3751df ext/threadx",
+        "-55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5",
+        "-c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1",
+        "-3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4",
+        "-626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4",
+        "-8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7",
+        "-624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5",
+        "-fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal",
+        "-b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal",
+        "-f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal",
+        "-a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal",
+        "-2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal"
+      ],
+      "working_tree_sha256": "3db53d56f8c32a961c352002f261bae0bb4e406abc2e0b12c97fe0410e892694"
+    },
+    "programs": [
+      {
+        "binary": "nexus_stm32f407_clock_sleep_test",
+        "exit_code": 0,
+        "tests": 19,
+        "passed": 19,
+        "skipped": 0,
+        "binary_sha256": "4471c76aec1a7e5fe07afb48128262012c35e6466a46c4ec58efa5de1b93f025",
+        "xml_sha256": "56e87de2b5cfdbf95c606f74fddc61f987000b932c240b8d2e9f2ad376046234"
+      },
+      {
+        "binary": "nexus_gd32f470_clock_sleep_test",
+        "exit_code": 0,
+        "tests": 20,
+        "passed": 20,
+        "skipped": 0,
+        "binary_sha256": "0af658beb57f2c674dd6b08a4b269f8e40cf2b4a416907c1071a4401bf18f0a1",
+        "xml_sha256": "12e79013e305a2c11e56ab95a34f9ba9af5f0b3810d9290533f2860a04636fbd"
+      }
+    ],
+    "passed": 39,
+    "skipped": 0
+  },
+  "related": {
+    "source": {
+      "root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "commit": "ce4bc5bb45eaa92a368017492f5e840ce8e5a3b2",
+      "tree": "a09e3f4e2a61b61110ea58ebaf3c59f70d70b86f",
+      "dirty": true,
+      "submodules": [
+        "-dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos",
+        "-93387b0a60382a29579bbad5045c68328e3751df ext/threadx",
+        "-55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5",
+        "-c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1",
+        "-3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4",
+        "-626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4",
+        "-8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7",
+        "-624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5",
+        "-fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal",
+        "-b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal",
+        "-f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal",
+        "-a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal",
+        "-2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal"
+      ],
+      "working_tree_sha256": "3db53d56f8c32a961c352002f261bae0bb4e406abc2e0b12c97fe0410e892694"
+    },
+    "programs": [
+      {
+        "binary": "nexus_clock_domain_test",
+        "exit_code": 0,
+        "tests": 17,
+        "passed": 17,
+        "skipped": 0,
+        "binary_sha256": "9e2282f3aec738c3704b975d87bdd1357500a6b5c0f2ba490679d34ae2030163",
+        "xml_sha256": "232561ba3a86c0b3462516dfc748b31e1e279f96ee714f43d4fa1083638999ab"
+      },
+      {
+        "binary": "nexus_stm32f407_lowpower_test",
+        "exit_code": 0,
+        "tests": 6,
+        "passed": 6,
+        "skipped": 0,
+        "binary_sha256": "1ed3cc8b658cc532f7d3c42d4a4fbf59666b6906c07b123785cd9ae6f6723f21",
+        "xml_sha256": "b3d24269bf913c4d1b07322e58d4e14ed198780075dfb15c2310799fb2830873"
+      },
+      {
+        "binary": "nexus_gd32f470_lowpower_test",
+        "exit_code": 0,
+        "tests": 6,
+        "passed": 6,
+        "skipped": 0,
+        "binary_sha256": "e5add1108f3da917ca0c9ece644110095ede34077a31d16e69f0226d9b8bd200",
+        "xml_sha256": "46b0d4b7810a853b2e85edec845d49a545b95996b006a9cf7b5374784c0342b3"
+      },
+      {
+        "binary": "nexus_stm32f407_lowpower_integration_test",
+        "exit_code": 0,
+        "tests": 3,
+        "passed": 3,
+        "skipped": 0,
+        "binary_sha256": "42f8520e2bf0ab2d7d06b4813a391404fd687f80e8d92feb57f1b1b1695abb31",
+        "xml_sha256": "56386a24bccc63f9720754047364b9c8a8358240a52c91de06ea4f7ad3ed5ef5"
+      },
+      {
+        "binary": "nexus_gd32f470_lowpower_integration_test",
+        "exit_code": 0,
+        "tests": 3,
+        "passed": 3,
+        "skipped": 0,
+        "binary_sha256": "cfa07077e9ded6f86697620bda154e0a3affb4d8f259fff10d06dbc2b274c1d2",
+        "xml_sha256": "0b61110d99733d31c1657f495e9e581cd85de0258c9990db560d189c256d5ede"
+      }
+    ],
+    "passed": 35,
+    "skipped": 0
+  },
+  "total_current_native_cases_passed": 74,
+  "native_builds": {
+    "red-build": {
+      "returncode": 0,
+      "max_completed_child_rss_kib": 214396
+    },
+    "green-build": {
+      "returncode": 0,
+      "max_completed_child_rss_kib": 215624
+    }
+  },
+  "format": {
+    "returncode": 0,
+    "scope": "All three complete files through maintained scripts/tools/format.py, existing locked clang-format14"
+  },
+  "arm": {
+    "status": "two current frozen translation units compiled actual0",
+    "scope": "Strict C11 ARM object compile based on historical actual production flags with explicit paths/compiler relocation and -std=c11/-MD/-MF additions. Not current CMake generation, linking, installed SDK or HIL.",
+    "objects": [
+      {
+        "family": "stm32f407",
+        "object": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/stm32f407/sleep.o",
+          "bytes": 1716,
+          "sha256": "96c7902ffbd9fc6fd74581b26e38583e8d10910fc7db1768917bf7a9031bdf5c"
+        },
+        "dependencies": 24,
+        "dependency_file": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/stm32f407/sleep.d",
+          "bytes": 2547,
+          "sha256": "16ca38e21557a65f6de2e9f1127bac8fb2f29dd00fa4745a58371072616edef3"
+        }
+      },
+      {
+        "family": "gd32f470",
+        "object": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/gd32f470/sleep.o",
+          "bytes": 1728,
+          "sha256": "026a2a212ae6d13f9df40371615c2f55ef1fdb837327b201f4d88809b8a8cce2"
+        },
+        "dependencies": 38,
+        "dependency_file": {
+          "path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/build/sleep-arm-objects/gd32f470/sleep.d",
+          "bytes": 4430,
+          "sha256": "0ee71beddb7a465f35b2e00535ed8b8e62d01f7e919ccdcd7d26d8357512b085"
+        }
+      }
+    ],
+    "preparation": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/arm-object-preparation.json",
+      "bytes": 7282,
+      "sha256": "3f95390743eed5e4e8905680b48269574f6d6d9b49bdaaac8f90d812e09d5166"
+    },
+    "compiler_version": "arm-none-eabi-gcc (Arm GNU Toolchain 14.3.Rel1 (Build arm-14.174)) 14.3.1 20250623\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "current_compiler_sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385"
+  },
+  "inputs": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/inputs-and-artifacts.json",
+    "bytes": 90791,
+    "sha256": "9536c30509ab43a0175cbd5a5a92714dc49f1e7956d613e7771d471db5f447e7"
+  },
+  "transport": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/execution-evidence.tar.gz",
+    "bytes": 52790,
+    "sha256": "19bdae9770c11fc0a99092c0a06cf0085ee6552afcfcafce83556b5ca2ef4f84"
+  },
+  "transport_manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/execution-archive-manifest.json",
+    "bytes": 38870,
+    "sha256": "f06de34a85c0b000e7fe3474384b692e8f9155449fb711d86671b2807ff1b5b5"
+  },
+  "raw_identity_scope": "Own source is dirty development checkout with restored dependency bytes and absent nested Git metadata. Each phase retained whole-source/index/baseline11-untracked observations. Canonical donor15 recursive Git locks and actual current442 compiled input/header hashes separately bound; no candidate qualification.",
+  "baseline_untracked_count": 11,
+  "baseline_untracked_preserved": true,
+  "no_stage_commit_push": true,
+  "not_claimed": [
+    "full IO-30 runtime clock/power transitions",
+    "complete timebase configuration/health",
+    "dynamic clocks or Stop continuity",
+    "active-I/O enrollment beyond existing contract",
+    "current ARM firmware link/resource budget",
+    "clean installed SDK",
+    "offline dual-build candidate",
+    "physical MCU/HIL"
+  ],
+  "setup_failures": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/setup-observations.json",
+    "bytes": 981,
+    "sha256": "92704d3c6f3aef5b179b41558e6517b28e10020d5c5c9f80fa0d34672e7cc01b"
+  },
+  "report_only_failure": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/report-generation-observation-r1.json",
+    "bytes": 398,
+    "sha256": "859b8e905eb0ea85a8515889ae7b0a5ed300856efcddf1ec75dabf840baccbbb"
+  },
+  "budget": {
+    "persistent_cap_allocated": 524288,
+    "tmp_new_allocated_cap": 31457280,
+    "last_observed_tmp_build_plus_raw_new_allocated": 24969216,
+    "native_build_original_allocated": 83685376,
+    "native_ELFs": "Actual temporary build bytes bound by SHA; no full durable Native ELF copy in this bounded transport. Two actual ARM objects, historical DB/config bytes, raw commands, full Google XML and all phase result records retained in verified archive."
+  },
+  "oom_events_after": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "measurement_boundary": "RUSAGE_CHILDREN reports maximum completed child, not whole concurrent process-family peak."
+}

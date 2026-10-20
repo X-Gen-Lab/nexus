@@ -1,0 +1,24 @@
+    def test_checkout_cleanup_preserves_bound_early_failure_evidence(self):
+        self.document()
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            env['NEXUS_EXPECTED_COMMIT'] = 'bad'
+            request = self.execute('request', root, env)
+            self.assertNotEqual(request.returncode, 0)
+            early = parent / 'nexus-qualification-early-123-1'
+            self.assertTrue((early / 'request.raw').is_file())
+            context = (early / 'context.json').read_bytes()
+            # An external checkout may clean/init the entire workspace.
+            shutil.rmtree(root)
+            root.mkdir()
+            env.update(NEXUS_CHECKOUT_VALIDATED='', NEXUS_JOB_RESULT='failure')
+            self.assertEqual(self.execute('collect', root, env).returncode, 0)
+            self.assertEqual(self.execute('readiness', root, env).returncode, 0)
+            copied = root / 'build/software-qualification/setup'
+            self.assertEqual((copied / 'context.json').read_bytes(), context)
+            self.assertTrue((copied / 'request.raw').is_file())
+            self.assertEqual(json.loads((copied / 'identity-unavailable.json').read_text())['identity_available'], False)
+            self.assertFalse(list(root.rglob('identity.json')))
+

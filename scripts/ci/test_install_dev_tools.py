@@ -63,6 +63,8 @@ class InstallDevToolsTests(unittest.TestCase):
                 "versions": self.installed,
             }
             return subprocess.CompletedProcess(command, 0, json.dumps(data), "")
+        if "actionlint-prepare" in command:
+            return subprocess.CompletedProcess(command, 0, "verified", "")
         if "pip" in command:
             if self.fail_pip:
                 raise subprocess.CalledProcessError(7, command, stderr="package download failed")
@@ -167,6 +169,14 @@ class InstallDevToolsTests(unittest.TestCase):
         self.assertFalse(any("--install-hooks" in call for call in self.calls))
         self.assertEqual(sum(call[-1] == "--version" for call in self.calls), 2)
         self.assertIn("hook installation skipped", output)
+
+    def test_skip_hooks_prepares_locked_actionlint_after_python_tools(self):
+        result, _, _, error = self.invoke(["--skip-hooks"])
+        self.assertEqual((result, error), (0, ""))
+        prepares = [call for call in self.calls if "actionlint-prepare" in call]
+        self.assertEqual(len(prepares), 1)
+        self.assertIn(str(self.root / ".venv/nexus-actionlint"), prepares[0])
+        self.assertFalse(any("--install-hooks" in call for call in self.calls))
 
     def test_configured_hook_path_is_rejected_before_any_install(self):
         self.hooks_path = ".custom-hooks\n"

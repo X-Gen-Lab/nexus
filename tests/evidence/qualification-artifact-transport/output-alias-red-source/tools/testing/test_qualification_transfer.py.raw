@@ -1,0 +1,341 @@
+"""Lossless qualification transport; tiny fixtures are not SDK/OCI proof."""
+
+import copy
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+from tools.evidence import qualification_transfer as transfer
+from tools.evidence import store
+from tools.evidence.common import EvidenceError
+from tools.evidence.identity import canonical_digest
+
+
+class QualificationTransferTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
+        self.parent = Path(self.temporary.name)
+        self.root = self.parent / 'checkout with spaces'
+        self.root.mkdir()
+        self.context = {'commit': 'a' * 40, 'run_id': '123', 'attempt': '1'}
+        for role, relative in transfer.ROOTS:
+            directory = self.root / relative
+            directory.mkdir(parents=True)
+            (directory / '.hidden').write_bytes(b'original raw\0')
+            (directory / 'empty-dir').mkdir()
+            (directory / 'empty.stderr').write_bytes(b'')
+            (directory / '.hidden').chmod(0o600)
+        identity = {'schema_version': 1, 'kind': 'ci_job_identity',
+                    'source': {'commit': self.context['commit'], 'dirty': False},
+                    'run': {'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '1'},
+                    'job_result': 'success', 'artifacts': [],
+                    'qualification': 'not_a_software_candidate'}
+        for role, relative in transfer.ROOTS[:2]:
+            for item in store.inventory(self.root / relative):
+                if item['kind'] == 'file':
+                    identity['artifacts'].append({
+                        'relative_path': relative + '/' + item['path'],
+                        'size': item['size'], 'sha256': item['sha256']})
+        identity['record_sha256'] = canonical_digest(identity)
+        path = self.root / dict(transfer.ROOTS)['job_identity'] / 'identity.json'
+        path.write_text(json.dumps(identity))
+        self.output = self.parent / 'transfer'
+
+    def prepared(self):
+        return transfer.prepare(self.root, self.output, self.context)
+
+    def outcomes(self, manifest):
+        return {'part' + str(index): {
+                    'outcome': 'success', 'outputs': {
+                        'artifact-id': str(100 + index),
+                        'artifact-digest': 'b' * 64}}
+                for index in range(len(manifest['parts']))}
+
+    def test_complete_existing_portable_schema_round_trip(self):
+        before = transfer.inventory(self.root)
+        manifest = self.prepared()
+        self.assertEqual(manifest['package']['kind'], 'portable_evidence')
+        result = transfer.finish(self.output, self.outcomes(manifest))
+        self.assertEqual(result['status'], 'uploaded')
+        self.assertFalse(result['qualified'])
+        joined = self.parent / 'joined'
+        verified = transfer.verify(self.output / 'core',
+                                   self.output / 'parts', joined,
+                                   self.context)
+        self.assertEqual(verified['status'], 'verified_transport')
+        self.assertFalse(verified['qualified'])
+        restored = self.parent / 'restored'
+        store.restore_tree(manifest['package'], restored,
+                           archive_override=joined)
+        self.assertEqual(store.inventory(restored), before['entries'])
+        self.assertEqual(transfer.inventory(self.root), before)
+
+    def test_role_authority_is_exact(self):
+        self.assertEqual(transfer.ROOTS, (
+            ('qualification', 'build/software-qualification'),
+            ('delivery', 'build/delivery'),
+            ('job_identity', 'build/job-identities/software-qualification')))
+        self.assertEqual(transfer.PART_BYTES, 256 * 1024 ** 2)
+        self.assertEqual(transfer.MAX_PARTS, 8)
+
+    def test_hidden_zero_length_and_directory_modes_preserved(self):
+        before = transfer.inventory(self.root)
+        self.assertTrue(any(item['path'].endswith('/.hidden') and
+                            item['mode'] == 0o600 for item in before['entries']))
+        self.assertTrue(any(item.get('size') == 0 for item in before['entries']))
+        self.assertTrue(any(item['kind'] == 'directory'
+                            for item in before['entries']))
+
+    def test_missing_role_refused(self):
+        (self.root / dict(transfer.ROOTS)['delivery']).rename(
+            self.root / 'elsewhere')
+        with self.assertRaises(EvidenceError):
+            self.prepared()
+
+    def test_existing_output_refused(self):
+        self.output.mkdir()
+        with self.assertRaises(EvidenceError):
+            self.prepared()
+
+    def test_output_inside_input_refused(self):
+        self.output = self.root / dict(transfer.ROOTS)['delivery'] / 'output'
+        with self.assertRaises(EvidenceError):
+            self.prepared()
+
+    def test_input_alias_symlink_refused(self):
+        (self.root / dict(transfer.ROOTS)['delivery'] / 'alias').symlink_to(
+            self.root / dict(transfer.ROOTS)['qualification'] / '.hidden')
+        with self.assertRaises(EvidenceError):
+            self.prepared()
+
+    def test_identity_source_and_run_mismatch_refused(self):
+        for name, value in (('commit', 'c' * 40), ('run_id', '124'),
+                            ('attempt', '2')):
+            with self.subTest(name=name):
+                context = dict(self.context, **{name: value})
+                with self.assertRaises(EvidenceError):
+                    transfer.prepare(self.root, self.output, context)
+
+    def test_changed_original_snapshot_refused(self):
+        before = transfer.inventory(self.root)
+        (self.root / dict(transfer.ROOTS)['delivery'] / '.hidden').write_bytes(
+            b'changed original')
+        with self.assertRaises(EvidenceError):
+            transfer.unchanged(self.root, before)
+
+    def test_tiny_split_boundaries_and_ninth_part_refused(self):
+        for size, count in ((0, 0), (1, 1), (4, 1), (5, 2), (32, 8)):
+            with self.subTest(size=size):
+                directory = self.parent / ('parts-' + str(size))
+                directory.mkdir()
+                sink = transfer.SplitWriter(directory, part_bytes=4)
+                sink.write(b'x' * size)
+                sink.close()
+                self.assertEqual(len(sink.parts), count)
+        directory = self.parent / 'too-many'
+        directory.mkdir()
+        sink = transfer.SplitWriter(directory, part_bytes=4)
+        with self.assertRaises(EvidenceError):
+            try:
+                sink.write(b'x' * 33)
+            finally:
+                sink.close()
+
+    def test_missing_required_upload_never_complete(self):
+        manifest = self.prepared()
+        for status in ('failure', 'skipped', 'cancelled'):
+            outcomes = self.outcomes(manifest)
+            outcomes['part0']['outcome'] = status
+            result = transfer.finish(self.output, outcomes)
+            self.assertEqual(result['status'], 'partial')
+            self.assertFalse(result['qualified'])
+
+    def test_two_required_volumes_cannot_share_one_artifact_id(self):
+        manifest = self.prepared()
+        # Metadata-only upload identity test; no large SDK or image is built.
+        manifest['parts'][0]['size'] = transfer.PART_BYTES
+        manifest['parts'].append({
+            'ordinal': 1, 'name': 'part-001', 'offset': transfer.PART_BYTES,
+            'size': 1, 'sha256': 'c' * 64})
+        manifest['package']['archive']['size'] = transfer.PART_BYTES + 1
+        (self.output / 'core/manifest.json').write_text(json.dumps(manifest))
+        outcomes = self.outcomes(manifest)
+        outcomes['part1']['outputs']['artifact-id'] = '100'
+        self.assertEqual(transfer.finish(self.output, outcomes)['status'],
+                         'partial')
+
+    def test_success_without_artifact_identity_refused(self):
+        manifest = self.prepared()
+        outcomes = self.outcomes(manifest)
+        outcomes['part0']['outputs']['artifact-id'] = ''
+        self.assertEqual(transfer.finish(self.output, outcomes)['status'],
+                         'partial')
+
+    def test_missing_extra_and_changed_part_refused(self):
+        manifest = self.prepared()
+        transfer.finish(self.output, self.outcomes(manifest))
+        part = self.output / 'parts/part-000'
+        original = part.read_bytes()
+        extra = self.output / 'parts/part-007'
+        extra.write_bytes(b'extra')
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.parent / 'extra', self.context)
+        extra.unlink()
+        part.write_bytes(original[:-1])
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.parent / 'changed', self.context)
+        part.unlink()
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.parent / 'missing', self.context)
+
+    def test_partial_receipt_cannot_verify(self):
+        self.prepared()
+        transfer.finish(self.output, {})
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.parent / 'partial', self.context)
+
+    def test_boolean_ordinal_cannot_impersonate_integer_zero(self):
+        manifest = self.prepared()
+        transfer.finish(self.output, self.outcomes(manifest))
+        manifest['parts'][0]['ordinal'] = False
+        (self.output / 'core/manifest.json').write_text(json.dumps(manifest))
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.parent / 'boolean', self.context)
+
+    def test_claimed_uploaded_without_complete_receipts_refused(self):
+        manifest = self.prepared()
+        transfer.finish(self.output, self.outcomes(manifest))
+        path = self.output / 'core/uploads.json'
+        receipt = json.loads(path.read_text())
+        receipt['uploads'] = []
+        path.write_text(json.dumps(receipt))
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.parent / 'claimed', self.context)
+
+    def test_special_input_and_symlink_output_refused(self):
+        import os
+        original = self.root / dict(transfer.ROOTS)['delivery']
+        fifo = original / 'pipe'
+        os.mkfifo(fifo)
+        with self.assertRaises(EvidenceError):
+            self.prepared()
+        fifo.unlink()
+        alias = self.parent / 'alias'
+        alias.symlink_to(original, target_is_directory=True)
+        with self.assertRaises(EvidenceError):
+            transfer.prepare(self.root, alias / 'new', self.context)
+
+    def test_identity_stale_raw_and_dirty_success_refused(self):
+        path = self.root / dict(transfer.ROOTS)['job_identity'] / 'identity.json'
+        original = json.loads(path.read_text())
+        for field in ('dirty', 'raw'):
+            with self.subTest(field=field):
+                changed = copy.deepcopy(original)
+                if field == 'dirty':
+                    changed['source']['dirty'] = True
+                else:
+                    changed['artifacts'][0]['sha256'] = 'e' * 64
+                changed.pop('record_sha256')
+                changed['record_sha256'] = canonical_digest(changed)
+                path.write_text(json.dumps(changed))
+                with self.assertRaises(EvidenceError):
+                    self.prepared()
+
+    def test_reordered_offset_and_unexpected_used_slot_refused(self):
+        manifest = self.prepared()
+        outcomes = self.outcomes(manifest)
+        outcomes['part7'] = {'outcome': 'success', 'outputs': {
+            'artifact-id': '107', 'artifact-digest': 'b' * 64}}
+        self.assertEqual(transfer.finish(self.output, outcomes)['status'],
+                         'partial')
+        transfer.finish(self.output, self.outcomes(manifest))
+        for key, value in (('offset', 1), ('ordinal', 1), ('name', 'part-007')):
+            with self.subTest(key=key):
+                changed = copy.deepcopy(manifest)
+                changed['parts'][0][key] = value
+                (self.output / 'core/manifest.json').write_text(
+                    json.dumps(changed))
+                with self.assertRaises(EvidenceError):
+                    transfer.verify(self.output / 'core', self.output / 'parts',
+                                    self.parent / ('bad-' + key), self.context)
+
+    def test_cli_github_output_cannot_mutate_original_or_core(self):
+        import subprocess
+        import sys
+        for index, suffix in enumerate(('core/manifest.json', 'parts/part-000',
+                                        'original')):
+            with self.subTest(target=suffix):
+                output = self.parent / ('cli-' + str(index))
+                target = (self.root / dict(transfer.ROOTS)['delivery'] /
+                          '.hidden' if suffix == 'original' else output / suffix)
+                command = [sys.executable, '-B', transfer.__file__, 'prepare',
+                           '--root', str(self.root), '--output', str(output),
+                           '--commit', self.context['commit'], '--run-id', '123',
+                           '--attempt', '1', '--github-output', str(target)]
+                result = subprocess.run(command, capture_output=True, timeout=10)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse(output.exists())
+
+    def test_verification_output_cannot_mutate_core(self):
+        manifest = self.prepared()
+        transfer.finish(self.output, self.outcomes(manifest))
+        before = store.inventory(self.output / 'core')
+        with self.assertRaises(EvidenceError):
+            transfer.verify(self.output / 'core', self.output / 'parts',
+                            self.output / 'core/joined.tar.gz', self.context)
+        self.assertEqual(store.inventory(self.output / 'core'), before)
+
+    def test_rehashed_bad_gzip_and_tar_tails_refused(self):
+        manifest = self.prepared()
+        original = (self.output / 'check.tar.gz').read_bytes()
+        plain = gzip.decompress(original)
+        bad_crc = bytearray(original)
+        bad_crc[-8] ^= 1
+        bad_size = bytearray(original)
+        bad_size[-4] ^= 1
+        cases = [bytes(bad_crc), bytes(bad_size), original[:-1], original + b'junk',
+                 original + gzip.compress(b'second'),
+                 gzip.compress(plain + b'nonzero'),
+                 gzip.compress(plain + plain)]
+        for index, raw in enumerate(cases):
+            with self.subTest(index=index):
+                archive = self.parent / ('bad-' + str(index))
+                archive.write_bytes(raw)
+                package = copy.deepcopy(manifest['package'])
+                package['archive'] = {'path': str(archive), 'size': len(raw),
+                                      'sha256': hashlib.sha256(raw).hexdigest()}
+                with self.assertRaises(EvidenceError):
+                    transfer.validate_archive(package, archive)
+
+    def test_rehashed_first_padding_malformed_header_refused(self):
+        manifest = self.prepared()
+        plain = bytearray(gzip.decompress(
+            (self.output / 'check.tar.gz').read_bytes()))
+        import tarfile
+        with tarfile.open(self.output / 'check.tar.gz', 'r:gz') as archive:
+            list(archive)
+            offset = archive.offset
+        for tail in (b'X' * 512, b'X'):
+            with self.subTest(bytes=len(tail)):
+                raw = gzip.compress(bytes(plain[:offset]) + tail)
+                archive = self.parent / ('header-' + str(len(tail)))
+                archive.write_bytes(raw)
+                package = copy.deepcopy(manifest['package'])
+                package['archive'] = {'path': str(archive), 'size': len(raw),
+                                      'sha256': hashlib.sha256(raw).hexdigest()}
+                with self.assertRaises(EvidenceError):
+                    transfer.validate_archive(package, archive)
+
+
+if __name__ == '__main__':
+    unittest.main()

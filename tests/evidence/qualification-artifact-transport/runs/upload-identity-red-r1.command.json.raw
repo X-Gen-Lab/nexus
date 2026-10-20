@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tools.testing.test_qualification_transfer",
+    "-v"
+  ],
+  "cwd": "/dev/shm/nexus-qualification-transport-20261018-r1",
+  "stage": "upload-identity-red-r1",
+  "started_ns": 1792312564172292545,
+  "finished_ns": 1792312564387056466,
+  "duration_seconds": 0.21476439199977904,
+  "timeout_seconds": 180.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/upload-identity-red-r1.attempts/1792312564172227157-49d1a15f1e4e470997da0a5b42d1f1de/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/upload-identity-red-r1.attempts/1792312564172227157-49d1a15f1e4e470997da0a5b42d1f1de/stderr.txt",
+    "bytes": 4450,
+    "sha256": "030fc33ee801ad6552ec398caaf1719813acc3d2a5c8c9764f5af08101cb25c3"
+  },
+  "attempt_receipt": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/upload-identity-red-r1.attempts/1792312564172227157-49d1a15f1e4e470997da0a5b42d1f1de/receipt.json"
+}

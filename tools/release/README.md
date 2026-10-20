@@ -31,14 +31,48 @@ signature does not establish a different SDK source commit by itself.
 
 ## Raw evidence and publication
 
-Strict consumer output includes exactly thirteen unborn Git fixtures: Native,
-STM32F407 and GD32F470, plus H743, U575, F103, GD303 and G474 with each of the
-baremetal and FreeRTOS backends. Missing or additional fixture roots are rejected;
-the historical seven-consumer set is not a current fallback. Transport archives
-retain their original bytes, file modes and empty directories, then verify the
-complete inventory before crossing the artifact identity boundary. The outer
-artifact contains an inert archive, manifest and original consumer report.
-Verification rejects unsafe paths, links, extra files and changed bytes.
+The immutable consumer plan in `transport.py` is shared by the installed SDK
+producer and the standalone versioned transport. Its current exact selection
+has 41 independent consumer roots and 44 executable images: three C/C++ base
+roots, ten MCU/backend roots and twenty-eight selected-feature roots. Four images
+execute as Native programs; 40 MCU images are linked software evidence. The
+36 generic retention checks cover ten MCU/backend and twenty-six selected-feature
+images; base image resource checks are a separate scope. These counts describe
+the required plan, not an execution result or physical acceptance.
+
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v4`.
+Changing the reviewed plan also requires reviewing its policy identity.
+Packing and verification require every exact plan root and nonempty image;
+missing, additional or same-count substituted Git roots fail. Report/manifest
+claims cannot authorize another selection. Each consumer's `.git` is only an
+unborn `git init` fixture isolating the SDK from its parent's source identity.
+History, remotes, an index, active hooks and foreign Git metadata remain refused.
+The SDK requires the complete shared plan module even after a rehashed omission.
+
+Archives retain all original raw bytes, file modes and empty directories, verify
+the complete inventory and consume the gzip stream through its CRC/size trailer
+before crossing the artifact identity boundary. The outer artifact contains an
+inert archive, manifest and original consumer report. Unsafe paths, links,
+duplicate entries, trailing compressed content and changed bytes fail. Transport
+does not rewrite a failed report or establish that a recorded command executed;
+actual source, job and builder identities retain that separate responsibility.
+
+Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
+source, bytes and hash-pinned helper. The current policy does not accept it as
+a fallback or rewrite it as the 41-root/44-image selection. Earlier policy-v3
+34-root/37-image and 36-root/39-image plans also retain their exact historical
+source identities; neither is the current plan or a fallback. Five newly selected
+features extend the 23-feature, 36-root plan: H743 SPI DMA Cache on, U575 finite
+UART hardware-chain TX, U575 LPTIM2 RUN one-shot, and H743 continuous UART RX
+with Cache off and Cache on. The explicit exact plan, rather than an old count
+or the policy label alone, determines current admission.
+
+Historical schema-1 thirteen-root archives keep their original bytes, source and
+hash-pinned helper for read-only recovery. Current packing and verification do
+not accept them as a fallback or migrate them into current qualification. The
+earlier seven-root set is likewise not a current selection. A repaired transport
+does not qualify a previously failed SDK or offline-build run; new committed
+source needs its own complete successful execution.
 
 Local evidence storage is handled by `tools/evidence/store.py`. Its `copy`
 operation preserves an independent content-addressed archive, reads every safe

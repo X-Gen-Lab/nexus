@@ -1,0 +1,384 @@
+[
+  {
+    "stage": "first-config-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/first-config-whole-red/receipt.json",
+    "sha256": "af946766d1f02fbbd302d8e26d937be4d1dca6a5a9b07fe7a2c804f66971b868",
+    "actual_exit": 1,
+    "junit": null,
+    "tests": 9,
+    "failures": 1,
+    "errors": 8,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "whole-after-first-integration",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/whole-after-first-integration/receipt.json",
+    "sha256": "5d0961695a4da2d3a2d1ca3ae645470500d86941b57da05eb3142ad7c7c4aecc",
+    "actual_exit": 0,
+    "junit": null,
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "first-spi-factory-whole",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/first-spi-factory-whole/receipt.json",
+    "sha256": "d74f5f2c47360c82eb5d7f6d41878251ea60a52bf2200f81d2a81ed0ceb8ec22",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/first-spi-factory-whole/junit.xml",
+      "sha256": "26b047a2016fa18fee4d4189bf7bdefd8ee7aa66f2c78105b8e17a8cd7148281",
+      "fresh": true,
+      "tests": 15,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "reset16-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/reset16-whole-red/receipt.json",
+    "sha256": "c0e5a2c3d143c417285bfc5d7cbf68f3d4892b0fb7ce30bf2928f75bbce7c9fe",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/reset16-whole-red/junit.xml",
+      "sha256": "34343885247e00801354992f3146653208e3709b070e7e7ada28a3e3c53c8000",
+      "fresh": true,
+      "tests": 16,
+      "failures": 7,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "legacy-uart-dma-reset-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/legacy-uart-dma-reset-whole-red/receipt.json",
+    "sha256": "4e3d29daf93526cd26048278807fb67380813255fdde7f6379615a88e9d61bc0",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/legacy-uart-dma-reset-whole-red/junit.xml",
+      "sha256": "a38c4b8ab4fa3d7c8807db8c8f6fceb69a754c6d79e1fcfba4fa670ba01677ec",
+      "fresh": true,
+      "tests": 9,
+      "failures": 12,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "legacy-uart-receive-reset-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/legacy-uart-receive-reset-whole-red/receipt.json",
+    "sha256": "fc7cb1d7e3c0c539f3048d54854ca91619a3d343cf5f0f1d573018f2a6b3ce27",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/legacy-uart-receive-reset-whole-red/junit.xml",
+      "sha256": "9e0439aed1227a4f6538ab1ad05ad52e9d89356f57a6d95fbad0c8b882352518",
+      "fresh": true,
+      "tests": 8,
+      "failures": 12,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "shared-reset-whole-green-spi",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/shared-reset-whole-green-spi/receipt.json",
+    "sha256": "704028ef2b2df072ea1459bd57647aa6fb8bce9455e25b69c49fdaf08ae38cd3",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/shared-reset-whole-green-spi/junit.xml",
+      "sha256": "ffe1dfc980f5ecb838bfac3a50763d1cd48753192a3663ea874c1101d40b9a77",
+      "fresh": true,
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "shared-reset-whole-green-uart-tx",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/shared-reset-whole-green-uart-tx/receipt.json",
+    "sha256": "851b458d634fd594d6e80abd6d9bfe832c1c5680f2799aec41e6688e5658e89f",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/shared-reset-whole-green-uart-tx/junit.xml",
+      "sha256": "3ccce553c1c60effa7da6d5896f6c59fcaeb03bab4b68b1301a8f2f6f3dbeff1",
+      "fresh": true,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "shared-reset-whole-green-uart-rx",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/shared-reset-whole-green-uart-rx/receipt.json",
+    "sha256": "8c2b90ec9fee1ef2facf5c1c2f997aac386783a353ef1b8cbe60f70f9a8bf60c",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/shared-reset-whole-green-uart-rx/junit.xml",
+      "sha256": "71f976031f11e6a2e7be70aaea6737ad311f450001dd92cd7d749225bc012850",
+      "fresh": true,
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "mixed-tx-first-whole",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/mixed-tx-first-whole/receipt.json",
+    "sha256": "71fd9566311f1685aff88f8c2d0b26f374da6a0ebd1332eb7b213227cc3ae80d",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/mixed-tx-first-whole/junit.xml",
+      "sha256": "d6106b4a039d2af652e3163f6e1c9af042e2aa4f5781c15019383aab113a02c4",
+      "fresh": true,
+      "tests": 17,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "mixed-rx-first-whole",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/mixed-rx-first-whole/receipt.json",
+    "sha256": "ff0ae4bb0d0db15206640c851d4f165ecc7e992ebd56cfc3d18bcc8e870da7ba",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/mixed-rx-first-whole/junit.xml",
+      "sha256": "0a464bd829fe4c7cc32cc3df16f38e27413292b162b08b404b313da29ffbe121",
+      "fresh": true,
+      "tests": 18,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "uart-tx-postgate-coverage-whole",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/uart-tx-postgate-coverage-whole/receipt.json",
+    "sha256": "be0106d10f2507189cefec20956068df6332b519dc6be93ec2a8637f2ca9e3bb",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/uart-tx-postgate-coverage-whole/junit.xml",
+      "sha256": "376d6a5abb170dc745c1abff8c334c070f711402df064d0d11718f9e7102e261",
+      "fresh": true,
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "uart-rx-postgate-coverage-whole",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/uart-rx-postgate-coverage-whole/receipt.json",
+    "sha256": "e9f0600a45e72c580e8e56edbd9fb856599ee125177ca41630ee1a4c979c9653",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/uart-rx-postgate-coverage-whole/junit.xml",
+      "sha256": "eab23879a99b0bd5c4fde4c0d3d3359aa5c5d0b568cbdf3249912b6310dcae86",
+      "fresh": true,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "dma2-spi-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-spi-whole-red/receipt.json",
+    "sha256": "b4a36b89d1c621320e1fca017f4b8766307e2716f32331047dc0be62b3d45262",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-spi-whole-red/junit.xml",
+      "sha256": "1a60786c6e10b5ed8bf6f7cb4f7914e340d340dc922fb2f806caacf32a6155ac",
+      "fresh": true,
+      "tests": 16,
+      "failures": 9,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "dma2-uart-tx-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-uart-tx-whole-red/receipt.json",
+    "sha256": "5e747aa45ceff25fb00c1ed52709e126d122de2f0d6958d1312df40622c772e1",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-uart-tx-whole-red/junit.xml",
+      "sha256": "b4813f93074e64660a98074360206cacedcae4f969eed175d1e444470b196fdb",
+      "fresh": true,
+      "tests": 10,
+      "failures": 17,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "dma2-uart-rx-whole-red",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-uart-rx-whole-red/receipt.json",
+    "sha256": "6061a1a1499743574a9044fbdbafe456c6176810a502547ef1acce6221fc38a0",
+    "actual_exit": 1,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-uart-rx-whole-red/junit.xml",
+      "sha256": "d5f3086e30d1725a8e45e0c4b8ffc85dc8b466e85a1f8092a7437e346818142a",
+      "fresh": true,
+      "tests": 9,
+      "failures": 17,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "dma2-mask-whole-green-spi",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-mask-whole-green-spi/receipt.json",
+    "sha256": "4f754fd3f92e8ec6a8f01946308fb7a6f3426642de9efc14a1eb511cdff70be0",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-mask-whole-green-spi/junit.xml",
+      "sha256": "72c9a3c3e15ccc978888112fcea7e2323f5a85676b6db16cef93448e0a20ba6e",
+      "fresh": true,
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "dma2-mask-whole-green-uart-tx",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-mask-whole-green-uart-tx/receipt.json",
+    "sha256": "a046a6331a303ff3a42891db562639c707627e1fe6b31263c56cc613cedc64cc",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-mask-whole-green-uart-tx/junit.xml",
+      "sha256": "512f76fd25bcab9318311df898b8b2604de5f9d053814ca01271dd79684d4c3f",
+      "fresh": true,
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "dma2-mask-whole-green-uart-rx",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-mask-whole-green-uart-rx/receipt.json",
+    "sha256": "da506fa071482bf4fe0201661aff6c7ac674fb83175b7657f0dcf77d49eb0848",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/dma2-mask-whole-green-uart-rx/junit.xml",
+      "sha256": "ee26a3e438050c3164c3dab095f95d2318ac032c80c0d221a1164d9b0ec398bd",
+      "fresh": true,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  },
+  {
+    "stage": "mixed-rx-consumer-order-whole",
+    "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/mixed-rx-consumer-order-whole/receipt.json",
+    "sha256": "83cec7ca1754bf629a82efc72ea07d52a7b013fc3dafc2401b3b63e6804ef6e7",
+    "actual_exit": 0,
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d2-evidence/mixed-rx-consumer-order-whole/junit.xml",
+      "sha256": "37070738dd629299206949a6792740fa3bd7abb540e5d36ded2d4d6fb87b6b44",
+      "fresh": true,
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    },
+    "tests": null,
+    "failures": null,
+    "errors": null,
+    "classification": "retained actual historical stage; not a current complete final tuple"
+  }
+]

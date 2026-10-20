@@ -31,7 +31,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         self.write_lock(self.lock)
         for name in self.lock["files"]:
             file = self.source / name
-            file.parent.mkdir(exist_ok=True)
+            file.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / "vendors/st/stm32f4_hal" / name, file)
         for source in (self.source, self.cmsis):
             (source / ".git").mkdir()
@@ -69,7 +69,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         result = self.verify()
         self.assertEqual(result["commit"], official.COMMIT)
         self.assertEqual(result["cmsis_commit"], official.CMSIS_COMMIT)
-        self.assertEqual(result["verified_files"], 8)
+        self.assertEqual(result["verified_files"], 11)
         self.assertEqual(result["license"], "BSD-3-Clause")
         self.assertEqual(result["source_kind"], "git_checkout")
         self.assertFalse(result["software_qualified"])
@@ -80,7 +80,7 @@ class STM32F4OfficialSourceTests(unittest.TestCase):
         cmsis = ROOT / "vendors/st/cmsis_device_f4"
         lock = ROOT / "dependencies/stm32f4-hal.lock.json"
         result = official.verify(source, lock, cmsis)
-        self.assertEqual(result["verified_files"], 8)
+        self.assertEqual(result["verified_files"], 11)
         executed = subprocess.run([
             sys.executable, "-B", str(ROOT / "tools/maintenance/stm32f4_hal_lock.py"),
             "--source", str(source), "--lock", str(lock),

@@ -155,6 +155,9 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         summaries(hw);
         return;
     }
+    if (offset == 0x800U && hw->hold_address_clear && (value & 0x7F0U) == 0U) {
+        value |= hw->registers[offset / 4U] & 0x7F0U;
+    }
     if (offset == 0x804U) {
         uint32_t result = value & ~((1U << 9U) | (1U << 10U));
         if (hw->hold_disconnect) {
@@ -177,6 +180,11 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
             hw->reserved_ep0_pid_command = true;
         }
         uint32_t previous = hw->registers[offset / 4U];
+        unsigned number = (offset - (in ? 0x900U : 0xB00U)) / 32U;
+        unsigned direction = number + (in ? 0U : 4U);
+        if ((hw->hold_stall_clear_mask & (1U << direction)) != 0U) {
+            value |= previous & (1U << 21U);
+        }
         if (in && (value & (1U << 30U)) != 0U &&
             (previous & (1U << 17U)) == 0U) {
             hw->early_in_disable = true;

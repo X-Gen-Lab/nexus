@@ -5,11 +5,13 @@ import io
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from tools.documentation import cli
+from tools.documentation import cli, install
 from tools.dev import dev
 
 
@@ -312,6 +314,278 @@ class DocumentationCommandTests(unittest.TestCase):
         cli.normalize_generated_svg(folder)
         self.assertNotIn(b"<!DOCTYPE", image.read_bytes())
         self.assertIn(b'id="local"', image.read_bytes())
+
+
+class DocumentationTestEnvironmentTests(unittest.TestCase):
+    """The entry point admits a verified tuple before running the whole suite."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.root = Path(self.directory.name) / "source"
+        (self.root / "docs").mkdir(parents=True)
+        (self.root / "docs/index.md").write_text("# Start\n")
+        self.prefix = Path(self.directory.name) / "locked tools with spaces"
+        self.report = self.root / "build/result.json"
+        self.record = {"suite": "documentation", "discovered": 3,
+                       "executed": 3, "skipped": 0, "failures": 0,
+                       "errors": 0, "expected_failures": 0,
+                       "unexpected_successes": 0, "status": "passed"}
+        self.environment = {"PATH": str(self.prefix / "bin"),
+                            "PYTHONNOUSERSITE": "1",
+                            "NEXUS_DOCS_TOOL_PREFIX": str(self.prefix),
+                            "NEXUS_DOCS_TOOL_IDENTITY":
+                                str(self.prefix / "installation.json")}
+        self.runner = self.enterContext(patch(
+            "tools.testing.run_tool_tests.execute_directory",
+            return_value=self.record))
+        self.run = self.enterContext(patch.object(
+            cli.process, "run", side_effect=self.child_success))
+
+    def child_success(self, command, **kwargs):
+        del command, kwargs
+        self.report.parent.mkdir(parents=True, exist_ok=True)
+        self.report.write_text(json.dumps(self.record))
+        return SimpleNamespace(returncode=0, stdout="complete suite\n", stderr="")
+
+    def invoke(self, *, explicit=True):
+        arguments = ["test", "--report", str(self.report)]
+        if explicit:
+            arguments += ["--tool-prefix", str(self.prefix)]
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            return cli.main(arguments, root=self.root)
+
+    def verified_environment(self):
+        return patch.object(install, "environment", return_value=self.environment)
+
+    def test_explicit_prefix_dispatches_to_verified_venv_and_full_cli(self):
+        with self.verified_environment() as environment:
+            self.assertEqual(self.invoke(), 0)
+        environment.assert_called_once_with(self.prefix)
+        self.runner.assert_not_called()
+        command = self.run.call_args.args[0]
+        self.assertEqual(command, [str(self.prefix / "venv/bin/python"),
+            str(self.root / "tools/documentation/cli.py"), "test",
+            "--tool-prefix", str(self.prefix), "--report", str(self.report)])
+        self.assertEqual(self.run.call_args.kwargs["cwd"], self.root)
+        self.assertEqual(self.run.call_args.kwargs["env"], self.environment)
+        self.assertEqual(json.loads(self.report.read_text()), self.record)
+
+    def test_default_prefix_uses_the_verified_default_installation(self):
+        with self.verified_environment() as environment:
+            self.assertEqual(self.invoke(explicit=False), 0)
+        environment.assert_called_once_with(None)
+        self.assertEqual(self.run.call_args.args[0][0],
+                         str(self.prefix / "venv/bin/python"))
+        self.runner.assert_not_called()
+
+    def test_selected_venv_runs_complete_documentation_directory_directly(self):
+        with self.verified_environment(), \
+                patch.object(sys, "prefix", str(self.prefix / "venv")):
+            self.assertEqual(self.invoke(), 0)
+        self.run.assert_not_called()
+        self.runner.assert_called_once_with(self.root / "tools/documentation",
+                                            "documentation")
+        self.assertEqual(json.loads(self.report.read_text()), self.record)
+
+    def test_base_executable_identity_does_not_replace_venv_identity(self):
+        self.prefix.mkdir()
+        (self.prefix / "venv/bin").mkdir(parents=True)
+        (self.prefix / "venv/bin/python").symlink_to(sys.executable)
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 0)
+        self.run.assert_called_once()
+        self.runner.assert_not_called()
+
+    def test_child_failure_preserves_actual_exit_and_removes_partial_report(self):
+        def failed_child(*args, **kwargs):
+            self.child_success(*args, **kwargs)
+            return SimpleNamespace(returncode=7, stdout="", stderr="failed\n")
+        self.run.side_effect = failed_child
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 7)
+        self.assertFalse(self.report.exists())
+        self.runner.assert_not_called()
+
+    def test_child_timeout_preserves_actual_exit_code(self):
+        self.run.side_effect = None
+        self.run.return_value = SimpleNamespace(returncode=124, stdout="",
+                                                stderr="timeout\n")
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 124)
+        self.assertFalse(self.report.exists())
+
+    def test_missing_installed_tuple_is_rejected_without_install_or_runner(self):
+        with patch.object(install, "main") as installer:
+            self.assertEqual(self.invoke(), 2)
+        installer.assert_not_called()
+        self.runner.assert_not_called()
+        self.run.assert_not_called()
+        self.assertFalse(self.report.exists())
+
+    def test_tampered_installed_bytes_are_rejected_before_dispatch(self):
+        self.prefix.mkdir()
+        tool = self.prefix / "observed-tool"
+        tool.write_text("locked bytes")
+        receipt = {"lock_sha256": install.digest(install.LOCK),
+                   "files": install.tree_files(self.prefix),
+                   "tools": {}, "target": {}}
+        (self.prefix / "installation.json").write_text(json.dumps(receipt))
+        tool.write_text("changed bytes")
+        self.assertEqual(self.invoke(), 2)
+        self.runner.assert_not_called()
+        self.run.assert_not_called()
+
+    def test_stale_pass_is_removed_before_environment_validation(self):
+        self.report.parent.mkdir()
+        self.report.write_text(json.dumps(self.record))
+        with patch.object(install, "environment", side_effect=ValueError("drift")):
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+        self.runner.assert_not_called()
+
+    def test_child_zero_without_fresh_report_is_rejected(self):
+        self.run.side_effect = None
+        self.run.return_value = SimpleNamespace(returncode=0, stdout="", stderr="")
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+
+    def test_child_malformed_report_is_rejected_and_removed(self):
+        def broken_child(*args, **kwargs):
+            result = self.child_success(*args, **kwargs)
+            self.report.write_text("{broken")
+            return result
+        self.run.side_effect = broken_child
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+
+    def test_child_skipped_execution_cannot_be_a_pass(self):
+        self.record["skipped"] = 1
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+
+    def test_child_zero_test_execution_cannot_be_a_pass(self):
+        self.record.update(discovered=0, executed=0)
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+
+    def test_child_incomplete_execution_cannot_be_a_pass(self):
+        self.record["executed"] = 2
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+
+    def test_direct_suite_failure_cannot_retain_a_pass_report(self):
+        self.report.parent.mkdir()
+        self.report.write_text(json.dumps(self.record))
+        self.runner.side_effect = ValueError("suite did not completely pass")
+        with self.verified_environment(), \
+                patch.object(sys, "prefix", str(self.prefix / "venv")):
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+        self.run.assert_not_called()
+
+    def test_already_selected_venv_still_validates_installed_tuple(self):
+        with patch.object(sys, "prefix", str(self.prefix / "venv")), \
+                patch.object(install, "environment", side_effect=ValueError("drift")):
+            self.assertEqual(self.invoke(), 2)
+        self.runner.assert_not_called()
+        self.run.assert_not_called()
+
+    def test_child_report_must_name_the_complete_documentation_suite(self):
+        self.record["suite"] = "unrelated"
+        with self.verified_environment():
+            self.assertEqual(self.invoke(), 2)
+        self.assertFalse(self.report.exists())
+
+
+class DocumentationWorkspaceTests(unittest.TestCase):
+    """External output owns its work files and failure evidence together."""
+
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.base = Path(self.directory.name)
+        self.root = self.base / "source"
+        (self.root / "docs").mkdir(parents=True)
+        (self.root / "docs/index.md").write_text("# Start" + chr(10))
+        (self.root / "dependencies").mkdir()
+        (self.root / "dependencies/platform-compatibility.json").write_text(
+            json.dumps({"semantic_version": "fixture"}))
+        self.prefix = self.base / "locked tools"
+        self.external = self.base / "delivery/site"
+        self.enterContext(patch.object(install, "environment", return_value={}))
+        self.enterContext(patch.object(install, "diagnose", return_value={
+            "prefix": str(self.prefix)}))
+        self.enterContext(patch.object(cli, "observe_git_source", return_value={
+            "commit": "fixture", "dirty": False}))
+        self.enterContext(patch.object(cli.check, "scan", return_value={
+            "errors": []}))
+        self.enterContext(patch("tools.documentation.diagrams.check",
+                                return_value={"errors": []}))
+        self.run = self.enterContext(patch.object(
+            cli.process, "run", side_effect=self.failed_command))
+
+    def failed_command(self, command, **kwargs):
+        """Keep the actual workspace argument at the external command port."""
+        del command
+        log = kwargs["log"]
+        log.write_text("fixture doxygen failure" + chr(10))
+        receipt = log.with_suffix(".receipt.json")
+        receipt.write_text(json.dumps({"exit_code": 7}))
+        self.receipt = receipt
+        return SimpleNamespace(returncode=7, stdout="", stderr="",
+                               receipt_path=receipt)
+
+    def failed_build(self, destination):
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            with self.assertRaisesRegex(ValueError, "doxygen failed.*7"):
+                cli.build(self.root, destination, tool_prefix=self.prefix)
+
+    def test_external_build_does_not_write_source_build_directory(self):
+        self.failed_build(self.external)
+        self.assertFalse((self.root / "build").exists())
+        self.run.assert_called_once()
+
+    def test_external_failure_receipt_and_raw_stay_beside_output(self):
+        self.failed_build(self.external)
+        expected = self.external.parent / "documentation-attempts"
+        self.assertTrue(self.receipt.is_relative_to(expected))
+        self.assertTrue(self.receipt.is_file())
+        workspaces = list(expected.iterdir())
+        self.assertEqual(len(workspaces), 1)
+        failure = workspaces[0] / "documentation-build-failure.json"
+        record = json.loads(failure.read_text())
+        self.assertEqual(record["status"], "failed")
+        self.assertIn(str(self.receipt), record["error"])
+        self.assertTrue((workspaces[0] / "doxygen.log").is_file())
+        self.assertFalse((self.external / "documentation-build.json").exists())
+
+    def test_workspace_sibling_symlink_is_rejected_before_command(self):
+        actual = self.base / "unrelated"
+        actual.mkdir()
+        sentinel = actual / "keep.txt"
+        sentinel.write_text("untouched")
+        self.external.parent.mkdir()
+        (self.external.parent / "documentation-attempts").symlink_to(
+            actual, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, "workspace.*symlink"):
+            cli.build(self.root, self.external, tool_prefix=self.prefix)
+        self.run.assert_not_called()
+        self.assertEqual(sentinel.read_text(), "untouched")
+        self.assertEqual(list(actual.iterdir()), [sentinel])
+        self.assertFalse((self.root / "build").exists())
+
+    def test_default_output_keeps_original_build_workspace_location(self):
+        destination = self.root / "build/documentation"
+        self.failed_build(destination)
+        expected = self.root / "build/documentation-attempts"
+        self.assertTrue(self.receipt.is_relative_to(expected))
+        self.assertEqual(len(list(expected.iterdir())), 1)
 
 
 if __name__ == "__main__":

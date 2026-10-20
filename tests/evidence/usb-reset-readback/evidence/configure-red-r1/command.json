@@ -1,0 +1,33 @@
+{
+  "kind": "focused development; whole selected program where named",
+  "qualification": false,
+  "command": [
+    "python",
+    "-B",
+    "tools/dev/dev.py",
+    "configure",
+    "--preset",
+    "native-debug"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "started_ns": 1792291296641444967,
+  "ended_ns": 1792291296692673386,
+  "exit_code": 2,
+  "source_before": {
+    "io/src/usb_device_controller.c": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3",
+    "io/native/usb_device.h": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+    "io/native/usb_device.c": "873f7bd689c18894ccdd568276afa888b9bf0e79ce622eca322a7d44d800b815",
+    "tests/google/usb_device_test.cpp": "2d932915fee82805d13cd68f6d12195faba8078f64b1b34b75f3d988b7a92bd7"
+  },
+  "source_after": {
+    "io/src/usb_device_controller.c": "caac78c495a36886c76c69a60e52745140f7f7c2a5ebf52ae5af2d6ebe2275d3",
+    "io/native/usb_device.h": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+    "io/native/usb_device.c": "873f7bd689c18894ccdd568276afa888b9bf0e79ce622eca322a7d44d800b815",
+    "tests/google/usb_device_test.cpp": "2d932915fee82805d13cd68f6d12195faba8078f64b1b34b75f3d988b7a92bd7"
+  },
+  "maxrss_kib": 14464,
+  "jobs": 1,
+  "environment_selection_cleared": true,
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "9918bf8874bae4e634b822b6ae81428d3695d4d76e0fa4f6757a3a69826ac7a4"
+}

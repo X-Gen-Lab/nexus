@@ -1,0 +1,21 @@
+{
+  "guard_after_copy": {
+    "observed_ns": 1792301273752599211,
+    "tmp_free": 449245184,
+    "persistent_free": 85860352,
+    "memory_available": 2061389824,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0
+    },
+    "task_tmp_allocated": 16105472,
+    "task_persistent_allocated": 90112
+  },
+  "boundaries": "TMP>=200MiB; persistent>=64MiB; cgroup available>=600MiB/OOM0, taskTMP<=32MiB and metadata<=128KiB. Independent microtask budget only; no candidate/SDK/OCI admission changes.",
+  "actual_package_exit": 0,
+  "package_receipt_sha256": "205c3a48892ca8d2ebc4fb3750d8cea5c3fbb664400839b841f24b56324718c7"
+}

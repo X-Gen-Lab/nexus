@@ -1,11 +1,14 @@
 """Verify complete face-to-method retention independently of build success."""
 
 import struct
+from pathlib import Path
+import tempfile
 from types import SimpleNamespace
 import unittest
 
 from tools.evidence.common import EvidenceError
-from tools.measurement.retention import inspect_provider_retention, source_contracts
+from tools.measurement.retention import (inspect_provider_retention,
+                                         reference_layout, source_contracts)
 from tools.measurement.elf import Elf32
 
 
@@ -418,6 +421,192 @@ class ArrayContextTests(unittest.TestCase):
         elf.loads[2]['virtual'] = 0xffffffe0
         with self.assertRaisesRegex(EvidenceError, 'address range'):
             inspect_provider_retention(elf, bindings)
+
+
+class ReadonlyReferenceContextTests(unittest.TestCase):
+    def fixture(self):
+        """External ELF bytes retain two const lane refs and one writable owner."""
+        elf = image()
+        struct.pack_into('<8I', elf.data, 0, 0x08001010, 0x08001030,
+                         0x08001010, 0x08001038, 0x08002001, 0x08002011,
+                         0x08002021, 0x08002031)
+        struct.pack_into('<IB3xIB3x', elf.data, 48,
+                         0x20000000, 1, 0x20000000, 2)
+        elf.defined_symbols = [
+            {'name': name, 'value': address, 'size': size, 'section': section,
+             'type': 1, 'binding': 0 if name.startswith('s_nx_') else 1}
+            for name, address, size, section in (
+                ('s_nx_face_left', 0x08001000, 8, 0),
+                ('s_nx_face_right', 0x08001008, 8, 0),
+                ('nx_stm32g474_pwm_shared_ops', 0x08001010, 16, 0),
+                ('s_nx_channel_left', 0x08001030, 8, 0),
+                ('s_nx_channel_right', 0x08001038, 8, 0),
+                ('s_nx_physical_pwm_shared_tim3', 0x20000000, 32, 2))]
+        elf.defined_symbols += [
+            {'name': name, 'value': 0x08002001 + index * 16, 'size': 16,
+             'section': 1, 'type': 2, 'binding': 0, 'file': 'pwm_shared.c'}
+            for index, name in enumerate(('set', 'start', 'stop', 'state'))]
+        bindings = '''
+#include "stm32g474_pwm_shared.h"
+static nx_stm32g474_pwm_shared_state_t s_nx_physical_pwm_shared_tim3;
+static const nx_stm32g474_pwm_shared_channel_t s_nx_channel_left = {
+    .owner = &s_nx_physical_pwm_shared_tim3, .channel = 1u
+};
+static const nx_stm32g474_pwm_shared_channel_t s_nx_channel_right = {
+    .owner = &s_nx_physical_pwm_shared_tim3, .channel = 2u
+};
+static const nx_pwm_port_t s_nx_face_left = {
+    &nx_stm32g474_pwm_shared_ops, (void*)&s_nx_channel_left
+};
+static const nx_pwm_port_t s_nx_face_right = {
+    &nx_stm32g474_pwm_shared_ops, (void*)&s_nx_channel_right
+};
+'''
+        return elf, bindings
+
+    def test_two_const_lane_contexts_trace_one_actual_writable_owner(self):
+        elf, bindings = self.fixture()
+        report = inspect_provider_retention(elf, bindings)
+        self.assertEqual((report['face_count'], report['operations_table_count'],
+                          report['method_count']), (2, 1, 4))
+        for index, face in enumerate(report['faces'], 1):
+            self.assertEqual(face['context_kind'], 'readonly_reference')
+            self.assertEqual(face['owner_symbol'], 's_nx_physical_pwm_shared_tim3')
+            self.assertEqual(face['owner_address'], 0x20000000)
+            self.assertEqual(face['selector_field'], 'channel')
+            self.assertEqual(face['selector_value'], index)
+            self.assertTrue(face['context_contract']['path'].endswith(
+                'soc/stm32g474/private/stm32g474_pwm_shared.h'))
+
+    def test_face_pointer_cannot_target_the_neighbor_const_reference(self):
+        elf, bindings = self.fixture()
+        struct.pack_into('<I', elf.data, 4, 0x08001038)
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_const_owner_pointer_must_match_its_exact_generated_owner(self):
+        elf, bindings = self.fixture()
+        struct.pack_into('<I', elf.data, 48, 0x20000020)
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_const_selector_bytes_must_match_the_generated_literal(self):
+        elf, bindings = self.fixture()
+        elf.data[52] = 2
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_const_reference_cannot_live_in_writable_storage(self):
+        elf, bindings = self.fixture()
+        elf.defined_symbols[3].update(section=2, value=0x20000020)
+        struct.pack_into('<I', elf.data, 4, 0x20000020)
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_mutable_owner_cannot_be_a_readonly_object(self):
+        elf, bindings = self.fixture()
+        elf.defined_symbols[5].update(section=0, value=0x08001060)
+        struct.pack_into('<I', elf.data, 48, 0x08001060)
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_const_reference_needs_file_backed_load_bytes(self):
+        elf, bindings = self.fixture()
+        elf.loads[0]['files'] = 48
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_owner_needs_full_writable_load_coverage(self):
+        elf, bindings = self.fixture()
+        elf.loads[2]['memory'] = 16
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_owner_symbol_cannot_be_missing_or_weak(self):
+        for missing in (False, True):
+            with self.subTest(missing=missing):
+                elf, bindings = self.fixture()
+                if missing:
+                    del elf.defined_symbols[5]
+                else:
+                    elf.defined_symbols[5]['binding'] = 2
+                with self.assertRaises(EvidenceError):
+                    inspect_provider_retention(elf, bindings)
+
+    def test_const_reference_size_must_match_its_actual_private_layout(self):
+        elf, bindings = self.fixture()
+        elf.defined_symbols[3]['size'] = 12
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_const_reference_declaration_is_unique_and_unconditional(self):
+        _, bindings = self.fixture()
+        declaration = bindings[bindings.index('static const nx_stm32g474'):
+                               bindings.index('static const nx_stm32g474',
+                                              bindings.index('static const nx_stm32g474') + 1)]
+        for source in (bindings + declaration,
+                       bindings.replace(declaration, '#if UNKNOWN\n' +
+                                        declaration + '#endif\n')):
+            with self.subTest(source=source), self.assertRaises(EvidenceError):
+                inspect_provider_retention(self.fixture()[0], source)
+
+    def test_const_reference_requires_the_actual_private_type_contract(self):
+        elf, bindings = self.fixture()
+        bindings = bindings.replace('nx_stm32g474_pwm_shared_channel_t',
+                                    'nx_unknown_reference_t')
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_const_reference_rejects_missing_or_computed_fields(self):
+        _, bindings = self.fixture()
+        for old, new in ((', .channel = 1u', ''),
+                         ('.channel = 1u', '.channel = 1u + 0u'),
+                         ('.channel = 1u', '.channel = 256u'),
+                         ('.owner = &s_nx_physical_pwm_shared_tim3',
+                          '.owner = (void*)&s_nx_physical_pwm_shared_tim3')):
+            with self.subTest(new=new), self.assertRaises(EvidenceError):
+                inspect_provider_retention(self.fixture()[0],
+                                           bindings.replace(old, new))
+
+    def test_const_owner_requires_an_exact_mutable_typed_declaration(self):
+        elf, bindings = self.fixture()
+        bindings = bindings.replace(
+            'static nx_stm32g474_pwm_shared_state_t ',
+            'static nx_unrelated_state_t ')
+        with self.assertRaises(EvidenceError):
+            inspect_provider_retention(elf, bindings)
+
+    def test_conditional_private_include_cannot_prove_a_context_layout(self):
+        for directive in ('#if 0', '#ifdef UNKNOWN'):
+            with self.subTest(directive=directive):
+                elf, bindings = self.fixture()
+                bindings = bindings.replace(
+                    '#include "stm32g474_pwm_shared.h"',
+                    directive + '\n#include "stm32g474_pwm_shared.h"\n#endif')
+                with self.assertRaises(EvidenceError):
+                    inspect_provider_retention(elf, bindings)
+
+    def test_same_basename_header_cannot_select_a_layout_by_content(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = root / 'soc/first/private/shared_ref.h'
+            second = root / 'soc/second/private/shared_ref.h'
+            first.parent.mkdir(parents=True)
+            second.parent.mkdir(parents=True)
+            first.write_text('typedef struct { nx_owner_t* owner; '
+                             'uint8_t lane; } nx_test_ref_t;\n')
+            unrelated = second.parent / 'unrelated.h'
+            unrelated.write_text('typedef unsigned int unrelated_layout_t;\n')
+            # Distinct, unrelated includes do not change the selected proof.
+            layout, contract = reference_layout(
+                root, '#include "shared_ref.h"\n#if UNKNOWN\n'
+                '#include "unrelated.h"\n#endif\n', 'nx_test_ref_t')
+            self.assertEqual(layout, ('nx_owner_t', 'owner', '8', 'lane'))
+            self.assertEqual(contract['path'], str(first))
+            second.write_text('typedef unsigned int unrelated_layout_t;\n')
+            with self.assertRaises(EvidenceError):
+                reference_layout(root, '#include "shared_ref.h"\n',
+                                 'nx_test_ref_t')
 
 
 if __name__ == "__main__":

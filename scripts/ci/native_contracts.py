@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute Native CTest once with complete case-level Google evidence."""
+"""Execute the full Native runtime plan with case-level Google evidence."""
 
 import argparse
 import json
@@ -71,8 +71,8 @@ def google_binaries(build):
     return binaries
 
 
-def ctest_names(plan, binaries):
-    """Bind each Google executable to exactly one unfiltered CTest command."""
+def ctest_names(plan, binaries, build):
+    """Admit build-local runtime commands and every unfiltered Google binary."""
     tests = plan.get("tests")
     if not isinstance(tests, list) or not tests:
         raise ValueError("CTest plan contains zero tests")
@@ -80,10 +80,19 @@ def ctest_names(plan, binaries):
     if (any(not isinstance(name, str) or not name for name in names)
             or len(names) != len(set(names))):
         raise ValueError("CTest plan names are missing or duplicated")
+    registrations = {}
+    for item in tests:
+        command = item.get("command")
+        if (not isinstance(command, list) or not command or not command[0]
+                or any(not isinstance(argument, str) for argument in command)):
+            raise ValueError("Native runtime command is missing or malformed")
+        # Tool interpreters and relocated SDK child builds belong to their
+        # complete tool domains, rather than each parent sanitizer profile.
+        binary = checked_binary(command[0], build).resolve()
+        registrations.setdefault(binary, []).append(command)
     for binary in binaries:
-        registrations = [item for item in tests
-                         if item.get("command") == [str(binary)]]
-        if len(registrations) != 1:
+        commands = registrations.get(binary.resolve(), [])
+        if len(commands) != 1 or commands[0] != [str(binary)]:
             raise ValueError("GoogleTest binary is not registered exactly once "
                              "with an unfiltered CTest command: " + str(binary))
     return set(names)
@@ -117,14 +126,14 @@ def main(arguments=None):
         plan = json.loads(execute(
             [ctest, "--test-dir", str(build), "--show-only=json-v1"], env,
             output / "ctest-plan.txt"))
-        planned = ctest_names(plan, binaries)
+        planned = ctest_names(plan, binaries, build)
         discovered = {}
         for index, binary in enumerate(binaries):
             listing = execute([str(binary), "--gtest_filter=*",
                                "--gtest_list_tests"], env,
                               output / f"discovery-{index}.txt")
             discovered[binary] = discovered_cases(listing)
-        # CTest runs the complete plan, including the non-Google contracts.
+        # CTest runs the complete runtime plan, including non-Google contracts.
         # GoogleTest's directory output names each report after its executable.
         env.update({"GTEST_OUTPUT": "xml:" + str(google) + "/",
                     "GTEST_REPEAT": "1", "GTEST_ALSO_RUN_DISABLED_TESTS": "1"})
@@ -156,7 +165,9 @@ def main(arguments=None):
             "schema": 1, "kind": "development-contract-execution",
             "preset": args.preset, "passed": sum(r["passed"] for r in results),
             "suites": results, "ctest": ctest_result,
-            "scope": "Single complete CTest and case-level Google execution; "
+            "scope": "Single complete Native runtime CTest and case-level "
+                     "Google execution; mode-independent tools execute in "
+                     "separate complete domains, not inferred here; "
                      "not historical TDD order or physical qualification",
         }, indent=2) + "\n")
         print(f"Executed {ctest_result['passed']} CTest entries and "

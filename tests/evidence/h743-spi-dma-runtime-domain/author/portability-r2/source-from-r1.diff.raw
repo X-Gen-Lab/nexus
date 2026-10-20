@@ -1,0 +1,12 @@
+--- r1/model.cpp
++++ r2/model.cpp
+@@ -57,7 +57,8 @@
+     auto& m = g_h743_spi_dma_model;
+     m.spi.SR &= ~(uint32_t)(NX_STM32H743_SPI_FIFO_LEVELS | SPI_SR_TXP);
+     if (m.rx_count != 0U)
+-        m.spi.SR |= SPI_SR_RXP | ((m.rx_count % 4U) << SPI_SR_RXPLVL_Pos);
++        m.spi.SR |= static_cast<uint32_t>(
++            SPI_SR_RXP | ((m.rx_count % 4U) << SPI_SR_RXPLVL_Pos));
+     if (m.rx_count >= 4U)
+         m.spi.SR |= SPI_SR_RXWNE;
+     if (m.tx_count < 8U)

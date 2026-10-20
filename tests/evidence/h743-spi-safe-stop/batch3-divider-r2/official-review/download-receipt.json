@@ -1,0 +1,17 @@
+{
+  "url": "https://www.st.com/resource/en/datasheet/stm32h743vi.pdf",
+  "started_utc": "2026-10-18T02:33:15.608739+00:00",
+  "byte_cap": 16777216,
+  "TLS_verification": "default enabled",
+  "proxy": "inherited environment, not changed",
+  "status": "downloaded",
+  "http_status": 200,
+  "final_url": "https://www.st.com/resource/en/datasheet/stm32h743vi.pdf",
+  "headers": {
+    "Content-Type": "application/pdf"
+  },
+  "bytes": 7075281,
+  "sha256": "f6e620179006c8c4d497b477ba065edc89c6dd9ac24d9debb3362910651f42ee",
+  "path": "/tmp/nexus-spi-divider-datasheet-review-20261018-r1/stm32h743vi.pdf",
+  "finished_utc": "2026-10-18T02:33:16.174625+00:00"
+}

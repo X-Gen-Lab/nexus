@@ -22,7 +22,8 @@ FACE_DECLARATION = re.compile(
 )
 FACE_INITIALIZER = re.compile(
     FACE_DECLARATION.pattern + r"\s*\{\s*&(nx_\w+_ops)\s*,\s*"
-    r"&(\w+(?:\[(?:0|[1-9][0-9]*)\])?)\s*\}\s*;"
+    r"(\(\s*void\s*\*\s*\)\s*&\w+|"
+    r"&\w+(?:\[(?:0|[1-9][0-9]*)\])?)\s*\}\s*;"
 )
 
 
@@ -36,7 +37,9 @@ def selected_faces(bindings):
             or [item[:2] for item in connections] != declarations):
         raise EvidenceError(
             "duplicate or unsupported generated face initializer")
-    return connections
+    return [(kind, name, operations,
+             context[1:] if context.startswith("&") else context)
+            for kind, name, operations, context in connections]
 
 
 def conditional_at(source, offset):
@@ -245,8 +248,118 @@ def object_words(elf, symbol, section):
     return struct.unpack_from("<" + "I" * (size // 4), elf.data, offset)
 
 
-def context_object(elf, bindings, expression):
+def reference_layout(root, bindings, typename):
+    """Read one direct private reference layout, not a provider/mode mapping.
+
+    The supported ARM layout is deliberately narrow: a mutable typed owner
+    pointer followed by one fixed-width unsigned selector. Other C layouts or
+    conditional definitions require their own explicit auditing support.
+    """
+    headers = {}
+    for directive in re.finditer(
+            r'^[ \t]*#[ \t]*include[ \t]+"([^"\r\n]+)"',
+            bindings, flags=re.MULTILINE):
+        include = directive[1]
+        if Path(include).name != include:
+            continue
+        candidates = set((root / "soc").glob("*/private/" + include))
+        for directory in (root / "io/private", root / "io/include/nexus/io"):
+            path = directory / include
+            if path.is_file():
+                candidates.add(path)
+        for path in candidates:
+            headers.setdefault(path, []).append((directive.start(),
+                                                 len(candidates)))
+    declarations = []
+    for path in sorted(headers):
+        source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
+                        flags=re.DOTALL)
+        # A normal header guard does not make its public layout conditional.
+        source = re.sub(r"\A\s*#\s*ifndef\s+(\w+)\s*\n"
+                        r"\s*#\s*define\s+\1\b[^\n]*", "", source, count=1)
+        for declaration in re.finditer(
+                r"\btypedef\s+struct\s*\{([^{}]*)\}\s*" +
+                re.escape(typename) + r"\s*;", source):
+            for offset, candidates in headers[path]:
+                if candidates != 1:
+                    raise EvidenceError("ambiguous readonly context include")
+                if conditional_at(bindings, offset):
+                    raise EvidenceError("conditional readonly context include")
+            if conditional_at(source, declaration.start()):
+                raise EvidenceError("conditional readonly context type")
+            layout = re.fullmatch(
+                r"\s*(nx_\w+_t)\s*\*\s*(\w+)\s*;\s*"
+                r"uint(8|16|32)_t\s+(\w+)\s*;\s*", declaration.group(1))
+            if layout is None or layout[2] == layout[4]:
+                raise EvidenceError("unsupported readonly context layout")
+            declarations.append((layout.groups(), file_identity(path)))
+    if len(declarations) != 1:
+        raise EvidenceError("missing or duplicate readonly context type")
+    return declarations[0]
+
+
+def readonly_context(elf, bindings, name, root):
+    """Prove immutable selector bytes and their exact writable physical owner."""
+    source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", bindings, flags=re.DOTALL)
+    declarations = list(re.finditer(
+        r"\bstatic\s+const\s+(nx_\w+_t)\s+" + re.escape(name) +
+        r"\s*=\s*\{([^{}]*)\}\s*;", source))
+    if (len(declarations) != 1 or len(re.findall(
+            r"\bstatic\s+const\s+\w+\s+" + re.escape(name) + r"\b",
+            source)) != 1):
+        raise EvidenceError("missing or duplicate readonly context declaration")
+    declaration = declarations[0]
+    if conditional_at(source, declaration.start()):
+        raise EvidenceError("conditional readonly context declaration")
+    (owner_type, pointer_field, width, selector_field), contract = reference_layout(
+        root, source, declaration[1])
+    fields = {}
+    for token in declaration[2].strip().rstrip(",").split(","):
+        field = re.fullmatch(r"\s*\.(\w+)\s*=\s*(.*?)\s*", token)
+        if field is None or field[1] in fields:
+            raise EvidenceError("unsupported readonly context initializer")
+        fields[field[1]] = field[2]
+    if set(fields) != {pointer_field, selector_field}:
+        raise EvidenceError("readonly context fields differ from private layout")
+    owner_expression = re.fullmatch(r"&([A-Za-z_]\w*)", fields[pointer_field])
+    selector = re.fullmatch(r"(0|[1-9][0-9]*)[uU]?", fields[selector_field])
+    if owner_expression is None or selector is None:
+        raise EvidenceError("readonly context requires direct owner and literal selector")
+    owner_name, value, width = owner_expression[1], int(selector[1]), int(width)
+    if value >= 1 << width:
+        raise EvidenceError("readonly context selector exceeds private field")
+    owners = list(re.finditer(r"\bstatic\s+" + re.escape(owner_type) +
+                             r"\s+" + re.escape(owner_name) + r"\s*;", source))
+    if len(owners) != 1 or conditional_at(source, owners[0].start()):
+        raise EvidenceError("missing or conditional typed context owner declaration")
+    reference, section = linked_object(elf, name, "readonly context")
+    if reference["size"] != 8:
+        raise EvidenceError("readonly context differs from private ARM layout")
+    words = object_words(elf, reference, section)
+    owner, _ = linked_object(elf, owner_name, "context owner", writable=True)
+    if any(not 0 <= obj["value"] < obj["value"] + obj["size"] <= 1 << 32
+           for obj in (reference, owner)):
+        raise EvidenceError("readonly context/owner address range exceeds ARM")
+    if (reference["value"] < owner["value"] + owner["size"] and
+            owner["value"] < reference["value"] + reference["size"]):
+        raise EvidenceError("readonly context overlaps writable owner")
+    if words[0] != owner["value"]:
+        raise EvidenceError("readonly context owner pointer differs from assembly")
+    if words[1] & ((1 << width) - 1) != value:
+        raise EvidenceError("readonly context selector differs from assembly")
+    return reference["value"], {
+        "context_kind": "readonly_reference", "context_symbol": name,
+        "owner_symbol": owner_name, "owner_address": owner["value"],
+        "selector_field": selector_field, "selector_value": value,
+        "context_contract": contract,
+    }
+
+
+def context_object(elf, bindings, expression, *, root=ROOT):
     """Resolve a scalar or literal array element from the actual linked size."""
+    reference = re.fullmatch(r"\(\s*void\s*\*\s*\)\s*&(\w+)", expression)
+    if reference is not None:
+        return readonly_context(elf, bindings, reference[1], root)
     match = re.fullmatch(r"(\w+)(?:\[([0-9]+)\])?", expression)
     if match is None:
         raise EvidenceError("unsupported context expression")
@@ -324,7 +437,8 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT):
         if table["size"] != 4 * len(slot_names):
             raise EvidenceError(
                 "concrete operations layout differs from public ABI")
-        context_address, context_facts = context_object(elf, bindings, context)
+        context_address, context_facts = context_object(elf, bindings, context,
+                                                        root=root)
         if words[0] != table["value"]:
             raise EvidenceError("face operations pointer differs from assembly")
         if words[1] != context_address:

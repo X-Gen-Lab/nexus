@@ -139,8 +139,15 @@ def check_text(path, relative):
         errors.append(f"{relative}: use LF line endings")
     if contents and not contents.endswith(b"\n"):
         errors.append(f"{relative}: missing final newline")
-    if path.suffix != ".md":
-        for number, line in enumerate(text.splitlines(), 1):
+    # Only LF advances a line; hidden ASCII controls must not split it.
+    for number, line in enumerate(text.split("\n"), 1):
+        for match in re.finditer(r"[\x01-\x08\x0b\x0c\x0e-\x1f\x7f]", line):
+            errors.append(
+                f"{relative}:{number}: ASCII control U+"
+                f"{ord(match.group()):04X}"
+            )
+        if path.suffix != ".md":
+            line = line.rstrip("\r")
             if line.rstrip(" \t") != line:
                 errors.append(f"{relative}:{number}: trailing whitespace")
     if path.suffix == ".py":

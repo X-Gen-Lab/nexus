@@ -1,0 +1,2223 @@
+{
+  "scope": "Actual two exact configure/build presets and whole generated Native programs on frozen dirty main source; no complete SDK/ARM/offline/HIL qualification",
+  "source_unchanged": true,
+  "index_tree": "72d3654445ef1c3147452311d44da59ea24048b7",
+  "commands": [
+    {
+      "label": "pair-configure",
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "tools/dev/dev.py",
+        "configure",
+        "--preset",
+        "fixture-io-evolution-native-time-pair"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/pair-configure.attempts/1792292343989600889-6749c3882a154d068161d0506175eab1/receipt.json"
+    },
+    {
+      "label": "pair-build",
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "tools/dev/dev.py",
+        "build",
+        "--preset",
+        "fixture-io-evolution-native-time-pair"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/pair-build.attempts/1792292366908652569-e430b0d152a44e25a2a69fcf5fdc309c/receipt.json"
+    },
+    {
+      "label": "pair-runtime",
+      "command": [
+        "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/bin/nexus_rtc_lptim_pair_generated_test",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/pair.xml"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/pair-runtime.attempts/1792292385518345946-4cd5e0ff7e2944d99798e43c036581fc/receipt.json"
+    },
+    {
+      "label": "pair-symbols",
+      "command": [
+        "nm",
+        "-S",
+        "--size-sort",
+        "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/bin/nexus_rtc_lptim_pair_generated_test"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/pair-symbols.attempts/1792292385523515062-5710a6798f804f009de0df4d030cc5a6/receipt.json"
+    },
+    {
+      "label": "empty-configure",
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "tools/dev/dev.py",
+        "configure",
+        "--preset",
+        "fixture-io-evolution-native-time-empty"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/empty-configure.attempts/1792292385580212237-216274e70baf4a0aadadd43aef9755ff/receipt.json"
+    },
+    {
+      "label": "empty-build",
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "tools/dev/dev.py",
+        "build",
+        "--preset",
+        "fixture-io-evolution-native-time-empty"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/empty-build.attempts/1792292408357796574-90ae9ed9ecd940199baa39745d1a46e7/receipt.json"
+    },
+    {
+      "label": "empty-runtime",
+      "command": [
+        "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/bin/nexus_rtc_lptim_empty_generated_test",
+        "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/empty.xml"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/empty-runtime.attempts/1792292426423918573-fa347c04d5174bb2b39ebc6352ec3c6c/receipt.json"
+    },
+    {
+      "label": "empty-symbols",
+      "command": [
+        "nm",
+        "-S",
+        "--size-sort",
+        "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/bin/nexus_rtc_lptim_empty_generated_test"
+      ],
+      "returncode": 0,
+      "receipt": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/empty-symbols.attempts/1792292426429138218-296d1cae1d9841ce81bef07324e62e6e/receipt.json"
+    }
+  ],
+  "programs": [
+    {
+      "variant": "pair",
+      "preset": "fixture-io-evolution-native-time-pair",
+      "target": "nexus_rtc_lptim_pair_generated_test",
+      "executable": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/bin/nexus_rtc_lptim_pair_generated_test",
+      "executable_bytes": 665888,
+      "executable_sha256": "b5b18f0a3d06ca5cb33bd9df3f0175e8c8acf99ac4b6218eeadbb3e0996a0f7b",
+      "xml": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/pair.xml",
+      "xml_sha256": "6f3d23de59c5cbfe26c309c97578c4cba81ecf098d2277cfbc31b71b7a5157fc",
+      "cases": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "inputs": [
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/CMakeCache.txt",
+          "bytes": 24541,
+          "sha256": "58a2dfe62eba820120976cbccd699d184c0ae9c13b20bde6bef1aaa454b1b1ef"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/generated/bindings.c",
+          "bytes": 20741,
+          "sha256": "2140489a7fa26ac9d044aaa7b1323da22863af4f929b21facafe2c99d76ea73a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/generated/nexus_factory.h",
+          "bytes": 20500,
+          "sha256": "a2863f56ac5293775859cd1b23f605673bbfb5c4baf21f18feb3867898a44b95"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/generated/resolved.json",
+          "bytes": 13956,
+          "sha256": "514bfab060a0a797869e9026cd5a3f0fceae9a0fed301d562d2a596d82875131"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/quality/build-provenance.json",
+          "bytes": 10333,
+          "sha256": "7c27e7d2d10c57c7bf3d63fc52f7a496c578315b9a44818919caee188d41e124"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/quality/configure-provenance.json",
+          "bytes": 10321,
+          "sha256": "0c4aed2a72764548293b3e67dab594fd1d9166bd4c92af7f104974784635d112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/can-factory-gd32/bindings.c",
+          "bytes": 34390,
+          "sha256": "b222c0be05e8e1caae207408ed500d9ea879e09bbdbc637200a53a6d9ac9fd93"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/can-factory-gd32/nexus_factory.h",
+          "bytes": 21938,
+          "sha256": "3662ad22b86eed827e5b679fd2dda6bf261f991d33e9b746aecc7bb55312e315"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/can-factory-gd32/resolved.json",
+          "bytes": 38909,
+          "sha256": "56f57b4c142e58f50d569d654fb7bde49316aa4cd770c52ff9b3cfdc8b5362eb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/can-factory-stm32/bindings.c",
+          "bytes": 34320,
+          "sha256": "f15c9ac79d76e7bfd921296ddfed7167b2ad333fb000c58d3612c4ccb127342c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/can-factory-stm32/nexus_factory.h",
+          "bytes": 21938,
+          "sha256": "3662ad22b86eed827e5b679fd2dda6bf261f991d33e9b746aecc7bb55312e315"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/can-factory-stm32/resolved.json",
+          "bytes": 36081,
+          "sha256": "79988696b9b24a4a65e3420ce796fb8c266c59ffbd04f0ba5684b9ec0206b549"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-factory-gd32/bindings.c",
+          "bytes": 39757,
+          "sha256": "6fc26268055cb4a0da50c55b642fa4e83c5bd721e13cb110d5b5998d034fe028"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-factory-gd32/nexus_factory.h",
+          "bytes": 21913,
+          "sha256": "1f072c89e28687830acad6672cceb535b37fcfb6cca427623576d33939eb99a8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-factory-gd32/resolved.json",
+          "bytes": 37078,
+          "sha256": "4629c95e405dafcfbb54419913246dad2198576367edc48b3bcfba2ca51fb2a4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-factory-stm32/bindings.c",
+          "bytes": 39555,
+          "sha256": "35c066808131e3a9aa993d85256f789ca0362fe4bb7cfa58efd509d73ae65981"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-factory-stm32/nexus_factory.h",
+          "bytes": 21913,
+          "sha256": "1f072c89e28687830acad6672cceb535b37fcfb6cca427623576d33939eb99a8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-factory-stm32/resolved.json",
+          "bytes": 32707,
+          "sha256": "477b774847320001f6d52a38c7791023eb6928bf07c6c148d56982d3f2094528"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-frames-factory-gd32/bindings.c",
+          "bytes": 40259,
+          "sha256": "8c28ef6e4920aceacacbeab57fadd8ebd0143a49492339ff9473706cdbbea07e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-frames-factory-gd32/nexus_factory.h",
+          "bytes": 21975,
+          "sha256": "ef7872b007c4dacb44d75330047cc7a0cc264b91db59c4155d610a972ab385fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-frames-factory-gd32/resolved.json",
+          "bytes": 38000,
+          "sha256": "747a6dfedbd9266100bd3046525f550fc4b731d51f7bbc6667c38a062ab3506f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-frames-factory-stm32/bindings.c",
+          "bytes": 40033,
+          "sha256": "4386ceb3ba5526810ce6c18752f3fb6f492e5943741cf96d67f144bfd78ae815"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-frames-factory-stm32/nexus_factory.h",
+          "bytes": 21975,
+          "sha256": "ef7872b007c4dacb44d75330047cc7a0cc264b91db59c4155d610a972ab385fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/eth-frames-factory-stm32/resolved.json",
+          "bytes": 33620,
+          "sha256": "de2fdcbe19b0589e666d4996ceb28c2bc1053317a3bf4e3491163c2a2ea01b7a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/f103-devices-factory/bindings.c",
+          "bytes": 26768,
+          "sha256": "0168e8b11e9e9bc5c1ad84afcc153cab3ac7a313e5b755d37a9ad5694b280de4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/f103-devices-factory/nexus_factory.h",
+          "bytes": 21983,
+          "sha256": "8279a7356f43816a0cb029ef5e1e20913fe2a2046d61265d2780912ab60fe5fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/f103-devices-factory/resolved.json",
+          "bytes": 28180,
+          "sha256": "25cb4f184c5309859f8488a5467a2cd5b54cc0f06114e9fd55de07822d5dd295"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-acquisition-factory/bindings.c",
+          "bytes": 37717,
+          "sha256": "5e465b5c2c02d0845f1c0ce0961a9d06b141f745d0a0812eeb265f67cecfed44"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-acquisition-factory/nexus_factory.h",
+          "bytes": 22761,
+          "sha256": "1353601aa1e2f2bbce3881c29ad68ff940e14443e04b4948b2824ad59f06f55c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-acquisition-factory/resolved.json",
+          "bytes": 73349,
+          "sha256": "3f0ee3c6e89cd637ff4af27805f6af2a8c9418799647733ca05a0a1a7fd38ab0"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-injected-software-factory/bindings.c",
+          "bytes": 27807,
+          "sha256": "0104337a1c3277a3a560471aa4a3da3e7473bf900a4ca8e6691ca5438153fe17"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-injected-software-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-injected-software-factory/resolved.json",
+          "bytes": 71418,
+          "sha256": "39c4f35524b3c2ce84e79b3b56ac7c9d0037cd8ad8a19341b587a204fa69a00b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-injected-timer-factory/bindings.c",
+          "bytes": 28934,
+          "sha256": "cad255570d46b1bc4b737323c40fd2956a6ba63488f34dfb71ffd6fb48c293fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-injected-timer-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-injected-timer-factory/resolved.json",
+          "bytes": 72355,
+          "sha256": "4c469cef1009dc8132d0ba5fb7b49ec85f1f2eea1077ed515c12cf67b3b1b009"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-regular-software-factory/bindings.c",
+          "bytes": 30124,
+          "sha256": "c35dc853281d39c84a2d75d54ca8ccf001af0ba2403992f3533b7465899c5ddf"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-regular-software-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-regular-software-factory/resolved.json",
+          "bytes": 73463,
+          "sha256": "642c9095276a544cbb90ad8541012a96829a5108415e8ddd1c10506a3a461c93"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-regular-timer-factory/bindings.c",
+          "bytes": 31251,
+          "sha256": "c9ca6b481f92f04d730b2c4b26eb0da71348b54190e76ed3f99876eb4177518c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-regular-timer-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-adc-group-regular-timer-factory/resolved.json",
+          "bytes": 74405,
+          "sha256": "7dedd2eb5edc4d627f46d52f5d3279c39b04aedcedb34489bd9703e15861c119"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-capture-factory/bindings.c",
+          "bytes": 19471,
+          "sha256": "8bf26aa805a1cd466f4aa45f0a1412f38422c35e06474672538c979c055f5c15"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-capture-factory/nexus_factory.h",
+          "bytes": 15397,
+          "sha256": "740ad28d39e90e0ded2ab4f73c3e89516421362f6440a1f4c60a71e963975cf0"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-capture-factory/resolved.json",
+          "bytes": 69514,
+          "sha256": "376e043c5fc39ba3a78f2fe1f89009defcb7358cc7a15a0323cafd0ba474e8e1"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-control-factory/bindings.c",
+          "bytes": 24892,
+          "sha256": "062b6434dc47fe0d86583dfe8c7b2408f63750892af69c6032691d966e21d107"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-control-factory/nexus_factory.h",
+          "bytes": 15390,
+          "sha256": "c944c45fa34beab7bcf9c25ce1b5b46f1b4c8424d63812dee68e1bbb7093293a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-control-factory/resolved.json",
+          "bytes": 72930,
+          "sha256": "b9519efce6ba6c71dcb2c477ec84847afba08ada80c74f296f31badb81250d2b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-encoder-factory/bindings.c",
+          "bytes": 19292,
+          "sha256": "1bfdcf04e4fcb29778636d123440a5358b7276ce7891636f47fcf50b47794735"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-encoder-factory/nexus_factory.h",
+          "bytes": 15392,
+          "sha256": "1488782eebe67d188fdf7d59d8e82e1e211ef22479de4006de5d77de647302bf"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-encoder-factory/resolved.json",
+          "bytes": 69809,
+          "sha256": "eae8d377fee66703ef33face08c65052aa0f5c4be9dea05804601aeb3f20749c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-exti-factory/bindings.c",
+          "bytes": 27084,
+          "sha256": "51164268eea6d3389c218b8f653d497254269a1b96a9ac3a144fdb67eeb44ef1"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-exti-factory/nexus_factory.h",
+          "bytes": 20430,
+          "sha256": "f12f6a18c179989a1db53933885a937b46f41f1869b121b25c16996118199932"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-exti-factory/resolved.json",
+          "bytes": 69575,
+          "sha256": "3999ba024a7963756c44137be0da9d755f21ba0f33e5bc4409c0e254fcb22b6f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-factory/bindings.c",
+          "bytes": 27494,
+          "sha256": "32defcd162b93a3b0434361d21ddd3ab263d2afcedf00064df1e793431739c34"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-factory/resolved.json",
+          "bytes": 71802,
+          "sha256": "f174b3c2f36c458e926706962aafa275939b4ff26d467e7d5f95c1691a74d20a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-fdcan-factory-loopback/bindings.c",
+          "bytes": 26218,
+          "sha256": "7c12f96a588bbd24165239d4efee093937a5c209c1e2de81520e142397d0d728"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-fdcan-factory-loopback/nexus_factory.h",
+          "bytes": 20409,
+          "sha256": "9f65cabbe1d5e8e36ac21fa6e9a21a700641c06c63a3170eaae7791899829367"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-fdcan-factory-loopback/resolved.json",
+          "bytes": 70392,
+          "sha256": "082afd8993350f95620dd5c572495a90efc8b4b02768403442927574840515e3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-fdcan-factory-normal/bindings.c",
+          "bytes": 26207,
+          "sha256": "a5d27ee354b5cc159817fb8ff58a3139392ac7647cf8924e179e708ea09b1b76"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-fdcan-factory-normal/nexus_factory.h",
+          "bytes": 20409,
+          "sha256": "9f65cabbe1d5e8e36ac21fa6e9a21a700641c06c63a3170eaae7791899829367"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-fdcan-factory-normal/resolved.json",
+          "bytes": 70360,
+          "sha256": "7d28c0a0f7d2e01559565ec2961bfd803fc4e3675fd7c173f494ad0d6e55d952"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-i2c-long-factory/bindings.c",
+          "bytes": 36153,
+          "sha256": "01142537ce0d136af4a01caefb0daea5e5628c01d66dcd39f567fa1305bcf57c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-i2c-long-factory/nexus_factory.h",
+          "bytes": 24208,
+          "sha256": "daab8e872c9292cccbd7adb3d59a07793a9f11ae408a708d40b9fc5a1b5a6f2b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-i2c-long-factory/resolved.json",
+          "bytes": 71910,
+          "sha256": "a7d03e507323f16aac56d6009d4a28bd3978fedd6c517077499826a183c02cca"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-mainstream/bindings.c",
+          "bytes": 50820,
+          "sha256": "66b8936303cd26c575b642e75f7333bad95898c1b8d3ae294df52acd5427bf53"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-mainstream/nexus_factory.h",
+          "bytes": 22136,
+          "sha256": "10b9249347c989b24403fc950e9c959e77912dfdc41d62b6a2be5cacac9bf0b8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-mainstream/resolved.json",
+          "bytes": 80839,
+          "sha256": "dff38f294ace1767698238a6d3c2a414f71e8692712416c74cd5d5387e85063e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-peripheral-factory/bindings.c",
+          "bytes": 36935,
+          "sha256": "0eca671ef192a4ce0b47d327bd38226bc8a070586de0de9e455218f6f59598be"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-peripheral-factory/nexus_factory.h",
+          "bytes": 22024,
+          "sha256": "315eead60f06b81f0719cae42baaec8244e2bf93b0c3636014306ff96f38c70b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-peripheral-factory/resolved.json",
+          "bytes": 74650,
+          "sha256": "de9e5e16efc4ac0f7d4533a7365b898c4e72f958ed810dfa8b1d0cae79059cae"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-adc-factory/bindings.c",
+          "bytes": 34848,
+          "sha256": "185c52e571e9df92a7a71b8bad3cff33f58505c4bda6c09d7ff0b4df71f6b979"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-adc-factory/nexus_factory.h",
+          "bytes": 20408,
+          "sha256": "77068dd04020f73bec06a466d4ef888e7108fe215a4ef1f4c146880a1b11b2b7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-adc-factory/resolved.json",
+          "bytes": 79581,
+          "sha256": "1d4aa74e8f5944fe2c6c344945707beee7bf4e40523d1d7825f996cb1a18c5e4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-factory/bindings.c",
+          "bytes": 27628,
+          "sha256": "48423e97f6a688312363d1663ff2370dca683ee77d58d73ab82ffdd9e71d3b16"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-factory/nexus_factory.h",
+          "bytes": 20428,
+          "sha256": "4fd740a0da232bb2f4dd01138c4cb4910df347db21105699cb3e4a23b2d2d886"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-factory/resolved.json",
+          "bytes": 71382,
+          "sha256": "50bbf0f2f2ee7551eaa68e9249d616633f63981c4787518035e290a5d96e6684"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-shared-factory/bindings.c",
+          "bytes": 25795,
+          "sha256": "68c1ce749698b0c1a92a6ace42932596da22bacd9a653e1893b810a52c7e9451"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-shared-factory/nexus_factory.h",
+          "bytes": 20427,
+          "sha256": "f9897ca4ecfc3662f3451c5fefe8d830020e6b8dac651f8c3f85076d8667d034"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/g474-pwm-shared-factory/resolved.json",
+          "bytes": 72468,
+          "sha256": "f00af793e96b8ff178d13c228e78da476d7743d17a32e9ba5a3364b52c28eee7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-devices-factory/bindings.c",
+          "bytes": 27631,
+          "sha256": "2e818d51c157f7d986ec7a2bf4192ddfa662d0ba8bc76125f58ad43d738419f4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-devices-factory/nexus_factory.h",
+          "bytes": 22008,
+          "sha256": "78c87efda72c1815fc2b79a8d1fd4bc763f53671da3e31a4936e0cd88ca1c0bd"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-devices-factory/resolved.json",
+          "bytes": 29181,
+          "sha256": "73e318bd86ca7ef735f5d168a38ec45932a79fd9db1d8a28b659e15bbac3465e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-factory/bindings.c",
+          "bytes": 21635,
+          "sha256": "100194590c387a804869cc1f5c7681b68e922d0da1acf77e27bd52b227ae7eff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-factory/nexus_factory.h",
+          "bytes": 21979,
+          "sha256": "5482cbc3507a6b224eee60edf75a117d774822a78d198378a1f51000053f6193"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-factory/resolved.json",
+          "bytes": 27576,
+          "sha256": "382871e4c6bc575dccf06a4337000c7edc62ed14bbcfb2dfaa371286e1a64f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-spi-factory/bindings.c",
+          "bytes": 22638,
+          "sha256": "5ee629396f9f47c7ed1fc6782e8a14461bbeefaaf5d85e982cb4de23a091c91b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-spi-factory/nexus_factory.h",
+          "bytes": 21970,
+          "sha256": "c10b00ca262c3686cbef8bbb38e104637ebcb2f799211e24aa5bfbbeb8bdc002"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd303-spi-factory/resolved.json",
+          "bytes": 28023,
+          "sha256": "48ca302c1d73bdfbda092a9d803608da0ce7c6c65c5c02ca1d860aaa5076f96c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd32-flash-factory/bindings.c",
+          "bytes": 17242,
+          "sha256": "c1816edf6e4aabe2b120ae466b76c5244185acf15ca14cf8a04e9849203db762"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd32-flash-factory/nexus_factory.h",
+          "bytes": 20408,
+          "sha256": "effa09375a4654ae68d99659500979d5551f203c5bd06e7917436239dccd3882"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/gd32-flash-factory/resolved.json",
+          "bytes": 32181,
+          "sha256": "e9d4805a741d349e0a0790c18b1df7dfd012a47fcfd8ffbf0a7d9a53f5622dff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-dma-factory/bindings.c",
+          "bytes": 30833,
+          "sha256": "7d688189f1572a18a1031fbb59fee994e23cb0fbe04d4a256e1aebdcf7cf9f09"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-dma-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-dma-factory/resolved.json",
+          "bytes": 20061,
+          "sha256": "badbd1a5cbd1ca08f12e32ef383d8ee402295dbd9de1a040aee0e2e99f50b45d"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-factory/bindings.c",
+          "bytes": 28808,
+          "sha256": "8f2267ad4878c1464edfccd1045f0113966180367fdcd388d5d413dfc7cb5f08"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-factory/resolved.json",
+          "bytes": 19121,
+          "sha256": "8204821c83cf657eb17c4a941e28dd768dd6e7afd3075107d7fcaca142cc276c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-high-factory/bindings.c",
+          "bytes": 54818,
+          "sha256": "14775181a4e7eaf7dccf6cd2eab451fe0abf7075858eefa18ced867b1e922ae8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-high-factory/nexus_factory.h",
+          "bytes": 24406,
+          "sha256": "96a5c1e7c4ee9be3bc1fb674936756624b606aec4696e66aa59aedad0d2414f5"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-high-factory/resolved.json",
+          "bytes": 30994,
+          "sha256": "e0d9b7d127a7d73be535e45e65d66f79db79305e13d42acf4a22b56b75a77ba9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-i2c-long-factory/bindings.c",
+          "bytes": 51825,
+          "sha256": "155b88552b10b3d7b7ec9645542d55404c9b94b85b5a2afeb2588b53f3fbe6ec"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-i2c-long-factory/nexus_factory.h",
+          "bytes": 25076,
+          "sha256": "bb76926ab228edfd1faf56e14ffa9e2aa72d43e340060e8cf8becfc58248cb60"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-i2c-long-factory/resolved.json",
+          "bytes": 28233,
+          "sha256": "2edd7e231ccd0aaae09765f4fe49bb9d97103a497ea2dd14830ad2386f29372c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-peripheral-factory/bindings.c",
+          "bytes": 50844,
+          "sha256": "908b17051d61b7433ab1ac48a26437962ac0e17d72a871afa2282d48f99b619e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-peripheral-factory/nexus_factory.h",
+          "bytes": 23629,
+          "sha256": "256e505b97fa5ffbe52798da6c57e880037692d6173a04d76ebffab22c44f3e7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-peripheral-factory/resolved.json",
+          "bytes": 26940,
+          "sha256": "6869de5dfa1dc4d57e3c07f93372d4eef0bca4a36ec4a6b3ad92344ea89b8d13"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-receive-factory/bindings.c",
+          "bytes": 30902,
+          "sha256": "f47427af69165cda4c612ed6b284b26e234e57561f72eecae9c77a14497c8563"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-receive-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-receive-factory/resolved.json",
+          "bytes": 20101,
+          "sha256": "364e4d2761967e90bb69831a43152b51325be3331d571aaa7c078dd907fe1230"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-uart-fifo-factory/bindings.c",
+          "bytes": 24127,
+          "sha256": "025ca92750ccaa15794ebfb2718821075314c2b6c6c0cef99544cb0a44340a49"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-uart-fifo-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-uart-fifo-factory/resolved.json",
+          "bytes": 18642,
+          "sha256": "802197b4dd49fcab81284c0ca7ca40bf5ec6599ce95bb9f7b9f6c3b531448d8a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-uart-rtscts-factory/bindings.c",
+          "bytes": 24620,
+          "sha256": "6aa2101cae78d086bb372f78b51db36b9883b0cd3d2accd7dcfca883ced4d2f9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-uart-rtscts-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/h743-uart-rtscts-factory/resolved.json",
+          "bytes": 19842,
+          "sha256": "d594af4118cf286ec651b17d3432d7240d31ffa50c722c89d756414a362c73aa"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-gd32-dma/bindings.c",
+          "bytes": 46565,
+          "sha256": "0f7583e6deaf00fd28451345c8448ed7b3451b70aa75f46d02f8100d0a595aa3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-gd32-dma/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-gd32-dma/resolved.json",
+          "bytes": 40275,
+          "sha256": "423a12faacd81250ab0f8b4374a71253d0ba5eec893ec282ec2a2129c35f9b56"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-gd32-irq/bindings.c",
+          "bytes": 39281,
+          "sha256": "1248dd1757f02f6d7d3c875c0c6c7ef8b62292039e801528884fee89506e5b7a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-gd32-irq/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-gd32-irq/resolved.json",
+          "bytes": 36321,
+          "sha256": "2f262425355df871157eb8581b60aca16f8cf64272fea3f2e81fba032c22929c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-stm32-dma/bindings.c",
+          "bytes": 46122,
+          "sha256": "6cf3a5a349b1381cefd295a9acd6af39c40b6680281a579addb9908e57daac1a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-stm32-dma/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-stm32-dma/resolved.json",
+          "bytes": 36062,
+          "sha256": "4aa1aa1f742c54d91558ca12448757a350ab843c6e16dd335d135b838f34a135"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-stm32-irq/bindings.c",
+          "bytes": 39076,
+          "sha256": "414a62e5a97d64c08ad706435e5c12551bf7ffa3dcdab1fb6d37d8a1c3c8f099"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-stm32-irq/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/i2c-pair-stm32-irq/resolved.json",
+          "bytes": 32116,
+          "sha256": "400a42c34b2fb7977db97a156d3e97cd7f3fb6d77d28fedf1cff4ac59aa4ca94"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/multi-controller-factory-gd32/bindings.c",
+          "bytes": 83500,
+          "sha256": "0358c45c031330ad300e194671fab32295980b6c21b25bd0c6d2cff0516549a6"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/multi-controller-factory-gd32/nexus_factory.h",
+          "bytes": 23692,
+          "sha256": "6210ba04fcb51c3f9be5081d7bc813ebdc94075a06c4fe904ac14df4a3da2232"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/multi-controller-factory-gd32/resolved.json",
+          "bytes": 51066,
+          "sha256": "45bc18ef1ab5dccc492f5f74e641c345195e169c1b61404e5a320528b6c69e37"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/multi-controller-factory-stm32/bindings.c",
+          "bytes": 85368,
+          "sha256": "1fc86d70e0480cd3b4b475a9a70b8694957d3aa6d1f0f05e3178583fdddf5133"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/multi-controller-factory-stm32/nexus_factory.h",
+          "bytes": 23692,
+          "sha256": "6210ba04fcb51c3f9be5081d7bc813ebdc94075a06c4fe904ac14df4a3da2232"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/multi-controller-factory-stm32/resolved.json",
+          "bytes": 46552,
+          "sha256": "23c43abfe52a0db25ea6ab2c4fafca646cbd1f30d89eafa7850d5e68f6163850"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-factory/bindings.c",
+          "bytes": 41018,
+          "sha256": "5e6ecd93b43c5b93ad1e628e22888848c537c509eda0bd4735ac05595c5448e7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-factory/nexus_factory.h",
+          "bytes": 24750,
+          "sha256": "8cdcff1a984f75a0be09ad57ac2cc26ccdfeea18a4534d478b98cc13ff4a49f5"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-factory/resolved.json",
+          "bytes": 24346,
+          "sha256": "5af50ce8be8dda221003b0f0c3a6ec78d67cddc967e31e1c5cd65c20f0eb4e30"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-spi-dma-factory/bindings.c",
+          "bytes": 25560,
+          "sha256": "0c08148e4130cd7264d00fe7844943d284ab3133c5450a994b7d8088cccce052"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-spi-dma-factory/nexus_factory.h",
+          "bytes": 24837,
+          "sha256": "bd03ca91333dbef135f743e1c4a852b2eedd1c1d4e236986422897d443363e01"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-spi-dma-factory/resolved.json",
+          "bytes": 13726,
+          "sha256": "4a040edcc75979f318d7f46afe6a78808022be0347368d55f0ebe627b41ccee1"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-time-empty/bindings.c",
+          "bytes": 15080,
+          "sha256": "75a805493f5861d0fcdb480d23fe6f18ba438da49979d9ae924e3b7d4fec2a18"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-time-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-time-empty/resolved.json",
+          "bytes": 11546,
+          "sha256": "b0761fbb27b40500df5f81a46c5ac9d20cccc55b3cfc1eb2f5003657ebb1a3d3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-time-pair/bindings.c",
+          "bytes": 20741,
+          "sha256": "2140489a7fa26ac9d044aaa7b1323da22863af4f929b21facafe2c99d76ea73a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-time-pair/nexus_factory.h",
+          "bytes": 20500,
+          "sha256": "a2863f56ac5293775859cd1b23f605673bbfb5c4baf21f18feb3867898a44b95"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/native-time-pair/resolved.json",
+          "bytes": 13956,
+          "sha256": "514bfab060a0a797869e9026cd5a3f0fceae9a0fed301d562d2a596d82875131"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/nexus_workload_gd303_test-generated/bindings.c",
+          "bytes": 21635,
+          "sha256": "100194590c387a804869cc1f5c7681b68e922d0da1acf77e27bd52b227ae7eff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/nexus_workload_gd303_test-generated/nexus_factory.h",
+          "bytes": 21979,
+          "sha256": "5482cbc3507a6b224eee60edf75a117d774822a78d198378a1f51000053f6193"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/nexus_workload_gd303_test-generated/resolved.json",
+          "bytes": 27576,
+          "sha256": "382871e4c6bc575dccf06a4337000c7edc62ed14bbcfb2dfaa371286e1a64f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/nexus_workload_uart3_test-generated/bindings.c",
+          "bytes": 28763,
+          "sha256": "8387facf814318c225ff829af9778a9dd4222b369a849b18ae0c6fab4508fbd2"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/nexus_workload_uart3_test-generated/nexus_factory.h",
+          "bytes": 21976,
+          "sha256": "4a9d2d384ffcd932298818acdb3e1606c1ef25ce62f3da20f40172c74c7dfe45"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/nexus_workload_uart3_test-generated/resolved.json",
+          "bytes": 19127,
+          "sha256": "c82e985f8f9bb67af12f50bd7932a11f3bc6b1c86aab2cef9fcbda15ba9b833c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-gd32-empty/bindings.c",
+          "bytes": 15793,
+          "sha256": "b921d6d3bfcd142eb15bb7e2d84de8f4b727906707fdf9b2c34bcf01083b42e9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-gd32-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-gd32-empty/resolved.json",
+          "bytes": 30578,
+          "sha256": "a3fd3edc0d528ed9abd92b2af9fbb257fc8eb21da1697684f1d793bcf9468f03"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-gd32-gpio/bindings.c",
+          "bytes": 20263,
+          "sha256": "0ebd83c007ea1ac6f484a9d3f0239151a973c3fa08b3981bd8ae5183a8c294c7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-gd32-gpio/nexus_factory.h",
+          "bytes": 20405,
+          "sha256": "ec4eb09aed9feabced05293cffa4fd248c5d53d550dc841731cbbbae41179523"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-gd32-gpio/resolved.json",
+          "bytes": 31218,
+          "sha256": "50cc1b8e5fb02d6f973c0643732462f67b8b7b9d15680c814aa486d046cd73a9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-stm32-empty/bindings.c",
+          "bytes": 16020,
+          "sha256": "173b6465c2063ab044fc6306712515b8e2176b3852560fcb029689792efc92a5"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-stm32-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-stm32-empty/resolved.json",
+          "bytes": 26204,
+          "sha256": "11e7f094b2d5fd5603ec04ed985822ffb0f15a907995febc687ab721772aa961"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-stm32-gpio/bindings.c",
+          "bytes": 21825,
+          "sha256": "597ae687cad89d658ea319798e031c0a4a00d9c7a0d51f41dccfa79d10a233bc"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-stm32-gpio/nexus_factory.h",
+          "bytes": 20405,
+          "sha256": "ec4eb09aed9feabced05293cffa4fd248c5d53d550dc841731cbbbae41179523"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/physical-platform-stm32-gpio/resolved.json",
+          "bytes": 26848,
+          "sha256": "cf953cb6dee05f31235d7bf18a5831a51ab20b1f2756d9149d9d1eb9a45a8582"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/single-spi-factory-gd32/bindings.c",
+          "bytes": 23288,
+          "sha256": "dd810c366fd6c6865184effaf3aa264c65fc7f306d8ab15f6851b647c4e9f522"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/single-spi-factory-gd32/nexus_factory.h",
+          "bytes": 15418,
+          "sha256": "2187c4ff358024b523692eebc5e9b0efce9d3d5d29a051943aadf37771aa25c3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/single-spi-factory-gd32/resolved.json",
+          "bytes": 35321,
+          "sha256": "903ec6ba819cd34c4fa0b843e2b4aec0b00dd4ffa6d205074e04bfe4841f46ef"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/single-spi-factory-stm32/bindings.c",
+          "bytes": 24784,
+          "sha256": "3a578188a1f0502d0fb4f343ff03c523e66fe317a5981a85f9d415dfa54206f7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/single-spi-factory-stm32/nexus_factory.h",
+          "bytes": 15418,
+          "sha256": "0a13d558b87f33c1e21ef3502a67116c3ae621aea2bd2dddeadadc68b2e3491c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/single-spi-factory-stm32/resolved.json",
+          "bytes": 30542,
+          "sha256": "fec235d4572c10040f0545cc314e8c0241cd168273b1240e6d3305b7da5f1755"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/stm32-flash-factory/bindings.c",
+          "bytes": 17887,
+          "sha256": "054dc286a3fa66ea6ba85aa294128673e4f6fad93aa15b849245bd74b296f441"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/stm32-flash-factory/nexus_factory.h",
+          "bytes": 20408,
+          "sha256": "effa09375a4654ae68d99659500979d5551f203c5bd06e7917436239dccd3882"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/stm32-flash-factory/resolved.json",
+          "bytes": 28797,
+          "sha256": "e1b014a7e3b5bcce20235821a23b78757d166771c399aa1c3de7209fe43a88cc"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/timer-factory-gd32/bindings.c",
+          "bytes": 36200,
+          "sha256": "db6179204075c9992ae786a983ef9c34c6d6cecd11f973a5be0fe4f701a0f82e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/timer-factory-gd32/nexus_factory.h",
+          "bytes": 20449,
+          "sha256": "9f41f6fb91344aea63aaf1590b38377085bfff142f263cff2c40c1b8b4109e2f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/timer-factory-gd32/resolved.json",
+          "bytes": 36299,
+          "sha256": "b858146fd0fbac1714c1c4ee141bd19bbbaaa76f711faa375423a0362c8717b6"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/timer-factory-stm32/bindings.c",
+          "bytes": 35768,
+          "sha256": "3e5abedb8eb02c7d3b416e79fcf2da6e9c36704faf0fba9fe9c2473f1a29157e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/timer-factory-stm32/nexus_factory.h",
+          "bytes": 20449,
+          "sha256": "9f41f6fb91344aea63aaf1590b38377085bfff142f263cff2c40c1b8b4109e2f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/timer-factory-stm32/resolved.json",
+          "bytes": 31894,
+          "sha256": "671215033826df25a52ee1f92ab951d85046b419a3f656069bd8a742b09463be"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-factory/bindings.c",
+          "bytes": 29031,
+          "sha256": "66d3c1e34670d3b351993b5d921030497fd64a20d4b267335ec865ee3974ada4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-factory/resolved.json",
+          "bytes": 80518,
+          "sha256": "7c3dcc9956bdffe7cdfee769739238b2d115574d5ad4040638846d989886a0e9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-i2c-long-factory/bindings.c",
+          "bytes": 46471,
+          "sha256": "4f50eb68e545233ec50321fc0c5e6d11bc35872cc60fff6ee01034ff95624c38"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-i2c-long-factory/nexus_factory.h",
+          "bytes": 25015,
+          "sha256": "6105160f1bea8fbdca8aba74b9c99dd005c285b060653756e7d9fe9b6e60346f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-i2c-long-factory/resolved.json",
+          "bytes": 87441,
+          "sha256": "599c1fe09800c2c851fdc683575feaeefb6e01d3ca808319f3651a467699a991"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-mainstream/bindings.c",
+          "bytes": 68430,
+          "sha256": "bc29e41e6688c4b3e7d4c7cf5abc38a5724fc7888711bd47b2d006ebb2857cff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-mainstream/nexus_factory.h",
+          "bytes": 22252,
+          "sha256": "c5c1f28a608b387242e26c1237bc992d55794ac112c024fefa7f24efe527b05c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-mainstream/resolved.json",
+          "bytes": 88208,
+          "sha256": "918427e7d4fc6af39758b4816132be507e731f975648be09907e99d3e7069997"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-peripherals/bindings.c",
+          "bytes": 45473,
+          "sha256": "48e1a50359b947f38d332c36cd996cee4350074a96f74a6b178e02e970bb5465"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-peripherals/nexus_factory.h",
+          "bytes": 23568,
+          "sha256": "35ae7cf0947d04b2af0d00211d8271a8200f73c8ca64c1540e45d3e703fa0f56"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-peripherals/resolved.json",
+          "bytes": 86151,
+          "sha256": "1e203f5a933025fd81ab187016b2498be12849da60ae5a4d2bd2499860277e24"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-fifo-factory/bindings.c",
+          "bytes": 24410,
+          "sha256": "c0b204ff1673289a1c3d7c30d39c099d379db54a06695a098be550f6f5703228"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-fifo-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-fifo-factory/resolved.json",
+          "bytes": 80037,
+          "sha256": "5a3e0f08d514acf3b079b1962ab709904992080c8820a724e5a6dcfcc54e3f3d"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-gpdma-factory/bindings.c",
+          "bytes": 24907,
+          "sha256": "0795785e1d1517704baf5e15eb32c9b9d0e2b3312117295cc1d3ace82e2f3d0f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-gpdma-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-gpdma-factory/resolved.json",
+          "bytes": 80865,
+          "sha256": "5962199f85b69668bed1ab022219445595f3a46840f3b1a9d4acf63f87e77e39"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-rtscts-factory/bindings.c",
+          "bytes": 25077,
+          "sha256": "0532980b91617b098e7339a56f1e3af04f415e0e56dfbec3826f1632f6188645"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-rtscts-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/u575-uart-rtscts-factory/resolved.json",
+          "bytes": 78215,
+          "sha256": "31c93b6d04c2a8bf4b648f9a7171b6ceb670f613f65ca4121205769da1496ec3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/usb-factory-gd32/bindings.c",
+          "bytes": 27717,
+          "sha256": "1142d19917a2792eee397b0f6dfccfb268ef0120fb0c748c597b58aa024e6417"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/usb-factory-gd32/nexus_factory.h",
+          "bytes": 20559,
+          "sha256": "a0f251f24e8e9e7297d181dee9c6fba200cc6966cf941fa54ea46a5017d7db00"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/usb-factory-gd32/resolved.json",
+          "bytes": 36375,
+          "sha256": "c31cad132e568ceb4442e8d11911565957061ea7e28420c27b70e04773ea63a2"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/usb-factory-stm32/bindings.c",
+          "bytes": 27564,
+          "sha256": "f0d6a172d760b887d17b371d934b3c7d03041757b7a6f9e6f374ba6232846f9c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/usb-factory-stm32/nexus_factory.h",
+          "bytes": 20559,
+          "sha256": "a0f251f24e8e9e7297d181dee9c6fba200cc6966cf941fa54ea46a5017d7db00"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-pair/tests/contracts/google/usb-factory-stm32/resolved.json",
+          "bytes": 31334,
+          "sha256": "d0467ecfbd05d6c6948c0f028fc41778420ffe6892cd155126295e0dfa87301c"
+        }
+      ]
+    },
+    {
+      "variant": "empty",
+      "preset": "fixture-io-evolution-native-time-empty",
+      "target": "nexus_rtc_lptim_empty_generated_test",
+      "executable": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/bin/nexus_rtc_lptim_empty_generated_test",
+      "executable_bytes": 649520,
+      "executable_sha256": "4ae49c44c0d22af29d98d58b60b79e119f3156f59e71c8cf4f0b641613843fdf",
+      "xml": "/workspace/nexus-io-recovery-20261018/validation/native-time-presets-r3/empty.xml",
+      "xml_sha256": "ca7d7d3f3ac7e1cc3d8b6981ed78af3b2727210578d91edf130cefd069a16cc4",
+      "cases": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "inputs": [
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/CMakeCache.txt",
+          "bytes": 24552,
+          "sha256": "f62aede3a1c66094dad882f02919c02d15f5f27fad528968c5960afdc5a29d08"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/generated/bindings.c",
+          "bytes": 15080,
+          "sha256": "75a805493f5861d0fcdb480d23fe6f18ba438da49979d9ae924e3b7d4fec2a18"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/generated/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/generated/resolved.json",
+          "bytes": 11546,
+          "sha256": "b0761fbb27b40500df5f81a46c5ac9d20cccc55b3cfc1eb2f5003657ebb1a3d3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/quality/build-provenance.json",
+          "bytes": 10346,
+          "sha256": "9fedf24ae181bf87bdd696a31f864668f63d4235cf401cf07d49ae56da60f8b8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/quality/configure-provenance.json",
+          "bytes": 10333,
+          "sha256": "547a56cd30434ab45017aae48815ad0329292557ec6b872e7833d39133440501"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/can-factory-gd32/bindings.c",
+          "bytes": 34390,
+          "sha256": "b222c0be05e8e1caae207408ed500d9ea879e09bbdbc637200a53a6d9ac9fd93"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/can-factory-gd32/nexus_factory.h",
+          "bytes": 21938,
+          "sha256": "3662ad22b86eed827e5b679fd2dda6bf261f991d33e9b746aecc7bb55312e315"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/can-factory-gd32/resolved.json",
+          "bytes": 38909,
+          "sha256": "56f57b4c142e58f50d569d654fb7bde49316aa4cd770c52ff9b3cfdc8b5362eb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/can-factory-stm32/bindings.c",
+          "bytes": 34320,
+          "sha256": "f15c9ac79d76e7bfd921296ddfed7167b2ad333fb000c58d3612c4ccb127342c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/can-factory-stm32/nexus_factory.h",
+          "bytes": 21938,
+          "sha256": "3662ad22b86eed827e5b679fd2dda6bf261f991d33e9b746aecc7bb55312e315"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/can-factory-stm32/resolved.json",
+          "bytes": 36081,
+          "sha256": "79988696b9b24a4a65e3420ce796fb8c266c59ffbd04f0ba5684b9ec0206b549"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-factory-gd32/bindings.c",
+          "bytes": 39757,
+          "sha256": "6fc26268055cb4a0da50c55b642fa4e83c5bd721e13cb110d5b5998d034fe028"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-factory-gd32/nexus_factory.h",
+          "bytes": 21913,
+          "sha256": "1f072c89e28687830acad6672cceb535b37fcfb6cca427623576d33939eb99a8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-factory-gd32/resolved.json",
+          "bytes": 37078,
+          "sha256": "4629c95e405dafcfbb54419913246dad2198576367edc48b3bcfba2ca51fb2a4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-factory-stm32/bindings.c",
+          "bytes": 39555,
+          "sha256": "35c066808131e3a9aa993d85256f789ca0362fe4bb7cfa58efd509d73ae65981"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-factory-stm32/nexus_factory.h",
+          "bytes": 21913,
+          "sha256": "1f072c89e28687830acad6672cceb535b37fcfb6cca427623576d33939eb99a8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-factory-stm32/resolved.json",
+          "bytes": 32707,
+          "sha256": "477b774847320001f6d52a38c7791023eb6928bf07c6c148d56982d3f2094528"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-frames-factory-gd32/bindings.c",
+          "bytes": 40259,
+          "sha256": "8c28ef6e4920aceacacbeab57fadd8ebd0143a49492339ff9473706cdbbea07e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-frames-factory-gd32/nexus_factory.h",
+          "bytes": 21975,
+          "sha256": "ef7872b007c4dacb44d75330047cc7a0cc264b91db59c4155d610a972ab385fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-frames-factory-gd32/resolved.json",
+          "bytes": 38000,
+          "sha256": "747a6dfedbd9266100bd3046525f550fc4b731d51f7bbc6667c38a062ab3506f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-frames-factory-stm32/bindings.c",
+          "bytes": 40033,
+          "sha256": "4386ceb3ba5526810ce6c18752f3fb6f492e5943741cf96d67f144bfd78ae815"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-frames-factory-stm32/nexus_factory.h",
+          "bytes": 21975,
+          "sha256": "ef7872b007c4dacb44d75330047cc7a0cc264b91db59c4155d610a972ab385fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/eth-frames-factory-stm32/resolved.json",
+          "bytes": 33620,
+          "sha256": "de2fdcbe19b0589e666d4996ceb28c2bc1053317a3bf4e3491163c2a2ea01b7a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/f103-devices-factory/bindings.c",
+          "bytes": 26768,
+          "sha256": "0168e8b11e9e9bc5c1ad84afcc153cab3ac7a313e5b755d37a9ad5694b280de4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/f103-devices-factory/nexus_factory.h",
+          "bytes": 21983,
+          "sha256": "8279a7356f43816a0cb029ef5e1e20913fe2a2046d61265d2780912ab60fe5fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/f103-devices-factory/resolved.json",
+          "bytes": 28180,
+          "sha256": "25cb4f184c5309859f8488a5467a2cd5b54cc0f06114e9fd55de07822d5dd295"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-acquisition-factory/bindings.c",
+          "bytes": 37717,
+          "sha256": "5e465b5c2c02d0845f1c0ce0961a9d06b141f745d0a0812eeb265f67cecfed44"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-acquisition-factory/nexus_factory.h",
+          "bytes": 22761,
+          "sha256": "1353601aa1e2f2bbce3881c29ad68ff940e14443e04b4948b2824ad59f06f55c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-acquisition-factory/resolved.json",
+          "bytes": 73349,
+          "sha256": "3f0ee3c6e89cd637ff4af27805f6af2a8c9418799647733ca05a0a1a7fd38ab0"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-injected-software-factory/bindings.c",
+          "bytes": 27807,
+          "sha256": "0104337a1c3277a3a560471aa4a3da3e7473bf900a4ca8e6691ca5438153fe17"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-injected-software-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-injected-software-factory/resolved.json",
+          "bytes": 71418,
+          "sha256": "39c4f35524b3c2ce84e79b3b56ac7c9d0037cd8ad8a19341b587a204fa69a00b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-injected-timer-factory/bindings.c",
+          "bytes": 28934,
+          "sha256": "cad255570d46b1bc4b737323c40fd2956a6ba63488f34dfb71ffd6fb48c293fb"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-injected-timer-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-injected-timer-factory/resolved.json",
+          "bytes": 72355,
+          "sha256": "4c469cef1009dc8132d0ba5fb7b49ec85f1f2eea1077ed515c12cf67b3b1b009"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-regular-software-factory/bindings.c",
+          "bytes": 30124,
+          "sha256": "c35dc853281d39c84a2d75d54ca8ccf001af0ba2403992f3533b7465899c5ddf"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-regular-software-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-regular-software-factory/resolved.json",
+          "bytes": 73463,
+          "sha256": "642c9095276a544cbb90ad8541012a96829a5108415e8ddd1c10506a3a461c93"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-regular-timer-factory/bindings.c",
+          "bytes": 31251,
+          "sha256": "c9ca6b481f92f04d730b2c4b26eb0da71348b54190e76ed3f99876eb4177518c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-regular-timer-factory/nexus_factory.h",
+          "bytes": 20411,
+          "sha256": "055356cd86ca00047d8785237fbe0961db2ca3e78668c56d68fb347e6843263e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-adc-group-regular-timer-factory/resolved.json",
+          "bytes": 74405,
+          "sha256": "7dedd2eb5edc4d627f46d52f5d3279c39b04aedcedb34489bd9703e15861c119"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-capture-factory/bindings.c",
+          "bytes": 19471,
+          "sha256": "8bf26aa805a1cd466f4aa45f0a1412f38422c35e06474672538c979c055f5c15"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-capture-factory/nexus_factory.h",
+          "bytes": 15397,
+          "sha256": "740ad28d39e90e0ded2ab4f73c3e89516421362f6440a1f4c60a71e963975cf0"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-capture-factory/resolved.json",
+          "bytes": 69514,
+          "sha256": "376e043c5fc39ba3a78f2fe1f89009defcb7358cc7a15a0323cafd0ba474e8e1"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-control-factory/bindings.c",
+          "bytes": 24892,
+          "sha256": "062b6434dc47fe0d86583dfe8c7b2408f63750892af69c6032691d966e21d107"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-control-factory/nexus_factory.h",
+          "bytes": 15390,
+          "sha256": "c944c45fa34beab7bcf9c25ce1b5b46f1b4c8424d63812dee68e1bbb7093293a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-control-factory/resolved.json",
+          "bytes": 72930,
+          "sha256": "b9519efce6ba6c71dcb2c477ec84847afba08ada80c74f296f31badb81250d2b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-encoder-factory/bindings.c",
+          "bytes": 19292,
+          "sha256": "1bfdcf04e4fcb29778636d123440a5358b7276ce7891636f47fcf50b47794735"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-encoder-factory/nexus_factory.h",
+          "bytes": 15392,
+          "sha256": "1488782eebe67d188fdf7d59d8e82e1e211ef22479de4006de5d77de647302bf"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-encoder-factory/resolved.json",
+          "bytes": 69809,
+          "sha256": "eae8d377fee66703ef33face08c65052aa0f5c4be9dea05804601aeb3f20749c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-exti-factory/bindings.c",
+          "bytes": 27084,
+          "sha256": "51164268eea6d3389c218b8f653d497254269a1b96a9ac3a144fdb67eeb44ef1"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-exti-factory/nexus_factory.h",
+          "bytes": 20430,
+          "sha256": "f12f6a18c179989a1db53933885a937b46f41f1869b121b25c16996118199932"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-exti-factory/resolved.json",
+          "bytes": 69575,
+          "sha256": "3999ba024a7963756c44137be0da9d755f21ba0f33e5bc4409c0e254fcb22b6f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-factory/bindings.c",
+          "bytes": 27494,
+          "sha256": "32defcd162b93a3b0434361d21ddd3ab263d2afcedf00064df1e793431739c34"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-factory/resolved.json",
+          "bytes": 71802,
+          "sha256": "f174b3c2f36c458e926706962aafa275939b4ff26d467e7d5f95c1691a74d20a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-fdcan-factory-loopback/bindings.c",
+          "bytes": 26218,
+          "sha256": "7c12f96a588bbd24165239d4efee093937a5c209c1e2de81520e142397d0d728"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-fdcan-factory-loopback/nexus_factory.h",
+          "bytes": 20409,
+          "sha256": "9f65cabbe1d5e8e36ac21fa6e9a21a700641c06c63a3170eaae7791899829367"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-fdcan-factory-loopback/resolved.json",
+          "bytes": 70392,
+          "sha256": "082afd8993350f95620dd5c572495a90efc8b4b02768403442927574840515e3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-fdcan-factory-normal/bindings.c",
+          "bytes": 26207,
+          "sha256": "a5d27ee354b5cc159817fb8ff58a3139392ac7647cf8924e179e708ea09b1b76"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-fdcan-factory-normal/nexus_factory.h",
+          "bytes": 20409,
+          "sha256": "9f65cabbe1d5e8e36ac21fa6e9a21a700641c06c63a3170eaae7791899829367"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-fdcan-factory-normal/resolved.json",
+          "bytes": 70360,
+          "sha256": "7d28c0a0f7d2e01559565ec2961bfd803fc4e3675fd7c173f494ad0d6e55d952"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-i2c-long-factory/bindings.c",
+          "bytes": 36153,
+          "sha256": "01142537ce0d136af4a01caefb0daea5e5628c01d66dcd39f567fa1305bcf57c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-i2c-long-factory/nexus_factory.h",
+          "bytes": 24208,
+          "sha256": "daab8e872c9292cccbd7adb3d59a07793a9f11ae408a708d40b9fc5a1b5a6f2b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-i2c-long-factory/resolved.json",
+          "bytes": 71910,
+          "sha256": "a7d03e507323f16aac56d6009d4a28bd3978fedd6c517077499826a183c02cca"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-mainstream/bindings.c",
+          "bytes": 50820,
+          "sha256": "66b8936303cd26c575b642e75f7333bad95898c1b8d3ae294df52acd5427bf53"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-mainstream/nexus_factory.h",
+          "bytes": 22136,
+          "sha256": "10b9249347c989b24403fc950e9c959e77912dfdc41d62b6a2be5cacac9bf0b8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-mainstream/resolved.json",
+          "bytes": 80839,
+          "sha256": "dff38f294ace1767698238a6d3c2a414f71e8692712416c74cd5d5387e85063e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-peripheral-factory/bindings.c",
+          "bytes": 36935,
+          "sha256": "0eca671ef192a4ce0b47d327bd38226bc8a070586de0de9e455218f6f59598be"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-peripheral-factory/nexus_factory.h",
+          "bytes": 22024,
+          "sha256": "315eead60f06b81f0719cae42baaec8244e2bf93b0c3636014306ff96f38c70b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-peripheral-factory/resolved.json",
+          "bytes": 74650,
+          "sha256": "de9e5e16efc4ac0f7d4533a7365b898c4e72f958ed810dfa8b1d0cae79059cae"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-adc-factory/bindings.c",
+          "bytes": 34848,
+          "sha256": "185c52e571e9df92a7a71b8bad3cff33f58505c4bda6c09d7ff0b4df71f6b979"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-adc-factory/nexus_factory.h",
+          "bytes": 20408,
+          "sha256": "77068dd04020f73bec06a466d4ef888e7108fe215a4ef1f4c146880a1b11b2b7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-adc-factory/resolved.json",
+          "bytes": 79581,
+          "sha256": "1d4aa74e8f5944fe2c6c344945707beee7bf4e40523d1d7825f996cb1a18c5e4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-factory/bindings.c",
+          "bytes": 27628,
+          "sha256": "48423e97f6a688312363d1663ff2370dca683ee77d58d73ab82ffdd9e71d3b16"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-factory/nexus_factory.h",
+          "bytes": 20428,
+          "sha256": "4fd740a0da232bb2f4dd01138c4cb4910df347db21105699cb3e4a23b2d2d886"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-factory/resolved.json",
+          "bytes": 71382,
+          "sha256": "50bbf0f2f2ee7551eaa68e9249d616633f63981c4787518035e290a5d96e6684"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-shared-factory/bindings.c",
+          "bytes": 25795,
+          "sha256": "68c1ce749698b0c1a92a6ace42932596da22bacd9a653e1893b810a52c7e9451"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-shared-factory/nexus_factory.h",
+          "bytes": 20427,
+          "sha256": "f9897ca4ecfc3662f3451c5fefe8d830020e6b8dac651f8c3f85076d8667d034"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/g474-pwm-shared-factory/resolved.json",
+          "bytes": 72468,
+          "sha256": "f00af793e96b8ff178d13c228e78da476d7743d17a32e9ba5a3364b52c28eee7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-devices-factory/bindings.c",
+          "bytes": 27631,
+          "sha256": "2e818d51c157f7d986ec7a2bf4192ddfa662d0ba8bc76125f58ad43d738419f4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-devices-factory/nexus_factory.h",
+          "bytes": 22008,
+          "sha256": "78c87efda72c1815fc2b79a8d1fd4bc763f53671da3e31a4936e0cd88ca1c0bd"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-devices-factory/resolved.json",
+          "bytes": 29181,
+          "sha256": "73e318bd86ca7ef735f5d168a38ec45932a79fd9db1d8a28b659e15bbac3465e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-factory/bindings.c",
+          "bytes": 21635,
+          "sha256": "100194590c387a804869cc1f5c7681b68e922d0da1acf77e27bd52b227ae7eff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-factory/nexus_factory.h",
+          "bytes": 21979,
+          "sha256": "5482cbc3507a6b224eee60edf75a117d774822a78d198378a1f51000053f6193"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-factory/resolved.json",
+          "bytes": 27576,
+          "sha256": "382871e4c6bc575dccf06a4337000c7edc62ed14bbcfb2dfaa371286e1a64f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-spi-factory/bindings.c",
+          "bytes": 22638,
+          "sha256": "5ee629396f9f47c7ed1fc6782e8a14461bbeefaaf5d85e982cb4de23a091c91b"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-spi-factory/nexus_factory.h",
+          "bytes": 21970,
+          "sha256": "c10b00ca262c3686cbef8bbb38e104637ebcb2f799211e24aa5bfbbeb8bdc002"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd303-spi-factory/resolved.json",
+          "bytes": 28023,
+          "sha256": "48ca302c1d73bdfbda092a9d803608da0ce7c6c65c5c02ca1d860aaa5076f96c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd32-flash-factory/bindings.c",
+          "bytes": 17242,
+          "sha256": "c1816edf6e4aabe2b120ae466b76c5244185acf15ca14cf8a04e9849203db762"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd32-flash-factory/nexus_factory.h",
+          "bytes": 20408,
+          "sha256": "effa09375a4654ae68d99659500979d5551f203c5bd06e7917436239dccd3882"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/gd32-flash-factory/resolved.json",
+          "bytes": 32181,
+          "sha256": "e9d4805a741d349e0a0790c18b1df7dfd012a47fcfd8ffbf0a7d9a53f5622dff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-dma-factory/bindings.c",
+          "bytes": 30833,
+          "sha256": "7d688189f1572a18a1031fbb59fee994e23cb0fbe04d4a256e1aebdcf7cf9f09"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-dma-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-dma-factory/resolved.json",
+          "bytes": 20061,
+          "sha256": "badbd1a5cbd1ca08f12e32ef383d8ee402295dbd9de1a040aee0e2e99f50b45d"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-factory/bindings.c",
+          "bytes": 28808,
+          "sha256": "8f2267ad4878c1464edfccd1045f0113966180367fdcd388d5d413dfc7cb5f08"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-factory/resolved.json",
+          "bytes": 19121,
+          "sha256": "8204821c83cf657eb17c4a941e28dd768dd6e7afd3075107d7fcaca142cc276c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-high-factory/bindings.c",
+          "bytes": 54818,
+          "sha256": "14775181a4e7eaf7dccf6cd2eab451fe0abf7075858eefa18ced867b1e922ae8"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-high-factory/nexus_factory.h",
+          "bytes": 24406,
+          "sha256": "96a5c1e7c4ee9be3bc1fb674936756624b606aec4696e66aa59aedad0d2414f5"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-high-factory/resolved.json",
+          "bytes": 30994,
+          "sha256": "e0d9b7d127a7d73be535e45e65d66f79db79305e13d42acf4a22b56b75a77ba9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-i2c-long-factory/bindings.c",
+          "bytes": 51825,
+          "sha256": "155b88552b10b3d7b7ec9645542d55404c9b94b85b5a2afeb2588b53f3fbe6ec"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-i2c-long-factory/nexus_factory.h",
+          "bytes": 25076,
+          "sha256": "bb76926ab228edfd1faf56e14ffa9e2aa72d43e340060e8cf8becfc58248cb60"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-i2c-long-factory/resolved.json",
+          "bytes": 28233,
+          "sha256": "2edd7e231ccd0aaae09765f4fe49bb9d97103a497ea2dd14830ad2386f29372c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-peripheral-factory/bindings.c",
+          "bytes": 50844,
+          "sha256": "908b17051d61b7433ab1ac48a26437962ac0e17d72a871afa2282d48f99b619e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-peripheral-factory/nexus_factory.h",
+          "bytes": 23629,
+          "sha256": "256e505b97fa5ffbe52798da6c57e880037692d6173a04d76ebffab22c44f3e7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-peripheral-factory/resolved.json",
+          "bytes": 26940,
+          "sha256": "6869de5dfa1dc4d57e3c07f93372d4eef0bca4a36ec4a6b3ad92344ea89b8d13"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-receive-factory/bindings.c",
+          "bytes": 30902,
+          "sha256": "f47427af69165cda4c612ed6b284b26e234e57561f72eecae9c77a14497c8563"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-receive-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-receive-factory/resolved.json",
+          "bytes": 20101,
+          "sha256": "364e4d2761967e90bb69831a43152b51325be3331d571aaa7c078dd907fe1230"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-uart-fifo-factory/bindings.c",
+          "bytes": 24127,
+          "sha256": "025ca92750ccaa15794ebfb2718821075314c2b6c6c0cef99544cb0a44340a49"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-uart-fifo-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-uart-fifo-factory/resolved.json",
+          "bytes": 18642,
+          "sha256": "802197b4dd49fcab81284c0ca7ca40bf5ec6599ce95bb9f7b9f6c3b531448d8a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-uart-rtscts-factory/bindings.c",
+          "bytes": 24620,
+          "sha256": "6aa2101cae78d086bb372f78b51db36b9883b0cd3d2accd7dcfca883ced4d2f9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-uart-rtscts-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/h743-uart-rtscts-factory/resolved.json",
+          "bytes": 19842,
+          "sha256": "d594af4118cf286ec651b17d3432d7240d31ffa50c722c89d756414a362c73aa"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-gd32-dma/bindings.c",
+          "bytes": 46565,
+          "sha256": "0f7583e6deaf00fd28451345c8448ed7b3451b70aa75f46d02f8100d0a595aa3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-gd32-dma/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-gd32-dma/resolved.json",
+          "bytes": 40275,
+          "sha256": "423a12faacd81250ab0f8b4374a71253d0ba5eec893ec282ec2a2129c35f9b56"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-gd32-irq/bindings.c",
+          "bytes": 39281,
+          "sha256": "1248dd1757f02f6d7d3c875c0c6c7ef8b62292039e801528884fee89506e5b7a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-gd32-irq/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-gd32-irq/resolved.json",
+          "bytes": 36321,
+          "sha256": "2f262425355df871157eb8581b60aca16f8cf64272fea3f2e81fba032c22929c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-stm32-dma/bindings.c",
+          "bytes": 46122,
+          "sha256": "6cf3a5a349b1381cefd295a9acd6af39c40b6680281a579addb9908e57daac1a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-stm32-dma/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-stm32-dma/resolved.json",
+          "bytes": 36062,
+          "sha256": "4aa1aa1f742c54d91558ca12448757a350ab843c6e16dd335d135b838f34a135"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-stm32-irq/bindings.c",
+          "bytes": 39076,
+          "sha256": "414a62e5a97d64c08ad706435e5c12551bf7ffa3dcdab1fb6d37d8a1c3c8f099"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-stm32-irq/nexus_factory.h",
+          "bytes": 22025,
+          "sha256": "434286aa9c4a69259cbbd04312b0bfe17e4debfe2a0faa2159eec27ff2f8c112"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/i2c-pair-stm32-irq/resolved.json",
+          "bytes": 32116,
+          "sha256": "400a42c34b2fb7977db97a156d3e97cd7f3fb6d77d28fedf1cff4ac59aa4ca94"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/multi-controller-factory-gd32/bindings.c",
+          "bytes": 83500,
+          "sha256": "0358c45c031330ad300e194671fab32295980b6c21b25bd0c6d2cff0516549a6"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/multi-controller-factory-gd32/nexus_factory.h",
+          "bytes": 23692,
+          "sha256": "6210ba04fcb51c3f9be5081d7bc813ebdc94075a06c4fe904ac14df4a3da2232"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/multi-controller-factory-gd32/resolved.json",
+          "bytes": 51066,
+          "sha256": "45bc18ef1ab5dccc492f5f74e641c345195e169c1b61404e5a320528b6c69e37"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/multi-controller-factory-stm32/bindings.c",
+          "bytes": 85368,
+          "sha256": "1fc86d70e0480cd3b4b475a9a70b8694957d3aa6d1f0f05e3178583fdddf5133"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/multi-controller-factory-stm32/nexus_factory.h",
+          "bytes": 23692,
+          "sha256": "6210ba04fcb51c3f9be5081d7bc813ebdc94075a06c4fe904ac14df4a3da2232"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/multi-controller-factory-stm32/resolved.json",
+          "bytes": 46552,
+          "sha256": "23c43abfe52a0db25ea6ab2c4fafca646cbd1f30d89eafa7850d5e68f6163850"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-factory/bindings.c",
+          "bytes": 41018,
+          "sha256": "5e6ecd93b43c5b93ad1e628e22888848c537c509eda0bd4735ac05595c5448e7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-factory/nexus_factory.h",
+          "bytes": 24750,
+          "sha256": "8cdcff1a984f75a0be09ad57ac2cc26ccdfeea18a4534d478b98cc13ff4a49f5"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-factory/resolved.json",
+          "bytes": 24346,
+          "sha256": "5af50ce8be8dda221003b0f0c3a6ec78d67cddc967e31e1c5cd65c20f0eb4e30"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-spi-dma-factory/bindings.c",
+          "bytes": 25560,
+          "sha256": "0c08148e4130cd7264d00fe7844943d284ab3133c5450a994b7d8088cccce052"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-spi-dma-factory/nexus_factory.h",
+          "bytes": 24837,
+          "sha256": "bd03ca91333dbef135f743e1c4a852b2eedd1c1d4e236986422897d443363e01"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-spi-dma-factory/resolved.json",
+          "bytes": 13726,
+          "sha256": "4a040edcc75979f318d7f46afe6a78808022be0347368d55f0ebe627b41ccee1"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-time-empty/bindings.c",
+          "bytes": 15080,
+          "sha256": "75a805493f5861d0fcdb480d23fe6f18ba438da49979d9ae924e3b7d4fec2a18"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-time-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-time-empty/resolved.json",
+          "bytes": 11546,
+          "sha256": "b0761fbb27b40500df5f81a46c5ac9d20cccc55b3cfc1eb2f5003657ebb1a3d3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-time-pair/bindings.c",
+          "bytes": 20741,
+          "sha256": "2140489a7fa26ac9d044aaa7b1323da22863af4f929b21facafe2c99d76ea73a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-time-pair/nexus_factory.h",
+          "bytes": 20500,
+          "sha256": "a2863f56ac5293775859cd1b23f605673bbfb5c4baf21f18feb3867898a44b95"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/native-time-pair/resolved.json",
+          "bytes": 13956,
+          "sha256": "514bfab060a0a797869e9026cd5a3f0fceae9a0fed301d562d2a596d82875131"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/nexus_workload_gd303_test-generated/bindings.c",
+          "bytes": 21635,
+          "sha256": "100194590c387a804869cc1f5c7681b68e922d0da1acf77e27bd52b227ae7eff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/nexus_workload_gd303_test-generated/nexus_factory.h",
+          "bytes": 21979,
+          "sha256": "5482cbc3507a6b224eee60edf75a117d774822a78d198378a1f51000053f6193"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/nexus_workload_gd303_test-generated/resolved.json",
+          "bytes": 27576,
+          "sha256": "382871e4c6bc575dccf06a4337000c7edc62ed14bbcfb2dfaa371286e1a64f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/nexus_workload_uart3_test-generated/bindings.c",
+          "bytes": 28763,
+          "sha256": "8387facf814318c225ff829af9778a9dd4222b369a849b18ae0c6fab4508fbd2"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/nexus_workload_uart3_test-generated/nexus_factory.h",
+          "bytes": 21976,
+          "sha256": "4a9d2d384ffcd932298818acdb3e1606c1ef25ce62f3da20f40172c74c7dfe45"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/nexus_workload_uart3_test-generated/resolved.json",
+          "bytes": 19127,
+          "sha256": "c82e985f8f9bb67af12f50bd7932a11f3bc6b1c86aab2cef9fcbda15ba9b833c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-gd32-empty/bindings.c",
+          "bytes": 15793,
+          "sha256": "b921d6d3bfcd142eb15bb7e2d84de8f4b727906707fdf9b2c34bcf01083b42e9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-gd32-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-gd32-empty/resolved.json",
+          "bytes": 30578,
+          "sha256": "a3fd3edc0d528ed9abd92b2af9fbb257fc8eb21da1697684f1d793bcf9468f03"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-gd32-gpio/bindings.c",
+          "bytes": 20263,
+          "sha256": "0ebd83c007ea1ac6f484a9d3f0239151a973c3fa08b3981bd8ae5183a8c294c7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-gd32-gpio/nexus_factory.h",
+          "bytes": 20405,
+          "sha256": "ec4eb09aed9feabced05293cffa4fd248c5d53d550dc841731cbbbae41179523"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-gd32-gpio/resolved.json",
+          "bytes": 31218,
+          "sha256": "50cc1b8e5fb02d6f973c0643732462f67b8b7b9d15680c814aa486d046cd73a9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-stm32-empty/bindings.c",
+          "bytes": 16020,
+          "sha256": "173b6465c2063ab044fc6306712515b8e2176b3852560fcb029689792efc92a5"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-stm32-empty/nexus_factory.h",
+          "bytes": 20378,
+          "sha256": "9f04d28c69456fc23f641af3a5034d43b838df0dbdbd8cca3705c91c3a306f9a"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-stm32-empty/resolved.json",
+          "bytes": 26204,
+          "sha256": "11e7f094b2d5fd5603ec04ed985822ffb0f15a907995febc687ab721772aa961"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-stm32-gpio/bindings.c",
+          "bytes": 21825,
+          "sha256": "597ae687cad89d658ea319798e031c0a4a00d9c7a0d51f41dccfa79d10a233bc"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-stm32-gpio/nexus_factory.h",
+          "bytes": 20405,
+          "sha256": "ec4eb09aed9feabced05293cffa4fd248c5d53d550dc841731cbbbae41179523"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/physical-platform-stm32-gpio/resolved.json",
+          "bytes": 26848,
+          "sha256": "cf953cb6dee05f31235d7bf18a5831a51ab20b1f2756d9149d9d1eb9a45a8582"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/single-spi-factory-gd32/bindings.c",
+          "bytes": 23288,
+          "sha256": "dd810c366fd6c6865184effaf3aa264c65fc7f306d8ab15f6851b647c4e9f522"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/single-spi-factory-gd32/nexus_factory.h",
+          "bytes": 15418,
+          "sha256": "2187c4ff358024b523692eebc5e9b0efce9d3d5d29a051943aadf37771aa25c3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/single-spi-factory-gd32/resolved.json",
+          "bytes": 35321,
+          "sha256": "903ec6ba819cd34c4fa0b843e2b4aec0b00dd4ffa6d205074e04bfe4841f46ef"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/single-spi-factory-stm32/bindings.c",
+          "bytes": 24784,
+          "sha256": "3a578188a1f0502d0fb4f343ff03c523e66fe317a5981a85f9d415dfa54206f7"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/single-spi-factory-stm32/nexus_factory.h",
+          "bytes": 15418,
+          "sha256": "0a13d558b87f33c1e21ef3502a67116c3ae621aea2bd2dddeadadc68b2e3491c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/single-spi-factory-stm32/resolved.json",
+          "bytes": 30542,
+          "sha256": "fec235d4572c10040f0545cc314e8c0241cd168273b1240e6d3305b7da5f1755"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/stm32-flash-factory/bindings.c",
+          "bytes": 17887,
+          "sha256": "054dc286a3fa66ea6ba85aa294128673e4f6fad93aa15b849245bd74b296f441"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/stm32-flash-factory/nexus_factory.h",
+          "bytes": 20408,
+          "sha256": "effa09375a4654ae68d99659500979d5551f203c5bd06e7917436239dccd3882"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/stm32-flash-factory/resolved.json",
+          "bytes": 28797,
+          "sha256": "e1b014a7e3b5bcce20235821a23b78757d166771c399aa1c3de7209fe43a88cc"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/timer-factory-gd32/bindings.c",
+          "bytes": 36200,
+          "sha256": "db6179204075c9992ae786a983ef9c34c6d6cecd11f973a5be0fe4f701a0f82e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/timer-factory-gd32/nexus_factory.h",
+          "bytes": 20449,
+          "sha256": "9f41f6fb91344aea63aaf1590b38377085bfff142f263cff2c40c1b8b4109e2f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/timer-factory-gd32/resolved.json",
+          "bytes": 36299,
+          "sha256": "b858146fd0fbac1714c1c4ee141bd19bbbaaa76f711faa375423a0362c8717b6"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/timer-factory-stm32/bindings.c",
+          "bytes": 35768,
+          "sha256": "3e5abedb8eb02c7d3b416e79fcf2da6e9c36704faf0fba9fe9c2473f1a29157e"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/timer-factory-stm32/nexus_factory.h",
+          "bytes": 20449,
+          "sha256": "9f41f6fb91344aea63aaf1590b38377085bfff142f263cff2c40c1b8b4109e2f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/timer-factory-stm32/resolved.json",
+          "bytes": 31894,
+          "sha256": "671215033826df25a52ee1f92ab951d85046b419a3f656069bd8a742b09463be"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-factory/bindings.c",
+          "bytes": 29031,
+          "sha256": "66d3c1e34670d3b351993b5d921030497fd64a20d4b267335ec865ee3974ada4"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-factory/nexus_factory.h",
+          "bytes": 21977,
+          "sha256": "0a0b41b170420d941d7501d7a0f608fa5ab3f84a9901a8e0f0cc54d4b2243d71"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-factory/resolved.json",
+          "bytes": 80518,
+          "sha256": "7c3dcc9956bdffe7cdfee769739238b2d115574d5ad4040638846d989886a0e9"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-i2c-long-factory/bindings.c",
+          "bytes": 46471,
+          "sha256": "4f50eb68e545233ec50321fc0c5e6d11bc35872cc60fff6ee01034ff95624c38"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-i2c-long-factory/nexus_factory.h",
+          "bytes": 25015,
+          "sha256": "6105160f1bea8fbdca8aba74b9c99dd005c285b060653756e7d9fe9b6e60346f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-i2c-long-factory/resolved.json",
+          "bytes": 87441,
+          "sha256": "599c1fe09800c2c851fdc683575feaeefb6e01d3ca808319f3651a467699a991"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-mainstream/bindings.c",
+          "bytes": 68430,
+          "sha256": "bc29e41e6688c4b3e7d4c7cf5abc38a5724fc7888711bd47b2d006ebb2857cff"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-mainstream/nexus_factory.h",
+          "bytes": 22252,
+          "sha256": "c5c1f28a608b387242e26c1237bc992d55794ac112c024fefa7f24efe527b05c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-mainstream/resolved.json",
+          "bytes": 88208,
+          "sha256": "918427e7d4fc6af39758b4816132be507e731f975648be09907e99d3e7069997"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-peripherals/bindings.c",
+          "bytes": 45473,
+          "sha256": "48e1a50359b947f38d332c36cd996cee4350074a96f74a6b178e02e970bb5465"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-peripherals/nexus_factory.h",
+          "bytes": 23568,
+          "sha256": "35ae7cf0947d04b2af0d00211d8271a8200f73c8ca64c1540e45d3e703fa0f56"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-peripherals/resolved.json",
+          "bytes": 86151,
+          "sha256": "1e203f5a933025fd81ab187016b2498be12849da60ae5a4d2bd2499860277e24"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-fifo-factory/bindings.c",
+          "bytes": 24410,
+          "sha256": "c0b204ff1673289a1c3d7c30d39c099d379db54a06695a098be550f6f5703228"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-fifo-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-fifo-factory/resolved.json",
+          "bytes": 80037,
+          "sha256": "5a3e0f08d514acf3b079b1962ab709904992080c8820a724e5a6dcfcc54e3f3d"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-gpdma-factory/bindings.c",
+          "bytes": 24907,
+          "sha256": "0795785e1d1517704baf5e15eb32c9b9d0e2b3312117295cc1d3ace82e2f3d0f"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-gpdma-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-gpdma-factory/resolved.json",
+          "bytes": 80865,
+          "sha256": "5962199f85b69668bed1ab022219445595f3a46840f3b1a9d4acf63f87e77e39"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-rtscts-factory/bindings.c",
+          "bytes": 25077,
+          "sha256": "0532980b91617b098e7339a56f1e3af04f415e0e56dfbec3826f1632f6188645"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-rtscts-factory/nexus_factory.h",
+          "bytes": 21953,
+          "sha256": "60bfb01efb9ad33e55adb80335092ab3159df52850f8682b729f8e082ddc4be3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/u575-uart-rtscts-factory/resolved.json",
+          "bytes": 78215,
+          "sha256": "31c93b6d04c2a8bf4b648f9a7171b6ceb670f613f65ca4121205769da1496ec3"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/usb-factory-gd32/bindings.c",
+          "bytes": 27717,
+          "sha256": "1142d19917a2792eee397b0f6dfccfb268ef0120fb0c748c597b58aa024e6417"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/usb-factory-gd32/nexus_factory.h",
+          "bytes": 20559,
+          "sha256": "a0f251f24e8e9e7297d181dee9c6fba200cc6966cf941fa54ea46a5017d7db00"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/usb-factory-gd32/resolved.json",
+          "bytes": 36375,
+          "sha256": "c31cad132e568ceb4442e8d11911565957061ea7e28420c27b70e04773ea63a2"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/usb-factory-stm32/bindings.c",
+          "bytes": 27564,
+          "sha256": "f0d6a172d760b887d17b371d934b3c7d03041757b7a6f9e6f374ba6232846f9c"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/usb-factory-stm32/nexus_factory.h",
+          "bytes": 20559,
+          "sha256": "a0f251f24e8e9e7297d181dee9c6fba200cc6966cf941fa54ea46a5017d7db00"
+        },
+        {
+          "path": "/tmp/nexus-io-validation-20261018/build/fixture-io-evolution-native-time-empty/tests/contracts/google/usb-factory-stm32/resolved.json",
+          "bytes": 31334,
+          "sha256": "d0467ecfbd05d6c6948c0f028fc41778420ffe6892cd155126295e0dfa87301c"
+        }
+      ]
+    }
+  ],
+  "source": {
+    "root": "/tmp/nexus-io-validation-20261018",
+    "commit": "7e2dbe92a5328d23f00b2d07c49f45a763ae8bbb",
+    "tree": "54cff88b7c13b0c383e415ade70fa2cee72d2e77",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.2.202603_rel)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (c8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (8f922cd)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (624374f)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (fee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (f5929f4)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (a1996ee)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (2552682)"
+    ],
+    "working_tree_sha256": "5888994d515a549e1af50c9fe013b67a9358b9adc7579377ed3162847a0f8d66"
+  }
+}

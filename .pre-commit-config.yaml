@@ -24,14 +24,23 @@ repos:
         pass_filenames: false
         always_run: true
         require_serial: true
+      - id: nexus-workflow-lint
+        name: Nexus offline staged GitHub Actions DSL lint
+        entry: python scripts/ci/lint_workflows.py --staged
+        language: python
+        additional_dependencies: &workflow_python
+          - pre-commit==4.3.0
+          - clang-format==14.0.6
+          - PyYAML==6.0.3
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+        require_serial: true
       - id: nexus-tdd-gate
         name: Nexus GoogleTest and GoogleMock contract execution
         entry: python scripts/ci/tdd_gate.py --staged
         language: python
-        additional_dependencies:
-          - pre-commit==4.3.0
-          - clang-format==14.0.6
-          - PyYAML==6.0.3
+        additional_dependencies: *workflow_python
         stages: [pre-commit]
         pass_filenames: false
         always_run: true

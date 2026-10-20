@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_empty_generated_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-empty-runtime-r1/result.xml"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "actual_exit": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-empty-runtime-r1/command.attempts/1792289453939486095-2c7289390897441fb51000fd7ee61791/receipt.json",
+  "source_unchanged": true,
+  "qualification": "This actual command only; no historical scope inherited."
+}

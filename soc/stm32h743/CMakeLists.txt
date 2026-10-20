@@ -35,20 +35,64 @@ if(h7_gpio_modes OR h7_uart_modes OR h7_spi_modes OR h7_pwm_modes OR h7_exti_mod
 endif()
 if(h7_uart_modes)
     list(APPEND h7_sources drivers/uart.c)
+    if("irq-fifo-bytes" IN_LIST h7_uart_modes)
+        list(APPEND h7_sources drivers/uart_fifo.c)
+    endif()
+    if("irq-fifo-rtscts-bytes" IN_LIST h7_uart_modes)
+        list(APPEND h7_sources drivers/uart_rtscts.c)
+    endif()
     if("dma-tx" IN_LIST h7_uart_modes)
         list(APPEND h7_sources drivers/uart_dma.c)
     endif()
     if("rx-dma-idle" IN_LIST h7_uart_modes)
         list(APPEND h7_sources drivers/uart_receive.c)
     endif()
+    if("rx-dma-continuous" IN_LIST h7_uart_modes)
+        list(APPEND h7_sources drivers/uart_continuous.c)
+    endif()
 endif()
-foreach(kind spi pwm exti watchdog adc flash i2c)
+foreach(kind pwm exti watchdog adc flash i2c)
     if(h7_${kind}_modes)
         list(APPEND h7_sources drivers/${kind}.c)
     endif()
 endforeach()
+if(h7_spi_modes)
+    list(APPEND h7_sources drivers/spi_wire.c)
+    if("short-poll" IN_LIST h7_spi_modes)
+        list(APPEND h7_sources drivers/spi.c)
+    endif()
+    if("dma" IN_LIST h7_spi_modes)
+        list(APPEND h7_sources drivers/spi_dma.c)
+    endif()
+endif()
 if(h7_i2c_modes)
     list(APPEND h7_sources "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c")
+endif()
+if(h7_flash_modes)
+    set(h7_flash_ram_sources
+        drivers/flash_ram.c drivers/flash_ram_owner.c
+        drivers/flash_ram_transaction.c drivers/flash_mpu.c)
+    list(APPEND h7_sources drivers/flash_execution.c drivers/flash_ram_enter.S
+        ${h7_flash_ram_sources})
+    # Busy-bank execution cannot gain implicit FP, stack-protector, libc or
+    # LTO-generated calls. Actual linked instruction closure is checked too.
+    set_source_files_properties(${h7_flash_ram_sources} PROPERTIES
+        COMPILE_OPTIONS "-mgeneral-regs-only;-fno-lto;-fno-builtin;-fno-stack-protector;-fno-jump-tables;-fno-tree-loop-distribute-patterns;-fno-unwind-tables;-fno-asynchronous-unwind-tables;-fstack-usage")
+    set(h7_flash_su_files)
+    foreach(source IN LISTS h7_flash_ram_sources)
+        set(stack_file "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/nexus_soc_stm32h743.dir/${source}.su")
+        set_property(SOURCE "${source}" APPEND PROPERTY OBJECT_OUTPUTS "${stack_file}")
+        list(APPEND h7_flash_su_files "${stack_file}")
+    endforeach()
+    set(h7_stack_witness "${CMAKE_CURRENT_BINARY_DIR}/flash-stack-outputs.stamp")
+    add_custom_target(nexus_h743_flash_stack_outputs
+        COMMAND "${CMAKE_COMMAND}" "-DNEXUS_STACK_WITNESS=${h7_stack_witness}"
+            "-DNEXUS_STACK_FILES=${h7_flash_su_files}"
+            -P "${NEXUS_SOURCE_DIR}/cmake/platform/H743StackUsage.cmake"
+        BYPRODUCTS "${h7_stack_witness}"
+        VERBATIM)
+    set_property(SOURCE ${h7_flash_ram_sources} APPEND PROPERTY
+        OBJECT_DEPENDS "${h7_stack_witness}")
 endif()
 if(h7_sources)
     add_library(nexus_soc_stm32h743 STATIC ${h7_sources})
@@ -56,11 +100,18 @@ if(h7_sources)
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32h743 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/soc/common"
+        "${NEXUS_SOURCE_DIR}/io/private")
     target_include_directories(nexus_soc_stm32h743 SYSTEM PRIVATE
         "${h7_device}/Include" "${h7_cmsis}")
     target_compile_definitions(nexus_soc_stm32h743 PRIVATE STM32H743xx)
-    if(h7_spi_modes OR h7_adc_modes)
+    if(h7_flash_modes)
+        add_dependencies(nexus_soc_stm32h743 nexus_h743_flash_stack_outputs)
+        set_property(TARGET nexus_soc_stm32h743 PROPERTY
+            NEXUS_H743_FLASH_SU_FILES "${h7_flash_su_files}")
+    endif()
+    if(h7_spi_modes OR h7_adc_modes OR "irq-fifo-bytes" IN_LIST h7_uart_modes OR
+            "irq-fifo-rtscts-bytes" IN_LIST h7_uart_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
         nexus_stm32_official(nexus_soc_stm32h743 h7)
     endif()
@@ -70,13 +121,17 @@ else()
 endif()
 set(NEXUS_STARTUP_SOURCE
     "${h7_device}/Source/Templates/gcc/startup_stm32h743xx.s" PARENT_SCOPE)
-set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S" PARENT_SCOPE)
+set(h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S")
 if(NEXUS_MEMORY_SRAM1)
-    set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/power_boot.S"
-        "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c" PARENT_SCOPE)
+    list(APPEND h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/memory_init.c")
 endif()
+file(READ "${NEXUS_CONFIG_DIR}/resolved.json" h7_resolved)
+string(JSON h7_clock_profile GET "${h7_resolved}" clock_profile)
+if(h7_clock_profile STREQUAL "hsi64-pll384-cache-off")
+    list(APPEND h7_system_sources "${CMAKE_CURRENT_SOURCE_DIR}/clock.c")
+endif()
+set(NEXUS_SYSTEM_SOURCE ${h7_system_sources} PARENT_SCOPE)
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES
     "${CMAKE_CURRENT_SOURCE_DIR}/private" PARENT_SCOPE)
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${h7_device}/Include" "${h7_cmsis}"

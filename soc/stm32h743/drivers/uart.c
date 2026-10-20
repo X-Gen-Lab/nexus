@@ -7,6 +7,9 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "stm32h743_provider.h"
+#if NEXUS_CORE_HZ == 384000000U
+#include "stm32h743_clock.h"
+#endif
 #include <limits.h>
 #ifndef NX_H743_IRQ_AVAILABLE
 #define NX_H743_IRQ_AVAILABLE(irq)                                             \
@@ -80,15 +83,10 @@ static void observe_tc(nx_stm32h743_uart_state_t* p, nx_time_us_t now) {
                       NX_H743_READ(&p->registers->CR1) & ~TX_SOURCES);
     }
 }
-static void service(void* context) {
-    nx_stm32h743_uart_state_t* p = context;
-    if (!task_context() || p == NULL)
-        return;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
+bool nx_stm32h743_uart_tx_prepare_settle_locked(nx_stm32h743_uart_state_t* p) {
     nx_uart_tx_request_t* request = p->active;
     if (request == NULL) {
-        nx_arch_irq_restore(guard);
-        return;
+        return false;
     }
     nx_time_us_t now = nx_time_now_us();
     observe_tc(p, now);
@@ -101,24 +99,35 @@ static void service(void* context) {
                            NX_H743_READ(&p->registers->CR1) & ~TX_SOURCES,
                            TX_SOURCES)) {
             (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
-            nx_arch_irq_restore(guard);
-            return;
+            return false;
         }
-        nx_result_t terminal = p->terminal;
-        size_t transferred = p->tx_position;
-        p->active = NULL;
-        nx_request_settle(&request->base, terminal, transferred);
+        return true;
     } else if (p->terminal != NX_SUCCESS &&
                nx_deadline_expired(p->drain_deadline, now)) {
         (void)nx_request_transition(&request->base, NX_REQUEST_QUARANTINED);
     }
+    return false;
+}
+void nx_stm32h743_uart_tx_settle_locked(nx_stm32h743_uart_state_t* p) {
+    nx_uart_tx_request_t* request = p->active;
+    if (request == NULL)
+        return;
+    nx_result_t terminal = p->terminal;
+    size_t transferred = p->tx_position;
+    p->active = NULL;
+    nx_request_settle(&request->base, terminal, transferred);
+}
+static void service(void* context) {
+    nx_stm32h743_uart_state_t* p = context;
+    if (!task_context() || p == NULL)
+        return;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (nx_stm32h743_uart_tx_prepare_settle_locked(p))
+        nx_stm32h743_uart_tx_settle_locked(p);
     nx_arch_irq_restore(guard);
 }
-static nx_result_t start(void* context, nx_uart_tx_request_t* request,
-                         bool admitted) {
-    nx_stm32h743_uart_state_t* p = context;
-    if (!task_context())
-        return NX_ERROR_CONTEXT;
+nx_result_t nx_stm32h743_uart_tx_validate(nx_stm32h743_uart_state_t* p,
+                                          nx_uart_tx_request_t* request) {
     if (p == NULL || request == NULL || !span(request, sizeof(*request)) ||
         !span(request->data, request->length))
         return NX_ERROR_INVALID;
@@ -126,17 +135,18 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         protected_span(p, request->data, request->length) ||
         overlap(request, sizeof(*request), request->data, request->length))
         return NX_ERROR_INVALID;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    return NX_SUCCESS;
+}
+nx_result_t nx_stm32h743_uart_tx_start_locked(nx_stm32h743_uart_state_t* p,
+                                              nx_uart_tx_request_t* request,
+                                              bool admitted) {
     if (!p->initialized || p->closing) {
-        nx_arch_irq_restore(guard);
         return NX_ERROR_STATE;
     }
     if (p->active != NULL) {
-        nx_arch_irq_restore(guard);
         return NX_ERROR_BUSY;
     }
     if (nx_deadline_expired(request->base.deadline, nx_time_now_us())) {
-        nx_arch_irq_restore(guard);
         return NX_ERROR_TIMEOUT;
     }
     nx_result_t result =
@@ -155,6 +165,18 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         if ((NX_H743_READ(&p->registers->CR1) & USART_CR1_TXEIE_TXFNFIE) == 0U)
             begin_drain(p, NX_ERROR_IO, nx_time_now_us());
     }
+    return result;
+}
+static nx_result_t start(void* context, nx_uart_tx_request_t* request,
+                         bool admitted) {
+    nx_stm32h743_uart_state_t* p = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    nx_result_t result = nx_stm32h743_uart_tx_validate(p, request);
+    if (result != NX_SUCCESS)
+        return result;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    result = nx_stm32h743_uart_tx_start_locked(p, request, admitted);
     nx_arch_irq_restore(guard);
     return result;
 }
@@ -167,19 +189,13 @@ static nx_result_t start_admitted(void* p, nx_uart_tx_request_t* request) {
         return NX_ERROR_STATE;
     return start(p, request, true);
 }
-static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
-    nx_stm32h743_uart_state_t* p = context;
-    if (!task_context())
-        return NX_ERROR_CONTEXT;
-    if (p == NULL || request == NULL)
-        return NX_ERROR_INVALID;
-    nx_arch_irq_state_t guard = nx_arch_irq_save();
+nx_result_t nx_stm32h743_uart_tx_cancel_locked(nx_stm32h743_uart_state_t* p,
+                                               nx_uart_tx_request_t* request) {
     if (p->active != request) {
         nx_result_t result =
             nx_request_state(&request->base) == NX_REQUEST_SETTLED
                 ? NX_SUCCESS
                 : NX_ERROR_STATE;
-        nx_arch_irq_restore(guard);
         return result;
     }
     nx_time_us_t now = nx_time_now_us();
@@ -187,8 +203,18 @@ static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
     if (!p->tx_complete) {
         begin_drain(p, NX_ERROR_CANCELLED, now);
     }
-    nx_arch_irq_restore(guard);
     return NX_SUCCESS;
+}
+static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
+    nx_stm32h743_uart_state_t* p = context;
+    if (!task_context())
+        return NX_ERROR_CONTEXT;
+    if (p == NULL || request == NULL)
+        return NX_ERROR_INVALID;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    nx_result_t result = nx_stm32h743_uart_tx_cancel_locked(p, request);
+    nx_arch_irq_restore(guard);
+    return result;
 }
 void nx_stm32h743_uart_transmit_irq(nx_stm32h743_uart_state_t* p,
                                     uint32_t status) {
@@ -387,7 +413,11 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
          (p->rx_storage != NULL || p->rx_capacity != 0U)))
         return NX_ERROR_INVALID;
     if ((p->profile != NX_UART_RX_BYTES && p->profile != NX_UART_RX_BLOCKS) ||
+#if NEXUS_CORE_HZ == 384000000U
+        clock != 64000000U)
+#else
         (clock != 64000000U && clock != 32000000U))
+#endif
         return NX_ERROR_UNSUPPORTED;
     if (p->irq != USART3_IRQn)
         return NX_ERROR_UNSUPPORTED;
@@ -397,11 +427,20 @@ nx_result_t nx_stm32h743_uart_initialize(nx_stm32h743_uart_state_t* p,
         !NX_H743_IRQ_AVAILABLE(p->irq))
         return NX_ERROR_BUSY;
     if (!g_nx_stm32h743_system.started ||
+#if NEXUS_CORE_HZ == 384000000U
+        !nx_stm32h743_pll384_clocks_ready() ||
+#else
         g_nx_stm32h743_system.core_hz != clock ||
+#endif
         (NX_H743_READ(&g_nx_stm32h743_system.rcc->APB1LENR) &
          RCC_APB1LENR_USART3EN) == 0U ||
         (NX_H743_READ(&g_nx_stm32h743_system.rcc->D2CCIP2R) &
-         RCC_D2CCIP2R_USART28SEL) != 0U)
+         RCC_D2CCIP2R_USART28SEL) !=
+#if NEXUS_CORE_HZ == 384000000U
+            (3U << RCC_D2CCIP2R_USART28SEL_Pos))
+#else
+            0U)
+#endif
         return NX_ERROR_STATE;
     if (overlap(p->rx_storage, p->rx_capacity, p, sizeof(*p)) ||
         overlap(p->rx_storage, p->rx_capacity, p->registers,

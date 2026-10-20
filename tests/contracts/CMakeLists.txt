@@ -1,26 +1,6 @@
-# Explicit behavior suites, never inferred from a recursive file scan.
-add_test(NAME contract_configuration_rejection
-    COMMAND "${Python3_EXECUTABLE}" -B -m unittest discover
-        -s "${NEXUS_SOURCE_DIR}/tools/configure" -p "test_*.py")
-set_tests_properties(contract_configuration_rejection PROPERTIES
-    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}")
-add_test(NAME contract_build_system
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tests/contracts/test_build_system.py")
-set_tests_properties(contract_build_system PROPERTIES
-    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" TIMEOUT 300)
-add_test(NAME contract_m7_integer_overlay
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/os/freertos/test_m7_integer_overlay.py")
-set_tests_properties(contract_m7_integer_overlay PROPERTIES
-    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}")
-add_test(NAME contract_runtime_sdk
-    COMMAND "${Python3_EXECUTABLE}" -B
-        "${NEXUS_SOURCE_DIR}/tests/contracts/test_runtime_sdk.py")
-set_tests_properties(contract_runtime_sdk PROPERTIES
-    # This suite builds multiple relocated C/C++ SDK consumers. Its aggregate
-    # budget is separate from each child's retained 180-second process timeout.
-    WORKING_DIRECTORY "${NEXUS_SOURCE_DIR}" TIMEOUT 900)
+# CTest owns every Native runtime contract in each compiler/sanitizer mode.
+# Configuration, SDK and FreeRTOS overlay tests run through the complete
+# configure/contracts/freertos tool domains; they do not inherit this mode.
 
 function(nexus_behavior_test name)
     cmake_parse_arguments(ARG "" "" "SOURCES;LIBRARIES;INCLUDES;DEFINITIONS" ${ARGN})

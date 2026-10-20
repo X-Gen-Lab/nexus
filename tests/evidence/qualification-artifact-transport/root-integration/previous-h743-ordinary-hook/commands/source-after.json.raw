@@ -1,0 +1,5 @@
+{
+  "soc/stm32h743/drivers/flash_ram_owner.c": "12247423eb8391750a50c13d28922f46a661f0b103de98a0a5fce9c595eb833e",
+  "soc/stm32h743/private/stm32h743_flash_ram.h": "dbde77b867d72ea806da3ec749542af7d4b62c9d98584a8cd0818ecd30bce290",
+  "tests/google/h743_flash_ram_generated_test.cpp": "1d93d9dc40e4de29520847581ab30617665f83440214f5520193d66b7fc893fa"
+}

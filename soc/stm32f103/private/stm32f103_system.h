@@ -69,7 +69,11 @@ uint64_t nx_stm32f103_system_now(nx_stm32f103_system_t* system);
 /** \brief Acknowledge one owned W0C overflow or enter terminal fault handling.
  */
 void nx_stm32f103_system_timer_irq(nx_stm32f103_system_t* system);
-/** \brief Check medium-density DEV_ID0x410 and128KiB; not package identity. */
+/**
+ * \brief Check the CPU-readable factory Flash size for the declared target.
+ * \note ES096 2.2.2 prevents normal software IDCODE/REV_ID observation.
+ *       A matching 128KiB density does not identify device group or package.
+ */
 nx_result_t nx_stm32f103_validate_identity(void);
 /** \brief Pre-RAM CPU-only VTOR/priority grouping; never starts a scheduler. */
 void SystemInit(void);

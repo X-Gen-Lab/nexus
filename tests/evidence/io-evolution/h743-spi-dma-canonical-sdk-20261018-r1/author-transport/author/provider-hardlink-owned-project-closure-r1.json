@@ -1,0 +1,85 @@
+{
+  "status": "actual_complete_module_red_to_green",
+  "module_tests": 53,
+  "red_failing_methods": 4,
+  "red_subtest_inclusive_failures": 9,
+  "red_errors": 0,
+  "green_failures_errors_skipped": 0,
+  "actual_red_returncode": 1,
+  "actual_green_returncode": 0,
+  "same_tests_and_discovery": true,
+  "original_35_method_AST_unchanged": true,
+  "old_49_preservation": "Only four new methods appended to previous49; authoritative red/green tests bytes identical.",
+  "minimum_production_fix": "Local owned_file hardlink check for authored selections/project CMake entry; complete owned-project inventory for all regular-file suffixes, rejecting symlink subtrees; no new build/source selection graph.",
+  "sources": [
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "bytes": 21604,
+      "sha256": "99b0122ff51b2d9f6c271d4ee975b264588a43340f0e776282de505ac2923910"
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "bytes": 24360,
+      "sha256": "10c619d5b47b7cd418d8c07a751e467703dff981fae8d32e5fa52facc0e03024"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.json",
+      "sha256": "aa3f618ef447c108b8bfcb599d7a23445f5a2ba726ebed39bf0948a59ca2e1d6"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.result.json",
+      "sha256": "6d7af9773c11ac7d97bf38c08745b70647c35683b860540c23c5f4bb7d56f9f5"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.before-source.json",
+      "sha256": "87a0041239c1bfe39695b746891e7026f50f8831b1286caf2a50ec7d8798e08d"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.before-source.zip",
+      "sha256": "d0f203aa82638e2c27b87a48da3382913ecf95ed1e92e5607abf99dc1da62c69"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.after-source.json",
+      "sha256": "87a0041239c1bfe39695b746891e7026f50f8831b1286caf2a50ec7d8798e08d"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.after-source.zip",
+      "sha256": "61dd0a989cafd58dcd4a233576fb3c3b93a8c20da17488e8fac8c68225aa11b4"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-red.raw",
+      "sha256": "90571c64ab046e825950bb42beb729b0240ed17dd66fdc77657152bdc2c90fa8"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.json",
+      "sha256": "36a7b29784281362cfb23d0d2dcb6597ece7eb5e5c93542e009b167d95a404fb"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.result.json",
+      "sha256": "6e28dfa764a1bc355f56d41572dd442fc2af6b26b11e8cd829b0f4efc6b09c51"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.before-source.json",
+      "sha256": "249d90e8862295aeb6589e998778fc9e58d0cf05f6f657767ecfdd47a0804976"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.before-source.zip",
+      "sha256": "4e8b2b79e94a082d0bea42bdd7cd591ca8c00d28d78c5d6a2350a7c0816d5ca9"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.after-source.json",
+      "sha256": "249d90e8862295aeb6589e998778fc9e58d0cf05f6f657767ecfdd47a0804976"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.after-source.zip",
+      "sha256": "183f56bbb42aeb0b8092f62b3d48d24177c432177a1eda143cd2d3e27e430200"
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.raw",
+      "sha256": "42fe7923e9db4adb87131780ac40f0b2ab93caee62e7f0f3677ec7c02c3dcebf"
+    }
+  ],
+  "scope": "Python tool actual fixture/snapshot boundary regressions; no ARM/SDK/MCU execution qualification."
+}

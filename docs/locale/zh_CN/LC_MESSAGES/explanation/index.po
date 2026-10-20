@@ -8,12 +8,55 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: f6be73ad4175b5847b46a6f8958d8efb0a1952b5a6b0f062cbd0b25ccd9042b3\n"
+"X-Nexus-Source-SHA256: d6930e8ce6a332b19d2a6859478b6cbb25881007e58377db110b984173a957eb\n"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/index.md:8
 msgid "Architecture explanations"
 msgstr "架构解释"
 
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/index.md:10
 msgid ""
 "Understand boundaries, static assembly and retained storage before changing "
 "a provider. The linked design contracts remain authoritative."
 msgstr "修改提供者前，先理解边界、静态装配和必须保留的存储。链接的设计合同仍是规范依据。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/index.md:12
+msgid ""
+"The [I/O evolution design](../design/io-evolution.md) explains resource "
+"plans, optional traits and enhanced data contracts; its execution ledger "
+"keeps current and pending work separate."
+msgstr ""
+"[I/O 增量架构](../design/io-evolution.md)说明资源计划、可选 traits "
+"与增强数据合同；对应台账分别保留当前实现和待完成工作。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/index.md:16
+msgid ""
+"The [H743 Flash RAM design](../design/h743-flash-ram.md) explains the "
+"selected V/cache-off maintenance boundary: a private CPU bridge, RAM vector "
+"owner, temporary MPU protection and real drain before return. The source is "
+"integrated; the target diagrams retain open production-ELF and complete "
+"software exits."
+msgstr ""
+"[H743 Flash RAM 设计](../design/h743-flash-ram.md)说明选定 V／Cache off 的维护边界：私有 "
+"CPU bridge、RAM 向量 owner、临时 MPU 保护，以及返回前的真实排空。源代码已接入；目标图所要求的生产 ELF "
+"与完整软件退出仍未完成。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/index.md:21
+msgid ""
+"The [RTC/LPTIM explanation](rtc-lptim.md) separates raw calendar, finite "
+"counter and Core deadline domains. It covers current Native typed assembly, "
+"ownership, drain and explicit lifecycle; physical RTC/LPTIM and low-power "
+"support remain separate targets."
+msgstr ""
+"[RTC/LPTIM 说明](rtc-lptim.md)区分原始日历、有限计数与 Core deadline 域。本文解释当前 Native "
+"类型化装配、所有权、排空和显式生命周期；物理 RTC/LPTIM 与低功耗支持仍是独立目标。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/index.md:23
+msgid ""
+"The [GPIO pin-state explanation](gpio-pin-states.md) separates explicit GPIO"
+" images from factory identity, cold pad/gate ownership and checked cleanup. "
+"Its current G474 reference does not provide wake, retention or hardware low-"
+"power qualification."
+msgstr ""
+"[GPIO 引脚状态说明](gpio-pin-states.md)将显式 GPIO 图像与 factory 身份、冷态 pad/gate "
+"所有权及受检查的清理分开解释。其当前 G474 参考范围不提供 wake、retention 或硬件低功耗资格。"

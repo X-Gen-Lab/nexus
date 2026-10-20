@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "kind": "independent-final-H743-UART-runtime-domain-lifecycle-source-and-evidence-review",
+  "decision": "PASS",
+  "open_blockers": [],
+  "reviewed_at_utc": "2026-10-18T10:10:45.764566+00:00",
+  "scope": "Exact10-source final d256 tuple and complete append-only three-part development evidence bundle. No tests/builds/source/index/Main mutation by reviewer. Approval is for this software change and its focused host proofs; Root integration and ordinary complete-index hooks remain required.",
+  "source_binding": {
+    "base_HEAD": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+    "branch": "feat/h743-uart-runtime-domain-20261018",
+    "root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "freeze": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/source-freeze-final.json",
+    "freeze_bytes": 3231,
+    "freeze_sha256": "d2565120f5cb2d470f1fccfff5cefb46c66f81dd43f64ba0ffc9278bbf1ebe4e",
+    "source10": [
+      {
+        "path": "soc/stm32h743/drivers/uart_dma.c",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/files/soc/stm32h743/drivers/uart_dma.c",
+        "bytes": 24239,
+        "sha256": "5333baf72d24573a6dd58bb81b8a4cf1c545e9b4431b02e5675b930e7ee1cbc6"
+      },
+      {
+        "path": "soc/stm32h743/drivers/uart_receive.c",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/files/soc/stm32h743/drivers/uart_receive.c",
+        "bytes": 27878,
+        "sha256": "224924ff67098b2bb812f4bf98c6d30381c2f5d634f03ada7769d19cd89d0e33"
+      },
+      {
+        "path": "soc/stm32h743/private/stm32h743_dma.h",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/private/stm32h743_dma.h",
+        "bytes": 2006,
+        "sha256": "9d1ce1c7e6e78873e82ae60eb55bdc5359b6d06344c73ad19d4488c182565b10"
+      },
+      {
+        "path": "soc/stm32h743/private/stm32h743_uart_receive.h",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/private/stm32h743_uart_receive.h",
+        "bytes": 2376,
+        "sha256": "f850e08354ef2f1d16b9bdcb3ba02d851fecab68a1adb0b5d6b90a98d3cc5e76"
+      },
+      {
+        "path": "tests/google/h743_dma_test.cpp",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/files/tests/google/h743_dma_test.cpp",
+        "bytes": 33299,
+        "sha256": "e96f57bb944ba45b93b83361b7a102146463994fd514c640d96cfd7a3558330e"
+      },
+      {
+        "path": "tests/google/h743_receive_test.cpp",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/files/tests/google/h743_receive_test.cpp",
+        "bytes": 38779,
+        "sha256": "2e62680a099597cc460ed6006e9ad209d10c54bed633a7a91f8c4f347d091c96"
+      },
+      {
+        "path": "tests/google/h743_dma_model.cpp",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/tests/google/h743_dma_model.cpp",
+        "bytes": 5956,
+        "sha256": "d178c989d7fe3f44a023e02dac33427890cc31d14c9c28f72640e0b7250946b0"
+      },
+      {
+        "path": "tests/google/h743_dma_model.h",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/tests/google/h743_dma_model.h",
+        "bytes": 2217,
+        "sha256": "8d397e54cd41f071e7a3d6c7a73f89e6ba47fa993324f14eb9d37ba0da7f63c2"
+      },
+      {
+        "path": "soc/stm32h743/drivers/uart.c",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/drivers/uart.c",
+        "bytes": 20027,
+        "sha256": "1d67d5573623c66e1fe1359706018c1370ee195fc4cc2a7613cc852a01c0ca82"
+      },
+      {
+        "path": "soc/stm32h743/private/stm32h743_provider.h",
+        "snapshot": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/files/soc/stm32h743/private/stm32h743_provider.h",
+        "bytes": 14743,
+        "sha256": "86a14eeb3bb5464266f507a38243ed8baff187f91f8262cc2e46d4d7ec5b2a36"
+      }
+    ],
+    "all10_snapshot_and_current_owned_bytes_verified": true,
+    "index_sha256_before_after": "56f0b6f8ef5eb2045c54ed54060080162028558cf104bbe3d77c5218b0a3152d",
+    "full_index_gzip_matches_current_index": true,
+    "no_staged_changes": true,
+    "exactly_authorized10_tracked_changes": true,
+    "all10_before_source_full_gzip_CRC_SHA_match_base_Git_blobs": true
+  },
+  "required_complete_bundle": {
+    "must_consume_all_three": true,
+    "handoffs": [
+      {
+        "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/completed-handoff-r1.json",
+        "bytes": 1090,
+        "sha256": "37ed79723d02646309ededf548fec1c2554d02b21dc9f4a4e73f27b3af782ef8"
+      },
+      {
+        "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/completed-handoff-r2.json",
+        "bytes": 1014,
+        "sha256": "2913f73cfa978e5fa733e9f7007981016e02f6b8f42bc34c18170c6537973581"
+      },
+      {
+        "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/runtime-receipts-supplement-r1/completed-bridge.json",
+        "bytes": 1632,
+        "sha256": "0071db59ebd9e9d29e62cd04477225e94f575a4a349408c0386658d11bf72533"
+      }
+    ],
+    "original_archive": {
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/delivery-evidence-r1.zip",
+      "bytes": 1322250,
+      "members": 309,
+      "leaves": 308,
+      "sha256": "fd33ed8068070be2183e0bed5158d92658a7f7468e95711ae11fad1c7aba6e6b"
+    },
+    "lifecycle_delta_archive": {
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/delivery-delta-r2.zip",
+      "bytes": 153319,
+      "members": 84,
+      "leaves": 83,
+      "sha256": "b4d78d503673ea97bfe5c10d36dce5bc416af96143d300ebec75c0c0d792517c"
+    },
+    "runtime_completion_archive": {
+      "path": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/lifecycle-r2/runtime-receipts-supplement-r1/original-runtime-receipts.zip",
+      "bytes": 37846,
+      "members": 40,
+      "leaves": 39,
+      "sha256": "301b10f83d47ac47989bf6f0eae06fc33534863cf3af3ca5895cb686c1f98f31"
+    },
+    "all_archive_CRC_and_each_declared_leaf_original_size_SHA_and_archive_bytes_verified": true,
+    "source_copies_regular_without_symlink_ancestors": true,
+    "old_original_archives_unchanged": true,
+    "completion_note": "The first lifecycle seal glob selected commands/lifecycle-* and omitted13 real runtime directories starting nexus_h743_*. That metadata omission is now closed by an immutable supplement containing exactly13 receipts plus26 stdout/stderr originals, derived from the four actual phase result lists. It is not a product RED or new execution."
+  },
+  "code_contract_review": [
+    "Selected UART DMA and RX-block modes test DMA1EN plus both DMA1RST and DMA2RST, consistent with both resets affecting shared DMAMUX1. Only those two selected state types add a sticky bool; ordinary UART state and public ABI do not grow.",
+    "Once any retained mode observes loss, it permanently latches domain_lost, preserves a previously non-SUCCESS terminal, quarantines an accepted TX, retains RX stream/FILLING duties, and attempts exactly its owned DMA stream and USART3 NVIC withdrawal.",
+    "Isolation uses actual enable-bit readback after DSB/ISB; it does not use IRQ_AVAILABLE as a runtime off proof or trust only a control-call return. Failure to prove either off enters the source-visible masked fault-observe/nonreturn loop.",
+    "DMA/mux reads and writes are guarded. Zero returned by a blocked read is not accepted as sufficient drain evidence: checked withdrawal and final mode guard must also succeed before any request/producer release.",
+    "Cache clean and pre/post invalidate occur outside the saved mask under retained loans. Reentrant observers may latch permanent loss; callback-return paths recheck before DMA programming or block publication.",
+    "TX DMA completion checks real memory EN/source facts independently of USART TC, retains the existing D2 checked TX-source withdrawal/NVIC isolation policy, and rechecks mode state after final acknowledgement immediately before clearing active and SETTLED.",
+    "RX finish checks the domain after cache work and DMA/UART acknowledgements and before publish/abort; domain loss keeps its producer loan/FILLING state even after an external restore. Prior already-published consumer loans may be released without allowing the damaged producer to restart.",
+    "Shared PIO TX uses private validation/start/cancel/prepare-settle/final-settle leaves from ordinary uart.c. RX service checks and prepares/rechecks/settles under the same saved mask, without an IRQ-restore gap or a duplicated TX state machine.",
+    "RX port stop now cancels and services any accepted shared TX through the mode-aware path before delegating to ordinary stop. If that request has not joined, stop returns BUSY instead of letting ordinary service bypass the mode fence.",
+    "Both cold initializers clear sticky state only at a fresh unowned point after ownership and hardware checks, before ordinary UART acquisition. After ordinary UART succeeds and may already have delivered an IRQ, the masked tail first claims mode responsibility and calls domain_live; an earlier observed fault cannot be erased by a tail clear.",
+    "Cold rejected/null rollback remains bounded and existing context/argument policy is preserved. No reset/gate restoration, hidden recovery, registry, extra provider worker, new public interface or new routing graph is introduced."
+  ],
+  "closed_findings": [
+    {
+      "id": "UART-EARLY-STOP-01",
+      "classification": "REAL_PRODUCTION_LIFETIME_DEFECT_CLOSED",
+      "actual_RED": "WholeRX71:3 failures in the three real domain variants, old68 pass, errors/skips0.",
+      "fix": "Six-line mode cancel/service/join before ordinary stop; same test bytes whole71 GREEN. FirstCANCELLED remains unchanged and the accepted request stays Q/borrowed on loss.",
+      "historical_result_sha256_RED": "c8310a88d1411be5f2c66f77b0dc99b367581b3947398e3c50646631c397eca9",
+      "historical_result_sha256_GREEN": "7336cc25104bb07f5be898b5c2eaf2c486ba1a36331b8368b3b21265dc59552a"
+    },
+    {
+      "id": "UART-COLD-LIFECYCLE-02",
+      "classification": "REAL_PRODUCTION_STICKY_LIFETIME_DEFECT_CLOSED",
+      "actual_RED": "WholeTX70 and wholeRX74 each fail3, errors/skips0; only new real IRQ-observed initialization variants fail.",
+      "oracle": "Existing before_irq_save callback changes RCC, dispatches the actually enabled USART IRQ after initialized/retained become true but before mode-retention save, then restores external RCC. No private SUT stage or model replacement is used.",
+      "fix": "Move the fresh cold clear before acquisition; post-ordinary masked mode retention plus live guard returns STATE and preserves duties/isolated vectors. Identical tests then70/74 GREEN.",
+      "RED_result_sha256": "34798ba8af5503bc80d10c597347cfb139fdbdc8ad4089ba5f10b3c137f97aec",
+      "GREEN_result_sha256": "8ada325b1218e2deef3481bf3470808d17075611dfd640a6629ccdfbd6bffefa"
+    },
+    {
+      "id": "UART-EARLY-ORACLE-02",
+      "classification": "HONEST_FIRST_GREEN_COVERAGE_STRENGTHENING",
+      "change": "Two fault lambdas explicitly ADD_FAILURE if the call returns; shared trace marks body return and parent checks returned=false for fault branches over a bounded20ms observation.",
+      "limit": "The current production already parks forever; no intentionally damaged implementation or fabricated RED was used. Bounded observation plus source inspection does not prove infinite time."
+    }
+  ],
+  "TDD_history_preserved": {
+    "initial_same_programs": "TX66 fail30/RX67 fail36 -> same133 GREEN; original35/31 cases pass and new external-model selfcheck passes.",
+    "healthy_stop_saved_mask": "TX67/RX68 each fail1 -> same135 GREEN.",
+    "setup_classification": "First build used a nonexistent ACQUIRED enum in a new assertion; corrected to existing BORROWED before actual runtime RED. Original failed source/raw kept and not called a production RED.",
+    "old_candidate_boundary": "d638/267 and later71e25e/408 remain real immutable historical tuples. Neither is substituted for final d256/420.",
+    "matched_historical_ELFs": "Original12 plus additional4 old-final and2 new lifecycle-RED gzip ELF copies independently fully consumed for CRC and SHA; previous overwritten live binary paths are read through their preserved gzip identity."
+  },
+  "actual_final_execution": {
+    "program_executions": 9,
+    "unique_Debug_cases": 276,
+    "ASAN_UBSAN_case_executions": 144,
+    "total_case_executions_across_profiles": 420,
+    "failures": 0,
+    "errors": 0,
+    "disabled": 0,
+    "skipped": 0,
+    "programs": [
+      {
+        "profile": "debug",
+        "target": "nexus_h743_dma_test",
+        "tests": 70,
+        "ELF_sha256": "0fcaf9073fbf4b4c3a5d3370a5c26f38954ff3bb2b49783dd66a01c56deaaec4",
+        "XML_sha256": "50d9eb01449e78699f24e7e435148ec075444d23424027efec68328a21574abf"
+      },
+      {
+        "profile": "debug",
+        "target": "nexus_h743_receive_test",
+        "tests": 74,
+        "ELF_sha256": "b2fddb80cc80703c93e4e3010fbc432982af89f435a9e2cdc92d78d09c5c48b3",
+        "XML_sha256": "4aa3443ec0753a9193eac407f200eed13c301ee03ee61effdc304a96cc08c56e"
+      },
+      {
+        "profile": "debug",
+        "target": "nexus_h743_provider_test",
+        "tests": 29,
+        "ELF_sha256": "be32f4e1300dcf101678dca54d08164cc76dba14ca76c7140f89cb8d9614ce37",
+        "XML_sha256": "9c60bfa71592f361e3134f8e917312fb51eff8389a4fee5255b30f1ee89db14f"
+      },
+      {
+        "profile": "debug",
+        "target": "nexus_h743_uart_fifo_test",
+        "tests": 45,
+        "ELF_sha256": "a697078feab1cff0f18ec8d50e59452f452ed4f9e7cca0225ece15dded3a14b1",
+        "XML_sha256": "414b0e08b62a47857fb9abe620a435a921f0c81ae69135c7106d439510dd4967"
+      },
+      {
+        "profile": "debug",
+        "target": "nexus_h743_uart_rtscts_test",
+        "tests": 38,
+        "ELF_sha256": "c854824fd34946ba4f2ef2a388ed8cf3b00e4fc7ca6e5c7806961e5bdbbc1ac5",
+        "XML_sha256": "8eea562ca518bb29a549689bc9e3c4d4c08de06807b51a347ef158913f4acc4f"
+      },
+      {
+        "profile": "debug",
+        "target": "nexus_h743_uart_fifo_factory_test",
+        "tests": 9,
+        "ELF_sha256": "eda785446b59b7c709f4a002db988e76dbe7f10a0289039b0fc6d33406dba998",
+        "XML_sha256": "3f081af755dc9e07773f82b4594ece9c8e6e8d43d40db2fa28e9c056b86d9b84"
+      },
+      {
+        "profile": "debug",
+        "target": "nexus_h743_uart_rtscts_factory_test",
+        "tests": 11,
+        "ELF_sha256": "c8219b6e908033cd25fb023cf5d9f26a4bc39b9d1e8b0515fd301ed58919a982",
+        "XML_sha256": "fe98d2a4be850310bedea0c67e69efe3d3cd7fc0f6685232f59a524dabba838e"
+      },
+      {
+        "profile": "asan",
+        "target": "nexus_h743_dma_test",
+        "tests": 70,
+        "ELF_sha256": "462b061bf891378ada6a0b1e0638e34f6f91af4c77fdaaac0be337f34213af68",
+        "XML_sha256": "2dcacbb414eedf4f8d72c1c2e3f48fcd232b4cab9b463a603a853dfa9523aa8b"
+      },
+      {
+        "profile": "asan",
+        "target": "nexus_h743_receive_test",
+        "tests": 74,
+        "ELF_sha256": "998057b60795a12723dd9534f005848c906ae61517930ea646d5f5e35474a25d",
+        "XML_sha256": "eff0ff19b22cebe756a1ea72e0df0f7ebe4bd8ea85f1f97dbb0a73ab594650b0"
+      }
+    ],
+    "all9_ELF_hashes_and_fresh_XML_hashes_verified": true,
+    "all_XML_case_statuses_complete": true,
+    "test_listing_exactly_matches_all420_XML_cases": true,
+    "listing_not_counted_as_an_extra_execution": true,
+    "all13_new_runtime_receipts_and_26_raw_streams_independently_verified": true,
+    "runtime_argv_exact_whole_binary_plus_XML_output_only": true,
+    "no_filter_or_shard": true,
+    "ASAN_runtime_stderr_empty": true
+  },
+  "build_and_style": {
+    "canonical_presets": "Maintained native-debug and native-asan CMake graphs; actual selected compiler rows, source identity and unchanged strong warning flags inspected.",
+    "selected_compile_rows_per_profile": "Final compile-input maps are checked against each actual compile_commands.json and observed source digests; prior59-row candidate map retained historically.",
+    "ASAN_flags_verified": [
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-Werror",
+      "-Wconversion"
+    ],
+    "strict_style_files": 10,
+    "clang_format": "14.0.6",
+    "all_style_source_hashes_equal_final10": true,
+    "wholefile_new_or_unlisted_strict_no_added_debt": true,
+    "actual_compile_tests_not_a_mock_SUT": true
+  },
+  "compatibility_and_cost_facts": {
+    "original35_TX_and31_RX_case_source_regions_byte_preserved": true,
+    "71e25e_entire_two_test_sources_preserved_as_prefixes_before_added_lifecycle_cases": true,
+    "ordinary_UART_state_definition_bytes": 567,
+    "ordinary_state_definition_unchanged": true,
+    "ordinary_transmit_IRQ_body_bytes": 1114,
+    "ordinary_transmit_IRQ_body_sha256": "d95e9646fec8d75d1e6fa3daab5d3f03f1b97bb1b70f05b249c592899aec3ad5",
+    "ordinary_transmit_IRQ_body_unchanged": true,
+    "actual_target_Flash_RAM_instruction_cost": "Not measured by this packet; source identity and host tests do not establish MCU link cost or timing."
+  },
+  "model_limits": [
+    "DMA1 reset clears engine plus mux; DMA2 reset clears mux without clearing DMA1 EN/NDTR; gateoff does not invent drain. Forbidden DMA/mux probes are recorded and required absent on containment paths.",
+    "The NVIC model keeps enable/pending/active facts and respects real model mask save/restore. Hardware callbacks change external RCC/cache/MMIO facts, not private SUT stage to create success.",
+    "Parent fork kill/reap disposes of parked host children only; it is not a successful provider stop, bus drain or storage reclamation proof.",
+    "Only observed violations latch. Pulses entirely between observations are not detected; permanent Q has no implicit recovery. Fault nonreturn has no normal-ISR WCET assertion."
+  ],
+  "resource_and_ownership_boundaries": {
+    "feature_allocated_reported": 3956736,
+    "feature_cap": 4194304,
+    "build_allocated": 227602432,
+    "build_cap": 234881024,
+    "highest_measured_child_RSS_KiB": 624244,
+    "reported_OOM_and_OOMkill_counters": 0,
+    "worker_receipts": "Actual wrapper direct-child completion and test-owned fork kill/wait checked; no broader process-family/OCI qualification claimed.",
+    "original_source_evidence_index_not_deleted_or_rewritten": true,
+    "reviewer_new_test_or_build_executions": 0
+  },
+  "not_established": [
+    "Root current Main complete-index gate/commit/push for this overlay",
+    "Actual ARM linkage, MCU ABI/layout/Flash cost, measured cycles or IRQ WCET",
+    "InstalledSDK/sourceSDK/OCI/offline/candidate/remoteAPI qualification",
+    "Real STM32/GD32 board/DMA bus/cache/HIL behavior"
+  ],
+  "integration_condition": "Root must integrate the composed final10 source paths plus all immutable base, lifecycle-delta and39-runtime completion evidence, then execute fresh ordinary complete-index hooks. Do not import obsolete source copies as active sources or label old408 as current420.",
+  "earlier_report_unchanged": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-independent-review-20261018-r1/early-candidate-review-r1.json",
+    "sha256": "804c922115b15017b8db4d6fcaee10d41b1d1125fcecaf67d3c97ec949ca8d54"
+  },
+  "review_operational_note": "Read-only validation scripts rejected two incorrect assumptions about historical result/list and new discovery JSON shape before any report was written. They were corrected against actual records; they are metadata-navigation errors, not product/test REDs. No actual failed test or old proof was overwritten.",
+  "review_side_effects": "Only this new final exec-shm report was written. No source/index/Main edits, test/build/helper/dispatch/network operation by reviewer."
+}

@@ -1,0 +1,12 @@
+import importlib.util,json,sys,unittest
+from pathlib import Path
+report=Path(sys.argv[1]);suite=unittest.TestSuite()
+for i,name in enumerate(sys.argv[2:]):
+ spec=importlib.util.spec_from_file_location('complete_module_'+str(i),name)
+ module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ suite.addTests(unittest.defaultTestLoader.loadTestsFromModule(module))
+expected=suite.countTestCases();assert expected>0
+result=unittest.TextTestRunner(verbosity=1).run(suite)
+record={'discovered':expected,'executed':result.testsRun,'failures':len(result.failures),'errors':len(result.errors),'skipped':len(result.skipped),'expected_failures':len(result.expectedFailures),'unexpected_successes':len(result.unexpectedSuccesses)}
+report.write_text(json.dumps(record,indent=2)+'\n')
+raise SystemExit(0 if result.wasSuccessful() and result.testsRun==expected and not result.skipped and not result.expectedFailures else 1)

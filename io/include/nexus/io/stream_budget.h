@@ -67,7 +67,8 @@ typedef struct {
  *                  (block_units*1000000)); payload is
  * required*block*unit_bytes. Finite math is conservative under the declared
  * FIFO frontier release bound; out-of-order release may still block the next
- *                  cursor. Latency requires target_delay < floor(block/rate).
+ *                  cursor. Latency requires target_delay_us <
+ *                  floor(units_per_block*1000000/units_per_second).
  *                  This creates no backpressure or hardware qualification.
  */
 nx_result_t nx_stream_budget_calculate(const nx_stream_budget_t* budget,

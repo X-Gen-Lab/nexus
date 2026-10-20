@@ -1,0 +1,595 @@
+{
+  "kind": "complete final r3 workflow actionlint reviewed transport",
+  "source_count": 14,
+  "files": [
+    {
+      "path": "tests/evidence/workflow-actionlint/author/authored-history-map-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/authored-history-map-r1.json.gz",
+      "bytes": 1909,
+      "sha256": "34272c2d5934141c7624ee536fed49e2200cc292fc65eed79a79a46347fa25b7",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/authored-history-map-r2.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/authored-history-map-r2.json.gz",
+      "bytes": 421,
+      "sha256": "6384ffd76846fea0571dbac6e8f449ea47fd155372b2adc3236c5807ae8160b6",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/authored-history-map-r3.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/authored-history-map-r3.json.gz",
+      "bytes": 711,
+      "sha256": "bbb09ed403c72b18407aabbf83b911f247b5e23f1d5a22995b1b3734af97651d",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/authored-history-r1.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/authored-history-r1.tar.gz",
+      "bytes": 107313,
+      "sha256": "db23750f844e906123bbf3c37078fdfd5611030b8802386debd134a91ab8aa83",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/authored-history-r2.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/authored-history-r2.tar.gz",
+      "bytes": 13221,
+      "sha256": "9eaa181d95eb7b0344c1c5c03109f13543682ff550c258807139e0156b0ece94",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/authored-history-r3.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/authored-history-r3.tar.gz",
+      "bytes": 41982,
+      "sha256": "088f3fd29bd8c3b274b4a4ee243264be3a0c88d17e8f8d52d1218d235ad494c1",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/baseline.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/baseline.json",
+      "bytes": 4984,
+      "sha256": "fc5d9ce0a14a10abb913fe1e8560799fba99bb0c02ddcbbf5bf07eab9acc1fb9",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/.github/workflows/quality-checks.yml.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/.github/workflows/quality-checks.yml.gz",
+      "bytes": 1680,
+      "sha256": "cadf5fb62eca3fe8d49d0c3a85959e1177bc79388393d59a0b9b8b83ed15a805",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/.github/workflows/test_platform_ci.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/.github/workflows/test_platform_ci.py.gz",
+      "bytes": 12691,
+      "sha256": "a85469bbabb527f86d4bcf22bf2e48598ebcb3bba70267ed5ed9e0d79b3a8797",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/.pre-commit-config.yaml.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/.pre-commit-config.yaml.gz",
+      "bytes": 479,
+      "sha256": "a4a87ec2ad8a3bc26e8ab007a1cb4eb378b4375ea04660da39beb35971156bd6",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/index.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/index.gz",
+      "bytes": 728756,
+      "sha256": "a0f76ce95a0b8ee52ac66ac9b4f404378111b5765c9f760bf4866013f78804b3",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/scripts/ci/test_install_dev_tools.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/scripts/ci/test_install_dev_tools.py.gz",
+      "bytes": 2816,
+      "sha256": "63f27545ce5f4c9027ac42c77a01f91b6c0f70073e73b08c30f6cef60227e365",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/scripts/ci/test_style_gate.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/scripts/ci/test_style_gate.py.gz",
+      "bytes": 5280,
+      "sha256": "a269cf66ca21421d0f23eb1bc9f4a8b2ed047d26597245e3041e4d92ded7ab40",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/scripts/setup/install_dev_tools.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/scripts/setup/install_dev_tools.py.gz",
+      "bytes": 3002,
+      "sha256": "8deb8722ee5d0877bff15b5ab13f0941aea796655cd85a5215b6caa349124d19",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/tools/dev/README.md.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/tools/dev/README.md.gz",
+      "bytes": 3532,
+      "sha256": "0e6d5525b32e2c395c68fa1792ff72f4c2ada3c09f2e5e59f7c48c4600241322",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/tools/dev/dependencies.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/tools/dev/dependencies.py.gz",
+      "bytes": 6667,
+      "sha256": "245b6311bba8934040317006300c6762729bbd958ee86683949f905c0285c9e5",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/tools/dev/dev.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/tools/dev/dev.py.gz",
+      "bytes": 4141,
+      "sha256": "3ee243535fab33cecc8a765a267f4ec4cdea0373b3d6de2ee3b1bb65e4b56a65",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/tools/testing/test_build_delivery.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/tools/testing/test_build_delivery.py.gz",
+      "bytes": 4391,
+      "sha256": "df8c48bfb740a28c2fb2337010e66a49c5d9ad251ac6151468f8c5036a98297c",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/before/tools/testing/test_dev.py.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/before/tools/testing/test_dev.py.gz",
+      "bytes": 1418,
+      "sha256": "187ce6d52b6cc8a47c19be520e06846a1e4274d9cc53651a7fa2c8ecbea7520e",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/command-summary-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/command-summary-r1.json.gz",
+      "bytes": 8257,
+      "sha256": "6b3c6611aedf3e000b5e37a476c97fc9ff78a8062baaa58e41905eab23ca7fbb",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/completed-handoff-r1.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/completed-handoff-r1.json",
+      "bytes": 9308,
+      "sha256": "2b993b7b8037cc6424e34206b02f37be1c5d9eb78f73ff9b885b4911ca0ee43b",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/execution-evidence-map-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/execution-evidence-map-r1.json.gz",
+      "bytes": 108464,
+      "sha256": "f3c6b92be0193b78e96395837e8ecf6a630588da87c08df4b36d8204141ecd20",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/execution-evidence-r1.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/execution-evidence-r1.tar.gz",
+      "bytes": 3493777,
+      "sha256": "2c39919f4522220935bead3a6653176b94dda6168488aed806ba22d3dbef3a7e",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/execution-summary-r1.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/execution-summary-r1.json",
+      "bytes": 4971,
+      "sha256": "354a3283e8cff51be75ebbad0876d1cd189e4bd0d8c08a60a854de2385dcab36",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/files-r2/scripts/ci/lint_workflows.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files-r2/scripts/ci/lint_workflows.py",
+      "bytes": 12841,
+      "sha256": "b2d69d75330dc5cd7fc5e740daa9bb7905b088b0529c180abe5ca016512edb54",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/files-r2/scripts/ci/test_lint_workflows.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files-r2/scripts/ci/test_lint_workflows.py",
+      "bytes": 20310,
+      "sha256": "7e487222ff5035b8627319d80888458664a9d63708a4f1abf6362ccd64b05545",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/files-r2/tools/dev/README.md.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files-r2/tools/dev/README.md",
+      "bytes": 11107,
+      "sha256": "8b581087c65c0c0683c065b0143274c7ec96c54d2348600e12a27765372acad5",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "scripts/ci/lint_workflows.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files-r3/scripts/ci/lint_workflows.py",
+      "bytes": 13348,
+      "sha256": "dc37ae3ddd4cf80d77cc9516efeccb22b1fb623c39ba813cbefe7967186f03aa",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "scripts/ci/test_lint_workflows.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files-r3/scripts/ci/test_lint_workflows.py",
+      "bytes": 22493,
+      "sha256": "91fccd4d92ecc2356574dfa5cdd59d4f1195a184c547df48dce05624dbe5d5b0",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tools/dev/README.md",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files-r3/tools/dev/README.md",
+      "bytes": 11403,
+      "sha256": "3049a724fc5aa270fed44e3ea92fbb3b3052992f1a2ffcd25eb89b01e44eb8e0",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": ".github/workflows/quality-checks.yml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/.github/workflows/quality-checks.yml",
+      "bytes": 5477,
+      "sha256": "02b5a0ba018af5261c52a72e342687961d9771786df79dd38f810f2e1e7fd46a",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/.github/workflows/test_platform_ci.py",
+      "bytes": 60127,
+      "sha256": "12cad2d97f6a30d687c28ca9ee221180a2c266a8634e9cad6a52c6b04790bc8e",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/.pre-commit-config.yaml",
+      "bytes": 1725,
+      "sha256": "44f4a23f11a09bedd56579c64fe3e718127b8609d72a4805643051a6f800b88c",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "dependencies/actionlint.lock.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/dependencies/actionlint.lock.json",
+      "bytes": 2943,
+      "sha256": "0bf30ff8d5dd4062d63f897c27f3e7225c673447855e977a0560e121cd2872d5",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/files/scripts/ci/lint_workflows.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/scripts/ci/lint_workflows.py",
+      "bytes": 11972,
+      "sha256": "fb466fef2ae10f27faec2cd90db6947af3f7ec921e82d829dd4d7c05ae0f4800",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "scripts/ci/test_install_dev_tools.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/scripts/ci/test_install_dev_tools.py",
+      "bytes": 12627,
+      "sha256": "4b24ab6c10ba03973b13ab70910b767fdb584a605f0f3d200a7f84089858fd37",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/files/scripts/ci/test_lint_workflows.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/scripts/ci/test_lint_workflows.py",
+      "bytes": 15893,
+      "sha256": "bc580ad67c41d041f94df718a0de9f048cdb579223f0127bb4e88f85435b3ea1",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "scripts/ci/test_style_gate.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/scripts/ci/test_style_gate.py",
+      "bytes": 23285,
+      "sha256": "13c865d6137d907bf16b472a1f7acb26f907c9c2c4dbec9b63269216f386c232",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "scripts/setup/install_dev_tools.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/scripts/setup/install_dev_tools.py",
+      "bytes": 9007,
+      "sha256": "9e7f68c23520981dd58caad5a9430cc21ba011d276cb50edbaf77a624c8bb595",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/files/tools/dev/README.md.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/tools/dev/README.md",
+      "bytes": 10895,
+      "sha256": "189014ce3c5cefa0bfe325048ed622c3caf30183826045dccc61a12909d390d6",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tools/dev/dependencies.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/tools/dev/dependencies.py",
+      "bytes": 34133,
+      "sha256": "599bd2829c159004f54ec1394f021570410afa0438ee2133be42ebd3e6cf1729",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tools/dev/dev.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/tools/dev/dev.py",
+      "bytes": 14123,
+      "sha256": "ae89afb4cfe764bbf8070cdc3fb7c9cc82e4bd3d59b53c351b2e680d7cd4e8ff",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tools/testing/test_build_delivery.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/tools/testing/test_build_delivery.py",
+      "bytes": 27786,
+      "sha256": "4dbab7aa3223365baf7703ff9788bd0579238244bd635a7cabe28ba792234eb5",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tools/testing/test_dev.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/files/tools/testing/test_dev.py",
+      "bytes": 6429,
+      "sha256": "4c364b5b1cc96a7ef2dcaf5b53a2f4b4559e0f2fb1b35d5fe898de339734cf41",
+      "origin": "final r3 canonical source"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/manifest-r1.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/manifest-r1.json",
+      "bytes": 18624,
+      "sha256": "d792b7b77f883029b579848c64035665037eb6e60ec73fdc88aa93841e2c07f7",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-audit-r1/attempt-receipt.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-audit-r1/attempt-receipt.json.raw",
+      "bytes": 1205,
+      "sha256": "4e99f77647c025405478b5b0a2b3b8fbbf203171d91a1a016a8161ebf18ac035",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-audit-r1/command.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-audit-r1/command.json.raw",
+      "bytes": 1393,
+      "sha256": "ffcb68d26ec8e2d189cdb60935b41740806da1960bf464674eb23aeac5ddaf9b",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-audit-r1/latest.log.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-audit-r1/latest.log.raw",
+      "bytes": 575,
+      "sha256": "c9f437f4521783dcc48fe8f9b60f21e8e02c855155faf3b4ef2614fcfff3cee8",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-audit-r1/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-audit-r1/stderr.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-audit-r1/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-audit-r1/stdout.txt.raw",
+      "bytes": 575,
+      "sha256": "c9f437f4521783dcc48fe8f9b60f21e8e02c855155faf3b4ef2614fcfff3cee8",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-audit-r1/verify_delivery_r1.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-audit-r1/verify_delivery_r1.py.raw",
+      "bytes": 2432,
+      "sha256": "0f5d7f388a17f177774b2e9ec26611ddc16973fa49f0debbb304940d274e1a78",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-evidence-map-r1.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-evidence-map-r1.json",
+      "bytes": 4290,
+      "sha256": "505b882c3be7ffd5df251f7e7338599461d70e0554dddf1b089c18083926d12b",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-failure-r1/attempt-receipt.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-failure-r1/attempt-receipt.json.raw",
+      "bytes": 1134,
+      "sha256": "f303e8476263d88ae45a1283c0ebb13e9ff39cf6657a57eb78970d934108f618",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-failure-r1/command.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-failure-r1/command.json.raw",
+      "bytes": 1302,
+      "sha256": "5a914cc97e708c8d056702435121c46c4dcdfbf43faf72e075c1d5745bde8d69",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-failure-r1/latest.log.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-failure-r1/latest.log.raw",
+      "bytes": 1293,
+      "sha256": "b324d54af0dc744b2c38c4d62e78623c4b409121a2b3901d6b1659ca20c322eb",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-failure-r1/package_execution.py.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-failure-r1/package_execution.py.raw",
+      "bytes": 10824,
+      "sha256": "8ac52d187be63d579dec1359f55fb8b1e5c2c83db3dfa47f47a2f20c26677932",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-failure-r1/stderr.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-failure-r1/stderr.txt.raw",
+      "bytes": 1293,
+      "sha256": "b324d54af0dc744b2c38c4d62e78623c4b409121a2b3901d6b1659ca20c322eb",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/packaging-failure-r1/stdout.txt.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/packaging-failure-r1/stdout.txt.raw",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/root-integration-preparation-r1.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/root-integration-preparation-r1.json",
+      "bytes": 2501,
+      "sha256": "61461fe5097b1f48fe974c100af9f1ed40ce03edd3c42cbe6aef1827c558e392",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/scope-addendum.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/scope-addendum.json",
+      "bytes": 331,
+      "sha256": "4b3c4948a89d229c880f7bccc1c36309791c9318dc8f3d7553d61f633c3bddf0",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/source-freeze-r1.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/source-freeze-r1.json",
+      "bytes": 6115,
+      "sha256": "8c03c7ed163fb24eaac97cac2c47276db49b6c5f3bc780f312165c32525d68f6",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/source-freeze-r2.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/source-freeze-r2.json",
+      "bytes": 6234,
+      "sha256": "33303939b80e8d4ce2395860219cb72e2972ba1867e84a4856fba5f9101fb8f9",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/source-freeze-r3.json.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/source-freeze-r3.json",
+      "bytes": 6234,
+      "sha256": "9fa5dce33cd44520af32669021255877b1be0c74b0a65f3778f1cf47fd7bd7d9",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/source-r2.diff",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/source-r2.diff",
+      "bytes": 65807,
+      "sha256": "4b6e6a5538756ed30c0143f73a6b69259c3fe431d4f4bcabd67ee4b9be0e79e5",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/source-r3.diff",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/source-r3.diff",
+      "bytes": 68849,
+      "sha256": "659d4c7d80b55f5f6dae9c654f267e129ea2ab7a649970f4a324dcd3cccb0768",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/source.diff",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/source.diff",
+      "bytes": 60201,
+      "sha256": "3b99b59c756c8c742dbe6f4f6b48a916c807c3fb9b1507105c63519c8795f7fb",
+      "origin": "original frozen author evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/manifest-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/manifest-r2.json",
+      "bytes": 19438,
+      "sha256": "95b057952d6094c8ed4c99da194f1cfab828689d6e788632d42acf8656dade88",
+      "origin": "corrected final enclosing metadata; originals retained"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/author/completed-handoff-r2.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/workflow-actionlint-r1/completed-handoff-r2.json",
+      "bytes": 11033,
+      "sha256": "4dd093eb93d2b5b7b298e202249c8cc08c64d3c0b61fef2d70eff418e9c23c10",
+      "origin": "corrected final enclosing metadata; originals retained"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/manifest-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/manifest-r1.json",
+      "bytes": 1394,
+      "sha256": "ef92b60787017b16e6ec0be38990776f75071229df325c8dde7e4c737e97952b",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/actionlint-lock-draft-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/actionlint-lock-draft-r1.json",
+      "bytes": 5006,
+      "sha256": "fbf317d11c8ec341fcaa0ba278c4ff540be789cd9fc202e9e07c6a22aaf19a7b",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/asset-preparation-summary-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/asset-preparation-summary-r1.json",
+      "bytes": 4013,
+      "sha256": "fd95c924fde15dcccbcff31c76922a26016a1bc75db7d927c70e4a113747c3f8",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/completion-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/completion-r1.json",
+      "bytes": 703,
+      "sha256": "dc2ca7dca840c305611fbd22659db2acdb69bb74b9bb59e74c0435f19fddba06",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/metadata-package-process.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/metadata-package-process.zip",
+      "bytes": 3972,
+      "sha256": "8739f0e0228a303f3d15a5f240df7e70a92e41d48ee4ec16d08784910be27e92",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/original-metadata-and-receipts.zip",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/original-metadata-and-receipts.zip",
+      "bytes": 61845,
+      "sha256": "ebbc31150d9c191912f75d984ee0146c807b450335fbbe25a03f8731f7bf9943",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/preparation-report-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/preparation-report-r1.json.gz",
+      "bytes": 3887,
+      "sha256": "6733bb689aa6b6ba64bf0db2a56b6651ae940b4e4b9724143761d3b0a378c627",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-assets/transport-map-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1/transport-map-r1.json.gz",
+      "bytes": 3589,
+      "sha256": "51ecb7424fc8ab9752d1afc33ee67ce3d99e537ee2ebc2382517cdaacdbc21fc",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-probes/manifest-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/actionlint-probes-r1/manifest-r1.json",
+      "bytes": 557,
+      "sha256": "ad3452972c8f7ec7b5f5585eb9c545dd9445be9bd2cafd35600d56e57f1ef576",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-probes/original-probes.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/actionlint-probes-r1/original-probes.tar.gz",
+      "bytes": 158750,
+      "sha256": "b280a27ada3ac9f0580bf66b61560d3a64c47b1b2e879bd6e61965b863e8b24a",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-probes/original-transport-map-r1.json.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/actionlint-probes-r1/original-transport-map-r1.json.gz",
+      "bytes": 16858,
+      "sha256": "b996bf17084d32e9fee0773e4d35bc2eb1d48ae10f1d121bdf04e332fe2969fb",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/official-probes/probe-report-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/actionlint-probes-r1/probe-report-r1.json",
+      "bytes": 38742,
+      "sha256": "6c3e45c0330be6b529c65f92e36d5aca57ac6d6d9fb96ba408735a1f4634805b",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/reviews-and-design/actionlint-official-assets-independent-review-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-independent-review-r1.json",
+      "bytes": 21209,
+      "sha256": "6df38a95a387c5cecb55b74b11d9276b3094b7d82160205778234b6fd22f39aa",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/reviews-and-design/actionlint-integration-design-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-integration-design-r1.json",
+      "bytes": 12837,
+      "sha256": "b3ccec3323b0c8c50b70d8f15e479e9f46089e25d20ef7d13f9abbaa98532fbe",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/reviews-and-design/actionlint-integration-design-independent-review-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/actionlint-integration-design-independent-review-r1.json",
+      "bytes": 19419,
+      "sha256": "9a5d999ac61ebb8b6052514b78f9888c1aa954a8eba04709b3ed5d854fee7532",
+      "origin": "evidence"
+    },
+    {
+      "path": "tests/evidence/workflow-actionlint/reviews-and-design/workflow-actionlint-source-pre-review-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/validation/workflow-actionlint-source-pre-review-r1.json",
+      "bytes": 7689,
+      "sha256": "7c6be20ace7669e0aead91e5d0fbfbb01c41f9f4adf39c758433c0f25d1677b2",
+      "origin": "evidence"
+    }
+  ],
+  "scope": "full source and original evidence incl packaging failure; final Root normal complete gates/tool preparation pending"
+}

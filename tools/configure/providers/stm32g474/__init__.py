@@ -15,6 +15,11 @@ CPU_FEATURES = MappingProxyType({
     "icache_line_bytes": 0, "dcache_line_bytes": 0, "security": "single",
     "sau": False, "mve": "none", "dsp": True})
 PREFIX = "stm32g474"
+CONTROLLER_INTERFACES = MappingProxyType({
+    "ADC1": MappingProxyType({"adc_group": (
+        "regular-sequence-dma", "injected-sequence")}),
+    "TIM3": MappingProxyType({"encoder": ("quadrature",)}),
+    "TIM1": MappingProxyType({"pwm_adc": ("finite-regular-dma",)})})
 MODEL = False
 FACT_REFERENCES = descriptor.maintained("stm32g474").references
 CAN_CONTROLLERS = ()
@@ -34,11 +39,21 @@ LIMITS = MappingProxyType({"uart_baud": (2594, 1000000),
                            "spi_hz": (664063, 42500000),
                            "pwm_period": 65535, "timer_hz": 170000000})
 _MODES = MappingProxyType({
+    ("adc_group", "regular-sequence-dma"): "adc_group",
+    ("adc_group", "injected-sequence"): "adc_group",
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
+    ("gpio", "named-states"): "pin_state",
     ("uart", "irq-bytes"): "uart", ("exti", "edge-event"): "exti",
     ("watchdog", "independent"): "watchdog",
     ("spi", "short-poll"): "spi",
     ("pwm", "fixed-pwm"): "pwm",
+    ("pwm", "shared-fixed-pwm"): "pwm_shared",
+    ("pwm_group", "coherent-pwm"): "pwm_group",
+    ("pwm_adc", "finite-regular-dma"): "pwm_adc",
+    ("can_fd", "iso-fd-loopback"): "fdcan",
+    ("can_fd", "iso-fd-normal"): "fdcan",
+    ("timer_capture", "edge-capture"): "timer_capture",
+    ("encoder", "quadrature"): "encoder",
     ("adc", "single-shot"): "adc",
     ("adc", "trigger-dma"): "adc_stream",
     ("flash", "poll-word"): "flash",
@@ -56,7 +71,16 @@ def validate_selection(selection, route):
     """Accept only the actual fixed provider and reviewed route, not SKU potential."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
-    if kind == "uart":
+    if kind == "adc_group":
+        from . import adc_group
+        adc_group.validate_selection(selection, route)
+    elif kind in {"pwm_adc", "can_fd"}:
+        try:
+            from ... import coupled_io
+        except ImportError:
+            import coupled_io
+        coupled_io.validate_selection(selection, route, PREFIX)
+    elif kind == "uart":
         reviewed = {
             "LPUART1": (("PA2", "tx", 12), ("PA3", "rx", 12)),
             "USART1": (("PA9", "tx", 7), ("PA10", "rx", 7)),
@@ -113,7 +137,48 @@ def validate_selection(selection, route):
             common.fail("G474 SPI requires its exact reviewed AF5 route")
         common.integer(selection.get("max_hz"), *LIMITS["spi_hz"],
                        "G474 SPI maximum frequency")
+    elif kind == "timer_capture":
+        if selection.get("irq_priority") != 5:
+            common.fail("G474 TIM5 capture requires IRQ priority5")
+    elif kind == "encoder":
+        expected = (("PA6", "encoder-a", 2), ("PA7", "encoder-b", 2))
+        if (route["controller"] != "TIM3" or
+                tuple((pin["pin"], pin["function"], pin["af"])
+                      for pin in route["pins"]) != expected):
+            common.fail("G474 encoder requires exact TIM3 PA6/PA7 AF2")
+        if selection.get("counting") not in {"x2-ti1", "x2-ti2", "x4-ti12"}:
+            common.fail("G474 encoder counting personality is unmaintained")
+        common.integer(selection.get("filter_a"), 0, 15, "Encoder filter_a")
+        common.integer(selection.get("filter_b"), 0, 15, "Encoder filter_b")
+        if any(type(selection.get(key)) is not bool for key in
+               ("invert_a", "invert_b", "exclusive")) or not selection["exclusive"]:
+            common.fail("G474 encoder requires explicit input polarity and exclusive ownership")
+    elif kind == "pwm_group":
+        actual = tuple((pin["pin"], pin["function"], pin["af"])
+                       for pin in route["pins"])
+        expected = (("PA8", "ch1", 6), ("PA9", "ch2", 6),
+                    ("PA10", "ch3", 6), ("PA1", "comp1-inp", 0),
+                    ("PA4", "comp1-inm", 0))
+        if route["controller"] != "TIM1" or actual != expected:
+            common.fail("G474 coherent PWM requires exact TIM1/COMP1 routes")
+        if type(selection.get("exclusive")) is not bool or not selection["exclusive"]:
+            common.fail("G474 coherent PWM requires an exclusive owner")
+        tick = common.integer(selection.get("tick_hz"), 1, 170000000, "PWM group tick")
+        if 170000000 % tick or 170000000 // tick > 65536:
+            common.fail("PWM group tick must exactly divide its timer kernel")
+        common.integer(selection.get("period_ticks"), 2, 65535, "PWM group period")
+        ticks = common.integer(selection.get("deadtime_ticks"), 0, 1008, "PWM group deadtime")
+        if not (ticks <= 127 or ticks <= 254 and ticks % 2 == 0 or
+                256 <= ticks <= 504 and ticks % 8 == 0 or
+                512 <= ticks <= 1008 and ticks % 16 == 0):
+            common.fail("PWM group deadtime requires exact hardware encoding")
+        if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
+            common.fail("G474 coherent PWM implements IRQ priority5 only")
     elif kind == "pwm":
+        if selection["mode"] == "shared-fixed-pwm":
+            from . import pwm_shared
+            pwm_shared.validate_selection(selection, route)
+            return
         expected = {"TIM3": "PA6", "TIM4": "PB6"}.get(route["controller"])
         if tuple((pin["pin"], pin["function"], pin["af"])
                  for pin in route["pins"]) != ((expected, "ch1", 2),):
@@ -164,8 +229,10 @@ def validate_selection(selection, route):
 
 
 def validate_dma(route, mode, normalize):
-    expected = (("DMA1:stream1:channel5",) if route["controller"] == "ADC1" and
-                mode == "trigger-dma" else None)
+    expected = (("DMA1:stream1:channel5",) if (
+        route["controller"] == "ADC1" and mode in {
+            "trigger-dma", "regular-sequence-dma"} or
+        route["controller"] == "TIM1" and mode == "finite-regular-dma") else None)
     common.validate_dma(route, mode, expected, "stm32g474", normalize,
                         trigger="TIM6")
 

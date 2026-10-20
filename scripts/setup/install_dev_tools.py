@@ -190,6 +190,11 @@ def main(arguments=None):
         if mismatches:
             raise InstallError("Installed tools do not match lock: " + "; ".join(mismatches))
         verify_tools(python, formatter, pins, root)
+        run([
+            python, root / "tools/dev/dependencies.py", "actionlint-prepare",
+            "--root", root, "--install-dir", directory / "nexus-actionlint",
+            "--cache", root / "build/cache/downloads",
+        ], root)
         if not args.skip_hooks:
             run([
                 python, "-I", "-m", "pre_commit", "install", "--install-hooks",

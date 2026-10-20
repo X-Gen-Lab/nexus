@@ -541,6 +541,34 @@ static bool drain(nx_usb_endpoint_t* ep) {
     }
     return clear;
 }
+/** \brief Reopening requires observed STALL clear; bulk also starts DATA0. */
+static bool clear_halts(nx_usb_controller_t* c, bool reset) {
+    for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        nx_usb_endpoint_t* ep = &c->endpoints[i];
+        if (!reset && ep->number != 0U) {
+            continue;
+        }
+        uint32_t offset = ep_offset(ep);
+        uint32_t control = NX_USB_READ(c->registers, offset);
+        /* OUT0 can still receive internal SETUP FIFO data without a PIO loan.
+         * Every other reset direction must be inactive before changing PID. */
+        if (reset && (ep->in || ep->number != 0U) && (control & ENABLE) != 0U) {
+            return false;
+        }
+        control &= ~STALL;
+        if (reset && ep->bulk) {
+            control |= 1U << 28U;
+        }
+        NX_USB_WRITE(c->registers, offset, control);
+        nx_arch_dsb();
+        uint32_t observed = NX_USB_READ(c->registers, offset);
+        if ((observed & STALL) != 0U ||
+            (reset && ep->bulk && (observed & (1U << 16U)) != 0U)) {
+            return false;
+        }
+    }
+    return true;
+}
 /** \brief Advance EP0 only after real packet completion in the current epoch.
  */
 static void control_complete(nx_usb_endpoint_t* ep, nx_result_t result,
@@ -651,26 +679,32 @@ static void progress(nx_usb_controller_t* c) {
             }
         }
     }
-    if (c->setup_pending && endpoint(c, 0U, true)->request == NULL &&
-        endpoint(c, 0U, false)->request == NULL) {
+    if (c->setup_pending && !c->reset_pending &&
+        endpoint(c, 0U, true)->request == NULL &&
+        endpoint(c, 0U, false)->request == NULL && clear_halts(c, false)) {
+        endpoint(c, 0U, true)->halted = false;
+        endpoint(c, 0U, false)->halted = false;
         c->setup_pending = false;
-        for (unsigned i = 0U; i < 2U; ++i) {
-            nx_usb_endpoint_t* ep = endpoint(c, 0U, i == 0U);
-            uint32_t offset = ep_offset(ep);
-            NX_USB_WRITE(base, offset, NX_USB_READ(base, offset) & ~STALL);
-            ep->halted = false;
-        }
     }
     bool pending = false;
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         pending = pending || c->endpoints[i].request != NULL;
     }
     if (c->reset_pending && !pending) {
-        if (hot_flush(c, (0x10U << 6U) | 32U) && hot_flush(c, 16U)) {
-            c->reset_pending = false;
+        if (hot_flush(c, (0x10U << 6U) | 32U) && hot_flush(c, 16U) &&
+            clear_halts(c, true)) {
             uint32_t config = NX_USB_READ(base, CONFIG) & ~0x7F0U;
             NX_USB_WRITE(base, CONFIG, config);
-            c->snapshot.address = 0U;
+            nx_arch_dsb();
+            if (NX_USB_READ(base, CONFIG) == config) {
+                /* No reset fact alone revokes a loan or reopens admission. */
+                for (size_t i = 0U; i < c->endpoint_count; ++i) {
+                    c->endpoints[i].halted = false;
+                }
+                c->snapshot.address = 0U;
+                c->setup_pending = false;
+                c->reset_pending = false;
+            }
         }
     }
     bool draining_out = false;
@@ -680,7 +714,7 @@ static void progress(nx_usb_controller_t* c) {
                                         nx_request_state(&ep->request->base) !=
                                             NX_REQUEST_ACTIVE);
     }
-    if (!draining_out && !c->snapshot.closing) {
+    if (!draining_out && !c->reset_pending && !c->snapshot.closing) {
         NX_USB_WRITE(base, CONTROL, NX_USB_READ(base, CONTROL) | (1U << 10U));
     }
     arm_setup(c);

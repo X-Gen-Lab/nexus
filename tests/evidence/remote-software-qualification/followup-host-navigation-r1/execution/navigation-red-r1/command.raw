@@ -1,0 +1,50 @@
+.......F...F..................................
+======================================================================
+FAIL: test_failed_partial_archive_keeps_failure_and_original_setup_bytes (complete_module_0.SoftwareQualificationContracts.test_failed_partial_archive_keeps_failure_and_original_setup_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py", line 796, in test_failed_partial_archive_keeps_failure_and_original_setup_bytes
+    self.assertEqual(result.returncode, 37)
+AssertionError: 0 != 37
+
+======================================================================
+FAIL: test_offline_navigation_is_sealed_opaque_before_actual_host_identity (complete_module_0.SoftwareQualificationContracts.test_offline_navigation_is_sealed_opaque_before_actual_host_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/tools/maintenance/job_identity.py", line 211, in capture
+    configuration = _configuration(path)
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/nexus-io36-native-20261018/tools/maintenance/job_identity.py", line 81, in _configuration
+    inputs = resolved_input_files(path, resolved)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/nexus-io36-native-20261018/tools/evidence/identity.py", line 181, in resolved_input_files
+    identity = file_identity(file)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/tmp/nexus-io36-native-20261018/tools/evidence/common.py", line 95, in file_identity
+    file = regular_file(path)
+           ^^^^^^^^^^^^^^^^^^
+  File "/tmp/nexus-io36-native-20261018/tools/evidence/common.py", line 77, in regular_file
+    raise EvidenceError(f"required regular file missing or empty: {file.name}")
+tools.evidence.common.EvidenceError: required regular file missing or empty: board.json
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py", line 871, in test_offline_navigation_is_sealed_opaque_before_actual_host_identity
+    record = capture(root=root, job='offline-navigation-fixture',
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/nexus-io36-native-20261018/tools/maintenance/job_identity.py", line 214, in capture
+    raise EvidenceError('configuration validation failed: ' +
+tools.evidence.common.EvidenceError: configuration validation failed: required regular file missing or empty: board.json
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py", line 876, in test_offline_navigation_is_sealed_opaque_before_actual_host_identity
+    self.fail('Host identity must bind the opaque offline closure: ' + str(error))
+AssertionError: Host identity must bind the opaque offline closure: configuration validation failed: required regular file missing or empty: board.json
+
+----------------------------------------------------------------------
+Ran 46 tests in 3.654s
+
+FAILED (failures=2)

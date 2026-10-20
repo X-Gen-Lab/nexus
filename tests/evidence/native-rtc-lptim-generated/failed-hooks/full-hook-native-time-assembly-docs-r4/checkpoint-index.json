@@ -1,0 +1,89 @@
+{
+  "kind": "failed_full_normal_hook_round_checkpoint",
+  "parent_stage": "native-time-assembly-docs-full-commit-r4",
+  "parent_exit": 1,
+  "index_tree": "7834e15d80515e12ffbd0af99aeb088e6c6e9569",
+  "tool_domains": {
+    "testing": {
+      "suite": "testing",
+      "discovered": 997,
+      "executed": 997,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    "configure": {
+      "suite": "configure",
+      "discovered": 855,
+      "executed": 855,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    "ci": {
+      "suite": "ci",
+      "discovered": 369,
+      "executed": 369,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    "workflows": {
+      "suite": "workflows",
+      "discovered": 64,
+      "executed": 64,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    }
+  },
+  "failure": "Both STM32/GD32 physical factory Google targets fail real link: fixture empty-bundle rename list omits newly exported RTC/LPTIM accessors/capabilities. All four tool domains passed; Google programs not executed in this round.",
+  "google_programs_executed": 0,
+  "archives": [
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-time-assembly-docs-r4/batch-0001.tar.gz",
+      "bytes": 1888,
+      "sha256": "68a140c773cbe3c4b15d1d5b310c09b30cdc946289043943a0f08a9def8b62ad",
+      "files": 5
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-time-assembly-docs-r4/batch-0002.tar.gz",
+      "bytes": 2303,
+      "sha256": "1a7a58ab1239bcc046bfc872952aece6e196624bf8fb04c3dc9f7999ca0d452b",
+      "files": 10
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-time-assembly-docs-r4/batch-0003.tar.gz",
+      "bytes": 1496,
+      "sha256": "3983fbc53b73ede9da5e9a6a4e57de5bb05f893f07b9b132f0a421fe04844984",
+      "files": 5
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-time-assembly-docs-r4/batch-0004.tar.gz",
+      "bytes": 1655,
+      "sha256": "bd6ec83011d0b7b7570e7c025cd6ed13bb5b642e763f7dc46bd7d17c4d78b961",
+      "files": 4
+    },
+    {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-hook-native-time-assembly-docs-r4/batch-0005.tar.gz",
+      "bytes": 4769,
+      "sha256": "aed3b40618c4a68b637d7d4897fbd133cf320b242f8e5625667f8fc8ff089c8e",
+      "files": 4
+    }
+  ],
+  "all_member_crc_bytes_mode_pax_mtime_verified": true,
+  "monitor_pending_receipts": [],
+  "normal_commit": "FAILED_NOT_COMMITTED"
+}

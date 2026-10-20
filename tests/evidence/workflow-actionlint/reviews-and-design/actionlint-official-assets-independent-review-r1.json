@@ -1,0 +1,408 @@
+{
+  "schema": 1,
+  "kind": "independent read-only official actionlint asset identity review",
+  "reviewer": "/root/io24_checker_review_r2",
+  "reviewed_utc": "2026-10-18T05:31:59.277261+00:00",
+  "decision": {
+    "result": "PASS_ASSET_IDENTITY_PREPARATION_ONLY",
+    "blockers": [],
+    "meaning": "The precise four official archives and their executable/license bytes are independently matched to retained release API and published checksums. Linux -version execution receipt is valid. This closes only the asset identity preparation prerequisite of the design review.",
+    "installed": false,
+    "repository_lock_adopted": false,
+    "workflow_lint_pass_established": false,
+    "local_metadata_behavior_established": false,
+    "cross_platform_execution_established": false,
+    "qualification": false
+  },
+  "bindings": {
+    "metadata_base": "/workspace/nexus-io-recovery-20261018/validation/actionlint-official-assets-r1",
+    "retained_TMP_base": "/tmp/nexus-actionlint-assets-20261018-r1",
+    "manifest": {
+      "bytes": 1394,
+      "sha256": "ef92b60787017b16e6ec0be38990776f75071229df325c8dde7e4c737e97952b"
+    },
+    "all_7_manifest_leaves": {
+      "actionlint-lock-draft-r1.json": {
+        "bytes": 5006,
+        "sha256": "fbf317d11c8ec341fcaa0ba278c4ff540be789cd9fc202e9e07c6a22aaf19a7b"
+      },
+      "asset-preparation-summary-r1.json": {
+        "bytes": 4013,
+        "sha256": "fd95c924fde15dcccbcff31c76922a26016a1bc75db7d927c70e4a113747c3f8"
+      },
+      "completion-r1.json": {
+        "bytes": 703,
+        "sha256": "dc2ca7dca840c305611fbd22659db2acdb69bb74b9bb59e74c0435f19fddba06"
+      },
+      "metadata-package-process.zip": {
+        "bytes": 3972,
+        "sha256": "8739f0e0228a303f3d15a5f240df7e70a92e41d48ee4ec16d08784910be27e92"
+      },
+      "original-metadata-and-receipts.zip": {
+        "bytes": 61845,
+        "sha256": "ebbc31150d9c191912f75d984ee0146c807b450335fbbe25a03f8731f7bf9943"
+      },
+      "preparation-report-r1.json.gz": {
+        "bytes": 3887,
+        "sha256": "6733bb689aa6b6ba64bf0db2a56b6651ae940b4e4b9724143761d3b0a378c627"
+      },
+      "transport-map-r1.json.gz": {
+        "bytes": 3589,
+        "sha256": "51ecb7424fc8ab9752d1afc33ee67ce3d99e537ee2ebc2382517cdaacdbc21fc"
+      }
+    },
+    "original_plan_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/actionlint-integration-design-independent-review-r1.json",
+      "sha256": "9a5d999ac61ebb8b6052514b78f9888c1aa954a8eba04709b3ed5d854fee7532"
+    }
+  },
+  "upstream": {
+    "repository": "https://github.com/rhysd/actionlint",
+    "version": "1.7.12",
+    "tag": "v1.7.12",
+    "tag_commit": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+    "tag_object_type": "commit",
+    "release_id": 303326868,
+    "release_API": "https://api.github.com/repos/rhysd/actionlint/releases/303326868",
+    "release_page": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+    "published_at": "2026-03-30T17:49:21Z",
+    "draft": false,
+    "prerelease": false,
+    "selection_check": "Retained releases API first nondraft/nonprerelease entry matches exact selected-release API ID/tag. Exact lightweight tag reference resolves to the recorded commit. No latest URL used as a future lock.",
+    "retained_API_and_inventory_identity": {
+      "releases-api.json": {
+        "bytes": 125945,
+        "sha256": "1cde0a691884518ea0e36fcad4230922bf881170c0019a460a95b8f1374f1946"
+      },
+      "selected-release-api.json": {
+        "bytes": 23687,
+        "sha256": "7ddd433ff61972bdfd2590e6461386537e6674922bbed96438f576c324870f8f"
+      },
+      "tag-reference-api.json": {
+        "bytes": 343,
+        "sha256": "3416a42f7a3e8a9f924c9b338153a96306aa7ba41b90a16c8c2ebc99a0fabbf0"
+      },
+      "actionlint_1.7.12_checksums.txt": {
+        "bytes": 1130,
+        "sha256": "433028cf0ba3c42163ea1a668dedce30fcdbe84fe912b1a5e288c006eab8a4f5"
+      },
+      "archive-inspection.json": {
+        "bytes": 11895,
+        "sha256": "4049d6642f885363b8729817d414e0b9669bba47ec2376e2617d6e3a7f53c63a"
+      }
+    },
+    "trust": "API asset digests and checksums are two observations of the same upstream trust domain; not an independent signature/attestation or proof of source-to-binary reproducibility.",
+    "signature_verified": false
+  },
+  "independent_archive_checks": {
+    "actual_archive_count": 4,
+    "actual_archive_total_bytes": 9353003,
+    "regular_members_checked": 44,
+    "method": "Streamed actual retained archives. Checked each full archive size/SHA against exact draft, official release asset ID/name/size/browser URL/digest and checksum filename row. Recomputed every regular member size/SHA/mode against archive-inspection.json. ZIP reads also verify CRC. No extraction or binary execution by reviewer.",
+    "paths": "All44 member paths unique, canonical relative and contain no traversal/backslash; all TAR members regular, ZIP members regular/nonencrypted and not directories/symlinks. Eleven regular files per archive; per-archive expanded payload below8MiB.",
+    "executable_headers": "Read initial bytes only to confirm ELF64 x86_64, both Mach-O64 CPUs, and full PE signature/COFF AMD64. Headers are format identity, not execution validation.",
+    "linux_TMP_copy": "Retained TMP linux/actionlint actual size/SHA matches the streamed Linux member and draft. No other platform executable was extracted by the preparation helper.",
+    "assets": [
+      {
+        "platform": "linux_amd64",
+        "filename": "actionlint_1.7.12_linux_amd64.tar.gz",
+        "official_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+        "api_asset_id": 384924896,
+        "archive_bytes": 2353908,
+        "archive_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+        "api_digest": "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+        "members": 11,
+        "expanded_regular_bytes": 6257891,
+        "executable": {
+          "member": "actionlint",
+          "bytes": 6074530,
+          "mode": 493,
+          "sha256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4"
+        },
+        "binary_header_verified": "ELF64 little endian, e_machine62 (x86_64)",
+        "notices": [
+          {
+            "member": "LICENSE.txt",
+            "bytes": 1067,
+            "mode": 420,
+            "sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22"
+          }
+        ],
+        "execution_scope": "-version only"
+      },
+      {
+        "platform": "darwin_amd64",
+        "filename": "actionlint_1.7.12_darwin_amd64.tar.gz",
+        "official_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_amd64.tar.gz",
+        "api_asset_id": 384924880,
+        "archive_bytes": 2355828,
+        "archive_sha256": "5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644",
+        "api_digest": "sha256:5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644",
+        "members": 11,
+        "expanded_regular_bytes": 6303809,
+        "executable": {
+          "member": "actionlint",
+          "bytes": 6120448,
+          "mode": 493,
+          "sha256": "d1f7cee75ae2873609bd9567b4600bebc5315a5e733e73202987a44fafdd53b2"
+        },
+        "binary_header_verified": "Mach-O64, cputype0x01000007 (x86_64)",
+        "notices": [
+          {
+            "member": "LICENSE.txt",
+            "bytes": 1067,
+            "mode": 420,
+            "sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22"
+          }
+        ],
+        "execution_scope": "not executed"
+      },
+      {
+        "platform": "darwin_arm64",
+        "filename": "actionlint_1.7.12_darwin_arm64.tar.gz",
+        "official_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_arm64.tar.gz",
+        "api_asset_id": 384924893,
+        "archive_bytes": 2164202,
+        "archive_sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+        "api_digest": "sha256:aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+        "members": 11,
+        "expanded_regular_bytes": 6013203,
+        "executable": {
+          "member": "actionlint",
+          "bytes": 5829842,
+          "mode": 493,
+          "sha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388"
+        },
+        "binary_header_verified": "Mach-O64, cputype0x0100000c (arm64)",
+        "notices": [
+          {
+            "member": "LICENSE.txt",
+            "bytes": 1067,
+            "mode": 420,
+            "sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22"
+          }
+        ],
+        "execution_scope": "not executed"
+      },
+      {
+        "platform": "windows_amd64",
+        "filename": "actionlint_1.7.12_windows_amd64.zip",
+        "official_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip",
+        "api_asset_id": 384924919,
+        "archive_bytes": 2479065,
+        "archive_sha256": "6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9",
+        "api_digest": "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9",
+        "members": 11,
+        "expanded_regular_bytes": 6616129,
+        "executable": {
+          "member": "actionlint.exe",
+          "bytes": 6432768,
+          "mode": 33261,
+          "sha256": "54ca21be3de4c7cfa26914aa8b61bd76bf573ef3caac5f80d110558cdf241718"
+        },
+        "binary_header_verified": "DOS/PE signature with COFF machine0x8664 (AMD64)",
+        "notices": [
+          {
+            "member": "LICENSE.txt",
+            "bytes": 1067,
+            "mode": 33188,
+            "sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22"
+          }
+        ],
+        "execution_scope": "not executed"
+      }
+    ]
+  },
+  "license": {
+    "declared": "MIT",
+    "member": "LICENSE.txt",
+    "bytes": 1067,
+    "sha256": "03a26b06d224380a02bf100e05fff3b2dfc71b14d4e2fa685ec9963a87563c22",
+    "assessment": "All four streamed notice members match each other, the retained notice copies and draft. Read actual license text and MIT grant/disclaimer. No unsigned asset is described as signed."
+  },
+  "actual_execution_evidence": {
+    "preparation_stages": [
+      {
+        "stage": "archive-inspection",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "72854eef1ca929598e6fd303fd35521cebfb0f9a091d938b17952caa2d0dc525",
+        "stdout_sha256": "e33a2877cdfeb1ebd282c11dbb2110dc54c8ed39aa4ee876a5d4b51d43e69c6d",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301095747471486,
+        "finished_ns": 1792301095912066569
+      },
+      {
+        "stage": "darwin-amd64-download",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "6e18fe851cda186d6cc079bb9b3b14811d92dece6db7e41d8a1e8c9435247a90",
+        "stdout_sha256": "0a6f4a331c82d478453534c005041eb61cc9ddf2f9aecd5a09482104e322ef58",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301022630428990,
+        "finished_ns": 1792301023096128935
+      },
+      {
+        "stage": "darwin-arm64-download",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "c481d6e9c84784dbb49e0565298a8cc82d19bf115c5a0e8a50cf970153c6f819",
+        "stdout_sha256": "6896c915924307b6f4735ebae428e06cdac6c83400f33609910f5992d661ebdd",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301026461648709,
+        "finished_ns": 1792301027027827540
+      },
+      {
+        "stage": "linux-amd64-download",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "398092dbe8717cc9e78425c889fc1c51c58e3a4c10c216313b6a74e2fed98916",
+        "stdout_sha256": "c97b534588ea42b129e687ca2723f1325ee8d6befc57156fd4d535623260c354",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301018932701672,
+        "finished_ns": 1792301019297961996
+      },
+      {
+        "stage": "linux-version",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "52cda6b4387e4b86310e2791c4cd9f578de5228b18cf50a678e0f73626c33255",
+        "stdout_sha256": "9d34cdaec053c6005199c08f2bac628bd8c087303faa26fd8ab58c3e22216ff5",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301105039456429,
+        "finished_ns": 1792301105044142638
+      },
+      {
+        "stage": "official-checksums",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "213ecb0247cadf6eaeb6c4aacf2f3d2ab5bb79feb9e080724971847745c4428c",
+        "stdout_sha256": "0ef3cf1cab3dcaca50b84b2815ab842342498c6b0b0326780e365bb0614c4894",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301013041290325,
+        "finished_ns": 1792301013407195481
+      },
+      {
+        "stage": "release-list",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "1cd6cc277422e5492f85c05450d57fabc0270f271c33d8de704e4a58b8c3759c",
+        "stdout_sha256": "9757db199491e54ba77082e290749c3ac51ccb22a89bc92f81b3e063a0c06c4b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792300992771165860,
+        "finished_ns": 1792300993337347790
+      },
+      {
+        "stage": "selected-release",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "ff81e89947363823446463f975f0bd0fe5ae5b9ed8186963a1fb1f889c7ec102",
+        "stdout_sha256": "d03789893cffc111d14ddfd9bd047d1b1214e98e9ded6494d526a5fdb87cb1d8",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301001623669769,
+        "finished_ns": 1792301002039286612
+      },
+      {
+        "stage": "tag-reference",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "a0915bda8073ec2a0e2344f2263f47ffa95642e7c0c33e09e9072acce3fa80ef",
+        "stdout_sha256": "9370689f25cd821f0829d4786823ecb12077a58af6a072c07a71c88141debb78",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301004684186889,
+        "finished_ns": 1792301005050928236
+      },
+      {
+        "stage": "windows-amd64-download",
+        "actual_exit": 0,
+        "outcome": "completed",
+        "withdrawal_complete": true,
+        "withdrawal_stable": true,
+        "receipt_sha256": "cd3699c9bcd70a07650df316544b6bedb41a3e3a41eac2c24a753c7f84a66850",
+        "stdout_sha256": "8b33bcaaf1078e0b26d25f38cad8583ccedfba46a50d01983a17ac6ad2d45e42",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "started_ns": 1792301030427274110,
+        "finished_ns": 1792301030843079728
+      }
+    ],
+    "metadata_package_stage": {
+      "actual_exit": 0,
+      "outcome": "completed",
+      "withdrawal_complete": true,
+      "withdrawal_stable": true,
+      "receipt_sha256": "205c3a48892ca8d2ebc4fb3750d8cea5c3fbb664400839b841f24b56324718c7",
+      "stdout_sha256": "310e46366e04f91a22c727832adb42f86b981a8f0d0686b03bec186b8042f17c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "inner_outer_raw_checked": "All10 preparation outer commands and attempt receipts have matching command/cwd/time/exit/output identities, actual0/completed with stable complete withdrawal. Matching stdout/stderr SHA are present in raw archive and retained TMP. Package command/receipt and streams likewise match.",
+    "only_tool_command": [
+      "/tmp/nexus-actionlint-assets-20261018-r1/linux/actionlint",
+      "-version"
+    ],
+    "linux_actual_exit": 0,
+    "linux_actual_stdout": "1.7.12\ninstalled by downloading from release page\nbuilt with go1.26.1 compiler for linux/amd64\n",
+    "linux_actual_stderr_bytes": 0,
+    "chronology": "Recorded archive-inspection completed before Linux-version began; helper verifies and writes the streamed Linux executable before invocation. Current TMP executable remains exact matching bytes.",
+    "scope": "No workflows/local-uses probes, installer, hooks, doctor, SDK, OCI, firmware or qualification execution are included. Other three platform assets have only byte/header identity observations."
+  },
+  "raw_transport": {
+    "original_metadata_and_receipts_zip_members": 73,
+    "original_transport_map_rows": 73,
+    "package_process_zip_members": 7,
+    "package_map_rows": 6,
+    "checks": "Recomputed CRC and SHA/size for all73 original mapped ZIP entries and compared each original TMP source. Checked all7 package ZIP members; its six mapped raw/receipt/guard entries match original TMP source, and its own map is covered by ZIP CRC and manifest hash. Both ZIP member sets unique/safe.",
+    "gzip": "Both report and original transport-map gzip decoded bytes equal their retained original TMP JSON byte-for-byte; compressed bytes match manifest hashes.",
+    "history": "Original API/checksum/inventory/notice/helper/raw/receipt bytes are preserved. No archive/binary copied into persistent metadata; full executable/archive bytes remain TMP only.",
+    "recovery_limit": "Persistent metadata records exact identities but is not a self-contained offline executable archive after TMP loss. Future installer can obtain exact hash-locked official bytes; this report does not turn the draft into an installed tool."
+  },
+  "budget": {
+    "author_limits": {
+      "task_TMP_max": 33554432,
+      "metadata_allocated_max": 131072,
+      "TMP_free_min": 209715200,
+      "persistent_free_min": 67108864,
+      "cgroup_headroom_min": 629145600
+    },
+    "recorded_snapshots_checked": 24,
+    "all_recorded_guards_within_limits": true,
+    "all_recorded_OOM_counters_zero": true,
+    "min_recorded_TMP_free": 449245184,
+    "min_recorded_persistent_free": 85860352,
+    "min_recorded_cgroup_headroom": 2055561216,
+    "packet_logical_bytes_current": 84409,
+    "packet_allocated_bytes_current": 98304,
+    "task_TMP_allocated_current": 16105472,
+    "scope": "Discrete before/after/prepublication snapshots plus current read-only allocation; no continuous peak/RSS assertion. These limits concern this preparation task, not relaxed candidate/SDK/OCI admission thresholds."
+  },
+  "adoption_notes_not_asset_blockers": [
+    "Draft is explicitly not repository lock. Keep preparation-only absolute TMP paths, observed output and evidence references out of any portability-sensitive operational schema, or label them evidence rather than required install paths.",
+    "TAR member mode values are permission bits while ZIP draft values include regular-file type bits. A final schema/verifier must normalize or explicitly distinguish these before comparing installed permissions; current recorded values faithfully match their source archives.",
+    "Leave environment.lock unchanged as recommended. A standalone actionlint asset lock remains single authority, with normal new source/provenance observations.",
+    "The prior exact-version local-metadata presence/deletion and isolated Git-selector behavior gates remain open. No whole workflow pass, installer portability, macOS/Windows execution or GitHub remote qualification follows from a version string."
+  ],
+  "review_actions": {
+    "performed": "Read frozen API/metadata/raw/helper source, stream-hash four archives and44 members, inspect executable headers, verify notices, all80 ZIP CRC/byte identities, gzip/original equality,11 recorded command receipts and budget snapshots.",
+    "not_performed": "No binary execution, version re-run, install, archive extraction to disk, network fetch, workflow/localuses probe, tests/build, cleanup, Main/source/index/ref/venv/lock mutation.",
+    "write": "Only this new independent global validation JSON outside frozen asset packet.",
+    "source_scope_limit": "The preparation helper source is consistent with its no-install/no-main-write scope. Its resource guards are not a full before/after Main source/index manifest; this review does not invent such a guard."
+  },
+  "frozen_packet_unchanged_after_review": true
+}

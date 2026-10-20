@@ -53,6 +53,19 @@ software candidate additionally requires all other qualification scopes for
 the same source, resolved configuration and ELF. Physical HIL stays
 `not_executed` until equipment actually runs it.
 
+Development source observations can also describe a dirty checkout. Only these
+dirty records add `working_tree_sha256`, binding the Git-visible tracked patch,
+index, untracked regular-file bytes and modes, symlink text and initialized
+submodule observations. Identical bytes rewritten with a new modification time
+keep the same identity. Historical dirty records without this fingerprint are
+stale; they cannot retrospectively prove which dirty bytes were observed.
+
+Clean source records keep exactly `root`, `commit`, `tree`, `dirty` and
+`submodules`. Candidates and external consumers still require clean source.
+Dirty observation does not qualify a candidate or an OCI/offline reproduction.
+It excludes ignored or Git-hidden worktree data and does not lock out concurrent
+writers or prove that no change-and-restore occurred between observations.
+
 # 离线构建与外部工程
 
 复现输入分别绑定平台的干净 Git 版本、完整可发布 Source SDK、不可变 OCI
@@ -81,3 +94,72 @@ Overlay2／overlayfs 使用共享只读镜像层、有界 tmpfs 并关闭 daemon
 取消会终止 CLI 进程组并清理命名容器；真实退出码和原始日志保留。失败或取消
 不产生通过资格。最终候选还须满足同一源码、resolved 配置和 ELF 的全部软件
 验收范围。实板未执行时，物理 HIL 始终记录为 `not_executed`。
+
+开发阶段也可观察 dirty 工作区。仅 dirty 记录新增 `working_tree_sha256`，
+绑定 Git 可见的已跟踪补丁、索引、未跟踪普通文件的字节和权限、符号链接文本，
+以及已初始化子模块的观察结果。相同字节只因重写而修改时间发生变化时，身份不变。
+缺少该指纹的历史 dirty 记录视为过期，不能追溯证明当时观察了哪些 dirty 字节。
+
+clean 源码记录仍精确包含 `root`、`commit`、`tree`、`dirty` 和 `submodules`
+五项。候选与外部工程消费仍要求 clean 源码。dirty 观察不能赋予候选或 OCI／离线
+复现资格；它不涵盖被忽略或被 Git 隐藏的工作区数据，也不锁住并发写入者，不能
+证明两次观察之间没有发生修改后恢复原值的操作。
+
+## Independently downloadable qualification evidence
+
+The nonpublishing qualification workflow transports its complete original
+qualification, delivery and job-identity trees. The immutable `ROOTS` table in
+`qualification_transfer.py` owns their exact roles; factory, SDK, environment,
+recipe and candidate contracts are unchanged. Hidden files, empty directories,
+zero-byte stderr and file modes remain part of the complete inventory. There
+is no selected-file optimization or removal of duplicated OCI bytes.
+
+Preparation writes an existing-schema portable evidence archive directly into
+at most eight 256 MiB parts. Each part has its own pinned GitHub artifact upload
+with compression disabled, leaving ample ZIP overhead below the connector's
+512 MiB limit. A separate core artifact contains the original identity bytes,
+ordered offsets/sizes/SHA256, logical archive identity and actual upload outcomes.
+The whole original input inventory and stat identities must remain unchanged;
+symlinks, special entries, aliased roots and overlapping outputs are rejected.
+The new transport bounds are not changes to any inner evidence-format limit.
+
+Download core first and bind it to the actual final run, job, source and attempt.
+Obtain every declared part by its actual GitHub artifact ID and API ZIP digest,
+not by an arbitrary filename or a producer's success flag. Keep each part ZIP
+separate: one artifact containing all parts would still exceed the limit.
+Admit storage for the complete compressed archive, reassembly and any subsequent
+restore before downloading; tmpfs capacity alone is not memory headroom.
+
+After safe ZIP extraction into a new parts directory, verify the complete set:
+
+```sh
+python -B tools/evidence/qualification_transfer.py verify \
+  --core /download/core --parts /download/parts \
+  --output /new/evidence.tar.gz --commit EXACT_SOURCE_SHA \
+  --run-id ACTUAL_RUN_ID --attempt ACTUAL_ATTEMPT
+```
+
+Verification checks every ordinal, offset, size and digest, the entire joined
+archive, one complete gzip member through CRC/ISIZE, strict TAR framing,
+non-sparse bounded logical sizes and the unchanged portable-evidence inventory.
+The original logical job, source, run
+and result must match the core; its identity bytes must also match the archived
+copy, whose qualification/delivery files must match the original artifact list.
+Rehashing an outer envelope cannot substitute a different original source.
+Existing `store.py`, `environment.py`,
+SDK and reproduction validators then retain their own responsibilities. Never
+execute archived scripts. Existing outputs are not overwritten; interrupted
+attempts retain partial files and must use a fresh destination for another try.
+
+A failed required volume, missing upload identity or failed core upload means
+incomplete delivery. Remaining volume/core uploads still preserve diagnostics.
+If preparation fails, the original monolithic failure-only uploader preserves
+available raw bytes, potentially exceeding the connector limit; that fallback
+is not successful multipart delivery. Final GitHub job/API identity remains
+mandatory even when an earlier original job-identity record says success.
+
+`verified_transport` proves transported bytes and modes only. It never establishes
+a software candidate, physical MCU execution, HIL or independent validation of a
+historical artifact that could not be downloaded. New runs have new transport
+identities; the previous oversized ZIP and all failed download observations keep
+their original identities and unresolved validation status.

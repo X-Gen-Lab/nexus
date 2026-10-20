@@ -43,14 +43,19 @@
       "modes": [
         "irq-bytes",
         "dma-tx",
-        "rx-dma-idle"
+        "rx-dma-idle",
+        "rx-dma-continuous",
+        "irq-fifo-bytes"
       ],
-      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown. RM0433 DMA1 stream0/DMAMUX1 channel0, USART3_TX request46; official ST H7 HAL v1.11.5 DMA request table. RX normal blocks: RM0433 Rev9 sections15.3.15/15.3.16, DMA1 stream1/DMAMUX1 channel1 USART3_RX request45; official ST H7 HAL v1.11.5 request table. Owner-service restart gaps possible; no circular/continuous claim.",
+      "source": "DS12110 Rev11 alternate-function table PD8/PD9 AF7 USART3; actual CMSIS IRQ39; UM2407 Rev6 VCP default SB19/SB12 ON. Physical fitting unknown. RM0433 DMA1 stream0/DMAMUX1 channel0, USART3_TX request46; official ST H7 HAL v1.11.5 DMA request table. RX normal blocks: RM0433 Rev9 sections15.3.15/15.3.16, DMA1 stream1/DMAMUX1 channel1 USART3_RX request45; official ST H7 HAL v1.11.5 request table. rx-dma-idle has owner-service restart gaps. The separate rx-dma-continuous selection uses reviewed DMA1 Stream1 DBM/CT and posted-buffer replacement with a same-clock bounded replacement deadline; hardware and loss qualification remain unexecuted.",
       "mode_dma": {
         "dma-tx": [
           "DMA1:stream0:channel46"
         ],
         "rx-dma-idle": [
+          "DMA1:stream1:channel45"
+        ],
+        "rx-dma-continuous": [
           "DMA1:stream1:channel45"
         ]
       }
@@ -99,9 +104,16 @@
         }
       ],
       "modes": [
-        "short-poll"
+        "short-poll",
+        "dma"
       ],
-      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL."
+      "source": "DS12110 Rev11 STM32H743ZI package and alternate function table; RM0433 Rev9 selected finite software reference. External PCB wiring unknown; no physical HIL.",
+      "mode_dma": {
+        "dma": [
+          "DMA1:stream2:channel83",
+          "DMA1:stream3:channel84"
+        ]
+      }
     },
     {
       "id": "tim3-pa6",
@@ -228,6 +240,40 @@
         "poll-word"
       ],
       "source": "DS12110 Rev11 exact PA3 ADC1_INP15 and PB8/PB9 AF4; RM0433 Rev9 ADC/I2C and2MiB dual-bank Flash. Source-reviewed software-only fixture; VDDA, supply voltage, I2C pull-ups/rise/fall and external wiring physically unqualified."
+    },
+    {
+      "id": "usart3-pd8-pd9-pd11-pd12-rtscts",
+      "variants": [
+        "STM32H743ZIT6"
+      ],
+      "controller": "USART3",
+      "kind": "uart",
+      "pins": [
+        {
+          "pin": "PD8",
+          "function": "tx",
+          "af": 7
+        },
+        {
+          "pin": "PD9",
+          "function": "rx",
+          "af": 7
+        },
+        {
+          "pin": "PD11",
+          "function": "cts",
+          "af": 7
+        },
+        {
+          "pin": "PD12",
+          "function": "rts",
+          "af": 7
+        }
+      ],
+      "modes": [
+        "irq-fifo-rtscts-bytes"
+      ],
+      "source": "DS12110 Rev11 Table10 exact STM32H743ZIT6 LQFP144 PD8/PD9/PD11/PD12 AF7; software silicon reference only, no PCB or peer qualification."
     }
   ]
 }

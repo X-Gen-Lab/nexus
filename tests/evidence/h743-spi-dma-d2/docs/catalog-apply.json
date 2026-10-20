@@ -1,0 +1,72 @@
+{
+  "kind": "authorized_metadata_only_catalog_admission",
+  "source_before": {
+    "root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "commit": "61d0698458bd6fe92b6d91914cbb9bec86d96754",
+    "tree": "3e22858bf95a3afc00605536b453f7a81e8bd9cd",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.2.202603_rel)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (c8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (8f922cd)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (624374f)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (fee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (f5929f4)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (a1996ee)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (2552682)"
+    ],
+    "working_tree_sha256": "2c613f8e21d2d7ef1ca6d848bb7d1d43c933ba0206733728fc5c2b3607b05c01"
+  },
+  "source_after": {
+    "root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "commit": "61d0698458bd6fe92b6d91914cbb9bec86d96754",
+    "tree": "3e22858bf95a3afc00605536b453f7a81e8bd9cd",
+    "dirty": true,
+    "submodules": [
+      "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)",
+      " 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)",
+      " dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)",
+      " 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.2.202603_rel)",
+      " 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)",
+      " c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (c8e9a4a)",
+      " 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)",
+      " 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)",
+      " 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (8f922cd)",
+      " 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (624374f)",
+      " fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (fee494a)",
+      " b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)",
+      " f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (f5929f4)",
+      " a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (a1996ee)",
+      " 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (2552682)"
+    ],
+    "working_tree_sha256": "b46a536e82991bd4e510a8c2d2d540c0447cd0fb9a34277207ddb5ccc7c2bdba"
+  },
+  "catalogs": [
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256": "dd33e905611ef1a079085bfd8509f3b51a37c43d0f0e005b2d270d24920f8e84",
+      "reviewed_false_sha256": "940f1ccdea38d45b0afe9599f301a0b6f2767df404832b39121dd199ab730a92",
+      "reviewed_true_sha256": "6a05770c9916846d3c24d24ee11589a7e4167b87ca422816c861265184013768"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "before_sha256": "180b64b14e9ddd87a059cf5eec8b25a03fa0b3616d16c90244663ce423eb69e5",
+      "reviewed_false_sha256": "0dcaa77794580bef63361c3be45f6dda5716a8e8136748ae072c032efc6b50b2",
+      "reviewed_true_sha256": "b313c57e1d5fbd665caff8fa0eec8a514909743cc7f586f9d37cbab1a1a36bd4"
+    }
+  ],
+  "page_sha256": "3ce2824667281bef8c6136cab183183f4f00929f3a6a2e86acdae4dabab206e2",
+  "feature_allocated_bytes": 2129920,
+  "feature_cap": 2359296,
+  "temporary_allocated_bytes": 24518656,
+  "persistent_free_bytes": 72429568,
+  "only_authorized_two_catalogs_written": true,
+  "full_source_check_still_pending_author_comment_token": true
+}

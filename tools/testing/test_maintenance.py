@@ -49,10 +49,89 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
         self.assertEqual(spi["boards"], [])
 
+    def test_native_selected_models_preserve_real_ops_and_no_physical_claim(self):
+        rows = capabilities.collect(ROOT)
+        selected = [row for row in rows if row["family"] == "native"]
+        self.assertTrue(selected, "Selected Native models require source provenance")
+        fixture = "cmake/package/verification/io_evolution/native-time-pair.toml"
+        for controller, kind, mode in (
+                ("RTC0", "rtc", "calendar-alarm"),
+                ("RTC1", "rtc", "calendar-alarm"),
+                ("LPTIM0", "lptim", "counter16-oneshot"),
+                ("LPTIM1", "lptim", "counter16-oneshot")):
+            with self.subTest(controller=controller):
+                values = [row for row in selected if
+                          (row["controller"], row["kind"], row["mode"]) ==
+                          (controller, kind, mode)]
+                self.assertEqual(len(values), 1)
+                row = values[0]
+                self.assertEqual(row["implementation"], "MODEL")
+                self.assertIs(row["physical_qualified"], False)
+                self.assertEqual(row["routes"], [])
+                self.assertEqual(row["boards"], [])
+                self.assertEqual(row["exports"], ["io/native/rtc_lptim.c"])
+                self.assertIn(fixture, row["fixtures"])
+        empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
+        self.assertFalse(any(empty in row["fixtures"] for row in rows),
+                         "Empty selection must not invent provider evidence")
+        for row in selected:
+            self.assertEqual(row["implementation"], "MODEL")
+            self.assertIs(row["physical_qualified"], False)
+            self.assertTrue(row["fixtures"])
+            self.assertTrue(row["exports"])
+        rendered = capabilities.render(selected)
+        self.assertIn("native (MODEL; physical=false)", rendered)
+        self.assertNotIn("| native |", rendered)
+
     def test_checked_document_matches_facts_and_selected_implementation(self):
         expected = capabilities.render(capabilities.collect(ROOT))
         document = (ROOT / capabilities.DOCUMENT).read_text()
         capabilities.check_block(document, expected)
+
+    def test_redistributed_references_preserve_selected_source_provenance(self):
+        directory = ROOT / "cmake/package/verification/io_evolution"
+        fixtures = sorted(directory.glob("*.toml"))
+        self.assertTrue(fixtures)
+        rows = capabilities.collect(ROOT)
+        for fixture in fixtures:
+            resolved = capabilities.configure.resolve(fixture, ROOT)
+            relative = fixture.relative_to(ROOT).as_posix()
+            for item in resolved["controllers"]:
+                with self.subTest(fixture=fixture.name, device=item["id"]):
+                    selected = [row for row in rows if
+                                (row["family"], row["controller"], row["kind"],
+                                 row["mode"]) ==
+                                (resolved["soc_family"], item["controller"],
+                                 item["kind"], item["mode"])]
+                    self.assertEqual(len(selected), 1)
+                    self.assertIn(relative, selected[0]["fixtures"])
+                    self.assertTrue(selected[0]["exports"])
+
+    def test_alternate_interface_uses_its_exact_route_and_source_on_one_timer(self):
+        rows = capabilities.collect(ROOT)
+        timer = [row for row in rows if row["family"] == "stm32g474" and
+                 row["controller"] == "TIM3"]
+        self.assertEqual({(row["kind"], row["mode"]) for row in timer},
+                         {("pwm", "fixed-pwm"),
+                          ("pwm", "shared-fixed-pwm"),
+                          ("encoder", "quadrature")})
+        encoder = next(row for row in timer if row["kind"] == "encoder")
+        pwm = next(row for row in timer if row["mode"] == "fixed-pwm")
+        shared = next(row for row in timer
+                      if row["mode"] == "shared-fixed-pwm")
+        self.assertEqual(encoder["routes"], ["tim3-encoder-pa6-pa7"])
+        self.assertEqual(pwm["routes"], ["tim3-ch1-pa6"])
+        self.assertEqual(shared["routes"], ["tim3-ch1-pa6", "tim3-ch2-pa7"])
+        self.assertEqual(shared["exports"],
+                         ["soc/stm32g474/drivers/pwm_shared.c"])
+        self.assertIn("cmake/package/verification/io_evolution/"
+                      "g474-pwm-shared.toml",
+                      shared["fixtures"])
+        self.assertEqual(encoder["exports"],
+                         ["soc/stm32g474/drivers/encoder.c"])
+        self.assertIn("tests/contracts/g474_control_assembly/encoder.toml",
+                      encoder["fixtures"])
+        self.assertEqual(encoder["boards"], [])
 
 
 class AgentMaintenanceTests(unittest.TestCase):

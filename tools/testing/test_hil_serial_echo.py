@@ -16,8 +16,73 @@ import tty
 import unittest
 from unittest.mock import patch
 
+from tools.configure import configure
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.hil import serial_echo
+from tools.hil.admit import validate_console
+
+
+class HilConsoleWireFrameTests(unittest.TestCase):
+    """Pure TOML/configuration checks; no compiler, PTY or device is opened."""
+
+    def console(self, family, words=False, frame=None):
+        fixture_name, instance = {
+            "f407": ("stm32f407_qiming_v31", "uart1"),
+            "gd470": ("gd32f470_liangshan", "uart0"),
+        }[family]
+        fixture = json.loads((configure.ROOT / "tools/hil/fixtures" /
+                              (fixture_name + ".json")).read_text())
+        assembly = configure.ROOT / "tests/contracts/io_evolution_assembly" / (
+            family + ("-uart9n1.toml" if words else "-uart7e2.toml"))
+        if frame is None:
+            return fixture, configure.resolve_ir(assembly).to_dict()
+        contents = assembly.read_text().split(
+            "\n[uart." + instance + ".frame]\n")[0]
+        if frame == "explicit_8n1":
+            contents += ("\n[uart." + instance + ".frame]\n"
+                         'data_bits = 8\nparity = "none"\n'
+                         'stop_bits = 1\nflow = "none"\n')
+        with tempfile.TemporaryDirectory() as directory:
+            authored = Path(directory) / "console.toml"
+            authored.write_text(contents)
+            return fixture, configure.resolve_ir(authored).to_dict()
+
+    def reject(self, family, words=False):
+        fixture, resolved = self.console(family, words)
+        with self.assertRaisesRegex(EvidenceError, "8N1|frame|word"):
+            validate_console(fixture, resolved)
+
+    def test_f407_word_face_cannot_be_an_eight_bit_smoke_console(self):
+        self.reject("f407", words=True)
+
+    def test_gd470_word_face_cannot_be_an_eight_bit_smoke_console(self):
+        self.reject("gd470", words=True)
+
+    def test_f407_seven_even_two_is_not_an_eight_none_one_console(self):
+        self.reject("f407")
+
+    def test_gd470_seven_even_two_is_not_an_eight_none_one_console(self):
+        self.reject("gd470")
+
+    def test_word_face_cannot_inherit_the_legacy_byte_default(self):
+        fixture, resolved = self.console("f407", words=True)
+        resolved["controllers"][0].pop("frame")
+        with self.assertRaisesRegex(EvidenceError, "8N1|frame|word"):
+            validate_console(fixture, resolved)
+
+    def test_legacy_byte_console_without_frame_keeps_defined_eight_n_one(self):
+        for family in ("f407", "gd470"):
+            with self.subTest(family=family):
+                fixture, resolved = self.console(family, frame="omitted")
+                self.assertNotIn("frame", resolved["controllers"][0])
+                validate_console(fixture, resolved)
+
+    def test_explicit_eight_none_one_console_remains_admitted(self):
+        for family in ("f407", "gd470"):
+            with self.subTest(family=family):
+                fixture, resolved = self.console(family,
+                                                  frame="explicit_8n1")
+                validate_console(fixture, resolved)
 
 
 class HilSerialEchoTests(unittest.TestCase):

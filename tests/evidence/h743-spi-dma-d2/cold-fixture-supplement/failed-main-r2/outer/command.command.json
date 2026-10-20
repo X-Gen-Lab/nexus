@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "command": [
+    "git",
+    "-c",
+    "gc.auto=0",
+    "-c",
+    "maintenance.auto=false",
+    "commit",
+    "-m",
+    "feat(io): assemble finite H743 SPI DMA endpoints"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "stage": "h743-spi-dma-d2-full-commit-r2",
+  "started_ns": 1792311291704425978,
+  "finished_ns": 1792311631764065946,
+  "duration_seconds": 340.05964191100065,
+  "timeout_seconds": 7200.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/h743-spi-dma-d2-full-commit-r2/command.attempts/1792311291704329893-439339c9b32e415a82c9194dd2bcffa6/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/commands/h743-spi-dma-d2-full-commit-r2/command.attempts/1792311291704329893-439339c9b32e415a82c9194dd2bcffa6/stderr.txt",
+    "bytes": 967,
+    "sha256": "d1c7457b4c1cf8f70db766db9490a652e3c3cd069173e4fbe4b3a261ec109b6f"
+  },
+  "attempt_receipt": "/workspace/nexus-io-recovery-20261018/validation/commands/h743-spi-dma-d2-full-commit-r2/command.attempts/1792311291704329893-439339c9b32e415a82c9194dd2bcffa6/receipt.json"
+}

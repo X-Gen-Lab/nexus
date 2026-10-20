@@ -1,0 +1,210 @@
+{
+  "kind": "Independent final source and actual evidence review of H743 fixed-HSI SPI divider S0.3",
+  "reviewed_at_utc": "2026-10-18T02:39:35.388577+00:00",
+  "author_manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/manifest.json",
+    "bytes": 30240,
+    "sha256": "dc1eb13953cdb7fa7eb190643e4e739dbdfa168639cbab9ec7b1afc164a3ee60"
+  },
+  "base_commit": "3e63888152491678a3e2e8a32a9a522d575834b9",
+  "decision": {
+    "blocker_found": false,
+    "focused_source_and_TDD_ready_for_normal_integration": true,
+    "prior_comment_quality_item": "CLOSED for these inspected bytes; literal backslash brief/note restored and all7 combined C-family sources contain no forbidden ASCII control.",
+    "prior_CSTART_EOT_behavior_items": "Remain CLOSED: repaired race drain/withdraw and independent quiet preserved.",
+    "full_integration_qualified": false
+  },
+  "frozen_sources_before_after_review": {
+    "soc/stm32h743/drivers/spi.c": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/soc/stm32h743/drivers/spi.c",
+      "bytes": 21301,
+      "sha256": "26766fe3e5b9010eeaa92164556c8701fbfeaafc65ed038c030630259fd7937e"
+    },
+    "tests/google/h743_peripheral_test.cpp": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tests/google/h743_peripheral_test.cpp",
+      "bytes": 32301,
+      "sha256": "b5fbef62991a953b400d80e0605333cfee77859448d58ba872ed1a56e56794a2"
+    },
+    "tests/google/h743_peripheral_factory_test.cpp": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tests/google/h743_peripheral_factory_test.cpp",
+      "bytes": 7831,
+      "sha256": "da4874c4b4a0b20b81a3e6a83594c1bb679300dcb15aeca08bb8e57d8a1e5c0f"
+    },
+    "tests/google/h743_model.h": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tests/google/h743_model.h",
+      "bytes": 7266,
+      "sha256": "1626b1cdbfb4750d550c359d37f6b34bb4fcbe8b742ef8f568c6d8fafeb91d8b"
+    },
+    "tests/google/h743_model.cpp": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tests/google/h743_model.cpp",
+      "bytes": 24814,
+      "sha256": "05cee6923341a2a5f67486e4ef04dd506cd868054769e296a359d688bfc8eda7"
+    },
+    "tools/configure/providers/stm32h743/bindings.py": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tools/configure/providers/stm32h743/bindings.py",
+      "bytes": 18811,
+      "sha256": "d90c63ecb774f3c272b688882d312c41e0e5ab5486fa5a2f26ce07060e1f8d0b"
+    },
+    "tools/configure/providers/stm32h743/test_peripherals.py": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tools/configure/providers/stm32h743/test_peripherals.py",
+      "bytes": 7402,
+      "sha256": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04"
+    },
+    "soc/stm32h743/private/stm32h743_provider.h": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/files/soc/stm32h743/private/stm32h743_provider.h",
+      "bytes": 13407,
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61"
+    },
+    "tests/google/h743_high_kernel_test.cpp": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/files/tests/google/h743_high_kernel_test.cpp",
+      "bytes": 24034,
+      "sha256": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654"
+    }
+  },
+  "minimal_production_change": [
+    "After separately recorded comment-only repair, the only noncomment C-token change relative to the reviewed race source is the fixed-profile source_max: nominal32MHz chooses32500000, nominal64MHz chooses65000000. The existing valid() admits only these nominal values for fixed builds. No mutable state/header layout, face, operations table, allocation, worker, registry or ownership protocol was added.",
+    "The existing uint64 cross-product chooses the smallest hardware divisor2..256 satisfying source_max <= requested_max_hz * divisor. If even256 is insufficient, transfer returns UNSUPPORTED before active=true and before any transfer MMIO write/CS acquisition. Existing output count reset and clock/pin register reads are not described as zero-effect memory output or zero-MMIO-read rejection.",
+    "At64MHz fixed, requested16MHz now needsdiv8;1MHz needsdiv128. The lower hardware boundary is ceil(65000000/256)=253907Hz:253906*256=64999936 is insufficient,253907*256=65000192 is sufficient. At32MHz fixed,8MHz needsdiv8 and250kHz needsdiv256; nominal32/128=250kHz cannot meet a strict250kHz ceiling at the32.5MHz source upper bound.",
+    "Python emission obtains the same fixed upper bound from the resolved nominal APB2 clock, or uses the existing validated high clock_plan domains.spi4.maximum_hz. Unknown fixed clock profiles fail closed. Both controller max_hz and effective endpoint max_hz are checked against the maximum hardware divisor; inherited endpoint rate still uses the controller option. Existing250000Hz configuration policy floor and endpoint<=controller ceiling remain, so this is not a promise to expose every theoretically reachable32MHz hardware rate.",
+    "The high-profile99450000 branch is unchanged. p.clock_hz and generated .clock_hz remain nominal32/64/96MHz. finish_clock is byte-identical; it uses the chosen divisor and nominal same-source TIM/SPI ratio. The bound was not substituted for measured time or used to shorten quiet withdrawal.",
+    "The entire repaired drain/withdraw region is byte-identical after comment stripping. CSUSP never replays CSTART1; finite EOT race acceptance, RX-prefix accounting, quiet, CS-high readback, SCK GPIO ownership and reset/failed-withdraw retention remain intact."
+  ],
+  "official_envelope": {
+    "fresh_independent_packet": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/official-review/manifest.json",
+      "bytes": 1214,
+      "sha256": "72ac5a50d34ff0d07ec13be0965e60dd393567f3845b5df04c6bbbc04a5f6697"
+    },
+    "fresh_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/official-review/independent-envelope-review-r1.json",
+      "bytes": 6559,
+      "sha256": "c602462d266ee42ea040d6724aa710de27229b1b3f4c8df547b1292835a0171d"
+    },
+    "actual_ST_download": "HTTPS200;7075281bytes;SHAf6e620179006c8c4d497b477ba065edc89c6dd9ac24d9debb3362910651f42ee;actualDS12110Rev11 January2026",
+    "current_Table134_p232": "64.3*1.01*1.0003=64.9624829MHz; divided2=32.48124145MHz, both below selected65/32.5 engineering ceilings.",
+    "qualification_scope": "RevV, unchanged factory-default HSITRIM64, stable reviewed HSI topology under its exclusive clock owner, VDD1.62..3.6V and applicable junction range. This does not extend olderY/W fixed nominal contracts into newly qualified electrical bounds. SPI itself relies on the existing System/trusted private-owner clock contract; it does not freshly measure frequency or add a silicon/trim lease.",
+    "assurance": "Factory limits production-tested, full temperature drift characterized, voltage drift design-guaranteed. Composed bound is engineering reasoning, not a joint-condition production guarantee, instantaneous jitter or hardware measurement. Suffix6 TJmax125C is not ambient85C/low-power105C; other power profiles retain their stricter constraints."
+  },
+  "test_and_fixture_preservation": {
+    "original_peripheral37": "Exact source prefix except two explicitly documented endpoint rates250000->254000. Both still usediv256 and retain all original quiet/tail/timeout/lease assertions. They are disclosed input refinements, not falsely reported byte-identical methods.",
+    "factory10": "Original whole10 source is an exact prefix; new11th case uses real generated Platform/endpoint and observes actual launched CFG1 divisor128 for canonical1MHz endpoint.",
+    "Python5": "All5 old test methods are AST-identical. Two new methods cover6 rejection field/profile combinations and5 valid profile/rate cases; whole module is7 methods with23 total subtests.",
+    "Python_oracle_boundary": "Controller-negative arrangements also have a low child rate, so the failure alone does not isolate the controller guard from endpoint rejection. The two distinct source guards were independently read; no claim of independent mutation proof for each guard is made.",
+    "model": "Only a scalar observed-launch divisor and capture from actual CFG1 on actual CSTART0->1 were added to the reviewed race model. It does not read the endpoint request frequency or SUT owner state to choose expected divisors.",
+    "fixed32": "Private fixtures explicitly set RCC HSIDIV2/ready plus nominal/model core32 and private kernel32 before runtime. These are coherent host facts for the private controller, not physical32MHz or a complete generated32MHz System qualification.",
+    "cold_factory": "New factory case originally omitted SPI_SR cold reset facts. Added actualTXP|TXC0x1002 from RM0433 before platform start; EOT was not fabricated. Corrected pure whole11 and exact ELF are authoritative. Original mixed11 failure/raw/source remain historical and its missing ELF is not admitted as closure.",
+    "comments": "Initial malformed Doxygen repair is comment-stripped-byte-identical to race baseline; later final polish in production/factory is also comment-stripped-byte-identical. Final matching six build/run and Python run bind the polished bytes, rather than inheriting previous binary hashes."
+  },
+  "actual_TDD": {
+    "Python": {
+      "whole_methods": 7,
+      "subtests": 23,
+      "RED_failure_subtests": 4,
+      "RED_failed_test_methods": 1,
+      "RED_actual_exit": 1,
+      "GREEN_actual_exit": 0,
+      "final_fail_error_skip": 0,
+      "test_source_sha256_unchanged": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
+      "RED_receipt_sha256": "7c9d5bd1911dbd6c426773ed816ed238759a33981d9d74432d62f8dd3d64bd1b",
+      "final_GREEN_receipt_sha256": "7452fbfc262cefb71cc4654f6588ddc9c254c806d46c6e507c3426e595bbf3b9"
+    },
+    "authoritative_Native_RED": [
+      {
+        "stage": "native-red-r2-whole-nexus_h743_peripheral_test",
+        "tests": 42,
+        "failed_cases": 4,
+        "failure_assertions": 12,
+        "actual_exit": 1,
+        "source_sha256": "533fc21e6e8c25d138c1b6b4d2561a59f96785ffbba2158f5484054c35461dcd",
+        "ELF_sha256": "4de4849769973482c816fd5581a49244df62aa7a8f3a4a5dc00903b5b9fd0efa",
+        "receipt_sha256": "a20916c05504b2fc7aa69eac74f363ac06c2c6b5551729fe17dc196d014d3f81"
+      },
+      {
+        "stage": "native-red-r2-whole-nexus_h743_peripheral_factory_test",
+        "tests": 11,
+        "failed_cases": 1,
+        "failure_assertions": 2,
+        "actual_exit": 1,
+        "source_sha256": "533fc21e6e8c25d138c1b6b4d2561a59f96785ffbba2158f5484054c35461dcd",
+        "ELF_sha256": "2c30d3e441ff9e4c14d827b1ae3164b16da9462fbffb3fb3437dadbdb4b4f48e",
+        "receipt_sha256": "788d2e2be7b2ca9b1ef63ca5f906b1940cec8970d93f7ade5f09c3801408ff18"
+      }
+    ],
+    "final_Native_whole": [
+      {
+        "program": "nexus_h743_peripheral_test",
+        "tests": 42,
+        "actual_exit": 0,
+        "elf_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-final178/nexus_h743_peripheral_test",
+        "elf_sha256": "7a7b9369ac2cf619a05046286b1e65c03e3057cddd5066614a49800f7415188b",
+        "receipt_sha256": "258613b5503dc17d50d0fd57b86b996a29ff2aa9466e04f411ff249325e39198",
+        "junit_sha256": "6674aab8d09f042602cdfeb6df43d7ab73b3e186f90fd9c0dc99c4bc661807cd"
+      },
+      {
+        "program": "nexus_h743_system_test",
+        "tests": 47,
+        "actual_exit": 0,
+        "elf_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-final178/nexus_h743_system_test",
+        "elf_sha256": "a29cec153c9ac018873fe7af4ea4ce13ea6031e54b5c2cfb6ea4d6695676ca01",
+        "receipt_sha256": "21b18323a45e38d6c09235d8d1c3bf631e5b610352204869c829e4202309f73d",
+        "junit_sha256": "1f98597ed4a97ece8757a3a55c04ee624b881768ff4b0b10f02bb295d28e42cb"
+      },
+      {
+        "program": "nexus_h743_clock_test",
+        "tests": 38,
+        "actual_exit": 0,
+        "elf_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-final178/nexus_h743_clock_test",
+        "elf_sha256": "62e31d256ce67c7a1b0be7a5c03ab102bef7c6fdeba2c6597392708fae6a9878",
+        "receipt_sha256": "089ff765760242d3d271ef45309992087b93e8586cffcc56bbdb640e97ebe47b",
+        "junit_sha256": "eda0a5a6958338f59c05a75fdb1e36328dbd2adc5fe00d3fdbddd7288f85ec45"
+      },
+      {
+        "program": "nexus_h743_high_kernel_test",
+        "tests": 30,
+        "actual_exit": 0,
+        "elf_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-final178/nexus_h743_high_kernel_test",
+        "elf_sha256": "6cbf35c06c88ba8ec3b280de4061eb664284c563aebd728fb82e4b2ef9417f55",
+        "receipt_sha256": "5f78583b8fde4f54153dd8770f93846378055794b3d0b94661ff6135766f6c7a",
+        "junit_sha256": "fa8fabdc601f04f153a9dc8d6580878c5273c61b8aace7c90fc7694dce11a84f"
+      },
+      {
+        "program": "nexus_h743_high_factory_test",
+        "tests": 10,
+        "actual_exit": 0,
+        "elf_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-final178/nexus_h743_high_factory_test",
+        "elf_sha256": "a720381fe5e813bcf53f08eb62a3c4cb34d72578b49d69c01c44feab9f2f3e7f",
+        "receipt_sha256": "83e9fb45aaacbb646814ab11c98b12e4d2fefd774eadf0612f39e7cb1ddfdce1",
+        "junit_sha256": "0e717deeb2e61004c4843f2bd91976b08ed6cb77f668ae7bba9efd0ff05cf822"
+      },
+      {
+        "program": "nexus_h743_peripheral_factory_test",
+        "tests": 11,
+        "actual_exit": 0,
+        "elf_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-divider-final178/nexus_h743_peripheral_factory_test",
+        "elf_sha256": "8fe3d4f3e65b0f13d52bf8fe4e5ad7b33d5c0e86b17a543e885baa13173f862a",
+        "receipt_sha256": "738a0632fe52b38feae60750b0fbd25b697068ee6b0c7216cf1dc256318c9b29",
+        "junit_sha256": "3db1d05cecf2b644a2d91f9e924c77843ec584619a471edede34f02b5a7b1eb8"
+      }
+    ],
+    "final_total": 178,
+    "final_style": "Actual0 on9 explicitpaths,7 C/C++ sources; mechanical success supplemented by independent exact byte/control/comment inspection."
+  },
+  "evidence_readback": {
+    "frozen_source_size_and_SHA": 9,
+    "gzip_compressed_and_uncompressed_SHA_size_CRC": 52,
+    "stage_receipt_hash_and_actual_return_raw": 19,
+    "final_ELF_stream_SHA": 6,
+    "authoritative_RED_ELF_stream_SHA": 2,
+    "XML": "All final Native cases are unique classname/name,run/completed,0failure/error/skip/notrun; six counts42/47/38/30/10/11 total178. XML hashes and actual original XML mtimes within receipt intervals match compressed copies. Python XML seven unique methods/fourREDfailure events and final0,23subtests and actual log summary agree.",
+    "source_guards": "Final Native stages bind17 selected source paths before/after; Python binds7. All9 final reviewed source hashes match every final Native run; this is not a complete compiler/dependency graph proof.",
+    "full_execution": "Native whole binary plus only fresh gtest_output; launcher clears inherited GTEST_ variables. Python default loader runs the complete named module and enforces7 methods/nonzero/no skips. No filter/shard or dropped case was introduced.",
+    "retention": "Matching final6 ELF and authoritative RED2 ELF are retained in TMP and were streamed against receipt hashes. Persistent raw/XML/source bytes are exact; this review does not pretend the TMP binaries are durable artifacts.",
+    "reviewer_operations": "Read-only code/hash/AST/XML/raw review; no test/build/configuration/formatter/source/index/ref mutation or subagent."
+  },
+  "not_established": [
+    "Complete main normal hooks or CI after integrating these overlays",
+    "New ARM firmware build/runtime, installed clean full SDK matrix or repeatable network-disabled candidate builds",
+    "Physical bus waveform, actual worst-case clock/voltage/temperature/CS/SCK timing or HIL",
+    "Resource/performance/WCET optimality, broader SPI DMA/continuous/segmented support, or older silicon revision electrical qualification"
+  ]
+}

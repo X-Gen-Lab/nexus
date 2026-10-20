@@ -450,7 +450,8 @@
         "rx-dma-idle",
         "dma-duplex",
         "rx-dma-continuous",
-        "dma-duplex-continuous"
+        "dma-duplex-continuous",
+        "irq-words"
       ],
       "irq": [
         "USART0_IRQHandler"
@@ -719,7 +720,12 @@
         "clock:ETHMACTX",
         "clock:ETHMACRX",
         "controller:SYSCFG_RMII"
-      ]
+      ],
+      "interfaces": {
+        "eth_frames": [
+          "rmii-vlan-sg-ptp"
+        ]
+      }
     },
     "TIMER3": {
       "kind": "timer_capture",

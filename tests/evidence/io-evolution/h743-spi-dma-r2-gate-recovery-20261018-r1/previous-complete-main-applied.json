@@ -1,0 +1,11 @@
+{
+  "kind": "exact-all-staged-reviewed-catalogue-correction",
+  "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+  "tree": "be47b2e55a32ea43960daf71220320af7ddeba10",
+  "source_files": 35,
+  "staged_files": 422,
+  "deleted_files": 3,
+  "complete_manifest_sha256": "5d9c63f8a29014b705f1c068630e96d49246d5354d4f0699f3307b374e9d6842",
+  "previous_all392_inputs_preserved": true,
+  "normal_gate": "pending"
+}

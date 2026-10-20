@@ -1,0 +1,29 @@
+[detached HEAD 474b3da3] fix(tooling): expose public CA to sandboxed build clients
+ 25 files changed, 2029 insertions(+), 4 deletions(-)
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/baseline-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/before/tools/dev/Dockerfile.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/before/tools/evidence/recipe.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/before/tools/testing/test_build_recipe.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/completed-handoff-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/execution-evidence-map-r1.json.gz
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/execution-evidence-r1.tar.gz
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/execution-summary-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/history/test-red-r1.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/history/test-red-r2.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/manifest-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/packaging-originals-map-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/packaging-originals-r1.tar.gz
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/red-source-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/source-freeze-r1.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/source.diff
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/support/derive.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/support/run.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/author/support/verify_final.py.raw
+ create mode 100644 tests/evidence/oci-ca-reader-r1/final-independent-review.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/normalized-integration-map.json
+ create mode 100644 tests/evidence/oci-ca-reader-r1/remote/completed-failed-job-log.json
+Nexus format, comment and text checks.............................................Passed
+Nexus offline documentation source and configuration checks.......................Passed
+Nexus offline staged GitHub Actions DSL lint......................................Passed
+Nexus GoogleTest and GoogleMock contract execution................................Passed
+Nexus conventional commit message........................................Passed

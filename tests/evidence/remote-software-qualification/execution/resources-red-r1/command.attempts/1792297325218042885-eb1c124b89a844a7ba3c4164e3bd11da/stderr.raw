@@ -1,0 +1,13 @@
+...........F...............................
+======================================================================
+FAIL: test_reusable_is_readonly_same_source_and_has_no_publication (complete_module_0.SoftwareQualificationContracts.test_reusable_is_readonly_same_source_and_has_no_publication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/nexus-io36-native-20261018/.github/workflows/test_platform_ci.py", line 525, in test_reusable_is_readonly_same_source_and_has_no_publication
+    self.assertLess(steps.index(self.step('resources')), steps.index(setup),
+AssertionError: 4 not less than 3 : Measure runner headroom before online preparation
+
+----------------------------------------------------------------------
+Ran 43 tests in 3.207s
+
+FAILED (failures=1)

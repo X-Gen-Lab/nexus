@@ -2,7 +2,9 @@
 
 import ast
 from datetime import datetime, timedelta, timezone
+import gzip
 import hashlib
+import io
 import importlib.util
 import json
 import os
@@ -82,10 +84,11 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
                 "p.add_argument('--output');a=p.parse_args();o=Path(a.output)\n"
                 "o.mkdir(parents=True)\n"
                 "(o/'.nexus-sdk-consumer-check').write_text('owned SDK consumer verification\\n')\n"
-                "for n in ('native','stm32','gd32','h743 baremetal','h743 freertos',"
-                "'u575 baremetal','u575 freertos','f103 baremetal','f103 freertos',"
-                "'gd303 baremetal','gd303 freertos','g474 baremetal','g474 freertos'):\n"
-                " m.prepare_consumer(Path(a.prefix),o,n,lambda c: subprocess.run(c,check=True,capture_output=True),version='0.1.0')\n"
+                "from tools.release.transport import consumer_layout\n"
+                "for source,build,images in consumer_layout():\n"
+                " m.prepare_consumer(Path(a.prefix),o,source.removesuffix(' source'),lambda c: subprocess.run(c,check=True,capture_output=True),version='0.1.0')\n"
+                " for image in images:\n"
+                "  p=o/image;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'ELF external build port fixture')\n"
                 "(o/'command-00.log').write_text('passed consumer command\\n')\n"
                 f"(o/'verification.json').write_text(json.dumps({{'kind': 'source_sdk_consumer_verification', 'status': 'passed', 'source_revision': {COMMIT!r}, 'physical_status': 'not_executed', 'commands': [{{'argv': ['git','init'], 'exit_code': 0, 'log': 'command-00.log'}}]}}))\n")
             (source / "tools").mkdir()
@@ -305,13 +308,23 @@ class ConsumerTransportTests(unittest.TestCase):
         raw.mkdir()
         (raw / ".nexus-sdk-consumer-check").write_text(
             "owned SDK consumer verification\n")
-        for name in ("native", "stm32", "gd32", "h743 baremetal",
-                     "h743 freertos", "u575 baremetal", "u575 freertos",
-                     "f103 baremetal", "f103 freertos", "gd303 baremetal",
-                     "gd303 freertos", "g474 baremetal", "g474 freertos"):
-            prepare_consumer(base / "prefix", raw, name,
-                lambda command: subprocess.run(command, check=True,
-                    capture_output=True), version="0.1.0")
+        from tools.release.transport import consumer_layout
+        for source, _, images in consumer_layout():
+            prepare_consumer(base / "prefix", raw,
+                source.removesuffix(" source"), lambda command: subprocess.run(
+                    command, check=True, capture_output=True), version="0.1.0")
+            # Only Git/transport execute here; firmware bytes are external ports.
+            for image in images:
+                target = raw / image
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(b"\x7fELF synthetic transport image\n")
+        # Inventoried auxiliary outputs are not additional executable images.
+        for name in ("stm32 build/bin/installed_c.bin",
+                     "stm32 build/bin/installed_c.map",
+                     "stm32 build/bin/installed_c.resources.json",
+                     "selected h743 high build/bin/installed_selected.h743-flash-ram.compiler.raw",
+                     "selected h743 high build/bin/installed_selected.h743-flash-ram.json"):
+            (raw / name).write_bytes(b"auxiliary fixture; not SDK evidence\n")
         (raw / "command-00.log").write_bytes(b"actual consumer output\n")
         (raw / "verification.json").write_text(json.dumps({
             "kind": "source_sdk_consumer_verification", "status": "passed",
@@ -365,9 +378,232 @@ class ConsumerTransportTests(unittest.TestCase):
         original = {path.relative_to(raw).as_posix(): path.read_bytes()
                     for path in raw.rglob("*") if path.is_file()}
         self.assertEqual(restored, original)
-        self.assertEqual(len(list(raw.rglob(".git"))), 13)
+        self.assertEqual(len(list(raw.rglob(".git"))), 41)
         manifest = json.loads((packed / "consumer-raw-manifest.json").read_text())
-        self.assertEqual(manifest["git_metadata"], "thirteen_unborn_init_fixtures")
+        self.assertEqual(manifest["git_metadata"], "current_unborn_init_fixtures")
+        self.assertEqual(manifest["consumer_roots"], sorted(transport.FIXTURES))
+        self.assertEqual(manifest["consumer_images"], sorted(transport.IMAGES))
+
+    def test_complete_current_consumer_matrix_crosses_transport(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        manifest = transport.pack(raw, base / "transport", COMMIT)
+        self.assertEqual(manifest["schema_version"], 2)
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v4")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v4")
+        self.assertEqual(len(list(raw.rglob(".git"))), 41)
+        self.assertEqual(len(manifest["consumer_images"]), 44)
+        auxiliary = "stm32 build/bin/installed_c.bin"
+        self.assertIn(auxiliary, manifest["files"])
+        self.assertNotIn(auxiliary, manifest["consumer_images"])
+        transport.verify(base / "transport", COMMIT)
+
+    def test_each_current_root_and_image_is_required(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for name in sorted(transport.FIXTURES | transport.IMAGES):
+            with self.subTest(name=name):
+                target = raw / name
+                saved = base / "withdrawn"
+                target.rename(saved)
+                try:
+                    with self.assertRaisesRegex(ValueError, "Exact current"):
+                        transport.pack(raw, base / "transport", COMMIT)
+                finally:
+                    saved.rename(target)
+
+    def test_equal_count_root_substitution_and_report_claim_cannot_authorize_it(self):
+        from tools.release import transport
+        for change in ("replace", "extra", "zero-image", "extra-image"):
+            with self.subTest(change=change):
+                base, raw = self.fixture()
+                if change == "zero-image":
+                    (raw / "selected native time pair build/bin/installed_selected").write_bytes(b"")
+                elif change == "extra-image":
+                    (raw / "stm32 build/bin/unreviewed.elf").write_bytes(
+                        b"\x7fELF unreviewed fixture")
+                else:
+                    original = raw / "selected g474 shared pwm source"
+                    if change == "replace":
+                        original.rename(raw / "unreviewed source")
+                    else:
+                        consumer_module().prepare_consumer(base / "prefix", raw,
+                            "unreviewed", lambda command: subprocess.run(
+                                command, check=True, capture_output=True),
+                            version="0.1.0")
+                report_path = raw / "verification.json"
+                report = json.loads(report_path.read_text())
+                report["consumer_roots"] = ["unreviewed source/.git"]
+                report["consumer_images"] = ["unreviewed build/bin/image"]
+                report_path.write_text(json.dumps(report))
+                with self.assertRaisesRegex(ValueError, "Exact current"):
+                    transport.pack(raw, base / "transport", COMMIT)
+
+    def test_old_thirteen_roots_are_not_a_current_fallback(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for name, _, _ in consumer_module().SELECTED_CONSUMERS:
+            shutil.rmtree(raw / ("selected " + name + " source"))
+            shutil.rmtree(raw / ("selected " + name + " build"))
+        self.assertEqual(len(list(raw.rglob(".git"))), 13)
+        with self.assertRaisesRegex(ValueError, "Exact current"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_schema_and_manifest_claims_cannot_reduce_or_expand_the_plan(self):
+        from tools.release import transport
+        for change in ("legacy", "missing-schema", "float-schema", "policy",
+                       "roots", "images"):
+            with self.subTest(change=change):
+                base, raw = self.fixture()
+                output = base / "transport"
+                transport.pack(raw, output, COMMIT)
+                path = output / "consumer-raw-manifest.json"
+                manifest = json.loads(path.read_text())
+                if change == "legacy":
+                    manifest["schema_version"] = 1
+                    manifest["git_metadata"] = "thirteen_unborn_init_fixtures"
+                elif change == "missing-schema":
+                    del manifest["schema_version"]
+                elif change == "float-schema":
+                    manifest["schema_version"] = 2.0
+                else:
+                    key = "consumer_" + change
+                    manifest[key] = "invented" if change == "policy" else []
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "policy claim"):
+                    transport.verify(output, COMMIT)
+
+    def test_standalone_extracted_transport_has_no_checkout_import_dependency(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        helper = base / "standalone.py"
+        helper.write_bytes((ROOT / "tools/release/transport.py").read_bytes())
+        environment = dict(os.environ)
+        environment.pop("PYTHONPATH", None)
+        result = subprocess.run([sys.executable, "-B", str(helper), "pack",
+            "--raw", str(raw), "--output", str(base / "transport"),
+            "--expected-commit", COMMIT], cwd=base, env=environment,
+            capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        transport.verify(base / "transport", COMMIT)
+
+    def test_rehashed_archive_git_state_and_missing_image_are_still_rejected(self):
+        from tools.release import transport
+        contamination = (("config", b"[remote \"origin\"]\nurl=secret\n"),
+                         ("index", b"tracked index"),
+                         ("objects/ab/object", b"history"),
+                         ("refs/heads/main", b"a" * 40),
+                         ("logs/HEAD", b"history"),
+                         ("commondir", b"../foreign"),
+                         ("hooks/pre-commit", b"active hook"),
+                         ("image", None))
+        for relative, data in contamination:
+            with self.subTest(relative=relative):
+                base, raw = self.fixture()
+                output = base / "transport"
+                transport.pack(raw, output, COMMIT)
+                name = ("selected native time empty build/bin/installed_selected"
+                        if relative == "image" else "native source/.git/" + relative)
+                manifest_path = output / "consumer-raw-manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                original = output / "consumer-raw.tar.gz"
+                rewritten = base / "changed.tar.gz"
+                replaced = False
+                with tarfile.open(original) as source:
+                    with tarfile.open(rewritten, "w:gz") as archive:
+                        for member in source:
+                            if member.name == name:
+                                replaced = True
+                                if data is None:
+                                    continue
+                                member.size = len(data)
+                                archive.addfile(member, io.BytesIO(data))
+                            else:
+                                archive.addfile(member, source.extractfile(member)
+                                                if member.isfile() else None)
+                        if not replaced:
+                            member = tarfile.TarInfo(name)
+                            member.size, member.mode = len(data), 0o600
+                            archive.addfile(member, io.BytesIO(data))
+                rewritten.replace(original)
+                if data is None:
+                    del manifest["files"][name]
+                else:
+                    manifest["files"][name] = {"size": len(data),
+                        "sha256": hashlib.sha256(data).hexdigest(),
+                        "mode": manifest["files"].get(name, {}).get("mode", 0o600)}
+                manifest["archive"] = transport.byte_identity(original)
+                manifest_path.write_text(json.dumps(manifest))
+                with self.assertRaises(ValueError):
+                    transport.verify(output, COMMIT)
+
+    def test_gzip_trailer_is_verified_even_with_rehashed_archive_identity(self):
+        from tools.release import transport
+        for change in ("crc", "size", "truncated", "trailing", "concatenated",
+                       "tar-tail", "second-tar", "invalid-end-header",
+                       "short-end-header"):
+            with self.subTest(change=change):
+                base, raw = self.fixture()
+                output = base / "transport"
+                transport.pack(raw, output, COMMIT)
+                archive = output / "consumer-raw.tar.gz"
+                data = bytearray(archive.read_bytes())
+                if change == "truncated":
+                    data = data[:-5]
+                elif change == "trailing":
+                    data += b"unexpected compressed tail"
+                elif change == "concatenated":
+                    data += gzip.compress(b"second member")
+                elif change in {"invalid-end-header", "short-end-header"}:
+                    plain = gzip.decompress(data)
+                    with tarfile.open(fileobj=io.BytesIO(plain)) as parsed:
+                        end = max(member.offset_data +
+                                  ((member.size + 511) // 512) * 512
+                                  for member in parsed)
+                    self.assertEqual(plain[end:end + 512], b"\0" * 512)
+                    if change == "invalid-end-header":
+                        plain = plain[:end] + b"x" * 512 + plain[end + 512:]
+                    else:
+                        plain = plain[:end] + b"truncated nonzero header"
+                    data = gzip.compress(plain)
+                elif change in {"tar-tail", "second-tar"}:
+                    tail = b"unregistered payload"
+                    if change == "second-tar":
+                        stream = io.BytesIO()
+                        with tarfile.open(fileobj=stream, mode="w") as following:
+                            member = tarfile.TarInfo("unregistered")
+                            member.size = len(tail)
+                            following.addfile(member, io.BytesIO(tail))
+                        tail = stream.getvalue()
+                    data = gzip.compress(gzip.decompress(data) + tail)
+                else:
+                    data[-8 if change == "crc" else -4] ^= 1
+                archive.write_bytes(data)
+                manifest_path = output / "consumer-raw-manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                manifest["archive"] = transport.byte_identity(archive)
+                manifest_path.write_text(json.dumps(manifest))
+                with self.assertRaises((ValueError, OSError, EOFError)):
+                    transport.verify(output, COMMIT)
+
+    def test_zero_tar_padding_is_valid_but_gzip_expansion_is_bounded(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        output = base / "transport"
+        transport.pack(raw, output, COMMIT)
+        archive = output / "consumer-raw.tar.gz"
+        archive.write_bytes(gzip.compress(
+            gzip.decompress(archive.read_bytes()) + b"\0" * 1024))
+        path = output / "consumer-raw-manifest.json"
+        manifest = json.loads(path.read_text())
+        manifest["archive"] = transport.byte_identity(archive)
+        path.write_text(json.dumps(manifest))
+        transport.verify(output, COMMIT)
+        compressed = base / "expanded.gz"
+        compressed.write_bytes(gzip.compress(b"\0" * 16384))
+        with unittest.mock.patch.multiple(transport, MAX_BYTES=1, MAX_FILES=1):
+            with self.assertRaisesRegex(ValueError, "Expanded transport archive"):
+                transport.verify_gzip(compressed)
 
     def test_missing_each_new_consumer_fixture_is_rejected(self):
         from tools.release import transport
@@ -376,7 +612,7 @@ class ConsumerTransportTests(unittest.TestCase):
                 with self.subTest(family=family, backend=backend):
                     base, raw = self.fixture()
                     shutil.rmtree(raw / (family + " " + backend + " source"))
-                    with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
+                    with self.assertRaisesRegex(ValueError, "Exact current consumer"):
                         transport.pack(raw, base / "transport", COMMIT)
 
     def test_legacy_seven_consumer_set_is_not_a_current_transport_fallback(self):
@@ -385,8 +621,60 @@ class ConsumerTransportTests(unittest.TestCase):
         for family in ("f103", "gd303", "g474"):
             for backend in ("baremetal", "freertos"):
                 shutil.rmtree(raw / (family + " " + backend + " source"))
-        with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
+        for name, _, _ in consumer_module().SELECTED_CONSUMERS:
+            shutil.rmtree(raw / ("selected " + name + " source"))
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
             transport.pack(raw, base / "transport", COMMIT)
+
+    def test_previous_thirty_one_roots_cannot_replace_the_current_plan(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for label in ("h743 spi dma", "h743 spi dma uart tx",
+                      "h743 spi dma uart rx",
+                      "h743 runtime clock", "g474 pin states",
+                      "h743 spi dma cache on", "u575 uart chain",
+                      "u575 lptim run",
+                      "h743 uart continuous", "h743 uart continuous cache on"):
+            shutil.rmtree(raw / ("selected " + label + " source"))
+            shutil.rmtree(raw / ("selected " + label + " build"))
+        self.assertEqual(len(list(raw.rglob(".git"))), 31)
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_previous_thirty_six_roots_cannot_replace_the_current_plan(self):
+        from tools.release import transport
+        base, raw = self.fixture()
+        for label in ("h743 spi dma cache on", "u575 uart chain",
+                      "u575 lptim run",
+                      "h743 uart continuous", "h743 uart continuous cache on"):
+            shutil.rmtree(raw / ("selected " + label + " source"))
+            shutil.rmtree(raw / ("selected " + label + " build"))
+        self.assertEqual(len(list(raw.rglob(".git"))), 36)
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
+            transport.pack(raw, base / "transport", COMMIT)
+
+    def test_schema_two_previous_policy_is_not_a_current_fallback(self):
+        from tools.release import transport
+        for policy in ("nexus-sdk-consumers-v2", "nexus-sdk-consumers-v3"):
+            with self.subTest(policy=policy):
+                base, raw = self.fixture()
+                packed = base / "transport"
+                transport.pack(raw, packed, COMMIT)
+                path = packed / transport.MANIFEST
+                manifest = json.loads(path.read_text())
+                self.assertEqual(manifest["schema_version"], 2)
+                archive = packed / transport.ARCHIVE
+                archive.write_bytes(gzip.compress(
+                    gzip.decompress(archive.read_bytes()), mtime=1))
+                self.assertNotEqual(manifest["archive"],
+                                    transport.byte_identity(archive))
+                # Rehashing valid raw bytes cannot authorize an old plan policy.
+                manifest["archive"] = transport.byte_identity(archive)
+                manifest["consumer_policy"] = policy
+                path.write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError,
+                                            "current consumer policy"):
+                    transport.verify(packed, COMMIT)
 
     def test_unreviewed_consumer_root_is_rejected(self):
         from tools.release import transport
@@ -394,7 +682,7 @@ class ConsumerTransportTests(unittest.TestCase):
         consumer_module().prepare_consumer(base / "prefix", raw,
             "unreviewed baremetal", lambda command: subprocess.run(command,
                 check=True, capture_output=True), version="0.1.0")
-        with self.assertRaisesRegex(ValueError, "Exactly thirteen"):
+        with self.assertRaisesRegex(ValueError, "Exact current consumer"):
             transport.pack(raw, base / "transport", COMMIT)
 
     def test_manifest_cannot_describe_seven_fixtures_for_current_raw_bytes(self):

@@ -1,0 +1,19 @@
+{
+  "old_test_count": 5,
+  "new_test_count": 7,
+  "four_old_methods_ast_unchanged": [
+    "test_authoring_factory_provider_and_cmake_contracts_agree",
+    "test_missing_factory_kind_is_rejected",
+    "test_unmapped_component_is_rejected",
+    "test_reviewed_alternate_interface_requires_execution_traits"
+  ],
+  "remaining_old_method_all_assertion_expressions_preserved": true,
+  "remaining_old_method_change": "adds exact three H743 SPI branch before original generic H743/U575 restriction",
+  "tests_red_green_byte_identical": true,
+  "catalogue_only_adds_three_sorted_entries": [
+    "h743-spi-dma-uart-rx.toml",
+    "h743-spi-dma-uart-tx.toml",
+    "h743-spi-dma.toml"
+  ],
+  "matrix_production_changed": false
+}

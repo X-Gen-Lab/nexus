@@ -1,0 +1,12 @@
+                                                                    Table 2. Device variants
+
+                                                                                               Silicon revision codes
+                     Reference
+                                                                          Device marking(1)                             REV_ID(2)
+
+                                                                                Y, W                                     0x1003
+       STM32H742xI/G, STM32H743xI/G,
+                                                                                 X                                       0x2001
+         STM32H750xB, STM32H753xI
+                                                                                 V                                       0x2003
+

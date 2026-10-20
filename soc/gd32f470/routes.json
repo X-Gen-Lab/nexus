@@ -47,7 +47,8 @@
         "rx-dma-idle",
         "dma-duplex",
         "rx-dma-continuous",
-        "dma-duplex-continuous"
+        "dma-duplex-continuous",
+        "irq-words"
       ],
       "source": "https://www.gd32mcu.com/data/documents/datasheet/GD32F470xx_Datasheet_Rev2.2.pdf",
       "dma": [
@@ -585,6 +586,68 @@
         }
       ],
       "source": "GD32F470xx datasheet Rev2.2 AF tables: TIMER3_CH0 PB6 AF2, TIMER0_CH0 PA8/CH0_ON PB13/BRKIN PB12 AF1; silicon pads only."
+    },
+    {
+      "id": "rmii-frames-a-c-g",
+      "controller": "ENET",
+      "kind": "eth_frames",
+      "variants": [
+        "GD32F470ZGT6"
+      ],
+      "modes": [
+        "rmii-vlan-sg-ptp"
+      ],
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "refclk",
+          "af": 11
+        },
+        {
+          "pin": "PA2",
+          "function": "mdio",
+          "af": 11
+        },
+        {
+          "pin": "PA7",
+          "function": "crs_dv",
+          "af": 11
+        },
+        {
+          "pin": "PC1",
+          "function": "mdc",
+          "af": 11
+        },
+        {
+          "pin": "PC4",
+          "function": "rxd0",
+          "af": 11
+        },
+        {
+          "pin": "PC5",
+          "function": "rxd1",
+          "af": 11
+        },
+        {
+          "pin": "PG11",
+          "function": "txen",
+          "af": 11
+        },
+        {
+          "pin": "PG13",
+          "function": "txd0",
+          "af": 11
+        },
+        {
+          "pin": "PG14",
+          "function": "txd1",
+          "af": 11
+        }
+      ],
+      "source": "RMII AF11 silicon pad mux only. PHY, reset, external 50MHz clock and Board electric route remain external, unqualified. GD32F470xx Datasheet Rev2.2 AF11 / GD32F4xx UM Rev3.3 Selected enhanced SG/VLAN/PTP interface shares the physical MAC; external PHY and reference-clock/electrical qualification remain unknown.",
+      "resources": [
+        "clock:ETHMACPTP"
+      ]
     }
   ]
 }

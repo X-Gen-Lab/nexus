@@ -261,3 +261,285 @@ msgstr "在可配置异常已被屏蔽的条件下等待一次。"
 
 msgid "Atomically recheck a published sequence before WFI."
 msgstr "执行 WFI 前，以原子方式重新检查已发布序列。"
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "Privileged Task/configurable-IRQ short metadata sections only; do not block, allocate, call OS functions, copy large buffers or invoke callbacks. NMI/HardFault remain unmasked. Native uses a recursive host exclusion model, not physical IRQ timing or signal safety. NMI/HardFault must not access shared metadata protected by this mask. ARM unprivileged callers need an explicit privileged gateway owned by their OS."
+msgstr "仅用于特权 Task／可配置 IRQ 中的短元数据临界区；不得阻塞、分配内存、调用 OS 函数、复制大缓冲区或执行回调。NMI/HardFault 仍未屏蔽。Native 使用可递归的主机互斥模型，不提供物理 IRQ 时序或信号安全保证。NMI/HardFault 不得访问由该屏蔽保护的共享元数据。ARM 非特权调用者需要由其 OS 拥有的显式特权网关。"
+
+msgid "Token to restore exactly once in reverse nesting order."
+msgstr "用于按嵌套的相反顺序恰好恢复一次的令牌。"
+
+msgid "Privileged contexts only. Restores PRIMASK only; BASEPRI/FAULTMASK, where present, are not modified."
+msgstr "仅限特权上下文。只恢复 PRIMASK；不修改已实现的 BASEPRI/FAULTMASK。"
+
+msgid "[in] Token from this CPU/thread's latest unmatched save."
+msgstr "[in] 来自当前 CPU／线程最近一次尚未配对恢复的 save 的令牌。"
+
+msgid "Bounded read-only privileged task/IRQ query. Does not mask interrupts or grant a stable critical section. Values refer to this CPU/security state, not another security world or an SMP peer. Unprivileged reads do not establish mask state."
+msgstr "有界、只读的特权任务／IRQ 查询。不屏蔽中断，也不建立稳定的临界区。数值属于当前 CPU／安全状态，不属于另一安全域或 SMP 对等核。非特权读取不能确定实际屏蔽状态。"
+
+msgid "Current PRIMASK and implemented BASEPRI/FAULTMASK values."
+msgstr "当前 PRIMASK 以及已实现的 BASEPRI/FAULTMASK 值。"
+
+msgid "Bounded privileged task/IRQ query, no state change. ARM unprivileged reads do not establish the actual mask state."
+msgstr "有界的特权任务／IRQ 查询，不改变状态。ARM 非特权读取不能确定实际屏蔽状态。"
+
+msgid "True for PRIMASK, implemented BASEPRI/FAULTMASK, or Native thread nesting. Baseline Cortex-M cores query PRIMASK only."
+msgstr "PRIMASK、已实现的 BASEPRI/FAULTMASK 或 Native 线程嵌套存在屏蔽时为 true。Baseline Cortex-M 内核只查询 PRIMASK。"
+
+msgid "Bounded read-only task/IRQ query. The identity belongs to the current CPU/security state; it is not a portable SoC IRQ number or evidence that a kernel ISR call is allowed."
+msgstr "有界、只读的任务／IRQ 查询。该身份属于当前 CPU／安全状态；它不是可移植的 SoC IRQ 编号，也不能证明允许调用内核 ISR API。"
+
+msgid "IPSR exception number, zero for Thread mode or Native."
+msgstr "IPSR 异常编号；Thread 模式或 Native 返回零。"
+
+msgid "Bounded read-only task/IRQ query. Handler privilege does not depend on the interrupted Thread's CONTROL.nPRIV. This query does not establish Secure-world ownership."
+msgstr "有界、只读的任务／IRQ 查询。Handler 模式的特权不取决于被中断 Thread 的 CONTROL.nPRIV。该查询不证明 Secure 域所有权。"
+
+msgid "True in Handler mode or privileged Thread mode. Native always returns true because it has no CPU privilege model."
+msgstr "处于 Handler 模式或特权 Thread 模式时为 true。Native 没有 CPU 特权模型，因此始终返回 true。"
+
+msgid "Cortex-M IPSR is nonzero; Native has no hardware ISR and always returns false. Host signals are unsupported contexts."
+msgstr "Cortex-M 的 IPSR 非零时为 true；Native 没有硬件 ISR，始终返回 false。不支持主机信号上下文。"
+
+msgid "Cortex-M DMB; Native sequentially consistent thread fence. Does not prove DMA idle or clean noncoherent cache lines."
+msgstr "Cortex-M 执行 DMB；Native 执行顺序一致的线程栅栏。不证明 DMA 已空闲，也不清理非一致性缓存行。"
+
+msgid "Cortex-M DSB; Native thread fence is a behavioral model, not a physical bus/DMA completion guarantee."
+msgstr "Cortex-M 执行 DSB；Native 线程栅栏只是行为模型，不保证物理总线／DMA 已完成。"
+
+msgid "Cortex-M ISB; Native thread fence has no pipeline semantics."
+msgstr "Cortex-M 执行 ISB；Native 线程栅栏不具有流水线语义。"
+
+msgid "Counter frequency follows CPU clock. Use unsigned snapshot subtraction only for intervals shorter than 2^32 cycles; this counter is neither shared monotonic time nor a deadline."
+msgstr "计数器频率随 CPU 时钟变化。仅可对短于 2^32 个周期的区间使用无符号快照相减；该计数器既不是共享单调时间，也不是 deadline。"
+
+msgid "[out] DWT CYCCNT snapshot, unchanged when unavailable."
+msgstr "[out] DWT CYCCNT 快照；不可用时保持输出不变。"
+
+msgid "True when a maintained CPU counter is enabled; false on Native, an unreviewed/disabled/unavailable DWT, or an unprivileged caller. Does not enable/reset it. Only a reviewed CPU profile may read the optional DWT registers."
+msgstr "已维护的 CPU 计数器已启用时为 true；Native、未审查／已禁用／不可用的 DWT 或非特权调用者返回 false。不启用或复位计数器。只有经过审查的 CPU profile 才可读取可选 DWT 寄存器。"
+
+msgid "Restore on the same CPU/thread in strict reverse order. This is neither a FreeRTOS BASEPRI token nor an SMP lock."
+msgstr "必须在同一 CPU／线程上，严格按嵌套的相反顺序恢复。它既不是 FreeRTOS BASEPRI 令牌，也不是 SMP 锁。"
+
+msgid "Absent BASEPRI/FAULTMASK registers are zero. Native reports PRIMASK as zero or one according to current thread nesting. This snapshot is neither a restore token nor a kernel lock."
+msgstr "不存在的 BASEPRI/FAULTMASK 寄存器报告零。Native 根据当前线程嵌套将 PRIMASK 报告为零或一。该快照既不是恢复令牌，也不是内核锁。"
+
+msgid "Storage is a live, naturally aligned uint32_t; all concurrent accesses use these helpers or compatible compiler atomics. Initialize before publishing storage. Load/store use compiler acquire/release operations on all maintained CPUs and never mask interrupts. Other than ARMv6-M, RMW uses compiler lock-free operations; exclusive instruction retries do not establish a fixed cycle bound."
+msgstr "存储必须是存续且自然对齐的 uint32_t；所有并发访问均须使用这些 helper 或兼容的编译器原子操作。发布存储前先初始化。所有已维护 CPU 的 load/store 都使用编译器 acquire/release 操作，且从不屏蔽中断。除 ARMv6-M 外，RMW 使用编译器无锁操作；exclusive 指令的重试不构成固定周期上限。"
+
+msgid "ARMv6-M RMW is CPU-local, bounded saved-PRIMASK exclusion. Only privileged Thread/configurable-IRQ contexts on one CPU may access this domain. NMI/HardFault, unprivileged callers, another core, DMA and another security domain must not access its storage concurrently. It is not an SMP or bus atomic operation. No callback, allocation, blocking call or payload copy occurs while masked."
+msgstr "ARMv6-M RMW 使用 CPU 本地、有界且保存 PRIMASK 的互斥。只有同一 CPU 上的特权 Thread／可配置 IRQ 上下文可访问该域。NMI/HardFault、非特权调用者、其他内核、DMA 和其他安全域不得并发访问其存储。它不是 SMP 或总线原子操作。屏蔽期间不执行回调、分配、阻塞调用或载荷复制。"
+
+msgid "[inout] Live naturally aligned word in the caller-owned atomic domain; all concurrent accesses use this contract."
+msgstr "[inout] 调用者拥有的原子域内、存续且自然对齐的字；所有并发访问均遵守本合同。"
+
+msgid "[inout] Separate, private caller storage; failure replaces it with the observed value. Success leaves it unchanged."
+msgstr "[inout] 独立的调用者私有存储；失败时以观察到的值替换，成功时保持不变。"
+
+msgid "[in] Replacement word stored only when comparison succeeds."
+msgstr "[in] 仅在比较成功时写入的替换字。"
+
+msgid "True only when the original word equals expected and the desired word was stored. No spurious failure is allowed."
+msgstr "仅当原字等于 expected 且 desired 字已存入时为 true。不允许伪失败。"
+
+msgid "ARMv6-M conservatively acquires the observed word too."
+msgstr "ARMv6-M 还会保守地以 acquire 语义读取观察到的字。"
+
+msgid "Privileged task/configurable-IRQ context in the current security domain only. The caller excludes other CPU, security-world and DMA users of every complete line until return, and keeps cache configuration stable. No hidden IRQ mask, allocation or cache enable occurs. Supported geometry is an explicitly reviewed 32-byte line; range rounding is forbidden. Work is bounded by bytes/32 and is not a DMA drain, device completion or transfer of ownership."
+msgstr "仅限当前安全域中的特权任务／可配置 IRQ 上下文。调用者须在返回前排除其他 CPU、安全域及 DMA 对每个完整缓存行的使用，并保持缓存配置稳定。不隐式屏蔽 IRQ、分配内存或启用缓存。支持的几何仅为经过显式审查的 32 字节缓存行；禁止将范围向外取整。工作量以 bytes/32 为界，不代表 DMA 排空、设备完成或所有权转移。"
+
+msgid "[in] First byte of exclusively owned complete lines."
+msgstr "[in] 独占拥有的完整缓存行的首字节。"
+
+msgid "[in] Nonzero whole-line length in the CPU address space."
+msgstr "[in] CPU 地址空间内、非零且由完整缓存行组成的长度。"
+
+msgid "OK after maintenance and barriers; INVALID for partial lines or an overflowing/non-32-bit range; CONTEXT for an unprivileged caller; UNSUPPORTED for an absent or disabled reviewed cache. Rejection performs no maintenance writes."
+msgstr "维护和屏障完成后返回 OK；部分缓存行或溢出／非 32 位范围返回 INVALID；非特权调用者返回 CONTEXT；经过审查的缓存不存在或已禁用时返回 UNSUPPORTED。拒绝时不进行维护写入。"
+
+msgid "The caller permits all dirty data in these lines to be discarded and satisfies clean's exclusion/context contract. No adjacent line is touched or rounded into the range. For DMA receive, providers coordinate both pre-DMA and post-drain maintenance; this call does not establish idle."
+msgstr "调用者须允许丢弃这些缓存行中的全部脏数据，并满足 clean 的互斥／上下文合同。不触及相邻行，也不将其向外取整纳入范围。DMA 接收由 provider 协调 DMA 前与排空后的维护；本调用不证明空闲。"
+
+msgid "The same context, range and capability results as clean."
+msgstr "上下文、范围和能力相关返回结果与 clean 相同。"
+
+msgid "Satisfies clean's exclusion/context contract. Distinct from invalidate: dirty contents are written before discard."
+msgstr "须满足 clean 的互斥／上下文合同。与 invalidate 不同：先写回脏内容，再丢弃。"
+
+msgid "Satisfies clean's exclusion/context contract. All present caches are checked before any maintenance. With only one reviewed cache, only that cache is maintained. The caller prevents execution from the changing range, including other security-world users. This is not code validation, an MPU policy change or a global cache/branch-predictor flush."
+msgstr "须满足 clean 的互斥／上下文合同。任何维护前先检查所有存在的缓存；只有一个经过审查的缓存时，只维护该缓存。调用者须阻止从正在改变的范围执行代码，包括其他安全域用户。这不是代码验证、MPU 策略变更，也不是全局缓存／分支预测器刷新。"
+
+msgid "OK after data clean, instruction invalidate and execution barriers; INVALID/CONTEXT as above; UNSUPPORTED when both reviewed caches are absent or a present cache is disabled."
+msgstr "数据 clean、指令 invalidate 和执行屏障完成后返回 OK；INVALID/CONTEXT 同上；两个经过审查的缓存均不存在，或某个存在的缓存已禁用时返回 UNSUPPORTED。"
+
+msgid "Reviewed M7 only. Requires privileged Thread, PRIMASK=1, BASEPRI=FAULTMASK=0 and known-clean caches from a trusted reset or prior successful owned clean/disable. CCR bits being zero alone do not prove clean foreign state; never adopt an unknown bootloader state. Caller excludes all other cache users, DMA, NMI and HardFault access to affected memory throughout the transition. It owns memory attributes, execution and coherency policy; enabling a cache does not establish DMA coherence. No IRQ mask changes, allocation or cache adoption occur. Rejected initial admission has no retained responsibility. An IO failure can retain owned_mask/selector_pending; call cold_disable and retain storage until it succeeds."
+msgstr "仅支持经过审查的 M7。要求特权 Thread、PRIMASK=1、BASEPRI=FAULTMASK=0，并且缓存已由可信复位或先前成功的所有者 clean/disable 证明为干净。仅 CCR 位为零不能证明外来状态干净；绝不接管未知 bootloader 状态。调用者须在整个转换期间排除所有其他缓存用户、DMA、NMI 和 HardFault 对受影响内存的访问，并拥有内存属性、执行和一致性策略；启用缓存本身不建立 DMA 一致性。不改变 IRQ 屏蔽、不分配内存，也不接管缓存。初始准入被拒绝时不保留责任。IO 失败可能保留 owned_mask/selector_pending；须调用 cold_disable，并保留存储直至其成功。"
+
+msgid "[inout] Exclusively owned, initially empty control object."
+msgstr "[inout] 独占拥有且初始为空的控制对象。"
+
+msgid "[in] Nonzero combination of DATA and INSTRUCTION bits."
+msgstr "[in] DATA 和 INSTRUCTION 位的非零组合。"
+
+msgid "OK after verified enable and selector restoration; INVALID for arguments; CONTEXT for unsafe context; UNSUPPORTED for an unreviewed CPU/geometry; STATE for live/foreign caches; IO when a register write is not confirmed by readback."
+msgstr "验证启用及 selector 恢复后返回 OK；参数错误返回 INVALID；上下文不安全返回 CONTEXT；CPU／几何未经审查返回 UNSUPPORTED；存在活动／外来缓存返回 STATE；寄存器写入未获回读确认时返回 IO。"
+
+msgid "Satisfies enable's exclusion and context contract after every DMA/provider has drained. Rejects enabled caches outside owned_mask. The data clean/disable transition uses a stack-free leaf so no local dirty line can appear between the final clean and CCR update. Its bounded work is four ways times the verified set count, not constant latency. Failed operations remain retryable without adopting a new cache or forgetting the original selector. A zero object is an idempotent no-op on a supported CPU profile."
+msgstr "在所有 DMA/provider 均已排空后，满足 enable 的互斥和上下文合同。拒绝 owned_mask 以外已启用的缓存。数据 clean/disable 转换使用不使用栈的叶函数，避免最终 clean 与 CCR 更新之间出现本地脏行。其有界工作量为四路乘以经过验证的组数，不代表恒定延迟。失败操作可重试，不接管新缓存，也不遗忘原 selector。对于受支持的 CPU profile，零对象是幂等的无操作。"
+
+msgid "[inout] Same live object passed to cold_enable."
+msgstr "[inout] 传给 cold_enable 的同一存续对象。"
+
+msgid "OK only after cache disable and selector restoration; INVALID, CONTEXT, UNSUPPORTED, STATE or IO retain ownership."
+msgstr "仅在缓存禁用且 selector 恢复后返回 OK；INVALID、CONTEXT、UNSUPPORTED、STATE 或 IO 均保留所有权。"
+
+msgid "Zero initialize before first use; do not modify fields or copy a live object. Retain the object until owned_mask and selector_pending are both zero. owned_mask conservatively records cleanup responsibility, not enabled hardware bits."
+msgstr "首次使用前零初始化；不得修改字段或复制活动对象。须保留对象，直到 owned_mask 和 selector_pending 都为零。owned_mask 保守记录清理责任，不表示硬件启用位。"
+
+msgid "Read-only Task/IRQ query, no hardware access or discovery."
+msgstr "只读的 Task/IRQ 查询，不访问硬件，也不进行发现。"
+
+msgid "Exact reviewed CPU facts; Native reports absent hardware."
+msgstr "经过精确审查的 CPU 事实；Native 报告硬件不存在。"
+
+msgid "Cache sizes are zero when absent, MPU version is zero, seven or eight. These facts do not prove enabled hardware, memory reachability, cross-domain ownership or HIL status."
+msgstr "缓存不存在时大小为零；MPU 版本为零、七或八。这些事实不证明硬件已启用、内存可达、跨域所有权或 HIL 状态。"
+
+msgid "Pure bounded task/IRQ function. Inputs and output must not overlap. This encodes fields, not SoC memory reachability, cache ownership, DMA coherency or product protection policy."
+msgstr "纯函数、有界的任务／IRQ 操作。输入与输出不得重叠。它只编码字段，不证明 SoC 内存可达性、缓存所有权、DMA 一致性或产品保护策略。"
+
+msgid "[in] Size exponent 5..32, aligned base, AP 0/1/2/3/5/6, TEX 0..7 and raw S/C/B bits. Subregion mask is at most 255 and must be zero for sizes below 256 bytes. A 4 GiB region has base zero. Reserved/implementation-defined TEX/C/B encodings are rejected, never truncated or rounded."
+msgstr "[in] 大小指数为 5..32，base 按大小对齐，AP 为 0/1/2/3/5/6，TEX 为 0..7，S/C/B 为原始位。子区域 mask 不超过 255；大小小于 256 字节时必须为零。4 GiB 区域的 base 为零。拒绝保留／实现定义的 TEX/C/B 编码，不截断或取整。"
+
+msgid "[out] RBAR and enabled RASR; unchanged on failure."
+msgstr "[out] RBAR 和置有启用位的 RASR 编码；失败时不改变输出。"
+
+msgid "NX_ARCH_OK or NX_ARCH_INVALID, independent of CPU profile."
+msgstr "NX_ARCH_OK 或 NX_ARCH_INVALID，与 CPU profile 无关。"
+
+msgid "Pure bounded task/IRQ function. Inputs and output must not overlap. No address rounding or v7/v8 policy conversion."
+msgstr "纯函数、有界的任务／IRQ 操作。输入与输出不得重叠。不进行地址取整或 v7/v8 策略转换。"
+
+msgid "[in] 32-byte aligned base, inclusive limit ending in 0x1f, base not above limit, AP 0..3, SH 0/2/3 and MAIR index 0..7. The caller owns the corresponding MAIR policy."
+msgstr "[in] base 按 32 字节对齐；包含在范围内的 limit 末尾为 0x1f；base 不大于 limit；AP 为 0..3，SH 为 0/2/3，MAIR 索引为 0..7。调用者拥有相应的 MAIR 策略。"
+
+msgid "[out] RBAR and enabled RLAR; unchanged on failure."
+msgstr "[out] RBAR 和置有启用位的 RLAR 编码；失败时不改变输出。"
+
+msgid "Privileged Thread only with PRIMASK set and exclusive caller ownership of this MPU. NMI/HardFault/another security world must not modify it. Disables only the selected region, writes its fields, restores incoming RNR and leaves CTRL unchanged. No allocation, OS calls, implicit MPU enable, bulk clear or Secure access to the Non-secure alias."
+msgstr "仅限 PRIMASK 已置位、且调用者独占此 MPU 的特权 Thread。NMI/HardFault／其他安全域不得修改它。只禁用选定区域、写入其字段、恢复传入的 RNR，并保持 CTRL 不变。不分配内存、不调用 OS、不隐式启用 MPU、不批量清零，也不从 Secure 访问 Non-secure 别名。"
+
+msgid "[in] Region number below actual MPU_TYPE.DREGION."
+msgstr "[in] 小于实际 MPU_TYPE.DREGION 的区域编号。"
+
+msgid "[in] Fields validated by nx_arch_mpu_v7_encode."
+msgstr "[in] 已由 nx_arch_mpu_v7_encode 验证的字段。"
+
+msgid "NX_ARCH_UNSUPPORTED before MMIO for a different/absent compiled MPU; NX_ARCH_INVALID for invalid fields or index; NX_ARCH_CONTEXT for an unprivileged, Handler, unmasked or enabled-MPU caller. Rejection performs no register writes."
+msgstr "编译的 MPU 类型不同或不存在时，在 MMIO 前返回 NX_ARCH_UNSUPPORTED；字段或索引无效返回 NX_ARCH_INVALID；非特权、Handler、未屏蔽或 MPU 已启用的调用上下文返回 NX_ARCH_CONTEXT。拒绝时不写寄存器。"
+
+msgid "Privileged masked Thread, disabled MPU and exclusive local ownership required. No MAIR updates or cross-world alias access. Incoming RNR and CTRL are preserved."
+msgstr "要求已屏蔽的特权 Thread、已禁用的 MPU 及本地独占所有权。不更新 MAIR，也不访问跨域别名。保留传入的 RNR 和 CTRL。"
+
+msgid "[in] Fields validated by nx_arch_mpu_v8_encode."
+msgstr "[in] 已由 nx_arch_mpu_v8_encode 验证的字段。"
+
+msgid "Same rejection and ownership rules as v7_program; the compiled MPU must specifically implement Armv8-M."
+msgstr "拒绝及所有权规则与 v7_program 相同；编译的 MPU 必须明确实现 Armv8-M。"
+
+msgid "Caller owns valid memory attributes and all regions using this slot. Privileged masked Thread, disabled MPU and exclusive local ownership required. No CTRL or RNR writes, no cache maintenance, and no cross-world register access."
+msgstr "调用者拥有有效内存属性及所有使用此槽的区域。要求已屏蔽的特权 Thread、已禁用的 MPU 及本地独占所有权。不写 CTRL 或 RNR、不维护缓存，也不跨域访问寄存器。"
+
+msgid "[in] Attribute slot 0..7."
+msgstr "[in] 属性槽 0..7。"
+
+msgid "[in] Architectural MAIR byte, at most 255. Device encodings are 0x00/0x04/0x08/0x0c; Normal memory uses nonzero outer/inner nibbles other than reserved 0x8."
+msgstr "[in] 架构 MAIR 字节，不超过 255。Device 编码为 0x00/0x04/0x08/0x0c；Normal 内存使用非零的外层／内层半字节，且不得为保留值 0x8。"
+
+msgid "NX_ARCH_OK, NX_ARCH_UNSUPPORTED for absent/v7 MPU, NX_ARCH_INVALID for an out-of-range field, or NX_ARCH_CONTEXT under the programming context rules."
+msgstr "成功返回 NX_ARCH_OK；MPU 不存在或为 v7 返回 NX_ARCH_UNSUPPORTED；字段越界返回 NX_ARCH_INVALID；不满足编程上下文规则时返回 NX_ARCH_CONTEXT。"
+
+msgid "Allocation-free permission observation only. Hardware CMSE checks both security attribution and NonSecure MPU rights as an unprivileged caller. Adjacent permitted regions may be conservatively rejected. No memory is copied, pinned or borrowed. Success neither authenticates a gateway caller nor proves RAM, DMA reachability, lifetime or fault safety. The integrating owner must exclude MMIO through its SoC RAM policy and prevent attribution/mapping changes through the subsequent access. Interrupts, another world, DMA and faults are not excluded here; no masks or hardware policy are changed. A gateway must separately snapshot its input and validate output before any irreversible operation."
+msgstr "只进行不分配内存的权限观察。硬件 CMSE 按非特权调用者身份，同时检查安全属性和 NonSecure MPU 权限。相邻的许可区域也可能被保守拒绝。不复制、固定或借用任何内存。成功既不认证网关调用者，也不证明 RAM、DMA 可达性、生命周期或故障安全。集成所有者须通过其 SoC RAM 策略排除 MMIO，并在后续访问期间阻止属性／映射变化。这里不排除中断、其他安全域、DMA 或故障；不改变屏蔽或硬件策略。任何不可逆操作前，网关还须独立快照输入并验证输出。"
+
+msgid "[in] Non-null start; never dereferenced by this API."
+msgstr "[in] 非空起始地址；此 API 从不解引用它。"
+
+msgid "[in] Positive length with a representable inclusive end."
+msgstr "[in] 正长度，且包含在范围内的结束地址可表示。"
+
+msgid "[in] Exact READ or READWRITE access, never a bit mask."
+msgstr "[in] 精确选择 READ 或 READWRITE 访问，不是位 mask。"
+
+msgid "OK for complete current access; INVALID for malformed or denied spans; CONTEXT outside privileged Secure Thread; UNSUPPORTED in Native, single-state or NonSecure images."
+msgstr "完整当前访问允许时返回 OK；范围格式错误或拒绝访问返回 INVALID；特权 Secure Thread 以外返回 CONTEXT；Native、单一安全状态或 NonSecure 镜像返回 UNSUPPORTED。"
+
+msgid "Bounded read-only Task/IRQ query, no hardware access. This does not grant access to another world's memory or devices."
+msgstr "有界、只读的 Task/IRQ 查询，不访问硬件。不授予访问其他安全域内存或设备的权限。"
+
+msgid "Single-domain, Secure or NonSecure reviewed image state."
+msgstr "经过审查的镜像状态：单域、Secure 或 NonSecure。"
+
+msgid "Pure Task/IRQ operation. Encoding marks the requested region enabled but does not enable SAU hardware. External policy owns overlap, IDAU restrictions and NSC veneers."
+msgstr "纯 Task/IRQ 操作。编码将请求区域标为已启用，但不启用 SAU 硬件。外部策略拥有重叠、IDAU 限制和 NSC veneer 的责任。"
+
+msgid "[in] Base aligned to 32 bytes; inclusive limit ending at a complete 32-byte boundary. Base must not exceed limit."
+msgstr "[in] base 按 32 字节对齐；包含在范围内的 limit 须位于完整 32 字节边界的末尾。base 不得超过 limit。"
+
+msgid "[out] Encoded region, unchanged on failure."
+msgstr "[out] 编码后的区域；失败时保持不变。"
+
+msgid "OK or INVALID for null arguments or invalid boundaries."
+msgstr "成功返回 OK；参数为空或边界无效返回 INVALID。"
+
+msgid "Secure privileged Thread with incoming PRIMASK set only. Caller excludes all other region/selector users and keeps NMI/HardFault outside this metadata. Requires reviewed SAU region support. Does not modify CTRL, ALLNS, another region, another security world's registers or enable the SAU. Current RNR is restored; DSB/ISB complete region writes. Policy, secure gateways and IDAU configuration stay external."
+msgstr "仅限传入 PRIMASK 已置位的 Secure 特权 Thread。调用者须排除所有其他区域／selector 用户，并使 NMI/HardFault 不接触该元数据。要求已审查的 SAU 区域支持。不修改 CTRL、ALLNS、其他区域或其他安全域寄存器，也不启用 SAU。恢复当前 RNR；DSB/ISB 完成区域写入。策略、安全网关及 IDAU 配置仍由外部负责。"
+
+msgid "[in] Region index below the actual hardware TYPE count."
+msgstr "[in] 小于实际硬件 TYPE 计数的区域索引。"
+
+msgid "[in] Explicit reviewed region and NSC permission."
+msgstr "[in] 显式审查过的区域及 NSC 权限。"
+
+msgid "OK, INVALID, CONTEXT or UNSUPPORTED without retained state."
+msgstr "返回 OK、INVALID、CONTEXT 或 UNSUPPORTED，不保留状态。"
+
+msgid "Same context and ownership contract as nx_arch_sau_write. Preserves CTRL, ALLNS, other regions and incoming RNR."
+msgstr "上下文和所有权合同与 nx_arch_sau_write 相同。保留 CTRL、ALLNS、其他区域及传入的 RNR。"
+
+msgid "OK, INVALID, CONTEXT or UNSUPPORTED without other writes."
+msgstr "返回 OK、INVALID、CONTEXT 或 UNSUPPORTED，不进行其他写入。"
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-11"
+msgstr "2026-10-11"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Privileged Thread mode, incoming PRIMASK=1, BASEPRI and FAULTMASK clear. SCR.SLEEPDEEP must be clear. The caller owns the final readiness check and timer/wake source. WFI wakes for a pending enabled interrupt despite PRIMASK; the interrupt runs after the caller restores its saved mask. No register, mask, clock or pending interrupt is changed. Current CPU/security state only; no physical HIL claim."
+msgstr "特权 Thread 模式，传入 PRIMASK=1，BASEPRI 和 FAULTMASK 清零。SCR.SLEEPDEEP 必须清零。调用者拥有最终就绪检查及定时器／唤醒源。即使 PRIMASK 已置位，待决且已启用的中断也会使 WFI 唤醒；调用者恢复保存的屏蔽后才执行中断。不改变任何寄存器、屏蔽、时钟或待决中断。仅针对当前 CPU／安全状态，不声明物理 HIL 资格。"
+
+msgid "OK after wake, CONTEXT or UNSUPPORTED without sleeping."
+msgstr "唤醒后返回 OK；CONTEXT 或 UNSUPPORTED 时不进入睡眠。"
+
+msgid "Privileged Thread mode with all incoming masks clear. Saves PRIMASK, performs acquire observation under that mask, optionally sleeps, and restores the exact mask. Publishers must be same-CPU configurable IRQs or Threads; NMI/HardFault, DMA, SMP and other security-world publishers are excluded. The caller keeps storage alive, owns an enabled IRQ timer for finite deadlines, and retries the authoritative predicate after wake. Native is unsupported."
+msgstr "特权 Thread 模式，所有传入屏蔽均须清零。保存 PRIMASK，在该屏蔽下执行 acquire 观察，必要时睡眠，然后精确恢复原屏蔽。发布者必须是同 CPU 的可配置 IRQ 或 Thread；排除 NMI/HardFault、DMA、SMP 及其他安全域发布者。调用者须保持存储存续，为有限 deadline 拥有已启用的 IRQ 定时器，并在唤醒后重试权威谓词。Native 不支持。"
+
+msgid "[in] Naturally aligned, shared 32-bit wake sequence."
+msgstr "[in] 自然对齐的共享 32 位唤醒序列。"
+
+msgid "[in] Snapshot before the caller's readiness check."
+msgstr "[in] 调用者执行就绪检查前的快照。"
+
+msgid "[out] True only when WFI was executed."
+msgstr "[out] 仅在实际执行 WFI 时为 true。"
+
+msgid "OK, INVALID, CONTEXT or UNSUPPORTED."
+msgstr "返回 OK、INVALID、CONTEXT 或 UNSUPPORTED。"

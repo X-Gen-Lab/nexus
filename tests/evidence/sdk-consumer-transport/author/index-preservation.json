@@ -1,0 +1,13 @@
+{
+  "kind": "lossless-new-before-index-preservation",
+  "uncompressed_sha256": "85fe752015f12be5ca7345e4a13c22fb17e17f9d44ee23764ffda80664b79b44",
+  "uncompressed_size": 3516583,
+  "archive": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/index.raw.gz",
+  "archive_sha256": "d68b21672dc36b126dbb09da2cc474d12d7a1ce4bfa8fdfb19a97baa932ade7f",
+  "mode": 384,
+  "uid": 1000,
+  "gid": 1000,
+  "atime_ns": 1792303858670402936,
+  "mtime_ns": 1792303817893639950,
+  "verification": "Full decompression through CRC/EOF, size/SHA match, original second SHA unchanged. Only newly created redundant index.raw is retired; ownRoot Git index unchanged."
+}

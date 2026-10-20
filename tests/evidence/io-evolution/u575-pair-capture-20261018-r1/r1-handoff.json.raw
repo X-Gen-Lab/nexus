@@ -1,0 +1,164 @@
+{
+  "kind": "u575_pair_four_file_pure_development_handoff",
+  "source_count": 4,
+  "source_map": "/dev/shm/nexus-u575-pair-feature-20261018-r1/final-four-source-freeze-r1.json",
+  "source_map_sha256": "76d846fa23756808b7d0aab630ba37cc2951bb3bafc5aa85950f038c29c4d6fc",
+  "files": [
+    {
+      "path": "tools/evidence/u575_pair.py",
+      "source": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tools/evidence/u575_pair.py",
+      "bytes": 34630,
+      "sha256": "3378cb0291ad6071169373bd3c9756089d03def4f9a3b81f270d20df873392d5",
+      "mode": 384
+    },
+    {
+      "path": "tools/testing/test_u575_pair_evidence.py",
+      "source": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tools/testing/test_u575_pair_evidence.py",
+      "bytes": 28470,
+      "sha256": "2f4f4b2ddd977140bbc4da297cbbb262361ea94f0dae500b3eb6f7e1c53a4d13",
+      "mode": 384
+    },
+    {
+      "path": "tests/contracts/u575_trustzone/test_gate.py",
+      "source": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tests/contracts/u575_trustzone/test_gate.py",
+      "bytes": 10349,
+      "sha256": "3b3b843c88d7aaf4eedca001ac26e824db4e883dcef9e3f970289f5959311d94",
+      "mode": 384
+    },
+    {
+      "path": "tests/contracts/u575_trustzone/README.md",
+      "source": "/dev/shm/nexus-u575-pair-feature-20261018-r1/files/tests/contracts/u575_trustzone/README.md",
+      "bytes": 10974,
+      "sha256": "d8f2b8f116a5bc292be558accd6006f6e396c8b7a73b1d06425a516327eca4c5",
+      "mode": 384
+    }
+  ],
+  "actual_final": {
+    "pure_tests": 51,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "full_four_file_maintained_text": 0,
+    "CLI_help": 0,
+    "source_and_index_before_after_equal": true,
+    "guard": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-source-and-execution-guard-r2.json",
+    "maximum_completed_child_rss_kib": 35780
+  },
+  "history": [
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/firstcoverage.command.json",
+      "actual_exit": 1,
+      "classification": "new API absent: firstcoverage/setup; not old production defect RED"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-context-history-red.command.json",
+      "actual_exit": 1,
+      "classification": "actual same-checker contract regression RED; see original raw and retained source/test gzip"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-corrected-regressions.command.json",
+      "actual_exit": 0,
+      "classification": "actual completed GREEN; first implementation25 is first capability coverage, not historical CMSE proof"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-discovered-regressions.command.json",
+      "actual_exit": 1,
+      "classification": "actual same-checker contract regression RED; see original raw and retained source/test gzip"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-first-implementation.command.json",
+      "actual_exit": 0,
+      "classification": "actual completed GREEN; first implementation25 is first capability coverage, not historical CMSE proof"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-green.command.json",
+      "actual_exit": 0,
+      "classification": "actual completed GREEN; first implementation25 is first capability coverage, not historical CMSE proof"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-include-conflict-red.command.json",
+      "actual_exit": 1,
+      "classification": "actual same-checker contract regression RED; see original raw and retained source/test gzip"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-green.command.json",
+      "actual_exit": 0,
+      "classification": "actual completed GREEN; first implementation25 is first capability coverage, not historical CMSE proof"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-member-digest-red.command.json",
+      "actual_exit": 1,
+      "classification": "actual same-checker contract regression RED; see original raw and retained source/test gzip"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r1.command.json",
+      "actual_exit": 1,
+      "classification": "fixture precondition mismatch after stronger metadata check; original map rejection oracle preserved after coherent fixture reanchor"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-pure-final-r2.command.json",
+      "actual_exit": 0,
+      "classification": "actual completed GREEN; first implementation25 is first capability coverage, not historical CMSE proof"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-schema-green.command.json",
+      "actual_exit": 0,
+      "classification": "actual completed GREEN; first implementation25 is first capability coverage, not historical CMSE proof"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-strict-schema-red.command.json",
+      "actual_exit": 1,
+      "classification": "actual same-checker contract regression RED; see original raw and retained source/test gzip"
+    },
+    {
+      "command": "/dev/shm/nexus-u575-pair-feature-20261018-r1/whole-two-schema-red.command.json",
+      "actual_exit": 1,
+      "classification": "actual same-checker contract regression RED; see original raw and retained source/test gzip"
+    }
+  ],
+  "old17_gate_method_bodies_byte_identical": true,
+  "new_actual_input_gate_methods": 2,
+  "not_executed": [
+    "new real pair input positive",
+    "complete real typed closure seal/streamverify",
+    "independent full restore",
+    "new source ARM build",
+    "installedSDK",
+    "OCI",
+    "physical HIL",
+    "CI integration",
+    "Root staged style and full hooks"
+  ],
+  "style_setup": "CLI refused two untracked new files; no actual/alternate index staging, no bypass. Maintained check_text executed on complete four files0. Full staged gates belong to Root.",
+  "format_setup": "Dry-run local line wrapping AST/syntax guards rejected candidates before source write; final whole51 includes actual final wrapped bytes. Two fixture local variable extractions preserve oracle; old17 unchanged.",
+  "budgets": {
+    "original_feature_limit": 524288,
+    "before_only_actual_allocated": 815104,
+    "first_raised_limit": 1310720,
+    "approved_final_limit": 1572864,
+    "reason": "complete index gzip787965B alone exceeds original512KiB; preserved all old bytes and later genuine regression raw",
+    "pure_temp_limit": 33554432,
+    "real_closure_not_authorized": true
+  },
+  "real_closure_forecast": {
+    "old_readonly_selected_data_plus_inventory_bytes": 78282103,
+    "not_a_new_corpus_count": true,
+    "fresh_Root_clean_source_required": true,
+    "fresh_before_after_link_library_lock_required": true,
+    "stream_storage_prediction": "~80MiB staging +20-32MiB compressed +<=8MiB metadata/selective views; actual new size unknown",
+    "full_restore_prediction": "adds~80MiB; 192MiB is tight estimate only, requires separate actual admitted cap",
+    "strict_format_caps": "128MiB compressed+logical,160MiB raw TAR expansion; scheduling storage is separate and not guaranteed by format caps"
+  },
+  "CI": "fifth path reserved; not modified before Root D3 normal published fast-forward",
+  "persistence": "all prepared files volatile in exec-shm; not durable until Root normal commit/push",
+  "raw_archive": {
+    "path": "/dev/shm/nexus-u575-pair-feature-20261018-r1/final-checks-raw-r1.tar.gz",
+    "sha256": "7a6c86a3203375e2f6bb38b7cf31dc73df7a2898ea0b848ddb82cfa330558819",
+    "members": 44
+  },
+  "actual_resource_end": {
+    "workspace_free": 67387392,
+    "tmp_free": 229416960,
+    "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+  }
+}

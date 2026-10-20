@@ -65,17 +65,13 @@ def collect(root=ROOT):
         route_doc = configure.load(path.parent / "routes.json")
         configure.obj(route_doc, {"schema_version", "routes"}, (), "routes")
         configure.integer(route_doc["schema_version"], 1, 1, "routes schema")
+        # Use the resolver's complete reviewed physical/interface validation.
+        # Union exact-part results without inventing a documentation mode gate.
         route_index = {}
-        for route in route_doc["routes"]:
-            identity = route["id"]
-            if identity in route_index:
-                raise ValueError(f"Duplicate route: {identity}")
-            controller = soc["controllers"].get(route["controller"])
-            if (controller is None or controller["kind"] != route["kind"]
-                    or not set(route["modes"]).issubset(controller["modes"])
-                    or not set(route["variants"]).issubset(soc["variants"])):
-                raise ValueError(f"Route contradicts SoC facts: {identity}")
-            route_index[identity] = route
+        provider = configure.maintained(soc["id"])
+        for part in soc["variants"]:
+            route_index.update(configure.resolve_routes(
+                route_doc, soc, part, provider))
         routes[soc["id"]] = route_index
         for source in sorted((path.parent / "drivers").glob("*.c")):
             for symbol in source_ops(source, root):
@@ -85,7 +81,8 @@ def collect(root=ROOT):
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
     shared_sources = (set((root / "soc/common").glob("*.c"))
-                      | set((root / "io/src").glob("*.c")))
+                      | set((root / "io/src").glob("*.c"))
+                      | set((root / "io/native").glob("*.c")))
     for source in sorted(shared_sources):
         for symbol in source_ops(source, root):
             if symbol in exports:
@@ -107,15 +104,19 @@ def collect(root=ROOT):
                 raise ValueError("Board binding contradicts route: "
                                  + binding["id"])
             for mode in route["modes"]:
-                declared[(family, binding["controller"], mode)].add(board["id"])
+                declared[(family, binding["controller"], route["kind"], mode)].add(board["id"])
     selected = defaultdict(lambda: {"fixtures": set(), "exports": set()})
     assembly_paths = (root / "tools/configure/assemblies").glob("*.toml")
     contract_paths = (root / "tests/contracts").glob("*_assembly/*.toml")
-    fixture_paths = sorted(set(assembly_paths) | set(contract_paths))
+    sdk_paths = (root / "cmake/package/verification/io_evolution").glob("*.toml")
+    fixture_paths = sorted(set(assembly_paths) | set(contract_paths)
+                           | set(sdk_paths))
     for fixture in fixture_paths:
         result = configure.resolve(fixture, root)
         if result["soc_family"] == "native":
-            continue
+            provider = configure.maintained(result["soc_family"])
+            if provider.MODEL is not True or result["physical_qualified"] is not False:
+                raise ValueError("Native source provenance requires an unqualified MODEL")
         source = c_code(bindings.emit(result)[1])
         for item in result["controllers"]:
             name = bindings.symbol(item["id"])
@@ -126,25 +127,42 @@ def collect(root=ROOT):
             if len(matches) != 1 or matches[0] not in exports:
                 raise ValueError("Selected ops has no production definition: "
                                  + f"{fixture}:{name}")
-            key = result["soc_family"], item["controller"], item["mode"]
+            key = (result["soc_family"], item["controller"],
+                   item["kind"], item["mode"])
             selected[key]["fixtures"].add(fixture.relative_to(root).as_posix())
             selected[key]["exports"].add(exports[matches[0]])
     rows = []
     for family, soc in sorted(facts.items()):
         for controller, facts_item in sorted(soc["controllers"].items()):
-            for mode in sorted(facts_item["modes"]):
-                key = family, controller, mode
-                reviewed = [route["id"] for route in routes[family].values()
-                            if route["controller"] == controller
-                            and mode in route["modes"]]
-                row = {"family": family, "controller": controller,
-                       "kind": facts_item["kind"], "mode": mode,
-                       "routes": sorted(reviewed),
-                       "boards": sorted(declared[key]),
-                       "fixtures": sorted(selected[key]["fixtures"]),
-                       "exports": sorted(selected[key]["exports"])}
-                rows.append(row)
-    known = {(row["family"], row["controller"], row["mode"]) for row in rows}
+            interfaces = [(facts_item["kind"], facts_item["modes"])]
+            interfaces += sorted(facts_item.get("interfaces", {}).items())
+            for kind, modes in interfaces:
+                for mode in sorted(modes):
+                    key = family, controller, kind, mode
+                    reviewed = [route["id"] for route in routes[family].values()
+                                if route["controller"] == controller and
+                                route["kind"] == kind and mode in route["modes"]]
+                    row = {"family": family, "controller": controller,
+                           "kind": kind, "mode": mode,
+                           "routes": sorted(reviewed),
+                           "boards": sorted(declared[key]),
+                           "fixtures": sorted(selected[key]["fixtures"]),
+                           "exports": sorted(selected[key]["exports"])}
+                    rows.append(row)
+    # Host models have no physical SoC/Board inventory here. Project only
+    # controllers actually selected by the same resolver/face-to-ops path.
+    # Empty assemblies therefore cannot manufacture a model capability row.
+    for key in sorted(selected):
+        family, controller, kind, mode = key
+        if family != "native":
+            continue
+        rows.append({"family": family, "controller": controller,
+                     "kind": kind, "mode": mode, "routes": [], "boards": [],
+                     "fixtures": sorted(selected[key]["fixtures"]),
+                     "exports": sorted(selected[key]["exports"]),
+                     "implementation": "MODEL", "physical_qualified": False})
+    known = {(row["family"], row["controller"], row["kind"], row["mode"])
+             for row in rows}
     if selected.keys() - known:
         raise ValueError("Resolved fixture selects an undeclared mode")
     return rows
@@ -158,6 +176,10 @@ def render(rows):
              "| --- | --- | --- | --- | --- | --- | --- | --- |"]
     for row in rows:
         cells = [row[key] for key in ("family", "controller", "kind", "mode")]
+        if row.get("implementation") == "MODEL":
+            if row.get("physical_qualified") is not False:
+                raise ValueError("Model rows cannot assert physical qualification")
+            cells[0] += " (MODEL; physical=false)"
         for key in ("routes", "boards", "fixtures", "exports"):
             cells.append(", ".join(f"`{value}`" for value in row[key]) or "—")
         lines.append("| " + " | ".join(cells) + " |")

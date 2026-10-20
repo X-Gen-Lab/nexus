@@ -1,0 +1,3687 @@
+{
+  "kind": "complete matching baseline Native executable preservation before normal in-place rebuild",
+  "source_head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "original_full_gate_sha256": "46fa76810dac52bf168cda69671c82dba9db3fd921b3c3b1be0d4f4c766591aa",
+  "programs": 306,
+  "uncompressed_bytes": 816494288,
+  "gzip_bytes": 477771753,
+  "unique_blob_count": 297,
+  "allocated_cap": 536870912,
+  "files": [
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_adc_format_test",
+        "bytes": 2272240,
+        "sha256": "7d17f0d71ee4ca5fa8d27fb2c9b5fdb9eb914a785b58d1d84e8eaa6f92c83bd6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7d17f0d71ee4ca5fa8d27fb2c9b5fdb9eb914a785b58d1d84e8eaa6f92c83bd6.elf.gz",
+      "gzip_bytes": 1251774,
+      "gzip_sha256": "4fdc031cf66234da6d74b14a40cc21ff5e91b133fe152cbc0b160ccc9fa25689",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_adc_group_test",
+        "bytes": 2516784,
+        "sha256": "fbadd71ec7c4f63932a842fa36df636458acb6261561c4d31ec0215794bf4ffb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fbadd71ec7c4f63932a842fa36df636458acb6261561c4d31ec0215794bf4ffb.elf.gz",
+      "gzip_bytes": 1450661,
+      "gzip_sha256": "14dc4d4f58290f20d87083dd2d3bfe38acda4e5693f257be3247b9b3b9ff9d0d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_both_test",
+        "bytes": 2666776,
+        "sha256": "baba2ac0d65f1945411389700b4edccb9969401dda1ca5294be2e672d7a6048c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/baba2ac0d65f1945411389700b4edccb9969401dda1ca5294be2e672d7a6048c.elf.gz",
+      "gzip_bytes": 1550527,
+      "gzip_sha256": "6a9c8ce446a524ef2132e7d573c344c51bbaf758d73bd79fda0a9f1a60bc1bd3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_control_m7_test",
+        "bytes": 3021168,
+        "sha256": "126f7247cb4a750b0d6589ed4216a7787a765334644853ea3db6c3f24aaf0488"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/126f7247cb4a750b0d6589ed4216a7787a765334644853ea3db6c3f24aaf0488.elf.gz",
+      "gzip_bytes": 1813224,
+      "gzip_sha256": "c105a4f6e8a1fdfd595ba683bf37eae4848c862a26a07ed181c67fc367121c5e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_control_unsupported_test",
+        "bytes": 2916456,
+        "sha256": "38d47f5c1f881615584dd1c822a16aa354b2ffa8617c6af2abd9b90a6dbef29f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/38d47f5c1f881615584dd1c822a16aa354b2ffa8617c6af2abd9b90a6dbef29f.elf.gz",
+      "gzip_bytes": 1724092,
+      "gzip_sha256": "043816714a5760b505b0d5c342a2952a57785acdcd7efebd6b596c3b4bbf7a41",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_data_test",
+        "bytes": 2665752,
+        "sha256": "ebd682442e6bd1b05d919b3de18dc61acbdfc8392e0a6bd2fbe169dc66f85bd6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ebd682442e6bd1b05d919b3de18dc61acbdfc8392e0a6bd2fbe169dc66f85bd6.elf.gz",
+      "gzip_bytes": 1549353,
+      "gzip_sha256": "c26195f39d6049bacc91c9e5d5bab190bd43c1f6d0d78e270d8308b74dd14fff",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_instruction_test",
+        "bytes": 2659928,
+        "sha256": "e93e8870cffbb32cad713a028f18dc3403c8817abd3f0f8d1bfd889a9f3d1f0d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e93e8870cffbb32cad713a028f18dc3403c8817abd3f0f8d1bfd889a9f3d1f0d.elf.gz",
+      "gzip_bytes": 1547514,
+      "gzip_sha256": "96b8e101e11f16ac1a3d02dce21fa47663f760ce4f7b102b954e187d6498cee4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cache_none_test",
+        "bytes": 2478336,
+        "sha256": "317cc6a4dc9cd593a15fbd77bb64ecdbd2156153dabc5bdfcb954cc3cc69523d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/317cc6a4dc9cd593a15fbd77bb64ecdbd2156153dabc5bdfcb954cc3cc69523d.elf.gz",
+      "gzip_bytes": 1396604,
+      "gzip_sha256": "caaae73d5ffd9b684d89a968e92a94994af5a3e75a014a3323537c7773b29f8b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m0_test",
+        "bytes": 2612472,
+        "sha256": "23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683.elf.gz",
+      "gzip_bytes": 1512041,
+      "gzip_sha256": "d91ce86ef5cf25d96b8507aa7a6375761b21e8dafbc5f781821ac184c0d6979a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m0plus_test",
+        "bytes": 2612472,
+        "sha256": "23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683.elf.gz",
+      "gzip_bytes": 1512041,
+      "gzip_sha256": "d91ce86ef5cf25d96b8507aa7a6375761b21e8dafbc5f781821ac184c0d6979a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m23_test",
+        "bytes": 2612472,
+        "sha256": "23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/23daba74a0988809b8a1f345c4a9fbae11d072adba65a952d713478a3f399683.elf.gz",
+      "gzip_bytes": 1512041,
+      "gzip_sha256": "d91ce86ef5cf25d96b8507aa7a6375761b21e8dafbc5f781821ac184c0d6979a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m33_test",
+        "bytes": 2625208,
+        "sha256": "67de9a99b62f75ea1a6d9b3f0f5f3391e8f93bdddbec88a0a36659248b66b9cb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/67de9a99b62f75ea1a6d9b3f0f5f3391e8f93bdddbec88a0a36659248b66b9cb.elf.gz",
+      "gzip_bytes": 1518221,
+      "gzip_sha256": "ebd9b04b6eab1a72817d839d10468c3134799d059e78b8a72608bd6acdcb12e5",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m3_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a.elf.gz",
+      "gzip_bytes": 1540204,
+      "gzip_sha256": "923e2569e778408f00c5f478fcb52b5e5f493e9d5976ed66f3f0db874f29477d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m4_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a.elf.gz",
+      "gzip_bytes": 1540204,
+      "gzip_sha256": "923e2569e778408f00c5f478fcb52b5e5f493e9d5976ed66f3f0db874f29477d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m55_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a.elf.gz",
+      "gzip_bytes": 1540204,
+      "gzip_sha256": "923e2569e778408f00c5f478fcb52b5e5f493e9d5976ed66f3f0db874f29477d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m7_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a.elf.gz",
+      "gzip_bytes": 1540204,
+      "gzip_sha256": "923e2569e778408f00c5f478fcb52b5e5f493e9d5976ed66f3f0db874f29477d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_cortex_m85_test",
+        "bytes": 2658624,
+        "sha256": "8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8397f1dad13ab73b602b6466e6eb95cab7e3a90eccadac035f42264c6e6e6f9a.elf.gz",
+      "gzip_bytes": 1540204,
+      "gzip_sha256": "923e2569e778408f00c5f478fcb52b5e5f493e9d5976ed66f3f0db874f29477d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_mpu_v0_test",
+        "bytes": 2669976,
+        "sha256": "657e3b3f08697da3873b88a4564480a885698fdf0d9b9f59c0eb992c714e1cd2"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/657e3b3f08697da3873b88a4564480a885698fdf0d9b9f59c0eb992c714e1cd2.elf.gz",
+      "gzip_bytes": 1544698,
+      "gzip_sha256": "90afa1f25484315d87608d7ccdb268a1257d7907a6acd020fa8d0ca812d8e2ff",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_mpu_v7_test",
+        "bytes": 2814736,
+        "sha256": "7691784e583543647319b228c79feb4fadcdb59df321fe3c3242ea543f7650e6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7691784e583543647319b228c79feb4fadcdb59df321fe3c3242ea543f7650e6.elf.gz",
+      "gzip_bytes": 1650483,
+      "gzip_sha256": "0928d4be07ab97b1890dbfea001ffe9001af401523d0032970c41e450d74fad8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_mpu_v8_test",
+        "bytes": 2868912,
+        "sha256": "8405bba7eb827eb5ef8ba031403392d21850272815efd50e8874e1960eac2ed4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8405bba7eb827eb5ef8ba031403392d21850272815efd50e8874e1960eac2ed4.elf.gz",
+      "gzip_bytes": 1678044,
+      "gzip_sha256": "d59b91646b4ac0f1b1c249fe598cd031d7da2aadf8beeb93f66a713c9de33bc0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_native_mechanism_test",
+        "bytes": 2235304,
+        "sha256": "4c6006e4017a65c97ccb9aa82c23ce1faaa23d476197987d63fd4a0d9b685e36"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/4c6006e4017a65c97ccb9aa82c23ce1faaa23d476197987d63fd4a0d9b685e36.elf.gz",
+      "gzip_bytes": 1227650,
+      "gzip_sha256": "4d0822ece3c150a655d37f9d65a785a90e8f92b64dbbee18cc9bec1b85bc96c6",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_native_test",
+        "bytes": 2354416,
+        "sha256": "d137c77c18271faf5defdd514d2cb7e496163534122943c770e616cbf1072e37"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d137c77c18271faf5defdd514d2cb7e496163534122943c770e616cbf1072e37.elf.gz",
+      "gzip_bytes": 1323452,
+      "gzip_sha256": "aac0dd2139cc46ae9a93140adfd9d2c3da1d8c21d5a0ad9fa2f96123e7d680d5",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_native_test",
+        "bytes": 2367528,
+        "sha256": "7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0.elf.gz",
+      "gzip_bytes": 1340238,
+      "gzip_sha256": "bf793fd127e36053eb1ad20820f2cf1bdccef136ecd4b65662d2bd7744ccf550",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_nonsecure_test",
+        "bytes": 2367528,
+        "sha256": "7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0.elf.gz",
+      "gzip_bytes": 1340238,
+      "gzip_sha256": "bf793fd127e36053eb1ad20820f2cf1bdccef136ecd4b65662d2bd7744ccf550",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_secure-no-sau_test",
+        "bytes": 2663336,
+        "sha256": "049c6c0d77a3b030069ea2696ae214eeb01998471fe59a6f33b1119c14b3a75b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/049c6c0d77a3b030069ea2696ae214eeb01998471fe59a6f33b1119c14b3a75b.elf.gz",
+      "gzip_bytes": 1556973,
+      "gzip_sha256": "7b019e34461b4a4b8e84769cb9b860901fc437648704ab67108c500325ccf4ae",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_secure_test",
+        "bytes": 2663336,
+        "sha256": "049c6c0d77a3b030069ea2696ae214eeb01998471fe59a6f33b1119c14b3a75b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/049c6c0d77a3b030069ea2696ae214eeb01998471fe59a6f33b1119c14b3a75b.elf.gz",
+      "gzip_bytes": 1556973,
+      "gzip_sha256": "7b019e34461b4a4b8e84769cb9b860901fc437648704ab67108c500325ccf4ae",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_nonsecure_single_test",
+        "bytes": 2367528,
+        "sha256": "7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7c894950129a3ba4a625aee58db6850914076f42e413f971edf534809b7b95f0.elf.gz",
+      "gzip_bytes": 1340238,
+      "gzip_sha256": "bf793fd127e36053eb1ad20820f2cf1bdccef136ecd4b65662d2bd7744ccf550",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_nonsecure_test",
+        "bytes": 2484472,
+        "sha256": "e9a6f176c7ab444cce4f7d4c544ab113d29a22b64523627fb8b46ab18e18d625"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e9a6f176c7ab444cce4f7d4c544ab113d29a22b64523627fb8b46ab18e18d625.elf.gz",
+      "gzip_bytes": 1417502,
+      "gzip_sha256": "1f0e01f0b09b8ca9f7e8ab7300640693f4e5b596b2d3112c7aa232517a16b659",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_secure-no-sau_test",
+        "bytes": 2484472,
+        "sha256": "dce4c958c6bacafc9aca8efe0a5330e96fa7a610bb93b36e0ff34ce6025c1405"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dce4c958c6bacafc9aca8efe0a5330e96fa7a610bb93b36e0ff34ce6025c1405.elf.gz",
+      "gzip_bytes": 1417466,
+      "gzip_sha256": "ab66acea5432428da4f9162c2ed799c514107c0b53549ed58faa494e15e08a3a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_secure_test",
+        "bytes": 2805944,
+        "sha256": "aff1144057a2a9d8422fd0b564920dce4504708f4c2337793e8d1b12c807c8ab"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/aff1144057a2a9d8422fd0b564920dce4504708f4c2337793e8d1b12c807c8ab.elf.gz",
+      "gzip_bytes": 1657790,
+      "gzip_sha256": "f0daa56472a86209175beddf55d0705917fb299e5d128861686a4f84038c9287",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_security_single_test",
+        "bytes": 2484512,
+        "sha256": "919cb1b7a8d2f5b1352fb3301b7bd917b3aad29b56065600c71fa3f1a407c713"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/919cb1b7a8d2f5b1352fb3301b7bd917b3aad29b56065600c71fa3f1a407c713.elf.gz",
+      "gzip_bytes": 1417465,
+      "gzip_sha256": "27779f5505816f947817c8027c01310513977f1c61729f3cd59b71dc2a3884b0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_arch_sleep_test",
+        "bytes": 2712288,
+        "sha256": "91cef5b52336f8ead5311360261b5977bbcc657f321113c241cceb123fda80a5"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/91cef5b52336f8ead5311360261b5977bbcc657f321113c241cceb123fda80a5.elf.gz",
+      "gzip_bytes": 1594323,
+      "gzip_sha256": "7d2a5cf38869d041abba213d5c1d65e58a4be5f913eba422e3bb4aca34cbf123",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_atomic_m0_test",
+        "bytes": 2732240,
+        "sha256": "259b116e2c1fff4e1837f027717abc64850fe23930f5f13d9df335714efd59cd"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/259b116e2c1fff4e1837f027717abc64850fe23930f5f13d9df335714efd59cd.elf.gz",
+      "gzip_bytes": 1610034,
+      "gzip_sha256": "ca5bc1be6db73d490b12e388c4c2d9405e0dbae583e8feaa384381007f005722",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_atomic_native_test",
+        "bytes": 2277000,
+        "sha256": "f23833c440244936c1f73630c5add497569a01694358805eb36d365720000d5f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f23833c440244936c1f73630c5add497569a01694358805eb36d365720000d5f.elf.gz",
+      "gzip_bytes": 1255731,
+      "gzip_sha256": "f3c7050468ec4ea16cb81f6a9975fd35e64dfeaa39e3049fa2c04de01fb626bd",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_can_controller_test",
+        "bytes": 2567872,
+        "sha256": "b6d47b09f003c140c43c40661f17665d799b653a30c9c98f742337da1c435c42"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b6d47b09f003c140c43c40661f17665d799b653a30c9c98f742337da1c435c42.elf.gz",
+      "gzip_bytes": 1460407,
+      "gzip_sha256": "1ea8a81237a6239aa0aab839384a5d129bdc3c57eae749546375c1aa599dd17f",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_can_fd_contract_test",
+        "bytes": 2254904,
+        "sha256": "7a8be1db37718eb818c67a48f5b03a3c361b838e6c0d39068c0f70425dc4b04f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7a8be1db37718eb818c67a48f5b03a3c361b838e6c0d39068c0f70425dc4b04f.elf.gz",
+      "gzip_bytes": 1244143,
+      "gzip_sha256": "3d73cc0f51f11bd8f9b0ccd9eb72cc670e0baeb45d72d9744805bbf168fb8efc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_clock_domain_test",
+        "bytes": 2394648,
+        "sha256": "15ddbefac60cf262e443adaa8b14770ae21ff5e8dea105c41b6dcaa9c1453f13"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/15ddbefac60cf262e443adaa8b14770ae21ff5e8dea105c41b6dcaa9c1453f13.elf.gz",
+      "gzip_bytes": 1332573,
+      "gzip_sha256": "2792094ecba9f7eabcc2ab49da616aad6bc04a93d654668789c286319dd21a75",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_common_ethernet_frames_test",
+        "bytes": 2889064,
+        "sha256": "e816954b7ccf2d388ae1328516d0d83806b3f69a080f74f3175be5ec0c9ee6a0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e816954b7ccf2d388ae1328516d0d83806b3f69a080f74f3175be5ec0c9ee6a0.elf.gz",
+      "gzip_bytes": 1727021,
+      "gzip_sha256": "0b2957d75e2b1c5c82d18360ee3a6fa9a22ffb8fcb7d56511ab07dd0040a0ca8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_cycle_probe_disabled_test",
+        "bytes": 2209872,
+        "sha256": "8a79424237330f7bcc18ff36e78a22b4d0fc51a3f2e124069fce8ea52db2eda1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8a79424237330f7bcc18ff36e78a22b4d0fc51a3f2e124069fce8ea52db2eda1.elf.gz",
+      "gzip_bytes": 1207509,
+      "gzip_sha256": "a24351b66a6791e5ccad77218174519726dc7e6df94758ccc0f9b91cc940c45e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_cycle_probe_native_test",
+        "bytes": 2233808,
+        "sha256": "439036da31a799c5d28c3ec9c85220ddc27a9855e5132434b07e56735b116e4c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/439036da31a799c5d28c3ec9c85220ddc27a9855e5132434b07e56735b116e4c.elf.gz",
+      "gzip_bytes": 1230505,
+      "gzip_sha256": "b931b82e8fa28f0c9477417bbb7f688a4926f250d6606103798971d4d359bcbb",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_cycle_probe_test",
+        "bytes": 2775088,
+        "sha256": "710d9bbf9e0a99541887ef8e22ae29f7ffa6111d1abb3fc3d3f2ca63594b2311"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/710d9bbf9e0a99541887ef8e22ae29f7ffa6111d1abb3fc3d3f2ca63594b2311.elf.gz",
+      "gzip_bytes": 1632687,
+      "gzip_sha256": "eedcf6462aa5186a2d86b0c43db074cf03799f086513609d12f10261bd84b707",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_dp83848_test",
+        "bytes": 2656800,
+        "sha256": "5b000a6dd9fd2c65f9939d664d83f5d9a7004557322a6c25db3cbc5a94881b41"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5b000a6dd9fd2c65f9939d664d83f5d9a7004557322a6c25db3cbc5a94881b41.elf.gz",
+      "gzip_bytes": 1569577,
+      "gzip_sha256": "81fd552b13fcc8bbfcb96698f944cb3b4b1666182f1a50be83ddfb41ec778367",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_api_test",
+        "bytes": 2438072,
+        "sha256": "fc7c7c91b1b2df696defeeaa6e84ce9b751c6f416f6374228c0d5dc5691db86e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fc7c7c91b1b2df696defeeaa6e84ce9b751c6f416f6374228c0d5dc5691db86e.elf.gz",
+      "gzip_bytes": 1405017,
+      "gzip_sha256": "7f5150541e11a674a08f8454373e020367233da0fa3e06b27e6ed4512d67f013",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_frames_api_test",
+        "bytes": 2511824,
+        "sha256": "5ca71ffe6f460698331bfdd2feb1493f7e2493d101f4e248a5a1267dbe710740"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5ca71ffe6f460698331bfdd2feb1493f7e2493d101f4e248a5a1267dbe710740.elf.gz",
+      "gzip_bytes": 1453829,
+      "gzip_sha256": "6a61eafbad3ad7e07157c9a351b15574df4d6bdbdf162cc4ccd24c992c80ef82",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_frames_native_test",
+        "bytes": 2453072,
+        "sha256": "9fca73696373071f7a3c275cd661bf2e89dabd1d05f8fef3fd96a933302b4bf4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9fca73696373071f7a3c275cd661bf2e89dabd1d05f8fef3fd96a933302b4bf4.elf.gz",
+      "gzip_bytes": 1401995,
+      "gzip_sha256": "2595a6c1ddf8d63fc7d7e1a6adb59b9b9a467cb9fd54e164c353ce4549d49aea",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_mac_test",
+        "bytes": 2610784,
+        "sha256": "e9ce0cde7a85202e8eb9be7ef1983602baae9b60b8bf400f3b72075d242a7b50"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e9ce0cde7a85202e8eb9be7ef1983602baae9b60b8bf400f3b72075d242a7b50.elf.gz",
+      "gzip_bytes": 1482553,
+      "gzip_sha256": "e8a423d585cdcd18ce7b40fdc20335cd0b769bb8403e2490f6be628d7d425730",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_native_test",
+        "bytes": 2349872,
+        "sha256": "31954806e2608c025427cca6e65bce666892fc3c15b0306684c45a40f13d78e1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/31954806e2608c025427cca6e65bce666892fc3c15b0306684c45a40f13d78e1.elf.gz",
+      "gzip_bytes": 1319183,
+      "gzip_sha256": "4ca3317e7aef7acad86a57a523054b093f34c2f6a0c1c6cd90e21a2b03e844c8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_ethernet_raw_errata_test",
+        "bytes": 2282744,
+        "sha256": "ac42881dc8a733479ca6302268d926c6690fb5a0916f7a8443fbbb6945d8cd24"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ac42881dc8a733479ca6302268d926c6690fb5a0916f7a8443fbbb6945d8cd24.elf.gz",
+      "gzip_bytes": 1274054,
+      "gzip_sha256": "5c85f85e40cbada0dcb03125ca42ca564b87cdacf0b8daf382a32127bd352c38",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_f103_devices_factory_test",
+        "bytes": 2349848,
+        "sha256": "7c858eeb0b9ce86055f28cfb5deb28205e31044bd62998baf9feea903b3a4eab"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7c858eeb0b9ce86055f28cfb5deb28205e31044bd62998baf9feea903b3a4eab.elf.gz",
+      "gzip_bytes": 1323014,
+      "gzip_sha256": "7c5cdbeffef123bbd83fcf0714ed8883dcef9aa30fb35d176665bb3b0c312b0a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_flash_provenance_test",
+        "bytes": 2466368,
+        "sha256": "c3513fb46f0d9378d413f13d2b34b97f5afc9e75ac8d7e8fa490be08bd8441ef"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c3513fb46f0d9378d413f13d2b34b97f5afc9e75ac8d7e8fa490be08bd8441ef.elf.gz",
+      "gzip_bytes": 1431349,
+      "gzip_sha256": "88f6e914b2a8dac9d4751bb724b613696e612b9aea0dc2cc6da1d29df19d6c2e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_baseline_context_test",
+        "bytes": 4881464,
+        "sha256": "307cd58d8cfb333df4151cfe5df50fda8e3591e3fec8269ad6dfe24af829ade5"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/307cd58d8cfb333df4151cfe5df50fda8e3591e3fec8269ad6dfe24af829ade5.elf.gz",
+      "gzip_bytes": 3168315,
+      "gzip_sha256": "2febc3d999955ba986bd8a985a873b454e5f117addbe3e6afae2c55982770d68",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_context_test",
+        "bytes": 4975736,
+        "sha256": "87e0af97e65ad1100127dc7eaf2cffe60a146cab9c4f30d5fd98c976ca859f59"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/87e0af97e65ad1100127dc7eaf2cffe60a146cab9c4f30d5fd98c976ca859f59.elf.gz",
+      "gzip_bytes": 3229328,
+      "gzip_sha256": "665e8a5fe633f1f203f8af860c131061c314c491a563a92445c039b8ed44f50d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_failstop_test",
+        "bytes": 2315552,
+        "sha256": "0e02bed0bc65619ef3118f37f595cce1e9a26e3c644a92a81bab7033c6586d1a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0e02bed0bc65619ef3118f37f595cce1e9a26e3c644a92a81bab7033c6586d1a.elf.gz",
+      "gzip_bytes": 1290414,
+      "gzip_sha256": "6599cec1e3d4c6d02b7d2fd158f40f8f0345dc378d964c988b1a44f51eade367",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_m23_context_test",
+        "bytes": 4880720,
+        "sha256": "1b338f6d127ca602b92331b01609aad54cdaa0a0bf0574fb79aba7152f81241e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/1b338f6d127ca602b92331b01609aad54cdaa0a0bf0574fb79aba7152f81241e.elf.gz",
+      "gzip_bytes": 3167591,
+      "gzip_sha256": "ae3a575921db0026078b762768500616e49674f64475f223f43f09b31e7cfe8e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_guard_v7_test",
+        "bytes": 2479056,
+        "sha256": "dadcdb0c6439a25372c47eacef88111c946edc045d5e1dc2ccdadaec26601eeb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dadcdb0c6439a25372c47eacef88111c946edc045d5e1dc2ccdadaec26601eeb.elf.gz",
+      "gzip_bytes": 1445578,
+      "gzip_sha256": "720f77275dbbabc621d6537b42a477bd86eb8274149def1a9c249a2949a03a64",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_guard_v8_ns_test",
+        "bytes": 2484256,
+        "sha256": "8e038ebc85ebacafa1e79d0214094aee0d453ce783eb6caa2df90705a1adce77"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8e038ebc85ebacafa1e79d0214094aee0d453ce783eb6caa2df90705a1adce77.elf.gz",
+      "gzip_bytes": 1449658,
+      "gzip_sha256": "82b2d6e73dedbc3f2ecf08011af5456e163788439f60af14949697583244b757",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_guard_v8_single_test",
+        "bytes": 2484256,
+        "sha256": "118f338140916b7afcd1e5427f6aabcb85c7e1c6bb5a7096a8b7e00195457c80"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/118f338140916b7afcd1e5427f6aabcb85c7e1c6bb5a7096a8b7e00195457c80.elf.gz",
+      "gzip_bytes": 1449718,
+      "gzip_sha256": "4be51b2238cb515d28c5ebcc4e7827d6b3b35dea159d64c75982371614a10a48",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_m3_test",
+        "bytes": 2732856,
+        "sha256": "9e69832a5a697855647b49a5171175406284841b4d60518528b5f071686bbee2"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9e69832a5a697855647b49a5171175406284841b4d60518528b5f071686bbee2.elf.gz",
+      "gzip_bytes": 1642084,
+      "gzip_sha256": "e6c15e39370bcefc0454d135dddae260cc5b7497f43564eb2cde491eca76293a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_m4_test",
+        "bytes": 2732856,
+        "sha256": "788009d162ecede6bf0bb3f3861b3e779d3d39ed67a14f1f38cf234a6cf60c89"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/788009d162ecede6bf0bb3f3861b3e779d3d39ed67a14f1f38cf234a6cf60c89.elf.gz",
+      "gzip_bytes": 1642131,
+      "gzip_sha256": "41c0e0611ced2b80ddb8d0e9b770461ee15410b95d9c8f559d25db9caddef577",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_v8_ns_test",
+        "bytes": 2689600,
+        "sha256": "f5a2bb558a91701c1f87636064bc3f1a74039e7b3b1fb4ec1b714caa061400b0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f5a2bb558a91701c1f87636064bc3f1a74039e7b3b1fb4ec1b714caa061400b0.elf.gz",
+      "gzip_bytes": 1611963,
+      "gzip_sha256": "d96cb160dca768b3ed7138bcb7b4dc7c5139b70d5aa1d0b8fac677955a143035",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_port_v8_single_test",
+        "bytes": 2689600,
+        "sha256": "2b0c3ed2db5f3ffb1d24155ef516538bfb3ad688fbe431e40df908f7f5bc2a2c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2b0c3ed2db5f3ffb1d24155ef516538bfb3ad688fbe431e40df908f7f5bc2a2c.elf.gz",
+      "gzip_bytes": 1611953,
+      "gzip_sha256": "bc49a11c3e125eacf2e0c3ffdd6a6a688bc3307f251a62559f684bcc0dcbe1ca",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_v7_test",
+        "bytes": 2958584,
+        "sha256": "c49af2725e0d6b735d7d67da1d1c298f5d172a728818110ce1cd3a6feefd38ba"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c49af2725e0d6b735d7d67da1d1c298f5d172a728818110ce1cd3a6feefd38ba.elf.gz",
+      "gzip_bytes": 1803818,
+      "gzip_sha256": "27c2cd134d8799f7aaaf5ae146f5962f7d8609ec837318620e36d14b9c4133c7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_mpu_v8_test",
+        "bytes": 2981784,
+        "sha256": "697fd352b647720ceabbeef654bb151214d2d35fc0153b074e365e1a192b6a09"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/697fd352b647720ceabbeef654bb151214d2d35fc0153b074e365e1a192b6a09.elf.gz",
+      "gzip_bytes": 1816201,
+      "gzip_sha256": "558f832d57adeca818b25cd0be2034084c22471c246fa283f0e2bafc5b44f0a3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_notifications_disabled_test",
+        "bytes": 4804888,
+        "sha256": "78e1dcc9e1a346eaa07be490d8c7c27ba37196d9f8d3e2868dd8f06319a42b9b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/78e1dcc9e1a346eaa07be490d8c7c27ba37196d9f8d3e2868dd8f06319a42b9b.elf.gz",
+      "gzip_bytes": 3112753,
+      "gzip_sha256": "5e16363d99adeb3052a1f4d3685abccf3d033b4dfc3266137afb0d8c4e8a7906",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_prestart_test",
+        "bytes": 2343360,
+        "sha256": "ccba51057f6972de309f59aac164e6c57d2ee1c0f7fafd13892f660f4c32ab92"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ccba51057f6972de309f59aac164e6c57d2ee1c0f7fafd13892f660f4c32ab92.elf.gz",
+      "gzip_bytes": 1309408,
+      "gzip_sha256": "8cba969b9258922375e3ad1ca81f5f132e230f2b9476513868b11b4c424ba27b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_priority8_context_test",
+        "bytes": 4975864,
+        "sha256": "0cca531e955da67e1e5c2648e720b16124f608abd136ef066518a4543b493bf8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0cca531e955da67e1e5c2648e720b16124f608abd136ef066518a4543b493bf8.elf.gz",
+      "gzip_bytes": 3229587,
+      "gzip_sha256": "af61729e20fdeae1154384f73b680669e3158083ab3be91e68428890d76fe42d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_services_kernel_test",
+        "bytes": 2184600,
+        "sha256": "d3e65fc487099fbf4723429183fd56d8ffb4296d515735a0c5ae4a93f9bd0877"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d3e65fc487099fbf4723429183fd56d8ffb4296d515735a0c5ae4a93f9bd0877.elf.gz",
+      "gzip_bytes": 1278352,
+      "gzip_sha256": "a4a45e6782a5f29138d240f7985683755e195a3d27d30525bc5bb1612956a432",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_stack_test",
+        "bytes": 2766192,
+        "sha256": "b6ef40c5d36f1b87988650f9ab7089267de48cc103546157d92d11be87402921"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b6ef40c5d36f1b87988650f9ab7089267de48cc103546157d92d11be87402921.elf.gz",
+      "gzip_bytes": 1641915,
+      "gzip_sha256": "19637d8bdf09dd6285437ef337f4be0fa0799d4d1a26b7f20b804d54da0ec0b8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_freertos_v8_context_test",
+        "bytes": 4975872,
+        "sha256": "a0bf36a378b2a1325d03c0a8cf999bcbcd30361ffe191b0cf6c8e7d370d85dde"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a0bf36a378b2a1325d03c0a8cf999bcbcd30361ffe191b0cf6c8e7d370d85dde.elf.gz",
+      "gzip_bytes": 3229455,
+      "gzip_sha256": "3ba039b680b3cd5c63ddf7a6796a3f7ab4bcfe0a82b1457017005ea2520b1577",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_acquisition_factory_test",
+        "bytes": 2459728,
+        "sha256": "5761f8b2c33d998827f7a37507e51fa69ccfaeb38772af22df34659f2e041694"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5761f8b2c33d998827f7a37507e51fa69ccfaeb38772af22df34659f2e041694.elf.gz",
+      "gzip_bytes": 1401188,
+      "gzip_sha256": "12b0203d9f8b669cf84898e6df71228b747f8706fcfa64ad8b227a764985f6bc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_acquisition_test",
+        "bytes": 2848416,
+        "sha256": "5e92903c613559b103171f83af409a7ccc85b44af5ae3c5747d6ca9b33909d8f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5e92903c613559b103171f83af409a7ccc85b44af5ae3c5747d6ca9b33909d8f.elf.gz",
+      "gzip_bytes": 1676988,
+      "gzip_sha256": "4ba1c98aec102ee9ba3f6e431b7d929b9336c0bc011b713faf3d763f8355098a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_injected_software_factory_test",
+        "bytes": 2595400,
+        "sha256": "7546d769081578efef74ff21d8cf5875236d36669e3c2105a5584ae9b91d377b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7546d769081578efef74ff21d8cf5875236d36669e3c2105a5584ae9b91d377b.elf.gz",
+      "gzip_bytes": 1506763,
+      "gzip_sha256": "dccd911a05a9caf8208d8a3f9746a86048f024fdabe79898d3a9e6d0af931477",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_injected_timer_factory_test",
+        "bytes": 2596560,
+        "sha256": "0b406f164e39cdc5fc736f6fcab69b3074aa2342a5df83455f2618e969e07a81"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0b406f164e39cdc5fc736f6fcab69b3074aa2342a5df83455f2618e969e07a81.elf.gz",
+      "gzip_bytes": 1508129,
+      "gzip_sha256": "0b970169a14d7baea0c6f3a76ca6b6071bc02b09d6f47b37443a2f8740756f61",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_regular_software_factory_test",
+        "bytes": 2595144,
+        "sha256": "9569bffdf73dc7c2d2ce88065cfcbd1de9f13728e01cabadd8c1823d161c30c4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9569bffdf73dc7c2d2ce88065cfcbd1de9f13728e01cabadd8c1823d161c30c4.elf.gz",
+      "gzip_bytes": 1506655,
+      "gzip_sha256": "1b8994459e676ef1c3cf3253849b9cd4fbed1930b2daf51bd7303cd5a76a4eca",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_regular_timer_factory_test",
+        "bytes": 2596224,
+        "sha256": "dae330f0d64cbe8e84dc3301adf27ed049ec0f2925d1cbb72e48d959b86c46f9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dae330f0d64cbe8e84dc3301adf27ed049ec0f2925d1cbb72e48d959b86c46f9.elf.gz",
+      "gzip_bytes": 1507894,
+      "gzip_sha256": "f3e47f46b927dbde105778de34e455fca832fbd9bbc96d8440baef48e2e99565",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_adc_group_test",
+        "bytes": 2970000,
+        "sha256": "b4e4712dd7ba218c35bf1fb3750df30138a62935c5856e5edcf5543f2791adeb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b4e4712dd7ba218c35bf1fb3750df30138a62935c5856e5edcf5543f2791adeb.elf.gz",
+      "gzip_bytes": 1726455,
+      "gzip_sha256": "3f9c7ec4a92ba695cb8b182dd9a1c18126359d7da3c355cf771e9afd10b6a152",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_capture_factory_test",
+        "bytes": 2380880,
+        "sha256": "03002279226e9d81e0fca7bdac0906b0f2b71c7dd577d9296dac47217b0cd19e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/03002279226e9d81e0fca7bdac0906b0f2b71c7dd577d9296dac47217b0cd19e.elf.gz",
+      "gzip_bytes": 1342756,
+      "gzip_sha256": "91898b5d18facbec4acd95b8986e4fb2eb919fb62273089b82d34fcde1be6d9a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_control_factory_test",
+        "bytes": 2618328,
+        "sha256": "4c30808b77f62e5096d6b7eab4d8c94336949e93f8bdcf9933a2d3e4e04abaf0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/4c30808b77f62e5096d6b7eab4d8c94336949e93f8bdcf9933a2d3e4e04abaf0.elf.gz",
+      "gzip_bytes": 1531086,
+      "gzip_sha256": "492b23d1b939fe80747c2032c54355968798f6b1242dcb5dfddc7594649456f2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_encoder_factory_test",
+        "bytes": 2370032,
+        "sha256": "539219010fbeb252f940df37688672efb7b0b5159c0f52f64b0bb98f68568e98"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/539219010fbeb252f940df37688672efb7b0b5159c0f52f64b0bb98f68568e98.elf.gz",
+      "gzip_bytes": 1336213,
+      "gzip_sha256": "7e2d3a5d3a0830b6f7d741794dede2e20e7af6c49c73e2f5a766fcf058145a33",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_exti_test",
+        "bytes": 2691424,
+        "sha256": "0fa74c4f755bd809ca776a03be280348dff3955bc0f2f20fc382ab06af74d574"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0fa74c4f755bd809ca776a03be280348dff3955bc0f2f20fc382ab06af74d574.elf.gz",
+      "gzip_bytes": 1580766,
+      "gzip_sha256": "9b5b4be052f3fffaa586aa3a127828e5677dd5f19547007863404183fbae6684",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_factory_test",
+        "bytes": 2542752,
+        "sha256": "b87349412980426df8ac1ba996d9661edcc38ef2d4969eb7d52e208c7924db43"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b87349412980426df8ac1ba996d9661edcc38ef2d4969eb7d52e208c7924db43.elf.gz",
+      "gzip_bytes": 1449802,
+      "gzip_sha256": "dbf8b6fb410ca8eedd1603b63b6eb0ddb74e8942e629d41b5bbaf8ad2537ef4b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_fdcan_factory_test",
+        "bytes": 2552576,
+        "sha256": "161362869b340a0588116d3a1ff6bf348e17da0d801c1a68a1f18bc031a9e208"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/161362869b340a0588116d3a1ff6bf348e17da0d801c1a68a1f18bc031a9e208.elf.gz",
+      "gzip_bytes": 1495929,
+      "gzip_sha256": "2a64d4302189dc33deb09add214bd10252d026f876a3ee9d5796ffa071c0a100",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_fdcan_normal_factory_test",
+        "bytes": 2552616,
+        "sha256": "fe9a89254253f8c8cf7da8605c46a573a9373ad425fab1ef8407faac1c13d3aa"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fe9a89254253f8c8cf7da8605c46a573a9373ad425fab1ef8407faac1c13d3aa.elf.gz",
+      "gzip_bytes": 1496163,
+      "gzip_sha256": "a2eb9e5f37dd2bc2a725b7f9a9bdf92abc1472422a260629dfa9729824b4fe57",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_fdcan_test",
+        "bytes": 2869576,
+        "sha256": "78d9bd59769d7a1763dab235da05abe96497e1931a6b3866be6016145fdaa3c7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/78d9bd59769d7a1763dab235da05abe96497e1931a6b3866be6016145fdaa3c7.elf.gz",
+      "gzip_bytes": 1715058,
+      "gzip_sha256": "306e75d826206ac02e1d2483ecf8a19eca8d8cb6c5cff0e0532936ee5527f787",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_i2c_long_factory_test",
+        "bytes": 2630352,
+        "sha256": "dc51abdc1f0ef73a7600c55313f50744e9815673856ff0bf787dbe9b7139d3f8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dc51abdc1f0ef73a7600c55313f50744e9815673856ff0bf787dbe9b7139d3f8.elf.gz",
+      "gzip_bytes": 1561210,
+      "gzip_sha256": "f7eb5dac51e542b05bf0a48ea8f0146b5b95e2a3a9934479f796ba00e6c3974b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_i2c_v2_test",
+        "bytes": 2565312,
+        "sha256": "8a1972a073762eb489864d6d06fcc2a30a0ea3a68b56b0d16f18497405d5416e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8a1972a073762eb489864d6d06fcc2a30a0ea3a68b56b0d16f18497405d5416e.elf.gz",
+      "gzip_bytes": 1503650,
+      "gzip_sha256": "bbd020425ccea9f4330efa51a543f9be5f4f28bf9864dac3f74a73dada289806",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_mainstream_test",
+        "bytes": 2373200,
+        "sha256": "19039e0e118d4c96bf08e4dfea83d96dcb4a8191c58d7d43b741baa0b297007f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/19039e0e118d4c96bf08e4dfea83d96dcb4a8191c58d7d43b741baa0b297007f.elf.gz",
+      "gzip_bytes": 1338326,
+      "gzip_sha256": "c03d467bbd0f13f1ca6949ddbde3e2e9b42593030b252191994efd0717b607b8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_peripheral_factory_test",
+        "bytes": 2373344,
+        "sha256": "fded0ea58adbec8a5b5551c700babd4855376bb824ed1f80c3cc143937a68e27"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fded0ea58adbec8a5b5551c700babd4855376bb824ed1f80c3cc143937a68e27.elf.gz",
+      "gzip_bytes": 1342757,
+      "gzip_sha256": "50c151f487a74a4fed6124a0d8aa33b6ea88cc9441893a05cadb6ae941a1b456",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_provider_test",
+        "bytes": 2732296,
+        "sha256": "d866c80e5ef3aab2a67ddffdab189917f74f8e13e510a3cbe4d6b5fa09eba409"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d866c80e5ef3aab2a67ddffdab189917f74f8e13e510a3cbe4d6b5fa09eba409.elf.gz",
+      "gzip_bytes": 1599660,
+      "gzip_sha256": "2bf571e955036e810dfff3a3d22ca267a509d58eb7e9a330f063f0388364e02d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_adc_factory_test",
+        "bytes": 2666208,
+        "sha256": "1db96aedbd8aa7e678ca2afda5324df569f9286256ea801f11dedbe8d2b9fa0f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/1db96aedbd8aa7e678ca2afda5324df569f9286256ea801f11dedbe8d2b9fa0f.elf.gz",
+      "gzip_bytes": 1569399,
+      "gzip_sha256": "412902bfdf1b102e6cd2a9fd1c43d1eb37306792286667ed3ab1824a9f85793b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_adc_test",
+        "bytes": 3006456,
+        "sha256": "dac08fa2ad9fb5e1741173d4062c9ee7f097235c9dd67991b1414a3a3475080c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dac08fa2ad9fb5e1741173d4062c9ee7f097235c9dd67991b1414a3a3475080c.elf.gz",
+      "gzip_bytes": 1818425,
+      "gzip_sha256": "dc2c421a79822bf648beb160b2b1f1b81aaa20c9301c2e0af7e0d3de96703e82",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_factory_test",
+        "bytes": 2346792,
+        "sha256": "b9ae87b7f93c7ff59a71e397c8e19b78561fa4643b65a1b3b6f4b926df385c3f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b9ae87b7f93c7ff59a71e397c8e19b78561fa4643b65a1b3b6f4b926df385c3f.elf.gz",
+      "gzip_bytes": 1317395,
+      "gzip_sha256": "007f789ad96bebeec4cfc41cf2f57829c312265409fb6bf88d43a9bba448a8d6",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_group_test",
+        "bytes": 2552680,
+        "sha256": "6da9fc272097f9e954bc194bf8048f6ef03ce5c27d1aecd9aae03ba2660d03fe"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/6da9fc272097f9e954bc194bf8048f6ef03ce5c27d1aecd9aae03ba2660d03fe.elf.gz",
+      "gzip_bytes": 1475129,
+      "gzip_sha256": "8bff0f4b52ddbc817fd3394c9f0a74140ba03e653f498ff0586d95717c400261",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_shared_factory_test",
+        "bytes": 2674688,
+        "sha256": "d6506e952026d248b75fa632cb66ee2783ae7798ccab52751db20223d2b40d65"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d6506e952026d248b75fa632cb66ee2783ae7798ccab52751db20223d2b40d65.elf.gz",
+      "gzip_bytes": 1573451,
+      "gzip_sha256": "8e438b0fa2f0e6d555cf74e76bde067ff9abd69dd3286c4d381acb29c6b5ba35",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_shared_test",
+        "bytes": 2645592,
+        "sha256": "e876ff179c0c1c75e2b779533ae52b92de3b3448d0a0e610f9e5e25b596daffe"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e876ff179c0c1c75e2b779533ae52b92de3b3448d0a0e610f9e5e25b596daffe.elf.gz",
+      "gzip_bytes": 1537264,
+      "gzip_sha256": "e9963e38eea3b59041acf18260229e0a9b4d38fa75d5cee073386f2d736e2d1d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_pwm_test",
+        "bytes": 2386296,
+        "sha256": "73aed454ed758ea93098e7df204fe4439c29818a2dcef6abcb2023a7c9e68360"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/73aed454ed758ea93098e7df204fe4439c29818a2dcef6abcb2023a7c9e68360.elf.gz",
+      "gzip_bytes": 1343374,
+      "gzip_sha256": "035fd716c466f3efe9b2158950d79c1065373a20188ad787ad84f2505caa52e3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_spi_test",
+        "bytes": 2693968,
+        "sha256": "43162ee4e751ddaadf7bf631a505654a1ccb5d4ba04edceafef78db2282eef74"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/43162ee4e751ddaadf7bf631a505654a1ccb5d4ba04edceafef78db2282eef74.elf.gz",
+      "gzip_bytes": 1584976,
+      "gzip_sha256": "4aa3f9c41126f5319d588d7334daeb3e775f51a34b4e2314342341f005661ad4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_system_test",
+        "bytes": 3048800,
+        "sha256": "64d681008dfc9fc3fe6e14271d14db0e445c8676ccb59ee3a01fdf02688e84b1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/64d681008dfc9fc3fe6e14271d14db0e445c8676ccb59ee3a01fdf02688e84b1.elf.gz",
+      "gzip_bytes": 1823254,
+      "gzip_sha256": "c11f64567bee2d8736b1151d5b1f24276c7d2e80a2a2cd283765d394822bea67",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_timer_modes_test",
+        "bytes": 2665376,
+        "sha256": "9081d6b98ec067475fab0d6200f368f6576527cd9dadbfac91497003739ab8f9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9081d6b98ec067475fab0d6200f368f6576527cd9dadbfac91497003739ab8f9.elf.gz",
+      "gzip_bytes": 1565218,
+      "gzip_sha256": "53752a756157eb92d5916759e6eb5d9706cf8aa8e6528340885e07eb1f05b908",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_g474_watchdog_test",
+        "bytes": 2364544,
+        "sha256": "8165fc7d78bd5116d788ec86f6630d23bc608dc26d5f8ec94a84e2ba8be1616c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8165fc7d78bd5116d788ec86f6630d23bc608dc26d5f8ec94a84e2ba8be1616c.elf.gz",
+      "gzip_bytes": 1320438,
+      "gzip_sha256": "541358423303475b1b9a9d4f483a93eae390bf87813e8fd883de3a040afab8ef",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd303_devices_factory_test",
+        "bytes": 2363216,
+        "sha256": "2100570716fc03e65628c187c6df006e7c56d00d63ec140b0e10d2ba5ffd6269"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2100570716fc03e65628c187c6df006e7c56d00d63ec140b0e10d2ba5ffd6269.elf.gz",
+      "gzip_bytes": 1334532,
+      "gzip_sha256": "f96c15b181a52c962bd199903492098c3a1ef3f622cd6261e58816a4b5c43269",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_adc_initialize_test",
+        "bytes": 2703984,
+        "sha256": "cd46ad6a7617af2804c6ff9505ad12a9924bafb92c6a6e76a2f0e09062b33a2c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/cd46ad6a7617af2804c6ff9505ad12a9924bafb92c6a6e76a2f0e09062b33a2c.elf.gz",
+      "gzip_bytes": 1585618,
+      "gzip_sha256": "ca644392ea1bd0fdbdd92d9e8dfb0998f09c496adc43e69cec21d400d2d91492",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_adc_stream_test",
+        "bytes": 2568408,
+        "sha256": "a30fa76c13b4124e62617abd51b360732c41167ca86a3338e4be956ec8142f37"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a30fa76c13b4124e62617abd51b360732c41167ca86a3338e4be956ec8142f37.elf.gz",
+      "gzip_bytes": 1459109,
+      "gzip_sha256": "1fb1949288b94c10c626356034b4f631eb0ad96558177ec48edb55370df38498",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_arch_test",
+        "bytes": 2856280,
+        "sha256": "72a111c368e2fc9675b66fd067a1b0f658fca601efa0ae3f3a2dbdccc926e0c4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/72a111c368e2fc9675b66fd067a1b0f658fca601efa0ae3f3a2dbdccc926e0c4.elf.gz",
+      "gzip_bytes": 1710567,
+      "gzip_sha256": "60e8dfb61a0a0fbf106ecc1b6eeee1d731dbd36fb2baec9893c431fbc5ff8db6",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_can_factory_test",
+        "bytes": 3072168,
+        "sha256": "b415c2b14b5e8e2a5afa0de583297c56373c7f2eecac08ec336645828ba46ba8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b415c2b14b5e8e2a5afa0de583297c56373c7f2eecac08ec336645828ba46ba8.elf.gz",
+      "gzip_bytes": 1887855,
+      "gzip_sha256": "bcb8ae25a5becd1ef0daf8b5a0ba9a4dd7ab9051c24bef430ccc88aea5bd122d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_can_test",
+        "bytes": 2361792,
+        "sha256": "e17692df7a203620debd7da98380cd38f85c0eb2745352d0e13b2ba57c015229"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e17692df7a203620debd7da98380cd38f85c0eb2745352d0e13b2ba57c015229.elf.gz",
+      "gzip_bytes": 1326189,
+      "gzip_sha256": "2fc2357a093cd6dd0da71ffb63aa149414b109fcf307387fdb5d481843826479",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_eth_factory_test",
+        "bytes": 3264568,
+        "sha256": "f248ac85608448f9a0f0d1962c9362fb210521260dc590a45a55f3c849e9c7c5"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f248ac85608448f9a0f0d1962c9362fb210521260dc590a45a55f3c849e9c7c5.elf.gz",
+      "gzip_bytes": 2017686,
+      "gzip_sha256": "977a8a3d9fb4142c5ec8a4be213a037182aeba2f7d5edfe743db880e98534ee3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_eth_frames_factory_test",
+        "bytes": 2617680,
+        "sha256": "5ff30887665440d18d5a9b9aa19d23beab7038c8f2a0ab7bbed60b63fc2d29f8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5ff30887665440d18d5a9b9aa19d23beab7038c8f2a0ab7bbed60b63fc2d29f8.elf.gz",
+      "gzip_bytes": 1554482,
+      "gzip_sha256": "052b9704c9d6b4f0d0cfae0f9760da841ea4880b0e1ce7d64caf3075867e9158",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_ethernet_frames_test",
+        "bytes": 2938296,
+        "sha256": "4bd95eb17fc418e03b9711a18ef7d224df62e9d3fc9d64d5cb98c611b75ff4cc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/4bd95eb17fc418e03b9711a18ef7d224df62e9d3fc9d64d5cb98c611b75ff4cc.elf.gz",
+      "gzip_bytes": 1754136,
+      "gzip_sha256": "a94ce7a2956e25e8707506040a88cfe15b0562a2e5486ddbccaf76d2720b5efa",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_ethernet_raw_errata_test",
+        "bytes": 2293424,
+        "sha256": "544f8061dcf4877e0595cbfeb02bdb5290b095230da0f91b2c838b823d5d6f4b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/544f8061dcf4877e0595cbfeb02bdb5290b095230da0f91b2c838b823d5d6f4b.elf.gz",
+      "gzip_bytes": 1281022,
+      "gzip_sha256": "f4bdedafa729d67ed390bdb7af7223ef028a986c2d65a77a17a24b452a08f4f2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_ethernet_test",
+        "bytes": 2622584,
+        "sha256": "ce5f9f943ea16e17a63e0e9d0f0aa8ab1ded795b581f9cd0625452449812d127"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ce5f9f943ea16e17a63e0e9d0f0aa8ab1ded795b581f9cd0625452449812d127.elf.gz",
+      "gzip_bytes": 1493406,
+      "gzip_sha256": "d077a9c1b262c0c4fe61816193d0bcf42f2f4c76e354c65f99d51482f9c425fb",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_exti_test",
+        "bytes": 2659520,
+        "sha256": "5ac1ff0d138fe5ba1948866951dc13ffbdc71f7f69a4da4c71a07405136f0f24"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5ac1ff0d138fe5ba1948866951dc13ffbdc71f7f69a4da4c71a07405136f0f24.elf.gz",
+      "gzip_bytes": 1558139,
+      "gzip_sha256": "bab714d32e3c440425e9b9fcf99b5af0603067052ad5c70393651367f9e8e92a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_flash_fault_test",
+        "bytes": 2289752,
+        "sha256": "b42689ec34b2d2348a0aaabb70deeb60ee4f811e0f5c6aa663f4b82f1001d6ba"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b42689ec34b2d2348a0aaabb70deeb60ee4f811e0f5c6aa663f4b82f1001d6ba.elf.gz",
+      "gzip_bytes": 1272512,
+      "gzip_sha256": "ca85adc2b278204a53492a43d1b54419ebf2a61a16d6c6a1ebe0053631b13145",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_flash_program_test",
+        "bytes": 2467240,
+        "sha256": "7f9a762ef409108590b511fb729e67082a983c15ba013269bdee0e19971ca772"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7f9a762ef409108590b511fb729e67082a983c15ba013269bdee0e19971ca772.elf.gz",
+      "gzip_bytes": 1404775,
+      "gzip_sha256": "fee95594f31c863c393ab0141bcabbb4fe940d5b72a14c722e9ffc237c25300c",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_async_test",
+        "bytes": 2744040,
+        "sha256": "1dc83f1fd13b8f5e7bc53b8d1dfd5988aeca7017907f21c27f3138537e13dc0f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/1dc83f1fd13b8f5e7bc53b8d1dfd5988aeca7017907f21c27f3138537e13dc0f.elf.gz",
+      "gzip_bytes": 1617917,
+      "gzip_sha256": "99c56e61d0325eee7167b294241693d09a5a73830a2ee3734d212f5e8c181a68",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_pair_factory_test",
+        "bytes": 2818136,
+        "sha256": "a79f1c6af59eb96b6a476b510650dd5187765671b4383ff0a592ab699a6b0b7c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a79f1c6af59eb96b6a476b510650dd5187765671b4383ff0a592ab699a6b0b7c.elf.gz",
+      "gzip_bytes": 1676440,
+      "gzip_sha256": "6e59ba8daab25ab8637fe718633bd0569f424b4f1032e9d8b00ac1206b64bd07",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_pair_irq_factory_test",
+        "bytes": 2804048,
+        "sha256": "3c2047fbdf2b2d89b2fffe78ab5ffb7b3df01e0501938777f45620690109e51e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3c2047fbdf2b2d89b2fffe78ab5ffb7b3df01e0501938777f45620690109e51e.elf.gz",
+      "gzip_bytes": 1671058,
+      "gzip_sha256": "be816227995355dc4a8331060f1db037d6a32470b18988bf81e07a81df7bf6b9",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_i2c_register_test",
+        "bytes": 2631968,
+        "sha256": "ec17b596be2f5309f3148f7ebc3f7d02aef3bcce3437d04537a7022a0ad8582f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ec17b596be2f5309f3148f7ebc3f7d02aef3bcce3437d04537a7022a0ad8582f.elf.gz",
+      "gzip_bytes": 1546316,
+      "gzip_sha256": "efc317064718d6079f8d038be8490256890d4e9befcf15171af8f00714b61911",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_memory_boot_both_test",
+        "bytes": 2240184,
+        "sha256": "ded3e4f5cc0a62c018dd3ce429929d95e02bd1bbbaf2a27e7fe741906fe08510"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ded3e4f5cc0a62c018dd3ce429929d95e02bd1bbbaf2a27e7fe741906fe08510.elf.gz",
+      "gzip_bytes": 1243472,
+      "gzip_sha256": "a4d1a524d49e25f654cb5862bcc93c0b39a57b44f41f890885544ce6d8ab765b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_memory_boot_default_test",
+        "bytes": 2231824,
+        "sha256": "3a018296988e343daf1929186b131269bf415b7f2b2b1171777cff53e770d649"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3a018296988e343daf1929186b131269bf415b7f2b2b1171777cff53e770d649.elf.gz",
+      "gzip_bytes": 1238564,
+      "gzip_sha256": "6af9cf8d57d68f5787601e408d0d5f6b92640fec431986a8a4dbb5ad5db75dda",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_memory_test",
+        "bytes": 2296792,
+        "sha256": "a903d362df31c96e77de3cb4b4a2861b28ef4ca560a3f6ebd71b970f34a4d212"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a903d362df31c96e77de3cb4b4a2861b28ef4ca560a3f6ebd71b970f34a4d212.elf.gz",
+      "gzip_bytes": 1265507,
+      "gzip_sha256": "859ca45b16e250b61efc15968d97eec9d4e684cf383d374356ded54493b35f0a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_multi_controller_factory_test",
+        "bytes": 3331808,
+        "sha256": "3e0ef01a1794a893fd952c33e1259523408ae6304d261f8887e6f600999ae227"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3e0ef01a1794a893fd952c33e1259523408ae6304d261f8887e6f600999ae227.elf.gz",
+      "gzip_bytes": 2050617,
+      "gzip_sha256": "0b1884d07691a4276c533fcdc02510345d9c516c1de8cec4b5c2641838dd5370",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_multi_test",
+        "bytes": 2500984,
+        "sha256": "db0eafaadbd2b42585b069f054277bd9b6f968ebb4ff94227c0bc427f4e9c915"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/db0eafaadbd2b42585b069f054277bd9b6f968ebb4ff94227c0bc427f4e9c915.elf.gz",
+      "gzip_bytes": 1432776,
+      "gzip_sha256": "db85eab43e3d0e7598adca5bfab58851beb8d04823a0894343b1affaed76573b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_physical_platform_factory_test",
+        "bytes": 2883552,
+        "sha256": "adff2f434b4e9a5797cec159ebbd021b1d258f6ad641f7133856daaa4c3dcc2f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/adff2f434b4e9a5797cec159ebbd021b1d258f6ad641f7133856daaa4c3dcc2f.elf.gz",
+      "gzip_bytes": 1731306,
+      "gzip_sha256": "4961bc45c1747802cb69ee6c00e6d81857bbcab3aae3330737eda2c07d229640",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_single_spi_factory_test",
+        "bytes": 2508280,
+        "sha256": "e3e8fac1c639bee17c1e6f2356df573cdb80a508b6e293f3cfefce25001ecf84"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e3e8fac1c639bee17c1e6f2356df573cdb80a508b6e293f3cfefce25001ecf84.elf.gz",
+      "gzip_bytes": 1453691,
+      "gzip_sha256": "27f47738800cbe394bdc1dbbace7c16ae11e557d413e933cfd4025c463601185",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_dma_owner_test",
+        "bytes": 2612648,
+        "sha256": "5cd30b60f15ca7ade771334a8380b8c2a2271e1da119f36f1fac844c032a7587"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5cd30b60f15ca7ade771334a8380b8c2a2271e1da119f36f1fac844c032a7587.elf.gz",
+      "gzip_bytes": 1527779,
+      "gzip_sha256": "bb839f682beee5048f8f16eb6b4a568402d4f9ce5baaa47dcb853196b10e32f4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_dma_sequence_test",
+        "bytes": 2399992,
+        "sha256": "adca867136361270ea53c05899614c13681098f95c970c08a3a2ea96f3d97ec4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/adca867136361270ea53c05899614c13681098f95c970c08a3a2ea96f3d97ec4.elf.gz",
+      "gzip_bytes": 1349938,
+      "gzip_sha256": "0008c58de101dcbea0a0185f8fbf0ab38f6e5c143d15473edd2d95d180a31653",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_dma_test",
+        "bytes": 2653136,
+        "sha256": "3da5b5ba89549a22d0a7ff85a3ed91854e23f273380a84b180a71eec83306d32"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3da5b5ba89549a22d0a7ff85a3ed91854e23f273380a84b180a71eec83306d32.elf.gz",
+      "gzip_bytes": 1558430,
+      "gzip_sha256": "959815f769f1aa27a7c0fcdd7c90b4141f63392b58b54da8d5c54d8ea91d4821",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_spi_transaction_test",
+        "bytes": 2338840,
+        "sha256": "857611a185809bf561ebd3542aa0b48956a4b804682bebadfaf76b428da897a7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/857611a185809bf561ebd3542aa0b48956a4b804682bebadfaf76b428da897a7.elf.gz",
+      "gzip_bytes": 1316904,
+      "gzip_sha256": "473a82e466ab3fc224b7d11060bbb1a28a7679a0377178f1ad722948f689f852",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_system_transaction_test",
+        "bytes": 2510072,
+        "sha256": "4cb3d0ab78a737e393d12123136a2f0c225ad6836a8b6dfc0d77907e06e51f74"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/4cb3d0ab78a737e393d12123136a2f0c225ad6836a8b6dfc0d77907e06e51f74.elf.gz",
+      "gzip_bytes": 1447485,
+      "gzip_sha256": "e65ced54015575399c4ec8750bb4bd225f491aea18f37f12ee02f125f8a565bd",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_timebase_contract_test",
+        "bytes": 3171584,
+        "sha256": "8dcbb3e8a7bf5747b2c829c60f64e0fbb3bfd9c78d674bae9f790897c9201b89"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8dcbb3e8a7bf5747b2c829c60f64e0fbb3bfd9c78d674bae9f790897c9201b89.elf.gz",
+      "gzip_bytes": 1922134,
+      "gzip_sha256": "c6983d2196175573ba42099651d198da8369ad1b783b47f8c43771cb3c460d3e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_timer_factory_test",
+        "bytes": 3086456,
+        "sha256": "8be48882467fff98332cd578d16b948db293baf4ca5fbea5d0159da87f7c4ebf"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8be48882467fff98332cd578d16b948db293baf4ca5fbea5d0159da87f7c4ebf.elf.gz",
+      "gzip_bytes": 1874992,
+      "gzip_sha256": "038284286d2c6d9b121a7759362406b7bf939bfe233767630873d082304bb8c4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_dma_test",
+        "bytes": 2377992,
+        "sha256": "e5cbc980747c2f04fd238eb435f328d7481022df7955b36830bcc8cd43bc7703"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e5cbc980747c2f04fd238eb435f328d7481022df7955b36830bcc8cd43bc7703.elf.gz",
+      "gzip_bytes": 1339202,
+      "gzip_sha256": "f6dc342e38de38ba7baeeb8ad0308deab79d56acd99c0de178db27564dfb02de",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_formats_test",
+        "bytes": 2628480,
+        "sha256": "f2df26f0380f637e2699e586f3881421eb81cb09b8a5d6598e214f324d425195"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f2df26f0380f637e2699e586f3881421eb81cb09b8a5d6598e214f324d425195.elf.gz",
+      "gzip_bytes": 1511499,
+      "gzip_sha256": "0c847876a6ce8a054ea1f259a646581e81f861726094409ab39c7713a94bcc8c",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_receive_test",
+        "bytes": 3114288,
+        "sha256": "b98612b5d8af9c8536f2539e197ca768553cc5832a606fbbb68215fd6e679d3a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b98612b5d8af9c8536f2539e197ca768553cc5832a606fbbb68215fd6e679d3a.elf.gz",
+      "gzip_bytes": 1884875,
+      "gzip_sha256": "f3f88fc8dc49732d2dd73bfaadce2854f24e562ecbc9cc9238b7e08ebb7737b2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_uart_stream_test",
+        "bytes": 2584944,
+        "sha256": "5ee34d6ba096a51d9b1e7e82190bd58a6781715ec67a733198f5d25ea5c46bad"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5ee34d6ba096a51d9b1e7e82190bd58a6781715ec67a733198f5d25ea5c46bad.elf.gz",
+      "gzip_bytes": 1518062,
+      "gzip_sha256": "dd719b9403d0388ddfb89a5eb098b2e0936e0fc9d914be3c455bb611003ae5fd",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32_usb_factory_test",
+        "bytes": 3003992,
+        "sha256": "c1714e5da208a07f338bc9b8379f839d6a78ce6966d71c1a546878c8cda49747"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c1714e5da208a07f338bc9b8379f839d6a78ce6966d71c1a546878c8cda49747.elf.gz",
+      "gzip_bytes": 1833933,
+      "gzip_sha256": "74ed8e65be08d9900c7efe6a01dadb70eab864247cfdbc11e8bb5a5aee64e29a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_exti_test",
+        "bytes": 2501856,
+        "sha256": "f6d369eb3faeed17f60c56ce8f977508d0ba48aaca99ad7343ec79bb1091627e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f6d369eb3faeed17f60c56ce8f977508d0ba48aaca99ad7343ec79bb1091627e.elf.gz",
+      "gzip_bytes": 1454522,
+      "gzip_sha256": "1c64ed90813a507f702e1c798115d018a7c91583b69dd795c1c51fa2436d995a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_factory_test",
+        "bytes": 2382888,
+        "sha256": "23402e7abc68bb749afff3da3b7b60045c36a565db1ffbf8ca7c6dc8281dc2f1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/23402e7abc68bb749afff3da3b7b60045c36a565db1ffbf8ca7c6dc8281dc2f1.elf.gz",
+      "gzip_bytes": 1344201,
+      "gzip_sha256": "053285b94f87bc962366df73fbc4b7104ae35146fc1b70cdc94ab2b669d8ede3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_provider_test",
+        "bytes": 2613072,
+        "sha256": "1e9f966b8060fbb6cf910ee16f80dda12629c3efa03119f7ef72187b1134909f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/1e9f966b8060fbb6cf910ee16f80dda12629c3efa03119f7ef72187b1134909f.elf.gz",
+      "gzip_bytes": 1529591,
+      "gzip_sha256": "9c9f7abbeb7fe219aa289a2f9cb70f4568a89df7a68aa4754801b620cc8e80d8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_spi_factory_test",
+        "bytes": 2357744,
+        "sha256": "75714c385d002a92cb39a4b8ad0ca646510e568a085d3cc2171e347552c0c345"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/75714c385d002a92cb39a4b8ad0ca646510e568a085d3cc2171e347552c0c345.elf.gz",
+      "gzip_bytes": 1331598,
+      "gzip_sha256": "f0a894278fe9c28040ecfd78b7c978239a5cf072002a18bd6da4ad7aeeef45dc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_spi_test",
+        "bytes": 2395056,
+        "sha256": "be4b533d5b41a8313343d356bca16445148270b5015cfe2531c1db1773ec6e14"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/be4b533d5b41a8313343d356bca16445148270b5015cfe2531c1db1773ec6e14.elf.gz",
+      "gzip_bytes": 1346616,
+      "gzip_sha256": "de48f7d7b15fbb28ae010348a4783794bbcdf588a5e40ab6505d0ff25b28dcee",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_system_test",
+        "bytes": 2532176,
+        "sha256": "9fb8579df694777ce2a7fee895023948275bfbc24ee3c67a178c6f7c5464c88f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9fb8579df694777ce2a7fee895023948275bfbc24ee3c67a178c6f7c5464c88f.elf.gz",
+      "gzip_bytes": 1443478,
+      "gzip_sha256": "dc31a3c96b48b80bb5515f481f4c0d831afd5461864dc3ec122028ef75da1b32",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_transport_test",
+        "bytes": 2365840,
+        "sha256": "3be99f59695f391aa9cb714c63c8d324e7ecf712690d4a6f43bb059b72b1eb39"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3be99f59695f391aa9cb714c63c8d324e7ecf712690d4a6f43bb059b72b1eb39.elf.gz",
+      "gzip_bytes": 1329992,
+      "gzip_sha256": "b6c2402584dd476b30b8c4b6e4cd8dfd7355e708d3491f00c55c9f87c05960ec",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f303_watchdog_test",
+        "bytes": 2417960,
+        "sha256": "22ffc8e88d629274beef210397b20e9657f081f510859196159c09e81e493f65"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/22ffc8e88d629274beef210397b20e9657f081f510859196159c09e81e493f65.elf.gz",
+      "gzip_bytes": 1358699,
+      "gzip_sha256": "e22ef1cf5073f539c89f04103b7999799c245b024cfbfa0eacc839c07cf10689",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_clock_sleep_test",
+        "bytes": 2386000,
+        "sha256": "99157c7e781517596517247775c445cae34ae4dcb36b56565fac37cfb2ad869d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/99157c7e781517596517247775c445cae34ae4dcb36b56565fac37cfb2ad869d.elf.gz",
+      "gzip_bytes": 1328000,
+      "gzip_sha256": "a86701902fa318ead0f7c41377b560fbcd7d6f296fab890d222928d5c520fc7d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_i2c_multi_controller_test",
+        "bytes": 2544056,
+        "sha256": "5fd34593d90a9dc8865b3189d1007820d409d9065f849b4a21c894f67c0dc3fa"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5fd34593d90a9dc8865b3189d1007820d409d9065f849b4a21c894f67c0dc3fa.elf.gz",
+      "gzip_bytes": 1466049,
+      "gzip_sha256": "8979d20fed406300f10da5099adf89079c89556057dfaa1e61959c52ab3ab6fc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_lowpower_integration_test",
+        "bytes": 2279344,
+        "sha256": "7dfc3918f94ec0706bc3884d68acb587f8d25d72c45cbdbc5e310c8327a263c8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7dfc3918f94ec0706bc3884d68acb587f8d25d72c45cbdbc5e310c8327a263c8.elf.gz",
+      "gzip_bytes": 1268337,
+      "gzip_sha256": "2f571b1fad9e90acdfea8bdad23d6e317814940d32abfc442bc08e740251057a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_lowpower_test",
+        "bytes": 2289448,
+        "sha256": "76a3eed40262a29043fad3addc5a381b3f66d7255584a5a9d4bf36d153e165d3"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/76a3eed40262a29043fad3addc5a381b3f66d7255584a5a9d4bf36d153e165d3.elf.gz",
+      "gzip_bytes": 1270426,
+      "gzip_sha256": "17e3cc1ace262990fdcbf962296381228b00b0618ed4863f648595a5834b2a41",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_spi_multi_controller_test",
+        "bytes": 2504008,
+        "sha256": "7558dcd6b1b08916b992e03767be8962ae243c656a7dd18dfb60955d67ef707b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7558dcd6b1b08916b992e03767be8962ae243c656a7dd18dfb60955d67ef707b.elf.gz",
+      "gzip_bytes": 1435089,
+      "gzip_sha256": "c9ddf62bf9c4811241c8c60729d8da2b33f4f78c7b8130fbc03042e678033ea1",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_timer_advanced_test",
+        "bytes": 2896336,
+        "sha256": "d1a6509e07e0ca0655ed0eedcacedc9957ba5ce88125fc00c7bb90a7b0cc1bc9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d1a6509e07e0ca0655ed0eedcacedc9957ba5ce88125fc00c7bb90a7b0cc1bc9.elf.gz",
+      "gzip_bytes": 1686138,
+      "gzip_sha256": "4e98e0cc4c3d7c0cfbdc11b8077660edca4cdff63cadad8a1a9591bbc29888f0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_uart_multi_controller_test",
+        "bytes": 2483456,
+        "sha256": "2f97b99a697962badb83d5bd41fefec335c1e2dc0d2711fcc4e907b996a4e4e3"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2f97b99a697962badb83d5bd41fefec335c1e2dc0d2711fcc4e907b996a4e4e3.elf.gz",
+      "gzip_bytes": 1423169,
+      "gzip_sha256": "b7659e2b0f9b4fbea8a32febdad1ccbaedd243b5575d23e48839d1172f949431",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_usb_clock_test",
+        "bytes": 2352008,
+        "sha256": "0a9dfd2fe773270097573aa0fd99d741f365d334b149c556e266cb6c128cfb13"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0a9dfd2fe773270097573aa0fd99d741f365d334b149c556e266cb6c128cfb13.elf.gz",
+      "gzip_bytes": 1304548,
+      "gzip_sha256": "9947d4bd59b4119530eb8c8aef1a426d99ec745e114d427f468ca6cb3cdf2a93",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_gd32f470_usb_device_test",
+        "bytes": 2406712,
+        "sha256": "53d58f831b6522b2b6c711b606f9e8eb5c5e4033e18d04dcaabb0f2bb280e2bc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/53d58f831b6522b2b6c711b606f9e8eb5c5e4033e18d04dcaabb0f2bb280e2bc.elf.gz",
+      "gzip_bytes": 1371909,
+      "gzip_sha256": "56dfdc1c24c7671b63adfc7690d659f9eed54fce0f4ef2ed5462d0d97391c486",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_generic_i2c_async_test",
+        "bytes": 2735904,
+        "sha256": "5218f16c8c397e9d4a9c907ad8effadd45094549423a7b5bb46b36d16f91fe3d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5218f16c8c397e9d4a9c907ad8effadd45094549423a7b5bb46b36d16f91fe3d.elf.gz",
+      "gzip_bytes": 1607419,
+      "gzip_sha256": "cbc0f0e4a03635b63a0acd126b0e89db72d51cb11fd7b86fb6971cb9eec1e350",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_clock_test",
+        "bytes": 2601544,
+        "sha256": "802d4e90d33811c0842db0c2d6dc4daaed9ed9a8903ad080016508d1508a540e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/802d4e90d33811c0842db0c2d6dc4daaed9ed9a8903ad080016508d1508a540e.elf.gz",
+      "gzip_bytes": 1469208,
+      "gzip_sha256": "319c1491ce53b2f9c7d1ecebea536f3ed38424a4541697839e111ecb245ff272",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_conversion_test",
+        "bytes": 3419248,
+        "sha256": "762828f9343bc92cc5974382279baeab8cfd9670cde2cda662218d42a1714c80"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/762828f9343bc92cc5974382279baeab8cfd9670cde2cda662218d42a1714c80.elf.gz",
+      "gzip_bytes": 2190541,
+      "gzip_sha256": "06ce00685f0247852b93ab09f027233a4760813345c79ed26cc5ce8428042c75",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_dma_factory_test",
+        "bytes": 2438568,
+        "sha256": "805ef172c632e41d89cc46505b00636699182b9ab92db1cd63d85cee1730c4e3"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/805ef172c632e41d89cc46505b00636699182b9ab92db1cd63d85cee1730c4e3.elf.gz",
+      "gzip_bytes": 1394075,
+      "gzip_sha256": "9425b8d57b3460e1caebec36b9a66cd7d65f6fc0636939980bc9a7e254b5feeb",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_dma_test",
+        "bytes": 2989608,
+        "sha256": "94d978df8898ab03d83f82f518ea75d862662a973273d4506baff962e9a2cc55"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/94d978df8898ab03d83f82f518ea75d862662a973273d4506baff962e9a2cc55.elf.gz",
+      "gzip_bytes": 1820512,
+      "gzip_sha256": "ba5b59480bda15a612f307ea8d3defbfa5ce8c6de80ff672172df4b65deb62e7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_factory_test",
+        "bytes": 2491824,
+        "sha256": "5db991165f254db640a1b989d2337592042d1b7f18ea4c929b03e5f9768a4d6f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5db991165f254db640a1b989d2337592042d1b7f18ea4c929b03e5f9768a4d6f.elf.gz",
+      "gzip_bytes": 1422907,
+      "gzip_sha256": "2bc69d0d9b99c9c2137d21ecee77f38969643cb6fb8712a3f7c91515cae55b9a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_execution_test",
+        "bytes": 3038736,
+        "sha256": "e9868ab7e7740b18dc65f0b3ae7828dd382e1fb2a9cf9beed864a6ea95950eb4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e9868ab7e7740b18dc65f0b3ae7828dd382e1fb2a9cf9beed864a6ea95950eb4.elf.gz",
+      "gzip_bytes": 1919886,
+      "gzip_sha256": "123469faf297c61e8515171a654ebd40e4735c69dda4ed6d8f6c7c059260a7c6",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_image_admission_test",
+        "bytes": 2898904,
+        "sha256": "3d02ffb1e1a2944eef619885ecbd74cf3858014140116470242932ab3ac94b78"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3d02ffb1e1a2944eef619885ecbd74cf3858014140116470242932ab3ac94b78.elf.gz",
+      "gzip_bytes": 1788657,
+      "gzip_sha256": "581f0cdef0e3f6a1a07577d58ab95882683eb782905796729a6ac94c06d48407",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_mpu_test",
+        "bytes": 3382760,
+        "sha256": "c0cedda9500dd357ef5e79f294c082a90a471c0987fed0a0dd64a59a89bb9727"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c0cedda9500dd357ef5e79f294c082a90a471c0987fed0a0dd64a59a89bb9727.elf.gz",
+      "gzip_bytes": 2184897,
+      "gzip_sha256": "03affaf0caf578e436576918822b111c20a2ed6a2308e647c091e8d14fdc2b87",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_ram_closure_test",
+        "bytes": 3728760,
+        "sha256": "cb623afebaca5804778ca5aa303bf0e185476c7a66b1c2c0556a441c1e1c8df9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/cb623afebaca5804778ca5aa303bf0e185476c7a66b1c2c0556a441c1e1c8df9.elf.gz",
+      "gzip_bytes": 2396757,
+      "gzip_sha256": "e7afd067f6d0dedea287add0daa83ca36609bb1aa8278ea1494c100ea7d1bb79",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_ram_generated_test",
+        "bytes": 3095976,
+        "sha256": "e26eea8eaa884dbcba181b37c46b74e57fe3bf8abdf95f008f23bbdc7166c36f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e26eea8eaa884dbcba181b37c46b74e57fe3bf8abdf95f008f23bbdc7166c36f.elf.gz",
+      "gzip_bytes": 1966328,
+      "gzip_sha256": "84c74142e0535466da7ff352d5a2708ff1f8fd0b203e453843a2ee3b039ab021",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_flash_ram_test",
+        "bytes": 2816272,
+        "sha256": "b4743ee4faeb53fe46ef843a94a7896249700cd6db3bce04f7aee2ae0c5236d2"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b4743ee4faeb53fe46ef843a94a7896249700cd6db3bce04f7aee2ae0c5236d2.elf.gz",
+      "gzip_bytes": 1667121,
+      "gzip_sha256": "481a77a7b572afd7962cf338f8568e2fe7d59e0ab90e3f2aeee328852c99946a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_high_factory_test",
+        "bytes": 3129936,
+        "sha256": "96f30779ebb004e7949ea5a18649e35f9fab095dd58099e72d82ed14f50299d6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/96f30779ebb004e7949ea5a18649e35f9fab095dd58099e72d82ed14f50299d6.elf.gz",
+      "gzip_bytes": 1999331,
+      "gzip_sha256": "3c89dd4d794973a7d8910878edd4ed07482ceb46cf851811cfb1f91df93f4a85",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_high_kernel_test",
+        "bytes": 3176488,
+        "sha256": "b9e35aea363996f10839bf0015162532b2dfd05a5fcf7152289fa05ebf83ad27"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b9e35aea363996f10839bf0015162532b2dfd05a5fcf7152289fa05ebf83ad27.elf.gz",
+      "gzip_bytes": 1992000,
+      "gzip_sha256": "6d7d73bd728804b8f2aec7e80f13fa4d7ebc980e46e44ab501c71833901cbd47",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_high_system_test",
+        "bytes": 2447280,
+        "sha256": "cc8605a1da529cac30277c7d61ec628ecfb57f9a09833a49e284180ddb8b7202"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/cc8605a1da529cac30277c7d61ec628ecfb57f9a09833a49e284180ddb8b7202.elf.gz",
+      "gzip_bytes": 1380143,
+      "gzip_sha256": "97a59bfc8a31877ddd9a29a73d1c309a425b4390b358ce323c0b704828d8464d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_i2c_long_factory_test",
+        "bytes": 3299232,
+        "sha256": "dcd7fed1269931b604b24883d778056d95baca95528585580f6dfddd8b5244d8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dcd7fed1269931b604b24883d778056d95baca95528585580f6dfddd8b5244d8.elf.gz",
+      "gzip_bytes": 2170898,
+      "gzip_sha256": "01022266ddb9fb2005f0841e122db38f7e8da4599e886350ec236ef383c0180a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_i2c_v2_test",
+        "bytes": 2665928,
+        "sha256": "7835f23885c05f3576ea2ac038a507698305b2078bd88a985b348cb127bfb2b7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7835f23885c05f3576ea2ac038a507698305b2078bd88a985b348cb127bfb2b7.elf.gz",
+      "gzip_bytes": 1573571,
+      "gzip_sha256": "65b8b4b877393e671e43a5d3a24746e513c53c65356b5898631dc6b7dbaaea71",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_memory_test",
+        "bytes": 2267856,
+        "sha256": "2c1e61fa7959f745819a5f0326dbe7a86b779f941a2cb53e5a6646ed94e8cc16"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2c1e61fa7959f745819a5f0326dbe7a86b779f941a2cb53e5a6646ed94e8cc16.elf.gz",
+      "gzip_bytes": 1248741,
+      "gzip_sha256": "73f1d2acd5ece920ed526e8bb1d92fca53c99fa53f05a40e9348d5f0503f894a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_peripheral_factory_test",
+        "bytes": 3123472,
+        "sha256": "c395c6edac4232e5d62fc47e3a7fe0892c522a0aa1e1965280a3905941ef2c91"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c395c6edac4232e5d62fc47e3a7fe0892c522a0aa1e1965280a3905941ef2c91.elf.gz",
+      "gzip_bytes": 1991554,
+      "gzip_sha256": "9368015a77208f3d81c4ad0cd65d174fd3b706280b8605f46cb21feb8d8b0cf6",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_peripheral_test",
+        "bytes": 3068880,
+        "sha256": "d05a74af0b8cacc8f304520c03f01c0033327a704fd44b5836e00dc548c824ed"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d05a74af0b8cacc8f304520c03f01c0033327a704fd44b5836e00dc548c824ed.elf.gz",
+      "gzip_bytes": 1838283,
+      "gzip_sha256": "bf31513eb122e9e1a094b75d654ef1adf2adb3dcd8e248a16374c01afe0728c7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_provider_test",
+        "bytes": 2768792,
+        "sha256": "21b75336f30fbf4c8be733f32c52cd8e50082a5b581fa8ab76986e855331827e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/21b75336f30fbf4c8be733f32c52cd8e50082a5b581fa8ab76986e855331827e.elf.gz",
+      "gzip_bytes": 1635065,
+      "gzip_sha256": "1c19d38cd8059cf7c525cc093d6185127ac56995583268178bcf3bc9324e21d0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_receive_factory_test",
+        "bytes": 2454680,
+        "sha256": "3b52a742bfd2e1b51410f3bb698f418a54a7c82dd5e85b133c0e14f97625a481"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3b52a742bfd2e1b51410f3bb698f418a54a7c82dd5e85b133c0e14f97625a481.elf.gz",
+      "gzip_bytes": 1403909,
+      "gzip_sha256": "5dbb9cce7215d2d8e7458e87ef04de0ff32b0f2664fffd5c5ec74e79c4ccc3b7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_receive_test",
+        "bytes": 3069896,
+        "sha256": "c4d57829bffa4054372582eb900ceb8aac77180d189be589749617c2483809e9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c4d57829bffa4054372582eb900ceb8aac77180d189be589749617c2483809e9.elf.gz",
+      "gzip_bytes": 1880472,
+      "gzip_sha256": "481afc2c5be6477437cc89ff3c70f02ceff3e12fca73ed0f5cb9963e4e420b4b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_spi_dma_test",
+        "bytes": 2869816,
+        "sha256": "54ac1fe4bce873e69aaa594419342f2ba411d66031661faaca10231bbb4b2074"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/54ac1fe4bce873e69aaa594419342f2ba411d66031661faaca10231bbb4b2074.elf.gz",
+      "gzip_bytes": 1692805,
+      "gzip_sha256": "bfe3337d6c1be7a016cb0295c49d557272850ae294b9a6609dda32516bc3f18b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_spi_wire_test",
+        "bytes": 2692688,
+        "sha256": "b4c5eb388f0b072400ac258b0760c8f015d1d8bfd5c76b18ec7f888cf1e2e1f0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b4c5eb388f0b072400ac258b0760c8f015d1d8bfd5c76b18ec7f888cf1e2e1f0.elf.gz",
+      "gzip_bytes": 1578325,
+      "gzip_sha256": "1a82da0f8e5778f4e5cfb3bec6f323dffd1cfd31d9fd0888ddf641fdfba24480",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_system_test",
+        "bytes": 2785560,
+        "sha256": "a393d5644660f9123e63db80a9bd0cf964615f62a2654387d8e2ea024ba6e5c2"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a393d5644660f9123e63db80a9bd0cf964615f62a2654387d8e2ea024ba6e5c2.elf.gz",
+      "gzip_bytes": 1612886,
+      "gzip_sha256": "49ac3d77384e02cf75ab68dc6bf9538cba93566a52b7ad7caaf7fc518fe1f1f5",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_fifo_factory_test",
+        "bytes": 2491192,
+        "sha256": "5f3926b8d0d320f64ef9f8ea0113265c4191c239aa2417fd896660eaa1a047c1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5f3926b8d0d320f64ef9f8ea0113265c4191c239aa2417fd896660eaa1a047c1.elf.gz",
+      "gzip_bytes": 1432835,
+      "gzip_sha256": "89457d21b20fd6699ccb7dbf39aa42ba13c88dfe8bc869c1b1302dfd17980c72",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_fifo_test",
+        "bytes": 3003592,
+        "sha256": "c62fb8781b10956f00f1fa5c9dee409e94902d66d1b1473ae1e4d17bb258af77"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c62fb8781b10956f00f1fa5c9dee409e94902d66d1b1473ae1e4d17bb258af77.elf.gz",
+      "gzip_bytes": 1800544,
+      "gzip_sha256": "5b7568ba7fbcf4f3875ce86203206d24a5ac663b5dc1c5988c2e999698503c18",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_rtscts_factory_test",
+        "bytes": 2525544,
+        "sha256": "d9cbe60a4e70241294f248ebc9945c5dc08bfc9edeac20bd38dbc2a48dc61757"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d9cbe60a4e70241294f248ebc9945c5dc08bfc9edeac20bd38dbc2a48dc61757.elf.gz",
+      "gzip_bytes": 1454680,
+      "gzip_sha256": "a84dba2f444b195026d00983340814b4c629faeb09f63f9ace0eb935c79ef5cd",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_h743_uart_rtscts_test",
+        "bytes": 2966120,
+        "sha256": "67ea73bc9be90463982aea63cef71502aff2b1d6729aff02eb577c8cc996f1a5"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/67ea73bc9be90463982aea63cef71502aff2b1d6729aff02eb577c8cc996f1a5.elf.gz",
+      "gzip_bytes": 1771390,
+      "gzip_sha256": "0a067cd8067d5035c171babf6cbc465ea216bf7dd500d9dbf7c68d4131bc2e9f",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_hardware_contract_test",
+        "bytes": 2767384,
+        "sha256": "891255c494035e4f3b86951bd2ffd2f632c2f8f323ee70267c936ca008deec1b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/891255c494035e4f3b86951bd2ffd2f632c2f8f323ee70267c936ca008deec1b.elf.gz",
+      "gzip_bytes": 1650138,
+      "gzip_sha256": "5dd514000383a35cb3bfa7361c2892284884b44f2e7dba6b7116889667d85f26",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_i2c_bus_clear_test",
+        "bytes": 3080064,
+        "sha256": "9c48ff79512bbf36aa4b22b2c081bba23ae888c576688ead1ca6cec41b5b23e7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9c48ff79512bbf36aa4b22b2c081bba23ae888c576688ead1ca6cec41b5b23e7.elf.gz",
+      "gzip_bytes": 1852788,
+      "gzip_sha256": "1ba8e96b323b9eeb0bf57aa1504b125746878773438c1adb70f932ec97f38121",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_io_observation_contract_test",
+        "bytes": 2402456,
+        "sha256": "ae00efbf4f0f7ce457959277b6c64eb0420a582681f6d8f847a5ad972ee1fe8e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ae00efbf4f0f7ce457959277b6c64eb0420a582681f6d8f847a5ad972ee1fe8e.elf.gz",
+      "gzip_bytes": 1364965,
+      "gzip_sha256": "84c81f060a51260d9964738ae831de6b384a43dea15650f2a750fd3bdd4a64b3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_io_observer_test",
+        "bytes": 2842224,
+        "sha256": "866873b1d09edc600697241f13643ec10c593a35142eb5bdb7817600f2dbf035"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/866873b1d09edc600697241f13643ec10c593a35142eb5bdb7817600f2dbf035.elf.gz",
+      "gzip_bytes": 1694334,
+      "gzip_sha256": "5a23d95ae207a178e3cbea47b4c9fa3fad544df201aaa18aafbe15847e90a280",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_io_state_machine_test",
+        "bytes": 2750576,
+        "sha256": "b6574d65695b343f23da16cc6df348f5742a81dec3a46fa10dcb0663c33858cf"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b6574d65695b343f23da16cc6df348f5742a81dec3a46fa10dcb0663c33858cf.elf.gz",
+      "gzip_bytes": 1633066,
+      "gzip_sha256": "2bfd124c07332c805ab6bfa7d31ac0bc68b572b36ea91aa6dbd4adea48656ee7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_irq_wake_gd32_test",
+        "bytes": 2363736,
+        "sha256": "c400de7c19aa97016f7cbbc925ece949bbcd60c4869c6803d79469bea7017af0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c400de7c19aa97016f7cbbc925ece949bbcd60c4869c6803d79469bea7017af0.elf.gz",
+      "gzip_bytes": 1338594,
+      "gzip_sha256": "770bf1417c8474f9019a1924ed8dc9d64d6442df77c9e0b212fba693ac5e3d88",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_irq_wake_provider_test",
+        "bytes": 2707816,
+        "sha256": "e5a1a0030a4e149bc90f7e33fc6cd9a1c66108d0b2db38d7f3d8862322c66207"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e5a1a0030a4e149bc90f7e33fc6cd9a1c66108d0b2db38d7f3d8862322c66207.elf.gz",
+      "gzip_bytes": 1630077,
+      "gzip_sha256": "6e48c3cf5208e89cbab23b18bbe30c235777306674307abd1cf1e9fb65af3485",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_irq_wake_stm32_test",
+        "bytes": 2332896,
+        "sha256": "ed3d95571d7fc8c4f322d6e260230221a16154ac6060d234c813b8ffcb6d6c1e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ed3d95571d7fc8c4f322d6e260230221a16154ac6060d234c813b8ffcb6d6c1e.elf.gz",
+      "gzip_bytes": 1318347,
+      "gzip_sha256": "4ce792cd1d19cf80e2a5444e2e46aaa80e288ac4a4d08783248be0ab9464a9dc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_legacy_devices_test",
+        "bytes": 2729224,
+        "sha256": "bf68fe239ae78038cc987d2c719f413253a5dfd47e04dcf636a3342581e253e8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/bf68fe239ae78038cc987d2c719f413253a5dfd47e04dcf636a3342581e253e8.elf.gz",
+      "gzip_bytes": 1594969,
+      "gzip_sha256": "8dbfe7bee61d9209bfe9fa8a6e0d87316f0bcbf98fd235f34f5596f984b089c7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_legacy_gd32_watchdog_test",
+        "bytes": 2476496,
+        "sha256": "10582f9da80c3d7cadb67fa501170883ed505c0d8721cfc8d595cd7370b3258a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/10582f9da80c3d7cadb67fa501170883ed505c0d8721cfc8d595cd7370b3258a.elf.gz",
+      "gzip_bytes": 1422989,
+      "gzip_sha256": "d467b80eec7377acc6c573a94ee933f7e6808fe1ec2a61b484f17a452928b641",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_legacy_stm32_watchdog_test",
+        "bytes": 2480024,
+        "sha256": "954fde89d936eb1d3c991117428d842d07382f7a498fac16108c1cf1a4c60ba1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/954fde89d936eb1d3c991117428d842d07382f7a498fac16108c1cf1a4c60ba1.elf.gz",
+      "gzip_bytes": 1424917,
+      "gzip_sha256": "6bfa081e4aa742cebc8cb343715994f45eae2d61aba34df535d08a9567de8ca0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_async_test",
+        "bytes": 2422240,
+        "sha256": "3615cb3950e4b6befff6abcb9f7b800f9f1a663c47cf5a796892aa222b9c6dcc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3615cb3950e4b6befff6abcb9f7b800f9f1a663c47cf5a796892aa222b9c6dcc.elf.gz",
+      "gzip_bytes": 1369482,
+      "gzip_sha256": "0fa238772efa884421538e52056f9f149dc9c43d9bcaaad3d4420e7a749586e6",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_factory_test",
+        "bytes": 2708568,
+        "sha256": "aaab9f916746e26effb3104afe755fd5522b9cd896c5d4fe030820821303b484"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/aaab9f916746e26effb3104afe755fd5522b9cd896c5d4fe030820821303b484.elf.gz",
+      "gzip_bytes": 1573074,
+      "gzip_sha256": "7b716657dc17d8b16f88e8f4edb7411ddb2a5fdc4a84767639705d5e257e56ae",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_instances_test",
+        "bytes": 2925240,
+        "sha256": "657d3187ed7c2fa8249e679b22c3120a36db4a35bbcb1d89e68bf8dae529bb10"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/657d3187ed7c2fa8249e679b22c3120a36db4a35bbcb1d89e68bf8dae529bb10.elf.gz",
+      "gzip_bytes": 1768517,
+      "gzip_sha256": "ec3fa4ad95b71203b5941e63bd32f516413fc1be07c2ac8c5e7a434e30f5eec8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_spi_dma_factory_test",
+        "bytes": 2402176,
+        "sha256": "56e7b75c5ac3900bd83a0c1966d48ccc95f42a284695d92584df82101aad0f9a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/56e7b75c5ac3900bd83a0c1966d48ccc95f42a284695d92584df82101aad0f9a.elf.gz",
+      "gzip_bytes": 1362244,
+      "gzip_sha256": "11d4290cb43087c233b58f06b519a39597368bd91691b820cb15498963f2040b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_native_spi_dma_owner_test",
+        "bytes": 2439168,
+        "sha256": "0ec1be9eda446a8e6da87f126e80ff2f905b7df136c39d4cf50a04f976e41671"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0ec1be9eda446a8e6da87f126e80ff2f905b7df136c39d4cf50a04f976e41671.elf.gz",
+      "gzip_bytes": 1382369,
+      "gzip_sha256": "6195ee3eae5cee5c9985a0efc28a33bf9492b4c5707d028b5d978651b7c31ece",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_diagnostic_native_test",
+        "bytes": 2265208,
+        "sha256": "1fdcab062d35e7b805c60ebdc38aa86cc5617198134847d1bbfe744148d6ce67"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/1fdcab062d35e7b805c60ebdc38aa86cc5617198134847d1bbfe744148d6ce67.elf.gz",
+      "gzip_bytes": 1257682,
+      "gzip_sha256": "f1de2f4a15bd308099fbee88cd600d668bd134db85446cde6276868cb35757ac",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_diagnostic_test",
+        "bytes": 2312736,
+        "sha256": "50240ae5c3798cb9344b93f498d4407d6d031849d6d53ddab7bbb7f3e8b7814b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/50240ae5c3798cb9344b93f498d4407d6d031849d6d53ddab7bbb7f3e8b7814b.elf.gz",
+      "gzip_bytes": 1273022,
+      "gzip_sha256": "cbedd3ae55af145d528cf58bbab80e59fe533915a50902ee91f6e5059c7ad486",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_lowpower_test",
+        "bytes": 3316456,
+        "sha256": "6be9bba70dff544f9d4604cedbc2f28fed0c319b65f7cb10885b800a8a68edb7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/6be9bba70dff544f9d4604cedbc2f28fed0c319b65f7cb10885b800a8a68edb7.elf.gz",
+      "gzip_bytes": 2005450,
+      "gzip_sha256": "302e76af324eed1b9f8d88b87b183b98b46e66134863d78b0f4fc80980da8178",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_secure_context_test",
+        "bytes": 3040296,
+        "sha256": "11a3fb8f18a646d3cb5359d3fa7c5c5afa95f7f27fc1d5c45bef052ff92fdd74"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/11a3fb8f18a646d3cb5359d3fa7c5c5afa95f7f27fc1d5c45bef052ff92fdd74.elf.gz",
+      "gzip_bytes": 1820782,
+      "gzip_sha256": "d46f52f4cd7df7b99d8ae15399729eb2296e8ff4c4a9835643fd1c7637562f0c",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_secure_fp_context_test",
+        "bytes": 3027456,
+        "sha256": "7c586bae9e8f313148d999eec3eff3abc2802b4781c0eb6443b6f4a67852d79a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7c586bae9e8f313148d999eec3eff3abc2802b4781c0eb6443b6f4a67852d79a.elf.gz",
+      "gzip_bytes": 1810369,
+      "gzip_sha256": "1d2769a8fc1f8fb7e9a76dcbf57dd45a98fcf2fdda544dcf802a63ad51113a6f",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_os_wait_test",
+        "bytes": 3103928,
+        "sha256": "adf75599c8e9ce6e6732a1709347f509c71a608161f0464dc977fc26ab44b54d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/adf75599c8e9ce6e6732a1709347f509c71a608161f0464dc977fc26ab44b54d.elf.gz",
+      "gzip_bytes": 1908760,
+      "gzip_sha256": "f6497a980174ce8da7fd67cf6b44b64de420bc56c3757524e18bb647b9bcd77d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_owner_mock_test",
+        "bytes": 2754256,
+        "sha256": "9d098a245102d1b80fd576f469f19c0644c6899ca52764be0b58bbc334980175"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9d098a245102d1b80fd576f469f19c0644c6899ca52764be0b58bbc334980175.elf.gz",
+      "gzip_bytes": 1642417,
+      "gzip_sha256": "ce331c7f9b992eaf77b5f6fd5c67bf2a132f3f77173861b8be18682e182647f2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_polymorphic_io_test",
+        "bytes": 2642552,
+        "sha256": "21cf589f5262be9c88a6674b4132ab8ef9854d71be3feb79e878f9b9e9eabb17"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/21cf589f5262be9c88a6674b4132ab8ef9854d71be3feb79e878f9b9e9eabb17.elf.gz",
+      "gzip_bytes": 1555261,
+      "gzip_sha256": "268dd81d6086f409a2267ff91bf1e1604598bd5a0fe0499bb6d4b4e9561726b3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_realtime_metadata_test",
+        "bytes": 2704032,
+        "sha256": "cd4ce3a2f0a35e893a88c85979dcc024628fb0e75290958020a22ab7ddc2b55f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/cd4ce3a2f0a35e893a88c85979dcc024628fb0e75290958020a22ab7ddc2b55f.elf.gz",
+      "gzip_bytes": 1609652,
+      "gzip_sha256": "c1d9705d113ac9c1306b0542f5d657521a88bbe765725abcac2c614593e7ba56",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_empty_generated_test",
+        "bytes": 2229712,
+        "sha256": "70aafd98df3899486ff11207a8c6588ea5754f4c6fb1231f85f51bff68df3d1a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/70aafd98df3899486ff11207a8c6588ea5754f4c6fb1231f85f51bff68df3d1a.elf.gz",
+      "gzip_bytes": 1226567,
+      "gzip_sha256": "61fcef9927876881d7b92928630ea8a9560896d4826e2cde4c723d55e1127b8a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_final_access_test",
+        "bytes": 2297528,
+        "sha256": "a4ede7794beb49723aeee2ee9892aa9e4267cb620ea79d4f560864a863435ff2"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a4ede7794beb49723aeee2ee9892aa9e4267cb620ea79d4f560864a863435ff2.elf.gz",
+      "gzip_bytes": 1285198,
+      "gzip_sha256": "4306febc37a47deeae7c4dfc83482260527820fe4d038c20bab0b608e2d864ad",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_pair_generated_test",
+        "bytes": 2267696,
+        "sha256": "45b3f6dc732a21e1bdab5f03bb07f6a9db106d498ae11733086b50535246fe5c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/45b3f6dc732a21e1bdab5f03bb07f6a9db106d498ae11733086b50535246fe5c.elf.gz",
+      "gzip_bytes": 1258763,
+      "gzip_sha256": "6f99565a021762fa496519c27689dca1d896466a234bf433409442e0bb291e6e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_start_test",
+        "bytes": 2498792,
+        "sha256": "fccc63eb340bd7fa5cf80d53cbe62309c89987db502d4ae25da299638c7e70ca"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fccc63eb340bd7fa5cf80d53cbe62309c89987db502d4ae25da299638c7e70ca.elf.gz",
+      "gzip_bytes": 1435767,
+      "gzip_sha256": "982c037dde07decefa15afba0eaa7582c3300e96275fccb96d201b0659cf8502",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_rtc_lptim_test",
+        "bytes": 2877152,
+        "sha256": "4d242ad46f1dc8e7508ff52daf382a090bdddceea51833ddfc34f3a31125e483"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/4d242ad46f1dc8e7508ff52daf382a090bdddceea51833ddfc34f3a31125e483.elf.gz",
+      "gzip_bytes": 1707166,
+      "gzip_sha256": "e7873b461da62094ac37bf4b4cb45826c2670f726e0236201c08bfd2b1f6b2cc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_silicon_admission_test",
+        "bytes": 2533672,
+        "sha256": "47846351382998ebd8e8f86644a9a9d3acdbeb18e077131897c0bfcbece73f17"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/47846351382998ebd8e8f86644a9a9d3acdbeb18e077131897c0bfcbece73f17.elf.gz",
+      "gzip_bytes": 1461878,
+      "gzip_sha256": "70ee8c0c3cbb987b765f5c81e707924678a9c2ee8607fd3348fe06a6a1732969",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_async_owner_mock_test",
+        "bytes": 2790888,
+        "sha256": "7dde51d548f912229f7dc3a43f822f89749cffe3f28418e40fc4bca00ebb32ef"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7dde51d548f912229f7dc3a43f822f89749cffe3f28418e40fc4bca00ebb32ef.elf.gz",
+      "gzip_bytes": 1665322,
+      "gzip_sha256": "47f80485b9fd4bb530b462744bb618664a3f7d55953168ca10a42595800964a0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_dma_owner_test",
+        "bytes": 2880000,
+        "sha256": "a65ee88a1e57c6394c0ddcdd06f848281707ba0aeaddecfef481aab8b1d96860"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a65ee88a1e57c6394c0ddcdd06f848281707ba0aeaddecfef481aab8b1d96860.elf.gz",
+      "gzip_bytes": 1721196,
+      "gzip_sha256": "9b6e7c1214e461862108e22c71eeb5092426f16b69507c452bee97205c8839a1",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_dma_owner_wait_test",
+        "bytes": 2396936,
+        "sha256": "e99871d1c81bdcd499bdbbb4bc7d79c832c10e82877418ca64e6d8e21f596859"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e99871d1c81bdcd499bdbbb4bc7d79c832c10e82877418ca64e6d8e21f596859.elf.gz",
+      "gzip_bytes": 1360521,
+      "gzip_sha256": "d0ccccb85fccceb81d2a1f8801c8db2fd6a8020f36b41e88fd01314427e33730",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_dma_transaction_test",
+        "bytes": 2649992,
+        "sha256": "7be2ba0f94277a3b4ac819176001de50aeaba3ab02d4e3725a5c6177dab45827"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7be2ba0f94277a3b4ac819176001de50aeaba3ab02d4e3725a5c6177dab45827.elf.gz",
+      "gzip_bytes": 1548350,
+      "gzip_sha256": "092c200c83d093e7651529e584d739088264e6ba878bd301259dae82ed9debfd",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_spi_transaction_test",
+        "bytes": 2547112,
+        "sha256": "fd80ce87b23c738f386a18c7bc73d13b0a14cec01190effed1f2678c317d9858"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fd80ce87b23c738f386a18c7bc73d13b0a14cec01190effed1f2678c317d9858.elf.gz",
+      "gzip_bytes": 1478927,
+      "gzip_sha256": "7d621d7070be1ab3c9a133df803674970d29f87ec1a438175e1d101cf8b582a1",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stack_observation_test",
+        "bytes": 2234216,
+        "sha256": "787588cb29b920c7be8dbc6a4c7eeef417e9a344af42d918d95feea20f9a033d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/787588cb29b920c7be8dbc6a4c7eeef417e9a344af42d918d95feea20f9a033d.elf.gz",
+      "gzip_bytes": 1227607,
+      "gzip_sha256": "0e9f1d6b7e4dae8cd884541adadc045bade0d190d0ab94e080a5010eeb5c8f6c",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_adc_stream_test",
+        "bytes": 2579008,
+        "sha256": "2bcffcffdc71d0a741f1daf658711ce98937bbf0d18bc7d8bdddfe3c5c087d3f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2bcffcffdc71d0a741f1daf658711ce98937bbf0d18bc7d8bdddfe3c5c087d3f.elf.gz",
+      "gzip_bytes": 1469560,
+      "gzip_sha256": "df5d38344ed105c9835f113fb04590d01d71c76b03a5b779b89a08166e6eb8a4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_can_factory_test",
+        "bytes": 3077048,
+        "sha256": "ab95a19c2336c5ae36b77dff68e45a01f410d7a368cbbf51193380716652802e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ab95a19c2336c5ae36b77dff68e45a01f410d7a368cbbf51193380716652802e.elf.gz",
+      "gzip_bytes": 1893069,
+      "gzip_sha256": "cffbf660db863c1d2438588c39fd38936700440603e36aaa43ece5888084c109",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_can_test",
+        "bytes": 2364304,
+        "sha256": "7ca277cb054c612a94c9cdba31f99b8b135e2f69c59d0614ceff1441f80ebfbc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7ca277cb054c612a94c9cdba31f99b8b135e2f69c59d0614ceff1441f80ebfbc.elf.gz",
+      "gzip_bytes": 1328526,
+      "gzip_sha256": "a3a9080102152871ff536f46becb0e847dce85004c355118ba749ed189a82311",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_eth_factory_test",
+        "bytes": 3267800,
+        "sha256": "c605b7e87139ec6e9d2f69b0c1817ed55482b0656aae2dba2c306beac095bdfa"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c605b7e87139ec6e9d2f69b0c1817ed55482b0656aae2dba2c306beac095bdfa.elf.gz",
+      "gzip_bytes": 2021292,
+      "gzip_sha256": "e7650172d1b1bd42a753b80a9dd59ce20a8c0d25675a079dc183bd17b5f33ec7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_eth_frames_factory_test",
+        "bytes": 2572168,
+        "sha256": "a60445047418c561e6fc1c2c740ef2e6070daab5a77e8a3493c06396de61c1e5"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a60445047418c561e6fc1c2c740ef2e6070daab5a77e8a3493c06396de61c1e5.elf.gz",
+      "gzip_bytes": 1523191,
+      "gzip_sha256": "018549249375bb7f333070338bc340442d2cb4894bfc0a84061072dd8d9d9bf3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_ethernet_frames_test",
+        "bytes": 2938280,
+        "sha256": "e0c63d6b0f0cbcddd3a925e649a8f06c24d1b15ebb964e05ae99632f95d7348d"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e0c63d6b0f0cbcddd3a925e649a8f06c24d1b15ebb964e05ae99632f95d7348d.elf.gz",
+      "gzip_bytes": 1754013,
+      "gzip_sha256": "8495b9251eafb9b9f016b22d969ae5c26ef2e9a6d720cba7a6115b5a2ec0fd9f",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_ethernet_raw_errata_test",
+        "bytes": 2293848,
+        "sha256": "8ac1ff8939cfad2426349515f8ab15f9c13f5eda3ceb3118943dd42602f7793a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8ac1ff8939cfad2426349515f8ab15f9c13f5eda3ceb3118943dd42602f7793a.elf.gz",
+      "gzip_bytes": 1281499,
+      "gzip_sha256": "dd2e90c7e09bc51e5fa9859bf724fc15a744c1a72038073c6b6667dd9e4af79a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_ethernet_test",
+        "bytes": 2623008,
+        "sha256": "8a14274abb30d752033c8cad319a157599d4ac6927f2fe3f662487cf8f518992"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/8a14274abb30d752033c8cad319a157599d4ac6927f2fe3f662487cf8f518992.elf.gz",
+      "gzip_bytes": 1493895,
+      "gzip_sha256": "92fb42026e3fc8d7983865a2436f05a93210610d49e3a36603023e7c5de75c30",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_exti_test",
+        "bytes": 2421536,
+        "sha256": "a900275c85ed714a0091249f2aa3f7885522831468f11cbbf47ab1ec7ebf4f40"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a900275c85ed714a0091249f2aa3f7885522831468f11cbbf47ab1ec7ebf4f40.elf.gz",
+      "gzip_bytes": 1369040,
+      "gzip_sha256": "4b0e6223ce23c81f31d2979936a64b2da148cfd64df05f44bacdd2d7aa0082ca",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_flash_program_test",
+        "bytes": 2461272,
+        "sha256": "f1de052e1090218cafb1f0cb6895ba685907801b625f7859e1905f43623d32e0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f1de052e1090218cafb1f0cb6895ba685907801b625f7859e1905f43623d32e0.elf.gz",
+      "gzip_bytes": 1401947,
+      "gzip_sha256": "fabf229e0fdbc715ddae26b76c8e86799785b1dc36299758153164a2bef71c74",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_hal_reference",
+        "bytes": 2276656,
+        "sha256": "3499b7d5f11d0d3031153c4c526f9e007abff8c8ba72372c0e176a4b5d7f9651"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3499b7d5f11d0d3031153c4c526f9e007abff8c8ba72372c0e176a4b5d7f9651.elf.gz",
+      "gzip_bytes": 1267051,
+      "gzip_sha256": "940380000d9b967bdd0d8d5318ccf7fc95bfed68b5c45100db70b973fb77bccd",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_async_test",
+        "bytes": 2734472,
+        "sha256": "5ef6ee6543e267d057f17e61e8759aba8d0837b17236369c478ec34dea320377"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5ef6ee6543e267d057f17e61e8759aba8d0837b17236369c478ec34dea320377.elf.gz",
+      "gzip_bytes": 1608961,
+      "gzip_sha256": "ddc76bce1a0fd3f452d80205a0f64a5cf7773df611e94002533e0aa1b4b11899",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_pair_factory_test",
+        "bytes": 2813568,
+        "sha256": "9c8bea9cda9860261b69dc2d84129783f89a9d66adeb36c42535a5aaef95dfbd"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9c8bea9cda9860261b69dc2d84129783f89a9d66adeb36c42535a5aaef95dfbd.elf.gz",
+      "gzip_bytes": 1675949,
+      "gzip_sha256": "b1ab2732ce9c5d990ead0d34cb51bd6562e64c975f6597d955bff449721c5837",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_pair_irq_factory_test",
+        "bytes": 2804032,
+        "sha256": "f831c56f37a63688ed6a8166f2ba2a2ec0dc0092e1e6f3316a27caffcf406977"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f831c56f37a63688ed6a8166f2ba2a2ec0dc0092e1e6f3316a27caffcf406977.elf.gz",
+      "gzip_bytes": 1670831,
+      "gzip_sha256": "1cb51a288090027cfbdc017fa0427aeeaf8c4fe375282a5fd66b1a480978568e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_i2c_register_test",
+        "bytes": 2632328,
+        "sha256": "7c940189a25cd180e2a1a7e83c7cb8adc466f312a4cc7126d7334dc7c3807a65"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7c940189a25cd180e2a1a7e83c7cb8adc466f312a4cc7126d7334dc7c3807a65.elf.gz",
+      "gzip_bytes": 1545130,
+      "gzip_sha256": "69b4cda1db3b38c7668397d0f6a594153f4a96839dcf16d86f25f4ef87b961a8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_boot_ccm_test",
+        "bytes": 2235784,
+        "sha256": "3777c8d663ac8bed5d90b22323cc8b20083026234bed346e9d440f94d802249a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3777c8d663ac8bed5d90b22323cc8b20083026234bed346e9d440f94d802249a.elf.gz",
+      "gzip_bytes": 1244385,
+      "gzip_sha256": "1b419bd40078ef4db8f60fc0b69568af6a0e462fc0fa100ba855df8d34ff4740",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_boot_default_test",
+        "bytes": 2226192,
+        "sha256": "b2d805f43619a1fa1398f353b17b4348bdd12c67c70d7c2edf5219163afd8f54"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b2d805f43619a1fa1398f353b17b4348bdd12c67c70d7c2edf5219163afd8f54.elf.gz",
+      "gzip_bytes": 1238312,
+      "gzip_sha256": "83007d26bdf640f53e39fe5dd60d38c52b039ac01a9b1f6a7a57ed2a47fa4261",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_boot_invalid_test",
+        "bytes": 2219720,
+        "sha256": "0628f06bcbfcb49980b3ff37316624319bcb56ac5c7658ff98a6e706605d4238"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0628f06bcbfcb49980b3ff37316624319bcb56ac5c7658ff98a6e706605d4238.elf.gz",
+      "gzip_bytes": 1231793,
+      "gzip_sha256": "edea0bbd04d0d4f3aafd648a2d2bd88fce9aac8ab94949d7a9589bc1e39d4fb4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_memory_test",
+        "bytes": 2280864,
+        "sha256": "41be4a39e3b3b709c7faec47e5db075dcdad9b4e69c28a3cee4b3660e916960e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/41be4a39e3b3b709c7faec47e5db075dcdad9b4e69c28a3cee4b3660e916960e.elf.gz",
+      "gzip_bytes": 1257855,
+      "gzip_sha256": "730f354a52e4579d328622ac99d8affcfa29c69a084ffad6a5d1fc8c6594677f",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_multi_controller_factory_test",
+        "bytes": 3295992,
+        "sha256": "cc8710ff4e8930bc80bbb8fdd56b5b747f61d58e284706b14a1ef6a160813200"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/cc8710ff4e8930bc80bbb8fdd56b5b747f61d58e284706b14a1ef6a160813200.elf.gz",
+      "gzip_bytes": 2030295,
+      "gzip_sha256": "633308cd39fee5470a6fbcaff99588c6a3de14851fc09f19d38703a7f2c368a2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_official_test",
+        "bytes": 2422224,
+        "sha256": "6df4d39fbc02b9577a6b63350dc6b12aced0f528a936b09a8baf9b903ab3bbe8"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/6df4d39fbc02b9577a6b63350dc6b12aced0f528a936b09a8baf9b903ab3bbe8.elf.gz",
+      "gzip_bytes": 1374818,
+      "gzip_sha256": "f40421d9d77f3e292de3ceb3310b891d748c6d2606173ae83028e1e5ee0ba461",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_physical_platform_factory_test",
+        "bytes": 2866160,
+        "sha256": "50260ec5557d2a90ecc38842f951ff37249f3779867962188b25a4d899883e08"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/50260ec5557d2a90ecc38842f951ff37249f3779867962188b25a4d899883e08.elf.gz",
+      "gzip_bytes": 1725318,
+      "gzip_sha256": "2e62d0335210bfe9072f62cfa300ec8316289d8d13b8b1f9dd4279e1d660afcf",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_single_spi_factory_test",
+        "bytes": 2474072,
+        "sha256": "2b2a92052523499dd9f2d82c21dc3e45b6a3901e052affa6de391dcf9db7e74a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2b2a92052523499dd9f2d82c21dc3e45b6a3901e052affa6de391dcf9db7e74a.elf.gz",
+      "gzip_bytes": 1438763,
+      "gzip_sha256": "0c089a0a16446a72f0cdb77548fdbcea2355d69908c0534303a17159be892319",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_dma_owner_test",
+        "bytes": 2613352,
+        "sha256": "02e64f794279135d9b0957d6c425b0ba7d1670840ceca72735f840b0940738cd"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/02e64f794279135d9b0957d6c425b0ba7d1670840ceca72735f840b0940738cd.elf.gz",
+      "gzip_bytes": 1528886,
+      "gzip_sha256": "aa846dbbf16e3ecd084b3401ce7dfd55cc6a227244437f973e9a81410a6949b0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_dma_sequence_test",
+        "bytes": 2394304,
+        "sha256": "693d4adc2857fb41ed4d1f3625f0a46e355824ee6fc2e4da53081f3031286d69"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/693d4adc2857fb41ed4d1f3625f0a46e355824ee6fc2e4da53081f3031286d69.elf.gz",
+      "gzip_bytes": 1352680,
+      "gzip_sha256": "a7c7a27c9d226ac07a35d05e8015dbe8243843660f55e66e1629e98aaf98772a",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_dma_test",
+        "bytes": 2406832,
+        "sha256": "c9b05e26022394f48953458e2aebcb419c9c627463278f51db1e0e4837a33cbe"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c9b05e26022394f48953458e2aebcb419c9c627463278f51db1e0e4837a33cbe.elf.gz",
+      "gzip_bytes": 1357806,
+      "gzip_sha256": "41af74c853fcb15e1572b6b4f778e533bf378bed59def5f0f59d87970ea112c2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_spi_transaction_test",
+        "bytes": 2339952,
+        "sha256": "ca0f722829d68a025f480c7a5eb621a411bc70b24aca858a72492c1d8da43ee4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ca0f722829d68a025f480c7a5eb621a411bc70b24aca858a72492c1d8da43ee4.elf.gz",
+      "gzip_bytes": 1318559,
+      "gzip_sha256": "102619636622a22bdd986a552c8619041473904f3a70692af8c646f0c7c32669",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_system_transaction_test",
+        "bytes": 3088584,
+        "sha256": "ab7938efddeb40630723fcf8de16e3d113903afb0aeb696f996bf86ac7eac3b0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/ab7938efddeb40630723fcf8de16e3d113903afb0aeb696f996bf86ac7eac3b0.elf.gz",
+      "gzip_bytes": 1852543,
+      "gzip_sha256": "d48495ea3531e5f5cac202c7d2de2861d381b7a364d8c4e91e7dd65b4f6e52e7",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_timer_factory_test",
+        "bytes": 3090560,
+        "sha256": "45e114c1a2c0dd0a02436fd3d8f1d05485256abe8b9e3af01cde4109751c28cb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/45e114c1a2c0dd0a02436fd3d8f1d05485256abe8b9e3af01cde4109751c28cb.elf.gz",
+      "gzip_bytes": 1879265,
+      "gzip_sha256": "aa32de826d581afe7237750d30807680637009ce4b4bf12bd619d0918f4a91ed",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_dma_test",
+        "bytes": 2371016,
+        "sha256": "a2ceaf4761b51f97c657da07a64557a74f8f0e26e4378d51b35c8c99cec4ebd1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a2ceaf4761b51f97c657da07a64557a74f8f0e26e4378d51b35c8c99cec4ebd1.elf.gz",
+      "gzip_bytes": 1330772,
+      "gzip_sha256": "f25140e3460a02d4fc3de914476807691c91d3b85e6a2f3c52a6bc1dfd0caecf",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_formats_test",
+        "bytes": 2581416,
+        "sha256": "4addc89aade56e18ebcfeaf099095c6631958812e08075dd52a728be0279c046"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/4addc89aade56e18ebcfeaf099095c6631958812e08075dd52a728be0279c046.elf.gz",
+      "gzip_bytes": 1478641,
+      "gzip_sha256": "6c1dfa5d5875e495af4c7ac4b37e5cf695f8f521bad5be2e3d1fd2b1c5966b11",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_receive_test",
+        "bytes": 3076816,
+        "sha256": "690811c0ae0358bb67af15bce2589c1d4e48c08e5647c63edc57350f7e2da8f0"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/690811c0ae0358bb67af15bce2589c1d4e48c08e5647c63edc57350f7e2da8f0.elf.gz",
+      "gzip_bytes": 1854976,
+      "gzip_sha256": "b6cc750f2e0589098597c1141891e1caba353d7e4343d31704e3b28c59ed8814",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_uart_stream_test",
+        "bytes": 2335416,
+        "sha256": "b3da31f3b9b2c8d835a0343faae18d83a2d3b11475031cbbac3f8acc30ef5555"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/b3da31f3b9b2c8d835a0343faae18d83a2d3b11475031cbbac3f8acc30ef5555.elf.gz",
+      "gzip_bytes": 1308893,
+      "gzip_sha256": "9922e9f082739256f87d8df351d88fbab02d51889cf66daf58e4be3faf42deda",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_usb_factory_test",
+        "bytes": 3021448,
+        "sha256": "194572b6e9eab118b4f39d5a906122d0fd5b50ea3d17c0bebcfc9cde91577b72"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/194572b6e9eab118b4f39d5a906122d0fd5b50ea3d17c0bebcfc9cde91577b72.elf.gz",
+      "gzip_bytes": 1841952,
+      "gzip_sha256": "d4b57b3762f489846cbdd1ddc68695f4660683c84f2197e1bb86c6853a67bd7b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32_watchdog_test",
+        "bytes": 2276616,
+        "sha256": "9d7c546ccd6cd4fd0b96020b974c891611dc3bab1b9c7feb9d4deab9bcb6d6a6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9d7c546ccd6cd4fd0b96020b974c891611dc3bab1b9c7feb9d4deab9bcb6d6a6.elf.gz",
+      "gzip_bytes": 1260067,
+      "gzip_sha256": "00b267dc3eb7a8a11353a301769d3a8664e9ccb5f03c24c0ffcdeff8874174be",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_exti_test",
+        "bytes": 2637248,
+        "sha256": "3afa3918a90ecb9d9ca72a1725e9b9363e9660e136eddaf40084d96bbb8aaf90"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/3afa3918a90ecb9d9ca72a1725e9b9363e9660e136eddaf40084d96bbb8aaf90.elf.gz",
+      "gzip_bytes": 1540622,
+      "gzip_sha256": "81ba78254fece3dd866b1bd7bcc5411fdb462f84d538bfeef77584f4c4f83943",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_provider_test",
+        "bytes": 2667184,
+        "sha256": "f11bf1a51b6116f8520da354069fed0ae535306cbd35b5d79999f913188ea031"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f11bf1a51b6116f8520da354069fed0ae535306cbd35b5d79999f913188ea031.elf.gz",
+      "gzip_bytes": 1557259,
+      "gzip_sha256": "bf92ea720b8c6b1e6e1f706ca239a92c2b7e2bed37394f4a5601032a668f4835",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_spi_test",
+        "bytes": 2527552,
+        "sha256": "e645d4b6e1d75d6e96404dffe2c9a01b161d1ca3696e8c41491393eb57cb9f87"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e645d4b6e1d75d6e96404dffe2c9a01b161d1ca3696e8c41491393eb57cb9f87.elf.gz",
+      "gzip_bytes": 1467678,
+      "gzip_sha256": "bfd5ceddc116d1234f7cb267fda29e065b5175443e37aedf32708988f576f5e9",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_system_test",
+        "bytes": 2699400,
+        "sha256": "6cbbc7f0b87096a0b799cee65fbadb3c4d8119aecd70edd498709f7d740e6cdd"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/6cbbc7f0b87096a0b799cee65fbadb3c4d8119aecd70edd498709f7d740e6cdd.elf.gz",
+      "gzip_bytes": 1582040,
+      "gzip_sha256": "21c56acafd26e681a6309fe9db0e419b98639c74d7380ab5ccdd9d3f88b7d533",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_transport_test",
+        "bytes": 2367160,
+        "sha256": "34c5152c76464553ec0f2d61174e81fd4c403d922a85761aed1c37d450b6b36b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/34c5152c76464553ec0f2d61174e81fd4c403d922a85761aed1c37d450b6b36b.elf.gz",
+      "gzip_bytes": 1331650,
+      "gzip_sha256": "f746e8d45c19ba97828a85a43e2d2652674820c9fc4af9852ce0929f128660f8",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f103_watchdog_test",
+        "bytes": 2465480,
+        "sha256": "018f85818609d1dee2c8aaa094fea3f3d654894c27d781ce6d5407bddb952cc6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/018f85818609d1dee2c8aaa094fea3f3d654894c27d781ce6d5407bddb952cc6.elf.gz",
+      "gzip_bytes": 1393894,
+      "gzip_sha256": "ebee2588625b9c548382282853ac9a4c2ba509f19c43dc6a4a8cb9de4edfd47e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_clock_sleep_test",
+        "bytes": 2382944,
+        "sha256": "c72293562473651534178320a241936feb27b6cd673d9a1c0f72fb692dc73955"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/c72293562473651534178320a241936feb27b6cd673d9a1c0f72fb692dc73955.elf.gz",
+      "gzip_bytes": 1325780,
+      "gzip_sha256": "55f7b457eb84073c36621881f9de187bb4478416fed8f3d3f36cc6836cab2bad",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_i2c_multi_controller_test",
+        "bytes": 2545096,
+        "sha256": "e7770a44900145e08b499ef9d72527c08b95032651bdc93f6782bf5300216ff7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e7770a44900145e08b499ef9d72527c08b95032651bdc93f6782bf5300216ff7.elf.gz",
+      "gzip_bytes": 1466882,
+      "gzip_sha256": "c22ef69fcb4614fc93d7f43f881e117d78fdd104211643e594b25fdd3fa7c34d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_lowpower_integration_test",
+        "bytes": 2279296,
+        "sha256": "fab6865d1bbe489eb76b91dcf894b6d630e83981c63df5bb8c834592a344d5aa"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/fab6865d1bbe489eb76b91dcf894b6d630e83981c63df5bb8c834592a344d5aa.elf.gz",
+      "gzip_bytes": 1269014,
+      "gzip_sha256": "d79526b2bc4233d13579dd1824d79f958584c6c0257f38048702392e331acb43",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_lowpower_test",
+        "bytes": 2291736,
+        "sha256": "9a3a3c7db5a87e18eee0def1f26ce8445fadd510b6c9edfbb4df9878b5f43a21"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9a3a3c7db5a87e18eee0def1f26ce8445fadd510b6c9edfbb4df9878b5f43a21.elf.gz",
+      "gzip_bytes": 1273169,
+      "gzip_sha256": "e512745191ed685113964378b064de614bea29ef651cf5d76e28622e878dfdbc",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_spi_multi_controller_test",
+        "bytes": 2522904,
+        "sha256": "dd3c5edb4b0061ff709d8a8e86dbc2a143de813df52f30f86de2209114f092a4"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dd3c5edb4b0061ff709d8a8e86dbc2a143de813df52f30f86de2209114f092a4.elf.gz",
+      "gzip_bytes": 1450023,
+      "gzip_sha256": "cadca04d29b21a3be1f584f4179590df6b046e001adf0f572a3f1893658331c1",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_timer_advanced_test",
+        "bytes": 2893856,
+        "sha256": "a62fb0ce6afb05f6c7341d0e85bba0f0c9918ed209c82e67a1207052dfa5d7fd"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a62fb0ce6afb05f6c7341d0e85bba0f0c9918ed209c82e67a1207052dfa5d7fd.elf.gz",
+      "gzip_bytes": 1687528,
+      "gzip_sha256": "51c88474c0a4a9ec1cd13998fc09ca4f3586c44e17c35da8d6913d806b35abe3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_uart_multi_controller_test",
+        "bytes": 2480608,
+        "sha256": "56e945e42e3a847fe6a16c437db7544d232f59dbe738a033382a4d91be5d9d51"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/56e945e42e3a847fe6a16c437db7544d232f59dbe738a033382a4d91be5d9d51.elf.gz",
+      "gzip_bytes": 1420377,
+      "gzip_sha256": "44b6ad3e27f4a6a36312e90186adaef4d4cfff1b04bf7c55e3c766f3f0735f49",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_usb_clock_test",
+        "bytes": 2308336,
+        "sha256": "03d070f737a89edba2b02d4cb7daa5b7d96fdb161a1fc08d59e3ce4ba39edf35"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/03d070f737a89edba2b02d4cb7daa5b7d96fdb161a1fc08d59e3ce4ba39edf35.elf.gz",
+      "gzip_bytes": 1280675,
+      "gzip_sha256": "b8a50e5f93da1183475fc5de9ecf3ece7c17fb298ed47c214b7c37c737598d3e",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stm32f407_usb_device_test",
+        "bytes": 2406584,
+        "sha256": "896bc49816c3f16564a00061d9f100f01f2be23cc5d330f086afe254bae95118"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/896bc49816c3f16564a00061d9f100f01f2be23cc5d330f086afe254bae95118.elf.gz",
+      "gzip_bytes": 1371307,
+      "gzip_sha256": "aa5c1acd8d678c1fad5d4fcdc606f82f2d82d930fbb5e7045def58b5ca57fed3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stream_profile_test",
+        "bytes": 2708216,
+        "sha256": "7dd1d09104999839ddefe7be19d872973e1bd33911abc9d399a11b2851346a34"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/7dd1d09104999839ddefe7be19d872973e1bd33911abc9d399a11b2851346a34.elf.gz",
+      "gzip_bytes": 1592483,
+      "gzip_sha256": "0c15234f2c5f98bc11be4945a76d7de6485b7a9db5fc0cc49ced5f3cde601d68",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_stream_storage_test",
+        "bytes": 2270096,
+        "sha256": "bf70a5c38b110ccb24f31cae2e24f4f376507cb7389e176b484333f33291885f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/bf70a5c38b110ccb24f31cae2e24f4f376507cb7389e176b484333f33291885f.elf.gz",
+      "gzip_bytes": 1251094,
+      "gzip_sha256": "2e76922b1c5aa05963ccd398388870f8125c2d99cd0292dde5d77037d93323ce",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_bootstrap_test",
+        "bytes": 2384352,
+        "sha256": "31054f6a460456ee0f7bef8cedb3f6ee12d624f00cd6553cd6f0c742e8123f63"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/31054f6a460456ee0f7bef8cedb3f6ee12d624f00cd6553cd6f0c742e8123f63.elf.gz",
+      "gzip_bytes": 1340618,
+      "gzip_sha256": "933a51031ffb51dbf920152fe39623a211fd287788658a2f4f43260cbe90d449",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_irq_primask_test",
+        "bytes": 2301216,
+        "sha256": "d0238b7201a499bd79f7c2e67fb933286f288bcd9fa1be6141137709090929c9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d0238b7201a499bd79f7c2e67fb933286f288bcd9fa1be6141137709090929c9.elf.gz",
+      "gzip_bytes": 1283329,
+      "gzip_sha256": "70a1e5fa016b7d0302d97f89faaad444afc3f3c3fffb26aa17faf4c52c1990a3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_irq_test",
+        "bytes": 2313280,
+        "sha256": "6c562bc4a94f6ed1e331e35d45f9c48a9411d120d94a7f9648e78566a0b91595"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/6c562bc4a94f6ed1e331e35d45f9c48a9411d120d94a7f9648e78566a0b91595.elf.gz",
+      "gzip_bytes": 1289639,
+      "gzip_sha256": "15f0898f3258413cc3c533033a7543dcefae2202cc2e8e527a2cf7a3992ac498",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_kernel_test",
+        "bytes": 2921360,
+        "sha256": "27dc620829de851afc47e1daf656b46f14717162b8b8314c6f6961e2f56e8d74"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/27dc620829de851afc47e1daf656b46f14717162b8b8314c6f6961e2f56e8d74.elf.gz",
+      "gzip_bytes": 1754736,
+      "gzip_sha256": "0160c7bcaa9ebea405b4877b25b4b87bd9a76054cd56d91b6f0b6fb560c58ab4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_linux_port_test",
+        "bytes": 2501472,
+        "sha256": "e0e690d4b0c67d30c05b334db9a76e1e84057a6ef5c5440a212238d293fb84cc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/e0e690d4b0c67d30c05b334db9a76e1e84057a6ef5c5440a212238d293fb84cc.elf.gz",
+      "gzip_bytes": 1446464,
+      "gzip_sha256": "bd00fa6fd2a81063382d701d67d88b198166d8f255751b4c8be083276f6f4440",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_m4_external_test",
+        "bytes": 2645536,
+        "sha256": "cd76fcbe0f97c4e7071f1d84cbedda309173d0f3f343e6add1edd5cdefd008d6"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/cd76fcbe0f97c4e7071f1d84cbedda309173d0f3f343e6add1edd5cdefd008d6.elf.gz",
+      "gzip_bytes": 1559169,
+      "gzip_sha256": "033e254b8756d04c118d8db11cded91fb6bea30c432154618387f2f157957534",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_m4_primask_test",
+        "bytes": 2333568,
+        "sha256": "04473b2d0eda835de5d26a2fb75838c2d405d6d5923e29e3dd513592768d3df7"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/04473b2d0eda835de5d26a2fb75838c2d405d6d5923e29e3dd513592768d3df7.elf.gz",
+      "gzip_bytes": 1327309,
+      "gzip_sha256": "eaa41eefec03838ded0b633757c865e9785f0ccaefd1c370c9d473f51cb22dfb",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_threadx_m4_test",
+        "bytes": 2333552,
+        "sha256": "eea8eb2d81c3c9f2aa82ffef5b3d9371cf0aa30a3a3a9d78c1ae7bc2614ae15b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/eea8eb2d81c3c9f2aa82ffef5b3d9371cf0aa30a3a3a9d78c1ae7bc2614ae15b.elf.gz",
+      "gzip_bytes": 1327272,
+      "gzip_sha256": "25c1310de63a0c531d6213463411db03fb694e4027b536d7843ebfdd0691eece",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_timebase_lowpower_test",
+        "bytes": 2598432,
+        "sha256": "40717d91c41932eab6fd6373c557fd6f86b0815958f5993d9cdbbb4c073334ba"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/40717d91c41932eab6fd6373c557fd6f86b0815958f5993d9cdbbb4c073334ba.elf.gz",
+      "gzip_bytes": 1498421,
+      "gzip_sha256": "efe0aa6ed0e0026904eae2623980d38714ba7115115856ffa296270ca00ae8eb",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_devices_test",
+        "bytes": 2756528,
+        "sha256": "d7e773f7508245c7e719fe62aef584a07ebc3255e279375f3b5629b03a9fcdcb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d7e773f7508245c7e719fe62aef584a07ebc3255e279375f3b5629b03a9fcdcb.elf.gz",
+      "gzip_bytes": 1595343,
+      "gzip_sha256": "b5caf26305c1c5b6e5c26964d6396a7ae5ec049e94c3e2b414668536b6ee3bd1",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_factory_test",
+        "bytes": 2435272,
+        "sha256": "89681f8f34ebf0ef94bf7ae8f7937672424fa5ba1d913cd2ec5fa8ffa62729fc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/89681f8f34ebf0ef94bf7ae8f7937672424fa5ba1d913cd2ec5fa8ffa62729fc.elf.gz",
+      "gzip_bytes": 1376654,
+      "gzip_sha256": "6899ca362f584f2c3f8f222743aa8caa5fff6ef322e9139a8ec9b612a9c51b09",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_i2c_long_factory_test",
+        "bytes": 2674544,
+        "sha256": "dad922932161f482cf32206e543937b40a49730376aa99ae23c89abdd253d909"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/dad922932161f482cf32206e543937b40a49730376aa99ae23c89abdd253d909.elf.gz",
+      "gzip_bytes": 1599132,
+      "gzip_sha256": "800815154f93d8d29d4a1c69a13b406a4932bd7c6ef2c694ea9bf04aad2ef211",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_mainstream_factory_test",
+        "bytes": 2411768,
+        "sha256": "a0ca43ce22049eecb6ea73d6af5b037d9ca2630afda3db1cb3bb4cca183c280c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a0ca43ce22049eecb6ea73d6af5b037d9ca2630afda3db1cb3bb4cca183c280c.elf.gz",
+      "gzip_bytes": 1369606,
+      "gzip_sha256": "43b912668c9afb59ee6b9fe0f3ffa1bcc9570d1a0eb3ee946bf8e6b7ccce11ce",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_mainstream_test",
+        "bytes": 2690040,
+        "sha256": "87895794a9f82859a28d6c8069f8cdeb961f14548d89d644da0be71cc7c686db"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/87895794a9f82859a28d6c8069f8cdeb961f14548d89d644da0be71cc7c686db.elf.gz",
+      "gzip_bytes": 1597245,
+      "gzip_sha256": "c15f43692f9544e777bf7cf788083a52c68c4e5880f1a6e26bf44c06d59b16c0",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_peripheral_factory_test",
+        "bytes": 2482608,
+        "sha256": "d02b95d27c3607dbf946da77464df9df78c2a79e901a6764dd15b149ccc9dac1"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d02b95d27c3607dbf946da77464df9df78c2a79e901a6764dd15b149ccc9dac1.elf.gz",
+      "gzip_bytes": 1421778,
+      "gzip_sha256": "7a08ab30150296250455d3299213599605485785e743f4a89c64bb7d65b30af2",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_provider_test",
+        "bytes": 2755320,
+        "sha256": "113304c67e0f04f0ecc1ef48b80376ace12931266cbf2e707916b4ebb3fb00bf"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/113304c67e0f04f0ecc1ef48b80376ace12931266cbf2e707916b4ebb3fb00bf.elf.gz",
+      "gzip_bytes": 1622777,
+      "gzip_sha256": "731245a55a3740a3e91553d588b06d6334d14156b0f80977f8974619c558aa38",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_secure_batch_test",
+        "bytes": 2505616,
+        "sha256": "5708ecac31048f5f9840fb2a226342bb2dd2348ba5dd67b29eed0882c137c11e"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/5708ecac31048f5f9840fb2a226342bb2dd2348ba5dd67b29eed0882c137c11e.elf.gz",
+      "gzip_bytes": 1456664,
+      "gzip_sha256": "4c7fd2e22fab40cb2758868428d7726fef93a85ad6a5177dd991aee5bb9d781c",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_security_test",
+        "bytes": 2840424,
+        "sha256": "9aabe2f90ae71c73332e4a7b4beb97f93785b101df954aae968dc79be3fb2ce9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9aabe2f90ae71c73332e4a7b4beb97f93785b101df954aae968dc79be3fb2ce9.elf.gz",
+      "gzip_bytes": 1679383,
+      "gzip_sha256": "51436540673893de5e59b7e93a5dfd51376979574401c713bdf338cd04c7c085",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_system_test",
+        "bytes": 2522464,
+        "sha256": "9f8cb42f59bbe7fab083238b10bcf409608d45e296bcfb2e7eb726faa883d983"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/9f8cb42f59bbe7fab083238b10bcf409608d45e296bcfb2e7eb726faa883d983.elf.gz",
+      "gzip_bytes": 1437932,
+      "gzip_sha256": "ef70878a46a8c9f76dc07f2f90b4889819c867a5c726eaa464c3fa2c002235bb",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_fifo_factory_test",
+        "bytes": 2466744,
+        "sha256": "549669e702e3518caf9d410b27c1ed2f32f9ef35d461e6ad1e61e831cf3f6c5c"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/549669e702e3518caf9d410b27c1ed2f32f9ef35d461e6ad1e61e831cf3f6c5c.elf.gz",
+      "gzip_bytes": 1411549,
+      "gzip_sha256": "aac710132b5d537e157f4bdd58e7c3d9e93d57ff3782bc5f082bf90e54b0db69",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_fifo_test",
+        "bytes": 2984840,
+        "sha256": "54d9e7ca3537059a9c84d3d0797aebc31f8b387b0698618e676379d618560414"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/54d9e7ca3537059a9c84d3d0797aebc31f8b387b0698618e676379d618560414.elf.gz",
+      "gzip_bytes": 1779101,
+      "gzip_sha256": "1ecdd2db2fe4f741bfd98dcdb1a4a3e933f9ff7e47cdd34db40845b8b64599be",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_gpdma_factory_test",
+        "bytes": 2454568,
+        "sha256": "d4876a07ec62a804e7c3d172e434aecc3b7f9be2ed786c3675ef76341243fa9f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d4876a07ec62a804e7c3d172e434aecc3b7f9be2ed786c3675ef76341243fa9f.elf.gz",
+      "gzip_bytes": 1400563,
+      "gzip_sha256": "60659555d746fc5fd90de9b1d5d360d20fdf3713ac82ce79b38673e12c80fd90",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_gpdma_test",
+        "bytes": 2964856,
+        "sha256": "402193f75cda25c40c96192941cd38b13c9ed5c31c55c26b47b34e6ea379dac9"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/402193f75cda25c40c96192941cd38b13c9ed5c31c55c26b47b34e6ea379dac9.elf.gz",
+      "gzip_bytes": 1766396,
+      "gzip_sha256": "8882a0e5b1bf70c4f901fd0ff9b5cce968f400b2868d0ce7fcbe8dc774cfbb2b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_rtscts_factory_test",
+        "bytes": 2499976,
+        "sha256": "056eae8b6462c86843db248b49c34267082067600ee6348039fc7d7349c377fb"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/056eae8b6462c86843db248b49c34267082067600ee6348039fc7d7349c377fb.elf.gz",
+      "gzip_bytes": 1432676,
+      "gzip_sha256": "fac65a47e48648ec4bd16551edd8019906302a41052b7b13febef1b5750dd185",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_u575_uart_rtscts_test",
+        "bytes": 2944296,
+        "sha256": "a2f3cf934de2468e53aa6be195c5be42683800475402be366c75c421958b655f"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/a2f3cf934de2468e53aa6be195c5be42683800475402be366c75c421958b655f.elf.gz",
+      "gzip_bytes": 1749575,
+      "gzip_sha256": "b219867a91a170078e1c52d54e320bf116761a128275ab3cdb8fa1109e559ff4",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_formats_test",
+        "bytes": 2324696,
+        "sha256": "2e7e31d0acbd7e1b63eb027f09854008f731d53c8e662ea2c098d2442c836143"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2e7e31d0acbd7e1b63eb027f09854008f731d53c8e662ea2c098d2442c836143.elf.gz",
+      "gzip_bytes": 1296743,
+      "gzip_sha256": "e82c68450ed0fa4c4592b4c656b023fef7f5c8a28ad311c14f5757c6b1dcdc2d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_owner_mock_test",
+        "bytes": 2536968,
+        "sha256": "d85c25ffb13a1f14f1a2e3c5ebcec315ee52157bbf251dc217c97af02d883599"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/d85c25ffb13a1f14f1a2e3c5ebcec315ee52157bbf251dc217c97af02d883599.elf.gz",
+      "gzip_bytes": 1476724,
+      "gzip_sha256": "9cb3021bfbaa1a3220b91927bc9cc8ac02ebf368ccbbb0d4b0d926a7c1735956",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_rs485_test",
+        "bytes": 3009896,
+        "sha256": "88f0ad005ee16ad92fa09e077d273d0789e6c9dcd6322fe3299c3ed502138d2b"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/88f0ad005ee16ad92fa09e077d273d0789e6c9dcd6322fe3299c3ed502138d2b.elf.gz",
+      "gzip_bytes": 1827313,
+      "gzip_sha256": "75a856a2a3225b526547e7907b852042a12bd3b6a3ad07e1846fc15b232cb057",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_uart_v1_channel_dma_test",
+        "bytes": 2622096,
+        "sha256": "53d7cb34af4b4676f7d606b22c3443826d6481e31fd89cef21d25f1c896f0f76"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/53d7cb34af4b4676f7d606b22c3443826d6481e31fd89cef21d25f1c896f0f76.elf.gz",
+      "gzip_bytes": 1528582,
+      "gzip_sha256": "e8865aaa302a8dedbc5ea4748d4f86bbf86a4cc9f6299fdac0c750e3245e35a3",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_usb_device_test",
+        "bytes": 2873992,
+        "sha256": "2fca1762d1e5880df3b49613e8d37476e4b527a81d41409668cac32c5d649afc"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/2fca1762d1e5880df3b49613e8d37476e4b527a81d41409668cac32c5d649afc.elf.gz",
+      "gzip_bytes": 1668630,
+      "gzip_sha256": "9b1db4fcf2a4f12a52b1b25c732125bde162750866ea01f6707867593c11e48d",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_user_io_broker_test",
+        "bytes": 2995696,
+        "sha256": "f28b95671ba9d37127868534fd677d5995aff487f06013af47d52ab9ce14e12a"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/f28b95671ba9d37127868534fd677d5995aff487f06013af47d52ab9ce14e12a.elf.gz",
+      "gzip_bytes": 1791420,
+      "gzip_sha256": "10d7b297eb72c0df3e7c7786e7907c5edf957c425cab45edd44ac6dff680b137",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_workload_gd303_test",
+        "bytes": 2758568,
+        "sha256": "0d6a962280de283dc0c57075f840c634f5fb16f45f479e507ade52e634a38104"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/0d6a962280de283dc0c57075f840c634f5fb16f45f479e507ade52e634a38104.elf.gz",
+      "gzip_bytes": 1632475,
+      "gzip_sha256": "576a99ec0e1716306279c27a9af81687e68c7da77e5490db8f58dab3409c577b",
+      "complete_decompressed_SHA_CRC_verified": true
+    },
+    {
+      "original": {
+        "path": "/tmp/nexus-io-validation-20261018/build/native-debug/bin/nexus_workload_uart3_test",
+        "bytes": 2758520,
+        "sha256": "10d2c5ca2b38e96acf2c2ab0b1a7c103c5e63309926f1d35d72e59b717011e62"
+      },
+      "original_mode": 448,
+      "gzip": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/10d2c5ca2b38e96acf2c2ab0b1a7c103c5e63309926f1d35d72e59b717011e62.elf.gz",
+      "gzip_bytes": 1632153,
+      "gzip_sha256": "b308d2a923b704fd0f95584723e98b6198d8e3fed515bf8d16047e75181156cf",
+      "complete_decompressed_SHA_CRC_verified": true
+    }
+  ],
+  "source_ELFs_not_modified": true,
+  "history": "r1 capped384MiB after256 fully verified blobs, retained unchanged; Root explicitly increased only this development preservation cap to512MiB for r2. All existing blobs are reverified in full; ordinary resource floors and qualification caps unchanged.",
+  "storage": "volatile executable tmpfs retained originals; not GitHub publication or a new execution/qualification"
+}

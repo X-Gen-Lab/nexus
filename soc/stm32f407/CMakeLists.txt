@@ -11,7 +11,7 @@ foreach(required "${stm32_device}/Include/stm32f407xx.h"
 endforeach()
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/platform/ControllerModes.cmake")
 set(stm32_sources)
-foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
+foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth eth_frames
         timer_capture advanced_pwm)
     nexus_controller_modes(modes "${kind}")
     if(NOT modes)
@@ -19,24 +19,32 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
     endif()
     if(kind STREQUAL "eth")
         list(APPEND stm32_sources drivers/ethernet.c)
+    elseif(kind STREQUAL "eth_frames")
+        list(APPEND stm32_sources drivers/ethernet_frames.c)
     elseif(kind STREQUAL "pwm")
         list(APPEND stm32_sources drivers/timer.c)
     else()
         list(APPEND stm32_sources "drivers/${kind}.c")
     endif()
     # Pin acquisition and rollback share GPIO helpers, including CS/PWM pins.
-    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth|timer_capture|advanced_pwm)$")
+    if(kind MATCHES "^(gpio|uart|spi|i2c|exti|pwm|adc|can|usb_device|eth|eth_frames|timer_capture|advanced_pwm)$")
         list(APPEND stm32_sources drivers/gpio.c)
     endif()
     if(kind STREQUAL "uart")
+        if("irq-words" IN_LIST modes)
+            list(APPEND stm32_sources drivers/uart_word.c)
+        endif()
         if("dma-tx" IN_LIST modes OR "dma-duplex" IN_LIST modes
             OR "dma-duplex-continuous" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_dma.c)
         endif()
+        if("dma-duplex" IN_LIST modes OR "dma-duplex-continuous" IN_LIST modes)
+            list(APPEND stm32_sources drivers/uart_duplex.c)
+        endif()
         if("rx-dma-idle" IN_LIST modes OR "rx-dma-continuous" IN_LIST modes
             OR "dma-duplex" IN_LIST modes
             OR "dma-duplex-continuous" IN_LIST modes)
-            list(APPEND stm32_sources drivers/uart_receive.c drivers/uart_dma.c)
+            list(APPEND stm32_sources drivers/uart_receive.c)
         endif()
         if("irq-blocks" IN_LIST modes)
             list(APPEND stm32_sources drivers/uart_stream.c)
@@ -51,6 +59,9 @@ foreach(kind gpio uart spi i2c flash watchdog exti pwm adc can usb_device eth
     elseif(kind STREQUAL "eth")
         list(APPEND stm32_sources
             "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/eth_mac.c")
+    elseif(kind STREQUAL "eth_frames")
+        list(APPEND stm32_sources
+            "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/eth_frames_mac.c")
     elseif(kind STREQUAL "usb_device")
         list(APPEND stm32_sources usb_clock.c
             "${CMAKE_CURRENT_SOURCE_DIR}/../../io/src/usb_device_controller.c")

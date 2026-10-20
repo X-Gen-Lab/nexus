@@ -1,0 +1,6 @@
+{
+  "tests/google/h743_peripheral_test.cpp": "79f0a4c25d542b380603ae709bf044df54dd9e79e8b3165e0edd56df71848c13",
+  "tests/google/h743_model.h": "a717f36ee96d8e26c1e106e89215fd9908d32a64fc3558a037099419dd5e6ad7",
+  "tests/google/h743_model.cpp": "f98e3bf789f14fcd6db384d12613d51c2cdb5c4b203a36a458029446e5f64269",
+  "soc/stm32h743/drivers/spi.c": "7a39abffb787426c607588dabe8902ef424c7f25d2b3c170a4bfebc5af2e93bf"
+}

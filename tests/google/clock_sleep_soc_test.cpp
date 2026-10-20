@@ -19,6 +19,8 @@
 #define CONFIG       RCU_CFG0
 #define WAIT_STATE   FMC_WS
 #define SOURCE_READY RCU_CTL_HXTALSTB
+#define SLEEP_CLOCK  RCU_APB1SPEN
+#define TIMER_SLEEP  RCU_APB1SPEN_TIMER1SPEN
 #else
 #include "stm32f407_sleep.h"
 #include "stm32f407xx.h"
@@ -28,6 +30,8 @@
 #define CONFIG       RCC->CFGR
 #define WAIT_STATE   FLASH->ACR
 #define SOURCE_READY RCC_CR_HSERDY
+#define SLEEP_CLOCK  RCC->APB1LPENR
+#define TIMER_SLEEP  RCC_APB1LPENR_TIM2LPEN
 #endif
 #include <array>
 #include <cstring>
@@ -102,6 +106,7 @@ class ClockSleep : public ::testing::Test {
                  RCC_CFGR_PPRE2_DIV2;
         WAIT_STATE = FLASH_ACR_LATENCY_5WS;
 #endif
+        SLEEP_CLOCK = TIMER_SLEEP;
         ASSERT_EQ(nx_clock_domain_construct(&domain, 2), NX_SUCCESS);
         ASSERT_EQ(nx_clock_domain_close(&domain, &barrier), NX_SUCCESS);
     }
@@ -111,6 +116,31 @@ class ClockSleep : public ::testing::Test {
     }
     nx_result_t Sleep(nx_clock_power_mode_t mode = NX_CLOCK_SHALLOW_SLEEP) {
         return SOC_SLEEP(barrier, mode, &sequence, 77, &slept);
+    }
+    using Registers = std::array<unsigned char, 8192>;
+    Registers ClockRegisters() {
+        Registers result;
+        std::memcpy(result.data(), reinterpret_cast<void*>(0x40023000U),
+                    result.size());
+        return result;
+    }
+    void ExpectRejectedWithoutMutation(const Registers& registers) {
+        auto saved_domain = domain;
+        auto saved_barrier = barrier;
+        auto saved_token = token;
+        auto saved_sequence = sequence;
+        EXPECT_EQ(Sleep(), NX_ERROR_UNSUPPORTED);
+        EXPECT_FALSE(slept);
+        EXPECT_EQ(waits, 0U);
+        EXPECT_FALSE(nx_arch_irq_is_masked());
+        EXPECT_EQ(std::memcmp(registers.data(),
+                              reinterpret_cast<void*>(0x40023000U),
+                              registers.size()),
+                  0);
+        EXPECT_EQ(std::memcmp(&saved_domain, &domain, sizeof(domain)), 0);
+        EXPECT_EQ(std::memcmp(&saved_barrier, &barrier, sizeof(barrier)), 0);
+        EXPECT_EQ(std::memcmp(&saved_token, &token, sizeof(token)), 0);
+        EXPECT_EQ(sequence, saved_sequence);
     }
 };
 TEST_F(ClockSleep, FixedRunDrainedWfiPreservesAllClockRegisters) {
@@ -182,6 +212,24 @@ TEST_F(ClockSleep, SourceFailureAtMaskBoundaryRejectsBeforeWfi) {
     on_mask = []() { CONTROL &= ~static_cast<uint32_t>(SOURCE_READY); };
     EXPECT_EQ(Sleep(), NX_ERROR_UNSUPPORTED);
     EXPECT_EQ(waits, 0U);
+}
+TEST_F(ClockSleep, DisabledTimerSleepClockRejectsWithoutRepair) {
+    SLEEP_CLOCK &= ~static_cast<uint32_t>(TIMER_SLEEP);
+    ExpectRejectedWithoutMutation(ClockRegisters());
+
+    /* Only the external clock owner repairs its profile. Rejection must not
+     * consume the closed barrier or change its retained identity. */
+    SLEEP_CLOCK |= TIMER_SLEEP;
+    EXPECT_EQ(Sleep(), NX_SUCCESS);
+    EXPECT_TRUE(slept);
+    EXPECT_EQ(waits, 1U);
+}
+TEST_F(ClockSleep, TimerSleepClockAtFinalMaskBoundaryIsRechecked) {
+    SLEEP_CLOCK &= ~static_cast<uint32_t>(TIMER_SLEEP);
+    auto expected = ClockRegisters();
+    SLEEP_CLOCK |= TIMER_SLEEP;
+    on_mask = []() { SLEEP_CLOCK &= ~static_cast<uint32_t>(TIMER_SLEEP); };
+    ExpectRejectedWithoutMutation(expected);
 }
 TEST_F(ClockSleep, StopAndDynamicRunAreExplicitlyUnsupported) {
     EXPECT_EQ(Sleep(NX_CLOCK_DEEP_STOP), NX_ERROR_UNSUPPORTED);

@@ -1,15 +1,26 @@
 #!/usr/bin/env python3
 """Verify independent consumers of an existing publishable source SDK prefix."""
 import argparse
+import concurrent.futures
 import json
+import re
+import shlex
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import shutil
-import subprocess
+import signal
 import sys
+import tomllib
+import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
+from tools.dev import process  # noqa: E402
+from tools.evidence.common import file_identity, regular_file  # noqa: E402
+from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
+                                     SELECTED_CONSUMERS)  # noqa: E402
+
+
 
 
 def clean_environment():
@@ -147,7 +158,8 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '__has_include("stm32u575_provider.h") || '
         '__has_include("stm32f103_provider.h") || '
         '__has_include("gd32f303_provider.h") || '
-        '__has_include("stm32g474_provider.h")\n'
+        '__has_include("stm32g474_provider.h") || '
+        '__has_include("rtc_lptim_provider.h")\n'
         '#error Provider implementation leaked into the product\n#endif\n'
         'static nx_uart_tx_request_t request;\n'
         'static uint8_t data[2] = {0x12U, 0x34U};\n')
@@ -193,100 +205,532 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     return source, build, arguments
 
 
+def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name,
+                              run_checked, *, expected_revision):
+    """Reuse installed canonical inputs through a separate public C project."""
+    sdk = prefix / "share/nexus/src"
+    verification = sdk / "cmake/package/verification/io_evolution"
+    relative = PurePosixPath(assembly_name)
+    if (relative.is_absolute() or ".." in relative.parts or
+            "\\" in assembly_name or str(relative) != assembly_name or
+            relative.suffix != ".toml"):
+        raise ValueError("Selected consumer requires a canonical SDK-relative TOML")
+    assembly = regular_file(sdk / assembly_name)
+    if not re.fullmatch(r"[a-z0-9-]+", smoke_name):
+        raise ValueError("Selected consumer smoke name is invalid")
+    smoke = regular_file(verification / "consumers" / (smoke_name + ".c"))
+    authored = tomllib.loads(assembly.read_text())
+    if type(authored.get("schema")) is not int or authored["schema"] != 2:
+        raise ValueError("Selected consumer requires assembly schema 2")
+    source = directory / ("selected " + name + " source")
+    build = directory / ("selected " + name + " build")
+    source.mkdir()
+    run_checked(["git", "init", "--quiet", str(source)])
+    version = load_policy(sdk)["semantic_version"]
+    (source / "CMakeLists.txt").write_text(
+        'cmake_minimum_required(VERSION 3.31)\n'
+        'project(installed_selected_consumer LANGUAGES C ASM)\n'
+        'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
+        f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
+        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c)\n'
+        'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
+        'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
+        'file(WRITE "${CMAKE_BINARY_DIR}/resolved-config.txt" "${config_root}")\n')
+    shutil.copyfile(smoke, source / "main.c")
+    (source / "private_headers.c").write_text(
+        '#if __has_include("stm32h7xx.h") || '
+        '__has_include("stm32u5xx.h") || __has_include("stm32g4xx.h") || '
+        '__has_include("stm32f4xx.h") || __has_include("gd32f4xx.h")\n'
+        '#error Vendor SDK leaked into product source\n#endif\n'
+        '#if __has_include("stm32h743_clock.h") || '
+        '__has_include("stm32h743_provider.h") || '
+        '__has_include("stm32h743_spi_dma.h") || '
+        '__has_include("stm32h743_uart_rtscts.h") || '
+        '__has_include("stm32h743_uart_continuous.h") || '
+        '__has_include("stm32u575_uart_gpdma.h") || '
+        '__has_include("stm32u575_uart_gpdma_chain.h") || '
+        '__has_include("stm32u575_uart_gpdma_impl.h") || '
+        '__has_include("stm32u575_provider.h") || '
+        '__has_include("stm32u575_uart_rtscts.h") || '
+        '__has_include("stm32u575_lptim.h") || '
+        '__has_include("stm32g474_fdcan.h") || '
+        '__has_include("stm32g474_pwm_adc.h") || '
+        '__has_include("stm32g474_adc_group.h") || '
+        '__has_include("stm32g474_pwm_shared.h") || '
+        '__has_include("stm32g474_pin_state.h") || '
+        '__has_include("pin_state_impl.h") || '
+        '__has_include("stm32f407_eth_frames.h") || '
+        '__has_include("gd32f470_eth_frames.h") || '
+        '__has_include("stm32g474_provider.h") || '
+        '__has_include("rtc_lptim_provider.h")\n'
+        '#error Private provider leaked into product source\n#endif\n'
+        '_Static_assert(1, "Public source include isolation");\n')
+    command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
+               "-DCMAKE_BUILD_TYPE=Release",
+               f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
+               "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF",
+               f"-DNEXUS_ASSEMBLY_FILE={assembly}",
+               "-DNEXUS_EXPECTED_SOURCE_REVISION=" + expected_revision]
+    if authored["backend"] != "native":
+        command.append(f"-DCMAKE_TOOLCHAIN_FILE={sdk / 'cmake/toolchains/arm-gcc.cmake'}")
+    return source, build, command
+
+
+def check_native_time_image(sdk, source, build, config, commands, run_checked):
+    """Observe this Linux host fixture, not MCU RAM or a general ELF loader.
+
+    Canonical C executes real table methods and checks the entire face/ops
+    spans against live /proc/self/maps. nm records only selected retained
+    software objects. Neither symbol type nor ELF section flags prove runtime
+    read-only mappings, and this observation never claims total RAM or HIL.
+    """
+    resolved = json.loads((config / "resolved.json").read_text())
+    if (resolved.get("soc_family") != "native" or
+            resolved.get("backend") != "native" or
+            resolved.get("cpu", {}).get("arch") != "native"):
+        raise ValueError("Native observation requires the actual Native domain")
+    verification = sdk / "cmake/package/verification/io_evolution"
+    main = file_identity(source / "main.c")
+    matches = []
+    for profile in ("pair", "empty"):
+        canonical = verification / "consumers" / ("native-time-" + profile + ".c")
+        if canonical.is_file() and file_identity(canonical)["sha256"] == main["sha256"]:
+            matches.append(profile)
+    if len(matches) != 1:
+        raise ValueError("Native consumer differs from the installed canonical C scenario")
+    profile = matches[0]
+    assembly = verification / ("native-time-" + profile + ".toml")
+    authored = tomllib.loads(assembly.read_text())
+    expected = {(kind, name): item for kind in ("rtc", "lptim")
+                for name, item in authored.get(kind, {}).items()}
+    actual = resolved.get("controllers", [])
+    if (not isinstance(actual, list) or len(actual) != len(expected) or
+            {(item.get("kind"), item.get("id")) for item in actual} != set(expected)):
+        raise ValueError("Native selected controller identities differ from the canonical assembly")
+    for item in actual:
+        want = expected[(item["kind"], item["id"])]
+        if item.get("mode") != want["mode"] or (
+                item["kind"] == "lptim" and item.get("tick_hz") != want["tick_hz"]):
+            raise ValueError("Native selected mode/rate differs from the canonical assembly")
+    for entry in commands:
+        file = Path(entry["file"]).resolve()
+        if file not in {source / "main.c", source / "private_headers.c", config / "bindings.c"}:
+            continue
+        argv = entry.get("arguments") or shlex.split(entry["command"])
+        if argv.count("-c") != 1:
+            raise ValueError("Native compile row does not identify one actual source")
+        selected = Path(argv[argv.index("-c") + 1])
+        if not selected.is_absolute():
+            selected = Path(entry["directory"]) / selected
+        if selected.resolve() != file:
+            raise ValueError("Native compile row source and -c argument disagree")
+        if file.parent == source and any(value in " ".join(argv)
+                for value in ("/io/native", "/io/private")):
+            raise ValueError("Private Native state leaked into the public consumer")
+    if sum(Path(entry["file"]).resolve() == config / "bindings.c" for entry in commands) != 1:
+        raise ValueError("Native generated bindings have no unique compile row")
+    image = build / "bin/installed_selected"
+    with image.open("rb") as stream:
+        header = stream.read(20)
+    if len(header) != 20 or header[:6] != b"\x7fELF\x02\x01" or header[18:20] != b"\x3e\x00":
+        raise ValueError("Native observation supports only actual little-endian x86_64 ELF64")
+    inputs = {
+        "elf": image, "resolved": config / "resolved.json",
+        "bindings": config / "bindings.c", "compile_commands": build / "compile_commands.json",
+        "canonical_source": verification / "consumers" / ("native-time-" + profile + ".c"),
+        "assembly": assembly, "sdk_manifest": sdk / ".nexus-source-sdk.json",
+        "public_source": source / "main.c", "private_probe": source / "private_headers.c",
+    }
+    before = {name: file_identity(path) for name, path in inputs.items()}
+    runtime = run_checked([str(image)])
+    if runtime.returncode:
+        raise ValueError("Native canonical runtime failed")
+    observed = run_checked(["nm", "-S", "--defined-only", "--format=posix", str(image)])
+    if observed.returncode or len(observed.stdout) > 4 * 1024 * 1024:
+        raise ValueError("Native symbol observation failed or exceeded its bound")
+    symbols = {}
+    for line in observed.stdout.splitlines():
+        fields = line.split()
+        if not fields:
+            continue
+        name = fields[0]
+        if not (name.startswith("s_nx_port_") or name in {
+                "nx_native_rtc_ops", "nx_native_lptim_ops",
+                "nx_native_time_clock_read", "s_nx_native_time_clock"}):
+            continue
+        if (len(fields) != 4 or name in symbols or
+                not re.fullmatch(r"[0-9a-fA-F]+", fields[2]) or
+                not re.fullmatch(r"[0-9a-fA-F]+", fields[3])):
+            raise ValueError("Native selected symbol identity is ambiguous")
+        symbols[name] = {"type": fields[1], "address": int(fields[2], 16),
+                         "size": int(fields[3], 16)}
+    states = {"s_nx_port_" + name.replace("-", "_") for _, name in expected}
+    required = set(states)
+    if expected:
+        required.update(("nx_native_rtc_ops", "nx_native_lptim_ops",
+                         "nx_native_time_clock_read", "s_nx_native_time_clock"))
+    if set(symbols) != required or any(item["size"] <= 0 for item in symbols.values()):
+        raise ValueError("Native selected provider retention differs from the resolved selection")
+    if before != {name: file_identity(path) for name, path in inputs.items()}:
+        raise ValueError("Native observation inputs changed during execution")
+    return {"kind": "native-time-host-observation", "status": "passed",
+            "physical_status": "not_executed", **before,
+            "selected_state_count": len(states),
+            "selected_state_bytes": sum(symbols[name]["size"] for name in states),
+            "symbols": symbols,
+            "qualification": "This Linux x86_64 canonical runtime and selected symbol subset only; not total RAM, MCU or hardware qualification."}
+
+
+def check_selected_image(sdk, source, build, run_checked):
+    """Bind selected artifacts to actual resources and the retained provider."""
+    if (build / "resolved-sdk.txt").read_text() != str(sdk):
+        raise ValueError("Selected consumer resolved another source SDK")
+    commands = json.loads((build / "compile_commands.json").read_text())
+    products = [entry for entry in commands
+                if Path(entry["file"]).resolve() in
+                {source / "main.c", source / "private_headers.c"}]
+    if (len(products) != 2 or
+            {Path(entry["file"]).name for entry in products} !=
+            {"main.c", "private_headers.c"} or
+            any(value in entry["command"] for entry in products for value in
+                ("/vendors/", "/soc/", "-DSTM32", "-DGD32"))):
+        raise ValueError("Selected consumer private inputs leaked into product")
+    config = Path((build / "resolved-config.txt").read_text())
+    resolved = json.loads((config / "resolved.json").read_text())
+    if resolved.get("backend") == "native":
+        return check_native_time_image(sdk, source, build, config, commands, run_checked)
+    artifacts = {suffix: file_identity(build / "bin" /
+                                      ("installed_selected." + suffix))
+                 for suffix in ("elf", "bin", "map")}
+    if any(record["size"] == 0 for record in artifacts.values()):
+        raise ValueError("Selected consumer artifact is empty")
+    config = Path((build / "resolved-config.txt").read_text())
+    resources_path = build / "bin/installed_selected.resources.json"
+    resources = json.loads(resources_path.read_text())
+    if (resources["status"] != "passed" or
+            resources["elf"] != artifacts["elf"] or
+            resources["resolved"] != file_identity(config / "resolved.json")):
+        raise ValueError("Selected consumer resource/configuration binding failed")
+    retention_path = build / "provider-retention.json"
+    run_checked([sys.executable, "-B", str(sdk / "tools/measurement/retention.py"),
+                 "--elf", artifacts["elf"]["path"],
+                 "--bindings", str(config / "bindings.c"),
+                 "--resolved", str(config / "resolved.json"),
+                 "--output", str(retention_path)])
+    retention = json.loads(retention_path.read_text())
+    if (retention["status"] != "passed" or
+            retention["elf"] != artifacts["elf"]):
+        raise ValueError("Selected consumer provider retention failed")
+    return {"artifacts": artifacts, "resources": file_identity(resources_path),
+            "resolved": file_identity(config / "resolved.json"),
+            "retention": file_identity(retention_path)}
+
+
+def positive_parallel(value):
+    """Require a canonical positive job count, without a policy maximum."""
+    try:
+        count = int(value)
+    except (TypeError, ValueError) as error:
+        raise argparse.ArgumentTypeError(
+            "parallel must be a positive integer") from error
+    if count < 1 or str(count) != value:
+        raise argparse.ArgumentTypeError("parallel must be a positive integer")
+    return count
+
+
+def verify_consumer(kind, specification, prefix, output, identity, run_checked):
+    """Execute one complete independent chain from the shared transport plan."""
+    sdk = prefix / "share/nexus/src"
+    if kind == "base":
+        name, arm, chip = specification
+        source, build, command = prepare_consumer(
+            prefix, output, name, run_checked, arm=arm, chip=chip,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_c", "installed_cpp"])
+        commands = json.loads((build / "compile_commands.json").read_text())
+        for entry in commands:
+            if Path(entry["file"]).name not in {"main.c", "main.cpp"}:
+                continue
+            if any(value in entry["command"] for value in
+                   ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470")):
+                raise ValueError(
+                    "Private implementation input leaked into product source")
+        if arm:
+            for application in ("installed_c", "installed_cpp"):
+                resources = json.loads((build / "bin" /
+                    (application + ".resources.json")).read_text())
+                if resources["status"] != "passed":
+                    raise ValueError(
+                        "MCU consumer resource/configuration binding failed")
+        else:
+            for application in ("installed_c", "installed_cpp"):
+                run_checked([str(build / "bin" / application)])
+    elif kind == "modern":
+        family, backend = specification
+        source, build, command = prepare_modern_consumer(
+            prefix, output, family, backend, run_checked,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_modern"])
+        commands = json.loads((build / "compile_commands.json").read_text())
+        products = [entry for entry in commands
+                    if Path(entry["file"]).resolve() == source / "main.c"]
+        if len(products) != 1 or any(value in products[0]["command"]
+                for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
+            raise ValueError("Modern consumer private inputs leaked into product")
+        image = build / "bin/installed_modern.elf"
+        resources = json.loads(
+            (build / "bin/installed_modern.resources.json").read_text())
+        if resources["status"] != "passed" or image.stat().st_size == 0:
+            raise ValueError("Modern consumer linked resource binding failed")
+        config = Path((build / "resolved-config.txt").read_text())
+        retention_path = build / "provider-retention.json"
+        run_checked([sys.executable, "-B",
+            str(sdk / "tools/measurement/retention.py"),
+            "--elf", str(image), "--bindings", str(config / "bindings.c"),
+            "--resolved", str(config / "resolved.json"),
+            "--output", str(retention_path)])
+        if json.loads(retention_path.read_text())["status"] != "passed":
+            raise ValueError("Modern consumer provider retention failed")
+    else:
+        name, assembly, smoke = specification
+        source, build, command = prepare_selected_consumer(
+            prefix, output, name, assembly, smoke, run_checked,
+            expected_revision=identity["source_revision"])
+        run_checked(command)
+        run_checked(["cmake", "--build", str(build), "--parallel", "1",
+                     "--target", "installed_selected"])
+        image = check_selected_image(sdk, source, build, run_checked)
+        image.update({"name": name, "assembly": str(sdk / assembly)})
+        return image
+    return None
+
+
+class ConsumerCancelled(Exception):
+    """A peer already failed; this chain must stop without replacing its cause."""
+
+
+class ConsumerCommandError(ValueError):
+    """Retain a real command failure, separately from coordinator cancellation."""
+
+    def __init__(self, record, output):
+        self.exit_code = record["exit_code"]
+        if (self.exit_code == 130 and
+                isinstance(record.get("child_returncode"), int) and
+                record["child_returncode"] > 0):
+            self.exit_code = record["child_returncode"]
+        super().__init__(f"Consumer command failed; see {output / record['log']}")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--prefix", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--parallel", type=positive_parallel, default=2,
+                        help="Total concurrent consumer jobs (default: 2); "
+                             "each build uses one job")
     args = parser.parse_args(argv)
     prefix, output = args.prefix.absolute(), args.output.absolute()
     records = []
     report = {"schema_version": 1, "kind": "source_sdk_consumer_verification",
               "prefix": str(prefix), "status": "failed",
-              "physical_status": "not_executed", "commands": records}
+              "physical_status": "not_executed", "commands": records,
+              "selected_images": [], "parallel_jobs": args.parallel}
+    output_prepared = False
+    cancel = threading.Event()
+    failure_lock = threading.Lock()
+    failures = []
+
+    def remember_failure(index, error):
+        failure = {"consumer_index": index, "error": str(error),
+                   "exit_code": getattr(error, "exit_code", None)}
+        with failure_lock:
+            failures.append(failure)
+            cancel.set()
+        return failure
+
+    def command_runner(index, commands):
+        def run_checked(command):
+            if cancel.is_set():
+                raise ConsumerCancelled("Consumer cancelled after an earlier failure")
+            phase = len(commands)
+            log = output / f"command-{index:02d}-{phase:02d}.log"
+            environment = clean_environment()
+            # The worker owns one global job, including nested configure/check
+            # tools. NEXUS_BUILD_JOBS takes precedence in the shared runner.
+            environment.update(NEXUS_BUILD_JOBS="1",
+                               CMAKE_BUILD_PARALLEL_LEVEL="1",
+                               CTEST_PARALLEL_LEVEL="1")
+            result = process.run(command, cwd=Path.cwd(), env=environment,
+                                 log=log, timeout=180,
+                                 stage="source-sdk-consumer",
+                                 cancel_event=cancel)
+            receipt = json.loads(result.receipt_path.read_text())
+            record = {"argv": [str(value) for value in command],
+                      "exit_code": result.returncode, "log": log.name,
+                      "consumer_index": index, "phase_index": phase,
+                      "allocated_jobs": 1,
+                      "receipt": str(result.receipt_path.relative_to(output)),
+                      **{key: receipt[key] for key in (
+                          "started_ns", "finished_ns", "duration_seconds",
+                          "outcome", "child_returncode", "withdrawal_complete")}}
+            commands.append(record)
+            if result.returncode:
+                if (result.returncode == 130 and cancel.is_set() and
+                        not (receipt.get("child_returncode") is not None and
+                             receipt["child_returncode"] > 0)):
+                    raise ConsumerCancelled(
+                        "Running consumer withdrawn after an earlier failure")
+                raise ConsumerCommandError(record, output)
+            if not receipt["withdrawal_complete"]:
+                raise ValueError("Consumer process withdrawal was incomplete")
+            return result
+        return run_checked
+
     try:
-        if prefix.resolve() != prefix or output.resolve() != output or output.is_relative_to(prefix):
-            raise ValueError("Consumer output must be canonical and outside the SDK")
+        if (prefix.resolve() != prefix or output.resolve() != output or
+                output.is_relative_to(prefix) or prefix.is_relative_to(output)):
+            raise ValueError("Consumer SDK and output must be canonical and disjoint")
         if output.exists():
             if not (output / ".nexus-sdk-consumer-check").is_file():
-                raise ValueError("Existing output is not an owned consumer verification bundle")
+                raise ValueError(
+                    "Existing output is not an owned consumer verification bundle")
             shutil.rmtree(output)
         output.mkdir(parents=True)
-        (output / ".nexus-sdk-consumer-check").write_text("owned SDK consumer verification\n")
-        def run_checked(command):
-            result = subprocess.run(command, capture_output=True, text=True,
-                                    env=clean_environment(), timeout=180)
-            index = len(records)
-            log = output / f"command-{index:02d}.log"
-            log.write_text(result.stdout + result.stderr)
-            records.append({"argv": [str(value) for value in command],
-                            "exit_code": result.returncode, "log": log.name})
-            if result.returncode:
-                raise ValueError(f"Consumer command {index} failed; see {log}")
-            return result
+        (output / ".nexus-sdk-consumer-check").write_text(
+            "owned SDK consumer verification\n")
+        output_prepared = True
         sdk = prefix / "share/nexus/src"
-        run_checked([sys.executable, "-B", str(sdk / "cmake/package/package_source_sdk.py"),
-                     "--verify", str(sdk)])
+        command_runner(0, records)([
+            sys.executable, "-B", str(sdk / "cmake/package/package_source_sdk.py"),
+            "--verify", str(sdk)])
         identity = json.loads((sdk / ".nexus-source-sdk.json").read_text())
         if identity["publishable"] is not True or identity["source_dirty"]:
-            raise ValueError("Formal consumer verification requires a publishable committed source SDK")
+            raise ValueError(
+                "Formal consumer verification requires a publishable committed "
+                "source SDK")
         report["source_revision"] = identity["source_revision"]
         report["source_tree"] = identity["source_tree"]
-        for name, arm, chip in (("native", False, "native"),
-                                ("stm32", True, "stm32"), ("gd32", True, "gd32")):
-            source, build, command = prepare_consumer(prefix, output, name,
-                run_checked, arm=arm, chip=chip, expected_revision=identity["source_revision"])
-            run_checked(command)
-            run_checked(["cmake", "--build", str(build), "--parallel", "4",
-                         "--target", "installed_c", "installed_cpp"])
-            commands = json.loads((build / "compile_commands.json").read_text())
-            for entry in commands:
-                if Path(entry["file"]).name not in {"main.c", "main.cpp"}:
-                    continue
-                if any(value in entry["command"] for value in
-                       ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470")):
-                    raise ValueError("Private implementation input leaked into product source")
-            if arm:
-                for application in ("installed_c", "installed_cpp"):
-                    resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
-                    if resources["status"] != "passed":
-                        raise ValueError("MCU consumer resource/configuration binding failed")
-            else:
-                for application in ("installed_c", "installed_cpp"):
-                    run_checked([str(build / "bin" / application)])
-        for family in ("h743", "u575", "f103", "gd303", "g474"):
-            for backend in ("baremetal", "freertos"):
-                source, build, command = prepare_modern_consumer(
-                    prefix, output, family, backend, run_checked,
-                    expected_revision=identity["source_revision"])
-                run_checked(command)
-                run_checked(["cmake", "--build", str(build), "--parallel", "2",
-                             "--target", "installed_modern"])
-                commands = json.loads((build / "compile_commands.json").read_text())
-                products = [entry for entry in commands
-                            if Path(entry["file"]).resolve() == source / "main.c"]
-                if len(products) != 1 or any(value in products[0]["command"]
-                        for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
-                    raise ValueError("Modern consumer private inputs leaked into product")
-                image = build / "bin/installed_modern.elf"
-                resources = json.loads(
-                    (build / "bin/installed_modern.resources.json").read_text())
-                if resources["status"] != "passed" or image.stat().st_size == 0:
-                    raise ValueError("Modern consumer linked resource binding failed")
-                config = Path((build / "resolved-config.txt").read_text())
-                retention_path = build / "provider-retention.json"
-                run_checked([sys.executable, "-B",
-                    str(sdk / "tools/measurement/retention.py"),
-                    "--elf", str(image), "--bindings", str(config / "bindings.c"),
-                    "--resolved", str(config / "resolved.json"),
-                    "--output", str(retention_path)])
-                if json.loads(retention_path.read_text())["status"] != "passed":
-                    raise ValueError("Modern consumer provider retention failed")
+        # The maintained transport tuples remain the sole plan authority.
+        plan = ([("base", specification) for specification in BASE_CONSUMERS] +
+                [("modern", specification) for specification in MODERN_CONSUMERS] +
+                [("selected", specification) for specification in SELECTED_CONSUMERS])
+        results = [None] * len(plan)
+        local_records = [[] for _ in plan]
+        workers = min(args.parallel, len(plan))
+        report["consumer_workers"] = workers
+
+        def work(position):
+            kind, specification = plan[position]
+            name = (specification[0] + " " + specification[1]
+                    if kind == "modern" else
+                    ("selected " if kind == "selected" else "") + specification[0])
+            outcome = {"consumer_index": position + 1, "name": name,
+                       "status": "cancelled"}
+            try:
+                if cancel.is_set():
+                    raise ConsumerCancelled("Consumer cancelled before admission")
+                image = verify_consumer(kind, specification, prefix, output,
+                                        identity, command_runner(
+                                            position + 1, local_records[position]))
+                outcome["status"] = "passed"
+                if image is not None:
+                    outcome["selected_image"] = image
+            except ConsumerCancelled as error:
+                outcome["error"] = str(error)
+            except Exception as error:
+                outcome["status"] = "failed"
+                outcome["failure"] = remember_failure(position + 1, error)
+            return outcome
+
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=workers)
+        started = {}
+        pending = set()
+        next_position = 0
+        interrupted = False
+        previous_handlers = {}
+
+        def interrupt(signum, frame):
+            nonlocal interrupted
+            del signum, frame
+            # Raising here could interrupt shutdown itself before its report.
+            interrupted = True
+            cancel.set()
+
+        # Signals reach only the coordinator; set cancellation before waiting
+        # for workers so every started process tree can be withdrawn and joined.
+        if threading.current_thread() is threading.main_thread():
+            for signum in (signal.SIGINT, signal.SIGTERM):
+                previous_handlers[signum] = signal.signal(signum, interrupt)
+        try:
+            while (next_position < len(plan) and len(pending) < workers and
+                   not cancel.is_set()):
+                future = executor.submit(work, next_position)
+                started[future] = next_position
+                pending.add(future)
+                next_position += 1
+            while pending:
+                completed, pending = concurrent.futures.wait(
+                    pending, return_when=concurrent.futures.FIRST_COMPLETED)
+                for future in completed:
+                    results[started[future]] = future.result()
+                while (next_position < len(plan) and len(pending) < workers and
+                       not cancel.is_set()):
+                    future = executor.submit(work, next_position)
+                    started[future] = next_position
+                    pending.add(future)
+                    next_position += 1
+        except KeyboardInterrupt:
+            interrupted = True
+            cancel.set()
+        finally:
+            # Unexpected coordinator errors must also release running children.
+            if pending or failures:
+                cancel.set()
+            executor.shutdown(wait=True, cancel_futures=True)
+            for future, position in started.items():
+                if future.cancelled():
+                    results[position] = {"consumer_index": position + 1,
+                                         "status": "cancelled"}
+                else:
+                    results[position] = future.result()
+            for signum, handler in previous_handlers.items():
+                signal.signal(signum, handler)
+            for commands in local_records:
+                records.extend(commands)
+            report["consumers"] = [item if item is not None else {
+                "consumer_index": index + 1, "status": "not_started"}
+                for index, item in enumerate(results)]
+            report["selected_images"] = [item["selected_image"] for item in results
+                if item is not None and "selected_image" in item]
+        if interrupted:
+            error = ValueError("Consumer verification interrupted")
+            error.exit_code = 130
+            remember_failure(0, error)
+        if failures:
+            report["failures"] = failures
+            report["first_failure"] = failures[0]
+            raise ValueError(failures[0]["error"])
+        if len(results) != len(plan) or any(
+                item is None or item["status"] != "passed" for item in results):
+            raise ValueError("Consumer plan was not completely joined and verified")
         report["status"] = "passed"
-    except (OSError, ValueError, subprocess.TimeoutExpired, KeyError) as error:
-        report["error"] = str(error)
-        print(f"Source SDK consumers rejected: {error}", file=sys.stderr)
-    if output.is_dir() and (output / ".nexus-sdk-consumer-check").is_file():
-        (output / "verification.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    except Exception as error:
+        if not failures:
+            remember_failure(0, error)
+        report["failures"] = failures
+        report["first_failure"] = failures[0]
+        report["error"] = failures[0]["error"]
+        print(f"Source SDK consumers rejected: {report['error']}",
+              file=sys.stderr)
+    if (output_prepared and output.is_dir() and
+            (output / ".nexus-sdk-consumer-check").is_file()):
+        (output / "verification.json").write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n")
     return 0 if report["status"] == "passed" else 1
 
 

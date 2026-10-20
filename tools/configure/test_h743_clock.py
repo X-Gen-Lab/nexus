@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import configure as gate
+from tools.configure import bindings, configure as gate
 
 
 class H743ClockConfigurationTests(unittest.TestCase):
@@ -77,6 +77,42 @@ class H743ClockConfigurationTests(unittest.TestCase):
         facts["clock_profiles"]["hsi32-fixed-cache-off"]["apb1_hz"] = 16000000
         with self.assertRaises(ValueError):
             gate.validate_soc(facts, "STM32H743ZIT6")
+
+    def test_selected_flash_owns_cold_timing_inside_platform_lifecycle(self):
+        fixture = gate.ROOT / "tests/contracts/h743_assembly/peripherals.toml"
+        original = fixture.read_text().replace(
+            '"../../../boards/stm32h743zi_hsi_reference"',
+            '"' + str(gate.ROOT / "boards/stm32h743zi_hsi_reference") + '"')
+        for frequency in (32, 64):
+            with self.subTest(frequency=frequency):
+                path = self.directory / "flash.toml"
+                path.write_text(original.replace("hsi64-fixed-cache-off",
+                    f"hsi{frequency}-fixed-cache-off"))
+                _, source = bindings.emit(gate.resolve_ir(path))
+                self.assertIn("static nx_stm32h743_flash_timing_state_t", source)
+                system = source.index("nx_stm32h743_system_start(")
+                timing = source.index("nx_stm32h743_flash_timing_initialize(")
+                controller = source.index("result.primary = prepare_")
+                self.assertLess(system, timing)
+                self.assertLess(timing, controller)
+                self.assertIn("nx_platform_stop_impl(diagnostic, true)",
+                              source[timing:controller])
+                self.assertLess(source.index("nx_stm32h743_flash_timing_stop("),
+                                source.index("nx_stm32h743_system_stop("))
+
+    def test_unselected_flash_has_no_timing_owner_or_calls(self):
+        _, source = bindings.emit(gate.resolve_ir(self.assembly()))
+        self.assertNotIn("flash_timing_", source)
+
+    def test_flash_cache_profile_requires_an_implemented_joint_owner(self):
+        fixture = gate.ROOT / "tests/contracts/h743_assembly/peripherals.toml"
+        original = fixture.read_text().replace(
+            '"../../../boards/stm32h743zi_hsi_reference"',
+            '"' + str(gate.ROOT / "boards/stm32h743zi_hsi_reference") + '"')
+        path = self.directory / "cache-flash.toml"
+        path.write_text(original.replace("cache-off", "cache-on"))
+        with self.assertRaisesRegex(ValueError, "Flash.*cache|cache.*Flash"):
+            gate.resolve_ir(path)
 
 
 if __name__ == "__main__":

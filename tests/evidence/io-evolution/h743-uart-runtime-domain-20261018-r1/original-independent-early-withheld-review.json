@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "kind": "early-readonly-H743-UART-runtime-domain-lifecycle-code-review",
+  "reviewed_at_utc": "2026-10-18T09:40:08.115855+00:00",
+  "decision": "WITHHOLD_FINAL_PASS_PENDING_TARGETED_STOP_TDD_AND_FINAL_EVIDENCE",
+  "open_static_candidate": "RX shared-TX stop delegation can bypass the mode final-settle domain guard; author is executing targeted TDD, not yet independently reviewed.",
+  "scope": "Exact d63810-source early code/model/lifecycle review only; no tests/builds/network or source/index/Main edits by this reviewer. Not a runtime qualification or final evidence PASS.",
+  "candidate": {
+    "root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "base": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+    "freeze": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/source-freeze-candidate.json",
+    "freeze_sha256": "d638fb84131c47a0e8f5c58625a0729ce288c8e9ecd7260a536ca3e54ba06b48",
+    "source_count": 10,
+    "source_bytes": 164829,
+    "preserved10_full_gzip_sources_crc_size_sha_verified": true,
+    "sources": [
+      {
+        "path": "soc/stm32h743/drivers/uart_dma.c",
+        "bytes": 24139,
+        "sha256": "3340215c2b2d4cefe7776476194c0f7dd08870e481e076c95f33f27b6f182232",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__drivers__uart_dma.c.gz",
+        "gzip_sha256": "5da22cae754cfbe7b8496ac4c713a40c1b816745adda6ed36080343064f0f5df"
+      },
+      {
+        "path": "soc/stm32h743/drivers/uart_receive.c",
+        "bytes": 27607,
+        "sha256": "daafd70e6b3fdf7a797843f68fc9b50dc33d5ea37c481915c1e374a5159bc7a8",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__drivers__uart_receive.c.gz",
+        "gzip_sha256": "77ca5d2e5e6333c504d0efafd66aa524aca979ae869bc36d7e8f3e7d13dad018"
+      },
+      {
+        "path": "soc/stm32h743/private/stm32h743_dma.h",
+        "bytes": 2006,
+        "sha256": "9d1ce1c7e6e78873e82ae60eb55bdc5359b6d06344c73ad19d4488c182565b10",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__private__stm32h743_dma.h.gz",
+        "gzip_sha256": "a5dc8467dbb4280dd6674e0f805df12c67ba726308ad780b068c41303e3db594"
+      },
+      {
+        "path": "soc/stm32h743/private/stm32h743_uart_receive.h",
+        "bytes": 2376,
+        "sha256": "f850e08354ef2f1d16b9bdcb3ba02d851fecab68a1adb0b5d6b90a98d3cc5e76",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__private__stm32h743_uart_receive.h.gz",
+        "gzip_sha256": "4ff2d1434f33ba3a28f49c1efc8b4c4d68e071873c214ffd7006fb3566e62e25"
+      },
+      {
+        "path": "tests/google/h743_dma_test.cpp",
+        "bytes": 31042,
+        "sha256": "eefefced87b53c9115559b58b882433f764a0f1f0fcd810be1d3034094904624",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_dma_test.cpp.gz",
+        "gzip_sha256": "0460966496cdd8d38b5a7fd11e12885c71c415f72fe2ceca93a73677d06fb141"
+      },
+      {
+        "path": "tests/google/h743_receive_test.cpp",
+        "bytes": 34716,
+        "sha256": "13c2ba14fd40c02c2bebe0a3d904b8a6228266546fc42ef7dacbc2b2446d4bbb",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_receive_test.cpp.gz",
+        "gzip_sha256": "c3d3dec5303c26efc29e7e47306eb4f68f906ae639c3f0254716079ca2357755"
+      },
+      {
+        "path": "tests/google/h743_dma_model.cpp",
+        "bytes": 5956,
+        "sha256": "d178c989d7fe3f44a023e02dac33427890cc31d14c9c28f72640e0b7250946b0",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_dma_model.cpp.gz",
+        "gzip_sha256": "0ebc6128499b9cd727beaeae76b8a3fa7464ccab7b8876bebd110742521cc972"
+      },
+      {
+        "path": "tests/google/h743_dma_model.h",
+        "bytes": 2217,
+        "sha256": "8d397e54cd41f071e7a3d6c7a73f89e6ba47fa993324f14eb9d37ba0da7f63c2",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/tests__google__h743_dma_model.h.gz",
+        "gzip_sha256": "91ac102dd3a247e1a66be060d93cf04d55af665e6e6ec954cdffc6d6c34eb923"
+      },
+      {
+        "path": "soc/stm32h743/drivers/uart.c",
+        "bytes": 20027,
+        "sha256": "1d67d5573623c66e1fe1359706018c1370ee195fc4cc2a7613cc852a01c0ca82",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__drivers__uart.c.gz",
+        "gzip_sha256": "a061a37084cca967bb263438e42e68b82c5e1a1f687ad0c0ed76aff5e2c9a766"
+      },
+      {
+        "path": "soc/stm32h743/private/stm32h743_provider.h",
+        "bytes": 14743,
+        "sha256": "86a14eeb3bb5464266f507a38243ed8baff187f91f8262cc2e46d4d7ec5b2a36",
+        "preserved_gzip": "/dev/shm/nexus-h743-uart-runtime-feature-20261018-r1/candidate-d638-sources/soc__stm32h743__private__stm32h743_provider.h.gz",
+        "gzip_sha256": "e9355f1aae47731a6b10e80668450e23a437725af98eb0eef5fb8e5b61b3a2f0"
+      }
+    ]
+  },
+  "authorization": {
+    "path": "/dev/shm/nexus-h743-uart-runtime-authorization-20261018-r1/plan-r2.json",
+    "sha256": "c4e2c0aa8982e50bf0a225a55f909320cd00b5e7efefdba54070d3a2197033f6"
+  },
+  "sound_code_properties": [
+    "Both modes observe DMA1EN and both DMA1RST/DMA2RST, reflecting shared DMAMUX1 reset. Sticky bools are only in selected mode state, not the ordinary UART state.",
+    "Observed retained-domain loss permanently latches domain_lost, retains accepted storage and RX FILLING state, and replaces terminal SUCCESS with STATE without overwriting a prior CANCELLED/TIMEOUT/IO.",
+    "Both owned stream and USART3 NVIC disable operations are attempted. DSB/ISB plus independent actual enable-bit reads prove isolation; the algorithm does not confuse IRQ_AVAILABLE or control-call status with enable-off evidence.",
+    "If either owned vector cannot be proved disabled, code saves the interrupt mask, observes the platform fault and explicitly loops forever. Other vectors are untouched.",
+    "DMA/mux accesses use guarded domain reads/writes. A blocked read returning zero is insufficient for release because withdrawal and final-settle domain predicates must also succeed.",
+    "Cache clean and pre/post invalidate execute outside the saved mask while request/FILLING loans remain retained. Reentrant observations remain sticky; callback returns are rechecked before launch/publish.",
+    "TX DMA service checks domain after final acknowledgement before active=NULL and SETTLED. RX finish checks after cache, DMA and UART acknowledgements before publish/abort.",
+    "RX ordinary-PIO TX service uses the shared private prepare/settle leaves in one saved mask and checks the mode again immediately before its last request access. No new public ABI/registry/second TX machine is added.",
+    "Ordinary submit/cancel preserve task-context and argument ordering; pure span/alias checks precede admission. The ordinary transmit IRQ body is byte-identical to the base."
+  ],
+  "preservation": {
+    "ordinary_transmit_irq_body_bytes": 1114,
+    "ordinary_transmit_irq_body_sha256": "d95e9646fec8d75d1e6fa3daab5d3f03f1b97bb1b70f05b249c592899aec3ad5",
+    "ordinary_transmit_irq_exact": true,
+    "original_TX_test_from_first_class_to_original_end_preserved_as_contiguous_bytes": true,
+    "original_RX_test_from_first_class_to_original_end_preserved_as_contiguous_bytes": true,
+    "TX_candidate_diff_lines": "+308/-0",
+    "RX_candidate_diff_lines": "+334/-0",
+    "ordinary_state_fields_unchanged": true,
+    "no_actual_ARM_cost_or_layout_measurement_by_reviewer": true
+  },
+  "stop_candidate": {
+    "id": "UART-EARLY-STOP-01",
+    "classification": "CONCRETE_STATIC_PATH_AWAITING_AUTHOR_TDD",
+    "affected": "RX block profile with an accepted shared PIO TX request during port stop.",
+    "chain": [
+      "uart_receive.c stop checks the mode, drains RX and clears DMA duties, then delegates to nx_stm32h743_uart_ops.stop(&s->uart).",
+      "Ordinary stop can cancel the shared TX and call ordinary service, whose private prepare/settle path deliberately knows no RX domain.",
+      "A real domain loss triggered on the ordinary CR1 source-withdrawal write can therefore occur inside the delegation. Outer mode checks occur only after ordinary stop returns and may be too late if the request was already SETTLED."
+    ],
+    "required_real_oracle": "No RX stream, real accepted shared PIO TX with progress/TC facts; inject each gateoff/DMA1 reset/DMA2 reset after accepted CR1 withdrawal inside stop. Require original pointer/borrow and Q, BUSY stop, actual owned-vector isolation, and first-terminal preservation.",
+    "author_response": "Root and author accepted same10-window regression-first validation. Author preserved d638 sources plus matching seven binaries before the new test. No targeted RED/GREEN result is claimed by this early report."
+  },
+  "nonreturn_test_oracle": {
+    "id": "UART-EARLY-ORACLE-02",
+    "classification": "COVERAGE_STRENGTHENING_NOT_CURRENT_PRODUCTION_DEFECT",
+    "observation": "Both DomainChild(fault=true) bodies can return after service without an explicit unexpected-return failure. The common wrapper then publishes observed and pauses, so a future returning fault path could satisfy the existing fault/masked/borrowed assertions.",
+    "recommended_change": "Explicit ADD_FAILURE after the faulting service call and/or trace.returned=false assertion for the fault branch. Current code already loops forever, so first GREEN coverage is honest and does not justify a manufactured production RED.",
+    "author_response": "Accepted. Author will separately strengthen the oracle after stop TDD, preserving the earlier source/results and describing bounded observation rather than an infinite-time proof."
+  },
+  "external_model_review": [
+    "DMA1 reset clears the modeled DMA1 engine and DMAMUX1; DMA2 reset clears only DMAMUX1 while preserving DMA1 EN/NDTR/error facts. Gateoff alone does not fabricate DMA completion.",
+    "Forbidden DMA/mux accesses are counted, not silently admitted. IRQ enable/pending/active facts are separate and dispatch is refused while the real modeled interrupt mask is saved.",
+    "Cache/MMIO callbacks alter external hardware facts rather than private SUT stage fields. Forked Q/fault children retain their storage until parent kill/wait; child termination is not claimed as provider cleanup or actual MCU DMA drain."
+  ],
+  "execution_boundary": {
+    "tests_executed_by_reviewer": 0,
+    "independent_final_raw_XML_ELF_binding": "PENDING",
+    "author_reported_only": {
+      "initial": "TX66 fail30/RX67 fail36, original35/31 pass, then same133 GREEN",
+      "mask_oracle": "whole135 RED2 then GREEN135",
+      "candidate_latest_debug": "TX67+RX68+ordinary29/45/38/9/11 =267 GREEN; ASAN configure only at that notification"
+    },
+    "no_inheritance": "Stop followup, nonreturn enhancement, final Debug/ASAN/style/ordinary receipts, ARM linked cost/layout, SDK and normal full gates require the later exact tuple."
+  },
+  "review_binding_note": "A seal attempt correctly rejected the moving files/ latest RX test copy after the author began its explicitly authorized stop-regression edit. No report was written on that failed binding attempt. This report binds all10 preserved candidate-d638-sources gzip originals, each independently CRC/size/SHA verified, rather than mislabeling latest WIP as the old candidate. This was metadata navigation, not a production or test RED.",
+  "remaining": [
+    "Targeted stop whole-program RED or explicit falsification, then minimal fix and same whole GREEN.",
+    "Separate honest nonreturn coverage strengthening.",
+    "Final frozen source/raw/receipt/fresh XML/matched Debug+ASAN/ordinary/style binding and full independent review.",
+    "Root normal complete hooks plus separately scoped ARM/SDK/HIL evidence."
+  ],
+  "review_side_effects": "Only this new exec-shm report is written. No source/index/Main change or test/build/network execution."
+}

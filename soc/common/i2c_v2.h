@@ -9,6 +9,7 @@
 #ifndef NX_I2C_V2_H
 #define NX_I2C_V2_H
 #include "nexus/io/i2c.h"
+#include "nexus/io/i2c_long.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,6 +51,7 @@ typedef struct {
 } nx_i2c_v2_endpoint_state_t;
 extern const nx_i2c_ops_t nx_i2c_v2_ops;
 extern const nx_i2c_endpoint_ops_t nx_i2c_v2_endpoint_ops;
+extern const nx_i2c_long_ops_t nx_i2c_v2_long_endpoint_ops;
 /** \brief Acquire cold disabled hardware after the SoC has acquired its gate.
  * \param[in,out] port: Exact static context with reviewed finite poll budget.
  * \return Success or rejection; retained requires ordinary stop cleanup.

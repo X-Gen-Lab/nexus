@@ -1,0 +1,475 @@
+Running main() from gmock_main.cc
+[==========] Running 47 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 47 tests from H743System
+[ RUN      ] H743System.ForeignVUserTrimRejectsAllFixedProfilesBeforeMutation
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+32000000/0
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 3
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 14
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:44: Failure
+Expected equality of these values:
+  (0x1UL << (0U)) | (0x1UL << (2U))
+    Which is: 5
+  g_h743_model.rcc.CR
+    Which is: 45
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+32000000/0
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 3
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 14
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:44: Failure
+Expected equality of these values:
+  (0x1UL << (0U)) | (0x1UL << (2U))
+    Which is: 5
+  g_h743_model.rcc.CR
+    Which is: 45
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+32000000/3
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 7
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 14
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:42: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.cache_enable_calls
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:44: Failure
+Expected equality of these values:
+  (0x1UL << (0U)) | (0x1UL << (2U))
+    Which is: 5
+  g_h743_model.rcc.CR
+    Which is: 45
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+32000000/3
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 7
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 14
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:42: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.cache_enable_calls
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:44: Failure
+Expected equality of these values:
+  (0x1UL << (0U)) | (0x1UL << (2U))
+    Which is: 5
+  g_h743_model.rcc.CR
+    Which is: 45
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+64000000/0
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 13
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+64000000/0
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 13
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+64000000/3
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 5
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 13
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:42: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.cache_enable_calls
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:36: Failure
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result.primary
+    Which is: 0
+64000000/3
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:39: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_nx_stm32h743_system.remaining_effects
+    Which is: 5
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:40: Failure
+Value of: g_nx_stm32h743_system.started
+  Actual: true
+Expected: false
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:41: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.writes
+    Which is: 13
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:42: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.cache_enable_calls
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:45: Failure
+Expected equality of these values:
+  0U
+    Which is: 0
+  g_h743_model.timer.CR1
+    Which is: 1
+
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/h743_system_test.cpp:46: Failure
+Value of: g_h743_model.irq_enabled[TIM2_IRQn]
+  Actual: true
+Expected: false
+
+[  FAILED  ] H743System.ForeignVUserTrimRejectsAllFixedProfilesBeforeMutation (0 ms)
+[ RUN      ] H743System.VReadOnlyCalibrationDoesNotChangeFixedTrimAdmission
+[       OK ] H743System.VReadOnlyCalibrationDoesNotChangeFixedTrimAdmission (0 ms)
+[ RUN      ] H743System.StartedOwnerBusyPrecedesForeignVUserTrim
+[       OK ] H743System.StartedOwnerBusyPrecedesForeignVUserTrim (0 ms)
+[ RUN      ] H743System.RetainedDividerBusyPrecedesForeignVUserTrim
+[       OK ] H743System.RetainedDividerBusyPrecedesForeignVUserTrim (0 ms)
+[ RUN      ] H743System.NonVFixedNominalContractDoesNotUseVTrimLayout
+[       OK ] H743System.NonVFixedNominalContractDoesNotUseVTrimLayout (0 ms)
+[ RUN      ] H743System.Hsi64EstablishesIndependentOneMhzTimer
+[       OK ] H743System.Hsi64EstablishesIndependentOneMhzTimer (0 ms)
+[ RUN      ] H743System.TimebasePrescalerUpdateNeverExportsATrgoPulse
+[       OK ] H743System.TimebasePrescalerUpdateNeverExportsATrgoPulse (0 ms)
+[ RUN      ] H743System.WrapDuringSourceWithdrawalIsClearedBeforeDroppingTimer
+[       OK ] H743System.WrapDuringSourceWithdrawalIsClearedBeforeDroppingTimer (0 ms)
+[ RUN      ] H743System.RefusedQuietMmsRestorationKeepsQuiescentTimerAndGate
+[       OK ] H743System.RefusedQuietMmsRestorationKeepsQuiescentTimerAndGate (0 ms)
+[ RUN      ] H743System.CacheOrUnknownClockIsRejectedWithoutWrites
+[       OK ] H743System.CacheOrUnknownClockIsRejectedWithoutWrites (0 ms)
+[ RUN      ] H743System.PowerNotReadyCannotStartOrWriteRuntimeRamHardware
+[       OK ] H743System.PowerNotReadyCannotStartOrWriteRuntimeRamHardware (0 ms)
+[ RUN      ] H743System.QueuedFlashWorkRejectsBeforeHsi32DividerOrTimerMutation
+[       OK ] H743System.QueuedFlashWorkRejectsBeforeHsi32DividerOrTimerMutation (0 ms)
+[ RUN      ] H743System.ArmedFlashPulseRejectsBeforeHsi32DividerOrTimerMutation
+[       OK ] H743System.ArmedFlashPulseRejectsBeforeHsi32DividerOrTimerMutation (0 ms)
+[ RUN      ] H743System.ExistingTimerOrIrqCannotBeAdopted
+[       OK ] H743System.ExistingTimerOrIrqCannotBeAdopted (0 ms)
+[ RUN      ] H743System.ForeignTimerTriggerOutputAndCaptureRejectBeforeMutation
+[       OK ] H743System.ForeignTimerTriggerOutputAndCaptureRejectBeforeMutation (0 ms)
+[ RUN      ] H743System.LatentTimerStateRejectsAfterGateWithoutResetOrTimerWrites
+[       OK ] H743System.LatentTimerStateRejectsAfterGateWithoutResetOrTimerWrites (0 ms)
+[ RUN      ] H743System.RefusedGateRollbackRetainsOnlyGateWithoutTakingForeignTimer
+[       OK ] H743System.RefusedGateRollbackRetainsOnlyGateWithoutTakingForeignTimer (0 ms)
+[ RUN      ] H743System.TimerWriteRefusalRetainsFailedCleanupForRetry
+[       OK ] H743System.TimerWriteRefusalRetainsFailedCleanupForRetry (0 ms)
+[ RUN      ] H743System.IrqRefusalRetainsTimerUntilActualDetach
+[       OK ] H743System.IrqRefusalRetainsTimerUntilActualDetach (0 ms)
+[ RUN      ] H743System.PendingWrapIsFoldedOnceAndAcknowledgedWithoutDoubleCount
+[       OK ] H743System.PendingWrapIsFoldedOnceAndAcknowledgedWithoutDoubleCount (0 ms)
+[ RUN      ] H743System.IdentityRequiresTwoMibAndCorrectGroup
+[       OK ] H743System.IdentityRequiresTwoMibAndCorrectGroup (0 ms)
+[ RUN      ] H743System.InvalidPollAndUnprivilegedCallerHaveNoEffects
+[       OK ] H743System.InvalidPollAndUnprivilegedCallerHaveNoEffects (0 ms)
+[ RUN      ] H743System.RefusedUpdateFlagClearCannotPublishInventedEpoch
+[       OK ] H743System.RefusedUpdateFlagClearCannotPublishInventedEpoch (0 ms)
+[ RUN      ] H743System.RefusedPrescalerUpdateCannotEnableIncorrectTimeDomain
+[       OK ] H743System.RefusedPrescalerUpdateCannotEnableIncorrectTimeDomain (0 ms)
+[ RUN      ] H743System.StaleUpdateFlagCannotProveRefusedPrescalerDelivery
+[       OK ] H743System.StaleUpdateFlagCannotProveRefusedPrescalerDelivery (0 ms)
+[ RUN      ] H743System.IsolatedTimerFaultStillOffersMaskedTerminalObservation
+[       OK ] H743System.IsolatedTimerFaultStillOffersMaskedTerminalObservation (0 ms)
+[ RUN      ] H743System.UnisolatedTimerFaultOffersMaskedNonreturningObservation
+[       OK ] H743System.UnisolatedTimerFaultOffersMaskedNonreturningObservation (0 ms)
+[ RUN      ] H743System.ReturningObserverCannotResumeIsolatedTimerProgress
+[       OK ] H743System.ReturningObserverCannotResumeIsolatedTimerProgress (1009 ms)
+[ RUN      ] H743System.ReturningObserverCannotResumeUnisolatedTimerProgress
+[       OK ] H743System.ReturningObserverCannotResumeUnisolatedTimerProgress (1005 ms)
+[ RUN      ] H743System.FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer
+[       OK ] H743System.FaultBeforeSnapshotMaskCannotResumeDeadlineConsumer (0 ms)
+[ RUN      ] H743System.Hsi32PublishesOnlyAfterDividerActuallyPropagates
+[       OK ] H743System.Hsi32PublishesOnlyAfterDividerActuallyPropagates (0 ms)
+[ RUN      ] H743System.UnsupportedFrequencyRejectsBeforeAnyHardwareWrite
+[       OK ] H743System.UnsupportedFrequencyRejectsBeforeAnyHardwareWrite (0 ms)
+[ RUN      ] H743System.WrittenDividerWithoutReadyFlagCannotStartTimeOrIrq
+[       OK ] H743System.WrittenDividerWithoutReadyFlagCannotStartTimeOrIrq (0 ms)
+[ RUN      ] H743System.RefusedDividerWriteCannotBeReportedAsClockAdmission
+[       OK ] H743System.RefusedDividerWriteCannotBeReportedAsClockAdmission (0 ms)
+[ RUN      ] H743System.TimerFailureRollsBackOnlyOwnedDividerAfterTimerWithdrawal
+[       OK ] H743System.TimerFailureRollsBackOnlyOwnedDividerAfterTimerWithdrawal (0 ms)
+[ RUN      ] H743System.ClockRestoreFailureRetainsResponsibilityUntilActualReady
+[       OK ] H743System.ClockRestoreFailureRetainsResponsibilityUntilActualReady (0 ms)
+[ RUN      ] H743System.FailedTimerWithdrawalDoesNotRestoreClockUnderLiveTimer
+[       OK ] H743System.FailedTimerWithdrawalDoesNotRestoreClockUnderLiveTimer (0 ms)
+[ RUN      ] H743System.CacheProfileOwnsBothCachesUntilTimerIsWithdrawn
+[       OK ] H743System.CacheProfileOwnsBothCachesUntilTimerIsWithdrawn (0 ms)
+[ RUN      ] H743System.CacheEnableFailureRollsBackOwnedCpuStateBeforeClock
+[       OK ] H743System.CacheEnableFailureRollsBackOwnedCpuStateBeforeClock (0 ms)
+[ RUN      ] H743System.FailedCacheRollbackRetainsOwnersAndDefersClockRestoration
+[       OK ] H743System.FailedCacheRollbackRetainsOwnersAndDefersClockRestoration (0 ms)
+[ RUN      ] H743System.CacheOffNeverInvokesColdCacheControl
+[       OK ] H743System.CacheOffNeverInvokesColdCacheControl (0 ms)
+[ RUN      ] H743System.CacheAdmissionRejectionDoesNotInventCleanupOwnership
+[       OK ] H743System.CacheAdmissionRejectionDoesNotInventCleanupOwnership (0 ms)
+[ RUN      ] H743System.StaleCacheResponsibilityCannotEnterAnotherColdEpoch
+[       OK ] H743System.StaleCacheResponsibilityCannotEnterAnotherColdEpoch (0 ms)
+[ RUN      ] H743System.DividerRestorationRefusalRetainsOnlyDividerResponsibility
+[       OK ] H743System.DividerRestorationRefusalRetainsOnlyDividerResponsibility (0 ms)
+[ RUN      ] H743System.DividerStartAndRollbackTimeoutsPreserveBothFailureReasons
+[       OK ] H743System.DividerStartAndRollbackTimeoutsPreserveBothFailureReasons (0 ms)
+[ RUN      ] H743System.UnknownCacheCombinationRejectsWithoutHardwareEffects
+[       OK ] H743System.UnknownCacheCombinationRejectsWithoutHardwareEffects (0 ms)
+[ RUN      ] H743System.SelectorOnlyRollbackFailureKeepsCpuAndClockResponsibility
+[       OK ] H743System.SelectorOnlyRollbackFailureKeepsCpuAndClockResponsibility (0 ms)
+[----------] 47 tests from H743System (2017 ms total)
+
+[----------] Global test environment tear-down
+[==========] 47 tests from 1 test suite ran. (2017 ms total)
+[  PASSED  ] 46 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] H743System.ForeignVUserTrimRejectsAllFixedProfilesBeforeMutation
+
+ 1 FAILED TEST

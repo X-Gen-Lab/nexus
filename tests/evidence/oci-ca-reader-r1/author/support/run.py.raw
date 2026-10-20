@@ -1,0 +1,53 @@
+from pathlib import Path
+import json
+import os
+import shutil
+import sys
+import time
+
+ROOT = Path('/tmp/nexus-h743-fixed-hsi-s0-20261018')
+TMP = Path('/tmp/nexus-oci-ca-reader-20261018-r1')
+OUT = Path('/workspace/nexus-io-recovery-20261018/features/oci-ca-reader-r1')
+sys.path.insert(0, str(ROOT))
+from tools.dev.process import run
+
+
+def allocated(root):
+    return root.stat().st_blocks * 512 + sum(
+        path.lstat().st_blocks * 512 for path in root.rglob('*'))
+
+
+def guard():
+    cgroup = Path('/sys/fs/cgroup')
+    events = dict(line.split() for line in
+                  (cgroup / 'memory.events').read_text().splitlines())
+    facts = {'tmp_free': shutil.disk_usage('/tmp').free,
+             'persistent_free': shutil.disk_usage('/workspace').free,
+             'memory_available': int((cgroup / 'memory.max').read_text()) -
+                                 int((cgroup / 'memory.current').read_text()),
+             'events': events, 'task_tmp_allocated': allocated(TMP),
+             'task_persistent_allocated': allocated(OUT)}
+    assert facts['tmp_free'] >= 200 * 1024**2, facts
+    assert facts['persistent_free'] >= 64 * 1024**2, facts
+    assert facts['memory_available'] >= 600 * 1024**2, facts
+    assert all(int(events[name]) == 0 for name in
+               ('oom', 'oom_kill', 'oom_group_kill')), facts
+    assert facts['task_tmp_allocated'] <= 20 * 1024**2, facts
+    assert facts['task_persistent_allocated'] <= 256 * 1024, facts
+    with (TMP / 'guards.jsonl').open('a') as stream:
+        stream.write(json.dumps({'time_ns': time.time_ns(), **facts}) + '\n')
+    return facts
+
+
+if __name__ == '__main__':
+    label, command = sys.argv[1], sys.argv[2:]
+    guard()
+    result = run(command, cwd=ROOT,
+                 env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1',
+                      'TMPDIR': str(TMP), 'NEXUS_BUILD_JOBS': '1',
+                      'CMAKE_BUILD_PARALLEL_LEVEL': '1'},
+                 log=TMP / 'runs' / (label + '.log'), timeout=120,
+                 stage=label)
+    guard()
+    print('actual exit', result.returncode)
+    sys.exit(result.returncode)

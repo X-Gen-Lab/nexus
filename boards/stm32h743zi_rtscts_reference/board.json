@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "stm32h743zi-rtscts-reference",
+  "soc": "STM32H743ZIT6",
+  "soc_family": "stm32h743",
+  "source_revision": "Exact package/AF silicon reference only; no asserted PCB connector or peer wiring",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {
+      "id": "uart-flow",
+      "controller": "USART3",
+      "route": "usart3-pd8-pd9-pd11-pd12-rtscts"
+    }
+  ],
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "unknowns": [
+    "No fabricated PCB/net/connector facts; actual electrical route, peer voltage/polarity/reaction delay and reset/AF handoff unobserved.",
+    "No HIL executed; this software-reference package does not qualify a Nucleo VCP path for RTS/CTS.",
+    "RTS and CTS are active-low hardware controls; RTS alone does not guarantee a peer stops before overrun."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32h743zi.pdf",
+      "scope": "DS12110 Rev11 Table10 exact STM32H743ZIT6 LQFP144 PD8/PD9/PD11/PD12 AF7"
+    }
+  ]
+}

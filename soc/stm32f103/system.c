@@ -15,7 +15,6 @@ nx_stm32f103_system_t g_nx_stm32f103_system = {
 #endif
 #ifndef NX_F103_FLASH_KIB
 #define NX_F103_FLASH_KIB() (*(volatile const uint16_t*)UINT32_C(0x1ffff7e0))
-#define NX_F103_DEVICE_ID() (DBGMCU->IDCODE)
 #endif
 #define NX_F103_COUNTER_MAX    UINT32_C(65535)
 #define NX_F103_COUNTER_PERIOD UINT64_C(65536)
@@ -54,10 +53,10 @@ void SystemInit(void) {
 #endif
 }
 nx_result_t nx_stm32f103_validate_identity(void) {
-    return NX_F103_FLASH_KIB() == 128U &&
-                   ((uint32_t)NX_F103_DEVICE_ID() & 0xfffU) == 0x410U
-               ? NX_SUCCESS
-               : NX_ERROR_IO;
+    /* ES096 Rev15 2.2.2: normal software cannot authenticate the debug-only
+     * IDCODE. RM0008 30.1.1 permits CPU reads of the factory size halfword.
+     * This validates density only, never device group, revision or package. */
+    return NX_F103_FLASH_KIB() == 128U ? NX_SUCCESS : NX_ERROR_IO;
 }
 nx_result_t nx_stm32f103_system_preflight(const nx_stm32f103_system_t* s) {
     if (!task_context()) {

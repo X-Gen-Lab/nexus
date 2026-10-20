@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "kind": "independent-D3-complete-normalized-transport-admission-review",
+  "reviewer": "/root/io24_ram_impl_r2",
+  "created_utc": "2026-10-18T10:27:52.623722+00:00",
+  "result": "PASS",
+  "blocking_findings": [],
+  "approval_scope": "Exact normalized payload bytes, source/delete bindings, evidence-only retargeting, complete Root provenance ZIP, and compatibility with the previously reviewed fixed-root three-deletion integration helper. No new code implementation or test execution qualification.",
+  "inputs": {
+    "normalized_map": {
+      "path": "/dev/shm/nexus-d3-main-package-20261018-r1/normalized-inputs.json",
+      "bytes": 288071,
+      "sha256": "c94770a7097d0f1d9c783249e73f71699b14bac231f2c512995ea35765787357"
+    },
+    "author_transport": {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/normalized-transport-r1.json",
+      "bytes": 157029,
+      "sha256": "5305d4ea564f2d2663830a3f1a90ada086dbe9a75482969c82216c82ded75d1b"
+    },
+    "author_final_freeze": {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-source33-and-execution-freeze-r1.json",
+      "bytes": 15017,
+      "sha256": "50a7fc913098dea0185602eb528b8002fbd66b4eaf05e27ff825b3d2f7fa7751"
+    },
+    "final_code_peer": {
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-independent-review-20261018-r1.json",
+      "bytes": 28504,
+      "sha256": "28270c19ddc5c871b8233818577e0579a9c9f6f5ae886e19affbd089eb65da90"
+    },
+    "root_prior_archive": {
+      "path": "/dev/shm/nexus-d3-root-provenance-20261018-r1/root-prior-evidence.zip",
+      "bytes": 2220055,
+      "sha256": "1bd0cd3f0080788f4dacf21a1cd22b2e60af19327336b92acac8d2b17fc27e00"
+    },
+    "root_prior_members": {
+      "path": "/dev/shm/nexus-d3-root-provenance-20261018-r1/members.json",
+      "bytes": 34639,
+      "sha256": "0e4ddbd8fa3ca908e563698e951e8c4c3f35ac238fbbda4a86e46315d23d56e5"
+    },
+    "deletion_integration_helper": {
+      "path": "/dev/shm/nexus-root-deletion-integration-20261018-r1/integrate-clean-reviewed-deletions-r4.py",
+      "bytes": 8815,
+      "sha256": "bcc499e70acad662e7500bb07f08004b66e6f9209b901c4acfe4ce6bd9ad0880"
+    },
+    "prior_helper_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/root-deletion-integration-independent-review-r1.json",
+      "bytes": 11429,
+      "sha256": "ee07e2896cce19ec5f088d7f6d3a11bb0b105c3372cc870668ea8143ca30aece"
+    }
+  },
+  "main_observed_before_admission": {
+    "root": "/tmp/nexus-io-validation-20261018",
+    "HEAD": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+    "tree": "3925bfc209c728a33d8d19f21c19c0ee266b13e9",
+    "porcelain": "",
+    "old_source_worktree_bytes_equal_HEAD": true,
+    "canonical_existing_changed": 26,
+    "canonical_new": 4,
+    "canonical_unchanged": 0,
+    "deletions_worktree_bytes_equal_HEAD": true,
+    "scope": "These identities were observed before Root was given PASS. A later authorized Root integration is not a reviewer guard failure."
+  },
+  "payload_verification": {
+    "write_rows": 387,
+    "write_bytes": 9625243,
+    "delete_rows": 3,
+    "canonical_write_rows": 30,
+    "canonical_operation_count": 33,
+    "evidence_rows": 357,
+    "author_original_targets": 378,
+    "author_source_rows": 30,
+    "author_evidence_rows": 348,
+    "root_extra_rows": 9,
+    "all_387_regular_sources_exact_size_SHA256": true,
+    "no_source_or_ancestor_symlink": true,
+    "safe_relative_targets_no_dotdot_git_build_vendor_escape": true,
+    "all_390_operation_paths_unique_casefold_unique": true,
+    "all_30_sources_match_final_freeze_and_PASS_peer": true,
+    "canonical_3_deletions_match_author_freeze_peer_and_clean_Main_old_blobs": true,
+    "three_moves_preserve_original_TOML_bytes": true
+  },
+  "canonical_writes": [
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma.toml",
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma-uart-tx.toml",
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f"
+    },
+    {
+      "path": "tools/configure/assemblies/h743-spi-dma-uart-rx.toml",
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6"
+    },
+    {
+      "path": "cmake/package/verification/io_evolution/consumers/h743-spi-dma.c",
+      "sha256": "b29f077131d982231651312590ef284ac08f830204163fc54acbd05088298677"
+    },
+    {
+      "path": "scripts/ci/provider_assemblies.py",
+      "sha256": "b0e81591848a37fc04e71e80c9823113a40192561305fc543f57e176751f039d"
+    },
+    {
+      "path": "scripts/ci/test_provider_assemblies.py",
+      "sha256": "1fda7ef85e0ca971775a31e68627848ea9c820a78ed1295299090f596875512c"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/CMakeLists.txt",
+      "sha256": "5855fa1ef59bab32bea058270f3cf8125bfd6ce4b6d45ef1ae018cd1d87da089"
+    },
+    {
+      "path": "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "sha256": "23ab8551db93ed9f9abbe7c3237288df27d2172c9422ed9e113814288e13517b"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_factory.cmake",
+      "sha256": "0b25363754762494540c0909f31d90f402d307ac2dce1a3d62bdafe712e614b8"
+    },
+    {
+      "path": "tools/configure/test_selected_contract_authority.py",
+      "sha256": "7414c6b41b359db93950d5b3c4a0da0c7f402a3399a2d92a7d907205e5795996"
+    },
+    {
+      "path": "cmake/package/verify_consumers.py",
+      "sha256": "85e3d40faeb41390fbdd7a95ba9cd2b5992ed69502dab5e7c9cecff3858070f8"
+    },
+    {
+      "path": "cmake/package/package_source_sdk.py",
+      "sha256": "83eb8409230869dd1c2adc045a16f2456c8358919697680b33779eb743bc74fe"
+    },
+    {
+      "path": "tools/configure/providers/descriptor.py",
+      "sha256": "7cbdc5fa99324212c0035fa811c7ca4a99c0ba03d3e256ad0cae75b80097eedb"
+    },
+    {
+      "path": "tools/release/transport.py",
+      "sha256": "1e7c2fb763895046dbaebe60fd4fcf7047508e5156b21dc223c63a3324f7e0ec"
+    },
+    {
+      "path": "tests/contracts/test_device_sdk_payload.py",
+      "sha256": "ac5e3ca3d8d85bb891244a7f65f0a3618db441463a8fa17b6d73dc4da2b06498"
+    },
+    {
+      "path": "tools/testing/test_sdk_verification_call.py",
+      "sha256": "9410229a460138e502b10d2798528fadbd31aa5a1b7d00a6abc2f904052f3e33"
+    },
+    {
+      "path": ".github/workflows/test_release.py",
+      "sha256": "a53120a076aee2ec87ee615a6de5890478ea0f0574f3cf40daa627b87292cbcb"
+    },
+    {
+      "path": "tools/dev/plans/software.json",
+      "sha256": "37ca63d9b233cc62da16699275394b848c5c7528ea5a9b2606434c7e79aa0f9f"
+    },
+    {
+      "path": "tools/testing/test_qualification_plan.py",
+      "sha256": "d8d1baa45a0aa3a04d1f17a91db353c67024e564e48c0833654560c7e44a402e"
+    },
+    {
+      "path": "tools/testing/test_work_packages.py",
+      "sha256": "b856eaa730efadcfe7ec0b92bc480263bf6d186085eefc2848dd35b1b13efff8"
+    },
+    {
+      "path": ".github/workflows/build-matrix.yml",
+      "sha256": "10e52ea538c9c30822d5e0cbfc928f093d97bc2fe78da8c70d163d2136616d04"
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "sha256": "45ed33110b8cc8b3d952b5ad859d6e68faa7e63a7f2ddf0972d2ced016c16930"
+    },
+    {
+      "path": "docs/design/provider-assemblies.md",
+      "sha256": "1bbfb23bf0714762926565a85b492ce1cf8846cf203e31ec420de01b7585aafa"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/design/provider-assemblies.po",
+      "sha256": "05ddbc7acbdf19dea8d6f76be24de20fafa89dc21eea7b94786414a92eaf2b35"
+    },
+    {
+      "path": "docs/delivery/capabilities.md",
+      "sha256": "e19b3aadefcf745f753099205d52c1a424eed71f6c8d6ff12f7dee42083a0264"
+    },
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "sha256": "045618f04b580e4d5e095a6be8b4c8ee121afd15842bb9505f6cc93b3badbe56"
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "sha256": "0bad0a10366e797c06a45e1d64a11f8de4a4f87a696addb5ebe4fe09a109b525"
+    },
+    {
+      "path": "tools/release/README.md",
+      "sha256": "a92860b63e1476820c2d6480c4c23e94eb86370cfa20780c880558296dca5752"
+    },
+    {
+      "path": "soc/stm32h743/README.md",
+      "sha256": "4bce41176f2c7419ba7d280f985b250203b386d0b6783c315cc0ecea358cfc89"
+    },
+    {
+      "path": "docs/design/io-evolution-execution.csv",
+      "sha256": "c99c5f99a48b429cd8b2da36cab1271d977cff7d5cd37ceef0deefd3805b874f"
+    }
+  ],
+  "canonical_deletions": [
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma.toml",
+      "bytes": 491,
+      "sha256": "25a3436419917826c2084d77b0877310517880c352f150498e804fdfaf05c9c2"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "bytes": 653,
+      "sha256": "f6b5ffdb3855cb6478099df9491abf06657f467c4f3877443e04811b8b89f86f"
+    },
+    {
+      "path": "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "bytes": 646,
+      "sha256": "77f56de9001dd5cf16b428b8f71587678fe4ea379a412722ecac0c4ad17bd2b6"
+    }
+  ],
+  "evidence_retarget": {
+    "from": "validation/h743-spi-dma-canonical-sdk-d3-r1/",
+    "to": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/author-transport/",
+    "count": 348,
+    "original_author_target_present_on_all_378_author_rows": true,
+    "durable_source_bytes_SHA_unchanged": true,
+    "active_source_targets_unchanged": true,
+    "all_348_author_evidence_preserved": true,
+    "active_docs_PO_READMEs_ledger_validation_or_author_transport_references": 0,
+    "docs_scope": "Eight active docs/PO/README/ledger files were searched for validation/ or author-transport references; none exist. Historical immutable metadata references are retained as evidence, not rewritten or treated as live documentation links."
+  },
+  "root_extra_entries": [
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/original-author-transport.json",
+      "bytes": 157029,
+      "sha256": "5305d4ea564f2d2663830a3f1a90ada086dbe9a75482969c82216c82ded75d1b"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/original-author-handoff.json",
+      "bytes": 784,
+      "sha256": "704534dcffecb1acbc16e32d8639f29f32a51f5c3ee0d346b11fc787728859f3"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/root-prior-evidence.zip",
+      "bytes": 2220055,
+      "sha256": "1bd0cd3f0080788f4dacf21a1cd22b2e60af19327336b92acac8d2b17fc27e00"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/root-prior-evidence-members.json",
+      "bytes": 34639,
+      "sha256": "0e4ddbd8fa3ca908e563698e951e8c4c3f35ac238fbbda4a86e46315d23d56e5"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/root-prior-evidence-preservation.json",
+      "bytes": 861,
+      "sha256": "d4876c5c66b86f8dcc3285ba6619b9ddb092d3142833e3f5f3d7528f8b439038"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/original-D3-independent-review.json",
+      "bytes": 28504,
+      "sha256": "28270c19ddc5c871b8233818577e0579a9c9f6f5ae886e19affbd089eb65da90"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/root-normalizer.py.raw",
+      "bytes": 3896,
+      "sha256": "b9d37cb7598695a52705be374ac5d1510a7b70aa43ecaecbf8df64a1afcdc863"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/root-normalizer-first-rejected.py.raw",
+      "bytes": 3158,
+      "sha256": "2572baaa95a0cb31fae3f49dc689323502a2a4052f4cbbcda6b2fd8a2a45d1ae"
+    },
+    {
+      "path": "tests/evidence/io-evolution/h743-spi-dma-canonical-sdk-20261018-r1/root/root-normalization-first-attempt.json",
+      "bytes": 408,
+      "sha256": "8986218bf4cf95fad54a100cfa79ad22fa74d6e181259e14b1fce47925b08a65"
+    }
+  ],
+  "root_zip_verification": {
+    "zip_members": 111,
+    "indexed_original_leaves": 110,
+    "embedded_self_excluded_members_manifest": 1,
+    "outer_ZIP_CRC_all_members": true,
+    "all_110_member_size_SHA_mode_and_original_source_bytes_mode": true,
+    "embedded_members_json_exact_external_bytes": true,
+    "unique_casefold_safe_names": true,
+    "indexed_original_uncompressed_bytes": 6388786,
+    "note": "The members.json index intentionally does not list itself; 110 payload members plus this verified embedded manifest account for all 111 entries."
+  },
+  "prior_full_gate_checkpoint": {
+    "source_head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+    "parent_exit": 0,
+    "archives": 35,
+    "gzip_crc_full_EOF_checked": true,
+    "all_35_compressed_size_SHA256_match_index": true,
+    "payload_member_occurrences": 2812,
+    "per_archive_manifest_entries": 35,
+    "all_member_size_SHA_mode_PAX_mtime_rechecked": true,
+    "actual_terminal_receipts": 624,
+    "all_exit_0_completed_with_stable_complete_withdrawal": true,
+    "qualification": "Prior dd full-gate evidence only, not the upcoming D3 staged-index run."
+  },
+  "qualification_boundaries": {
+    "prior_dd_full_gate": {
+      "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+      "programs": 309,
+      "Google_cases": 5427,
+      "tool_tests": 2412,
+      "inherited_as_latest_D3": false
+    },
+    "prior_f9_CI": {
+      "head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+      "run_id": 39113910352,
+      "API_status": "completed/success",
+      "scope": "Historical CI30 and actual Native checkout; no latest-source promotion."
+    },
+    "prior_dd_remote_qualification": {
+      "head": "dd839d29f6ad43267fc8d77bdd0b8e5e03e4d211",
+      "run_id": 39116634150,
+      "attempt": 1,
+      "API_status": "completed/success",
+      "archive_scope": "Three part-download verification summaries, original core manifest/identity/uploads and API/source binding are preserved. Original giant part ZIP payloads are not represented as included in this Root provenance ZIP. Multipart content reconstruction/admission remains pending at this snapshot.",
+      "inherited_as_latest_D3": false
+    },
+    "prior_ARM29": "Historical dd report and its PASS peer retained; updated integrated D3 29-project stage not yet established.",
+    "latest_D3": "Full clean installed SDK34 roots/37 images, integrated ARM29, fresh normal hooks, remote OCI/offline/candidate acceptance and HIL are not established by this transport review.",
+    "physical_HIL": "not_executed"
+  },
+  "helper_admission": {
+    "exact_previously_reviewed_r4_hash_bound": true,
+    "fixed_Main_root_and_clean_expected_HEAD": true,
+    "strict_delete_whitelist_exactly_three_old_TOMLs": true,
+    "complete_index_and_all_overwritten_deleted_preimages_before_mutation": true,
+    "all_input_hashes_and_clean_identity_rechecked_before_deletion": true,
+    "exact_staged_name_set_and_index_blob_bytes_delete_set_verified": true,
+    "no_force_reset_stash_clean_or_commit_bypass": true,
+    "appended_review_and_map": 2,
+    "expected_final_written_rows": 389,
+    "expected_final_deleted_rows": 3,
+    "expected_final_staged_paths": 392,
+    "expected_source_operations": 33,
+    "executed_by_reviewer": false,
+    "required_next_action": "Root may integrate this exact payload through r4 under its controlled HEAD/hash/count arguments, then execute fresh ordinary complete-index hooks and the exact post-commit verifier. A review PASS is not a successful integration or commit."
+  },
+  "receipt_destination_adaptation": {
+    "adapted_scripts": 3,
+    "all_original_and_adapted_hashes_verified": true,
+    "each_diff_exactly_one_line_destination_only": true,
+    "normal_hooks_and_verification_policy_unchanged": true
+  },
+  "first_root_normalizer_failure": {
+    "preserved": true,
+    "actual_tool_exit": 1,
+    "classification": "Root metadata adapter assertion rejecting evidence under validation/; no Main mutation, no production behavior RED. Exact348 evidence target relocation fixes packaging while preserving all original bytes."
+  },
+  "reviewer_actions": {
+    "tests_build_binaries_Docker_network_dispatch_run": false,
+    "source_Main_index_stage_push_mutations": false,
+    "helper_execution": false,
+    "new_spawn": false,
+    "read_only_git_optional_locks_disabled": true,
+    "report_only_new_output": true,
+    "all_proofs_are_existing_source_bound_raw_and_metadata": true
+  }
+}

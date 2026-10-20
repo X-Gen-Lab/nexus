@@ -1,0 +1,370 @@
+Running Sphinx v7.4.7
+loading translations [en]... done
+making output directory... done
+myst v4.0.1: MdParserConfig(commonmark_only=False, gfm_only=False, enable_extensions={'colon_fence'}, disable_syntax=[], all_links_external=False, links_external_new_tab=False, url_schemes=('http', 'https', 'mailto', 'ftp'), ref_domains=None, fence_as_directive=set(), number_code_blocks=[], title_to_header=False, heading_anchors=5, heading_slug_func=None, html_meta={}, footnote_sort=True, footnote_transition=True, words_per_minute=200, substitutions={}, linkify_fuzzy_links=True, dmath_allow_labels=True, dmath_allow_space=True, dmath_allow_digits=True, dmath_double_inline=False, update_mathjax=True, mathjax_classes='tex2jax_process|mathjax_process|math|output_area', enable_checkboxes=False, suppress_warnings=[], highlight_code_blocks=True)
+building [gettext]: targets for 2 template files
+reading templates... [ 50%] /tmp/nexus-io36-native-20261018/docs/sphinx/templates/layout.html
+reading templates... [100%] /tmp/nexus-io36-native-20261018/docs/sphinx/templates/relations.html
+
+building [gettext]: targets for 116 source files that are out of date
+updating environment: [new config] 116 added, 0 changed, 0 removed
+reading sources... [  1%] assets/diagrams/README
+reading sources... [  2%] delivery/README
+reading sources... [  3%] delivery/architecture
+reading sources... [  3%] delivery/build-system-verification
+reading sources... [  4%] delivery/capabilities
+reading sources... [  5%] delivery/cortex-m
+reading sources... [  6%] delivery/index
+reading sources... [  7%] delivery/io-evolution-next-wave
+reading sources... [  8%] delivery/migration
+reading sources... [  9%] delivery/next-iterations
+reading sources... [  9%] delivery/os
+reading sources... [ 10%] delivery/qualification
+reading sources... [ 11%] delivery/security-review
+reading sources... [ 12%] delivery/soc-extensions-verification
+reading sources... [ 13%] delivery/soc-refinement-verification
+reading sources... [ 14%] delivery/support
+reading sources... [ 15%] delivery/verification
+reading sources... [ 16%] design/README
+reading sources... [ 16%] design/adc-group
+reading sources... [ 17%] design/arch-contracts
+reading sources... [ 18%] design/build-system
+reading sources... [ 19%] design/can-fd
+reading sources... [ 20%] design/classic-can
+reading sources... [ 21%] design/clock-domain-sleep
+reading sources... [ 22%] design/documentation-improvements
+reading sources... [ 22%] design/documentation-standards
+reading sources... [ 23%] design/documentation-system
+reading sources... [ 24%] design/documentation-templates
+reading sources... [ 25%] design/engineering-handbook
+reading sources... [ 26%] design/ethernet
+reading sources... [ 27%] design/ethernet-frames
+reading sources... [ 28%] design/fault-observation
+reading sources... [ 28%] design/h743-flash-ram
+reading sources... [ 29%] design/h743-high-clock
+reading sources... [ 30%] design/i2c-bus-clear
+reading sources... [ 31%] design/index
+reading sources... [ 32%] design/integration-contracts
+reading sources... [ 33%] design/io-evolution
+reading sources... [ 34%] design/io-lifecycle-matrix
+reading sources... [ 34%] design/io-observation-recovery
+reading sources... [ 35%] design/mainstream-mcu-adaptation
+reading sources... [ 36%] design/multiple-controllers
+reading sources... [ 37%] design/multiple-dma-controllers
+reading sources... [ 38%] design/next-generation-platform
+reading sources... [ 39%] design/official-stm32-provider
+reading sources... [ 40%] design/os-backend-integration
+reading sources... [ 41%] design/os-contracts
+reading sources... [ 41%] design/provider-assemblies
+reading sources... [ 42%] design/pwm-adc
+reading sources... [ 43%] design/soc-execution-budgets
+reading sources... [ 44%] design/soc-refinement
+reading sources... [ 45%] design/source-compatibility
+reading sources... [ 46%] design/stack-observation-endurance
+reading sources... [ 47%] design/stm32g474
+reading sources... [ 47%] design/threadx
+reading sources... [ 48%] design/timebase-lowpower
+reading sources... [ 49%] design/timer-advanced
+reading sources... [ 50%] design/u575-trustzone-contract
+reading sources... [ 51%] design/u575-uart-gpdma
+reading sources... [ 52%] design/uart-dma-rs485
+reading sources... [ 53%] design/uart-fifo
+reading sources... [ 53%] design/usb-device
+reading sources... [ 54%] design/user-io-broker
+reading sources... [ 55%] development/documentation
+reading sources... [ 56%] development/implementation-map
+reading sources... [ 57%] development/index
+reading sources... [ 58%] development/workflow
+reading sources... [ 59%] explanation/factory
+reading sources... [ 59%] explanation/index
+reading sources... [ 60%] explanation/ownership
+reading sources... [ 61%] explanation/platform-architecture
+reading sources... [ 62%] explanation/rtc-lptim
+reading sources... [ 63%] explanation/source-map
+reading sources... [ 64%] guides/board-porting
+reading sources... [ 65%] guides/index
+reading sources... [ 66%] guides/migration
+reading sources... [ 66%] guides/os-shutdown
+reading sources... [ 67%] guides/performance-hil
+reading sources... [ 68%] guides/provider-porting
+reading sources... [ 69%] guides/source-checkout
+reading sources... [ 70%] index
+reading sources... [ 71%] reference/api/arch
+reading sources... [ 72%] reference/api/components
+reading sources... [ 72%] reference/api/core
+reading sources... [ 73%] reference/api/index
+reading sources... [ 74%] reference/api/io
+reading sources... [ 75%] reference/api/os
+reading sources... [ 76%] reference/configuration/assembly
+reading sources... [ 77%] reference/configuration/index
+reading sources... [ 78%] reference/configuration/tools
+reading sources... [ 78%] reference/documentation-delivery
+reading sources... [ 79%] reference/documentation-tools
+reading sources... [ 80%] reference/history
+reading sources... [ 81%] reference/index
+reading sources... [ 82%] reference/platforms/index
+reading sources... [ 83%] reference/platforms/qualification
+reading sources... [ 84%] reference/platforms/support
+reading sources... [ 84%] sphinx/development/coding_standards
+reading sources... [ 85%] status/documentation-acceptance
+reading sources... [ 86%] status/hardware
+reading sources... [ 87%] status/index
+reading sources... [ 88%] status/ledgers
+reading sources... [ 89%] status/ledgers/build-system
+reading sources... [ 90%] status/ledgers/documentation-system
+reading sources... [ 91%] status/ledgers/factory-platform
+reading sources... [ 91%] status/ledgers/next-generation
+reading sources... [ 92%] status/ledgers/os
+reading sources... [ 93%] status/ledgers/platform-refinement
+reading sources... [ 94%] status/ledgers/soc-refinement
+reading sources... [ 95%] status/release-0.1.0
+reading sources... [ 96%] status/roadmap
+reading sources... [ 97%] status/software-verification
+reading sources... [ 97%] status/support
+reading sources... [ 98%] tutorials/async-io
+reading sources... [ 99%] tutorials/index
+reading sources... [100%] tutorials/source-sdk
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+copying assets... 
+copying assets: done
+writing output... [  1%] assets/diagrams/README
+writing output... [  2%] delivery/README
+writing output... [  3%] delivery/architecture
+writing output... [  3%] delivery/build-system-verification
+writing output... [  4%] delivery/capabilities
+writing output... [  5%] delivery/cortex-m
+writing output... [  6%] delivery/index
+writing output... [  7%] delivery/io-evolution-next-wave
+writing output... [  8%] delivery/migration
+writing output... [  9%] delivery/next-iterations
+writing output... [  9%] delivery/os
+writing output... [ 10%] delivery/qualification
+writing output... [ 11%] delivery/security-review
+writing output... [ 12%] delivery/soc-extensions-verification
+writing output... [ 13%] delivery/soc-refinement-verification
+writing output... [ 14%] delivery/support
+writing output... [ 15%] delivery/verification
+writing output... [ 16%] design/README
+writing output... [ 16%] design/adc-group
+writing output... [ 17%] design/arch-contracts
+writing output... [ 18%] design/build-system
+writing output... [ 19%] design/can-fd
+writing output... [ 20%] design/classic-can
+writing output... [ 21%] design/clock-domain-sleep
+writing output... [ 22%] design/documentation-improvements
+writing output... [ 22%] design/documentation-standards
+writing output... [ 23%] design/documentation-system
+writing output... [ 24%] design/documentation-templates
+writing output... [ 25%] design/engineering-handbook
+writing output... [ 26%] design/ethernet
+writing output... [ 27%] design/ethernet-frames
+writing output... [ 28%] design/fault-observation
+writing output... [ 28%] design/h743-flash-ram
+writing output... [ 29%] design/h743-high-clock
+writing output... [ 30%] design/i2c-bus-clear
+writing output... [ 31%] design/index
+writing output... [ 32%] design/integration-contracts
+writing output... [ 33%] design/io-evolution
+writing output... [ 34%] design/io-lifecycle-matrix
+writing output... [ 34%] design/io-observation-recovery
+writing output... [ 35%] design/mainstream-mcu-adaptation
+writing output... [ 36%] design/multiple-controllers
+writing output... [ 37%] design/multiple-dma-controllers
+writing output... [ 38%] design/next-generation-platform
+writing output... [ 39%] design/official-stm32-provider
+writing output... [ 40%] design/os-backend-integration
+writing output... [ 41%] design/os-contracts
+writing output... [ 41%] design/provider-assemblies
+writing output... [ 42%] design/pwm-adc
+writing output... [ 43%] design/soc-execution-budgets
+writing output... [ 44%] design/soc-refinement
+writing output... [ 45%] design/source-compatibility
+writing output... [ 46%] design/stack-observation-endurance
+writing output... [ 47%] design/stm32g474
+writing output... [ 47%] design/threadx
+writing output... [ 48%] design/timebase-lowpower
+writing output... [ 49%] design/timer-advanced
+writing output... [ 50%] design/u575-trustzone-contract
+writing output... [ 51%] design/u575-uart-gpdma
+writing output... [ 52%] design/uart-dma-rs485
+writing output... [ 53%] design/uart-fifo
+writing output... [ 53%] design/usb-device
+writing output... [ 54%] design/user-io-broker
+writing output... [ 55%] development/documentation
+writing output... [ 56%] development/implementation-map
+writing output... [ 57%] development/index
+writing output... [ 58%] development/workflow
+writing output... [ 59%] explanation/factory
+writing output... [ 59%] explanation/index
+writing output... [ 60%] explanation/ownership
+writing output... [ 61%] explanation/platform-architecture
+writing output... [ 62%] explanation/rtc-lptim
+writing output... [ 63%] explanation/source-map
+writing output... [ 64%] guides/board-porting
+writing output... [ 65%] guides/index
+writing output... [ 66%] guides/migration
+writing output... [ 66%] guides/os-shutdown
+writing output... [ 67%] guides/performance-hil
+writing output... [ 68%] guides/provider-porting
+writing output... [ 69%] guides/source-checkout
+writing output... [ 70%] index
+writing output... [ 71%] reference/api/arch
+writing output... [ 72%] reference/api/components
+writing output... [ 72%] reference/api/core
+writing output... [ 73%] reference/api/index
+writing output... [ 74%] reference/api/io
+writing output... [ 75%] reference/api/os
+writing output... [ 76%] reference/configuration/assembly
+writing output... [ 77%] reference/configuration/index
+writing output... [ 78%] reference/configuration/tools
+writing output... [ 78%] reference/documentation-delivery
+writing output... [ 79%] reference/documentation-tools
+writing output... [ 80%] reference/history
+writing output... [ 81%] reference/index
+writing output... [ 82%] reference/platforms/index
+writing output... [ 83%] reference/platforms/qualification
+writing output... [ 84%] reference/platforms/support
+writing output... [ 84%] sphinx/development/coding_standards
+writing output... [ 85%] status/documentation-acceptance
+writing output... [ 86%] status/hardware
+writing output... [ 87%] status/index
+writing output... [ 88%] status/ledgers
+writing output... [ 89%] status/ledgers/build-system
+writing output... [ 90%] status/ledgers/documentation-system
+writing output... [ 91%] status/ledgers/factory-platform
+writing output... [ 91%] status/ledgers/next-generation
+writing output... [ 92%] status/ledgers/os
+writing output... [ 93%] status/ledgers/platform-refinement
+writing output... [ 94%] status/ledgers/soc-refinement
+writing output... [ 95%] status/release-0.1.0
+writing output... [ 96%] status/roadmap
+writing output... [ 97%] status/software-verification
+writing output... [ 97%] status/support
+writing output... [ 98%] tutorials/async-io
+writing output... [ 99%] tutorials/index
+writing output... [100%] tutorials/source-sdk
+
+writing message catalogs... [  1%] assets/diagrams/README
+writing message catalogs... [  2%] delivery/README
+writing message catalogs... [  3%] delivery/architecture
+writing message catalogs... [  3%] delivery/build-system-verification
+writing message catalogs... [  4%] delivery/capabilities
+writing message catalogs... [  5%] delivery/cortex-m
+writing message catalogs... [  6%] delivery/index
+writing message catalogs... [  7%] delivery/io-evolution-next-wave
+writing message catalogs... [  8%] delivery/migration
+writing message catalogs... [  9%] delivery/next-iterations
+writing message catalogs... [  9%] delivery/os
+writing message catalogs... [ 10%] delivery/qualification
+writing message catalogs... [ 11%] delivery/security-review
+writing message catalogs... [ 12%] delivery/soc-extensions-verification
+writing message catalogs... [ 13%] delivery/soc-refinement-verification
+writing message catalogs... [ 14%] delivery/support
+writing message catalogs... [ 15%] delivery/verification
+writing message catalogs... [ 16%] design/README
+writing message catalogs... [ 16%] design/adc-group
+writing message catalogs... [ 17%] design/arch-contracts
+writing message catalogs... [ 18%] design/build-system
+writing message catalogs... [ 19%] design/can-fd
+writing message catalogs... [ 20%] design/classic-can
+writing message catalogs... [ 21%] design/clock-domain-sleep
+writing message catalogs... [ 22%] design/documentation-improvements
+writing message catalogs... [ 22%] design/documentation-standards
+writing message catalogs... [ 23%] design/documentation-system
+writing message catalogs... [ 24%] design/documentation-templates
+writing message catalogs... [ 25%] design/engineering-handbook
+writing message catalogs... [ 26%] design/ethernet
+writing message catalogs... [ 27%] design/ethernet-frames
+writing message catalogs... [ 28%] design/fault-observation
+writing message catalogs... [ 28%] design/h743-flash-ram
+writing message catalogs... [ 29%] design/h743-high-clock
+writing message catalogs... [ 30%] design/i2c-bus-clear
+writing message catalogs... [ 31%] design/index
+writing message catalogs... [ 32%] design/integration-contracts
+writing message catalogs... [ 33%] design/io-evolution
+writing message catalogs... [ 34%] design/io-lifecycle-matrix
+writing message catalogs... [ 34%] design/io-observation-recovery
+writing message catalogs... [ 35%] design/mainstream-mcu-adaptation
+writing message catalogs... [ 36%] design/multiple-controllers
+writing message catalogs... [ 37%] design/multiple-dma-controllers
+writing message catalogs... [ 38%] design/next-generation-platform
+writing message catalogs... [ 39%] design/official-stm32-provider
+writing message catalogs... [ 40%] design/os-backend-integration
+writing message catalogs... [ 41%] design/os-contracts
+writing message catalogs... [ 41%] design/provider-assemblies
+writing message catalogs... [ 42%] design/pwm-adc
+writing message catalogs... [ 43%] design/soc-execution-budgets
+writing message catalogs... [ 44%] design/soc-refinement
+writing message catalogs... [ 45%] design/source-compatibility
+writing message catalogs... [ 46%] design/stack-observation-endurance
+writing message catalogs... [ 47%] design/stm32g474
+writing message catalogs... [ 47%] design/threadx
+writing message catalogs... [ 48%] design/timebase-lowpower
+writing message catalogs... [ 49%] design/timer-advanced
+writing message catalogs... [ 50%] design/u575-trustzone-contract
+writing message catalogs... [ 51%] design/u575-uart-gpdma
+writing message catalogs... [ 52%] design/uart-dma-rs485
+writing message catalogs... [ 53%] design/uart-fifo
+writing message catalogs... [ 53%] design/usb-device
+writing message catalogs... [ 54%] design/user-io-broker
+writing message catalogs... [ 55%] development/documentation
+writing message catalogs... [ 56%] development/implementation-map
+writing message catalogs... [ 57%] development/index
+writing message catalogs... [ 58%] development/workflow
+writing message catalogs... [ 59%] explanation/factory
+writing message catalogs... [ 59%] explanation/index
+writing message catalogs... [ 60%] explanation/ownership
+writing message catalogs... [ 61%] explanation/platform-architecture
+writing message catalogs... [ 62%] explanation/rtc-lptim
+writing message catalogs... [ 63%] explanation/source-map
+writing message catalogs... [ 64%] guides/board-porting
+writing message catalogs... [ 65%] guides/index
+writing message catalogs... [ 66%] guides/migration
+writing message catalogs... [ 66%] guides/os-shutdown
+writing message catalogs... [ 67%] guides/performance-hil
+writing message catalogs... [ 68%] guides/provider-porting
+writing message catalogs... [ 69%] guides/source-checkout
+writing message catalogs... [ 70%] index
+writing message catalogs... [ 71%] reference/api/arch
+writing message catalogs... [ 72%] reference/api/components
+writing message catalogs... [ 72%] reference/api/core
+writing message catalogs... [ 73%] reference/api/index
+writing message catalogs... [ 74%] reference/api/io
+writing message catalogs... [ 75%] reference/api/os
+writing message catalogs... [ 76%] reference/configuration/assembly
+writing message catalogs... [ 77%] reference/configuration/index
+writing message catalogs... [ 78%] reference/configuration/tools
+writing message catalogs... [ 78%] reference/documentation-delivery
+writing message catalogs... [ 79%] reference/documentation-tools
+writing message catalogs... [ 80%] reference/history
+writing message catalogs... [ 81%] reference/index
+writing message catalogs... [ 82%] reference/platforms/index
+writing message catalogs... [ 83%] reference/platforms/qualification
+writing message catalogs... [ 84%] reference/platforms/support
+writing message catalogs... [ 84%] sphinx/development/coding_standards
+writing message catalogs... [ 85%] status/documentation-acceptance
+writing message catalogs... [ 86%] status/hardware
+writing message catalogs... [ 87%] status/index
+writing message catalogs... [ 88%] status/ledgers
+writing message catalogs... [ 89%] status/ledgers/build-system
+writing message catalogs... [ 90%] status/ledgers/documentation-system
+writing message catalogs... [ 91%] status/ledgers/factory-platform
+writing message catalogs... [ 91%] status/ledgers/next-generation
+writing message catalogs... [ 92%] status/ledgers/os
+writing message catalogs... [ 93%] status/ledgers/platform-refinement
+writing message catalogs... [ 94%] status/ledgers/soc-refinement
+writing message catalogs... [ 95%] status/release-0.1.0
+writing message catalogs... [ 96%] status/roadmap
+writing message catalogs... [ 97%] status/software-verification
+writing message catalogs... [ 97%] status/support
+writing message catalogs... [ 98%] tutorials/async-io
+writing message catalogs... [ 99%] tutorials/index
+writing message catalogs... [100%] tutorials/source-sdk
+
+build succeeded.
+
+The message catalogs are in build/documentation-attempts/34baefbbab8c4195aec0687be71997b0/gettext.

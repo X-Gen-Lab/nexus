@@ -33,7 +33,7 @@ class DependencyProposalTests(unittest.TestCase):
         return {"path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "size": len(data)}
 
     def test_actual_inventory_observes_pins_not_latest_claims(self):
-        expected = {item.path for item in source_catalogue.SOURCE_DEPENDENCIES}
+        expected = {item.path for item in source_catalogue.ALL_SOURCE_DEPENDENCIES}
         declared = proposals.git(ROOT, "show", "HEAD:.gitmodules")
         if any('path = ' + path not in declared and 'path=' + path not in declared
                for path in expected):
@@ -236,7 +236,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
         self.git(self.root, "init", "--quiet")
         self.threadx_lock = json.loads((ROOT / "dependencies/threadx.lock.json").read_text())
         self.g4_lock = json.loads((ROOT / "dependencies/stm32g4.lock.json").read_text())
-        dependencies = list(source_catalogue.SOURCE_DEPENDENCIES)
+        dependencies = list(source_catalogue.ALL_SOURCE_DEPENDENCIES)
         if not any(item.identifier == "stm32g4_cmsis" for item in dependencies):
             dependencies.append(source_catalogue.SourceDependency(
                 "stm32g4_cmsis", "vendors/st/cmsis_device_g4",
@@ -259,6 +259,9 @@ class DependencyInventoryGitTests(unittest.TestCase):
                 if item.path in {official.directory, official.cmsis_directory}:
                     review = {"commit": (official.commit
                         if item.path == official.directory else official.cmsis_commit)}
+            if item.identifier == "googletest":
+                review = {"commit": json.loads(
+                    (ROOT / item.source_lock).read_text())["commit"]}
             if review is not None:
                 # Fixed device pins use real local official Git objects. A
                 # fabricated fixture commit must never relax the source lock.
@@ -293,13 +296,11 @@ class DependencyInventoryGitTests(unittest.TestCase):
                    (json.dumps(self.threadx_lock) + "\n").encode())
         self.write(self.root / "dependencies/stm32g4.lock.json",
                    (json.dumps(self.g4_lock) + "\n").encode())
-        for name in ("dependencies/googletest.lock.json", "dependencies/source/googletest-LICENSE.txt",
+        for name in ("dependencies/googletest.lock.json",
                      "dependencies/toolchains.lock.json", "dependencies/environment.lock.json",
                      "dependencies/development-tools.txt", "dependencies/environment-tools.txt",
                      "dependencies/actions.lock.json", "vendors/gigadevice/gd32f4xx/source.lock.json"):
             self.write(self.root / name, (ROOT / name).read_bytes())
-        google = json.loads((ROOT / "dependencies/googletest.lock.json").read_text())
-        self.write(self.root / google["archive"], (ROOT / google["archive"]).read_bytes())
         for notice in (ROOT / "vendors/gigadevice/gd32f4xx/LICENSES").iterdir():
             self.write(self.root / "vendors/gigadevice/gd32f4xx/LICENSES" / notice.name,
                        notice.read_bytes())
@@ -319,6 +320,21 @@ class DependencyInventoryGitTests(unittest.TestCase):
     def commit(self, path, message):
         self.git(path, "-c", "user.name=Dependency test", "-c",
                  "user.email=dependency-test@local.invalid", "commit", "--quiet", "-m", message)
+
+    def test_googletest_inventory_records_gitlink_and_upstream_license(self):
+        result = proposals.inventory(self.root)
+        record = next(item for item in result["dependencies"]
+                      if item["id"] == "googletest")
+        self.assertEqual(record.get("path"), "ext/googletest")
+        self.assertEqual(record["revision"],
+                         self.git(self.root / "ext/googletest",
+                                  "rev-parse", "HEAD"))
+        self.assertEqual(record["upstream_url"],
+                         "https://github.com/google/googletest.git")
+        self.assertEqual({Path(item["path"]).relative_to(self.root).as_posix()
+                          for item in record["identities"]},
+                         {".gitmodules", "dependencies/googletest.lock.json",
+                          "ext/googletest/LICENSE"})
 
     def test_committed_gitlinks_observe_real_threadx_identity_and_all_sources(self):
         result = proposals.inventory(self.root)
@@ -346,7 +362,7 @@ class DependencyInventoryGitTests(unittest.TestCase):
         result = proposals.inventory(self.root)
         self.assertEqual(len([record for record in result["dependencies"]
                               if record.get("path")]),
-                         len(source_catalogue.SOURCE_DEPENDENCIES))
+                         len(source_catalogue.ALL_SOURCE_DEPENDENCIES))
         for part, review in cmsis_device_lock.REVIEWED_DEVICES.items():
             with self.subTest(part=part):
                 record = next(record for record in result["dependencies"]

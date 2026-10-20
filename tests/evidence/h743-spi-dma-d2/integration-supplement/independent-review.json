@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "kind": "independent_read_only_D2_integration_supplement_and_complete_staged_append_review",
+  "status": "PASS",
+  "open_blockers": [],
+  "reviewed_at_utc": "2026-10-18T08:13:59.008905+00:00",
+  "scope": "Exact two-source plan/inventory correction and static admission of append-helper/new223 payload. No helper or tests executed by reviewer; final composed225 Main hooks remain pending.",
+  "manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/manifest.json",
+    "bytes": 977,
+    "sha256": "259d17001a7e94c204882848ce0cc74de74244abf80bdaa84adcc96876a96d06"
+  },
+  "source_freeze": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/source-freeze.json",
+    "bytes": 2145,
+    "sha256": "10854d7bb29f09fa3cb922411dc327c49d0313c55bbf39ba4445c85081bd05ff"
+  },
+  "report": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/report.json",
+    "bytes": 6057,
+    "sha256": "d61fdc5d18e2898bd100315db4ef74ad5b62a416e4d87a01bd00fea471d4db68"
+  },
+  "source_patch": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/source2.patch",
+    "bytes": 2616,
+    "sha256": "f5a6fd8f65701b1e95223023d676eacbcb87ea5742ae76586d056e252d5e136d"
+  },
+  "sources": [
+    {
+      "path": "tools/dev/plans/software.json",
+      "bytes": 52117,
+      "sha256": "7b6d07c3ee965fa9a325b0790986632c28ad0d64b88fbaf6e090d13d0cfb4b8e"
+    },
+    {
+      "path": "tools/testing/test_work_packages.py",
+      "bytes": 23007,
+      "sha256": "3e5ef331113708a65ff0080f7cba8b622976e0db9e8a242fff2868dc33819c6b"
+    }
+  ],
+  "source_review": {
+    "plan": {
+      "formal_true_unchanged": true,
+      "all158_stages_preserved": true,
+      "only_changed_stage": "providers-h743_assembly",
+      "checker": "provider_assemblies",
+      "timeout_s": 7200,
+      "old_args_prefix_byte_values_preserved": true,
+      "only_appended_fixture_pairs": [
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+        "--fixture",
+        "{root}/tests/contracts/h743_assembly/spi-dma.toml"
+      ],
+      "new_exact_H743_fixture_count": 29,
+      "all29_real_authored_TOML_once": true,
+      "no_checker_bypass_or_lowered_admission": true
+    },
+    "inventory": {
+      "MCU_count_before": 191,
+      "MCU_count_after": 192,
+      "Native_MODEL_rows_unchanged": 19,
+      "new_exact_identity": "stm32h743.SPI4.dma",
+      "kind_mode": "spi/dma",
+      "provider_implementation": "spi_dma",
+      "selected_and_SDK_required_sources": [
+        "soc/stm32h743/drivers/spi_dma.c"
+      ],
+      "three_exact_resolver_fixtures_asserted": true,
+      "software_hardware_status_both_not_executed": true,
+      "remove_only_new_SPI_assertions_and_revert_count_reconstructs_entire_old_file_bytes": true,
+      "old24_test_methods_names_preserved": true,
+      "all_prior_Native_MODEL_physical_false_and_MCU_field_shape_assertions_preserved": true,
+      "no_production_derivation_change": true
+    },
+    "original_D2_34_actual_bytes_and_index_unchanged": true
+  },
+  "actual_RED": {
+    "kind": "configuration/delivery contract, not runtime RED",
+    "Root_complete_testing_methods": 1009,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "actual_exit": 1,
+    "old_plan_omits_three_fixtures_and_actual_report192_vs_old191": true,
+    "original_raw_and_receipt_copies_exact": true,
+    "old_first_full_attempt_stays_failed": true,
+    "enhanced_new_SPI_assertions_classification": "Post-failure coverage strengthening, not asserted to be present in the original RED test source."
+  },
+  "actual_focused_GREEN": {
+    "whole_modules": [
+      {
+        "module": "tools.testing.test_qualification_plan",
+        "methods": 8,
+        "subtests": 73,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "actual_exit": 0,
+        "source_before_after_equal": true
+      },
+      {
+        "module": "tools.testing.test_work_packages",
+        "methods": 24,
+        "subtests": 242,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "actual_exit": 0,
+        "source_before_after_equal": true
+      }
+    ],
+    "methods": 32,
+    "subtests": 315,
+    "raw_archive": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/supplement-integration-r1/whole-module-evidence.tar.gz",
+      "bytes": 3132,
+      "sha256": "12c355a86d5818ad6ba6f9711698a29a8244884aed9ed92dd7fbc5cf6c974bc8"
+    },
+    "archive_members": 8,
+    "all_member_size_SHA_and_gzip_CRC_EOF_verified": true,
+    "expanded_tar_bytes": 30720,
+    "both_direct_children_joined": true,
+    "evidence_scope": "Complete unittest modules through archived loadTestsFromName runner and direct joined child records; not claimed as a fresh complete1009 run or additional tools.dev.process family receipt."
+  },
+  "budget_and_guards": {
+    "supplement_actual_allocated_bytes": 151552,
+    "supplement_cap_allocated_bytes": 196608,
+    "TMP_root_approved_cap": 4194304,
+    "bootstrap_2097152_retained_as_historical_proposal_not_actual_admission": true,
+    "exact_TMP_peak_not_claimed": true,
+    "reported_child_RSS_max_KiB": 39368,
+    "recorded_OOM_before_after_equal": true,
+    "author_full_index_gzip_reused": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/index-before.gz",
+      "gzip_bytes": 736624,
+      "gzip_sha256": "efa3e7d0b169658ee4528795e0f6636591a0ea7a9ea0ec69288c238b6e02e1aa",
+      "uncompressed_bytes": 3535332,
+      "uncompressed_sha256": "6118ba170e0c57e390afdab7a39b02af0fb6cc4ea0ce7b30bac9511cee9665f7",
+      "full_decompression_equals_current": true
+    },
+    "Main_staged_tree_observed": "c7dbf82f615e003a3c717230c7f059a2edb0179f",
+    "Main_staged190_matches_prior_complete_manifest": true,
+    "full_Main_staged_index_gzip": {
+      "path": "tests/evidence/h743-spi-dma-d2/integration-supplement/failed-main-r1/before-complete-staged-index.gz",
+      "durable_source": "/dev/shm/nexus-h743-d2-main-package-20261018-r2/before-staged-index.gz",
+      "bytes": 762895,
+      "sha256": "6b7953bce9f19467ec6a00bbc3260996211b19860a45ca7fb6e1e5a54e0e80a8",
+      "origin": "Complete actual190-path index before any supplement mutation"
+    },
+    "Main_index_observed": {
+      "path": "/tmp/nexus-io-validation-20261018/.git/index",
+      "bytes": 3599974,
+      "sha256": "4b4839ab81cb80af6540244a57827982f4ac612a62440183374debf364ee938f"
+    }
+  },
+  "append_helper_static_review": {
+    "identity": {
+      "path": "/dev/shm/nexus-h743-d2-main-package-20261018-r2/append-reviewed-complete-staged.py",
+      "bytes": 6926,
+      "sha256": "59e0612b0421012b22be60f8fb389612888658354505c59627d48286ba07a6d1"
+    },
+    "locks_HEAD474_and_exact190_c7db_before_input": true,
+    "rejects_redirected_Git_env_WIP_untracked_or_changed_prior_rows": true,
+    "checks_all_input_original_bytes_SHA_before_Main_write": true,
+    "backups_complete_index_and_every_modified_preimage_before_rename_or_copy": true,
+    "single_allowed_old_target_change": "tests/evidence/oci-ca-reader/main-normal-gate/start.json -> tests/evidence/oci-ca-reader/main-normal-gate/start.json.raw",
+    "original_start_bytes_preserved_and_original_external_leaf_not_touched": true,
+    "renamed_bad_target_never_in_HEAD_asserted": true,
+    "no_reset_stash_clean_index_clearing_or_rollback": true,
+    "git_add_A_force_is_finite_explicit_reviewed_rows_plus_single_removed_uncommitted_name": true,
+    "source_union_fixed_old29_plus_new2": true,
+    "final_no_HEAD_deleted_files_and_all_staged_paths_blobs_exact": true,
+    "not_executed_by_reviewer": true,
+    "applies_only_to_reviewed223_payload_with_unique_new_review_and_manifest_targets": true
+  },
+  "complete_payload_static_review": {
+    "map": {
+      "path": "/dev/shm/nexus-h743-d2-main-package-20261018-r2/normalized-transport.json",
+      "bytes": 94103,
+      "sha256": "d0ef8e33b06de900d2b39b49bad86be5416184ee0c766b335db1167b1134d258"
+    },
+    "payload_rows": 223,
+    "source_rows": 31,
+    "evidence_rows": 192,
+    "all_leaf_size_SHA_and_regular_no_symlink_verified": true,
+    "target_unique_casefold_and_canonical_relative": true,
+    "old190_retained_exact_except_single_path_suffix_raw": true,
+    "all_author_supplement_leaf_files_covered": true,
+    "historical_script_sources_raw_not_active": true,
+    "Main_old_inputs_and_failed_outer_checkpoint_before_index_and_prior_transport_review_retained": true,
+    "helper_adds_review_plus_map_itself": 2,
+    "expected_final_target_count": 225,
+    "no_new_normal_Main_pass_or_runtime_support_claim": true
+  },
+  "limits": [
+    "Final225 integration and the complete ordinary Main hooks must be executed by Root; these are not covered by the two-module32-method GREEN.",
+    "Formal29-fixture declaration is now complete but this supplement did not execute that full ARM plan. Existing focused ARM5 remains the original D2 result.",
+    "Source/SDK-required list matching is not installed SDK, OCI/offline reproduction or physical HIL qualification.",
+    "Source-freeze phrase all19 Native tests is interpreted precisely as19 retained Native MODEL inventory rows/assertions; the whole work-package module has24 test methods, not19 new Native test executions.",
+    "OriginalD2 source review, prior transport review, failed first Main attempt, raw metadata without newline and all historical archives remain immutable."
+  ],
+  "review_actions": "Only read/hash/parse source and JSON, compare exact before bytes/AST method names, read immutable Git index/tree metadata and existing archive/log evidence; only this report is written. No source/Main/index/helper/SUT/test/build execution."
+}

@@ -1,0 +1,144 @@
+{
+  "utc": "2026-10-18T09:04:33.074924+00:00",
+  "head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+  "remote_head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+  "full_normal_gate": "/dev/shm/nexus-h743-composite-evidence-correction-20261018-r1/full-gate-composite-r2.json",
+  "proof_sha256": "33cd8b2a386b343d0bac81816ed4eeaf8be60180880227422504852c8a274bd1",
+  "publication": "ordinary push from exact verified standalone checkout",
+  "persistent_central_replica": "not advanced; avoids duplicate object allocation near resource floor",
+  "source_protection": "original workspace/central worktree and old evidence untouched; complete commit retained on GitHub and in validation checkout",
+  "force_gc_or_prune": false,
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "ls-remote",
+        "https://github.com/X-Gen-Lab/nexus.git",
+        "refs/heads/feat/io-evolution-20261017"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "push",
+        "https://github.com/X-Gen-Lab/nexus.git",
+        "HEAD:refs/heads/feat/io-evolution-20261017"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "ls-remote",
+        "https://github.com/X-Gen-Lab/nexus.git",
+        "refs/heads/feat/io-evolution-20261017"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "-c",
+        "maintenance.auto=false",
+        "-c",
+        "pack.threads=1",
+        "-c",
+        "pack.windowMemory=32m",
+        "-C",
+        "/tmp/nexus-io-validation-20261018",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

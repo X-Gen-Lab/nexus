@@ -1,0 +1,95 @@
+--- baseline26766/spi.c
++++ batch4/spi.c
+@@ -7,9 +7,10 @@
+  * \copyright       Copyright (c) 2026 Nexus Team
+  */
+ #include "nexus/core/fault.h"
++#include "stm32h743_clock.h"
+ #include "stm32h743_provider.h"
+-#if NEXUS_CORE_HZ == 384000000U
+-#include "stm32h743_clock.h"
++#ifndef NX_H743_SILICON_ID
++#define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
+ #endif
+ #include "stm32h7xx_ll_spi.h"
+ /* ES0392 2.22.5: CRC-disabled finite reception still requires CRCSIZE=7. */
+@@ -104,20 +105,31 @@
+ #endif
+            p->poll_limit != 0U;
+ }
+-static bool clock_ready(const nx_stm32h743_spi_state_t* p) {
++/** \brief The SPI clock envelope requires exact V identity and default trim. */
++static nx_result_t clock_ready(const nx_stm32h743_spi_state_t* p) {
+     RCC_TypeDef* r = g_nx_stm32h743_system.rcc;
+-    if (r == NULL || !g_nx_stm32h743_system.started ||
++    if (r == NULL || !g_nx_stm32h743_system.started)
++        return NX_ERROR_STATE;
++    /* HSICFGR has the reviewed layout only on revision V. Do not read that
++     * register until the independent DEV_ID/REV_ID check admits this cut. */
++    if (!nx_stm32h743_is_revision_v(NX_H743_SILICON_ID()))
++        return NX_ERROR_UNSUPPORTED;
++    if ((NX_H743_READ(&r->HSICFGR) & RCC_HSICFGR_HSITRIM) !=
++        (0x40U << RCC_HSICFGR_HSITRIM_Pos))
++        return NX_ERROR_STATE;
+ #if NEXUS_CORE_HZ == 384000000U
+-        !nx_stm32h743_pll384_clocks_ready())
++    if (!nx_stm32h743_pll384_clocks_ready())
+ #else
+-        g_nx_stm32h743_system.core_hz != p->clock_hz)
++    if (g_nx_stm32h743_system.core_hz != p->clock_hz)
+ #endif
+-        return false;
++        return NX_ERROR_STATE;
+     if (p->reset == &r->APB2RSTR && p->reset_mask == RCC_APB2RSTR_SPI4RST)
+         return (NX_H743_READ(&r->APB2ENR) & RCC_APB2ENR_SPI4EN) != 0U &&
+-               (NX_H743_READ(&r->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) == 0U;
+-
+-    return false;
++                       (NX_H743_READ(&r->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) ==
++                           0U
++                   ? NX_SUCCESS
++                   : NX_ERROR_STATE;
++    return NX_ERROR_STATE;
+ }
+ static bool span(const void* value, size_t size) {
+     return value != NULL && size != 0U &&
+@@ -308,8 +320,9 @@
+         NX_H743_READ(&p->registers->CFG2) != 0U ||
+         (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) != 0U)
+         return NX_ERROR_BUSY;
+-    if (!clock_ready(p))
+-        return NX_ERROR_STATE;
++    const nx_result_t readiness = clock_ready(p);
++    if (readiness != NX_SUCCESS)
++        return readiness;
+     p->retained = true;
+     p->fault = false;
+     NX_H743_WRITE(&p->registers->CFG1, BYTE_CONFIG);
+@@ -345,7 +358,8 @@
+         return NX_ERROR_INVALID;
+     *transferred = 0U;
+     nx_stm32h743_spi_state_t* p = e->port;
+-    if (!p->initialized || !e->cs->initialized || p->fault || !clock_ready(p))
++    if (!p->initialized || !e->cs->initialized || p->fault ||
++        clock_ready(p) != NX_SUCCESS)
+         return NX_ERROR_STATE;
+     if (p->active || (NX_H743_READ(&p->registers->SR) & FIFO_LEVELS) != 0U)
+         return NX_ERROR_BUSY;
+@@ -454,7 +468,7 @@
+         return NX_ERROR_INVALID;
+     if (p->active)
+         return NX_ERROR_BUSY;
+-    if (!p->retained || !clock_ready(p))
++    if (!p->retained || clock_ready(p) != NX_SUCCESS)
+         return NX_ERROR_STATE;
+     if (withdraw(p) != NX_SUCCESS)
+         return NX_ERROR_IO;
+@@ -476,7 +490,7 @@
+         return NX_ERROR_BUSY;
+     if (!p->retained)
+         return NX_SUCCESS;
+-    if (!clock_ready(p))
++    if (clock_ready(p) != NX_SUCCESS)
+         return NX_ERROR_STATE;
+     if (withdraw(p) != NX_SUCCESS)
+         return NX_ERROR_IO;

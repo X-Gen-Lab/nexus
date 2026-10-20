@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+"""Lint the complete staged GitHub Actions input using one offline host tool."""
+
+import argparse
+import hashlib
+import importlib.metadata
+import json
+import os
+from pathlib import Path, PurePosixPath
+import re
+import subprocess
+import sys
+import tarfile
+import tempfile
+import time
+import uuid
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+from tools.dev import dependencies, process
+from tools.evidence.common import EvidenceError, separate_outputs
+
+CONFIGS = (".github/actionlint.yaml", ".github/actionlint.yml")
+PYTHON_LOCK = "dependencies/workflow-tools.txt"
+TOOL_LOCK = str(dependencies.ACTIONLINT_LOCK)
+
+
+class WorkflowError(ValueError):
+    """Staged inputs or the prepared tool could not be safely admitted."""
+
+
+def child_environment():
+    """Keep the caller's real index only in parent Git reads."""
+    return {key: value for key, value in os.environ.items()
+            if not key.startswith("GIT_")} | {
+                "GIT_CONFIG_NOSYSTEM": "1",
+                "GIT_CONFIG_GLOBAL": os.devnull,
+                "GIT_CONFIG_SYSTEM": os.devnull,
+            }
+
+
+def git(root, *arguments):
+    result = subprocess.run(
+        ["git", *arguments], cwd=root,
+        env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"},
+        capture_output=True, timeout=30, check=False)
+    if result.returncode:
+        raise WorkflowError("Cannot read actual Git index: " +
+                            result.stderr.decode(errors="replace"))
+    return result.stdout
+
+
+def canonical(name):
+    path = PurePosixPath(name)
+    if (not name or ":" in name or "\\" in name or path.is_absolute() or
+            any(part in ("", ".", "..") for part in name.split("/")) or
+            any(ord(char) < 32 or ord(char) == 127 for char in name)):
+        raise WorkflowError("Unsafe staged input path: " + repr(name))
+    return path
+
+
+def selected(name):
+    path = PurePosixPath(name)
+    return (name in (TOOL_LOCK, PYTHON_LOCK, *CONFIGS) or
+            path.name in ("action.yml", "action.yaml") or
+            (path.parent == PurePosixPath(".github/workflows") and
+             path.suffix in (".yml", ".yaml")))
+
+
+def capture(root, records):
+    inputs, aliases = {}, {}
+    expanded = 0
+    for row in records.split(b"\0"):
+        if not row:
+            continue
+        metadata, raw_name = row.split(b"\t", 1)
+        mode, oid, stage = metadata.split()
+        if stage != b"0":
+            raise WorkflowError("Cannot lint an unmerged index")
+        name = raw_name.decode("utf-8")
+        if not selected(name):
+            continue
+        canonical(name)
+        parts = name.split("/")
+        for length in range(1, len(parts) + 1):
+            prefix = "/".join(parts[:length])
+            previous = aliases.setdefault(prefix.casefold(), prefix)
+            if previous != prefix:
+                raise WorkflowError("Case alias in staged workflow inputs")
+        if mode not in (b"100644", b"100755"):
+            raise WorkflowError("Workflow inputs must be regular blobs: "
+                                + name)
+        identity = oid.decode("ascii")
+        if git(root, "cat-file", "-t", identity).strip() != b"blob":
+            raise WorkflowError("Workflow input object is not a blob")
+        size = int(git(root, "cat-file", "-s", identity).strip())
+        if (not 0 <= size <= 4 * 1024 * 1024 or
+                expanded + size > 16 * 1024 * 1024):
+            raise WorkflowError("Workflow input exceeds bounded size")
+        data = git(root, "cat-file", "blob", identity)
+        if len(data) != size:
+            raise WorkflowError("Workflow blob differs from admitted size")
+        expanded += size
+        inputs[name] = data
+    if TOOL_LOCK not in inputs or PYTHON_LOCK not in inputs:
+        raise WorkflowError("Staged actionlint and PyYAML locks are required")
+    return inputs
+
+
+def check_yaml_pin(data):
+    pins = [line.split("#", 1)[0].strip()
+            for line in data.decode("utf-8").splitlines()]
+    pins = [line for line in pins if line]
+    if (len(pins) != 1 or not re.fullmatch(r"PyYAML==[0-9.]+", pins[0]) or
+            importlib.metadata.version("PyYAML") != pins[0].split("==")[1]):
+        raise WorkflowError("PyYAML differs from staged workflow-tools.txt")
+
+
+def local_references(inputs):
+    """Check literal local presence, leaving workflow grammar to actionlint."""
+    import yaml
+
+    def reference(value, reusable=False):
+        if not isinstance(value, str) or not value.startswith("./"):
+            return
+        name = value[2:].rstrip("/")
+        try:
+            if name:
+                canonical(name)
+        except WorkflowError as error:
+            raise WorkflowError("Unsafe local reference: " + value) from error
+        if reusable:
+            path = PurePosixPath(name)
+            if (path.parent != PurePosixPath(".github/workflows") or
+                    path.suffix not in (".yaml", ".yml") or name not in inputs):
+                raise WorkflowError("Missing staged local reusable: " + value)
+        else:
+            prefix = name + "/" if name else ""
+            candidates = [prefix + suffix for suffix in
+                          ("action.yml", "action.yaml")]
+            if sum(path in inputs for path in candidates) != 1:
+                raise WorkflowError("Missing or ambiguous staged action "
+                                    "metadata: " + value)
+
+    def steps(value):
+        if isinstance(value, list):
+            for step in value:
+                if isinstance(step, dict):
+                    reference(step.get("uses"))
+
+    for name, data in inputs.items():
+        path = PurePosixPath(name)
+        if (path.parent != PurePosixPath(".github/workflows") and
+                path.name not in ("action.yml", "action.yaml")):
+            continue
+        try:
+            document = yaml.safe_load(data)
+        except yaml.YAMLError as error:
+            raise WorkflowError("Invalid staged YAML: " + name) from error
+        if not isinstance(document, dict):
+            continue
+        jobs = document.get("jobs")
+        if isinstance(jobs, dict):
+            for job in jobs.values():
+                if isinstance(job, dict):
+                    reference(job.get("uses"), reusable=True)
+                    steps(job.get("steps"))
+        runs = document.get("runs")
+        if isinstance(runs, dict) and runs.get("using") == "composite":
+            steps(runs.get("steps"))
+
+
+def protect_output(log, root, prefix, protected=()):
+    if ".." in log.parts:
+        raise WorkflowError("Unsafe noncanonical workflow output location")
+    log = log.absolute()
+    outputs = (log, log.with_suffix(".command.json"),
+               log.parent / (log.stem + ".attempts"),
+               log.parent / (log.stem + ".inputs"))
+    for output in outputs:
+        if (any(part.is_symlink() for part in (output, *output.parents)) or
+                (output.exists() and output.is_file() and
+                 output.stat().st_nlink != 1) or
+                output == root or
+                output.resolve().is_relative_to(prefix.resolve()) or
+                (output.is_relative_to(root) and
+                 not output.is_relative_to(root / "build"))):
+            raise WorkflowError("Unsafe workflow output location")
+    try:
+        separate_outputs(list(outputs), list(protected), [prefix])
+    except EvidenceError as error:
+        raise WorkflowError("Unsafe workflow output: " + str(error)) from error
+    return log
+
+
+def staged(root, prefix, log, *, timeout=60):
+    """Snapshot every maintained workflow input; leave the full index intact."""
+    root, prefix = Path(root).resolve(), Path(prefix).absolute()
+    log = protect_output(Path(log), root, prefix)
+    checkout = git(root, "rev-parse", "--show-toplevel").decode().strip()
+    if Path(checkout).resolve() != root:
+        raise WorkflowError("Workflow lint requires the actual checkout root")
+    before = git(root, "ls-files", "--stage", "-z")
+    index_path = Path(git(root, "rev-parse", "--git-path", "index")
+                      .decode().strip())
+    if not index_path.is_absolute():
+        index_path = root / index_path
+    index_bytes = index_path.read_bytes()
+    log = protect_output(log, root, prefix, [index_path])
+    try:
+        inputs = capture(root, before)
+        log = protect_output(log, root, prefix,
+                             [index_path, *[root / name for name in inputs]])
+        check_yaml_pin(inputs[PYTHON_LOCK])
+        configs = [name for name in CONFIGS if name in inputs]
+        if len(configs) > 1:
+            raise WorkflowError("Ambiguous staged actionlint config names")
+        config = configs[0] if configs else CONFIGS[0]
+        inputs.setdefault(config, b"{}\n")
+        local_references(inputs)
+        workflows = sorted(name for name in inputs if
+                           PurePosixPath(name).parent ==
+                           PurePosixPath(".github/workflows"))
+        if not workflows:
+            raise WorkflowError("No staged workflows to lint")
+        temporary = tempfile.TemporaryDirectory(
+            prefix="nexus-workflow-snapshot-")
+        with temporary as directory:
+            snapshot = Path(directory)
+            for name, data in inputs.items():
+                path = snapshot / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(data)
+            # actionlint discovers local metadata through a project Git root.
+            # An empty directory suffices; no actual repository is initialized.
+            (snapshot / ".git").mkdir()
+            executable = dependencies.verify_actionlint(
+                prefix, snapshot / TOOL_LOCK)
+            archive_root = log.parent / (log.stem + ".inputs")
+            archive_root.mkdir(parents=True, exist_ok=True)
+            identity = str(time.time_ns()) + "-" + uuid.uuid4().hex
+            archive = archive_root / (identity + ".tar.gz")
+            with tarfile.open(archive, "w:gz") as content:
+                for name in sorted(inputs):
+                    content.add(snapshot / name, arcname=name, recursive=False)
+            manifest = {name: {"bytes": len(data), "sha256":
+                              hashlib.sha256(data).hexdigest()}
+                        for name, data in inputs.items()}
+            (archive_root / (identity + ".json")).write_text(
+                json.dumps({"inputs": manifest, "index_sha256":
+                            hashlib.sha256(before).hexdigest(),
+                            "tool_sha256": hashlib.sha256(
+                                executable.read_bytes()).hexdigest()},
+                           indent=2) + "\n", encoding="utf-8")
+            result = process.run(
+                [str(executable), "-shellcheck=", "-pyflakes=", "-no-color",
+                 "-config-file", str(snapshot / config),
+                 *[str(snapshot / name) for name in workflows]],
+                cwd=snapshot, env=child_environment(), log=log,
+                timeout=timeout, stage="workflow-dsl-lint")
+            return result.returncode
+    except EvidenceError as error:
+        raise WorkflowError(str(error)) from error
+    finally:
+        if (git(root, "ls-files", "--stage", "-z") != before or
+                index_path.read_bytes() != index_bytes):
+            raise WorkflowError("Git index changed during workflow lint")
+
+
+def main(arguments=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--staged", action="store_true")
+    mode.add_argument("--doctor", action="store_true")
+    parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument("--tool-prefix", type=Path)
+    parser.add_argument("--log", type=Path,
+                        default=Path("build/quality/workflow-lint/lint.log"))
+    args = parser.parse_args(arguments)
+    prefix = args.tool_prefix or args.root / ".venv/nexus-actionlint"
+    try:
+        if args.doctor:
+            executable = dependencies.verify_actionlint(
+                prefix, args.root / dependencies.ACTIONLINT_LOCK)
+            check_yaml_pin((args.root / PYTHON_LOCK).read_bytes())
+            print("Verified offline workflow DSL tool: " + str(executable))
+            return 0
+        log = args.log if args.log.is_absolute() else args.root / args.log
+        result = staged(args.root, prefix, log)
+        if log.exists():
+            print(log.read_text(), end="")
+        return result
+    except (WorkflowError, EvidenceError, OSError, ValueError,
+            subprocess.SubprocessError,
+            importlib.metadata.PackageNotFoundError) as error:
+        print("Workflow lint rejected: " + str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

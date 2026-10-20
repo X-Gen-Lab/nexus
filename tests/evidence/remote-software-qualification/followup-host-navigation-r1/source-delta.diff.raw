@@ -1,0 +1,153 @@
+--- a/.github/workflows/software-qualification.yml
++++ b/.github/workflows/software-qualification.yml
+@@ -34,6 +34,7 @@
+       NEXUS_QUALIFICATION_ASSEMBLY: ${{ inputs.qualification_assembly }}
+       NEXUS_QUALIFICATION_WORKLOAD: ${{ inputs.qualification_workload }}
+       Q: ${{ github.workspace }}/build/software-qualification
++      E: ${{ runner.temp }}/nexus-reproduction-${{ github.run_id }}-${{ github.run_attempt }}
+       PYTHONDONTWRITEBYTECODE: '1'
+       CMAKE_BUILD_PARALLEL_LEVEL: '1'
+       NEXUS_BUILD_JOBS: '1'
+@@ -203,6 +204,7 @@
+         id: reproduce
+         run: |
+           exec > >(tee "$Q/reproduce.raw") 2>&1
++          mkdir "$E"
+           .venv/bin/python tools/evidence/reproduce.py --prepare-spec \
+             --spec "$Q/spec.json" --source "$GITHUB_WORKSPACE" \
+             --source-sdk "$RUNNER_TEMP/nexus-source-sdk/share/nexus/src/.nexus-source-sdk.json" \
+@@ -210,7 +212,7 @@
+             --workload "$NEXUS_QUALIFICATION_WORKLOAD" \
+             --environment "$Q/observed-oci/environment.json" \
+             --toolchain "$RUNNER_TEMP/nexus-arm-toolchain"
+-          .venv/bin/python tools/evidence/reproduce.py --spec "$Q/spec.json" --report "$Q/reproduction.json"
++          .venv/bin/python tools/evidence/reproduce.py --spec "$Q/spec.json" --report "$E/reproduction.json"
+       - name: Preserve available setup and failed partial output without qualifying it
+         id: collect
+         if: always()
+@@ -222,6 +224,23 @@
+           mkdir -p "$Q/setup"
+           if test -d "$RUNNER_TEMP/nexus-qualification-early-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"; then
+             cp -p -- "$RUNNER_TEMP/nexus-qualification-early-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/"* "$Q/setup/"
++          fi
++          exec > >(tee "$Q/collect.raw") 2>&1
++          if test -e "$E" || test -L "$E"; then
++            .venv/bin/python tools/evidence/store.py export \
++              --source "$E" --store "$Q/reproduction-store" \
++              --report "$Q/reproduction-package.json"
++          else
++            python3 - <<'PY'
++          import json, os
++          from pathlib import Path
++          output = Path(os.environ['GITHUB_WORKSPACE']) / 'build/software-qualification'
++          (output / 'reproduction-package.json').write_text(json.dumps({
++              'status': 'not_executed', 'archive_created': False,
++              'reason': 'execution_directory_not_created'}) + '\n')
++          if os.environ['NEXUS_JOB_RESULT'] == 'success':
++              raise SystemExit('Successful qualification requires an execution archive')
++          PY
+           fi
+           if [[ "$NEXUS_CHECKOUT_VALIDATED" == true && "$NEXUS_JOB_RESULT" != success && -x .venv/bin/python ]]; then
+             for name in nexus-source-sdk nexus-sdk-consumers nexus-sdk-consumer-transport; do
+--- a/.github/workflows/test_platform_ci.py
++++ b/.github/workflows/test_platform_ci.py
+@@ -477,6 +477,7 @@
+                     NEXUS_QUALIFICATION_ASSEMBLY=
+                         'tools/configure/assemblies/space board.toml',
+                     NEXUS_QUALIFICATION_WORKLOAD='gpio',
++                    E=str(parent / 'nexus-reproduction-123-1'),
+                     GITHUB_OUTPUT=str(parent / 'outputs'),
+                     GITHUB_REPOSITORY='fixture/nexus',
+                     GITHUB_WORKFLOW_REF='fixture/nexus/performance.yml@refs/heads/test',
+@@ -489,6 +490,10 @@
+         script = script.replace('python3 tools/release/delivery.py',
+                                 shlex.quote(sys.executable) + ' ' +
+                                 shlex.quote(str(ROOT / 'tools/release/delivery.py')))
++        if env.get('REAL_EVIDENCE_STORE') == 'true':
++            script = script.replace('.venv/bin/python tools/evidence/store.py',
++                                    shlex.quote(sys.executable) + ' ' +
++                                    shlex.quote(str(ROOT / 'tools/evidence/store.py')))
+         return subprocess.run(['bash', '-euo', 'pipefail', '-c', script],
+                               cwd=root, env=env, capture_output=True, text=True)
+ 
+@@ -811,6 +816,80 @@
+             self.assertFalse((parent / 'outputs').exists())
+             self.assertFalse(list(root.rglob('identity.json')))
+ 
++    def test_offline_navigation_is_sealed_opaque_before_actual_host_identity(self):
++        from tools.configure import configure
++        from tools.evidence import store
++        from tools.evidence.common import EvidenceError
++        from tools.maintenance.job_identity import capture
++        self.document()
++        with tempfile.TemporaryDirectory() as temporary:
++            parent = Path(temporary)
++            root = self.fixture(parent)
++            env = self.environment(root, parent)
++            q = root / 'build/software-qualification'
++            q.mkdir(parents=True)
++            env.update(Q=str(q), NEXUS_CHECKOUT_VALIDATED='true',
++                       NEXUS_JOB_RESULT='success', REAL_EVIDENCE_STORE='true')
++            # Use the actual maintained resolver and its canonical full IR.
++            navigation = {}
++            resolved = configure.resolve(
++                ROOT / 'tools/configure/assemblies/qiming-baremetal.toml',
++                ROOT, input_paths=navigation)
++            report_argument = re.search(r'--report "([^"\n]+)"',
++                                        self.step('reproduce')['run']).group(1)
++            report_path = Path(report_argument.replace('$Q', str(q)).replace('$E', env['E']))
++            report_path.parent.mkdir(parents=True, exist_ok=True)
++            report_path.write_text('{"kind":"navigation-transport-fixture"}\n')
++            runs = report_path.parent / 'reproduction-runs'
++            for directory, mount in (('run-a', '/inputs/sdk-a'),
++                                     ('different-path-b', '/other/sdk-b')):
++                generated = runs / directory / 'build/generated'
++                generated.mkdir(parents=True)
++                (generated / 'resolved.json').write_text(json.dumps(resolved))
++                container_paths = {label: mount + '/share/nexus/src/' + label
++                                   for label in navigation}
++                self.assertTrue(container_paths)
++                self.assertTrue(all(not Path(path).exists()
++                                    for path in container_paths.values()))
++                (generated / 'input_paths.json').write_text(json.dumps(container_paths))
++                artifacts = generated.parent / 'bin'
++                artifacts.mkdir()
++                (artifacts / 'image.elf').write_bytes(b'fixture ELF transport bytes\0')
++                (artifacts / 'image.bin').write_bytes(b'fixture BIN transport bytes\0')
++                (runs / directory / 'command-0.log').write_bytes(b'original raw command bytes\n')
++                (runs / directory / 'command.json').write_text(json.dumps(
++                    {'argv': ['cmake', '-S', mount + '/share/nexus/src']}))
++            original = store.inventory(report_path.parent)
++            delivery = root / 'build/delivery'
++            delivery.mkdir()
++            (delivery / 'fixture.raw').write_text('host identity fixture only\n')
++            collection = self.execute('collect', root, env)
++            self.assertEqual(collection.returncode, 0,
++                             collection.stdout + collection.stderr)
++            selected = [root / path for path in
++                        self.step('identity')['with']['artifacts'].splitlines()]
++            try:
++                record = capture(root=root, job='offline-navigation-fixture',
++                                 result='success', expected_commit=env['NEXUS_EXPECTED_COMMIT'],
++                                 artifacts=selected, tools={'python': sys.executable},
++                                 output=root / 'build/actual-host-identity')
++            except (EvidenceError, OSError, ValueError) as error:
++                self.fail('Host identity must bind the opaque offline closure: ' + str(error))
++            package_path = q / 'reproduction-package.json'
++            self.assertTrue(package_path.is_file())
++            package = json.loads(package_path.read_text())
++            store.verify_package(package)
++            restored = parent / 'restored-offline-execution'
++            store.restore_tree(package, restored)
++            self.assertEqual(store.inventory(restored), original)
++            self.assertEqual(store.inventory(report_path.parent), original)
++            self.assertEqual(record['job_result'], 'success')
++            self.assertEqual(record['qualification'], 'not_a_software_candidate')
++            self.assertFalse(any(item['relative_path'].endswith('/resolved.json')
++                                 for item in record['artifacts']))
++            self.assertTrue(any(item['relative_path'].endswith('.tar.gz')
++                                for item in record['artifacts']))
++
+     def test_identity_and_failure_upload_are_explicit_and_exact(self):
+         steps = self.steps()
+         identity = self.step('identity')

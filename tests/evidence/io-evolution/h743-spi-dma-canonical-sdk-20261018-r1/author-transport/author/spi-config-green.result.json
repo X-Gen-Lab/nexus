@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "tools/configure/providers/stm32h743/test_spi_dma.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.json"
+  ],
+  "actual_returncode": 0,
+  "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/spi-config-green.attempts/1792315181644816157-dd604d2ab252400485d241555f9c818e/receipt.json",
+  "child_maxrss_KiB": 25724,
+  "headroom_after": 3537068032,
+  "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+}

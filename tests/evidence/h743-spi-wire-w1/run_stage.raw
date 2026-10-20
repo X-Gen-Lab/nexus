@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+"""Execute one unchanged whole S0.4 admission stage and retain actual facts."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import signal
+import shutil
+import subprocess
+import sys
+import time
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/tmp/nexus-h743-spi-safe-stop-20261018')
+TOOLS = Path('/tmp/nexus-io-validation-20261018/.venv/bin')
+RELATIVE = (
+    'soc/stm32h743/drivers/spi.c',
+    'soc/stm32h743/drivers/spi_wire.c',
+    'soc/stm32h743/private/stm32h743_spi_wire.h',
+    'tests/google/h743_spi_wire_test.cpp',
+    'tests/google/h743_spi_wire.cmake',
+    'tests/google/CMakeLists.txt',
+    'tests/google/h743.cmake',
+    'tests/google/h743_high.cmake',
+    'tests/google/h743_flash_ram_closure.cmake',
+    'tests/google/i2c_v2_long_factory.cmake',
+    'soc/stm32h743/CMakeLists.txt',
+    'tools/configure/providers/descriptor.py',
+    'tests/google/h743_peripheral_factory_test.cpp',
+    'tools/configure/providers/stm32h743/bindings.py',
+    'tools/configure/providers/stm32h743/test_peripherals.py',
+    'soc/stm32h743/private/stm32h743_provider.h',
+    'tests/google/h743_model.h',
+    'tests/google/h743_peripheral_test.cpp',
+    'tests/google/h743_high_kernel_test.cpp',
+    'soc/stm32h743/system.c',
+    'soc/stm32h743/private/stm32h743_system.h',
+    'tests/google/h743_model.cpp',
+    'tests/google/h743_system_test.cpp',
+    'soc/stm32h743/clock.c',
+    'soc/stm32h743/private/stm32h743_clock.h',
+    'tests/google/h743_clock_test.cpp',
+    'tests/google/h743_clock_model.cpp',
+    'tests/google/h743_clock_model.h',
+)
+
+def identity():
+    return {name: (hashlib.sha256((ROOT / name).read_bytes()).hexdigest() if (ROOT / name).is_file() else None)
+            for name in RELATIVE}
+
+stage = sys.argv[1]
+args = sys.argv[2:]
+out = ROOT / 'build/h743-spi-wire-w1-evidence' / stage
+out.mkdir(parents=True, exist_ok=False)
+env = {key: value for key, value in os.environ.items()
+       if not key.startswith('GTEST_')}
+env['PATH'] = str(TOOLS) + os.pathsep + env.get('PATH', '')
+env['CMAKE_BUILD_PARALLEL_LEVEL'] = '1'
+env['PYTHONDONTWRITEBYTECODE'] = '1'
+xml = None
+if args[0] == 'whole':
+    binary = ROOT / 'build/native-debug/bin' / args[1]
+    xml = out / 'junit.xml'
+    command = [str(binary), '--gtest_output=xml:' + str(xml)]
+else:
+    command = [str(TOOLS / 'python'), 'tools/dev/dev.py', *args]
+maximum = int(Path('/sys/fs/cgroup/memory.max').read_text())
+current = int(Path('/sys/fs/cgroup/memory.current').read_text())
+before = {
+    'source': identity(), 'tmp_free': shutil.disk_usage(ROOT).free,
+    'index_sha256': hashlib.sha256((ROOT / '.git/index').read_bytes()).hexdigest(),
+    'memory_current': current, 'memory_max': maximum,
+    'memory_events': Path('/sys/fs/cgroup/memory.events').read_text(),
+}
+assert maximum - current >= 600 * 1024 * 1024, 'RAM budget unavailable'
+assert before['tmp_free'] >= 200 * 1024 * 1024, 'output filesystem budget unavailable'
+print(json.dumps({'stage': stage, 'command': command, 'before': before}), flush=True)
+start = time.time_ns()
+timed_out = False
+with (out / 'raw.log').open('wb') as stream:
+    child = subprocess.Popen(command, cwd=ROOT, env=env,
+                             stdout=stream, stderr=subprocess.STDOUT,
+                             start_new_session=True)
+    try:
+        code = child.wait(timeout=180)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        os.killpg(child.pid, signal.SIGTERM)
+        try:
+            code = child.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            os.killpg(child.pid, signal.SIGKILL)
+            code = child.wait()
+    result = subprocess.CompletedProcess(command, code)
+end = time.time_ns()
+after = {
+    'source': identity(), 'tmp_free': shutil.disk_usage(ROOT).free,
+    'index_sha256': hashlib.sha256((ROOT / '.git/index').read_bytes()).hexdigest(),
+    'memory_current': int(Path('/sys/fs/cgroup/memory.current').read_text()),
+    'memory_events': Path('/sys/fs/cgroup/memory.events').read_text(),
+}
+record = {
+    'kind': 'actual whole program' if xml else 'maintained command',
+    'qualification': False, 'stage': stage, 'command': command,
+    'cwd': str(ROOT), 'started_ns': start, 'ended_ns': end,
+    'exit_code': result.returncode, 'timed_out': timed_out,
+    'before': before, 'after': after,
+    'source_stable': before['source'] == after['source'],
+    'children_maxrss_kib': resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
+    'raw_sha256': hashlib.sha256((out / 'raw.log').read_bytes()).hexdigest(),
+}
+if xml is not None:
+    record['binary_sha256'] = hashlib.sha256(binary.read_bytes()).hexdigest()
+    if xml.is_file():
+        data = xml.read_bytes()
+        tree = ET.fromstring(data)
+        cases = list(tree.iter('testcase'))
+        record['junit'] = {
+            'path': str(xml), 'sha256': hashlib.sha256(data).hexdigest(),
+            'fresh': xml.stat().st_mtime_ns >= start,
+            'tests': len(cases),
+            'failures': sum(len(list(x.iter('failure'))) for x in cases),
+            'errors': sum(len(list(x.iter('error'))) for x in cases),
+            'skipped': sum(len(list(x.iter('skipped'))) for x in cases),
+            'notrun': sum(x.get('status') == 'notrun' for x in cases),
+        }
+    else:
+        record['junit'] = None
+(out / 'receipt.json').write_text(json.dumps(record, indent=2) + '\n')
+print(json.dumps(record, indent=2), flush=True)
+raise SystemExit(result.returncode)

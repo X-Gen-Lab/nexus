@@ -1,0 +1,90 @@
+{
+  "kind": "Independent read-only source and actual TDD evidence review of maintained-text ASCII control rejection",
+  "reviewed_at_utc": "2026-10-18T02:31:52.870203+00:00",
+  "manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/manifest.json",
+    "bytes": 8578,
+    "sha256": "fbc94b8fe5be3b6ae018a81b26e99597790045bc02401f0732bf4feaae45e0fe"
+  },
+  "authoring_base": "fc93be77d64dcd160886cb3b4c9c23ccbb943b59",
+  "reviewed_main_base": "7e2dbe92a5328d23f00b2d07c49f45a763ae8bbb",
+  "decision": {
+    "blocker_found": false,
+    "focused_change_ready_for_normal_integration_gates": true,
+    "full_repository_qualification": false
+  },
+  "reviewed_sources": {
+    "scripts/ci/style_gate.py": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/files/scripts/ci/style_gate.py",
+      "bytes": 16106,
+      "sha256": "fbff5470007f7218d0d3b7ed3f54e63bedfb595a6558a98a8fbe18fda00940a3"
+    },
+    "scripts/ci/test_style_gate.py": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/files/scripts/ci/test_style_gate.py",
+      "bytes": 23216,
+      "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6"
+    }
+  },
+  "minimality": {
+    "production_AST": "Only check_text changed; all other functions/classes and existing selection/exclusion/debt/ownership code retained.",
+    "old_tests": "All 35 old class methods, including29 test methods, are AST-identical to exact authoring-base Git object. New3 TextHygiene tests plus1 staged CLI test give whole33.",
+    "TDD_same_test_bytes": true
+  },
+  "source_assessment": [
+    "check_text retains initial NUL-byte ValueError, UTF-8 strict decoding, CR LF-ending diagnostic, and missing-final-LF diagnostic. It scans decoded characters for only U+0001..U+001F except TAB/LF/CR, plus ASCII DEL U+007F. Existing CR diagnostic handles CR rather than duplicate ASCII-control errors. There is no Unicode category/bidi expansion or regex execution against unselected raw output.",
+    "LF alone advances reported source line numbers. Vertical tab, form feed, file/group/record separator characters no longer create fake lines or trailing-space evidence. Exact ASCII diagnostics include the maintained relative path, LF line number and code point. The class includes the actual0x08 Doxygen corruption discovered in SPI comments.",
+    "TAB and LF are not forbidden; valid UTF-8 prose remains decodable. Python compile checking follows the existing text checks. Literal source escapes such as backslash-b contain no hidden control byte and remain governed by normal language syntax, not this scan.",
+    "The Markdown trailing-space exemption remains. Non-Markdown trailing spaces/tabs at real LF boundaries are rejected as before. Removing terminal CR before checking whitespace preserves existing CRLF trailing-whitespace behavior, while the independent CR diagnostic always rejects CR.",
+    "run_checks file selection, tracked/index requirements, source ownership, vendor exclusions, sealed debt checks, and text suffixes are unchanged. The new staged test executes the real CLI: four maintained suffixes fail for actual backspace, .log/.bin and vendors exclusion stay ignored, and an untracked .txt does not enter the selection. No historical debt rebaseline or new ignore rule was introduced.",
+    "The scan has no write path and does not rewrite or sanitize bytes. Its policy applies to existing selected maintained text, which includes .txt; it does not claim that arbitrary execution logs named .txt are universally exempt. The preserved feature raw files are .log / unselected attempt outputs, and all28 protected files remain byte-identical."
+  ],
+  "bounded_whitespace_semantic_change": {
+    "blocking": false,
+    "observation": "Old str.splitlines also split at Unicode NEL U+0085, LINE SEPARATOR U+2028 and PARAGRAPH SEPARATOR U+2029. New LF-only splitting does not. Thus a space immediately before such an embedded separator can cease to be reported as trailing whitespace in non-Markdown text.",
+    "example_read_only_reasoning": "Text SPACE U+2028 tail LF was two logical splitlines lines before; it is now one LF line whose interior space is not trailing. No test or implementation was executed by this reviewer to infer this; it follows directly from the changed split API.",
+    "assessment": "Consistent with the repository LF line-boundary rule and avoids interpreting allowed Unicode prose as physical source lines. Do not describe it as preserving every old Unicode-separator whitespace diagnostic. This does not introduce acceptance of forbidden ASCII controls or CR, which have their own nonzero diagnostics."
+  },
+  "actual_TDD": {
+    "red": {
+      "whole_tests": 33,
+      "failure_records_including_subtests": 30,
+      "errors": 0,
+      "skips": 0,
+      "actual_child_and_outer_exit": 1,
+      "reason": "29 forbidden-ASCII subtests lacked the new required diagnostic plus real staged hidden-backspace acceptance regression. Existing NUL/CR and valid UTF8/TAB/LF checks passed.",
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/red.attempts/1792290463517550901-9d283bf7e5ca497caaee16aecf997ce5/receipt.json",
+        "bytes": 1141,
+        "sha256": "86d190585107df70739869dfafd5b51f4c8f2a289654029bf8fed85cd42cc47c"
+      },
+      "stderr_sha256": "6cfb42600138c86d63b8978833cf2ae755afdd24e2f7897d582dfd8ef18d8ec9"
+    },
+    "green": {
+      "whole_tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "actual_child_and_outer_exit": 0,
+      "receipt": {
+        "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/green.attempts/1792290502218398138-5753883a6b9e42a08260cdde5a7ba8d5/receipt.json",
+        "bytes": 1145,
+        "sha256": "4017acec528fe551764eda265bdc80ef12db0202be5aeb10fbaf94c52d5497e9"
+      },
+      "stderr_sha256": "ac46a76d89ca5fe6c073d206f1d37019426bbc8756774c0e1074ca6aedcafc6e"
+    },
+    "preservation": "Exact final test bytes are present in red-source and final-source; RED production matches base39ee6a0b, GREEN productionfbff5470. Maintained process.run full unittest module command has no filter/subset; actual completed receipts, stdout/stderr sizes and SHA match the full retained log endings."
+  },
+  "independent_evidence_readback": {
+    "manifest_artifact_size_and_SHA_verified": 25,
+    "protected_files_verified_before_vs_after_and_actual_current_bytes": 28,
+    "protected_scope": "Four separately published HSI WIP files,23 old s0-evidence files, and exact Git index; before/after HEAD identity claims match the authoring-base scope. Reviewer did not repeat an actual live HEAD/status command or infer full-tree qualification.",
+    "index_sha256": "80a6c715a2e02f1330e2b86baab92b620ce28e6a83e6a80709ccd44998e33d16",
+    "prior_tests": "35 existing class methods preserved by AST comparison to exact Git source object.",
+    "reviewer_operations": "Small read-only source/AST/hash/raw receipt inspection only; no test, compilation, configure, formatter, helper execution, source/main/index/ref change, or subagent was used."
+  },
+  "limits": [
+    "Whole scripts.ci.test_style_gate module is the only new executed qualification. Complete main normal hooks/CI remain separate.",
+    "This ASCII check catches literal backspace corruption but cannot prove Doxygen semantics or detect a note command accidentally split using an otherwise valid LF; SPI comment-only corrections still need their own byte review.",
+    "No firmware, ARM, SDK, physical timing, hardware or HIL claim follows from this tool change."
+  ]
+}

@@ -1,0 +1,46 @@
+// FIG-22 current exact G474 named GPIO software lifecycle.
+// Dashed edges: generation / pure identity. Solid: lifecycle or selection.
+// No request states, automatic clock repair, wake or physical safety are implied.
+digraph gpioPinStates {
+    graph [label="FIG-22 G474 命名 GPIO 状态\n当前软件；无低功耗或 HIL 资格", rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=14, bgcolor="white", pad=0.2, nodesep=0.3, ranksep=0.4];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, margin="0.1,0.08"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=9, arrowsize=0.7];
+    authored [label="Board + TOML"];
+    assembled [label="静态 face、计划和私有状态"];
+    factory [label="factory 查找"];
+    cold [label="Platform：冷快照与 pad/gate 租约"];
+    select [label="串行特权 select"];
+    apply [label="全组撤驱动；latch／字段；目标读回"];
+    active [label="已证明 DEFAULT／SLEEP 图像"];
+    retained [label="运行失败：保留已初始化实例的租约", fillcolor="#fff7ed"];
+    cleanup [label="清理失败：保留尚未完成的责任", fillcolor="#fff7ed"];
+    shutdown [label="Platform stop：只重试未完成阶段"];
+    gate [label="Platform：证明 gate 清理完成"];
+    stop [label="provider stop：证明已撤驱动"];
+    restore [label="Platform：恢复冷快照"];
+    released [label="清理已证明；释放租约", fillcolor="#f0fdf4"];
+    authored -> assembled [label="构建期生成", style=dashed];
+    factory -> assembled [label="仅返回既有 face", style=dashed];
+    assembled -> cold [label="Platform start"];
+    cold -> active [label="初始化并证明 DEFAULT"];
+    cold -> cleanup [label="启动有未撤回效果"];
+    active -> select [label="显式目标；其他写者已静止"];
+    select -> apply [label="dirty 或目标改变；准入已通过"];
+    apply -> active [label="提交已检查的目标"];
+    select -> active [label="同目标且图像一致；不写寄存器"];
+    select -> retained [label="拒绝仍保留既有租约"];
+    apply -> retained [label="转换证明未完成"];
+    retained -> select [label="已初始化且未 stop；重试目标"];
+    active -> shutdown [label="显式 Platform stop"];
+    retained -> shutdown [label="重试受检查的清理"];
+    cleanup -> shutdown [label="重试尚未完成的清理"];
+    shutdown -> stop [label="provider 责任尚未完成"];
+    shutdown -> restore [label="provider 已撤回"];
+    shutdown -> gate [label="仅 gate 责任尚未完成"];
+    stop -> restore [label="仅 provider 证明完成"];
+    stop -> cleanup [label="撤驱动证明未完成"];
+    restore -> gate [label="冷快照已恢复"];
+    restore -> cleanup [label="快照恢复尚未完成"];
+    gate -> released [label="gate 清理已证明"];
+    gate -> cleanup [label="gate 清理尚未完成"];
+}

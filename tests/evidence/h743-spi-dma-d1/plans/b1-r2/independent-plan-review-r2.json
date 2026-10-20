@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "kind": "independent_read_only_B1_finite_design_r2_re_review",
+  "reviewer": "/root/style_control_chars",
+  "observed_ns": 1792294836212109090,
+  "decision": {
+    "result": "PASS for the exact revised design and closure of the two r1 IRQ blockers; implementation remains unauthorized.",
+    "new_design_blocker_count": 0,
+    "r1_D1_blockers_closed": 2,
+    "r1_cold_boundary_and_bounded_work_clarifications_closed": 2,
+    "W1_implementation_authorized": false,
+    "D1_or_B1_production_implemented_or_tested": false,
+    "new_hardware_SDK_full_source_qualification": false
+  },
+  "exact_review_inputs": {
+    "plan": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/PLAN.md",
+      "bytes": 38816,
+      "sha256": "10fc6cdf560a00ca5c7a9e268532c8d77b437c8cb2dfdce7e48c0020be5a0783"
+    },
+    "manifest": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r2/manifest.json",
+      "bytes": 4284,
+      "sha256": "09ca25ad73326474c9bcf3ab36eca0f70bdc5a550192db0af081f4222431a4de"
+    },
+    "prior_independent_review": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r1/independent-plan-review-r1.json",
+      "sha256": "30959642a0cb9640548ef7891829133a292311186f692866b5fcffed96010952"
+    },
+    "prior_immutable_inputs_verified": [
+      {
+        "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r1/PLAN.md",
+        "sha256": "e72b80701c2515b5720b1236077484c11a4f1735ce848ea35567a37e8911fb39",
+        "unchanged": true
+      },
+      {
+        "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r1/manifest.json",
+        "sha256": "ff6475e20d96d387d986c9bd789c5822b1137c8f8658d0003bb8cf4036ba0bf5",
+        "unchanged": true
+      },
+      {
+        "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/b1-finite-design-r1/independent-plan-review-r1.json",
+        "sha256": "30959642a0cb9640548ef7891829133a292311186f692866b5fcffed96010952",
+        "unchanged": true
+      },
+      {
+        "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/manifest.json",
+        "sha256": "38b87a219f8c2b8434bfe81b7b7b166822ce326782dde67d9aa92075fe09fac9",
+        "unchanged": true
+      }
+    ],
+    "r2_declared_read_only_references_verified": [
+      {
+        "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/arch/include/nexus/arch/arch.h",
+        "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289",
+        "manifest_identity_exact": true
+      },
+      {
+        "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/core/include/nexus/core/fault.h",
+        "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b",
+        "manifest_identity_exact": true
+      },
+      {
+        "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/soc/stm32h743/private/stm32h743_system.h",
+        "sha256": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+        "manifest_identity_exact": true
+      },
+      {
+        "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/tests/google/h743_model.cpp",
+        "sha256": "3877086d3448d19ab334225c957153c5935cdb34ce903b3215cba3e29a7ffd09",
+        "manifest_identity_exact": true
+      },
+      {
+        "path": "/tmp/nexus-io-evolution-recovery-materialization-20261018/tests/google/h743_model.h",
+        "sha256": "11c0f74912a4c95e402af3e656344e6013756964326d034810a4232656ae8f15",
+        "manifest_identity_exact": true
+      }
+    ],
+    "current_main_relevant_contract_reads": [
+      {
+        "path": "/tmp/nexus-io-validation-20261018/arch/include/nexus/arch/arch.h",
+        "sha256": "d75363b08688a651330fee4e0b16738aef3dafb24403f6caaac1ffabe1400289",
+        "inspection": "relevant Arch/Core/NVIC/legacy-model contract sections only"
+      },
+      {
+        "path": "/tmp/nexus-io-validation-20261018/arch/cortex_m/nx_arch_cortex_m.c",
+        "sha256": "0f0074a66d1c3ef41d7359381c9b2d3308a4cee0ed1fe9a21d060ccf88795941",
+        "inspection": "relevant Arch/Core/NVIC/legacy-model contract sections only"
+      },
+      {
+        "path": "/tmp/nexus-io-validation-20261018/core/include/nexus/core/fault.h",
+        "sha256": "097fc9bdc5f14958f80161afdf9a9fdff20f8db931c581fb4f208865feb3766b",
+        "inspection": "relevant Arch/Core/NVIC/legacy-model contract sections only"
+      },
+      {
+        "path": "/tmp/nexus-io-validation-20261018/soc/stm32h743/private/stm32h743_system.h",
+        "sha256": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+        "inspection": "relevant Arch/Core/NVIC/legacy-model contract sections only"
+      },
+      {
+        "path": "/tmp/nexus-io-validation-20261018/tests/google/h743_model.cpp",
+        "sha256": "3877086d3448d19ab334225c957153c5935cdb34ce903b3215cba3e29a7ffd09",
+        "inspection": "relevant Arch/Core/NVIC/legacy-model contract sections only"
+      },
+      {
+        "path": "/tmp/nexus-io-validation-20261018/vendors/arm/CMSIS_5/CMSIS/Core/Include/core_cm7.h",
+        "sha256": "a0cf64f2c787e7b63840b2db527c804c5341fb6f3e08f7ad8c599646de545f08",
+        "inspection": "relevant Arch/Core/NVIC/legacy-model contract sections only"
+      }
+    ]
+  },
+  "review_method": "Read the exact r2 plan/manifest, including all of normative section9, and compare every r1-to-r2 change in sections1..8. Re-check current Arch save/restore/mask and Core terminal-fault contracts, the H743 disable+pending helper and legacy host model behavior, CMSIS direct NVIC disable/enable/pending/active leaves, and local RM EOTIE/TXC/SUSP semantics. No source authoring, tests/builds or new hardware observations were used.",
+  "closed_findings": [
+    {
+      "id": "B1-COLD-TERM-01",
+      "result": "CLOSED in design",
+      "lines": [
+        28,
+        185
+      ],
+      "reason": "Pure Python/C static assembly and typed lookup perform no MMIO and introduce no runtime construct/reset API. Private hardware initialize and explicit Platform.start/prepare perform actual identity/trim/cache/clock/register/NVIC admission reads before acquisition. Read-only pre-acquisition rejection is distinguished from zero MMIO; partial acquisition failure still has the retained rollback responsibility specified in section3.",
+      "future_source_oracle": "Separate no-MMIO lookup trace and real initialize/start trace, with identity check preceding V-layout reads. Do not replace either boundary with the other or reconstruct a retained state."
+    },
+    {
+      "id": "B1-IRQ-EOT-01",
+      "result": "CLOSED in design",
+      "lines": [
+        49,
+        196
+      ],
+      "reason": "Every SPI IRQ path is forbidden to write IFCR, change CSTART/TSIZE/SPE or reset. Masked EOTIE leaves physical EOT/TXC/SUSP available for task observation. The task alone checks actual CSTART0 with the appropriate SUSP or nonzero-TSIZE finite predicate, then establishes independent quiet. SUSPC precedes SPE0; EOTC follows valid stop/quiet/RX drain/SUSP clear/SPE0. ISR snapshots remain hints, not stop proofs. Stage retention avoids demanding legitimately cleared flags again or replaying the payload.",
+      "official_cross_check": "RM0433 Rev9 EOTIE enables EOT/SUSP/TXC. For TSIZE nonzero TXC copies EOT including software clearing; SUSP must be cleared before disabling SPI. The revised EOT-before-task and EOT/CSUSP-race oracles directly address the erased-evidence defect.",
+      "future_source_oracles": [
+        "EotIrqBeforeTaskKeepsWireEvidence",
+        "EotWinsCsuspWithoutSusp",
+        "StalePendingCannotCompleteNext"
+      ]
+    },
+    {
+      "id": "B1-IRQ-ISOLATE-02",
+      "result": "CLOSED in design",
+      "lines": [
+        214,
+        229
+      ],
+      "reason": "One owned source mask/ack attempt and readback precede direct disable of only the owned NVIC vector when necessary. ISER0 after barriers proves delivery isolation; ISPR1 and the current handler IABR1 remain legal. The original composite helper is explicitly rejected as the sole sticky-level isolation predicate. Verified isolation permits restoring the incoming mask and returning with Q/loan/owner retained for real task withdrawal. The vector stays disabled through rejected cleanup, and source/flag/pending/active joining is re-proved before any release or re-enable.",
+      "terminal_failure_boundary": "If neither source isolation nor owned NVIC delivery disable is proved, preserve the first cause and all references, mark the valid active request Q, retain configurable-exception masking, call the existing bounded Core fault observer once, then do not return. This branch is explicitly system fail-stop, with no normal ISR WCET/progress/electrical-safety claim and no masking claim for NMI/HardFault. It never publishes SETTLED, resets ownership or treats observer return as release permission.",
+      "future_source_oracles": [
+        "SpiMaskRefusedNeedsNvicIsolation",
+        "DmaW1cMaskAndDualRefusal",
+        "IsolatedPendingClearRetry",
+        "UnisolatableLevelFaultDoesNotReturn"
+      ]
+    },
+    {
+      "id": "B1-BOUNDED-LEAF-01",
+      "result": "CLOSED as a design specification, not as a measured bound",
+      "lines": [
+        239
+      ],
+      "reason": "The plan now specifies returning-IRQ16read/8write and service-stage64read/16write planning limits, one stage per service, at most8 stopped FIFO byte reads, single source/NVIC attempts and no time/poll/dynamic-retry loops. Shared leaves carry no request/queue/epoch. A terminal fail-stop path is separately excluded from a return-time bound. Concrete implementation must measure and enforce these limits; no existing compile or runtime result is inherited."
+    }
+  ],
+  "IRQ_and_loan_semantic_review": [
+    "DMA TC/HT/error handling is generation/active-owner-associated diagnostic work. Software-disabled-stream TC cannot become SUCCESS, and TX TC alone proves neither RX completion nor wire idle.",
+    "SPI EOT/TXC/SUSP are notification and physical-observation inputs, not an IRQ-owned final settlement decision. No normal ISR releases references, CS or caller payload.",
+    "A source-mask refusal cannot be excused by a momentary clear flag. Either all owned enabled sources are proved masked or owned NVIC delivery is proved disabled before a normal return.",
+    "Pending delivery and active exception status are distinct from source deassertion and memory/peripheral withdrawal. Disabling delivery preserves a pending1 sticky source without falsely declaring it cleared.",
+    "Normal returning paths restore exactly the incoming mask; terminal fail-stop intentionally retains the configurable-exception mask and abandons normal system progress. Do not present the terminal branch as a normal short metadata critical section or bounded service return.",
+    "A disabled vector does not establish DMA completion, SPI idle, cache visibility or lifetime join. Q continues to retain request, endpoint, payload and necessary gates until actual hardware withdrawal and external observer/control responsibilities finish.",
+    "Cache/DC-bit repair and software QUIET_DONE/isolated-vector state do not replace compatible cache-owner recovery or a fresh valid quiet proof after a broken clock/time epoch.",
+    "Task-only final joining checks all relevant source masks, real DMA/SPI stop, exact flags, owned pending0 and inactive vector while protected from a new local IRQ entry; then clear references and publish SETTLED as final request access.",
+    "Out-of-owner/exact-vector calls cannot disable or clear foreign resources. Current exception identity must use the actual Arch exception-number contract, not treat raw IRQn as IPSR."
+  ],
+  "architecture_and_cost_review": {
+    "unnecessary_new_architecture_found": false,
+    "private_additions_justified": [
+      "A mode-only isolated-vector responsibility mask for the three fixed exclusively owned vectors is necessary retained hardware cleanup state, not a new owner registry.",
+      "Small private CMSIS disable/get-enabled/clear-get-pending leaves are justified because the existing H743 helper couples disable to pending-clear success. They avoid weakening System-wide semantics or exposing a new public framework.",
+      "The existing Arch barriers/mask primitives and Core nx_fault_observe contract suffice; no new public fault callback, worker, scheduler, queue, global controller pool or runtime constructor is required."
+    ],
+    "preserved_scope": [
+      "Public SPI ABI and ordinary polling state remain unchanged; async service still excludes polling drain/finish_clock/park calls.",
+      "Finite byte mode directly owns one request; the common spi_dma_sequence backend remains the sole later segmented owner and is not redundantly selected for one byte request.",
+      "W1 remains the four-new-file/six-existing-file window already reviewed. D1/D2 mode-only DMA and exact directional tuple/profile/cache-off gates remain separate slices.",
+      "The explicit terminal helper is a private irreversible-failure path, not a second general fault-recovery architecture or permission to release a quarantined borrow."
+    ]
+  },
+  "future_oracle_quality": {
+    "external_arbiter_required": true,
+    "reason": "The revised arbiter is driven by real flag+IE, NVIC enabled/pending/active, priority and incoming local masks, and must demonstrate continuous re-pending before a task is allowed to intervene. It does not grant artificial task scheduling as evidence of recovery.",
+    "model_self_checks": [
+      "Nonzero TSIZE EOTC clears EOT and copied TXC.",
+      "Idle CSUSP after EOT does not guarantee SUSP.",
+      "Sticky enabled sources can re-pend.",
+      "ICER isolates delivery without automatically clearing the source or guaranteeing pending0; refused ICER preserves actual ISER1."
+    ],
+    "fault_subprocess": "The planned observer records and returns, leaving the actual provider terminal path alive until the parent bounded timeout kills/reaps it. No exception/longjmp/finally reset may fabricate loan return. Recoverable cases remove only external faults and use real service/stop cleanup.",
+    "TDD_truthfulness": "Missing-symbol RED remains link-contract evidence only. A first correct implementation that immediately passes must be reported honestly; no deliberately broken production body should be invented to manufacture behavior RED. No RED/GREEN was executed by this review."
+  },
+  "carried_forward_execution_gates": {
+    "W1_authorized": false,
+    "new_integrated_Root_commit_required": true,
+    "fresh_hunk_baseline_required": "The eight shared-source stale snapshot differences found in r1 remain a baseline-selection gate. Use Root current RTC+S0 integrated commit and final S0.4 nine-source mapping, not old3e whole-file replacement.",
+    "evidence_protection": "All old S0 source/ELF/XML/raw/cache/compile-DB/freeze artifacts stay immutable; any later execution uses fresh B1 stage and retained directories. This review made no ELF copy or build output.",
+    "resource_gate": "R2 does not waive output-filesystem and RAM headroom checks or the separate clean-SDK budget. It makes no claim that roughly732MiB current TMP is sufficient for the suggested1.2GiB SDK closure.",
+    "required_scope_evidence": "Only future actual whole-program Native/configuration/ARM/SDK runs on exact matching source can establish their own results; no HIL, MCU waveform or complete-platform qualification follows from design approval."
+  },
+  "official_semantics_read": {
+    "path": "/tmp/nexus-h743-spi-s0-2-official-20261018/rm0433-attempt2.txt",
+    "sha256": "7b142be592dfa60b2e977691f8c26cf05709fe73d194f6accebbed8df9499949",
+    "sections": [
+      "SPI IER EOTIE, p2223",
+      "SPI SR TXC copy and SUSP clear-before-disable, p2225"
+    ],
+    "CMSIS_leaves": [
+      "__NVIC_DisableIRQ writes only one ICER bit and issues DSB/ISB.",
+      "__NVIC_GetEnableIRQ reads ISER.",
+      "Pending and active queries are separate."
+    ],
+    "source_limit": "Existing local official text and headers were read; no new download or hardware validation."
+  },
+  "new_blockers": [],
+  "plan_source_or_evidence_modified": false,
+  "tests_or_builds_run": false,
+  "written_artifact_scope": "Only b1-finite-design-r2/independent-plan-review-r2.json.",
+  "not_performed": [
+    "W1 or B1 source authoring",
+    "plan/manifest/old-review edits",
+    "source/index/ref/stage/commit/push changes",
+    "test/build/configuration/compiler execution",
+    "new clone/network/tool install",
+    "ELF/evidence archive/copy/cleanup",
+    "hardware/SDK/whole-source qualification"
+  ]
+}

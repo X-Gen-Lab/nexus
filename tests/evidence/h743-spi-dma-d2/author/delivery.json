@@ -1,0 +1,114 @@
+{
+  "kind": "D2 completed focused selectable finite SPI4 DMA slice",
+  "source_freeze_sha256": "246cb4de76e54fc993bceeecd3ce674936e566f14d51b80eb8610c6bdaeb98bf",
+  "sealed_map_sha256": "5e51ecad26cb7a4206004f144ae2b262c9f595e2d42445a7a2a8234e654f885c",
+  "base": "61d0698458bd6fe92b6d91914cbb9bec86d96754",
+  "branch": "feat/h743-spi-dma-d2-20261018",
+  "source_paths": 34,
+  "changed_paths": 29,
+  "scope": "DEV0x450/REV0x2003/defaulttrim64/fixedHSI64/cacheoff/baremetal/SPI4mode0/8bit finite; RX DMA1stream2/req83/IRQ13, TXstream3/req84/IRQ14, SPI IRQ84; optional existing UART stream0 TX or stream1 RX",
+  "results": {
+    "Native_whole_programs": 15,
+    "Native_actual_cases": 400,
+    "Native_failure_error_skip_notrun": 0,
+    "Python_complete_modules": 7,
+    "Python_methods": 85,
+    "Python_subtests": 113,
+    "device_payload_unit_only_methods": 14,
+    "device_payload_unit_only_subtests": 121,
+    "format_and_comments_complete_C_files": 8,
+    "tracked_style_paths": 26,
+    "tracked_style_actual_C_files": 5,
+    "ARM_normal_matrix_fixtures": 5,
+    "ARM_normal_commands": 22,
+    "all_actual_exit_zero": true
+  },
+  "ARM_actual_rows": [
+    {
+      "fixture": "empty.toml",
+      "flash_LOAD_bytes": 2926,
+      "AXI_allocated_reserved_bytes_including_main_stack": 2104,
+      "faces": 0,
+      "methods": 0
+    },
+    {
+      "fixture": "peripherals.toml",
+      "flash_LOAD_bytes": 26568,
+      "AXI_allocated_reserved_bytes_including_main_stack": 6920,
+      "faces": 9,
+      "methods": 24
+    },
+    {
+      "fixture": "spi-dma.toml",
+      "flash_LOAD_bytes": 12592,
+      "AXI_allocated_reserved_bytes_including_main_stack": 2320,
+      "faces": 2,
+      "methods": 8
+    },
+    {
+      "fixture": "spi-dma-uart-tx.toml",
+      "flash_LOAD_bytes": 20228,
+      "AXI_allocated_reserved_bytes_including_main_stack": 2608,
+      "faces": 3,
+      "methods": 15
+    },
+    {
+      "fixture": "spi-dma-uart-rx.toml",
+      "flash_LOAD_bytes": 21268,
+      "AXI_allocated_reserved_bytes_including_main_stack": 2804,
+      "faces": 3,
+      "methods": 16
+    }
+  ],
+  "ABI": {
+    "ordinary_SPI_state_bytes": 32,
+    "ordinary_SPI_endpoint_bytes": 20,
+    "DMA_only_state_bytes": 120,
+    "DMA_only_endpoint_bytes": 32,
+    "DMA_only_CS_state_bytes": 12,
+    "shared_DMA1_gate_contribution_bytes": 4,
+    "empty_retains_no_SPI_DMA_ops_state_or_strong_vectors": true,
+    "ordinary_all_writable_symbol_names_sizes_equal_prior_W1": true,
+    "ordinary_RAM_delta_bytes": 0,
+    "ordinary_actual_flash_LOAD_delta_bytes": -8,
+    "no_per_byte_ordinary_path_or_state_change": true
+  },
+  "evidence": {
+    "leaf_map": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/sealed-evidence-map.json",
+    "all_actual_raw_archive": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/final-evidence.tar.xz",
+    "all_actual_raw_archive_sha256": "953756a3c6f7d389183647bf0599f49a821ad5de0fba8172f5437339f7fdd5ed",
+    "raw_entries": 398,
+    "all_archive_members_complete_sha_readback": true,
+    "matching_Native_ELFs": 15,
+    "old_D1_byte_identical_reused": 8,
+    "fresh_ELF_gzip_complete_SHA_CRC_verified": 7,
+    "full_original_ARM_source_input_reports": "Referenced original /dev/shm normal reports remain intact; raw command streams and derived small execution summaries are durable, without claiming copied raw source inventories"
+  },
+  "preservation": {
+    "Git_index_byte_exact": "6118ba170e0c57e390afdab7a39b02af0fb6cc4ea0ce7b30bac9511cee9665f7",
+    "all_tracked_changes_inside_authorized34": true,
+    "all_untracked_inside_approved_sources_or_unchanged_history": true,
+    "unchanged_historical_files": 64,
+    "original_UART_factory_and_Google_CMake_full_HEAD_prefix_preserved": true,
+    "all_other_tracked_sources_unchanged": true,
+    "original_before_gzip_and_index_gzip_preserved": true
+  },
+  "history_classes": [
+    "New9 module initial failure is configuration RED, not link/runtime RED.",
+    "Actual DMA1 cold guard regression then DMA2 shared-DMAMUX extension had complete whole RED before each minimal production guard.",
+    "UART TC IRQ level storm: whole19 real3failedcases/13parentXML assertions RED before checked peripheral mask/owned NVIC isolation/fault/retry fix.",
+    "RX initial consumer-ready-block stop error and compile dangling-else/initializer cast/bundle loader failures are fixture/setup corrections, not production RED.",
+    "Namespace comment correction preserved lexical C/C++ tokens; first exact-space match failed before source writes; initial named build was a retained no-op.",
+    "ARM r1 fourth input failed because generic UART fixture assumed an unselected LED; first3 partial results are not full qualification; fresh5 r2 passed after explicit selected-GPIO guard.",
+    "Raw archive initial print attempted getmembers after closing TarFile; bytes and complete readback already existed. Corrected read-only verification retained all original raw/gzip, no fabrication.",
+    "One final metadata draft used a nonexistent manual protected-path label typed_ir.py and stopped before writing map/source; corrected final protection relies on actual Git authorized34 isolation, not an invented path."
+  ],
+  "limits": [
+    "No target execution, electrical HIL, MCU timing or measured stack high-water. ARM RAM is linked reserved allocation including the explicit main stack.",
+    "No installed clean SDK/D3 qualification; payload14 is a unit test only.",
+    "Debug focused Native400/ARM5 are not ASAN qualification. Root separately fixes known old D1 external-model ASAN narrowing without changing these frozen bytes.",
+    "Cold shared reset and UART TC fixes do not close runtime-domain loss audit; Root schedules a separate adjacent batch.",
+    "Docs fullcheck is on unchanged32 facts/483-message page; subsequent two fixture guards do not alter page/PO. Root normal full gate rebinds overall source34.",
+    "Nonreturning fault retains loan; no normal ISR WCET claim at fault park."
+  ]
+}

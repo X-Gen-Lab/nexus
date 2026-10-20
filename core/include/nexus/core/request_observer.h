@@ -53,8 +53,9 @@ nx_result_t nx_request_observer_bind(nx_request_observer_t* observer,
  * epoch. \param[in,out]   observer: Bound sidecar under caller serialization.
  * \param[in]       now: Same monotonic domain as the request deadline.
  * \param[out]      out: Distinct output, unchanged on error.
- * \return          SUCCESS, STATE for stale/released identity, INVALID or IO
- *                  for reversed time; counters saturate without epoch reuse.
+ * \return          SUCCESS, STATE for stale/released identity, INVALID for
+ *                  invalid arguments or IO for reversed time. Counters
+ *                  saturate without epoch reuse.
  * \note            Borrowed state exposes no speculative result/count. NULL
  *                  slot, stale epoch and overlap reject before request access.
  *                  This neither services hardware nor interprets deadline as

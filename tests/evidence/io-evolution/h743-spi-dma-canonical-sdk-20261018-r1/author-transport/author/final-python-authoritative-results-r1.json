@@ -1,0 +1,111 @@
+{
+  "status": "passed",
+  "complete_modules": 9,
+  "actual_total_tests": 253,
+  "failures_errors_skips": 0,
+  "same_33_source_bytes_modes_and_HEAD_all9": true,
+  "each_authoritative_execution_serialized_index_unchanged": true,
+  "historical_index_cache_event": "final-python-work_packages24 actual module0 / outer1 preserved; fresh complete24-r2+54-r2 are authoritative. First seven used earlier unchanged cached index; logical stage equals published HEAD throughout, not falsely one byte-identical index across independent runs.",
+  "modules": [
+    {
+      "stage": "final-python-provider53",
+      "module": "scripts/ci/test_provider_assemblies.py",
+      "tests": 53,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "36a7b29784281362cfb23d0d2dcb6597ece7eb5e5c93542e009b167d95a404fb",
+      "execution_result_sha256": "11c203971aa243931175d9f32fc08b9daf2e8fee2e53f507541fe2aa9e37b1d7",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1697071104
+    },
+    {
+      "stage": "final-python-spi_config9",
+      "module": "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "tests": 9,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "84cb656091936887f830d7810b588a55311bec94f84d306c35d360fb5345f6ed",
+      "execution_result_sha256": "ac082cfad2674f3e7b7de9a2ccbda544f12c1f4cac558e10285bcee334a07eb6",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1704067072
+    },
+    {
+      "stage": "final-python-selected18",
+      "module": "tools/configure/test_selected_contract_authority.py",
+      "tests": 18,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "ea8425f3bc1422ea25851d35a03e910d8258424d2b0186fcd606a60b0e70c80f",
+      "execution_result_sha256": "550f74d2fecf66200c11a5c1e2004a0d63286596c1d8d4ead933f122800c370b",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1700851712
+    },
+    {
+      "stage": "final-python-payload15",
+      "module": "tests/contracts/test_device_sdk_payload.py",
+      "tests": 15,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "da96aad4f4ec49523c96300de324ba55c88c87c6173ed4d3429cb95c0285eb3d",
+      "execution_result_sha256": "0e86f4a344b6a85ccf1c048b5384ba46b485584c1908a1a5197e47eb48130f04",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1698852864
+    },
+    {
+      "stage": "final-python-sdk28",
+      "module": "tools/testing/test_sdk_verification_call.py",
+      "tests": 28,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "2b5bea83798387f5d1f6085305987d836630e7b1c932bf214c39ca23e895c12d",
+      "execution_result_sha256": "e27d9b644a9d386a9f9e1bfb3860f652bd058809f6296ab8580da12f7c099f73",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1668939776
+    },
+    {
+      "stage": "final-python-release44",
+      "module": ".github/workflows/test_release.py",
+      "tests": 44,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "ef55a60685cd872478c2dcf879c674387ea14a6fc454f772cf832791a104398f",
+      "execution_result_sha256": "62d45a14e55ca4f426169a5d0f15e11b693af8077be3b8e77441bc7bb24b40d2",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1621135360
+    },
+    {
+      "stage": "final-python-qualification8",
+      "module": "tools/testing/test_qualification_plan.py",
+      "tests": 8,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "a1f778adba3e8e7db173e9ad31558b6a4f09b00cd9466495bfb71bd4576523f8",
+      "result_sha256": "503a8d96f12c29ddc8dbac10d89c8ae7fff47b3816072ea6c55a6f17de74e963",
+      "execution_result_sha256": "91efbd4253e18ddf5a584a7726392ceb74d84d001a419327a96f4d17543c72b8",
+      "source_before_sha256": "031e3e4b11a0f678f4b5f440e53795f6dae21e91c30fbad6df0ec44e5bd612b2",
+      "minimum_headroom": 1700028416
+    },
+    {
+      "stage": "final-python-work_packages24-r2",
+      "module": "tools/testing/test_work_packages.py",
+      "tests": 24,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "9633596fbfac4c65093930be645f055e91327fd6fe07908ae8e50d7b29f29046",
+      "result_sha256": "b8f73f90c26c2f9d1b2d609195605e53e77dfe5fedb15cd024481011ea96f895",
+      "execution_result_sha256": "5856facfc810f6a87fe070d11f7b1f202b85944aa0801ca5d4c566ebc1b846bf",
+      "source_before_sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "minimum_headroom": 1605398528
+    },
+    {
+      "stage": "final-python-ci54-r2",
+      "module": ".github/workflows/test_platform_ci.py",
+      "tests": 54,
+      "actual_returncode": 0,
+      "index_sha256_during_execution": "9633596fbfac4c65093930be645f055e91327fd6fe07908ae8e50d7b29f29046",
+      "result_sha256": "509f0528f5217afab9300aa5ac590bb1f009e2d98760354d9c414339e5595e4f",
+      "execution_result_sha256": "39af6ea0588023c844a255f4e12537e0c668ff34e4cf0a264e9b2ac6b6db0fe1",
+      "source_before_sha256": "2b4b3c363ec0e665afa2e64986ecd124a6511401c68f8e9814d3ba98b6f5ff89",
+      "minimum_headroom": 1305305088
+    }
+  ],
+  "qualification": false
+}

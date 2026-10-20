@@ -1,0 +1,47 @@
+{
+  "kind": "actual_required_clang_diagnostic_RED_not_runtime_crash",
+  "actual_returncode": 1,
+  "diagnostic_errors": 4,
+  "branch_clone": 1,
+  "null_flow": 3,
+  "source_sha256": "81ce62f3c95843ab2751c2057d4ed164c52933701460e5a9a5788538d9cb8db4",
+  "raw_sha256": "15458f77a6ec18e601d35367432ecc7209e813f68c3f43ccaaa91fa98bd5b783",
+  "receipt": {
+    "schema": 1,
+    "command": [
+      "/dev/shm/nexus-clang14-required-20261018-r1/unpacked/clang_tidy/data/bin/clang-tidy",
+      "/tmp/nexus-io36-native-20261018/soc/stm32h743/drivers/spi_dma.c",
+      "-p",
+      "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/actual-tu-context",
+      "--checks=-*,clang-analyzer-*,bugprone-*,cert-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-clang-analyzer-optin.performance.Padding,-bugprone-easily-swappable-parameters,-bugprone-macro-parentheses,-bugprone-reserved-identifier,-cert-dcl37-c,-cert-dcl51-cpp",
+      "--warnings-as-errors=*",
+      "--header-filter=/tmp/nexus-io36-native-20261018/(core|io|os|components|arch|boards|soc|tools)/.*"
+    ],
+    "cwd": "/tmp/nexus-io36-native-20261018",
+    "stage": "required-clang-original-TU-r3",
+    "started_ns": 1792310232470614389,
+    "finished_ns": 1792310235796905851,
+    "duration_seconds": 3.3262922629983223,
+    "timeout_seconds": 1800.0,
+    "outcome": "completed",
+    "exit_code": 1,
+    "child_returncode": 1,
+    "withdrawn_processes": [],
+    "withdrawal_stable": true,
+    "withdrawal_complete": true,
+    "build_parallelism": 1,
+    "stdout": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/required-clang-original-TU-r3.attempts/1792310232470566136-74a63bef62b0484891428f47c9c40f0d/stdout.txt",
+      "bytes": 35877,
+      "sha256": "ea9f2699f0bc5ee745b2fdae0620473d7f581edc74623c2a5e59f64b4158f80a"
+    },
+    "stderr": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/required-clang-original-TU-r3.attempts/1792310232470566136-74a63bef62b0484891428f47c9c40f0d/stderr.txt",
+      "bytes": 231,
+      "sha256": "ab0dfd2a6073c916bd31adfd741f1e7d1f4e16ac543e5056f1d073df65e4587f"
+    },
+    "attempt_receipt": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/required-clang-original-TU-r3.attempts/1792310232470566136-74a63bef62b0484891428f47c9c40f0d/receipt.json"
+  },
+  "policy_unchanged": true,
+  "actual_context": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/analysis-r3/actual-tu-context/compile_commands.json"
+}

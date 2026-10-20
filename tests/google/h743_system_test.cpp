@@ -22,6 +22,102 @@ class H743System : public testing::Test {
         return nx_stm32h743_system_start(&g_nx_stm32h743_system, hz, 0U, 8U);
     }
 };
+TEST_F(H743System, ForeignVUserTrimRejectsAllFixedProfilesBeforeMutation) {
+    const uint32_t both = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    for (uint32_t hz : {32000000U, 64000000U}) {
+        for (uint32_t cache : {0U, both}) {
+            for (uint32_t trim : {0x3fU, 0x41U}) {
+                nx_h743_model_reset();
+                g_h743_model.rcc.HSICFGR =
+                    (trim << RCC_HSICFGR_HSITRIM_Pos) | 0xabcU;
+                const uint32_t configuration = g_h743_model.rcc.HSICFGR;
+                const auto result = nx_stm32h743_system_start(
+                    &g_nx_stm32h743_system, hz, cache, 8U);
+                EXPECT_EQ(NX_ERROR_STATE, result.primary) << hz << '/' << cache;
+                EXPECT_EQ(NX_SUCCESS, result.cleanup);
+                EXPECT_EQ(0U, result.remaining_effects);
+                EXPECT_EQ(0U, g_nx_stm32h743_system.remaining_effects);
+                EXPECT_FALSE(g_nx_stm32h743_system.started);
+                EXPECT_EQ(0U, g_h743_model.writes);
+                EXPECT_EQ(0U, g_h743_model.cache_enable_calls);
+                EXPECT_EQ(configuration, g_h743_model.rcc.HSICFGR);
+                EXPECT_EQ(RCC_CR_HSION | RCC_CR_HSIRDY, g_h743_model.rcc.CR);
+                EXPECT_EQ(0U, g_h743_model.timer.CR1);
+                EXPECT_FALSE(g_h743_model.irq_enabled[TIM2_IRQn]);
+                /* A real erroneous acquisition is withdrawn after recording
+                 * every rejection assertion, never hidden by a fixture reset.
+                 */
+                if (g_nx_stm32h743_system.remaining_effects != 0U) {
+                    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_system_stop(
+                                              &g_nx_stm32h743_system, 8U));
+                }
+            }
+        }
+    }
+}
+TEST_F(H743System, VReadOnlyCalibrationDoesNotChangeFixedTrimAdmission) {
+    const uint32_t both = NX_ARCH_CACHE_DATA | NX_ARCH_CACHE_INSTRUCTION;
+    for (uint32_t hz : {32000000U, 64000000U}) {
+        for (uint32_t cache : {0U, both}) {
+            nx_h743_model_reset();
+            g_h743_model.rcc.HSICFGR |= 0xabcU;
+            const uint32_t configuration = g_h743_model.rcc.HSICFGR;
+            ASSERT_EQ(NX_SUCCESS, nx_stm32h743_system_start(
+                                      &g_nx_stm32h743_system, hz, cache, 8U)
+                                      .primary);
+            EXPECT_EQ(configuration, g_h743_model.rcc.HSICFGR);
+            ASSERT_EQ(NX_SUCCESS,
+                      nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+            EXPECT_EQ(configuration, g_h743_model.rcc.HSICFGR);
+        }
+    }
+}
+TEST_F(H743System, StartedOwnerBusyPrecedesForeignVUserTrim) {
+    ASSERT_EQ(NX_SUCCESS, Start().primary);
+    g_h743_model.rcc.HSICFGR ^= 1U << RCC_HSICFGR_HSITRIM_Pos;
+    const uint32_t configuration = g_h743_model.rcc.HSICFGR;
+    const uint32_t writes = g_h743_model.writes;
+    const uint32_t effects = g_nx_stm32h743_system.remaining_effects;
+    EXPECT_EQ(NX_ERROR_BUSY, Start(32000000U).primary);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(effects, g_nx_stm32h743_system.remaining_effects);
+    EXPECT_TRUE(g_nx_stm32h743_system.started);
+    EXPECT_EQ(configuration, g_h743_model.rcc.HSICFGR);
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+}
+TEST_F(H743System, RetainedDividerBusyPrecedesForeignVUserTrim) {
+    ASSERT_EQ(NX_SUCCESS, Start(32000000U).primary);
+    g_h743_model.ignore_write = &g_h743_model.rcc.CR;
+    ASSERT_EQ(NX_ERROR_IO,
+              nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+    ASSERT_EQ(NX_STM32H743_EFFECT_DIVIDER,
+              g_nx_stm32h743_system.remaining_effects);
+    ASSERT_FALSE(g_nx_stm32h743_system.started);
+    g_h743_model.rcc.HSICFGR ^= 1U << RCC_HSICFGR_HSITRIM_Pos;
+    const uint32_t configuration = g_h743_model.rcc.HSICFGR;
+    const uint32_t writes = g_h743_model.writes;
+    EXPECT_EQ(NX_ERROR_BUSY, Start().primary);
+    EXPECT_EQ(writes, g_h743_model.writes);
+    EXPECT_EQ(NX_STM32H743_EFFECT_DIVIDER,
+              g_nx_stm32h743_system.remaining_effects);
+    EXPECT_EQ(configuration, g_h743_model.rcc.HSICFGR);
+    g_h743_model.ignore_write = nullptr;
+    EXPECT_EQ(NX_SUCCESS, nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+    EXPECT_EQ(0U, g_nx_stm32h743_system.remaining_effects);
+}
+TEST_F(H743System, NonVFixedNominalContractDoesNotUseVTrimLayout) {
+    /* This preserves the existing fixed nominal contract. It grants no V
+     * electrical envelope or PLL384 qualification to another silicon cut. */
+    for (uint32_t revision : {0x1003U, 0x2001U}) {
+        nx_h743_model_reset();
+        g_h743_model.silicon_id = (revision << 16U) | 0x450U;
+        g_h743_model.rcc.HSICFGR = 0x00020000U;
+        ASSERT_EQ(NX_SUCCESS, Start().primary) << revision;
+        EXPECT_EQ(0x00020000U, g_h743_model.rcc.HSICFGR);
+        EXPECT_EQ(NX_SUCCESS,
+                  nx_stm32h743_system_stop(&g_nx_stm32h743_system, 8U));
+    }
+}
 TEST_F(H743System, Hsi64EstablishesIndependentOneMhzTimer) {
     ASSERT_EQ(Start().primary, NX_SUCCESS);
     EXPECT_EQ(g_h743_model.timer.PSC, 63U);
@@ -81,6 +177,42 @@ TEST_F(H743System, PowerNotReadyCannotStartOrWriteRuntimeRamHardware) {
     g_h743_model.power.CSR1 = 0U;
     EXPECT_EQ(Start().primary, NX_ERROR_BUSY);
     EXPECT_EQ(g_h743_model.writes, 0U);
+}
+TEST_F(H743System, QueuedFlashWorkRejectsBeforeHsi32DividerOrTimerMutation) {
+    for (uint32_t busy : {uint32_t(FLASH_SR_QW), uint32_t(FLASH_SR_WBNE)}) {
+        for (unsigned bank = 0U; bank < 2U; ++bank) {
+            nx_h743_model_reset();
+            volatile uint32_t* status =
+                bank == 0U ? &g_h743_model.flash.SR1 : &g_h743_model.flash.SR2;
+            *status = busy;
+            const auto result = Start(32000000U);
+            EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+            EXPECT_EQ(NX_SUCCESS, result.cleanup);
+            EXPECT_EQ(0U, result.remaining_effects);
+            EXPECT_EQ(0U, g_h743_model.writes);
+            EXPECT_EQ(RCC_CR_HSION | RCC_CR_HSIRDY, g_h743_model.rcc.CR);
+            EXPECT_EQ(busy, *status);
+        }
+    }
+}
+TEST_F(H743System, ArmedFlashPulseRejectsBeforeHsi32DividerOrTimerMutation) {
+    for (uint32_t control :
+         {uint32_t(FLASH_CR_PG), uint32_t(FLASH_CR_SER), uint32_t(FLASH_CR_BER),
+          uint32_t(FLASH_CR_START)}) {
+        for (unsigned bank = 0U; bank < 2U; ++bank) {
+            nx_h743_model_reset();
+            volatile uint32_t* armed =
+                bank == 0U ? &g_h743_model.flash.CR1 : &g_h743_model.flash.CR2;
+            *armed = FLASH_CR_LOCK | control;
+            const auto result = Start(32000000U);
+            EXPECT_EQ(NX_ERROR_BUSY, result.primary);
+            EXPECT_EQ(NX_SUCCESS, result.cleanup);
+            EXPECT_EQ(0U, result.remaining_effects);
+            EXPECT_EQ(0U, g_h743_model.writes);
+            EXPECT_EQ(RCC_CR_HSION | RCC_CR_HSIRDY, g_h743_model.rcc.CR);
+            EXPECT_EQ(FLASH_CR_LOCK | control, *armed);
+        }
+    }
 }
 TEST_F(H743System, ExistingTimerOrIrqCannotBeAdopted) {
     g_h743_model.irq_enabled[TIM2_IRQn] = true;

@@ -1,0 +1,46 @@
+{
+  "source": [
+    {
+      "path": "tests/google/h743_spi_dma_model.h",
+      "sha256": "2ca1a328b052b8c28287f8f1a30208e2eaeb86a462eab6c5c48b31f9a7a19cd7",
+      "gzip_sha256": "ba243493b5213b48164319d50c4bc41a6536b2c2978ca33aa12adc30ee62fb41"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_test.cpp",
+      "sha256": "00c4453caf017e72819111d17c920ac2053fb574f480ad5cb7677bc89ea6301d",
+      "gzip_sha256": "c2739ff8824bccbccaa7fc976c405c80e3c36cf9d6d610637c413ee9d30a2291"
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.cpp",
+      "sha256": "cc0e572fb6b730297e7fbac715b44018450a2653ecb119149bf15765aa5aeb2e",
+      "gzip_sha256": "fdd2231eb24007f9e0c7d9b65a4a8f841e21f430072f109530253e6cf287ad72"
+    },
+    {
+      "path": "tests/google/h743_spi_dma.cmake",
+      "sha256": "23843d102b3f357006c1c8b8c537ae654506aee73540bb45ca34a1bd7680fed1",
+      "gzip_sha256": "b0a369be8e85cc60e815399063ab2673ba8cee25c0f424f5f86684cdeececc15"
+    },
+    {
+      "path": "tests/google/CMakeLists.txt",
+      "sha256": "253f81ce4d095a05869c3c800b08381bc856b2810dfb156c6b71e30be8b66bde",
+      "gzip_sha256": "1388df625de7feb7ea16048cd01ed12086411ff28cb9e5131d1a980e31448462"
+    },
+    {
+      "path": "soc/stm32h743/drivers/spi_dma.c",
+      "sha256": "8cf6f76e635bda6183751287d4b245dedee163992af2673ae7c508bd2ef3265f",
+      "gzip_sha256": "21fc2f182ce5559bee633f71dd1eab346ab23862a371c76d13c2c26e03c5e5a2"
+    },
+    {
+      "path": "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "sha256": "da0924272fc1ff39ba49088f5842e7e7208c9bd0cb46a0f7b4c947dd018bae6c",
+      "gzip_sha256": "c61ca437f9ba57a1b736f64b80deb0a55e7be4ba5e3b96f6dff2c9183919853d"
+    }
+  ],
+  "binary": {
+    "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-cleanup45-red/nexus_h743_spi_dma_test",
+    "size": 2854968,
+    "sha256": "9aca73f07e6ef9a6f11d463c880f271f7edef55fa3457cc2931204b7e800f324"
+  },
+  "actual_receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/cleanup45-whole-red/receipt.json",
+  "runner_setup": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/whole/receipt.json"
+}

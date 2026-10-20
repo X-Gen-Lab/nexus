@@ -1,0 +1,126 @@
+{
+  "actual_archive_validation": "full gzip CRC/EOF and memberSHA/size/mode passed",
+  "archive": {
+    "bytes": 15727,
+    "mode": 384,
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/checks-evidence-r1.tar.gz",
+    "sha256": "0f4be7d04a26969feced87148f28601bd3db22fe6cb727bb8972478867074aeb"
+  },
+  "member_count": 19,
+  "members": {
+    "author/final-source8-approved-r1.json": {
+      "bytes": 7703,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/final-source8-approved-r1.json",
+      "sha256": "814a586e4d8a4e08bf913eef59352d9c7898407aa3453e3ca456509e8630b073"
+    },
+    "author/run_checks_prepared.py": {
+      "bytes": 3482,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/run_checks_prepared.py",
+      "sha256": "aa4541a0d39caef890e0c07e605313e99e2d65d10a926a74e37ea6e68f01fad8"
+    },
+    "author/seal_final_checks.py": {
+      "bytes": 5048,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1/seal_final_checks.py",
+      "sha256": "470c86b29ece950a30a10da8c7854a6872a06b84fb2a5de4bcd17edbd5b749cc"
+    },
+    "outputs/checks-execution.json": {
+      "bytes": 5299,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/checks-execution.json",
+      "sha256": "b492a33d2059a34e3b0d4bd61e766bacbb9e6cfe7a8837387bd728a78309cd3d"
+    },
+    "outputs/full-source-check.json": {
+      "bytes": 47981,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/full-source-check.json",
+      "sha256": "9802252f72276c3da9328c1e7fef8538b2fdb068ff859612c4b2e3fe5c245303"
+    },
+    "outputs/full-source.attempts/1792316769420087547-74aa816d3c4c4616b34a568996b53703/receipt.json": {
+      "bytes": 1352,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/full-source.attempts/1792316769420087547-74aa816d3c4c4616b34a568996b53703/receipt.json",
+      "sha256": "9f3224a2a5dc91815074e5451639dd82df38444503a5b4ffdf3cb317efce84d5"
+    },
+    "outputs/full-source.attempts/1792316769420087547-74aa816d3c4c4616b34a568996b53703/stderr.txt": {
+      "bytes": 0,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/full-source.attempts/1792316769420087547-74aa816d3c4c4616b34a568996b53703/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "outputs/full-source.attempts/1792316769420087547-74aa816d3c4c4616b34a568996b53703/stdout.txt": {
+      "bytes": 46,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/full-source.attempts/1792316769420087547-74aa816d3c4c4616b34a568996b53703/stdout.txt",
+      "sha256": "f310d4624a050a5b0be2ffd5044d17c913341aea65c4535eba8ccf92c2cbd399"
+    },
+    "outputs/full-source.command.json": {
+      "bytes": 1519,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/full-source.command.json",
+      "sha256": "d00451c478f263799b9aa9d84747590fd2d5d1185a35f8271b396ca077817802"
+    },
+    "outputs/full-source.raw": {
+      "bytes": 46,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/full-source.raw",
+      "sha256": "f310d4624a050a5b0be2ffd5044d17c913341aea65c4535eba8ccf92c2cbd399"
+    },
+    "outputs/page-translation-check.json": {
+      "bytes": 788,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page-translation-check.json",
+      "sha256": "4945ebfd2c174454a4bec4cd48e0c6bc6f8d76ccc6ed5fb592f3fa6d51aaeb67"
+    },
+    "outputs/page.attempts/1792316769297817938-6d86947cd55349bab6292ef643fe699e/receipt.json": {
+      "bytes": 1137,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page.attempts/1792316769297817938-6d86947cd55349bab6292ef643fe699e/receipt.json",
+      "sha256": "bce8944c3d8e59d9e5d11431e3a00a11b80734c3cdbe1409e48a0f29d366a66e"
+    },
+    "outputs/page.attempts/1792316769297817938-6d86947cd55349bab6292ef643fe699e/stderr.txt": {
+      "bytes": 0,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page.attempts/1792316769297817938-6d86947cd55349bab6292ef643fe699e/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "outputs/page.attempts/1792316769297817938-6d86947cd55349bab6292ef643fe699e/stdout.txt": {
+      "bytes": 616,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page.attempts/1792316769297817938-6d86947cd55349bab6292ef643fe699e/stdout.txt",
+      "sha256": "e8644ba6a06da4224f2b1f77165657bebf6f5dbe5a5a1ea07b599d8cdc73fec5"
+    },
+    "outputs/page.command.json": {
+      "bytes": 1297,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page.command.json",
+      "sha256": "f7cd2d386629f493e47124e33e0faab2f820d3a336c87281bc7df50fc0dc788b"
+    },
+    "outputs/page.raw": {
+      "bytes": 616,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page.raw",
+      "sha256": "e8644ba6a06da4224f2b1f77165657bebf6f5dbe5a5a1ea07b599d8cdc73fec5"
+    },
+    "outputs/page_gate.py": {
+      "bytes": 582,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1/page_gate.py",
+      "sha256": "54ffd7f97e41351bc08b36125586fab87011b36a3fe392330006ae12d1185c87"
+    },
+    "reviews/independent-translation-r1.json": {
+      "bytes": 15616,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-d3-translation-independent-review-20261018-r1.json",
+      "sha256": "0ed115cb36962edf9075374e5767e8aae45b6955053159ea9d7c4e0318d04dad"
+    },
+    "reviews/metadata-only-author-delta-r1.json": {
+      "bytes": 1204,
+      "mode": 384,
+      "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/docs-reviewed-metadata-only-delta-r1.json",
+      "sha256": "840884cfaa6321ef1a4fda1f57bc70774855146da3abfc99a76ab5db7747d477"
+    }
+  }
+}

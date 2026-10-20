@@ -1,0 +1,127 @@
+{
+  "kind": "oci_public_ca_reader_baseline",
+  "root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "branch": "feat/oci-ca-reader-20261018",
+  "base_commit": "6d235058ca8bf3d26cd7cf2c48ecf15f21c2c119",
+  "source_count": 3,
+  "before": [
+    {
+      "path": "tools/evidence/recipe.py",
+      "bytes": 8579,
+      "sha256": "cb23a98c99e1da1c40186c3cb67b6026189a7e31d21c7b834d1ccd30b820d6c5",
+      "mode": 384,
+      "before_transport": "before/tools/evidence/recipe.py"
+    },
+    {
+      "path": "tools/dev/Dockerfile",
+      "bytes": 1512,
+      "sha256": "8f46b8f2390368f99048a1049a977fa5d71deb5ba09da5164a57847ec2a5d158",
+      "mode": 384,
+      "before_transport": "before/tools/dev/Dockerfile"
+    },
+    {
+      "path": "tools/testing/test_build_recipe.py",
+      "bytes": 4537,
+      "sha256": "439d07621516cc451e1abf3ff461424295eea8f7726216613f63d4ad8e31f11a",
+      "mode": 384,
+      "before_transport": "before/tools/testing/test_build_recipe.py"
+    }
+  ],
+  "index": {
+    "original_path": "/tmp/nexus-h743-fixed-hsi-s0-20261018/.git/index",
+    "complete_before_tmp": "/tmp/nexus-oci-ca-reader-20261018-r1/baseline-index.raw",
+    "bytes": 3572109,
+    "sha256": "d5601605374374a347d740eaacdda38a6e4759d73307c87d4eaebfc39b60e550"
+  },
+  "unrelated": [
+    {
+      "path": "s0-evidence/configure-red/receipt.json",
+      "bytes": 2888,
+      "sha256": "95407b84dd325d531b6fe735e4a2548ea86aa324b95a88a1583613b28873f9ba",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/style/receipt.json",
+      "bytes": 921,
+      "sha256": "f4ba80960b861f8038e5761bd54b2d8ed63313ef602245639e8a44d7074d858f",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/style/report.json",
+      "bytes": 2016,
+      "sha256": "01bde27708fdaa24398ca1ab7b15dd183703b5d0a7314361d208bc5450b86562",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-clock-green/junit.xml",
+      "bytes": 10474,
+      "sha256": "e5152f5b50354be51f2e0973af7b43ea80f558bd46fa719338d1ded02b3ee4f8",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-clock-green/receipt.json",
+      "bytes": 3339,
+      "sha256": "1206c04dbb24b75916d03969df4bf42c0a8734c6fc234ba637c31fed8901bdfd",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-clock-red/junit.xml",
+      "bytes": 10474,
+      "sha256": "e5ea2bd3fd338d05b9f683181da86a38b8169f2fdf035be1d0cd80dd242f4077",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-clock-red/receipt.json",
+      "bytes": 3333,
+      "sha256": "067abd0e68e7fbf602a14e498dd13f728787a35f0c76b138b861be7526ac88dd",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-system-green/junit.xml",
+      "bytes": 12828,
+      "sha256": "d9d07e58d11174ecd24ab828d67024aa4c5e3c25104a20bbaca5cc6730cfd036",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-system-green/receipt.json",
+      "bytes": 3343,
+      "sha256": "ddca6ddb61263ff75a7a68afdee2767579d1622f9a6402697b94a5f4166e9ca4",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-system-red/junit.xml",
+      "bytes": 36958,
+      "sha256": "572fde4bad287e4e91fe6a11cd4589382e3502bf7bc83a642bec786dd3c0d45f",
+      "mode": 384
+    },
+    {
+      "path": "s0-evidence/whole-system-red/receipt.json",
+      "bytes": 3338,
+      "sha256": "d8c6e2f3dab0527c93421cbf35434e458dadfc1723d7c65af906a93c74797080",
+      "mode": 384
+    }
+  ],
+  "unchanged_locked_inputs": [
+    {
+      "path": "dependencies/build-recipe.lock.json",
+      "bytes": 832,
+      "sha256": "184f54646e38adea736a62f7e7b9ce7115dc8399f329ef2906f75cbd5daf30a6"
+    },
+    {
+      "path": "dependencies/environment.lock.json",
+      "bytes": 1181,
+      "sha256": "ba90902e9048279fc38121fbcab003e8fed07dfd17044637d4aed979a7e966cd"
+    },
+    {
+      "path": "dependencies/python-tools-linux-cp312.txt",
+      "bytes": 1442,
+      "sha256": "0c2b01c2ccbe113e21acffb28174805411b454a57849409700c3594a507130f0"
+    }
+  ],
+  "caps": {
+    "persistent_bytes": 262144,
+    "tmp_bytes": 20971520,
+    "jobs": 1
+  },
+  "no_stage_commit_push": true
+}

@@ -1,0 +1,80 @@
+from pathlib import Path
+import hashlib
+import json
+import os
+import re
+import sys
+
+sys.path.insert(0, '/dev/shm/nexus-clang14-required-20261018-r1')
+from run import PREFIX, ROOT, guard
+from tools.dev.process import run
+from scripts.ci.quality_tools import TIDY_CHECKS
+
+
+def execute(label, argv):
+    guard(label + '-before')
+    result = run(argv, cwd=PREFIX,
+                 env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1',
+                      'TMPDIR': str(PREFIX / 'tmp')},
+                 log=PREFIX / 'runs' / (label + '.log'),
+                 timeout=120, stage=label)
+    guard(label + '-after')
+    assert result.returncode == 0, (label, result.returncode)
+    receipt = json.loads((PREFIX / 'runs' / (label + '.command.json')).read_text())
+    return Path(receipt['stdout']['path']).read_text()
+
+
+def identity(path):
+    path = Path(path)
+    value = hashlib.sha256()
+    with path.open('rb') as stream:
+        while chunk := stream.read(1024 * 1024):
+            value.update(chunk)
+    return {'path': str(path), 'resolved_path': str(path.resolve()),
+            'bytes': path.stat().st_size, 'sha256': value.hexdigest()}
+
+
+record = json.loads((PREFIX / 'runs/elf-dependency-resolution-r1.command.json').read_text())
+resolved = Path(record['stdout']['path']).read_text()
+assert 'not found' not in resolved
+paths = {}
+for line in resolved.splitlines():
+    if '=> /' in line:
+        soname, rest = line.strip().split(' => ', 1)
+        paths[soname] = Path(rest.split()[0])
+    elif line.strip().startswith('/'):
+        path = Path(line.strip().split()[0])
+        paths[path.name] = path
+assert len(paths) == 9
+rows = []
+for index, (soname, path) in enumerate(sorted(paths.items())):
+    dynamic = execute(f'host-library-dynamic-{index:02d}',
+                      ['readelf', '--wide', '--dynamic', str(path)])
+    needed = re.findall(r'\(NEEDED\).*?\[(.*?)\]', dynamic)
+    assert set(needed).issubset(paths)
+    rows.append({'soname': soname, **identity(path), 'needed': needed})
+versions = execute('host-library-package-versions-r1',
+                   ['dpkg-query', '-W', '-f', '${binary:Package}\t${Version}\n',
+                    'libc6', 'libstdc++6', 'libgcc-s1', 'zlib1g'])
+libc = execute('actual-host-libc-version-r1', ['getconf', 'GNU_LIBC_VERSION'])
+binary = PREFIX / 'unpacked/clang_tidy/data/bin/clang-tidy'
+probe = execute('actual-required-profile-header-probe-r1',
+                [str(binary), '--checks=' + TIDY_CHECKS,
+                 '--warnings-as-errors=*', str(PREFIX / 'header_probe.c'),
+                 '--', '-std=c11', '-H'])
+result = {'binary': identity(binary), 'host_dependencies': rows,
+          'package_versions': versions, 'glibc_version': libc.strip(),
+          'resource_dir': str(PREFIX / 'resources/usr/lib/llvm-14/lib/clang/14.0.6'),
+          'probe_source': identity(PREFIX / 'header_probe.c'),
+          'required_checks': TIDY_CHECKS,
+          'quality_driver': identity(ROOT / 'scripts/ci/quality_tools.py'),
+          'environment': {key: os.environ.get(key) for key in
+                          ('LD_LIBRARY_PATH', 'LD_PRELOAD', 'CPATH',
+                           'C_INCLUDE_PATH', 'CPLUS_INCLUDE_PATH')},
+          'all_needed_resolved_existing_only': True,
+          'actual_required_profile_header_probe_exit': 0,
+          'guard': guard('closure-observation-complete')}
+(PREFIX / 'closure-observation.json').write_text(json.dumps(result, indent=2) + '\n')
+print(json.dumps({'dependency_count': len(rows), 'glibc_version': libc.strip(),
+                  'package_versions': versions, 'required_profile_probe_exit': 0,
+                  'new_system_dependencies_installed': False}))

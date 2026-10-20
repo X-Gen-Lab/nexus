@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "soc": "STM32G474RET6",
+  "soc_family": "stm32g474",
+  "source_revision": "DS12288 Rev6 silicon routes; software fixture only",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 24000000
+  },
+  "reserved_resources": [
+    "PA13",
+    "PA14"
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32g474re.pdf",
+      "scope": "DS12288 G474RE silicon pin multiplexing only; fixture wiring, input voltage and external output stages are not inspected."
+    }
+  ],
+  "id": "stm32g474re-pwm-adc-software-fixture",
+  "bindings": [
+    {
+      "id": "window",
+      "controller": "TIM1",
+      "route": "tim1-adc1-window-pa8-pa9-pa10-pa0-comp1-pa1-pa4",
+      "mask": 1811,
+      "initial": 0,
+      "supply_mv": 3300
+    },
+    {
+      "id": "wave",
+      "controller": "TIM1",
+      "route": "tim1-group-pa8-pa9-pa10-comp1-pa1-pa4",
+      "mask": 1810,
+      "initial": 0
+    },
+    {
+      "id": "sensor",
+      "controller": "ADC1",
+      "route": "adc1-in1-pa0",
+      "supply_mv": 3300
+    }
+  ],
+  "unknowns": [
+    "Software fixture only: physical PCB revision, clock source population and HIL are not observed.",
+    "The24MHz HSE and3300mV supply/reference are declared software inputs, not measured Board facts.",
+    "PA8/PA9/PA10 outputs, PA0 analog input and COMP1 PA1/PA4 inputs are unattached silicon routes; external thresholds, output-stage safety and aperture timing are unqualified."
+  ]
+}

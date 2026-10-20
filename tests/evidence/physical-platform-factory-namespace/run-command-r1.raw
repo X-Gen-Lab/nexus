@@ -1,0 +1,56 @@
+"""Execute bounded complete fixture commands, with maintained process receipts."""
+from pathlib import Path
+import hashlib,json,os,subprocess,sys
+R=Path('/tmp/nexus-io36-native-20261018')
+B=Path(__file__).resolve().parent
+V=Path('/workspace/nexus-build-system-20261012/.venv/bin')
+A=Path('/tmp/nexus-io-tools-recovery-20261018/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin')
+base=json.loads((B/'base-identity-r1.json').read_text())
+assert len(sys.argv)==2
+stage=sys.argv[1]
+D=B/'validation'/stage
+D.mkdir(parents=True,exist_ok=False)
+def identity(p):
+    a=Path(p).read_bytes()
+    return {'bytes':len(a),'sha256':hashlib.sha256(a).hexdigest()}
+def state():
+    protected={name:identity(R/name) for name in base['protected_authored_inputs']}
+    assert all(protected[n]=={k:v[k] for k in ['bytes','sha256']} for n,v in base['protected_authored_inputs'].items())
+    fixtures={name:identity(R/name) for name in base['protected_fixture_inputs']}
+    assert all(fixtures[n]=={k:v[k] for k in ['bytes','sha256']} for n,v in base['protected_fixture_inputs'].items())
+    index=identity(R/'.git/index')
+    assert index=={k:base['index'][k] for k in ['bytes','sha256']}
+    sem=hashlib.sha256(subprocess.check_output(['git','--no-optional-locks','ls-files','--stage','-z'],cwd=R,env=dict(os.environ,GIT_OPTIONAL_LOCKS='0'))).hexdigest()
+    assert sem==base['index_semantics_sha256']
+    return {'owned_cmake':identity(R/base['source_rel']), 'protected_authored_inputs':protected,'protected_fixture_inputs':fixtures,'index':index,'index_semantics_sha256':sem}
+def build_allocated():
+    return sum(p.stat().st_blocks*512 for p in (R/'build/native-debug').rglob('*') if p.is_file() and not p.is_symlink())
+before=state();(D/'source-index-before.json').write_text(json.dumps(before,indent=2)+'\n')
+T=base['targets']
+if stage.startswith('configure-'):
+    argv=[str(V/'python'),'tools/dev/dev.py','configure','--preset','native-debug']
+elif stage.startswith('graph-'):
+    argv=[str(R/'.venv/bin/ninja'),'-C',str(R/'build/native-debug'),'-n',*T]
+elif stage.startswith('build-'):
+    argv=[str(V/'python'),'tools/dev/dev.py','build','--preset','native-debug','--target',*T,'--parallel','1']
+    if stage=='build-red-r1':
+        argv+=['--','-k','0']
+elif stage in ['stm32-discovery-r1','gd32-discovery-r1','stm32-runtime-r1','gd32-runtime-r1']:
+    family=stage.split('-')[0];program=R/'build/native-debug/bin'/('nexus_'+family+'_physical_platform_factory_test')
+    argv=[str(program)]
+    if 'discovery' in stage:argv+=['--gtest_list_tests']
+    else:argv+=['--gtest_repeat=1','--gtest_also_run_disabled_tests','--gtest_output=xml:'+str(D/'result.xml')]
+else:raise ValueError('Unsupported owned stage')
+env=dict(os.environ);assert not env.get('SKIP') and not env.get('NEXUS_SKIP_TDD')
+env.update(PATH=str(V)+os.pathsep+str(A)+os.pathsep+env.get('PATH',''),PYTHONDONTWRITEBYTECODE='1',NEXUS_BUILD_JOBS='1',CMAKE_BUILD_PARALLEL_LEVEL='1',GIT_OPTIONAL_LOCKS='0')
+for name in ('GTEST_FILTER','GTEST_TOTAL_SHARDS','GTEST_SHARD_INDEX','GTEST_OUTPUT','GTEST_REPEAT','GTEST_ALSO_RUN_DISABLED_TESTS'):env.pop(name,None)
+sys.path.insert(0,str(R));from tools.dev import process
+result=process.run(argv,cwd=R,env=env,timeout=600,stage=stage,log=D/'command.raw')
+after=state();(D/'source-index-after.json').write_text(json.dumps(after,indent=2)+'\n')
+growth=build_allocated()-base['initial_build_allocated_bytes']
+summary={'stage':stage,'actual_exit':result.returncode,'receipt':str(result.receipt_path),'source_index_guard_stable':before==after,'build_allocated_growth_bytes':growth,'TMP_increment_limit':base['TMP_increment_limit_bytes'],'scope':'Exact two full Native fixture targets/programs only; no full repository/ARM/HIL qualification'}
+(D/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps(summary),flush=True);print(result.stdout[-13000:],flush=True);print(result.stderr[-3000:],file=sys.stderr,flush=True)
+assert before==after and growth<=base['TMP_increment_limit_bytes']
+assert sum(p.stat().st_size for p in B.rglob('*') if p.is_file())<=base['persistent_limit_bytes']
+raise SystemExit(result.returncode)

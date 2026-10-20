@@ -1,0 +1,23 @@
+{
+  "normalconfigure_exit": 0,
+  "build_exit": 1,
+  "classification": "real whole-target missing-symbol link RED; no runtime/ELF/XML exists",
+  "missing_symbols": [
+    "nx_stm32h743_spi_wire_clock_ready",
+    "nx_stm32h743_spi_wire_cs_driven",
+    "nx_stm32h743_spi_wire_disable",
+    "nx_stm32h743_spi_wire_divider",
+    "nx_stm32h743_spi_wire_pins_ready",
+    "nx_stm32h743_spi_wire_quiet_us",
+    "nx_stm32h743_spi_wire_release_cs",
+    "nx_stm32h743_spi_wire_reset",
+    "nx_stm32h743_spi_wire_sck_alternate",
+    "nx_stm32h743_spi_wire_sck_idle",
+    "nx_stm32h743_spi_wire_stopped",
+    "nx_stm32h743_spi_wire_suspend_once"
+  ],
+  "retained_test_object": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-red-link/h743_spi_wire_test.cpp.o",
+  "test_object_sha256": "c7ef66a1907e7661de1c3db5fa6e52debfeecc06c181eb900dc603303dc1b929",
+  "testcases_authored": 28,
+  "receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/missing-api-whole-build/receipt.json"
+}

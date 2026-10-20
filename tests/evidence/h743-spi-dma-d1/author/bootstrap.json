@@ -1,0 +1,208 @@
+{
+  "head": "5095ad990a5ed0f45539320b1936260a027be9fb",
+  "branch": "feat/h743-spi-dma-d1-20261018",
+  "index_sha256": "224343a4534e36fb54eb1312cbafde0042a712cb4233e7beb6f399c15b756a93",
+  "w1_sources": {
+    "soc/stm32h743/CMakeLists.txt": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+    "soc/stm32h743/drivers/spi.c": "3ca2b57e51bd46abcba837963f6db50f99a93e5821bcbdff565c1cf8958660ff",
+    "tests/google/CMakeLists.txt": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444",
+    "tests/google/h743.cmake": "0fb1560a4a087469304936c31a53ace7df31b997cf16fde3e536e15df88c0ca7",
+    "tests/google/h743_flash_ram_closure.cmake": "15456b1c63094444a098dfc8094d312ec731cab1622f46d4bef5f679dd5ad3db",
+    "tests/google/h743_high.cmake": "d851a64314bd66eb1d24dd722b98a752e74ac0cc9ff8087eaf4202d1e405769b",
+    "tests/google/i2c_v2_long_factory.cmake": "08dfdde41a33092db3b09e45ab1de02561dcae8634985555b4af711dc498c6bd",
+    "tools/configure/providers/descriptor.py": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+    "soc/stm32h743/drivers/spi_wire.c": "4d8fd3b71c9669649a2b6f54cddcc98ae6d8a709d76e917b57e2b86965b1fdb9",
+    "soc/stm32h743/private/stm32h743_spi_wire.h": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7",
+    "tests/google/h743_spi_wire.cmake": "8d8076715a00b53d4a5e141fb4701a4fe2cab63f137d5547279ce4318dd52814",
+    "tests/google/h743_spi_wire_test.cpp": "1cd42595ac39e6a56fec44970b35b86c25389989c6e2f0bb5f46af98d4bb0c9c"
+  },
+  "historical_untracked": [
+    {
+      "relative": "s0-evidence/configure-red/receipt.json",
+      "sha256": "421f026e078a5c787fcab3b83e87e012b55f4398de54c59257d50bd5a4f14be3",
+      "bytes": 4029
+    },
+    {
+      "relative": "s0-evidence/green157-programs/nexus_h743_clock_test",
+      "sha256": "7ffdf793972ded7ffe7b6a66f60fd62cffdb0411dbd1ec4851e6bb7a7cc57233",
+      "bytes": 2596936
+    },
+    {
+      "relative": "s0-evidence/green157-programs/nexus_h743_high_factory_test",
+      "sha256": "202e4b11d6ed393b0be917361b751cb8cb8819bcaac51cad9192e5e9f57554b2",
+      "bytes": 3122536
+    },
+    {
+      "relative": "s0-evidence/green157-programs/nexus_h743_high_kernel_test",
+      "sha256": "de1237b11ee1559267a74ad52a3bd4d9886c3e2e756fafe34fb2ede516d27ea5",
+      "bytes": 3167904
+    },
+    {
+      "relative": "s0-evidence/green157-programs/nexus_h743_peripheral_test",
+      "sha256": "817da5df7a0d59f8b57ac1f81ada8e64888f6bdd07688aa9ffa65e1940941fb1",
+      "bytes": 2851520
+    },
+    {
+      "relative": "s0-evidence/green157-programs/nexus_h743_system_test",
+      "sha256": "59dc62c57bd6d311240e9319751e64fec7d5e08c307028d543318e96c5e623cd",
+      "bytes": 2785128
+    },
+    {
+      "relative": "s0-evidence/style-final/receipt.json",
+      "sha256": "39e640d1345f8dbb1795b8340f4b5ea35c46fc7899efe1d3e2ec6c1995866ca7",
+      "bytes": 1244
+    },
+    {
+      "relative": "s0-evidence/style-final/report.json",
+      "sha256": "16601d16c66809040a91f31b75d2c01d47de36b88ac364b6db51e297cea99768",
+      "bytes": 2736
+    },
+    {
+      "relative": "s0-evidence/style/receipt.json",
+      "sha256": "6e9e6cf102d629c30fa8a5c38650762fec44febd569f8f49e7f90bceec6b7855",
+      "bytes": 1238
+    },
+    {
+      "relative": "s0-evidence/style/report.json",
+      "sha256": "4887156a8032b9a70ebfe1e1ef125c14cc87b5280b7e999ecf213a487a258eea",
+      "bytes": 2736
+    },
+    {
+      "relative": "s0-evidence/whole-clock-final/junit.xml",
+      "sha256": "9e26f3ef121b744dd9bd46818ac0fd7ff6279fa93355fccea431ba0cddf61312",
+      "bytes": 10512
+    },
+    {
+      "relative": "s0-evidence/whole-clock-final/receipt.json",
+      "sha256": "1a1422b7c74ea1d5463d6a6730f001d1271ceea99a1d4cc7297a8df4a4e3a6b0",
+      "bytes": 4483
+    },
+    {
+      "relative": "s0-evidence/whole-clock-green/junit.xml",
+      "sha256": "d97fe2c968d01c41ee8bcac50d53377e72b82c31e8c66440cc0d9ef6217f7af7",
+      "bytes": 10512
+    },
+    {
+      "relative": "s0-evidence/whole-clock-green/receipt.json",
+      "sha256": "bb1c980aadc75f73a193f7566e5f3e1c96d01ac488c38b4641ffc04d3ee62816",
+      "bytes": 4483
+    },
+    {
+      "relative": "s0-evidence/whole-fixed-factory-final/junit.xml",
+      "sha256": "d45e148a1f48381e47f88343a4f560f1d86df5ac4d016ff2232d62350d51215f",
+      "bytes": 3171
+    },
+    {
+      "relative": "s0-evidence/whole-fixed-factory-final/receipt.json",
+      "sha256": "47577a63fd331052dde16822e99e165b470ec001652909b0b66196c5d799663f",
+      "bytes": 4520
+    },
+    {
+      "relative": "s0-evidence/whole-full-late-fixture-boundary/junit.xml",
+      "sha256": "f5db8845a7bf8be867781578a1beace9c5c215aa83884c93fe892828e73c2a0a",
+      "bytes": 10077
+    },
+    {
+      "relative": "s0-evidence/whole-full-late-fixture-boundary/receipt.json",
+      "sha256": "f6772864135095ec3c252cbebe241cfa390ac2a6b271f95a7b8438ae40744279",
+      "bytes": 4533
+    },
+    {
+      "relative": "s0-evidence/whole-high-factory-final/junit.xml",
+      "sha256": "42286b62e4d76f368f8fe4678a34aa7163cb7637278ab21328a93a3904af0fc3",
+      "bytes": 3074
+    },
+    {
+      "relative": "s0-evidence/whole-high-factory-final/receipt.json",
+      "sha256": "04d429013f41ea613584e191927170d87a0f55d97409487c349076dab1cbd1fb",
+      "bytes": 4511
+    },
+    {
+      "relative": "s0-evidence/whole-high-factory-green/junit.xml",
+      "sha256": "37f887172b2951d1345dbed0a8f82e57510fdcbb3120c1c639f07072d0c38633",
+      "bytes": 3075
+    },
+    {
+      "relative": "s0-evidence/whole-high-factory-green/receipt.json",
+      "sha256": "35fe56396aee36f036f490dd971a49919ce3b5280c63e638c469cb6d3af4128c",
+      "bytes": 4511
+    },
+    {
+      "relative": "s0-evidence/whole-high-kernel-final/junit.xml",
+      "sha256": "e148b552522f97303a461e75a4ee0b570e4ddd5862388649dfeba8dd47e5d9f5",
+      "bytes": 9489
+    },
+    {
+      "relative": "s0-evidence/whole-high-kernel-final/receipt.json",
+      "sha256": "ef82a27e55d2e6037f971ac6d708ebfd44dc57d482c1c06dd8435e7ff97f73c0",
+      "bytes": 4507
+    },
+    {
+      "relative": "s0-evidence/whole-high-kernel-green/junit.xml",
+      "sha256": "5122b6417ae85f129cb44fb74104a169b9b0cf75f567c64fffb3e3ec10eb3f8f",
+      "bytes": 9489
+    },
+    {
+      "relative": "s0-evidence/whole-high-kernel-green/receipt.json",
+      "sha256": "8fbcef61d1590a79591664b33ac4353254a82445f1b6e6497d6b36fed26b2dac",
+      "bytes": 4507
+    },
+    {
+      "relative": "s0-evidence/whole-peripheral-final/junit.xml",
+      "sha256": "96995e40233ca1f3ca381de985913d399da6faab6e5894a1f916bef32aacf8f1",
+      "bytes": 9593
+    },
+    {
+      "relative": "s0-evidence/whole-peripheral-final/receipt.json",
+      "sha256": "2438f14f3591f91c2c17471658182db77744b60b150058c449c8475fad2a7e83",
+      "bytes": 4503
+    },
+    {
+      "relative": "s0-evidence/whole-peripheral-green-r1/junit.xml",
+      "sha256": "c8db83b6c1356c6c65af8cd26090fd602de1ec8ad4323b2bf9556415b8a9abf8",
+      "bytes": 9322
+    },
+    {
+      "relative": "s0-evidence/whole-peripheral-green-r1/receipt.json",
+      "sha256": "5aed30fe1bf0501795dbb3f7b93836f6092225d83d7b7d8072d63b809cd91f8c",
+      "bytes": 4512
+    },
+    {
+      "relative": "s0-evidence/whole-peripheral-red/junit.xml",
+      "sha256": "d09ccb029b1a2bf0b4ab995ce72640c07f91b6243f6377b89a65e62dcddcc406",
+      "bytes": 26731
+    },
+    {
+      "relative": "s0-evidence/whole-peripheral-red/receipt.json",
+      "sha256": "2ae929f623682ed6cf93d4e6ee44622fe920b2427203bca2d29bac0cb1647c86",
+      "bytes": 4498
+    },
+    {
+      "relative": "s0-evidence/whole-system-final/junit.xml",
+      "sha256": "7a76b3e37ac4313a67ec84722adc8439c56c106472760940fdc6ab892bbb0685",
+      "bytes": 12877
+    },
+    {
+      "relative": "s0-evidence/whole-system-final/receipt.json",
+      "sha256": "7e4da0d1393d0eb637034bab72d6e04fb41693d3f0e690d4331cb1f474edb597",
+      "bytes": 4487
+    },
+    {
+      "relative": "s0-evidence/whole-system-green/junit.xml",
+      "sha256": "da71fd90d33c2a0ae5a608cfe9d556c95e76013b3ec5af631dc2f8d8574fc19a",
+      "bytes": 12879
+    },
+    {
+      "relative": "s0-evidence/whole-system-green/receipt.json",
+      "sha256": "edaa168fb0a750e9e7ffe9e1aaedb3a4d4fe8915c0463fce45fde2edf9193e1d",
+      "bytes": 4487
+    }
+  ],
+  "baseline_build_allocated": 252542976,
+  "tmp_free": 537268224,
+  "persistent_free": 18939904,
+  "memory_current": 15133483008,
+  "memory_max": 17179869184,
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "scope": "D1 six new paths + tests/google/CMakeLists include only; no factory/modes/ARM/SDK/HIL"
+}

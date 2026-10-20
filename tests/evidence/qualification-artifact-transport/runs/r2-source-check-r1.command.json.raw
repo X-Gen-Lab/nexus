@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "/dev/shm/nexus-qualification-transport-feature-20261018-r1/r2/check_source.py"
+  ],
+  "cwd": "/dev/shm/nexus-qualification-transport-20261018-r1",
+  "stage": "r2-source-check-r1",
+  "started_ns": 1792313744520828395,
+  "finished_ns": 1792313744685279503,
+  "duration_seconds": 0.16445209900120972,
+  "timeout_seconds": 180.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-source-check-r1.attempts/1792313744520768384-338ee2217f04404fab7020f9619d0a36/stdout.txt",
+    "bytes": 1031,
+    "sha256": "e545d8b64aebaa32fc76b462e2fa1dd56e2b505f58f9f78d67b3e1f8b5c98f7f"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-source-check-r1.attempts/1792313744520768384-338ee2217f04404fab7020f9619d0a36/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "attempt_receipt": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/r2-source-check-r1.attempts/1792313744520768384-338ee2217f04404fab7020f9619d0a36/receipt.json"
+}

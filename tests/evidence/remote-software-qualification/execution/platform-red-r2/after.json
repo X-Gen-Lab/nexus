@@ -1,0 +1,53 @@
+{
+  "source": {
+    ".github/workflows/test_platform_ci.py": {
+      "bytes": 41594,
+      "sha256": "e7df3bef7c1aa605e010810eb8737f3d6f092199e7e714097be9edde3b6f1e07"
+    },
+    ".github/workflows/performance.yml": {
+      "bytes": 2397,
+      "sha256": "a236dd93a67c4443a1c144435d84a65cf72511dae5a4da6e7ad7d49457c57de2"
+    },
+    ".github/workflows/software-qualification.yml": null
+  },
+  "index": {
+    "bytes": 3350564,
+    "sha256": "9144d61700cb775043ff6e9d30eacdcc8ca41834fb5f7ac4a94ce00131bc36ca"
+  },
+  "semantic_index_sha256": "78707d6b81d9eebbf31471321a0673a2c5f272a679ae3574e57dc3a519bd3bb3",
+  "protected": {
+    ".github/workflows/ci.yml": {
+      "bytes": 2663,
+      "sha256": "d7e7f2309f3a16c709f0992d81dee28fa544e69c3b799fd998e4213f33143192"
+    },
+    ".github/workflows/release.yml": {
+      "bytes": 11948,
+      "sha256": "92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2"
+    },
+    ".github/actions/setup-build/action.yml": {
+      "bytes": 1580,
+      "sha256": "b4268f2c214e6574d987a785c5618e1435534ad6a049e5b5ac141ab4f26effe7"
+    },
+    ".github/actions/record-identity/action.yml": {
+      "bytes": 3102,
+      "sha256": "4107fbfd0b2a663e0b8e5f2c89215a4351f2c67c0ab83b0ef9edd6230bd234d4"
+    },
+    "tools/evidence/reproduce.py": {
+      "bytes": 32866,
+      "sha256": "aaa431bfbfe1bae2b4453a2ec166cac05865856399ff409e33e3e9d33708887a"
+    },
+    "tools/evidence/storage.py": {
+      "bytes": 17178,
+      "sha256": "d959ea5b8ce2819ba6ef66e0671c2fdf44276f96b4d818a74b88de4cdeee1856"
+    },
+    "dependencies/environment.lock.json": {
+      "bytes": 1181,
+      "sha256": "ba90902e9048279fc38121fbcab003e8fed07dfd17044637d4aed979a7e966cd"
+    },
+    "dependencies/build-recipe.lock.json": {
+      "bytes": 832,
+      "sha256": "184f54646e38adea736a62f7e7b9ce7115dc8399f329ef2906f75cbd5daf30a6"
+    }
+  },
+  "status": " M .github/workflows/test_platform_ci.py\n"
+}

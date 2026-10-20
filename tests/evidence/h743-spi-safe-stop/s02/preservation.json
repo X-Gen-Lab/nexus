@@ -1,0 +1,15 @@
+{
+  "tests/google/h743_peripheral_test.cpp": {
+    "original_cases": 21,
+    "new_cases": 12,
+    "original_method_bodies_byte_preserved": true,
+    "only_existing_method_delta": "independent hold_spi_suspend setup added"
+  },
+  "tests/google/h743_high_kernel_test.cpp": {
+    "original_cases": 30,
+    "new_cases": 0,
+    "original_method_bodies_byte_preserved": true,
+    "only_existing_method_delta": "none"
+  },
+  "ordinary_SPI_state_and_endpoint_declarations_byte_unchanged": true
+}

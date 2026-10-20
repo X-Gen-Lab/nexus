@@ -14,6 +14,37 @@
 /* Read-only CPU identity fields are initialized once; the model resets only
  * the writable control fields observed by production preflight. */
 static SCB_Type s_h743_core{};
+/* Observe the selected GPIO facts independently of provider progress. A lost
+ * CS route never converts an already selected interval into a release. */
+static void spi_observe_pins(void) {
+    if (!g_h743_model.spi_watch_pins || g_h743_model.spi == nullptr)
+        return;
+    GPIO_TypeDef* gpio = &g_h743_model.gpio_e;
+    SPI_TypeDef* spi = g_h743_model.spi;
+    const bool cs_output = ((gpio->MODER >> 22U) & 3U) == 1U;
+    bool selected = g_h743_model.spi_was_selected;
+    if (cs_output)
+        selected = (gpio->ODR & (1U << 11U)) == 0U;
+    if (selected && !g_h743_model.spi_was_selected)
+        g_h743_model.spi_selected_cpol = (spi->CFG2 & SPI_CFG2_CPOL) != 0U;
+    if (selected) {
+        const bool route = ((gpio->MODER >> 24U) & 3U) == 2U &&
+                           ((gpio->MODER >> 28U) & 3U) == 2U &&
+                           ((gpio->AFR[1] >> 16U) & 15U) == 5U &&
+                           ((gpio->AFR[1] >> 24U) & 15U) == 5U;
+        const bool control = (spi->CR1 & SPI_CR1_SPE) != 0U ||
+                             (spi->CFG2 & SPI_CFG2_AFCNTR) != 0U;
+        if (!cs_output || !route || !control ||
+            g_h743_model.spi_selected_cpol !=
+                ((spi->CFG2 & SPI_CFG2_CPOL) != 0U))
+            ++g_h743_model.spi_selected_control_losses;
+    } else if (g_h743_model.spi_was_selected &&
+               (((spi->CR1 & (SPI_CR1_SPE | SPI_CR1_CSTART)) != 0U) ||
+                g_h743_model.timer.CNT < g_h743_model.spi_tail_until)) {
+        ++g_h743_model.spi_reset_order_errors;
+    }
+    g_h743_model.spi_was_selected = selected;
+}
 extern "C" {
 nx_h743_model_t g_h743_model;
 nx_stm32h743_system_t g_nx_stm32h743_system;
@@ -26,6 +57,8 @@ void nx_h743_model_reset(void) {
     s_h743_core.CPACR = 0U;
     g_h743_model.core = &s_h743_core;
     g_h743_model.rcc.CR = RCC_CR_HSION | RCC_CR_HSIRDY;
+    /* Revision V resets the user trim to64; HSICAL remains silicon-specific. */
+    g_h743_model.rcc.HSICFGR = 0x40U << RCC_HSICFGR_HSITRIM_Pos;
     g_h743_model.power.CR3 = PWR_CR3_LDOEN;
     g_h743_model.power.CSR1 = PWR_CSR1_ACTVOSRDY;
     g_h743_model.flash.ACR = FLASH_ACR_LATENCY_7WS;
@@ -53,6 +86,38 @@ uint32_t nx_h743_model_read(volatile uint32_t* reg) {
         address < timer + sizeof(g_h743_model.timer) &&
         (g_h743_model.rcc.APB1LENR & RCC_APB1LENR_TIM2EN) == 0U)
         return 0U;
+    if (g_h743_model.spi != nullptr && reg == &g_h743_model.spi->CR1 &&
+        (g_h743_model.spi->CR1 & SPI_CR1_CSTART) != 0U &&
+        g_h743_model.spi_idle_before_suspend_status != 0U &&
+        ++g_h743_model.spi_idle_before_suspend_reads == 2U) {
+        /* Complete after the initial drain observation, before its RMW read.
+         * That read sees hardware-cleared CSTART. The following idle CSUSP
+         * need not latch SUSP; no simultaneous start1/suspend1 priority is
+         * assumed. Partial flags/zero TSIZE are conservative fault inputs. */
+        SPI_TypeDef* spi = g_h743_model.spi;
+        const uint32_t status = g_h743_model.spi_idle_before_suspend_status;
+        g_h743_model.spi_idle_before_suspend_status = 0U;
+        ++g_h743_model.spi_idle_before_suspend_events;
+        if (g_h743_model.spi_zero_tsize_before_suspend)
+            spi->CR2 = 0U;
+        spi->CR1 &= ~(uint32_t)SPI_CR1_CSTART;
+        spi->SR =
+            (spi->SR & ~(uint32_t)(SPI_SR_SUSP | SPI_SR_EOT | SPI_SR_TXC)) |
+            status;
+        if ((spi->CR2 & SPI_CR2_TSIZE) != 0U &&
+            (status & (SPI_SR_EOT | SPI_SR_TXC)) == (SPI_SR_EOT | SPI_SR_TXC) &&
+            g_h743_model.spi_sent == (spi->CR2 & SPI_CR2_TSIZE) &&
+            g_h743_model.spi_sent > g_h743_model.spi_received) {
+            spi->RXDR = (uint8_t)~spi->TXDR;
+            spi->SR |= SPI_SR_RXP;
+            g_h743_model.spi_queued_words = 0U;
+        }
+        const uint32_t divisor =
+            2U << ((spi->CFG1 & SPI_CFG1_MBR) >> SPI_CFG1_MBR_Pos);
+        const uint32_t clock = g_nx_stm32h743_system.core_hz;
+        g_h743_model.spi_tail_until =
+            g_h743_model.timer.CNT + (divisor * 1000000U + clock - 1U) / clock;
+    }
     uint32_t value = *reg;
     if (g_h743_model.uart != nullptr && reg == &g_h743_model.uart->RDR)
         g_h743_model.uart->ISR &= ~(uint32_t)USART_ISR_RXNE_RXFNE;
@@ -81,6 +146,46 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
     }
     if (reg == g_h743_model.ignore_write)
         return;
+    if (g_h743_model.spi != nullptr) {
+        SPI_TypeDef* spi = g_h743_model.spi;
+        spi_observe_pins();
+        if (reg == &g_h743_model.gpio_e.BSRR && (value & (1U << 11U)) != 0U &&
+            g_h743_model.spi_hold_cs_high)
+            return;
+        if (reg == &g_h743_model.gpio_e.MODER && ((value >> 24U) & 3U) == 1U &&
+            g_h743_model.spi_hold_sck_output)
+            return;
+        if (reg == &spi->CR1 && (value & SPI_CR1_CSUSP) != 0U) {
+            ++g_h743_model.spi_suspend_requests;
+            if ((value & SPI_CR1_CSTART) != 0U)
+                ++g_h743_model.spi_start_suspend_commands;
+            if ((spi->CR1 & SPI_CR1_CSTART) != 0U)
+                g_h743_model.spi_suspend_pending = true;
+            value &= ~(uint32_t)SPI_CR1_CSUSP;
+        }
+        /* RM0433 read/set: writing zero cannot clear a running CSTART.
+         * Record bus-command bits above before applying this hardware rule. */
+        if (reg == &spi->CR1 && (value & SPI_CR1_SPE) != 0U &&
+            (spi->CR1 & SPI_CR1_CSTART) != 0U)
+            value |= SPI_CR1_CSTART;
+        if (reg == &spi->CR1 && (value & SPI_CR1_CSTART) != 0U &&
+            (spi->CR1 & SPI_CR1_CSTART) == 0U) {
+            spi->SR &= ~(uint32_t)(SPI_SR_EOT | SPI_SR_TXC);
+            g_h743_model.spi_observed_launch_divisor =
+                2U << ((spi->CFG1 & SPI_CFG1_MBR) >> SPI_CFG1_MBR_Pos);
+            g_h743_model.spi_observed_launch_mode =
+                ((spi->CFG2 & SPI_CFG2_CPOL) != 0U ? 2U : 0U) |
+                ((spi->CFG2 & SPI_CFG2_CPHA) != 0U ? 1U : 0U);
+        }
+        if (reg == &spi->CR1 && (value & SPI_CR1_SPE) == 0U &&
+            (spi->CR1 & SPI_CR1_SPE) != 0U) {
+            if ((spi->CR1 & SPI_CR1_CSTART) != 0U)
+                ++g_h743_model.spi_disable_before_stop;
+            spi->SR &= ~(uint32_t)(SPI_SR_RXP | SPI_SR_RXWNE | SPI_SR_RXPLVL);
+            g_h743_model.spi_queued_words = 0U;
+            value &= ~(uint32_t)SPI_CR1_CSTART;
+        }
+    }
     if (g_h743_model.pwm != nullptr) {
         TIM_TypeDef* pwm = g_h743_model.pwm;
         if (reg == &pwm->EGR && (value & TIM_EGR_UG) != 0U &&
@@ -160,8 +265,22 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
     if (g_h743_model.spi != nullptr) {
         SPI_TypeDef* spi = g_h743_model.spi;
         if (reg == &g_h743_model.rcc.APB2RSTR &&
-            (value & RCC_APB2RSTR_SPI4RST) != 0U &&
-            !g_h743_model.hold_spi_reset) {
+            (value & RCC_APB2RSTR_SPI4RST) != 0U) {
+            ++g_h743_model.spi_reset_assertions;
+            if (g_h743_model.spi_watch_pins) {
+                const GPIO_TypeDef* gpio = &g_h743_model.gpio_e;
+                if (((gpio->MODER >> 22U) & 3U) != 1U ||
+                    (gpio->ODR & (1U << 11U)) == 0U ||
+                    ((gpio->MODER >> 24U) & 3U) != 1U ||
+                    (((gpio->ODR >> 12U) & 1U) != 0U) !=
+                        g_h743_model.spi_selected_cpol ||
+                    (spi->CR1 & (SPI_CR1_SPE | SPI_CR1_CSTART)) != 0U)
+                    ++g_h743_model.spi_reset_order_errors;
+            }
+            /* A held reset is a real refused RCC write/readback, not a
+             * successful RCC edge whose target happens to stay unchanged. */
+            if (g_h743_model.hold_spi_reset)
+                return;
             if ((spi->SR & SPI_SR_EOT) != 0U &&
                 g_h743_model.timer.CNT < g_h743_model.spi_tail_until)
                 g_h743_model.spi_tail_truncated = true;
@@ -169,9 +288,13 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
             spi->CFG1 = 7U | (7U << SPI_CFG1_CRCSIZE_Pos);
             spi->SR = SPI_SR_TXP | SPI_SR_TXC;
             g_h743_model.spi_sent = g_h743_model.spi_received = 0U;
+            g_h743_model.spi_queued_words = 0U;
         }
         if (reg == &spi->IFCR) {
             spi->SR &= ~value;
+            if ((value & SPI_IFCR_EOTC) != 0U && spi->CR2 != 0U)
+                spi->SR &= ~(uint32_t)SPI_SR_TXC;
+            spi_observe_pins();
             return;
         }
     }
@@ -229,6 +352,7 @@ void nx_h743_model_write(volatile uint32_t* reg, uint32_t value) {
             uart->ISR &= ~(uint32_t)USART_ISR_RXNE_RXFNE;
     }
     *reg = value;
+    spi_observe_pins();
 }
 nx_result_t nx_h743_model_irq_control(int irq, bool enabled, uint8_t priority) {
     if (irq < 0 || irq >= 150 || priority >= 16U) {
@@ -303,7 +427,9 @@ void nx_h743_model_flash_write32(volatile uint32_t* address, uint32_t value) {
 void nx_h743_model_spi_write8(volatile uint32_t* reg, uint8_t value) {
     *reg = value;
     ++g_h743_model.spi_sent;
-    if (!g_h743_model.hold_spi_progress) {
+    ++g_h743_model.spi_queued_words;
+    if (!g_h743_model.hold_spi_progress && !g_h743_model.spi_leave_tx_queued) {
+        g_h743_model.spi_queued_words = 0U;
         g_h743_model.spi->RXDR = (uint8_t)~value;
         g_h743_model.spi->SR |= SPI_SR_RXP;
     }
@@ -311,8 +437,10 @@ void nx_h743_model_spi_write8(volatile uint32_t* reg, uint8_t value) {
 uint8_t nx_h743_model_spi_read8(volatile uint32_t* reg) {
     ++g_h743_model.spi_received;
     g_h743_model.spi->SR &= ~(uint32_t)SPI_SR_RXP;
-    if (g_h743_model.spi_received == g_h743_model.spi->CR2) {
+    if (g_h743_model.spi_received == g_h743_model.spi->CR2 &&
+        (g_h743_model.spi->SR & SPI_SR_EOT) == 0U) {
         g_h743_model.spi->SR |= SPI_SR_EOT | SPI_SR_TXC;
+        g_h743_model.spi->CR1 &= ~(uint32_t)SPI_CR1_CSTART;
         uint32_t divisor =
             2U << ((g_h743_model.spi->CFG1 & SPI_CFG1_MBR) >> SPI_CFG1_MBR_Pos);
         uint32_t clock = g_nx_stm32h743_system.core_hz;
@@ -325,6 +453,33 @@ void nx_h743_model_spi_poll(void* context) {
     (void)context;
     if (!g_h743_model.hold_spi_time)
         ++g_h743_model.timer.CNT;
+    if (g_h743_model.spi_suspend_pending && !g_h743_model.hold_spi_suspend) {
+        g_h743_model.spi_suspend_pending = false;
+        ++g_h743_model.spi_completed_suspensions;
+        g_h743_model.spi->CR1 &= ~(uint32_t)SPI_CR1_CSTART;
+        g_h743_model.spi->SR |= SPI_SR_SUSP;
+        if (g_h743_model.spi_late_rx_on_suspend &&
+            g_h743_model.spi_sent > g_h743_model.spi_received) {
+            g_h743_model.spi->RXDR = (uint8_t)~g_h743_model.spi->TXDR;
+            g_h743_model.spi->SR |= SPI_SR_RXP;
+            g_h743_model.spi_queued_words = 0U;
+            /* Wire completion belongs to arrival, never the later FIFO
+             * read. EOT exists only when this complete frame ends TSIZE. */
+            if (g_h743_model.spi->CR2 != 0U &&
+                g_h743_model.spi_received + 1U == g_h743_model.spi->CR2 &&
+                g_h743_model.spi_sent == g_h743_model.spi->CR2) {
+                g_h743_model.spi->SR |= SPI_SR_EOT | SPI_SR_TXC;
+                const uint32_t divisor =
+                    2U << ((g_h743_model.spi->CFG1 & SPI_CFG1_MBR) >>
+                           SPI_CFG1_MBR_Pos);
+                const uint32_t clock = g_nx_stm32h743_system.core_hz;
+                g_h743_model.spi_tail_until =
+                    g_h743_model.timer.CNT +
+                    (divisor * 1000000U + clock - 1U) / clock;
+            }
+        }
+    }
+    spi_observe_pins();
 }
 void nx_h743_model_system_poll(void* system) {
     (void)system;

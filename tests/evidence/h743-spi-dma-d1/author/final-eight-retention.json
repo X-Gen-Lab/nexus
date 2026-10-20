@@ -1,0 +1,47 @@
+{
+  "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8",
+  "files": [
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_clock_test",
+      "bytes": 2601544,
+      "sha256": "62e31d256ce67c7a1b0be7a5c03ab102bef7c6fdeba2c6597392708fae6a9878"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_high_factory_test",
+      "bytes": 3129928,
+      "sha256": "dbf5836962c1842a2a2ee913b2e526deb1230a7088f7e2832f9d054e2f1b9bed"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_high_kernel_test",
+      "bytes": 3176496,
+      "sha256": "16bd59ec07ed6da3a8eb02c57cb3f40c649716ba6023493727b983fb1ddbea20"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_peripheral_factory_test",
+      "bytes": 3123488,
+      "sha256": "8e6415136afe2c8abe2c28c325c5af283cb56d1d2f71a73181efd58e8421cadc"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_peripheral_test",
+      "bytes": 3068912,
+      "sha256": "1fed4fb9f3f71aa5435629011199dd825e551436b02d0e815c0dd789584720ea"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_spi_dma_test",
+      "bytes": 2869816,
+      "sha256": "48c083551f93585043b36b2848aa69801f1b1beba97241cc83295eb9bdf9df3b"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_spi_wire_test",
+      "bytes": 2692688,
+      "sha256": "3231265183ba5d6b3c70bb5c48aae48d4d20599307d648bd76cabc7e219ee0b4"
+    },
+    {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_system_test",
+      "bytes": 2785608,
+      "sha256": "a29cec153c9ac018873fe7af4ea4ce13ea6031e54b5c2cfb6ea4d6695676ca01"
+    }
+  ],
+  "build_allocated": 312631296,
+  "delta": 60088320
+}

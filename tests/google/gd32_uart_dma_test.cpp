@@ -75,8 +75,8 @@ class GD32UARTDMA : public ::testing::Test {
         s_error_at_ack = false;
         region = {reinterpret_cast<uintptr_t>(payload), sizeof(payload),
                   NX_DMA_MEMORY_READ};
-        state.regions = &region;
-        state.region_count = 1;
+        state.resources.regions = &region;
+        state.resources.region_count = 1;
         ASSERT_EQ(nx_gd32_uart_dma_initialize(&state, 115200, NX_UART_RX_BYTES,
                                               rx, sizeof(rx), 5),
                   NX_SUCCESS);

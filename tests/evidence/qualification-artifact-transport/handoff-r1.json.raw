@@ -1,0 +1,38 @@
+{
+  "allocated_regular_file_bytes_before_handoff": 2793472,
+  "evidence_archive": {
+    "bytes": 866919,
+    "mode": 384,
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/execution-evidence-r1.tar.gz",
+    "sha256": "859690f10deb2da56dd0d12e05d61503c533dfc8c7b49a8d92807f278e4d91b2"
+  },
+  "evidence_map": {
+    "bytes": 56055,
+    "mode": 384,
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/execution-evidence-map-r1.json",
+    "sha256": "40113432dee813416d2bab8d36aa885173376053c76b76757ad14c550e0c403c"
+  },
+  "freeze": {
+    "bytes": 3293,
+    "mode": 384,
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/source-and-execution-freeze-r1.json",
+    "sha256": "2d9179c3492b032b2f8cc9415850d9257ef64e81c74ee100fe34cb67e5d0ce4f"
+  },
+  "index_stable": true,
+  "not_executed": [
+    "new actual remote qualification",
+    "local SDK/OCI build",
+    "ARM link",
+    "candidate promotion",
+    "physical HIL"
+  ],
+  "persistence": "volatile only; Root normal commit/push required",
+  "qualification": "not_qualified",
+  "source_stable": true,
+  "transport_map": {
+    "bytes": 2862,
+    "mode": 384,
+    "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/transport-map-r1.json",
+    "sha256": "954fe7e710c30024da3a56681f73053dc7d1a52c19788d0fb24d8980c2660477"
+  }
+}

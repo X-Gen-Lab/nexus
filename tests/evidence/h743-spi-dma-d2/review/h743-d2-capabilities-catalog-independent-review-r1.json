@@ -1,0 +1,22 @@
+{
+  "decision": "APPROVE_EXACT_CANDIDATE_MESSAGES_FOR_REVIEWED_METADATA",
+  "source_sha256": "3ce2824667281bef8c6136cab183183f4f00929f3a6a2e86acdae4dabab206e2",
+  "actual_pot_sha256": "3b14b980172a6a9d9c473f7f4cd3040e619aa76cf08a781c429ac97ff165cc43",
+  "catalogs": [
+    {
+      "path": "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "candidate_sha256": "940f1ccdea38d45b0afe9599f301a0b6f2767df404832b39121dd199ab730a92",
+      "retained_pairs": 479,
+      "new_exact_code_path_messages": 4,
+      "required_messages": 483
+    },
+    {
+      "path": "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "candidate_sha256": "0dcaa77794580bef63361c3be45f6dda5716a8e8136748ae072c032efc6b50b2",
+      "retained_pairs": 479,
+      "new_exact_code_path_messages": 4,
+      "required_messages": 483
+    }
+  ],
+  "scope": "Independent actual candidate byte/parser comparison, exact required messages and existing translations; only four verbatim existing code-path messages added per language. No full HTML/SDK/ARM/HIL qualification."
+}

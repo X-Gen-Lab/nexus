@@ -9,11 +9,15 @@ COMMON = (
     "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor",
+    "resource_graph", "trigger_graph", "dma_topology", "io_traits",
+    "selected_contracts",
+    "enhanced_endpoints", "uart_formats", "stream_profiles",
 )
 PLATFORM = (
     "configure", "authored", "bindings", "emission", "can", "memory", "contracts",
-    "usb_device", "ethernet", "timer_advanced", "secondary_controllers",
+    "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
     "fact_references", "clocks", "physical_facts", "preflight", "gpio_phase",
+    "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",
     "providers/hardware",
 )
 

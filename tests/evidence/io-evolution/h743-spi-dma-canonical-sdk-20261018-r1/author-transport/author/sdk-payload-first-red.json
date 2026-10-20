@@ -1,0 +1,31 @@
+{
+  "module": "tests/contracts/test_device_sdk_payload.py",
+  "discovered": [
+    "d3_whole_module.DeviceSDKPayloadTests.test_expanded_soc_ownership_is_complete_and_required_by_sdk",
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_pre_ram_power_boot_assembly_and_header_are_required",
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_spi_canonical_inputs_and_shared_smoke_are_required",
+    "d3_whole_module.DeviceSDKPayloadTests.test_modern_consumer_inputs_are_explicit_and_use_only_relocated_sdk",
+    "d3_whole_module.DeviceSDKPayloadTests.test_native_selected_checker_rejects_wrong_source_domain_and_retention",
+    "d3_whole_module.DeviceSDKPayloadTests.test_native_selected_checker_runs_host_and_observes_only_selected_symbols",
+    "d3_whole_module.DeviceSDKPayloadTests.test_native_selected_template_does_not_cross_compile_host_model",
+    "d3_whole_module.DeviceSDKPayloadTests.test_native_time_payload_and_selected_consumers_are_explicit",
+    "d3_whole_module.DeviceSDKPayloadTests.test_new_soc_payload_requires_its_actual_owned_firmware_sources",
+    "d3_whole_module.DeviceSDKPayloadTests.test_original_notice_lock_and_verifier_cannot_be_omitted_from_payload",
+    "d3_whole_module.DeviceSDKPayloadTests.test_rehashed_omission_cannot_remove_new_provider_inputs",
+    "d3_whole_module.DeviceSDKPayloadTests.test_rtscts_canonical_inputs_and_boards_are_owned_sdk_requirements",
+    "d3_whole_module.DeviceSDKPayloadTests.test_selected_adc_and_rtscts_sources_are_owned_sdk_requirements",
+    "d3_whole_module.DeviceSDKPayloadTests.test_shared_pwm_reference_is_an_explicit_public_sdk_consumer",
+    "d3_whole_module.DeviceSDKPayloadTests.test_upstream_checkout_exports_only_the_exact_reviewed_component"
+  ],
+  "run": 15,
+  "failures": [
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_spi_canonical_inputs_and_shared_smoke_are_required (path='tools/configure/assemblies/h743-spi-dma.toml')",
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_spi_canonical_inputs_and_shared_smoke_are_required (path='tools/configure/assemblies/h743-spi-dma-uart-tx.toml')",
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_spi_canonical_inputs_and_shared_smoke_are_required (path='tools/configure/assemblies/h743-spi-dma-uart-rx.toml')",
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_spi_canonical_inputs_and_shared_smoke_are_required (path='cmake/package/verification/io_evolution/consumers/h743-spi-dma.c')",
+    "d3_whole_module.DeviceSDKPayloadTests.test_h743_spi_canonical_inputs_and_shared_smoke_are_required"
+  ],
+  "errors": [],
+  "skipped": [],
+  "successful": false
+}

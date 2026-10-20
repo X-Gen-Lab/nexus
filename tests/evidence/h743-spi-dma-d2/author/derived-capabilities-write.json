@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/tmp/nexus-io-validation-20261018/.venv/bin/python",
+    "-B",
+    "tools/maintenance/capabilities.py",
+    "--root",
+    "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "--write"
+  ],
+  "actual_exit": 0,
+  "before_sha256": "0b97b5a9001662a07a45f379705567ca5fb8847b55224df2e30e45ca47ef34c3",
+  "after_sha256": "3ce2824667281bef8c6136cab183183f4f00929f3a6a2e86acdae4dabab206e2",
+  "persisted_first_and_actual_matches": true,
+  "manual_prefix_and_suffix_preserved": true,
+  "raw_sha256": "c940e3f485e6ea1b4e323d6843423cd35b7e18e1a11f80a553c5dfdb03963fa7",
+  "qualification": false
+}

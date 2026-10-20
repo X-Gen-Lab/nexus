@@ -9,9 +9,11 @@ msgstr ""
 "X-Nexus-Reviewed: true\n"
 "X-Nexus-Source-SHA256: bc74e6fe204936dd37b0425ca3384dd9de8200a2e8ac2c3d62f27142c1d07a39\n"
 
+#: ../../../../docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
 msgstr "Source-adjacent contracts"
 
+#: ../../../../docs/explanation/source-map.md:10
 msgid ""
 "The layer README files remain canonical beside their implementation. The "
 "following inclusions read those exact files rather than copying a second "
@@ -21,12 +23,15 @@ msgstr ""
 "following inclusions read those exact files rather than copying a second "
 "contract. Relative source links are bound to the website source revision."
 
+#: ../../../../docs/explanation/source-map.md:14
 msgid "Core"
 msgstr "Core"
 
+#: ../../../../core/README.md:2
 msgid "Core contracts"
 msgstr "Core contracts"
 
+#: ../../../../core/README.md:4
 msgid ""
 "C11 caller-owned request admission, stable control identities, completion "
 "state and monotonic absolute deadlines. No devices, OS scheduler, allocation"
@@ -36,6 +41,7 @@ msgstr ""
 "state and monotonic absolute deadlines. No devices, OS scheduler, allocation"
 " or global registry. Public interfaces are in `include/nexus/core`."
 
+#: ../../../../core/README.md:8
 msgid ""
 "REJECTED retains no references. An accepted chain borrows request and "
 "buffers until acquire-observed SETTLED. SETTLED is its last request access. "
@@ -51,6 +57,7 @@ msgstr ""
 "the operation. Queue adapters own their outer request and use explicit inner"
 " provider metadata where needed."
 
+#: ../../../../core/README.md:14
 msgid ""
 "`tests/contracts/core_contract_test.c` executes publication, admission, "
 "wrapping time arithmetic and terminal-state invariants. Host results do not "
@@ -60,12 +67,15 @@ msgstr ""
 "wrapping time arithmetic and terminal-state invariants. Host results do not "
 "prove MCU interrupt ordering or worst-case execution time."
 
+#: ../../../../docs/explanation/source-map.md:21
 msgid "Arch"
 msgstr "Arch"
 
+#: ../../../../arch/README.md:2
 msgid "CPU-local primitives"
 msgstr "CPU-local primitives"
 
+#: ../../../../arch/README.md:4
 msgid ""
 "`Nexus::Arch` exposes saved interrupt masks, exact exception identity, "
 "current privilege, ordering barriers and an optional already-enabled DWT "
@@ -93,6 +103,7 @@ msgstr ""
 "startup or factory. See [CPU contracts](/design/arch-contracts.md) and the "
 "[runtime assembly example](/delivery/cortex-m.md)."
 
+#: ../../../../arch/README.md:16
 msgid ""
 "Save/restore tokens on the same CPU/thread in strict reverse order. Cortex-M"
 " preserves incoming PRIMASK and does not overwrite BASEPRI/FAULTMASK where "
@@ -110,6 +121,7 @@ msgstr ""
 "large copies, kernel calls or user callbacks. A saved Arch token is not a "
 "kernel critical-section token or an SMP lock."
 
+#: ../../../../arch/README.md:24
 msgid ""
 "Mask/context queries let blocking I/O reject contexts that prevent its "
 "progress. The read-only mask snapshot distinguishes PRIMASK, BASEPRI and "
@@ -143,6 +155,7 @@ msgstr ""
 "are explicit CPU facts, never inferred by probing arbitrary registers or "
 "enabling optional units."
 
+#: ../../../../arch/README.md:38
 msgid ""
 "`sleep.h` exposes two explicit shallow-sleep operations. The masked "
 "`nx_arch_wait_for_interrupt()` requires privileged Thread mode, PRIMASK=1, "
@@ -176,6 +189,7 @@ msgstr ""
 "evidence does not qualify a concrete timer, clock continuity, physical power"
 " behavior or wake latency."
 
+#: ../../../../arch/README.md:53
 msgid ""
 "`cache.h` exposes distinct data clean, invalidate, combined maintenance and "
 "instruction synchronization. Every range must own complete reviewed 32-byte "
@@ -221,6 +235,7 @@ msgstr ""
 "caller. The optional M0+ MPU uses the v7-format registers confirmed by "
 "CMSIS."
 
+#: ../../../../arch/README.md:73
 msgid ""
 "`security.h` identifies the reviewed image state and encodes explicit SAU "
 "regions. Only a Secure compiler/profile with reviewed SAU regions can "
@@ -238,6 +253,7 @@ msgstr ""
 " unsupported without SAU MMIO. IDAU, overlap rules, memory permissions and "
 "gateway policy stay outside these mechanisms."
 
+#: ../../../../arch/README.md:80
 msgid ""
 "`nonsecure.h` supplies an instantaneous Secure Thread observation of a "
 "complete span using the actual CMSE NonSecure unprivileged read or "
@@ -257,6 +273,7 @@ msgstr ""
 " must separately establish these conditions before accessing memory or "
 "performing an operation."
 
+#: ../../../../arch/README.md:88
 msgid ""
 "`features.h` reports immutable reviewed cache/MPU/DWT/security/SAU "
 "capabilities, not enabled state or hardware qualification. Native exposes "
@@ -290,6 +307,7 @@ msgstr ""
 "establish a fixed cycle bound. Initialize words before publication and "
 "retain their lifetime until every reader/writer has stopped."
 
+#: ../../../../arch/README.md:103
 msgid ""
 "Native models recursive exclusion and C11 fences; it does not model real "
 "NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore "
@@ -317,30 +335,11 @@ msgstr ""
 "establish the maintained register layouts. Actual IRQ latency, privilege "
 "transitions, DMA/cache coherency and CPU timing require HIL."
 
+#: ../../../../docs/explanation/source-map.md:28 ../../../../io/README.md:2
 msgid "Typed I/O"
 msgstr "Typed I/O"
 
-msgid ""
-"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-"interfaces. Each selected instance has an immutable face with two pointers: "
-"shared read-only methods and a pointer to private provider state. Generated "
-"faces live in read-only storage; their state and selected buffers are "
-"private static objects in the generated translation unit. Manually assembled"
-" providers use storage supplied by their explicit constructor owner. A "
-"32-bit target spends eight bytes of Flash per face; mutable state and exact-"
-"capacity buffers are separate. Method pointers are shared per provider and "
-"mode rather than repeated in every mutable instance."
-msgstr ""
-"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-"interfaces. Each selected instance has an immutable face with two pointers: "
-"shared read-only methods and a pointer to private provider state. Generated "
-"faces live in read-only storage; their state and selected buffers are "
-"private static objects in the generated translation unit. Manually assembled"
-" providers use storage supplied by their explicit constructor owner. A "
-"32-bit target spends eight bytes of Flash per face; mutable state and exact-"
-"capacity buffers are separate. Method pointers are shared per provider and "
-"mode rather than repeated in every mutable instance."
-
+#: ../../../../io/README.md:17
 msgid ""
 "Public operations check the face and dispatch its exact context. Different "
 "provider tables can coexist in one image without redefining public symbols. "
@@ -356,6 +355,7 @@ msgstr ""
 " execution, deadline, buffer ownership and failure contract. Provider "
 "headers, register layouts and SDK types stay private."
 
+#: ../../../../io/README.md:24
 msgid ""
 "Generated typed factory IDs select instances and distinguish SPI/I2C "
 "controllers from their child endpoints. Lookup returns a static identity. "
@@ -373,6 +373,7 @@ msgstr ""
 "stopping requires caller and IRQ quiescence rather than promising that a "
 "pointer has been revoked."
 
+#: ../../../../io/README.md:31
 msgid ""
 "Stream reserve, publish, acquire, release, abort and stop access constant "
 "metadata independent of block count. Stop checks an outstanding-block count;"
@@ -390,6 +391,7 @@ msgstr ""
 "operation whose work grows with block count. This complexity contract is not"
 " physical IRQ latency or cycle qualification."
 
+#: ../../../../io/README.md:39
 msgid ""
 "Default paths need no OS locks or hidden tasks. Requests and transfer "
 "buffers remain caller-owned; generated provider buffers are assembly-owned "
@@ -407,6 +409,7 @@ msgstr ""
 "replays a failed transaction. Flash exposes physical geometry; products "
 "provide explicit restricted regions."
 
+#: ../../../../io/README.md:46
 msgid ""
 "The Native model owns independent state per instance. Its explicit default "
 "fixtures support focused tests; generated assemblies use separate state and "
@@ -422,12 +425,15 @@ msgstr ""
 "physical routes; software-only fixtures do not establish PCB connectivity or"
 " physical timing."
 
+#: ../../../../docs/explanation/source-map.md:35
 msgid "OS adapters"
 msgstr "OS adapters"
 
+#: ../../../../os/README.md:2
 msgid "Optional OS adapters"
 msgstr "Optional OS adapters"
 
+#: ../../../../os/README.md:4
 msgid ""
 "Thin wait/wake and per-object storage contracts. Baremetal has no scheduler;"
 " Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and "
@@ -439,6 +445,7 @@ msgstr ""
 "queue storage selected by the caller. No universal maximum pool, hidden "
 "worker, default timer daemon or device dependency on OS."
 
+#: ../../../../os/README.md:9
 msgid ""
 "Notifications are hints: arm/recheck the authoritative request predicate. "
 "Kernel ISR operations validate the selected syscall ceiling. Native task "
@@ -458,6 +465,7 @@ msgstr ""
 "detachment. Applications own scheduler start, workers, queue depth, fairness"
 " and shutdown progress."
 
+#: ../../../../os/README.md:17
 msgid ""
 "The real FreeRTOS POSIX scheduler fixture validates host task/queue "
 "lifecycle. The default privileged runtime selects exact pinned kernel "
@@ -479,6 +487,7 @@ msgstr ""
 "qualify MCU exception priority, FP/MVE context switches, stack high-water or"
 " timing."
 
+#: ../../../../os/README.md:26
 msgid ""
 "Running APIs require privileged, unmasked Thread mode. Before scheduler "
 "start, the pinned Baseline ports may retain PRIMASK=1 and Mainline ports "
@@ -498,6 +507,7 @@ msgstr ""
 " the PRIMASK kernel contract; Mainline IRQ wakes validate implemented "
 "bounds, priority width and syscall ceiling."
 
+#: ../../../../os/README.md:34
 msgid ""
 "Armv8-M supports explicit NTZ, Secure-only, and Nonsecure standalone build "
 "modes. The selected NTZ kernels do not allocate Secure task contexts or "
@@ -523,6 +533,7 @@ msgstr ""
 "split security, are rejected. See the OS contracts and current matrix before"
 " selecting an optional isolation profile."
 
+#: ../../../../os/README.md:45
 msgid ""
 "Explicit split mode instead selects the real TrustZone-aware Nonsecure ports"
 " and a separately linked Secure baremetal Runtime with "
@@ -552,6 +563,7 @@ msgstr ""
 "and host lease tests do not qualify physical attribution, context retention,"
 " stack peaks or adversarial NS-kernel isolation."
 
+#: ../../../../os/README.md:57
 msgid ""
 "The first scheduler start requires cold privileged Thread/MSP state with "
 "FPCA clear; applications must not leave active FP context before bootstrap. "
@@ -573,6 +585,7 @@ msgstr ""
 "`NEXUS_CPU_SECURE_ONLY` macro selects that port encoding and does not grant "
 "Secure access to a single-world image."
 
+#: ../../../../os/README.md:66
 msgid ""
 "M55/M85 use their actual MVE-aware exception/context ports. The kernel's "
 "`configENABLE_FPU` switch activates the shared coprocessor register bank and"
@@ -594,6 +607,7 @@ msgstr ""
 "does not qualify that behavior or guarantee cross-world payload "
 "preservation."
 
+#: ../../../../os/README.md:75
 msgid ""
 "The host fixture keeps the pinned kernel and POSIX port unchanged, and uses "
 "`tests/contracts/os_freertos_runtime/posix_event.c` as its owned event "
@@ -613,9 +627,11 @@ msgstr ""
 "correction does not change the MCU backend or establish MCU scheduler "
 "qualification."
 
+#: ../../../../os/README.md:83
 msgid "Maintained execution contracts"
 msgstr "Maintained execution contracts"
 
+#: ../../../../os/README.md:85
 msgid ""
 "See [OS contracts](/design/os-contracts.md), [delivery "
 "scope](/delivery/os.md) and the {download}`OS01-OS55 execution ledger "
@@ -629,6 +645,7 @@ msgstr ""
 "integration contract](/design/os-backend-integration.md) and its active "
 "execution probe; a probe pass does not register another supported RTOS."
 
+#: ../../../../os/README.md:92
 msgid ""
 "Finite notification deadlines are checked even after a coalesced sequence "
 "hint; continuous unrelated wakes cannot extend a wait. The public predicate "
@@ -644,6 +661,7 @@ msgstr ""
 "absolute budget only when blocking. `NX_DEADLINE_NEVER` uses genuine untimed"
 " host waiting."
 
+#: ../../../../os/README.md:98
 msgid ""
 "Task creation validates the selected port's startup frame and alignment "
 "before kernel mutation. Startup minimum and measured runtime stack budget "
@@ -659,6 +677,7 @@ msgstr ""
 " tasks and direct notifications are explicit optional paths with their own "
 "storage and receiver/index contracts."
 
+#: ../../../../os/README.md:104
 msgid ""
 "Closable queues use separate caller-owned controls and per-operation waiter "
 "storage; raw queues retain their minimal native blocking implementation. "
@@ -674,6 +693,7 @@ msgstr ""
 "destroy notification, queue and guard storage. The external UART owner "
 "example demonstrates that flow."
 
+#: ../../../../os/README.md:110
 msgid ""
 "The optional tickless path needs an explicitly bound timer port and a "
 "continuous clock; without it, normal Tick remains active. Diagnostics use "
@@ -689,12 +709,15 @@ msgstr ""
 "or verifies retained OS hardware records without operating equipment; all "
 "unexecuted physical cases stay `not_executed`."
 
+#: ../../../../docs/explanation/source-map.md:42
 msgid "Components"
 msgstr "Components"
 
+#: ../../../../components/README.md:2
 msgid "Optional common components"
 msgstr "Optional common components"
 
+#: ../../../../components/README.md:4
 msgid ""
 "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART "
 "owner, BMP280 core and SPI transport, instance-level Log, two-bank commit-"
@@ -708,6 +731,7 @@ msgstr ""
 "Modbus RTU parsing. Unreferenced component code does not enter a firmware "
 "image."
 
+#: ../../../../components/README.md:9
 msgid ""
 "Owners have one executor, exact slot capacity, stable cancellation epochs "
 "and caller-owned operations. Initialization links unused slots before "
@@ -735,6 +759,7 @@ msgstr ""
 "or global lookup. Products supply transports, authorization, regions, task "
 "policy and budgets."
 
+#: ../../../../components/README.md:21
 msgid ""
 "Meaningful regressions in `tests/contracts` cover concurrent producers, late"
 " cancel/TC, failure quarantine, interrupted persistence and protocol "
@@ -746,9 +771,11 @@ msgstr ""
 "malformed inputs. A durable host file is not a physical Flash power-cut "
 "qualification."
 
+#: ../../../../docs/explanation/source-map.md:49
 msgid "Exact SoC implementations"
 msgstr "Exact SoC implementations"
 
+#: ../../../../docs/explanation/source-map.md:51
 msgid ""
 "The private implementation boundaries and reference configurations are "
 "maintained in [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
@@ -777,3 +804,54 @@ msgstr ""
 "SOURCE/soc/stm32h743/README.md) and [STM32U575](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md). Their "
 "links bind this website revision."
+
+#: ../../../../io/README.md:4
+msgid ""
+"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
+"interfaces. The optional [GPIO pin-state contract](/explanation/gpio-pin-"
+"states.md) adds an explicit selected face for authored DEFAULT/SLEEP images."
+" Its generated instance ID and runtime selection enum remain separate; "
+"lookup never acquires pad ownership or starts a power transition. Each "
+"selected instance has an immutable face with two pointers: shared read-only "
+"methods and a pointer to private provider state. Generated faces live in "
+"read-only storage; their state and selected buffers are private static "
+"objects in the generated translation unit. Manually assembled providers use "
+"storage supplied by their explicit constructor owner. A 32-bit target spends"
+" eight bytes of Flash per face; mutable state and exact-capacity buffers are"
+" separate. Method pointers are shared per provider and mode rather than "
+"repeated in every mutable instance."
+msgstr ""
+"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
+"interfaces. The optional [GPIO pin-state contract](/explanation/gpio-pin-"
+"states.md) adds an explicit selected face for authored DEFAULT/SLEEP images."
+" Its generated instance ID and runtime selection enum remain separate; "
+"lookup never acquires pad ownership or starts a power transition. Each "
+"selected instance has an immutable face with two pointers: shared read-only "
+"methods and a pointer to private provider state. Generated faces live in "
+"read-only storage; their state and selected buffers are private static "
+"objects in the generated translation unit. Manually assembled providers use "
+"storage supplied by their explicit constructor owner. A 32-bit target spends"
+" eight bytes of Flash per face; mutable state and exact-capacity buffers are"
+" separate. Method pointers are shared per provider and mode rather than "
+"repeated in every mutable instance."
+
+#~ msgid ""
+#~ "GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
+#~ "interfaces. Each selected instance has an immutable face with two pointers: "
+#~ "shared read-only methods and a pointer to private provider state. Generated "
+#~ "faces live in read-only storage; their state and selected buffers are "
+#~ "private static objects in the generated translation unit. Manually assembled"
+#~ " providers use storage supplied by their explicit constructor owner. A "
+#~ "32-bit target spends eight bytes of Flash per face; mutable state and exact-"
+#~ "capacity buffers are separate. Method pointers are shared per provider and "
+#~ "mode rather than repeated in every mutable instance."
+#~ msgstr ""
+#~ "GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
+#~ "interfaces. Each selected instance has an immutable face with two pointers: "
+#~ "shared read-only methods and a pointer to private provider state. Generated "
+#~ "faces live in read-only storage; their state and selected buffers are "
+#~ "private static objects in the generated translation unit. Manually assembled"
+#~ " providers use storage supplied by their explicit constructor owner. A "
+#~ "32-bit target spends eight bytes of Flash per face; mutable state and exact-"
+#~ "capacity buffers are separate. Method pointers are shared per provider and "
+#~ "mode rather than repeated in every mutable instance."

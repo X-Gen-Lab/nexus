@@ -1,0 +1,157 @@
+{
+  "root": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "head": "a07bc6eecd8ef0d85a6882249c7a481a4f69dc28",
+  "branch": "feat/workflow-actionlint-20261018",
+  "index_sha256": "261d453cd13fc3558c77e9c7cd8e2d808dde73113fce259af79571c1d9a64216",
+  "index_bytes": 3509285,
+  "full_index_records_sha256": "bbf1f1deb0aa4604425c6f151bfaeb276b5fe1f4dfd91b3108c8cccc89ded853",
+  "unrelated_untracked": [
+    {
+      "path": "s0-evidence/configure-red/receipt.json",
+      "bytes": 2888,
+      "sha256": "95407b84dd325d531b6fe735e4a2548ea86aa324b95a88a1583613b28873f9ba"
+    },
+    {
+      "path": "s0-evidence/style/receipt.json",
+      "bytes": 921,
+      "sha256": "f4ba80960b861f8038e5761bd54b2d8ed63313ef602245639e8a44d7074d858f"
+    },
+    {
+      "path": "s0-evidence/style/report.json",
+      "bytes": 2016,
+      "sha256": "01bde27708fdaa24398ca1ab7b15dd183703b5d0a7314361d208bc5450b86562"
+    },
+    {
+      "path": "s0-evidence/whole-clock-green/junit.xml",
+      "bytes": 10474,
+      "sha256": "e5152f5b50354be51f2e0973af7b43ea80f558bd46fa719338d1ded02b3ee4f8"
+    },
+    {
+      "path": "s0-evidence/whole-clock-green/receipt.json",
+      "bytes": 3339,
+      "sha256": "1206c04dbb24b75916d03969df4bf42c0a8734c6fc234ba637c31fed8901bdfd"
+    },
+    {
+      "path": "s0-evidence/whole-clock-red/junit.xml",
+      "bytes": 10474,
+      "sha256": "e5ea2bd3fd338d05b9f683181da86a38b8169f2fdf035be1d0cd80dd242f4077"
+    },
+    {
+      "path": "s0-evidence/whole-clock-red/receipt.json",
+      "bytes": 3333,
+      "sha256": "067abd0e68e7fbf602a14e498dd13f728787a35f0c76b138b861be7526ac88dd"
+    },
+    {
+      "path": "s0-evidence/whole-system-green/junit.xml",
+      "bytes": 12828,
+      "sha256": "d9d07e58d11174ecd24ab828d67024aa4c5e3c25104a20bbaca5cc6730cfd036"
+    },
+    {
+      "path": "s0-evidence/whole-system-green/receipt.json",
+      "bytes": 3343,
+      "sha256": "ddca6ddb61263ff75a7a68afdee2767579d1622f9a6402697b94a5f4166e9ca4"
+    },
+    {
+      "path": "s0-evidence/whole-system-red/junit.xml",
+      "bytes": 36958,
+      "sha256": "572fde4bad287e4e91fe6a11cd4589382e3502bf7bc83a642bec786dd3c0d45f"
+    },
+    {
+      "path": "s0-evidence/whole-system-red/receipt.json",
+      "bytes": 3338,
+      "sha256": "d8c6e2f3dab0527c93421cbf35434e458dadfc1723d7c65af906a93c74797080"
+    }
+  ],
+  "source_paths": [
+    "dependencies/actionlint.lock.json",
+    "tools/dev/dependencies.py",
+    "tools/testing/test_build_delivery.py",
+    "scripts/setup/install_dev_tools.py",
+    "scripts/ci/test_install_dev_tools.py",
+    "scripts/ci/lint_workflows.py",
+    "scripts/ci/test_lint_workflows.py",
+    ".github/workflows/test_platform_ci.py",
+    "tools/dev/dev.py",
+    "tools/testing/test_dev.py",
+    ".pre-commit-config.yaml",
+    ".github/workflows/quality-checks.yml",
+    "tools/dev/README.md"
+  ],
+  "before": [
+    {
+      "path": "dependencies/actionlint.lock.json",
+      "absent": true
+    },
+    {
+      "path": "tools/dev/dependencies.py",
+      "bytes": 24432,
+      "sha256": "286f20fc6a208408bf2c3793390f8aacbf69f4af9a425b102e0919216bdad708"
+    },
+    {
+      "path": "tools/testing/test_build_delivery.py",
+      "bytes": 22571,
+      "sha256": "ea3096eff4094e73eaecd87db8a572f5460b4d028f3ed542c1a8e45aa6aacf49"
+    },
+    {
+      "path": "scripts/setup/install_dev_tools.py",
+      "bytes": 8766,
+      "sha256": "c529ad4fb7f88c252b99f993d87d47c68cef6a7302b652bcd8a46c5815a096fd"
+    },
+    {
+      "path": "scripts/ci/test_install_dev_tools.py",
+      "bytes": 12037,
+      "sha256": "0f25c662d3c1d2870ffcb2390b920753c3af4d3d2a84de56b6271a21969daf76"
+    },
+    {
+      "path": "scripts/ci/lint_workflows.py",
+      "absent": true
+    },
+    {
+      "path": "scripts/ci/test_lint_workflows.py",
+      "absent": true
+    },
+    {
+      "path": ".github/workflows/test_platform_ci.py",
+      "bytes": 58474,
+      "sha256": "30402005841e35a190b3d2207af77587f8c09030dc61f4c09ca453eaf938d2a2"
+    },
+    {
+      "path": "tools/dev/dev.py",
+      "bytes": 13908,
+      "sha256": "f8460288d942477a5b2b131d67857b93d859b7d5df5c7ddef2c628b3a8122c8c"
+    },
+    {
+      "path": "tools/testing/test_dev.py",
+      "bytes": 5977,
+      "sha256": "4f1908b1d119f46462b6fece37023624be18d5d3cdd1bf2a112a0a1a32ca25e2"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "bytes": 1369,
+      "sha256": "72e4e1d110b339fae146aa8369fd4559189d2e2e358d85514f8a6655dee04600"
+    },
+    {
+      "path": ".github/workflows/quality-checks.yml",
+      "bytes": 5095,
+      "sha256": "ff308167d1d29064fb19600be4319e09023e735b653ce7ff0b85b3d1dd97a800"
+    },
+    {
+      "path": "tools/dev/README.md",
+      "bytes": 8506,
+      "sha256": "1220fc067fa0311061a0167add8eddea4f4ab1dff0bfa7fb72b7ebc2deee3c46"
+    }
+  ],
+  "guards": {
+    "tmp_free": 335671296,
+    "persistent_free": 83496960,
+    "memory_available": 1781022720,
+    "events": {
+      "low": "0",
+      "high": "0",
+      "max": "0",
+      "oom": "0",
+      "oom_kill": "0",
+      "oom_group_kill": "0"
+    }
+  }
+}

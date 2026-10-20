@@ -1,0 +1,77 @@
+{
+ "kind": "final SDK consumer transport correction, r3",
+ "supersedes_handoff": {
+  "path": "completed-handoff-r1.json",
+  "sha256": "2c0de6ae2e5d9c46e70ce21d2b0e6ba74a360c1417d7d3b7a5fc3282b16d713e"
+ },
+ "source_freeze": {
+  "path": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/final-r3/source-freeze-r3.json",
+  "sha256": "a8e9fd659e71cb43da0d1262457e450c3e3aec3b03c576c6d4ee6892f241db29"
+ },
+ "source_count": 7,
+ "own_root": "/tmp/nexus-io36-native-20261018",
+ "head": "38271c0d1749ce3f2225ee4de5ddc8b1cc0bc96b",
+ "index_sha256": "85fe752015f12be5ca7345e4a13c22fb17e17f9d44ee23764ffda80664b79b44",
+ "index_before_after_equal": true,
+ "stage_commit_push": false,
+ "final_scope": "Whole release module42 + whole producer verification module24 + whole SourceSDKSelection class19;85 passed,0skipped/errors/failures. Not full source-SDK module/all tool suites/actualSDK/ARM/OCI/HIL. Root normal commit/remote CI owns those independent admissions.",
+ "final_working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+ "additional_TDD": "Malformed512B header at first TAR end and short nonzero header were each really admitted by r2: whole42 RED exactly2subfail,0error. Added seek(archive.offset) before zero-only tail scan; whole42 GREEN. r2/85 source and all older RED/fixture errors remain immutable historical development evidence.",
+ "phases": {
+  "release-invalid-header-red-r3": {
+   "exit_code": 1,
+   "tests": 42,
+   "result": "executions/release-invalid-header-red-r3/result.json",
+   "result_sha256": "31c1768a915403c809d37a49d67c3ab75975383db384147f04d85ffebb6f00d7",
+   "receipt": "executions/release-invalid-header-red-r3/command.command.json",
+   "receipt_sha256": "c016a74425220b6e6b2290ce60abc47dc0658d2d6f3532c6d9bd6b5fa4c719d9",
+   "working_tree_sha256": "863766a68f762dd324ca8a834949ba63d61aa36d0204801f9114d2db480bd1f8",
+   "source_unchanged": true,
+   "max_completed_child_rss_kib": 39964
+  },
+  "release-final-green-r3": {
+   "exit_code": 0,
+   "tests": 42,
+   "result": "executions/release-final-green-r3/result.json",
+   "result_sha256": "a82ff45807fb753942344cdae52119d603e3bf56bcf450f7ee42a4fea80e92d4",
+   "receipt": "executions/release-final-green-r3/command.command.json",
+   "receipt_sha256": "03c6d10757f3f4d46153f809574f7ae650e38b42ba604eaad84c4b3b9bd447d2",
+   "working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+   "source_unchanged": true,
+   "max_completed_child_rss_kib": 40484
+  },
+  "producer-whole-module-final-r3": {
+   "exit_code": 0,
+   "tests": 24,
+   "result": "executions/producer-whole-module-final-r3/result.json",
+   "result_sha256": "87a01e4537f10205f83fa1bfdb0e434c4be5dbe1249c3706047dd685c594a945",
+   "receipt": "executions/producer-whole-module-final-r3/command.command.json",
+   "receipt_sha256": "ba03e2168410b47445364e62d83d72545c52625893cd6363cd99cab4407960c6",
+   "working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+   "source_unchanged": true,
+   "max_completed_child_rss_kib": 44484
+  },
+  "source-sdk-selection-class-final-r3": {
+   "exit_code": 0,
+   "tests": 19,
+   "result": "executions/source-sdk-selection-class-final-r3/result.json",
+   "result_sha256": "7d17fcd2da2c4823445b622104af4bf5eef933ddd3f823369b0d6ba0bbdd19c4",
+   "receipt": "executions/source-sdk-selection-class-final-r3/command.command.json",
+   "receipt_sha256": "4a0f05bb49bf922da00c73380e2e7774990c8436be460fa36ea27520c442652b",
+   "working_tree_sha256": "c0a5027014904e249a8969fe9510f46a03e822e1061dea6547e417ebb58ac4bf",
+   "source_unchanged": true,
+   "max_completed_child_rss_kib": 28900
+  }
+ },
+ "resources": {
+  "feature_limit_allocated": 2621440,
+  "allocated_before_summary": 2584576,
+  "persistent_free_now": 75788288,
+  "TMP_new_current_allocated": 0,
+  "TMP_peak_measured": false,
+  "max_completed_child_rss_kib": 44484,
+  "RSS_boundary": "RUSAGE maximum completed child, not simultaneous-family peak",
+  "oom_after": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+ },
+ "source_write_status": "All seven sources frozen; all owned processes joined. Await independent final code/evidence review; no Main/index touched."
+}

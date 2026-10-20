@@ -409,7 +409,8 @@
         "rx-dma-idle",
         "dma-duplex",
         "rx-dma-continuous",
-        "dma-duplex-continuous"
+        "dma-duplex-continuous",
+        "irq-words"
       ],
       "irq": [
         "USART1_IRQn"
@@ -646,7 +647,12 @@
         "clock:ETHMACTX",
         "clock:ETHMACRX",
         "controller:SYSCFG_RMII"
-      ]
+      ],
+      "interfaces": {
+        "eth_frames": [
+          "rmii-vlan-sg-ptp"
+        ]
+      }
     },
     "TIM4": {
       "kind": "timer_capture",

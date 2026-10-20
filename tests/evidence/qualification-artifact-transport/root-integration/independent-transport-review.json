@@ -1,0 +1,172 @@
+{
+  "kind": "independent-final-qualification-multipart-normalized-transport-admission-review",
+  "schema": 1,
+  "reviewed_at_utc": "2026-10-18T09:16:53.411303+00:00",
+  "decision": "PASS",
+  "open_blockers": [],
+  "scope": "Read-only admission review of the complete Root transport map, source binding and preserved historical ordinary-hook evidence. No tests or workflows executed, no Main/source/index mutation. Earlier independent code review is reused only for its exact unchanged final-R2 source tuple.",
+  "transport": {
+    "path": "/dev/shm/nexus-qualification-transport-main-package-20261018-r1/normalized-transport.json",
+    "bytes": 153310,
+    "sha256": "a6ad84b3e970bc1799d9e4279feaf57f2b62fc8e9c09c8d5965aee1fac51ae02",
+    "payload_files": 295,
+    "payload_bytes": 4722923,
+    "canonical_sources": 5,
+    "final_files_after_helper_review_and_map_append": 297,
+    "target_paths_unique_and_casefold_unique": true,
+    "relative_canonical_paths_without_dotgit_or_escape": true,
+    "every_source_regular_without_symlink_ancestors": true,
+    "every_payload_bytes_and_sha256_independently_verified": true,
+    "declared_modes_match_where_present": true,
+    "all_290_evidence_targets_raw_or_gzip": true,
+    "canonical_sources_exact_final_r2": [
+      {
+        "path": "tools/evidence/qualification_transfer.py",
+        "bytes": 25434,
+        "sha256": "72971508bbab15318cf33aff5b24fd10202a9c7c309d9b1348838575294a4931"
+      },
+      {
+        "path": "tools/testing/test_qualification_transfer.py",
+        "bytes": 23043,
+        "sha256": "55de5db88e4e0504cce620274fef2c03f3ead41894c1e1577e928ecd4bdf8811"
+      },
+      {
+        "path": ".github/workflows/software-qualification.yml",
+        "bytes": 21872,
+        "sha256": "0e2f9855c403255f4a90e84d6bbc8add1d73736b3b3bf810cf351fe6b384611a"
+      },
+      {
+        "path": ".github/workflows/test_platform_ci.py",
+        "bytes": 65499,
+        "sha256": "de74a13c78c849062ace3e5d285706c909ca873853ea25262237d3ee245d9d2b"
+      },
+      {
+        "path": "tools/evidence/README.md",
+        "bytes": 10414,
+        "sha256": "3adbf894062d5e2affa4c3120956767736e1344ccc18006713a903267ccc8bc6"
+      }
+    ]
+  },
+  "completeness": {
+    "author_normalized_map": {
+      "path": "/dev/shm/nexus-qualification-transport-normalized-20261018-r1/normalized-map-r2.json",
+      "sha256": "418243cdb87d97c21980a559f1863711e809ab533e615f8045f971ebfd956e68",
+      "rows": 224,
+      "all_target_source_size_sha_rows_preserved": true
+    },
+    "original_author_feature_root": "/dev/shm/nexus-qualification-transport-feature-20261018-r1",
+    "regular_leaf_count": 218,
+    "all218_original_feature_leaves_present_with_exact_bytes_and_original_paths_mapped_to_nonexecuted_evidence": true,
+    "normalization_history_files": 5,
+    "normalization_r1_and_r2_maps_not_overwritten": true,
+    "original_code_review": {
+      "path": "/dev/shm/nexus-qualification-transport-independent-review-r1.json",
+      "bytes": 25984,
+      "sha256": "81cd65393f652759cb977bffd9078a74a5eecad456e4e03308949467b66887aa",
+      "unchanged_and_in_payload": true
+    },
+    "all_original_r1_r2_raw_and_archives_preserved": true,
+    "no_giant_zip_vendor_tool_binary_in_payload": true
+  },
+  "historical_ordinary_hook": {
+    "head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+    "tree": "b1ed81b19428cb49de736f69bc84b87836c0d4b9",
+    "checkpoint_index": "/dev/shm/nexus-full-hook-h743-spi-dma-composite-r2/checkpoint-index.json",
+    "checkpoint_archives": 34,
+    "checkpoint_archive_bytes": 1293925,
+    "all_archive_sha_size_and_full_gzip_crc_eof_verified": true,
+    "checkpoint_manifests_checked": 34,
+    "all_member_path_sets_sizes_sha_modes_verified": true,
+    "member_occurrences": 2812,
+    "round_started_ns": 1792313723954817361,
+    "terminal_commands": 624,
+    "terminal_exit_codes": {
+      "0": 624
+    },
+    "all_terminal_receipts_completed_stable_and_fully_withdrawn": true,
+    "all_terminal_starts_at_or_after_round_anchor": true,
+    "all_1248_declared_stdout_stderr_files_present_and_exactly_hash_bound": true,
+    "execution_aggregate_and_xml_crosscheck": {
+      "google_programs": 309,
+      "individually_sha_bound_and_parsed_xml": 309,
+      "google_cases": 5427,
+      "tool_suites": 4,
+      "tool_cases": 2377,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "disabled": 0,
+      "every_recorded_google_case_passed": true,
+      "tool_suite_counts": {
+        "testing": 1009,
+        "configure": 866,
+        "ci": 412,
+        "workflows": 90
+      }
+    },
+    "complete_parent_commit_receipt": {
+      "outcome": "completed",
+      "exit_code": 0,
+      "stdout_stderr_size_sha_and_inclusion_verified": true,
+      "withdrawal_stable_and_complete": true
+    },
+    "full_gate_report_sha256": "33cd8b2a386b343d0bac81816ed4eeaf8be60180880227422504852c8a274bd1",
+    "publish_result_head_remote_head_and_gate_sha_consistent": true,
+    "all_recorded_publish_command_exit_codes_zero": true,
+    "qualification_boundary": "All these historical execution/publication results belong only to f9a1d157. They do not qualify the new multipart source tuple or replace the fresh normal complete-index gate after integration."
+  },
+  "raw_and_download_secret_screen": {
+    "all295_payload_files_read": true,
+    "gzip_streams_fully_consumed": 37,
+    "checkpoint_regular_members_also_scanned": 2812,
+    "screened_byte_observations_including_compressed_and_expanded_duplicates": 46104608,
+    "private_signed_or_tokenized_download_url_candidates": 0,
+    "method": "Byte URL inspection of raw payload files, full gzip expansions and checkpoint members, looking for SAS sig/signature, X-Amz/X-Goog signature and token-bearing artifact/blob download queries. No URL contents printed.",
+    "limit": "This bounded screen found no actual signed private download URLs; it is not a universal secret-detection or remote-authentication assertion."
+  },
+  "main_observed_before_integration": {
+    "root": "/tmp/nexus-io-validation-20261018",
+    "head": "f9a1d157d19bdbe9b34137768263a80ab59c47f2",
+    "clean": true,
+    "complete_index_gzip": "/dev/shm/nexus-qualification-transport-main-package-20261018-r1/before-main-index.gz",
+    "compressed_bytes": 780420,
+    "uncompressed_index_bytes": 3666195,
+    "uncompressed_index_sha256": "2351cdf004927d74cad41a791bb80cc25c6ea7822f1ab2f61492091b0979a677",
+    "gzip_roundtrip_and_current_index_exact": true,
+    "overwritten_preimages": [
+      {
+        "path": ".github/workflows/software-qualification.yml",
+        "bytes": 15588,
+        "sha256": "0c96220022feb037b3a93c6eda55b19d52b8276766a4a32ece9b01eefd127d8c"
+      },
+      {
+        "path": ".github/workflows/test_platform_ci.py",
+        "bytes": 60127,
+        "sha256": "12cad2d97f6a30d687c28ca9ee221180a2c266a8634e9cad6a52c6b04790bc8e"
+      },
+      {
+        "path": "tools/evidence/README.md",
+        "bytes": 6865,
+        "sha256": "20406f8391a87ccc417d9a1761a488206da5f24e31a0b14a73a7beb709603d79"
+      }
+    ],
+    "all_other_targets_absent": true,
+    "time_boundary": "These identities were observed before Root integration. A subsequent authorized integration need not retain the clean pre-integration index."
+  },
+  "integration_helper": {
+    "path": "/workspace/nexus-io-recovery-20261018/integrate-clean-reviewed-r1.py",
+    "bytes": 5647,
+    "sha256": "5fd71708311e0fba9d8cd309fe0868ed8826c5b68c86b36b301c4c1796349212",
+    "reviewed_read_only_not_executed": true,
+    "checks": "Expected clean HEAD; exact map/review SHA; casefold-unique safe relative targets; each source size/SHA/no symlinks; current tracked preimages match HEAD and are preserved before writes; explicit rows-only forced add; exact all-staged names and blobs; no unstaged/untracked WIP.",
+    "acyclic_append": "The helper appends this new independent transport report and the reviewed normalized map as two separate evidence rows after the295 payload rows, yielding297 targets. The map intentionally does not self-list.",
+    "postcondition_still_required": "Root exact integration and a fresh ordinary complete-index commit gate, then normal publication. No source or gate bypass is authorized by this report."
+  },
+  "not_established": [
+    "Fresh ordinary hooks for the multipart five-source tuple",
+    "New GitHub workflow dispatch/API execution or artifact ID authentication",
+    "Actual large multipart upload/download or historical809MB ZIP verification",
+    "New SDK/OCI/offline/candidate/HIL qualification"
+  ],
+  "reviewer_side_effects": "Only this independent report is newly written in the Root package directory. No helper, test, workflow, build, dispatch, Git mutation or source edit was run."
+}

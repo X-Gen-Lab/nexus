@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "command": [
+    "git",
+    "diff",
+    "--check",
+    "--",
+    "scripts/ci/style_gate.py",
+    "scripts/ci/test_style_gate.py"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "stage": "style-control-chars-diff-check",
+  "started_ns": 1792290549741666011,
+  "finished_ns": 1792290549749775219,
+  "duration_seconds": 0.008108828000331414,
+  "timeout_seconds": 30.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/style-control-chars/diff-check.attempts/1792290549741540702-c1234450138c4a11a512745ab2fab7ae/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

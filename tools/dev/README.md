@@ -81,9 +81,11 @@ These commands delegate to `dependencies.py` and `qualification.py`; they do not
 establish a second build graph. Cache commands delegate to `cache.py`.
 
 Preset preparation records the assembly/Board bytes and every selected recursive
-Gitlink. Native models require all seven catalogue roots and their nested sources
-(nine initialized modules in the current checkout). ARM preparation requires CMSIS,
-the chosen STM32 family when applicable, and the selected scheduler closure.
+Gitlink. Native models require all registered runtime and host-test roots,
+recursively.
+ARM preparation requires CMSIS, the chosen STM32 family when applicable, and the
+selected scheduler closure. SDK and candidate preparation use only registered
+runtime sources; the host-only `ext/googletest` submodule is not required.
 CI's ARM identity binds this receipt to the explicit matrix preset and every
 uploaded resolved configuration. It rechecks current pins, nested sources and
 dirty files before and after capture, and uploads the original receipt.
@@ -133,3 +135,45 @@ dependency locks, tool changes and unknown non-document inputs require behavior
 execution. Ordinary Markdown/RST and `docs/` changes are documentation; explicit
 coding-policy documents also require behavior checks. Git diffs include additions,
 deletions and both rename sides. CI runs this same policy on the actual Git diff.
+
+`python scripts/setup/install_dev_tools.py` explicitly prepares the pinned
+GitHub Actions linter in `.venv/nexus-actionlint`, with its MIT notice and exact
+archive/binary identities from `dependencies/actionlint.lock.json`. Supported
+hosts are Linux x86_64, macOS x86_64/arm64 and Windows x86_64. The existing
+content-addressed download cache is rechecked on every hit. An existing owned
+prefix is verified without a download; an unknown or damaged prefix is rejected
+and preserved for explicit repair. `--skip-hooks` still prepares the host tools.
+The original two development Python pins remain in `development-tools.txt`.
+
+The `nexus-workflow-lint` hook and commit-style CI invoke
+`python scripts/ci/lint_workflows.py --staged`. Prepare dependencies before
+committing; lint never installs or fetches. The hook shares the existing TDD
+Python environment, including PyYAML from `workflow-tools.txt`; it verifies this
+version against the staged authority. `dev.py doctor --target workflows` checks
+only those offline prerequisites, without requiring a compiler or CMake.
+An explicit `--tool-prefix` supports a separately prepared owned host prefix.
+
+The linter snapshots every indexed workflow, local action metadata, tool lock
+and optional actionlint config, even when unchanged in the pending commit. It
+honors the caller's actual alternate index. Parent object reads disable
+replacement refs and promisor lazy fetching. Roots with any partialClone,
+promisor or partialCloneFilter Git configuration are rejected before object
+reads. This fail-closed complete-checkout contract also covers older Git that
+may ignore the no-lazy-fetch environment setting. The isolated tool environment
+removes Git selection and Git configuration redirects. Without a staged
+config, the snapshot contains an explicit empty config at the normal default
+path; unstaged and ambient config cannot change validation. Shellcheck and
+pyflakes integration are explicitly disabled rather than discovered from PATH.
+Literal local references must remain inside the snapshot and name regular
+indexed reusable workflows or exactly one action metadata file. Upstream
+handles the Actions DSL and input contracts; this presence check only closes
+its silent missing-action behavior. The complete index is checked before and
+after execution. Once tool execution is prepared, raw stdout/stderr, actual exit
+receipts and compressed original input snapshots remain under
+`build/quality/workflow-lint/` on success or failure. Early admission failures
+are
+diagnosed before those tool artifacts exist. Snapshots preserve blob content;
+they do not reconstruct the complete Git index or its executable modes.
+This is workflow DSL validation; it does not establish remote dispatch, SDK,
+firmware or hardware qualification. The new lock joins normal provenance input
+observation without changing the SDK's compiler or OCI tool requirements.

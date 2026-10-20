@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/tmp/nexus-workflow-actionlint-20261018-r1/package_execution.py"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "stage": "package-execution-r1",
+  "started_ns": 1792304937478792214,
+  "finished_ns": 1792304939047097127,
+  "duration_seconds": 1.5683071660023415,
+  "timeout_seconds": 240.0,
+  "outcome": "completed",
+  "exit_code": 1,
+  "child_returncode": 1,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/tmp/nexus-workflow-actionlint-20261018-r1/runs/package-execution-r1.attempts/1792304937478741899-cd34377ae73c4068a45270c3077128c8/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/tmp/nexus-workflow-actionlint-20261018-r1/runs/package-execution-r1.attempts/1792304937478741899-cd34377ae73c4068a45270c3077128c8/stderr.txt",
+    "bytes": 1293,
+    "sha256": "b324d54af0dc744b2c38c4d62e78623c4b409121a2b3901d6b1659ca20c322eb"
+  },
+  "attempt_receipt": "/tmp/nexus-workflow-actionlint-20261018-r1/runs/package-execution-r1.attempts/1792304937478741899-cd34377ae73c4068a45270c3077128c8/receipt.json"
+}

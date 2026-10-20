@@ -1,0 +1,273 @@
+# Authored Chinese translation of the exact canonical CAN FD contract.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b4aa5216d74f6b781d75e3308a9f77c1afe4cad7d0fcd3e5d82c71c371884408\n"
+
+msgid "CAN FD with fixed physical RAM and explicit request ownership"
+msgstr "CAN FD：固定物理 RAM 与明确的请求所有权"
+
+msgid "Use this contract to assemble and execute the exact STM32G474RET6 FDCAN1 software reference. It offers `iso-fd-normal` for external communication and `iso-fd-loopback` for internal silent loopback, both at nominal 500 kbit/s and data 2 Mbit/s from HSE 24 MHz. These are separately selected software modes. Neither mode establishes a populated transceiver, measured clock accuracy, external ACK, termination or physical timing qualification. HIL remains `not_executed`."
+msgstr "本合同用于装配和执行精确的 STM32G474RET6 FDCAN1 软件参考。`iso-fd-normal` 用于外部通信，`iso-fd-loopback` 用于内部静默环回；二者均使用 HSE 24 MHz，标称阶段 500 kbit/s、数据阶段 2 Mbit/s。这是分别选择的两个软件模式，均不能证明已安装收发器、实测时钟精度、外部 ACK、终端电阻或物理时序资格。HIL 仍为 `not_executed`。"
+
+msgid "Select a separate static interface"
+msgstr "选择独立的静态接口"
+
+msgid "![FIG-16: current build-time assembly and runtime calls; CAN FD selects one controller face and one private owner](../assets/diagrams/io-evolution.svg)"
+msgstr "![FIG-16：当前构建期装配与运行调用；CAN FD 选择一个控制器接口面和一个私有所有者](../assets/diagrams/io-evolution.svg)"
+
+msgid "FIG-16: current build-time assembly and runtime calls; CAN FD selects one controller face and one private owner"
+msgstr "FIG-16：当前构建期装配与运行调用；CAN FD 选择一个控制器接口面和一个私有所有者"
+
+msgid "**FIG-16 describes shared current mechanisms, not a CAN bus timing diagram.** Here the selected face is `nx_can_fd_port_t`, the compact lookup is `nx_factory_can_fd`, and the runtime provider owns FDCAN1 and its fixed message RAM. Generation arrows, lookup arrows and runtime calls keep their original meanings. Lookup neither reads hardware nor starts a transmission."
+msgstr "**FIG-16 描述共享的当前机制，不是 CAN 总线时序图。** 在此选择中，接口面为 `nx_can_fd_port_t`，紧凑查找为 `nx_factory_can_fd`，运行期 provider 拥有 FDCAN1 及其固定消息 RAM。生成箭头、查找箭头和运行调用保留原有含义。查找既不读取硬件，也不启动发送。"
+
+msgid "The [normal fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-can-fd-normal.toml) and [loopback fixture](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-can-fd-loopback.toml) use the same software Board and physical claims. The strict resolver selects one mode, validates exact rates, masks, ring capacity and IRQ policy, then publishes immutable typed IR and one generated bundle. Conflicting controller, shared FDCAN configuration, message RAM, vector and pad claims are rejected. The Board records silicon PA11/PA12 AF9 routing; its physical PCB revision, oscillator population and external PHY are unknown."
+msgstr "以同一个软件 Board 和物理资源声明为基础，[正常模式夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-can-fd-normal.toml)和[环回夹具](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/g474-can-fd-loopback.toml)分别选择模式。严格解析器校验精确速率、掩码、环容量和 IRQ 策略，再发布不可变 typed IR 与一份生成 bundle。控制器、共享 FDCAN 配置、消息 RAM、向量和焊盘的冲突声明都会被拒绝。Board 记录硅片 PA11/PA12 AF9 路线；实际 PCB 修订、晶振安装及外部 PHY 均未知。"
+
+msgid "Owner"
+msgstr "所有者"
+
+msgid "Responsibility"
+msgstr "责任"
+
+msgid "Platform"
+msgstr "Platform"
+
+msgid "Start HSE24/PLL170 and TIM2, acquire the shared FDCAN gate and pads, construct domain then controller, and retain unfinished outer leases"
+msgstr "启动 HSE24/PLL170 与 TIM2，取得共享 FDCAN 时钟门和焊盘，先构造 domain 再构造 controller，并保留未完成的外层租约"
+
+msgid "Private domain"
+msgstr "私有 domain"
+
+msgid "Validate fixed physical RAM and CKDIV0, reject a live peer, and retain the domain until every acquired controller stops"
+msgstr "验证固定物理 RAM 与 CKDIV0，拒绝活跃 peer，并在所有已取得控制器停止前保留 domain"
+
+msgid "FDCAN provider"
+msgstr "FDCAN provider"
+
+msgid "Own the three physical transmit slots, fixed filters, two receive FIFOs, value ring and line0 publishers"
+msgstr "拥有三个物理发送槽、固定过滤器、两个接收 FIFO、值事件环及 line0 发布者"
+
+msgid "Application executor"
+msgstr "应用执行者"
+
+msgid "Serialize privileged unmasked task calls, supply service progress and deadlines, and join external observers"
+msgstr "序列化特权且未屏蔽中断的任务调用，提供 service 推进和 deadline，并等待外部观察者退出"
+
+msgid "Caller/generated storage"
+msgstr "调用方／生成存储"
+
+msgid "Keep accepted requests, immutable filter plan, ring and wake sink live through their stated release conditions"
+msgstr "在规定的释放条件满足前，保持已接受请求、不可变过滤计划、事件环和唤醒 sink 有效"
+
+msgid "The classic [CAN interface](classic-can.md) remains separate. A classic face never becomes a CAN FD face, and its frame, operations table and default state do not gain 64-byte payload or FDCAN fields. The optional CAN FD face has two pointers and eight shared methods: 8 B and 32 B respectively on a 32-bit ABI. Selected private state, requests and the caller-sized event ring are separate costs. These structural sizes are not measured cycles, latency or stack bounds. There is no allocator, software transmit FIFO, global object pool or hidden worker."
+msgstr "经典 [CAN 接口](classic-can.md)保持独立。经典接口面不会变成 CAN FD 接口面，其帧、方法表和默认状态也不会增加 64 字节 payload 或 FDCAN 字段。可选 CAN FD 接口面只有两个指针和八个共享方法：在 32 位 ABI 上分别为 8 B 和 32 B。选定私有状态、请求及调用方定容的事件环单独计入成本。这些结构尺寸不是实测周期、延迟或栈边界。实现没有分配器、软件发送 FIFO、全局对象池或隐藏 worker。"
+
+msgid "Exact hardware selection and units"
+msgstr "精确硬件选择与单位"
+
+msgid "Fact"
+msgstr "事实"
+
+msgid "Fixed selection and boundary"
+msgstr "固定选择及边界"
+
+msgid "Target"
+msgstr "目标"
+
+msgid "STM32G474RET6, Cortex-M4F, baremetal, FDCAN1 only"
+msgstr "STM32G474RET6、Cortex-M4F、baremetal，仅 FDCAN1"
+
+msgid "Clock"
+msgstr "时钟"
+
+msgid "System/APB 170 MHz; FDCAN uses HSE 24 MHz, CCIPR.FDCANSEL0 and CKDIV=0 / divide by 1"
+msgstr "系统／APB 为 170 MHz；FDCAN 使用 HSE 24 MHz、CCIPR.FDCANSEL0 以及 CKDIV=0／除以 1"
+
+msgid "Nominal phase"
+msgstr "标称阶段"
+
+msgid "BRP=3, SEG1=12, SEG2=3, SJW=2; 500 kbit/s, 81.25% sample point; NBTP `0x02020B02`"
+msgstr "BRP=3、SEG1=12、SEG2=3、SJW=2；500 kbit/s，采样点 81.25%；NBTP `0x02020B02`"
+
+msgid "Data phase"
+msgstr "数据阶段"
+
+msgid "BRP=1, SEG1=9, SEG2=2, SJW=2; 2 Mbit/s, 83.33% sample point; DBTP `0x00000811`"
+msgstr "BRP=1、SEG1=9、SEG2=2、SJW=2；2 Mbit/s，采样点 83.33%；DBTP `0x00000811`"
+
+msgid "Normal mode"
+msgstr "正常模式"
+
+msgid "ISO FD enabled, BRS permitted per frame, DAR1; TEST/MON/ASM/LBCK0"
+msgstr "启用 ISO FD，允许逐帧选择 BRS，DAR1；TEST/MON/ASM/LBCK0"
+
+msgid "Loopback mode"
+msgstr "环回模式"
+
+msgid "Same format/timing with TEST1, MON1 and LBCK1; no external ACK qualification"
+msgstr "相同格式和时序，TEST1、MON1、LBCK1；不建立外部 ACK 资格"
+
+msgid "Transmit values"
+msgstr "发送值"
+
+msgid "DATA only; classic 0..8 B or FD 0..8/12/16/20/24/32/48/64 B; lengths never round up"
+msgstr "仅 DATA；经典帧 0..8 B，FD 帧 0..8/12/16/20/24/32/48/64 B；长度绝不向上取整"
+
+msgid "Physical queue"
+msgstr "物理队列"
+
+msgid "Three 18-word elements; hardware identifier priority, not software admission order"
+msgstr "三个各 18 word 的元素；按硬件标识符优先级选择，不按软件准入顺序"
+
+msgid "Filters"
+msgstr "过滤器"
+
+msgid "Immutable mask lists: at most 28 standard or 8 extended entries, each targeting FIFO0 or FIFO1; unmatched and remote frames rejected"
+msgstr "不可变掩码列表：标准条目最多 28 个，扩展条目最多 8 个，每项指向 FIFO0 或 FIFO1；拒绝未匹配帧及远程帧"
+
+msgid "Receive"
+msgstr "接收"
+
+msgid "Two blocking FIFOs, three 18-word elements each; copied events preserve raw DLC, ESI, filter and FIFO facts"
+msgstr "两个阻塞 FIFO，每个含三个各 18 word 的元素；复制事件保留 raw DLC、ESI、过滤器及 FIFO 事实"
+
+msgid "Time"
+msgstr "时间"
+
+msgid "TSS0, raw hardware timestamp0 and `NX_CAN_FD_TIMESTAMP_UNAVAILABLE`; `acquired_us` is monotonic acquisition time"
+msgstr "TSS0，原始硬件时间戳为 0，并设置 `NX_CAN_FD_TIMESTAMP_UNAVAILABLE`；`acquired_us` 为单调采集时间"
+
+msgid "Interrupts"
+msgstr "中断"
+
+msgid "Reserve IRQ21/22 cold; only IT0/IRQ21 is enabled, at logical priority5; ILS0 and ILE.EINT0"
+msgstr "冷态预留 IRQ21/22；仅启用 IT0/IRQ21，逻辑优先级为 5；ILS0 与 ILE.EINT0"
+
+msgid "Pads"
+msgstr "焊盘"
+
+msgid "PA11 RX/PA12 TX AF9, with TX latch prepared recessive before alternate-function connection"
+msgstr "PA11 RX／PA12 TX AF9；连接复用功能前先把 TX 锁存器准备为隐性电平"
+
+msgid "The FDCAN kernel is not the 170 MHz APB clock and does not use the timer clock doubling rule. Arbitrary timing tuples, automatic clock changes, additional controllers, remote transmit and other operating modes are not selected. Clock tolerance, propagation delay, oscillator accuracy and sampling margins require separate physical validation."
+msgstr "FDCAN 内核不使用 170 MHz APB 时钟，也不适用 timer 时钟倍频规则。当前选择不开放任意时序参数、自动时钟改变、其他控制器、远程发送或其他运行模式。时钟容差、传播延迟、晶振精度及采样裕量需要独立实物验证。"
+
+msgid "The G4 reduced M_CAN integration has a fixed 212-word / 848 B instance region at `SRAMCAN_BASE` (`0x4000A400`). A generated domain points to this physical lease; arbitrary caller SRAM cannot substitute for message RAM."
+msgstr "G4 精简 M_CAN 集成在 `SRAMCAN_BASE`（`0x4000A400`）具有固定的 212 word／848 B 实例区域。生成 domain 指向这个物理租约，不能用任意调用方 SRAM 替代消息 RAM。"
+
+msgid "Section"
+msgstr "分区"
+
+msgid "Byte offset"
+msgstr "字节偏移"
+
+msgid "Capacity"
+msgstr "容量"
+
+msgid "Standard filters"
+msgstr "标准过滤器"
+
+msgid "0x000"
+msgstr "0x000"
+
+msgid "28 words"
+msgstr "28 word"
+
+msgid "Extended filters"
+msgstr "扩展过滤器"
+
+msgid "0x070"
+msgstr "0x070"
+
+msgid "8 two-word filters"
+msgstr "8 个两字过滤器"
+
+msgid "RX FIFO0"
+msgstr "RX FIFO0"
+
+msgid "0x0B0"
+msgstr "0x0B0"
+
+msgid "3 elements of 18 words"
+msgstr "3 个各 18 word 的元素"
+
+msgid "RX FIFO1"
+msgstr "RX FIFO1"
+
+msgid "0x188"
+msgstr "0x188"
+
+msgid "TX event FIFO"
+msgstr "TX 事件 FIFO"
+
+msgid "0x260"
+msgstr "0x260"
+
+msgid "3 two-word elements; frame requests do not select event storage"
+msgstr "3 个两字元素；帧请求不选择事件存储"
+
+msgid "TX queue"
+msgstr "TX 队列"
+
+msgid "0x278"
+msgstr "0x278"
+
+msgid "3 elements of 18 words, ending before `0x350`"
+msgstr "3 个各 18 word 的元素，结束于 `0x350` 之前"
+
+msgid "Initialization clears only this instance region. It does not reset a live FDCAN2/3 peer or disable the shared gate. H7's configurable message RAM uses a different integration; these register and RAM offsets do not establish H7 support."
+msgstr "初始化仅清空当前实例区域，不会复位活跃 FDCAN2/3 peer，也不会关闭共享时钟门。H7 的可配置消息 RAM 属于另一种集成；这些寄存器和 RAM 偏移不建立 H7 支持。"
+
+msgid "Prepare, admit and prove physical completion"
+msgstr "准备、准入与物理完成证明"
+
+msgid "Initialize request metadata once, then use `nx_can_fd_tx_prepare` to copy a whole frame and an absolute deadline in the selected monotonic domain. Preparation retains no frame pointer. Submission from the sole task executor validates the whole value, physical queue index, deadline and storage disjointness before admission. A rejected call leaves the request unborrowed and performs no transmit RAM writes or add request."
+msgstr "先初始化请求元数据，再用 `nx_can_fd_tx_prepare` 复制完整帧及选定单调时间域中的绝对 deadline。准备阶段不保留帧指针。唯一任务执行者提交时，在准入前校验完整值、物理队列索引、deadline 和存储互不重叠。被拒绝的调用不会借用请求，也不会写发送 RAM 或发出 add request。"
+
+msgid "ACCEPTED borrows the complete request until acquire-observed SETTLED. The provider packs the exact DLC and payload into the selected physical element, then publishes TXBAR after a barrier. No software queue changes the hardware identifier arbitration order. Existing requests cannot become another call's output or wake storage. Public face/table identities, private controls, peer registers, shared RAM and SCS/NVIC controls are also protected from output aliases."
+msgstr "ACCEPTED 借用整个请求，直到调用方以 acquire 观察 SETTLED。provider 把精确 DLC 和 payload 打包到选定物理元素，执行屏障后发布 TXBAR。软件队列不会改变硬件标识符仲裁顺序。已借用请求不能成为另一次调用的输出或唤醒存储。公共接口面／方法表身份、私有控制、peer 寄存器、共享 RAM 和 SCS/NVIC 控制也受输出别名保护。"
+
+msgid "![FIG-06: current request lifecycle; cancellation and quarantine retain the request until physical drain precedes SETTLED](../assets/diagrams/request-lifecycle.svg)"
+msgstr "![FIG-06：当前请求生命周期；取消和隔离继续保留请求，先完成物理排空才能发布 SETTLED](../assets/diagrams/request-lifecycle.svg)"
+
+msgid "FIG-06: current request lifecycle; cancellation and quarantine retain the request until physical drain precedes SETTLED"
+msgstr "FIG-06：当前请求生命周期；取消和隔离继续保留请求，先完成物理排空才能发布 SETTLED"
+
+msgid "**FIG-06 supplies the shared ownership states.** ACCEPTED and REJECTED are admission results. In this provider, source withdrawal means both TXBAR and TXBRP are clear for the slot, followed by a fresh TXBTO or TXBCF observation. An empty slot alone, a latched interrupt alone or a stale prior completion cannot release the request. A hardware add scan may keep TXBAR set while TXBRP still reads zero."
+msgstr "**FIG-06 给出共享所有权状态。** ACCEPTED 与 REJECTED 是准入结果。在此 provider 中，源撤离要求对应槽的 TXBAR 和 TXBRP 都已清零，随后重新观察 TXBTO 或 TXBCF。单独的空槽、已锁存中断或上一次陈旧完成都不能释放请求。硬件 add scan 期间，TXBRP 仍为零时 TXBAR 也可能保持置位。"
+
+msgid "TXBTO proves successful transmission and reports the actual payload byte count. It can win a cancellation race, even when TXBCF is also set. TXBCF without TXBTO proves completed cancellation or an unsuccessful DAR attempt; an explicit cancel reports CANCELLED, and an unsuccessful ordinary attempt reports IO with zero transferred bytes. A missing external ACK does not trigger software replay. Bus retry and protocol recovery policy belong to the external product."
+msgstr "TXBTO 证明成功发送，并报告实际 payload 字节数。即使 TXBCF 同时置位，真实发送也可以赢得取消竞争。没有 TXBTO 的 TXBCF 证明取消完成或一次失败的 DAR 尝试；显式取消报告 CANCELLED，普通发送尝试失败报告 IO，已传输字节为零。缺失外部 ACK 不会触发软件重发。总线重试与协议恢复策略属于外部产品。"
+
+msgid "Cancel, timeout, bus-off and stop request physical cancellation. They never revoke the existing loan. A failed drain deadline leaves the request QUARANTINED, the slot retained and stop/recover/domain release blocked. Later physical proof may still permit settlement. The executor must continue bounded service; a wake hint does not supply execution progress."
+msgstr "取消、超时、bus-off 与 stop 都请求物理取消，绝不撤销已有借用。排空 deadline 失败会使请求保持 QUARANTINED、槽继续保留，并阻止 stop/recover/domain 释放。后续物理证明仍可能允许结束请求。执行者必须继续有界 service；唤醒提示不提供执行推进。"
+
+msgid "Receive, recover and close the owner"
+msgstr "接收、恢复与关闭所有者"
+
+msgid "An IRQ or explicit service call processes at most three transmit slots and the initial three elements in each receive FIFO. Copied receive values retain ESI as observed transmitter state. FD DLC15 means 64 B; classic DLC9..15 normalizes to 8 B with an explicit flag. The event's acquisition time is not SOF, and a disabled hardware timestamp is never promoted to physical bus time."
+msgstr "一次 IRQ 或显式 service 最多处理三个发送槽，以及每个接收 FIFO 最初的三个元素。复制后的接收值保留 ESI，表示观测到的发送者状态。FD DLC15 表示 64 B；经典 DLC9..15 规范为 8 B，并附显式标志。事件采集时间不是 SOF，已禁用的硬件时间戳也不会被解释为物理总线时间。"
+
+msgid "The caller-sized event ring does not overwrite older records. Software loss counts and hardware-loss lower bounds remain distinct. Pending loss follows older records and precedes newly retained frames. Bus-off, error counters and last-error state are latched separately from ring fullness. Only actual enabled line0 imposes a syscall ceiling on wake binding; disabled reserved line1 does not become an additional kernel publisher. A rejected binding preserves the earlier sink."
+msgstr "调用方定容的事件环不会覆盖旧记录。软件丢失计数与硬件丢失下界分开保留；待发布丢失边界排在旧记录之后、新保留帧之前。bus-off、错误计数和 last-error 状态独立锁存，不依赖事件环是否已满。只有实际启用的 line0 对唤醒绑定施加系统调用优先级下限；已预留但禁用的 line1 不会成为另一个内核发布者。被拒绝的绑定保留原 sink。"
+
+msgid "Explicit recovery requires every transmit loan and notification publisher to drain. It reenters initialization without replay, shared reset or reassignment of the message RAM lease. The immutable mode stays normal or loopback across recovery. Bus-off recovery timing still depends on actual controller and bus progress; returning from configuration does not measure the required bus idle."
+msgstr "显式恢复要求所有发送借用和通知发布者都已排空。它重新进入初始化，不重发、不复位共享域，也不重新分配消息 RAM 租约。不可变模式在恢复后仍保持 normal 或 loopback。bus-off 恢复时序依赖真实控制器和总线推进；配置返回不代表已测量所需总线空闲时间。"
+
+msgid "Stop closes admission, drains slots, disables peripheral sources, joins line0 and only then enters acknowledged INIT. A final PSR/ECR snapshot precedes CCE, which can destroy hardware outcome facts. Successful controller stop ends its request/ring/wake loans; any failure preserves incomplete leases for retry. Platform then releases the domain and restores outer pad/gate/system ownership. External adapter observers still need their own join before storage reuse."
+msgstr "stop 先关闭准入，排空槽，禁用外设源并等待 line0 退出，然后才进入已应答的 INIT。最终 PSR/ECR 快照先于 CCE，因为 CCE 可能破坏硬件完成事实。控制器 stop 成功才结束其请求／环／唤醒借用；任何失败都保留未完成租约以便重试。之后 Platform 释放 domain，并恢复外层焊盘／时钟门／系统所有权。存储复用前，外部 adapter 观察者仍须单独退出。"
+
+msgid "Sources and software qualification"
+msgstr "来源与软件资格"
+
+msgid "The authoritative API is [can_fd.h](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/can_fd.h), with the shared [request contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/core/include/nexus/core/request.h). [The private provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/fdcan.c) uses pinned official FDCAN definitions and direct volatile MMIO. It does not link HAL driver C, `HAL_GetTick`, HAL handles or MSP callbacks into this implementation. The [G4 source lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json) preserves the exact selected headers, paired CMSIS identities and original licenses."
+msgstr "权威 API 为 [can_fd.h](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/can_fd.h)，并遵循共享的[请求合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/core/include/nexus/core/request.h)。[私有 provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/fdcan.c)复用固定版本官方 FDCAN 定义，直接访问 volatile MMIO；本实现不链接 HAL 驱动 C、`HAL_GetTick`、HAL handle 或 MSP 回调。[G4 来源锁](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json)保留精确选定头文件、配套 CMSIS 身份及原始许可。"
+
+msgid "Reviewed hardware references are RM0440 Rev9, DS12288 Rev6 and ES0430 Rev9. RM0440 defines the fixed message RAM, queue and cancellation proof, including unsuccessful DAR attempts. Its TEST.RX bit is read-only pin state: configuration readback checks owned LBCK/TX controls and must allow a recessive RX bit. EFBI0 and the absence of mixed dedicated/FIFO transmission avoid the selected FDCAN errata conditions; they do not qualify every silicon limitation."
+msgstr "已审硬件参考为 RM0440 Rev9、DS12288 Rev6 和 ES0430 Rev9。RM0440 定义固定消息 RAM、队列及取消证明，包括失败的 DAR 尝试。TEST.RX 位是只读引脚状态：配置读回仅检查拥有的 LBCK/TX 控制，必须允许 RX 为隐性电平。EFBI0 和不混用 dedicated/FIFO 发送规避了选定 FDCAN 勘误条件，不能据此宣称所有硅片限制均已验证。"
+
+msgid "[Common contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/can_fd_contract_test.cpp), [real provider register/event tests](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_fdcan_test.cpp) and [both generated-factory selections](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_fdcan_factory_test.cpp) exercise the actual C implementation. GoogleMock observes external MMIO/IRQ effects. Models cover external ACK/no-ACK, cancellation races, fixed RAM, read-only status, input/output isolation and retained shutdown. Generated tests execute actual system startup with one shared RCC/TIM2 model, then the normal TOML/factory path; they do not hand-set Platform readiness."
+msgstr "[公共合同测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/can_fd_contract_test.cpp)、[真实 provider 寄存器／事件测试](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_fdcan_test.cpp)及[两个生成 factory 选择](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/g474_fdcan_factory_test.cpp)执行实际 C 实现。GoogleMock 观察外部 MMIO/IRQ 效果。模型覆盖外部 ACK／无 ACK、取消竞争、固定 RAM、只读状态、输入输出隔离及失败停止后的保留。生成测试使用同一个 RCC/TIM2 模型执行真实系统启动，再走正常 TOML/factory 路径，不手工设置 Platform 就绪状态。"
+
+msgid "Actual execution and source identities belong to the [delivery evidence](../delivery/README.md). Host models and any separately recorded ARM links do not establish physical ACK, error injection, bus-off recovery time, oscillator envelope, throughput, IRQ latency or WCET. Normal mode still needs an inspected transceiver circuit, safe electrical connection and independent HIL evidence before physical deployment qualification."
+msgstr "实际执行与来源身份以[交付证据](../delivery/README.md)为准。主机模型及任何单独记录的 ARM 链接都不能建立物理 ACK、错误注入、bus-off 恢复时间、晶振范围、吞吐、IRQ 延迟或 WCET 资格。正常模式在取得物理部署资格前，仍需已检查的收发器电路、安全电气连接及独立 HIL 证据。"

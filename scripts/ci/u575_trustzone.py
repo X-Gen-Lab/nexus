@@ -5,6 +5,7 @@ programs option bytes, runs a station or seals a single-ELF software candidate.
 """
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -13,11 +14,14 @@ import shlex
 import shutil
 import struct
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from scripts.ci import arch_compile, provider_assemblies
-from tools.evidence.common import EvidenceError, atomic_json, file_identity
+from tools.configure import dependencies
+from tools.evidence.common import (EvidenceError, atomic_json, file_identity,
+                                   regular_file)
 from tools.evidence.identity import git_source
 from tools.measurement.elf import Elf32, binary_from_elf
 from tools.measurement.soc_costs import decode_function
@@ -144,6 +148,8 @@ def source_inputs(root):
     """Bind the complete maintained graph and fixture, including new files."""
     paths = {Path(item["path"]) for item in
              provider_assemblies.source_inputs(root, [])}
+    runtime_paths, _ = dependencies.snapshot(mode="runtime")
+    paths.update(Path(path) for path in runtime_paths.values())
     paths.add(Path(__file__).resolve())
     for directory in (root / "tests/contracts/u575_trustzone",
                       root / "vendors/st/cmsis_device_u5/Include",
@@ -172,7 +178,252 @@ def compile_profile(build, stage, compiler):
     return arch_compile.digest(path)
 
 
-def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
+def _capture_file(path):
+    """Hash bounded regular bytes while retaining their observation metadata."""
+    from tools.evidence import u575_pair
+    path = regular_file(path, nonempty=False)
+    before = path.stat()
+    if before.st_size > u575_pair.MAX_BYTES:
+        raise EvidenceError("pair capture input exceeds bound")
+    checksum = hashlib.sha256()
+    remaining = before.st_size
+    with path.open("rb") as stream:
+        while remaining:
+            block = stream.read(min(u575_pair.CHUNK, remaining))
+            if not block:
+                raise EvidenceError("pair capture input changed")
+            checksum.update(block)
+            remaining -= len(block)
+        if stream.read(1):
+            raise EvidenceError("pair capture input changed")
+    after = path.stat()
+    keys = ("st_dev", "st_ino", "st_mode", "st_uid", "st_gid", "st_size",
+            "st_mtime_ns", "st_ctime_ns")
+    if any(getattr(before, key) != getattr(after, key) for key in keys):
+        raise EvidenceError("pair capture input changed")
+    return {"path": str(path), "bytes": before.st_size,
+            "sha256": checksum.hexdigest(), "mode": before.st_mode & 0o777,
+            "device": before.st_dev, "inode": before.st_ino,
+            "uid": before.st_uid, "gid": before.st_gid,
+            "mtime_ns": before.st_mtime_ns, "ctime_ns": before.st_ctime_ns}
+
+
+def _capture_metadata(label):
+    """Bound the read itself, including growth after the observed size."""
+    from tools.evidence import u575_pair
+    path = regular_file(label, nonempty=False)
+    size = path.stat().st_size
+    if size > u575_pair.MAX_METADATA:
+        raise EvidenceError("pair metadata exceeds bound")
+    with path.open("rb") as stream:
+        raw = stream.read(size + 1)
+    if len(raw) != size:
+        raise EvidenceError("pair metadata changed during read")
+    return raw
+
+
+def begin_pair_context(output, tools, recorder, source):
+    """Retain actual GCC-selected libraries before any configure/build call."""
+    from tools.evidence import u575_pair
+    u575_pair._source(source)
+    control = Path(output) / "pair-context"
+    if (control.exists() or any(p.is_symlink() for p in
+                               (control, *control.parents))):
+        raise EvidenceError("pair context control must be fresh and unaliased")
+    if set(tools) != u575_pair.TOOLS:
+        raise EvidenceError("exact original pair tool set required")
+    # The original gate resolves tool links to their actual file identities.
+    tool_before = {name: _capture_file(Path(path).resolve())
+                   for name, path in tools.items()}
+    compiler = tool_before["gcc"]
+    libraries, aliases = {}, set()
+    # A query uses the same ABI as both actual stages, never host defaults.
+    for name in ("libgcc.a", "libc_nano.a", "libnosys.a"):
+        raw = recorder.execute([tools["gcc"], "-mcpu=cortex-m33", "-mthumb",
+            "-mfloat-abi=soft", "--print-file-name=" + name],
+            "pair-before-" + name)
+        lines = raw.splitlines()
+        if len(lines) != 1 or not Path(lines[0]).is_absolute():
+            raise EvidenceError(
+                "actual absolute GCC library selection required")
+        # Reject symlink components before collapsing legitimate bin/../lib.
+        regular_file(lines[0])
+        path = Path(os.path.normpath(lines[0]))
+        row = _capture_file(path)
+        alias = (row["device"], row["inode"])
+        if alias in aliases:
+            raise EvidenceError("pair library choices must not alias")
+        aliases.add(alias)
+        libraries[name] = row
+    control.mkdir()
+    copies = control / "before-libraries"
+    copies.mkdir()
+    for name, row in libraries.items():
+        destination = copies / name
+        u575_pair._copy_retained(Path(row["path"]), destination,
+            {"size": row["bytes"], "sha256": row["sha256"],
+             "mode": row["mode"]})
+        if _capture_file(row["path"]) != row:
+            raise EvidenceError("original pair library changed before build")
+        row["copy"] = _capture_file(destination)
+    value = {"source": json.loads(json.dumps(source)), "compiler": compiler,
+             "tools": tool_before, "libraries": libraries,
+             "observed_ns": time.time_ns()}
+    atomic_json(control / "libraries-before.json", value)
+    return value
+
+
+def finish_pair_context(output, report, before):
+    """Publish only the exact typed closure after the unchanged build gate."""
+    from tools.evidence import u575_pair
+    control = Path(output) / "pair-context"
+    targets = [control / leaf for leaf in
+               ("libraries-after.json", "history.json", "context.json")]
+    if any(p.exists() or p.is_symlink() for p in targets):
+        raise EvidenceError("pair context outputs must be absent")
+    selected = u575_pair.collect_report(report)
+    if report["source"] != before["source"]:
+        raise EvidenceError("original pair source changed")
+    for name, snapshot in before["tools"].items():
+        if _capture_file(snapshot["path"]) != snapshot:
+            raise EvidenceError("original pair tool changed")
+        reported = u575_pair._identity(report["tools"][name])
+        if any(reported[key] != snapshot["bytes" if key == "size" else key]
+               for key in ("path", "size", "sha256")):
+            raise EvidenceError("original pair tool report changed")
+    after = {}
+    for name, row in before["libraries"].items():
+        original = {key: value for key, value in row.items() if key != "copy"}
+        if (_capture_file(row["path"]) != original or
+                _capture_file(row["copy"]["path"]) != row["copy"]):
+            raise EvidenceError("original or retained pair library changed")
+        after[name] = original
+    known_libraries = {row["path"]: row for row in after.values()}
+    emitted, not_emitted = {}, {}
+    for stage in report["build_inputs"]:
+        name = stage["stage"]
+        database = regular_file(stage["compile_commands"]["path"])
+        directory = database.parent
+        for leaf in u575_pair.BUNDLE:
+            path = directory / "nexus-runtime/generated" / leaf
+            selected[str(path)] = {"path": str(path)}
+        if database.stat().st_size > u575_pair.MAX_METADATA:
+            raise EvidenceError("actual compile database exceeds bound")
+        declared = u575_pair.compile_outputs(
+            json.loads(_capture_metadata(database)), name,
+            report["tools"]["gcc"]["path"])
+        emitted[name], not_emitted[name] = [], []
+        for label in declared:
+            path = Path(label)
+            if path.is_symlink():
+                raise EvidenceError("compiler output cannot be a symlink")
+            if path.exists():
+                selected[label] = {"path": label}
+                emitted[name].append(label)
+            else:
+                not_emitted[name].append(label)
+        api = {row["path"]: row for row in stage.get("cmake_file_api", [])}
+        indexes = [label for label in api if Path(label).name.startswith(
+            "index-")]
+        if len(indexes) != 1:
+            raise EvidenceError("one exact stage File API index required")
+        def read_api(label):
+            if label not in api:
+                raise EvidenceError("File API reply missing from typed inputs")
+            path = regular_file(label)
+            if path.stat().st_size > u575_pair.MAX_METADATA:
+                raise EvidenceError("File API metadata exceeds bound")
+            return _capture_metadata(path)
+        graph = u575_pair.cmake_link_graph(indexes[0], str(directory), name,
+            report["artifacts"][name]["path"], read_api)
+        if set(graph["inputs"]) != set(api):
+            raise EvidenceError(
+                "unrelated File API replies are not capture inputs")
+        local = set(emitted[name]) | set(graph["libraries"])
+        for label in graph["libraries"]:
+            regular_file(label)
+        if name == "nonsecure":
+            local.add(report["artifacts"]["secure_import"]["path"])
+        map_path = regular_file(report["artifacts"][name + "_map"]["path"])
+        if map_path.stat().st_size > u575_pair.MAX_METADATA:
+            raise EvidenceError("actual map exceeds bound")
+        links = u575_pair.map_inputs(_capture_metadata(map_path), str(directory))
+        for label in links:
+            path = Path(label)
+            if label in known_libraries:
+                expected = known_libraries[label]
+                prior = selected.get(label)
+                if prior and "sha256" in prior and (
+                        prior["sha256"] != expected["sha256"] or
+                        prior.get("size", prior.get("bytes")) !=
+                        expected["bytes"]):
+                    raise EvidenceError("original pair library report changed")
+                selected[label] = expected
+            elif path.is_relative_to(directory):
+                if label not in local:
+                    raise EvidenceError("unexpected local pair map LOAD")
+                selected.setdefault(label, {"path": label})
+            elif name == "nonsecure" and label in local:
+                selected.setdefault(label, {"path": label})
+            else:
+                raise EvidenceError("unknown external pair map LOAD")
+    if len(selected) > u575_pair.MAX_ENTRIES:
+        raise EvidenceError("pair capture input count exceeds bound")
+    files = [_capture_file(path) for path in sorted(selected)]
+    if sum(row["bytes"] for row in files) > u575_pair.MAX_BYTES:
+        raise EvidenceError("pair capture closure exceeds bound")
+    # The original report is still authoritative; history cannot replace it.
+    for row in files:
+        prior = selected[row["path"]]
+        if (row["path"] in known_libraries and
+                row != known_libraries[row["path"]]):
+            raise EvidenceError("original pair library changed during capture")
+        if "sha256" in prior and (prior["sha256"] != row["sha256"] or
+                prior.get("size", prior.get("bytes")) != row["bytes"]):
+            raise EvidenceError("original pair report input changed")
+    atomic_json(targets[0], {"libraries": after,
+                            "observed_ns": time.time_ns()})
+    history = {"files": files, "libraries_before": before["libraries"],
+               "libraries_after": after, "emitted": emitted,
+               "not_emitted": not_emitted}
+    atomic_json(targets[1], history)
+    context = {"schema_version": 1, "kind": "u575_pair_build_context",
+               "source": report["source"], "tools": report["tools"],
+               "report": file_identity(Path(output) / "report.json"),
+               "history": [file_identity(targets[1])]}
+    def read_metadata(label):
+        path = regular_file(label, nonempty=False)
+        if path.stat().st_size > u575_pair.MAX_METADATA:
+            raise EvidenceError("pair metadata exceeds bound")
+        return _capture_metadata(path)
+    u575_pair.build_pair(context, read_metadata)
+    atomic_json(targets[2], context)
+    return targets[2]
+
+
+def capture_cmake_inputs(build, stage):
+    """Retain replies for only the actual executable's dependency closure."""
+    from tools.evidence import u575_pair
+    indexes = list((build / ".cmake/api/v1/reply").glob("index-*.json"))
+    if len(indexes) != 1:
+        raise EvidenceError("one fresh CMake File API index required")
+    records = {}
+    def read(label):
+        row = _capture_file(label)
+        if row["bytes"] > u575_pair.MAX_METADATA:
+            raise EvidenceError("File API reply exceeds metadata bound")
+        records[label] = {key: row[key] for key in ("path", "bytes", "sha256")}
+        raw = _capture_metadata(label)
+        if hashlib.sha256(raw).hexdigest() != row["sha256"]:
+            raise EvidenceError("File API reply changed")
+        return raw
+    graph = u575_pair.cmake_link_graph(str(indexes[0]), str(build), stage,
+        str(build / ("u575_" + stage + ".elf")), read)
+    return [records[label] for label in graph["inputs"]]
+
+
+def run(root, output, compiler="arm-none-eabi-gcc", parallel=2,
+        capture_pair_context=False):
     root = root.resolve()
     output = provider_assemblies.fresh_output(output, root)
     report = {"schema_version": 1, "kind": "u575_trustzone_software_pair",
@@ -188,6 +439,8 @@ def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
         if type(parallel) is not int or not 1 <= parallel <= 4:
             raise EvidenceError("bounded build parallelism required")
         source = git_source(root)
+        if capture_pair_context and source["dirty"]:
+            raise EvidenceError("pair capture requires a clean build source")
         fixture = root / "tests/contracts/u575_trustzone"
         inputs = source_inputs(root)
         report["source"], report["source_inputs"] = source, inputs
@@ -202,9 +455,15 @@ def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
         recorder.env["PATH"] = str(Path(tools["gcc"]).parent) + os.pathsep + recorder.env["PATH"]
         for name, tool in tools.items():
             recorder.execute([tool, "--version"], name + "-version")
+        before_context = (begin_pair_context(output, tools, recorder, source)
+                          if capture_pair_context else None)
         report["build_inputs"] = []
         for stage in ("secure", "nonsecure"):
             build = output / stage
+            if capture_pair_context:
+                query = build / ".cmake/api/v1/query/codemodel-v2"
+                query.parent.mkdir(parents=True)
+                query.write_bytes(b"")
             argv = [tools["cmake"], "-S", str(fixture), "-B", str(build), "-G", "Ninja",
                     "-DCMAKE_TOOLCHAIN_FILE=" + str(root / "cmake/toolchains/arm-gcc.cmake"),
                     "-DCMAKE_C_COMPILER=" + tools["gcc"],
@@ -219,10 +478,14 @@ def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
                               str(parallel)], stage + "-build")
             dependencies = recorder.execute([tools["ninja"], "-C", str(build),
                 "-t", "deps"], stage + "-dependencies")
-            report["build_inputs"].append({"stage": stage,
+            stage_inputs = {"stage": stage,
                 "compile_commands": compile_profile(build, stage, tools["gcc"]),
                 "compiler_dependencies": [arch_compile.digest(path) for path in
-                    provider_assemblies.dependency_paths(dependencies, build)]})
+                    provider_assemblies.dependency_paths(dependencies, build)]}
+            if capture_pair_context:
+                stage_inputs["cmake_file_api"] = capture_cmake_inputs(
+                    build, stage)
+            report["build_inputs"].append(stage_inputs)
         secure_path = output / "secure/u575_secure.elf"
         nonsecure_path = output / "nonsecure/u575_nonsecure.elf"
         import_path = output / "secure/secure-import.o"
@@ -278,9 +541,15 @@ def run(root, output, compiler="arm-none-eabi-gcc", parallel=2):
         if git_source(root) != source:
             raise EvidenceError("source identity changed during paired build")
         report["status"] = "passed"
+        if capture_pair_context:
+            atomic_json(output / "report.json", report)
+            finish_pair_context(output, report, before_context)
     except (OSError, ValueError, KeyError, TypeError) as error:
+        report["status"] = "failed"
         report["failure"] = str(error)
-    atomic_json(output / "report.json", report)
+    # A published context anchors immutable original report bytes.
+    if not (capture_pair_context and report["status"] == "passed"):
+        atomic_json(output / "report.json", report)
     return 0 if report["status"] == "passed" else 1
 
 
@@ -290,9 +559,11 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--compiler", default="arm-none-eabi-gcc")
     parser.add_argument("--parallel", type=int, default=2)
+    parser.add_argument("--capture-pair-context", action="store_true")
     args = parser.parse_args()
     try:
-        return run(args.root, args.output, args.compiler, args.parallel)
+        return run(args.root, args.output, args.compiler, args.parallel,
+                   args.capture_pair_context)
     except (OSError, ValueError) as error:
         print("U575 pair rejected: " + str(error), file=sys.stderr)
         return 1

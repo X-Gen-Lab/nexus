@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "command": [
+    "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_rtc_lptim_test",
+    "--gtest_filter=*",
+    "--gtest_repeat=1",
+    "--gtest_also_run_disabled_tests",
+    "--gtest_output=xml:/workspace/nexus-io-recovery-20261018/features/io36-native/validation/batch1-runtime-main-green-r1/result.xml"
+  ],
+  "cwd": "/tmp/nexus-io36-native-20261018",
+  "stage": "batch1-runtime-main-green-r1",
+  "started_ns": 1792287396035639561,
+  "finished_ns": 1792287396043941477,
+  "duration_seconds": 0.008302416999868,
+  "timeout_seconds": 1800.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/validation/batch1-runtime-main-green-r1/command.attempts/1792287396035518889-f5c8c5b9e4a544678d5cd62d5ce5fe68/stdout.txt",
+    "bytes": 4779,
+    "sha256": "2c8e454946a60dcc1bad2549350cdee552a2fc6c9ae81fa1f3b37b0c77a7a239"
+  },
+  "stderr": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/validation/batch1-runtime-main-green-r1/command.attempts/1792287396035518889-f5c8c5b9e4a544678d5cd62d5ce5fe68/stderr.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

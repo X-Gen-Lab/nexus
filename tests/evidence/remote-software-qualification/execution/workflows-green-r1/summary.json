@@ -1,0 +1,9 @@
+{
+  "phase": "workflows-green-r1",
+  "exit_code": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/workflows-green-r1/command.attempts/1792297206715736697-325bc7d7eab244f8a9a52958b14c9dfb/receipt.json",
+  "guards_stable": true,
+  "persistent_allocated_bytes": 589824,
+  "TMP_live_allocated_bytes": 0,
+  "child_max_rss_KiB": 33308
+}

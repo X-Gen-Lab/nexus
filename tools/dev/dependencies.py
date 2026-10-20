@@ -23,10 +23,13 @@ from tools.evidence.common import (EvidenceError, atomic_json, digest, fields,
                                    file_identity, load_json, regular_file, separate_outputs)
 
 ROOT = Path(__file__).resolve().parents[2]
-from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
+from tools.maintenance.source_catalogue import (
+    ALL_SOURCE_DEPENDENCIES, SOURCE_DEPENDENCIES,
+)
 from tools.configure.providers import descriptor
 
-MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
+MODULES = tuple(dependency.path for dependency in ALL_SOURCE_DEPENDENCIES)
+RUNTIME_MODULES = tuple(dependency.path for dependency in SOURCE_DEPENDENCIES)
 FAMILY_MODULE = {item.family: tuple(path for _, path in item.git_dependencies)
                  for item in descriptor.families() if item.family != "native"}
 
@@ -36,8 +39,9 @@ def required_submodules(scope: str, family: str | None = None,
     if scope in ("native", "sdk", "candidate"):
         if scope == "native" and family not in (None, "native"):
             raise EvidenceError("Native dependencies cannot select a hardware family")
-        # Native model tests deliberately compile all maintained vendor headers.
-        return MODULES
+        # Native models compile all maintained vendor headers and host tests.
+        # Firmware/source-SDK exports do not acquire the host test framework.
+        return MODULES if scope == "native" else RUNTIME_MODULES
     if scope != "arm" or family not in FAMILY_MODULE or backend not in ("baremetal", "freertos", "threadx"):
         raise EvidenceError("unsupported dependency scope/family/backend")
     # The family descriptor owns its approved Git dependencies. The imported
@@ -377,6 +381,186 @@ def install_ccache(directory: Path, cache_directory: Path, *, root: Path = ROOT)
             shutil.rmtree(temporary)
 
 
+ACTIONLINT_LOCK = Path("dependencies/actionlint.lock.json")
+
+
+def actionlint_asset(lock_path: Path) -> tuple[dict, dict]:
+    """Read the single official distribution authority for this host."""
+    import platform
+    lock = load_json(lock_path)
+    fields(lock, {"schema_version", "kind", "version", "tag", "tag_commit",
+                  "upstream", "license", "signature_verified", "assets"})
+    if (lock["schema_version"] != 1 or
+            lock["kind"] != "actionlint_official_distribution" or
+            not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", lock["version"]) or
+            lock["tag"] != "v" + lock["version"] or
+            lock["upstream"] != "https://github.com/rhysd/actionlint" or
+            lock["license"] != "MIT" or lock["signature_verified"] is not False):
+        raise EvidenceError("invalid actionlint lock identity")
+    platforms = {"linux_amd64", "darwin_amd64", "darwin_arm64",
+                 "windows_amd64"}
+    if not isinstance(lock["assets"], dict) or set(lock["assets"]) != platforms:
+        raise EvidenceError("actionlint lock requires the four reviewed hosts")
+    for name, asset in lock["assets"].items():
+        fields(asset, {"url", "bytes", "sha256", "format", "executable",
+                       "notice"})
+        extension = "zip" if name.startswith("windows_") else "tar.gz"
+        expected = (lock["upstream"] + "/releases/download/" + lock["tag"] +
+                    "/actionlint_" + lock["version"] + "_" + name +
+                    "." + extension)
+        if asset["url"] != expected or asset["format"] != extension:
+            raise EvidenceError("actionlint lock requires exact official URL")
+        for record in (asset, asset["executable"], asset["notice"]):
+            if (type(record["bytes"]) is not int or
+                    not 0 < record["bytes"] <= 8 * 1024 * 1024 or
+                    not re.fullmatch(r"[0-9a-f]{64}", record["sha256"])):
+                raise EvidenceError("invalid actionlint size or digest")
+        for record, member, mode in (
+                (asset["executable"], "actionlint.exe" if
+                 name.startswith("windows_") else "actionlint", 0o755),
+                (asset["notice"], "LICENSE.txt", 0o644)):
+            fields(record, {"member", "bytes", "sha256", "mode"})
+            if record["member"] != member or record["mode"] != mode:
+                raise EvidenceError("invalid actionlint member or mode")
+    system = platform.system().lower()
+    machine = {"x86_64": "amd64", "amd64": "amd64",
+               "arm64": "arm64", "aarch64": "arm64"}.get(
+                   platform.machine().lower(), "unsupported")
+    host = system + "_" + machine
+    if host not in platforms:
+        raise EvidenceError("unsupported actionlint host: " + host)
+    return lock, {"platform": host, **lock["assets"][host]}
+
+
+def verify_actionlint(directory: Path, lock_path: Path) -> Path:
+    """Verify owned exact bytes offline; never discover or download a tool."""
+    import os
+    directory = Path(directory).absolute()
+    if any(path.is_symlink() for path in (directory, *directory.parents)):
+        raise EvidenceError("actionlint prefix cannot use a symlink")
+    lock, asset = actionlint_asset(lock_path)
+    try:
+        receipt = load_json(directory / "receipt.json")
+        if receipt != {"schema_version": 1, "kind": "prepared_actionlint",
+                       "lock_sha256": digest(lock_path),
+                       "platform": asset["platform"],
+                       "version": lock["version"]}:
+            raise EvidenceError("actionlint receipt differs from staged lock")
+        for record in (asset["executable"], asset["notice"]):
+            path = directory / record["member"]
+            regular_file(path)
+            if (path.stat().st_size != record["bytes"] or
+                    digest(path) != record["sha256"] or
+                    (os.name != "nt" and
+                     path.stat().st_mode & 0o777 != record["mode"])):
+                raise EvidenceError("actionlint member differs from lock")
+        stdout = directory / "version.stdout"
+        stderr = directory / "version.stderr"
+        regular_file(stdout)
+        regular_file(stderr, nonempty=False)
+        if (stdout.read_bytes().splitlines()[0] != lock["version"].encode()
+                or stderr.read_bytes()):
+            raise EvidenceError("actionlint version evidence differs from lock")
+    except (OSError, IndexError, EvidenceError) as error:
+        raise EvidenceError("actionlint not prepared for this lock; run "
+                            "install_dev_tools.py explicitly: " + str(error)) from error
+    return directory / asset["executable"]["member"]
+
+
+def install_actionlint(directory: Path, cache_directory: Path, *,
+                       root: Path = ROOT) -> dict:
+    """Explicitly prepare one reviewed host tool; preserve unknown prefixes."""
+    from tools.dev.cache import fetch
+    from tools.dev import process
+    import os
+    import stat
+    lock_path = root / ACTIONLINT_LOCK
+    lock, asset = actionlint_asset(lock_path)
+    directory = directory.absolute()
+    cache_directory = cache_directory.absolute()
+    if (directory.is_relative_to(cache_directory) or
+            cache_directory.is_relative_to(directory)):
+        raise EvidenceError("actionlint cache/prefix overlap is not allowed")
+    if any(path.is_symlink() for path in (directory, *directory.parents)):
+        raise EvidenceError("actionlint preparation cannot use symlinks")
+    if directory.exists():
+        verify_actionlint(directory, lock_path)
+        return load_json(directory / "receipt.json")
+    archive = fetch(asset["url"], cache_directory, asset["sha256"],
+                    maximum_bytes=asset["bytes"])
+    if archive.stat().st_size != asset["bytes"]:
+        raise EvidenceError("actionlint archive size differs from lock")
+    directory.parent.mkdir(parents=True, exist_ok=True)
+    temporary = Path(tempfile.mkdtemp(prefix=".actionlint-", dir=directory.parent))
+    wanted = {item["member"]: item for item in
+              (asset["executable"], asset["notice"])}
+    seen, expanded = set(), 0
+    attempted = False
+
+    def member(name, size, mode, source):
+        nonlocal expanded
+        parts = name.split("/")
+        if (name in seen or "\\" in name or
+                any(part in ("", ".", "..") for part in parts)):
+            raise EvidenceError("unsafe actionlint archive member")
+        seen.add(name)
+        expanded += size
+        if expanded > 8 * 1024 * 1024 or len(seen) > 32:
+            raise EvidenceError("actionlint archive exceeds extraction bound")
+        if name in wanted:
+            record = wanted[name]
+            if size != record["bytes"] or mode & 0o777 != record["mode"]:
+                raise EvidenceError("actionlint archive member differs from lock")
+            target = temporary / name
+            with target.open("xb") as output:
+                shutil.copyfileobj(source, output, 1024 * 1024)
+            if digest(target) != record["sha256"]:
+                raise EvidenceError("actionlint member digest differs from lock")
+            target.chmod(record["mode"])
+
+    try:
+        if asset["format"] == "zip":
+            with zipfile.ZipFile(archive) as content:
+                for item in content.infolist():
+                    mode = item.external_attr >> 16
+                    if (not stat.S_ISREG(mode) or item.flag_bits & 1):
+                        raise EvidenceError("nonregular actionlint ZIP member")
+                    with content.open(item) as source:
+                        member(item.filename, item.file_size, mode, source)
+        else:
+            with tarfile.open(archive, "r:gz") as content:
+                for item in content:
+                    if not item.isfile():
+                        raise EvidenceError("nonregular actionlint TAR member")
+                    with content.extractfile(item) as source:
+                        member(item.name, item.size, item.mode, source)
+        if not set(wanted).issubset(seen):
+            raise EvidenceError("actionlint archive lacks binary or notice")
+        attempted = True
+        result = process.run(
+            [str(temporary / asset["executable"]["member"]), "-version"],
+            cwd=temporary, env=dict(os.environ),
+            log=temporary / "prepare.log", timeout=30,
+            stage="actionlint-version")
+        command = load_json(temporary / "prepare.command.json")
+        for channel in ("stdout", "stderr"):
+            shutil.copyfile(command[channel]["path"],
+                            temporary / ("version." + channel))
+        if result.returncode:
+            raise EvidenceError("actual actionlint -version failed")
+        receipt = {"schema_version": 1, "kind": "prepared_actionlint",
+                   "lock_sha256": digest(lock_path),
+                   "platform": asset["platform"], "version": lock["version"]}
+        atomic_json(temporary / "receipt.json", receipt)
+        verify_actionlint(temporary, lock_path)
+        temporary.replace(directory)
+        return receipt
+    finally:
+        # Keep a failed execution and its original receipts for diagnosis.
+        if temporary.exists() and not attempted:
+            shutil.rmtree(temporary)
+
+
 def verify_upgrade(gates: dict) -> dict:
     """Reuse the reviewed dependency gate list; references never approve a merge."""
     from tools.maintenance.dependency_proposals import GATES
@@ -421,6 +605,10 @@ def main(argv=None) -> int:
     child.add_argument("--install-dir", type=Path, required=True)
     child.add_argument("--cache", type=Path, required=True)
     child.add_argument("--root", type=Path, default=ROOT)
+    child = actions.add_parser("actionlint-prepare")
+    child.add_argument("--install-dir", type=Path, required=True)
+    child.add_argument("--cache", type=Path, required=True)
+    child.add_argument("--root", type=Path, default=ROOT)
     child = actions.add_parser("upgrade-verify")
     child.add_argument("--gates", type=Path, required=True)
     child.add_argument("--report", type=Path, required=True)
@@ -444,6 +632,9 @@ def main(argv=None) -> int:
             result = install_wheels(args.bundle, args.python, report=args.report)
         elif args.operation == "ccache-prepare":
             result = install_ccache(args.install_dir, args.cache, root=args.root)
+        elif args.operation == "actionlint-prepare":
+            result = install_actionlint(args.install_dir, args.cache, root=args.root)
+            result = {**result, "status": "verified"}
         else:
             result = verify_upgrade(load_json(args.gates))
             atomic_json(args.report, result)

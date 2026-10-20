@@ -40,13 +40,17 @@ def check_contracts(root=configure.ROOT):
     for family in descriptor.families():
         provider = maintained(family.family)
         soc = configure.load(root / "soc" / family.family / "soc.json")
+        for part in soc["variants"]:
+            configure.validate_soc(soc, part)
         for controller in soc["controllers"].values():
-            kind = controller["kind"]
-            if kind not in kinds:
-                raise ValueError("Provider kind has no authored/factory contract: " + kind)
-            for mode in controller["modes"]:
-                provider.mode_implementation(kind, mode)
-                mode_traits(kind, mode)
+            interfaces = [(controller["kind"], controller["modes"])]
+            interfaces += sorted(controller.get("interfaces", {}).items())
+            for kind, modes in interfaces:
+                if kind not in kinds:
+                    raise ValueError("Provider kind has no authored/factory contract: " + kind)
+                for mode in modes:
+                    provider.mode_implementation(kind, mode)
+                    mode_traits(kind, mode)
     return {"kinds": sorted(kinds), "components": sorted(COMPONENTS),
             "families": [item.family for item in descriptor.families()]}
 

@@ -1,0 +1,48 @@
+from pathlib import Path
+import json
+import os
+import shutil
+import sys
+import time
+
+PREFIX = Path('/dev/shm/nexus-clang14-required-20261018-r1')
+ROOT = Path('/tmp/nexus-io-validation-20261018')
+sys.path.insert(0, str(ROOT))
+from tools.dev.process import run
+
+
+def guard(label):
+    cg = Path('/sys/fs/cgroup')
+    events = dict(line.split() for line in
+                  (cg / 'memory.events').read_text().splitlines())
+    allocated = PREFIX.stat().st_blocks * 512 + sum(
+        path.lstat().st_blocks * 512 for path in PREFIX.rglob('*'))
+    facts = {'time_ns': time.time_ns(), 'label': label,
+             'allocated': allocated, 'shm_free': shutil.disk_usage('/dev/shm').free,
+             'tmp_free': shutil.disk_usage('/tmp').free,
+             'persistent_free': shutil.disk_usage('/workspace').free,
+             'memory_available': int((cg / 'memory.max').read_text()) -
+                                 int((cg / 'memory.current').read_text()),
+             'events': events}
+    assert allocated <= 160 * 1024**2, facts
+    assert facts['memory_available'] >= 900 * 1024**2, facts
+    assert facts['persistent_free'] >= 64 * 1024**2, facts
+    assert all(int(events[k]) == 0 for k in
+               ('oom', 'oom_kill', 'oom_group_kill')), facts
+    with (PREFIX / 'guards.jsonl').open('a') as stream:
+        stream.write(json.dumps(facts) + '\n')
+    return facts
+
+
+if __name__ == '__main__':
+    label, command = sys.argv[1], sys.argv[2:]
+    guard(label + '-before')
+    result = run(command, cwd=PREFIX,
+                 env={**os.environ, 'TMPDIR': str(PREFIX / 'tmp'),
+                      'PYTHONDONTWRITEBYTECODE': '1',
+                      'PIP_DISABLE_PIP_VERSION_CHECK': '1'},
+                 log=PREFIX / 'runs' / (label + '.log'),
+                 timeout=300, stage=label)
+    guard(label + '-after')
+    print('actual exit', result.returncode)
+    sys.exit(result.returncode)

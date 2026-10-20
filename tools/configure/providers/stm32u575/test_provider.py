@@ -52,7 +52,7 @@ class U575ProviderTests(unittest.TestCase):
     def test_only_reviewed_uart_gpio_routes_and_modes_are_accepted(self):
         self.provider.validate_selection(uart(), uart())
         self.provider.validate_selection(gpio(), gpio())
-        for item in (uart(controller="USART2"), uart(mode="dma-tx"),
+        for item in (uart(controller="USART2"), uart(mode="dma-duplex"),
                      uart(rx_profile="blocks"), gpio(mask=64)):
             with self.subTest(item=item):
                 with self.assertRaises(ConfigurationError):
@@ -104,6 +104,136 @@ class U575ProviderTests(unittest.TestCase):
         self.assertEqual(board["clocks"], {})
         self.assertIsNone(board["physical_pcb_revision"])
         self.assertTrue(any("TZEN" in text for text in board["unknowns"]))
+
+
+class U575GpdmaSelectionTests(unittest.TestCase):
+    def setUp(self):
+        self.provider = importlib.import_module(
+            "tools.configure.providers.stm32u575")
+
+    def resolve(self):
+        from tools.configure import configure
+        return configure.resolve_ir(
+            ROOT / "cmake/package/verification/io_evolution/u575-uart-gpdma.toml",
+            ROOT)
+
+    def test_exact_dma_mode_uses_selected_extension_without_public_new_face(self):
+        item = uart(mode="dma-tx")
+        self.provider.validate_selection(item, item)
+        self.assertEqual(self.provider.mode_implementation("uart", "dma-tx"),
+                         "uart_gpdma")
+        result = Result(item)
+        port = result.controllers[0]
+        construction = self.provider.constructor(port, result, {}, {}, ())
+        self.assertEqual(construction.state_type,
+                         "nx_stm32u575_uart_gpdma_state_t")
+        self.assertEqual(self.provider.operations(port),
+                         "nx_stm32u575_uart_gpdma_ops")
+        self.assertTrue(construction.retain_on_failed_init)
+
+    def test_strict_gpdma_route_keeps_engine_channel_and_request_separate(self):
+        self.assertEqual(self.provider.validate_dma_resource(
+            "dma:GPDMA1:channel0:request25"), ("GPDMA1", 0, 25))
+        self.assertEqual(self.provider.validate_dma_resource(
+            "dma:GPDMA1:channel0"), ("GPDMA1", 0, None))
+        self.assertEqual(self.provider.dma_irq("GPDMA1:channel0:request25"),
+                         "irq:GPDMA1_Channel0")
+        self.assertEqual(self.provider.dma_physical_key(
+            "dma:GPDMA1:channel0:request25"), "dma:GPDMA1:channel0")
+        for value in ("dma:DMA1:stream0:channel25",
+                      "dma:LPDMA1:channel0:request25",
+                      "dma:GPDMA2:channel0:request25",
+                      "dma:GPDMA1:channel1:request25",
+                      "dma:GPDMA1:channel0:request26",
+                      "dma:GPDMA1:channel00:request25",
+                      "dma:GPDMA1:channel0:request025"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.provider.validate_dma_resource(value)
+
+    def test_normalizer_discards_request_but_preserves_real_channel_identity(self):
+        from tools.configure import configure
+        self.assertEqual(configure.normalize_resource(
+            "dma:GPDMA1:channel0:request25"), "dma:GPDMA1:channel0")
+        self.assertEqual(configure.normalize_resource(
+            "dma:DMA2:stream7:channel4"), "dma:DMA2:stream7")
+
+    def test_physical_projection_and_collision_use_gpdma_without_fake_dma1(self):
+        from tools.configure import dma_topology
+        selected = [{"id": "console", "controller": "USART1",
+                     "dma": ["GPDMA1:channel0:request25"]}]
+        plan = dma_topology.resolve_selected(selected, self.provider)
+        lane = plan.lanes[0]
+        self.assertEqual((lane.engine, lane.lane, lane.request),
+                         ("GPDMA1", 0, 25))
+        self.assertEqual(lane.physical_key, "dma:GPDMA1:channel0")
+        self.assertEqual(dma_topology.DmaTopologyIR.from_validated(
+            plan.to_dict()), plan)
+        with self.assertRaises(AttributeError):
+            lane.request = 26
+        with self.assertRaisesRegex(ValueError, "conflict"):
+            dma_topology.resolve_selected(selected + [{
+                "id": "other", "controller": "USART2",
+                "dma": ["GPDMA1:channel0:request25"]}], self.provider)
+
+    def test_foreign_controller_profile_and_nondefault_frame_stay_rejected(self):
+        items = [uart(mode="dma-tx", controller="USART2", pins=[
+            {"pin": "PA2", "function": "tx", "af": 7},
+            {"pin": "PA3", "function": "rx", "af": 7}]),
+            uart(mode="dma-tx", rx_profile="blocks"),
+            uart(mode="dma-tx", irq_priority=6),
+            uart(mode="dma-tx", frame={"data_bits": 8, "parity": "even",
+                                       "stop_bits": 1, "flow": "none"}),
+            uart(mode="rx-dma-idle")]
+        for item in items:
+            with self.subTest(item=item), self.assertRaises(ValueError):
+                self.provider.validate_selection(item, item)
+
+    def test_authored_toml_projects_exact_two_vectors_and_pinned_ll_source(self):
+        result = self.resolve()
+        port = next(item for item in result.controllers if item.kind == "uart")
+        self.assertEqual((port.controller, port.mode), ("USART1", "dma-tx"))
+        claims = {item["key"] for item in result["claims"]}
+        self.assertTrue({"dma:GPDMA1:channel0", "irq:GPDMA1_Channel0",
+                         "irq:USART1"}.issubset(claims))
+        self.assertEqual(result.dma_topology.lanes[0].engine, "GPDMA1")
+        dependencies = [entry for entry in result["source_dependencies"]
+                        if entry["path"] == "vendors/st/stm32u5_hal"]
+        self.assertEqual(len(dependencies), 1)
+        self.assertEqual(dependencies[0]["commit"],
+                         "2552682ee5a0d6f826a6435750fc9267be65868b")
+
+    def test_generated_vectors_tables_and_cold_retention_select_real_provider(self):
+        from tools.configure import bindings
+        result = self.resolve()
+        _, source = bindings.emit(result)
+        self.assertIn('#include "stm32u575_uart_gpdma.h"', source)
+        self.assertIn("nx_stm32u575_uart_gpdma_state_t s_nx_port_console", source)
+        self.assertIn("&nx_stm32u575_uart_gpdma_ops", source)
+        self.assertIn("GPDMA1_Channel0_IRQHandler", source)
+        self.assertIn("nx_stm32u575_uart_gpdma_irq(&s_nx_port_console)", source)
+        self.assertIn("nx_stm32u575_uart_gpdma_uart_irq(&s_nx_port_console)", source)
+        self.assertIn(".dma_irq_policy", source)
+        self.assertLess(source.index(".uart.retained"),
+                        source.index(".uart.registers = USART1"))
+        self.assertIn("nx_stm32u575_uart_gpdma_initialize", source)
+        self.assertNotIn("nx_stm32u575_uart_irq(&s_nx_port_console)", source)
+
+    def test_preflight_claims_vector_without_reading_unclocked_gpdma(self):
+        from tools.configure import preflight
+        source = "\n".join(preflight.emit(self.resolve()))
+        self.assertIn("NX_U575_IRQ_AVAILABLE(GPDMA1_Channel0_IRQn)", source)
+        self.assertNotIn("GPDMA1_Channel0->", source)
+
+    def test_ordinary_irq_constructor_keeps_original_state_ops_and_vector(self):
+        result = Result(uart())
+        item = result.controllers[0]
+        construction = self.provider.constructor(item, result, {}, {}, ())
+        source = "\n".join(construction.definitions)
+        self.assertEqual(construction.state_type, "nx_stm32u575_uart_state_t")
+        self.assertEqual(self.provider.operations(item), "nx_stm32u575_uart_ops")
+        self.assertIn("nx_stm32u575_uart_irq", source)
+        self.assertNotIn("gpdma", source.lower())
+        self.assertNotIn("GPDMA1", source)
 
 
 if __name__ == "__main__":

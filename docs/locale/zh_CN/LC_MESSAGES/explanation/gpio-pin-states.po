@@ -1,0 +1,296 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus source docs\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: f1b1ce48d95c946ed5b0cbe5e40c2849956ec945b7b1679ffa13929f349df974\n"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:10
+msgid "GPIO pin states: explicit images under one retained lease"
+msgstr "GPIO 引脚状态：在同一保留租约下显式选择寄存器图像"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:12
+msgid ""
+"Use this explanation to select an explicitly authored `DEFAULT` or `SLEEP` "
+"GPIO image without transferring pad ownership. The current named-state "
+"assembly is limited to STM32G474RET6, GPIOA, baremetal and `hse24-pll170`. "
+"Its PA5 software Board fixture does not establish PCB wiring, electrical "
+"safety or hardware low-power behavior. Other providers do not acquire this "
+"mode from the public header alone."
+msgstr ""
+"本文说明如何选择明确编写的 `DEFAULT` 或 `SLEEP` GPIO 图像，同时保持原有 pad 所有权。当前命名状态装配仅限 "
+"STM32G474RET6、GPIOA、baremetal 和 `hse24-pll170`。其中 PA5 软件 Board 夹具不建立 PCB "
+"接线、电气安全或硬件低功耗行为资格。公共头文件的存在不会自动为其他 provider 增加该模式。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:19
+msgid ""
+"The public [pin-state declarations](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/pin_state.h) "
+"own the API contract. The [I/O evolution design](../design/io-evolution.md) "
+"and its execution ledger keep this mechanism separate from the remaining "
+"wake, retention and power-mode work. This page explains integration and "
+"responsibility; it does not replace those declarations or mark IO-31 "
+"complete."
+msgstr ""
+"公共 [pin-state 声明](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/io/include/nexus/io/pin_state.h)是 API 合同的权威来源。[I/O "
+"演进设计](../design/io-evolution.md)及其实施台账将本机制与后续 wake、retention "
+"和电源模式工作分开记录。本文解释接入和责任边界，不替代这些声明，也不将 IO-31 标记为完成。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:25
+msgid "One authored plan, three distinct identities"
+msgstr "一份编写的计划，三种不同身份"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:27
+msgid ""
+"Board facts explicitly supply both GPIO images. The ordinary TOML selects a "
+"GPIO binding with `mode = \"named-states\"`; strict resolution produces "
+"immutable register plans and existing static provider storage. No runtime "
+"strings, heap, worker, dynamic registry or second pin-configuration "
+"authority is introduced."
+msgstr ""
+"Board 事实明确给出两个 GPIO 图像。普通 TOML 以 `mode = \"named-states\"` 选择 GPIO "
+"binding；严格解析产生不可变寄存器计划和既有静态 provider 存储。它不引入运行时字符串、堆、worker、动态注册表或第二个引脚配置权威。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:32
+msgid "`nx_pin_state_id_t` identifies one generated factory instance."
+msgstr "`nx_pin_state_id_t` 标识一个生成的 factory 实例。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:33
+msgid ""
+"`nx_pin_state_port_t` is its immutable public face: shared readonly "
+"operations and that instance's private context."
+msgstr ""
+"`nx_pin_state_port_t` 是该实例的不可变公共 face，包含共享 readonly 操作表和该实例的私有 context。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:35
+msgid ""
+"`nx_pin_state_selection_t` selects `NX_PIN_STATE_DEFAULT` or "
+"`NX_PIN_STATE_SLEEP`; it is not a factory instance ID."
+msgstr ""
+"`nx_pin_state_selection_t` 选择 `NX_PIN_STATE_DEFAULT` 或 "
+"`NX_PIN_STATE_SLEEP`；它不是 factory 实例 ID。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:38
+msgid ""
+"`nx_factory_pin_state()` returns the existing face without touching "
+"hardware. Ordinary GPIO lookup does not return a named-state instance. "
+"Lifecycle work belongs to explicit Platform start/stop, and runtime "
+"selection enters the provider directly through `nx_pin_state_select()`."
+msgstr ""
+"`nx_factory_pin_state()` 直接返回既有 face，不访问硬件。普通 GPIO 查找不会返回命名状态实例。生命周期工作属于显式 "
+"Platform start/stop；运行选择通过 `nx_pin_state_select()` 直接进入 provider。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:43
+msgid "The selected configuration is maintained here:"
+msgstr "选定配置由以下维护文件给出："
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:49
+msgid ""
+"The software Board explicitly declares PA5 output push-pull, low speed, no "
+"pull and level zero for `default`, and analog/no-pull for `sleep`. These are"
+" fixture values, not inferred board-safe levels. Products must provide "
+"reviewed electrical facts and their own policy instead of copying the names "
+"as safety guarantees."
+msgstr ""
+"软件 Board 明确规定：`default` 为 PA5 output、push-pull、low speed、no pull、level "
+"zero，`sleep` 为 analog/no-"
+"pull。这些是夹具值，不是根据板名推断的安全电平。产品必须提供已审查的电气事实及自身策略，不能将这些名称当作安全保证。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:54
+msgid ""
+"![Current G474 named GPIO ownership: cold lease, checked selection and "
+"separate Platform cleanup](../assets/diagrams/gpio-pin-states.svg)"
+msgstr ""
+"![当前 G474 命名 GPIO 所有权：冷态租约、受检查的选择以及独立的 Platform 清理](../assets/diagrams/gpio-"
+"pin-states.svg)"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:54
+msgid ""
+"Current G474 named GPIO ownership: cold lease, checked selection and "
+"separate Platform cleanup"
+msgstr "当前 G474 命名 GPIO 所有权：冷态租约、受检查的选择以及独立的 Platform 清理"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:56
+msgid ""
+"FIG-22 describes the current selected software lifecycle. Arrows distinguish"
+" build-time generation, pure lookup, state selection and cleanup. Every "
+"failure retains the responsibility it has not proved released; rendering "
+"does not establish a physical transition or HIL result."
+msgstr ""
+"FIG-22 "
+"描述当前选定的软件生命周期。箭头分别表示构建期生成、纯查找、状态选择和清理。每条失败路径都保留尚未证明已释放的责任；渲染成功不建立物理转换或 HIL "
+"结果。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:61
+msgid "Cold startup acquires responsibility before driving"
+msgstr "冷态启动先取得责任，再驱动输出"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:63
+msgid ""
+"The generated Platform owns the exact selected pads, bank gate and original "
+"cold snapshot. Its cold admission checks the selected resources before "
+"accepting hardware effects. Named-state initialization requires selected "
+"pads to be input or analog, unlocked and in a powered, non-reset bank. "
+"Existing output or AF ownership is not permission to take over that pad."
+msgstr ""
+"生成的 Platform 拥有精确选定的 pads、bank gate 及原始冷态快照。冷态准入在接受硬件效果前检查选定资源。命名状态初始化要求选定 "
+"pads 处于 input 或 analog、未锁定，且 bank 已供钟并未处于 reset。既有 output 或 AF 所有权不构成接管该 pad"
+" 的许可。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:69
+msgid ""
+"Initialization proves the authored `DEFAULT` image before opening the "
+"instance. A failed startup can leave partial effects and cleanup "
+"responsibility. The Platform's rollback must use checked provider stop and "
+"original-snapshot restoration; it cannot discard the lease because the "
+"constructor returned an error. Keep the owner, immutable plans and their "
+"complete storage live until that cleanup actually succeeds."
+msgstr ""
+"初始化在开放实例前证明已达到编写的 `DEFAULT` 图像。启动失败可能留下部分效果及清理责任。Platform rollback 必须执行受检查的 "
+"provider stop 与原始快照恢复，不能因为构造返回错误就丢弃租约。必须保持 owner、不可变计划及其完整存储有效，直到清理实际成功。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:76
+msgid "Selection is serialized privileged work"
+msgstr "选择操作在串行特权上下文中执行"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:78
+msgid ""
+"The caller provides one serialized, non-reentrant, privileged same-CPU "
+"Thread executor. Incoming interrupt masks must be clear. No ISR/NMI, "
+"competing pad or RCC writer, clock transition or register takeover may run "
+"concurrently. These are integration preconditions, not permissions "
+"established by matching register bits or by the factory pointer."
+msgstr ""
+"调用者提供同一 CPU 上唯一、串行、不可重入的特权 Thread 执行者。调用入口的中断屏蔽状态必须清零。ISR/NMI、竞争的 pad 或 RCC "
+"写者、时钟转换和寄存器接管不能与调用并发。这些是接入前提，不是寄存器数值匹配或取得 factory 指针后自动获得的许可。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:84
+msgid ""
+"The provider uses a bounded masked section and restores the saved interrupt "
+"state. Bank gate/reset checks precede GPIO register access; selected lock "
+"bits are then checked without taking over a locked pad. An unavailable bank "
+"is rejected without silently enabling its clock or clearing reset. A clean "
+"committed image is checked even when selecting the same state; external "
+"drift can return `STATE` and retain dirty responsibility instead of silently"
+" accepting the altered image."
+msgstr ""
+"provider 在有界中断屏蔽区间内执行并恢复保存的中断状态。GPIO 寄存器访问前先检查 bank gate/reset，再检查选定 lock "
+"位，不接管已锁定 pad。bank 不可用时直接拒绝，不暗中开启时钟或清除 reset。即使重新选择同一状态，也检查干净的已提交图像；外部偏移可以返回 "
+"`STATE` 并保留 dirty 责任，而不是静默接受已被修改的图像。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:92
+msgid ""
+"For a transition, the provider first proves that the entire selected group "
+"has withdrawn its drivers. It then programs the required output latch and "
+"electrical fields, applies the target mode and checks the actual target "
+"image. Only that proof commits the new selection. Masks preserve unrelated "
+"pads. This ordering is software behavior; it does not prove glitch-free pad "
+"voltage, external bias or an electrical settling interval."
+msgstr ""
+"转换时，provider 首先证明整个选定组已撤驱动，再设置所需输出 latch 与电气字段，应用目标 "
+"mode，并检查实际目标图像。只有这些证明完成后才提交新选择。掩码保留未选中的 pads。这个顺序描述软件行为，不证明 pad "
+"电压无毛刺、外部偏置或电气稳定时间。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:99
+msgid ""
+"A partial failure may leave neither the previous image nor the target image."
+" The lease stays retained, and the caller must not reuse its storage or hand"
+" the pads to a different writer. An initialized instance that has not "
+"stopped can retry an explicit supported target; otherwise resume checked "
+"Platform cleanup. A failed initialization or an already withdrawn provider "
+"cannot be reopened by selection. There is no hidden background repair, "
+"automatic clock recovery or deadline-based ownership release."
+msgstr ""
+"部分失败后，寄存器图像可能既不等于旧图像，也不等于目标图像。租约仍被保留；调用者不能复用存储或将 pads 交给其他写者。尚未 stop "
+"的已初始化实例可以显式重试受支持的目标；其他情况应继续受检查的 Platform 清理。初始化失败或已经撤回的 provider "
+"不能通过选择操作重新开放。没有隐藏后台修复、自动时钟恢复，也不会因 deadline 到期而释放所有权。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:107
+msgid "Stop has two separate completion boundaries"
+msgstr "stop 有两个不同的完成边界"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:109
+msgid ""
+"Private provider stop proves selected drivers withdrawn. Its success is that"
+" provider's final access, but it does not by itself restore the Platform's "
+"cold snapshot or release the bank lease. Those remain separate generated "
+"Platform cleanup steps."
+msgstr ""
+"私有 provider stop 证明选定驱动已撤回。成功是该 provider 的最后一次访问，但不会仅凭这个结果恢复 Platform "
+"冷态快照或释放 bank 租约；这些仍是独立的生成 Platform 清理步骤。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:114
+msgid ""
+"The Platform restores the saved selected-pad image and proves that "
+"restoration before releasing its GPIO gate responsibility. If restoration "
+"fails after provider stop succeeded, its pending snapshot and lease remain "
+"live. If restoration is already proved and only gate cleanup fails, only the"
+" remaining gate responsibility stays pending. Keep the complete storage "
+"until the whole Platform stop succeeds, and retry only unfinished cleanup. "
+"Do not repeat construction, zero storage or interpret a first error as proof"
+" that every resource is still fully running or fully released."
+msgstr ""
+"Platform 先恢复保存的选定 pad 图像并证明恢复成功，再释放自身 GPIO gate 责任。如果 provider stop "
+"成功后，快照恢复失败，尚待恢复的快照及租约继续存活。如果快照恢复已经证明完成，而仅 gate 清理失败，则只保留剩余 gate "
+"责任。必须保持完整存储有效，直到整个 Platform stop "
+"成功，重试时只推进未完成的清理。不能重复构造、清零存储，也不能将首个错误解释为所有资源仍完整运行或全部已释放。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:123
+msgid "Use the public selected face"
+msgstr "使用公共 selected face"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:125
+msgid ""
+"After a successful Platform start, an external product uses only public and "
+"generated headers. The fragment below is the named-state branch of the "
+"maintained link fixture; the surrounding fixture handles startup and stop. "
+"It is not a standalone application or a physical execution result."
+msgstr ""
+"Platform start 成功后，外部产品只使用公共及生成头文件。下面的片段是维护链接夹具中的命名状态分支；外层夹具负责 start 和 "
+"stop。它不是独立应用，也不表示物理执行结果。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:136
+msgid ""
+"Factory lookup, synchronous selection and final Platform cleanup allocate no"
+" request or transfer buffer. The operation performs bounded work over at "
+"most 16 selected pad bits; readonly plans, mutable provider state and the "
+"Platform's saved snapshots remain distinct costs. No measured MCU latency, "
+"total RAM or worst-case interrupt bound is implied by that structural "
+"statement."
+msgstr ""
+"factory 查找、同步选择和最终 Platform 清理不分配 request 或 transfer buffer。操作在至多 16 个选定 pad"
+" bit 上执行有界工作；readonly 计划、可变 provider 状态及 Platform 保存的快照是不同的成本项。这个结构性结论不表示已测 "
+"MCU 延迟、总 RAM 或最坏中断屏蔽时间。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:142
+msgid "Current scope and verification boundary"
+msgstr "当前范围与验证边界"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:144
+msgid ""
+"Current source implements named GPIO images, cold ownership and explicit "
+"selection for the exact G474 reference tuple. The derived [capability "
+"matrix](../delivery/capabilities.md) records selected modes and source "
+"definitions; it does not qualify a board or execute a firmware image."
+msgstr ""
+"当前源码为精确的 G474 参考配置实现命名 GPIO "
+"图像、冷态所有权与显式选择。派生[能力矩阵](../delivery/capabilities.md)记录选定模式和源定义，不建立板卡资格，也不会执行固件镜像。"
+
+#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/explanation/gpio-pin-states.md:149
+msgid ""
+"Native register/factory tests establish the exercised software and failure "
+"paths. Actual ARM linking, installed SDK consumption and HIL require their "
+"own same-source evidence. The public interface and figure do not establish "
+"AF switching, wake routing, retention, deep Sleep/STOP entry, monotonic "
+"continuity, PCB safety or real pad timing. Those remain separate contracts "
+"and work packages."
+msgstr ""
+"Native 寄存器/factory 测试建立其实际执行的软件和失败路径证据。真实 ARM 链接、installed SDK 消费和 HIL "
+"各自需要匹配源码的证据。公共接口和图示不建立 AF 切换、wake 路由、retention、deep Sleep/STOP "
+"进入、单调时间连续性、PCB 安全或真实 pad 时序。这些仍属于独立合同与工作包。"

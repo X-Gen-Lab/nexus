@@ -24,12 +24,12 @@ from tools.configure.metadata import (  # noqa: E402
     fields, identity, parse_json, read_json, regular, snapshot,
 )
 from tools.maintenance.source_catalogue import (  # noqa: E402
-    SOURCE_DEPENDENCIES, declared_modules,
+    ALL_SOURCE_DEPENDENCIES, declared_modules,
 )
 from tools.maintenance import (  # noqa: E402
     cmsis_device_lock, stm32f1_hal_lock, stm32f4_hal_lock,
     stm32g4_hal_lock, stm32h7_hal_lock, stm32u5_hal_lock,
-    stm32g4_lock, threadx_lock,
+    stm32g4_lock, threadx_lock, googletest_lock,
 )
 
 GATES = ("license_review", "configuration", "host_models", "cortex_runtime",
@@ -86,7 +86,7 @@ def inventory(root=ROOT):
     module_bytes, module_identity = snapshot(root / ".gitmodules")
     urls = declared_modules(module_bytes)
     records = []
-    for dependency in SOURCE_DEPENDENCIES:
+    for dependency in ALL_SOURCE_DEPENDENCIES:
         name, path, notice = dependency.identifier, dependency.path, dependency.notice
         entry = git(root, "ls-tree", "HEAD", "--", path).split()
         if len(entry) != 4 or entry[:2] != ["160000", "commit"]:
@@ -99,7 +99,9 @@ def inventory(root=ROOT):
             lock_path = root / dependency.source_lock
             lock_bytes, lock_identity = snapshot(lock_path)
             locked = parse_json(lock_bytes)
-            if name == "threadx":
+            if name == "googletest":
+                googletest_lock.verify(checkout, lock_path)
+            elif name == "threadx":
                 threadx_lock.verify(checkout, lock_path, "linux")
             elif name in OFFICIAL_DRIVERS:
                 official = OFFICIAL_DRIVERS[name]
@@ -114,28 +116,14 @@ def inventory(root=ROOT):
                 raise ValueError("Source lock validator requires catalogue review")
             if locked["commit"] != entry[2]:
                 raise ValueError("Source lock differs from committed source Gitlink: " + path)
-            references.extend([lock_identity,
-                               *[identity(checkout / filename)
-                                 for filename in sorted(locked["files"])]])
+            references.append(lock_identity)
+            if name != "googletest":
+                references.extend(identity(checkout / filename)
+                                  for filename in sorted(locked["files"]))
         records.append({"id": name, "revision": entry[2], "kind": "git_source",
                         "path": path, "upstream_url": urls[path],
                         "identities": references,
                         "license_review": "current_notices_observed"})
-    google_path = root / "dependencies/googletest.lock.json"
-    google_bytes, google_identity = snapshot(google_path)
-    google = parse_json(google_bytes)
-    archive = root / google["archive"]
-    archive_identity = identity(archive)
-    if archive_identity["sha256"] != google["sha256"] or archive_identity["size"] != google["bytes"]:
-        raise ValueError("Pinned GoogleTest archive identity changed")
-    origin = re.fullmatch(r"https://codeload\.github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/tar\.gz/([0-9a-f]{40})", google["url"])
-    if origin is None or origin.group(3) != google["commit"]:
-        raise ValueError("GoogleTest source URL differs from its exact commit")
-    records.append({"id": "googletest", "revision": google["commit"],
-                    "kind": "git_source", "upstream_url": "https://github.com/" + origin.group(1) + "/" + origin.group(2) + ".git",
-                    "identities": [google_identity,
-                    archive_identity, identity(root / "dependencies/source/googletest-LICENSE.txt")],
-                    "license_review": "current_notices_observed"})
     vendor_path = root / "vendors/gigadevice/gd32f4xx/source.lock.json"
     vendor_bytes, vendor_identity = snapshot(vendor_path)
     vendor = parse_json(vendor_bytes)

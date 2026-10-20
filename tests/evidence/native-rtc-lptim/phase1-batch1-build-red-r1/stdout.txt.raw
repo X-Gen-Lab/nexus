@@ -1,0 +1,299 @@
++ /tmp/nexus-io36-native-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_rtc_lptim_test nexus_rtc_lptim_final_access_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/88] Building C object core/CMakeFiles/nexus_core.dir/src/time.c.o
+[2/88] Building C object core/CMakeFiles/nexus_core.dir/src/request.c.o
+[3/88] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
+[4/88] Building C object core/CMakeFiles/nexus_core.dir/src/request_observer.c.o
+[5/88] Building C object core/CMakeFiles/nexus_core.dir/src/fault.c.o
+[6/88] Building C object core/CMakeFiles/nexus_core.dir/src/silicon.c.o
+[7/88] Building C object arch/CMakeFiles/nexus_arch.dir/native/nx_arch_native.c.o
+[8/88] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache.c.o
+[9/88] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_cache_control.c.o
+[10/88] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_mpu.c.o
+[11/88] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_security.c.o
+[12/88] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_nonsecure.c.o
+[13/88] Building C object arch/CMakeFiles/nexus_arch.dir/cortex_m/nx_arch_sleep.c.o
+[14/88] Building CXX object _deps/google-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[15/88] Linking C static library lib/libnexus_core.a
+[16/88] Linking C static library lib/libnexus_arch.a
+[17/88] Building C object io/CMakeFiles/nexus_io.dir/src/gpio.c.o
+[18/88] Building C object io/CMakeFiles/nexus_io.dir/src/uart.c.o
+[19/88] Building C object io/CMakeFiles/nexus_io.dir/src/uart_word.c.o
+[20/88] Building C object io/CMakeFiles/nexus_io.dir/src/spi.c.o
+[21/88] Building C object io/CMakeFiles/nexus_io.dir/src/spi_transaction.c.o
+[22/88] Building C object io/CMakeFiles/nexus_io.dir/src/spi_dma_transaction.c.o
+[23/88] Building C object io/CMakeFiles/nexus_io.dir/src/spi_dma_sequence.c.o
+[24/88] Building C object io/CMakeFiles/nexus_io.dir/src/spi_dma_owner_binding.c.o
+[25/88] Building C object io/CMakeFiles/nexus_io.dir/src/i2c.c.o
+[26/88] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_long.c.o
+[27/88] Building C object io/CMakeFiles/nexus_io.dir/src/flash.c.o
+[28/88] Building C object io/CMakeFiles/nexus_io.dir/src/watchdog.c.o
+[29/88] Building C object io/CMakeFiles/nexus_io.dir/src/exti.c.o
+[30/88] Building C object io/CMakeFiles/nexus_io.dir/src/timer.c.o
+[31/88] Building C object io/CMakeFiles/nexus_io.dir/src/adc.c.o
+[32/88] Building C object io/CMakeFiles/nexus_io.dir/src/adc_format.c.o
+[33/88] Building C object io/CMakeFiles/nexus_io.dir/src/adc_group.c.o
+[34/88] Building C object io/CMakeFiles/nexus_io.dir/src/flash_region.c.o
+[35/88] Building C object io/CMakeFiles/nexus_io.dir/src/dma.c.o
+[36/88] Building C object io/CMakeFiles/nexus_io.dir/src/stream.c.o
+[37/88] Building C object io/CMakeFiles/nexus_io.dir/src/wake.c.o
+[38/88] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
+[39/88] Building C object io/CMakeFiles/nexus_io.dir/src/adc_observer.c.o
+[40/88] Building C object io/CMakeFiles/nexus_io.dir/src/uart_rs485.c.o
+[41/88] Building C object io/CMakeFiles/nexus_io.dir/src/stream_budget.c.o
+[42/88] Building C object io/CMakeFiles/nexus_io.dir/src/can.c.o
+[43/88] Building C object io/CMakeFiles/nexus_io.dir/src/can_fd.c.o
+[44/88] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet.c.o
+[45/88] Building C object io/CMakeFiles/nexus_io.dir/src/ethernet_frames.c.o
+[46/88] Building C object io/CMakeFiles/nexus_io.dir/src/mdio.c.o
+[47/88] Building C object io/CMakeFiles/nexus_io.dir/src/usb_device.c.o
+[48/88] Building C object io/CMakeFiles/nexus_io.dir/src/timer_capture.c.o
+[49/88] Building C object io/CMakeFiles/nexus_io.dir/src/advanced_pwm.c.o
+[50/88] Building C object io/CMakeFiles/nexus_io.dir/src/observation.c.o
+[51/88] Building C object io/CMakeFiles/nexus_io.dir/src/pwm_group.c.o
+[52/88] Building C object io/CMakeFiles/nexus_io.dir/src/pwm_adc.c.o
+[53/88] Building C object io/CMakeFiles/nexus_io.dir/src/stream_profile.c.o
+[54/88] Building C object io/CMakeFiles/nexus_io.dir/src/encoder.c.o
+[55/88] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[56/88] Linking CXX static library lib/libgtest.a
+[57/88] Linking C static library lib/libnexus_io.a
+[58/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[59/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[60/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[61/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart_word.c.o
+[62/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[63/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[64/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[65/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[66/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[67/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[68/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[69/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[70/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_dma_transaction.c.o
+[71/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[72/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/can.c.o
+[73/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet.c.o
+[74/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet_frames.c.o
+[75/88] Building C object io/CMakeFiles/nexus_io_native.dir/native/usb_device.c.o
+[76/88] Building C object io/CMakeFiles/nexus_can_native_engine.dir/src/can_controller.c.o
+[77/88] Building C object io/CMakeFiles/nexus_eth_native_engine.dir/src/eth_mac.c.o
+[78/88] Building C object io/CMakeFiles/nexus_eth_frames_native_engine.dir/src/eth_frames_mac.c.o
+[79/88] Building C object io/CMakeFiles/nexus_usb_native_engine.dir/src/usb_device_controller.c.o
+[80/88] Linking CXX static library lib/libgmock.a
+[81/88] Building CXX object _deps/google-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[82/88] Linking C static library lib/libnexus_io_native.a
+[83/88] Building CXX object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o
+[84/88] Building CXX object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_final_access_test.dir/rtc_lptim_final_access_test.cpp.o
+[85/88] Linking CXX static library lib/libgmock_main.a
+[86/88] Linking CXX executable bin/nexus_rtc_lptim_test
+FAILED: [code=1] bin/nexus_rtc_lptim_test 
+: && /usr/bin/c++ -g -Wl,--compress-debug-sections=zlib-gabi -Wl,--dependency-file=tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/link.d tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o -o bin/nexus_rtc_lptim_test  lib/libgmock_main.a  lib/libnexus_io_native.a  lib/libgmock.a  lib/libgtest.a  lib/libnexus_io.a  lib/libnexus_core.a  lib/libnexus_arch.a && :
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: warning: relocation against `nx_native_lptim_ops' in read-only section `.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime::NativeTime()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:53:(.text._ZN12_GLOBAL__N_110NativeTimeC2Ev+0x53): undefined reference to `nx_native_rtc_ops'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:53:(.text._ZN12_GLOBAL__N_110NativeTimeC2Ev+0xcc): undefined reference to `nx_native_lptim_ops'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime::TearDown()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:84:(.text._ZN12_GLOBAL__N_110NativeTime8TearDownEv+0x33): undefined reference to `nx_rtc_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:85:(.text._ZN12_GLOBAL__N_110NativeTime8TearDownEv+0xc5): undefined reference to `nx_rtc_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:86:(.text._ZN12_GLOBAL__N_110NativeTime8TearDownEv+0x152): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:87:(.text._ZN12_GLOBAL__N_110NativeTime8TearDownEv+0x1df): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime::SetUp()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:70:(.text._ZN12_GLOBAL__N_110NativeTime5SetUpEv+0x34): undefined reference to `nx_native_rtc_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:71:(.text._ZN12_GLOBAL__N_110NativeTime5SetUpEv+0xcb): undefined reference to `nx_native_rtc_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:72:(.text._ZN12_GLOBAL__N_110NativeTime5SetUpEv+0x158): undefined reference to `nx_native_lptim_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:74:(.text._ZN12_GLOBAL__N_110NativeTime5SetUpEv+0x1e5): undefined reference to `nx_native_lptim_construct'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_CalendarValidationUsesRawMod4YearsAndIndependentWeekday_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:165:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarValidationUsesRawMod4YearsAndIndependentWeekday_Test8TestBodyEv+0x50): undefined reference to `nx_rtc_calendar_validate'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:179:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarValidationUsesRawMod4YearsAndIndependentWeekday_Test8TestBodyEv+0x116): undefined reference to `nx_rtc_calendar_validate'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:181:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarValidationUsesRawMod4YearsAndIndependentWeekday_Test8TestBodyEv+0x1b9): undefined reference to `nx_rtc_calendar_validate'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:183:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarValidationUsesRawMod4YearsAndIndependentWeekday_Test8TestBodyEv+0x256): undefined reference to `nx_rtc_alarm_validate'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime::Shot(unsigned long, nx_lptim_port_t const&, unsigned int, unsigned long)':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:105:(.text._ZN12_GLOBAL__N_110NativeTime4ShotEmRK15nx_lptim_port_tjm+0x40): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:106:(.text._ZN12_GLOBAL__N_110NativeTime4ShotEmRK15nx_lptim_port_tjm+0x103): undefined reference to `nx_lptim_request_prepare'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:402:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x3a): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:404:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0xf1): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:405:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x178): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:406:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x213): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:407:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x2b7): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:408:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x353): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:410:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x403): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:412:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x4c0): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:413:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x548): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:414:(.text._ZN12_GLOBAL__N_169NativeTime_IdleProgressIsNotAnImplicitClockAndShotOneCanBeReused_Test8TestBodyEv+0x5c8): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:443:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x10f): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:444:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x1b7): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:445:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x254): undefined reference to `nx_native_lptim_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:447:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x300): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:448:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x3a8): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:449:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x432): undefined reference to `nx_lptim_port_cancel'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:450:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x4bb): undefined reference to `nx_native_lptim_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:451:(.text._ZN12_GLOBAL__N_172NativeTime_HeldTimeoutKeepsFirstCauseButProgressesToFinalSevenTicks_Test8TestBodyEv+0x542): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:485:(.text._ZN12_GLOBAL__N_172NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test8TestBodyEv+0x136): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:486:(.text._ZN12_GLOBAL__N_172NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test8TestBodyEv+0x1d8): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:487:(.text._ZN12_GLOBAL__N_172NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test8TestBodyEv+0x26c): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:488:(.text._ZN12_GLOBAL__N_172NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test8TestBodyEv+0x300): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:490:(.text._ZN12_GLOBAL__N_172NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test8TestBodyEv+0x397): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:491:(.text._ZN12_GLOBAL__N_172NativeTime_DeadlineEventTieAndCancelBeforeServiceHaveDistinctCauses_Test8TestBodyEv+0x429): undefined reference to `nx_lptim_port_cancel'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTimeDispatch_SharedReadonlyTableSupportsAnUnrelatedProvider_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:651:(.text._ZN12_GLOBAL__N_170NativeTimeDispatch_SharedReadonlyTableSupportsAnUnrelatedProvider_Test8TestBodyEv+0x53d): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime::Alarm(unsigned long, nx_rtc_port_t const&, nx_rtc_alarm_t, unsigned long) [clone .constprop.0]':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:97:(.text._ZN12_GLOBAL__N_110NativeTime5AlarmEmRK13nx_rtc_port_t14nx_rtc_alarm_tm.constprop.0+0x42): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:98:(.text._ZN12_GLOBAL__N_110NativeTime5AlarmEmRK13nx_rtc_port_t14nx_rtc_alarm_tm.constprop.0+0xf3): undefined reference to `nx_rtc_request_prepare'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime::Set(nx_rtc_port_t const&, nx_rtc_calendar_t) [clone .isra.0]':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:91:(.text._ZN12_GLOBAL__N_110NativeTime3SetERK13nx_rtc_port_t17nx_rtc_calendar_t.isra.0+0x2a): undefined reference to `nx_rtc_port_set'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_FirstObservedExpiryWinsOverPendingRTCEvent_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:474:(.text._ZN12_GLOBAL__N_158NativeTime_FirstObservedExpiryWinsOverPendingRTCEvent_Test8TestBodyEv+0x130): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:475:(.text._ZN12_GLOBAL__N_158NativeTime_FirstObservedExpiryWinsOverPendingRTCEvent_Test8TestBodyEv+0x1d6): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:477:(.text._ZN12_GLOBAL__N_158NativeTime_FirstObservedExpiryWinsOverPendingRTCEvent_Test8TestBodyEv+0x269): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_InvalidStaticAdmissionDoesNotReadCoreClock_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:306:(.text._ZN12_GLOBAL__N_158NativeTime_InvalidStaticAdmissionDoesNotReadCoreClock_Test8TestBodyEv+0x7c): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:309:(.text._ZN12_GLOBAL__N_158NativeTime_InvalidStaticAdmissionDoesNotReadCoreClock_Test8TestBodyEv+0x139): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:612:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0xbc): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:613:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x191): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:614:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x243): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:616:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x2e4): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:617:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x385): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:620:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x586): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:621:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x62c): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:623:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x6d4): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:626:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x773): undefined reference to `nx_native_lptim_ops'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:626:(.text._ZN12_GLOBAL__N_171NativeTime_InvalidAndMissingMethodsDoNotWriteOutputOrEnterProvider_Test8TestBodyEv+0x780): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:234:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x70): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:235:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x152): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:237:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x251): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:240:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x3cb): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:241:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x472): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:242:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x553): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:244:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x6af): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:245:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x766): undefined reference to `nx_rtc_port_cancel'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:247:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x84d): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:248:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x909): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:249:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0x9bb): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:251:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0xa6a): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:253:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0xbde): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:256:(.text._ZN12_GLOBAL__N_169NativeTime_TwoCalendarsAndTwoCountersHaveIndependentOwnerDomains_Test8TestBodyEv+0xdcd): undefined reference to `nx_lptim_port_cancel'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_AlarmCrossesMidnightWithoutLosingIntermediateMatch_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:353:(.text._ZN12_GLOBAL__N_166NativeTime_AlarmCrossesMidnightWithoutLosingIntermediateMatch_Test8TestBodyEv+0x86): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:354:(.text._ZN12_GLOBAL__N_166NativeTime_AlarmCrossesMidnightWithoutLosingIntermediateMatch_Test8TestBodyEv+0x106): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:356:(.text._ZN12_GLOBAL__N_166NativeTime_AlarmCrossesMidnightWithoutLosingIntermediateMatch_Test8TestBodyEv+0x1ab): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:360:(.text._ZN12_GLOBAL__N_166NativeTime_AlarmCrossesMidnightWithoutLosingIntermediateMatch_Test8TestBodyEv+0x3c2): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_ColdConstructionCopiesClockWithoutReadingOrSettingTime_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:116:(.text._ZN12_GLOBAL__N_170NativeTime_ColdConstructionCopiesClockWithoutReadingOrSettingTime_Test8TestBodyEv+0x61): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:119:(.text._ZN12_GLOBAL__N_170NativeTime_ColdConstructionCopiesClockWithoutReadingOrSettingTime_Test8TestBodyEv+0x215): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_CalendarCarryUsesActualMonthLengthAndIndependentWeekday_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:342:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarCarryUsesActualMonthLengthAndIndependentWeekday_Test8TestBodyEv+0xc1): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:343:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarCarryUsesActualMonthLengthAndIndependentWeekday_Test8TestBodyEv+0x188): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:344:(.text._ZN12_GLOBAL__N_171NativeTime_CalendarCarryUsesActualMonthLengthAndIndependentWeekday_Test8TestBodyEv+0x228): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:500:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0xa6): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:501:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x14b): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:502:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x1e1): undefined reference to `nx_native_rtc_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:503:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x284): undefined reference to `nx_native_lptim_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:504:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x31f): undefined reference to `nx_rtc_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:505:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x3bf): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:506:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x455): undefined reference to `nx_rtc_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:507:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x4f5): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:510:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x6cb): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:511:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x773): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:512:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x81c): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:513:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x8ce): undefined reference to `nx_native_rtc_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:514:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0x970): undefined reference to `nx_native_lptim_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:515:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0xa01): undefined reference to `nx_rtc_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:516:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0xa9f): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:520:(.text._ZN12_GLOBAL__N_164NativeTime_HeldStopClosesAdmissionButNeverRevokesEitherLoan_Test8TestBodyEv+0xb8c): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:136:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x5a): undefined reference to `nx_native_lptim_ops'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:137:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x79): undefined reference to `nx_native_lptim_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:140:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x1e6): undefined reference to `nx_native_lptim_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:141:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x2a3): undefined reference to `nx_lptim_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:143:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x36e): undefined reference to `nx_native_lptim_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:147:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x4eb): undefined reference to `nx_native_rtc_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:149:(.text._ZN12_GLOBAL__N_171NativeTime_StatelessClockAndRejectedConstructionLeaveStorageIntact_Test8TestBodyEv+0x63b): undefined reference to `nx_native_rtc_construct'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:366:(.text._ZN12_GLOBAL__N_173NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test8TestBodyEv+0x57): undefined reference to `nx_rtc_port_stop'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:367:(.text._ZN12_GLOBAL__N_173NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test8TestBodyEv+0xfc): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:371:(.text._ZN12_GLOBAL__N_173NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test8TestBodyEv+0x23f): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:374:(.text._ZN12_GLOBAL__N_173NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test8TestBodyEv+0x39f): undefined reference to `nx_native_rtc_construct'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:376:(.text._ZN12_GLOBAL__N_173NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test8TestBodyEv+0x4f2): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:378:(.text._ZN12_GLOBAL__N_173NativeTime_ClosedCalendarCanAdvanceButPublicReadAndReconstructReject_Test8TestBodyEv+0x632): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:554:(.text._ZN12_GLOBAL__N_166NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test8TestBodyEv+0x8c): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:555:(.text._ZN12_GLOBAL__N_166NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test8TestBodyEv+0x157): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:556:(.text._ZN12_GLOBAL__N_166NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test8TestBodyEv+0x210): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:559:(.text._ZN12_GLOBAL__N_166NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test8TestBodyEv+0x2c4): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:564:(.text._ZN12_GLOBAL__N_166NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test8TestBodyEv+0x4bb): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:567:(.text._ZN12_GLOBAL__N_166NativeTime_WholeAndPartialProviderAliasesRejectBeforeAnyWrite_Test8TestBodyEv+0x55f): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_PreparationValidatesEveryInputBeforeChangingBaseOrPayload_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:192:(.text._ZN12_GLOBAL__N_173NativeTime_PreparationValidatesEveryInputBeforeChangingBaseOrPayload_Test8TestBodyEv+0x8e): undefined reference to `nx_rtc_request_prepare'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:195:(.text._ZN12_GLOBAL__N_173NativeTime_PreparationValidatesEveryInputBeforeChangingBaseOrPayload_Test8TestBodyEv+0x1fe): undefined reference to `nx_rtc_request_prepare'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:201:(.text._ZN12_GLOBAL__N_173NativeTime_PreparationValidatesEveryInputBeforeChangingBaseOrPayload_Test8TestBodyEv+0x384): undefined reference to `nx_lptim_request_prepare'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_PreparationRejectsPartialInputOverlapWithoutDereferencingIt_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:215:(.text._ZN12_GLOBAL__N_175NativeTime_PreparationRejectsPartialInputOverlapWithoutDereferencingIt_Test8TestBodyEv+0x75): undefined reference to `nx_rtc_request_prepare'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:220:(.text._ZN12_GLOBAL__N_175NativeTime_PreparationRejectsPartialInputOverlapWithoutDereferencingIt_Test8TestBodyEv+0x1f5): undefined reference to `nx_rtc_request_prepare'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:226:(.text._ZN12_GLOBAL__N_175NativeTime_PreparationRejectsPartialInputOverlapWithoutDereferencingIt_Test8TestBodyEv+0x35e): undefined reference to `nx_lptim_request_prepare'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:264:(.text._ZN12_GLOBAL__N_169NativeTime_SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm_Test8TestBodyEv+0xb4): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:267:(.text._ZN12_GLOBAL__N_169NativeTime_SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm_Test8TestBodyEv+0x22b): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:270:(.text._ZN12_GLOBAL__N_169NativeTime_SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm_Test8TestBodyEv+0x301): undefined reference to `nx_rtc_port_set'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:272:(.text._ZN12_GLOBAL__N_169NativeTime_SetInvalidatesOldDomainAndCannotMutateAnAcceptedAlarm_Test8TestBodyEv+0x43c): undefined reference to `nx_rtc_port_cancel'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_AlreadyMatchingAlarmIsRejectedWithoutEffects_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:280:(.text._ZN12_GLOBAL__N_160NativeTime_AlreadyMatchingAlarmIsRejectedWithoutEffects_Test8TestBodyEv+0xa7): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:383:(.text._ZN12_GLOBAL__N_163NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test8TestBodyEv+0x5b): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:385:(.text._ZN12_GLOBAL__N_163NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test8TestBodyEv+0x114): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:388:(.text._ZN12_GLOBAL__N_163NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test8TestBodyEv+0x262): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:392:(.text._ZN12_GLOBAL__N_163NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test8TestBodyEv+0x47c): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:394:(.text._ZN12_GLOBAL__N_163NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test8TestBodyEv+0x5c3): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:396:(.text._ZN12_GLOBAL__N_163NativeTime_Full65536ShotWrapsCounterWithoutPublishingEarly_Test8TestBodyEv+0x677): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:458:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x81): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:459:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x10f): undefined reference to `nx_native_rtc_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:460:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x195): undefined reference to `nx_rtc_port_cancel'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:462:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x23b): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:464:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x362): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:465:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x406): undefined reference to `nx_native_rtc_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:466:(.text._ZN12_GLOBAL__N_162NativeTime_HeldRTCEventDoesNotOverrideEarlierCancellation_Test8TestBodyEv+0x484): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:529:(.text._ZN12_GLOBAL__N_168NativeTime_ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot_Test8TestBodyEv+0x98): undefined reference to `nx_rtc_port_set'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:533:(.text._ZN12_GLOBAL__N_168NativeTime_ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot_Test8TestBodyEv+0x20a): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:534:(.text._ZN12_GLOBAL__N_168NativeTime_ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot_Test8TestBodyEv+0x2a6): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:535:(.text._ZN12_GLOBAL__N_168NativeTime_ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot_Test8TestBodyEv+0x335): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:541:(.text._ZN12_GLOBAL__N_168NativeTime_ExhaustionRejectsSetButNeverAbandonsLastAcceptedShot_Test8TestBodyEv+0x4d3): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:577:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0xb2): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:578:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x16d): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:581:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x238): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:582:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x2f5): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:586:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x3d7): undefined reference to `nx_rtc_request_prepare'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:588:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x4ab): undefined reference to `nx_lptim_request_prepare'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:590:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x55f): undefined reference to `nx_rtc_port_read'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:593:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x61b): undefined reference to `nx_lptim_port_sample'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:598:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x828): undefined reference to `nx_rtc_port_cancel'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:599:(.text._ZN12_GLOBAL__N_164NativeTime_ActiveRequestCannotBePreparedAgainOrUsedAsOutput_Test8TestBodyEv+0x8c1): undefined reference to `nx_lptim_port_cancel'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_EqualityDeadlineRejectsBeforeBorrowOrSourceEffects_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:294:(.text._ZN12_GLOBAL__N_166NativeTime_EqualityDeadlineRejectsBeforeBorrowOrSourceEffects_Test8TestBodyEv+0x17f): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:295:(.text._ZN12_GLOBAL__N_166NativeTime_EqualityDeadlineRejectsBeforeBorrowOrSourceEffects_Test8TestBodyEv+0x252): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:315:(.text._ZN12_GLOBAL__N_174NativeTime_AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement_Test8TestBodyEv+0x78): undefined reference to `nx_rtc_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:316:(.text._ZN12_GLOBAL__N_174NativeTime_AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement_Test8TestBodyEv+0x11c): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:317:(.text._ZN12_GLOBAL__N_174NativeTime_AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement_Test8TestBodyEv+0x1bb): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:319:(.text._ZN12_GLOBAL__N_174NativeTime_AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement_Test8TestBodyEv+0x26b): undefined reference to `nx_native_rtc_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:321:(.text._ZN12_GLOBAL__N_174NativeTime_AlarmNeedsFutureBoundaryAndExplicitServiceBeforeSettlement_Test8TestBodyEv+0x3c8): undefined reference to `nx_rtc_port_service'
+/usr/bin/ld: tests/contracts/google/CMakeFiles/nexus_rtc_lptim_test.dir/rtc_lptim_test.cpp.o: in function `(anonymous namespace)::NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test::TestBody()':
+/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:420:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x4f): undefined reference to `nx_lptim_port_submit'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:421:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x104): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:422:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x19f): undefined reference to `nx_native_lptim_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:423:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x243): undefined reference to `nx_lptim_port_cancel'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:427:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x493): undefined reference to `nx_native_lptim_model_advance'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:429:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x5ea): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:430:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x699): undefined reference to `nx_lptim_port_cancel'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:431:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x745): undefined reference to `nx_native_lptim_model_hold_withdraw'
+/usr/bin/ld: /tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_test.cpp:433:(.text._ZN12_GLOBAL__N_162NativeTime_HeldCancelKeepsBorrowAndReportsFinalSevenTicks_Test8TestBodyEv+0x894): undefined reference to `nx_lptim_port_service'
+/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.

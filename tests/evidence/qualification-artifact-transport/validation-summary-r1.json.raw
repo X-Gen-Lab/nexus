@@ -1,0 +1,320 @@
+{
+  "boundary": "transport bytes/modes/context consistency only; actual GitHub API artifacts/final job and inner qualification validators remain independent; historic809844813B ZIP remains unavailable",
+  "final": {
+    "all_workflow_actionlint": "actual0 with locked1.7.12; shellcheck/pyflakes disabled per maintained DSL policy",
+    "fail": 0,
+    "full_five_file_maintained_text_check": true,
+    "python_asts": 3,
+    "skip": 0,
+    "unit_tests": 28,
+    "workflow_tests": 52
+  },
+  "limits": {
+    "feature_allocated_cap": 4194304,
+    "jobs": 1,
+    "no_SDK_OCI_ARM_HIL_or_remote_run": true,
+    "test_output_cap": 33554432
+  },
+  "qualified": false,
+  "stages": [
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "actionlint-r1",
+      "record": {
+        "bytes": 3161,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/actionlint-r1.json",
+        "sha256": "c0bdd4b64307cd92f7c7d5dab2dc81f79c1c39343234dd9b6adfefc12486932a"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "actionlint-r2",
+      "record": {
+        "bytes": 3161,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/actionlint-r2.json",
+        "sha256": "6e367e43cc7e25ac85ceae0cc63ea46222e535410e0a00b5ca373f2972c8ab9a"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "tiny real rehashed core/source mismatch accepted; probe exits1, not hardware or SDK proof",
+      "index_stable": true,
+      "name": "core-binding-probe-r1",
+      "record": {
+        "bytes": 3169,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/core-binding-probe-r1.json",
+        "sha256": "db5de8bc017bb86db96f7e587aae4a8a9e9a44b1b6e60a2414763b1c245edaf4"
+      },
+      "returncode": 1,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "final-unit-r1",
+      "record": {
+        "bytes": 3161,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-unit-r1.json",
+        "sha256": "bd826dc6f83b42a60deb0882e5c546980455d23a11aef36ad619e517ade8abdd"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "final-unit-r2",
+      "record": {
+        "bytes": 3161,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-unit-r2.json",
+        "sha256": "9fa4afe4f0b287cdd9d46237d735841fe63ad34b6caeb158736a22b0f6cc2463"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "final-workflow-r1",
+      "record": {
+        "bytes": 3165,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-workflow-r1.json",
+        "sha256": "8e48e372a63bdbb95859df99a0a15691bdeeef7f752067f84ff92dca44c2a8f6"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "final-workflow-r2",
+      "record": {
+        "bytes": 3165,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-workflow-r2.json",
+        "sha256": "214195c84e6f89ca2a54c0bdfc4237147c7dff0395d9335962ebc7027c13b90a"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "final-workflow-r3",
+      "record": {
+        "bytes": 3165,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/final-workflow-r3.json",
+        "sha256": "6ab555250b291327b38c0f02ee737f4ad7fd955bc9952db59e68cb59927a83fe"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "identity-closure-green-r1",
+      "record": {
+        "bytes": 3173,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/identity-closure-green-r1.json",
+        "sha256": "c136b3092dc865cb1dbe355222f9569672fccc68616cac0090c8e8e879dc46b3"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "whole28 exactly4 failures: context/job and archive/artifact binding",
+      "index_stable": true,
+      "name": "identity-closure-red-r1",
+      "record": {
+        "bytes": 3171,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/identity-closure-red-r1.json",
+        "sha256": "b83a15f97465d2a948ccffed4994511805a121e696dc4a5e5a5ec042fba7224d"
+      },
+      "returncode": 1,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "output-alias-green-r1",
+      "record": {
+        "bytes": 3169,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/output-alias-green-r1.json",
+        "sha256": "8a9200b3583224e3e0f6a437a317428826bceed5c3252b811bc94117b28e1749"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "whole24 exactly4 failures: protected control output3 and core join output1",
+      "index_stable": true,
+      "name": "output-alias-red-r1",
+      "record": {
+        "bytes": 3167,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/output-alias-red-r1.json",
+        "sha256": "b978a30ad1c2ea2d4cee46ea9c16eaecc99fbaeb8a5cc7326625c726ef66f774"
+      },
+      "returncode": 1,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "parser-green-r1",
+      "record": {
+        "bytes": 3163,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/parser-green-r1.json",
+        "sha256": "c033975e9fa8e4f6208c73776987392ddda70d753d4f8661c797deeeca0588c3"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "whole18 exactly2 fails: boolean ordinal and empty upload receipt",
+      "index_stable": true,
+      "name": "parser-red-r1",
+      "record": {
+        "bytes": 3161,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/parser-red-r1.json",
+        "sha256": "6b16c89c219d9102c1f57f8cf1dca83ab70923208e1c82446f38f69242528b79"
+      },
+      "returncode": 1,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "source-check-r1",
+      "record": {
+        "bytes": 3163,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/source-check-r1.json",
+        "sha256": "f92f6fdf08ce9292c5c2e9a4bc567c0d713bf9ecb9698efc14b827d921e4351d"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "source-check-r2",
+      "record": {
+        "bytes": 3163,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/source-check-r2.json",
+        "sha256": "d7107067c9083886eab8769404f79b195118987caa2f64a6dcb9c8c4d905fb05"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "new capability first coverage whole16; ResourceWarning observed and then closed; not a behavior RED",
+      "index_stable": true,
+      "name": "unit-firstcoverage-r1",
+      "record": {
+        "bytes": 3169,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/unit-firstcoverage-r1.json",
+        "sha256": "ad7b8e2a9f51d77dbb3f7a6082248c2e65571d20e84b802825070aa7205e776f"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "unit-green-r2",
+      "record": {
+        "bytes": 3161,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/unit-green-r2.json",
+        "sha256": "64608da09dde3ac3999826a676760ee27fd74a559d9ce44d1a12529af609fe00"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "whole22 exactly1 fail: reused artifact ID",
+      "index_stable": true,
+      "name": "upload-identity-red-r1",
+      "record": {
+        "bytes": 3170,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/upload-identity-red-r1.json",
+        "sha256": "7da60adec17362f718b24499c06e4c6456bbb9968907fe5ecdc543dff1bd23fd"
+      },
+      "returncode": 1,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "workflow-green-r1",
+      "record": {
+        "bytes": 3165,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/workflow-green-r1.json",
+        "sha256": "dbaca7b0eb3dcec0be7902053c7b4aa92573a706d961aeb6cba6165bbb16b09f"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "actual bounded scope; retain historical source identity, not final qualification",
+      "index_stable": true,
+      "name": "workflow-green-r2",
+      "record": {
+        "bytes": 3165,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/workflow-green-r2.json",
+        "sha256": "a7dc0d4ada7e82d0b5185a99189b01f4cd1b47c92292b24b3908ce470d4b2975"
+      },
+      "returncode": 0,
+      "source_stable": true
+    },
+    {
+      "classification": "mixed setup/path/dependency plus new delivery contract failure; not accepted pure behavior RED",
+      "index_stable": true,
+      "name": "workflow-red-r1",
+      "record": {
+        "bytes": 3091,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/workflow-red-r1.json",
+        "sha256": "614d7de4604b42d3390443ed8fae860bc4e268f86338b933d5b8a23cebcea83a"
+      },
+      "returncode": 1,
+      "source_stable": true
+    },
+    {
+      "classification": "whole49, exactly one new delivery-contract failure; accepted delivery RED",
+      "index_stable": true,
+      "name": "workflow-red-r2",
+      "record": {
+        "bytes": 3163,
+        "mode": 384,
+        "path": "/dev/shm/nexus-qualification-transport-feature-20261018-r1/runs/workflow-red-r2.json",
+        "sha256": "775c578e2fb6f473e4d978e17a723395c667968a5b1fdcfacc3dabd635e18e23"
+      },
+      "returncode": 1,
+      "source_stable": true
+    }
+  ]
+}

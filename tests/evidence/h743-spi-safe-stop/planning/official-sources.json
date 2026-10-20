@@ -1,0 +1,144 @@
+{
+  "kind": "S0.2 read-only official-source review; not executed TDD",
+  "production_writes": false,
+  "source": {
+    "soc/stm32h743/drivers/spi.c": {
+      "bytes": 13287,
+      "sha256": "d4d24ecb573f6090b2a371c3d6fc84db0402f224727b9e2b08d8954ac54c7faa"
+    },
+    "soc/stm32h743/private/stm32h743_provider.h": {
+      "bytes": 12789,
+      "sha256": "849b4e47b203cd8dffe95e635606421fc1022771e196c8cb7943c313b1ba729d"
+    },
+    "tests/google/h743_model.h": {
+      "bytes": 6393,
+      "sha256": "11c0f74912a4c95e402af3e656344e6013756964326d034810a4232656ae8f15"
+    },
+    "tests/google/h743_model.cpp": {
+      "bytes": 16907,
+      "sha256": "3877086d3448d19ab334225c957153c5935cdb34ce903b3215cba3e29a7ffd09"
+    },
+    "tests/google/h743_peripheral_test.cpp": {
+      "bytes": 14111,
+      "sha256": "8afbf735b2d30160fab593ffe0d3ac2568da7a6c26d02444d64753f6d0f1eeee"
+    },
+    "tools/configure/providers/stm32h743/bindings.py": {
+      "bytes": 18264,
+      "sha256": "8211df2a6f05c83bcbac31ecd7187b9dac5aac502384302b2e229d3486d18395"
+    },
+    "tools/configure/providers/stm32h743/emission.py": {
+      "bytes": 15833,
+      "sha256": "657c3e95eb3f30c827a3492fc2e68e8a45e48fd633387885e3c9ebf56e12dd82"
+    },
+    "boards/stm32h743zi_hsi_reference/board.json": {
+      "bytes": 3023,
+      "sha256": "c64c2417658067bae417e1906c92f656780884246ae2ada5ce0d78f2b47a492f"
+    },
+    "soc/stm32h743/routes.json": {
+      "bytes": 7010,
+      "sha256": "d243047b47d68cfa1abf52811acbb43abb6d1824177239d90412a0ea6d331127"
+    },
+    "vendors/st/stm32h7_hal/Inc/stm32h7xx_ll_spi.h": {
+      "bytes": 125330,
+      "sha256": "637d0822e248429fd87182786f1e727860dc52645440405642e08f5df13bf565"
+    },
+    "vendors/st/stm32h7_hal/Src/stm32h7xx_hal_spi.c": {
+      "bytes": 128641,
+      "sha256": "4eeb322662c6fc531e42da9eef1474b6b32221f848dd7ec4fb0c4f0c408a013b"
+    }
+  },
+  "observed_git_HEAD": "fc93be77d64dcd160886cb3b4c9c23ccbb943b59",
+  "HEAD_note": "Root integration/hook is in progress; source SHA is observed dirty input, not a new committed identity",
+  "downloads": {
+    "proxy_environment_preserved": true,
+    "CA_environment_preserved": true,
+    "rows": [
+      {
+        "url": "https://www.st.com/resource/en/reference_manual/rm0433-stm32h742-stm32h743753-and-stm32h750-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+        "path": "/tmp/nexus-h743-spi-s0-2-official-20261018/rm0433.pdf",
+        "error": "source size cap"
+      },
+      {
+        "url": "https://www.st.com/resource/en/errata_sheet/es0392-stm32h742xig-stm32h743xig-stm32h750xb-and-stm32h753xi-device-limitations-stmicroelectronics.pdf",
+        "path": "/tmp/nexus-h743-spi-s0-2-official-20261018/es0392.pdf",
+        "resolved_url": "https://www.st.com/resource/en/errata_sheet/es0392-stm32h742xig-stm32h743xig-stm32h750xb-and-stm32h753xi-device-limitations-stmicroelectronics.pdf",
+        "status": 200,
+        "bytes": 3278533,
+        "sha256": "effe23b2b79ec4ee33a8ab42b1b934cdd34100775cd6ca6b8dc8f3f2f01a1f9e",
+        "content_type": "application/pdf",
+        "pdftotext_exit": 0
+      },
+      {
+        "url": "https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/v4.2.0/drivers/spi/spi_ll_stm32.c",
+        "path": "/tmp/nexus-h743-spi-s0-2-official-20261018/zephyr-v4.2.0-spi_ll_stm32.c",
+        "resolved_url": "https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/v4.2.0/drivers/spi/spi_ll_stm32.c",
+        "status": 200,
+        "bytes": 45909,
+        "sha256": "25be3544523ecb689f20d8ea51b9d6c9fd1141f8f1a1981618b0bd1f953fb09e",
+        "content_type": "text/plain; charset=utf-8"
+      }
+    ]
+  },
+  "rm_attempt2": {
+    "attempt": 2,
+    "url": "https://www.st.com/resource/en/reference_manual/rm0433-stm32h742-stm32h743753-and-stm32h750-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "proxy_CA_environment_preserved": true,
+    "resolved_url": "https://www.st.com/resource/en/reference_manual/rm0433-stm32h742-stm32h743753-and-stm32h750-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "status": 200,
+    "bytes": 66378901,
+    "sha256": "672a9433d6602da224e5215f571beed2be0e683cb025526f4afe9db61c26b6a0",
+    "pdftotext_exit": 0
+  },
+  "zephyr": {
+    "tag": "v4.2.0",
+    "commit": "413b789deb391d3a37d06b463288a5fe765ee57e",
+    "lsremote_sha256": "5da61b9e675b957222bd26746cbc8b5ca350c9890a87e05781a111ee60827379",
+    "spi_ll_stm32.c": {
+      "url": "https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/413b789deb391d3a37d06b463288a5fe765ee57e/drivers/spi/spi_ll_stm32.c",
+      "sha256": "25be3544523ecb689f20d8ea51b9d6c9fd1141f8f1a1981618b0bd1f953fb09e",
+      "bytes": 45909
+    },
+    "tag_and_commit_source_equal": true,
+    "spi_ll_stm32.h": {
+      "url": "https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/413b789deb391d3a37d06b463288a5fe765ee57e/drivers/spi/spi_ll_stm32.h",
+      "sha256": "2da713a0133aab33e5b73271135ebbe2c5777d8cb772603b97f265b034ee921a",
+      "bytes": 6136
+    }
+  },
+  "rm_text_sha256": "7b142be592dfa60b2e977691f8c26cf05709fe73d194f6accebbed8df9499949",
+  "es_text_sha256": "d366eedc7a4fb4ea32aec4719c659b9e78fdc03d966066a0a42cd2f100b7c246",
+  "official_facts": [
+    {
+      "reference": "RM0433 Rev9 \u00a750.4.9 p2171; text155148..155151",
+      "fact": "AFCNTR drives associated outputs independent of SPE; later CFG1/CFG2 changes can change pin levels."
+    },
+    {
+      "reference": "RM0433 Rev9 \u00a750.4.12 p2177; text155447..155498",
+      "fact": "Drain final TXC/EOT or suspended CSTART0; read RXFIFO empty; only then disable. TSIZE>0 EOT/TXC are equal."
+    },
+    {
+      "reference": "RM0433 Rev9 SPI_CR1 p2216; text157951..157969",
+      "fact": "CSUSP reads0; accepted request clears CSTART at the end of current frame; SUSP proves end of frame."
+    },
+    {
+      "reference": "RM0433 Rev9 SPI_SR p2225; text158405..158422",
+      "fact": "TSIZE>0 TXC copies EOT; clear SUSP before SPE disable."
+    },
+    {
+      "reference": "RM0433 Rev9 SPI_CFG2 AFCNTR; text158207..158215",
+      "fact": "AFCNTR0 releases GPIO control at SPE0; AFCNTR1 keeps associated AF outputs at current configured state."
+    },
+    {
+      "reference": "ES0392 Rev15 \u00a72.22.5/6 p46; text2790..2820",
+      "fact": "Keep CRCSIZE7 with disabled CRC/nonzeroTSIZE; delay after EOT before disable to avoid trailing SCK truncation."
+    },
+    {
+      "reference": "locked HAL a1996ee SPI Abort lines2605..2647",
+      "fact": "Request CSUSP, observe CSTART clear, clear/check SUSP; complete helper disables SPE/IT/DMA. Its timeout fallback is not Nexus borrowed-frame proof."
+    },
+    {
+      "reference": "Zephyr v4.2.0 commit413b789 spi_ll_stm32.c:491..544 and .h:186..238",
+      "fact": "Wait actual busy/EOT/TXC then deassert GPIO CS before disabling SPI; FIFO flush/readback helper. No automatic adoption of its unbounded loops or a new reset/pin guarantee."
+    }
+  ]
+}

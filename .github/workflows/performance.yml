@@ -4,12 +4,45 @@ on:
   schedule:
     - cron: '0 2 * * 1'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Existing profiles or explicit nonpublishing qualification
+        type: choice
+        default: profiles
+        options:
+          - profiles
+          - qualification-only
+      expected_commit:
+        description: Exact source SHA; must equal this workflow commit
+        type: string
+        default: ''
+      qualification_assembly:
+        description: Explicit maintained TOML for two offline builds
+        type: string
+        default: tools/configure/assemblies/qiming-baremetal.toml
+      qualification_workload:
+        description: Explicit workload for the declared offline tuple
+        type: choice
+        default: gpio
+        options:
+          - empty
+          - gpio
+          - uart
+          - spi
 
 permissions:
   contents: read
 
 jobs:
+  qualification:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'qualification-only'
+    uses: ./.github/workflows/software-qualification.yml
+    with:
+      expected_commit: ${{ inputs.expected_commit }}
+      qualification_assembly: ${{ inputs.qualification_assembly }}
+      qualification_workload: ${{ inputs.qualification_workload }}
   profiles:
+    if: github.event_name == 'schedule' || inputs.mode == 'profiles'
     name: Linked costs (${{ matrix.board }})
     runs-on: ubuntu-24.04
     timeout-minutes: 60

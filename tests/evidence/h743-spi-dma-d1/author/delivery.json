@@ -1,0 +1,227 @@
+{
+  "kind": "D1 private finite HSI64/cacheoff byte-DMA software delivery; independent review pending",
+  "source_freeze_sha256": "bb812f45a61ad671c199868c3544d39baeec523b67c5e1eef0988397ab2ca240",
+  "whole_programs": [
+    {
+      "stage": "pending-error47-model-whole-green",
+      "receipt_sha256": "3510c5e299923e9f3f8e272921d24055d8f4ad5c8009901ac09f5d836578e0d1",
+      "binary_sha256": "48c083551f93585043b36b2848aa69801f1b1beba97241cc83295eb9bdf9df3b",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/pending-error47-model-whole-green/junit.xml",
+        "sha256": "03e298db7c55a844661f381411574945956692c815979af60aa2c8e982577cc4",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-spi_wire",
+      "receipt_sha256": "cd4da0457712142cc89ac0a30f55ea3041dcad0cde4bc1307826a6ba4afdd69d",
+      "binary_sha256": "3231265183ba5d6b3c70bb5c48aae48d4d20599307d648bd76cabc7e219ee0b4",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-spi_wire/junit.xml",
+        "sha256": "b17533dccce5a003b7be1cf05b44f47fcab188c9001799eedebca578b7111ee2",
+        "fresh": true,
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-peripheral",
+      "receipt_sha256": "207795393bff0294316b2d9ad7464de3f36b1658f1a437d1ac2ec279c35db462",
+      "binary_sha256": "1fed4fb9f3f71aa5435629011199dd825e551436b02d0e815c0dd789584720ea",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-peripheral/junit.xml",
+        "sha256": "e231894003eff1c644a1134713ed5cded76b670a84835b1ab7ec970f8e5ad9b9",
+        "fresh": true,
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-system",
+      "receipt_sha256": "b7183c7988c0fed0be646e8ae10a8675b2764b9e9f381794b16ee2c8d2ca2e52",
+      "binary_sha256": "a29cec153c9ac018873fe7af4ea4ce13ea6031e54b5c2cfb6ea4d6695676ca01",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-system/junit.xml",
+        "sha256": "3484a5574698938b0803d2dc22940f7f44415cab6e1a347afa28c367c7ec1401",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-clock",
+      "receipt_sha256": "8f1f5f4a0e85f032a6e84da7e34312d057008fe42f4dfaa934dac841b6d6ab70",
+      "binary_sha256": "62e31d256ce67c7a1b0be7a5c03ab102bef7c6fdeba2c6597392708fae6a9878",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-clock/junit.xml",
+        "sha256": "a05a30ed0ed62245357821ef4e280ac484a14698cc8ae8f06ecabc20c5bf4516",
+        "fresh": true,
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-high_kernel",
+      "receipt_sha256": "be36060c182c771d21800494b71179e194cd2eeb1373b4d190b3df7a7856e086",
+      "binary_sha256": "16bd59ec07ed6da3a8eb02c57cb3f40c649716ba6023493727b983fb1ddbea20",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-high_kernel/junit.xml",
+        "sha256": "79001a9ff082b563245c84faf278a6dac4039f6b8575e9e6b8d0e9261307b470",
+        "fresh": true,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-high_factory",
+      "receipt_sha256": "8ddc0fa13f89ab108ee70c62153698e39ad5c2c4450b199bc2a306aac5bb8f02",
+      "binary_sha256": "dbf5836962c1842a2a2ee913b2e526deb1230a7088f7e2832f9d054e2f1b9bed",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-high_factory/junit.xml",
+        "sha256": "528057dce8e8fb6baac04ae369a1124ff06b22891f0e654a500afd2d2b5b2146",
+        "fresh": true,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-peripheral_factory",
+      "receipt_sha256": "40b52b5498ad8cab7b04b8dc2e3050711f3ec852712833afab844ce012178a52",
+      "binary_sha256": "8e6415136afe2c8abe2c28c325c5af283cb56d1d2f71a73181efd58e8421cadc",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-dma-d1-evidence/final-whole-peripheral_factory/junit.xml",
+        "sha256": "01dc9c1287f93951fc73312f968686afa9174121f42f1e1c7220cb4155072803",
+        "fresh": true,
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    }
+  ],
+  "whole_program_count": 8,
+  "whole_cases": 262,
+  "legacy_whole_cases": 215,
+  "new_whole_cases": 47,
+  "python": {
+    "tests": 7,
+    "subtests": 23,
+    "receipt_sha256": "4137e471b4e92e73d112e35f6ab867b5e53a101745956a385c9ca7e07fabfda6"
+  },
+  "style": {
+    "explicit_source_count": 5,
+    "comment_strict": true,
+    "tracked_cmake_text": true,
+    "new_cmake_whitespace": true,
+    "receipt_sha256": "e298dda7e908b1d25be4e317f4642d18688c0b306c2d6a6dab7412b64d993f4e",
+    "full_staged_gate": false
+  },
+  "historical_stage_classification": {
+    "first-api-build": "setup compile failure; configure/build started with 4.4s overlap; no RED qualification",
+    "strict-api-link-red": "strictly sequential same setup compile failure; no behavior RED",
+    "strict-api-link-red-r2": "real five-symbol missing-backend link RED; 39 authored, no runtime ELF/XML",
+    "first-whole-39": "actual39/38passed/onecase2assert fixture errors, not production regression",
+    "corrected-first-whole39": "same production after external fixture corrections; first39 coverage GREEN",
+    "review-gaps42-build-red": "authoring setup left old39/no-op build, not42 RED",
+    "gaps42-whole-red": "real42 production regression RED two cases/14 assertions",
+    "gaps42-whole-green": "minimal cold/resource IRQ-domain fixes; actual42 GREEN",
+    "whole": "runner argument misuse actual exit2; setup only",
+    "cleanup45-whole-red": "real45 production regression RED two cases/four assertions",
+    "cleanup45-whole-green": "first cleanup error locked without erasing earlier cause; actual45 GREEN",
+    "submit-taint46-whole-red": "real46 production regression RED one case/three assertions",
+    "submit-taint46-whole-green": "observed borrowed-domain violation sticky, second request remains READY/no loan; actual46 GREEN",
+    "pending-error47-model-whole-red": "actual47 one assertion external model EN0-before-pending-write-completion mismatch; fixture RED only",
+    "pending-error47-model-whole-green": "only model corrected to keep EN1 until pending memory commit; production unchanged; actual47 GREEN"
+  },
+  "evidence_zip_sha256": "9bedfc2ade20ebb569a07f7dc3b1fa2c85731f0346b1be6b6431a68eec60fed9",
+  "transport_map_sha256": "d02de7ba18f23055bf2409c81266309e2c66fe14f9d4dc543bfb863796277c03",
+  "retained_eight": {
+    "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8",
+    "files": [
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_clock_test",
+        "bytes": 2601544,
+        "sha256": "62e31d256ce67c7a1b0be7a5c03ab102bef7c6fdeba2c6597392708fae6a9878"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_high_factory_test",
+        "bytes": 3129928,
+        "sha256": "dbf5836962c1842a2a2ee913b2e526deb1230a7088f7e2832f9d054e2f1b9bed"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_high_kernel_test",
+        "bytes": 3176496,
+        "sha256": "16bd59ec07ed6da3a8eb02c57cb3f40c649716ba6023493727b983fb1ddbea20"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_peripheral_factory_test",
+        "bytes": 3123488,
+        "sha256": "8e6415136afe2c8abe2c28c325c5af283cb56d1d2f71a73181efd58e8421cadc"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_peripheral_test",
+        "bytes": 3068912,
+        "sha256": "1fed4fb9f3f71aa5435629011199dd825e551436b02d0e815c0dd789584720ea"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_spi_dma_test",
+        "bytes": 2869816,
+        "sha256": "48c083551f93585043b36b2848aa69801f1b1beba97241cc83295eb9bdf9df3b"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_spi_wire_test",
+        "bytes": 2692688,
+        "sha256": "3231265183ba5d6b3c70bb5c48aae48d4d20599307d648bd76cabc7e219ee0b4"
+      },
+      {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-final8/nexus_h743_system_test",
+        "bytes": 2785608,
+        "sha256": "a29cec153c9ac018873fe7af4ea4ce13ea6031e54b5c2cfb6ea4d6695676ca01"
+      }
+    ],
+    "build_allocated": 312631296,
+    "delta": 60088320
+  },
+  "bounds": {
+    "feature_allocated_now": 872448,
+    "feature_limit": 1048576,
+    "tmp_build_allocated": 312676352,
+    "tmp_build_baseline": 252542976,
+    "tmp_build_delta": 60133376,
+    "tmp_increment_limit": 67108864,
+    "tmp_free": 389992448,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "limitations": [
+    "private D1 not admitted production configuration/factory/catalog",
+    "no ARM/current installed SDK/HIL qualification",
+    "mmap/fork kill only parent process handling, never provider cleanup",
+    "lifetime gate/cache/clock/pin/region/vector ownership are trusted static caller preconditions; sampling taints actual observed violations, not full history detection",
+    "host MMIO bounds only normal returning IRQ/service; unisolatable IRQ takes nonreturning masked fault boundary",
+    "old S0 and W1 historical packets unchanged; no old qualification inherited"
+  ]
+}

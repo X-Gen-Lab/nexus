@@ -2,9 +2,12 @@
 try:
     from ...emission import dma_regions
     from ...gpio_phase import rollback_pin, withdraw_pin
+    from ... import enhanced_endpoints, uart_formats
 except ImportError:
     from emission import dma_regions
     from gpio_phase import rollback_pin, withdraw_pin
+    import enhanced_endpoints
+    import uart_formats
 from ..common import Construction, controller_ir, mode_traits
 from .. import hardware
 try:
@@ -116,23 +119,30 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         name = _symbol(item["id"])
         traits = mode_traits(kind, item.mode)
         blocks, receive = traits.block_stream, traits.rx_dma
+        words = item.mode == "irq-words"
         profile = 'NX_UART_RX_EVENTS' if item.options.rx_profile == "events" else 'NX_UART_RX_BYTES'
-        storage = 'nx_uart_rx_event_t' if item.options.rx_profile == "events" else 'uint8_t'
+        storage = ('uint16_t' if words else 'nx_uart_rx_event_t'
+                   if item.options.rx_profile == "events" else 'uint8_t')
         capacity = (item.options.rx_capacity or 0)
         if not blocks:
             declarations.append(f"static {storage} s_nx_rx_{name}[{capacity}];")
         descriptor = item["controller"].lower()
         dma = traits.tx_dma
         prefix = []
-        if receive:
+        if words:
+            call = (f"nx_gd32_uart_word_initialize(&s_nx_port_{name}, "
+                    f"&nx_gd32_{descriptor}_controller, {item.options.baud}u, "
+                    f"s_nx_rx_{name}, {capacity}u, {item.options.irq.priority}u)")
+        elif receive:
             from . import _FIXED_DMA
             if tuple(item.get("dma", ())) != _FIXED_DMA.get((item["controller"], item.mode)):
                 raise ValueError("UART DMA differs from its reviewed fixed route")
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
-            prefix = [f"    s_nx_port_{name}.transmit.regions = s_nx_dma_regions_{name};",
-                      f"    s_nx_port_{name}.transmit.region_count = {region_count}u;",
-                      f"    s_nx_port_{name}.continuous = {'true' if traits.continuous else 'false'};"]
+            receive_state = f"s_nx_port_{name}" + (".receive" if dma else "")
+            prefix = [f"    {receive_state}.resources.regions = s_nx_dma_regions_{name};",
+                      f"    {receive_state}.resources.region_count = {region_count}u;",
+                      f"    {receive_state}.continuous = {'true' if traits.continuous else 'false'};"]
             receive_impl = "uart_duplex" if dma else "uart_receive"
             call = (f"nx_gd32_{receive_impl}_initialize(&s_nx_port_{name}, "
                     f"{item.options.baud}u, {item.options.irq.priority}u)")
@@ -142,39 +152,55 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
         elif dma:
             region_lines, region_count = dma_regions(name, result)
             declarations += region_lines
-            prefix = [f"    s_nx_port_{name}.regions = s_nx_dma_regions_{name};",
-                      f"    s_nx_port_{name}.region_count = {region_count}u;"]
+            prefix = [f"    s_nx_port_{name}.resources.regions = s_nx_dma_regions_{name};",
+                      f"    s_nx_port_{name}.resources.region_count = {region_count}u;"]
             call = (f"nx_gd32_uart_dma_initialize(&s_nx_port_{name}, "
                     f"{item.options.baud}u, {profile}, s_nx_rx_{name}, {capacity}u, {item.options.irq.priority}u)")
         else:
             call = (f"nx_gd32_uart_initialize_at(&s_nx_port_{name}, &nx_gd32_{descriptor}_controller, "
                     f"{item.options.baud}u, {profile}, s_nx_rx_{name}, {capacity}u, {item.options.irq.priority}u)")
+            if uart_formats.changed(item):
+                call = (f"nx_gd32_uart_initialize_format_at(&s_nx_port_{name}, "
+                        f"&nx_gd32_{descriptor}_controller, "
+                        f"{item.options.baud}u, {profile}, s_nx_rx_{name}, "
+                        f"{capacity}u, {item.options.irq.priority}u, "
+                        f"{uart_formats.expression(item.options.frame)})")
         prepare = prepared(name, [(pin, 2, 1, False, None) for pin in item["pins"]], call)
         position = prepare.index(f"    status = {call};")
         prepare[position:position] = prefix
+        if words or uart_formats.changed(item):
+            rejected = prepare.index(f"    status = {call};") + 1
+            prepare[rejected:rejected + 1] = [
+                "    if (status != NX_SUCCESS) {",
+                f"        if (s_nx_port_{name}.initialized) {{ return status; }}",
+                "        goto rollback;", "    }"]
         declarations += prepare
-        declarations += released(name, item["pins"], f"nx_uart_port_stop(&s_nx_face_{name})")
+        stop_function = "nx_uart_word_port_stop" if words else "nx_uart_port_stop"
+        declarations += released(name, item["pins"],
+                                 f"{stop_function}(&s_nx_face_{name})")
         vector = item["controller"] + "_IRQHandler"
-        irq_implementation = ("uart_duplex" if receive and dma else
+        irq_implementation = ("uart_word" if words else
+                              "uart_format" if uart_formats.changed(item) else
+                              "uart_duplex" if receive and dma else
                               "uart_receive" if receive else
                               "uart_dma_uart" if dma else
                               "uart_stream" if blocks else "uart")
+        irq_call = uart_formats.irq_call(item, f"nx_gd32_{irq_implementation}_irq(&s_nx_port_{name});")
         declarations += [f"void {vector}(void);",
                          "/** \\brief Fixed generated UART controller dispatch. */",
-                         f"void {vector}(void) {{ nx_gd32_{irq_implementation}_irq(&s_nx_port_{name}); }}"]
+                         f"void {vector}(void) {{ {irq_call} }}"]
         if receive:
             port_binding = hardware.maintained("gd32f470", item.controller)
             vector = hardware.dma_vector("gd32f470", port_binding.dma("rx-dma-idle")[0])
             declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact selected GD DMA RX publisher. */",
-                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_receive_dma_irq(&s_nx_port_{name}); }}"]
-        dma_state = f"s_nx_port_{name}" + (".transmit" if receive else "")
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_receive_dma_irq(&{receive_state}); }}"]
         if dma:
             port_binding = hardware.maintained("gd32f470", item.controller)
             vector = hardware.dma_vector("gd32f470", port_binding.dma("dma-tx")[0])
             declarations += [f"void {vector}_IRQHandler(void);",
                              "/** \\brief Exact GD USART0 TX DMA terminal observation. */",
-                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_dma_irq(&{dma_state}); }}"]
+                             f"void {vector}_IRQHandler(void) {{ nx_gd32_uart_{'duplex_dma' if receive else 'dma'}_irq(&s_nx_port_{name}); }}"]
         initialize = f"prepare_{name}()"
         stop = [f"stop_{name}()"]
     elif kind == "spi":
@@ -211,7 +237,8 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
             endpoint = f"s_nx_endpoint_{name}" if index == 0 else f"s_nx_endpoint_{child_name}"
             if index:
                 declarations.append(f"static nx_gd32_{implementation}_endpoint_state_t {endpoint};")
-            declarations += _endpoint_face("spi", child_name, endpoint, implementation)
+            declarations += enhanced_endpoints.face(
+                child, endpoint, f"nx_gd32_{implementation}_endpoint_ops", "gd32")
             base = endpoint + (".endpoint" if dma else "")
             # Every endpoint retains its own reviewed CS. No first-child bus alias.
             after += [f"    {base}.cs_gpio = {cs_gpio};", f"    {base}.cs_mask = {cs_mask}u;"]
@@ -407,25 +434,29 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
     return Construction(
         state_type=f"nx_gd32_{implementation}_state_t",
         definitions=declarations, initialize=initialize, stop=stop,
-        retain_on_failed_init=kind == "exti")
+        retain_on_failed_init=(kind == "exti" or kind == "uart" and
+                               (item.mode == "irq-words" or
+                                uart_formats.changed(item))))
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Emit one reviewed GD32 instance, including explicit GPIO construction."""
     item = controller_ir(item, "gd32f470")
     if secondary_controllers.applies(item, result, "gd32"):
-        return secondary_controllers.constructor(item, result, "gd32")
+        construction = secondary_controllers.constructor(item, result, "gd32")
+        return enhanced_endpoints.dma_construction(item, construction, "gd32")
     if item.kind in timer_advanced.KINDS:
         return timer_advanced.constructor(item, result, "gd32")
     if item.kind == "can":
         return can.constructor(item, result, "gd32")
-    if item.kind == "eth":
+    if item.kind in {"eth", "eth_frames"}:
         return ethernet.constructor(item, result, "gd32")
     if item.kind == "usb_device":
         return usb_device.constructor(item, result, "gd32")
     if item.kind != "gpio":
-        return _controller_constructor(item, result, board_bindings, routes,
-                                       devices)
+        construction = _controller_constructor(
+            item, result, board_bindings, routes, devices)
+        return enhanced_endpoints.dma_construction(item, construction, "gd32")
     name = _symbol(item.id)
     index = ord(item["pins"][0]["pin"][1]) - ord("A")
     mask = item.options.mask or sum(1 << int(pin["pin"][2:])

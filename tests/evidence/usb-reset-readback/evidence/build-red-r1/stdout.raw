@@ -1,0 +1,38 @@
++ /tmp/nexus-io-validation-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_usb_device_test --parallel 1
+[0/2] Re-checking globbed directories...
+[1/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/time.c.o
+[2/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/gpio.c.o
+[3/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart.c.o
+[4/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/uart_word.c.o
+[5/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi.c.o
+[6/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/i2c.c.o
+[7/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/flash.c.o
+[8/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/watchdog.c.o
+[9/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/exti.c.o
+[10/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/timer.c.o
+[11/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/adc.c.o
+[12/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_async.c.o
+[13/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/spi_dma_transaction.c.o
+[14/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/stream.c.o
+[15/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/can.c.o
+[16/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet.c.o
+[17/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/ethernet_frames.c.o
+[18/26] Building C object io/CMakeFiles/nexus_io_native.dir/native/usb_device.c.o
+[19/26] Building C object io/CMakeFiles/nexus_can_native_engine.dir/src/can_controller.c.o
+[20/26] Building C object io/CMakeFiles/nexus_eth_native_engine.dir/src/eth_mac.c.o
+[21/26] Building C object io/CMakeFiles/nexus_eth_frames_native_engine.dir/src/eth_frames_mac.c.o
+[22/26] Building C object io/CMakeFiles/nexus_usb_native_engine.dir/src/usb_device_controller.c.o
+[23/26] Linking C static library lib/libnexus_io_native.a
+[24/26] Building CXX object tests/contracts/google/CMakeFiles/nexus_usb_device_test.dir/usb_device_test.cpp.o
+FAILED: [code=1] tests/contracts/google/CMakeFiles/nexus_usb_device_test.dir/usb_device_test.cpp.o 
+/usr/bin/c++  -I/tmp/nexus-h743-fixed-hsi-s0-20261018/io/native -I/tmp/nexus-h743-fixed-hsi-s0-20261018/io/private -I/tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/generated -I/tmp/nexus-h743-fixed-hsi-s0-20261018/io/include -I/tmp/nexus-h743-fixed-hsi-s0-20261018/core/include -I/tmp/nexus-h743-fixed-hsi-s0-20261018/arch/include -isystem /tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock/include -isystem /tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googlemock -isystem /tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest/include -isystem /tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/_deps/googletest-6910c9d9165801d8827d628cb72eb7ea9dd538c5/googletest -g -std=c++17 -Os -ffunction-sections -fdata-sections -Wall -Wextra -Werror -Wpedantic -Wconversion -Wshadow -MD -MT tests/contracts/google/CMakeFiles/nexus_usb_device_test.dir/usb_device_test.cpp.o -MF tests/contracts/google/CMakeFiles/nexus_usb_device_test.dir/usb_device_test.cpp.o.d -o tests/contracts/google/CMakeFiles/nexus_usb_device_test.dir/usb_device_test.cpp.o -c /tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/usb_device_test.cpp
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/usb_device_test.cpp: In member function ‘virtual void UsbMmioFacts_RefusedAddressAndStallClearsPreserveSelectedHardwareBits_Test::TestBody()’:
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/usb_device_test.cpp:691:33: error: conversion from ‘unsigned int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Werror=conversion]
+  691 |     for (uint8_t mask : {1U, 16U}) {
+      |                                 ^
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/usb_device_test.cpp: In member function ‘virtual void UsbDevice_SetupKeepsControlAdmissionBlockedUntilBothStallsAreClear_Test::TestBody()’:
+/tmp/nexus-h743-fixed-hsi-s0-20261018/tests/google/usb_device_test.cpp:788:33: error: conversion from ‘unsigned int’ to ‘uint8_t’ {aka ‘unsigned char’} may change value [-Werror=conversion]
+  788 |     for (uint8_t mask : {1U, 16U}) {
+      |                                 ^
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.

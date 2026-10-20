@@ -1,0 +1,213 @@
+{
+  "schema": 1,
+  "kind": "host-navigation-orchestration-fix-local-tests-not-remote-qualification",
+  "closes_blocker_review": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/remote-software-qualification-code-independent-review-r1.json",
+    "sha256": "f296d2b3d904e8adc56b980ec5ff4820330ea73af7367a8a14def1eceb8a07a7"
+  },
+  "historical_blocked_freeze": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/source-and-execution-freeze-r1.json",
+    "bytes": 16524,
+    "sha256": "d5ca1eeeecd3a35787446354e5c6bfbd5787d6ee32b75c77d261a2e49642ea2b"
+  },
+  "historical_map": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/integration-manifest-r1.json",
+    "bytes": 65328,
+    "sha256": "64516d25c42a9b09af41812b168d566459da013bada8dc7f950cd861e2a4134d"
+  },
+  "all_original_158_mapped_leaves_verified_unchanged": true,
+  "root": "/tmp/nexus-io36-native-20261018",
+  "baseline_HEAD_and_index_remain_unchanged": true,
+  "sources": [
+    {
+      "expected_path": ".github/workflows/software-qualification.yml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/implementation-r2/.github/workflows/software-qualification.yml",
+      "bytes": 15520,
+      "sha256": "6402393134b489732549c67306c7b2e82825dac08236a4ac39b0730df2ca4a28"
+    },
+    {
+      "expected_path": ".github/workflows/performance.yml",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/first-production/.github/workflows/performance.yml",
+      "bytes": 3593,
+      "sha256": "26eddc2c2afd747addb52028746027119bc30abc0fa6726d87dc2c07829cd018"
+    },
+    {
+      "expected_path": ".github/workflows/test_platform_ci.py",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/tests-first-r2/.github/workflows/test_platform_ci.py",
+      "bytes": 56419,
+      "sha256": "57e801fd0b3133fdc8132118ec8016ff75b3e5be500a82b01c591d3d64134e8e"
+    }
+  ],
+  "actual_delta_paths": [
+    ".github/workflows/software-qualification.yml",
+    ".github/workflows/test_platform_ci.py"
+  ],
+  "performance_unchanged_from_r1": true,
+  "all_45_prior_test_methods_preserved_bytewise": true,
+  "new_method_count": 1,
+  "phases": [
+    {
+      "phase": "navigation-green-r1",
+      "actual_exit": 1,
+      "counts": {
+        "discovered": 46,
+        "executed": 46,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/navigation-green-r1/command.attempts/1792298293159849883-b0a93551697347e780adf28c30c3d6d3/receipt.json",
+      "started_ns": 1792298293159948872,
+      "finished_ns": 1792298296642339254,
+      "child_max_RSS_KiB": 31048,
+      "TMP_live_allocated_at_join_bytes": 0
+    },
+    {
+      "phase": "navigation-green-r2",
+      "actual_exit": 0,
+      "counts": {
+        "discovered": 46,
+        "executed": 46,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/navigation-green-r2/command.attempts/1792298348662229367-78a1904fcf8d4f6b9540ab17b91e69fd/receipt.json",
+      "started_ns": 1792298348662354846,
+      "finished_ns": 1792298352959270603,
+      "child_max_RSS_KiB": 32552,
+      "TMP_live_allocated_at_join_bytes": 0
+    },
+    {
+      "phase": "navigation-red-r1",
+      "actual_exit": 1,
+      "counts": {
+        "discovered": 46,
+        "executed": 46,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/navigation-red-r1/command.attempts/1792298229207058808-ac35c99841b14afcba58c89d836e001a/receipt.json",
+      "started_ns": 1792298229207149554,
+      "finished_ns": 1792298232987813826,
+      "child_max_RSS_KiB": 32724,
+      "TMP_live_allocated_at_join_bytes": 0
+    },
+    {
+      "phase": "navigation-red-r2",
+      "actual_exit": 1,
+      "counts": {
+        "discovered": 46,
+        "executed": 46,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/navigation-red-r2/command.attempts/1792298254864474512-7000a60b609c4495aa72a1c83e8d0926/receipt.json",
+      "started_ns": 1792298254864579530,
+      "finished_ns": 1792298258614941436,
+      "child_max_RSS_KiB": 32604,
+      "TMP_live_allocated_at_join_bytes": 0
+    },
+    {
+      "phase": "navigation-related-final-r1",
+      "actual_exit": 0,
+      "counts": {
+        "discovered": 85,
+        "executed": 85,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0
+      },
+      "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/navigation-related-final-r1/command.attempts/1792298453437728793-1c6281bb17644f94893e89fafbd7dcc0/receipt.json",
+      "started_ns": 1792298453437956766,
+      "finished_ns": 1792298469914001556,
+      "child_max_RSS_KiB": 44268,
+      "TMP_live_allocated_at_join_bytes": 0
+    },
+    {
+      "phase": "workflows-navigation-final-r1",
+      "actual_exit": 0,
+      "counts": {
+        "suite": "workflows",
+        "discovered": 79,
+        "executed": 79,
+        "skipped": 0,
+        "failures": 0,
+        "errors": 0,
+        "expected_failures": 0,
+        "unexpected_successes": 0,
+        "status": "passed"
+      },
+      "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/workflows-navigation-final-r1/command.attempts/1792298416395141496-f3cf888d7e9e423aa6b97ba832718b91/receipt.json",
+      "started_ns": 1792298416395244621,
+      "finished_ns": 1792298426617410921,
+      "child_max_RSS_KiB": 35496,
+      "TMP_live_allocated_at_join_bytes": 0
+    }
+  ],
+  "final_counts": {
+    "navigation-green-r2": {
+      "discovered": 46,
+      "executed": 46,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0
+    },
+    "workflows-navigation-final-r1": {
+      "suite": "workflows",
+      "discovered": 79,
+      "executed": 79,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0,
+      "status": "passed"
+    },
+    "navigation-related-final-r1": {
+      "discovered": 85,
+      "executed": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "expected_failures": 0,
+      "unexpected_successes": 0
+    }
+  },
+  "actual_contract": {
+    "RED": "Complete46 navigation-red-r2 actual1FAIL/0ERROR, original45PASS; actual job_identity.capture/_configuration/resolved_input_files could not navigate a container-rooted board.json on host. No mocking of those functions/file_identity.",
+    "fixture_setup_before_clean_RED": "navigation-red-r1 had the same navigation failure plus an older external-port test bypassed by unconditional real-store path relocation. Limited relocation to REAL_EVIDENCE_STORE=true; no production edit before clean r2RED.",
+    "implementation_setup_failure": "navigation-green-r1 actual5FAIL caught malformed nested heredoc indentation, including original bash-n check. Original raw/source retained; smallest dedent only produced46GREEN.",
+    "fixed_boundary": "Fresh E in RUNNER_TEMP keyed run/attempt holds original report+runs; Q retains spec and CLI raw. Always collector exports existing E by real maintained store.py into Q opaque archive+manifest; original tree is not moved/deleted/rewritten. E absent emits explicit not_executed; success without E fails. Export error propagates nonzero and earlier CLI errors/raw are not overwritten. Identity and upload bind only Q+existing delivery.",
+    "actual_regression_execution": "Maintained configure.resolve generated canonical complete qiming IR; fixture navigation points to both /inputs/sdk-a and /other/sdk-b. Real collector store export, verify_package, restore_tree and actual host capture(Q+delivery) passed; restored and original inventories are equal for raw resolved/input_paths, fixture ELF/BIN transport bytes and commands/logs.",
+    "fixture_scope": "ELF/BIN are explicitly named unit transport byte fixtures, not compiled/ABI-validated images. No Docker/offline build/SDK matrix/network/dispatch was executed. Host job identity is metadata only, not software candidate qualification.",
+    "unmodified_authorities": "Generic identity, navigation, storage admission, reproduction engine, delivery stage, CI/release policies and historical locks unchanged."
+  },
+  "resources": {
+    "feature_allocated_cap_bytes": 2097152,
+    "cap_authority": "Root explicitly increased feature cap from1.5MiB to2MiB for full before/raw/final closure; no historical data deleted or shortened.",
+    "TMP_limit_bytes": 26214400,
+    "max_measured_child_RSS_KiB": 44268,
+    "TMP_join_values": [
+      0
+    ],
+    "TMP_peak_not_continuously_sampled": true
+  },
+  "qualification": false,
+  "physical_status": "not_executed",
+  "independent_delta_review_and_normal_full_gate_pending": true
+}

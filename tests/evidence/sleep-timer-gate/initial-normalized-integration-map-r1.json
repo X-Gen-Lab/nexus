@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "source_count": 3,
+  "files": [
+    {
+      "path": "soc/gd32f470/sleep.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/soc/gd32f470/sleep.c",
+      "bytes": 3878,
+      "sha256": "9bc1732c1cac5fffd976cd3ca8a40d5a86efc874283dbb5b0495946307874fbc",
+      "origin": "final-source"
+    },
+    {
+      "path": "soc/stm32f407/sleep.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/soc/stm32f407/sleep.c",
+      "bytes": 3843,
+      "sha256": "46ff30d8daed46d8974c23dcb9afb00c3cf48812109e584772552f559a1653bc",
+      "origin": "final-source"
+    },
+    {
+      "path": "tests/google/clock_sleep_soc_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/after/tests/google/clock_sleep_soc_test.cpp",
+      "bytes": 11829,
+      "sha256": "12966b51c1a92043185822db25b8456d23b377a9dd11a1b32e9af3a28fb08796",
+      "origin": "final-source"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/arm-object-preparation.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/arm-object-preparation.json",
+      "bytes": 7282,
+      "sha256": "3f95390743eed5e4e8905680b48269574f6d6d9b49bdaaac8f90d812e09d5166",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/baseline.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/baseline.json",
+      "bytes": 3682,
+      "sha256": "a208a4838ec8f1dcb751e1ef509b355443b44c4b1804fe77ec25e94600b74348",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/before/soc/gd32f470/sleep.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/before/soc/gd32f470/sleep.c",
+      "bytes": 3817,
+      "sha256": "165534059ec5087170e5f30e2235d28a71e233d77ef850a2af3d9b52a4b3320f",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/before/soc/stm32f407/sleep.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/before/soc/stm32f407/sleep.c",
+      "bytes": 3781,
+      "sha256": "e57a5a885382abc0b1a8fd079ebafaa0cb14ab96c71205524d9f9b141be229ad",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/before/tests/google/clock_sleep_soc_test.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/before/tests/google/clock_sleep_soc_test.cpp",
+      "bytes": 9787,
+      "sha256": "294d78cb83126d8f7004775a0a2bc47e3d94d5809ae756daae6b9d3588373194",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/completed-handoff-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/completed-handoff-r1.json",
+      "bytes": 14045,
+      "sha256": "68656027ecac0a564234861ccaad7e1e212334b471ee13a48c192c553373b68d",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/execution-archive-manifest.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/execution-archive-manifest.json",
+      "bytes": 38870,
+      "sha256": "f06de34a85c0b000e7fe3474384b692e8f9155449fb711d86671b2807ff1b5b5",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/execution-evidence.tar.gz",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/execution-evidence.tar.gz",
+      "bytes": 52790,
+      "sha256": "19bdae9770c11fc0a99092c0a06cf0085ee6552afcfcafce83556b5ca2ef4f84",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/inputs-and-artifacts.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/inputs-and-artifacts.json",
+      "bytes": 90791,
+      "sha256": "9536c30509ab43a0175cbd5a5a92714dc49f1e7956d613e7771d471db5f447e7",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/native-compile-commands.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/native-compile-commands.json",
+      "bytes": 46139,
+      "sha256": "e52082757071db6c424b12d8995f895d063b9210892d25b41e14cd91461302e2",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/red-source/tests/google/clock_sleep_soc_test.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/red-source/tests/google/clock_sleep_soc_test.cpp",
+      "bytes": 11829,
+      "sha256": "12966b51c1a92043185822db25b8456d23b377a9dd11a1b32e9af3a28fb08796",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/report-generation-observation-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/report-generation-observation-r1.json",
+      "bytes": 398,
+      "sha256": "859b8e905eb0ea85a8515889ae7b0a5ed300856efcddf1ec75dabf840baccbbb",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/run.raw",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/run.py",
+      "bytes": 5044,
+      "sha256": "fa89e93ff2f942b806ee71b9b8eb09d77cefe4d6fc8a73f9e4cab9031cd71513",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/setup-observations.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/setup-observations.json",
+      "bytes": 981,
+      "sha256": "92704d3c6f3aef5b179b41558e6517b28e10020d5c5c9f80fa0d34672e7cc01b",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/source-freeze-r1.json",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/source-freeze-r1.json",
+      "bytes": 1048,
+      "sha256": "895135c28eb81adeb93a6f07d812b9cde592b60585f6a93c879163013c311f4c",
+      "origin": "historical-evidence-byte-unchanged"
+    },
+    {
+      "path": "tests/evidence/sleep-timer-gate/source.diff",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sleep-timer-gate-r1/source.diff",
+      "bytes": 4840,
+      "sha256": "4c1d7f68a8adbf7738c6de58bc147275c8afe9b085e62c4d128a4d9cc5bacfc1",
+      "origin": "historical-evidence-byte-unchanged"
+    }
+  ],
+  "source_freeze_sha256": "895135c28eb81adeb93a6f07d812b9cde592b60585f6a93c879163013c311f4c",
+  "normalization": "19 complete author files byte observed; 3 after/ files map canonical sources; other historical source/scripts use raw suffix, unchanged bytes. Source and archive independent review required."
+}

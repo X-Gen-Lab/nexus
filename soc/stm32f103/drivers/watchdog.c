@@ -36,8 +36,9 @@ static bool output_valid(const nx_stm32f103_watchdog_state_t* p,
 static void observed(const nx_stm32f103_watchdog_state_t* p,
                      nx_watchdog_state_t* state) {
     *state = p->state;
-    state->debug_freeze =
-        (NX_F103_READ(&p->debug->CR) & DBGMCU_CR_DBG_IWDG_STOP) != 0U;
+    /* ES096 2.2.2 excludes CPU DBGMCU_CR access. This is the supported
+     * firmware setting, never an observation of an external debug agent. */
+    state->debug_freeze = false;
     if ((NX_F103_READ(&p->flash->OBR) & FLASH_OBR_IWDG_SW) == 0U) {
         state->enabled = true;
         state->irreversible = true;
@@ -50,23 +51,9 @@ static void observed(const nx_stm32f103_watchdog_state_t* p,
             bounds(state, prescaler > 6U ? 256U : 4U << prescaler,
                    (NX_F103_READ(&p->registers->RLR) & 0xfffU) + 1U);
         }
-        state->debug_freeze =
-            (NX_F103_READ(&p->debug->CR) & DBGMCU_CR_DBG_IWDG_STOP) != 0U;
     }
 }
 static nx_result_t restore_preparation(nx_stm32f103_watchdog_state_t* p) {
-    if (p->debug_owned) {
-        uint32_t debug = NX_F103_READ(&p->debug->CR);
-        NX_F103_WRITE(&p->debug->CR,
-                      (debug & ~(uint32_t)DBGMCU_CR_DBG_IWDG_STOP) |
-                          (p->saved_debug & DBGMCU_CR_DBG_IWDG_STOP));
-        nx_arch_dsb();
-        if ((NX_F103_READ(&p->debug->CR) & DBGMCU_CR_DBG_IWDG_STOP) !=
-            (p->saved_debug & DBGMCU_CR_DBG_IWDG_STOP)) {
-            return NX_ERROR_IO;
-        }
-        p->debug_owned = false;
-    }
     if (p->lsi_owned) {
         NX_F103_WRITE(&p->rcc->CSR,
                       NX_F103_READ(&p->rcc->CSR) & ~(uint32_t)RCC_CSR_LSION);
@@ -133,6 +120,9 @@ static nx_result_t enable(void* context, uint32_t timeout, bool debug_freeze,
     if (!valid(p) || !output_valid(p, state)) {
         return NX_ERROR_INVALID;
     }
+    if (debug_freeze) {
+        return NX_ERROR_UNSUPPORTED;
+    }
     observed(p, state);
     if (state->enabled) {
         p->state = *state;
@@ -163,8 +153,6 @@ static nx_result_t enable(void* context, uint32_t timeout, bool debug_freeze,
         ++prescaler;
     }
     p->lsi_owned = (NX_F103_READ(&p->rcc->CSR) & RCC_CSR_LSION) == 0U;
-    p->saved_debug = NX_F103_READ(&p->debug->CR);
-    p->debug_owned = false;
     p->preparation_retained = true;
     NX_F103_WRITE(&p->rcc->CSR, NX_F103_READ(&p->rcc->CSR) | RCC_CSR_LSION);
     uint32_t polls = p->poll_limit;
@@ -178,19 +166,6 @@ static nx_result_t enable(void* context, uint32_t timeout, bool debug_freeze,
         (void)restore_preparation(p);
         return NX_ERROR_IO;
     }
-    uint32_t debug = NX_F103_READ(&p->debug->CR);
-    uint32_t selected = debug_freeze
-                            ? debug | DBGMCU_CR_DBG_IWDG_STOP
-                            : debug & ~(uint32_t)DBGMCU_CR_DBG_IWDG_STOP;
-    p->debug_owned = (debug & DBGMCU_CR_DBG_IWDG_STOP) !=
-                     (selected & DBGMCU_CR_DBG_IWDG_STOP);
-    NX_F103_WRITE(&p->debug->CR, selected);
-    nx_arch_dsb();
-    if ((NX_F103_READ(&p->debug->CR) & DBGMCU_CR_DBG_IWDG_STOP) !=
-        (selected & DBGMCU_CR_DBG_IWDG_STOP)) {
-        (void)restore_preparation(p);
-        return NX_ERROR_IO;
-    }
     nx_watchdog_state_t envelope = {0};
     uint32_t old_pr = NX_F103_READ(&p->registers->PR) & 7U;
     uint32_t old_divisor = old_pr > 6U ? 256U : 4U << old_pr;
@@ -199,7 +174,7 @@ static nx_result_t enable(void* context, uint32_t timeout, bool debug_freeze,
     uint32_t old_count = 4096U;
     p->state.enabled = true;
     p->state.irreversible = true;
-    p->state.debug_freeze = debug_freeze;
+    p->state.debug_freeze = false;
     bounds(&p->state, divisor, count);
     NX_F103_WRITE(&p->registers->KR, 0xccccU);
     NX_F103_WRITE(&p->registers->KR, 0x5555U);

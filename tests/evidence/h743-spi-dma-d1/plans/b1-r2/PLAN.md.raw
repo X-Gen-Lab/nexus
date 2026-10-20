@@ -1,0 +1,264 @@
+# B1：STM32H743 SPI4 有限 DMA 最小纵向交付计划 r2
+
+状态：只读设计 r2，尚无 B1 生产写入、配置、编译或测试授权。r1 原件不变，本版修订审查30959642提出的构造术语、EOT唯一清旗者及IRQ隔离失败边界，待独立复审；新增约束优先于r1。本计划不继承丢失的旧 DMA 224/ARM13 资格。恢复的 TOML 只提供作者输入；旧 C/H/model/test 不存在。S0.2、EOT/rs、S0.3、S0.4 的冻结文件及原始失败记录保持不变。
+
+## 1. 唯一首发组合
+
+| 项目 | B1 准入范围 |
+|---|---|
+| 芯片 | DEV_ID=0x450、REV_ID=0x2003；先检查身份，再读 V 的 HSICFGR；HSITRIM=0x40 |
+| 时钟 | hsi64-fixed-cache-off，SPI4 APB2 名义 64 MHz、工程选频上界 65 MHz；运行中再次核对 |
+| 板级 | 软件参考板的 GPIOE：PE11 低有效 CS，PE12/13/14 AF5；静态构造者承担独占路由、门控和串行寿命合同，不以寄存器一致性替代授权 |
+| RX | DMA1 Stream2、DMAMUX1 Channel2、request83、IRQ13 |
+| TX | DMA1 Stream3、DMAMUX1 Channel3、request84、IRQ14 |
+| SPI IRQ | SPI4_IRQn=84；三个向量统一 priority5、calls_os=false；不增加 ISR OS 调用 |
+| 格式 | 主机、8-bit、有限 TSIZE=1..65535；公共 length/count 单位均为字节 |
+| 首片事务 | 一个请求、一段、一整段 CS；没有分段公共面、16-bit、delay、循环或连续模式 |
+| 内存 | 被选中并初始化的 AXI SRAM [0x24000000,0x24080000)，byte alignment1；完整实际跨度在同一合法区间内、无回绕 |
+| DMA 设置 | peripheral/memory 8-bit、direct mode、single transfer、normal、DMA flow controller；关闭 CIRC/DBM/PFCTRL/packing；SPI4 实例的 RX/TX FIFO 各8字节（RM Table422） |
+| 调用者存储 | 普通 submit 要求 TX/RX 都非 NULL；submit_memory 的固定 TX/RX 字节也由调用者显式提供；完整实际访问跨度互不重叠 |
+| 选入成本 | DMA 状态、驱动、IRQ、可选 traits 只在 dma 模式存在；普通 polling state、空选择固件均不增加 DMA 存储 |
+
+初始参考端点采用 mode0、max_hz=1.5 MHz，按 65 MHz 选 /64；原 S0 的 64 MHz/16 MHz、32 MHz/8 MHz、最小可达率等合同由共享 helper 保留。B1 新模式只放行 64/cache-off/baremetal；其它 profile、后端和 mode1/2/3 暂显式拒绝，不从同一寄存器推导笛卡尔资格。需要扩大范围时另写正例和真实验证。
+
+不接纳 SRAM1、TCM、Flash、SRAM4 或任意 CPU 可访问指针作为本批 DMA payload。请求描述符可在稳定的普通 CPU RAM/栈中，只要调用者保证整个借用期寿命；payload 才受 DMA 可达域限制。
+
+## 2. 架构与复用
+
+纯静态装配仅生成/定义 C 状态存储、不可变 face、资源常量和绑定引用；公共 typed factory 的 lookup 仅返回现有 nx_spi_port_t / nx_spi_endpoint_t 和只读 ops，二者都不读写 MMIO。这里不新增 runtime construct API，也不能以纯装配名义重置已有 live/retained state。硬件 nx_stm32h743_spi_dma_initialize 及 Platform.start 是另一个边界：按显式调用进行实际准入读取、取得硬件和失败清理，不承诺零 MMIO。生成的构造逻辑选入 mode-only 的 nx_stm32h743_spi_dma_state_t；它可嵌入现有 wire state，普通 polling state 字段布局保持原样。端点保存静态 CS/mode/rate 绑定；无 heap、worker、全局注册表、逐字节虚表或隐藏 dummy/discard cell。
+
+先把 S0 已验证的协议叶子提取到私有 spi_wire.c / stm32h743_spi_wire.h，polling 与 DMA 均直接调用。共享内容包括 exact-V/trim/实际时钟门控检查、上界 divider、同源 quiet 间隔计算、安全 CSUSP 命令、停止谓词、CS 高写/ODR 证明、SCK GPIO 接管和独占 SPI reset。helper 不持有请求、任务、队列或时钟 epoch，不新增普通 state 字段。
+
+共享的是有界 MMIO/纯计算叶子，不能把当前同步 drain()/finish_clock() 或 retain_and_park() 接进 async service。polling 保留其有限轮询和无法归还调用者栈时的 fault/park 边界；DMA 自己保存 stage、quiet deadline、active request 和首因，单次 service 最多推进一个硬件阶段，RX drain 读取最多8个已停止 FIFO 字节，未满足条件立即返回。helper 的每个读回失败可观察，不能用 reset_done 等软件布尔替代真实硬件事实。逐字节 polling 的原循环不引入间接调用；小纯计算/命令叶子可为 private static inline，大型冷路径可为直接 C 调用。实际 ARM 比较提取前后 FlashLOAD/RAM 和符号闭包，不预称零 Flash 开销。
+
+common 的 io/private/spi_dma_sequence.h 与 io/src/spi_dma_sequence.c 保持唯一分段 owner。B1 的公共有限 byte request 不伪装成 segment request，也不为一段分配冗余 sequence owner。后续 segmented 模式直接实现既有 validate/begin/advance/cancel/release/stop backend，才选入该 common owner；不复制 sequence 状态机，不把多次 finite submit 包成虚假 whole-CS 分段实现。B1 不导出新 segmented factory 类。
+
+## 3. 接收、启动和数据路径
+
+1. 硬件 initialize / Platform.start 先检查合法上下文、已有 retained/active/BUSY、精确路由、System 时间域、V 身份与 trim、实际 cache-off、SPI/DMA/DMAMUX/NVIC 的外来占用。身份通过前不读 V-only 位图。先完整校验再改硬件；任何部分取得失败由真实生成 rollback 保留责任。
+2. admission 完整校验 READY、deadline、端点属于该 port、1..65535、两个实际 payload 跨度/固定单字节跨度、DMA 区间、描述符和 state/face/端点/MMIO 等保护存储别名。reject 时无请求引用、无新 CS 低、无残留 MMIO 效果。
+3. 仅在成功接纳后保留 request/endpoint。接纳后的启动拒绝是这个请求的失败，需要 drain/settle 或 quarantine；不得把已经取得的借用按未接纳错误直接退还。
+4. CS 高期间配置 CPOL/AFCNTR、MBR、TSIZE、CRC-disabled CRCSIZE7，交回 SCK AF5，验证路由后再选中 CS。SPI IER 只选实际需要的 terminal/error 源。
+5. 按 RM0433 50.4.14：先 SPI RXDMAEN，再使 RX/TX stream 能够服务请求，再 TXDMAEN，随后 SPE/CSTART。每个 stream 在 EN0 后才可改 PAR/M0AR/NDTR/CR；检查实际 req83/84 和 channel2/3，不照抄 F4 CHSEL 或 UART 路径。
+6. 真实外部模型由 SPI 帧、DMA 请求、FIFO/内存提交来推进 NDTR/TC/错误。TX TC 只说明 TX DMA 结束，不说明 RX 或 wire 已完成；软件禁流也可触发 TC。成功必须是本请求两方向正常完成、NDTR0/EN0、有限 SPI 完成和后续全部撤回证明。
+
+普通 submit 可先以 non-NULL 两缓冲完成首个成功路径；固定 TX/RX cell 的 MINC0 要在该 mode 最终准入前另加真实回归。若这一后续切片尚未完成，submit_memory 对非零 flags 必须显式 UNSUPPORTED，不能宣称完整固定单元支持。固定 RX 的 direct-mode DME 才是合法 DME 注入场景；在尚无固定 RX 时不伪造不可能的 DME 硬件正例。
+
+## 4. IRQ、取消和撤回责任
+
+IRQ 只对本 provider 已取得的 stream/vector 观察、锁存诊断并撤下通知源；不访问其它 stream，不发布 SETTLED，不运行用户回调，不调用 OS。SPI IRQ 完全不写 SPI_IFCR，只 mask 已取得的 EOTIE/错误 IE 并读回，保留实际 EOT/TXC/SUSP 供 task 的 stop/quiet 谓词。SPI 的 flag 清除/reset 唯一执行者是已取得 owner 的 task；具体清旗阶段和隔离阶梯见第9节。DMA IRQ 可在先锁存诊断后 mask/W1C 本 stream 精确组，保留邻居标志。任何 mask/W1C 拒绝都必须执行有界隔离判定，不能只置 Q 后返回中断风暴。
+
+非本向量、未启动请求、陈旧状态或外来调用必须无借用变化；外来资源拒绝路径不得为自己清 NVIC pending。公开 cross-task cancellation 继续走已有 adapter stable slot/epoch，不给裸 request 指针赋予额外跨任务安全。provider 的单执行者只认当前 active request；IRQ 与 task 对引用和状态的交接用既有短临界区。
+
+```text
+READY --校验后接纳--> ACTIVE
+ACTIVE --完成/取消/期限/首错误--> DRAINING
+DRAINING --任一停止/可见性/读回未证--> QUARANTINED
+DRAINING / QUARANTINED --原责任全部真实完成--> SETTLED
+```
+
+具体停止顺序：
+
+1. 关闭新接纳，锁存第一个结果；取消/timeout 后的正常 EOT 只能作为安全停止证据，不能把首因改成 SUCCESS。
+2. 按 H7 SPI 的 RM 顺序先禁 DMA stream，实际观察两 EN0。P2M 的停止/TC 语义包含剩余 FIFO 写入内存的完成；TC 可以由软件 stop 产生，因此不凭它宣布成功。此时保留 peripheral DMA buffer 位，不能照抄 UART/F4 先撤 SPI request 位的停机顺序。
+3. 对仍在运行的 SPI 发 CSUSP，写值必须排除 CSTART1（rs 写0不清）。接受实际 CSTART0 且 SUSP，或非零 TSIZE 下 EOT/TXC 同时置位的有限完成竞态。TSIZE>0 时 TXC 复制 EOT，二者不是两份独立 wire 证据。
+4. 在上述停止观测后重新建立独立 quiet deadline。TIM2 PSC63 与 SPI APB2 同源 HSI；使用名义 divider/64 的计数比和 ceil(divisor/64)+2 个 1us 标度 tick，不能用 65 MHz 上界缩短实际 SCK 的 guard。service 不等待时间流逝；时间域失效或 clock/trim/cache 状态变更时保留借用，待条件恢复后重新证明，不能用旧 epoch 硬超时释放。
+5. 有界排空 RXFIFO 的残留完整字节，失败事务允许丢弃未交付字节；不以 TXDR 写入或未发送的 TXFIFO 计完成。已证停止后 SPE0 可 flush 未发送 TXFIFO，不要求它继续发出以清空。清 SUSP、SPE0 与 FIFO 实际读回后，才清 SPI TXDMAEN/RXDMAEN 并确认。
+6. 完成 owned IRQ 撤源/W1C/读回及 pending 的真实联结。SPI EOTC 仅允许 task 在已观测本请求真实停止、quiet完成、RX drain及SUSP清除/SPE0后写；ISR不得提前清除EOT/TXC，task也不能把IRQ hint当停止证明。SPI/DMA源撤回失败先证明NVIC隔离或进入第9节的terminal fault边界。cache-off 的 payload 仍保留到 DMA/外设全部停止；不调用无意义的 cache clean/invalidate。若外部打开 cache，进入拒绝/保留路径，不能按旧 cache-off 契约归还。
+7. 确已选中的 CS 必须真实高写并 ODR 读回；随后按配置 CPOL latch PE12、GPIO 输出接管读回，再独占 SPI4 APB2 reset/读回。对从未选中过的路径保留真实 unselected 事实，不伪造 CS 转换。不得 reset DMA1 或全 DMAMUX 来影响其它使用者。
+8. reset 拒绝时允许物理 CS 已高，但 request、endpoint、必要 gate/逻辑 owner 仍 retained；重试不得重放 payload、取消首因或再次推进已完成阶段。只有移除所有 provider 引用后才最后一次 publish SETTLED，此后不再碰 request/payload。
+
+EN 拒停、清旗/mask 拒绝、SPI 无停止证明、quiet 未完成、CS 读回失败、SCK 接管失败、reset 拒绝均不能归还借用。只有 IRQ 已被证明可隔离时，service 的时间/动作预算耗尽才允许保持 Q 后返回；不能隔离时必须进入第9节的 terminal fault，不能返回中断风暴。外部故障恢复后经过实际 drain/stop 重试才能释放。首次失败的 byte count 采用现有 F4/GD DMA 相同保守口径：SUCCESS=length，否则0；0不宣称 RX 缓冲从未被部分写过。
+
+## 5. 可独立评审的实施切片
+
+### W1：共享 wire 叶子，仍交付完整 polling
+
+首批新文件：
+
+- soc/stm32h743/private/stm32h743_spi_wire.h
+- soc/stm32h743/drivers/spi_wire.c
+- tests/google/h743_spi_wire_test.cpp
+- tests/google/h743_spi_wire.cmake
+
+首批现有文件精确 hunk：
+
+- soc/stm32h743/drivers/spi.c：只改为调用 helper，polling drain/park 留在本文件。
+- soc/stm32h743/CMakeLists.txt：仅 SPI 被选中才编入 helper。
+- tests/google/h743.cmake、h743_high.cmake：原所有直接编译 spi.c 的 target 加 helper 源，不更改原断言。
+- tests/google/CMakeLists.txt：一次新专有 cmake include。
+- tools/configure/providers/descriptor.py：helper 是 H743 私有必需 payload；只增该项，不覆盖 RTC owner 的其它内容。
+
+新增 helper 合同测试先真实 missing-symbol RED，再实现完整叶子并由真实 polling 使用；纯机械提取不捏造行为 RED。外部 MMIO oracle 覆盖安全 CSUSP 命令、EOT/SUSP 竞态、零 TSIZE/单标志拒绝、CS 高→SCK latch/output→reset 顺序和失败读回。最后全部原六 whole 程序、Python7、style、cold empty ARM/selected polling ARM。退出条件是完整 polling 同合同可工作、普通 state 大小不变、空选择无 helper 符号；不是提交一份未使用声明空壳。
+
+### D1：真正有限 DMA，先私有硬件合同闭环
+
+新文件：soc/stm32h743/private/stm32h743_spi_dma.h、drivers/spi_dma.c；tests/google/h743_spi_dma_model.h/.cpp、h743_spi_dma_test.cpp、h743_spi_dma.cmake。复用当前 System/GPIO 模型的端口，不往所有旧程序注入新 DMA 行为。
+
+先声明完整 finite API 与完整 Google 程序，正常 target 到真实缺实现 link RED；没有实现时目标只编译完整测试、现有 public SPI/共享 wire/System/model，不在 CMake 引用不存在文件造成 configure 失败，也不造空 driver 来假装 API 已实现。测试使用真实 public SPI submit/service/cancel/stop 面，直接私有构造只是为精确错误准入隔离。实际模型注册 DMA 控制器/stream/DMAMUX/SPI 硬件叶子与固定 AXI SRAM 映射，数据来自真实 caller TX，由 frame/DMA request 写入真实 caller RX。DMA 的 32-bit bus address 与 host pointer 必须显式模型总线映射，不通过修改 provider 的合法域把任意 host 栈声明为 AXI SRAM。
+
+首个 GREEN 包必须包含成功事务、deadline/cancel、TX TC 早于 RX/wire、真实 EN 拒停后 Q/解除后重试、读回失败与 IRQ 电平撤源。不能只完成寄存器装配或把模型 EOT/TXC 全局置1。mode catalog 仍不新增为可选，直到 D2 的真实装配全闭合。
+
+### D2：配置→typed factory→IRQ→公共 API 完整纵切
+
+新作者输入 tests/contracts/h743_spi_dma/finite64.toml；正常生成的 factory test（h743_spi_dma_factory_test.cpp）和 ARM public-only main。引用已有参考 Board，不复制 PCB 专有配置。
+
+精确改动：
+
+- soc/stm32h743/soc.json：SPI4 mode_resources 的三向量/两 stream 和 DMAMUX tuple，只给 dma；short-poll 不获得 IRQ 资源。现有资源字符串固定为 RX DMA1:stream2:channel83、TX DMA1:stream3:channel84；这里 channel 是既有 IR 对请求选择器的命名，实际仍写 DMAMUX CCR，不写 DMA SxCR.CHSEL。
+- tools/configure/providers/stm32h743/__init__.py：保留 UART 原 topology；SPI 用显式 tuple 集合，不扩大 controller×stream×request 笛卡尔积。dma_irq 同样按 exact tuple 验证。
+- 同目录 bindings.py（可分出 spi_dma.py）：选择 mode-only state/ops、AXI-only region、三实际 IRQ handler、GPIO/门控生命周期；失败 prepare 不覆写 retained 指针，生成 cleanup 真实重试。
+- tools/configure/configure.py：仅一个 H743 SPI dma 精确 profile/backend gate，沿用现有 schema2 与 typed IR；若无需新事实就不修改 authored.py/ir.py。
+- tools/configure/selected_contracts.py：B1 mode 只可选 cache-off，报告 byte unit/alignment1/max65535、TX/RX DMA/IRQ；cache_line_bytes=0、provider_domain，无虚假的 32B exclusive-line 要求。该精确分支依赖真实 mode/profile gate。后续开放 cache-on 前必须把所选 cache 事实正规化到 IR，不能继续硬编码 cache-off 或从 CPU 能力猜运行策略。
+- soc/stm32h743/CMakeLists.txt、descriptor.py：仅 dma 选入驱动/私有头；polling/empty 无 DMA state、IRQ 或 driver retention。
+- tools/configure/providers/stm32h743/test_spi_dma.py 新完整模块：合法输入正例、错误 tuple/priority/calls_os/profile/backend/empty/multiple conflict 反例、mode-only emission 与 typed-factory traits 一致；保留原 test_peripherals.py 的其它模式拒绝意图。
+
+shared schema/IR/factory/SDK 文件都以 Root 当前 RTC+S0 集成提交为基线，只写获准精确 hunk，先读当前 SHA；禁止从本地旧 3e 克隆覆盖整文件。
+
+### D3：模式完成与交付门禁
+
+若 D1/D2 暂未支持 fixed TX/RX，另新增真实 MINC0 byte 单元正例、别名拒绝、合法 RX_FIXED DME/TE 的 IRQ 撤源/恢复回归后才启用。然后补最终 exact-V/live trim/cache rejection、generated failed-init cleanup、CS/SCK/reset refusal 与 foreign IRQ 无效果全程序。
+
+ARM fixture 新增 tests/contracts/h743_spi_dma/CMakeLists.txt、main.c、empty_main.c；使用新 finite64.toml 与既有 tests/contracts/h743_assembly/empty.toml 两个明示输入，不重用未确认 SHA 的旧 reconstructed empty。实际选择决定使用两个 public-only main 中哪一个，不让空选择引用不存在的 SPI ID。sidecar 由实际 resolved/bindings/ELF 校验请求号/向量/强定义 handler、两 caller buffer 的 DMA 可达地址及 load/RAM 并集，不把 host 测试的 mmap 大小当 MCU RAM。empty 保留启动文件默认 weak IRQ alias 是正常的；检查的是没有选入的强 handler/DMA driver/state，而非粗略要求符号名全消失。
+
+installed SDK 新增 cmake/package/verification/io_evolution/h743-spi-dma.toml 和 consumers/h743-spi-dma.c，以及必需 helper/driver/header/Board payload、私有头不可公开探针。SDK TOML 的 Board 相对路径依当前四级目录，而不是照抄 tests 的三级路径。SDK omission tests 真实拒绝剥掉新文件的包。cmake/package/package_source_sdk.py、verify_consumers.py、tools/testing/test_device_sdk_payload.py、tools/configure/providers/descriptor.py 交 Root 单 writer 合并，按实际 selected 元组推导数量，不沿用丢失的30/43/46等旧总数。
+
+每片正常 commit 由 Root 完整 hook 验证后推进；本 agent 不 stage/commit/push。每个测试程序保整个运行、fresh XML、原始退码、源码/工具前后 SHA 与 matching ELF；不能把 compile setup/missing symbol RED 当行为 RED，亦不改变旧断言通过新实现。
+
+## 6. 关键真实 RED oracle
+
+| 场景 | 独立可观测条件与必须保留的断言 |
+|---|---|
+| 配置 | exact tuple/profile 正例当前 unsupported；只改 catalog 不能成为终点，正常 factory/public 程序仍须执行 |
+| 启动 | 外部端口 trace 证明 RXDMAEN→stream→TXDMAEN→SPE/CSTART；CS 首先保持高，路由/CPOL 成立后才选择 |
+| 传输 | mmap 的真实 AXI bytes，经独立 DMA/frame 模型拷入 RX；NDTR 只在对应提交之后递减，非直接伪造 TC 完成 |
+| TX 早完成 | TX TC/EN0 但 RX NDTR>0 或 SPI 未停，request/CS/所有 payload 仍借用 |
+| 软件 TC | cancel 禁流产生的 TC 不允许 SUCCESS；保首因与 transferred0 |
+| EN 拒停 | owned EN 写拒绝，service 固定读写数内返回，Q/借用/CS 保留；解除后真实 drain 完成才 SETTLED |
+| 粘滞错误 | 实际 flag+enable 导致 NVIC level re-pend；IRQ先latch再撤源，不能依赖手工一次 handler 或先 task service 消除电平 |
+| 拒绝清理 | IRQ mask/W1C 或 SPI停止/quiet/CS/SCK/reset读回拒绝，分阶段责任仍在，恢复后无重放；物理 CS 已高不等于 loan 归还 |
+| 选择/时期 | exactV/defaulttrim、实际cache0；非V先于V-only读；live错误不释放 active/retained；纯装配/冷 factory lookup 零 MMIO；硬件 initialize 必须真的读取准入事实 |
+| 邻居 | stream0/1 UART flags、其它 DMAMUX、外来 NVIC pending 不被清；重复/stale cancel 或非本向量不作用其它请求 |
+| 最终访问 | publish SETTLED 之前已清 active/endpoint/数据引用；外部 model 最后一笔 DMA 写发生在归还前，之后不触碰 request/payload |
+
+GMock 仅观察 cache/IRQ/time 等硬件叶子的调用条件/顺序，不 mock 被测 provider 方法；FIFO、CSTART rs、EOT/SUSP、sticky IRQ 及 DMA EN 的语义来自 RM/ES。测试退出不得 reset active model 或手动清 provider retained；失败责任的实际重试要在 teardown/unmap 前完成。无法恢复的 fault 子进程保现场并真实 kill/reap，不能 fake exception 模拟归还。
+
+## 7. 资源与 S0 证据保护
+
+read-only-inputs.json 列实际读到的主树/本地源 SHA、资源快照和八枚 matching ELF。六枚 final187 + 两枚最终真实 RED62 共24,057,376B，已经存在独立 retained 目录，脱离 build/native-debug/bin。它们及原 compile DB/cache、原 XML/raw/gzip 不能因 B1 构建重写或清理。源码历史在持久 files/ 中。
+
+优先继续同 ownROOT，避免新 clone 约800MiB。但要等 Root 的 RTC+S0 正常提交完成并发新精确基线，再先保护/比较本地九源与新提交、获准后安全 forward 合并。不能以 checkout/reset/clean/stash 抹掉 WIP/原件；任何冲突逐 hunk 处理。不重用已有 evidence stage 名称；B1 用 build/b1-evidence/<fresh stage>、独立 retained-B1，旧目录不被 generator output 覆盖。旧三层 source freeze 原件不变。
+
+如需跨 TMP 重启保证 ELF，可由 Root 另批持久8..16MiB，将八 ELF 流式 gzip 到持久区，校验原 SHA、gzip SHA/CRC，原 TMP 原件不删。本计划不执行归档、不占用该预算。
+
+| 操作 | 增量规划预算（估算，执行前以实际 free/closure 复核） |
+|---|---|
+| 当前只读计划 | 持久≤120KiB；无新 clone/工具/编译/测试进程 |
+| W1 helper + 完整轮询回归 | 持久源码/小证据≤250KiB；TMP增量约25..70MiB；jobs1 C++ 子进程参考峰值350MiB，启动前可用内存余量≥600MiB |
+| D1 Native DMA 全程序/model | 持久每片≤500KiB；TMP增量约35..90MiB（含实际 ELF/对象/RED保留）；jobs1，余量≥600MiB；不平行 docs/SDK heavy |
+| D2 factory + 配置 | 持久每片≤300KiB；TMP约20..60MiB；完整 Python module 单进程，无 CMake 并发写 |
+| 两 ARM fixture | TMP新鲜输出预算≥128MiB；单job，RAM余量≥300MiB，并核实际 GCC/TU/RSS；源/索引/工具全局冻结 |
+| clean installed SDK | 包+前缀+消费者实测前不猜可放入；建议另有≥1.2GiB输出 free 才安排，现约735MiB不承诺可执行；Root可按实际 SDK占量收敛 |
+| 目标 MCU 状态 | 设计预算 controller≤192B/endpoint≤32B（32-bit ABI，仅规划目标）；最终以真实对象/ELF计量。无 payload copy、heap、worker、固定dummy存储；traits关闭为0对象 |
+
+执行采用 RAM 和精确输出文件系统 free 双预算；开始/阶段间/结束记录 events、实际 child RSS、磁盘占量。上述余量不是 OOM 保证，不用 slab 或其它 mount 的空闲替代真正输出预算。预测闭包扩大或不足先停报，保已执行退码，不降门槛。
+
+## 8. 官方依据与最终边界
+
+已在受控本地来源核对，未新下载：RM0433 Rev9（SHA672a9433d6602da224e5215f571beed2be0e683cb025526f4afe9db61c26b6a0）；ES0392 Rev15（SHAeffe23b2b79ec4ee33a8ab42b1b934cdd34100775cd6ca6b8dc8f3f2f01a1f9e）；DS12110 Rev11 默认 V trim/条件包络见 batch3-divider-r2/official-review/manifest.json SHA72ac5a50d34ff0d07ec13be0965e60dd393567f3845b5df04c6bbbc04a5f6697。locked HAL a1996eed9172b59887bafaaa0ea1816ea14d48b5、CMSIS8f922cdc7cc6de2344e75ddd657889f4ff761790 只提供官方实现/定义，不能把 HAL F4 停机顺序套 H7。
+
+- RM17.3.2：DMAMUX1 channel0..7 连接 DMA1 stream0..7；request83/84；官方 CMSIS IRQ13/14/84。
+- RM2.4、memory map：AXI SRAM DMA1可达；TCM CPU可访问不等于 DMA1可达。
+- RM15.3.4、15.3.15/16 pp653–654：NDTR、正常/中断 TC 与 EN0、P2M剩余 FIFO 提交语义。
+- RM15.3.20/15.4 pp657–658：TE自动EN0；DME/FE不必自动停；错误sticky与中断条件。
+- RM50.4.14 pp2179–2180：H7 DMA启动/关闭次序。
+- RM50.4.9/.12、CR1/SR：AFCNTR、SPE0 FIFO flush、CSTART rs、CSUSP/SUSP/EOT；ES2.22.5/.6：CRCSIZE7 与独立 trailing-edge quiet。
+
+参考 Zephyr 的静态资源声明、精确 compatible/SoC driver 选择和官方 HAL/LL 复用；不复制其调度/设备注册/DT 子系统来增加本平台热路径成本。任何新引用必须记录确切版本与实际读取，不把风格参考当芯片证明。
+
+软件退出条件是上述唯一组合配置/Native/normal ARM/installed SDK 证据全部闭合，并由 Root 正常 commit hooks 和独审绑定同源。HIL 仍需要实板、探针、串口/逻辑分析仪、DMA实传和 SCK/CS 实际波形；host pin-control oracle 不等同无毛刺证明。缓存、SRAM1、16-bit、multi-segment、wake、FreeRTOS，以及 continuous UART 全部留下一独立批；不借 B1 有限 DMA 宣称其已支持。
+
+## 9. r2 的强制边界与真实外部端口回归
+
+本节是 B1-COLD-TERM-01、B1-IRQ-EOT-01、B1-IRQ-ISOLATE-02 的规范性修订。它替代 r1 中笼统的“construct读取硬件”“IRQ清已消费flag”“失败只置Q”表述；不是已实现/已测试结论。r1 SHA、独审原件及 S0 原件均保持不变。
+
+### 9.1 两个不同的 cold 边界
+
+| 操作 | 是否读取硬件 | 责任 |
+|---|---|---|
+| Python 构造/生成 C 静态对象、face/常量定义 | 否 | 验证已读作者输入并生成静态绑定；不初始化硬件 |
+| runtime typed factory lookup、端点/port 冷身份查询 | 否 | 返回已有对象/比较存储身份；不取得 gate、IRQ、CS |
+| 私有硬件 initialize、显式 Platform.start/prepare | 是 | 真正读取身份、trim、cache、时钟、寄存器、NVIC及外来占用，再取得资源 |
+| submit/service/stop/recover | 是 | 验证 live owner/实际条件并推进或保留清理责任 |
+
+initialize 的未接纳拒绝可以有只读 MMIO，但没有新增写入、资源借用或 CS 转换；“零残留效果”不等于“零读取”。lookup 的零 MMIO 正例和 initialize 的实际读取/先身份后V-layout正例必须分别断言，不能把其中一个实现替换成另一个。
+
+### 9.2 唯一清旗者与 EOT 保存
+
+RM0433 Rev9 50.11.5/6：EOTIE 同时允许 EOT、TXC、SUSP 通知；TSIZE 非零时 TXC 复制 EOT，包括软件清除。故 B1 不采用“ISR 清 EOT 后靠软件 done 布尔证明 wire”设计。ISR 的 snapshot 只用于提示/诊断，不是 task 的停止凭据。
+
+| 端口/flag | IRQ 可以做 | IRQ 禁止做 | task 可以清除的最早阶段 |
+|---|---|---|---|
+| SPI EOT/TXC/SUSP | 读 SR/IER；mask 已取得的 EOTIE并读回；失败则隔离 SPI4 NVIC | 不写任何 SPI_IFCR；不改 CSTART/TSIZE/SPE；不宣称 wire stopped | 实际 CSTART0、非零TSIZE+EOT/TXC 或 SUSP 被 task 观测，并完成独立 quiet；SUSP 必须在 SPE0 前清，EOTC 在 quiet/RX drain/SUSP清除/SPE0之后才允许 |
+| SPI 已启用错误源 | 先锁存首个错误/相关SR，再mask已取得的错误IE并读回；失败则隔离 NVIC | 不清 EOT/TXC/SUSP，不 reset，不清未取得的位 | task 已完成停止/quiet并保存错误后，按合法 IFCR/SPE0 语义清；实际读回失败继续保留 |
+| RX/TX DMA TC/HT/TE/DME/FE | 读本stream的flag/enable；先锁存，mask本stream CR/FCR中选入的IE，再精确W1C观察到的本stream位并读回 | 不碰邻居flag；不因TC清active或SETTLED；不把软件stop的TC当正常成功 | task 最终重新采样晚到错误/EN/NDTR，再完成剩余精确清旗；未清净保留责任 |
+
+SPI_IFCR 在 B1 的唯一软件写入者是拥有该 controller 的 task hardware lifecycle，含显式 initialize/recover/stop 和该 task 发起的 checked reset；所有 SPI IRQ 路径都不写 IFCR。polling 与 DMA 是互斥选入的同一 controller owner，不能存在第二个并发清旗者。
+
+正常完成：DMA/帧模型产生有限 EOT、TXC 和 CSTART0→NVIC 先交 SPI IRQ→IRQ mask EOTIE并留下真实flag→task 再从实际 CR1/CR2/SR 取得停止谓词并建立 quiet。CSUSP/EOT竞态也依此工作：CSTART 已被 EOT 清除后，闲置 CSUSP 不必产生 SUSP，保留的 EOT/TXC 才能成为合法有限完成证据。
+
+task 观察前不能 EOTC、不能 reset 或把 TSIZE 清成0；observe-to-quiet阶段不可只引用 ISR 保存的 SR 快照。quiet 证明完成后才推进 RX drain/SUSP清除/SPE0/request位清除/EOT清旗，后续重试保持 stage，不回头要求已经合法清掉的旧 EOT，也不重发 CSTART/payload。
+
+新请求启动前，task 在未选中 CS、无旧借用且所有旧源已归还时，验证/清理旧 flags 和 NVIC pending；保持 IER0 直到本请求 active引用、TSIZE、CPOL、DMA 和 CSTART 按序设置后，再安装实际需要的通知源，防止 reset TXC 或旧 pending 被误认成新完成。若这些清理读回失败，新请求不接纳；已经持有的 controller 责任也不消失。期间不允许靠 IRQ 清掉旧 EOT 以迎合新请求。
+
+### 9.3 source mask/W1C 失败的有界隔离阶梯
+
+隔离对象固定为本 owner 已取得的三个独占向量13/14/84，不是泛化 controller 框架。冷 prepare 若发现这些向量/stream外来占用，先拒绝，不能为自己禁用或清别人的 NVIC。运行期处理流程：
+
+1. 进入既有短 Arch IRQ metadata 临界区，检查当前硬件异常身份、精确已取得 owner/vector 和 active 引用；锁存首因/诊断，绝不先清证据。非法或不属于本 owner 的调用零资源副作用。
+2. SPI IRQ 一次尝试 mask 已取得的 EOT/错误 IE 并实际读回；DMA IRQ 一次 mask 本stream CR/FCR IE，锁存后一次精确 W1C，实际读回。任何一个 mask 或应清flag拒绝都记为隔离需求，不循环重试、不等待 task 来撤当前电平。
+3. 正常返回要求：所有本向量可发中断的已取得源均被证明 mask，或触发失败后已证明该 owned NVIC delivery disabled。不能仅因一次 flag 暂时为0就忽略一个被拒绝的mask，因为后续硬件事件仍可重挂起。
+4. 需要隔离时，通过既有 CMSIS NVIC_DisableIRQ 对这一个 owned vector 作一次 ICER write，DSB/ISB后读实际 NVIC_GetEnableIRQ/ISER。ISER=0 才证明未来delivery被阻止。保留 mode-only isolated-vector责任位及 active/request/endpoint/payload，返回前恢复正常 incoming mask，任务才能继续服务。不存在解除借用的动作。
+5. NVIC disabled 时，sticky level仍可使 ISPR/pending=1；这是合法隔离结果，不能误判成“disable没生效”，也不能把 pending0 当 source 已清。当前 ISR 的 active/IABR=1 在异常返回前同样合法；ISR内不等它归零、不清别的active状态。当前handler退出后被禁向量不再tail-chain。
+6. 原 NX_H743_IRQ_CONTROL(false) 组合了 disable+clear-pending，并要求 pending0；它不能单独充当上述 sticky-source 隔离谓词。B1 使用一组私有直接 NVIC 叶子（disable、get-enabled、clear/get-pending；沿既有CMSIS和Arch屏障机制），不修改 System 通用helper、不新增公共控制框架。其外部模型不得把 disable 自动等同于消除源或清尽pending。
+7. 隔离只解决中断可调度性，不解决 DMA/线端/可见性。单 task service 在后续调用中依 RM 次序停DMA/SPI、完成quiet等；每次只尝试一个stage。source mask/W1C依旧拒绝时保持Q和隔离，不在每次失败后重开向量。
+8. 只有源已实际mask、DMA/外设停止且flag已按唯一清旗者规则清净，task才清该owned NVIC pending，DSB/ISB并读回 ISPR0；在Thread/短临界区最终联结时确认该向量不在active。pending/clear读回拒绝，仍Q+ISER0+保loan，下一次service可重试。新请求前验证所有责任已清，才允许重新开启该向量；stop成功则保持NVIC disabled。不得无条件恢复旧ISER快照来开启一个仍有粘滞源的向量。
+
+需要独立证明 DMA↔CPU 可见性和 cache owner；仅把外部 CCR.DC 改回0不证明污染的cache行已处理或旧时间域已恢复。此时继续保loan，不用 isolated-vector=0 或 QUIET_DONE 软件状态跳过外部 owner 的兼容恢复/新quiet证明。本批不新增 cache-on 接管能力。
+
+### 9.4 无法隔离的 terminal fault，明确不返回
+
+若 source mask/W1C失败，且同一 owned NVIC 的disable实际读回仍enabled，则无法证明回到Thread后不会无限tail-chain。这条路径**不能只把request设Q然后恢复PRIMASK返回**，也不能继续宣称ISR有正常返回的WCET。
+
+选定平台边界为既有 Arch/Core fail-stop：保留全部资源/借用引用和首因，把合法active request标为Q；保持或取得本地 configurable IRQ mask，核其Arch掩码合同，调用一次有界、无分配、不可重入的 nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO,...)，随后专用不返回terminal loop。它不调用 polling drain/finish_clock/retain_and_park，不尝试reset、CS释放或假SETTLED。若 observer 返回，仍停驻；只有产品另行评审的不返回恢复才能替代，不能把 observer 当释放授权。
+
+这是停止系统正常服务的故障边界：本地全局可配置中断被保留mask、其它任务/中断进展与deadline都不再保证，绝不称“isolated且仍正常运行”、正常ISR WCET或电气安全输出。不能声称掩码挡住NMI/HardFault或失效的CPU/总线。若Arch本地mask合同本身不成立，已经越出可支持故障模型，不能从host变量伪造继续执行保证。
+
+正常返回ISR的预算只适用于源mask已验证或owned NVIC已验证disabled的分支；terminal分支只约束进入fault前的有限动作和observer合同，整个分支不保证返回时间。异步 service 仍保持有界/无wait；它遇到同一无法隔离条件也进入上述明确terminal边界，而不返回一个会立即饿死自己的Q。
+
+### 9.5 实现前冻结的工作量合同
+
+以下是实现/模型要验证的设计上限，尚未计量为实际结果：每次正常/成功隔离后返回的 IRQ，外部 MMIO 不超过16读/8写，source mask/W1C和NVIC disable各至多一次；一次 task service 最多一个撤回阶段、至多8个已停止SPI4 FIFO数据读取，阶段上限64外部读/16写。无时间推进循环、无NX_H743_SPI_POLL循环、无动态重试循环。若具体叶子无法满足上限，先按新实际设计审查，不隐瞒增加预算。
+
+共用 wire 叶子只返回明确的观察结果/错误：request_suspend_once 不携 CSTART1；observe_stopped 返回 CSTART/TSIZE/SR 的一致受控观测；quiet_interval 仅算同源比率；SPI disable/CS/SCK/reset各一次固定步骤和读回。它们没有 request/队列/epoch；DMA stage持有quiet deadline和重试责任，polling wrapper仍自行完成其原同步合同。跨非法时间域不能沿用旧quiet deadline；恢复先重核 clock/cache/time ownership再建立新的guard。
+
+### 9.6 测试顺序、独立 oracle 与误设识别
+
+所有列项都是未来 whole-program tests-first 要求，没有声称已执行RED/GREEN。新API未实现时可以先有真实 missing-symbol RED，但这仅证明链接合同。随后保留同一完整程序执行实际硬件行为；首个正确实现若直接GREEN，如实记coverage，不能人为造坏body制造行为RED。测试失败必须先分清external model setup与provider行为，保留原raw/source/退码。
+
+| 新外部端口场景 | 独立硬件 oracle | 对错误实现的预期可观察失败 |
+|---|---|---|
+| ConstructLookupVersusInitialize | 先取factory并只读face身份，实际MMIO计数不变；随后实际Platform.start，trace先ID后V-onlytrim/资源读取 | lookup读硬件，或initialize零读取却假称已经验明V/trim，分别失败 |
+| EotIrqBeforeTaskKeepsWireEvidence | 真DMA/帧先产生CSTART0、EOT=TXC=1；arbiter先派SPIIRQ、此间无task；IRQ后SR仍1而EOTIE实际0，task真实quiet后仅一次settle | ISR写EOTC导致EOT/TXC同时0，或把hint当实际stop并提前CS/settle |
+| EotWinsCsuspWithoutSusp | CSTART观察之后、CSUSP到达前由硬件完成；安全命令写0不清ongoing，也不重发1；EOT后闲置CSUSP不自动造SUSP | 仅认SUSP而永久Q；RMW重发CSTART；模型每次CSUSP强造SUSP掩盖bug |
+| StalePendingCannotCompleteNext | 前请求真实清理；在无源的新start边界制造owned pending事件，实际清pending/校验后再发新帧，新request不能靠旧hint完成 | 陈旧snapshot/TC或IRQ hint使新request先于新帧settle；测试手动修SR来过关 |
+| SpiMaskRefusedNeedsNvicIsolation | EOTIE写0拒绝，EOT真实保持；flag+IE持续驱动level。IRQ一次尝试后ISER实际0，ISPR可仍1；request/CS/loan保留，task可重试 | 只置Q但ISER仍1，arbiter返回后继续tail-chain；错误要求pending0而把有效隔离当fatal |
+| DmaW1cMaskAndDualRefusal | 分别拒本stream W1C、IE mask、两者；合法sticky flag+enabled持续level；只隔离该DMA向量，邻居flags/enables/pending保原样 | 模型替SUT自动清busy/flag、只手工调一次IRQ、误清stream0/1或其它向量 |
+| IsolatedPendingClearRetry | source已清、向量ISER0后拒NVIC pending清除；实际Q/loan/isolated责任保留。解除外部拒绝再真实service完成清理，无payload重放 | pending没清便放loan、无条件重开向量、恢复故障靠测试改provider状态 |
+| UnisolatableLevelFaultDoesNotReturn | 同时拒source mask/W1C与owned ICER；实际ISER仍1、level持续。子进程fault observer只记录并返回；共享trace记录Q/borrow/PRIMASK和未发布SETTLED，parent真实超时kill/reap | 正常返回并尾链，或observer返回后释放request/CS；伪throw/longjmp/abort代替provider不返回边界 |
+
+external arbiter 必须从真实 flag+IE、NVIC enabled/pending/active、优先级和本地mask决定再次派发；不能每个handler调用后无条件清pending或每个service自动放行中断。正常返回但未隔离的风暴，在先禁止task介入的有界dispatcher观察窗内记失败；此后只能为清理外部解除故障、走真实provider drain，不把被测试框架强制让出的task时间当可恢复性证明。
+
+模型自身先核四个物理事实：①TSIZE>0时EOTC同时清EOT/TXC；②EOT已使CSTART0时CSUSP不保证SUSP；③sticky flag+IE能在enabled时再挂起；④ICER只隔离delivery、不自动清peripheral flag或保证ISPR0，拒ICER必须保持实际ISER1。selftest只能纠正这些硬件叶子，不能读取被测driver的stage/retained/done来决定进展。
+
+故障子进程不通过exception恢复、不在finally里清active或重置model。可恢复case解除的只有外部拒写/硬件fault，之后调用真实service/stop并核责任归零；不可恢复case明确终止进程并reap，保留fault现场，不假称原loan在存活系统中已归还。host时间窗仅证明所测程序不返回，不能升级为MCU物理WCET/HIL结论。

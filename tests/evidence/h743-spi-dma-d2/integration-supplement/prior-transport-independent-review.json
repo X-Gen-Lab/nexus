@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "kind": "independent_read_only_D2_normalized_transport_admission_review",
+  "status": "PASS",
+  "open_blockers": [],
+  "reviewed_at_utc": "2026-10-18T07:57:36.808355+00:00",
+  "scope": "Payload transport/admission only. Exact188 payload rows, with exact29 reviewed changed sources and159 evidence rows, plus the existing verified helper append of source-review and map itself for190 final staged targets. No new test or code qualification.",
+  "transport_map": {
+    "path": "/dev/shm/nexus-h743-d2-main-package-20261018-r1/normalized-transport.json",
+    "bytes": 78317,
+    "sha256": "2e5555ce17a466b09d5d17cff1ecf6329c33b971fa4fe5ac6f736e40d78727d3"
+  },
+  "base_head": "474b3da3e7e60bf73c573f073465036c8db6437f",
+  "source_freeze": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-d2/source-freeze-r2.json",
+    "bytes": 7687,
+    "sha256": "246cb4de76e54fc993bceeecd3ce674936e566f14d51b80eb8610c6bdaeb98bf"
+  },
+  "source_review_unchanged": {
+    "path": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-d2-code-independent-review-r1.json",
+    "bytes": 46668,
+    "sha256": "ba5be46e936583e200410ca3cd5511e3e4cf2d282195edb4ee1f42139cf790b5"
+  },
+  "payload_validation": {
+    "rows": 188,
+    "active_sources": 29,
+    "evidence_rows": 159,
+    "every_row_actual_bytes_and_SHA256_verified": true,
+    "target_unique_including_casefold": true,
+    "targets_relative_canonical_no_escape": true,
+    "sources_regular_no_symlink_ancestors": true,
+    "unchanged_dependencies_only_evidence_raw": 5,
+    "author_feature_file_count": 101,
+    "all_author_feature_regular_files_in_map": true,
+    "docs_prepared_and_final_full_packages_in_map": true,
+    "all_historical_executable_source_extensions_mapped_as_raw_or_compressed_archives": true,
+    "archive_source_authority_not_promoted": true
+  },
+  "active_source_validation": {
+    "changed_paths_exactly_equal_freeze_true_set": true,
+    "all34_source_flags_rederived_from_immutable_Main474_blobs": true,
+    "all34_prior_authored_baseline61_blobs_equal_Main474_preimages": true,
+    "no_intervening_changed_file_content_clobbered": true,
+    "source_paths": [
+      "soc/stm32h743/soc.json",
+      "soc/stm32h743/routes.json",
+      "tools/configure/providers/stm32h743/__init__.py",
+      "tools/configure/configure.py",
+      "tools/configure/providers/stm32h743/bindings.py",
+      "tools/configure/providers/stm32h743/emission.py",
+      "tools/configure/preflight.py",
+      "tools/configure/selected_contracts.py",
+      "soc/stm32h743/CMakeLists.txt",
+      "tools/configure/providers/descriptor.py",
+      "tools/configure/providers/stm32h743/test_spi_dma.py",
+      "tools/configure/providers/stm32h743/test_peripherals.py",
+      "tests/google/h743_spi_dma_factory_model.h",
+      "tests/google/h743_spi_dma_factory_model.cpp",
+      "tests/google/h743_spi_dma_factory_test.cpp",
+      "tests/google/h743_spi_dma_factory.cmake",
+      "tests/google/CMakeLists.txt",
+      "tests/contracts/h743_assembly/spi-dma.toml",
+      "tests/contracts/h743_assembly/spi-dma-uart-tx.toml",
+      "tests/contracts/h743_assembly/spi-dma-uart-rx.toml",
+      "tests/google/h743_dma_factory_test.cpp",
+      "tests/google/h743_receive_factory_test.cpp",
+      "soc/stm32h743/drivers/uart_dma.c",
+      "tests/google/h743_dma_model.h",
+      "docs/delivery/capabilities.md",
+      "docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "tests/contracts/h743_assembly/CMakeLists.txt",
+      "tests/contracts/h743_assembly/main.c"
+    ],
+    "Google_main_CMake_delta": "--- 474/CMakeLists.txt\n+++ D2/CMakeLists.txt\n@@ -596,3 +596,5 @@\n include(\"${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake\")\n \n include(h743_spi_dma.cmake)\n+\n+include(h743_spi_dma_factory.cmake)\n",
+    "SPI_runtime_domain_or_portability_source_not_silently_added": true
+  },
+  "original_index_preservation": {
+    "compressed": {
+      "path": "/dev/shm/nexus-h743-d2-main-package-20261018-r1/before-main-index.gz",
+      "bytes": 754387,
+      "sha256": "1751e0d215f7dc3a2d1fa6b5875579b7251afb74e72323930b545455dfd88463"
+    },
+    "complete_decompressed_bytes": 3575304,
+    "decompressed_SHA256": "d24ac7ed5c4fc9ac2946f87c7c8e6b143b3189f734c489560832164dba0d95e0",
+    "matched_Main_index_during_completed_payload_review_before_parent_integration": true,
+    "index_before": {
+      "path": "/tmp/nexus-io-validation-20261018/.git/index",
+      "bytes": 3575304,
+      "sha256": "d24ac7ed5c4fc9ac2946f87c7c8e6b143b3189f734c489560832164dba0d95e0"
+    },
+    "current_index_after_parent_authorized_integration_started": {
+      "path": "/tmp/nexus-io-validation-20261018/.git/index",
+      "bytes": 3599974,
+      "sha256": "4b4839ab81cb80af6540244a57827982f4ac612a62440183374debf364ee938f"
+    }
+  },
+  "required_helper_dependency": {
+    "helper": {
+      "path": "/workspace/nexus-io-recovery-20261018/integrate-clean-reviewed-r1.py",
+      "bytes": 5647,
+      "sha256": "5fd71708311e0fba9d8cd309fe0868ed8826c5b68c86b36b301c4c1796349212"
+    },
+    "review_arg_required": "/workspace/nexus-io-recovery-20261018/validation/h743-spi-dma-d2-code-independent-review-r1.json",
+    "review_sha_arg_required": "ba5be46e936583e200410ca3cd5511e3e4cf2d282195edb4ee1f42139cf790b5",
+    "review_target_required": "tests/evidence/h743-spi-dma-d2/review/h743-spi-dma-d2-code-independent-review-r1.json",
+    "manifest_arg_required": "/dev/shm/nexus-h743-d2-main-package-20261018-r1/normalized-transport.json",
+    "manifest_SHA_required": "2e5555ce17a466b09d5d17cff1ecf6329c33b971fa4fe5ac6f736e40d78727d3",
+    "manifest_target_requirement": "A unique evidence target for this original transport map; helper appends original bytes to avoid a self-referential map.",
+    "payload_rows": 188,
+    "helper_appended_rows": 2,
+    "expected_final_rows": 190,
+    "expected_source_count": 29,
+    "review_and_manifest_digest_checked_before_any_Main_write": true,
+    "source_and_target_preimages_verified_against_HEAD": true,
+    "all_overwritten_files_preserved_before_checkout_mutation": true,
+    "all190_actual_staged_paths_and_staged_blob_bytes_checked": true,
+    "helper_not_executed_by_reviewer": true
+  },
+  "prior474_evidence_admission": {
+    "qualification_scope": "Historical ordinary full normal hooks for public CA-reader tooling correction at474, not a successful OCI/Docker/SDK/offline software-qualification run.",
+    "complete_checkpoints": 33,
+    "archive_compressed_bytes": 1291061,
+    "declared_completed_commands": 618,
+    "declared_exit_counts": {
+      "0": 618
+    },
+    "all33_archive_bytes_SHA256_in_payload_and_index": true,
+    "checkpoint_index": {
+      "path": "/dev/shm/nexus-full-hook-oci-ca-reader-r1/checkpoint-index.json",
+      "bytes": 8118,
+      "sha256": "ccb628b33b0398c91d91d2137174dd5e6ac27888f0c78ac4790ddcd437e19e7a"
+    },
+    "actual_last_archive_execution_report_matches_source_bound_fullgate_identity": true,
+    "Google_programs": 306,
+    "Google_cases": 5364,
+    "tool_methods": 2368,
+    "all_aggregate_failure_error_skip_counts_zero": true,
+    "actual_normal_commit_receipt_zero_completed_stable_withdrawal": true,
+    "full_gate": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/full-gate-oci-ca-reader-r1.json",
+      "bytes": 155410,
+      "sha256": "46fa76810dac52bf168cda69671c82dba9db3fd921b3c3b1be0d4f4c766591aa"
+    },
+    "ordinary_push_proof": {
+      "path": "/workspace/nexus-io-recovery-20261018/validation/publish-474b3da3-direct-r1/result.json",
+      "bytes": 3465,
+      "sha256": "037d6382c5bd5a0b0e7348d2a124d45640336a83fb3f996ab5a6213400eb01f6"
+    },
+    "head_and_post_push_remote_equal474": true,
+    "no_network_requery_or_new_publication_done_by_reviewer": true,
+    "persistence_scope": "Original checkpoint stored volatile tmpfs and ordinary474 commit already published. Checkpoint bytes become GitHub-durable only after their incorporation and verified publication in this new commit."
+  },
+  "focused_evidence_scope": {
+    "existing_D2_review_retained": true,
+    "Native15_400_Python7_85_ARM5_and_catalogs_originals_mapped": true,
+    "first_ARM5_attempt_partial_failure_preserved_separately": true,
+    "old398_focused_archive_not_requalified_or_repeated_here": true,
+    "matching_ELFs_and_other_generated_artifacts_referenced_as_original_TMP_evidence_not_pretended_durable_source_payload": true,
+    "current_complete_Main_hooks_pending": true
+  },
+  "review_actions": [
+    "Read and hash each188 payload original; parse exact frozen34 source records and immutable Git blob preimages.",
+    "Verify original full index gzip bytes, helper source, prior checkpoint inventory, actual archived aggregate and normal commit/push identities.",
+    "Only this independent report was newly written. No Main, author source, Git index/ref, archive or qualification evidence was modified; no helper, build, test, OCI or binary executed."
+  ],
+  "limits": [
+    "PASS is conditional on using the reviewed helper with exact map/review hashes and unique evidence targets, producing190 exact final paths before ordinary full hooks.",
+    "This review is transport admission, not Main190 integration execution, new full hooks, OCI success, SDK consumer qualification, runtime-domain containment or physical HIL.",
+    "Main index matched the preserved d24ac7ed preimage during the completed payload review. Root then explicitly authorized and began integration; any later index difference is recorded separately, not treated as payload failure. Map/source/review identity changes still require a new binding."
+  ]
+}

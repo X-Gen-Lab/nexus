@@ -1,0 +1,20 @@
+{
+  "kind": "tests-first before any divider production change or execution",
+  "comment_only_baseline_sha256": "b37db9d7e859c6b0f53e52ecf9e18d4a0343aa66a8742973c68963c42fb24fa2",
+  "production_spi_sha256": "533fc21e6e8c25d138c1b6b4d2561a59f96785ffbba2158f5484054c35461dcd",
+  "production_bindings_sha256": "8211df2a6f05c83bcbac31ecd7187b9dac5aac502384302b2e229d3486d18395",
+  "new_native_cases": 6,
+  "new_python_methods": 2,
+  "legacy_two_slow_tail_policy_change": "250000 to254000Hz, retain div256/quiet intent; exact old bodies not preserved for those two cases",
+  "python_fixture_setup": "Separate controller/endpoint TOML sections; asserts parsed exact rates/profile before invoking configure; old sequential replacement issue corrected before any execution",
+  "new_observation": "Only capture actual CFG1 MBR on external CSTART hardware write; no production state",
+  "quiet": "Same-source nominal timer/SPI ratio unchanged; upper65/32.5MHz only selects/rejects divider",
+  "source": {
+    "tests/google/h743_peripheral_test.cpp": "cbc5d2cde15fd384d7d2712d4c7baf636d03c5db9add9f87c8da38eca9ecf712",
+    "tests/google/h743_model.h": "1626b1cdbfb4750d550c359d37f6b34bb4fcbe8b742ef8f568c6d8fafeb91d8b",
+    "tests/google/h743_model.cpp": "05cee6923341a2a5f67486e4ef04dd506cd868054769e296a359d688bfc8eda7",
+    "tests/google/h743_peripheral_factory_test.cpp": "799646e2ee7c5f8682150e38d97d09ca6e8544d166133a79891c2540d14cca9b",
+    "tools/configure/providers/stm32h743/test_peripherals.py": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
+    "soc/stm32h743/drivers/spi.c": "533fc21e6e8c25d138c1b6b4d2561a59f96785ffbba2158f5484054c35461dcd"
+  }
+}

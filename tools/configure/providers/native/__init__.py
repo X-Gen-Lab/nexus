@@ -26,10 +26,14 @@ SPI_REQUIRES_ENDPOINT = False
 _FIXED_DMA = MappingProxyType({})
 
 _MODE_IMPLEMENTATIONS = MappingProxyType({
+    ("rtc", "calendar-alarm"): "rtc",
+    ("lptim", "counter16-oneshot"): "lptim",
     ('gpio', 'input'): 'gpio',
     ('gpio', 'output'): 'gpio',
     ('uart', 'irq-byte-event'): 'uart',
+    ('uart', 'irq-words'): 'uart_word',
     ('spi', 'short-poll'): 'spi',
+    ('spi', 'async-model'): 'spi_dma',
     ('i2c', 'poll-messages'): 'i2c',
     ('flash', 'poll-byte'): 'flash',
     ('watchdog', 'independent'): 'watchdog',

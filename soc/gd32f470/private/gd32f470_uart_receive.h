@@ -10,7 +10,8 @@
 
 /** \brief Only selected receive modes own these exact hardware targets. */
 typedef struct {
-    nx_gd32_uart_dma_state_t transmit;
+    nx_gd32_uart_state_t uart;
+    nx_gd32_uart_dma_resources_t resources;
     nx_stream_t* stream;
     nx_stream_producer_t producer;
     nx_stream_fill_t fill[3];
@@ -23,8 +24,11 @@ typedef struct {
     bool stopping;
 } nx_gd32_uart_receive_state_t;
 
-/** \brief Build-time name for the same selected caller-owned storage. */
-typedef nx_gd32_uart_receive_state_t nx_gd32_uart_duplex_state_t;
+/** \brief Duplex reuses the compact RX owner and adds only selected TX DMA. */
+typedef struct {
+    nx_gd32_uart_receive_state_t receive;
+    nx_gd32_uart_tx_dma_extension_t transmit;
+} nx_gd32_uart_duplex_state_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,14 +83,34 @@ nx_gd32_uart_receive_tx_validate(void* context,
  * \return          Same cold route and ownership checks as receive initialize.
  * \note            Only this constructor retains TX-DMA initialization code.
  */
-nx_result_t nx_gd32_uart_duplex_initialize(nx_gd32_uart_receive_state_t* state,
+nx_result_t nx_gd32_uart_duplex_initialize(nx_gd32_uart_duplex_state_t* state,
                                            uint32_t baud, unsigned priority);
 /** \brief UART vector for selected TX-DMA and independent RX DMA state. */
-void nx_gd32_uart_duplex_irq(nx_gd32_uart_receive_state_t* state);
+void nx_gd32_uart_duplex_irq(nx_gd32_uart_duplex_state_t* state);
+/** \brief Exact TX-DMA vector decodes the independent duplex extension. */
+void nx_gd32_uart_duplex_dma_irq(nx_gd32_uart_duplex_state_t* state);
 /** \brief Matching pure validator for the selected duplex transport face. */
 nx_result_t
 nx_gd32_uart_duplex_tx_validate(void* context,
                                 const nx_uart_tx_request_t* request);
+
+/** \brief Private shared RX algorithm used by both selected owner layouts. */
+nx_result_t nx_gd32_uart_receive_prepare(nx_gd32_uart_receive_state_t* state);
+void nx_gd32_uart_receive_finish_initialize(nx_gd32_uart_receive_state_t* state,
+                                            unsigned priority);
+void nx_gd32_uart_receive_service(nx_gd32_uart_receive_state_t* state);
+nx_result_t nx_gd32_uart_receive_validate(nx_gd32_uart_receive_state_t* state,
+                                          const nx_uart_tx_request_t* request);
+nx_result_t nx_gd32_uart_receive_start(nx_gd32_uart_receive_state_t* state,
+                                       nx_stream_t* stream, size_t owner_size);
+nx_result_t nx_gd32_uart_receive_stop(void* context);
+nx_result_t
+nx_gd32_uart_receive_attach_wake(nx_gd32_uart_receive_state_t* state,
+                                 const nx_irq_wake_t* wake, uint8_t ceiling,
+                                 bool duplex);
+bool nx_gd32_uart_receive_irq_facts(nx_gd32_uart_receive_state_t* state,
+                                    uint32_t status);
+void nx_gd32_uart_receive_vector_stop(void);
 
 #ifdef __cplusplus
 }

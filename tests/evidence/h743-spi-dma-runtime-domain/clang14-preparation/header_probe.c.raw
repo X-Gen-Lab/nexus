@@ -1,0 +1,14 @@
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdalign.h>
+#include <stdatomic.h>
+
+_Static_assert(__clang_major__ == 14, "The actual frontend must be Clang14");
+_Static_assert(sizeof(size_t) >= sizeof(uint16_t), "Builtin sizes are parsed");
+_Static_assert(alignof(max_align_t) > 0, "Builtin alignment is available");
+
+int clang14_header_probe(void) {
+    atomic_uint value = ATOMIC_VAR_INIT(0U);
+    return atomic_load_explicit(&value, memory_order_relaxed) == 0U ? 0 : 1;
+}

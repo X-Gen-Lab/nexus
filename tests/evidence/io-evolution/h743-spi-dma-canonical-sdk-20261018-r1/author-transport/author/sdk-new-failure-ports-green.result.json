@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "tools/testing/test_sdk_verification_call.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.json"
+  ],
+  "actual_returncode": 0,
+  "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/sdk-new-failure-ports-green.attempts/1792315251625753471-3d4e6d0da6504c1ca760dfb222dbae79/receipt.json",
+  "child_maxrss_KiB": 47764,
+  "headroom_after": 3522002944,
+  "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+}

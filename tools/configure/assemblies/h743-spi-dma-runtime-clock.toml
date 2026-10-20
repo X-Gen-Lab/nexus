@@ -1,0 +1,32 @@
+schema = 2
+board_package = "../../../boards/stm32h743zi_hsi_reference"
+backend = "baremetal"
+clock = "hsi64-fixed-cache-off"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[spi.bus4]
+binding = "spi4"
+mode = "dma"
+max_hz = 1000000
+[spi.bus4.irq]
+priority = 5
+calls_os = false
+
+[spi_device.device4]
+controller = "bus4"
+driver = "spi-endpoint"
+cs_binding = "spi4-cs"
+mode = 0
+max_hz = 1000000
+
+[power]
+mode = "fixed-run"
+controllers = ["bus4"]

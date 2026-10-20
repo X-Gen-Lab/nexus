@@ -12,9 +12,14 @@ runtime registry or automatic IRQ/DMA/polling fallback.
 
 The silicon route inventory covers the 52 package GPIO pads. The fixed profile
 reserves PF0/PF1 for HSE and PG10 for NRST until an explicit reviewed option-byte
-policy exists. Pad inventory does not authorize a PCB connection. FDCAN, USB and
+policy exists. Pad inventory does not authorize a PCB connection. USB and
 Ethernet remain unsupported here. ADC and I2C routes are software fixtures with
 no populated analog circuit, pull-ups or external device asserted.
+
+FDCAN1 now has exact STM32G474RET6 ISO-FD normal and internal-loopback software
+selections at 500 kbit/s / 2 Mbit/s, fixed 212-word physical message RAM and three
+hardware-priority TX slots. See [the CAN FD ownership contract](../../docs/design/can-fd.md);
+transceiver wiring, physical timing and HIL remain unverified.
 
 The source-reviewed reference Board is NUCLEO-G474RE, MB1367 C04/C05 documentation.
 The physical PCB revision, fitted crystal and solder bridges have not been
@@ -74,7 +79,7 @@ it retains the executor, buffers and controller/CS owners, masks IRQs and calls
 the fault observer; it parks if the observer returns. Idle stop/recovery failures
 retain retryable leases. There are no asynchronous submission or DMA methods.
 
-PWM selects TIM3 CH1 PA6 AF2 or TIM4 CH1 PB6 AF2, each with exclusive ownership
+The ordinary `fixed-pwm` mode selects TIM3 CH1 PA6 AF2 or TIM4 CH1 PB6 AF2, each with exclusive ownership
 of its whole timer. It is edge-aligned, upcounting and active-high, with a fixed
 170 MHz/integer-divisor tick, divisor1..65536, period1..65535 and duty0..period.
 CCR preload stages duty for an update event; period/base changes are rejected.
@@ -86,6 +91,27 @@ Startup uses quiet UG and an inactive GPIO level. Stop proves output/counter
 withdrawal and Board idle; failed private close retains cleanup responsibility.
 Other channels, shared bases, complementary output, capture, break, IRQ and DMA
 are outside this profile.
+
+The separate `shared-fixed-pwm` selection uses exact TIM3 CH1/PA6 and CH2/PA7
+AF2 at the fixed 170 MHz kernel. Two ordinary `nx_pwm_port_t` factory faces
+point through readonly channel references to one physical owner, one immutable
+tick/period configuration and one cold initialization/final close. Both existing
+`[pwm]` declarations must agree on tick and period; no share flag or runtime
+registry is added. The sole normal input is
+[`g474-pwm-shared.toml`](../../cmake/package/verification/io_evolution/g474-pwm-shared.toml).
+Its 1 MHz counter, 1000-tick period, duties 250/750 and PA6-low/PA7-high inactive
+latches are software reference choices, not inspected PCB or electrical facts.
+
+Each shared-channel set changes only its CCR preload. A channel joining a
+running peer adopts the current phase without UG or counter restart; coherent
+group start and a full first pulse are not promised. Channel stop withdraws only
+its own output and establishes its Board inactive GPIO level; only the last
+channel stops CEN. Final physical close may use exclusive reset and must succeed
+before Platform releases either pad snapshot, added clock or System lease.
+Refused reset, inactive-latch or outer restoration retains the relevant cleanup
+responsibility. The pair excludes other whole-TIM3 owners and conflicting
+PA6/PA7 users. It uses no TIM3 IRQ or DMA; physical phase/pulse timing and HIL
+remain unmeasured.
 
 IWDG lookup and Platform startup never enable or feed the watchdog. Enable uses
 the RM0440 non-window sequence and reports DS12288 Table45 full-temperature LSI
@@ -195,6 +221,48 @@ Failed relock or cache restoration retains a private cleanup lease and rejects
 further reads/writes. Platform stop retries the actual restoration before
 releasing that state.
 
+## Finite coupled PWM and ADC reference
+
+The separate `pwm_adc` / `finite-regular-dma` software assembly selects one
+TIM1/ADC1 owner and one `nx_pwm_adc_t` face. It keeps TIM1 CH1/2/3 PA8/PA9/PA10
+AF6 duties constant for a finite request, uses internal CH4 PWM2/TRGO2 at a
+50-tick phase in a 100-tick period, and samples PA0/ADC1_IN1 through DMA1
+channel1/DMAMUX1 request5. The counter is 1 MHz from the 170 MHz kernel; deadtime
+is separately 170 kernel ticks. COMP1 PA1/PA4 supplies the selected noninverted
+break input. This software-only Board does not establish analog wiring, a power
+stage or physical safety qualification.
+
+The owner disables ADC while idle and discards two software primes before each
+finite halfword DMA window. ADC limited requests with DMACFG0 prevent buffer
+overwrite after TC, but do not stop PWM. Task service proves CEN0 before changing
+the trigger route, then ADC stop/disable, DMA/address detachment and both vector
+joins before SETTLED. Captured and late TE/OVR/break errors remain authoritative;
+failed drain retains the request and outer leases. Public stop closes admission;
+final Platform close additionally restores priorities, comparator, pads and
+clocks. No independently startable ADC or group face aliases the owner. Exact
+format, finite deadline observation, failure and software-test boundaries are in
+[the coupled acquisition contract](../../docs/design/pwm-adc.md). HIL remains
+`not_executed`.
+
+## Finite ordered ADC groups
+
+The separate `adc_group` selections own ADC1/common and expose one static
+`nx_adc_group_port_t`. At SYSCLK/8=21.25 MHz they execute regular sequences with
+real CONT1 or TIM6-triggered finite normal DMA, or one injected frame through
+software/JQDIS1 or a single TIM6 OPM trigger. Ordered logical channels, integer
+stride/padding, actual sample codes and trigger provenance are explicit.
+Named X/Y/Z layouts use the shared observed-IDCODE/Flash-size policy; Z rank
+duplication changes physical rank count and raw stride without a hidden buffer.
+
+Accepted arrays include whole-frame padding and remain borrowed through actual
+trigger, ADC, DMA and vector withdrawal. Real priming and a checked freshness
+budget prevent stale idle conversions from becoming valid data; failed drain
+retains the request and outer leases for retry. Ordinary ADC and PWM/ADC owners
+remain separate, mutually conflicting selections. The four canonical software
+assemblies, internal-channel limits, failure contract and software/physical
+boundaries are in [the ADC sequence contract](../../docs/design/adc-group.md).
+HIL remains `not_executed`.
+
 ## SDK and evidence
 
 The official CMSIS Device G4 source is pinned to
@@ -219,7 +287,12 @@ other clocks, alternate controllers or unreviewed PCB routes.
 固定 PWM、独立 IWDG 和 PA0/PA1 EXTI。PF0/PF1 保留给 HSE，PG10 保留给 NRST。
 GPIO 焊盘清单不建立 PCB 接线。新增独立软件夹具接入 ADC1 PA0/IN1 单次采样、
 TIM6 触发的有限普通 DMA block、I2C1 PB8/PB9 polling 及完整物理 Flash；
-未列模式仍拒绝，FDCAN/USB/以太网未接入。
+未列模式仍拒绝，USB/以太网未接入。
+
+FDCAN1 新增精确 STM32G474RET6 的 ISO-FD 正常/内部环回软件装配，
+500 kbit/s / 2 Mbit/s、固定 212 word 物理消息 RAM 与 3 个硬件优先级发送槽。
+详见 [CAN FD 所有权合同](../../docs/design/can-fd.md)；收发器接线、物理时序与
+HIL 仍未验证。
 
 ADC 为独立单端 12 位、SYSCLK/128=1.328125 MHz、code0（2.5 周期）bulb 采样。
 稳压器延迟 22 us，校准后延迟 5 us；考虑 1 MHz 计时量化后，仍满足 20 us 和
@@ -235,6 +308,35 @@ IRQ 停止触发，任务观察 DMA/ADC 撤离及 ADEN 清零后发布；下一�
 存在间隙。close 读回冷态配置，失败保留责任并允许重试；消费者仍负责释放借用。
 仅选择 96 KiB SRAM1/2；32 KiB CCM 在 0x10000000 统计一次，芯片也允许通过
 0x20018000 别名进行 DMA（RM0440 p89），当前软件策略未开放这些 CCM 地址。
+
+独立 `pwm_adc` / `finite-regular-dma` 软件装配用一个 `nx_pwm_adc_t` 接口统一拥有
+TIM1/ADC1。TIM1 CH1/2/3 的 PA8/PA9/PA10 AF6 占空比在有限请求期间保持不变；
+170 MHz 内核分频得到 1 MHz 计数，period100、内部 CH4 PWM2/TRGO2 phase50，
+deadtime 独立使用 170 个内核时钟 tick。PA0/ADC1_IN1 通过 DMA1 channel1、
+DMAMUX1 request5 进行半字普通 DMA；COMP1 PA1/PA4 提供选定的非反相 break。
+该软件 Board 不建立实际模拟接线、功率级或安全资格。
+
+每次启用 ADC 后先丢弃两次软件转换，空闲时禁用 ADC。DMACFG0 的有限请求避免
+TC 后覆写缓冲区，但不会停止 PWM。任务 service 先证明 CEN0，再改变触发路由，
+随后观察 ADC 停止/禁用、DMA 与地址撤离以及两个向量退出，才发布 SETTLED。
+排空中已捕获和迟到的 TE/OVR/break 不得被完成状态覆盖；失败时保留请求及外层
+租约。公共 stop 关闭新准入，最终 Platform close 还需恢复优先级、比较器、引脚
+和时钟。不会另暴露可独立启动的 ADC/group 接口。精确格式、有限 deadline 的观察
+规则、失败及软件测试范围见[联合采样合同](../../docs/design/pwm-adc.md)；HIL 仍为
+`not_executed`。
+
+独立 `adc_group` 装配统一拥有 ADC1/common，以一个静态 `nx_adc_group_port_t`
+暴露有序整数帧。SYSCLK/8=21.25 MHz 下，regular 使用真实 CONT1 或 TIM6 触发的
+有限普通 DMA；injected 只接收一次软件/JQDIS1 或 TIM6 OPM 触发的完整帧。
+逻辑通道顺序、整数步幅/填充、采样时间码和触发来源均显式报告；X/Y/Z 命名布局
+通过同一实读 IDCODE/Flash 大小策略准入，Z 重复物理 rank，改变步幅而不增加
+隐藏打包缓冲区。
+
+已接受数组包含完整帧填充，直到触发、ADC、DMA 和向量实际撤离后才归还。真实
+预转换和新鲜度预算防止空闲后的陈旧转换成为有效数据；排空失败保留请求及外层
+租约，允许重试。普通 ADC、PWM/ADC 和本组模式为独立且互斥的选择。四个规范
+软件装配、内部通道限制、失败合同及软件/实板边界见
+[ADC 序列合同](../../docs/design/adc-group.md)；HIL 仍为 `not_executed`。
 
 I2C1 为 PB8/PB9 AF4 开漏、HSI16、100 kHz 标准模式的固定 timing，外部上拉与
 上升/下降时间由 Board 验证。每次最多八条消息，每条 1--256 字节；支持 repeated
@@ -255,7 +357,7 @@ Flash 区域、看门狗、执行停顿及掉电策略。所有新增模式的 H
 
 SPI 每次最多 256 字节、使用有限 deadline，最高 42.5 MHz；无法证明已接受调用的
 移位器排空或 CS 无效时，保留执行者与借用存储，屏蔽中断并观察故障，观察者返回后
-停驻。PWM 仅为 TIM3 CH1 PA6 AF2、TIM4 CH1 PB6 AF2，独占整个控制器，不支持
+停驻。普通 `fixed-pwm` 模式仅为 TIM3 CH1 PA6 AF2、TIM4 CH1 PB6 AF2，独占整个控制器，不支持
 动态 base、其他 channel、互补、capture、break、IRQ 或 DMA。IWDG 激活不可逆；
 准备清理失败保留重试责任。所有 HIL 均为 `not_executed`。
 SPI/PWM 选择 OSPEEDR11。PWM 计数范围仅代表逻辑能力：DS12288 Table56 在 30 pF

@@ -103,8 +103,8 @@ class UARTMultiple : public testing::Test {
         held = nullptr;
         regions[0] = {(uintptr_t)payload, sizeof(payload), NX_DMA_MEMORY_READ};
         for (unsigned i = 0U; i < 2U; ++i) {
-            states[i].regions = regions;
-            states[i].region_count = 1U;
+            states[i].resources.regions = regions;
+            states[i].resources.region_count = 1U;
 #if defined(NX_DMA_MULTI_STM32)
             states[i].uart.registers = uarts[i];
             states[i].uart.baud = 115200U;
@@ -112,11 +112,11 @@ class UARTMultiple : public testing::Test {
             states[i].uart.rx_storage = rings[i];
             states[i].uart.rx_capacity = sizeof(rings[i]);
             states[i].uart.irq = i == 0U ? UIRQ0 : UIRQ1;
-            states[i].dma = i == 0U ? DMA2 : DMA1;
-            states[i].tx = i == 0U ? DMA2_Stream7 : DMA1_Stream6;
-            states[i].stream = i == 0U ? 7U : 6U;
-            states[i].channel = 4U;
-            states[i].dma_irq = i == 0U ? TXIRQ0 : TXIRQ1;
+            states[i].resources.dma = i == 0U ? DMA2 : DMA1;
+            states[i].transmit.tx = i == 0U ? DMA2_Stream7 : DMA1_Stream6;
+            states[i].transmit.stream = i == 0U ? 7U : 6U;
+            states[i].transmit.channel = 4U;
+            states[i].transmit.dma_irq = i == 0U ? TXIRQ0 : TXIRQ1;
 #endif
             nx_request_initialize(&requests[i].base);
             ASSERT_EQ(nx_uart_tx_prepare(&requests[i], payload[i],
@@ -307,9 +307,9 @@ TEST_F(UARTMultiple, IdleForeignPublisherRejectsBeforeClockOrFlagMutation) {
 }
 TEST_F(UARTMultiple, SecondaryCannotAcquireForeignColdControllerFacts) {
 #if defined(NX_DMA_MULTI_STM32)
-    states[1].tx = DMA2_Stream7;
+    states[1].transmit.tx = DMA2_Stream7;
     EXPECT_EQ(Initialize(1U), NX_ERROR_UNSUPPORTED);
-    states[1].tx = DMA1_Stream6;
+    states[1].transmit.tx = DMA1_Stream6;
     EXPECT_EQ(nx_stm32_uart_dma_initialize(&states[1], 84000000U),
               NX_ERROR_UNSUPPORTED);
 #else

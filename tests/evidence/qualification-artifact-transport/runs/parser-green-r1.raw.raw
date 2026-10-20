@@ -1,0 +1,23 @@
+test_boolean_ordinal_cannot_impersonate_integer_zero (tools.testing.test_qualification_transfer.QualificationTransferTests.test_boolean_ordinal_cannot_impersonate_integer_zero) ... ok
+test_changed_original_snapshot_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_changed_original_snapshot_refused) ... ok
+test_claimed_uploaded_without_complete_receipts_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_claimed_uploaded_without_complete_receipts_refused) ... ok
+test_complete_existing_portable_schema_round_trip (tools.testing.test_qualification_transfer.QualificationTransferTests.test_complete_existing_portable_schema_round_trip) ... ok
+test_existing_output_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_existing_output_refused) ... ok
+test_hidden_zero_length_and_directory_modes_preserved (tools.testing.test_qualification_transfer.QualificationTransferTests.test_hidden_zero_length_and_directory_modes_preserved) ... ok
+test_identity_source_and_run_mismatch_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_identity_source_and_run_mismatch_refused) ... ok
+test_input_alias_symlink_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_input_alias_symlink_refused) ... ok
+test_missing_extra_and_changed_part_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_missing_extra_and_changed_part_refused) ... ok
+test_missing_required_upload_never_complete (tools.testing.test_qualification_transfer.QualificationTransferTests.test_missing_required_upload_never_complete) ... ok
+test_missing_role_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_missing_role_refused) ... ok
+test_output_inside_input_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_output_inside_input_refused) ... ok
+test_partial_receipt_cannot_verify (tools.testing.test_qualification_transfer.QualificationTransferTests.test_partial_receipt_cannot_verify) ... ok
+test_rehashed_bad_gzip_and_tar_tails_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_rehashed_bad_gzip_and_tar_tails_refused) ... ok
+test_rehashed_first_padding_malformed_header_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_rehashed_first_padding_malformed_header_refused) ... ok
+test_role_authority_is_exact (tools.testing.test_qualification_transfer.QualificationTransferTests.test_role_authority_is_exact) ... ok
+test_success_without_artifact_identity_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_success_without_artifact_identity_refused) ... ok
+test_tiny_split_boundaries_and_ninth_part_refused (tools.testing.test_qualification_transfer.QualificationTransferTests.test_tiny_split_boundaries_and_ninth_part_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.097s
+
+OK

@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Run the entire focused H743 peripheral Python module, with fresh JUnit."""
+import hashlib
+import io
+import json
+import os
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+import xml.etree.ElementTree as ET
+
+ROOT = Path('/tmp/nexus-h743-spi-safe-stop-20261018')
+MODULE = 'tools.configure.providers.stm32h743.test_peripherals'
+PATHS = ('soc/stm32h743/drivers/spi.c',
+         'tests/google/h743_peripheral_test.cpp',
+         'tests/google/h743_peripheral_factory_test.cpp',
+         'tests/google/h743_model.h', 'tests/google/h743_model.cpp',
+         'tools/configure/providers/stm32h743/bindings.py',
+         'tools/configure/providers/stm32h743/test_peripherals.py')
+def source():
+    return {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+            for name in PATHS}
+
+class Recorded(unittest.TextTestResult):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.rows = []
+        self.active_events = []
+        self.subtests = 0
+    def startTest(self, test):
+        super().startTest(test)
+        self.active_events = []
+        self.started = time.monotonic()
+    def stopTest(self, test):
+        self.rows.append((test.id(), time.monotonic() - self.started,
+                          list(self.active_events)))
+        super().stopTest(test)
+    def addFailure(self, test, err):
+        self.active_events.append(('failure', self._exc_info_to_string(err, test)))
+        super().addFailure(test, err)
+    def addError(self, test, err):
+        self.active_events.append(('error', self._exc_info_to_string(err, test)))
+        super().addError(test, err)
+    def addSkip(self, test, reason):
+        self.active_events.append(('skipped', reason))
+        super().addSkip(test, reason)
+    def addSubTest(self, test, subtest, err):
+        self.subtests += 1
+        if err is not None:
+            kind = 'failure' if issubclass(err[0], test.failureException) else 'error'
+            self.active_events.append((kind, str(subtest) + '\n' +
+                                       self._exc_info_to_string(err, test)))
+        super().addSubTest(test, subtest, err)
+
+stage = sys.argv[1]
+out = ROOT / 'build/batch4-admission-evidence' / stage
+out.mkdir(parents=True, exist_ok=False)
+os.chdir(ROOT)
+sys.path.insert(0, str(ROOT))
+started = time.time_ns()
+before = source()
+suite = unittest.defaultTestLoader.loadTestsFromName(MODULE)
+expected = suite.countTestCases()
+raw = io.StringIO()
+result = unittest.TextTestRunner(stream=raw, verbosity=2,
+                                 resultclass=Recorded).run(suite)
+(out / 'raw.log').write_text(raw.getvalue())
+xml = ET.Element('testsuite', name=MODULE, tests=str(result.testsRun),
+                 failures=str(len(result.failures)), errors=str(len(result.errors)),
+                 skipped=str(len(result.skipped)))
+for name, duration, events in result.rows:
+    row = ET.SubElement(xml, 'testcase', classname=name.rsplit('.', 1)[0],
+                        name=name.rsplit('.', 1)[1], time=f'{duration:.6f}')
+    for kind, message in events:
+        ET.SubElement(row, kind, message=message.splitlines()[0]).text = message
+payload = ET.tostring(xml, encoding='utf-8', xml_declaration=True)
+(out / 'junit.xml').write_bytes(payload)
+ret = 0 if result.wasSuccessful() and expected == 7 and result.testsRun == expected and not result.skipped else 1
+record = {'kind': 'actual complete Python module', 'qualification': False,
+          'command': [sys.executable, str(Path(__file__).resolve()), stage],
+          'module': MODULE, 'cwd': str(ROOT), 'started_ns': started,
+          'ended_ns': time.time_ns(), 'before': before, 'after': source(),
+          'source_stable': before == source(), 'expected_methods': expected,
+          'tests': result.testsRun, 'subtests': result.subtests,
+          'failures': len(result.failures), 'errors': len(result.errors),
+          'skipped': len(result.skipped), 'exit_code': ret,
+          'maxrss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+          'raw_sha256': hashlib.sha256(raw.getvalue().encode()).hexdigest(),
+          'xml_sha256': hashlib.sha256(payload).hexdigest(),
+          'xml_fresh': (out / 'junit.xml').stat().st_mtime_ns >= started,
+          'memory_events': Path('/sys/fs/cgroup/memory.events').read_text()}
+(out / 'receipt.json').write_text(json.dumps(record, indent=2) + '\n')
+print(json.dumps(record))
+print(raw.getvalue())
+raise SystemExit(ret)

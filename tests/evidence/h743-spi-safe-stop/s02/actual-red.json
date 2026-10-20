@@ -1,0 +1,114 @@
+{
+  "kind": "observed complete peripheral RED before production fix",
+  "qualification": false,
+  "receipt": {
+    "kind": "actual whole program",
+    "qualification": false,
+    "stage": "whole-peripheral-red",
+    "command": [
+      "/tmp/nexus-h743-spi-safe-stop-20261018/build/native-debug/bin/nexus_h743_peripheral_test",
+      "--gtest_output=xml:/tmp/nexus-h743-spi-safe-stop-20261018/s0-evidence/whole-peripheral-red/junit.xml"
+    ],
+    "cwd": "/tmp/nexus-h743-spi-safe-stop-20261018",
+    "started_ns": 1792288593310853980,
+    "ended_ns": 1792288594327379356,
+    "exit_code": 1,
+    "timed_out": false,
+    "before": {
+      "source": {
+        "soc/stm32h743/drivers/spi.c": "d4d24ecb573f6090b2a371c3d6fc84db0402f224727b9e2b08d8954ac54c7faa",
+        "soc/stm32h743/private/stm32h743_provider.h": "849b4e47b203cd8dffe95e635606421fc1022771e196c8cb7943c313b1ba729d",
+        "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+        "tests/google/h743_peripheral_test.cpp": "865a546b9cd7e3909dc14189fada7a3ec1520dc03a33b0b37a4751b046e061de",
+        "tests/google/h743_high_kernel_test.cpp": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+        "soc/stm32h743/system.c": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e",
+        "soc/stm32h743/private/stm32h743_system.h": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+        "tests/google/h743_model.cpp": "578b490f8b9130dcb77345258dce3c8fd378ff9a779c7cd886e6beee315e4ed3",
+        "tests/google/h743_system_test.cpp": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+        "soc/stm32h743/clock.c": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac",
+        "soc/stm32h743/private/stm32h743_clock.h": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+        "tests/google/h743_clock_test.cpp": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+        "tests/google/h743_clock_model.cpp": "0af041077359739156c079657f91fd188adccccd76d00426883563e42f9c30fe",
+        "tests/google/h743_clock_model.h": "d5ead9ce82852231a06833ef4e9f48fc362efe3b7fb68d30d95e5122fa822ea6"
+      },
+      "tmp_free": 1460977664,
+      "memory_current": 13866807296,
+      "memory_max": 17179869184,
+      "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+    },
+    "after": {
+      "source": {
+        "soc/stm32h743/drivers/spi.c": "d4d24ecb573f6090b2a371c3d6fc84db0402f224727b9e2b08d8954ac54c7faa",
+        "soc/stm32h743/private/stm32h743_provider.h": "849b4e47b203cd8dffe95e635606421fc1022771e196c8cb7943c313b1ba729d",
+        "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+        "tests/google/h743_peripheral_test.cpp": "865a546b9cd7e3909dc14189fada7a3ec1520dc03a33b0b37a4751b046e061de",
+        "tests/google/h743_high_kernel_test.cpp": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+        "soc/stm32h743/system.c": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e",
+        "soc/stm32h743/private/stm32h743_system.h": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+        "tests/google/h743_model.cpp": "578b490f8b9130dcb77345258dce3c8fd378ff9a779c7cd886e6beee315e4ed3",
+        "tests/google/h743_system_test.cpp": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+        "soc/stm32h743/clock.c": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac",
+        "soc/stm32h743/private/stm32h743_clock.h": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+        "tests/google/h743_clock_test.cpp": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+        "tests/google/h743_clock_model.cpp": "0af041077359739156c079657f91fd188adccccd76d00426883563e42f9c30fe",
+        "tests/google/h743_clock_model.h": "d5ead9ce82852231a06833ef4e9f48fc362efe3b7fb68d30d95e5122fa822ea6"
+      },
+      "tmp_free": 1460932608,
+      "memory_current": 13866840064,
+      "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+    },
+    "source_stable": true,
+    "children_maxrss_kib": 15640,
+    "raw_sha256": "14160cf0862d07ad5174f6be22b8e97a5e21d2b74eb4c08a5f95ca2bfba8c0d7",
+    "binary_sha256": "fb995c961609530da47f441f39087f4a29842764ddd85f6fc89dd72e65b9006c",
+    "junit": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/s0-evidence/whole-peripheral-red/junit.xml",
+      "sha256": "d09ccb029b1a2bf0b4ab995ce72640c07f91b6243f6377b89a65e62dcddcc406",
+      "fresh": true,
+      "tests": 32,
+      "failures": 25,
+      "errors": 0,
+      "skipped": 0,
+      "notrun": 0
+    }
+  },
+  "failed_cases": [
+    {
+      "name": "ModesZeroAndThreeKeepPinsControlledThroughFinalReset",
+      "assertions": 10
+    },
+    {
+      "name": "StalledRxSuspendsTheRealFrameBeforeReturningPartialTimeout",
+      "assertions": 4
+    },
+    {
+      "name": "RefusedSuspendCannotResetOrReturnTheBorrowedFrame",
+      "assertions": 1
+    },
+    {
+      "name": "RefusedCsHighLeavesSelectedPinsAndBorrowIntact",
+      "assertions": 1
+    },
+    {
+      "name": "RefusedSckTakeoverKeepsTheFrameAfterPhysicalCsHigh",
+      "assertions": 1
+    },
+    {
+      "name": "RefusedResetRetainsFrameAndSafeIdleAfterPhysicalCsHigh",
+      "assertions": 1
+    },
+    {
+      "name": "LateCompleteRxDuringDrainExtendsOnlyTheSubmittedPrefix",
+      "assertions": 3
+    },
+    {
+      "name": "SuspendedUnsentTxFifoIsFlushedWithoutInventingCompletion",
+      "assertions": 1
+    },
+    {
+      "name": "ForeignSckRouteRejectsBeforeAnyTransferEffect",
+      "assertions": 3
+    }
+  ],
+  "old_21_cases_passed": true
+}

@@ -1,0 +1,54 @@
+{
+  "classification": "actual authoritative five-symbol link RED, not runtime",
+  "receipt_sha256": "4e2c1f675fad81133348e40571f972c8a4c22f8900955622a070ac72e2f9ffc5",
+  "raw_sha256": "44caf451fb6aff013fca54a23ea138241ce8d50733333b5625d10c9fde131ea1",
+  "undefined_symbols": [
+    "nx_stm32h743_spi_dma_endpoint_ops",
+    "nx_stm32h743_spi_dma_initialize",
+    "nx_stm32h743_spi_dma_irq",
+    "nx_stm32h743_spi_dma_ops",
+    "nx_stm32h743_spi_dma_wire_irq"
+  ],
+  "authored_cases": 39,
+  "whole_runtime_executed": false,
+  "binary_exists": false,
+  "source_stable": true,
+  "sources": [
+    {
+      "relative": "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "sha256": "da0924272fc1ff39ba49088f5842e7e7208c9bd0cb46a0f7b4c947dd018bae6c",
+      "gzip_sha256": "c61ca437f9ba57a1b736f64b80deb0a55e7be4ba5e3b96f6dff2c9183919853d"
+    },
+    {
+      "relative": "tests/google/CMakeLists.txt",
+      "sha256": "253f81ce4d095a05869c3c800b08381bc856b2810dfb156c6b71e30be8b66bde",
+      "gzip_sha256": "1388df625de7feb7ea16048cd01ed12086411ff28cb9e5131d1a980e31448462"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma.cmake",
+      "sha256": "bffb4660f1fea7270dd0a2d75a8e2f11f61a8726b4d4a724c7a67054f11ef961",
+      "gzip_sha256": "0c307a575eb7457db0e525d91f6d750a2f8b5d063c271d160a84d4e1f731339a"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma_model.cpp",
+      "sha256": "87e664d10b5531bd645befbc6d0b986b1c271156b3e59addbc6cf8fd6771a79c",
+      "gzip_sha256": "d33315ac2aafb4fc1145f19762357ad276a6d3bfb0c28f673c2859b209f080f3"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma_model.h",
+      "sha256": "f43502ab2deeda9621fe71b75abe4bda3fc5896eb3a6d360d5bcd7e6e3c52100",
+      "gzip_sha256": "9bc3873e6910a4288357a67126452b1029c135b65f2c500190efc71bb221d322"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma_test.cpp",
+      "sha256": "b3c0d662f1b067d053e8e0fbb2c75af70b96793853b939e305f53d8509e0ee19",
+      "gzip_sha256": "40e11579230ea9c0c402c9b284add0e90214d479ceeae7edef3628494d21008e"
+    }
+  ],
+  "retained_object": {
+    "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-api-red/h743_spi_dma_test.cpp.o",
+    "bytes": 3002496,
+    "sha256": "b5ba199648389533d55f163aa3181f020a14bb431d50fc7edf5829a72dcbbf4e"
+  },
+  "prior_attempts": "first overlap + two conversion/setup errors retained separately; no production body existed"
+}

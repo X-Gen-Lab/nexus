@@ -5,6 +5,10 @@
       "bytes": 533860,
       "sha256": "13e9cfc1df70a4dd34234bbad84def36e71bd8032f4ddbb6f29ac5d9e872c071"
     },
+    "Inc/stm32u5xx_ll_dma.h": {
+      "bytes": 322291,
+      "sha256": "2cca143aaf883cffacd46e6a0a29a4a677badd485b7eb19f8da6199eceacead6"
+    },
     "Inc/stm32u5xx_ll_i2c.h": {
       "bytes": 97434,
       "sha256": "8b7b9ad4cb5aeff1df318c042399f55726e745f129146f7ba27cec3d4623449d"
@@ -16,6 +20,10 @@
     "Inc/stm32u5xx_ll_tim.h": {
       "bytes": 298912,
       "sha256": "02157f3fbfcce84f5223d6d7486da02e4eb4e22949ff170ade76ac25115c3178"
+    },
+    "Inc/stm32u5xx_ll_usart.h": {
+      "bytes": 177899,
+      "sha256": "50a203a04e4b9688b95db3c806cb5af1a4c436b1608ea44e04d72205f354127b"
     },
     "LICENSE.md": {
       "bytes": 1484,

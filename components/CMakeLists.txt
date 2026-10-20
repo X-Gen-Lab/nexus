@@ -9,6 +9,9 @@ target_link_libraries(nexus_spi_owner PUBLIC nexus_bus_owner nexus_io PRIVATE ne
 add_library(nexus_spi_async_owner STATIC bus_owner/src/spi_async_owner.c)
 target_link_libraries(nexus_spi_async_owner PUBLIC nexus_bus_owner nexus_io
     PRIVATE nexus_owned_warnings nexus_build_options)
+add_library(nexus_spi_dma_owner STATIC bus_owner/src/spi_dma_owner.c)
+target_link_libraries(nexus_spi_dma_owner PUBLIC nexus_bus_owner nexus_io
+    PRIVATE nexus_arch nexus_owned_warnings nexus_build_options)
 add_library(nexus_uart_owner STATIC bus_owner/src/uart_owner.c)
 target_link_libraries(nexus_uart_owner PUBLIC nexus_bus_owner nexus_io PRIVATE nexus_owned_warnings nexus_build_options)
 
@@ -38,6 +41,7 @@ endif()
 add_library(Nexus::BusOwner ALIAS nexus_bus_owner)
 add_library(Nexus::SpiOwner ALIAS nexus_spi_owner)
 add_library(Nexus::SPIAsyncOwner ALIAS nexus_spi_async_owner)
+add_library(Nexus::SPIDMATransactionOwner ALIAS nexus_spi_dma_owner)
 add_library(Nexus::UARTOwner ALIAS nexus_uart_owner)
 add_library(Nexus::BMP280 ALIAS nexus_bmp280)
 add_library(Nexus::BMP280SPI ALIAS nexus_bmp280_spi)

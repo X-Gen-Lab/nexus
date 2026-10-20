@@ -1,0 +1,192 @@
+{
+  "qualification": false,
+  "scope": "matching Native215 before comment-only header correction; whole XML/source stable actuals unchanged",
+  "programs": [
+    {
+      "name": "nexus_h743_spi_wire_test",
+      "bytes": 2692680,
+      "sha256": "7dc5c85407a26dec0dc4533fcc0755b4977ca594e112a1ec8bdd6b6a40bef30b",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_spi_wire_test/junit.xml",
+        "sha256": "86a8e087155961e02813f33e37cef4290e7791da7f793fc3cff23b6ddeed4195",
+        "fresh": true,
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_spi_wire_test"
+    },
+    {
+      "name": "nexus_h743_peripheral_test",
+      "bytes": 3068912,
+      "sha256": "559ccd80b4c054da415d07cecf7b8fc6f47ad7fc0b31136d5ba5ef460c0aec94",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "d15af919572d40ac7018d77337805bbc784836be66d34d5e24a48654bf527255",
+        "fresh": true,
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_peripheral_test"
+    },
+    {
+      "name": "nexus_h743_system_test",
+      "bytes": 2785608,
+      "sha256": "a29cec153c9ac018873fe7af4ea4ce13ea6031e54b5c2cfb6ea4d6695676ca01",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_system_test/junit.xml",
+        "sha256": "7c1aa353670bad18655d877ea7c580f57a3bc86cb5815925f99d6f5ff6b8a957",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_system_test"
+    },
+    {
+      "name": "nexus_h743_clock_test",
+      "bytes": 2601544,
+      "sha256": "62e31d256ce67c7a1b0be7a5c03ab102bef7c6fdeba2c6597392708fae6a9878",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_clock_test/junit.xml",
+        "sha256": "c76e70343874ea891345cbc125cc51546ea1207f87163626931356c9b886c23a",
+        "fresh": true,
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_clock_test"
+    },
+    {
+      "name": "nexus_h743_high_kernel_test",
+      "bytes": 3176496,
+      "sha256": "43889b159e365d3caaa212a5cf1c96cbf05ca186a2ea841a37c06f0dda9fcacc",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_high_kernel_test/junit.xml",
+        "sha256": "bd6de8d81a3de7729b96b567753442093849d85c5e051f1120ce45b34cd9a65b",
+        "fresh": true,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_high_kernel_test"
+    },
+    {
+      "name": "nexus_h743_high_factory_test",
+      "bytes": 3129928,
+      "sha256": "45776f6bbb6a0b633be9c095f2852b46f88a7bccbfe848013832669f19099a6b",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_high_factory_test/junit.xml",
+        "sha256": "be1d3ef5316387c28aa79df6380df67171be5053e4aa476068cf6eb0f32028ef",
+        "fresh": true,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_high_factory_test"
+    },
+    {
+      "name": "nexus_h743_peripheral_factory_test",
+      "bytes": 3123496,
+      "sha256": "c671c4615d97998ddb79d7de68fdd4fa1e350a7bed3082b3a1093df8a4fd06a9",
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/h743-spi-wire-w1-evidence/final-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "0b148c442f4bf440a69da1f63cf1b792b233b14b1604b7655fedb53bf895249f",
+        "fresh": true,
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      },
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/w1-retained-final215/nexus_h743_peripheral_factory_test"
+    }
+  ],
+  "sources": [
+    {
+      "relative": "soc/stm32h743/CMakeLists.txt",
+      "bytes": 6172,
+      "sha256": "11974a7b5f6fa062f0167b3015ccdc8bc504f0b0f1796c17364fe366fa904c97",
+      "gzip_sha256": "f091a481bf2d365a66654aa85f39493cfe5ae8ed4bf4c9ef339f67173a4297d7"
+    },
+    {
+      "relative": "soc/stm32h743/drivers/spi.c",
+      "bytes": 13488,
+      "sha256": "3ca2b57e51bd46abcba837963f6db50f99a93e5821bcbdff565c1cf8958660ff",
+      "gzip_sha256": "a186eacda71cfbe1d397472c73e64a76a2013737165ae608853b81e47c2bef4b"
+    },
+    {
+      "relative": "soc/stm32h743/drivers/spi_wire.c",
+      "bytes": 10206,
+      "sha256": "1aa06e5375ce12b588230ff1544245d4d802febfb7acce29e637bc9cdd5bddfd",
+      "gzip_sha256": "67676f1cb1c3888bcb31f9cbc15602c6564c706db4dc321b4d10fe49fe545d05"
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_spi_wire.h",
+      "bytes": 5030,
+      "sha256": "e907f19f6bf9dc273141550aa7285c31658715065fe8caaef2bd93362d53f2d7",
+      "gzip_sha256": "51b858e97e7287ca63d7629e6de5d91fe97fbc23572ed6905bbdeeac796f3283"
+    },
+    {
+      "relative": "tests/google/CMakeLists.txt",
+      "bytes": 28115,
+      "sha256": "4f515b4af4f3eb5c137561fb8c25baac89960c71d048bb9b48fea2adacee1444",
+      "gzip_sha256": "2589d3cd7f9ceca3cec8b4dc5477ea8991b668905f22ceeb147f8e70ed3b669d"
+    },
+    {
+      "relative": "tests/google/h743.cmake",
+      "bytes": 9825,
+      "sha256": "0fb1560a4a087469304936c31a53ace7df31b997cf16fde3e536e15df88c0ca7",
+      "gzip_sha256": "52c5029de66ef49410b2be64b2d62de1534e78341f474670c9ee5456d755b231"
+    },
+    {
+      "relative": "tests/google/h743_flash_ram_closure.cmake",
+      "bytes": 3106,
+      "sha256": "15456b1c63094444a098dfc8094d312ec731cab1622f46d4bef5f679dd5ad3db",
+      "gzip_sha256": "fa5e3d9cea5a60c1770053b88df63fc31ad2810da379d40d0b506c6344aaf2cf"
+    },
+    {
+      "relative": "tests/google/h743_high.cmake",
+      "bytes": 5340,
+      "sha256": "d851a64314bd66eb1d24dd722b98a752e74ac0cc9ff8087eaf4202d1e405769b",
+      "gzip_sha256": "eb62175b832605fc2f7b1ba88f7f9fe4ea03dd1ed77e80a9c4b10680246aad74"
+    },
+    {
+      "relative": "tests/google/h743_spi_wire.cmake",
+      "bytes": 812,
+      "sha256": "8d8076715a00b53d4a5e141fb4701a4fe2cab63f137d5547279ce4318dd52814",
+      "gzip_sha256": "128961daf328f67b5f3ee9194562ecbb7f33c9eb6a5edf4a5c0c842c6a5f2d1a"
+    },
+    {
+      "relative": "tests/google/h743_spi_wire_test.cpp",
+      "bytes": 15854,
+      "sha256": "27c836324de7b5cee6a49fe59928089e29a4e0becb338a931c812956bed6e1fd",
+      "gzip_sha256": "796f6d9d622a1c1bc5725dfcc29af5c6fbe51122f2ed07c2078e31043998c3b8"
+    },
+    {
+      "relative": "tests/google/i2c_v2_long_factory.cmake",
+      "bytes": 5084,
+      "sha256": "08dfdde41a33092db3b09e45ab1de02561dcae8634985555b4af711dc498c6bd",
+      "gzip_sha256": "83f8b2bb3a69b9041acbc767b4cd20c6f3d724740fba672ab0629e759e9844c5"
+    },
+    {
+      "relative": "tools/configure/providers/descriptor.py",
+      "bytes": 14537,
+      "sha256": "e6b1b6f3ae316ed06c2c74e139a6e3d9b49d7ccbcbf60d9243172b7b86f9033c",
+      "gzip_sha256": "c81988e9b22f5a4ef192d434348788a2d8ed0abab85f00bfba1766099c3c0a23"
+    }
+  ]
+}

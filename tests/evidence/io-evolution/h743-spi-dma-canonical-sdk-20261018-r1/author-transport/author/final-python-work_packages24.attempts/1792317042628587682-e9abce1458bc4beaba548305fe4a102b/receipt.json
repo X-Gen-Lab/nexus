@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "tools/testing/test_work_packages.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.json"
+  ],
+  "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+  "stage": "final-python-work_packages24",
+  "started_ns": 1792317042628637787,
+  "finished_ns": 1792317092258339702,
+  "duration_seconds": 49.62970249600039,
+  "timeout_seconds": 7200.0,
+  "outcome": "completed",
+  "exit_code": 0,
+  "child_returncode": 0,
+  "withdrawn_processes": [],
+  "withdrawal_stable": true,
+  "withdrawal_complete": true,
+  "build_parallelism": 1,
+  "stdout": {
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/stdout.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stderr": {
+    "path": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/final-python-work_packages24.attempts/1792317042628587682-e9abce1458bc4beaba548305fe4a102b/stderr.txt",
+    "bytes": 4164,
+    "sha256": "6a61191a63280c709c3417fd77508727768b77c3c9166bf3d3cbd5511dada61c"
+  }
+}

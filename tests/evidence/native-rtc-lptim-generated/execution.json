@@ -1,0 +1,159 @@
+{
+  "kind": "actual-focused-source-and-execution-transport",
+  "qualification": false,
+  "source_freeze_sha256": "85e01921e1bc53b81f30bff232bf3477aec3ac6d228a04ebebc3891dd21d729f",
+  "stream_mapping": [
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/comment-style-r1/command.attempts/1792289697137751610-06f0cf9cf9f3470ba81b2ddb556c648a/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/comment-style-r1/stdout.txt.raw",
+      "sha256": "ee5685680b7589fa85973b080a42c0e275a5ff7f2c2c446546d2d7760b089eeb"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/comment-style-r1/command.attempts/1792289697137751610-06f0cf9cf9f3470ba81b2ddb556c648a/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/comment-style-r1/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/configure-domain-r1/command.attempts/1792288997627447342-d74db9f6e9a44f1095b0e141eb8e19a7/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/configure-domain-r1/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/configure-domain-r1/command.attempts/1792288997627447342-d74db9f6e9a44f1095b0e141eb8e19a7/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/configure-domain-r1/stderr.txt.raw",
+      "sha256": "ea61817dc3a711557d8e04300ef2a6c9f297eb0b3c051bd96b078cf2e07e2035"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/configure-domain-r2/command.attempts/1792289697152036213-67c40677b8404fac8bd50fe4b91a273f/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/configure-domain-r2/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/configure-domain-r2/command.attempts/1792289697152036213-67c40677b8404fac8bd50fe4b91a273f/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/configure-domain-r2/stderr.txt.raw",
+      "sha256": "d88f9660963da412d6eeca7e99b20f3ccf585ce00ec2f0c642613440d7bdb2e6"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r1/command.attempts/1792289236584033681-e0af4ebabef14bdb9e36bc865d0de7f8/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-build-r1/stdout.txt.raw",
+      "sha256": "052b4f6023c8b62589c32b69925effedd4c1299ed777adfc7189d8d671b739d7"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r1/command.attempts/1792289236584033681-e0af4ebabef14bdb9e36bc865d0de7f8/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-build-r1/stderr.txt.raw",
+      "sha256": "e902d06cf56939f38b5fbd60467cff3f1af007a2e05c14eafd4514b4193530f8"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r2/command.attempts/1792289398401033046-5488c1ba0be146b9b638f1294b080578/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-build-r2/stdout.txt.raw",
+      "sha256": "fc6a25a4bde12d15c49d6d9bde2b012b630cb51afa280035ec1b1a6e1d15d143"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r2/command.attempts/1792289398401033046-5488c1ba0be146b9b638f1294b080578/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-build-r2/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r3/command.attempts/1792289434910911933-429c9c0489594fe1bde657f93cdbeddc/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-build-r3/stdout.txt.raw",
+      "sha256": "feebe2c14af14d79d6b5c2a92557ac01d6331da7891e09d5b04e375238169d0b"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-build-r3/command.attempts/1792289434910911933-429c9c0489594fe1bde657f93cdbeddc/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-build-r3/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-empty-runtime-r1/command.attempts/1792289453939486095-2c7289390897441fb51000fd7ee61791/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-empty-runtime-r1/stdout.txt.raw",
+      "sha256": "0006a35bf9f7740ec37ee194237c011a16f125adc223455427c24430ac48d66d"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-empty-runtime-r1/command.attempts/1792289453939486095-2c7289390897441fb51000fd7ee61791/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-empty-runtime-r1/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-pair-runtime-r1/command.attempts/1792289447454694758-8218a3d5359e4846886c836c901d770f/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-pair-runtime-r1/stdout.txt.raw",
+      "sha256": "0006a35bf9f7740ec37ee194237c011a16f125adc223455427c24430ac48d66d"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/generated-pair-runtime-r1/command.attempts/1792289447454694758-8218a3d5359e4846886c836c901d770f/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/generated-pair-runtime-r1/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-green-r1/command.attempts/1792288913741027501-1b335707136947dc8ac4e30c5be9f0ee/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/resolver-green-r1/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-green-r1/command.attempts/1792288913741027501-1b335707136947dc8ac4e30c5be9f0ee/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/resolver-green-r1/stderr.txt.raw",
+      "sha256": "690e5630b399d6795d222e1e1b6c6e024a28f89ecdac38a024da59048397bbab"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-red-r1/command.attempts/1792288782099124075-a09fa7407d5547ddb5269df5e71ab43d/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/resolver-red-r1/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/resolver-red-r1/command.attempts/1792288782099124075-a09fa7407d5547ddb5269df5e71ab43d/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/resolver-red-r1/stderr.txt.raw",
+      "sha256": "2f1ff44db93b8dae75c7447f9e2b1548b0d60befc06cfa4b90da5c64784df8d8"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-module-green-r1/command.attempts/1792289560964516411-e5727e7b1db04446b98fe30ee9173be3/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-module-green-r1/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-module-green-r1/command.attempts/1792289560964516411-e5727e7b1db04446b98fe30ee9173be3/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-module-green-r1/stderr.txt.raw",
+      "sha256": "58b32e3805b75a7e368d7ca141aefcac491c7d1c951ebc859028ada213adf862"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-module-green-r2/command.attempts/1792289587515022126-0170c2bf3cab4be5976d1ecbbd2acf01/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-module-green-r2/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-module-green-r2/command.attempts/1792289587515022126-0170c2bf3cab4be5976d1ecbbd2acf01/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-module-green-r2/stderr.txt.raw",
+      "sha256": "edbb31892a6dcbea04eaaa2bab69c45906afe954044f351667f7c993ef1dd32a"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-module-red-r1/command.attempts/1792289503631226988-ff696503ebdd4e7b926d964af9287b2c/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-module-red-r1/stdout.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-module-red-r1/command.attempts/1792289503631226988-ff696503ebdd4e7b926d964af9287b2c/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-module-red-r1/stderr.txt.raw",
+      "sha256": "2b9ec995a20b219cc80c9e00153c4136d56c2a48028fa460e672bdc1d68c50e6"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-prepare-development-r1/command.attempts/1792289613072497684-850afdd6965f41dea39b7dea8e65a4b0/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-prepare-development-r1/stdout.txt.raw",
+      "sha256": "692511f4393571ceeae2770a8eafb6c104db4e9c018ae48274d053e6d77156c6"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-prepare-development-r1/command.attempts/1792289613072497684-850afdd6965f41dea39b7dea8e65a4b0/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-prepare-development-r1/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-two-native-development-r1/command.attempts/1792289648462609226-6e5f9e26dbba4bda84a708639989467e/stdout.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-two-native-development-r1/stdout.txt.raw",
+      "sha256": "90ec4f1c7d538659e794d1ecd73f66dd647d5cc141308d890c1e6b234b3875e4"
+    },
+    {
+      "executed": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3/validation/sdk-two-native-development-r1/command.attempts/1792289648462609226-6e5f9e26dbba4bda84a708639989467e/stderr.txt",
+      "retained": "tests/evidence/native-rtc-lptim-generated/sdk-two-native-development-r1/stderr.txt.raw",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_scope": "26 frozen phase3 source files atop manual phase1/2. Subsequent maintained-boundary test follow-up required by independent review is separate.",
+  "scope": "All copied receipts and stream bytes are original actual executions. Setup failures are retained, not production RED. Focused dirty SDK is not publishable; main full gates, clean full SDK matrix, offline builds and HIL are not inherited."
+}

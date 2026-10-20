@@ -1,0 +1,8 @@
+{
+  "index_sha256": "c0a557bdc6e89fa1e02097868861885e796e28d685e7ff6dd542feb2cf3ba21a",
+  "index_bytes": 3279017,
+  "initial_index_sha256": "80a6c715a2e02f1330e2b86baab92b620ce28e6a83e6a80709ccd44998e33d16",
+  "staged_diff_against_head": "",
+  "classification": "Index byte SHA changed without any staging command; maintained provenance/read-only Git may refresh cached stat data. Semantic index has no staged diff against same HEAD. No index restoration performed.",
+  "qualification": false
+}

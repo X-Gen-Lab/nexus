@@ -1,0 +1,30 @@
+# S0.2 最小写入与验收计划（未实施）
+
+只读核对已完成；无新生产、测试注册或编译。S0.1 四个原件保持冻结，等待 Root 新提交后另开独立分支。本批不实现 divider 包络或 DMA。
+
+## 文件
+
+- `soc/stm32h743/drivers/spi.c`：仅停机、CS、PE12 接管与下一笔 AF 回交。
+- `tests/google/h743_model.h`、`.cpp`：真实外部 CSUSP/SUSP/CSTART 语义、GPIOE 叶子和寄存器事件 oracle；不读 provider 私有进度作结论。
+- `tests/google/h743_peripheral_test.cpp`：原全部测试保留，SPI fixture 明确使用已选 PE11/12/13/14 与 GPIOE gate；新增下列完整程序回归。
+- `soc/stm32h743/private/stm32h743_provider.h`：仅合同注释，记录现有可信静态构造者拥有 GPIOE/PE12/AF5/时钟及串行寿命；不新增 state、token、registry 或运行时虚表。
+
+`emission.py:start_resources` 已真实捕获冷态 GPIOE lease，`bindings.py` 已固定 PE12/13/14 AF5 与高初始 PE11；硬件状态校验不是授权来源。手工私有构造者承担相同前提。公共 face 不允许另选 SCK 路线。
+
+## 最小协议
+
+1. 停止提交 TX。成功观察 EOT/TXC+CSTART0；失败而 CSTART1 时只发 CSUSP，按独立有界预算等真实 SUSP+CSTART0。TSIZE>0 的 TXC 复制 EOT，不能用陈旧 TXC 当中途停机证明。
+2. 使用与 caller deadline 独立的一周期+两个 timer 量化裕量；不改本批分频选择。读出残留 RX FIFO，未空不能忽略。SUSP 用 IFCR 清除并读回，再 SPE0 并验证 FIFO/控制状态；持续保持 AFCNTR 与实际 CPOL。
+3. 已选 CS 必须实际输出高并读回；丢 GPIO mode 不能当 release。CS 读回失败保 held pointer/active frame，禁止 reset。
+4. 确认 CS 已释放后，PE12 BSRR latch 到当前 CPOL，再切 GPIO output 并读回。只改 PE12 指定位；不虚构 MOSI idle、电阻或外部 pull。已是本 owner 的 GPIO idle 时保留真实 latch。
+5. 最后独占 APB reset，核两边沿、SPE0、FIFO 空。下一笔 CS 仍高时先配 CPOL/AFCNTR并读回，再 PE12 交回 AF5，最后 assert CS。mode0→3→0 独立预期必须由测试 literal 给出。
+6. 活动 transfer 无法证明任何前提时，保留栈帧和 active/retained/fault，经既有不返回故障边界停住；不抛异常、清 active 或 teardown 恢复。reset 拒绝允许物理 CS 已高，但帧仍不得返回。
+7. idle recover/stop 失败保端口责任并可重试；必须真实 stop/drain 后才 reset，不重放旧传输。冷态 prepare 尚未路由 GPIO 的失败清理单独覆盖：从未发起通信/未选 CS 的事实不伪造为新 CS 转换；不得为了 cleanup 任意接管 foreign route。
+
+## 实际 TDD 顺序
+
+先修正模型 EOT 时硬件自动清 CSTART、CSUSP 读零/SUSP 硬件事件的 fixture 事实，明确它不算行为 RED。新增外部 pin/reset oracle 和所有 regression 后，完整 `nexus_h743_peripheral_test` 首跑；预期正常 reset 在 CS 低、缺 CSUSP 与拒绝 handoff 路径真实失败，再作最小生产修复。首跑已 GREEN 的 case 标 coverage，不造坏代码。
+
+旧 `RefusedDrainCannotReturnOrReleaseTheCallerAndChipSelect` 的全部断言保留，增加独立 `hold_spi_suspend` 故障以继续精确测试“真正未停止”的路径；另新增“reset 失败时 CS 可高但 frame 保留”用例。不能让 `hold_spi_reset` 冒充 suspend 拒绝。
+
+完整 peripheral +受影响 System/clock 程序、5文件格式/注释检查、fresh JUnit 与原始退码实际通过再交付。最终 root hook/ARM/SDK另验；无实板则不宣称物理无毛刺。官源精确身份见 `official-sources.json`。首次 RM 下载35MiB cap失败已记录，第二次同官方 URL 实际66,378,901B；不把下载/fixture错误冒作行为 RED。

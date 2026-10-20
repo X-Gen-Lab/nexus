@@ -1,0 +1,47 @@
+{
+  "kind": "first whole39 actual1;38passed/1case2assert failed; not provider behavior RED",
+  "binary_sha256": "6bfa0c982278df8e83c7eab0d0a3cf563ca393e523d6138e7b12aac837dc2392",
+  "retained_binary": "/tmp/nexus-h743-spi-safe-stop-20261018/build/d1-retained-first39/nexus_h743_spi_dma_test",
+  "sources": [
+    {
+      "relative": "soc/stm32h743/drivers/spi_dma.c",
+      "sha256": "317fb3903528a930ee6bce536da5232c2098ae52d5d3b6f9696d0051a184deb2",
+      "gzip_sha256": "8dcaf4085b0d3d4139e3fc1f1d0b5a92bf214962dfbea53a00a1581eb541ecb2"
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_spi_dma.h",
+      "sha256": "da0924272fc1ff39ba49088f5842e7e7208c9bd0cb46a0f7b4c947dd018bae6c",
+      "gzip_sha256": "c61ca437f9ba57a1b736f64b80deb0a55e7be4ba5e3b96f6dff2c9183919853d"
+    },
+    {
+      "relative": "tests/google/CMakeLists.txt",
+      "sha256": "253f81ce4d095a05869c3c800b08381bc856b2810dfb156c6b71e30be8b66bde",
+      "gzip_sha256": "1388df625de7feb7ea16048cd01ed12086411ff28cb9e5131d1a980e31448462"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma.cmake",
+      "sha256": "23843d102b3f357006c1c8b8c537ae654506aee73540bb45ca34a1bd7680fed1",
+      "gzip_sha256": "b0a369be8e85cc60e815399063ab2673ba8cee25c0f424f5f86684cdeececc15"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma_model.cpp",
+      "sha256": "4ae8336f3953efddef9e1d9901790a20285e92849aa606a5d89c5c2bc6d6bdb9",
+      "gzip_sha256": "2d9c0cc90f4d47e9f3073868b46c333aca108afe5f745989aa810eab8ea8b4ee"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma_model.h",
+      "sha256": "f43502ab2deeda9621fe71b75abe4bda3fc5896eb3a6d360d5bcd7e6e3c52100",
+      "gzip_sha256": "9bc3873e6910a4288357a67126452b1029c135b65f2c500190efc71bb221d322"
+    },
+    {
+      "relative": "tests/google/h743_spi_dma_test.cpp",
+      "sha256": "b3c0d662f1b067d053e8e0fbb2c75af70b96793853b939e305f53d8509e0ee19",
+      "gzip_sha256": "40e11579230ea9c0c402c9b284add0e90214d479ceeae7edef3628494d21008e"
+    }
+  ],
+  "fixture_issues": [
+    "manual pending before enabled IRQ entry is legally cleared by exception entry; inject independent pending at actual disable boundary instead",
+    "RM0433p667 only FCR DMDIS/FTH protected by EN; live FEIE masking must not be flagged as illegal config write"
+  ],
+  "production_sha256_unchanged": "317fb3903528a930ee6bce536da5232c2098ae52d5d3b6f9696d0051a184deb2"
+}

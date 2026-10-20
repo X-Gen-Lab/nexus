@@ -1,0 +1,134 @@
+{
+  "evidence_count": 13,
+  "file_count": 15,
+  "files": [
+    {
+      "bytes": 1870,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/files/tools/configure/assemblies/catalogue.json",
+      "kind": "source",
+      "mode": 384,
+      "path": "tools/configure/assemblies/catalogue.json",
+      "sha256": "151de3f45a55bd2b27878349b15e193df0d72115acbab23b43aed62801295dcf"
+    },
+    {
+      "bytes": 7332,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/files/tools/configure/test_matrix.py",
+      "kind": "source",
+      "mode": 384,
+      "path": "tools/configure/test_matrix.py",
+      "sha256": "cb17f06f36356cc842811d451fcee46078c75ff50474c2efc017f7d9c0b2e854"
+    },
+    {
+      "bytes": 5677,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/actual-ir-inspection.json.gz",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/actual-ir-inspection.json.gz",
+      "sha256": "abc963ce14a55df298242de41cddb0f2a1d13676a4fb649601ee6cb32cb941c8"
+    },
+    {
+      "bytes": 357,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/actual-ir-inspection.json.gz.identity.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/actual-ir-inspection.json.gz.identity.json",
+      "sha256": "fc04a532da077556bdabeb5ef2e2c08fe92c46a957519cd3dadded015d4c3f37"
+    },
+    {
+      "bytes": 1779,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/before/tools/configure/assemblies/catalogue.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/before/tools/configure/assemblies/catalogue.json.raw",
+      "sha256": "cc0a4d65a91adfd3d8ad4a3f6b655a82dd7a617257df4692f15aafcbab73c477"
+    },
+    {
+      "bytes": 2437,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/before/tools/configure/test_matrix.py",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/before/tools/configure/test_matrix.py.raw",
+      "sha256": "8281e178905874d7f7bfdc187028ce68008afd67e01120b2457b89e91c303a0b"
+    },
+    {
+      "bytes": 6411,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/before.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/before.json",
+      "sha256": "5defbff0b31c468b626c4c3f00322e799cca473dc1054c65b26b37c9b1eb10bf"
+    },
+    {
+      "bytes": 3408,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/completed-handoff-r1.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/completed-handoff-r1.json",
+      "sha256": "b4933f681e72cf4b61d11d83f32d8058a153877d4b5e7f39accc7867fe7112b5"
+    },
+    {
+      "bytes": 12876,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/execution-evidence-map-r1.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/execution-evidence-map-r1.json",
+      "sha256": "1053edca3f4a7f40a0ddb89b98d6d91d089971b0e5314d70411a359b14ebca21"
+    },
+    {
+      "bytes": 35329,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/execution-evidence-r1.zip",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/execution-evidence-r1.zip",
+      "sha256": "c04d8bd1034a71f1e63810c2b1c369f97984720f1ab4268d0ab77938a353b7e1"
+    },
+    {
+      "bytes": 9522,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/final-source2-and-execution-freeze-r1.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/final-source2-and-execution-freeze-r1.json",
+      "sha256": "4be216ece66e4cf34ed72cf9d2fc1c0a1823b2209287646c1055e8df344fd1b2"
+    },
+    {
+      "bytes": 717,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/preservation.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/preservation.json",
+      "sha256": "0a65dafcfb312386e30d3a8b8884cf303e36ebd442f93f12590ba2cac328b201"
+    },
+    {
+      "bytes": 741,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/source2-map.json",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/source2-map.json",
+      "sha256": "fed654cfc1b3627f772b4b9d9620ba7c8147214aa50f562f0efb95131b01d880"
+    },
+    {
+      "bytes": 6184,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/source2.diff",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/source2.diff.raw",
+      "sha256": "bbd4c762872a2756274fa10a3c9b3f8962ab8b5cabaa4013fb80726198e0a505"
+    },
+    {
+      "bytes": 7332,
+      "durable_source": "/dev/shm/nexus-h743-d3-catalogue-amendment-20261018-r1/tests-first/tools/configure/test_matrix.py",
+      "kind": "evidence",
+      "mode": 384,
+      "path": "docs/delivery/evidence/h743-spi-dma-canonical-sdk-catalogue-amendment-20261018-r1/tests-first/tools/configure/test_matrix.py.raw",
+      "sha256": "cb17f06f36356cc842811d451fcee46078c75ff50474c2efc017f7d9c0b2e854"
+    }
+  ],
+  "history_raw_suffix": "historical full source copies and textual diff keep their bytes and transport with .raw suffix",
+  "original_d3_source33_and_maps_unchanged": true,
+  "schema": 1,
+  "source35_execution_scope": "complete869 configure and two-file style, with actual RED and failed PATH attempt separately retained; no Main hook qualification",
+  "source_count": 2,
+  "unmapped_enclosing_metadata": [
+    "normalized-transport-r1.json"
+  ]
+}

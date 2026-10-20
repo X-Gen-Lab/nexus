@@ -1,0 +1,129 @@
+{
+  "kind": "Independent source-scope addendum: fixed-HSI SPI requested ceiling admission gap",
+  "reviewed_at_utc": "2026-10-18T02:44:54.364662+00:00",
+  "decision": {
+    "integration_blocker": "OPEN",
+    "priority": "P1",
+    "issue": "The runtime path accepts non-V silicon while relying on an electrical bound only established for an exact reviewed V/factory-trim context.",
+    "prior_review_superseded": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/independent-final-source-and-evidence-review-r1.json",
+      "bytes": 16463,
+      "sha256": "4c37f566224c5e4316d403e2b37d1c05a118406fb334b84ef6455f6f3b49c192"
+    },
+    "correction": "The previous no-blocker outcome was too broad: documenting that non-V electrical qualification is not upgraded does not enforce the runtime admission prerequisite. All observed178/Python GREEN outcomes and source hashes remain valid historical focused results; they do not close this newly traced path."
+  },
+  "source_identity": {
+    "soc/stm32h743/system.c": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/system.c",
+      "bytes": 20887,
+      "sha256": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e"
+    },
+    "soc/stm32h743/power_boot.S": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/power_boot.S",
+      "bytes": 2120,
+      "sha256": "92cd244544bd9bb1a2466352a3680d7310439990138a5e07922d9d5918722bc2"
+    },
+    "soc/stm32h743/private/stm32h743_clock.h": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/private/stm32h743_clock.h",
+      "bytes": 4784,
+      "sha256": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc"
+    },
+    "soc/stm32h743/private/stm32h743_system.h": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/private/stm32h743_system.h",
+      "bytes": 7685,
+      "sha256": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25"
+    },
+    "soc/stm32h743/clock.c": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/clock.c",
+      "bytes": 23198,
+      "sha256": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac"
+    },
+    "tools/configure/providers/stm32h743/emission.py": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/tools/configure/providers/stm32h743/emission.py",
+      "bytes": 15833,
+      "sha256": "657c3e95eb3f30c827a3492fc2e68e8a45e48fd633387885e3c9ebf56e12dd82"
+    },
+    "soc/stm32h743/soc.json": {
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/soc/stm32h743/soc.json",
+      "bytes": 12063,
+      "sha256": "11be37f2f42aaeb598c011df34cca8069d38b0edbdf60d2b8bd9784af245c7fa"
+    },
+    "soc/stm32h743/drivers/spi.c": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/soc/stm32h743/drivers/spi.c",
+      "bytes": 21301,
+      "sha256": "26766fe3e5b9010eeaa92164556c8701fbfeaafc65ed038c030630259fd7937e"
+    },
+    "soc/stm32h743/private/stm32h743_provider.h": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/files/soc/stm32h743/private/stm32h743_provider.h",
+      "bytes": 13407,
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61"
+    }
+  },
+  "concrete_source_derived_path": [
+    {
+      "stage": "reset/power",
+      "path": "soc/stm32h743/power_boot.S:53",
+      "fact": "DEV450 with REV1003 follows older-cut AXI workaround and then .Lboot_complete/bx lr. REV2001 or unknown>=2000 skips workaround. Neither path hard-rejects non-V."
+    },
+    {
+      "stage": "generated platform identity",
+      "path": "tools/configure/providers/stm32h743/emission.py:163 / system.c:454",
+      "fact": "Fixed start invokes validate_identity, which accepts DEV_ID450 plus2048KiB density and deliberately does not check high16 revision bits."
+    },
+    {
+      "stage": "fixed System admission",
+      "path": "soc/stm32h743/system.c:155",
+      "fact": "The condition is is_revision_v(ID) && nondefault HSICFGR trim. Non-V identities skip the V register/trim check. With other legal cold HSI/LDO/cache/timer facts, System preflight and fixed32/64 start can succeed. Header explicitly retains older fixed nominal contracts."
+    },
+    {
+      "stage": "selected SPI constructor",
+      "path": "tools/configure/providers/stm32h743/bindings.py:109",
+      "fact": "Generated fixed SPI prepares the existing nominal32/64 state and calls initialize; its new Python rate check cannot observe actual runtime die revision."
+    },
+    {
+      "stage": "SPI initialize and ongoing readiness",
+      "path": "soc/stm32h743/drivers/spi.c:108",
+      "fact": "valid() accepts nominal32/64 and private register/reset facts. Fixed clock_ready() checks System.started, nominal core equality, SPI4 gate and SPI45SEL0; it does not inspect IDCODE or user trim. Matching exclusive pin/CS/state facts then permit transfer."
+    },
+    {
+      "stage": "requested ceiling",
+      "path": "soc/stm32h743/drivers/spi.c:371",
+      "fact": "The selected fixed source_max65/32.5 is used without distinguishing that non-V context. Runtime accepts a context for which the reviewed whole electrical prerequisite has not been established."
+    }
+  ],
+  "path_status": "A concrete accepted path follows from production branch conditions; this reviewer did not execute a new regression or assert a measured overspeed value for unknown silicon. Exact effects and rejection ordering require the next true TDD batch.",
+  "manual_contract_check": {
+    "private_constructor": "Provider header requires exclusive trusted pin/clock ownership and serial-executor lifetime. It does not explicitly require exactREV2003 or defaultHSITRIM64 for the fixed requested-frequency ceiling; matching readable registers are not themselves authorization.",
+    "shared_helper": "is_revision_v is pure inline DEV_ID450 && REV_ID2003. It is not called by fixed SPI or fixed System as a hard gate.",
+    "high_profile": "Optional PLL384 factory_trim explicitly rejects non-V and nondefault V trim, and pll384_clocks_ready repeats it. That existing high-only gate is not executed by the fixed path; fixed builds do not link clock.c merely because the helper header exists.",
+    "no_hidden_fact_gate": "soc.json reviewed_revision_ids2003 belongs only to the optional high profile; four fixed HSI entries lack this restriction."
+  },
+  "alternative_official_source": {
+    "actual_current_DS": "DS12110Rev11 fresh downloaded from ST;SHAf6e620179006c8c4d497b477ba065edc89c6dd9ac24d9debb3362910651f42ee",
+    "Y_specific": "Chapter6 Electrical characteristics(revY), Table37 page128 separately gives63.7..64.3, voltage-0.12..+0.03percent and full-TJ -2..+1percent, numerically matching V Table134. It can support a separately established actualY/default-calibration contract.",
+    "Y_source_excerpt": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/independent-admission-revY-Table37-excerpt-r1.txt",
+      "bytes": 2822,
+      "sha256": "6d658a72040794302055c056ad81f0ceb9c56aa63eb81751164c329613b846c5"
+    },
+    "identity_ambiguity": "ES0392Rev15 Table2 maps Y and W to the same REV_ID1003, X to2001 and V to2003. Current automatic runtime observation cannot distinguish Y from W. No reviewed W/X/unknown electrical table scope or equivalent factory-trim contract was identified.",
+    "errata_excerpt": {
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/independent-admission-ES0392-Table2-excerpt-r1.txt",
+      "bytes": 830,
+      "sha256": "8caf2dd6311443a35fef7f17de84a9db7d6986b39663cb63ddab88f75ed7fcce"
+    },
+    "conclusion": "The Y-specific table is not a proof that every non-V context currently admitted by fixed System/SPI satisfies the ceiling. It does not close the runtime admission gap."
+  },
+  "recommended_minimal_followup": [
+    "Keep generic fixed System32/64 behavior, other peripherals and old nominal cuts unchanged. Scope the stricter electrical prerequisite to the SPI operations that claim a requested maximum based on65/32.5.",
+    "Use the existing exact DEV450/REV2003 inline identity helper in the fixed SPI admission/readiness path. Observe actual IDCODE before reading V-specific HSICFGR, then require HSITRIM[6:0]==0x40. Reuse the existing model injection macro for actual ID/trim observations; do not trust an authored bool, capability label or preflight result cached from a different lifetime.",
+    "Check before setting retained/active, acquiring CS or writing SPI/pin controls on new admission. Repeat at transfer readiness, not only System start. Keeping the existing clock_ready boolean and STATE result is a small option; if using UNSUPPORTED for revision vsSTATE for trim, preserve and document existing context/BUSY/error priority deliberately rather than implying unchanged ordering.",
+    "For already-owned cleanup, failed prerequisite must retain responsibility and never clear active/loans merely because the new admission check failed. Require restoration/join according to the current clock ownership contract. Do not reject an unrelated System use or let an identity-only check grant hardware ownership.",
+    "Add real whole-module regressions first: cold/non-V1003,2001,unknown/wrongDEV fail before residual writes/retained state; good V after a prior non-V System context still succeeds only when exact facts match; changed V trim after successful setup is rejected before transfer writes/CS/active and leaves output/borrow contracts precise. Include generated fixed factory use and32 as well as64 where needed. Keep V positive and existing high exact-cut tests. Execute actual RED before the smallest production gate and fresh complete GREEN; do not inherit178 as this regression result."
+  ],
+  "remaining_limits": [
+    "No source was modified, test/build/configure executed, index/ref changed or new child spawned by reviewer.",
+    "No observed hardware overspeed, physical Y/W discrimination, new silicon qualification, ARM or HIL result is claimed.",
+    "Frozen source9, original author manifest, actual178 and prior independent report remain unmodified; this addendum is the authoritative qualification correction for the new admission issue."
+  ]
+}

@@ -15,6 +15,7 @@
 #define NEXUS_NATIVE_PROVIDER_H
 
 #include "nexus/io/native/model.h"
+#include "nexus/io/spi_transaction.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -172,6 +173,7 @@ extern const nx_exti_ops_t nx_native_exti_ops;
 extern const nx_pwm_ops_t nx_native_pwm_ops;
 extern const nx_adc_ops_t nx_native_adc_ops;
 extern const nx_spi_endpoint_ops_t nx_native_spi_endpoint_ops;
+extern const nx_spi_transaction_ops_t nx_native_spi_transaction_ops;
 extern const nx_i2c_endpoint_ops_t nx_native_i2c_endpoint_ops;
 
 /** \brief Explicit default fixtures; generated assemblies use their own state.

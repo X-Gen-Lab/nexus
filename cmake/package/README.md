@@ -91,10 +91,19 @@ python cmake/package/verify_consumers.py \
   --prefix /relocated/nexus-sdk --output build/installed-sdk-check
 ```
 
+`--parallel N` is the total consumer job budget (default: `2`). Independent
+consumers may configure, build and verify concurrently; each compiler build uses
+one job. `--parallel 1` retains serial execution. Each consumer still performs
+fresh installed-source verification. A failure cancels and joins all started
+work before the final failed report is written.
+
 `verification.json` and per-command logs retain actual arguments and exit codes.
 This command fails for development fixtures, missing tools, any compile/run/link
 failure, leaked private includes or failed ELF resource/configuration binding.
-An old owned verification directory is invalidated before a new attempt.
+The SDK prefix and verification output must be canonical paths without symlink
+aliases, and neither may contain the other. Admission failure leaves both SDK
+bytes and any previous report untouched and writes its diagnostic to stderr.
+Only an admitted owned verification directory is invalidated for a new attempt.
 
 The package includes the repository formatter and comment-policy files. Git
 commit hooks and whole-checkout lint workflows remain repository maintenance
@@ -102,8 +111,9 @@ tools; they are not installed into the consumer's Git repository by `find_packag
 
 The source SDK includes authored TOML readers, typed resolution and factory
 generation, maintained default assemblies and dependency provenance locks.
-GoogleTest/GoogleMock source archives, licenses and contract binaries belong to
-host repository development and are excluded from the firmware SDK payload.
+The pinned `ext/googletest` Git submodule, its licenses and contract binaries
+belong to host repository development and are excluded from the firmware SDK
+payload.
 Configuring a firmware consumer never downloads a test dependency. A consumer
 that needs platform development tests uses the complete repository checkout;
 the installed source SDK explicitly excludes those contract targets.

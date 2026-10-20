@@ -46,6 +46,36 @@ class BuildRecipeTests(unittest.TestCase):
                 self.assertIn(
                     "-o Acquire::https::CaInfo=/run/secrets/proxy_ca", command)
 
+    def test_public_ca_mount_is_readable_by_sandboxed_network_clients(self):
+        text = re.sub(r"\\\n\s*", " ", self.emitted_recipe())
+        networked = [line for line in text.splitlines()
+                     if line.startswith("RUN ")
+                     and ("apt-get" in line or "python -m pip" in line)]
+        self.assertEqual(len(networked), 2)
+        for instruction in networked:
+            client = "apt" if "apt-get" in instruction else "pip"
+            with self.subTest(client=client):
+                mounts = re.findall(r"--mount=([^ ]+)", instruction)
+                self.assertEqual(len(mounts), 1)
+                options = dict(item.split("=", 1)
+                               for item in mounts[0].split(","))
+                self.assertEqual(options["type"], "secret")
+                self.assertEqual(options["id"], "proxy_ca")
+                self.assertEqual(options["required"], "true")
+                # BuildKit defaults secrets to 0400; APT drops to the _apt UID.
+                mode = int(options.get("mode", "0400"), 8)
+                self.assertEqual(mode, 0o444,
+                                 "Public CA must be read-only for every UID")
+
+    def test_checked_in_dockerfile_matches_verified_declared_recipe(self):
+        root = Path(__file__).resolve().parents[2]
+        lock_path = root / "dependencies/build-recipe.lock.json"
+        lock = json.loads(lock_path.read_text())
+        requirements = "dependencies/python-tools-linux-cp312.txt"
+        recipe.verify(lock, root / requirements)
+        generated = recipe.emit(lock, requirements)
+        self.assertEqual((root / "tools/dev/Dockerfile").read_text(), generated)
+
     def test_recipe_output_cannot_replace_requirements_input(self):
         observed = self.root / "observed.json"
         observed.write_text(json.dumps(self.observed))

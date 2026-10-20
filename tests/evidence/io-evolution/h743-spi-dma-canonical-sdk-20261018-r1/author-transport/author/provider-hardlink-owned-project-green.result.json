@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/dev/shm/nexus-h743-spi-dma-d3-work-20261018-r1/run_whole.py",
+    "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+    "scripts/ci/test_provider_assemblies.py",
+    "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.json"
+  ],
+  "actual_returncode": 0,
+  "receipt": "/dev/shm/nexus-h743-spi-dma-d3-20261018-r1/provider-hardlink-owned-project-green.attempts/1792316376412052599-b7842a654243446cbb9783dd756e4ef9/receipt.json",
+  "child_maxrss_KiB": 32172,
+  "headroom_after": 1820262400,
+  "events": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+}

@@ -1,0 +1,16 @@
++ /tmp/nexus-io-validation-20261018/.venv/bin/cmake --preset native-debug
+Preset CMake variables:
+
+  CMAKE_BUILD_TYPE="Debug"
+  NEXUS_ASSEMBLY_FILE="/tmp/nexus-h743-fixed-hsi-s0-20261018/tools/configure/assemblies/native.toml"
+  NEXUS_BUILD_TESTS="ON"
+
+-- Found Python3: /tmp/nexus-io-validation-20261018/.venv/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.11") found components: Interpreter
+-- Found Python3: /tmp/nexus-io-validation-20261018/.venv/bin/python3.12 (found version "3.12.14") found components: Interpreter
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
+-- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
+-- Nexus: NATIVE_MODEL/native, Os
+-- Sole resolved configuration: /tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug/generated/resolved.json
+-- Configuring done (20.9s)
+-- Generating done (0.4s)
+-- Build files have been written to: /tmp/nexus-h743-fixed-hsi-s0-20261018/build/native-debug

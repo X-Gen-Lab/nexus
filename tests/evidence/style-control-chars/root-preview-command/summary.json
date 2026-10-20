@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "/workspace/nexus-io-recovery-20261018/preview-proposed-style-r1.py"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "returncode": 0,
+  "receipt": "/workspace/nexus-io-recovery-20261018/validation/commands/proposed-style-preview-r1/command.attempts/1792292507230624447-5a9325bd024e42638bde83bf56d8c379/receipt.json",
+  "source_unchanged": true,
+  "qualification": "actual command only; inspect scope and reports"
+}

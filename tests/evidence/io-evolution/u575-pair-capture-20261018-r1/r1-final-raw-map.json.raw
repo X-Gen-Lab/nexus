@@ -1,0 +1,316 @@
+{
+  "archive": "/dev/shm/nexus-u575-pair-feature-20261018-r1/final-checks-raw-r1.tar.gz",
+  "bytes": 7857,
+  "sha256": "7a6c86a3203375e2f6bb38b7cf31dc73df7a2898ea0b848ddb82cfa330558819",
+  "members": [
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/receipt.json",
+      "member": "check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/receipt.json",
+      "bytes": 1384,
+      "sha256": "c17d2cbe5dbd29f87b2fc26dd355939efac0cd443e7118875a9a270a7aa997be",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/stderr.txt",
+      "member": "check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/stdout.txt",
+      "member": "check-four-r1.attempts/1792319658739854703-5308454992984c6299313b5a8f3c9ab8/stdout.txt",
+      "bytes": 799,
+      "sha256": "5cb47f33a5cd6e52923540a6c0abed8a895d44939bf6942ff05c9b1028279a41",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/check-four-r1.command.json",
+      "member": "check-four-r1.command.json",
+      "bytes": 1540,
+      "sha256": "0985758f67c6ca05b645180aff9997d9420dc6af53d548e80c833557fbdc2a0a",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/check-four-r1.log",
+      "member": "check-four-r1.log",
+      "bytes": 799,
+      "sha256": "5cb47f33a5cd6e52923540a6c0abed8a895d44939bf6942ff05c9b1028279a41",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/check_four.py",
+      "member": "check_four.py",
+      "bytes": 497,
+      "sha256": "1b00f41ef7f3abddb512bc0db35ec13f48d68bc3112460600484223fee310542",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/receipt.json",
+      "member": "final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/receipt.json",
+      "bytes": 1125,
+      "sha256": "6ee51c6d6511eeb3dc11d7fdcf9dad11ee7c8374559150baf6c1fc933f38ee80",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/stderr.txt",
+      "member": "final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/stdout.txt",
+      "member": "final-cli-help-r2.attempts/1792319882399730055-481731ddece049c0a440dc5b47c90bb2/stdout.txt",
+      "bytes": 360,
+      "sha256": "c85993e2c15766541a21a31229f944039152872cf25c137af57082af9bd9f4eb",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help-r2.command.json",
+      "member": "final-cli-help-r2.command.json",
+      "bytes": 1285,
+      "sha256": "2bcde83cc94d6a4a03060605832a98272579d236b9bc19fe17c8b95a1fd21f36",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help-r2.log",
+      "member": "final-cli-help-r2.log",
+      "bytes": 360,
+      "sha256": "c85993e2c15766541a21a31229f944039152872cf25c137af57082af9bd9f4eb",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/receipt.json",
+      "member": "final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/receipt.json",
+      "bytes": 1116,
+      "sha256": "94c0b16527a5380c870385367a61b447ed117be3ea82693e6d939871ee96d79f",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/stderr.txt",
+      "member": "final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/stdout.txt",
+      "member": "final-cli-help.attempts/1792319770416860081-8b252b1f39d04c9584fa0ffc926b7ee3/stdout.txt",
+      "bytes": 360,
+      "sha256": "c85993e2c15766541a21a31229f944039152872cf25c137af57082af9bd9f4eb",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help.command.json",
+      "member": "final-cli-help.command.json",
+      "bytes": 1273,
+      "sha256": "97635a6659f19387a7b3e6c9e82aa59cea7f82b2e38abc6d96b8da52651ac461",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-cli-help.log",
+      "member": "final-cli-help.log",
+      "bytes": 360,
+      "sha256": "c85993e2c15766541a21a31229f944039152872cf25c137af57082af9bd9f4eb",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-source-and-execution-guard-r2.json",
+      "member": "final-source-and-execution-guard-r2.json",
+      "bytes": 3441,
+      "sha256": "f9cc32ca5882ccbea5561123c576fabbdcccb83ad5429fe9f794546c393501aa",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-source-and-execution-guard.json",
+      "member": "final-source-and-execution-guard.json",
+      "bytes": 3390,
+      "sha256": "d3081aa415a3bc0772e5ce880950a93854c73ec283a37a788328886d05c34f03",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/receipt.json",
+      "member": "final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/receipt.json",
+      "bytes": 1387,
+      "sha256": "e87b4a377b3c12b9b88ed8637bce3ee4673f996e2662207506c4091e46f533d4",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/stderr.txt",
+      "member": "final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/stdout.txt",
+      "member": "final-text-check-r2.attempts/1792319882284353363-dfc0f8a83dd34401b1af879bace48067/stdout.txt",
+      "bytes": 799,
+      "sha256": "e44915a2b8a334bab5df26c030dcc020cb149a899bd484ff8fb4dc79bb40bc7f",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check-r2.command.json",
+      "member": "final-text-check-r2.command.json",
+      "bytes": 1549,
+      "sha256": "88d4a1b630a8a0232d6e99e997d315b8b24e2b635130e68ff0c75505a2778466",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check-r2.log",
+      "member": "final-text-check-r2.log",
+      "bytes": 799,
+      "sha256": "e44915a2b8a334bab5df26c030dcc020cb149a899bd484ff8fb4dc79bb40bc7f",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/receipt.json",
+      "member": "final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/receipt.json",
+      "bytes": 1378,
+      "sha256": "271a9a7aa44e3bbd638496710cd49f50a94e6f26ff6d444f738e0b5d725217e8",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/stderr.txt",
+      "member": "final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/stdout.txt",
+      "member": "final-text-check.attempts/1792319770632657342-07473a9a373143b9a3c349c57181c55c/stdout.txt",
+      "bytes": 799,
+      "sha256": "5cb47f33a5cd6e52923540a6c0abed8a895d44939bf6942ff05c9b1028279a41",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check.command.json",
+      "member": "final-text-check.command.json",
+      "bytes": 1537,
+      "sha256": "ffdb1170cde418bb12c7f81ec83a51f0036ce937fe42cf3fcb8e7d55d5a9dee8",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-text-check.log",
+      "member": "final-text-check.log",
+      "bytes": 799,
+      "sha256": "5cb47f33a5cd6e52923540a6c0abed8a895d44939bf6942ff05c9b1028279a41",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/receipt.json",
+      "member": "final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/receipt.json",
+      "bytes": 1146,
+      "sha256": "f50980f2f9266b655663593e5ec45736ea72a9fe2a3d2ff5d90def0b2057448a",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/stderr.txt",
+      "member": "final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/stderr.txt",
+      "bytes": 7919,
+      "sha256": "273cecbe5f13ff22a1fed4b35ae300fe37b52ef4816161447848505db65b6caa",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/stdout.txt",
+      "member": "final-whole50.attempts/1792319766888989444-c462a96b9acd4976b58013ca8d92e525/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole50.command.json",
+      "member": "final-whole50.command.json",
+      "bytes": 1302,
+      "sha256": "2e8acfdcf46f781f0095112f39524fd2635b5acf881a363ce328ce2522b19c81",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole50.log",
+      "member": "final-whole50.log",
+      "bytes": 7919,
+      "sha256": "273cecbe5f13ff22a1fed4b35ae300fe37b52ef4816161447848505db65b6caa",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/receipt.json",
+      "member": "final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/receipt.json",
+      "bytes": 1144,
+      "sha256": "439d665b794f8ffe6b50344c0b89424605feb290f7f286a1eb736e46f0821915",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/stderr.txt",
+      "member": "final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/stderr.txt",
+      "bytes": 8106,
+      "sha256": "c531cf6b4825f18938b29542ecfd986b68e13281a039c0067a703fef0326d622",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/stdout.txt",
+      "member": "final-whole51.attempts/1792319878653596243-b01abdf74a4b4c2dbb2f94a8d11fca59/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole51.command.json",
+      "member": "final-whole51.command.json",
+      "bytes": 1300,
+      "sha256": "c55221561f1d5f1918995ab5d831c3152e8d551e811294c7804694c90500adb1",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/final-whole51.log",
+      "member": "final-whole51.log",
+      "bytes": 8106,
+      "sha256": "c531cf6b4825f18938b29542ecfd986b68e13281a039c0067a703fef0326d622",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/receipt.json",
+      "member": "style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/receipt.json",
+      "bytes": 1360,
+      "sha256": "7d319a85ab822334e24573053e8bc2f50da88726d3f2dd3895ad8f66030de617",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/stderr.txt",
+      "member": "style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/stderr.txt",
+      "bytes": 128,
+      "sha256": "c13ed5fb95b3327d1ea18d86b6d7dfd0e35da772a121f26a13f46b793b4c34ae",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/stdout.txt",
+      "member": "style-r1.attempts/1792319595633864071-cf9f881c177646d08dd5c3efb6173599/stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/style-r1.command.json",
+      "member": "style-r1.command.json",
+      "bytes": 1511,
+      "sha256": "94274e07f22dd914ce5f31d9a3b4ab1442184f7b565412128a8d6512cf4e5ab1",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/style-r1.log",
+      "member": "style-r1.log",
+      "bytes": 128,
+      "sha256": "c13ed5fb95b3327d1ea18d86b6d7dfd0e35da772a121f26a13f46b793b4c34ae",
+      "mode": 384
+    },
+    {
+      "path": "/dev/shm/nexus-u575-pair-tests-20261018-r1/style.json",
+      "member": "style.json",
+      "bytes": 203,
+      "sha256": "2bbe5939ac63ab2f69f210e2c42f5124772edd498e730535a845c2cbcb9b0e80",
+      "mode": 384
+    }
+  ],
+  "verification": "full gzip EOF/CRC plus every member SHA/size/mode"
+}

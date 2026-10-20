@@ -1,0 +1,7 @@
+{
+  "actual_exit_code": 1,
+  "stage": "summary creation only, after all validation had joined",
+  "error": "AssertionError: 11",
+  "cause": "Report assembler expected10 result directories although 11 real phases existed. No report written, no source/index/test/gate change. Corrected report inventory count to actual11; no validation rerun or result relabel.",
+  "production_test_failure": false
+}

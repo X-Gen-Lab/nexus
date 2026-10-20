@@ -107,6 +107,24 @@ automation verifies real execution, not the historical order of developer work.
 The framework enables C++17 only for Native tests. Firmware remains C11 and never
 links GoogleTest, GoogleMock, C++ test fixtures or their runtime.
 
+Deliver one complete functional increment at a time: implementation, focused
+regressions, current documentation and the ordinary complete-index gates. Report
+the exact working behavior and remaining gaps; commit and test counts alone are
+not completion. Retain original evidence, but track it once in a compact archive
+or a recoverable artifact with an exact source and member manifest. Reference
+that copy instead of committing repeated before-images, transport archives and
+control bundles. Do not build new evidence frameworks for routine changes.
+
+Apply the test-retention and execution rules in the
+[engineering handbook](docs/design/engineering-handbook.md). Remove a test only
+after identifying its obsolete contract or equivalent independent coverage;
+preserve meaningful failure regressions. Move mode-independent Python and SDK
+checks to the explicit tool domains instead of repeating them in each Native
+preset. Keep all four Native C/Google modes and the ordinary complete-index
+commit gate. Analyze every distinct compiler context; bound concurrency and
+retain cancellation, diagnostics and fresh reports. Cache verified tool inputs,
+never successful test reports.
+
 Keep the existing `.clang-format`, `.editorconfig` and backslash Doxygen style:
 80 columns, four spaces, attached braces and type-attached pointer stars. Sources
 have file/brief/author/version/date/copyright; headers have file/brief/author and

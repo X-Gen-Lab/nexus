@@ -1,0 +1,17 @@
+import hashlib,json,os,resource,sys
+from pathlib import Path
+ROOT=Path('/dev/shm/nexus-qualification-transport-20261018-r1')
+FEATURE=Path('/dev/shm/nexus-qualification-transport-feature-20261018-r1')
+sys.path.insert(0,str(ROOT))
+from tools.dev import process
+from tools.evidence.identity import observe_git_source
+name=sys.argv[1]
+cg=Path('/sys/fs/cgroup'); free=int((cg/'memory.max').read_text())-int((cg/'memory.current').read_text())
+if free<900*1024**2:raise SystemExit('headroom below admitted spawn floor')
+env=dict(os.environ,PATH='/workspace/nexus-build-system-20261012/.venv/bin:'+os.environ['PATH'],PYTHONDONTWRITEBYTECODE='1',TMPDIR='/dev/shm/nexus-qualification-transport-test-output-20261018-r1',CMAKE_BUILD_PARALLEL_LEVEL='1',NEXUS_BUILD_JOBS='1')
+before=observe_git_source(ROOT); index=hashlib.sha256((ROOT/'.git/index').read_bytes()).hexdigest()
+r=process.run(sys.argv[2:],cwd=ROOT,env=env,log=FEATURE/'runs'/(name+'.raw'),timeout=180,stage=name)
+record={'returncode':r.returncode,'source_before':before,'source_after':observe_git_source(ROOT),'index_before':index,'index_after':hashlib.sha256((ROOT/'.git/index').read_bytes()).hexdigest(),'maximum_child_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'cgroup_events':(cg/'memory.events').read_text(),'actual_receipt':str(r.receipt_path)}
+(FEATURE/'runs'/(name+'.json')).write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps({'name':name,'actual_exit':r.returncode,'max_child_kib':record['maximum_child_kib'],'source_stable':record['source_before']==record['source_after']}))
+print((r.stdout+r.stderr)[-2200:]);sys.exit(r.returncode)

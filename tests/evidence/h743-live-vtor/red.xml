@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="6" failures="3" disabled="0" errors="0" time="0.003" timestamp="2026-10-18T00:53:47.824" name="AllTests">
+  <testsuite name="H743FlashRamGenerated" tests="6" failures="3" disabled="0" skipped="0" errors="0" time="0.003" timestamp="2026-10-18T00:53:47.824">
+    <testcase name="NormalLookupIsColdAndStartCopiesSelectedFlash" file="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp" line="143" status="run" result="completed" time="0." timestamp="2026-10-18T00:53:47.824" classname="H743FlashRamGenerated" />
+    <testcase name="FailedPrepareAndBusyStopPreserveOrderedCleanup" file="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp" line="160" status="run" result="completed" time="0." timestamp="2026-10-18T00:53:47.825" classname="H743FlashRamGenerated" />
+    <testcase name="NormalPulsesAndRestartKeepTheOriginalCpuContext" file="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp" line="186" status="run" result="completed" time="0." timestamp="2026-10-18T00:53:47.825" classname="H743FlashRamGenerated" />
+    <testcase name="ChangedLiveVtorRejectsProgramBeforeStaging" file="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp" line="216" status="run" result="completed" time="0." timestamp="2026-10-18T00:53:47.825" classname="H743FlashRamGenerated">
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:233&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;  result&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:233
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result
+    Which is: 0
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:234&#x0A;Expected equality of these values:&#x0A;  foreign_vtor&#x0A;    Which is: 134218752&#x0A;  g_h743_model.core-&gt;VTOR&#x0A;    Which is: 134217728&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:234
+Expected equality of these values:
+  foreign_vtor
+    Which is: 134218752
+  g_h743_model.core->VTOR
+    Which is: 134217728
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:124&#x0A;Expected equality of these values:&#x0A;  0&#x0A;  std::memcmp(saved.execution.data(), cpu.execution, saved.execution.size())&#x0A;    Which is: -16&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:124
+Expected equality of these values:
+  0
+  std::memcmp(saved.execution.data(), cpu.execution, saved.execution.size())
+    Which is: -16
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:128&#x0A;Expected equality of these values:&#x0A;  0&#x0A;  std::memcmp(saved.registers.data(), &amp;g_h743_model.flash, saved.registers.size())&#x0A;    Which is: -1&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:128
+Expected equality of these values:
+  0
+  std::memcmp(saved.registers.data(), &g_h743_model.flash, saved.registers.size())
+    Which is: -1
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:130&#x0A;Expected equality of these values:&#x0A;  saved.writes&#x0A;    Which is: 112&#x0A;  g_h743_model.writes&#x0A;    Which is: 117&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:130
+Expected equality of these values:
+  saved.writes
+    Which is: 112
+  g_h743_model.writes
+    Which is: 117
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:131&#x0A;Expected equality of these values:&#x0A;  saved.stores&#x0A;    Which is: 0&#x0A;  g_h743_model.flash_store_count&#x0A;    Which is: 8&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:131
+Expected equality of these values:
+  saved.stores
+    Which is: 0
+  g_h743_model.flash_store_count
+    Which is: 8
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:132&#x0A;Expected equality of these values:&#x0A;  saved.bridges&#x0A;    Which is: 0&#x0A;  cpu.bridge_entries&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:132
+Expected equality of these values:
+  saved.bridges
+    Which is: 0
+  cpu.bridge_entries
+    Which is: 1
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:133&#x0A;Expected equality of these values:&#x0A;  saved.vtor_writes&#x0A;    Which is: 0&#x0A;  cpu.vtor_writes&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:133
+Expected equality of these values:
+  saved.vtor_writes
+    Which is: 0
+  cpu.vtor_writes
+    Which is: 2
+]]></failure>
+    </testcase>
+    <testcase name="ChangedLiveVtorRejectsEraseBeforeStaging" file="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp" line="239" status="run" result="completed" time="0." timestamp="2026-10-18T00:53:47.826" classname="H743FlashRamGenerated">
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:252&#x0A;Expected equality of these values:&#x0A;  NX_ERROR_STATE&#x0A;    Which is: 3&#x0A;  result&#x0A;    Which is: 0&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:252
+Expected equality of these values:
+  NX_ERROR_STATE
+    Which is: 3
+  result
+    Which is: 0
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:253&#x0A;Expected equality of these values:&#x0A;  foreign_vtor&#x0A;    Which is: 134218752&#x0A;  g_h743_model.core-&gt;VTOR&#x0A;    Which is: 134217728&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:253
+Expected equality of these values:
+  foreign_vtor
+    Which is: 134218752
+  g_h743_model.core->VTOR
+    Which is: 134217728
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:124&#x0A;Expected equality of these values:&#x0A;  0&#x0A;  std::memcmp(saved.execution.data(), cpu.execution, saved.execution.size())&#x0A;    Which is: -34&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:124
+Expected equality of these values:
+  0
+  std::memcmp(saved.execution.data(), cpu.execution, saved.execution.size())
+    Which is: -34
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:128&#x0A;Expected equality of these values:&#x0A;  0&#x0A;  std::memcmp(saved.registers.data(), &amp;g_h743_model.flash, saved.registers.size())&#x0A;    Which is: -1&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:128
+Expected equality of these values:
+  0
+  std::memcmp(saved.registers.data(), &g_h743_model.flash, saved.registers.size())
+    Which is: -1
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:130&#x0A;Expected equality of these values:&#x0A;  saved.writes&#x0A;    Which is: 112&#x0A;  g_h743_model.writes&#x0A;    Which is: 118&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:130
+Expected equality of these values:
+  saved.writes
+    Which is: 112
+  g_h743_model.writes
+    Which is: 118
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:132&#x0A;Expected equality of these values:&#x0A;  saved.bridges&#x0A;    Which is: 0&#x0A;  cpu.bridge_entries&#x0A;    Which is: 1&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:132
+Expected equality of these values:
+  saved.bridges
+    Which is: 0
+  cpu.bridge_entries
+    Which is: 1
+]]></failure>
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:133&#x0A;Expected equality of these values:&#x0A;  saved.vtor_writes&#x0A;    Which is: 0&#x0A;  cpu.vtor_writes&#x0A;    Which is: 2&#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:133
+Expected equality of these values:
+  saved.vtor_writes
+    Which is: 0
+  cpu.vtor_writes
+    Which is: 2
+]]></failure>
+    </testcase>
+    <testcase name="MissingCoreRefusesAdmissionAndRetainsStopOwner" file="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp" line="258" status="run" result="completed" time="0.001" timestamp="2026-10-18T00:53:47.826" classname="H743FlashRamGenerated">
+      <failure message="/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:266&#x0A;Death test: { auto&amp; cpu = nexus_test::h743_ram::cpu; auto* const core = g_nx_stm32h743_system.core; const auto before = CaptureCommandState(); g_nx_stm32h743_system.core = nullptr; switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;NX_ERROR_STATE&quot;, &quot;nx_stm32h743_flash_ram_admission(cpu.owner_port)&quot;, NX_ERROR_STATE, nx_stm32h743_flash_ram_admission(cpu.owner_port)))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 272, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;nullptr&quot;, &quot;g_nx_stm32h743_system.core&quot;, nullptr, g_nx_stm32h743_system.core))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 274, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(g_nx_stm32h743_system.started)) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 275, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, &quot;g_nx_stm32h743_system.started&quot;, &quot;false&quot;, &quot;true&quot;) .c_str()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;NX_ERROR_STATE&quot;, &quot;nx_stm32h743_flash_ram_stop(cpu.execution)&quot;, NX_ERROR_STATE, nx_stm32h743_flash_ram_stop(cpu.execution)))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 276, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;nullptr&quot;, &quot;g_nx_stm32h743_system.core&quot;, nullptr, g_nx_stm32h743_system.core))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 278, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(g_nx_stm32h743_system.started)) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 279, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, &quot;g_nx_stm32h743_system.started&quot;, &quot;false&quot;, &quot;true&quot;) .c_str()) = ::testing::Message(); ExpectNoCommandEffects(before); g_nx_stm32h743_system.core = core; switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;NX_SUCCESS&quot;, &quot;nx_stm32h743_flash_ram_stop(cpu.execution)&quot;, NX_SUCCESS, nx_stm32h743_flash_ram_stop(cpu.execution)))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 282, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;nullptr&quot;, &quot;cpu.owner_port-&gt;execution&quot;, nullptr, cpu.owner_port-&gt;execution))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 283, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(!(cpu.execution-&gt;prepared))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 284, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, &quot;cpu.execution-&gt;prepared&quot;, &quot;true&quot;, &quot;false&quot;) .c_str()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare(&quot;NX_SUCCESS&quot;, &quot;nx_platform_stop()&quot;, NX_SUCCESS, nx_platform_stop()))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 285, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(!(g_nx_stm32h743_system.started))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, &quot;/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp&quot;, 286, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, &quot;g_nx_stm32h743_system.started&quot;, &quot;true&quot;, &quot;false&quot;) .c_str()) = ::testing::Message(); std::_Exit(testing::Test::HasFailure() ? 1 : 0); }&#x0A;    Result: died but not with expected exit code:&#x0A;            Terminated by signal 11&#x0A;Actual msg:&#x0A;[  DEATH   ] &#x0A;" type=""><![CDATA[/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp:266
+Death test: { auto& cpu = nexus_test::h743_ram::cpu; auto* const core = g_nx_stm32h743_system.core; const auto before = CaptureCommandState(); g_nx_stm32h743_system.core = nullptr; switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("NX_ERROR_STATE", "nx_stm32h743_flash_ram_admission(cpu.owner_port)", NX_ERROR_STATE, nx_stm32h743_flash_ram_admission(cpu.owner_port)))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 272, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("nullptr", "g_nx_stm32h743_system.core", nullptr, g_nx_stm32h743_system.core))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 274, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(g_nx_stm32h743_system.started)) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 275, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "g_nx_stm32h743_system.started", "false", "true") .c_str()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("NX_ERROR_STATE", "nx_stm32h743_flash_ram_stop(cpu.execution)", NX_ERROR_STATE, nx_stm32h743_flash_ram_stop(cpu.execution)))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 276, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("nullptr", "g_nx_stm32h743_system.core", nullptr, g_nx_stm32h743_system.core))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 278, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(g_nx_stm32h743_system.started)) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 279, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "g_nx_stm32h743_system.started", "false", "true") .c_str()) = ::testing::Message(); ExpectNoCommandEffects(before); g_nx_stm32h743_system.core = core; switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("NX_SUCCESS", "nx_stm32h743_flash_ram_stop(cpu.execution)", NX_SUCCESS, nx_stm32h743_flash_ram_stop(cpu.execution)))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 282, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("nullptr", "cpu.owner_port->execution", nullptr, cpu.owner_port->execution))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 283, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(!(cpu.execution->prepared))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 284, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "cpu.execution->prepared", "true", "false") .c_str()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("NX_SUCCESS", "nx_platform_stop()", NX_SUCCESS, nx_platform_stop()))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 285, gtest_ar.failure_message()) = ::testing::Message(); switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar_ = ::testing::AssertionResult(!(g_nx_stm32h743_system.started))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "/tmp/nexus-io-validation-20261018/tests/google/h743_flash_ram_generated_test.cpp", 286, ::testing::internal::GetBoolAssertionFailureMessage( gtest_ar_, "g_nx_stm32h743_system.started", "true", "false") .c_str()) = ::testing::Message(); std::_Exit(testing::Test::HasFailure() ? 1 : 0); }
+    Result: died but not with expected exit code:
+            Terminated by signal 11
+Actual msg:
+[  DEATH   ] 
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

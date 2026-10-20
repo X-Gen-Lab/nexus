@@ -1,0 +1,18 @@
+test_authored_kind_cannot_substitute_another_controller_kind (test_rtc_lptim.NativeTimeAssemblyTests.test_authored_kind_cannot_substitute_another_controller_kind) ... ok
+test_bundle_is_deterministic_and_binds_host_facts_and_cold_sources (test_rtc_lptim.NativeTimeAssemblyTests.test_bundle_is_deterministic_and_binds_host_facts_and_cold_sources) ... ok
+test_duplicate_real_controller_is_a_resource_conflict (test_rtc_lptim.NativeTimeAssemblyTests.test_duplicate_real_controller_is_a_resource_conflict) ... ok
+test_editor_schema_matches_its_authoritative_generator (test_rtc_lptim.NativeTimeAssemblyTests.test_editor_schema_matches_its_authoritative_generator) ... ok
+test_empty_keeps_only_zero_count_stubs_and_no_selected_clock (test_rtc_lptim.NativeTimeAssemblyTests.test_empty_keeps_only_zero_count_stubs_and_no_selected_clock) ... ok
+test_existing_lifecycle_emits_construct_or_explicit_reopen (test_rtc_lptim.NativeTimeAssemblyTests.test_existing_lifecycle_emits_construct_or_explicit_reopen) ... ok
+test_factory_is_pure_typed_and_keeps_compact_class_local_ids (test_rtc_lptim.NativeTimeAssemblyTests.test_factory_is_pure_typed_and_keeps_compact_class_local_ids) ... ok
+test_lptim_tick_frequency_is_explicit_positive_uint32 (test_rtc_lptim.NativeTimeAssemblyTests.test_lptim_tick_frequency_is_explicit_positive_uint32) ... ok
+test_pair_uses_existing_immutable_controller_ir_and_claims (test_rtc_lptim.NativeTimeAssemblyTests.test_pair_uses_existing_immutable_controller_ir_and_claims) ... ok
+test_physical_providers_do_not_inherit_host_modes (test_rtc_lptim.NativeTimeAssemblyTests.test_physical_providers_do_not_inherit_host_modes) ... ok
+test_selected_units_are_occurrences_and_ticks_without_fake_byte_width (test_rtc_lptim.NativeTimeAssemblyTests.test_selected_units_are_occurrences_and_ticks_without_fake_byte_width) ... ok
+test_unknown_time_policy_and_irq_fields_are_not_accepted (test_rtc_lptim.NativeTimeAssemblyTests.test_unknown_time_policy_and_irq_fields_are_not_accepted) ... ok
+test_wrong_mode_is_rejected_without_replacing_an_existing_bundle (test_rtc_lptim.NativeTimeAssemblyTests.test_wrong_mode_is_rejected_without_replacing_an_existing_bundle) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.059s
+
+OK

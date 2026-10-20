@@ -1,0 +1,22 @@
+{
+  "first_47_green_source": {
+    "io/src/usb_device_controller.c": "8dc8922e15c8a016e4dd0358f92afa113ceeafaa20c5f4504564d9f473f673d8",
+    "io/native/usb_device.h": "df28788a6cab953818f2f692c47f4a4e06fbdf9f0597b4c276a8f67f40d1289c",
+    "io/native/usb_device.c": "873f7bd689c18894ccdd568276afa888b9bf0e79ce622eca322a7d44d800b815",
+    "tests/google/usb_device_test.cpp": "fb331cbada826b4a50e83c3ea5695599df89b72e8aca3275063a2d5710acecb5"
+  },
+  "status": "preliminary prototype, three primary defects have actual RED/GREEN; extra conservative guards lack independent reset-branch RED coverage",
+  "additional_guards": [
+    "non-OUT0 enabled-direction reset gate",
+    "reset bulk DATA0 command and readable DPID proof",
+    "retain global OUT NAK until reset commit"
+  ],
+  "prior_coverage_limit": "ClearStallRequiresActualBulkDataZeroReadback tests public stall(false), not reset-specific proof branches; existing request reset/flush tests do not cover idle foreign-enable reset",
+  "next_tdd_slice_oracles": [
+    "Unknown enabled non-OUT0 direction retains reset gate/clock and software halt until inactive",
+    "Ignored nonzero-bulk SD0 command with readable DATA1 retains reset gate/clock/halt",
+    "Address/ST\u200bALL reset proof refusal retains an already observed global OUT NAK"
+  ],
+  "formatting_note": "Coverage build r1 used formatter fallback at persisted mirror location; restored explicit repository .clang-format before coverage execution. No behavior execution used r1 formatting candidate.",
+  "qualification": false
+}

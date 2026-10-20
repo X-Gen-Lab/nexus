@@ -7,7 +7,11 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/arch/cache.h"
+#include "nexus/core/fault.h"
 #include "stm32h743_dma.h"
+#ifndef NX_H743_SILICON_ID
+#define NX_H743_SILICON_ID() NX_H743_READ(&DBGMCU->IDCODE)
+#endif
 #include <limits.h>
 
 #ifndef NX_H743_IRQ_AVAILABLE
@@ -15,6 +19,9 @@
     (NVIC_GetEnableIRQ((IRQn_Type)(irq)) == 0U &&                              \
      NVIC_GetPendingIRQ((IRQn_Type)(irq)) == 0U &&                             \
      NVIC_GetActive((IRQn_Type)(irq)) == 0U)
+#endif
+#ifndef NX_H743_IRQ_ENABLED
+#define NX_H743_IRQ_ENABLED(irq) (NVIC_GetEnableIRQ((IRQn_Type)(irq)) != 0U)
 #endif
 #ifndef NX_H743_DMA_CLEAN
 #define NX_H743_DMA_CLEAN(address, bytes) nx_arch_dcache_clean(address, bytes)
@@ -50,30 +57,93 @@ static bool protected_span(const nx_stm32h743_uart_dma_state_t* s,
            (s->uart.wake != NULL &&
             overlaps(data, bytes, s->uart.wake, sizeof(*s->uart.wake)));
 }
-static bool checked(volatile uint32_t* reg, uint32_t value, uint32_t mask) {
+static bool domain_hardware(void) {
+    RCC_TypeDef* rcc = g_nx_stm32h743_system.rcc;
+    return rcc != NULL &&
+           (NX_H743_READ(&rcc->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0U &&
+           (NX_H743_READ(&rcc->AHB1RSTR) &
+            (RCC_AHB1RSTR_DMA1RST | RCC_AHB1RSTR_DMA2RST)) == 0U;
+}
+static bool domain_live(nx_stm32h743_uart_dma_state_t* s) {
+    if (!s->domain_lost && domain_hardware())
+        return true;
+    if (!s->retained && !s->uart.retained)
+        return false;
+    s->domain_lost = true;
+    if (s->uart.active != NULL) {
+        if (s->uart.terminal == NX_SUCCESS)
+            s->uart.terminal = NX_ERROR_STATE;
+        (void)nx_request_transition(&s->uart.active->base,
+                                    NX_REQUEST_QUARANTINED);
+    }
+    (void)NX_H743_IRQ_CONTROL(DMA1_Stream0_IRQn, false, 5U);
+    (void)NX_H743_IRQ_CONTROL(USART3_IRQn, false, 5U);
+    nx_arch_dsb();
+    nx_arch_isb();
+    bool isolated = !NX_H743_IRQ_ENABLED(DMA1_Stream0_IRQn);
+    isolated = !NX_H743_IRQ_ENABLED(USART3_IRQn) && isolated;
+    if (!isolated) {
+        (void)nx_arch_irq_save();
+        nx_arch_dsb();
+        nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+        for (;;) {
+        }
+    }
+    return false;
+}
+static uint32_t domain_read(nx_stm32h743_uart_dma_state_t* s,
+                            volatile uint32_t* reg) {
+    return domain_live(s) ? NX_H743_READ(reg) : 0U;
+}
+static bool checked(nx_stm32h743_uart_dma_state_t* s, volatile uint32_t* reg,
+                    uint32_t value, uint32_t mask) {
+    if (!domain_live(s))
+        return false;
     NX_H743_WRITE(reg, value);
     nx_arch_dsb();
-    return (NX_H743_READ(reg) & mask) == (value & mask);
+    return domain_live(s) && (NX_H743_READ(reg) & mask) == (value & mask);
+}
+/** \brief Refused peripheral withdrawal keeps the loan behind real NVIC
+ * isolation. */
+static void withdraw_uart_sources(nx_stm32h743_uart_dma_state_t* s) {
+    if (checked(s, &s->uart.registers->CR1,
+                NX_H743_READ(&s->uart.registers->CR1) & ~TX_SOURCES,
+                TX_SOURCES))
+        return;
+    (void)nx_request_transition(&s->uart.active->base, NX_REQUEST_QUARANTINED);
+    (void)NX_H743_IRQ_CONTROL(USART3_IRQn, false, 5U);
+    nx_arch_dsb();
+    nx_arch_isb();
+    if (!NX_H743_IRQ_ENABLED(USART3_IRQn))
+        return;
+    (void)nx_arch_irq_save();
+    nx_arch_dsb();
+    nx_fault_observe(NX_FAULT_PLATFORM, NX_ERROR_IO, __FILE__, __LINE__);
+    for (;;) {
+    }
 }
 static bool cached(void) {
     return (NX_H743_READ(&g_nx_stm32h743_system.core->CCR) & SCB_CCR_DC_Msk) !=
            0U;
 }
 static uint32_t flags(nx_stm32h743_uart_dma_state_t* s) {
-    return NX_H743_READ(&s->dma->LISR) & DMA_FLAGS;
+    return domain_read(s, &s->dma->LISR) & DMA_FLAGS;
 }
 static void acknowledge(nx_stm32h743_uart_dma_state_t* s, uint32_t mask) {
+    if (!domain_live(s))
+        return;
     NX_H743_WRITE(&s->dma->LIFCR, mask & DMA_FLAGS);
     nx_arch_dsb();
+    (void)domain_live(s);
 }
 /** \brief Every independent withdrawal is attempted even when one refuses. */
 static bool detach(nx_stm32h743_uart_dma_state_t* s) {
     USART_TypeDef* uart = s->uart.registers;
     bool peripheral = checked(
-        &uart->CR3, NX_H743_READ(&uart->CR3) & ~(uint32_t)USART_CR3_DMAT,
+        s, &uart->CR3, NX_H743_READ(&uart->CR3) & ~(uint32_t)USART_CR3_DMAT,
         USART_CR3_DMAT);
-    bool engine = checked(&s->tx->CR,
-                          NX_H743_READ(&s->tx->CR) &
+    bool engine = checked(s, &s->tx->CR,
+                          domain_read(s, &s->tx->CR) &
                               ~((uint32_t)DMA_SxCR_EN | DMA_SOURCES),
                           (uint32_t)DMA_SxCR_EN | DMA_SOURCES);
     /* Preserve error flags until the final post-withdrawal observation. */
@@ -97,7 +167,7 @@ static void drain(nx_stm32h743_uart_dma_state_t* s, nx_result_t reason,
 /** \brief Inspect memory progress independently from the final USART bit. */
 static void observe(nx_stm32h743_uart_dma_state_t* s, nx_time_us_t now) {
     nx_stm32h743_uart_state_t* uart = &s->uart;
-    if (uart->active == NULL)
+    if (uart->active == NULL || !domain_live(s))
         return;
     if (s->preparing) {
         if (nx_deadline_expired(uart->active->base.deadline, now))
@@ -108,7 +178,7 @@ static void observe(nx_stm32h743_uart_dma_state_t* s, nx_time_us_t now) {
     if ((status & DMA_ERRORS) != 0U)
         drain(s, NX_ERROR_IO, now);
     if (!s->draining && (status & DMA_LISR_TCIF0) != 0U) {
-        if (NX_H743_READ(&s->tx->NDTR) != 0U)
+        if (domain_read(s, &s->tx->NDTR) != 0U)
             drain(s, NX_ERROR_IO, now);
         else {
             s->dma_complete = true;
@@ -121,7 +191,7 @@ static void observe(nx_stm32h743_uart_dma_state_t* s, nx_time_us_t now) {
     if (!s->draining)
         return;
     bool detached = detach(s);
-    size_t remaining = s->launched ? NX_H743_READ(&s->tx->NDTR) : 0U;
+    size_t remaining = s->launched ? domain_read(s, &s->tx->NDTR) : 0U;
     if (remaining > uart->active->length) {
         drain(s, NX_ERROR_IO, now);
         return;
@@ -133,8 +203,10 @@ static void observe(nx_stm32h743_uart_dma_state_t* s, nx_time_us_t now) {
     if (detached && (untouched || (NX_H743_READ(&uart->registers->ISR) &
                                    USART_ISR_TC) != 0U))
         uart->tx_complete = true;
-    if (!uart->tx_complete)
-        (void)checked(&uart->registers->CR1,
+    if (uart->tx_complete)
+        withdraw_uart_sources(s);
+    else
+        (void)checked(s, &uart->registers->CR1,
                       (NX_H743_READ(&uart->registers->CR1) & ~TX_SOURCES) |
                           USART_CR1_TCIE,
                       TX_SOURCES);
@@ -147,6 +219,10 @@ static void service(void* context) {
     if (s == NULL || !task_context())
         return;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if ((s->retained || s->uart.retained) && !domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     nx_uart_tx_request_t* request = s->uart.active;
     if (request == NULL) {
         nx_arch_irq_restore(guard);
@@ -156,17 +232,26 @@ static void service(void* context) {
     observe(s, now);
     if (!s->preparing && s->draining) {
         nx_dma_drain_facts_t facts = {
-            request->length, s->launched ? NX_H743_READ(&s->tx->NDTR) : 0U,
-            (NX_H743_READ(&s->tx->CR) & DMA_SxCR_EN) == 0U,
-            (NX_H743_READ(&s->tx->CR) & DMA_SOURCES) == 0U &&
+            request->length, s->launched ? domain_read(s, &s->tx->NDTR) : 0U,
+            (domain_read(s, &s->tx->CR) & DMA_SxCR_EN) == 0U,
+            (domain_read(s, &s->tx->CR) & DMA_SOURCES) == 0U &&
                 (NX_H743_READ(&s->uart.registers->CR3) & USART_CR3_DMAT) == 0U,
             s->uart.tx_complete};
         bool drained = nx_dma_drain_check(&facts) == NX_SUCCESS;
         bool sources =
             drained &&
-            checked(&s->uart.registers->CR1,
+            checked(s, &s->uart.registers->CR1,
                     NX_H743_READ(&s->uart.registers->CR1) & ~TX_SOURCES,
                     TX_SOURCES);
+        if (sources && !NX_H743_IRQ_ENABLED(USART3_IRQn)) {
+            sources = NX_H743_IRQ_CONTROL(USART3_IRQn, true, 5U) == NX_SUCCESS;
+            nx_arch_dsb();
+            nx_arch_isb();
+            sources = NX_H743_IRQ_ENABLED(USART3_IRQn) && sources;
+            if (!sources)
+                (void)nx_request_transition(&request->base,
+                                            NX_REQUEST_QUARANTINED);
+        }
         if (sources) {
             if ((flags(s) & DMA_ERRORS) != 0U && s->uart.terminal == NX_SUCCESS)
                 s->uart.terminal = NX_ERROR_IO;
@@ -178,6 +263,10 @@ static void service(void* context) {
             if (flags(s) != 0U) {
                 (void)nx_request_transition(&request->base,
                                             NX_REQUEST_QUARANTINED);
+                nx_arch_irq_restore(guard);
+                return;
+            }
+            if (!domain_live(s)) {
                 nx_arch_irq_restore(guard);
                 return;
             }
@@ -213,13 +302,13 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
         return NX_ERROR_INVALID;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
     nx_stm32h743_uart_state_t* uart = &s->uart;
-    if (!uart->initialized || uart->closing || !s->retained ||
-        cached() != s->cached)
+    if (!uart->initialized || !s->retained || !domain_live(s) ||
+        uart->closing || cached() != s->cached)
         result = NX_ERROR_STATE;
     else if (uart->active != NULL || s->preparing ||
-             (NX_H743_READ(&s->tx->CR) &
+             (domain_read(s, &s->tx->CR) &
               ((uint32_t)DMA_SxCR_EN | DMA_SOURCES)) != 0U ||
-             NX_H743_READ(&s->mux->CCR) != TX_REQUEST)
+             domain_read(s, &s->mux->CCR) != TX_REQUEST)
         result = NX_ERROR_BUSY;
     else if (nx_deadline_expired(request->base.deadline, nx_time_now_us()))
         result = NX_ERROR_TIMEOUT;
@@ -246,6 +335,10 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
                   : NX_ARCH_OK;
     guard = nx_arch_irq_save();
     s->preparing = false;
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return NX_SUCCESS;
+    }
     if (clean != NX_ARCH_OK || cached() != s->cached)
         drain(s, NX_ERROR_IO, nx_time_now_us());
     else if (nx_deadline_expired(request->base.deadline, nx_time_now_us()))
@@ -253,20 +346,27 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
     if (!s->draining) {
         acknowledge(s, DMA_FLAGS);
         bool valid = flags(s) == 0U;
-        valid = checked(&s->tx->PAR, (uint32_t)(uintptr_t)&uart->registers->TDR,
+        valid =
+            checked(s, &s->tx->PAR, (uint32_t)(uintptr_t)&uart->registers->TDR,
+                    UINT32_MAX) &&
+            valid;
+        valid = checked(s, &s->tx->M0AR, (uint32_t)(uintptr_t)request->data,
                         UINT32_MAX) &&
-                valid;
-        valid = checked(&s->tx->M0AR, (uint32_t)(uintptr_t)request->data,
-                        UINT32_MAX) &&
-                valid;
-        valid = checked(&s->tx->NDTR, (uint32_t)request->length, UINT16_MAX) &&
                 valid;
         valid =
-            checked(&s->tx->FCR, 0U, DMA_SxFCR_DMDIS | DMA_SxFCR_FEIE) && valid;
+            checked(s, &s->tx->NDTR, (uint32_t)request->length, UINT16_MAX) &&
+            valid;
+        valid = checked(s, &s->tx->FCR, 0U, DMA_SxFCR_DMDIS | DMA_SxFCR_FEIE) &&
+                valid;
         uint32_t control = DMA_SxCR_MINC | DMA_SxCR_DIR_0 | DMA_SxCR_PL_1 |
                            DMA_SxCR_TCIE | DMA_SxCR_TEIE | DMA_SxCR_DMEIE;
-        valid = checked(&s->tx->CR, control, UINT32_MAX) && valid;
-        valid = checked(&uart->registers->CR1,
+        /* ES0392 Rev15 2.20.4: match the locked ST HAL's X/V protocol;
+         * Y/W keeps bit20 reserved. This is not silicon admission. */
+        if ((NX_H743_SILICON_ID() & UINT32_C(0xffff0000)) >=
+            UINT32_C(0x20000000))
+            control |= DMA_SxCR_TRBUFF;
+        valid = checked(s, &s->tx->CR, control, UINT32_MAX) && valid;
+        valid = checked(s, &uart->registers->CR1,
                         NX_H743_READ(&uart->registers->CR1) & ~TX_SOURCES,
                         TX_SOURCES) &&
                 valid;
@@ -276,9 +376,9 @@ static nx_result_t start(void* context, nx_uart_tx_request_t* request,
             (NX_H743_READ(&uart->registers->ISR) & USART_ISR_TC) == 0U && valid;
         if (valid) {
             s->launched = true;
-            valid = checked(&s->tx->CR, control | DMA_SxCR_EN, UINT32_MAX);
+            valid = checked(s, &s->tx->CR, control | DMA_SxCR_EN, UINT32_MAX);
             if (valid)
-                valid = checked(&uart->registers->CR3,
+                valid = checked(s, &uart->registers->CR3,
                                 NX_H743_READ(&uart->registers->CR3) |
                                     USART_CR3_DMAT,
                                 USART_CR3_DMAT);
@@ -306,6 +406,12 @@ static nx_result_t cancel(void* context, nx_uart_tx_request_t* request) {
     if (s == NULL || request == NULL)
         return NX_ERROR_INVALID;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if ((s->retained || s->uart.retained) && !domain_live(s)) {
+        nx_result_t lost =
+            s->uart.active == request ? NX_SUCCESS : NX_ERROR_STATE;
+        nx_arch_irq_restore(guard);
+        return lost;
+    }
     nx_result_t result = NX_SUCCESS;
     if (s->uart.active != request)
         result = nx_request_state(&request->base) == NX_REQUEST_SETTLED
@@ -324,6 +430,10 @@ void nx_stm32h743_uart_dma_irq(nx_stm32h743_uart_dma_state_t* s) {
     if (s == NULL || !s->uart.initialized)
         return;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     if (s->uart.active != NULL)
         observe(s, nx_time_now_us());
     else
@@ -335,7 +445,15 @@ void nx_stm32h743_uart_dma_uart_irq(nx_stm32h743_uart_dma_state_t* s) {
     if (s == NULL || !s->uart.initialized)
         return;
     nx_arch_irq_state_t guard = nx_arch_irq_save();
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     observe(s, nx_time_now_us());
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return;
+    }
     uint32_t status = NX_H743_READ(&s->uart.registers->ISR);
     nx_arch_irq_restore(guard);
     nx_stm32h743_uart_receive_irq(&s->uart, status);
@@ -348,6 +466,11 @@ static nx_result_t stop(void* context) {
         return NX_ERROR_INVALID;
     if (!s->retained && !s->uart.retained)
         return NX_SUCCESS;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
+    bool available = domain_live(s);
+    nx_arch_irq_restore(guard);
+    if (!available)
+        return NX_ERROR_BUSY;
     s->uart.closing = true;
     if (s->uart.active != NULL) {
         (void)cancel(s, s->uart.active);
@@ -355,19 +478,29 @@ static nx_result_t stop(void* context) {
         if (s->uart.active != NULL)
             return NX_ERROR_BUSY;
     }
-    if (s->preparing || s->uart.wake_publishers != 0U || !detach(s))
+    guard = nx_arch_irq_save();
+    if (!domain_live(s) || s->preparing || s->uart.wake_publishers != 0U ||
+        !detach(s)) {
+        nx_arch_irq_restore(guard);
         return NX_ERROR_BUSY;
+    }
     nx_result_t result = NX_H743_IRQ_CONTROL(DMA1_Stream0_IRQn, false, 5U);
+    if (result == NX_SUCCESS) {
+        acknowledge(s, DMA_FLAGS);
+        if (flags(s) != 0U || !checked(s, &s->tx->CR, 0U, UINT32_MAX) ||
+            !checked(s, &s->mux->CCR, 0U, UINT32_MAX))
+            result = domain_live(s) ? NX_ERROR_IO : NX_ERROR_BUSY;
+    }
+    nx_arch_irq_restore(guard);
     if (result != NX_SUCCESS)
         return result;
-    acknowledge(s, DMA_FLAGS);
-    if (flags(s) != 0U || !checked(&s->tx->CR, 0U, UINT32_MAX) ||
-        !checked(&s->mux->CCR, 0U, UINT32_MAX))
-        return NX_ERROR_IO;
     result = nx_stm32h743_uart_ops.stop(&s->uart);
-    if (result == NX_SUCCESS)
+    guard = nx_arch_irq_save();
+    available = domain_live(s);
+    if (available && result == NX_SUCCESS)
         s->retained = false;
-    return result;
+    nx_arch_irq_restore(guard);
+    return available ? result : NX_ERROR_BUSY;
 }
 static nx_result_t read_bytes(void* context, uint8_t* bytes, size_t capacity,
                               size_t* count) {
@@ -416,8 +549,14 @@ nx_result_t nx_stm32h743_uart_dma_initialize(nx_stm32h743_uart_dma_state_t* s,
         s->uart.registers != USART3)
         return NX_ERROR_UNSUPPORTED;
 #endif
+    if (s->retained || s->uart.retained || s->preparing)
+        return NX_ERROR_BUSY;
+    if (!domain_hardware())
+        return NX_ERROR_STATE;
+    s->domain_lost = false;
     if (s->retained || s->uart.retained || s->preparing ||
-        NX_H743_READ(&s->tx->CR) != 0U || NX_H743_READ(&s->mux->CCR) != 0U ||
+        domain_read(s, &s->tx->CR) != 0U ||
+        domain_read(s, &s->mux->CCR) != 0U ||
         !NX_H743_IRQ_AVAILABLE(DMA1_Stream0_IRQn))
         return NX_ERROR_BUSY;
     if ((NX_H743_READ(&g_nx_stm32h743_system.rcc->AHB1ENR) &
@@ -432,14 +571,20 @@ nx_result_t nx_stm32h743_uart_dma_initialize(nx_stm32h743_uart_dma_state_t* s,
     result = nx_stm32h743_uart_initialize(&s->uart, clock, limit);
     if (result != NX_SUCCESS)
         return result;
+    nx_arch_irq_state_t guard = nx_arch_irq_save();
     s->retained = true;
+    if (!domain_live(s)) {
+        nx_arch_irq_restore(guard);
+        return NX_ERROR_STATE;
+    }
     s->cached = cached();
     s->preparing = s->launched = s->dma_complete = s->draining = false;
     acknowledge(s, DMA_FLAGS);
-    if (flags(s) != 0U || !checked(&s->mux->CCR, TX_REQUEST, UINT32_MAX))
+    if (flags(s) != 0U || !checked(s, &s->mux->CCR, TX_REQUEST, UINT32_MAX))
         result = NX_ERROR_IO;
     else
         result = NX_H743_IRQ_CONTROL(DMA1_Stream0_IRQn, true, 5U);
+    nx_arch_irq_restore(guard);
     if (result != NX_SUCCESS)
         (void)stop(s);
     return result;

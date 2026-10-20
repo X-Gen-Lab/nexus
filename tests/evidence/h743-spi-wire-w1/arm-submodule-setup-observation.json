@@ -1,0 +1,96 @@
+{
+  "classification": "setup; independent exact children exist but submodule.init metadata absent in own local config",
+  "rows": [
+    {
+      "path": "ext/freertos",
+      "locked": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0",
+      "actual": "dbf70559b27d39c1fdb68dfb9a32140b6a6777a0",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "ext/threadx",
+      "locked": "93387b0a60382a29579bbad5045c68328e3751df",
+      "actual": "93387b0a60382a29579bbad5045c68328e3751df",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/arm/CMSIS_5",
+      "locked": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+      "actual": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/cmsis_device_f1",
+      "locked": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+      "actual": "c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/cmsis_device_f4",
+      "locked": "3c77349ce04c8af401454cc51f85ea9a50e34fc1",
+      "actual": "3c77349ce04c8af401454cc51f85ea9a50e34fc1",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/cmsis_device_g4",
+      "locked": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+      "actual": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/cmsis_device_h7",
+      "locked": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
+      "actual": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/cmsis_device_u5",
+      "locked": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+      "actual": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/stm32f1_hal",
+      "locked": "fee494a92b5ad331f92ad21f76c66a5cb83773ee",
+      "actual": "fee494a92b5ad331f92ad21f76c66a5cb83773ee",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/stm32f4_hal",
+      "locked": "b6f0ed3829f3829eb358a2e7417d80bba1a42db7",
+      "actual": "b6f0ed3829f3829eb358a2e7417d80bba1a42db7",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/stm32g4_hal",
+      "locked": "f5929f431f9effe45fbe18f5337e4753ced9ac92",
+      "actual": "f5929f431f9effe45fbe18f5337e4753ced9ac92",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/stm32h7_hal",
+      "locked": "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
+      "actual": "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
+      "status": "",
+      "matches": true
+    },
+    {
+      "path": "vendors/st/stm32u5_hal",
+      "locked": "2552682ee5a0d6f826a6435750fc9267be65868b",
+      "actual": "2552682ee5a0d6f826a6435750fc9267be65868b",
+      "status": "",
+      "matches": true
+    }
+  ]
+}

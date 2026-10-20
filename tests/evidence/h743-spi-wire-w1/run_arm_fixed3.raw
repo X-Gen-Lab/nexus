@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+"""Run exactly three maintained ARM W1 fixtures; retain actual status and budgets."""
+from pathlib import Path
+import hashlib,json,os,resource,shutil,signal,subprocess,time
+ROOT=Path('/tmp/nexus-h743-spi-safe-stop-20261018')
+BASE=Path('/workspace/nexus-io-recovery-20261018/features/h743-spi-wire-w1')
+TOOLS=Path('/tmp/nexus-io-validation-20261018/.venv/bin')
+ARM=Path('/tmp/nexus-io-tools-recovery-20261018/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-gcc')
+OUT=ROOT/'build/h743-spi-wire-w1-arm-fixed-r1'
+EVID=ROOT/'build/h743-spi-wire-w1-evidence/final-arm-fixed3'
+EVID.mkdir(exist_ok=False)
+FILES=json.loads((BASE/'final-source-freeze.json').read_text())['sources']
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def allocated(p):return sum(q.lstat().st_blocks*512 for q in [p,*p.rglob('*')])
+def state():
+ return {'sources':{x['relative']:sha(ROOT/x['relative']) for x in FILES},'index':sha(ROOT/'.git/index'),'tmp_free':shutil.disk_usage(ROOT).free,'persistent_free':shutil.disk_usage(BASE).free,'build_allocated':allocated(ROOT/'build'),'memory_current':int(Path('/sys/fs/cgroup/memory.current').read_text()),'memory_max':int(Path('/sys/fs/cgroup/memory.max').read_text()),'events':Path('/sys/fs/cgroup/memory.events').read_text()}
+baseline=json.loads((BASE/'bootstrap.json').read_text())['baseline_build_allocated_bytes']
+before=state()
+assert before['memory_max']-before['memory_current']>=600*1024*1024
+assert before['tmp_free']>=200*1024*1024
+assert before['build_allocated']-baseline<80*1024*1024
+assert before['events']=='low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n'
+env={k:v for k,v in os.environ.items() if not k.startswith(('GIT_','GTEST_','CTEST_'))}
+env.update(PATH=str(TOOLS)+os.pathsep+str(ARM.parent)+os.pathsep+env['PATH'],PYTHONDONTWRITEBYTECODE='1',CMAKE_BUILD_PARALLEL_LEVEL='1')
+command=[str(TOOLS/'python'),'scripts/ci/provider_assemblies.py','--root',str(ROOT),'--fixture','tests/contracts/h743_assembly/peripherals.toml','--fixture','tests/contracts/h743_assembly/peripherals32.toml','--fixture','tests/contracts/h743_assembly/empty.toml','--family','stm32h743','--compiler',str(ARM),'--output',str(OUT),'--parallel','1']
+start=time.time_ns(); print(json.dumps({'command':command,'before':before}),flush=True)
+stop_reason=None;peak_build=before['build_allocated'];peak_memory=before['memory_current']
+with (EVID/'raw.log').open('wb') as f:
+ child=subprocess.Popen(command,cwd=ROOT,env=env,stdout=f,stderr=subprocess.STDOUT,start_new_session=True)
+ while child.poll() is None:
+  time.sleep(2)
+  current=state();peak_build=max(peak_build,current['build_allocated']);peak_memory=max(peak_memory,current['memory_current'])
+  if current['build_allocated']-baseline>=80*1024*1024:stop_reason='owned TMP increment budget exceeded'
+  if current['tmp_free']<100*1024*1024:stop_reason='output filesystem free under 100MiB'
+  if time.time_ns()-start>900*10**9:stop_reason='whole gate time exceeded 900s'
+  if stop_reason:
+   os.killpg(child.pid,signal.SIGTERM)
+   try:child.wait(timeout=5)
+   except subprocess.TimeoutExpired:os.killpg(child.pid,signal.SIGKILL)
+   break
+ code=child.wait()
+after=state();record={'qualification':False,'scope':'three existing exact ARM fixture link/resource/retention proofs, no runtime or HIL','command':command,'actual_exit':code,'stop_reason':stop_reason,'started_ns':start,'ended_ns':time.time_ns(),'before':before,'after':after,'source_stable':before['sources']==after['sources'],'index_stable':before['index']==after['index'],'peak_owned_build_allocated':peak_build,'peak_memory_current':peak_memory,'children_maxrss_kib':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'raw_sha256':sha(EVID/'raw.log')}
+if (OUT/'report.json').is_file():
+ report=json.loads((OUT/'report.json').read_text());record.update(report_sha256=sha(OUT/'report.json'),gate_status=report.get('status'),fixture_count=len(report.get('fixtures',[])),gate_error=report.get('error'))
+(EVID/'receipt.json').write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record,indent=2),flush=True)
+raise SystemExit(code)

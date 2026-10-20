@@ -1,0 +1,393 @@
+{
+  "kind": "actual_completed_commands",
+  "commands": [
+    {
+      "receipt": "runs/derive-dockerfile-r1.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "/tmp/nexus-oci-ca-reader-20261018-r1/derive.py"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "derive-dockerfile-r1",
+      "started_ns": 1792308175776938994,
+      "finished_ns": 1792308175841195983,
+      "duration_seconds": 0.06425910200050566,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/derive-dockerfile-r1.attempts/1792308175776898924-793508e241cf4115b37a06f4a58105f9/stdout.txt",
+        "bytes": 65,
+        "sha256": "2eca9a05eeb0b937cafaf9115307436a67a51653e4195e60d27408f4d63dff26"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/derive-dockerfile-r1.attempts/1792308175776898924-793508e241cf4115b37a06f4a58105f9/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/derive-dockerfile-r1.attempts/1792308175776898924-793508e241cf4115b37a06f4a58105f9/receipt.json"
+    },
+    {
+      "receipt": "runs/final-diff-r1.command.json",
+      "schema": 1,
+      "command": [
+        "git",
+        "diff",
+        "--binary",
+        "--",
+        "tools/evidence/recipe.py",
+        "tools/dev/Dockerfile",
+        "tools/testing/test_build_recipe.py"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "final-diff-r1",
+      "started_ns": 1792308226443652820,
+      "finished_ns": 1792308226459673937,
+      "duration_seconds": 0.01602221899884171,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-diff-r1.attempts/1792308226443609885-fd4f322cfbc44257846ece99bf3b257f/stdout.txt",
+        "bytes": 5356,
+        "sha256": "1f5cc367f1b0ecf151ffe3f4e11d15126ae25dcb78742b9482fb30b6dc0e0aad"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-diff-r1.attempts/1792308226443609885-fd4f322cfbc44257846ece99bf3b257f/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-diff-r1.attempts/1792308226443609885-fd4f322cfbc44257846ece99bf3b257f/receipt.json"
+    },
+    {
+      "receipt": "runs/final-source-index-text-verification-r1.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "/tmp/nexus-oci-ca-reader-20261018-r1/verify_final.py"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "final-source-index-text-verification-r1",
+      "started_ns": 1792308256708135136,
+      "finished_ns": 1792308256822461350,
+      "duration_seconds": 0.11432836699896143,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-source-index-text-verification-r1.attempts/1792308256708095286-124adc9026a64fd3b57a03e94f4e2c68/stdout.txt",
+        "bytes": 520,
+        "sha256": "ab54d206cb85f44d25fb287c7cb2fb45fe1cd4bde0d81468ebef06e1eeb2bd1f"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-source-index-text-verification-r1.attempts/1792308256708095286-124adc9026a64fd3b57a03e94f4e2c68/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-source-index-text-verification-r1.attempts/1792308256708095286-124adc9026a64fd3b57a03e94f4e2c68/receipt.json"
+    },
+    {
+      "receipt": "runs/final-tracked-names-r1.command.json",
+      "schema": 1,
+      "command": [
+        "git",
+        "diff",
+        "--name-only",
+        "-z"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "final-tracked-names-r1",
+      "started_ns": 1792308226492046188,
+      "finished_ns": 1792308226556302495,
+      "duration_seconds": 0.06425822900200728,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-tracked-names-r1.attempts/1792308226491785405-05d7b5ffac7d4a7385872df7476adc0f/stdout.txt",
+        "bytes": 81,
+        "sha256": "51844d887a84a13bfb530fb9e2111be0f470ae78dc5f76561296d5e1edd12d23"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-tracked-names-r1.attempts/1792308226491785405-05d7b5ffac7d4a7385872df7476adc0f/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-tracked-names-r1.attempts/1792308226491785405-05d7b5ffac7d4a7385872df7476adc0f/receipt.json"
+    },
+    {
+      "receipt": "runs/final-untracked-names-r1.command.json",
+      "schema": 1,
+      "command": [
+        "git",
+        "ls-files",
+        "--others",
+        "--exclude-standard",
+        "-z"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "final-untracked-names-r1",
+      "started_ns": 1792308226590699081,
+      "finished_ns": 1792308226622816848,
+      "duration_seconds": 0.032118999002705095,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-untracked-names-r1.attempts/1792308226590658950-8c952a2bbf7d4fa7a7a0c07ad9e79727/stdout.txt",
+        "bytes": 428,
+        "sha256": "222d5025f41d2e44b4664267b0deed32469154c62393fdc50f682deb51d8741b"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-untracked-names-r1.attempts/1792308226590658950-8c952a2bbf7d4fa7a7a0c07ad9e79727/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/final-untracked-names-r1.attempts/1792308226590658950-8c952a2bbf7d4fa7a7a0c07ad9e79727/receipt.json"
+    },
+    {
+      "receipt": "runs/normal-recipe-verify-r1.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "tools/evidence/recipe.py",
+        "verify",
+        "--lock",
+        "dependencies/build-recipe.lock.json",
+        "--requirements",
+        "dependencies/python-tools-linux-cp312.txt",
+        "--dockerfile",
+        "tools/dev/Dockerfile",
+        "--report",
+        "/tmp/nexus-oci-ca-reader-20261018-r1/recipe-inputs.json"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "normal-recipe-verify-r1",
+      "started_ns": 1792308183856532779,
+      "finished_ns": 1792308183920793198,
+      "duration_seconds": 0.06426237099731225,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/normal-recipe-verify-r1.attempts/1792308183856489244-58649b2acb0845e7880d9daf3c96e6d2/stdout.txt",
+        "bytes": 25,
+        "sha256": "2a5e165989c4e59b1e3b8cfc1d68d22df0b2bba187be251c354f34773c270409"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/normal-recipe-verify-r1.attempts/1792308183856489244-58649b2acb0845e7880d9daf3c96e6d2/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/normal-recipe-verify-r1.attempts/1792308183856489244-58649b2acb0845e7880d9daf3c96e6d2/receipt.json"
+    },
+    {
+      "receipt": "runs/whole-recipe-green-r1.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_build_recipe"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "whole-recipe-green-r1",
+      "started_ns": 1792308183709279125,
+      "finished_ns": 1792308183824048815,
+      "duration_seconds": 0.11477142299918341,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-green-r1.attempts/1792308183709238353-3bb1d5a633fa48d4a3f832c1548bb60b/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-green-r1.attempts/1792308183709238353-3bb1d5a633fa48d4a3f832c1548bb60b/stderr.txt",
+        "bytes": 1555,
+        "sha256": "7dba84579ab5e4bb50f76b7d094e094e7c7666c565c2b19ed310ca7dc2054f57"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-green-r1.attempts/1792308183709238353-3bb1d5a633fa48d4a3f832c1548bb60b/receipt.json"
+    },
+    {
+      "receipt": "runs/whole-recipe-red-r1.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_build_recipe"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "whole-recipe-red-r1",
+      "started_ns": 1792308074603349584,
+      "finished_ns": 1792308074717773226,
+      "duration_seconds": 0.1144253549973655,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r1.attempts/1792308074603298016-d8ebba096e334ae88044cfd446e5ceab/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r1.attempts/1792308074603298016-d8ebba096e334ae88044cfd446e5ceab/stderr.txt",
+        "bytes": 3244,
+        "sha256": "df68640de987324b64ee18d5c9c57572f1c997405d449f73f59afaa6956e954b"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r1.attempts/1792308074603298016-d8ebba096e334ae88044cfd446e5ceab/receipt.json"
+    },
+    {
+      "receipt": "runs/whole-recipe-red-r2.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_build_recipe"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "whole-recipe-red-r2",
+      "started_ns": 1792308113486806936,
+      "finished_ns": 1792308113601247831,
+      "duration_seconds": 0.11444228799882694,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r2.attempts/1792308113486768037-e4853c3b5f274edda41149de80eb0ffb/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r2.attempts/1792308113486768037-e4853c3b5f274edda41149de80eb0ffb/stderr.txt",
+        "bytes": 3244,
+        "sha256": "18bf776183e27d4c7e02f3299e83226e9c9d3cdf980d0c80988044f386cdd5e6"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r2.attempts/1792308113486768037-e4853c3b5f274edda41149de80eb0ffb/receipt.json"
+    },
+    {
+      "receipt": "runs/whole-recipe-red-r3.command.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "tools.testing.test_build_recipe"
+      ],
+      "cwd": "/tmp/nexus-h743-fixed-hsi-s0-20261018",
+      "stage": "whole-recipe-red-r3",
+      "started_ns": 1792308148890816535,
+      "finished_ns": 1792308149005265071,
+      "duration_seconds": 0.11444949700307916,
+      "timeout_seconds": 120.0,
+      "outcome": "completed",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r3.attempts/1792308148890774842-bbf479550b5d443e83100c2d76acdbba/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r3.attempts/1792308148890774842-bbf479550b5d443e83100c2d76acdbba/stderr.txt",
+        "bytes": 3244,
+        "sha256": "62a99d119b38e9413e1c31c191d9a685ca88465a482c2bfd8fc82f87caa813ca"
+      },
+      "attempt_receipt": "/tmp/nexus-oci-ca-reader-20261018-r1/runs/whole-recipe-red-r3.attempts/1792308148890774842-bbf479550b5d443e83100c2d76acdbba/receipt.json"
+    }
+  ],
+  "accepted_red": {
+    "label": "whole-recipe-red-r3",
+    "methods": 8,
+    "failed_subtests": 2,
+    "errors": 0,
+    "skipped": 0,
+    "actual_exit": 1,
+    "reason": "Both actual emitted mounts default0400 rather than public-CA0444."
+  },
+  "green": {
+    "label": "whole-recipe-green-r1",
+    "methods": 8,
+    "failed_subtests": 0,
+    "errors": 0,
+    "skipped": 0,
+    "actual_exit": 0,
+    "same_test_bytes": true
+  },
+  "old_methods_preserved_exactly": 6,
+  "normal_recipe_verify_actual_exit": 0,
+  "three_file_text_check_actual_exit": 0,
+  "prior_reds": "R1/R2 full8 runs retained, same2subfail/0error; test width-only edits precede acceptedR3. Two inline authoring width assertions also failed, no production changes then; red-source-r1.json records the correction.",
+  "remote_red": {
+    "run": "39106146065",
+    "job_step": 8,
+    "path": "/workspace/nexus-io-recovery-20261018/validation/remote-qualification-dispatch-6d235058-r1/connector-completed-job-log.json",
+    "sha256": "f2ec4b47fadce2841169b2add355eb3fa1e59b303bdca71401eb163add4dd7e0",
+    "reason": "APT could not load /run/secrets/proxy_ca: Permission denied; actual exit100. Existing remote raw remains unchanged outside this small feature packet."
+  },
+  "limits": "No Docker build/pull, new OCI bytes, reproduction, SDK or hardware qualification. Root must run the new remote workflow."
+}

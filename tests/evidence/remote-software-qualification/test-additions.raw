@@ -1,0 +1,224 @@
+class SoftwareQualificationContracts(unittest.TestCase):
+    def document(self):
+        path = ROOT / '.github/workflows/software-qualification.yml'
+        self.assertTrue(path.is_file(), 'Explicit nonpublishing reusable workflow required')
+        return workflow(path.name)
+
+    def steps(self):
+        return self.document()['jobs']['qualify']['steps']
+
+    def step(self, identifier):
+        return next(step for step in self.steps() if step.get('id') == identifier)
+
+    def fixture(self, parent):
+        root = parent / 'source with spaces'
+        root.mkdir()
+        assembly = root / 'tools/configure/assemblies/space board.toml'
+        assembly.parent.mkdir(parents=True)
+        assembly.write_text('schema = 2\n')
+        (root / '.gitignore').write_text('build/\n')
+        subprocess.run(['git', 'init', '-q', str(root)], check=True)
+        self.commit(root)
+        return root
+
+    def commit(self, root):
+        subprocess.run(['git', '-C', str(root), 'add', '.'], check=True)
+        subprocess.run(['git', '-C', str(root), '-c', 'user.name=Fixture',
+                        '-c', 'user.email=fixture@example.invalid',
+                        'commit', '-qm', 'tracked fixture'], check=True)
+
+    def environment(self, root, parent):
+        commit = subprocess.check_output(['git', '-C', str(root), 'rev-parse',
+                                          'HEAD'], text=True).strip()
+        return dict(os.environ, GITHUB_WORKSPACE=str(root), RUNNER_TEMP=str(parent),
+                    GITHUB_SHA=commit, NEXUS_WORKFLOW_SHA=commit,
+                    NEXUS_EXPECTED_COMMIT=commit,
+                    NEXUS_QUALIFICATION_ASSEMBLY=
+                        'tools/configure/assemblies/space board.toml',
+                    NEXUS_QUALIFICATION_WORKLOAD='gpio',
+                    GITHUB_OUTPUT=str(parent / 'outputs'),
+                    GITHUB_REPOSITORY='fixture/nexus',
+                    GITHUB_WORKFLOW_REF='fixture/nexus/performance.yml@refs/heads/test',
+                    GITHUB_EVENT_NAME='workflow_dispatch', GITHUB_REF='refs/heads/test',
+                    GITHUB_RUN_ID='123', GITHUB_RUN_ATTEMPT='1')
+
+    def execute(self, identifier, root, env):
+        script = self.step(identifier)['run']
+        # Relocate the real maintained guard CLI, not its implementation.
+        script = script.replace('python3 tools/release/delivery.py',
+                                shlex.quote(sys.executable) + ' ' +
+                                shlex.quote(str(ROOT / 'tools/release/delivery.py')))
+        return subprocess.run(['bash', '-euo', 'pipefail', '-c', script],
+                              cwd=root, env=env, capture_output=True, text=True)
+
+    def test_default_profiles_and_required_policies_are_preserved(self):
+        import hashlib
+        document = workflow('performance.yml')
+        mode = document['on']['workflow_dispatch']['inputs']['mode']
+        self.assertEqual(mode['default'], 'profiles')
+        self.assertEqual(mode['options'], ['profiles', 'qualification-only'])
+        self.assertEqual(document['on']['schedule'], [{'cron': '0 2 * * 1'}])
+        profile = dict(document['jobs']['profiles'])
+        self.assertEqual(profile.pop('if'),
+                         "github.event_name == 'schedule' || inputs.mode == 'profiles'")
+        canonical = json.dumps(profile, sort_keys=True, separators=(',', ':')).encode()
+        self.assertEqual(hashlib.sha256(canonical).hexdigest(), PROFILE_BASELINE_SHA)
+        caller = document['jobs']['qualification']
+        self.assertEqual(caller['if'],
+                         "github.event_name == 'workflow_dispatch' && inputs.mode == 'qualification-only'")
+        self.assertEqual(caller['uses'], './.github/workflows/software-qualification.yml')
+        self.assertNotIn('secrets', caller)
+        for name, expected in POLICY_BASELINE_SHAS.items():
+            self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), expected)
+
+    def test_reusable_is_readonly_same_source_and_has_no_publication(self):
+        document = self.document()
+        self.assertEqual(set(document['on']), {'workflow_call'})
+        self.assertEqual(document['permissions'], {'contents': 'read'})
+        self.assertEqual(set(document['jobs']), {'qualify'})
+        checkout = self.step('checkout')
+        self.assertEqual(checkout['with']['ref'], '${{ github.sha }}')
+        self.assertEqual(checkout['with']['persist-credentials'], 'false')
+        self.assertEqual(checkout['with']['fetch-depth'], '0')
+        for name in ('expected_commit', 'qualification_assembly', 'qualification_workload'):
+            self.assertEqual(document['on']['workflow_call']['inputs'][name]['required'], 'true')
+        uses = '\n'.join(step.get('uses', '') for step in self.steps())
+        self.assertNotIn('attest', uses)
+        self.assertNotIn('secrets', document)
+        script = '\n'.join(step.get('run', '') for step in self.steps())
+        self.assertNotIn('docker run ', script)
+        self.assertNotIn('--development-fixture', script)
+        self.assertNotIn('candidate.py', script)
+        self.assertNotIn('${{ inputs.', script)
+
+    def test_request_guard_rejects_all_sha_mismatches_without_identity(self):
+        self.document()
+        variants = [('NEXUS_EXPECTED_COMMIT', ''),
+                    ('NEXUS_EXPECTED_COMMIT', 'A' * 40),
+                    ('NEXUS_EXPECTED_COMMIT', '$(touch injected)'),
+                    ('GITHUB_SHA', '1' * 40), ('NEXUS_WORKFLOW_SHA', '2' * 40)]
+        for key, value in variants:
+            with self.subTest(key=key, value=value), tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                env = self.environment(root, parent)
+                env[key] = value
+                result = self.execute('request', root, env)
+                self.assertNotEqual(result.returncode, 0)
+                reason = parent / 'nexus-qualification-early/identity-unavailable.json'
+                self.assertTrue(reason.is_file())
+                self.assertEqual(json.loads(reason.read_text())['identity_available'], False)
+                self.assertFalse((root / 'injected').exists())
+                self.assertFalse(list(root.rglob('identity.json')))
+                self.assertFalse((parent / 'nexus-source-sdk').exists())
+
+    def test_source_guard_accepts_tracked_spaces_and_records_exact_tuple(self):
+        self.document()
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            self.assertEqual(self.execute('request', root, env).returncode, 0)
+            result = self.execute('source', root, env)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            receipt = json.loads((root / 'build/software-qualification/source.json').read_text())
+            self.assertEqual(receipt['commit'], env['NEXUS_EXPECTED_COMMIT'])
+            self.assertEqual(receipt['assembly'], env['NEXUS_QUALIFICATION_ASSEMBLY'])
+            self.assertEqual(receipt['workload'], 'gpio')
+            self.assertIn('validated=true', (parent / 'outputs').read_text())
+
+    def test_source_guard_rejects_head_dirty_path_and_workload(self):
+        self.document()
+        for kind in ('head', 'dirty', 'alias', 'absolute', 'symlink', 'untracked', 'workload'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                env = self.environment(root, parent)
+                if kind == 'head':
+                    env['NEXUS_EXPECTED_COMMIT'] = '3' * 40
+                elif kind == 'dirty':
+                    (root / '.gitignore').write_text('changed\n')
+                elif kind == 'alias':
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = 'tools/configure/assemblies/../assemblies/space board.toml'
+                elif kind == 'absolute':
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = str(root / env['NEXUS_QUALIFICATION_ASSEMBLY'])
+                elif kind == 'symlink':
+                    link = root / 'tools/configure/assemblies/link.toml'
+                    link.symlink_to('space board.toml')
+                    self.commit(root)
+                    env = self.environment(root, parent)
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = 'tools/configure/assemblies/link.toml'
+                elif kind == 'untracked':
+                    (root / 'tools/configure/assemblies/new.toml').write_text('schema=2\n')
+                    env['NEXUS_QUALIFICATION_ASSEMBLY'] = 'tools/configure/assemblies/new.toml'
+                else:
+                    env['NEXUS_QUALIFICATION_WORKLOAD'] = '$(touch injected)'
+                result = self.execute('source', root, env)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse((parent / 'outputs').exists())
+                self.assertFalse((root / 'injected').exists())
+                self.assertFalse(list(root.rglob('identity.json')))
+
+    def test_complete_sdk_and_actual_observed_image_delegation(self):
+        sdk = self.step('sdk')['run']
+        for command in ('dependencies.py prepare --scope sdk',
+                        'package_source_sdk.py', 'verify_consumers.py',
+                        'transport.py pack', 'delivery.py stage'):
+            self.assertIn(command, sdk)
+        self.assertIn('--parallel 1', sdk)
+        self.assertIn('$RUNNER_TEMP/nexus-source-sdk', sdk)
+        self.assertNotIn('--development-fixture', sdk)
+        image = self.step('image')['run']
+        for command in ('recipe.py verify', 'docker build', 'container.py seal',
+                        'container.py verify', 'container.py load'):
+            self.assertIn(command, image)
+        self.assertLess(image.index('container.py seal'), image.index('container.py load'))
+        self.assertIn('--secret id=proxy_ca,src=/etc/ssl/certs/ca-certificates.crt', image)
+        self.assertIn('dependencies/python-tools-linux-cp312.txt', image)
+        self.assertIn('sha256:[0-9a-f]{64}', image)
+        formal = self.step('reproduce')['run']
+        self.assertEqual(formal.count('tools/evidence/reproduce.py'), 2)
+        self.assertIn('--prepare-spec', formal)
+        self.assertIn('--workload "$NEXUS_QUALIFICATION_WORKLOAD"', formal)
+        self.assertNotIn('--docker', formal)
+        self.assertNotIn('--qualification', formal)
+
+    def test_setup_failure_preserves_raw_and_does_not_create_identity(self):
+        self.document()
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            root = self.fixture(parent)
+            env = self.environment(root, parent)
+            env['NEXUS_EXPECTED_COMMIT'] = 'bad'
+            self.assertNotEqual(self.execute('request', root, env).returncode, 0)
+            env.update(NEXUS_CHECKOUT_VALIDATED='', NEXUS_JOB_RESULT='failure')
+            self.assertEqual(self.execute('collect', root, env).returncode, 0)
+            self.assertEqual(self.execute('readiness', root, env).returncode, 0)
+            evidence = root / 'build/software-qualification'
+            self.assertTrue((evidence / 'setup/identity-unavailable.json').is_file())
+            self.assertTrue((evidence / 'setup/request.raw').is_file())
+            self.assertFalse(list(root.rglob('identity.json')))
+            self.assertNotIn('ready=true', (parent / 'outputs').read_text()
+                             if (parent / 'outputs').exists() else '')
+
+    def test_identity_and_failure_upload_are_explicit_and_exact(self):
+        steps = self.steps()
+        identity = self.step('identity')
+        self.assertEqual(identity['uses'], './.github/actions/record-identity')
+        self.assertEqual(identity['if'], "always() && steps.readiness.outputs.ready == 'true'")
+        self.assertEqual(identity['with']['result'], '${{ job.status }}')
+        self.assertEqual(identity['with']['require-dependencies'], 'true')
+        upload = self.step('upload')
+        self.assertEqual(upload['if'], 'always()')
+        self.assertEqual(upload['with']['include-hidden-files'], 'true')
+        self.assertEqual(upload['with']['if-no-files-found'], 'error')
+        self.assertEqual(upload['with']['retention-days'], '30')
+        self.assertEqual(steps[steps.index(upload) - 1], identity)
+        self.assertIn(identity['with']['output'], upload['with']['path'])
+        self.assertEqual(self.step('collect')['if'], 'always()')
+        collect = self.step('collect')['run']
+        self.assertIn('tools/evidence/store.py export', collect)
+        self.assertNotIn('transport.py pack', collect)
+        self.assertIn('NEXUS_JOB_RESULT', collect)
+
+

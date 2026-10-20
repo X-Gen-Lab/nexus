@@ -1,0 +1,59 @@
+{
+  "kind": "authorized-source-before",
+  "root": "/tmp/nexus-io36-native-20261018",
+  "head": "38271c0d1749ce3f2225ee4de5ddc8b1cc0bc96b",
+  "branch": "feat/sdk-consumer-transport-20261018",
+  "head_tree": "080246edee130f63f05ae410212f168258866701",
+  "index_sha256": "85fe752015f12be5ca7345e4a13c22fb17e17f9d44ee23764ffda80664b79b44",
+  "files": {
+    "tools/release/transport.py": {
+      "sha256": "0e3c9ab5722f0d58b82500e5b2718a955df055adc656832dd3ac89c1d5f1cf96",
+      "size": 16919,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tools/release/transport.py"
+    },
+    "cmake/package/verify_consumers.py": {
+      "sha256": "19ce976ca80079240ca5ef723710ffc52945eba34917b0ee736d505810c9b87d",
+      "size": 31585,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/cmake/package/verify_consumers.py"
+    },
+    "cmake/package/package_source_sdk.py": {
+      "sha256": "ae715c4da9c6c418ce3ff423367d85d61fc0946b1234f82d3e6a2fbfc5e025f7",
+      "size": 50650,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/cmake/package/package_source_sdk.py"
+    },
+    ".github/workflows/test_release.py": {
+      "sha256": "4d171a2b962813639b3754a7365d89b57d96c6c05e120e1b1b2e0b7ad4a95af0",
+      "size": 56959,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/.github/workflows/test_release.py"
+    },
+    "tools/release/README.md": {
+      "sha256": "8e1a6b524cb58d4bd856e6feaece7364b7d0886c866db25eeaaf604f2d44ae72",
+      "size": 5172,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tools/release/README.md"
+    },
+    "tests/contracts/test_source_sdk.py": {
+      "sha256": "ac336f46b7b1558f14f8bb3e4421701a4c1a98b67485aab52e377df8be619126",
+      "size": 109798,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tests/contracts/test_source_sdk.py"
+    },
+    "tools/testing/test_sdk_verification_call.py": {
+      "sha256": "664b5d1d4ea503bfbfddd561121c1b8883ccb57bd2c8d24f1374d14a7b0bc925",
+      "size": 38547,
+      "mode": 384,
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/sdk-consumer-transport-r1/before/tools/testing/test_sdk_verification_call.py"
+    }
+  },
+  "tmp_root": "/tmp/nexus-sdk-consumer-transport-r1",
+  "tmp_start_allocated_bytes": 0,
+  "workspace_free_bytes": 73252864,
+  "tmp_free_bytes": 461058048,
+  "memory_current": 15493865472,
+  "memory_limit": 17179869184,
+  "oom_baseline": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+}

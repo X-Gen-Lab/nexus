@@ -1,0 +1,407 @@
+{
+  "kind": "model_width_portability_followup",
+  "parent_manifest": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/manifest.json",
+    "bytes": 8621,
+    "sha256": "df91fc43b99435bc691887c747d4e9d9ff6eee4c6fac74bc631d43ef68136559"
+  },
+  "final_composed_four_sources": [
+    {
+      "path": "soc/stm32h743/drivers/spi_dma.c",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/soc/stm32h743/drivers/spi_dma.c",
+      "bytes": 32063,
+      "sha256": "81ce62f3c95843ab2751c2057d4ed164c52933701460e5a9a5788538d9cb8db4",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_test.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_test.cpp",
+      "bytes": 47180,
+      "sha256": "3877b23e6de8d31c858248c6905d36278e4cc79c99c658e2181e7b59e6d0e0c9",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.cpp",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/portability-r2/files/tests/google/h743_spi_dma_model.cpp",
+      "bytes": 15459,
+      "sha256": "9f2e79c4b6ad03d67ba4e2078252b7f9d4239dbfd6e6b30e2aead3a409988ee4",
+      "mode": 384
+    },
+    {
+      "path": "tests/google/h743_spi_dma_model.h",
+      "durable_source": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/files/tests/google/h743_spi_dma_model.h",
+      "bytes": 4391,
+      "sha256": "b4b242f899e015a33581e94880df55e84d483f05ca53e14963f0f4a206ea8bed",
+      "mode": 384
+    }
+  ],
+  "only_source_changed": "tests/google/h743_spi_dma_model.cpp",
+  "semantic_note": "Explicit uint32_t boundary only. RXP bit0 and (rx_count modulo4)<<13 occupy bits0,13,14, so all previous register bit values are retained.",
+  "compile_RED": {
+    "actual_returncode": 1,
+    "stage": "asan-original-tu-r1",
+    "runtime_RED_claimed": false,
+    "diagnostic": "same unsigned-long to uint32_t -Wconversion under unchanged ASAN/UBSAN/Werror flags"
+  },
+  "debug": {
+    "build": 0,
+    "runtime": 0,
+    "tests": 53,
+    "failures": 0,
+    "errors": 0,
+    "disabled": 0,
+    "skipped": 0,
+    "xml": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/debug.xml",
+      "bytes": 28002,
+      "sha256": "f25bee0ac49f5c34c8a8c8f814a47de54fade95dcd7fcbadaa3d3c5b8527dd31"
+    },
+    "elf": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/debug-matching.elf",
+      "bytes": 2928728,
+      "sha256": "0d8390a8833f174e86d24f7d1167f0c42ad19bb0684f83634e521008a4306f67"
+    }
+  },
+  "asan": {
+    "build": 0,
+    "runtime": 0,
+    "tests": 53,
+    "failures": 0,
+    "errors": 0,
+    "disabled": 0,
+    "skipped": 0,
+    "xml": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan.xml",
+      "bytes": 28008,
+      "sha256": "2c435b48334d764349c89639d174b3826f6e84af8469192ac80f12d1ab2cd471"
+    },
+    "elf": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build/bin/nexus_h743_spi_dma_test",
+      "bytes": 5781136,
+      "sha256": "8d984815945d0018ef53273488d05f20e9ca3f407c547f5c7c3057b45d952431"
+    },
+    "stderr_bytes": 0,
+    "storage": "Real ASAN bin frozen in place; no additional copy to keep TMP80MiB limit."
+  },
+  "style": {
+    "actual_returncode": 0,
+    "files": 4,
+    "report": {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/style-whole-four-r2.json",
+      "bytes": 2049,
+      "sha256": "2392117e45150c9f86755b1b4316f1702a919bb22af7e2fb4758d897089516f5"
+    }
+  },
+  "all_eight_actual_commands": [
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-original-tu-r1.attempts/1792308918776270106-25c53e480b564e8484c9a4599ff84933/receipt.json",
+      "schema": 1,
+      "command": [
+        "cmake",
+        "--build",
+        "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build",
+        "--target",
+        "tests/contracts/google/CMakeFiles/nexus_h743_spi_dma_test.dir/h743_spi_dma_model.cpp.o",
+        "--parallel",
+        "1"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "asan-original-tu-r1",
+      "started_ns": 1792308918776327722,
+      "finished_ns": 1792308919242106618,
+      "duration_seconds": 0.4657792869984405,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-original-tu-r1.attempts/1792308918776270106-25c53e480b564e8484c9a4599ff84933/stdout.txt",
+        "bytes": 2529,
+        "sha256": "8d5e5e8c4807e58900f9b7416f587f16ece31a1e9ae6e6361c208e034377ca67"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-original-tu-r1.attempts/1792308918776270106-25c53e480b564e8484c9a4599ff84933/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-whole53-r2.attempts/1792309017199584075-143a22181af043b7a5f6d299b70b04e4/receipt.json",
+      "schema": 1,
+      "command": [
+        "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build/bin/nexus_h743_spi_dma_test",
+        "--gtest_output=xml:/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan.xml"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "asan-whole53-r2",
+      "started_ns": 1792309017199641522,
+      "finished_ns": 1792309017714763866,
+      "duration_seconds": 0.5151230859992211,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-whole53-r2.attempts/1792309017199584075-143a22181af043b7a5f6d299b70b04e4/stdout.txt",
+        "bytes": 7817,
+        "sha256": "23a995a3660fb20ed38c31d8eae1b60fab2ee3085afdcab3c394f6d7e0d23000"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-whole53-r2.attempts/1792309017199584075-143a22181af043b7a5f6d299b70b04e4/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/build-asan-r2.attempts/1792308962258265226-ddf7c4f426f342318037f565ba620ffd/receipt.json",
+      "schema": 1,
+      "command": [
+        "cmake",
+        "--build",
+        "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build",
+        "--target",
+        "nexus_h743_spi_dma_test",
+        "--parallel",
+        "1"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "build-asan-r2",
+      "started_ns": 1792308962258328712,
+      "finished_ns": 1792308987594279950,
+      "duration_seconds": 25.33595268999852,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/build-asan-r2.attempts/1792308962258265226-ddf7c4f426f342318037f565ba620ffd/stdout.txt",
+        "bytes": 5418,
+        "sha256": "be506cccb417e911e1742c5eedab47a05f2aa125f49f0f1f6b350aa3b5ab0411"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/build-asan-r2.attempts/1792308962258265226-ddf7c4f426f342318037f565ba620ffd/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/build-debug-r2.attempts/1792308948921608948-bf16772d07774737ae9b6b57f49eb132/receipt.json",
+      "schema": 1,
+      "command": [
+        "cmake",
+        "--build",
+        "build/native-debug",
+        "--target",
+        "nexus_h743_spi_dma_test",
+        "--parallel",
+        "1"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "build-debug-r2",
+      "started_ns": 1792308948921664021,
+      "finished_ns": 1792308949488315239,
+      "duration_seconds": 0.5666522300016368,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/build-debug-r2.attempts/1792308948921608948-bf16772d07774737ae9b6b57f49eb132/stdout.txt",
+        "bytes": 211,
+        "sha256": "116ba5fd335c2d752e80566491df866c652616361833f30d78edf8d7c65ea3b2"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/build-debug-r2.attempts/1792308948921608948-bf16772d07774737ae9b6b57f49eb132/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/configure-asan-r1.attempts/1792308880870273129-dd7e08f455b84f189298f945229eb357/receipt.json",
+      "schema": 1,
+      "command": [
+        "cmake",
+        "--preset",
+        "native-asan",
+        "-B",
+        "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/asan-build"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "configure-asan-r1",
+      "started_ns": 1792308880870334261,
+      "finished_ns": 1792308899538548953,
+      "duration_seconds": 18.66821627399986,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/configure-asan-r1.attempts/1792308880870273129-dd7e08f455b84f189298f945229eb357/stdout.txt",
+        "bytes": 1770,
+        "sha256": "05002ecf2c9b7ec017c6e480da0ed5c57e88946829bf02a50a4a4c198cf1b1d5"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/configure-asan-r1.attempts/1792308880870273129-dd7e08f455b84f189298f945229eb357/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/debug-whole53-r2.attempts/1792308957088789344-849d1fd0e22543729cf810aedf2e643b/receipt.json",
+      "schema": 1,
+      "command": [
+        "/tmp/nexus-io36-native-20261018/build/native-debug/bin/nexus_h743_spi_dma_test",
+        "--gtest_output=xml:/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/debug.xml"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "debug-whole53-r2",
+      "started_ns": 1792308957088854892,
+      "finished_ns": 1792308957303583471,
+      "duration_seconds": 0.21472942999753286,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/debug-whole53-r2.attempts/1792308957088789344-849d1fd0e22543729cf810aedf2e643b/stdout.txt",
+        "bytes": 7817,
+        "sha256": "0f4880cefdcb155c68f094cd8afdc3db44da825eeebcd1327a35342c1d6a596f"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/debug-whole53-r2.attempts/1792308957088789344-849d1fd0e22543729cf810aedf2e643b/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/format-model-r2.attempts/1792308948677952633-2a7f0b422af34c87a1083d8f5a682647/receipt.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/clang-format",
+        "-i",
+        "tests/google/h743_spi_dma_model.cpp"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "format-model-r2",
+      "started_ns": 1792308948678007425,
+      "finished_ns": 1792308948742420488,
+      "duration_seconds": 0.06441399400137016,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/format-model-r2.attempts/1792308948677952633-2a7f0b422af34c87a1083d8f5a682647/stdout.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/format-model-r2.attempts/1792308948677952633-2a7f0b422af34c87a1083d8f5a682647/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/style-whole-four-r2.attempts/1792309027809095748-7c74d3aea4cf4282906e8ae5cb8a1b64/receipt.json",
+      "schema": 1,
+      "command": [
+        "/workspace/nexus-build-system-20261012/.venv/bin/python",
+        "scripts/ci/style_gate.py",
+        "soc/stm32h743/drivers/spi_dma.c",
+        "tests/google/h743_spi_dma_test.cpp",
+        "tests/google/h743_spi_dma_model.cpp",
+        "tests/google/h743_spi_dma_model.h",
+        "--report",
+        "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/style-whole-four-r2.json"
+      ],
+      "cwd": "/tmp/nexus-io36-native-20261018",
+      "stage": "style-whole-four-r2",
+      "started_ns": 1792309027809159615,
+      "finished_ns": 1792309029086542949,
+      "duration_seconds": 1.277383734999603,
+      "timeout_seconds": 1800.0,
+      "outcome": "completed",
+      "exit_code": 0,
+      "child_returncode": 0,
+      "withdrawn_processes": [],
+      "withdrawal_stable": true,
+      "withdrawal_complete": true,
+      "build_parallelism": 1,
+      "stdout": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/style-whole-four-r2.attempts/1792309027809095748-7c74d3aea4cf4282906e8ae5cb8a1b64/stdout.txt",
+        "bytes": 88,
+        "sha256": "6551d9debb468296e3cb65fcdfb0f308dccf88cebbe74b353285eafa7bd61a56"
+      },
+      "stderr": {
+        "path": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/portability-r2/style-whole-four-r2.attempts/1792309027809095748-7c74d3aea4cf4282906e8ae5cb8a1b64/stderr.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "all_children_joined": true,
+  "old_three_sources_test_assertions_index_and_r1_records_unchanged": true,
+  "old_ELFs_retained": true,
+  "archive": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/portability-r2/actual-r2-execution-evidence.tar.gz",
+    "bytes": 21366,
+    "sha256": "ad0e56cb128f7c1ba74ffd676fc64abf6d2b7afaa9091970b206e96d7f6e1f4e"
+  },
+  "map": {
+    "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-dma-runtime-domain-r1/portability-r2/actual-r2-execution-evidence-map.json",
+    "bytes": 11664,
+    "sha256": "a79ad4b6d3ffaa1e10573cc49b3f09d6eb923ed01cda956050df5822f875eb67"
+  },
+  "verified_member_count": 60,
+  "gzip_CRC_all_member_SHA_size_mode_verified": true,
+  "resources": {
+    "current": {
+      "memory_current": 14634704896,
+      "memory_max": 17179869184,
+      "headroom": 2545164288,
+      "persistent_free": 69378048,
+      "persistent_alloc": 524288,
+      "tmp_alloc": 75714560,
+      "build_alloc": 92438528,
+      "oom": "low 0\nhigh 0\nmax 3388\noom 0\noom_kill 0\noom_group_kill 0\n"
+    },
+    "new_TMP_plus_debug_build_delta": 82763776,
+    "cap_bytes": 83886080,
+    "persistent_cap": 1048576,
+    "max_child_rss_kib": 460452,
+    "oom_increase": false
+  },
+  "limits": [
+    "Native focused Debug+ASAN/UBSAN only; no remote CI success/ARM/SDK/HIL/WCET upgrade.",
+    "Original r1 runtime RED/GREEN remains its historical tuple; this round establishes compile RED and two fresh same53 executions.",
+    "Root normal full hooks and independent delta review pending."
+  ]
+}

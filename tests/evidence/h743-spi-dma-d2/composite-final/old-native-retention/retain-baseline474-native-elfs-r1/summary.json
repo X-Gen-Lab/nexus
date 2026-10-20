@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "command": [
+    "/workspace/nexus-build-system-20261012/.venv/bin/python",
+    "-B",
+    "/dev/shm/nexus-main-native-elf-retention-20261018-r1/preserve.py"
+  ],
+  "cwd": "/tmp/nexus-io-validation-20261018",
+  "returncode": 1,
+  "receipt": "/workspace/nexus-io-recovery-20261018/validation/commands/retain-baseline474-native-elfs-r1/command.attempts/1792312421074759870-054786c945c240b8b51d3af87ee9f4e4/receipt.json",
+  "source_unchanged": true,
+  "qualification": "actual command only; inspect scope and reports"
+}

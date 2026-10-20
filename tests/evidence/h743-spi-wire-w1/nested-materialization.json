@@ -1,0 +1,66 @@
+{
+  "classification": "local-only two exact nested dependency materializations; no network/index/main/donor changes",
+  "nested": [
+    {
+      "relative": "ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+      "donor_head": "9c5bad7b2f42b4e8420f12290b9bc085d3309e8b",
+      "donor_worktree_allocated_bytes": 212992,
+      "donor_clean": true,
+      "target_was_empty": true,
+      "command": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--shared",
+        "--no-checkout",
+        "/tmp/nexus-io-validation-20261018/ext/freertos/portable/ThirdParty/Community-Supported-Ports",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/ext/freertos/portable/ThirdParty/Community-Supported-Ports"
+      ],
+      "clone_exit": 0,
+      "clone_stdout": "",
+      "clone_stderr": "Cloning into '/tmp/nexus-h743-spi-safe-stop-20261018/ext/freertos/portable/ThirdParty/Community-Supported-Ports'...\n",
+      "checkout_exit": 0,
+      "checkout_stdout": "",
+      "checkout_stderr": "HEAD is now at 9c5bad7 Add port for Renesas RH850 F1KM-S4 (#12)\n",
+      "canonical_origin": "https://github.com/FreeRTOS/FreeRTOS-Kernel-Community-Supported-Ports",
+      "allocated_bytes": 1241088,
+      "donor_config_unchanged": true,
+      "donor_index_unchanged": true
+    },
+    {
+      "relative": "ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+      "donor_head": "dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9",
+      "donor_worktree_allocated_bytes": 188416,
+      "donor_clean": true,
+      "target_was_empty": true,
+      "command": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--shared",
+        "--no-checkout",
+        "/tmp/nexus-io-validation-20261018/ext/freertos/portable/ThirdParty/Partner-Supported-Ports",
+        "/tmp/nexus-h743-spi-safe-stop-20261018/ext/freertos/portable/ThirdParty/Partner-Supported-Ports"
+      ],
+      "clone_exit": 0,
+      "clone_stdout": "",
+      "clone_stderr": "Cloning into '/tmp/nexus-h743-spi-safe-stop-20261018/ext/freertos/portable/ThirdParty/Partner-Supported-Ports'...\n",
+      "checkout_exit": 0,
+      "checkout_stdout": "",
+      "checkout_stderr": "HEAD is now at dc3afc6 Remove incorrect portYIELD_FROM_ISR() functions per discussion in https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports/issues/9 (#13)\n",
+      "canonical_origin": "https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports",
+      "allocated_bytes": 643072,
+      "donor_config_unchanged": true,
+      "donor_index_unchanged": true
+    }
+  ],
+  "total_nested_allocated": 1884160,
+  "parent_init_exit": 0,
+  "parent_init_stderr": "Submodule 'ThirdParty/FreeRTOS-Kernel-Community-Supported-Ports' (https://github.com/FreeRTOS/FreeRTOS-Kernel-Community-Supported-Ports) registered for path 'portable/ThirdParty/Community-Supported-Ports'\nSubmodule 'ThirdParty/FreeRTOS-Kernel-Partner-Supported-Ports' (https://github.com/FreeRTOS/FreeRTOS-Kernel-Partner-Supported-Ports) registered for path 'portable/ThirdParty/Partner-Supported-Ports'\n",
+  "status": " dbf70559b27d39c1fdb68dfb9a32140b6a6777a0 ext/freertos (dbf7055)\n 9c5bad7b2f42b4e8420f12290b9bc085d3309e8b ext/freertos/portable/ThirdParty/Community-Supported-Ports (9c5bad7)\n dc3afc6e837426b4bda81bbb6cf45bfb6f34c7e9 ext/freertos/portable/ThirdParty/Partner-Supported-Ports (dc3afc6)\n 93387b0a60382a29579bbad5045c68328e3751df ext/threadx (v6.5.2.202603_rel)\n 55b19837f5703e418ca37894d5745b1dc05e4c91 vendors/arm/CMSIS_5 (heads/develop)\n c8e9a4a4f16b6d2cb2a2083cbe5161025280fb22 vendors/st/cmsis_device_f1 (c8e9a4a)\n 3c77349ce04c8af401454cc51f85ea9a50e34fc1 vendors/st/cmsis_device_f4 (3c77349)\n 626ee412334a5ed2e5b320af5a8d77d69f03a558 vendors/st/cmsis_device_g4 (626ee41)\n 8f922cdc7cc6de2344e75ddd657889f4ff761790 vendors/st/cmsis_device_h7 (8f922cd)\n 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8 vendors/st/cmsis_device_u5 (624374f)\n fee494a92b5ad331f92ad21f76c66a5cb83773ee vendors/st/stm32f1_hal (fee494a)\n b6f0ed3829f3829eb358a2e7417d80bba1a42db7 vendors/st/stm32f4_hal (b6f0ed3)\n f5929f431f9effe45fbe18f5337e4753ced9ac92 vendors/st/stm32g4_hal (f5929f4)\n a1996eed9172b59887bafaaa0ea1816ea14d48b5 vendors/st/stm32h7_hal (a1996ee)\n 2552682ee5a0d6f826a6435750fc9267be65868b vendors/st/stm32u5_hal (2552682)\n",
+  "index_sha256": "7172de6764210aa6c53bd3adfa73260ba6dd9134a641a5694b70f878e004f252",
+  "setup_observations": [
+    "top13 init occurred but next recursive-status assertion failed on two genuinely missing nested trees; r2 ARM not started",
+    "first nested prep assumed donor .git directory; actual donor .git is gitfile; NotADirectoryError before clone; corrected to git --absolute-git-dir, no target mutation before correction"
+  ]
+}

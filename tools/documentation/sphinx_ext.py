@@ -558,6 +558,9 @@ def normalize_included_references(app, doctree) -> None:
 def setup(app) -> dict[str, object]:
     """Register only deterministic source and HTML transformations."""
     from tools.documentation.search_language import NexusChineseSearch
+    if 'breathe' in getattr(app, 'extensions', {}):
+        from tools.documentation.breathe_i18n import SourcedDoxygenFileDirective
+        app.add_directive('doxygenfile', SourcedDoxygenFileDirective, override=True)
     app.add_search_language(NexusChineseSearch)
     app.add_config_value('nexus_source_dirty', False, 'env')
     app.add_config_value('nexus_available_languages', os.environ.get('NEXUS_DOCS_LANGUAGES'),

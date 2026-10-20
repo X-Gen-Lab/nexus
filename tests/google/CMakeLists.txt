@@ -1,33 +1,21 @@
 # Host-only framework: firmware and source-SDK consumers never enter this tree.
-enable_language(CXX)
 if(CMAKE_CROSSCOMPILING OR NOT NEXUS_SOC_FAMILY STREQUAL "native")
     message(FATAL_ERROR "GoogleTest/GoogleMock require the Native test profile")
 endif()
+include("${NEXUS_SOURCE_DIR}/cmake/testing/GoogleTest.cmake")
+nexus_host_google_test()
 
-file(READ "${NEXUS_SOURCE_DIR}/dependencies/googletest.lock.json" google_lock)
-string(JSON google_archive GET "${google_lock}" archive)
-string(JSON google_commit GET "${google_lock}" commit)
-string(JSON google_sha256 GET "${google_lock}" sha256)
-set(google_archive "${NEXUS_SOURCE_DIR}/${google_archive}")
-if(NOT EXISTS "${google_archive}")
-    message(FATAL_ERROR "Missing pinned GoogleTest archive; no network fallback")
+# Preserve complete host DWARF without repeating uncompressed framework debug
+# sections in every contract executable. Firmware never enters this directory.
+set(nexus_google_compressed_debug_enabled FALSE)
+if(UNIX AND NOT APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    include(CheckLinkerFlag)
+    check_linker_flag(CXX "-Wl,--compress-debug-sections=zlib-gabi"
+        nexus_google_compressed_debug)
+    if(nexus_google_compressed_debug)
+        set(nexus_google_compressed_debug_enabled TRUE)
+    endif()
 endif()
-file(SHA256 "${google_archive}" google_actual)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/dependencies/googletest.lock.json" "${google_archive}")
-if(NOT google_actual STREQUAL google_sha256)
-    message(FATAL_ERROR "GoogleTest archive differs from the source lock")
-endif()
-set(google_root "${CMAKE_BINARY_DIR}/_deps/googletest-${google_commit}")
-# A fresh extraction prevents a previously edited dependency from being reused.
-file(REMOVE_RECURSE "${google_root}")
-file(ARCHIVE_EXTRACT INPUT "${google_archive}"
-    DESTINATION "${CMAKE_BINARY_DIR}/_deps")
-set(INSTALL_GTEST OFF CACHE BOOL "GoogleTest is test-only" FORCE)
-set(BUILD_GMOCK ON CACHE BOOL "GoogleMock contract tests" FORCE)
-set(gtest_force_shared_crt ON CACHE BOOL "Host MSVC runtime" FORCE)
-add_subdirectory("${google_root}" "${CMAKE_BINARY_DIR}/_deps/google-build"
-    EXCLUDE_FROM_ALL)
 
 add_custom_target(nexus_google_contracts)
 function(nexus_google_test name)
@@ -37,6 +25,10 @@ function(nexus_google_test name)
     set_target_properties(${name} PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(${name} PRIVATE nexus_build_options nexus_owned_warnings
         GTest::gmock_main ${ARG_LIBRARIES})
+    if(nexus_google_compressed_debug_enabled)
+        target_link_options(${name} PRIVATE
+            "-Wl,--compress-debug-sections=zlib-gabi")
+    endif()
     target_include_directories(${name} PRIVATE ${ARG_INCLUDES})
     if(ARG_STM32F4_LL)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
@@ -47,7 +39,22 @@ function(nexus_google_test name)
     set_tests_properties(${name} PROPERTIES TIMEOUT 30 LABELS "GoogleTest")
 endfunction()
 
+include("${CMAKE_CURRENT_LIST_DIR}/g474_pin_state.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/uart_v1_channel_dma.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/uart_formats.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cycle_probe.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/adc_control.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_timer_modes.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_control_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_timer_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_pwm_adc.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/u575_uart_gpdma.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/u575_uart_gpdma_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_pwm_adc_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/fdcan.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/g474_fdcan_factory.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_ram_sources.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/h743_high.cmake")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/legacy_devices.cmake")
 
@@ -71,12 +78,41 @@ nexus_google_test(nexus_uart_rs485_test SOURCES uart_rs485_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch)
 nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
     LIBRARIES Nexus::OwnerObserver Nexus::IO)
+nexus_google_test(nexus_io_observation_contract_test
+    SOURCES io_observation_contract_test.cpp
+    LIBRARIES Nexus::IO)
+nexus_google_test(nexus_silicon_admission_test
+    SOURCES silicon_admission_test.cpp
+    LIBRARIES Nexus::Core
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/common")
+nexus_google_test(nexus_spi_dma_transaction_test
+    SOURCES spi_dma_transaction_test.cpp
+    LIBRARIES Nexus::NativeModel Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
 nexus_google_test(nexus_io_state_machine_test SOURCES io_state_machine_test.cpp
     LIBRARIES Nexus::OwnerObserver Nexus::IO Nexus::UARTOwner
         Nexus::SPIAsyncOwner Nexus::NativeModel
     INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
 nexus_google_test(nexus_stream_storage_test SOURCES stream_storage_test.cpp
     LIBRARIES Nexus::IO Nexus::Arch)
+nexus_google_test(nexus_stream_profile_test SOURCES stream_profile_test.cpp
+    LIBRARIES Nexus::IO Nexus::Arch)
+nexus_google_test(nexus_spi_dma_owner_test SOURCES spi_dma_owner_test.cpp
+    LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch)
+nexus_google_test(nexus_native_spi_dma_owner_test
+    SOURCES native_spi_dma_owner_test.cpp
+        "${NEXUS_SOURCE_DIR}/io/native/spi_dma_transaction.c"
+    LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+        "${NEXUS_SOURCE_DIR}/io/private")
+target_compile_options(nexus_native_spi_dma_owner_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/native_spi_dma_owner_model.h")
+nexus_google_test(nexus_spi_dma_owner_wait_test
+    SOURCES spi_dma_owner_wait_test.cpp
+    LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::OSNative
+        Nexus::OwnerObserver Threads::Threads Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+        "${NEXUS_SOURCE_DIR}/io/private")
 nexus_google_test(nexus_flash_provenance_test SOURCES flash_provenance_test.cpp
     LIBRARIES Nexus::FlashStorage Nexus::NativeModel)
 nexus_google_test(nexus_native_instances_test SOURCES native_instances_test.cpp
@@ -157,6 +193,8 @@ target_compile_options(nexus_stm32_uart_dma_test PRIVATE
 # The host model compiles production register algorithms for two GD controllers.
 set(gd_multi_root "${NEXUS_SOURCE_DIR}/soc/gd32f470")
 set(gd_multi_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
+include("${CMAKE_CURRENT_SOURCE_DIR}/spi_transaction.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/spi_dma_owner_factory.cmake")
 nexus_google_test(nexus_irq_wake_gd32_test SOURCES irq_wake_gd32_test.cpp
     "${gd_multi_root}/drivers/uart.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
@@ -203,6 +241,8 @@ target_compile_options(nexus_stm32_spi_dma_test PRIVATE
 
 target_sources(nexus_stm32_spi_dma_test PRIVATE
     "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/spi_dma.c")
+target_include_directories(nexus_stm32_spi_dma_test PRIVATE
+    "${NEXUS_SOURCE_DIR}/io/private")
 
 nexus_google_test(nexus_gd32_uart_dma_test SOURCES gd32_uart_dma_test.cpp
     "${gd_multi_root}/drivers/uart.c" "${gd_multi_root}/drivers/uart_dma.c"
@@ -224,6 +264,7 @@ nexus_google_test(nexus_stm32_uart_receive_test STM32F4_LL
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_dma.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_receive.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/uart_duplex.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
 target_include_directories(nexus_stm32_uart_receive_test SYSTEM PRIVATE
@@ -239,6 +280,7 @@ nexus_google_test(nexus_gd32_uart_receive_test
         "${gd_multi_root}/drivers/uart.c"
         "${gd_multi_root}/drivers/uart_dma.c"
         "${gd_multi_root}/drivers/uart_receive.c"
+        "${gd_multi_root}/drivers/uart_duplex.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
@@ -271,7 +313,8 @@ nexus_google_test(nexus_gd32_spi_dma_test SOURCES gd32_spi_dma_test.cpp
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
     LIBRARIES Nexus::IO
     INCLUDES "${gd_multi_root}" "${gd_multi_root}/private"
-        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
+        "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
+        "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(nexus_gd32_spi_dma_test SYSTEM PRIVATE
     "${gd_multi_vendor}/CMSIS/GD/GD32F4xx/Include"
     "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Include")
@@ -494,6 +537,7 @@ include(gd32_exti.cmake)
 include(stm32_exti.cmake)
 include(stm32_official.cmake)
 include(h743.cmake)
+include(h743_spi_wire.cmake)
 include(h743_dma.cmake)
 include(workload_uart3.cmake)
 include(u575.cmake)
@@ -504,3 +548,34 @@ include(g474_mainstream.cmake)
 include(u575_mainstream.cmake)
 include(stm32f103.cmake)
 include(legacy_watchdog.cmake)
+include(h743_flash_execution.cmake)
+include(g474_adc_group.cmake)
+include(ethernet_raw_errata.cmake)
+include(h743_uart_fifo.cmake)
+include(u575_uart_fifo.cmake)
+include(h743_uart_rtscts.cmake)
+include(u575_uart_rtscts.cmake)
+include(ethernet_frames.cmake)
+include(h743_flash_image_admission.cmake)
+include(g474_adc_group_factory.cmake)
+include(h743_uart_fifo_factory.cmake)
+include(u575_uart_fifo_factory.cmake)
+include(h743_uart_rtscts_factory.cmake)
+include(u575_uart_rtscts_factory.cmake)
+include(ethernet_frames_factory.cmake)
+include(i2c_v2_long_factory.cmake)
+include(g474_pwm_shared.cmake)
+include(g474_pwm_shared_factory.cmake)
+include(h743_flash_ram.cmake)
+include(h743_flash_ram_closure.cmake)
+include(h743_flash_mpu.cmake)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/rtc_lptim.cmake")
+
+include(h743_spi_dma.cmake)
+
+include(h743_spi_dma_factory.cmake)
+include("${CMAKE_CURRENT_SOURCE_DIR}/h743_runtime_clock.cmake")
+include(u575_lptim.cmake)
+include(u575_uart_chain.cmake)
+include(h743_uart_continuous.cmake)

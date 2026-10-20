@@ -1,0 +1,26 @@
+{
+  "kind": "r2-actual-failure-classification-and-r3-prepared-environment",
+  "r2": {
+    "style": "originalAPI exactbytes lacked finalLF; canonical35source unaffected",
+    "testing": {
+      "executed": 1044,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "failed_test": "test_overlay_inspection_observes_real_driver_and_filesystem",
+      "observed_admission": "insufficient_space",
+      "defaults_required_bytes": 402653184,
+      "r2_tmp_free_observed_after_exit": 228851712,
+      "temporary_directory_created_after_outer_launch": true,
+      "cached_initial_fallback_inference": "CMake test stdout actually used /tmp; missing-at-launch TMPDIR is consistent with fallback, not directly observed process environment"
+    }
+  },
+  "r3": {
+    "prepared_TMPDIR": "/dev/shm/nexus-full-hook-temp-d3-canonical-sdk-20261018-r3",
+    "exists_before_launch": true,
+    "actual_filesystem_free_bytes": 4626395136,
+    "storage_reserve_and_tests_unchanged": true
+  },
+  "source_and_index_untouched": true,
+  "full_hook_pending": true
+}

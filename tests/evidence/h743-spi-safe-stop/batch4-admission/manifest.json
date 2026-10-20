@@ -1,0 +1,1574 @@
+{
+  "scope": "S0.4 exact STM32H743 DEV450 REV2003 default-HSITRIM64 SPI envelope admission; focused Native TDD only",
+  "status": "frozen pending independent review and Root integration",
+  "base_commit": "3e63888152491678a3e2e8a32a9a522d575834b9",
+  "own_root": "/tmp/nexus-h743-spi-safe-stop-20261018",
+  "production_sha256": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0",
+  "source_window": [
+    "soc/stm32h743/drivers/spi.c",
+    "tests/google/h743_peripheral_test.cpp",
+    "tests/google/h743_peripheral_factory_test.cpp"
+  ],
+  "combined_nine_source": [
+    {
+      "relative": "soc/stm32h743/drivers/spi.c",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/files/soc/stm32h743/drivers/spi.c",
+      "bytes": 22078,
+      "sha256": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0",
+      "new_in_batch4": true
+    },
+    {
+      "relative": "tests/google/h743_peripheral_test.cpp",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/files/tests/google/h743_peripheral_test.cpp",
+      "bytes": 39244,
+      "sha256": "5f22040613ac9ec10d6179518c35e5aed3284476e3f23f9d9356f9ecad0fdf4a",
+      "new_in_batch4": true
+    },
+    {
+      "relative": "tests/google/h743_peripheral_factory_test.cpp",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/files/tests/google/h743_peripheral_factory_test.cpp",
+      "bytes": 11971,
+      "sha256": "4a06392b09493247486a25389e0b22eacf11dde2f1aa7d60131def6d3c8084ce",
+      "new_in_batch4": true
+    },
+    {
+      "relative": "tests/google/h743_model.h",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tests/google/h743_model.h",
+      "bytes": 7266,
+      "sha256": "1626b1cdbfb4750d550c359d37f6b34bb4fcbe8b742ef8f568c6d8fafeb91d8b",
+      "new_in_batch4": false
+    },
+    {
+      "relative": "tests/google/h743_model.cpp",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tests/google/h743_model.cpp",
+      "bytes": 24814,
+      "sha256": "05cee6923341a2a5f67486e4ef04dd506cd868054769e296a359d688bfc8eda7",
+      "new_in_batch4": false
+    },
+    {
+      "relative": "tools/configure/providers/stm32h743/bindings.py",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tools/configure/providers/stm32h743/bindings.py",
+      "bytes": 18811,
+      "sha256": "d90c63ecb774f3c272b688882d312c41e0e5ab5486fa5a2f26ce07060e1f8d0b",
+      "new_in_batch4": false
+    },
+    {
+      "relative": "tools/configure/providers/stm32h743/test_peripherals.py",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/files/tools/configure/providers/stm32h743/test_peripherals.py",
+      "bytes": 7402,
+      "sha256": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
+      "new_in_batch4": false
+    },
+    {
+      "relative": "soc/stm32h743/private/stm32h743_provider.h",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/files/soc/stm32h743/private/stm32h743_provider.h",
+      "bytes": 13407,
+      "sha256": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "new_in_batch4": false
+    },
+    {
+      "relative": "tests/google/h743_high_kernel_test.cpp",
+      "path": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/files/tests/google/h743_high_kernel_test.cpp",
+      "bytes": 24034,
+      "sha256": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+      "new_in_batch4": false
+    }
+  ],
+  "original_test_methods": {
+    "tests/google/h743_peripheral_test.cpp": {
+      "preserved_original_prefix_bytes": 32301,
+      "prefix_sha256": "b5fbef62991a953b400d80e0605333cfee77859448d58ba872ed1a56e56794a2",
+      "old_whole_cases": 42
+    },
+    "tests/google/h743_peripheral_factory_test.cpp": {
+      "preserved_original_prefix_bytes": 7831,
+      "prefix_sha256": "da4874c4b4a0b20b81a3e6a83594c1bb679300dcb15aeca08bb8e57d8a1e5c0f",
+      "old_whole_cases": 11
+    }
+  },
+  "production_changes": [
+    "Reuse unchanged existing exact-V inline from unconditional clock header; fixed-profile object+ELF nm prove no PLL384 symbols.",
+    "BUSY retained/active/hardware checks precede cold admission. DEV_ID/REV_ID exact check precedes V-only HSICFGR read. Cold nonV UNSUPPORTED; bad V trim STATE; transfer/recover/stop invalid readiness STATE.",
+    "No System, state layout, public API, other provider or typed IR changes. Previous S0.2 stop/rs/EOT/quiet/CS/SCK/reset and S0.3 divider logic retained."
+  ],
+  "classification": [
+    "Initial wrong factory event happened after SPI initialize; initial factory RED/partialGREEN are not cold-admission proof. Full raw/source/ELF retained.",
+    "Corrected TIM2+ADC ADRDY event occurs in EXTI before Flash/I2C/PWM/SPI, logs exact hardware values and count1. Old production actually reaches successful platform start, so Flash is not its rejection oracle.",
+    "New refused-System-stop expectation corrected: started=false invalidates epoch before withdrawal, EFFECT_TIMER and real CEN/gate retain cleanup. Initial one-assert failure and source/ELF retained; no production System fix.",
+    "Final authoritative whole49/13 against exact26766 with final test bytes: RED5cases/28assert and RED2cases/13assert. Same minimal2bc guard after both test corrections, not an adjusted production workaround."
+  ],
+  "final_authoritative_red": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/final-contrast-actual-red.json",
+  "final_six_whole": [
+    {
+      "stage": "final-r3-whole-nexus_h743_clock_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/receipt.json",
+      "sha256": "1833feac82c99cedcae25e102ff3f172d97ec5fc72f3732c4f43f94c17c2627d",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/junit.xml",
+        "sha256": "1c8c10cf7eb648ec2ac3844c5382a684ff5893a358182fb8992619a94dd5f5e4",
+        "fresh": true,
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_high_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/receipt.json",
+      "sha256": "fa888d10650bb2fa56f2616c719abe07b8fe0351e0751678d6b47cde74f13a4e",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/junit.xml",
+        "sha256": "08347032845d4bb9991c0f0ae785344dab6b01d161aa3b715c880d4c115d065e",
+        "fresh": true,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_high_kernel_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/receipt.json",
+      "sha256": "7efa95978423064c614bef253eb2c757ee23c62963d853e7fbe79a517963223e",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/junit.xml",
+        "sha256": "b36c79e0eb84fca14d09d913bf6df590d9050752464494c28a41221be327db34",
+        "fresh": true,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "8edb3422a84b030c4164ff94a33cf7ee51f8e989410a7f4cea0dd8f58f3dace5",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "2294c05bf91ff7c8280a30350a048e51d5c6a4ed523a0962ffeebbe8b9da4b4e",
+        "fresh": true,
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "5ff0318e8a1e136308fe379a54fd798f5d31d6e44342f2e89d297ae71b0296cb",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "a32924f79c58b4a66b4269bb10258226903a312ebf4bf781b49f7ba79bb46096",
+        "fresh": true,
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_system_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/receipt.json",
+      "sha256": "a35c6b44907ab45537d4945c8aaef7d6be8e0ed8c2f40420d2c7f2e377fa3491",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/junit.xml",
+        "sha256": "86989f182463f43cafdbc6cd2b7a2b8cb202397b6b171530fac768f09ec4f354",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    }
+  ],
+  "final_whole_tests": 187,
+  "python_whole_methods": 7,
+  "python_subtests": 23,
+  "python_receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-python-whole/receipt.json",
+  "style_receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-style/receipt.json",
+  "fixed_header_symbol_receipt": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/fixed-header-no-pll-r2/receipt.json",
+  "read_only_symbol_setup_failure": "Guessed object path missing in first nm setup; no nm command launched; receipt preserved. Actual second check derives -o from compile database.",
+  "retained_final_elfs": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch4-admission/retained-final-elfs.json",
+  "receipts": [
+    {
+      "stage": "corrected-red-build",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-build/receipt.json",
+      "sha256": "ea920ef31807837685a2ef28a3bd3ef0c5933f36a56ff5a5f47e599b1aaff560",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 306016,
+      "junit": null
+    },
+    {
+      "stage": "corrected-red-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "945159ccbc2b97d73a5290f1d42199e734de60ec1ae1bc6b1b17fae565f9328c",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "a307a639d93e0db1220c0b717c3eb50ead69eef63f75fabe8ef03ec43f260eb6",
+        "fresh": true,
+        "tests": 13,
+        "failures": 12,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "corrected-red-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "07d67d285e518e497e8a5740a792a23aa8868b5875aae4eb4caece20d39ffece",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "fb1268e947dfd9a5120d50906c6a13b38aa3eca3ae08169f4bf22135fa48c059",
+        "fresh": true,
+        "tests": 49,
+        "failures": 28,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-contrast-red-build",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-build/receipt.json",
+      "sha256": "f3923d7a5a034250c62e33d5168e0913f13395c5b44dcf46ca1dbcf078c11638",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 306428,
+      "junit": null
+    },
+    {
+      "stage": "final-contrast-red-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "35afc37800d983b6e0748446838f5c6597770442933b5cd1ff4ef7b2bf829238",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "e684645eb36750ecdff9563c38aa9647b759f8557bb2f6ef2fff80cc1d4d7113",
+        "fresh": true,
+        "tests": 13,
+        "failures": 13,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-contrast-red-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "1b947057588967a6799c8911c7dc128de6fc5b44b78062dadab8dbf9e4601a87",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "9bf75f9e155e89e8c2273caf3bbe5d7414d5f5135891b7407f04f87c76ba1f3d",
+        "fresh": true,
+        "tests": 49,
+        "failures": 28,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-python-whole",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-python-whole/receipt.json",
+      "sha256": "3d117a59eeb244587024761c1cf62d6f214207069dd4829aca476e2e845a433b",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": null,
+      "junit": null
+    },
+    {
+      "stage": "final-r2-six-build",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-six-build/receipt.json",
+      "sha256": "3a43710ae8ee84de40ddd9b3836b26875d4b8a226950ed150e40cced8fdf520c",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 41668,
+      "junit": null
+    },
+    {
+      "stage": "final-r2-whole-nexus_h743_clock_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_clock_test/receipt.json",
+      "sha256": "8bbaa2dadb9f1c99b62ee9cfe081db900d98c34873318070c93f01c32e48ed89",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_clock_test/junit.xml",
+        "sha256": "c835f61f0d3f6fbf047c5c10963541d64bc35d38ae5b8a3a5ef0f4bb8e3f569c",
+        "fresh": true,
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r2-whole-nexus_h743_high_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_factory_test/receipt.json",
+      "sha256": "e008abed8993750b7777d3e389841fc85b4febf60d7bc068c761359e4a63bfe5",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_factory_test/junit.xml",
+        "sha256": "092f3f9cc95f7fc664a074dac35d5a5fa89896eb4531049fec01f331262222a8",
+        "fresh": true,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r2-whole-nexus_h743_high_kernel_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_kernel_test/receipt.json",
+      "sha256": "8b1bb5494a31eb8adc666022af0f55dd130b0262d4972b350d2d2d5b8124ffbf",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_kernel_test/junit.xml",
+        "sha256": "31cf869c54f9cd4c37e239076e315068994a1455afcada3be1e3b8a0a28d82ad",
+        "fresh": true,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r2-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "1080aa12192fffcc6670fa68dd101969c996f1f12ab215f9ccaf879ef8e1ea73",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "47969c703af6d8384d49f346bbe5a5cfa07a015ddc79188b7b9ba8f516551cae",
+        "fresh": true,
+        "tests": 13,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r2-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "7cf6e81acbc8b90554e2f5ffcad6d792eb0926286ac6a42bc1ad53e723f3d53d",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "e1ad3e51288ae5d3ce2e93329d525646a0a8a4b8a01b03a0f6b545d0006cd51d",
+        "fresh": true,
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r2-whole-nexus_h743_system_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_system_test/receipt.json",
+      "sha256": "680e98eb0b5aeeccd0ef27fb76b0228c74e7f240e7c65f8985766f23e6aa09ef",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_system_test/junit.xml",
+        "sha256": "f02d1f067f23a05d17f0ed23adee5c96f6e3f8566d083585140cfdfd45f31740",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-six-build",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-six-build/receipt.json",
+      "sha256": "fe06d06401de65d3a0e98d5ca3532d682f8a60bec423dff9fccca80a556f062c",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 41636,
+      "junit": null
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_clock_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/receipt.json",
+      "sha256": "1833feac82c99cedcae25e102ff3f172d97ec5fc72f3732c4f43f94c17c2627d",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/junit.xml",
+        "sha256": "1c8c10cf7eb648ec2ac3844c5382a684ff5893a358182fb8992619a94dd5f5e4",
+        "fresh": true,
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_high_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/receipt.json",
+      "sha256": "fa888d10650bb2fa56f2616c719abe07b8fe0351e0751678d6b47cde74f13a4e",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/junit.xml",
+        "sha256": "08347032845d4bb9991c0f0ae785344dab6b01d161aa3b715c880d4c115d065e",
+        "fresh": true,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_high_kernel_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/receipt.json",
+      "sha256": "7efa95978423064c614bef253eb2c757ee23c62963d853e7fbe79a517963223e",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/junit.xml",
+        "sha256": "b36c79e0eb84fca14d09d913bf6df590d9050752464494c28a41221be327db34",
+        "fresh": true,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "8edb3422a84b030c4164ff94a33cf7ee51f8e989410a7f4cea0dd8f58f3dace5",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "2294c05bf91ff7c8280a30350a048e51d5c6a4ed523a0962ffeebbe8b9da4b4e",
+        "fresh": true,
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "5ff0318e8a1e136308fe379a54fd798f5d31d6e44342f2e89d297ae71b0296cb",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "a32924f79c58b4a66b4269bb10258226903a312ebf4bf781b49f7ba79bb46096",
+        "fresh": true,
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-r3-whole-nexus_h743_system_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/receipt.json",
+      "sha256": "a35c6b44907ab45537d4945c8aaef7d6be8e0ed8c2f40420d2c7f2e377fa3491",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/junit.xml",
+        "sha256": "86989f182463f43cafdbc6cd2b7a2b8cb202397b6b171530fac768f09ec4f354",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-six-build",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-six-build/receipt.json",
+      "sha256": "d1d79e3117181e94c9b0934b15ebdd88f27cfb7f7094cf495f331bc37a60bd3e",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 41748,
+      "junit": null
+    },
+    {
+      "stage": "final-style",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-style/receipt.json",
+      "sha256": "af79b091f43e9083406c346c39d48d21341c1036e0b772f9aafa5db9d41c8a1a",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 38488,
+      "junit": null
+    },
+    {
+      "stage": "final-whole-nexus_h743_clock_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_clock_test/receipt.json",
+      "sha256": "a230897092e96d30138e9c278440849956dfcb66d672488b901317b967e7803b",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_clock_test/junit.xml",
+        "sha256": "5a69de679f0f183570a05eb09caf983d01c2008c320bc535f10b88f45a672346",
+        "fresh": true,
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-nexus_h743_high_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_factory_test/receipt.json",
+      "sha256": "654edc219b3dfe40b3ece7dfdcd340599a17783a4f854960b51278e317fde72a",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_factory_test/junit.xml",
+        "sha256": "939bb3d4cf1cace22607d875f9f1252ce011ab479dc89cc008bca8122a3a5bd0",
+        "fresh": true,
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-nexus_h743_high_kernel_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_kernel_test/receipt.json",
+      "sha256": "f969e3ac0c395857cd145dd922dd53ee51964e17bac4fa51681d084f78c873f4",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_kernel_test/junit.xml",
+        "sha256": "59459ae9cb5cea5b44432180f0dee9a1d6027cfcc4d8e2dc583dd34e704d0fb8",
+        "fresh": true,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "690b5b97a786f5afbc22244325fdb02c62cc64f5d6d993ef8cf3c2b48075fb74",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "8aef20de84805e6d03fd3224511277ace8edf678e17aa4119b527cd0e648a421",
+        "fresh": true,
+        "tests": 13,
+        "failures": 11,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "b4f98c17cbbc414f62f3f8c4416e7d9f141472ed7208e187622b400c3b4429c0",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "d2a8db9d672445d42c079ceaf455abd425755cb0a6a57ccccc908c976c478239",
+        "fresh": true,
+        "tests": 49,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "final-whole-nexus_h743_system_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_system_test/receipt.json",
+      "sha256": "2b656c2f4ec40f44de6f5093d7af9ee7781b40440a5af4c4888f120f32a20e51",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_system_test/junit.xml",
+        "sha256": "6812d7cd87de9e88bb1e2df323aa1a39b0c0ddfe3553ee1f3989a527dcc998a6",
+        "fresh": true,
+        "tests": 47,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "fixed-header-no-pll",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/fixed-header-no-pll/receipt.json",
+      "sha256": "0befd3c94a37dc888cef7ab3e047d58a604b17017c7a8481a8de27702b28d40d",
+      "exit_code": 1,
+      "source_stable": null,
+      "children_maxrss_kib": null,
+      "junit": null
+    },
+    {
+      "stage": "fixed-header-no-pll-r2",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/fixed-header-no-pll-r2/receipt.json",
+      "sha256": "a945aeaf5197560e4be0eca1c794b44a8a394fdb0f2d82fef433ca7fe753d8b9",
+      "exit_code": 0,
+      "source_stable": null,
+      "children_maxrss_kib": null,
+      "junit": null
+    },
+    {
+      "stage": "native-red-build",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-build/receipt.json",
+      "sha256": "950d044f099bd03f123db2ad48670f254cbe66686c71a408fca113c1443efedf",
+      "exit_code": 0,
+      "source_stable": true,
+      "children_maxrss_kib": 352084,
+      "junit": null
+    },
+    {
+      "stage": "native-red-whole-nexus_h743_peripheral_factory_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "sha256": "acc759fb1668f1f90c7d8adbfcba7fc4110a22f0346789a592e336a151969161",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_factory_test/junit.xml",
+        "sha256": "36d947b529a1256148c42bfff9c5e5e1a2bcfc0b885db58559af2b12e569a235",
+        "fresh": true,
+        "tests": 13,
+        "failures": 11,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    },
+    {
+      "stage": "native-red-whole-nexus_h743_peripheral_test",
+      "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_test/receipt.json",
+      "sha256": "a9c5972c048a6739987f5ec1632a85b6090051247d5f27cc61bfce3e0ad53719",
+      "exit_code": 1,
+      "source_stable": true,
+      "children_maxrss_kib": 15640,
+      "junit": {
+        "path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_test/junit.xml",
+        "sha256": "6d18a241cca2dc525be169d64e1827332806b1a11fb472252821537eb9ce72a2",
+        "fresh": true,
+        "tests": 49,
+        "failures": 28,
+        "errors": 0,
+        "skipped": 0,
+        "notrun": 0
+      }
+    }
+  ],
+  "archives": [
+    {
+      "relative": "evidence-gzip/corrected-red-build/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-build/raw.log",
+      "bytes": 727,
+      "sha256": "bed8555c6f4464da8f692b9fac03a0a359c5d6eac4735e8575613cba953c97d3",
+      "gzip_bytes": 300,
+      "gzip_sha256": "9689cde8039be3e53de72d601e2d20963ae027e61aa1ba6e6a9d1303ee2493dd"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-build/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-build/receipt.json",
+      "bytes": 4911,
+      "sha256": "ea920ef31807837685a2ef28a3bd3ef0c5933f36a56ff5a5f47e599b1aaff560",
+      "gzip_bytes": 1407,
+      "gzip_sha256": "0f13e8ef0c27107e9b99766515457b8bd0e4154c8064cc4896999f0d9a74d001"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-whole-nexus_h743_peripheral_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_factory_test/junit.xml",
+      "bytes": 9166,
+      "sha256": "a307a639d93e0db1220c0b717c3eb50ead69eef63f75fabe8ef03ec43f260eb6",
+      "gzip_bytes": 1205,
+      "gzip_sha256": "defbe192705b67b7644054984627fc98ac9e4045e4de041fb83895ee4d79e2bc"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-whole-nexus_h743_peripheral_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_factory_test/raw.log",
+      "bytes": 5259,
+      "sha256": "ca5f45b1b1096beb2dcfc7bf49cfb87fb0dc5c19215dae2fbee061d2f7bbb4b0",
+      "gzip_bytes": 1105,
+      "gzip_sha256": "1d0705ce2c7778f740a27da4fc13e630393f91aa7248dae57123a3ec5b1b7fff"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-whole-nexus_h743_peripheral_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "bytes": 5408,
+      "sha256": "945159ccbc2b97d73a5290f1d42199e734de60ec1ae1bc6b1b17fae565f9328c",
+      "gzip_bytes": 1558,
+      "gzip_sha256": "f2a05aca1b06104fdfd78430009995caad9d3b6ba18f6dc96b17be76cfdd7b01"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-whole-nexus_h743_peripheral_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_test/junit.xml",
+      "bytes": 25981,
+      "sha256": "fb1268e947dfd9a5120d50906c6a13b38aa3eca3ae08169f4bf22135fa48c059",
+      "gzip_bytes": 2615,
+      "gzip_sha256": "0f6fbc845a13083bd05b1d5dfb623059578e0779ef098bf5f213cba423914116"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-whole-nexus_h743_peripheral_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_test/raw.log",
+      "bytes": 13556,
+      "sha256": "a3f5c49543b89aa89c19cb83710b6088bdacf67bd824868ddbfbf0cd9a2d36ac",
+      "gzip_bytes": 2257,
+      "gzip_sha256": "9d324b42f1be3bcc4a5918695d1ea4c59f12932c1dad0a21818e776ca165051d"
+    },
+    {
+      "relative": "evidence-gzip/corrected-red-whole-nexus_h743_peripheral_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/corrected-red-whole-nexus_h743_peripheral_test/receipt.json",
+      "bytes": 5376,
+      "sha256": "07d67d285e518e497e8a5740a792a23aa8868b5875aae4eb4caece20d39ffece",
+      "gzip_bytes": 1563,
+      "gzip_sha256": "79738e311a7d28127c41227fc550904ef6381fcaa019653dbdd03e4b329e2d53"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-build/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-build/raw.log",
+      "bytes": 727,
+      "sha256": "bed8555c6f4464da8f692b9fac03a0a359c5d6eac4735e8575613cba953c97d3",
+      "gzip_bytes": 300,
+      "gzip_sha256": "9689cde8039be3e53de72d601e2d20963ae027e61aa1ba6e6a9d1303ee2493dd"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-build/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-build/receipt.json",
+      "bytes": 4916,
+      "sha256": "f3923d7a5a034250c62e33d5168e0913f13395c5b44dcf46ca1dbcf078c11638",
+      "gzip_bytes": 1409,
+      "gzip_sha256": "61b25c10925bc49c29b23360fc35dc534f46d619a9a4757ca61831972c5a406b"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-whole-nexus_h743_peripheral_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_factory_test/junit.xml",
+      "bytes": 9563,
+      "sha256": "e684645eb36750ecdff9563c38aa9647b759f8557bb2f6ef2fff80cc1d4d7113",
+      "gzip_bytes": 1217,
+      "gzip_sha256": "d64275c88590fc7560711d03b7b731045b0ca32adc04c87e49bb3da239f642c5"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-whole-nexus_h743_peripheral_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_factory_test/raw.log",
+      "bytes": 5429,
+      "sha256": "df8defd667d771bc1b28aac65861bf869aca0337b440cabc9fdf44cb4b4273ab",
+      "gzip_bytes": 1107,
+      "gzip_sha256": "d3f59cf5f6aa518d55cc5296cae6abebf20110103ceaf09c2799fe0d3463635a"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-whole-nexus_h743_peripheral_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "bytes": 5423,
+      "sha256": "35afc37800d983b6e0748446838f5c6597770442933b5cd1ff4ef7b2bf829238",
+      "gzip_bytes": 1562,
+      "gzip_sha256": "b75d5c6ab5533fd70f6a674de0bf6430decf0ad159448f305d45cc365cca2a9b"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-whole-nexus_h743_peripheral_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_test/junit.xml",
+      "bytes": 25983,
+      "sha256": "9bf75f9e155e89e8c2273caf3bbe5d7414d5f5135891b7407f04f87c76ba1f3d",
+      "gzip_bytes": 2625,
+      "gzip_sha256": "26f77d09a9bff49bccdb2fc3b28b3b86c39c32b8bb8be9c16cac340fe3b2e9b1"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-whole-nexus_h743_peripheral_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_test/raw.log",
+      "bytes": 13556,
+      "sha256": "4f9ce6dcf862eda23108d0d0ebb52437cfb9634bd2c1fc9a530fb5e53e22918c",
+      "gzip_bytes": 2259,
+      "gzip_sha256": "4eb87ebd948381cae42547fc97c07f82ea1f6de7429f5fe77db7a3c67a149ac5"
+    },
+    {
+      "relative": "evidence-gzip/final-contrast-red-whole-nexus_h743_peripheral_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-contrast-red-whole-nexus_h743_peripheral_test/receipt.json",
+      "bytes": 5391,
+      "sha256": "1b947057588967a6799c8911c7dc128de6fc5b44b78062dadab8dbf9e4601a87",
+      "gzip_bytes": 1570,
+      "gzip_sha256": "a98ddfb735bbca7af37043a7bea3f7d9709d981dab64f922368851ebe4141a3a"
+    },
+    {
+      "relative": "evidence-gzip/final-python-whole/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-python-whole/junit.xml",
+      "bytes": 1507,
+      "sha256": "cdc332937a14eca2390b87ed7059c44287320c2b9d63ce549152821a68544ad0",
+      "gzip_bytes": 467,
+      "gzip_sha256": "9885239e46b1c56925ee6a54ea92a668b914105fa62d5b32c54afceac89aa13e"
+    },
+    {
+      "relative": "evidence-gzip/final-python-whole/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-python-whole/raw.log",
+      "bytes": 1600,
+      "sha256": "2d192a113a7a51dd266f526110679d2a4874b1671c7e0a926e92baeeec39b367",
+      "gzip_bytes": 399,
+      "gzip_sha256": "96c1eab61b5ea40c8e1ceb183515c3e23974b6e4d5dcc73b03c66aeb1c7ffb34"
+    },
+    {
+      "relative": "evidence-gzip/final-python-whole/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-python-whole/receipt.json",
+      "bytes": 2542,
+      "sha256": "3d117a59eeb244587024761c1cf62d6f214207069dd4829aca476e2e845a433b",
+      "gzip_bytes": 951,
+      "gzip_sha256": "5d1e255f30ccca27bda2a6565edcd7d10154a9941448b773c5ad3a109efd4f3b"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-six-build/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-six-build/raw.log",
+      "bytes": 1071,
+      "sha256": "fe2df6f964f5c2f120099f69d68d1306ac780b770e026158f389c988ccf2baa0",
+      "gzip_bytes": 337,
+      "gzip_sha256": "90c3d685ce7bac9a7f304589b077e045100414d50e9b1b8dc20ef8922fc234e6"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-six-build/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-six-build/receipt.json",
+      "bytes": 5039,
+      "sha256": "3a43710ae8ee84de40ddd9b3836b26875d4b8a226950ed150e40cced8fdf520c",
+      "gzip_bytes": 1435,
+      "gzip_sha256": "3198aff20f4b7a1544d86803c1ceeecb0903e7acde3e02d87970d5975b043310"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_clock_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_clock_test/junit.xml",
+      "bytes": 10512,
+      "sha256": "c835f61f0d3f6fbf047c5c10963541d64bc35d38ae5b8a3a5ef0f4bb8e3f569c",
+      "gzip_bytes": 1524,
+      "gzip_sha256": "b44e62e2a6e7b85a3bb29658cd05dfb7d3dcca1a5117ae8878a17fb5886af045"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_clock_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_clock_test/raw.log",
+      "bytes": 6260,
+      "sha256": "1f40e7a0927c8a9808e2b4177ec4f148626fcb3e3c813b7f2798ffb264d41b45",
+      "gzip_bytes": 1418,
+      "gzip_sha256": "34d84e48204a3c4e747ee9bbe26cc392bec8a2436e71e18cf25b67afe427a01d"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_clock_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_clock_test/receipt.json",
+      "bytes": 5340,
+      "sha256": "8bbaa2dadb9f1c99b62ee9cfe081db900d98c34873318070c93f01c32e48ed89",
+      "gzip_bytes": 1561,
+      "gzip_sha256": "260803c1129d7713ea8d493d24b6ea76ebda7184b022fdaed9c5c4f61485cdfb"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_high_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_factory_test/junit.xml",
+      "bytes": 3075,
+      "sha256": "092f3f9cc95f7fc664a074dac35d5a5fa89896eb4531049fec01f331262222a8",
+      "gzip_bytes": 667,
+      "gzip_sha256": "f4d26e705dca06b905d5d159aef03ab21526f243c2acca1aaf7855e8d8b7c3ef"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_high_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_factory_test/raw.log",
+      "bytes": 1937,
+      "sha256": "f2f43674b466a566c808006ef577c6094311b8ea7411d2e439f14cbdd6bda473",
+      "gzip_bytes": 549,
+      "gzip_sha256": "3471bde5e9106671cbaad0d9b90072cd0fa06bec846a8bba8d598e777210243d"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_high_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_factory_test/receipt.json",
+      "bytes": 5368,
+      "sha256": "e008abed8993750b7777d3e389841fc85b4febf60d7bc068c761359e4a63bfe5",
+      "gzip_bytes": 1565,
+      "gzip_sha256": "382ff7462106c514855d429f146fcb8a1fbcf1d6d5eee6cf7e6e9ac575ad7066"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_high_kernel_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_kernel_test/junit.xml",
+      "bytes": 9489,
+      "sha256": "31cf869c54f9cd4c37e239076e315068994a1455afcada3be1e3b8a0a28d82ad",
+      "gzip_bytes": 1497,
+      "gzip_sha256": "3f4b7f7fe79b3f810b39320c0a9d226702df085a8566eac91f6483c2f47fa647"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_high_kernel_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_kernel_test/raw.log",
+      "bytes": 5760,
+      "sha256": "0af7a1e5870861efce98f764259dc4adb1101a0f5e4cbd50d6d99a2987a95998",
+      "gzip_bytes": 1386,
+      "gzip_sha256": "d6ca93c8daf444c631b56b6ffaa359af6a673c69d7998e19e494ff1e6e560798"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_high_kernel_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_high_kernel_test/receipt.json",
+      "bytes": 5364,
+      "sha256": "8b1bb5494a31eb8adc666022af0f55dd130b0262d4972b350d2d2d5b8124ffbf",
+      "gzip_bytes": 1561,
+      "gzip_sha256": "a3eeb84a57156f8cd7902b12f9378c474c17c33661c8181470fc28401e191a03"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_peripheral_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_factory_test/junit.xml",
+      "bytes": 4438,
+      "sha256": "47969c703af6d8384d49f346bbe5a5cfa07a015ddc79188b7b9ba8f516551cae",
+      "gzip_bytes": 857,
+      "gzip_sha256": "cf42a386c8914cb13fb441ecf53298dc48d4eb65933194e512222f783d0b7ab4"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_peripheral_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_factory_test/raw.log",
+      "bytes": 3176,
+      "sha256": "e1abf22e49f9da47515152bcd89d17cae6385f77624decca2829e6638c87c7d2",
+      "gzip_bytes": 869,
+      "gzip_sha256": "8dc6aa92e714497432eafce6aa91341db1903e230ea96e1e62bad0fec4812db5"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_peripheral_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "bytes": 5392,
+      "sha256": "1080aa12192fffcc6670fa68dd101969c996f1f12ab215f9ccaf879ef8e1ea73",
+      "gzip_bytes": 1557,
+      "gzip_sha256": "467aefb697f6cf98c0fa1669139bac59d1304d72aac1cee95bf1dca0142f8675"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_peripheral_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_test/junit.xml",
+      "bytes": 14070,
+      "sha256": "e1ad3e51288ae5d3ce2e93329d525646a0a8a4b8a01b03a0f6b545d0006cd51d",
+      "gzip_bytes": 1915,
+      "gzip_sha256": "f0a6a2ee105090f556d780518196fc951a86f6fd16af21ec6e025d4237b60cb3"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_peripheral_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_test/raw.log",
+      "bytes": 8091,
+      "sha256": "eb3f7dcc4040a0924fe751966f33ccc4354ac014fae3a3669e61acce72fbce13",
+      "gzip_bytes": 1738,
+      "gzip_sha256": "8f8cf526c45f3f218e3abc85e1e703fe6409653dedcf604774df6fac040a7613"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_peripheral_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_test/receipt.json",
+      "bytes": 5360,
+      "sha256": "7cf6e81acbc8b90554e2f5ffcad6d792eb0926286ac6a42bc1ad53e723f3d53d",
+      "gzip_bytes": 1563,
+      "gzip_sha256": "184beccca50200af69501a75acb6006e1fed4ec13add7a7fb04505f15530444f"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_system_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_system_test/junit.xml",
+      "bytes": 12878,
+      "sha256": "f02d1f067f23a05d17f0ed23adee5c96f6e3f8566d083585140cfdfd45f31740",
+      "gzip_bytes": 1722,
+      "gzip_sha256": "021893a9bc51bacfe36f5db2e6d6d10777096a19ea93cae2cc4f2f121d75da23"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_system_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_system_test/raw.log",
+      "bytes": 7723,
+      "sha256": "68055559a73b4e7d42db67130bf10e5586705f711cb6256a8f2ca6fddda2259b",
+      "gzip_bytes": 1577,
+      "gzip_sha256": "6c6a498f82bef5766077e2e4f412d0f9631e336cad5669ddcb186d8dd31568f3"
+    },
+    {
+      "relative": "evidence-gzip/final-r2-whole-nexus_h743_system_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r2-whole-nexus_h743_system_test/receipt.json",
+      "bytes": 5344,
+      "sha256": "680e98eb0b5aeeccd0ef27fb76b0228c74e7f240e7c65f8985766f23e6aa09ef",
+      "gzip_bytes": 1563,
+      "gzip_sha256": "cd14279e39249f65a4f747f76539bdadde4ef1264941579cae69b4e4c9645b7d"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-six-build/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-six-build/raw.log",
+      "bytes": 1071,
+      "sha256": "fe2df6f964f5c2f120099f69d68d1306ac780b770e026158f389c988ccf2baa0",
+      "gzip_bytes": 337,
+      "gzip_sha256": "90c3d685ce7bac9a7f304589b077e045100414d50e9b1b8dc20ef8922fc234e6"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-six-build/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-six-build/receipt.json",
+      "bytes": 5039,
+      "sha256": "fe06d06401de65d3a0e98d5ca3532d682f8a60bec423dff9fccca80a556f062c",
+      "gzip_bytes": 1433,
+      "gzip_sha256": "d1301719c6384a1653749edd4c64bef9d6d2550e8b7ae8b6e63537af363645ba"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_clock_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/junit.xml",
+      "bytes": 10512,
+      "sha256": "1c8c10cf7eb648ec2ac3844c5382a684ff5893a358182fb8992619a94dd5f5e4",
+      "gzip_bytes": 1527,
+      "gzip_sha256": "71311bf862ad6e71bd615632477981a0d5b55d2291bd8f82d97820a126355a16"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_clock_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/raw.log",
+      "bytes": 6260,
+      "sha256": "1f40e7a0927c8a9808e2b4177ec4f148626fcb3e3c813b7f2798ffb264d41b45",
+      "gzip_bytes": 1418,
+      "gzip_sha256": "34d84e48204a3c4e747ee9bbe26cc392bec8a2436e71e18cf25b67afe427a01d"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_clock_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_clock_test/receipt.json",
+      "bytes": 5340,
+      "sha256": "1833feac82c99cedcae25e102ff3f172d97ec5fc72f3732c4f43f94c17c2627d",
+      "gzip_bytes": 1561,
+      "gzip_sha256": "cb76c5a735a08905042401d561cbe09181b1b441e6936224672bfc8b345d1626"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_high_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/junit.xml",
+      "bytes": 3075,
+      "sha256": "08347032845d4bb9991c0f0ae785344dab6b01d161aa3b715c880d4c115d065e",
+      "gzip_bytes": 662,
+      "gzip_sha256": "ed323d1c1dc9c4b0bb8abf3df0856668bd30eae3bdb0980990a7923c7f3a7d75"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_high_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/raw.log",
+      "bytes": 1937,
+      "sha256": "f2f43674b466a566c808006ef577c6094311b8ea7411d2e439f14cbdd6bda473",
+      "gzip_bytes": 549,
+      "gzip_sha256": "3471bde5e9106671cbaad0d9b90072cd0fa06bec846a8bba8d598e777210243d"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_high_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_factory_test/receipt.json",
+      "bytes": 5368,
+      "sha256": "fa888d10650bb2fa56f2616c719abe07b8fe0351e0751678d6b47cde74f13a4e",
+      "gzip_bytes": 1563,
+      "gzip_sha256": "34b5d6e1474ad42f358749ab49f3de2564a05e01f4a0a1d679f96547f76fb3a3"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_high_kernel_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/junit.xml",
+      "bytes": 9489,
+      "sha256": "b36c79e0eb84fca14d09d913bf6df590d9050752464494c28a41221be327db34",
+      "gzip_bytes": 1497,
+      "gzip_sha256": "236a44cc2140f4bee94a7b7f0af463d961173172e9ab34d9ea8e761a4ca4ff61"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_high_kernel_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/raw.log",
+      "bytes": 5760,
+      "sha256": "9241f1c05e9a8cd2a1a9027698d55953fabb3b5baea68e750a50d2d4db931466",
+      "gzip_bytes": 1384,
+      "gzip_sha256": "e8316b69c6ca1d5b04cdfca2ff2aa75feb6e3d340158faee137148be71d54044"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_high_kernel_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_high_kernel_test/receipt.json",
+      "bytes": 5364,
+      "sha256": "7efa95978423064c614bef253eb2c757ee23c62963d853e7fbe79a517963223e",
+      "gzip_bytes": 1565,
+      "gzip_sha256": "16468428ff1e506f9aea00ef60cb1f7e669b217456057ad419046ff8cd0bf9be"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_peripheral_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/junit.xml",
+      "bytes": 4027,
+      "sha256": "2294c05bf91ff7c8280a30350a048e51d5c6a4ed523a0962ffeebbe8b9da4b4e",
+      "gzip_bytes": 722,
+      "gzip_sha256": "d192edd1917c66e8431c555c3993d6f46917cf6aa1d85d7747db6f1a17a5eecb"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_peripheral_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/raw.log",
+      "bytes": 2873,
+      "sha256": "eacaa68456c0cc0d983b6498eca91f7bc0793d85ae5381ad562f6d5ae66180f8",
+      "gzip_bytes": 726,
+      "gzip_sha256": "9c649b10ff723c9479480622dae19051eb3c4abf65bca7f249f3c63f8efbc316"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_peripheral_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "bytes": 5392,
+      "sha256": "8edb3422a84b030c4164ff94a33cf7ee51f8e989410a7f4cea0dd8f58f3dace5",
+      "gzip_bytes": 1556,
+      "gzip_sha256": "7672babd957c7bc56ce7f271f01be5079cca3577c9f0c6ab7b0cd15c5cef7c88"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_peripheral_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/junit.xml",
+      "bytes": 14070,
+      "sha256": "a32924f79c58b4a66b4269bb10258226903a312ebf4bf781b49f7ba79bb46096",
+      "gzip_bytes": 1922,
+      "gzip_sha256": "d95164f1d2ca956e88ab60a37f148bc370e7698df75d84ff85dabfca11b43822"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_peripheral_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/raw.log",
+      "bytes": 8091,
+      "sha256": "4f04ded8c34152269397e8f6a99656f51bee48be2cb3391b12a78de1d0b0fe7f",
+      "gzip_bytes": 1740,
+      "gzip_sha256": "6f5727ede9e0d3a4b59ac86162d13db8c6893c933cb4ad6c6f0c2e0f4515d10f"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_peripheral_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_peripheral_test/receipt.json",
+      "bytes": 5360,
+      "sha256": "5ff0318e8a1e136308fe379a54fd798f5d31d6e44342f2e89d297ae71b0296cb",
+      "gzip_bytes": 1560,
+      "gzip_sha256": "73b013eda71c608dfe17b29ea57b74fc858356a929501ab136b990af5aa922bd"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_system_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/junit.xml",
+      "bytes": 12878,
+      "sha256": "86989f182463f43cafdbc6cd2b7a2b8cb202397b6b171530fac768f09ec4f354",
+      "gzip_bytes": 1726,
+      "gzip_sha256": "606d8d483be16e871532d2f4dd8f2c1240f4cff293daa17afed06f4a7c64f5d9"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_system_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/raw.log",
+      "bytes": 7723,
+      "sha256": "68055559a73b4e7d42db67130bf10e5586705f711cb6256a8f2ca6fddda2259b",
+      "gzip_bytes": 1577,
+      "gzip_sha256": "6c6a498f82bef5766077e2e4f412d0f9631e336cad5669ddcb186d8dd31568f3"
+    },
+    {
+      "relative": "evidence-gzip/final-r3-whole-nexus_h743_system_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-r3-whole-nexus_h743_system_test/receipt.json",
+      "bytes": 5344,
+      "sha256": "a35c6b44907ab45537d4945c8aaef7d6be8e0ed8c2f40420d2c7f2e377fa3491",
+      "gzip_bytes": 1560,
+      "gzip_sha256": "eedf9e29f1345714aea2e46df134a044550802290b9bd77dd878ce40da3a8aa8"
+    },
+    {
+      "relative": "evidence-gzip/final-six-build/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-six-build/raw.log",
+      "bytes": 1071,
+      "sha256": "fe2df6f964f5c2f120099f69d68d1306ac780b770e026158f389c988ccf2baa0",
+      "gzip_bytes": 337,
+      "gzip_sha256": "90c3d685ce7bac9a7f304589b077e045100414d50e9b1b8dc20ef8922fc234e6"
+    },
+    {
+      "relative": "evidence-gzip/final-six-build/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-six-build/receipt.json",
+      "bytes": 5038,
+      "sha256": "d1d79e3117181e94c9b0934b15ebdd88f27cfb7f7094cf495f331bc37a60bd3e",
+      "gzip_bytes": 1430,
+      "gzip_sha256": "be72aee64e3a24086a4c43e3f0598092dec30cf1901e3516ad0b043589c3f001"
+    },
+    {
+      "relative": "evidence-gzip/final-style/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-style/raw.log",
+      "bytes": 88,
+      "sha256": "8b95d2b1bb8ca9931fe7adfa7da7593f452e6aa742f2423b23d58e5fe1c8d1f0",
+      "gzip_bytes": 98,
+      "gzip_sha256": "cf8877ceff350d81f225d99fe37a17d0852365f6ca313c2e78bec98c86eec56a"
+    },
+    {
+      "relative": "evidence-gzip/final-style/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-style/receipt.json",
+      "bytes": 3046,
+      "sha256": "af79b091f43e9083406c346c39d48d21341c1036e0b772f9aafa5db9d41c8a1a",
+      "gzip_bytes": 905,
+      "gzip_sha256": "f6c5d7f7dd868cfb4e47eecf16f5b65dc270281135d3fe3c77845c1a6470c880"
+    },
+    {
+      "relative": "evidence-gzip/final-style/report.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-style/report.json",
+      "bytes": 3356,
+      "sha256": "8e3bd3bd33013634f92605388ff17efd3a0fcb4f5c16688d2c95073d399897ab",
+      "gzip_bytes": 930,
+      "gzip_sha256": "1e941a162ab81486c7f16b205c5b3678f1d4dc68565c43a6d55380e89909c28f"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_clock_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_clock_test/junit.xml",
+      "bytes": 10512,
+      "sha256": "5a69de679f0f183570a05eb09caf983d01c2008c320bc535f10b88f45a672346",
+      "gzip_bytes": 1523,
+      "gzip_sha256": "425fc714a3f8968f4a1c5f9a2bc09912801d08721a0378572fe8c5d8b518a9ec"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_clock_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_clock_test/launcher.log",
+      "bytes": 7621,
+      "sha256": "8a62d0ff1e0b710d7f087aa12aa3735519e388a6dcd18a45926247a69813c673",
+      "gzip_bytes": 1704,
+      "gzip_sha256": "41d2abacee0b2bae3e61a0d474fdbf150c589b0c59824b8552255022f4bd58c3"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_clock_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_clock_test/raw.log",
+      "bytes": 6260,
+      "sha256": "1f40e7a0927c8a9808e2b4177ec4f148626fcb3e3c813b7f2798ffb264d41b45",
+      "gzip_bytes": 1418,
+      "gzip_sha256": "34d84e48204a3c4e747ee9bbe26cc392bec8a2436e71e18cf25b67afe427a01d"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_clock_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_clock_test/receipt.json",
+      "bytes": 5333,
+      "sha256": "a230897092e96d30138e9c278440849956dfcb66d672488b901317b967e7803b",
+      "gzip_bytes": 1555,
+      "gzip_sha256": "9d1fba1f2bac86a9a308552a7d964ff85ac87b2bcb052a9ef9987d19aa66400f"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_factory_test/junit.xml",
+      "bytes": 3075,
+      "sha256": "939bb3d4cf1cace22607d875f9f1252ce011ab479dc89cc008bca8122a3a5bd0",
+      "gzip_bytes": 666,
+      "gzip_sha256": "2acb5ed1755b15854469afa3f5ef168479fc4e872ca122a0ad24cd3e9e4b45b3"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_factory_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_factory_test/launcher.log",
+      "bytes": 7670,
+      "sha256": "1a93ca49dd5a7f15b1388ea02a0cc611728d4dd6494284a464d69f2af3b5ff64",
+      "gzip_bytes": 1706,
+      "gzip_sha256": "fcd1225782ff741675a1a4587834485b3e7ca00691f4ed9abf682655ce42fda5"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_factory_test/raw.log",
+      "bytes": 1937,
+      "sha256": "60fd5c0e682631d24fedbc56c76af542565810d1833d903ef821a18cddc16a6b",
+      "gzip_bytes": 549,
+      "gzip_sha256": "336b70de32292422a76c743a2807c01b6bf35391ab512c5ac43f676e3c9731f8"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_factory_test/receipt.json",
+      "bytes": 5361,
+      "sha256": "654edc219b3dfe40b3ece7dfdcd340599a17783a4f854960b51278e317fde72a",
+      "gzip_bytes": 1558,
+      "gzip_sha256": "744406a52aac377f4c8fead06149635fb2dbaa9a79fcd043fd47e69854ff1bf9"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_kernel_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_kernel_test/junit.xml",
+      "bytes": 9489,
+      "sha256": "59459ae9cb5cea5b44432180f0dee9a1d6027cfcc4d8e2dc583dd34e704d0fb8",
+      "gzip_bytes": 1497,
+      "gzip_sha256": "736f5b48223d1811a2ce1f89cff4ad4b969e63139f3dfe7f286562b080941203"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_kernel_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_kernel_test/launcher.log",
+      "bytes": 7663,
+      "sha256": "f521d25bd77dc8e6f4d31147d844ccc55ae8e021e0714981901dca0bdef82e05",
+      "gzip_bytes": 1710,
+      "gzip_sha256": "a0cf342b9e0d565efc31543b39f8dc1f0913be17cc48efbbe434150f4dc7ca50"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_kernel_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_kernel_test/raw.log",
+      "bytes": 5760,
+      "sha256": "9241f1c05e9a8cd2a1a9027698d55953fabb3b5baea68e750a50d2d4db931466",
+      "gzip_bytes": 1384,
+      "gzip_sha256": "e8316b69c6ca1d5b04cdfca2ff2aa75feb6e3d340158faee137148be71d54044"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_high_kernel_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_high_kernel_test/receipt.json",
+      "bytes": 5357,
+      "sha256": "f969e3ac0c395857cd145dd922dd53ee51964e17bac4fa51681d084f78c873f4",
+      "gzip_bytes": 1561,
+      "gzip_sha256": "52989f0a6fea796b3e7148a70ccddf46cbb9881ed5689ca39e6e064cdde53e10"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_factory_test/junit.xml",
+      "bytes": 8680,
+      "sha256": "8aef20de84805e6d03fd3224511277ace8edf678e17aa4119b527cd0e648a421",
+      "gzip_bytes": 1203,
+      "gzip_sha256": "0c3442d1b9ea7018634d8242e64d36091733fbca8855a21bbce842df627672ac"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_factory_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_factory_test/launcher.log",
+      "bytes": 7713,
+      "sha256": "84cc56de263830cc485f79f20e4450369fdc291c9b89e3fae377f099def29388",
+      "gzip_bytes": 1703,
+      "gzip_sha256": "98fb688aa6ff7293f05b9ea9e90419eb6838b3f831cfe5c8a261cc4228a72c39"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_factory_test/raw.log",
+      "bytes": 4721,
+      "sha256": "1894d5aa17d5d018f918d3a082fb52b1f61f44a7b8345dce1238343c2fa5c86e",
+      "gzip_bytes": 1002,
+      "gzip_sha256": "b622f500c35cadcc0a2ab65622a164141a0d6427db46c64ba8506ab69858c27a"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "bytes": 5386,
+      "sha256": "690b5b97a786f5afbc22244325fdb02c62cc64f5d6d993ef8cf3c2b48075fb74",
+      "gzip_bytes": 1555,
+      "gzip_sha256": "2f2da6ebd0a25dfb3fe7465e9d1c7add2d1e76a82b326d9b41cc81219c40dc27"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_test/junit.xml",
+      "bytes": 14070,
+      "sha256": "d2a8db9d672445d42c079ceaf455abd425755cb0a6a57ccccc908c976c478239",
+      "gzip_bytes": 1923,
+      "gzip_sha256": "79e195c62dbd5b950778973acf390bebdc4f9122fb5d35eb09734297491e045d"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_test/launcher.log",
+      "bytes": 7656,
+      "sha256": "064bbd8d6caadb67dbec0851850d50706d14b44dc5fe252b5444e9d86506b201",
+      "gzip_bytes": 1706,
+      "gzip_sha256": "0de20a2b1b2cf280decf3934f007df842587aafd48a4e827351dbf71550cfb81"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_test/raw.log",
+      "bytes": 8091,
+      "sha256": "60c8e00525787033bb4631dd2acc8512ce2097c89ef2de69ef8dc6998ef4b2bc",
+      "gzip_bytes": 1742,
+      "gzip_sha256": "8ead8393d992d20acf2ce8e091ccd27922d6774673ed7a28459ef949323493e1"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_peripheral_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_peripheral_test/receipt.json",
+      "bytes": 5353,
+      "sha256": "b4f98c17cbbc414f62f3f8c4416e7d9f141472ed7208e187622b400c3b4429c0",
+      "gzip_bytes": 1558,
+      "gzip_sha256": "5b0598061d7260cb8398183a4c912c5b017cb9f1e6d438739a15399ca5563e43"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_system_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_system_test/junit.xml",
+      "bytes": 12879,
+      "sha256": "6812d7cd87de9e88bb1e2df323aa1a39b0c0ddfe3553ee1f3989a527dcc998a6",
+      "gzip_bytes": 1715,
+      "gzip_sha256": "049038a71bf4a5f7767b15ddb9af96986b17d4b09a5d56798ac572c0aa6a1c38"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_system_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_system_test/launcher.log",
+      "bytes": 7628,
+      "sha256": "6ddcdb69cc797273b144d32ff33bdbc965c734795e61908e993ce185765ff4f1",
+      "gzip_bytes": 1705,
+      "gzip_sha256": "aad2ba28a62c712a0a5cfa94073ae7698509874b16ba56601a14c3b29705e8f6"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_system_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_system_test/raw.log",
+      "bytes": 7723,
+      "sha256": "2f6c57d3b35f022cae57387ed9f49e7b250acc134c177ce9f4cded43ce27a717",
+      "gzip_bytes": 1574,
+      "gzip_sha256": "fb65cd12c7f35b76dffcf57ab4081c7531f4bb8672b283103368de0ee664dd22"
+    },
+    {
+      "relative": "evidence-gzip/final-whole-nexus_h743_system_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/final-whole-nexus_h743_system_test/receipt.json",
+      "bytes": 5337,
+      "sha256": "2b656c2f4ec40f44de6f5093d7af9ee7781b40440a5af4c4888f120f32a20e51",
+      "gzip_bytes": 1560,
+      "gzip_sha256": "e09643c63cc69003d25475df59a13deea0161120005424a33a3a17113651a7a9"
+    },
+    {
+      "relative": "evidence-gzip/fixed-header-no-pll/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/fixed-header-no-pll/receipt.json",
+      "bytes": 313,
+      "sha256": "0befd3c94a37dc888cef7ab3e047d58a604b17017c7a8481a8de27702b28d40d",
+      "gzip_bytes": 225,
+      "gzip_sha256": "5c8c3086e16c176aac06d202524c7a0cadfe967632b4e237de8be6eb497cb2f8"
+    },
+    {
+      "relative": null,
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/fixed-header-no-pll-r2/raw.log",
+      "bytes": 1392384,
+      "sha256": "862c2ba53df077e46975dcced85252c8dc29577d3c9f9637677fde371ab5cb52",
+      "gzip_bytes": 156113,
+      "gzip_sha256": "57a3bb0ee5f7f2b83100856248e494ec72194ad034714c0124dfbe5e5f472e5f",
+      "external_retained_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-admission-final187/fixed-header-no-pll-full-raw.log.gz",
+      "reason": "Full nm raw remains in TMP under the original long-log budget; persistent receipt retains exact command/input/output hashes."
+    },
+    {
+      "relative": "evidence-gzip/fixed-header-no-pll-r2/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/fixed-header-no-pll-r2/receipt.json",
+      "bytes": 5738,
+      "sha256": "a945aeaf5197560e4be0eca1c794b44a8a394fdb0f2d82fef433ca7fe753d8b9",
+      "gzip_bytes": 1027,
+      "gzip_sha256": "1b62f2eb29cdd8bbbd15c6e3627d33f8e0537e7e78b2b32257f2dd7572b0ea58"
+    },
+    {
+      "relative": "evidence-gzip/native-red-build/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-build/raw.log",
+      "bytes": 587,
+      "sha256": "4fb371324b6a46a085d5e2f5692d3371ad18c078922278203d1ed3322a2f4e54",
+      "gzip_bytes": 269,
+      "gzip_sha256": "961316a1e3359cc792fa423ed8b6acd129c13beccf827487bd6b28275f21d8eb"
+    },
+    {
+      "relative": "evidence-gzip/native-red-build/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-build/receipt.json",
+      "bytes": 4910,
+      "sha256": "950d044f099bd03f123db2ad48670f254cbe66686c71a408fca113c1443efedf",
+      "gzip_bytes": 1402,
+      "gzip_sha256": "23667ae93e01f6dc21d1271024e487ebdbe3b210b7c62a3959f432bb813bd2c7"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_factory_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_factory_test/junit.xml",
+      "bytes": 8680,
+      "sha256": "36d947b529a1256148c42bfff9c5e5e1a2bcfc0b885db58559af2b12e569a235",
+      "gzip_bytes": 1194,
+      "gzip_sha256": "fcb8c7fab3137e7ce3e6abdc6089914ae571f5ca13653962d502cc1904483bb6"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_factory_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_factory_test/launcher.log",
+      "bytes": 7738,
+      "sha256": "78c74656f721b87339ab24378086e5fbfa37eb4d6e24ac153effed2288662f80",
+      "gzip_bytes": 1703,
+      "gzip_sha256": "620fa91f8820cfcd5fa575a2a6b407d862475fb9f8b9aca78ca789bb809ea147"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_factory_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_factory_test/raw.log",
+      "bytes": 4721,
+      "sha256": "1894d5aa17d5d018f918d3a082fb52b1f61f44a7b8345dce1238343c2fa5c86e",
+      "gzip_bytes": 1002,
+      "gzip_sha256": "b622f500c35cadcc0a2ab65622a164141a0d6427db46c64ba8506ab69858c27a"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_factory_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_factory_test/receipt.json",
+      "bytes": 5401,
+      "sha256": "acc759fb1668f1f90c7d8adbfcba7fc4110a22f0346789a592e336a151969161",
+      "gzip_bytes": 1553,
+      "gzip_sha256": "45d5787fbcfdfdc36e4215349179f5216e7685394a02de6040b1fb635e46b677"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_test/junit.xml.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_test/junit.xml",
+      "bytes": 25984,
+      "sha256": "6d18a241cca2dc525be169d64e1827332806b1a11fb472252821537eb9ce72a2",
+      "gzip_bytes": 2618,
+      "gzip_sha256": "5db6013bd5b920dc4b372ae9d9c040205fe377f192eafe80d855d8a808bfafad"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_test/launcher.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_test/launcher.log",
+      "bytes": 7682,
+      "sha256": "491b84a6288b10909f0412f62bd002ab2f27715a84fe50e5ba287f3778682d7a",
+      "gzip_bytes": 1704,
+      "gzip_sha256": "1a3000a5dcc50708e14d6cc45750dfdc8c77d90a8e7c06870e9611fefa020f65"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_test/raw.log.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_test/raw.log",
+      "bytes": 13556,
+      "sha256": "08d304757aae54440827484640245f098daa562ad1fc4a851897e1841dfd5fc0",
+      "gzip_bytes": 2253,
+      "gzip_sha256": "a6654688189d523f7966e5b6396b109db4b369846b5502369b7f9c55d7a93d68"
+    },
+    {
+      "relative": "evidence-gzip/native-red-whole-nexus_h743_peripheral_test/receipt.json.gz",
+      "original_path": "/tmp/nexus-h743-spi-safe-stop-20261018/build/batch4-admission-evidence/native-red-whole-nexus_h743_peripheral_test/receipt.json",
+      "bytes": 5369,
+      "sha256": "a9c5972c048a6739987f5ec1632a85b6090051247d5f27cc61bfce3e0ad53719",
+      "gzip_bytes": 1556,
+      "gzip_sha256": "71ceee79efc6a22d43b7f5d2990ad7221fb8c04a32219a1b0d39d7b69975085f"
+    }
+  ],
+  "official_basis": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/official-review/manifest.json",
+  "prior_open_addendum": "/workspace/nexus-io-recovery-20261018/features/h743-spi-stop-s0/batch3-divider-r2/independent-admission-scope-addendum-r1.json",
+  "prior_history_immutable": {
+    "batch3_manifest_sha256": "dc1eb13953cdb7fa7eb190643e4e739dbdfa168639cbab9ec7b1afc164a3ee60",
+    "batch3_addendum_sha256": "b520fe4f0c07c2ba30d8c925a18bc853136e52e3b9fe322cebc6a985fa282730"
+  },
+  "limitations": [
+    "No normal fullhooks, ARM, installed SDK or HIL executed in this batch. Parent must validate current integrated tuple.",
+    "V supply/temperature factory-trim conditions remain board/platform electrical preconditions; no new physical measurement or nonV electrical qualification.",
+    "No B1 DMA source, cache/segmented/continuous UART or expanded feature admission."
+  ],
+  "resources": {
+    "events_final": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "peak_observed_child_rss_kib": 352084,
+    "workspace_free": 78426112,
+    "tmp_free": 774782976,
+    "packet_budget_note": "Unsealed initial packet exceeded 500KiB because full nm symbol output gzip was 156113B. Preserve that full raw+gzip in retained TMP; persistent command/receipt+SHA and every test raw/JUnit remain. No source or test result changed."
+  },
+  "all_owned_validation_children_joined": true
+}

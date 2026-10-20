@@ -1,0 +1,71 @@
+{
+  "kind": "actual whole program",
+  "qualification": false,
+  "stage": "whole-high-kernel-final",
+  "command": [
+    "/tmp/nexus-h743-spi-safe-stop-20261018/build/native-debug/bin/nexus_h743_high_kernel_test",
+    "--gtest_output=xml:/tmp/nexus-h743-spi-safe-stop-20261018/s0-evidence/whole-high-kernel-final/junit.xml"
+  ],
+  "cwd": "/tmp/nexus-h743-spi-safe-stop-20261018",
+  "started_ns": 1792288986961342417,
+  "ended_ns": 1792288986969009827,
+  "exit_code": 0,
+  "timed_out": false,
+  "before": {
+    "source": {
+      "soc/stm32h743/drivers/spi.c": "9cddd3444f868f41e05afa7984090da96a8889461d28042ab892e646fa41b1b1",
+      "soc/stm32h743/private/stm32h743_provider.h": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+      "tests/google/h743_peripheral_test.cpp": "80074d225d9c7a6b540a32bbe7b5d6f7988b3b67919d4bc8457e7a629e440e20",
+      "tests/google/h743_high_kernel_test.cpp": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+      "soc/stm32h743/system.c": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e",
+      "soc/stm32h743/private/stm32h743_system.h": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+      "tests/google/h743_model.cpp": "dd4162ee2aca3922b5ada815454cf516fc28a276ea479f027e7e07facddfa986",
+      "tests/google/h743_system_test.cpp": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+      "soc/stm32h743/clock.c": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac",
+      "soc/stm32h743/private/stm32h743_clock.h": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+      "tests/google/h743_clock_test.cpp": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+      "tests/google/h743_clock_model.cpp": "0af041077359739156c079657f91fd188adccccd76d00426883563e42f9c30fe",
+      "tests/google/h743_clock_model.h": "d5ead9ce82852231a06833ef4e9f48fc362efe3b7fb68d30d95e5122fa822ea6"
+    },
+    "tmp_free": 1390206976,
+    "memory_current": 13888835584,
+    "memory_max": 17179869184,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "after": {
+    "source": {
+      "soc/stm32h743/drivers/spi.c": "9cddd3444f868f41e05afa7984090da96a8889461d28042ab892e646fa41b1b1",
+      "soc/stm32h743/private/stm32h743_provider.h": "e42c16126dd914848f9fa254dd3c66fad7e12c0667a381c9fcf5306f0c70fe61",
+      "tests/google/h743_model.h": "1d154d6e231b157c567088f9e8df8cdf4a0b1d87e8f6875d59b5afa11f1f4e20",
+      "tests/google/h743_peripheral_test.cpp": "80074d225d9c7a6b540a32bbe7b5d6f7988b3b67919d4bc8457e7a629e440e20",
+      "tests/google/h743_high_kernel_test.cpp": "18e6df66a95c8080c21e15d0657666c53439114c260df0557df49fb2dd641654",
+      "soc/stm32h743/system.c": "31ffeae53e3127aab932b645baa5a7f86b5954cfd20bcc4efa8da553573f002e",
+      "soc/stm32h743/private/stm32h743_system.h": "37b463c2b3f3bea882b26f03763ece0268ddf9d3061468a5594b74aadfea5a25",
+      "tests/google/h743_model.cpp": "dd4162ee2aca3922b5ada815454cf516fc28a276ea479f027e7e07facddfa986",
+      "tests/google/h743_system_test.cpp": "9512722689eb45d806997d2665512b0900cf5137546d3a6af18c97d95a077822",
+      "soc/stm32h743/clock.c": "893c49f34da91f9cd100ba946c553b339db982f022b426d1c0c566bc7648acac",
+      "soc/stm32h743/private/stm32h743_clock.h": "83d60c8919535e6919b3d6d779f400a5493d9c0709eaf4d3f84621fa337ccdbc",
+      "tests/google/h743_clock_test.cpp": "9c502d46ffeabf62b08f98513afd3044887936a09ee921a7c357c386d9f9facb",
+      "tests/google/h743_clock_model.cpp": "0af041077359739156c079657f91fd188adccccd76d00426883563e42f9c30fe",
+      "tests/google/h743_clock_model.h": "d5ead9ce82852231a06833ef4e9f48fc362efe3b7fb68d30d95e5122fa822ea6"
+    },
+    "tmp_free": 1390186496,
+    "memory_current": 13889261568,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n"
+  },
+  "source_stable": true,
+  "children_maxrss_kib": 15640,
+  "raw_sha256": "9241f1c05e9a8cd2a1a9027698d55953fabb3b5baea68e750a50d2d4db931466",
+  "binary_sha256": "62470abf0514b52f59387303bc9e21e71f37180796529f89dbdac84f1c5e4d3c",
+  "junit": {
+    "path": "/tmp/nexus-h743-spi-safe-stop-20261018/s0-evidence/whole-high-kernel-final/junit.xml",
+    "sha256": "e148b552522f97303a461e75a4ee0b570e4ddd5862388649dfeba8dd47e5d9f5",
+    "fresh": true,
+    "tests": 30,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "notrun": 0
+  }
+}

@@ -24,20 +24,29 @@ ETH_CONTROLLER = None
 USB_CONTROLLER = None
 SPI_REQUIRES_ENDPOINT = True
 DMA_VECTOR = "Stream"
-DMA_TOPOLOGY = (frozenset((1,)), range(2), range(45, 47))
+DMA_TOPOLOGY = (frozenset((1,)), range(4), frozenset((45, 46, 83, 84)))
 DMA_MEMORY_ENGINES = ("DMA1", "DMA2", "BDMA", "MDMA")
 CONDITIONAL_PACKAGE_PADS = ("PC2_C", "PC3_C")
-CLOCK_PROFILES = MappingProxyType({
+CLOCK_PROFILES = MappingProxyType({**{
     f"hsi{mhz}-fixed-cache-{cache}": MappingProxyType({
         "source": "hsi", "input_hz": 64000000, "core_hz": mhz * 1000000,
         "apb1_hz": mhz * 1000000, "apb2_hz": mhz * 1000000})
-    for mhz in (32, 64) for cache in ("off", "on")})
+    for mhz in (32, 64) for cache in ("off", "on")},
+    "hsi64-pll384-cache-off": MappingProxyType({
+        "source": "hsi", "input_hz": 64000000,
+        "core_hz": 64000000 * 6,
+        "apb1_hz": 64000000 * 6 // 4,
+        "apb2_hz": 64000000 * 6 // 4})})
 LIMITS = MappingProxyType({"uart_baud": (977, 1000000), "spi_hz": (250000, 16000000), "pwm_period": 65535, "timer_hz": 64000000})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart", ("uart", "dma-tx"): "uart_dma",
+    ("uart", "irq-fifo-bytes"): "uart_fifo",
+    ("uart", "irq-fifo-rtscts-bytes"): "uart_rtscts",
     ("uart", "rx-dma-idle"): "uart_receive",
-    ("spi", "short-poll"): "spi", ("pwm", "fixed-pwm"): "pwm",
+    ("uart", "rx-dma-continuous"): "uart_continuous",
+    ("spi", "short-poll"): "spi", ("spi", "dma"): "spi_dma",
+    ("pwm", "fixed-pwm"): "pwm",
     ("exti", "edge-event"): "exti",
     ("watchdog", "independent"): "watchdog",
     ("i2c", "poll-messages"): "i2c",
@@ -64,20 +73,25 @@ def validate_selection(selection, route):
     mode_implementation(kind, selection["mode"])
     if kind == "uart":
         expected = (("PD8", "tx", 7), ("PD9", "rx", 7))
+        if selection["mode"] == "irq-fifo-rtscts-bytes":
+            expected += (("PD11", "cts", 7), ("PD12", "rts", 7))
         actual = tuple((pin["pin"], pin["function"], pin["af"])
                        for pin in route["pins"])
         if route["controller"] != "USART3" or actual != expected:
-            common.fail("Only reviewed USART3 PD8/PD9 AF7 is maintained")
+            common.fail("USART3 requires the exact ordered AF7 pads for its selected mode")
         baud = common.integer(selection["baud"], *LIMITS["uart_baud"],
                               "USART baud")
         divisor = (64000000 + baud // 2) // baud
         if not 16 <= divisor <= 0xffff:
             common.fail("USART baud differs from the actual PRESC1 divider")
-        profile = "blocks" if selection["mode"] == "rx-dma-idle" else "bytes"
+        profile = ("blocks" if selection["mode"] in
+                   ("rx-dma-idle", "rx-dma-continuous") else "bytes")
         if selection["rx_profile"] != profile:
             common.fail(f"H743 selected USART provider requires {profile} reception")
         if type(selection.get("irq_priority")) is not int or selection["irq_priority"] != 5:
             common.fail("H743 USART provider implements IRQ priority5 only")
+        if selection["mode"] == "rx-dma-continuous" and selection.get("calls_os", False):
+            common.fail("H743 continuous RX requires calls_os=false")
     elif kind == "gpio":
         permitted = {"GPIOB": {"PB0"}, "GPIOE": {"PE11"}}
         pins = route["pins"]
@@ -97,6 +111,10 @@ def validate_selection(selection, route):
         if route["controller"] != "SPI4" or actual != expected:
             common.fail("H743 SPI4 requires exact PE12/13/14 AF5")
         common.integer(selection.get("max_hz"), *LIMITS["spi_hz"], "SPI rate")
+        if selection["mode"] == "dma" and (
+                selection.get("irq_priority") != 5 or
+                selection.get("calls_os", False)):
+            common.fail("H743 SPI DMA requires priority5/calls_os=false")
     elif kind == "pwm":
         expected = (("PA6", "ch1", 2),)
         actual = tuple((pin["pin"], pin["function"], pin["af"]) for pin in route["pins"])
@@ -136,8 +154,11 @@ def validate_selection(selection, route):
 
 def validate_dma(route, mode, normalize):
     expected = ({"dma-tx": ("DMA1:stream0:channel46",),
-                 "rx-dma-idle": ("DMA1:stream1:channel45",)}.get(mode)
-                if route["controller"] == "USART3" else None)
+                 "rx-dma-idle": ("DMA1:stream1:channel45",),
+                 "rx-dma-continuous": ("DMA1:stream1:channel45",)}.get(mode)
+                if route["controller"] == "USART3" else
+                ("DMA1:stream2:channel83", "DMA1:stream3:channel84")
+                if route["controller"] == "SPI4" and mode == "dma" else None)
     common.validate_dma(route, mode, expected, "stm32h743", normalize)
 
 
@@ -163,4 +184,4 @@ def builtin_cs(controller):
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,
-                       start_system, start_resources)
+                       start_system, start_resources, stop_resources)

@@ -57,7 +57,22 @@ nx_result_t nx_stm32_gpio_write(void* context, uint32_t set_mask,
 /** \brief Return a masked single-port input snapshot. */
 nx_result_t nx_stm32_gpio_read(const void* context, uint32_t* value) {
     const nx_stm32_gpio_state_t* port = context;
-    if (port == NULL || !port->initialized || value == NULL) {
+    if (port == NULL || !port->initialized || value == NULL ||
+        port->registers == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    /* The complete SDK register struct is owned by this binding.
+     * Reject output aliases before any input observation or output store. */
+    const uintptr_t output = (uintptr_t)value;
+    const uintptr_t state = (uintptr_t)port;
+    const uintptr_t bank = (uintptr_t)port->registers;
+    if (output % _Alignof(uint32_t) != 0U ||
+        output > UINTPTR_MAX - sizeof(*value) ||
+        state > UINTPTR_MAX - sizeof(*port) ||
+        bank > UINTPTR_MAX - sizeof(*port->registers) ||
+        (output < state + sizeof(*port) && state < output + sizeof(*value)) ||
+        (output < bank + sizeof(*port->registers) &&
+         bank < output + sizeof(*value))) {
         return NX_ERROR_INVALID;
     }
     *value = LL_GPIO_ReadInputPort(port->registers) & port->mask;

@@ -7,9 +7,15 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "h743_dma_model.h"
+#include "nexus/core/fault.h"
 #include "stm32h743_dma.h"
+#include <csignal>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <new>
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <unistd.h>
 using testing::_;
 class CacheBoundary {
   public:
@@ -85,6 +91,20 @@ TEST_F(H743Dma, ExactSelectedStreamAndMuxAdmitWithoutFallback) {
     EXPECT_EQ(0U, registers.CR1 & USART_CR1_TXEIE_TXFNFIE);
     EXPECT_NE(0U, registers.CR3 & USART_CR3_DMAT);
 }
+
+class H743DmaRevision : public H743Dma,
+                        public testing::WithParamInterface<uint32_t> {};
+TEST_P(H743DmaRevision, AlternativeUsartProtocolMatchesReviewedRevision) {
+    g_h743_model.silicon_id = (GetParam() << 16U) | 0x450U;
+    Start();
+    ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+    ASSERT_NE(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
+    /* ES0392 2.20.4: X/V need bit20; the locked ST HAL excludes Y/W. */
+    EXPECT_EQ(GetParam() >= 0x2000U ? DMA_SxCR_TRBUFF : 0U,
+              g_h743_dma_stream.CR & DMA_SxCR_TRBUFF);
+}
+INSTANTIATE_TEST_SUITE_P(ReviewedCuts, H743DmaRevision,
+                         testing::Values(0x1003U, 0x2001U, 0x2003U));
 
 TEST_F(H743Dma, UnpoweredSelectedSram1RejectsBeforeRequestBorrowOrDmaEffects) {
     Start();
@@ -451,4 +471,359 @@ TEST_F(H743Dma, FinishedWireWinsAControlThatArrivesAfterItsObservedDeadline) {
     nx_uart_port_service(&port);
     EXPECT_EQ(NX_REQUEST_SETTLED, nx_request_state(&request.base));
     EXPECT_EQ(NX_SUCCESS, request.base.result);
+}
+
+struct DomainTrace {
+    volatile bool observed;
+    volatile bool failed;
+    volatile bool fault;
+    volatile bool borrowed;
+    volatile bool masked;
+    volatile bool both_attempted;
+    volatile bool returned;
+};
+static DomainTrace* domain_trace;
+static nx_stm32h743_uart_dma_state_t* domain_owner;
+extern "C" void nx_fault_observe(nx_fault_domain_t domain, nx_result_t reason,
+                                 const char*, unsigned) {
+    if (domain_trace != nullptr) {
+        domain_trace->fault =
+            domain == NX_FAULT_PLATFORM && reason == NX_ERROR_IO;
+        domain_trace->masked = nx_arch_irq_is_masked();
+        domain_trace->borrowed =
+            domain_owner != nullptr && domain_owner->uart.active != nullptr;
+        domain_trace->both_attempted =
+            g_h743_dma_irq_disables[DMA1_Stream0_IRQn] != 0U &&
+            g_h743_dma_irq_disables[USART3_IRQn] != 0U;
+        __atomic_store_n(&domain_trace->observed, true, __ATOMIC_RELEASE);
+    }
+}
+template <class Body> static void DomainChild(Body body, bool fault = false) {
+    void* memory = mmap(nullptr, sizeof(DomainTrace), PROT_READ | PROT_WRITE,
+                        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    ASSERT_NE(MAP_FAILED, memory);
+    auto* trace = new (memory) DomainTrace{};
+    pid_t child = fork();
+    ASSERT_NE(-1, child);
+    if (child == 0) {
+        domain_trace = trace;
+        body();
+        trace->failed = testing::Test::HasFailure();
+        __atomic_store_n(&trace->returned, true, __ATOMIC_RELEASE);
+        __atomic_store_n(&trace->observed, true, __ATOMIC_RELEASE);
+        for (;;)
+            pause();
+    }
+    bool exited = false;
+    int status = 0;
+    for (unsigned attempt = 0U;
+         attempt < 3000U &&
+         !__atomic_load_n(&trace->observed, __ATOMIC_ACQUIRE);
+         ++attempt) {
+        if (waitpid(child, &status, WNOHANG) == child) {
+            exited = true;
+            break;
+        }
+        usleep(1000U);
+    }
+    if (fault && !exited) {
+        for (unsigned attempt = 0U;
+             attempt < 20U &&
+             !__atomic_load_n(&trace->returned, __ATOMIC_ACQUIRE);
+             ++attempt)
+            usleep(1000U);
+    }
+    EXPECT_TRUE(trace->observed);
+    EXPECT_FALSE(trace->failed);
+    EXPECT_EQ(!fault, __atomic_load_n(&trace->returned, __ATOMIC_ACQUIRE));
+    EXPECT_EQ(fault, trace->fault);
+    if (fault) {
+        EXPECT_TRUE(trace->masked);
+        EXPECT_TRUE(trace->borrowed);
+        EXPECT_TRUE(trace->both_attempted);
+    }
+    if (!exited) {
+        EXPECT_EQ(0, kill(child, SIGKILL));
+        EXPECT_EQ(child, waitpid(child, &status, 0));
+        EXPECT_TRUE(WIFSIGNALED(status));
+    }
+    trace->~DomainTrace();
+    EXPECT_EQ(0, munmap(memory, sizeof(DomainTrace)));
+}
+static unsigned selected_domain;
+static void DomainTxDma(void* owner) {
+    nx_stm32h743_uart_dma_irq(
+        static_cast<nx_stm32h743_uart_dma_state_t*>(owner));
+}
+static void DomainTxUart(void* owner) {
+    nx_stm32h743_uart_dma_uart_irq(
+        static_cast<nx_stm32h743_uart_dma_state_t*>(owner));
+}
+
+class H743DmaDomain : public H743Dma,
+                      public testing::WithParamInterface<unsigned> {
+  protected:
+    void Fault() {
+        nx_h743_dma_model_domain(GetParam(), true);
+    }
+    void Restore() {
+        nx_h743_dma_model_domain(GetParam(), false);
+    }
+    void Isolated() {
+        EXPECT_FALSE(g_h743_model.irq_enabled[DMA1_Stream0_IRQn]);
+        EXPECT_FALSE(g_h743_model.irq_enabled[USART3_IRQn]);
+        EXPECT_EQ(0U, g_h743_dma_forbidden_reads);
+        EXPECT_EQ(0U, g_h743_dma_forbidden_writes);
+    }
+};
+TEST_F(H743Dma, ExternalResetModelKeepsIndependentDomainsAndTrueMaskDelivery) {
+    g_h743_dma_stream.CR = DMA_SxCR_EN;
+    g_h743_dma_stream.NDTR = 7U;
+    g_h743_dma_registers.LISR = DMA_LISR_TEIF0;
+    g_h743_dma_mux.CCR = 46U;
+    registers.CR1 = USART_CR1_UE;
+    nx_h743_dma_model_domain(2U, true);
+    EXPECT_NE(0U, g_h743_dma_stream.CR & DMA_SxCR_EN);
+    EXPECT_EQ(7U, g_h743_dma_stream.NDTR);
+    EXPECT_EQ(DMA_LISR_TEIF0, g_h743_dma_registers.LISR);
+    EXPECT_EQ(0U, g_h743_dma_mux.CCR);
+    EXPECT_EQ(USART_CR1_UE, registers.CR1);
+    nx_h743_dma_model_domain(2U, false);
+    nx_h743_dma_model_domain(1U, true);
+    EXPECT_EQ(0U, g_h743_dma_stream.CR);
+    EXPECT_EQ(0U, g_h743_dma_stream.NDTR);
+    EXPECT_EQ(0x21U, g_h743_dma_stream.FCR);
+    nx_h743_dma_model_domain(1U, false);
+    g_h743_dma_stream.NDTR = 19U;
+    nx_h743_dma_model_domain(0U, true);
+    EXPECT_EQ(19U, g_h743_dma_stream.NDTR);
+    nx_h743_dma_model_domain(0U, false);
+    g_h743_model.irq_enabled[DMA1_Stream0_IRQn] = true;
+    auto guard = nx_arch_irq_save();
+    EXPECT_FALSE(
+        nx_h743_dma_model_dispatch(DMA1_Stream0_IRQn, DomainTxDma, &state));
+    nx_arch_irq_restore(guard);
+}
+TEST_P(H743DmaDomain, RejectsBeforeBorrowWithoutAnyDmaProbe) {
+    DomainChild([&] {
+        Start();
+        Fault();
+        EXPECT_EQ(NX_ERROR_STATE, nx_uart_port_submit(&port, &request));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&request.base));
+        EXPECT_EQ(nullptr, state.uart.active);
+        Isolated();
+        Restore();
+        EXPECT_EQ(NX_ERROR_STATE, nx_uart_port_submit(&port, &request));
+        EXPECT_TRUE(state.retained);
+    });
+}
+TEST_P(H743DmaDomain, ServiceLossStaysQuarantinedAfterExternalRestore) {
+    DomainChild([&] {
+        Start();
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        Fault();
+        nx_uart_port_service(&port);
+        EXPECT_EQ(&request, state.uart.active);
+        EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+        EXPECT_EQ(NX_ERROR_STATE, state.uart.terminal);
+        Isolated();
+        Restore();
+        for (unsigned i = 0U; i < 3U; ++i) {
+            nx_uart_port_service(&port);
+            EXPECT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &request));
+            EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_stop(&port));
+        }
+        EXPECT_EQ(&request, state.uart.active);
+        EXPECT_TRUE(state.retained);
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain, DmaIrqContainsOnlyTheTwoOwnedVectors) {
+    DomainChild([&] {
+        Start();
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        g_h743_model.irq_enabled[DMA1_Stream2_IRQn] = true;
+        Fault();
+        ASSERT_TRUE(
+            nx_h743_dma_model_dispatch(DMA1_Stream0_IRQn, DomainTxDma, &state));
+        EXPECT_TRUE(g_h743_model.irq_enabled[DMA1_Stream2_IRQn]);
+        EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain, UartIrqContainsLossBeforeAnyDmaStatusRead) {
+    DomainChild([&] {
+        Start();
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        Fault();
+        ASSERT_TRUE(
+            nx_h743_dma_model_dispatch(USART3_IRQn, DomainTxUart, &state));
+        EXPECT_EQ(&request, state.uart.active);
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain, SecondReadySubmitCannotWashAnObservedLoss) {
+    DomainChild([&] {
+        Start();
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        nx_uart_tx_request_t second{};
+        nx_request_initialize(&second.base);
+        ASSERT_EQ(NX_SUCCESS,
+                  nx_uart_tx_prepare(&second, bytes, sizeof(bytes), 10000U));
+        Fault();
+        EXPECT_EQ(NX_ERROR_STATE, nx_uart_port_submit(&port, &second));
+        EXPECT_EQ(NX_REQUEST_READY, nx_request_state(&second.base));
+        Restore();
+        nx_uart_port_service(&port);
+        EXPECT_EQ(&request, state.uart.active);
+        EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain, CleanReturnObservesLostDomainBeforeProgramming) {
+    DomainChild([&] {
+        Start(true);
+        testing::StrictMock<CacheBoundary> boundary;
+        cache_boundary = &boundary;
+        g_h743_dma_clean = CacheClean;
+        EXPECT_CALL(boundary, Clean(_, 64U))
+            .WillOnce(testing::Invoke([&](uintptr_t, size_t) {
+                Fault();
+                return NX_ARCH_OK;
+            }));
+        EXPECT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        EXPECT_EQ(&request, state.uart.active);
+        EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain, ReentrantCleanObserverCannotReleaseThePreparingLoan) {
+    DomainChild([&] {
+        Start(true);
+        testing::StrictMock<CacheBoundary> boundary;
+        cache_boundary = &boundary;
+        g_h743_dma_clean = CacheClean;
+        EXPECT_CALL(boundary, Clean(_, 64U))
+            .WillOnce(testing::Invoke([&](uintptr_t, size_t) {
+                Fault();
+                nx_uart_port_service(&port);
+                Restore();
+                EXPECT_EQ(&request, state.uart.active);
+                return NX_ARCH_OK;
+            }));
+        EXPECT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain,
+       AcceptedAcknowledgeLossPrecedesFlagsReadbackAndSettlement) {
+    DomainChild([&] {
+        Start();
+        ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+        CompleteMemory();
+        CompleteWire();
+        selected_domain = GetParam();
+        g_h743_dma_after_write = [](volatile uint32_t* reg, uint32_t) {
+            if (reg == &g_h743_dma_registers.LIFCR &&
+                g_h743_model.ignore_write != reg) {
+                g_h743_dma_after_write = nullptr;
+                nx_h743_dma_model_domain(selected_domain, true);
+            }
+        };
+        nx_uart_port_service(&port);
+        EXPECT_EQ(&request, state.uart.active);
+        EXPECT_EQ(NX_REQUEST_QUARANTINED, nx_request_state(&request.base));
+        Isolated();
+    });
+}
+TEST_P(H743DmaDomain, FirstObservedTerminalSurvivesLaterDomainLoss) {
+    for (nx_result_t reason :
+         {NX_ERROR_CANCELLED, NX_ERROR_TIMEOUT, NX_ERROR_IO}) {
+        DomainChild([&] {
+            Start();
+            ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+            if (reason == NX_ERROR_CANCELLED)
+                ASSERT_EQ(NX_SUCCESS, nx_uart_port_cancel(&port, &request));
+            else {
+                if (reason == NX_ERROR_TIMEOUT)
+                    g_h743_model.timer.CNT = 20000U;
+                else
+                    g_h743_dma_registers.LISR |= DMA_LISR_TEIF0;
+                nx_stm32h743_uart_dma_irq(&state);
+            }
+            ASSERT_EQ(reason, state.uart.terminal);
+            Fault();
+            nx_uart_port_service(&port);
+            EXPECT_EQ(reason, state.uart.terminal);
+            EXPECT_EQ(&request, state.uart.active);
+            Isolated();
+        });
+    }
+}
+TEST_P(H743DmaDomain, FailedOwnedNvicIsolationParksMaskedWithTheRealLoan) {
+    DomainChild(
+        [&] {
+            Start();
+            ASSERT_EQ(NX_SUCCESS, nx_uart_port_submit(&port, &request));
+            domain_owner = &state;
+            g_h743_model.hold_irq_off = true;
+            Fault();
+            nx_uart_port_service(&port);
+            ADD_FAILURE() << "owned IRQ isolation failure must not return";
+        },
+        true);
+}
+INSTANTIATE_TEST_SUITE_P(SharedDmaDomain, H743DmaDomain,
+                         testing::Values(0U, 1U, 2U));
+
+TEST_F(H743Dma, HealthyStopSamplesTheDomainOnlyWhileItsSavedMaskIsHeld) {
+    Start();
+    g_h743_dma_watch_domain_mask = true;
+    EXPECT_EQ(NX_SUCCESS, nx_uart_port_stop(&port));
+    g_h743_dma_watch_domain_mask = false;
+    EXPECT_GT(g_h743_dma_domain_reads, 0U);
+    EXPECT_EQ(0U, g_h743_dma_unmasked_domain_reads);
+}
+
+static bool initialization_boundary_seen;
+static bool initialization_irq_delivered;
+static void LoseDomainBeforeModeRetention(void* owner) {
+    auto* state = static_cast<nx_stm32h743_uart_dma_state_t*>(owner);
+    if (!state->uart.initialized || !state->uart.retained || state->retained ||
+        !g_h743_model.irq_enabled[USART3_IRQn] || nx_arch_irq_is_masked()) {
+        g_h743_model.before_irq_save = LoseDomainBeforeModeRetention;
+        return;
+    }
+    initialization_boundary_seen = true;
+    nx_h743_dma_model_domain(selected_domain, true);
+    initialization_irq_delivered =
+        nx_h743_dma_model_dispatch(USART3_IRQn, DomainTxUart, owner);
+    nx_h743_dma_model_domain(selected_domain, false);
+}
+TEST_P(H743DmaDomain, InitializationCannotForgetAnIrqObservedDomainLoss) {
+    DomainChild([&] {
+        selected_domain = GetParam();
+        initialization_boundary_seen = false;
+        initialization_irq_delivered = false;
+        g_h743_model.critical_context = &state;
+        g_h743_model.before_irq_save = LoseDomainBeforeModeRetention;
+        EXPECT_EQ(NX_ERROR_STATE,
+                  nx_stm32h743_uart_dma_initialize(&state, 64000000U, 8U));
+        EXPECT_TRUE(initialization_boundary_seen);
+        EXPECT_TRUE(initialization_irq_delivered);
+        EXPECT_TRUE(state.domain_lost);
+        EXPECT_TRUE(state.retained);
+        EXPECT_TRUE(state.uart.retained);
+        EXPECT_TRUE(state.uart.initialized);
+        EXPECT_EQ(0U, g_h743_dma_stream.CR);
+        EXPECT_EQ(0U, g_h743_dma_mux.CCR);
+        Isolated();
+        nx_uart_port_service(&port);
+        EXPECT_EQ(NX_ERROR_BUSY, nx_uart_port_stop(&port));
+        EXPECT_TRUE(state.domain_lost);
+        EXPECT_TRUE(state.retained);
+        EXPECT_TRUE(state.uart.retained);
+        Isolated();
+    });
 }

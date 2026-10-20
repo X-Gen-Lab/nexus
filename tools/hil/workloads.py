@@ -219,13 +219,58 @@ WORKLOADS = MappingProxyType({
          "bounded_break_fixture", "external_safe_rearm_policy"),
         {"break_cases": "count", "deadtime_error": "ns", "break_lateness": "us",
          "unsafe_outputs": "count"}),
+    "uart_word_wire": _definition(
+        7, ("uart",),
+        "Exchange 000/0ff/100/1ff words and cancel across load, TC and stop",
+        ("word_values_bit8", "nine_bit_wire_waveform", "tx_load_tc_settlement",
+         "cancel_quarantine_late_tc", "fresh_rx_epoch"),
+        ("native_word_peer", "logic_analyzer", "debug_probe"),
+        ("reviewed_nine_bit_peer", "separate_control_console",
+         "reviewed_voltage_routes", "no_reclaim_before_settlement"),
+        {"received_words": "count", "word_errors": "count",
+         "stop_lateness": "us"}),
+    "spi_dma_whole_cs_segments": _definition(
+        7, ("spi",),
+        "Exercise 8/16-bit whole-CS segments, fixed cells and retained drain",
+        ("cs_sck_mosi_miso_segments", "fixed_dummy_discard_cells",
+         "dma_en_count_irq_wire_idle", "cancel_timeout_each_segment",
+         "cs_release_settlement_order"),
+        ("reviewed_spi_peer", "logic_analyzer", "debug_probe"),
+        ("exact_enhanced_endpoint", "reviewed_cs_routes",
+         "legal_dma_memory", "isolated_fault_injection",
+         "no_reclaim_before_settlement"),
+        {"segments_exercised": "count", "protocol_errors": "count",
+         "wire_completion_latency": "us"}),
+    "i2c_v2_long_timing": _definition(
+        7, ("i2c",),
+        "Exercise 255/256/257/511/512-byte messages and TCR fault boundaries",
+        ("scl_sda_start_tcr_stop", "ack_nack_wire_counts",
+         "measured_clock_rise_fall_voltage", "timingr_cr1_readback",
+         "register_progress_separate_from_wire_ack", "failed_abort_no_replay"),
+        ("oscilloscope", "logic_analyzer", "reviewed_i2c_peer", "debug_probe"),
+        ("authored_timing_envelope", "analog_filter_on_digital_filter_zero",
+         "measured_pullups_voltage", "isolated_fault_injection"),
+        {"message_count": "count", "protocol_errors": "count",
+         "rise_time": "ns"}),
+    "pwm_group_comp_break": _definition(
+        7, ("pwm_group",),
+        "Commit CH1..3 shadows and observe COMP1 latched break without restart",
+        ("pwm_trigger_common_timebase", "udis_shadow_commits",
+         "fresh_uif_no_bootstrap_trigger", "comparator_break_latch",
+         "tim1_syscfg_gate_reset", "close_irq_join"),
+        ("reference_source", "oscilloscope", "logic_analyzer", "debug_probe"),
+        ("exact_group_comparator_route", "analog_input_limits",
+         "passive_loads_outputs_disconnected", "external_rearm_policy"),
+        {"commits": "count", "break_cases": "count",
+         "unsafe_restart_count": "count", "commit_skew": "ns"}),
 })
 
 MAX_VALUE = 2 ** 64 - 1
 WORK_AMOUNTS = frozenset({"duration", "iterations", "power_cut_cases",
                           "received_bytes", "flow_cases", "sample_count",
                           "frame_count", "packet_count", "edge_count",
-                          "break_cases"})
+                          "break_cases", "received_words", "segments_exercised",
+                          "message_count", "commits"})
 TASK_CASES = frozenset({"m4f_context", "stack_peaks", "lifecycle_endurance",
                         "tickless_timer", "fail_stop"})
 
@@ -242,6 +287,53 @@ def _selected_dma(controller):
 MODE_CASES = frozenset({"uart_rx_dma", "uart_direction_flow", "adc_continuous",
                         "can_bus", "ethernet_raw", "usb_device",
                         "timer_capture", "advanced_pwm_break"})
+IO_PROTOCOL_CASES = frozenset({"uart_word_wire", "spi_dma_whole_cs_segments",
+                               "i2c_v2_long_timing", "pwm_group_comp_break"})
+
+
+def _selected_io_protocol(name, controller, resolved):
+    """Observe exact typed selections, never infer a provider from a chip name."""
+    def child(driver):
+        return any(item.get("driver") == driver and
+                   item.get("controller") == controller["id"]
+                   for item in resolved.get("devices", ()))
+
+    if name == "uart_word_wire":
+        return (controller["kind"] == "uart" and
+                controller["mode"] == "irq-words" and
+                controller.get("rx_profile") == "words" and
+                controller.get("frame") == {"data_bits": 9, "parity": "none",
+                                            "stop_bits": 1, "flow": "none"})
+    if name == "spi_dma_whole_cs_segments":
+        return (controller["kind"] == "spi" and _selected_dma(controller) and
+                controller.get("interface_kind") == "spi_dma_transaction" and
+                child("spi-dma-transaction"))
+    if name == "i2c_v2_long_timing":
+        timing = controller.get("timing_resolution")
+        if (resolved.get("soc_family") not in
+                ("stm32g474", "stm32h743", "stm32u575") or
+                controller["kind"] != "i2c" or
+                controller["mode"] != "poll-messages" or
+                not child("i2c-long-endpoint") or not isinstance(timing, dict)):
+            return False
+        assumptions = timing.get("assumptions", {})
+        return (type(timing.get("cr1_filter_bits")) is int and
+                timing["cr1_filter_bits"] == 0 and
+                timing.get("provenance") == "authored_declared_assumptions" and
+                assumptions.get("analog_filter_ns_min") == 50 and
+                assumptions.get("analog_filter_ns_max") == 260 and
+                assumptions.get("digital_filter_cycles") == 0)
+    if name == "pwm_group_comp_break":
+        pins = {(pin.get("function"), pin.get("pin"))
+                for pin in controller.get("pins", ())}
+        return (resolved.get("soc_family") == "stm32g474" and
+                controller["kind"] == "pwm_group" and
+                controller["mode"] == "coherent-pwm" and
+                controller["controller"] == "TIM1" and
+                controller.get("exclusive") is True and
+                {("ch1", "PA8"), ("ch2", "PA9"), ("ch3", "PA10"),
+                 ("comp1-inp", "PA1"), ("comp1-inm", "PA4")} <= pins)
+    return False
 
 
 def _selected_protocol(name, controller):
@@ -286,6 +378,9 @@ def _selection(name, definition, resolved):
     if name in MODE_CASES and not any(
             _selected_protocol(name, item) for item in selected):
         gaps.append("selected_" + name + "_mode")
+    if name in IO_PROTOCOL_CASES and not any(
+            _selected_io_protocol(name, item, resolved) for item in selected):
+        gaps.append("selected_" + name + "_protocol")
     if name == "tickless_timer" and not (
             isinstance(resolved.get("kernel_profile"), dict) and
             resolved["kernel_profile"].get("tickless") is True):
@@ -421,6 +516,10 @@ def validate_workload(workload: dict, fixture: dict, resolved: dict):
             require(any(_selected_protocol(name, selected[value])
                         for value in bound_ids),
                     "workload must bind its actual selected provider mode")
+        if name in IO_PROTOCOL_CASES:
+            require(any(_selected_io_protocol(name, selected[value], resolved)
+                        for value in bound_ids),
+                    "workload must bind its actual selected typed protocol")
         _text(case["stimulus"], "stimulus")
         _descriptions(case["raw_observations"], definition["raw_observations"],
                       "raw acquisition")

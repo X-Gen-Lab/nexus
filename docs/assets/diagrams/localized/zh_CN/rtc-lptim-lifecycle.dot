@@ -1,0 +1,74 @@
+// FIG-21. Current: selected Native typed assembly and explicit lifecycle.
+// Dashed cluster/edge: future physical RTC/LPTIM adaptation only.
+// Private start is explicit; no public start, IRQ, hardware driver or scheduler is invented.
+digraph rtcLptimLifecycle {
+    graph [label="FIG-21 Native RTC/LPTIM：装配与最终访问\n实线：当前 Native；虚线：未来硬件目标", rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.55];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    subgraph clusterCurrent {
+        label="当前运行时：每实例一个串行 Native owner"; color="#64748b";
+    executor [label="外部串行任务执行者"];
+    face [label="公共 RTC／LPTIM 接口面\n只读 ops + 实例 context"];
+    owner [label="独立私有 Native 状态\n共享只读 ops；最多一个 active 请求"];
+    clock [label="复制的 Core 时钟接口面\n被借用的 context 持续有效且不重叠"];
+    model [label="显式主机模型推进\n只改变请求源；不发布请求结果"];
+    source [label="日历／有限计数请求源\narmed 与 pending 事实"];
+    stop [label="stop 立即关闭准入\n保留的借用仍可能需要排空", shape=note, fillcolor="#f8fafc"];
+    closed [label="已关闭；无 active／armed／pending／terminal\n外部 join 仍由调用方证明", fillcolor="#f8fafc"];
+    reopen [label="显式私有 start\n检查完整 owner；保留责任优先 BUSY\n再检查已构造、已关闭及代次余量"];
+    refused [label="start 被拒绝时全部 owner 字节保持不变\nINVALID／BUSY／STATE／EXHAUSTED", shape=note, fillcolor="#fff7ed"];
+    executor -> face [label="公共任务调用；没有隐式 worker"];
+    face -> owner [label="分发 ops(context, ...)"];
+    owner -> clock [label="只在需要时读取有限 deadline"];
+    executor -> model [label="串行主机专用控制"];
+    model -> source [label="有界推进；不改变 Core 时间"];
+    owner -> stop [label="生命周期规则", arrowhead=none];
+    stop -> closed [label="干净 stop，或已实际撤回保留的请求源"];
+    closed -> reopen [label="完成外部 join 后显式私有调用"];
+    reopen -> owner [label="SUCCESS：先 generation++，再 opened=true\n保留日历／速率／时钟／故障"];
+    reopen -> refused [label="检查失败；不读时钟、不推进请求源"];
+    }
+    subgraph clusterRequest {
+        label="当前：协议动作；ACTIVE／QUARANTINED／SETTLED 是请求状态"; color="#64748b";
+    ready [label="READY：调用方存储\n已初始化，未被借用", fillcolor="#f8fafc"];
+    active [label="ACTIVE：provider 借用\n完整且不可修改的请求"];
+    terminal [label="锁存首次终止原因\nservice／cancel／stop 均可撤源"];
+    held [label="QUARANTINED：hold 阻止撤源\n请求与 owner 仍须有效", fillcolor="#fff7ed"];
+    detached [label="已证明撤源\n请求源关闭；pending 清除；active 脱离\nLPTIM：复制最终 tick；推进代次"];
+    settled [label="SETTLED：release 发布\nprovider 对请求的最终访问", fillcolor="#f0fdf4"];
+    ready -> ready [label="REJECTED：不借用，无请求源效果", constraint=false];
+    ready -> active [label="submit SUCCESS = ACCEPTED"];
+    active -> terminal [label="显式 service 观察／cancel／stop"];
+    terminal -> held [label="请求源已 armed 且存在 hold"];
+    held -> terminal [label="真实公共操作重试；原因不变", constraint=false];
+    terminal -> detached [label="允许撤源"];
+    detached -> settled [label="全部必要引用脱离后才能发布"];
+    settled -> ready [label="消费结果并完成外部 join 后再 prepare", constraint=false];
+    }
+    owner -> active [label="保留精确请求身份"];
+    held -> refused [label="私有 start 返回 BUSY；绝不撤销借用", constraint=false];
+    settled -> closed [label="仅限此前 stop 已关闭准入", constraint=false];
+    clock -> terminal [label="只观察 Core deadline；\n不推进请求源"];
+    source -> terminal [label="service 观察 pending 事件\n只有未锁存更早原因时，到期才优先"];
+    source -> held [label="hold 期间请求源可以继续推进\nLPTIM 结果取最终撤源时的 tick", constraint=false];
+    subgraph clusterTarget {
+        label="当前构建：普通类型化配置与静态装配"; style=rounded; color="#64748b";
+    toml [label="普通 [rtc.name]／[lptim.name]\nNative RTC0/1 与 LPTIM0/1，无引脚／IRQ", fillcolor="#f8fafc"];
+    ir [label="现有 ControllerIR -> provider 路径\n不引入第二套配置权威", fillcolor="#f8fafc"];
+    platform [label="生成的 nx_platform_start/stop\n外部显式生命周期，没有调度器"];
+    generated [label="生成被选择的静态状态／接口面\n以及纯类型化 factory 查找", fillcolor="#f8fafc"];
+    toml -> ir [label="构建：严格验证与资源占用检查"];
+    ir -> generated [label="构建：沿现有 provider 静态生成"];
+    }
+    generated -> face [label="运行时查找返回已有接口面\n查找不执行初始化", constraint=false];
+    generated -> platform [label="构建：生成现有生命周期入口"];
+    executor -> platform [label="显式 start／stop；检查结果"];
+    platform -> owner [label="首次准备：只构造一次", constraint=false];
+    platform -> reopen [label="后续准备：对已构造 owner 调用私有 start", constraint=false];
+    platform -> stop [label="公共 port stop；保留失败清理责任", constraint=false];
+    subgraph clusterHardwareTarget {
+        label="目标：物理适配，未实现且未执行"; style=dashed; color="#64748b";
+    hardware [label="H743／U575 RTC + LPTIM\n时钟／备份复位／IRQ／STOP／VBAT\n没有硬件或 HIL 验证资格", fillcolor="#f8fafc"];
+    }
+    hardware -> face [label="未来 provider 必须满足公共合同", style=dashed, constraint=false];
+}

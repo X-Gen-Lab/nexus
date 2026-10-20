@@ -37,8 +37,8 @@ remain authoritative; this page is not another completion database.
 | STM32F407VET6 | M4F; 512 KiB Flash; 128 KiB SRAM plus 64 KiB CCM | Existing Sky reference; package and Board routes remain independent |
 | GD32F470ZGT6 | M4F; 1 MiB Flash; 512 KiB across SRAM/TCM regions | Existing Liangshan reference; separate GD32 SDK and provider |
 | STM32G474RET6 | M4F; 512 KiB Flash; 96 KiB SRAM plus 32 KiB CCM | Existing Nucleo reference; selected peripheral expansion in this iteration |
-| STM32H743ZIT6 | M7; 2 MiB Flash; domain-specific RAM | Fixed HSI/cache, finite USART3 DMA, optional initialized D2 SRAM1 and selected finite peripheral fixture |
-| STM32U575ZIT6Q | M33; 2 MiB Flash; domain-specific RAM | TZEN0 finite peripherals; separate TZEN1 scalar GPIO and copied cooperative jobs |
+| STM32H743ZIT6 | M7; 2 MiB Flash; domain-specific RAM | Fixed HSI/cache, finite USART3 DMA, optional initialized D2 SRAM1 and selected finite peripheral fixtures; separate V-revision HSI64 baremetal SPI4 DMA and continuous USART3 double-buffer RX with Cache off/on; Cache-off PLL384 references |
+| STM32U575ZIT6Q | M33; 2 MiB Flash; domain-specific RAM | TZEN0 finite peripherals, selected USART1 GPDMA TX, finite hardware-chain TX or bounded FIFO IRQ bytes; separate pinless LPTIM2 RUN one-shot and TZEN1 scalar GPIO/copied cooperative jobs |
 | STM32F103RBT6 | M3; 128 KiB Flash; 20 KiB SRAM | NUCLEO-F103RB source reference; HSI8, finite GPIO/UART/SPI/I2C/ADC/PWM/EXTI/Flash/IWDG selections |
 | GD32F303RCT6 | M4F; 256 KiB code Flash; 48 KiB SRAM | IRC8M chip reference with finite peripheral selections and TIMER1/TIMER4 time cascade; no invented PCB |
 
@@ -66,8 +66,8 @@ selection; a register header or upstream library is insufficient to accept it.
 | Public class | F407 and F470 existing scope | G474 increment | H743 and U575 increment | F103 and GD32F303 increment |
 | --- | --- | --- | --- | --- |
 | GPIO | Selected inputs/outputs and safe initialization | A/B/C/D/F/G package routes; PF0/PF1/PG10 reserved | H743 selected GPIO; U575 A..G and H0/H1/H3 package routes, subject to power admission | Selected legacy GPIO inputs/outputs; reviewed pin subsets only |
-| UART | Selected IRQ, finite/continuous RX and DMA modes | LPUART1, USART1/2/3 and UART4/5 IRQ bytes | H743 USART3 IRQ, finite DMA TX or RX-IDLE; U575 USART1/2 IRQ bytes | USART2/USART0 IRQ bytes, finite channel-DMA TX or duplex finite RX blocks |
-| SPI | Selected byte and full-duplex DMA modes | SPI1/2 finite polling; no DMA | H743 SPI4 and U575 SPI1 finite polling | F103 SPI1 and GD303 SPI0 finite polling |
+| UART | Selected IRQ, finite/continuous RX and DMA modes | LPUART1, USART1/2/3 and UART4/5 IRQ bytes | H743 USART3 IRQ, finite DMA TX/RX-IDLE and separate V/HSI64 baremetal continuous double-buffer RX; U575 USART1/2 IRQ bytes, selected finite USART1 GPDMA TX or hardware-chain TX; both families have separate bounded FIFO IRQ selections | USART2/USART0 IRQ bytes, finite channel-DMA TX or duplex finite RX blocks |
+| SPI | Selected byte and full-duplex DMA modes | SPI1/2 finite polling; no DMA | H743 SPI4 and U575 SPI1 finite polling; separate H743 V-revision HSI64 baremetal finite SPI4 DMA with Cache off/on | F103 SPI1 and GD303 SPI0 finite polling |
 | I2C | Selected polling and shared asynchronous engine | I2C1 PB8/PB9 finite polling with HSI16 | H743/U575 I2C1 PB8/PB9 finite V2 polling | F103 I2C1/GD303 I2C0 PB6/PB7 IRQ messages, nominal 80 kHz, priority 0 without kernel notification |
 | ADC | Selected one-shot, trigger and block modes | ADC1 PA0/IN1 bulb shots or finite TIM6 normal-DMA blocks | H743 ADC1 PA3/INP15 16-bit shots; U575 ADC4 PC0/channel1 12-bit shots with external supply admission | PA0/channel0, 12-bit software shots at 4 MHz; explicit calibration and warmup |
 | PWM/timer | Selected PWM, capture and advanced timer contracts | TIM3/4 CH1 exclusive fixed-base PWM | TIM3 CH1 PA6, exclusive fixed-base PWM | F103 TIM3 CH1/GD303 TIMER2 CH0 PA6, exclusive fixed-base PWM |
@@ -81,6 +81,60 @@ routes, transfer modes and backends must fail during resolution. They must not
 fall back from DMA to polling or substitute a different controller or pin.
 The [derived capability matrix](../delivery/capabilities.md) and the existing
 [SoC ledger](soc-refinement.md) retain their actual authority.
+
+The optional Ethernet contracts also remain distinct. The original `eth` face
+uses contiguous untagged frames and four-word descriptors. The separate
+[`eth_frames` selection](ethernet-frames.md) uses eight-word descriptors,
+scatter-gather frame loans, one in-band VLAN C-tag and MAC hardware-event
+timestamps on exact F407/F470 RMII references. They cannot own the same MAC
+simultaneously. Neither contract includes a protocol stack or network clock
+synchronization, and software composition does not qualify PHY/PCB wiring.
+
+H743 SPI4 DMA selects DEV_ID `0x450`, REV_ID `0x2003` (V), fixed HSI64/default
+trim, Cache off/on and baremetal. Its normal finite full-duplex requests borrow
+non-overlapping TX/RX spans in selected initialized AXI SRAM. Cache off accepts
+1..65535 bytes; Cache on requires exclusive complete 32-byte lines with aligned
+addresses and lengths of 32..65504 bytes. DMA1 Stream2/3 remain separate from
+optional USART3 Stream0 TX or Stream1 RX. PLL384, FreeRTOS, 16-bit, fixed
+dummy/discard and multisegment SPI DMA are
+outside that mode. See the [H743 provider contract](../../soc/stm32h743/README.md).
+
+The separate H743 `rx-dma-continuous` mode uses USART3, DMA1 Stream1/request45,
+DBM/CIRC and at least three equal caller-owned AXI SRAM buffers. It selects the
+V revision, fixed HSI64, baremetal and Cache off/on. Task service replaces the
+inactive bank before a conservative BRR/TIM2-derived deadline and performs Cache
+maintenance outside the IRQ. A late or uncertain replacement, cache failure or
+no FREE buffer stops production with visible loss; loans remain until actual
+drain. IDLE closes this producer and publishes its drained prefix; a caller must
+explicitly reinitialize the stream before restarting. TX remains finite IRQ,
+not DMA duplex. Cache-on buffers own complete aligned 32-byte lines. The mode
+accepts 32..65535-byte Cache-off buffers or 32..65504-byte Cache-on buffers.
+It does not establish measured throughput, deadline or physical qualification.
+
+U575 USART1 `dma-tx` selects TZEN0, MSIS4, 8N1, Cache off and finite nonsecure
+SRAM1 payloads through GPDMA1 channel0/request25. IRQ-byte RX remains independent.
+The [GPDMA contract](u575-uart-gpdma.md) preserves ES0499 persistent DMAT,
+separate UART wire TC and full source/IRQ/publisher drain. The independent
+[`irq-fifo-bytes` selection](uart-fifo.md) has explicit thresholds and per-IRQ
+RX/TX byte budgets; it does not combine with DMA. These selections do not add
+USART2 DMA/FIFO, RX DMA, LPDMA, TrustZone transport or autonomous
+low-power execution.
+
+The separate U575 `dma-chain-tx` mode uses the same USART1/GPDMA channel and
+independent IRQ-byte RX. One request borrows a contiguous SRAM1 payload, up to
+three blocks of at most 65535 bytes, and at most two packed 12-byte private
+nodes. The 24-byte node array is 32-byte aligned within one CLBAR window. The
+196605-byte protocol limit also requires actual reachable, nonaliasing RAM; it
+does not reserve the whole SRAM for the caller. Payload and nodes remain live
+until fetch/channel/IRQ drain and independently observed UART TC. This finite
+selection does not enable scatter-gather or cyclic chains.
+
+The independent pinless U575 LPTIM2 `irq-counter16-oneshot` reference selects
+TZEN0, MSIS4, baremetal and PCLK1/4 for a nominal 1 MHz RUN counter. Requests
+accept 2..65536 ticks; one tick is rejected because ARR must exceed reset CCR0.
+IRQ68 priority5 never calls the OS. It owns no external pin or DMA and does not
+promise Stop, backup or VBAT continuity. PCB and silicon revision remain
+unobserved; software model and link checks do not measure physical timing.
 
 ### Exact mode boundaries
 
@@ -127,6 +181,12 @@ at most one command, POLL reads latched status, CANCEL preserves earlier effects
 and CONSUME releases only a terminal job. Tickets never wrap; no NS address
 survives a call. This provides neither a user-buffer loan nor general asynchronous
 or cross-security transport support.
+
+F103 standalone admission checks the CPU-readable factory Flash density,
+not a debug-only device-group or revision value. ES096 Rev15 section2.2.2
+reports zero from normal-software DBGMCU reads; group and revision therefore
+remain unobserved. The configured STM32F103RBT6 declaration and package still
+require separate integration evidence. See the [F103 source boundary](../../soc/stm32f103/README.md).
 
 F103 uses USART2 PA2/PA3 and PA0/PA1 EXTI events. F103 SPI1 and GD303 SPI0 use
 default PA5/PA6/PA7 with explicit PA4 active-low CS, nominal 31.25 kHz..4 MHz,

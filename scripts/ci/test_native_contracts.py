@@ -72,8 +72,11 @@ class NativeExecutionTests(unittest.TestCase):
             binary.chmod(0o755)
             self.binaries.append(binary)
             cmake.append(f'add_test(NAME {name} COMMAND "{binary}")')
-        cmake.append(f'add_test(NAME ordinary COMMAND "{sys.executable}" '
-                     '-c "raise SystemExit(0)")')
+        self.ordinary = self.build / "ordinary"
+        self.ordinary.write_text(
+            f"#!{sys.executable}\nraise SystemExit(0)\n")
+        self.ordinary.chmod(0o755)
+        cmake.append(f'add_test(NAME ordinary COMMAND "{self.ordinary}")')
         self.cmake = cmake
         self.configure()
         (self.root / "CMakePresets.json").write_text(json.dumps({
@@ -172,14 +175,13 @@ class NativeExecutionTests(unittest.TestCase):
         self.assertFalse(old.exists())
 
     def test_failed_ordinary_ctest_rejects_google_success(self):
-        self.cmake[-1] = self.cmake[-1].replace(
-            "SystemExit(0)", "SystemExit(1)")
-        self.configure()
+        self.ordinary.write_text(
+            self.ordinary.read_text().replace("SystemExit(0)", "SystemExit(1)"))
         self.assert_rejected()
 
     def test_mixed_skipped_ctest_cannot_establish_complete_execution(self):
-        self.cmake[-1] = self.cmake[-1].replace(
-            "SystemExit(0)", "SystemExit(7)")
+        self.ordinary.write_text(
+            self.ordinary.read_text().replace("SystemExit(0)", "SystemExit(7)"))
         self.cmake.append("set_tests_properties(ordinary PROPERTIES "
                           "SKIP_RETURN_CODE 7)")
         self.configure()
@@ -200,6 +202,15 @@ class NativeExecutionTests(unittest.TestCase):
         }))
         self.assert_rejected()
 
+    def test_extra_filtered_registration_cannot_repeat_a_google_binary(self):
+        self.cmake.append(
+            f'add_test(NAME again COMMAND "{self.binaries[0]}" '
+            '--gtest_filter=*)')
+        self.configure()
+        self.assert_rejected()
+        for binary in self.binaries:
+            self.assertFalse(binary.with_suffix(".count").exists())
+
     def test_preset_filter_cannot_hide_an_ordinary_contract(self):
         path = self.root / "CMakePresets.json"
         presets = json.loads(path.read_text())
@@ -208,6 +219,34 @@ class NativeExecutionTests(unittest.TestCase):
         }
         path.write_text(json.dumps(presets))
         self.assert_rejected()
+
+    def test_mode_independent_python_tool_cannot_enter_native_runtime_plan(self):
+        self.cmake[-1] = (
+            f'add_test(NAME ordinary COMMAND "{sys.executable}" '
+            '-c "raise SystemExit(0)")')
+        self.configure()
+        self.assert_rejected()
+        for binary in self.binaries:
+            self.assertFalse(binary.with_suffix(".count").exists())
+
+    def test_aliased_ordinary_runtime_command_rejects_before_discovery(self):
+        alias = self.build / "ordinary-alias"
+        alias.symlink_to(self.ordinary)
+        self.cmake[-1] = f'add_test(NAME ordinary COMMAND "{alias}")'
+        self.configure()
+        self.assert_rejected()
+        for binary in self.binaries:
+            self.assertFalse(binary.with_suffix(".count").exists())
+
+    def test_runtime_scenario_arguments_preserve_the_complete_plan(self):
+        self.cmake[-1] = (
+            f'add_test(NAME ordinary COMMAND "{self.ordinary}" scenario)')
+        self.configure()
+        result, output = self.execute()
+        self.assertEqual(result, 0, output)
+        record = json.loads(self.summary.read_text())
+        self.assertEqual(record["ctest"]["passed"], 3)
+        self.assertEqual(record["passed"], 4)
 
 
 if __name__ == "__main__":

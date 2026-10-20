@@ -27,6 +27,25 @@ Windows uses `.venv/Scripts/python.exe`. Installation establishes pre-commit and
 commit-msg hooks. Hooks inspect staged inputs without staging or silently fixing
 files. Preserve unstaged work and actual failure diagnostics; never bypass hooks.
 
+## Prepare the pinned host test framework
+
+GoogleTest and GoogleMock are the Git submodule `ext/googletest`, pinned to
+version 1.16.0 and commit `6910c9d9165801d8827d628cb72eb7ea9dd538c5`.
+The recursive checkout above includes it. For an existing checkout, prepare the
+Native dependency scope explicitly before running tests:
+
+```sh
+python tools/dev/dev.py prepare --scope native --allow-network
+```
+
+To initialize only this submodule, use
+`git submodule update --init --recursive ext/googletest` instead. Preparation may
+use the network; CMake configuration uses only the prepared local source and
+fails if the required source is missing, differs from the pin or has local
+modifications. It neither fetches a dependency nor substitutes a system
+installation. The framework stays in the host test graph; ARM builds and firmware
+SDK consumers do not require it.
+
 ## Execute RED, GREEN and review
 
 For new C behavior or defect fixes, first add a meaningful GoogleTest/GoogleMock

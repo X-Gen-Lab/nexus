@@ -47,6 +47,29 @@ typedef struct {
     bool hold_watchdog_update;
     bool hold_spi_progress;
     bool hold_spi_reset;
+    bool hold_spi_suspend;
+    bool spi_suspend_pending;
+    bool spi_zero_tsize_before_suspend;
+    uint32_t spi_idle_before_suspend_status;
+    uint32_t spi_idle_before_suspend_events;
+    uint32_t spi_idle_before_suspend_reads;
+    uint32_t spi_start_suspend_commands;
+    bool spi_late_rx_on_suspend;
+    bool spi_leave_tx_queued;
+    bool spi_hold_cs_high;
+    bool spi_hold_sck_output;
+    bool spi_watch_pins;
+    bool spi_was_selected;
+    bool spi_selected_cpol;
+    uint32_t spi_queued_words;
+    uint32_t spi_suspend_requests;
+    uint32_t spi_completed_suspensions;
+    uint32_t spi_reset_assertions;
+    uint32_t spi_reset_order_errors;
+    uint32_t spi_selected_control_losses;
+    uint32_t spi_observed_launch_mode;
+    uint32_t spi_observed_launch_divisor;
+    uint32_t spi_disable_before_stop;
     uint32_t spi_sent;
     uint32_t spi_received;
     uint32_t spi_tail_until;
@@ -145,6 +168,7 @@ void nx_h743_model_irq_restore(nx_arch_irq_state_t previous);
 #define NX_H743_SILICON_ID()           g_h743_model.silicon_id
 #define NX_H743_GPIOB                  (&g_h743_model.gpio_b)
 #define NX_H743_GPIOD                  (&g_h743_model.gpio_d)
+#define NX_H743_GPIOE                  (&g_h743_model.gpio_e)
 #define NX_H743_UART_POLL(port)        nx_h743_model_uart_poll(port)
 #define NX_H743_WATCHDOG_POLL(port)    nx_h743_model_watchdog_poll(port)
 #define NX_H743_SPI_WRITE8(reg, value) nx_h743_model_spi_write8((reg), (value))

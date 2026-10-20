@@ -1,0 +1,58 @@
+import gzip,hashlib,json,shutil,tarfile
+from pathlib import Path
+R=Path('/tmp/nexus-h743-fixed-hsi-s0-20261018');D=Path('/dev/shm/nexus-h743-spi-dma-d3-docs-20261018-r1');O=Path('/dev/shm/nexus-h743-spi-dma-d3-docs-gettext-20261018-r1');A=Path('/dev/shm/nexus-h743-spi-dma-d3-20261018-r1')
+def sha(p):
+ h=hashlib.sha256()
+ with p.open('rb') as s:
+  while b:=s.read(65536):h.update(b)
+ return h.hexdigest()
+def e(p):return {'path':str(p),'bytes':p.stat().st_size,'sha256':sha(p),'mode':p.stat().st_mode&0o777}
+def write(n,v):
+ p=D/n;assert not p.exists();p.write_text(json.dumps(v,ensure_ascii=False,indent=2,sort_keys=True)+'\n');return e(p)
+old=json.loads((D/'source8-false-catalog-freeze-r1.json').read_text());files=[]
+for x in old['files']:
+ p=R/x['path'];prior=Path(x['source'])
+ if p.suffix=='.po':
+  assert p.read_bytes()==prior.read_bytes().replace(b'X-Nexus-Reviewed: false',b'X-Nexus-Reviewed: true')
+  q=D/'approved'/x['path'];q.parent.mkdir(parents=True,exist_ok=True);assert not q.exists();shutil.copy2(p,q)
+  files.append({'path':x['path'],'source':str(q),'bytes':q.stat().st_size,'sha256':sha(q)})
+ else:
+  assert sha(p)==x['sha256'];files.append(x)
+review=Path('/dev/shm/nexus-h743-d3-translation-independent-review-20261018-r1.json');assert sha(review)=='0ed115cb36962edf9075374e5767e8aae45b6955053159ea9d7c4e0318d04dad'
+delta=A/'docs-reviewed-metadata-only-delta-r1.json';assert sha(delta)=='840884cfaa6321ef1a4fda1f57bc70774855146da3abfc99a76ab5db7747d477'
+execution=json.loads((O/'checks-execution.json').read_text());assert execution['status']=='passed' and execution['source_before']==execution['source_after'] and execution['index_before_sha256']==execution['index_after_sha256']
+report=json.loads((O/'full-source-check.json').read_text());assert not report['errors'] and not report['translations']['errors']
+summary=write('final-source8-approved-r1.json',{'source_count':8,'files':files,'original_false_freeze':e(D/'source8-false-catalog-freeze-r1.json'),'independent_review':e(review),'metadata_only_author_delta':e(delta),'validation':{'two_page_records':4,'full_source_pages':report['pages'],'full_translation_records':len(report['translations']['records']),'configuration_examples':report['configuration_examples'],'diagrams':report['diagrams'],'execution':e(O/'checks-execution.json'),'observed_source':execution['source_before'],'observed_index':execution['index_before_sha256'],'status':'passed','scope':'docs checks only; no HTML/softwareSDK/ARM/HIL qualification'},'qualified':False,'persistence':'volatile until Root normal commit/push'})
+selected=[]
+for name in ['checks-execution.json','page-translation-check.json','full-source-check.json','page_gate.py']:
+ selected.append(('outputs/'+name,O/name))
+for stage in ['page','full-source']:
+ for p in O.glob(stage+'*'):
+  if p.is_file():selected.append(('outputs/'+p.name,p))
+  elif p.name==stage+'.attempts':
+   for q in p.rglob('*'):
+    if q.is_file():selected.append(('outputs/'+str(q.relative_to(O)),q))
+selected.extend([('author/run_checks_prepared.py',D/'run_checks_prepared.py'),('author/seal_final_checks.py',D/'seal_final_checks.py'),('author/final-source8-approved-r1.json',D/'final-source8-approved-r1.json'),('reviews/independent-translation-r1.json',review),('reviews/metadata-only-author-delta-r1.json',delta)])
+# Explicit reports may also match stage prefixes; retain one original entry.
+unique={n:p for n,p in selected};selected=sorted(unique.items());records={n:e(p) for n,p in selected}
+archive=D/'checks-evidence-r1.tar.gz'
+with archive.open('xb') as raw,gzip.GzipFile(fileobj=raw,mode='wb',mtime=0,filename='') as z,tarfile.open(fileobj=z,mode='w|') as t:
+ for n,p in selected:
+  info=t.gettarinfo(str(p),arcname=n)
+  with p.open('rb') as s:t.addfile(info,s)
+seen=set()
+with tarfile.open(archive,'r|gz') as t:
+ for m in t:
+  assert m.isfile() and m.name in records and m.name not in seen
+  x=records[m.name];assert m.size==x['bytes'] and m.mode&0o777==x['mode']
+  h=hashlib.sha256()
+  with t.extractfile(m) as s:
+   while b:=s.read(65536):h.update(b)
+  assert h.hexdigest()==x['sha256'];seen.add(m.name);t.members.clear()
+assert seen==set(records)
+with gzip.open(archive,'rb') as s:
+ while s.read(65536):pass
+emap=write('checks-evidence-map-r1.json',{'archive':e(archive),'member_count':len(records),'members':records,'actual_archive_validation':'full gzip CRC/EOF and memberSHA/size/mode passed'})
+handoff=write('handoff-r1.json',{'final_source8':summary,'checks_archive':e(archive),'checks_map':emap,'extraction_archive':e(D/'extraction-evidence-r1.tar.gz'),'extraction_map':e(D/'extraction-evidence-map-r1.json'),'canonical_source_writer':'stopped; only Parent author metadata changedfalse->true as approved','not_executed':['full HTML site','SDK consumption in this docs task','ARM runtime','HIL'],'qualified':False})
+a=sum(p.stat().st_blocks*512 for p in D.rglob('*') if p.is_file());assert a<=1048576,a
+print(json.dumps({'final_source8':summary,'handoff':handoff,'checks_archive':e(archive),'checks_members':len(records),'allocated':a}))

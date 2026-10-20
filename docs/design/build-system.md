@@ -70,7 +70,7 @@ an integrated test result.
 | pre-commit | 4.3.0 | 4.3.0 |
 | Optional ccache | 4.14.1, Linux x86_64 static distribution | Actual binary and cache hit/miss validation |
 | Git | Source and submodule identity tooling | Host 2.52.0; recorded OCI artifact 2.47.3 |
-| GoogleTest/GoogleMock | 1.16.0, pinned commit and archive SHA-256 | Host-only framework; final full-source execution separately recorded |
+| GoogleTest/GoogleMock | 1.16.0, pinned Git submodule `ext/googletest` and matching lock commit | Host-only framework; final full-source execution separately recorded |
 
 Ninja single-configuration builds are maintained. Ninja Multi-Config is
 explicitly rejected; other generators have no implied acceptance. C11 remains
