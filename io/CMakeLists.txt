@@ -10,7 +10,7 @@ add_library(nexus_io STATIC
     src/ethernet.c src/ethernet_frames.c src/mdio.c
     src/usb_device.c src/usb_profile.c src/timer_capture.c src/advanced_pwm.c src/observation.c
     src/pwm_group.c src/pwm_adc.c src/stream_profile.c src/encoder.c
-    src/rtc.c src/lptim.c src/pin_state.c)
+    src/rtc.c src/lptim.c src/pin_state.c src/frame_stream.c)
 target_include_directories(nexus_io PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(nexus_io PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/private")
 target_link_libraries(nexus_io PUBLIC nexus_core PRIVATE nexus_build_options nexus_owned_warnings Nexus::Arch)

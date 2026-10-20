@@ -20,6 +20,9 @@ ADDITIONS = {
             'bytes': 175243,
             'sha256': '0a739716ed496ee660c25a16b0e90a40bb83998fb83107fa778164dd6419403a'}},
     'u5': {
+        'Inc/stm32u5xx_ll_rtc.h': {
+            'bytes': 226081,
+            'sha256': 'e40e46698164cd4c0722460fbb59c868be643ba0f7447e0bed439a88f3a63bf2'},
         'Inc/stm32u5xx_ll_dma.h': {
             'bytes': 322291,
             'sha256': '2cca143aaf883cffacd46e6a0a29a4a677badd485b7eb19f8da6199eceacead6'},
@@ -99,11 +102,34 @@ class OfficialHeaderClosureTests(unittest.TestCase):
             self.assertEqual(result['verified_files'], 11)
             self.assertFalse(result['software_qualified'])
 
-    def test_u5_exact_closed_graph_adds_only_dma_and_usart(self):
+    def test_u5_exact_closed_graph_adds_only_dma_usart_and_rtc(self):
         profile = PROFILES['u5']
         expected = BASE_FILES['u5'] | ADDITIONS['u5'].keys()
         self.assertEqual(profile.selected_files, expected)
         self.assertEqual(profile.contract(proposed_lock('u5')), expected)
+
+    def test_u5_rtc_sdk_export_closes_actual_provider_and_cmsis_includes(self):
+        import re
+        header = 'Inc/stm32u5xx_ll_rtc.h'
+        profile = PROFILES['u5']
+        provider = (ROOT / 'soc/stm32u575/drivers/rtc.c').read_text()
+        self.assertIn('#include "stm32u5xx_ll_rtc.h"', provider)
+        spec = importlib.util.spec_from_file_location(
+            'nexus_package_for_rtc_header_closure',
+            ROOT / 'cmake/package/package_source_sdk.py')
+        module = importlib.util.module_from_spec(spec)
+        sys.path.insert(0, str(ROOT / 'cmake/package'))
+        spec.loader.exec_module(module)
+        selected = module.dependency_entries(ROOT, profile.directory)
+        self.assertIn(header, selected)
+        text = (ROOT / profile.directory / header).read_text()
+        includes = set(re.findall(r'^#include "([^"]+)"', text, re.MULTILINE))
+        self.assertEqual(includes, {'stm32u5xx.h'})
+        device = module.dependency_entries(ROOT, profile.cmsis_directory)
+        self.assertTrue({'Include/stm32u5xx.h', 'Include/stm32u575xx.h',
+                         'Include/system_stm32u5xx.h'}.issubset(device))
+        core = module.dependency_entries(ROOT, 'vendors/arm/CMSIS_5')
+        self.assertIn('CMSIS/Core/Include/core_cm33.h', core)
 
     def test_g4_exact_closed_graph_adds_transitive_hal_definitions_only(self):
         profile = PROFILES['g4']

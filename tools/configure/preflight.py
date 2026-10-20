@@ -60,7 +60,10 @@ def _modern_selected(result):
         allowed = {"gpio", "uart", "spi", "pwm", "exti", "watchdog",
                    "adc", "i2c", "flash"}
         if not h7:
-            allowed.add("lptim")
+            allowed.update({"lptim", "rtc"})
+        if not h7 and item.kind == "rtc":
+            source += ["    result.primary = nx_stm32u575_rtc_preflight();",
+                       "    if (result.primary != NX_SUCCESS) { return result; }"]
         if item.kind not in allowed:
             fail("New SoC cold profile has no maintained controller admission")
         if not h7 and item.kind == "lptim":

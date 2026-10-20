@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4d3bbec0277cd76f2a2b07982edaf684c891f51e7f8dba8a197b9c63233e49db\n"
+"X-Nexus-Source-SHA256: b6c31573253e75c6870af67466fc43619830ef95f1f15b51f2f3ccf861234ce8\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:1
 msgid "SoC extension verification"
@@ -582,19 +582,6 @@ msgstr ""
 msgid "Remaining acceptance"
 msgstr "剩余验收"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:166
-msgid ""
-"SOC-28 through SOC-32 and SOC-36 are exact partial references. Their "
-"original hardware, peripheral and isolation exits remain open. SOC-33 "
-"bootloader/running state handoff, SOC-34 dynamic frequency changes and "
-"SOC-35 deep STOP with continuous time are not implemented. SOC-37 through "
-"SOC-55 provide station, admission, capture and result-validation tooling; "
-"physical execution remains pending equipment."
-msgstr ""
-"SOC-28 至 SOC-32 和 SOC-36 是精确的部分参考，原始硬件、外设、隔离退出条件保持开放。SOC-33 "
-"bootloader／运行态交接、SOC-34 动态变频、SOC-35 连续计时 deep STOP 未实现。SOC-37 至 SOC-55 提供 "
-"station、准入、采集和结果校验工具；物理执行等待设备。"
-
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:173
 msgid ""
 "Fixed clock profiles do not establish DVFS. Ordinary WFI or tickless idle "
@@ -605,3 +592,11 @@ msgid ""
 msgstr ""
 "固定时钟不建立 DVFS，普通 WFI／tickless idle 不建立 deep STOP。主机模型和链接 ARM 镜像不建立电气、硅片 "
 "DMA／cache 一致性、TrustZone 隔离、中断延迟、实测功耗或 WCET。应用、PCB 专有政策与恢复由外部工程负责。"
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "At the qualified source recorded above, SOC-28 through SOC-32 and SOC-36 are exact partial references. Their original hardware, peripheral and isolation exits remain open. SOC-33 bootloader/running state handoff, SOC-34 dynamic frequency changes and SOC-35 deep STOP with continuous time are not implemented. SOC-37 through SOC-55 provide station, admission, capture and result-validation tooling; physical execution remains pending equipment."
+msgstr "在上述已资格化源码中，SOC-28 至 SOC-32 和 SOC-36 是精确的部分参考，原始硬件、外设、隔离退出条件保持开放。SOC-33 bootloader／运行态交接、SOC-34 动态变频、SOC-35 连续计时 deep STOP 未实现。SOC-37 至 SOC-55 提供 station、准入、采集和结果校验工具；物理执行等待设备。"
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "Later bounded source increments include the exact F407 masked Flash tail [handoff and four I/O mechanisms](../design/io-extension-boundaries.md). They do not inherit this record's software execution or close the complete SOC-33 exit; SOC-34 DVFS and SOC-35 deep-STOP continuity remain unimplemented."
+msgstr "后续有界源码增量包括精确 F407 屏蔽 Flash 尾跳[交接及四项 I/O 机制](../design/io-extension-boundaries.md)。它们不继承本记录的软件执行结果，也不关闭完整 SOC-33 退出条件；SOC-34 DVFS 与 SOC-35 deep-STOP 连续性仍未实现。"

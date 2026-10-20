@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-quality-20261019/tools/testing/evidence/io-extensions-20261020/rtc-configuration/6573b1c6bc3242a4b6a9c34a28cdd93ce23b3cf0de9136391de95a3df574f2e1.tar.gz",
+    "sha256": "6573b1c6bc3242a4b6a9c34a28cdd93ce23b3cf0de9136391de95a3df574f2e1",
+    "size": 5476
+  },
+  "bytes": 26258,
+  "files": 19,
+  "kind": "portable_evidence",
+  "manifest_sha256": "f4c16f5ca9a72632881659c6290d7a6572d7dcb88cb8657d1beeeaa3a576ea34",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

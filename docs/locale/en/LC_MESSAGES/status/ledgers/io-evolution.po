@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4efddafd2c95aab8b8cea813214d199deddf7c696fd64e763f1f651bd7225dd4\n"
+"X-Nexus-Source-SHA256: d07596f37a8e7a90dc47ee8fef25d580e08bcd7eaae59f7d3a9ae1059c0170fe\n"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
@@ -992,10 +992,6 @@ msgid "AMP resource partition and epoch-safe IPC"
 msgstr "AMP resource partition and epoch-safe IPC"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "core;arch"
-msgstr "core;arch"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Unique hardware owner and explicit remote reset/cache contract"
 msgstr "Unique hardware owner and explicit remote reset/cache contract"
 
@@ -1049,28 +1045,39 @@ msgstr ""
 "soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
 "ram.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
-"run.toml;tests/google/u575_lptim_test.cpp"
-msgstr ""
-"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
-"run.toml;tests/google/u575_lptim_test.cpp"
-
-
 msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/io-evolution-execution.csv>`。 "
-"源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`。"
+"源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`990fae704bf16353dabb5e0dc8c62946da4629844e7d7376c474c9cb36d67e46`。"
 msgstr ""
 "This page is derived from the original CSV; it is not a new status "
 "authority, execution record or software qualification. Original IDs, "
 "order and all fields come from {download}`original ledger "
 "<../../design/io-evolution-execution.csv>`. Source: "
 "`docs/design/io-evolution-execution.csv`; SHA-256: "
-"`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`."
+"`990fae704bf16353dabb5e0dc8c62946da4629844e7d7376c474c9cb36d67e46`."
 
 msgid ""
 "soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
 msgstr ""
 "soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"

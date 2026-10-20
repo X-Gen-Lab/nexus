@@ -1,0 +1,41 @@
+// FIG-23 current bounded software mechanisms, independently selected.
+// Source contracts: docs/design/io-extension-boundaries.md and linked headers.
+// Every arrow names calls, supplied storage or required external proof.
+digraph ioExtensionOwnership {
+    graph [label="FIG-23 Current software ownership\nIndependent selected mechanisms; no hardware qualification",
+           rankdir=LR, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.65];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    app [label="External owner\nSerial execution / service / shutdown / joins", fillcolor="#f8fafc"];
+    mapped [label="MappedStorage\nExact slot + epoch loans\nOne backend writer"];
+    amp [label="AMPIPC\nLane + boot epochs + sequence\nOffer / ACK cache lines"];
+    handoff [label="STM32F407Handoff\nExisting ClockDomain barrier\nMasked Flash-vector tail"];
+    rtc [label="U575 retained RTC\nOne AlarmA request\nRUN polling / prepared LSE"];
+    frame [label="FrameStream + H743 DMA2D\nComplete source-frame loan\nRGB565 AXI M2M / D-Cache off"];
+    storage [label="Caller storage\nRequests / payloads / slots / shared records", fillcolor="#f8fafc"];
+    proof [label="External proofs\nJoined consumers / old-epoch access impossible\nClock users drained / valid backup domain", fillcolor="#fff7ed"];
+    ports [label="Explicit AMP ports\nUnique role claim / persistent boot history\nCoherent control ordering / cache operations", fillcolor="#f8fafc"];
+    held [label="Failed withdrawal\nRetain exact loans and state\nQUARANTINED requests remain borrowed", fillcolor="#fff7ed"];
+    app -> mapped [label="calls acquire / release / service"];
+    app -> amp [label="calls send / receive / finish / join"];
+    app -> handoff [label="enrolls / closes / proves barrier / calls"];
+    app -> rtc [label="calls factory face / service / stop"];
+    app -> frame [label="publishes frame / submits / services"];
+    storage -> mapped [label="supplies slots + writer input"];
+    storage -> amp [label="supplies shared records + payload"];
+    storage -> rtc [label="supplies request"];
+    storage -> frame [label="supplies pool + request + destination"];
+    proof -> mapped [label="joins map readers before release", style=dashed];
+    proof -> amp [label="authorizes reset_join only", style=dashed];
+    ports -> amp [label="supplies target-specific ordering + identity", style=dashed];
+    proof -> handoff [label="all enrolled + unenrolled owners quiet", style=dashed];
+    proof -> rtc [label="boot owner preserves exact LSE calendar", style=dashed];
+    mapped -> held [label="unmap / writer drain fails"];
+    amp -> held [label="ACK / epoch proof fails"];
+    rtc -> held [label="alarm withdrawal / restore fails"];
+    frame -> held [label="DMA2D drain proof fails"];
+}

@@ -156,7 +156,9 @@ MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
+        "consumers/f407-handoff.c",
         "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
+        "consumers/u575-rtc.c",
         "consumers/h743-uart-duplex-continuous.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
         "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
@@ -347,6 +349,21 @@ REQUIRED_FILES += (
     "soc/gd32f470/private/gd32f470_spi_dma.h",
     "soc/gd32f470/private/gd32f470_uart_stream.h",
     "soc/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32f470/private/usb_conf.h")
+REQUIRED_FILES += (
+    "components/amp_ipc/CMakeLists.txt",
+    "components/amp_ipc/src/amp_ipc.c",
+    "components/amp_ipc/include/nexus/components/amp_ipc.h",
+    "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
+    "components/stm32f407_handoff/CMakeLists.txt",
+    "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+    "soc/stm32f407/handoff.c",
+    "soc/stm32f407/private/stm32f407_handoff_hw.h",
+    "cmake/package/verification/io_evolution/consumers/f407-handoff.c")
+REQUIRED_FILES += (
+    "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+    "components/frame_dma2d/CMakeLists.txt",
+    "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
+    "components/frame_dma2d/src/h743_frame_dma2d.c")
 for _component, _include, _private in (
         ("clock_domain", "nexus/components/clock_domain.h", "clock_domain_impl.h"),
         ("user_io_broker", "nexus/components/user_io_broker.h", "user_io_broker_impl.h"),
@@ -406,6 +423,14 @@ REQUIRED_FILES += tuple("components/storage/src/" + name + ".c" for name in (
 REQUIRED_FILES += tuple("components/storage/include/nexus/components/" + name
                         + ".h" for name in (
     "storage", "flash_storage", "file_flash"))
+REQUIRED_FILES += ("components/mapped_storage/CMakeLists.txt",)
+REQUIRED_FILES += tuple("components/mapped_storage/src/" + name + ".c"
+                        for name in ("mapped_storage", "mapped_storage_owner",
+                                     "native_mapped_storage"))
+REQUIRED_FILES += tuple("components/mapped_storage/include/nexus/components/"
+                        + name + ".h" for name in (
+                            "mapped_storage", "mapped_storage_owner",
+                            "native_mapped_storage"))
 REQUIRED_FILES += ("tools/maintenance/cmsis_device_lock.py",)
 for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
     REQUIRED_FILES += (_review["lock_name"],)

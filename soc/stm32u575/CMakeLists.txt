@@ -30,6 +30,7 @@ nexus_controller_modes(u5_pwm_modes pwm)
 nexus_controller_modes(u5_exti_modes exti)
 nexus_controller_modes(u5_flash_modes flash)
 nexus_controller_modes(u5_lptim_modes lptim)
+nexus_controller_modes(u5_rtc_modes rtc)
 if(u5_gpio_modes OR u5_uart_modes OR u5_spi_modes OR u5_i2c_modes OR u5_pwm_modes)
     list(APPEND u5_sources drivers/gpio.c)
 endif()
@@ -47,6 +48,9 @@ if("dma-tx" IN_LIST u5_uart_modes)
 endif()
 if("dma-chain-tx" IN_LIST u5_uart_modes)
     list(APPEND u5_sources drivers/uart_dma_chain.c)
+endif()
+if(u5_rtc_modes)
+    list(APPEND u5_sources drivers/rtc.c)
 endif()
 if(u5_lptim_modes)
     list(APPEND u5_sources drivers/lptim.c)
@@ -72,7 +76,7 @@ if(u5_sources)
     target_include_directories(nexus_soc_stm32u575 SYSTEM PRIVATE
         "${u5_device}/Include" "${u5_cmsis}")
     target_compile_definitions(nexus_soc_stm32u575 PRIVATE STM32U575xx)
-    if(u5_spi_modes OR u5_i2c_modes OR u5_adc_modes OR u5_pwm_modes OR
+    if(u5_rtc_modes OR u5_spi_modes OR u5_i2c_modes OR u5_adc_modes OR u5_pwm_modes OR
             "dma-tx" IN_LIST u5_uart_modes OR
             "dma-chain-tx" IN_LIST u5_uart_modes OR
             "irq-fifo-bytes" IN_LIST u5_uart_modes OR

@@ -59,3 +59,8 @@ add_subdirectory(clock_domain)
 add_subdirectory(user_io_broker)
 
 add_subdirectory(usb_control)
+
+add_subdirectory(mapped_storage)
+add_subdirectory(amp_ipc)
+add_subdirectory(stm32f407_handoff)
+add_subdirectory(frame_dma2d)

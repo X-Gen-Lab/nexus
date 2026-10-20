@@ -371,7 +371,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         models = [row for row in report["work_packages"] if row["family"] == "native"]
         physical = [row for row in report["work_packages"] if row["family"] != "native"]
         self.assertEqual(len(models), 19)
-        self.assertEqual(len(physical), 197)
+        self.assertEqual(len(physical), 198)
         spi = [row for row in physical
                if row["identity"] == "stm32h743.SPI4.dma"]
         self.assertEqual(len(spi), 1)
@@ -422,6 +422,8 @@ class CurrentWorkPackageTests(unittest.TestCase):
                 "tools/configure/assemblies/h743-uart-duplex-continuous.toml"]),
             ("stm32u575.USART1.dma-chain-tx", "uart_chain", "uart_dma_chain", [
                 "tools/configure/assemblies/u575-uart-chain.toml"]),
+            ("stm32u575.RTC0.retained-calendar-alarm", "rtc", "rtc", [
+                "tools/configure/assemblies/u575-rtc-run.toml"]),
             ("stm32u575.LPTIM2.irq-counter16-oneshot", "lptim", "lptim", [
                 "tools/configure/assemblies/u575-lptim-run.toml"]),
         )

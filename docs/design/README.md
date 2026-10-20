@@ -5,6 +5,8 @@
 block storage 由调用者提供。SDK 和 provider storage 私有，应用产品工程独立。
 这里的设计合同与 [当前交付](../delivery/README.md) 一起使用，历史文档不建立当前资格。
 
+五项有界软件增量的装配、借用与恢复责任见[映射存储、AMP、镜像交接、RTC 与帧边界](io-extension-boundaries.md)。完整原始退出条件与实板状态保持不变。
+
 | 文档 | 用途 |
 |---|---|
 | [文档系统架构与交付规划](documentation-system.md) | 读者任务、单一正文、MyST/API、双语、门禁、版本与离线交付的目标方案 |
@@ -88,7 +90,9 @@ TZEN0 增加 SPI/I2C/ADC/PWM/EXTI/Flash，外部电源与安全状态准入仍�
 推进；不保留 NS 指针，不代表通用双域 factory、NS RTOS 或异步借用。
 ECC `program_flags`、fresh-erase 来源与逐脉冲完成责任见公共 Flash 合同；当前源
 实现和最终集成资格分别记录，不继承历史执行计数。
-SOC-33–35 仍未实现；SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
+SOC-33 的有限软件增量见上述边界页，完整退出仍开放；SOC-34/35 仍未实现，
+RTC RUN 不建立深 STOP 连续计时；
+SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、
 构建发布1；维护责任由Codex全部承担，无需实名人员。远程branch protection状态

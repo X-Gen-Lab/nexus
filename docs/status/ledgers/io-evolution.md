@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`990fae704bf16353dabb5e0dc8c62946da4629844e7d7376c474c9cb36d67e46`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -597,7 +597,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | time |
 | `task` | RTC LPTIM alarms wrap backup and reset domains |
-| `implementation_paths` | io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp |
+| `implementation_paths` | io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | Wall-clock and monotonic domains remain separate |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -613,9 +613,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | storage |
 | `task` | SDMMC and serial memory block command mapped interfaces |
-| `implementation_paths` | io;soc |
+| `implementation_paths` | io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | XIP cache DMA loans and erase ownership are explicit |
-| `implementation_status` | pending |
+| `implementation_status` | in_progress |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -661,9 +661,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | multicore |
 | `task` | AMP resource partition and epoch-safe IPC |
-| `implementation_paths` | core;arch |
+| `implementation_paths` | core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | Unique hardware owner and explicit remote reset/cache contract |
-| `implementation_status` | pending |
+| `implementation_status` | in_progress |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -677,9 +677,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | audio |
 | `task` | I2S SAI PDM framing and continuous DMA loans |
-| `implementation_paths` | io;soc |
+| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | Frame-slot format and bounded underrun; optional external codec |
-| `implementation_status` | pending |
+| `implementation_status` | in_progress |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |
@@ -693,9 +693,9 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | multimedia |
 | `task` | Camera display accelerator planar and strided buffers |
-| `implementation_paths` | io;soc |
+| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | Frame completion backpressure external memory and 2D DMA ownership |
-| `implementation_status` | pending |
+| `implementation_status` | in_progress |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
 | `maintenance_owner` | Codex |

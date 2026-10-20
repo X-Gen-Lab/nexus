@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e64ef491c1ef0475361cc617219312f750f7c17b0a6aab74bfe541f7b3d41d6a\n"
+"X-Nexus-Source-SHA256: 8267d24a0084316326577f7822ec2fc4cb1b775cc4bf42566ef9e1e0f50ecb3b\n"
 
 msgid "SoC 原专项台账"
 msgstr "Original SoC workstream ledger"
@@ -19,14 +19,14 @@ msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-"
 "refinement-"
-"execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。"
+"execution.csv`；SHA-256：`cc9e4fb4aeb198f48602b124f600529c60b1e5a6bd4282b8f4d048fa3c409641`。"
 msgstr ""
 "This page is derived from the original CSV; it is not a new status "
 "authority, execution record or software qualification. Original IDs, order "
 "and all fields come from the {download}`original ledger <../../design/soc-"
 "refinement-execution.csv>`. Source: `docs/design/soc-refinement-"
 "execution.csv`; SHA-256: "
-"`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`."
+"`cc9e4fb4aeb198f48602b124f600529c60b1e5a6bd4282b8f4d048fa3c409641`."
 
 msgid ""
 "不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
@@ -872,9 +872,6 @@ msgstr "Bootloader and running-state handoff"
 msgid "not_implemented"
 msgstr "not_implemented"
 
-msgid "soc;docs/design/integration-contracts.md"
-msgstr "soc;docs/design/integration-contracts.md"
-
 msgid ""
 "Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry "
 "contract"
@@ -1095,3 +1092,15 @@ msgstr "SOC-55"
 
 msgid "Load endurance"
 msgstr "Load endurance"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "not_qualified"
+msgstr "not_qualified"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
+msgstr "soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md"
+msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md"

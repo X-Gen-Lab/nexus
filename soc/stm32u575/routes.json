@@ -2481,6 +2481,19 @@
         "irq-fifo-rtscts-bytes"
       ],
       "source": "DS13737 Rev10 Table26 Q-column and Table27 exact STM32U575ZIT6Q PA9/PA10/PA11/PA12 AF7; software silicon reference only, no PCB or peer qualification."
+    },
+    {
+      "id": "rtc0-retained-lse-run",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "RTC0",
+      "kind": "rtc",
+      "pins": [],
+      "modes": [
+        "retained-calendar-alarm"
+      ],
+      "source": "RM0456 Rev7 chapter63 and ES0499 Rev12 2.19.3: externally prepared retained LSE32768 BCD24h BYPSHAD PRER127/255, polling AlarmA only. Pinless software ownership reference; no PCB oscillator route or physical qualification."
     }
   ]
 }

@@ -52,7 +52,9 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         'find_package(Nexus CONFIG REQUIRED)\n'
         'add_executable(parent_plain parent.c)\n'
         'nexus_add_firmware(installed_c SOURCES main.c)\n'
-        'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES Nexus::Log Nexus::BMP280 Nexus::Storage)\n'
+        'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES '
+        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC'
+        + (' Nexus::STM32F407Handoff' if arm and chip == "stm32" else '') + ')\n'
         'target_compile_options(installed_cpp PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>")\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n')
@@ -78,16 +80,24 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             ' if (result.primary != NX_SUCCESS) return 1;\n'
             ' return nx_platform_stop() == NX_SUCCESS ? 0 : 2;\n}\n')
     (source / "main.c").write_text(code)
+    handoff = arm and chip == "stm32"
     (source / "main.cpp").write_text(
         '#include "nexus/components/log.h"\n'
         '#include "nexus/components/bmp280.h"\n'
         '#include "nexus/components/storage.h"\n'
-        '#include <cstring>\n' + code.replace(
+        '#include "nexus/components/mapped_storage.h"\n'
+        '#include "nexus/components/mapped_storage_owner.h"\n'
+        '#include "nexus/components/amp_ipc_storage.h"\n'
+        + ('#include "nexus/components/stm32f407_handoff.h"\n' if handoff else '')
+        + '#include <cstring>\n' + code.replace(
             ' nx_platform_start_result_t result',
             ' nx_log_sink_port_t sink;\n std::memset(&sink, 0, sizeof(sink));\n'
             ' if (nx_log_init(nullptr, sink, NX_LOG_INFO) != NX_ERROR_INVALID) return 3;\n'
             ' if (nx_bmp280_compensate(nullptr, 0, 0, nullptr) != NX_ERROR_INVALID) return 4;\n'
-            ' nx_platform_start_result_t result'))
+            ' if (nx_mapped_storage_stop(nullptr) != NX_ERROR_INVALID) return 5;\n'
+            ' if (nx_amp_ipc_send(nullptr, 0, 0, nullptr) != NX_ERROR_INVALID) return 6;\n'
+            + (' if (nx_stm32f407_handoff_initialize(0) != NX_ERROR_INVALID) return 8;\n'
+               if handoff else '') + ' nx_platform_start_result_t result'))
     arguments = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
                  "-DCMAKE_BUILD_TYPE=Release", f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
                  "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF"]
@@ -125,7 +135,10 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     build = directory / (family + " " + backend + " build")
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
-    kernel = " LIBRARIES Nexus::OSFreeRTOS" if backend == "freertos" else ""
+    libraries = ["Nexus::OSFreeRTOS"] if backend == "freertos" else []
+    if family == "h743":
+        libraries.append("Nexus::H743FrameDMA2D")
+    kernel = " LIBRARIES " + " ".join(libraries) if libraries else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
         'project(installed_modern_consumer LANGUAGES C ASM)\n'
@@ -170,6 +183,8 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
             '_Alignas(8) static StackType_t task_stack[128];\n'
             'static void task_entry(void* context) {\n'
             '    (void)context;\n    for (;;) {}\n}\n')
+    if family == "h743":
+        code += '#include "nexus/components/frame_dma2d.h"\n'
     code += (
         'int main(void) {\n'
         '    nx_platform_start_result_t start = nx_platform_start();\n'
@@ -183,6 +198,9 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '    (void)nx_uart_port_submit(console, &request);\n'
         '    (void)nx_uart_port_cancel(console, &request);\n'
         '    nx_uart_port_service(console);\n')
+    if family == "h743":
+        code += ('    if (nx_h743_frame_dma2d_initialize(NULL, NULL, NULL) != '
+                 'NX_ERROR_INVALID) return 9;\n')
     if backend == "freertos":
         code += (
             '    /* Link the actual kernel; software qualification never runs it. */\n'
@@ -257,6 +275,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32u575_provider.h") || '
         '__has_include("stm32u575_uart_rtscts.h") || '
         '__has_include("stm32u575_lptim.h") || '
+        '__has_include("stm32u575_rtc.h") || '
         '__has_include("stm32g474_fdcan.h") || '
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '

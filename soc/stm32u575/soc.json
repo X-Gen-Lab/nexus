@@ -770,6 +770,14 @@
       "resources": [
         "irq:FLASH_IRQn"
       ]
+    },
+    "RTC0": {
+      "kind": "rtc",
+      "modes": [
+        "retained-calendar-alarm"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "reserved_resources": [

@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/soc-refinement-execution.csv)。
-源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。
+源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`cc9e4fb4aeb198f48602b124f600529c60b1e5a6bd4282b8f4d048fa3c409641`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -581,11 +581,11 @@ source_language: zh_CN
 | `priority` | P2 |
 | `scope` | conditional_extension |
 | `task` | Bootloader and running-state handoff |
-| `implementation_status` | not_implemented |
-| `software_status` | not_executed |
+| `implementation_status` | partial_exact_reference_implemented |
+| `software_status` | not_qualified |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc;docs/design/integration-contracts.md |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md |
+| `implementation_paths` | soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md |
 | `exit_condition` | Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry contract |
 | `owner` | codex |
 

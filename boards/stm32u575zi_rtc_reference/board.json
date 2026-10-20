@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "stm32u575zi-rtc-reference",
+  "soc": "STM32U575ZIT6Q",
+  "soc_family": "stm32u575",
+  "source_revision": "RM0456 Rev7 chapter63 and ES0499 Rev12 retained RTC RUN software reference",
+  "physical_pcb_revision": null,
+  "clocks": {},
+  "bindings": [
+    {"id": "rtc0", "controller": "RTC0", "route": "rtc0-retained-lse-run"}
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only reference. No PCB crystal route, fitted oscillator or physical station is asserted.",
+    "External boot owner must prepare and preserve LSE32768 crystal mode with LSEBYP=0 and LSEDRV=2/3, RTCEN/RTCAPBEN, PWREN/DBP, locked WPR with no competing writer, and valid BCD24h BYPSHAD PRER127/255 retained calendar before platform start.",
+    "ES0499 Rev12 2.2.3/16 affect revision X; this revision-unqualified software profile conservatively requires LSEBYP=0 and LSEDRV=2/3 without writing either field. External boot/Board owners exclude PC13 transitions on this LQFP part per section 2.2.1. LSE bypass is unaffected by section 2.2.1 and outside this selected profile.",
+    "Calendar provenance, including intentionally initialized YY00, is an external premise; INITS alone cannot establish it.",
+    "External boot owner owns PC14/PC15 oscillator resources. No selected GPIO owner may use those pads.",
+    "RUN polling only: no calendar set, calibration, backup reset, IRQ wake, Stop2, VBAT persistence or physical HIL qualification."
+  ],
+  "provenance": [
+    {"repository": "https://github.com/STMicroelectronics/cmsis-device-u5", "tree": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8", "scope": "Exact U575 RTC AlarmA/SCR layout, APB3 gate, AHB3 PWR gate, DBPR and BDCR; no PCB facts."}
+  ]
+}

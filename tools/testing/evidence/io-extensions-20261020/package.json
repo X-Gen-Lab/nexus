@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-quality-20261019/tools/testing/evidence/io-extensions-20261020/a066f25e735317e244b61a3214f37b536f89958a0f53bebb541c504f9d53bd1f.tar.gz",
+    "sha256": "a066f25e735317e244b61a3214f37b536f89958a0f53bebb541c504f9d53bd1f",
+    "size": 19834242
+  },
+  "bytes": 86292338,
+  "files": 972,
+  "kind": "portable_evidence",
+  "manifest_sha256": "f4b975ef7f45acb9c6d57d942be590cbf40656868a9512e50ccc4fe1b030c97e",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

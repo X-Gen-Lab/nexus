@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: da37ea0f0c331befeb0652e9f0d4993e74e639133b4e83f95c777adc155b0847\n"
+"X-Nexus-Source-SHA256: 65e565a192d0f5cf317825423990883025cb41715502b5ede30d459cda8c44e5\n"
 
 #: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -2863,3 +2863,23 @@ msgid ""
 "`soc/stm32h743/drivers/uart_duplex.c`"
 msgstr ""
 "`soc/stm32h743/drivers/uart_duplex.c`"
+
+# Generated source identity; unchanged in both locales.
+msgid "retained-calendar-alarm"
+msgstr "retained-calendar-alarm"
+
+# Generated source identity; unchanged in both locales.
+msgid "`rtc0-retained-lse-run`"
+msgstr "`rtc0-retained-lse-run`"
+
+# Generated source identity; unchanged in both locales.
+msgid "`stm32u575zi-rtc-reference`"
+msgstr "`stm32u575zi-rtc-reference`"
+
+# Generated source identity; unchanged in both locales.
+msgid "`tools/configure/assemblies/u575-rtc-run.toml`"
+msgstr "`tools/configure/assemblies/u575-rtc-run.toml`"
+
+# Generated source identity; unchanged in both locales.
+msgid "`soc/stm32u575/drivers/rtc.c`"
+msgstr "`soc/stm32u575/drivers/rtc.c`"

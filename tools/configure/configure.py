@@ -774,9 +774,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     assembly["clock_profile"] not in {
                         "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"})):
                 fail("H743 continuous UART requires baremetal/fixed HSI64")
-            if (family == "stm32u575" and route["kind"] == "lptim" and
+            if (family == "stm32u575" and route["kind"] in {"lptim", "rtc"} and
                     (backend != "baremetal" or assembly["clock_profile"] != "msis4")):
-                fail("U575 LPTIM requires baremetal/fixed MSIS4")
+                fail(f"U575 {route['kind'].upper()} requires baremetal/fixed MSIS4")
             if mode in uart_formats.FIFO_MODES and assembly["clock_profile"] != (
                     "hsi64-fixed-cache-off"
                     if family == "stm32h743" else "msis4"):

@@ -1,0 +1,141 @@
+# Exact extracted message set; independent semantic review recorded separately.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: ba312381753f67dfcdc0885df62f693402d23ad5471a1df858426e39c7c0178f\n"
+
+msgid "Mapped storage, AMP, image handoff, RTC and frame boundaries"
+msgstr "映射存储、AMP、镜像交接、RTC 与帧边界"
+
+msgid "This page explains five bounded software increments and their assembly and ownership contracts. It helps integrators select the exact mechanism and retain storage through failure. These implementations do not complete the original IO-32/37–42 or SOC-33–35 exit conditions. Physical HIL remains `not_executed`; software development results do not establish a clean software candidate."
+msgstr "本页说明五项有界软件增量及其装配和所有权合同，帮助接入者选择精确机制并在失败时保留存储。这些实现没有完成 IO-32/37–42 或 SOC-33–35 的原始退出条件。物理 HIL 仍为 `not_executed`；软件开发结果不建立 clean 软件候选资格。"
+
+msgid "Selection and source identity"
+msgstr "选择与源码身份"
+
+msgid "Increment"
+msgstr "增量"
+
+msgid "Public assembly"
+msgstr "公共装配"
+
+msgid "Current software scope"
+msgstr "当前软件范围"
+
+msgid "Mapped ownership"
+msgstr "映射所有权"
+
+msgid "`Nexus::MappedStorage`; Native-only `Nexus::NativeMappedStorage`"
+msgstr "`Nexus::MappedStorage`；仅 Native 的 `Nexus::NativeMappedStorage`"
+
+msgid "Caller-owned read slots and one writer; coherent Native NOR bytes"
+msgstr "调用方读槽与单个写入者；一致性 Native NOR 字节模型"
+
+msgid "AMP epoch/cache core"
+msgstr "AMP epoch／cache 核心"
+
+msgid "`Nexus::AMPIPC`"
+msgstr "`Nexus::AMPIPC`"
+
+msgid "Explicit unidirectional lanes, caller-owned shared records and hardware ports"
+msgstr "显式单向 lane、调用方共享记录与硬件端口"
+
+msgid "Running-image tail handoff"
+msgstr "运行镜像尾跳交接"
+
+msgid "`Nexus::STM32F407Handoff`"
+msgstr "`Nexus::STM32F407Handoff`"
+
+msgid "Exact STM32F407VET6/ZGT6 baremetal Platform only"
+msgstr "仅精确 STM32F407VET6/ZGT6 裸机 Platform"
+
+msgid "Retained RTC AlarmA"
+msgstr "保留 RTC AlarmA"
+
+msgid "Normal U575 Platform/factory; `u575-rtc-run.toml`"
+msgstr "普通 U575 Platform／factory；`u575-rtc-run.toml`"
+
+msgid "TZEN=0, MSIS4, baremetal, prepared retained LSE calendar, RUN polling"
+msgstr "TZEN=0、MSIS4、裸机、预先准备的保留 LSE 日历、RUN 轮询"
+
+msgid "Frame layouts and DMA2D"
+msgstr "帧布局与 DMA2D"
+
+msgid "`Nexus::IO`; optional `Nexus::H743FrameDMA2D`"
+msgstr "`Nexus::IO`；可选 `Nexus::H743FrameDMA2D`"
+
+msgid "Common frame contracts; exact H743 V, D-Cache off, RGB565 M2M in AXI SRAM"
+msgstr "公共帧合同；精确 H743 V、D-Cache off、AXI SRAM 中 RGB565 M2M"
+
+msgid "Optional component targets are linked explicitly through `nexus_add_firmware(... LIBRARIES ...)`. They do not create factory entries or discover hardware. RTC uses the maintained [assembly](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/u575-rtc-run.toml) and `nx_factory_rtc(NX_RTC_ID_CALENDAR)`. Its pinless software reference Board has unknown PCB identity and does not establish an LSE crystal route. The DMA2D public consumer is an explicit component fixture, without TOML/factory routing."
+msgstr "可选组件目标通过 `nexus_add_firmware(... LIBRARIES ...)` 显式链接，不创建 factory 条目或发现硬件。RTC 使用已维护[装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/u575-rtc-run.toml)和 `nx_factory_rtc(NX_RTC_ID_CALENDAR)`。其无引脚软件参考 Board 的 PCB 身份未知，不建立 LSE 晶振路线。DMA2D 的公共 consumer 是显式组件夹具，没有 TOML／factory 路由。"
+
+msgid "Ownership and progress"
+msgstr "所有权与推进"
+
+msgid "![FIG-23: current software ownership; each labeled arrow denotes a call, supplied storage or proof, and the selected mechanisms are independent](../assets/diagrams/io-extension-ownership.svg)"
+msgstr "![FIG-23：当前软件所有权；每条标注箭头表示调用、提供存储或证明，所选机制彼此独立](../assets/diagrams/io-extension-ownership.svg)"
+
+msgid "FIG-23: current software ownership; each labeled arrow denotes a call, supplied storage or proof, and the selected mechanisms are independent"
+msgstr "FIG-23：当前软件所有权；每条标注箭头表示调用、提供存储或证明，所选机制彼此独立"
+
+msgid "FIG-23 is a current software architecture figure. The external owner supplies storage, serializes each executor, advances service and joins users. Dashed edges show required external ports or proof. No arrow implies automatic enrollment, a hidden worker or one mechanism invoking another. The source basis is the public headers and implementations linked below; the figure establishes no hardware result."
+msgstr "FIG-23 是当前软件架构图。外部 owner 提供存储、串行执行各 executor、推进 service 并 join 用户。虚线边表示必需的外部端口或证明。任何箭头都不表示自动登记、隐藏 worker 或一个机制调用另一个机制。源码依据为下文链接的公共头文件及实现；本图不建立硬件执行结果。"
+
+msgid "Accepted asynchronous requests borrow their metadata and buffers until acquire-observed `SETTLED`. Rejected admission retains no new borrow or residual hardware effects. Cancellation and deadlines request withdrawal; the caller must continue the required service. Failed drain retains `QUARANTINED` storage and recovery responsibility. The provider detaches actual references before its final release-publication. Consumers, controls and observers must also be joined before their own storage is reused. See the [shared lifecycle contract](../explanation/ownership.md)."
+msgstr "已接受的异步请求借用其元数据和缓冲区，直到调用方以 acquire 观察 `SETTLED`。拒绝接纳不保留新借用或残留硬件效果。取消与 deadline 请求撤源；调用方必须继续必需的 service。排空失败保留 `QUARANTINED` 存储和恢复责任。provider 在最后一次 release 发布前撤回真实引用。consumer、control 和 observer 也必须 join，才能复用其自身存储。见[共享生命周期合同](../explanation/ownership.md)。"
+
+msgid "Mapped ownership and coherent Native NOR"
+msgstr "映射所有权与一致性 Native NOR"
+
+msgid "The [public face](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/include/nexus/components/mapped_storage.h) and [owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/include/nexus/components/mapped_storage_owner.h) use exact instance/slot/epoch loans. Copying a token creates no new loan; epochs never wrap. A live supported CPU/XIP/DMA-read loan excludes every PROGRAM/ERASE writer to the entire aperture. All command, cache and DMA writers must use the sole backend. Consumers join before release; failed final unmap retains the exact loan and blocks writers. Stop permanently closes admission and waits for all maps and the writer without revoking them."
+msgstr "[公共 face](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/include/nexus/components/mapped_storage.h)和 [owner](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/include/nexus/components/mapped_storage_owner.h)使用精确实例／槽／epoch 借用。复制 token 不产生新借用；epoch 不回绕。有效且受支持的 CPU／XIP／DMA-read 借用排斥整个 aperture 的所有 PROGRAM／ERASE 写入。全部命令、cache 和 DMA 写入都必须经过唯一 backend。consumer 在 release 前 join；最后一次 unmap 失败会保留精确借用并阻止写入。stop 永久关闭接纳，并等待全部映射和写入者，不撤销借用。"
+
+msgid "Writer admission checks geometry, alignment, overflow and aliasing against owner, slots, backend context and aperture before effects. Accepted PROGRAM retains its input until settlement; partial effects remain visible and are never replayed. After backend recovery, continued service can retry failed drain. The [Native backend](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/include/nexus/components/native_mapped_storage.h) preserves caller bytes, programs only 1-to-0, erases to `0xff` and mutates at most the configured byte quantum per service call. It accepts coherent CPU reads only. Physical QUADSPI/serial memory, SDMMC, XIP/cache/DMA qualification and resource factory assembly remain open."
+msgstr "写入接纳在产生效果前检查几何、对齐、溢出，以及与 owner、槽、backend context 和 aperture 的别名。已接受的 PROGRAM 保留输入直到结束；部分效果保持可见且绝不重放。backend 恢复后，继续 service 可以重试失败的排空。[Native backend](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/mapped_storage/include/nexus/components/native_mapped_storage.h)保留调用方字节，只允许 1-to-0 编程，擦除为 `0xff`，每次 service 最多修改配置的字节 quantum。它仅接受一致性 CPU 读。物理 QUADSPI／串行存储、SDMMC、XIP／cache／DMA 资格和资源 factory 装配仍未完成。"
+
+msgid "AMP epoch/cache lanes"
+msgstr "AMP epoch／cache lane"
+
+msgid "The [AMP API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/amp_ipc/include/nexus/components/amp_ipc.h) and [caller-storage constructor](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/amp_ipc/include/nexus/components/amp_ipc_storage.h) use separate offer and ACK cache lines, exact peer/local boot epochs and a nonwrapping slot sequence. One serialized privileged Thread executes each lane role. The caller supplies storage, coherent acquire/release control access, cache clean/invalidate and a unique hardware-role claim. The configured power-of-two cache granule is 1..64 B and divides 64 B. The claim port rejects a reused or non-increasing local boot epoch, including after normal join. Authoritative nonzero boot-epoch history must survive CPU/whole-device resets and fail closed at exhaustion."
+msgstr "[AMP API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/amp_ipc/include/nexus/components/amp_ipc.h)与[调用方存储构造器](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/amp_ipc/include/nexus/components/amp_ipc_storage.h)使用独立 offer 和 ACK cache line、精确 peer／local boot epoch 及不回绕的槽序号。每个 lane 角色由一个串行化特权 Thread 执行。调用方提供存储、一致性 acquire／release control 访问、cache clean／invalidate 和唯一硬件角色 claim。配置的 cache granule 为 1..64 B 的二次幂且整除 64 B。claim 端口拒绝复用或不递增的 local boot epoch，包括正常 join 之后。权威非零 boot-epoch 历史必须跨 CPU／整机复位保留，并在耗尽时关闭接纳。"
+
+msgid "Accepted send retains its payload until an acquire-observed exact epoch-pair/sequence ACK or explicit proof that the old peer's CPU, DMA, IRQ and observers can never again access the exact lane/payload under that execution epoch. Elapsed timeouts never release a loan; observing a changed peer epoch faults and closes the lane. Restoring an old shared word cannot reopen it. Receive invalidates descriptors and payload before producing a readonly view. The caller joins readers before `finish`; a valid `finish` consumes that view even if ACK cache clean or epoch validation fails, while local state remains retained for retry or recovery. `close` blocks admission; `join` waits for ACKs and finished views; `reset_join` additionally requires exact peer-stop proof. There is no cancel or blocking-wait API. Exact multicore target, cache attributes, atomicity and resource partition are unselected; single-core H743 is not an AMP target."
+msgstr "已接受的 send 保留 payload，直到 acquire 观察到精确 epoch 对／序号 ACK，或显式证明旧 peer 的 CPU、DMA、IRQ 和 observer 在该执行 epoch 下永远无法再次访问精确 lane／payload。超时已过绝不 release 借用；观察到 peer epoch 改变会使 lane fault 并关闭。恢复旧共享字不能重新打开 lane。receive 在生成只读 view 前 invalidate 描述符和 payload。调用方在 `finish` 前 join 读者；有效 `finish` 即使在 ACK cache clean 或 epoch 校验失败时也会消费该 view，而本地状态继续保留以供重试或恢复。`close` 阻止接纳；`join` 等待 ACK 和已完成 view；`reset_join` 还要求精确 peer-stop 证明。没有 cancel 或阻塞 wait API。精确多核目标、cache 属性、原子性和资源划分尚未选择；单核 H743 不是 AMP 目标。"
+
+msgid "F407 masked tail handoff and clock barrier"
+msgstr "F407 屏蔽中断尾跳与时钟 barrier"
+
+msgid "The [handoff component](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h) reuses the existing ClockDomain barrier. Initialize once, explicitly enroll every owner, close admission, cancel/drain/join all users, stop the actual Platform and release exact leases. An empty foreign domain, stale epoch or retained lease rejects. The domain cannot discover unenrolled users or other bus masters."
+msgstr "[交接组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h)复用既有 ClockDomain barrier。初始化一次，显式登记每个 owner，关闭接纳，cancel／drain／join 全部用户，停止实际 Platform，再 release 精确 lease。空的外来 domain、过期 epoch 或保留 lease 均拒绝。domain 不能发现未登记用户或其他 bus master。"
+
+msgid "The caller enters privileged MSP Thread with `PRIMASK=1`, `BASEPRI=FAULTMASK=0` and `CONTROL=0`. It must establish stopped System, HSI16/reset buses, no active FP/lazy context or MPU, no enabled/pending/active SysTick/NVIC source, no live peripheral/DMA gate and idle Flash with `ACR=0` (ART/prefetch disabled). Rejection preserves masks and writes no MMIO; reading SysTick CTRL consumes COUNTFLAG. The 98-entry Flash vector table is 512 B aligned and fits the exact generated/observed 512 KiB or 1 MiB density. MSP is 8 B aligned in `(0x20000000,0x20020000]`; Thumb PC's first halfword lies in physical Flash. Shared device ID `0x413` cannot establish exact-part/PCB identity. The caller excludes NMI/HardFault, debugger and other masters throughout transfer."
+msgstr "调用方从特权 MSP Thread 进入，要求 `PRIMASK=1`、`BASEPRI=FAULTMASK=0` 和 `CONTROL=0`。调用方必须建立 System 已停止、HSI16／复位总线、无活动 FP／lazy context 或 MPU、无 enabled／pending／active SysTick／NVIC 源、无活动外设／DMA gate 且 Flash 空闲，`ACR=0`（ART／prefetch 禁用）。拒绝保持中断屏蔽并且不写 MMIO；读取 SysTick CTRL 会消费 COUNTFLAG。98 项 Flash 向量表按 512 B 对齐，并完整位于精确生成／观测的 512 KiB 或 1 MiB 容量内。MSP 在 `(0x20000000,0x20020000]` 中按 8 B 对齐；Thumb PC 的首个半字位于物理 Flash。共享器件 ID `0x413` 不能建立精确型号／PCB 身份。调用方在整个交接期间排除 NMI／HardFault、调试器和其他 master。"
+
+msgid "Successful tail transfer never returns: it sets VTOR, disables CP10/11 with barriers, clears CONTROL/PSP, replaces MSP and branches while masked. Main SRAM persists until target startup. The target accepts masked entry and resets controllers before enabling gates; no source deadline survives. Image selection, authentication, partitions and recovery stay external. Live RTOS/FPU adoption, H743/cache handoff, DVFS and deep-STOP continuity remain open."
+msgstr "尾跳成功后不返回：它设置 VTOR，经 barrier 禁用 CP10/11，清零 CONTROL／PSP，替换 MSP，并在屏蔽状态分支。主 SRAM 保留到目标启动。目标接受屏蔽入口，并在启用 gate 前复位控制器；源 deadline 均失效。镜像选择、认证、分区和恢复仍属外部。活动 RTOS／FPU 接管、H743／cache 交接、DVFS 和 deep-STOP 连续性仍未完成。"
+
+msgid "U575 retained LSE calendar in RUN"
+msgstr "U575 RUN 中保留 LSE 日历"
+
+msgid "The [RTC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/rtc.c) requires an external boot owner to preserve a valid 24-hour BCD calendar, `BYPSHAD`, prescalers 127/255, actual LSE 32768 Hz, `RTCSEL=LSE`, `RTCEN`, `LSERDY`, `RTCAPBEN`, `PWREN` and `DBP`. Boot hands over locked WPR; it remains locked between calls with no other writer. Calibration, shift, binary mode, another RTC owner and a live RTC vector reject. Accepted service briefly unlocks WPR with CA/53, checks the protected write and unconditionally relocks with FF. The provider does not write calendar, RCC, PWR or TAMP, enable an IRQ or repair/reset the backup domain. Year-00 provenance remains external; INITS cannot prove it. `set` returns `UNSUPPORTED`."
+msgstr "[RTC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/rtc.c)要求外部 boot owner 保留有效 24 小时 BCD 日历、`BYPSHAD`、127/255 预分频、实际 LSE 32768 Hz、`RTCSEL=LSE`、`RTCEN`、`LSERDY`、`RTCAPBEN`、`PWREN` 和 `DBP`。校准、shift、binary 模式、其他 RTC owner 和活动 RTC vector 均拒绝。Boot 以 locked WPR 交接；调用间 WPR 保持 locked，且无其他 writer。已接受的 service 以 CA/53 短暂解锁 WPR，检查受保护写入，并无条件以 FF 重新锁定。provider 不写日历、RCC、PWR 或 TAMP，不启用 IRQ，也不修复／复位 backup domain。年份 00 来源仍属外部；INITS 无法证明它。`set` 返回 `UNSUPPORTED`。"
+
+msgid "Reads try at most eight coherent SSR/TR/DR pairs and preserve output on invalid or unstable data. Natural year 99-to-00 rollover preserves the domain; successful reopen advances a nonwrapping 64-bit domain. AlarmA borrows one request. Core monotonic deadlines remain independent of calendar time. One service phase per call disables ALRAE with readback and a 100 µs Core-time crossing guard, clears and observes ALRAF, then restores saved alarm registers with readback before detaching and settling. Failed disable/clear/restore retains quarantine. Foreign clock/configuration drift permanently retains responsibility for external recovery. This mode provides no Stop2, LPDMA, VBAT-continuity or wake qualification."
+msgstr "读取最多尝试八对一致性 SSR／TR／DR，数据无效或不稳定时保持输出不变。年份 99 自然翻转到 00 保持 domain；成功重开提升不回绕的 64 位 domain。AlarmA 借用一个请求。Core 单调 deadline 独立于日历时间。每次调用推进一个 service 阶段：禁用 ALRAE 并读回，以 100 µs Core 时间保护跨时钟传播，清除并观察 ALRAF，然后恢复保存的 alarm 寄存器并读回，最后撤引用并结束。禁用／清除／恢复失败保留隔离。外来时钟／配置漂移永久保留责任，要求外部恢复。本模式不提供 Stop2、LPDMA、VBAT 连续性或唤醒资格。"
+
+msgid "Complete frames and H743 RGB565 DMA2D"
+msgstr "完整帧与 H743 RGB565 DMA2D"
+
+msgid "The [frame contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/frame_stream.h) binds a copied, checked layout to an existing `nx_stream` pool. Audio layouts retain full stored slots, including inactive SAI slots; PDM uses byte-interleaved lanes and complete eight-frame groups. Planar layouts accept up to four disjoint checked stride intervals. These are data contracts, not SAI/DCMI providers. Publication requires complete frame bytes. Empty acquisition increments a saturating underrun counter without choosing silence/repeat policy. DMA-view release requires actual engine, IRQ and peripheral detachment facts and exact control identity/epoch."
+msgstr "[帧合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/frame_stream.h)将经过复制和检查的布局绑定到既有 `nx_stream` 池。音频布局保留完整存储槽，包括非活动 SAI 槽；PDM 使用字节交织 lane 和完整八帧组。平面布局接受最多四个互不重叠且经过检查的 stride 区间。这些是数据合同，不是 SAI／DCMI provider。发布要求完整帧字节。空 acquire 提升饱和 underrun 计数，不选择静音／重复策略。DMA-view release 要求实际 engine、IRQ 和外设撤引用事实，以及精确 control 身份／epoch。"
+
+msgid "The [DMA2D component](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/frame_dma2d/include/nexus/components/frame_dma2d.h) has one caller-owned executor and no queue. It admits exact H743 V ID `0x20030450`, D-Cache off, exclusive cold DMA2D and RGB565 memory-to-memory transfers with even byte/stride values and hardware pixel/line bounds. Both surfaces must occupy AXI SRAM `[0x24000000,0x24080000)`. Destination writes cannot overlap any source-pool slot's full capacity, including frame tails and other free slots. Acceptance borrows request, live source-frame loan and destination; rejection leaves the original source loan with the caller. Successful completion requires TC and START-clear. Cancel/error drain instead requires START/CLUT/IRQ withdrawal without requiring TC. The provider releases the loan only after this proof and clearing FGMAR/OMAR/NLR. Cancel/deadline starts ABORT without reasserting START; failed proof retains every borrow in quarantine. Continued service can recover real drain. Stop closes admission, starts withdrawal and returns `BUSY` for active work. The caller continues service and retries stop, which resets the controller and withdraws its owned gate."
+msgstr "[DMA2D 组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/frame_dma2d/include/nexus/components/frame_dma2d.h)有一个调用方 executor，没有队列。它仅接纳精确 H743 V ID `0x20030450`、D-Cache off、独占冷态 DMA2D 和 RGB565 memory-to-memory 传输，要求偶数字节／stride 及硬件像素／行数边界。两个 surface 都必须位于 AXI SRAM `[0x24000000,0x24080000)`。目标写入不得重叠任何源池 slot 的完整容量，包括帧尾和其他空闲 slot。接受后借用请求、有效源帧借用和目标；拒绝后原源借用仍属于调用方。成功完成要求 TC 和 START-clear。cancel／error 排空要求 START／CLUT／IRQ 撤回，不要求 TC。provider 只有完成该证明并清零 FGMAR／OMAR／NLR 后才 release 借用。cancel／deadline 启动 ABORT，绝不重新断言 START；证明失败时所有借用继续隔离。继续 service 可以通过真实排空恢复。stop 关闭接纳，启动撤源，活动工作返回 `BUSY`。调用方继续 service 并重试 stop；stop 复位控制器并撤回自有 gate。"
+
+msgid "Validation and remaining exits"
+msgstr "验证与剩余退出条件"
+
+msgid "Maintained regressions are [mapped storage](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/mapped_storage_test.cpp), [AMP](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/amp_ipc_test.cpp), [handoff](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/stm32f407_handoff_test.cpp), [RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/u575_rtc_test.cpp), [frame layouts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/frame_stream_test.cpp) and [DMA2D](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_frame_dma2d_test.cpp). They exercise software contracts and external hardware models; they do not establish electrical, retained-power, multicore or station behavior. Exact execution and frozen-source identities belong in the [compact development evidence](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/io-extensions-20261020/README.md) and delivery records. The original {download}`I/O <io-evolution-execution.csv>` and {download}`SoC <soc-refinement-execution.csv>` ledgers retain their full exits and authoritative status. No exit is narrowed by this page."
+msgstr "已维护回归为[映射存储](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/mapped_storage_test.cpp)、[AMP](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/amp_ipc_test.cpp)、[交接](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/stm32f407_handoff_test.cpp)、[RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/u575_rtc_test.cpp)、[帧布局](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/frame_stream_test.cpp)和 [DMA2D](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_frame_dma2d_test.cpp)。它们检查软件合同和外部硬件模型，不建立电气、保留供电、多核或工位行为。精确执行和冻结源码身份由[紧凑开发证据](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/io-extensions-20261020/README.md)与交付记录维护。原始 {download}`I/O <io-evolution-execution.csv>` 与 {download}`SoC <soc-refinement-execution.csv>` 台账保留完整退出条件和权威状态。本页不缩小任何退出条件。"
+
+msgid "ES0499 Rev12 sections 2.2.3 and 2.2.16 identify oscillator-stop limitations for LSE drive codes 00/01 on revision X; Table 3 marks these limitations repaired on W/U. This reference does not qualify a silicon revision, so its crystal-mode profile requires `LSEBYP=0` and conservatively admits only `LSEDRV=10/11` on every revision. It never writes either field. Section 2.2.1 separately requires external boot and Board owners to exclude PC13 transitions for crystal LSE on this LQFP part. LSE bypass is unaffected by section 2.2.1 and is outside this selected profile. GPIO reads cannot prove that electrical condition, and this software reference declares no PCB route or measured oscillator behavior."
+msgstr "ES0499 Rev12 第2.2.3和2.2.16节记录了 revision X 在 LSE 驱动代码 00/01 下可能停止振荡的限制；表3将 W/U 标为已修复。本参考不限定硅修订版，因此晶体模式配置要求 `LSEBYP=0`，并对所有修订版保守地仅准入 `LSEDRV=10/11`，绝不写入这两个字段。第2.2.1节另要求外部 boot 与 Board owner 在该 LQFP 器件使用晶体 LSE 时排除 PC13 跳变。LSE 旁路不受第2.2.1节影响，并且不属于此选定配置。GPIO 读取不能证明这一电气条件，本软件参考也不声明 PCB 走线或振荡器实测行为。"

@@ -68,6 +68,12 @@ class MaintainedMatrixTests(unittest.TestCase):
                                   for entry in item["selected"]},
                                  {("spi", "SPI4", "dma")} |
                                  ({("uart", "USART3", mode)} if mode else set()))
+            elif item["assembly"] == "tools/configure/assemblies/u575-rtc-run.toml":
+                self.assertEqual((item["family"], item["backend"], item["scope"]),
+                                 ("stm32u575", "baremetal", "public_reference"))
+                self.assertEqual([(entry["kind"], entry["controller"], entry["mode"])
+                                  for entry in item["selected"]],
+                                 [("rtc", "RTC0", "retained-calendar-alarm")])
             elif item["assembly"] == "tools/configure/assemblies/u575-lptim-run.toml":
                 self.assertEqual((item["family"], item["backend"], item["scope"]),
                                  ("stm32u575", "baremetal", "public_reference"))
