@@ -180,6 +180,8 @@ def validate_clock_profiles(soc, provider):
 
 def resolve_interrupts(cpu, irq, backend, provider):
     """Bind logical IRQ range and syscall policy to a maintained kernel port."""
+    # CPU bundle generation imports factory, which imports these shared checks.
+    # Delay this dependency until provider modules have completed initialization.
     try:
         from .. import cpu as profiles
     except ImportError:
@@ -315,7 +317,16 @@ def validate_selection(selection, route, provider, ram_size):
         if not {"channels", "sample_times", "reference_mv"}.issubset(selection):
             fail("ADC requires channels, sample_times and reference_mv")
         channels = sequence(selection["channels"], "ADC channels")
-        expected = [int(pin["pin"][2:]) for pin in route["pins"]]
+        mapping = getattr(provider, "ADC_PIN_CHANNELS", None)
+        if mapping is None:
+            expected = [int(pin["pin"][2:]) for pin in route["pins"]]
+        else:
+            expected = []
+            for pin in route["pins"]:
+                key = (route["controller"], pin["pin"])
+                if key not in mapping:
+                    fail("ADC controller/pin lacks a reviewed channel mapping")
+                expected.append(mapping[key])
         if channels != expected or not channels or len(channels) > 16:
             fail("ADC channel sequence differs from reviewed analog pins")
         for channel in channels:
@@ -333,8 +344,9 @@ def validate_selection(selection, route, provider, ram_size):
         if not mode_traits(kind, selection["mode"]).dma and ({"irq_priority", "calls_os"} & selection.keys()):
             fail("Polling ADC has no IRQ options")
     elif kind == "i2c":
-        if selection.get("max_hz", 100000) != 100000:
-            fail("Only reviewed 100 kHz I2C mode is maintained")
+        limits = provider.LIMITS.get("i2c_hz", (100000, 100000))
+        integer(selection.get("max_hz", 100000), *limits,
+                "Reviewed I2C maximum frequency")
         if mode_traits(kind, selection["mode"]).irq:
             if "irq_priority" not in selection:
                 fail("Asynchronous I2C requires an explicit IRQ priority")

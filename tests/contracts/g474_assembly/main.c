@@ -35,6 +35,14 @@ static void retain_optional_faces(void) {
         s_optional_face = nx_factory_spi(id);
     for (nx_spi_device_id_t id = 0U; id != NX_SPI_DEVICE_ID_COUNT; ++id)
         s_optional_face = nx_factory_spi_device(id);
+    for (nx_adc_id_t id = 0U; id != NX_ADC_ID_COUNT; ++id)
+        s_optional_face = nx_factory_adc(id);
+    for (nx_i2c_id_t id = 0U; id != NX_I2C_ID_COUNT; ++id)
+        s_optional_face = nx_factory_i2c(id);
+    for (nx_i2c_device_id_t id = 0U; id != NX_I2C_DEVICE_ID_COUNT; ++id)
+        s_optional_face = nx_factory_i2c_device(id);
+    for (nx_flash_id_t id = 0U; id != NX_FLASH_ID_COUNT; ++id)
+        s_optional_face = nx_factory_flash(id);
 }
 int main(void) {
     nx_platform_start_result_t start = nx_platform_start();

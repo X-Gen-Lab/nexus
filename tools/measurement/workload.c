@@ -9,6 +9,7 @@
 #include "nexus/core/time.h"
 #include "nexus_bindings.h"
 #include "nexus_config.h"
+#include "nexus_factory.h"
 #if defined(NEXUS_BACKEND_FREERTOS)
 #include "nexus/os/freertos.h"
 #endif
@@ -20,7 +21,8 @@ int main(void) {
         return 1;
     }
 #if defined(NEXUS_WORKLOAD_gpio)
-    if (nx_gpio_port_toggle(nx_binding_led0, NEXUS_LED0_MASK) != NX_SUCCESS) {
+    const nx_gpio_port_t* gpio = nx_factory_gpio(NEXUS_WORKLOAD_GPIO_ID);
+    if (nx_gpio_port_toggle(gpio, NEXUS_WORKLOAD_GPIO_MASK) != NX_SUCCESS) {
         return 2;
     }
 #elif defined(NEXUS_WORKLOAD_uart)
@@ -32,13 +34,7 @@ int main(void) {
         NX_SUCCESS) {
         return 4;
     }
-#if defined(NEXUS_UART3_SELECTED)
-    const nx_uart_port_t* uart = nx_binding_uart3;
-#elif defined(NEXUS_UART1_SELECTED)
-    const nx_uart_port_t* uart = nx_binding_uart1;
-#else
-    const nx_uart_port_t* uart = nx_binding_uart0;
-#endif
+    const nx_uart_port_t* uart = nx_factory_uart(NEXUS_WORKLOAD_UART_ID);
     if (nx_uart_port_submit(uart, &request) != NX_SUCCESS) {
         return 5;
     }

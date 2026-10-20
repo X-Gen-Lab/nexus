@@ -18,6 +18,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/** \brief Configure reviewed PB8/PB9 AF4 open drain; Board owns pull-ups. */
+nx_result_t nx_stm32g474_i2c_pins_prepare(void);
 typedef struct {
     GPIO_TypeDef* registers;
     uint32_t mask;

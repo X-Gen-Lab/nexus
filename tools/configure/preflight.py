@@ -52,9 +52,40 @@ def _modern_selected(result):
     source = []
     pads = {}
     for item in result.controllers:
-        allowed = {"gpio", "uart"} if h7 else {"gpio", "uart", "watchdog"}
+        allowed = {"gpio", "uart", "spi", "pwm", "exti", "watchdog",
+                   "adc", "i2c", "flash"}
         if item.kind not in allowed:
             fail("New SoC cold profile has no maintained controller admission")
+        if h7 and item.kind in {"spi", "pwm"}:
+            register = "APB2ENR" if item.kind == "spi" else "APB1LENR"
+            reset = "APB2RSTR" if item.kind == "spi" else "APB1LRSTR"
+            source += _reject(
+                f"(NX_H743_READ(&RCC->{register}) & RCC_{register}_{item.controller}EN) != 0u || "
+                f"(NX_H743_READ(&RCC->{reset}) & RCC_{reset}_{item.controller}RST) != 0u")
+            if item.kind == "spi":
+                source += _reject(
+                    "(NX_H743_READ(&RCC->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) != 0u")
+        if h7 and item.kind == "exti":
+            line = int(item.controller.removeprefix("EXTI"))
+            source += _reject(
+                "((NX_H743_READ(&EXTI->IMR1) | NX_H743_READ(&EXTI->EMR1) | "
+                "NX_H743_READ(&EXTI->RTSR1) | NX_H743_READ(&EXTI->FTSR1) | "
+                f"NX_H743_READ(&EXTI->PR1)) & {1 << line}u) != 0u || "
+                f"!NX_H743_IRQ_AVAILABLE(EXTI{line}_IRQn)")
+        if h7 and item.kind == "i2c":
+            source += _reject(
+                "(NX_H743_READ(&RCC->APB1LENR) & RCC_APB1LENR_I2C1EN) != 0u || "
+                "(NX_H743_READ(&RCC->APB1LRSTR) & RCC_APB1LRSTR_I2C1RST) != 0u || "
+                "(NX_H743_READ(&RCC->D2CCIP2R) & RCC_D2CCIP2R_I2C123SEL) != 0u")
+        if h7 and item.kind == "adc":
+            source += _reject(
+                "(NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_ADC12EN) != 0u || "
+                "(NX_H743_READ(&RCC->AHB1RSTR) & RCC_AHB1RSTR_ADC12RST) != 0u")
+        if h7 and item.kind == "flash":
+            source += _reject(
+                "((NX_H743_READ(&FLASH->SR1) | NX_H743_READ(&FLASH->SR2)) & "
+                "(FLASH_SR_BSY | FLASH_SR_QW | FLASH_SR_WBNE)) != 0u || "
+                "(NX_H743_READ(&FLASH->OPTSR_CUR) & FLASH_OPTSR_SWAP_BANK_OPT) != 0u")
         if item.kind == "uart":
             if not h7:
                 uart = item.controller
@@ -79,9 +110,42 @@ def _modern_selected(result):
                     f"NX_H743_READ(&DMA1_Stream{lane}->CR) != 0u || "
                     f"NX_H743_READ(&DMAMUX1_Channel{lane}->CCR) != 0u", indent=8)
                 source.append("    }")
+        elif not h7 and item.kind in {"spi", "pwm", "i2c", "adc"}:
+            register = ("APB2ENR" if item.controller == "SPI1" else
+                        "AHB3ENR" if item.controller == "ADC4" else "APB1ENR1")
+            source += _reject(
+                f"(NX_U575_READ(&RCC->{register}) & "
+                f"RCC_{register}_{item.controller}EN) != 0u")
+            if item.kind in {"spi", "i2c"}:
+                source += _reject(f"(NX_U575_READ(&RCC->CCIPR1) & RCC_CCIPR1_{item.controller}SEL) != 0u")
+                if item.kind == "i2c":
+                    source += _reject("(NX_U575_READ(&RCC->CR) & (RCC_CR_HSION | RCC_CR_HSIKERON | RCC_CR_HSIRDY)) != 0u")
+                    source += _reject("(NX_U575_READ(&RCC->ICSCR3) & RCC_ICSCR3_HSITRIM) != RCC_ICSCR3_HSITRIM_4")
+            elif item.kind == "adc":
+                source += _reject("(NX_U575_READ(&RCC->CCIPR3) & RCC_CCIPR3_ADCDACSEL) != 0u || (NX_U575_READ(&RCC->AHB2ENR1) & RCC_AHB2ENR1_ADC12EN) != 0u || (NX_U575_READ(&RCC->AHB3ENR) & RCC_AHB3ENR_PWREN) == 0u || (NX_U575_READ(&NX_U575_PWR->SVMCR) & PWR_SVMCR_ASV) == 0u")
+        elif not h7 and item.kind == "flash":
+            source += _reject("!NX_U575_IRQ_AVAILABLE(FLASH_IRQn)")
+        elif not h7 and item.kind == "exti":
+            line = int(item.controller[-1])
+            source += _reject(f"!NX_U575_IRQ_AVAILABLE((IRQn_Type)EXTI{line}_IRQn)")
+            source += _reject(f"((NX_U575_READ(&EXTI->IMR1) | NX_U575_READ(&EXTI->EMR1) | NX_U575_READ(&EXTI->RTSR1) | NX_U575_READ(&EXTI->FTSR1) | NX_U575_READ(&EXTI->RPR1) | NX_U575_READ(&EXTI->FPR1)) & {1 << line}u) != 0u")
         for pin in item["pins"]:
             name = pin["pin"]
             pads.setdefault(name[1], set()).add(int(name[2:]))
+    if not h7 and "claims" in result:
+        owners = {item.id for item in result.controllers}
+        owners.update(item["id"] for item in result["devices"])
+        for claim in owned_claims(result, owners):
+            if claim["key"].startswith("pin:"):
+                pin = claim["key"][4:]
+                pads.setdefault(pin[1], set()).add(int(pin[2:]))
+    if h7:
+        for item in result.devices:
+            binding = result["board_bindings"].get(item.get("cs_binding"))
+            if binding is not None:
+                for pin in result["routes"][binding["route"]]["pins"]:
+                    name = pin["pin"]
+                    pads.setdefault(name[1], set()).add(int(name[2:]))
     for port, numbers in sorted(pads.items()):
         mask = sum(1 << number for number in numbers)
         if not h7 and port == "G" and mask & ~3:
@@ -112,7 +176,7 @@ def selected(result):
     claims = tuple(owned_claims(result, owners))
     if family == "stm32g474":
         for item in result.controllers:
-            if item.kind in {"uart", "spi", "pwm"}:
+            if item.kind in {"uart", "spi", "pwm", "i2c"}:
                 controller = item.controller
                 register = ("APB1ENR2" if controller == "LPUART1" else
                             "APB2ENR" if controller in {"USART1", "SPI1"} else
@@ -128,7 +192,23 @@ def selected(result):
                     source += _reject(
                         f"(NX_G474_READ(&RCC->CCIPR) & "
                         f"RCC_CCIPR_{controller}SEL) != 0u")
+                if item.kind == "i2c":
+                    source += _reject(
+                        "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_I2C1SEL) != 0u")
+            if item.kind == "adc":
+                source += _reject(
+                    "(NX_G474_READ(&RCC->CCIPR) & RCC_CCIPR_ADC12SEL) != 0u")
+                source += _reject(
+                    "(NX_G474_READ(&RCC->AHB2ENR) & RCC_AHB2ENR_ADC12EN) != 0u")
+                source += _reject(
+                    "(NX_G474_READ(&RCC->AHB2ENR) & RCC_AHB2ENR_ADC345EN) != 0u")
+                if item.mode == "trigger-dma":
+                    source += _reject(
+                        "(NX_G474_READ(&RCC->APB1ENR1) & RCC_APB1ENR1_TIM6EN) != 0u")
         for item in result.controllers:
+            if item.kind == "flash":
+                source += _reject(
+                    "(NX_G474_READ(&FLASH->ECCR) & FLASH_ECCR_ECCIE) != 0u")
             if item.kind == "exti":
                 line = int(item.controller.removeprefix("EXTI"))
                 source += _reject(
@@ -194,6 +274,14 @@ def selected(result):
         if match is None:
             fail("No maintained selected DMA lane admission: " + key)
         dma, lane = match.groups()
+        if family == "stm32g474":
+            source += _reject(
+                f"(NX_G474_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u && "
+                f"NX_G474_READ(&{dma}_Channel{lane}->CCR) != 0u")
+            source += _reject(
+                "(NX_G474_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMAMUX1EN) != 0u && "
+                "NX_G474_READ(&DMAMUX1_Channel0->CCR) != 0u")
+            continue
         control = (f"{dma}_Stream{lane}->CR" if family == "stm32f407" else
                    f"DMA_CHCTL({dma}, DMA_CH{lane})")
         source += _reject(f"({control} & 1u) != 0u")

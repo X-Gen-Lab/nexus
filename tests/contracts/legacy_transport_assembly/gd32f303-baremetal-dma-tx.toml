@@ -1,0 +1,27 @@
+schema = 2
+board = "gd32f303_reference"
+backend = "baremetal"
+clock = "irc8"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[uart.serial]
+binding = "uart0"
+mode = "dma-tx"
+baud = 115200
+
+[uart.serial.rx]
+format = "bytes"
+capacity = 32
+
+[uart.serial.irq]
+priority = 5
+calls_os = false

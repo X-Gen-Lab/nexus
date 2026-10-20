@@ -775,11 +775,20 @@ TEST_F(MultipleFactory, RefusedSelectedVectorJoinRetainsResourcesUntilRetry) {
     unsigned irq = (unsigned)SECONDARY_I2C_RX_IRQ;
     s_refused = &NVIC->ICER[irq / 32U];
     s_hold = 1U << (irq % 32U);
-    EXPECT_EQ(nx_platform_stop(), NX_ERROR_BUSY);
+    EXPECT_EQ(nx_platform_stop(), NX_ERROR_IO);
     EXPECT_TRUE(irq_enabled(SECONDARY_I2C_RX_IRQ));
+    EXPECT_TRUE(i2c_state->initialized);
+    EXPECT_TRUE(i2c_state->stopping);
+    EXPECT_EQ(i2c_state->active, nullptr);
     EXPECT_EQ(nx_platform_start().primary, NX_ERROR_STATE);
+    EXPECT_TRUE(i2c_state->initialized);
     s_refused = nullptr;
     EXPECT_EQ(nx_platform_stop(), NX_SUCCESS);
+    EXPECT_FALSE(i2c_state->initialized);
+    EXPECT_FALSE(irq_enabled(SECONDARY_I2C_RX_IRQ));
+    EXPECT_EQ(nx_platform_start().primary, NX_SUCCESS);
+    EXPECT_TRUE(i2c_state->initialized);
+    EXPECT_FALSE(i2c_state->stopping);
 }
 TEST_F(MultipleFactory, SecondaryActivePublisherCannotBeReusedAfterDisable) {
     ASSERT_EQ(nx_platform_start().primary, NX_SUCCESS);

@@ -1,0 +1,33 @@
+{
+  "commit": "a1996eed9172b59887bafaaa0ea1816ea14d48b5",
+  "files": {
+    "Inc/stm32h7xx_ll_adc.h": {
+      "bytes": 477383,
+      "sha256": "0de1d50a9dd51caca179a2b761f43b24880149516ba3e884b01cbfadc77721a1"
+    },
+    "Inc/stm32h7xx_ll_spi.h": {
+      "bytes": 125330,
+      "sha256": "637d0822e248429fd87182786f1e727860dc52645440405642e08f5df13bf565"
+    },
+    "LICENSE.md": {
+      "bytes": 1485,
+      "sha256": "376c82bcef0be563bf59b93d05cfdd4b6295e4660b55b31dd8a883bf1d6637f7"
+    }
+  },
+  "kind": "nexus-reviewed-official-driver",
+  "license": {
+    "expression": "BSD-3-Clause",
+    "path": "LICENSE.md"
+  },
+  "pairing": {
+    "cmsis_commit": "8f922cdc7cc6de2344e75ddd657889f4ff761790",
+    "cmsis_repository": "https://github.com/STMicroelectronics/cmsis-device-h7.git",
+    "commit": "5abb9764b32e11a6557b90bf39531528019b5761",
+    "release": "v1.13.0",
+    "repository": "https://github.com/STMicroelectronics/STM32CubeH7.git"
+  },
+  "release": "STM32CubeH7-v1.13.0-pinned-driver",
+  "repository": "https://github.com/STMicroelectronics/stm32h7xx_hal_driver.git",
+  "schema_version": 1,
+  "selected_api": "stm32h743-ll-inline"
+}

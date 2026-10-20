@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 import shutil
-import re
 import tempfile
 
 from tools.evidence.common import (EvidenceError, fields, file_identity, load_json,
@@ -72,6 +71,19 @@ def validate_reproduction(report, manifest, resolved, resolver, *, live=True):
     if (spec["source"] != manifest["source"] or evidence["toolchain"] != spec["toolchain"]
             or len(spec["commands"]) != 2):
         raise EvidenceError("reproduction specification/input identity differs")
+    external = spec.get("schema_version") == 2
+    if external:
+        from tools.evidence import consumer
+        consumer.contract(spec["consumer"])
+        if evidence.get("consumer") != spec.get("consumer"):
+            raise EvidenceError("external consumer identity differs from declared source")
+        if live:
+            consumer.verify(spec["consumer"])
+        for key in ("consumer_directory", "consumer_mount"):
+            runs = evidence.get("runs", [])
+            if (len(runs) != 2 or not all(isinstance(run.get(key), str) and
+                    run[key] for run in runs) or runs[0][key] == runs[1][key]):
+                raise EvidenceError("external consumer roots/mounts must be independently distinct")
     environment = load_json(resolver(evidence["environment"]))
     runs = evidence.get("runs")
     if not isinstance(runs, list) or len(runs) != 2:
@@ -83,7 +95,8 @@ def validate_reproduction(report, manifest, resolved, resolver, *, live=True):
             raise EvidenceError("reproduction roots/mounts must be independently distinct")
     if runs[0]["source_snapshot"] != runs[1]["source_snapshot"] or not runs[0]["source_snapshot"]["files"]:
         raise EvidenceError("clean source snapshots differ or are empty")
-    from tools.evidence.common import command
+    from tools.evidence.container import docker_prefix
+    from tools.evidence.reproduce import container_argv
     if (runs[0]["source_package_snapshot"] != runs[1]["source_package_snapshot"] or
             evidence["source_sdk"]["sha256"] != spec["source_sdk"]["sha256"]):
         raise EvidenceError("declared SDK prefixes differ between independent builds")
@@ -108,31 +121,56 @@ def validate_reproduction(report, manifest, resolved, resolver, *, live=True):
                     raise EvidenceError("reproduction artifact leaves the declared clean output")
         if run.get("status") != "passed" or run.get("clean_output") is not True or len(run["commands"]) != 2:
             raise EvidenceError("complete clean build commands required")
-        replacements = {"source": run["source_mount"], "build": run["output_mount"],
-            "toolchain": "/toolchain", "assembly": run["source_mount"] + "/" + spec["assembly"]}
+        if external:
+            from tools.evidence.inputs import records_identity, tree_identity
+            consumer_directory = Path(run["consumer_directory"])
+            for other in (package_directory, output_directory):
+                if (consumer_directory == other or consumer_directory.is_relative_to(other)
+                        or other.is_relative_to(consumer_directory)):
+                    raise EvidenceError("external consumer must be independent of SDK and output")
+            files = run.get("consumer_files")
+            if (not isinstance(files, dict) or "CMakeLists.txt" not in files or
+                    spec["assembly"] not in files):
+                raise EvidenceError("complete external consumer source closure required")
+            records = []
+            for name, identity in files.items():
+                consumer.relative_path(name, "consumer source file")
+                path = resolver(identity)
+                if live and path != regular_file(consumer_directory / name, nonempty=False):
+                    raise EvidenceError("external consumer source leaves declared snapshot")
+                records.append({"path": name, "size": identity["size"],
+                                "sha256": identity["sha256"]})
+            expected = spec["consumer"]["snapshot"]
+            if (records_identity(records) != expected or
+                    run.get("consumer_snapshot") != expected or
+                    (live and tree_identity(consumer_directory) != expected)):
+                raise EvidenceError("external consumer snapshot differs from declared bytes")
+            if (run.get("resolved", {}).get("sha256") != manifest["configuration"]["sha256"] or
+                    (live and resolver(run["resolved"]) != regular_file(
+                        output_directory / consumer.relative_path(spec["resolved"], "resolved configuration")))):
+                raise EvidenceError("external consumer resolved configuration differs from candidate")
         for execution, expected in zip(run["commands"], spec["commands"]):
             argv = execution["argv"]
             if (type(execution.get("exit_code")) is not int or execution["exit_code"] != 0
                     or execution.get("failure") or not isinstance(argv, list)):
                 raise EvidenceError("failed or absent offline execution rejected")
-            if (not isinstance(run.get("container_user"), str) or
-                    not re.fullmatch(r"[0-9]+:[0-9]+", run["container_user"]) or
-                    "--user" not in argv or argv[argv.index("--user") + 1] != run["container_user"]):
-                raise EvidenceError("recorded bind-mount execution user differs from actual argv")
-            if ("--network" not in argv or argv[argv.index("--network") + 1] != "none"
-                    or "--read-only" not in argv or "--cap-drop" not in argv
-                    or argv[argv.index("--cap-drop") + 1] != "ALL"):
-                raise EvidenceError("offline container boundary absent from actual argv")
-            mounts = {argv[index + 1] for index, value in enumerate(argv) if value == "--mount"}
-            expected_mounts = {
-                f"type=bind,src={run['package_directory']},dst={run['package_mount']},readonly",
-                f"type=bind,src={run['output_directory']},dst={run['output_mount']}",
-                f"type=bind,src={spec['toolchain']['path']},dst=/toolchain,readonly"}
-            expanded = command(expected, replacements)
-            if mounts != expected_mounts or argv[-len(expanded):] != expanded:
-                raise EvidenceError("actual build argv differs from declared inputs")
-            if argv[-len(expanded) - 1] != environment["image_config_id"]:
-                raise EvidenceError("offline command used a different OCI image")
+            prefix_length = len(docker_prefix())
+            if len(argv) < prefix_length + 4:
+                raise EvidenceError("complete managed Docker prefix and container name required")
+            # The caller may select a Docker executable, but every other prefix
+            # token and daemon endpoint is fixed. Exact reconstruction rejects
+            # alternate volume syntax, extra options and duplicate flags too.
+            docker = argv[prefix_length - 2]
+            container_name = argv[prefix_length + 3]
+            allowed = [container_argv(spec, run, expected,
+                environment["image_config_id"], container_name=container_name,
+                docker=docker)]
+            if spec.get("schema_version") == 1 and "storage_preflight" not in evidence:
+                allowed.append(container_argv(spec, run, expected,
+                    environment["image_config_id"], container_name=container_name,
+                    docker=docker, legacy=True))
+            if argv not in allowed:
+                raise EvidenceError("actual Docker argv differs from the complete offline boundary")
             resolver(execution["raw"])
         for role in ("elf", "bin"):
             if run["artifacts"][role]["sha256"] != manifest["artifacts"][role]["sha256"]:

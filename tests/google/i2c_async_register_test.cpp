@@ -1,7 +1,9 @@
 /**
  * \file            i2c_async_register_test.cpp
- * \brief           Real V1 asynchronous register algorithms and borrowed
- * storage \author          Nexus Team \version         1.0.0 \date 2026-10-11
+ * \brief           Real V1 asynchronous registers and borrowed storage
+ * \author          Nexus Team
+ * \version         1.0.0
+ * \date            2026-10-11
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "i2c_v1_async.h"
@@ -30,6 +32,7 @@ std::vector<uint32_t> address_dma_windows;
 std::vector<uint8_t> output;
 unsigned data_reads;
 bool hold_dma;
+bool model_privileged;
 
 class I2CAsyncRegisters : public testing::Test {
   protected:
@@ -45,6 +48,20 @@ class I2CAsyncRegisters : public testing::Test {
     nx_i2c_request_t request = {};
     uint8_t bytes[4] = {};
     nx_i2c_message_t message = {bytes, 1U, true};
+    nx_result_t stop_from_wake_result = NX_SUCCESS;
+    /* The provider may retain this wake beyond TestBody after a fatal ASSERT.
+     * Keep its callback and context alive until TearDown has joined it. */
+    const nx_irq_wake_t stop_from_wake = {
+        this,
+        [](void* raw) -> nx_result_t {
+            auto* fixture = static_cast<I2CAsyncRegisters*>(raw);
+            fixture->registers[0] &= ~((1U << 8U) | (1U << 9U));
+            fixture->registers[6] = 0U;
+            nx_i2c_port_service(&fixture->bus);
+            fixture->stop_from_wake_result = nx_i2c_port_stop(&fixture->bus);
+            return NX_SUCCESS;
+        },
+        false};
 
     nx_result_t Initialize() {
 #if defined(NX_I2C_TEST_STM32)
@@ -59,6 +76,7 @@ class I2CAsyncRegisters : public testing::Test {
         model_time = 100U;
         data_reads = 0U;
         hold_dma = false;
+        model_privileged = true;
         input.clear();
         output.clear();
         address_windows.clear();
@@ -91,6 +109,7 @@ class I2CAsyncRegisters : public testing::Test {
         nx_request_initialize(&request.base);
     }
     void TearDown() override {
+        model_privileged = true;
         if (state.active != nullptr) {
             (void)nx_i2c_port_cancel(&bus, &request);
             if (state.dma != nullptr) {
@@ -149,6 +168,47 @@ TEST_F(I2CAsyncRegisters, OneByteNacksBeforeAddressClearAndWaitsStop) {
     nx_i2c_v1_irq(&state);
     EXPECT_EQ(data_reads, 1U);
 }
+TEST_F(I2CAsyncRegisters, UnprivilegedCallsRejectBeforeBorrowOrRegisters) {
+    ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 1000U),
+              NX_SUCCESS);
+    const auto before = std::vector<uint32_t>(registers, registers + 9U);
+    model_privileged = false;
+    EXPECT_EQ(nx_i2c_endpoint_submit(&endpoint, &request), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(nx_i2c_port_recover(&bus), NX_ERROR_CONTEXT);
+    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_ERROR_CONTEXT);
+    EXPECT_EQ(std::vector<uint32_t>(registers, registers + 9U), before);
+    EXPECT_TRUE(state.initialized);
+}
+
+#if !defined(NX_I2C_TEST_STM32) && !defined(NX_I2C_TEST_GD32)
+TEST_F(I2CAsyncRegisters, EightMhzUsesErrataSafeEightyKhzProfile) {
+    ASSERT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
+    state.peripheral_mhz = 8U;
+    ASSERT_EQ(Initialize(), NX_SUCCESS);
+    EXPECT_EQ(registers[7], 50U);
+    EXPECT_EQ(registers[8], 9U);
+}
+TEST_F(I2CAsyncRegisters, FailedVectorWithdrawalRetainsLiveState) {
+    state.stop_irqs = [](void*) -> nx_result_t { return NX_ERROR_IO; };
+    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_ERROR_IO);
+    EXPECT_TRUE(state.initialized);
+    EXPECT_TRUE(state.stopping);
+    state.stop_irqs = nullptr;
+}
+TEST_F(I2CAsyncRegisters, PublisherMustJoinBeforeStopReturnsBorrowedWake) {
+    state.wake = &stop_from_wake;
+    ASSERT_EQ(nx_i2c_request_prepare(&request, &message, 1U, 1000U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_i2c_endpoint_submit(&endpoint, &request), NX_SUCCESS);
+    registers[5] = 1U << 10U;
+    nx_i2c_v1_irq(&state);
+    EXPECT_EQ(stop_from_wake_result, NX_ERROR_BUSY);
+    EXPECT_EQ(state.wake, &stop_from_wake);
+    EXPECT_EQ(nx_i2c_port_stop(&bus), NX_SUCCESS);
+    EXPECT_EQ(state.wake, nullptr);
+}
+#endif
 
 TEST_F(I2CAsyncRegisters, FinalThreeWithdrawsAckBeforeNMinusTwo) {
     message.length = 3U;
@@ -606,6 +666,9 @@ TEST_F(I2CDmaRegisters, UnsafeDmaPublisherPreventsKernelWakeBinding) {
 
 extern "C" nx_time_us_t nx_time_now_us(void) {
     return model_time;
+}
+extern "C" bool nx_i2c_v1_model_privileged(void) {
+    return model_privileged;
 }
 extern "C" uint8_t nx_i2c_v1_model_read(void* raw) {
     auto* state = static_cast<nx_i2c_v1_state_t*>(raw);

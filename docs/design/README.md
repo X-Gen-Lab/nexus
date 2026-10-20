@@ -63,13 +63,16 @@ CPU runtime 不生成 SoC/Board/factory；ThreadX 另有明确的 Native/M4 子�
 首发为启明STM32F407ZGT6、天空星STM32F407VET6和梁山派GD32F470ZGT6，裸机/
 FreeRTOS、显式 ThreadX 及 Native 模型。新增 F103RBT6／GD32F303RCT6 参考及
 G474／H743／U575 增量按各文档的精确配置、完整镜像与 SDK 退出条件验收，不从公共
-类型推断完整系列或全部外设。F103 选定 GPIO、USART2、SPI1、EXTI0/1 和 IWDG；
-GD303 选定 GPIO、USART0、SPI0 和 FWDGT。G474 增加封装 GPIO、六 UART、有限
-SPI1/2、TIM3/4 CH1 固定 PWM 和 IWDG，保留 PA0/PA1 EXTI。H743 的四种固定
-HSI/cache 启动组合支持 USART3 有限 DMA TX 与 RX block，后者需要所有者重启且有间隙，
-不代表循环或连续接收。U575 增加 USART2、受电源准入约束的封装 GPIO 与 IWDG。
-现有 TZEN0 平台与独立 TZEN1
-无 OS 同步 GPIO 双域参考保持分开，后者不代表通用双域 factory、NS RTOS 或异步借用。
+类型推断完整系列或全部外设。F103/GD303 增加有限 UART channel-DMA、I2C IRQ、
+物理 Flash、单次 ADC 与固定 PWM；GD303 另维护 EXTI 和硬件级联 timebase。
+G474 的既有 GPIO/UART/SPI/PWM/IWDG/EXTI 之外，选入 bulb ADC 单次／有限 TIM6
+DMA、I2C1 和 ECC Flash。H743 的固定 HSI/cache 支持有限 TX DMA 或有 rearm
+间隙的 RX block，可显式初始化 D2 SRAM1；另有七类有限外设的软件夹具。U575
+TZEN0 增加 SPI/I2C/ADC/PWM/EXTI/Flash，外部电源与安全状态准入仍适用。
+独立无 OS 的 TZEN1 GPIO 参考可复制最多八条命令到 Secure slot，再由调用者逐步
+推进；不保留 NS 指针，不代表通用双域 factory、NS RTOS 或异步借用。
+ECC `program_flags`、fresh-erase 来源与逐脉冲完成责任见公共 Flash 合同；当前源
+实现和最终集成资格分别记录，不继承历史执行计数。
 SOC-33–35 仍未实现；SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、

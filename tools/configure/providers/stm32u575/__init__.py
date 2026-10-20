@@ -6,6 +6,8 @@ from .. import common
 CPU_ABI = MappingProxyType({
     "arch": "cortex-m33", "fpu": "fpv5-sp-d16", "float_abi": "hard"})
 ENUM_ABI = "short-enums"
+FLASH_PROGRAM_UNIT = 16
+FLASH_INPUT_ALIGNMENT = 1
 IRQ_PRIORITY_BITS = 4
 EXTERNAL_IRQ_COUNT = 126
 DWT_CYCCNT = False
@@ -19,7 +21,7 @@ MODEL = False
 CAN_CONTROLLERS = ()
 ETH_CONTROLLER = None
 USB_CONTROLLER = None
-SPI_REQUIRES_ENDPOINT = False
+SPI_REQUIRES_ENDPOINT = True
 DMA_VECTOR = None
 DMA_TOPOLOGY = (frozenset(), range(0), range(0))
 DMA_MEMORY_ENGINES = ("GPDMA1", "LPDMA1")
@@ -27,11 +29,17 @@ CLOCK_PROFILES = MappingProxyType({
     "msis4": MappingProxyType({
         "source": "msis", "input_hz": 4000000, "core_hz": 4000000,
         "apb1_hz": 4000000, "apb2_hz": 4000000})})
-LIMITS = MappingProxyType({"uart_baud": (62, 250000)})
+LIMITS = MappingProxyType({"uart_baud": (62, 250000),
+                           "spi_hz": (15625, 2000000),
+                           "pwm_period": 65535, "timer_hz": 4000000})
+ADC_PIN_CHANNELS = MappingProxyType({("ADC4", "PC0"): 1})
 _MODES = MappingProxyType({
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
-    ("watchdog", "independent"): "watchdog"})
+    ("watchdog", "independent"): "watchdog",
+    ("spi", "short-poll"): "spi", ("i2c", "poll-messages"): "i2c",
+    ("adc", "single-shot"): "adc", ("pwm", "fixed-pwm"): "pwm",
+    ("exti", "edge-event"): "exti", ("flash", "poll-word"): "flash"})
 _GPIO_MASKS = MappingProxyType({
     "GPIOA": 0xffff, "GPIOB": 0xefff, "GPIOC": 0xffcf,
     "GPIOD": 0xffff, "GPIOE": 0xffff, "GPIOF": 0xffff,
@@ -90,6 +98,54 @@ def validate_selection(selection, route):
     elif kind == "watchdog":
         if route["controller"] != "IWDG" or route["pins"]:
             common.fail("Only the pinless independent IWDG is maintained")
+    else:
+        reviewed = {
+            "spi": ("SPI1", (("PA5", "sck", 5), ("PA6", "miso", 5),
+                             ("PA7", "mosi", 5))),
+            "i2c": ("I2C1", (("PB8", "scl", 4), ("PB9", "sda", 4))),
+            "pwm": ("TIM3", (("PA6", "ch1", 2),)),
+            "adc": ("ADC4", (("PC0", "analog", 0),)),
+            "flash": ("FLASH", ())}
+        actual = tuple((pin["pin"], pin["function"], pin["af"])
+                       for pin in route["pins"])
+        if kind == "exti":
+            controller = route["controller"]
+            if controller not in {"EXTI0", "EXTI1"} or actual != (
+                    ("PA" + controller[-1], "input", 0),):
+                common.fail("U575 EXTI requires exact PA0/PA1 independent vector")
+            if selection.get("edge") not in {"rising", "falling", "both"}:
+                common.fail("U575 EXTI requires explicit raw edge selection")
+            common.integer(selection.get("event_capacity"), 1, 4096,
+                           "U575 event capacity")
+            common.integer(selection.get("irq_priority"), 0, 15,
+                           "U575 EXTI IRQ priority")
+        elif (route["controller"], actual) != reviewed[kind]:
+            common.fail("U575 selected peripheral requires exact reviewed route")
+        if kind == "spi":
+            common.integer(selection.get("max_hz"), *LIMITS["spi_hz"],
+                           "U575 SPI frequency")
+        elif kind == "i2c":
+            common.integer(selection.get("max_hz", 100000), 100000, 100000,
+                           "U575 I2C maximum frequency")
+        elif kind == "adc":
+            channels = selection.get("channels")
+            samples = selection.get("sample_times")
+            if (not isinstance(channels, (list, tuple)) or
+                    not isinstance(samples, (list, tuple)) or
+                    tuple(channels) != (1,) or tuple(samples) != (7,) or
+                    any(type(value) is not int for value in (*channels, *samples))):
+                common.fail("U575 ADC4 supports PC0/channel1 and samplecode7 only")
+            common.integer(selection.get("reference_mv"), 1000, 3600,
+                           "U575 nominal reference")
+        elif kind == "pwm":
+            tick = common.integer(selection.get("tick_hz"), 1, 4000000,
+                                  "U575 PWM tick")
+            if 4000000 % tick or 4000000 // tick > 65536:
+                common.fail("U575 PWM tick must divide the4MHz timer clock")
+            period = common.integer(selection.get("period_ticks"), 1, 65535,
+                                    "U575 PWM period")
+            common.integer(selection.get("duty_ticks"), 0, period,
+                           "U575 PWM duty")
 
 
 def validate_dma(route, mode, normalize):

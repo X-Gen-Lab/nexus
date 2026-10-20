@@ -8,6 +8,8 @@
  */
 #ifndef NX_GD32F303_PROVIDER_H
 #define NX_GD32F303_PROVIDER_H
+#include "gd32f303_devices.h"
+#include "gd32f303_exti.h"
 #include "gd32f303_system.h"
 #include "nexus/io/gpio.h"
 #include "nexus/io/spi.h"

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Verify fixed reviewed official CMSIS-device source and original notices.
 
-Only the selected part's five original upstream files belong to the component
-source closure. A clean full Git checkout establishes its official provenance;
+Only each selected part's explicitly reviewed original upstream files belong
+to the component source closure. A clean full Git checkout establishes its official provenance;
 an installed source SDK requires independent full-manifest verification instead.
 Neither source proof qualifies a driver, a firmware image or a physical Board.
 """
@@ -45,6 +45,7 @@ REVIEWED_DEVICES = {
             "Include/stm32h743xx.h", "Include/stm32h7xx.h",
             "Include/system_stm32h7xx.h",
             "Source/Templates/gcc/startup_stm32h743xx.s", "LICENSE.md",
+            "Source/Templates/system_stm32h7xx.c",
         }),
     },
     "STM32U575ZIT6Q": {

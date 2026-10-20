@@ -4,45 +4,30 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
+from contextlib import contextmanager
 import os
 from pathlib import Path
+import re
 import shutil
 import signal
+import stat
 import subprocess
 import sys
+import tempfile
 import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tools.evidence.common import (EvidenceError, atomic_json, command,
-    fields, file_identity, load_json, regular_file, stream_digest, verify_file_identity)
+    fields, file_identity, load_json, regular_file, verify_file_identity)
+from tools.evidence import consumer
+from tools.evidence import storage
 from tools.evidence.container import docker_prefix, verify as verify_environment
 from tools.evidence.identity import (git_source, verify_source, verify_sdk_package,
                                      resolved_identity)
+from tools.evidence.inputs import tree_identity
 from tools.measurement.elf import Elf32, binary_from_elf
 from tools.measurement.resources import resolved_float_abi, validate_elf_configuration
-
-
-def tree_identity(root: Path) -> dict:
-    if root.is_symlink() or not root.is_dir():
-        raise EvidenceError("declared input directory missing or symlink")
-    records = []
-    for path in sorted(root.rglob("*")):
-        if path.is_symlink():
-            raise EvidenceError("undeclared symlink in input tree")
-        if path.is_file():
-            with path.open("rb") as stream:
-                sha256 = stream_digest(stream)
-            records.append({"path": path.relative_to(root).as_posix(),
-                            "size": path.stat().st_size,
-                            "sha256": sha256})
-    if not records:
-        raise EvidenceError("empty declared input directory")
-    encoded = json.dumps(records, sort_keys=True, separators=(",", ":")).encode()
-    return {"sha256": hashlib.sha256(encoded).hexdigest(), "files": len(records),
-            "bytes": sum(entry["size"] for entry in records)}
 
 
 def copy_tracked(source: Path, destination: Path) -> dict:
@@ -200,34 +185,42 @@ def run_container_logged(argv: list[str], log: Path, *, container_name: str,
 
 
 def validate_spec(spec: dict) -> None:
-    fields(spec, {"schema_version", "source", "environment", "toolchain",
-        "assembly", "commands", "artifacts", "source_date_epoch", "source_sdk"})
-    if type(spec["schema_version"]) is not int or spec["schema_version"] != 1:
+    version = spec.get("schema_version")
+    if type(version) is not int or version not in {1, 2}:
         raise EvidenceError("unsupported reproduction schema")
+    fields(spec, {"schema_version", "source", "environment", "toolchain",
+        "assembly", "commands", "artifacts", "source_date_epoch", "source_sdk"} |
+        ({"consumer", "resolved"} if version == 2 else set()))
     verify_source(spec["source"], clean=True)
     verify_source_sdk(spec["source_sdk"], spec["source"])
+    if version == 2:
+        consumer.verify(spec["consumer"])
+        consumer.relative_path(spec["resolved"], "resolved configuration")
+        root = Path(spec["consumer"]["source"]["root"]) / spec["consumer"]["project"]
+        regular_file(root / consumer.relative_path(spec["assembly"], "consumer assembly"))
     fields(spec["toolchain"], {"path", "sha256", "files", "bytes"})
     actual = tree_identity(Path(spec["toolchain"]["path"]))
     if actual != {key: spec["toolchain"][key] for key in actual}:
         raise EvidenceError("declared toolchain tree differs from actual bytes")
-    if type(spec["source_date_epoch"]) is not int or spec["source_date_epoch"] < 0:
+    if (type(spec["source_date_epoch"]) is not int or
+            not 0 <= spec["source_date_epoch"] <= 0xffffffff):
         raise EvidenceError("nonnegative SOURCE_DATE_EPOCH required")
     if not isinstance(spec["commands"], list) or not spec["commands"]:
         raise EvidenceError("nonempty build command enumeration required")
     for argv in spec["commands"]:
         command(argv, {key: "/declared/" + key for key in
-                      ("source", "build", "toolchain", "assembly")})
+                      ("source", "build", "toolchain", "assembly", "sdk", "consumer")})
     if not isinstance(spec["artifacts"], dict) or set(spec["artifacts"]) != {"elf", "bin"}:
         raise EvidenceError("actual ELF and BIN comparison required")
     for value in [spec["assembly"], *spec["artifacts"].values()]:
-        if (not isinstance(value, str) or not value or Path(value).is_absolute()
-                or ".." in Path(value).parts or "," in value):
-            raise EvidenceError("declared artifact/assembly must be contained relative path")
+        consumer.relative_path(value, "declared artifact/assembly")
 
 
-def validate_build_artifacts(build: Path, artifacts: dict) -> None:
+def validate_build_artifacts(build: Path, artifacts: dict,
+                             resolved_path: str = "generated/resolved.json") -> None:
     """Recheck the actual linked ELF/BIN against this build's resolved input."""
-    resolved, _ = resolved_identity(build / "generated/resolved.json")
+    resolved, _ = resolved_identity(build / consumer.relative_path(
+        resolved_path, "resolved configuration"))
     flash = resolved["flash"]
     elf = Elf32(Path(artifacts["elf"]["path"]).read_bytes(),
                 float_abi=resolved_float_abi(resolved))
@@ -237,7 +230,133 @@ def validate_build_artifacts(build: Path, artifacts: dict) -> None:
         raise EvidenceError("offline BIN bytes differ from linked ELF")
 
 
+def container_argv(spec: dict, run: dict, expected: list[str], image: str, *,
+                   container_name: str, docker: str = "docker",
+                   legacy: bool = False) -> list[str]:
+    """Build the complete offline Docker boundary for production and proof.
+
+    `legacy` admits only the exact schema-1 shape before storage admission added
+    disabled daemon logging. Proof callers additionally require that the report
+    has no storage_preflight; new execution always uses the current boundary.
+    This pure function does not access the old host paths in archived receipts.
+    """
+    version = spec.get("schema_version")
+    if (type(version) is not int or version not in {1, 2} or
+            type(legacy) is not bool or (legacy and version != 1)):
+        raise EvidenceError("unsupported offline Docker boundary version")
+    if (not isinstance(container_name, str) or len(container_name) > 128 or
+            not re.fullmatch(r"nexus-[a-z0-9][a-z0-9_-]*", container_name)):
+        raise EvidenceError("bounded named Nexus reproduction container required")
+    if (not isinstance(docker, str) or not docker or len(docker) > 4096 or
+            docker.startswith("-") or any(character in docker for character in "\0\r\n") or
+            (not Path(docker).is_absolute() and
+             not re.fullmatch(r"[A-Za-z0-9_.-]+", docker))):
+        raise EvidenceError("one explicit Docker executable required")
+    if not isinstance(image, str) or not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
+        raise EvidenceError("immutable OCI image config identity required")
+    epoch = spec.get("source_date_epoch")
+    if type(epoch) is not int or not 0 <= epoch <= 0xffffffff:
+        raise EvidenceError("bounded SOURCE_DATE_EPOCH required")
+    user = run.get("container_user")
+    if (not isinstance(user, str) or not re.fullmatch(r"[0-9]{1,10}:[0-9]{1,10}", user) or
+            any(int(value) > 0xffffffff for value in user.split(":"))):
+        raise EvidenceError("bounded explicit bind-mount UID:GID required")
+
+    def absolute_path(value):
+        if (not isinstance(value, str) or not value or len(value) > 4096 or
+                any(character in value for character in ",\0\r\n") or
+                not Path(value).is_absolute() or value == "/" or
+                any(part in {"", ".", ".."} for part in value[1:].split("/"))):
+            raise EvidenceError("canonical absolute Docker boundary path required")
+        return value
+
+    package = absolute_path(run["package_directory"])
+    package_mount = absolute_path(run["package_mount"])
+    build = absolute_path(run["output_directory"])
+    build_mount = absolute_path(run["output_mount"])
+    toolchain = absolute_path(spec["toolchain"]["path"])
+    source_mount = absolute_path(run["source_mount"])
+    if source_mount != package_mount + "/share/nexus/src":
+        raise EvidenceError("source mount must belong to the complete SDK prefix")
+    assembly = consumer.relative_path(spec["assembly"], "reproduction assembly").as_posix()
+    replacements = {"source": source_mount, "build": build_mount,
+        "toolchain": "/toolchain", "sdk": package_mount,
+        "assembly": source_mount + "/" + assembly}
+    mounts = [(package, package_mount, True), (build, build_mount, False),
+              (toolchain, "/toolchain", True)]
+    if version == 2:
+        consumer_directory = absolute_path(run["consumer_directory"])
+        consumer_mount = absolute_path(run["consumer_mount"])
+        mounts.append((consumer_directory, consumer_mount, True))
+        replacements.update(consumer=consumer_mount,
+                            assembly=consumer_mount + "/" + assembly)
+    for index, (_, destination, _) in enumerate(mounts):
+        for _, other, _ in mounts[:index]:
+            if (Path(destination).is_relative_to(other) or
+                    Path(other).is_relative_to(destination)):
+                raise EvidenceError("Docker boundary mount destinations must be independent")
+    argv = [*docker_prefix(docker), "run", "--rm", "--name", container_name,
+        "--user", user, "--network", "none", "--read-only",
+        *([] if legacy else ["--log-driver", "none"]),
+        "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
+        "--pids-limit", "256", "--tmpfs", "/tmp:rw,nosuid,nodev,size=256m",
+        "--env", "HTTP_PROXY=", "--env", "HTTPS_PROXY=",
+        "--env", "ALL_PROXY=", "--env", "http_proxy=",
+        "--env", "https_proxy=", "--env", "all_proxy=",
+        "--env", "SOURCE_DATE_EPOCH=" + str(epoch), "--env", "LC_ALL=C",
+        "--env", "TZ=UTC"]
+    for host, destination, readonly in mounts:
+        argv += ["--mount", f"type=bind,src={host},dst={destination}" +
+                 (",readonly" if readonly else "")]
+    argv += ["--workdir", build_mount, image, *command(expected, replacements)]
+    return command(argv)
+
+
+@contextmanager
+def storage_lease(path: Path | None = None):
+    """Serialize daemon-owned copies; never unlink the shared lock inode."""
+    if os.name != "posix":
+        raise EvidenceError("formal Docker storage admission requires POSIX locking")
+    import fcntl
+    path = path or Path(tempfile.gettempdir()) / (
+        "nexus-offline-reproduction-" + str(os.getuid()) + ".lock")
+    descriptor = None
+    locked = False
+    try:
+        descriptor = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+    except OSError as error:
+        raise EvidenceError("cannot acquire the regular Docker storage lease") from error
+    try:
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid():
+            raise EvidenceError("storage lease must be a regular file owned by this user")
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            locked = True
+        except BlockingIOError as error:
+            raise EvidenceError("another offline reproduction is already active") from error
+        yield
+    finally:
+        if descriptor is not None:
+            if locked:
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+            os.close(descriptor)
+
+
 def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> dict:
+    try:
+        with storage_lease():
+            return _reproduce(spec_path, report_path, docker=docker)
+    except EvidenceError as error:
+        report = {"schema_version": 1, "kind": "offline_clean_rebuild",
+            "status": "failed", "hermetic_status": "not_established",
+            "reproducible_status": "not_established", "runs": [],
+            "physical_status": "not_executed", "failure": str(error)}
+        atomic_json(report_path, report)
+        return report
+
+
+def _reproduce(spec_path: Path, report_path: Path, *, docker: str) -> dict:
     spec = load_json(spec_path)
     report = {"schema_version": 1, "kind": "offline_clean_rebuild",
               "status": "failed", "hermetic_status": "not_established",
@@ -253,16 +372,32 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
         report["environment"] = file_identity(spec["environment"])
         report["toolchain"] = spec["toolchain"]
         report["source_sdk"] = spec["source_sdk"]
+        if "consumer" in spec:
+            report["consumer"] = spec["consumer"]
         report["declared_input_boundary"] = {
             "source": "verified complete publishable source SDK from the clean Git tree, read-only",
             "toolchain": "declared content-hashed tree, read-only",
             "environment": "verified OCI root filesystem",
             "network": "none", "credentials": "no host credential mounts",
             "outputs": "independent empty build directory per run"}
+        if "consumer" in spec:
+            report["declared_input_boundary"]["consumer"] = (
+                "separate clean Git project; tracked regular files only, read-only")
         runs_root = report_path.absolute().parent / (report_path.stem + "-runs")
         if runs_root.exists():
             raise EvidenceError("reproduction needs new independent clean run roots")
         runs_root.mkdir(parents=True)
+        try:
+            preflight = storage.inspect(environment["image_config_id"], docker=docker,
+                read_only=True, tmpfs_bytes=256 * storage.MIB,
+                daemon_log_driver="none")
+        except EvidenceError as error:
+            report["storage_inspection_fallback"] = str(error)
+            preflight = storage.probe(environment["image_config_id"],
+                output=runs_root / "storage-probe", runner=run_logged, docker=docker)
+        report["storage_preflight"] = preflight
+        if preflight.get("admitted_concurrency") != 1:
+            raise EvidenceError("physical Docker storage preflight did not admit one container")
         for index in range(2):
             run_root = runs_root / ("run-a" if index == 0 else "different-path-b")
             run_root.mkdir()
@@ -270,16 +405,11 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
             package_identity = copy_source_sdk(spec["source_sdk"], spec["source"], package_snapshot)
             snapshot = package_snapshot / "share/nexus/src"
             snapshot_identity = tree_identity(snapshot)
-            regular_file(snapshot / spec["assembly"])
             build = run_root / "build"
             build.mkdir()
             mount_package = "/inputs/sdk-a" if index == 0 else "/other/sdk-b"
             mount_source = mount_package + "/share/nexus/src"
             mount_build = "/work/build-a" if index == 0 else "/different/build-b"
-            mount_toolchain = "/toolchain"
-            replacements = {"source": mount_source, "build": mount_build,
-                "toolchain": mount_toolchain,
-                "assembly": mount_source + "/" + spec["assembly"]}
             run = {"source_snapshot": snapshot_identity,
                    "source_package_snapshot": package_identity,
                    "package_directory": str(package_snapshot), "package_mount": mount_package,
@@ -288,22 +418,35 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
                    "clean_output": True, "container_user": container_user, "commands": [],
                    "artifacts": {}, "status": "failed"}
             report["runs"].append(run)
+            if "consumer" in spec:
+                consumer_snapshot = run_root / "consumer"
+                consumer_identity = consumer.copy(spec["consumer"], consumer_snapshot)
+                mount_consumer = "/inputs/consumer-a" if index == 0 else "/other/consumer-b"
+                regular_file(consumer_snapshot / spec["assembly"])
+                from tools.evidence.proof import sdk_file_identity
+                run.update(consumer_directory=str(consumer_snapshot),
+                    consumer_mount=mount_consumer, consumer_snapshot=consumer_identity,
+                    consumer_files={path.relative_to(consumer_snapshot).as_posix():
+                        sdk_file_identity(path) for path in sorted(consumer_snapshot.rglob("*"))
+                        if path.is_file()})
+            else:
+                regular_file(snapshot / spec["assembly"])
             for number, argv in enumerate(spec["commands"]):
-                expanded = command(argv, replacements)
+                admission = storage.plan(driver=preflight["driver"],
+                    image_size_bytes=preflight["image_size_bytes"],
+                    image_root_bytes=preflight["image_root_bytes"],
+                    free_bytes=storage.free_space(Path(preflight["docker_root"])),
+                    reserve_bytes=preflight["reserve_bytes"],
+                    build_bytes=preflight["build_reserve_bytes"],
+                    read_only=True, tmpfs_bytes=256 * storage.MIB,
+                    daemon_log_driver="none")
+                run.setdefault("storage_admissions", []).append(admission)
+                if admission["admitted_concurrency"] != 1:
+                    raise EvidenceError("available physical storage fell below the container budget")
                 container_name = "nexus-repro-" + os.urandom(8).hex()
-                docker_argv = [*docker_prefix(docker), "run", "--rm", "--name",
-                    container_name, "--user", container_user, "--network", "none", "--read-only",
-                    "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
-                    "--pids-limit", "256", "--tmpfs", "/tmp:rw,nosuid,nodev,size=256m",
-                    "--env", "HTTP_PROXY=", "--env", "HTTPS_PROXY=",
-                    "--env", "ALL_PROXY=", "--env", "http_proxy=",
-                    "--env", "https_proxy=", "--env", "all_proxy=",
-                    "--env", "SOURCE_DATE_EPOCH=" + str(spec["source_date_epoch"]),
-                    "--env", "LC_ALL=C", "--env", "TZ=UTC",
-                    "--mount", f"type=bind,src={package_snapshot},dst={mount_package},readonly",
-                    "--mount", f"type=bind,src={build},dst={mount_build}",
-                    "--mount", f"type=bind,src={spec['toolchain']['path']},dst={mount_toolchain},readonly",
-                    "--workdir", mount_build, environment["image_config_id"], *expanded]
+                docker_argv = container_argv(spec, run, argv,
+                    environment["image_config_id"], container_name=container_name,
+                    docker=docker)
                 execution = run_container_logged(
                     docker_argv, run_root / f"command-{number}.log",
                     docker=docker, container_name=container_name)
@@ -312,13 +455,19 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
                     raise EvidenceError("offline build command failed; retained actual log")
             if tree_identity(package_snapshot) != package_identity:
                 raise EvidenceError("read-only source SDK prefix snapshot changed")
+            if "consumer" in spec and tree_identity(consumer_snapshot) != consumer_identity:
+                raise EvidenceError("read-only external consumer snapshot changed")
             for role, relative in spec["artifacts"].items():
                 path = regular_file(build / relative)
                 run["artifacts"][role] = file_identity(path)
-            validate_build_artifacts(build, run["artifacts"])
+            selected_resolved = spec.get("resolved", "generated/resolved.json")
+            validate_build_artifacts(build, run["artifacts"], selected_resolved)
+            run["resolved"] = file_identity(build / selected_resolved)
             run["status"] = "passed"
         verify_source(spec["source"], clean=True)
         verify_source_sdk(spec["source_sdk"], spec["source"])
+        if "consumer" in spec:
+            consumer.verify(spec["consumer"])
         if tree_identity(Path(spec["toolchain"]["path"])) != actual_toolchain(spec):
             raise EvidenceError("declared toolchain changed during reproduction")
         if report["runs"][0]["source_package_snapshot"] != report["runs"][1]["source_package_snapshot"]:
@@ -334,6 +483,10 @@ def reproduce(spec_path: Path, report_path: Path, *, docker: str = "docker") -> 
     except (EvidenceError, OSError, ValueError, KeyError, TypeError,
             subprocess.SubprocessError) as error:
         report["failure"] = str(error)
+    except BaseException as error:
+        report.update(status="cancelled", failure=str(error) or type(error).__name__)
+        atomic_json(report_path, report)
+        raise
     atomic_json(report_path, report)
     return report
 
@@ -343,11 +496,13 @@ def actual_toolchain(spec: dict) -> dict:
 
 
 def prepare_spec(source: Path, assembly: Path, environment: Path, toolchain: Path,
-                 workload: str = "empty", *, source_sdk: Path) -> dict:
+                 workload: str = "empty", *, source_sdk: Path,
+                 consumer_source: Path | None = None, consumer_project: str = ".",
+                 artifacts: dict | None = None, resolved: str | None = None) -> dict:
     """Declare exact current inputs before invoking two clean Docker builds."""
     source = source.resolve()
     assembly = regular_file(assembly)
-    if not assembly.is_relative_to(source):
+    if consumer_source is None and not assembly.is_relative_to(source):
         raise EvidenceError("reproduction assembly must belong to the tracked source input")
     if workload not in {"empty", "gpio", "uart", "spi"}:
         raise EvidenceError("unknown minimum reproduction workload")
@@ -359,10 +514,10 @@ def prepare_spec(source: Path, assembly: Path, environment: Path, toolchain: Pat
                            capture_output=True, check=True)
     path_maps = ("-ffile-prefix-map={source}=. -fdebug-prefix-map={source}=. "
                  "-ffile-prefix-map={build}=build -fdebug-prefix-map={build}=build")
-    return {"schema_version": 1, "source": source_record, "source_sdk": sdk_identity,
+    spec = {"schema_version": 1, "source": source_record, "source_sdk": sdk_identity,
         "environment": str(environment.absolute()),
         "toolchain": {"path": str(toolchain.absolute()), **tree_identity(toolchain)},
-        "assembly": assembly.relative_to(source).as_posix(),
+        "assembly": assembly.relative_to(source).as_posix() if consumer_source is None else "",
         "source_date_epoch": int(epoch.stdout),
         "commands": [["cmake", "-S", "{source}", "-B", "{build}", "-G", "Ninja",
             "-DCMAKE_TOOLCHAIN_FILE={source}/cmake/toolchains/arm-gcc.cmake",
@@ -371,6 +526,27 @@ def prepare_spec(source: Path, assembly: Path, environment: Path, toolchain: Pat
             "-DCMAKE_ASM_FLAGS=" + path_maps],
             ["cmake", "--build", "{build}", "--parallel", "2"]],
         "artifacts": {"elf": "bin/nexus_firmware.elf", "bin": "bin/nexus_firmware.bin"}}
+    if consumer_source is not None:
+        selected = consumer.identify(consumer_source, consumer_project)
+        project_root = Path(selected["source"]["root"]) / selected["project"]
+        if not assembly.is_relative_to(project_root):
+            raise EvidenceError("assembly must belong to the declared external consumer project")
+        consumer_maps = path_maps + " -ffile-prefix-map={consumer}=consumer -fdebug-prefix-map={consumer}=consumer"
+        spec.update(schema_version=2, consumer=selected,
+            assembly=assembly.relative_to(project_root).as_posix(),
+            resolved=resolved or "nexus-sdk/generated/resolved.json")
+        spec["commands"][0] = ["cmake", "-S", "{consumer}", "-B", "{build}", "-G", "Ninja",
+            "-DNexus_DIR={sdk}/lib/cmake/Nexus",
+            "-DCMAKE_TOOLCHAIN_FILE={source}/cmake/toolchains/arm-gcc.cmake",
+            "-DNEXUS_ASSEMBLY_FILE={assembly}", "-DNEXUS_BUILD_TESTS=OFF",
+            "-DNEXUS_BUILD_WORKLOAD=OFF", "-DCMAKE_C_FLAGS=" + consumer_maps,
+            "-DCMAKE_ASM_FLAGS=" + consumer_maps]
+    elif resolved is not None:
+        raise EvidenceError("custom resolved path requires an external consumer project")
+    if artifacts is not None:
+        spec["artifacts"] = artifacts
+    validate_spec(spec)
+    return spec
 
 
 def main() -> int:
@@ -384,6 +560,11 @@ def main() -> int:
     parser.add_argument("--environment", type=Path)
     parser.add_argument("--toolchain", type=Path)
     parser.add_argument("--source-sdk", type=Path)
+    parser.add_argument("--consumer-source", type=Path)
+    parser.add_argument("--consumer-project", default=".")
+    parser.add_argument("--resolved")
+    parser.add_argument("--artifact-elf")
+    parser.add_argument("--artifact-bin")
     parser.add_argument("--workload", choices=("empty", "gpio", "uart", "spi"), default="empty")
     parser.add_argument("--qualification", type=Path)
     args = parser.parse_args()
@@ -391,8 +572,13 @@ def main() -> int:
         if None in (args.assembly, args.environment, args.toolchain, args.source_sdk):
             parser.error("prepare requires --assembly --environment --toolchain --source-sdk")
         try:
+            if bool(args.artifact_elf) != bool(args.artifact_bin):
+                raise EvidenceError("declare both --artifact-elf and --artifact-bin")
             spec = prepare_spec(args.source, args.assembly, args.environment,
-                                args.toolchain, args.workload, source_sdk=args.source_sdk)
+                args.toolchain, args.workload, source_sdk=args.source_sdk,
+                consumer_source=args.consumer_source, consumer_project=args.consumer_project,
+                resolved=args.resolved, artifacts={"elf": args.artifact_elf,
+                    "bin": args.artifact_bin} if args.artifact_elf else None)
             atomic_json(args.spec, spec)
             print("Declared current source/config/toolchain/OCI inputs: " + str(args.spec))
             return 0
@@ -412,7 +598,7 @@ def main() -> int:
         if report["status"] == "passed":
             from tools.evidence.qualification import create_qualification
             elf = Path(report["runs"][0]["artifacts"]["elf"]["path"])
-            resolved = elf.parent.parent / "generated/resolved.json"
+            resolved = Path(report["runs"][0]["resolved"]["path"])
             checks = [{"name": f"clean_rebuild_{run_index}_{command_index}", **execution}
                 for run_index, run in enumerate(report["runs"])
                 for command_index, execution in enumerate(run["commands"])]

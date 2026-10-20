@@ -18,8 +18,10 @@ EXPECTED = {
     "f103-io.toml", "f103-io-freertos.toml",
     "f103-spi.toml", "f103-spi-freertos.toml",
     "f103-watchdog.toml", "f103-exti.toml",
+    "f103-devices.toml", "f103-devices-freertos.toml",
     "gd303-io.toml", "gd303-io-freertos.toml",
-    "gd303-spi-watchdog.toml", "gd303-spi-watchdog-freertos.toml"}
+    "gd303-spi-watchdog.toml", "gd303-spi-watchdog-freertos.toml",
+    "gd303-devices.toml", "gd303-devices-freertos.toml"}
 
 
 class MainstreamAssemblyTests(unittest.TestCase):
@@ -35,7 +37,7 @@ class MainstreamAssemblyTests(unittest.TestCase):
         paths = [FIXTURE / name for name in sorted(EXPECTED)]
         original = {path: path.read_bytes() for path in paths}
         rows = provider_assemblies.validate_fixtures(ROOT, paths)
-        self.assertEqual(len(rows), 10)
+        self.assertEqual(len(rows), 14)
         self.assertEqual({row["resolved"]["soc_family"] for row in rows},
                          {"stm32f103", "gd32f303"})
         self.assertEqual({row["resolved"]["backend"] for row in rows},
@@ -72,7 +74,7 @@ class MainstreamAssemblyTests(unittest.TestCase):
         fixture = ROOT / "tests/contracts/g474_assembly"
         harness = r'''#include "nexus_bindings.h"
 #include "nexus_factory.h"
-static uint16_t calls[4];
+static uint16_t calls[8];
 static bool bad_id;
 int nx_fixture_main(void);
 nx_platform_start_result_t nx_platform_start(void) {
@@ -95,20 +97,51 @@ const nx_spi_endpoint_t* nx_factory_spi_device(nx_spi_device_id_t id) {
     if (id != calls[3]++) bad_id = true;
     return NULL;
 }
+const nx_adc_port_t* nx_factory_adc(nx_adc_id_t id) {
+    if (id != calls[4]++) bad_id = true;
+    return NULL;
+}
+const nx_i2c_port_t* nx_factory_i2c(nx_i2c_id_t id) {
+    if (id != calls[5]++) bad_id = true;
+    return NULL;
+}
+const nx_i2c_endpoint_t* nx_factory_i2c_device(nx_i2c_device_id_t id) {
+    if (id != calls[6]++) bad_id = true;
+    return NULL;
+}
+const nx_flash_port_t* nx_factory_flash(nx_flash_id_t id) {
+    if (id != calls[7]++) bad_id = true;
+    return NULL;
+}
 int main(void) {
+    const uint16_t selected[] = {
+        NX_PWM_ID_COUNT, NX_WATCHDOG_ID_COUNT, NX_SPI_ID_COUNT,
+        NX_SPI_DEVICE_ID_COUNT, NX_ADC_ID_COUNT, NX_I2C_ID_COUNT,
+        NX_I2C_DEVICE_ID_COUNT, NX_FLASH_ID_COUNT};
+    const uint16_t expected[] = {EXPECTED_COUNTS};
     if (nx_fixture_main() != 0 || bad_id) return 1;
-    return calls[0] != NX_PWM_ID_COUNT || calls[1] != NX_WATCHDOG_ID_COUNT ||
-           calls[2] != NX_SPI_ID_COUNT || calls[3] != NX_SPI_DEVICE_ID_COUNT;
+    for (size_t index = 0U; index != sizeof(calls) / sizeof(calls[0]); ++index)
+        if (selected[index] != expected[index] || calls[index] != selected[index])
+            return 1;
+    return 0;
 }
 '''
-        for name in ("pwm", "watchdog", "spi"):
+        expected_counts = {
+            "empty": (0, 0, 0, 0, 0, 0, 0, 0),
+            "pwm": (2, 0, 0, 0, 0, 0, 0, 0),
+            "watchdog": (0, 1, 0, 0, 0, 0, 0, 0),
+            "spi": (0, 1, 2, 2, 0, 0, 0, 0),
+            "acquisition": (0, 0, 0, 0, 1, 1, 1, 1),
+            "acquisition-dma": (0, 0, 0, 0, 1, 1, 1, 1)}
+        for name, counts in expected_counts.items():
             with self.subTest(assembly=name), tempfile.TemporaryDirectory() as temp:
                 result = configure.resolve_ir(fixture / (name + ".toml"))
                 generated = Path(temp)
                 (generated / "nexus_bindings.h").write_text(bindings.emit(result)[0])
                 (generated / "nexus_factory.h").write_text(factory.emit(result)[0])
                 source = generated / "harness.c"
-                source.write_text(harness)
+                source.write_text(harness.replace(
+                    "EXPECTED_COUNTS", ", ".join(str(count) for count in counts)))
                 common = [compiler, "-std=c11", "-Werror", "-I" + str(generated)]
                 common += ["-I" + str(ROOT / layer / "include")
                            for layer in ("io", "core", "arch")]

@@ -143,7 +143,7 @@
           "id": "sram",
           "origin": 536870912,
           "size": 49152,
-          "dma": false,
+          "dma": true,
           "linker": true
         }
       ],
@@ -245,7 +245,9 @@
     "USART0": {
       "kind": "uart",
       "modes": [
-        "irq-bytes"
+        "irq-bytes",
+        "dma-tx",
+        "dma-duplex"
       ],
       "irq": [
         "USART0_IRQn"
@@ -280,17 +282,96 @@
       ],
       "irq": [],
       "pins": []
+    },
+    "I2C0": {
+      "kind": "i2c",
+      "modes": [
+        "irq-messages"
+      ],
+      "irq": [
+        "I2C0_EV_IRQn",
+        "I2C0_ER_IRQn"
+      ],
+      "irq_numbers": [
+        31,
+        32
+      ],
+      "clock_hz": 8000000,
+      "pins": [
+        "PB6",
+        "PB7"
+      ]
+    },
+    "ADC0": {
+      "kind": "adc",
+      "modes": [
+        "single-shot"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "TIMER2": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "pins": [
+        "PA6"
+      ]
+    },
+    "FMC": {
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "EXTI0": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI0_IRQn"
+      ],
+      "irq_numbers": [
+        6
+      ],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "EXTI1": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI1_IRQn"
+      ],
+      "irq_numbers": [
+        7
+      ],
+      "pins": [
+        "PA1"
+      ]
     }
   },
   "reserved_resources": [
     "timer:TIMER1",
-    "irq:TIMER1_IRQn"
+    "irq:TIMER1_IRQn",
+    "timer:TIMER4",
+    "irq:TIMER4_IRQn"
   ],
   "source_lock": "vendors/gigadevice/gd32f30x/source.lock.json",
   "references": "references.json",
   "provenance": [
     "GD32F303xx Datasheet Rev3.0 Jan2024 Table2-1 RC256KiB/48KiB, Table2-6 LQFP64 pin inventory and default USART0 PA9/PA10. PD0/PD1 require oscillator remap; inventory does not authorize board access.",
-    "GD32F30x User Manual Rev3.4 Dec2025 FMC bank0 2KiB pages; TIMER CNT/CAR16bit. IRC8 reset profile only; no PLL or running-state handoff.",
+    "GD32F30x User Manual Rev3.4 Dec2025 FMC bank0 2KiB pages, halfwordprogramming; Table16-1 TIMER4 ITI0 receives TIMER1_TRGO. Two16bitcounters form32bit1MHz cascade; highoverflowservice<4294967296us including Flashstall. IRC8 resetprofileonly.",
     "GD32F30x Firmware Library3.0.3 official GD32F30X_HD vector60 entries and Cortex-M4F feature definitions; no package identity can be inferred from CPU identity alone."
   ]
 }

@@ -26,7 +26,11 @@
       "anchors": {
         "memory": "FMC2.2/2.3 bank0 page2KiB; high-density256KiB",
         "clock": "RCU reset IRC8; fixed APB/AHB div1",
-        "timer": "TIMER_CNT/CAR bits15:0; overflow service <65536us at1MHz"
+        "timer": "Chapter16 Table16-1 p295 TIMER4 ITI0<-TIMER1_TRGO; section16.2 externalclockmode0 SMC7/TRGS0; lowPSC7/CAR65535, highPSC0/CAR65535;32bit1MHz hardware cascade and TIMER4overflow2^32us.",
+        "flash": "Sections2.3.4/2.3.6: bank0 2KiB pageerase,16bit halfwordprogramming requires erasedexceptzero, PGERR/WPERR/BUSY/ENDF. DatasheetTable4-21 pageerase max800ms; source/vectorfetchstall is explicitproductpolicy. Section2.4.4 p54 ENDF latches after every successful pulse independently of ENDIE; write1 clear must be readback-proven before every next pulse.",
+        "adc": "Sections12.4.1/12.4.2: poweron14CK_ADC, RSTCLB/CLB calibration; independent12bit PA0channel0 softwaretrigger,239.5samplecycles+12.5conversioncycles; CK_ADC=8MHz/2.",
+        "uart_channel_dma": "GD32F30x manual DMA request mapping: DMA0 channel3 USART0_TX and channel4 USART0_RX; fixed channel control/count/peripheral/memory layout and four-bit INTF groups. No F470 stream selector/FIFO contract.",
+        "i2c_irq": "GD32F30x manual I2C0 default PB6/PB7 AF open-drain, IRC8/APB8MHz, standard-mode CCR50/TRISE9 nominal80kHz; event/error IRQ31/32, bounded master receive windows and STOP/master drain."
       }
     },
     "errata": {
@@ -38,7 +42,10 @@
       "sha256": "5154b936ad2f7283fd5359dedfc137612666c0dc6af2734a5f325a609cbc459e",
       "bytes": 259206,
       "anchors": {
-        "applicability": "Exact device marking/revision applicability remains unobserved; source reviewed USART2.7 DMA restrictions are not opened by IRQ-only mode."
+        "applicability": "Actual device marking/revision remains unobserved; selected UART DMA2.7.1/2.7.3 and I2C2.8.1 source workarounds reviewed separately from physical qualification.",
+        "uart_dma_selected_profile": "Device limitations Rev1.4 2.7.1/2.7.3: TEN must precede DMA CHEN. Cold initialization enables TEN; every finite TX admission checks UEN/TEN before borrow or DMA enable. No mute or hardware flow-control claim.",
+        "i2c_selected_profile": "Device limitations Rev1.4 2.8.1: higher-priority receive IRQ avoids BTC races; selected IRQ0, no kernel calls and nominal80kHz master-only profile. Slave/SMBus limitations remain outside admission.",
+        "adc": "Sections2.4.1/2.4.2:1msminimum afterADCON beforecalibration (provider2msnominalmargin); Board VDDAdecoupling/beadexternal; CK_ADC=APB/2 avoids<=APB/4 immediateRDATAhazard."
       }
     }
   },
@@ -60,6 +67,6 @@
   },
   "limitations": [
     "Reference source index and tested finite provider scope only; no full-family electrical, timing or errata qualification.",
-    "Flash physical geometry is metadata only; no Flash program/erase provider or product reservation is advertised."
+    "Physical Flash provider exposes all128pages; products explicitlyreserveerasealignedregions and validvoltage,executionstall,watchdog/powerloss/recoverypolicy. No physical HIL."
   ]
 }

@@ -24,12 +24,14 @@ class TrustZonePairGate(unittest.TestCase):
         cls.nonsecure = (cls.directory / "nonsecure/u575_nonsecure.elf").read_bytes()
         cls.gateway = Elf32(cls.secure, float_abi="soft").symbol(
             "nx_reference_gpio") & ~1
+        cls.gateways = {name: Elf32(cls.secure, float_abi="soft").symbol(name) & ~1
+                        for name in ("nx_reference_gpio", "nx_reference_gpio_batch")}
 
     def validate(self, secure=None, nonsecure=None, imported=None):
         return validate_pair(
             self.secure if secure is None else secure,
             self.nonsecure if nonsecure is None else nonsecure,
-            self.gateway if imported is None else imported)
+            self.gateways if imported is None else imported)
 
     def ns_word(self, index, value):
         elf = Elf32(self.nonsecure, float_abi="soft")
@@ -81,11 +83,29 @@ class TrustZonePairGate(unittest.TestCase):
         with self.assertRaises(EvidenceError):
             self.validate(imported=self.gateway + 8)
 
+    def test_both_exact_imports_are_required(self):
+        with self.assertRaises(EvidenceError):
+            self.validate(imported={"nx_reference_gpio": self.gateway})
+        values = dict(self.gateways)
+        values["nx_reference_gpio_batch"] += 8
+        with self.assertRaises(EvidenceError):
+            self.validate(imported=values)
+
     def test_nsc_gateway_must_start_with_actual_sg_encoding(self):
         elf = Elf32(self.secure, float_abi="soft")
         section = next(s for s in elf.sections if s["name"] == ".gnu.sgstubs")
         data = bytearray(self.secure)
         offset = section["offset"] + self.gateway - section["address"]
+        data[offset:offset + 4] = b"\x00\xbf\x00\xbf"
+        with self.assertRaises(EvidenceError):
+            self.validate(secure=bytes(data))
+
+    def test_async_batch_gateway_requires_its_actual_sg_encoding(self):
+        elf = Elf32(self.secure, float_abi="soft")
+        gateway = elf.symbol("nx_reference_gpio_batch") & ~1
+        section = next(s for s in elf.sections if s["name"] == ".gnu.sgstubs")
+        data = bytearray(self.secure)
+        offset = section["offset"] + gateway - section["address"]
         data[offset:offset + 4] = b"\x00\xbf\x00\xbf"
         with self.assertRaises(EvidenceError):
             self.validate(secure=bytes(data))

@@ -120,6 +120,8 @@ def main(argv=None):
         packaged_commit = None
         identity_path = sdk / ".nexus-source-sdk.json"
         if identity_path.exists() or identity_path.is_symlink():
+            if identity_path.is_symlink():
+                raise ValueError("SDK manifest cannot follow symlinks")
             if (source != sdk / "vendors/st/cmsis_device_g4" or
                     args.lock.absolute() != sdk / "dependencies/stm32g4.lock.json"):
                 raise ValueError("Installed G4 requires exact SDK source and lock paths")

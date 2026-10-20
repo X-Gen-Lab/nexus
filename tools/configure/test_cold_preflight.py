@@ -58,7 +58,7 @@ class ColdPreflightGenerationTests(unittest.TestCase):
                  "RCC_APB2ENR_USART1EN", "RCC_CCIPR1_USART1SEL")):
             item = AdmissionInput(id="console", kind="uart", controller=controller,
                                   pins=[{"pin": pin} for pin in pins])
-            result = AdmissionInput(soc_family=family, controllers=(item,),
+            result = AdmissionInput(soc_family=family, controllers=(item,), devices=(),
                 claims=[{"key": "irq:" + controller, "owner": "console"}])
             with self.subTest(family=family):
                 source = "\n".join(preflight.emit(result))

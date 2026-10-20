@@ -1,0 +1,33 @@
+schema = 2
+board_package = "acquisition_board"
+backend = "baremetal"
+clock = "hse24-pll170"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 16384
+flash_load_limit_bytes = 65536
+
+[adc.sensor]
+binding = "sensor"
+mode = "single-shot"
+channels = [1]
+sample_times = [0]
+reference_mv = 3300
+
+[i2c.bus]
+binding = "bus"
+mode = "poll-messages"
+max_hz = 100000
+
+[i2c_device.sensor_registers]
+controller = "bus"
+address = 80
+
+[flash.physical]
+binding = "physical"
+mode = "poll-word"

@@ -1,4 +1,5 @@
 """One fixed time domain and selected-mask GPIO leases, without registries."""
+from ..common import owned_claims
 try:
     from ... import preflight
 except ImportError:
@@ -11,6 +12,8 @@ def implementation(item):
 
 
 def operations(item):
+    if item.kind == "i2c":
+        return "nx_i2c_v2_ops"
     return f"nx_stm32u575_{implementation(item)}_ops"
 
 
@@ -38,6 +41,13 @@ def _leases(result):
         for pin in item['pins']:
             name, number = pin['pin'][1], int(pin['pin'][2:])
             groups.setdefault(name, set()).add(number)
+    if "claims" in result:
+        owners = {item.id for item in result.controllers}
+        owners.update(item["id"] for item in result["devices"])
+        for claim in owned_claims(result, owners):
+            if claim["key"].startswith("pin:"):
+                pin = claim["key"][4:]
+                groups.setdefault(pin[1], set()).add(int(pin[2:]))
     return [(name, sum(1 << n for n in numbers),
         sum(3 << (2 * n) for n in numbers),
         sum(15 << (4 * n) for n in numbers if n < 8),
@@ -45,14 +55,17 @@ def _leases(result):
         for name, numbers in sorted(groups.items())]
 
 
-def _uart(result):
-    return any(item.kind == 'uart' for item in result.controllers)
-
-
-def _uart_gates(result):
-    return tuple(("APB2ENR", "USART1") if item.controller == "USART1"
-                 else ("APB1ENR1", "USART2")
-                 for item in result.controllers if item.kind == "uart")
+def _peripheral_gates(result):
+    groups = {}
+    for item in result.controllers:
+        if item.kind in {"uart", "spi", "pwm", "i2c", "adc"}:
+            register = ("APB2ENR" if item.controller in {"USART1", "SPI1"}
+                        else "AHB3ENR" if item.controller == "ADC4"
+                        else "APB1ENR1")
+            groups.setdefault(register, []).append(item.controller)
+    return tuple((register, " | ".join(
+        f"RCC_{register}_{controller}EN" for controller in controllers))
+        for register, controllers in sorted(groups.items()))
 
 
 def _fields(bits, fields, af0, af1):
@@ -66,8 +79,8 @@ def state_declarations(result):
     if not leases:
         return []
     source = ['static uint32_t s_nx_platform_gpio_clocks_added;']
-    for register, _ in _uart_gates(result):
-        source += [f'static uint32_t s_nx_uart_{register.lower()}_added;']
+    for register, _ in _peripheral_gates(result):
+        source += [f'static uint32_t s_nx_peripheral_{register.lower()}_added;']
     for name, bits, fields, af0, af1 in leases:
         gpio, lease = 'GPIO' + name, 's_nx_gpio' + name.lower() + '_lease'
         source += ['static struct {',
@@ -112,8 +125,8 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
     gates = ' | '.join('RCC_AHB2ENR1_GPIO' + n + 'EN'
                        for n, *_ in leases)
     source = [f'    s_nx_platform_gpio_clocks_added = ~NX_U575_READ(&RCC->AHB2ENR1) & ({gates});']
-    for register, controller in _uart_gates(result):
-        source += [f'    s_nx_uart_{register.lower()}_added = ~NX_U575_READ(&RCC->{register}) & RCC_{register}_{controller}EN;']
+    for register, gates in _peripheral_gates(result):
+        source += [f'    s_nx_peripheral_{register.lower()}_added = ~NX_U575_READ(&RCC->{register}) & ({gates});']
     for name, bits, fields, af0, af1 in leases:
         gpio, lease = 'GPIO' + name, 's_nx_gpio' + name.lower() + '_lease'
         source += [f'    {lease}.captured = false;',
@@ -145,6 +158,14 @@ def start_resources(result, *, cleanup="nx_platform_stop()"):
             if mask:
                 source += [f'    {lease}.{field} = NX_U575_READ(&{gpio}->{register}) & {mask}u;']
         source += [f'    {lease}.captured = true;']
+    for register, gates in _peripheral_gates(result):
+        source += [f'    NX_U575_WRITE(&RCC->{register}, NX_U575_READ(&RCC->{register}) | ({gates}));',
+                   '    nx_arch_dsb();',
+                   f'    if ((NX_U575_READ(&RCC->{register}) & ({gates})) != ({gates})) {{',
+                   '        result.primary = NX_ERROR_IO;',
+                   f'        result.cleanup = {cleanup};',
+                   '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
+                   '        return result;', '    }']
     return source
 
 
@@ -153,8 +174,8 @@ def stop_system(result, *, system_phase=None):
     for name, *_ in reversed(_leases(result)):
         source += [f'        nx_result_t gpio_{name.lower()} = restore_gpio{name.lower()}();',
             f'        if (gpio_{name.lower()} != NX_SUCCESS) {{ return gpio_{name.lower()}; }}']
-    for register, _ in _uart_gates(result):
-        added = f's_nx_uart_{register.lower()}_added'
+    for register, _ in _peripheral_gates(result):
+        added = f's_nx_peripheral_{register.lower()}_added'
         source += [f'        NX_U575_WRITE(&RCC->{register}, NX_U575_READ(&RCC->{register}) & ~{added});',
             '        nx_arch_dsb();',
             f'        if ((NX_U575_READ(&RCC->{register}) & {added}) != 0u) {{ return NX_ERROR_IO; }}',

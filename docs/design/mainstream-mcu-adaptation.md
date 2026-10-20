@@ -37,10 +37,10 @@ remain authoritative; this page is not another completion database.
 | STM32F407VET6 | M4F; 512 KiB Flash; 128 KiB SRAM plus 64 KiB CCM | Existing Sky reference; package and Board routes remain independent |
 | GD32F470ZGT6 | M4F; 1 MiB Flash; 512 KiB across SRAM/TCM regions | Existing Liangshan reference; separate GD32 SDK and provider |
 | STM32G474RET6 | M4F; 512 KiB Flash; 96 KiB SRAM plus 32 KiB CCM | Existing Nucleo reference; selected peripheral expansion in this iteration |
-| STM32H743ZIT6 | M7; 2 MiB Flash; domain-specific RAM | Existing HSI/cache reference profiles; selected USART3 DMA extension |
-| STM32U575ZIT6Q | M33; 2 MiB Flash; domain-specific RAM | Existing TZEN0 platform and separate synchronous TZEN1 GPIO reference |
-| STM32F103RBT6 | M3; 128 KiB Flash; 20 KiB SRAM | New NUCLEO-F103RB reference; HSI 8 MHz, legacy GPIO, USART2, SPI1, EXTI0/1 and IWDG |
-| GD32F303RCT6 | M4F; 256 KiB code Flash; 48 KiB SRAM | New chip reference; IRC8M, legacy GPIO, USART0, SPI0 and FWDGT; no invented PCB |
+| STM32H743ZIT6 | M7; 2 MiB Flash; domain-specific RAM | Fixed HSI/cache, finite USART3 DMA, optional initialized D2 SRAM1 and selected finite peripheral fixture |
+| STM32U575ZIT6Q | M33; 2 MiB Flash; domain-specific RAM | TZEN0 finite peripherals; separate TZEN1 scalar GPIO and copied cooperative jobs |
+| STM32F103RBT6 | M3; 128 KiB Flash; 20 KiB SRAM | NUCLEO-F103RB source reference; HSI8, finite GPIO/UART/SPI/I2C/ADC/PWM/EXTI/Flash/IWDG selections |
+| GD32F303RCT6 | M4F; 256 KiB code Flash; 48 KiB SRAM | IRC8M chip reference with finite peripheral selections and TIMER1/TIMER4 time cascade; no invented PCB |
 
 The H743 and U575 memory regions are not one interchangeable DMA heap. Consult
 their exact `soc.json` memory domains and DMA contracts. Likewise, F407 CCM is
@@ -66,14 +66,14 @@ selection; a register header or upstream library is insufficient to accept it.
 | Public class | F407 and F470 existing scope | G474 increment | H743 and U575 increment | F103 and GD32F303 increment |
 | --- | --- | --- | --- | --- |
 | GPIO | Selected inputs/outputs and safe initialization | A/B/C/D/F/G package routes; PF0/PF1/PG10 reserved | H743 selected GPIO; U575 A..G and H0/H1/H3 package routes, subject to power admission | Selected legacy GPIO inputs/outputs; reviewed pin subsets only |
-| UART | Selected IRQ, finite/continuous RX and DMA modes | LPUART1, USART1/2/3 and UART4/5 IRQ bytes | H743 USART3 IRQ, DMA TX and finite RX DMA blocks; U575 USART1/2 IRQ bytes | F103 USART2; GD303 USART0; IRQ bytes only |
-| SPI | Selected byte and full-duplex DMA modes | SPI1/2 finite polling; no DMA | Outside this increment | F103 SPI1 and GD303 SPI0 finite polling |
-| I2C | Selected polling and shared asynchronous engine | Outside this increment | Outside this increment | Outside this increment |
-| ADC | Selected one-shot, trigger and block modes | Outside this increment | Outside this increment | Outside this increment |
-| PWM/timer | Selected PWM, capture and advanced timer contracts | TIM3/4 CH1 exclusive fixed-base PWM | Outside this increment | Outside this increment |
-| EXTI | Selected edges and shared IRQ ownership | PA0/PA1 selected events | Outside this increment | F103 PA0/PA1 selected events; GD303 outside this increment |
-| Flash | Selected geometry and caller-supplied region | Outside this increment | Outside this increment | Outside this increment |
-| Watchdog | Selected irreversible watchdog lifecycle | Independent IWDG | U575 IWDG; H743 outside this increment | F103 IWDG and GD303 FWDGT |
+| UART | Selected IRQ, finite/continuous RX and DMA modes | LPUART1, USART1/2/3 and UART4/5 IRQ bytes | H743 USART3 IRQ, finite DMA TX or RX-IDLE; U575 USART1/2 IRQ bytes | USART2/USART0 IRQ bytes, finite channel-DMA TX or duplex finite RX blocks |
+| SPI | Selected byte and full-duplex DMA modes | SPI1/2 finite polling; no DMA | H743 SPI4 and U575 SPI1 finite polling | F103 SPI1 and GD303 SPI0 finite polling |
+| I2C | Selected polling and shared asynchronous engine | I2C1 PB8/PB9 finite polling with HSI16 | H743/U575 I2C1 PB8/PB9 finite V2 polling | F103 I2C1/GD303 I2C0 PB6/PB7 IRQ messages, nominal 80 kHz, priority 0 without kernel notification |
+| ADC | Selected one-shot, trigger and block modes | ADC1 PA0/IN1 bulb shots or finite TIM6 normal-DMA blocks | H743 ADC1 PA3/INP15 16-bit shots; U575 ADC4 PC0/channel1 12-bit shots with external supply admission | PA0/channel0, 12-bit software shots at 4 MHz; explicit calibration and warmup |
+| PWM/timer | Selected PWM, capture and advanced timer contracts | TIM3/4 CH1 exclusive fixed-base PWM | TIM3 CH1 PA6, exclusive fixed-base PWM | F103 TIM3 CH1/GD303 TIMER2 CH0 PA6, exclusive fixed-base PWM |
+| EXTI | Selected edges and shared IRQ ownership | PA0/PA1 selected events | PA0/PA1 selected events; U575 has separate rising/falling pending banks | PA0/PA1 selected events on both exact parts |
+| Flash | Selected geometry and caller-supplied region | DBANK=1, unswapped; 512 KiB, 2 KiB pages, 8-byte ECC units | H743 2 MiB/128 KiB sectors/32-byte units, Cache off; U575 TZEN0/SWAP0 2 MiB/8 KiB pages/16-byte units | F103 128 KiB/1 KiB pages; GD303 256 KiB/2 KiB pages; both 2-byte halfwords |
+| Watchdog | Selected irreversible watchdog lifecycle | Independent IWDG | U575 IWDG and H743 IWDG1 | F103 IWDG and GD303 FWDGT |
 
 CAN, USB, Ethernet, DAC and storage/protocol services are separate capabilities;
 the nine-class table does not include or qualify them. Unsupported controllers,
@@ -111,7 +111,7 @@ retain their separate retryable private leases.
 H743 USART3 uses PD8/PD9 AF7 and normal, finite RX DMA blocks on DMA1 Stream1,
 DMAMUX1 channel 1 request 45. The owner services completion and rearms the next
 block; gaps are possible. This is not a circular or continuous receiver. Only
-the reviewed AXI SRAM domain is admitted. Cache-off blocks contain 1..65535
+the selected initialized AXI/SRAM1 domains are admitted. Cache-off blocks contain 1..65535
 bytes. Cache-on blocks own complete, exclusive 32-byte cache lines, with aligned
 address and length and a maximum length of 65504 bytes. Source withdrawal,
 stable remaining count and post-invalidation precede publication. A borrowed
@@ -121,16 +121,84 @@ U575 adds USART2 PA2/PA3 AF7 and package-valid GPIO routes. PG[15:2] require an
 already established VDDIO2 supply and observed PWR clock/IO2SV configuration;
 the platform does not enable an unknown external rail. IO2SV is a configuration
 observation, not a measurement of rail voltage. TZEN0 remains the general
-platform profile; the separate synchronous TZEN1 GPIO reference does not grant
-asynchronous or cross-security transport support.
+platform profile. The separate TZEN1 reference also accepts cooperative GPIO
+jobs of at most eight PC7 commands copied into one Secure slot. SERVICE advances
+at most one command, POLL reads latched status, CANCEL preserves earlier effects
+and CONSUME releases only a terminal job. Tickets never wrap; no NS address
+survives a call. This provides neither a user-buffer loan nor general asynchronous
+or cross-security transport support.
 
 F103 uses USART2 PA2/PA3 and PA0/PA1 EXTI events. F103 SPI1 and GD303 SPI0 use
 default PA5/PA6/PA7 with explicit PA4 active-low CS, nominal 31.25 kHz..4 MHz,
 eight-bit words, modes 0..3 and at most 256 bytes per finite call. Their SPI
-assemblies cannot also select the PA5 GPIO/LED binding. F103 TIM2 and GD303
-TIMER1 are 16-bit at a nominal 1 MHz. Their extension can observe one pending
-wrap; the interrupt service and mask interval must stay below the nominal
-65.536 ms wrap period. Neither profile establishes calibrated wall time.
+assemblies cannot also select the PA5 GPIO/LED binding. F103 TIM2 is 16-bit at
+a nominal 1 MHz; its overflow service and mask interval must stay below
+65.536 ms. GD303 cascades TIMER1 update TRGO into TIMER4 ITI0 and extends the
+high overflow, with a service interval below 2^32 nominal microseconds. This
+preserves low wraps across the stated 800 ms Flash erase bound; the timer-bridge
+carry propagation still needs physical observation. Neither profile establishes
+calibrated wall time or FreeRTOS tick catch-up after same-bank fetch stalls.
+
+### Mode resources, acquisition and physical Flash
+
+F103 USART2 uses DMA1 channel7 for TX and channel6 for finite RX; GD303 USART0
+uses DMA0 channel3/channel4. TX-only construction has the compact TX state and
+explicit IRQ-byte ring; duplex alone adds caller-supplied RX blocks. Both admit
+only declared SRAM spans of 1..65535 bytes. Memory TC does not settle TX before
+wire TC and source withdrawal. Finite RX publishes only after channel/DMAR
+withdrawal and stable count; owner service rearms a free block, so gaps and
+visible loss remain part of the contract. An unavailable replacement never
+authorizes overwriting a consumer loan. Their PB6/PB7 I2C uses priority-zero
+IRQ handling and rejects kernel notifications; bus voltage and pull-ups are
+external. The shared legacy engine remains the sole protocol owner.
+
+G474 ADC1 selects single-ended 12-bit bulb sampling, SYSCLK/128 = 1.328125 MHz
+and sample code0. Software shots discard the first conversion and keep their
+explicit warmup and spacing guards. TIM6 finite normal-DMA blocks accept only
+2.5–50 kHz rates that divide the 1 MHz trigger timebase exactly. Bulb aperture
+depends on the preceding EOC and next trigger, not SMPR alone. IRQ stops the
+trigger; service observes DMA/ADC withdrawal and ADEN clear before publication,
+then a later service rearms. The admitted SRAM1/2 domain excludes CCM aliases
+even though silicon can DMA through its 0x20018000 alias. The 32 KiB CCM counts
+once. See [the exact G474 contract](stm32g474.md) for errata and aperture bounds.
+
+H743's optional D2 SRAM1 has explicit budgeting, gate admission and startup
+DATA/BSS initialization; NOINIT stays caller-owned. DMA rechecks initialized
+AXI/SRAM1 and clock state before borrowing. H743 ADC1 provides 16-bit raw shots
+on PA3/INP15 with cut-specific boost and complete linearity calibration;
+U575 ADC4 provides 12-bit PC0/channel1 shots after external VDDA/ASV admission.
+F103/GD303 use 12-bit PA0/channel0 shots at 4 MHz, with part-specific warmup and
+calibration. These formats and declared reference voltages are not measured
+analog accuracy. Their exact selected PWM/EXTI routes and pin conflicts remain
+in [support](../delivery/support.md) and the adjacent SoC contracts.
+
+Physical Flash exposes the whole exact part, not a product partition. Authored
+`supply_mv` is a mandatory software assumption where required, never a voltage
+measurement. `nx_flash_geometry_t.program_flags` can set
+`NX_FLASH_PROGRAM_REQUIRES_FRESH_ERASE`: each unit needs a successful erase and
+no later programming pulse. All-FF readback cannot prove hidden ECC history;
+failed/interrupted pulses consume the unit until its next successful erase.
+Providers keep no implicit history bitmap. Zero flags do not waive a provider's
+own programming rules, and all-FF input units issue no pulse.
+
+Every physical pulse first clears and observes stale error/completion state,
+then requires fresh completion after its actual busy/write-buffer drain.
+G474, U575 and F407 gate EOP latching with EOPIE; GD470 uses ENDIE for its end
+flag. Their polling owner exclusively leases a disabled/inactive FLASH IRQ while selected pulse interrupt bits are
+temporarily set; the NVIC never enables that vector. Cleanup removes pulse
+mode/enables, locks and observes pending withdrawal while preserving priority.
+Legacy F103/GD303 and H743 completion flags latch unconditionally under their
+register contracts; the interrupt-enable precondition is not inferred for them. H743 drains
+BSY/QW/WBNE and requires Cache off; U575 drains BSY/WDW in TZEN0/SWAP0.
+
+Timeout prevents a later pulse but cannot abort one already started. Same-bank
+fetch/IRQ can stall, and a permanently busy controller never returns caller
+storage as completed. Product code owns writable erase-aligned regions, voltage,
+watchdog, execution placement and power-loss recovery. The common Flash adapter
+does not invent erase history. The maintained two-bank storage algorithm erases
+the inactive bank before a save, writes distinct full header/payload units and
+programs a separate commit unit last; a failed save requires reopen/recovery
+before a later save erases that target again.
 
 Watchdog activation is irreversible, including a programming failure after the
 start command. Preparation failures retain any unwithdrawn LSI or debug lease

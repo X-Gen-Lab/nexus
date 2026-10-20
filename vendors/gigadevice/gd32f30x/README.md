@@ -7,7 +7,7 @@ The download is a nested 7z archive despite the downloaded filename extension.
 unmodified imported file's size, digest and license identity.
 
 This minimum import contains the exact GD32F30X_HD GCC startup, device/system
-headers and eight peripheral register-definition headers. Peripheral C engines,
+headers and twelve peripheral register-definition headers. Peripheral C engines,
 other density/series startup files, examples and middleware are excluded. Nexus
 uses its existing pinned Arm CMSIS Core and owns bounded lifecycle, clock and
 I/O behavior in `soc/gd32f303`.

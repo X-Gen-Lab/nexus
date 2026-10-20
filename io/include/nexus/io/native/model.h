@@ -222,10 +222,11 @@ void nx_native_i2c_fault(nx_result_t result, bool stuck);
  * \param[in,out]   memory: Caller-owned geometry-sized bytes; erased to 0xff.
  *
  * \param[in]       geometry: Caller-owned immutable contiguous sector
- *                  geometry.
+ *                  geometry with program_flags = 0. This NOR model does not
+ *                  implement hidden ECC erase-history requirements.
  *
- * \return          Success or INVALID; no heap, product reserve or
- *                  persistence.
+ * \return          Success, INVALID geometry or UNSUPPORTED program flags; no
+ *                  heap, product reserve or persistence.
  */
 nx_result_t nx_native_flash_configure(uint8_t* memory,
                                       const nx_flash_geometry_t* geometry);

@@ -12,6 +12,7 @@
 #include "stm32u575_security.h"
 #include "user_io_broker_impl.h"
 #include <arm_cmse.h>
+#include <string.h>
 
 static nx_stm32u575_tz_t owner;
 static const nx_stm32u575_tz_layout_t layout = {
@@ -20,6 +21,7 @@ static const nx_stm32u575_tz_layout_t layout = {
 static nx_stm32u575_gpio_state_t led = {
     .registers = GPIOC, .mask = 0x80U, .output = true};
 static const nx_gpio_port_t port = {&nx_stm32u575_gpio_ops, &led};
+static nx_stm32u575_secure_batch_t batch = {.port = &port, .allowed = 0x80U};
 static nx_user_io_broker_t broker;
 static nx_user_io_call_t call;
 /** \brief One immutable mapping epoch; two synchronous broker child loans. */
@@ -109,6 +111,44 @@ NX_REFERENCE_GATEWAY uint32_t nx_reference_gpio(
     nx_arch_dsb();
     nx_arch_isb();
     return (uint32_t)result.result;
+}
+
+NX_REFERENCE_GATEWAY uint32_t
+nx_reference_gpio_batch(const nx_stm32u575_secure_batch_message_t* message,
+                        nx_stm32u575_secure_batch_reply_t* reply) {
+    if (!cmse_nonsecure_caller() || nx_arch_exception_number() != 0U ||
+        !nx_arch_is_privileged() || nx_arch_irq_is_masked() ||
+        owner.state != NX_STM32U575_TZ_RUNNING || memory.in_gateway)
+        return (uint32_t)NX_ERROR_CONTEXT;
+    uint32_t original;
+    __asm volatile("mrs %0, primask_ns" : "=r"(original)::"memory");
+    const uint32_t masked = 1U;
+    __asm volatile("msr primask_ns, %0" : : "r"(masked) : "memory");
+    nx_arch_dsb();
+    nx_arch_isb();
+    memory.in_gateway = true;
+    nx_result_t result = NX_ERROR_PERMISSION;
+    /* The static NS world has no IRQ handlers, DMA or remapping authority.
+     * Its complete immutable RAM mapping is checked before either copy.
+     * CMSE permission checks remain mandatory even inside that address span. */
+    if (nx_stm32u575_secure_batch_ns_spans(
+            layout.ns_ram_base, layout.ns_ram_bytes, message, reply) &&
+        nx_arch_nonsecure_check(message, sizeof(*message),
+                                NX_ARCH_NONSECURE_READ) == NX_ARCH_OK &&
+        nx_arch_nonsecure_check(reply, sizeof(*reply),
+                                NX_ARCH_NONSECURE_READWRITE) == NX_ARCH_OK) {
+        nx_stm32u575_secure_batch_message_t input;
+        nx_stm32u575_secure_batch_reply_t output;
+        memcpy(&input, message, sizeof(input));
+        result = nx_stm32u575_secure_batch_dispatch(&batch, &input, &output);
+        if (result == NX_SUCCESS)
+            memcpy(reply, &output, sizeof(output));
+    }
+    memory.in_gateway = false;
+    __asm volatile("msr primask_ns, %0" : : "r"(original) : "memory");
+    nx_arch_dsb();
+    nx_arch_isb();
+    return (uint32_t)result;
 }
 
 void nx_reference_secure_main(void) {

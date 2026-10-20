@@ -143,7 +143,7 @@
           "id": "sram",
           "origin": 536870912,
           "size": 20480,
-          "dma": false,
+          "dma": true,
           "linker": true
         }
       ],
@@ -245,7 +245,9 @@
     "USART2": {
       "kind": "uart",
       "modes": [
-        "irq-bytes"
+        "irq-bytes",
+        "dma-tx",
+        "dma-duplex"
       ],
       "irq": [
         "USART2_IRQn"
@@ -309,6 +311,53 @@
         "PA6",
         "PA7"
       ]
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": [
+        "irq-messages"
+      ],
+      "irq": [
+        "I2C1_EV_IRQn",
+        "I2C1_ER_IRQn"
+      ],
+      "irq_numbers": [
+        31,
+        32
+      ],
+      "clock_hz": 8000000,
+      "pins": [
+        "PB6",
+        "PB7"
+      ]
+    },
+    "ADC1": {
+      "kind": "adc",
+      "modes": [
+        "single-shot"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "TIM3": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "pins": [
+        "PA6"
+      ]
+    },
+    "FLASH": {
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [],
+      "pins": []
     }
   },
   "reserved_resources": [

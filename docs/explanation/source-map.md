@@ -49,7 +49,9 @@ Relative source links are bound to the website source revision.
 ## Exact SoC implementations
 
 The private implementation boundaries and reference configurations are maintained
-in [STM32F407](../../soc/stm32f407/README.md),
+in [STM32F103](../../soc/stm32f103/README.md),
+[GD32F303](../../soc/gd32f303/README.md),
+[STM32F407](../../soc/stm32f407/README.md),
 [GD32F470](../../soc/gd32f470/README.md),
 [STM32G474](../../soc/stm32g474/README.md),
 [STM32H743](../../soc/stm32h743/README.md) and

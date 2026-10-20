@@ -24,6 +24,10 @@
     "Source/Templates/gcc/startup_stm32h743xx.s": {
       "bytes": 29344,
       "sha256": "e12e1466be79e9f368b5759575510ff90de067540ca1d975b20ac717d4fec8e5"
+    },
+    "Source/Templates/system_stm32h7xx.c": {
+      "bytes": 19751,
+      "sha256": "95a8fc5a6d765a78a8b6f0dd1fedc48994096df544e611e951c6c2e4426570e6"
     }
   },
   "license": {

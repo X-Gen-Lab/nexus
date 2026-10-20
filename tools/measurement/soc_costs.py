@@ -22,6 +22,7 @@ from tools.evidence.common import (EvidenceError, atomic_json, command, fields,
 from tools.evidence.identity import resolved_identity, resolved_input_files
 from tools.measurement.elf import Elf32
 from tools.measurement.resources import measure, resolved_float_abi
+from tools.measurement.static_storage import inspect_storage
 
 MAX_INPUT = 16 * 1024 * 1024
 PROVENANCE = {"configuration_sha256", "inputs", "source_dependencies",
@@ -36,7 +37,9 @@ def cost_values(metrics):
             **{"ram." + key: value["reserved_bytes"]
                for key, value in metrics["ram"].items()},
             **{key: metrics["reservations"][key]["bytes"]
-               for key in ("msp", "heap")}}
+               for key in ("msp", "heap")},
+            **{"static." + key + "_bytes": value for key, value in
+               metrics["static_storage"]["bytes"].items()}}
 
 
 def compiler_commands(path, cpu):
@@ -243,6 +246,8 @@ def observe(elf_path, resolved_path, budget_path, compile_commands_path, *,
     if resources["status"] != "passed":
         raise EvidenceError("actual resource budget exceeded")
     elf = Elf32(Path(elf_path).read_bytes(), float_abi=abi)
+    resources["metrics"]["static_storage"] = inspect_storage(
+        elf, resources["metrics"])
     output.mkdir(parents=True)
     executions = []
     def execute(argv, label):
@@ -360,6 +365,9 @@ def validate_observation(report):
     abi = resolved_float_abi(resolved, require_cpu=True)
     resources = measure(paths["elf"], paths["resolved"], paths["budget"],
                         float_abi=abi)
+    measured_elf = Elf32(paths["elf"].read_bytes(), float_abi=abi)
+    resources["metrics"]["static_storage"] = inspect_storage(
+        measured_elf, resources["metrics"])
     profiles, compilers, sources = compiler_commands(
         paths["compile_commands"], resolved["cpu"])
     if (resources["status"] != "passed" or

@@ -45,6 +45,29 @@
       "route": "gpio-pa4",
       "initial": 16,
       "mask": 16
+    },
+    {
+      "id": "i2c0",
+      "controller": "I2C1",
+      "route": "i2c1-pb6-pb7"
+    },
+    {
+      "id": "adc0",
+      "controller": "ADC1",
+      "route": "adc-pa0"
+    },
+    {
+      "id": "pwm0",
+      "controller": "TIM3",
+      "route": "pwm-pa6",
+      "initial": 0,
+      "mask": 64
+    },
+    {
+      "id": "flash0",
+      "controller": "FLASH",
+      "route": "flash-internal",
+      "supply_mv": 3300
     }
   ],
   "reserved_resources": [
@@ -55,7 +78,9 @@
     "Physical PCB revision, solder bridges and pin loads have not been inspected.",
     "PA5 LD2 population and PA2/PA3 USART2 ST-LINK VCP bridges have not been inspected.",
     "Nominal HSI 8 MHz retains datasheet tolerance; calibrated timing, baud and physical HIL have not been measured.",
-    "GPIOA PA4/PA5, USART2 PA2/PA3, IWDG, EXTI0/1 and SPI1 PA5/PA6/PA7 with PA4 CS are source references. PA5 LD2 loads SPI SCK; actual peripheral wiring and electrical behavior remain uninspected."
+    "GPIOA PA4/PA5, USART2 PA2/PA3, IWDG, EXTI0/1 and SPI1 PA5/PA6/PA7 with PA4 CS are source references. PA5 LD2 loads SPI SCK; actual peripheral wiring and electrical behavior remain uninspected.",
+    "PB6/PB7 I2C is a bare-silicon software route; external pullups, voltage, bus capacitance and endpoint wiring have not been inspected.",
+    "PA0 ADC and PA6 PWM are package software references; analog reference, decoupling, external loads and actual routes remain uninspected. Flash writes require valid2.7..3.6V and an explicit external region; no product reservation."
   ],
   "provenance": [
     {

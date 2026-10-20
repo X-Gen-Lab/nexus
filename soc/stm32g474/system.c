@@ -99,7 +99,8 @@ void SystemInit(void) {
 nx_result_t nx_stm32g474_validate_identity(void) {
     if ((uint32_t)NX_G474_FLASH_KIB() != 512U ||
         ((uint32_t)NX_G474_DEVICE_ID() & 0xfffU) != 0x469U ||
-        ((uint32_t)NX_G474_FLASH_OPTIONS() & FLASH_OPTR_DBANK) == 0U)
+        ((uint32_t)NX_G474_FLASH_OPTIONS() & FLASH_OPTR_DBANK) == 0U ||
+        ((uint32_t)NX_G474_FLASH_OPTIONS() & FLASH_OPTR_BFB2) != 0U)
         return NX_ERROR_IO;
     return NX_SUCCESS;
 }
@@ -132,6 +133,8 @@ nx_result_t nx_stm32g474_system_preflight(const nx_stm32g474_system_t* s) {
         (NX_G474_READ(&s->rcc->APB1ENR1) & RCC_APB1ENR1_TIM2EN) != 0U ||
         (NX_G474_READ(&s->rcc->APB1RSTR1) & RCC_APB1RSTR1_TIM2RST) != 0U ||
         !timer_cold(s) || (NX_G474_READ(&s->flash->SR) & FLASH_SR_BSY) != 0U ||
+        (NX_G474_READ(&s->flash->CR) &
+         ~(uint32_t)(FLASH_CR_LOCK | FLASH_CR_OPTLOCK)) != 0U ||
         !NX_G474_IRQ_AVAILABLE(TIM2_IRQn))
         return NX_ERROR_BUSY;
     return NX_SUCCESS;

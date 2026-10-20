@@ -18,7 +18,7 @@
 .thumb_func
 ExitRun0Mode:
     /* Run-star forbids RAM writes, including pushes/spills to MSP. Only
-     * scratch registers r0-r2 and the fixed PWR MMIO addresses are used. */
+     * scratch registers r0-r2 and reviewed MMIO addresses are used. */
     movw r0, #(NX_H743_BOOT_PWR_CR3 & 0xffff)
     movt r0, #(NX_H743_BOOT_PWR_CR3 >> 16)
     ldr r1, [r0]
@@ -51,6 +51,27 @@ ExitRun0Mode:
 .Lhalt:
     b .Lhalt
 .Lready:
+    /* ES0392 2.2.10: an older cut needs one outstanding AXI SRAM read.
+     * Match the pinned ST system template's REV_ID < 0x2000 selection.
+     * Apply after ACTVOSRDY and before any caller can touch its AXI stack. */
+    movw r0, #(NX_H743_BOOT_DBG_ID & 0xffff)
+    movt r0, #(NX_H743_BOOT_DBG_ID >> 16)
+    ldr r1, [r0]
+    lsrs r1, r1, #16
+    cmp r1, #NX_H743_BOOT_REV_NEW
+    bhs .Lboot_complete
+    movw r0, #(NX_H743_BOOT_AXI_FN & 0xffff)
+    movt r0, #(NX_H743_BOOT_AXI_FN >> 16)
+    ldr r1, [r0]
+    orr r1, r1, #NX_H743_BOOT_AXI_READ
+    str r1, [r0]
+    dsb sy
+    ldr r1, [r0]
+    tst r1, #NX_H743_BOOT_AXI_READ
+    bne .Lboot_complete
+    movs r0, #3
+    b .Lfailed
+.Lboot_complete:
     dsb sy
     isb sy
     bx lr

@@ -107,7 +107,12 @@ static void acknowledge(void* context) {
 }
 
 /** \brief Disabled NVIC sources and pending detach precede sink release. */
-static void stop_irqs(void* context) {
+static bool vector_idle(IRQn_Type irq) {
+    uint32_t index = (uint32_t)irq >> 5U;
+    uint32_t bit = UINT32_C(1) << ((uint32_t)irq & 31U);
+    return ((NVIC->ISER[index] | NVIC->ISPR[index]) & bit) == 0U;
+}
+static nx_result_t stop_irqs(void* context) {
     const nx_i2c_v1_state_t* state = context;
     NVIC_DisableIRQ(event_irq(state));
     NVIC_DisableIRQ(error_irq(state));
@@ -116,6 +121,12 @@ static void stop_irqs(void* context) {
         NVIC_DisableIRQ(dma_irq(state, false));
     }
     acknowledge(context);
+    if (!vector_idle(event_irq(state)) || !vector_idle(error_irq(state)) ||
+        (state->dma != NULL && (!vector_idle(dma_irq(state, true)) ||
+                                !vector_idle(dma_irq(state, false))))) {
+        return NX_ERROR_IO;
+    }
+    return NX_SUCCESS;
 }
 
 /** \brief Validate every possible publisher using actual selected IRQ policy.

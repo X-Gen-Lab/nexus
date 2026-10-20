@@ -2281,6 +2281,148 @@
         "independent"
       ],
       "source": "RM0456 Rev7 Chapter61, unprescaled LSI32kHz only. Assembly does not enable; application owns enable/feed policy; irreversible activation is retained."
+    },
+    {
+      "id": "spi1-pa5-pa6-pa7",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "SPI1",
+      "kind": "spi",
+      "pins": [
+        {
+          "pin": "PA5",
+          "function": "sck",
+          "af": 5
+        },
+        {
+          "pin": "PA6",
+          "function": "miso",
+          "af": 5
+        },
+        {
+          "pin": "PA7",
+          "function": "mosi",
+          "af": 5
+        }
+      ],
+      "modes": [
+        "short-poll"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "i2c1-pb8-pb9",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "I2C1",
+      "kind": "i2c",
+      "pins": [
+        {
+          "pin": "PB8",
+          "function": "scl",
+          "af": 4
+        },
+        {
+          "pin": "PB9",
+          "function": "sda",
+          "af": 4
+        }
+      ],
+      "modes": [
+        "poll-messages"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "tim3-pa6",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "TIM3",
+      "kind": "pwm",
+      "pins": [
+        {
+          "pin": "PA6",
+          "function": "ch1",
+          "af": 2
+        }
+      ],
+      "modes": [
+        "fixed-pwm"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "adc4-pc0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "ADC4",
+      "kind": "adc",
+      "pins": [
+        {
+          "pin": "PC0",
+          "function": "analog",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "single-shot"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "exti0-pa0",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "EXTI0",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA0",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "exti1-pa1",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "EXTI1",
+      "kind": "exti",
+      "pins": [
+        {
+          "pin": "PA1",
+          "function": "input",
+          "af": 0
+        }
+      ],
+      "modes": [
+        "edge-event"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
+    },
+    {
+      "id": "physical-flash",
+      "variants": [
+        "STM32U575ZIT6Q"
+      ],
+      "controller": "FLASH",
+      "kind": "flash",
+      "pins": [],
+      "modes": [
+        "poll-word"
+      ],
+      "source": "DS13737 Rev10 exactQ package/AF table and RM0456 Rev7. Software reference only; PCB/electrical behavior unobserved."
     }
   ]
 }

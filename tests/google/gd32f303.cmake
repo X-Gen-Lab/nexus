@@ -1,5 +1,5 @@
 # Actual GD32F303 code; only external register and vector boundaries are modeled.
-foreach(gd303_suite system provider watchdog spi)
+foreach(gd303_suite system provider watchdog spi exti)
 set(gd303_target nexus_gd32f303_${gd303_suite}_test)
 nexus_google_test(${gd303_target}
     SOURCES gd32f303_${gd303_suite}_test.cpp
@@ -9,6 +9,7 @@ nexus_google_test(${gd303_target}
         "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/uart.c"
         "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/watchdog.c"
         "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/exti.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/gd32f303/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model")

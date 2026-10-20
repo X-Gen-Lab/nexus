@@ -57,6 +57,19 @@ inside private SoC state machines; factory and public I/O contracts are unchange
 Full HAL Handle/callback transport requires separate mode-specific evaluation.
 See [official driver integration](../design/official-stm32-provider.md).
 
+The legacy F103/GD303 selections share private algorithms only after exact vendor
+register, bit, clock and memory checks. A TX-only channel-DMA instance owns a
+compact TX prefix and an IRQ-byte ring; only duplex adds the finite RX-block
+extension. Selected methods and direct IRQ entries let ordinary section GC remove
+unused block code. No runtime forwarding layer or implicit mode fallback is added.
+
+G474's selected ADC bulb mode, H743's Cache/domain policies and U575's TZEN0
+peripherals remain exact SoC contracts. Optional H743 D2 SRAM1 is budgeted and
+initialized before DMA admission; hardware reachability alone does not authorize
+an arbitrary address. Finite RX/ADC blocks require explicit owner service and
+rearm gaps. The separate TZEN1 GPIO job copies at most eight commands into Secure
+storage and retains no NonSecure pointer. It is not general asynchronous I/O.
+
 ## Lifecycle and failure responsibility
 
 ![Current initialization, failure withdrawal and retained cleanup responsibility](../assets/diagrams/platform-lifecycle.svg)
@@ -66,6 +79,13 @@ start and after stop; its pointer is not a capability to execute cold hardware.
 Partial failure can retain irreversible watchdog effects or busy borrows. Products
 must inspect primary and cleanup outcomes, continue the real executor, and retain
 quarantined resources. Platform start never starts a scheduler.
+
+Physical Flash reports exact geometry and `program_flags`. An ECC fresh-erase
+requirement belongs to the caller's provenance contract: all-FF readback cannot
+prove unused ECC state, and a failed pulse requires another erase. All-FF source
+units issue no pulse. A started pulse must settle before return; an expired
+deadline prevents later pulses and never cancels hardware already programming.
+Products own writable regions, voltage, execution stalls, watchdog and power loss.
 
 Optional generated diagnosed start/stop entries write phase and controller
 location to caller-owned cold-path storage. They retain no diagnostic pointer

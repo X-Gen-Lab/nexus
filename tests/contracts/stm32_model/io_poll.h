@@ -39,14 +39,16 @@ void nx_stm32_model_nvic_clear(int irq);
 #undef NVIC_GetEnableIRQ
 #undef NVIC_GetPendingIRQ
 #undef NVIC_GetActive
+#undef NVIC_ClearPendingIRQ
 #undef NVIC_GetPriority
 #undef NVIC_SetPriority
 #undef NVIC_EnableIRQ
-#define NVIC                    (&g_nx_stm32_io_nvic)
-#define NVIC_GetEnableIRQ(irq)  nx_stm32_model_nvic_bit(NVIC->ISER, (int)(irq))
-#define NVIC_GetPendingIRQ(irq) nx_stm32_model_nvic_bit(NVIC->ISPR, (int)(irq))
-#define NVIC_GetActive(irq)     nx_stm32_model_nvic_bit(NVIC->IABR, (int)(irq))
-#define NVIC_GetPriority(irq)   (NVIC->priority[(unsigned)(irq)])
+#define NVIC                      (&g_nx_stm32_io_nvic)
+#define NVIC_GetEnableIRQ(irq)    nx_stm32_model_nvic_bit(NVIC->ISER, (int)(irq))
+#define NVIC_GetPendingIRQ(irq)   nx_stm32_model_nvic_bit(NVIC->ISPR, (int)(irq))
+#define NVIC_GetActive(irq)       nx_stm32_model_nvic_bit(NVIC->IABR, (int)(irq))
+#define NVIC_ClearPendingIRQ(irq) nx_stm32_model_nvic_clear((int)(irq))
+#define NVIC_GetPriority(irq)     (NVIC->priority[(unsigned)(irq)])
 #define NVIC_SetPriority(irq, value)                                           \
     (NVIC->priority[(unsigned)(irq)] = (uint8_t)(value))
 #define NVIC_EnableIRQ(irq)             nx_stm32_model_nvic_enable((int)(irq))

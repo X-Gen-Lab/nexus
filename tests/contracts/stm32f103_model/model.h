@@ -18,6 +18,8 @@ typedef struct {
     RCC_TypeDef rcc;
     FLASH_TypeDef flash;
     TIM_TypeDef timer;
+    TIM_TypeDef pwm;
+    ADC_TypeDef adc;
     GPIO_TypeDef gpio;
     AFIO_TypeDef afio;
     EXTI_TypeDef exti;
@@ -75,6 +77,7 @@ void nx_f103_model_spi_poll(void* port);
 void nx_f103_model_spi_write(SPI_TypeDef* spi, uint8_t byte);
 uint8_t nx_f103_model_spi_read(SPI_TypeDef* spi);
 void nx_f103_model_watchdog_poll(void* port);
+void nx_f103_model_device_poll(unsigned kind, void* port);
 bool nx_f103_model_privileged(void);
 uint32_t nx_f103_model_read(volatile uint32_t* reg);
 void nx_f103_model_write(volatile uint32_t* reg, uint32_t value);
@@ -84,6 +87,9 @@ nx_result_t nx_f103_model_irq_control(int irq, bool enabled, uint8_t priority);
 #define NX_F103_SPI_WRITE_DATA(regs, byte) nx_f103_model_spi_write(regs, byte)
 #define NX_F103_SPI_READ_DATA(regs)        nx_f103_model_spi_read(regs)
 #define NX_F103_MODEL                      1
+#define NX_LEGACY_READ(reg)                nx_f103_model_read(reg)
+#define NX_LEGACY_WRITE(reg, value)        nx_f103_model_write(reg, value)
+#define NX_LEGACY_POLL(kind, port)         nx_f103_model_device_poll(kind, port)
 #define nx_arch_is_privileged()            nx_f103_model_privileged()
 #define NX_F103_READ(reg)                  nx_f103_model_read(reg)
 #define NX_F103_WRITE(reg, value)          nx_f103_model_write((reg), (value))
@@ -104,10 +110,16 @@ nx_result_t nx_f103_model_irq_control(int irq, bool enabled, uint8_t priority);
 #undef AFIO
 #undef RCC
 #undef EXTI
+#undef ADC1
+#undef TIM3
+#undef FLASH
 #define GPIOA NX_F103_GPIOA
 #define AFIO  NX_F103_AFIO
 #define RCC   (&g_f103_model.rcc)
 #define EXTI  (&g_f103_model.exti)
+#define ADC1  (&g_f103_model.adc)
+#define TIM3  (&g_f103_model.pwm)
+#define FLASH (&g_f103_model.flash)
 #ifdef __cplusplus
 }
 #endif

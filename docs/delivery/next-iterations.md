@@ -22,17 +22,26 @@ Ethernet、capture 和 complementary PWM。先以实际吞吐、IRQ latency、�
 IRQ 延迟或消费者速度下无丢失。I2C 保持 100 kHz、7-bit address，每条1–256 bytes、
 最多8条消息和精确 route；10-bit 或更长事务仍是独立扩展。
 
-H743 当前维护固定 HSI 时钟、timebase、GPIO、IRQ UART 和显式有限 UART TX DMA；
-Cache-on TX 只接受独占完整 Cache line 的 AXI SRAM payload，RX 仍是 IRQ bytes。
-U575 的默认 TZEN0 Platform 与独立 TZEN1 双域同步 GPIO 参考分别维护；双域参考
-不提供 RTOS、factory 或异步 DMA。芯片事实不授权其他模式、路由或实板资格。
+F103/GD303 新增有限 UART channel-DMA、正常 RX block、I2C IRQ 消息及物理
+Flash／单次 ADC／固定 PWM；GD303 另维护 EXTI。有限 RX 依赖 owner service
+重新装填，必须测量间隙、背压和丢失；I2C priority0 不允许内核通知。GD303 的硬件
+timer 级联还需实测跨域 carry 与 Flash 停顿，不能由主机模型推断传播延迟。
+
+G474 新增 ADC1 bulb 单次／TIM6 正常 DMA block、I2C1 polling 和 ECC Flash；
+必须实测首次转换丢弃、预热、2.5–50 kHz 精确触发范围与真实采样孔径。H743 已维护
+有限 UART RX DMA-IDLE、可选已初始化 D2 SRAM1 和七类有限外设；Cache-on DMA
+仍要求独占完整 lines，RX 有 service/rearm 间隙，Flash 仅开放 Cache off。U575
+TZEN0 已有 SPI/I2C/ADC/PWM/EXTI/Flash 的有限夹具；VDDA/ASV、VDDIO2 与真实
+总线电气须单独验收。独立 TZEN1 参考仅新增复制最多八个 PC7 命令的 cooperative
+job，Secure 私有存储保留状态，NS 地址不跨调用保留；没有通用异步借用、RTOS、
+双域 factory 或跨域 DMA。芯片事实不授权其他模式、路由或实板资格。
 后续顺序与明确退出条件见
 [SOC-28–36](../design/soc-refinement.md)：
 
 | 方向 | 进入实现前必须固定的合同 |
 |---|---|
-| G474 新模式或更多 controller/route | 精确寄存器、IRQ／DMA 冲突、Board 来源、实例隔离与预算 |
-| H743 DMA 与 Cache | DMA1/2、BDMA、MDMA 各自可达域，cache-line 所有权，对齐和 clean/invalidate 时序，失败后保留借用 |
+| G474 新模式或更多 controller/route | 已有 bulb/有限 DMA/I2C/Flash 的实测边界；新控制器另固定 IRQ／DMA 冲突、Board 来源、实例隔离与预算 |
+| H743 DMA 与 Cache | 已有 AXI/SRAM1 有限路径的实测一致性；其他 DMA1/2、BDMA、MDMA 分别审查可达域、cache-line 所有权、维护时点与失败借用 |
 | U575 DMA 与安全域 | GPDMA/LPDMA descriptor 生命周期、内存和外设归属、GTZC/MPCBB、实际 TZEN 入口与错误处理 |
 | 新固定时钟或运行时变频 | 供电／Flash／bus 顺序、consumer 重配置、回滚和 deadline domain；固定 profile 与动态转换分别实现 |
 | bootloader 接管或 deep STOP | VTOR／mask／FP／DMA 活跃状态、RAM 所有权，RTC/LPTIM 连续域、wake 恢复与精度 |
@@ -42,6 +51,11 @@ U575 的默认 TZEN0 Platform 与独立 TZEN1 双域同步 GPIO 参考分别维�
 合同，再用 GoogleTest/GoogleMock 做真实 RED→GREEN 的生产 provider 纵切片，
 随后验证实际生成 factory、ARM ELF、SDK 与物理边界。未选择模式不驻留资源，
 不把不断扩大的通用对象成本摊到全部产品。
+
+本轮源实现、定向开发执行与最终集成软件资格分开记录。最终验收须绑定冻结后的
+精确 source/config/tool/artifact；新文档、源码合并或旧测试计数不替代实际执行。
+ECC Flash 的 `program_flags`、fresh-erase 来源及逐脉冲完成证据也要进入产品调用
+合同。实板未接入，物理项继续为 `not_executed`，不提升为安全认证或生产发布。
 
 优先复用已有窄端口与静态装配；当现有合同无法表达硬件事实时允许明确版本化的
 破坏性变更。Flash 认证、升级、制造密钥与工业安全政策属于外部产品／独立机制，

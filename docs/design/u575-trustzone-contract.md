@@ -1,4 +1,4 @@
-# U575 synchronous dual-world reference contract
+# U575 dual-world GPIO reference contract
 
 This is a software reference for an explicit Secure and NonSecure image pair on
 STM32U575 with 2 MiB Flash. It is separate from the existing TZEN0 platform
@@ -121,6 +121,35 @@ SG/BLXNS opcodes alone. Host Google tests establish software admission and
 failure behavior; real ARM ELFs establish ABI/link/layout properties. Hardware
 must still verify attribution, fault delivery, CMSE observations, lock behavior,
 GPIO effect, provisioning and the exact board revision.
+
+## Copied cooperative GPIO jobs
+
+`nx_reference_gpio_batch` is a second narrow SG entry. Its fixed76byte scalar
+input and16byte reply must be fully aligned, disjoint spans within the sealed NS
+RAM mapping. The gateway checks arithmetic overflow and complete extents, then
+performs real CMSE NonSecure unprivileged read/write checks while preserving
+the incoming NS interrupt mask. It copies input into Secure storage before
+admission and copies a reply only after a successful operation. No NS address
+survives return. The existing static-world, no-IRQ, no-DMA and sealed-attribution
+preconditions remain mandatory.
+
+One static Secure slot stores at most eight granted PC7 set/clear commands.
+Admission copies and validates the complete list without GPIO effects. SERVICE
+executes at most one command, POLL only copies latched status, CANCEL settles
+future commands while previous writes remain effective, and CONSUME releases
+only a terminal job. Replacing running or unconsumed work is rejected. Tickets
+use monotonically increasing32bit epochs; UINT32_MAX exhausts admission and
+never wraps to make an old ticket valid. A GPIO error latches FAILED and the
+completed prefix; a caller polls that same ticket before consumption.
+
+This copied cooperative scenario creates no user-buffer loan, hidden worker,
+callback, clock or interrupt source. It provides no execution interval or
+gap-free waveform guarantee. It does not establish Secure UART, arbitrary DMA,
+NS IRQ, NS RTOS or general asynchronous TrustZone support. Production GoogleTest/
+GoogleMock contracts exercise copying, one-step progress, stale tickets, slot
+backpressure, cancellation, errors, span boundaries and alias rejection. The
+paired ARM gate verifies both real SG veneers, both exact import symbols and
+the Secure implementation addresses. Physical HIL remains not executed.
 
 ## Source basis and validation
 
