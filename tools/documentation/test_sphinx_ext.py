@@ -33,6 +33,58 @@ class DocumentationSourceTests(unittest.TestCase):
                 'a' * 40)
             self.assertIn('/blob/' + 'a' * 40 + '/core/include/nexus/core/request.h', result)
 
+    def test_source_link_code_labels_preserve_markup_and_bind_revision(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            page = root / 'docs/design/example.md'
+            page.parent.mkdir(parents=True)
+            assembly = root / 'tools/configure/assemblies/h743-high-peripherals.toml'
+            assembly.parent.mkdir(parents=True)
+            assembly.write_text('# maintained assembly fixture\n', encoding='utf-8')
+            (page.parent / 'status.csv').write_text('status\n', encoding='utf-8')
+            (page.parent / 'related.md').write_text('# Related\n', encoding='utf-8')
+            archived = root / 'docs/archive/history.md'
+            archived.parent.mkdir()
+            archived.write_text('# History\n', encoding='utf-8')
+            target = '../../tools/configure/assemblies/h743-high-peripherals.toml'
+            revision = 'a' * 40
+            bound = ('https://github.com/X-Gen-Lab/nexus/blob/' + revision
+                     + '/tools/configure/assemblies/h743-high-peripherals.toml')
+            literal = f'[`h743-high-peripherals.toml`]({target})'
+            unchanged = (
+                f'Use `[assembly]({target})` as markup.',
+                f'Use ``{literal}`` as markup.',
+                f'```markdown\n{literal}\n```\n',
+                f'~~~markdown\n{literal}\n~~~\n',
+                '!' + literal,
+                '[`assembly`](https://example.invalid/assembly.toml)',
+                '[`status.csv`](status.csv)',
+                '[`related.md`](related.md)',
+                f'Use ``literal ` [assembly]({target})`` as markup.',
+            )
+            cases = [(source, source) for source in unchanged]
+            for label in ('assembly', '`h743-high-peripherals.toml`',
+                          '`h743-high-peripherals.toml` assembly',
+                          '``h743-high-peripherals.toml``'):
+                cases.append((f'[{label}]({target})', f'[{label}]({bound})'))
+            cases.extend((
+                ('[`assemblies`](../../tools/configure/assemblies)',
+                 f'[`assemblies`](https://github.com/X-Gen-Lab/nexus/tree/{revision}'
+                 '/tools/configure/assemblies)'),
+                ('[`history.md`](../archive/history.md)',
+                 f'[`history.md`](https://github.com/X-Gen-Lab/nexus/blob/{revision}'
+                 '/docs/archive/history.md)'),
+                (f'Before `[example]({target})` then {literal} and [plain]({target}).',
+                 f'Before `[example]({target})` then '
+                 f'[`h743-high-peripherals.toml`]({bound}) and [plain]({bound}).'),
+            ))
+            for document_root_links in (False, True):
+                for source, expected in cases:
+                    with self.subTest(source=source, root_links=document_root_links):
+                        self.assertEqual(sphinx_ext.rewrite_local_links(
+                            source, page, root / 'docs', root, revision,
+                            document_root_links=document_root_links), expected)
+
     def test_source_directory_link_uses_revision_bound_tree(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
