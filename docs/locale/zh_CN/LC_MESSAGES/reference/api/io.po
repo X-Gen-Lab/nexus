@@ -7013,10 +7013,6 @@ msgid "[in] DATA or control STATUS; STATUS must be zero length."
 msgstr "[in] DATA 或控制 STATUS；STATUS 长度必须为零。"
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
-msgid "[in] Current SETUP epoch for EP0, zero for bulk endpoints."
-msgstr "[in] EP0 使用当前 SETUP epoch；bulk 端点使用零。"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
 msgid "[in] Absolute independent monotonic clock deadline."
 msgstr "[in] 独立单调时钟中的绝对时限。"
 
@@ -7098,10 +7094,6 @@ msgstr "仅端点无存活传输时设置／清除 STALL。"
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
 msgid "[in] Serialized owner, started and IRQ masks clear."
 msgstr "[in] 已启动的串行化所有者，IRQ 屏蔽须解除。"
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
-msgid "[in] Desired STALL; clearing bulk also resets DATA0."
-msgstr "[in] 期望的 STALL；清除 bulk STALL 时同时复位 DATA0。"
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
 msgid "Success after readback, BUSY retains a pending request."
@@ -7579,18 +7571,6 @@ msgstr ""
 "校验精确的选定 FS 事实，不观测 controller。"
 
 msgid ""
-"Task/ISR bounded and read-only. Facts identify selected software "
-"support; they never imply PCB routing, VBUS wiring or physical "
-"qualification. Public metadata, endpoint arrays, faces and operations "
-"tables require their natural C alignment and nonwrapping extents. "
-"Numeric rejection is not a probe of arbitrary addresses or opaque "
-"private contexts."
-msgstr ""
-"在 Task／ISR 中有界且只读。事实标识选定的软件支持；绝不表示 PCB 布线、VBUS 接线或物理资格。公共元数据、endpoint "
-"数组、face 及 operations table 须按其 C "
-"类型自然对齐，存储范围不能回绕。数值检查中的拒绝不能用于探测任意地址或不透明的私有 context。"
-
-msgid ""
 "[in] Stable readable immutable facts, faces and endpoint array."
 msgstr ""
 "[in] 稳定、可读且不可变的事实、face 及 endpoint 数组。"
@@ -7674,3 +7654,12 @@ msgid ""
 "Optional epoch-bound EP0 rejection, separate from generic ops."
 msgstr ""
 "可选的 epoch 绑定 EP0 拒绝接口，与 generic ops 独立。"
+
+msgid "[in] Current SETUP epoch for EP0, zero for nonzero endpoints."
+msgstr "[in] EP0 使用当前 SETUP epoch；非零端点使用零。"
+
+msgid "[in] Desired STALL; clearing bulk/interrupt resets DATA0."
+msgstr "[in] 期望的 STALL；清除 bulk/interrupt STALL 时同时复位 DATA0。"
+
+msgid "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS. Interrupt selects nonzero IN with 1..64-byte MPS. Host polling interval belongs to the external descriptor, not this profile."
+msgstr "在 Task／ISR 中有界且只读。事实标识选定的软件支持；绝不表示 PCB 布线、VBUS 接线或物理资格。公共元数据、endpoint 数组、face 及 operations table 须按其 C 类型自然对齐，存储范围不能回绕。数值检查中的拒绝不能用于探测任意地址或不透明的私有 context。 EP0 选择 control/64；非零 bulk 选择 8/16/32/64-byte MPS。interrupt 选择非零 IN，MPS 为 1..64-byte。host 轮询间隔属于外部 descriptor，不属于此 profile。"

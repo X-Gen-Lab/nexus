@@ -3,7 +3,7 @@
  * \brief           Bounded selected-FS descriptor structure validation
  * \author          Nexus Team
  * \version         1.0.0
- * \date            2026-10-20
+ * \date            2026-10-21
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/components/usb_descriptors.h"
@@ -58,15 +58,19 @@ static nx_result_t configuration(const nx_usb_device_profile_t* p,
                 (d[2] & 15U) == 0U || (d[3] & 252U) != 0U) {
                 return NX_ERROR_INVALID;
             }
-            if ((d[3] & 3U) != 2U) {
-                return NX_ERROR_UNSUPPORTED;
-            }
+            unsigned transfer = d[3] & 3U;
             unsigned number = d[2] & 15U;
             bool input = (d[2] & 128U) != 0U;
+            if (transfer != 2U && (transfer != 3U || !input)) {
+                return NX_ERROR_UNSUPPORTED;
+            }
+            nx_usb_profile_transfer_t selected =
+                transfer == 2U ? NX_USB_PROFILE_BULK : NX_USB_PROFILE_INTERRUPT;
             const nx_usb_endpoint_profile_t* ep =
                 nx_usb_profile_endpoint(p, (uint8_t)number, input);
-            if (ep == NULL || ep->transfer != NX_USB_PROFILE_BULK ||
-                u16(d + 4U) != ep->max_packet) {
+            if (ep == NULL || ep->transfer != selected ||
+                u16(d + 4U) != ep->max_packet ||
+                (transfer == 3U && d[6] == 0U)) {
                 return NX_ERROR_INVALID;
             }
             uint16_t bit = (uint16_t)(1U << (number * 2U + (input ? 1U : 0U)));

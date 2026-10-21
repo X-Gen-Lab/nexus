@@ -286,6 +286,14 @@ nx_result_t nx_native_usb_complete(nx_native_usb_device_t* model, uint8_t ep,
 }
 void nx_native_usb_reset(nx_native_usb_device_t* model) {
     if (model != NULL) {
+        /* ST FS bus reset clears USBAEP on every nonzero direction. This
+         * physical-port reference does not infer the GD reset side effect. */
+        for (uint32_t number = 1U; number < 4U; ++number) {
+            model->hardware.registers[(0x900U + number * 32U) / 4U] &=
+                ~(1U << 15U);
+            model->hardware.registers[(0xB00U + number * 32U) / 4U] &=
+                ~(1U << 15U);
+        }
         model->hardware.registers[0x14U / 4U] |= 1U << 12U;
     }
 }

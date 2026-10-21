@@ -66,3 +66,10 @@ IO-24 hardware exit is established by this archive.
 manifest; [verified.json](verified.json) records byte verification. No previous
 F407 archive or whole source/vendor/build tree is duplicated here. The living
 README and relocated package locator remain outside the immutable raw payload.
+
+## Accepted `430b0aea` successor
+
+The [accepted collection](accepted-430-COLLECTION.md) separately retains
+the actual later complete-index gate: 6,288 Google cases and 2,951 tool cases.
+The original `71d1...` archive above remains unchanged and describes its earlier
+archival phase; neither archive establishes the later USB increment or HIL.

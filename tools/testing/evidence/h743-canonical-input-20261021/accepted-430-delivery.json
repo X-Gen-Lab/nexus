@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "kind": "exact_successor_capture_of_accepted_h743_ordinary_gate",
+  "source_commit": "430b0aea19fc3304b5b6f76dcec8419448027357",
+  "source_tree": "3d4eef6bb2bf2656ccf5628d04cf5160f884e6ce",
+  "executed_google_cases": 6288,
+  "google_programs": 348,
+  "executed_tool_cases": 2951,
+  "commands": 702,
+  "ordinary_and_commit_msg_exit_code": 0,
+  "frozen_index_paths": 32,
+  "original_phase_notes": [
+    "The reporting consumer guessed2950, then failed its own assertion after the actual completed0 gate; this was not a test failure.",
+    "The original71d1 package precedes this430 gate and preserves the ed4f predecessor; it does not contain this acceptance.",
+    "This addendum captures accepted430 only, not the later USB increment or physical qualification."
+  ],
+  "retained_metadata_inputs": [
+    {
+      "path": "/tmp/nexus-h743-accepted-gate-capture-20261021/sealed-final-delivery.json",
+      "sha256": "b3db162ee8cfe5d4a3174b0c00c8cad82024c999290c29d6893f3a2b3379e549",
+      "size": 3773
+    },
+    {
+      "path": "/tmp/nexus-h743-accepted-gate-capture-20261021/capture-manifest.json",
+      "sha256": "d2856a8602b1d13e8e6754ff2e4a6cf1acbe120494d3094b636073440ddb50c3",
+      "size": 2190
+    },
+    {
+      "path": "/tmp/nexus-h743-accepted-gate-capture-20261021/independent-audit.json",
+      "sha256": "fe7b54f4956dd69849e2e4153d5b01412137798703bca6fab3f3f0f44e3d296f",
+      "size": 1063
+    },
+    {
+      "path": "/tmp/nexus-h743-accepted-gate-capture-20261021/payload-retirement.json",
+      "sha256": "2d20da3f259a65375a3637a1ef00c3585e9c184566a0576787d3859c14a716ce",
+      "size": 4110
+    },
+    {
+      "path": "/tmp/nexus-h743-accepted-gate-capture-20261021/payload-retirement-independent-audit.json",
+      "sha256": "49d05165101888c8841271bc97015bdc1b7173aa2a1904dd332a7411c3432a4b",
+      "size": 967
+    },
+    {
+      "path": "/tmp/nexus-h743-canonical-root-20261021/final-acceptance.json",
+      "sha256": "c4f62c4c5d666924b86268e4573f8f47ecbcbddf0771c2439265f5fffc101bb5",
+      "size": 680
+    },
+    {
+      "path": "/tmp/nexus-h743-canonical-root-20261021/ordinary-input-freeze.json",
+      "sha256": "f95f0956bf2b244ccdaa3517f8cfe89569ae14fe18c05d3e6267add0bb80b45c",
+      "size": 6829
+    }
+  ],
+  "raw_package": {
+    "schema_version": 1,
+    "kind": "portable_evidence",
+    "archive": {
+      "path": "tools/testing/evidence/h743-canonical-input-20261021/raw/0e00e1db76221e47ead52ff0952fd5134d4997d0ddd44676baa72c317c37a797.tar.gz",
+      "sha256": "0e00e1db76221e47ead52ff0952fd5134d4997d0ddd44676baa72c317c37a797",
+      "size": 1551911
+    },
+    "manifest_sha256": "f5c5daa47a956362c672a6f8c86f1527be9104a2332f24b9c265cd634c3e58e5",
+    "files": 2369,
+    "bytes": 16418722,
+    "signature_status": "unsigned",
+    "product_promotion": false
+  },
+  "verified_transported_copy": {
+    "status": "verified",
+    "files": 2369,
+    "bytes": 16418722,
+    "archive_sha256": "0e00e1db76221e47ead52ff0952fd5134d4997d0ddd44676baa72c317c37a797"
+  },
+  "archive_navigation_only_changed": true,
+  "copy_uses_distinct_inode": true,
+  "product_promotion": false,
+  "physical_status": "not_executed"
+}

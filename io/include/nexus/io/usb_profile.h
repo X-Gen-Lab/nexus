@@ -20,9 +20,11 @@ typedef enum { NX_USB_PROFILE_DEVICE } nx_usb_profile_role_t;
 typedef enum { NX_USB_PROFILE_FULL_SPEED } nx_usb_profile_speed_t;
 typedef enum { NX_USB_PROFILE_INTERNAL_FS } nx_usb_profile_phy_t;
 typedef enum { NX_USB_PROFILE_PIO } nx_usb_profile_engine_t;
+/* Selected kinds, independent of controller EPTYP encodings. */
 typedef enum {
     NX_USB_PROFILE_CONTROL,
-    NX_USB_PROFILE_BULK
+    NX_USB_PROFILE_BULK,
+    NX_USB_PROFILE_INTERRUPT
 } nx_usb_profile_transfer_t;
 typedef struct {
     const nx_usb_endpoint_port_t* port;
@@ -69,7 +71,10 @@ typedef struct {
  *                  endpoint arrays, faces and operations tables require their
  *                  natural C alignment and nonwrapping extents. Numeric
  *                  rejection is not a probe of arbitrary addresses or opaque
- *                  private contexts.
+ *                  private contexts. EP0 selects control/64; nonzero
+ *                  bulk selects 8/16/32/64-byte MPS. Interrupt selects
+ *                  nonzero IN with 1..64-byte MPS. Host polling interval
+ *                  belongs to the external descriptor, not this profile.
  */
 nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* profile);
 /**

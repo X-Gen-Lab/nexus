@@ -26,8 +26,11 @@ typedef struct {
  *                  output effects.
  *
  * \note            Configuration views require alternate zero, endpoint plans
- *                  matching selected bulk ports, consistent totals and unique
- *                  interface numbers. Class-specific subordinate bytes are
+ *                  matching selected bulk or interrupt IN ports, consistent
+ *                  totals and unique interface numbers. Interrupt bInterval is
+ *                  a nonzero linear count of full-speed 1 ms frames in external
+ *                  descriptor bytes. Bulk bInterval is not interpreted; no
+ *                  polling is scheduled. Class-specific subordinate bytes are
  *                  bounds-checked but not decoded. Class dispatch, VID/PID,
  *                  strings, policy, CDC/HID and descriptor lookup remain
  *                  external. Success is structural validation, not

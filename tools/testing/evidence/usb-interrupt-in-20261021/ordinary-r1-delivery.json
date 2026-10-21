@@ -1,0 +1,40 @@
+{
+  "kind": "failed_ordinary_R1_compile_evidence",
+  "master_exit_code": 1,
+  "source_base": "430b0aea19fc3304b5b6f76dcec8419448027357",
+  "candidate_index_tree": "8f33aa0000cf7d741488b0cf1c8f7edbd6cae3fa",
+  "candidate_index_paths": 48,
+  "source_freeze_files": 34,
+  "executed_tool_cases": 2955,
+  "executed_google_cases": 0,
+  "accepted_USB_commit": null,
+  "failure": "cc1plus killed compiling nexus_stm32_can_factory_test, Ninja [47/440]",
+  "oom_events": {
+    "oom": 63,
+    "oom_kill": 12
+  },
+  "raw_package": {
+    "schema_version": 1,
+    "kind": "portable_evidence",
+    "archive": {
+      "path": "tools/testing/evidence/usb-interrupt-in-20261021/raw/e30cc8c6bd35f9b8a9cf5c7ad8ced1e26286afe0527cb06584141fac6d15b9a9.tar.gz",
+      "sha256": "e30cc8c6bd35f9b8a9cf5c7ad8ced1e26286afe0527cb06584141fac6d15b9a9",
+      "size": 16592
+    },
+    "manifest_sha256": "990f4ee1466503671648b3fccafadc4cb72011e177d8cbb4d06694d4a0a966fa",
+    "files": 49,
+    "bytes": 104637,
+    "signature_status": "unsigned",
+    "product_promotion": false
+  },
+  "transported_copy_verified": {
+    "status": "verified",
+    "files": 49,
+    "bytes": 104637,
+    "archive_sha256": "e30cc8c6bd35f9b8a9cf5c7ad8ced1e26286afe0527cb06584141fac6d15b9a9"
+  },
+  "copy_distinct_inode": true,
+  "sealed_independent_review_sha256": "1702523405c7e6d41d4f6e8d45c2e6dfceb8cdd7701d54434308e364695d5e08",
+  "source_bodies_included": false,
+  "phase_note": "This failure is not R2 acceptance. Build-only resource-recovery preflight later completed configure/build with exit 0; R2 must rerun all ordinary checks and tests."
+}

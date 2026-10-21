@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 78ca88637a577d4bea8fd440fdf02e2a8a3ce8eb9e96c4d506aa5b3063f856c5\n"
+"X-Nexus-Source-SHA256: ccb4259fd955bf4340a92338c6d479257ea89d9de8251bd4d28bad18612cd300\n"
 
 #: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:1
 msgid "派生能力与接入矩阵"
@@ -1000,14 +1000,6 @@ msgid "`usbfs-pa11-pa12`"
 msgstr "`usbfs-pa11-pa12`"
 
 #: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/usb_assembly/gd32-freertos.toml`, "
-"`tests/contracts/usb_assembly/gd32.toml`"
-msgstr ""
-"`tests/contracts/usb_assembly/gd32-freertos.toml`, "
-"`tests/contracts/usb_assembly/gd32.toml`"
-
-#: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:0
 msgid "`io/src/usb_device_controller.c`"
 msgstr "`io/src/usb_device_controller.c`"
 
@@ -1484,18 +1476,6 @@ msgstr "`soc/stm32f407/drivers/watchdog.c`"
 #: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:0
 msgid "OTG_FS"
 msgstr "OTG_FS"
-
-#: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:0
-msgid ""
-"`tests/contracts/usb_assembly/stm32-ve-freertos.toml`, "
-"`tests/contracts/usb_assembly/stm32-ve.toml`, "
-"`tests/contracts/usb_assembly/stm32-zg-freertos.toml`, "
-"`tests/contracts/usb_assembly/stm32-zg.toml`"
-msgstr ""
-"`tests/contracts/usb_assembly/stm32-ve-freertos.toml`, "
-"`tests/contracts/usb_assembly/stm32-ve.toml`, "
-"`tests/contracts/usb_assembly/stm32-zg-freertos.toml`, "
-"`tests/contracts/usb_assembly/stm32-zg.toml`"
 
 #: ../../../../tmp/nexus-io-validation-20261018/docs/delivery/capabilities.md:0
 msgid "dma"
@@ -2810,3 +2790,9 @@ msgstr "`cmake/package/verification/io_evolution/h743-high-uart.toml`, `tests/co
 
 msgid "`cmake/package/verification/io_evolution/h743-high-uart.toml`, `tests/contracts/h743_assembly/io-freertos.toml`, `tests/contracts/h743_assembly/io.toml`, `tools/configure/assemblies/h743-high-peripherals.toml`, `tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, `tools/configure/assemblies/nucleo-h743-freertos-uart.toml`"
 msgstr "`cmake/package/verification/io_evolution/h743-high-uart.toml`, `tests/contracts/h743_assembly/io-freertos.toml`, `tests/contracts/h743_assembly/io.toml`, `tools/configure/assemblies/h743-high-peripherals.toml`, `tools/configure/assemblies/nucleo-h743-baremetal-uart.toml`, `tools/configure/assemblies/nucleo-h743-freertos-uart.toml`"
+
+msgid "`tests/contracts/usb_assembly/gd32-freertos.toml`, `tests/contracts/usb_assembly/gd32-interrupt.toml`, `tests/contracts/usb_assembly/gd32.toml`"
+msgstr "`tests/contracts/usb_assembly/gd32-freertos.toml`, `tests/contracts/usb_assembly/gd32-interrupt.toml`, `tests/contracts/usb_assembly/gd32.toml`"
+
+msgid "`tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml`"
+msgstr "`tests/contracts/usb_assembly/stm32-ve-freertos.toml`, `tests/contracts/usb_assembly/stm32-ve-interrupt.toml`, `tests/contracts/usb_assembly/stm32-ve.toml`, `tests/contracts/usb_assembly/stm32-zg-freertos.toml`, `tests/contracts/usb_assembly/stm32-zg-interrupt.toml`, `tests/contracts/usb_assembly/stm32-zg.toml`"

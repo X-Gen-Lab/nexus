@@ -1,0 +1,124 @@
+{
+  "kind": "USB_interrupt_IN_development_evidence_delivery",
+  "status": "sealed_verified_restored_inventory_equal",
+  "archive": {
+    "path": "/dev/shm/nexus-usb-interrupt-cas-20261021/3aedc16130ccf74d183ad5d12929794e191c4ee542f3143c3a28396ef907a926.tar.gz",
+    "sha256": "3aedc16130ccf74d183ad5d12929794e191c4ee542f3143c3a28396ef907a926",
+    "size": 2745116
+  },
+  "files": 602,
+  "payload_bytes": 14681702,
+  "manifest_sha256": "e9d186559c14eb495dd2df9cbc01f6246af5180f46d9313cda1ffc9ac2bc7a94",
+  "signature_status": "unsigned",
+  "product_promotion": false,
+  "export_invocations": 1,
+  "storage_implementation": "existing tools.evidence.store only",
+  "verification": {
+    "existing_store_verify": "PASS",
+    "existing_store_restore": "PASS",
+    "explicit_source_restored_inventory_comparison": "PASS",
+    "independent_closure_audit": "CLEAR"
+  },
+  "frozen_collection": {
+    "original_copies": 593,
+    "final_source_files": 34,
+    "final_reviewed_PO_files": 9,
+    "copy_list_sha256": "3812e8aabbda649b00e15c1e72016de7e43f6262321937374940a3a9bb30d908"
+  },
+  "actual_preserved_validation": {
+    "normal_USB_cases": 186,
+    "normal_USB_programs": 10,
+    "configuration_R3_cases": 51,
+    "focused_ASan_UBSan_cases": 84,
+    "focused_ASan_UBSan_programs": 4,
+    "selected_ARM_linked_fixtures": 6,
+    "unselected_ARM_linked_fixtures": 2,
+    "strict_bilingual_docs_R2_pages": 127,
+    "strict_bilingual_docs_R2_translation_records": 254,
+    "strict_bilingual_docs_R2_actual_commands": 4
+  },
+  "scope_limits": [
+    "Development evidence, unsigned; no candidate or product qualification claim.",
+    "No HIL or complete IO35 exit claim.",
+    "Focused sanitizer PASS does not cover the failed ten-target sanitizer build.",
+    "Original RED, setup failures, ARM r1 source-guard rejection, sanitizer OOM and first strict-docs failure remain distinct.",
+    "No automatic nonzero endpoint reactivation after reset; activation/SetConfiguration follow-up remains open.",
+    "Original obsolete interval rejection planning is preserved with the final descriptor-only interval corrigendum.",
+    "ST reset side-effect proof is not inferred for GD."
+  ],
+  "collection_constraints": {
+    "collector_compiler_configure_test_invocations": 0,
+    "collector_primary_or_index_writes": 0,
+    "archive_bodies_included": 0,
+    "whole_build_vendor_tool_HTML_APIXML_bodies_included": false,
+    "accepted_430_archive_body_included": false,
+    "resource_recovery_archive_bodies_included": false,
+    "payload_and_restored_retained": true,
+    "cleanup_performed": false
+  },
+  "intended_tracked_locator": "tools/testing/evidence/usb-interrupt-in-20261021/raw/3aedc16130ccf74d183ad5d12929794e191c4ee542f3143c3a28396ef907a926.tar.gz",
+  "accepted_430_reference_only": {
+    "archive_sha256": "0e00e1db76221e47ead52ff0952fd5134d4997d0ddd44676baa72c317c37a797",
+    "archive_size": 1551911,
+    "tracked_locator": "tools/testing/evidence/h743-canonical-input-20261021/raw/0e00e1db76221e47ead52ff0952fd5134d4997d0ddd44676baa72c317c37a797.tar.gz",
+    "metadata_path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/accepted-430-reference.json"
+  },
+  "phase_note": "The earlier unsealed collection status remains preserved in collection-phase-note.json. This external delivery record reports the subsequent actual single export, verify, restore and explicit inventory comparison.",
+  "separate_metadata": [
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/package.json",
+      "size": 498,
+      "sha256": "634810f66fe6ff7df9bc2ca5c7d5b0ed9e7368d54dd4869ff046d3483a30276b"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/verified.json",
+      "size": 152,
+      "sha256": "476324db3ac69da4fcde314abde7019d00cb33316086617e7a7db18e330d9551"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/restored.json",
+      "size": 233,
+      "sha256": "22d969fbdee375c96c28cd41afe2b648a5e002601fe839d6cd71720f4b92831f"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/restore-inventory-comparison.json",
+      "size": 540,
+      "sha256": "8d066b8a6ebb238a1ba99b41923e88d932c6ab957fe0e3811e7d92d10413d4cd"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/source-freeze.json",
+      "size": 13798,
+      "sha256": "7815cd5f4177253399683670e744de62e75f0308bf094f1bcbbd0be7a7482ed3"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/accepted-430-reference.json",
+      "size": 2032,
+      "sha256": "effd717d7d58df306d4b2ae2f6b34f0cdba7bf27002065ab6e23d48d178c3858"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/README.md",
+      "size": 6750,
+      "sha256": "411fdfecf7ee2f210645e54cd4b9ffca9e677287c1f3508daf84ffa360a96c7b"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/closure-independent-audit.json",
+      "size": 28774,
+      "sha256": "cafe3699ead093ccd9f6a8ab614d9c70920e7f4099aaf13ca84a1ba860aec137"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/storage-commands.json",
+      "size": 1350,
+      "sha256": "77af43f23e2996461316b4b9d60ff3fa5e4bf447052cea50a3dffe7fd4f2f3a5"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/copy-list-final.json",
+      "size": 257909,
+      "sha256": "3812e8aabbda649b00e15c1e72016de7e43f6262321937374940a3a9bb30d908"
+    },
+    {
+      "path": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/review-input-inventory.json",
+      "size": 43461,
+      "sha256": "878322332d6029c5ed1a71406069966fbb471835745d6fbccaed049d73ef67ec"
+    }
+  ]
+}

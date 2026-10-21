@@ -24,8 +24,6 @@ int main(void) {
     }
     const nx_usb_device_port_t* device =
         nx_factory_usb_device(NX_USB_DEVICE_ID_FS);
-    const nx_usb_endpoint_port_t* endpoint =
-        nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN);
     const nx_usb_device_profile_t* profile =
         nx_factory_usb_profile(NX_USB_DEVICE_ID_FS);
     const nx_usb_acm_state_t initial = {{115200U, 0U, 0U, 8U}, 0U, 0U};
@@ -34,10 +32,24 @@ int main(void) {
         nx_usb_acm_initialize(&s_nx_acm, profile, 0U, &initial) != NX_SUCCESS) {
         return (int)NX_ERROR_INVALID;
     }
+    const nx_usb_endpoint_profile_t* interrupt_in =
+        nx_usb_profile_endpoint(profile, 2U, true);
+    const nx_usb_endpoint_port_t* endpoint =
+        interrupt_in != NULL
+            ? interrupt_in->port
+            : nx_factory_usb_endpoint(NX_USB_ENDPOINT_ID_BULK_IN);
     /* Structural fixture bytes are external to the common adapter. */
     const uint8_t descriptor[] = {4U, 3U, 9U, 4U};
-    const nx_usb_descriptor_view_t view = {descriptor, sizeof(descriptor)};
-    (void)nx_usb_descriptor_validate(profile, &view);
+    const uint8_t configuration[] = {
+        9U, 2U,   39U, 0U,  1U, 1U, 0U, 128U, 50U,  9U,  4U,  0U, 0U,
+        3U, 255U, 0U,  0U,  0U, 7U, 5U, 129U, 2U,   64U, 0U,  0U, 7U,
+        5U, 1U,   2U,  64U, 0U, 0U, 7U, 5U,   130U, 3U,  10U, 0U, 16U};
+    const nx_usb_descriptor_view_t view = {
+        interrupt_in != NULL ? configuration : descriptor,
+        interrupt_in != NULL ? sizeof(configuration) : sizeof(descriptor)};
+    if (nx_usb_descriptor_validate(profile, &view) != NX_SUCCESS) {
+        return (int)NX_ERROR_INVALID;
+    }
     size_t count = 0U;
     nx_usb_device_state_t state = {0};
     nx_request_initialize(&s_nx_request.base);

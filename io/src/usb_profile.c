@@ -65,9 +65,14 @@ nx_result_t nx_usb_profile_validate(const nx_usb_device_profile_t* p) {
                 ep->max_packet != NX_USB_FS_MAX_PACKET) {
                 return NX_ERROR_INVALID;
             }
-        } else if (ep->transfer != NX_USB_PROFILE_BULK ||
-                   (ep->max_packet != 8U && ep->max_packet != 16U &&
-                    ep->max_packet != 32U && ep->max_packet != 64U)) {
+        } else if (ep->transfer == NX_USB_PROFILE_BULK) {
+            if (ep->max_packet != 8U && ep->max_packet != 16U &&
+                ep->max_packet != 32U && ep->max_packet != 64U) {
+                return NX_ERROR_INVALID;
+            }
+        } else if (ep->transfer != NX_USB_PROFILE_INTERRUPT || !ep->in ||
+                   ep->max_packet == 0U ||
+                   ep->max_packet > NX_USB_FS_MAX_PACKET) {
             return NX_ERROR_INVALID;
         }
         for (size_t j = 0U; j < i; ++j) {

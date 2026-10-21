@@ -98,8 +98,8 @@ TEST_F(UsbDescriptors, TruncatedZeroLengthAndDuplicateRecordsCannotPass) {
 }
 TEST_F(UsbDescriptors, UnimplementedModesAndAlternatePlansAreExplicit) {
     configuration[21] =
-        3U; /* Interrupt endpoint is not a selected bulk port. */
-    EXPECT_EQ(Validate(), NX_ERROR_UNSUPPORTED);
+        3U; /* Interrupt type mismatches this selected bulk port. */
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
     configuration[21] = 2U;
     configuration[12] = 1U;
     EXPECT_EQ(Validate(), NX_ERROR_UNSUPPORTED);
@@ -119,6 +119,50 @@ TEST_F(UsbDescriptors, DeviceMpsAndStringBoundsDoNotInventProductPolicy) {
     EXPECT_EQ(nx_usb_descriptor_validate(&profile, &view), NX_SUCCESS);
     string[0] = 3U;
     EXPECT_EQ(nx_usb_descriptor_validate(&profile, &view), NX_ERROR_INVALID);
+}
+
+TEST_F(UsbDescriptors, InterruptInProfileAcceptsAllFullSpeedPacketBounds) {
+    endpoints[2].transfer = NX_USB_PROFILE_INTERRUPT;
+    for (uint16_t maximum : {uint16_t{1}, uint16_t{10}, uint16_t{64}}) {
+        endpoints[2].max_packet = maximum;
+        EXPECT_EQ(nx_usb_profile_validate(&profile), NX_SUCCESS);
+    }
+    for (uint16_t maximum : {uint16_t{0}, uint16_t{65}}) {
+        endpoints[2].max_packet = maximum;
+        EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+    }
+    endpoints[2].max_packet = 10U;
+    endpoints[2].in = false;
+    endpoints[3].number = 2U;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+    endpoints[2].in = true;
+    endpoints[3].number = 1U;
+    endpoints[0].transfer = NX_USB_PROFILE_INTERRUPT;
+    EXPECT_EQ(nx_usb_profile_validate(&profile), NX_ERROR_INVALID);
+}
+TEST_F(UsbDescriptors, InterruptDescriptorOwnsItsLinearFullSpeedPollInterval) {
+    endpoints[2].transfer = NX_USB_PROFILE_INTERRUPT;
+    endpoints[2].max_packet = 10U;
+    configuration[21] = 3U;
+    configuration[22] = 10U;
+    for (uint8_t interval : {uint8_t{1}, uint8_t{16}, uint8_t{255}}) {
+        configuration[24] = interval;
+        EXPECT_EQ(Validate(), NX_SUCCESS);
+    }
+    configuration[24] = 0U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    configuration[24] = 16U;
+    configuration[22] = 11U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    configuration[22] = 10U;
+    configuration[21] = 2U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    configuration[21] = 7U;
+    EXPECT_EQ(Validate(), NX_ERROR_INVALID);
+    configuration[21] = 3U;
+    configuration[28] = 3U;
+    configuration[31] = 16U;
+    EXPECT_EQ(Validate(), NX_ERROR_UNSUPPORTED);
 }
 
 TEST_F(UsbDescriptors, UnalignedProfileGraphIsRejectedBeforeTypedReads) {

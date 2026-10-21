@@ -47,6 +47,12 @@ _Static_assert(USBFS_REG_BASE == 0x50000000U && USBFS_MAX_EP_COUNT == 4U &&
                    DIEPINTF_EPTXFUD == 16U && DIEPINTF_IEPNE == 64U &&
                    DEPCTL_NAKS == (1U << 17U) && GCCFG_VBUSIG == (1U << 21U),
                "FS lifecycle masks and capabilities");
+_Static_assert(DEPCTL_EPTYPE == (3U << 18U) && DEPCTL_MPL == 0x7FFU &&
+                   DIEPCTL_TXFNUM == (15U << 22U) &&
+                   DEPCTL_SD0PID == (1U << 28U) && DEPCTL_DPID == (1U << 16U) &&
+                   DEPCTL_EPACT == (1U << 15U) &&
+                   DEPLEN_PCNT == (0x3FFU << 19U),
+               "FS endpoint type, FIFO, DATA0 and packet register facts");
 #ifndef NX_USB_SOC_IRQ_GROUP
 #define NX_USB_SOC_IRQ_GROUP() NVIC_GetPriorityGrouping()
 #endif
