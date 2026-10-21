@@ -48,5 +48,17 @@ class UsbProfileGenerationTests(unittest.TestCase):
                 self.assertNotIn("nx_usb_endpoint_profile_t", source)
 
 
+    def test_activation_getter_is_independent_of_optional_rom_profiles(self):
+        for family in ("stm32-zg", "stm32-ve", "gd32"):
+            for capabilities in (False, True):
+                with self.subTest(family=family, capabilities=capabilities):
+                    header, source = self.generate(family, capabilities)
+                    self.assertIn('#include "nexus/io/usb_activation.h"',
+                                  header)
+                    self.assertIn("const nx_usb_activation_port_t* "
+                                  "nx_factory_usb_activation(", header)
+                    self.assertIn("nx_factory_usb_activation(", source)
+
+
 if __name__ == "__main__":
     unittest.main()

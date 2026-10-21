@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 73a3d84a77d809cc222cc4cf065cb50c88f594ccbcb2e74562cbd652ecf52898\n"
+"X-Nexus-Source-SHA256: 5d2e781ea5e0e1bfb26f6e08f96913088436932c25ef064adf27cce2f7ad4778\n"
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -8267,3 +8267,47 @@ msgstr "[in] Desired STALL; clearing bulk/interrupt resets DATA0."
 
 msgid "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS. Interrupt selects nonzero IN with 1..64-byte MPS. Host polling interval belongs to the external descriptor, not this profile."
 msgstr "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS. Interrupt selects nonzero IN with 1..64-byte MPS. Host polling interval belongs to the external descriptor, not this profile."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:344
+msgid "usb_activation.h"
+msgstr "usb_activation.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Optional explicit nonzero USB endpoint activation."
+msgstr "Optional explicit nonzero USB endpoint activation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Explicitly activate or deactivate one selected nonzero direction."
+msgstr "Explicitly activate or deactivate one selected nonzero direction."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "No request or buffer is borrowed. Existing loans must be explicitly cancelled and drained before target changes; failure never revokes other loans. Configuration/class policy remains external."
+msgstr "No request or buffer is borrowed. Existing loans must be explicitly cancelled and drained before target changes; failure never revokes other loans. Configuration/class policy remains external."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] Started serialized privileged Task owner, IRQ masks clear."
+msgstr "[in] Started serialized privileged Task owner, IRQ masks clear."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] Current software USB epoch; cold epoch zero is valid."
+msgstr "[in] Current software USB epoch; cold epoch zero is valid."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] USB address byte; EP0 is not admitted."
+msgstr "[in] USB address byte; EP0 is not admitted."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] Requested active state, never packet submission."
+msgstr "[in] Requested active state, never packet submission."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Success after proof; UNSUPPORTED when the operation is absent. INVALID/CONTEXT/STATE/BUSY reject before writes. IO may have partial effects and closes controller admission until explicit recovery."
+msgstr "Success after proof; UNSUPPORTED when the operation is absent. INVALID/CONTEXT/STATE/BUSY reject before writes. IO may have partial effects and closes controller admission until explicit recovery."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Optional controller operation; absence means UNSUPPORTED."
+msgstr "Optional controller operation; absence means UNSUPPORTED."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Immutable borrowed face, using the existing controller context."
+msgstr "Immutable borrowed face, using the existing controller context."

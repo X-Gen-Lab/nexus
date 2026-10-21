@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 73a3d84a77d809cc222cc4cf065cb50c88f594ccbcb2e74562cbd652ecf52898\n"
+"X-Nexus-Source-SHA256: 5d2e781ea5e0e1bfb26f6e08f96913088436932c25ef064adf27cce2f7ad4778\n"
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -7663,3 +7663,47 @@ msgstr "[in] 期望的 STALL；清除 bulk/interrupt STALL 时同时复位 DATA0
 
 msgid "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS. Interrupt selects nonzero IN with 1..64-byte MPS. Host polling interval belongs to the external descriptor, not this profile."
 msgstr "在 Task／ISR 中有界且只读。事实标识选定的软件支持；绝不表示 PCB 布线、VBUS 接线或物理资格。公共元数据、endpoint 数组、face 及 operations table 须按其 C 类型自然对齐，存储范围不能回绕。数值检查中的拒绝不能用于探测任意地址或不透明的私有 context。 EP0 选择 control/64；非零 bulk 选择 8/16/32/64-byte MPS。interrupt 选择非零 IN，MPS 为 1..64-byte。host 轮询间隔属于外部 descriptor，不属于此 profile。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:344
+msgid "usb_activation.h"
+msgstr "usb_activation.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Optional explicit nonzero USB endpoint activation."
+msgstr "可选的非零 USB endpoint 显式激活接口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Explicitly activate or deactivate one selected nonzero direction."
+msgstr "显式激活或反激活一个已选定的非零 endpoint 方向。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "No request or buffer is borrowed. Existing loans must be explicitly cancelled and drained before target changes; failure never revokes other loans. Configuration/class policy remains external."
+msgstr "不借用任何 request 或 buffer。目标变更之前，必须显式取消并排空该目标的既有借用；失败从不撤销其他借用。配置／类策略仍由外部负责。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] Started serialized privileged Task owner, IRQ masks clear."
+msgstr "[in] 已启动；由序列化特权 Task owner 调用，进入时 IRQ masks 须 clear。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] Current software USB epoch; cold epoch zero is valid."
+msgstr "[in] 当前软件 USB epoch；冷态 epoch 0 合法。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] USB address byte; EP0 is not admitted."
+msgstr "[in] USB 地址字节；不准入 EP0。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "[in] Requested active state, never packet submission."
+msgstr "[in] 请求的 active 状态；此操作从不提交 packet。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Success after proof; UNSUPPORTED when the operation is absent. INVALID/CONTEXT/STATE/BUSY reject before writes. IO may have partial effects and closes controller admission until explicit recovery."
+msgstr "证明成立后成功；操作缺失时返回 UNSUPPORTED。INVALID／CONTEXT／STATE／BUSY 在写入前拒绝。IO 可能已有部分效果，并关闭 controller 准入，直到显式恢复。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Optional controller operation; absence means UNSUPPORTED."
+msgstr "可选的 controller 操作；操作缺失时返回 UNSUPPORTED。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
+msgid "Immutable borrowed face, using the existing controller context."
+msgstr "不可变的借用 face，使用既有 controller context。"

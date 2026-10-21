@@ -4,8 +4,9 @@
 GD32F470 的 internal-PHY full-speed device PIO 机制及实际 SDK 绑定。维护范围是
 EP0 control、显式选择的 EP1–EP3 bulk IN/OUT 与 interrupt IN、
 SETUP/reset/suspend/resume 事实、STALL、SET_ADDRESS、取消与退出。
-DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的总线 reset 后重新启用
-与完整 SET_CONFIGURATION 路径尚未接入，不能据此声称完整枚举／reset 恢复。
+DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的 active／mask 由
+独立可选 activation face 显式控制。SET_CONFIGURATION、配置就绪及其回滚由外部
+Chapter 9 owner 负责，packet 机制不能单独证明完整枚举／物理 reset 恢复。
 可选 `Nexus::USBControl` 组合 EP0 多包 DATA、必要 ZLP 与 STATUS；独立的
 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。
 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。
@@ -107,21 +108,96 @@ bulk／interrupt endpoint 使用 DATA0 命令。reset／clear-halt 必须核对 
 
 SETUP 严格解码八个 little-endian bytes，并产生单调递增 epoch。新 SETUP/reset
 使旧 control loan 进入排空，不能仅改 epoch 就撤销借用。reset 与 queued SETUP
-在同一 snapshot 中没有先后证明，先前 queued SETUP 被丢弃；复位排空完成仅解除
-待排空屏障，新 admission 仍须满足 endpoint 的实际启用条件。SET_ADDRESS 验证
+在同一 snapshot 中没有先后证明，先前 queued SETUP 被丢弃；reset 在旧 loan 排空和 FIFO flush 后，
+还须显式屏蔽并清除两系列选定非零方向的 active，读回成功才清 `reset_pending`。
+失败保留 reset 屏障和 clock，由 service 或完整 stop 继续恢复。新 admission 仍须
+满足 endpoint 的实际启用条件。SET_ADDRESS 验证
 当前标准 SETUP 的各字段，先 staged，只有对应 status-IN 实际 XFRC 后写 DCFG
 地址。地址读回失败关闭 controller。
 
-STM32F407 总线 reset 清除非零 endpoint 的 USBAEP，模型保留这个硬件事实。
-对未激活的非零 endpoint，submit 返回 STATE，prepared request 保持 READY，
-没有新 request／buffer 借用或 FIFO 写入。当前没有自动重新激活或配置策略；
-通用非零 endpoint activation 与 SET_CONFIGURATION 路径是独立后续任务。
-EP0 control 可继续按既有合同处理，不能把 DATA0 恢复或 reset 事件处理当成完整
-非零 endpoint 恢复，也不能从 controller 未 closing 推断已配置。
+STM32F407 总线 reset 清除非零 endpoint 的 USBAEP，模型保留这个硬件事实；
+GD 自动清 EPACT 尚无已核实依据。公共生产路径在 loan 排空后主动清两系列非零
+active／mask，形成统一的平台后置条件，不把它归因为 GD 的自动硬件行为。GD
+回归须保留硬件 active，再证明公共代码实际清除。完成 reset 后仍需以新当前 epoch
+显式 enable；reset／clear-halt／submit 均不自动激活。对 inactive 非零 endpoint，
+submit 返回 STATE，prepared request 保持 READY，没有新 request／buffer 借用或
+FIFO 写入。EP0 control 保留既有合同；DATA0 恢复、reset 事件或 controller 未
+closing 均不能证明外部 configuration 已提交。
 
 事件环保存 value facts，满时不覆盖旧事件；精确软件 loss marker 排在原队列后。
 最新 SETUP/epoch/closing 状态不依赖事件环空间。时间戳是 IRQ acquisition time，
 不是 USB 总线采样时刻；reset 批次中的无序旧 SETUP 不计作新的已接收 control。
+
+## 非零 endpoint 显式 activation
+
+独立的 `nexus/io/usb_activation.h` 提供 `nx_usb_activation_port_t`：face 是共享
+只读 ops 与既有 controller context 两指针，只提供一个同步
+`nx_usb_activation_set(port, epoch, endpoint_address, active)` 操作。生成的
+`nx_factory_usb_activation(nx_usb_device_id_t)` 返回选定 controller 的静态借用
+face，非法或不支持的 identity 返回 NULL；查找不初始化硬件、不 retain clock。
+生成独立于 `factory.capabilities`，不要求启用 ROM profile，不改变既有 USB ops、
+profile、face 布局或 factory ABI epoch 1。该机制不新增可变 controller／endpoint
+状态、队列、worker、实例池、动态分配、TOML 字段或 IR 类型。两指针布局说明 face
+形状；实际只读保留成本、未引用 GC 与完整镜像成本须分别以对应 ARM ELF 确认。
+
+操作只面向已经选定的 EP1–EP3 某一个方向，拒绝两个 EP0 地址及保留／未选地址；
+OUT 仍只允许既有 bulk。调用者须是同一个序列化特权 Task，进入时 incoming IRQ
+masks clear。controller 须 started、持有 clock、没有 closing／reset 屏障，参数
+`epoch` 等于最新权威软件 control/reset epoch；冷态 epoch 0 合法。无效 identity
+或已知旧软件 epoch 在 MMIO 前拒绝。软件检查通过后，已观察到的 raw USBRST
+也使本次调用在写入前返回 STATE。尚未采集的物理 SETUP/reset 仍可能随后发生，
+IRQ 临界区不提供总线原子性；stop/restart 后外部须丢弃旧缓存的 epoch。
+
+目标方向必须没有 request loan、disable 工作、EPENA、待确认的定义事件或尚未完成的
+SETUP 清理。IN 还要求专用 FIFO 全空且没有 flush；OUT 要求共享 RX status FIFO 空。
+否则返回 BUSY，不暗中取消请求、消费其他方向的 RX 或释放其存储。前置检查返回
+INVALID／CONTEXT／STATE／BUSY 时没有硬件写入，不建立新 loan；激活本身从不借用
+request 或 payload，不能代替已有 packet 的 cancel／drain／acquire SETTLED。
+
+冷启动仅使两个 EP0 方向 active 并解除其 endpoint mask；其余选定方向保留
+immutable 几何但 inactive／SNAK。使能一个 inactive 方向时，先按选定 MPS、wire
+类型和仅 IN 的 FIFO selector 配置目标，建立 DATA0、清 STALL、置 active 与 SNAK，
+保持 EPENA clear，不写 TSIZ 或 payload FIFO。核对稳定控制字段、DATA0 与 NAK，
+仅处理命令后新出现的目标 IN NAK-effective／token-empty 提示（0x50），并证明其
+W1C 清除；其他新事件使本次操作失败，进入 partial IO／closing。调用前已有的
+定义事件仍返回 BUSY，不在前置拒绝中清除。随后解除目标 EP_MASK 位并读回完整
+预期 mask。OUT 不写 reserved TxFIFO 字段。active、传输使能与 IRQ mask
+是三个独立条件；mask 或 active 单独成立均不代表已经接受一个包。
+
+反激活之前，外部必须实际 cancel／drain 并 acquire 目标 packet 的 SETTLED。
+操作先屏蔽目标方向且核对其他 mask 位未变，再设置 SNAK、清 active 并核对。
+每次仅修改对应方向，保留其他 endpoint 和两个 EP0 位，物理 vector／priority
+route 不变；不 flush 共享 RX、不重置 controller、不停止 clock，也不开始传输。
+Task 显式操作在既有有限 poll budget 内等待控制／W1C 读回，每项命令只发一次；
+reset progress 新增的反激活步骤只单次观察，由后续 service 继续，不在 IRQ 引入
+此 Task 等待循环。
+
+幂等调用必须先满足同样的无 loan／无 pending 前置条件。已经 active 的 enable
+先核对 immutable 几何，不重放控制寄存器配置，只按需修正目标 mask；重复 enable
+不得把 DATA1 重置为 DATA0、清除真实 HALT 或发送包。已经 inactive 的 disable
+不重新编程几何，只证明目标 mask 关闭及事件清除。只有显式 disable 后重新 enable
+才建立新 DATA0 并在读回成功后清 halt；disable 保留 PID。已 active 但 immutable
+几何损坏时返回 IO／closing，不通过重写控制寄存器掩盖错误。
+
+控制或 mask 写入后的读回失败返回 IO，并保留既有 `closing` 屏障；IO 可以已有
+部分硬件效果，不能作为无操作拒绝。只对目标 best-effort mask／inactive 回滚，
+若观察到 EPENA 意外为一，不能假装写零已完成 disable。失败不能通过重试 activation
+清 closing；外部须继续推进其他 loan 并执行显式完整 stop。stop 仍可能 BUSY，
+在既有 disable／flush／IRQ join 证明完成前保留 clock 与 caller storage。
+
+外部 Chapter 9/configuration owner 根据配置或 alternate 选择方向，先 cancel／
+drain／disable 旧方向，再 stage 新方向，随后提交该请求的 STATUS IN。这与 ST
+手册及参考 Zephyr 的 before-status 顺序一致，不强制解释为 ACK 后才可激活。
+外部仅在对应实际 STATUS 完成且仍满足当前事务条件后发布 configured readiness，
+此前自行阻止普通非零 packet admission。多次 setter 不是配置事务：后续失败、
+新 SETUP supersede 或 status 失败时，外部须撤销已经成功的 staging 或显式 stop；
+不能用平台 rollback 撤销主机已观察到的 ACK。去配置也须先实际排空／反激活，
+再按外部 deadline 与拒绝策略决定是否接受；DCD 不解码 configuration value。
+
+activation 补充既有 FIG-16 的显式控制调用，不新增生命周期 owner 或执行线程。
+它不提供 Chapter 9／class stack、CDC notification、多配置／alternate 策略、
+连续传输、DMA、ISO、interrupt OUT、HS／Host／OTG 或电气接入；软件机制不证明
+物理枚举／reset 时序、完整 IO-35 退出、clean candidate 或 HIL。
 
 ## 可选 EP0 packetizer 与外层借用
 
@@ -270,8 +346,9 @@ USBHS；这里只修正当前引用，历史证据保留原始字节。
 GD 手册 SHA256 是 `c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13`。
 完整出处身份绑定在 manifest。
 
-IO-35 的完整退出仍开放；有限 interrupt IN 不提供 notification 策略、完整类栈或
-非零 endpoint 的完整配置／reset 恢复。这不是 clean software candidate、产品
+IO-35 的完整退出仍开放；有限 interrupt IN 与显式 activation 不提供 notification
+策略、完整 Chapter 9／class stack、外部配置事务或物理 reset 恢复资格。它们不建立
+clean software candidate、产品
 release 或物理资格。三块 PCB 的 USB role、
 VBUS sensing/power/backfeed、pull-up/ESD、电气跳帽、pin lease 与共享引脚冲突尚需
 独立 reviewed Board 装配；本批没有配置这些引脚。枚举、主机重试、reset/拔线、

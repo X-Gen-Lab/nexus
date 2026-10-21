@@ -29,11 +29,16 @@ enum {
     OUT_EP = 0xB00U,
     FIFO = 0x1000U
 };
-#define ENABLE  (UINT32_C(1) << 31U)
-#define DISABLE (UINT32_C(1) << 30U)
-#define SNAK    (UINT32_C(1) << 27U)
-#define CNAK    (UINT32_C(1) << 26U)
-#define STALL   (UINT32_C(1) << 21U)
+#define ENABLE        (UINT32_C(1) << 31U)
+#define DISABLE       (UINT32_C(1) << 30U)
+#define SNAK          (UINT32_C(1) << 27U)
+#define CNAK          (UINT32_C(1) << 26U)
+#define STALL         (UINT32_C(1) << 21U)
+#define ACTIVE        (UINT32_C(1) << 15U)
+#define DATA_PID      (UINT32_C(1) << 16U)
+#define NAK_STATUS    (UINT32_C(1) << 17U)
+#define DATA0         (UINT32_C(1) << 28U)
+#define GEOMETRY_MASK (0x7FFU | (3U << 18U) | (15U << 22U))
 #define GLOBAL_MASK                                                            \
     ((1U << 4U) | (1U << 11U) | (1U << 12U) | (1U << 13U) | (1U << 18U) |      \
      (1U << 19U) | (1U << 31U))
@@ -240,6 +245,95 @@ static bool plan_valid(nx_usb_controller_t* c) {
     }
     return in0 && out0;
 }
+/** \brief Exact selected direction bit; EP0 has separate lifecycle ownership.
+ */
+static uint32_t endpoint_interrupt_bit(const nx_usb_endpoint_t* ep) {
+    return 1U << (ep->number + (ep->in ? 0U : 16U));
+}
+/** \brief Immutable nonzero geometry excludes OUT-only reserved FIFO fields. */
+static uint32_t endpoint_geometry(const nx_usb_endpoint_t* ep) {
+    uint32_t type = ep->transfer == NX_USB_PROFILE_INTERRUPT ? 3U : 2U;
+    return (uint32_t)ep->max_packet | (type << 18U) |
+           (ep->in ? (uint32_t)ep->number << 22U : 0U);
+}
+/** \brief Preserve every other selected route and prove the complete RMW. */
+static bool set_endpoint_mask(nx_usb_endpoint_t* ep, bool active) {
+    uintptr_t base = ep->controller->registers;
+    uint32_t before = NX_USB_READ(base, EP_MASK);
+    uint32_t bit = endpoint_interrupt_bit(ep);
+    uint32_t after = active ? before | bit : before & ~bit;
+    if (after != before) {
+        NX_USB_WRITE(base, EP_MASK, after);
+    }
+    nx_arch_dsb();
+    return NX_USB_READ(base, EP_MASK) == after;
+}
+/** \brief Post-command IN hints carry no packet; entry flags must be empty. */
+static bool activation_hints(nx_usb_endpoint_t* ep, bool task_wait) {
+    uint32_t flags = ep_flags(ep);
+    if ((flags & ~(ep->in ? 0x50U : 0U)) != 0U) {
+        return false;
+    }
+    if (flags != 0U) {
+        NX_USB_WRITE(ep->controller->registers, ep_offset(ep) + 8U, flags);
+        nx_arch_dsb();
+    }
+    return task_wait ? wait_bits(ep->controller, ep_offset(ep) + 8U, 0x5BU, 0U)
+                     : ep_flags(ep) == 0U;
+}
+/** \brief Fresh activation programs DATA0/NAK, never transfer size or EPENA. */
+static bool activate_endpoint(nx_usb_endpoint_t* ep, uint32_t control) {
+    uintptr_t base = ep->controller->registers;
+    uint32_t geometry = endpoint_geometry(ep);
+    uint32_t commands = ENABLE | DISABLE | SNAK | CNAK | DATA0 | (1U << 29U);
+    control = (control & ~(GEOMETRY_MASK | ACTIVE | STALL | commands)) |
+              geometry | ACTIVE | SNAK | DATA0;
+    NX_USB_WRITE(base, ep_offset(ep), control);
+    nx_arch_dsb();
+    uint32_t mask = GEOMETRY_MASK | ACTIVE | ENABLE | DISABLE | STALL |
+                    DATA_PID | NAK_STATUS;
+    uint32_t expected = geometry | ACTIVE | NAK_STATUS;
+    return wait_bits(ep->controller, ep_offset(ep), mask, expected) &&
+           activation_hints(ep, true);
+}
+/** \brief Task waits are bounded; reset IRQ retries without a polling loop. */
+static bool deactivate_endpoint(nx_usb_endpoint_t* ep, bool task_wait) {
+    uintptr_t base = ep->controller->registers;
+    bool masked = set_endpoint_mask(ep, false);
+    uint32_t control = NX_USB_READ(base, ep_offset(ep));
+    if ((control & (ENABLE | DISABLE)) != 0U) {
+        return false;
+    }
+    if ((control & ACTIVE) != 0U) {
+        uint32_t commands = SNAK | CNAK | DATA0 | (1U << 29U);
+        NX_USB_WRITE(base, ep_offset(ep),
+                     (control & ~(ACTIVE | commands)) | SNAK);
+        nx_arch_dsb();
+        uint32_t preserved = GEOMETRY_MASK | STALL | DATA_PID;
+        uint32_t mask = preserved | ACTIVE | ENABLE | DISABLE | NAK_STATUS;
+        uint32_t expected = (control & preserved) | NAK_STATUS;
+        bool observed =
+            task_wait ? wait_bits(ep->controller, ep_offset(ep), mask, expected)
+                      : (NX_USB_READ(base, ep_offset(ep)) & mask) == expected;
+        if (!observed) {
+            return false;
+        }
+    }
+    /* Mask failure must not skip safe best-effort active withdrawal. */
+    bool clear = activation_hints(ep, task_wait);
+    return masked && clear;
+}
+/** \brief Reset withdrawal follows genuine loan/FIFO drain on both families. */
+static bool reset_nonzero_endpoints(nx_usb_controller_t* c) {
+    for (size_t i = 0U; i < c->endpoint_count; ++i) {
+        nx_usb_endpoint_t* ep = &c->endpoints[i];
+        if (ep->number != 0U && (ep->request != NULL || ep->disable_requested ||
+                                 !deactivate_endpoint(ep, false))) {
+            return false;
+        }
+    }
+    return true;
+}
 /** \brief Keep EP0 SETUP reception armed, without borrowing application
  * buffers. */
 static void arm_setup(nx_usb_controller_t* c) {
@@ -301,7 +395,7 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         ep->rx_seen = false;
         ep->disable_requested = false;
         uint32_t offset = ep_offset(ep);
-        uint32_t control = SNAK | (1U << 15U);
+        uint32_t control = SNAK | (ep->number == 0U ? ACTIVE : 0U);
         if (ep->number != 0U) {
             /* Validation limits nonzero directions to bulk or interrupt. */
             uint32_t type = ep->transfer == NX_USB_PROFILE_INTERRUPT ? 3U : 2U;
@@ -320,10 +414,17 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         }
         NX_USB_WRITE(base, offset, control);
         NX_USB_WRITE(base, offset + 8U, 0x5BU);
-        if (ep_flags(ep) != 0U) {
+        uint32_t selected = ACTIVE | ENABLE | DISABLE;
+        if (ep->number != 0U) {
+            selected |= GEOMETRY_MASK | DATA_PID;
+        }
+        if ((NX_USB_READ(base, offset) & selected) != (control & selected) ||
+            ep_flags(ep) != 0U) {
             return NX_ERROR_IO;
         }
-        ep_mask |= 1U << (ep->number + (ep->in ? 0U : 16U));
+        if (ep->number == 0U) {
+            ep_mask |= endpoint_interrupt_bit(ep);
+        }
     }
     NX_USB_WRITE(base, IN_MASK, 0x0BU);
     NX_USB_WRITE(base, OUT_MASK, 0x5BU);
@@ -350,7 +451,8 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         !NX_USB_IRQ_ENABLED(base, c->irq.irq_number) ||
         NX_USB_IRQ_PRIORITY(base, c->irq.irq_number,
                             c->irq_policy.priority_bits) != c->irq.priority ||
-        NX_USB_READ(base, RX_SIZE) != c->rx_fifo_words) {
+        NX_USB_READ(base, RX_SIZE) != c->rx_fifo_words ||
+        NX_USB_READ(base, EP_MASK) != ep_mask) {
         c->snapshot.closing = true;
         return NX_ERROR_IO;
     }
@@ -706,7 +808,7 @@ static void progress(nx_usb_controller_t* c) {
     }
     if (c->reset_pending && !pending) {
         if (hot_flush(c, (0x10U << 6U) | 32U) && hot_flush(c, 16U) &&
-            clear_halts(c, true)) {
+            clear_halts(c, true) && reset_nonzero_endpoints(c)) {
             uint32_t config = NX_USB_READ(base, CONFIG) & ~0x7F0U;
             NX_USB_WRITE(base, CONFIG, config);
             nx_arch_dsb();
@@ -853,11 +955,12 @@ static nx_result_t submit(void* context, nx_usb_request_t* r) {
     nx_result_t result = NX_SUCCESS;
     uintptr_t base = c->registers;
     uint32_t offset = ep_offset(ep);
-    /* Bus reset can deactivate nonzero endpoints. Only external configuration
-     * policy may authorize reactivation; inactive hardware cannot take a loan.
-     */
+    /* Refuse an observed reset before IRQ collection advances the epoch. A
+     * later physical reset still owns the ordinary borrow/drain sequence.
+     * Only external policy activates nonzero endpoints after configuration. */
     if (!c->snapshot.started || c->snapshot.closing || ep->halted ||
         c->reset_pending ||
+        (NX_USB_READ(base, INTERRUPT) & (1U << 12U)) != 0U ||
         (ep->number != 0U && (NX_USB_READ(base, offset) & (1U << 15U)) == 0U)) {
         result = NX_ERROR_STATE;
     } else if (!request_valid(ep, r)) {
@@ -968,6 +1071,68 @@ static nx_result_t stall(void* context, bool value) {
     nx_result_t result = !c->snapshot.started || c->snapshot.closing
                              ? NX_ERROR_STATE
                              : stall_locked(ep, value);
+    nx_arch_irq_restore(saved);
+    return result;
+}
+/** \brief Explicit selected activation; no configuration/class decoding. */
+static nx_result_t activation_set(void* context, uint64_t epoch,
+                                  uint8_t address, bool active) {
+    nx_usb_controller_t* c = context;
+    if (c == NULL || (address & 0x70U) != 0U || (address & 15U) == 0U ||
+        (address & 15U) > 3U) {
+        return NX_ERROR_INVALID;
+    }
+    if (!task_context()) {
+        return NX_ERROR_CONTEXT;
+    }
+    nx_arch_irq_state_t saved = nx_arch_irq_save();
+    nx_result_t result = NX_SUCCESS;
+    nx_usb_endpoint_t* ep = NULL;
+    if (!c->snapshot.started || !c->clock_retained || c->snapshot.closing ||
+        c->reset_pending || c->snapshot.epoch != epoch) {
+        result = NX_ERROR_STATE;
+    } else if ((ep = endpoint(c, address & 15U, (address & 0x80U) != 0U)) ==
+               NULL) {
+        result = NX_ERROR_INVALID;
+    } else if (c->setup_pending || ep->request != NULL ||
+               ep->disable_requested) {
+        result = NX_ERROR_BUSY;
+    } else {
+        uintptr_t base = c->registers;
+        uint32_t pending = NX_USB_READ(base, INTERRUPT);
+        uint32_t control = NX_USB_READ(base, ep_offset(ep));
+        if ((pending & (1U << 12U)) != 0U) {
+            result = NX_ERROR_STATE;
+        } else if ((control & (ENABLE | DISABLE)) != 0U || ep_flags(ep) != 0U ||
+                   (NX_USB_READ(base, RESET) & 0x31U) != 0U ||
+                   (ep->in ? NX_USB_READ(base, ep_offset(ep) + 24U) !=
+                                 ep->fifo_words
+                           : (pending & 16U) != 0U)) {
+            result = NX_ERROR_BUSY;
+        } else if (active && (control & ACTIVE) != 0U &&
+                   (control & GEOMETRY_MASK) != endpoint_geometry(ep)) {
+            /* Do not repair an active configuration by replaying DATA0. */
+            c->snapshot.closing = true;
+            result = NX_ERROR_IO;
+        } else {
+            bool fresh = active && (control & ACTIVE) == 0U;
+            bool accepted = active
+                                ? (!fresh || activate_endpoint(ep, control)) &&
+                                      set_endpoint_mask(ep, true)
+                                : deactivate_endpoint(ep, true);
+            if (accepted) {
+                if (fresh) {
+                    ep->halted = false;
+                }
+            } else {
+                /* Partial failure retains every existing loan and clock.
+                 * Rollback is bounded and never clears unexpected EPENA. */
+                c->snapshot.closing = true;
+                (void)deactivate_endpoint(ep, true);
+                result = NX_ERROR_IO;
+            }
+        }
+    }
     nx_arch_irq_restore(saved);
     return result;
 }
@@ -1249,3 +1414,6 @@ const nx_usb_device_ops_t nx_usb_fs_device_ops = {.service = service,
 
 const nx_usb_setup_decision_ops_t nx_usb_fs_setup_decision_ops = {
     .reject = reject_setup};
+
+const nx_usb_activation_ops_t nx_usb_fs_activation_ops = {.set =
+                                                              activation_set};

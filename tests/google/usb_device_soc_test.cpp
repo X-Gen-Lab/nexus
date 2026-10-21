@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "nexus/io/native/model.h"
+#include "nexus/io/usb_activation.h"
 #include "usb_device.h"
 #ifdef NX_USB_GD_MODEL
 #include "gd32f470_usb_device.h"
@@ -58,6 +59,24 @@ class UsbSoc : public testing::Test {
     nx_usb_request_t interrupt_request = {};
     uint8_t interrupt_bytes[64] = {1U, 2U, 3U};
     const nx_usb_device_port_t port = {&nx_usb_fs_device_ops, &controller};
+    /** \brief The fixture owner explicitly selects its test directions. */
+    nx_result_t ActivateSelected() {
+        const nx_usb_activation_port_t activation = {&nx_usb_fs_activation_ops,
+                                                     &controller};
+        for (const auto& selected : endpoints) {
+            if (selected.number == 0U) {
+                continue;
+            }
+            const auto address = static_cast<uint8_t>(
+                selected.number | (selected.in ? 0x80U : 0U));
+            nx_result_t result = nx_usb_activation_set(
+                &activation, controller.snapshot.epoch, address, true);
+            if (result != NX_SUCCESS) {
+                return result;
+            }
+        }
+        return NX_SUCCESS;
+    }
     void SetUp() override {
         ASSERT_NE(mmap(reinterpret_cast<void*>(0x40023000U), 0x1000U,
                        PROT_READ | PROT_WRITE,
@@ -101,6 +120,7 @@ class UsbSoc : public testing::Test {
         endpoints[2].fifo_words = 32;
         nx_request_initialize(&interrupt_request.base);
         ASSERT_EQ(DEVICE_INIT(&controller, &clock), NX_SUCCESS);
+        ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
     }
     nx_result_t StartInterrupt(uint8_t number, uint16_t maximum) {
         nx_result_t result = nx_usb_device_stop(&port);
@@ -111,7 +131,8 @@ class UsbSoc : public testing::Test {
         endpoints[2].transfer = NX_USB_PROFILE_INTERRUPT;
         endpoints[2].max_packet = maximum;
         endpoints[2].fifo_words = 16U;
-        return DEVICE_INIT(&controller, &clock);
+        result = DEVICE_INIT(&controller, &clock);
+        return result == NX_SUCCESS ? ActivateSelected() : result;
     }
     void TearDown() override {
         hardware->hold_flush = hardware->hold_disable = hardware->hold_clear =
@@ -295,4 +316,134 @@ TEST_F(UsbSoc, FreshFlushFailureRetainsClockUntilBoundedStopRetry) {
         endpoint.controller = &controller;
     }
     hardware->hold_flush = false;
+}
+
+extern "C" const nx_usb_activation_ops_t nx_usb_fs_activation_ops;
+
+class UsbSocActivation : public UsbSoc {
+  protected:
+    const nx_usb_activation_port_t activation = {&nx_usb_fs_activation_ops,
+                                                 &controller};
+    nx_result_t Activate(uint8_t address, bool active) {
+        return nx_usb_activation_set(&activation, controller.snapshot.epoch,
+                                     address, active);
+    }
+};
+
+TEST_F(UsbSocActivation, ResetLeafKeepsActiveUntilPlatformDrainsAndWithdraws) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    ASSERT_EQ(Activate(0x01U, true), NX_SUCCESS);
+    nx_usb_endpoint_port_t in = {&nx_usb_fs_endpoint_ops, &endpoints[2]};
+    ASSERT_EQ(nx_usb_in_prepare(&interrupt_request, interrupt_bytes, 1U,
+                                NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &interrupt_request), NX_SUCCESS);
+    const auto before_reset_mask = hardware->registers[0x81CU / 4U];
+    hardware->hold_disable = true;
+    /* This hardware leaf publishes reset without clearing active. It proves
+     * platform behavior without asserting that GD silicon clears EPACT. */
+    hardware->registers[0x14U / 4U] |= 1U << 12U;
+    ASSERT_NE(hardware->registers[0x920U / 4U] & (1U << 15U), 0U);
+    nx_usb_controller_irq(&controller);
+    EXPECT_TRUE(controller.reset_pending);
+    EXPECT_EQ(hardware->registers[0x81CU / 4U], before_reset_mask);
+    EXPECT_NE(hardware->registers[0x920U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(endpoints[2].request, &interrupt_request);
+    EXPECT_EQ(nx_request_state(&interrupt_request.base), NX_REQUEST_DRAINING);
+    EXPECT_EQ(clock.consumers, 1U);
+    const auto writes = hardware->mmio_writes;
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_STATE);
+    EXPECT_EQ(hardware->mmio_writes, writes);
+    hardware->hold_disable = false;
+    ASSERT_EQ(nx_usb_device_service(&port), NX_SUCCESS);
+    ASSERT_EQ(nx_request_state(&interrupt_request.base), NX_REQUEST_SETTLED);
+    ASSERT_FALSE(controller.reset_pending);
+    EXPECT_EQ(hardware->registers[0x920U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(hardware->registers[0xB20U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(hardware->registers[0x81CU / 4U], 0x00010001U);
+    EXPECT_NE(hardware->registers[0x900U / 4U] & (1U << 15U), 0U);
+    EXPECT_NE(hardware->registers[0xB00U / 4U] & (1U << 15U), 0U);
+    ASSERT_EQ(nx_usb_in_prepare(&interrupt_request, interrupt_bytes, 1U,
+                                NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_usb_endpoint_submit(&in, &interrupt_request), NX_ERROR_STATE);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(nx_request_state(&interrupt_request.base), NX_REQUEST_READY);
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &interrupt_request), NX_SUCCESS);
+    /* Publish the same independent ACK facts as the existing SDK packet test.
+     */
+    hardware->registers[0x920U / 4U] &= ~(1U << 31U);
+    hardware->registers[0x928U / 4U] |= 1U;
+    hardware->registers[0x938U / 4U] = endpoints[2].fifo_words;
+    hardware->tx_count[1] = 0U;
+    nx_usb_controller_irq(&controller);
+    EXPECT_EQ(nx_request_state(&interrupt_request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(interrupt_request.base.result, NX_SUCCESS);
+}
+
+TEST_F(UsbSocActivation, CorruptActiveGeometryClosesWithoutReplayingData0) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    hardware->registers[0x920U / 4U] =
+        (hardware->registers[0x920U / 4U] & ~0x7FFU) | 63U | (1U << 16U);
+    const auto corrupt = hardware->registers[0x920U / 4U];
+    const auto writes = hardware->mmio_writes;
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_IO);
+    EXPECT_EQ(hardware->registers[0x920U / 4U], corrupt);
+    EXPECT_EQ(hardware->mmio_writes, writes);
+    EXPECT_TRUE(controller.snapshot.closing);
+    EXPECT_EQ(clock.consumers, 1U);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+}
+
+TEST_F(UsbSoc, LatchedRawResetRejectsActiveDirectionsBeforeIrqCollection) {
+    for (unsigned index : {2U, 3U}) {
+        SCOPED_TRACE(testing::Message() << "endpoint index=" << index);
+        ASSERT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+        ASSERT_EQ(DEVICE_INIT(&controller, &clock), NX_SUCCESS);
+        ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+        const auto& selected = endpoints[index];
+        const nx_usb_endpoint_port_t endpoint = {&nx_usb_fs_endpoint_ops,
+                                                 &endpoints[index]};
+        ASSERT_EQ(selected.in
+                      ? nx_usb_in_prepare(&interrupt_request, interrupt_bytes,
+                                          1U, NX_USB_DATA, 0U, 200U)
+                      : nx_usb_out_prepare(&interrupt_request, interrupt_bytes,
+                                           1U, NX_USB_DATA, 0U, 200U),
+                  NX_SUCCESS);
+        const uint32_t offset =
+            (selected.in ? 0x900U : 0xB00U) + 32U * selected.number;
+        const auto control = hardware->registers[offset / 4U];
+        ASSERT_NE(control & (1U << 15U), 0U);
+        ASSERT_EQ(endpoints[index].request, nullptr);
+        ASSERT_FALSE(controller.reset_pending);
+        const auto epoch = controller.snapshot.epoch;
+        const auto size = hardware->registers[(offset + 16U) / 4U];
+        const auto mask = hardware->registers[0x81CU / 4U];
+        /* This shared SDK hardware leaf retains active after the raw reset
+         * latch. Do not infer ST or GD silicon side effects from the model. */
+        hardware->registers[0x14U / 4U] |= 1U << 12U;
+        const auto writes = hardware->mmio_writes;
+        const auto result =
+            nx_usb_endpoint_submit(&endpoint, &interrupt_request);
+        EXPECT_EQ(result, NX_ERROR_STATE);
+        EXPECT_EQ(nx_request_state(&interrupt_request.base), NX_REQUEST_READY);
+        EXPECT_EQ(endpoints[index].request, nullptr);
+        EXPECT_EQ(hardware->mmio_writes, writes);
+        EXPECT_EQ(hardware->registers[offset / 4U], control);
+        EXPECT_EQ(hardware->registers[(offset + 16U) / 4U], size);
+        EXPECT_EQ(hardware->registers[0x81CU / 4U], mask);
+        EXPECT_EQ(hardware->tx_count[selected.number], 0U);
+        EXPECT_NE(hardware->registers[0x14U / 4U] & (1U << 12U), 0U);
+        EXPECT_EQ(controller.snapshot.epoch, epoch);
+        EXPECT_FALSE(controller.reset_pending);
+        EXPECT_FALSE(controller.snapshot.closing);
+        EXPECT_EQ(clock.consumers, 1U);
+        /* An accepted RED request remains fixture-owned through real stop. */
+        ASSERT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
+        if (result == NX_SUCCESS) {
+            ASSERT_EQ(nx_request_state(&interrupt_request.base),
+                      NX_REQUEST_SETTLED);
+        }
+    }
 }

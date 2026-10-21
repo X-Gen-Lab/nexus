@@ -9,6 +9,7 @@
 #include "nexus/components/usb_acm.h"
 #include "nexus/components/usb_control.h"
 #include "nexus/components/usb_descriptors.h"
+#include "nexus/io/usb_activation.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 static nx_usb_acm_t s_nx_acm;
@@ -52,6 +53,19 @@ int main(void) {
     }
     size_t count = 0U;
     nx_usb_device_state_t state = {0};
+    const nx_usb_activation_port_t* activation =
+        nx_factory_usb_activation(NX_USB_DEVICE_ID_FS);
+    uint8_t address =
+        (uint8_t)(0x80U | (interrupt_in != NULL ? interrupt_in->number : 1U));
+    nx_result_t activated = nx_usb_device_state(device, &state);
+    if (activated == NX_SUCCESS) {
+        /* Link-only owner selects one authored direction explicitly. */
+        activated =
+            nx_usb_activation_set(activation, state.epoch, address, true);
+    }
+    if (activated != NX_SUCCESS) {
+        return (int)activated;
+    }
     nx_request_initialize(&s_nx_request.base);
     nx_time_us_t deadline = nx_deadline_after(nx_time_now_us(), 1000U);
     (void)nx_usb_in_prepare(&s_nx_request, s_nx_packet, sizeof(s_nx_packet),
@@ -61,6 +75,7 @@ int main(void) {
     (void)nx_usb_device_service(device);
     (void)nx_usb_device_read_events(device, s_nx_events, 2U, &count);
     (void)nx_usb_device_state(device, &state);
+    (void)nx_usb_activation_set(activation, state.epoch, address, false);
     nx_request_initialize(&s_nx_reply.base);
     if (nx_usb_control_status_prepare(&s_nx_reply, state.epoch, deadline) ==
             NX_SUCCESS &&

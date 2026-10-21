@@ -49,6 +49,7 @@ OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
                     stm32h7_hal_lock, stm32u5_hal_lock)
 REQUIRED_FILES = (
     'io/include/nexus/io/usb_profile.h',
+    'io/include/nexus/io/usb_activation.h',
     'io/src/usb_profile.c',
     'tools/configure/usb_profiles.py',
     'components/usb_control/CMakeLists.txt',

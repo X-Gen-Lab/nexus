@@ -46,3 +46,30 @@ def emit(result):
                    f'            return &s_nx_usb_profile_{name};']
     source += ['        default:', '            return NULL;', '    }', '}']
     return header, source
+
+
+def emit_activation(result):
+    """Expose selected controller operations independently of ROM metadata."""
+    controllers = [item for item in result.controllers
+                   if item.kind == "usb_device"]
+    header = ['#include "nexus/io/usb_activation.h"',
+              '/** \\brief Fixed controller activation identity, or NULL.',
+              ' * \\note Task/ISR safe; no start, locks or hardware access.',
+              ' */',
+              'const nx_usb_activation_port_t* nx_factory_usb_activation(',
+              '    nx_usb_device_id_t id);']
+    source = []
+    for item in controllers:
+        name = item.id.replace("-", "_")
+        source += ['static const nx_usb_activation_port_t '
+                   f's_nx_usb_activation_{name} = {{',
+                   f'    &nx_usb_fs_activation_ops, &s_nx_port_{name}', '};']
+    source += ['/** \\brief Pure lookup; no start or hardware access. */',
+               'const nx_usb_activation_port_t* nx_factory_usb_activation(',
+               '    nx_usb_device_id_t id) {', '    switch (id) {']
+    for item in controllers:
+        name = item.id.replace("-", "_")
+        source += [f'        case NX_USB_DEVICE_ID_{name.upper()}:',
+                   f'            return &s_nx_usb_activation_{name};']
+    source += ['        default:', '            return NULL;', '    }', '}']
+    return header, source

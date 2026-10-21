@@ -7,6 +7,7 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #include "nexus/io/usb_device.h"
+#include "nexus/io/usb_activation.h"
 
 /** \brief Preparation never touches packet memory or changes a borrowed loan.
  */
@@ -142,4 +143,16 @@ nx_result_t nx_usb_device_stop(const nx_usb_device_port_t* port) {
     }
     return port->ops->stop == NULL ? NX_ERROR_UNSUPPORTED
                                    : port->ops->stop(port->context);
+}
+
+/** \brief Dispatch explicit activation through the selected controller face. */
+nx_result_t nx_usb_activation_set(const nx_usb_activation_port_t* port,
+                                  uint64_t epoch, uint8_t endpoint_address,
+                                  bool active) {
+    if (port == NULL || port->ops == NULL || port->context == NULL) {
+        return NX_ERROR_INVALID;
+    }
+    return port->ops->set == NULL
+               ? NX_ERROR_UNSUPPORTED
+               : port->ops->set(port->context, epoch, endpoint_address, active);
 }
