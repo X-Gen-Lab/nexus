@@ -587,6 +587,7 @@ include(uart_fifo_acquisition_probe.cmake)
 include("${CMAKE_CURRENT_SOURCE_DIR}/mapped_storage.cmake")
 include(amp_ipc.cmake)
 include(stm32f407_handoff.cmake)
+include(f407_i2s2_slave_tx.cmake)
 include(frame_stream.cmake)
 
 include(u575_retained_time.cmake)

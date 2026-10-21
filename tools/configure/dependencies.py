@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
-    "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir",
+    "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",

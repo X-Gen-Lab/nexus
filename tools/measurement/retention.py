@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.evidence.common import EvidenceError, atomic_json, file_identity
 from tools.measurement.elf import Elf32
 from tools.evidence.identity import resolved_identity, resolved_input_files
+from tools.configure import i2s2
 from tools.measurement.resources import (resolved_float_abi,
                                          validate_elf_configuration,
                                          input_protection_paths)
@@ -420,9 +421,195 @@ def concrete_method(elf, pointer):
             "definitions": matching}
 
 
-def inspect_provider_retention(elf, bindings, *, root=ROOT):
+def operations_table(elf, operations, expected_type, slot_names, provider):
+    """Audit shared table words against public ABI and private methods."""
+    table, section = linked_object(elf, operations, "operations")
+    if table["size"] != 4 * len(slot_names):
+        raise EvidenceError(
+            "concrete operations layout differs from public ABI")
+    slots = object_words(elf, table, section)
+    if not any(slots):
+        raise EvidenceError("concrete operations table has no methods")
+    methods = []
+    for index, (slot_name, pointer) in enumerate(zip(slot_names, slots)):
+        expected = provider["fields"].get(slot_name, "NULL")
+        if expected in ("NULL", "0"):
+            if pointer:
+                raise EvidenceError("uninitialized method unexpectedly linked")
+            continue
+        if not pointer:
+            raise EvidenceError("initialized method was omitted from table")
+        method = concrete_method(elf, pointer)
+        if expected not in method["symbols"]:
+            raise EvidenceError("initialized method points to another function")
+        if not any(definition["name"] == expected
+                   and (definition["binding"] == 1
+                        or definition["file"] is not None
+                        and Path(definition["file"]).name ==
+                        Path(provider["source"]["path"]).name)
+                   for definition in method["definitions"]):
+            raise EvidenceError("local method differs from initializer source")
+        methods.append({"slot": index, "name": slot_name, **method})
+    result = {"name": operations, "type": expected_type,
+              "source": provider["source"], "address": table["value"],
+              "bytes": table["size"], "slots": slot_names, "methods": methods,
+              "null_methods": sum(pointer == 0 for pointer in slots)}
+    if "template_source" in provider:
+        result["template_source"] = provider["template_source"]
+    return result
+
+
+def selected_i2s2_role(resolved):
+    """Only the exact validated hardware IR authorizes the component audit."""
+    if resolved is None or "i2s2" not in resolved:
+        return None
+    selected = resolved["i2s2"]
+    if (not isinstance(selected, dict)
+            or set(selected) != {"profile", "part", "claims"}):
+        raise EvidenceError("invalid resolved I2S2 role")
+    try:
+        role = i2s2.resolve({"profile": selected["profile"]},
+                            family=resolved.get("soc_family"),
+                            part=resolved.get("part"),
+                            backend=resolved.get("backend"),
+                            clock_profile=resolved.get("clock_profile"))
+    except ValueError as error:
+        raise EvidenceError(
+            "invalid resolved I2S2 role: " + str(error)) from error
+    if selected != {"profile": role.profile, "part": role.part,
+                    "claims": list(role.claims)}:
+        raise EvidenceError(
+            "resolved I2S2 role differs from validated typed IR")
+    return role
+
+
+def i2s2_storage_contract(root):
+    """Read the maintained 32-bit union ABI, including its uint64 alignment."""
+    path = root / ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                   "f407_i2s2_slave_tx.h")
+    source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
+                    flags=re.DOTALL)
+    source = re.sub(r"\A\s*#\s*ifndef\s+(\w+)\s*\n"
+                    r"\s*#\s*define\s+\1\b[^\n]*", "", source, count=1)
+    macro = "NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES"
+    sizes = list(re.finditer(
+        r"#\s*if\s+UINTPTR_MAX\s*==\s*UINT32_MAX\s*\n"
+        r"\s*#\s*define\s+" + macro + r"\s+([1-9][0-9]*)U\s*\n"
+        r"\s*#\s*elif\s+UINTPTR_MAX\s*==\s*UINT64_MAX\s*\n"
+        r"\s*#\s*define\s+" + macro + r"\s+([1-9][0-9]*)U\s*\n"
+        r"\s*#\s*else\s*\n\s*#\s*error[^\n]+\n"
+        r"\s*#\s*endif\b", source))
+    unions = list(re.finditer(
+        r"typedef\s+union\s*\{\s*uint64_t\s+alignment\s*;\s*"
+        r"uintptr_t\s+pointer_alignment\s*;\s*unsigned\s+char\s+"
+        r"private_bytes\s*\[\s*NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES\s*\]\s*;"
+        r"\s*\}\s*nx_f407_i2s2_slave_tx_storage_t\s*;", source))
+    # The uint64 member has 8-byte alignment in the maintained ARM AAPCS ABI.
+    if (len(sizes) != 1 or len(unions) != 1
+            or len(re.findall(r"#\s*define\s+" + macro + r"\b", source)) != 2
+            or re.search(r"#\s*undef\s+" + macro + r"\b", source)
+            or sizes[0].end() > unions[0].start()
+            or conditional_at(source, sizes[0].start())
+            or conditional_at(source, unions[0].start())
+            or int(sizes[0][1]) % 8):
+        raise EvidenceError("unsupported public I2S2 ARM storage layout")
+    return int(sizes[0][1]), file_identity(path)
+
+
+def inspect_i2s2_component(elf, role, face_types, layouts, providers, root):
+    """Audit caller pointer pairs without inventing factory bindings."""
+    face_type = "nx_f407_i2s2_slave_tx_t"
+    operations = "nx_f407_i2s2_slave_tx_ops"
+    expected_type = face_types.get(face_type)
+    provider = providers.get(operations)
+    if (provider is None or expected_type is None
+            or provider["type"] != expected_type
+            or provider["source"] != file_identity(
+                root / "soc/stm32f407/drivers/i2s2_slave_tx.c")):
+        raise EvidenceError(
+            "missing exact I2S2 public/private operations contract")
+    slot_names = layouts[expected_type]
+    if (slot_names != ["submit", "service", "cancel", "stop"]
+            or any(provider["fields"].get(name, "NULL") in ("NULL", "0")
+                   for name in slot_names)):
+        raise EvidenceError("I2S2 requires all four public operations methods")
+    table = operations_table(elf, operations, expected_type, slot_names,
+                             provider)
+    for method in table["methods"]:
+        expected = provider["fields"][method["name"]]
+        if not any(definition["name"] == expected
+                   and definition["binding"] == 0
+                   and definition["file"] is not None
+                   and Path(definition["file"]).name ==
+                   Path(provider["source"]["path"]).name
+                   for definition in method["definitions"]):
+            raise EvidenceError("I2S2 method lacks private provider provenance")
+    storage_bytes, contract = i2s2_storage_contract(root)
+    candidates = []
+    for symbol in elf.defined_symbols:
+        if (symbol["type"] != 1 or symbol["size"] != 8
+                or not 0 <= symbol["section"] < len(elf.sections)):
+            continue
+        section = elf.sections[symbol["section"]]
+        offset = section["offset"] + symbol["value"] - section["address"]
+        if (section["kind"] != 8 and section["address"] <= symbol["value"]
+                and 0 <= offset <= len(elf.data) - 4
+                and struct.unpack_from("<I", elf.data, offset)[0]
+                == table["address"]):
+            candidates.append(symbol["name"])
+    if not candidates:
+        raise EvidenceError("no retained I2S2 caller-owned face")
+    faces = []
+    spans = [(table["address"], table["address"] + table["bytes"])]
+    for name in candidates:
+        face, section = linked_object(elf, name, "component face")
+        if face["size"] != 8:
+            raise EvidenceError("component face must contain two ARM pointers")
+        words = object_words(elf, face, section)
+        owners = [symbol for symbol in elf.defined_symbols
+                  if symbol["type"] == 1 and symbol["value"] == words[1]]
+        if len(owners) != 1:
+            raise EvidenceError("missing or aliased I2S2 component storage")
+        owner, owner_section = linked_object(
+            elf, owners[0]["name"], "component storage", writable=True)
+        if (owner["size"] != storage_bytes or owner["value"] % 8
+                or owner_section["flags"] & 4
+                or any(load["flags"] & 1
+                       and load["virtual"] < owner["value"] + owner["size"]
+                       and owner["value"] < load["virtual"] + load["memory"]
+                       for load in elf.loads)):
+            raise EvidenceError(
+                "component storage differs from public ARM layout")
+        for obj in (face, owner):
+            start, end = obj["value"], obj["value"] + obj["size"]
+            if (not 0 < start < end <= 1 << 32
+                    or any(start < stop and begin < end
+                           for begin, stop in spans)):
+                raise EvidenceError("overlapping or invalid I2S2 object extent")
+            spans.append((start, end))
+        for other in elf.defined_symbols:
+            if (other is owners[0] or other["type"] != 1 or other["size"] <= 0
+                    or not 0 <= other["section"] < len(elf.sections)
+                    or not elf.sections[other["section"]]["flags"] & 2):
+                continue
+            if (owner["value"] < other["value"] + other["size"]
+                    and other["value"] < owner["value"] + owner["size"]):
+                raise EvidenceError("component storage overlaps another object")
+        faces.append({"name": name, "type": face_type, "operations": operations,
+                      "context": owner["name"], "address": face["value"],
+                      "origin": "caller_owned_component",
+                      "profile": role.profile,
+                      "context_address": owner["value"],
+                      "context_bytes": storage_bytes,
+                      "storage_contract": contract})
+    return faces, table
+
+
+def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None):
     """Trace selected faces through exact tables and all non-NULL methods."""
-    connections = selected_faces(bindings)
+    role = selected_i2s2_role(resolved)
+    connections = (selected_faces(bindings) if role is None
+                   or FACE_DECLARATION.search(bindings) else [])
     face_types, layouts, providers, public_inputs = source_contracts(root)
     faces, tables = [], {}
     for face_type, name, operations, context in connections:
@@ -436,7 +623,7 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT):
         if face["size"] != 8:
             raise EvidenceError("selected face must contain two ARM pointers")
         words = object_words(elf, face, section)
-        table, table_section = linked_object(elf, operations, "operations")
+        table, _ = linked_object(elf, operations, "operations")
         if table["size"] != 4 * len(slot_names):
             raise EvidenceError(
                 "concrete operations layout differs from public ABI")
@@ -451,40 +638,13 @@ def inspect_provider_retention(elf, bindings, *, root=ROOT):
                       **context_facts})
         if operations in tables:
             continue
-        slots = object_words(elf, table, table_section)
-        if not any(slots):
-            raise EvidenceError("concrete operations table has no methods")
-        methods = []
-        for index, (slot_name, pointer) in enumerate(zip(slot_names, slots)):
-            expected = provider["fields"].get(slot_name, "NULL")
-            if expected in ("NULL", "0"):
-                if pointer:
-                    raise EvidenceError(
-                        "uninitialized method unexpectedly linked")
-                continue
-            if not pointer:
-                raise EvidenceError("initialized method was omitted from table")
-            method = concrete_method(elf, pointer)
-            if expected not in method["symbols"]:
-                raise EvidenceError(
-                    "initialized method points to another function")
-            if not any(definition["name"] == expected
-                       and (definition["binding"] == 1
-                            or definition["file"] is not None
-                            and Path(definition["file"]).name ==
-                            Path(provider["source"]["path"]).name)
-                       for definition in method["definitions"]):
-                raise EvidenceError(
-                    "local method differs from initializer source")
-            methods.append({"slot": index, "name": slot_name, **method})
-        tables[operations] = {"name": operations, "type": expected_type,
-                              "source": provider["source"],
-                              "address": table["value"], "bytes": table["size"],
-                              "slots": slot_names, "methods": methods,
-                              "null_methods": sum(pointer == 0
-                                                  for pointer in slots)}
-        if "template_source" in provider:
-            tables[operations]["template_source"] = provider["template_source"]
+        tables[operations] = operations_table(
+            elf, operations, expected_type, slot_names, provider)
+    if role is not None:
+        component_faces, component_table = inspect_i2s2_component(
+            elf, role, face_types, layouts, providers, root)
+        faces.extend(component_faces)
+        tables[component_table["name"]] = component_table
     return {"schema_version": 1, "kind": "linked_provider_retention",
             "status": "passed", "face_count": len(faces),
             "operations_table_count": len(tables),
@@ -851,7 +1011,8 @@ def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT):
     elf = Elf32(elf_path.read_bytes(), float_abi=abi)
     if resolved_path is not None:
         validate_elf_configuration(elf, resolved)
-    report = inspect_provider_retention(elf, bindings_path.read_text(), root=root)
+    report = inspect_provider_retention(
+        elf, bindings_path.read_text(), root=root, resolved=resolved)
     if resolved is not None:
         mpu = inspect_mpu_gpio(elf, resolved, report, root=root)
         if mpu is not None:

@@ -304,7 +304,8 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
                "u575-stop2": "Nexus::U575Stop2",
                "u575-lpdma-copy": "Nexus::U575Stop2Copy",
                "u575-lptim1-lpbam": "Nexus::U575Stop2Lptim1",
-               "u575-mpu-gpio": "Nexus::U575MpuGpio"}.get(smoke_name)
+               "u575-mpu-gpio": "Nexus::U575MpuGpio",
+               "f407-i2s2-slave-tx": "Nexus::F407I2S2SlaveTx"}.get(smoke_name)
     component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
@@ -357,6 +358,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32g474_pin_state.h") || '
         '__has_include("pin_state_impl.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
+        '__has_include("stm32f407_i2s2_slave_tx.h") || '
         '__has_include("gd32f470_eth_frames.h") || '
         '__has_include("stm32g474_provider.h") || '
         '__has_include("rtc_lptim_provider.h")\n'

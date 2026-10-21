@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/soc-refinement-execution.csv)。
-源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`3e5cfc2893bb55c359f7e1bd63ddf842d5af8b12fc0fb97aa3a851a9816950c1`。
+源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -635,8 +635,8 @@ source_language: zh_CN
 | `implementation_status` | partial_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp |
+| `implementation_paths` | arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json |
 | `exit_condition` | Actual permissions address copy borrow async exit gateway and hardware isolation verified |
 | `owner` | codex |
 

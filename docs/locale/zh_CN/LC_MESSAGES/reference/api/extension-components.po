@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: cda9b127b1e6cedbc053743cb44a7f6dc59737ab19c58489cd60617393130eff\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 56d40999d9981ce660a4cd9164d5a209973c3cacdea89d3b90523bdcd60a014f\n"
 
 msgid "Extension and lifecycle APIs"
 msgstr "扩展与生命周期 API"
@@ -1321,3 +1321,66 @@ msgstr "Submit 返回 SUCCESS 表示 ACCEPTED，包括后续设置／读回错�
 
 msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."
 msgstr "abort_observations 限定进入隔离前 service 失败观察的次数。它是软件进展预算，不是实测的总线／DMA 时间界限。同一执行者在可恢复隔离后继续 service；实际排空可使请求结算。若观察到活动期间 RCC 时钟门丢失或复位被置位，则永久保留全部借用。恢复寄存器不能证明已丢失的传输历史；没有 API 能回收它。未被观察到的复位脉冲无法检测，因此仍必须独占 RCC 所有权。系统恢复由外部负责。"
+
+msgid "f407_i2s2_slave_tx.h"
+msgstr "f407_i2s2_slave_tx.h"
+
+msgid "Exact F407 finite stereo16 I2S2 slave transmitter."
+msgstr "精确面向 F407 的有限 stereo16 I2S2 从机发送器。"
+
+msgid "Fixed chip resource selected by the same validated hardware IR."
+msgstr "由同一份已验证硬件 IR 选定的固定芯片资源。"
+
+msgid "Acquire the selected F407 SPI2 personality and fixed pads."
+msgstr "取得选定 F407 SPI2 工作模式及固定引脚的所有权。"
+
+msgid "The caller owns the external master and holds CK idle LOW and WS HIGH continuously from before initialization/submission until acquire-observed ACTIVE. Pin reads sample instants; they cannot prove electrical silence. The master transmits exactly the declared complete frames and stops before a missing next word. Restart begins at the left channel. A prefilling cancellation with CK idle cannot empty DR; preserve QUARANTINED storage until coordinated drain clocks allow TXE then fresh BSY observations. This error drain can underrun and does not promise valid stereo audio or a complete transmitted frame; errors report zero transferred bytes. Timeout, TC or NDTR0 never proves wire completion or final access. The caller also supplies valid operating voltage, I/O levels, load, CK/WS/SD timing and DMA refill margin under DS8626. ACTIVE and pin samples do not measure or qualify those electrical/rate conditions."
+msgstr "调用方拥有外部主机，并且从初始化或提交之前开始，持续保持 CK 处于空闲 LOW、WS 处于 HIGH，直到以 acquire 语义观察到 ACTIVE。引脚读取只反映采样瞬间，不能证明电气信号持续静止。主机必须恰好传输所声明的完整帧，并在需要下一个尚未提供的数据字之前停止。再次启动时从左声道开始。已预填充时，若取消请求且 CK 仍保持空闲，DR 便无法排空；必须保留处于 QUARANTINED 的存储，直到协调提供的排空时钟允许先观察 TXE，再重新观察 BSY。这种错误排空可能产生欠载，并不保证得到有效的立体声音频或发送完整帧；错误一律报告零传输字节。超时、TC 或 NDTR0 都不能证明线上发送完成或已完成最终访问。调用方还必须按 DS8626 提供有效的工作电压、I/O 电平、负载、CK/WS/SD 时序和 DMA 补充数据裕量。ACTIVE 和引脚采样既不测量这些电气或速率条件，也不构成对它们的验证。"
+
+msgid "One privileged unmasked task serializes every method and external owner lifecycle. Preserve incoming masks on all rejection paths. NMI/HardFault, other DMA/IRQ/pin owners, reset/reclock/debugger writers and concurrent Platform stop are excluded. Observed reset or clock-profile history loss while borrowed permanently retains the request; restoring reset-looking registers cannot establish prior final access. Main SRAM is DMA-visible; CCM is not. Chip pin capability establishes neither a PCB route nor codec/electrical HIL. The assembly and fixture supply the actual F407/package identity: shared device-group and density reads alone do not distinguish an F405 or authenticate the physical package."
+msgstr "由一个未屏蔽中断的特权任务串行执行所有方法，并串行管理外部所有者的生命周期。所有拒绝路径都必须保留调用前的中断屏蔽状态。不允许从 NMI/HardFault 调用，也不允许其他 DMA/IRQ/引脚所有者、复位或重配时钟的写入方、调试器写入方以及并发 Platform stop 介入。借用期间一旦观察到复位或时钟配置历史丢失，请求就会被永久保留；将寄存器恢复成复位时的样子不能证明此前已经完成最终访问。主 SRAM 对 DMA 可见；CCM 不可见。芯片引脚能力既不能证明 PCB 布线，也不代表已经完成编解码器或电气 HIL 验证。实际的 F407 及封装身份由装配配置和测试夹具确定：仅凭共用的器件组标识和容量读数，既不能区分 F405 与 F407，也不能验证物理封装。"
+
+msgid "Exact F407VE/ZG, baremetal, HSE8/PLL168 and live TIM2 only. The normal hardware role exclusively claims SPI2/I2S2, PB12 WS/PB13 CK/PB15 SD AF5, DMA1 Stream4 channel0 and both vectors. No PLLI2S, continuous DBM or IRQ service is enabled. Peripheral/pad/SPI2 gate ownership lasts until stop SUCCESS, independently of each request's shorter frame loan. The selected cold-reset Platform separately holds the shared GPIOB/DMA1 gates. Initialization requires both already on; this provider never enables or withdraws them. Every shared domain user, including external HAL users, must join before Platform stop. Clock-gating is not proof of a reset engine; unknown running-state attachment is unsupported."
+msgstr "仅支持精确的 F407VE/ZG 器件、baremetal、HSE8/PLL168 以及有效运行中的 TIM2。常规硬件角色以独占方式声明 SPI2/I2S2、PB12 WS/PB13 CK/PB15 SD AF5、DMA1 Stream4 channel0 及两个向量。不启用 PLLI2S、连续 DBM 或 IRQ 服务。外设、引脚和 SPI2 时钟门控的所有权一直保留到 stop 返回 SUCCESS，独立于每个请求持续时间较短的帧借用。选定的冷复位 Platform 单独持有共享的 GPIOB/DMA1 时钟门控。初始化要求这两个门控已经开启；本提供方绝不启用或撤回它们。所有共享域使用者，包括外部 HAL 使用者，都必须在 Platform stop 前完成活动并汇合退出。时钟门控状态不能证明引擎已经复位；不支持接管运行状态未知的硬件。"
+
+msgid "[inout] Fresh zero storage, disjoint from all controls."
+msgstr "[inout] 全新的零初始化存储，且与所有控制对象的存储范围互不重叠。"
+
+msgid "[in] Stable readonly {&nx_f407_i2s2_slave_tx_ops, storage}."
+msgstr "[in] 地址稳定且只读的 {&nx_f407_i2s2_slave_tx_ops, storage}。"
+
+msgid "[in] Fixed resource and observation budget."
+msgstr "[in] 固定资源及观察预算。"
+
+msgid "SUCCESS, INVALID, CONTEXT, BUSY, STATE, UNSUPPORTED or IO. Initialization IO retains cleanup responsibility; call stop before reuse."
+msgstr "SUCCESS、INVALID、CONTEXT、BUSY、STATE、UNSUPPORTED 或 IO。初始化返回 IO 时仍保留清理责任；复用前须调用 stop。"
+
+msgid "Shared immutable methods; callbacks receive the storage context."
+msgstr "共享且不可变的方法表；回调接收存储上下文。"
+
+msgid "One complete contiguous interleaved stereo16 frame block."
+msgstr "一个完整、连续且交错存储的 stereo16 帧块。"
+
+msgid "Initialize and prepare base with the ordinary helpers. The source has one plane of contiguous nonempty rows, no offset or padding, and 4..131068 bytes in a multiple of four. Each frame stores left then right 16-bit little-endian samples. The fixed Philips I2S wire emits each sample MSB first in 16-bit slots. Sample values, rate, codec and external clocks are caller policy. Acceptance transfers the exact immutable source loan and borrows this request until acquire-observed SETTLED. Never separately release, mutate or reuse accepted storage. SUCCESS reports the whole block only after memory and wire completion. Every error or cancellation reports zero; the DMA count does not establish serialized audio bytes."
+msgstr "使用常规辅助函数初始化并准备 base。源数据由一个平面内的连续非空行组成，没有偏移或填充，大小为 4..131068 字节且必须是四的倍数。每帧按先左声道、后右声道的顺序存放 16 位小端采样。固定的 Philips I2S 线上格式使用 16 位时隙，并以 MSB 优先的顺序发送每个采样。采样值、速率、编解码器和外部时钟均由调用方决定。接受请求时会移交该确切且不可变的源帧借用，并借用此请求，直至以 acquire 语义观察到 SETTLED。不得自行释放、修改或复用已接受的存储。只有在内存传输和线上发送均完成后，SUCCESS 才报告整个块的字节数。任何错误或取消均报告零字节；DMA 计数无法证明已经串行发送的音频字节数。"
+
+msgid "One privileged serialized task executor; no ISR callback."
+msgstr "由一个特权任务串行执行所有操作；不提供 ISR 回调。"
+
+msgid "submit SUCCESS means ACCEPTED, including subsequent setup failure. QUEUED is not armed. Acquire-observed ACTIVE alone authorizes the external master to begin CK, after one DR halfword and a live TIM2 interval have been observed. Error, cancellation or timeout retains the full loan until actual engine, serializer, vector and address withdrawal. service returns SUCCESS when idle or settled, otherwise BUSY or an observed failure with the borrow retained. stop closes further admission and requests cancellation; repeat it after service proves the remaining cleanup. The first SR observation occurs only after acceptance because reading SR clears UDR/FRE. Its fault remains latched through cleanup; a later clean status read cannot erase the operation's cause. No method allocates, starts a task or replays a block. Admission checks controls against every full-capacity pool slot in O(slot count); service/cancel do not scan the pool."
+msgstr "submit 返回 SUCCESS 表示 ACCEPTED，即使后续设置失败也不改变这一含义。QUEUED 尚未完成就绪准备。只有在观察到 DR 中已有一个半字且有效运行的 TIM2 已经过所需间隔后，以 acquire 语义观察到 ACTIVE，才允许外部主机开始提供 CK。发生错误、取消或超时时，仍保留完整借用，直到实际完成 DMA 引擎、串行发送器、向量和地址引用的撤回。service 在空闲或请求已终结时返回 SUCCESS；否则返回 BUSY 或观察到的失败状态，同时继续保留借用。stop 关闭后续请求接纳并请求取消；待 service 证明剩余清理已经完成后，再次调用 stop。由于读取 SR 会清除 UDR/FRE，请求的首次 SR 观察仅在接受后发生。观察到的故障在整个清理过程中保持锁存；后续无故障的状态读取不能抹去本次操作的失败原因。任何方法都不分配内存、不启动任务，也不重放数据块。接纳请求时，会以 O(slot count) 的复杂度检查控制对象是否与池中每个槽位的完整容量范围重叠；service/cancel 不扫描该池。"
+
+msgid "Immutable caller-owned face; private state is separate."
+msgstr "由调用方持有的不可变接口对象；私有状态单独存放。"
+
+msgid "Exact resource and positive bounded observation budget."
+msgstr "精确选定的资源，以及为正数的有界观察预算。"
+
+msgid "poll_limit bounds each arm/drain observation loop, not time or external-clock progress. Arming observes at least three actual 1 MHz TIM2 ticks after I2SE readback. Deadlines are absolute in the current live Platform TIM2 epoch. The caller stops and joins this owner before Platform stop/restart; the deadline includes wire and observer withdrawal. No automatic ClockDomain enrollment is implied."
+msgstr "poll_limit 限制每次就绪准备或排空观察循环的次数，并不表示经过的时间，也不保证外部时钟推进。就绪准备必须在 I2SE 读回后观察到至少三个实际的 1 MHz TIM2 计数推进。截止时间是当前有效 Platform TIM2 时间纪元内的绝对时间。调用方必须先停止该所有者并等待其活动完全结束，再执行 Platform stop/restart；截止时间也涵盖线上发送排空和观察者撤回。这里并不意味着会自动加入 ClockDomain。"
+
+msgid "Exact storage for one owner, zeroed once before publication."
+msgstr "供一个所有者使用的精确大小存储，在发布前完成一次清零。"
+
+msgid "Do not copy or alter. Keep storage and face live through successful stop. Accepted request/source loans last until acquire-observed SETTLED; a failed stop never revokes an unfinished borrow."
+msgstr "不得复制或修改。存储和接口对象必须始终保持有效，直到 stop 成功。已接受的请求及源帧借用一直保留到以 acquire 语义观察到 SETTLED；stop 失败绝不撤销尚未结束的借用。"

@@ -1,0 +1,43 @@
+// FIG-30: exact finite role; solid order/branches, dashed retained responsibility.
+// Basis: f407_i2s2_slave_tx.h, i2s2_slave_tx.c and selected F407 System lifecycle.
+digraph f407I2s2SlaveTx {
+  graph [label="FIG-30 参考：F407 I2S2 有限从机发送\n外部 CK/WS；普通模式 DMA；一个完整 stereo16 块\n实线：必需顺序或已标明分支。虚线：保留责任／重试。\n仅芯片能力；无 PCB、电气或物理 HIL 资格。",
+    rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+    bgcolor="white", pad=0.25, nodesep=0.40, ranksep=0.45, splines=polyline];
+  node [shape=box, style="rounded,filled", color="#475569",
+    fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12,
+    margin="0.14,0.10"];
+  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+    fontsize=10, arrowsize=0.75];
+  platform [label="冷复位 Platform：无其他已在运行的总线主设备或外设\n拥有实时 TIM2 时间域及共享 GPIOB／DMA1 门控\n发送器要求共享门控已经开启", fillcolor="#eff6ff", group="main"];
+  owner [label="初始化单一特权任务拥有的发送器\n拥有 SPI2 门控／模式、PB12／PB13／PB15 及向量\n调用方持续保持 CK LOW／WS HIGH，直到 ACTIVE", fillcolor="#eff6ff", group="main"];
+  queued [label="ACCEPTED／QUEUED：借用请求及原始完整 帧\n先发布，再读请求路径中的读清除型 SR 或允许 DMA 预取\n提交成功本身不允许产生 CK", fillcolor="#eff6ff", group="main"];
+  active [label="DMA EN → TXDMAEN → I2SE 读回\nNDTR = N - 1／TXE = 0；至少 3 个实时 TIM2 计数\n只有 acquire 观察到 ACTIVE 才允许 主机 开始", fillcolor="#ecfdf5", group="main"];
+  count [label="正常 主机：为声明的完整 stereo 帧 提供时钟\n请求缺失的下一字前停止；重启从左声道开始\nTCIF + NDTR0 只证明内存计数完成", fillcolor="#ecfdf5", group="main"];
+  disable [label="DRAINING：首个错误保持；绝对截止时间 仍然适用\nTXDMAEN0 + DMA EN0，分别读回\n软件 禁用 也可能在 NDTR 非零时置位 TCIF", fillcolor="#f0fdf4", group="main"];
+  wire [label="只要尝试过 I2SE：先 TXE1，再新鲜 BSY0\n之后才能清 I2SE 并读回；保留已证明的 空闲 状态\n从未尝试 启用：不需要 串行发送器 证明", fillcolor="#f0fdf4", group="main"];
+  detach [label="撤回 stream 地址／计数／标志及两个向量\n汇合内存、线上及引用撤回证明", fillcolor="#f0fdf4", group="main"];
+  settled [label="脱离所有者引用；归还原始完整帧借用\n最后 release 发布 SETTLED：成功为完整块，错误为 0 B", fillcolor="#dcfce7", group="main"];
+  stopped [label="acquire 观察 SETTLED；join 外部观察者\n发送器 stop 归还 引脚／SPI2，保留共享门控\n所有共享用户 join 后，Platform stop 才结束时间域／门控", fillcolor="#dcfce7", group="main"];
+  held [label="QUARANTINED：所有 借用 及控制存储保持有效\n预取后 CK 安静不能清空 DR\n协调排空的时钟可能造成 underrun／无效音频", fillcolor="#fff7ed", group="side"];
+  lost [label="观察到 reset／门控／时钟配置／时间历史丢失\n本实例永久 QUARANTINED\n寄存器恢复不能证明此前的最终访问", fillcolor="#fef2f2", group="side"];
+  platform -> owner [label="Platform start 成功", weight=20];
+  owner -> queued [label="已验证的提交", weight=20];
+  queued -> active [label="有界同步 arm", weight=20];
+  active -> count [label="外部 主机 开始 CK", weight=20];
+  count -> disable [label="TCIF + NDTR0，或取消／绝对截止时间／错误", weight=20];
+  queued -> disable [label="已接受后的 设置 失败／取消", constraint=false, tailport=w, headport=w];
+  active -> disable [label="取消／绝对截止时间／错误", constraint=false, tailport=w, headport=w];
+  disable -> wire [label="已证明 DMA 引擎 撤回", weight=20];
+  wire -> detach [label="保留所需 串行发送器 证明", weight=20];
+  detach -> settled [label="最终访问证明完成", weight=20];
+  settled -> stopped [label="acquire 观察到 SETTLED", weight=20];
+  wire -> held [label="缺少线上证明", style=dashed, constraint=false];
+  disable -> held [label="缺少任一撤回证明", style=dashed, constraint=false];
+  detach -> held [label="缺少地址／向量证明", style=dashed, constraint=false];
+  held -> disable [label="有界重试；历史仍已知\n从已证明的清理阶段继续", style=dashed, constraint=false];
+  active -> lost [label="任一借用阶段丢失历史", style=dashed, constraint=false];
+  held -> lost [label="观察到历史丢失", style=dashed, weight=10];
+  { rank=same; wire; held; }
+  { rank=same; stopped; lost; }
+}

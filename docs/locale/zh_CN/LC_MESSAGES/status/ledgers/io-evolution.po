@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 08d9440d0467b03c741bca2fc89cbd8fd0e12714cc4224f8e58a53a23f5c8927\n"
+"X-Nexus-Source-SHA256: ad5817cc175469415cf53e1ab3a5724f57a657afc910b8f2c55eff524f52852d\n"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
@@ -1034,15 +1034,8 @@ msgid "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io
 msgstr "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
 
 # Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md"
-msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md"
-
-# Authoritative CSV machine identity; retained unchanged in both locales.
 msgid "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
 msgstr "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
-
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1d8501d18b0c6834b445cc339ca9e2291f9323947c8ed02b5f649f076b227f61`。"
-msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1d8501d18b0c6834b445cc339ca9e2291f9323947c8ed02b5f649f076b227f61`。"
 
 msgid "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
 msgstr "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
@@ -1056,3 +1049,9 @@ msgstr "partial_exact_reference_implemented"
 
 msgid "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
 msgstr "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
+msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
+
+msgid "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"

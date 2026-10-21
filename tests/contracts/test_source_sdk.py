@@ -91,6 +91,31 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertTrue((required - {"os/freertos/include/nexus/os/freertos_mpu_gpio.h",
                                     "os/freertos/mpu/gpio.c"}).issubset(set(payload)))
 
+    def test_selected_f407_i2s2_public_closure_is_required(self):
+        role_module = "tools/configure/i2s2.py"
+        required = {
+            role_module,
+            "components/f407_i2s2_slave_tx/CMakeLists.txt",
+            "components/f407_i2s2_slave_tx/include/nexus/components/"
+            "f407_i2s2_slave_tx.h",
+            "soc/stm32f407/drivers/i2s2_slave_tx.c",
+            "soc/stm32f407/private/stm32f407_i2s2_slave_tx.h",
+            "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
+            "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
+            "cmake/package/verification/io_evolution/consumers/"
+            "f407-i2s2-slave-tx.c",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in sorted(required):
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name),
+                                "Required I2S2 closure omitted: " + name)
+        payload = source_sdk.provider_descriptors.maintained("stm32f407").owned_payload
+        hardware = required - {role_module}
+        self.assertTrue(hardware.issubset(set(payload)),
+                        sorted(hardware - set(payload)))
+
     def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
         required = {
             "components/usb_control/CMakeLists.txt",

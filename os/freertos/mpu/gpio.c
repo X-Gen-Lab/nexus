@@ -78,7 +78,7 @@ static bool binding_valid(const nx_gpio_port_t** validated_port) {
     if (grant->mask == 0U || (grant->mask & ~UINT32_C(0xffff)) != 0U ||
         (uintptr_t)grant->port_slot % _Alignof(const nx_gpio_port_t*) != 0U ||
         !contains(layout.privileged_flash, (uintptr_t)grant->port_slot,
-                  sizeof(*grant->port_slot))) {
+                  sizeof(const nx_gpio_port_t*))) {
         return false;
     }
     const nx_gpio_port_t* port = *grant->port_slot;
@@ -229,18 +229,18 @@ nx_result_t nx_freertos_mpu_gpio_write(uint32_t device, uint32_t set,
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     nx_result_t result = NX_ERROR_STATE;
     if (control->phase == 1U && bound_live(control, task)) {
-        if (current != control->handle || device != grant->device) {
-            result = NX_ERROR_PERMISSION;
-        } else if ((set & reset) != 0U || (set | reset) == 0U) {
-            result = NX_ERROR_INVALID;
-        } else if (((set | reset) & ~grant->mask) != 0U) {
-            result = NX_ERROR_PERMISSION;
-        } else {
-            /* The selected typed provider performs exactly one bounded BSRR
-             * write. No kernel API, wait, callback policy or lifecycle change
-             * occurs while this final live-epoch check excludes close/delete.
-             */
-            result = nx_gpio_port_write(port, set, reset);
+        result = NX_ERROR_PERMISSION;
+        if (current == control->handle && device == grant->device) {
+            if ((set & reset) != 0U || (set | reset) == 0U) {
+                result = NX_ERROR_INVALID;
+            } else if (((set | reset) & ~grant->mask) == 0U) {
+                /* The selected typed provider performs exactly one bounded
+                 * BSRR write. No kernel API, wait, callback policy or lifecycle
+                 * change occurs while this final live-epoch check excludes
+                 * close/delete.
+                 */
+                result = nx_gpio_port_write(port, set, reset);
+            }
         }
     }
     nx_arch_irq_restore(saved);

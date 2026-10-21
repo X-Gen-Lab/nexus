@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8ea11e4e0130212557cdba4b0ec1b2b6fb9c92e6b72fc223b88cbfc8c025d476\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 20c45eeab37fe160d511f6bb8791efb1b3baa2fa7f2ad8e1e5e198fef51f2208\n"
 
 msgid "当前设计与实施台账"
 msgstr "当前设计与实施台账"
@@ -365,3 +365,8 @@ msgstr "行为变更采用 RED → GREEN → REFACTOR；主机 GoogleTest/Google
 msgid "[Source compatibility and SDK versions](source-compatibility.md)"
 msgstr "[源码兼容性与 SDK 版本](source-compatibility.md)"
 
+msgid "[F407 I2S2 从机有限发送](f407-i2s2-slave-tx.md)"
+msgstr "[F407 I2S2 从机有限发送](f407-i2s2-slave-tx.md)"
+
+msgid "精确 VE/ZG 裸机、外部 CK/WS、有限 normal DMA、整块帧借用和真实排空；开发软件证据与完整音频／实板退出分列"
+msgstr "精确 VE/ZG 裸机、外部 CK/WS、有限 normal DMA、整块帧借用和真实排空；开发软件证据与完整音频／实板退出分列"

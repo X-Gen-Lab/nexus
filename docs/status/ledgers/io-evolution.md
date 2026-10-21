@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1d8501d18b0c6834b445cc339ca9e2291f9323947c8ed02b5f649f076b227f61`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -677,7 +677,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | audio |
 | `task` | I2S SAI PDM framing and continuous DMA loans |
-| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md |
+| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md |
 | `exit_condition` | Frame-slot format and bounded underrun; optional external codec |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |

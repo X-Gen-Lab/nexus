@@ -1,6 +1,7 @@
 """Verify complete face-to-method retention independently of build success."""
 
 import struct
+from copy import deepcopy
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -468,6 +469,282 @@ class ProviderRetentionTests(unittest.TestCase):
     def test_missing_generated_bindings_cannot_establish_empty_success(self):
         with self.assertRaisesRegex(EvidenceError, "no selected faces"):
             inspect_provider_retention(image(), "")
+
+
+def i2s2_image(*, generated=False):
+    """External caller objects and actual four-slot component ABI bytes."""
+    elf = image()
+    if not generated:
+        elf.defined_symbols = []
+    objects = [("application_tx", 0x08001090, 8, 0),
+               ("nx_f407_i2s2_slave_tx_ops", 0x08001080, 16, 0),
+               ("application_storage", 0x20000080, 88, 2)]
+    elf.defined_symbols.extend(
+        {"name": name, "value": value, "size": size, "section": section,
+         "type": 1, "binding": int(name.endswith("_ops"))}
+        for name, value, size, section in objects)
+    elf.defined_symbols.extend(
+        {"name": name, "value": 0x08002081 + index * 16, "size": 16,
+         "section": 1, "type": 2, "binding": 0, "file": "i2s2_slave_tx.c"}
+        for index, name in enumerate(("submit", "service", "cancel", "stop")))
+    struct.pack_into("<6I", elf.data, 0x80, 0x08002081, 0x08002091,
+                     0x080020a1, 0x080020b1, 0x08001080, 0x20000080)
+    resolved = {
+        "soc_family": "stm32f407", "part": "STM32F407VET6",
+        "backend": "baremetal", "clock_profile": "hse8-pll168",
+        "i2s2": {"profile": "slave-tx-stereo16-pb12-pb13-pb15",
+                 "part": "STM32F407VET6", "claims": [
+                     "controller:SPI2", "pin:PB12", "pin:PB13", "pin:PB15",
+                     "dma:DMA1:stream4:channel0", "irq:DMA1_Stream4",
+                     "irq:SPI2"]}}
+    return elf, resolved
+
+
+class I2s2ComponentRetentionTests(unittest.TestCase):
+    """An explicit role admits real caller faces, never empty success."""
+
+    def setUp(self):
+        self.elf, self.resolved = i2s2_image()
+
+    def symbol(self, name):
+        return next(symbol for symbol in self.elf.defined_symbols
+                    if symbol["name"] == name)
+
+    def inspect(self, bindings=""):
+        return inspect_provider_retention(self.elf, bindings,
+                                          resolved=self.resolved)
+
+    def rejected(self, bindings=""):
+        with self.assertRaises(EvidenceError):
+            self.inspect(bindings)
+
+    def test_exact_role_audits_caller_face_table_and_all_four_methods(self):
+        report = self.inspect()
+        self.assertEqual((report["face_count"],
+                          report["operations_table_count"],
+                          report["method_count"]), (1, 1, 4))
+        face = report["faces"][0]
+        self.assertEqual(face["origin"], "caller_owned_component")
+        self.assertEqual(face["name"], "application_tx")
+        self.assertEqual(face["context"], "application_storage")
+        self.assertEqual(face["context_bytes"], 88)
+        self.assertEqual(report["tables"][0]["slots"],
+                         ["submit", "service", "cancel", "stop"])
+        self.assertEqual(report["tables"][0]["null_methods"], 0)
+        self.assertEqual(report["physical_status"], "not_executed")
+
+    def test_role_must_equal_the_exact_validated_typed_ir(self):
+        original = deepcopy(self.resolved)
+        mutations = [lambda r: r.pop("i2s2"),
+                     lambda r: r.update(i2s2=None),
+                     lambda r: r["i2s2"].update(extra=True),
+                     lambda r: r["i2s2"].update(claims=[]),
+                     lambda r: r["i2s2"].update(part="STM32F407ZGT6"),
+                     lambda r: r["i2s2"].update(profile="another-profile"),
+                     lambda r: r.update(soc_family="stm32h743"),
+                     lambda r: r.update(backend="freertos"),
+                     lambda r: r.update(clock_profile="hsi16")]
+        for index, mutate in enumerate(mutations):
+            with self.subTest(index=index):
+                self.resolved = deepcopy(original)
+                mutate(self.resolved)
+                self.rejected()
+
+    def test_zg_uses_its_matching_role_and_absent_role_keeps_legacy_scope(self):
+        self.resolved["part"] = "STM32F407ZGT6"
+        self.resolved["i2s2"]["part"] = "STM32F407ZGT6"
+        self.assertEqual(self.inspect()["method_count"], 4)
+        with self.assertRaisesRegex(EvidenceError, "no selected faces"):
+            inspect_provider_retention(self.elf, "")
+        self.assertNotIn("origin", inspect_provider_retention(
+            image(), BINDINGS)["faces"][0])
+
+    def test_selected_role_cannot_certify_missing_or_corrupt_caller_face(self):
+        self.symbol("application_tx")["size"] = 0
+        self.rejected()
+        self.symbol("application_tx")["size"] = 8
+        struct.pack_into("<I", self.elf.data, 0x90, 0x08001084)
+        self.rejected()
+
+    def test_readonly_ops_reference_does_not_substitute_for_a_caller_face(self):
+        self.elf.defined_symbols.append({
+            "name": "application_ops_reference", "value": 0x080010a0,
+            "size": 4, "section": 0, "type": 1, "binding": 0})
+        struct.pack_into("<I", self.elf.data, 0xa0, 0x08001080)
+        report = self.inspect()
+        self.assertEqual(report["face_count"], 1)
+        self.assertEqual(report["faces"][0]["name"], "application_tx")
+        self.assertEqual(report["method_count"], 4)
+
+    def test_caller_face_requires_complete_readonly_loaded_object_bytes(self):
+        for field, value in (("binding", 2), ("size", 12)):
+            with self.subTest(field=field):
+                self.elf, _ = i2s2_image()
+                self.symbol("application_tx")[field] = value
+                self.rejected()
+        self.elf, _ = i2s2_image()
+        self.elf.sections[0]["flags"] = 3
+        self.elf.loads[0]["flags"] = 6
+        self.rejected()
+        self.elf, _ = i2s2_image()
+        self.elf.loads[0]["files"] = 0x94
+        self.rejected()
+
+    def test_context_needs_one_exact_public_storage_extent_and_alignment(self):
+        for field, value in (("binding", 2), ("size", 80),
+                             ("size", 96), ("value", 0x20000084)):
+            with self.subTest(field=field, value=value):
+                self.elf, _ = i2s2_image()
+                self.symbol("application_storage")[field] = value
+                struct.pack_into("<I", self.elf.data, 0x94,
+                                 self.symbol("application_storage")["value"])
+                self.rejected()
+        self.elf, _ = i2s2_image()
+        self.elf.defined_symbols.append(dict(
+            self.symbol("application_storage"), name="storage_alias"))
+        self.rejected()
+
+    def test_readonly_face_and_operations_need_arm_pointer_alignment(self):
+        self.symbol("application_tx")["value"] += 1
+        struct.pack_into("<2I", self.elf.data, 0x91,
+                         0x08001080, 0x20000080)
+        self.rejected()
+        self.elf, _ = i2s2_image()
+        self.symbol("nx_f407_i2s2_slave_tx_ops")["value"] = 0x08001061
+        struct.pack_into("<4I", self.elf.data, 0x61, 0x08002081,
+                         0x08002091, 0x080020a1, 0x080020b1)
+        struct.pack_into("<I", self.elf.data, 0x90, 0x08001061)
+        self.rejected()
+
+    def test_reordered_public_slots_cannot_expand_the_component_abi(self):
+        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                    "f407_i2s2_slave_tx.h")
+        source = (Path(__file__).resolve().parents[2] / relative).read_text()
+        source = source.replace("(*submit)", "(*temporary)").replace(
+            "(*service)", "(*submit)").replace("(*temporary)", "(*service)")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            header = root / relative
+            header.parent.mkdir(parents=True)
+            header.write_text(source)
+            provider = root / "soc/stm32f407/drivers/i2s2_slave_tx.c"
+            provider.parent.mkdir(parents=True)
+            provider.write_text(
+                "const nx_f407_i2s2_slave_tx_ops_t "
+                "nx_f407_i2s2_slave_tx_ops = { .submit = submit, "
+                ".service = service, .cancel = cancel, .stop = stop };\n")
+            struct.pack_into("<2I", self.elf.data, 0x80,
+                             0x08002091, 0x08002081)
+            with self.assertRaises(EvidenceError):
+                inspect_provider_retention(self.elf, "", root=root,
+                                            resolved=self.resolved)
+
+    def test_context_must_be_writable_nonexecuting_and_fully_loaded(self):
+        for section_flags, load_flags, memory in ((2, 4, 256),
+                                                 (7, 7, 256), (3, 6, 160)):
+            with self.subTest(flags=section_flags, memory=memory):
+                self.elf, _ = i2s2_image()
+                self.elf.sections[2]["flags"] = section_flags
+                self.elf.loads[2].update(flags=load_flags, memory=memory)
+                self.rejected()
+
+    def test_executable_load_cannot_overlap_only_the_storage_interior(self):
+        self.elf.loads.append({
+            "offset": 256, "virtual": 0x20000088, "physical": 0x20000088,
+            "files": 16, "memory": 16, "flags": 5})
+        self.rejected()
+
+    def test_storage_size_follows_the_public_32bit_union_contract(self):
+        from tools.measurement.retention import i2s2_storage_contract
+        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                    "f407_i2s2_slave_tx.h")
+        source = (Path(__file__).resolve().parents[2] / relative).read_text()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / relative
+            path.parent.mkdir(parents=True)
+            path.write_text(source.replace("STORAGE_BYTES 88U",
+                                           "STORAGE_BYTES 96U"))
+            self.assertEqual(i2s2_storage_contract(Path(directory))[0], 96)
+
+    def test_redefined_or_changed_public_storage_contract_is_rejected(self):
+        from tools.measurement.retention import i2s2_storage_contract
+        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                    "f407_i2s2_slave_tx.h")
+        source = (Path(__file__).resolve().parents[2] / relative).read_text()
+        changes = [source.replace("typedef union {",
+                                  "#undef NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES\n"
+                                  "#define NX_F407_I2S2_SLAVE_TX_"
+                                  "STORAGE_BYTES 96U\n"
+                                  "typedef union {"),
+                   source.replace("uint64_t alignment;", "uint32_t alignment;")]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / relative
+            path.parent.mkdir(parents=True)
+            for index, changed in enumerate(changes):
+                with self.subTest(index=index):
+                    path.write_text(changed)
+                    with self.assertRaises(EvidenceError):
+                        i2s2_storage_contract(Path(directory))
+
+    def test_missing_weak_non_thumb_or_counterfeit_methods_are_rejected(self):
+        for pointer in (0, 0x08002080, 0x08002091):
+            with self.subTest(pointer=pointer):
+                self.elf, _ = i2s2_image()
+                struct.pack_into("<I", self.elf.data, 0x80, pointer)
+                self.rejected()
+        for field, value in (("binding", 2), ("binding", 1),
+                             ("file", "another_provider.c")):
+            with self.subTest(field=field):
+                self.elf, _ = i2s2_image()
+                self.symbol("submit")[field] = value
+                self.rejected()
+
+    def test_two_caller_faces_share_only_the_operations_table(self):
+        self.elf.sections[2]["size"] = 512
+        self.elf.loads[2]["memory"] = 512
+        self.elf.defined_symbols.extend([
+            dict(self.symbol("application_tx"), name="second_tx",
+                 value=0x080010a0),
+            dict(self.symbol("application_storage"), name="second_storage",
+                 value=0x20000100)])
+        struct.pack_into("<2I", self.elf.data, 0xa0, 0x08001080, 0x20000100)
+        report = self.inspect()
+        self.assertEqual((report["face_count"],
+                          report["operations_table_count"],
+                          report["method_count"]), (2, 1, 4))
+        for address in (0x20000080, 0x200000a0):
+            with self.subTest(address=address):
+                self.symbol("second_storage")["value"] = address
+                struct.pack_into("<I", self.elf.data, 0xa4, address)
+                self.rejected()
+
+    def test_mixed_generated_faces_keep_their_existing_pointer_audit(self):
+        self.elf, _ = i2s2_image(generated=True)
+        self.assertEqual(self.inspect(BINDINGS)["face_count"], 3)
+        struct.pack_into("<I", self.elf.data, 4, 0x20000020)
+        with self.assertRaisesRegex(EvidenceError, "context pointer"):
+            self.inspect(BINDINGS)
+
+    def test_resolved_file_entrypoint_runs_the_same_component_audit(self):
+        from unittest.mock import patch
+        from tools.measurement import retention
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            elf_path, bindings_path = root / "image.elf", root / "bindings.c"
+            elf_path.write_bytes(self.elf.data)
+            bindings_path.write_text("/* No generated factory faces. */\n")
+            with patch.object(retention, "Elf32", return_value=self.elf), \
+                    patch.object(retention, "resolved_identity",
+                                 return_value=(self.resolved, {})), \
+                    patch.object(retention, "resolved_float_abi",
+                                 return_value="hard"), \
+                    patch.object(retention, "resolved_input_files",
+                                 return_value=[]), \
+                    patch.object(retention, "validate_elf_configuration"):
+                report = retention.inspect_files(
+                    elf_path, bindings_path,
+                    resolved_path=root / "resolved.json")
+        self.assertEqual(report["method_count"], 4)
 
 
 class ArrayContextTests(unittest.TestCase):

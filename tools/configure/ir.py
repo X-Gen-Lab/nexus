@@ -11,10 +11,12 @@ try:
     from .resource_graph import ResourcePlanIR
     from .trigger_graph import TriggerPlanIR
     from .dma_topology import DmaTopologyIR
+    from .i2s2 import I2s2RoleIR
 except ImportError:
     from resource_graph import ResourcePlanIR
     from trigger_graph import TriggerPlanIR
     from dma_topology import DmaTopologyIR
+    from i2s2 import I2s2RoleIR
 
 
 def freeze(value):
@@ -842,6 +844,7 @@ class ConfigurationIR(Record):
     values: Mapping
     pwm_shared_owners: tuple[PwmSharedOwnerIR, ...] = ()
     runtime_power: RuntimePowerIR | None = None
+    i2s2: I2s2RoleIR | None = None
 
     @classmethod
     def from_validated(cls, result):
@@ -885,7 +888,10 @@ class ConfigurationIR(Record):
                          for item in result.get("pwm_shared_owners", ())),
                    (RuntimePowerIR(result["runtime_power"]["mode"],
                                    tuple(result["runtime_power"]["controllers"]))
-                    if "runtime_power" in result else None))
+                    if "runtime_power" in result else None),
+                   (I2s2RoleIR(result["i2s2"]["profile"], result["i2s2"]["part"],
+                               tuple(result["i2s2"]["claims"]))
+                    if "i2s2" in result else None))
 
     def to_dict(self):
         return thaw(self)

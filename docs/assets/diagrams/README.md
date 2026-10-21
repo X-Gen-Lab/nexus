@@ -348,3 +348,16 @@ cancel／deadline 不撤销存储。UEDE0／DIEROK 证明先于 DMA suspend／re
 close 撤回准入，join 在同一单核掩码排除边界解除 pin；随后由外部 owner 删除另一任务。closing marker 覆盖实际 kernel delete，task epoch 不复位，溢出拒绝。图不代替产品的 user quiescence、栈寿命、scheduler、安全输出或 provider stop 责任。
 
 依据：[精确实施合同](../../design/u575-mpu-gpio.md)、[公共 authority](../../../os/freertos/include/nexus/os/freertos_mpu_gpio.h)、[派发与生命周期](../../../os/freertos/mpu/gpio.c)、[真实 GPIO provider](../../../soc/stm32u575/drivers/gpio.c)、[normal memory generator](../../../tools/configure/memory.py)。[可编辑 DOT](u575-mpu-gpio.dot)。维护的 Native host 模型、normal M33 reset 链接及单个搬移 development SDK consumer 已实际通过；[源码绑定证据](../../../tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 分开记录阶段、ABI 与资源。软件模型及静态 layout／opcode／selected 入口及受支持 startup 调用目标 不证明真实 MPU 隔离或物理 HIL，也不建立 M7、完整 SDK plan 或 IO-39／SOC-36 原退出资格。
+
+(fig-30-f407-i2s2-slave-tx)=
+## FIG-30 F407 I2S2 从机有限发送与整块借用退出
+
+**身份：reference。范围：F407VE/ZG／baremetal／HSE8-PLL168／外部 CK/WS；PB12/PB13/PB15，DMA1 Stream4 channel0，有限 stereo16 整块发送。**
+
+![FIG-30：ACCEPTED 前无请求效果，ACTIVE 后才允许 CK，最终访问证明后归还整块](f407-i2s2-slave-tx.svg)
+
+实线表示所需顺序或已标明分支，虚线表示保留的借用责任和有界重试。冷复位 Platform 持有共享 GPIOB/DMA1 门控与 TIM2 时间域；显式发送器持有 SPI2 模式、引脚和两个向量。先 ACCEPTED／QUEUED 再读清除型 SR 或允许 DMA 预取；只有观察到 DR 预填充与实际 TIM2 间隔后 acquire 取得 ACTIVE 才允许外部主机提供 CK。引脚采样不证明连续静止。
+
+TCIF／NDTR0 只证明内存计数。停止 DMA 请求／引擎、观察 TXE 后另读新鲜 BSY、撤回地址／计数／标志和向量引用后，才能解除 owner 引用、归还原始整块借用并最终 release 发布 SETTLED。取消、超时或缺失证明都不撤销借用；首个错误保留，错误排空可能欠载且不保证有效音频。观察到复位／门控／时钟或时间历史丢失会永久隔离。所有共享用户及外部观察者先 join，最后才允许 Platform stop。
+
+依据：[精确机制页](../../design/f407-i2s2-slave-tx.md)、[公共合同](../../../components/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h)、[真实 provider](../../../soc/stm32f407/drivers/i2s2_slave_tx.c) 与[源码绑定证据](../../../tools/testing/evidence/f407-i2s2-20261020/README.md)。[可编辑 DOT](f407-i2s2-slave-tx.dot)。Native 模型、normal VE/ZG/default 链接和单个搬移 development SDK consumer 是有范围的软件执行；图和静态链接不执行外部时钟、不证明真实音频或 HIL。IO-41、完整 SDK／formal／OCI 与物理退出仍分别开放。

@@ -19,7 +19,7 @@ import tomllib
 
 try:
     from . import cpu as cpu_profiles
-    from . import bundle, dependencies, sdk, uart_formats
+    from . import bundle, dependencies, sdk, uart_formats, i2s2
     from . import resource_graph, trigger_graph, dma_topology
     from .contracts import COMPONENTS
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
@@ -35,6 +35,7 @@ except ImportError:
     import uart_formats
     import dependencies
     import sdk
+    import i2s2
     import resource_graph
     import trigger_graph
     import dma_topology
@@ -556,7 +557,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os", "factory", "can_domain", "power"}, "assembly")
+                   {"abi", "optimization", "components", "os", "factory", "can_domain", "power", "i2s2"}, "assembly")
     integer(assembly["schema_version"], 1, 1, "assembly schema")
     factory_options = obj(assembly.get("factory", {}), (),
                           {"capabilities"}, "factory policy")
@@ -632,6 +633,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     clock_plan = clocks.plan(assembly["clock_profile"], clock)
     clock = clocks.normalize(clock)
     clocks.match_board(clock, board["clocks"])
+    i2s2_role = i2s2.resolve(assembly.get("i2s2"), family=family,
+                            part=part, backend=backend,
+                            clock_profile=assembly["clock_profile"])
     if "os" in assembly and not isinstance(assembly["os"], dict):
         fail("OS policy: expected object")
     kernel_profile = kernel.resolve(assembly.get("os"), cpu_profile,
@@ -727,6 +731,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if previous is not None and previous["owner"] == "soc-timebase":
             continue
         claim(key, owner, "reserved", board["id"])
+    if i2s2_role is not None:
+        for resource in i2s2_role.claims:
+            claim(resource, "i2s2", i2s2_role.profile, "RM0090/DS8626 chip reference")
     if backend == "freertos":
         for irq in ("SysTick", "PendSV", "SVC"):
             claim("irq:" + irq, "freertos", "kernel",
@@ -1164,6 +1171,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "limitations": board["unknowns"] + ["Physical qualification not executed"],
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
+    if i2s2_role is not None:
+        result["i2s2"] = {"profile": i2s2_role.profile, "part": i2s2_role.part,
+                          "claims": list(i2s2_role.claims)}
     try:
         from . import runtime_power
     except ImportError:
@@ -1261,6 +1271,8 @@ def generate(result, output):
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
               *metadata.header_lines(thaw(result["platform_metadata"]))]
+    header.append("#define NEXUS_F407_I2S2_SLAVE_TX_SELECTED " +
+                  ("1u" if result.i2s2 is not None else "0u"))
     probes = any(getattr(getattr(item.options, "irq", None), "probe", False)
                  for item in result.controllers)
     if probes:
@@ -1285,6 +1297,10 @@ def generate(result, output):
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
+    cmake += ['set(NEXUS_F407_I2S2_SLAVE_TX_SELECTED ' +
+              ("ON" if result.i2s2 is not None else "OFF") + ')',
+              'set(NEXUS_F407_I2S2_PROFILE "' +
+              (result.i2s2.profile if result.i2s2 is not None else "") + '")']
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
     for selection in result.controllers:

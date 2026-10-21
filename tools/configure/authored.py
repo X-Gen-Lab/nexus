@@ -44,7 +44,7 @@ ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz
 USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
                        "max_packet", "fifo_words"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power"}
+TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2"}
 
 
 
@@ -133,6 +133,9 @@ def normalize(data, path, root, fail, obj, integer, text):
     for field in ("abi", "optimization", "components", "os", "factory", "can_domain", "power"):
         if field in data:
             result[field] = data[field]
+    if "i2s2" in data:
+        result["i2s2"] = dict(obj(data["i2s2"], {"profile"}, (),
+                                   "I2S2 chip hardware role"))
     return result
 
 
@@ -231,6 +234,9 @@ def editor_schema():
     properties["power"] = record({"mode", "controllers"}, {"mode", "controllers"})
     properties["power"]["properties"]["mode"] = {"const": "fixed-run"}
     properties["power"]["properties"]["controllers"] = {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string"}, "uniqueItems": True}
+    properties["i2s2"] = record({"profile"}, {"profile"})
+    properties["i2s2"]["properties"]["profile"] = {
+        "const": "slave-tx-stereo16-pb12-pb13-pb15"}
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})

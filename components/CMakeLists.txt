@@ -63,6 +63,7 @@ add_subdirectory(usb_control)
 add_subdirectory(mapped_storage)
 add_subdirectory(amp_ipc)
 add_subdirectory(stm32f407_handoff)
+add_subdirectory(f407_i2s2_slave_tx)
 add_subdirectory(frame_dma2d)
 
 add_subdirectory(stm32u575_retained_time)

@@ -1105,6 +1105,18 @@
       },
       "type": "object"
     },
+    "i2s2": {
+      "additionalProperties": false,
+      "properties": {
+        "profile": {
+          "const": "slave-tx-stereo16-pb12-pb13-pb15"
+        }
+      },
+      "required": [
+        "profile"
+      ],
+      "type": "object"
+    },
     "layout": {
       "type": "string"
     },

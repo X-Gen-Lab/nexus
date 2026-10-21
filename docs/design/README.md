@@ -27,6 +27,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [UART FIFO 有界中断服务](uart-fifo.md) | H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界 |
 | [ADC 分组采集](adc-group.md) | G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置 |
 | [增强以太网帧](ethernet-frames.md) | F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置 |
+| [F407 I2S2 从机有限发送](f407-i2s2-slave-tx.md) | 精确 VE/ZG 裸机、外部 CK/WS、有限 normal DMA、整块帧借用和真实排空；开发软件证据与完整音频／实板退出分列 |
 | [本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md) | 逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |

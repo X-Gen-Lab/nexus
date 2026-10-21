@@ -214,6 +214,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy"),
         ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2", "u575-lptim1-lpbam"),
         ("u575 mpu gpio", "u575-mpu-gpio-write", "u575-mpu-gpio"),
+        ("f407 i2s2 slave tx", "sky-i2s2-slave-tx", "f407-i2s2-slave-tx"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
@@ -222,7 +223,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
         "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty",
         "u575-lpdma-copy-stop2", "u575-lptim1-lpbam-stop2",
-        "u575-mpu-gpio-write"})
+        "u575-mpu-gpio-write", "sky-i2s2-slave-tx"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -267,7 +268,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         verification / "consumers/pin-states.c")
         for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
                      "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam",
-                     "u575-mpu-gpio",
+                     "u575-mpu-gpio", "f407-i2s2-slave-tx",
                      "h743-uart-continuous",
                      "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
@@ -582,7 +583,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                             ".." not in Path(path).parts
                             for _, path, _ in self.consumer.SELECTED_CONSUMERS))
 
-    def test_retained_and_stop2_smokes_link_explicit_public_components(self):
+    def test_selected_owner_smokes_link_explicit_public_components(self):
         for label, stem, smoke, library in (
                 ("u575 retained time", "nucleo-u575-baremetal-empty",
                  "u575-retained-time", "Nexus::U575RetainedTime"),
@@ -593,7 +594,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2",
                  "u575-lptim1-lpbam", "Nexus::U575Stop2Lptim1"),
                 ("u575 mpu gpio", "u575-mpu-gpio-write",
-                 "u575-mpu-gpio", "Nexus::U575MpuGpio")):
+                 "u575-mpu-gpio", "Nexus::U575MpuGpio"),
+                ("f407 i2s2 slave tx", "sky-i2s2-slave-tx",
+                 "f407-i2s2-slave-tx", "Nexus::F407I2S2SlaveTx")):
             assembly = "tools/configure/assemblies/" + stem + ".toml"
             with self.subTest(smoke=smoke):
                 directory = self.directory / smoke
@@ -607,6 +610,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                                  canonical.read_bytes())
                 project = (source / "CMakeLists.txt").read_text()
                 self.assertIn("LIBRARIES " + library + ")", project)
+                if smoke == "f407-i2s2-slave-tx":
+                    self.assertIn("stm32f407_i2s2_slave_tx.h",
+                                  (source / "private_headers.c").read_text())
                 self.assertIn("set(CMAKE_C_STANDARD 11)", project)
                 self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)
                 self.assertIn("set(CMAKE_C_EXTENSIONS OFF)", project)
@@ -696,7 +702,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                       "h743 uart duplex continuous",
                       "h743 uart duplex continuous cache on",
                       "u575 retained time", "u575 stop2", "u575 lpdma copy",
-                      "u575 lptim1 lpbam", "u575 mpu gpio"):
+                      "u575 lptim1 lpbam", "u575 mpu gpio", "f407 i2s2 slave tx"):
             for operation, exit_code in (("build", 51), ("retention", 52)):
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
@@ -774,6 +780,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         "h743-spi-dma-runtime-clock" else "h743-spi-dma")
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.stem == "sky-i2s2-slave-tx":
+                canonical = (self.sdk /
+                    "cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c")
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertIn("nx_f407_i2s2_slave_tx_initialize(", smoke)
+                self.assertIn("nx_frame_stream_acquire(", smoke)
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.stem == "nucleo-u575-baremetal-empty":
                 stem = ("u575-retained-time" if source.name ==

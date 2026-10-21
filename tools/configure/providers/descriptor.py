@@ -108,6 +108,13 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_device_f4", "stm32f4_cmsis"),
         ("hal_driver_f4", "stm32f4_hal")),
         references="references.json", owned_payload=(
+            "components/f407_i2s2_slave_tx/CMakeLists.txt",
+            "components/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h",
+            "soc/stm32f407/drivers/i2s2_slave_tx.c",
+            "soc/stm32f407/private/stm32f407_i2s2_slave_tx.h",
+            "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
+            "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
+            "cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c",
             "soc/stm32f407/drivers/ethernet_frames.c",
             "soc/stm32f407/private/stm32f407_eth_frames.h")),
     "gd32f470": FamilyDescriptor("gd32f470",

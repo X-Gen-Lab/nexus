@@ -160,3 +160,11 @@ These public headers describe framed data, explicit owners, retained clocks and 
 ```{doxygenfile} i3c_controller_storage.h
 :project: nexus
 ```
+
+(f407__i2s2__slave__tx_8h)=
+
+## f407_i2s2_slave_tx.h
+
+```{doxygenfile} f407_i2s2_slave_tx.h
+:project: nexus
+```

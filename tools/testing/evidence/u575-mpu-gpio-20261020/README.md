@@ -92,3 +92,33 @@ Use the existing `tools/evidence/store.py` verifier/restorer with an explicit
 `--archive` after checkout. Restored `raw-manifest.json` maps 558 role/path records
 to 385 unique blobs; archive membership and each blob digest are verified.
 This preservation does not re-execute the original checkers or establish HIL.
+
+The completed ordinary increment is commit
+`6032222cb099d7f5b4410b18f57f375126e87d7d`, tree
+`d170028a50bf8907fb85b957a3ff962c449c45fb`: 6253 GoogleTest/GoogleMock
+cases in 347 executables and 2909 tools (1349 testing, 950 configure,
+485 CI, 125 workflows), all with zero failures, errors and skips. The complete
+strict English/Chinese site passed for 126 source pages per language. The first
+1349-case attempt rejected one stale generated capability cell; the maintained
+generator and both reviewed catalogs were corrected before the entire gate reran.
+Original rejected and accepted execution, exact source freeze, fresh reports and
+source-bound documentation receipts are preserved once by
+`ordinary-gate-package.json` and its tracked raw archive. Use the maintained store
+with an explicit `--archive` path after moving this evidence. This is ordinary
+software acceptance of that exact commit; final-main formal, full SDK, offline
+candidate and physical HIL retain their separate exit conditions.
+
+The later remote analysis of that head rejected two `gpio.c` expressions
+(`bugprone-sizeof-expression` and `bugprone-branch-clone`). An independently
+reviewed equivalent refactor preserves pointer extent, authorization order,
+return-code precedence and the saved-mask BSRR boundary. Its actual focused
+successor passed 28 Google cases and required analysis in the affected GPIO
+context; the same analysis run also covered nine F407 contexts. A fresh normal
+U575 ARM link and maintained retention/MPU ELF audit passed. This successor
+loads 15310 B of Flash, 4 B above the earlier 603 image, with the same 24880 B
+BIN footprint, 6000 B SRAM including 2048 B MSP, and zero heap. Its ELF is
+`70969a20482387fce9a19d47f9325461f8d7ddfa51ac4cfcd5a5c656fb801db5`.
+Original remote rejection, source-equivalence reviews and fresh execution are
+retained in the [F407 increment evidence](../f407-i2s2-20261020/README.md).
+The earlier SDK snapshot and resource values remain their original source
+phases; this successor does not inherit a full SDK, final-main or HIL result.

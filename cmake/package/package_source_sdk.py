@@ -157,7 +157,7 @@ MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
-        "consumers/f407-handoff.c",
+        "consumers/f407-handoff.c", "consumers/f407-i2s2-slave-tx.c",
         "consumers/u575-lpdma-copy.c",
         "consumers/u575-lptim1-lpbam.c", "consumers/u575-mpu-gpio.c",
         "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
@@ -186,6 +186,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "native-time-pair.toml", "native-time-empty.toml",
         "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
 REQUIRED_FILES += ("tools/configure/selected_contracts.py",
+                   "tools/configure/i2s2.py",
                    "tools/configure/pin_states.py",
                    "tools/configure/assemblies/g474-pin-states.toml",
                    *IO_EVOLUTION_VERIFICATION_FILES)

@@ -65,6 +65,9 @@ nx_result_t nx_stm32_system_preflight(const nx_stm32_system_t* system);
  * \details         Task startup only; no running peripheral consumers.
  *                  Bootstrap has poll bounds, not invented elapsed time.
  *                  Failed source switching retains the live clock effects.
+ *                  The selected finite I2S2 cold-reset reference also holds
+ *                  shared GPIOB/DMA1 gates through Platform lifetime. This is
+ *                  not attachment to unknown gated DMA or running HAL owners.
  */
 nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
                                               uint32_t poll_limit);
@@ -81,6 +84,9 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
  * \note            Unrelated power fields and pre-existing PWR gates survive.
  *                  Consumers join before withdrawal; the live time epoch ends
  *                  before any timer/IRQ reference is removed.
+ *                  In the selected I2S2 reference, every shared-domain user,
+ *                  including external HAL users, has joined before added
+ *                  GPIOB/DMA1 gates are withdrawn. Pre-existing gates survive.
  */
 int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit);
 
