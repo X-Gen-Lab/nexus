@@ -19,6 +19,9 @@ from urllib.parse import quote, unquote, urlsplit
 LANGUAGES = ('en', 'zh_CN')
 _SOURCE_URL = 'https://github.com/X-Gen-Lab/nexus/blob'
 _LINK = re.compile(r'(?<!!)\[([^\]\n]+)\]\(([^\s)]+)\)')
+_INLINE_TOKEN = re.compile(
+    r'(?P<code>(?<!`)(?P<ticks>`+)(?!`).*?(?<!`)(?P=ticks)(?!`))|'
+    + _LINK.pattern)
 _RAW_SUFFIXES = {'.csv', '.json', '.dot', '.txt', '.po', '.pot', '.toml'}
 
 
@@ -160,6 +163,9 @@ def rewrite_local_links(source: str, page: Path, source_root: Path,
                 fragment = '#' + parsed.fragment if parsed.fragment else ''
                 base = _SOURCE_URL.replace('/blob', '/tree') if candidate.is_dir() else _SOURCE_URL
                 return f'[{label}]({base}/{revision}/{relative}{fragment})'
+            # Keep in-document code labels until role quoting supports them.
+            if '`' in label:
+                return match.group(0)
             if candidate.suffix in _RAW_SUFFIXES:
                 path = ('/' + quote(candidate.relative_to(source_root).as_posix())
                         if document_root_links else parsed.path)
@@ -170,9 +176,12 @@ def rewrite_local_links(source: str, page: Path, source_root: Path,
                 return f'[{label}]({path}{fragment})'
             return match.group(0)
 
-        parts = re.split(r'(`+.*?`+)', line)
-        result.append(''.join(part if number % 2 else _LINK.sub(replace, part)
-                              for number, part in enumerate(parts)))
+        def replace_token(match: re.Match[str]) -> str:
+            if match.group('code') is not None:
+                return match.group(0)
+            return _LINK.sub(replace, match.group(0))
+
+        result.append(_INLINE_TOKEN.sub(replace_token, line))
     return ''.join(result)
 
 

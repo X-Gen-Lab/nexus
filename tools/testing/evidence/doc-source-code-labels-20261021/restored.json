@@ -1,0 +1,9 @@
+{
+  "status": "PASS actual full restore inventory exactly equals original",
+  "entries": 234,
+  "files": 195,
+  "bytes": 3724435,
+  "inventory_sha256": "ab7a5ccef233d9485052c364b841a5e5b9d32b8beb6239fb9bdf20669f552607",
+  "includes_modes_paths_sizes_hashes": true,
+  "actual_restore": "/dev/shm/nexus-doc-link-evidence-prep-20261021/restored"
+}

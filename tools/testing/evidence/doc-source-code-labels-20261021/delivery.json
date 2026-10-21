@@ -1,0 +1,63 @@
+{
+  "status": "sealed verified fully restored exact inventory and owned expanded copies retired",
+  "kind": "Documentation code-label link development evidence",
+  "started_ns": 1792557825972898294,
+  "finished_ns": 1792557826421834431,
+  "archive": {
+    "path": "/dev/shm/nexus-doc-link-evidence-cas-20261021/e8f764d09218bc0f9f8e8d45c374a3f6ac28d16c69adb08189d3ec9b4dac2a79.tar.gz",
+    "sha256": "e8f764d09218bc0f9f8e8d45c374a3f6ac28d16c69adb08189d3ec9b4dac2a79",
+    "size": 765764
+  },
+  "files": 195,
+  "payload_bytes": 3724435,
+  "manifest_sha256": "f96d283e56fd680f1a937d7071d7d5e66691ea33aa8251aed6243a6b8f18bba8",
+  "export_invocations": 1,
+  "explicit_verify": "PASS",
+  "actual_full_restore": "PASS",
+  "inventory_equality": "PASS",
+  "inventory_entries": 234,
+  "original_copied_files": 193,
+  "source_freeze": {
+    "path": "/dev/shm/nexus-doc-link-evidence-prep-20261021/source-freeze.json",
+    "sha256": "3ab18c710571b31d5a8f58c71c1d8b2e05fa0af549d85a40e7b6748cf6d1075e"
+  },
+  "copy_list": {
+    "path": "/dev/shm/nexus-doc-link-evidence-prep-20261021/copy-list.json",
+    "sha256": "5598ba293cc85d5273cc2655c0ef379a06645c33cfc1a4538f6af2de07806c8b"
+  },
+  "actual_scopes": {
+    "RED_methods": 8,
+    "RED_failing_subtests": 14,
+    "whole_DocsSuite_cases": 336,
+    "strict_commands": 4,
+    "strict_pages": 127,
+    "strict_language_records": 254,
+    "fresh_POTs": 127,
+    "pure_current_inputs": 132,
+    "pure_output_deltas": 0
+  },
+  "signature_status": "unsigned",
+  "product_promotion": false,
+  "limitations": [
+    "Development phase only, not ordinary complete-index acceptance, clean candidate, SDK or HIL qualification.",
+    "Strict source and translation metadata with actual4raw commands are preserved; HTML/fonts/doctrees/APIXML/site bodies are deliberately excluded.",
+    "No whole source/build/vendor/tool copies or nested archive body.",
+    "Root may integrate evidence metadata after this copy freeze; current whole-Git fingerprint was not reinterpreted as executed source identity."
+  ],
+  "storage": "existing tools.evidence.store only",
+  "no_new_test_build_configure_extraction": true,
+  "no_primary_index_writes": true,
+  "original_site_workspace_raw_preserved": true,
+  "expanded_copy_retirement": {
+    "status": "retired only owned expanded payload and actual restore after full equality",
+    "paths": [
+      "/dev/shm/nexus-doc-link-evidence-prep-20261021/payload",
+      "/dev/shm/nexus-doc-link-evidence-prep-20261021/restored"
+    ],
+    "files_each": 195,
+    "bytes_each": 3724435,
+    "verified_archive_retained": "/dev/shm/nexus-doc-link-evidence-cas-20261021/e8f764d09218bc0f9f8e8d45c374a3f6ac28d16c69adb08189d3ec9b4dac2a79.tar.gz",
+    "source_site_workspace_reports_preserved": true,
+    "payload_and_restore_absent": true
+  }
+}
