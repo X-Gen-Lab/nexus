@@ -605,8 +605,209 @@ def inspect_i2s2_component(elf, role, face_types, layouts, providers, root):
     return faces, table
 
 
-def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None):
+COMPONENT_OWNER_SMOKES = frozenset((
+    "u575-retained-time", "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam"))
+
+
+def component_storage_size(root, stem, macro):
+    """Read the public ARM32 owner extent, rather than guess it from names."""
+    path = root / f"components/{stem}/include/nexus/components/{stem}.h"
+    source = path.read_text()
+    sizes = re.findall(r"#if UINTPTR_MAX == UINT32_MAX\s+"
+                       r"#define " + macro + r" ([1-9][0-9]*)U", source)
+    if len(sizes) != 1 or f"private_bytes[{macro}]" not in source:
+        raise EvidenceError("unsupported component owner storage contract")
+    return int(sizes[0]), file_identity(path)
+
+
+def component_owner_object(elf, name):
+    """Reject executable RAM and aliases, not just a writable section flag."""
+    obj, section = linked_object(elf, name, "component owner", writable=True)
+    start, end = obj["value"], obj["value"] + obj["size"]
+    if section["flags"] & 4 or any(
+            load["flags"] & 1 and start < load["virtual"] + load["memory"]
+            and load["virtual"] < end for load in elf.loads):
+        raise EvidenceError("component owner is executable RAM")
+    if any(other["type"] == 1 and other is not obj and other["size"] > 0
+           and start < other["value"] + other["size"] and other["value"] < end
+           for other in elf.defined_symbols):
+        raise EvidenceError("component owner has overlapping object aliases")
+    return obj
+
+
+def component_owner_input_paths(root):
+    """Protect all optional source contracts before mutating the output."""
+    from tools.release.transport import SELECTED_CONSUMERS
+    paths = {root / "core/include/nexus/core/time.h",
+             root / "tools/release/transport.py"}
+    paths.update((root / "io/include/nexus/io").glob("*.h"))
+    paths.update((root / "components").glob("*/include/nexus/components/*.h"))
+    paths.update((root / "components").glob("*/src/*.c"))
+    paths.update((root / "soc").glob("*/drivers/*.c"))
+    paths.update((root / "soc/common").glob("*.c"))
+    paths.update((root / "io/src").glob("*.c"))
+    paths.update((root / "io/private").glob("*.h"))
+    paths.add(root / "soc/stm32u575/stop2.c")
+    for _, assembly, smoke in SELECTED_CONSUMERS:
+        if smoke in COMPONENT_OWNER_SMOKES:
+            paths.update((root / assembly,
+                root / "cmake/package/verification/io_evolution/consumers" /
+                (smoke + ".c")))
+    return {path.resolve() for path in paths}
+
+
+def inspect_component_owner(elf, bindings, resolved, smoke, consumer, root):
+    """Prove explicit public component consumers without factory face claims."""
+    from tools.release.transport import SELECTED_CONSUMERS
+    choices = [item for item in SELECTED_CONSUMERS if item[2] == smoke]
+    if (smoke not in COMPONENT_OWNER_SMOKES or len(choices) != 1
+            or consumer is None or resolved is None):
+        raise EvidenceError(
+            "component owner requires an exact consumer contract")
+    _, assembly, _ = choices[0]
+    canonical = (root / "cmake/package/verification/io_evolution/consumers" /
+                 (smoke + ".c"))
+    consumer_identity = file_identity(Path(consumer))
+    if consumer_identity["sha256"] != file_identity(canonical)["sha256"]:
+        raise EvidenceError(
+            "component owner consumer differs from canonical smoke")
+    expected = {"path": assembly,
+                "sha256": file_identity(root / assembly)["sha256"]}
+    if (expected not in resolved.get("inputs", [])
+            or resolved.get("soc_family") != "stm32u575"
+            or resolved.get("part") != "STM32U575ZIT6Q"
+            or resolved.get("backend") != "baremetal"
+            or resolved.get("clock_profile") != "msis4"
+            or resolved.get("controllers") != []
+            or resolved.get("devices") != []
+            or resolved.get("cpu_profile", {}).get("definitions", {}).get(
+                "NEXUS_ARCH_SECURITY_STATE") != 0
+            or FACE_DECLARATION.search(bindings)):
+        raise EvidenceError(
+            "component owner differs from canonical empty U575 selection")
+    storage_bytes, storage_contract = component_storage_size(
+        root, "stm32u575_retained_time", "NX_U575_RETAINED_TIME_STORAGE_BYTES")
+    state = component_owner_object(elf, "s_clock")
+    face, section = linked_object(elf, "s_clock_face", "retained clock face")
+    if (state["size"] != storage_bytes or state["value"] % 8
+            or face["size"] != 8):
+        raise EvidenceError(
+            "retained clock face/storage differs from public ABI")
+    reader, context = object_words(elf, face, section)
+    method = concrete_method(elf, reader)
+    read_symbol = unique_symbol(elf, "nx_stm32u575_retained_time_now")
+    if (context != state["value"] or read_symbol["binding"] != 1
+            or read_symbol["value"] != reader
+            or "nx_stm32u575_retained_time_now" not in method["symbols"]):
+        raise EvidenceError(
+            "retained clock read/context differs from real owner")
+    faces = [{"name": face["name"], "type": "nx_clock_t", "reader": method,
+              "context": state["name"], "context_address": context,
+              "context_bytes": state["size"],
+              "storage_contract": storage_contract}]
+    spans = [(state["value"], state["size"])]
+    def writable_owner(name):
+        obj = component_owner_object(elf, name)
+        if any(obj["value"] < address + size
+               and address < obj["value"] + obj["size"]
+               for address, size in spans):
+            raise EvidenceError("component owner storage overlaps")
+        spans.append((obj["value"], obj["size"]))
+        return obj
+    methods = ["nx_stm32u575_retained_time_sample"]
+    if smoke == "u575-retained-time":
+        methods.append("nx_stm32u575_retained_time_stop")
+    initializer = "nx_stm32u575_retained_time_initialize"
+    tables = []
+    if smoke != "u575-retained-time":
+        writable_owner("s_owner")
+        writable_owner("s_domain")
+        methods += ["nx_stm32u575_stop2_identity", "nx_stm32u575_stop2_domain",
+                    "nx_stm32u575_stop2_initialize",
+                    "nx_stm32u575_stop2_recover"]
+        methods.append({"u575-stop2": "nx_stm32u575_stop2_enter",
+                        "u575-lpdma-copy": "nx_stm32u575_stop2_copy_enter",
+                        "u575-lptim1-lpbam":
+                            "nx_stm32u575_stop2_lptim1_enter"}[smoke])
+    if smoke in {"u575-lpdma-copy", "u575-lptim1-lpbam"}:
+        suffix = "copy" if smoke == "u575-lpdma-copy" else "lptim1"
+        prefix = "nx_stm32u575_lpdma_" + suffix
+        stem = "stm32u575_lpdma_" + suffix
+        storage_bytes, contract = component_storage_size(
+            root, stem, "NX_U575_LPDMA_" + suffix.upper() + "_STORAGE_BYTES")
+        owner = writable_owner("s_copy" if suffix == "copy" else "s_receiver")
+        if owner["size"] != storage_bytes or owner["value"] % 8:
+            raise EvidenceError(
+                "component owner extent differs from public storage")
+        face, section = linked_object(elf, "s_component_face", "component face")
+        if face["size"] != 8:
+            raise EvidenceError("component face must contain two ARM pointers")
+        operations, context = object_words(elf, face, section)
+        face_types, layouts, providers, _ = source_contracts(root)
+        typename = prefix + "_t"
+        operations_type = face_types.get(typename)
+        provider = providers.get(prefix + "_ops")
+        if provider is None or provider["type"] != operations_type:
+            raise EvidenceError(
+                "component operations differ from public/private contract")
+        table = operations_table(elf, prefix + "_ops", operations_type,
+                                 layouts[operations_type], provider)
+        if (operations != table["address"] or context != owner["value"]
+                or table["null_methods"] != 0):
+            raise EvidenceError(
+                "component face operations/context differ from owner")
+        tables.append(table)
+        faces.append({"name": face["name"], "type": typename,
+                      "context": owner["name"], "context_address": context,
+                      "context_bytes": owner["size"],
+                      "storage_contract": contract})
+        workspace = writable_owner("s_workspace")
+        source = writable_owner("s_source" if suffix == "copy" else "s_tuple")
+        if (workspace["size"] != (24 if suffix == "copy" else 48)
+                or workspace["value"] % 4
+                or any(not 0x28000000 <= obj["value"]
+                       < obj["value"] + obj["size"]
+                       <= 0x28004000 for obj in (workspace, source))):
+            raise EvidenceError(
+                "component SRAM4 workspace/source contract differs")
+        source_section = elf.sections[source["section"]]
+        if source_section["kind"] == 8:
+            raise EvidenceError(
+                "component source requires initialized LOAD bytes")
+        loaded_range(elf, source["value"], source["size"], "component source",
+                     writable=True,
+                     offset=source_section["offset"] + source["value"]
+                     - source_section["address"])
+        methods += [prefix + "_initialize", prefix + "_request_prepare"]
+        if suffix == "copy":
+            initializer += "_alarm_a_copy"
+    entrypoints = []
+    for name in [initializer, *methods]:
+        symbol = unique_symbol(elf, name)
+        if symbol["binding"] != 1:
+            raise EvidenceError(
+                "component entrypoint must be strong public code")
+        entrypoints.append(
+            {"name": name, **concrete_method(elf, symbol["value"])})
+    return {"schema_version": 1, "kind": "linked_component_owner_retention",
+            "status": "passed", "owner_profile": smoke,
+            "face_count": len(faces), "operations_table_count": len(tables),
+            "method_count": 1 + sum(len(table["methods"]) for table in tables),
+            "faces": faces, "tables": tables, "entrypoints": entrypoints,
+            "consumer": consumer_identity,
+            "assembly": file_identity(root / assembly),
+            "physical_status": "not_executed",
+            "limitations": ["Actual linked component references/storage/code; "
+                            "not factory faces, execution or physical "
+                            "qualification."]}
+
+
+def inspect_provider_retention(elf, bindings, *, root=ROOT, resolved=None,
+                               component_owner=None, consumer_path=None):
     """Trace selected faces through exact tables and all non-NULL methods."""
+    if component_owner is not None:
+        return inspect_component_owner(elf, bindings, resolved, component_owner,
+                                       consumer_path, root)
     role = selected_i2s2_role(resolved)
     connections = (selected_faces(bindings) if role is None
                    or FACE_DECLARATION.search(bindings) else [])
@@ -1000,7 +1201,8 @@ def inspect_mpu_gpio(elf, resolved, providers, *, root=ROOT):
                             "maintained startup shape; not runtime MPU isolation."]}
 
 
-def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT):
+def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT,
+                  component_owner=None, consumer_path=None):
     """Keep legacy hard-only reports and optionally bind exact resolved inputs."""
     resolved = None
     abi = "hard"
@@ -1012,7 +1214,8 @@ def inspect_files(elf_path, bindings_path, *, resolved_path=None, root=ROOT):
     if resolved_path is not None:
         validate_elf_configuration(elf, resolved)
     report = inspect_provider_retention(
-        elf, bindings_path.read_text(), root=root, resolved=resolved)
+        elf, bindings_path.read_text(), root=root, resolved=resolved,
+        component_owner=component_owner, consumer_path=consumer_path)
     if resolved is not None:
         mpu = inspect_mpu_gpio(elf, resolved, report, root=root)
         if mpu is not None:
@@ -1031,17 +1234,29 @@ def main(arguments=None):
     parser.add_argument("--bindings", type=Path, required=True)
     parser.add_argument("--resolved", type=Path,
                         help="bind current CPU ABI, linked configuration and declared inputs")
+    parser.add_argument("--component-owner",
+                        choices=sorted(COMPONENT_OWNER_SMOKES))
+    parser.add_argument("--consumer", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(arguments)
     try:
+        if (args.component_owner is None) != (args.consumer is None):
+            raise EvidenceError("component owner and consumer must be paired")
+        if args.component_owner is not None and args.resolved is None:
+            raise EvidenceError("component owner requires resolved inputs")
         protected = {args.elf.resolve(), args.bindings.resolve()}
+        if args.consumer is not None:
+            protected.add(args.consumer.resolve())
+            protected.update(component_owner_input_paths(ROOT))
         if args.resolved is not None:
             protected.update(input_protection_paths(args.resolved))
         if args.output.resolve() in protected:
             raise EvidenceError("retention output must not overwrite an input")
         args.output.unlink(missing_ok=True)
         report = inspect_files(args.elf, args.bindings,
-                               resolved_path=args.resolved)
+                               resolved_path=args.resolved,
+                               component_owner=args.component_owner,
+                               consumer_path=args.consumer)
         atomic_json(args.output, report)
         print(f"Retained {report['face_count']} selected faces, "
               f"{report['operations_table_count']} concrete tables and "

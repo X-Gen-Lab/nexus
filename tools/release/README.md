@@ -33,12 +33,12 @@ signature does not establish a different SDK source commit by itself.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-requires 48 independent consumer roots and 51 executable images. This policy-v8
-matrix is a required plan; the complete installed v8 consumer matrix has not
-been executed. Plan counts do not establish software qualification or physical
-acceptance.
+requires 50 independent consumer roots and 53 executable images under
+policy-v11. This is a required plan; actual installed-consumer execution must be
+assessed from its source-bound producer report and matching transport manifest.
+Plan counts do not establish software qualification or physical acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v8`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v11`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -47,7 +47,8 @@ unborn `git init` fixture isolating the SDK from its parent's source identity.
 History, remotes, an index, active hooks and foreign Git metadata remain refused.
 The SDK requires the complete shared plan module even after a rehashed omission.
 
-Policy-v8 adds exactly one selected MCU consumer relative to policy-v7:
+Historical policy-v8 required 48 roots and 51 images. It added exactly one
+selected MCU consumer relative to policy-v7:
 `u575 lptim1 lpbam`, using the canonical
 [assembly](../configure/assemblies/u575-lptim1-lpbam-stop2.toml) and public C11
 [consumer](../../cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c).
@@ -59,6 +60,24 @@ start/stop, retained partial-failure responsibility and compound final release.
 The additional required root and image do not inherit historical v7 execution,
 SDK qualification, pin routing or physical HIL results.
 
+Policy-v9 added `u575 mpu gpio`, using the canonical
+[assembly](../configure/assemblies/u575-mpu-gpio-write.toml) and public C11
+[consumer](../../cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c)
+with `Nexus::U575MpuGpio`. Its required plan had 49 roots and 52 images.
+Policy-v10 added `f407 i2s2 slave tx`, using the canonical
+[assembly](../configure/assemblies/sky-i2s2-slave-tx.toml) and public C11
+[consumer](../../cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c)
+with `Nexus::F407I2S2SlaveTx`, bringing the plan to 50 roots and 53 images.
+These additions specify public software consumers; they do not establish
+physical MPU isolation, external audio execution or HIL qualification.
+
+Policy-v11 retains 50 roots and 53 images, but changes the existing `h743 high`
+consumer to the canonical
+[assembly](../configure/assemblies/h743-high-peripherals.toml). Its consumer name
+and `h743-high` smoke remain unchanged. The previous verification-directory
+copy is not a fallback. A complete policy-v10 transport with the same root and
+image counts still cannot satisfy the current exact plan or policy identity.
+
 Archives retain all original raw bytes, file modes and empty directories, verify
 the complete inventory and consume the gzip stream through its CRC/size trailer
 before crossing the artifact identity boundary. The outer artifact contains an
@@ -69,7 +88,7 @@ actual source, job and builder identities retain that separate responsibility.
 
 Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
 source, bytes and hash-pinned helper. The current policy does not accept it as
-a fallback or rewrite it as the 48-root/51-image selection. Earlier policy-v3
+a fallback or rewrite it as the 50-root/53-image selection. Earlier policy-v3
 34-root/37-image and 36-root/39-image plans also retain their exact historical
 source identities; neither is the current plan or a fallback. Historical policy-v4
 has 28 selected features, 41 roots and 44 images: H743 SPI DMA Cache on, U575 finite
@@ -90,7 +109,8 @@ finite U575 SRAM4 copy consumer through
 `tools/configure/assemblies/u575-lpdma-copy-stop2.toml` and the public C11
 `u575-lpdma-copy` smoke, which links `Nexus::U575Stop2Copy`. It uses the same
 Stop2 owner for the bounded copy. Its original source, bytes and hash-pinned
-helper remain historical and cannot satisfy policy-v8. This required link check
+helper remain historical; they could not satisfy policy-v8 and cannot satisfy
+the current policy. This required link check
 does not record an executed full installed consumer matrix or a physical copy
 result. The explicit exact current plan, rather than an old count or the policy
 label alone, determines admission; v7 results cannot qualify the added LPTIM1

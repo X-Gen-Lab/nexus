@@ -8,6 +8,11 @@
 #include "nexus/components/stm32u575_stop2.h"
 #include "nexus_bindings.h"
 static nx_stm32u575_retained_time_storage_t s_clock;
+static const nx_clock_t s_clock_face = {nx_stm32u575_retained_time_now,
+                                        &s_clock};
+/** \brief A separate public caller actually consumes the injected clock. */
+nx_time_us_t nx_installed_clock_read(const nx_clock_t* clock);
+
 /** \brief Boot supplies the reviewed retained source; this is a link fixture.
  */
 int main(void) {
@@ -17,6 +22,12 @@ int main(void) {
     if (nx_stm32u575_retained_time_initialize(&s_clock, &config, &clock) !=
             NX_SUCCESS ||
         nx_stm32u575_stop2_initialize(1U, &s_clock) != NX_SUCCESS)
+        return 1;
+    if (clock.read != s_clock_face.read ||
+        clock.context != s_clock_face.context)
+        return 1;
+    nx_time_us_t now = clock.read(clock.context);
+    if (nx_installed_clock_read(&s_clock_face) < now)
         return 1;
     nx_clock_domain_t* domain = nx_stm32u575_stop2_domain();
     nx_clock_lease_t platform_owner = {0};
