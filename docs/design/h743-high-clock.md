@@ -187,7 +187,7 @@ The ARM presets are `fixture-io-evolution-h743-high-empty`,
 `fixture-io-evolution-h743-high-peripherals`. Their maintained inputs are
 [empty](../../cmake/package/verification/io_evolution/h743-high-empty.toml),
 [UART](../../cmake/package/verification/io_evolution/h743-high-uart.toml) and
-[peripherals](../../cmake/package/verification/io_evolution/h743-high-peripherals.toml).
+[peripherals](../../tools/configure/assemblies/h743-high-peripherals.toml).
 These records describe this development iteration; they do not establish a
 clean software candidate, offline reproducibility or physical qualification.
 The [I/O ledger](io-evolution-execution.csv) remains the status authority.

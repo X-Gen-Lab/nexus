@@ -80,10 +80,47 @@ class MaintainedMatrixTests(unittest.TestCase):
                 self.assertEqual([(entry["kind"], entry["controller"], entry["mode"])
                                   for entry in item["selected"]],
                                  [("lptim", "LPTIM2", "irq-counter16-oneshot")])
+            elif item["assembly"] == (
+                    "tools/configure/assemblies/h743-high-peripherals.toml"):
+                self.assertEqual((item["family"], item["backend"]),
+                                 ("stm32h743", "baremetal"))
+                self.assertEqual({entry["kind"] for entry in item["selected"]},
+                                 {"gpio", "uart", "spi", "pwm", "i2c", "adc",
+                                  "flash"})
             elif item["family"] in {"stm32h743", "stm32u575"}:
                 self.assertTrue({entry["kind"] for entry in item["selected"]}.issubset(
                     {"gpio", "uart"}))
 
+
+    def test_h743_flash_reference_has_one_canonical_high_profile(self):
+        reference = "tools/configure/assemblies/h743-high-peripherals.toml"
+        catalogue = json.loads((configure.ROOT / matrix.CATALOGUE).read_text())
+        self.assertEqual(catalogue["assemblies"].count(Path(reference).name), 1)
+        self.assertTrue((configure.ROOT / reference).is_file())
+        self.assertFalse((configure.ROOT /
+            "cmake/package/verification/io_evolution/"
+            "h743-high-peripherals.toml").exists())
+        rows = [item for item in matrix.resolve_catalogue()["references"]
+                if item["assembly"] == reference]
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual((row["family"], row["part"], row["backend"],
+                          row["scope"], row["physical_status"]),
+                         ("stm32h743", "STM32H743ZIT6", "baremetal",
+                          "public_reference", "not_executed"))
+        self.assertEqual({(item["kind"], item["controller"], item["mode"])
+                          for item in row["selected"]}, {
+            ("gpio", "GPIOB", "output"),
+            ("uart", "USART3", "irq-bytes"),
+            ("spi", "SPI4", "short-poll"),
+            ("pwm", "TIM3", "fixed-pwm"),
+            ("i2c", "I2C1", "poll-messages"),
+            ("adc", "ADC1", "single-shot"),
+            ("flash", "FLASH", "poll-word")})
+        result = configure.resolve_ir(configure.ROOT / reference)
+        self.assertEqual(result["clock_profile"], "hsi64-pll384-cache-off")
+        self.assertEqual(result.clock_plan.reviewed_revision_ids, (0x2003,))
+        self.assertFalse(result["physical_qualified"])
 
     def test_u575_sram4_copy_reference_is_exact_and_not_physical_qualification(self):
         reference = "tools/configure/assemblies/u575-lpdma-copy-stop2.toml"

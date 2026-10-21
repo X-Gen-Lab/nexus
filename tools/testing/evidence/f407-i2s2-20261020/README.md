@@ -132,3 +132,33 @@ test-only successor; the 1626-input rendering superset is unchanged.
 Sidecar raw archive: [raw/b287922234afd92fbfda7a583b3dd9b85e90193a154a0d189af4ce4562ccbbb3.tar.gz](raw/b287922234afd92fbfda7a583b3dd9b85e90193a154a0d189af4ce4562ccbbb3.tar.gz).
 SHA256: `b287922234afd92fbfda7a583b3dd9b85e90193a154a0d189af4ce4562ccbbb3`. Ordinary complete R2 remains
 **pending**; full v10 execution and physical HIL remain not executed.
+
+
+## Accepted ordinary R2: later local phase
+
+The earlier pending statements record the pre-gate archive phase. The complete
+local ordinary R2 subsequently passed at commit
+`56a66e05014d760fbbd8d3e2e3b5909e86e80da6`, tree
+`6aff81836de5b85ec71883e36dcdd2c6d5b262dd`: 6288 Google cases across 348
+executables and 2946 tool cases (1367 testing, 967 configure, 485 CI and 127
+workflows), with zero failures, errors or skips. The complete ordinary hooks
+and commit-message check passed. All 81 frozen source-file hashes are bound to
+that exact committed tree; later branch or working-tree observations are not
+substituted for it.
+
+The single accepted-R2 archive is
+[raw/6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d.tar.gz](raw/6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d.tar.gz),
+SHA256 `6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d`.
+Its 2364 files contain 702 current commands with their actual attempts and raw
+streams, all 348 execution XML reports, discovery results and the bounded
+IO-property reports. No historical attempt directory was swept.
+
+The [package descriptor](accepted-r2-package.json),
+[byte-verification receipt](accepted-r2-verified.json),
+[delivery record](accepted-r2-delivery.json) and
+[collection scope](accepted-r2-COLLECTION.md) accompany that same archive.
+The package was independently byte-verified using its planned repository-relative
+raw path without duplicating or recompressing the archive. This records local
+ordinary-gate acceptance; it makes no claim about remote CI, clean-main formal
+qualification, software-candidate promotion, the complete v10 image plan or
+physical HIL. Original source/docs and first-failure archives remain unchanged.

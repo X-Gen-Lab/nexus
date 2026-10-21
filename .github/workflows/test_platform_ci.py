@@ -940,6 +940,41 @@ class SoftwareQualificationContracts(unittest.TestCase):
             self.assertEqual(receipt['workload'], 'gpio')
             self.assertIn('validated=true', (parent / 'outputs').read_text())
 
+    def test_canonical_h743_flash_path_keeps_the_existing_source_guard(self):
+        self.document()
+        canonical = 'tools/configure/assemblies/h743-high-peripherals.toml'
+        catalogue = json.loads((ROOT /
+            'tools/configure/assemblies/catalogue.json').read_text())
+        self.assertEqual(catalogue['assemblies'].count(Path(canonical).name), 1)
+        actual = ROOT / canonical
+        self.assertTrue(actual.is_file())
+        previous = ('cmake/package/verification/io_evolution/'
+                    'h743-high-peripherals.toml')
+        self.assertFalse((ROOT / previous).exists())
+        for relative, admitted in ((canonical, True), (previous, False)):
+            with self.subTest(path=relative), \
+                    tempfile.TemporaryDirectory() as temporary:
+                parent = Path(temporary)
+                root = self.fixture(parent)
+                selected = root / relative
+                selected.parent.mkdir(parents=True, exist_ok=True)
+                selected.write_bytes(actual.read_bytes())
+                self.commit(root)
+                env = self.environment(root, parent)
+                env['NEXUS_QUALIFICATION_ASSEMBLY'] = relative
+                self.assertEqual(self.execute('request', root, env).returncode, 0)
+                result = self.execute('source', root, env)
+                if admitted:
+                    self.assertEqual(result.returncode, 0,
+                                     result.stdout + result.stderr)
+                    record = json.loads((root /
+                        'build/software-qualification/source.json').read_text())
+                    self.assertEqual(record['assembly'], canonical)
+                    self.assertEqual(record['workload'], 'gpio')
+                else:
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertFalse((parent / 'outputs').exists())
+
     def test_source_guard_rejects_head_dirty_path_and_workload(self):
         self.document()
         for kind in ('head', 'dirty', 'alias', 'absolute', 'symlink', 'untracked', 'backslash', 'workload'):

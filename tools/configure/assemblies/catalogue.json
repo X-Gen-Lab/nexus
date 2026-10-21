@@ -7,6 +7,7 @@
     "gd32-f303-freertos-empty.toml",
     "gd32-f303-freertos-io.toml",
     "gd32-f303-freertos-spi-watchdog.toml",
+    "h743-high-peripherals.toml",
     "h743-spi-dma-cache-on.toml",
     "h743-spi-dma-runtime-clock.toml",
     "h743-spi-dma-uart-rx.toml",

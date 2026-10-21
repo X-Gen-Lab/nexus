@@ -1086,7 +1086,7 @@
             "displayName": "h743-high-peripherals software fixture; PCB/HIL unqualified",
             "binaryDir": "${sourceDir}/build/fixture-io-evolution-h743-high-peripherals",
             "cacheVariables": {
-                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/cmake/package/verification/io_evolution/h743-high-peripherals.toml",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/h743-high-peripherals.toml",
                 "NEXUS_BUILD_TESTS": "OFF",
                 "NEXUS_BUILD_WORKLOAD": "OFF",
                 "NEXUS_IO_EVOLUTION_FIXTURE": "ON",

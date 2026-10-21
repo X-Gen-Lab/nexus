@@ -31,7 +31,7 @@ foreach(h743_high_target nexus_h743_high_system_test nexus_h743_high_kernel_test
 endforeach()
 
 # Exercise normal TOML generation, static factory and real lifecycle owners.
-set(h7_high_input "${NEXUS_SOURCE_DIR}/cmake/package/verification/io_evolution/h743-high-peripherals.toml")
+set(h7_high_input "${NEXUS_SOURCE_DIR}/tools/configure/assemblies/h743-high-peripherals.toml")
 set(h7_high_bundle "${CMAKE_CURRENT_BINARY_DIR}/h743-high-factory")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
