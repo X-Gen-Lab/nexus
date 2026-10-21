@@ -348,27 +348,77 @@ def _decode(address, encoded, *, bridge):
         f"{encoded.hex()}")
 
 
+def _compiled_source(record, source):
+    """Derive GCC's one debug spelling from the identified TU's actual argv."""
+    metadata = record["compile"]
+    _require(isinstance(metadata, dict) and
+             set(metadata) == {"directory", "arguments"},
+             "SU compile directory/arguments fields required")
+    directory, argv = metadata["directory"], metadata["arguments"]
+    _require(isinstance(directory, str) and Path(directory).is_absolute() and
+             Path(directory).is_dir(), "SU compile directory is invalid")
+    _require(isinstance(argv, list) and argv and
+             all(isinstance(arg, str) and arg for arg in argv) and
+             not any(arg.startswith("@") or arg in
+                     {";", "&&", "||", "|", ">", "<"} for arg in argv),
+             "opaque or invalid SU compile argv")
+    for option in ("-c", "-o"):
+        _require(argv.count(option) == 1 and
+                 argv.index(option) + 1 < len(argv),
+                 "one explicit SU compile " + option + " is required")
+    original = argv[argv.index("-c") + 1]
+    actual = Path(original)
+    if not actual.is_absolute():
+        actual = Path(directory) / actual
+    _require(actual.resolve() == Path(source),
+             "SU compile source differs from actual source")
+    maps = []
+    for arg in argv:
+        _require(not arg.startswith("-fcanon-prefix-map"),
+                 "canonicalized SU prefix maps are unsupported")
+        for option in ("-ffile-prefix-map", "-fdebug-prefix-map"):
+            if arg.startswith(option):
+                _require(arg.startswith(option + "="),
+                         "invalid SU debug prefix map")
+                old, separator, new = arg[len(option) + 1:].rpartition("=")
+                _require(separator and old, "invalid SU debug prefix map")
+                maps.append((old, new))
+    # GCC14 combines file/debug maps, prepends each option and replaces once.
+    # OLD is a raw string prefix; the final '=' separates OLD from NEW.
+    for old, new in reversed(maps):
+        if original.startswith(old):
+            return new + original[len(old):]
+    return original
+
+
 def _stack_records(records):
     _require(isinstance(records, (list, tuple)) and len(records) <= 256,
              "bounded actual SU records required")
-    rows, sources = [], set()
+    rows, sources, printed_sources = [], set(), {}
     for record in records:
-        _require(isinstance(record, dict) and set(record) == {"source", "raw"},
-                 "SU source/raw fields required")
+        _require(isinstance(record, dict) and set(record) in (
+                 {"source", "raw"}, {"source", "raw", "compile"}),
+                 "SU source/raw and optional compile fields required")
         source, raw = record["source"], record["raw"]
         _require(isinstance(source, str) and Path(source).is_file(),
                  "SU source does not exist")
         source = str(Path(source).resolve())
         _require(source not in sources, "ambiguous duplicate SU source")
         sources.add(source)
+        printed = (_compiled_source(record, source)
+                   if "compile" in record else None)
         _require(isinstance(raw, bytes) and 0 < len(raw) <= 1024 * 1024,
                  "actual nonempty bounded SU bytes required")
         for line in raw.decode("utf-8").splitlines():
             parts = line.split("\t")
             _require(len(parts) == 3, "invalid SU row")
             match = re.fullmatch(r"(.+):\d+:\d+:(.+)", parts[0])
-            _require(match and Path(match[1]).resolve() == Path(source),
+            _require(match and (match[1] == printed if printed is not None
+                     else Path(match[1]).resolve() == Path(source)),
                      "SU source identity differs")
+            _require(printed_sources.get(match[1], source) == source,
+                     "ambiguous printed SU source identity")
+            printed_sources[match[1]] = source
             _require(parts[1].isdigit() and int(parts[1]) <= MAX_FRAME,
                      "invalid SU frame")
             _require(parts[2] == "static", "dynamic or unknown SU frame")

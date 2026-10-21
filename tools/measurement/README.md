@@ -62,6 +62,22 @@ authored TOML, create aliases or change platform construction.
 多个实例必须显式传入 `-DNEXUS_WORKLOAD_UART_ID=NX_UART_ID_<NAME>`，GPIO 同理。
 不存在或类别错误的 ID 在配置阶段失败。工装选择不会修改 TOML、制造别名或改变平台装配。
 
+`h743_flash_ram.py` binds the selected RAM audit to the actual compile database
+and original compiler stack-usage (`.su`) bytes. For reproducible builds, each
+translation unit's exact `-c` input and ordered `-ffile-prefix-map` /
+`-fdebug-prefix-map` arguments determine one expected source spelling. The last
+matching map applies once; paths are never accepted by basename or suffix.
+Wrong sources, ambiguous source spellings and unmodelled path options fail.
+Original source and `.su` hashes remain intact, and failed CLI audits print the
+specific rejection reason. These checks do not establish physical execution.
+
+`h743_flash_ram.py` 将选定 RAM 审计绑定到实际编译数据库及编译器生成的原始
+栈用量（`.su`）字节。可复现构建中，每个编译单元的精确 `-c` 输入和有序
+`-ffile-prefix-map`／`-fdebug-prefix-map` 参数只派生一个预期源码名称。
+最后匹配的映射只应用一次，不使用文件名或路径后缀放行。错误源码、有歧义的
+源码名称及未建模的路径选项均拒绝。原始源码与 `.su` 摘要保持不变，命令行
+审计失败时输出具体拒绝原因。这些检查不建立实板执行资格。
+
 All results are linked storage observations. Dynamic stack high-water, cycles,
 IRQ latency, electrical behavior and physical qualification require their own
 executed measurements. An observation is not a software candidate or release.

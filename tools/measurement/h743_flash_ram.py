@@ -237,7 +237,9 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
         layout = verify_h743_ram_layout(elf, observations)
         cpu = verify_h743_cpu_bridge(elf, observations)
         static = verify_h743_ram_static(elf, observations, [
-            {"source": str(row["source"]), "raw": row["su"].read_bytes()}
+            {"source": str(row["source"]), "raw": row["su"].read_bytes(),
+             "compile": {"directory": str(row["directory"]),
+                         "arguments": row["arguments"]}}
             for row in selected],
             return_gate="nx_stm32h743_flash_ram_return")
         _require(before == [file_identity(path) for path in protected],
@@ -288,7 +290,10 @@ def main(argv=None):
         print("H743 RAM audit rejected: " + str(error), file=sys.stderr)
         return 1
     print("H743 RAM link audit: " + report["status"])
-    return 0 if report["status"] == "passed" else 1
+    if report["status"] != "passed":
+        print(report["failure"], file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
