@@ -15,6 +15,7 @@ import threading
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tools.configure.metadata import load_policy  # noqa: E402
+from tools.measurement.retention import COMPONENT_OWNER_SMOKES  # noqa: E402
 from tools.dev import process  # noqa: E402
 from tools.evidence.common import file_identity, regular_file  # noqa: E402
 from tools.release.transport import (BASE_CONSUMERS, MODERN_CONSUMERS,
@@ -278,9 +279,20 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     return source, build, arguments
 
 
+def component_owner_selection(specification):
+    """Only the exact maintained tuple enables an independent owner audit."""
+    if specification[2] not in COMPONENT_OWNER_SMOKES:
+        return None
+    if tuple(specification) not in SELECTED_CONSUMERS:
+        raise ValueError(
+            "Owner consumer differs from the canonical transport plan")
+    return specification[2]
+
+
 def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name,
                               run_checked, *, expected_revision):
     """Reuse installed canonical inputs through a separate public C project."""
+    owner = component_owner_selection((name, assembly_name, smoke_name))
     sdk = prefix / "share/nexus/src"
     verification = sdk / "cmake/package/verification/io_evolution"
     relative = PurePosixPath(assembly_name)
@@ -364,6 +376,14 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("rtc_lptim_provider.h")\n'
         '#error Private provider leaked into product source\n#endif\n'
         '_Static_assert(1, "Public source include isolation");\n')
+    if owner is not None:
+        with (source / "private_headers.c").open("a") as output:
+            output.write(
+                '#include "nexus/core/time.h"\n'
+                '/** \\brief External caller reads the injected face. */\n'
+                'nx_time_us_t nx_installed_clock_read(\n'
+                '    const nx_clock_t* clock) {\n'
+                '    return clock->read(clock->context);\n}\n')
     command = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
                "-DCMAKE_BUILD_TYPE=Release",
                f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
@@ -480,7 +500,8 @@ def check_native_time_image(sdk, source, build, config, commands, run_checked):
             "qualification": "This Linux x86_64 canonical runtime and selected symbol subset only; not total RAM, MCU or hardware qualification."}
 
 
-def check_selected_image(sdk, source, build, run_checked):
+def check_selected_image(sdk, source, build, run_checked, *,
+                         owner_specification=None):
     """Bind selected artifacts to actual resources and the retained provider."""
     if (build / "resolved-sdk.txt").read_text() != str(sdk):
         raise ValueError("Selected consumer resolved another source SDK")
@@ -510,16 +531,28 @@ def check_selected_image(sdk, source, build, run_checked):
             resources["elf"] != artifacts["elf"] or
             resources["resolved"] != file_identity(config / "resolved.json")):
         raise ValueError("Selected consumer resource/configuration binding failed")
+    owner = (component_owner_selection(owner_specification)
+             if owner_specification is not None else None)
     retention_path = build / "provider-retention.json"
-    run_checked([sys.executable, "-B", str(sdk / "tools/measurement/retention.py"),
+    command = [sys.executable, "-B",
+                 str(sdk / "tools/measurement/retention.py"),
                  "--elf", artifacts["elf"]["path"],
                  "--bindings", str(config / "bindings.c"),
                  "--resolved", str(config / "resolved.json"),
-                 "--output", str(retention_path)])
+                 "--output", str(retention_path)]
+    if owner is not None:
+        command += ["--component-owner", owner, "--consumer",
+                    str(source / "main.c")]
+    run_checked(command)
     retention = json.loads(retention_path.read_text())
     if (retention["status"] != "passed" or
             retention["elf"] != artifacts["elf"]):
         raise ValueError("Selected consumer provider retention failed")
+    if owner is not None and (
+            retention.get("kind") != "linked_component_owner_retention" or
+            retention.get("owner_profile") != owner or
+            retention.get("consumer") != file_identity(source / "main.c")):
+        raise ValueError("Selected component owner retention binding failed")
     return {"artifacts": artifacts, "resources": file_identity(resources_path),
             "resolved": file_identity(config / "resolved.json"),
             "retention": file_identity(retention_path)}
@@ -602,7 +635,8 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
         run_checked(command)
         run_checked(["cmake", "--build", str(build), "--parallel", "1",
                      "--target", "installed_selected"])
-        image = check_selected_image(sdk, source, build, run_checked)
+        image = check_selected_image(sdk, source, build, run_checked,
+                                     owner_specification=specification)
         image.update({"name": name, "assembly": str(sdk / assembly)})
         return image
     return None

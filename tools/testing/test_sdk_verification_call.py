@@ -460,6 +460,21 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 path = Path(command[command.index("--elf") + 1])
                 report["elf"] = {"path": str(path), "size": path.stat().st_size,
                                  "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+            if "--component-owner" in command:
+                role = command[command.index("--component-owner") + 1]
+                consumer = Path(command[command.index("--consumer") + 1])
+                report.update(kind="linked_component_owner_retention",
+                              owner_profile=role,
+                              consumer={"path": str(consumer),
+                                        "size": consumer.stat().st_size,
+                                        "sha256": hashlib.sha256(
+                                            consumer.read_bytes()).hexdigest()})
+                if self.selected_fault == "owner_kind":
+                    report["kind"] = "provider_method_retention"
+                elif self.selected_fault == "owner_role":
+                    report["owner_profile"] = "u575-other-owner"
+                elif self.selected_fault == "owner_consumer":
+                    report["consumer"]["sha256"] = "0" * 64
             Path(command[command.index("--output") + 1]).write_text(json.dumps(report))
         elif any(argument.endswith("package_source_sdk.py")
                  for argument in command):
@@ -621,6 +636,43 @@ class SDKConsumerParallelTests(unittest.TestCase):
                               str(self.sdk / assembly), command)
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg
                                     for arg in command))
+
+    def test_component_owner_audits_are_exactly_the_four_canonical_smokes(self):
+        status, _ = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 0)
+        commands = [command for command in self.commands
+                    if "--component-owner" in command]
+        expected = {"u575-retained-time", "u575-stop2", "u575-lpdma-copy",
+                    "u575-lptim1-lpbam"}
+        self.assertEqual(len(commands), len(expected))
+        self.assertEqual({command[command.index("--component-owner") + 1]
+                          for command in commands}, expected)
+        for command in commands:
+            self.assertIn("--resolved", command)
+            consumer = Path(command[command.index("--consumer") + 1])
+            role = command[command.index("--component-owner") + 1]
+            canonical = (self.sdk / "cmake/package/verification/"
+                         "io_evolution/consumers" / (role + ".c"))
+            self.assertEqual(consumer.read_bytes(), canonical.read_bytes())
+        for tuple_ in self.consumer.SELECTED_CONSUMERS:
+            if tuple_[2] in expected:
+                with self.subTest(role=tuple_[2]):
+                    self.assertEqual(
+                        self.consumer.component_owner_selection(tuple_),
+                        tuple_[2])
+                    with self.assertRaisesRegex(ValueError, "canonical"):
+                        self.consumer.component_owner_selection(
+                            ("impostor", tuple_[1], tuple_[2]))
+
+    def test_owner_report_cannot_claim_another_kind_role_or_source(self):
+        for fault in ("owner_kind", "owner_role", "owner_consumer"):
+            with self.subTest(fault=fault):
+                self.selected_fault = fault
+                with contextlib.redirect_stderr(io.StringIO()):
+                    status, report = self.execute(("--parallel", "1"))
+                self.assertEqual(status, 1)
+                self.assertEqual(report["status"], "failed")
+                self.assertIn("component owner", report["error"])
 
     def test_runtime_clock_uses_canonical_input_and_public_lifecycle_smoke(self):
         self.assertIn(("h743 runtime clock",

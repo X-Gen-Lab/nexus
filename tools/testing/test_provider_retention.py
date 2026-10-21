@@ -1346,5 +1346,192 @@ class U575MpuGpioRetentionTests(unittest.TestCase):
                 self.elf.data[offset] ^= 32
                 self.rejected()
 
+
+
+OWNER_ROLES = ("u575-retained-time", "u575-stop2", "u575-lpdma-copy",
+               "u575-lptim1-lpbam")
+
+
+def component_owner_image(role):
+    """Independent linked bytes for caller clock, storage and physical ops."""
+    elf = image()
+    elf.data = bytearray(2048)
+    elf.sections[0]["size"] = 256
+    elf.sections[1]["size"] = 768
+    elf.sections[2].update(size=512, offset=1024)
+    elf.loads[1].update(files=768, memory=768)
+    elf.loads[2].update(offset=1024, memory=512)
+    elf.sections += [
+        {"name": ".nx_sram4_data", "flags": 3, "address": 0x28000000,
+         "offset": 1024, "size": 64, "kind": 1},
+        {"name": ".nx_sram4_noinit", "flags": 3, "address": 0x28000100,
+         "offset": 1088, "size": 128, "kind": 8}]
+    elf.loads += [{"offset": 1024, "virtual": 0x28000000,
+                   "physical": 0x08003000, "files": 64, "memory": 384,
+                   "flags": 6}]
+    elf.defined_symbols = []
+    def symbol(name, value, size, section, kind, binding=1):
+        elf.defined_symbols.append(dict(name=name, value=value, size=size,
+            section=section, type=kind, binding=binding))
+    symbol("s_clock_face", 0x08001000, 8, 0, 1, 0)
+    symbol("s_clock", 0x20000000, 40, 2, 1, 0)
+    functions = ["nx_stm32u575_retained_time_now",
+                 "nx_stm32u575_retained_time_initialize",
+                 "nx_stm32u575_retained_time_sample",
+                 "nx_stm32u575_retained_time_stop"]
+    if role != "u575-retained-time":
+        functions += ["nx_stm32u575_stop2_identity",
+                      "nx_stm32u575_stop2_domain",
+                      "nx_stm32u575_stop2_initialize",
+                      "nx_stm32u575_stop2_recover"]
+        functions.append({"u575-stop2": "nx_stm32u575_stop2_enter",
+                          "u575-lpdma-copy": "nx_stm32u575_stop2_copy_enter",
+                          "u575-lptim1-lpbam":
+                              "nx_stm32u575_stop2_lptim1_enter"}[role])
+        symbol("s_domain", 0x20000100, 40, 2, 1, 0)
+        symbol("s_owner", 0x20000140, 52, 2, 1, 0)
+    if role in OWNER_ROLES[2:]:
+        suffix = "copy" if role == "u575-lpdma-copy" else "lptim1"
+        prefix = "nx_stm32u575_lpdma_" + suffix
+        functions += [prefix + "_initialize", prefix + "_request_prepare"]
+        if suffix == "copy":
+            functions.remove("nx_stm32u575_retained_time_initialize")
+            functions.append(
+                "nx_stm32u575_retained_time_initialize_alarm_a_copy")
+        count = 3 if suffix == "copy" else 4
+        symbol("s_component_face", 0x08001008, 8, 0, 1, 0)
+        symbol(prefix + "_ops", 0x08001020, count * 4, 0, 1)
+        symbol("s_copy" if suffix == "copy" else "s_receiver",
+               0x20000040, 88 if suffix == "copy" else 104, 2, 1, 0)
+        struct.pack_into("<2I", elf.data, 8, 0x08001020, 0x20000040)
+        callbacks = ("cancel", "service", "stop", "start")[:count]
+        for index, name in enumerate(callbacks):
+            address = 0x08002201 + index * 16
+            struct.pack_into("<I", elf.data, 32 + index * 4, address)
+            symbol(name, address, 16, 1, 2, 0)
+            elf.defined_symbols[-1]["file"] = "lpdma_copy.c"
+        symbol("s_workspace", 0x28000100, 24 if suffix == "copy" else 48,
+               4, 1, 0)
+        symbol("s_source" if suffix == "copy" else "s_tuple", 0x28000000,
+               17 if suffix == "copy" else 6, 3, 1, 0)
+    for index, name in enumerate(functions):
+        symbol(name, 0x08002001 + index * 16, 16, 1, 2)
+    struct.pack_into("<2I", elf.data, 0, 0x08002001, 0x20000000)
+    return elf
+
+
+class U575ComponentOwnerRetentionTests(unittest.TestCase):
+    def inspect(self, role, elf=None, **changes):
+        resolved = dict(soc_family="stm32u575", part="STM32U575ZIT6Q",
+                        backend="baremetal", clock_profile="msis4",
+                        controllers=[], devices=[], cpu_profile={
+                            "definitions": {"NEXUS_ARCH_SECURITY_STATE": 0}})
+        root = Path(__file__).resolve().parents[2]
+        from tools.release.transport import SELECTED_CONSUMERS
+        from tools.evidence.common import file_identity
+        assembly = next(item[1] for item in SELECTED_CONSUMERS
+                        if item[2] == role)
+        resolved["inputs"] = [{"path": assembly,
+                               "sha256": file_identity(
+                                   root / assembly)["sha256"]}]
+        resolved.update(changes)
+        return inspect_provider_retention(
+            elf or component_owner_image(role), "", resolved=resolved,
+            component_owner=role, consumer_path=root /
+            "cmake/package/verification/io_evolution/consumers" / (role + ".c"))
+
+    def test_each_owner_keeps_real_clock_context_and_complete_ops(self):
+        for role, tables, methods in zip(OWNER_ROLES, (0, 0, 1, 1),
+                                         (1, 1, 4, 5)):
+            with self.subTest(role=role):
+                result = self.inspect(role)
+                self.assertEqual(result["kind"],
+                                 "linked_component_owner_retention")
+                self.assertEqual(result["owner_profile"], role)
+                self.assertEqual(result["face_count"], 1 + tables)
+                self.assertEqual(result["operations_table_count"], tables)
+                self.assertEqual(result["method_count"], methods)
+
+    def test_empty_default_and_wrong_hardware_selection_still_reject(self):
+        with self.assertRaisesRegex(EvidenceError, "no selected faces"):
+            inspect_provider_retention(
+                component_owner_image(OWNER_ROLES[0]), "")
+        for changes in ({"soc_family": "stm32f407"}, {"part": "STM32U575"},
+                        {"backend": "freertos"}, {"clock_profile": "other"},
+                        {"controllers": [{"kind": "gpio"}]},
+                        {"inputs": []},
+                        {"inputs": [{"path": "tools/configure/assemblies/"
+                                             "nucleo-u575-baremetal-empty.toml",
+                                     "sha256": "0" * 64}]}):
+            with self.subTest(changes=changes), \
+                    self.assertRaises(EvidenceError):
+                self.inspect(OWNER_ROLES[0], **changes)
+
+    def test_owner_ram_must_be_nonexecutable_and_unaliased(self):
+        for fault in ("section", "load", "alias"):
+            with self.subTest(fault=fault):
+                elf = component_owner_image(OWNER_ROLES[0])
+                if fault == "section":
+                    elf.sections[2]["flags"] |= 4
+                elif fault == "load":
+                    elf.loads[2]["flags"] |= 1
+                else:
+                    alias = dict(next(item for item in elf.defined_symbols
+                                      if item["name"] == "s_clock"))
+                    alias["name"] = "other_owner"
+                    elf.defined_symbols.append(alias)
+                with self.assertRaises(EvidenceError):
+                    self.inspect(OWNER_ROLES[0], elf)
+
+    def test_component_cli_cannot_overwrite_its_canonical_consumer(self):
+        from unittest.mock import patch
+        from tools.measurement import retention
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            canonical = (root / "cmake/package/verification/io_evolution/"
+                         "consumers/u575-retained-time.c")
+            canonical.parent.mkdir(parents=True)
+            canonical.write_bytes(b"canonical consumer must survive\n")
+            original = canonical.read_bytes()
+            consumer = root / "main.c"
+            consumer.write_bytes(original)
+            files = [root / name for name in
+                     ("image.elf", "bindings.c", "resolved.json")]
+            for path in files:
+                path.write_bytes(b"external input")
+            report = dict(face_count=1, operations_table_count=0,
+                          method_count=1)
+            with patch.object(retention, "ROOT", root), \
+                    patch.object(retention, "input_protection_paths",
+                                 return_value=[]), \
+                    patch.object(retention, "inspect_files",
+                                 return_value=report):
+                result = retention.main([
+                    "--elf", str(files[0]), "--bindings", str(files[1]),
+                    "--resolved", str(files[2]),
+                    "--component-owner", OWNER_ROLES[0],
+                    "--consumer", str(consumer), "--output", str(canonical)])
+            self.assertEqual(result, 1)
+            self.assertEqual(canonical.read_bytes(), original)
+
+    def test_wrong_context_method_and_unloaded_or_writable_face_reject(self):
+        for role in OWNER_ROLES:
+            for fault in ("context", "method", "unloaded", "writable"):
+                with self.subTest(role=role, fault=fault):
+                    elf = component_owner_image(role)
+                    if fault == "context":
+                        struct.pack_into("<I", elf.data, 4, 0x20000004)
+                    elif fault == "method":
+                        elf.defined_symbols = [
+                            item for item in elf.defined_symbols
+                            if item["name"] != "nx_stm32u575_retained_time_now"]
+                    elif fault == "unloaded":
+                        elf.loads[0]["files"] = 0
+                    else:
+                        elf.sections[0]["flags"] |= 1
+                    with self.assertRaises(EvidenceError):
+                        self.inspect(role, elf)
+
+
 if __name__ == "__main__":
     unittest.main()

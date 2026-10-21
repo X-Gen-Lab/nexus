@@ -13,7 +13,14 @@
 
 #define POLL_LIMIT 10000U
 static nx_stm32u575_retained_time_storage_t s_clock;
+static const nx_clock_t s_clock_face = {nx_stm32u575_retained_time_now,
+                                        &s_clock};
+/** \brief A separate public caller actually consumes the injected clock. */
+nx_time_us_t nx_installed_clock_read(const nx_clock_t* clock);
+
 static nx_stm32u575_lpdma_lptim1_storage_t s_receiver;
+static const nx_stm32u575_lpdma_lptim1_t s_component_face = {
+    &nx_stm32u575_lpdma_lptim1_ops, &s_receiver};
 static nx_stm32u575_lpdma_lptim1_request_t s_request;
 NX_MEMORY_SRAM4_DATA static nx_stm32u575_lptim1_tuple_t s_tuple = {37U, 0U,
                                                                    2047U};
@@ -59,6 +66,15 @@ int main(void) {
             &s_request, &snapshot, &s_tuple, &s_workspace, NX_DEADLINE_NEVER) !=
             NX_SUCCESS)
         retain();
+    if (clock.read != s_clock_face.read ||
+        clock.context != s_clock_face.context)
+        retain();
+    nx_time_us_t now = clock.read(clock.context);
+    if (nx_installed_clock_read(&s_clock_face) < now)
+        retain();
+    if (receiver.ops != s_component_face.ops ||
+        receiver.context != s_component_face.context)
+        retain();
     nx_clock_domain_t* domain = nx_stm32u575_stop2_domain();
     nx_clock_lease_t platform = {0};
     if (nx_clock_domain_acquire(domain, &platform) != NX_SUCCESS)
@@ -74,8 +90,8 @@ int main(void) {
         retain();
     nx_arch_irq_state_t saved = nx_arch_irq_save();
     nx_stm32u575_stop2_lptim1_result_t entered =
-        nx_stm32u575_stop2_lptim1_enter(owners, &receiver, &s_request, 4096U,
-                                        POLL_LIMIT);
+        nx_stm32u575_stop2_lptim1_enter(owners, &s_component_face, &s_request,
+                                        4096U, POLL_LIMIT);
     nx_stm32u575_stop2_result_t drained = entered.transition;
     while (drained.remaining_effects != 0U)
         drained = nx_stm32u575_stop2_recover(owners, POLL_LIMIT);
@@ -85,7 +101,7 @@ int main(void) {
         nx_request_result(&s_request.base, &result, &transferred);
     /* Settlement joins the loan. Public stop still owns the access gates,
      * kernel mux and added LSESYS source until this separate observed join. */
-    while (nx_stm32u575_lpdma_lptim1_stop(&receiver, POLL_LIMIT) !=
+    while (nx_stm32u575_lpdma_lptim1_stop(&s_component_face, POLL_LIMIT) !=
            NX_SUCCESS) {
     }
     nx_arch_irq_restore(saved);

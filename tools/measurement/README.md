@@ -71,3 +71,21 @@ unknown station facts and numeric budgets remain unbound until equipment exists.
 这些结果只证明链接后存储量。动态栈峰值、周期、中断延迟、电气行为和物理资格都需要
 各自真实执行的测量。观察记录不是软件候选或发布。三板 HIL 准备沿用 `tools/hil`
 绑定精确构建的协议；设备未接入前，站点事实和数值预算继续保持未绑定。
+
+`retention.py` normally requires generated factory faces. Only the four exact
+canonical U575 retained-time, Stop2, LPDMA-copy and LPTIM1-LPBAM consumers use
+`--component-owner <smoke> --consumer <main.c>` together with `--resolved`.
+Their role comes from the existing transport tuple and matching canonical
+consumer bytes and assembly digest. The audit follows actual readonly clock
+and component faces into writable, nonexecutable caller storage and concrete
+loaded code/tables. Its `linked_component_owner_retention` report establishes
+linked component ownership, not factory retention, execution or HIL. Other empty
+assemblies still fail; this mode does not relax factory-face checks.
+
+`retention.py` 默认必须验证生成的 factory 接口对象。仅四个精确的 U575 标准
+retained-time、Stop2、LPDMA-copy 和 LPTIM1-LPBAM consumer 可同时使用
+`--component-owner <smoke> --consumer <main.c>` 与 `--resolved`。角色由现有
+transport 元组、相同的标准 consumer 字节和装配摘要共同确定。检查从真实只读时钟与
+组件接口追踪到可写且不可执行的调用方存储，以及实际加载的代码和操作表。
+`linked_component_owner_retention` 报告只证明组件的链接关系与存储所有权，
+不证明 factory 保留、实际执行或 HIL；其他空装配仍拒绝，factory 接口检查保持严格。
