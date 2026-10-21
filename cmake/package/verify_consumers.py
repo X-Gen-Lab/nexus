@@ -52,7 +52,9 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
         'find_package(Nexus CONFIG REQUIRED)\n'
         'add_executable(parent_plain parent.c)\n'
         'nexus_add_firmware(installed_c SOURCES main.c)\n'
-        'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES Nexus::Log Nexus::BMP280 Nexus::Storage)\n'
+        'nexus_add_firmware(installed_cpp SOURCES main.cpp LIBRARIES '
+        'Nexus::Log Nexus::BMP280 Nexus::Storage Nexus::MappedStorage Nexus::AMPIPC Nexus::I3CController Nexus::UserIoBroker'
+        + (' Nexus::STM32F407Handoff' if arm and chip == "stm32" else '') + ')\n'
         'target_compile_options(installed_cpp PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>")\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n')
@@ -78,16 +80,29 @@ def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
             ' if (result.primary != NX_SUCCESS) return 1;\n'
             ' return nx_platform_stop() == NX_SUCCESS ? 0 : 2;\n}\n')
     (source / "main.c").write_text(code)
+    handoff = arm and chip == "stm32"
     (source / "main.cpp").write_text(
         '#include "nexus/components/log.h"\n'
         '#include "nexus/components/bmp280.h"\n'
         '#include "nexus/components/storage.h"\n'
-        '#include <cstring>\n' + code.replace(
+        '#include "nexus/components/mapped_storage.h"\n'
+        '#include "nexus/components/mapped_storage_owner.h"\n'
+        '#include "nexus/components/amp_ipc_storage.h"\n'
+        '#include "nexus/components/i3c_controller_storage.h"\n'
+        '#include "nexus/components/user_io_async_storage.h"\n'
+        + ('#include "nexus/components/stm32f407_handoff.h"\n' if handoff else '')
+        + '#include <cstring>\n' + code.replace(
             ' nx_platform_start_result_t result',
             ' nx_log_sink_port_t sink;\n std::memset(&sink, 0, sizeof(sink));\n'
             ' if (nx_log_init(nullptr, sink, NX_LOG_INFO) != NX_ERROR_INVALID) return 3;\n'
             ' if (nx_bmp280_compensate(nullptr, 0, 0, nullptr) != NX_ERROR_INVALID) return 4;\n'
-            ' nx_platform_start_result_t result'))
+            ' if (nx_mapped_storage_stop(nullptr) != NX_ERROR_INVALID) return 5;\n'
+            ' if (nx_amp_ipc_construct(nullptr, nullptr) != NX_ERROR_INVALID) return 6;\n'
+            ' if (nx_i3c_controller_construct(nullptr, nullptr) != NX_ERROR_INVALID) return 9;\n'
+            ' if (nx_user_io_async_construct(nullptr, nullptr, 0U, nullptr) '
+            '!= NX_ERROR_INVALID) return 10;\n'
+            + (' if (nx_stm32f407_handoff_initialize(0) != NX_ERROR_INVALID) return 8;\n'
+               if handoff else '') + ' nx_platform_start_result_t result'))
     arguments = ["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
                  "-DCMAKE_BUILD_TYPE=Release", f"-DNexus_DIR={prefix / 'lib/cmake/Nexus'}",
                  "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_BUILD_WORKLOAD=OFF"]
@@ -125,13 +140,20 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
     build = directory / (family + " " + backend + " build")
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
-    kernel = " LIBRARIES Nexus::OSFreeRTOS" if backend == "freertos" else ""
+    libraries = ["Nexus::OSFreeRTOS"] if backend == "freertos" else []
+    if family == "h743":
+        libraries.append("Nexus::H743FrameDMA2D")
+    kernel = " LIBRARIES " + " ".join(libraries) if libraries else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
         'project(installed_modern_consumer LANGUAGES C ASM)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
         f'nexus_add_firmware(installed_modern SOURCES main.c{kernel})\n'
+        + ('set_target_properties(installed_modern PROPERTIES C_STANDARD 11 '
+           'C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)\n'
+           'nexus_target_warnings(installed_modern STRICT)\n'
+           if family == "h743" else '') +
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
@@ -170,6 +192,21 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
             '_Alignas(8) static StackType_t task_stack[128];\n'
             'static void task_entry(void* context) {\n'
             '    (void)context;\n    for (;;) {}\n}\n')
+    if family == "h743":
+        code += (
+            '#include "nexus/components/frame_dma2d.h"\n'
+            'static nx_h743_frame_dma2d_storage_t frame_storage;\n'
+            'static const nx_frame_blitter_t frame_blitter = {\n'
+            '    &nx_h743_frame_dma2d_ops, &frame_storage};\n'
+            'static const nx_h743_frame_dma2d_config_t frame_configuration = {\n'
+            '    NX_H743_FRAME_DMA2D_CONTROLLER, 4U};\n'
+            'static nx_stream_slot_t frame_slot;\n'
+            'static nx_stream_t frame_queue;\n'
+            'static nx_frame_stream_t frame_stream;\n'
+            'static nx_frame_dma_loan_t frame_source;\n'
+            'static nx_frame_blit_request_t frame_request;\n'
+            'static uint32_t frame_pixels[24];\n'
+            'static uint16_t frame_output[48];\n')
     code += (
         'int main(void) {\n'
         '    nx_platform_start_result_t start = nx_platform_start();\n'
@@ -183,6 +220,42 @@ def prepare_modern_consumer(prefix, directory, family, backend, run_checked,
         '    (void)nx_uart_port_submit(console, &request);\n'
         '    (void)nx_uart_port_cancel(console, &request);\n'
         '    nx_uart_port_service(console);\n')
+    if family == "h743":
+        code += (
+            '    /* Public link reference only: no physical DMA/timing result. */\n'
+            '    const nx_frame_plane_t frame_plane = {0U, 16U, 24U, 4U};\n'
+            '    nx_frame_layout_t frame_layout;\n'
+            '    frame_slot.data = (uint8_t*)frame_pixels;\n'
+            '    frame_slot.capacity = sizeof(frame_pixels);\n'
+            '    if (nx_frame_layout_planar(&frame_plane, 1U, &frame_layout) != NX_SUCCESS ||\n'
+            '        nx_stream_initialize(&frame_queue, &frame_slot, 1U) != NX_SUCCESS ||\n'
+            '        nx_frame_stream_initialize(&frame_stream, &frame_queue, &frame_layout) != NX_SUCCESS ||\n'
+            '        nx_h743_frame_dma2d_initialize(&frame_storage, &frame_blitter,\n'
+            '                                      &frame_configuration) != NX_SUCCESS) return 9;\n'
+            '    nx_stream_fill_t frame_fill;\n'
+            '    if (nx_stream_reserve(&frame_queue, &frame_fill) != NX_SUCCESS ||\n'
+            '        nx_frame_stream_publish(&frame_stream, &frame_fill, 0U) != NX_SUCCESS ||\n'
+            '        nx_frame_stream_acquire(&frame_stream, &frame_source) != NX_SUCCESS) return 10;\n'
+            '    nx_request_initialize(&frame_request.base);\n'
+            '    if (nx_request_prepare(&frame_request.base, NX_DEADLINE_NEVER) != NX_SUCCESS) return 11;\n'
+            '    frame_request.source = &frame_source;\n'
+            '    frame_request.width_bytes = 16U;\n'
+            '    frame_request.rows = 4U;\n'
+            '    frame_request.format = NX_FRAME_BLIT_ARGB8888_TO_RGB565;\n'
+            '    frame_request.destination = (uint8_t*)frame_output;\n'
+            '    frame_request.destination_stride = 24U;\n'
+            '    frame_request.destination_capacity = sizeof(frame_output);\n'
+            '    if (frame_blitter.ops->submit(frame_blitter.context, &frame_request,\n'
+            '                                  nx_time_now_us()) == NX_SUCCESS) {\n'
+            '        (void)frame_blitter.ops->service(frame_blitter.context, nx_time_now_us());\n'
+            '        (void)frame_blitter.ops->cancel(frame_blitter.context, &frame_request);\n'
+            '        (void)frame_blitter.ops->service(frame_blitter.context, nx_time_now_us());\n'
+            '    } else {\n'
+            '        const nx_dma_drain_facts_t unsubmitted = {frame_layout.bytes, 0U, true, true, true};\n'
+            '        (void)nx_frame_dma_release(&frame_stream, &frame_source, &unsubmitted);\n'
+            '    }\n'
+            '    /* Quarantine retains all static storage; this image is never run. */\n'
+            '    (void)frame_blitter.ops->stop(frame_blitter.context);\n')
     if backend == "freertos":
         code += (
             '    /* Link the actual kernel; software qualification never runs it. */\n'
@@ -227,12 +300,23 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
     source.mkdir()
     run_checked(["git", "init", "--quiet", str(source)])
     version = load_policy(sdk)["semantic_version"]
+    library = {"u575-retained-time": "Nexus::U575RetainedTime",
+               "u575-stop2": "Nexus::U575Stop2",
+               "u575-lpdma-copy": "Nexus::U575Stop2Copy",
+               "u575-lptim1-lpbam": "Nexus::U575Stop2Lptim1",
+               "u575-mpu-gpio": "Nexus::U575MpuGpio",
+               "f407-i2s2-slave-tx": "Nexus::F407I2S2SlaveTx"}.get(smoke_name)
+    component = " LIBRARIES " + library if library else ""
     (source / "CMakeLists.txt").write_text(
         'cmake_minimum_required(VERSION 3.31)\n'
         'project(installed_selected_consumer LANGUAGES C ASM)\n'
+        'set(CMAKE_C_STANDARD 11)\n'
+        'set(CMAKE_C_STANDARD_REQUIRED ON)\n'
+        'set(CMAKE_C_EXTENSIONS OFF)\n'
         'set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n'
         f'find_package(Nexus {version} EXACT CONFIG REQUIRED)\n'
-        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c)\n'
+        'nexus_add_firmware(installed_selected SOURCES main.c private_headers.c'
+        f'{component})\n'
         'get_target_property(sdk_root Nexus::Config NEXUS_SOURCE_DIR)\n'
         'get_target_property(config_root Nexus::Platform NEXUS_CONFIG_DIR)\n'
         'file(WRITE "${CMAKE_BINARY_DIR}/resolved-sdk.txt" "${sdk_root}")\n'
@@ -257,6 +341,16 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32u575_provider.h") || '
         '__has_include("stm32u575_uart_rtscts.h") || '
         '__has_include("stm32u575_lptim.h") || '
+        '__has_include("stm32u575_gpio_mpu.h") || '
+        '__has_include("stm32u575_mpu_user_init.h") || '
+        '__has_include("stm32u575_rtc.h") || '
+        '__has_include("retained_time.h") || '
+        '__has_include("stm32u575_rtc_calendar.h") || '
+        '__has_include("stm32u575_stop2_hw.h") || '
+        '__has_include("stm32u575_lpdma_copy_hw.h") || '
+        '__has_include("stm32u575_lpdma_copy_internal.h") || '
+        '__has_include("stm32u575_lptim1_profile.h") || '
+        '__has_include("stm32u575_lpdma_lptim1_internal.h") || '
         '__has_include("stm32g474_fdcan.h") || '
         '__has_include("stm32g474_pwm_adc.h") || '
         '__has_include("stm32g474_adc_group.h") || '
@@ -264,6 +358,7 @@ def prepare_selected_consumer(prefix, directory, name, assembly_name, smoke_name
         '__has_include("stm32g474_pin_state.h") || '
         '__has_include("pin_state_impl.h") || '
         '__has_include("stm32f407_eth_frames.h") || '
+        '__has_include("stm32f407_i2s2_slave_tx.h") || '
         '__has_include("gd32f470_eth_frames.h") || '
         '__has_include("stm32g474_provider.h") || '
         '__has_include("rtc_lptim_provider.h")\n'

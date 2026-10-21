@@ -1,0 +1,39 @@
+// FIG-27 current exact finite SRAM4 copy; selected ARM/SDK development checks passed; full qualification/HIL open.
+// Source: public copy/Stop2/retained-clock APIs and private compound release.
+digraph u575Stop2Copy {
+ graph [label="FIG-27: selected SRAM4 copy / same Stop2 owner\nSoftware models and source review complete\nSelected ARM / installed SDK development passed\nFull qualification / physical exits open", rankdir=TB,
+        labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.30, ranksep=0.50];
+ node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
+ edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+ boot [label="Selected reset-only startup / external owners\nSRAM4 power + DATA/BSS; persistent SRAM4EN / LPDMA1EN\nStable MSIS4 / MSIK4 profile; other channels / masters quiet", fillcolor="#fff7ed"];
+ run [label="Caller: exact closed RUN barrier\nStop Platform; join actual consumers\nEnd old TIM2 deadlines; retain all copy storage"];
+ clock [label="Independent retained RTC clock\nExplicit AlarmA-copy opt-in\nSame Stop2 identity / live generation"];
+ owner [label="Same concrete Stop2 owner / Copy variant\ncopy_enter: receiver before producer\nAlarmA + independent WUT escape / masked WFI"];
+ copy [label="Exact LPDMA1 channel 0 receiver\nPrivate validate_ready -> arm -> validate_sleep\nPublic service / cancel / stop never settle alone"];
+ buffers [label="Exact 16 KiB nonsecure SRAM4\nDisjoint source + destination + generated 24 B LLI\nFirst floor(n/2) bytes; second remaining bytes"];
+ first [label="Finite hardware chain\nAlarmA rising trigger 14 -> first block\nUngated second LLI / last-LLI completion / final link zero"];
+ guard [label="Wake / setup failure: verify RUN profile first\nUnknown profile: CPU withdrawal only\nNo RTC or DMA MMIO; retain peripheral effects / loan", fillcolor="#fff7ed"];
+ drain [label="Compound cleanup\nWithdraw AlarmA / WUT -> observe full reset CCR=0 + idle\nZero links / quiet IRQ -> restore claimed gates / clocks"];
+ held [label="Failed proof: whole loan / copy marker retained\nEven if hardware effects are zero\nRUN stays closed; recover retries without WFI", fillcolor="#fff7ed"];
+ quarantine [label="Observed external LPDMA1 reset during active loan\nPermanent QUARANTINE: quiet reset values CANNOT prove prior final access\nOnly actual external system reset ends responsibility", fillcolor="#fee2e2"];
+ release [label="Final release gate: all effects zero / Stop2 refs detached\nPrivate release succeeds -> final SETTLED publication\nAcquire observation + external joins permit reuse", fillcolor="#ecfdf5"];
+ open [label="Open exits\nPeripheral LPBAM / physical copy / Stop2 residency\nRetention / current / accuracy / wake latency / full IO-32 and SOC-35", style="rounded,dashed,filled", fillcolor="#f8fafc"];
+ boot -> buffers [label="prepares memory and keeps run gates stable", style=dashed];
+ boot -> owner [label="supplies profile and external exclusion proofs", style=dashed];
+ run -> owner [label="copy_enter with exact barrier / face / request"];
+ clock -> owner [label="same-owner / generation validation"];
+ owner -> copy [label="private admission and receiver arm"];
+ copy -> buffers [label="ACCEPTED: request / buffers / workspace loan"];
+ owner -> first [label="then enable AlarmA"];
+ buffers -> first [label="DMA reads / writes exact borrowed spans"];
+ first -> guard [label="IRQ114 or WUT IRQ2 pending wakes masked WFI"];
+ owner -> guard [label="setup failure also enters cleanup"];
+ guard -> drain [label="profile verified before RTC / DMA access"];
+ guard -> held [label="profile unknown: no peripheral withdrawal"];
+ drain -> held [label="any withdrawal / restore proof fails"];
+ held -> guard [label="recover: preserve masks / no WFI"];
+ copy -> quarantine [label="external engine reset observed while borrowed"];
+ drain -> release [label="ALL RTC / DMA / IRQ / power / gate / clock proofs"];
+ release -> held [label="release fails: restore Stop2 references / retain marker"];
+ release -> open [label="software final access establishes no physical result", style=dashed];
+}

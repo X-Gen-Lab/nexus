@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-h743-full-delivery-evidence-20261020/store/94bc39044e05e12918ed9a676e218ab225861d83269c6218196e2648810f6f98.tar.gz",
+    "sha256": "94bc39044e05e12918ed9a676e218ab225861d83269c6218196e2648810f6f98",
+    "size": 3250961
+  },
+  "bytes": 10775640,
+  "files": 283,
+  "kind": "portable_evidence",
+  "manifest_sha256": "f7d146043cd48192aac59e19321e370f565684856c999a3008ccd9cb526e3238",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

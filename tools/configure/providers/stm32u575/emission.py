@@ -21,6 +21,11 @@ def includes(result):
     selected = ['#include "stm32u575_uart_gpdma.h"'] if any(
         item.kind == "uart" and item.mode == "dma-tx"
         for item in result.controllers) else []
+    if any(item.kind == "rtc" for item in result.controllers):
+        if any(pin["pin"] in {"PC14", "PC15"}
+               for item in result.controllers for pin in item["pins"]):
+            raise ValueError("Retained LSE RTC conflicts with selected PC14/PC15 owner")
+        selected.append('#include "stm32u575_rtc.h"')
     if any(item.kind == "lptim" for item in result.controllers):
         selected.append('#include "stm32u575_lptim.h"')
     if any(item.kind == "uart" and item.mode == "dma-chain-tx"

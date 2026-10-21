@@ -56,6 +56,11 @@ void TIM2_IRQHandler(void) {
 #define NX_STM32_EFFECT_TIMER       2U
 #define NX_STM32_EFFECT_TIMER_GATE  4U
 #define NX_STM32_EFFECT_TIMER_QUIET 8U
+#if defined(NEXUS_F407_I2S2_SLAVE_TX_SELECTED) &&                              \
+    NEXUS_F407_I2S2_SLAVE_TX_SELECTED
+#define NX_STM32_EFFECT_GPIOB_GATE 16U
+#define NX_STM32_EFFECT_DMA1_GATE  32U
+#endif
 #ifndef NX_STM32_WRITE
 #define NX_STM32_WRITE(reg, value) (*(reg) = (uint32_t)(value))
 #endif
@@ -397,6 +402,23 @@ nx_stm32_start_result_t nx_stm32_system_start(nx_stm32_system_t* system,
         result.primary = -6;
         goto rollback;
     }
+#if defined(NEXUS_F407_I2S2_SLAVE_TX_SELECTED) &&                              \
+    NEXUS_F407_I2S2_SLAVE_TX_SELECTED
+    /* Normal cold-reset assembly excludes every running peripheral/master.
+     * Enabling a gated domain is not proof that a foreign old EN was idle.
+     * Shared gates live with Platform, beyond every pin/stream-local owner. */
+    uint32_t shared = RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_DMA1EN;
+    uint32_t missing = shared & ~system->rcc->AHB1ENR;
+    if ((missing & RCC_AHB1ENR_GPIOBEN) != 0U)
+        system->remaining_effects |= NX_STM32_EFFECT_GPIOB_GATE;
+    if ((missing & RCC_AHB1ENR_DMA1EN) != 0U)
+        system->remaining_effects |= NX_STM32_EFFECT_DMA1_GATE;
+    if (!write_checked(&system->rcc->AHB1ENR, system->rcc->AHB1ENR | shared,
+                       shared)) {
+        result.primary = -6;
+        goto rollback;
+    }
+#endif
     system->core_hz = 168000000U;
     system->started = true;
     return result;
@@ -415,6 +437,23 @@ int nx_stm32_system_stop(nx_stm32_system_t* system, uint32_t poll_limit) {
 #if defined(NEXUS_TIMEBASE_LOWPOWER) && NEXUS_TIMEBASE_LOWPOWER
     if (nx_stm32_lowpower_busy()) {
         return -1;
+    }
+#endif
+#if defined(NEXUS_F407_I2S2_SLAVE_TX_SELECTED) &&                              \
+    NEXUS_F407_I2S2_SLAVE_TX_SELECTED
+    /* All Platform consumers, including external HAL users, have joined.
+     * Retain attempted additions until their actual withdrawal reads back. */
+    uint32_t shared = 0U;
+    if ((system->remaining_effects & NX_STM32_EFFECT_GPIOB_GATE) != 0U)
+        shared |= RCC_AHB1ENR_GPIOBEN;
+    if ((system->remaining_effects & NX_STM32_EFFECT_DMA1_GATE) != 0U)
+        shared |= RCC_AHB1ENR_DMA1EN;
+    if (shared != 0U) {
+        if (!write_checked(&system->rcc->AHB1ENR,
+                           system->rcc->AHB1ENR & ~shared, shared))
+            return -1;
+        system->remaining_effects &=
+            ~(NX_STM32_EFFECT_GPIOB_GATE | NX_STM32_EFFECT_DMA1_GATE);
     }
 #endif
     if ((system->remaining_effects & NX_STM32_EFFECT_TIMER) != 0U) {

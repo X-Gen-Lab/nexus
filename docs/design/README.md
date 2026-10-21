@@ -5,6 +5,8 @@
 block storage 由调用者提供。SDK 和 provider storage 私有，应用产品工程独立。
 这里的设计合同与 [当前交付](../delivery/README.md) 一起使用，历史文档不建立当前资格。
 
+五项有界软件增量的装配、借用与恢复责任见[映射存储、AMP、镜像交接、RTC 与帧边界](io-extension-boundaries.md)。完整原始退出条件与实板状态保持不变。
+
 | 文档 | 用途 |
 |---|---|
 | [文档系统架构与交付规划](documentation-system.md) | 读者任务、单一正文、MyST/API、双语、门禁、版本与离线交付的目标方案 |
@@ -12,7 +14,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |
 | [内容与图示标准](documentation-standards.md) | 清晰表达、规范用语、事实/资格、示例、架构图和独立审查约束 |
 | [页面模板](documentation-templates.md) | tutorial/how-to/reference/explanation/status必需问题 |
-| [当前与目标参考图](../assets/diagrams/README.md) | 20 对本地 DOT/SVG：18 张编号主图与 2 张补充图；新增 target 图的渲染与审查另行记录 |
+| [当前与目标参考图](../assets/diagrams/README.md) | 本地 DOT/SVG 主图与两张补充图；主图以图清单为准，current/reference/target 身份、渲染与审查分别记录 |
 | [文档迁移映射](documentation-migration.csv) | 当前正文、工具和相邻 README 的去向；保留原资格与台账身份 |
 | [架构蓝图](next-generation-platform.md) | 原理、执行、所有权、性能/空间与支持边界 |
 | [I/O 增量架构](io-evolution.md) | 资源/触发/DMA 计划、可选 traits、硅片准入、数据单位与当前/待实现边界；状态由 IO-01–42 台账维护 |
@@ -25,6 +27,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [UART FIFO 有界中断服务](uart-fifo.md) | H743/U575 官方 LL 阈值、收发预算、IDLE 短尾和 TC 排空；正式配置与实板边界 |
 | [ADC 分组采集](adc-group.md) | G474 regular/injected、硅版本准入、采样格式、校准时效和真实停止；产品算法外置 |
 | [增强以太网帧](ethernet-frames.md) | F407/GD470 SG/VLAN、帧借用、硬件时间戳和全局中止；PHY 与协议政策外置 |
+| [F407 I2S2 从机有限发送](f407-i2s2-slave-tx.md) | 精确 VE/ZG 裸机、外部 CK/WS、有限 normal DMA、整块帧借用和真实排空；开发软件证据与完整音频／实板退出分列 |
 | [本轮 I/O 与时钟交付观察](../delivery/io-evolution-next-wave.md) | 逐配置开发证据、待冻结源码与最终资格分别记录，不继承旧 CI 或实板资格 |
 | [工程手册](engineering-handbook.md) | 既有格式/注释、工具、自动化、证据与发布 |
 | [构建系统合同](build-system.md) | 配置事务、增量依赖、目标策略、开发入口与交付边界 |
@@ -36,11 +39,15 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [后端接入与执行探针](os-backend-integration.md) | 新 RTOS 的能力合同、实际执行和不得自动扩大支持 |
 | [ThreadX 配置与接入](threadx.md) | 官方真实 Linux/M4 内核、独立 typed policy、bootstrap、静态对象与精确支持范围 |
 | [浅睡眠 timebase](timebase-lowpower.md) | 显式 FreeRTOS selector、固定 clock/compare alarm、量化 phase、失败保留与物理边界 |
+| [U575 保留时钟与 Stop2](u575-retained-time.md) | TZEN0 独立 RTC 时间域、显式 WUT owner、RUN 屏障与失败保留排空；通用 LPBAM 和物理退出仍开放 |
+| [U575 SRAM4 复制与 Stop2](u575-stop2-copy.md) | 精确 LPDMA1ch0、两块有限字节复制、AlarmA14 与 WUT 逃逸；全部 RTC/DMA/IRQ/门控/时钟退出后结清，完整 LPBAM 和物理退出仍开放 |
+| [U575 LPTIM1 单组 LPBAM 与 Stop2](u575-lptim1-lpbam.md) | 精确 SRAM4→LPTIM1 CCR1/RCR/ARR、REQ13/BREQ1/DREQ0 与显式 start/stop；同一 owner 复合退出，无 pin route，原 IO-32/SOC-35 退出仍开放 |
 | [Classic CAN](classic-can.md) | 三邮箱、共享 filter domain、controller-local abort/recovery 与 Board 电气 handoff |
 | [USB FS device](usb-device.md) | PIO packet/endpoint 所有权、独立 48 MHz owner、control epoch 与完整停止 |
 | [Raw Ethernet / MDIO](ethernet.md) | caller descriptor/RX loan、RMII、可选 DP83848；协议与 PHY/Board 政策外置 |
 | [高级 timer](timer-advanced.md) | capture 事件、complementary PWM/deadtime/break；共享资源与实际安全边界 |
-| [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO、可信 principal/pin/copy；U575 同步参考 transport 另见双域合同 |
+| [用户 I/O broker](user-io-broker.md) | kernel-invoked scalar GPIO 与 copied UART TX；可信 principal/copy/session authority；U575 同步参考 transport 另见双域合同 |
+| [I3C controller 核心](i3c-controller.md) | 单活动有限 SDR/DAA/CCC 与复制 IBI/hot-join；H563 仅编译参考，无物理 provider |
 | [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
 | [STM32G474 接入](stm32g474.md) | 精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI |
@@ -88,11 +95,21 @@ TZEN0 增加 SPI/I2C/ADC/PWM/EXTI/Flash，外部电源与安全状态准入仍�
 推进；不保留 NS 指针，不代表通用双域 factory、NS RTOS 或异步借用。
 ECC `program_flags`、fresh-erase 来源与逐脉冲完成责任见公共 Flash 合同；当前源
 实现和最终集成资格分别记录，不继承历史执行计数。
-SOC-33–35 仍未实现；SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
+SOC-33 的有限软件增量见上述边界页，完整退出仍开放；SOC-34 运行态变频仍未实现。
+SOC-35 新增 [U575 保留时间参考](u575-retained-time.md)的有界软件子集：独立 RTC
+时间域、显式 WUT/Stop2 owner 与失败保留排空；默认 Core TIM2 停止后旧 deadline
+失效。另有同一 owner 的选定 [SRAM4/LPDMA 有限复制](u575-stop2-copy.md)；通用外设
+LPBAM、物理复制/保留/精度/功耗/唤醒验收及完整退出仍开放；
+SOC-36 保留 partial，SOC-37–55 的物理验收仍为 not_executed。
 三Board未审实物PCB事实仍标unknown；软件测试夹具不升格真实
 Board路线。角色沿用十人配置：TL1、Core/I/O/OS2、BSP2、通用应用/通信2、QA/HIL2、
 构建发布1；维护责任由Codex全部承担，无需实名人员。远程branch protection状态
 须通过GitHub独立核实，不能从本地角色文件推断。
+
+另有独立选定的 [LPTIM1 单组 LPBAM](u575-lptim1-lpbam.md)：一组 SRAM4
+CCR1/RCR=0/ARR 经 LPDMA1 channel0 更新专用 LPTIM1。它沿用同一 concrete
+Stop2 owner，公开 start/stop 保留部分启动失败的归还责任；通用 LPBAM、引脚路线与
+实板验收不由该软件切片建立，原 IO-32/SOC-35 退出条件不变。
 
 行为变更采用 RED → GREEN → REFACTOR；主机 GoogleTest/GoogleMock 测试真实生产
 provider、factory 与 owner，配置工具用 Python unittest。commit hook 和 CI 执行同一

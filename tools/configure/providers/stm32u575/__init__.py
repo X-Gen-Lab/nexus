@@ -37,6 +37,7 @@ LIMITS = MappingProxyType({"uart_baud": (62, 250000),
 ADC_PIN_CHANNELS = MappingProxyType({("ADC4", "PC0"): 1})
 _MODES = MappingProxyType({
     ("lptim", "irq-counter16-oneshot"): "lptim",
+    ("rtc", "retained-calendar-alarm"): "rtc",
     ("gpio", "input"): "gpio", ("gpio", "output"): "gpio",
     ("uart", "irq-bytes"): "uart",
     ("uart", "irq-fifo-bytes"): "uart_fifo",
@@ -67,6 +68,10 @@ def validate_selection(selection, route):
     """Accept only the actual fixed provider and reviewed route, not SKU potential."""
     kind = route["kind"]
     mode_implementation(kind, selection["mode"])
+    if kind == "rtc":
+        if route["controller"] != "RTC0" or route["pins"]:
+            common.fail("U575 retained RTC requires exact pinless RTC0")
+        return
     if kind == "lptim":
         if (route["controller"] != "LPTIM2" or route["pins"] or
                 selection["mode"] != "irq-counter16-oneshot"):

@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-u575-copy-r4-final-gate-evidence-20261020/store/891975198e54f2202e9e9ec6bd2bf6e3ea6f1d72aee16dbf761fa9dba2962802.tar.gz",
+    "sha256": "891975198e54f2202e9e9ec6bd2bf6e3ea6f1d72aee16dbf761fa9dba2962802",
+    "size": 1276204
+  },
+  "bytes": 16155888,
+  "files": 3826,
+  "kind": "portable_evidence",
+  "manifest_sha256": "6d3553c0a098bd89122ae22c3d3ce1f831fa1c5338b4878efdc587f9af7ca3e0",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

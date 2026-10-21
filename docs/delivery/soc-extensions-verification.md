@@ -163,12 +163,17 @@ archive is not a published GitHub Release asset or a signed product release.
 
 ## Remaining acceptance
 
-SOC-28 through SOC-32 and SOC-36 are exact partial references. Their original
+At the qualified source recorded above, SOC-28 through SOC-32 and SOC-36 are exact partial references. Their original
 hardware, peripheral and isolation exits remain open. SOC-33 bootloader/running
 state handoff, SOC-34 dynamic frequency changes and SOC-35 deep STOP with
 continuous time are not implemented. SOC-37 through SOC-55 provide station,
 admission, capture and result-validation tooling; physical execution remains
 pending equipment.
+
+Later bounded source increments include the exact F407 masked Flash tail
+[handoff and four I/O mechanisms](../design/io-extension-boundaries.md).
+They do not inherit this record's software execution or close the complete
+SOC-33 exit; SOC-34 DVFS and SOC-35 deep-STOP continuity remain unimplemented.
 
 Fixed clock profiles do not establish DVFS. Ordinary WFI or tickless idle does
 not establish deep STOP. Host models and linked ARM images do not establish

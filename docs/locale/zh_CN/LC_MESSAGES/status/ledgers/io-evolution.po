@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4efddafd2c95aab8b8cea813214d199deddf7c696fd64e763f1f651bd7225dd4\n"
+"X-Nexus-Source-SHA256: ad5817cc175469415cf53e1ab3a5724f57a657afc910b8f2c55eff524f52852d\n"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
@@ -807,16 +807,8 @@ msgid "LPDMA autonomous Stop2 and LPBAM reference"
 msgstr "LPDMA 自主 Stop2 与 LPBAM 参考"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "soc/stm32u575"
-msgstr "soc/stm32u575"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Selected low-power peripheral SRAM4 and wake/stop ownership"
 msgstr "选定低功耗外设、SRAM4 与 wake/stop 所有权"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "pending"
-msgstr "pending"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:544
@@ -920,10 +912,6 @@ msgid "SDMMC and serial memory block command mapped interfaces"
 msgstr "SDMMC 与串行存储 block、command、mapped 接口"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "io;soc"
-msgstr "io;soc"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "XIP cache DMA loans and erase ownership are explicit"
 msgstr "XIP、cache、DMA loan 与 erase 所有权明确"
 
@@ -958,10 +946,6 @@ msgid "TrustZone peripheral broker and attribution"
 msgstr "TrustZone 外设 broker 与归属"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "core;arch;soc"
-msgstr "core;arch;soc"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Principal and memory validation; copied and borrowed data distinct"
 msgstr "principal 与内存校验；复制数据与借用数据分开"
 
@@ -977,10 +961,6 @@ msgstr "multicore"
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "AMP resource partition and epoch-safe IPC"
 msgstr "AMP 资源分区与 epoch 安全 IPC"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "core;arch"
-msgstr "core;arch"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Unique hardware owner and explicit remote reset/cache contract"
@@ -1036,25 +1016,42 @@ msgstr ""
 "soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
 "ram.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
-"run.toml;tests/google/u575_lptim_test.cpp"
-msgstr ""
-"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
-"run.toml;tests/google/u575_lptim_test.cpp"
-
-
-msgid ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/io-evolution-execution.csv>`。 "
-"源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`。"
-msgstr ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/io-evolution-execution.csv>`。 "
-"源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`b5e54696561289c2b0834331abe5f2326b3b9df1f1399c57cfae481bec4ba4c8`。"
-
 msgid ""
 "soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
 msgstr ""
 "soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
+msgstr "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
+
+msgid "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
+msgstr "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
+
+msgid "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
+msgstr "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
+
+
+msgid "partial_exact_reference_implemented"
+msgstr "partial_exact_reference_implemented"
+
+msgid "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+msgstr "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
+msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
+
+msgid "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"

@@ -11,6 +11,7 @@ typedef unsigned int word_t;
 unsigned char g_nx_stm32h743_flash_ram_workspace[1800]
     __attribute__((section(".bss.workspace"), aligned(1024)));
 volatile word_t diagnostic;
+const word_t g_pfnVectors[166] = {0};
 void Reset_Handler(void) {
     for (;;) {
     }
@@ -35,6 +36,20 @@ RAM word_t RamLeaf(word_t value) {
 #ifdef VALID_UNKNOWN_DATA_READ
     /* An unresolved argument is deliberately not an owned-address proof. */
     lane[0] = *(const volatile word_t*)(unsigned long)value;
+#endif
+#if defined(BAD_FLASH_READ_JOIN) || defined(BAD_FLASH_READ_UNKNOWN_JOIN)
+    __asm__ volatile("cmp r0,#0\nbeq 1f\n"
+#ifdef BAD_FLASH_READ_UNKNOWN_JOIN
+                     "nop\n"
+#else
+                     "movs r3,#0\n"
+#endif
+                     "b 2f\n1: movw r3,#0\nmovt r3,#0x0800\n2: ldr r2,[r3]" ::
+                         : "r2", "r3", "cc", "memory");
+#endif
+#ifdef BAD_CONSTANT_LOOP
+    __asm__ volatile("movs r3,#0\n1: adds r3,#1\ncmp r0,#0\nbne 1b" ::
+                         : "r3", "cc");
 #endif
 #ifdef BAD_FLASH_DATA_READ
     __asm__ volatile("movw r3,#0\nmovt r3,#0x0800\nldr r2,[r3]" ::
@@ -299,3 +314,10 @@ RAM void UnusedRamEntry(void) {
 #endif
 __asm__(".section .outside,\"a\",%progbits\n"
         ".balign 4\n.global outside_literal\noutside_literal: .word 0\n");
+
+/* Only the CPU/MMIO boundary symbol; this fixture never executes a device. */
+RAM __attribute__((noreturn)) void
+nx_stm32h743_flash_ram_terminal(void* workspace, word_t reason) {
+    (void)workspace;
+    RamTerminal(reason);
+}

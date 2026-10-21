@@ -353,16 +353,19 @@ class H743FlashRamClosureTests(unittest.TestCase):
         elf, _, observations = self.link(mutation="CPU_VALID")
         report = verify(elf, observations)
         self.assertEqual("passed", report["status"])
-        self.assertEqual("cpu_bridge_with_explicit_callee_contract",
+        self.assertEqual("fixed_pod_boundary_with_AAPCS_contract",
                          report["scope"])
         self.assertEqual(0, report["private_frame_bytes"])
         self.assertEqual(36, report["caller_frame_bytes"])
-        self.assertEqual(80, report["bridge_bytes"])
+        self.assertEqual(168, report["bridge_bytes"])
+        self.assertEqual("proved", report["return_gate"]["device_protocol"])
+        self.assertEqual(8, report["program_words"]["staged_word_reads"])
+        self.assertEqual(8, report["program_words"]["dynamic_word_stores"])
         self.assertEqual(elf.symbol("__nx_flash_ram_stack_start"),
                          report["stack_start"])
         self.assertEqual(elf.symbol("__nx_flash_ram_stack_end"),
                          report["stack_end"])
-        self.assertEqual("not_proved", report["callee_body"])
+        self.assertEqual("separately_checked", report["callee_body"])
         self.assertFalse(report["qualification"])
 
     def test_actual_cpu_bridge_rejects_lost_cpu_callee_and_return_identity(self):

@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 1845acd2db3f28395a067d6b3032760b58de0998124c262973025177ee4e3a4d\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 62e0a29a586d3356a3fcfdc221e877e0919f8bdaba0767963c1b44123c23e852\nX-Nexus-Reviewed: true\n"
 
 msgid "OS adapters: tasks, waits and explicit storage"
 msgstr "OS 适配器：任务、等待与显式存储"
@@ -835,26 +835,11 @@ msgstr "[in] 可选的调用者自定义数值诊断信息。"
 msgid "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
 msgstr "仅限特权 Thread，调度器未挂起且没有手动屏蔽。拒绝时不保留引用，不调用内核创建 API。检查实际链接器边界及 MPU_TYPE。创建容量最少为 64 个字；应用须另外预算实际执行深度。不使用堆或对象池。"
 
-msgid "[inout] Zero/live-free metadata in protected linker RAM."
-msgstr "[inout] 受保护链接器 RAM 中已清零／无存活对象的元数据。"
-
 msgid "[in] Validated user entry, stack and data mappings."
 msgstr "[in] 已验证的用户入口、栈和数据映射。"
 
-msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission."
-msgstr "成功，或准入前的 INVALID/CONTEXT/STATE/BUSY/IO。"
-
-msgid "One privileged lifecycle owner stops external access first. Single-core kernel deletion removes scheduler references synchronously. Self deletion is rejected; no hidden reaper."
-msgstr "由一个特权生命周期所有者先停止外部访问。单核内核删除会同步移除调度器引用。拒绝自删除；没有隐藏回收任务。"
-
 msgid "[inout] Owned live protected metadata; never the calling task."
 msgstr "[inout] 已拥有、存活且受保护的元数据；绝不能是调用任务本身。"
-
-msgid "Success, INVALID, CONTEXT or STATE with storage retained."
-msgstr "成功；或返回 INVALID、CONTEXT、STATE，并保留存储。"
-
-msgid "Zero-initialize in privileged RAM. The TCB includes the real port's context and syscall stack, inaccessible to users. One privileged lifecycle owner serializes start/delete."
-msgstr "在特权 RAM 中清零初始化。TCB 包含真实端口的上下文和系统调用栈，用户不可访问。由一个特权生命周期所有者串行执行 start/delete。"
 
 msgid "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
 msgstr "入口必须是显式用户代码，且不得返回。栈和上下文数据保持被借用，直到所有者删除；区域不得包含内核 RAM、代码或 MMIO。上下文必须完整位于用户栈、用户 Flash 或已映射数据内。名称必须在可读的链接器保留区域内、在 configMAX_TASK_NAME_LEN 长度内终止；名称在冷路径复制。"
@@ -879,9 +864,6 @@ msgstr "仅限调度器正在运行的 Thread。边界两侧不传递句柄或�
 
 msgid "[in] Relative kernel ticks; zero requests rescheduling."
 msgstr "[in] 内核相对 tick 数；零表示请求重新调度。"
-
-msgid "Thread-only MPU profile service, distinct from Core time. No object, memory, I/O or privilege-changing API exists."
-msgstr "仅限 Thread 的 MPU profile 服务，与 Core 时间区分。不提供对象、内存、I/O 或改变特权的 API。"
 
 msgid "Current kernel tick count in the selected OS clock domain."
 msgstr "选定 OS 时钟域内的当前内核 tick 计数。"
@@ -1287,3 +1269,112 @@ msgstr "[in] 端口时钟域内的绝对截止时间，或 NX_DEADLINE_NEVER；�
 
 msgid "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
 msgstr "观察到谓词为 true 时返回 NX_SUCCESS，包括 TIMEOUT 后的最后一次观察；否则返回端口错误"
+
+
+msgid "[inout] Cold or live-free metadata in protected linker RAM."
+msgstr "[inout] 受保护链接器 RAM 中的冷态或已无存活任务的元数据。"
+
+msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile also rejects task epoch OVERFLOW."
+msgstr "返回 SUCCESS；或在接纳前返回 INVALID／CONTEXT／STATE／BUSY／IO。GPIO 配置还会以 OVERFLOW 拒绝任务代次溢出。"
+
+msgid "One privileged lifecycle owner stops external access first. Kernel deletion synchronously removes scheduler references. Self deletion is rejected; no hidden reaper."
+msgstr "一个特权生命周期所有者先停止外部访问。内核删除会同步移除调度器引用。拒绝自删除；不设隐藏回收任务。"
+
+msgid "The GPIO profile returns BUSY while its authority pins the task. Close and join before deletion. A closing marker prevents reopen during kernel deletion; the epoch survives."
+msgstr "GPIO 配置在其授权持有任务生命周期固定引用时返回 BUSY。删除前须先 close 和 join。closing 标记防止在内核删除期间重新打开；保留该代次。"
+
+msgid "Success, INVALID, CONTEXT, STATE or BUSY."
+msgstr "SUCCESS、INVALID、CONTEXT、STATE 或 BUSY。"
+
+msgid "Zero-initialize in privileged RAM before first start. The TCB includes the real port context and protected stack. One privileged lifecycle owner serializes start/delete."
+msgstr "首次启动前，在特权 RAM 中零初始化。TCB 包含真实端口上下文和受保护栈。一个特权生命周期所有者串行调用 start/delete。"
+
+msgid "The GPIO profile requires cold zero-initialization and keeps the task epoch across deletion; never reset that history."
+msgstr "GPIO 配置要求冷态零初始化，并在删除后保留任务代次；不得重置该历史。"
+
+msgid "freertos_mpu_gpio.h"
+msgstr "freertos_mpu_gpio.h"
+
+msgid "One protected-task scalar GPIO WRITE authority."
+msgstr "供一个受保护任务使用的标量 GPIO WRITE 授权。"
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus Team"
+
+msgid "2026-10-20"
+msgstr "2026-10-20"
+
+msgid "Open the fixed grant for its exact live protected task."
+msgstr "为精确的存活受保护任务打开固定授权。"
+
+msgid "Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK must be zero, except the selected port's bootstrap BASEPRI before scheduler start. PRIMASK is saved and restored. This operation pins task deletion until join."
+msgstr "特权 Thread；调度器正在运行或尚未启动。BASEPRI/FAULTMASK 必须为零，但调度器启动前所选端口的引导 BASEPRI 除外。保存并恢复 PRIMASK。此操作固定任务生命周期，阻止其删除，直到 join。"
+
+msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
+msgstr "SUCCESS，或 INVALID／CONTEXT／STATE／BUSY。拒绝不遗留部分固定引用。"
+
+msgid "Revoke further calls without deleting or stopping the GPIO."
+msgstr "撤销后续调用；不删除任务，也不停止 GPIO。"
+
+msgid "The same privileged lifecycle owner serializes open/close/ join and task start/delete. NMI/HardFault never access this authority. Incoming interrupt masks are preserved."
+msgstr "同一个特权生命周期所有者串行调用 open/close/join 和任务 start/delete。NMI/HardFault 不得访问此授权。保留传入的中断屏蔽状态。"
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE; preserves all pins."
+msgstr "SUCCESS、INVALID、CONTEXT 或 STATE；保留全部固定引用。"
+
+msgid "Join a closed authority before task deletion or GPIO stop."
+msgstr "在删除任务或停止 GPIO 之前，对已关闭的授权执行 join。"
+
+msgid "The single-core saved-mask boundary excludes every active scalar effect. Join detaches its task pin before returning; it does not delete the task or reset its lifetime epoch."
+msgstr "单核上保存中断屏蔽状态的边界排除所有正在执行的标量效果。join 返回前解除其任务固定引用；不删除任务，也不重置其生命周期代次。"
+
+msgid "SUCCESS detaches the pin; INVALID/CONTEXT/STATE retain it."
+msgstr "SUCCESS 解除固定引用；INVALID／CONTEXT／STATE 保留固定引用。"
+
+msgid "Variables"
+msgstr "变量"
+
+msgid "Immutable WRITE grant in privileged Flash."
+msgstr "特权 Flash 中不可变的 WRITE 授权。"
+
+msgid "port_slot addresses the readonly generated nx_binding_led pointer. The initialized exact GPIOC PC7 face, operations and provider state outlive an open authority through successful join. The sole lifecycle owner does not stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping is granted."
+msgstr "port_slot 指向只读、生成的 nx_binding_led 指针。已初始化的精确 GPIOC PC7 接口、操作表与提供者状态须在授权打开期间持续有效，直到成功 join。唯一生命周期所有者不得停止或重新配置该 GPIO。不授予 READ、翻转、指针复制或 MMIO 映射能力。"
+
+msgid "Caller-owned protected authority; zero only at cold startup."
+msgstr "调用方拥有的受保护授权；仅在冷启动时清零。"
+
+msgid "Treat all fields as private. Join detaches the captured task epoch, without resetting the bound task's epoch history. Storage remains valid for the linked binding's entire lifetime, including rejection and closed states."
+msgstr "所有字段均视为私有。join 解除所捕获任务代次的绑定，不重置绑定任务的代次历史。存储必须在所链接绑定的整个生命周期内保持有效，包括拒绝和关闭状态。"
+
+msgid "One immutable assembly binding, in privileged Flash."
+msgstr "特权 Flash 中单个不可变装配绑定。"
+
+msgid "Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are disjoint privileged RAM; grant is privileged Flash. User arguments never select these objects."
+msgstr "仅定义一个 nx_freertos_mpu_gpio_binding 符号。control 和 task 位于互不重叠的特权 RAM 中；grant 位于特权 Flash 中。用户参数从不选择这些对象。"
+
+msgid "Keep the task epoch after deletion. Initialize only at cold startup."
+msgstr "删除后保留任务代次。仅在冷启动时初始化。"
+
+msgid "Explicit zero-initialized user storage in its reserved RAM span."
+msgstr "在预留 RAM 区间中显式定义、零初始化的用户存储。"
+
+msgid "Thread-only MPU profile service, distinct from Core time. No object handle or pointer crosses this service."
+msgstr "仅限 Thread 的 MPU 配置服务，与 Core 时间不同。此服务不跨边界传递对象句柄或指针。"
+
+msgid "Write the current protected task's one static GPIO grant."
+msgstr "通过当前受保护任务的一个静态 GPIO 授权执行写入。"
+
+msgid "Thread only with a running scheduler. Unknown identifiers and out-of-grant bits return PERMISSION; overlapping or zero masks return INVALID. No user MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A closed or stale task incarnation performs no GPIO write."
+msgstr "仅限 Thread，且调度器正在运行。未知标识符和授权外的位返回 PERMISSION；掩码重叠或两者均为零时返回 INVALID。不引入用户 MMIO 映射、READ、翻转、OS 等待、堆分配或指针借用。已关闭或陈旧的任务代次不产生 GPIO 写入。"
+
+msgid "[in] Exact assembly-local grant identifier, no pointer."
+msgstr "[in] 精确的装配内授权标识符，不是指针。"
+
+msgid "[in] Granted bits to set, disjoint from reset_mask."
+msgstr "[in] 获授权可置位的位，与 reset_mask 不重叠。"
+
+msgid "[in] Granted bits to reset."
+msgstr "[in] 获授权可复位的位。"
+
+msgid "Scalar SUCCESS or INVALID/PERMISSION/STATE/CONTEXT."
+msgstr "标量 SUCCESS，或 INVALID／PERMISSION／STATE／CONTEXT。"

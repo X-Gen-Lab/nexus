@@ -1,0 +1,43 @@
+// FIG-30: exact finite role; solid order/branches, dashed retained responsibility.
+// Basis: f407_i2s2_slave_tx.h, i2s2_slave_tx.c and selected F407 System lifecycle.
+digraph f407I2s2SlaveTx {
+  graph [label="FIG-30 reference: finite F407 I2S2 slave TX\nExternal CK/WS; normal DMA; one complete stereo16 block\nSolid: required order or named branch. Dashed: retained responsibility / retry.\nChip capability only; no PCB, electrical or physical HIL qualification.",
+    rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+    bgcolor="white", pad=0.25, nodesep=0.40, ranksep=0.45, splines=polyline];
+  node [shape=box, style="rounded,filled", color="#475569",
+    fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12,
+    margin="0.14,0.10"];
+  edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+    fontsize=10, arrowsize=0.75];
+  platform [label="Cold-reset Platform: no foreign running masters\nOwn live TIM2 epoch and shared GPIOB / DMA1 gates\nTransmitter requires shared gates already on", fillcolor="#eff6ff", group="main"];
+  owner [label="Initialize one privileged task-owned transmitter\nOwn SPI2 gate / personality, PB12 / PB13 / PB15 and vectors\nCaller holds CK LOW / WS HIGH through ACTIVE", fillcolor="#eff6ff", group="main"];
+  queued [label="ACCEPTED / QUEUED: borrow request + original whole frame\nPublish before request-path read-clear SR or DMA prefetch\nSubmission success alone does not authorize CK", fillcolor="#eff6ff", group="main"];
+  active [label="DMA EN → TXDMAEN → I2SE readback\nNDTR = N - 1 / TXE = 0; at least 3 live TIM2 ticks\nAcquire-observed ACTIVE alone authorizes the master", fillcolor="#ecfdf5", group="main"];
+  count [label="Normal master: clock declared complete stereo frames\nStop before a missing next word; restart left\nTCIF + NDTR0 proves memory count only", fillcolor="#ecfdf5", group="main"];
+  disable [label="DRAINING: first error remains sticky; deadline still applies\nTXDMAEN0 + DMA EN0, each read back\nSoftware disable may set TCIF with NDTR still nonzero", fillcolor="#f0fdf4", group="main"];
+  wire [label="If I2SE was attempted: TXE1, then fresh BSY0\nOnly then clear I2SE with readback; retain quiet proof\nNo enable attempt: serializer proof is unnecessary", fillcolor="#f0fdf4", group="main"];
+  detach [label="Withdraw stream addresses / count / flags and both vectors\nJoin memory, wire and reference withdrawal proofs", fillcolor="#f0fdf4", group="main"];
+  settled [label="Detach owner references; release original whole-frame loan\nFinal release-publish SETTLED: success whole block, error 0 B", fillcolor="#dcfce7", group="main"];
+  stopped [label="Acquire-observe SETTLED; join external observers\nTransmitter stop returns pads / SPI2, preserves shared gates\nAll shared users join before Platform stop ends epoch / gates", fillcolor="#dcfce7", group="main"];
+  held [label="QUARANTINED: every loan and control stays live\nQuiet CK after prefill cannot empty DR\nCoordinated drain clocks may underrun / produce invalid audio", fillcolor="#fff7ed", group="side"];
+  lost [label="Observed reset / gate / profile / time-history loss\nPermanent QUARANTINED for this instance\nRestored registers do not prove prior final access", fillcolor="#fef2f2", group="side"];
+  platform -> owner [label="successful Platform start", weight=20];
+  owner -> queued [label="validated submission", weight=20];
+  queued -> active [label="bounded synchronous arm", weight=20];
+  active -> count [label="external master starts CK", weight=20];
+  count -> disable [label="TCIF + NDTR0, or cancel / deadline / error", weight=20];
+  queued -> disable [label="accepted setup failure / cancel", constraint=false, tailport=w, headport=w];
+  active -> disable [label="cancel / deadline / error", constraint=false, tailport=w, headport=w];
+  disable -> wire [label="engine withdrawal proved", weight=20];
+  wire -> detach [label="required serializer proof retained", weight=20];
+  detach -> settled [label="final-access proof complete", weight=20];
+  settled -> stopped [label="acquire observes SETTLED", weight=20];
+  wire -> held [label="wire proof missing", style=dashed, constraint=false];
+  disable -> held [label="any withdrawal proof missing", style=dashed, constraint=false];
+  detach -> held [label="address / vector proof missing", style=dashed, constraint=false];
+  held -> disable [label="bounded retry; history still known\nresume already-proved cleanup stages", style=dashed, constraint=false];
+  active -> lost [label="history lost at any borrowed phase", style=dashed, constraint=false];
+  held -> lost [label="history loss observed", style=dashed, weight=10];
+  { rank=same; wire; held; }
+  { rank=same; stopped; lost; }
+}

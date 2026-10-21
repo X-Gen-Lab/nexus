@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 8b6375ce9f8f568b5e9a0232988f8ec4f6e122f4cb51fc747718ea65c2431b87\n"
+"X-Nexus-Source-SHA256: b0cf3778ab81c7bb99ae5880f294ae46a5a7e95e4f97c1fe53b7d55dfda840b3\n"
 
 msgid "精确支持范围"
 msgstr "精确支持范围"
@@ -838,40 +838,6 @@ msgstr ""
 "或多段传输。精确约束见 [H743 provider 合同](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md)。"
 
-#: ../../nexus-quality-20261019/docs/delivery/support.md:0
-msgid ""
-"PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-"
-"bank 替换时限与显式 loss/stop；新增 DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache "
-"on 要求独占完整 32-byte lines；无其他 DMA 引擎或运行状态接管；Flash 仅 Cache off；软件资格按精确源码独立记录"
-msgstr ""
-"PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-"
-"bank 替换时限与显式 loss/stop；新增 DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache "
-"on 要求独占完整 32-byte lines；无其他 DMA 引擎或运行状态接管；Flash 仅 Cache off；软件资格按精确源码独立记录"
-
-#: ../../nexus-quality-20261019/docs/delivery/support.md:0
-msgid ""
-"Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 "
-"MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；USART1 另可显式选择有限 GPDMA TX、有限硬件链 TX "
-"或有界 FIFO IRQ bytes；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1、物理 Flash 和无引脚 "
-"LPTIM2 RUN 单次计数；基础装配为裸机／FreeRTOS，新增模式按各自精确配置验收"
-msgstr ""
-"Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 "
-"MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；USART1 另可显式选择有限 GPDMA TX、有限硬件链 TX "
-"或有界 FIFO IRQ bytes；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1、物理 Flash 和无引脚 "
-"LPTIM2 RUN 单次计数；基础装配为裸机／FreeRTOS，新增模式按各自精确配置验收"
-
-#: ../../nexus-quality-20261019/docs/delivery/support.md:0
-msgid ""
-"PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 "
-"VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 "
-"SG／循环链；LPTIM2 仅裸机 RUN；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 "
-"RAM 放置"
-msgstr ""
-"PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 "
-"VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 "
-"SG／循环链；LPTIM2 仅裸机 RUN；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 "
-"RAM 放置"
-
 #: ../../nexus-quality-20261019/docs/delivery/support.md:132
 msgid ""
 "H743 USART3 的 `dma-tx` 使用 DMA1 Stream0、DMAMUX1 channel0/request46，RX 保持 IRQ "
@@ -954,20 +920,6 @@ msgstr ""
 "借用，直到真实排空；不覆盖旧块或自动重臂。IDLE 结束本次 producer 并发布已排空的 prefix，调用者须显式重新初始化 stream 再 "
 "start。TX 仍为独立有限 IRQ，不构成 DMA duplex；开发模型与链接不代表连续无损吞吐、时限或 HIL 资格。"
 
-
-msgid ""
-"Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM "
-"LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX "
-"DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 "
-"Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA、USART3 连续双缓冲 "
-"RX，以及显式有限 TX DMA／连续 RX 双向模式（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考"
-msgstr ""
-"Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM "
-"LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX "
-"DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 "
-"Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA、USART3 连续双缓冲 "
-"RX，以及显式有限 TX DMA／连续 RX 双向模式（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考"
-
 msgid ""
 "另选 `dma-duplex-continuous` 才在上述精确 V／HSI64／裸机／AXI 参考中增加有限 TX DMA，使用 DMA1 "
 "Stream0/request46；RX 仍使用 Stream1/request45。三路向量 分别承担 TX DMA、RX DMA 与 "
@@ -1005,3 +957,19 @@ msgstr ""
 "linked ELF 测量，不能推导零生命周期开销。RTS/CTS 并不代替 容量和排空合同；RS485 的 DE 引脚、极性及 "
 "setup/hold 时间由外部工程明确提供， 到达真实 UART TC 后才开始 hold 并撤销 DE。详见 [UART DMA 与 "
 "RS485](../design/uart-dma-rs485.md)。"
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA、USART3 连续双缓冲 RX，以及显式有限 TX DMA／连续 RX 双向模式（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考；可选独立 V／D-Cache off／AXI RGB565 DMA2D 组件"
+msgstr "Cortex-M7F；2 MiB Flash；AXI SRAM 512 KiB，可显式选入并初始化 D2 SRAM1；pre-RAM LDO、HSI32／HSI64 × Cache off/on、TIM2、GPIO、USART3 IRQ／有限 TX DMA／有限 RX DMA-IDLE；独立软件夹具增加 SPI4、I2C1、ADC1、TIM3 CH1、EXTI0/1、IWDG1 与物理 Flash；基础装配为裸机／FreeRTOS；另有 V 修订 HSI64 裸机 SPI4 有限 DMA、USART3 连续双缓冲 RX，以及显式有限 TX DMA／连续 RX 双向模式（均 Cache off/on），以及 PLL384／Cache off 裸机时钟参考；可选独立 V／D-Cache off／AXI RGB565 DMA2D 组件"
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-bank 替换时限与显式 loss/stop；新增 UART/SPI DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache on 要求独占完整 32-byte lines；无其他已选 DMA 引擎或运行状态接管；DMA2D 无 TOML/factory 路由；Flash 仅 Cache off；软件资格按精确源码独立记录"
+msgstr "PCB／供电／硅片 revision／Cache 一致性未观察；有限 RX 有 service/rearm 间隙，连续 RX 有界 inactive-bank 替换时限与显式 loss/stop；新增 UART/SPI DMA 模式只接纳所选 AXI SRAM，不接纳 PLL384 或 FreeRTOS；Cache on 要求独占完整 32-byte lines；无其他已选 DMA 引擎或运行状态接管；DMA2D 无 TOML/factory 路由；Flash 仅 Cache off；软件资格按精确源码独立记录"
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；USART1 另可显式选择有限 GPDMA TX、有限硬件链 TX 或有界 FIFO IRQ bytes；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1、物理 Flash、无引脚 LPTIM2 RUN 单次计数及预备 LSE RTC AlarmA RUN 轮询；基础装配为裸机／FreeRTOS，新增模式按各自精确配置验收"
+msgstr "Cortex-M33F；2 MiB Flash；SRAM1 192 KiB；外部预先确认 TZEN=0／SWAP_BANK=0，MSIS4 MHz、TIM2；GPIOA..H、USART1/2 IRQ bytes、IWDG；USART1 另可显式选择有限 GPDMA TX、有限硬件链 TX 或有界 FIFO IRQ bytes；独立软件夹具增加 SPI1、I2C1、ADC4、TIM3 CH1、EXTI0/1、物理 Flash、无引脚 LPTIM2 RUN 单次计数及预备 LSE RTC AlarmA RUN 轮询；基础装配为裸机／FreeRTOS，新增模式按各自精确配置验收"
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 SG／循环链；LPTIM2/RTC 仅裸机 RUN；RTC backup domain 由外部 boot owner 预备；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 RAM 放置"
+msgstr "PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 SG／循环链；LPTIM2/RTC 仅裸机 RUN；RTC backup domain 由外部 boot owner 预备；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 RAM 放置"

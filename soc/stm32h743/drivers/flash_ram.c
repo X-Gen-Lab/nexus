@@ -53,11 +53,14 @@
 NX_H743_RAM _Noreturn void
 nx_stm32h743_flash_ram_terminal(nx_stm32h743_flash_ram_workspace_t* execution,
                                 nx_stm32h743_flash_ram_fault_t reason) {
+    NX_H743_RAM_BIND(execution);
     execution->fault = reason;
-    execution->fault_status = NX_H743_READ(&execution->port->registers->SR1) |
-                              NX_H743_READ(&execution->port->registers->SR2);
+    execution->fault_status = NX_H743_READ(&NX_H743_RAM_FLASH(execution)->SR1) |
+                              NX_H743_READ(&NX_H743_RAM_FLASH(execution)->SR2);
     execution->active = true;
+#if defined(NX_H743_MODEL)
     execution->port->active = true;
+#endif
     NX_H743_FLASH_RAM_BARRIER();
     NX_H743_FLASH_RAM_MODEL_TERMINAL(execution);
     for (;;) {
@@ -67,14 +70,15 @@ nx_stm32h743_flash_ram_terminal(nx_stm32h743_flash_ram_workspace_t* execution,
 /** \brief A single acknowledged UIF supplies at most one overflow epoch. */
 static NX_H743_RAM void
 observe_time(nx_stm32h743_flash_ram_workspace_t* execution) {
-    nx_stm32h743_system_t* system = execution->system;
-    if ((NX_H743_READ(&system->timer->SR) & TIM_SR_UIF) == 0U)
+    NX_H743_RAM_BIND(execution);
+    nx_stm32h743_system_t* system = NX_H743_RAM_SYSTEM(execution);
+    if ((NX_H743_READ(&NX_H743_RAM_TIMER(execution)->SR) & TIM_SR_UIF) == 0U)
         return;
     /* TIM2 SR is W0C. Ones leave every unowned flag unchanged. Counting
      * follows readback, so a refused acknowledgement never counts twice. */
-    NX_H743_WRITE(&system->timer->SR, ~(uint32_t)TIM_SR_UIF);
+    NX_H743_WRITE(&NX_H743_RAM_TIMER(execution)->SR, ~(uint32_t)TIM_SR_UIF);
     NX_H743_FLASH_RAM_BARRIER();
-    if ((NX_H743_READ(&system->timer->SR) & TIM_SR_UIF) != 0U) {
+    if ((NX_H743_READ(&NX_H743_RAM_TIMER(execution)->SR) & TIM_SR_UIF) != 0U) {
         system->started = false;
         system->timer_error = NX_ERROR_IO;
         nx_stm32h743_flash_ram_terminal(execution,
@@ -91,31 +95,35 @@ observe_time(nx_stm32h743_flash_ram_workspace_t* execution) {
 
 NX_H743_RAM nx_time_us_t
 nx_stm32h743_flash_ram_time(nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     uint32_t count;
     do {
         observe_time(execution);
-        count = NX_H743_READ(&execution->system->timer->CNT);
+        count = NX_H743_READ(&NX_H743_RAM_TIMER(execution)->CNT);
         /* A wrap between acknowledgement and CNT must not mix an old epoch
          * with a new low word. Consume that wrap before retrying. */
-    } while ((NX_H743_READ(&execution->system->timer->SR) & TIM_SR_UIF) != 0U);
-    return execution->system->overflow_us + count;
+    } while ((NX_H743_READ(&NX_H743_RAM_TIMER(execution)->SR) & TIM_SR_UIF) !=
+             0U);
+    return NX_H743_RAM_SYSTEM(execution)->overflow_us + count;
 }
 
 /** \brief Both banks must be quiet before the RAM frame may return. */
 static NX_H743_RAM bool
 busy(const nx_stm32h743_flash_ram_workspace_t* execution) {
-    return ((NX_H743_READ(&execution->port->registers->SR1) |
-             NX_H743_READ(&execution->port->registers->SR2)) &
+    NX_H743_RAM_BIND(execution);
+    return ((NX_H743_READ(&NX_H743_RAM_FLASH(execution)->SR1) |
+             NX_H743_READ(&NX_H743_RAM_FLASH(execution)->SR2)) &
             NX_H743_RAM_BUSY) != 0U;
 }
 
 NX_H743_RAM bool
 nx_stm32h743_flash_ram_lock(nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     if (busy(execution))
         return false;
     volatile uint32_t* control = execution->bank == 0U
-                                     ? &execution->port->registers->CR1
-                                     : &execution->port->registers->CR2;
+                                     ? &NX_H743_RAM_FLASH(execution)->CR1
+                                     : &NX_H743_RAM_FLASH(execution)->CR2;
     const uint32_t restored = execution->saved_control | FLASH_CR_LOCK;
     NX_H743_WRITE(control, restored);
     NX_H743_FLASH_RAM_BARRIER();
@@ -124,14 +132,18 @@ nx_stm32h743_flash_ram_lock(nx_stm32h743_flash_ram_workspace_t* execution) {
 
 NX_H743_RAM nx_result_t nx_stm32h743_flash_ram_context(
     const nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     if (execution == NULL || !execution->prepared || !execution->active ||
-        execution->port == NULL || !execution->port->active ||
-        execution->system == NULL || !execution->system->started ||
-        execution->system->timer == NULL || execution->system->core == NULL ||
-        execution->port->registers == NULL || execution->bank > 1U ||
-        execution->port->poll_limit == 0U ||
+        !NX_H743_RAM_SYSTEM(execution)->started || execution->bank > 1U ||
         (execution->program && execution->destination == NULL))
         return NX_ERROR_STATE;
+#if defined(NX_H743_MODEL)
+    if (execution->port == NULL || !execution->port->active ||
+        execution->system == NULL || execution->system->timer == NULL ||
+        execution->system->core == NULL || execution->port->registers == NULL ||
+        execution->port->poll_limit == 0U)
+        return NX_ERROR_STATE;
+#endif
     if (NX_H743_FLASH_RAM_PRIMASK() != 1U ||
         (NX_H743_FLASH_RAM_CONTROL() & 3U) != 0U ||
         NX_H743_FLASH_RAM_IPSR() != 0U || NX_H743_FLASH_RAM_BASEPRI() != 0U ||
@@ -143,7 +155,7 @@ NX_H743_RAM nx_result_t nx_stm32h743_flash_ram_context(
      * The actual bridge/ELF additionally bounds every reachable C frame. */
     if (stack < first || stack - first < 224U ||
         stack - first >= sizeof(execution->stack) || stack % 8U != 0U ||
-        NX_H743_READ(&execution->system->core->VTOR) !=
+        NX_H743_READ(&NX_H743_RAM_CORE(execution)->VTOR) !=
             NX_H743_FLASH_RAM_VTOR(execution))
         return NX_ERROR_STATE;
     return NX_SUCCESS;
@@ -152,8 +164,9 @@ NX_H743_RAM nx_result_t nx_stm32h743_flash_ram_context(
 /** \brief Prepare controls without consuming a physical programming pulse. */
 static NX_H743_RAM nx_result_t
 arm(nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     observe_time(execution);
-    FLASH_TypeDef* flash = execution->port->registers;
+    FLASH_TypeDef* flash = NX_H743_RAM_FLASH(execution);
     volatile uint32_t* control =
         execution->bank == 0U ? &flash->CR1 : &flash->CR2;
     volatile uint32_t* status =
@@ -187,14 +200,24 @@ arm(nx_stm32h743_flash_ram_workspace_t* execution) {
 
 /** \brief Both RAM drain policies use the same eight stores or erase START. */
 static NX_H743_RAM void issue(nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     if (execution->program) {
-        for (unsigned word = 0U; word < 8U; ++word)
-            NX_H743_FLASH_WRITE32(execution->destination + word,
-                                  execution->words[word]);
+#if defined(NX_H743_MODEL)
+        NX_H743_FLASH_WRITE32(execution->destination + 0U, execution->words[0]);
+        NX_H743_FLASH_WRITE32(execution->destination + 1U, execution->words[1]);
+        NX_H743_FLASH_WRITE32(execution->destination + 2U, execution->words[2]);
+        NX_H743_FLASH_WRITE32(execution->destination + 3U, execution->words[3]);
+        NX_H743_FLASH_WRITE32(execution->destination + 4U, execution->words[4]);
+        NX_H743_FLASH_WRITE32(execution->destination + 5U, execution->words[5]);
+        NX_H743_FLASH_WRITE32(execution->destination + 6U, execution->words[6]);
+        NX_H743_FLASH_WRITE32(execution->destination + 7U, execution->words[7]);
+#else
+        nx_stm32h743_flash_ram_program_words();
+#endif
     } else {
         volatile uint32_t* control = execution->bank == 0U
-                                         ? &execution->port->registers->CR1
-                                         : &execution->port->registers->CR2;
+                                         ? &NX_H743_RAM_FLASH(execution)->CR1
+                                         : &NX_H743_RAM_FLASH(execution)->CR2;
         /* START may self-clear. Only drained status and fresh EOP establish
          * completion, rather than an assumption that START remains set. */
         NX_H743_WRITE(control, execution->configuration | FLASH_CR_START);
@@ -204,9 +227,10 @@ static NX_H743_RAM void issue(nx_stm32h743_flash_ram_workspace_t* execution) {
 
 static NX_H743_RAM nx_result_t
 completion(const nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     volatile uint32_t* status = execution->bank == 0U
-                                    ? &execution->port->registers->SR1
-                                    : &execution->port->registers->SR2;
+                                    ? &NX_H743_RAM_FLASH(execution)->SR1
+                                    : &NX_H743_RAM_FLASH(execution)->SR2;
     const uint32_t observed = NX_H743_READ(status);
     return (observed & NX_H743_RAM_ERRORS) == 0U &&
                    (observed & FLASH_SR_EOP) != 0U
@@ -214,8 +238,10 @@ completion(const nx_stm32h743_flash_ram_workspace_t* execution) {
                : NX_ERROR_IO;
 }
 
+#if defined(NX_H743_MODEL)
 NX_H743_RAM nx_result_t
 nx_stm32h743_flash_ram_pulse(nx_stm32h743_flash_ram_workspace_t* execution) {
+    NX_H743_RAM_BIND(execution);
     nx_result_t result = nx_stm32h743_flash_ram_context(execution);
     if (result != NX_SUCCESS)
         return result;
@@ -242,13 +268,19 @@ nx_stm32h743_flash_ram_pulse(nx_stm32h743_flash_ram_workspace_t* execution) {
     return result;
 }
 
+#endif
+
 NX_H743_RAM nx_stm32h743_flash_ram_pulse_outcome_t
 nx_stm32h743_flash_ram_pulse_until_idle(
     nx_stm32h743_flash_ram_workspace_t* execution, nx_time_us_t deadline,
     bool* timed_out) {
+    NX_H743_RAM_BIND(execution);
     if (busy(execution))
         nx_stm32h743_flash_ram_terminal(execution,
                                         NX_H743_FLASH_RAM_FAULT_DRAIN);
+#if !defined(NX_H743_MODEL)
+    timed_out = &g_nx_stm32h743_flash_ram_workspace.guard.timed_out;
+#endif
     *timed_out = nx_stm32h743_flash_ram_time(execution) >= deadline;
     nx_result_t result = NX_SUCCESS;
     if (!*timed_out) {

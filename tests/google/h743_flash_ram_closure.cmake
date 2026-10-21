@@ -50,3 +50,23 @@ target_compile_options(nexus_h743_flash_ram_generated_test PRIVATE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_ram_high_model.h")
 target_link_options(nexus_h743_flash_ram_generated_test PRIVATE
     "-Wl,--wrap=nx_stm32h743_flash_ram_initialize")
+
+# Exact selected-object constructor boundary; hardware ports remain external.
+nexus_google_test(nexus_h743_flash_fixed_storage_test
+    SOURCES h743_flash_fixed_storage_test.cpp h743_flash_ram_closure_model.cpp
+        h743_flash_mpu_model.cpp h743_flash_ram_observer.cpp
+        h743_model.cpp h743_flash_image_model.cpp
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
+        ${h743_flash_ram_production_sources}
+    LIBRARIES Nexus::IO Nexus::Arch
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+target_include_directories(nexus_h743_flash_fixed_storage_test SYSTEM PRIVATE
+    "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
+    "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+target_compile_definitions(nexus_h743_flash_fixed_storage_test PRIVATE
+    STM32H743xx NX_H743_FLASH_RAM_FIXED_STORAGE=1)
+target_compile_options(nexus_h743_flash_fixed_storage_test PRIVATE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_mpu_model.h"
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h")

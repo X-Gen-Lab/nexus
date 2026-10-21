@@ -21,7 +21,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v5"
+CONSUMER_POLICY = "nexus-sdk-consumers-v10"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -94,6 +94,9 @@ SELECTED_CONSUMERS = (
     ("u575 uart chain",
      "tools/configure/assemblies/u575-uart-chain.toml",
      "u575-uart-gpdma"),
+    ("u575 rtc run",
+     "tools/configure/assemblies/u575-rtc-run.toml",
+     "u575-rtc"),
     ("u575 lptim run",
      "tools/configure/assemblies/u575-lptim-run.toml",
      "u575-lptim"),
@@ -118,6 +121,24 @@ SELECTED_CONSUMERS = (
     ("g474 pin states",
      "tools/configure/assemblies/g474-pin-states.toml",
      "pin-states"),
+    ("u575 retained time",
+     "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml",
+     "u575-retained-time"),
+    ("u575 stop2",
+     "tools/configure/assemblies/nucleo-u575-baremetal-empty.toml",
+     "u575-stop2"),
+    ("u575 lpdma copy",
+     "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
+     "u575-lpdma-copy"),
+    ("u575 lptim1 lpbam",
+     "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
+     "u575-lptim1-lpbam"),
+    ("u575 mpu gpio",
+     "tools/configure/assemblies/u575-mpu-gpio-write.toml",
+     "u575-mpu-gpio"),
+    ("f407 i2s2 slave tx",
+     "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
+     "f407-i2s2-slave-tx"),
 )
 
 def consumer_layout():

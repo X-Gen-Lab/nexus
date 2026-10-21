@@ -22,11 +22,15 @@ typedef enum {
 /**
  * \brief Selected physical-controller workspace; cold owner derives every
  *        binding and command field before the bridge can enter this pod.
- * \note The generated instance requires 1024-byte alignment for VTOR. The
- *       dedicated stack closes Thread MSP/PSP and exception stacking without
- *       trusting an arbitrary application stack extent. sizeof is not an
- *       actual linked RAM-cost claim. No instance exists without Flash.
- *       Its private state cannot serve as a caller-authored execution proof.
+ * \note The generated instance requires 1024-byte alignment for VTOR.
+ *       Its dedicated stack owns the busy interval. Incoming MSP and active
+ *       Thread stacks each own 260 readable/writable bytes below entry SP:
+ *       36 bytes of saves plus 224 for nested extended exception frames and
+ *       alignment. These reserves apply before and after the private stack.
+ *       The caller supplies this ownership. The private-stack ELF bound
+ *       cannot establish arbitrary incoming stack ownership. sizeof is not
+ *       a linked RAM-cost claim. No instance exists without Flash. Private
+ *       state cannot serve as caller-authored execution proof.
  */
 struct nx_stm32h743_flash_ram_workspace {
     uint32_t vectors[NX_H743_FLASH_RAM_VECTOR_WORDS];
@@ -64,12 +68,59 @@ _Static_assert(
         (size_t)NX_H743_FLASH_RAM_STACK_TOP_BYTES,
     "RAM bridge stack prefix differs from C layout");
 #endif
+/* The selected physical pod uses the existing generated object and fixed
+ * CMSIS register identities. Host ports map only CPU/MMIO observations. */
+extern nx_stm32h743_flash_ram_workspace_t g_nx_stm32h743_flash_ram_workspace;
+#if defined(NX_H743_MODEL)
+#define NX_H743_RAM_BIND(execution)   ((void)(execution))
+#define NX_H743_RAM_FLASH(execution)  ((execution)->port->registers)
+#define NX_H743_RAM_SYSTEM(execution) ((execution)->system)
+#define NX_H743_RAM_TIMER(execution)  ((execution)->system->timer)
+#define NX_H743_RAM_CORE(execution)   ((execution)->system->core)
+#define NX_H743_RAM_GUARD(guard)      ((void)(guard))
+#define NX_H743_RAM_MPU(registers)    ((void)(registers))
+#else
+#define NX_H743_RAM_BIND(execution)                                            \
+    ((execution) = &g_nx_stm32h743_flash_ram_workspace, (void)(execution))
+#define NX_H743_RAM_FLASH(execution)  FLASH
+#define NX_H743_RAM_SYSTEM(execution) (&g_nx_stm32h743_system)
+#define NX_H743_RAM_TIMER(execution)  TIM2
+#define NX_H743_RAM_CORE(execution)   SCB
+#define NX_H743_RAM_GUARD(guard)                                               \
+    ((guard) = &g_nx_stm32h743_flash_ram_workspace.guard)
+#define NX_H743_RAM_MPU(registers) ((registers) = MPU)
+#define NX_H743_RAM_OFFSET(member, expected)                                   \
+    _Static_assert(offsetof(nx_stm32h743_flash_ram_workspace_t, member) ==     \
+                       (expected),                                             \
+                   "RAM assembly field offset differs")
+NX_H743_RAM_OFFSET(destination, NX_H743_RAM_DESTINATION_OFFSET);
+NX_H743_RAM_OFFSET(words, NX_H743_RAM_WORDS_OFFSET);
+NX_H743_RAM_OFFSET(saved_control, NX_H743_RAM_SAVED_CR_OFFSET);
+NX_H743_RAM_OFFSET(bank, NX_H743_RAM_BANK_OFFSET);
+NX_H743_RAM_OFFSET(fault, NX_H743_RAM_FAULT_OFFSET);
+_Static_assert(offsetof(nx_stm32h743_flash_ram_workspace_t, guard) +
+                       offsetof(nx_stm32h743_flash_mpu_state_t,
+                                remaining_effects) ==
+                   NX_H743_RAM_GUARD_EFFECT_OFFSET,
+               "RAM assembly guard offset differs");
+#undef NX_H743_RAM_OFFSET
+_Static_assert(sizeof(nx_stm32h743_system_t) == 48U &&
+                   offsetof(nx_stm32h743_system_t, overflow_us) == 24U &&
+                   offsetof(nx_stm32h743_system_t, timer_error) == 44U &&
+                   offsetof(nx_stm32h743_system_t, started) == 45U,
+               "RAM System epoch ABI differs");
+_Static_assert(FLASH_R_BASE == UINT32_C(0x52002000), "H743 Flash MMIO");
+_Static_assert(TIM2_BASE == UINT32_C(0x40000000), "H743 TIM2 MMIO");
+_Static_assert(SCB_BASE == UINT32_C(0xe000ed00), "M7 SCB MMIO");
+_Static_assert(MPU_BASE == UINT32_C(0xe000ed90), "M7 MPU MMIO");
+#endif
 /**
  * \brief Copy the exact linked pod and prepare its private exception vectors.
  * \param[in,out] port: Exclusive cold physical controller, with no active
  *        command. The generated Platform owns the physical lease.
- * \param[in,out] execution: Zeroed, 1024-aligned selected AXI workspace, fully
- *        disjoint from controller, System, MMIO and linked execution images.
+ * \param[in,out] execution: The exact existing generated workspace, zeroed
+ *        and 1024-aligned, fully disjoint from controller, System, MMIO and
+ *        linked execution images. Foreign storage rejects before effects.
  * \return SUCCESS only after copy readback and default NMI/HardFault alias
  *         admission; otherwise error without published execution or VTOR.
  * \note Privileged unmasked Thread, Cache-off, no live lazy-FP frame and no
@@ -138,40 +189,55 @@ void nx_stm32h743_flash_ram_terminal(
  *         to a RAM caller which must retain protection and terminate there.
  * \note Expiry suppresses a not-yet-issued trigger or latches a late pulse;
  *       it never aborts physical drain. poll_limit cannot end this loop.
- *       No function pointer, hidden mode flag or workspace-global lookup.
+ *       No function pointer or hidden mode flag. Physical RAM code names the
+ *       fixed generated workspace and official MMIO identities directly.
  */
 nx_stm32h743_flash_ram_pulse_outcome_t nx_stm32h743_flash_ram_pulse_until_idle(
     nx_stm32h743_flash_ram_workspace_t* execution, nx_time_us_t deadline,
     bool* timed_out);
 /**
- * \brief Close the RAM transaction before allowing its CPU bridge to return.
- * \param[in,out] execution: Exact active command on the retained private MSP.
- * \param[in] original: Incoming VTOR captured before RAM vector publication.
- * \param[in] result: Transaction outcome preserved after successful cleanup.
- * \return The supplied result only after both banks are idle, guard effects
- *         are zero, target LOCK is proved and original VTOR is read back.
- * \note The caller retains masks, stack, workspace and controller ownership.
- *       An unproved condition stays in the existing nonreturning RAM terminal
- *       path. This private boundary does not release the command or CPU state.
+ * \brief Assembly-only final hardware boundary after the C transaction.
+ * \param[in] result: Settled or rejected C outcome in r0, preserved on success.
+ * \return The result only after observed both-bank drain, exact target control
+ *         plus LOCK, zero guard effects, restored MPU control/region/selector,
+ *         and linker-known g_pfnVectors publication/readback with barriers.
+ * \note Private non-C ABI: the bridge supplies r8-r11 containing independently
+ *       captured CTRL, RNR and region15 masked RBAR/RASR. Actual selected C
+ *       must never write these registers; the ELF gate checks that restriction.
+ *       Failure tail-branches to the nonreturning RAM terminal. The caller
+ *       retains PRIMASK, private MSP and both command/physical ownership.
+ *       The host CPU/MMIO model uses the separate ordinary C signature below;
+ *       it does not emulate the assembly register-capture proof.
  */
+#if defined(NX_H743_MODEL)
 nx_result_t
 nx_stm32h743_flash_ram_return(nx_stm32h743_flash_ram_workspace_t* execution,
                               uint32_t original, nx_result_t result);
+#else
+nx_result_t nx_stm32h743_flash_ram_return(nx_result_t result);
+#endif
 /**
  * \brief Run the fully protected transaction after the real MSP bridge.
  * \param[in,out] execution: Exact prepared command with a finite absolute
  *        deadline. The bridge already owns private MSP and PRIMASK.
- * \return Only after both banks drain, LOCK, protection and VTOR restoration.
+ * \return To the private assembly caller after drain, LOCK and MPU cleanup;
+ *         RAM VTOR remains installed for its independent final hardware gate.
  * \note Any unproved post-trigger return condition remains in RAM forever;
  *       no Flash observer, callback, string or application recovery policy.
  */
 nx_result_t nx_stm32h743_flash_ram_transaction(
     nx_stm32h743_flash_ram_workspace_t* execution);
-/** \brief Real selected assembly bridge; model supplies only CPU register I/O.
+/** \brief Exact eight-read/eight-store assembly flashword pulse. */
+void nx_stm32h743_flash_ram_program_words(void);
+/** \brief Selected assembly bridge; model supplies only CPU register I/O.
+ * \note Privileged exclusive Thread and 260-byte incoming MSP/active-stack
+ *       ownership reserves are mandatory. The bridge preserves distinct
+ *       MSP/PSP, CONTROL/FPCA, PRIMASK and callee-saved registers. Its C
+ *       callees obey the admitted compiler AAPCS and private-frame contract.
  */
 nx_result_t
 nx_stm32h743_flash_ram_enter(nx_stm32h743_flash_ram_workspace_t* execution);
-/** \brief RAM exception entries retain the exact VTOR-backed workspace. */
+/** \brief RAM exception entries name the fixed generated workspace. */
 void nx_stm32h743_flash_ram_nmi(void);
 void nx_stm32h743_flash_ram_hardfault(void);
 /**

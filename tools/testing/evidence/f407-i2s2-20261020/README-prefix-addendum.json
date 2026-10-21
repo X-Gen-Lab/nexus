@@ -1,0 +1,16 @@
+{
+  "source_bound_prefix_sha256": "84764e76aaf64b962e082448ec282ea6f143692e535c577799b0a4dcce571e96",
+  "source_bound_prefix_bytes": 4023,
+  "prefix_unchanged": true,
+  "archived_README": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/payload/README.md",
+    "sha256": "7c6b8569e3f39ebcf14d273f8b7157a00522e086e1b25921daaa9d5c53e7394c",
+    "bytes": 7756
+  },
+  "final_repository_README": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/README.md",
+    "sha256": "b1ca9233d432bc9a70a79ab3f29061ee1b960ee0b54a2b7f0d01148625fc4a96",
+    "bytes": 8176
+  },
+  "delta": "Append-only archive index, later strict-site/MPU successor development facts, and outer archive locator. No original source/host/resource fact edited."
+}

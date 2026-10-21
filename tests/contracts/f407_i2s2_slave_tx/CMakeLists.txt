@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.31)
+project(nexus_f407_i2s2_public LANGUAGES C ASM)
+if(NOT NEXUS_SOURCE_ROOT OR NOT NEXUS_ASSEMBLY_FILE)
+    message(FATAL_ERROR "Explicit Nexus source and authored assembly are required")
+endif()
+add_subdirectory("${NEXUS_SOURCE_ROOT}" nexus)
+get_target_property(config_dir Nexus::Platform NEXUS_CONFIG_DIR)
+include("${config_dir}/selection.cmake")
+set(audio_libraries Nexus::IO)
+if(NEXUS_F407_I2S2_SLAVE_TX_SELECTED)
+    list(APPEND audio_libraries Nexus::F407I2S2SlaveTx)
+elseif(TARGET Nexus::F407I2S2SlaveTx)
+    message(FATAL_ERROR "Omitted I2S2 role must not expose its physical provider")
+endif()
+nexus_add_firmware(f407_i2s2_public
+    SOURCES "${NEXUS_SOURCE_ROOT}/cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c"
+    LIBRARIES ${audio_libraries})
+set_target_properties(f407_i2s2_public PROPERTIES
+    C_STANDARD 11 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
+nexus_target_warnings(f407_i2s2_public STRICT)

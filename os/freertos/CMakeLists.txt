@@ -46,10 +46,33 @@ if(NEXUS_OS_MEMORY_PROTECTION)
     set(mpu_prepare "${CMAKE_CURRENT_SOURCE_DIR}/mpu/prepare_port.py")
     set(mpu_output "${CMAKE_CURRENT_BINARY_DIR}/mpu-port")
     set(mpu_veneers "${port_root}/mpu_wrappers_v2_asm.c")
+    set(mpu_gpio_arguments)
+    if(NEXUS_OS_MPU_GPIO)
+        if(NOT NEXUS_SOC_FAMILY STREQUAL "stm32u575" OR
+                NOT NEXUS_FREERTOS_PORT STREQUAL "GCC/ARM_CM33_NTZ/non_secure")
+            message(FATAL_ERROR "GPIO gateway requires the selected U575 MPU port")
+        endif()
+        set(mpu_gpio_arguments --gpio-write)
+    endif()
+    # Always overwrite the derived header, including selected-to-default
+    # reconfiguration. A stale 71-slot header must never widen the default ABI.
+    set(mpu_numbers "${kernel_root}/include/mpu_syscall_numbers.h")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+        "${mpu_numbers}")
+    execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${mpu_prepare}"
+        --source "${mpu_numbers}"
+        --output "${mpu_output}/mpu_syscall_numbers.h" --numbers
+        ${mpu_gpio_arguments} RESULT_VARIABLE mpu_result
+        OUTPUT_VARIABLE mpu_stdout ERROR_VARIABLE mpu_stderr)
+    if(NOT mpu_result EQUAL 0)
+        message(FATAL_ERROR "MPU syscall number derivation rejected: "
+            "${mpu_stdout}${mpu_stderr}")
+    endif()
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
         "${mpu_prepare}" "${mpu_veneers}")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${mpu_prepare}"
         --source "${mpu_veneers}" --output "${mpu_output}/veneers.c" --veneers
+        ${mpu_gpio_arguments}
         RESULT_VARIABLE mpu_result
         OUTPUT_VARIABLE mpu_stdout ERROR_VARIABLE mpu_stderr)
     if(NOT mpu_result EQUAL 0)
@@ -61,6 +84,7 @@ if(NEXUS_OS_MEMORY_PROTECTION)
         "${port_root}/port.c")
     execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${mpu_prepare}"
         --source "${port_root}/port.c" --output "${mpu_output}/port.c"
+        ${mpu_gpio_arguments}
         RESULT_VARIABLE mpu_result
         OUTPUT_VARIABLE mpu_stdout ERROR_VARIABLE mpu_stderr)
     if(NOT mpu_result EQUAL 0)
@@ -74,7 +98,7 @@ if(NEXUS_OS_MEMORY_PROTECTION)
             "${port_root}/portasm.c")
         execute_process(COMMAND "${Python3_EXECUTABLE}" -B "${mpu_prepare}"
             --source "${port_root}/portasm.c" --output "${mpu_output}/portasm.c"
-            --assembly RESULT_VARIABLE mpu_result
+            --assembly ${mpu_gpio_arguments} RESULT_VARIABLE mpu_result
             OUTPUT_VARIABLE mpu_stdout ERROR_VARIABLE mpu_stderr)
         if(NOT mpu_result EQUAL 0)
             message(FATAL_ERROR "MPU bootstrap assembly derivation rejected: "
@@ -131,8 +155,20 @@ if(NEXUS_OS_MEMORY_PROTECTION)
         "${kernel_root}/include" "${port_root}")
     target_link_libraries(nx_freertos_mpu_syscalls PRIVATE nexus_core nexus_arch
         nexus_owned_warnings nexus_build_options)
+    target_include_directories(nx_freertos_mpu_syscalls BEFORE PRIVATE
+        "${mpu_output}")
+    target_include_directories(nx_freertos_kernel BEFORE PRIVATE
+        "${mpu_output}")
     target_sources(nexus_os_freertos INTERFACE
         $<TARGET_OBJECTS:nx_freertos_mpu_syscalls>)
+    if(NEXUS_OS_MPU_GPIO)
+        target_sources(nexus_os_freertos PRIVATE mpu/gpio.c)
+        target_include_directories(nexus_os_freertos PRIVATE
+            "${NEXUS_SOURCE_DIR}/soc/stm32u575/private")
+        target_link_libraries(nexus_os_freertos PRIVATE nexus_io
+            nexus_soc_stm32u575)
+        add_library(Nexus::U575MpuGpio ALIAS nexus_os_freertos)
+    endif()
 endif()
 # Kernel-owned callbacks must precede static archives at the consumer link.
 # Otherwise the adapter archive is scanned before tasks.c requires its hooks.

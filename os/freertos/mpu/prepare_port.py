@@ -66,8 +66,15 @@ def special_argument(text: str, name: str) -> str:
     return text.replace(old, '" mov r1, lr \\n"\n            ' + old)
 
 
-def prepare(source: Path, output: Path) -> None:
+def check_gpio_port(source: Path, gpio_write: bool) -> None:
+    """The scalar GPIO extension has one reviewed real port ABI only."""
+    if gpio_write and port_name(source) != "ARM_CM33_NTZ/non_secure":
+        raise ValueError("GPIO syscall requires exact ARM_CM33_NTZ port")
+
+
+def prepare(source: Path, output: Path, *, gpio_write: bool = False) -> None:
     """Derive complete real MPU ports with exact grants and one boot lease."""
+    check_gpio_port(source, gpio_write)
     text = checked_text(source, HASHES)
     version7 = port_name(source) in {"ARM_CM3_MPU", "ARM_CM4_MPU"}
     dispatcher = "vSVCHandler_C" if version7 else "vPortSVCHandler_C"
@@ -117,8 +124,10 @@ def prepare(source: Path, output: Path) -> None:
     output.write_text(text, encoding="utf-8")
 
 
-def prepare_assembly(source: Path, output: Path) -> None:
+def prepare_assembly(source: Path, output: Path, *,
+                     gpio_write: bool = False) -> None:
     """Preserve real v8 context assembly; attach special-SVC LR and origin."""
+    check_gpio_port(source, gpio_write)
     text = checked_text(source, ASSEMBLY_HASHES)
     text = special_argument(text, "vPortSVCHandler_C")
     text = startup_label(text)
@@ -137,8 +146,65 @@ VENEER_HASHES = {
 }
 
 
-def prepare_veneers(source: Path, output: Path) -> None:
+NUMBERS_HASH = "6701d2eac55e478e90d62ff2947b0d2c7f5157f3b344bcfec47ac80186c57816"
+
+
+def prepare_numbers(source: Path, output: Path, *,
+                    gpio_write: bool = False) -> None:
+    """Keep all pinned numbers; explicitly select one additional slot."""
+    content = source.read_bytes()
+    if hashlib.sha256(content).hexdigest() != NUMBERS_HASH:
+        raise ValueError("unreviewed or changed pinned syscall numbers")
+    text = content.decode("utf-8")
+    pattern = r"^#define (SYSTEM_CALL_\w+)\s+(\d+)\s*$"
+    original = dict(re.findall(pattern, text, re.MULTILINE))
+    if len(original) != 70 or set(map(int, original.values())) != set(range(70)):
+        raise ValueError("pinned syscall numbers no longer cover exact ABI")
+    if gpio_write:
+        text = unique_replace(
+            text,
+            "#define NUM_SYSTEM_CALLS                                   70  "
+            "/* Total number of system calls. */",
+            "#define NUM_SYSTEM_CALLS                                   71  "
+            "/* Total number of system calls. */")
+        text = unique_replace(
+            text, "#endif /* MPU_SYSCALL_NUMBERS_H */",
+            "#define SYSTEM_CALL_NexusGpioWrite                          70\n\n"
+            "#endif /* MPU_SYSCALL_NUMBERS_H */")
+        selected = dict(re.findall(pattern, text, re.MULTILINE))
+        if selected.pop("SYSTEM_CALL_NexusGpioWrite", None) != "70" or \
+                selected != original:
+            raise ValueError("GPIO extension changed an original syscall number")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(text, encoding="utf-8")
+
+
+GPIO_VENEER = '''
+/* Accepted calls return through the real port's protected exit path directly
+ * to the saved caller LR. A refused SVC returns here without entering the
+ * implementation; return CONTEXT rather than a caller-controlled r0 value. */
+nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set_mask,
+                          uint32_t reset_mask)
+    __attribute__((naked)) FREERTOS_SYSTEM_CALL;
+
+nx_result_t MPU_NexusGpioWrite(uint32_t device, uint32_t set_mask,
+                          uint32_t reset_mask) {
+    __asm volatile(
+        ".syntax unified\\n"
+        "svc %0\\n"
+        "movs r0, %1\\n"
+        "bx lr\\n"
+        :
+        : "i"(SYSTEM_CALL_NexusGpioWrite), "i"(NX_ERROR_CONTEXT)
+        : "memory");
+}
+'''
+
+
+def prepare_veneers(source: Path, output: Path, *,
+                    gpio_write: bool = False) -> None:
     """Retain the exact pinned two SVC veneer bodies, no unreviewed services."""
+    check_gpio_port(source, gpio_write)
     port = source.parent.name
     if port == "non_secure":
         port = source.parent.parent.name + "/non_secure"
@@ -147,6 +213,8 @@ def prepare_veneers(source: Path, output: Path) -> None:
         raise ValueError("unreviewed or changed pinned MPU veneers")
     text = content.decode("utf-8")
     prefix = text[:text.index("#if (")]
+    if gpio_write:
+        prefix += '#include "nexus/core/status.h"\n\n'
     retained = []
     for name in ("MPU_vTaskDelay", "MPU_xTaskGetTickCount"):
         pattern = (r"^[ \t]*(?:void|TickType_t) " + name +
@@ -157,20 +225,26 @@ def prepare_veneers(source: Path, output: Path) -> None:
         retained.append(matches[0].group())
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(prefix + "#if configENABLE_MPU == 1 && configUSE_MPU_WRAPPERS_V1 == 0\n" +
-                      "\n".join(retained) + "#endif\n", encoding="utf-8")
+                      "\n".join(retained) +
+                      (GPIO_VENEER if gpio_write else "") + "#endif\n",
+                      encoding="utf-8")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--veneers", action="store_true")
-    parser.add_argument("--assembly", action="store_true")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--veneers", action="store_true")
+    modes.add_argument("--assembly", action="store_true")
+    modes.add_argument("--numbers", action="store_true")
+    parser.add_argument("--gpio-write", action="store_true")
     arguments = parser.parse_args()
     try:
-        (prepare_veneers if arguments.veneers else
+        (prepare_numbers if arguments.numbers else
+         prepare_veneers if arguments.veneers else
          prepare_assembly if arguments.assembly else prepare)(
-            arguments.source, arguments.output)
+            arguments.source, arguments.output, gpio_write=arguments.gpio_write)
     except ValueError as error:
         parser.error(str(error))
     return 0

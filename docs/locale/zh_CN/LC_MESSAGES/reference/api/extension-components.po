@@ -1,0 +1,1386 @@
+# Exact messages independently reviewed; approval bound by companion receipt.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 56d40999d9981ce660a4cd9164d5a209973c3cacdea89d3b90523bdcd60a014f\n"
+
+msgid "Extension and lifecycle APIs"
+msgstr "扩展与生命周期 API"
+
+msgid "These public headers describe framed data, explicit owners, retained clocks and trusted mediation. Their declarations do not establish a board connection, execution mode, kernel gateway or physical qualification. Construction, memory ownership and final-access requirements remain part of each contract."
+msgstr "这些公共头文件描述成帧数据、显式所有者、保留时钟和可信代理。其声明并不证明板级连接、执行模式、内核网关或物理资格验证。构造、内存所有权及最后访问要求仍属于各自合同。"
+
+msgid "frame_stream.h"
+msgstr "frame_stream.h"
+
+msgid "Complete framed blocks and strided DMA consumer loans."
+msgstr "完整的成帧块与带步长的 DMA 消费者借用。"
+
+msgid "Author  Nexus Team"
+msgstr "作者  Nexus Team"
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "Defines"
+msgstr "宏定义"
+
+msgid "Typedefs"
+msgstr "类型定义"
+
+msgid "Immutable consumer block retained through final DMA access."
+msgstr "不可变消费者块，保留至 DMA 最后访问结束。"
+
+msgid "Zero-initialize before first acquisition. Keep this exact control live and exclusively owned until release; copied tokens never authorize earlier reuse or another instance."
+msgstr "首次获取前清零初始化。释放前必须让这个精确控制对象保持存活并由唯一所有者持有；复制的令牌从不授权提前复用或操作另一个实例。"
+
+msgid "Enums"
+msgstr "枚举"
+
+msgid "Memory representations; these values never configure a wire."
+msgstr "内存表示；这些取值从不配置总线上的传输。"
+
+msgid "Values:"
+msgstr "取值："
+
+msgid "Serial framing whose complete units determine block geometry."
+msgstr "串行成帧规则，其完整单位决定块的几何布局。"
+
+msgid "Position of useful sample bits in each stored slot container."
+msgstr "每个存储时隙容器中有效采样位的位置。"
+
+msgid "Functions"
+msgstr "函数"
+
+msgid "Compute complete audio storage without touching payload."
+msgstr "计算完整音频存储布局，不访问载荷。"
+
+msgid "Task/IRQ bounded pure calculation. No format conversion, serializer configuration or codec negotiation is performed."
+msgstr "可在任务或 IRQ 中执行的有界纯计算。不执行格式转换、串行器配置或编解码器协商。"
+
+msgid "Parameters"
+msgstr "参数"
+
+msgid "[in] Explicit framing, sample and stored slot geometry."
+msgstr "[in] 显式成帧规则、采样参数和存储时隙的几何布局。"
+
+msgid "[out] Separate fresh output, unchanged on rejection."
+msgstr "[out] 独立的新输出；拒绝时保持不变。"
+
+msgid "Returns"
+msgstr "返回值"
+
+msgid "SUCCESS, INVALID for incompatible framing or EXHAUSTED on arithmetic overflow; never retains an input or allocates."
+msgstr "成功返回 SUCCESS；成帧规则不兼容时返回 INVALID，算术溢出时返回 EXHAUSTED；从不保留输入或分配内存。"
+
+msgid "Check and copy planar/strided frame geometry."
+msgstr "检查并复制平面式或带步长的帧几何布局。"
+
+msgid "Bounded pure calculation. Pixel/color meanings remain with the selected camera/display/DMA adapter."
+msgstr "有界纯计算。像素和颜色的含义仍由所选相机、显示或 DMA 适配器负责。"
+
+msgid "[in] 1..NX_FRAME_MAX_PLANES immutable plane descriptions."
+msgstr "[in] 1..NX_FRAME_MAX_PLANES 个不可变平面描述。"
+
+msgid "[in] Exact plane count, not a runtime pool maximum."
+msgstr "[in] 精确平面数，并非运行时池的容量上限。"
+
+msgid "[out] Fresh output, unchanged on every rejection."
+msgstr "[out] 新输出；任何拒绝都保持其不变。"
+
+msgid "SUCCESS, INVALID for empty/overlapping/short-stride planes, or EXHAUSTED on byte arithmetic overflow."
+msgstr "成功返回 SUCCESS；平面为空、相互重叠或步长不足时返回 INVALID；字节数算术溢出时返回 EXHAUSTED。"
+
+msgid "Cold-bind a complete-frame layout to an existing queue."
+msgstr "在冷构造阶段将完整帧布局绑定到既有队列。"
+
+msgid "Task-only cold assembly, O(n squared) storage checks. No hardware or DMA-domain admission is inferred. Keep all queue/control/payload storage live through final stop."
+msgstr "仅供任务执行的冷构造，存储检查的复杂度为 O(n²)。不据此推断硬件或 DMA 域准入。全部队列、控制对象和载荷存储须保持存活，直至最终停止完成。"
+
+msgid "[out] Fresh control disjoint from queue and payloads."
+msgstr "[out] 新控制对象，与队列及载荷均不重叠。"
+
+msgid "[inout] Initialized unborrowed queue with all slots free."
+msgstr "[inout] 已初始化且未被借用的队列，全部时隙空闲。"
+
+msgid "[in] Checked complete-frame geometry, copied on success."
+msgstr "[in] 已检查的完整帧几何布局，成功时复制。"
+
+msgid "SUCCESS, INVALID for aliases/short buffers/bad layout, BUSY for outstanding blocks or STATE while stopping."
+msgstr "成功返回 SUCCESS；存在别名、缓冲区不足或布局无效时返回 INVALID；仍有未归还块时返回 BUSY；停止过程中返回 STATE。"
+
+msgid "Publish one complete frame after final producer access."
+msgstr "生产者最后访问结束后，发布一个完整帧。"
+
+msgid "Bounded task/IRQ metadata. Reserve/prepost/abort still use the existing stream; publication always has exact frame size."
+msgstr "可在任务或 IRQ 中执行的有界元数据操作。预留、预提交和中止仍使用既有流；发布大小始终等于精确帧大小。"
+
+msgid "[inout] Exclusive serialized producer binding."
+msgstr "[inout] 独占且串行使用的生产者绑定。"
+
+msgid "[in] Existing stream producer loan, detached from all DMA."
+msgstr "[in] 既有流的生产者借用，已从全部 DMA 脱离。"
+
+msgid "[in] Existing observed stream boundary flags."
+msgstr "[in] 已观察到的既有流边界标志。"
+
+msgid "Existing stream result; rejection retains the fill loan."
+msgstr "返回既有流的结果；拒绝时保留填充借用。"
+
+msgid "Publish one complete frame from the existing posted FIFO."
+msgstr "从既有预提交 FIFO 发布一个完整帧。"
+
+msgid "Bounded task/IRQ metadata; preserves pending and FIFO counts."
+msgstr "可在任务或 IRQ 中执行的有界元数据操作；保留待处理数和 FIFO 计数。"
+
+msgid "[inout] Same producer binding and complete-frame layout."
+msgstr "[inout] 同一生产者绑定及完整帧布局。"
+
+msgid "[inout] Existing posted producer bound to this stream."
+msgstr "[inout] 已绑定到此流的既有预提交生产者。"
+
+msgid "[in] Oldest pending loan, absent from all hardware targets."
+msgstr "[in] 最早的待处理借用，已不在任何硬件目标中。"
+
+msgid "[in] Observed existing stream boundary flags."
+msgstr "[in] 已观察到的既有流边界标志。"
+
+msgid "Existing posted-publication result, INVALID for foreign pool."
+msgstr "返回既有预提交发布操作的结果；来自其他池时返回 INVALID。"
+
+msgid "Acquire the next complete immutable DMA consumer loan."
+msgstr "获取下一个完整、不可变的 DMA 消费者借用。"
+
+msgid "Task/IRQ; output disjointness scans the fixed pool in O(n) before the O(1) guarded queue operation. Output cannot alias queue controls or any full-capacity pool payload. EMPTY creates no loan and never repeats a previous frame. Caller owns silence/blanking/stop policy. Do not use retries as additional observed boundaries."
+msgstr "可在任务或 IRQ 中调用。在带保护的 O(1) 队列操作前，以 O(n) 扫描固定池来检查输出不重叠。输出不得与队列控制对象或池内任何载荷的完整容量范围重叠。EMPTY 不创建借用，也从不重复上一帧。静音、消隐或停止策略由调用方负责。不得将重试计为额外观察到的边界。"
+
+msgid "[inout] Same serialized consumer, one call per observed output boundary when using underrun accounting."
+msgstr "[inout] 同一串行消费者；使用欠载计数时，每个观察到的输出边界只调用一次。"
+
+msgid "[inout] Zero or previously released control, unchanged on error."
+msgstr "[inout] 已清零或先前已释放的控制对象；出错时保持不变。"
+
+msgid "SUCCESS, EMPTY with saturating underrun count, BUSY for a live loan, INVALID for output alias or STATE for an incomplete queued block."
+msgstr "成功返回 SUCCESS；EMPTY 时增加饱和欠载计数；仍有活动借用时返回 BUSY；输出存在别名时返回 INVALID；已入队块不完整时返回 STATE。"
+
+msgid "Derive a strided byte rectangle from a live frame loan."
+msgstr "从活动帧借用导出带步长的字节矩形。"
+
+msgid "Task/IRQ; an O(n) immutable-pool output check precedes the O(1) guarded view calculation. Output cannot alias the loan, queue controls or any full-capacity pool payload. The adapter checks pixel alignment, resource and DMA domain."
+msgstr "可在任务或 IRQ 中调用。在带保护的 O(1) 视图计算前，以 O(n) 检查输出与不可变池不重叠。输出不得与借用控制对象、队列控制对象或池内任何载荷的完整容量范围重叠。像素对齐、资源及 DMA 域由适配器检查。"
+
+msgid "[in] Exact live immutable DMA consumer loan."
+msgstr "[in] 精确、活动且不可变的 DMA 消费者借用。"
+
+msgid "[in] Plane index in the bound layout."
+msgstr "[in] 已绑定布局中的平面索引。"
+
+msgid "[in] Byte column within a row, not a pixel count."
+msgstr "[in] 行内字节列偏移，并非像素数。"
+
+msgid "[in] First complete row."
+msgstr "[in] 起始完整行。"
+
+msgid "[in] Positive bytes per selected row."
+msgstr "[in] 每个选中行的正数字节数。"
+
+msgid "[in] Positive selected row count."
+msgstr "[in] 选中的正数行数。"
+
+msgid "[out] Fresh output unchanged on failure."
+msgstr "[out] 新输出；失败时保持不变。"
+
+msgid "SUCCESS, INVALID for out-of-plane rectangles or STATE for stale/foreign loans; no DMA access begins here."
+msgstr "成功返回 SUCCESS；矩形超出平面时返回 INVALID；借用身份陈旧或来自其他实例时返回 STATE；此处不启动 DMA 访问。"
+
+msgid "Release only after the adapter proves final DMA access."
+msgstr "只有适配器证明 DMA 最后访问结束后才能释放。"
+
+msgid "Bounded task/IRQ metadata. Timeout/cancel is not quiescence; failed drain retains the queue borrow, including during stop. This helper checks proof facts and does not stop hardware."
+msgstr "可在任务或 IRQ 中执行的有界元数据操作。超时或取消不代表静止；排空失败会保留队列借用，停止过程中也不例外。此辅助函数检查证明事实，不停止硬件。"
+
+msgid "[inout] Original owner; another instance cannot release."
+msgstr "[inout] 原始所有者；另一个实例不能释放。"
+
+msgid "[inout] Exact acquired control, cleared only on success."
+msgstr "[inout] 精确获取的控制对象，仅在成功时清除。"
+
+msgid "[in] Actual provider observations of engine, IRQ and peripheral quiescence; counter completion alone is not proof."
+msgstr "[in] 提供方对引擎、IRQ 和外设静止状态的实际观测；单凭计数器完成不构成证明。"
+
+msgid "SUCCESS, BUSY while any source remains, STATE for stale or foreign tokens, or INVALID for impossible drain counters."
+msgstr "成功返回 SUCCESS；任何访问源尚未退出时返回 BUSY；令牌身份陈旧或来自其他实例时返回 STATE；排空计数不可能成立时返回 INVALID。"
+
+msgid "Immutable audio memory format, independent of codec policy."
+msgstr "不可变音频内存格式，独立于编解码器策略。"
+
+msgid "PCM frames store every slot, including inactive slots, in ascending slot order; slot_bits is the container width. I2S has two 16/32-bit slots; SAI has 1..32 8/16/32-bit slots. PDM has 1..8 byte-interleaved lanes; each byte holds eight successive bits of one lane, so frames must divide by eight. active_slots selects valid lanes/slots without compacting storage. Sample byte order is explicitly declared."
+msgstr "PCM 帧按时隙升序存储每个时隙，包括非活动时隙；slot_bits 是容器位宽。I2S 有两个 16/32 位时隙；SAI 有 1..32 个 8/16/32 位时隙。PDM 有 1..8 条按字节交错的通道；每个字节保存同一通道连续的八个位，因此帧数必须能被八整除。active_slots 选择有效通道或时隙，不压缩存储布局。采样字节序须显式声明。"
+
+msgid "Public Members"
+msgstr "公共成员"
+
+msgid "One plane; the last row needs no trailing stride padding."
+msgstr "一个平面；最后一行无需尾随的步长填充。"
+
+msgid "row_bytes/stride are bytes, rows is a complete line count. A plane occupies (rows - 1) * stride + row_bytes bytes."
+msgstr "row_bytes 和 stride 的单位为字节，rows 为完整行数。一个平面占用 (rows - 1) * stride + row_bytes 字节。"
+
+msgid "Immutable frame geometry copied into a bound stream."
+msgstr "复制到已绑定流中的不可变帧几何布局。"
+
+msgid "Plane intervals, including inter-row padding, cannot overlap. bytes is the exact maximum plane end, not summed row bytes. Audio formats are separate immutable caller metadata; this layout represents their checked complete-unit storage."
+msgstr "各平面的区间（包括行间填充）不得重叠。bytes 是最远平面末端的精确位置，并非各行字节数之和。音频格式是独立、不可变的调用方元数据；此布局表示经检查的完整单位存储。"
+
+msgid "Caller-owned binding; the existing stream owns every queue."
+msgstr "调用方拥有的绑定；全部队列均由既有流拥有。"
+
+msgid "Initialize before publication. One serialized producer and consumer use framed publish/acquire exclusively until stop. Hardware, queue capacity and synchronization remain explicit."
+msgstr "发布前初始化。一个串行生产者和一个串行消费者始终使用成帧发布与获取接口，直至停止。硬件、队列容量及同步方式仍须显式提供。"
+
+msgid "Checked 2D byte rectangle for an explicit DMA adapter."
+msgstr "供显式 DMA 适配器使用的已检查二维字节矩形。"
+
+msgid "spi_dma_owner.h"
+msgstr "spi_dma_owner.h"
+
+msgid "Optional typed whole-CS SPI executor for bounded BusOwner."
+msgstr "面向有界 BusOwner 的可选类型化完整片选区间 SPI 执行器。"
+
+msgid "Bind a fresh executor without opening hardware or admission."
+msgstr "绑定新执行器，不开启硬件或准入。"
+
+msgid "Task-only, all lifecycle users joined before replacement. Uses original FIFO/slots/epochs; final provider terminal result survives late cancellation. Continue unique executor service during stop and quarantine. Hardware stop, publisher join and observer join remain explicit external steps."
+msgstr "仅供任务调用；替换前须让全部生命周期使用者完成会合退出。沿用原始 FIFO、时隙和 epoch；提供方最终终止结果不受晚到取消影响。停止和隔离期间继续由唯一执行器推进。硬件停止、发布者会合退出和观察者会合退出仍是显式外部步骤。"
+
+msgid "[inout] Zero fresh storage, distinct from capability/face."
+msgstr "[inout] 已清零的新存储，与能力对象及接口对象均不重叠。"
+
+msgid "[in] Initialized bus exclusively serviced by this owner."
+msgstr "[in] 已初始化且仅由此所有者推进的总线。"
+
+msgid "Executor for nx_bus_owner_init, zero port on invalid input."
+msgstr "供 nx_bus_owner_init 使用的执行器；输入无效时返回全零端口。"
+
+msgid "Check typed storage, then use bounded owner admission."
+msgstr "检查类型化存储，再使用有界所有者准入。"
+
+msgid "The request has an absolute deadline including queue time. Task multi-producer checks run outside the metadata guard. There is no capacity scan, allocation, OS lock or worker. One operation has one CS interval with allowed SCK gaps. Schedule bounded service even when hints fail. Waiters never service the shared controller. Queued provider failures settle later without converting admission into rejection."
+msgstr "请求使用包含排队时间的绝对期限。任务级多生产者检查在元数据保护区外执行。不扫描容量，不分配内存，也不创建 OS 锁或工作线程。一次操作对应一个 CS 区间，允许其中出现 SCK 间隙。即使提示通知失败，也须调度有界推进。等待者从不推进共享控制器。已排队请求的提供方失败随后结算，不把已接受准入改判为拒绝。"
+
+msgid "[inout] Owner with this exact typed executor."
+msgstr "[inout] 装配此精确类型化执行器的所有者。"
+
+msgid "[inout] Prepared READY outer request."
+msgstr "[inout] 已准备好的 READY 外层请求。"
+
+msgid "[in] Immutable chain through outer SETTLED."
+msgstr "[in] 不可变链，保持至外层请求进入 SETTLED。"
+
+msgid "[in] Optional static caller hint, or NULL."
+msgstr "[in] 可选的静态调用方提示端口，或 NULL。"
+
+msgid "[out] Stable slot/epoch identity on SUCCESS."
+msgstr "[out] SUCCESS 时返回稳定的时隙/epoch 身份。"
+
+msgid "SUCCESS means ACCEPTED; failure retains nothing."
+msgstr "SUCCESS 表示 ACCEPTED；失败不保留任何内容。"
+
+msgid "Caller-owned queued and active SPI chain."
+msgstr "调用方拥有的已排队或活动 SPI 链。"
+
+msgid "The outer deadline includes queue residence. The chain, descriptors and all TX/RX or fixed cells stay borrowed until acquire-observed outer SETTLED. Counts and results use words."
+msgstr "外层期限包含排队停留时间。链、描述符以及全部 TX/RX 缓冲区或固定存储单元保持被借用，直至以 acquire 语义观察到外层 SETTLED。计数和结果以字为单位。"
+
+msgid "Selected-only exact metadata; no queue, payload copy or worker."
+msgstr "仅为所选实例提供的精确元数据；不添加队列、载荷复制或工作线程。"
+
+msgid "mapped_storage.h"
+msgstr "mapped_storage.h"
+
+msgid "Bounded read mappings and exclusive storage requests."
+msgstr "有界只读映射与独占存储请求。"
+
+msgid "Read-only consumers; capability does not prove physical routing."
+msgstr "只读消费者；能力声明不证明物理布线。"
+
+msgid "Physical mutation, separate from read-map ownership."
+msgstr "物理修改操作，与只读映射所有权分离。"
+
+msgid "Prepare unborrowed caller storage without accessing payload."
+msgstr "准备未被借用的调用方存储，不访问载荷。"
+
+msgid "SUCCESS or INVALID/STATE; no retained references on failure."
+msgstr "成功返回 SUCCESS，否则返回 INVALID/STATE；失败不保留引用。"
+
+msgid "Query immutable geometry without starting hardware."
+msgstr "查询不可变几何参数，不启动硬件。"
+
+msgid "Acquire one bounded, positive read-only span on a serialized executor."
+msgstr "在串行执行器上获取一个有界、长度为正的只读范围。"
+
+msgid "SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection retains no loan. Live read maps exclude all command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run concurrently after successful acquisition."
+msgstr "返回 SUCCESS 或 INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE。拒绝不保留借用。活动只读映射排斥全部命令、编程、擦除、缓存及 DMA 写入者。成功获取后，CPU/XIP/DMA 消费者可以并发运行。"
+
+msgid "Release an exact live loan after its consumers have joined."
+msgstr "消费者全部会合退出后，释放一个精确的活动借用。"
+
+msgid "SUCCESS, INVALID/STATE, or backend unmap error retaining the loan. Task-only, same serialized executor; no forced revocation or timeout release."
+msgstr "返回 SUCCESS、INVALID/STATE，或保留借用的后端解除映射错误。仅供任务调用，使用同一串行执行器；不强制撤销借用，也不因超时释放。"
+
+msgid "Admit one exclusive PROGRAM/ERASE request with an absolute deadline."
+msgstr "以绝对期限接纳一个独占 PROGRAM/ERASE 请求。"
+
+msgid "SUCCESS is ACCEPTED, possibly settled. Rejection retains no request or payload and produces no hardware effects. No map loan may remain live. Task-only serialized owner; no workers, allocation, locks or queue exist."
+msgstr "SUCCESS 表示 ACCEPTED，请求可能已经完成结算。拒绝不保留请求或载荷，也不产生硬件效果。不得仍有活动映射借用。仅供串行任务所有者使用；不创建工作线程、内存分配、锁或队列。"
+
+msgid "Request cancellation by instance and nonrepeating writer epoch."
+msgstr "通过实例及不重复的写入 epoch 身份请求取消。"
+
+msgid "SUCCESS starts/observes drain; STATE rejects stale/foreign identity. Cancellation never releases storage. Continue service through drain."
+msgstr "SUCCESS 表示启动或观察排空；STATE 拒绝过期或属于其他实例的身份。取消从不释放存储。须继续推进，直至排空结束。"
+
+msgid "Advance one bounded backend step or drain attempt without waiting."
+msgstr "不等待地推进一次有界后端步骤或排空尝试。"
+
+msgid "Backend/IRQ/data references detach before release-publication of SETTLED, which is the final request access. Failed drain is QUARANTINED; storage remains borrowed and later service may retry source withdrawal."
+msgstr "在以 release 语义发布 SETTLED 前，后端、IRQ 和数据引用全部脱离；该发布是对请求的最后访问。排空失败进入 QUARANTINED；存储继续被借用，后续推进可以重试撤回访问源。"
+
+msgid "Close admission and request writer cancellation."
+msgstr "关闭准入并请求取消写入操作。"
+
+msgid "SUCCESS only after all map loans and writer sources are gone; BUSY retains storage and needs release/service. Repeated successful stop performs no backend operation. The owner cannot restart or revoke loans."
+msgstr "只有全部映射借用与写入访问源均已退出才返回 SUCCESS；BUSY 保留存储，仍需释放借用或继续推进。成功停止后的重复调用不执行后端操作。此所有者不能重启或撤销借用。"
+
+msgid "Exact byte geometry; units divide size and one another."
+msgstr "精确字节几何参数；各单位须整除总大小，且彼此满足整除关系。"
+
+msgid "Caller-owned request and input, borrowed through SETTLED."
+msgstr "调用方拥有的请求及输入，保持被借用至 SETTLED。"
+
+msgid "Initialize base before prepare. PROGRAM borrows length input bytes; ERASE requires NULL input. Geometry alignment is checked at admission. Partial effects survive cancellation, timeout and I/O failure. No replay."
+msgstr "准备前先初始化 base。PROGRAM 借用 length 个输入字节；ERASE 要求输入为 NULL。几何对齐在准入时检查。取消、超时或 I/O 失败都不会撤销已产生的部分效果。不得重放。"
+
+msgid "Stable instance-bound identity of one read mapping."
+msgstr "一个只读映射的稳定实例绑定身份。"
+
+msgid "Fields are immutable until release. Data stays read-only. Join every CPU, XIP instruction fetch and DMA reader before release; a copied token grants no additional loan. A failed release keeps the complete loan live."
+msgstr "释放前各字段均不可变，数据保持只读。释放前须让全部 CPU 读取者、XIP 指令取指及 DMA 读取者会合退出；复制的令牌不增加借用。释放失败会保留完整借用。"
+
+msgid "Stable writer identity; drain controls before reuse or destruction."
+msgstr "稳定的写入身份；复用或销毁前须排空控制请求。"
+
+msgid "Shared immutable operations; every callback receives instance state."
+msgstr "共享不可变操作表；每个回调都接收实例状态。"
+
+msgid "Immutable face; context and all retained storage outlive users."
+msgstr "不可变接口对象；上下文及全部保留存储必须比使用者存活更久。"
+
+msgid "mapped_storage_owner.h"
+msgstr "mapped_storage_owner.h"
+
+msgid "Explicit portable mapped-storage constructor and storage."
+msgstr "显式、可移植的映射存储构造器及存储。"
+
+msgid "Bind unused explicit storage without hardware or payload access."
+msgstr "绑定未使用的显式存储，不访问硬件或载荷。"
+
+msgid "SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, overflowing spans, inconsistent units and missing callbacks reject. Caller constructs a const face with owner_ops and this owner context."
+msgstr "返回 SUCCESS 或 INVALID；容量为零、元数据与映射窗口重叠、跨度溢出、单位不一致或缺少回调时拒绝。调用方使用 owner_ops 和此所有者上下文构造 const 接口对象。"
+
+msgid "Variables"
+msgstr "变量"
+
+msgid "One read-only method table shared by every portable owner instance."
+msgstr "全部可移植所有者实例共享的一张只读方法表。"
+
+msgid "Private provider boundary; immutable callbacks and independent context."
+msgstr "私有提供方边界；回调不可变，上下文独立。"
+
+msgid "Context is one explicitly sized private state span. Geometry and mapped address stay fixed. map SUCCESS establishes the readable aperture; map failure leaves no effects. unmap SUCCESS proves all aperture/cache references withdrawn; failure retains the last map loan. start is called only after request admission and mapping exclusion. start errors may have effects and always proceed through drain. poll advances bounded work, returns BUSY or a terminal result, and supplies monotonically increasing completed bytes. cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other errors quarantine it. No callback retains the request itself. Command/cache/DMA writers outside these callbacks are forbidden while the owner exists. Physical adapters own cache-line domains, XIP execution exclusion and hardware-specific drain proof."
+msgstr "上下文是一个显式给定大小的私有状态范围。几何参数和映射地址保持固定。map 返回 SUCCESS 后建立可读映射窗口；map 失败不留下效果。unmap 返回 SUCCESS 证明全部映射窗口及缓存引用已撤回；失败则保留最后一个映射借用。start 仅在请求准入且已排除映射后调用。start 错误可能已有副作用，因此始终继续排空。poll 推进有界工作，返回 BUSY 或终止结果，并提供单调递增的已完成字节数。cancel 启动撤回，但不证明已排空。drain 返回 SUCCESS 时，全部硬件、IRQ、缓存、DMA、描述符和数据访问源均已脱离；BUSY 保留所有权，其他错误使其进入隔离。任何回调都不保留请求本身。此所有者存活期间，禁止这些回调之外的命令、缓存或 DMA 写入者。物理适配器负责缓存行域、XIP 执行排斥及硬件专属的排空证明。"
+
+msgid "Exact caller-owned map capacity; fields belong to the owner."
+msgstr "精确的调用方映射容量；各字段归所有者管理。"
+
+msgid "Caller-owned state, published only after successful initialization."
+msgstr "调用方拥有的状态，仅在初始化成功后发布。"
+
+msgid "All methods and controls use one serialized task executor. Consumers may use their maps elsewhere, then join before release. No implicit IRQ guard or cross-task synchronization is supplied. Keep state, slots, backend context, clock and face alive through stop and control/consumer join."
+msgstr "全部方法和控制操作使用同一个串行任务执行器。消费者可以在其他执行上下文使用映射，但释放前须会合退出。不隐式提供 IRQ 保护或跨任务同步。状态、时隙、后端上下文、时钟和接口对象均须保持存活，直至停止及控制使用者与消费者会合退出。"
+
+msgid "native_mapped_storage.h"
+msgstr "native_mapped_storage.h"
+
+msgid "Caller-owned coherent Native NOR model with bounded steps."
+msgstr "调用方拥有的一致性 Native NOR 模型，每步工作量有界。"
+
+msgid "Construct an unused Native backend without modifying backing bytes."
+msgstr "构造未使用的 Native 后端，不修改底层存储字节。"
+
+msgid "SUCCESS or INVALID. Only CPU_READ is supported; XIP and DMA tags reject. Native coherent memory needs no cache maintenance. The portable owner still excludes mappings from every modeled mutation and drain."
+msgstr "返回 SUCCESS 或 INVALID。仅支持 CPU_READ；XIP 和 DMA 标记均拒绝。Native 一致性内存无需缓存维护。可移植所有者仍保证映射与每一次建模修改及排空互斥。"
+
+msgid "Independent Native backend state; never a physical Flash substitute."
+msgstr "独立的 Native 后端状态，从不替代物理 Flash。"
+
+msgid "The model preserves supplied bytes, programs only 1-to-0, and erases to 0xff. One service changes at most quantum bytes. No implicit file, heap, thread, DMA, executable aperture or durability claim exists. fault_after bounds mutated bytes; SIZE_MAX disables the fault. hold_drain models live retained sources and drain_error models failure to prove source withdrawal."
+msgstr "模型保留传入的字节，仅允许从 1 编程为 0，并擦除为 0xff。一次推进最多修改 quantum 个字节。不隐式创建文件、堆、线程、DMA 或可执行映射窗口，也不声称具有持久性。fault_after 限制已修改字节数；SIZE_MAX 禁用该故障。hold_drain 模拟尚存的保留访问源，drain_error 模拟无法证明访问源已撤回的失败。"
+
+msgid "amp_ipc.h"
+msgstr "amp_ipc.h"
+
+msgid "Bounded epoch-safe unidirectional shared-memory loans."
+msgstr "有界、以 epoch 防止旧身份复用的单向共享内存借用。"
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus Team"
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-20"
+msgstr "2026-10-20"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Explicit port-isolation unit; supported cache granules divide 64."
+msgstr "显式端口隔离单元；支持的缓存粒度须能整除 64。"
+
+msgid "Publish one complete-cache-line payload span without copying."
+msgstr "发布一个覆盖完整缓存行的载荷范围，不进行复制。"
+
+msgid "Serialized owner Thread only, same rule for every API below. No waits, allocation, scheduler, ISR or implicit worker. Outputs must not overlap any live instance/lane storage. Producer must finish DMA/other writers before this call."
+msgstr "仅供串行所有者 Thread 调用；下方全部 API 均遵守相同规则。不等待，不分配内存，不创建调度器、ISR 或隐式工作线程。输出不得与任何活动实例或通道存储重叠。生产者须在调用前结束 DMA 及其他写入者的访问。"
+
+msgid "SUCCESS transfers a read-only borrow until exact ACK poll or successful reset_join. Rejection retains nothing and does not publish. EXHAUSTED means no reusable slot identity."
+msgstr "SUCCESS 转移只读借用，直至轮询到精确 ACK 或 reset_join 成功。拒绝不保留内容，也不发布。EXHAUSTED 表示没有可复用的时隙身份。"
+
+msgid "Acquire-observe an exact ACK; BUSY/IO/STATE retain the sender borrow."
+msgstr "以 acquire 语义观察精确 ACK；BUSY/IO/STATE 均保留发送方借用。"
+
+msgid "Acquire one offer after descriptor/payload invalidation succeeds."
+msgstr "描述符及载荷失效操作成功后，获取一个发布项。"
+
+msgid "Join the caller view, then publish its exact ACK."
+msgstr "让调用方视图的全部使用者会合退出，再发布该视图的精确 ACK。"
+
+msgid "Valid ticket invocation permanently joins local readers. IO or STATE retains endpoint/slot storage; retry finish or use reset_join after closing. Stale tickets change nothing."
+msgstr "使用有效票据调用即不可撤销地确认本地读取者已会合退出。IO 或 STATE 保留端点和时隙存储；可重试 finish，或关闭后使用 reset_join。陈旧票据不改变任何状态。"
+
+msgid "Close admission; outstanding send/receive loans remain retained."
+msgstr "关闭准入；未完成的发送和接收借用仍被保留。"
+
+msgid "Join a closed endpoint after all exact ACKs/local returns."
+msgstr "全部精确 ACK 及本地归还完成后，让已关闭端点会合退出。"
+
+msgid "BUSY, IO or STATE retain the unique owner. Success performs its final access and unclaims the role. Storage cannot be reconstructed: boot/sequence identities never reset here."
+msgstr "BUSY、IO 或 STATE 保留唯一所有者。成功执行最后访问并释放该角色声明。不得重构存储：此处从不重置启动及序列身份。"
+
+msgid "Join after an explicit old-peer stop proof."
+msgstr "在取得显式旧对端停止证明后会合退出。"
+
+msgid "Closed endpoint required; receiver views must have been consumed by finish first. Failed proof retains ALL sender loans and ownership. Success retires this endpoint; any replacement uses a strictly newer nonzero boot epoch from the external boot owner, never rollover/reuse."
+msgstr "要求端点已关闭；接收者视图必须先由 finish 消费。证明失败保留发送方的全部借用及所有权。成功后此端点退役；任何替代端点均须使用外部启动所有者提供的、严格更新的非零启动 epoch，绝不回绕或复用。"
+
+msgid "One writer's isolated publication word; accesses use the port only."
+msgstr "一个写入者的隔离发布字；仅通过端口访问。"
+
+msgid "Shared descriptor; offsets refer to the configured payload window."
+msgstr "共享描述符；偏移量相对于已配置的载荷窗口。"
+
+msgid "Caller-owned shared slot with disjoint writer cache lines."
+msgstr "调用方拥有的共享时隙，各写入者的缓存行互不重叠。"
+
+msgid "Sender alone writes offer/published; receiver alone writes receipt/acknowledged. All four units must be reachable by both CPUs. Cold initialization precedes either endpoint."
+msgstr "仅发送方写 offer/published；仅接收方写 receipt/acknowledged。两个 CPU 均须能访问这四个单元。任一端点启动前须完成冷初始化。"
+
+msgid "Hardware/ownership boundary supplied by the integration."
+msgstr "集成方提供的硬件与所有权边界。"
+
+msgid "Every callback is synchronous, bounded and non-reentrant. claim grants the unique role owner of this exact lane and atomically rejects a reused/non-increasing local boot epoch, even after ordinary join. Its authoritative hardware boot owner preserves this history across CPU resets; exhaustion fails closed. Rejection has no effects. unclaim follows final join only and never erases boot identity history. clean/invalidate cover exact complete isolated cache lines, finish their architectural barriers, and may fail. A failed clean MUST NOT publish a control word. acquire/release are infallible atomic 32-bit coherent control operations: the port owns any control-cache maintenance. They must order descriptor/payload access across both CPUs and bus fabric. stopped proves the named old peer CPU, DMA, IRQ and all observers can never access the lane or payload again. The context binds the exact physical lane and peer execution epoch covered by stopped. An epoch observation, cancel, deadline or elapsed timeout never supplies this proof. No existing single-core SoC supplies it."
+msgstr "每个回调均同步、有界且不可重入。claim 授予此精确通道的唯一角色所有者，并以原子方式拒绝复用或未递增的本地启动 epoch，即使普通 join 已完成也不例外。其权威硬件启动所有者跨 CPU 复位保留此历史；耗尽时关闭接纳。拒绝不产生效果。unclaim 仅发生于最终会合退出后，且从不清除启动身份历史。clean/invalidate 覆盖精确、完整且隔离的缓存行，完成其架构屏障，并可能失败。clean 失败绝不能发布控制字。acquire/release 是不会失败的原子 32 位一致性控制操作：端口负责全部控制缓存维护。它们须跨两个 CPU 和总线互连，对描述符及载荷访问建立顺序。stopped 证明指定的旧对端 CPU、DMA、IRQ 及全部观察者从此再也不能访问通道或载荷。上下文绑定 stopped 所覆盖的精确物理通道和对端执行 epoch。epoch 观测、取消、期限或已流逝的超时都不能提供此证明。现有单核 SoC 均不提供该证明。"
+
+msgid "Instance/boot/slot identity; endpoint outlives every ticket copy."
+msgstr "实例、启动及时隙身份；端点须比每一份票据副本存活更久。"
+
+msgid "Receiver's borrowed read-only shared span."
+msgstr "接收者借用的只读共享范围。"
+
+msgid "Caller must join every local reader before finish. A valid finish invocation consumes the caller view even when link acknowledgement fails; endpoint storage remains retained."
+msgstr "调用方须在 finish 前让每个本地读取者会合退出。有效 finish 调用会消费调用方视图，即使链路确认失败也不例外；端点存储仍被保留。"
+
+msgid "Stable close identity; endpoint lives longer than all control copies."
+msgstr "稳定的关闭身份；端点须比全部控制对象副本存活更久。"
+
+msgid "amp_ipc_storage.h"
+msgstr "amp_ipc_storage.h"
+
+msgid "Caller-owned endpoint configuration and retained loan state."
+msgstr "调用方拥有的端点配置及保留借用状态。"
+
+msgid "Claim and bind unused zero-initialized endpoint storage."
+msgstr "声明并绑定未使用、已清零初始化的端点存储。"
+
+msgid "Serialized privileged owner Thread, before publication. Validates disjoint spans and exact boot epochs before claim. Rejected construction has no references or shared effects. The port must independently enforce unique hardware/role ownership; this component contains no global registry."
+msgstr "由串行特权所有者 Thread 在发布前调用。claim 前校验范围互不重叠及精确启动 epoch。构造拒绝不保留引用，也不产生共享效果。端口须独立强制唯一硬件及角色所有权；此组件不含全局注册表。"
+
+msgid "Zero-initialized local state; no sharing with another endpoint."
+msgstr "已清零初始化的本地状态；不与其他端点共享。"
+
+msgid "One unidirectional lane and exact caller-owned storage."
+msgstr "一条单向通道及精确的调用方存储。"
+
+msgid "Both boot words are externally published, monotonic nonzero epochs. Never republish an old boot identity, including after a whole-device reset. The boot owner must fail closed on exhaustion. Initial shared records/words are zeroed or retained from older epochs, never edited while live. Wire and boot words occupy separate complete 64-byte units. All shared spans align to granule (power of two, 1..64). Payload size is a positive multiple of granule. Configuration, callbacks and all supplied storage outlive final join."
+msgstr "两个启动字均为外部发布、单调且非零的 epoch。绝不重新发布旧启动身份，整机复位后也不例外。启动所有者须在耗尽时关闭接纳。初始共享记录及控制字须已清零，或保留自更早 epoch；活动期间不得编辑。协议控制字和启动字分别占用独立、完整的 64 字节单元。全部共享范围按 granule 对齐，granule 为 1..64 之间的二次幂。载荷大小是 granule 的正整数倍。配置、回调及全部传入存储均须保持存活，直至最终会合退出。"
+
+msgid "stm32f407_handoff.h"
+msgstr "stm32f407_handoff.h"
+
+msgid "Exact F407 Flash-image transfer after explicit owner drain."
+msgstr "显式所有者排空后的精确 F407 Flash 映像移交。"
+
+msgid "Construct the single static F407 handoff admission domain."
+msgstr "构造唯一的静态 F407 移交准入域。"
+
+msgid "Serialized privileged Thread, once before any consumer. No heap, hardware writes, discovery or implicit startup. The caller enrolls every platform/product execution, IRQ, DMA, observer and memory owner that can outlive entry. Release a lease only after its actual join/drain."
+msgstr "由串行特权 Thread 在任何消费者启动前调用一次。不使用堆，不写硬件，不执行发现或隐式启动。调用方须登记每个可能在入口之后仍存活的平台或产品执行者、IRQ、DMA、观察者及内存所有者。租约仅在其实际会合退出或排空后释放。"
+
+msgid "[in] Positive bound on enrolled live tokens."
+msgstr "[in] 已登记活动令牌数的正数上限。"
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE; never resets an epoch."
+msgstr "返回 SUCCESS、INVALID、CONTEXT 或 STATE；从不重置 epoch。"
+
+msgid "Return the existing single static admission domain."
+msgstr "返回既有的唯一静态准入域。"
+
+msgid "Pure lookup; does not initialize, acquire or touch hardware."
+msgstr "纯查询；不初始化、不获取租约，也不访问硬件。"
+
+msgid "Stable object identity, including before initialization."
+msgstr "稳定对象身份，初始化前亦有效。"
+
+msgid "Validate stopped F407 state and tail-transfer to Flash."
+msgstr "校验已停止的 F407 状态，并以尾跳转移交至 Flash。"
+
+msgid "Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. Stop the actual Platform, join all users and keep admission closed. An unrelated empty domain cannot authorize transfer. Rejects active FP/lazy preservation, partial CP10/11 permissions, MPU, ART, SysTick, enabled/pending/active IRQs, non-HSI16/reset buses, peripheral/DMA gates, busy Flash and retained System effects. Ordinary inactive CP10/11 permissions from SystemInit are supported. Main SRAM is preserved; MSP is 8-aligned in (0x20000000,0x20020000]. All 98 vectors fit exact observed and generated Flash geometry. Reset PC is Thumb with its first halfword in Flash. Success sets VTOR, disables CP10/11, sets CONTROL=0, PSP=0 and MSP, then branches to PC with PRIMASK=1. This is a masked handoff entry. No RAM copy/clear, image authentication/selection, device drain, clock change or physical qualification occurs. Target owns RAM startup and resets controllers before enabling gates. No old deadline survives transfer. Exclude NMI/HardFault, debugger, DMA and other bus masters. Enrollment is caller policy; Platform and product owners are never enrolled automatically. Rejection preserves masks and performs no writable MMIO. Reading SysTick CTRL consumes COUNTFLAG even if rejected."
+msgstr "仅支持所选 STM32F407VET6/ZGT6 裸机映像。调用方须为使用 MSP 的特权 Thread，PRIMASK=1，其他屏蔽寄存器为零。不得已启动调度器。停止实际 Platform，让全部使用者会合退出，并保持准入关闭。无关的空域不能授权移交。活动浮点状态或延迟保存、CP10/11 权限不完整、MPU、ART、SysTick、已启用或挂起或活动的 IRQ、非 HSI16 时钟或非复位总线配置、外设或 DMA 门控、忙碌 Flash 及残留 System 效果均导致拒绝。支持 SystemInit 设置的普通未激活 CP10/11 权限。保留主 SRAM；MSP 须按 8 字节对齐，且位于 (0x20000000,0x20020000]。全部 98 个向量须满足实际观察及生成配置确定的精确 Flash 几何范围。复位 PC 须为 Thumb，且首个半字位于 Flash。成功时设置 VTOR、禁用 CP10/11、设置 CONTROL=0、PSP=0 和 MSP，然后在 PRIMASK=1 下跳转到 PC。这是保持中断屏蔽的移交入口。不复制或清除 RAM，不认证或选择映像，不排空器件，不改变时钟，也不进行物理资格验证。目标映像负责 RAM 启动，并在启用门控前复位控制器。任何旧期限在移交后均不再有效。外部须排除 NMI/HardFault、调试器、DMA 及其他总线主设备。登记属于调用方策略；Platform 和产品所有者从不自动登记。拒绝时保留中断屏蔽状态，且不执行可写 MMIO 操作。即使拒绝，读取 SysTick CTRL 也会消耗 COUNTFLAG。"
+
+msgid "[in] Closed, drained barrier from this exact domain."
+msgstr "[in] 来自此精确域、已关闭且已排空的屏障。"
+
+msgid "[in] 512-aligned physical Flash vector address."
+msgstr "[in] 按 512 字节对齐的物理 Flash 向量地址。"
+
+msgid "Error before transfer; success never returns."
+msgstr "移交前可能返回错误；成功时永不返回。"
+
+msgid "frame_dma2d.h"
+msgstr "frame_dma2d.h"
+
+msgid "Exact opaque storage reservation for one optional owner."
+msgstr "为一个可选所有者保留的精确不透明存储。"
+
+msgid "Zero-initialize once; do not copy or mutate. This is one object's ABI storage, not a pool or allocator. Keep it, face and all accepted requests live until successful stop."
+msgstr "仅零初始化一次；不得复制或修改。这是一个对象的 ABI 存储，不是存储池或分配器。存储、接口及全部已接受请求都须存活至成功停止。"
+
+msgid "Explicit exclusive physical resource; no runtime resource registry."
+msgstr "显式独占的物理资源；没有运行时资源注册表。"
+
+msgid "Acquire cold DMA2D and its dedicated RCC gate/reset bit."
+msgstr "取得未启用的 DMA2D 及其专用 RCC 门控／复位位。"
+
+msgid "[inout] Fresh zero storage exclusively owned by caller."
+msgstr "[inout] 调用方独占的全新零初始化存储。"
+
+msgid "[in] Stable readonly {&nx_h743_frame_dma2d_ops, storage}."
+msgstr "[in] 稳定只读的 {&nx_h743_frame_dma2d_ops, storage}。"
+
+msgid "[in] Exact resource plus positive abort observation bound."
+msgstr "[in] 精确资源及正数中止观察次数上限。"
+
+msgid "SUCCESS, INVALID, BUSY for foreign gate/reset/IRQ ownership, UNSUPPORTED for non-V/cache-on, CONTEXT or IO."
+msgstr "SUCCESS、INVALID；外部占有门控／复位／IRQ 时为 BUSY；非 V 修订或缓存启用时为 UNSUPPORTED；也可能为 CONTEXT 或 IO。"
+
+msgid "One caller-owned request; rectangle coordinates are bytes."
+msgstr "调用方拥有的单个请求；矩形坐标以字节为单位。"
+
+msgid "One-executor task-only operations; each service call is bounded."
+msgstr "仅由单个执行者在任务上下文调用；每次 service 调用都有界。"
+
+msgid "Immutable face; state is separate caller-owned private storage."
+msgstr "不可变接口；状态位于调用方拥有的独立私有存储中。"
+
+msgid "Cold configuration for exact H743 V with D-Cache disabled."
+msgstr "适用于关闭 D-Cache 的精确 H743 V 修订的初始配置。"
+
+msgid "stm32u575_retained_time.h"
+msgstr "stm32u575_retained_time.h"
+
+msgid "Independent monotonic domain from a retained U575 calendar."
+msgstr "从保留的 U575 日历建立独立单调时钟域。"
+
+msgid "Exclusive exact RTC source; no second owner may configure it."
+msgstr "独占的精确 RTC 源；其他所有者不得配置它。"
+
+msgid "Open a separate elapsed clock without reading or changing Core TIM2."
+msgstr "打开独立的经过时间时钟，不读取或更改 Core TIM2。"
+
+msgid "Exact U575 TZEN0, privileged unmasked Thread, baremetal integration. External boot owns a valid raw calendar/LSE32768/RTCEN/RTCAPBEN, crystal mode LSEBYP=0 and conservative drive 10/11. ES0499 Rev12 2.2.3/16 affect revision X; this profile does not qualify revision. External boot/Board owners exclude PC13 transitions on the LQFP reference per 2.2.1; reads cannot prove electrical silence."
+msgstr "精确 U575 TZEN0，由特权、未屏蔽中断的 Thread 在裸机环境集成。外部启动代码负责有效的原始日历、LSE32768、RTCEN、RTCAPBEN，晶体模式 LSEBYP=0 及保守驱动档位 10/11。ES0499 Rev12 的 2.2.3/16 影响 X 修订；本配置不构成修订资格证明。外部启动／板级所有者须依据 2.2.1 排除 LQFP 参考封装上的 PC13 跳变；读取不能证明电气静默。"
+
+msgid "The selected MSIS4/equal-bus profile is checked before every tuple pair, with no concurrent clock-profile writer. This conservative profile is not a general RTC-write frequency rule. Require PRER127/255, BCD24h BYPSHAD, no shift/calibration/alarms."
+msgstr "每对元组读取前检查所选 MSIS4／等总线频率配置，且不得存在并发时钟配置写入者。此保守配置不是通用的 RTC 写入频率规则。要求 PRER127/255、BCD24h BYPSHAD，且无移位、校准或闹钟。"
+
+msgid "Both standalone and delegated construction require quiet RTC IRQ, WUTE/WUTIE clear and no RTC flags. The explicit wake_owner may operate only its WUT/IRQ fields after successful construction. Calendar provenance, including intentional YY00, cannot be inferred from INITS. DBP/WPR need not be unlocked; no hardware writes occur."
+msgstr "独立及委托构造都要求 RTC IRQ 静默、WUTE/WUTIE 清零且没有 RTC 标志。成功构造后，显式 wake_owner 只能操作其 WUT／IRQ 字段。INITS 不能证明日历来源，包括有意设置的 YY00。无需解锁 DBP/WPR；不写入硬件。"
+
+msgid "This face has a distinct domain from nx_time_now_us(). Old Core deadlines are never translated. Stop/reopen invalidates old faces' numerical deadlines after all consumers and observers have joined."
+msgstr "此接口的时钟域独立于 nx_time_now_us()。不转换旧 Core 截止时间。所有使用者与观察者完成汇合后，停止／重新打开会使旧接口中的数值截止时间失效。"
+
+msgid "[inout] Fresh zero or fully stopped, externally joined owner."
+msgstr "[inout] 全新零初始化，或已完全停止且外部已完成汇合的所有者。"
+
+msgid "[in] Separate immutable configuration, copied during this call."
+msgstr "[in] 独立不可变配置，在本次调用中复制。"
+
+msgid "[out] Separate writable face, copied only on success."
+msgstr "[out] 独立可写接口，仅成功时复制。"
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT, UNSUPPORTED or EXHAUSTED; rejection leaves owner and output unchanged, with no hardware writes."
+msgstr "SUCCESS、INVALID、STATE、BUSY、CONTEXT、UNSUPPORTED 或 EXHAUSTED；拒绝时所有者与输出不变，且不写入硬件。"
+
+msgid "Observe a bounded coherent tuple and extend the independent domain."
+msgstr "观察有界一致元组并扩展独立时钟域。"
+
+msgid "Thread may hold PRIMASK; BASEPRI/FAULTMASK and Handler mode are excluded. BUSY means no coherent tuple after eight bounded retries, and changes neither owner nor output. A source/configuration change, backward/out-of-window calendar or time exhaustion permanently taints this live epoch. Later samples return STATE; no stale value is valid."
+msgstr "Thread 可持有 PRIMASK；排除 BASEPRI/FAULTMASK 及 Handler 模式。BUSY 表示八次有界重试后仍无一致元组，且所有者与输出都不变。源／配置变化、日历回退或超出窗口、时间耗尽都会永久污染此活动纪元。后续采样返回 STATE；任何陈旧值都无效。"
+
+msgid "[inout] Same serialized privileged Thread owner."
+msgstr "[inout] 同一个串行化特权 Thread 所有者。"
+
+msgid "[out] Separate aligned writable output, unchanged on failure."
+msgstr "[out] 独立、对齐、可写的输出；失败时不变。"
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT or EXHAUSTED."
+msgstr "SUCCESS、INVALID、STATE、BUSY、CONTEXT 或 EXHAUSTED。"
+
+msgid "Check one explicit WUT identity against this live clock generation."
+msgstr "依据此活动时钟代次检查一个显式 WUT 身份。"
+
+msgid "Same serialized privileged Thread, PRIMASK0/1 allowed. The WUT owner obtains generation through sample and checks it before and after each transition. Reopen invalidates old bindings; no second owner is inferred."
+msgstr "同一个串行化特权 Thread，允许 PRIMASK 为 0 或 1。WUT 所有者通过 sample 取得代次，并在每次转换前后检查。重新打开使旧绑定失效；不会推断出第二个所有者。"
+
+msgid "SUCCESS, INVALID, STATE or CONTEXT; no output or hardware effects."
+msgstr "SUCCESS、INVALID、STATE 或 CONTEXT；不产生输出或硬件效果。"
+
+msgid "Clock-face read; failure cannot return a stale or invalid timestamp."
+msgstr "时钟接口读取；失败时不能返回陈旧或无效时间戳。"
+
+msgid "On any failed sample, taint the epoch, retain the interrupt mask, call nx_fault_observe(NX_FAULT_PLATFORM, reason, ...) and park if the observer returns. Products may supply separately reviewed nonreturning recovery. No loan or observer is released by fault observation."
+msgstr "任何采样失败时，污染该纪元，保留中断屏蔽状态，调用 nx_fault_observe(NX_FAULT_PLATFORM, reason, ...)，若观察者返回则停驻。产品可提供另行评审且不返回的恢复路径。故障观察不释放任何借用或观察者。"
+
+msgid "[inout] Exact live storage from successful initialization."
+msgstr "[inout] 成功初始化时的精确活动存储。"
+
+msgid "A new valid sample in the same independent monotonic domain."
+msgstr "同一独立单调时钟域中的新有效采样。"
+
+msgid "Close clock admission after every external face/deadline user joins."
+msgstr "所有外部接口／截止时间使用者完成汇合后关闭时钟接纳。"
+
+msgid "Does not reset generations or alter the source. An explicit reopen starts a new zero-based elapsed domain, including after a tainted one. No scheduler, wake IRQ, WFI, Core restoration, Stop2 or VBAT retention guarantee is established by this read-only source component."
+msgstr "不重置代次或更改时钟源。显式重新打开会启动新的从零开始的经过时间域，包括此前被污染的时钟域。此只读时钟源组件不建立调度器、唤醒 IRQ、WFI、Core 恢复、Stop2 或 VBAT 保留保证。"
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE; clean repeated stop is idempotent."
+msgstr "SUCCESS、INVALID、CONTEXT 或 STATE；干净状态下重复停止具有幂等性。"
+
+msgid "One zero-initialized caller owner, not a pool or allocation service."
+msgstr "单个零初始化的调用方所有者，不是存储池或分配服务。"
+
+msgid "Do not copy or mutate. Keep this storage alive through every copied clock face, deadline consumer and observer. Memory retention for any future power mode is an assembly obligation, never implied by a RAM address. This read-only clock does not require SRAM4 or enter Stop2."
+msgstr "不得复制或修改。存储须在每个复制的时钟接口、截止时间使用者及观察者存续期间保持有效。未来电源模式中的内存保留由装配方保证，不能由 RAM 地址推断。此只读时钟不要求 SRAM4，也不进入 Stop2。"
+
+msgid "Bounded observation gap, declared by the serialized lifecycle owner."
+msgstr "由串行生命周期所有者声明的有界观察间隔。"
+
+msgid "Observe at least once per max_gap_seconds, in 1..86400 seconds. Missed complete 100-year periods and small external clock settings cannot be detected from calendar snapshots. Exclude every calendar writer and other RTC configuration owner, including the polling AlarmA factory selection. The sole explicit WUT delegate is described below. The complete elapsed interval, including wake latency or recovery, must fit this gap; the nominal WUT duration alone is not a bound."
+msgstr "每个 max_gap_seconds 至少观察一次，其取值为 1..86400 秒。日历快照不能检测错过完整的百年周期或外部微小时钟调整。须排除全部日历写入者和其他 RTC 配置所有者，包括轮询 AlarmA 工厂选择。下文仅描述唯一显式 WUT 委托。完整经过时间（包括唤醒延迟或恢复）必须落在此间隔内；标称 WUT 时长本身不构成上限。"
+
+msgid "NULL for RTC-only; otherwise stable identity of one WUT owner."
+msgstr "仅 RTC 时为 NULL；否则为一个 WUT 所有者的稳定身份。"
+
+msgid "Delegates only WUCKSEL/WUTE/WUTIE, WUTR, WUTF/SCR.CWUTF and RTC IRQ ownership; ICSR.WUTWF may change with that bounded operation. That same serialized owner preserves every calendar/source field. Identity is compared without dereference; it is not authorization."
+msgstr "仅委托 WUCKSEL/WUTE/WUTIE、WUTR、WUTF/SCR.CWUTF 及 RTC IRQ 所有权；该有界操作可改变 ICSR.WUTWF。同一串行所有者须保留全部日历／时钟源字段。仅比较身份而不解引用；身份不构成授权。"
+
+msgid "A successful sample copied together in this owner's boot lifetime."
+msgstr "在此所有者的启动生命周期内一并复制的成功采样。"
+
+msgid "Microseconds are floor(ticks*1000000/256); resolution is 3906.25us, with exact carried fractional quarters. Generation changes only on explicit successful initialize/reopen, never natural 99->00 rollover."
+msgstr "微秒数为 floor(ticks*1000000/256)；分辨率为 3906.25us，并精确携带四分之一微秒的余数。代次仅在显式成功初始化／重新打开时变化，不随自然的 99->00 回绕变化。"
+
+msgid "stm32u575_stop2.h"
+msgstr "stm32u575_stop2.h"
+
+msgid "Exact U575 TZEN0 retained-RTC Stop2 boundary."
+msgstr "精确 U575 TZEN0 保留 RTC 的 Stop2 边界。"
+
+msgid "Stable trusted assembly identity for retained-time wake_owner."
+msgstr "供保留时间 wake_owner 使用的稳定可信装配身份。"
+
+msgid "Bind the static owner and construct its RUN domain."
+msgstr "绑定静态所有者并构造其 RUN 域。"
+
+msgid "Serialized privileged unmasked Thread, once. Retain clock storage throughout this owner's lifetime. No hardware writes or heap allocation occur."
+msgstr "仅一次，由特权、未屏蔽中断的 Thread 串行调用。时钟存储须在此所有者的整个生命周期中保留。不写入硬件，也不分配堆内存。"
+
+msgid "[in] Positive bound on external consumer leases."
+msgstr "[in] 外部使用者租约数量的正数上限。"
+
+msgid "[inout] Live retained-time owner bound to this identity."
+msgstr "[inout] 绑定到此身份的活动保留时间所有者。"
+
+msgid "SUCCESS, INVALID, CONTEXT, STATE or clock failure."
+msgstr "SUCCESS、INVALID、CONTEXT、STATE 或时钟失败。"
+
+msgid "Pure lookup; all platform/product RUN owners enroll explicitly."
+msgstr "纯查询；全部平台／产品 RUN 所有者均须显式登记。"
+
+msgid "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
+msgstr "在 PRIMASK=1 时配置 WUT、跨越 Stop2、恢复并排空。"
+
+msgid "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
+msgstr "[in] 2..65536 个 RTC/16 节拍，标称 488.28125us。"
+
+msgid "[in] Positive finite per-phase observation budget."
+msgstr "[in] 每阶段有限观察预算，必须为正。"
+
+msgid "Primary/cleanup results, retained effects and RTC samples."
+msgstr "主结果／清理结果、保留效果及 RTC 采样。"
+
+msgid "Retry retained WUT/IRQ/clock drain without another WFI."
+msgstr "重试保留的 WUT／IRQ／时钟排空，不再执行 WFI。"
+
+msgid "Same masked boundary and exact closed barrier. Recovery cannot repair a tainted RTC epoch or authorize old deadlines. Hardware drain can finish with invalid RTC sampling. Join all retained-clock users before its explicit stop/reopen."
+msgstr "使用相同屏蔽边界及精确已关闭屏障。恢复不能修复被污染的 RTC 纪元，也不能授权旧截止时间。即使 RTC 采样无效，硬件排空仍可完成。须在保留时钟显式停止／重新打开前汇合其全部使用者。"
+
+msgid "Bounded transition result; snapshots belong only to the RTC domain."
+msgstr "有界转换结果；快照仅属于 RTC 时钟域。"
+
+msgid "user_io_async.h"
+msgstr "user_io_async.h"
+
+msgid "Bounded copied UART user mediation."
+msgstr "有界复制式 UART 用户代理。"
+
+msgid "Authenticate and copy one bounded user gateway transaction."
+msgstr "认证并复制一次有界用户网关事务。"
+
+msgid "Privileged unmasked Thread, one serialized gateway executor. Authenticate the current principal on every call. The trusted copy port supplies fault containment and mapping stability; range checks alone prove neither. The caller separately drives the existing BusOwner/UARTOwner; this call never services it. CANCEL only requests its drain. CONSUME requires acquire SETTLED and the existing owner's idle/join barrier, copies the reply first, then wipes bytes/releases the exact cell. Failed reply copy, cancellation or quarantine never releases an accepted cell. No SVC/CMSE entry or NS RTOS is provided."
+msgstr "特权、未屏蔽中断的 Thread，由唯一网关执行者串行调用。每次调用均认证当前主体。可信复制端口提供故障隔离和映射稳定性；仅范围检查不能证明两者。调用方另外推进既有 BusOwner/UARTOwner；本调用从不执行其 service。CANCEL 仅请求其排空。CONSUME 要求以 acquire 观察 SETTLED 及既有所有者的空闲／汇合屏障，先复制回复，再擦除字节并释放精确单元。回复复制失败、取消或隔离都不释放已接受单元。不提供 SVC/CMSE 入口或 NS RTOS。"
+
+msgid "[inout] Trusted privileged binding and exact copied slots."
+msgstr "[inout] 可信特权绑定及精确复制槽位。"
+
+msgid "[in] Transient full readable user header, copied once."
+msgstr "[in] 临时完整可读的用户头部，仅复制一次。"
+
+msgid "[in] Transient readable SUBMIT bytes; NULL otherwise."
+msgstr "[in] 临时可读的 SUBMIT 字节；其他情况为 NULL。"
+
+msgid "[out] Transient disjoint full writable user reply."
+msgstr "[out] 临时、互不重叠且完整可写的用户回复。"
+
+msgid "SUCCESS after reply copy; identity/span/protocol/copy/control errors otherwise. No user address survives any return. A reply-copy error can follow acceptance: POLL the proposed slot/epoch; duplicate SUBMIT cannot replay or replace it."
+msgstr "回复复制后返回 SUCCESS；否则返回身份、跨度、协议、复制或控制错误。任何返回后均不保留用户地址。接受后仍可能发生回复复制错误：以 POLL 查询所提出的槽位／纪元；重复 SUBMIT 不得重放或替换它。"
+
+msgid "Close copied admission and cancel this binding's live work."
+msgstr "关闭复制接纳并取消此绑定的活动工作。"
+
+msgid "Trusted privileged management, not a user gateway action. Same serialized lifecycle executor as dispatch/join, except synchronous identity/copy callbacks may request close. This is not a general concurrent cross-task control API. Close is permanent; it does not close the underlying owner. No worker or provider service runs here. Keep driving the owner and authenticate POLL/CONSUME through normal dispatch. Identity/copy callbacks may request close, never recursively dispatch or reconstruct. All bound storage stays live."
+msgstr "可信特权管理操作，不是用户网关动作。与 dispatch/join 使用同一串行生命周期执行者，但同步身份／复制回调可以请求 close。这不是通用的跨任务并发控制 API。关闭是永久的，但不关闭底层所有者。此处不运行工作线程或提供者 service。须继续推进所有者，并通过常规 dispatch 认证 POLL/CONSUME。身份／复制回调可以请求 close，但不得递归 dispatch 或重新构造。全部绑定存储保持存活。"
+
+msgid "Privileged retirement after permanently lost user mappings."
+msgstr "用户映射永久丢失后的特权回收。"
+
+msgid "Same trusted serialized management as close/join; never an untrusted wire action. The kernel decides when cleanup is authorized. First close/cancel and separately drive the real owner. Every retained exact cell must acquire SETTLED and the owner must be idle. The trusted drained proof then fences future gateway entries and joins all outer observers while retaining the role. Only then are all copied payloads wiped and cells retired without user copyout. Pending, quarantined or unjoined work retains every cell unchanged. Success is idempotent and permanently rejects dispatch. It does not release the role: successful join is still required before reclaiming any bound storage. No forced borrow revocation, process-liveness policy or provider service is supplied."
+msgstr "与 close/join 使用相同的可信串行管理；绝不是不可信的传输动作。由内核决定何时授权清理。先 close/cancel，再另行推进真实所有者。每个保留的精确单元都必须以 acquire 观察 SETTLED，且所有者必须空闲。随后可信 drained 证明阻止未来网关入口并汇合全部外部观察者，同时保留角色。只有此后才能擦除全部复制载荷并回收单元，无需向用户复制输出。待处理、隔离或未汇合的工作保留每个单元不变。成功具有幂等性，并永久拒绝 dispatch。它不释放角色：回收任何绑定存储前仍须成功 join。不提供强制撤销借用、进程存活策略或提供者 service。"
+
+msgid "Join closed/consumed cells, owner and trusted gateway role."
+msgstr "汇合已关闭／已消费单元、所有者及可信网关角色。"
+
+msgid "Trusted serialized management. No reinitialization/reopen, hidden provider stop or identity registry is created. A successful join permits a fresh object with a larger claimed session; never reset or reconstruct this live object."
+msgstr "可信串行管理。不创建重新初始化／重新打开、隐式提供者停止或身份注册表。成功 join 后，可由新对象申领更大的会话；不得重置或重新构造此活动对象。"
+
+msgid "SUCCESS only after no gateway/copy, copied cell or owner publisher remains and the trusted role release proves outer gateway observers joined; BUSY/error retains role and storage."
+msgstr "仅在不再存在网关／复制、复制单元或所有者发布者，且可信角色释放证明外部网关观察者已汇合后返回 SUCCESS；BUSY 或错误均保留角色与存储。"
+
+msgid "Twelve scalar local C gateway words; no principal, address or callback."
+msgstr "十二个本地 C 网关标量字；不含主体、地址或回调。"
+
+msgid "SUBMIT proposes the exact next nonzero 64-bit epoch for an explicit slot within the exact claimed nonzero session and supplies positive length plus an absolute deadline in the existing owner's clock domain. Other actions use the accepted exact epoch and zero length/deadline words. device must match the immutable trusted binding; reserved=0. Word pairs encode low then high halves, independently of the compiler enum, pointer and uint64_t alignment ABI. These are local C gateway records; an integrating kernel owns byte order and any transport serialization."
+msgstr "SUBMIT 在精确已申领的非零会话内，为显式槽位提出精确下一个非零 64 位纪元，并提供正数长度及既有所有者时钟域中的绝对截止时间。其他动作使用精确已接受纪元，长度／截止时间字均为零。device 必须匹配不可变可信绑定；reserved=0。字对按低半部、高半部编码，不依赖编译器枚举、指针或 uint64_t 的对齐 ABI。这些是本地 C 网关记录；字节序及任何传输序列化均由集成内核负责。"
+
+msgid "Ten initialized scalar words; no privileged pointer."
+msgstr "十个已初始化标量字；不含特权指针。"
+
+msgid "state is a Core nx_request_state_t value encoded as uint32_t. Only SETTLED has a final result/count; other results are BUSY with count zero. accepted=1 denotes the retained copied cell, including a terminal error when the existing owner rejects admission. No hardware effect follows from acceptance alone."
+msgstr "state 为编码成 uint32_t 的 Core nx_request_state_t 值。仅 SETTLED 具有最终结果／计数；其他结果为 BUSY，计数为零。accepted=1 表示保留的复制单元，包括既有所有者拒绝接纳时的终结错误。仅接受本身不产生硬件效果。"
+
+msgid "user_io_async_storage.h"
+msgstr "user_io_async_storage.h"
+
+msgid "Trusted kernel assembly for exact copied UART user cells."
+msgstr "针对精确复制 UART 用户单元的可信内核装配。"
+
+msgid "Nominal copy permissions; actual access still requires trusted copy."
+msgstr "名义复制权限；实际访问仍须经过可信复制。"
+
+msgid "Cold construct one exact copied mediation over a real owner."
+msgstr "在真实所有者之上初始构造精确复制代理。"
+
+msgid "Privileged unmasked Thread with owner idle and no concurrent users. Cold O(n squared) alias checks reject all known mutable cell/payload/control overlaps and user-RAM aliases. Admission checks fixed region extents and copies at most the selected exact payload budget; no queue or worker is added. Keep policy, cells, owner, provider and all contexts stable through permanent close, consumption and successful join. Pure cold checks precede a constructing reservation and the trusted role claim; no fallible step follows successful claim. Fresh objects require a larger externally claimed session; this object cannot be reconstructed to reset its epochs."
+msgstr "特权、未屏蔽中断的 Thread，所有者空闲且没有并发使用者。初始 O(n squared) 别名检查拒绝全部已知可变单元／载荷／控制重叠及用户 RAM 别名。接纳检查固定区域范围，复制量不超过所选精确载荷预算；不增加队列或工作线程。策略、单元、所有者、提供者及全部上下文须在永久关闭、消费直至成功汇合期间保持稳定。纯初始检查先于构造保留及可信角色申领；成功申领后不再有可失败步骤。新对象须从外部申领更大的会话；不得重新构造此对象以重置纪元。"
+
+msgid "[out] Fresh zero privileged storage, initialized once."
+msgstr "[out] 全新零初始化的特权存储，仅初始化一次。"
+
+msgid "[inout] Exact caller-owned cells/payloads, no maximum pool."
+msgstr "[inout] 调用方拥有的精确单元／载荷，不设最大存储池。"
+
+msgid "[in] Positive cell count representable in a scalar slot ID."
+msgstr "[in] 能以标量槽位 ID 表示的正数单元数量。"
+
+msgid "[in] Immutable trusted principal/grant/copy/owner binding."
+msgstr "[in] 不可变可信主体／授权／复制／所有者绑定。"
+
+msgid "SUCCESS or INVALID/STATE/CONTEXT/BUSY/EXHAUSTED, or trusted claim error without new retained users or hardware effects; every rejected output remains unchanged."
+msgstr "SUCCESS 或 INVALID/STATE/CONTEXT/BUSY/EXHAUSTED，或可信申领错误；不新增保留的用户引用或硬件效果；拒绝时每个输出均保持不变。"
+
+msgid "Nominal actual user RAM; trusted copy still enforces real access."
+msgstr "名义上的实际用户 RAM；真实访问仍由可信复制强制检查。"
+
+msgid "Bounded trusted kernel identity and fault-contained copies."
+msgstr "有界可信内核身份及具有故障隔离的复制。"
+
+msgid "identity authenticates the current entry, never user input. Copy operations guarantee complete checked CPU access and mapping/process lifetime for the callback duration. Neither success nor error retains a user address, kernel scratch pointer, mapping or observer after return. Errors may have partially copied bytes; the copied payload cell is wiped on rejection, and reply failure is recoverable through exact slot/epoch. No callback blocks, dispatches recursively, or substitutes a permission observation for fault-safe copying. Identity/copy callbacks may close this mediation. A new kernel/CMSE wrapper must actually establish these preconditions; this component does not.              claim is a trusted exclusive role authority for the actual              owner/controller binding. It rejects a second live role even              with a larger session, and rejects reused/non-increasing              nonzero sessions from persistent, nonwrapping history across              fresh storage, process/device reset and reconstruction.              Failed claim retains no reference/effect. Successful claim              permanently consumes that session and retains the exact role              until release. release SUCCESS proves outer gateway/transport observers joined and detaches all authority references; failure retains the original role unchanged. drained SUCCESS permanently fences future outer gateway entry and joins all gateway/transport observers, while the exact role remains claimed. Failed drained preserves the role and every cell unchanged. It must not modify bound configuration, cell identities or requests. Claim, release and drained are bounded and cannot recursively construct, dispatch, close, reap or join. Context/history must remain live; no source code implements this kernel authority, physical isolation, storage partition or recovery policy. Alternate wrappers of one controller are not distinct roles."
+msgstr "identity 认证当前入口，绝不接受用户提供的身份。复制操作保证在回调期间完成全部经检查的 CPU 访问，并保证映射／进程生命周期。无论成功或错误，返回后均不保留用户地址、内核临时指针、映射或观察者。错误可能发生在部分字节已复制之后；拒绝时擦除复制载荷单元，回复失败可通过精确槽位／纪元恢复。任何回调都不得阻塞、递归 dispatch，或以权限观察替代故障安全复制。身份／复制回调可以关闭此代理。新的内核／CMSE 包装层必须真正建立这些前提；本组件不提供它们。claim 是针对实际所有者／控制器绑定的可信独占角色授权者。即使会话更大，也拒绝第二个活动角色；并依据跨新存储、进程／器件复位及重构保留的持久、不回绕历史，拒绝复用或不递增的非零会话。失败申领不保留任何引用或效果。成功申领永久消耗该会话，并保留精确角色直至释放。release 返回 SUCCESS 证明外部网关／传输观察者已汇合，并分离全部授权引用；失败时原角色保持不变。drained 返回 SUCCESS 永久阻止未来外部网关入口，并汇合全部网关／传输观察者，同时精确角色仍被申领。drained 失败保留角色及每个单元不变。它不得修改绑定配置、单元身份或请求。claim、release 和 drained 有界，且不得递归 construct、dispatch、close、reap 或 join。上下文／历史必须保持存活；源码不实现此内核授权、物理隔离、存储分区或恢复策略。同一控制器的不同包装不构成不同角色。"
+
+msgid "Immutable trusted one-principal/one-device/one-owner grant."
+msgstr "不可变可信的单主体／单设备／单所有者授权。"
+
+msgid "This is kernel configuration, never copied from users. owner/executor/port must be the already constructed exact BusOwner + UARTOwner bridge, with no other direct producers or external request/payload observers. Completion callbacks are not installed. All callback contexts remain privileged; explicit extents cover their complete live controls. Guard, clock and wake contexts may be the same trusted object. The caller owns actual UART startup, hardware attribution, executor scheduling, clock/deadline domain and final stop."
+msgstr "这是内核配置，绝不从用户复制。owner/executor/port 必须是已构造的精确 BusOwner + UARTOwner 桥接，不得有其他直接生产者或外部请求／载荷观察者。不安装完成回调。全部回调上下文保持在特权内存中；显式范围覆盖其完整活动控制。保护、时钟及唤醒上下文可以是同一可信对象。调用方负责实际 UART 启动、硬件归属、执行者调度、时钟／截止时间域及最终停止。"
+
+msgid "Exact privileged cell; initialize only data and capacity."
+msgstr "精确特权单元；仅初始化 data 和 capacity。"
+
+msgid "All other fields start zero and are mechanism-private after construction. data is independent writable privileged RAM, capacity is its exact positive byte budget, at most UINT32_MAX. No user pointer is ever assigned here. Core identity epochs never wrap and survive consume/close; never copy or reset a live cell. UARTOwner borrows operation/payload until real provider final access, then user-result retention lasts until successful reply copy plus joined CONSUME, or trusted joined reap. Epoch history survives both paths."
+msgstr "其他字段初始均为零，构造后为机制私有。data 是独立可写特权 RAM；capacity 是精确正数字节预算，最大为 UINT32_MAX。此处绝不赋入用户指针。Core 身份纪元从不回绕，并在 consume/close 后保留；不得复制或重置活动单元。UARTOwner 借用操作／载荷直至真实提供者的最后访问，此后用户结果保留至回复复制成功且 CONSUME 已汇合，或可信 reap 已汇合。两条路径均保留纪元历史。"
+
+msgid "Caller-owned trusted control; initialize once, never reset epochs."
+msgstr "调用方拥有的可信控制；仅初始化一次，不得重置纪元。"
+
+msgid "i3c_controller.h"
+msgstr "i3c_controller.h"
+
+msgid "Explicit bounded I3C discovery, transfers and event ownership."
+msgstr "显式有界的 I3C 发现、传输及事件所有权。"
+
+msgid "Prepare unused metadata without retaining its payload."
+msgstr "准备未使用的元数据，不取得载荷借用。"
+
+msgid "Serialized owner Thread. DISCOVER has no payload or target. PRIVATE permits 1..65535 bytes. CCC permits only ENEC/DISEC broadcast/direct writes and direct GETMWL/GETMRL/GETPID/ GETBCR/GETDCR/GETSTATUS reads, with exact defined lengths. GETMRL uses two bytes, or three when confirmed BCR bit2 advertises an IBI payload. Address-changing, HDR and controller-handoff CCCs reject. All APIs require one serialized executor. Port and clock callbacks must not reenter the core, invoke application code or mutate retained state. No ISR, allocation, OS lock or worker. Absolute deadlines use the injected clock."
+msgstr "由所有者 Thread 串行执行。DISCOVER 没有载荷或目标。PRIVATE 允许 1..65535 字节。CCC 仅允许 ENEC/DISEC 广播／定向写入，以及具有精确定义长度的定向 GETMWL/GETMRL/GETPID/GETBCR/GETDCR/GETSTATUS 读取。GETMRL 使用两字节；若已确认 BCR 的 bit2 声明 IBI 载荷，则使用三字节。拒绝改变地址、HDR 及控制器交接 CCC。全部 API 都要求唯一串行执行者。端口与时钟回调不得重入核心、调用应用代码或修改保留状态。不得在 ISR 中调用；不进行分配，不使用 OS 锁或工作线程。绝对截止时间使用注入的时钟。"
+
+msgid "Admit a finite operation after cold validation and readiness."
+msgstr "经初始校验及就绪检查后接纳有限操作。"
+
+msgid "SUCCESS transfers the borrow. Rejection has no effects or retained references. Outputs cannot alias retained controller, port table, target/event storage, policy, request or payload. Port and clock context spans remain the caller's responsibility."
+msgstr "SUCCESS 转移借用。拒绝不产生效果，也不保留引用。输出不得与保留的控制器、端口表、目标／事件存储、策略、请求或载荷形成别名。端口与时钟上下文范围仍由调用方负责。"
+
+msgid "Perform one bounded FIFO/event phase or one drain proof."
+msgstr "执行一个有界 FIFO／事件阶段，或一次排空证明。"
+
+msgid "Partial DAA, malformed observations and errors fault admission while retaining every known/tentative assigned address. Cancel/timeout/failed drain never release a loan. Failed quiescence stays QUARANTINED; continued service may recover. An event overflow returns OVERFLOW and latches its counter, without discarding an already retained queued event."
+msgstr "部分 DAA、畸形观察及错误使接纳进入故障状态，同时保留每个已知／暂定分配地址。取消、超时或排空失败绝不释放借用。静默证明失败时保持 QUARANTINED；继续 service 可以恢复。事件溢出返回 OVERFLOW 并锁存计数，不丢弃已保留的队列事件。"
+
+msgid "Request withdrawal using stable epoch before request dereference."
+msgstr "在解引用请求前，使用稳定纪元请求撤回。"
+
+msgid "Obtain only a confirmed target; tentative/retired records reject."
+msgstr "仅获取已确认目标；拒绝暂定／已退役记录。"
+
+msgid "Copy one retained event; EMPTY leaves output unchanged."
+msgstr "复制一个保留事件；EMPTY 时输出不变。"
+
+msgid "Copy saturating loss counters without clearing them."
+msgstr "复制饱和丢失计数器，不清零。"
+
+msgid "Close admission without changing loans, target identities or events."
+msgstr "关闭接纳，不更改借用、目标身份或事件。"
+
+msgid "Prove a whole-bus reset before invalidating dynamic addresses."
+msgstr "使动态地址失效前，证明已完成整条总线复位。"
+
+msgid "Requires closed admission. Hardware proof covers real wire, FIFO and IRQ quiescence AND every target's dynamic address invalidated. Peripheral reset or FIFO flush alone is never this proof. Failure preserves all loans and address records. Success settles outstanding work and invalidates endpoints; retained events preserve their old epochs for the caller."
+msgstr "要求接纳已关闭。硬件证明必须同时覆盖真实线路、FIFO、IRQ 静默，以及每个目标的动态地址均已失效。仅外设复位或 FIFO 清空绝不构成此证明。失败保留全部借用与地址记录。成功使未完成工作结算并使端点失效；保留事件仍携带旧纪元供调用方处理。"
+
+msgid "Reopen an idle unfaulted pause; faults require explicit bus reset."
+msgstr "重新打开空闲且无故障的暂停；故障要求显式总线复位。"
+
+msgid "Close, withdraw and finally relinquish the unique controller."
+msgstr "关闭、撤回，最后放弃唯一控制器。"
+
+msgid "Active work or queued events return BUSY. Caller continues service, consumes events and retries. Assigned/tentative addresses or a fault return STATE until whole-bus reset proof invalidates them. Successful final wire/ FIFO/IRQ quiescence releases ownership, never reconstructing this object. Storage outlives copied endpoints and tickets."
+msgstr "活动工作或队列事件返回 BUSY。调用方须继续 service、消费事件并重试。存在已分配／暂定地址或故障时返回 STATE，直至整条总线复位证明使其失效。最终真实线路／FIFO／IRQ 静默证明成功后释放所有权，不得重新构造此对象。存储须在所有复制的端点与票据存续期间保持有效。"
+
+msgid "Controller-bound confirmed target incarnation, never a factory ID."
+msgstr "绑定到控制器的已确认目标代次，绝不是工厂 ID。"
+
+msgid "Stable operation identity; controller outlives all copied controls."
+msgstr "稳定操作身份；控制器须在全部复制的控制存续期间保持有效。"
+
+msgid "Caller-owned finite operation; no implicit bus discovery."
+msgstr "调用方拥有的有限操作；不隐式发现总线。"
+
+msgid "Initialize base once with nx_request_initialize. Accepted metadata and payload stay borrowed until acquire SETTLED. TX stays immutable; transferred counts bytes handed to the FIFO, not acknowledged target effects. No replay after errors. Public fields are immutable throughout an accepted borrow."
+msgstr "仅使用 nx_request_initialize 初始化 base 一次。已接受元数据和载荷保持借用，直至以 acquire 观察 SETTLED。TX 保持不可变；transferred 统计交给 FIFO 的字节，而不是目标已确认的效果。错误后不重放。在整个已接受借用期间，公共字段均不可变。"
+
+msgid "Copied event; no callback, target creation or hidden work."
+msgstr "复制的事件；不调用回调、不创建目标、不隐式执行工作。"
+
+msgid "IBI endpoint retains its exact confirmed target epoch. Confirmed BCR bit1 must advertise IBI. Bit2 requires 1..4 payload bytes including MDB; otherwise zero data bytes. HOT_JOIN carries no endpoint and only requests explicit caller-controlled discovery. Payload is at most four bytes, as in the selected H563 reference; no timestamp claim."
+msgstr "IBI 端点保留精确已确认目标纪元。已确认 BCR 的 bit1 必须声明 IBI 能力。bit2 置位时要求 1..4 字节载荷且包含 MDB；否则为零数据字节。HOT_JOIN 不携带端点，仅请求由调用方显式控制的发现。与所选 H563 参考一致，载荷最多四字节；不提供时间戳保证。"
+
+msgid "Explicit loss accounting; counters saturate rather than wrap."
+msgstr "显式丢失统计；计数器饱和而不回绕。"
+
+msgid "i3c_controller_storage.h"
+msgstr "i3c_controller_storage.h"
+
+msgid "Caller storage and aggregate I3C hardware boundary."
+msgstr "调用方存储及聚合 I3C 硬件边界。"
+
+msgid "Bind unused zero storage and claim one controller."
+msgstr "绑定尚未使用且已零初始化的存储，并申领一个控制器。"
+
+msgid "Reject overlapping/unaligned/overflowing storage, duplicate PIDs/addresses, reserved I3C addresses and nonzero targets. The config value is copied and need not remain alive; its referenced storage and contexts remain live and separate from every request/payload/output. 48-bit PIDs are caller- authored, never selected by a factory. Positive event capacity and 1..8-byte service batches match this bounded SDR/IBI reference. No legacy I2C, DMA, HDR, target role, implicit discovery or hidden event worker."
+msgstr "拒绝重叠、未对齐、地址运算溢出的存储、重复 PID／地址、I3C 保留地址及非零目标。config 值被复制，无需继续存活；但其引用的存储与上下文须保持存活，并与每个请求／载荷／输出分离。48 位 PID 由调用方编写，绝不由工厂选择。正数事件容量及 1..8 字节 service 批次对应此有界 SDR/IBI 参考。不支持传统 I2C、DMA、HDR、目标角色、隐式发现或隐藏事件工作线程。"
+
+msgid "Authored immutable target policy, not runtime factory discovery."
+msgstr "预先编写的不可变目标策略，不是运行时工厂发现。"
+
+msgid "Caller-owned target record, zero-initialized once."
+msgstr "调用方拥有的目标记录，仅零初始化一次。"
+
+msgid "Core retains tentative and confirmed addresses on DAA error. Epoch never resets or wraps, including after bus reset."
+msgstr "DAA 出错时核心保留暂定及已确认地址。纪元从不重置或回绕，包括总线复位后。"
+
+msgid "Value command; begin copies it synchronously and retains no pointer."
+msgstr "值命令；begin 同步复制，不保留指针。"
+
+msgid "One bounded hardware observation and aggregate FIFO progress."
+msgstr "单次有界硬件观察及聚合 FIFO 进度。"
+
+msgid "No callback retains spans. tx/rx counts may not exceed the supplied capacities. DAA acknowledged confirms the preceding assignment BEFORE any next identity in this observation. A complete DAA with a tentative unacknowledged address is an error, never implicit success. Event data are fully copied."
+msgstr "任何回调均不保留跨度。tx/rx 计数不得超过提供的容量。本次观察中，DAA 确认必须先确认此前的地址分配，再处理下一个身份。若 DAA 完成时仍有未确认的暂定地址，则是错误，绝不视为隐式成功。事件数据全部复制。"
+
+msgid "Synchronous bounded hardware leaves; no request forwarding."
+msgstr "同步有界硬件叶操作；不转发请求。"
+
+msgid "begin and assign are infallible commands. pump reports later hardware failures and services at most the supplied batch capacities plus one IBI and one hot-join latch. No command or span is retained. No application code is called. withdraw requests abort. quiescent SUCCESS proves actual wire/FIFO/IRQ quiescence and all port observers detached."
+msgstr "begin 和 assign 是不可失败的命令。pump 报告之后发生的硬件失败，并最多处理所给批次容量，加一个 IBI 锁存及一个热加入锁存。不保留命令或跨度，不调用应用代码。withdraw 请求中止。quiescent 返回 SUCCESS 证明真实线路／FIFO／IRQ 已静默，且全部端口观察者已分离。"
+
+msgid "reset additionally proves EVERY target dynamic address invalidated. FIFO flush or controller reset alone cannot report SUCCESS. BUSY/IO/UNSUPPORTED proof retains loans and ownership. release follows successful final quiescence. The port context and supplied storage outlive observers."
+msgstr "reset 还须证明每个目标的动态地址均已失效。仅清空 FIFO 或复位控制器不能报告 SUCCESS。BUSY/IO/UNSUPPORTED 证明结果保留借用与所有权。仅在最终静默证明成功后才调用 release。端口上下文及提供的存储须在所有观察者存续期间保持有效。"
+
+msgid "All port/clock callbacks are non-reentrant: no core calls, application calls or mutation of retained core state. claim atomically acquires an exclusive controller and its IRQ/clock/pins. SUCCESS requires independently established proof that EVERY target dynamic address is invalidated, including targets still powered across MCU reset. The caller establishes this baseline before construction; claim never attempts an unproven reset. Rejection has no effects. ready is a read-only admission check."
+msgstr "全部端口／时钟回调均不可重入：不得调用核心、调用应用代码或修改核心保留状态。claim 原子地取得控制器及其 IRQ／时钟／引脚的独占所有权。SUCCESS 要求独立建立证明：每个目标的动态地址都已失效，包括 MCU 复位期间仍保持供电的目标。调用方须在构造前建立此基线；claim 绝不尝试未经证明的复位。拒绝不产生效果。ready 是只读接纳检查。"
+
+msgid "Exact caller capacities; separate static controller and target data."
+msgstr "调用方的精确容量；静态控制器与目标数据分离。"
+
+msgid "Open the fixed AlarmA-copy delegate for the same concrete Stop2 owner."
+msgstr "为同一个具体 Stop2 所有者打开固定 AlarmA-copy 委托。"
+
+msgid "All ordinary initialization preconditions remain required. Unlike the WUT-only initializer, this explicitly delegates fixed AlarmA compare registers, ALRAE and ALRAF/CALRAF to the same serialized wake owner. ALRAIE and automatic flag clearing stay forbidden. The fixed profile masks all calendar fields and compares no subseconds, producing its first event on a seconds increment. Both alarm registers start zero. The delegate preserves the calendar/source and owns complete producer withdrawal before any compound copy settlement. No AlarmA factory, arbitrary alarm scheduler or second RTC writer is admitted."
+msgstr "仍须满足普通初始化的全部前提。与仅使用 WUT 的初始化函数不同，此函数将固定 AlarmA 比较寄存器、ALRAE 和 ALRAF/CALRAF 显式委托给同一个串行化唤醒所有者。仍禁止 ALRAIE 和自动清除标志。固定配置屏蔽所有日历字段，且不比较亚秒，在秒递增时产生第一个事件。两个闹钟寄存器初始均为零。受委托者保持日历／时钟源不变，并负责在任何复合复制请求结束前完全撤回生产者。不准入 AlarmA factory、任意闹钟调度器或第二个 RTC 写入者。"
+
+msgid "[inout] Same fresh or fully stopped and joined storage."
+msgstr "[inout] 同一份已清零的新存储，或已完全停止且完成会合退出的存储。"
+
+msgid "[in] Same immutable configuration with non-NULL wake_owner."
+msgstr "[in] 同一不可变配置，其中 wake_owner 非 NULL。"
+
+msgid "[out] Separate writable face, unchanged on every rejection."
+msgstr "[out] 独立可写接口对象，每次拒绝时均保持不变。"
+
+msgid "Same initialization results; no hardware writes occur."
+msgstr "与普通初始化相同的结果；不发生硬件写入。"
+
+msgid "Validate the exact opt-in AlarmA-copy owner and live clock generation."
+msgstr "校验精确的显式启用 AlarmA-copy 所有者及活动时钟代次。"
+
+msgid "Same Thread/PRIMASK boundary as validate_wake. An ordinary WUT-only clock cannot authorize AlarmA. Wrong identity/generation/mode rejects without taint; observed source or fixed-profile drift taints the epoch."
+msgstr "与 validate_wake 相同的 Thread／PRIMASK 边界。普通的仅使用 WUT 的时钟不能授权 AlarmA。身份／代次／模式错误会被拒绝，且不污染时钟；观察到时钟源或固定配置偏移则污染该纪元。"
+
+msgid "[inout] Same live serialized clock owner."
+msgstr "[inout] 同一个活动的串行化时钟所有者。"
+
+msgid "[in] Exact stable identity from opt-in initialization."
+msgstr "[in] 显式启用初始化时指定的精确稳定身份。"
+
+msgid "[in] Nonzero generation obtained from a successful sample."
+msgstr "[in] 成功采样取得的非零代次。"
+
+msgid "SUCCESS, INVALID, STATE or CONTEXT; no hardware writes occur."
+msgstr "SUCCESS、INVALID、STATE 或 CONTEXT；不发生硬件写入。"
+
+msgid "stm32u575_lpdma_copy.h"
+msgstr "stm32u575_lpdma_copy.h"
+
+msgid "Exact U575 SRAM4 finite autonomous copy receiver."
+msgstr "精确的 U575 SRAM4 有限自主复制接收器。"
+
+msgid "Construct one serialized privileged Thread owner without MMIO writes."
+msgstr "构造一个串行化特权 Thread 所有者，不进行 MMIO 写入。"
+
+msgid "Exact STM32U575ZIT6Q TZEN0/MSIS4/MSIK4/equal buses/Range4 and selected SRAM4 only. LPDMA1EN/SRAM4EN and power/retention belong to selected startup; every channel and vector must initially be quiet. The run-gate owner keeps both gates and exclusive hardware configuration stable through stop and joins; no other LPDMA channel may start. This component owns only fixed sleep/autonomous bits and preserves unrelated RTC bits. SRAM4EN and power/retention preconditions belong to startup and the combined sleep owner. This component never repairs lost RAM by changing SRAM4PD/PDS and never disables the caller's SRAM4EN."
+msgstr "仅适用于精确的 STM32U575ZIT6Q TZEN0/MSIS4/MSIK4/等频总线/Range4 及已选择的 SRAM4。LPDMA1EN/SRAM4EN 和供电／保留由所选启动流程负责；所有通道和中断向量初始必须静止。运行门控所有者须在停止及会合退出完成前，保持两个门控和独占硬件配置稳定；其他 LPDMA 通道均不得启动。此组件仅拥有固定的睡眠／自主运行位，并保留无关 RTC 位。SRAM4EN 和供电／保留前提由启动流程及组合睡眠所有者负责。此组件从不通过修改 SRAM4PD/PDS 修复丢失的 RAM，也从不禁用调用方的 SRAM4EN。"
+
+msgid "[inout] Fresh zero or clean stopped and externally joined."
+msgstr "[inout] 已清零的新存储，或已干净停止且完成外部会合退出的存储。"
+
+msgid "[in] Separate immutable clock/owner binding."
+msgstr "[in] 独立且不可变的时钟／所有者绑定。"
+
+msgid "[out] Separate writable immutable face, unchanged on failure."
+msgstr "[out] 独立可写的不可变接口对象，失败时不变。"
+
+msgid "Prepare copied metadata in an unborrowed request, without MMIO."
+msgstr "在未被借用的请求中准备复制后的元数据，不进行 MMIO。"
+
+msgid "Rejecting a span, alias, wrap or state leaves every request byte unchanged. Preparation does not borrow or write any buffer/workspace. Old Core TIM2 deadlines are never translated into this domain."
+msgstr "拒绝范围、别名、回绕或状态时，请求的每个字节均保持不变。准备操作不借用或写入任何缓冲区／工作区。绝不将旧 Core TIM2 截止时间转换到此时钟域。"
+
+msgid "[inout] Initialized READY or consumed SETTLED, fully joined."
+msgstr "[inout] 已初始化为 READY 或已消费的 SETTLED 请求，且已完全会合退出。"
+
+msgid "[in] Separate successful retained clock sample."
+msgstr "[in] 独立的成功保留时钟采样。"
+
+msgid "[in] Borrowed immutable bytes wholly inside nonsecure SRAM4."
+msgstr "[in] 全部位于非安全 SRAM4 内、借用期间不可变的字节。"
+
+msgid "[out] Separate borrowed writable SRAM4 span."
+msgstr "[out] 独立的借用可写 SRAM4 范围。"
+
+msgid "[in] At least two bytes; both full extents must fit SRAM4."
+msgstr "[in] 至少两字节；两个完整范围均须容纳于 SRAM4。"
+
+msgid "[inout] Separate aligned 24-byte SRAM4 LLI workspace."
+msgstr "[inout] 独立且对齐的 24 字节 SRAM4 LLI 工作区。"
+
+msgid "[in] Absolute microseconds in that domain, or NEVER."
+msgstr "[in] 该时钟域中的绝对微秒数，或 NEVER。"
+
+msgid "Latch cancellation of the exact active identity without release."
+msgstr "锁存精确活动身份的取消请求，但不释放借用。"
+
+msgid "Late cancellation after observed channel completion rejects STATE. Cancellation before unobserved completion fixes the first failure. DMA drain alone cannot release an AlarmA/WUT/clock restoration loan."
+msgstr "观察到通道完成后，延迟取消会以 STATE 拒绝。在尚未观察到完成时取消，会确定首个失败。仅排空 DMA 不能释放 AlarmA/WUT/时钟恢复链的借用。"
+
+msgid "[in] Immutable face of the initialized physical receiver."
+msgstr "[in] 已初始化物理接收器的不可变 face。"
+
+msgid "[inout] Exact active request, retained through SETTLED."
+msgstr "[inout] 精确活动请求，须保留到 SETTLED。"
+
+msgid "Observe and perform bounded DMA withdrawal; never publish SETTLED."
+msgstr "观察并执行有界 DMA 撤回；绝不发布 SETTLED。"
+
+msgid "Positive finite per-phase observation budget, not a time estimate. BUSY retains request, both buffers and workspace, even after DMA idle. Only the concrete Stop2 owner can release after the entire RTC/IRQ/ DMA/clock/gate chain is restored. Unknown profile performs no DMA MMIO. An externally asserted LPDMA reset observed while borrowed leaves an uncertain loan permanently quarantined; reset-default IDLE cannot prove earlier master accesses joined. No software force release exists. Preserve incoming masks; while borrowed the concrete Stop2 boundary requires PRIMASK1, BASEPRI/FAULTMASK0 until complete recovery."
+msgstr "每阶段使用正数有限观察预算，不是时间估计。BUSY 会保留请求、两个缓冲区及工作区，即使 DMA 已空闲也不释放。只有具体 Stop2 owner 才能在整个 RTC/IRQ/DMA/时钟/门控链恢复后释放借用。配置未知时不执行 DMA MMIO。借用期间若观察到外部置位的 LPDMA 复位，不确定的借用将被永久隔离；复位默认的 IDLE 不能证明先前主设备的访问已汇合。不存在软件强制释放路径。保留传入的屏蔽状态；借用期间，具体 Stop2 边界要求保持 PRIMASK1、BASEPRI/FAULTMASK0，直到完全恢复。"
+
+msgid "[in] Positive observation budget for each drain phase."
+msgstr "[in] 每个排空阶段使用正数观察预算。"
+
+msgid "Close admission, retaining all live loans until compound recovery."
+msgstr "关闭接纳，并保留全部活动借用，直到复合恢复完成。"
+
+msgid "Keep every related object alive and RUN admission closed on BUSY. Repeated clean stop is safe after external publishers have joined. No Stop2 residency, LPBAM peripheral, physical copy or HIL result is implied by the public type or successful software execution."
+msgstr "返回 BUSY 时，须保持所有相关对象存活并关闭 RUN 接纳。外部发布者均已汇合后，可安全重复干净停止。公共类型或软件执行成功不表示 Stop2 物理驻留、LPBAM 外设、物理复制或 HIL 结果。"
+
+msgid "Exact physical implementation identity, not arbitrary callbacks."
+msgstr "精确物理实现的身份，不接受任意回调。"
+
+msgid "Zero-initialized caller owner; never copy, reset or reconstruct live."
+msgstr "调用者提供的零初始化 owner；存活期间绝不能复制、复位或重建。"
+
+msgid "Keep this storage, every copied face and bound clock alive until stop succeeds and all external observers have joined. One exact ch0 owner exists; there is no allocation, queue, worker or factory lookup. One privileged Thread serializes every lifecycle/control operation. No ISR, concurrent producer or unjoined delayed cancellation command may use request pointers across prepare/reuse."
+msgstr "保持此存储、每个复制的 face 及绑定时钟存活，直到 stop 成功且全部外部观察者已汇合。仅存在一个精确 ch0 owner；没有分配、队列、工作线程或 factory 查找。由一个特权 Thread 串行执行每项生命周期及控制操作。ISR、并发生产者或尚未汇合的延迟取消命令，均不得跨 prepare/复用使用请求指针。"
+
+msgid "One generated full next LLI; raw caller instructions are not used."
+msgstr "由 provider 生成的一个完整后继 LLI；不使用调用者的原始指令。"
+
+msgid "Entire 24-byte extent must be four-byte aligned in selected SRAM4. Provider overwrites all words only after admission. Keep it immutable and disjoint from both buffers and all request/control storage while borrowed. A NOINIT section never establishes descriptor construction."
+msgstr "完整的 24 字节范围必须位于已选 SRAM4 中，并按四字节对齐。provider 仅在接纳后覆盖全部字。借用期间须保持其不可变，并与两个缓冲区及所有请求／控制存储互不重叠。NOINIT section 从不代表描述符已构造。"
+
+msgid "Explicit same-owner clock binding; copied only on initialization."
+msgstr "显式绑定同一 owner 的时钟；仅在初始化时复制。"
+
+msgid "clock is the live opt-in AlarmA-copy retained clock. wake_owner is the stable concrete Stop2 owner identity. Identity equality is trusted assembly binding, never hardware authentication. No RTC writer exists in this component."
+msgstr "clock 是存活且显式选入 AlarmA-copy 的保留时钟。wake_owner 是具体 Stop2 owner 的稳定身份。身份相等表示可信装配绑定，不是硬件认证。此组件中不存在 RTC 写入者。"
+
+msgid "One finite two-block copy in the independent retained time domain."
+msgstr "在独立保留时间域中执行一次有限的双块复制。"
+
+msgid "Initialize base before prepare. Prepared metadata is caller immutable from ACCEPTED until acquire-observed SETTLED and external joins. source/destination/whole workspace must be disjoint exact nonsecure SRAM4 spans, not CPU-visible SRAM1 or secure aliases. length is at least two bytes; byte-width incremented transfers preserve exact byte count."
+msgstr "prepare 前须初始化 base。从 ACCEPTED 到以 acquire 观察 SETTLED 且外部使用者汇合期间，调用者不得修改准备好的元数据。source、destination 及整个 workspace 必须是精确非安全 SRAM4 中互不重叠的范围，不能使用 CPU 可见的 SRAM1 或安全别名。length 至少为两字节；字节宽度的递增传输保持精确字节数。"
+
+msgid "Shared readonly methods; public service never releases the chain."
+msgstr "共享只读方法；公共 service 从不释放此链。"
+
+msgid "Immutable typed face; copied faces still name the exact live owner."
+msgstr "不可变 typed face；复制的 face 仍指向同一个精确存活 owner。"
+
+msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/MSIK4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/MSIK4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+msgstr "仅适用于精确 STM32U575ZIT6Q TZEN0 裸机。特权 MSP Thread，CONTROL=0、PRIMASK=1、BASEPRI=FAULTMASK=0；不得已启动调度器。关闭 RUN 接纳、停止 Platform/System，并汇合全部生产者、IRQ、DMA、观察者及截止时间使用者。仅在实际排空后释放租约；没有剩余使用者时才传入已关闭屏障。登记从不自动进行。结束 Core TIM2 截止时间；不读取或重新启动 TIM2。独立 RTC 时钟位于此 RUN 域之外。要求 MSIS4/MSIK4／等总线频率、静默门控、全部 SRAM 保留，并关闭缓存、调试、MPU、SysTick、其他 IRQ 及 EXTI 源。拒绝时读取 SysTick CTRL 也会消耗 COUNTFLAG。独占 RTC：绑定的日历读取者及此 WUT 写入者。启动代码提供有效的保留 LSE 日历及 DBP=1。仅写入 WUT；每阶段先解锁 WPR 再重新锁定。外部须排除 NMI/HardFault、调试器、看门狗、其他主设备及异步配置写入者。门控值为零不能证明这些义务已满足。绑定是可信装配身份，不是硬件认证。WUTR=wake_ticks-1；首次 WUTF 位于 WUTR 至 WUTR+2 个节拍之间。RTC 采样分辨率为 3906.25us；短唤醒可能显示零经过时间。保留时钟的 max_gap_seconds 必须覆盖睡眠、配置／排空执行及外部有界唤醒延迟。如果硬件唤醒失败，WFI 没有 CPU 时长上限。错过采样间隔会污染独立时钟纪元。wait_executed 仅证明执行了 WFI，不证明物理驻留。全部返回路径均保留屏蔽状态。成功要求观察到 WUT、IRQ 及所加门控均已撤回，并恢复 MSIS4/MSIK4/Range4。排空失败时保留所有权。保持接纳关闭及相关对象存活；任何重启前均须调用 recover。任何失败都不撤销借用。重新启动 Platform 会创建新的 TIM2 纪元；旧截止时间均不能跨越该生命周期。仍不支持 RTOS Tick 补偿及 LPBAM。"
+
+msgid "stm32u575_stop2_copy.h"
+msgstr "stm32u575_stop2_copy.h"
+
+msgid "Exact same-owner U575 Stop2 finite SRAM4 copy boundary."
+msgstr "同一精确 owner 的 U575 Stop2 有限 SRAM4 复制边界。"
+
+msgid "Cross Stop2 with one finite AlarmA-triggered SRAM4 copy."
+msgstr "携带一次有限的 AlarmA 触发 SRAM4 复制跨越 Stop2。"
+
+msgid "All masked-MSP-Thread and stopped/joined RUN preconditions of enter remain required. The clock uses the explicit AlarmA-copy initializer and this owner's wake identity. Selected startup provides nonsecure SRAM4 and prepared LPDMA1 access; unrelated channels and masters are quiet. The receiver validates the actual binding and registers. No caller callback or gate mask authorizes exceptions."
+msgstr "enter 对中断屏蔽状态、MSP Thread 及已停止／汇合的 RUN 域所设的全部前提仍须满足。时钟使用显式 AlarmA-copy 初始化函数及此 owner 的唤醒身份。所选启动代码提供非安全 SRAM4 及已准备的 LPDMA1 访问；无关通道及主设备均静默。接收器验证实际绑定及寄存器。调用者回调或门控掩码均不能授权例外。"
+
+msgid "All calendar mask bits are set; ALRMASSR=0, ALRAIE=0 and ALRAFCLR=0. The receiver is ready before ALRAE enables the next whole-second event on trigger14. ALRAF and DMA pending remain intact while the producer is enabled. WUT is an independent escape. The receiver owns its generated second LLI and LPDMA1 channel0 IRQ114 wake vector. wait_executed proves WFI, never physical residency."
+msgstr "全部日历掩码位均已置位；ALRMASSR=0、ALRAIE=0 及 ALRAFCLR=0。在 ALRAE 使能 trigger14 上的下一个整秒事件前，接收器已准备就绪。生产者保持使能期间，不得清除 ALRAF 或 DMA pending。WUT 是独立的逃逸源。接收器拥有其生成的第二个 LLI，以及 LPDMA1 channel0 IRQ114 唤醒向量。wait_executed 仅证明执行了 WFI，不证明物理驻留。"
+
+msgid "Rejection leaves the new request unborrowed. Once accepted, setup failure retains every copy reference until RTC/WUT producer, DMA master/reset, IRQ, gate and clock restoration are independently quiet. Keep both owners, clock, buffers, workspace and RUN barrier live and closed. Preserve PRIMASK=1 through retained recovery. recover retries the same compound chain without WFI. An observed external LPDMA reset permanently quarantines the chain: quiet reset values and deassertion cannot prove the prior master's final access. Only an externally established system reset ends that responsibility. A tainted clock may settle an error after hardware drain, never a successful fresh elapsed time. No old TIM2 deadline, RTOS compensation, peripheral LPBAM plan or physical copy result is established."
+msgstr "拒绝时，新请求保持未借用。一旦接纳，配置失败会保留每个复制引用，直到 RTC/WUT 生产者、DMA 主设备／复位、IRQ、门控及时钟恢复均被独立确认静默。保持两个 owner、时钟、缓冲区、工作区及 RUN 屏障存活，且屏障保持关闭。保留状态的恢复期间须保持 PRIMASK=1。recover 重试同一复合链，不执行 WFI。若观察到外部 LPDMA 复位，此链将被永久隔离：静默复位值及复位解除不能证明先前主设备的最终访问。只有外部确立的系统复位才能结束该责任。受污染的时钟可以在硬件排空后以错误结束请求，但绝不能提供新的成功经过时间结果。此处不建立任何旧 TIM2 截止时间、RTOS 补偿、外设 LPBAM 计划或物理复制结果。"
+
+msgid "Link only Nexus::U575Stop2Copy for this mode. It owns the same static RUN domain and WUT/recover symbols as Nexus::U575Stop2; linking both alternatives is rejected. WUT-only enter remains available, but rejects every retained copy loan. Keep PRIMASK=1 until complete recovery."
+msgstr "此模式仅链接 Nexus::U575Stop2Copy。它与 Nexus::U575Stop2 拥有相同的静态 RUN 域及 WUT/recover 符号；同时链接两个备选实现会被拒绝。仍可调用仅使用 WUT 的 enter，但会拒绝每个保留中的复制借用。完全恢复前须保持 PRIMASK=1。"
+
+msgid "[in] Exact closed, drained RUN-domain barrier."
+msgstr "[in] 精确 RUN 域中已关闭且排空的屏障。"
+
+msgid "[in] Immutable initialized LPDMA1/channel0 face."
+msgstr "[in] 已初始化且不可变的 LPDMA1/channel0 face。"
+
+msgid "[inout] Prepared READY copy in the bound retained domain."
+msgstr "[inout] 已准备为 READY、位于绑定保留时间域中的复制请求。"
+
+msgid "[in] 4096..65536 RTC/16 ticks, nominal 2..32 s."
+msgstr "[in] 4096..65536 个 RTC/16 节拍，标称 2..32 s。"
+
+msgid "[in] Positive observation budget for each phase."
+msgstr "[in] 每阶段使用正数观察预算。"
+
+msgid "Admission, transition, cleanup and retained effects."
+msgstr "接纳、转换、清理及保留效果。"
+
+msgid "Separate copy admission and exact Stop2 transition observations."
+msgstr "分别观察复制接纳及精确 Stop2 转换。"
+
+msgid "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
+msgstr "accepted 表示请求、缓冲区及工作区已被借用，包括后续 RTC/电源配置失败的情况。只有以 acquire 观察到请求 SETTLED 后，才能读取最终复制结果及计数。transition 描述边界；dma_wake 记录所观察到的 ch0 NVIC pending。"
+
+msgid "stm32u575_lpdma_lptim1.h"
+msgstr "stm32u575_lpdma_lptim1.h"
+
+msgid "Exact U575 finite LPTIM1 autonomous register update."
+msgstr "精确 U575 的有限 LPTIM1 自主寄存器更新。"
+
+msgid "Bind one pure owner; no MMIO writes, allocation or worker."
+msgstr "绑定一个无副作用的 owner；不写 MMIO、不分配，也无 worker。"
+
+msgid "Exact STM32U575ZIT6Q TZEN0, MSIS4/MSIK4/equal buses/Range4, caches off. Selected SRAM4/LPDMA1 startup and retained LSE RTC access remain live. LPDMA0 and the entire LPTIM1 controller are exclusive; no other channel, timer writer, IRQ user or external reset exists. Config/face/control storage must be separate. Rejection retains no new reference."
+msgstr "精确 STM32U575ZIT6Q TZEN0、MSIS4/MSIK4、各总线频率相同、Range4、caches off。选定 SRAM4/LPDMA1 startup 和保留 LSE RTC 访问须保持有效。LPDMA0 和整个 LPTIM1 控制器必须独占；不得存在其他 channel、timer writer、IRQ user 或外部 reset。Config/face/control storage 必须分开。拒绝不保留新引用。"
+
+msgid "Explicitly prepare cold LPTIM1 access gates and LSE kernel."
+msgstr "显式准备冷态 LPTIM1 访问门控与 LSE kernel。"
+
+msgid "Unmasked privileged Thread, positive per-phase poll budget. Owns only LPTIM1EN, LPTIM1SEL and added LSESYSEN, preserving RTC/LSE provenance. LPTIM1 must be reset/cold and initially unclocked with reset mux. A failed preparation can retain effects; keep owner live and call stop until it succeeds. It never starts the timer or borrows a request."
+msgstr "未屏蔽的 privileged Thread，每阶段轮询预算为正数。仅拥有 LPTIM1EN、LPTIM1SEL 和新增的 LSESYSEN，保持 RTC/LSE 来源不变。LPTIM1 必须处于 reset/cold 状态，初始无时钟且 mux 为 reset 值。准备失败可能保留效果；须保持 owner 有效，并调用 stop 直至成功。它从不启动 timer，也不借用 request。"
+
+msgid "Prepare one SRAM4 tuple without borrowing or writing data/LLIs."
+msgstr "准备一组 SRAM4 tuple，不借用或写入 data/LLI。"
+
+msgid "Tuple contents remain unchanged from prepare through settlement. Invalid/aliased/wrapping spans leave every request byte unchanged. Deadline is absolute retained microseconds or NEVER; no TIM2 conversion."
+msgstr "Tuple 内容须从 prepare 到 settlement 保持不变。无效、重叠或回绕的区段不改变 request 的任何字节。Deadline 是保留时间域的绝对微秒值或 NEVER；不转换 TIM2 时间。"
+
+msgid "Request withdrawal without revoking any borrowed storage."
+msgstr "请求撤源，不撤销任何被借用的存储。"
+
+msgid "Masked privileged MSP Thread through compound recovery. Late cancel after observed DMA completion rejects STATE. First failure persists."
+msgstr "复合恢复全程使用屏蔽的 privileged MSP Thread。观察到 DMA 完成之后的迟到 cancel 被以 STATE 拒绝。首次失败保留。"
+
+msgid "Bounded producer/master isolation, never independent settlement."
+msgstr "有界隔离 producer/master，从不独立 settlement。"
+
+msgid "Producer UEDE withdrawal precedes DMA suspend/reset/idle. All final peripheral/IRQ references and Stop2 restoration precede final release. Unknown clock/access profile permits no peripheral MMIO; external DMA or LPTIM reset during a loan permanently quarantines that loan."
+msgstr "Producer UEDE 撤源先于 DMA suspend/reset/idle。全部最终 peripheral/IRQ 引用与 Stop2 恢复先于最终归还。Clock/access profile 未知时不允许 peripheral MMIO；借用期间的外部 DMA 或 LPTIM reset 将该借用永久隔离。"
+
+msgid "Close admission and restore owned start effects after compound join."
+msgstr "关闭准入，并在复合 join 后恢复自有 start 效果。"
+
+msgid "Positive per-phase observation budget is not elapsed time. BUSY keeps all effects/storage alive; recover through the concrete Stop2 owner. A fresh final write-OK proof means synchronized register writes, never physical Stop2 residency, output playback, board routing or HIL."
+msgstr "正数的每阶段观察预算不代表经过时间。BUSY 保持全部效果和存储有效；通过 concrete Stop2 owner 恢复。新的最终 write-OK 证明表示寄存器写入已同步，绝不代表物理 Stop2 驻留、输出播放、Board 路线或 HIL。"
+
+msgid "One caller-owned immutable register tuple, in exact SRAM4."
+msgstr "调用者拥有且不可变的一组寄存器 tuple，位于精确 SRAM4 中。"
+
+msgid "CCR1 < ARR, RCR=0 and 1023<=ARR<=65535. There is exactly one tuple; repeated updates need a separate write-OK proof and are not admitted. No GPIO route or physical waveform playback is established."
+msgstr "CCR1 < ARR、RCR=0 且 1023<=ARR<=65535。恰好一组 tuple；重复更新需要单独的 write-OK 证明，本参考不准入。该参考不建立 GPIO 路线或物理波形播放。"
+
+msgid "Exactly two generated continuation LLIs; never caller instructions."
+msgstr "恰好两个生成的 continuation LLI；绝不是调用者指令。"
+
+msgid "Entire aligned 48-byte extent is separate nonsecure SRAM4. The owner writes all words only after ACCEPTED; keep immutable until SETTLED."
+msgstr "整个对齐的 48 字节范围是独立的 nonsecure SRAM4。Owner 仅在 ACCEPTED 之后写入所有字；直到 SETTLED 都须保持不可变。"
+
+msgid "Zero caller storage, never copy/reset/reconstruct a live owner."
+msgstr "调用者存储须预先清零，不得复制、reset 或重建活动 owner。"
+
+msgid "One privileged Thread serializes all calls; no ISR/concurrent writer. Keep owner, clock and every face alive through stop and observer joins."
+msgstr "由一个 privileged Thread 串行调用全部方法；不得有 ISR 或并发 writer。Owner、clock 和每个 face 必须保持有效，直至 stop 与 observer join 完成。"
+
+msgid "Explicit live retained-clock and same concrete Stop2 binding."
+msgstr "显式绑定有效的 retained-clock 和同一 concrete Stop2。"
+
+msgid "Use the ordinary retained-clock initializer with wake_owner equal to nx_stm32u575_stop2_identity(). No AlarmA-copy opt-in is required."
+msgstr "使用普通 retained-clock 初始化器，wake_owner 等于 nx_stm32u575_stop2_identity()。无需 AlarmA-copy opt-in。"
+
+msgid "Prepared metadata; all fields are provider-controlled after prepare."
+msgstr "准备好的元数据；prepare 之后所有字段由 provider 控制。"
+
+msgid "Initialize base first. ACCEPTED borrows request, tuple and workspace until acquire-observed SETTLED and external joins. Cancel/deadline do not revoke a borrow. CPU control storage must be separate from SRAM4 data/LLIs. Never mutate or reprepare while borrowed."
+msgstr "先初始化 base。ACCEPTED 借用 request、tuple 和 workspace，直到 acquire 观察到 SETTLED 且外部 join 完成。Cancel/deadline 不撤销借用。CPU control storage 必须与 SRAM4 data/LLI 分开。借用期间不得修改或重新 prepare。"
+
+msgid "Shared immutable methods; service never publishes SETTLED."
+msgstr "共享不可变方法；service 从不发布 SETTLED。"
+
+msgid "Copied immutable faces retain the exact physical owner identity."
+msgstr "复制的不可变 face 保留精确物理 owner 身份。"
+
+msgid "stm32u575_stop2_lptim1.h"
+msgstr "stm32u575_stop2_lptim1.h"
+
+msgid "Same concrete Stop2 owner and finite LPTIM1 LPBAM boundary."
+msgstr "同一 concrete Stop2 owner 和有限 LPTIM1 LPBAM 边界。"
+
+msgid "One finite hardware-requested LPTIM1 tuple across Stop2."
+msgstr "跨 Stop2 的一组有限硬件请求 LPTIM1 tuple。"
+
+msgid "Link only Nexus::U575Stop2Lptim1; WUT/copy alternatives are exclusive. Same static owner, RUN ClockDomain and recovery. Ordinary retained time uses this wake identity; explicitly start the dedicated receiver first. Closed/drained exact RUN barrier, stopped Platform, privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0 remain required. Keep masks and RUN admission closed through all retained recovery."
+msgstr "仅链接 Nexus::U575Stop2Lptim1；WUT/copy 备选互斥。沿用同一 static owner、RUN ClockDomain 和 recovery。普通 retained time 使用此 wake identity；须先显式启动专用 receiver。仍须满足关闭并排空的精确 RUN barrier、已停止的 Platform、privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0。全部保留恢复期间须维持掩码及 RUN 准入关闭。"
+
+msgid "LPTIM1 LSE/preload/CC1E, initial ARR1023/RCR0; request13/BREQ1 gates CCR1, two generated software-requested LLIs write RCR and ARR last. No AlarmA trigger. WUT escapes at 4096..65536 RTC/16 ticks. Positive poll_limit bounds observations, not WFI duration or physical response."
+msgstr "LPTIM1 LSE/preload/CC1E，初始 ARR1023/RCR0；request13/BREQ1 门控 CCR1，两个生成的软件请求 LLI 写 RCR，最后写 ARR。无 AlarmA trigger。WUT 在 4096..65536 个 RTC/16 tick 时提供逃逸唤醒。正数 poll_limit 约束观察次数，不约束 WFI 时长或物理响应。"
+
+msgid "UEDE withdrawal/DIEROK precede DMA suspend/reset/idle and reference detach. Fresh write-OK gates success. Owned RCC reset disables LPTIM1 per ES0499. All peripheral/IRQ/gate/clock restoration precedes SETTLED; start access gates stay until joined public stop. Cancel/deadline never revoke storage. Unknown profile permits no peripheral MMIO. External peripheral reset permanently quarantines an active loan until system reset. Recovery never runs WFI. No GPIO/Board route, output playback, physical residency, timing/power or HIL result is implied."
+msgstr "UEDE 撤源/DIEROK 先于 DMA suspend/reset/idle 和引用移除。新的 write-OK 是成功的必要条件。自有 RCC reset 按 ES0499 关闭 LPTIM1。全部 peripheral/IRQ/gate/clock 恢复先于 SETTLED；start access gate 保留至 joined public stop。Cancel/deadline 从不撤销存储借用。Profile 未知时不允许 peripheral MMIO。外部 peripheral reset 将活动借用永久隔离，直至系统 reset。Recovery 从不执行 WFI。该参考不暗示 GPIO/Board 路线、输出播放、物理驻留、timing/power 或 HIL 结果。"
+
+msgid "Admission and software sleep observations, not the final result."
+msgstr "准入与软件睡眠观察，不是最终结果。"
+
+msgid "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
+msgstr "即使后续设置失败，accepted 仍借用 request/tuple/workspace。dma_wake 表示 pending IRQ114；wait_executed 仅证明执行过 WFI。"
+
+msgid "Explicit optional H743 RGB565 copy and fixed PFC owner."
+msgstr "显式可选的 H743 RGB565 复制与固定 PFC owner。"
+
+msgid "Exact source-to-RGB565 operations; unknown values are unsupported."
+msgstr "精确的源到 RGB565 操作；未知值不受支持。"
+
+msgid "RGB565 source and output; zero preserves the copy operation."
+msgstr "源和输出均为 RGB565；零值保留复制操作。"
+
+msgid "ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian MCU."
+msgstr "ARGB8888 到 RGB565；在此小端 MCU 上输入字节顺序为 B、G、R、A。"
+
+msgid "Alpha is discarded; no blending, channel/byte swap or CLUT load."
+msgstr "丢弃 alpha；不进行混合、通道／字节交换或 CLUT 加载。"
+
+msgid "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported. Offsets count each side's pixels (LOM=0), not bytes. CLUT/blending/other formats/IRQ are unsupported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
+msgstr "在未屏蔽中断的特权任务中，由单个执行者串行调用。调用方明确排除所有其他 DMA2D owner，包括 HAL、IRQ 处理器及组件外的资源选择。stop 前不得改变 Cache／RCC／复位／MPU 或时钟域。所有载荷必须完整位于 AXI SRAM [0x24000000, 0x24080000)；拒绝源／目标重叠。仅支持 RGB565 M2M 或固定 ARGB8888 到 RGB565 PFC。偏移按每侧自身的像素计数（LOM=0），不按字节计数。不支持 CLUT／混合／其他格式／IRQ。不创建引脚、Board 路由、调度器、队列或工作线程。初始化 IO 错误保留清理所有权；应调用 stop。成功 stop 会脱离每个源，随后仅撤回自己的 RCC 时钟门。重复 stop 不访问硬件。"
+
+msgid "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. x/width_bytes are source bytes, not output bytes or pixels. Source address/x/width/stride align to 2 for RGB565 or 4 for ARGB8888. Destination is RGB565, aligned to 2 bytes. Destination row bytes are width_bytes/source_pixel_bytes*2; destination_stride/capacity are bytes. LOM=0 pixel gaps are at most 0x3fff on each side; width at most 0x3fff pixels, height at most 0xffff rows. Success reports output bytes, excluding stride padding, through nx_request_result. Destination cannot overlap a full-capacity source-pool slot. Every control is disjoint from every slot's full capacity. The selected source slot is immutable through final access. Task-only admission checks known pool extents in O(n)."
+msgstr "使用普通请求辅助函数初始化／准备 base。ACCEPTED 借用本对象、精确源借用控制体与目标区间，直到 acquire 观察到 SETTLED。接纳时源借用所有权转移给此 owner；只有最终 DMA 访问结束后才释放。拒绝时原借用仍归调用方。不得单独释放、修改或复用已接纳的控制体、源或目标。x／width_bytes 是源字节数，不是输出字节数或像素数。RGB565 的源地址／x／宽度／步幅按 2 字节对齐，ARGB8888 则按 4 字节对齐。目标为 RGB565，按 2 字节对齐。目标行字节数为 width_bytes/source_pixel_bytes*2；destination_stride/capacity 以字节计。LOM=0 时每侧像素间隙最多为 0x3fff；宽度最多为 0x3fff 像素，高度最多为 0xffff 行。成功时通过 nx_request_result 报告输出字节数，不含步幅填充。目标不能与源池槽的完整容量重叠。每个控制体必须与每个槽的完整容量互不重叠。选中的源槽直到最终访问结束都保持不可变。仅限任务的接纳以 O(n) 检查已知池区间。"
+
+msgid "Submit SUCCESS means ACCEPTED, including a later setup/readback error. Accepted failures retain every borrow until service proves final drain. The first observed failure is retained across cancel/guard restoration."
+msgstr "Submit 返回 SUCCESS 表示 ACCEPTED，包括后续设置／读回错误。已接纳的失败保留全部借用，直到 service 证明最终排空。最先观察到的失败在取消／守卫恢复后仍被保留。"
+
+msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."
+msgstr "abort_observations 限定进入隔离前 service 失败观察的次数。它是软件进展预算，不是实测的总线／DMA 时间界限。同一执行者在可恢复隔离后继续 service；实际排空可使请求结算。若观察到活动期间 RCC 时钟门丢失或复位被置位，则永久保留全部借用。恢复寄存器不能证明已丢失的传输历史；没有 API 能回收它。未被观察到的复位脉冲无法检测，因此仍必须独占 RCC 所有权。系统恢复由外部负责。"
+
+msgid "f407_i2s2_slave_tx.h"
+msgstr "f407_i2s2_slave_tx.h"
+
+msgid "Exact F407 finite stereo16 I2S2 slave transmitter."
+msgstr "精确面向 F407 的有限 stereo16 I2S2 从机发送器。"
+
+msgid "Fixed chip resource selected by the same validated hardware IR."
+msgstr "由同一份已验证硬件 IR 选定的固定芯片资源。"
+
+msgid "Acquire the selected F407 SPI2 personality and fixed pads."
+msgstr "取得选定 F407 SPI2 工作模式及固定引脚的所有权。"
+
+msgid "The caller owns the external master and holds CK idle LOW and WS HIGH continuously from before initialization/submission until acquire-observed ACTIVE. Pin reads sample instants; they cannot prove electrical silence. The master transmits exactly the declared complete frames and stops before a missing next word. Restart begins at the left channel. A prefilling cancellation with CK idle cannot empty DR; preserve QUARANTINED storage until coordinated drain clocks allow TXE then fresh BSY observations. This error drain can underrun and does not promise valid stereo audio or a complete transmitted frame; errors report zero transferred bytes. Timeout, TC or NDTR0 never proves wire completion or final access. The caller also supplies valid operating voltage, I/O levels, load, CK/WS/SD timing and DMA refill margin under DS8626. ACTIVE and pin samples do not measure or qualify those electrical/rate conditions."
+msgstr "调用方拥有外部主机，并且从初始化或提交之前开始，持续保持 CK 处于空闲 LOW、WS 处于 HIGH，直到以 acquire 语义观察到 ACTIVE。引脚读取只反映采样瞬间，不能证明电气信号持续静止。主机必须恰好传输所声明的完整帧，并在需要下一个尚未提供的数据字之前停止。再次启动时从左声道开始。已预填充时，若取消请求且 CK 仍保持空闲，DR 便无法排空；必须保留处于 QUARANTINED 的存储，直到协调提供的排空时钟允许先观察 TXE，再重新观察 BSY。这种错误排空可能产生欠载，并不保证得到有效的立体声音频或发送完整帧；错误一律报告零传输字节。超时、TC 或 NDTR0 都不能证明线上发送完成或已完成最终访问。调用方还必须按 DS8626 提供有效的工作电压、I/O 电平、负载、CK/WS/SD 时序和 DMA 补充数据裕量。ACTIVE 和引脚采样既不测量这些电气或速率条件，也不构成对它们的验证。"
+
+msgid "One privileged unmasked task serializes every method and external owner lifecycle. Preserve incoming masks on all rejection paths. NMI/HardFault, other DMA/IRQ/pin owners, reset/reclock/debugger writers and concurrent Platform stop are excluded. Observed reset or clock-profile history loss while borrowed permanently retains the request; restoring reset-looking registers cannot establish prior final access. Main SRAM is DMA-visible; CCM is not. Chip pin capability establishes neither a PCB route nor codec/electrical HIL. The assembly and fixture supply the actual F407/package identity: shared device-group and density reads alone do not distinguish an F405 or authenticate the physical package."
+msgstr "由一个未屏蔽中断的特权任务串行执行所有方法，并串行管理外部所有者的生命周期。所有拒绝路径都必须保留调用前的中断屏蔽状态。不允许从 NMI/HardFault 调用，也不允许其他 DMA/IRQ/引脚所有者、复位或重配时钟的写入方、调试器写入方以及并发 Platform stop 介入。借用期间一旦观察到复位或时钟配置历史丢失，请求就会被永久保留；将寄存器恢复成复位时的样子不能证明此前已经完成最终访问。主 SRAM 对 DMA 可见；CCM 不可见。芯片引脚能力既不能证明 PCB 布线，也不代表已经完成编解码器或电气 HIL 验证。实际的 F407 及封装身份由装配配置和测试夹具确定：仅凭共用的器件组标识和容量读数，既不能区分 F405 与 F407，也不能验证物理封装。"
+
+msgid "Exact F407VE/ZG, baremetal, HSE8/PLL168 and live TIM2 only. The normal hardware role exclusively claims SPI2/I2S2, PB12 WS/PB13 CK/PB15 SD AF5, DMA1 Stream4 channel0 and both vectors. No PLLI2S, continuous DBM or IRQ service is enabled. Peripheral/pad/SPI2 gate ownership lasts until stop SUCCESS, independently of each request's shorter frame loan. The selected cold-reset Platform separately holds the shared GPIOB/DMA1 gates. Initialization requires both already on; this provider never enables or withdraws them. Every shared domain user, including external HAL users, must join before Platform stop. Clock-gating is not proof of a reset engine; unknown running-state attachment is unsupported."
+msgstr "仅支持精确的 F407VE/ZG 器件、baremetal、HSE8/PLL168 以及有效运行中的 TIM2。常规硬件角色以独占方式声明 SPI2/I2S2、PB12 WS/PB13 CK/PB15 SD AF5、DMA1 Stream4 channel0 及两个向量。不启用 PLLI2S、连续 DBM 或 IRQ 服务。外设、引脚和 SPI2 时钟门控的所有权一直保留到 stop 返回 SUCCESS，独立于每个请求持续时间较短的帧借用。选定的冷复位 Platform 单独持有共享的 GPIOB/DMA1 时钟门控。初始化要求这两个门控已经开启；本提供方绝不启用或撤回它们。所有共享域使用者，包括外部 HAL 使用者，都必须在 Platform stop 前完成活动并汇合退出。时钟门控状态不能证明引擎已经复位；不支持接管运行状态未知的硬件。"
+
+msgid "[inout] Fresh zero storage, disjoint from all controls."
+msgstr "[inout] 全新的零初始化存储，且与所有控制对象的存储范围互不重叠。"
+
+msgid "[in] Stable readonly {&nx_f407_i2s2_slave_tx_ops, storage}."
+msgstr "[in] 地址稳定且只读的 {&nx_f407_i2s2_slave_tx_ops, storage}。"
+
+msgid "[in] Fixed resource and observation budget."
+msgstr "[in] 固定资源及观察预算。"
+
+msgid "SUCCESS, INVALID, CONTEXT, BUSY, STATE, UNSUPPORTED or IO. Initialization IO retains cleanup responsibility; call stop before reuse."
+msgstr "SUCCESS、INVALID、CONTEXT、BUSY、STATE、UNSUPPORTED 或 IO。初始化返回 IO 时仍保留清理责任；复用前须调用 stop。"
+
+msgid "Shared immutable methods; callbacks receive the storage context."
+msgstr "共享且不可变的方法表；回调接收存储上下文。"
+
+msgid "One complete contiguous interleaved stereo16 frame block."
+msgstr "一个完整、连续且交错存储的 stereo16 帧块。"
+
+msgid "Initialize and prepare base with the ordinary helpers. The source has one plane of contiguous nonempty rows, no offset or padding, and 4..131068 bytes in a multiple of four. Each frame stores left then right 16-bit little-endian samples. The fixed Philips I2S wire emits each sample MSB first in 16-bit slots. Sample values, rate, codec and external clocks are caller policy. Acceptance transfers the exact immutable source loan and borrows this request until acquire-observed SETTLED. Never separately release, mutate or reuse accepted storage. SUCCESS reports the whole block only after memory and wire completion. Every error or cancellation reports zero; the DMA count does not establish serialized audio bytes."
+msgstr "使用常规辅助函数初始化并准备 base。源数据由一个平面内的连续非空行组成，没有偏移或填充，大小为 4..131068 字节且必须是四的倍数。每帧按先左声道、后右声道的顺序存放 16 位小端采样。固定的 Philips I2S 线上格式使用 16 位时隙，并以 MSB 优先的顺序发送每个采样。采样值、速率、编解码器和外部时钟均由调用方决定。接受请求时会移交该确切且不可变的源帧借用，并借用此请求，直至以 acquire 语义观察到 SETTLED。不得自行释放、修改或复用已接受的存储。只有在内存传输和线上发送均完成后，SUCCESS 才报告整个块的字节数。任何错误或取消均报告零字节；DMA 计数无法证明已经串行发送的音频字节数。"
+
+msgid "One privileged serialized task executor; no ISR callback."
+msgstr "由一个特权任务串行执行所有操作；不提供 ISR 回调。"
+
+msgid "submit SUCCESS means ACCEPTED, including subsequent setup failure. QUEUED is not armed. Acquire-observed ACTIVE alone authorizes the external master to begin CK, after one DR halfword and a live TIM2 interval have been observed. Error, cancellation or timeout retains the full loan until actual engine, serializer, vector and address withdrawal. service returns SUCCESS when idle or settled, otherwise BUSY or an observed failure with the borrow retained. stop closes further admission and requests cancellation; repeat it after service proves the remaining cleanup. The first SR observation occurs only after acceptance because reading SR clears UDR/FRE. Its fault remains latched through cleanup; a later clean status read cannot erase the operation's cause. No method allocates, starts a task or replays a block. Admission checks controls against every full-capacity pool slot in O(slot count); service/cancel do not scan the pool."
+msgstr "submit 返回 SUCCESS 表示 ACCEPTED，即使后续设置失败也不改变这一含义。QUEUED 尚未完成就绪准备。只有在观察到 DR 中已有一个半字且有效运行的 TIM2 已经过所需间隔后，以 acquire 语义观察到 ACTIVE，才允许外部主机开始提供 CK。发生错误、取消或超时时，仍保留完整借用，直到实际完成 DMA 引擎、串行发送器、向量和地址引用的撤回。service 在空闲或请求已终结时返回 SUCCESS；否则返回 BUSY 或观察到的失败状态，同时继续保留借用。stop 关闭后续请求接纳并请求取消；待 service 证明剩余清理已经完成后，再次调用 stop。由于读取 SR 会清除 UDR/FRE，请求的首次 SR 观察仅在接受后发生。观察到的故障在整个清理过程中保持锁存；后续无故障的状态读取不能抹去本次操作的失败原因。任何方法都不分配内存、不启动任务，也不重放数据块。接纳请求时，会以 O(slot count) 的复杂度检查控制对象是否与池中每个槽位的完整容量范围重叠；service/cancel 不扫描该池。"
+
+msgid "Immutable caller-owned face; private state is separate."
+msgstr "由调用方持有的不可变接口对象；私有状态单独存放。"
+
+msgid "Exact resource and positive bounded observation budget."
+msgstr "精确选定的资源，以及为正数的有界观察预算。"
+
+msgid "poll_limit bounds each arm/drain observation loop, not time or external-clock progress. Arming observes at least three actual 1 MHz TIM2 ticks after I2SE readback. Deadlines are absolute in the current live Platform TIM2 epoch. The caller stops and joins this owner before Platform stop/restart; the deadline includes wire and observer withdrawal. No automatic ClockDomain enrollment is implied."
+msgstr "poll_limit 限制每次就绪准备或排空观察循环的次数，并不表示经过的时间，也不保证外部时钟推进。就绪准备必须在 I2SE 读回后观察到至少三个实际的 1 MHz TIM2 计数推进。截止时间是当前有效 Platform TIM2 时间纪元内的绝对时间。调用方必须先停止该所有者并等待其活动完全结束，再执行 Platform stop/restart；截止时间也涵盖线上发送排空和观察者撤回。这里并不意味着会自动加入 ClockDomain。"
+
+msgid "Exact storage for one owner, zeroed once before publication."
+msgstr "供一个所有者使用的精确大小存储，在发布前完成一次清零。"
+
+msgid "Do not copy or alter. Keep storage and face live through successful stop. Accepted request/source loans last until acquire-observed SETTLED; a failed stop never revokes an unfinished borrow."
+msgstr "不得复制或修改。存储和接口对象必须始终保持有效，直到 stop 成功。已接受的请求及源帧借用一直保留到以 acquire 语义观察到 SETTLED；stop 失败绝不撤销尚未结束的借用。"

@@ -249,9 +249,13 @@ class H743FlashRamStaticTests(unittest.TestCase):
         self.accepted(mutation="VALID_FLASH_CONSTANT_ONLY")
         for mutation in ("BAD_FLASH_DATA_READ", "BAD_FLASH_DATA_LITERAL",
                          "BAD_FLASH_READ_PARTIAL_BOUNDARY",
-                         "BAD_FLASH_READ_CALL_RETURN"):
+                         "BAD_FLASH_READ_CALL_RETURN", "BAD_FLASH_READ_JOIN",
+                         "BAD_FLASH_READ_UNKNOWN_JOIN"):
             with self.subTest(mutation=mutation):
                 self.rejected(mutation, "constant-address Flash data read")
+
+    def test_real_constant_growth_rejects_instead_of_forgetting_values(self):
+        self.rejected("BAD_CONSTANT_LOOP", "constant .*bound exceeded")
 
     def test_constant_detection_does_not_promote_unresolved_c_data_operands(self):
         _, report = self.accepted(mutation="VALID_UNKNOWN_DATA_READ")
@@ -347,6 +351,25 @@ class H743RamConstantFlowTests(unittest.TestCase):
             None, functions, list(reversed(range(len(blocks)))),
             {index: True for index in functions})
 
+    def test_flash_address_alternative_survives_a_control_flow_join(self):
+        with self.assertRaisesRegex(EvidenceError,
+                                    "constant-address Flash data read"):
+            self.analyze([(0x24001000, [
+                "0028", "01d0", "0023", "03e0", "40f20003",
+                "c0f60003", "1a68", "7047"])])
+
+    def test_unknown_does_not_erase_a_known_flash_alternative(self):
+        with self.assertRaisesRegex(EvidenceError,
+                                    "constant-address Flash data read"):
+            self.analyze([(0x24001000, [
+                "0028", "01d0", "00bf", "03e0", "40f20003",
+                "c0f60003", "1a68", "7047"])])
+
+    def test_growing_loop_constants_fail_closed(self):
+        with self.assertRaisesRegex(EvidenceError, "constant .*bound exceeded"):
+            self.analyze([(0x24001000, [
+                "0023", "0133", "0028", "fcd1", "7047"])])
+
     def test_partial_stack_store_invalidates_the_whole_overlapping_word(self):
         report = self.analyze([(0x24001000, [
             "81b0", "40f20003", "c0f60003", "0093", "0022",
@@ -375,10 +398,14 @@ class H743RamConstantFlowTests(unittest.TestCase):
             (target, ["7346", "1a68", "7047"])])
         self.assertTrue(report["unresolved_read_sites"])
 
-    def test_post_index_writeback_does_not_leave_the_old_base_constant(self):
-        report = self.analyze([(0x24001000, [
-            "40f20003", "c0f60003", "43f8040b", "1a68", "7047"])])
-        self.assertTrue(report["unresolved_read_sites"])
+    def test_post_index_writeback_preserves_the_updated_flash_address(self):
+        # Start four bytes below Flash. STR post-index advances r3 into Flash;
+        # forgetting writeback, or retaining the old base, must not hide LDR.
+        with self.assertRaisesRegex(EvidenceError,
+                                    "constant-address Flash data read"):
+            self.analyze([(0x24001000, [
+                "40f20003", "c0f60003", "043b", "43f8040b", "1a68",
+                "7047"])])
 
 
 if __name__ == "__main__":

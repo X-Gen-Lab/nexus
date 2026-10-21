@@ -52,8 +52,19 @@ cooperative job。静态 factory 按模式保留精确状态和资源，不生�
 镜像、104 个 CPU runtime 变体、SDK 独立消费及完整 GitHub CI。八个 H743/U575
 公开参考配置分别完成两次独立断网构建，ELF/BIN 逐字节一致，并封存为无签名软件
 候选；具体范围和原始证据见结果索引。后续文档提交只记录该源码，不继承为新的
-代码执行资格。实板未接入，物理 HIL 均为 `not_executed`；运行态交接、DVFS 和
-深 STOP 连续计时尚未实现，55 项原始退出条件保持不变。
+代码执行资格。实板未接入，物理 HIL 均为 `not_executed`。当前有限 F407 屏蔽
+Flash 尾跳不代表通用运行态接管；SOC-34 的 DVFS 仍未实现。SOC-35 已增加
+[U575 保留时钟与 Stop2](../design/u575-retained-time.md)的有界软件子集，使用独立
+RTC 时间域与显式 WUT/Stop2 owner；另有同一 owner 的选定
+[SRAM4/LPDMA 有限复制](../design/u575-stop2-copy.md)。通用外设 LPBAM 尚未实现，
+物理复制、保留、精度、功耗及唤醒验收仍未执行。SOC-35 完整退出仍开放；全部 55 项原始退出条件保持不变。
+
+另有独立选定的 [LPTIM1 单组 LPBAM 软件参考](../design/u575-lptim1-lpbam.md)，
+由同一 concrete Stop2 owner 管理固定 SRAM4 CCR1/RCR=0/ARR 更新及显式 start/stop
+的部分失败恢复。它不建立引脚路线、完整波形播放或实板资格；物理 HIL 仍为
+`not_executed`，原 IO-32/SOC-35 退出条件不变。完整 SDK 消费计划由
+[维护的 transport policy](../../tools/release/transport.py) 定义；历史 v7/v8 执行记录
+不能覆盖新增选择。本页不宣称新增选择已取得完整 SDK、离线复现或软件候选资格。
 
 既有构建系统交付绑定 `cc6a065c`，完整结果单独记录在构建结果索引，不能继承
 上面的历史 SoC 执行身份。该版本的八个候选使用 H743 HSI64／Cache off 和 U575

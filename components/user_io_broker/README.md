@@ -1,7 +1,7 @@
 # User I/O broker
 
-An optional kernel-invoked component admits one scalar GPIO message against an
-explicit principal/device/mask policy. `Nexus::UserIoBroker` has no instances,
+The scalar GPIO path of this optional kernel-invoked component admits one
+message against an explicit principal/device/mask policy. `Nexus::UserIoBroker` has no instances,
 maximum loan pool, worker, allocation or implicit OS dependency. Provider state
 and construction remain private; each integrating kernel supplies its own
 caller-owned broker, call slots and trusted memory ports.
@@ -18,3 +18,17 @@ FreeRTOS SVC routing, task identity, actual MPU/TrustZone enforcement, user faul
 containment and the kernel memory pinner still need an integrating kernel. No
 physical isolation or electrical qualification follows from these software tests.
 See [the contract](../../docs/design/user-io-broker.md).
+
+The same optional target also provides explicit copied UART TX mediation through
+`user_io_async.h` and trusted caller-owned `user_io_async_storage.h`. It uses the
+existing BusOwner/UARTOwner queue, copies user bytes before acceptance and retains
+only privileged cells. Exact trusted session/slot/epoch identities, real provider
+drain and owner publication join precede consumption. Closed privileged reap
+additionally needs actual outer-gateway drain proof; final join releases the
+exclusive externally claimed role. Copy errors, cancellation, quarantine and
+failed proof never authorize replay or premature storage reuse.
+
+This common mechanism does not supply SVC/CMSE entry, kernel identity/copy/session
+authority, MPU/TrustZone isolation, NS RTOS or physical qualification. The single
+canonical contract and its reviewed Chinese translation are linked above; full
+IO-39/SOC-36 exits remain open.

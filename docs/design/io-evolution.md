@@ -463,19 +463,34 @@ control algorithms and recovery policy remain in external consumer projects.
 ## Work that is still a separate implementation
 
 The ledger retains the exits for broader linked-list DMA selections, broader
-high-throughput H743 configurations, U575 low-power autonomous execution, broader or continuous
-synchronized control groups, advanced Ethernet/USB, external storage, TrustZone
-services, multicore transport, audio and frame devices. A public type, validated
-topology or model does not complete these exits. Each mode needs its own provider, reviewed route,
-failure and ownership tests, ARM/SDK checks, resource costs and physical evidence
-where applicable. Finite [U575 UART GPDMA TX](u575-uart-gpdma.md), its separate
-[hardware-chain TX selection](../../soc/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx), the
-[joint PWM/ADC window](pwm-adc.md) and selected [G474 CAN FD modes](can-fd.md) now
-have specific software paths; those selections do not complete the broader exits
-or establish external wiring, measured performance or HIL. The finite chain
-implements actual hardware node fetch and descriptor/payload drain for one
-contiguous SRAM1 source. It does not select noncontiguous scatter/gather,
-circular chains, RX DMA or autonomous low-power execution.
+high-throughput H743 configurations, U575 general peripheral LPBAM, broader or
+continuous synchronized control groups, advanced Ethernet/USB, external storage,
+TrustZone services, multicore transport, audio and frame devices. A public type,
+validated topology or model does not complete these exits. Each mode needs its
+own provider, reviewed route, failure and ownership tests, ARM/SDK checks,
+resource costs and physical evidence where applicable. Finite
+[U575 UART GPDMA TX](u575-uart-gpdma.md), its separate
+[hardware-chain TX selection](../../soc/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx), the [joint PWM/ADC window](pwm-adc.md), selected
+[G474 CAN FD modes](can-fd.md) and the separately selected
+[finite SRAM4/LPDMA1 channel-0 Stop2 copy](u575-stop2-copy.md) now have specific
+software paths; those selections do not complete the broader exits or establish
+external wiring, measured performance or HIL. The finite GPDMA chain implements
+actual hardware node fetch and descriptor/payload drain for one contiguous SRAM1
+source. That GPDMA selection does not select noncontiguous scatter/gather,
+circular chains, RX DMA or autonomous low-power execution. The separate SRAM4
+copy uses the same concrete Stop2 owner for AlarmA14, independent WUT escape and
+compound RTC/DMA/IRQ/gate/clock final release; general peripheral LPBAM and the
+full IO-32/SOC-35 exits remain open.
+
+The dedicated [single-tuple LPTIM1 LPBAM reference](u575-lptim1-lpbam.md)
+adds one finite SRAM4 CCR1/RCR=0/ARR update under that same concrete Stop2 owner.
+The first word uses hardware request13 with BREQ1 and reserved DREQ0; two fixed
+continuation LLIs write RCR and ARR last. Explicit start/stop retains partial
+preparation and failed-drain responsibility. Fresh write-OK and all final-access
+proofs are necessary for success; success establishes synchronized register
+writes, not complete waveform playback. There is no GPIO route or physical HIL
+result, and general peripheral LPBAM and the original IO-32/SOC-35 exits remain
+open.
 
 Use [platform integration contracts](integration-contracts.md),
 [the lifecycle matrix](io-lifecycle-matrix.md),

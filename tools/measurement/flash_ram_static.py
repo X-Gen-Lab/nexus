@@ -3,11 +3,11 @@
 Every instruction comes from ELF-validated bytes; printed mnemonics carry no
 meaning here. This finite classifier checks direct control/literal closure,
 canonical returns and a static frame bound under explicit C memory and compiler
-ABI obligations. A finite constant analysis detects recoverable physical-Flash
-reads;
-unresolved C pointers remain unproved. Optional production gate dominance does
-not prove the gate's MPU/drain/VTOR semantics. Neither check proves arbitrary
-pointer ownership, timing, CPU execution or hardware behavior.
+ABI obligations. Limited fixture mode detects recoverable physical-Flash reads.
+Production mode requires the independent byte-defined assembly boundary and
+classifies every C data operand by fixed object, exact MMIO or proved SP slots;
+an unresolved operand rejects the image. These checks retain explicit C/ABI
+ownership obligations and do not establish hardware or timing behavior.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from __future__ import annotations
 from bisect import bisect_left
 from dataclasses import dataclass
 import hashlib
+from itertools import product
 from pathlib import Path
 import re
 
@@ -110,6 +111,9 @@ def _decode(address, encoded, *, bridge):
             if op != 1:
                 _destination(rd)
             rm = (h >> 3) & 15
+            if op == 1:
+                _require(not {rd, rm}.intersection((13, 15)),
+                         "unsupported high CMP PC/SP operand")
             return _Op(writes_lr=rd == 14 and op != 1,
                        writes=() if op == 1 else (rd,),
                        reads=(rm,) if op == 2 else (rd, rm))
@@ -162,10 +166,16 @@ def _decode(address, encoded, *, bridge):
             return _Op(it_count=4 - ((mask & -mask).bit_length() - 1))
         if h & 0xf000 == 0xc000:
             _require(h & 255, "empty integer multiple transfer")
-            return _Op(writes=tuple(i for i in range(8) if h & (1 << i))
-                       if h & 0x800 else (),
-                       reads=((h >> 8) & 7,) if h & 0x800 else (),
-                       store_bases=() if h & 0x800 else ((h >> 8) & 7,))
+            registers = tuple(i for i in range(8) if h & (1 << i))
+            base, load = (h >> 8) & 7, bool(h & 0x800)
+            # T1 LDM suppresses writeback when its base is itself loaded.
+            # STM always writes its base, including when no data register is
+            # a destination. Protection checks need every architectural write.
+            writeback = not load or base not in registers
+            return _Op(writes=(registers if load else ()) +
+                       ((base,) if writeback else ()),
+                       reads=(base,) if load else (),
+                       store_bases=() if load else (base,))
         if h & 0xf000 == 0xd000 and (h >> 8) & 15 < 14:
             return _Op("conditional", address + 4 + _signed((h & 255) * 2, 9))
         if h & 0xf800 == 0xe000:
@@ -247,6 +257,8 @@ def _decode(address, encoded, *, bridge):
             if k & 0x800:
                 _require(k & 0x500, "invalid indexed transfer")
                 _require(h & 15 != 13 or not k & 0x100, "dynamic SP write")
+                _require(not k & 0x100 or h & 15 != k >> 12,
+                         "unpredictable writeback/data register overlap")
             else:
                 _require(h & 15 != 13 or h & 16,
                          "unknown indexed SP store footprint")
@@ -265,7 +277,8 @@ def _decode(address, encoded, *, bridge):
                        stack_values=(k >> 12,) if h & 15 == 13 and size else (),
                        stack_load=(offset, load_size, (k >> 12,))
                        if h & 15 == 13 and load_size else (),
-                       writes=(k >> 12,) if h & 16 else (),
+                       writes=((k >> 12,) if h & 16 else ()) +
+                       ((h & 15,) if k & 0x900 == 0x900 else ()),
                        reads=(h & 15,) + ((k & 15,) if not k & 0x800 else ())
                        if h & 16 and h & 15 != 13 else (),
                        store_bases=() if h & 16 or h & 15 == 13 else
@@ -372,7 +385,8 @@ def _normalized(name):
 
 
 def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
-          entry_tainted=(13,), entry_stack=(), required_return=None):
+          entry_tainted=(13,), entry_stack=(), required_return=None,
+          allow_retained_terminal=False):
     """Bound SP paths and check returns under the C memory/ABI obligations.
 
     Track register copies/arithmetic of SP, MSP and PSP conservatively.
@@ -470,7 +484,8 @@ def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
                 _require(op.kind != "call" or not ordinary_c or after % 8 == 0,
                          "ordinary C call violates 8-byte SP alignment")
                 if op.kind != "call":
-                    _require(after == 0 and restored,
+                    _require((after == 0 and restored) or
+                             (allow_retained_terminal and not may_return[callee]),
                              "tailcall retains an SP frame")
                 arguments = tuple(sorted(
                     slot + after for slot in (*stack_taint, *entry_stack)
@@ -506,18 +521,25 @@ def _walk(code, start, calls, may_return, *, ordinary_c, transfer,
 
 
 
-def _constant_effect(address, encoded, op, values, literal):
+def _constant_effect(address, encoded, op, values, literal, *,
+                     all_accesses=False):
     """Exact constants only; Unknown never becomes a permission for a read.
 
-    This is a defect detector for statically recoverable physical-Flash reads,
-    not an allowlist for unresolved C pointers. Operand widths and writeback
-    come from the same admitted bytes, never mnemonic or stack-taint inputs.
+    Limited mode detects statically recoverable physical-Flash reads. Full
+    operand observation adds both access directions for independent ownership
+    classification; Unknown itself never grants permission. Widths/writeback
+    come from admitted bytes, never mnemonic or stack-taint inputs.
     """
     h = int.from_bytes(encoded[:2], "little")
     k = int.from_bytes(encoded[2:], "little") if len(encoded) == 4 else 0
     after = [None if i in op.writes else value
              for i, value in enumerate(values)]
     accesses = []
+    if all_accesses and op.kind in ("push", "pop"):
+        # Includes GCC's single-word LDR-postindexed POP-PC alias. Its memory
+        # operand is accounted once through the matching frame/return proof,
+        # rather than misclassifying it as an arbitrary direct-SP load.
+        return tuple(after), accesses
 
     def memory(load, rn, offset, width, *, rm=None, shift=0, writeback=False,
                pre=True):
@@ -531,12 +553,18 @@ def _constant_effect(address, encoded, op, values, literal):
             _require(effective is None or not (
                 effective < 0x08200000 and 0x08000000 < effective + width),
                 "constant-address Flash data read")
+        if all_accesses:
+            accesses.append((address, effective, width, load, rn))
+        elif load:
             accesses.append((address, effective, width))
         if writeback:
-            after[rn] = None
+            after[rn] = ((base + offset + (index << shift)) & 0xffffffff
+                         if base is not None and index is not None else None)
 
     if op.literal:
         after[op.writes[0]] = literal(*op.literal)
+        if all_accesses:
+            accesses.append((address, *op.literal, True, 15))
     if len(encoded) == 2:
         if h & 0xf800 == 0x2000:
             after[(h >> 8) & 7] = h & 255
@@ -547,6 +575,12 @@ def _constant_effect(address, encoded, op, values, literal):
                              (1 if h & 0xf800 == 0x3000 else -1)) & 0xffffffff
         elif h & 0xff00 == 0x4600:
             after[(h & 7) | ((h >> 4) & 8)] = values[(h >> 3) & 15]
+        elif h & 0xfc00 == 0x4400 and (h >> 8) & 3 == 0:
+            rd, rm = (h & 7) | ((h >> 4) & 8), (h >> 3) & 15
+            if values[rd] is not None and values[rm] is not None:
+                after[rd] = (values[rd] + values[rm]) & 0xffffffff
+        elif h & 0xf000 == 0x9000 and all_accesses:
+            memory(bool(h & 0x800), 13, (h & 255) * 4, 4)
         elif h & 0xf000 == 0x5000:
             mode = (h >> 9) & 7
             memory(mode >= 3, (h >> 3) & 7, 0,
@@ -557,8 +591,9 @@ def _constant_effect(address, encoded, op, values, literal):
                    ((h >> 6) & 31) * width, width)
         elif h & 0xf000 == 0xc000:
             regs = tuple(i for i in range(8) if h & (1 << i))
-            memory(bool(h & 0x800), (h >> 8) & 7, 0, 4 * len(regs),
-                   writeback=True)
+            load, rn = bool(h & 0x800), (h >> 8) & 7
+            memory(load, rn, 4 * len(regs), 4 * len(regs), pre=False,
+                   writeback=not (load and rn in regs))
     else:
         if h & 0xfbf0 in (0xf240, 0xf2c0):
             rd = (k >> 8) & 15
@@ -593,6 +628,44 @@ def _constant_effect(address, encoded, op, values, literal):
             if values[rn] is not None:
                 after[rd] = (values[rn] + immediate *
                              (-1 if h & 0xa0 else 1)) & 0xffffffff
+        elif h & 0xfe00 in (0xea00, 0xeb00):
+            operation, rd, rn, rm = ((h >> 5) & 15, (k >> 8) & 15,
+                                     h & 15, k & 15)
+            amount, shift = ((k >> 12) & 7) * 4 + ((k >> 6) & 3), (k >> 4) & 3
+            right = values[rm]
+            if right is not None:
+                if shift == 0:
+                    right = (right << amount) & 0xffffffff
+                elif shift == 1:
+                    right >>= amount or 32
+                elif shift == 2:
+                    right = (_signed(right, 32) >> (amount or 32)) & 0xffffffff
+                elif amount:
+                    right = ((right >> amount) |
+                             (right << (32 - amount))) & 0xffffffff
+                else:
+                    right = None  # RRX includes an unproved carry flag.
+            left = values[rn] if rn != 15 else None
+            if rd != 15 and right is not None:
+                if operation in (2, 3) and rn == 15:
+                    after[rd] = right if operation == 2 else right ^ 0xffffffff
+                elif left is not None:
+                    if operation == 0:
+                        after[rd] = left & right
+                    elif operation == 1:
+                        after[rd] = left & ~right & 0xffffffff
+                    elif operation == 2:
+                        after[rd] = left | right
+                    elif operation == 3:
+                        after[rd] = left | (~right & 0xffffffff)
+                    elif operation == 4:
+                        after[rd] = left ^ right
+                    elif operation == 8:
+                        after[rd] = (left + right) & 0xffffffff
+                    elif operation == 13:
+                        after[rd] = (left - right) & 0xffffffff
+                    elif operation == 14:
+                        after[rd] = (right - left) & 0xffffffff
         elif h & 0xfff0 in (0xf8d0, 0xf8c0, 0xf890, 0xf880, 0xf8b0,
                             0xf8a0, 0xf990, 0xf9b0):
             width = {0xf8d0: 4, 0xf8c0: 4, 0xf890: 1, 0xf880: 1,
@@ -616,14 +689,226 @@ def _constant_effect(address, encoded, op, values, literal):
     return tuple(after), accesses
 
 
-def _constant_memory(elf, functions, order, may_return):
-    """Finite constant lattice; differing incoming values join to Unknown.
+MAX_CONSTANT_ALTERNATIVES = 32
+UNKNOWN_CONSTANT = frozenset({None})
 
-    Unknown pointer reads are retained explicitly. Passing this detector does
-    not establish that all RAM data addresses or device effects are safe.
+
+def _constant_union(left, right):
+    result = left | right
+    _require(len(result) <= MAX_CONSTANT_ALTERNATIVES,
+             "constant alternative bound exceeded")
+    return result
+
+
+def _constant_alternatives(address, encoded, op, values, literal, *,
+                           all_accesses=False):
+    """Lift the byte-defined scalar effects over finite may-value sets.
+
+    Unknown remains an explicit alternative, so it cannot erase a known Flash
+    address at a join. Exhausting either bound rejects instead of widening away
+    an address. This still does not prove a pointer loaded from unknown memory.
     """
-    summaries, observed = {}, set()
-    unknown = (None,) * 16
+    inputs = tuple(sorted(set((*op.reads, *op.store_bases))))
+    combinations = 1
+    for register in inputs:
+        combinations *= len(values[register])
+    _require(combinations <= 4096, "constant operand product bound exceeded")
+    # Prefer a known representative so an unlisted writeback that clears its
+    # base is distinguishable from an unchanged Unknown register.
+    representative = [next((x for x in choices if x is not None), None)
+                      for choices in values]
+    outputs = [set() for _ in values]
+    observed = set()
+    for alternatives in product(*(values[index] for index in inputs)):
+        incoming = representative[:]
+        for index, value in zip(inputs, alternatives):
+            incoming[index] = value
+        after, accesses = _constant_effect(address, encoded, op,
+                                           incoming, literal,
+                                           all_accesses=all_accesses)
+        observed.update(accesses)
+        for index, value in enumerate(after):
+            if (index in inputs or index in op.writes or
+                    value != incoming[index]):
+                outputs[index].add(value)
+            else:
+                outputs[index].update(values[index])
+    result = tuple(frozenset(choices) for choices in outputs)
+    _require(all(len(choices) <= MAX_CONSTANT_ALTERNATIVES for choices in result),
+             "constant alternative bound exceeded")
+    return result, observed
+
+
+class _OwnedMemoryPolicy:
+    """Fixed selected objects and exact official device register accesses.
+
+    Object extents are read from the ELF and checked against the selected
+    C/assembly ABI. Permission to read object bytes never turns a loaded word
+    into an address proof. The staged command and vector/stack prefix cannot
+    be written through this data class during the maintenance window.
+    """
+
+    # RM0433/CMSIS H743 registers used by the selected CPU-only pod. Values
+    # are (address, width); separate directions prevent writes to status/type.
+    READ_MMIO = frozenset((address, 4) for address in (
+        0x5200200c, 0x52002010, 0x5200210c, 0x52002110,
+        0x40000010, 0x40000024, 0xe000ed08, 0xe000ed14,
+        0xe000ed90, 0xe000ed94, 0xe000ed98, 0xe000ed9c, 0xe000eda0,
+        0xe000ef34))
+    WRITE_MMIO = frozenset((address, 4) for address in (
+        0x52002004, 0x5200200c, 0x52002014,
+        0x52002104, 0x5200210c, 0x52002114,
+        0x40000010, 0xe000ed08,
+        0xe000ed94, 0xe000ed98, 0xe000ed9c, 0xe000eda0))
+
+    def __init__(self, elf):
+        self.workspace = self.object(elf,
+            "g_nx_stm32h743_flash_ram_workspace", 1800)
+        self.system = self.object(elf, "g_nx_stm32h743_system", 48)
+        self.pod = (elf.symbol("__nx_flash_ram_start"),
+                    elf.symbol("__nx_flash_ram_end"))
+        _require(self.pod[0] < self.pod[1], "invalid operand pod extent")
+        spans = (self.workspace, self.system, self.pod)
+        _require(all(not (left[0] < right[1] and right[0] < left[1])
+                     for index, left in enumerate(spans)
+                     for right in spans[index + 1:]),
+                 "owned operand objects overlap")
+
+    @staticmethod
+    def object(elf, name, size):
+        symbols = [row for row in elf.defined_symbols
+                   if row["name"] == name and row["binding"] == 1]
+        _require(len(symbols) == 1 and symbols[0]["type"] == 1 and
+                 symbols[0]["size"] == size,
+                 "fixed operand object ABI differs: " + name)
+        first = symbols[0]["value"]
+        _require(0x24000000 <= first < first + size <= 0x24080000 and
+                 len([row for row in elf.loads if row["flags"] == 6 and
+                      row["virtual"] <= first < first + size <=
+                      row["virtual"] + row["memory"]]) == 1,
+                 "operand object has no unique writable RAM extent: " + name)
+        return first, first + size
+
+    @staticmethod
+    def inside(first, width, span):
+        return span[0] <= first < first + width <= span[1]
+
+    def classify(self, address, width, load, *, literal=False):
+        _require(isinstance(address, int) and 0 < width <= 64 and
+                 0 <= address < address + width <= 0x100000000,
+                 "unclassified RAM data operand")
+        if literal:
+            _require(load and width == 4 and address % 4 == 0 and
+                     self.inside(address, width, self.pod),
+                     "literal operand leaves copied RAM pod")
+            return "literal"
+        if self.inside(address, width, self.workspace):
+            offset = address - self.workspace[0]
+            allowed = ((1688, 1800),) if load else (
+                (1744, 1753), (1755, 1756), (1768, 1796))
+            _require(any(first <= offset < offset + width <= last
+                         for first, last in allowed),
+                     "RAM operand touches frozen command/vector/stack bytes")
+            return "workspace"
+        if self.inside(address, width, self.system):
+            offset = address - self.system[0]
+            _require(load or any(first <= offset < offset + width <= last
+                                for first, last in ((24, 32), (44, 46))),
+                     "RAM store changes frozen System ownership")
+            return "system"
+        allowed = self.READ_MMIO if load else self.WRITE_MMIO
+        _require((address, width) in allowed,
+                 "RAM data operand has no exact MMIO/object permission")
+        return "mmio"
+
+
+def _owned_stack_access(depth, offset, size, arguments):
+    """Direct fixed SP reads stay in this frame or actual caller word slots."""
+    if 0 <= offset < offset + size <= depth:
+        return True
+    first, last = offset - depth, offset - depth + size
+    return (first >= 0 and all(any(slot <= byte < slot + 4
+                                  for slot in arguments)
+                              for byte in range(first, last)))
+
+
+def _equality_successors(code, address, values):
+    """Refine only EQ on a byte-defined CMP with one immediate predecessor.
+
+    No flag lifetime or sampled hardware value is inferred. A second incoming
+    CFG edge, an IT-conditional CMP, an intervening instruction or any other
+    flag condition disables this rule. Unknown on both sides remains unknown.
+    """
+    instruction, branch, _ = code[address]
+    raw = bytes.fromhex(instruction["encoding"])
+    h = int.from_bytes(raw[:2], "little")
+    if len(raw) != 2 or h & 0xf000 != 0xd000 or (h >> 8) & 15 not in (0, 1):
+        return values, values
+    incoming = []
+    for pc, (row, op, conditional) in code.items():
+        following = pc + len(bytes.fromhex(row["encoding"]))
+        returns = op.kind == "return" or op.kind == "pop" and 15 in op.registers
+        edges = []
+        if op.kind in ("branch", "conditional"):
+            edges.append(op.target)
+        if (not returns and op.kind != "branch") or conditional:
+            edges.append(following)
+        if address in edges:
+            incoming.append(pc)
+    if len(incoming) != 1 or address == min(code):
+        return values, values
+    previous = incoming[0]
+    row, op, conditional = code[previous]
+    encoded = bytes.fromhex(row["encoding"])
+    if conditional or previous + len(encoded) != address or len(encoded) != 2:
+        return values, values
+    cmp = int.from_bytes(encoded, "little")
+    right_register = None
+    if cmp & 0xffc0 == 0x4280:
+        left, right_register = cmp & 7, (cmp >> 3) & 7
+        right = values[right_register]
+    elif cmp & 0xfc00 == 0x4400 and (cmp >> 8) & 3 == 1:
+        left = (cmp & 7) | ((cmp >> 4) & 8)
+        right_register = (cmp >> 3) & 15
+        right = values[right_register]
+    elif cmp & 0xf800 == 0x2800:
+        left, right = (cmp >> 8) & 7, frozenset({cmp & 255})
+    else:
+        return values, values
+    if left in (13, 15) or right_register in (13, 15):
+        return values, values
+    left_values = values[left]
+    if None not in right:
+        common = (right if None in left_values else left_values & right)
+    elif None not in left_values:
+        common = left_values
+    else:
+        return values, values
+    if not common:
+        # An infeasible edge may be retained conservatively. Never manufacture
+        # a usable constant or silently delete a disagreeing alternative.
+        return values, values
+    equal = list(values)
+    equal[left] = common
+    if right_register is not None:
+        equal[right_register] = common
+    equal = tuple(equal)
+    return (equal, values) if (h >> 8) & 15 == 0 else (values, equal)
+
+
+def _constant_memory(elf, functions, order, may_return, *, strict=False,
+                     assembly=()):
+    """Bounded may-constant sets retain every incoming alternative at joins.
+
+    Limited mode retains unresolved reads explicitly without granting ownership.
+    Strict mode rejects every operand outside the selected object/MMIO/SP
+    classes. Device effects and the dynamic programming leaf need the separately
+    computed byte-defined assembly proof and maintained provider models.
+    """
+    summaries, observed, classified = {}, set(), set()
+    unknown = (UNKNOWN_CONSTANT,) * 16
+    policy = _OwnedMemoryPolicy(elf) if strict else None
+    verified_assembly = {row["name"]: row for row in assembly}
 
     def literal(address, size):
         matches = [row for row in elf.loads
@@ -635,7 +920,7 @@ def _constant_memory(elf, functions, order, may_return):
         return int.from_bytes(elf.data[offset:offset + size], "little")
 
     def join(left, right):
-        return tuple(a if a == b else None for a, b in zip(left, right))
+        return tuple(_constant_union(a, b) for a, b in zip(left, right))
 
     def walk(index, incoming, argument_stack=()):
         key = index, incoming, argument_stack
@@ -644,6 +929,19 @@ def _constant_memory(elf, functions, order, may_return):
         _require(len(summaries) < 20000, "constant call bound exceeded")
         summaries[key] = unknown
         function = functions[index]
+        if function["symbol"]["name"] in verified_assembly:
+            proved = verified_assembly[function["symbol"]["name"]]
+            symbol = function["symbol"]
+            _require(proved["address"] == symbol["value"] & ~1 and
+                     proved["size"] == symbol["size"],
+                     "assembly operand proof identity differs")
+            # The independently byte-proved leaf respects C callee saves.
+            # Volatile outputs are unknown; no address is inferred from them.
+            result = list(incoming)
+            for register in (0, 1, 2, 3, 12, 14):
+                result[register] = UNKNOWN_CONSTANT
+            summaries[key] = tuple(result)
+            return summaries[key]
         code = function["code"]
         start = function["symbol"]["value"] & ~1
         states, queue, outputs = {}, [(start, incoming, 0, ())], None
@@ -655,9 +953,11 @@ def _constant_memory(elf, functions, order, may_return):
                 old_values, old_depth, old_slots = state
                 _require(old_depth == depth, "constant flow SP mismatch")
                 values = join(values, old_values)
-                current = dict(slots)
-                slots = tuple((slot, value) for slot, value in old_slots
-                              if current.get(slot) == value)
+                current, previous = dict(slots), dict(old_slots)
+                slots = tuple((slot, _constant_union(
+                    current.get(slot, UNKNOWN_CONSTANT),
+                    previous.get(slot, UNKNOWN_CONSTANT)))
+                    for slot in sorted(current.keys() | previous.keys()))
                 if (values, depth, slots) == state:
                     continue
             states[address] = values, depth, slots
@@ -665,9 +965,31 @@ def _constant_memory(elf, functions, order, may_return):
             _require(steps < 40000, "constant CFG bound exceeded")
             instruction, op, conditional = code[address]
             encoded = bytes.fromhex(instruction["encoding"])
-            after, accesses = _constant_effect(address, encoded, op,
-                                               values, literal)
+            after, accesses = _constant_alternatives(
+                address, encoded, op, values, literal, all_accesses=strict)
             observed.update(accesses)
+            if strict:
+                for site, effective, width, load, base in accesses:
+                    if base == 13:
+                        footprint = op.stack_load if load else op.stack_store
+                        _require(footprint and
+                                 _owned_stack_access(depth, footprint[0],
+                                                     width, dict(argument_stack)),
+                                 "RAM SP operand leaves proven frame/arguments")
+                        kind = "stack"
+                    else:
+                        try:
+                            kind = policy.classify(effective, width, load,
+                                                   literal=bool(op.literal))
+                        except EvidenceError as error:
+                            raise EvidenceError(
+                                f"{error} at {site:#x} in " +
+                                function["symbol"]["name"]) from error
+                    classified.add((site, effective, width, load, kind))
+                if op.kind in ("push", "pop"):
+                    # _walk proved each matching save/restore and frame span.
+                    classified.add((address, None, 4 * len(op.registers),
+                                    op.kind == "pop", "stack"))
             after = list(after)
             stack = dict(slots)
             new_depth = depth + op.delta
@@ -679,30 +1001,32 @@ def _constant_memory(elf, functions, order, may_return):
                         del stack[slot]
                 if size == 4 and len(op.stack_values) == 1:
                     value = values[op.stack_values[0]]
-                    if value is not None:
-                        stack[-depth + offset] = value
+                    stack[-depth + offset] = value
             if op.stack_load:
                 offset, size, registers = op.stack_load
                 arguments = dict(argument_stack)
                 if (size, len(registers)) in ((4, 1), (8, 2)):
                     for n, register in enumerate(registers):
                         slot = -depth + offset + n * 4
-                        after[register] = stack.get(slot, arguments.get(slot))
+                        after[register] = stack.get(
+                            slot, arguments.get(slot, UNKNOWN_CONSTANT))
             if op.kind == "push":
                 for n, register in enumerate(op.registers):
                     slot = -new_depth + n * 4
                     for previous in tuple(stack):
                         if slot < previous + 4 and previous < slot + 4:
                             del stack[previous]
-                    if values[register] is not None:
-                        stack[slot] = values[register]
+                    stack[slot] = values[register]
             elif op.kind == "pop":
                 for n, register in enumerate(op.registers):
-                    after[register] = stack.get(-depth + n * 4)
+                    after[register] = stack.get(-depth + n * 4,
+                                                UNKNOWN_CONSTANT)
             stack = tuple(sorted((slot, value) for slot, value in stack.items()
                                  if slot >= -new_depth))
             after = tuple(after)
             following = address + len(encoded)
+            taken, fallthrough = (_equality_successors(code, address, after)
+                                  if strict else (after, after))
             next_nodes = []
             if op.kind == "return" or op.kind == "pop" and 15 in op.registers:
                 outputs = after if outputs is None else join(outputs, after)
@@ -711,23 +1035,23 @@ def _constant_memory(elf, functions, order, may_return):
                 if child is not None:
                     args = tuple((slot + new_depth, value)
                                  for slot, value in stack if slot >= -new_depth)
-                    incoming = list(after)
+                    incoming = list(taken)
                     if op.kind == "call":
-                        incoming[14] = None
+                        incoming[14] = UNKNOWN_CONSTANT
                     result = walk(child, tuple(incoming), args)
                     if may_return[child]:
                         if op.kind == "call":
                             result = list(result)
-                            result[14] = None
+                            result[14] = UNKNOWN_CONSTANT
                             next_nodes.append((following, tuple(result),
                                                new_depth, stack))
                         else:
                             outputs = result if outputs is None else join(
                                 outputs, result)
                 else:
-                    next_nodes.append((op.target, after, new_depth, stack))
+                    next_nodes.append((op.target, taken, new_depth, stack))
                 if op.kind == "conditional":
-                    next_nodes.append((following, after, new_depth, stack))
+                    next_nodes.append((following, fallthrough, new_depth, stack))
             else:
                 next_nodes.append((following, after, new_depth, stack))
             if conditional:
@@ -738,15 +1062,100 @@ def _constant_memory(elf, functions, order, may_return):
 
     for index in order:
         walk(index, unknown)
-    return {"status": "checked", "scope": "constant-address defect detector",
+    if strict:
+        return {"status": "proved", "scope": "fixed selected RAM operands",
+                "read_sites": len({row[0] for row in classified if row[3]}),
+                "write_sites": len({row[0] for row in classified if not row[3]}),
+                "unresolved_read_sites": [], "unresolved_write_sites": [],
+                "all_data_operands": "proved", "device_protocol": "separate",
+                "alternative_limit": MAX_CONSTANT_ALTERNATIVES,
+                "classified_operands": [
+                    {"instruction": site, "address": effective,
+                     "bytes": width, "direction": "read" if load else "write",
+                     "class": kind}
+                    for site, effective, width, load, kind in sorted(
+                        classified, key=lambda row: (row[0], -1 if row[1] is None
+                                                     else row[1], row[3]))],
+                "separately_proved_assembly": list(assembly),
+                "limits": ["C AAPCS and exclusive object ownership required",
+                           "dynamic Flash stores require exact assembly proof",
+                           "no speculation, physical bus-master or timing proof"]}
+    return {"status": "checked",
+            "scope": "finite-alternative constant-address defect detector",
             "read_sites": len({row[0] for row in observed}),
             "unresolved_read_sites": sorted({address for address, value, width
                                                in observed if value is None}),
             "all_data_operands": "not_proved",
             "device_protocol": "not_proved",
-            "limits": ["differing CFG constants join to Unknown",
+            "alternative_limit": MAX_CONSTANT_ALTERNATIVES,
+            "limits": ["finite constant alternatives and operand products "
+                       "fail closed",
                        "pointer-loaded and unresolved operands remain unproved",
                        "physical Flash range only; no alias/speculation proof"]}
+
+def _program_word_invocations(functions, order, may_return, leaf):
+    """Saturating interprocedural count: every possible path gets at most one.
+
+    The call graph is already acyclic. Local zero-weight cycles converge on
+    (PC, count); any positive-weight cycle or repeated call reaches two and
+    rejects. IT-skipped instructions keep their separate zero-weight edge.
+    Nonreturning paths still consume their observed pulse count.
+    """
+    summaries, rows = {}, []
+    for index in order:
+        function = functions[index]
+        if index == leaf:
+            outputs, maximum = {1}, 1
+        else:
+            start = function["symbol"]["value"] & ~1
+            pending, seen, outputs, maximum = [(start, 0)], set(), set(), 0
+            code = function["code"]
+            while pending:
+                address, count = pending.pop()
+                if (address, count) in seen:
+                    continue
+                _require(len(seen) < 40000, "program invocation CFG bound exceeded")
+                seen.add((address, count))
+                _require(address in code, "program invocation leaves RAM CFG")
+                instruction, op, conditional = code[address]
+                following = address + len(bytes.fromhex(instruction["encoding"]))
+                maximum = max(maximum, count)
+                if op.kind == "return" or op.kind == "pop" and 15 in op.registers:
+                    outputs.add(count)
+                elif op.kind in ("call", "branch", "conditional"):
+                    child = function["calls"].get(address)
+                    if child is not None:
+                        _require(child in summaries,
+                                 "program invocation call order differs")
+                        child_outputs, child_maximum = summaries[child]
+                        maximum = max(maximum, count + child_maximum)
+                        _require(maximum <= 1,
+                                 "program pulse invocation bound exceeded")
+                        if may_return[child]:
+                            for value in child_outputs:
+                                if op.kind == "call":
+                                    pending.append((following, count + value))
+                                else:
+                                    outputs.add(count + value)
+                    else:
+                        pending.append((op.target, count))
+                    if op.kind == "conditional":
+                        pending.append((following, count))
+                else:
+                    pending.append((following, count))
+                if conditional:
+                    pending.append((following, count))
+        summaries[index] = outputs, maximum
+        rows.append({"index": index, "name": function["symbol"]["name"],
+                     "address": function["symbol"]["value"] & ~1,
+                     "maximum_invocations": maximum})
+    transaction = [row for row in rows if row["name"] == PREFIX + "transaction"]
+    _require(len(transaction) == 1 and transaction[0]["maximum_invocations"] == 1,
+             "transaction has no reachable program pulse invocation")
+    return {"status": "proved", "maximum_invocations": 1,
+            "stores_per_invocation": 8, "maximum_dynamic_word_stores": 8,
+            "functions": rows}
+
 
 def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
                            return_gate=None):
@@ -858,6 +1267,28 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
     _require(bridge.get("status") == "passed" and
              bridge.get("private_frame_bytes") == 0,
              "actual bridge private frame proof missing")
+    fixed_boundary = bridge.get("closure") == "fixed_pod_boundary"
+    assembly = bridge.get("assembly_functions", ()) if fixed_boundary else ()
+    if fixed_boundary:
+        _require(isinstance(assembly, (list, tuple)) and
+                 {row["name"] for row in assembly} == {
+                     PREFIX + "enter", PREFIX + "return", PREFIX + "program_words"}
+                 and len(assembly) == 3 and
+                 bridge.get("return_gate", {}).get("device_protocol") == "proved",
+                 "incomplete fixed assembly boundary proof")
+    if return_gate is not None:
+        _require(fixed_boundary,
+                 "production requires the checked fixed assembly boundary")
+    assembly_names = {row["name"] for row in assembly}
+    if return_gate is not None:
+        for function in functions.values():
+            if function["symbol"]["name"] in assembly_names:
+                continue
+            for _, op, _ in function["code"].values():
+                writes = (*op.writes,
+                          *(op.registers if op.kind == "pop" else ()))
+                _require(not set(writes).intersection(range(8, 12)),
+                         "C instruction writes a protected MPU capture")
     records = _stack_records(stack_usage)
     reports, bounds, may_return, summaries = [], {}, {}, {}
     def summarize(index, tainted, stack=()):
@@ -875,7 +1306,10 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
                 transfer=lambda child, incoming, arguments: summarize(
                     child, incoming, arguments)[2],
                 entry_tainted=tainted, entry_stack=stack,
+                allow_retained_terminal=(
+                    function["symbol"]["name"] in assembly_names),
                 required_return=(names[return_gate][0] if return_gate is not None
+                                 and not fixed_boundary
                                  and function["symbol"]["name"] ==
                                  PREFIX + "transaction" else None))
         return summaries[key]
@@ -883,7 +1317,7 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
         function, symbol = functions[index], functions[index]["symbol"]
         peak, returns, _ = summarize(index, (13,))
         source = None
-        if symbol["name"] == PREFIX + "enter":
+        if symbol["name"] == PREFIX + "enter" or symbol["name"] in assembly_names:
             frame = bridge["private_frame_bytes"]
         else:
             matches = [
@@ -908,7 +1342,11 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
                         "address": symbol["value"] & ~1, "frame_bytes": frame,
                         "encoded_frame_bytes": peak, "chain_bytes": bound,
                         "may_return": returns})
-    memory = _constant_memory(elf, functions, order, may_return)
+    memory = _constant_memory(elf, functions, order, may_return,
+                              strict=return_gate is not None, assembly=assembly)
+    program_invocations = (_program_word_invocations(
+        functions, order, may_return, names[PREFIX + "program_words"][0])
+        if return_gate is not None else {"status": "not_requested"})
     nmi, hardfault = names[PREFIX + "nmi"][0], names[PREFIX + "hardfault"][0]
     _require(not may_return[nmi] and not may_return[hardfault],
              "NMI/HardFault has an actual return path; nonreturn required")
@@ -927,16 +1365,21 @@ def verify_h743_ram_static(elf, observations, stack_usage, *, roots=(),
             "stack_available_bytes": available,
             "functions": reports, "edges": edges,
             "constant_memory": memory,
-            "return_gate": {"status": "checked" if return_gate else "not_requested",
+            "program_invocations": program_invocations,
+            "return_gate": ({"status": "proved", "name": return_gate,
+                             **bridge["return_gate"]} if return_gate else {
+                            "status": "not_requested",
                             "name": return_gate,
                             "scope": "transaction return-path dominance; no "
                                      "further calls or explicit stores",
-                            "device_protocol": "not_proved"},
+                            "device_protocol": "not_proved"}),
             "stack_sources": records,
             "assumptions": [
                 "compiler AAPCS compliance for C callees and frame records",
                 "C memory ownership prevents untracked saved-return aliases"],
-            "limits": ["no C data-pointer/Flash-read or MPU protocol proof",
+            "limits": [("fixed object/MMIO operands and assembly boundary only"
+                        if return_gate else
+                        "no C data-pointer/Flash-read or MPU protocol proof"),
                        "stack-pointer spills fail closed; no general alias proof",
                        "no CPU execution, timing or hardware qualification",
                        "SU identities are not signed build attestation",

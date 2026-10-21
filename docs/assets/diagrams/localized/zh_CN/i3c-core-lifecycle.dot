@@ -1,0 +1,39 @@
+// FIG-26 current common I3C mechanism, no physical controller provider.
+// Basis: public i3c_controller headers and i3c_controller.c.
+digraph i3cCore {
+    graph [label="FIG-26 当前有界 I3C 核心\nH563 声明仅编译；物理 provider／HIL／完整 IO-38 退出开放",
+           rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+           bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.65];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    caller [label="外部串行 executor + 存储\n调用方 PID/address 策略；request + payload\n显式 service／event／reset／stop", fillcolor="#f8fafc"];
+    core [label="可选 Nexus::I3CController\n单个活动有限 request；无传输队列\nDISCOVER／PRIVATE／白名单 CCC"];
+    port [label="必需的同步硬件 port\n唯一 claim + 基线地址失效证明\n1..8 B 聚合 FIFO 批次；不保留跨度", fillcolor="#f8fafc"];
+    records [label="调用方 target 记录\n分配前记录 tentative epoch/address\n仅硬件 ACK 后 confirmed\n失败保留全部已知地址"];
+    events [label="调用方容量的复制 event ring\nIBI：confirmed epoch，最多 4 B\nHot join 请求显式发现\n溢出只丢新事件；计数饱和"];
+    draining [label="DRAINING：借用保留\n完成／取消／deadline／错误\nFIFO/frame 完成绝不授权回收"];
+    quarantine [label="QUARANTINED：借用保留\nwire／FIFO／IRQ／observer 证明失败\n继续显式恢复／service", fillcolor="#fff7ed"];
+    settled [label="SETTLED：request 最后访问\n撤回 active request + stable slot\nRelease 发布；调用方 acquire 观察"];
+    reset [label="Closed 后显式整总线 RESET\n静止且每个 target 地址均失效\n仅复位 controller 或 flush FIFO 不足"];
+    stop [label="最终显式 STOP\n无 work/event/fault/assigned 或 tentative 地址\n最终静止证明 -> release claim\nController 保留永久 identity/tombstone"];
+    { rank=same; core; port; }
+    caller -> core [label="prepare；接受 submit 后借用\n精确 request + payload"];
+    core -> port [label="begin／assign／有界 pump"];
+    port -> core [label="复制聚合观察；\n无应用回调"];
+    core -> records [label="显式 DAA；target epoch 不回绕"];
+    core -> events [label="复制有界 IBI/HJ；\n绝不调度 discovery"];
+    core -> draining [label="有限完成或撤回"];
+    draining -> settled [label="quiescent SUCCESS：全部最后访问已撤回", style=dashed];
+    draining -> quarantine [label="证明 BUSY／IO／UNSUPPORTED"];
+    quarantine -> settled [label="后续真实静止证明成功", style=dashed];
+    caller -> reset [label="close；请求外部 reset 证明"];
+    reset -> records [label="证明 SUCCESS：地址失效；保留 epoch", style=dashed];
+    reset -> settled [label="证明 SUCCESS 同时撤回保留 request", style=dashed];
+    records -> reset [label="活动／tentative 地址或 fault 禁止最终 stop"];
+    caller -> stop [label="消费 event；重试显式 stop", constraint=false];
+    settled -> stop [label="request 已撤回；仍须满足其他 stop 谓词"];
+    port -> stop [label="release 前最终 quiescent 证明", style=dashed, constraint=false];
+}

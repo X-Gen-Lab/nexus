@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "portable_evidence",
+  "archive": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/store/0a799290296991780a20b967d2cda38d64ee0f4c41e5370e6f369a97cd1e39b0.tar.gz",
+    "sha256": "0a799290296991780a20b967d2cda38d64ee0f4c41e5370e6f369a97cd1e39b0",
+    "size": 4356681
+  },
+  "manifest_sha256": "9275d8f5560a7239cf0a3924a3d136bcc0e212b93ea0f58e5f11d5de80a28dc1",
+  "files": 1137,
+  "bytes": 21363564,
+  "signature_status": "unsigned",
+  "product_promotion": false
+}

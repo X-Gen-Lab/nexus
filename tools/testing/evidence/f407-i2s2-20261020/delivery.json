@@ -1,0 +1,57 @@
+{
+  "status": "SEALED_AND_BYTE_VERIFIED",
+  "package": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/package.json",
+    "sha256": "14fe797b36fac26af5091778ce4921cbaef36bf4e2e7f7f95f82c5eb04c07bf9",
+    "bytes": 517
+  },
+  "verified": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/verified.json",
+    "sha256": "239a05d43cd99c70772a160232ae391044b44c2aa5f8578ccf04dcc59851582f",
+    "bytes": 153
+  },
+  "README": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/README.md",
+    "sha256": "b1ca9233d432bc9a70a79ab3f29061ee1b960ee0b54a2b7f0d01148625fc4a96",
+    "bytes": 8176
+  },
+  "README_prefix_addendum": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/README-prefix-addendum.json",
+    "sha256": "11aefa19c2268cfd91e8cae3862355f2b5cbfacc7d37477ae625b8c025f8fbb4",
+    "bytes": 763
+  },
+  "archive": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/store/0a799290296991780a20b967d2cda38d64ee0f4c41e5370e6f369a97cd1e39b0.tar.gz",
+    "sha256": "0a799290296991780a20b967d2cda38d64ee0f4c41e5370e6f369a97cd1e39b0",
+    "size": 4356681
+  },
+  "files": 1137,
+  "bytes": 21363564,
+  "source_bound_README_prefix": "84764e76aaf64b962e082448ec282ea6f143692e535c577799b0a4dcce571e96",
+  "strict_site": {
+    "status": "passed_development_dirty_staged_phase",
+    "build_manifest_sha256": "18ded2de446932c8e5529e346c4c53fa5f73139946afd762d0df921db2b27d82",
+    "source_pages": 127,
+    "languages": [
+      "en",
+      "zh_CN"
+    ],
+    "command_exits": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "unchanged_frozen_input_superset": 1626,
+    "final_catalogs": 12,
+    "independently_reviewed_new_pairs": 107,
+    "qualification": false
+  },
+  "ordinary_full_index_gate": "pending",
+  "full_v10_matrix": "not_executed",
+  "physical_HIL": "not_executed",
+  "collector_compiler_configure_build_tests": false,
+  "collector_primary_source_index_writes": false,
+  "external_full_SDK_build_archives_duplicated": false,
+  "whole_XML_HTML_copied": false
+}

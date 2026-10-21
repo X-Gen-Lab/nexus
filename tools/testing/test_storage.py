@@ -89,12 +89,43 @@ class StorageTests(unittest.TestCase):
             replies = [{"Driver": "overlay2", "DockerRootDir": directory},
                 [{"Id": "sha256:" + "d" * 64, "Size": 500,
                   "GraphDriver": {"Name": "overlay2"}}]]
+            observations = []
+            statvfs = storage.os.statvfs
+            def observe(root):
+                filesystem = statvfs(root)
+                observations.append(filesystem)
+                return filesystem
             with mock.patch.object(storage, "run_adapter", side_effect=[
-                    json.dumps(item).encode() for item in replies]):
+                    json.dumps(item).encode() for item in replies]), \
+                    mock.patch.object(storage.os, "statvfs",
+                        side_effect=observe) as filesystem:
                 result = storage.inspect("image:tag", read_only=True,
                     tmpfs_bytes=256, daemon_log_driver="none")
-        self.assertEqual(result["status"], "admitted")
+            filesystem.assert_called_once_with(Path(directory))
+        self.assertEqual(result["free_bytes"],
+            observations[0].f_bavail * observations[0].f_frsize)
+        self.assertEqual(result["docker_root"], directory)
+        self.assertEqual(result["driver"], "overlay2")
+        self.assertEqual(result["image_config_id"], "sha256:" + "d" * 64)
         self.assertIsNone(result["image_root_bytes"])
+
+    def test_overlay_inspection_rejects_zero_free_with_default_budget(self):
+        with tempfile.TemporaryDirectory() as directory:
+            replies = [{"Driver": "overlay2", "DockerRootDir": directory},
+                [{"Id": "sha256:" + "d" * 64, "Size": 500,
+                  "GraphDriver": {"Name": "overlay2"}}]]
+            with mock.patch.object(storage, "run_adapter", side_effect=[
+                    json.dumps(item).encode() for item in replies]), \
+                    mock.patch.object(storage, "free_space",
+                        return_value=0) as free:
+                result = storage.inspect("image:tag", read_only=True,
+                    tmpfs_bytes=256, daemon_log_driver="none")
+            free.assert_called_once_with(Path(directory))
+        self.assertEqual(result["status"], "insufficient_space")
+        self.assertEqual(result["free_bytes"], 0)
+        self.assertEqual(result["admitted_concurrency"], 0)
+        self.assertEqual(result["required_for_requested_bytes"],
+            384 * 1024 * 1024)
 
     def test_allocated_tree_counts_hardlinks_once_and_never_follows_symlinks(self):
         with tempfile.TemporaryDirectory() as directory:

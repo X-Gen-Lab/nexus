@@ -510,13 +510,21 @@ V revision `0x2003` admission before physical programming or erase. This applies
 to every selected Flash profile, including fixed HSI32/64 and HSI64/PLL384;
 unknown cuts are rejected. UART and devices without their own cut contract
 do not inherit the Flash restriction; SPI has the separate V/trim contract
-above. Assemblies without Flash acquire no RAM workspace. One generated
-workspace holds private vectors, stack, staged input and protection state. The
-CPU-only assembly bridge installs private MSP; the RAM transaction owns VTOR
-publication/readback, the MPU guard and physical both-bank drain. There is no
-fallback to the former ordinary Flash-resident pulse path. These mechanisms and
-their still-open production-ELF/software exits are described in the
-[RAM maintenance design](../../docs/design/h743-flash-ram.md).
+above. Assemblies without Flash acquire no RAM workspace. The generated
+Platform owns one existing fixed workspace and its embedded guard; foreign
+workspace construction rejects before effects. Public SDK consumers use the
+immutable `nx_factory_flash` face and ordinary Platform start/stop, without
+supplying a workspace or including private types. The assembly bridge installs
+private MSP and protects incoming MPU captures in r8-r11; the C transaction owns
+RAM VTOR publication, the MPU guard and actual both-bank drain. Its final
+assembly gate checks restored hardware and linker-known original VTOR before
+exact caller restoration. The selected link requires zero unclassified explicit
+reads/stores and at most one exact eight-store programming leaf per transaction.
+The incoming MSP and active Thread stack each require 260 owned bytes below the
+bridge-entry SP, in addition to ordinary C frames; the private-stack bound does
+not prove those incoming extents. There is no ordinary Flash pulse fallback.
+The [RAM maintenance design](../../docs/design/h743-flash-ram.md) gives the
+C/ABI, external-owner and per-profile evidence obligations.
 
 This synchronous maintenance mode masks configurable interrupts and provides no
 tight interrupt-latency or wall-time deadline ceiling. Deadline expiry after
@@ -680,9 +688,16 @@ byte写入均未开放。正在执行的Flash脉冲不能被timeout撤销；必�
 排空或最终锁定失败将保留调用帧并进入终止故障路径。当前开发路径要求选定的
 V修订0x2003、冷态RAM复制与独立工作区；该准入适用于包括固定HSI32/64和PLL384
 在内的所有选定Flash配置，未知cut拒绝。UART和未声明自身cut合同的其他外设不
-继承Flash限制；SPI另有上文的独立V／trim合同。未选Flash的装配也不取得RAM工作区。不再回退到原Flash驻留的脉冲路径；CPU bridge
-仅负责栈和CPU状态，RAM事务负责VTOR、MPU和实际排空。生产ELF闭包及完整软件
-退出尚未完成，IO-24仍为in_progress。维护窗口屏蔽可配置中断，不承诺严格中断
+继承Flash限制；SPI另有上文的独立V／trim合同。未选Flash的装配不取得RAM工作区。
+生成的Platform拥有唯一既有固定工作区及内嵌guard；外来工作区构造在效果发生前拒绝。
+公共SDK consumer通过不可变nx_factory_flash face和普通Platform start/stop使用它，
+无需提供工作区或包含私有类型。汇编bridge安装私有MSP，并在r8-r11中保护传入MPU
+捕获值；C事务负责RAM VTOR发布、MPU guard和双Bank实际排空，最终汇编gate在
+精确恢复调用者前检查已恢复硬件及链接器已知原始VTOR。选定链接要求显式read/store
+无未分类项，且每个事务至多调用一次精确八次store的编程leaf。bridge入口处传入MSP
+和活动Thread栈各需在SP下方另有260字节拥有的存储，不计普通C栈帧；私有栈界限
+不能证明这些传入范围。不回退到普通Flash脉冲路径。完整IO-24退出及逐配置证据
+仍以原台账为准；维护窗口屏蔽可配置中断，不承诺严格中断
 延迟或硬实时deadline；MPU不停止其他bus master，外部调用者必须撤回并join。
 完整边界见[RAM维护设计](../../docs/design/h743-flash-ram.md)。所有物理HIL仍为
 not_executed。

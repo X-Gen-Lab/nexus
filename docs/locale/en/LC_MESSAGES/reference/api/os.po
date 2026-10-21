@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 1845acd2db3f28395a067d6b3032760b58de0998124c262973025177ee4e3a4d\nX-Nexus-Reviewed: true\n"
+msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 62e0a29a586d3356a3fcfdc221e877e0919f8bdaba0767963c1b44123c23e852\nX-Nexus-Reviewed: true\n"
 
 msgid "OS adapters: tasks, waits and explicit storage"
 msgstr "OS adapters: tasks, waits and explicit storage"
@@ -835,26 +835,11 @@ msgstr "[in] Optional caller-defined numeric diagnostic."
 msgid "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
 msgstr "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
 
-msgid "[inout] Zero/live-free metadata in protected linker RAM."
-msgstr "[inout] Zero/live-free metadata in protected linker RAM."
-
 msgid "[in] Validated user entry, stack and data mappings."
 msgstr "[in] Validated user entry, stack and data mappings."
 
-msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission."
-msgstr "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission."
-
-msgid "One privileged lifecycle owner stops external access first. Single-core kernel deletion removes scheduler references synchronously. Self deletion is rejected; no hidden reaper."
-msgstr "One privileged lifecycle owner stops external access first. Single-core kernel deletion removes scheduler references synchronously. Self deletion is rejected; no hidden reaper."
-
 msgid "[inout] Owned live protected metadata; never the calling task."
 msgstr "[inout] Owned live protected metadata; never the calling task."
-
-msgid "Success, INVALID, CONTEXT or STATE with storage retained."
-msgstr "Success, INVALID, CONTEXT or STATE with storage retained."
-
-msgid "Zero-initialize in privileged RAM. The TCB includes the real port's context and syscall stack, inaccessible to users. One privileged lifecycle owner serializes start/delete."
-msgstr "Zero-initialize in privileged RAM. The TCB includes the real port's context and syscall stack, inaccessible to users. One privileged lifecycle owner serializes start/delete."
 
 msgid "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
 msgstr "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
@@ -879,9 +864,6 @@ msgstr "Thread only with a running scheduler. No handle or pointer crosses the b
 
 msgid "[in] Relative kernel ticks; zero requests rescheduling."
 msgstr "[in] Relative kernel ticks; zero requests rescheduling."
-
-msgid "Thread-only MPU profile service, distinct from Core time. No object, memory, I/O or privilege-changing API exists."
-msgstr "Thread-only MPU profile service, distinct from Core time. No object, memory, I/O or privilege-changing API exists."
 
 msgid "Current kernel tick count in the selected OS clock domain."
 msgstr "Current kernel tick count in the selected OS clock domain."
@@ -1287,3 +1269,112 @@ msgstr "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no 
 
 msgid "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
 msgstr "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
+
+
+msgid "[inout] Cold or live-free metadata in protected linker RAM."
+msgstr "[inout] Cold or live-free metadata in protected linker RAM."
+
+msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile also rejects task epoch OVERFLOW."
+msgstr "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile also rejects task epoch OVERFLOW."
+
+msgid "One privileged lifecycle owner stops external access first. Kernel deletion synchronously removes scheduler references. Self deletion is rejected; no hidden reaper."
+msgstr "One privileged lifecycle owner stops external access first. Kernel deletion synchronously removes scheduler references. Self deletion is rejected; no hidden reaper."
+
+msgid "The GPIO profile returns BUSY while its authority pins the task. Close and join before deletion. A closing marker prevents reopen during kernel deletion; the epoch survives."
+msgstr "The GPIO profile returns BUSY while its authority pins the task. Close and join before deletion. A closing marker prevents reopen during kernel deletion; the epoch survives."
+
+msgid "Success, INVALID, CONTEXT, STATE or BUSY."
+msgstr "Success, INVALID, CONTEXT, STATE or BUSY."
+
+msgid "Zero-initialize in privileged RAM before first start. The TCB includes the real port context and protected stack. One privileged lifecycle owner serializes start/delete."
+msgstr "Zero-initialize in privileged RAM before first start. The TCB includes the real port context and protected stack. One privileged lifecycle owner serializes start/delete."
+
+msgid "The GPIO profile requires cold zero-initialization and keeps the task epoch across deletion; never reset that history."
+msgstr "The GPIO profile requires cold zero-initialization and keeps the task epoch across deletion; never reset that history."
+
+msgid "freertos_mpu_gpio.h"
+msgstr "freertos_mpu_gpio.h"
+
+msgid "One protected-task scalar GPIO WRITE authority."
+msgstr "One protected-task scalar GPIO WRITE authority."
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+
+msgid "2026-10-20"
+msgstr "2026-10-20"
+
+msgid "Open the fixed grant for its exact live protected task."
+msgstr "Open the fixed grant for its exact live protected task."
+
+msgid "Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK must be zero, except the selected port's bootstrap BASEPRI before scheduler start. PRIMASK is saved and restored. This operation pins task deletion until join."
+msgstr "Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK must be zero, except the selected port's bootstrap BASEPRI before scheduler start. PRIMASK is saved and restored. This operation pins task deletion until join."
+
+msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
+msgstr "SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
+
+msgid "Revoke further calls without deleting or stopping the GPIO."
+msgstr "Revoke further calls without deleting or stopping the GPIO."
+
+msgid "The same privileged lifecycle owner serializes open/close/ join and task start/delete. NMI/HardFault never access this authority. Incoming interrupt masks are preserved."
+msgstr "The same privileged lifecycle owner serializes open/close/ join and task start/delete. NMI/HardFault never access this authority. Incoming interrupt masks are preserved."
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE; preserves all pins."
+msgstr "SUCCESS, INVALID, CONTEXT or STATE; preserves all pins."
+
+msgid "Join a closed authority before task deletion or GPIO stop."
+msgstr "Join a closed authority before task deletion or GPIO stop."
+
+msgid "The single-core saved-mask boundary excludes every active scalar effect. Join detaches its task pin before returning; it does not delete the task or reset its lifetime epoch."
+msgstr "The single-core saved-mask boundary excludes every active scalar effect. Join detaches its task pin before returning; it does not delete the task or reset its lifetime epoch."
+
+msgid "SUCCESS detaches the pin; INVALID/CONTEXT/STATE retain it."
+msgstr "SUCCESS detaches the pin; INVALID/CONTEXT/STATE retain it."
+
+msgid "Variables"
+msgstr "Variables"
+
+msgid "Immutable WRITE grant in privileged Flash."
+msgstr "Immutable WRITE grant in privileged Flash."
+
+msgid "port_slot addresses the readonly generated nx_binding_led pointer. The initialized exact GPIOC PC7 face, operations and provider state outlive an open authority through successful join. The sole lifecycle owner does not stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping is granted."
+msgstr "port_slot addresses the readonly generated nx_binding_led pointer. The initialized exact GPIOC PC7 face, operations and provider state outlive an open authority through successful join. The sole lifecycle owner does not stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping is granted."
+
+msgid "Caller-owned protected authority; zero only at cold startup."
+msgstr "Caller-owned protected authority; zero only at cold startup."
+
+msgid "Treat all fields as private. Join detaches the captured task epoch, without resetting the bound task's epoch history. Storage remains valid for the linked binding's entire lifetime, including rejection and closed states."
+msgstr "Treat all fields as private. Join detaches the captured task epoch, without resetting the bound task's epoch history. Storage remains valid for the linked binding's entire lifetime, including rejection and closed states."
+
+msgid "One immutable assembly binding, in privileged Flash."
+msgstr "One immutable assembly binding, in privileged Flash."
+
+msgid "Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are disjoint privileged RAM; grant is privileged Flash. User arguments never select these objects."
+msgstr "Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are disjoint privileged RAM; grant is privileged Flash. User arguments never select these objects."
+
+msgid "Keep the task epoch after deletion. Initialize only at cold startup."
+msgstr "Keep the task epoch after deletion. Initialize only at cold startup."
+
+msgid "Explicit zero-initialized user storage in its reserved RAM span."
+msgstr "Explicit zero-initialized user storage in its reserved RAM span."
+
+msgid "Thread-only MPU profile service, distinct from Core time. No object handle or pointer crosses this service."
+msgstr "Thread-only MPU profile service, distinct from Core time. No object handle or pointer crosses this service."
+
+msgid "Write the current protected task's one static GPIO grant."
+msgstr "Write the current protected task's one static GPIO grant."
+
+msgid "Thread only with a running scheduler. Unknown identifiers and out-of-grant bits return PERMISSION; overlapping or zero masks return INVALID. No user MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A closed or stale task incarnation performs no GPIO write."
+msgstr "Thread only with a running scheduler. Unknown identifiers and out-of-grant bits return PERMISSION; overlapping or zero masks return INVALID. No user MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A closed or stale task incarnation performs no GPIO write."
+
+msgid "[in] Exact assembly-local grant identifier, no pointer."
+msgstr "[in] Exact assembly-local grant identifier, no pointer."
+
+msgid "[in] Granted bits to set, disjoint from reset_mask."
+msgstr "[in] Granted bits to set, disjoint from reset_mask."
+
+msgid "[in] Granted bits to reset."
+msgstr "[in] Granted bits to reset."
+
+msgid "Scalar SUCCESS or INVALID/PERMISSION/STATE/CONTEXT."
+msgstr "Scalar SUCCESS or INVALID/PERMISSION/STATE/CONTEXT."

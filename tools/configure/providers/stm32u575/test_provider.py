@@ -1,6 +1,7 @@
 """Exact U575 reference metadata and allocation-free emitter contracts."""
 import importlib
 import json
+import tempfile
 from pathlib import Path
 import unittest
 
@@ -33,6 +34,122 @@ class Result(dict):
 
 
 class U575ProviderTests(unittest.TestCase):
+    def test_autonomous_copy_source_sdk_contract_is_complete(self):
+        import importlib.util
+        from tools.configure.providers import descriptor
+        spec = importlib.util.spec_from_file_location(
+            "nexus_copy_sdk_contract", ROOT /
+            "cmake/package/package_source_sdk.py")
+        sdk = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(sdk)
+        paths = (
+            "components/stm32u575_stop2/CMakeLists.txt",
+            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
+            "soc/stm32u575/stop2.c",
+            "soc/stm32u575/private/stm32u575_stop2_hw.h",
+            "cmake/package/verification/io_evolution/consumers/u575-stop2.c",
+            "components/stm32u575_lpdma_copy/CMakeLists.txt",
+            "components/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h",
+            "components/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h",
+            "soc/stm32u575/drivers/lpdma_copy.c",
+            "soc/stm32u575/private/stm32u575_lpdma_copy_hw.h",
+            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h",
+            "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c",
+        )
+        payload = descriptor.maintained("stm32u575").owned_payload
+        for name in paths:
+            with self.subTest(path=name, contract="owned payload"):
+                self.assertIn(name, payload)
+            with self.subTest(path=name, contract="required payload"):
+                self.assertIn(name, sdk.REQUIRED_FILES)
+            with self.subTest(path=name, contract="selected payload"):
+                self.assertTrue(sdk.selected(name))
+
+    def test_lptim1_reference_source_sdk_contract_is_complete(self):
+        import importlib.util
+        from tools.configure.providers import descriptor
+        own_root = Path(__file__).resolve().parents[4]
+        spec = importlib.util.spec_from_file_location(
+            "nexus_lptim1_sdk_contract", own_root /
+            "cmake/package/package_source_sdk.py")
+        sdk = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(sdk)
+        paths = (
+            "components/stm32u575_lpdma_lptim1/CMakeLists.txt",
+            "components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h",
+            "components/stm32u575_lpdma_lptim1/private/stm32u575_lpdma_lptim1_internal.h",
+            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h",
+            "soc/stm32u575/private/stm32u575_lptim1_profile.h",
+            "soc/stm32u575/drivers/lpdma_lptim1.c",
+            "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c",
+        )
+        payload = descriptor.maintained("stm32u575").owned_payload
+        for name in paths:
+            with self.subTest(path=name, contract="owned payload"):
+                self.assertIn(name, payload)
+            with self.subTest(path=name, contract="required payload"):
+                self.assertIn(name, sdk.REQUIRED_FILES)
+            with self.subTest(path=name, contract="selected payload"):
+                self.assertTrue(sdk.selected(name))
+
+    def test_lptim1_reference_is_explicitly_catalogued(self):
+        own_root = Path(__file__).resolve().parents[4]
+        catalogue = json.loads((own_root /
+            "tools/configure/assemblies/catalogue.json").read_text())
+        self.assertEqual(catalogue["assemblies"].count(
+            "u575-lptim1-lpbam-stop2.toml"), 1)
+
+    def test_lptim1_sdk_plan_prepares_the_explicit_public_component(self):
+        import importlib.util
+        own_root = Path(__file__).resolve().parents[4]
+        spec = importlib.util.spec_from_file_location(
+            "nexus_lptim1_transport_contract", own_root /
+            "tools/release/transport.py")
+        transport = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(transport)
+        assembly = "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml"
+        smoke = "u575-lptim1-lpbam"
+        self.assertIn(("u575 lptim1 lpbam", assembly, smoke),
+                      transport.SELECTED_CONSUMERS)
+        spec = importlib.util.spec_from_file_location(
+            "nexus_lptim1_consumer_contract", own_root /
+            "cmake/package/verify_consumers.py")
+        consumer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(consumer)
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            prefix = directory / "prefix"
+            sdk = prefix / "share/nexus/src"
+            for name in (assembly,
+                         "cmake/package/verification/io_evolution/consumers/"
+                         + smoke + ".c"):
+                target = sdk / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes((own_root / name).read_bytes())
+            policy = sdk / "dependencies/platform-compatibility.json"
+            policy.parent.mkdir(parents=True)
+            policy.write_bytes((ROOT /
+                "dependencies/platform-compatibility.json").read_bytes())
+            commands = []
+            source, _, command = consumer.prepare_selected_consumer(
+                prefix, directory, "u575 lptim1 lpbam", assembly, smoke,
+                commands.append, expected_revision="a" * 40)
+            project = (source / "CMakeLists.txt").read_text()
+            self.assertIn("LIBRARIES Nexus::U575Stop2Lptim1)", project)
+            self.assertIn("set(CMAKE_C_STANDARD 11)", project)
+            private = (source / "private_headers.c").read_text()
+            self.assertIn("stm32u575_lptim1_profile.h", private)
+            self.assertIn("stm32u575_lpdma_lptim1_internal.h", private)
+            self.assertEqual((source / "main.c").read_bytes(),
+                (sdk / "cmake/package/verification/io_evolution/consumers" /
+                 (smoke + ".c")).read_bytes())
+            self.assertEqual(len(commands), 1)
+            self.assertEqual(commands[0][:3], ["git", "init", "--quiet"])
+            self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in item
+                                for item in command))
+
     def setUp(self):
         self.provider = importlib.import_module(
             "tools.configure.providers.stm32u575")
@@ -97,6 +214,14 @@ class U575ProviderTests(unittest.TestCase):
         self.assertNotIn("PC4", variant["pins"])
         self.assertEqual(variant["memory"][0]["size"], 196608)
         self.assertEqual(variant["flash"]["erase_blocks"], [8192] * 256)
+
+    def test_selected_sram4_initializer_remains_in_required_sdk_payload(self):
+        from tools.configure.providers import descriptor
+        payload = descriptor.maintained("stm32u575").owned_payload
+        for name in ("soc/stm32u575/memory_init.c",
+                     "soc/stm32u575/private/stm32u575_memory_init.h"):
+            with self.subTest(path=name):
+                self.assertIn(name, payload)
 
     def test_reference_board_does_not_invent_hse_or_physical_qualification(self):
         board = json.loads((ROOT / "boards/stm32u575_nucleo_zi_q/"

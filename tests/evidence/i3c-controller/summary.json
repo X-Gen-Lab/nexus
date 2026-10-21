@@ -1,0 +1,292 @@
+{
+  "scope": "Common external-port I3C development execution; physical provider and HIL not executed; complete integration gates separate",
+  "archive": {
+    "path": "development.tar.gz",
+    "bytes": 1671151,
+    "sha256": "f6b08d06968a15fe3c549808f444eb3e9fa384691a1a22a7e1c705c105b8e463"
+  },
+  "member_manifest_sha256": "7ededc0bb0f65d217d9718ea5a59ec9ecdf9256b6e21fd952b74b4f187b647a4",
+  "final_sources": {
+    "components/i3c_controller/CMakeLists.txt": "c2d5f6ab49cfec58fdeb86a9c64c3b2e1fbd54099ef0e73b084d9afd31a8cd67",
+    "components/i3c_controller/include/nexus/components/i3c_controller.h": "692865bd0d943fcd3eae3275025a6574f69232ab6cebc2123248bfa67fce421c",
+    "components/i3c_controller/include/nexus/components/i3c_controller_storage.h": "c366e0b6fa2f52336a8bc50ceeb0185d4ef2c551f05a83907865decbb8721ea0",
+    "components/i3c_controller/src/i3c_controller.c": "dd6747cab96ef8b3ca2dd3b1762ec17a6149d9a338dbf188fff90285d7a803be",
+    "tests/google/i3c_controller.cmake": "51da5893b59e9b7f88f7f56352ce3e838f6c44b1b53b02cb20a7259e5f80592b",
+    "tests/google/i3c_controller_test.cpp": "6e81ae7890a5d401e0f749e05ad6983f812dec66357e101e82c6721873b90854",
+    "tests/contracts/i3c_runtime/CMakeLists.txt": "6a473309b3773a6df6b8fe275eb11f2d9675912c94f7b4fdcdb204654c8b5179",
+    "tests/contracts/i3c_runtime/cpu.json": "026a8b37b69470b8df4ca3731abeaa11547d07fc86ea3d7571e6646073e15376",
+    "tests/contracts/i3c_runtime/h563_reference.c": "3657e8f7d0b86cd6f2ed1b326fee73691f4b4cf054ff854935b2c13834764c08",
+    "tests/contracts/i3c_runtime/linker.ld": "e92289898090d94b6e57ae726eae4f2e652ecda8c106bd61e0dcc031f6077b0f",
+    "tests/contracts/i3c_runtime/main.c": "22e9ae0156fd2c9306ebb300e825bc1dfa16039b8f0429a61d1a4304464a5865",
+    "tests/contracts/i3c_runtime/runtime.toml": "cecee3af17354cbdf4bdc4b701bfc188855370016d32649f8443861193b34adc",
+    "tools/testing/test_i3c_sdk.py": "c7f659beb12dc3d5765961802b943e668cdfaed69e6d8a1455c924400dcc312b",
+    "integration/public-sdk.patch": "05fba2c39fec44e62ae23da8cc1fcb5248b164ff1e6cdd9419e8f29bd0e4b44d"
+  },
+  "host": {
+    "final-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "39",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:14:08.386",
+        "name": "AllTests"
+      }
+    },
+    "final-header-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "40",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.003",
+        "timestamp": "2026-10-20T16:16:38.662",
+        "name": "AllTests"
+      }
+    },
+    "formatted-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "34",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:09:26.320",
+        "name": "AllTests"
+      }
+    },
+    "freeze-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "40",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:14:30.223",
+        "name": "AllTests"
+      }
+    },
+    "green-first": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "32",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.001",
+        "timestamp": "2026-10-20T16:07:59.157",
+        "name": "AllTests"
+      }
+    },
+    "ibi-shape-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "38",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:12:12.109",
+        "name": "AllTests"
+      }
+    },
+    "ibi-shape-red": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "google": {
+        "tests": "38",
+        "failures": "1",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:11:42.374",
+        "name": "AllTests"
+      }
+    },
+    "observation-order-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "34",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.001",
+        "timestamp": "2026-10-20T16:09:05.664",
+        "name": "AllTests"
+      }
+    },
+    "observation-order-red": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "google": {
+        "tests": "34",
+        "failures": "2",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.004",
+        "timestamp": "2026-10-20T16:08:49.466",
+        "name": "AllTests"
+      }
+    },
+    "polished-header-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "40",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:20:21.785",
+        "name": "AllTests"
+      }
+    },
+    "red": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "google": {
+        "tests": "32",
+        "failures": "32",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.003",
+        "timestamp": "2026-10-20T16:06:08.678",
+        "name": "AllTests"
+      }
+    },
+    "stop-address-green": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "google": {
+        "tests": "37",
+        "failures": "0",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:11:13.822",
+        "name": "AllTests"
+      }
+    },
+    "stop-address-red": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "google": {
+        "tests": "34",
+        "failures": "1",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:10:08.313",
+        "name": "AllTests"
+      }
+    },
+    "stop-fault-red": {
+      "returncodes": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "google": {
+        "tests": "39",
+        "failures": "1",
+        "disabled": "0",
+        "errors": "0",
+        "time": "0.002",
+        "timestamp": "2026-10-20T16:13:44.825",
+        "name": "AllTests"
+      }
+    }
+  },
+  "definitive_host": "evidence/polished-header-green/execution.json",
+  "arm_closure": "integration/runtime-final/closure.json",
+  "arm_size": "text\t   data\t    bss\t    dec\t    hex\tfilename\n   4020\t      0\t    240\t   4260\t   10a4\t/tmp/nexus-i3c-reference-20261020/integration/runtime-final/build/nexus_i3c_runtime.elf",
+  "independent_review_sha256": "35dc0d31979ddc90221851579d7c307fd8b71067471af1001786b3f370f33e66",
+  "sdk": {
+    "red": "integration/sdk-red.json",
+    "green": "integration/sdk-green.json"
+  },
+  "qualification": {
+    "physical_hil": "not_executed",
+    "full_IO_38_exit": "open",
+    "clean_software_candidate": "not_established"
+  }
+}

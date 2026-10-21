@@ -19,7 +19,7 @@ import tomllib
 
 try:
     from . import cpu as cpu_profiles
-    from . import bundle, dependencies, sdk, uart_formats
+    from . import bundle, dependencies, sdk, uart_formats, i2s2
     from . import resource_graph, trigger_graph, dma_topology
     from .contracts import COMPONENTS
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
@@ -35,6 +35,7 @@ except ImportError:
     import uart_formats
     import dependencies
     import sdk
+    import i2s2
     import resource_graph
     import trigger_graph
     import dma_topology
@@ -556,7 +557,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     assembly = obj(assembly_input,
                    {"schema_version", "board_package", "backend", "clock_profile",
                     "controllers", "devices", "memory_budgets", "layout"},
-                   {"abi", "optimization", "components", "os", "factory", "can_domain", "power"}, "assembly")
+                   {"abi", "optimization", "components", "os", "factory", "can_domain", "power", "i2s2"}, "assembly")
     integer(assembly["schema_version"], 1, 1, "assembly schema")
     factory_options = obj(assembly.get("factory", {}), (),
                           {"capabilities"}, "factory policy")
@@ -632,6 +633,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     clock_plan = clocks.plan(assembly["clock_profile"], clock)
     clock = clocks.normalize(clock)
     clocks.match_board(clock, board["clocks"])
+    i2s2_role = i2s2.resolve(assembly.get("i2s2"), family=family,
+                            part=part, backend=backend,
+                            clock_profile=assembly["clock_profile"])
     if "os" in assembly and not isinstance(assembly["os"], dict):
         fail("OS policy: expected object")
     kernel_profile = kernel.resolve(assembly.get("os"), cpu_profile,
@@ -647,15 +651,44 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if optimization not in {"O0", "Og", "O2", "Os", "O3", "O2-lto", "Os-lto", "O3-lto"}:
         fail(f"Unsupported optimization profile: {optimization}")
     budgets = obj(assembly["memory_budgets"], {"main_stack_bytes"},
-                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions"},
+                  {"flash_load_bytes", "static_ram_bytes", "libc_heap_bytes", "regions", "mpu"},
                   "memory budgets")
     for name, value in budgets.items():
-        if name == "regions":
+        if name in {"regions", "mpu"}:
             continue
         integer(value, 0 if name == "libc_heap_bytes" else 1, context=name)
     if budgets["main_stack_bytes"] % 8:
         fail("Main stack must have 8-byte alignment")
     ram = next(region for region in variant["memory"] if region["linker"])
+    gpio_user = (backend == "freertos" and
+                 kernel_profile.user_io == "gpio-write")
+    if gpio_user and (family != "stm32u575" or part != "STM32U575ZIT6Q" or
+                      assembly["clock_profile"] != "msis4" or
+                      assembly["layout"] is not None or "power" in assembly):
+        fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
+    if ("mpu" in budgets) != gpio_user:
+        fail("Explicit protected MPU reservations require GPIO user I/O")
+    if gpio_user:
+        fields = {"privileged_flash_bytes", "user_flash_bytes",
+                  "syscall_flash_bytes", "privileged_ram_bytes",
+                  "user_ram_bytes"}
+        reservations = obj(budgets["mpu"], fields, (), "MPU reservations")
+        for name, value in reservations.items():
+            integer(value, 32, UINT32_MAX, "MPU reservation " + name)
+            if value % 32:
+                fail("MPU reservations require exact 32-byte granules")
+        if (sum(reservations[name] for name in (
+                "privileged_flash_bytes", "user_flash_bytes",
+                "syscall_flash_bytes")) > variant["flash"]["size"] or
+                reservations["privileged_ram_bytes"] +
+                reservations["user_ram_bytes"] > ram["size"]):
+            fail("MPU reservations exceed physical Flash/SRAM1")
+        if (budgets.get("regions") or budgets["main_stack_bytes"] +
+                budgets.get("libc_heap_bytes", 0) >=
+                reservations["privileged_ram_bytes"] or
+                budgets.get("static_ram_bytes", ram["size"]) >
+                reservations["privileged_ram_bytes"]):
+            fail("MPU privileged reservations cannot cover optional RAM or exhaust MSP")
     if budgets["main_stack_bytes"] + budgets.get("libc_heap_bytes", 0) >= ram["size"]:
         fail("Reserved stack/heap exhaust default RAM")
     if budgets.get("static_ram_bytes", ram["size"]) > ram["size"]:
@@ -698,6 +731,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
         if previous is not None and previous["owner"] == "soc-timebase":
             continue
         claim(key, owner, "reserved", board["id"])
+    if i2s2_role is not None:
+        for resource in i2s2_role.claims:
+            claim(resource, "i2s2", i2s2_role.profile, "RM0090/DS8626 chip reference")
     if backend == "freertos":
         for irq in ("SysTick", "PendSV", "SVC"):
             claim("irq:" + irq, "freertos", "kernel",
@@ -708,14 +744,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             claim("irq:" + irq, "threadx", "kernel",
                   "ThreadX " + irq_profile["kernel_port"])
     selected = []
-    adc_group_review = None
-    if any(item.get("authored_kind") == "adc_group"
-           for item in assembly["controllers"]):
-        if family != "stm32g474":
-            fail("ADC group has no maintained provider")
-        adc_group_path = contained_file(root, soc.get("adc_group_review", ""))
-        adc_group_review = read(adc_group_path)
-        adc_group_digest = hashlib.sha256(snapshots[adc_group_path]).hexdigest()
+    adc_group_contract = None
     instance_ids = []
     irq_owners = {}
     for selection in sequence(assembly["controllers"], "selected controllers"):
@@ -774,9 +803,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     assembly["clock_profile"] not in {
                         "hsi64-fixed-cache-off", "hsi64-fixed-cache-on"})):
                 fail("H743 continuous UART requires baremetal/fixed HSI64")
-            if (family == "stm32u575" and route["kind"] == "lptim" and
+            if (family == "stm32u575" and route["kind"] in {"lptim", "rtc"} and
                     (backend != "baremetal" or assembly["clock_profile"] != "msis4")):
-                fail("U575 LPTIM requires baremetal/fixed MSIS4")
+                fail(f"U575 {route['kind'].upper()} requires baremetal/fixed MSIS4")
             if mode in uart_formats.FIFO_MODES and assembly["clock_profile"] != (
                     "hsi64-fixed-cache-off"
                     if family == "stm32h743" else "msis4"):
@@ -878,6 +907,17 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             if route["kind"] == "can_fd":
                 selected[-1]["message_ram_words"] = hardware["message_ram_words"]
             if route["kind"] == "adc_group":
+                if family != "stm32g474":
+                    fail("ADC group has no maintained provider")
+                if adc_group_contract is None:
+                    adc_group_path = contained_file(
+                        root, soc.get("adc_group_review", ""))
+                    review = read(adc_group_path)
+                    adc_group_contract = (
+                        review, hashlib.sha256(
+                            snapshots[adc_group_path]).hexdigest(),
+                        adc_group_path)
+                adc_group_review, adc_group_digest, _ = adc_group_contract
                 try:
                     from .providers.stm32g474 import adc_group
                 except ImportError:
@@ -1034,10 +1074,16 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             fail("I2C requires at least one explicit address endpoint")
         if controller["kind"] == "spi" and provider.SPI_REQUIRES_ENDPOINT and not children:
             fail("SPI requires at least one reviewed CS endpoint")
+    if gpio_user and (len(selected) != 1 or
+            selected[0]["kind"] != "gpio" or
+            selected[0]["controller"] != "GPIOC" or
+            selected[0]["mode"] != "output" or
+            selected[0]["mask"] != 0x80):
+        fail("GPIO user I/O requires the single exact PC7 output binding")
     layout = variant["flash"].copy()
     inputs = [assembly_path, board_path, soc_path, routes_path, policy_path]
-    if adc_group_review is not None:
-        inputs.append(adc_group_path)
+    if adc_group_contract is not None:
+        inputs.append(adc_group_contract[2])
     if reference_path is not None:
         inputs.append(reference_path)
     for name in sequence(board.get("inputs", []), "declared Board inputs"):
@@ -1125,6 +1171,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
               "limitations": board["unknowns"] + ["Physical qualification not executed"],
               "physical_qualified": False,
               "enum_abi": provider.ENUM_ABI}
+    if i2s2_role is not None:
+        result["i2s2"] = {"profile": i2s2_role.profile, "part": i2s2_role.part,
+                          "claims": list(i2s2_role.claims)}
     try:
         from . import runtime_power
     except ImportError:
@@ -1222,6 +1271,8 @@ def generate(result, output):
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
               *metadata.header_lines(thaw(result["platform_metadata"]))]
+    header.append("#define NEXUS_F407_I2S2_SLAVE_TX_SELECTED " +
+                  ("1u" if result.i2s2 is not None else "0u"))
     probes = any(getattr(getattr(item.options, "irq", None), "probe", False)
                  for item in result.controllers)
     if probes:
@@ -1246,6 +1297,10 @@ def generate(result, output):
              f'set(NEXUS_OPTIMIZATION "{result["optimization"]}")',
              'set(NEXUS_SELECTED_KINDS "' + ';'.join(sorted({item['kind'] for item in result['controllers']})) + '")',
              'set(NEXUS_SELECTED_COMPONENTS "' + ';'.join(result['components']) + '")']
+    cmake += ['set(NEXUS_F407_I2S2_SLAVE_TX_SELECTED ' +
+              ("ON" if result.i2s2 is not None else "OFF") + ')',
+              'set(NEXUS_F407_I2S2_PROFILE "' +
+              (result.i2s2.profile if result.i2s2 is not None else "") + '")']
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
     for selection in result.controllers:

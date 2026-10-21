@@ -97,6 +97,7 @@ class ModeTraits:
 
 _MODE_TRAITS = MappingProxyType({
     ("rtc", "calendar-alarm"): ModeTraits(),
+    ("rtc", "retained-calendar-alarm"): ModeTraits(),
     ("lptim", "counter16-oneshot"): ModeTraits(),
     ("lptim", "irq-counter16-oneshot"): ModeTraits(irq=True),
     ("adc_group", "regular-sequence-dma"): ModeTraits(irq=True, rx_dma=True),

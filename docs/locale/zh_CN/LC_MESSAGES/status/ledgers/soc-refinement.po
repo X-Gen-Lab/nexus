@@ -10,21 +10,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: e64ef491c1ef0475361cc617219312f750f7c17b0a6aab74bfe541f7b3d41d6a\n"
+"X-Nexus-Source-SHA256: 56742f9e78b984bfb1c8cf4348ff560c479848e9de289854d3f14bea2c7e85eb\n"
 
 msgid "SoC 原专项台账"
 msgstr "SoC 原专项台账"
-
-msgid ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-"
-"refinement-"
-"execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。"
-msgstr ""
-"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
-"<../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-"
-"refinement-"
-"execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。"
 
 msgid ""
 "不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
@@ -816,9 +805,6 @@ msgstr "bootloader 与运行状态交接"
 msgid "not_implemented"
 msgstr "not_implemented"
 
-msgid "soc;docs/design/integration-contracts.md"
-msgstr "soc;docs/design/integration-contracts.md"
-
 msgid ""
 "Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry "
 "contract"
@@ -844,16 +830,6 @@ msgstr "SOC-35"
 msgid "Deep STOP continuous time"
 msgstr "深 STOP 连续时间"
 
-msgid "soc;os"
-msgstr "soc;os"
-
-msgid ""
-"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;docs/design/timebase-lowpower.md"
-msgstr ""
-"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;docs/design/timebase-lowpower.md"
-
 msgid ""
 "Exact RTC LPTIM retention wake recovery precision and power physically "
 "verified"
@@ -864,25 +840,6 @@ msgstr "SOC-36"
 
 msgid "Userspace MPU TrustZone transport"
 msgstr "userspace MPU／TrustZone transport"
-
-msgid "partial_synchronous_reference_implemented"
-msgstr "partial_synchronous_reference_implemented"
-
-msgid ""
-"arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone"
-msgstr ""
-"arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone"
-
-msgid ""
-"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-"
-"broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-"
-"extensions-results.json;docs/delivery/soc-extensions-verification.md"
-msgstr ""
-"docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-"
-"broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-"
-"extensions-results.json;docs/delivery/soc-extensions-verification.md"
 
 msgid ""
 "Actual permissions address copy borrow async exit gateway and hardware "
@@ -1029,3 +986,34 @@ msgstr "SOC-55"
 
 msgid "Load endurance"
 msgstr "满载耐久"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "not_qualified"
+msgstr "not_qualified"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
+msgstr "soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
+
+# Authoritative CSV machine identity; retained unchanged in both locales.
+msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md"
+msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md"
+
+msgid "partial_reference_implemented"
+msgstr "partial_reference_implemented"
+
+
+msgid "components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+msgstr "components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+
+msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md"
+msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md"
+
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`。"
+msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`。"
+
+msgid "arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp"
+msgstr "arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp"
+
+msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json"
+msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json"

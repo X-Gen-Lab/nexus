@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 4d3bbec0277cd76f2a2b07982edaf684c891f51e7f8dba8a197b9c63233e49db\n"
+"X-Nexus-Source-SHA256: b6c31573253e75c6870af67466fc43619830ef95f1f15b51f2f3ccf861234ce8\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:1
 msgid "SoC extension verification"
@@ -671,22 +671,6 @@ msgstr ""
 msgid "Remaining acceptance"
 msgstr "Remaining acceptance"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:166
-msgid ""
-"SOC-28 through SOC-32 and SOC-36 are exact partial references. Their "
-"original hardware, peripheral and isolation exits remain open. SOC-33 "
-"bootloader/running state handoff, SOC-34 dynamic frequency changes and "
-"SOC-35 deep STOP with continuous time are not implemented. SOC-37 through "
-"SOC-55 provide station, admission, capture and result-validation tooling; "
-"physical execution remains pending equipment."
-msgstr ""
-"SOC-28 through SOC-32 and SOC-36 are exact partial references. Their "
-"original hardware, peripheral and isolation exits remain open. SOC-33 "
-"bootloader/running state handoff, SOC-34 dynamic frequency changes and "
-"SOC-35 deep STOP with continuous time are not implemented. SOC-37 through "
-"SOC-55 provide station, admission, capture and result-validation tooling; "
-"physical execution remains pending equipment."
-
 #: ../../../workspace/nexus-build-system-20261012/docs/delivery/soc-extensions-verification.md:173
 msgid ""
 "Fixed clock profiles do not establish DVFS. Ordinary WFI or tickless idle "
@@ -700,3 +684,11 @@ msgstr ""
 "establish electrical behavior, DMA/cache coherence on silicon, TrustZone "
 "isolation, interrupt latency, measured power or WCET. Applications, PCB-"
 "specific policies and recovery decisions remain in external projects."
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "At the qualified source recorded above, SOC-28 through SOC-32 and SOC-36 are exact partial references. Their original hardware, peripheral and isolation exits remain open. SOC-33 bootloader/running state handoff, SOC-34 dynamic frequency changes and SOC-35 deep STOP with continuous time are not implemented. SOC-37 through SOC-55 provide station, admission, capture and result-validation tooling; physical execution remains pending equipment."
+msgstr "At the qualified source recorded above, SOC-28 through SOC-32 and SOC-36 are exact partial references. Their original hardware, peripheral and isolation exits remain open. SOC-33 bootloader/running state handoff, SOC-34 dynamic frequency changes and SOC-35 deep STOP with continuous time are not implemented. SOC-37 through SOC-55 provide station, admission, capture and result-validation tooling; physical execution remains pending equipment."
+
+# Reviewed bounded-scope prose correction; unchanged messages retained.
+msgid "Later bounded source increments include the exact F407 masked Flash tail [handoff and four I/O mechanisms](../design/io-extension-boundaries.md). They do not inherit this record's software execution or close the complete SOC-33 exit; SOC-34 DVFS and SOC-35 deep-STOP continuity remain unimplemented."
+msgstr "Later bounded source increments include the exact F407 masked Flash tail [handoff and four I/O mechanisms](../design/io-extension-boundaries.md). They do not inherit this record's software execution or close the complete SOC-33 exit; SOC-34 DVFS and SOC-35 deep-STOP continuity remain unimplemented."

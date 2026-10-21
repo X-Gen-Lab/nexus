@@ -1,0 +1,50 @@
+digraph u575Lptim1Lpbam {
+  graph [label="FIG-28 reference：单组 LPTIM1 tuple、唯一 Stop2 owner、有序最终访问证明\nSTM32U575ZIT6Q / TZEN0 / baremetal / SRAM4_NS / LPDMA1 channel0\n实线：必要顺序或标明的分支。虚线：保留责任／恢复。\n不声明引脚路由、PWM 播放或 HIL；IO-32 / SOC-35 完整退出仍开放。", rankdir=TB, labelloc=t,
+    fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white",
+    pad=0.25, nodesep=0.30, ranksep=0.44, splines=polyline, compound=true];
+  node [shape=box, style="rounded,filled", color="#475569",
+    fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12,
+    margin="0.13,0.09"];
+  edge [color="#475569", fontcolor="#0f172a",
+    fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+  prepare [label="纯 initialize → 显式公共 start\n冷态／独占：LPTIM1EN + LSE mux + 按需 LSESYSEN\n观察 LSESYSRDY；效果保留至 joined 公共 stop", fillcolor="#eff6ff", group="main"];
+  loan [label="RUN 已关闭／join；LPTIM2 已禁用；Platform 已停\nprivileged masked MSP Thread；同一 Stop2 owner / ClockDomain\nACCEPTED 借用 request + 12 B tuple + 48 B LLI 工作区", fillcolor="#eff6ff", group="main"];
+  arm [label="有界等待：ENABLE 后至少再过 2 个保留 RTC tick\n初始 CMP1OK / REPOK / ARROK 新鲜证明后清旗\n独立 WUT 退出；不写 AlarmA", fillcolor="#eff6ff", group="main"];
+  writes [label="HW REQ13 / BREQ1 / 保留位 DREQ0 → CCR1\n两个 SWREQ continuation LLI → RCR0 → 最后 ARR\nARR 的 APB 写应答清除 UE", fillcolor="#ecfdf5", group="main"];
+  writeok [label="成功：观察有限 DMA 完成 + 锁存三个新鲜 write-OK\n在 DIER 可能清旗前保留此证明", fillcolor="#ecfdf5", group="main"];
+  withdraw [label="1. 撤回生产源：UEDE0 + 新鲜 DIEROK\n随后撤回 WUT", fillcolor="#f0fdf4", group="main"];
+  master [label="2. DMA suspend / SUSPF / idle\n整字 CCR RESET，再证明完整 CCR0\n撤除地址／link／flags／NVIC 引用", fillcolor="#f0fdf4", group="main"];
+  timer [label="3. 自有 LPTIM1 RCC reset；绝不 ENABLE0（ES0499）\n证明控制器冷态／IRQ67 安静\n恢复本次借用的 SMEN / AMEN", fillcolor="#f0fdf4", group="main"];
+  settled [label="4. 恢复其余借用 gate／RTC／电源／时钟\n撤除 Stop2 与 request 引用\n最后 release store：SETTLED", fillcolor="#dcfce7", group="main"];
+  stop [label="acquire 观察 SETTLED + 外部观察者 join\njoined 公共 stop 恢复启动 gate／mux／LSESYS\n随后才释放物理角色", fillcolor="#dcfce7", group="main"];
+  partial [label="start 部分失败：尚无 tuple 借用\n公共 stop 重试启动账本恢复\n不接管或复位外部控制器", fillcolor="#fff7ed", group="side"];
+  held [label="证明失败保留借用与全部存储\n后续完成不得将已锁存错误升级为成功\nprofile 未知：不访问 RTC / DMA / LPTIM MMIO\nrecover 保持 mask；绝不再次 WFI\n自有复位仅在 DMA 最终访问证明后可重试", fillcolor="#fff7ed", group="side"];
+  foreign [label="借用期间观察到外部 DMA 或 LPTIM reset\n永久隔离；存储仍被借用\n安静的复位默认值不能证明 join", fillcolor="#fef2f2", group="side"];
+  subgraph cluster_exit {
+    label="复合退出：四项证明缺一不可";
+    color="#86a2b8"; style=rounded; fontsize=12; labelloc=b; labeljust=l;
+    withdraw; master; timer; settled;
+  }
+  prepare -> loan [label="start 成功", weight=20];
+  prepare -> partial [label="start 失败且保留效果", weight=1];
+  loan -> arm [label="ACCEPTED", weight=20];
+  arm -> writes [label="启动生产源／masked WFI", weight=20];
+  writes -> writeok [label="已观察有限 DMA\n此前 service 保持 BUSY", weight=20];
+  writeok -> withdraw [label="保留成功证明", weight=20];
+  writes -> withdraw [label="cancel／deadline／error\n存储仍被借用", weight=1, constraint=false];
+  arm -> withdraw [label="已接受后准备失败", weight=1, constraint=false,tailport=w,headport=w];
+  withdraw -> master [label="生产源已撤回并应答", weight=20];
+  master -> timer [label="DMA 最终访问已证明", weight=20];
+  timer -> settled [label="外设与 IRQ 已证明", weight=20];
+  settled -> stop [label="仅最终 SETTLED", weight=20, tailport=e, headport=e];
+  partial -> partial [label="公共 stop 重试；账本仍保留", weight=1, style=dashed];
+  writes -> held [label="访问 profile 失效", weight=1, style=dashed,constraint=false,tailport=e,headport=n];
+  writeok -> held [label="write-OK 未全：\n首轮保留生产源 + 借用", weight=1, style=dashed,constraint=false,tailport=e,headport=w];
+  master -> held [label="任一复合证明失败", weight=1, style=dashed,constraint=false,ltail=cluster_exit];
+  held -> withdraw [label="profile 有效后 recover\n撤源前先带入失败", weight=1, style=dashed,constraint=false,lhead=cluster_exit];
+  held -> foreign [label="任何活动借用阶段观察到外部复位", weight=20, style=dashed];
+  { rank=same; loan; partial; }
+  { rank=same; writeok; held; }
+  { rank=same; stop; foreign; }
+  partial -> held [style=invis, weight=20];
+}

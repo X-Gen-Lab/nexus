@@ -1,0 +1,40 @@
+// FIG-24: current exact software ownership and lifecycle; open exits are dashed.
+// Basis: retained_time API/source and Stop2 API/source; no automatic enrollment.
+digraph u575RetainedStop2 {
+ graph [label="FIG-24 当前保留时钟／Stop2 软件\n精确 TZEN0 参考；物理及自主传输退出条件仍开放", rankdir=TB,
+        labelloc=t, fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55];
+ node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12, margin="0.14,0.10"];
+ edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+ subgraph cluster_ownership {
+  label="所有权：显式装配与串行执行"; color="#94a3b8";
+  boot [label="外部 boot／Board\n有效晶体 LSE＋日历／PC13 静默\n无并发源配置或时钟配置写入者", fillcolor="#fff7ed"];
+  clock [label="调用方保留存储\n独立 nx_clock_t／identity／generation\n只读一致 tuple helper"];
+  sleep [label="精确 Stop2 owner\n仅委托 WUT＋RTC IRQ\n拥有自增 RCC／PWR 效果及恢复"];
+  run [label="RUN owners／ClockDomain\n关闭准入；结束 Core deadline；停止 Platform\njoin 生产者／观察者；释放已排空租约"];
+  tim2 [label="默认 Core TIM2\n停止后旧 domain 无效\n重新启动创建新 epoch", fillcolor="#f8fafc"];
+  boot -> clock [label="提供受保留的源；不写源配置", style=dashed];
+  sleep -> clock [label="提供稳定唤醒 identity；检查 generation"];
+  run -> sleep [label="精确已登记 barrier；不隐含排空"];
+  run -> tim2 [label="停止使旧 Core deadline 失效"];
+ }
+ subgraph cluster_lifecycle {
+  label="唤醒生命周期：真实排空前保留硬件效果所有权"; color="#94a3b8";
+  quiet [label="QUIET\n绑定有效保留时钟\n已验证源及 RUN 访问配置"];
+  armed [label="ARMED／WFI\n已观察 WUTWF／WPR 重新锁定\n保持 PRIMASK；WFI 不证明驻留"];
+  drain [label="DRAIN\n读时钟前验证 RUN 访问配置\n撤回 WUT／RTC IRQ／自增 gate"];
+  held [label="保留效果\ndomain 保持关闭／存储保持有效\n清理失败不撤销所有权", fillcolor="#fff7ed"];
+  tainted [label="受污时钟\n受检 sample 报告失败\nclock face 报错并停驻；不返回旧值", fillcolor="#fee2e2"];
+  quiet -> armed [label="源／barrier 准入后置备"];
+  armed -> drain [label="唤醒或配置失败"];
+  drain -> quiet [label="排空／恢复完成；同一时钟 epoch 仍有效"];
+  drain -> held [label="排空／恢复失败"];
+  held -> drain [label="recover：重试排空；不执行 WFI"];
+  clock -> tainted [label="时钟读取观察到源／访问配置／经过时间边界无效"];
+  drain -> tainted [label="硬件已隔离；时钟 epoch 仍无效"];
+ }
+ clock -> quiet [style=invis, weight=100, minlen=1];
+ open [label="开放退出条件：须另行实现与物理证明\nLPDMA／LPBAM＋SRAM4／domain 准入\nStop2 保留／电流／时延／振荡器精度", style="rounded,dashed,filled", fillcolor="#f8fafc"];
+ drain -> open [label="软件机制本身不建立这些退出资格", style=dashed];
+ held -> open [style=invis, weight=100];
+ tainted -> open [style=invis, weight=100];
+}

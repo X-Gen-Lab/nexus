@@ -24,6 +24,8 @@
  *                  placement never grants bus-master access. ADDSRAM DMA
  * requires provider address, alignment and ownership validation. Ordinary
  * storage, the main MSP and unselected images keep their existing layout.
+ * U575 SRAM4 selection also prepares reset-owned PWR/SRAM4/LPDMA run gates;
+ * autonomous operation and DMA borrow admission require their own provider.
  */
 #if !defined(__GNUC__) && !defined(__clang__)
 #error                                                                         \
@@ -79,6 +81,17 @@
     _Pragma("GCC error \"SRAM1 memory region is not selected\"")
 #define NX_MEMORY_SRAM1_BSS    NX_MEMORY_SRAM1_DATA
 #define NX_MEMORY_SRAM1_NOINIT NX_MEMORY_SRAM1_DATA
+#endif
+
+#if defined(NEXUS_MEMORY_SRAM4) && NEXUS_MEMORY_SRAM4 == 1
+#define NX_MEMORY_SRAM4_DATA   NX_CORE_MEMORY_ATTRIBUTE(".nx_sram4_data")
+#define NX_MEMORY_SRAM4_BSS    NX_CORE_MEMORY_ATTRIBUTE(".bss.nx_sram4")
+#define NX_MEMORY_SRAM4_NOINIT NX_CORE_MEMORY_ATTRIBUTE(".bss.nx_sram4_noinit")
+#else
+#define NX_MEMORY_SRAM4_DATA                                                   \
+    _Pragma("GCC error \"SRAM4 memory region is not selected\"")
+#define NX_MEMORY_SRAM4_BSS    NX_MEMORY_SRAM4_DATA
+#define NX_MEMORY_SRAM4_NOINIT NX_MEMORY_SRAM4_DATA
 #endif
 
 #endif

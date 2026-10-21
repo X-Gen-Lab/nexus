@@ -204,17 +204,26 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("h743 spi dma uart rx", "h743-spi-dma-uart-rx", "h743-spi-dma"),
         ("g474 pin states", "g474-pin-states", "pin-states"),
         ("u575 lptim run", "u575-lptim-run", "u575-lptim"),
+        ("u575 rtc run", "u575-rtc-run", "u575-rtc"),
         ("h743 uart continuous", "h743-uart-continuous", "h743-uart-continuous"),
         ("h743 uart continuous cache on", "h743-uart-continuous-cache-on", "h743-uart-continuous"),
         ("h743 uart duplex continuous", "h743-uart-duplex-continuous", "h743-uart-duplex-continuous"),
         ("h743 uart duplex continuous cache on", "h743-uart-duplex-continuous-cache-on", "h743-uart-duplex-continuous"),
+        ("u575 retained time", "nucleo-u575-baremetal-empty", "u575-retained-time"),
+        ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2"),
+        ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy"),
+        ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2", "u575-lptim1-lpbam"),
+        ("u575 mpu gpio", "u575-mpu-gpio-write", "u575-mpu-gpio"),
+        ("f407 i2s2 slave tx", "sky-i2s2-slave-tx", "f407-i2s2-slave-tx"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
         "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
         "u575-uart-chain", "h743-spi-dma-uart-tx", "h743-spi-dma-uart-rx",
-        "g474-pin-states", "u575-lptim-run", "h743-uart-continuous",
+        "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
-        "h743-uart-duplex-continuous-cache-on"})
+        "h743-uart-duplex-continuous-cache-on", "nucleo-u575-baremetal-empty",
+        "u575-lpdma-copy-stop2", "u575-lptim1-lpbam-stop2",
+        "u575-mpu-gpio-write", "sky-i2s2-slave-tx"})
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="SDK CLI budgets ")
@@ -257,7 +266,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                         verification / "consumers/h743-spi-dma.c")
         shutil.copyfile(ROOT / "cmake/package/verification/io_evolution/consumers/pin-states.c",
                         verification / "consumers/pin-states.c")
-        for stem in ("u575-lptim", "h743-uart-continuous",
+        for stem in ("u575-lptim", "u575-rtc", "u575-retained-time",
+                     "u575-stop2", "u575-lpdma-copy", "u575-lptim1-lpbam",
+                     "u575-mpu-gpio", "f407-i2s2-slave-tx",
+                     "h743-uart-continuous",
                      "h743-uart-duplex-continuous"):
             relative = Path("cmake/package/verification/io_evolution/consumers") / (stem + ".c")
             shutil.copyfile(ROOT / relative, self.sdk / relative)
@@ -571,6 +583,44 @@ class SDKConsumerParallelTests(unittest.TestCase):
                             ".." not in Path(path).parts
                             for _, path, _ in self.consumer.SELECTED_CONSUMERS))
 
+    def test_selected_owner_smokes_link_explicit_public_components(self):
+        for label, stem, smoke, library in (
+                ("u575 retained time", "nucleo-u575-baremetal-empty",
+                 "u575-retained-time", "Nexus::U575RetainedTime"),
+                ("u575 stop2", "nucleo-u575-baremetal-empty", "u575-stop2",
+                 "Nexus::U575Stop2"),
+                ("u575 lpdma copy", "u575-lpdma-copy-stop2", "u575-lpdma-copy",
+                 "Nexus::U575Stop2Copy"),
+                ("u575 lptim1 lpbam", "u575-lptim1-lpbam-stop2",
+                 "u575-lptim1-lpbam", "Nexus::U575Stop2Lptim1"),
+                ("u575 mpu gpio", "u575-mpu-gpio-write",
+                 "u575-mpu-gpio", "Nexus::U575MpuGpio"),
+                ("f407 i2s2 slave tx", "sky-i2s2-slave-tx",
+                 "f407-i2s2-slave-tx", "Nexus::F407I2S2SlaveTx")):
+            assembly = "tools/configure/assemblies/" + stem + ".toml"
+            with self.subTest(smoke=smoke):
+                directory = self.directory / smoke
+                directory.mkdir()
+                source, _, command = self.consumer.prepare_selected_consumer(
+                    self.prefix, directory, label, assembly, smoke,
+                    lambda argv: None, expected_revision="a" * 40)
+                canonical = (self.sdk / "cmake/package/verification/io_evolution/consumers" /
+                             (smoke + ".c"))
+                self.assertEqual((source / "main.c").read_bytes(),
+                                 canonical.read_bytes())
+                project = (source / "CMakeLists.txt").read_text()
+                self.assertIn("LIBRARIES " + library + ")", project)
+                if smoke == "f407-i2s2-slave-tx":
+                    self.assertIn("stm32f407_i2s2_slave_tx.h",
+                                  (source / "private_headers.c").read_text())
+                self.assertIn("set(CMAKE_C_STANDARD 11)", project)
+                self.assertIn("set(CMAKE_C_STANDARD_REQUIRED ON)", project)
+                self.assertIn("set(CMAKE_C_EXTENSIONS OFF)", project)
+                self.assertIn("-DNEXUS_ASSEMBLY_FILE=" +
+                              str(self.sdk / assembly), command)
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg
+                                    for arg in command))
+
     def test_runtime_clock_uses_canonical_input_and_public_lifecycle_smoke(self):
         self.assertIn(("h743 runtime clock",
                        "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
@@ -647,10 +697,12 @@ class SDKConsumerParallelTests(unittest.TestCase):
     def test_each_selected_mode_build_and_retention_failure_terminates_the_matrix(self):
         for label in ("h743 spi dma", "h743 spi dma cache on",
                       "h743 spi dma uart tx", "h743 spi dma uart rx",
-                      "u575 uart chain", "u575 lptim run",
+                      "u575 uart chain", "u575 lptim run", "u575 rtc run",
                       "h743 uart continuous", "h743 uart continuous cache on",
                       "h743 uart duplex continuous",
-                      "h743 uart duplex continuous cache on"):
+                      "h743 uart duplex continuous cache on",
+                      "u575 retained time", "u575 stop2", "u575 lpdma copy",
+                      "u575 lptim1 lpbam", "u575 mpu gpio", "f407 i2s2 slave tx"):
             for operation, exit_code in (("build", 51), ("retention", 52)):
                 with self.subTest(label=label, operation=operation):
                     self.selected_fault = "selected:" + operation + ":" + label
@@ -729,16 +781,40 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.stem == "sky-i2s2-slave-tx":
+                canonical = (self.sdk /
+                    "cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c")
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertIn("nx_f407_i2s2_slave_tx_initialize(", smoke)
+                self.assertIn("nx_frame_stream_acquire(", smoke)
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.stem == "nucleo-u575-baremetal-empty":
+                stem = ("u575-retained-time" if source.name ==
+                        "selected u575 retained time source" else "u575-stop2")
+                canonical = self.sdk / "cmake/package/verification/io_evolution/consumers" / (stem + ".c")
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
+            elif assembly.stem in {"u575-lpdma-copy-stop2",
+                                   "u575-lptim1-lpbam-stop2", "u575-mpu-gpio-write"}:
+                stem = ("u575-lpdma-copy" if assembly.stem ==
+                        "u575-lpdma-copy-stop2" else "u575-lptim1-lpbam" if
+                        assembly.stem == "u575-lptim1-lpbam-stop2" else "u575-mpu-gpio")
+                canonical = (self.sdk /
+                    "cmake/package/verification/io_evolution/consumers" /
+                    (stem + ".c"))
+                self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
+                self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
             elif assembly.name == "g474-pin-states.toml":
                 canonical = self.sdk / "cmake/package/verification/io_evolution/consumers/pin-states.c"
                 self.assertEqual((source / "main.c").read_bytes(), canonical.read_bytes())
                 self.assertIn("nx_factory_pin_state", smoke)
                 self.assertTrue(any("CMAKE_TOOLCHAIN_FILE" in arg for arg in command))
-            elif assembly.stem in {"u575-lptim-run", "h743-uart-continuous",
+            elif assembly.stem in {"u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
                                    "h743-uart-continuous-cache-on",
                                    "h743-uart-duplex-continuous",
                                    "h743-uart-duplex-continuous-cache-on"}:
-                stem = ("u575-lptim" if assembly.stem == "u575-lptim-run"
+                stem = ("u575-rtc" if assembly.stem == "u575-rtc-run"
+                        else "u575-lptim" if assembly.stem == "u575-lptim-run"
                         else "h743-uart-duplex-continuous" if
                         assembly.stem.startswith("h743-uart-duplex-")
                         else "h743-uart-continuous")
@@ -755,7 +831,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "stm32f407_eth_frames.h", "gd32f470_eth_frames.h",
                          "stm32g474_pwm_shared.h", "rtc_lptim_provider.h",
                          "stm32h743_spi_dma.h", "stm32g474_pin_state.h",
-                         "pin_state_impl.h", "stm32u575_lptim.h",
+                         "pin_state_impl.h", "stm32u575_lptim.h", "stm32u575_rtc.h",
+                         "retained_time.h", "stm32u575_rtc_calendar.h",
+                         "stm32u575_stop2_hw.h",
+                         "stm32u575_lpdma_copy_hw.h",
+                         "stm32u575_lpdma_copy_internal.h",
+                         "stm32u575_lptim1_profile.h",
+                         "stm32u575_lpdma_lptim1_internal.h",
                          "stm32u575_uart_gpdma_chain.h",
                          "stm32u575_uart_gpdma_impl.h",
                          "stm32h743_uart_continuous.h",
@@ -852,7 +934,9 @@ class SDKConsumerParallelTests(unittest.TestCase):
                          "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
                          "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
                          "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
-                         "consumers/g474-pwm-shared.c", "native-time-pair.toml",
+                         "consumers/g474-pwm-shared.c", "consumers/u575-retained-time.c",
+                         "consumers/u575-stop2.c",
+                         "consumers/u575-lptim1-lpbam.c", "native-time-pair.toml",
                          "native-time-empty.toml", "consumers/native-time-pair.c",
                          "consumers/native-time-empty.c"):
             with self.subTest(relative=relative):
@@ -1218,7 +1302,8 @@ finally:
         self.assertEqual(report['status'], 'passed')
         self.assertEqual(report['parallel_jobs'], jobs)
         self.assertEqual(report['consumer_workers'], jobs)
-        self.assertEqual(len(report['consumers']), 43)
+        self.assertEqual(len(report['consumers']),
+                         13 + len(self.fixture.SELECTED_INPUTS))
         self.assertTrue(all(row['status'] == 'passed'
                             for row in report['consumers']))
         self.assertEqual([row['name'] for row in report['selected_images']],

@@ -114,11 +114,12 @@ REQUIRED_FILES = (
     "os/freertos/include/nexus/os/lowpower.h",
     "os/freertos/include/nexus/os/freertos_diagnostics.h",
     "os/freertos/include/nexus/os/freertos_mpu.h",
+    "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
     "os/freertos/include/nexus/os/freertos_user.h",
     "os/freertos/include/nexus/os/secure_context.h",
     "os/freertos/mpu/prepare_port.py", "os/freertos/mpu/private.h",
     "os/freertos/mpu/task.c", "os/freertos/mpu/layout.c",
-    "os/freertos/mpu/syscalls.c",
+    "os/freertos/mpu/syscalls.c", "os/freertos/mpu/gpio.c",
     "os/freertos/mpu/guard.c", "os/freertos/mpu/guard_arm.c",
     "os/freertos/mpu/guard.h",
     "os/freertos/secure/Integration.cmake",
@@ -156,7 +157,11 @@ MANIFEST = ".nexus-source-sdk.json"
 IO_EVOLUTION_VERIFICATION_FILES = tuple(
     "cmake/package/verification/io_evolution/" + name for name in (
         "consumers/h743-spi-dma.c", "consumers/h743-runtime-clock.c",
+        "consumers/f407-handoff.c", "consumers/f407-i2s2-slave-tx.c",
+        "consumers/u575-lpdma-copy.c",
+        "consumers/u575-lptim1-lpbam.c", "consumers/u575-mpu-gpio.c",
         "consumers/h743-uart-continuous.c", "consumers/u575-lptim.c",
+        "consumers/u575-rtc.c", "consumers/u575-retained-time.c", "consumers/u575-stop2.c", "consumers/user-io-async.c",
         "consumers/h743-uart-duplex-continuous.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
         "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
@@ -181,6 +186,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "native-time-pair.toml", "native-time-empty.toml",
         "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
 REQUIRED_FILES += ("tools/configure/selected_contracts.py",
+                   "tools/configure/i2s2.py",
                    "tools/configure/pin_states.py",
                    "tools/configure/assemblies/g474-pin-states.toml",
                    *IO_EVOLUTION_VERIFICATION_FILES)
@@ -347,6 +353,45 @@ REQUIRED_FILES += (
     "soc/gd32f470/private/gd32f470_spi_dma.h",
     "soc/gd32f470/private/gd32f470_uart_stream.h",
     "soc/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32f470/private/usb_conf.h")
+REQUIRED_FILES += (
+    "components/amp_ipc/CMakeLists.txt",
+    "components/amp_ipc/src/amp_ipc.c",
+    "components/amp_ipc/include/nexus/components/amp_ipc.h",
+    "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
+    "components/stm32f407_handoff/CMakeLists.txt",
+    "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+    "soc/stm32f407/handoff.c",
+    "soc/stm32f407/private/stm32f407_handoff_hw.h",
+    "cmake/package/verification/io_evolution/consumers/f407-handoff.c")
+REQUIRED_FILES += (
+    "components/user_io_broker/include/nexus/components/user_io_async.h",
+    "components/user_io_broker/include/nexus/components/user_io_async_storage.h",
+    "components/user_io_broker/src/user_io_async.c",
+    "cmake/package/verification/io_evolution/consumers/user-io-async.c")
+REQUIRED_FILES += (
+    "components/stm32u575_retained_time/CMakeLists.txt",
+    "components/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h",
+    "components/stm32u575_retained_time/private/retained_time.h",
+    "components/stm32u575_retained_time/src/stm32u575_retained_time.c",
+    "soc/stm32u575/private/stm32u575_rtc_calendar.h",
+    "cmake/package/verification/io_evolution/consumers/u575-retained-time.c")
+REQUIRED_FILES += (
+    "components/stm32u575_stop2/CMakeLists.txt",
+    "components/stm32u575_stop2/README.md",
+    "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
+    "soc/stm32u575/stop2.c",
+    "soc/stm32u575/private/stm32u575_stop2_hw.h",
+    "cmake/package/verification/io_evolution/consumers/u575-stop2.c")
+REQUIRED_FILES += (
+    "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+    "components/frame_dma2d/CMakeLists.txt",
+    "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
+    "components/frame_dma2d/src/h743_frame_dma2d.c")
+REQUIRED_FILES += (
+    "components/i3c_controller/CMakeLists.txt",
+    "components/i3c_controller/src/i3c_controller.c",
+    "components/i3c_controller/include/nexus/components/i3c_controller.h",
+    "components/i3c_controller/include/nexus/components/i3c_controller_storage.h")
 for _component, _include, _private in (
         ("clock_domain", "nexus/components/clock_domain.h", "clock_domain_impl.h"),
         ("user_io_broker", "nexus/components/user_io_broker.h", "user_io_broker_impl.h"),
@@ -406,6 +451,14 @@ REQUIRED_FILES += tuple("components/storage/src/" + name + ".c" for name in (
 REQUIRED_FILES += tuple("components/storage/include/nexus/components/" + name
                         + ".h" for name in (
     "storage", "flash_storage", "file_flash"))
+REQUIRED_FILES += ("components/mapped_storage/CMakeLists.txt",)
+REQUIRED_FILES += tuple("components/mapped_storage/src/" + name + ".c"
+                        for name in ("mapped_storage", "mapped_storage_owner",
+                                     "native_mapped_storage"))
+REQUIRED_FILES += tuple("components/mapped_storage/include/nexus/components/"
+                        + name + ".h" for name in (
+                            "mapped_storage", "mapped_storage_owner",
+                            "native_mapped_storage"))
 REQUIRED_FILES += ("tools/maintenance/cmsis_device_lock.py",)
 for _review in cmsis_device_lock.REVIEWED_DEVICES.values():
     REQUIRED_FILES += (_review["lock_name"],)

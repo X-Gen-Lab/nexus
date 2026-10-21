@@ -57,6 +57,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             ("stm32u575", "u575 uart chain",
              "u575-uart-chain", "u575-uart-gpdma"),
             ("stm32u575", "u575 lptim run", "u575-lptim-run", "u575-lptim"),
+            ("stm32u575", "u575 rtc run", "u575-rtc-run", "u575-rtc"),
         )
         for family, label, stem, smoke in rows:
             with self.subTest(consumer=label), \

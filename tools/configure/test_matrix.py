@@ -68,6 +68,12 @@ class MaintainedMatrixTests(unittest.TestCase):
                                   for entry in item["selected"]},
                                  {("spi", "SPI4", "dma")} |
                                  ({("uart", "USART3", mode)} if mode else set()))
+            elif item["assembly"] == "tools/configure/assemblies/u575-rtc-run.toml":
+                self.assertEqual((item["family"], item["backend"], item["scope"]),
+                                 ("stm32u575", "baremetal", "public_reference"))
+                self.assertEqual([(entry["kind"], entry["controller"], entry["mode"])
+                                  for entry in item["selected"]],
+                                 [("rtc", "RTC0", "retained-calendar-alarm")])
             elif item["assembly"] == "tools/configure/assemblies/u575-lptim-run.toml":
                 self.assertEqual((item["family"], item["backend"], item["scope"]),
                                  ("stm32u575", "baremetal", "public_reference"))
@@ -78,6 +84,30 @@ class MaintainedMatrixTests(unittest.TestCase):
                 self.assertTrue({entry["kind"] for entry in item["selected"]}.issubset(
                     {"gpio", "uart"}))
 
+
+    def test_u575_sram4_copy_reference_is_exact_and_not_physical_qualification(self):
+        reference = "tools/configure/assemblies/u575-lpdma-copy-stop2.toml"
+        rows = [item for item in matrix.resolve_catalogue()["references"]
+                if item["assembly"] == reference]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual((rows[0]["board"], rows[0]["family"], rows[0]["part"],
+                          rows[0]["backend"], rows[0]["scope"],
+                          rows[0]["physical_status"]),
+                         ("stm32u575-nucleo-zi-q", "stm32u575",
+                          "STM32U575ZIT6Q", "baremetal", "public_reference",
+                          "not_executed"))
+        self.assertEqual(rows[0]["selected"], [])
+        result = configure.resolve_ir(configure.ROOT / reference).to_dict()
+        self.assertEqual(result["clock_profile"], "msis4")
+        self.assertFalse(result["physical_qualified"])
+        self.assertEqual(result["memory"], [
+            {"id": "sram1", "origin": 0x20000000, "size": 196608,
+             "dma_engines": {"GPDMA1": True, "LPDMA1": False}, "linker": True},
+            {"id": "sram4", "origin": 0x28000000, "size": 16384,
+             "dma_engines": {"GPDMA1": True, "LPDMA1": True}, "linker": True}])
+        self.assertEqual(result["memory_budgets"], {
+            "main_stack_bytes": 2048, "libc_heap_bytes": 0,
+            "static_ram_bytes": 4096, "regions": {"sram4": {"limit_bytes": 512}}})
 
     def test_g474_named_state_reference_is_exact_and_not_physical_qualification(self):
         reference = "tools/configure/assemblies/g474-pin-states.toml"

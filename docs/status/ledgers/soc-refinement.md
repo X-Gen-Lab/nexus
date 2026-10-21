@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/soc-refinement-execution.csv)。
-源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`03add7405a9c459686bb0b6af326a56c4148b55a37202fb9bfd221bc9bcd6725`。
+源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -581,11 +581,11 @@ source_language: zh_CN
 | `priority` | P2 |
 | `scope` | conditional_extension |
 | `task` | Bootloader and running-state handoff |
-| `implementation_status` | not_implemented |
-| `software_status` | not_executed |
+| `implementation_status` | partial_exact_reference_implemented |
+| `software_status` | not_qualified |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc;docs/design/integration-contracts.md |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md |
+| `implementation_paths` | soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md |
 | `exit_condition` | Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry contract |
 | `owner` | codex |
 
@@ -615,11 +615,11 @@ source_language: zh_CN
 | `priority` | P2 |
 | `scope` | conditional_extension |
 | `task` | Deep STOP continuous time |
-| `implementation_status` | not_implemented |
-| `software_status` | not_executed |
+| `implementation_status` | partial_exact_reference_implemented |
+| `software_status` | not_qualified |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc;os |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md |
+| `implementation_paths` | components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md |
 | `exit_condition` | Exact RTC LPTIM retention wake recovery precision and power physically verified |
 | `owner` | codex |
 
@@ -632,11 +632,11 @@ source_language: zh_CN
 | `priority` | P2 |
 | `scope` | conditional_extension |
 | `task` | Userspace MPU TrustZone transport |
-| `implementation_status` | partial_synchronous_reference_implemented |
+| `implementation_status` | partial_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
+| `implementation_paths` | arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json |
 | `exit_condition` | Actual permissions address copy borrow async exit gateway and hardware isolation verified |
 | `owner` | codex |
 

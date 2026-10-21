@@ -1,0 +1,40 @@
+{
+  "status": "SIDECAR_SEALED_AND_BYTE_VERIFIED_ORDINARY_R2_PENDING",
+  "package": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/ordinary-r1-sidecar/package.json",
+    "sha256": "dba35eac6411169aa2a40ea114f74c64f4f68b40f2377dd2a7085bbca76ab023",
+    "bytes": 531
+  },
+  "verified": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/ordinary-r1-sidecar/verified.json",
+    "sha256": "fb6db4ef89e7457292247f25a2c96d680b9e4400dbdab91756589eecc06a8e43",
+    "bytes": 149
+  },
+  "archive": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/ordinary-r1-sidecar/store/b287922234afd92fbfda7a583b3dd9b85e90193a154a0d189af4ce4562ccbbb3.tar.gz",
+    "sha256": "b287922234afd92fbfda7a583b3dd9b85e90193a154a0d189af4ce4562ccbbb3",
+    "size": 36747
+  },
+  "files": 27,
+  "bytes": 142260,
+  "README": {
+    "path": "/tmp/nexus-f407-i2s2-final-delivery-evidence-20261020/README.md",
+    "sha256": "eec73604078b65869ac55a2f238ef9da0c62831a03a3e791aff1222dadfb7c81",
+    "bytes": 9758
+  },
+  "README_previous_prefix_sha256": "b1ca9233d432bc9a70a79ab3f29061ee1b960ee0b54a2b7f0d01148625fc4a96",
+  "README_previous_prefix_bytes": 8176,
+  "README_previous_prefix_unchanged": true,
+  "original_1137_archive_sha256": "0a799290296991780a20b967d2cda38d64ee0f4c41e5370e6f369a97cd1e39b0",
+  "original_archive_unchanged": true,
+  "first_gate": "1366executed1365pass1fail0error0skip;notaccepted;laterstagesnotexecuted",
+  "focused_followup": "21pass0skip;testonly;production7ecaunchanged",
+  "external_recovery_archive": {
+    "path": "/tmp/nexus-examples-generated-cas-20261021/e0c92b1b7ff86e399eb43025944a935b2ff0b461d4f04fd61943903f46a1b7a8.tar.gz",
+    "sha256": "e0c92b1b7ff86e399eb43025944a935b2ff0b461d4f04fd61943903f46a1b7a8",
+    "size": 26329699
+  },
+  "full_build_payload_copied": false,
+  "ordinary_R2": "pending",
+  "collector_reran_compiler_tests_or_modified_primary_index": false
+}

@@ -475,6 +475,7 @@ include(os_wait.cmake)
 include(os_optional.cmake)
 include(os_secure.cmake)
 include(freertos_mpu.cmake)
+include(freertos_mpu_gpio.cmake)
 include(gd32_arch.cmake)
 include(gd32_memory.cmake)
 include(stm32_memory.cmake)
@@ -525,6 +526,7 @@ include(threadx.cmake)
 include(i2c_multi_controller.cmake)
 
 include(user_io_broker.cmake)
+include(user_io_async.cmake)
 
 include(failstop.cmake)
 
@@ -577,6 +579,25 @@ include(h743_spi_dma.cmake)
 include(h743_spi_dma_factory.cmake)
 include("${CMAKE_CURRENT_SOURCE_DIR}/h743_runtime_clock.cmake")
 include(u575_lptim.cmake)
+include(u575_rtc.cmake)
 include(u575_uart_chain.cmake)
 include(h743_uart_continuous.cmake)
 include(uart_fifo_acquisition_probe.cmake)
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/mapped_storage.cmake")
+include(amp_ipc.cmake)
+include(stm32f407_handoff.cmake)
+include(f407_i2s2_slave_tx.cmake)
+include(frame_stream.cmake)
+
+include(u575_retained_time.cmake)
+include(u575_stop2.cmake)
+
+include(i3c_controller.cmake)
+
+include(u575_memory.cmake)
+
+include(u575_lpdma_copy.cmake)
+include(u575_stop2_copy.cmake)
+
+include(u575_lptim1_lpbam.cmake)

@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-u575-lptim1-visual-addendum-20261020/evidence-store/a542f6870a153d7ad73c7a29789b74b2f6f0dcb574f7c5a2f27e682fb71a42f4.tar.gz",
+    "sha256": "a542f6870a153d7ad73c7a29789b74b2f6f0dcb574f7c5a2f27e682fb71a42f4",
+    "size": 1072263
+  },
+  "bytes": 3109563,
+  "files": 19,
+  "kind": "portable_evidence",
+  "manifest_sha256": "cb7eface4a7104e842da1d53f1d012a216e1f1668ac0f66ff78ce53c02fc3f7c",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

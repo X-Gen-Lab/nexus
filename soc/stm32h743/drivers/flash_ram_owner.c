@@ -155,12 +155,21 @@ static bool idle(const nx_stm32h743_flash_state_t* port) {
 nx_result_t nx_stm32h743_flash_ram_initialize(
     nx_stm32h743_flash_state_t* port,
     nx_stm32h743_flash_ram_workspace_t* execution) {
+#if !defined(NX_H743_MODEL) || defined(NX_H743_FLASH_RAM_FIXED_STORAGE)
+    if (execution != &g_nx_stm32h743_flash_ram_workspace)
+        return NX_ERROR_INVALID;
+#endif
     if (!objects(port, execution))
         return NX_ERROR_INVALID;
     nx_result_t result = cpu_admission();
     if (result != NX_SUCCESS)
         return result;
     nx_stm32h743_system_t* s = &g_nx_stm32h743_system;
+#if !defined(NX_H743_MODEL)
+    if (port->registers != FLASH || s->flash != FLASH || s->timer != TIM2 ||
+        s->core != SCB || (uintptr_t)port->memory != UINT32_C(0x08000000))
+        return NX_ERROR_INVALID;
+#endif
     if (!s->started || s->core == NULL || s->timer == NULL ||
         s->flash == NULL || port->registers != s->flash ||
         port->memory == NULL ||
@@ -237,6 +246,17 @@ nx_stm32h743_flash_ram_admission(const nx_stm32h743_flash_state_t* port) {
     nx_result_t result = cpu_admission();
     if (result != NX_SUCCESS)
         return result;
+#if !defined(NX_H743_MODEL) || defined(NX_H743_FLASH_RAM_FIXED_STORAGE)
+    if (port->execution != &g_nx_stm32h743_flash_ram_workspace)
+        return NX_ERROR_STATE;
+#endif
+#if !defined(NX_H743_MODEL)
+    if (port->registers != FLASH || (uintptr_t)port->memory != 0x08000000U ||
+        g_nx_stm32h743_system.flash != FLASH ||
+        g_nx_stm32h743_system.timer != TIM2 ||
+        g_nx_stm32h743_system.core != SCB)
+        return NX_ERROR_STATE;
+#endif
     if (port->execution == NULL || port->execution->port != port ||
         port->execution->system != &g_nx_stm32h743_system ||
         !port->execution->prepared)
@@ -253,13 +273,25 @@ nx_stm32h743_flash_ram_admission(const nx_stm32h743_flash_state_t* port) {
 
 bool nx_stm32h743_flash_ram_external(const nx_stm32h743_flash_state_t* port,
                                      const void* value, size_t bytes) {
+#if !defined(NX_H743_MODEL) || defined(NX_H743_FLASH_RAM_FIXED_STORAGE)
+    return (port->execution == NULL ||
+            port->execution == &g_nx_stm32h743_flash_ram_workspace) &&
+           !code_alias(value, bytes) &&
+           !alias(value, bytes, &g_nx_stm32h743_flash_ram_workspace,
+                  sizeof(g_nx_stm32h743_flash_ram_workspace));
+#else
     return !code_alias(value, bytes) &&
            (port->execution == NULL ||
             !alias(value, bytes, port->execution, sizeof(*port->execution)));
+#endif
 }
 
 nx_result_t
 nx_stm32h743_flash_ram_stop(nx_stm32h743_flash_ram_workspace_t* execution) {
+#if !defined(NX_H743_MODEL) || defined(NX_H743_FLASH_RAM_FIXED_STORAGE)
+    if (execution != &g_nx_stm32h743_flash_ram_workspace)
+        return NX_ERROR_INVALID;
+#endif
     if (execution == NULL)
         return NX_ERROR_INVALID;
     if (!execution->prepared && !execution->active && execution->port == NULL)

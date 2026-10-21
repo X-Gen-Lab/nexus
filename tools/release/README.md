@@ -33,14 +33,12 @@ signature does not establish a different SDK source commit by itself.
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK
 producer and the standalone versioned transport. Its current exact selection
-has 43 independent consumer roots and 46 executable images: three C/C++ base
-roots, ten MCU/backend roots and thirty selected-feature roots. Four images
-execute as Native programs; 42 MCU images are linked software evidence. The
-38 generic retention checks cover ten MCU/backend and twenty-eight selected-feature
-images; base image resource checks are a separate scope. These counts describe
-the required plan, not an execution result or physical acceptance.
+requires 48 independent consumer roots and 51 executable images. This policy-v8
+matrix is a required plan; the complete installed v8 consumer matrix has not
+been executed. Plan counts do not establish software qualification or physical
+acceptance.
 
-New transport manifests use schema `2` and policy `nexus-sdk-consumers-v5`.
+New transport manifests use schema `2` and policy `nexus-sdk-consumers-v8`.
 Changing the reviewed plan also requires reviewing its policy identity.
 Packing and verification require every exact plan root and nonempty image;
 missing, additional or same-count substituted Git roots fail. Report/manifest
@@ -48,6 +46,18 @@ claims cannot authorize another selection. Each consumer's `.git` is only an
 unborn `git init` fixture isolating the SDK from its parent's source identity.
 History, remotes, an index, active hooks and foreign Git metadata remain refused.
 The SDK requires the complete shared plan module even after a rehashed omission.
+
+Policy-v8 adds exactly one selected MCU consumer relative to policy-v7:
+`u575 lptim1 lpbam`, using the canonical
+[assembly](../configure/assemblies/u575-lptim1-lpbam-stop2.toml) and public C11
+[consumer](../../cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c).
+It links `Nexus::U575Stop2Lptim1` as a compile-time alternative of the same
+concrete Stop2 owner, with its own public request contract for one finite SRAM4
+CCR1/RCR=0/ARR tuple. This is not a repeated or general LPBAM program. The
+[reference contract](../../docs/design/u575-lptim1-lpbam.md) defines explicit
+start/stop, retained partial-failure responsibility and compound final release.
+The additional required root and image do not inherit historical v7 execution,
+SDK qualification, pin routing or physical HIL results.
 
 Archives retain all original raw bytes, file modes and empty directories, verify
 the complete inventory and consume the gzip stream through its CRC/size trailer
@@ -59,7 +69,7 @@ actual source, job and builder identities retain that separate responsibility.
 
 Historical schema-2 policy-v2 31-root/34-image evidence keeps its original
 source, bytes and hash-pinned helper. The current policy does not accept it as
-a fallback or rewrite it as the 43-root/46-image selection. Earlier policy-v3
+a fallback or rewrite it as the 48-root/51-image selection. Earlier policy-v3
 34-root/37-image and 36-root/39-image plans also retain their exact historical
 source identities; neither is the current plan or a fallback. Historical policy-v4
 has 28 selected features, 41 roots and 44 images: H743 SPI DMA Cache on, U575 finite
@@ -67,8 +77,24 @@ UART hardware-chain TX, U575 LPTIM2 RUN one-shot, and H743 continuous UART RX
 with Cache off and Cache on extended its preceding 23-feature plan. Policy-v5
 adds explicit H743 UART continuous DMA duplex with Cache off and Cache on;
 policy-v4 evidence retains its own source and helper and cannot satisfy this plan.
-The explicit exact plan, rather than an old count
-or the policy label alone, determines current admission.
+The preceding policy-v5 plan has 44 roots and 47 images after adding the U575
+RTC RUN consumer. Policy-v6 adds two independent consumers using the maintained
+U575 baremetal empty assembly: retained time links `Nexus::U575RetainedTime`,
+and the bounded Stop2 owner links `Nexus::U575Stop2`. Their public C11 sources
+remain separate from the mutually exclusive RTC RUN factory. These are required
+software link checks; they do not execute Stop2 or establish physical wake timing.
+That historical policy-v6 selection has 46 roots and 49 images.
+
+Historical policy-v7 requires 47 roots and 50 images. It added the optional
+finite U575 SRAM4 copy consumer through
+`tools/configure/assemblies/u575-lpdma-copy-stop2.toml` and the public C11
+`u575-lpdma-copy` smoke, which links `Nexus::U575Stop2Copy`. It uses the same
+Stop2 owner for the bounded copy. Its original source, bytes and hash-pinned
+helper remain historical and cannot satisfy policy-v8. This required link check
+does not record an executed full installed consumer matrix or a physical copy
+result. The explicit exact current plan, rather than an old count or the policy
+label alone, determines admission; v7 results cannot qualify the added LPTIM1
+consumer or the complete v8 matrix.
 
 Historical schema-1 thirteen-root archives keep their original bytes, source and
 hash-pinned helper for read-only recovery. Current packing and verification do

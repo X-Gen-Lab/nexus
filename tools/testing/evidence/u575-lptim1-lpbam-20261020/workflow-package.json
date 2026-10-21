@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "portable_evidence",
+  "archive": {
+    "path": "/tmp/nexus-u575-lptim-workflow-addendum-20261020/evidence-store/9df8ce54a7ad97e5d1745afac9c5774e132bf1383db695f06788d1e563173001.tar.gz",
+    "sha256": "9df8ce54a7ad97e5d1745afac9c5774e132bf1383db695f06788d1e563173001",
+    "size": 83451
+  },
+  "manifest_sha256": "f9109625d8a3779daa2bbbf91ba26437dcc693a0738622e7bdbf2961bfef5975",
+  "files": 28,
+  "bytes": 409212,
+  "signature_status": "unsigned",
+  "product_promotion": false
+}

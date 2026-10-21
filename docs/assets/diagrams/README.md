@@ -2,10 +2,15 @@
 
 本图册保留15类必需视图、两张补充图与本轮 I/O 架构视图 FIG-16，
 另加入 IO-24 的 FIG-17/18 目标图源、IO-36 的 FIG-21 Native 装配／生命周期图，
-以及 IO-31 的 FIG-22 G474 命名 GPIO 状态／所有权图。主图登记见
+以及 IO-31 的 FIG-22 G474 命名 GPIO 状态／所有权图。FIG-23–26 依次描述
+五项有界软件机制的所有权、U575 保留时钟与 Stop2 所有权及状态、
+UART TX 复制代理的 kernel 所有权与退出、I3C 核心借用与整总线证明。
+FIG-27 另述同一 Stop2 owner 的选定 SRAM4/LPDMA 有限复制及复合退出。主图登记见
 [图清单](diagram-index.csv)，维护规则见
 [图示标准](../../design/documentation-standards.md)。图有精确current/reference/target身份，
 不可从图源存在、渲染成功或软件流程推断硬件和外部发布已执行。
+
+FIG-28 另述单组 LPTIM1 tuple 的选定 LPBAM 参考，以及同一 Stop2 owner 的有序最终访问证明。
 
 原15类主图及两张补充图的代码依据保持`0111c8d3b9c7b37d258b9c401070305b13b6f3a1`。
 FIG-16 描述 `c4249e98` 基线之后的 I/O 增量机制，其具体源码链接和执行状态见
@@ -228,42 +233,47 @@ preposted producer和普通producer不得混用。旧块在两个hardware target
 
 ## FIG-17 H743 Flash RAM 边界目标设计
 
-**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／Cache off；源已集成，生产 ELF 闭包
-与完整软件退出尚未完成，实板 HIL 未执行。**
+**身份：target。范围：仅选定 STM32H743ZIT6 V 修订／三个 Cache-off 配置；
+选定的显式操作数及汇编协议证明已实现，IO-24 原始完整退出与候选资格仍开放，实板 HIL 未执行。**
 
-![FIG-17 target：cold factory、显式准备和直接调用分别标记；一个私有 Flash owner 内的 CPU bridge、RAM VTOR 与 MPU guard 的完整退出尚未完成](h743-flash-ram-architecture.svg)
+![FIG-17 target：单一固定 workspace owner；汇编入口保护捕获值，C RAM 阶段与独立汇编返回门分工明确](h743-flash-ram-architecture.svg)
 
-构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；运行边分别表达查找、调用、
-复制结果与真实 MMIO 观测。factory 仅返回既有 face。忙区间内全部执行、输入、
-向量、栈及诊断必须留在已准入 RAM；guard 只约束 CPU。虚线所示其他 bus master
-撤回／join 由外部维护调用者负责，不表示平台创建 worker 或已停止硬件。
+构建边表达单份 TOML 经不可变 IR 选入生命周期与 face；factory 仅返回既有不可变 face，
+显式 Platform start／stop 负责准备及保留失败清理。普通 provider 验证固定物理绑定；
+单一生成 workspace 保存命令、诊断与 selector 效果账本。汇编入口保存调用者 CPU 状态，
+在 r8-r11 中独立保护 MPU 捕获值，然后以私有 MSP 调用 C RAM 阶段。C 阶段发布私有 VTOR，
+安装 guard，发出最多一次脉冲，真实排空并恢复 MPU；独立汇编返回门核对硬件与受保护捕获值，
+恢复链接器确定的 VTOR 并证明读回后，汇编桥才恢复调用者 CPU 状态。guard 只约束 CPU；
+其他 bus master 的撤回／join、调用者栈预留及恢复策略仍由外部调用者按合同保证。
 
 目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
 [既有 H743 provider 范围](../../../soc/stm32h743/README.md)、
 [IO-24 原始退出条件](../../design/io-evolution-execution.csv)。
-[可编辑 DOT](h743-flash-ram-architecture.dot)。新增图的渲染、语义独立审查、双语
-输出检查、实际浏览器与软件／实板资格须分别记录，不能从草稿存在推断。
+[可编辑 DOT](h743-flash-ram-architecture.dot)。图的渲染、独立语义审查与双语输出检查
+只建立各自范围的文档证据；软件候选与实板资格仍分别判断。
 
 ## FIG-18 RAM 维护结清目标设计
 
 **身份：target。范围：选定 V 修订／Cache off 的同步物理脉冲；这是协议阶段，
 不新增公共 request enum，不证明有界返回时间。**
 
-![FIG-18 target：deadline 到期继续保留保护并真实排空；只有双 Bank 空闲、LOCK 与精确恢复证明成立才返回；永久 busy 无返回边](h743-flash-ram-lifecycle.svg)
+![FIG-18 target：所有返回的 C RAM 路径汇入独立汇编门；超时保留责任，永久 busy 或无法证明恢复均无返回](h743-flash-ram-lifecycle.svg)
 
-每条边表示有条件的控制流。触发前已有临时效果的拒绝必须先证明回退；触发后
-TIMEOUT 只锁存结果，不撤销脉冲，也不返回 Flash handler。双 Bank 真实空闲后，
-仍须证明 LOCK、TIM2 时间域／epoch 及精确 MPU／VTOR 恢复；CPU bridge 的精确恢复由实际 ARM 指令流另行证明。永久 busy 持续留在
-RAM 排空环；无法证明恢复则留在不返回 RAM fail-stop，不暗示自动复位或喂狗。
-所有返回的 RAM 路径，包括触发前 VTOR 发布拒绝和 guard／deadline 拒绝，都必须
-先通过共同返回门：双 Bank 空闲、guard 无保留效果、完整保存的目标控制值与 LOCK
-已读回证明；必要时先锁定空闲目标，再恢复 VTOR。
+每条边表示有条件的控制流。汇编入口、C 阶段及汇编返回门共用一份内嵌 selector 效果账本：
+写 RNR 前登记，精确恢复并读回后清除；独立 MPU 捕获值保存在 r8-r11，C 阶段不得改写。
+触发前已有临时效果的拒绝必须先证明回退；触发后 TIMEOUT 只锁存结果，不撤销脉冲，也不返回
+Flash handler。C 阶段在有效 TIM2 epoch 下真实排空双 Bank，证明 LOCK 并恢复 MPU，仍保留
+私有 VTOR 与私有 MSP。所有返回的 C 路径都必须经过独立汇编门：读回双 Bank 空闲、
+零保留效果、精确保存的目标控制值与 LOCK，并对照受保护捕获值证明 MPU；随后恢复
+链接器确定的 g_pfnVectors，执行屏障并证明 VTOR 读回。只有此后汇编桥才恢复 CPU 并返回。
+永久 busy 持续留在 RAM 排空环；捕获、清理或返回条件无法证明则进入不返回 RAM 终止路径，
+不暗示自动复位或喂狗。
 
 目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
 [Arch 合同](../../design/arch-contracts.md)、
 [当前软件与物理资格边界](../../delivery/qualification.md)。
-[可编辑 DOT](h743-flash-ram-lifecycle.dot)。图中返回条件仍需实际
-生产 ELF、真实 provider 测试与物理 station 分别建立证据。
+[可编辑 DOT](h743-flash-ram-lifecycle.dot)。选定显式操作数及汇编协议的软件证明
+受合同中的编译器、调用者与所有权前提约束；IO-24 原始完整退出、候选资格及物理 station 证据仍开放。
 
 ## 补充视图
 
@@ -306,3 +316,48 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 
 依据：[GPIO pin-state 说明](../../explanation/gpio-pin-states.md)、[公共接口](../../../io/include/nexus/io/pin_state.h)、[G474 provider](../../../soc/stm32g474/drivers/pin_state.c)、[冷态租约生成](../../../tools/configure/gpio_phase.py)。
 [可编辑 DOT](gpio-pin-states.dot)；实施关联：IO-31。
+
+(fig-28-u575-lptim1-lpbam)=
+## FIG-28 U575 LPTIM1 单 tuple 与 Stop2 有序退出
+
+**身份：reference。范围：STM32U575ZIT6Q／TZEN0／baremetal／SRAM4／LPDMA1 channel0；仅一组固定 LPTIM1 CCR1／RCR0／ARR tuple，内部输出未路由。**
+
+成功所需的三个新鲜 write-OK 须在任何 DIER 撤源写入之前锁存；后续不依赖标志存活。有限 DMA 完成但确认缺失时，首轮保留生产源与借用并锁存 IO；下一次 service／recover 带入该失败再撤源，晚到 TC 不会升级成功。该软件参考已通过有针对性的 RED／GREEN 模型与选定 M33 开发重链接；渲染与翻译检查不建立候选或物理资格。
+
+![FIG-28：启动账本与活动借用分开；成功 write-OK、撤源、DMA 最终访问、外设复位和全部恢复后才最终 SETTLED](u575-lptim1-lpbam.svg)
+
+实线标明必要顺序或分支，虚线标明保留责任与恢复。纯初始化之后显式公共 start 取得冷态独占 LPTIM1 的 gate、LSE mux 与按需 LSESYS；部分失败的启动账本保留至公共 stop 证明恢复。新 ARM owner 为 104 B，其中新增 16 B 账本；原 SRAM4 copy owner 仍为 88 B。
+
+ACCEPTED 借用 request、12 B tuple 与完整 48 B LLI 工作区。ENABLE 后至少再过两个保留 RTC tick；初始新鲜写 OK 先证明再清旗。硬件请求 13／BREQ1／保留位 DREQ0 写 CCR1，两个 SWREQ continuation LLI 依次写 RCR0、最后写 ARR；成功还须三个新鲜 write-OK。没有重复 tuple 模式；RUN LPTIM2 须预先关闭并 join。
+
+cancel／deadline 不撤销存储。UEDE0／DIEROK 证明先于 DMA suspend／reset／idle 及引用撤除；随后通过自有 RCC reset 关闭 LPTIM1，绝不清 ENABLE。全部 RTC／IRQ／loan gate／电源／时钟与引用恢复后才最终 SETTLED；acquire 观察与外部 observer join 后，joined 公共 stop 另行归还启动 access claims。未知 profile 禁止 RTC／DMA／LPTIM MMIO；recover 不再 WFI。自有 reset 仅在 DMA 最终访问证明后可重试；活动借用期间观察到的外部 reset 永久隔离，安静默认值不能证明 join。
+
+依据：[单 tuple 参考合同](../../design/u575-lptim1-lpbam.md)、[公共 receiver](../../../components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)、[公共 Stop2 face](../../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)、[私有 LPTIM1 profile](../../../soc/stm32u575/private/stm32u575_lptim1_profile.h)。[可编辑 DOT](u575-lptim1-lpbam.dot)；实施关联：IO-32／SOC-35。图不表示引脚路由、完整 PWM 周期播放或物理／HIL 执行；原完整退出条件仍开放。
+
+(fig-29-u575-mpu-gpio)=
+## FIG-29 U575 MPU-v2 单任务 scalar GPIO WRITE authority
+
+**身份：reference。范围：STM32U575ZIT6Q／TZEN0／MSIS4／CM33 MPU-v2／八个 MPU region；单任务、只读固定 PC7 WRITE grant。**
+
+![FIG-29：真实 SVC70、可信 current TCB 与只读绑定、掩码边界内一次 BSRR；close／join 后才删除任务](u575-mpu-gpio.svg)
+
+五个显式 normal memory region 保护普通代码、provider、TCB 与 authority；只有窄 syscall region 和显式 user text 可由 user 执行，外设 MMIO 不映射给 user。真实 reset 路径在核对完整范围后初始化 user DATA/BSS。维护的 selected 静态 ELF gate 核对三个 Nexus user 入口、真实 veneer 与完整 privileged helper/provider 指令范围；受支持的 GNU Os 启动形状之外一律拒绝。
+
+实线标记实际调用、权限核验或返回，虚线标记唯一 privileged owner 的装配与生命周期职责。open 绑定实际 static TCB 与单调 epoch 并阻止删除；scalar 调用只在最终 guard 中核对仍有效的 task、device 与 PC7 mask 后执行一次 BSRR。未知 device／越权 mask／错误 task、两 mask 均为零或 set/reset 重叠、closed／陈旧代次与错误上下文均无 GPIO 效果；无 registry、worker、指针传参或异步 request。
+
+close 撤回准入，join 在同一单核掩码排除边界解除 pin；随后由外部 owner 删除另一任务。closing marker 覆盖实际 kernel delete，task epoch 不复位，溢出拒绝。图不代替产品的 user quiescence、栈寿命、scheduler、安全输出或 provider stop 责任。
+
+依据：[精确实施合同](../../design/u575-mpu-gpio.md)、[公共 authority](../../../os/freertos/include/nexus/os/freertos_mpu_gpio.h)、[派发与生命周期](../../../os/freertos/mpu/gpio.c)、[真实 GPIO provider](../../../soc/stm32u575/drivers/gpio.c)、[normal memory generator](../../../tools/configure/memory.py)。[可编辑 DOT](u575-mpu-gpio.dot)。维护的 Native host 模型、normal M33 reset 链接及单个搬移 development SDK consumer 已实际通过；[源码绑定证据](../../../tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 分开记录阶段、ABI 与资源。软件模型及静态 layout／opcode／selected 入口及受支持 startup 调用目标 不证明真实 MPU 隔离或物理 HIL，也不建立 M7、完整 SDK plan 或 IO-39／SOC-36 原退出资格。
+
+(fig-30-f407-i2s2-slave-tx)=
+## FIG-30 F407 I2S2 从机有限发送与整块借用退出
+
+**身份：reference。范围：F407VE/ZG／baremetal／HSE8-PLL168／外部 CK/WS；PB12/PB13/PB15，DMA1 Stream4 channel0，有限 stereo16 整块发送。**
+
+![FIG-30：ACCEPTED 前无请求效果，ACTIVE 后才允许 CK，最终访问证明后归还整块](f407-i2s2-slave-tx.svg)
+
+实线表示所需顺序或已标明分支，虚线表示保留的借用责任和有界重试。冷复位 Platform 持有共享 GPIOB/DMA1 门控与 TIM2 时间域；显式发送器持有 SPI2 模式、引脚和两个向量。先 ACCEPTED／QUEUED 再读清除型 SR 或允许 DMA 预取；只有观察到 DR 预填充与实际 TIM2 间隔后 acquire 取得 ACTIVE 才允许外部主机提供 CK。引脚采样不证明连续静止。
+
+TCIF／NDTR0 只证明内存计数。停止 DMA 请求／引擎、观察 TXE 后另读新鲜 BSY、撤回地址／计数／标志和向量引用后，才能解除 owner 引用、归还原始整块借用并最终 release 发布 SETTLED。取消、超时或缺失证明都不撤销借用；首个错误保留，错误排空可能欠载且不保证有效音频。观察到复位／门控／时钟或时间历史丢失会永久隔离。所有共享用户及外部观察者先 join，最后才允许 Platform stop。
+
+依据：[精确机制页](../../design/f407-i2s2-slave-tx.md)、[公共合同](../../../components/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h)、[真实 provider](../../../soc/stm32f407/drivers/i2s2_slave_tx.c) 与[源码绑定证据](../../../tools/testing/evidence/f407-i2s2-20261020/README.md)。[可编辑 DOT](f407-i2s2-slave-tx.dot)。Native 模型、normal VE/ZG/default 链接和单个搬移 development SDK consumer 是有范围的软件执行；图和静态链接不执行外部时钟、不证明真实音频或 HIL。IO-41、完整 SDK／formal／OCI 与物理退出仍分别开放。

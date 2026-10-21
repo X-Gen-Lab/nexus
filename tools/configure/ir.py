@@ -11,10 +11,12 @@ try:
     from .resource_graph import ResourcePlanIR
     from .trigger_graph import TriggerPlanIR
     from .dma_topology import DmaTopologyIR
+    from .i2s2 import I2s2RoleIR
 except ImportError:
     from resource_graph import ResourcePlanIR
     from trigger_graph import TriggerPlanIR
     from dma_topology import DmaTopologyIR
+    from i2s2 import I2s2RoleIR
 
 
 def freeze(value):
@@ -101,6 +103,7 @@ class KernelProfileIR(Record):
     kernel_policy: str
     kernel_port: str
     memory_protection: bool
+    user_io: str
     system_call_stack_words: int
     security_model: str
     secure_idle_stack_bytes: int
@@ -124,7 +127,7 @@ class KernelProfileIR(Record):
         return cls(*(record[name] for name in (
             "profile", "tick_source", "tick_hz", "tick_reload", "max_priorities",
             "syscall_priority", "kernel_policy", "kernel_port",
-            "memory_protection", "system_call_stack_words", "security_model",
+            "memory_protection", "user_io", "system_call_stack_words", "security_model",
             "secure_idle_stack_bytes",
             "idle_stack_words",
             "max_task_name_len", "mutexes", "counting_semaphores",
@@ -763,12 +766,22 @@ class MemoryRegionBudgetIR:
 
 
 @dataclass(frozen=True)
+class MpuMemoryReservationsIR:
+    privileged_flash_bytes: int
+    user_flash_bytes: int
+    syscall_flash_bytes: int
+    privileged_ram_bytes: int
+    user_ram_bytes: int
+
+
+@dataclass(frozen=True)
 class MemoryBudgetIR:
     main_stack_bytes: int
     libc_heap_bytes: int
     static_ram_limit_bytes: int | None
     flash_load_limit_bytes: int | None
     regions: tuple[MemoryRegionBudgetIR, ...] = ()
+    mpu: MpuMemoryReservationsIR | None = None
 
 
 @dataclass(frozen=True)
@@ -831,6 +844,7 @@ class ConfigurationIR(Record):
     values: Mapping
     pwm_shared_owners: tuple[PwmSharedOwnerIR, ...] = ()
     runtime_power: RuntimePowerIR | None = None
+    i2s2: I2s2RoleIR | None = None
 
     @classmethod
     def from_validated(cls, result):
@@ -848,7 +862,9 @@ class ConfigurationIR(Record):
                                 budgets.get("flash_load_bytes"),
                                 tuple(MemoryRegionBudgetIR(name, choice["limit_bytes"])
                                       for name, choice in sorted(
-                                          budgets.get("regions", {}).items())))
+                                          budgets.get("regions", {}).items())),
+                                (MpuMemoryReservationsIR(**budgets["mpu"])
+                                 if "mpu" in budgets else None))
         irq = InterruptProfileIR(**result["irq"])
         cpu = CpuProfileIR.from_validated(result["cpu_profile"])
         kernel_type = (ThreadXKernelProfileIR if result["backend"] == "threadx"
@@ -872,7 +888,10 @@ class ConfigurationIR(Record):
                          for item in result.get("pwm_shared_owners", ())),
                    (RuntimePowerIR(result["runtime_power"]["mode"],
                                    tuple(result["runtime_power"]["controllers"]))
-                    if "runtime_power" in result else None))
+                    if "runtime_power" in result else None),
+                   (I2s2RoleIR(result["i2s2"]["profile"], result["i2s2"]["part"],
+                               tuple(result["i2s2"]["claims"]))
+                    if "i2s2" in result else None))
 
     def to_dict(self):
         return thaw(self)

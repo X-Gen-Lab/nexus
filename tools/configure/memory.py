@@ -15,7 +15,8 @@ def select(regions, budgets, family, part, *, obj, integer, fail):
         family == "gd32f470" and part == "GD32F470ZGT6") else
         {"ccm"} if family == "stm32f407" and part in {
             "STM32F407VET6", "STM32F407ZGT6"} else
-        {"sram1"} if family == "stm32h743" and part == "STM32H743ZIT6"
+        {"sram1"} if family == "stm32h743" and part == "STM32H743ZIT6" else
+        {"sram4"} if family == "stm32u575" and part == "STM32U575ZIT6Q"
         else set())
     for name, choice in choices.items():
         if name not in maintained or name not in available:
@@ -61,7 +62,7 @@ def resource_budget(result):
 def selections(result):
     selected = {region["id"] for region in result["memory"] if region["linker"]}
     return [("NEXUS_MEMORY_" + name.upper(), int(name in selected))
-            for name in ("addsram", "tcm", "ccm", "sram1")]
+            for name in ("addsram", "tcm", "ccm", "sram1", "sram4")]
 
 
 def header_lines(result):
@@ -115,7 +116,123 @@ def _extra_sections(regions):
     return "\n".join(sections)
 
 
+def _mpu_linker(result):
+    """Emit the selected five-domain v8 layout with real reset copy bounds.
+
+    The exact policy and reservation sizes are validated by configuration.
+    User initializers have a distinct cold-start copy/zero ABI; ordinary data,
+    kernel metadata and the boot stack remain in the primary privileged RAM.
+    """
+    budgets = result["memory_budgets"]
+    reservations = budgets["mpu"]
+    flash = result["layout"]
+    ram = next(region for region in result["memory"] if region["linker"])
+    flash_origin = flash["origin"]
+    svc_origin = flash_origin + reservations["privileged_flash_bytes"]
+    user_flash_origin = svc_origin + reservations["syscall_flash_bytes"]
+    ram_origin = ram["origin"]
+    user_ram_origin = ram_origin + reservations["privileged_ram_bytes"]
+    domains = (
+        ("PRIV_FLASH", "rx", flash_origin,
+         reservations["privileged_flash_bytes"]),
+        ("SVC_FLASH", "rx", svc_origin, reservations["syscall_flash_bytes"]),
+        ("USER_FLASH", "rx", user_flash_origin,
+         reservations["user_flash_bytes"]),
+        ("PRIV_RAM", "rw", ram_origin, reservations["privileged_ram_bytes"]),
+        ("USER_RAM", "rw", user_ram_origin, reservations["user_ram_bytes"]),
+    )
+    domain_lines = "\n".join(
+        f"    {name} ({access}) : ORIGIN = 0x{origin:08x}, LENGTH = {size}"
+        for name, access, origin, size in domains)
+    nexus_domains = (
+        ("privileged_flash", "PRIV_FLASH"),
+        ("syscall_flash", "SVC_FLASH"),
+        ("user_flash", "USER_FLASH"),
+        ("privileged_ram", "PRIV_RAM"),
+        ("user_ram", "USER_RAM"),
+    )
+    bounds = "\n".join(
+        f"__nexus_{name}_start__ = ORIGIN({domain});\n"
+        f"__nexus_{name}_end__ = ORIGIN({domain}) + LENGTH({domain});"
+        for name, domain in nexus_domains)
+    aliases = "\n".join(
+        f"__{port}_start__ = __nexus_{name}_start__;\n"
+        f"__{port}_end__ = __nexus_{name}_end__ - 1;"
+        for port, name in (("privileged_functions", "privileged_flash"),
+                           ("privileged_sram", "privileged_ram"),
+                           ("unprivileged_flash", "user_flash"),
+                           ("syscalls_flash", "syscall_flash")))
+    identities = "\n".join(
+        f"__nx_resolved_sha256_{index} = 0x"
+        f"{result['configuration_sha256'][index * 8:(index + 1) * 8]};"
+        for index in range(8))
+    # Optional physical domains are outside this exact policy. Preserve their
+    # existing fail-closed input-section checks in the privileged primary RAM.
+    extras = [region for region in result["memory"] if region["id"] != ram["id"]]
+    extra_sections = _extra_sections(extras).replace(
+        "> RAM :ram", "> PRIV_RAM :ram")
+    return f'''/* Explicit selected MPU reservations; physical facts unchanged. */
+ENTRY(Reset_Handler)
+PHDRS {{
+    flash PT_LOAD FLAGS(5);
+    syscalls PT_LOAD FLAGS(5);
+    user_flash PT_LOAD FLAGS(5);
+    data PT_LOAD FLAGS(6);
+    user_data PT_LOAD FLAGS(6);
+    ram PT_LOAD FLAGS(6);
+    user_ram PT_LOAD FLAGS(6);
+    stack PT_LOAD FLAGS(6);
+}}
+MEMORY {{
+{domain_lines}
+}}
+{bounds}
+{aliases}
+__nx_flash_start = 0x{flash_origin:08x};
+__nx_flash_end = 0x{flash_origin + flash["size"]:08x};
+__nx_flash_live_start = __nx_flash_start;
+__nx_flash_image_load_start = __nx_flash_start;
+_estack = ORIGIN(PRIV_RAM) + LENGTH(PRIV_RAM);
+_sp = _estack;
+_Min_Stack_Size = {budgets["main_stack_bytes"]};
+_Min_Heap_Size = {budgets.get("libc_heap_bytes", 0)};
+__nx_msp_start = _estack - _Min_Stack_Size;
+__nx_msp_end = _estack;
+{identities}
+SECTIONS {{
+    .syscalls : {{ *(freertos_system_calls freertos_system_calls.*) }} > SVC_FLASH :syscalls
+    .user_text : {{ *(.nexus_user_text .nexus_user_text.*) *(.nexus_user_rodata .nexus_user_rodata.*) }} > USER_FLASH :user_flash
+    .isr_vector : {{ KEEP(*(.isr_vector)) KEEP(*(.vectors)) }} > PRIV_FLASH :flash
+    .text : {{ *(privileged_functions privileged_functions.*) *(.text*) *(.rodata*) KEEP(*(.init)) KEEP(*(.fini)) }} > PRIV_FLASH :flash
+    .ARM.extab : {{ *(.ARM.extab*) }} > PRIV_FLASH :flash
+    .ARM.exidx : {{ __exidx_start = .; *(.ARM.exidx*) __exidx_end = .; }} > PRIV_FLASH :flash
+    .preinit_array : {{ PROVIDE_HIDDEN(__preinit_array_start = .); KEEP(*(.preinit_array*)) PROVIDE_HIDDEN(__preinit_array_end = .); }} > PRIV_FLASH :flash
+    .init_array : {{ PROVIDE_HIDDEN(__init_array_start = .); KEEP(*(SORT(.init_array.*))) KEEP(*(.init_array*)) PROVIDE_HIDDEN(__init_array_end = .); }} > PRIV_FLASH :flash
+    .fini_array : {{ PROVIDE_HIDDEN(__fini_array_start = .); KEEP(*(SORT(.fini_array.*))) KEEP(*(.fini_array*)) PROVIDE_HIDDEN(__fini_array_end = .); }} > PRIV_FLASH :flash
+    __nx_mpu_priv_code_end = .;
+    __nx_flash_live_end = MAX(__nx_mpu_priv_code_end, MAX(ADDR(.syscalls) + SIZEOF(.syscalls), ADDR(.user_text) + SIZEOF(.user_text)));
+{extra_sections}
+    .nx_mpu_user_data : ALIGN(32) {{ . = ALIGN(32); __nx_mpu_user_data_start = .; *(.nexus_user_data .nexus_user_data.*) . = ALIGN(32); __nx_mpu_user_data_end = .; }} > USER_RAM AT> PRIV_FLASH :user_data
+    __nx_mpu_user_data_load = LOADADDR(.nx_mpu_user_data);
+    .nx_mpu_user_bss (NOLOAD) : AT(ADDR(.nx_mpu_user_bss)) {{ . = ALIGN(32); __nx_mpu_user_bss_start = .; *(.bss.nexus_user_data .bss.nexus_user_data.*) *(.nexus_user_bss .nexus_user_bss.*) . = ALIGN(32); __nx_mpu_user_bss_end = .; }} > USER_RAM :user_ram
+    _sidata = LOADADDR(.data);
+    .data : ALIGN(4) {{ . = ALIGN(4); _sdata = .; *(privileged_data privileged_data.*) *(.data*) . = ALIGN(4); _edata = .; }} > PRIV_RAM AT> PRIV_FLASH :data
+    __nx_flash_image_load_end = MAX(__nx_flash_live_end, MAX(LOADADDR(.data) + SIZEOF(.data), LOADADDR(.nx_mpu_user_data) + SIZEOF(.nx_mpu_user_data)));
+    .bss (NOLOAD) : AT(ADDR(.bss)) {{ . = ALIGN(4); _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; }} > PRIV_RAM :ram
+    .reserved (NOLOAD) : AT(ADDR(.reserved)) {{ . = ALIGN(8); __heap_start = .; __nx_heap_start = .; . += _Min_Heap_Size; __heap_end = .; __nx_heap_end = .; }} > PRIV_RAM :ram
+    .msp __nx_msp_start (NOLOAD) : AT(__nx_msp_start) {{ . += _Min_Stack_Size; }} > PRIV_RAM :stack
+    PROVIDE(end = _ebss);
+    PROVIDE(_end = _ebss);
+    ASSERT(_ebss + _Min_Heap_Size <= _estack - _Min_Stack_Size, "RAM stack/heap overlap")
+    ASSERT((__nx_mpu_user_data_start & 31) == 0 && (__nx_mpu_user_data_end & 31) == 0, "user data requires exact MPU granules")
+    ASSERT((__nx_mpu_user_bss_start & 31) == 0 && (__nx_mpu_user_bss_end & 31) == 0, "user BSS requires exact MPU granules")
+}}
+'''
+
+
 def linker(result):
+    if result["memory_budgets"].get("mpu") is not None:
+        return _mpu_linker(result)
     ram = next(region for region in result["memory"] if region["linker"])
     flash = result["layout"]
     stack = result["memory_budgets"]["main_stack_bytes"]

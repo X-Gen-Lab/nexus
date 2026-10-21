@@ -30,6 +30,92 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_required_public_verification_sources_survive_snapshot_selection(self):
+        omitted = sorted(name for name in source_sdk.REQUIRED_FILES
+                         if name.startswith("cmake/package/verification/io_evolution/")
+                         and not source_sdk.selected(name))
+        self.assertEqual(omitted, [],
+                         "Required public SDK programs cannot be excluded by selection")
+
+    def test_async_and_retained_owner_public_closure_is_required(self):
+        required = {
+            "components/user_io_broker/CMakeLists.txt",
+            "components/user_io_broker/include/nexus/components/user_io_async.h",
+            "components/user_io_broker/include/nexus/components/"
+            "user_io_async_storage.h",
+            "components/user_io_broker/src/user_io_async.c",
+            "components/stm32u575_retained_time/CMakeLists.txt",
+            "components/stm32u575_retained_time/include/nexus/components/"
+            "stm32u575_retained_time.h",
+            "components/stm32u575_retained_time/private/retained_time.h",
+            "components/stm32u575_retained_time/src/stm32u575_retained_time.c",
+            "soc/stm32u575/private/stm32u575_rtc_calendar.h",
+            "components/stm32u575_stop2/CMakeLists.txt",
+            "components/stm32u575_stop2/include/nexus/components/"
+            "stm32u575_stop2.h",
+            "soc/stm32u575/stop2.c",
+            "soc/stm32u575/private/stm32u575_stop2_hw.h",
+        }
+        required.update("cmake/package/verification/io_evolution/consumers/"
+                        + name + ".c" for name in (
+                            "user-io-async", "u575-retained-time", "u575-stop2"))
+        self.assertFalse(required - set(source_sdk.REQUIRED_FILES),
+                         sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in sorted(required):
+            with self.subTest(name=name):
+                self.assertTrue((ROOT / name).is_file())
+                self.assertTrue(source_sdk.selected(name),
+                                "Required public closure omitted: " + name)
+
+    def test_selected_u575_mpu_gpio_assembly_is_explicitly_catalogued(self):
+        catalogue = json.loads((source_sdk.SOURCE_ROOT /
+            "tools/configure/assemblies/catalogue.json").read_text())
+        self.assertEqual(catalogue["assemblies"].count("u575-mpu-gpio-write.toml"), 1)
+
+    def test_selected_u575_mpu_gpio_public_closure_is_required(self):
+        required = {
+            "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
+            "os/freertos/mpu/gpio.c",
+            "soc/stm32u575/private/stm32u575_gpio_mpu.h",
+            "soc/stm32u575/mpu_user_init.c",
+            "soc/stm32u575/private/stm32u575_mpu_user_init.h",
+            "tools/configure/assemblies/u575-mpu-gpio-write.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in required:
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name))
+        payload = source_sdk.provider_descriptors.maintained("stm32u575").owned_payload
+        self.assertTrue((required - {"os/freertos/include/nexus/os/freertos_mpu_gpio.h",
+                                    "os/freertos/mpu/gpio.c"}).issubset(set(payload)))
+
+    def test_selected_f407_i2s2_public_closure_is_required(self):
+        role_module = "tools/configure/i2s2.py"
+        required = {
+            role_module,
+            "components/f407_i2s2_slave_tx/CMakeLists.txt",
+            "components/f407_i2s2_slave_tx/include/nexus/components/"
+            "f407_i2s2_slave_tx.h",
+            "soc/stm32f407/drivers/i2s2_slave_tx.c",
+            "soc/stm32f407/private/stm32f407_i2s2_slave_tx.h",
+            "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
+            "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
+            "cmake/package/verification/io_evolution/consumers/"
+            "f407-i2s2-slave-tx.c",
+        }
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        for name in sorted(required):
+            with self.subTest(path=name):
+                self.assertTrue(source_sdk.selected(name),
+                                "Required I2S2 closure omitted: " + name)
+        payload = source_sdk.provider_descriptors.maintained("stm32f407").owned_payload
+        hardware = required - {role_module}
+        self.assertTrue(hardware.issubset(set(payload)),
+                        sorted(hardware - set(payload)))
+
     def test_optional_usb_control_and_profile_sources_cannot_be_omitted(self):
         required = {
             "components/usb_control/CMakeLists.txt",
@@ -184,6 +270,13 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "tools/release/transport.py",
             "components/usb_control/include/nexus/components/usb_acm.h",
             "components/usb_control/src/usb_acm.c",
+            "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
+            "os/freertos/mpu/gpio.c",
+            "soc/stm32u575/private/stm32u575_gpio_mpu.h",
+            "soc/stm32u575/mpu_user_init.c",
+            "soc/stm32u575/private/stm32u575_mpu_user_init.h",
+            "tools/configure/assemblies/u575-mpu-gpio-write.toml",
+            "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
         )
         self.assertIn(required[0], source_sdk.REQUIRED_FILES)
         with tempfile.TemporaryDirectory(prefix="SDK required plan ") as value:
@@ -351,6 +444,54 @@ class SourceSDKSelectionTests(unittest.TestCase):
                                 if argument.startswith("-DNEXUS_ASSEMBLY_FILE="))
                 self.assertTrue(assembly.endswith(".toml"), assembly)
 
+    def test_optional_handoff_is_consumed_only_by_the_exact_f407_arm_project(self):
+        for arm, chip in ((False, "stm32"), (True, "stm32"), (True, "gd32")):
+            with self.subTest(arm=arm, chip=chip), tempfile.TemporaryDirectory() as value:
+                directory = Path(value)
+                policy = directory / "prefix/share/nexus/src/dependencies/platform-compatibility.json"
+                policy.parent.mkdir(parents=True)
+                shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
+                source, _, _ = consumer_gate.prepare_consumer(
+                    directory / "prefix", directory, "optional",
+                    lambda arguments: None, arm=arm, chip=chip)
+                cmake = (source / "CMakeLists.txt").read_text()
+                code = (source / "main.cpp").read_text()
+                expected = arm and chip == "stm32"
+                self.assertEqual("Nexus::STM32F407Handoff" in cmake, expected)
+                self.assertEqual("nx_stm32f407_handoff_initialize(0)" in code,
+                                 expected)
+                self.assertIn("Nexus::MappedStorage", cmake)
+                self.assertIn("Nexus::AMPIPC", cmake)
+                self.assertIn("Nexus::UserIoBroker", cmake)
+                self.assertIn('"nexus/components/user_io_async_storage.h"',
+                              code)
+                self.assertIn(
+                    "nx_user_io_async_construct(nullptr, nullptr, 0U, nullptr) "
+                    "!= NX_ERROR_INVALID", code)
+                self.assertIn("nx_amp_ipc_construct(nullptr, nullptr) != NX_ERROR_INVALID", code)
+
+    def test_optional_frame_blitter_is_consumed_only_by_h743_projects(self):
+        for family in ("h743", "u575", "f103", "gd303", "g474"):
+            for backend in ("baremetal", "freertos"):
+                with self.subTest(family=family, backend=backend), tempfile.TemporaryDirectory() as value:
+                    directory = Path(value)
+                    policy = directory / "prefix/share/nexus/src/dependencies/platform-compatibility.json"
+                    policy.parent.mkdir(parents=True)
+                    shutil.copyfile(ROOT / "dependencies/platform-compatibility.json", policy)
+                    source, _, _ = consumer_gate.prepare_modern_consumer(
+                        directory / "prefix", directory, family, backend,
+                        lambda arguments: None)
+                    cmake = (source / "CMakeLists.txt").read_text()
+                    code = (source / "main.c").read_text()
+                    expected = family == "h743"
+                    self.assertEqual("Nexus::H743FrameDMA2D" in cmake, expected)
+                    for public_contract in (
+                            '#include "nexus/components/frame_dma2d.h"',
+                            "nx_h743_frame_dma2d_initialize(",
+                            "NX_FRAME_BLIT_ARGB8888_TO_RGB565"):
+                        self.assertEqual(public_contract in code, expected,
+                                         public_contract)
+
     def test_exposed_io_core_clock_and_provider_closures_are_required(self):
         required = {
             "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
@@ -379,6 +520,25 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "os/freertos/stack_snapshot.c",
             "os/freertos/include/nexus/os/freertos_stack.h",
             "components/clock_domain/src/clock_domain.c",
+            "components/amp_ipc/CMakeLists.txt",
+            "components/amp_ipc/src/amp_ipc.c",
+            "components/amp_ipc/include/nexus/components/amp_ipc.h",
+            "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
+            "components/stm32f407_handoff/CMakeLists.txt",
+            "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+            "soc/stm32f407/handoff.c",
+            "soc/stm32f407/private/stm32f407_handoff_hw.h",
+            "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+            "components/frame_dma2d/CMakeLists.txt",
+            "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
+            "components/frame_dma2d/src/h743_frame_dma2d.c",
+            "components/mapped_storage/CMakeLists.txt",
+            "components/mapped_storage/src/mapped_storage.c",
+            "components/mapped_storage/src/mapped_storage_owner.c",
+            "components/mapped_storage/src/native_mapped_storage.c",
+            "components/mapped_storage/include/nexus/components/mapped_storage.h",
+            "components/mapped_storage/include/nexus/components/mapped_storage_owner.h",
+            "components/mapped_storage/include/nexus/components/native_mapped_storage.h",
             "components/user_io_broker/src/user_io_broker.c",
             "components/dp83848/src/dp83848.c",
             "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
@@ -931,7 +1091,9 @@ class SourceSDKTests(unittest.TestCase):
     def run_ok(cls, arguments, **kwargs):
         result = cls.run_process(arguments, **kwargs)
         if result.returncode:
-            raise AssertionError(result.stdout + result.stderr)
+            raise AssertionError(
+                f"Command failed (exit {result.returncode}): {arguments!r}\n"
+                + result.stdout + result.stderr)
         return result
 
     def verify(self):
@@ -1491,6 +1653,22 @@ class SourceSDKTests(unittest.TestCase):
             "tools/configure/timer_advanced.py", "tools/configure/bindings.py",
             "cmake/platform/ControllerModes.cmake",
             "components/clock_domain/private/clock_domain_impl.h",
+            "components/amp_ipc/CMakeLists.txt",
+            "components/amp_ipc/src/amp_ipc.c",
+            "components/amp_ipc/include/nexus/components/amp_ipc.h",
+            "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
+            "components/stm32f407_handoff/CMakeLists.txt",
+            "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+            "soc/stm32f407/handoff.c",
+            "soc/stm32f407/private/stm32f407_handoff_hw.h",
+            "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+            "components/frame_dma2d/CMakeLists.txt",
+            "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
+            "components/frame_dma2d/src/h743_frame_dma2d.c",
+            "components/mapped_storage/CMakeLists.txt",
+            "components/mapped_storage/src/mapped_storage_owner.c",
+            "components/mapped_storage/src/native_mapped_storage.c",
+            "components/mapped_storage/include/nexus/components/mapped_storage.h",
             "components/user_io_broker/include/nexus/components/user_io_broker.h",
             "components/dp83848/include/nexus/dp83848/dp83848.h",
             "soc/stm32g474/system.c", "soc/stm32g474/drivers/uart.c",

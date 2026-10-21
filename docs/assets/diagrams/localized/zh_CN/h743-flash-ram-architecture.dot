@@ -1,54 +1,49 @@
-// FIG-17 target IO-24 design; not completed code or physical qualification.
-// Scope: selected STM32H743ZIT6 V / Cache off only.
-// Basis: docs/design/h743-flash-ram.md target contract and IO-24 ledger.
-// Edges are explicitly lookup, call, copy, protection or caller preconditions.
-// This diagram introduces no second physical owner or background executor.
+// FIG-17: target IO-24; selected operand / assembly protocol proof implemented.
+// Original complete exit and candidate qualification remain open; no physical execution.
+// One generated physical owner; caller preconditions remain in the linked contract.
 digraph h743FlashRamArchitecture {
-    graph [label="FIG-17 H743 Flash RAM 边界目标设计\\n仅选定 V / Cache off；完整软件与 ELF 退出尚未完成",
-           fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB,
-           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.6,
-           newrank=true];
-    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
-          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
-          fontsize=12, margin="0.16,0.10"];
-    edge [color="#475569", fontcolor="#0f172a",
-          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.8];
-    build [label="单份 authored TOML 与已审事实\\n不可变 IR；按选择生成 bundle 与 CMake"];
-    app [label="外部维护调用者\\n负责调度、bus-master join 与恢复策略",
-         fillcolor="#f8fafc"];
-    factory [label="冷态 typed factory\\n返回既有不可变 Flash face"];
-    face [label="Flash face\\n共享只读 ops 与私有 context"];
-    lifecycle [label="显式 Platform 生命周期\\n准备选定字节；保留清理失败责任"];
+    graph [label="FIG-17 H743 Flash RAM 边界目标设计\n选定 V 修订／三个 Cache-off 配置；实板 HIL 未执行", fontname="Noto Sans CJK SC", fontsize=15, labelloc=t, rankdir=TB, bgcolor="white", pad=0.25, nodesep=0.40, ranksep=0.50, newrank=true];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=11, margin="0.16,0.10"];
+    edge [color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=9, arrowsize=0.8];
+    build [label="单份 TOML ＋已审查事实\n不可变 IR；仅选定静态对象"];
+    app [label="外部维护调用者\n负责调度、其他 bus master 的 join 与恢复", fillcolor="#f8fafc"];
+    factory [label="冷态 typed factory\n返回既有不可变 Flash 接口面"];
+    face [label="Flash 接口面\n共享只读 ops ＋私有 context"];
+    lifecycle [label="显式 Platform start／stop\n准备字节；清理失败保留责任"];
     subgraph clusterOwner {
-        label="单一私有 H743 Flash 控制器 owner：目标设计";
-        color="#64748b"; fontname="Noto Sans CJK SC";
-        provider [label="Flash provider\\n校验操作、区域、别名与调用上下文"];
-        prepare [label="冷态 RAM 准备\\n校验 LOAD / RUN；复制并证明就绪"];
-        bridge [label="仅负责 CPU 的 RAM bridge\\n保存 CPU 状态；安装私有 MSP"];
-        pod [label="整个忙事务留在 AXI RAM\\n发布／恢复 VTOR；保留输入与诊断"];
-        guard [label="RAM 内私有 MPU guard\\nCode XN 与 Strongly-ordered；AP001；CTRL7"];
-        prepare -> bridge [label="提供已证明的代码与私有 RAM"];
-        provider -> bridge [label="最终准入后直接调用"];
-        bridge -> pod [label="在私有 MSP 下调用；事务负责 VTOR"];
-        pod -> guard [label="触发前安装；排空后恢复"];
+        label="单一物理 Flash owner／固定生成 workspace"; color="#64748b"; fontname="Noto Sans CJK SC";
+    provider [label="冷态 provider 准入\n精确绑定、输入、布局及调用上下文"];
+    prepare [label="冷态 RAM 准备\n验证 LOAD／RUN；复制并证明就绪"];
+    bridge [label="私有 MSP 上的汇编入口\n保存 CPU 状态；r8-r11 保护 MPU 捕获值"];
+    pod [label="C RAM 阶段：固定 workspace／MMIO\n发布私有 VTOR；guard；脉冲；排空；恢复 MPU"];
+    gate [label="独立汇编返回门\n读回空闲／LOCK／效果账本／捕获的 MPU\n恢复链接器确定的 VTOR 并证明读回"];
+    restore [label="汇编桥恢复调用者 CPU 状态\n仅在返回门成功后执行"];
+    ledger [label="内嵌的唯一 selector 效果账本\n写 RNR 前登记；精确恢复并读回后清除", fillcolor="#f8fafc"];
+    terminal [label="不返回的 RAM 终止路径\n捕获、清理或返回条件无法证明时进入", fillcolor="#fff7ed"];
+    prepare -> bridge [label="提供已准入的代码／向量／私有栈"];
+    provider -> bridge [label="最终准入后直接调用"];
+    bridge -> pod [label="保护捕获值；已建立私有 MSP"];
+    pod -> gate [label="所有返回的 C 路径；仍保留私有 VTOR"];
+    gate -> restore [label="硬件返回检查全部证明成立"];
+    bridge -> ledger [label="登记 selector 效果", style=dotted, arrowhead=none];
+    gate -> ledger [label="检查并结清 selector 效果", style=dotted, arrowhead=none];
+    bridge -> terminal [label="捕获无法证明"];
+    pod -> terminal [label="结清无法证明"];
+    gate -> terminal [label="返回条件无法证明"];
     }
-    flash [label="实际 Flash 控制器／双 Bank\\n编程 store 或擦除 START；观测排空与 LOCK",
-           fillcolor="#f8fafc"];
-    time [label="既有 System TIM2 时间域与 epoch\\n证明回绕 service；不伪造丢失时间",
-          fillcolor="#f8fafc"];
-    build -> lifecycle [label="生成选定准备／清理"];
-    build -> face [label="生成静态 face 与共享 ops 引用"];
-    app -> factory [label="查找 typed Flash 身份"];
-    factory -> face [label="返回既有引用；不执行准备"];
-    app -> lifecycle [label="显式 start / stop 调用"];
-    lifecycle -> prepare [label="使用前调用准备"];
+    hardware [label="固定 FLASH／SCB／MPU 寄存器\n双 Bank 空闲；LOCK；向量与 MPU 读回", fillcolor="#f8fafc"];
+    time [label="既有 System TIM2 时间域／epoch\n截止时间观测要求时间有效", fillcolor="#f8fafc"];
+    build -> lifecycle [label="生成选定的准备／清理"];
+    build -> face [label="生成接口面及共享 ops 引用"];
+    app -> factory [label="typed identity 查找"];
+    factory -> face [label="既有引用；不执行准备"];
+    app -> lifecycle [label="显式生命周期调用"];
+    lifecycle -> prepare [label="使用前准备"];
     app -> face [label="直接同步 I/O 调用"];
     face -> provider [label="ops(context, ...) 调用"];
-    app -> provider [label="前提：撤回并 join 其他 master",
-                     style=dashed];
-    pod -> flash [label="已校验写入／实际状态观测",
-                  dir=both];
-    pod -> time [label="同域 deadline 与 epoch 观测",
-                 dir=both];
-    // No return edge bypasses drain, LOCK or restoration; see FIG-18.
+    app -> provider [label="调用前提：其他 master 已 join；栈预留成立", style=dashed];
+    pod -> hardware [label="物理脉冲／状态／guard／私有 VTOR", dir=both];
+    gate -> hardware [label="独立读回；恢复固定 VTOR", dir=both];
+    pod -> time [label="同一时间域的截止时间及 epoch 观测", dir=both];
+    // Terminal has no outgoing edge; FIG-18 expands guarded settlement.
 }

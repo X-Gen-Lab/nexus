@@ -1,0 +1,50 @@
+digraph u575Lptim1Lpbam {
+  graph [label="FIG-28 reference: one LPTIM1 tuple, one Stop2 owner, ordered final-access proof\nSTM32U575ZIT6Q / TZEN0 / baremetal / SRAM4_NS / LPDMA1 channel0\nSolid: required order or named branch. Dashed: retained responsibility / recovery.\nNo pin route, PWM playback or HIL claim; complete IO-32 / SOC-35 exits remain open.", rankdir=TB, labelloc=t,
+    fontname="Noto Sans CJK SC", fontsize=16, bgcolor="white",
+    pad=0.25, nodesep=0.30, ranksep=0.44, splines=polyline, compound=true];
+  node [shape=box, style="rounded,filled", color="#475569",
+    fontcolor="#0f172a", fontname="Noto Sans CJK SC", fontsize=12,
+    margin="0.13,0.09"];
+  edge [color="#475569", fontcolor="#0f172a",
+    fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+  prepare [label="Pure initialize → explicit public start\nCold / exclusive: LPTIM1EN + LSE mux + needed LSESYSEN\nObserve LSESYSRDY; effects owned until joined public stop", fillcolor="#eff6ff", group="main"];
+  loan [label="Closed / joined RUN; LPTIM2 disabled; Platform stopped\nPrivileged masked MSP Thread; same Stop2 owner / ClockDomain\nACCEPTED borrows request + tuple 12 B + LLI workspace 48 B", fillcolor="#eff6ff", group="main"];
+  arm [label="Bounded: after ENABLE, at least 2 more retained RTC ticks\nFresh bootstrap CMP1OK / REPOK / ARROK, then clear\nIndependent WUT escape; no AlarmA writes", fillcolor="#eff6ff", group="main"];
+  writes [label="HW REQ13 / BREQ1 / reserved DREQ0 → CCR1\nTwo SWREQ continuation LLIs → RCR0 → ARR last\nARR acknowledged APB write clears UE", fillcolor="#ecfdf5", group="main"];
+  writeok [label="Success: observe finite DMA completion + latch fresh three write-OK\nKeep this proof before DIER can clear the flags", fillcolor="#ecfdf5", group="main"];
+  withdraw [label="1. Withdraw producer: UEDE0 + fresh DIEROK\nThen withdraw WUT", fillcolor="#f0fdf4", group="main"];
+  master [label="2. DMA suspend / SUSPF / idle\nFull-word CCR RESET, then complete CCR0\nDetach address / link / flags / NVIC references", fillcolor="#f0fdf4", group="main"];
+  timer [label="3. Owned LPTIM1 RCC reset; never ENABLE0 (ES0499)\nProve cold controller / quiet IRQ67\nRestore loan SMEN / AMEN", fillcolor="#f0fdf4", group="main"];
+  settled [label="4. Restore remaining loan gates / RTC / power / clocks\nDetach Stop2 and request references\nFinal release store: SETTLED", fillcolor="#dcfce7", group="main"];
+  stop [label="Acquire-observe SETTLED + external observer joins\nJoined public stop restores start gate / mux / LSESYS\nOnly then release the physical role", fillcolor="#dcfce7", group="main"];
+  partial [label="Partial start failure: no tuple loan\nPublic stop retries start-ledger restoration\nNever adopt or reset a foreign controller", fillcolor="#fff7ed", group="side"];
+  held [label="Failed proof retains the loan and all storage\nLatched error stays error despite later completion\nUnknown profile: no RTC / DMA / LPTIM MMIO\nRecover keeps masks; never another WFI\nOwned-reset retry only after DMA final-access proof", fillcolor="#fff7ed", group="side"];
+  foreign [label="Observed external DMA or LPTIM reset during a loan\nPermanent quarantine; storage remains borrowed\nQuiet reset defaults do not prove a join", fillcolor="#fef2f2", group="side"];
+  subgraph cluster_exit {
+    label="Compound exit: all four proofs are required";
+    color="#86a2b8"; style=rounded; fontsize=12; labelloc=b; labeljust=l;
+    withdraw; master; timer; settled;
+  }
+  prepare -> loan [label="start succeeds", weight=20];
+  prepare -> partial [label="start fails with effects", weight=1];
+  loan -> arm [label="ACCEPTED", weight=20];
+  arm -> writes [label="start producer / masked WFI", weight=20];
+  writes -> writeok [label="finite DMA observed\nearlier service stays BUSY", weight=20];
+  writeok -> withdraw [label="success proof retained", weight=20];
+  writes -> withdraw [label="cancel / deadline / error\nstorage stays borrowed", weight=1, constraint=false];
+  arm -> withdraw [label="accepted setup fails", weight=1, constraint=false,tailport=w,headport=w];
+  withdraw -> master [label="producer withdrawn and acknowledged", weight=20];
+  master -> timer [label="DMA final access proved", weight=20];
+  timer -> settled [label="peripheral and IRQ proof", weight=20];
+  settled -> stop [label="final SETTLED only", weight=20, tailport=e, headport=e];
+  partial -> partial [label="public stop retry; ledger stays owned", weight=1, style=dashed];
+  writes -> held [label="access profile lost", weight=1, style=dashed,constraint=false,tailport=e,headport=n];
+  writeok -> held [label="missing write-OK:\nfirst keep producer + loan", weight=1, style=dashed,constraint=false,tailport=e,headport=w];
+  master -> held [label="any compound proof fails", weight=1, style=dashed,constraint=false,ltail=cluster_exit];
+  held -> withdraw [label="valid profile; recover\ncarry failure before withdrawal", weight=1, style=dashed,constraint=false,lhead=cluster_exit];
+  held -> foreign [label="external reset observed at any active-loan phase", weight=20, style=dashed];
+  { rank=same; loan; partial; }
+  { rank=same; writeok; held; }
+  { rank=same; stop; foreign; }
+  partial -> held [style=invis, weight=20];
+}

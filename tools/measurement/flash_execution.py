@@ -1081,6 +1081,209 @@ class _CpuBridge:
                 "H743 RAM closure: unproved CPU bridge operation")
 
 
+def _fixed_boundary_instruction(address, encoded):
+    """Narrow v7E-M boundary vocabulary; every operand is byte-derived."""
+    h = int.from_bytes(encoded[:2], 'little')
+    k = int.from_bytes(encoded[2:], 'little') if len(encoded) == 4 else 0
+    if len(encoded) == 2:
+        if h & 0xfc00 == 0x4400 and (h >> 8) & 3 == 1:
+            return _Instruction(address, 2, 'cmp',
+                ((h & 7) | ((h >> 4) & 8), (h >> 3) & 15))
+        if h & 0xffc0 == 0x4300:
+            return _Instruction(address, 2, 'orrs', (h & 7, (h >> 3) & 7))
+    else:
+        if h & 0xff7f == 0xf85f:
+            return _instruction(address, encoded)
+        if h & 0xfff0 in (0xf8d0, 0xf8c0):
+            register, base = k >> 12, h & 15
+            _require(register not in (13, 15) and base not in (13, 15),
+                     'boundary memory PC/SP operand')
+            return _Instruction(address, 4,
+                'load' if h & 16 else 'store',
+                (register, base, k & 4095, 4, False))
+        if h & 0xfbe0 in (0xf000, 0xf040) and not k & 0x8000:
+            immediate = (((h >> 10) & 1) << 11 |
+                         ((k >> 12) & 7) << 8 | (k & 255))
+            _require(immediate < 256, 'boundary expanded immediate')
+            rd, rn = (k >> 8) & 15, h & 15
+            if h & 0xfbe0 == 0xf000 and h & 16 and rd == 15:
+                return _Instruction(address, 4, 'tsti', (rn, immediate))
+            if h & 0xfbe0 == 0xf040 and not h & 16:
+                return _Instruction(address, 4, 'orri', (rd, rn, immediate))
+        if h & 0xffe0 == 0xeb00 and not h & 16 and not k & 0x8030:
+            return _Instruction(address, 4, 'addshift',
+                ((k >> 8) & 15, h & 15, k & 15,
+                 ((k >> 12) & 7) * 4 + ((k >> 6) & 3)))
+    try:
+        return _bridge_instruction(address, encoded)
+    except EvidenceError:
+        return _instruction(address, encoded)
+
+
+def _verify_fixed_boundary(program, code, stack, workspace):
+    """Recognize one complete byte-defined protocol and all its refusal paths.
+
+    This finite recognizer accepts exactly the independently specified register,
+    address, mask, comparison, barrier and branch sequence. It consumes actual
+    ELF literals at each executed LDR, never mnemonic text or an unused literal.
+    C cannot forge the r8-r11 snapshots under the explicit AAPCS contract.
+    """
+    selected = {}
+    tokens = {}
+    for suffix in ('enter', 'return', 'program_words', 'transaction', 'terminal'):
+        indices = program.names.get(PREFIX + suffix, ())
+        _require(len(indices) == 1, 'fixed boundary symbol absent/ambiguous')
+        index = indices[0]
+        symbol = program.symbols[index]
+        _require(symbol['value'] & 1 and _inside(
+            symbol['value'] & ~1, symbol['size'], code),
+            'fixed boundary symbol leaves RAM pod')
+        selected[suffix] = (index, symbol)
+        if suffix in ('transaction', 'terminal'):
+            continue
+        decoded = program.decoded(index)
+        rows = []
+        next_address = symbol['value'] & ~1
+        for row in decoded['instructions']:
+            _require(row['address'] == next_address,
+                     'fixed boundary executable gap or data island')
+            next_address += len(bytes.fromhex(row['encoding']))
+            inst = _fixed_boundary_instruction(
+                row['address'], bytes.fromhex(row['encoding']))
+            op, args = inst.op, inst.args
+            if op == 'literal':
+                op, args = 'constant', (args[0], program.word(args[1]))
+            rows.append((inst.address, op, args))
+        # GNU as may align the function's literal pool with one dead NOP.
+        if rows and rows[-1][1:] == ('nop', ()):
+            rows.pop()
+        tokens[suffix] = rows
+
+    def address(suffix):
+        return selected[suffix][1]['value'] & ~1
+
+    def check(suffix, expected):
+        actual = [(op, args) for _, op, args in tokens[suffix]]
+        _require(actual == expected,
+                 'fixed boundary ' + suffix + ' protocol differs')
+
+    # A failure branches to the exact three-instruction RAM diagnostic tail.
+    # It can neither rejoin a success path nor return through C/Flash code.
+    def tail(suffix):
+        rows = tokens[suffix]
+        _require(len(rows) >= 3, 'fixed boundary refusal tail absent')
+        return rows[-3][0]
+
+    save = tuple(range(4, 12)) + (14,)
+    fail = tail('enter')
+    before = [
+        ('mrs', (12, 16)), ('mask', ()), ('save', (save,)),
+        ('mrs', (4, 8)), ('mrs', (5, 9)), ('mrs', (6, 20)),
+        ('copy', (7, 12)), ('addw', (1, 0, stack[1] - workspace)),
+        ('msr', (8, 1)), ('bic', (1, 6, 2)), ('msr', (20, 1)), ('isb', ())]
+    capture = [
+        ('constant', (12, workspace)), ('mov', (2, 1)),
+        ('store', (2, 12, 1788, 4, False)),
+        ('constant', (1, 0xe000ed90)),
+        ('load', (8, 1, 4, 4, False)), ('load', (9, 1, 8, 4, False)),
+        ('mov', (2, 15)), ('store', (2, 1, 8, 4, False)),
+        ('load', (3, 1, 8, 4, False)), ('cmp', (3, 2)),
+        ('conditional', (1, fail)), ('load', (10, 1, 12, 4, False)),
+        ('bic', (10, 10, 31)), ('load', (11, 1, 16, 4, False)),
+        ('store', (9, 1, 8, 4, False)), ('load', (2, 1, 8, 4, False)),
+        ('cmp', (2, 9)), ('conditional', (1, fail)), ('mov', (2, 0)),
+        ('store', (2, 12, 1788, 4, False)), ('dsb', ()), ('isb', ())]
+    transaction = ('call', (address('transaction'),))
+    after = [
+        ('copy', (9, 0)), ('msr', (9, 5)), ('msr', (8, 4)),
+        ('msr', (20, 6)), ('isb', ()), ('copy', (0, 9)), ('copy', (12, 7)),
+        ('restore', (save,)), ('msr', (16, 12)), ('exchange', (14,))]
+    diagnostic = [('constant', (0, workspace)), ('mov', (1, 4)),
+                  ('branch', (address('terminal'),))]
+    check('enter', before + capture + [transaction,
+          ('call', (address('return'),))] + after + diagnostic)
+    # Reuse the symbolic CPU proof for both original Thread stack selectors.
+    # Snapshot values are opaque protected captures, rather than sampled words.
+    for selector in (0, 1):
+        machine = _CpuBridge(selector, workspace, stack[1], address('transaction'))
+        for op, args in before:
+            machine.execute(_Instruction(0, 0, op, args))
+        for register in range(8, 12):
+            machine.reg[register] = ('protected-MPU-capture', register)
+        machine.execute(_Instruction(0, 0, *transaction))
+        for op, args in after:
+            machine.execute(_Instruction(0, 0, op, args))
+        _require(machine.returned and machine.caller_frame == 36,
+                 'fixed boundary CPU roundtrip failed')
+
+    fail = tail('return')
+    unequal = ('conditional', (1, fail))
+    greater = ('conditional', (8, fail))
+    gate = [
+        ('constant', (1, 0x52002000)),
+        ('load', (2, 1, 16, 4, False)), ('load', (3, 1, 272, 4, False)),
+        ('orrs', (2, 3)), ('tsti', (2, 7)), unequal,
+        ('constant', (12, workspace)), ('load', (2, 12, 1788, 4, False)),
+        ('cmpi', (2, 0)), unequal,
+        ('load', (2, 12, 1740, 4, False)), ('cmpi', (2, 1)), greater,
+        ('addshift', (1, 1, 2, 8)), ('load', (2, 12, 1736, 4, False)),
+        ('bic', (3, 2, 0x30)), ('cmpi', (3, 0)), unequal,
+        ('orri', (2, 2, 1)), ('store', (2, 1, 12, 4, False)), ('dsb', ()),
+        ('load', (3, 1, 12, 4, False)), ('cmp', (3, 2)), unequal,
+        ('bic', (2, 8, 4)), ('cmpi', (2, 0)), unequal,
+        ('copy', (2, 9)), ('cmpi', (2, 15)), greater,
+        ('constant', (1, 0xe000ed90)), ('load', (2, 1, 4, 4, False)),
+        ('cmp', (2, 8)), unequal, ('mov', (2, 1)),
+        ('store', (2, 12, 1788, 4, False)), ('mov', (2, 15)),
+        ('store', (2, 1, 8, 4, False)), ('load', (3, 1, 8, 4, False)),
+        ('cmp', (3, 2)), unequal, ('load', (2, 1, 12, 4, False)),
+        ('bic', (2, 2, 31)), ('cmp', (2, 10)), unequal,
+        ('load', (2, 1, 16, 4, False)), ('cmp', (2, 11)), unequal,
+        ('store', (9, 1, 8, 4, False)), ('load', (2, 1, 8, 4, False)),
+        ('cmp', (2, 9)), unequal, ('mov', (2, 0)),
+        ('store', (2, 12, 1788, 4, False)), ('dsb', ()), ('isb', ()),
+        ('constant', (1, VTOR)),
+        ('constant', (2, program.elf.symbol('g_pfnVectors'))),
+        ('store', (2, 1, 0, 4, False)), ('dsb', ()), ('isb', ()),
+        ('load', (3, 1, 0, 4, False)), ('cmp', (3, 2)), unequal,
+        ('exchange', (14,))]
+    check('return', gate + diagnostic)
+    pulse = [('constant', (0, workspace)),
+             ('load', (1, 0, 1696, 4, False))]
+    for word in range(8):
+        pulse += [('load', (2, 0, 1700 + 4 * word, 4, False)),
+                  ('store', (2, 1, 4 * word, 4, False))]
+    check('program_words', pulse + [('exchange', (14,))])
+    proved = [dict(index=selected[name][0], name=selected[name][1]['name'],
+                   address=address(name), size=selected[name][1]['size'])
+              for name in ('enter', 'return', 'program_words')]
+    return {
+        'status': 'passed', 'scope': 'fixed_pod_boundary_with_AAPCS_contract',
+        'closure': 'fixed_pod_boundary', 'qualification': False,
+        'elf_sha256': hashlib.sha256(program.elf.data).hexdigest(),
+        'bridge_bytes': selected['enter'][1]['size'],
+        'private_frame_bytes': 0, 'caller_frame_bytes': 36,
+        'stack_start': stack[0], 'stack_end': stack[1],
+        'assembly_functions': proved,
+        'return_gate': {'device_protocol': 'proved',
+                        'saved_policy_integrity': 'AAPCS-protected r8-r11 captures',
+                        'failure_target': address('terminal')},
+        'program_words': {'staged_word_reads': 8, 'dynamic_word_stores': 8,
+                          'dynamic_base_reads': 0, 'offsets': list(range(0, 32, 4))},
+        'callee_symbol': dict(index=selected['transaction'][0],
+                             **selected['transaction'][1]),
+        'callee_body': 'separately_checked',
+        'physical_execution': 'not_executed',
+        'callee_obligations': [
+            'AAPCS: r4-r11, caller saved frame and private SP preserved',
+            'C returns privileged MSP Thread, PRIMASK=1; all C memory operands '
+            'and private frames checked independently',
+            'incoming MSP and active Thread caller stack each own 260 bytes '
+            'for the 36-byte save plus 224-byte nested exception reserve',
+            'default original NMI/HardFault aliases do not return; RAM handlers '
+            'are independently checked nonreturning before any pulse']}
+
+
 def verify_h743_cpu_bridge(elf, observations):
     """Prove only the actual straight-line bridge under an explicit C contract.
 
@@ -1094,6 +1297,8 @@ def verify_h743_cpu_bridge(elf, observations):
              "CPU bridge ELF hash mismatch")
     program = _Program(elf, observations)
     code, stack, workspace = _cpu_bridge_layout(program)
+    if program.names.get(PREFIX + "program_words"):
+        return _verify_fixed_boundary(program, code, stack, workspace)
     selected = []
     for suffix in ("enter", "transaction"):
         indices = program.names.get(PREFIX + suffix, ())

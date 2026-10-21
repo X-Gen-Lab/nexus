@@ -1,0 +1,38 @@
+// FIG-25 current optional copied-UART mechanism, not an installed gateway.
+// Basis: user_io_async.h/.c, existing BusOwner/UARTOwner and Core request.
+// Every visible edge names copying, a borrow, execution or required proof.
+digraph copiedUserIo {
+    graph [label="FIG-25 Copied UART TX: current software ownership\nActual kernel entry / NS RTOS / HIL and full IO-39/SOC-36 exits remain open",
+           rankdir=TB, labelloc=t, fontname="Noto Sans CJK SC", fontsize=16,
+           bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.65];
+    node [shape=box, style="rounded,filled", fillcolor="#eff6ff",
+          color="#475569", fontcolor="#0f172a", fontname="Noto Sans CJK SC",
+          fontsize=12, margin="0.14,0.10"];
+    edge [color="#475569", fontcolor="#0f172a",
+          fontname="Noto Sans CJK SC", fontsize=10, arrowsize=0.75];
+    user [label="Untrusted caller\nScalar device / session / slot / epoch\nTransient TX bytes and reply span", fillcolor="#f8fafc"];
+    gateway [label="Kernel-invoked dispatch\nTrusted principal before copies\nFault-contained snapshot; no retained user address"];
+    cells [label="Exact privileged copied cells\nRequest + copied TX bytes\nNo second FIFO or worker"];
+    execution [label="One existing BusOwner FIFO\nUARTOwner + selected UART port\nExternal executor advances real hardware"];
+    settled [label="Required final-access predicate\nAcquire Core SETTLED + owner idle\nActual UART/IRQ and publisher withdrawal"];
+    retire [label="Retire copied result cells\nCONSUME: successful reply copy\nOR closed REAP: trusted drained proof\nThen detach + wipe; preserve epochs"];
+    joined [label="Final JOIN\nClosed + all cells retired + owner idle\nAuthority release SUCCESS permits reclaim"];
+    authority [label="Trusted kernel/session authority\nUnique actual-owner role + persistent history\nidentity / claim / drained / release", fillcolor="#f8fafc"];
+    manager [label="Trusted serialized kernel owner\nExplicit service / cancel / close / reap / join\nNo implicit scheduler or provider stop", fillcolor="#f8fafc"];
+    retained [label="Failure retains responsibility\nQUARANTINED keeps copied borrow\nProof/release failure keeps role and storage", fillcolor="#fff7ed"];
+    user -> gateway [label="copied scalar protocol + transient bytes"];
+    authority -> gateway [label="each entry: identity\nconstruction only: exclusive session claim", style=dashed];
+    gateway -> cells [label="SUBMIT: copy before admission"];
+    cells -> execution [label="borrows request + privileged payload"];
+    manager -> execution [label="calls existing service / cancel"];
+    execution -> settled [label="real drain; final publication; publisher exits"];
+    settled -> retire [label="terminal state alone does not free the cell"];
+    authority -> retire [label="REAP only: old gateway observers joined\nfuture entry blocked; role stays claimed", style=dashed];
+    manager -> retire [label="closed trusted REAP; no user action"];
+    retire -> joined [label="only after every copied cell retires"];
+    authority -> joined [label="JOIN only: outer observer join + role release", style=dashed];
+    execution -> retained [label="failed actual drain / QUARANTINED"];
+    retire -> retained [label="failed copy / proof: no wipe"];
+    joined -> retained [label="failed release: no reclaim"];
+    retained -> execution [label="external recovery + continued service\nwhile hardware still owns the request", constraint=false];
+}

@@ -1,0 +1,34 @@
+schema = 2
+board = "stm32u575_nucleo_zi_q"
+backend = "freertos"
+clock = "msis4"
+optimization = "Os"
+
+[factory]
+capabilities = true
+
+[memory]
+main_stack_bytes = 2048
+libc_heap_bytes = 0
+static_ram_limit_bytes = 8192
+flash_load_limit_bytes = 32768
+
+# Explicit software reservations inside the existing exact part facts.
+[memory.mpu]
+privileged_flash_bytes = 24576
+syscall_flash_bytes = 256
+user_flash_bytes = 1024
+privileged_ram_bytes = 8192
+user_ram_bytes = 2048
+
+[os]
+profile = "minimal"
+tick_source = "systick"
+tick_hz = 1000
+syscall_priority = 5
+memory_protection = true
+user_io = "gpio-write"
+
+[gpio.led]
+binding = "led0"
+mode = "output"

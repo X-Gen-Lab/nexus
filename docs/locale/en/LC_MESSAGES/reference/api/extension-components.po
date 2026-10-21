@@ -1,0 +1,1386 @@
+# Exact messages independently reviewed; approval bound by companion receipt.
+msgid ""
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 56d40999d9981ce660a4cd9164d5a209973c3cacdea89d3b90523bdcd60a014f\n"
+
+msgid "Extension and lifecycle APIs"
+msgstr "Extension and lifecycle APIs"
+
+msgid "These public headers describe framed data, explicit owners, retained clocks and trusted mediation. Their declarations do not establish a board connection, execution mode, kernel gateway or physical qualification. Construction, memory ownership and final-access requirements remain part of each contract."
+msgstr "These public headers describe framed data, explicit owners, retained clocks and trusted mediation. Their declarations do not establish a board connection, execution mode, kernel gateway or physical qualification. Construction, memory ownership and final-access requirements remain part of each contract."
+
+msgid "frame_stream.h"
+msgstr "frame_stream.h"
+
+msgid "Complete framed blocks and strided DMA consumer loans."
+msgstr "Complete framed blocks and strided DMA consumer loans."
+
+msgid "Author  Nexus Team"
+msgstr "Author  Nexus Team"
+
+msgid "Nexus Team"
+msgstr "Nexus Team"
+
+msgid "Defines"
+msgstr "Defines"
+
+msgid "Typedefs"
+msgstr "Typedefs"
+
+msgid "Immutable consumer block retained through final DMA access."
+msgstr "Immutable consumer block retained through final DMA access."
+
+msgid "Zero-initialize before first acquisition. Keep this exact control live and exclusively owned until release; copied tokens never authorize earlier reuse or another instance."
+msgstr "Zero-initialize before first acquisition. Keep this exact control live and exclusively owned until release; copied tokens never authorize earlier reuse or another instance."
+
+msgid "Enums"
+msgstr "Enums"
+
+msgid "Memory representations; these values never configure a wire."
+msgstr "Memory representations; these values never configure a wire."
+
+msgid "Values:"
+msgstr "Values:"
+
+msgid "Serial framing whose complete units determine block geometry."
+msgstr "Serial framing whose complete units determine block geometry."
+
+msgid "Position of useful sample bits in each stored slot container."
+msgstr "Position of useful sample bits in each stored slot container."
+
+msgid "Functions"
+msgstr "Functions"
+
+msgid "Compute complete audio storage without touching payload."
+msgstr "Compute complete audio storage without touching payload."
+
+msgid "Task/IRQ bounded pure calculation. No format conversion, serializer configuration or codec negotiation is performed."
+msgstr "Task/IRQ bounded pure calculation. No format conversion, serializer configuration or codec negotiation is performed."
+
+msgid "Parameters"
+msgstr "Parameters"
+
+msgid "[in] Explicit framing, sample and stored slot geometry."
+msgstr "[in] Explicit framing, sample and stored slot geometry."
+
+msgid "[out] Separate fresh output, unchanged on rejection."
+msgstr "[out] Separate fresh output, unchanged on rejection."
+
+msgid "Returns"
+msgstr "Returns"
+
+msgid "SUCCESS, INVALID for incompatible framing or EXHAUSTED on arithmetic overflow; never retains an input or allocates."
+msgstr "SUCCESS, INVALID for incompatible framing or EXHAUSTED on arithmetic overflow; never retains an input or allocates."
+
+msgid "Check and copy planar/strided frame geometry."
+msgstr "Check and copy planar/strided frame geometry."
+
+msgid "Bounded pure calculation. Pixel/color meanings remain with the selected camera/display/DMA adapter."
+msgstr "Bounded pure calculation. Pixel/color meanings remain with the selected camera/display/DMA adapter."
+
+msgid "[in] 1..NX_FRAME_MAX_PLANES immutable plane descriptions."
+msgstr "[in] 1..NX_FRAME_MAX_PLANES immutable plane descriptions."
+
+msgid "[in] Exact plane count, not a runtime pool maximum."
+msgstr "[in] Exact plane count, not a runtime pool maximum."
+
+msgid "[out] Fresh output, unchanged on every rejection."
+msgstr "[out] Fresh output, unchanged on every rejection."
+
+msgid "SUCCESS, INVALID for empty/overlapping/short-stride planes, or EXHAUSTED on byte arithmetic overflow."
+msgstr "SUCCESS, INVALID for empty/overlapping/short-stride planes, or EXHAUSTED on byte arithmetic overflow."
+
+msgid "Cold-bind a complete-frame layout to an existing queue."
+msgstr "Cold-bind a complete-frame layout to an existing queue."
+
+msgid "Task-only cold assembly, O(n squared) storage checks. No hardware or DMA-domain admission is inferred. Keep all queue/control/payload storage live through final stop."
+msgstr "Task-only cold assembly, O(n squared) storage checks. No hardware or DMA-domain admission is inferred. Keep all queue/control/payload storage live through final stop."
+
+msgid "[out] Fresh control disjoint from queue and payloads."
+msgstr "[out] Fresh control disjoint from queue and payloads."
+
+msgid "[inout] Initialized unborrowed queue with all slots free."
+msgstr "[inout] Initialized unborrowed queue with all slots free."
+
+msgid "[in] Checked complete-frame geometry, copied on success."
+msgstr "[in] Checked complete-frame geometry, copied on success."
+
+msgid "SUCCESS, INVALID for aliases/short buffers/bad layout, BUSY for outstanding blocks or STATE while stopping."
+msgstr "SUCCESS, INVALID for aliases/short buffers/bad layout, BUSY for outstanding blocks or STATE while stopping."
+
+msgid "Publish one complete frame after final producer access."
+msgstr "Publish one complete frame after final producer access."
+
+msgid "Bounded task/IRQ metadata. Reserve/prepost/abort still use the existing stream; publication always has exact frame size."
+msgstr "Bounded task/IRQ metadata. Reserve/prepost/abort still use the existing stream; publication always has exact frame size."
+
+msgid "[inout] Exclusive serialized producer binding."
+msgstr "[inout] Exclusive serialized producer binding."
+
+msgid "[in] Existing stream producer loan, detached from all DMA."
+msgstr "[in] Existing stream producer loan, detached from all DMA."
+
+msgid "[in] Existing observed stream boundary flags."
+msgstr "[in] Existing observed stream boundary flags."
+
+msgid "Existing stream result; rejection retains the fill loan."
+msgstr "Existing stream result; rejection retains the fill loan."
+
+msgid "Publish one complete frame from the existing posted FIFO."
+msgstr "Publish one complete frame from the existing posted FIFO."
+
+msgid "Bounded task/IRQ metadata; preserves pending and FIFO counts."
+msgstr "Bounded task/IRQ metadata; preserves pending and FIFO counts."
+
+msgid "[inout] Same producer binding and complete-frame layout."
+msgstr "[inout] Same producer binding and complete-frame layout."
+
+msgid "[inout] Existing posted producer bound to this stream."
+msgstr "[inout] Existing posted producer bound to this stream."
+
+msgid "[in] Oldest pending loan, absent from all hardware targets."
+msgstr "[in] Oldest pending loan, absent from all hardware targets."
+
+msgid "[in] Observed existing stream boundary flags."
+msgstr "[in] Observed existing stream boundary flags."
+
+msgid "Existing posted-publication result, INVALID for foreign pool."
+msgstr "Existing posted-publication result, INVALID for foreign pool."
+
+msgid "Acquire the next complete immutable DMA consumer loan."
+msgstr "Acquire the next complete immutable DMA consumer loan."
+
+msgid "Task/IRQ; output disjointness scans the fixed pool in O(n) before the O(1) guarded queue operation. Output cannot alias queue controls or any full-capacity pool payload. EMPTY creates no loan and never repeats a previous frame. Caller owns silence/blanking/stop policy. Do not use retries as additional observed boundaries."
+msgstr "Task/IRQ; output disjointness scans the fixed pool in O(n) before the O(1) guarded queue operation. Output cannot alias queue controls or any full-capacity pool payload. EMPTY creates no loan and never repeats a previous frame. Caller owns silence/blanking/stop policy. Do not use retries as additional observed boundaries."
+
+msgid "[inout] Same serialized consumer, one call per observed output boundary when using underrun accounting."
+msgstr "[inout] Same serialized consumer, one call per observed output boundary when using underrun accounting."
+
+msgid "[inout] Zero or previously released control, unchanged on error."
+msgstr "[inout] Zero or previously released control, unchanged on error."
+
+msgid "SUCCESS, EMPTY with saturating underrun count, BUSY for a live loan, INVALID for output alias or STATE for an incomplete queued block."
+msgstr "SUCCESS, EMPTY with saturating underrun count, BUSY for a live loan, INVALID for output alias or STATE for an incomplete queued block."
+
+msgid "Derive a strided byte rectangle from a live frame loan."
+msgstr "Derive a strided byte rectangle from a live frame loan."
+
+msgid "Task/IRQ; an O(n) immutable-pool output check precedes the O(1) guarded view calculation. Output cannot alias the loan, queue controls or any full-capacity pool payload. The adapter checks pixel alignment, resource and DMA domain."
+msgstr "Task/IRQ; an O(n) immutable-pool output check precedes the O(1) guarded view calculation. Output cannot alias the loan, queue controls or any full-capacity pool payload. The adapter checks pixel alignment, resource and DMA domain."
+
+msgid "[in] Exact live immutable DMA consumer loan."
+msgstr "[in] Exact live immutable DMA consumer loan."
+
+msgid "[in] Plane index in the bound layout."
+msgstr "[in] Plane index in the bound layout."
+
+msgid "[in] Byte column within a row, not a pixel count."
+msgstr "[in] Byte column within a row, not a pixel count."
+
+msgid "[in] First complete row."
+msgstr "[in] First complete row."
+
+msgid "[in] Positive bytes per selected row."
+msgstr "[in] Positive bytes per selected row."
+
+msgid "[in] Positive selected row count."
+msgstr "[in] Positive selected row count."
+
+msgid "[out] Fresh output unchanged on failure."
+msgstr "[out] Fresh output unchanged on failure."
+
+msgid "SUCCESS, INVALID for out-of-plane rectangles or STATE for stale/foreign loans; no DMA access begins here."
+msgstr "SUCCESS, INVALID for out-of-plane rectangles or STATE for stale/foreign loans; no DMA access begins here."
+
+msgid "Release only after the adapter proves final DMA access."
+msgstr "Release only after the adapter proves final DMA access."
+
+msgid "Bounded task/IRQ metadata. Timeout/cancel is not quiescence; failed drain retains the queue borrow, including during stop. This helper checks proof facts and does not stop hardware."
+msgstr "Bounded task/IRQ metadata. Timeout/cancel is not quiescence; failed drain retains the queue borrow, including during stop. This helper checks proof facts and does not stop hardware."
+
+msgid "[inout] Original owner; another instance cannot release."
+msgstr "[inout] Original owner; another instance cannot release."
+
+msgid "[inout] Exact acquired control, cleared only on success."
+msgstr "[inout] Exact acquired control, cleared only on success."
+
+msgid "[in] Actual provider observations of engine, IRQ and peripheral quiescence; counter completion alone is not proof."
+msgstr "[in] Actual provider observations of engine, IRQ and peripheral quiescence; counter completion alone is not proof."
+
+msgid "SUCCESS, BUSY while any source remains, STATE for stale or foreign tokens, or INVALID for impossible drain counters."
+msgstr "SUCCESS, BUSY while any source remains, STATE for stale or foreign tokens, or INVALID for impossible drain counters."
+
+msgid "Immutable audio memory format, independent of codec policy."
+msgstr "Immutable audio memory format, independent of codec policy."
+
+msgid "PCM frames store every slot, including inactive slots, in ascending slot order; slot_bits is the container width. I2S has two 16/32-bit slots; SAI has 1..32 8/16/32-bit slots. PDM has 1..8 byte-interleaved lanes; each byte holds eight successive bits of one lane, so frames must divide by eight. active_slots selects valid lanes/slots without compacting storage. Sample byte order is explicitly declared."
+msgstr "PCM frames store every slot, including inactive slots, in ascending slot order; slot_bits is the container width. I2S has two 16/32-bit slots; SAI has 1..32 8/16/32-bit slots. PDM has 1..8 byte-interleaved lanes; each byte holds eight successive bits of one lane, so frames must divide by eight. active_slots selects valid lanes/slots without compacting storage. Sample byte order is explicitly declared."
+
+msgid "Public Members"
+msgstr "Public Members"
+
+msgid "One plane; the last row needs no trailing stride padding."
+msgstr "One plane; the last row needs no trailing stride padding."
+
+msgid "row_bytes/stride are bytes, rows is a complete line count. A plane occupies (rows - 1) * stride + row_bytes bytes."
+msgstr "row_bytes/stride are bytes, rows is a complete line count. A plane occupies (rows - 1) * stride + row_bytes bytes."
+
+msgid "Immutable frame geometry copied into a bound stream."
+msgstr "Immutable frame geometry copied into a bound stream."
+
+msgid "Plane intervals, including inter-row padding, cannot overlap. bytes is the exact maximum plane end, not summed row bytes. Audio formats are separate immutable caller metadata; this layout represents their checked complete-unit storage."
+msgstr "Plane intervals, including inter-row padding, cannot overlap. bytes is the exact maximum plane end, not summed row bytes. Audio formats are separate immutable caller metadata; this layout represents their checked complete-unit storage."
+
+msgid "Caller-owned binding; the existing stream owns every queue."
+msgstr "Caller-owned binding; the existing stream owns every queue."
+
+msgid "Initialize before publication. One serialized producer and consumer use framed publish/acquire exclusively until stop. Hardware, queue capacity and synchronization remain explicit."
+msgstr "Initialize before publication. One serialized producer and consumer use framed publish/acquire exclusively until stop. Hardware, queue capacity and synchronization remain explicit."
+
+msgid "Checked 2D byte rectangle for an explicit DMA adapter."
+msgstr "Checked 2D byte rectangle for an explicit DMA adapter."
+
+msgid "spi_dma_owner.h"
+msgstr "spi_dma_owner.h"
+
+msgid "Optional typed whole-CS SPI executor for bounded BusOwner."
+msgstr "Optional typed whole-CS SPI executor for bounded BusOwner."
+
+msgid "Bind a fresh executor without opening hardware or admission."
+msgstr "Bind a fresh executor without opening hardware or admission."
+
+msgid "Task-only, all lifecycle users joined before replacement. Uses original FIFO/slots/epochs; final provider terminal result survives late cancellation. Continue unique executor service during stop and quarantine. Hardware stop, publisher join and observer join remain explicit external steps."
+msgstr "Task-only, all lifecycle users joined before replacement. Uses original FIFO/slots/epochs; final provider terminal result survives late cancellation. Continue unique executor service during stop and quarantine. Hardware stop, publisher join and observer join remain explicit external steps."
+
+msgid "[inout] Zero fresh storage, distinct from capability/face."
+msgstr "[inout] Zero fresh storage, distinct from capability/face."
+
+msgid "[in] Initialized bus exclusively serviced by this owner."
+msgstr "[in] Initialized bus exclusively serviced by this owner."
+
+msgid "Executor for nx_bus_owner_init, zero port on invalid input."
+msgstr "Executor for nx_bus_owner_init, zero port on invalid input."
+
+msgid "Check typed storage, then use bounded owner admission."
+msgstr "Check typed storage, then use bounded owner admission."
+
+msgid "The request has an absolute deadline including queue time. Task multi-producer checks run outside the metadata guard. There is no capacity scan, allocation, OS lock or worker. One operation has one CS interval with allowed SCK gaps. Schedule bounded service even when hints fail. Waiters never service the shared controller. Queued provider failures settle later without converting admission into rejection."
+msgstr "The request has an absolute deadline including queue time. Task multi-producer checks run outside the metadata guard. There is no capacity scan, allocation, OS lock or worker. One operation has one CS interval with allowed SCK gaps. Schedule bounded service even when hints fail. Waiters never service the shared controller. Queued provider failures settle later without converting admission into rejection."
+
+msgid "[inout] Owner with this exact typed executor."
+msgstr "[inout] Owner with this exact typed executor."
+
+msgid "[inout] Prepared READY outer request."
+msgstr "[inout] Prepared READY outer request."
+
+msgid "[in] Immutable chain through outer SETTLED."
+msgstr "[in] Immutable chain through outer SETTLED."
+
+msgid "[in] Optional static caller hint, or NULL."
+msgstr "[in] Optional static caller hint, or NULL."
+
+msgid "[out] Stable slot/epoch identity on SUCCESS."
+msgstr "[out] Stable slot/epoch identity on SUCCESS."
+
+msgid "SUCCESS means ACCEPTED; failure retains nothing."
+msgstr "SUCCESS means ACCEPTED; failure retains nothing."
+
+msgid "Caller-owned queued and active SPI chain."
+msgstr "Caller-owned queued and active SPI chain."
+
+msgid "The outer deadline includes queue residence. The chain, descriptors and all TX/RX or fixed cells stay borrowed until acquire-observed outer SETTLED. Counts and results use words."
+msgstr "The outer deadline includes queue residence. The chain, descriptors and all TX/RX or fixed cells stay borrowed until acquire-observed outer SETTLED. Counts and results use words."
+
+msgid "Selected-only exact metadata; no queue, payload copy or worker."
+msgstr "Selected-only exact metadata; no queue, payload copy or worker."
+
+msgid "mapped_storage.h"
+msgstr "mapped_storage.h"
+
+msgid "Bounded read mappings and exclusive storage requests."
+msgstr "Bounded read mappings and exclusive storage requests."
+
+msgid "Read-only consumers; capability does not prove physical routing."
+msgstr "Read-only consumers; capability does not prove physical routing."
+
+msgid "Physical mutation, separate from read-map ownership."
+msgstr "Physical mutation, separate from read-map ownership."
+
+msgid "Prepare unborrowed caller storage without accessing payload."
+msgstr "Prepare unborrowed caller storage without accessing payload."
+
+msgid "SUCCESS or INVALID/STATE; no retained references on failure."
+msgstr "SUCCESS or INVALID/STATE; no retained references on failure."
+
+msgid "Query immutable geometry without starting hardware."
+msgstr "Query immutable geometry without starting hardware."
+
+msgid "Acquire one bounded, positive read-only span on a serialized executor."
+msgstr "Acquire one bounded, positive read-only span on a serialized executor."
+
+msgid "SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection retains no loan. Live read maps exclude all command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run concurrently after successful acquisition."
+msgstr "SUCCESS or INVALID/UNSUPPORTED/BUSY/EXHAUSTED/STATE. Rejection retains no loan. Live read maps exclude all command/program/erase/cache/DMA writers. CPU/XIP/DMA consumers may run concurrently after successful acquisition."
+
+msgid "Release an exact live loan after its consumers have joined."
+msgstr "Release an exact live loan after its consumers have joined."
+
+msgid "SUCCESS, INVALID/STATE, or backend unmap error retaining the loan. Task-only, same serialized executor; no forced revocation or timeout release."
+msgstr "SUCCESS, INVALID/STATE, or backend unmap error retaining the loan. Task-only, same serialized executor; no forced revocation or timeout release."
+
+msgid "Admit one exclusive PROGRAM/ERASE request with an absolute deadline."
+msgstr "Admit one exclusive PROGRAM/ERASE request with an absolute deadline."
+
+msgid "SUCCESS is ACCEPTED, possibly settled. Rejection retains no request or payload and produces no hardware effects. No map loan may remain live. Task-only serialized owner; no workers, allocation, locks or queue exist."
+msgstr "SUCCESS is ACCEPTED, possibly settled. Rejection retains no request or payload and produces no hardware effects. No map loan may remain live. Task-only serialized owner; no workers, allocation, locks or queue exist."
+
+msgid "Request cancellation by instance and nonrepeating writer epoch."
+msgstr "Request cancellation by instance and nonrepeating writer epoch."
+
+msgid "SUCCESS starts/observes drain; STATE rejects stale/foreign identity. Cancellation never releases storage. Continue service through drain."
+msgstr "SUCCESS starts/observes drain; STATE rejects stale/foreign identity. Cancellation never releases storage. Continue service through drain."
+
+msgid "Advance one bounded backend step or drain attempt without waiting."
+msgstr "Advance one bounded backend step or drain attempt without waiting."
+
+msgid "Backend/IRQ/data references detach before release-publication of SETTLED, which is the final request access. Failed drain is QUARANTINED; storage remains borrowed and later service may retry source withdrawal."
+msgstr "Backend/IRQ/data references detach before release-publication of SETTLED, which is the final request access. Failed drain is QUARANTINED; storage remains borrowed and later service may retry source withdrawal."
+
+msgid "Close admission and request writer cancellation."
+msgstr "Close admission and request writer cancellation."
+
+msgid "SUCCESS only after all map loans and writer sources are gone; BUSY retains storage and needs release/service. Repeated successful stop performs no backend operation. The owner cannot restart or revoke loans."
+msgstr "SUCCESS only after all map loans and writer sources are gone; BUSY retains storage and needs release/service. Repeated successful stop performs no backend operation. The owner cannot restart or revoke loans."
+
+msgid "Exact byte geometry; units divide size and one another."
+msgstr "Exact byte geometry; units divide size and one another."
+
+msgid "Caller-owned request and input, borrowed through SETTLED."
+msgstr "Caller-owned request and input, borrowed through SETTLED."
+
+msgid "Initialize base before prepare. PROGRAM borrows length input bytes; ERASE requires NULL input. Geometry alignment is checked at admission. Partial effects survive cancellation, timeout and I/O failure. No replay."
+msgstr "Initialize base before prepare. PROGRAM borrows length input bytes; ERASE requires NULL input. Geometry alignment is checked at admission. Partial effects survive cancellation, timeout and I/O failure. No replay."
+
+msgid "Stable instance-bound identity of one read mapping."
+msgstr "Stable instance-bound identity of one read mapping."
+
+msgid "Fields are immutable until release. Data stays read-only. Join every CPU, XIP instruction fetch and DMA reader before release; a copied token grants no additional loan. A failed release keeps the complete loan live."
+msgstr "Fields are immutable until release. Data stays read-only. Join every CPU, XIP instruction fetch and DMA reader before release; a copied token grants no additional loan. A failed release keeps the complete loan live."
+
+msgid "Stable writer identity; drain controls before reuse or destruction."
+msgstr "Stable writer identity; drain controls before reuse or destruction."
+
+msgid "Shared immutable operations; every callback receives instance state."
+msgstr "Shared immutable operations; every callback receives instance state."
+
+msgid "Immutable face; context and all retained storage outlive users."
+msgstr "Immutable face; context and all retained storage outlive users."
+
+msgid "mapped_storage_owner.h"
+msgstr "mapped_storage_owner.h"
+
+msgid "Explicit portable mapped-storage constructor and storage."
+msgstr "Explicit portable mapped-storage constructor and storage."
+
+msgid "Bind unused explicit storage without hardware or payload access."
+msgstr "Bind unused explicit storage without hardware or payload access."
+
+msgid "SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, overflowing spans, inconsistent units and missing callbacks reject. Caller constructs a const face with owner_ops and this owner context."
+msgstr "SUCCESS or INVALID; zero capacity, overlapping metadata/aperture, overflowing spans, inconsistent units and missing callbacks reject. Caller constructs a const face with owner_ops and this owner context."
+
+msgid "Variables"
+msgstr "Variables"
+
+msgid "One read-only method table shared by every portable owner instance."
+msgstr "One read-only method table shared by every portable owner instance."
+
+msgid "Private provider boundary; immutable callbacks and independent context."
+msgstr "Private provider boundary; immutable callbacks and independent context."
+
+msgid "Context is one explicitly sized private state span. Geometry and mapped address stay fixed. map SUCCESS establishes the readable aperture; map failure leaves no effects. unmap SUCCESS proves all aperture/cache references withdrawn; failure retains the last map loan. start is called only after request admission and mapping exclusion. start errors may have effects and always proceed through drain. poll advances bounded work, returns BUSY or a terminal result, and supplies monotonically increasing completed bytes. cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other errors quarantine it. No callback retains the request itself. Command/cache/DMA writers outside these callbacks are forbidden while the owner exists. Physical adapters own cache-line domains, XIP execution exclusion and hardware-specific drain proof."
+msgstr "Context is one explicitly sized private state span. Geometry and mapped address stay fixed. map SUCCESS establishes the readable aperture; map failure leaves no effects. unmap SUCCESS proves all aperture/cache references withdrawn; failure retains the last map loan. start is called only after request admission and mapping exclusion. start errors may have effects and always proceed through drain. poll advances bounded work, returns BUSY or a terminal result, and supplies monotonically increasing completed bytes. cancel initiates withdrawal but proves no drain. drain SUCCESS detaches every hardware/IRQ/cache/DMA/descriptor/data source; BUSY retains ownership, other errors quarantine it. No callback retains the request itself. Command/cache/DMA writers outside these callbacks are forbidden while the owner exists. Physical adapters own cache-line domains, XIP execution exclusion and hardware-specific drain proof."
+
+msgid "Exact caller-owned map capacity; fields belong to the owner."
+msgstr "Exact caller-owned map capacity; fields belong to the owner."
+
+msgid "Caller-owned state, published only after successful initialization."
+msgstr "Caller-owned state, published only after successful initialization."
+
+msgid "All methods and controls use one serialized task executor. Consumers may use their maps elsewhere, then join before release. No implicit IRQ guard or cross-task synchronization is supplied. Keep state, slots, backend context, clock and face alive through stop and control/consumer join."
+msgstr "All methods and controls use one serialized task executor. Consumers may use their maps elsewhere, then join before release. No implicit IRQ guard or cross-task synchronization is supplied. Keep state, slots, backend context, clock and face alive through stop and control/consumer join."
+
+msgid "native_mapped_storage.h"
+msgstr "native_mapped_storage.h"
+
+msgid "Caller-owned coherent Native NOR model with bounded steps."
+msgstr "Caller-owned coherent Native NOR model with bounded steps."
+
+msgid "Construct an unused Native backend without modifying backing bytes."
+msgstr "Construct an unused Native backend without modifying backing bytes."
+
+msgid "SUCCESS or INVALID. Only CPU_READ is supported; XIP and DMA tags reject. Native coherent memory needs no cache maintenance. The portable owner still excludes mappings from every modeled mutation and drain."
+msgstr "SUCCESS or INVALID. Only CPU_READ is supported; XIP and DMA tags reject. Native coherent memory needs no cache maintenance. The portable owner still excludes mappings from every modeled mutation and drain."
+
+msgid "Independent Native backend state; never a physical Flash substitute."
+msgstr "Independent Native backend state; never a physical Flash substitute."
+
+msgid "The model preserves supplied bytes, programs only 1-to-0, and erases to 0xff. One service changes at most quantum bytes. No implicit file, heap, thread, DMA, executable aperture or durability claim exists. fault_after bounds mutated bytes; SIZE_MAX disables the fault. hold_drain models live retained sources and drain_error models failure to prove source withdrawal."
+msgstr "The model preserves supplied bytes, programs only 1-to-0, and erases to 0xff. One service changes at most quantum bytes. No implicit file, heap, thread, DMA, executable aperture or durability claim exists. fault_after bounds mutated bytes; SIZE_MAX disables the fault. hold_drain models live retained sources and drain_error models failure to prove source withdrawal."
+
+msgid "amp_ipc.h"
+msgstr "amp_ipc.h"
+
+msgid "Bounded epoch-safe unidirectional shared-memory loans."
+msgstr "Bounded epoch-safe unidirectional shared-memory loans."
+
+msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+
+msgid "1.0.0"
+msgstr "1.0.0"
+
+msgid "2026-10-20"
+msgstr "2026-10-20"
+
+msgid "Copyright (c) 2026 Nexus Team"
+msgstr "Copyright (c) 2026 Nexus Team"
+
+msgid "Explicit port-isolation unit; supported cache granules divide 64."
+msgstr "Explicit port-isolation unit; supported cache granules divide 64."
+
+msgid "Publish one complete-cache-line payload span without copying."
+msgstr "Publish one complete-cache-line payload span without copying."
+
+msgid "Serialized owner Thread only, same rule for every API below. No waits, allocation, scheduler, ISR or implicit worker. Outputs must not overlap any live instance/lane storage. Producer must finish DMA/other writers before this call."
+msgstr "Serialized owner Thread only, same rule for every API below. No waits, allocation, scheduler, ISR or implicit worker. Outputs must not overlap any live instance/lane storage. Producer must finish DMA/other writers before this call."
+
+msgid "SUCCESS transfers a read-only borrow until exact ACK poll or successful reset_join. Rejection retains nothing and does not publish. EXHAUSTED means no reusable slot identity."
+msgstr "SUCCESS transfers a read-only borrow until exact ACK poll or successful reset_join. Rejection retains nothing and does not publish. EXHAUSTED means no reusable slot identity."
+
+msgid "Acquire-observe an exact ACK; BUSY/IO/STATE retain the sender borrow."
+msgstr "Acquire-observe an exact ACK; BUSY/IO/STATE retain the sender borrow."
+
+msgid "Acquire one offer after descriptor/payload invalidation succeeds."
+msgstr "Acquire one offer after descriptor/payload invalidation succeeds."
+
+msgid "Join the caller view, then publish its exact ACK."
+msgstr "Join the caller view, then publish its exact ACK."
+
+msgid "Valid ticket invocation permanently joins local readers. IO or STATE retains endpoint/slot storage; retry finish or use reset_join after closing. Stale tickets change nothing."
+msgstr "Valid ticket invocation permanently joins local readers. IO or STATE retains endpoint/slot storage; retry finish or use reset_join after closing. Stale tickets change nothing."
+
+msgid "Close admission; outstanding send/receive loans remain retained."
+msgstr "Close admission; outstanding send/receive loans remain retained."
+
+msgid "Join a closed endpoint after all exact ACKs/local returns."
+msgstr "Join a closed endpoint after all exact ACKs/local returns."
+
+msgid "BUSY, IO or STATE retain the unique owner. Success performs its final access and unclaims the role. Storage cannot be reconstructed: boot/sequence identities never reset here."
+msgstr "BUSY, IO or STATE retain the unique owner. Success performs its final access and unclaims the role. Storage cannot be reconstructed: boot/sequence identities never reset here."
+
+msgid "Join after an explicit old-peer stop proof."
+msgstr "Join after an explicit old-peer stop proof."
+
+msgid "Closed endpoint required; receiver views must have been consumed by finish first. Failed proof retains ALL sender loans and ownership. Success retires this endpoint; any replacement uses a strictly newer nonzero boot epoch from the external boot owner, never rollover/reuse."
+msgstr "Closed endpoint required; receiver views must have been consumed by finish first. Failed proof retains ALL sender loans and ownership. Success retires this endpoint; any replacement uses a strictly newer nonzero boot epoch from the external boot owner, never rollover/reuse."
+
+msgid "One writer's isolated publication word; accesses use the port only."
+msgstr "One writer's isolated publication word; accesses use the port only."
+
+msgid "Shared descriptor; offsets refer to the configured payload window."
+msgstr "Shared descriptor; offsets refer to the configured payload window."
+
+msgid "Caller-owned shared slot with disjoint writer cache lines."
+msgstr "Caller-owned shared slot with disjoint writer cache lines."
+
+msgid "Sender alone writes offer/published; receiver alone writes receipt/acknowledged. All four units must be reachable by both CPUs. Cold initialization precedes either endpoint."
+msgstr "Sender alone writes offer/published; receiver alone writes receipt/acknowledged. All four units must be reachable by both CPUs. Cold initialization precedes either endpoint."
+
+msgid "Hardware/ownership boundary supplied by the integration."
+msgstr "Hardware/ownership boundary supplied by the integration."
+
+msgid "Every callback is synchronous, bounded and non-reentrant. claim grants the unique role owner of this exact lane and atomically rejects a reused/non-increasing local boot epoch, even after ordinary join. Its authoritative hardware boot owner preserves this history across CPU resets; exhaustion fails closed. Rejection has no effects. unclaim follows final join only and never erases boot identity history. clean/invalidate cover exact complete isolated cache lines, finish their architectural barriers, and may fail. A failed clean MUST NOT publish a control word. acquire/release are infallible atomic 32-bit coherent control operations: the port owns any control-cache maintenance. They must order descriptor/payload access across both CPUs and bus fabric. stopped proves the named old peer CPU, DMA, IRQ and all observers can never access the lane or payload again. The context binds the exact physical lane and peer execution epoch covered by stopped. An epoch observation, cancel, deadline or elapsed timeout never supplies this proof. No existing single-core SoC supplies it."
+msgstr "Every callback is synchronous, bounded and non-reentrant. claim grants the unique role owner of this exact lane and atomically rejects a reused/non-increasing local boot epoch, even after ordinary join. Its authoritative hardware boot owner preserves this history across CPU resets; exhaustion fails closed. Rejection has no effects. unclaim follows final join only and never erases boot identity history. clean/invalidate cover exact complete isolated cache lines, finish their architectural barriers, and may fail. A failed clean MUST NOT publish a control word. acquire/release are infallible atomic 32-bit coherent control operations: the port owns any control-cache maintenance. They must order descriptor/payload access across both CPUs and bus fabric. stopped proves the named old peer CPU, DMA, IRQ and all observers can never access the lane or payload again. The context binds the exact physical lane and peer execution epoch covered by stopped. An epoch observation, cancel, deadline or elapsed timeout never supplies this proof. No existing single-core SoC supplies it."
+
+msgid "Instance/boot/slot identity; endpoint outlives every ticket copy."
+msgstr "Instance/boot/slot identity; endpoint outlives every ticket copy."
+
+msgid "Receiver's borrowed read-only shared span."
+msgstr "Receiver's borrowed read-only shared span."
+
+msgid "Caller must join every local reader before finish. A valid finish invocation consumes the caller view even when link acknowledgement fails; endpoint storage remains retained."
+msgstr "Caller must join every local reader before finish. A valid finish invocation consumes the caller view even when link acknowledgement fails; endpoint storage remains retained."
+
+msgid "Stable close identity; endpoint lives longer than all control copies."
+msgstr "Stable close identity; endpoint lives longer than all control copies."
+
+msgid "amp_ipc_storage.h"
+msgstr "amp_ipc_storage.h"
+
+msgid "Caller-owned endpoint configuration and retained loan state."
+msgstr "Caller-owned endpoint configuration and retained loan state."
+
+msgid "Claim and bind unused zero-initialized endpoint storage."
+msgstr "Claim and bind unused zero-initialized endpoint storage."
+
+msgid "Serialized privileged owner Thread, before publication. Validates disjoint spans and exact boot epochs before claim. Rejected construction has no references or shared effects. The port must independently enforce unique hardware/role ownership; this component contains no global registry."
+msgstr "Serialized privileged owner Thread, before publication. Validates disjoint spans and exact boot epochs before claim. Rejected construction has no references or shared effects. The port must independently enforce unique hardware/role ownership; this component contains no global registry."
+
+msgid "Zero-initialized local state; no sharing with another endpoint."
+msgstr "Zero-initialized local state; no sharing with another endpoint."
+
+msgid "One unidirectional lane and exact caller-owned storage."
+msgstr "One unidirectional lane and exact caller-owned storage."
+
+msgid "Both boot words are externally published, monotonic nonzero epochs. Never republish an old boot identity, including after a whole-device reset. The boot owner must fail closed on exhaustion. Initial shared records/words are zeroed or retained from older epochs, never edited while live. Wire and boot words occupy separate complete 64-byte units. All shared spans align to granule (power of two, 1..64). Payload size is a positive multiple of granule. Configuration, callbacks and all supplied storage outlive final join."
+msgstr "Both boot words are externally published, monotonic nonzero epochs. Never republish an old boot identity, including after a whole-device reset. The boot owner must fail closed on exhaustion. Initial shared records/words are zeroed or retained from older epochs, never edited while live. Wire and boot words occupy separate complete 64-byte units. All shared spans align to granule (power of two, 1..64). Payload size is a positive multiple of granule. Configuration, callbacks and all supplied storage outlive final join."
+
+msgid "stm32f407_handoff.h"
+msgstr "stm32f407_handoff.h"
+
+msgid "Exact F407 Flash-image transfer after explicit owner drain."
+msgstr "Exact F407 Flash-image transfer after explicit owner drain."
+
+msgid "Construct the single static F407 handoff admission domain."
+msgstr "Construct the single static F407 handoff admission domain."
+
+msgid "Serialized privileged Thread, once before any consumer. No heap, hardware writes, discovery or implicit startup. The caller enrolls every platform/product execution, IRQ, DMA, observer and memory owner that can outlive entry. Release a lease only after its actual join/drain."
+msgstr "Serialized privileged Thread, once before any consumer. No heap, hardware writes, discovery or implicit startup. The caller enrolls every platform/product execution, IRQ, DMA, observer and memory owner that can outlive entry. Release a lease only after its actual join/drain."
+
+msgid "[in] Positive bound on enrolled live tokens."
+msgstr "[in] Positive bound on enrolled live tokens."
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE; never resets an epoch."
+msgstr "SUCCESS, INVALID, CONTEXT or STATE; never resets an epoch."
+
+msgid "Return the existing single static admission domain."
+msgstr "Return the existing single static admission domain."
+
+msgid "Pure lookup; does not initialize, acquire or touch hardware."
+msgstr "Pure lookup; does not initialize, acquire or touch hardware."
+
+msgid "Stable object identity, including before initialization."
+msgstr "Stable object identity, including before initialization."
+
+msgid "Validate stopped F407 state and tail-transfer to Flash."
+msgstr "Validate stopped F407 state and tail-transfer to Flash."
+
+msgid "Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. Stop the actual Platform, join all users and keep admission closed. An unrelated empty domain cannot authorize transfer. Rejects active FP/lazy preservation, partial CP10/11 permissions, MPU, ART, SysTick, enabled/pending/active IRQs, non-HSI16/reset buses, peripheral/DMA gates, busy Flash and retained System effects. Ordinary inactive CP10/11 permissions from SystemInit are supported. Main SRAM is preserved; MSP is 8-aligned in (0x20000000,0x20020000]. All 98 vectors fit exact observed and generated Flash geometry. Reset PC is Thumb with its first halfword in Flash. Success sets VTOR, disables CP10/11, sets CONTROL=0, PSP=0 and MSP, then branches to PC with PRIMASK=1. This is a masked handoff entry. No RAM copy/clear, image authentication/selection, device drain, clock change or physical qualification occurs. Target owns RAM startup and resets controllers before enabling gates. No old deadline survives transfer. Exclude NMI/HardFault, debugger, DMA and other bus masters. Enrollment is caller policy; Platform and product owners are never enrolled automatically. Rejection preserves masks and performs no writable MMIO. Reading SysTick CTRL consumes COUNTFLAG even if rejected."
+msgstr "Selected STM32F407VET6/ZGT6 baremetal images only. Caller is privileged Thread on MSP, PRIMASK=1, other masks clear. No scheduler may have started. Stop the actual Platform, join all users and keep admission closed. An unrelated empty domain cannot authorize transfer. Rejects active FP/lazy preservation, partial CP10/11 permissions, MPU, ART, SysTick, enabled/pending/active IRQs, non-HSI16/reset buses, peripheral/DMA gates, busy Flash and retained System effects. Ordinary inactive CP10/11 permissions from SystemInit are supported. Main SRAM is preserved; MSP is 8-aligned in (0x20000000,0x20020000]. All 98 vectors fit exact observed and generated Flash geometry. Reset PC is Thumb with its first halfword in Flash. Success sets VTOR, disables CP10/11, sets CONTROL=0, PSP=0 and MSP, then branches to PC with PRIMASK=1. This is a masked handoff entry. No RAM copy/clear, image authentication/selection, device drain, clock change or physical qualification occurs. Target owns RAM startup and resets controllers before enabling gates. No old deadline survives transfer. Exclude NMI/HardFault, debugger, DMA and other bus masters. Enrollment is caller policy; Platform and product owners are never enrolled automatically. Rejection preserves masks and performs no writable MMIO. Reading SysTick CTRL consumes COUNTFLAG even if rejected."
+
+msgid "[in] Closed, drained barrier from this exact domain."
+msgstr "[in] Closed, drained barrier from this exact domain."
+
+msgid "[in] 512-aligned physical Flash vector address."
+msgstr "[in] 512-aligned physical Flash vector address."
+
+msgid "Error before transfer; success never returns."
+msgstr "Error before transfer; success never returns."
+
+msgid "frame_dma2d.h"
+msgstr "frame_dma2d.h"
+
+msgid "Exact opaque storage reservation for one optional owner."
+msgstr "Exact opaque storage reservation for one optional owner."
+
+msgid "Zero-initialize once; do not copy or mutate. This is one object's ABI storage, not a pool or allocator. Keep it, face and all accepted requests live until successful stop."
+msgstr "Zero-initialize once; do not copy or mutate. This is one object's ABI storage, not a pool or allocator. Keep it, face and all accepted requests live until successful stop."
+
+msgid "Explicit exclusive physical resource; no runtime resource registry."
+msgstr "Explicit exclusive physical resource; no runtime resource registry."
+
+msgid "Acquire cold DMA2D and its dedicated RCC gate/reset bit."
+msgstr "Acquire cold DMA2D and its dedicated RCC gate/reset bit."
+
+msgid "[inout] Fresh zero storage exclusively owned by caller."
+msgstr "[inout] Fresh zero storage exclusively owned by caller."
+
+msgid "[in] Stable readonly {&nx_h743_frame_dma2d_ops, storage}."
+msgstr "[in] Stable readonly {&nx_h743_frame_dma2d_ops, storage}."
+
+msgid "[in] Exact resource plus positive abort observation bound."
+msgstr "[in] Exact resource plus positive abort observation bound."
+
+msgid "SUCCESS, INVALID, BUSY for foreign gate/reset/IRQ ownership, UNSUPPORTED for non-V/cache-on, CONTEXT or IO."
+msgstr "SUCCESS, INVALID, BUSY for foreign gate/reset/IRQ ownership, UNSUPPORTED for non-V/cache-on, CONTEXT or IO."
+
+msgid "One caller-owned request; rectangle coordinates are bytes."
+msgstr "One caller-owned request; rectangle coordinates are bytes."
+
+msgid "One-executor task-only operations; each service call is bounded."
+msgstr "One-executor task-only operations; each service call is bounded."
+
+msgid "Immutable face; state is separate caller-owned private storage."
+msgstr "Immutable face; state is separate caller-owned private storage."
+
+msgid "Cold configuration for exact H743 V with D-Cache disabled."
+msgstr "Cold configuration for exact H743 V with D-Cache disabled."
+
+msgid "stm32u575_retained_time.h"
+msgstr "stm32u575_retained_time.h"
+
+msgid "Independent monotonic domain from a retained U575 calendar."
+msgstr "Independent monotonic domain from a retained U575 calendar."
+
+msgid "Exclusive exact RTC source; no second owner may configure it."
+msgstr "Exclusive exact RTC source; no second owner may configure it."
+
+msgid "Open a separate elapsed clock without reading or changing Core TIM2."
+msgstr "Open a separate elapsed clock without reading or changing Core TIM2."
+
+msgid "Exact U575 TZEN0, privileged unmasked Thread, baremetal integration. External boot owns a valid raw calendar/LSE32768/RTCEN/RTCAPBEN, crystal mode LSEBYP=0 and conservative drive 10/11. ES0499 Rev12 2.2.3/16 affect revision X; this profile does not qualify revision. External boot/Board owners exclude PC13 transitions on the LQFP reference per 2.2.1; reads cannot prove electrical silence."
+msgstr "Exact U575 TZEN0, privileged unmasked Thread, baremetal integration. External boot owns a valid raw calendar/LSE32768/RTCEN/RTCAPBEN, crystal mode LSEBYP=0 and conservative drive 10/11. ES0499 Rev12 2.2.3/16 affect revision X; this profile does not qualify revision. External boot/Board owners exclude PC13 transitions on the LQFP reference per 2.2.1; reads cannot prove electrical silence."
+
+msgid "The selected MSIS4/equal-bus profile is checked before every tuple pair, with no concurrent clock-profile writer. This conservative profile is not a general RTC-write frequency rule. Require PRER127/255, BCD24h BYPSHAD, no shift/calibration/alarms."
+msgstr "The selected MSIS4/equal-bus profile is checked before every tuple pair, with no concurrent clock-profile writer. This conservative profile is not a general RTC-write frequency rule. Require PRER127/255, BCD24h BYPSHAD, no shift/calibration/alarms."
+
+msgid "Both standalone and delegated construction require quiet RTC IRQ, WUTE/WUTIE clear and no RTC flags. The explicit wake_owner may operate only its WUT/IRQ fields after successful construction. Calendar provenance, including intentional YY00, cannot be inferred from INITS. DBP/WPR need not be unlocked; no hardware writes occur."
+msgstr "Both standalone and delegated construction require quiet RTC IRQ, WUTE/WUTIE clear and no RTC flags. The explicit wake_owner may operate only its WUT/IRQ fields after successful construction. Calendar provenance, including intentional YY00, cannot be inferred from INITS. DBP/WPR need not be unlocked; no hardware writes occur."
+
+msgid "This face has a distinct domain from nx_time_now_us(). Old Core deadlines are never translated. Stop/reopen invalidates old faces' numerical deadlines after all consumers and observers have joined."
+msgstr "This face has a distinct domain from nx_time_now_us(). Old Core deadlines are never translated. Stop/reopen invalidates old faces' numerical deadlines after all consumers and observers have joined."
+
+msgid "[inout] Fresh zero or fully stopped, externally joined owner."
+msgstr "[inout] Fresh zero or fully stopped, externally joined owner."
+
+msgid "[in] Separate immutable configuration, copied during this call."
+msgstr "[in] Separate immutable configuration, copied during this call."
+
+msgid "[out] Separate writable face, copied only on success."
+msgstr "[out] Separate writable face, copied only on success."
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT, UNSUPPORTED or EXHAUSTED; rejection leaves owner and output unchanged, with no hardware writes."
+msgstr "SUCCESS, INVALID, STATE, BUSY, CONTEXT, UNSUPPORTED or EXHAUSTED; rejection leaves owner and output unchanged, with no hardware writes."
+
+msgid "Observe a bounded coherent tuple and extend the independent domain."
+msgstr "Observe a bounded coherent tuple and extend the independent domain."
+
+msgid "Thread may hold PRIMASK; BASEPRI/FAULTMASK and Handler mode are excluded. BUSY means no coherent tuple after eight bounded retries, and changes neither owner nor output. A source/configuration change, backward/out-of-window calendar or time exhaustion permanently taints this live epoch. Later samples return STATE; no stale value is valid."
+msgstr "Thread may hold PRIMASK; BASEPRI/FAULTMASK and Handler mode are excluded. BUSY means no coherent tuple after eight bounded retries, and changes neither owner nor output. A source/configuration change, backward/out-of-window calendar or time exhaustion permanently taints this live epoch. Later samples return STATE; no stale value is valid."
+
+msgid "[inout] Same serialized privileged Thread owner."
+msgstr "[inout] Same serialized privileged Thread owner."
+
+msgid "[out] Separate aligned writable output, unchanged on failure."
+msgstr "[out] Separate aligned writable output, unchanged on failure."
+
+msgid "SUCCESS, INVALID, STATE, BUSY, CONTEXT or EXHAUSTED."
+msgstr "SUCCESS, INVALID, STATE, BUSY, CONTEXT or EXHAUSTED."
+
+msgid "Check one explicit WUT identity against this live clock generation."
+msgstr "Check one explicit WUT identity against this live clock generation."
+
+msgid "Same serialized privileged Thread, PRIMASK0/1 allowed. The WUT owner obtains generation through sample and checks it before and after each transition. Reopen invalidates old bindings; no second owner is inferred."
+msgstr "Same serialized privileged Thread, PRIMASK0/1 allowed. The WUT owner obtains generation through sample and checks it before and after each transition. Reopen invalidates old bindings; no second owner is inferred."
+
+msgid "SUCCESS, INVALID, STATE or CONTEXT; no output or hardware effects."
+msgstr "SUCCESS, INVALID, STATE or CONTEXT; no output or hardware effects."
+
+msgid "Clock-face read; failure cannot return a stale or invalid timestamp."
+msgstr "Clock-face read; failure cannot return a stale or invalid timestamp."
+
+msgid "On any failed sample, taint the epoch, retain the interrupt mask, call nx_fault_observe(NX_FAULT_PLATFORM, reason, ...) and park if the observer returns. Products may supply separately reviewed nonreturning recovery. No loan or observer is released by fault observation."
+msgstr "On any failed sample, taint the epoch, retain the interrupt mask, call nx_fault_observe(NX_FAULT_PLATFORM, reason, ...) and park if the observer returns. Products may supply separately reviewed nonreturning recovery. No loan or observer is released by fault observation."
+
+msgid "[inout] Exact live storage from successful initialization."
+msgstr "[inout] Exact live storage from successful initialization."
+
+msgid "A new valid sample in the same independent monotonic domain."
+msgstr "A new valid sample in the same independent monotonic domain."
+
+msgid "Close clock admission after every external face/deadline user joins."
+msgstr "Close clock admission after every external face/deadline user joins."
+
+msgid "Does not reset generations or alter the source. An explicit reopen starts a new zero-based elapsed domain, including after a tainted one. No scheduler, wake IRQ, WFI, Core restoration, Stop2 or VBAT retention guarantee is established by this read-only source component."
+msgstr "Does not reset generations or alter the source. An explicit reopen starts a new zero-based elapsed domain, including after a tainted one. No scheduler, wake IRQ, WFI, Core restoration, Stop2 or VBAT retention guarantee is established by this read-only source component."
+
+msgid "SUCCESS, INVALID, CONTEXT or STATE; clean repeated stop is idempotent."
+msgstr "SUCCESS, INVALID, CONTEXT or STATE; clean repeated stop is idempotent."
+
+msgid "One zero-initialized caller owner, not a pool or allocation service."
+msgstr "One zero-initialized caller owner, not a pool or allocation service."
+
+msgid "Do not copy or mutate. Keep this storage alive through every copied clock face, deadline consumer and observer. Memory retention for any future power mode is an assembly obligation, never implied by a RAM address. This read-only clock does not require SRAM4 or enter Stop2."
+msgstr "Do not copy or mutate. Keep this storage alive through every copied clock face, deadline consumer and observer. Memory retention for any future power mode is an assembly obligation, never implied by a RAM address. This read-only clock does not require SRAM4 or enter Stop2."
+
+msgid "Bounded observation gap, declared by the serialized lifecycle owner."
+msgstr "Bounded observation gap, declared by the serialized lifecycle owner."
+
+msgid "Observe at least once per max_gap_seconds, in 1..86400 seconds. Missed complete 100-year periods and small external clock settings cannot be detected from calendar snapshots. Exclude every calendar writer and other RTC configuration owner, including the polling AlarmA factory selection. The sole explicit WUT delegate is described below. The complete elapsed interval, including wake latency or recovery, must fit this gap; the nominal WUT duration alone is not a bound."
+msgstr "Observe at least once per max_gap_seconds, in 1..86400 seconds. Missed complete 100-year periods and small external clock settings cannot be detected from calendar snapshots. Exclude every calendar writer and other RTC configuration owner, including the polling AlarmA factory selection. The sole explicit WUT delegate is described below. The complete elapsed interval, including wake latency or recovery, must fit this gap; the nominal WUT duration alone is not a bound."
+
+msgid "NULL for RTC-only; otherwise stable identity of one WUT owner."
+msgstr "NULL for RTC-only; otherwise stable identity of one WUT owner."
+
+msgid "Delegates only WUCKSEL/WUTE/WUTIE, WUTR, WUTF/SCR.CWUTF and RTC IRQ ownership; ICSR.WUTWF may change with that bounded operation. That same serialized owner preserves every calendar/source field. Identity is compared without dereference; it is not authorization."
+msgstr "Delegates only WUCKSEL/WUTE/WUTIE, WUTR, WUTF/SCR.CWUTF and RTC IRQ ownership; ICSR.WUTWF may change with that bounded operation. That same serialized owner preserves every calendar/source field. Identity is compared without dereference; it is not authorization."
+
+msgid "A successful sample copied together in this owner's boot lifetime."
+msgstr "A successful sample copied together in this owner's boot lifetime."
+
+msgid "Microseconds are floor(ticks*1000000/256); resolution is 3906.25us, with exact carried fractional quarters. Generation changes only on explicit successful initialize/reopen, never natural 99->00 rollover."
+msgstr "Microseconds are floor(ticks*1000000/256); resolution is 3906.25us, with exact carried fractional quarters. Generation changes only on explicit successful initialize/reopen, never natural 99->00 rollover."
+
+msgid "stm32u575_stop2.h"
+msgstr "stm32u575_stop2.h"
+
+msgid "Exact U575 TZEN0 retained-RTC Stop2 boundary."
+msgstr "Exact U575 TZEN0 retained-RTC Stop2 boundary."
+
+msgid "Stable trusted assembly identity for retained-time wake_owner."
+msgstr "Stable trusted assembly identity for retained-time wake_owner."
+
+msgid "Bind the static owner and construct its RUN domain."
+msgstr "Bind the static owner and construct its RUN domain."
+
+msgid "Serialized privileged unmasked Thread, once. Retain clock storage throughout this owner's lifetime. No hardware writes or heap allocation occur."
+msgstr "Serialized privileged unmasked Thread, once. Retain clock storage throughout this owner's lifetime. No hardware writes or heap allocation occur."
+
+msgid "[in] Positive bound on external consumer leases."
+msgstr "[in] Positive bound on external consumer leases."
+
+msgid "[inout] Live retained-time owner bound to this identity."
+msgstr "[inout] Live retained-time owner bound to this identity."
+
+msgid "SUCCESS, INVALID, CONTEXT, STATE or clock failure."
+msgstr "SUCCESS, INVALID, CONTEXT, STATE or clock failure."
+
+msgid "Pure lookup; all platform/product RUN owners enroll explicitly."
+msgstr "Pure lookup; all platform/product RUN owners enroll explicitly."
+
+msgid "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
+msgstr "Arm WUT, cross Stop2, restore and drain with PRIMASK=1."
+
+msgid "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
+msgstr "[in] 2..65536 RTC/16 ticks, nominal 488.28125us."
+
+msgid "[in] Positive finite per-phase observation budget."
+msgstr "[in] Positive finite per-phase observation budget."
+
+msgid "Primary/cleanup results, retained effects and RTC samples."
+msgstr "Primary/cleanup results, retained effects and RTC samples."
+
+msgid "Retry retained WUT/IRQ/clock drain without another WFI."
+msgstr "Retry retained WUT/IRQ/clock drain without another WFI."
+
+msgid "Same masked boundary and exact closed barrier. Recovery cannot repair a tainted RTC epoch or authorize old deadlines. Hardware drain can finish with invalid RTC sampling. Join all retained-clock users before its explicit stop/reopen."
+msgstr "Same masked boundary and exact closed barrier. Recovery cannot repair a tainted RTC epoch or authorize old deadlines. Hardware drain can finish with invalid RTC sampling. Join all retained-clock users before its explicit stop/reopen."
+
+msgid "Bounded transition result; snapshots belong only to the RTC domain."
+msgstr "Bounded transition result; snapshots belong only to the RTC domain."
+
+msgid "user_io_async.h"
+msgstr "user_io_async.h"
+
+msgid "Bounded copied UART user mediation."
+msgstr "Bounded copied UART user mediation."
+
+msgid "Authenticate and copy one bounded user gateway transaction."
+msgstr "Authenticate and copy one bounded user gateway transaction."
+
+msgid "Privileged unmasked Thread, one serialized gateway executor. Authenticate the current principal on every call. The trusted copy port supplies fault containment and mapping stability; range checks alone prove neither. The caller separately drives the existing BusOwner/UARTOwner; this call never services it. CANCEL only requests its drain. CONSUME requires acquire SETTLED and the existing owner's idle/join barrier, copies the reply first, then wipes bytes/releases the exact cell. Failed reply copy, cancellation or quarantine never releases an accepted cell. No SVC/CMSE entry or NS RTOS is provided."
+msgstr "Privileged unmasked Thread, one serialized gateway executor. Authenticate the current principal on every call. The trusted copy port supplies fault containment and mapping stability; range checks alone prove neither. The caller separately drives the existing BusOwner/UARTOwner; this call never services it. CANCEL only requests its drain. CONSUME requires acquire SETTLED and the existing owner's idle/join barrier, copies the reply first, then wipes bytes/releases the exact cell. Failed reply copy, cancellation or quarantine never releases an accepted cell. No SVC/CMSE entry or NS RTOS is provided."
+
+msgid "[inout] Trusted privileged binding and exact copied slots."
+msgstr "[inout] Trusted privileged binding and exact copied slots."
+
+msgid "[in] Transient full readable user header, copied once."
+msgstr "[in] Transient full readable user header, copied once."
+
+msgid "[in] Transient readable SUBMIT bytes; NULL otherwise."
+msgstr "[in] Transient readable SUBMIT bytes; NULL otherwise."
+
+msgid "[out] Transient disjoint full writable user reply."
+msgstr "[out] Transient disjoint full writable user reply."
+
+msgid "SUCCESS after reply copy; identity/span/protocol/copy/control errors otherwise. No user address survives any return. A reply-copy error can follow acceptance: POLL the proposed slot/epoch; duplicate SUBMIT cannot replay or replace it."
+msgstr "SUCCESS after reply copy; identity/span/protocol/copy/control errors otherwise. No user address survives any return. A reply-copy error can follow acceptance: POLL the proposed slot/epoch; duplicate SUBMIT cannot replay or replace it."
+
+msgid "Close copied admission and cancel this binding's live work."
+msgstr "Close copied admission and cancel this binding's live work."
+
+msgid "Trusted privileged management, not a user gateway action. Same serialized lifecycle executor as dispatch/join, except synchronous identity/copy callbacks may request close. This is not a general concurrent cross-task control API. Close is permanent; it does not close the underlying owner. No worker or provider service runs here. Keep driving the owner and authenticate POLL/CONSUME through normal dispatch. Identity/copy callbacks may request close, never recursively dispatch or reconstruct. All bound storage stays live."
+msgstr "Trusted privileged management, not a user gateway action. Same serialized lifecycle executor as dispatch/join, except synchronous identity/copy callbacks may request close. This is not a general concurrent cross-task control API. Close is permanent; it does not close the underlying owner. No worker or provider service runs here. Keep driving the owner and authenticate POLL/CONSUME through normal dispatch. Identity/copy callbacks may request close, never recursively dispatch or reconstruct. All bound storage stays live."
+
+msgid "Privileged retirement after permanently lost user mappings."
+msgstr "Privileged retirement after permanently lost user mappings."
+
+msgid "Same trusted serialized management as close/join; never an untrusted wire action. The kernel decides when cleanup is authorized. First close/cancel and separately drive the real owner. Every retained exact cell must acquire SETTLED and the owner must be idle. The trusted drained proof then fences future gateway entries and joins all outer observers while retaining the role. Only then are all copied payloads wiped and cells retired without user copyout. Pending, quarantined or unjoined work retains every cell unchanged. Success is idempotent and permanently rejects dispatch. It does not release the role: successful join is still required before reclaiming any bound storage. No forced borrow revocation, process-liveness policy or provider service is supplied."
+msgstr "Same trusted serialized management as close/join; never an untrusted wire action. The kernel decides when cleanup is authorized. First close/cancel and separately drive the real owner. Every retained exact cell must acquire SETTLED and the owner must be idle. The trusted drained proof then fences future gateway entries and joins all outer observers while retaining the role. Only then are all copied payloads wiped and cells retired without user copyout. Pending, quarantined or unjoined work retains every cell unchanged. Success is idempotent and permanently rejects dispatch. It does not release the role: successful join is still required before reclaiming any bound storage. No forced borrow revocation, process-liveness policy or provider service is supplied."
+
+msgid "Join closed/consumed cells, owner and trusted gateway role."
+msgstr "Join closed/consumed cells, owner and trusted gateway role."
+
+msgid "Trusted serialized management. No reinitialization/reopen, hidden provider stop or identity registry is created. A successful join permits a fresh object with a larger claimed session; never reset or reconstruct this live object."
+msgstr "Trusted serialized management. No reinitialization/reopen, hidden provider stop or identity registry is created. A successful join permits a fresh object with a larger claimed session; never reset or reconstruct this live object."
+
+msgid "SUCCESS only after no gateway/copy, copied cell or owner publisher remains and the trusted role release proves outer gateway observers joined; BUSY/error retains role and storage."
+msgstr "SUCCESS only after no gateway/copy, copied cell or owner publisher remains and the trusted role release proves outer gateway observers joined; BUSY/error retains role and storage."
+
+msgid "Twelve scalar local C gateway words; no principal, address or callback."
+msgstr "Twelve scalar local C gateway words; no principal, address or callback."
+
+msgid "SUBMIT proposes the exact next nonzero 64-bit epoch for an explicit slot within the exact claimed nonzero session and supplies positive length plus an absolute deadline in the existing owner's clock domain. Other actions use the accepted exact epoch and zero length/deadline words. device must match the immutable trusted binding; reserved=0. Word pairs encode low then high halves, independently of the compiler enum, pointer and uint64_t alignment ABI. These are local C gateway records; an integrating kernel owns byte order and any transport serialization."
+msgstr "SUBMIT proposes the exact next nonzero 64-bit epoch for an explicit slot within the exact claimed nonzero session and supplies positive length plus an absolute deadline in the existing owner's clock domain. Other actions use the accepted exact epoch and zero length/deadline words. device must match the immutable trusted binding; reserved=0. Word pairs encode low then high halves, independently of the compiler enum, pointer and uint64_t alignment ABI. These are local C gateway records; an integrating kernel owns byte order and any transport serialization."
+
+msgid "Ten initialized scalar words; no privileged pointer."
+msgstr "Ten initialized scalar words; no privileged pointer."
+
+msgid "state is a Core nx_request_state_t value encoded as uint32_t. Only SETTLED has a final result/count; other results are BUSY with count zero. accepted=1 denotes the retained copied cell, including a terminal error when the existing owner rejects admission. No hardware effect follows from acceptance alone."
+msgstr "state is a Core nx_request_state_t value encoded as uint32_t. Only SETTLED has a final result/count; other results are BUSY with count zero. accepted=1 denotes the retained copied cell, including a terminal error when the existing owner rejects admission. No hardware effect follows from acceptance alone."
+
+msgid "user_io_async_storage.h"
+msgstr "user_io_async_storage.h"
+
+msgid "Trusted kernel assembly for exact copied UART user cells."
+msgstr "Trusted kernel assembly for exact copied UART user cells."
+
+msgid "Nominal copy permissions; actual access still requires trusted copy."
+msgstr "Nominal copy permissions; actual access still requires trusted copy."
+
+msgid "Cold construct one exact copied mediation over a real owner."
+msgstr "Cold construct one exact copied mediation over a real owner."
+
+msgid "Privileged unmasked Thread with owner idle and no concurrent users. Cold O(n squared) alias checks reject all known mutable cell/payload/control overlaps and user-RAM aliases. Admission checks fixed region extents and copies at most the selected exact payload budget; no queue or worker is added. Keep policy, cells, owner, provider and all contexts stable through permanent close, consumption and successful join. Pure cold checks precede a constructing reservation and the trusted role claim; no fallible step follows successful claim. Fresh objects require a larger externally claimed session; this object cannot be reconstructed to reset its epochs."
+msgstr "Privileged unmasked Thread with owner idle and no concurrent users. Cold O(n squared) alias checks reject all known mutable cell/payload/control overlaps and user-RAM aliases. Admission checks fixed region extents and copies at most the selected exact payload budget; no queue or worker is added. Keep policy, cells, owner, provider and all contexts stable through permanent close, consumption and successful join. Pure cold checks precede a constructing reservation and the trusted role claim; no fallible step follows successful claim. Fresh objects require a larger externally claimed session; this object cannot be reconstructed to reset its epochs."
+
+msgid "[out] Fresh zero privileged storage, initialized once."
+msgstr "[out] Fresh zero privileged storage, initialized once."
+
+msgid "[inout] Exact caller-owned cells/payloads, no maximum pool."
+msgstr "[inout] Exact caller-owned cells/payloads, no maximum pool."
+
+msgid "[in] Positive cell count representable in a scalar slot ID."
+msgstr "[in] Positive cell count representable in a scalar slot ID."
+
+msgid "[in] Immutable trusted principal/grant/copy/owner binding."
+msgstr "[in] Immutable trusted principal/grant/copy/owner binding."
+
+msgid "SUCCESS or INVALID/STATE/CONTEXT/BUSY/EXHAUSTED, or trusted claim error without new retained users or hardware effects; every rejected output remains unchanged."
+msgstr "SUCCESS or INVALID/STATE/CONTEXT/BUSY/EXHAUSTED, or trusted claim error without new retained users or hardware effects; every rejected output remains unchanged."
+
+msgid "Nominal actual user RAM; trusted copy still enforces real access."
+msgstr "Nominal actual user RAM; trusted copy still enforces real access."
+
+msgid "Bounded trusted kernel identity and fault-contained copies."
+msgstr "Bounded trusted kernel identity and fault-contained copies."
+
+msgid "identity authenticates the current entry, never user input. Copy operations guarantee complete checked CPU access and mapping/process lifetime for the callback duration. Neither success nor error retains a user address, kernel scratch pointer, mapping or observer after return. Errors may have partially copied bytes; the copied payload cell is wiped on rejection, and reply failure is recoverable through exact slot/epoch. No callback blocks, dispatches recursively, or substitutes a permission observation for fault-safe copying. Identity/copy callbacks may close this mediation. A new kernel/CMSE wrapper must actually establish these preconditions; this component does not.              claim is a trusted exclusive role authority for the actual              owner/controller binding. It rejects a second live role even              with a larger session, and rejects reused/non-increasing              nonzero sessions from persistent, nonwrapping history across              fresh storage, process/device reset and reconstruction.              Failed claim retains no reference/effect. Successful claim              permanently consumes that session and retains the exact role              until release. release SUCCESS proves outer gateway/transport observers joined and detaches all authority references; failure retains the original role unchanged. drained SUCCESS permanently fences future outer gateway entry and joins all gateway/transport observers, while the exact role remains claimed. Failed drained preserves the role and every cell unchanged. It must not modify bound configuration, cell identities or requests. Claim, release and drained are bounded and cannot recursively construct, dispatch, close, reap or join. Context/history must remain live; no source code implements this kernel authority, physical isolation, storage partition or recovery policy. Alternate wrappers of one controller are not distinct roles."
+msgstr "identity authenticates the current entry, never user input. Copy operations guarantee complete checked CPU access and mapping/process lifetime for the callback duration. Neither success nor error retains a user address, kernel scratch pointer, mapping or observer after return. Errors may have partially copied bytes; the copied payload cell is wiped on rejection, and reply failure is recoverable through exact slot/epoch. No callback blocks, dispatches recursively, or substitutes a permission observation for fault-safe copying. Identity/copy callbacks may close this mediation. A new kernel/CMSE wrapper must actually establish these preconditions; this component does not.              claim is a trusted exclusive role authority for the actual              owner/controller binding. It rejects a second live role even              with a larger session, and rejects reused/non-increasing              nonzero sessions from persistent, nonwrapping history across              fresh storage, process/device reset and reconstruction.              Failed claim retains no reference/effect. Successful claim              permanently consumes that session and retains the exact role              until release. release SUCCESS proves outer gateway/transport observers joined and detaches all authority references; failure retains the original role unchanged. drained SUCCESS permanently fences future outer gateway entry and joins all gateway/transport observers, while the exact role remains claimed. Failed drained preserves the role and every cell unchanged. It must not modify bound configuration, cell identities or requests. Claim, release and drained are bounded and cannot recursively construct, dispatch, close, reap or join. Context/history must remain live; no source code implements this kernel authority, physical isolation, storage partition or recovery policy. Alternate wrappers of one controller are not distinct roles."
+
+msgid "Immutable trusted one-principal/one-device/one-owner grant."
+msgstr "Immutable trusted one-principal/one-device/one-owner grant."
+
+msgid "This is kernel configuration, never copied from users. owner/executor/port must be the already constructed exact BusOwner + UARTOwner bridge, with no other direct producers or external request/payload observers. Completion callbacks are not installed. All callback contexts remain privileged; explicit extents cover their complete live controls. Guard, clock and wake contexts may be the same trusted object. The caller owns actual UART startup, hardware attribution, executor scheduling, clock/deadline domain and final stop."
+msgstr "This is kernel configuration, never copied from users. owner/executor/port must be the already constructed exact BusOwner + UARTOwner bridge, with no other direct producers or external request/payload observers. Completion callbacks are not installed. All callback contexts remain privileged; explicit extents cover their complete live controls. Guard, clock and wake contexts may be the same trusted object. The caller owns actual UART startup, hardware attribution, executor scheduling, clock/deadline domain and final stop."
+
+msgid "Exact privileged cell; initialize only data and capacity."
+msgstr "Exact privileged cell; initialize only data and capacity."
+
+msgid "All other fields start zero and are mechanism-private after construction. data is independent writable privileged RAM, capacity is its exact positive byte budget, at most UINT32_MAX. No user pointer is ever assigned here. Core identity epochs never wrap and survive consume/close; never copy or reset a live cell. UARTOwner borrows operation/payload until real provider final access, then user-result retention lasts until successful reply copy plus joined CONSUME, or trusted joined reap. Epoch history survives both paths."
+msgstr "All other fields start zero and are mechanism-private after construction. data is independent writable privileged RAM, capacity is its exact positive byte budget, at most UINT32_MAX. No user pointer is ever assigned here. Core identity epochs never wrap and survive consume/close; never copy or reset a live cell. UARTOwner borrows operation/payload until real provider final access, then user-result retention lasts until successful reply copy plus joined CONSUME, or trusted joined reap. Epoch history survives both paths."
+
+msgid "Caller-owned trusted control; initialize once, never reset epochs."
+msgstr "Caller-owned trusted control; initialize once, never reset epochs."
+
+msgid "i3c_controller.h"
+msgstr "i3c_controller.h"
+
+msgid "Explicit bounded I3C discovery, transfers and event ownership."
+msgstr "Explicit bounded I3C discovery, transfers and event ownership."
+
+msgid "Prepare unused metadata without retaining its payload."
+msgstr "Prepare unused metadata without retaining its payload."
+
+msgid "Serialized owner Thread. DISCOVER has no payload or target. PRIVATE permits 1..65535 bytes. CCC permits only ENEC/DISEC broadcast/direct writes and direct GETMWL/GETMRL/GETPID/ GETBCR/GETDCR/GETSTATUS reads, with exact defined lengths. GETMRL uses two bytes, or three when confirmed BCR bit2 advertises an IBI payload. Address-changing, HDR and controller-handoff CCCs reject. All APIs require one serialized executor. Port and clock callbacks must not reenter the core, invoke application code or mutate retained state. No ISR, allocation, OS lock or worker. Absolute deadlines use the injected clock."
+msgstr "Serialized owner Thread. DISCOVER has no payload or target. PRIVATE permits 1..65535 bytes. CCC permits only ENEC/DISEC broadcast/direct writes and direct GETMWL/GETMRL/GETPID/ GETBCR/GETDCR/GETSTATUS reads, with exact defined lengths. GETMRL uses two bytes, or three when confirmed BCR bit2 advertises an IBI payload. Address-changing, HDR and controller-handoff CCCs reject. All APIs require one serialized executor. Port and clock callbacks must not reenter the core, invoke application code or mutate retained state. No ISR, allocation, OS lock or worker. Absolute deadlines use the injected clock."
+
+msgid "Admit a finite operation after cold validation and readiness."
+msgstr "Admit a finite operation after cold validation and readiness."
+
+msgid "SUCCESS transfers the borrow. Rejection has no effects or retained references. Outputs cannot alias retained controller, port table, target/event storage, policy, request or payload. Port and clock context spans remain the caller's responsibility."
+msgstr "SUCCESS transfers the borrow. Rejection has no effects or retained references. Outputs cannot alias retained controller, port table, target/event storage, policy, request or payload. Port and clock context spans remain the caller's responsibility."
+
+msgid "Perform one bounded FIFO/event phase or one drain proof."
+msgstr "Perform one bounded FIFO/event phase or one drain proof."
+
+msgid "Partial DAA, malformed observations and errors fault admission while retaining every known/tentative assigned address. Cancel/timeout/failed drain never release a loan. Failed quiescence stays QUARANTINED; continued service may recover. An event overflow returns OVERFLOW and latches its counter, without discarding an already retained queued event."
+msgstr "Partial DAA, malformed observations and errors fault admission while retaining every known/tentative assigned address. Cancel/timeout/failed drain never release a loan. Failed quiescence stays QUARANTINED; continued service may recover. An event overflow returns OVERFLOW and latches its counter, without discarding an already retained queued event."
+
+msgid "Request withdrawal using stable epoch before request dereference."
+msgstr "Request withdrawal using stable epoch before request dereference."
+
+msgid "Obtain only a confirmed target; tentative/retired records reject."
+msgstr "Obtain only a confirmed target; tentative/retired records reject."
+
+msgid "Copy one retained event; EMPTY leaves output unchanged."
+msgstr "Copy one retained event; EMPTY leaves output unchanged."
+
+msgid "Copy saturating loss counters without clearing them."
+msgstr "Copy saturating loss counters without clearing them."
+
+msgid "Close admission without changing loans, target identities or events."
+msgstr "Close admission without changing loans, target identities or events."
+
+msgid "Prove a whole-bus reset before invalidating dynamic addresses."
+msgstr "Prove a whole-bus reset before invalidating dynamic addresses."
+
+msgid "Requires closed admission. Hardware proof covers real wire, FIFO and IRQ quiescence AND every target's dynamic address invalidated. Peripheral reset or FIFO flush alone is never this proof. Failure preserves all loans and address records. Success settles outstanding work and invalidates endpoints; retained events preserve their old epochs for the caller."
+msgstr "Requires closed admission. Hardware proof covers real wire, FIFO and IRQ quiescence AND every target's dynamic address invalidated. Peripheral reset or FIFO flush alone is never this proof. Failure preserves all loans and address records. Success settles outstanding work and invalidates endpoints; retained events preserve their old epochs for the caller."
+
+msgid "Reopen an idle unfaulted pause; faults require explicit bus reset."
+msgstr "Reopen an idle unfaulted pause; faults require explicit bus reset."
+
+msgid "Close, withdraw and finally relinquish the unique controller."
+msgstr "Close, withdraw and finally relinquish the unique controller."
+
+msgid "Active work or queued events return BUSY. Caller continues service, consumes events and retries. Assigned/tentative addresses or a fault return STATE until whole-bus reset proof invalidates them. Successful final wire/ FIFO/IRQ quiescence releases ownership, never reconstructing this object. Storage outlives copied endpoints and tickets."
+msgstr "Active work or queued events return BUSY. Caller continues service, consumes events and retries. Assigned/tentative addresses or a fault return STATE until whole-bus reset proof invalidates them. Successful final wire/ FIFO/IRQ quiescence releases ownership, never reconstructing this object. Storage outlives copied endpoints and tickets."
+
+msgid "Controller-bound confirmed target incarnation, never a factory ID."
+msgstr "Controller-bound confirmed target incarnation, never a factory ID."
+
+msgid "Stable operation identity; controller outlives all copied controls."
+msgstr "Stable operation identity; controller outlives all copied controls."
+
+msgid "Caller-owned finite operation; no implicit bus discovery."
+msgstr "Caller-owned finite operation; no implicit bus discovery."
+
+msgid "Initialize base once with nx_request_initialize. Accepted metadata and payload stay borrowed until acquire SETTLED. TX stays immutable; transferred counts bytes handed to the FIFO, not acknowledged target effects. No replay after errors. Public fields are immutable throughout an accepted borrow."
+msgstr "Initialize base once with nx_request_initialize. Accepted metadata and payload stay borrowed until acquire SETTLED. TX stays immutable; transferred counts bytes handed to the FIFO, not acknowledged target effects. No replay after errors. Public fields are immutable throughout an accepted borrow."
+
+msgid "Copied event; no callback, target creation or hidden work."
+msgstr "Copied event; no callback, target creation or hidden work."
+
+msgid "IBI endpoint retains its exact confirmed target epoch. Confirmed BCR bit1 must advertise IBI. Bit2 requires 1..4 payload bytes including MDB; otherwise zero data bytes. HOT_JOIN carries no endpoint and only requests explicit caller-controlled discovery. Payload is at most four bytes, as in the selected H563 reference; no timestamp claim."
+msgstr "IBI endpoint retains its exact confirmed target epoch. Confirmed BCR bit1 must advertise IBI. Bit2 requires 1..4 payload bytes including MDB; otherwise zero data bytes. HOT_JOIN carries no endpoint and only requests explicit caller-controlled discovery. Payload is at most four bytes, as in the selected H563 reference; no timestamp claim."
+
+msgid "Explicit loss accounting; counters saturate rather than wrap."
+msgstr "Explicit loss accounting; counters saturate rather than wrap."
+
+msgid "i3c_controller_storage.h"
+msgstr "i3c_controller_storage.h"
+
+msgid "Caller storage and aggregate I3C hardware boundary."
+msgstr "Caller storage and aggregate I3C hardware boundary."
+
+msgid "Bind unused zero storage and claim one controller."
+msgstr "Bind unused zero storage and claim one controller."
+
+msgid "Reject overlapping/unaligned/overflowing storage, duplicate PIDs/addresses, reserved I3C addresses and nonzero targets. The config value is copied and need not remain alive; its referenced storage and contexts remain live and separate from every request/payload/output. 48-bit PIDs are caller- authored, never selected by a factory. Positive event capacity and 1..8-byte service batches match this bounded SDR/IBI reference. No legacy I2C, DMA, HDR, target role, implicit discovery or hidden event worker."
+msgstr "Reject overlapping/unaligned/overflowing storage, duplicate PIDs/addresses, reserved I3C addresses and nonzero targets. The config value is copied and need not remain alive; its referenced storage and contexts remain live and separate from every request/payload/output. 48-bit PIDs are caller- authored, never selected by a factory. Positive event capacity and 1..8-byte service batches match this bounded SDR/IBI reference. No legacy I2C, DMA, HDR, target role, implicit discovery or hidden event worker."
+
+msgid "Authored immutable target policy, not runtime factory discovery."
+msgstr "Authored immutable target policy, not runtime factory discovery."
+
+msgid "Caller-owned target record, zero-initialized once."
+msgstr "Caller-owned target record, zero-initialized once."
+
+msgid "Core retains tentative and confirmed addresses on DAA error. Epoch never resets or wraps, including after bus reset."
+msgstr "Core retains tentative and confirmed addresses on DAA error. Epoch never resets or wraps, including after bus reset."
+
+msgid "Value command; begin copies it synchronously and retains no pointer."
+msgstr "Value command; begin copies it synchronously and retains no pointer."
+
+msgid "One bounded hardware observation and aggregate FIFO progress."
+msgstr "One bounded hardware observation and aggregate FIFO progress."
+
+msgid "No callback retains spans. tx/rx counts may not exceed the supplied capacities. DAA acknowledged confirms the preceding assignment BEFORE any next identity in this observation. A complete DAA with a tentative unacknowledged address is an error, never implicit success. Event data are fully copied."
+msgstr "No callback retains spans. tx/rx counts may not exceed the supplied capacities. DAA acknowledged confirms the preceding assignment BEFORE any next identity in this observation. A complete DAA with a tentative unacknowledged address is an error, never implicit success. Event data are fully copied."
+
+msgid "Synchronous bounded hardware leaves; no request forwarding."
+msgstr "Synchronous bounded hardware leaves; no request forwarding."
+
+msgid "begin and assign are infallible commands. pump reports later hardware failures and services at most the supplied batch capacities plus one IBI and one hot-join latch. No command or span is retained. No application code is called. withdraw requests abort. quiescent SUCCESS proves actual wire/FIFO/IRQ quiescence and all port observers detached."
+msgstr "begin and assign are infallible commands. pump reports later hardware failures and services at most the supplied batch capacities plus one IBI and one hot-join latch. No command or span is retained. No application code is called. withdraw requests abort. quiescent SUCCESS proves actual wire/FIFO/IRQ quiescence and all port observers detached."
+
+msgid "reset additionally proves EVERY target dynamic address invalidated. FIFO flush or controller reset alone cannot report SUCCESS. BUSY/IO/UNSUPPORTED proof retains loans and ownership. release follows successful final quiescence. The port context and supplied storage outlive observers."
+msgstr "reset additionally proves EVERY target dynamic address invalidated. FIFO flush or controller reset alone cannot report SUCCESS. BUSY/IO/UNSUPPORTED proof retains loans and ownership. release follows successful final quiescence. The port context and supplied storage outlive observers."
+
+msgid "All port/clock callbacks are non-reentrant: no core calls, application calls or mutation of retained core state. claim atomically acquires an exclusive controller and its IRQ/clock/pins. SUCCESS requires independently established proof that EVERY target dynamic address is invalidated, including targets still powered across MCU reset. The caller establishes this baseline before construction; claim never attempts an unproven reset. Rejection has no effects. ready is a read-only admission check."
+msgstr "All port/clock callbacks are non-reentrant: no core calls, application calls or mutation of retained core state. claim atomically acquires an exclusive controller and its IRQ/clock/pins. SUCCESS requires independently established proof that EVERY target dynamic address is invalidated, including targets still powered across MCU reset. The caller establishes this baseline before construction; claim never attempts an unproven reset. Rejection has no effects. ready is a read-only admission check."
+
+msgid "Exact caller capacities; separate static controller and target data."
+msgstr "Exact caller capacities; separate static controller and target data."
+
+msgid "Open the fixed AlarmA-copy delegate for the same concrete Stop2 owner."
+msgstr "Open the fixed AlarmA-copy delegate for the same concrete Stop2 owner."
+
+msgid "All ordinary initialization preconditions remain required. Unlike the WUT-only initializer, this explicitly delegates fixed AlarmA compare registers, ALRAE and ALRAF/CALRAF to the same serialized wake owner. ALRAIE and automatic flag clearing stay forbidden. The fixed profile masks all calendar fields and compares no subseconds, producing its first event on a seconds increment. Both alarm registers start zero. The delegate preserves the calendar/source and owns complete producer withdrawal before any compound copy settlement. No AlarmA factory, arbitrary alarm scheduler or second RTC writer is admitted."
+msgstr "All ordinary initialization preconditions remain required. Unlike the WUT-only initializer, this explicitly delegates fixed AlarmA compare registers, ALRAE and ALRAF/CALRAF to the same serialized wake owner. ALRAIE and automatic flag clearing stay forbidden. The fixed profile masks all calendar fields and compares no subseconds, producing its first event on a seconds increment. Both alarm registers start zero. The delegate preserves the calendar/source and owns complete producer withdrawal before any compound copy settlement. No AlarmA factory, arbitrary alarm scheduler or second RTC writer is admitted."
+
+msgid "[inout] Same fresh or fully stopped and joined storage."
+msgstr "[inout] Same fresh or fully stopped and joined storage."
+
+msgid "[in] Same immutable configuration with non-NULL wake_owner."
+msgstr "[in] Same immutable configuration with non-NULL wake_owner."
+
+msgid "[out] Separate writable face, unchanged on every rejection."
+msgstr "[out] Separate writable face, unchanged on every rejection."
+
+msgid "Same initialization results; no hardware writes occur."
+msgstr "Same initialization results; no hardware writes occur."
+
+msgid "Validate the exact opt-in AlarmA-copy owner and live clock generation."
+msgstr "Validate the exact opt-in AlarmA-copy owner and live clock generation."
+
+msgid "Same Thread/PRIMASK boundary as validate_wake. An ordinary WUT-only clock cannot authorize AlarmA. Wrong identity/generation/mode rejects without taint; observed source or fixed-profile drift taints the epoch."
+msgstr "Same Thread/PRIMASK boundary as validate_wake. An ordinary WUT-only clock cannot authorize AlarmA. Wrong identity/generation/mode rejects without taint; observed source or fixed-profile drift taints the epoch."
+
+msgid "[inout] Same live serialized clock owner."
+msgstr "[inout] Same live serialized clock owner."
+
+msgid "[in] Exact stable identity from opt-in initialization."
+msgstr "[in] Exact stable identity from opt-in initialization."
+
+msgid "[in] Nonzero generation obtained from a successful sample."
+msgstr "[in] Nonzero generation obtained from a successful sample."
+
+msgid "SUCCESS, INVALID, STATE or CONTEXT; no hardware writes occur."
+msgstr "SUCCESS, INVALID, STATE or CONTEXT; no hardware writes occur."
+
+msgid "stm32u575_lpdma_copy.h"
+msgstr "stm32u575_lpdma_copy.h"
+
+msgid "Exact U575 SRAM4 finite autonomous copy receiver."
+msgstr "Exact U575 SRAM4 finite autonomous copy receiver."
+
+msgid "Construct one serialized privileged Thread owner without MMIO writes."
+msgstr "Construct one serialized privileged Thread owner without MMIO writes."
+
+msgid "Exact STM32U575ZIT6Q TZEN0/MSIS4/MSIK4/equal buses/Range4 and selected SRAM4 only. LPDMA1EN/SRAM4EN and power/retention belong to selected startup; every channel and vector must initially be quiet. The run-gate owner keeps both gates and exclusive hardware configuration stable through stop and joins; no other LPDMA channel may start. This component owns only fixed sleep/autonomous bits and preserves unrelated RTC bits. SRAM4EN and power/retention preconditions belong to startup and the combined sleep owner. This component never repairs lost RAM by changing SRAM4PD/PDS and never disables the caller's SRAM4EN."
+msgstr "Exact STM32U575ZIT6Q TZEN0/MSIS4/MSIK4/equal buses/Range4 and selected SRAM4 only. LPDMA1EN/SRAM4EN and power/retention belong to selected startup; every channel and vector must initially be quiet. The run-gate owner keeps both gates and exclusive hardware configuration stable through stop and joins; no other LPDMA channel may start. This component owns only fixed sleep/autonomous bits and preserves unrelated RTC bits. SRAM4EN and power/retention preconditions belong to startup and the combined sleep owner. This component never repairs lost RAM by changing SRAM4PD/PDS and never disables the caller's SRAM4EN."
+
+msgid "[inout] Fresh zero or clean stopped and externally joined."
+msgstr "[inout] Fresh zero or clean stopped and externally joined."
+
+msgid "[in] Separate immutable clock/owner binding."
+msgstr "[in] Separate immutable clock/owner binding."
+
+msgid "[out] Separate writable immutable face, unchanged on failure."
+msgstr "[out] Separate writable immutable face, unchanged on failure."
+
+msgid "Prepare copied metadata in an unborrowed request, without MMIO."
+msgstr "Prepare copied metadata in an unborrowed request, without MMIO."
+
+msgid "Rejecting a span, alias, wrap or state leaves every request byte unchanged. Preparation does not borrow or write any buffer/workspace. Old Core TIM2 deadlines are never translated into this domain."
+msgstr "Rejecting a span, alias, wrap or state leaves every request byte unchanged. Preparation does not borrow or write any buffer/workspace. Old Core TIM2 deadlines are never translated into this domain."
+
+msgid "[inout] Initialized READY or consumed SETTLED, fully joined."
+msgstr "[inout] Initialized READY or consumed SETTLED, fully joined."
+
+msgid "[in] Separate successful retained clock sample."
+msgstr "[in] Separate successful retained clock sample."
+
+msgid "[in] Borrowed immutable bytes wholly inside nonsecure SRAM4."
+msgstr "[in] Borrowed immutable bytes wholly inside nonsecure SRAM4."
+
+msgid "[out] Separate borrowed writable SRAM4 span."
+msgstr "[out] Separate borrowed writable SRAM4 span."
+
+msgid "[in] At least two bytes; both full extents must fit SRAM4."
+msgstr "[in] At least two bytes; both full extents must fit SRAM4."
+
+msgid "[inout] Separate aligned 24-byte SRAM4 LLI workspace."
+msgstr "[inout] Separate aligned 24-byte SRAM4 LLI workspace."
+
+msgid "[in] Absolute microseconds in that domain, or NEVER."
+msgstr "[in] Absolute microseconds in that domain, or NEVER."
+
+msgid "Latch cancellation of the exact active identity without release."
+msgstr "Latch cancellation of the exact active identity without release."
+
+msgid "Late cancellation after observed channel completion rejects STATE. Cancellation before unobserved completion fixes the first failure. DMA drain alone cannot release an AlarmA/WUT/clock restoration loan."
+msgstr "Late cancellation after observed channel completion rejects STATE. Cancellation before unobserved completion fixes the first failure. DMA drain alone cannot release an AlarmA/WUT/clock restoration loan."
+
+msgid "[in] Immutable face of the initialized physical receiver."
+msgstr "[in] Immutable face of the initialized physical receiver."
+
+msgid "[inout] Exact active request, retained through SETTLED."
+msgstr "[inout] Exact active request, retained through SETTLED."
+
+msgid "Observe and perform bounded DMA withdrawal; never publish SETTLED."
+msgstr "Observe and perform bounded DMA withdrawal; never publish SETTLED."
+
+msgid "Positive finite per-phase observation budget, not a time estimate. BUSY retains request, both buffers and workspace, even after DMA idle. Only the concrete Stop2 owner can release after the entire RTC/IRQ/ DMA/clock/gate chain is restored. Unknown profile performs no DMA MMIO. An externally asserted LPDMA reset observed while borrowed leaves an uncertain loan permanently quarantined; reset-default IDLE cannot prove earlier master accesses joined. No software force release exists. Preserve incoming masks; while borrowed the concrete Stop2 boundary requires PRIMASK1, BASEPRI/FAULTMASK0 until complete recovery."
+msgstr "Positive finite per-phase observation budget, not a time estimate. BUSY retains request, both buffers and workspace, even after DMA idle. Only the concrete Stop2 owner can release after the entire RTC/IRQ/ DMA/clock/gate chain is restored. Unknown profile performs no DMA MMIO. An externally asserted LPDMA reset observed while borrowed leaves an uncertain loan permanently quarantined; reset-default IDLE cannot prove earlier master accesses joined. No software force release exists. Preserve incoming masks; while borrowed the concrete Stop2 boundary requires PRIMASK1, BASEPRI/FAULTMASK0 until complete recovery."
+
+msgid "[in] Positive observation budget for each drain phase."
+msgstr "[in] Positive observation budget for each drain phase."
+
+msgid "Close admission, retaining all live loans until compound recovery."
+msgstr "Close admission, retaining all live loans until compound recovery."
+
+msgid "Keep every related object alive and RUN admission closed on BUSY. Repeated clean stop is safe after external publishers have joined. No Stop2 residency, LPBAM peripheral, physical copy or HIL result is implied by the public type or successful software execution."
+msgstr "Keep every related object alive and RUN admission closed on BUSY. Repeated clean stop is safe after external publishers have joined. No Stop2 residency, LPBAM peripheral, physical copy or HIL result is implied by the public type or successful software execution."
+
+msgid "Exact physical implementation identity, not arbitrary callbacks."
+msgstr "Exact physical implementation identity, not arbitrary callbacks."
+
+msgid "Zero-initialized caller owner; never copy, reset or reconstruct live."
+msgstr "Zero-initialized caller owner; never copy, reset or reconstruct live."
+
+msgid "Keep this storage, every copied face and bound clock alive until stop succeeds and all external observers have joined. One exact ch0 owner exists; there is no allocation, queue, worker or factory lookup. One privileged Thread serializes every lifecycle/control operation. No ISR, concurrent producer or unjoined delayed cancellation command may use request pointers across prepare/reuse."
+msgstr "Keep this storage, every copied face and bound clock alive until stop succeeds and all external observers have joined. One exact ch0 owner exists; there is no allocation, queue, worker or factory lookup. One privileged Thread serializes every lifecycle/control operation. No ISR, concurrent producer or unjoined delayed cancellation command may use request pointers across prepare/reuse."
+
+msgid "One generated full next LLI; raw caller instructions are not used."
+msgstr "One generated full next LLI; raw caller instructions are not used."
+
+msgid "Entire 24-byte extent must be four-byte aligned in selected SRAM4. Provider overwrites all words only after admission. Keep it immutable and disjoint from both buffers and all request/control storage while borrowed. A NOINIT section never establishes descriptor construction."
+msgstr "Entire 24-byte extent must be four-byte aligned in selected SRAM4. Provider overwrites all words only after admission. Keep it immutable and disjoint from both buffers and all request/control storage while borrowed. A NOINIT section never establishes descriptor construction."
+
+msgid "Explicit same-owner clock binding; copied only on initialization."
+msgstr "Explicit same-owner clock binding; copied only on initialization."
+
+msgid "clock is the live opt-in AlarmA-copy retained clock. wake_owner is the stable concrete Stop2 owner identity. Identity equality is trusted assembly binding, never hardware authentication. No RTC writer exists in this component."
+msgstr "clock is the live opt-in AlarmA-copy retained clock. wake_owner is the stable concrete Stop2 owner identity. Identity equality is trusted assembly binding, never hardware authentication. No RTC writer exists in this component."
+
+msgid "One finite two-block copy in the independent retained time domain."
+msgstr "One finite two-block copy in the independent retained time domain."
+
+msgid "Initialize base before prepare. Prepared metadata is caller immutable from ACCEPTED until acquire-observed SETTLED and external joins. source/destination/whole workspace must be disjoint exact nonsecure SRAM4 spans, not CPU-visible SRAM1 or secure aliases. length is at least two bytes; byte-width incremented transfers preserve exact byte count."
+msgstr "Initialize base before prepare. Prepared metadata is caller immutable from ACCEPTED until acquire-observed SETTLED and external joins. source/destination/whole workspace must be disjoint exact nonsecure SRAM4 spans, not CPU-visible SRAM1 or secure aliases. length is at least two bytes; byte-width incremented transfers preserve exact byte count."
+
+msgid "Shared readonly methods; public service never releases the chain."
+msgstr "Shared readonly methods; public service never releases the chain."
+
+msgid "Immutable typed face; copied faces still name the exact live owner."
+msgstr "Immutable typed face; copied faces still name the exact live owner."
+
+msgid "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/MSIK4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/MSIK4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+msgstr "Exact STM32U575ZIT6Q TZEN0 baremetal only. Privileged MSP Thread, CONTROL=0, PRIMASK=1, BASEPRI=FAULTMASK=0. No scheduler may have started. Close RUN admission, stop Platform/System and join every producer, IRQ, DMA, observer and deadline user. Release leases only after real drain; pass the closed barrier when no consumers remain. Enrollment is never automatic. End Core TIM2 deadlines; TIM2 is not read or restarted. The independent RTC clock stays outside this RUN domain. Requires MSIS4/MSIK4/equal buses, quiet gates, all SRAM retained, caches/debug/MPU/SysTick/other IRQ and EXTI sources off. Reading SysTick CTRL consumes COUNTFLAG on rejection too. Exclusive RTC: bound calendar reader and this WUT writer. Boot supplies valid retained LSE calendar and DBP=1. Only WUT is written; WPR is unlocked then relocked each phase. Exclude NMI/HardFault, debugger, watchdogs, other masters and asynchronous configuration writers externally. Zero gates cannot prove those obligations. Binding is trusted assembly identity, never hardware authentication. WUTR=wake_ticks-1. First WUTF is between WUTR and WUTR+2 ticks. RTC samples resolve 3906.25us; short wakes may show zero elapsed. Retained max_gap_seconds must cover sleep, arm/drain execution and externally bounded wake latency. WFI has no CPU duration bound if hardware wake fails. A missed sample gap taints the independent clock epoch. wait_executed proves WFI ran, never physical residency. All returns preserve masks. Success requires observed WUT, IRQ and added gate withdrawal plus MSIS4/MSIK4/Range4 restore. Failed drain retains ownership. Keep admission closed and related objects alive; call recover before any restart. No failure revokes a loan. Restarting Platform creates a new TIM2 epoch; no old deadline survives that lifecycle. RTOS Tick compensation and LPBAM remain unsupported."
+
+msgid "stm32u575_stop2_copy.h"
+msgstr "stm32u575_stop2_copy.h"
+
+msgid "Exact same-owner U575 Stop2 finite SRAM4 copy boundary."
+msgstr "Exact same-owner U575 Stop2 finite SRAM4 copy boundary."
+
+msgid "Cross Stop2 with one finite AlarmA-triggered SRAM4 copy."
+msgstr "Cross Stop2 with one finite AlarmA-triggered SRAM4 copy."
+
+msgid "All masked-MSP-Thread and stopped/joined RUN preconditions of enter remain required. The clock uses the explicit AlarmA-copy initializer and this owner's wake identity. Selected startup provides nonsecure SRAM4 and prepared LPDMA1 access; unrelated channels and masters are quiet. The receiver validates the actual binding and registers. No caller callback or gate mask authorizes exceptions."
+msgstr "All masked-MSP-Thread and stopped/joined RUN preconditions of enter remain required. The clock uses the explicit AlarmA-copy initializer and this owner's wake identity. Selected startup provides nonsecure SRAM4 and prepared LPDMA1 access; unrelated channels and masters are quiet. The receiver validates the actual binding and registers. No caller callback or gate mask authorizes exceptions."
+
+msgid "All calendar mask bits are set; ALRMASSR=0, ALRAIE=0 and ALRAFCLR=0. The receiver is ready before ALRAE enables the next whole-second event on trigger14. ALRAF and DMA pending remain intact while the producer is enabled. WUT is an independent escape. The receiver owns its generated second LLI and LPDMA1 channel0 IRQ114 wake vector. wait_executed proves WFI, never physical residency."
+msgstr "All calendar mask bits are set; ALRMASSR=0, ALRAIE=0 and ALRAFCLR=0. The receiver is ready before ALRAE enables the next whole-second event on trigger14. ALRAF and DMA pending remain intact while the producer is enabled. WUT is an independent escape. The receiver owns its generated second LLI and LPDMA1 channel0 IRQ114 wake vector. wait_executed proves WFI, never physical residency."
+
+msgid "Rejection leaves the new request unborrowed. Once accepted, setup failure retains every copy reference until RTC/WUT producer, DMA master/reset, IRQ, gate and clock restoration are independently quiet. Keep both owners, clock, buffers, workspace and RUN barrier live and closed. Preserve PRIMASK=1 through retained recovery. recover retries the same compound chain without WFI. An observed external LPDMA reset permanently quarantines the chain: quiet reset values and deassertion cannot prove the prior master's final access. Only an externally established system reset ends that responsibility. A tainted clock may settle an error after hardware drain, never a successful fresh elapsed time. No old TIM2 deadline, RTOS compensation, peripheral LPBAM plan or physical copy result is established."
+msgstr "Rejection leaves the new request unborrowed. Once accepted, setup failure retains every copy reference until RTC/WUT producer, DMA master/reset, IRQ, gate and clock restoration are independently quiet. Keep both owners, clock, buffers, workspace and RUN barrier live and closed. Preserve PRIMASK=1 through retained recovery. recover retries the same compound chain without WFI. An observed external LPDMA reset permanently quarantines the chain: quiet reset values and deassertion cannot prove the prior master's final access. Only an externally established system reset ends that responsibility. A tainted clock may settle an error after hardware drain, never a successful fresh elapsed time. No old TIM2 deadline, RTOS compensation, peripheral LPBAM plan or physical copy result is established."
+
+msgid "Link only Nexus::U575Stop2Copy for this mode. It owns the same static RUN domain and WUT/recover symbols as Nexus::U575Stop2; linking both alternatives is rejected. WUT-only enter remains available, but rejects every retained copy loan. Keep PRIMASK=1 until complete recovery."
+msgstr "Link only Nexus::U575Stop2Copy for this mode. It owns the same static RUN domain and WUT/recover symbols as Nexus::U575Stop2; linking both alternatives is rejected. WUT-only enter remains available, but rejects every retained copy loan. Keep PRIMASK=1 until complete recovery."
+
+msgid "[in] Exact closed, drained RUN-domain barrier."
+msgstr "[in] Exact closed, drained RUN-domain barrier."
+
+msgid "[in] Immutable initialized LPDMA1/channel0 face."
+msgstr "[in] Immutable initialized LPDMA1/channel0 face."
+
+msgid "[inout] Prepared READY copy in the bound retained domain."
+msgstr "[inout] Prepared READY copy in the bound retained domain."
+
+msgid "[in] 4096..65536 RTC/16 ticks, nominal 2..32 s."
+msgstr "[in] 4096..65536 RTC/16 ticks, nominal 2..32 s."
+
+msgid "[in] Positive observation budget for each phase."
+msgstr "[in] Positive observation budget for each phase."
+
+msgid "Admission, transition, cleanup and retained effects."
+msgstr "Admission, transition, cleanup and retained effects."
+
+msgid "Separate copy admission and exact Stop2 transition observations."
+msgstr "Separate copy admission and exact Stop2 transition observations."
+
+msgid "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
+msgstr "accepted means the request, buffers and workspace became borrowed, including when later RTC/power setup fails. Read the final copy result and count only through acquire-observed request SETTLED. transition describes the boundary; dma_wake records observed ch0 NVIC pending."
+
+msgid "stm32u575_lpdma_lptim1.h"
+msgstr "stm32u575_lpdma_lptim1.h"
+
+msgid "Exact U575 finite LPTIM1 autonomous register update."
+msgstr "Exact U575 finite LPTIM1 autonomous register update."
+
+msgid "Bind one pure owner; no MMIO writes, allocation or worker."
+msgstr "Bind one pure owner; no MMIO writes, allocation or worker."
+
+msgid "Exact STM32U575ZIT6Q TZEN0, MSIS4/MSIK4/equal buses/Range4, caches off. Selected SRAM4/LPDMA1 startup and retained LSE RTC access remain live. LPDMA0 and the entire LPTIM1 controller are exclusive; no other channel, timer writer, IRQ user or external reset exists. Config/face/control storage must be separate. Rejection retains no new reference."
+msgstr "Exact STM32U575ZIT6Q TZEN0, MSIS4/MSIK4/equal buses/Range4, caches off. Selected SRAM4/LPDMA1 startup and retained LSE RTC access remain live. LPDMA0 and the entire LPTIM1 controller are exclusive; no other channel, timer writer, IRQ user or external reset exists. Config/face/control storage must be separate. Rejection retains no new reference."
+
+msgid "Explicitly prepare cold LPTIM1 access gates and LSE kernel."
+msgstr "Explicitly prepare cold LPTIM1 access gates and LSE kernel."
+
+msgid "Unmasked privileged Thread, positive per-phase poll budget. Owns only LPTIM1EN, LPTIM1SEL and added LSESYSEN, preserving RTC/LSE provenance. LPTIM1 must be reset/cold and initially unclocked with reset mux. A failed preparation can retain effects; keep owner live and call stop until it succeeds. It never starts the timer or borrows a request."
+msgstr "Unmasked privileged Thread, positive per-phase poll budget. Owns only LPTIM1EN, LPTIM1SEL and added LSESYSEN, preserving RTC/LSE provenance. LPTIM1 must be reset/cold and initially unclocked with reset mux. A failed preparation can retain effects; keep owner live and call stop until it succeeds. It never starts the timer or borrows a request."
+
+msgid "Prepare one SRAM4 tuple without borrowing or writing data/LLIs."
+msgstr "Prepare one SRAM4 tuple without borrowing or writing data/LLIs."
+
+msgid "Tuple contents remain unchanged from prepare through settlement. Invalid/aliased/wrapping spans leave every request byte unchanged. Deadline is absolute retained microseconds or NEVER; no TIM2 conversion."
+msgstr "Tuple contents remain unchanged from prepare through settlement. Invalid/aliased/wrapping spans leave every request byte unchanged. Deadline is absolute retained microseconds or NEVER; no TIM2 conversion."
+
+msgid "Request withdrawal without revoking any borrowed storage."
+msgstr "Request withdrawal without revoking any borrowed storage."
+
+msgid "Masked privileged MSP Thread through compound recovery. Late cancel after observed DMA completion rejects STATE. First failure persists."
+msgstr "Masked privileged MSP Thread through compound recovery. Late cancel after observed DMA completion rejects STATE. First failure persists."
+
+msgid "Bounded producer/master isolation, never independent settlement."
+msgstr "Bounded producer/master isolation, never independent settlement."
+
+msgid "Producer UEDE withdrawal precedes DMA suspend/reset/idle. All final peripheral/IRQ references and Stop2 restoration precede final release. Unknown clock/access profile permits no peripheral MMIO; external DMA or LPTIM reset during a loan permanently quarantines that loan."
+msgstr "Producer UEDE withdrawal precedes DMA suspend/reset/idle. All final peripheral/IRQ references and Stop2 restoration precede final release. Unknown clock/access profile permits no peripheral MMIO; external DMA or LPTIM reset during a loan permanently quarantines that loan."
+
+msgid "Close admission and restore owned start effects after compound join."
+msgstr "Close admission and restore owned start effects after compound join."
+
+msgid "Positive per-phase observation budget is not elapsed time. BUSY keeps all effects/storage alive; recover through the concrete Stop2 owner. A fresh final write-OK proof means synchronized register writes, never physical Stop2 residency, output playback, board routing or HIL."
+msgstr "Positive per-phase observation budget is not elapsed time. BUSY keeps all effects/storage alive; recover through the concrete Stop2 owner. A fresh final write-OK proof means synchronized register writes, never physical Stop2 residency, output playback, board routing or HIL."
+
+msgid "One caller-owned immutable register tuple, in exact SRAM4."
+msgstr "One caller-owned immutable register tuple, in exact SRAM4."
+
+msgid "CCR1 < ARR, RCR=0 and 1023<=ARR<=65535. There is exactly one tuple; repeated updates need a separate write-OK proof and are not admitted. No GPIO route or physical waveform playback is established."
+msgstr "CCR1 < ARR, RCR=0 and 1023<=ARR<=65535. There is exactly one tuple; repeated updates need a separate write-OK proof and are not admitted. No GPIO route or physical waveform playback is established."
+
+msgid "Exactly two generated continuation LLIs; never caller instructions."
+msgstr "Exactly two generated continuation LLIs; never caller instructions."
+
+msgid "Entire aligned 48-byte extent is separate nonsecure SRAM4. The owner writes all words only after ACCEPTED; keep immutable until SETTLED."
+msgstr "Entire aligned 48-byte extent is separate nonsecure SRAM4. The owner writes all words only after ACCEPTED; keep immutable until SETTLED."
+
+msgid "Zero caller storage, never copy/reset/reconstruct a live owner."
+msgstr "Zero caller storage, never copy/reset/reconstruct a live owner."
+
+msgid "One privileged Thread serializes all calls; no ISR/concurrent writer. Keep owner, clock and every face alive through stop and observer joins."
+msgstr "One privileged Thread serializes all calls; no ISR/concurrent writer. Keep owner, clock and every face alive through stop and observer joins."
+
+msgid "Explicit live retained-clock and same concrete Stop2 binding."
+msgstr "Explicit live retained-clock and same concrete Stop2 binding."
+
+msgid "Use the ordinary retained-clock initializer with wake_owner equal to nx_stm32u575_stop2_identity(). No AlarmA-copy opt-in is required."
+msgstr "Use the ordinary retained-clock initializer with wake_owner equal to nx_stm32u575_stop2_identity(). No AlarmA-copy opt-in is required."
+
+msgid "Prepared metadata; all fields are provider-controlled after prepare."
+msgstr "Prepared metadata; all fields are provider-controlled after prepare."
+
+msgid "Initialize base first. ACCEPTED borrows request, tuple and workspace until acquire-observed SETTLED and external joins. Cancel/deadline do not revoke a borrow. CPU control storage must be separate from SRAM4 data/LLIs. Never mutate or reprepare while borrowed."
+msgstr "Initialize base first. ACCEPTED borrows request, tuple and workspace until acquire-observed SETTLED and external joins. Cancel/deadline do not revoke a borrow. CPU control storage must be separate from SRAM4 data/LLIs. Never mutate or reprepare while borrowed."
+
+msgid "Shared immutable methods; service never publishes SETTLED."
+msgstr "Shared immutable methods; service never publishes SETTLED."
+
+msgid "Copied immutable faces retain the exact physical owner identity."
+msgstr "Copied immutable faces retain the exact physical owner identity."
+
+msgid "stm32u575_stop2_lptim1.h"
+msgstr "stm32u575_stop2_lptim1.h"
+
+msgid "Same concrete Stop2 owner and finite LPTIM1 LPBAM boundary."
+msgstr "Same concrete Stop2 owner and finite LPTIM1 LPBAM boundary."
+
+msgid "One finite hardware-requested LPTIM1 tuple across Stop2."
+msgstr "One finite hardware-requested LPTIM1 tuple across Stop2."
+
+msgid "Link only Nexus::U575Stop2Lptim1; WUT/copy alternatives are exclusive. Same static owner, RUN ClockDomain and recovery. Ordinary retained time uses this wake identity; explicitly start the dedicated receiver first. Closed/drained exact RUN barrier, stopped Platform, privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0 remain required. Keep masks and RUN admission closed through all retained recovery."
+msgstr "Link only Nexus::U575Stop2Lptim1; WUT/copy alternatives are exclusive. Same static owner, RUN ClockDomain and recovery. Ordinary retained time uses this wake identity; explicitly start the dedicated receiver first. Closed/drained exact RUN barrier, stopped Platform, privileged MSP Thread CONTROL0/PRIMASK1/BASEPRI0/FAULTMASK0 remain required. Keep masks and RUN admission closed through all retained recovery."
+
+msgid "LPTIM1 LSE/preload/CC1E, initial ARR1023/RCR0; request13/BREQ1 gates CCR1, two generated software-requested LLIs write RCR and ARR last. No AlarmA trigger. WUT escapes at 4096..65536 RTC/16 ticks. Positive poll_limit bounds observations, not WFI duration or physical response."
+msgstr "LPTIM1 LSE/preload/CC1E, initial ARR1023/RCR0; request13/BREQ1 gates CCR1, two generated software-requested LLIs write RCR and ARR last. No AlarmA trigger. WUT escapes at 4096..65536 RTC/16 ticks. Positive poll_limit bounds observations, not WFI duration or physical response."
+
+msgid "UEDE withdrawal/DIEROK precede DMA suspend/reset/idle and reference detach. Fresh write-OK gates success. Owned RCC reset disables LPTIM1 per ES0499. All peripheral/IRQ/gate/clock restoration precedes SETTLED; start access gates stay until joined public stop. Cancel/deadline never revoke storage. Unknown profile permits no peripheral MMIO. External peripheral reset permanently quarantines an active loan until system reset. Recovery never runs WFI. No GPIO/Board route, output playback, physical residency, timing/power or HIL result is implied."
+msgstr "UEDE withdrawal/DIEROK precede DMA suspend/reset/idle and reference detach. Fresh write-OK gates success. Owned RCC reset disables LPTIM1 per ES0499. All peripheral/IRQ/gate/clock restoration precedes SETTLED; start access gates stay until joined public stop. Cancel/deadline never revoke storage. Unknown profile permits no peripheral MMIO. External peripheral reset permanently quarantines an active loan until system reset. Recovery never runs WFI. No GPIO/Board route, output playback, physical residency, timing/power or HIL result is implied."
+
+msgid "Admission and software sleep observations, not the final result."
+msgstr "Admission and software sleep observations, not the final result."
+
+msgid "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
+msgstr "accepted borrows request/tuple/workspace even when setup later fails. dma_wake is pending IRQ114; wait_executed proves WFI execution only."
+
+msgid "Explicit optional H743 RGB565 copy and fixed PFC owner."
+msgstr "Explicit optional H743 RGB565 copy and fixed PFC owner."
+
+msgid "Exact source-to-RGB565 operations; unknown values are unsupported."
+msgstr "Exact source-to-RGB565 operations; unknown values are unsupported."
+
+msgid "RGB565 source and output; zero preserves the copy operation."
+msgstr "RGB565 source and output; zero preserves the copy operation."
+
+msgid "ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian MCU."
+msgstr "ARGB8888 to RGB565; input bytes B,G,R,A on this little-endian MCU."
+
+msgid "Alpha is discarded; no blending, channel/byte swap or CLUT load."
+msgstr "Alpha is discarded; no blending, channel/byte swap or CLUT load."
+
+msgid "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported. Offsets count each side's pixels (LOM=0), not bytes. CLUT/blending/other formats/IRQ are unsupported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
+msgstr "Privileged unmasked task, one serialized executor. Caller explicitly excludes every other DMA2D owner, including HAL, IRQ handlers and resource selections outside this component. Never change Cache/RCC/reset/MPU or clock domain before stop. All payloads must be wholly in AXI SRAM [0x24000000, 0x24080000); source/destination overlap is rejected. Only RGB565 M2M or fixed ARGB8888-to-RGB565 PFC is supported. Offsets count each side's pixels (LOM=0), not bytes. CLUT/blending/other formats/IRQ are unsupported. No pins, Board route, scheduler, queue or worker is created. Initialization IO errors retain cleanup ownership; call stop. A successful stop detaches every source then withdraws only its RCC gate. Repeated stop performs no hardware accesses."
+
+msgid "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. x/width_bytes are source bytes, not output bytes or pixels. Source address/x/width/stride align to 2 for RGB565 or 4 for ARGB8888. Destination is RGB565, aligned to 2 bytes. Destination row bytes are width_bytes/source_pixel_bytes*2; destination_stride/capacity are bytes. LOM=0 pixel gaps are at most 0x3fff on each side; width at most 0x3fff pixels, height at most 0xffff rows. Success reports output bytes, excluding stride padding, through nx_request_result. Destination cannot overlap a full-capacity source-pool slot. Every control is disjoint from every slot's full capacity. The selected source slot is immutable through final access. Task-only admission checks known pool extents in O(n)."
+msgstr "Initialize/prepare base using the ordinary request helpers. ACCEPTED borrows this object, the exact source loan control and destination span until acquire-observed SETTLED. Source loan ownership transfers to this owner on acceptance; it is released only after final DMA access. Rejection leaves the original loan with its caller. Do not separately release, mutate or reuse accepted controls, source or destination. x/width_bytes are source bytes, not output bytes or pixels. Source address/x/width/stride align to 2 for RGB565 or 4 for ARGB8888. Destination is RGB565, aligned to 2 bytes. Destination row bytes are width_bytes/source_pixel_bytes*2; destination_stride/capacity are bytes. LOM=0 pixel gaps are at most 0x3fff on each side; width at most 0x3fff pixels, height at most 0xffff rows. Success reports output bytes, excluding stride padding, through nx_request_result. Destination cannot overlap a full-capacity source-pool slot. Every control is disjoint from every slot's full capacity. The selected source slot is immutable through final access. Task-only admission checks known pool extents in O(n)."
+
+msgid "Submit SUCCESS means ACCEPTED, including a later setup/readback error. Accepted failures retain every borrow until service proves final drain. The first observed failure is retained across cancel/guard restoration."
+msgstr "Submit SUCCESS means ACCEPTED, including a later setup/readback error. Accepted failures retain every borrow until service proves final drain. The first observed failure is retained across cancel/guard restoration."
+
+msgid "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."
+msgstr "abort_observations bounds failed service observations before quarantine. It is a software progress budget, not a measured bus/DMA timing bound. The same executor continues service after recoverable quarantine; actual drain can settle it. Observed active RCC gate loss or reset assertion instead permanently retains all borrows. Restoring registers cannot prove that lost transfer history; no API reclaims it. An unobserved reset pulse is undetectable, so exclusive RCC ownership remains mandatory. System recovery is external."
+
+msgid "f407_i2s2_slave_tx.h"
+msgstr "f407_i2s2_slave_tx.h"
+
+msgid "Exact F407 finite stereo16 I2S2 slave transmitter."
+msgstr "Exact F407 finite stereo16 I2S2 slave transmitter."
+
+msgid "Fixed chip resource selected by the same validated hardware IR."
+msgstr "Fixed chip resource selected by the same validated hardware IR."
+
+msgid "Acquire the selected F407 SPI2 personality and fixed pads."
+msgstr "Acquire the selected F407 SPI2 personality and fixed pads."
+
+msgid "The caller owns the external master and holds CK idle LOW and WS HIGH continuously from before initialization/submission until acquire-observed ACTIVE. Pin reads sample instants; they cannot prove electrical silence. The master transmits exactly the declared complete frames and stops before a missing next word. Restart begins at the left channel. A prefilling cancellation with CK idle cannot empty DR; preserve QUARANTINED storage until coordinated drain clocks allow TXE then fresh BSY observations. This error drain can underrun and does not promise valid stereo audio or a complete transmitted frame; errors report zero transferred bytes. Timeout, TC or NDTR0 never proves wire completion or final access. The caller also supplies valid operating voltage, I/O levels, load, CK/WS/SD timing and DMA refill margin under DS8626. ACTIVE and pin samples do not measure or qualify those electrical/rate conditions."
+msgstr "The caller owns the external master and holds CK idle LOW and WS HIGH continuously from before initialization/submission until acquire-observed ACTIVE. Pin reads sample instants; they cannot prove electrical silence. The master transmits exactly the declared complete frames and stops before a missing next word. Restart begins at the left channel. A prefilling cancellation with CK idle cannot empty DR; preserve QUARANTINED storage until coordinated drain clocks allow TXE then fresh BSY observations. This error drain can underrun and does not promise valid stereo audio or a complete transmitted frame; errors report zero transferred bytes. Timeout, TC or NDTR0 never proves wire completion or final access. The caller also supplies valid operating voltage, I/O levels, load, CK/WS/SD timing and DMA refill margin under DS8626. ACTIVE and pin samples do not measure or qualify those electrical/rate conditions."
+
+msgid "One privileged unmasked task serializes every method and external owner lifecycle. Preserve incoming masks on all rejection paths. NMI/HardFault, other DMA/IRQ/pin owners, reset/reclock/debugger writers and concurrent Platform stop are excluded. Observed reset or clock-profile history loss while borrowed permanently retains the request; restoring reset-looking registers cannot establish prior final access. Main SRAM is DMA-visible; CCM is not. Chip pin capability establishes neither a PCB route nor codec/electrical HIL. The assembly and fixture supply the actual F407/package identity: shared device-group and density reads alone do not distinguish an F405 or authenticate the physical package."
+msgstr "One privileged unmasked task serializes every method and external owner lifecycle. Preserve incoming masks on all rejection paths. NMI/HardFault, other DMA/IRQ/pin owners, reset/reclock/debugger writers and concurrent Platform stop are excluded. Observed reset or clock-profile history loss while borrowed permanently retains the request; restoring reset-looking registers cannot establish prior final access. Main SRAM is DMA-visible; CCM is not. Chip pin capability establishes neither a PCB route nor codec/electrical HIL. The assembly and fixture supply the actual F407/package identity: shared device-group and density reads alone do not distinguish an F405 or authenticate the physical package."
+
+msgid "Exact F407VE/ZG, baremetal, HSE8/PLL168 and live TIM2 only. The normal hardware role exclusively claims SPI2/I2S2, PB12 WS/PB13 CK/PB15 SD AF5, DMA1 Stream4 channel0 and both vectors. No PLLI2S, continuous DBM or IRQ service is enabled. Peripheral/pad/SPI2 gate ownership lasts until stop SUCCESS, independently of each request's shorter frame loan. The selected cold-reset Platform separately holds the shared GPIOB/DMA1 gates. Initialization requires both already on; this provider never enables or withdraws them. Every shared domain user, including external HAL users, must join before Platform stop. Clock-gating is not proof of a reset engine; unknown running-state attachment is unsupported."
+msgstr "Exact F407VE/ZG, baremetal, HSE8/PLL168 and live TIM2 only. The normal hardware role exclusively claims SPI2/I2S2, PB12 WS/PB13 CK/PB15 SD AF5, DMA1 Stream4 channel0 and both vectors. No PLLI2S, continuous DBM or IRQ service is enabled. Peripheral/pad/SPI2 gate ownership lasts until stop SUCCESS, independently of each request's shorter frame loan. The selected cold-reset Platform separately holds the shared GPIOB/DMA1 gates. Initialization requires both already on; this provider never enables or withdraws them. Every shared domain user, including external HAL users, must join before Platform stop. Clock-gating is not proof of a reset engine; unknown running-state attachment is unsupported."
+
+msgid "[inout] Fresh zero storage, disjoint from all controls."
+msgstr "[inout] Fresh zero storage, disjoint from all controls."
+
+msgid "[in] Stable readonly {&nx_f407_i2s2_slave_tx_ops, storage}."
+msgstr "[in] Stable readonly {&nx_f407_i2s2_slave_tx_ops, storage}."
+
+msgid "[in] Fixed resource and observation budget."
+msgstr "[in] Fixed resource and observation budget."
+
+msgid "SUCCESS, INVALID, CONTEXT, BUSY, STATE, UNSUPPORTED or IO. Initialization IO retains cleanup responsibility; call stop before reuse."
+msgstr "SUCCESS, INVALID, CONTEXT, BUSY, STATE, UNSUPPORTED or IO. Initialization IO retains cleanup responsibility; call stop before reuse."
+
+msgid "Shared immutable methods; callbacks receive the storage context."
+msgstr "Shared immutable methods; callbacks receive the storage context."
+
+msgid "One complete contiguous interleaved stereo16 frame block."
+msgstr "One complete contiguous interleaved stereo16 frame block."
+
+msgid "Initialize and prepare base with the ordinary helpers. The source has one plane of contiguous nonempty rows, no offset or padding, and 4..131068 bytes in a multiple of four. Each frame stores left then right 16-bit little-endian samples. The fixed Philips I2S wire emits each sample MSB first in 16-bit slots. Sample values, rate, codec and external clocks are caller policy. Acceptance transfers the exact immutable source loan and borrows this request until acquire-observed SETTLED. Never separately release, mutate or reuse accepted storage. SUCCESS reports the whole block only after memory and wire completion. Every error or cancellation reports zero; the DMA count does not establish serialized audio bytes."
+msgstr "Initialize and prepare base with the ordinary helpers. The source has one plane of contiguous nonempty rows, no offset or padding, and 4..131068 bytes in a multiple of four. Each frame stores left then right 16-bit little-endian samples. The fixed Philips I2S wire emits each sample MSB first in 16-bit slots. Sample values, rate, codec and external clocks are caller policy. Acceptance transfers the exact immutable source loan and borrows this request until acquire-observed SETTLED. Never separately release, mutate or reuse accepted storage. SUCCESS reports the whole block only after memory and wire completion. Every error or cancellation reports zero; the DMA count does not establish serialized audio bytes."
+
+msgid "One privileged serialized task executor; no ISR callback."
+msgstr "One privileged serialized task executor; no ISR callback."
+
+msgid "submit SUCCESS means ACCEPTED, including subsequent setup failure. QUEUED is not armed. Acquire-observed ACTIVE alone authorizes the external master to begin CK, after one DR halfword and a live TIM2 interval have been observed. Error, cancellation or timeout retains the full loan until actual engine, serializer, vector and address withdrawal. service returns SUCCESS when idle or settled, otherwise BUSY or an observed failure with the borrow retained. stop closes further admission and requests cancellation; repeat it after service proves the remaining cleanup. The first SR observation occurs only after acceptance because reading SR clears UDR/FRE. Its fault remains latched through cleanup; a later clean status read cannot erase the operation's cause. No method allocates, starts a task or replays a block. Admission checks controls against every full-capacity pool slot in O(slot count); service/cancel do not scan the pool."
+msgstr "submit SUCCESS means ACCEPTED, including subsequent setup failure. QUEUED is not armed. Acquire-observed ACTIVE alone authorizes the external master to begin CK, after one DR halfword and a live TIM2 interval have been observed. Error, cancellation or timeout retains the full loan until actual engine, serializer, vector and address withdrawal. service returns SUCCESS when idle or settled, otherwise BUSY or an observed failure with the borrow retained. stop closes further admission and requests cancellation; repeat it after service proves the remaining cleanup. The first SR observation occurs only after acceptance because reading SR clears UDR/FRE. Its fault remains latched through cleanup; a later clean status read cannot erase the operation's cause. No method allocates, starts a task or replays a block. Admission checks controls against every full-capacity pool slot in O(slot count); service/cancel do not scan the pool."
+
+msgid "Immutable caller-owned face; private state is separate."
+msgstr "Immutable caller-owned face; private state is separate."
+
+msgid "Exact resource and positive bounded observation budget."
+msgstr "Exact resource and positive bounded observation budget."
+
+msgid "poll_limit bounds each arm/drain observation loop, not time or external-clock progress. Arming observes at least three actual 1 MHz TIM2 ticks after I2SE readback. Deadlines are absolute in the current live Platform TIM2 epoch. The caller stops and joins this owner before Platform stop/restart; the deadline includes wire and observer withdrawal. No automatic ClockDomain enrollment is implied."
+msgstr "poll_limit bounds each arm/drain observation loop, not time or external-clock progress. Arming observes at least three actual 1 MHz TIM2 ticks after I2SE readback. Deadlines are absolute in the current live Platform TIM2 epoch. The caller stops and joins this owner before Platform stop/restart; the deadline includes wire and observer withdrawal. No automatic ClockDomain enrollment is implied."
+
+msgid "Exact storage for one owner, zeroed once before publication."
+msgstr "Exact storage for one owner, zeroed once before publication."
+
+msgid "Do not copy or alter. Keep storage and face live through successful stop. Accepted request/source loans last until acquire-observed SETTLED; a failed stop never revokes an unfinished borrow."
+msgstr "Do not copy or alter. Keep storage and face live through successful stop. Accepted request/source loans last until acquire-observed SETTLED; a failed stop never revokes an unfinished borrow."

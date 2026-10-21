@@ -38,13 +38,13 @@ INSTANCE_FIELDS = {
 INSTANCE_FIELDS["eth_frames"] = set(INSTANCE_FIELDS["eth"])
 KINDS = set(INSTANCE_FIELDS)
 MEMORY_FIELDS = {"main_stack_bytes", "libc_heap_bytes", "static_ram_limit_bytes",
-                 "flash_load_limit_bytes", "regions"}
+                 "flash_load_limit_bytes", "regions", "mpu"}
 ENDPOINT_FIELDS = {"spi": {"controller", "driver", "cs_binding", "mode", "max_hz", "model_bytes"},
                    "i2c": {"controller", "driver", "address", "model_bytes"}}
 USB_ENDPOINT_FIELDS = {"controller", "number", "direction", "transfer",
                        "max_packet", "fifo_words"}
 TOP_REQUIRED = {"schema", "backend", "clock", "memory"}
-TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power"}
+TOP_OPTIONAL = {"board", "board_package", "optimization", "components", "layout", "abi", "os", "factory", "can_domain", "power", "i2s2"}
 
 
 
@@ -133,6 +133,9 @@ def normalize(data, path, root, fail, obj, integer, text):
     for field in ("abi", "optimization", "components", "os", "factory", "can_domain", "power"):
         if field in data:
             result[field] = data[field]
+    if "i2s2" in data:
+        result["i2s2"] = dict(obj(data["i2s2"], {"profile"}, (),
+                                   "I2S2 chip hardware role"))
     return result
 
 
@@ -231,6 +234,9 @@ def editor_schema():
     properties["power"] = record({"mode", "controllers"}, {"mode", "controllers"})
     properties["power"]["properties"]["mode"] = {"const": "fixed-run"}
     properties["power"]["properties"]["controllers"] = {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string"}, "uniqueItems": True}
+    properties["i2s2"] = record({"profile"}, {"profile"})
+    properties["i2s2"]["properties"]["profile"] = {
+        "const": "slave-tx-stereo16-pb12-pb13-pb15"}
     properties["components"] = {"type": "array", "items": {"type": "string"}, "uniqueItems": True}
     properties["abi"] = record({"arch", "fpu", "float_abi"}, {"arch", "fpu", "float_abi"})
     properties["memory"] = record(MEMORY_FIELDS, {"main_stack_bytes"})
@@ -240,6 +246,13 @@ def editor_schema():
     properties["memory"]["properties"]["regions"]["additionalProperties"][
         "properties"]["limit_bytes"] = {"type": "integer", "minimum": 4,
                                         "multipleOf": 4}
+    mpu_fields = {"privileged_flash_bytes", "user_flash_bytes",
+                  "syscall_flash_bytes", "privileged_ram_bytes",
+                  "user_ram_bytes"}
+    properties["memory"]["properties"]["mpu"] = record(mpu_fields, mpu_fields)
+    properties["memory"]["properties"]["mpu"]["properties"] = {
+        name: {"type": "integer", "minimum": 32, "maximum": 0xffffffff,
+               "multipleOf": 32} for name in sorted(mpu_fields)}
     properties["can_domain"] = record({"split", "filters"}, {"split", "filters"})
     filter_fields = {"controller", "bank", "id", "mask", "format", "fifo",
                      "remote", "match_remote"}

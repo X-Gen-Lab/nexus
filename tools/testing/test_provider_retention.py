@@ -1,6 +1,7 @@
 """Verify complete face-to-method retention independently of build success."""
 
 import struct
+from copy import deepcopy
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -139,6 +140,116 @@ def file_symbol_elf():
     for index, section in enumerate(sections):
         struct.pack_into("<10I", data, 0x300 + index * 40, *section)
     return data
+
+
+class ComponentPublicContractsTests(unittest.TestCase):
+    """Component faces use the same strict public and linked-byte contract."""
+
+    def tree(self, directory, *, tagged=False):
+        root = Path(directory)
+        base = root / "io/include/nexus/io/base.h"
+        header = root / "components/probe/include/nexus/components/probe.h"
+        source = root / "soc/reviewed/drivers/probe.c"
+        metadata = header.with_name("metadata.h")
+        face = ("struct nx_component_probe { const nx_component_probe_ops_t* ops; "
+                "void* context; };\n" if tagged else
+                "typedef struct { const nx_component_probe_ops_t* ops; "
+                "void* context; } nx_component_probe_t;\n")
+        for path, text in (
+                (base, "typedef struct { int (*ready)(void*); } nx_base_ops_t;\n"),
+                (header, "typedef struct { int (*start)(void*); "
+                 "int (*stop)(void*); } nx_component_probe_ops_t;\n" + face),
+                (metadata, "typedef unsigned int nx_component_metadata_t;\n"),
+                (source, "const nx_base_ops_t nx_base_ops = {0};\n"
+                 "const nx_component_probe_ops_t nx_component_probe_ops = {"
+                 ".start = real_start, .stop = real_stop};\n")):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        return root, header, source, metadata
+
+    def test_component_public_face_layout_provider_and_all_header_inputs(self):
+        from tools.evidence.common import file_identity
+        for tagged in (False, True):
+            with self.subTest(tagged=tagged), tempfile.TemporaryDirectory() as directory:
+                root, header, source, metadata = self.tree(directory, tagged=tagged)
+                faces, layouts, providers, inputs = source_contracts(root)
+                self.assertEqual(faces["nx_component_probe_t"],
+                                 "nx_component_probe_ops_t")
+                self.assertEqual(layouts["nx_component_probe_ops_t"], ["start", "stop"])
+                self.assertEqual(providers["nx_component_probe_ops"], {
+                    "type": "nx_component_probe_ops_t",
+                    "fields": {"start": "real_start", "stop": "real_stop"},
+                    "source": file_identity(source)})
+                self.assertIn(file_identity(header), inputs)
+                self.assertIn(file_identity(metadata), inputs)
+                metadata.write_text("typedef unsigned long nx_component_metadata_t;\n")
+                self.assertIn(file_identity(metadata), source_contracts(root)[3])
+
+    def test_actual_soc_component_operations_use_the_public_component_header(self):
+        from tools.evidence.common import file_identity
+        faces, layouts, providers, inputs = source_contracts()
+        self.assertEqual(faces["nx_stm32u575_lpdma_copy_t"],
+                         "nx_stm32u575_lpdma_copy_ops_t")
+        self.assertEqual(layouts["nx_stm32u575_lpdma_copy_ops_t"],
+                         ["cancel", "service", "stop"])
+        self.assertEqual(set(providers["nx_stm32u575_lpdma_copy_ops"]["fields"]),
+                         {"cancel", "service", "stop"})
+        root = Path(__file__).resolve().parents[2]
+        self.assertIn(file_identity(root / "components/stm32u575_lpdma_copy/include/"
+                                    "nexus/components/stm32u575_lpdma_copy.h"), inputs)
+
+    def test_duplicate_component_operations_and_face_types_are_rejected(self):
+        for declaration, message in (
+                ("typedef struct { int (*ready)(void*); } nx_base_ops_t;\n", "layout"),
+                ("typedef struct { const nx_component_probe_ops_t* ops; "
+                 "void* context; } nx_component_probe_t;\n", "duplicate public face")):
+            with self.subTest(message=message), tempfile.TemporaryDirectory() as directory:
+                root, header, _, _ = self.tree(directory)
+                header.with_name("duplicate.h").write_text(declaration)
+                with self.assertRaisesRegex(EvidenceError, message):
+                    source_contracts(root)
+
+    def test_component_operations_with_data_fields_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, header, _, _ = self.tree(directory)
+            header.write_text(header.read_text().replace(
+                "} nx_component_probe_ops_t;", "int state; } nx_component_probe_ops_t;"))
+            with self.assertRaisesRegex(EvidenceError, "public operations layout"):
+                source_contracts(root)
+
+    def test_unknown_component_provider_type_is_still_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, source, _ = self.tree(directory)
+            source.write_text(source.read_text().replace(
+                "nx_component_probe_ops_t nx_component_probe_ops",
+                "nx_unreviewed_ops_t nx_component_probe_ops"))
+            with self.assertRaisesRegex(EvidenceError, "unsupported concrete"):
+                source_contracts(root)
+
+    def test_component_linked_method_bytes_are_still_audited(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _, _ = self.tree(directory)
+            elf = image()
+            elf.defined_symbols[0]["name"] = "s_nx_face_component"
+            elf.defined_symbols[2].update(name="nx_component_probe_ops", size=8)
+            elf.defined_symbols[6]["name"] = "real_start"
+            elf.defined_symbols[7]["name"] = "real_stop"
+            struct.pack_into("<2I", elf.data, 16, 0x08002001, 0x08002011)
+            bindings = ("static const nx_component_probe_t s_nx_face_component = {"
+                        "&nx_component_probe_ops, &s_nx_port_bus};\n")
+            result = inspect_provider_retention(elf, bindings, root=root)
+            self.assertEqual(result["method_count"], 2)
+            self.assertEqual(result["tables"][0]["slots"], ["start", "stop"])
+            for pointer, message in ((0, "initialized method"),
+                                     (0x08002001, "another function")):
+                with self.subTest(pointer=pointer):
+                    struct.pack_into("<I", elf.data, 20, pointer)
+                    with self.assertRaisesRegex(EvidenceError, message):
+                        inspect_provider_retention(elf, bindings, root=root)
+            struct.pack_into("<I", elf.data, 20, 0x08002011)
+            elf.defined_symbols[2]["size"] = 12
+            with self.assertRaisesRegex(EvidenceError, "layout differs"):
+                inspect_provider_retention(elf, bindings, root=root)
 
 
 class ProviderRetentionTests(unittest.TestCase):
@@ -358,6 +469,282 @@ class ProviderRetentionTests(unittest.TestCase):
     def test_missing_generated_bindings_cannot_establish_empty_success(self):
         with self.assertRaisesRegex(EvidenceError, "no selected faces"):
             inspect_provider_retention(image(), "")
+
+
+def i2s2_image(*, generated=False):
+    """External caller objects and actual four-slot component ABI bytes."""
+    elf = image()
+    if not generated:
+        elf.defined_symbols = []
+    objects = [("application_tx", 0x08001090, 8, 0),
+               ("nx_f407_i2s2_slave_tx_ops", 0x08001080, 16, 0),
+               ("application_storage", 0x20000080, 88, 2)]
+    elf.defined_symbols.extend(
+        {"name": name, "value": value, "size": size, "section": section,
+         "type": 1, "binding": int(name.endswith("_ops"))}
+        for name, value, size, section in objects)
+    elf.defined_symbols.extend(
+        {"name": name, "value": 0x08002081 + index * 16, "size": 16,
+         "section": 1, "type": 2, "binding": 0, "file": "i2s2_slave_tx.c"}
+        for index, name in enumerate(("submit", "service", "cancel", "stop")))
+    struct.pack_into("<6I", elf.data, 0x80, 0x08002081, 0x08002091,
+                     0x080020a1, 0x080020b1, 0x08001080, 0x20000080)
+    resolved = {
+        "soc_family": "stm32f407", "part": "STM32F407VET6",
+        "backend": "baremetal", "clock_profile": "hse8-pll168",
+        "i2s2": {"profile": "slave-tx-stereo16-pb12-pb13-pb15",
+                 "part": "STM32F407VET6", "claims": [
+                     "controller:SPI2", "pin:PB12", "pin:PB13", "pin:PB15",
+                     "dma:DMA1:stream4:channel0", "irq:DMA1_Stream4",
+                     "irq:SPI2"]}}
+    return elf, resolved
+
+
+class I2s2ComponentRetentionTests(unittest.TestCase):
+    """An explicit role admits real caller faces, never empty success."""
+
+    def setUp(self):
+        self.elf, self.resolved = i2s2_image()
+
+    def symbol(self, name):
+        return next(symbol for symbol in self.elf.defined_symbols
+                    if symbol["name"] == name)
+
+    def inspect(self, bindings=""):
+        return inspect_provider_retention(self.elf, bindings,
+                                          resolved=self.resolved)
+
+    def rejected(self, bindings=""):
+        with self.assertRaises(EvidenceError):
+            self.inspect(bindings)
+
+    def test_exact_role_audits_caller_face_table_and_all_four_methods(self):
+        report = self.inspect()
+        self.assertEqual((report["face_count"],
+                          report["operations_table_count"],
+                          report["method_count"]), (1, 1, 4))
+        face = report["faces"][0]
+        self.assertEqual(face["origin"], "caller_owned_component")
+        self.assertEqual(face["name"], "application_tx")
+        self.assertEqual(face["context"], "application_storage")
+        self.assertEqual(face["context_bytes"], 88)
+        self.assertEqual(report["tables"][0]["slots"],
+                         ["submit", "service", "cancel", "stop"])
+        self.assertEqual(report["tables"][0]["null_methods"], 0)
+        self.assertEqual(report["physical_status"], "not_executed")
+
+    def test_role_must_equal_the_exact_validated_typed_ir(self):
+        original = deepcopy(self.resolved)
+        mutations = [lambda r: r.pop("i2s2"),
+                     lambda r: r.update(i2s2=None),
+                     lambda r: r["i2s2"].update(extra=True),
+                     lambda r: r["i2s2"].update(claims=[]),
+                     lambda r: r["i2s2"].update(part="STM32F407ZGT6"),
+                     lambda r: r["i2s2"].update(profile="another-profile"),
+                     lambda r: r.update(soc_family="stm32h743"),
+                     lambda r: r.update(backend="freertos"),
+                     lambda r: r.update(clock_profile="hsi16")]
+        for index, mutate in enumerate(mutations):
+            with self.subTest(index=index):
+                self.resolved = deepcopy(original)
+                mutate(self.resolved)
+                self.rejected()
+
+    def test_zg_uses_its_matching_role_and_absent_role_keeps_legacy_scope(self):
+        self.resolved["part"] = "STM32F407ZGT6"
+        self.resolved["i2s2"]["part"] = "STM32F407ZGT6"
+        self.assertEqual(self.inspect()["method_count"], 4)
+        with self.assertRaisesRegex(EvidenceError, "no selected faces"):
+            inspect_provider_retention(self.elf, "")
+        self.assertNotIn("origin", inspect_provider_retention(
+            image(), BINDINGS)["faces"][0])
+
+    def test_selected_role_cannot_certify_missing_or_corrupt_caller_face(self):
+        self.symbol("application_tx")["size"] = 0
+        self.rejected()
+        self.symbol("application_tx")["size"] = 8
+        struct.pack_into("<I", self.elf.data, 0x90, 0x08001084)
+        self.rejected()
+
+    def test_readonly_ops_reference_does_not_substitute_for_a_caller_face(self):
+        self.elf.defined_symbols.append({
+            "name": "application_ops_reference", "value": 0x080010a0,
+            "size": 4, "section": 0, "type": 1, "binding": 0})
+        struct.pack_into("<I", self.elf.data, 0xa0, 0x08001080)
+        report = self.inspect()
+        self.assertEqual(report["face_count"], 1)
+        self.assertEqual(report["faces"][0]["name"], "application_tx")
+        self.assertEqual(report["method_count"], 4)
+
+    def test_caller_face_requires_complete_readonly_loaded_object_bytes(self):
+        for field, value in (("binding", 2), ("size", 12)):
+            with self.subTest(field=field):
+                self.elf, _ = i2s2_image()
+                self.symbol("application_tx")[field] = value
+                self.rejected()
+        self.elf, _ = i2s2_image()
+        self.elf.sections[0]["flags"] = 3
+        self.elf.loads[0]["flags"] = 6
+        self.rejected()
+        self.elf, _ = i2s2_image()
+        self.elf.loads[0]["files"] = 0x94
+        self.rejected()
+
+    def test_context_needs_one_exact_public_storage_extent_and_alignment(self):
+        for field, value in (("binding", 2), ("size", 80),
+                             ("size", 96), ("value", 0x20000084)):
+            with self.subTest(field=field, value=value):
+                self.elf, _ = i2s2_image()
+                self.symbol("application_storage")[field] = value
+                struct.pack_into("<I", self.elf.data, 0x94,
+                                 self.symbol("application_storage")["value"])
+                self.rejected()
+        self.elf, _ = i2s2_image()
+        self.elf.defined_symbols.append(dict(
+            self.symbol("application_storage"), name="storage_alias"))
+        self.rejected()
+
+    def test_readonly_face_and_operations_need_arm_pointer_alignment(self):
+        self.symbol("application_tx")["value"] += 1
+        struct.pack_into("<2I", self.elf.data, 0x91,
+                         0x08001080, 0x20000080)
+        self.rejected()
+        self.elf, _ = i2s2_image()
+        self.symbol("nx_f407_i2s2_slave_tx_ops")["value"] = 0x08001061
+        struct.pack_into("<4I", self.elf.data, 0x61, 0x08002081,
+                         0x08002091, 0x080020a1, 0x080020b1)
+        struct.pack_into("<I", self.elf.data, 0x90, 0x08001061)
+        self.rejected()
+
+    def test_reordered_public_slots_cannot_expand_the_component_abi(self):
+        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                    "f407_i2s2_slave_tx.h")
+        source = (Path(__file__).resolve().parents[2] / relative).read_text()
+        source = source.replace("(*submit)", "(*temporary)").replace(
+            "(*service)", "(*submit)").replace("(*temporary)", "(*service)")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            header = root / relative
+            header.parent.mkdir(parents=True)
+            header.write_text(source)
+            provider = root / "soc/stm32f407/drivers/i2s2_slave_tx.c"
+            provider.parent.mkdir(parents=True)
+            provider.write_text(
+                "const nx_f407_i2s2_slave_tx_ops_t "
+                "nx_f407_i2s2_slave_tx_ops = { .submit = submit, "
+                ".service = service, .cancel = cancel, .stop = stop };\n")
+            struct.pack_into("<2I", self.elf.data, 0x80,
+                             0x08002091, 0x08002081)
+            with self.assertRaises(EvidenceError):
+                inspect_provider_retention(self.elf, "", root=root,
+                                            resolved=self.resolved)
+
+    def test_context_must_be_writable_nonexecuting_and_fully_loaded(self):
+        for section_flags, load_flags, memory in ((2, 4, 256),
+                                                 (7, 7, 256), (3, 6, 160)):
+            with self.subTest(flags=section_flags, memory=memory):
+                self.elf, _ = i2s2_image()
+                self.elf.sections[2]["flags"] = section_flags
+                self.elf.loads[2].update(flags=load_flags, memory=memory)
+                self.rejected()
+
+    def test_executable_load_cannot_overlap_only_the_storage_interior(self):
+        self.elf.loads.append({
+            "offset": 256, "virtual": 0x20000088, "physical": 0x20000088,
+            "files": 16, "memory": 16, "flags": 5})
+        self.rejected()
+
+    def test_storage_size_follows_the_public_32bit_union_contract(self):
+        from tools.measurement.retention import i2s2_storage_contract
+        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                    "f407_i2s2_slave_tx.h")
+        source = (Path(__file__).resolve().parents[2] / relative).read_text()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / relative
+            path.parent.mkdir(parents=True)
+            path.write_text(source.replace("STORAGE_BYTES 88U",
+                                           "STORAGE_BYTES 96U"))
+            self.assertEqual(i2s2_storage_contract(Path(directory))[0], 96)
+
+    def test_redefined_or_changed_public_storage_contract_is_rejected(self):
+        from tools.measurement.retention import i2s2_storage_contract
+        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+                    "f407_i2s2_slave_tx.h")
+        source = (Path(__file__).resolve().parents[2] / relative).read_text()
+        changes = [source.replace("typedef union {",
+                                  "#undef NX_F407_I2S2_SLAVE_TX_STORAGE_BYTES\n"
+                                  "#define NX_F407_I2S2_SLAVE_TX_"
+                                  "STORAGE_BYTES 96U\n"
+                                  "typedef union {"),
+                   source.replace("uint64_t alignment;", "uint32_t alignment;")]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / relative
+            path.parent.mkdir(parents=True)
+            for index, changed in enumerate(changes):
+                with self.subTest(index=index):
+                    path.write_text(changed)
+                    with self.assertRaises(EvidenceError):
+                        i2s2_storage_contract(Path(directory))
+
+    def test_missing_weak_non_thumb_or_counterfeit_methods_are_rejected(self):
+        for pointer in (0, 0x08002080, 0x08002091):
+            with self.subTest(pointer=pointer):
+                self.elf, _ = i2s2_image()
+                struct.pack_into("<I", self.elf.data, 0x80, pointer)
+                self.rejected()
+        for field, value in (("binding", 2), ("binding", 1),
+                             ("file", "another_provider.c")):
+            with self.subTest(field=field):
+                self.elf, _ = i2s2_image()
+                self.symbol("submit")[field] = value
+                self.rejected()
+
+    def test_two_caller_faces_share_only_the_operations_table(self):
+        self.elf.sections[2]["size"] = 512
+        self.elf.loads[2]["memory"] = 512
+        self.elf.defined_symbols.extend([
+            dict(self.symbol("application_tx"), name="second_tx",
+                 value=0x080010a0),
+            dict(self.symbol("application_storage"), name="second_storage",
+                 value=0x20000100)])
+        struct.pack_into("<2I", self.elf.data, 0xa0, 0x08001080, 0x20000100)
+        report = self.inspect()
+        self.assertEqual((report["face_count"],
+                          report["operations_table_count"],
+                          report["method_count"]), (2, 1, 4))
+        for address in (0x20000080, 0x200000a0):
+            with self.subTest(address=address):
+                self.symbol("second_storage")["value"] = address
+                struct.pack_into("<I", self.elf.data, 0xa4, address)
+                self.rejected()
+
+    def test_mixed_generated_faces_keep_their_existing_pointer_audit(self):
+        self.elf, _ = i2s2_image(generated=True)
+        self.assertEqual(self.inspect(BINDINGS)["face_count"], 3)
+        struct.pack_into("<I", self.elf.data, 4, 0x20000020)
+        with self.assertRaisesRegex(EvidenceError, "context pointer"):
+            self.inspect(BINDINGS)
+
+    def test_resolved_file_entrypoint_runs_the_same_component_audit(self):
+        from unittest.mock import patch
+        from tools.measurement import retention
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            elf_path, bindings_path = root / "image.elf", root / "bindings.c"
+            elf_path.write_bytes(self.elf.data)
+            bindings_path.write_text("/* No generated factory faces. */\n")
+            with patch.object(retention, "Elf32", return_value=self.elf), \
+                    patch.object(retention, "resolved_identity",
+                                 return_value=(self.resolved, {})), \
+                    patch.object(retention, "resolved_float_abi",
+                                 return_value="hard"), \
+                    patch.object(retention, "resolved_input_files",
+                                 return_value=[]), \
+                    patch.object(retention, "validate_elf_configuration"):
+                report = retention.inspect_files(
+                    elf_path, bindings_path,
+                    resolved_path=root / "resolved.json")
+        self.assertEqual(report["method_count"], 4)
 
 
 class ArrayContextTests(unittest.TestCase):
@@ -608,6 +995,356 @@ static const nx_pwm_port_t s_nx_face_right = {
                 reference_layout(root, '#include "shared_ref.h"\n',
                                  'nx_test_ref_t')
 
+
+def mpu_gpio_image():
+    """External ELF bytes for the selected five-domain normal firmware ABI."""
+    data = bytearray(0x8000)
+    flash, ram, svc, user = 0x08000000, 0x20000000, 0x08006000, 0x08006100
+    sections = [
+        {"name": ".text", "kind": 1, "flags": 6, "address": flash,
+         "offset": 0, "size": 0x6000},
+        {"name": ".syscalls", "kind": 1, "flags": 6, "address": svc,
+         "offset": 0x6000, "size": 46},
+        {"name": ".user_text", "kind": 1, "flags": 6, "address": user,
+         "offset": 0x6100, "size": 64},
+        {"name": ".data", "kind": 1, "flags": 3, "address": ram,
+         "offset": 0x7000, "size": 284},
+        {"name": ".bss", "kind": 8, "flags": 3, "address": ram + 0x200,
+         "offset": 0x7200, "size": 0x1000},
+        {"name": ".nx_mpu_user_data", "kind": 1, "flags": 3,
+         "address": ram + 0x2000, "offset": 0x7400, "size": 32},
+        {"name": ".nx_mpu_user_bss", "kind": 8, "flags": 3,
+         "address": ram + 0x2020, "offset": 0x7500, "size": 1024},
+    ]
+    elf = SimpleNamespace(data=data, sections=sections, defined_symbols=[],
+                          entry=flash + 0x301, loads=[])
+    for section in sections:
+        elf.loads.append({"virtual": section["address"],
+                          "physical": (flash + 0x5000 if section["name"] == ".data"
+                                       else flash + 0x5200 if section["name"] ==
+                                       ".nx_mpu_user_data" else section["address"]),
+                          "offset": section["offset"],
+                          "files": 0 if section["kind"] == 8 else section["size"],
+                          "memory": section["size"],
+                          "flags": 6 if section["flags"] & 1 else 5})
+    def symbol(name, address, size=0, section=0xfff1, kind=0, binding=1,
+               file=None):
+        value = {"name": name, "value": address, "size": size,
+                 "section": section, "type": kind, "binding": binding,
+                 "file": file}
+        elf.defined_symbols.append(value)
+        return value
+    def function(name, address, body=b'\x70\x47', section=0, binding=1,
+                 file=None):
+        symbol(name, address | 1, len(body), section, 2, binding, file)
+        offset = sections[section]["offset"] + address - sections[section]["address"]
+        data[offset:offset + len(body)] = body
+    def wide_branch(address, target, link=False):
+        displacement = (target - address - 4) & 0x1ffffff
+        sign = displacement >> 24
+        first = 0xf000 | sign << 10 | (displacement >> 12 & 0x3ff)
+        second = ((0xd000 if link else 0x9000) |
+                  ((~(displacement >> 23 ^ sign) & 1) << 13) |
+                  ((~(displacement >> 22 ^ sign) & 1) << 11) |
+                  (displacement >> 1 & 0x7ff))
+        return struct.pack('<HH', first, second)
+    domains = {"privileged_flash": (flash, svc),
+               "syscall_flash": (svc, user),
+               "user_flash": (user, user + 0x400),
+               "privileged_ram": (ram, ram + 0x2000),
+               "user_ram": (ram + 0x2000, ram + 0x2800)}
+    for name, (start, end) in domains.items():
+        symbol('__nexus_' + name + '_start__', start)
+        symbol('__nexus_' + name + '_end__', end)
+    for name, domain in (("privileged_functions", "privileged_flash"),
+                         ("syscalls_flash", "syscall_flash"),
+                         ("unprivileged_flash", "user_flash"),
+                         ("privileged_sram", "privileged_ram")):
+        symbol('__' + name + '_start__', domains[domain][0])
+        symbol('__' + name + '_end__', domains[domain][1] - 1)
+    symbol('__nexus_mpu_gpio_task_size', 864)
+    symbol('__nexus_mpu_gpio_control_size', 24)
+    for name, address in (("__nx_mpu_user_data_start", ram + 0x2000),
+                          ("__nx_mpu_user_data_end", ram + 0x2020),
+                          ("__nx_mpu_user_data_load", flash + 0x5200),
+                          ("__nx_mpu_user_bss_start", ram + 0x2020),
+                          ("__nx_mpu_user_bss_end", ram + 0x2420),
+                          ("_estack", ram + 0x2000)):
+        symbol(name, address)
+    for name, address, size, section in (
+            ("nx_freertos_mpu_gpio_binding", flash + 0x100, 12, 0),
+            ("grant", flash + 0x110, 12, 0),
+            ("nx_binding_led", flash + 0x120, 4, 0),
+            ("s_nx_face_led", flash + 0x124, 8, 0),
+            ("nx_stm32u575_gpio_ops", flash + 0x12c, 12, 0),
+            ("control", ram + 0x200, 24, 4),
+            ("task", ram + 0x218, 864, 4),
+            ("s_nx_port_led", ram + 0x600, 12, 4),
+            ("uxSystemCallImplementations", ram, 284, 3)):
+        symbol(name, address, size, section, 1)
+    struct.pack_into('<3I', data, 0x100, ram + 0x200, ram + 0x218,
+                     flash + 0x110)
+    struct.pack_into('<3I', data, 0x110, flash + 0x120, 0, 128)
+    struct.pack_into('<6I', data, 0x120, flash + 0x124,
+                     flash + 0x12c, ram + 0x600,
+                     flash + 0x201, flash + 0x211, flash + 0x221)
+    for index, name in enumerate(("write", "read", "toggle")):
+        function(name, flash + 0x200 + 16 * index, binding=0, file='gpio.c')
+    required = ('nx_freertos_mpu_gpio_open', 'nx_freertos_mpu_gpio_close',
+                'nx_freertos_mpu_gpio_join', 'nx_freertos_mpu_gpio_write',
+                'nx_freertos_mpu_task_start', 'nx_freertos_mpu_task_delete',
+                'nx_freertos_mpu_layout', 'nx_stm32u575_gpio_mpu_validate',
+                'nx_factory_gpio', 'nx_gpio_port_write',
+                'nx_stm32u575_mpu_user_initialize',
+                'nx_stm32u575_validate_identity', 'nx_arch_irq_save',
+                'nx_arch_dsb', 'nx_arch_isb',
+                'MPU_vTaskDelayImpl', 'MPU_xTaskGetTickCountImpl',
+                'MPU_NexusGpioWriteImpl', 'vSystemCallEnter', 'vSystemCallExit',
+                'xTaskGetCurrentTaskHandle', 'xTaskCreateRestrictedStatic',
+                'vTaskDelete')
+    for index, name in enumerate(required):
+        function(name, flash + 0x400 + 4 * index)
+    addresses = {s['name']: s['value'] & ~1 for s in elf.defined_symbols
+                 if s['type'] == 2}
+    veneers = (("nx_freertos_user_delay", "MPU_vTaskDelay", 6),
+               ("nx_freertos_user_ticks", "MPU_xTaskGetTickCount", 13),
+               ("nx_freertos_user_gpio_write", "MPU_NexusGpioWrite", 70))
+    for index, (wrapper, veneer, slot) in enumerate(veneers):
+        va = svc + 20 * index
+        if index < 2:
+            body = bytes.fromhex('01b4eff3148010f0010f01bc01d1')
+            body += wide_branch(va + 14, addresses[veneer + 'Impl'])
+            body += struct.pack('<H', 0xdf00 | slot)
+        else:
+            body = bytes.fromhex('46df0e207047')
+        function(veneer, va, body, 1)
+        function(wrapper, user + 4 * index,
+                 wide_branch(user + 4 * index, va), 2)
+        struct.pack_into('<I', data, 0x7000 + 4 * slot,
+                         addresses[veneer + 'Impl'] | 1)
+    # Actual normal startup shape: stack setup; SystemInit before primary RAM;
+    # identity success guard; masked park on failure; then user initializer.
+    reset, system, boot = flash + 0x300, flash + 0x800, flash + 0x900
+    function('Reset_Handler', reset, bytes.fromhex('dff834d0') +
+             wide_branch(reset + 4, system, True) + bytes.fromhex('00217047'),
+             binding=2)
+    struct.pack_into('<I', data, 0x338, ram + 0x2000)
+    struct.pack_into('<2I', data, 0, ram + 0x2000, reset | 1)
+    body = bytearray.fromhex(
+        '10b5124cd4f8883043f47003c4f88830'
+        '0000000000000000'
+        '4ff00063a360e2680b4b22f4e0621204120c1343e360'
+        '000000000000000000000000'
+        '10b100000000fee7000000000028f8d010bd'
+        '00ed00e00003fa05')
+    for offset, target in ((16, addresses['nx_arch_dsb']),
+                           (20, addresses['nx_arch_isb']),
+                           (46, addresses['nx_arch_dsb']),
+                           (50, addresses['nx_arch_isb']),
+                           (54, addresses['nx_stm32u575_validate_identity']),
+                           (60, addresses['nx_arch_irq_save']), (66, boot)):
+        body[offset:offset + 4] = wide_branch(system + offset, target, True)
+    function('SystemInit', system, bytes(body))
+    body = bytearray.fromhex(
+        '30b5094d91b001ac0fcd0fc40fcd0fc40fcd0fc4'
+        '95e8070084e8070001a80000000011b030bd00bf00550008')
+    body[30:34] = wide_branch(boot + 30,
+        addresses['nx_stm32u575_mpu_user_initialize'], True)
+    function('nx_stm32u575_mpu_user_boot', boot, bytes(body))
+    plan = [word for name in domains for word in domains[name]]
+    plan += [flash + 0x5200, ram + 0x2000, ram + 0x2020,
+             ram + 0x2020, ram + 0x2420]
+    struct.pack_into('<15I', data, 0x5500, *plan)
+    resolved = {"soc_family": "stm32u575", "part": "STM32U575ZIT6Q",
+                "backend": "freertos", "clock_profile": "msis4",
+                "cpu": {"arch": "cortex-m33", "float_abi": "hard", "mpu_version": 8,
+                        "mpu_regions": 8, "security": "single"},
+                "cpu_profile": {"definitions": {"NEXUS_ARCH_SECURITY_STATE": 0}},
+                "kernel_profile": {"user_io": "gpio-write",
+                                   "memory_protection": True,
+                                   "kernel_port": "GCC/ARM_CM33_NTZ/non_secure",
+                                   "security_model": "single",
+                                   "tick_source": "systick", "tickless": False},
+                "layout": {"origin": flash, "size": 2097152},
+                "memory": [{"id": "sram1", "origin": ram,
+                            "size": 196608, "linker": True}],
+                "memory_budgets": {"mpu": {
+                    "privileged_flash_bytes": 24576, "syscall_flash_bytes": 256,
+                    "user_flash_bytes": 1024, "privileged_ram_bytes": 8192,
+                    "user_ram_bytes": 2048}},
+                "controllers": [{"kind": "gpio", "id": "led", "binding": "led0",
+                                 "controller": "GPIOC", "mask": 128,
+                                 "mode": "output", "route": "gpio-pc7"}]}
+    bindings = ('static const nx_gpio_port_t s_nx_face_led = '
+                '{&nx_stm32u575_gpio_ops, &s_nx_port_led};')
+    return elf, resolved, bindings
+
+
+class U575MpuGpioRetentionTests(unittest.TestCase):
+    """Exercise the existing resolved inspector with external ELF/config bytes."""
+
+    def setUp(self):
+        self.elf, self.resolved, self.bindings = mpu_gpio_image()
+
+    def symbol(self, name):
+        return next(s for s in self.elf.defined_symbols if s['name'] == name)
+
+    def inspect(self):
+        from unittest.mock import patch
+        from tools.measurement import retention
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            elf_path, bindings_path = root / 'image.elf', root / 'bindings.c'
+            elf_path.write_bytes(self.elf.data)
+            bindings_path.write_text(self.bindings)
+            with patch.object(retention, 'Elf32', return_value=self.elf), \
+                    patch.object(retention, 'resolved_identity',
+                                 return_value=(self.resolved, {})), \
+                    patch.object(retention, 'resolved_input_files', return_value=[]), \
+                    patch.object(retention, 'validate_elf_configuration'):
+                return retention.inspect_files(elf_path, bindings_path,
+                                               resolved_path=root / 'resolved.json')
+
+    def rejected(self):
+        with self.assertRaises(EvidenceError):
+            self.inspect()
+
+    def test_selected_normal_layout_is_checked_without_fixed_user_entry(self):
+        report = self.inspect()
+        self.assertIn('mpu_gpio', report)
+        result = report['mpu_gpio']
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['task_bytes'], 864)
+        self.assertEqual(result['control_bytes'], 24)
+
+    def test_unselected_profile_preserves_existing_retention_scope(self):
+        self.resolved['kernel_profile']['user_io'] = 'none'
+        self.assertNotIn('mpu_gpio', self.inspect())
+
+    def test_wrong_profile_and_missing_reservations_fail_closed(self):
+        for path, value in ((('part',), 'STM32U585ZIT6Q'),
+                            (('cpu', 'mpu_regions'), 16),
+                            (('cpu_profile', 'definitions',
+                              'NEXUS_ARCH_SECURITY_STATE'), 1),
+                            (('memory_budgets', 'mpu'), None)):
+            with self.subTest(path=path):
+                self.setUp()
+                node = self.resolved
+                for key in path[:-1]:
+                    node = node[key]
+                node[path[-1]] = value
+                self.rejected()
+
+    def test_domain_end_alias_and_entire_function_extent_are_checked(self):
+        for name, change in (('__nexus_user_flash_end__', 32),
+                             ('__syscalls_flash_end__', 1),
+                             ('nx_freertos_user_delay', 0x400)):
+            with self.subTest(name=name):
+                self.setUp()
+                self.symbol(name)['value'] += change
+                self.rejected()
+        self.setUp()
+        self.symbol('nx_freertos_user_delay')['size'] = 0x401
+        self.rejected()
+
+    def test_wrapper_branch_veneer_svc_and_fallback_are_real_bytes(self):
+        for offset in (0x6100, 0x6012, 0x6026, 0x6028, 0x602a):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset] ^= 1
+                self.rejected()
+
+    def test_table_has_exact_slots_and_initial_loaded_thumb_implementations(self):
+        for slot, pointer in ((0, 0x08000401), (6, 0), (13, 0x08006101),
+                              (70, 0x0800043c)):
+            with self.subTest(slot=slot):
+                self.setUp()
+                struct.pack_into('<I', self.elf.data, 0x7000 + slot * 4, pointer)
+                self.rejected()
+        self.setUp()
+        self.symbol('uxSystemCallImplementations')['size'] = 280
+        self.rejected()
+
+    def test_full_readonly_binding_chain_and_gpio_grant_are_checked(self):
+        for offset, value in ((0x108, 0x20000200), (0x110, 0x08006100),
+                              (0x118, 0x100), (0x120, 0x08006100)):
+            with self.subTest(offset=offset):
+                self.setUp()
+                struct.pack_into('<I', self.elf.data, offset, value)
+                self.rejected()
+
+    def test_compiled_abi_facts_and_full_protected_objects_are_required(self):
+        for name, key, value in (('__nexus_mpu_gpio_task_size', 'section', 0),
+                                 ('__nexus_mpu_gpio_control_size', 'value', 0),
+                                 ('task', 'size', 8),
+                                 ('control', 'value', 0x20002000),
+                                 ('task', 'value', 0x20000200)):
+            with self.subTest(name=name, key=key):
+                self.setUp()
+                self.symbol(name)[key] = value
+                self.rejected()
+
+    def test_protected_gateway_factory_provider_and_boot_cannot_enter_user_flash(self):
+        for name in ('nx_factory_gpio', 'nx_gpio_port_write',
+                     'nx_freertos_mpu_gpio_open',
+                     'nx_stm32u575_mpu_user_initialize',
+                     'nx_stm32u575_gpio_mpu_validate', 'write'):
+            with self.subTest(name=name):
+                self.setUp()
+                self.symbol(name).update(value=0x08006121, section=2)
+                self.rejected()
+
+    def test_user_data_load_and_noload_bss_must_match_complete_bounds(self):
+        for mutation in ('load', 'bss', 'end', 'physical'):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                if mutation == 'load':
+                    self.symbol('__nx_mpu_user_data_load')['value'] = 0x08006100
+                elif mutation == 'bss':
+                    self.elf.sections[6]['kind'] = 1
+                elif mutation == 'end':
+                    self.symbol('__nx_mpu_user_data_end')['value'] += 32
+                else:
+                    self.elf.loads[5]['physical'] = 0x08006100
+                self.rejected()
+
+    def test_reset_boot_call_and_identity_failure_guard_are_required(self):
+        for offset in (0x304, 0x836, 0x83a, 0x840, 0x842, 0x91e):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset] ^= 1
+                self.rejected()
+
+    def test_missing_duplicate_or_weak_authority_proof_is_rejected(self):
+        for mutation in ('missing', 'duplicate', 'weak', 'load'):
+            with self.subTest(mutation=mutation):
+                self.setUp()
+                binding = self.symbol('nx_freertos_mpu_gpio_binding')
+                if mutation == 'missing':
+                    self.elf.defined_symbols.remove(binding)
+                elif mutation == 'duplicate':
+                    self.elf.defined_symbols.append(dict(binding))
+                elif mutation == 'weak':
+                    binding['binding'] = 2
+                else:
+                    self.elf.loads[0]['memory'] = 0x108
+                    self.elf.loads[0]['files'] = 0x108
+                self.rejected()
+
+
+    def test_early_return_cannot_fake_startup_call_reachability(self):
+        for offset in (0x800, 0x900):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset:offset + 2] = bytes.fromhex('7047')
+                self.rejected()
+
+    def test_reset_stack_and_actual_user_initializer_plan_are_checked(self):
+        for offset in (0, 0x338, 0x928, 0x5500, 0x552c):
+            with self.subTest(offset=offset):
+                self.setUp()
+                self.elf.data[offset] ^= 32
+                self.rejected()
 
 if __name__ == "__main__":
     unittest.main()
