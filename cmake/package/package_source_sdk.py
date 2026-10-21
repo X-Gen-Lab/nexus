@@ -164,7 +164,7 @@ IO_EVOLUTION_VERIFICATION_FILES = tuple(
         "consumers/u575-rtc.c", "consumers/u575-retained-time.c", "consumers/u575-stop2.c", "consumers/user-io-async.c",
         "consumers/h743-uart-duplex-continuous.c",
         "h743-high-empty.toml", "h743-high-uart.toml",
-        "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
+        "u575-uart-gpdma.toml",
         "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
         "g474-pwm-adc.toml", "boards/g474-fdcan/board.json",
         "boards/g474-pwm-adc/board.json", "consumers/h743-high.c",
@@ -189,6 +189,7 @@ REQUIRED_FILES += ("tools/configure/selected_contracts.py",
                    "tools/configure/i2s2.py",
                    "tools/configure/pin_states.py",
                    "tools/configure/assemblies/g474-pin-states.toml",
+                   "tools/configure/assemblies/h743-high-peripherals.toml",
                    *IO_EVOLUTION_VERIFICATION_FILES)
 REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
 REQUIRED_FILES += (

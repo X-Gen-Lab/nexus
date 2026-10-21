@@ -37,6 +37,24 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertEqual(omitted, [],
                          "Required public SDK programs cannot be excluded by selection")
 
+    def test_h743_flash_uses_one_required_canonical_sdk_input(self):
+        reference = "tools/configure/assemblies/h743-high-peripherals.toml"
+        previous = ("cmake/package/verification/io_evolution/"
+                    "h743-high-peripherals.toml")
+        self.assertEqual(source_sdk.REQUIRED_FILES.count(reference), 1)
+        self.assertNotIn(previous, source_sdk.REQUIRED_FILES)
+        self.assertTrue(source_sdk.selected(reference))
+        self.assertTrue((ROOT / reference).is_file())
+        self.assertFalse((ROOT / previous).exists())
+        self.assertEqual(consumer_gate.SELECTED_CONSUMERS.count(
+            ("h743 high", reference, "h743-high")), 1)
+        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        preset, = [row for row in presets["configurePresets"]
+                   if row["name"] ==
+                   "fixture-io-evolution-h743-high-peripherals"]
+        self.assertEqual(preset["cacheVariables"]["NEXUS_ASSEMBLY_FILE"],
+                         "${sourceDir}/" + reference)
+
     def test_async_and_retained_owner_public_closure_is_required(self):
         required = {
             "components/user_io_broker/CMakeLists.txt",
@@ -336,13 +354,14 @@ class SourceSDKSelectionTests(unittest.TestCase):
         directory = "cmake/package/verification/io_evolution/"
         names = {
             "h743-high-empty.toml", "h743-high-uart.toml",
-            "h743-high-peripherals.toml", "u575-uart-gpdma.toml",
+            "u575-uart-gpdma.toml",
             "g474-can-fd-loopback.toml", "g474-can-fd-normal.toml",
             "g474-pwm-adc.toml", "boards/g474-fdcan/board.json",
             "boards/g474-pwm-adc/board.json", "consumers/h743-high.c",
             "consumers/u575-uart-gpdma.c", "consumers/g474-can-fd.c",
             "consumers/g474-pwm-adc.c"}
         required = {directory + name for name in names}
+        required.add("tools/configure/assemblies/h743-high-peripherals.toml")
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
         for name in required:
@@ -562,7 +581,6 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
         moves = {
             "h743-high-empty.toml": "h743_high_assembly/empty.toml",
             "h743-high-uart.toml": "h743_high_assembly/io.toml",
-            "h743-high-peripherals.toml": "h743_high_assembly/peripherals.toml",
             "u575-uart-gpdma.toml": "u575_assembly/usart1-dma-tx.toml",
             "g474-can-fd-loopback.toml": "g474_control_assembly/can-fd.toml",
             "g474-can-fd-normal.toml": "g474_control_assembly/can-fd-normal.toml",
@@ -595,8 +613,14 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
             if name not in expected:
                 continue
             value = preset["cacheVariables"]["NEXUS_ASSEMBLY_FILE"]
-            self.assertTrue(value.startswith(
-                "${sourceDir}/cmake/package/verification/io_evolution/"), value)
+            if name == "h743-high-peripherals":
+                self.assertEqual(value,
+                    "${sourceDir}/tools/configure/assemblies/"
+                    "h743-high-peripherals.toml")
+            else:
+                self.assertTrue(value.startswith(
+                    "${sourceDir}/cmake/package/verification/io_evolution/"),
+                    value)
             selected[name] = Path(value).name
         self.assertEqual(set(selected), expected)
         self.assertEqual(len(set(selected.values())), 7)

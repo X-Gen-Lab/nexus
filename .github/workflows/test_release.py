@@ -299,11 +299,11 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
 
 
 class ConsumerTransportTests(unittest.TestCase):
-    def test_f407_i2s2_has_one_current_v10_public_owner_consumer(self):
+    def test_f407_i2s2_has_one_current_public_owner_consumer(self):
         from tools.release import transport
         row = ("f407 i2s2 slave tx", "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
                "f407-i2s2-slave-tx")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v10")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v11")
         self.assertEqual(transport.SELECTED_CONSUMERS[-1], row)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected f407 i2s2 slave tx source/.git", transport.FIXTURES)
@@ -341,7 +341,7 @@ class ConsumerTransportTests(unittest.TestCase):
         from tools.release import transport
         row = ("u575 mpu gpio", "tools/configure/assemblies/u575-mpu-gpio-write.toml",
                "u575-mpu-gpio")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v10")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v11")
         self.assertEqual(transport.SELECTED_CONSUMERS[-2], row)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected u575 mpu gpio source/.git", transport.FIXTURES)
@@ -407,7 +407,7 @@ class ConsumerTransportTests(unittest.TestCase):
         row = ("u575 lpdma copy",
                "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
                "u575-lpdma-copy")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v10")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v11")
         self.assertIn(row, transport.SELECTED_CONSUMERS)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertIn("selected u575 lpdma copy source/.git", transport.FIXTURES)
@@ -419,7 +419,7 @@ class ConsumerTransportTests(unittest.TestCase):
         row = ("u575 lptim1 lpbam",
                "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
                "u575-lptim1-lpbam")
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v10")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v11")
         self.assertEqual(transport.SELECTED_CONSUMERS[-3], row)
         self.assertEqual(transport.SELECTED_CONSUMERS.count(row), 1)
         self.assertEqual(consumer_module().SELECTED_CONSUMERS[-3], row)
@@ -520,7 +520,7 @@ class ConsumerTransportTests(unittest.TestCase):
         }
         self.assertTrue(expected.issubset(set(transport.SELECTED_CONSUMERS)),
                         expected - set(transport.SELECTED_CONSUMERS))
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v10")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v11")
         for name, _, _ in expected:
             self.assertIn("selected " + name + " source/.git",
                           transport.FIXTURES)
@@ -617,8 +617,8 @@ class ConsumerTransportTests(unittest.TestCase):
         base, raw = self.fixture()
         manifest = transport.pack(raw, base / "transport", COMMIT)
         self.assertEqual(manifest["schema_version"], 2)
-        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v10")
-        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v10")
+        self.assertEqual(transport.CONSUMER_POLICY, "nexus-sdk-consumers-v11")
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v11")
         self.assertEqual(len(list(raw.rglob(".git"))), 50)
         self.assertEqual(len(manifest["consumer_images"]), 53)
         auxiliary = "stm32 build/bin/installed_c.bin"
@@ -888,6 +888,32 @@ class ConsumerTransportTests(unittest.TestCase):
         self.assertEqual(len(list(raw.rglob(".git"))), 36)
         with self.assertRaisesRegex(ValueError, "Exact current consumer"):
             transport.pack(raw, base / "transport", COMMIT)
+
+    def test_complete_v10_plan_with_same_roots_and_images_is_rejected(self):
+        from tools.release import transport
+        canonical = ("h743 high",
+                     "tools/configure/assemblies/h743-high-peripherals.toml",
+                     "h743-high")
+        self.assertEqual(transport.SELECTED_CONSUMERS.count(canonical), 1)
+        self.assertNotIn((canonical[0], "cmake/package/verification/"
+                          "io_evolution/h743-high-peripherals.toml",
+                          canonical[2]), transport.SELECTED_CONSUMERS)
+        base, raw = self.fixture()
+        packed = base / "transport"
+        manifest = transport.pack(raw, packed, COMMIT)
+        self.assertEqual(manifest["consumer_policy"], "nexus-sdk-consumers-v11")
+        self.assertEqual(len(manifest["consumer_roots"]), 50)
+        self.assertEqual(len(manifest["consumer_images"]), 53)
+        transport.verify(packed, COMMIT)
+        archive = packed / transport.ARCHIVE
+        original_archive = archive.read_bytes()
+        manifest["consumer_policy"] = "nexus-sdk-consumers-v10"
+        (packed / transport.MANIFEST).write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(ValueError, "current consumer policy"):
+            transport.verify(packed, COMMIT)
+        self.assertEqual(archive.read_bytes(), original_archive,
+                         "Old policy rejection must preserve the complete "
+                         "raw bytes")
 
     def test_schema_two_previous_policy_is_not_a_current_fallback(self):
         from tools.release import transport

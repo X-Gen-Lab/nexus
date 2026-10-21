@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "portable_evidence",
+  "archive": {
+    "path": "tools/testing/evidence/h743-canonical-input-20261021/raw/71d1d2a1cb1f5c220402283660c58c95dfabf3343bdcd70097b9b2992bda6201.tar.gz",
+    "sha256": "71d1d2a1cb1f5c220402283660c58c95dfabf3343bdcd70097b9b2992bda6201",
+    "size": 2756654
+  },
+  "manifest_sha256": "efa2cc9c7c1adcc0aca1696463f269419184fc0defe5ae5f08036485250fc29b",
+  "files": 2527,
+  "bytes": 23539962,
+  "signature_status": "unsigned",
+  "product_promotion": false
+}

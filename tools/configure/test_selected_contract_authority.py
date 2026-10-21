@@ -34,10 +34,6 @@ class SelectedContractAuthorityTests(unittest.TestCase):
              "nx_stm32h743_pll384_system_start("),
             ("h743-high-uart", {"gpio", "uart"},
              "nx_stm32h743_pll384_system_start("),
-            ("h743-high-peripherals",
-             {"gpio", "uart", "spi", "spi_device", "pwm", "i2c",
-              "i2c_device", "adc", "flash"},
-             "nx_stm32h743_pll384_system_start("),
             ("u575-uart-gpdma", {"uart"},
              "nx_stm32u575_uart_gpdma_initialize("),
             ("g474-can-fd-loopback", {"can_fd"},
@@ -67,6 +63,16 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                                  expected)
                 self.assertIn(mechanism, bindings.emit(result)[1])
                 self.assertFalse(result["physical_qualified"])
+
+    def test_canonical_h743_high_flash_keeps_exact_public_interfaces(self):
+        result, records = self.selected(
+            "tools/configure/assemblies/h743-high-peripherals.toml")
+        self.assertEqual({row.public_class for row in records},
+                         {"gpio", "uart", "spi", "spi_device", "pwm", "i2c",
+                          "i2c_device", "adc", "flash"})
+        self.assertIn("nx_stm32h743_pll384_system_start(",
+                      bindings.emit(result)[1])
+        self.assertFalse(result["physical_qualified"])
 
     def test_catalogue_has_eight_exact_parts_without_family_inference(self):
         rows = self.compiler().catalogue(configure.ROOT)

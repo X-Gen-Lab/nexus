@@ -217,7 +217,8 @@ class SDKConsumerParallelTests(unittest.TestCase):
         ("f407 i2s2 slave tx", "sky-i2s2-slave-tx", "f407-i2s2-slave-tx"),
     )
     CANONICAL_ASSEMBLIES = frozenset({
-        "h743-spi-dma-runtime-clock", "h743-spi-dma", "h743-spi-dma-cache-on",
+        "h743-high-peripherals", "h743-spi-dma-runtime-clock",
+        "h743-spi-dma", "h743-spi-dma-cache-on",
         "u575-uart-chain", "h743-spi-dma-uart-tx", "h743-spi-dma-uart-rx",
         "g474-pin-states", "u575-lptim-run", "u575-rtc-run", "h743-uart-continuous",
         "h743-uart-continuous-cache-on", "h743-uart-duplex-continuous",
@@ -239,7 +240,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
             "publishable": True, "source_dirty": False,
             "source_revision": "a" * 40, "source_tree": "b" * 40}))
         verification = self.sdk / "cmake/package/verification/io_evolution"
-        for name in ("h743-high-peripherals", "u575-uart-gpdma",
+        for name in ("u575-uart-gpdma",
                      "g474-can-fd-normal", "g474-can-fd-loopback",
                      "g474-pwm-adc", "g474-adc-group-regular-software",
                      "g474-adc-group-regular-timer",
@@ -927,20 +928,22 @@ class SDKConsumerParallelTests(unittest.TestCase):
 
     def test_missing_installed_input_or_smoke_never_falls_back_to_checkout(self):
         directory = self.sdk / "cmake/package/verification/io_evolution"
-        for relative in ("h743-high-peripherals.toml", "consumers/h743-high.c",
-                         "g474-adc-group-regular-software.toml",
-                         "consumers/g474-adc-group.c", "h743-uart-fifo.toml",
-                         "u575-uart-fifo.toml", "consumers/uart-fifo.c",
-                         "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
-                         "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
-                         "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
-                         "consumers/g474-pwm-shared.c", "consumers/u575-retained-time.c",
-                         "consumers/u575-stop2.c",
-                         "consumers/u575-lptim1-lpbam.c", "native-time-pair.toml",
-                         "native-time-empty.toml", "consumers/native-time-pair.c",
-                         "consumers/native-time-empty.c"):
-            with self.subTest(relative=relative):
-                file = directory / relative
+        inputs = [self.sdk / "tools/configure/assemblies/" /
+                  "h743-high-peripherals.toml"]
+        inputs.extend(directory / relative for relative in (
+            "consumers/h743-high.c",
+            "g474-adc-group-regular-software.toml",
+            "consumers/g474-adc-group.c", "h743-uart-fifo.toml",
+            "u575-uart-fifo.toml", "consumers/uart-fifo.c",
+            "f407zg-eth-frames.toml", "gd470-eth-frames.toml",
+            "consumers/ethernet-frames.c", "h743-uart-rtscts.toml",
+            "u575-uart-rtscts.toml", "g474-pwm-shared.toml",
+            "consumers/g474-pwm-shared.c", "consumers/u575-retained-time.c",
+            "consumers/u575-stop2.c", "consumers/u575-lptim1-lpbam.c",
+            "native-time-pair.toml", "native-time-empty.toml",
+            "consumers/native-time-pair.c", "consumers/native-time-empty.c"))
+        for file in inputs:
+            with self.subTest(relative=str(file.relative_to(self.sdk))):
                 original = file.read_bytes()
                 file.unlink()
                 try:
@@ -950,6 +953,22 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     self.assertEqual(report["status"], "failed")
                 finally:
                     file.write_bytes(original)
+
+    def test_missing_canonical_h743_input_rejects_old_verification_copy(self):
+        canonical = self.sdk / "tools/configure/assemblies/" / (
+            "h743-high-peripherals.toml")
+        previous = self.sdk / "cmake/package/verification/io_evolution/" / (
+            "h743-high-peripherals.toml")
+        self.assertTrue(canonical.is_file())
+        self.assertFalse(previous.exists())
+        previous.write_bytes(canonical.read_bytes())
+        canonical.unlink()
+        with contextlib.redirect_stderr(io.StringIO()):
+            status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 1)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(len(self.builds()), 13,
+                         "Missing selected input must precede its CMake build")
 
     def test_frames_failure_is_terminal_after_all_twenty_four_prior_roots(self):
         for fault in ("frames_build", "frames_retention"):

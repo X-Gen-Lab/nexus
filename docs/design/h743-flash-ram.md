@@ -269,6 +269,21 @@ alignment padding and the real call/exception stack requirement. An array size
 or host `sizeof` is not linked cost, measured stack use, throughput or WCET.
 This page makes no measured cost, stack high-water, throughput or WCET claim.
 
+The selected PLL384 peripheral reference is authored once in
+[h743-high-peripherals.toml](../../tools/configure/assemblies/h743-high-peripherals.toml).
+The maintained catalogue, normal preset, generated host factory and installed
+Source SDK consumer use that same input. Moving its source authority does not
+change its V-cut, baremetal, Cache-off or `poll-word` restrictions.
+
+The existing `performance.yml` qualification-only path accepts this canonical
+input with an explicit `gpio` workload and exact source SHA. That workload starts
+the selected Platform and exercises GPIO; it does not fetch the public Flash face.
+RAM-pod retention alone therefore does not prove retention of every public Flash
+operation. The installed public Flash consumer and exact linked retention checks
+remain separate evidence. A successful future run can establish only its actual
+source, image and reproduced scope; it does not close the full IO-24 exit or
+change physical HIL from `not_executed`.
+
 | Evidence required before software exit | Boundary |
 | --- | --- |
 | Real GoogleTest/GoogleMock RED then GREEN | Actual provider/bridge boundary, failures, late drain and instance isolation; no mock implementation |

@@ -1,0 +1,67 @@
+{
+  "status": "SEALED_BYTE_VERIFIED_ACCEPTED_ORDINARY_R2",
+  "commit": "56a66e05014d760fbbd8d3e2e3b5909e86e80da6",
+  "tree": "6aff81836de5b85ec71883e36dcdd2c6d5b262dd",
+  "package": {
+    "path": "tools/testing/evidence/f407-i2s2-20261020/accepted-r2-package.json",
+    "sha256": "605b8dc16f4ce9b404fe634bc74c4385544cd35bd19ad5d2e84be5e1fedd24ac",
+    "bytes": 503
+  },
+  "verified": {
+    "path": "tools/testing/evidence/f407-i2s2-20261020/accepted-r2-verified.json",
+    "sha256": "cdd823e788428b97008c0e8ef7b543e2c2c97eb6dc02b9c7d0283b0aa817c44e",
+    "bytes": 153
+  },
+  "collection": {
+    "path": "tools/testing/evidence/f407-i2s2-20261020/accepted-r2-COLLECTION.md",
+    "sha256": "c0a1178835ddc051a9f11024c96932a47cf10898f4b60163d19bd50e7e5c1f52",
+    "bytes": 1222
+  },
+  "archive": {
+    "path": "tools/testing/evidence/f407-i2s2-20261020/raw/6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d.tar.gz",
+    "sha256": "6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d",
+    "size": 1447119
+  },
+  "files": 2364,
+  "bytes": 15987352,
+  "source_paths_bound_via_git_show": 81,
+  "current_commands": 702,
+  "google_executables": 348,
+  "google_passed": 6288,
+  "tools_total": 2946,
+  "all_failures_errors_skips": 0,
+  "historical_attempts_swept": false,
+  "primary_index_or_README_mutations": false,
+  "compiler_configure_tests_executed_by_collector": false,
+  "formal_clean_main_complete_SDK_matrix_or_HIL_qualification": false,
+  "relocation": {
+    "original_package": {
+      "path": "/tmp/nexus-f407-accepted-gate-evidence-20261021/package.json",
+      "sha256": "efb89116182dde536a6bbcb649b85efbdbaa761041a6f5bd1e54c2d9d63f5584",
+      "bytes": 511
+    },
+    "original_delivery": {
+      "path": "/tmp/nexus-f407-accepted-gate-evidence-20261021/delivery.json",
+      "sha256": "f832aa661ce453137ce557b4f6409440141c4a69e8cb0682b5e130ebfa776928",
+      "bytes": 1456
+    },
+    "delta": "Only artifact locators and relocated package-file identity updated; exact archive bytes, manifest identity, counts, source binding and qualification limits unchanged.",
+    "validation": {
+      "status": "verified_after_repository_relative_relocation",
+      "validator": "tools.evidence.store.verify_package",
+      "simulated_repository_root": "/tmp/nexus-f407-accepted-r2-integration-20261021/final",
+      "planned_archive_path": "tools/testing/evidence/f407-i2s2-20261020/raw/6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d.tar.gz",
+      "result": {
+        "status": "verified",
+        "files": 2364,
+        "bytes": 15987352,
+        "archive_sha256": "6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d"
+      },
+      "single_original_archive": "/tmp/nexus-f407-accepted-gate-evidence-20261021/store/6785060b2b48f871013c30219bd2f8c7c519bd330343e7a20d902c24cd7fcf0d.tar.gz",
+      "archive_bytes_unchanged": true,
+      "temporary_regular_hardlink_used_for_exact_path": true,
+      "temporary_hardlink_removed": true,
+      "archive_recompressed_or_duplicated": false
+    }
+  }
+}

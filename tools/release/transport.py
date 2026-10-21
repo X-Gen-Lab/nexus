@@ -21,7 +21,7 @@ ARCHIVE = "consumer-raw.tar.gz"
 MANIFEST = "consumer-raw-manifest.json"
 # The producer and standalone transport share this reviewed immutable plan.
 # A report may describe these identities, never authorize another fixture set.
-CONSUMER_POLICY = "nexus-sdk-consumers-v10"
+CONSUMER_POLICY = "nexus-sdk-consumers-v11"
 BASE_CONSUMERS = (("native", False, "native"),
                   ("stm32", True, "stm32"), ("gd32", True, "gd32"))
 MODERN_CONSUMERS = tuple((family, backend)
@@ -29,7 +29,7 @@ MODERN_CONSUMERS = tuple((family, backend)
     for backend in ("baremetal", "freertos"))
 SELECTED_CONSUMERS = (
     ("h743 high",
-     "cmake/package/verification/io_evolution/h743-high-peripherals.toml",
+     "tools/configure/assemblies/h743-high-peripherals.toml",
      "h743-high"),
     ("u575 gpdma",
      "cmake/package/verification/io_evolution/u575-uart-gpdma.toml",

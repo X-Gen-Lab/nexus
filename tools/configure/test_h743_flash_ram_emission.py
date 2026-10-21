@@ -14,12 +14,16 @@ from tools.configure import bindings, configure, factory, memory
 
 
 ASSEMBLIES = configure.ROOT / "cmake/package/verification/io_evolution"
+FLASH_ASSEMBLY = (configure.ROOT /
+                  "tools/configure/assemblies/h743-high-peripherals.toml")
 WORKSPACE = "g_nx_stm32h743_flash_ram_workspace"
 
 
 class H743FlashRamEmissionTests(unittest.TestCase):
     def resolve(self, name="h743-high-peripherals"):
-        return configure.resolve_ir(ASSEMBLIES / (name + ".toml"))
+        path = (FLASH_ASSEMBLY if name == "h743-high-peripherals" else
+                ASSEMBLIES / (name + ".toml"))
+        return configure.resolve_ir(path)
 
     def test_selected_flash_emits_one_aligned_private_physical_workspace(self):
         source = bindings.emit(self.resolve())[1]
@@ -50,11 +54,12 @@ class H743FlashRamEmissionTests(unittest.TestCase):
             r"result.primary = prepare_storage\(\);")
 
     def test_physical_workspace_is_independent_of_the_public_instance_name(self):
-        original = (ASSEMBLIES / "h743-high-peripherals.toml").read_text()
+        original = FLASH_ASSEMBLY.read_text()
         board = tomllib.loads(original)["board_package"]
         original = original.replace(
             'board_package = "' + board + '"',
-            'board_package = "' + str((ASSEMBLIES / board).resolve()) + '"')
+            'board_package = "' +
+            str((FLASH_ASSEMBLY.parent / board).resolve()) + '"')
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "renamed.toml"
             path.write_text(original.replace("[flash.storage]",

@@ -57,7 +57,8 @@ class H743FlashRamClosureTests(unittest.TestCase):
         self.directory = Path(self.storage.name)
         self.images = 0
         self.selected = gate.resolve(
-            ASSEMBLIES / "h743-high-peripherals.toml", root=ROOT)
+            ROOT / "tools/configure/assemblies/h743-high-peripherals.toml",
+            root=ROOT)
         self.unselected = gate.resolve(
             ASSEMBLIES / "h743-high-empty.toml", root=ROOT)
 
