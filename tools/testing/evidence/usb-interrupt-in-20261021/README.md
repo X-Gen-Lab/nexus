@@ -117,3 +117,17 @@ The original 48-path index and 34-source freeze identify R1. A later evidence
 addendum changes the R2 index, which must run the ordinary gate independently.
 Generated documentation copies were subsequently archived, actually restored
 and compared before retirement; the sealed development packet remains unchanged.
+
+## Accepted interrupt-IN ordinary R2 successor
+
+Commit `6b10c814c21d94b069f5690300152f904ea14d22`, tree
+`a7109d16e669e0d015eb4f79978ca65cfbacce05`, passed the unchanged ordinary
+and commit-message gates: 348 Google executables / 6,296 cases and 2,955 tool
+cases, with zero failures/errors/skips. All 52 frozen paths and the original
+34-source subset match the commit. `accepted-6b-package.json` references the
+single successor archive containing 702 fresh commands and original raw
+reports. Historical R1 attempts remain explicitly excluded. The exact prior
+catalogue recovered as a reused input matches the fresh IO-plan hash; it is not
+a reused test result. Verification and actual full restoration matched all
+5,323 inventory entries. This is development host acceptance, separate from
+later activation changes, formal clean-main qualification and physical HIL.

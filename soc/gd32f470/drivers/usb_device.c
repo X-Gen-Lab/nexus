@@ -53,6 +53,11 @@ _Static_assert(DEPCTL_EPTYPE == (3U << 18U) && DEPCTL_MPL == 0x7FFU &&
                    DEPCTL_EPACT == (1U << 15U) &&
                    DEPLEN_PCNT == (0x3FFU << 19U),
                "FS endpoint type, FIFO, DATA0 and packet register facts");
+_Static_assert((DAEPINTEN_IEPIE & 0xFU) == 0xFU &&
+                   (DAEPINTEN_OEPIE & 0xF0000U) == 0xF0000U &&
+                   DEPCTL_SNAK == (1U << 27U) && DEPCTL_CNAK == (1U << 26U) &&
+                   DEPCTL_STALL == (1U << 21U),
+               "FS activation and selected endpoint interrupt mask facts");
 #ifndef NX_USB_SOC_IRQ_GROUP
 #define NX_USB_SOC_IRQ_GROUP() NVIC_GetPriorityGrouping()
 #endif

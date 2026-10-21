@@ -144,6 +144,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "components/usb_control/src/usb_descriptors.c",
             "components/usb_control/src/usb_acm.c",
             "io/include/nexus/io/usb_profile.h",
+            "io/include/nexus/io/usb_activation.h",
             "io/src/usb_profile.c",
             "tools/configure/usb_profiles.py",
         }

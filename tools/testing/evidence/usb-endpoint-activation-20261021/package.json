@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "tools/testing/evidence/usb-endpoint-activation-20261021/raw/95af2a4ffac2133f2fa838934eabb7a592bf2731f21d1d76a607701875b51549.tar.gz",
+    "sha256": "95af2a4ffac2133f2fa838934eabb7a592bf2731f21d1d76a607701875b51549",
+    "size": 2424733
+  },
+  "bytes": 12946426,
+  "files": 863,
+  "kind": "portable_evidence",
+  "manifest_sha256": "723a5e6755875b44d728b94020f804d77ee23946b65bb56e4d67495eb64dbd19",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

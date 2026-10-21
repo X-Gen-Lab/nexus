@@ -6,6 +6,7 @@
 #ifndef NEXUS_PRIVATE_USB_DEVICE_CONTROLLER_H
 #define NEXUS_PRIVATE_USB_DEVICE_CONTROLLER_H
 #include "nexus/arch/arch.h"
+#include "nexus/io/usb_activation.h"
 #include "nexus/io/usb_device.h"
 #include "nexus/io/usb_profile.h"
 #ifdef __cplusplus
@@ -74,6 +75,7 @@ struct nx_usb_controller {
 };
 extern const nx_usb_endpoint_ops_t nx_usb_fs_endpoint_ops;
 extern const nx_usb_device_ops_t nx_usb_fs_device_ops;
+extern const nx_usb_activation_ops_t nx_usb_fs_activation_ops;
 extern const nx_usb_setup_decision_ops_t nx_usb_fs_setup_decision_ops;
 /** \brief Cold privileged start, pins/electrical role already authorized. */
 nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* controller);

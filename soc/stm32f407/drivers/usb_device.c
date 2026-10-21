@@ -67,6 +67,21 @@ _Static_assert(USB_OTG_DIEPCTL_EPTYP_Pos == 18U &&
                    USB_OTG_DOEPCTL_USBAEP == (1U << 15U) &&
                    USB_OTG_DIEPTSIZ_PKTCNT == (0x3FFU << 19U),
                "FS endpoint type, FIFO, DATA0 and packet register facts");
+_Static_assert(USB_OTG_DAINTMSK_IEPM_Pos == 0U &&
+                   USB_OTG_DAINTMSK_OEPM_Pos == 16U &&
+                   (USB_OTG_DAINTMSK_IEPM & 0xFU) == 0xFU &&
+                   (USB_OTG_DAINTMSK_OEPM & 0xF0000U) == 0xF0000U &&
+                   USB_OTG_DIEPCTL_SNAK == (1U << 27U) &&
+                   USB_OTG_DOEPCTL_SNAK == (1U << 27U) &&
+                   USB_OTG_DIEPCTL_CNAK == (1U << 26U) &&
+                   USB_OTG_DOEPCTL_CNAK == (1U << 26U) &&
+                   USB_OTG_DIEPCTL_STALL == (1U << 21U) &&
+                   USB_OTG_DOEPCTL_STALL == (1U << 21U) &&
+                   USB_OTG_DOEPCTL_MPSIZ == 0x7FFU &&
+                   USB_OTG_DOEPCTL_NAKSTS == (1U << 17U) &&
+                   USB_OTG_DOEPCTL_EPENA == (1U << 31U) &&
+                   USB_OTG_DOEPCTL_EPDIS == (1U << 30U),
+               "FS activation, selected interrupt masks and OUT control facts");
 #ifndef NX_USB_SOC_IRQ_GROUP
 #define NX_USB_SOC_IRQ_GROUP() NVIC_GetPriorityGrouping()
 #endif

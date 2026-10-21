@@ -39,6 +39,8 @@ typedef struct {
     bool hold_clear;
     bool hold_address_clear;
     uint8_t hold_stall_clear_mask;
+    /** \brief Native-only selected endpoint-mask write-fault control. */
+    uint32_t hold_ep_mask_bits;
     bool hold_in_nak;
     bool hold_disconnect;
     bool early_in_disable;

@@ -129,6 +129,13 @@ void nx_native_usb_write(uintptr_t base, uint32_t offset, uint32_t value) {
         summaries(hw);
         return;
     }
+    if (offset == 0x81CU) {
+        /* Fault only the selected stored mask bits, never provider state. */
+        uint32_t held = hw->hold_ep_mask_bits;
+        hw->registers[offset / 4U] =
+            (value & ~held) | (hw->registers[offset / 4U] & held);
+        return;
+    }
     if (offset == 0x10U) {
         uint32_t command = value;
         if (!hw->hold_reset) {

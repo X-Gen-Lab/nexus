@@ -8,6 +8,7 @@
  */
 extern "C" {
 #include "nexus/io/native/model.h"
+#include "nexus/io/usb_activation.h"
 #include "usb_device.h"
 }
 #include <chrono>
@@ -28,6 +29,24 @@ class UsbDevice : public testing::Test {
                                          &model.controller};
     nx_usb_endpoint_port_t Port(unsigned index) {
         return {&nx_usb_fs_endpoint_ops, &endpoints[index]};
+    }
+    /** \brief The fixture owner explicitly selects its test directions. */
+    nx_result_t ActivateSelected() {
+        const nx_usb_activation_port_t activation = {&nx_usb_fs_activation_ops,
+                                                     &model.controller};
+        for (const auto& selected : endpoints) {
+            if (selected.number == 0U) {
+                continue;
+            }
+            const auto address = static_cast<uint8_t>(
+                selected.number | (selected.in ? 0x80U : 0U));
+            nx_result_t result = nx_usb_activation_set(
+                &activation, model.controller.snapshot.epoch, address, true);
+            if (result != NX_SUCCESS) {
+                return result;
+            }
+        }
+        return NX_SUCCESS;
     }
     void SetUp() override {
         ASSERT_EQ(nx_native_clock_configure(true, 100U), NX_SUCCESS);
@@ -55,6 +74,7 @@ class UsbDevice : public testing::Test {
         model.hardware.clock_ready = true;
         nx_request_initialize(&request.base);
         ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+        ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
     }
     void TearDown() override {
         model.hardware.hold_disable = false;
@@ -63,6 +83,7 @@ class UsbDevice : public testing::Test {
         model.hardware.hold_clear = false;
         model.hardware.hold_bulk_pid = false;
         model.hardware.hold_stall_clear_mask = 0U;
+        model.hardware.hold_ep_mask_bits = 0U;
         model.hardware.hold_gonak = false;
         model.hardware.hold_disconnect = model.hardware.hold_in_nak = false;
         model.hardware.on_source_disable = nullptr;
@@ -78,7 +99,8 @@ class UsbDevice : public testing::Test {
         endpoints[2].transfer = NX_USB_PROFILE_INTERRUPT;
         endpoints[2].max_packet = maximum;
         endpoints[2].fifo_words = 16U;
-        return nx_native_usb_initialize(&model);
+        result = nx_native_usb_initialize(&model);
+        return result == NX_SUCCESS ? ActivateSelected() : result;
     }
     void ReceiveSetup(const uint8_t* data) {
         ASSERT_EQ(nx_native_usb_receive(&model, 0, data, 8, true), NX_SUCCESS);
@@ -162,6 +184,7 @@ TEST_F(UsbDevice, InterruptDataZeroReadbackGuardsClearHaltAndResetAdmission) {
             /* DATA0 proof does not activate a reset-deactivated endpoint. */
             ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
             ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+            ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
             EXPECT_NE(model.hardware.registers[0x920U / 4U] & (1U << 15U), 0U);
         }
         ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
@@ -1038,6 +1061,7 @@ TEST_F(UsbDevice, ResetKeepsAdmissionClosedUntilAddressZeroIsObserved) {
     EXPECT_EQ(endpoints[2].request, nullptr);
     ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
     ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
     EXPECT_NE(model.hardware.registers[0x920U / 4U] & (1U << 15U), 0U);
     ASSERT_EQ(nx_usb_endpoint_submit(&bulk, &request), NX_SUCCESS);
     ASSERT_EQ(nx_native_usb_complete(&model, 1, true), NX_SUCCESS);
@@ -1081,6 +1105,7 @@ TEST_F(UsbDevice, ResetClearsSelectedBulkHaltOnlyAfterHardwareReadback) {
     EXPECT_EQ(endpoints[3].request, nullptr);
     ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
     ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
     ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1, NX_USB_DATA, 0, 200),
               NX_SUCCESS);
     ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
@@ -1360,10 +1385,505 @@ TEST_F(UsbDevice, UnprovedResetKeepsObservedOutNakAfterActualLoanDrain) {
     EXPECT_EQ(endpoints[3].request, nullptr);
     ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
     ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
     EXPECT_NE(model.hardware.registers[0xB20U / 4U] & (1U << 15U), 0U);
     ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
     ASSERT_EQ(nx_native_usb_receive(&model, 1, payload, 1, false), NX_SUCCESS);
     ASSERT_EQ(nx_native_usb_complete(&model, 1, false), NX_SUCCESS);
     nx_usb_controller_irq(&model.controller);
     EXPECT_EQ(request.base.result, NX_SUCCESS);
+}
+
+extern "C" const nx_usb_activation_ops_t nx_usb_fs_activation_ops;
+
+class UsbActivation : public UsbDevice {
+  protected:
+    const nx_usb_activation_port_t activation = {&nx_usb_fs_activation_ops,
+                                                 &model.controller};
+    void SetUp() override {
+        UsbDevice::SetUp();
+        ASSERT_FALSE(HasFatalFailure());
+        ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+        ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    }
+    nx_result_t Activate(uint8_t address, bool active) {
+        return nx_usb_activation_set(
+            &activation, model.controller.snapshot.epoch, address, active);
+    }
+};
+
+TEST_F(UsbActivation, ColdStartLeavesOnlyEp0ActiveWithoutPacketBorrow) {
+    EXPECT_NE(model.hardware.registers[0x900U / 4U] & (1U << 15U), 0U);
+    EXPECT_NE(model.hardware.registers[0xB00U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(model.hardware.registers[0xB20U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U], 0x00010001U);
+    auto in = Port(2);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(nx_usb_endpoint_submit(&in, &request), NX_ERROR_STATE);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(model.hardware.tx_count[1], 0U);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    EXPECT_FALSE(model.hardware.reserved_ep0_pid_command);
+}
+
+TEST_F(UsbActivation, ExplicitEnableChangesOnlySelectedInactiveDirection) {
+    const auto ep0_in = model.hardware.registers[0x900U / 4U];
+    const auto ep0_out = model.hardware.registers[0xB00U / 4U];
+    const auto other = model.hardware.registers[0xB20U / 4U];
+    const auto mask = model.hardware.registers[0x81CU / 4U];
+    const auto geometry = model.hardware.registers[0x104U / 4U];
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    const auto control = model.hardware.registers[0x920U / 4U];
+    EXPECT_NE(control & (1U << 15U), 0U);
+    EXPECT_NE(control & (1U << 17U), 0U);
+    EXPECT_EQ(control & ((1U << 31U) | (1U << 21U) | (1U << 16U)), 0U);
+    EXPECT_EQ(control & 0x7FFU, 64U);
+    EXPECT_EQ((control >> 18U) & 3U, 2U);
+    EXPECT_EQ((control >> 22U) & 15U, 1U);
+    EXPECT_EQ(model.hardware.registers[0x928U / 4U] & 0x5BU, 0U);
+    EXPECT_EQ(model.hardware.registers[0x900U / 4U], ep0_in);
+    EXPECT_EQ(model.hardware.registers[0xB00U / 4U], ep0_out);
+    EXPECT_EQ(model.hardware.registers[0xB20U / 4U], other);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U], mask | (1U << 1U));
+    EXPECT_EQ(model.hardware.registers[0x104U / 4U], geometry);
+    EXPECT_EQ(model.hardware.tx_count[1], 0U);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(endpoints[3].request, nullptr);
+}
+
+TEST_F(UsbActivation, SelectedBulkDirectionsAndInterruptInActivateByExactPlan) {
+    struct Selection {
+        uint8_t number;
+        uint8_t transfer;
+        uint16_t maximum;
+    };
+    const Selection selections[] = {{1U, NX_USB_PROFILE_BULK, 64U},
+                                    {2U, NX_USB_PROFILE_BULK, 8U},
+                                    {3U, NX_USB_PROFILE_BULK, 32U},
+                                    {1U, NX_USB_PROFILE_INTERRUPT, 1U},
+                                    {2U, NX_USB_PROFILE_INTERRUPT, 10U},
+                                    {3U, NX_USB_PROFILE_INTERRUPT, 64U}};
+    for (const auto& selection : selections) {
+        SCOPED_TRACE(testing::Message()
+                     << "number=" << static_cast<unsigned>(selection.number)
+                     << " transfer="
+                     << static_cast<unsigned>(selection.transfer));
+        ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+        endpoints[2].number = endpoints[3].number = selection.number;
+        endpoints[2].transfer = selection.transfer;
+        endpoints[2].max_packet = selection.maximum;
+        ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+        ASSERT_EQ(
+            Activate(static_cast<uint8_t>(0x80U | selection.number), true),
+            NX_SUCCESS);
+        ASSERT_EQ(Activate(selection.number, true), NX_SUCCESS);
+        const uint32_t in_offset = 0x900U + 32U * selection.number;
+        const uint32_t out_offset = 0xB00U + 32U * selection.number;
+        const auto in_control = model.hardware.registers[in_offset / 4U];
+        EXPECT_EQ(in_control & 0x7FFU, selection.maximum);
+        EXPECT_EQ((in_control >> 18U) & 3U,
+                  selection.transfer == NX_USB_PROFILE_BULK ? 2U : 3U);
+        EXPECT_EQ((in_control >> 22U) & 15U, selection.number);
+        const auto out_control = model.hardware.registers[out_offset / 4U];
+        EXPECT_EQ((out_control >> 18U) & 3U, 2U);
+        EXPECT_EQ(out_control & (15U << 22U), 0U);
+        EXPECT_EQ((in_control | out_control) & (1U << 31U), 0U);
+        auto in = Port(2);
+        ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+                  NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+        ASSERT_EQ(nx_native_usb_complete(&model, selection.number, true),
+                  NX_SUCCESS);
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_SUCCESS);
+        auto out = Port(3);
+        const uint8_t payload[] = {42U};
+        ASSERT_EQ(
+            nx_usb_out_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+            NX_SUCCESS);
+        ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+        ASSERT_EQ(
+            nx_native_usb_receive(&model, selection.number, payload, 1U, false),
+            NX_SUCCESS);
+        ASSERT_EQ(nx_native_usb_complete(&model, selection.number, false),
+                  NX_SUCCESS);
+        nx_usb_controller_irq(&model.controller);
+        ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        EXPECT_EQ(request.base.result, NX_SUCCESS);
+        EXPECT_EQ(bytes[0], payload[0]);
+    }
+    EXPECT_FALSE(model.hardware.reserved_ep0_pid_command);
+}
+
+TEST_F(UsbActivation, Ep0ReservedAndUnselectedAddressesRejectBeforeMmio) {
+    const uint8_t addresses[] = {0x00U, 0x80U, 0x11U, 0x91U, 0x02U, 0x82U};
+    for (uint8_t address : addresses) {
+        SCOPED_TRACE(static_cast<unsigned>(address));
+        const auto reads = model.hardware.mmio_reads;
+        const auto writes = model.hardware.mmio_writes;
+        EXPECT_EQ(Activate(address, true), NX_ERROR_INVALID);
+        EXPECT_EQ(model.hardware.mmio_reads, reads);
+        EXPECT_EQ(model.hardware.mmio_writes, writes);
+        EXPECT_FALSE(model.controller.snapshot.closing);
+    }
+    EXPECT_FALSE(model.hardware.reserved_ep0_pid_command);
+}
+
+TEST_F(UsbActivation, PriorSoftwareEpochRejectsWithoutChangingHardware) {
+    const auto previous = model.controller.snapshot.epoch;
+    const uint8_t setup[8] = {0x80U, 6U, 0U, 1U, 0U, 0U, 1U, 0U};
+    ReceiveSetup(setup);
+    ASSERT_GT(model.controller.snapshot.epoch, previous);
+    ASSERT_FALSE(model.controller.setup_pending);
+    const auto reads = model.hardware.mmio_reads;
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(nx_usb_activation_set(&activation, previous, 0x81U, true),
+              NX_ERROR_STATE);
+    EXPECT_EQ(model.hardware.mmio_reads, reads);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+}
+
+TEST_F(UsbActivation, RepeatedEnablePreservesData1AndHaltUntilFreshActivation) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    auto in = Port(2);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_NE(model.hardware.registers[0x920U / 4U] & (1U << 16U), 0U);
+    ASSERT_EQ(nx_usb_endpoint_stall(&in, true), NX_SUCCESS);
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_NE(model.hardware.registers[0x920U / 4U] & (1U << 16U), 0U);
+    EXPECT_NE(model.hardware.registers[0x920U / 4U] & (1U << 21U), 0U);
+    EXPECT_TRUE(endpoints[2].halted);
+    ASSERT_EQ(Activate(0x81U, false), NX_SUCCESS);
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] &
+                  ((1U << 16U) | (1U << 21U)),
+              0U);
+    EXPECT_FALSE(endpoints[2].halted);
+}
+
+TEST_F(UsbActivation, DisableCannotRevokeActiveOrQuarantinedBorrow) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    auto in = Port(2);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(Activate(0x81U, false), NX_ERROR_BUSY);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(endpoints[2].request, &request);
+    model.hardware.hold_disable = true;
+    ASSERT_EQ(nx_usb_endpoint_cancel(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_clock_advance(20U), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_QUARANTINED);
+    writes = model.hardware.mmio_writes;
+    EXPECT_EQ(Activate(0x81U, false), NX_ERROR_BUSY);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(endpoints[2].request, &request);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_disable = false;
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(Activate(0x81U, false), NX_SUCCESS);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U] & (1U << 1U), 0U);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+}
+
+TEST_F(UsbActivation, UnclaimedHardwareActivityRequiresExplicitProgress) {
+    model.hardware.registers[0x920U / 4U] |= 1U << 31U;
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(Activate(0x81U, false), NX_ERROR_BUSY);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_NE(model.hardware.registers[0x920U / 4U] & (1U << 31U), 0U);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_FALSE(model.controller.snapshot.closing);
+    /* The normal full-stop path, not this method, owns hardware withdrawal. */
+}
+
+TEST_F(UsbActivation, ResetDrainsThenRequiresExplicitCurrentEpochActivation) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    auto in = Port(2);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    const auto previous = model.controller.snapshot.epoch;
+    const auto before_reset_mask = model.hardware.registers[0x81CU / 4U];
+    model.hardware.hold_disable = true;
+    nx_native_usb_reset(&model);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_TRUE(model.controller.reset_pending);
+    ASSERT_GT(model.controller.snapshot.epoch, previous);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U], before_reset_mask);
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_STATE);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+    EXPECT_EQ(endpoints[2].request, &request);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_DRAINING);
+    model.hardware.hold_disable = false;
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    ASSERT_FALSE(model.controller.reset_pending);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    EXPECT_EQ(nx_usb_endpoint_submit(&in, &request), NX_ERROR_STATE);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(nx_usb_activation_set(&activation, previous, 0x81U, true),
+              NX_ERROR_STATE);
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+}
+
+TEST_F(UsbActivation, FailedData0ReadbackClosesWithoutRevokingAnotherLoan) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    auto in = Port(2);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(Activate(0x81U, false), NX_SUCCESS);
+    ASSERT_NE(model.hardware.registers[0x920U / 4U] & (1U << 16U), 0U);
+    ASSERT_EQ(Activate(0x01U, true), NX_SUCCESS);
+    auto out = Port(3);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    model.hardware.hold_bulk_pid = true;
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_IO);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_EQ(endpoints[3].request, &request);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_disable = true;
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
+    EXPECT_EQ(endpoints[3].request, &request);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_disable = model.hardware.hold_bulk_pid = false;
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+}
+
+TEST_F(UsbActivation, IncomingMaskRejectsWithoutMmioAndRemainsMasked) {
+    const auto reads = model.hardware.mmio_reads;
+    const auto writes = model.hardware.mmio_writes;
+    const auto saved = nx_arch_irq_save();
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_CONTEXT);
+    EXPECT_TRUE(nx_arch_irq_is_masked());
+    nx_arch_irq_restore(saved);
+    EXPECT_EQ(model.hardware.mmio_reads, reads);
+    EXPECT_EQ(model.hardware.mmio_writes, writes);
+}
+
+TEST_F(UsbActivation, ConfigurationStatusAloneDoesNotActivateEndpoints) {
+    const uint8_t setup[8] = {0U, 9U, 1U, 0U, 0U, 0U, 0U, 0U};
+    ReceiveSetup(setup);
+    auto in0 = Port(0);
+    ASSERT_EQ(nx_usb_in_prepare(&request, nullptr, 0U, NX_USB_STATUS,
+                                model.controller.snapshot.epoch, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in0, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 0U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(request.base.result, NX_SUCCESS);
+    EXPECT_FALSE(model.controller.snapshot.control_pending);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] & (1U << 15U), 0U);
+    EXPECT_EQ(model.hardware.registers[0xB20U / 4U] & (1U << 15U), 0U);
+}
+
+TEST_F(UsbActivation, ExternalOwnerStagesBeforeStatusThenStartsPackets) {
+    const uint8_t setup[8] = {0U, 9U, 1U, 0U, 0U, 0U, 0U, 0U};
+    ReceiveSetup(setup);
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    ASSERT_TRUE(model.controller.snapshot.control_pending);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(model.hardware.tx_count[1], 0U);
+    auto in0 = Port(0);
+    ASSERT_EQ(nx_usb_in_prepare(&request, nullptr, 0U, NX_USB_STATUS,
+                                model.controller.snapshot.epoch, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in0, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 0U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    ASSERT_EQ(request.base.result, NX_SUCCESS);
+    ASSERT_FALSE(model.controller.snapshot.control_pending);
+    auto in = Port(2);
+    ASSERT_EQ(nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&in, &request), NX_SUCCESS);
+    ASSERT_EQ(nx_native_usb_complete(&model, 1U, true), NX_SUCCESS);
+    nx_usb_controller_irq(&model.controller);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_SUCCESS);
+}
+
+TEST_F(UsbActivation, FailedUnmaskRollsBackTargetAndRetainsAnotherLoan) {
+    ASSERT_EQ(Activate(0x01U, true), NX_SUCCESS);
+    auto out = Port(3);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 1U, NX_USB_DATA, 0U, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    ASSERT_FALSE(model.controller.snapshot.closing);
+    const auto unrelated_mask =
+        model.hardware.registers[0x81CU / 4U] & ~(1U << 1U);
+    ASSERT_NE(unrelated_mask & (1U << 17U), 0U);
+    const auto writes = model.hardware.mmio_writes;
+    model.hardware.hold_ep_mask_bits = 1U << 1U;
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_IO);
+    EXPECT_GT(model.hardware.mmio_writes, writes);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U] & (1U << 1U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] &
+                  ((1U << 15U) | (1U << 31U)),
+              0U);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U] & ~(1U << 1U),
+              unrelated_mask);
+    EXPECT_EQ(model.hardware.tx_count[1], 0U);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(endpoints[3].request, &request);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_disable = true;
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
+    EXPECT_EQ(endpoints[3].request, &request);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_ep_mask_bits = 0U;
+    model.hardware.hold_disable = false;
+    ASSERT_EQ(nx_usb_device_service(&device), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+}
+
+TEST_F(UsbActivation, FailedMaskWithdrawalKeepsClockUntilActualStopProof) {
+    ASSERT_EQ(Activate(0x81U, true), NX_SUCCESS);
+    ASSERT_NE(model.hardware.registers[0x81CU / 4U] & (1U << 1U), 0U);
+    const auto before_mask = model.hardware.registers[0x81CU / 4U];
+    model.hardware.hold_ep_mask_bits = 1U << 1U;
+    const auto writes = model.hardware.mmio_writes;
+    EXPECT_EQ(Activate(0x81U, false), NX_ERROR_IO);
+    EXPECT_GT(model.hardware.mmio_writes, writes);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_NE(model.hardware.registers[0x81CU / 4U] & (1U << 1U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U], before_mask);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
+    EXPECT_TRUE(model.controller.snapshot.started);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_ep_mask_bits = 0U;
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    EXPECT_FALSE(model.controller.snapshot.started);
+    EXPECT_EQ(model.hardware.consumers, 0U);
+}
+
+TEST_F(UsbActivation, RefusedNakEffectiveClearCannotPublishActivationSuccess) {
+    ASSERT_EQ(model.hardware.registers[0x928U / 4U] & 0x5BU, 0U);
+    ASSERT_EQ(model.hardware.registers[0x81CU / 4U] & (1U << 1U), 0U);
+    const auto before_mask = model.hardware.registers[0x81CU / 4U];
+    const auto writes = model.hardware.mmio_writes;
+    model.hardware.hold_clear = true;
+    EXPECT_EQ(Activate(0x81U, true), NX_ERROR_IO);
+    EXPECT_GT(model.hardware.mmio_writes, writes);
+    EXPECT_NE(model.hardware.registers[0x928U / 4U] & (1U << 6U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U] & (1U << 1U), 0U);
+    EXPECT_EQ(model.hardware.registers[0x81CU / 4U], before_mask);
+    EXPECT_EQ(model.hardware.registers[0x920U / 4U] & (1U << 31U), 0U);
+    EXPECT_EQ(model.hardware.tx_count[1], 0U);
+    EXPECT_TRUE(model.controller.snapshot.closing);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_clear = false;
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+}
+
+TEST_F(UsbDevice, LatchedRawResetRejectsPacketsBeforeIrqCollectsTheEpoch) {
+    for (unsigned index : {2U, 3U, 0U, 1U}) {
+        SCOPED_TRACE(testing::Message() << "endpoint index=" << index);
+        ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+        ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+        ASSERT_EQ(ActivateSelected(), NX_SUCCESS);
+        auto endpoint = Port(index);
+        const auto& selected = endpoints[index];
+        uint64_t control_epoch = 0U;
+        if (selected.number == 0U) {
+            const uint8_t setup[8] = {
+                static_cast<uint8_t>(selected.in ? 0x80U : 0U),
+                6U,
+                0U,
+                0U,
+                0U,
+                0U,
+                1U,
+                0U};
+            ReceiveSetup(setup);
+            ASSERT_FALSE(HasFatalFailure());
+            ASSERT_TRUE(model.controller.snapshot.control_pending);
+            ASSERT_FALSE(model.controller.setup_pending);
+            control_epoch = model.controller.snapshot.epoch;
+        }
+        ASSERT_EQ(selected.in
+                      ? nx_usb_in_prepare(&request, bytes, 1U, NX_USB_DATA,
+                                          control_epoch, 200U)
+                      : nx_usb_out_prepare(&request, bytes, 1U, NX_USB_DATA,
+                                           control_epoch, 200U),
+                  NX_SUCCESS);
+        const uint32_t offset =
+            (selected.in ? 0x900U : 0xB00U) + 32U * selected.number;
+        const auto control = model.hardware.registers[offset / 4U];
+        ASSERT_NE(control & (1U << 15U), 0U);
+        ASSERT_EQ(endpoints[index].request, nullptr);
+        ASSERT_FALSE(model.controller.reset_pending);
+        const auto epoch = model.controller.snapshot.epoch;
+        const auto size = model.hardware.registers[(offset + 16U) / 4U];
+        const auto mask = model.hardware.registers[0x81CU / 4U];
+        /* Publish only the external reset latch. Keeping active proves the
+         * generic admission rule independently of ST's nonzero reset clear. */
+        model.hardware.registers[0x14U / 4U] |= 1U << 12U;
+        const auto writes = model.hardware.mmio_writes;
+        const auto result = nx_usb_endpoint_submit(&endpoint, &request);
+        EXPECT_EQ(result, NX_ERROR_STATE);
+        EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_READY);
+        EXPECT_EQ(endpoints[index].request, nullptr);
+        EXPECT_EQ(model.hardware.mmio_writes, writes);
+        EXPECT_EQ(model.hardware.registers[offset / 4U], control);
+        EXPECT_EQ(model.hardware.registers[(offset + 16U) / 4U], size);
+        EXPECT_EQ(model.hardware.registers[0x81CU / 4U], mask);
+        EXPECT_EQ(model.hardware.tx_count[selected.number], 0U);
+        EXPECT_NE(model.hardware.registers[0x14U / 4U] & (1U << 12U), 0U);
+        EXPECT_EQ(model.controller.snapshot.epoch, epoch);
+        EXPECT_FALSE(model.controller.reset_pending);
+        EXPECT_FALSE(model.controller.snapshot.closing);
+        EXPECT_EQ(model.hardware.consumers, 1U);
+        /* RED can accept. Keep fixture-owned request/payload alive until the
+         * real stop joins its hardware references before the next table row. */
+        ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+        if (result == NX_SUCCESS) {
+            ASSERT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+        }
+    }
 }

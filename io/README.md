@@ -47,3 +47,30 @@ fixtures support focused tests; generated assemblies use separate state and
 buffers. Native behavior, production-register fault models and ARM link fixtures
 establish software evidence. Board facts authorize reviewed physical routes;
 software-only fixtures do not establish PCB connectivity or physical timing.
+
+The optional USB `nx_usb_activation_port_t` is a controller face with one
+synchronous setter and the existing provider context. Its generated
+`nx_factory_usb_activation` lookup is independent of optional ROM profiles and
+`factory.capabilities`, with no hardware access or new mutable state, queue,
+worker or allocation. Existing USB faces, ops/profile layouts and factory ABI
+epoch 1 stay unchanged. Retained read-only ARM cost and unreferenced GC require
+linked evidence separate from the two-pointer face layout.
+
+Activation controls one already selected nonzero endpoint direction; EP0 remains
+separate. Cold start activates/unmasks only EP0. A setter uses the current
+software epoch, including valid cold epoch 0, and requires a quiet target with no
+loan. Enable proves endpoint geometry, DATA0, NAK and active state before
+unmasking that direction; disable masks it before withdrawing active. Neither
+starts a transfer. Repeated enable preserves DATA1/HALT; explicit disable/enable
+establishes fresh DATA0 only after proof. Other directions and their loans remain
+owned. After actual reset drain, common software explicitly masks/deactivates
+nonzero directions on both families; this does not assert an unproved GD reset
+side effect. Reset, clear-halt and submit never activate a nonzero endpoint.
+
+A failed post-write proof may have partial effects: IO closes admission, retains
+clock/storage and requires continued drain plus explicit full stop. External
+Chapter 9 policy stages selected endpoints before status IN, gates ordinary
+packet admission until configured readiness is committed, and owns rollback or
+stop on superseding SETUP/status failure. The setter is not a configuration
+transaction. The [USB packet contract](../docs/design/usb-device.md) retains
+FIG-16 and the full IO-35, class/configuration and physical HIL limits.

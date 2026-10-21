@@ -1,0 +1,54 @@
+# USB endpoint activation development evidence
+
+This packet binds the 32 changed implementation, test and current documentation
+inputs to source HEAD `6b10c814c21d94b069f5690300152f904ea14d22`, tree
+`a7109d16e669e0d015eb4f79978ca65cfbacce05`, plus the final source patch. Main
+merge `8b27691c9a8ba4980ed2475eed6f43e46b9cc341` has the same tree and is only
+the ARM layout comparator; it is not substituted for the actual build HEAD.
+
+The optional activation face reuses the existing controller context and shared
+read-only methods. Cold start activates only EP0. Explicit directional changes
+prove geometry, NAK, DATA0 and masks; reset withdraws nonzero directions only
+after genuine loan/FIFO drain. A latched raw reset rejects packet admission
+before borrowing or writing. External Chapter 9 configuration remains external.
+
+Actual development execution:
+
+- Configuration RED: a three-test run with six expected getter subtest failures
+  before implementing the getter; 24 complete configuration tests then passed.
+- Runtime RED: seven complete programs, 126 cases and 24 expected failures with
+  inert declarations. The first GREEN compilation failed on a test-header
+  dependency; its original diagnostics remain separate from runtime results.
+- Intermediate GREEN: 12 whole USB programs and 210 cases passed. The additional
+  raw-reset regression then produced exactly three failed cases in 98 tests;
+  after the admission fix, all 12 whole programs / 213 cases passed.
+- The source-SDK header-closure regression failed before the required-file fix;
+  all 29 source-SDK selection tests then passed. This is not the installed SDK
+  matrix or clean-main SDK qualification.
+- Six selected ARM links and two unselected controls passed. The retained
+  activation face and shared ops occupy 8 and 4 read-only bytes; they point to
+  the existing controller and executable method. Existing USB RAM layouts and
+  static objects are unchanged. Each selected verification image adds 1,096
+  Flash bytes, including verification-owner calls, with zero static RAM delta.
+  These are whole-image measurements, not isolated driver cost or throughput.
+- Strict Doxygen/gettext/English/Chinese builds passed 127 pages and 254 language
+  records. The capability authority check passed. API and prose catalogs have
+  independent semantic review; old translations remain preserved.
+
+`package.json` references the compact raw archive: 863 files, 12,946,426 bytes.
+`verified.json` records its verification; `restored.json` records actual full
+restoration and equality of all 1,072 inventory entries. The root also verified
+the normal copied archive after moving its storage path into this directory.
+The archive retains raw commands, receipts, 34 Google XML reports, final source
+patch, ARM artifacts, 127 fresh POTs, translation records and review metadata.
+
+Generated HTML, fonts, doctrees and API XML are excluded from the source packet.
+The separate full local recovery archive has digest
+`291efc0e55f9afd0354bdfb642ef3c89671b6318593dfa34989de97e96767ca7`;
+its verified full restore preceded retirement of the two exact generated docs
+roots. Its body is not nested or committed here.
+
+This is pre-commit development evidence. Ordinary complete-index and remote
+checks are later phases and must bind their own accepted commit. Physical HIL,
+complete USB class/configuration support and formal clean-main qualification
+are not established by this packet.
