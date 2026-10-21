@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "tools/testing/evidence/usb-interrupt-in-20261021/raw/3aedc16130ccf74d183ad5d12929794e191c4ee542f3143c3a28396ef907a926.tar.gz",
+    "sha256": "3aedc16130ccf74d183ad5d12929794e191c4ee542f3143c3a28396ef907a926",
+    "size": 2745116
+  },
+  "bytes": 14681702,
+  "files": 602,
+  "kind": "portable_evidence",
+  "manifest_sha256": "e9d186559c14eb495dd2df9cbc01f6246af5180f46d9313cda1ffc9ac2bc7a94",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

@@ -308,7 +308,8 @@ def editor_schema():
         properties[kind + "_device"] = {"type": "object", "additionalProperties": record(fields, {"controller"})}
     endpoint_schema = record(USB_ENDPOINT_FIELDS, USB_ENDPOINT_FIELDS - {"fifo_words"})
     endpoint_schema["properties"]["direction"] = {"enum": ["in", "out"]}
-    endpoint_schema["properties"]["transfer"] = {"enum": ["control", "bulk"]}
+    endpoint_schema["properties"]["transfer"] = {
+        "enum": ["control", "bulk", "interrupt"]}
     properties["usb_endpoint"] = {"type": "object", "additionalProperties": endpoint_schema}
     schema["oneOf"] = [{"required": ["board"], "not": {"required": ["board_package"]}},
                        {"required": ["board_package"], "not": {"required": ["board"]}}]

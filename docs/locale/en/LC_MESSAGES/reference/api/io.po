@@ -7568,10 +7568,6 @@ msgid "[in] DATA or control STATUS; STATUS must be zero length."
 msgstr "[in] DATA or control STATUS; STATUS must be zero length."
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
-msgid "[in] Current SETUP epoch for EP0, zero for bulk endpoints."
-msgstr "[in] Current SETUP epoch for EP0, zero for bulk endpoints."
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
 msgid "[in] Absolute independent monotonic clock deadline."
 msgstr "[in] Absolute independent monotonic clock deadline."
 
@@ -7656,10 +7652,6 @@ msgstr "Set/clear STALL only after the endpoint has no live transfer."
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
 msgid "[in] Serialized owner, started and IRQ masks clear."
 msgstr "[in] Serialized owner, started and IRQ masks clear."
-
-#: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
-msgid "[in] Desired STALL; clearing bulk also resets DATA0."
-msgstr "[in] Desired STALL; clearing bulk also resets DATA0."
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:346
 msgid "Success after readback, BUSY retains a pending request."
@@ -8176,21 +8168,6 @@ msgstr ""
 "Validate exact selected FS facts without observing the controller."
 
 msgid ""
-"Task/ISR bounded and read-only. Facts identify selected software "
-"support; they never imply PCB routing, VBUS wiring or physical "
-"qualification. Public metadata, endpoint arrays, faces and operations "
-"tables require their natural C alignment and nonwrapping extents. "
-"Numeric rejection is not a probe of arbitrary addresses or opaque "
-"private contexts."
-msgstr ""
-"Task/ISR bounded and read-only. Facts identify selected software "
-"support; they never imply PCB routing, VBUS wiring or physical "
-"qualification. Public metadata, endpoint arrays, faces and operations "
-"tables require their natural C alignment and nonwrapping extents. "
-"Numeric rejection is not a probe of arbitrary addresses or opaque "
-"private contexts."
-
-msgid ""
 "[in] Stable readable immutable facts, faces and endpoint array."
 msgstr ""
 "[in] Stable readable immutable facts, faces and endpoint array."
@@ -8281,3 +8258,12 @@ msgid ""
 "Optional epoch-bound EP0 rejection, separate from generic ops."
 msgstr ""
 "Optional epoch-bound EP0 rejection, separate from generic ops."
+
+msgid "[in] Current SETUP epoch for EP0, zero for nonzero endpoints."
+msgstr "[in] Current SETUP epoch for EP0, zero for nonzero endpoints."
+
+msgid "[in] Desired STALL; clearing bulk/interrupt resets DATA0."
+msgstr "[in] Desired STALL; clearing bulk/interrupt resets DATA0."
+
+msgid "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS. Interrupt selects nonzero IN with 1..64-byte MPS. Host polling interval belongs to the external descriptor, not this profile."
+msgstr "Task/ISR bounded and read-only. Facts identify selected software support; they never imply PCB routing, VBUS wiring or physical qualification. Public metadata, endpoint arrays, faces and operations tables require their natural C alignment and nonwrapping extents. Numeric rejection is not a probe of arbitrary addresses or opaque private contexts. EP0 selects control/64; nonzero bulk selects 8/16/32/64-byte MPS. Interrupt selects nonzero IN with 1..64-byte MPS. Host polling interval belongs to the external descriptor, not this profile."

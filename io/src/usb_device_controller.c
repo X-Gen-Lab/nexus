@@ -116,6 +116,11 @@ static uint32_t ep_offset(const nx_usb_endpoint_t* ep) {
 static uint32_t ep_flags(const nx_usb_endpoint_t* ep) {
     return NX_USB_READ(ep->controller->registers, ep_offset(ep) + 8U) & 0x5BU;
 }
+/** \brief Selected bulk/interrupt DATA PID commands never apply to EP0. */
+static bool uses_data_toggle(const nx_usb_endpoint_t* ep) {
+    return ep->number != 0U && (ep->transfer == NX_USB_PROFILE_BULK ||
+                                ep->transfer == NX_USB_PROFILE_INTERRUPT);
+}
 /** \brief Cold polls have a finite work budget and never depend on USB frames.
  */
 static bool wait_bits(nx_usb_controller_t* c, uint32_t offset, uint32_t mask,
@@ -191,20 +196,27 @@ static bool plan_valid(nx_usb_controller_t* c) {
     bool in0 = false, out0 = false;
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];
-        if (ep->number > 3U || ep->request != NULL ||
-            (ep->number == 0U
-                 ? (ep->bulk || ep->max_packet != 64U)
-                 : (!ep->bulk ||
-                    (ep->max_packet != 8U && ep->max_packet != 16U &&
-                     ep->max_packet != 32U && ep->max_packet != 64U)))) {
+        if (ep->number > 3U || ep->request != NULL) {
             return false;
         }
         if (ep->number == 0U) {
+            if (ep->transfer != NX_USB_PROFILE_CONTROL ||
+                ep->max_packet != 64U) {
+                return false;
+            }
             if (ep->in) {
                 in0 = true;
             } else {
                 out0 = true;
             }
+        } else if (ep->transfer == NX_USB_PROFILE_BULK) {
+            if (ep->max_packet != 8U && ep->max_packet != 16U &&
+                ep->max_packet != 32U && ep->max_packet != 64U) {
+                return false;
+            }
+        } else if (ep->transfer != NX_USB_PROFILE_INTERRUPT || !ep->in ||
+                   ep->max_packet == 0U || ep->max_packet > 64U) {
+            return false;
         }
         if (ep->in &&
             (ep->fifo_words < 16U || ep->fifo_start < c->rx_fifo_words ||
@@ -289,10 +301,12 @@ nx_result_t nx_usb_controller_initialize(nx_usb_controller_t* c) {
         ep->rx_seen = false;
         ep->disable_requested = false;
         uint32_t offset = ep_offset(ep);
-        uint32_t control = SNAK | (1U << 15U) |
-                           (ep->number == 0U ? 0U
-                                             : (uint32_t)ep->max_packet |
-                                                   (2U << 18U) | (1U << 28U));
+        uint32_t control = SNAK | (1U << 15U);
+        if (ep->number != 0U) {
+            /* Validation limits nonzero directions to bulk or interrupt. */
+            uint32_t type = ep->transfer == NX_USB_PROFILE_INTERRUPT ? 3U : 2U;
+            control |= (uint32_t)ep->max_packet | (type << 18U) | (1U << 28U);
+        }
         if (ep->in) {
             control |= (uint32_t)ep->number << 22U;
             uint32_t fifo = ((uint32_t)ep->fifo_words << 16U) | ep->fifo_start;
@@ -541,7 +555,7 @@ static bool drain(nx_usb_endpoint_t* ep) {
     }
     return clear;
 }
-/** \brief Reopening requires observed STALL clear; bulk also starts DATA0. */
+/** \brief Reopening requires STALL clear and selected DATA0 readback. */
 static bool clear_halts(nx_usb_controller_t* c, bool reset) {
     for (size_t i = 0U; i < c->endpoint_count; ++i) {
         nx_usb_endpoint_t* ep = &c->endpoints[i];
@@ -556,14 +570,14 @@ static bool clear_halts(nx_usb_controller_t* c, bool reset) {
             return false;
         }
         control &= ~STALL;
-        if (reset && ep->bulk) {
+        if (reset && uses_data_toggle(ep)) {
             control |= 1U << 28U;
         }
         NX_USB_WRITE(c->registers, offset, control);
         nx_arch_dsb();
         uint32_t observed = NX_USB_READ(c->registers, offset);
         if ((observed & STALL) != 0U ||
-            (reset && ep->bulk && (observed & (1U << 16U)) != 0U)) {
+            (reset && uses_data_toggle(ep) && (observed & (1U << 16U)) != 0U)) {
             return false;
         }
     }
@@ -839,8 +853,12 @@ static nx_result_t submit(void* context, nx_usb_request_t* r) {
     nx_result_t result = NX_SUCCESS;
     uintptr_t base = c->registers;
     uint32_t offset = ep_offset(ep);
+    /* Bus reset can deactivate nonzero endpoints. Only external configuration
+     * policy may authorize reactivation; inactive hardware cannot take a loan.
+     */
     if (!c->snapshot.started || c->snapshot.closing || ep->halted ||
-        c->reset_pending) {
+        c->reset_pending ||
+        (ep->number != 0U && (NX_USB_READ(base, offset) & (1U << 15U)) == 0U)) {
         result = NX_ERROR_STATE;
     } else if (!request_valid(ep, r)) {
         result = NX_ERROR_INVALID;
@@ -923,13 +941,14 @@ static nx_result_t stall_locked(nx_usb_endpoint_t* ep, bool value) {
         return NX_ERROR_BUSY;
     }
     control = value ? control | STALL : control & ~STALL;
-    if (!value && ep->bulk) {
+    if (!value && uses_data_toggle(ep)) {
         control |= 1U << 28U;
     }
     NX_USB_WRITE(c->registers, offset, control);
     uint32_t readback = NX_USB_READ(c->registers, offset);
-    bool accepted = ((readback & STALL) != 0U) == value &&
-                    (value || !ep->bulk || (readback & (1U << 16U)) == 0U);
+    bool accepted =
+        ((readback & STALL) != 0U) == value &&
+        (value || !uses_data_toggle(ep) || (readback & (1U << 16U)) == 0U);
     if (accepted) {
         ep->halted = value;
     }

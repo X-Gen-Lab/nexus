@@ -73,12 +73,18 @@ def endpoint(device):
     if not isinstance(direction, str) or direction not in {"in", "out"}:
         fail("USB endpoint direction must be explicitly in or out")
     transfer = device["transfer"]
-    if (not isinstance(transfer, str) or
-            transfer != ("control" if number == 0 else "bulk")):
-        fail("USB EP0 requires control and endpoints 1..3 require bulk")
-    maximum = integer(device["max_packet"], 8, 64, "USB packet bytes")
-    if maximum not in ({64} if number == 0 else {8, 16, 32, 64}):
-        fail("USB packet bound differs from the selected control/bulk direction")
+    if not isinstance(transfer, str):
+        fail("USB endpoint transfer requires an explicit type")
+    maximum = integer(device["max_packet"], 1, 64, "USB packet bytes")
+    if number == 0:
+        valid = transfer == "control" and maximum == 64
+    elif transfer == "bulk":
+        valid = maximum in {8, 16, 32, 64}
+    else:
+        valid = transfer == "interrupt" and direction == "in"
+    if not valid:
+        fail("USB requires EP0 control/64, bulk 8/16/32/64 or "
+             "IN interrupt 1..64")
     if direction == "in":
         integer(device.get("fifo_words"), 16, 320, "USB IN FIFO words")
     elif "fifo_words" in device:
@@ -146,9 +152,15 @@ def constructor(item, result, prefix):
               "    nx_result_t status;"]
     for child in children:
         option = child.options
+        transfer = {
+            "control": "NX_USB_PROFILE_CONTROL",
+            "bulk": "NX_USB_PROFILE_BULK",
+            "interrupt": "NX_USB_PROFILE_INTERRUPT",
+        }[option.transfer]
         lines += [f"    s_nx_usb_endpoints_{name}[{option.index}] = (nx_usb_endpoint_t){{",
                   f"        .number = {option.number}u, .in = {str(option.direction == 'in').lower()},",
-                  f"        .bulk = {str(option.transfer == 'bulk').lower()}, .max_packet = {option.max_packet}u,",
+                  f"        .transfer = {transfer}, "
+                  f".max_packet = {option.max_packet}u,",
                   f"        .fifo_start = {option.fifo_start}u, .fifo_words = {option.fifo_words}u", "    };"]
     policy = result["irq"]
     kernel = kernel_policy_constant(result)

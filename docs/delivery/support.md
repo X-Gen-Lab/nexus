@@ -77,7 +77,7 @@ GPIO 参考单独维护；不从芯片型号或通用接口推断其他外设、
 | PWM | 固定 timer/channel/base、CCR shadow、0/100%、safe inactive；公共 stop 可以 restart，平台 teardown 释放 owner |
 | ADC | reviewed channel、single-shot/低速 scan、有限及连续双缓冲定时触发 DMA blocks；显式 sample time/reference；只发布完整扫描；可选外部序列与软件观测时间记录 |
 | Classic CAN | 11/29-bit DATA/RTR、0–8 bytes、真实三邮箱、共享 filter domain、显式 abort/bus-off recovery；没有 CAN FD 或自动重发 |
-| USB FS device | internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk8/16/32/64、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；没有 Host/HS/DMA/ISO/class stack |
+| USB FS device | internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk IN/OUT MPS8/16/32/64 B、interrupt IN MPS1–64 B、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；非零 endpoint 配置／reset 后重新启用待接入；没有 Host/HS/DMA/ISO/class stack |
 
 F407 名义周期使用 `(RLR + 1) × divisor / 32000`，GD470 使用
 `(RLD × divisor + 1) / 32000`，不能套用同一公式。F407 数据手册的 17..47 kHz

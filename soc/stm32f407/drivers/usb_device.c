@@ -54,6 +54,19 @@ _Static_assert(
         USB_OTG_DIEPCTL_NAKSTS == (1U << 17U) && USB_OTG_DOEPINT_STUP == 8U &&
         USB_OTG_GCCFG_NOVBUSSENS == (1U << 21U),
     "FS capabilities, lifecycle bits and exact vector");
+_Static_assert(USB_OTG_DIEPCTL_EPTYP_Pos == 18U &&
+                   USB_OTG_DIEPCTL_EPTYP == (3U << 18U) &&
+                   USB_OTG_DOEPCTL_EPTYP_Pos == 18U &&
+                   USB_OTG_DOEPCTL_EPTYP == (3U << 18U) &&
+                   USB_OTG_DIEPCTL_MPSIZ == 0x7FFU &&
+                   USB_OTG_DIEPCTL_TXFNUM == (15U << 22U) &&
+                   USB_OTG_DIEPCTL_SD0PID_SEVNFRM == (1U << 28U) &&
+                   USB_OTG_DOEPCTL_SD0PID_SEVNFRM == (1U << 28U) &&
+                   USB_OTG_DIEPCTL_EONUM_DPID == (1U << 16U) &&
+                   USB_OTG_DIEPCTL_USBAEP == (1U << 15U) &&
+                   USB_OTG_DOEPCTL_USBAEP == (1U << 15U) &&
+                   USB_OTG_DIEPTSIZ_PKTCNT == (0x3FFU << 19U),
+               "FS endpoint type, FIFO, DATA0 and packet register facts");
 #ifndef NX_USB_SOC_IRQ_GROUP
 #define NX_USB_SOC_IRQ_GROUP() NVIC_GetPriorityGrouping()
 #endif

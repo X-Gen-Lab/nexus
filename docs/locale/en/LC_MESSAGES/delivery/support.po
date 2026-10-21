@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b0cf3778ab81c7bb99ae5880f294ae46a5a7e95e4f97c1fe53b7d55dfda840b3\n"
+"X-Nexus-Source-SHA256: ccd8623aa3dca8bc8050eceb804dcf72f040950cd53c725023420b4e78cc6232\n"
 
 msgid "精确支持范围"
 msgstr "Exact support scope"
@@ -399,14 +399,6 @@ msgstr ""
 
 msgid "USB FS device"
 msgstr "USB FS device"
-
-msgid ""
-"internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk8/16/32/64、packet loan、SETUP"
-" epoch、reset/stop drain、独立 48 MHz owner；没有 Host/HS/DMA/ISO/class stack"
-msgstr ""
-"Internal-PHY PIO, EP0 control IN/OUT64, EP1–3 bulk8/16/32/64, packet loans, "
-"SETUP epochs, reset/stop drain, independent 48 MHz owner; no "
-"Host/HS/DMA/ISO/class stack"
 
 msgid ""
 "F407 名义周期使用 `(RLR + 1) × divisor / 32000`，GD470 使用 `(RLD × divisor + 1) / "
@@ -1156,3 +1148,6 @@ msgstr "Cortex-M33F; 2 MiB Flash; 192 KiB SRAM1; externally established TZEN=0/S
 # Reviewed bounded-scope prose correction; unchanged messages retained.
 msgid "PCB／SMPS／silicon revision／option bytes／VDDIO2 未测量；Cache off；ADC 要求外部准备 VDDA/ASV；USART1 GPDMA 仅有限连续地址 SRAM1 TX，RX 保持 IRQ bytes；硬件链最多三块、两私有节点，不开放通用 SG／循环链；LPTIM2/RTC 仅裸机 RUN；RTC backup domain 由外部 boot owner 预备；无 RX DMA、LPDMA、自主低功耗、Stop/VBAT 连续性、通用双域 factory 或其他 RAM 放置"
 msgstr "PCB, SMPS, silicon revision, option bytes and VDDIO2 remain unmeasured; Cache off; ADC requires externally prepared VDDA/ASV; USART1 GPDMA supports only finite contiguous SRAM1 TX and retains IRQ-byte RX; hardware chains have at most three blocks and two private nodes, without general SG or cyclic chains; LPTIM2/RTC are baremetal RUN only; an external boot owner prepares the RTC backup domain; no RX DMA, LPDMA, autonomous low power, Stop/VBAT continuity, generic dual-domain factory or other RAM placement"
+
+msgid "internal PHY PIO、EP0 control IN/OUT64、EP1–3 bulk IN/OUT MPS8/16/32/64 B、interrupt IN MPS1–64 B、packet loan、SETUP epoch、reset/stop drain、独立 48 MHz owner；非零 endpoint 配置／reset 后重新启用待接入；没有 Host/HS/DMA/ISO/class stack"
+msgstr "Internal-PHY PIO, EP0 control IN/OUT64, EP1–3 bulk IN/OUT MPS8/16/32/64 B and interrupt IN MPS1–64 B, packet loans, SETUP epochs, reset/stop drain and an independent 48 MHz owner; nonzero endpoint configuration/reactivation after reset remains to be integrated; no Host/HS/DMA/ISO/class stack"

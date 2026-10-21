@@ -21,8 +21,11 @@ def emit(result):
         for child in children:
             endpoint = child.id.replace("-", "_")
             options = child.options
-            transfer = ('NX_USB_PROFILE_CONTROL' if options.transfer == "control"
-                        else 'NX_USB_PROFILE_BULK')
+            transfer = {
+                "control": "NX_USB_PROFILE_CONTROL",
+                "bulk": "NX_USB_PROFILE_BULK",
+                "interrupt": "NX_USB_PROFILE_INTERRUPT",
+            }[options.transfer]
             source.append(f'    {{ &s_nx_device_face_{endpoint}, '
                           f'{options.max_packet}U, {options.number}U, '
                           f'{str(options.direction == "in").lower()}, {transfer} }},')

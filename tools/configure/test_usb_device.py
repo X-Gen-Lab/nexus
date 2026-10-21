@@ -47,6 +47,83 @@ class UsbConfigurationTests(unittest.TestCase):
                     self.assertIn("clock:CK48", claims)
                     self.assertIn("clock:PLLSAIP", claims)
 
+    def interrupt_endpoint(self, **changes):
+        fields = {"controller": '"fs"', "number": "2", "direction": '"in"',
+                  "transfer": '"interrupt"', "max_packet": "10",
+                  "fifo_words": "16"}
+        fields.update(changes)
+        return ("\n[usb_endpoint.notification]\n" +
+                "\n".join(key + "=" + value for key, value in fields.items()
+                          if value is not None) + "\n")
+
+    def test_interrupt_in_preserves_exact_typed_plan_and_existing_bulk_ports(self):
+        for family in ("stm32-zg", "stm32-ve", "gd32"):
+            with self.subTest(family=family):
+                path = self.assembly(family, mutate=lambda text:
+                                     text + self.interrupt_endpoint())
+                ir = gate.resolve_ir(path)
+                options = next(item.options for item in ir.devices
+                               if item.id == "notification")
+                self.assertEqual((options.number, options.direction,
+                                  options.transfer, options.max_packet,
+                                  options.fifo_start,
+                                  options.fifo_words),
+                                 (2, "in", "interrupt", 10, 160, 16))
+                self.assertEqual(len(ir.devices), 5)
+                self.assertFalse(ir["physical_qualified"])
+                with self.assertRaises(FrozenInstanceError):
+                    options.transfer = "bulk"
+                claims = {item["key"] for item in ir["claims"]}
+                controller = "USBFS" if family == "gd32" else "OTG_FS"
+                self.assertIn("usb:" + controller + ":endpoint:2:in", claims)
+                self.assertFalse(any(item.startswith("dma:") for item in claims))
+                output = self.root / (family + "-interrupt")
+                gate.configure(path, output)
+                source = (output / "bindings.c").read_text()
+                self.assertIn("static nx_usb_endpoint_t s_nx_usb_endpoints_fs[5]",
+                              source)
+                self.assertIn("NX_USB_PROFILE_INTERRUPT", source)
+                self.assertIn("NX_USB_PROFILE_BULK", source)
+                self.assertNotIn("malloc", source)
+
+    def test_interrupt_in_accepts_full_speed_non_power_of_two_packet_bounds(self):
+        for maximum in (1, 10, 64):
+            with self.subTest(maximum=maximum):
+                path = self.assembly(mutate=lambda text: text +
+                    self.interrupt_endpoint(max_packet=str(maximum)))
+                ir = gate.resolve_ir(path)
+                options = next(item.options for item in ir.devices
+                               if item.id == "notification")
+                self.assertEqual(options.max_packet, maximum)
+
+    def test_interrupt_in_rejects_unsupported_and_ambiguous_authored_fields(self):
+        changes = ({"max_packet": "0"}, {"max_packet": "65"},
+                   {"max_packet": "true"}, {"direction": '"out"',
+                    "fifo_words": None}, {"number": "0"}, {"number": "4"},
+                   {"transfer": '"isochronous"'}, {"interval_frames": "16"},
+                   {"fifo_words": "15"}, {"fifo_words": "161"},
+                   {"polling_worker": "true"})
+        for change in changes:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                gate.resolve_ir(self.assembly(mutate=lambda text:
+                    text + self.interrupt_endpoint(**change)))
+        for legacy in ('transfer="control"', 'transfer="bulk"'):
+            with self.subTest(legacy=legacy), self.assertRaises(ValueError):
+                gate.resolve_ir(self.assembly(mutate=lambda text:
+                    text.replace(legacy, legacy + "\ninterval_frames=1", 1)))
+
+    def test_interrupt_in_keeps_optional_profile_emission_opt_out(self):
+        path = self.assembly(mutate=lambda text:
+            text.replace("capabilities=true", "capabilities=false") +
+            self.interrupt_endpoint())
+        output = self.root / "interrupt-no-capabilities"
+        gate.configure(path, output)
+        header = (output / "nexus_factory.h").read_text()
+        source = (output / "bindings.c").read_text()
+        self.assertNotIn("nx_factory_usb_profile", header)
+        self.assertNotIn("nx_usb_endpoint_profile_t", source)
+        self.assertIn("static nx_usb_endpoint_t s_nx_usb_endpoints_fs[5]", source)
+
     def test_fifo_starts_are_one_typed_plan_with_exact_selected_storage(self):
         ir = gate.resolve_ir(self.assembly())
         directions = {(item.options.number, item.options.direction): item.options

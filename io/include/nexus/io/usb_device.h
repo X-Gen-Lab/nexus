@@ -79,7 +79,7 @@ typedef struct {
  * \param[in] bytes: Immutable packet bytes, NULL only for zero length.
  * \param[in] length: Packet length, no automatic terminating ZLP.
  * \param[in] stage: DATA or control STATUS; STATUS must be zero length.
- * \param[in] epoch: Current SETUP epoch for EP0, zero for bulk endpoints.
+ * \param[in] epoch: Current SETUP epoch for EP0, zero for nonzero endpoints.
  * \param[in] deadline: Absolute independent monotonic clock deadline.
  * \return Success, INVALID or STATE; rejection retains no references.
  */
@@ -92,7 +92,7 @@ nx_result_t nx_usb_in_prepare(nx_usb_request_t* request, const uint8_t* bytes,
  * \param[out] bytes: Borrowed until SETTLED only after accepted submission.
  * \param[in] capacity: At most endpoint MPS; short packets complete normally.
  * \param[in] stage: DATA or zero-capacity control STATUS.
- * \param[in] epoch: Current SETUP epoch for EP0, zero for bulk endpoints.
+ * \param[in] epoch: Current SETUP epoch for EP0, zero for nonzero endpoints.
  * \param[in] deadline: Absolute independent monotonic clock deadline.
  * \return Success, INVALID or STATE; rejection creates no borrow.
  */
@@ -123,7 +123,7 @@ nx_result_t nx_usb_endpoint_cancel(const nx_usb_endpoint_port_t* port,
 /**
  * \brief Set/clear STALL only after the endpoint has no live transfer.
  * \param[in] port: Serialized owner, started and IRQ masks clear.
- * \param[in] stalled: Desired STALL; clearing bulk also resets DATA0.
+ * \param[in] stalled: Desired STALL; clearing bulk/interrupt resets DATA0.
  * \return Success after readback, BUSY retains a pending request.
  */
 nx_result_t nx_usb_endpoint_stall(const nx_usb_endpoint_port_t* port,

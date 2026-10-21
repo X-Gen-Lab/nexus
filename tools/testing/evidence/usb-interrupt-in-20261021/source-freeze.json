@@ -1,0 +1,318 @@
+{
+  "status": "root_verified_final_copylist_and_live_source_freeze",
+  "git_base": "430b0aea19fc3304b5b6f76dcec8419448027357",
+  "copy_list": "/dev/shm/nexus-usb-interrupt-evidence-prep-20261021/copy-list-final.json",
+  "copy_list_sha256": "3812e8aabbda649b00e15c1e72016de7e43f6262321937374940a3a9bb30d908",
+  "files": [
+    {
+      "source": "/tmp/nexus-quality-20261019/components/usb_control/include/nexus/components/usb_descriptors.h",
+      "member": "source/final/components/usb_control/include/nexus/components/usb_descriptors.h",
+      "bytes": 2117,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "74175c6954f008c1255fe3887221d02418798b5393716683e01a148d0e530c99",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/components/usb_control/src/usb_descriptors.c",
+      "member": "source/final/components/usb_control/src/usb_descriptors.c",
+      "bytes": 4474,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "eb582a480f9492c4d6e77807c7b8af61848992b27a4c07ad113af2e5a11f33d6",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/delivery/capabilities.md",
+      "member": "source/final/docs/delivery/capabilities.md",
+      "bytes": 60795,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "ccb4259fd955bf4340a92338c6d479257ea89d9de8251bd4d28bad18612cd300",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/delivery/support.md",
+      "member": "source/final/docs/delivery/support.md",
+      "bytes": 31669,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "ccd8623aa3dca8bc8050eceb804dcf72f040950cd53c725023420b4e78cc6232",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/design/usb-device.md",
+      "member": "source/final/docs/design/usb-device.md",
+      "bytes": 21354,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "a685025c4cd3b45e19b042c7815fd1b2a949f3b9994d10b54aea0aabd3b8434b",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "member": "source/final/docs/locale/en/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119428,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "323526ac67c5476db1a5630694ee7a4219713fa73320db1fd1b7f358ed4258f3",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/en/LC_MESSAGES/delivery/support.po",
+      "member": "source/final/docs/locale/en/LC_MESSAGES/delivery/support.po",
+      "bytes": 72123,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "9743c1d2028c42a9477149bb23f504f82e3c74af2bc82cc05469ac13110d86ac",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/en/LC_MESSAGES/design/usb-device.po",
+      "member": "source/final/docs/locale/en/LC_MESSAGES/design/usb-device.po",
+      "bytes": 48291,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "477dc7cebcacb59afc2301dd5818efecc2a77d7a025bf7f8623aabcda22bc449",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/en/LC_MESSAGES/reference/api/components.po",
+      "member": "source/final/docs/locale/en/LC_MESSAGES/reference/api/components.po",
+      "bytes": 85905,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "caa7b83efa3e6d98d917eb72a9f59a795fe71809e4abdd86e2b49fad137d941c",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/en/LC_MESSAGES/reference/api/io.po",
+      "member": "source/final/docs/locale/en/LC_MESSAGES/reference/api/io.po",
+      "bytes": 434526,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "0b5cab8af7cda4374b8a259336e600bc5764a9d79cdcdd0f546cf35f969bb2e5",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "member": "source/final/docs/locale/zh_CN/LC_MESSAGES/delivery/capabilities.po",
+      "bytes": 119156,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "d762050dcb201faeba05d676802e29103f94c33249ca326ae587a3b62f108cab",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/zh_CN/LC_MESSAGES/delivery/support.po",
+      "member": "source/final/docs/locale/zh_CN/LC_MESSAGES/delivery/support.po",
+      "bytes": 68975,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "4580c284979ebf3b435e8d819c85349d50485f474fabad2413c37de649c939fb",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/zh_CN/LC_MESSAGES/reference/api/components.po",
+      "member": "source/final/docs/locale/zh_CN/LC_MESSAGES/reference/api/components.po",
+      "bytes": 87087,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "f84be84358e3550e5b0a049704b0f0150888b41ee305718d9e6b4cb21eb9d4e8",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po",
+      "member": "source/final/docs/locale/zh_CN/LC_MESSAGES/reference/api/io.po",
+      "bytes": 434374,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "5ba4d93d4a086ce8b17e66b4a8f4b32c2aa4e643c633274bae7cf4764119e00a",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/io/include/nexus/io/usb_device.h",
+      "member": "source/final/io/include/nexus/io/usb_device.h",
+      "bytes": 8458,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "d4951c5796eed451aca3eeebc4a8bf140751304ef04e270ce297b9b385f1c0d5",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/io/include/nexus/io/usb_profile.h",
+      "member": "source/final/io/include/nexus/io/usb_profile.h",
+      "bytes": 5410,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "b2e3aa9138df1eccd4c763e590f2fbe835c6cfbbb58879c29cac854ffbac6683",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/io/native/usb_device.c",
+      "member": "source/final/io/native/usb_device.c",
+      "bytes": 12065,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "948a91aa66c356d53f874c6985c05d4f5e3804ce53553fad788ac7753e60930e",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/io/private/usb_device_controller.h",
+      "member": "source/final/io/private/usb_device_controller.h",
+      "bytes": 3045,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "ec9cdcd34904acdc63d3c58214fd0a248ee25b1739280db3064e84ad9cb88c89",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/io/src/usb_device_controller.c",
+      "member": "source/final/io/src/usb_device_controller.c",
+      "bytes": 49612,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "1afdd1c3404a14f3cbe00be172fb7a429c6065d17ac4aef3aabbf8932343dd1c",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/io/src/usb_profile.c",
+      "member": "source/final/io/src/usb_profile.c",
+      "bytes": 5101,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "a600f75d94f37dc50acdc8b2f0ebd35b7a31e7dbdd888e25a8b8d25b1323c62a",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/soc/gd32f470/drivers/usb_device.c",
+      "member": "source/final/soc/gd32f470/drivers/usb_device.c",
+      "bytes": 4019,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "96c8c1c3a2fd130e9b85215d94b11256350a0846ca7ecc01919c3bd7f539d2e8",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/soc/stm32f407/drivers/usb_device.c",
+      "member": "source/final/soc/stm32f407/drivers/usb_device.c",
+      "bytes": 4998,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "d9a07e3263f198cfbdf9fdd8ae948e682a04fec25825cf1dec83f1391cf4eabc",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/contracts/usb_assembly/controller_main.c",
+      "member": "source/final/tests/contracts/usb_assembly/controller_main.c",
+      "bytes": 4253,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "eac957c348555a6cf1137d2b5b77f0fffbefc1479a867998e5516b6d20a02d4e",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/contracts/usb_assembly/gd32-interrupt.toml",
+      "member": "source/final/tests/contracts/usb_assembly/gd32-interrupt.toml",
+      "bytes": 940,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "ba4a09070c96c0d1f4e28dd186e8de9d0d285e0533a2ba8f84d0ae6818f05699",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/contracts/usb_assembly/stm32-ve-interrupt.toml",
+      "member": "source/final/tests/contracts/usb_assembly/stm32-ve-interrupt.toml",
+      "bytes": 941,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "4f5ab8c1ca296c5d340abea9876a3edaff2bbce7e16122ba0ba4e12bfaff1351",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/contracts/usb_assembly/stm32-zg-interrupt.toml",
+      "member": "source/final/tests/contracts/usb_assembly/stm32-zg-interrupt.toml",
+      "bytes": 941,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "54f8a4b77bcf82eb6225fa8c82ab40cb809c25f6c386d588149d3d7390e77f39",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/google/usb_descriptor_test.cpp",
+      "member": "source/final/tests/google/usb_descriptor_test.cpp",
+      "bytes": 9508,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "437e45c89d5721a284b3e58d9f2743142eb2f6dc618e200b96844244a5e98e6d",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/google/usb_device_soc_test.cpp",
+      "member": "source/final/tests/google/usb_device_soc_test.cpp",
+      "bytes": 12844,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "544e9722629647e3fc0c9e3bbe80c94a7719f7fbc49ca0131fbfb304a961bc7e",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tests/google/usb_device_test.cpp",
+      "member": "source/final/tests/google/usb_device_test.cpp",
+      "bytes": 65497,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "75afca65ead6eb717cd6f37a72e35ac80811fb3bbb18834c4233366a5107eaf7",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tools/configure/assembly.schema.json",
+      "member": "source/final/tools/configure/assembly.schema.json",
+      "bytes": 47956,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "19aab3d9e21bf7221eb900ee9ef870422b6883bd51e615543c281ceb16643a68",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tools/configure/authored.py",
+      "member": "source/final/tools/configure/authored.py",
+      "bytes": 18461,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "90f0f82539e5a795d15a6705f7312caaa5bf934ce099bcb0425c1e2e0a5c1682",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tools/configure/test_usb_device.py",
+      "member": "source/final/tools/configure/test_usb_device.py",
+      "bytes": 12444,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "cc27ea65835beff7211da23bfea7cecf784671a29fe322e929870661fe9bc95c",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tools/configure/usb_device.py",
+      "member": "source/final/tools/configure/usb_device.py",
+      "bytes": 12576,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "d900279a0806754fdb5a47bd76cf3570331a1d717597561039e32ef264ecf525",
+      "mode": 384,
+      "independent_inode": true
+    },
+    {
+      "source": "/tmp/nexus-quality-20261019/tools/configure/usb_profiles.py",
+      "member": "source/final/tools/configure/usb_profiles.py",
+      "bytes": 2590,
+      "role": "final_changed_USB_source_once_after_Docs_PASS",
+      "sha256": "77d831f247d90dea41e717c0d14566239f6756601e131d54e0a928ef3151b339",
+      "mode": 384,
+      "independent_inode": true
+    }
+  ],
+  "all593_original_and_copied_hashes_verified": true,
+  "source_count": 34,
+  "copies": 593,
+  "compact_packet_seal_authorized": true
+}

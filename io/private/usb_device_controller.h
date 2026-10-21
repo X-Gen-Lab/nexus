@@ -36,7 +36,8 @@ typedef struct {
     uint16_t max_packet;
     uint8_t number;
     bool in;
-    bool bulk;
+    /** \brief Validated profile transfer value, stored in one byte. */
+    uint8_t transfer;
     bool halted;
     bool rx_seen;
     bool disable_requested;

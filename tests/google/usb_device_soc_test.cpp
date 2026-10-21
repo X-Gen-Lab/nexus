@@ -55,6 +55,8 @@ class UsbSoc : public testing::Test {
     nx_usb_endpoint_t endpoints[4] = {};
     nx_usb_event_t events[2] = {};
     ClockState clock = {};
+    nx_usb_request_t interrupt_request = {};
+    uint8_t interrupt_bytes[64] = {1U, 2U, 3U};
     const nx_usb_device_port_t port = {&nx_usb_fs_device_ops, &controller};
     void SetUp() override {
         ASSERT_NE(mmap(reinterpret_cast<void*>(0x40023000U), 0x1000U,
@@ -89,25 +91,113 @@ class UsbSoc : public testing::Test {
         for (unsigned i = 0; i < 4; ++i) {
             endpoints[i].number = static_cast<uint8_t>(i / 2U);
             endpoints[i].in = (i % 2U) == 0;
-            endpoints[i].bulk = i >= 2;
+            endpoints[i].transfer = static_cast<uint8_t>(
+                i >= 2 ? NX_USB_PROFILE_BULK : NX_USB_PROFILE_CONTROL);
             endpoints[i].max_packet = 64;
         }
         endpoints[0].fifo_start = 128;
         endpoints[0].fifo_words = 32;
         endpoints[2].fifo_start = 160;
         endpoints[2].fifo_words = 32;
+        nx_request_initialize(&interrupt_request.base);
         ASSERT_EQ(DEVICE_INIT(&controller, &clock), NX_SUCCESS);
+    }
+    nx_result_t StartInterrupt(uint8_t number, uint16_t maximum) {
+        nx_result_t result = nx_usb_device_stop(&port);
+        if (result != NX_SUCCESS) {
+            return result;
+        }
+        endpoints[2].number = number;
+        endpoints[2].transfer = NX_USB_PROFILE_INTERRUPT;
+        endpoints[2].max_packet = maximum;
+        endpoints[2].fifo_words = 16U;
+        return DEVICE_INIT(&controller, &clock);
     }
     void TearDown() override {
         hardware->hold_flush = hardware->hold_disable = hardware->hold_clear =
             false;
         hardware->hold_irq_disable = hardware->hold_gonak = false;
+        hardware->hold_bulk_pid = false;
+        hardware->hold_stall_clear_mask = 0U;
         EXPECT_EQ(nx_usb_device_stop(&port), NX_SUCCESS);
         EXPECT_EQ(CLOCK_STOP(&clock, 200), NX_SUCCESS);
         EXPECT_EQ(munmap(reinterpret_cast<void*>(0x50000000U), 0x10000U), 0);
         EXPECT_EQ(munmap(reinterpret_cast<void*>(0x40023000U), 0x1000U), 0);
     }
 };
+TEST_F(UsbSoc, InterruptDataAndZlpNeedXfrcAndDedicatedFifoWithdrawal) {
+    struct Selection {
+        uint8_t number;
+        uint16_t maximum;
+    };
+    const Selection selections[] = {{1U, 1U}, {2U, 10U}, {3U, 64U}};
+    for (const auto& selection : selections) {
+        SCOPED_TRACE(testing::Message()
+                     << "EP=" << static_cast<unsigned>(selection.number)
+                     << " MPS=" << selection.maximum);
+        ASSERT_EQ(StartInterrupt(selection.number, selection.maximum),
+                  NX_SUCCESS);
+        nx_usb_endpoint_port_t in = {&nx_usb_fs_endpoint_ops, &endpoints[2]};
+        const uint32_t offset = 0x900U + selection.number * 32U;
+        const uint32_t control = hardware->registers[offset / 4U];
+        EXPECT_EQ((control >> 18U) & 3U, 3U);
+        EXPECT_EQ(control & 0x7FFU, selection.maximum);
+        EXPECT_EQ((control >> 22U) & 15U, selection.number);
+        EXPECT_EQ(hardware->registers[(0x100U + selection.number * 4U) / 4U],
+                  (16U << 16U) | 160U);
+        EXPECT_EQ(hardware->registers[0x834U / 4U], 0U);
+        const auto other_out = hardware->registers[0xB20U / 4U];
+        for (size_t length : {size_t{selection.maximum}, size_t{0}}) {
+            SCOPED_TRACE(testing::Message() << "length=" << length);
+            ASSERT_EQ(
+                nx_usb_in_prepare(&interrupt_request,
+                                  length == 0U ? nullptr : interrupt_bytes,
+                                  length, NX_USB_DATA, 0U, 200U),
+                NX_SUCCESS);
+            ASSERT_EQ(nx_usb_endpoint_submit(&in, &interrupt_request),
+                      NX_SUCCESS);
+            EXPECT_EQ(hardware->registers[(offset + 16U) / 4U],
+                      (1U << 19U) | static_cast<uint32_t>(length));
+            EXPECT_EQ(hardware->registers[0x834U / 4U], 0U);
+            EXPECT_EQ(hardware->tx_count[selection.number], (length + 3U) / 4U);
+            if (length != 0U) {
+                EXPECT_EQ(hardware->tx[selection.number][0],
+                          length == 1U ? 1U : 0x030201U);
+            }
+            EXPECT_EQ(nx_request_state(&interrupt_request.base),
+                      NX_REQUEST_ACTIVE);
+            EXPECT_EQ(endpoints[2].request, &interrupt_request);
+            hardware->registers[(offset + 8U) / 4U] |= 16U;
+            nx_usb_controller_irq(&controller);
+            EXPECT_EQ(nx_request_state(&interrupt_request.base),
+                      NX_REQUEST_ACTIVE);
+            hardware->registers[(offset + 8U) / 4U] |= 1U;
+            nx_usb_controller_irq(&controller);
+            EXPECT_EQ(nx_request_state(&interrupt_request.base),
+                      NX_REQUEST_ACTIVE);
+            hardware->registers[offset / 4U] &= ~(1U << 31U);
+            hardware->registers[(offset + 24U) / 4U] = 15U;
+            nx_usb_controller_irq(&controller);
+            EXPECT_EQ(nx_request_state(&interrupt_request.base),
+                      NX_REQUEST_ACTIVE);
+            EXPECT_EQ(endpoints[2].request, &interrupt_request);
+            hardware->registers[(offset + 24U) / 4U] = 16U;
+            hardware->tx_count[selection.number] = 0U;
+            hardware->registers[(offset + 8U) / 4U] |= 16U;
+            nx_usb_controller_irq(&controller);
+            ASSERT_EQ(nx_request_state(&interrupt_request.base),
+                      NX_REQUEST_SETTLED);
+            EXPECT_EQ(interrupt_request.base.result, NX_SUCCESS);
+            EXPECT_EQ(interrupt_request.base.transferred, length);
+            EXPECT_EQ(endpoints[2].request, nullptr);
+            EXPECT_EQ(hardware->registers[0x834U / 4U], 0U);
+            EXPECT_EQ(hardware->registers[0xB20U / 4U], other_out);
+            EXPECT_EQ(endpoints[0].request, nullptr);
+            EXPECT_EQ(endpoints[1].request, nullptr);
+            EXPECT_FALSE(hardware->reserved_ep0_pid_command);
+        }
+    }
+}
 TEST_F(UsbSoc, RealRegisterFactsAndClockConsumerSurviveUntilDetach) {
     EXPECT_EQ(controller.registers, 0x50000000U);
     EXPECT_EQ(controller.irq.irq_number, 67);

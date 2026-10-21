@@ -2,8 +2,10 @@
 
 公共接口是 `nexus/io/usb_device.h`。当前纵切片提供 Native、STM32F407 和
 GD32F470 的 internal-PHY full-speed device PIO 机制及实际 SDK 绑定。维护范围是
-EP0 control、显式选择的 EP1–EP3 bulk IN/OUT、SETUP/reset/suspend/resume 事实、
-STALL、SET_ADDRESS、取消与退出。DCD 的一次 request 仍是一个不超过 MPS 的包。
+EP0 control、显式选择的 EP1–EP3 bulk IN/OUT 与 interrupt IN、
+SETUP/reset/suspend/resume 事实、STALL、SET_ADDRESS、取消与退出。
+DCD 的一次 request 仍是一个不超过 MPS 的包；非零 endpoint 的总线 reset 后重新启用
+与完整 SET_CONFIGURATION 路径尚未接入，不能据此声称完整枚举／reset 恢复。
 可选 `Nexus::USBControl` 组合 EP0 多包 DATA、必要 ZLP 与 STATUS；独立的
 `Nexus::USBDescriptors` 校验外部描述符结构。两者不创建任务或分配内存。
 具体 class 分派、描述符字节与查找、VID/PID、字符串、配置及恢复策略由外部工程提供。
@@ -20,8 +22,11 @@ owner。实例共享只读方法表，没有全局可变 registry、endpoint 最
 
 两款 SoC 的 USBFS 基址都是 `0x50000000`，四个 IN / 四个 OUT 方向、320-word FIFO，
 单一 IRQ 67；绑定用锁定 SDK 验证实际 offset、stride、容量和 W1C/只读位。
-EP0 固定 64-byte MPS；bulk MPS 只能是 8/16/32/64。RX FIFO 至少 64 words；每个
-被选 IN FIFO 至少 16 words，分区先验证无重叠且总计不超过 320 words。
+EP0 固定 64-byte MPS；bulk MPS 只能是 8/16/32/64。interrupt 仅选入 EP1–EP3
+IN，MPS 为 1–64 B，允许 10 B 等非二次幂长度；interrupt OUT 和 ISO 未接入。
+RX FIFO 至少 64 words；每个被选 IN FIFO 至少 16 words，分区先验证无重叠且总计
+不超过 320 words。方向、类型、MPS、FIFO 与重复 identity 的非法计划在 clock
+validate／retain 和 MMIO 之前拒绝。
 
 | SoC | 实际 48 MHz 来源 | 接入行为 |
 |---|---|---|
@@ -35,11 +40,13 @@ GD32 原 200 MHz 主 PLL 的 Q9 输出不是 48 MHz，不能直接用于 USB。G
 时钟。pin/electrical/VBUS 和所有 clock-gated 隐藏消费者必须由外部资源 owner 先
 授权并静止，不能仅凭 gate 为零推断系统独占。
 
-ARM GCC 14.3 的实际 sizeof probe 为：controller 144 B、每个 endpoint 40 B、
+既有 ARM GCC 14.3 的实际 sizeof probe 为：controller 144 B、每个 endpoint 40 B、
 每个 event 40 B、request 56 B，STM/GD clock state 分别 8/16 B。生产单元的 ARM
 objects 无全局 `.data`/`.bss`；完整 ELF 的未选 GC/资源变化由实际装配构建另行证明。
 这些既有 DCD 尺寸不包含可选 ROM profile、EP0 adapter 或调用者的 outer request；
-新增组件的 Flash／RAM 成本需以同源 ARM ELF 与实际 ABI 分别确认。
+新增组件的 Flash／RAM 成本需以同源 ARM ELF 与实际 ABI 分别确认。私有 endpoint
+用 `uint8_t transfer` 替换原单字节 `bulk`，没有新增 interval、调度或队列字段；
+字段宽度保持一字节，不以 host sizeof 或历史 probe 代替新镜像的 ARM 成本测量。
 
 ## 选定 ROM profile 与描述符
 
@@ -49,13 +56,21 @@ objects 无全局 `.data`/`.bss`；完整 ELF 的未选 GC/资源变化由实际
 endpoint 数组与 `nx_factory_usb_profile` getter。设为 `false` 时不生成这些对象
 或 getter；普通 USB face、方法表、provider context 与既有 generic capability
 类型不因此扩大。getter 不初始化硬件，也不发现新 endpoint。
+装配在既有 `transfer` 字段增加 `"interrupt"` 取值；不可变 IR 与公共 profile 字段不变。
+公共 `NX_USB_PROFILE_INTERRUPT` 的枚举值是 2，USB wire／寄存器 EPTYP 值是 3；
+provider 显式映射类型，不把两者直接强转混用。
 
 `nx_usb_profile_validate` 只读检查选定事实，不能证明实际时钟、PCB、VBUS 或枚举。
 外部 descriptor 通过 `nx_usb_descriptor_view_t` 传给
 `nx_usb_descriptor_validate`：device、configuration、string 必须完整；校验
-length／total、EP0 MPS、唯一 interface、alternate 0，以及 bulk endpoint 的
-方向／编号／MPS 与选定 profile 的对应关系。class-specific 子结构只检查边界，
-不解码其类语义；其他传输类型、alternate setting 等扩展不由本参考接入。
+length／total、EP0 MPS、唯一 interface、alternate 0，以及 bulk／interrupt IN
+endpoint 的方向／编号／类型／MPS 与选定 profile 的对应关系。interrupt 描述符的
+`bInterval` 必须是 1–255 个 full-speed 1 ms frame 的线性计数，零无效；它由外部
+描述符独占，不复制到 TOML、IR、profile 或 provider state。DCD 不调度 host poll，
+也不承诺实际间隔；bulk 的既有 interval 处理保持不变。选定类型不符、描述的 endpoint
+未选入 profile 或 MPS 不符返回 INVALID；interrupt OUT、ISO、非零 control 与 alternate setting
+仍为 UNSUPPORTED，保留字段非法仍为 INVALID。class-specific 子结构只检查边界，
+不解码其类语义。
 
 描述符校验按给定完整长度扫描，不读取硬件、不复制或保留 descriptor；通过只表示
 结构合法。选择哪段描述符、处理何种请求及 class 内容仍属外部策略。发送后，
@@ -73,22 +88,36 @@ payload，直到 acquire-observed SETTLED。所有 request、payload、输出、
 immutable clock ops 和 wake target 均检查与 controller/endpoint/ring/clock state
 及已有 loan 的重叠。拒绝 state/read_events 输出别名时输出保持原值。
 
-IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、FIFO 空闲容量恢复并且观察到的
-W1C completion 清除读回成功才发布 SUCCESS。OUT 必须同时读到包数据和 XFRC，
+IN 的每次有限 data／ZLP 的长度寄存器写入 `(1U << 19) | length`（PKTCNT=1），
+MCNT／保留高位保持零，interrupt 不增加 odd/even-frame 命令。
+每个选定 IN direction 使用独立 Tx FIFO，
+一次同步装入整个不超过 64 B 的包，没有剩余软件 refill 工作；TX-empty mask 保持零，
+不创建 TXFE refill worker。IN FIFO 写入不是完成，只有 XFRC、EP enable 已清、
+FIFO 空闲容量恢复并且观察到的 W1C completion 清除读回成功才发布 SUCCESS。
+OUT 必须同时读到包数据和 XFRC，
 short packet 正常完成；越界包的所有 FIFO words 都被消费，最多复制 caller capacity，
 之后报告 OVERFLOW 并排空，不越界写 caller buffer。
 
 IN TXFE 是只读状态，不参与 W1C 清除/完成的零值证明。ITTXFE 是主机 IN token 在
 FIFO 尚空时到达的可重试信息，OUT STUP 是正常 SETUP phase 事实；两者不错误地终止
 包。IN control timeout 和 OUT FIFO overrun 使用对应方向的真实事件位。EP0 的
-DATA PID 由 SETUP/core 管理：bits 29:28/16 对 EP0 是 reserved，软件仅对 bulk
-endpoint 使用 DATA0 命令。
+DATA PID 由 SETUP/core 管理：bits 29:28/16 对 EP0 是 reserved，软件只对非零
+bulk／interrupt endpoint 使用 DATA0 命令。reset／clear-halt 必须核对 DATA0
+读回；失败保留 reset admission 屏障或 halt，不提前允许新包借用。
 
 SETUP 严格解码八个 little-endian bytes，并产生单调递增 epoch。新 SETUP/reset
 使旧 control loan 进入排空，不能仅改 epoch 就撤销借用。reset 与 queued SETUP
-在同一 snapshot 中没有先后证明，先前 queued SETUP 被丢弃；复位排空完成后才允许
-新 admission。SET_ADDRESS 验证当前标准 SETUP 的各字段，先 staged，只有对应
-status-IN 实际 XFRC 后写 DCFG 地址。地址读回失败关闭 controller。
+在同一 snapshot 中没有先后证明，先前 queued SETUP 被丢弃；复位排空完成仅解除
+待排空屏障，新 admission 仍须满足 endpoint 的实际启用条件。SET_ADDRESS 验证
+当前标准 SETUP 的各字段，先 staged，只有对应 status-IN 实际 XFRC 后写 DCFG
+地址。地址读回失败关闭 controller。
+
+STM32F407 总线 reset 清除非零 endpoint 的 USBAEP，模型保留这个硬件事实。
+对未激活的非零 endpoint，submit 返回 STATE，prepared request 保持 READY，
+没有新 request／buffer 借用或 FIFO 写入。当前没有自动重新激活或配置策略；
+通用非零 endpoint activation 与 SET_CONFIGURATION 路径是独立后续任务。
+EP0 control 可继续按既有合同处理，不能把 DATA0 恢复或 reset 事件处理当成完整
+非零 endpoint 恢复，也不能从 controller 未 closing 推断已配置。
 
 事件环保存 value facts，满时不覆盖旧事件；精确软件 loss marker 排在原队列后。
 最新 SETUP/epoch/closing 状态不依赖事件环空间。时间戳是 IRQ acquisition time，
@@ -227,19 +256,23 @@ FIFO，已撤回的 PIO 执行者不再拥有 caller buffer；下一次 cold cor
 两家实际 SDK 的六个 production ARM 单元通过 strict C11 编译。对应 clock owner 的
 27 个独立 cases 保留在 `usb-clock-iteration`，不重复计入 DCD 57。历史模型的
 错误 TXFE/EP0/PID 假设和失败日志保留，最新源与旧报告的身份不混用。
-这些历史计数不覆盖新增 profile、descriptor helper 或 EP0 packetizer。新增量的
-开发证据分别记录 ROM profile、descriptor、control 与软件 epoch 的真实回归、
+这些历史计数不覆盖新增 profile、descriptor helper、EP0 packetizer 或 interrupt IN。
+新增量的开发证据分别记录 ROM profile、descriptor、control 与软件 epoch 的真实回归、
 对齐反例 RED→修正后的 focused GREEN，以及精确 ARM 装配的编译与链接。
 每份结果只描述对应源码与命令；用例明细及失败尝试见该批原始回执。
 focused GREEN 与 ARM 链接不建立 clean SDK 或完整 Native
 候选资格；SDK consumer、资源、双语文档与普通完整提交门禁仍须分别验证。
 
 资料是锁定 ST CMSIS header 的 FS 寄存器事实，以及 GD32F4xx User Manual Rev3.3
-§29.3（尤其 printed p986–995 的 EP0、W1C、TXFE）和 §4.3.24/26 的 PLLSAI/CK48。
+§28.7.3（DIEPxCTL printed p988–990、DIEPxINTF p994–995、DIEPxLEN p998）
+和 §4.3.24/26 的 PLLSAI/CK48。Rev3.3 的 chapter 28 是 USBFS，chapter 29 是
+USBHS；这里只修正当前引用，历史证据保留原始字节。
 GD 手册 SHA256 是 `c8e1d20d7cde338892d08dcb233345e03f7960256a60a36c755c576d9cd65c13`。
 完整出处身份绑定在 manifest。
 
-这不是 clean software candidate、产品 release 或物理资格。三块 PCB 的 USB role、
+IO-35 的完整退出仍开放；有限 interrupt IN 不提供 notification 策略、完整类栈或
+非零 endpoint 的完整配置／reset 恢复。这不是 clean software candidate、产品
+release 或物理资格。三块 PCB 的 USB role、
 VBUS sensing/power/backfeed、pull-up/ESD、电气跳帽、pin lease 与共享引脚冲突尚需
 独立 reviewed Board 装配；本批没有配置这些引脚。枚举、主机重试、reset/拔线、
 传输错误、PHY 三周期 flush 时序和实际 ISR/WCET/HIL 均未执行，不继承旧例程测试。
