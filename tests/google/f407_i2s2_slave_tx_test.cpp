@@ -1331,12 +1331,13 @@ extern "C" bool nx_arch_in_isr(void) {
 extern "C" bool nx_arch_is_privileged(void) {
     return privileged;
 }
+/* Synchronous MMIO model: compiler ordering, no thread publication. */
 extern "C" void nx_arch_dmb(void) {
-    std::atomic_thread_fence(std::memory_order_seq_cst);
+    std::atomic_signal_fence(std::memory_order_seq_cst);
 }
 extern "C" void nx_arch_dsb(void) {
-    std::atomic_thread_fence(std::memory_order_seq_cst);
+    std::atomic_signal_fence(std::memory_order_seq_cst);
 }
 extern "C" void nx_arch_isb(void) {
-    std::atomic_thread_fence(std::memory_order_seq_cst);
+    std::atomic_signal_fence(std::memory_order_seq_cst);
 }
