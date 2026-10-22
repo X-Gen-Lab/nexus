@@ -1344,6 +1344,10 @@ class ReleaseAdmissionTests(unittest.TestCase):
                 matrix = item.get("strategy", {}).get("matrix", {})
                 if matrix:
                     key, values = next(iter(matrix.items()))
+                    values = list(values)
+                    for included in matrix.get("include", []):
+                        if key in included and included[key] not in values:
+                            values.append(included[key])
                     names.extend(item["name"].replace("${{ matrix." + key + " }}", value)
                                  for value in values)
                 else:
@@ -1371,6 +1375,34 @@ class ReleaseAdmissionTests(unittest.TestCase):
         valid["jobs"][0]["conclusion"] = "skipped"
         with self.assertRaises(ValueError):
             require_jobs(valid)
+
+    def test_include_only_pin_state_provider_has_strict_admission(self):
+        from tools.release.delivery import require_jobs
+        valid = self.jobs_record()
+        names = [job["name"] for job in valid["jobs"]]
+        for fixture in ("pin_state_fixture", "h743_assembly", "u575_assembly"):
+            with self.subTest(fixture=fixture):
+                self.assertEqual(names.count(
+                    f"Provider assembly audits ({fixture})"), 1)
+        for mutation in ("missing", "substituted", "extra", "failure", "skipped"):
+            with self.subTest(mutation=mutation):
+                record = self.jobs_record()
+                pin_state = next(job for job in record["jobs"] if job["name"] ==
+                                 "Provider assembly audits (pin_state_fixture)")
+                reason = "matrix identities differ"
+                if mutation == "missing":
+                    record["jobs"].remove(pin_state)
+                elif mutation == "substituted":
+                    pin_state["name"] = "Provider assembly audits (substitute)"
+                elif mutation == "extra":
+                    record["jobs"].append({**pin_state,
+                        "name": "Provider assembly audits (unreviewed_fixture)"})
+                else:
+                    pin_state["conclusion"] = mutation
+                    reason = "without skips"
+                record["total_count"] = len(record["jobs"])
+                with self.assertRaisesRegex(ValueError, reason):
+                    require_jobs(record)
 
     def test_guard_executes_exact_source_rejection(self):
         result = subprocess.run([sys.executable, "tools/release/delivery.py", "guard",

@@ -82,6 +82,9 @@ epoch `1` and authored assembly schema `2` remain separate, unchanged identities
 - The H743 RAM/stack audit derives each original `.su` source identity from
   its actual compile arguments and ordered GCC file/debug prefix maps. It
   rejects wrong or ambiguous sources instead of matching basenames or suffixes.
+- Release CI admission requires the include-only pin-state provider audit within
+  the exact provider matrix; missing, substituted, extra or unsuccessful jobs
+  remain rejected.
 
 ### Verification and limitations
 
