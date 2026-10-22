@@ -8,10 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Development source version: `0.2.0`. No 0.2.0 public release or candidate
-qualification is implied by this heading. The published 0.1.0 tag, assets and
-original evidence remain unchanged. Factory epoch `1` and authored assembly
-schema `2` remain separate, unchanged identities.
+Future changes are tracked here.
+
+## [0.2.0] - 2026-10-22 (Asia/Shanghai)
+
+Source SDK preview preparation. Published previews and their immutable source
+identities are recorded in [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases);
+this entry alone establishes neither publication nor candidate qualification.
+The published 0.1.0 tag, assets and original evidence remain unchanged. Factory
+epoch `1` and authored assembly schema `2` remain separate, unchanged identities.
 
 ### Added
 
@@ -27,6 +32,13 @@ schema `2` remain separate, unchanged identities.
   independent IRQ TX or explicitly select finite DMA TX with a shared UART owner.
 - U575 TZEN0 finite USART1 GPDMA hardware-chain TX and LPTIM2 RUN one-shot
   references. These do not enable autonomous STOP operation or arbitrary chains.
+- Selected U575 [retained-time and bounded Stop2](docs/design/u575-retained-time.md),
+  [finite SRAM4 LPDMA copy](docs/design/u575-stop2-copy.md) and
+  [single-tuple LPTIM1 LPBAM](docs/design/u575-lptim1-lpbam.md) software references;
+  these do not provide general LPBAM or complete low-power qualification.
+- Selected [U575 MPU GPIO WRITE](docs/design/u575-mpu-gpio.md) and
+  [F407 finite I2S2 slave TX](docs/design/f407-i2s2-slave-tx.md) components;
+  physical isolation and external audio execution remain unqualified.
 - Pure caller-owned timestamp budget comparison with known uncertainty bounds
   and separate WITHIN, EXCEEDED and UNKNOWN results. Raw DWT snapshots do not
   acquire an elapsed-time or clock-continuity guarantee.
@@ -42,9 +54,10 @@ schema `2` remain separate, unchanged identities.
   qualification records keep their original source and version.
 - Host-only GoogleTest and GoogleMock use the pinned `ext/googletest` Git
   submodule. Firmware and its installed source SDK exclude the host framework.
-- Source SDK consumer policy v5 requires 43 independent roots and 46 images,
-  including two explicit H743 DMA-duplex configurations. These are required-plan
-  counts; execution results bind a particular source and uploaded evidence.
+- Source SDK consumer policy v11 requires 50 independent roots and 53 images;
+  `h743 high` uses the canonical
+  `tools/configure/assemblies/h743-high-peripherals.toml`. These are required-plan
+  identities; execution results bind a particular source and retained evidence.
 - Measurement schema 2 requires raw DWT endpoints, a continuous counter epoch,
   and an independent admitted reference with CPU-frequency and timing-error
   bounds. Older scalar assertions cannot qualify new measurements.
@@ -63,13 +76,20 @@ schema `2` remain separate, unchanged identities.
   production execution closure remains a separate, unfinished proof scope.
 - Provider-required public consumers must also belong to the source SDK's
   reviewed export selection.
+- Independent U575 retained-time, Stop2, LPDMA-copy and LPTIM1-LPBAM SDK
+  consumers verify their canonical component owners, caller storage and linked
+  code without claiming factory-face retention or hardware execution.
+- The H743 RAM/stack audit derives each original `.su` source identity from
+  its actual compile arguments and ordered GCC file/debug prefix maps. It
+  rejects wrong or ambiguous sources instead of matching basenames or suffixes.
 
 ### Verification and limitations
 
 Fresh tests, exact linked-image comparisons, independent SDK consumption and
 candidate evidence must qualify the changed source separately. Physical MCU HIL
-remains `not_executed`. Bootloader handoff, dynamic reclocking, deep STOP and
-broader H743/U575 modes retain their existing unimplemented or partial boundaries.
+remains `not_executed`. General bootloader handoff, dynamic reclocking, complete
+deep-STOP support and broader H743/U575 modes retain their existing unimplemented
+or partial boundaries.
 
 ## [0.1.0] - 2026-10-15 (Asia/Shanghai)
 

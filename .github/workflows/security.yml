@@ -47,7 +47,8 @@ jobs:
   codeql:
     name: CodeQL analysis (${{ matrix.language }})
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Bound the complete C++ extraction and security query execution.
+    timeout-minutes: ${{ matrix.language == 'cpp' && 90 || 45 }}
     permissions:
       contents: read
       security-events: write
