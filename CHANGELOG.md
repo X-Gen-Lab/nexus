@@ -88,6 +88,10 @@ epoch `1` and authored assembly schema `2` remain separate, unchanged identities
 - Complete CI evidence has a separate bounded aggregate inventory budget. An
   explicit tagged-source recovery mode preserves immutable SDK source/tag
   identities while validating the trusted main builder and both fresh full CI runs.
+- Tagged-source recovery uses `NEXUS_RELEASE_TOKEN` only in its final write
+  step and requires that credential before SDK work. Ordinary publication,
+  builds, downloads and attestation retain their built-in credentials.
+  Publication failures report bounded, sanitized HTTP details.
 
 ### Verification and limitations
 

@@ -54,6 +54,7 @@ jobs:
           NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
           NEXUS_PUBLISH: ${{ inputs.publish }}
           NEXUS_RECOVER_TAGGED_SOURCE: ${{ inputs.recover_tagged_source }}
+          NEXUS_RELEASE_TOKEN_CONFIGURED: ${{ secrets.NEXUS_RELEASE_TOKEN != '' }}
         run: |
           case "$GITHUB_REF" in
             refs/heads/main) ;;
@@ -67,6 +68,10 @@ jobs:
           if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then
             if [[ "${NEXUS_PUBLISH:-false}" != true ]]; then
               echo 'Tagged-source recovery requires explicit publication' >&2
+              exit 1
+            fi
+            if [[ "${NEXUS_RELEASE_TOKEN_CONFIGURED:-false}" != true ]]; then
+              echo 'Tagged-source recovery requires NEXUS_RELEASE_TOKEN with repository-limited Actions: read, Contents: write and Workflows: write permissions' >&2
               exit 1
             fi
             arguments+=(--recover-tagged-source --publish --repository "$GH_REPO")
@@ -299,6 +304,8 @@ jobs:
             --workflow-ref "$GITHUB_WORKFLOW_REF" \
             --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
       - name: Publish only the complete verified asset set on the existing exact tag
+        env:
+          GH_TOKEN: ${{ inputs.recover_tagged_source && secrets.NEXUS_RELEASE_TOKEN || github.token }}
         run: |
           arguments=()
           if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then

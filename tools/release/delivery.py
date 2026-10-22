@@ -16,7 +16,7 @@ import sys
 import tarfile
 import tempfile
 from urllib.error import HTTPError
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -335,6 +335,82 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
     write(output / "release-manifest.json", release_manifest)
 
 
+def _github_http_failure(method, url, error, token):
+    """Retain bounded GitHub diagnostics without credentials or response dumps."""
+    def safe_text(value, limit=256):
+        if not isinstance(value, str):
+            return None
+        if token:
+            value = value.replace(token, "[REDACTED]").replace(
+                quote(token, safe=""), "[REDACTED]")
+        if re.search(r"<[^>]*>", value):
+            return None
+        value = re.sub(r"https?://[^\s<>\"']+", "[URL omitted]", value,
+                       flags=re.IGNORECASE)
+        value = re.sub(r"[\x00-\x1f\x7f]", " ", value)
+        return " ".join(value.split())[:limit]
+
+    endpoint = "[unrecognized endpoint omitted]"
+    try:
+        parsed = urlsplit(url)
+        if parsed.scheme == "https" and parsed.hostname in ("api.github.com", "uploads.github.com"):
+            endpoint = safe_text(parsed.hostname + (parsed.path or "/"), 512)
+    except ValueError:
+        pass
+    details = {"method": method if re.fullmatch(r"[A-Z]{1,12}", method) else "UNKNOWN",
+               "endpoint": endpoint, "status": error.code}
+    try:
+        contents = error.read(16385)
+    except (OSError, ValueError):
+        contents = b""
+    finally:
+        try:
+            error.close()
+        except (OSError, ValueError):
+            pass
+    body = None
+    if isinstance(contents, bytes) and len(contents) <= 16384:
+        try:
+            body = json.loads(contents)
+        except (ValueError, RecursionError):
+            pass
+    if isinstance(body, dict):
+        if message := safe_text(body.get("message"), 512):
+            details["message"] = message
+        errors = body.get("errors")
+        if isinstance(errors, list):
+            selected = []
+            for item in errors[:5]:
+                if isinstance(item, dict):
+                    item = {key: text for key in ("resource", "code", "field", "message")
+                            if (text := safe_text(item.get(key)))}
+                else:
+                    item = safe_text(item)
+                if item:
+                    selected.append(item)
+            if selected:
+                details["errors"] = selected
+        documentation = body.get("documentation_url")
+        if (isinstance(documentation, str) and (not token or token not in documentation)
+                and re.fullmatch(r"https://docs\.github\.com/[A-Za-z0-9/_.#-]{1,500}", documentation)):
+            details["documentation_url"] = documentation
+    headers = {}
+    for name in ("X-GitHub-Request-Id", "X-Accepted-GitHub-Permissions",
+                 "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Used",
+                 "X-RateLimit-Reset", "X-RateLimit-Resource", "Retry-After"):
+        if error.headers and (value := safe_text(error.headers.get(name))):
+            headers[name] = value
+    if headers:
+        details["headers"] = headers
+    for field in ("errors", "message", "documentation_url", "headers"):
+        rendered = "GitHub request failed: " + json.dumps(details, ensure_ascii=True)
+        if len(rendered) <= 4096:
+            return rendered
+        details.pop(field, None)
+        details["truncated"] = True
+    return "GitHub request failed: " + json.dumps(details, ensure_ascii=True)
+
+
 class GitHub:
     """GitHub HTTP is the sole remote publication boundary."""
 
@@ -360,7 +436,7 @@ class GitHub:
         except HTTPError as error:
             if missing and error.code == 404:
                 return None
-            raise ValueError(f"GitHub {method} request failed with HTTP {error.code}") from error
+            raise ValueError(_github_http_failure(method, url, error, self.token)) from None
         return contents if binary else json.loads(contents)
 
     def get(self, path):

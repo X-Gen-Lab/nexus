@@ -790,7 +790,7 @@ print('{"status":"fixture-only"}')
 
 
 PROFILE_BASELINE_SHA = '921ef15385b75a0a9e91dc4be22db7362dcf0f342cfd473008222c431d15d715'
-POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e', '.github/workflows/release.yml': '1ace6ced84a4a474161b041d7b34f08e7fc0046b5986e887c568563597d48174'}
+POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e', '.github/workflows/release.yml': '7bd91f314401d686e4c6935bfb29279b4a123c09786262e36f5be64da872e010'}
 
 
 class SoftwareQualificationContracts(unittest.TestCase):

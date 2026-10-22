@@ -99,12 +99,28 @@ been tagged, keep that tag fixed. The `recover_tagged_source` input defaults to
 and the current `main` workflow builder to differ. Same-source runs do not
 require `builder_ci_run_id`.
 
+Before recovery, open this repository's **Settings → Secrets and variables →
+Actions → New repository secret** and create `NEXUS_RELEASE_TOKEN`. Use an
+approved credential restricted to this repository with Actions read, Contents
+write and Workflows write permissions. See the
+[publishing contract](../../tools/release/README.md#publishing-credentials)
+for token types, expiry and approval. Enter the value only in GitHub's secret
+field; never send it in chat. Connecting GitHub to the assistant does not create
+this Actions secret.
+
+Recovery rejects a missing secret before SDK work. This check proves only that
+the secret is configured, not that its permissions, approval or expiry are
+valid. Only the final recovery publication step uses it; SDK preparation,
+downloads and attestation retain the built-in workflow credentials. An ordinary
+publication from one source and builder commit always uses the built-in token.
+
 From the repository root, use an authenticated GitHub CLI with Actions write
 permission. Set `NEXUS_RELEASE_SOURCE` to the tagged 40-character source
 commit. Set `NEXUS_CI_RUN_ID` to its successful full CI run on `main` and
 `NEXUS_BUILDER_CI_RUN_ID` to the successful full CI run for the current `main`
 builder. Both runs must have been created within the last 24 hours; source CI
-cannot qualify a different builder. Then dispatch:
+cannot qualify a different builder. After each delivery-tool repair, select the
+new builder's CI run, keeping the source commit and tag unchanged. Then dispatch:
 
 ```sh
 gh workflow run release.yml --ref main \
