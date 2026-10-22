@@ -6,10 +6,12 @@ Applications, workers, product roles, private PCB data, Flash reservations and
 recovery policy live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
 or private product repositories. [中文入口](README_CN.md).
 
-**This checkout uses Nexus 0.2.0 for development and software-candidate work.**
-It is not a published 0.2.0 release; a version value does not establish software
-or hardware qualification. Consumers recompile source under the exact selected
-configuration and toolchain. Read the [changelog](CHANGELOG.md) before integration.
+**This checkout uses Nexus 0.2.0 for development and Source SDK previews.**
+Published previews and their immutable source identities are recorded in
+[GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases). A version value
+does not establish software or hardware qualification. Consumers recompile source
+under the exact selected configuration and toolchain. Read the
+[changelog](CHANGELOG.md) before integration.
 The first public Source SDK preview remains Nexus 0.1.0, dated 2026-10-15
 (Asia/Shanghai); its [historical release guide](docs/status/release-0.1.0.md)
 describes those immutable released bytes. Physical MCU HIL is `not_executed`.

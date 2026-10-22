@@ -5,8 +5,9 @@ Nexus 是面向工业 MCU 的静态装配 C11 平台，提供 CPU、控制器、
 恢复策略由 [nexus-examples](https://github.com/X-Gen-Lab/nexus-examples)
 或私有产品仓库维护。[English](README.md)。
 
-**当前源码使用 Nexus 0.2.0，处于开发与软件候选准备阶段。** 这不是已公开发行的
-0.2.0；版本值不建立软件或硬件资格。消费方须使用精确选择的配置与工具链重新
+**当前源码使用 Nexus 0.2.0，用于开发与 Source SDK 预览。** 已发布的预览版及其
+不可变源码身份以 [GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)
+为准。版本值不建立软件或硬件资格。消费方须使用精确选择的配置与工具链重新
 编译源码，接入前请阅读[更新日志](CHANGELOG_CN.md)。首个公开 Source SDK
 开发者预览版仍是 2026-10-15（Asia/Shanghai）的 Nexus 0.1.0；其
 [历史发行指南](docs/status/release-0.1.0.md)描述对应不可变发行字节。
