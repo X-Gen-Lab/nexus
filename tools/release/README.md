@@ -46,6 +46,47 @@ aggregate of complete source-CI artifacts permits 200,000 files: the observed
 path, count and limit separately. No artifact is removed to fit the budget;
 the evidence archive still verifies every original member's bytes.
 
+## Publishing credentials
+
+SDK preparation, artifact downloads, OIDC and attestation keep the built-in
+workflow credentials. Only tagged-source recovery's final publication step
+selects the repository secret `NEXUS_RELEASE_TOKEN`. Ordinary publication from
+the same source and builder commit always uses `GITHUB_TOKEN`, even if the
+secret is configured. Tagged-source recovery requires the secret and rejects
+its absence before source scripts or SDK work. The early check establishes
+presence only. GitHub still validates the token's permissions, organization
+approval and expiry when publication runs.
+
+Create the secret in this repository's **Settings → Secrets and variables →
+Actions → New repository secret**, using the name `NEXUS_RELEASE_TOKEN`.
+Restrict its credential to `X-Gen-Lab/nexus` with these repository permissions:
+
+| Permission | Access | Used by the final publication step |
+| --- | --- | --- |
+| Actions | Read | Recheck the exact source and builder CI runs and jobs |
+| Contents | Write | Create the release and upload, download and publish assets |
+| Workflows | Write | Satisfy applicable release-target authorization checks |
+
+Use an approved GitHub App installation token or an organization-approved
+fine-grained personal access token. An installation token expires: issue it
+close to dispatch, ensure it remains valid through publication, and replace
+the secret before later runs if needed. This workflow consumes the credential;
+it does not issue or renew it. Enter the token only in GitHub's secret field,
+never in chat or repository files. Connecting a GitHub app to the assistant does
+not create an Actions repository secret.
+
+GitHub's [Create a release API](https://docs.github.com/en/rest/releases/releases#create-a-release)
+documents an additional Workflows write requirement for applicable release
+targets with `.github/workflows` changes relative to the default branch. The
+built-in `GITHUB_TOKEN` cannot acquire that permission through workflow
+`permissions`. This documented condition does not by itself establish the cause
+of a particular HTTP 403: inspect the bounded, sanitized HTTP diagnostic,
+including the API reason and request identifier when available.
+
+Credential changes do not change the SDK source or move its tag. A repair to the
+delivery builder requires that new builder's own fresh full CI; a previous
+builder's successful CI cannot qualify the repaired commit.
+
 ## Raw evidence and publication
 
 The immutable consumer plan in `transport.py` is shared by the installed SDK

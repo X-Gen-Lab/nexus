@@ -1592,6 +1592,55 @@ class ReleaseAdmissionTests(unittest.TestCase):
 
 
 class ReleaseRecoveryTests(unittest.TestCase):
+    def test_release_credential_is_available_only_to_the_publication_step(self):
+        document = workflow()
+        guard = document["jobs"]["guard"]["steps"][1]
+        self.assertEqual(guard["env"].get("NEXUS_RELEASE_TOKEN_CONFIGURED"),
+                         "${{ secrets.NEXUS_RELEASE_TOKEN != '' }}")
+        publisher = document["jobs"]["publish"]
+        self.assertEqual(publisher["env"]["GH_TOKEN"], "${{ github.token }}")
+        for job in document["jobs"].values():
+            self.assertNotIn("workflows", job.get("permissions", {}))
+            for step in job.get("steps", []):
+                token = step.get("env", {}).get("GH_TOKEN")
+                if "tools/release/delivery.py publish" in step.get("run", ""):
+                    self.assertEqual(token,
+                        "${{ inputs.recover_tagged_source && secrets.NEXUS_RELEASE_TOKEN || github.token }}")
+                else:
+                    self.assertNotIn("secrets.NEXUS_RELEASE_TOKEN", token or "")
+
+    def test_recovery_missing_release_credential_fails_before_source_code(self):
+        step = workflow()["jobs"]["guard"]["steps"][1]
+        base, source, tagged, builder, _ = self.guard_fixture()
+        marker = base / "source-code-called"
+        python = base / "python3"
+        python.write_text("#!/bin/sh\ntouch \"$SOURCE_CODE_MARKER\"\n")
+        python.chmod(0o755)
+        for recovery, publishing, configured, admitted in (
+                ("true", "true", "false", False),
+                ("true", "true", "true", True),
+                ("false", "false", "false", True),
+                ("false", "true", "false", True),
+                ("false", "false", "true", True),
+                ("false", "true", "true", True)):
+            with self.subTest(recovery=recovery, publishing=publishing,
+                              configured=configured):
+                marker.unlink(missing_ok=True)
+                result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
+                    cwd=source, env={**os.environ, "PATH": str(base) + os.pathsep + os.environ["PATH"],
+                        "SOURCE_CODE_MARKER": str(marker), "GITHUB_REF": "refs/heads/main",
+                        "GITHUB_SHA": builder, "GITHUB_WORKFLOW_SHA": builder,
+                        "NEXUS_EXPECTED_COMMIT": tagged if recovery == "true" else builder,
+                        "NEXUS_RECOVER_TAGGED_SOURCE": recovery, "NEXUS_PUBLISH": publishing,
+                        "NEXUS_RELEASE_TOKEN_CONFIGURED": configured,
+                        "GH_REPO": "X-Gen-Lab/nexus"},
+                    capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode == 0, admitted, result.stderr)
+                self.assertEqual(marker.exists(), admitted)
+                if not admitted:
+                    for text in ("NEXUS_RELEASE_TOKEN", "Actions: read", "Contents: write", "Workflows: write"):
+                        self.assertIn(text, result.stderr)
+
     run_record = ReleaseAdmissionTests.run_record
     jobs_record = ReleaseAdmissionTests.jobs_record
 
@@ -1727,7 +1776,8 @@ class ReleaseRecoveryTests(unittest.TestCase):
                     "GITHUB_REPOSITORY": "X-Gen-Lab/nexus", "GH_REPO": "X-Gen-Lab/nexus",
                     "NEXUS_EXPECTED_COMMIT": "malformed" if mutation == "malformed" else tagged,
                     "NEXUS_PUBLISH": "false" if mutation == "not-publishing" else "true",
-                    "NEXUS_RECOVER_TAGGED_SOURCE": "false" if mutation == "default" else "true"}
+                    "NEXUS_RECOVER_TAGGED_SOURCE": "false" if mutation == "default" else "true",
+                    "NEXUS_RELEASE_TOKEN_CONFIGURED": "true"}
                 result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
                     cwd=source, env=environment, capture_output=True, text=True, timeout=15)
                 self.assertEqual(result.returncode == 0, mutation is None, result.stderr)
@@ -1931,6 +1981,176 @@ class ReleaseRecoveryTests(unittest.TestCase):
                     self.assertEqual(api.upload.call_count, 2)
                 else:
                     api.create.assert_not_called()
+
+
+class GitHubHTTPTests(unittest.TestCase):
+    token = "fixture-release-token-never-log"
+
+    def client(self):
+        from tools.release.delivery import GitHub
+        with unittest.mock.patch.dict(os.environ, {"GH_TOKEN": self.token}):
+            return GitHub("X-Gen-Lab/nexus")
+
+    def failure(self, url, body, *, headers=None, status=403):
+        from urllib.error import HTTPError
+        from email.message import Message
+        observed = Message()
+        for name, value in (headers or {}).items():
+            observed[name] = value
+        error = HTTPError(url, status, "untrusted reason " + self.token,
+                          observed, io.BytesIO(body))
+        error.read = unittest.mock.Mock(wraps=error.read)
+        return error
+
+    def reject(self, client, error, *, url=None, payload=None):
+        with unittest.mock.patch("tools.release.delivery.urlopen", side_effect=error) as port:
+            with self.assertRaises(ValueError) as caught:
+                client.request("POST", url or client.base + "/releases", payload)
+        request = port.call_args.args[0]
+        self.assertEqual(request.get_method(), "POST")
+        self.assertEqual(request.get_header("Authorization"), "Bearer " + self.token)
+        self.assertEqual(port.call_args.kwargs, {"timeout": 120})
+        detail = str(caught.exception)
+        self.assertNotIn(self.token, detail)
+        self.assertNotIn("untrusted reason", detail)
+        self.assertTrue(caught.exception.__suppress_context__)
+        self.assertLessEqual(len(detail), 4096)
+        return detail
+
+    def test_create_error_preserves_only_safe_json_and_response_headers(self):
+        client = self.client()
+        body = json.dumps({"message": "Resource not accessible by integration " + self.token,
+            "errors": [{"resource": "Release", "field": "target_commitish", "code": "forbidden",
+                        "message": "Workflows permission required", "value": "PRIVATE-JSON"}],
+            "documentation_url": "https://docs.github.com/rest/releases/releases#create-a-release",
+            "private": "PRIVATE-JSON"}).encode()
+        error = self.failure(client.base + "/releases", body, headers={
+            "X-GitHub-Request-Id": "REQ-123", "X-Accepted-GitHub-Permissions": "contents=write; workflows=write",
+            "X-RateLimit-Remaining": "0", "Retry-After": "60",
+            "Authorization": "Bearer " + self.token, "Set-Cookie": "PRIVATE-HEADER"})
+        detail = self.reject(client, error, payload={"target_commitish": COMMIT, "body": "PRIVATE-PAYLOAD"})
+        for text in ("POST", "api.github.com/repos/X-Gen-Lab/nexus/releases", "403",
+                     "Resource not accessible by integration", "target_commitish", "Workflows permission required",
+                     "https://docs.github.com/rest/releases/releases#create-a-release", "REQ-123",
+                     "contents=write; workflows=write", "Retry-After", "60", "X-RateLimit-Remaining"):
+            self.assertIn(text, detail)
+        for text in ("PRIVATE-JSON", "PRIVATE-HEADER", "PRIVATE-PAYLOAD", "Authorization", "Set-Cookie"):
+            self.assertNotIn(text, detail)
+        error.read.assert_called_once_with(16385)
+
+    def test_upload_error_omits_queries_redirect_urls_and_request_bytes(self):
+        client = self.client()
+        url = "https://uploads.github.com/repos/X-Gen-Lab/nexus/releases/3/assets?name=PRIVATE-NAME&sig=PRIVATE-SIGNATURE#PRIVATE-FRAGMENT"
+        redirected = "https://private-bucket.s3.amazonaws.com/PRIVATE-OBJECT?sig=PRIVATE-SIGNATURE"
+        error = self.failure(redirected, json.dumps({"message": "Upload refused " + redirected +
+            " HTTPS://PRIVATE.example/PRIVATE-OBJECT?sig=PRIVATE-SIGNATURE",
+            "documentation_url": redirected, "errors": [{"message": "Bearer " + self.token}]}).encode(),
+            headers={"Location": redirected, "X-GitHub-Request-Id": "REQ-UPLOAD"})
+        detail = self.reject(client, error, url=url, payload=b"PRIVATE-UPLOAD-BYTES")
+        self.assertIn("uploads.github.com/repos/X-Gen-Lab/nexus/releases/3/assets", detail)
+        self.assertIn("REQ-UPLOAD", detail)
+        for text in ("PRIVATE-", "s3.amazonaws.com", "?name", "sig=", "#PRIVATE", "Location"):
+            self.assertNotIn(text, detail)
+
+    def test_non_json_or_oversize_response_has_no_body_fallback(self):
+        client = self.client()
+        for body in (b"<html>PRIVATE-HTML body and credentials</html>",
+                     json.dumps({"message": "PRIVATE-OVERSIZE", "padding": "x" * 20000}).encode(),
+                     b'{"message":"PRIVATE-BROKEN"', b'\xffPRIVATE-ENCODING'):
+            with self.subTest(kind=body[:20]):
+                error = self.failure(client.base + "/releases", body)
+                detail = self.reject(client, error)
+                self.assertNotIn("PRIVATE-", detail)
+                error.read.assert_called_once_with(16385)
+        error = self.failure(client.base + "/releases", b'{}')
+        error.read.side_effect = OSError("PRIVATE-READ " + self.token)
+        detail = self.reject(client, error)
+        self.assertIn("403", detail)
+        self.assertNotIn("PRIVATE-READ", detail)
+        error = self.failure(client.base + "/releases", b'{}')
+        error.close = unittest.mock.Mock(side_effect=ValueError("PRIVATE-CLOSE " + self.token))
+        detail = self.reject(client, error)
+        self.assertIn("403", detail)
+        self.assertNotIn("PRIVATE-CLOSE", detail)
+
+    def test_json_fields_are_bounded_redacted_before_truncation_and_allowlisted(self):
+        client = self.client()
+        errors = [{"resource": "Release", "code": "bad", "message": "error-" + str(i),
+                   "unknown": "PRIVATE-ERROR"} for i in range(8)]
+        error = self.failure(client.base + "/releases", json.dumps({
+            "message": "x" * 500 + self.token + "y" * 5000, "errors": errors,
+            "documentation_url": "https://docs.github.com/rest?sig=PRIVATE-DOCS"}).encode(),
+            headers={"X-GitHub-Request-Id": "x" * 250 + self.token + "z" * 1000})
+        detail = self.reject(client, error)
+        self.assertNotIn(self.token[:6], detail)
+        self.assertIn("error-4", detail)
+        self.assertNotIn("error-5", detail)
+        self.assertNotIn("PRIVATE-", detail)
+        self.assertNotIn("sig=", detail)
+
+    def test_endpoint_and_header_values_cannot_echo_credentials_or_external_urls(self):
+        client = self.client()
+        url = "https://" + self.token + "@api.github.com/repos/" + self.token + "/releases?token=" + self.token
+        error = self.failure(url, b'{}', headers={"X-Accepted-GitHub-Permissions":
+            "contents=write " + self.token + " https://private.example/PRIVATE-HEADER?sig=secret\t"})
+        detail = self.reject(client, error, url=url)
+        self.assertNotIn("private.example", detail)
+        self.assertNotIn("?token", detail)
+        self.assertNotIn("PRIVATE-", detail)
+        unknown = self.reject(client, self.failure(url, b'{}'),
+                              url="https://private.example/PRIVATE-PATH?sig=PRIVATE-QUERY")
+        self.assertNotIn("private.example", unknown)
+        self.assertNotIn("PRIVATE-", unknown)
+
+    def test_missing_404_and_successful_json_and_binary_responses_are_unchanged(self):
+        client = self.client()
+        error = self.failure(client.base + "/releases/tags/absent", b"PRIVATE-404", status=404)
+        with unittest.mock.patch("tools.release.delivery.urlopen", side_effect=error):
+            self.assertIsNone(client.get("/releases/tags/absent"))
+        error.read.assert_not_called()
+        with unittest.mock.patch("tools.release.delivery.urlopen", return_value=io.BytesIO(b'{"id":3}')):
+            self.assertEqual(client.create({"tag_name": "v0.2.0"}), {"id": 3})
+        contents = b"\x00\xffretained actual archive bytes"
+        with unittest.mock.patch("tools.release.delivery.urlopen", return_value=io.BytesIO(contents)):
+            self.assertEqual(client.asset_bytes({"id": 3}), contents)
+
+    def test_error_traceback_cannot_restore_the_untrusted_http_reason(self):
+        import traceback
+        client = self.client()
+        error = self.failure(client.base + "/releases", b'{}')
+        with unittest.mock.patch("tools.release.delivery.urlopen", side_effect=error):
+            with self.assertRaises(ValueError) as caught:
+                client.create({"tag_name": "v0.2.0"})
+        rendered = "".join(traceback.format_exception(caught.exception))
+        self.assertNotIn(self.token, rendered)
+        self.assertNotIn("untrusted reason", rendered)
+
+    def test_json_and_allowlisted_headers_cannot_restore_embedded_html(self):
+        client = self.client()
+        error = self.failure(client.base + "/releases", json.dumps({
+            "message": "<html>PRIVATE-MESSAGE</html>",
+            "errors": [{"message": "<script>PRIVATE-ERROR</script>", "code": "forbidden"}]}).encode(),
+            headers={"X-GitHub-Request-Id": "<html>PRIVATE-HEADER</html>"})
+        detail = self.reject(client, error)
+        self.assertIn("403", detail)
+        self.assertIn("forbidden", detail)
+        self.assertNotIn("PRIVATE-", detail)
+        self.assertNotIn("<html>", detail)
+
+    def test_large_unicode_diagnostics_remain_bounded_complete_json(self):
+        client = self.client()
+        errors = [{key: "界" * 160 for key in ("resource", "field", "code", "message")}
+                  for _ in range(5)]
+        body = json.dumps({"message": "界" * 512, "errors": errors}, ensure_ascii=False).encode()
+        self.assertLess(len(body), 16384)
+        error = self.failure(client.base + "/releases", body,
+            headers={"X-GitHub-Request-Id": "REQ-BUDGET"})
+        detail = self.reject(client, error)
+        observed = json.loads(detail.removeprefix("GitHub request failed: "))
+        self.assertEqual(observed["method"], "POST")
+        self.assertEqual(observed["status"], 403)
+        self.assertEqual(observed["headers"]["X-GitHub-Request-Id"], "REQ-BUDGET")
+        self.assertTrue(observed["truncated"])
 
 
 if __name__ == "__main__":
