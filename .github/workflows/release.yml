@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       expected_commit:
-        description: Exact 40-character checkout commit; mismatches fail closed
+        description: Exact 40-character SDK source commit; mismatches fail closed
         type: string
         required: true
       publish:
@@ -13,6 +13,14 @@ on:
         default: false
       ci_run_id:
         description: Successful full CI run on main at expected_commit (last 24h)
+        type: string
+        default: ''
+      recover_tagged_source:
+        description: Explicitly recover an immutable tagged source with the current main builder
+        type: boolean
+        default: false
+      builder_ci_run_id:
+        description: Fresh successful full main CI for this workflow builder; required for recovery
         type: string
         default: ''
 
@@ -36,23 +44,37 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.expected_commit }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Require the exact requested checkout before any qualification
         env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+          NEXUS_PUBLISH: ${{ inputs.publish }}
+          NEXUS_RECOVER_TAGGED_SOURCE: ${{ inputs.recover_tagged_source }}
         run: |
           case "$GITHUB_REF" in
             refs/heads/main) ;;
             *) echo 'Unauthorized delivery workflow ref' >&2; exit 1 ;;
           esac
-          if [[ ! "$NEXUS_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ || "$NEXUS_EXPECTED_COMMIT" != "$GITHUB_SHA" ]]; then
+          if [[ ! "$NEXUS_EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ || "$GITHUB_SHA" != "$GITHUB_WORKFLOW_SHA" || "$(git rev-parse HEAD)" != "$GITHUB_SHA" ]]; then
+            echo 'Qualification and publication require the exact workflow source commit and builder checkout' >&2
+            exit 1
+          fi
+          arguments=(--expected-commit "$NEXUS_EXPECTED_COMMIT" --actual-commit "$GITHUB_SHA")
+          if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then
+            if [[ "${NEXUS_PUBLISH:-false}" != true ]]; then
+              echo 'Tagged-source recovery requires explicit publication' >&2
+              exit 1
+            fi
+            arguments+=(--recover-tagged-source --publish --repository "$GH_REPO")
+          elif [[ "$NEXUS_EXPECTED_COMMIT" != "$GITHUB_SHA" ]]; then
             echo 'Qualification and publication require the exact workflow source commit' >&2
             exit 1
           fi
-          python3 tools/release/delivery.py guard \
-            --expected-commit "$NEXUS_EXPECTED_COMMIT" \
-            --actual-commit "$(git rev-parse HEAD)"
+          python3 tools/release/delivery.py guard "${arguments[@]}"
       - name: Require fresh successful full CI before reusing its qualification
         if: inputs.publish
         env:
@@ -60,6 +82,8 @@ jobs:
           GH_REPO: ${{ github.repository }}
           NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
           NEXUS_CI_RUN_ID: ${{ inputs.ci_run_id }}
+          NEXUS_RECOVER_TAGGED_SOURCE: ${{ inputs.recover_tagged_source }}
+          NEXUS_BUILDER_CI_RUN_ID: ${{ inputs.builder_ci_run_id }}
         run: |
           [[ "$NEXUS_CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
           gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID" > "$RUNNER_TEMP/ci-run.json"
@@ -68,6 +92,15 @@ jobs:
           python3 tools/release/delivery.py check-ci \
             --record "$RUNNER_TEMP/ci-run.json" --jobs "$RUNNER_TEMP/ci-jobs.json" \
             --expected-commit "$NEXUS_EXPECTED_COMMIT"
+          if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then
+            [[ "$NEXUS_BUILDER_CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+            gh api "repos/$GH_REPO/actions/runs/$NEXUS_BUILDER_CI_RUN_ID" > "$RUNNER_TEMP/builder-ci-run.json"
+            builder_attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/builder-ci-run.json")
+            gh api "repos/$GH_REPO/actions/runs/$NEXUS_BUILDER_CI_RUN_ID/attempts/$builder_attempt/jobs?per_page=100" > "$RUNNER_TEMP/builder-ci-jobs.json"
+            python3 tools/release/delivery.py check-ci \
+              --record "$RUNNER_TEMP/builder-ci-run.json" --jobs "$RUNNER_TEMP/builder-ci-jobs.json" \
+              --expected-commit "$GITHUB_SHA"
+          fi
   platform:
     needs: guard
     if: ${{ !inputs.publish }}
@@ -214,10 +247,12 @@ jobs:
       GH_REPO: ${{ github.repository }}
       NEXUS_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
       NEXUS_CI_RUN_ID: ${{ inputs.ci_run_id }}
+      NEXUS_RECOVER_TAGGED_SOURCE: ${{ inputs.recover_tagged_source }}
+      NEXUS_BUILDER_CI_RUN_ID: ${{ inputs.builder_ci_run_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.expected_commit }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Download this run's SDK and exact qualified CI documentation
@@ -227,6 +262,12 @@ jobs:
           gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID" > "$RUNNER_TEMP/release-inputs/ci-run.json"
           attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/release-inputs/ci-run.json")
           gh api "repos/$GH_REPO/actions/runs/$NEXUS_CI_RUN_ID/attempts/$attempt/jobs?per_page=100" > "$RUNNER_TEMP/release-inputs/ci-jobs.json"
+          if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then
+            [[ "$NEXUS_BUILDER_CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+            gh api "repos/$GH_REPO/actions/runs/$NEXUS_BUILDER_CI_RUN_ID" > "$RUNNER_TEMP/release-inputs/builder-ci-run.json"
+            builder_attempt=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["run_attempt"])' "$RUNNER_TEMP/release-inputs/builder-ci-run.json")
+            gh api "repos/$GH_REPO/actions/runs/$NEXUS_BUILDER_CI_RUN_ID/attempts/$builder_attempt/jobs?per_page=100" > "$RUNNER_TEMP/release-inputs/builder-ci-jobs.json"
+          fi
           gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-$NEXUS_EXPECTED_COMMIT" --dir "$RUNNER_TEMP/release-inputs/sdk"
           gh run download "$GITHUB_RUN_ID" --name "nexus-source-sdk-attestation-$NEXUS_EXPECTED_COMMIT" --dir "$RUNNER_TEMP/release-inputs/attestation"
           gh run download "$NEXUS_CI_RUN_ID" --name "nexus-documentation-$NEXUS_EXPECTED_COMMIT" --dir "$RUNNER_TEMP/release-inputs/docs"
@@ -240,10 +281,14 @@ jobs:
             --source-ref "$GITHUB_REF"
       - name: Verify and assemble immutable release assets
         run: |
+          arguments=()
+          if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then
+            arguments+=(--recover-tagged-source --builder-commit "$GITHUB_SHA" --builder-ci-run-id "$NEXUS_BUILDER_CI_RUN_ID")
+          fi
           python3 tools/release/delivery.py bundle \
             --inputs "$RUNNER_TEMP/release-inputs" --output "$RUNNER_TEMP/release-assets" \
             --expected-commit "$NEXUS_EXPECTED_COMMIT" --ci-run-id "$NEXUS_CI_RUN_ID" \
-            --release-run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
+            --release-run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" "${arguments[@]}"
       - name: Disclose the separate source and versioned delivery workflow identities
         run: |
           git show "$GITHUB_SHA:tools/release/transport.py" > "$RUNNER_TEMP/nexus-consumer-transport.py"
@@ -255,6 +300,10 @@ jobs:
             --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT"
       - name: Publish only the complete verified asset set on the existing exact tag
         run: |
+          arguments=()
+          if [[ "${NEXUS_RECOVER_TAGGED_SOURCE:-false}" == true ]]; then
+            arguments+=(--recover-tagged-source --builder-commit "$GITHUB_SHA" --builder-ci-run-id "$NEXUS_BUILDER_CI_RUN_ID")
+          fi
           python3 tools/release/delivery.py publish \
             --output "$RUNNER_TEMP/release-assets" --expected-commit "$NEXUS_EXPECTED_COMMIT" \
-            --ci-run-id "$NEXUS_CI_RUN_ID" --repository "$GH_REPO"
+            --ci-run-id "$NEXUS_CI_RUN_ID" --repository "$GH_REPO" "${arguments[@]}"

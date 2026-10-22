@@ -89,3 +89,41 @@ Public product examples live in
 
 FIG-10 shows the current software consumption flow. Runtime and MCU link evidence
 remain separate from [physical qualification](../reference/platforms/qualification.md).
+
+## Recover delivery without moving an existing tag
+
+Release maintainers normally use the same commit for SDK source and the
+delivery workflow. If only delivery tooling needs repair after the source has
+been tagged, keep that tag fixed. The `recover_tagged_source` input defaults to
+`false`; only an explicit recovery with `publish=true` allows the tagged source
+and the current `main` workflow builder to differ. Same-source runs do not
+require `builder_ci_run_id`.
+
+From the repository root, use an authenticated GitHub CLI with Actions write
+permission. Set `NEXUS_RELEASE_SOURCE` to the tagged 40-character source
+commit. Set `NEXUS_CI_RUN_ID` to its successful full CI run on `main` and
+`NEXUS_BUILDER_CI_RUN_ID` to the successful full CI run for the current `main`
+builder. Both runs must have been created within the last 24 hours; source CI
+cannot qualify a different builder. Then dispatch:
+
+```sh
+gh workflow run release.yml --ref main \
+    -f expected_commit="$NEXUS_RELEASE_SOURCE" \
+    -f ci_run_id="$NEXUS_CI_RUN_ID" \
+    -f builder_ci_run_id="$NEXUS_BUILDER_CI_RUN_ID" \
+    -f publish=true -f recover_tagged_source=true
+```
+
+The workflow derives the builder from its actual `main` workflow and checkout.
+Recovery requires identical source and builder version-policy bytes, the
+existing tag pointing to the source, and the live `main` reference pointing to
+the builder. The SDK, documentation and source CI retain the tagged source
+identity; the delivery receipt records the builder separately. Policy
+mismatches reject admission, and both references are checked before and after
+asset uploads.
+
+Keep every original evidence file when repairing packaging limits. Do not move
+the tag, omit evidence or substitute a different source CI run to obtain
+success. A dispatch alone does not establish publication: inspect the completed
+workflow, release manifest and assets, then independently download and verify
+the SDK. Recovery does not establish physical HIL or production qualification.

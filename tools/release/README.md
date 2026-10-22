@@ -14,20 +14,37 @@ title. Preparing a later version requires a reviewed policy change; these tools
 never bump the version, move a tag or replace an existing release
 automatically.
 
-Both dispatch modes require the requested source commit to equal the trusted
-main workflow commit before executing checkout-owned scripts. A publishing
-dispatch also requires a successful full CI run on `main` for that commit
-created within the last 24 hours, and an existing matching version tag. Every
-required CI job must have actually succeeded. The current `main` and tag are
-checked again before publication completes. A qualification dispatch executes
-the maintained build and contract workflows without publishing a release. Both
-dispatch modes use the trusted main workflow.
+By default, both dispatch modes require the requested source commit to equal
+the trusted main workflow commit before executing source-owned scripts. A
+publishing dispatch requires an explicit successful full CI run on `main` for
+that source, created within the last 24 hours, and an existing matching version
+tag. Every required CI job must have actually succeeded. A qualification dispatch
+executes the maintained build and contract workflows without publishing a release.
+
+Only `publish=true` with explicit `recover_tagged_source=true` admits a separate
+immutable tagged source. The guard first checks out the actual workflow builder,
+requires its clean HEAD and workflow SHA to agree, checks live main/tag identities,
+and compares the tagged compatibility policy as pure Git blob bytes with the
+trusted builder policy. It executes no tagged-source script before admission.
+Recovery also requires an explicit `builder_ci_run_id` for the builder's own
+fresh successful full main CI; `ci_run_id` continues to identify the SDK source CI.
+The source SDK job still observes and rebuilds that exact tagged source. The
+publisher uses trusted builder tools, retains the source's complete CI evidence
+and both builder CI API records, and records their run ID/attempt separately.
+Publication rechecks both fresh full CI runs, unchanged attempts, live main at
+the builder and the unchanged tag at the SDK source before and after upload.
 
 The SDK source checkout and the workflow builder commit remain separately
 recorded identities; normal main dispatches require their commits to coincide.
 Attestation verification binds the actual builder commit and ref; SDK identity
 verification binds the requested source and executed qualification. A builder
 signature does not establish a different SDK source commit by itself.
+
+Release inventories retain a 100,000-file limit per ordinary input. Only the
+aggregate of complete source-CI artifacts permits 200,000 files: the observed
+29-artifact set contains 103,918 files. Empty and over-limit inputs report their
+path, count and limit separately. No artifact is removed to fit the budget;
+the evidence archive still verifies every original member's bytes.
 
 ## Raw evidence and publication
 

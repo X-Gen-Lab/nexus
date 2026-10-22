@@ -85,6 +85,9 @@ epoch `1` and authored assembly schema `2` remain separate, unchanged identities
 - Release CI admission requires the include-only pin-state provider audit within
   the exact provider matrix; missing, substituted, extra or unsuccessful jobs
   remain rejected.
+- Complete CI evidence has a separate bounded aggregate inventory budget. An
+  explicit tagged-source recovery mode preserves immutable SDK source/tag
+  identities while validating the trusted main builder and both fresh full CI runs.
 
 ### Verification and limitations
 
