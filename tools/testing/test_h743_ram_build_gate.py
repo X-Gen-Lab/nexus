@@ -147,6 +147,7 @@ class H743RamBuildGateTests(unittest.TestCase):
         report = json.loads(output.read_text())
         self.assertEqual("failed", report["status"])
         self.assertIn("image guard record", report["failure"])
+        self.assertIn(report["failure"], result.stderr.decode())
 
     def test_real_callee_cannot_hide_a_stack_address_from_its_caller(self):
         # The real caller retains its fixed workspace in r6 across this time

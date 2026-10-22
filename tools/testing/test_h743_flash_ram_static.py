@@ -44,7 +44,7 @@ class H743FlashRamStaticTests(unittest.TestCase):
                          repr((argv, result.stdout, result.stderr)))
         return result.stdout
 
-    def link(self, mutation=None, *, duplicate_locals=False):
+    def link(self, mutation=None, *, duplicate_locals=False, prefix_maps=()):
         directory = self.directory / str(self.images)
         self.images += 1
         directory.mkdir()
@@ -55,6 +55,8 @@ class H743FlashRamStaticTests(unittest.TestCase):
                  "-mgeneral-regs-only", "-fno-builtin", "-fstack-usage",
                  "-fno-stack-protector", "-fno-unwind-tables",
                  "-fno-asynchronous-unwind-tables", "-ffreestanding"]
+        flags += [value.replace("{source}", str(directory))
+                  for value in prefix_maps]
         objects, usage = [], []
         sources = [source]
         if duplicate_locals:
@@ -72,11 +74,16 @@ class H743FlashRamStaticTests(unittest.TestCase):
         for item in sources:
             obj = item.with_suffix(".o")
             argv = flags + (["-D" + mutation] if mutation else [])
-            self.command(argv + ["-c", str(item), "-o", str(obj)], directory)
+            actual = argv + ["-c", str(item), "-o", str(obj)]
+            self.command(actual, directory)
             objects.append(obj)
             su = obj.with_suffix(".su")
             self.assertTrue(su.is_file(), "actual compiler .su is required")
-            usage.append({"source": str(item), "raw": su.read_bytes()})
+            record = {"source": str(item), "raw": su.read_bytes()}
+            if prefix_maps:
+                record["compile"] = {"directory": str(directory),
+                                     "arguments": actual}
+            usage.append(record)
         bridge = directory / "bridge.o"
         bridge_source = ROOT / "soc/stm32h743/drivers/flash_ram_enter.S"
         self.command(flags + ["-I", str(ROOT / "soc/stm32h743/private"),
@@ -285,6 +292,11 @@ class H743FlashRamStaticTests(unittest.TestCase):
         self.accepted()
         self.rejected("RETURNING_NMI", "NMI|nonreturn")
 
+    def test_real_mapped_elf_keeps_the_complete_ram_and_stack_proof(self):
+        self.accepted(duplicate_locals=True, prefix_maps=(
+            "-ffile-prefix-map={source}=.",
+            "-fdebug-prefix-map={source}=."))
+
     def test_missing_duplicate_and_misbound_stack_records_are_rejected(self):
         image, _ = self.accepted()
         for mode in ("missing", "duplicate", "source"):
@@ -324,6 +336,143 @@ class H743FlashRamStaticTests(unittest.TestCase):
         edited["objdump"] = edited["objdump"].replace(b"b508", b"bf00", 1)
         with self.assertRaisesRegex(EvidenceError, "bytes differ"):
             self.verify((image[0], edited, image[2]))
+
+
+class H743StackSourceTests(unittest.TestCase):
+    """Compiler bytes retain source identity under actual debug prefix maps."""
+
+    def setUp(self):
+        self.compiler = (os.environ.get("NEXUS_ARM_GCC") or
+                         shutil.which("arm-none-eabi-gcc"))
+        self.assertTrue(self.compiler, "actual ARM compiler is required")
+        self.storage = tempfile.TemporaryDirectory(prefix="h743-su=source-")
+        self.addCleanup(self.storage.cleanup)
+        self.root = Path(self.storage.name)
+        self.source = self.root / "entry.c"
+        self.source.write_text("unsigned entry(unsigned value) {\n"
+                               "    volatile unsigned saved = value;\n"
+                               "    return saved;\n}\n")
+        self.count = 0
+
+    def compile(self, maps, source=None, *, relative=False):
+        source = source or self.source
+        self.count += 1
+        obj = self.root / (str(self.count) + ".o")
+        spelling = (str(source.relative_to(self.root)) if relative
+                    else str(source))
+        argv = [self.compiler, "-mcpu=cortex-m7", "-mthumb", "-Os",
+                "-fstack-usage", *maps, "-c", spelling, "-o", str(obj)]
+        result = subprocess.run(argv, cwd=self.root, capture_output=True,
+                                timeout=30, check=False)
+        self.assertEqual(0, result.returncode, result.stderr)
+        return {"source": str(source),
+                "raw": obj.with_suffix(".su").read_bytes(),
+                "compile": {"directory": str(self.root), "arguments": argv}}
+
+    def records(self, records):
+        return importlib.import_module(MODULE)._stack_records(records)
+
+    def test_actual_gcc_debug_maps_keep_order_and_single_raw_replacement(self):
+        root, source = str(self.root), str(self.source)
+        cases = [
+            (["-ffile-prefix-map=" + root + "=.",
+              "-fdebug-prefix-map=" + root + "=./debug"], "./debug/entry.c"),
+            (["-fdebug-prefix-map=" + root + "=./debug",
+              "-ffile-prefix-map=" + root + "=."], "./entry.c"),
+            (["-ffile-prefix-map=" + source[:-2] + "=./specific",
+              "-fdebug-prefix-map=" + root + "=./broad"], "./broad/entry.c"),
+            (["-ffile-prefix-map=" + root + "=.",
+              "-fdebug-prefix-map=.=./chain"], "./entry.c"),
+            (["-ffile-prefix-map=" + source[:-2] + "=./partial"],
+             "./partial.c"),
+            (["-fmacro-prefix-map=" + root + "=./macro",
+              "-fprofile-prefix-map=" + root + "=./profile"], source),
+        ]
+        for flags, printed in cases:
+            with self.subTest(flags=flags):
+                record = self.compile(flags)
+                original = record["raw"]
+                self.assertTrue(original.startswith((printed + ":").encode()))
+                rows = self.records([record])
+                self.assertEqual(str(self.source), rows[0]["source"])
+                self.assertEqual(hashlib.sha256(original).hexdigest(),
+                                 rows[0]["su_sha256"])
+                self.assertEqual(original, record["raw"])
+
+    def test_mapped_identity_cannot_use_missing_changed_or_opaque_metadata(
+            self):
+        flags = ["-ffile-prefix-map=" + str(self.root) + "=./first",
+                 "-fdebug-prefix-map=" + str(self.root) + "=./last"]
+        record = self.compile(flags)
+        self.records([record])
+        impostor = self.root / "other" / self.source.name
+        impostor.parent.mkdir()
+        impostor.write_bytes(self.source.read_bytes())
+        for fault in ("absent", "delete", "change", "reorder", "source",
+                      "source-argv", "duplicate-c", "duplicate-o", "directory",
+                      "response", "shell", "canon", "invalid-map",
+                      "partial-context"):
+            with self.subTest(fault=fault):
+                changed = deepcopy(record)
+                argv = changed["compile"]["arguments"]
+                if fault == "absent":
+                    del changed["compile"]
+                elif fault == "delete":
+                    argv[:] = [value for value in argv if value not in flags]
+                elif fault == "change":
+                    argv[argv.index(flags[-1])] = flags[-1] + "-wrong"
+                elif fault == "reorder":
+                    position = argv.index(flags[0])
+                    argv[position:position + 2] = reversed(flags)
+                elif fault == "source":
+                    changed["source"] = str(impostor)
+                elif fault == "source-argv":
+                    argv[argv.index("-c") + 1] = str(impostor)
+                elif fault == "invalid-map":
+                    argv.append("-fdebug-prefix-map=malformed")
+                elif fault == "duplicate-c":
+                    argv.extend(["-c", str(self.source)])
+                elif fault == "duplicate-o":
+                    argv.extend(["-o", "other.o"])
+                elif fault == "directory":
+                    changed["compile"]["directory"] = "."
+                elif fault in ("response", "shell", "canon"):
+                    argv.append({"response": "@hidden.rsp", "shell": ";",
+                                 "canon": "-fcanon-prefix-map"}[fault])
+                else:
+                    del changed["compile"]["arguments"]
+                with self.assertRaises(EvidenceError):
+                    self.records([changed])
+
+    def test_legacy_and_mapped_real_sources_cannot_share_printed_identity(self):
+        legacy = self.compile([], relative=True)
+        del legacy["compile"]
+        other = self.root / "other" / self.source.name
+        other.parent.mkdir()
+        other.write_text("unsigned other(unsigned value) { return value; }\n")
+        mapped = self.compile(["-ffile-prefix-map=" + str(other) +
+                               "=" + self.source.name], other)
+        previous = Path.cwd()
+        try:
+            os.chdir(self.root)
+            for record in (legacy, mapped):
+                self.records([record])
+            with self.assertRaisesRegex(EvidenceError, "ambiguous.*SU"):
+                self.records([legacy, mapped])
+        finally:
+            os.chdir(previous)
+
+    def test_two_real_sources_cannot_share_a_mapped_printed_identity(self):
+        other = self.root / "other" / "entry.c"
+        other.parent.mkdir()
+        other.write_text("unsigned other(unsigned value) { return value; }\n")
+        records = [self.compile(["-ffile-prefix-map=" + str(source) +
+                                 "=./shared.c"], source)
+                   for source in (self.source, other)]
+        for record in records:
+            self.records([record])
+        with self.assertRaisesRegex(EvidenceError, "ambiguous.*SU"):
+            self.records(records)
 
 
 class H743RamConstantFlowTests(unittest.TestCase):
