@@ -8,9 +8,14 @@
 
 ## [Unreleased]
 
-开发源码版本为 `0.2.0`。本标题不表示 0.2.0 已公开发行或软件候选已通过验收。
-已发布 0.1.0 的 tag、附件和原始证据保持不变。Factory epoch `1` 与 authored
-assembly schema `2` 是独立身份，本次均保持不变。
+后续变更在此记录。
+
+## [0.2.0] - 2026-10-22 (Asia/Shanghai)
+
+Source SDK 预览发布准备。已发布的预览版及其不可变源码身份以
+[GitHub Releases](https://github.com/X-Gen-Lab/nexus/releases)为准；本条目本身不
+证明已经发布或软件候选已通过验收。已发布 0.1.0 的 tag、附件和原始证据保持
+不变。Factory epoch `1` 与 authored assembly schema `2` 是独立身份，本次均保持不变。
 
 ### 新增
 
@@ -19,18 +24,57 @@ assembly schema `2` 是独立身份，本次均保持不变。
   这不是全平台 HAL Handle/callback 迁移。
 - 可选的调用方存储冷路径生命周期诊断，以及从既有权威派生的只读模式审查
   工作包视图。该视图不执行测试，也不授予软件或物理资格。
+- 明确选择的 H743 V 修订、HSI64、裸机 AXI SRAM 参考，维护 Cache off/on 下的
+  有限 SPI DMA 和连续 UART RX；RX 可保留独立 IRQ TX，也可明确选择共享 UART
+  owner 的有限 DMA TX。
+- U575 TZEN0 有限 USART1 GPDMA 硬件链 TX 与 LPTIM2 RUN 单次计数参考；
+  不开放自主 STOP 操作或任意链。
+- 所选 U575 [保留时间与有界 Stop2](docs/design/u575-retained-time.md)、
+  [有限 SRAM4 LPDMA 复制](docs/design/u575-stop2-copy.md)与
+  [单组 LPTIM1 LPBAM](docs/design/u575-lptim1-lpbam.md)软件参考；不提供通用
+  LPBAM 或完整低功耗资格。
+- 所选 [U575 MPU GPIO WRITE](docs/design/u575-mpu-gpio.md)与
+  [F407 有限 I2S2 slave TX](docs/design/f407-i2s2-slave-tx.md)组件；物理隔离与外部
+  音频执行仍未取得资格。
+- 调用方独立拥有的时间戳预算比较，包含已知不确定度边界和独立的 WITHIN、
+  EXCEEDED、UNKNOWN 结果；原始 DWT 快照本身不取得已用时间或时钟连续性保证。
+- 五个所选 I/O 模式及七个独立 ThreadX 验收协议的软件 HIL 准备；参考夹具保持
+  未绑定，不能授权物理工位。
 
 ### 变更
 
 - 构造器返回明确冻结的构造合同，声明私有状态、静态定义、初始化与失败清理责任。
 - 当前 Source SDK consumer 使用 exact `0.2.0`；旧 SDK 与资格记录保留原始
   源码和版本身份。
+- 仅 host 使用的 GoogleTest／GoogleMock 固定为 `ext/googletest` Git 子模块；
+  固件及其安装的源码 SDK 不包含 host 测试框架。
+- Source SDK consumer policy v11 要求 50 个独立 root 和 53 个镜像；`h743 high`
+  使用标准 `tools/configure/assemblies/h743-high-peripherals.toml`。这些是必需计划
+  的身份；实际执行结果绑定特定源码和保留证据。
+- 测量 schema 2 要求原始 DWT 端点、连续 counter epoch，以及带 CPU 频率和
+  时序误差边界的独立准入参考；旧标量断言不能证明新测量合格。
+- 手动绑定精确 main SHA 的工作流以有界 deadline 执行完整软件计划，并保留两个
+  原始输出树；执行该入口与软件候选封存仍是独立验收阶段。
+
+### 修复
+
+- H743 TX/RX domain-loss 路径保留借用，并在隔离后停止外设访问；RX 发布前
+  必须完成最后一次 live-domain 观察。
+- H743 UART 成功停止后恢复其拥有的冷态寄存器以供重启；排空或恢复失败时
+  保留资源，不返回虚假成功。
+- 有限 H743 Flash ELF 审计跟踪真实 callee 寄存器和栈参数来源，并拒绝不支持的
+  SP register-offset load；完整生产执行闭包仍是独立且未完成的证明范围。
+- provider 必需的公共 consumer 还必须属于源码 SDK 已审查的导出选择。
+- U575 retained-time、Stop2、LPDMA-copy 和 LPTIM1-LPBAM 独立 SDK consumer
+  校验各自标准组件 owner、调用方存储与实际链接代码，不冒称 factory 接口保留或实板执行。
+- H743 RAM／栈审计根据实际编译参数及有序 GCC file/debug prefix map，推导原始
+  `.su` 的源码身份；拒绝错误或有歧义的源码，不按文件名或路径后缀放行。
 
 ### 验证与限制
 
 变更后的源码须单独取得新鲜测试、精确链接镜像比较、独立 SDK 消费和候选证据。
-MCU 实板 HIL 继续为 `not_executed`。Bootloader 交接、动态变频、deep STOP 与
-更广的 H743/U575 模式保持既有未实现或部分实现边界。
+MCU 实板 HIL 继续为 `not_executed`。通用 bootloader 交接、动态变频、完整 deep-STOP
+支持与更广的 H743/U575 模式保持既有未实现或部分实现边界。
 
 ## [0.1.0] - 2026-10-15（Asia/Shanghai）
 
