@@ -364,6 +364,101 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertEqual(arguments[arguments.index('--parallel') + 1],
                                  '2')
 
+    def analyzer_installation(self, directory, *, update_status=0, install_status=0):
+        root = Path(directory)
+        tools, temporary = root / 'ports', root / 'runner temporary'
+        tools.mkdir()
+        temporary.mkdir()
+        calls = root / 'apt-calls.jsonl'
+        apt = tools / 'apt-get'
+        apt.write_text('#!' + sys.executable + '\n'
+            'import json,os,sys\nfrom pathlib import Path\n'
+            'args=sys.argv[1:];options={}\n'
+            'for index,arg in enumerate(args):\n'
+            ' if arg=="-o":\n'
+            '  key,_,value=args[index+1].partition("=");options[key]=value\n'
+            'operation=next((arg for arg in args if arg in ("update","install")),None)\n'
+            'source=options.get("Dir::Etc::sourcelist");parts=options.get("Dir::Etc::sourceparts")\n'
+            'record={"argv":args,"options":options,"operation":operation,"source":source,\n'
+            ' "source_text":Path(source).read_text() if source else None,\n'
+            ' "sourceparts":sorted(p.name for p in Path(parts).iterdir()) if parts else None}\n'
+            'with open(os.environ["APT_CALLS"],"a") as output:output.write(json.dumps(record)+"\\n")\n'
+            'raise SystemExit(int(os.environ["UPDATE_STATUS" if operation=="update" else "INSTALL_STATUS"]))\n')
+        apt.chmod(0o755)
+        sudo = tools / 'sudo'
+        sudo.write_text('#!' + sys.executable + '\n'
+            'import os,sys\nfrom pathlib import Path\n'
+            'if sys.argv[1:2] != ["apt-get"]:raise SystemExit(97)\n'
+            'port=Path(__file__).resolve().parent/"apt-get"\n'
+            'os.execv(str(port),[str(port),*sys.argv[2:]])\n')
+        sudo.chmod(0o755)
+        # Only these harmless host programs are reachable through PATH. Both
+        # privileged ports are local fixtures and never delegate to host APT.
+        for name in ('cat', 'mkdir'):
+            target = shutil.which(name)
+            self.assertIsNotNone(target)
+            (tools / name).symlink_to(target)
+        step = next(step for step in workflow('quality-checks.yml')['jobs']['static-analysis']['steps']
+                    if step.get('name') == 'Install analyzers')
+        self.assertNotRegex(step['run'], r'/[^\s;]*(?:sudo|apt-get)\b')
+        result = subprocess.run([shutil.which('bash'), '-euo', 'pipefail', '-c', step['run']],
+            cwd=root, env={'PATH': str(tools), 'RUNNER_TEMP': str(temporary),
+                'APT_CALLS': str(calls), 'UPDATE_STATUS': str(update_status),
+                'INSTALL_STATUS': str(install_status)}, capture_output=True, text=True, timeout=5)
+        records = [json.loads(line) for line in calls.read_text().splitlines()] if calls.exists() else []
+        return result, records, step
+
+    def test_analyzer_installation_uses_signed_official_sources_and_bounded_requests(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result, calls, step = self.analyzer_installation(directory)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual([call['operation'] for call in calls], ['update', 'install'])
+            self.assertEqual(int(step['timeout-minutes']), 10)
+            self.assertEqual(calls[0]['source'], calls[1]['source'])
+            for call in calls:
+                with self.subTest(operation=call['operation']):
+                    self.assertEqual(call['sourceparts'], [])
+                    options = call['options']
+                    expected = {'Dir::Etc::sourcelist', 'Dir::Etc::sourceparts', 'Acquire::Retries',
+                                'Acquire::http::Timeout', 'Acquire::https::Timeout'}
+                    if call['operation'] == 'update':
+                        expected.add('APT::Update::Error-Mode')
+                    self.assertEqual(set(options), expected)
+                    for key, value in {'Acquire::Retries': '2', 'Acquire::http::Timeout': '30',
+                                       'Acquire::https::Timeout': '30'}.items():
+                        self.assertEqual(options[key], value)
+                    paragraphs = [dict(line.split(': ', 1) for line in paragraph.splitlines())
+                                  for paragraph in call['source_text'].strip().split('\n\n')]
+                    self.assertEqual(len(paragraphs), 2)
+                    self.assertEqual({p['URIs']: p['Suites'].split() for p in paragraphs}, {
+                        'https://archive.ubuntu.com/ubuntu/': ['noble', 'noble-updates', 'noble-backports'],
+                        'https://security.ubuntu.com/ubuntu/': ['noble-security']})
+                    for paragraph in paragraphs:
+                        self.assertEqual(set(paragraph), {'Types', 'URIs', 'Suites', 'Components', 'Signed-By'})
+                        self.assertEqual(paragraph['Types'], 'deb')
+                        self.assertEqual(set(paragraph['Components'].split()),
+                                         {'main', 'restricted', 'universe', 'multiverse'})
+                        self.assertEqual(paragraph['Signed-By'],
+                                         '/usr/share/keyrings/ubuntu-archive-keyring.gpg')
+                    self.assertNotIn('Dir::State::lists', options,
+                                     'Keep the runner-managed APT sandbox and lists permissions')
+            self.assertEqual(calls[0]['options']['APT::Update::Error-Mode'], 'any')
+            arguments = calls[1]['argv']
+            self.assertEqual(arguments[arguments.index('install'):],
+                             ['install', '-y', 'clang-tidy-14', 'cppcheck'])
+
+    def test_analyzer_installation_propagates_update_and_install_failures(self):
+        for update, install, expected, operations in (
+                (100, 0, 100, ['update']),
+                (0, 100, 100, ['update', 'install']),
+                (0, 124, 124, ['update', 'install'])):
+            with self.subTest(update=update, install=install), \
+                    tempfile.TemporaryDirectory() as directory:
+                result, calls, _ = self.analyzer_installation(
+                    directory, update_status=update, install_status=install)
+                self.assertEqual(result.returncode, expected, result.stderr)
+                self.assertEqual([call['operation'] for call in calls], operations)
+
     def test_arm_cache_restores_only_untrusted_archive_bytes(self):
         action = yaml.load((ROOT / '.github/actions/setup-build/action.yml')
                            .read_text(), Loader=yaml.BaseLoader)
