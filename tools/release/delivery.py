@@ -22,6 +22,8 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.dont_write_bytecode = True
+INVENTORY_FILE_LIMIT = 100000
+CI_EVIDENCE_FILE_LIMIT = 200000
 
 from tools.configure.metadata import load_policy
 
@@ -44,13 +46,16 @@ def digest(path):
 
 
 def commit(value):
-    if not re.fullmatch(r"[0-9a-f]{40}", value):
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{40}", value):
         raise ValueError("An exact 40-character commit is required")
     return value
 
 
-def inventory(path):
+def inventory(path, *, file_limit=None):
     path = Path(path)
+    file_limit = INVENTORY_FILE_LIMIT if file_limit is None else file_limit
+    if type(file_limit) is not int or file_limit <= 0:
+        raise ValueError("Release inventory requires a positive file limit")
     if any(item.is_symlink() for item in (path, *path.parents)):
         raise ValueError("Release paths must not traverse symlinks")
     result = {}
@@ -59,8 +64,11 @@ def inventory(path):
             raise ValueError("Release payload contains a nonregular path")
         if item.is_file():
             result[item.relative_to(path).as_posix()] = digest(item)
-    if not result or len(result) > 100000:
-        raise ValueError("Release payload inventory is empty or exceeds its bound")
+    if not result:
+        raise ValueError(f"Release payload inventory is empty: path={path} count=0 limit={file_limit}")
+    if len(result) > file_limit:
+        raise ValueError(f"Release payload inventory exceeds its file limit: path={path} "
+                         f"count={len(result)} limit={file_limit}")
     return result
 
 
@@ -190,16 +198,20 @@ def verify_identity(path, artifact_root, expected_commit, job, run_id, attempt):
 
 
 
-def archive_evidence(inputs, destination):
+def archive_evidence(inputs, destination, *, include_builder_ci=False):
     """Retain raw consumer outputs and qualification files with original paths."""
     inputs = Path(inputs)
     selections = [inputs / name for name in (
         "sdk/delivery/sdk-consumers", "sdk/delivery/staging-copy.json",
         "sdk/job-identities", "docs", "attestation", "ci-evidence",
         "ci-run.json", "ci-jobs.json")]
+    if include_builder_ci:
+        selections.extend(inputs / name for name in
+                          ("builder-ci-run.json", "builder-ci-jobs.json"))
     expected = {}
     for selection in selections:
-        paths = inventory(selection) if selection.is_dir() else {
+        limit = CI_EVIDENCE_FILE_LIMIT if selection == inputs / "ci-evidence" else INVENTORY_FILE_LIMIT
+        paths = inventory(selection, file_limit=limit) if selection.is_dir() else {
             selection.name: digest(selection)}
         for name, checksum in paths.items():
             path = selection / name if selection.is_dir() else selection
@@ -223,7 +235,8 @@ def archive_evidence(inputs, destination):
         raise ValueError("Verification evidence archive changed raw qualification bytes")
 
 
-def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, attempt):
+def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, attempt,
+           *, recover_tagged_source=False, builder_commit=None, builder_ci_run_id=None):
     from tools.documentation import delivery
     source, inputs, output = Path(source), Path(inputs), Path(output)
     version = load_policy(source)["semantic_version"]
@@ -233,6 +246,17 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
     require_jobs(read(inputs / "ci-jobs.json"))
     if run["id"] != ci_run_id:
         raise ValueError("CI input belongs to a different run")
+    builder_run = None
+    if recover_tagged_source:
+        commit(builder_commit)
+        if type(builder_ci_run_id) is not int or builder_ci_run_id <= 0:
+            raise ValueError("Tagged-source recovery requires an explicit builder CI run")
+        builder_run = require_ci(read(inputs / "builder-ci-run.json"), builder_commit)
+        require_jobs(read(inputs / "builder-ci-jobs.json"))
+        if builder_run["id"] != builder_ci_run_id:
+            raise ValueError("Builder CI input belongs to a different run")
+    elif builder_commit is not None or builder_ci_run_id is not None:
+        raise ValueError("Separate builder inputs require explicit tagged-source recovery")
     sdk, docs = inputs / "sdk", inputs / "docs"
     prefix, checks = sdk / "delivery/source-sdk", sdk / "delivery/sdk-consumers"
     verify_sdk(source, prefix, expected_commit)
@@ -292,10 +316,10 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
         shutil.copyfile(original, output / name)
         if digest(original) != digest(output / name):
             raise ValueError("Release asset copy changed")
-    archive_evidence(inputs, output / raw_archive)
+    archive_evidence(inputs, output / raw_archive, include_builder_ci=recover_tagged_source)
     assets = [{"name": path.name, "size": path.stat().st_size, "sha256": digest(path)}
               for path in sorted(output.iterdir())]
-    write(output / "release-manifest.json", {"schema_version": 1,
+    release_manifest = {"schema_version": 1,
           "kind": "nexus_software_preview", "tag": "v" + version,
           "source_commit": expected_commit,
           "ci_run_id": ci_run_id, "ci_run_attempt": run["run_attempt"],
@@ -304,14 +328,18 @@ def bundle(source, inputs, output, expected_commit, ci_run_id, release_run_id, a
           "production_qualification": False,
           "evidence_layout": {"sdk_archive_root": sdk_root,
                               "sdk_restore_path": "sdk/delivery/source-sdk",
-                              "raw_records": raw_archive}})
+                              "raw_records": raw_archive}}
+    if builder_run is not None:
+        release_manifest.update(builder_ci_run_id=builder_ci_run_id,
+                                builder_ci_run_attempt=builder_run["run_attempt"])
+    write(output / "release-manifest.json", release_manifest)
 
 
 class GitHub:
     """GitHub HTTP is the sole remote publication boundary."""
 
     def __init__(self, repository):
-        if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        if not isinstance(repository, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
             raise ValueError("Invalid repository")
         self.repository = repository
         self.base = "https://api.github.com/repos/" + repository
@@ -353,19 +381,44 @@ class GitHub:
                             {"draft": False, "prerelease": True})
 
 
-def require_refs(api, expected_commit, tag):
-    for ref in ("heads/main", "tags/" + tag):
+def require_refs(api, expected_commit, tag, *, builder_commit=None):
+    builder_commit = expected_commit if builder_commit is None else commit(builder_commit)
+    for ref, expected in (("heads/main", builder_commit), ("tags/" + tag, expected_commit)):
         value = api.get("/git/ref/" + ref)
         if value is None:
             raise ValueError("Explicit existing main and release tag are required")
         target = value["object"]
         if ref.startswith("tags/") and target["type"] == "tag":
             target = api.get("/git/tags/" + target["sha"])["object"]
-        if target.get("type") != "commit" or target.get("sha") != expected_commit:
+        if target.get("type") != "commit" or target.get("sha") != expected:
             raise ValueError("Main or existing release tag differs from the expected commit")
 
 
-def publish(output, expected_commit, ci_run_id, *, api, source=None):
+def guard(expected_commit, actual_commit, *, source=ROOT, api=None,
+          publishing=False, recover_tagged_source=False):
+    expected_commit, actual_commit = commit(expected_commit), commit(actual_commit)
+    if not recover_tagged_source and expected_commit != actual_commit:
+        raise ValueError("Expected commit differs from actual workflow checkout")
+    if recover_tagged_source and (publishing is not True or api is None):
+        raise ValueError("Tagged-source recovery requires explicit publication")
+    source = Path(source)
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
+    status = subprocess.check_output(["git", "status", "--porcelain", "--untracked-files=all"],
+                                     cwd=source, text=True)
+    if head != actual_commit or status:
+        raise ValueError("Delivery requires the exact clean builder checkout")
+    if recover_tagged_source:
+        policy = source / "dependencies/platform-compatibility.json"
+        tag = "v" + load_policy(source)["semantic_version"]
+        require_refs(api, expected_commit, tag, builder_commit=actual_commit)
+        original = subprocess.check_output(["git", "show",
+            expected_commit + ":dependencies/platform-compatibility.json"], cwd=source)
+        if original != policy.read_bytes():
+            raise ValueError("Tagged source and trusted builder compatibility policies differ")
+
+
+def publish(output, expected_commit, ci_run_id, *, api, source=None,
+            recover_tagged_source=False, builder_commit=None, builder_ci_run_id=None):
     version = load_policy(ROOT if source is None else source)["semantic_version"]
     tag = "v" + version
     output = Path(output)
@@ -373,6 +426,17 @@ def publish(output, expected_commit, ci_run_id, *, api, source=None):
     if (release_manifest.get("tag") != tag or
             release_manifest.get("source_commit") != commit(expected_commit)):
         raise ValueError("Release manifest source/tag mismatch")
+    if recover_tagged_source:
+        if (not isinstance(builder_commit, str) or
+                release_manifest.get("builder_commit") != commit(builder_commit) or
+                release_manifest.get("builder_workflow_ref") !=
+                api.repository + "/.github/workflows/release.yml@refs/heads/main" or
+                type(builder_ci_run_id) is not int or builder_ci_run_id <= 0 or
+                release_manifest.get("builder_ci_run_id") != builder_ci_run_id):
+            raise ValueError("Tagged-source recovery builder identity differs")
+    elif (builder_commit is not None and builder_commit != expected_commit) or builder_ci_run_id is not None:
+        raise ValueError("Separate builder inputs require explicit tagged-source recovery")
+    builder_commit = expected_commit if builder_commit is None else builder_commit
     assets = release_manifest["assets"]
     assets = assets + [{"name": "release-manifest.json",
         "size": (output / "release-manifest.json").stat().st_size,
@@ -387,10 +451,24 @@ def publish(output, expected_commit, ci_run_id, *, api, source=None):
         if path.is_symlink() or path.stat().st_size != item["size"] or digest(path) != item["sha256"]:
             raise ValueError("Release asset bytes changed before upload")
     observed_run = require_ci(api.get("/actions/runs/" + str(ci_run_id)), expected_commit)
+    if (observed_run["id"] != ci_run_id or release_manifest.get("ci_run_id") != ci_run_id or
+            type(release_manifest.get("ci_run_attempt")) is not int or
+            observed_run["run_attempt"] != release_manifest["ci_run_attempt"]):
+        raise ValueError("Source CI run or attempt differs from release inputs")
     jobs_path = ("/actions/runs/" + str(ci_run_id) + "/attempts/" +
                  str(observed_run["run_attempt"]) + "/jobs?per_page=100")
     require_jobs(api.get(jobs_path))
-    require_refs(api, expected_commit, tag)
+    builder_run = None
+    if recover_tagged_source:
+        builder_run = require_ci(api.get("/actions/runs/" + str(builder_ci_run_id)), builder_commit)
+        if (builder_run["id"] != builder_ci_run_id or
+                type(release_manifest.get("builder_ci_run_attempt")) is not int or
+                builder_run["run_attempt"] != release_manifest.get("builder_ci_run_attempt")):
+            raise ValueError("Builder CI run or attempt differs from release inputs")
+        builder_jobs_path = ("/actions/runs/" + str(builder_ci_run_id) + "/attempts/" +
+                             str(builder_run["run_attempt"]) + "/jobs?per_page=100")
+        require_jobs(api.get(builder_jobs_path))
+    require_refs(api, expected_commit, tag, builder_commit=builder_commit)
     if api.get("/releases/tags/" + tag) is not None:
         raise ValueError("Release already exists; inspect its bytes before any retry")
     release = api.create({"tag_name": tag, "target_commitish": expected_commit,
@@ -413,10 +491,17 @@ def publish(output, expected_commit, ci_run_id, *, api, source=None):
     if {item["name"] for item in remote} != {item["name"] for item in assets}:
         raise ValueError("Uploaded release asset set differs; release remains draft")
     final_run = require_ci(api.get("/actions/runs/" + str(ci_run_id)), expected_commit)
-    if final_run["run_attempt"] != observed_run["run_attempt"]:
+    if (final_run["id"] != observed_run["id"] or
+            final_run["run_attempt"] != observed_run["run_attempt"]):
         raise ValueError("CI was rerun during publication; release remains draft")
     require_jobs(api.get(jobs_path))
-    require_refs(api, expected_commit, tag)
+    if builder_run is not None:
+        final_builder = require_ci(api.get("/actions/runs/" + str(builder_ci_run_id)), builder_commit)
+        if (final_builder["id"] != builder_run["id"] or
+                final_builder["run_attempt"] != builder_run["run_attempt"]):
+            raise ValueError("Builder CI was rerun during publication; release remains draft")
+        require_jobs(api.get(builder_jobs_path))
+    require_refs(api, expected_commit, tag, builder_commit=builder_commit)
     return api.publish(release["id"])
 
 
@@ -426,6 +511,9 @@ def main(arguments=None):
     child = commands.add_parser("guard")
     child.add_argument("--expected-commit", required=True)
     child.add_argument("--actual-commit", required=True)
+    child.add_argument("--publish", action="store_true")
+    child.add_argument("--recover-tagged-source", action="store_true")
+    child.add_argument("--repository")
     child = commands.add_parser("stage")
     child.add_argument("--source", type=Path, required=True)
     child.add_argument("--prefix", type=Path, required=True)
@@ -440,6 +528,9 @@ def main(arguments=None):
     child.add_argument("--ci-run-id", type=int, required=True)
     child.add_argument("--release-run-id", type=int, required=True)
     child.add_argument("--attempt", type=int, required=True)
+    child.add_argument("--recover-tagged-source", action="store_true")
+    child.add_argument("--builder-commit")
+    child.add_argument("--builder-ci-run-id", type=int)
     child = commands.add_parser("check-ci")
     child.add_argument("--record", type=Path, required=True)
     child.add_argument("--jobs", type=Path, required=True)
@@ -450,22 +541,30 @@ def main(arguments=None):
     child.add_argument("--expected-commit", required=True)
     child.add_argument("--ci-run-id", type=int, required=True)
     child.add_argument("--repository", required=True)
+    child.add_argument("--recover-tagged-source", action="store_true")
+    child.add_argument("--builder-commit")
+    child.add_argument("--builder-ci-run-id", type=int)
     args = parser.parse_args(arguments)
     try:
         if args.command == "guard":
-            if commit(args.expected_commit) != args.actual_commit:
-                raise ValueError("Expected commit differs from actual workflow checkout")
+            guard(args.expected_commit, args.actual_commit, publishing=args.publish,
+                  recover_tagged_source=args.recover_tagged_source,
+                  api=GitHub(args.repository) if args.recover_tagged_source else None)
         elif args.command == "stage":
             stage(args.source, args.prefix, args.consumers, args.output, args.expected_commit)
         elif args.command == "bundle":
             bundle(args.source, args.inputs, args.output, args.expected_commit,
-                   args.ci_run_id, args.release_run_id, args.attempt)
+                   args.ci_run_id, args.release_run_id, args.attempt,
+                   recover_tagged_source=args.recover_tagged_source,
+                   builder_commit=args.builder_commit, builder_ci_run_id=args.builder_ci_run_id)
         elif args.command == "check-ci":
             require_ci(read(args.record), args.expected_commit)
             require_jobs(read(args.jobs))
         else:
             publish(args.output, args.expected_commit, args.ci_run_id,
-                    api=GitHub(args.repository), source=args.source)
+                    api=GitHub(args.repository), source=args.source,
+                    recover_tagged_source=args.recover_tagged_source,
+                    builder_commit=args.builder_commit, builder_ci_run_id=args.builder_ci_run_id)
     except (ValueError, OSError, subprocess.SubprocessError, KeyError) as error:
         print("Release rejected: " + str(error), file=sys.stderr)
         return 1

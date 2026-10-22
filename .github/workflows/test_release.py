@@ -126,10 +126,12 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
 
     def test_workflow_keeps_source_checkout_and_names_separate_from_builder_signer(self):
         document = workflow()
-        for job_name in ("guard", "source-sdk", "publish"):
+        for job_name in ("guard", "publish"):
             checkout = document["jobs"][job_name]["steps"][0]
             self.assertEqual(checkout["with"]["ref"],
-                             "${{ inputs.expected_commit }}")
+                             "${{ github.sha }}")
+        self.assertEqual(document["jobs"]["source-sdk"]["steps"][0]["with"]["ref"],
+                         "${{ inputs.expected_commit }}")
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             calls = root / "calls.jsonl"
@@ -162,29 +164,28 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
 
     def test_workflow_guard_rejects_arbitrary_dispatch_refs(self):
         step = workflow()["jobs"]["guard"]["steps"][1]
-        actual = subprocess.check_output(["git", "rev-parse", "HEAD"],
-                                         cwd=ROOT, text=True).strip()
+        _, source, _, actual, _ = ReleaseRecoveryTests.guard_fixture(self)
         for ref in ("refs/heads/main", "refs/heads/delivery/0.1.0",
                     "refs/heads/unreviewed", "refs/tags/v0.1.0",
                     "refs/heads/main/extra", "refs/heads/main-extra"):
             result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
-                cwd=ROOT, env={**os.environ, "GITHUB_REF": ref,
+                cwd=source, env={**os.environ, "GITHUB_REF": ref,
                     "NEXUS_EXPECTED_COMMIT": actual, "NEXUS_PUBLISH": "true",
-                    "GITHUB_SHA": actual},
+                    "GITHUB_SHA": actual, "GITHUB_WORKFLOW_SHA": actual},
                 capture_output=True, text=True)
             self.assertEqual(result.returncode == 0,
                              ref == "refs/heads/main")
         result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
-            cwd=ROOT, env={**os.environ, "GITHUB_REF": "refs/heads/main",
+            cwd=source, env={**os.environ, "GITHUB_REF": "refs/heads/main",
                 "NEXUS_EXPECTED_COMMIT": actual, "NEXUS_PUBLISH": "false",
-                "GITHUB_SHA": "b" * 40}, capture_output=True, text=True)
+                "GITHUB_SHA": "b" * 40, "GITHUB_WORKFLOW_SHA": "b" * 40},
+            capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("exact workflow source commit", result.stderr)
 
     def test_guard_admits_only_exact_main_workflow_commit_before_source_code(self):
         step = workflow()["jobs"]["guard"]["steps"][1]
-        actual = subprocess.check_output(["git", "rev-parse", "HEAD"],
-                                         cwd=ROOT, text=True).strip()
+        _, source, _, actual, _ = ReleaseRecoveryTests.guard_fixture(self)
         with tempfile.TemporaryDirectory() as directory:
             temporary = Path(directory)
             marker = temporary / "source-tool-called"
@@ -200,9 +201,10 @@ class SDKWorkflowExecutionTests(unittest.TestCase):
                         ("A" * 40, "A" * 40, False)):
                     marker.unlink(missing_ok=True)
                     result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
-                        cwd=ROOT, env={**os.environ, "GITHUB_REF": "refs/heads/main",
+                        cwd=source, env={**os.environ, "GITHUB_REF": "refs/heads/main",
                             "PATH": str(temporary) + os.pathsep + os.environ["PATH"],
                             "SOURCE_TOOL_MARKER": str(marker), "GITHUB_SHA": builder,
+                            "GITHUB_WORKFLOW_SHA": builder,
                             "NEXUS_EXPECTED_COMMIT": expected, "NEXUS_PUBLISH": publishing},
                         capture_output=True, text=True, check=False, timeout=10)
                     with self.subTest(publish=publishing, expected=expected, builder=builder):
@@ -1231,7 +1233,7 @@ class ReleaseVersionTests(unittest.TestCase):
             "release_id": payload.name}
         return source, inputs, output, documentation
 
-    def run_bundle(self, source, inputs, output, documentation):
+    def run_bundle(self, source, inputs, output, documentation, **arguments):
         from tools.release.delivery import bundle
         from tools.documentation import delivery as documentation_delivery
         # Source SDK/package and documentation verification are external tool
@@ -1241,7 +1243,7 @@ class ReleaseVersionTests(unittest.TestCase):
                                             return_value=documentation), \
                 unittest.mock.patch.object(documentation_delivery, "MANIFEST",
                                             "manifest.json"):
-            bundle(source, inputs, output, COMMIT, 123, 321, 1)
+            bundle(source, inputs, output, COMMIT, 123, 321, 1, **arguments)
 
     def test_bundle_uses_policy_version_for_tag_archives_and_preserved_bytes(self):
         source, inputs, output, documentation = self.fixture()
@@ -1429,7 +1431,7 @@ class ReleaseAdmissionTests(unittest.TestCase):
             root = Path(directory)
             (root / "asset.tar.gz").write_bytes(b"verified archive")
             manifest = {"tag": "v" + load_policy(ROOT)["semantic_version"],
-                        "source_commit": COMMIT,
+                        "source_commit": COMMIT, "ci_run_id": 123, "ci_run_attempt": 1,
                         "assets": [{"name": "asset.tar.gz", "size": 16,
                                     "sha256": hashlib.sha256(
                                         b"verified archive").hexdigest()}]}
@@ -1453,6 +1455,7 @@ class ReleaseAdmissionTests(unittest.TestCase):
         (root / "asset.tar.gz").write_bytes(b"verified archive")
         (root / "release-manifest.json").write_text(json.dumps({
             "tag": "v" + version, "source_commit": COMMIT,
+            "ci_run_id": 123, "ci_run_attempt": 1,
             "assets": [{"name": "asset.tar.gz", "size": 16,
                         "sha256": hashlib.sha256(b"verified archive").hexdigest()}]}))
         api = unittest.mock.Mock()
@@ -1586,6 +1589,348 @@ class ReleaseAdmissionTests(unittest.TestCase):
         for name, job in document["jobs"].items():
             self.assertEqual(job.get("permissions", {}).get("contents", "read"),
                              "write" if name == "publish" else "read")
+
+
+class ReleaseRecoveryTests(unittest.TestCase):
+    run_record = ReleaseAdmissionTests.run_record
+    jobs_record = ReleaseAdmissionTests.jobs_record
+
+    def evidence_fixture(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        inputs = root / "inputs"
+        for name in ("sdk/delivery/sdk-consumers/raw.log",
+                     "sdk/delivery/staging-copy.json", "sdk/job-identities/id.json",
+                     "docs/.buildinfo", "attestation/bundle.json",
+                     "ci-run.json", "ci-jobs.json"):
+            path = inputs / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("original " + name)
+        for index in range(3):
+            path = inputs / "ci-evidence" / f"artifact-{index}" / "raw.log"
+            path.parent.mkdir(parents=True)
+            path.write_text(f"original CI bytes {index}")
+        return root, inputs
+
+    def test_inventory_distinguishes_empty_and_file_budget_with_path(self):
+        from tools.release.delivery import inventory
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, "empty.*count=0.*limit=2") as caught:
+                inventory(root, file_limit=2)
+            self.assertIn(str(root), str(caught.exception))
+            for index in range(3):
+                (root / str(index)).write_bytes(b"original bytes")
+            self.assertEqual(len(inventory(root, file_limit=3)), 3)
+            with self.assertRaisesRegex(ValueError, "exceeds.*count=3.*limit=2") as caught:
+                inventory(root, file_limit=2)
+            self.assertIn(str(root), str(caught.exception))
+
+    def test_only_ci_aggregate_has_larger_budget_and_all_bytes_survive(self):
+        from tools.release import delivery
+        for overloaded in (None, "ci-evidence", "docs"):
+            with self.subTest(overloaded=overloaded):
+                root, inputs = self.evidence_fixture()
+                if overloaded:
+                    for index in range(3):
+                        (inputs / overloaded / f"extra-{index}").write_bytes(b"extra")
+                with unittest.mock.patch.object(delivery, "INVENTORY_FILE_LIMIT", 2), \
+                     unittest.mock.patch.object(delivery, "CI_EVIDENCE_FILE_LIMIT", 4):
+                    archive = root / "evidence.tar.gz"
+                    if overloaded:
+                        limit = 4 if overloaded == "ci-evidence" else 2
+                        with self.assertRaisesRegex(ValueError, f"exceeds.*limit={limit}"):
+                            delivery.archive_evidence(inputs, archive)
+                    else:
+                        delivery.archive_evidence(inputs, archive)
+                        with tarfile.open(archive) as stream:
+                            for path in inputs.rglob("*"):
+                                if path.is_file():
+                                    self.assertEqual(stream.extractfile(
+                                        path.relative_to(inputs).as_posix()).read(), path.read_bytes())
+
+    def guard_fixture(self, *, policy_drift=False):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        base = Path(temporary.name)
+        source = base / "checkout"
+        source.mkdir()
+        policy = (ROOT / "dependencies/platform-compatibility.json").read_bytes()
+        for name in ("dependencies", "tools/release", "tools/configure"):
+            (source / name).mkdir(parents=True, exist_ok=True)
+        (source / "dependencies/platform-compatibility.json").write_bytes(
+            policy + (b"\n" if policy_drift else b""))
+        (source / ".gitignore").write_text("build/\n")
+        (source / "tools/release/delivery.py").write_text(
+            "import os\nfrom pathlib import Path\n"
+            "Path(os.environ['SOURCE_CODE_SENTINEL']).write_text('untrusted source ran')\n")
+
+        def git(*arguments):
+            return subprocess.check_output(["git", *arguments], cwd=source,
+                                           stderr=subprocess.PIPE, text=True).strip()
+
+        git("init", "--quiet")
+        git("config", "user.name", "Fixture")
+        git("config", "user.email", "fixture@example.invalid")
+        git("add", ".")
+        git("commit", "--quiet", "-m", "Tagged SDK source")
+        tagged = git("rev-parse", "HEAD")
+        git("tag", "-a", "v0.2.0", "-m", "Immutable source")
+        (source / "dependencies/platform-compatibility.json").write_bytes(policy)
+        for name in ("tools/release/delivery.py", "tools/configure/metadata.py"):
+            shutil.copyfile(ROOT / name, source / name)
+        (source / "builder.txt").write_text("trusted builder\n")
+        git("add", ".")
+        git("commit", "--quiet", "-m", "Trusted recovery builder")
+        builder = git("rev-parse", "HEAD")
+        routes = {"/git/ref/heads/main": {"object": {"type": "commit", "sha": builder}},
+                  "/git/ref/tags/v0.2.0": {"object": {"type": "tag", "sha": "c" * 40}},
+                  "/git/tags/" + "c" * 40: {"object": {"type": "commit", "sha": tagged}}}
+        return base, source, tagged, builder, routes
+
+    def test_actual_guard_admits_only_explicit_clean_tagged_source_recovery(self):
+        step = workflow()["jobs"]["guard"]["steps"][1]
+        for mutation in (None, "default", "not-publishing", "nonmain", "head",
+                         "workflow", "malformed", "main", "tag", "missing-tag",
+                         "policy", "dirty"):
+            with self.subTest(mutation=mutation):
+                base, source, tagged, builder, routes = self.guard_fixture(
+                    policy_drift=mutation == "policy")
+                if mutation in ("main", "tag"):
+                    path = "/git/ref/heads/main" if mutation == "main" else "/git/tags/" + "c" * 40
+                    routes[path]["object"]["sha"] = "b" * 40
+                if mutation == "missing-tag":
+                    del routes["/git/ref/tags/v0.2.0"]
+                if mutation == "dirty":
+                    (source / "builder.txt").write_text("uncommitted builder\n")
+                api = base / "api.json"
+                api.write_text(json.dumps(routes))
+                sentinel = base / "source-code-called"
+                python = base / "python3"
+                python.write_text("#!" + sys.executable + "\n"
+                    "import importlib.util,json,os,sys\nfrom pathlib import Path\n"
+                    "sys.dont_write_bytecode=True\n"
+                    "s=importlib.util.spec_from_file_location('trusted_delivery',sys.argv[1])\n"
+                    "m=importlib.util.module_from_spec(s);s.loader.exec_module(m)\n"
+                    "routes=json.loads(Path(os.environ['API_FIXTURE']).read_text())\n"
+                    "class API:\n repository='X-Gen-Lab/nexus'\n"
+                    " def get(self,path):return routes.get(path)\n"
+                    "m.GitHub=lambda repository:API()\n"
+                    "raise SystemExit(m.main(sys.argv[2:]))\n")
+                python.chmod(0o755)
+                environment = {**os.environ, "PATH": str(base) + os.pathsep + os.environ["PATH"],
+                    "API_FIXTURE": str(api), "SOURCE_CODE_SENTINEL": str(sentinel),
+                    "GITHUB_REF": "refs/heads/other" if mutation == "nonmain" else "refs/heads/main",
+                    "GITHUB_SHA": "b" * 40 if mutation == "head" else builder,
+                    "GITHUB_WORKFLOW_SHA": "b" * 40 if mutation == "workflow" else builder,
+                    "GITHUB_REPOSITORY": "X-Gen-Lab/nexus", "GH_REPO": "X-Gen-Lab/nexus",
+                    "NEXUS_EXPECTED_COMMIT": "malformed" if mutation == "malformed" else tagged,
+                    "NEXUS_PUBLISH": "false" if mutation == "not-publishing" else "true",
+                    "NEXUS_RECOVER_TAGGED_SOURCE": "false" if mutation == "default" else "true"}
+                result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
+                    cwd=source, env=environment, capture_output=True, text=True, timeout=15)
+                self.assertEqual(result.returncode == 0, mutation is None, result.stderr)
+                self.assertFalse(sentinel.exists(), "Tagged source code ran before admission")
+
+    def test_guard_credentials_and_recovery_inputs_are_explicit_workflow_values(self):
+        document = workflow()
+        inputs = document["on"]["workflow_dispatch"]["inputs"]
+        self.assertEqual(inputs["recover_tagged_source"]["default"], "false")
+        self.assertEqual(inputs["builder_ci_run_id"]["default"], "")
+        environment = document["jobs"]["guard"]["steps"][1]["env"]
+        for name, expected in {"GH_TOKEN": "${{ github.token }}",
+                "GH_REPO": "${{ github.repository }}", "NEXUS_PUBLISH": "${{ inputs.publish }}",
+                "NEXUS_RECOVER_TAGGED_SOURCE": "${{ inputs.recover_tagged_source }}"}.items():
+            self.assertEqual(environment[name], expected)
+
+    def test_source_identity_remains_tagged_source_under_distinct_builder(self):
+        from tools.maintenance.job_identity import capture
+        base, source, tagged, builder, _ = self.guard_fixture()
+        subprocess.run(["git", "checkout", "--quiet", tagged], cwd=source, check=True)
+        artifact = source / "build/raw.log"
+        artifact.parent.mkdir()
+        artifact.write_bytes(b"original source SDK evidence")
+        with unittest.mock.patch.dict(os.environ, {"GITHUB_SHA": builder,
+                "GITHUB_RUN_ID": "321", "GITHUB_RUN_ATTEMPT": "1"}):
+            record = capture(root=source, job="source-sdk", result="success",
+                expected_commit=tagged, artifacts=[artifact], tools={"python": sys.executable},
+                output=source / "build/identity", require_dependencies=False)
+        self.assertEqual(record["source"]["commit"], tagged)
+        self.assertFalse(record["source"]["dirty"])
+        self.assertNotIn("GITHUB_SHA", record["run"])
+        (source / ".gitignore").write_text("changed tracked source\n")
+        with self.assertRaisesRegex(ValueError, "dirty checkout"):
+            capture(root=source, job="source-sdk", result="success",
+                expected_commit=tagged, artifacts=[artifact], tools={"python": sys.executable},
+                output=source / "build/dirty-identity", require_dependencies=False)
+
+    def test_actual_guard_checks_explicit_builder_ci_before_source_jobs(self):
+        step = workflow()["jobs"]["guard"]["steps"][2]
+        for mutation in (None, "missing-id", "source", "stale", "skipped"):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                builder = {**self.run_record(), "id": 456, "head_sha": "b" * 40}
+                jobs = self.jobs_record()
+                if mutation == "source":
+                    builder["head_sha"] = "c" * 40
+                if mutation == "stale":
+                    builder["created_at"] = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
+                if mutation == "skipped":
+                    jobs["jobs"][0]["conclusion"] = "skipped"
+                routes = {"/actions/runs/123": self.run_record(),
+                    "/actions/runs/123/attempts/1/jobs?per_page=100": self.jobs_record(),
+                    "/actions/runs/456": builder,
+                    "/actions/runs/456/attempts/1/jobs?per_page=100": jobs}
+                (root / "api.json").write_text(json.dumps(routes))
+                gh = root / "gh"
+                gh.write_text("#!" + sys.executable + "\nimport json,os,sys\n"
+                    "from pathlib import Path\n"
+                    "routes=json.loads(Path(os.environ['API_FIXTURE']).read_text())\n"
+                    "path=sys.argv[2].removeprefix('repos/X-Gen-Lab/nexus')\n"
+                    "print(json.dumps(routes[path]))\n")
+                gh.chmod(0o755)
+                environment = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                    "API_FIXTURE": str(root / "api.json"), "RUNNER_TEMP": str(root),
+                    "GH_REPO": "X-Gen-Lab/nexus", "NEXUS_EXPECTED_COMMIT": COMMIT,
+                    "NEXUS_CI_RUN_ID": "123", "NEXUS_BUILDER_CI_RUN_ID": "" if mutation == "missing-id" else "456",
+                    "NEXUS_RECOVER_TAGGED_SOURCE": "true", "GITHUB_SHA": "b" * 40}
+                result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", step["run"]],
+                    cwd=ROOT, env=environment, capture_output=True, text=True, timeout=15)
+                self.assertEqual(result.returncode == 0, mutation is None, result.stderr)
+
+    def test_bundle_binds_builder_ci_and_archives_only_its_raw_api_records(self):
+        for mutation in (None, "missing", "source", "skipped"):
+            with self.subTest(mutation=mutation):
+                source, inputs, output, documentation = ReleaseVersionTests.fixture(self)
+                run = {**self.run_record(), "id": 456, "head_sha": "b" * 40}
+                jobs = self.jobs_record()
+                if mutation == "source":
+                    run["head_sha"] = "c" * 40
+                if mutation == "skipped":
+                    jobs["jobs"][0]["conclusion"] = "skipped"
+                if mutation != "missing":
+                    (inputs / "builder-ci-run.json").write_text(json.dumps(run))
+                (inputs / "builder-ci-jobs.json").write_text(json.dumps(jobs))
+                arguments = {"recover_tagged_source": True, "builder_commit": "b" * 40,
+                             "builder_ci_run_id": 456}
+                if mutation:
+                    with self.assertRaises((ValueError, OSError)):
+                        ReleaseVersionTests.run_bundle(self, source, inputs, output,
+                                                       documentation, **arguments)
+                    self.assertFalse(output.exists())
+                else:
+                    ReleaseVersionTests.run_bundle(self, source, inputs, output,
+                                                   documentation, **arguments)
+                    manifest = json.loads((output / "release-manifest.json").read_text())
+                    self.assertEqual(manifest["source_commit"], COMMIT)
+                    self.assertEqual(manifest["builder_ci_run_id"], 456)
+                    self.assertEqual(manifest["builder_ci_run_attempt"], 1)
+                    with tarfile.open(output / manifest["evidence_layout"]["raw_records"]) as archive:
+                        for name in ("builder-ci-run.json", "builder-ci-jobs.json"):
+                            self.assertEqual(archive.extractfile(name).read(),
+                                             (inputs / name).read_bytes())
+
+    def recovery_publisher(self):
+        root, api = ReleaseAdmissionTests.publisher_fixture(self)
+        api.repository = "X-Gen-Lab/nexus"
+        original = api.get.side_effect
+
+        def get(path):
+            if path == "/git/ref/heads/main":
+                return {"object": {"type": "commit", "sha": "b" * 40}}
+            if path == "/actions/runs/456":
+                return {**self.run_record(), "id": 456, "head_sha": "b" * 40}
+            return original(path)
+
+        api.get.side_effect = get
+        path = root / "release-manifest.json"
+        manifest = json.loads(path.read_text())
+        manifest.update(builder_commit="b" * 40, builder_ci_run_id=456,
+            builder_ci_run_attempt=1,
+            builder_workflow_ref="X-Gen-Lab/nexus/.github/workflows/release.yml@refs/heads/main")
+        path.write_text(json.dumps(manifest))
+        return root, api
+
+    def test_recovery_publisher_preserves_source_and_requires_explicit_builder(self):
+        from tools.release.delivery import publish
+        for mutation in (None, "default", "missing-builder", "builder", "manifest-builder",
+                         "workflow", "missing-builder-ci", "manifest-builder-ci", "manifest-attempt",
+                         "source-manifest-id", "source-manifest-attempt"):
+            with self.subTest(mutation=mutation):
+                root, api = self.recovery_publisher()
+                path = root / "release-manifest.json"
+                manifest = json.loads(path.read_text())
+                if mutation == "manifest-builder":
+                    manifest["builder_commit"] = "c" * 40
+                if mutation == "workflow":
+                    manifest["builder_workflow_ref"] = "foreign/repo/.github/workflows/release.yml@refs/heads/main"
+                if mutation == "manifest-builder-ci":
+                    manifest["builder_ci_run_id"] = 789
+                if mutation == "manifest-attempt":
+                    manifest["builder_ci_run_attempt"] = 2
+                if mutation == "source-manifest-id":
+                    manifest["ci_run_id"] = 789
+                if mutation == "source-manifest-attempt":
+                    manifest["ci_run_attempt"] = 2
+                path.write_text(json.dumps(manifest))
+                arguments = {"recover_tagged_source": mutation != "default",
+                    "builder_commit": None if mutation == "missing-builder" else
+                                      "invalid" if mutation == "builder" else "b" * 40,
+                    "builder_ci_run_id": None if mutation == "missing-builder-ci" else 456}
+                if mutation:
+                    with self.assertRaises(ValueError):
+                        publish(root, COMMIT, 123, api=api, **arguments)
+                    api.create.assert_not_called()
+                else:
+                    publish(root, COMMIT, 123, api=api, **arguments)
+                    self.assertEqual(api.create.call_args.args[0]["target_commitish"], COMMIT)
+                    api.publish.assert_called_once_with(5)
+
+    def test_recovery_rechecks_refs_and_both_ci_runs(self):
+        from tools.release.delivery import publish
+        for mutation in ("main-before", "main-after", "tag-before", "tag-after",
+                         "source-ci-source", "source-ci-stale", "source-ci-skipped",
+                         "builder-ci-source", "builder-ci-stale", "builder-ci-skipped",
+                         "source-ci-attempt-after", "builder-ci-attempt-after",
+                         "source-ci-skipped-after", "builder-ci-skipped-after",
+                         "source-ci-failed-after", "builder-ci-failed-after"):
+            with self.subTest(mutation=mutation):
+                root, api = self.recovery_publisher()
+                original = api.get.side_effect
+                calls = {}
+
+                def get(path):
+                    calls[path] = calls.get(path, 0) + 1
+                    response = original(path)
+                    if mutation.startswith(("main-", "tag-")):
+                        ref = "/git/ref/heads/main" if mutation.startswith("main-") else "/git/ref/tags/v0.2.0"
+                        if path == ref and calls[path] == (2 if mutation.endswith("after") else 1):
+                            return {"object": {"type": "commit", "sha": "c" * 40}}
+                    run = 456 if mutation.startswith("builder-ci-") else 123
+                    if path == f"/actions/runs/{run}":
+                        if mutation.endswith("-source"):
+                            response["head_sha"] = "c" * 40
+                        if mutation.endswith("-stale"):
+                            response["created_at"] = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
+                        if mutation.endswith("-attempt-after") and calls[path] == 2:
+                            response["run_attempt"] = 2
+                    if f"/actions/runs/{run}/attempts/" in path and (
+                            "-skipped" in mutation or "-failed" in mutation):
+                        if not mutation.endswith("after") or calls[path] == 2:
+                            response["jobs"][0]["conclusion"] = (
+                                "skipped" if "-skipped" in mutation else "failure")
+                    return response
+
+                api.get.side_effect = get
+                with self.assertRaises(ValueError):
+                    publish(root, COMMIT, 123, api=api, recover_tagged_source=True,
+                            builder_commit="b" * 40, builder_ci_run_id=456)
+                api.publish.assert_not_called()
+                if mutation.endswith("after"):
+                    self.assertEqual(api.upload.call_count, 2)
+                else:
+                    api.create.assert_not_called()
 
 
 if __name__ == "__main__":

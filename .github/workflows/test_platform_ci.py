@@ -790,7 +790,7 @@ print('{"status":"fixture-only"}')
 
 
 PROFILE_BASELINE_SHA = '921ef15385b75a0a9e91dc4be22db7362dcf0f342cfd473008222c431d15d715'
-POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e', '.github/workflows/release.yml': '92b10f16e20ff0c52df7744bc4b4a75284dd8591e9f1ce015ba8708d272933e2'}
+POLICY_BASELINE_SHAS = {'.github/workflows/ci.yml': 'e2ad98367ccdfe5a2292599dfce90a367555a75900717e263b9bd546b9f01f3e', '.github/workflows/release.yml': '1ace6ced84a4a474161b041d7b34f08e7fc0046b5986e887c568563597d48174'}
 
 
 class SoftwareQualificationContracts(unittest.TestCase):
@@ -812,6 +812,10 @@ class SoftwareQualificationContracts(unittest.TestCase):
         assembly.parent.mkdir(parents=True)
         assembly.write_text('schema = 2\n')
         (root / '.gitignore').write_text('build/\n')
+        for name in ('tools/release/delivery.py', 'tools/configure/metadata.py'):
+            target = root / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
         subprocess.run(['git', 'init', '-q', str(root)], check=True)
         self.commit(root)
         return root
@@ -840,10 +844,10 @@ class SoftwareQualificationContracts(unittest.TestCase):
 
     def execute(self, identifier, root, env):
         script = self.step(identifier)['run']
-        # Relocate the real maintained guard CLI, not its implementation.
+        # Execute the maintained guard in the fixture's actual clean checkout.
         script = script.replace('python3 tools/release/delivery.py',
                                 shlex.quote(sys.executable) + ' ' +
-                                shlex.quote(str(ROOT / 'tools/release/delivery.py')))
+                                shlex.quote(str(root / 'tools/release/delivery.py')))
         if env.get('REAL_EVIDENCE_STORE') == 'true':
             script = script.replace('.venv/bin/python tools/evidence/store.py',
                                     shlex.quote(sys.executable) + ' ' +
