@@ -29,6 +29,150 @@ from tools.dev import process as maintained_process
 ACTUAL_PROCESS_RUN = maintained_process.run
 
 
+class SDKPublicCompileInputTests(unittest.TestCase):
+    """Exercise argv and canonical source boundaries without compiling models."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="SDK include paths ")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.sdk = self.root / "external soc/vendors tree/sdk"
+        self.build = self.root / "product -DSTM32 name/build"
+        self.build.mkdir(parents=True)
+        self.public = (self.sdk / "components/soc/stm32/stm32f407_handoff/include")
+        (self.public / "nexus/components").mkdir(parents=True)
+        (self.public.parent / "CMakeLists.txt").write_text(
+            "# Maintained component exports its sibling include directory.\n")
+        self.private = self.sdk / "soc/stm32/stm32f407/private"
+        self.private.mkdir(parents=True)
+        specification = importlib.util.spec_from_file_location(
+            "include_boundary_consumer", ROOT / "cmake/package/verify_consumers.py")
+        self.consumer = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(self.consumer)
+
+    def private_input(self, arguments, *, command=False):
+        entry = {"file": str(self.build / "main.c"),
+                 "directory": str(self.build)}
+        argv = ["cc", *map(str, arguments), "-c", str(self.build / "main.c")]
+        entry["command" if command else "arguments"] = (
+            shlex.join(argv) if command else argv)
+        return self.consumer.private_compile_inputs(entry, self.sdk)
+
+    def test_public_chip_include_and_kernel_exports_remain_public(self):
+        paths = [self.public, self.public / "nexus/components",
+                 self.sdk / "ext/freertos/include",
+                 self.sdk / "ext/freertos/portable/GCC/ARM_CM4F",
+                 self.sdk / "ext/threadx/common/inc",
+                 self.sdk / "ext/threadx/ports/cortex_m4/gnu/inc",
+                 self.sdk / "os/threadx/config"]
+        for path in paths:
+            for command in (False, True):
+                with self.subTest(path=path, command=command):
+                    self.assertFalse(self.private_input(["-I", path], command=command))
+
+    def test_real_implementation_inputs_and_aliases_are_private(self):
+        paths = [self.sdk, self.sdk / "components", self.sdk / "soc", self.private,
+                 self.sdk / "vendors/st/stm32f4_hal/Inc",
+                 self.sdk / "io/private",
+                 self.public.parent, self.public.parent / "src",
+                 self.public.parent / "private",
+                 self.public.parent / "src/include",
+                 self.public.parent / "other/include",
+                 self.public / "../private",
+                 self.sdk / "components/../soc/stm32/stm32f407/private"]
+        for option in ("-I", "-isystem", "-iquote", "-idirafter", "-include", "-imacros"):
+            for path in paths:
+                for joined in (False, True):
+                    with self.subTest(option=option, path=path, joined=joined):
+                        args = [option + str(path)] if joined else [option, path]
+                        self.assertTrue(self.private_input(args))
+
+    def test_relative_and_symlink_paths_use_real_sdk_boundaries(self):
+        relative = os.path.relpath(self.private, self.build)
+        self.assertTrue(self.private_input(["-isystem", relative], command=True))
+        public_relative = os.path.relpath(self.public, self.build)
+        self.assertFalse(self.private_input(["-I" + public_relative]))
+        alias = self.public / "hidden"
+        alias.symlink_to(self.private, target_is_directory=True)
+        self.assertTrue(self.private_input(["-I", alias]))
+        outside = self.root / "another SDK/soc/private/vendors"
+        outside.mkdir(parents=True)
+        self.assertFalse(self.private_input(["-I", outside], command=True))
+        lookalike = self.sdk.with_name(self.sdk.name + "-other") / "soc/private"
+        self.assertFalse(self.private_input(["-I", lookalike]))
+
+    def test_chip_definitions_are_options_instead_of_path_substrings(self):
+        for arguments in (["-DSTM32F407xx"], ["-D", "GD32F470"],
+                          ["-Wp,-DSTM32F407xx"], ["-Wp,-D,GD32F470"],
+                          ["-Xpreprocessor", "-DSTM32F407xx"]):
+            with self.subTest(arguments=arguments):
+                self.assertTrue(self.private_input(arguments))
+        self.assertFalse(self.private_input(["-I", self.build]))
+        self.assertFalse(self.private_input(["-DPRODUCT_PATH=-DSTM32-example"]))
+
+    def test_forwarded_includes_and_arguments_override_command_text(self):
+        self.assertTrue(self.private_input(["-Wp,-I," + str(self.private)]))
+        self.assertTrue(self.private_input(
+            ["-Xpreprocessor", "-isystem", "-Xpreprocessor", self.private]))
+        entry = {"file": str(self.build / "main.c"), "directory": str(self.build),
+                 "arguments": ["cc", "-I", str(self.private)],
+                 "command": "cc -I" + shlex.quote(str(self.public))}
+        self.assertTrue(self.consumer.private_compile_inputs(entry, self.sdk))
+        entry["arguments"] = ["cc", "-I", str(self.public)]
+        entry["command"] = "cc -I" + shlex.quote(str(self.private))
+        self.assertFalse(self.consumer.private_compile_inputs(entry, self.sdk))
+
+    def test_generic_component_public_exports_need_no_local_cmake_file(self):
+        for name in ("bus_owner", "bmp280", "log", "storage", "modbus"):
+            with self.subTest(component=name):
+                public = self.sdk / "components" / name / "include"
+                (public / "nexus/components").mkdir(parents=True)
+                self.assertFalse(self.private_input(["-I", public]))
+
+    def test_nested_vendor_paths_are_sdk_private(self):
+        for path in (self.sdk / "components/log/vendors/include",
+                     self.sdk / "io/include/vendors"):
+            with self.subTest(path=path):
+                self.assertTrue(self.private_input(["-I", path]))
+
+    def test_unmodeled_frontend_and_shell_forwarders_fail_closed(self):
+        for args in (["cc", "-Xclang", "-internal-isystem", "-Xclang",
+                      str(self.private)],
+                     ["cc", "-internal-externc-isystem", str(self.private)],
+                     ["sh", "-c", "cc -I" + shlex.quote(str(self.private))],
+                     ["env", "sh", "-c", "cc -I" + shlex.quote(str(self.private))],
+                     ["CPATH=" + str(self.private), "cc", "-c", "main.c"]):
+            with self.subTest(arguments=args):
+                entry = {"file": str(self.build / "main.c"),
+                         "directory": str(self.build), "arguments": args}
+                with self.assertRaises(ValueError):
+                    self.consumer.private_compile_inputs(entry, self.sdk)
+
+    def test_unexpanded_or_missing_command_text_fails_closed(self):
+        for command in (None, [], "", "cc -I$NEXUS_SDK/soc/private -c main.c",
+                        "cc -I`echo private` -c main.c", "cc -c main.c && other"):
+            with self.subTest(command=command):
+                for arguments in ({}, {"arguments": None}):
+                    entry = {"file": str(self.build / "main.c"),
+                             "directory": str(self.build), "command": command,
+                             **arguments}
+                    with self.assertRaises(ValueError):
+                        self.consumer.private_compile_inputs(entry, self.sdk)
+
+    def test_uninspectable_inputs_fail_closed(self):
+        for args in (["-I"], ["-isystem"], ["-D"], ["-Xpreprocessor"],
+                     ["@opaque-options.rsp"], ["-c", "@opaque-options.rsp"],
+                     ["-Wp,@opaque-options.rsp"],
+                     ["-isystem=$SYSROOT/private"],
+                     ["-iprefix", str(self.sdk)], ["-iwithprefixbefore", "private"],
+                     ["--sysroot=" + str(self.sdk)], ["-isysroot", str(self.sdk)]):
+            with self.subTest(args=args):
+                entry = {"file": str(self.build / "main.c"),
+                         "directory": str(self.build), "arguments": ["cc", *args]}
+                with self.assertRaises(ValueError):
+                    self.consumer.private_compile_inputs(entry, self.sdk)
+
+
 class SDKVerificationCallTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
@@ -312,6 +456,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
                      "arguments": ["cc", "-c", str(path)],
                      "command": "cc -c " + shlex.quote(str(path))}
                     for path in products]
+            if self.selected_fault == "public_chip_include":
+                public = self.sdk / "components/soc/stm32/stm32f407_handoff/include"
+                (public / "nexus/components").mkdir(parents=True, exist_ok=True)
+                (public.parent / "CMakeLists.txt").write_text("# Public chip API.\n")
+                for row in rows:
+                    row["arguments"].insert(1, "-I" + str(public))
+                    row["command"] = shlex.join(row["arguments"])
             (build / "compile_commands.json").write_text(json.dumps(rows))
             config = build / "configuration"
             config.mkdir()
@@ -379,10 +530,17 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if self.selected_fault == "private_include":
                     (build / "compile_commands.json").write_text(json.dumps([
                         {"file": str(source / "main.c"),
-                         "command": "cc -I" + str(self.sdk / "soc/stm32/stm32u575/private")
-                                    + " -c main.c"},
+                         "directory": str(build),
+                         "arguments": ["cc", "-I",
+                             str(self.sdk / "soc/stm32/stm32u575/private"),
+                             "-c", str(source / "main.c")],
+                         "command": shlex.join(["cc", "-I",
+                             str(self.sdk / "soc/stm32/stm32u575/private"),
+                             "-c", str(source / "main.c")])},
                         {"file": str(source / "private_headers.c"),
-                         "command": "cc -c private_headers.c"}]))
+                         "directory": str(build),
+                         "command": "cc -c " + shlex.quote(
+                             str(source / "private_headers.c"))}]))
         elif command[0] == "cmake" and "--build" in command:
             code = 42 if self.failed_build else 0
             if (Path(command[2]).name.startswith("selected ") and
@@ -1098,6 +1256,13 @@ class SDKConsumerParallelTests(unittest.TestCase):
                     self.assertEqual(report["commands"][-1]["exit_code"], 48)
                 else:
                     self.assertIn("retention", report["error"])
+
+    def test_public_chip_exports_preserve_every_consumer_guard_and_root(self):
+        self.selected_fault = "public_chip_include"
+        status, report = self.execute(("--parallel", "1"))
+        self.assertEqual(status, 0, report)
+        self.assertEqual(report["status"], "passed")
+        self.assert_complete_matrix()
 
     def test_native_runtime_nm_private_state_and_missing_owner_fail_closed(self):
         for fault in ("native_runtime", "native_nm", "native_private_include",

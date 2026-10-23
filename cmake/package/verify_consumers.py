@@ -32,6 +32,103 @@ def clean_environment():
     return environment
 
 
+def private_compile_inputs(entry, sdk):
+    """Audit actual compiler options against canonical Nexus source boundaries.
+
+    Kernel PUBLIC headers remain valid. Chip component APIs live below their
+    declared package's include/nexus directory; neither package roots nor
+    implementation directories become public because their path contains soc.
+    """
+    arguments = entry.get("arguments")
+    if arguments is None:
+        command = entry.get("command")
+        if (not isinstance(command, str) or not command.strip() or
+                re.search(r"[$`\r\n;|&<>]", command)):
+            raise ValueError("Compiler command requires explicit shell expansion")
+        arguments = shlex.split(command)
+    if (not isinstance(arguments, list) or not arguments or
+            any(not isinstance(item, str) for item in arguments)):
+        raise ValueError("Malformed public compiler arguments")
+    if re.match(r"[A-Za-z_][A-Za-z0-9_]*=", arguments[0]):
+        raise ValueError("Compiler environment requires explicit expansion")
+    if Path(arguments[0]).name in {"sh", "bash", "dash", "zsh", "ksh",
+                                   "csh", "fish", "cmd", "cmd.exe", "env",
+                                   "powershell", "powershell.exe", "pwsh"}:
+        raise ValueError("Shell compiler wrappers require explicit expansion")
+    if any(item.startswith("@") for item in arguments):
+        raise ValueError("Response compiler options require explicit expansion")
+    arguments = list(arguments[1:])
+    roots = {Path(sdk).resolve(), Path(__file__).resolve().parents[2]}
+
+    def private_path(value):
+        if not value or value.startswith(("=", "$SYSROOT")):
+            raise ValueError("Include path requires explicit expansion")
+        path = Path(value)
+        if not path.is_absolute():
+            if not entry.get("directory"):
+                raise ValueError("Relative include path requires compile directory")
+            path = Path(entry["directory"]) / path
+        path = path.resolve()
+        for root in roots:
+            if not path.is_relative_to(root):
+                continue
+            relative = path.relative_to(root)
+            parts = relative.parts
+            if (not parts or parts[0] == "soc" or
+                    {"vendors", "private"}.intersection(parts)):
+                return True
+            if parts == ("components",):
+                return True
+            if parts[:2] == ("components", "soc"):
+                if len(parts) <= 4 or parts[4] != "include":
+                    return True
+                package = root.joinpath(*parts[:4])
+                if (not (package / "CMakeLists.txt").is_file() or
+                        not (package / "include/nexus").is_dir()):
+                    return True
+        return False
+
+    def operand():
+        if arguments and arguments[0] == "-Xpreprocessor":
+            arguments.pop(0)
+        if not arguments:
+            raise ValueError("Missing public compiler option operand")
+        return arguments.pop(0)
+
+    paths = ("-include-pch", "-isystem", "-iquote", "-idirafter",
+             "-include", "-imacros", "-I")
+    while arguments:
+        argument = arguments.pop(0)
+        if argument == "-Xpreprocessor":
+            arguments.insert(0, operand())
+            continue
+        if argument.startswith("-Wp,"):
+            arguments[:0] = argument[4:].split(",")
+            continue
+        if argument.startswith("@"):
+            raise ValueError("Response compiler options require explicit expansion")
+        if argument.startswith(("-iprefix", "-iwithprefix", "-isysroot",
+                                "--sysroot", "-imultilib", "-isystem-after",
+                                "-include-pth", "-Xclang", "-internal-isystem",
+                                "-internal-externc-isystem")):
+            raise ValueError("Include search prefix requires explicit expansion")
+        if argument in {"-c", "-o", "-MF", "-MT", "-MQ", "-x"}:
+            operand()
+            continue
+        if argument == "-D" or argument.startswith("-D"):
+            definition = operand() if argument == "-D" else argument[2:]
+            if definition.split("=", 1)[0].startswith(("STM32", "GD32")):
+                return True
+            continue
+        for option in paths:
+            if argument == option or argument.startswith(option):
+                value = operand() if argument == option else argument[len(option):]
+                if private_path(value):
+                    return True
+                break
+    return False
+
+
 def prepare_consumer(prefix, directory, name, run_checked, *, fixture=False,
                      arm=False, chip="stm32", expected_revision=None,
                      version=None, contracts=False):
@@ -443,8 +540,7 @@ def check_native_time_image(sdk, source, build, config, commands, run_checked):
             selected = Path(entry["directory"]) / selected
         if selected.resolve() != file:
             raise ValueError("Native compile row source and -c argument disagree")
-        if file.parent == source and any(value in " ".join(argv)
-                for value in ("/soc/native/drivers", "/io/private")):
+        if file.parent == source and private_compile_inputs(entry, sdk):
             raise ValueError("Private Native state leaked into the public consumer")
     if sum(Path(entry["file"]).resolve() == config / "bindings.c" for entry in commands) != 1:
         raise ValueError("Native generated bindings have no unique compile row")
@@ -512,8 +608,7 @@ def check_selected_image(sdk, source, build, run_checked, *,
     if (len(products) != 2 or
             {Path(entry["file"]).name for entry in products} !=
             {"main.c", "private_headers.c"} or
-            any(value in entry["command"] for entry in products for value in
-                ("/vendors/", "/soc/", "-DSTM32", "-DGD32"))):
+            any(private_compile_inputs(entry, sdk) for entry in products)):
         raise ValueError("Selected consumer private inputs leaked into product")
     config = Path((build / "resolved-config.txt").read_text())
     resolved = json.loads((config / "resolved.json").read_text())
@@ -585,8 +680,7 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
         for entry in commands:
             if Path(entry["file"]).name not in {"main.c", "main.cpp"}:
                 continue
-            if any(value in entry["command"] for value in
-                   ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470")):
+            if private_compile_inputs(entry, sdk):
                 raise ValueError(
                     "Private implementation input leaked into product source")
         if arm:
@@ -610,8 +704,7 @@ def verify_consumer(kind, specification, prefix, output, identity, run_checked):
         commands = json.loads((build / "compile_commands.json").read_text())
         products = [entry for entry in commands
                     if Path(entry["file"]).resolve() == source / "main.c"]
-        if len(products) != 1 or any(value in products[0]["command"]
-                for value in ("/vendors/", "/soc/", "-DSTM32", "-DGD32")):
+        if len(products) != 1 or private_compile_inputs(products[0], sdk):
             raise ValueError("Modern consumer private inputs leaked into product")
         image = build / "bin/installed_modern.elf"
         resources = json.loads(

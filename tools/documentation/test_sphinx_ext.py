@@ -46,7 +46,7 @@ class DocumentationSourceTests(unittest.TestCase):
             archived = root / 'docs/archive/history.md'
             archived.parent.mkdir()
             archived.write_text('# History\n', encoding='utf-8')
-            target = '../configure/assemblies/h743-high-peripherals.toml'
+            target = '../../tools/configure/assemblies/h743-high-peripherals.toml'
             revision = 'a' * 40
             bound = ('https://github.com/X-Gen-Lab/nexus/blob/' + revision
                      + '/tools/configure/assemblies/h743-high-peripherals.toml')
@@ -68,7 +68,7 @@ class DocumentationSourceTests(unittest.TestCase):
                           '``h743-high-peripherals.toml``'):
                 cases.append((f'[{label}]({target})', f'[{label}]({bound})'))
             cases.extend((
-                ('[`assemblies`](../configure/assemblies)',
+                ('[`assemblies`](../../tools/configure/assemblies)',
                  f'[`assemblies`](https://github.com/X-Gen-Lab/nexus/tree/{revision}'
                  '/tools/configure/assemblies)'),
                 ('[`history.md`](../archive/history.md)',

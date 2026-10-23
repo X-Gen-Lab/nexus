@@ -1269,7 +1269,7 @@ class SourceSDKTests(unittest.TestCase):
     def test_relocated_arm_consumer_compiles_real_startup_and_linker(self):
         _, build, result = self.consumer("arm", arm=True, fixture=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.run_ok(["cmake", "--build", str(build), "--parallel", "4", "--target", "installed_c", "installed_cpp"])
+        self.run_ok(["cmake", "--build", str(build), "--parallel", "1", "--target", "installed_c", "installed_cpp"])
         for application in ("installed_c", "installed_cpp"):
             self.assertGreater((build / "bin" / (application + ".elf")).stat().st_size, 0)
             resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
@@ -1280,7 +1280,7 @@ class SourceSDKTests(unittest.TestCase):
     def test_relocated_gd32_consumer_compiles_real_startup_and_linker(self):
         _, build, result = self.consumer("gd32 arm", arm=True, chip="gd32", fixture=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.run_ok(["cmake", "--build", str(build), "--parallel", "4", "--target", "installed_c", "installed_cpp"])
+        self.run_ok(["cmake", "--build", str(build), "--parallel", "1", "--target", "installed_c", "installed_cpp"])
         for application in ("installed_c", "installed_cpp"):
             self.assertGreater((build / "bin" / (application + ".elf")).stat().st_size, 0)
             resources = json.loads((build / "bin" / (application + ".resources.json")).read_text())
@@ -1343,8 +1343,8 @@ class SourceSDKTests(unittest.TestCase):
                 self.assertEqual(len(products), 1)
                 for entry in commands:
                     self.assertNotIn(str(ROOT) + "/", entry["command"])
-                for private in ("/vendors/", "/soc/", "-DSTM32G474"):
-                    self.assertNotIn(private, products[0]["command"])
+                self.assertFalse(consumer_gate.private_compile_inputs(
+                    products[0], self.sdk))
 
     def check_private_includes(self, build):
         commands = json.loads((build / "compile_commands.json").read_text())
@@ -1352,11 +1352,8 @@ class SourceSDKTests(unittest.TestCase):
         self.assertEqual(len(product), 2)
         for entry in product:
             command = entry["command"]
-            self.assertNotIn("/vendors/", command)
-            self.assertNotIn("/soc/", command)
+            self.assertFalse(consumer_gate.private_compile_inputs(entry, self.sdk))
             self.assertNotIn(str(ROOT) + "/", command)
-            self.assertNotIn("-DSTM32F407", command)
-            self.assertNotIn("-DGD32F470", command)
 
     def modern_consumer(self, family, board, backend):
         consumers = self.directory / "typed platform consumers"
@@ -1389,8 +1386,7 @@ class SourceSDKTests(unittest.TestCase):
         self.assertEqual(len(products), 1)
         for entry in commands:
             self.assertNotIn(str(ROOT) + "/", entry["command"])
-        for private in ("/vendors/", "/soc/", "-DSTM32", "-DGD32"):
-            self.assertNotIn(private, products[0]["command"])
+        self.assertFalse(consumer_gate.private_compile_inputs(products[0], self.sdk))
         # The SDK must supply the selected original vector table, exactly once.
         startup_name = {
             "h743": "startup_stm32h743xx.s", "u575": "startup_stm32u575xx.s",
@@ -1459,8 +1455,7 @@ class SourceSDKTests(unittest.TestCase):
         self.assertEqual(len(product), 1)
         for entry in commands:
             self.assertNotIn(str(ROOT) + "/", entry["command"])
-        for private in ("/vendors/", "/soc/", "-DSTM32F407", "-DGD32F470"):
-            self.assertNotIn(private, product[0]["command"])
+        self.assertFalse(consumer_gate.private_compile_inputs(product[0], self.sdk))
         if arm:
             image = build / "bin/installed_threadx.elf"
             resources = json.loads(
