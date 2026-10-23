@@ -22,6 +22,12 @@ Record oscillator values, supply conditions, SWD reservations, pins, active leve
 jumper conditions and safe initial outputs. Distinguish document defaults from an
 observation of your particular board. Start with one LED and one console route.
 
+Choose a maintained fixed clock profile matching those oscillator facts. A new
+Board oscillator value does not synthesize an arbitrary PLL, power, Flash
+wait-state or peripheral kernel-clock plan. Add and verify an exact SoC profile
+before authorizing a new combination; parsing success does not measure clocks
+or establish electrical qualification.
+
 The following is a complete maintained Board file, including `soc_family`:
 
 ```{literalinclude} ../../boards/stm32f407_qiming_v31/board.json

@@ -524,7 +524,7 @@ class H743RamBuildGateTests(unittest.TestCase):
         rows, sources, objects, usage = [], [], [], []
         for name in module.RAM_SOURCES:
             row = next(row for row in actual if row["file"].endswith("/" + name))
-            source = scratch / "soc/stm32h743/drivers" / name
+            source = scratch / "soc/stm32/stm32h743/drivers" / name
             source.parent.mkdir(parents=True, exist_ok=True)
             source.write_bytes(Path(row["file"]).read_bytes())
             obj = scratch / (name + ".obj")

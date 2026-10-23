@@ -9,10 +9,10 @@
 #define NEXUS_FLASH_H
 
 #include "nexus/core/time.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_flash_port nx_flash_port_t;
 /**
  * \brief           Erase sector geometry, with offset relative to full
  *                  physical Flash.

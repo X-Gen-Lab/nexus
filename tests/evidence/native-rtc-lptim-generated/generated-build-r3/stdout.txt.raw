@@ -1,9 +1,0 @@
-+ /tmp/nexus-io36-native-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_rtc_lptim_pair_generated_test nexus_rtc_lptim_empty_generated_test --parallel 1
-[0/2] Re-checking globbed directories...
-[1/8] Building C object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-pair.c.o
-[2/8] Building C object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_pair_generated_test.dir/native-time-pair/bindings.c.o
-[3/8] Building CXX object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_empty_generated_test.dir/rtc_lptim_generated_test.cpp.o
-[4/8] Building C object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_empty_generated_test.dir/__/__/cmake/package/verification/io_evolution/consumers/native-time-empty.c.o
-[5/8] Building C object tests/contracts/google/CMakeFiles/nexus_rtc_lptim_empty_generated_test.dir/native-time-empty/bindings.c.o
-[6/8] Linking CXX executable bin/nexus_rtc_lptim_pair_generated_test
-[7/8] Linking CXX executable bin/nexus_rtc_lptim_empty_generated_test

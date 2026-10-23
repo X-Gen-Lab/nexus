@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4fb5b8c9d09850d18310a09b8018f16bd5e37e578da4509590be3be70768eaf7\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 27fab468a0cec0736ca90b0cc6406e2173c66b637d4fdf74387221f738b7a1eb\n"
 
 msgid "SoC refinement and physical acceptance"
 msgstr "SoC refinement and physical acceptance"
@@ -83,8 +83,25 @@ msgstr "General dual-world factory, NS RTOS/task identities, retained NS pointer
 msgid "These are source-reviewed Board references. Their physical PCB revisions, silicon revisions, solder bridges, electrical connections and option bytes have not been observed. Reference-only HIL admission fails closed; selecting a matching chip name cannot promote a reference into a qualified physical Board. The [extension execution record](../delivery/soc-extensions-verification.md) distinguishes normal commit gates, development ARM observations and final qualification. The [earlier baseline](../delivery/soc-refinement-verification.md) retains its original source identity and evidence. Reference software status in the ledger records bounded host/ARM evidence; it does not establish a clean candidate, physical acceptance or every original exit condition."
 msgstr "These are source-reviewed Board references. Their physical PCB revisions, silicon revisions, solder bridges, electrical connections and option bytes have not been observed. Reference-only HIL admission fails closed; selecting a matching chip name cannot promote a reference into a qualified physical Board. The [extension execution record](../delivery/soc-extensions-verification.md) distinguishes normal commit gates, development ARM observations and final qualification. The [earlier baseline](../delivery/soc-refinement-verification.md) retains its original source identity and evidence. Reference software status in the ledger records bounded host/ARM evidence; it does not establish a clean candidate, physical acceptance or every original exit condition."
 
-msgid "The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source withdrawal. Its test Board is an explicit software fixture, with no inferred connector, button or electrical bias. The [H743 contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md) defines all four HSI 32/64 MHz and Cache off/on combinations. Fixed cold profile selection does not implement a running frequency transition."
-msgstr "The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source withdrawal. Its test Board is an explicit software fixture, with no inferred connector, button or electrical bias. The [H743 contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md) defines all four HSI 32/64 MHz and Cache off/on combinations. Fixed cold profile selection does not implement a running frequency transition."
+#: docs/design/soc-refinement.md:76
+msgid ""
+"The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and "
+"EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source "
+"withdrawal. Its test Board is an explicit software fixture, with no inferred"
+" connector, button or electrical bias. The [H743 "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32h743/README.md) defines all four HSI 32/64 MHz and "
+"Cache off/on combinations. Fixed cold profile selection does not implement a"
+" running frequency transition."
+msgstr ""
+"The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and "
+"EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source "
+"withdrawal. Its test Board is an explicit software fixture, with no inferred"
+" connector, button or electrical bias. The [H743 "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32h743/README.md) defines all four HSI 32/64 MHz and "
+"Cache off/on combinations. Fixed cold profile selection does not implement a"
+" running frequency transition."
 
 msgid "H743 USART3 DMA TX owns DMA1 Stream0, DMAMUX1 Channel0 request46 and its separate vector; the alternative RX-IDLE selection owns DMA1 Stream1/channel1 request45 and keeps TX IRQ-driven. Finite RX needs owner service and rearm gaps; it is not continuous or implicit duplex. Cache-on buffers occupy exclusively owned complete 32-byte lines in selected initialized AXI/SRAM1, with no outward rounding or hidden bounce buffer. Cache cleaning follows borrow admission, runs outside the long interrupt mask, and cannot settle storage while preparation is active. DMA completion, wire TC and source withdrawal remain distinct. Failed withdrawal quarantines the loan; the provider must drain before cache and timer shutdown."
 msgstr "H743 USART3 DMA TX owns DMA1 Stream0, DMAMUX1 Channel0 request46 and its separate vector; the alternative RX-IDLE selection owns DMA1 Stream1/channel1 request45 and keeps TX IRQ-driven. Finite RX needs owner service and rearm gaps; it is not continuous or implicit duplex. Cache-on buffers occupy exclusively owned complete 32-byte lines in selected initialized AXI/SRAM1, with no outward rounding or hidden bounce buffer. Cache cleaning follows borrow admission, runs outside the long interrupt mask, and cannot settle storage while preparation is active. DMA completion, wire TC and source withdrawal remain distinct. Failed withdrawal quarantines the loan; the provider must drain before cache and timer shutdown."
@@ -274,4 +291,3 @@ msgstr "SOC-36 still needs a separately reviewed dual-world configuration/factor
 
 msgid "Physical equipment is currently disconnected. SOC-37–55 have executable tooling and station-binding obligations; their physical exit status remains `not_executed`. See [HIL authoring and commands](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)."
 msgstr "Physical equipment is currently disconnected. SOC-37–55 have executable tooling and station-binding obligations; their physical exit status remains `not_executed`. See [HIL authoring and commands](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)."
-

@@ -6,7 +6,7 @@ foreach(profile m7 unsupported)
     endif()
     nexus_google_test(nexus_arch_cache_control_${profile}_test
         SOURCES "${CMAKE_CURRENT_LIST_DIR}/arch_cache_control_test.cpp"
-            "${NEXUS_SOURCE_DIR}/arch/cortex_m/nx_arch_cache_control.c"
+            "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_cache_control.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/google")
     target_compile_definitions(nexus_arch_cache_control_${profile}_test

@@ -1,5 +1,0 @@
-tests/google/spi_multi_controller_test.cpp: In member function ‘nx_result_t {anonymous}::SPIMultiple::Initialize(unsigned int)’:
-tests/google/spi_multi_controller_test.cpp:111:16: error: ‘nx_gd32_spi_dma_initialize_at’ was not declared in this scope; did you mean ‘nx_gd32_spi_dma_initialize’?
-  111 |         return nx_gd32_spi_dma_initialize_at(&states[i], &children[i], i == 0U ? &nx_gd32_spi4_controller : &nx_gd32_spi0_controller,
-      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                nx_gd32_spi_dma_initialize

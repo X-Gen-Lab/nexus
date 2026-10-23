@@ -1,4 +1,0 @@
-20000000 00000028 D g_nx_stm32_system
-080001d8 0000001c T nx_component_link_entry
-08000078 00000160 T nx_stm32_system_start
-08000000 00000078 t restore_hsi

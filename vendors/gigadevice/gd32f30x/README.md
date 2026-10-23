@@ -10,7 +10,7 @@ This minimum import contains the exact GD32F30X_HD GCC startup, device/system
 headers and twelve peripheral register-definition headers. Peripheral C engines,
 other density/series startup files, examples and middleware are excluded. Nexus
 uses its existing pinned Arm CMSIS Core and owns bounded lifecycle, clock and
-I/O behavior in `soc/gd32f303`.
+I/O behavior in `soc/gd32/gd32f303`.
 
 The original per-file BSD-3-Clause and Apache-2.0 notices remain intact. Their
 texts and the package's original GigaDevice SLA are retained under `LICENSES`.

@@ -1,5 +1,0 @@
-/workspace/nexus/io/src/stream_budget.c: In function 'nx_stream_budget_calculate':
-/workspace/nexus/io/src/stream_budget.c:60:43: error: comparison is always false due to limited range of data type [-Werror=type-limits]
-   60 |     if ((uint64_t)budget->units_per_block > UINT64_MAX / UINT64_C(1000000) ||
-      |                                           ^
-cc1: all warnings being treated as errors

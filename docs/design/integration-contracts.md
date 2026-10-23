@@ -40,7 +40,7 @@ SoC provider 实现公共 IO/核心合同，并使用 Arch。器件 driver 使�
 一个维护中的 SoC package 通常包含：
 
 ```text
-soc/<family>/
+soc/<vendor>/<family>/
   soc.json                 # 精确 SKU、内存、时钟与控制器事实
   routes.json              # 已复核路由及模式的有限 allowlist
   CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
@@ -49,6 +49,12 @@ soc/<family>/
 ```
 
 family 目录可以复用代码，`soc.json` 仍分别定义 STM32F407VET6、STM32F407ZGT6、GD32F470ZGT6。型号、封装、Flash、SRAM 域和 IRQ 表不能被一个家族字符串代替。新增型号不等于已有所有 controller 都支持该型号。
+
+当前厂家目录为 `stm32` 与 `gd32`，例如 `soc/stm32/stm32f407` 和
+`soc/gd32/gd32f470`。`soc/common` 保留已核实的跨厂家寄存器协议算法；
+`soc/native/drivers` 实现独立主机模型。`source_directory` 由同一维护中的
+family descriptor 给出，配置仍使用原 family 标识；物理目录不构成第二份配置权威。
+CPU 实现按 ISA 位于 `arch/arm/cortex_m` 或 `arch/native`，公共头路径保持稳定。
 
 `routes.json` 每条记录至少绑定精确 SKU、controller、pin/AF、clock domain、IRQ、允许传输模式、允许 DMA route 和来源。可复用路由记录，但必须限定适用 SKU/封装。源资料复核与实板资格采用不同字段。
 
@@ -64,6 +70,11 @@ boards/<board-id>/
 ```
 
 Board 不复制 SDK、HAL、RTOS port 或链接器脚本。普通 GPIO 初始电平与 pin binding 可直接表达为数据；只有无法用已维护数据合同表达的有界电气动作才增加 `board.c`。这种代码仍须通过中性硬件端口工作。
+
+Board 的晶振声明必须匹配已维护的固定时钟 profile。一个新的晶振数值不会自动
+生成任意 PLL、电源、Flash wait-state 或外设 kernel clock 组合；需要新组合时，
+先为精确 SoC 实现并验证相应 profile，再允许 Board 装配选择。当前软件能力与
+物理频率、供电和唤醒测量分别取得，不从配置解析成功推导实板资格。
 
 下面是字段示意，`example-board` 并非声称存在或已经维护的 Board：
 

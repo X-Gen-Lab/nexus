@@ -1,6 +1,0 @@
-{
-  "actual_exit": 1,
-  "source_unchanged": true,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/batch3-boundary-followup/validation/original-module-red-r1/command.attempts/1792290177713775094-f995d04914844a0794aaf84dfc21fa69/receipt.json",
-  "scope": "complete test_sdk_verification_call module with external process boundary only; no compilation/fullsuite"
-}

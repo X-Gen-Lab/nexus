@@ -1,4 +1,5 @@
 """Audit directly specialized provider tables from their actual source files."""
+from tools.configure.providers.descriptor import source_directory
 
 from pathlib import Path
 import tempfile
@@ -35,7 +36,7 @@ class ProviderTemplateTests(unittest.TestCase):
                 with self.subTest(family=family, name=name):
                     provider = providers[f"nx_{stem}_{name}_ops"]
                     self.assertEqual(provider["source"], file_identity(
-                        ROOT / "soc" / family / "drivers" / (name + ".c")))
+                        ROOT / source_directory(family) / "drivers" / (name + ".c")))
                     self.assertEqual(provider["template_source"], file_identity(
                         ROOT / "io/private" / template))
 

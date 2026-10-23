@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_ETHERNET_H
 #define NEXUS_IO_ETHERNET_H
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
@@ -70,10 +71,10 @@ typedef struct {
     nx_result_t (*stop)(void*);
     nx_result_t (*attach_wake)(void*, const nx_irq_wake_t*, uint8_t);
 } nx_eth_ops_t;
-typedef struct {
+struct nx_eth_port {
     const nx_eth_ops_t* ops;
     void* context;
-} nx_eth_port_t;
+};
 /**
  * \brief Prepare an initialized, unborrowed request and its immutable frame.
  * \param[in,out] request: Initialized READY or consumed SETTLED storage.

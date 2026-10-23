@@ -1,9 +1,0 @@
-test_changed_source_identity_fails_closed (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_changed_source_identity_fails_closed) ... ok
-test_existing_output_is_never_overwritten (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_existing_output_is_never_overwritten) ... ok
-test_missing_tool_retains_actual_failure_report (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_missing_tool_retains_actual_failure_report) ... ok
-test_preprocessing_does_not_overwrite_actual_build_depfiles (tests.contracts.test_gd32_memory_matrix.MemoryMatrixTests.test_preprocessing_does_not_overwrite_actual_build_depfiles) ... ok
-
-----------------------------------------------------------------------
-Ran 4 tests in 0.008s
-
-OK

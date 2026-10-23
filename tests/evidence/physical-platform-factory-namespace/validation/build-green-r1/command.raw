@@ -1,6 +1,0 @@
-+ /tmp/nexus-io36-native-20261018/.venv/bin/cmake --build --preset native-debug --target nexus_stm32_physical_platform_factory_test nexus_gd32_physical_platform_factory_test --parallel 1
-[0/2] Re-checking globbed directories...
-[1/5] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_physical_platform_factory_test_empty.dir/physical-platform-stm32-empty/bindings.c.o
-[2/5] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_physical_platform_factory_test_empty.dir/physical-platform-gd32-empty/bindings.c.o
-[3/5] Linking CXX executable bin/nexus_stm32_physical_platform_factory_test
-[4/5] Linking CXX executable bin/nexus_gd32_physical_platform_factory_test

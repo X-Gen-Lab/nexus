@@ -3,10 +3,10 @@ nexus_google_test(nexus_pin_state_test SOURCES pin_state_test.cpp
     LIBRARIES Nexus::IO)
 nexus_google_test(nexus_g474_pin_state_test
     SOURCES g474_pin_state_test.cpp g474_pin_state_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pin_state.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pin_state.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/io/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private")
 target_include_directories(nexus_g474_pin_state_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -39,12 +39,12 @@ nexus_google_test(nexus_g474_pin_state_factory_test
     SOURCES g474_pin_state_factory_test.cpp g474_pin_state_model.cpp
         "${g4_pins_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pin_state.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pin_state.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_pins_bundle}"
         "${NEXUS_SOURCE_DIR}/io/private"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_pin_state_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"

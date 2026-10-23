@@ -352,7 +352,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                              "arguments": ["cc", "-c", str(config / "bindings.c")],
                              "command": "cc -c " + shlex.quote(str(config / "bindings.c"))})
                 if self.selected_fault == "native_private_include":
-                    rows[0]["arguments"].insert(1, "-I" + str(self.sdk / "io/native"))
+                    rows[0]["arguments"].insert(1, "-I" + str(self.sdk / "soc/native/drivers"))
                     rows[0]["command"] = shlex.join(rows[0]["arguments"])
                 (build / "compile_commands.json").write_text(json.dumps(rows))
                 # Native owns no ARM byproducts. Their absence is asserted by
@@ -379,7 +379,7 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if self.selected_fault == "private_include":
                     (build / "compile_commands.json").write_text(json.dumps([
                         {"file": str(source / "main.c"),
-                         "command": "cc -I" + str(self.sdk / "soc/stm32u575/private")
+                         "command": "cc -I" + str(self.sdk / "soc/stm32/stm32u575/private")
                                     + " -c main.c"},
                         {"file": str(source / "private_headers.c"),
                          "command": "cc -c private_headers.c"}]))
@@ -1116,6 +1116,10 @@ class SDKConsumerParallelTests(unittest.TestCase):
                 if fault in ("native_runtime", "native_nm"):
                     self.assertEqual(report["commands"][-1]["exit_code"],
                                      49 if fault == "native_runtime" else 50)
+                elif fault == "native_private_include":
+                    self.assertEqual(
+                        report["error"],
+                        "Selected consumer private inputs leaked into product")
                 else:
                     self.assertIn("Native", report["error"])
 

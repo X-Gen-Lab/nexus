@@ -1,7 +1,7 @@
 # Actual production reset initialization; framework remains host-only.
 nexus_google_test(nexus_gd32_memory_test SOURCES gd32_memory_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/gd32f470/memory_init.c"
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/gd32f470")
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/memory_init.c"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470")
 
 # These reset-only model headers select a controlled test variant. They are not
 # factory/configuration authority or source-SDK qualification.
@@ -19,10 +19,10 @@ foreach(memory_variant default both)
     file(WRITE "${memory_model}/nexus_config.h"
         "#define NEXUS_MEMORY_ADDSRAM ${memory_selected}\n#define NEXUS_MEMORY_TCM ${memory_selected}\n")
     nexus_google_test(${memory_target} SOURCES gd32_memory_boot_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/system.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
             "${NEXUS_SOURCE_DIR}/core/include"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_include_directories(${memory_target} BEFORE PRIVATE "${memory_model}")
@@ -39,6 +39,6 @@ foreach(memory_variant default both)
         -Wl,-Ttext-segment=0x60000000)
     if(memory_selected)
         target_sources(${memory_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/memory_init.c")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/memory_init.c")
     endif()
 endforeach()

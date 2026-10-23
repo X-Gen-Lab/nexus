@@ -25,12 +25,12 @@ nexus_google_test(nexus_g474_control_factory_test
     SOURCES g474_control_factory_test.cpp
         "${g4_control_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm_group.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_group.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_control_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_control_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"

@@ -1,4 +1,0 @@
-[1/4] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_kernel_test.cpp.o
-[2/4] Linking CXX executable nexus_threadx_kernel_test
-[3/4] Building CXX object CMakeFiles/nexus_threadx_linux_port_test.dir/workspace/nexus/tests/google/threadx_linux_port_test.cpp.o
-[4/4] Linking CXX executable nexus_threadx_linux_port_test

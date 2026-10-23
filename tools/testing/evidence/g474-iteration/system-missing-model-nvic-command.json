@@ -1,8 +1,0 @@
-{
-  "command": [
-    "/workspace/nexus-iteration-bus-design/g474-build/g474_system_test",
-    "--gtest_output=xml:/workspace/nexus-iteration-bus-design/g474-src/evidence/system-missing-model-nvic.xml"
-  ],
-  "returncode": 1,
-  "scope": "Fixture missing model IRQ_AVAILABLE macro exposed actual PPB on host; not a production behavior RED"
-}

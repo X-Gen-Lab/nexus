@@ -1,9 +1,0 @@
-{
-  "command": [
-    "/workspace/nexus/build/uart-iteration/bin/nexus_io_observer_test",
-    "--gtest_output=xml:/workspace/nexus-io-implementation-evidence/observer-tdd/io_observer-width-green.xml"
-  ],
-  "returncode": 0,
-  "start": 1791740016.036126,
-  "end": 1791740016.0395849
-}

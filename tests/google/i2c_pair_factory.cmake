@@ -45,14 +45,14 @@ foreach(i2c_pair_family stm32 gd32)
             SOURCES i2c_pair_factory_test.cpp
             "${i2c_pair_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/soc/common/i2c_v1_async.c"
-            "${NEXUS_SOURCE_DIR}/soc/${i2c_pair_soc}/drivers/i2c_async.c"
-            "${NEXUS_SOURCE_DIR}/soc/${i2c_pair_soc}/drivers/gpio.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/i2c_async.c"
+            "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/drivers/gpio.c"
             LIBRARIES Nexus::IO Nexus::Arch
             INCLUDES "${i2c_pair_bundle}"
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
                 "${NEXUS_SOURCE_DIR}/soc/common"
-                "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-                "${NEXUS_SOURCE_DIR}/soc/${i2c_pair_soc}/private")
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+                "${NEXUS_SOC_SOURCE_${i2c_pair_soc}}/private")
         if(i2c_pair_mode STREQUAL "irq")
             target_compile_definitions(${i2c_pair_target} PRIVATE NX_I2C_PAIR_IRQ)
         endif()

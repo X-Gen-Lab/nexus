@@ -32,11 +32,11 @@ foreach(timer_family stm32 gd32)
     set(timer_target "nexus_${timer_family}_timer_factory_test")
     nexus_google_test(${timer_target} SOURCES timer_factory_test.cpp
         "${timer_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/${timer_soc}/drivers/timer_capture.c"
-        "${NEXUS_SOURCE_DIR}/soc/${timer_soc}/drivers/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_soc}}/drivers/advanced_pwm.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${timer_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOURCE_DIR}/soc/${timer_soc}/private")
+            "${NEXUS_SOC_SOURCE_${timer_soc}}/private")
     target_compile_options(${timer_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/timer_factory_model.h")
     target_compile_definitions(${timer_target} PRIVATE

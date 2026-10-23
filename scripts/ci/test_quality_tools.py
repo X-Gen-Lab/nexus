@@ -337,7 +337,7 @@ class RequiredAnalysisTests(unittest.TestCase):
                          "tests/contracts/os_freertos_runtime/posix_idle.c")
 
     def test_register_models_use_actual_production_compilation_entries(self):
-        source = self.root / "soc/gd32f470/drivers/uart.c"
+        source = self.root / "soc/gd32/gd32f470/drivers/uart.c"
         source.parent.mkdir(parents=True)
         source.write_text("int production_driver;\n")
         model = self.root / "tests/contracts/gd32_io_test.c"

@@ -1,4 +1,5 @@
 """Configure actual SoC targets and inspect their selected compilation units."""
+from tools.configure.providers.descriptor import source_directory
 
 import json
 from pathlib import Path
@@ -37,7 +38,7 @@ add_library(nexus_arch INTERFACE)
 add_library(Nexus::Arch ALIAS nexus_arch)
 add_library(nexus_build_options INTERFACE)
 add_library(nexus_owned_warnings INTERFACE)
-add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" soc)
+add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
 ''')
             cmake = shutil.which("cmake")
             if cmake is None:
@@ -52,8 +53,9 @@ add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" soc)
             if not database.exists():
                 return set(), set()
             units = json.loads(database.read_text())
+            provider_directory = ROOT / source_directory(family)
             provider = {Path(unit["file"]).name for unit in units
-                        if "/soc/" + family + "/" in unit["file"]}
+                        if Path(unit["file"]).is_relative_to(provider_directory)}
             sdk = {Path(unit["file"]).stem for unit in units
                    if "/GD32F4xx_standard_peripheral/Source/" in unit["file"]}
             self.assertEqual(len(units), len({unit["file"] for unit in units}))

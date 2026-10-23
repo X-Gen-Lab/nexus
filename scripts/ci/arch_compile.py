@@ -315,7 +315,7 @@ def run(root: Path, compiler: str, output: Path) -> int:
         for name, path in selected_tools.items():
             recorder.execute([path, '--version'], name + '-version',
                              nonempty=True)
-        source = root / 'arch/cortex_m/nx_arch_cortex_m.c'
+        source = root / 'arch/arm/cortex_m/nx_arch_cortex_m.c'
         header = root / 'arch/include/nexus/arch/arch.h'
         if not source.is_file() or not header.is_file():
             raise ValueError('maintained Cortex-M Arch source/header missing')

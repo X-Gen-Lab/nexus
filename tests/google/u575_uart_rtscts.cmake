@@ -1,13 +1,13 @@
 # Verify the selected RTSCTS provider using complete register-level contracts.
 nexus_google_test(nexus_u575_uart_rtscts_test
     SOURCES u575_uart_rtscts_test.cpp u575_uart_rtscts_model.cpp u575_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart_fifo.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart_rtscts.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_fifo.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_rtscts.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
         "${NEXUS_SOURCE_DIR}/tests/google"
         "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(nexus_u575_uart_rtscts_test SYSTEM PRIVATE

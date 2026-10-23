@@ -444,7 +444,7 @@ def check_native_time_image(sdk, source, build, config, commands, run_checked):
         if selected.resolve() != file:
             raise ValueError("Native compile row source and -c argument disagree")
         if file.parent == source and any(value in " ".join(argv)
-                for value in ("/io/native", "/io/private")):
+                for value in ("/soc/native/drivers", "/io/private")):
             raise ValueError("Private Native state leaked into the public consumer")
     if sum(Path(entry["file"]).resolve() == config / "bindings.c" for entry in commands) != 1:
         raise ValueError("Native generated bindings have no unique compile row")

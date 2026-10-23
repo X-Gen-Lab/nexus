@@ -85,8 +85,8 @@ class H743FlashRamStaticTests(unittest.TestCase):
                                      "arguments": actual}
             usage.append(record)
         bridge = directory / "bridge.o"
-        bridge_source = ROOT / "soc/stm32h743/drivers/flash_ram_enter.S"
-        self.command(flags + ["-I", str(ROOT / "soc/stm32h743/private"),
+        bridge_source = ROOT / "soc/stm32/stm32h743/drivers/flash_ram_enter.S"
+        self.command(flags + ["-I", str(ROOT / "soc/stm32/stm32h743/private"),
                      "-c", str(bridge_source),
                      "-o", str(bridge)], directory)
         elf_path = directory / "image.elf"

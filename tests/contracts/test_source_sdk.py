@@ -1,4 +1,5 @@
 """Relocate the real source SDK and compile/run independent public consumers."""
+from tools.configure.providers.descriptor import source_directory
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,7 @@ sys.path.insert(0, str(ROOT / "cmake/package"))
 import verify_consumers as consumer_gate
 import package_source_sdk as source_sdk
 from tools.configure.metadata import load_policy
+from tools.dev.presets import Presets
 
 # Fixture repositories are disposable; automatic maintenance must neither
 # detach nor outlive the Git command that owns their temporary directory.
@@ -30,6 +32,21 @@ OFFICIAL_F4_VERIFIED_FILES = frozenset({
 
 
 class SourceSDKSelectionTests(unittest.TestCase):
+    def test_component_construction_helpers_are_required_sdk_payload(self):
+        required = {"cmake/platform/Components.cmake",
+                    "components/soc/CMakeLists.txt",
+                    "components/soc/stm32/CMakeLists.txt"}
+        self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
+                        sorted(required - set(source_sdk.REQUIRED_FILES)))
+        self.assertTrue(all(source_sdk.selected(name) for name in required))
+
+    def test_development_preset_catalogue_is_not_a_partial_sdk_payload(self):
+        self.assertFalse(source_sdk.selected("CMakePresets.json"))
+        for name in ("base", "native", "stm32", "gd32", "verification"):
+            with self.subTest(preset=name):
+                self.assertFalse(source_sdk.selected(
+                    "cmake/presets/" + name + ".json"))
+
     def test_required_public_verification_sources_survive_snapshot_selection(self):
         omitted = sorted(name for name in source_sdk.REQUIRED_FILES
                          if name.startswith("cmake/package/verification/io_evolution/")
@@ -48,8 +65,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
         self.assertFalse((ROOT / previous).exists())
         self.assertEqual(consumer_gate.SELECTED_CONSUMERS.count(
             ("h743 high", reference, "h743-high")), 1)
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
-        preset, = [row for row in presets["configurePresets"]
+        preset, = [row for row, _ in Presets(ROOT).rows["configure"].values()
                    if row["name"] ==
                    "fixture-io-evolution-h743-high-peripherals"]
         self.assertEqual(preset["cacheVariables"]["NEXUS_ASSEMBLY_FILE"],
@@ -62,17 +78,17 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "components/user_io_broker/include/nexus/components/"
             "user_io_async_storage.h",
             "components/user_io_broker/src/user_io_async.c",
-            "components/stm32u575_retained_time/CMakeLists.txt",
-            "components/stm32u575_retained_time/include/nexus/components/"
+            "components/soc/stm32/stm32u575_retained_time/CMakeLists.txt",
+            "components/soc/stm32/stm32u575_retained_time/include/nexus/components/"
             "stm32u575_retained_time.h",
-            "components/stm32u575_retained_time/private/retained_time.h",
-            "components/stm32u575_retained_time/src/stm32u575_retained_time.c",
-            "soc/stm32u575/private/stm32u575_rtc_calendar.h",
-            "components/stm32u575_stop2/CMakeLists.txt",
-            "components/stm32u575_stop2/include/nexus/components/"
+            "components/soc/stm32/stm32u575_retained_time/private/retained_time.h",
+            "components/soc/stm32/stm32u575_retained_time/src/stm32u575_retained_time.c",
+            "soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h",
+            "components/soc/stm32/stm32u575_stop2/CMakeLists.txt",
+            "components/soc/stm32/stm32u575_stop2/include/nexus/components/"
             "stm32u575_stop2.h",
-            "soc/stm32u575/stop2.c",
-            "soc/stm32u575/private/stm32u575_stop2_hw.h",
+            "soc/stm32/stm32u575/stop2.c",
+            "soc/stm32/stm32u575/private/stm32u575_stop2_hw.h",
         }
         required.update("cmake/package/verification/io_evolution/consumers/"
                         + name + ".c" for name in (
@@ -94,9 +110,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
         required = {
             "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
             "os/freertos/mpu/gpio.c",
-            "soc/stm32u575/private/stm32u575_gpio_mpu.h",
-            "soc/stm32u575/mpu_user_init.c",
-            "soc/stm32u575/private/stm32u575_mpu_user_init.h",
+            "soc/stm32/stm32u575/private/stm32u575_gpio_mpu.h",
+            "soc/stm32/stm32u575/mpu_user_init.c",
+            "soc/stm32/stm32u575/private/stm32u575_mpu_user_init.h",
             "tools/configure/assemblies/u575-mpu-gpio-write.toml",
             "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
         }
@@ -113,11 +129,11 @@ class SourceSDKSelectionTests(unittest.TestCase):
         role_module = "tools/configure/i2s2.py"
         required = {
             role_module,
-            "components/f407_i2s2_slave_tx/CMakeLists.txt",
-            "components/f407_i2s2_slave_tx/include/nexus/components/"
+            "components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt",
+            "components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
             "f407_i2s2_slave_tx.h",
-            "soc/stm32f407/drivers/i2s2_slave_tx.c",
-            "soc/stm32f407/private/stm32f407_i2s2_slave_tx.h",
+            "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c",
+            "soc/stm32/stm32f407/private/stm32f407_i2s2_slave_tx.h",
             "tools/configure/assemblies/sky-i2s2-slave-tx.toml",
             "tools/configure/assemblies/qiming-i2s2-slave-tx.toml",
             "cmake/package/verification/io_evolution/consumers/"
@@ -145,7 +161,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "components/usb_control/src/usb_acm.c",
             "io/include/nexus/io/usb_profile.h",
             "io/include/nexus/io/usb_activation.h",
-            "io/src/usb_profile.c",
+            "io/src/mechanisms/usb_profile.c",
             "tools/configure/usb_profiles.py",
         }
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
@@ -196,9 +212,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "io/include/nexus/io/ethernet_frames.h",
             "io/private/eth_frames_mac.h",
             "io/private/eth_frames_validation.h",
-            "io/src/ethernet_frames.c", "io/src/eth_frames_mac.c",
-            "io/native/ethernet_frames.c", "io/native/ethernet_frames.h",
-            "io/native/ethernet_frames_access.h"}
+            "io/src/api/ethernet_frames.c", "io/src/controllers/eth_frames_mac.c",
+            "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
+            "soc/native/drivers/ethernet_frames_access.h"}
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
         for name in required:
@@ -231,7 +247,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
         for family, relative in additions.items():
             with self.subTest(family=family):
                 descriptor = source_sdk.provider_descriptors.maintained(family)
-                required = {f"soc/{family}/" + name for name in relative}
+                required = {f"{source_directory(family)}/" + name for name in relative}
                 self.assertTrue(required.issubset(set(descriptor.owned_payload)),
                                 sorted(required - set(descriptor.owned_payload)))
                 self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
@@ -259,10 +275,10 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "boards/g474-adc-group/board.json", "consumers/g474-adc-group.c")}
         required.update({
             "tools/configure/providers/stm32g474/adc_group.py",
-            "soc/stm32g474/reviews/adc-group.json",
-            "io/include/nexus/io/adc_group.h", "io/src/adc_group.c",
-            "soc/stm32g474/private/stm32g474_adc_group.h",
-            "soc/stm32g474/drivers/adc_group.c",
+            "soc/stm32/stm32g474/reviews/adc-group.json",
+            "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c",
+            "soc/stm32/stm32g474/private/stm32g474_adc_group.h",
+            "soc/stm32/stm32g474/drivers/adc_group.c",
             "soc/common/stm32_identity.h", "core/include/nexus/core/silicon.h",
             "core/src/silicon.c"})
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
@@ -274,8 +290,8 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_fifo_template_and_both_selected_family_leaves_are_required(self):
         required = {"io/private/uart_fifo_impl.h"}
         for family in ("stm32h743", "stm32u575"):
-            required.update({f"soc/{family}/drivers/uart_fifo.c",
-                             f"soc/{family}/private/{family}_uart_fifo.h"})
+            required.update({f"{source_directory(family)}/drivers/uart_fifo.c",
+                             f"{source_directory(family)}/private/{family}_uart_fifo.h"})
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
 
@@ -291,9 +307,9 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "components/usb_control/src/usb_acm.c",
             "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
             "os/freertos/mpu/gpio.c",
-            "soc/stm32u575/private/stm32u575_gpio_mpu.h",
-            "soc/stm32u575/mpu_user_init.c",
-            "soc/stm32u575/private/stm32u575_mpu_user_init.h",
+            "soc/stm32/stm32u575/private/stm32u575_gpio_mpu.h",
+            "soc/stm32/stm32u575/mpu_user_init.c",
+            "soc/stm32/stm32u575/private/stm32u575_mpu_user_init.h",
             "tools/configure/assemblies/u575-mpu-gpio-write.toml",
             "cmake/package/verification/io_evolution/consumers/u575-mpu-gpio.c",
         )
@@ -381,22 +397,22 @@ class SourceSDKSelectionTests(unittest.TestCase):
     def test_coupled_io_public_private_and_generator_payloads_are_required(self):
         required = {
             "io/include/nexus/io/can_fd.h", "io/include/nexus/io/pwm_adc.h",
-            "io/src/can_fd.c", "io/src/pwm_adc.c", "io/private/can_fd_impl.h",
+            "io/src/api/can_fd.c", "io/src/api/pwm_adc.c", "io/private/can_fd_impl.h",
             "tools/configure/coupled_io.py",
             "tools/configure/providers/stm32g474/coupled.py",
-            "soc/stm32g474/drivers/fdcan.c",
-            "soc/stm32g474/drivers/pwm_adc.c",
-            "soc/stm32g474/private/stm32g474_fdcan.h",
-            "soc/stm32g474/private/stm32g474_pwm_adc.h"}
+            "soc/stm32/stm32g474/drivers/fdcan.c",
+            "soc/stm32/stm32g474/drivers/pwm_adc.c",
+            "soc/stm32/stm32g474/private/stm32g474_fdcan.h",
+            "soc/stm32/stm32g474/private/stm32g474_pwm_adc.h"}
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
 
     def test_coupled_g474_units_and_generator_are_explicit_family_payload(self):
         descriptor = source_sdk.provider_descriptors.maintained("stm32g474")
-        required = {"soc/stm32g474/drivers/fdcan.c",
-                    "soc/stm32g474/drivers/pwm_adc.c",
-                    "soc/stm32g474/private/stm32g474_fdcan.h",
-                    "soc/stm32g474/private/stm32g474_pwm_adc.h"}
+        required = {"soc/stm32/stm32g474/drivers/fdcan.c",
+                    "soc/stm32/stm32g474/drivers/pwm_adc.c",
+                    "soc/stm32/stm32g474/private/stm32g474_fdcan.h",
+                    "soc/stm32/stm32g474/private/stm32g474_pwm_adc.h"}
         self.assertTrue(required.issubset(set(descriptor.owned_payload)),
                         sorted(required - set(descriptor.owned_payload)))
         self.assertIn("tools/configure/providers/stm32g474/coupled.py",
@@ -521,13 +537,13 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "core/include/nexus/core/fault.h", "core/src/fault.c",
             "core/include/nexus/core/stack_observation.h",
             "core/src/stack_observation.c", "io/CMakeLists.txt",
-            "io/include/nexus/io/usb_device.h", "io/src/usb_device.c",
-            "io/src/usb_device_controller.c", "io/private/usb_device_controller.h",
-            "io/native/usb_device_access.h", "io/native/usb_device.c",
+            "io/include/nexus/io/usb_device.h", "io/src/api/usb_device.c",
+            "io/src/controllers/usb_device_controller.c", "io/private/usb_device_controller.h",
+            "soc/native/drivers/usb_device_access.h", "soc/native/drivers/usb_device.c",
             "io/include/nexus/io/ethernet.h", "io/include/nexus/io/mdio.h",
-            "io/src/eth_mac.c", "io/private/eth_mac.h",
-            "io/native/ethernet_access.h", "io/native/ethernet.c",
-            "io/src/can_controller.c", "io/private/can_controller.h",
+            "io/src/controllers/eth_mac.c", "io/private/eth_mac.h",
+            "soc/native/drivers/ethernet_access.h", "soc/native/drivers/ethernet.c",
+            "io/src/controllers/can_controller.c", "io/private/can_controller.h",
             "io/include/nexus/io/timer_capture.h",
             "io/include/nexus/io/advanced_pwm.h",
             "io/private/timer_advanced_controller.h",
@@ -544,11 +560,11 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "components/amp_ipc/src/amp_ipc.c",
             "components/amp_ipc/include/nexus/components/amp_ipc.h",
             "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
-            "components/stm32f407_handoff/CMakeLists.txt",
-            "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
-            "soc/stm32f407/handoff.c",
-            "soc/stm32f407/private/stm32f407_handoff_hw.h",
-            "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+            "components/soc/stm32/stm32f407_handoff/CMakeLists.txt",
+            "components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+            "soc/stm32/stm32f407/handoff.c",
+            "soc/stm32/stm32f407/private/stm32f407_handoff_hw.h",
+            "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
             "components/frame_dma2d/CMakeLists.txt",
             "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
             "components/frame_dma2d/src/h743_frame_dma2d.c",
@@ -564,7 +580,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "scripts/ci/vendor_import_identity.py", "scripts/ci/verify_vendor_source.py",
         }
         for family in ("stm32f407", "gd32f470"):
-            required.update(f"soc/{family}/" + name for name in (
+            required.update(f"{source_directory(family)}/" + name for name in (
                 "system.c", "timebase_lowpower.c", "usb_clock.c",
                 "drivers/usb_device.c", "drivers/ethernet.c", "drivers/can.c",
                 "drivers/timer_capture.c", "drivers/advanced_pwm.c",
@@ -603,13 +619,13 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
                                   previous / "board.json").exists())
 
     def test_all_seven_normal_presets_select_the_installed_canonical_inputs(self):
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        presets = Presets(ROOT)
         expected = {
             "h743-high-empty", "h743-high-uart", "h743-high-peripherals",
             "u575-uart-gpdma", "g474-can-fd", "g474-can-fd-normal",
             "g474-pwm-adc"}
         selected = {}
-        for preset in presets["configurePresets"]:
+        for preset, _ in presets.rows["configure"].values():
             name = preset["name"].removeprefix("fixture-io-evolution-")
             if name not in expected:
                 continue
@@ -647,9 +663,9 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
         expected = {"g474-adc-group-" + name + ".toml" for name in (
             "regular-software", "regular-timer", "injected-software",
             "injected-timer")}
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        presets = Presets(ROOT)
         selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
-                    for preset in presets["configurePresets"]]
+                    for preset, _ in presets.rows["configure"].values()]
         for name in expected:
             with self.subTest(assembly=name):
                 file = directory / name
@@ -665,9 +681,9 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
         import tomllib
         from tools.configure import configure
         directory = ROOT / "cmake/package/verification/io_evolution"
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        presets = Presets(ROOT)
         selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
-                    for preset in presets["configurePresets"]]
+                    for preset, _ in presets.rows["configure"].values()]
         for part in ("f407zg", "gd470"):
             with self.subTest(part=part):
                 file = directory / (part + "-eth-frames.toml")
@@ -684,9 +700,9 @@ class SourceSDKPortableVerificationTests(unittest.TestCase):
     def test_both_fifo_normal_presets_reuse_the_installed_canonical_inputs(self):
         from tools.configure import configure
         directory = ROOT / "cmake/package/verification/io_evolution"
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
+        presets = Presets(ROOT)
         selected = [preset.get("cacheVariables", {}).get("NEXUS_ASSEMBLY_FILE", "")
-                    for preset in presets["configurePresets"]]
+                    for preset, _ in presets.rows["configure"].values()]
         for family in ("h743", "u575"):
             with self.subTest(family=family):
                 file = directory / (family + "-uart-fifo.toml")
@@ -773,11 +789,11 @@ class SourceSDKG4SelectionTests(unittest.TestCase):
 
     def test_closed_g4_owned_platform_and_reference_sources_are_required(self):
         required = {
-            "soc/stm32g474/CMakeLists.txt", "soc/stm32g474/system.c",
-            "soc/stm32g474/drivers/gpio.c", "soc/stm32g474/drivers/uart.c",
-            "soc/stm32g474/private/stm32g474_system.h",
-            "soc/stm32g474/private/stm32g474_provider.h",
-            "soc/stm32g474/soc.json", "soc/stm32g474/routes.json",
+            "soc/stm32/stm32g474/CMakeLists.txt", "soc/stm32/stm32g474/system.c",
+            "soc/stm32/stm32g474/drivers/gpio.c", "soc/stm32/stm32g474/drivers/uart.c",
+            "soc/stm32/stm32g474/private/stm32g474_system.h",
+            "soc/stm32/stm32g474/private/stm32g474_provider.h",
+            "soc/stm32/stm32g474/soc.json", "soc/stm32/stm32g474/routes.json",
             "boards/stm32g474re_hse24_reference/board.json",
             "tools/configure/providers/stm32g474/__init__.py",
             "tools/configure/providers/stm32g474/bindings.py",
@@ -934,9 +950,9 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
                  "-m", "committed snapshot baseline")
         self.entries = source_sdk.tree_entries(self.repository)
         self.write("core/committed.c", "int working_source;\n")
-        self.write("arch/cortex_m/staged.c", "int staged_source;\n")
+        self.write("arch/arm/cortex_m/staged.c", "int staged_source;\n")
         self.write("docs/staged.txt", "nonselected staged source\n")
-        self.git("add", "arch/cortex_m/staged.c", "docs/staged.txt")
+        self.git("add", "arch/arm/cortex_m/staged.c", "docs/staged.txt")
         self.write("tools/untracked.py", "untracked_source = True\n")
         self.write("docs/untracked.txt", "nonselected untracked source\n")
         self.write("dependencies/source/host-framework.tar.gz", "host only\n")
@@ -959,7 +975,7 @@ class SourceSDKDevelopmentSnapshotTests(unittest.TestCase):
         names = source_sdk.snapshot_files(
             self.repository, self.entries, development_fixture=True)
         self.assertEqual(names, {
-            "core/committed.c", "arch/cortex_m/staged.c",
+            "core/committed.c", "arch/arm/cortex_m/staged.c",
             "tools/untracked.py"})
         self.assertEqual(self.git("write-tree"), before)
 
@@ -1150,7 +1166,7 @@ class SourceSDKTests(unittest.TestCase):
         commands = self.standalone_resolver_commands()
         for command in commands.values():
             self.run_ok(command)
-        target = self.sdk / "io/src/gpio.c"
+        target = self.sdk / "io/src/api/gpio.c"
         original = target.read_bytes()
         try:
             target.write_bytes(original + b"\n/* Source SDK payload tamper. */\n")
@@ -1158,7 +1174,7 @@ class SourceSDKTests(unittest.TestCase):
                 with self.subTest(boundary=name):
                     rejected = self.run_process(command)
                     self.assertNotEqual(rejected.returncode, 0)
-                    self.assertIn("Source SDK file identity changed: io/src/gpio.c",
+                    self.assertIn("Source SDK file identity changed: io/src/api/gpio.c",
                                   rejected.stderr)
                     self.assertFalse(Path(command[-1]).exists())
         finally:
@@ -1537,8 +1553,8 @@ class SourceSDKTests(unittest.TestCase):
         identity = self.sdk / source_sdk.MANIFEST
         original_identity = identity.read_bytes()
         for name in ("arch/include/nexus/arch/arch.h",
-                     "arch/cortex_m/nx_arch_cortex_m.c",
-                     "arch/cortex_m/private/compiler.h",
+                     "arch/arm/cortex_m/nx_arch_cortex_m.c",
+                     "arch/arm/cortex_m/private/compiler.h",
                      "arch/native/nx_arch_native.c"):
             with self.subTest(name=name):
                 target = self.sdk / name
@@ -1597,16 +1613,16 @@ class SourceSDKTests(unittest.TestCase):
     def test_rehashed_soc_extensions_and_reference_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
-        names = ["soc/stm32g474/drivers/exti.c",
-                 "soc/stm32h743/drivers/uart_dma.c",
-                 "soc/stm32h743/private/stm32h743_dma.h",
-                 "soc/stm32u575/security.c",
-                 "soc/stm32u575/private/stm32u575_security.h",
-                 "soc/stm32u575/private/stm32u575_security_hw.h"]
+        names = ["soc/stm32/stm32g474/drivers/exti.c",
+                 "soc/stm32/stm32h743/drivers/uart_dma.c",
+                 "soc/stm32/stm32h743/private/stm32h743_dma.h",
+                 "soc/stm32/stm32u575/security.c",
+                 "soc/stm32/stm32u575/private/stm32u575_security.h",
+                 "soc/stm32/stm32u575/private/stm32u575_security_hw.h"]
         for mechanism in ("cache_control", "nonsecure"):
             names += [f"arch/include/nexus/arch/{mechanism}.h",
-                      f"arch/cortex_m/nx_arch_{mechanism}.c",
-                      f"arch/cortex_m/private/{mechanism}.h"]
+                      f"arch/arm/cortex_m/nx_arch_{mechanism}.c",
+                      f"arch/arm/cortex_m/private/{mechanism}.h"]
         names += [f"tools/configure/assemblies/nucleo-{chip}-{backend}-{mode}.toml"
                   for chip in ("h743", "u575")
                   for backend in ("baremetal", "freertos")
@@ -1660,20 +1676,20 @@ class SourceSDKTests(unittest.TestCase):
         old_identity = identity.read_bytes()
         names = (
             "core/src/fault.c", "core/include/nexus/core/fault.h",
-            "io/include/nexus/io/usb_device.h", "io/src/usb_device_controller.c",
-            "io/private/usb_device_controller.h", "io/native/usb_device_access.h",
-            "io/include/nexus/io/ethernet.h", "io/src/eth_mac.c",
+            "io/include/nexus/io/usb_device.h", "io/src/controllers/usb_device_controller.c",
+            "io/private/usb_device_controller.h", "soc/native/drivers/usb_device_access.h",
+            "io/include/nexus/io/ethernet.h", "io/src/controllers/eth_mac.c",
             "io/private/eth_mac.h", "io/include/nexus/io/mdio.h",
-            "soc/stm32f407/drivers/usb_device.c",
-            "soc/gd32f470/drivers/ethernet.c",
-            "soc/stm32f407/private/stm32f407_can.h",
-            "io/src/can_controller.c", "io/private/can_controller.h",
+            "soc/stm32/stm32f407/drivers/usb_device.c",
+            "soc/gd32/gd32f470/drivers/ethernet.c",
+            "soc/stm32/stm32f407/private/stm32f407_can.h",
+            "io/src/controllers/can_controller.c", "io/private/can_controller.h",
             "io/include/nexus/io/advanced_pwm.h",
             "io/private/timer_advanced_controller.h",
-            "soc/gd32f470/drivers/timer_capture.c",
+            "soc/gd32/gd32f470/drivers/timer_capture.c",
             "os/freertos/timebase_lowpower.c",
             "os/freertos/private/timebase_lowpower.h",
-            "soc/stm32f407/timebase_lowpower.c", "soc/gd32f470/usb_clock.c",
+            "soc/stm32/stm32f407/timebase_lowpower.c", "soc/gd32/gd32f470/usb_clock.c",
             "tools/configure/usb_device.py", "tools/configure/ethernet.py",
             "tools/configure/timer_advanced.py", "tools/configure/bindings.py",
             "cmake/platform/ControllerModes.cmake",
@@ -1682,11 +1698,11 @@ class SourceSDKTests(unittest.TestCase):
             "components/amp_ipc/src/amp_ipc.c",
             "components/amp_ipc/include/nexus/components/amp_ipc.h",
             "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
-            "components/stm32f407_handoff/CMakeLists.txt",
-            "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
-            "soc/stm32f407/handoff.c",
-            "soc/stm32f407/private/stm32f407_handoff_hw.h",
-            "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+            "components/soc/stm32/stm32f407_handoff/CMakeLists.txt",
+            "components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+            "soc/stm32/stm32f407/handoff.c",
+            "soc/stm32/stm32f407/private/stm32f407_handoff_hw.h",
+            "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
             "components/frame_dma2d/CMakeLists.txt",
             "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
             "components/frame_dma2d/src/h743_frame_dma2d.c",
@@ -1696,9 +1712,9 @@ class SourceSDKTests(unittest.TestCase):
             "components/mapped_storage/include/nexus/components/mapped_storage.h",
             "components/user_io_broker/include/nexus/components/user_io_broker.h",
             "components/dp83848/include/nexus/dp83848/dp83848.h",
-            "soc/stm32g474/system.c", "soc/stm32g474/drivers/uart.c",
-            "soc/stm32g474/private/stm32g474_provider.h",
-            "soc/stm32g474/soc.json", "soc/stm32g474/routes.json",
+            "soc/stm32/stm32g474/system.c", "soc/stm32/stm32g474/drivers/uart.c",
+            "soc/stm32/stm32g474/private/stm32g474_provider.h",
+            "soc/stm32/stm32g474/soc.json", "soc/stm32/stm32g474/routes.json",
             "boards/stm32g474re_hse24_reference/board.json",
             "tools/configure/providers/stm32g474/__init__.py",
             "tools/configure/providers/stm32g474/bindings.py",
@@ -1982,11 +1998,11 @@ class SourceSDKTests(unittest.TestCase):
     def test_rehashed_modern_soc_owned_firmware_omissions_reject(self):
         identity = self.sdk / source_sdk.MANIFEST
         old_identity = identity.read_bytes()
-        names = ["soc/stm32h743/power_boot.S",
-                 "soc/stm32h743/private/boot_registers.h"]
+        names = ["soc/stm32/stm32h743/power_boot.S",
+                 "soc/stm32/stm32h743/private/boot_registers.h"]
         for family, board in (("stm32h743", "stm32h743_nucleo_zi2"),
                               ("stm32u575", "stm32u575_nucleo_zi_q")):
-            names += [f"soc/{family}/" + name for name in (
+            names += [f"{source_directory(family)}/" + name for name in (
                 "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
                 f"private/{family}_system.h", f"private/{family}_provider.h",
                 "soc.json", "routes.json")]

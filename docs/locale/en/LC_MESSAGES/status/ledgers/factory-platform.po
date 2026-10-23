@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cb818a62c68eca24b4a3c1f1c7505e2048658e573bad17d211562f118fa723bc\n"
+"X-Nexus-Source-SHA256: 55f104edf5f9776b40697a11aa6a0f1478ec8d7a4827794a623057a8d57a8f2a\n"
 
 msgid "Factory 与 TDD 台账"
 msgstr "Factory and TDD ledger"
@@ -19,14 +19,14 @@ msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/factory-platform-execution.csv>`。 源文件：`docs/design/factory-"
 "platform-"
-"execution.csv`；SHA-256：`49215c9d35115fd258b86d516869215950c78ee5579ca440d9427de731780836`。"
+"execution.csv`；SHA-256：`3020b37aa2e32245511b3be8ca7acc5c961a6fa49409aa170a795dbbd6fc8df8`。"
 msgstr ""
 "This page is derived from the original CSV; it is not a new status "
 "authority, execution record or software qualification. Original IDs, order "
 "and all fields come from the {download}`original ledger "
 "<../../design/factory-platform-execution.csv>`. Source: "
 "`docs/design/factory-platform-execution.csv`; SHA-256: "
-"`49215c9d35115fd258b86d516869215950c78ee5579ca440d9427de731780836`."
+"`3020b37aa2e32245511b3be8ca7acc5c961a6fa49409aa170a795dbbd6fc8df8`."
 
 msgid ""
 "不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
@@ -220,10 +220,11 @@ msgstr "multiple independent Native providers"
 msgid "Core;QA"
 msgstr "Core;QA"
 
+#: docs/status/ledgers/factory-platform.md:26
 msgid ""
-"io/native;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp"
+"soc/native/drivers;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp"
 msgstr ""
-"io/native;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp"
+"soc/native/drivers;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp"
 
 msgid ""
 "actual generated factory; independent resources; stopped admission; borrowed"
@@ -268,8 +269,9 @@ msgstr "all nine interface kinds share static ops"
 msgid "Core;BSP"
 msgstr "Core;BSP"
 
-msgid "io/include/nexus/io;io/src;soc/*/drivers;io/native"
-msgstr "io/include/nexus/io;io/src;soc/*/drivers;io/native"
+#: docs/status/ledgers/factory-platform.md:26
+msgid "io/include/nexus/io;io/src;soc/*/*/drivers;soc/native/drivers"
+msgstr "io/include/nexus/io;io/src;soc/*/*/drivers;soc/native/drivers"
 
 msgid ""
 "production SDK private; all calls use exact context; C/C++ ABI consumers"
@@ -310,10 +312,11 @@ msgstr "wake"
 msgid "explicit bounded IRQ wake"
 msgstr "explicit bounded IRQ wake"
 
+#: docs/status/ledgers/factory-platform.md:26
 msgid ""
-"io/include/nexus/io/wake.h;io/src/wake.c;tests/google/irq_wake_test.cpp"
+"io/include/nexus/io/wake.h;io/src/mechanisms/wake.c;tests/google/irq_wake_test.cpp"
 msgstr ""
-"io/include/nexus/io/wake.h;io/src/wake.c;tests/google/irq_wake_test.cpp"
+"io/include/nexus/io/wake.h;io/src/mechanisms/wake.c;tests/google/irq_wake_test.cpp"
 
 msgid ""
 "latched predicates; actual publisher priority ceiling; detach publishers "
@@ -334,8 +337,11 @@ msgstr "STM32 USART1 finite TX DMA"
 msgid "BSP;QA"
 msgstr "BSP;QA"
 
-msgid "soc/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp"
-msgstr "soc/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid ""
+"soc/stm32/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp"
+msgstr ""
+"soc/stm32/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp"
 
 msgid ""
 "DMA2 stream7 channel4; memory-domain rejection; memory TC distinct from wire"
@@ -350,8 +356,11 @@ msgstr "FP-012"
 msgid "GD32 USART0 finite TX DMA"
 msgstr "GD32 USART0 finite TX DMA"
 
-msgid "soc/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp"
-msgstr "soc/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid ""
+"soc/gd32/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp"
+msgstr ""
+"soc/gd32/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp"
 
 msgid ""
 "DMA1 channel7 selector4; independent wire and engine drain; late IRQ "
@@ -366,8 +375,11 @@ msgstr "FP-013"
 msgid "STM32 SPI1 full duplex finite DMA"
 msgstr "STM32 SPI1 full duplex finite DMA"
 
-msgid "soc/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp"
-msgstr "soc/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid ""
+"soc/stm32/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp"
+msgstr ""
+"soc/stm32/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp"
 
 msgid ""
 "DMA2 RXstream0/TXstream3 channel3; nonoverlapping buffers; CS retained until"
@@ -382,8 +394,10 @@ msgstr "FP-014"
 msgid "GD32 SPI4 full duplex finite DMA"
 msgstr "GD32 SPI4 full duplex finite DMA"
 
-msgid "soc/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp"
-msgstr "soc/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid "soc/gd32/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp"
+msgstr ""
+"soc/gd32/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp"
 
 msgid ""
 "DMA1 RXchannel3/TXchannel4 selector2; no poll-as-async; exact CS interval"
@@ -420,8 +434,11 @@ msgstr "stream"
 msgid "bounded fixed-block loans and Native producers"
 msgstr "bounded fixed-block loans and Native producers"
 
-msgid "io/src/stream.c;io/native/stream.c;tests/google/native_async_test.cpp"
-msgstr "io/src/stream.c;io/native/stream.c;tests/google/native_async_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid ""
+"io/src/mechanisms/stream.c;soc/native/drivers/stream.c;tests/google/native_async_test.cpp"
+msgstr ""
+"io/src/mechanisms/stream.c;soc/native/drivers/stream.c;tests/google/native_async_test.cpp"
 
 msgid ""
 "never overwrite loan; epoch identity; loss ordering; stop joins producers "
@@ -436,8 +453,9 @@ msgstr "FP-017"
 msgid "STM32 and GD32 UART RX IDLE/block providers"
 msgstr "STM32 and GD32 UART RX IDLE/block providers"
 
-msgid "soc/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp"
-msgstr "soc/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid "soc/*/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp"
+msgstr "soc/*/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp"
 
 msgid ""
 "exact mode; whole/IDLE prefix publication; bounded loss; final block and "
@@ -455,8 +473,9 @@ msgstr "adc"
 msgid "STM32 and GD32 timer trigger DMA block providers"
 msgstr "STM32 and GD32 timer trigger DMA block providers"
 
-msgid "soc/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp"
-msgstr "soc/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp"
+#: docs/status/ledgers/factory-platform.md:26
+msgid "soc/*/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp"
+msgstr "soc/*/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp"
 
 msgid ""
 "timer and conversion limits; disabled normal DMA before publication; "
@@ -474,10 +493,11 @@ msgstr "controllers"
 msgid "multiple GD32 controllers and reviewed resources"
 msgstr "multiple GD32 controllers and reviewed resources"
 
+#: docs/status/ledgers/factory-platform.md:26
 msgid ""
-"soc/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml"
+"soc/gd32/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml"
 msgstr ""
-"soc/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml"
+"soc/gd32/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml"
 
 msgid ""
 "independent UART/SPI/I2C descriptors; exact controller clocks and generated "

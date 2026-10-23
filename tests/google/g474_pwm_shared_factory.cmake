@@ -26,12 +26,12 @@ nexus_google_test(nexus_g474_pwm_shared_factory_test
         g474_pwm_shared_factory_ports.cpp g474_pwm_shared_model.cpp
         "${g4_shared_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm_shared.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_shared.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_shared_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 nexus_stm32_official(nexus_g474_pwm_shared_factory_test g4)
 target_include_directories(nexus_g474_pwm_shared_factory_test SYSTEM PRIVATE

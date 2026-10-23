@@ -120,14 +120,14 @@ class G474ProviderTests(unittest.TestCase):
         self.assertFalse(self.provider.shares_irq("uart", "irq:LPUART1"))
 
     def test_clock_metadata_cannot_drift_from_fixed_implementation(self):
-        facts = json.loads((ROOT / "soc/stm32g474/soc.json").read_text())
+        facts = json.loads((ROOT / "soc/stm32/stm32g474/soc.json").read_text())
         validate_clock_profiles(facts, self.provider)
         facts["clock_profiles"]["hse24-pll170"]["apb1_hz"] = 85000000
         with self.assertRaises(ConfigurationError):
             validate_clock_profiles(facts, self.provider)
 
     def test_memory_domains_count_once_and_exclude_ccm_from_dma(self):
-        facts = json.loads((ROOT / "soc/stm32g474/soc.json").read_text())
+        facts = json.loads((ROOT / "soc/stm32/stm32g474/soc.json").read_text())
         variant = facts["variants"]["STM32G474RET6"]
         self.assertEqual(sum(item["size"] for item in variant["memory"]),
                          128 * 1024)

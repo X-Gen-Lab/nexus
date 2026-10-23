@@ -7,6 +7,7 @@
 #ifndef NEXUS_IO_ETHERNET_FRAMES_H
 #define NEXUS_IO_ETHERNET_FRAMES_H
 #include "nexus/io/ethernet.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/observation.h"
 #ifdef __cplusplus
 extern "C" {
@@ -82,10 +83,10 @@ typedef struct {
     nx_result_t (*recover)(void*, nx_time_us_t);
     nx_result_t (*attach_wake)(void*, const nx_irq_wake_t*, uint8_t);
 } nx_eth_frames_ops_t;
-typedef struct {
+struct nx_eth_frames_port {
     const nx_eth_frames_ops_t* ops;
     void* context;
-} nx_eth_frames_port_t;
+};
 /**
  * \brief Prepare unborrowed request storage without hardware effects.
  * \note Serialized task owner. Validate nonempty fragments, overflow and the

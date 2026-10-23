@@ -51,7 +51,7 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 | [选定装配资格门禁](provider-assemblies.md) | 逐个 authored fixture 实际 ARM 构建、资源预算、链接保留和不可变输入 |
 | [多控制器](multiple-controllers.md) | 独立 provider/IRQ/DMA 所有权；配置开放与硅片实现分别记录 |
 | [STM32G474 接入](stm32g474.md) | 精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI |
-| [STM32H743 接入](../../soc/stm32h743/README.md) | 四种固定 HSI/cache 配置及冷态 cache 所有权；独立 V／HSI64／裸机参考增加 SPI4 有限 DMA、USART3 连续 RX／IRQ TX，以及显式有限 TX DMA／连续 RX 双向模式 |
+| [STM32H743 接入](../../soc/stm32/stm32h743/README.md) | 四种固定 HSI/cache 配置及冷态 cache 所有权；独立 V／HSI64／裸机参考增加 SPI4 有限 DMA、USART3 连续 RX／IRQ TX，以及显式有限 TX DMA／连续 RX 双向模式 |
 | [U575 双域参考合同](u575-trustzone-contract.md) | 独立 Secure/NS Runtime、冷态归属封存、固定 NS world 与同步 GPIO；无 RTOS/factory/async/HIL 扩大承诺 |
 | [SoC 完善与 55 项台账](soc-refinement.md) | 实现范围、原始退出条件、软件机制与实板验收分列 |
 | [I2C 总线恢复](i2c-bus-clear.md) | 调用者独占 GPIO、有限时序与失败后继续清理的合同 |

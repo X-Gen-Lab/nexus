@@ -91,7 +91,7 @@ class H743SpiDmaConfiguration(unittest.TestCase):
             self.assertIn("(uintptr_t)0x24000000u", body)
             self.assertNotIn("(uintptr_t)0x30000000u", body)
             paths = json.loads((output / "input_paths.json").read_text())
-            self.assertIn("soc/stm32h743/routes.json", paths)
+            self.assertIn("soc/stm32/stm32h743/routes.json", paths)
 
     def test_traits_do_not_claim_cache_or_enhanced_interfaces(self):
         result = configure.resolve_ir(FIXTURES / "h743-spi-dma.toml")

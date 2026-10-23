@@ -1,0 +1,43 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "nexus-base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "nexus-native",
+            "hidden": true,
+            "inherits": "nexus-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native.toml",
+                "NEXUS_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "nexus-arm",
+            "hidden": true,
+            "inherits": "nexus-base",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arm-gcc.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "NEXUS_BUILD_TESTS": "OFF"
+            }
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "nexus-test",
+            "hidden": true,
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error"
+            }
+        }
+    ]
+}

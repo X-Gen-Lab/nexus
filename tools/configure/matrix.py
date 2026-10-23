@@ -3,10 +3,16 @@
 This reports software selections and reviewed routes, never physical execution
 or a source-target graph. Assemblies enter through one explicit catalogue.
 """
+try:
+    from .providers.descriptor import source_directory
+except ImportError:
+    from providers.descriptor import source_directory
 import argparse
 import json
 from pathlib import Path
 import re
+import subprocess
+import tempfile
 
 try:
     from . import authored, configure, factory
@@ -25,6 +31,35 @@ except ImportError:
 CATALOGUE = "tools/configure/assemblies/catalogue.json"
 
 
+def component_choices(root):
+    """Execute the sole target map instead of interpreting CMake syntax."""
+    with tempfile.TemporaryDirectory(
+            prefix="nexus-component-choices-") as value:
+        directory = Path(value)
+        output = directory / "choices"
+        script = directory / "query.cmake"
+        script.write_text(
+            'include("${NEXUS_COMPONENT_MODULE}")\n'
+            'nexus_component_choices(choices)\n'
+            'file(WRITE "${NEXUS_COMPONENT_OUTPUT}" "${choices}")\n',
+            encoding="utf-8")
+        try:
+            result = subprocess.run(
+                ["cmake", "-DNEXUS_COMPONENT_MODULE=" + str(
+                    root / "cmake/platform/Components.cmake"),
+                 "-DNEXUS_COMPONENT_OUTPUT=" + str(output),
+                 "-P", str(script)],
+                capture_output=True, text=True, timeout=20, check=False)
+        except (OSError, subprocess.SubprocessError) as error:
+            raise ValueError("Cannot query CMake component choices: " +
+                             str(error)) from error
+        if result.returncode:
+            raise ValueError("CMake component choices rejected: " +
+                             result.stderr)
+        choices = output.read_text(encoding="utf-8")
+    return frozenset(choices.split(";")) if choices else frozenset()
+
+
 def check_contracts(root=configure.ROOT):
     """Reject missing authoring, factory, provider and CMake selection entries."""
     kinds = frozenset(authored.KINDS)
@@ -33,13 +68,12 @@ def check_contracts(root=configure.ROOT):
     properties = authored.editor_schema()["properties"]
     if not kinds.issubset(properties):
         raise ValueError("Editor schema is missing authored controller kinds")
-    cmake = (root / "CMakeLists.txt").read_text(encoding="utf-8")
-    selected = frozenset(re.findall(r'component STREQUAL "([a-z0-9-]+)"', cmake))
+    selected = component_choices(root)
     if selected != COMPONENTS:
         raise ValueError("Maintained components differ from CMake target selection")
     for family in descriptor.families():
         provider = maintained(family.family)
-        soc = configure.load(root / "soc" / family.family / "soc.json")
+        soc = configure.load(root / source_directory(family.family) / "soc.json")
         for part in soc["variants"]:
             configure.validate_soc(soc, part)
         for controller in soc["controllers"].values():

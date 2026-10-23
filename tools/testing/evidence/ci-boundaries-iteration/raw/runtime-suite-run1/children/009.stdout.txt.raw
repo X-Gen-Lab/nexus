@@ -1,9 +1,0 @@
-[0/1] Re-running CMake...
--- Nexus CPU runtime: native/baremetal
--- Configuring done (0.2s)
--- Generating done (0.0s)
--- Build files have been written to: /tmp/nexus CPU runtime tkqa0yll/consumer build
-[1/5] Building C object CMakeFiles/app_c.dir/main.c.o
-[2/5] Building CXX object CMakeFiles/app_cpp.dir/main.cpp.o
-[3/5] Linking C executable bin/app_c
-[4/5] Linking CXX executable bin/app_cpp

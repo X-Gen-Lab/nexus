@@ -57,7 +57,7 @@ the corresponding exact Board package with the same role.
 ```
 
 The component target is `Nexus::F407I2S2SlaveTx`, defined by
-[its CMake file](../../components/f407_i2s2_slave_tx/CMakeLists.txt) only for
+[its CMake file](../../components/soc/stm32/f407_i2s2_slave_tx/CMakeLists.txt) only for
 the validated selection. A consumer explicitly links it and constructs one
 stable readonly face with shared operations and separate zero-initialized owner
 storage. Factory lookup does not create or start an audio owner. The firmware
@@ -208,10 +208,10 @@ The hardware sequence follows RM0090 Rev22 sections 28.4.6–28.4.8 and
 10.3.13–10.3.14, with DS8626 electrical requirements and the pinned ES0182
 scope. The SPI-only BSY erratum workaround is not substituted for the I2S
 shutdown sequence. Source identities are maintained in
-[the F407 reference manifest](../../soc/stm32f407/references.json).
+[the F407 reference manifest](../../soc/stm32/stm32f407/references.json).
 
-See the [public contract](../../components/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h),
-[real provider](../../soc/stm32f407/drivers/i2s2_slave_tx.c),
-[selected System lifecycle](../../soc/stm32f407/private/stm32f407_system.h),
+See the [public contract](../../components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h),
+[real provider](../../soc/stm32/stm32f407/drivers/i2s2_slave_tx.c),
+[selected System lifecycle](../../soc/stm32/stm32f407/private/stm32f407_system.h),
 [frame ownership contract](../../io/include/nexus/io/frame_stream.h) and
 [qualification boundaries](../delivery/qualification.md).

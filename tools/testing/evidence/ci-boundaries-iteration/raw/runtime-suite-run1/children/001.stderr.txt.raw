@@ -1,6 +1,0 @@
-CMake Error at /workspace/nexus/cmake/platform/Runtime.cmake:32 (message):
-  NEXUS_OS_TICK_HZ is not a runtime override; use ASSEMBLY
-Call Stack (most recent call first):
-  CMakeLists.txt:11 (nexus_add_runtime)
-
-

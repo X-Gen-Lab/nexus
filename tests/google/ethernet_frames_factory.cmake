@@ -33,14 +33,14 @@ foreach(eth_frames_family stm32 gd32)
         "nexus_${eth_frames_family}_eth_frames_factory_test")
     nexus_google_test(${eth_frames_target}
         SOURCES ethernet_frames_factory_test.cpp "${eth_frames_bundle}/bindings.c"
-            "${NEXUS_SOURCE_DIR}/soc/${eth_frames_soc}/system.c"
-            "${NEXUS_SOURCE_DIR}/soc/${eth_frames_soc}/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/${eth_frames_soc}/drivers/ethernet_frames.c"
-            "${NEXUS_SOURCE_DIR}/io/src/eth_frames_mac.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/system.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/gpio.c"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/drivers/ethernet_frames.c"
+            "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${eth_frames_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOURCE_DIR}/soc/${eth_frames_soc}"
-            "${NEXUS_SOURCE_DIR}/soc/${eth_frames_soc}/private")
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}"
+            "${NEXUS_SOC_SOURCE_${eth_frames_soc}}/private")
     target_compile_options(${eth_frames_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_frames_factory_model.h"
         -fdata-sections -ffunction-sections -fno-pie)
@@ -72,7 +72,7 @@ foreach(eth_frames_family stm32 gd32)
         target_link_libraries(${eth_frames_sdk} PRIVATE nexus_build_options)
         target_include_directories(${eth_frames_sdk} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/private")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${eth_frames_sdk} SYSTEM PRIVATE
             "${eth_frames_gd}/CMSIS"
             "${eth_frames_gd}/CMSIS/GD/GD32F4xx/Include"
@@ -82,7 +82,7 @@ foreach(eth_frames_family stm32 gd32)
         target_compile_options(${eth_frames_sdk} PRIVATE
             "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
         target_sources(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/timebase.c")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/timebase.c")
         target_link_libraries(${eth_frames_target} PRIVATE ${eth_frames_sdk})
         target_compile_definitions(${eth_frames_target} PRIVATE
             NX_ETH_FRAMES_FACTORY_GD32 NX_GD32_CLOCK_MODEL

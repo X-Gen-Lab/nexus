@@ -1,5 +1,0 @@
-[1/5] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
-[2/5] Linking C static library lib/libnexus_core.a
-[3/5] Building C object tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/__/__/os/freertos/timebase_lowpower.c.o
-[4/5] Building CXX object tests/contracts/google/CMakeFiles/nexus_timebase_lowpower_test.dir/timebase_lowpower_test.cpp.o
-[5/5] Linking CXX executable bin/nexus_timebase_lowpower_test

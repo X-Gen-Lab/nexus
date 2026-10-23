@@ -1,4 +1,5 @@
 """Derived work packages never promote source navigation to qualification."""
+from tools.configure.providers.descriptor import source_directory
 
 import copy
 from contextlib import redirect_stderr, redirect_stdout
@@ -332,7 +333,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
         selected = next(row for row in report["work_packages"]
                         if row["identity"] == "stm32f407.USART1.dma-tx")
         self.assertEqual(selected["provider_implementation"], "uart_dma")
-        self.assertIn("soc/stm32f407/drivers/uart_dma.c", selected["sdk_required_sources"])
+        self.assertIn("soc/stm32/stm32f407/drivers/uart_dma.c", selected["sdk_required_sources"])
         self.assertTrue(selected["reviewed_properties"])
         self.assertTrue(report["authority_inputs"])
         inputs = {row["path"] for row in report["authority_inputs"]}
@@ -380,7 +381,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
                           selected["kind"], selected["mode"]),
                          ("stm32h743", "SPI4", "spi", "dma"))
         self.assertEqual(selected["provider_implementation"], "spi_dma")
-        sources = ["soc/stm32h743/drivers/spi_dma.c"]
+        sources = ["soc/stm32/stm32h743/drivers/spi_dma.c"]
         self.assertEqual(selected["selected_ops_sources"], sources)
         self.assertEqual(selected["sdk_required_sources"], sources)
         self.assertEqual(selected["resolver_fixtures"], [
@@ -402,7 +403,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
                          ("stm32g474", "GPIOA", "gpio", "named-states",
                           "pin_state"))
         self.assertEqual(pin["reviewed_routes"], ["gpio-pa5"])
-        source = ["soc/stm32g474/drivers/pin_state.c"]
+        source = ["soc/stm32/stm32g474/drivers/pin_state.c"]
         self.assertEqual(pin["selected_ops_sources"], source)
         self.assertEqual(pin["sdk_required_sources"], source)
         self.assertEqual(pin["resolver_fixtures"],
@@ -431,7 +432,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
             with self.subTest(mode=identity):
                 row = modes[identity]
                 family = identity.split(".")[0]
-                sources = [f"soc/{family}/drivers/{source_name}.c"]
+                sources = [f"{source_directory(family)}/drivers/{source_name}.c"]
                 self.assertEqual(row["provider_implementation"], implementation)
                 self.assertEqual(row["selected_ops_sources"], sources)
                 self.assertEqual(row["sdk_required_sources"], sources)
@@ -472,7 +473,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
                           (row["controller"], row["kind"], row["mode"]) ==
                           (controller, kind, mode)]
                 self.assertEqual(len(values), 1)
-                self.assertEqual(values[0]["selected_ops_sources"], ["io/native/rtc_lptim.c"])
+                self.assertEqual(values[0]["selected_ops_sources"], ["soc/native/drivers/rtc_lptim.c"])
                 self.assertIn(fixture, values[0]["resolver_fixtures"])
                 self.assertIn(values[0]["provider_implementation"], {"rtc", "lptim"})
         inputs = {row["path"] for row in report["authority_inputs"]}
@@ -480,7 +481,7 @@ class CurrentWorkPackageTests(unittest.TestCase):
                          "tools/configure/providers/native/__init__.py",
                          "tools/configure/providers/native/bindings.py",
                          "tools/configure/providers/native/emission.py",
-                         "io/native/rtc_lptim.c", fixture} <= inputs)
+                         "soc/native/drivers/rtc_lptim.c", fixture} <= inputs)
         empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
         self.assertFalse(any(empty in row["resolver_fixtures"] for row in models))
         self.assertFalse(report["software_qualification"])

@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_TIMER_CAPTURE_H
 #define NEXUS_IO_TIMER_CAPTURE_H
 #include "nexus/core/time.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,10 +39,10 @@ typedef struct {
     nx_result_t (*state)(const void* context, nx_timer_capture_state_t* state);
 } nx_timer_capture_ops_t;
 /** \brief Immutable identity; state and methods outlive calls and IRQs. */
-typedef struct {
+struct nx_timer_capture {
     const nx_timer_capture_ops_t* ops;
     void* context;
-} nx_timer_capture_t;
+};
 /**
  * \brief Borrow an exact event ring and enable the fixed capture channel.
  * \param[in] port: One privileged task owner, serialized with stop/read.

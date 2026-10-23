@@ -1,24 +1,24 @@
 set(h743_high_model_sources h743_model.cpp h743_clock_model.cpp
     h743_high_profile_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/clock.c")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/clock.c")
 nexus_google_test(nexus_h743_high_system_test
     SOURCES h743_high_system_test.cpp ${h743_high_model_sources}
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 nexus_google_test(nexus_h743_high_kernel_test
     SOURCES h743_high_kernel_test.cpp ${h743_high_model_sources}
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/i2c.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
         "${NEXUS_SOURCE_DIR}/soc/common")
 foreach(h743_high_target nexus_h743_high_system_test nexus_h743_high_kernel_test)
     target_include_directories(${h743_high_target} SYSTEM PRIVATE
@@ -52,18 +52,18 @@ endforeach()
 nexus_google_test(nexus_h743_high_factory_test
     SOURCES h743_high_factory_test.cpp "${h7_high_bundle}/bindings.c"
         ${h743_high_model_sources}
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_high_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
         "${NEXUS_SOURCE_DIR}/soc/common")
 target_include_directories(nexus_h743_high_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
@@ -80,7 +80,7 @@ foreach(h743_high_flash_target nexus_h743_high_kernel_test
     target_sources(${h743_high_flash_target} PRIVATE h743_flash_image_model.cpp
         h743_flash_fixture.cpp h743_flash_ram_closure_model.cpp
         h743_flash_mpu_model.cpp ${h743_flash_ram_production_sources}
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c")
     target_compile_options(${h743_high_flash_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/h743_flash_image_model.h")
 endforeach()

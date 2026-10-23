@@ -40,6 +40,11 @@ Read the [architecture](../explanation/platform-architecture.md),
    error is not the expected behavioral RED result.
 3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
    shared CPU resolver; do not duplicate CPU flags or infer optional features.
+   Place MCU implementations under `soc/<vendor>/<family>/` and declare that
+   canonical `source_directory` in the maintained family descriptor. Public
+   family identifiers stay independent of the directory. CPU implementation
+   sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed
+   cross-vendor register algorithms remain in `soc/common/`.
 4. Add the family to the explicit maintained provider map in `tools/configure/`.
    Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
    Return an explicit frozen `Construction` record, including the private state

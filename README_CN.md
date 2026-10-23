@@ -18,6 +18,12 @@ MCU 实板 HIL 状态为 `not_executed`。
 初始化、加锁或探测设备。日常 I/O 通过共享只读 ops 访问独立私有 context。
 CMake 负责源码依赖图；Kconfig 与 cache 宏不构成平行配置权威。
 
+源码按厂家分为 `soc/stm32/` 与 `soc/gd32/`，Arm 原语位于
+`arch/arm/cortex_m/`，Native 模型位于 `soc/native/drivers/`。公共头文件路径、
+CMake 目标名称及配置中的系列标识保持稳定。[源码相邻合同](docs/explanation/source-map.md)
+说明目录与所有权。新产品应使用生成的 `nexus_factory_strong.h`，取得按类别区分的
+强类型 factory 引用。
+
 | 层 | 责任 |
 | --- | --- |
 | Core | 结果、单调 deadline、请求借用和稳定 epoch |

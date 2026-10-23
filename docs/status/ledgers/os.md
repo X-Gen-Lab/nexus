@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/os-execution.csv)。
-源文件：`docs/design/os-execution.csv`；SHA-256：`df25e8d6e399df3b1aa6a1c444b9570be04929bf70d30f8484a11dff4e3ed747`。
+源文件：`docs/design/os-execution.csv`；SHA-256：`1a01b0795609b31d1b0f41ccdaf2d83e0dc14c0671f3f7889e5964a5d54d76ec`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -114,7 +114,7 @@ source_language: zh_CN
 | `task_id` | OS06 |
 | `priority` | P1 |
 | `task` | Baseline complete IRQ wake binding |
-| `implementation_paths` | io/src/wake.c;io/native/uart.c |
+| `implementation_paths` | io/src/mechanisms/wake.c;soc/native/drivers/uart.c |
 | `evidence_paths` | tests/google/wake_test.cpp;tests/google/irq_wake_test.cpp;tests/google/irq_wake_stm32_test.cpp;tests/google/irq_wake_gd32_test.cpp |
 | `implementation_status` | implemented |
 | `software_status` | development_passed |
@@ -129,7 +129,7 @@ source_language: zh_CN
 | `task_id` | OS07 |
 | `priority` | P1 |
 | `task` | Explicit NONE/PRIMASK/BASEPRI kernel policy |
-| `implementation_paths` | io/include/nexus/io/wake.h;io/src/wake.c;tools/configure/kernel.py |
+| `implementation_paths` | io/include/nexus/io/wake.h;io/src/mechanisms/wake.c;tools/configure/kernel.py |
 | `evidence_paths` | tests/google/wake_test.cpp;tools/configure/test_kernel.py |
 | `implementation_status` | implemented |
 | `software_status` | development_passed |
@@ -669,7 +669,7 @@ source_language: zh_CN
 | `task_id` | OS43 |
 | `priority` | optional |
 | `task` | CPU-local atomic shallow idle |
-| `implementation_paths` | arch/include/nexus/arch/sleep.h;arch/cortex_m/nx_arch_sleep.c |
+| `implementation_paths` | arch/include/nexus/arch/sleep.h;arch/arm/cortex_m/nx_arch_sleep.c |
 | `evidence_paths` | tests/google/arch_sleep_test.cpp |
 | `implementation_status` | implemented |
 | `software_status` | development_passed |

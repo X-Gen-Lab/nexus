@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "status": "failed",
-  "base_ref": "HEAD",
-  "errors": [
-    "Files are not in the Git index: ['docs/design/provider-assemblies.md', 'scripts/ci/provider_assemblies.py', 'scripts/ci/test_provider_assemblies.py', 'tools/testing/test_provider_templates.py']"
-  ]
-}

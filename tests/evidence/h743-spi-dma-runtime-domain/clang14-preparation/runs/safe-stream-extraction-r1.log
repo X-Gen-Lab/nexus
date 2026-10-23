@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/dev/shm/nexus-clang14-required-20261018-r1/extract.py", line 49, in <module>
-    assert len(infos) == 9
-           ^^^^^^^^^^^^^^^
-AssertionError

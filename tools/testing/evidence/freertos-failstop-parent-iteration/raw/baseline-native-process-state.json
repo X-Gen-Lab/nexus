@@ -1,6 +1,0 @@
-{
-  "pid": 3725762,
-  "stat": "3725762 (nexus_freertos_) Z 1 3725749 3725749 0 -1 4228172 225 0 0 0 4198 2 0 0 20 0 1 0 30647638 0 0 18446744073709551615 0 0 0 0 0 0 0 0 9408 1 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
-  "command": "",
-  "cleanup_attempt": "Refused to signal because exact-command verification no longer matched; no process was signalled by this attempt"
-}

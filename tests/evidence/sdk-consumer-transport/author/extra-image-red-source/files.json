@@ -1,9 +1,0 @@
-{
-  "tools/release/transport.py": "86f79da1bb5cd332817ceb711c860d964eb12e612840325a4bd0eee358299ea5",
-  "cmake/package/verify_consumers.py": "8f1db6316f90bc3ea40961c1a4e3884f8d56b97cf4c2049d1194a119284adbd0",
-  "cmake/package/package_source_sdk.py": "8a7cc46345f6c368868d97573d5ea0802eae4959e7b5dcf94a8976c5bd833152",
-  ".github/workflows/test_release.py": "a0e0f5e8488130dc72489b9d5308ce5e6b1a5bb073c3966cc72ff1da315bf9c6",
-  "tools/release/README.md": "b575349f27d45c59b60eae9badc734bb74189d3144b5374c0dabc0b9c4aae3bd",
-  "tests/contracts/test_source_sdk.py": "99a2e394f953f6350d09be33140fc0af09ddc17dbd3d666349a22f08aed0a3ad",
-  "tools/testing/test_sdk_verification_call.py": "6818734a2cca5a42c2fe55fdf639ef659955fd4310aa7cba878d6be504e9691d"
-}

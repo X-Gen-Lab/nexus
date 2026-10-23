@@ -1,6 +1,0 @@
-{
-  "boards/gd32f470_liangshan/board.json": "/workspace/nexus/boards/gd32f470_liangshan/board.json",
-  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
-  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json",
-  "tools/configure/assemblies/liangshan-baremetal.toml": "/workspace/nexus/tools/configure/assemblies/liangshan-baremetal.toml"
-}

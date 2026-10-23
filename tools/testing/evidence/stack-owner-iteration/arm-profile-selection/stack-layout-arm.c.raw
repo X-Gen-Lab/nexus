@@ -1,5 +1,0 @@
-#include "nexus/os/freertos_stack.h"
-void fixture_layout(void);
-void fixture_layout(void) {
- __asm__ volatile(".global __stack_binding_bytes\n.equ __stack_binding_bytes,%c0\n.global __stack_observation_bytes\n.equ __stack_observation_bytes,%c1\n" : : "i"(sizeof(nx_freertos_stack_binding_t)), "i"(sizeof(nx_stack_observation_t)));
-}

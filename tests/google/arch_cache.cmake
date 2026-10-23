@@ -12,7 +12,7 @@ foreach(profile none data instruction both)
     set(name "nexus_arch_cache_${profile}_test")
     nexus_google_test(${name}
         SOURCES "${CMAKE_CURRENT_LIST_DIR}/arch_cache_test.cpp"
-        "${NEXUS_SOURCE_DIR}/arch/cortex_m/nx_arch_cache.c"
+        "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_cache.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/google")
     target_compile_definitions(${name} PRIVATE NEXUS_ARCH_MECHANISM_MODEL

@@ -72,7 +72,7 @@ class MemoryRegionConfigurationTests(unittest.TestCase):
                          ["sram"])
 
     def test_extra_selection_cannot_replace_the_authoritative_primary_ram(self):
-        soc = json.loads((gate.ROOT / "soc/gd32f470/soc.json").read_text())
+        soc = json.loads((gate.ROOT / "soc/gd32/gd32f470/soc.json").read_text())
         physical = soc["variants"]["GD32F470ZGT6"]["memory"]
         original = json.dumps(physical, sort_keys=True)
         selected = memory.select(list(reversed(physical)),

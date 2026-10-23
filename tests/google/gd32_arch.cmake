@@ -1,10 +1,10 @@
 # Execute the production GD32 timebase against mocked CPU and SDK boundaries.
 nexus_google_test(nexus_gd32_arch_test SOURCES gd32_arch_test.cpp
-    "${NEXUS_SOURCE_DIR}/soc/gd32f470/timebase.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/timebase.c"
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
 set(gd_arch_vendor
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")

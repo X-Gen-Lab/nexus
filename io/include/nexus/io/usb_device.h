@@ -6,6 +6,7 @@
 #ifndef NEXUS_USB_DEVICE_H
 #define NEXUS_USB_DEVICE_H
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
@@ -56,10 +57,10 @@ typedef struct {
     nx_result_t (*cancel)(void*, nx_usb_request_t*);
     nx_result_t (*stall)(void*, bool);
 } nx_usb_endpoint_ops_t;
-typedef struct {
+struct nx_usb_endpoint_port {
     const nx_usb_endpoint_ops_t* ops;
     void* context;
-} nx_usb_endpoint_port_t;
+};
 /** \brief Controller identity remains separate from endpoint identities. */
 typedef struct {
     nx_result_t (*service)(void*);
@@ -69,10 +70,10 @@ typedef struct {
     nx_result_t (*attach_wake)(void*, const nx_irq_wake_t*, uint8_t);
     nx_result_t (*stop)(void*);
 } nx_usb_device_ops_t;
-typedef struct {
+struct nx_usb_device_port {
     const nx_usb_device_ops_t* ops;
     void* context;
-} nx_usb_device_port_t;
+};
 /**
  * \brief Prepare one IN packet without reading or borrowing its bytes.
  * \param[in,out] request: Initialized unborrowed request.

@@ -43,17 +43,17 @@ class U575ProviderTests(unittest.TestCase):
         sdk = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(sdk)
         paths = (
-            "components/stm32u575_stop2/CMakeLists.txt",
-            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
-            "soc/stm32u575/stop2.c",
-            "soc/stm32u575/private/stm32u575_stop2_hw.h",
+            "components/soc/stm32/stm32u575_stop2/CMakeLists.txt",
+            "components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
+            "soc/stm32/stm32u575/stop2.c",
+            "soc/stm32/stm32u575/private/stm32u575_stop2_hw.h",
             "cmake/package/verification/io_evolution/consumers/u575-stop2.c",
-            "components/stm32u575_lpdma_copy/CMakeLists.txt",
-            "components/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h",
-            "components/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h",
-            "soc/stm32u575/drivers/lpdma_copy.c",
-            "soc/stm32u575/private/stm32u575_lpdma_copy_hw.h",
-            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h",
+            "components/soc/stm32/stm32u575_lpdma_copy/CMakeLists.txt",
+            "components/soc/stm32/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h",
+            "components/soc/stm32/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h",
+            "soc/stm32/stm32u575/drivers/lpdma_copy.c",
+            "soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h",
+            "components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h",
             "tools/configure/assemblies/u575-lpdma-copy-stop2.toml",
             "cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c",
         )
@@ -76,12 +76,12 @@ class U575ProviderTests(unittest.TestCase):
         sdk = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(sdk)
         paths = (
-            "components/stm32u575_lpdma_lptim1/CMakeLists.txt",
-            "components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h",
-            "components/stm32u575_lpdma_lptim1/private/stm32u575_lpdma_lptim1_internal.h",
-            "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h",
-            "soc/stm32u575/private/stm32u575_lptim1_profile.h",
-            "soc/stm32u575/drivers/lpdma_lptim1.c",
+            "components/soc/stm32/stm32u575_lpdma_lptim1/CMakeLists.txt",
+            "components/soc/stm32/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h",
+            "components/soc/stm32/stm32u575_lpdma_lptim1/private/stm32u575_lpdma_lptim1_internal.h",
+            "components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h",
+            "soc/stm32/stm32u575/private/stm32u575_lptim1_profile.h",
+            "soc/stm32/stm32u575/drivers/lpdma_lptim1.c",
             "tools/configure/assemblies/u575-lptim1-lpbam-stop2.toml",
             "cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c",
         )
@@ -207,7 +207,7 @@ class U575ProviderTests(unittest.TestCase):
         self.assertEqual(self.provider.start_resources(Result()), [])
 
     def test_package_inventory_and_sram1_default_remain_exact(self):
-        facts = json.loads((ROOT / "soc/stm32u575/soc.json").read_text())
+        facts = json.loads((ROOT / "soc/stm32/stm32u575/soc.json").read_text())
         variant = facts["variants"]["STM32U575ZIT6Q"]
         self.assertEqual(len(variant["pins"]), 111)
         self.assertNotIn("PB12", variant["pins"])
@@ -218,8 +218,8 @@ class U575ProviderTests(unittest.TestCase):
     def test_selected_sram4_initializer_remains_in_required_sdk_payload(self):
         from tools.configure.providers import descriptor
         payload = descriptor.maintained("stm32u575").owned_payload
-        for name in ("soc/stm32u575/memory_init.c",
-                     "soc/stm32u575/private/stm32u575_memory_init.h"):
+        for name in ("soc/stm32/stm32u575/memory_init.c",
+                     "soc/stm32/stm32u575/private/stm32u575_memory_init.h"):
             with self.subTest(path=name):
                 self.assertIn(name, payload)
 

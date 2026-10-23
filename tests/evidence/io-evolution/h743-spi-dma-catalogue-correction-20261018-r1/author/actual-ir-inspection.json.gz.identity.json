@@ -1,9 +1,0 @@
-{
-  "original_name": "actual-ir-inspection.json",
-  "original_bytes": 80770,
-  "original_sha256": "bb26ff280fa1ed4ce26a381a89107863bdd0cc6deea18105b15e0c12ffdf42c5",
-  "original_mode": 384,
-  "archive": "actual-ir-inspection.json.gz",
-  "archive_sha256": "abc963ce14a55df298242de41cddb0f2a1d13676a4fb649601ee6cb32cb941c8",
-  "byte_exact_round_trip": true
-}

@@ -1,6 +1,0 @@
-{
-  "external/gd32f470zgt6-freertos-i2c-irq.toml": "/workspace/nexus-config-iteration-evidence/mode-arm-expanded/gd32f470zgt6-freertos-i2c-irq.toml",
-  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
-  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json",
-  "tests/contracts/gd32_assembly/software_board/board.json": "/workspace/nexus/tests/contracts/gd32_assembly/software_board/board.json"
-}

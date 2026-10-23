@@ -1,5 +1,11 @@
 # CPU-local primitives
 
+Public headers remain in `include/nexus/arch/`. Arm Cortex-M implementation
+sources live in `arm/cortex_m/`, and host primitives live in `native/`. The ISA
+directory is a build-time ownership boundary; CPU facts select one implementation
+without a runtime CPU factory. A new architecture needs its own reviewed
+implementation and compiler contract rather than a placeholder support claim.
+
 `Nexus::Arch` exposes saved interrupt masks, exact exception identity, current
 privilege, ordering barriers and an optional already-enabled DWT cycle snapshot.
 It does not call I/O, OS or vendor SDK code. One compile-time Cortex-M primitive

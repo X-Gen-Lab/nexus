@@ -1,17 +1,17 @@
 # Native-only source contracts; no physical RTC/LPTIM claim.
 nexus_google_test(nexus_rtc_lptim_test SOURCES rtc_lptim_test.cpp
     LIBRARIES Nexus::NativeModel
-    INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers")
 if(UNIX AND NOT APPLE)
     nexus_google_test(nexus_rtc_lptim_final_access_test
         SOURCES rtc_lptim_final_access_test.cpp
         LIBRARIES Nexus::NativeModel
-        INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers")
 endif()
 
 nexus_google_test(nexus_rtc_lptim_start_test SOURCES rtc_lptim_start_test.cpp
     LIBRARIES Nexus::NativeModel
-    INCLUDES "${NEXUS_SOURCE_DIR}/io/native")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers")
 
 # The same canonical public C scenarios are consumed by the installed SDK.
 foreach(nx_time_profile pair empty)
@@ -40,5 +40,5 @@ foreach(nx_time_profile pair empty)
         SOURCES rtc_lptim_generated_test.cpp "${nx_time_consumer}"
             "${nx_time_bundle}/bindings.c"
         LIBRARIES Nexus::NativeModel
-        INCLUDES "${nx_time_bundle}" "${NEXUS_SOURCE_DIR}/io/native")
+        INCLUDES "${nx_time_bundle}" "${NEXUS_SOURCE_DIR}/soc/native/drivers")
 endforeach()

@@ -6,6 +6,9 @@
  * \date            2026-10-18
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/io/spi.h"
+#include "nexus/io/stream.h"
+#include "nexus/io/uart.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 

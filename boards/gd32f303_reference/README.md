@@ -12,5 +12,5 @@ option-byte, SWJ-remap or boot-strap changes are performed. Actual reset, power,
 voltage levels, pulls, routing, clock tolerance and physical tests remain the
 responsibility of a separately identified Board package and HIL station.
 
-See [the provider contract](../../soc/gd32f303/README.md) for exact implemented
+See [the provider contract](../../soc/gd32/gd32f303/README.md) for exact implemented
 modes, static ownership, finite time-domain limits and unsupported scope.

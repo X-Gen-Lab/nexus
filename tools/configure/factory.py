@@ -38,6 +38,8 @@ def interface_type(class_name, shape):
 
 def public_header(kind):
     return {"pwm": "timer", "eth": "ethernet", "eth_frames": "ethernet_frames",
+            "spi_device": "spi", "i2c_device": "i2c",
+            "usb_endpoint": "usb_device",
             "spi_transaction_device": "spi_transaction",
             "i2c_long_device": "i2c_long",
             "spi_dma_transaction_device": "spi_dma_transaction"}.get(kind, kind)
@@ -85,16 +87,16 @@ def emit(result):
     header = ['/**', ' * \\file            nexus_factory.h',
               ' * \\brief           Typed lookup of statically selected instances.',
               ' * \\author          Nexus Team', ' */',
-              '#ifndef NEXUS_FACTORY_H', '#define NEXUS_FACTORY_H']
+              '#ifndef NEXUS_FACTORY_H', '#define NEXUS_FACTORY_H',
+              '#include <stddef.h>', '#include <stdint.h>',
+              '#include "nexus/io/fwd.h"']
     if uart_formats.probed(result):
         header.append('#include "nexus_config.h"')
-    for kind in KINDS:
-        header.append(f'#include "nexus/io/{public_header(kind)}.h"')
-    for name, _, _ in classes(result):
-        if name in {"spi_transaction_device", "i2c_long_device", "uart_word",
-                    "spi_dma_transaction", "spi_dma_transaction_device", "pin_state"}:
-            header.append(f'#include "nexus/io/{public_header(name)}.h"')
-    header.append('#include "nexus/io/mdio.h"')
+    selected_headers = sorted({public_header(name)
+                               for name, _, instances in classes(result)
+                               if instances})
+    for name in selected_headers:
+        header.append(f'#include "nexus/io/{name}.h"')
     header += ['#ifdef __cplusplus', 'extern "C" {', '#endif']
     source = []
     for class_name, shape, instances in classes(result):

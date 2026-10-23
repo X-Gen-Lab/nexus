@@ -5,6 +5,12 @@ Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and queue
 storage selected by the caller. No universal maximum pool, hidden worker,
 default timer daemon or device dependency on OS.
 
+The common public abstraction is the wait/wake port. Task, queue, join and
+storage APIs are deliberately backend-specific and expose the selected kernel's
+real control-block requirements. A product switching kernels adapts its task
+lifecycle explicitly; the platform supplies no universal Task/Queue ABI or
+maximum storage pool.
+
 Notifications are hints: arm/recheck the authoritative request predicate. Kernel
 ISR operations validate the selected syscall ceiling. Native task return ends the
 pthread; FreeRTOS wrappers publish completion and suspend until external deletion;

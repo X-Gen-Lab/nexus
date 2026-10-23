@@ -1,4 +1,5 @@
 """CPU facts and interrupt policy remain one validated assembly decision."""
+from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 import tempfile
@@ -16,7 +17,7 @@ class InterruptProfileTests(unittest.TestCase):
                              ("gd32f470", "GD32F470ZGT6")):
             for value in (1, "enabled", None, family == "native"):
                 with self.subTest(family=family, value=value):
-                    soc = gate.load(gate.ROOT / "soc" / family / "soc.json")
+                    soc = gate.load(gate.ROOT / source_directory(family) / "soc.json")
                     soc["cpu"]["dwt_cyccnt"] = value
                     with self.assertRaisesRegex(gate.ConfigurationError,
                                                 "DWT cycle counter"):
@@ -25,14 +26,14 @@ class InterruptProfileTests(unittest.TestCase):
     def test_irq_width_cannot_contradict_verified_soc_facts(self):
         for value in (True, 0, 9, 3):
             with self.subTest(value=value):
-                soc = gate.load(gate.ROOT / "soc/stm32f407/soc.json")
+                soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
                 soc["irq"]["priority_bits"] = value
                 with self.assertRaisesRegex(gate.ConfigurationError,
                                             "IRQ priority bits"):
                     gate.validate_soc(soc, "STM32F407ZGT6")
 
     def test_unknown_interrupt_fact_is_rejected(self):
-        soc = gate.load(gate.ROOT / "soc/stm32f407/soc.json")
+        soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
         soc["irq"] = {"priority_bits": 4, "syscall_priority": 1}
         with self.assertRaisesRegex(gate.ConfigurationError, "unknown"):
             gate.validate_soc(soc, "STM32F407ZGT6")

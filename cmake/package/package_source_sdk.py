@@ -50,7 +50,7 @@ OFFICIAL_DRIVERS = (stm32f1_hal_lock, stm32f4_hal_lock, stm32g4_hal_lock,
 REQUIRED_FILES = (
     'io/include/nexus/io/usb_profile.h',
     'io/include/nexus/io/usb_activation.h',
-    'io/src/usb_profile.c',
+    'io/src/mechanisms/usb_profile.c',
     'tools/configure/usb_profiles.py',
     'components/usb_control/CMakeLists.txt',
     'components/usb_control/include/nexus/components/usb_control.h',
@@ -61,36 +61,37 @@ REQUIRED_FILES = (
     'components/usb_control/src/usb_acm.c',
     "CMakeLists.txt", "LICENSE", ".gitmodules", "dependencies/toolchains.lock.json",
     "dependencies/environment.lock.json", "core/include/nexus/core/request.h",
-    "arch/include/nexus/arch/arch.h", "arch/cortex_m/nx_arch_cortex_m.c",
-    "arch/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
+    "arch/include/nexus/arch/arch.h", "arch/arm/cortex_m/nx_arch_cortex_m.c",
+    "arch/arm/cortex_m/private/compiler.h", "arch/native/nx_arch_native.c",
     "arch/include/nexus/arch/atomic.h", "arch/include/nexus/arch/features.h",
     "arch/include/nexus/arch/cache.h", "arch/include/nexus/arch/mpu.h",
-    "arch/include/nexus/arch/security.h", "arch/cortex_m/private/mechanisms.h",
-    "arch/cortex_m/nx_arch_cache.c", "arch/cortex_m/nx_arch_mpu.c",
-    "arch/cortex_m/nx_arch_security.c",
+    "arch/include/nexus/arch/security.h", "arch/arm/cortex_m/private/mechanisms.h",
+    "arch/arm/cortex_m/nx_arch_cache.c", "arch/arm/cortex_m/nx_arch_mpu.c",
+    "arch/arm/cortex_m/nx_arch_security.c",
     "arch/include/nexus/arch/cache_control.h",
-    "arch/cortex_m/nx_arch_cache_control.c",
-    "arch/cortex_m/private/cache_control.h",
+    "arch/arm/cortex_m/nx_arch_cache_control.c",
+    "arch/arm/cortex_m/private/cache_control.h",
     "arch/include/nexus/arch/nonsecure.h",
-    "arch/cortex_m/nx_arch_nonsecure.c",
-    "arch/cortex_m/private/nonsecure.h",
-    "arch/include/nexus/arch/sleep.h", "arch/cortex_m/nx_arch_sleep.c",
-    "arch/cortex_m/private/sleep.h",
+    "arch/arm/cortex_m/nx_arch_nonsecure.c",
+    "arch/arm/cortex_m/private/nonsecure.h",
+    "arch/include/nexus/arch/sleep.h", "arch/arm/cortex_m/nx_arch_sleep.c",
+    "arch/arm/cortex_m/private/sleep.h",
     "core/include/nexus/core/memory.h",
     "core/include/nexus/core/request_observer.h", "core/src/request_observer.c",
-    "io/include/nexus/io/stream_budget.h", "io/src/stream_budget.c",
+    "io/include/nexus/io/stream_budget.h", "io/src/mechanisms/stream_budget.c",
     "components/owner_observer/CMakeLists.txt",
     "components/owner_observer/include/nexus/components/owner_observer.h",
     "components/owner_observer/src/owner_observer.c",
-    "soc/gd32f470/memory_init.c", "soc/gd32f470/private/memory_init.h",
-    "core/src/request.c", "io/include/nexus/io/gpio.h",
+    "soc/gd32/gd32f470/memory_init.c", "soc/gd32/gd32f470/private/memory_init.h",
+    "core/src/request.c", "io/include/nexus/io/fwd.h",
+    "soc/native/CMakeLists.txt", "io/include/nexus/io/gpio.h",
     "io/include/nexus/io/uart.h", "os/freertos/include/FreeRTOSConfig.h",
     "boards/stm32f407_qiming_v31/board.json",
     "boards/stm32f407ve_sky_qingchun/board.json",
     "boards/gd32f470_liangshan/board.json",
-    "soc/stm32f407/soc.json", "soc/gd32f470/soc.json",
+    "soc/stm32/stm32f407/soc.json", "soc/gd32/gd32f470/soc.json",
     "tools/configure/configure.py", "cmake/platform/Firmware.cmake",
-    "cmake/platform/TargetPolicy.cmake",
+    "cmake/platform/TargetPolicy.cmake", "cmake/platform/Components.cmake",
     "tools/configure/bundle.py", "tools/configure/dependencies.py",
     "tools/configure/contracts.py", "tools/configure/matrix.py",
     "tools/configure/sdk.py",
@@ -196,13 +197,13 @@ REQUIRED_FILES += ("io/private/uart_fifo_impl.h",)
 REQUIRED_FILES += (
     "io/include/nexus/io/ethernet_frames.h",
     "io/private/eth_frames_mac.h", "io/private/eth_frames_validation.h",
-    "io/src/ethernet_frames.c", "io/src/eth_frames_mac.c",
-    "io/native/ethernet_frames.c", "io/native/ethernet_frames.h",
-    "io/native/ethernet_frames_access.h")
+    "io/src/api/ethernet_frames.c", "io/src/controllers/eth_frames_mac.c",
+    "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
+    "soc/native/drivers/ethernet_frames_access.h")
 REQUIRED_FILES += (
     "tools/configure/providers/stm32g474/adc_group.py",
-    "soc/stm32g474/reviews/adc-group.json",
-    "io/include/nexus/io/adc_group.h", "io/src/adc_group.c")
+    "soc/stm32/stm32g474/reviews/adc-group.json",
+    "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c")
 # Required payload identity is separate from CMake's production source graph.
 # Every exposed kernel profile must survive a rehashed omission attempt.
 for _port in ("ARM_CM0", "ARM_CM3", "ARM_CM4F", "ARM_CM7/r0p1",
@@ -297,39 +298,40 @@ REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
     "spi_dma_transaction", "spi_dma_owner_binding", "uart_format", "uart_word",
     "native/spi_dma_model", "spi", "stream", "stream_budget", "stream_profile", "timer",
     "timer_capture", "uart", "uart_rs485", "usb_device", "wake", "watchdog"))
-REQUIRED_FILES += tuple("io/src/" + name + ".c" for name in (
-    "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd",
-    "can_controller", "cycle_probe", "dma", "encoder",
-    "eth_mac", "ethernet", "exti", "flash", "flash_region", "gpio", "i2c",
-    "i2c_bus_clear", "i2c_long", "mdio", "observation", "pwm_adc", "pwm_group", "spi",
-    "spi_transaction", "spi_dma_transaction", "spi_dma_sequence",
-    "spi_dma_owner_binding", "uart_word", "stream", "stream_budget",
-    "stream_profile", "timer",
-    "timer_capture", "uart", "uart_rs485", "usb_device",
-    "usb_device_controller", "wake", "watchdog"))
+REQUIRED_FILES += tuple("io/src/api/" + name + ".c" for name in (
+    "adc", "advanced_pwm", "can", "can_fd", "encoder", "ethernet", "exti",
+    "flash", "gpio", "i2c", "mdio", "pwm_adc", "pwm_group", "spi", "uart_word",
+    "timer", "timer_capture", "uart", "usb_device", "watchdog"))
+REQUIRED_FILES += tuple("io/src/controllers/" + name + ".c" for name in (
+    "can_controller", "eth_mac", "usb_device_controller"))
+REQUIRED_FILES += tuple("io/src/mechanisms/" + name + ".c" for name in (
+    "adc_format", "adc_observer", "cycle_probe", "dma", "flash_region",
+    "i2c_bus_clear", "i2c_long", "observation", "spi_transaction",
+    "spi_dma_transaction", "spi_dma_sequence", "spi_dma_owner_binding",
+    "stream", "stream_budget", "stream_profile", "uart_rs485", "wake"))
 REQUIRED_FILES += tuple("io/private/" + name + ".h" for name in (
     "advanced_pwm_impl", "can_controller", "can_fd_impl", "eth_mac",
     "spi_dma_sequence", "spi_dma_sequence_owner",
     "timer_advanced_controller", "timer_capture_impl", "usb_device_controller"))
-REQUIRED_FILES += tuple("io/native/" + name + ".c" for name in (
+REQUIRED_FILES += tuple("soc/native/drivers/" + name + ".c" for name in (
     "adc", "can", "ethernet", "exti", "flash", "gpio", "i2c", "spi",
     "spi_async", "spi_dma_transaction", "stream", "time", "timer", "uart", "uart_word",
     "usb_device", "watchdog"))
-REQUIRED_FILES += tuple("io/native/" + name + ".h" for name in (
+REQUIRED_FILES += tuple("soc/native/drivers/" + name + ".h" for name in (
     "can", "can_access", "ethernet", "ethernet_access", "provider",
     "spi_dma_provider", "uart_word_provider",
     "usb_device", "usb_device_access"))
 for _family in ("stm32f407", "gd32f470"):
-    REQUIRED_FILES += tuple("soc/" + _family + "/" + name for name in (
+    REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/" + name for name in (
         "CMakeLists.txt", "system.c", "sleep.c", "timebase_lowpower.c",
         "usb_clock.c", "soc.json", "routes.json"))
-    REQUIRED_FILES += tuple("soc/" + _family + "/drivers/" + name + ".c"
+    REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/drivers/" + name + ".c"
                             for name in (
         "adc", "adc_continuous", "adc_stream", "advanced_pwm", "can",
         "ethernet", "exti", "flash", "gpio", "i2c", "i2c_async", "spi",
         "spi_dma", "timer", "timer_capture", "uart", "uart_dma",
         "uart_receive", "uart_duplex", "uart_stream", "uart_word", "usb_device", "watchdog"))
-    REQUIRED_FILES += tuple("soc/" + _family + "/private/" + _family + "_"
+    REQUIRED_FILES += tuple(provider_descriptors.source_directory(_family) + "/private/" + _family + "_"
                             + name + ".h" for name in (
         "can", "dma", "eth", "i2c_async", "lowpower", "provider", "sleep",
         "timer_advanced", "uart_receive", "uart_word", "usb_clock", "usb_device"))
@@ -338,32 +340,32 @@ REQUIRED_FILES += tuple("tools/configure/" + name + ".py" for name in (
     "enhanced_endpoints", "uart_formats", "i2c_timing_selection",
     "stream_profiles", "coupled_io", "runtime_power"))
 REQUIRED_FILES += (
-    "soc/stm32g474/drivers/pwm_group.c",
-    "soc/stm32g474/drivers/timer_capture.c",
-    "soc/stm32g474/drivers/encoder.c",
-    "soc/stm32g474/private/stm32g474_pwm_group.h",
-    "soc/stm32g474/private/stm32g474_timer.h",
+    "soc/stm32/stm32g474/drivers/pwm_group.c",
+    "soc/stm32/stm32g474/drivers/timer_capture.c",
+    "soc/stm32/stm32g474/drivers/encoder.c",
+    "soc/stm32/stm32g474/private/stm32g474_pwm_group.h",
+    "soc/stm32/stm32g474/private/stm32g474_timer.h",
     "soc/common/uart_control.h")
 REQUIRED_FILES += (
     "tools/configure/fact_references.py", "tools/configure/preflight.py",
     "tools/configure/gpio_phase.py",
-    "soc/stm32f407/references.json", "soc/gd32f470/references.json",
-    "soc/stm32f407/private/stm32f407_system.h",
-    "soc/stm32f407/private/stm32f407_stream.h",
-    "soc/gd32f470/timebase.c", "soc/gd32f470/private/system.h",
-    "soc/gd32f470/private/gd32f470_adc_stream.h",
-    "soc/gd32f470/private/gd32f470_spi_dma.h",
-    "soc/gd32f470/private/gd32f470_uart_stream.h",
-    "soc/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32f470/private/usb_conf.h")
+    "soc/stm32/stm32f407/references.json", "soc/gd32/gd32f470/references.json",
+    "soc/stm32/stm32f407/private/stm32f407_system.h",
+    "soc/stm32/stm32f407/private/stm32f407_stream.h",
+    "soc/gd32/gd32f470/timebase.c", "soc/gd32/gd32f470/private/system.h",
+    "soc/gd32/gd32f470/private/gd32f470_adc_stream.h",
+    "soc/gd32/gd32f470/private/gd32f470_spi_dma.h",
+    "soc/gd32/gd32f470/private/gd32f470_uart_stream.h",
+    "soc/gd32/gd32f470/private/gd32f4xx_libopt.h", "soc/gd32/gd32f470/private/usb_conf.h")
 REQUIRED_FILES += (
     "components/amp_ipc/CMakeLists.txt",
     "components/amp_ipc/src/amp_ipc.c",
     "components/amp_ipc/include/nexus/components/amp_ipc.h",
     "components/amp_ipc/include/nexus/components/amp_ipc_storage.h",
-    "components/stm32f407_handoff/CMakeLists.txt",
-    "components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
-    "soc/stm32f407/handoff.c",
-    "soc/stm32f407/private/stm32f407_handoff_hw.h",
+    "components/soc/stm32/stm32f407_handoff/CMakeLists.txt",
+    "components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h",
+    "soc/stm32/stm32f407/handoff.c",
+    "soc/stm32/stm32f407/private/stm32f407_handoff_hw.h",
     "cmake/package/verification/io_evolution/consumers/f407-handoff.c")
 REQUIRED_FILES += (
     "components/user_io_broker/include/nexus/components/user_io_async.h",
@@ -371,21 +373,21 @@ REQUIRED_FILES += (
     "components/user_io_broker/src/user_io_async.c",
     "cmake/package/verification/io_evolution/consumers/user-io-async.c")
 REQUIRED_FILES += (
-    "components/stm32u575_retained_time/CMakeLists.txt",
-    "components/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h",
-    "components/stm32u575_retained_time/private/retained_time.h",
-    "components/stm32u575_retained_time/src/stm32u575_retained_time.c",
-    "soc/stm32u575/private/stm32u575_rtc_calendar.h",
+    "components/soc/stm32/stm32u575_retained_time/CMakeLists.txt",
+    "components/soc/stm32/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h",
+    "components/soc/stm32/stm32u575_retained_time/private/retained_time.h",
+    "components/soc/stm32/stm32u575_retained_time/src/stm32u575_retained_time.c",
+    "soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h",
     "cmake/package/verification/io_evolution/consumers/u575-retained-time.c")
 REQUIRED_FILES += (
-    "components/stm32u575_stop2/CMakeLists.txt",
-    "components/stm32u575_stop2/README.md",
-    "components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
-    "soc/stm32u575/stop2.c",
-    "soc/stm32u575/private/stm32u575_stop2_hw.h",
+    "components/soc/stm32/stm32u575_stop2/CMakeLists.txt",
+    "components/soc/stm32/stm32u575_stop2/README.md",
+    "components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h",
+    "soc/stm32/stm32u575/stop2.c",
+    "soc/stm32/stm32u575/private/stm32u575_stop2_hw.h",
     "cmake/package/verification/io_evolution/consumers/u575-stop2.c")
 REQUIRED_FILES += (
-    "io/include/nexus/io/frame_stream.h", "io/src/frame_stream.c",
+    "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
     "components/frame_dma2d/CMakeLists.txt",
     "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
     "components/frame_dma2d/src/h743_frame_dma2d.c")
@@ -404,7 +406,7 @@ for _component, _include, _private in (
         REQUIRED_FILES += ("components/" + _component + "/private/" + _private,)
 # G474 owned support retains its selected production units independently of
 # test fixtures. The device closure follows each exact reviewed source lock.
-REQUIRED_FILES += tuple("soc/stm32g474/" + name for name in (
+REQUIRED_FILES += tuple("soc/stm32/stm32g474/" + name for name in (
     "CMakeLists.txt", "system.c", "drivers/gpio.c", "drivers/uart.c",
     "drivers/exti.c", "drivers/spi.c", "drivers/watchdog.c", "drivers/pwm.c",
     "private/stm32g474_system.h", "private/stm32g474_provider.h",
@@ -413,7 +415,7 @@ REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
 REQUIRED_FILES += tuple("tools/configure/providers/stm32g474/" + name for name in (
     "__init__.py", "bindings.py", "emission.py"))
 # The standalone Secure mechanism includes its complete private hardware port.
-REQUIRED_FILES += tuple("soc/stm32u575/" + name for name in (
+REQUIRED_FILES += tuple("soc/stm32/stm32u575/" + name for name in (
     "security.c", "private/stm32u575_security.h",
     "private/stm32u575_security_hw.h"))
 # Public measurement references are part of the supported SDK input surface.
@@ -429,7 +431,8 @@ REQUIRED_FILES += tuple(
 REQUIRED_FILES += (
     "arch/CMakeLists.txt", "cmake/toolchains/arm-gcc.cmake",
     "cmake/package/verify_consumers.py", "tools/release/transport.py",
-    "components/CMakeLists.txt",
+    "components/CMakeLists.txt", "components/soc/CMakeLists.txt",
+    "components/soc/stm32/CMakeLists.txt",
     "os/wait.c", "os/baremetal/notify.c", "os/native/native.c",
     "os/include/nexus/os/wait.h", "os/include/nexus/os/baremetal.h",
     "os/native/include/nexus/os/native.h",
@@ -619,9 +622,10 @@ def selected(name):
     # Historical audit archives belong to the repository, not the source SDK.
     if name.startswith("tools/testing/evidence/"):
         return False
-    # Host test frameworks never become firmware source dependencies. Their
-    # reviewed lock stays in the SDK provenance, without host-only payloads.
-    if name.startswith(("dependencies/source/", "cmake/testing/")):
+    # Host frameworks and checkout presets do not become firmware dependencies.
+    # The SDK excludes the root preset index, so its includes are not payload.
+    # Reviewed host locks remain in provenance without host-only payloads.
+    if name.startswith(("dependencies/source/", "cmake/testing/", "cmake/presets/")):
         return False
     return (name in ROOT_FILES or name.split("/", 1)[0] in ROOT_DIRS
             or any(name.startswith(directory + "/")

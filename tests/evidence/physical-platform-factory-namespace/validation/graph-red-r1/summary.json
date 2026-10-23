@@ -1,9 +1,0 @@
-{
-  "stage": "graph-red-r1",
-  "actual_exit": 0,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/graph-red-r1/command.attempts/1792294650833967334-026657fdedb14710a4a6d45271b8b136/receipt.json",
-  "source_index_guard_stable": true,
-  "build_allocated_growth_bytes": 4096,
-  "TMP_increment_limit": 104857600,
-  "scope": "Exact two full Native fixture targets/programs only; no full repository/ARM/HIL qualification"
-}

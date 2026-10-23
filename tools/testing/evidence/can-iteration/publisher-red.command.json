@@ -1,9 +1,0 @@
-{
-  "command": [
-    "/workspace/nexus-industrial-design/can-tests/build/can_contract",
-    "--gtest_output=xml:/workspace/nexus/tools/testing/evidence/can-iteration/publisher-red.xml"
-  ],
-  "exit_code": 1,
-  "stage": "RED",
-  "expected_failure": "Successful stop dropped wake borrow while concurrent Native publisher callback was live"
-}

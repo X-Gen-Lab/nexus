@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bc74e6fe204936dd37b0425ca3384dd9de8200a2e8ac2c3d62f27142c1d07a39\n"
+"X-Nexus-Source-SHA256: 106f592299a30bbdfc5c4c0e2c51bba3ab9dbee0391cbd176c926879ccf43643\n"
 
 #: ../../../../docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
@@ -271,73 +271,6 @@ msgstr ""
 #: ../../../../docs/explanation/source-map.md:28 ../../../../io/README.md:2
 msgid "Typed I/O"
 msgstr "类型化 I/O"
-
-#: ../../../../io/README.md:17
-msgid ""
-"Public operations check the face and dispatch its exact context. Different "
-"provider tables can coexist in one image without redefining public symbols. "
-"A missing optional method reports `NX_ERROR_UNSUPPORTED`; invalid faces "
-"reject before provider access. A method must preserve the public operation's"
-" execution, deadline, buffer ownership and failure contract. Provider "
-"headers, register layouts and SDK types stay private."
-msgstr ""
-"公共操作检查接口面并分派其准确 context。不同提供者方法表可以共存于同一镜像，不重新定义公共符号。缺失可选方法返回 "
-"`NX_ERROR_UNSUPPORTED`；非法接口面在访问提供者前拒绝。方法必须保持公共操作的执行、截止时间、缓冲区所有权和失败合同。提供者头文件、寄存器布局与"
-" SDK 类型保持私有。"
-
-#: ../../../../io/README.md:24
-msgid ""
-"Generated typed factory IDs select instances and distinguish SPI/I2C "
-"controllers from their child endpoints. Lookup returns a static identity. "
-"Platform start, request admission, service, recovery and stop remain "
-"explicit; lookup performs no hardware initialization, allocation, name "
-"search or locking. Faces remain valid while provider storage exists, so "
-"stopping requires caller and IRQ quiescence rather than promising that a "
-"pointer has been revoked."
-msgstr ""
-"生成的类型化 factory ID 选择实例，并区分 SPI/I2C 控制器及子端点。查找返回静态身份。Platform "
-"启动、请求准入、service、恢复和停止均保持显式；查找不初始化硬件、不分配、不搜索名称、不加锁。提供者存储存在时接口面仍有效，因此停止要求调用者和 "
-"IRQ 静止，不能承诺指针已被撤销。"
-
-#: ../../../../io/README.md:31
-msgid ""
-"Stream reserve, publish, acquire, release, abort and stop access constant "
-"metadata independent of block count. Stop checks an outstanding-block count;"
-" filling, ready and borrowed blocks remain counted until proved abort or "
-"matching release. It never scans the block array or revokes a loan under the"
-" interrupt mask. Storage overlap validation remains a cold assembly "
-"operation whose work grows with block count. This complexity contract is not"
-" physical IRQ latency or cycle qualification."
-msgstr ""
-"Stream reserve、publish、acquire、release、abort、stop 访问的元数据数量固定，不随块数变化。Stop 检查 "
-"outstanding-block 计数；filling、ready、borrowed 块均保持计数，直到已证明 abort 或匹配 "
-"release。它不在中断屏蔽期间扫描块数组或撤销借用。存储重叠验证仍为冷装配操作，其工作量随块数增长。该复杂度合同不建立物理 IRQ 延迟或周期资格。"
-
-#: ../../../../io/README.md:39
-msgid ""
-"Default paths need no OS locks or hidden tasks. Requests and transfer "
-"buffers remain caller-owned; generated provider buffers are assembly-owned "
-"and separate. UART tracks physical TC separately from loaded bytes and "
-"request release; error-only RX events never invent data. SPI and I2C "
-"preserve their bounded polling contracts, and controller recovery never "
-"replays a failed transaction. Flash exposes physical geometry; products "
-"provide explicit restricted regions."
-msgstr ""
-"默认路径不需要 OS 锁或隐藏任务。Request 与传输缓冲区由调用者拥有；生成提供者缓冲区归装配所有且单独存在。UART 分别跟踪物理 "
-"TC、已加载字节及请求释放；只有错误的 RX 事件绝不虚构数据。SPI 与 I2C 保持有界轮询合同，控制器恢复绝不重放失败事务。Flash "
-"暴露物理几何；产品提供显式受限区域。"
-
-#: ../../../../io/README.md:46
-msgid ""
-"The Native model owns independent state per instance. Its explicit default "
-"fixtures support focused tests; generated assemblies use separate state and "
-"buffers. Native behavior, production-register fault models and ARM link "
-"fixtures establish software evidence. Board facts authorize reviewed "
-"physical routes; software-only fixtures do not establish PCB connectivity or"
-" physical timing."
-msgstr ""
-"Native 模型为每实例保留独立状态。其显式默认夹具用于聚焦测试；生成装配使用独立状态和缓冲区。Native 行为、生产寄存器故障模型及 ARM "
-"链接夹具建立软件证据。Board 事实授权已审查物理路由；仅软件夹具不建立 PCB 连通性或物理时序。"
 
 #: ../../../../docs/explanation/source-map.md:35
 msgid "OS adapters"
@@ -623,82 +556,387 @@ msgstr ""
 msgid "Exact SoC implementations"
 msgstr "准确 SoC 实现"
 
-#: ../../../../docs/explanation/source-map.md:51
+#: docs/explanation/source-map.md:86
 msgid ""
 "The private implementation boundaries and reference configurations are "
 "maintained in [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32f103/README.md), "
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md), "
 "[GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32f407/README.md), "
+"SOURCE/soc/gd32/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md), "
 "[GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/README.md), "
+"SOURCE/soc/gd32/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md), "
 "[STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32h743/README.md) and [STM32U575](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md). Their "
-"links bind this website revision."
+"SOURCE/soc/stm32/stm32h743/README.md) and "
+"[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/README.md). Their links bind this website "
+"revision."
 msgstr ""
 "私有实现边界与参考配置由 [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
 "DOCUMENTATION-"
-"SOURCE/soc/stm32f103/README.md)、[GD32F303](https://github.com/X-Gen-"
+"SOURCE/soc/stm32/stm32f103/README.md)、[GD32F303](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f303/README.md)、[STM32F407](https://github.com/X-Gen-"
+"SOURCE/soc/gd32/gd32f303/README.md)、[STM32F407](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32f407/README.md)、[GD32F470](https://github.com/X-Gen-"
+"SOURCE/soc/stm32/stm32f407/README.md)、[GD32F470](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f470/README.md)、[STM32G474](https://github.com/X-Gen-"
+"SOURCE/soc/gd32/gd32f470/README.md)、[STM32G474](https://github.com/X-Gen-"
 "Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32g474/README.md)、[STM32H743](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md) 和 "
+"SOURCE/soc/stm32/stm32g474/README.md)、[STM32H743](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/README.md) 和 "
 "[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32u575/README.md) 维护。这些链接绑定当前站点源码版本。"
+"SOURCE/soc/stm32/stm32u575/README.md) 维护。这些链接绑定当前站点源码版本。"
 
-#: ../../../../io/README.md:4
+#: docs/explanation/source-map.md:14
 msgid ""
-"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-"interfaces. The optional [GPIO pin-state contract](/explanation/gpio-pin-"
-"states.md) adds an explicit selected face for authored DEFAULT/SLEEP images."
-" Its generated instance ID and runtime selection enum remain separate; "
-"lookup never acquires pad ownership or starts a power transition. Each "
-"selected instance has an immutable face with two pointers: shared read-only "
-"methods and a pointer to private provider state. Generated faces live in "
-"read-only storage; their state and selected buffers are private static "
-"objects in the generated translation unit. Manually assembled providers use "
-"storage supplied by their explicit constructor owner. A 32-bit target spends"
-" eight bytes of Flash per face; mutable state and exact-capacity buffers are"
-" separate. Method pointers are shared per provider and mode rather than "
-"repeated in every mutable instance."
+"The physical layout groups Arm CPU implementations by ISA and MCU packages "
+"by vendor. Family identifiers, public include paths and explicit target "
+"names remain stable. These are source ownership groups, not runtime "
+"forwarding layers."
 msgstr ""
-"GPIO、UART、SPI、I2C、Flash、watchdog、EXTI、PWM、ADC 提供 C11 接口。可选的 [GPIO "
-"引脚状态合同](/explanation/gpio-pin-states.md) 为显式编写的 DEFAULT/SLEEP 图像增加选定接口面。生成实例"
-" ID 与运行时选择枚举保持分离；查找既不取得 pad "
-"所有权，也不启动电源转换。每个选定实例包含不可变接口面，持有两个指针：共享只读方法及私有提供者状态指针。生成接口面位于只读存储；状态及选定缓冲区是生成翻译单元中的私有静态对象。手工装配提供者使用显式构造所有者提供的存储。32"
-" 位目标的每个接口面占用八字节 Flash；可变状态和准确容量缓冲区单独计算。方法指针按提供者及模式共享，不在每个可变实例中重复。"
+"物理目录按 ISA 分组 Arm CPU 实现，按厂家分组 MCU "
+"包。系列标识、公共头路径和显式目标名称保持稳定。这些分组表达源码所有权，不是运行时转发层。"
 
-#~ msgid ""
-#~ "GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-#~ "interfaces. Each selected instance has an immutable face with two pointers: "
-#~ "shared read-only methods and a pointer to private provider state. Generated "
-#~ "faces live in read-only storage; their state and selected buffers are "
-#~ "private static objects in the generated translation unit. Manually assembled"
-#~ " providers use storage supplied by their explicit constructor owner. A "
-#~ "32-bit target spends eight bytes of Flash per face; mutable state and exact-"
-#~ "capacity buffers are separate. Method pointers are shared per provider and "
-#~ "mode rather than repeated in every mutable instance."
-#~ msgstr ""
-#~ "GPIO、UART、SPI、I2C、Flash、watchdog、EXTI、PWM、ADC 提供 C11 "
-#~ "接口。每个选定实例包含不可变接口面，持有两个指针：共享只读方法及私有提供者状态指针。生成接口面位于只读存储；状态及选定缓冲区是生成翻译单元中的私有静态对象。手工装配提供者使用显式构造所有者提供的存储。32"
-#~ " 位目标的每个接口面占用八字节 Flash；可变状态和准确容量缓冲区单独计算。方法指针按提供者及模式共享，不在每个可变实例中重复。"
+#: docs/explanation/source-map.md:18
+msgid ""
+"Historical development collections are retained in the [evidence "
+"archive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/docs/archive/evidence/README.md) with exact member identities and "
+"restore instructions. Their original source and execution scope remain "
+"unchanged; archive restoration does not establish current-source "
+"qualification."
+msgstr ""
+"历史开发集合保存在[证据归档](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/docs/archive/evidence/README.md)中，附有精确成员身份和恢复步骤。其原始源码与执行范围保持不变；恢复归档不建立当前源码的资格。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:52
-msgid "The optional USB `nx_usb_activation_port_t` is a controller face with one synchronous setter and the existing provider context. Its generated `nx_factory_usb_activation` lookup is independent of optional ROM profiles and `factory.capabilities`, with no hardware access or new mutable state, queue, worker or allocation. Existing USB faces, ops/profile layouts and factory ABI epoch 1 stay unchanged. Retained read-only ARM cost and unreferenced GC require linked evidence separate from the two-pointer face layout."
-msgstr "可选的 USB `nx_usb_activation_port_t` 是 controller face，只提供一个同步 setter 并使用既有 provider context。生成的 `nx_factory_usb_activation` 查找独立于可选 ROM profile 和 `factory.capabilities`，不访问硬件，不新增可变状态、队列、worker 或分配。既有 USB face、ops/profile 布局和 factory ABI epoch 1 保持不变。实际只读 ARM 保留成本及未引用 GC 须以链接证据分别确认，不能从两指针 face 布局直接推断。"
+#: arch/README.md:4
+msgid ""
+"Public headers remain in `include/nexus/arch/`. Arm Cortex-M implementation "
+"sources live in `arm/cortex_m/`, and host primitives live in `native/`. The "
+"ISA directory is a build-time ownership boundary; CPU facts select one "
+"implementation without a runtime CPU factory. A new architecture needs its "
+"own reviewed implementation and compiler contract rather than a placeholder "
+"support claim."
+msgstr ""
+"公共头仍位于 `include/nexus/arch/`。Arm Cortex-M 实现源码位于 `arm/cortex_m/`，主机原语位于 "
+"`native/`。ISA 目录是构建期所有权边界；CPU 事实选择一个实现，不设置运行时 CPU "
+"factory。新架构需要自身经过审查的实现和编译器合同，不能以占位声明代替支持。"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:60
-msgid "Activation controls one already selected nonzero endpoint direction; EP0 remains separate. Cold start activates/unmasks only EP0. A setter uses the current software epoch, including valid cold epoch 0, and requires a quiet target with no loan. Enable proves endpoint geometry, DATA0, NAK and active state before unmasking that direction; disable masks it before withdrawing active. Neither starts a transfer. Repeated enable preserves DATA1/HALT; explicit disable/enable establishes fresh DATA0 only after proof. Other directions and their loans remain owned. After actual reset drain, common software explicitly masks/deactivates nonzero directions on both families; this does not assert an unproved GD reset side effect. Reset, clear-halt and submit never activate a nonzero endpoint."
-msgstr "activation 控制一个已经选定的非零 endpoint 方向；EP0 单独处理。冷启动仅激活并解除 EP0 的 mask。setter 使用当前软件 epoch，冷态 epoch 0 合法，目标必须静止且无借用。enable 先证明 endpoint 几何、DATA0、NAK 与 active，再解除该方向 mask；disable 先屏蔽再清 active。两者均不启动传输。重复 enable 保留 DATA1/HALT；显式 disable/enable 仅在证明成立后建立新 DATA0。其他方向及其借用继续受原所有权约束。reset 实际排空后，公共软件在两系列上显式屏蔽并反激活非零方向；这不宣称 GD 有未经证明的 reset 副作用。reset、clear-halt 和 submit 从不激活非零 endpoint。"
+#: io/README.md:2
+msgid "Typed I/O contracts and shared mechanisms"
+msgstr "类型化 I/O 合同与共享机制"
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:71
-msgid "A failed post-write proof may have partial effects: IO closes admission, retains clock/storage and requires continued drain plus explicit full stop. External Chapter 9 policy stages selected endpoints before status IN, gates ordinary packet admission until configured readiness is committed, and owns rollback or stop on superseding SETUP/status failure. The setter is not a configuration transaction. The [USB packet contract](/design/usb-device.md) retains FIG-16 and the full IO-35, class/configuration and physical HIL limits."
-msgstr "写入后的证明失败可能已有部分效果：IO 关闭准入并保留 clock/storage，要求继续排空及显式完整 stop。外部 Chapter 9 策略在 status IN 之前 stage 选定 endpoint，在 configured readiness 提交之前阻止普通 packet 准入，并在被新 SETUP 取代或 status 失败时负责回滚或 stop。setter 不是配置事务。[USB packet 合同](/design/usb-device.md) 保留 FIG-16，以及完整 IO-35、class/configuration 和物理 HIL 的边界。"
+#: io/README.md:4
+msgid ""
+"Public C11 interfaces cover GPIO, UART, SPI, I2C, physical Flash, watchdog, "
+"interrupt/timer/acquisition mechanisms, CAN, USB, Ethernet and selected "
+"RTC/LPTIM contracts. The [derived capability "
+"matrix](/delivery/capabilities.md) identifies actual provider modes and "
+"reviewed routes. An interface header alone does not provide every operation "
+"on every chip or authorize PCB wiring."
+msgstr ""
+"公共 C11 接口覆盖 GPIO、UART、SPI、I2C、物理 Flash、watchdog、中断／定时／采集机制、CAN、USB、Ethernet "
+"和选定的 RTC／LPTIM 合同。[派生能力矩阵](/delivery/capabilities.md)标明实际 provider "
+"模式和已审路由。仅有接口头文件不代表每款芯片提供全部操作，也不授权 PCB 接线。"
+
+#: docs/explanation/source-map.md:60
+msgid "Source group"
+msgstr "源码组"
+
+#: docs/explanation/source-map.md:60
+msgid "Responsibility"
+msgstr "责任"
+
+#: docs/explanation/source-map.md:60
+msgid "`include/nexus/io/`"
+msgstr "`include/nexus/io/`"
+
+#: docs/explanation/source-map.md:60
+msgid "Stable public Nexus types and operation/ownership contracts"
+msgstr "稳定公共 Nexus 类型与操作／所有权合同"
+
+#: docs/explanation/source-map.md:60
+msgid "`src/api/`"
+msgstr "`src/api/`"
+
+#: docs/explanation/source-map.md:60
+msgid "Checked dispatch through the selected immutable face"
+msgstr "通过所选不可变 face 校验并分派"
+
+#: docs/explanation/source-map.md:60
+msgid "`src/mechanisms/`"
+msgstr "`src/mechanisms/`"
+
+#: docs/explanation/source-map.md:60
+msgid "Shared stream, DMA drain, wake, transaction and observation rules"
+msgstr "共享 stream、DMA 排空、唤醒、事务与观察规则"
+
+#: docs/explanation/source-map.md:60
+msgid "`src/controllers/`"
+msgstr "`src/controllers/`"
+
+#: docs/explanation/source-map.md:60
+msgid ""
+"Shared CAN, USB and Ethernet controller engines selected by SoC targets"
+msgstr "由 SoC 目标选择的共享 CAN、USB 和 Ethernet 控制器引擎"
+
+#: docs/explanation/source-map.md:60
+msgid "`private/`"
+msgstr "`private/`"
+
+#: docs/explanation/source-map.md:60
+msgid ""
+"Private engine structures, hardware boundaries and direct provider templates"
+msgstr "私有引擎结构、硬件边界和直接 provider 模板"
+
+#: docs/explanation/source-map.md:60
+msgid "`../soc/native/drivers/`"
+msgstr "`../soc/native/drivers/`"
+
+#: docs/explanation/source-map.md:60
+msgid "Independent host models implementing the same public faces"
+msgstr "实现相同公共 face 的独立主机模型"
+
+#: docs/explanation/source-map.md:60
+msgid "`../soc/<vendor>/<family>/drivers/`"
+msgstr "`../soc/<vendor>/<family>/drivers/`"
+
+#: docs/explanation/source-map.md:60
+msgid "Exact MCU provider and mode implementations"
+msgstr "精确 MCU provider 与模式实现"
+
+#: io/README.md:20
+msgid ""
+"Every selected instance has a readonly face containing shared readonly "
+"methods and an independent private context. On a 32-bit target the face "
+"occupies eight bytes of readonly storage; method tables, mutable state, "
+"selected buffers and linked code have separate costs. Generated instances "
+"use exact static storage; explicit constructors use storage provided by "
+"their owner. Public consumers receive no vendor register layout or SDK state"
+" type."
+msgstr ""
+"每个所选实例拥有一个只读 face，其中包含共享只读方法和独立私有 context。在 32 位目标上，face "
+"占用八字节只读存储；方法表、可变状态、所选缓冲和链接代码的成本分别计算。生成实例使用精确静态存储；显式构造器使用其所有者供给的存储。公共消费者不会获得厂商寄存器布局或"
+" SDK 状态类型。"
+
+#: io/README.md:27
+msgid ""
+"Public operations validate the face and dispatch `ops(context, ...)`. "
+"Providers can use direct private calls within their register hot paths. A "
+"missing optional method reports `NX_ERROR_UNSUPPORTED`. Different "
+"provider/mode tables coexist without replacing public symbols. IRQ entries "
+"are fixed to the selected concrete instances and do not look up a factory "
+"for each byte."
+msgstr ""
+"公共操作校验 face，再分派 `ops(context, ...)`。provider 可在寄存器热路径内使用私有直接调用。缺失的可选方法返回 "
+"`NX_ERROR_UNSUPPORTED`。不同 provider／模式的方法表可并存，无须替换公共符号。IRQ "
+"入口固定连接所选具体实例，不逐字节查询 factory。"
+
+#: io/README.md:33
+msgid ""
+"Generated factory getters return existing identities. Lookup, Platform "
+"start, request admission, service, recovery and stop remain separate "
+"actions. Controller and endpoint identities stay distinct for SPI/I2C buses."
+" New products should use the generated strong-reference header; see the "
+"[factory contract](/explanation/factory.md) for headers and ID lifetime."
+msgstr ""
+"生成的 factory getter 返回已有身份。查找、Platform 启动、请求接纳、service、恢复和停止仍是独立动作。SPI／I2C "
+"总线的控制器与端点身份保持独立。新产品应使用生成的强类型引用头；头文件和 ID 生命周期参见 [factory "
+"合同](/explanation/factory.md)。"
+
+#: io/README.md:39
+msgid ""
+"The direct path has one serialized executor in each operation's allowed "
+"context. Requests and transfer buffers remain caller-owned through acquire-"
+"observed SETTLED. Cancel, deadline and failed drain never revoke a borrow. A"
+" provider withdraws hardware, IRQ and deferred references before its final "
+"release publication; QUARANTINED storage and cleanup responsibility remain "
+"retained. The [ownership table](/explanation/ownership.md) distinguishes "
+"direct calls, fixed IRQ work, cross-task adapters, waiting and shutdown."
+msgstr ""
+"直接路径在每项操作允许的上下文中由单一串行执行者推进。请求与传输缓冲由调用者拥有，并须保持到 acquire 观察 "
+"SETTLED。取消、deadline 和排空失败绝不撤销借用。provider 在最终 release 发布前撤回硬件、IRQ "
+"和延迟引用；QUARANTINED 存储与清理责任继续保留。[所有权表](/explanation/ownership.md)区分直接调用、固定 IRQ"
+" 工作、跨任务 adapter、等待和停机。"
+
+#: io/README.md:47
+msgid ""
+"Stream reserve, publish, acquire, release, abort and stop access a constant "
+"amount of metadata independent of block count. Stop checks the outstanding "
+"count and does not scan or revoke borrowed blocks under an interrupt mask. "
+"Cold storage-overlap validation examines the complete selected block set; it"
+" has a different cost. These software complexity contracts do not establish "
+"physical IRQ latency."
+msgstr ""
+"stream 的 reserve、publish、acquire、release、abort 和 stop 访问的元数据数量固定，与块数无关。stop "
+"检查未归还计数，不在中断屏蔽期间扫描或撤销借出的块。冷态存储重叠校验检查完整所选块集合，具有不同成本。这些软件复杂度合同不建立物理 IRQ 延迟资格。"
+
+#: io/README.md:53
+msgid ""
+"DMA memory completion, peripheral wire completion and request settlement are"
+" separate facts. Providers check exact DMA reachability, selected domains, "
+"Cache ownership and real source withdrawal. Finite and continuous modes have"
+" distinct loan/rearm/backpressure contracts. Default paths add no mandatory "
+"OS locks, hidden driver tasks or universal buffer pools. The [DMA and stream"
+" contracts](/design/io-evolution.md) own exact scope."
+msgstr ""
+"DMA 内存完成、外设线上完成和请求结清是不同事实。provider 检查精确 DMA 可达性、所选域、Cache "
+"所有权和真实源撤回。有限模式与连续模式具有不同借用／重装／背压合同。默认路径不增加强制 OS 锁、隐藏驱动任务或通用缓冲池。精确范围由 [DMA 与 "
+"stream 合同](/design/io-evolution.md)规定。"
+
+#: io/README.md:60
+msgid ""
+"The optional [USB activation contract](/design/usb-device.md) keeps a "
+"separate immutable activation face and the existing provider context. Its "
+"selected nonzero endpoint setter is a bounded controller action; external "
+"Chapter 9 policy owns configuration, rollback and ordinary packet admission."
+" It adds no default worker or configuration transaction. The public "
+"declaration retains its context, partial-effect and full-stop obligations."
+msgstr ""
+"可选 [USB 激活合同](/design/usb-device.md)保留独立不可变激活 face 和已有 provider "
+"context。其所选非零端点 setter 是有界控制器动作；外部 Chapter 9 政策拥有配置、回退和普通数据包接纳责任。它不增加默认 "
+"worker 或配置事务。公共声明继续规定上下文、部分效果和完整停止义务。"
+
+#: io/README.md:67
+msgid ""
+"Native, production-register models, selected ARM links and physical HIL "
+"establish different evidence. Independent instance state and source-"
+"directory organization do not establish electrical behavior, measured timing"
+" or losslessness under arbitrary load. MCU physical HIL remains "
+"`not_executed`."
+msgstr ""
+"Native、生产寄存器模型、所选 ARM 链接和实物 HIL "
+"分别建立不同证据。独立实例状态和源码目录组织不能证明电气行为、实测时序或任意负载下无丢失。MCU 实物 HIL 仍为 `not_executed`。"
+
+#: os/README.md:9
+msgid ""
+"The common public abstraction is the wait/wake port. Task, queue, join and "
+"storage APIs are deliberately backend-specific and expose the selected "
+"kernel's real control-block requirements. A product switching kernels adapts"
+" its task lifecycle explicitly; the platform supplies no universal "
+"Task/Queue ABI or maximum storage pool."
+msgstr ""
+"共同公共抽象是等待／唤醒端口。任务、队列、join 和存储 API "
+"有意采用后端专用形式，暴露所选内核的真实控制块要求。产品切换内核时显式适配任务生命周期；平台不提供通用 Task／Queue ABI 或最大存储池。"
+
+#: components/README.md:9
+msgid ""
+"General mechanisms remain in their named component directories. Exact STM32 "
+"extensions live under `components/soc/stm32/`, including selected F407 "
+"handoff/I2S2 and U575 retained-time/LPDMA/Stop2 mechanisms. Their public "
+"include paths and explicit target names stay stable. This source grouping "
+"does not broaden the supported chip, backend, clock, security or physical "
+"qualification scope."
+msgstr ""
+"通用机制保留在各自命名的组件目录。精确 STM32 扩展位于 `components/soc/stm32/`，包括所选 F407 "
+"handoff／I2S2 和 U575 retained-time／LPDMA／Stop2 "
+"机制。其公共头路径和显式目标名称保持稳定。这种源码分组不会扩大支持的芯片、后端、时钟、安全域或实物资格范围。"
+
+#: soc/README.md:2
+msgid "SoC packages and private providers"
+msgstr "SoC 包与私有 provider"
+
+#: soc/README.md:4
+msgid ""
+"MCU source ownership follows the vendor and exact maintained family. Public "
+"family identifiers such as `stm32f407` and `gd32f470` remain unchanged. The "
+"maintained family descriptor supplies the canonical source directory; "
+"directory names do not create another configuration authority or a runtime "
+"registry."
+msgstr ""
+"MCU 源码所有权按厂家和精确维护系列划分。`stm32f407`、`gd32f470` "
+"等公共系列标识保持不变。维护中的系列描述符提供规范源码目录；目录名称不产生另一份配置权威或运行时登记表。"
+
+#: soc/README.md:20
+msgid ""
+"Each MCU family owns `soc.json`, `routes.json`, its private controller "
+"state, selected driver sources and explicit CMake targets. Startup, clocks, "
+"timebase, memory and power code remain with that family. Common register "
+"algorithms are shared only after every wrapper checks the real vendor "
+"layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do"
+" not establish equivalence."
+msgstr ""
+"每个 MCU 系列拥有 `soc.json`、`routes.json`、私有控制器状态、所选驱动源码和显式 CMake "
+"目标。启动、时钟、时间基准、内存和电源代码仍归该系列所有。只有各包装层分别检查真实厂商寄存器布局、位、时钟、IRQ／DMA "
+"路由和勘误后，才共享通用寄存器算法。相似的外设名称不能证明实现等价。"
+
+#: soc/README.md:26
+msgid ""
+"`native/drivers/` implements the public I/O contracts as independent host "
+"models; it does not establish MCU timing or electrical behavior. `common/` "
+"remains cross-vendor because its reviewed algorithms serve both STM32 and "
+"GD32."
+msgstr ""
+"`native/drivers/` 用独立主机模型实现公共 I/O 合同，不建立 MCU 时序或电气行为资格。`common/` "
+"保持跨厂家归属，因为其中经过审查的算法同时服务 STM32 和 GD32。"
+
+#: soc/README.md:30
+msgid ""
+"The [Board packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/boards/README.md) authorize reviewed PCB bindings. "
+"Adding a Board does not enable a new clock tree automatically: select an "
+"exact maintained clock profile, or implement and verify another profile. "
+"Keep unsupported oscillators, domains, modes and silicon revisions explicit."
+msgstr ""
+"[Board 包](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/boards/README.md)授权经过审查的 PCB 绑定。增加 Board 不会自动启用新的时钟树：应选择精确维护的时钟 "
+"profile，或实现并验证另一 profile。不支持的晶振、域、模式和硅片修订须明确保留。"
+
+#: soc/README.md:35
+msgid ""
+"Use the [provider guide](/guides/provider-porting.md) for implementation, "
+"the [derived matrix](/delivery/capabilities.md) for selected routes and "
+"modes, and the [qualification guide](/reference/platforms/qualification.md) "
+"for actual evidence. CPU support, SDK macros and source-directory presence "
+"do not establish whole-family support. MCU physical HIL remains "
+"`not_executed`."
+msgstr ""
+"实现遵循 [provider 指南](/guides/provider-"
+"porting.md)，所选路由和模式参见[派生矩阵](/delivery/capabilities.md)，实际证据参见[资格指南](/reference/platforms/qualification.md)。CPU"
+" 支持、SDK 宏和源码目录存在均不建立整个系列的支持资格。MCU 实物 HIL 仍为 `not_executed`。"
+
+#: docs/explanation/source-map.md:95
+msgid "Board packages"
+msgstr "Board 包"
+
+#: boards/README.md:2
+msgid "Reviewed Board facts"
+msgstr "经过审查的 Board 事实"
+
+#: boards/README.md:4
+msgid ""
+"A Board package records PCB/source identity, the exact SoC, oscillators, "
+"reviewed controller bindings, safe initial levels, reserved resources, "
+"provenance and explicitly unknown electrical facts. It reuses the selected "
+"[SoC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/README.md); it does not copy drivers or vendor SDKs."
+msgstr ""
+"Board 包记录 PCB／来源身份、精确 SoC、晶振、已审控制器绑定、安全初始电平、保留资源、资料来源，以及明确未知的电气事实。它复用所选 [SoC"
+" provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/README.md)，不复制驱动或厂商 SDK。"
+
+#: boards/README.md:15
+msgid ""
+"Private PCB packages belong in external product repositories and are "
+"selected through `board_package`. Maintained public packages are selected "
+"through `board`. Keep the family identifier independent of the "
+"manufacturer's physical directory. Board declarations cannot change a chip's"
+" memory geometry or enable an unmaintained clock profile, DMA route or "
+"controller mode."
+msgstr ""
+"私有 PCB 包属于外部产品仓库，通过 `board_package` 选择。维护中的公共包通过 `board` "
+"选择。系列标识须独立于厂家的物理目录。Board 声明不能改变芯片内存几何，也不能启用未维护的时钟 profile、DMA 路由或控制器模式。"
+
+#: boards/README.md:21
+msgid ""
+"Start with an exact part and a small reviewed route set, then follow the "
+"[Board porting guide](/guides/board-porting.md). A syntactically valid JSON "
+"file does not establish fitted components, connector continuity, power "
+"supply or physical timing. Uninspected PCB revisions and jumpers remain "
+"unknown; software fixtures do not qualify a real PCB. MCU physical HIL "
+"remains `not_executed`."
+msgstr ""
+"从精确料号和少量已审路由开始，再遵循 [Board 接入指南](/guides/board-porting.md)。JSON "
+"语法有效不能证明器件装配、连接器导通、电源或物理时序。未检查的 PCB 修订和跳线仍为未知；软件夹具不建立真实 PCB 的资格。MCU 实物 HIL "
+"仍为 `not_executed`。"

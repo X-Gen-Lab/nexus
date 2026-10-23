@@ -1,7 +1,0 @@
-{
-  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
-  "external/gd32-first-freertos.toml": "/workspace/nexus-config-iteration-evidence/can-arm-matrix-green/gd32-first-freertos.toml",
-  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
-  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json",
-  "tests/contracts/can_assembly/gd32_board/board.json": "/workspace/nexus/tests/contracts/can_assembly/gd32_board/board.json"
-}

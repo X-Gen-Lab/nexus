@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ad5817cc175469415cf53e1ab3a5724f57a657afc910b8f2c55eff524f52852d\n"
+"X-Nexus-Source-SHA256: a167559a6e9c22a2e93002044f83eaa82c96d3cdfa4f7a8f01b10afdfbc8aa2c\n"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
@@ -207,11 +207,11 @@ msgstr "budgets"
 msgid "Bounded IRQ and service execution observation"
 msgstr "有界 IRQ 与 service 执行观察"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py"
+"io/include/nexus/io/cycle_probe.h;io/src/mechanisms/cycle_probe.c;tools/configure/factory.py"
 msgstr ""
-"io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py"
+"io/include/nexus/io/cycle_probe.h;io/src/mechanisms/cycle_probe.c;tools/configure/factory.py"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Optional probes compile out; explicit service and IRQ budgets"
@@ -230,11 +230,11 @@ msgstr "stream"
 msgid "Rate block hold-time loss and backpressure budgets"
 msgstr "速率、block 持有时间、丢失与背压预算"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c"
+"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/mechanisms/stream_profile.c"
 msgstr ""
-"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c"
+"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/mechanisms/stream_profile.c"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Actual selected-provider configuration validates stream budget"
@@ -299,11 +299,11 @@ msgstr "resources"
 msgid "Hierarchical controller base channel resource claims"
 msgstr "分层 controller、base 与 channel 资源声明"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
+"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
 msgstr ""
-"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
+"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
@@ -319,11 +319,11 @@ msgstr "IO-10"
 msgid "Physical peripheral identity and mutually exclusive personalities"
 msgstr "物理外设身份与互斥工作模式"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json"
+"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32/stm32g474/soc.json"
 msgstr ""
-"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json"
+"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32/stm32g474/soc.json"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Canonical aliases and personality conflicts rejected"
@@ -415,12 +415,12 @@ msgstr "IO-15"
 msgid "Bounded FIFO IRQ service and concurrent stream load"
 msgstr "有界 FIFO IRQ service 与并发 stream 负载"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
+"io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
 "fifo.md"
 msgstr ""
-"io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
+"io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
 "fifo.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -440,11 +440,11 @@ msgstr "spi"
 msgid "Whole-CS segments dummy cycles and 8/16-bit words"
 msgstr "完整 CS 区间分段、dummy cycle 与 8/16-bit word"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c"
+"io/include/nexus/io/spi_dma_owner_binding.h;soc/native/drivers/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32/stm32f407/drivers/spi_dma.c;soc/gd32/gd32f470/drivers/spi_dma.c"
 msgstr ""
-"io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c"
+"io/include/nexus/io/spi_dma_owner_binding.h;soc/native/drivers/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32/stm32f407/drivers/spi_dma.c;soc/gd32/gd32f470/drivers/spi_dma.c"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Native STM32F407 GD32F470 polling then async DMA loan and drain"
@@ -486,12 +486,12 @@ msgstr "adc"
 msgid "Explicit sample formats groups triggers and provenance"
 msgstr "显式采样格式、分组、触发与来源"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-"
+"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/api/adc_group.c;soc/stm32/stm32g474/drivers/adc_group.c;docs/design/adc-"
 "group.md"
 msgstr ""
-"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-"
+"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/api/adc_group.c;soc/stm32/stm32g474/drivers/adc_group.c;docs/design/adc-"
 "group.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -511,11 +511,11 @@ msgstr "pwm"
 msgid "Atomic multi-channel shadow commit and break fault handling"
 msgstr "原子多通道 shadow 提交与 break fault 处理"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
+"io/include/nexus/io/pwm_group.h;soc/stm32/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
 msgstr ""
-"io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
+"io/include/nexus/io/pwm_group.h;soc/stm32/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Single timer owner; no automatic restart after break"
@@ -534,11 +534,11 @@ msgstr "capture"
 msgid "Counter widths filters encoders and overcapture"
 msgstr "counter 位宽、filter、encoder 与 overcapture"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c"
+"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32/stm32g474/drivers/timer_capture.c;soc/stm32/stm32g474/drivers/encoder.c"
 msgstr ""
-"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c"
+"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32/stm32g474/drivers/timer_capture.c;soc/stm32/stm32g474/drivers/encoder.c"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Wrap-safe capture and reviewed encoder modes on real providers"
@@ -557,12 +557,12 @@ msgstr "timestamps"
 msgid "Timestamp source domain epoch frequency and uncertainty"
 msgstr "时间戳来源、domain、epoch、频率与不确定度"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
+"io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
 "frames.md"
 msgstr ""
-"io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
+"io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
 "frames.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -583,9 +583,9 @@ msgstr "diagnostics"
 msgid "Optional state recovery ownership and checked service entry"
 msgstr "可选状态、恢复所有权与受检 service 入口"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "io/src/observation.c"
-msgstr "io/src/observation.c"
+#: docs/status/ledgers/io-evolution.md:26
+msgid "io/src/mechanisms/observation.c"
+msgstr "io/src/mechanisms/observation.c"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Checked dispatch is distinct from I/O progress or settlement"
@@ -604,11 +604,11 @@ msgstr "memory"
 msgid "Remove unused TX DMA fields from RX-only providers"
 msgstr "移除 RX-only provider 未使用的 TX DMA 字段"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
+"soc/stm32/stm32f407/drivers/uart_receive.c;soc/stm32/stm32f407/drivers/uart_duplex.c;soc/gd32/gd32f470/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
 msgstr ""
-"soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
+"soc/stm32/stm32f407/drivers/uart_receive.c;soc/stm32/stm32f407/drivers/uart_duplex.c;soc/gd32/gd32f470/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Fresh linked RAM measurements and duplex lifecycle regression"
@@ -645,11 +645,11 @@ msgstr "providers"
 msgid "Reuse reviewed peripheral IP generations and official HAL/LL"
 msgstr "复用受审外设 IP 代际及官方 HAL/LL"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py"
+"soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py"
 msgstr ""
-"soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py"
+"soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Private implementation sharing with exact per-family facts"
@@ -668,12 +668,12 @@ msgstr "h743"
 msgid "Cold PLL voltage latency and kernel-clock profiles"
 msgstr "冷 PLL、电压、latency 与内核时钟 profile"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
+"soc/stm32/stm32h743/clock.c;soc/stm32/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
 "clock.md"
 msgstr ""
-"soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
+"soc/stm32/stm32h743/clock.c;soc/stm32/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
 "clock.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -706,12 +706,12 @@ msgstr "u575"
 msgid "Finite GPDMA provider and USART errata handling"
 msgstr "有限 GPDMA provider 与 USART 勘误处理"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
+"soc/stm32/stm32u575/drivers/uart_dma.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
 "gpdma.md"
 msgstr ""
-"soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
+"soc/stm32/stm32u575/drivers/uart_dma.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
 "gpdma.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -731,12 +731,12 @@ msgstr "g474"
 msgid "Synchronous PWM ADC trigger and comparator break reference"
 msgstr "同步 PWM、ADC 触发与 comparator break 参考"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
+"io/include/nexus/io/pwm_adc.h;soc/stm32/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
 "adc.md"
 msgstr ""
-"io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
+"io/include/nexus/io/pwm_adc.h;soc/stm32/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
 "adc.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -760,12 +760,12 @@ msgstr "power"
 msgid "Optional runtime clock and power transitions"
 msgstr "可选运行时 clock 与 power 转换"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-"
+"tools/configure/runtime_power.py;soc/stm32/stm32h743/system.c;docs/design/clock-"
 "domain-sleep.md"
 msgstr ""
-"tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-"
+"tools/configure/runtime_power.py;soc/stm32/stm32h743/system.c;docs/design/clock-"
 "domain-sleep.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -785,12 +785,12 @@ msgstr "pinctrl"
 msgid "Explicit default sleep safe levels wake and retention"
 msgstr "显式 default/sleep 安全电平、wake 与 retention"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
+"io/include/nexus/io/pin_state.h;soc/stm32/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
 "pin-states.md"
 msgstr ""
-"io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
+"io/include/nexus/io/pin_state.h;soc/stm32/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
 "pin-states.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -823,12 +823,12 @@ msgstr "canfd"
 msgid "CAN FD payload timing BRS ESI and message RAM"
 msgstr "CAN FD payload、timing、BRS、ESI 与消息 RAM"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
+"io/include/nexus/io/can_fd.h;soc/stm32/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
 "fd.md"
 msgstr ""
-"io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
+"io/include/nexus/io/can_fd.h;soc/stm32/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
 "fd.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -848,12 +848,12 @@ msgstr "ethernet"
 msgid "VLAN scatter gather frame loans and hardware timestamps"
 msgstr "VLAN、SG frame loan 与硬件时间戳"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
+"io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
 "frames.md"
 msgstr ""
-"io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
+"io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
 "frames.md"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
@@ -873,9 +873,11 @@ msgstr "usb"
 msgid "Optional class adapters and exact PHY endpoint capabilities"
 msgstr "可选 class adapter 与精确 PHY/endpoint 能力"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "io/src/usb_device_controller.c;io/native/usb_device.c;components"
-msgstr "io/src/usb_device_controller.c;io/native/usb_device.c;components"
+#: docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
+msgstr ""
+"io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
 
 #: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Control reset ACK ZLP and device mode before additional USB modes"
@@ -1000,30 +1002,47 @@ msgstr "camera/display/accelerator 的 planar 与 strided buffer"
 msgid "Frame completion backpressure external memory and 2D DMA ownership"
 msgstr "frame 完成、背压、外部内存与 2D DMA 所有权"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"tools/configure/dma_topology.py;soc/stm32/stm32u575/drivers/uart_dma_chain.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
 "chain.toml"
 msgstr ""
-"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"tools/configure/dma_topology.py;soc/stm32/stm32u575/drivers/uart_dma_chain.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
 "chain.toml"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"soc/stm32/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
 "ram.md"
 msgstr ""
-"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"soc/stm32/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
 "ram.md"
 
+#: docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+"soc/stm32/stm32h743;soc/stm32/stm32h743/drivers/uart_continuous.c;soc/stm32/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32/stm32h743/drivers/uart_duplex.c;soc/stm32/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
+"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
+"on.toml;tools/configure/assemblies/h743-uart-duplex-"
+"continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-"
+"cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
 msgstr ""
-"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+"soc/stm32/stm32h743;soc/stm32/stm32h743/drivers/uart_continuous.c;soc/stm32/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32/stm32h743/drivers/uart_duplex.c;soc/stm32/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
+"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
+"on.toml;tools/configure/assemblies/h743-uart-duplex-"
+"continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-"
+"cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
 
-# Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
-msgstr "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
+#: docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;soc/native/drivers/rtc_lptim.c;soc/stm32/stm32u575/drivers/lptim.c;soc/stm32/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-"
+"run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-"
+"boundaries.md"
+msgstr ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;soc/native/drivers/rtc_lptim.c;soc/stm32/stm32u575/drivers/lptim.c;soc/stm32/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-"
+"run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-"
+"boundaries.md"
 
 # Authoritative CSV machine identity; retained unchanged in both locales.
 msgid "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
@@ -1043,15 +1062,36 @@ msgstr "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/con
 msgid "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
 msgstr "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
 
-
 msgid "partial_exact_reference_implemented"
 msgstr "partial_exact_reference_implemented"
 
-msgid "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
-msgstr "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+#: docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32/stm32u575;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-"
+"copy-"
+"stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-"
+"copy.c"
+msgstr ""
+"soc/stm32/stm32u575;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-"
+"copy-"
+"stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-"
+"copy.c"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
-msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2c0e65267d3500d36fdde78ed67bd55e2c8987df928e36dfd847d43ddb98d271`。"
+msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2c0e65267d3500d36fdde78ed67bd55e2c8987df928e36dfd847d43ddb98d271`。"
 
-msgid "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
-msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+#: docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io;soc;io/include/nexus/io/frame_stream.h;io/src/mechanisms/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-"
+"extension-"
+"boundaries.md;components/soc/stm32/f407_i2s2_slave_tx;soc/stm32/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-"
+"tx.toml;tools/configure/assemblies/qiming-i2s2-slave-"
+"tx.toml;docs/design/f407-i2s2-slave-"
+"tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+msgstr ""
+"io;soc;io/include/nexus/io/frame_stream.h;io/src/mechanisms/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-"
+"extension-"
+"boundaries.md;components/soc/stm32/f407_i2s2_slave_tx;soc/stm32/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-"
+"tx.toml;tools/configure/assemblies/qiming-i2s2-slave-"
+"tx.toml;docs/design/f407-i2s2-slave-"
+"tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"

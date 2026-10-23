@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="2" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T16:04:37.735" name="AllTests">
-  <testsuite name="Stm32UartReceive" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T16:04:37.735">
-    <testcase name="StartProgramsCallerBufferWithoutCpuPayloadCopy" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="66" status="run" result="completed" time="0." timestamp="2026-10-11T16:04:37.735" classname="Stm32UartReceive" />
-    <testcase name="InvalidFutureBufferRejectsWithoutLoanOrMmioEffect" file="/workspace/nexus/tests/google/stm32_uart_receive_test.cpp" line="77" status="run" result="completed" time="0." timestamp="2026-10-11T16:04:37.735" classname="Stm32UartReceive" />
-  </testsuite>
-</testsuites>

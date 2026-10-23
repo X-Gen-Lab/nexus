@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 5d2e781ea5e0e1bfb26f6e08f96913088436932c25ef064adf27cce2f7ad4778\n"
+"X-Nexus-Source-SHA256: dbb093f8120e4e8e759738ab0240f958c8a73cd404faa88b98753d4c2f25a6ab\n"
 
 #: ../../../../../tmp/nexus-h743-spi-safe-stop-20261018/docs/reference/api/io.md:8
 msgid "Typed I/O: devices and execution contracts"
@@ -7491,7 +7491,6 @@ msgstr "一个静态拥有的 provider；不执行发现，也不按寄存器分
 msgid "Immutable face; provider storage and plans outlive every use."
 msgstr "不可变公共接口对象；provider 存储与计划的生命周期须覆盖每次使用。"
 
-
 msgid ""
 "A timing bound can straddle a budget without proving either side."
 msgstr ""
@@ -7548,7 +7547,6 @@ msgid ""
 msgstr ""
 "仅当 delta.uncertainty_known 为 true 时 lower／upper 才可使用。否则两者均为零，verdict 为 "
 "UNKNOWN，绝不表示精确的零。"
-
 
 msgid ""
 "usb_profile.h"
@@ -7707,3 +7705,22 @@ msgstr "可选的 controller 操作；操作缺失时返回 UNSUPPORTED。"
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/api/io.md:346
 msgid "Immutable borrowed face, using the existing controller context."
 msgstr "不可变的借用 face，使用既有 controller context。"
+
+#: docs/reference/api/io.md:128
+msgid "fwd.h"
+msgstr "fwd.h"
+
+#: docs/reference/api/io.md:130
+msgid "Lightweight identities for typed I/O faces."
+msgstr "类型化 I/O face 的轻量身份。"
+
+#: docs/reference/api/io.md:130
+msgid ""
+"Include the matching public header before accessing its layout, operations, "
+"requests or value types. Forward identities neither construct nor acquire "
+"any device."
+msgstr "访问其布局、操作、请求或值类型前，须包含对应公共头文件。前置身份既不构造也不取得任何设备。"
+
+#: docs/reference/api/io.md:130
+msgid "Opaque identity; complete contracts live in its public header."
+msgstr "不透明身份；完整合同位于其公共头文件。"

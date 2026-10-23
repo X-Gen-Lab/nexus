@@ -9,10 +9,10 @@
 #define NEXUS_TIMER_H
 
 #include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_pwm_port nx_pwm_port_t;
 /**
  * \brief           PWM counts refer to the fixed declared post-prescaler timer
  *                  clock.

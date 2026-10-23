@@ -1,8 +1,0 @@
-[1/8] Building C object core/CMakeFiles/nexus_core.dir/src/stack_observation.c.o
-[2/8] Linking C static library lib/libnexus_core.a
-[3/8] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/can-factory-stm32/bindings.c.o
-[4/8] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/can-factory-gd32/bindings.c.o
-[5/8] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_can_factory_test.dir/can_factory_test.cpp.o
-[6/8] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_can_factory_test.dir/can_factory_test.cpp.o
-[7/8] Linking CXX executable bin/nexus_gd32_can_factory_test
-[8/8] Linking CXX executable bin/nexus_stm32_can_factory_test

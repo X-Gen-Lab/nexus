@@ -3,12 +3,12 @@
 foreach(timer_family stm32f407 gd32f470)
     set(timer_target "nexus_${timer_family}_timer_advanced_test")
     nexus_google_test(${timer_target} SOURCES timer_advanced_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${timer_family}/drivers/timer_capture.c"
-        "${NEXUS_SOURCE_DIR}/soc/${timer_family}/drivers/advanced_pwm.c"
-        "${NEXUS_SOURCE_DIR}/io/src/timer_capture.c"
-        "${NEXUS_SOURCE_DIR}/io/src/advanced_pwm.c"
+        "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/timer_capture.c"
+        "${NEXUS_SOC_SOURCE_${timer_family}}/drivers/advanced_pwm.c"
+        "${NEXUS_SOURCE_DIR}/io/src/api/timer_capture.c"
+        "${NEXUS_SOURCE_DIR}/io/src/api/advanced_pwm.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/${timer_family}/private"
+        INCLUDES "${NEXUS_SOC_SOURCE_${timer_family}}/private"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include"
             "${NEXUS_SOURCE_DIR}/io/private")

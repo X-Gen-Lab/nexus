@@ -7,6 +7,7 @@
 #define NEXUS_IO_CAN_H
 
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
@@ -72,10 +73,10 @@ typedef struct {
 } nx_can_ops_t;
 /** \brief Immutable face; lookup does not allocate, start or acquire hardware.
  */
-typedef struct {
+struct nx_can_port {
     const nx_can_ops_t* ops;
     void* context;
-} nx_can_port_t;
+};
 
 /**
  * \brief Validate and copy a classic frame into unborrowed request storage.

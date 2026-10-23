@@ -164,7 +164,7 @@ if(NEXUS_OS_MEMORY_PROTECTION)
     if(NEXUS_OS_MPU_GPIO)
         target_sources(nexus_os_freertos PRIVATE mpu/gpio.c)
         target_include_directories(nexus_os_freertos PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32u575/private")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private")
         target_link_libraries(nexus_os_freertos PRIVATE nexus_io
             nexus_soc_stm32u575)
         add_library(Nexus::U575MpuGpio ALIAS nexus_os_freertos)

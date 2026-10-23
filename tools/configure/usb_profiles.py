@@ -52,8 +52,8 @@ def emit_activation(result):
     """Expose selected controller operations independently of ROM metadata."""
     controllers = [item for item in result.controllers
                    if item.kind == "usb_device"]
-    header = ['#include "nexus/io/usb_activation.h"',
-              '/** \\brief Fixed controller activation identity, or NULL.',
+    header = (['#include "nexus/io/usb_activation.h"'] if controllers else [])
+    header += ['/** \\brief Fixed controller activation identity, or NULL.',
               ' * \\note Task/ISR safe; no start, locks or hardware access.',
               ' */',
               'const nx_usb_activation_port_t* nx_factory_usb_activation(',

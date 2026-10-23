@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 3b70058c0d1452d3b698164d63c7530369687ce9b16dee7ccee5668b4b484b4a\n"
+"X-Nexus-Source-SHA256: b2673cf0ebc1bdc3b35a8f220c51a614296f5a037ab1400438621c7c0b300e42\n"
 
 msgid "I/O 完善台账"
 msgstr "I/O 完善台账"
@@ -71,8 +71,9 @@ msgstr "not_executed"
 msgid "`implementation_paths`"
 msgstr "`implementation_paths`"
 
-msgid "soc/stm32f407/drivers/adc.c"
-msgstr "soc/stm32f407/drivers/adc.c"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "soc/stm32/stm32f407/drivers/adc.c"
+msgstr "soc/stm32/stm32f407/drivers/adc.c"
 
 msgid "`evidence_paths`"
 msgstr "`evidence_paths`"
@@ -98,8 +99,9 @@ msgstr "IO-02"
 msgid "ADC retry calibration"
 msgstr "ADC 重试校准"
 
-msgid "soc/gd32f470/drivers/adc.c"
-msgstr "soc/gd32f470/drivers/adc.c"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "soc/gd32/gd32f470/drivers/adc.c"
+msgstr "soc/gd32/gd32f470/drivers/adc.c"
 
 msgid "retry repeats bounded stable reset calibration"
 msgstr "重试会重复有界稳定复位校准"
@@ -225,8 +227,9 @@ msgstr "IO-10"
 msgid "Stream capacity backpressure budget"
 msgstr "stream 容量与背压预算"
 
-msgid "io/src/stream.c;tools/hil"
-msgstr "io/src/stream.c;tools/hil"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/mechanisms/stream.c;tools/hil"
+msgstr "io/src/mechanisms/stream.c;tools/hil"
 
 msgid "bounded capacity and caller policy; no overwritten loans"
 msgstr "有界容量与调用者策略；不覆盖借用项"
@@ -249,10 +252,11 @@ msgstr "IO-12"
 msgid "UART RX DMA and IDLE"
 msgstr "UART RX DMA 与 IDLE"
 
+#: docs/status/ledgers/platform-refinement.md:26
 msgid ""
-"soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c"
+"soc/stm32/stm32f407/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_receive.c"
 msgstr ""
-"soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c"
+"soc/stm32/stm32f407/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_receive.c"
 
 msgid ""
 "tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-"
@@ -279,8 +283,9 @@ msgstr "IO-14"
 msgid "UART RTS CTS and RS485"
 msgstr "UART RTS、CTS 与 RS485"
 
-msgid "io/src/uart_rs485.c;soc;tools/configure"
-msgstr "io/src/uart_rs485.c;soc;tools/configure"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/mechanisms/uart_rs485.c;soc;tools/configure"
+msgstr "io/src/mechanisms/uart_rs485.c;soc;tools/configure"
 
 msgid "tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md"
 msgstr "tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md"
@@ -294,8 +299,9 @@ msgstr "IO-15"
 msgid "Continuous ADC DMA"
 msgstr "连续 ADC DMA"
 
-msgid "io/src/stream.c;soc/*/drivers/adc_continuous.c"
-msgstr "io/src/stream.c;soc/*/drivers/adc_continuous.c"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/mechanisms/stream.c;soc/*/*/drivers/adc_continuous.c"
+msgstr "io/src/mechanisms/stream.c;soc/*/*/drivers/adc_continuous.c"
 
 msgid ""
 "tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-"
@@ -313,8 +319,9 @@ msgstr "IO-16"
 msgid "ADC channel timing expansion"
 msgstr "ADC 通道时序扩展"
 
-msgid "io/src/adc_observer.c;soc;tools/configure"
-msgstr "io/src/adc_observer.c;soc;tools/configure"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/mechanisms/adc_observer.c;soc;tools/configure"
+msgstr "io/src/mechanisms/adc_observer.c;soc;tools/configure"
 
 msgid "sample-time and scan rate hardware bounds"
 msgstr "采样时间和扫描速率的硬件限制"
@@ -325,8 +332,9 @@ msgstr "IO-17"
 msgid "DMA topology facts"
 msgstr "DMA 拓扑事实"
 
-msgid "io/src/dma.c;tools/configure"
-msgstr "io/src/dma.c;tools/configure"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/mechanisms/dma.c;tools/configure"
+msgstr "io/src/mechanisms/dma.c;tools/configure"
 
 msgid "common opaque IDs; provider validates reviewed physical topology"
 msgstr "公共不透明 ID；provider 验证已审查物理拓扑"
@@ -337,8 +345,9 @@ msgstr "IO-18"
 msgid "SPI one-way DMA"
 msgstr "SPI 单向 DMA"
 
-msgid "io/src/spi.c;soc/*/drivers/spi_dma.c"
-msgstr "io/src/spi.c;soc/*/drivers/spi_dma.c"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/api/spi.c;soc/*/*/drivers/spi_dma.c"
+msgstr "io/src/api/spi.c;soc/*/*/drivers/spi_dma.c"
 
 msgid "tools/testing/evidence/spi-memory-arm-commands.json"
 msgstr "tools/testing/evidence/spi-memory-arm-commands.json"
@@ -352,8 +361,10 @@ msgstr "IO-19"
 msgid "I2C interrupt DMA async"
 msgstr "I2C 中断／DMA 异步"
 
-msgid "io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c"
-msgstr "io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/api/i2c.c;soc/common/i2c_v1_async.c;soc/*/*/drivers/i2c_async.c"
+msgstr ""
+"io/src/api/i2c.c;soc/common/i2c_v1_async.c;soc/*/*/drivers/i2c_async.c"
 
 msgid ""
 "tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-"
@@ -371,8 +382,9 @@ msgstr "IO-20"
 msgid "I2C physical bus clear"
 msgstr "I2C 物理总线清除"
 
-msgid "io/src/i2c_bus_clear.c"
-msgstr "io/src/i2c_bus_clear.c"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io/src/mechanisms/i2c_bus_clear.c"
+msgstr "io/src/mechanisms/i2c_bus_clear.c"
 
 msgid "tests/evidence/i2c-bus-clear"
 msgstr "tests/evidence/i2c-bus-clear"
@@ -386,8 +398,9 @@ msgstr "IO-21"
 msgid "Additional reviewed controller routes"
 msgstr "新增已审查控制器路由"
 
-msgid "soc/*/drivers;tests/google"
-msgstr "soc/*/drivers;tests/google"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "soc/*/*/drivers;tests/google"
+msgstr "soc/*/*/drivers;tests/google"
 
 msgid "tools/testing/evidence/multi-controller-iteration"
 msgstr "tools/testing/evidence/multi-controller-iteration"
@@ -405,10 +418,11 @@ msgstr "IO-22"
 msgid "GD additional SRAM and TCM linker"
 msgstr "GD 附加 SRAM 与 TCM 链接"
 
+#: docs/status/ledgers/platform-refinement.md:26
 msgid ""
-"core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
+"core/include/nexus/core/memory.h;soc/gd32/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
 msgstr ""
-"core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
+"core/include/nexus/core/memory.h;soc/gd32/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform"
 
 msgid ""
 "tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-"
@@ -952,8 +966,9 @@ msgstr "IO-57"
 msgid "Timer capture advanced PWM"
 msgstr "Timer capture 与高级 PWM"
 
-msgid "io; soc/*/drivers; tools/configure/timer_advanced.py"
-msgstr "io；soc/*/drivers；tools/configure/timer_advanced.py"
+#: docs/status/ledgers/platform-refinement.md:26
+msgid "io; soc/*/*/drivers; tools/configure/timer_advanced.py"
+msgstr "io；soc/*/*/drivers；tools/configure/timer_advanced.py"
 
 msgid ""
 "tools/testing/evidence/timer-iteration;tools/testing/evidence/timer-factory-"
@@ -995,10 +1010,11 @@ msgstr "IO-59"
 msgid "Additional SoC Board complete vertical"
 msgstr "新增 SoC／Board 完整纵切片"
 
+#: docs/status/ledgers/platform-refinement.md:26
 msgid ""
-"soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
+"soc/stm32/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
 msgstr ""
-"soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
+"soc/stm32/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474"
 
 msgid ""
 "tools/testing/evidence/g474-iteration;tests/evidence/g474-factory-"
@@ -1033,15 +1049,14 @@ msgid ""
 "isolation not implemented"
 msgstr "可信特权 GPIO gateway 验证范围，借用保留至真实排空；可选组件；SVC、MPU、TZ gateway 和物理隔离未实现"
 
-
 msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/platform-refinement-execution.csv>`。 "
-"源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`775c626d571c734c924a53fdf5a7eb49490d7f3c07e135ce8b589d4afda0da0c`。"
+"源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`c5a33e63631b76b3b79a1261ed9dd7640f3baf699fa894dfdcc02878e5a92966`。"
 msgstr ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/platform-refinement-execution.csv>`。 "
-"源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`775c626d571c734c924a53fdf5a7eb49490d7f3c07e135ce8b589d4afda0da0c`。"
+"源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`c5a33e63631b76b3b79a1261ed9dd7640f3baf699fa894dfdcc02878e5a92966`。"
 
 msgid ""
 "2026-10-20 GET confirms main unprotected and empty effective rules and "

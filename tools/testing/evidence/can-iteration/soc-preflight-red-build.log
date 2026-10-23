@@ -1,8 +1,0 @@
-[ 52%] Built target can_engine
-[ 64%] Built target can_contract
-[ 70%] Building CXX object CMakeFiles/can_stm32f407_contract.dir/workspace/nexus/tests/google/can_soc_test.cpp.o
-[ 76%] Linking CXX executable can_stm32f407_contract
-[ 82%] Built target can_stm32f407_contract
-[ 88%] Building CXX object CMakeFiles/can_gd32f470_contract.dir/workspace/nexus/tests/google/can_soc_test.cpp.o
-[ 94%] Linking CXX executable can_gd32f470_contract
-[100%] Built target can_gd32f470_contract

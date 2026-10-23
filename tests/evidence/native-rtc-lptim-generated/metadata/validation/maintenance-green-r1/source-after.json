@@ -1,8 +1,0 @@
-{
-  "tools/maintenance/capabilities.py": "040096ad70b549e6caaa0a4bed73aebaa6de9375a0709a77360e59a79d9bbcdc",
-  "tools/testing/test_maintenance.py": "9aba8f6bcb401350b7e6c06949cafa3a65afa3a81e0a46736ed47ca4ea1c2ceb",
-  "CMakePresets.json": "8ab6e801c0b7e783439b4be1ed5d39650fefecf279cf1d12945e7cced26c2a2c",
-  "tools/dev/plans/software.json": "0de33ee1b30f629473e7fb334d4561e28dbb349139f76fe896a506944e800874",
-  "tools/testing/test_qualification_plan.py": "c92f356ddedbd11b5016ca7a7e7cb344e39f72cd75b9a5eab29a72e38d26756b",
-  "docs/delivery/capabilities.md": "4434a8b8433e5189eb936a87de04214ec0fddd7498218398890e079f7f22f344"
-}

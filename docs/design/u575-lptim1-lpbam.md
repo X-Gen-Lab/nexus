@@ -49,8 +49,8 @@ LPTIM1 controller is exclusive, initially reset/cold, with its access gate off
 and kernel mux at reset. No external timer writer, IRQ user or reset may share
 it. RUN LPTIM2 must already be disabled and joined.
 
-Use the [receiver API](../../components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)
-and [Stop2 API](../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)
+Use the [receiver API](../../components/soc/stm32/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)
+and [Stop2 API](../../components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)
 as declaration authorities. One privileged Thread serializes calls; copied
 faces retain the same physical identity. No ISR or concurrent writer controls
 these objects. Keep every owner, clock and face alive through stop and joins.
@@ -162,8 +162,8 @@ old Core TIM2 deadlines remain invalid.
 
 ## Sources and verification boundary
 
-[Production receiver](../../soc/stm32u575/drivers/lpdma_copy.c) and
-[concrete Stop2](../../soc/stm32u575/stop2.c) share invariants through typed
+[Production receiver](../../soc/stm32/stm32u575/drivers/lpdma_copy.c) and
+[concrete Stop2](../../soc/stm32/stm32u575/stop2.c) share invariants through typed
 compile-time profiles; the two public request/ops types remain distinct. The
 [maintained public C11 consumer](../../cmake/package/verification/io_evolution/consumers/u575-lptim1-lpbam.c)
 is the source integration reference. The complete installed-SDK consumer plan is

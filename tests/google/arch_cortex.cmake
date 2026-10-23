@@ -23,7 +23,7 @@ foreach(profile m0 m0plus m3 m4 m7 m23 m33 m55 m85)
     endif()
     set(name "nexus_arch_cortex_${profile}_test")
     nexus_google_test(${name} SOURCES arch_cortex_test.cpp
-        "${NEXUS_SOURCE_DIR}/arch/cortex_m/nx_arch_cortex_m.c"
+        "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_cortex_m.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/google")
     target_compile_definitions(${name} PRIVATE NEXUS_ARCH_CORTEX_M_MODEL

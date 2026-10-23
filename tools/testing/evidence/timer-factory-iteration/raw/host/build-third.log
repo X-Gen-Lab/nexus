@@ -1,8 +1,0 @@
-[ 20%] Built target timer_api
-[ 33%] Built target timer_arch
-[ 40%] Building CXX object test-import/CMakeFiles/nexus_stm32_timer_factory_test.dir/workspace/nexus/tests/google/timer_factory_test.cpp.o
-[ 46%] Building CXX object test-import/CMakeFiles/nexus_gd32_timer_factory_test.dir/workspace/nexus/tests/google/timer_factory_test.cpp.o
-[ 53%] Linking CXX executable nexus_stm32_timer_factory_test
-[ 60%] Linking CXX executable nexus_gd32_timer_factory_test
-[ 80%] Built target nexus_stm32_timer_factory_test
-[100%] Built target nexus_gd32_timer_factory_test

@@ -4,12 +4,12 @@ foreach(i2c_multi_family stm32f407 gd32f470)
     set(i2c_multi_target "nexus_${i2c_multi_family}_i2c_multi_controller_test")
     nexus_google_test(${i2c_multi_target} SOURCES i2c_multi_controller_test.cpp
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v1_async.c"
-        "${NEXUS_SOURCE_DIR}/soc/${i2c_multi_family}/drivers/i2c_async.c"
+        "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/drivers/i2c_async.c"
         LIBRARIES Nexus::IO
         INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/multi_controller"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
             "${NEXUS_SOURCE_DIR}/soc/common"
-            "${NEXUS_SOURCE_DIR}/soc/${i2c_multi_family}/private"
+            "${NEXUS_SOC_SOURCE_${i2c_multi_family}}/private"
             "${NEXUS_SOURCE_DIR}/arch/include")
     target_compile_options(${i2c_multi_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_multi_controller_model.h")

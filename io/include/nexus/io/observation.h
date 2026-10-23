@@ -6,9 +6,8 @@
 #ifndef NEXUS_IO_OBSERVATION_H
 #define NEXUS_IO_OBSERVATION_H
 
-#include "nexus/io/i2c.h"
-#include "nexus/io/spi.h"
-#include "nexus/io/uart.h"
+#include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

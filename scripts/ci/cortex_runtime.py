@@ -402,13 +402,13 @@ def compiled_objects(root: Path, build: Path, variant: dict) -> list[dict]:
         result.append({'source': compiler_gate.digest(Path(entry['file'])),
                        'object': compiler_gate.digest(obj), 'argv': argv})
     required = {'core/src/request.c', 'core/src/time.c',
-                'arch/cortex_m/nx_arch_cortex_m.c',
-                'arch/cortex_m/nx_arch_cache.c',
-                'arch/cortex_m/nx_arch_cache_control.c',
-                'arch/cortex_m/nx_arch_mpu.c',
-                'arch/cortex_m/nx_arch_security.c',
-                'arch/cortex_m/nx_arch_nonsecure.c',
-                'arch/cortex_m/nx_arch_sleep.c', 'os/wait.c'}
+                'arch/arm/cortex_m/nx_arch_cortex_m.c',
+                'arch/arm/cortex_m/nx_arch_cache.c',
+                'arch/arm/cortex_m/nx_arch_cache_control.c',
+                'arch/arm/cortex_m/nx_arch_mpu.c',
+                'arch/arm/cortex_m/nx_arch_security.c',
+                'arch/arm/cortex_m/nx_arch_nonsecure.c',
+                'arch/arm/cortex_m/nx_arch_sleep.c', 'os/wait.c'}
     sources = set()
     generated_port = build / 'nexus-runtime/os/freertos/m7-integer-port/port.c'
     for item in result:

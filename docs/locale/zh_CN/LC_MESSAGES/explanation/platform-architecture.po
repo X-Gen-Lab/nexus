@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: a1bfebe32cda01758025a7edd4eddd3d4c2847f60e1cfca6442b12c5158ebc95\n"
+"X-Nexus-Source-SHA256: 9ef3517a89692e1b964709a2d134620926b9a71a6b5cbd45a9aa02426b7c784c\n"
 
 msgid "How the platform is assembled and executed"
 msgstr "平台如何装配与执行"
@@ -260,3 +260,101 @@ msgstr ""
 "阅读[类型化工厂](factory.md)、[所有权](ownership.md)、[接入合同](../design/integration-"
 "contracts.md)和[精确支持范围](../reference/platforms/support.md)。架构图解释机制；测试、镜像检查和 "
 "HIL 分别建立各自执行范围。"
+
+#: docs/explanation/platform-architecture.md:33
+msgid "Current source organization"
+msgstr "当前源码组织"
+
+#: docs/explanation/platform-architecture.md:35
+msgid ""
+"The source tree groups MCU families by vendor and CPU implementations by "
+"instruction-set architecture. These directories describe ownership at build "
+"time; they add no runtime dispatch or lookup layer. Public include paths, "
+"target names and authored family identifiers remain stable."
+msgstr ""
+"源码树按厂家组织 MCU 系列，按指令集架构组织 CPU "
+"实现。这些目录表达构建期所有权，不增加运行时分派或查找层。公共头文件路径、目标名称和人工配置中的系列标识保持稳定。"
+
+#: docs/explanation/platform-architecture.md:40
+msgid ""
+"The [source-adjacent contracts](source-map.md) own the directory map and "
+"layer README content. Native models implement the same public I/O contracts "
+"under the Native SoC package. Shared register-protocol algorithms remain in "
+"`soc/common/` only when the participating wrappers independently establish "
+"their silicon semantics."
+msgstr ""
+"[源码旁的合同](source-map.md)维护目录映射与各层 README 内容。Native 模型在 Native SoC 包内实现相同的公共 "
+"I/O 合同。只有参与的包装层分别核实硅片语义后，共享寄存器协议算法才放入 `soc/common/`。"
+
+#: docs/explanation/platform-architecture.md:46
+msgid ""
+"Common components and selected STM32 extensions have distinct source "
+"ownership. Components are explicit targets; a chip-specific target still "
+"requires its exact SoC, mode and backend, and its presence does not extend "
+"the public support matrix."
+msgstr ""
+"通用组件与选定的 STM32 扩展具有不同的源码所有权。组件都是显式目标；芯片专用目标仍要求精确 SoC、模式和后端，其存在不会扩大公共支持矩阵。"
+
+#: docs/explanation/platform-architecture.md:51
+msgid "Platform and CPU-only Runtime"
+msgstr "Platform 与仅 CPU 的 Runtime"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Consumption entry"
+msgstr "消费入口"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Provided assembly"
+msgstr "提供的装配"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "External responsibility"
+msgstr "外部责任"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "`Nexus::Platform`"
+msgstr "`Nexus::Platform`"
+
+#: docs/explanation/platform-architecture.md:0
+msgid ""
+"Exact SoC/Board facts, selected providers, static factory and explicit "
+"lifecycle"
+msgstr "精确 SoC／Board 事实、所选 provider、静态 factory 与显式生命周期"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Product sources, workers, budgets, storage regions and recovery"
+msgstr "产品源码、执行任务、预算、存储区域与恢复"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "`Nexus::Runtime`"
+msgstr "`Nexus::Runtime`"
+
+#: docs/explanation/platform-architecture.md:0
+msgid "Core, Arch, public I/O faces and the explicitly selected OS adapter"
+msgstr "Core、Arch、公共 I/O 接口面与显式选择的 OS adapter"
+
+#: docs/explanation/platform-architecture.md:0
+msgid ""
+"Startup, vectors, memory/clock facts, Board wiring and concrete device "
+"providers"
+msgstr "启动、向量、内存／时钟事实、Board 接线及具体设备 provider"
+
+#: docs/explanation/platform-architecture.md:58
+msgid ""
+"One build directory admits one resolved assembly. Use separate build "
+"directories for different boards or CPU/security images; a product build "
+"coordinator or CI matrix owns their orchestration. Runtime and Platform "
+"reuse the same production mechanisms but are separate consumption modes."
+msgstr ""
+"一个构建目录只接纳一份解析后的装配。不同板卡或 CPU／安全域镜像使用独立构建目录，由产品构建协调器或 CI 矩阵编排。Runtime 与 "
+"Platform 复用相同生产机制，但属于不同的消费模式。"
+
+#: docs/explanation/platform-architecture.md:63
+msgid ""
+"The common OS boundary is the wait/wake port. Task, queue, join and storage "
+"APIs remain backend-specific, including the real kernel control-block types."
+" Products switching kernels must adapt that lifecycle explicitly; no "
+"universal object pool or hidden scheduling task is supplied."
+msgstr ""
+"共同 OS 边界是等待／唤醒端口。任务、队列、join 和存储 API "
+"仍为后端专用，包括真实内核控制块类型。产品切换内核时必须显式适配生命周期；平台不提供统一对象池或隐藏调度任务。"

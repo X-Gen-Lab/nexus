@@ -97,7 +97,7 @@ non-overlapping TX/RX spans in selected initialized AXI SRAM. Cache off accepts
 addresses and lengths of 32..65504 bytes. DMA1 Stream2/3 remain separate from
 optional USART3 Stream0 TX or Stream1 RX. PLL384, FreeRTOS, 16-bit, fixed
 dummy/discard and multisegment SPI DMA are
-outside that mode. See the [H743 provider contract](../../soc/stm32h743/README.md).
+outside that mode. See the [H743 provider contract](../../soc/stm32/stm32h743/README.md).
 
 The separate H743 `rx-dma-continuous` mode uses USART3, DMA1 Stream1/request45,
 DBM/CIRC and at least three equal caller-owned AXI SRAM buffers. It selects the
@@ -186,7 +186,7 @@ F103 standalone admission checks the CPU-readable factory Flash density,
 not a debug-only device-group or revision value. ES096 Rev15 section2.2.2
 reports zero from normal-software DBGMCU reads; group and revision therefore
 remain unobserved. The configured STM32F103RBT6 declaration and package still
-require separate integration evidence. See the [F103 source boundary](../../soc/stm32f103/README.md).
+require separate integration evidence. See the [F103 source boundary](../../soc/stm32/stm32f103/README.md).
 
 F103 uses USART2 PA2/PA3 and PA0/PA1 EXTI events. F103 SPI1 and GD303 SPI0 use
 default PA5/PA6/PA7 with explicit PA4 active-low CS, nominal 31.25 kHz..4 MHz,

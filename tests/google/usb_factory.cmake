@@ -51,12 +51,12 @@ foreach(usb_family stm32 gd32)
         endforeach()
         nexus_google_test(${usb_target} SOURCES ${usb_fixture_source}
             "${usb_bundle}/bindings.c"
-            "${NEXUS_SOURCE_DIR}/soc/${usb_soc}/drivers/usb_device.c"
-            "${NEXUS_SOURCE_DIR}/soc/${usb_soc}/usb_clock.c"
+            "${NEXUS_SOC_SOURCE_${usb_soc}}/drivers/usb_device.c"
+            "${NEXUS_SOC_SOURCE_${usb_soc}}/usb_clock.c"
             LIBRARIES Nexus::NativeModel Nexus::Arch
             INCLUDES "${usb_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-                "${NEXUS_SOURCE_DIR}/io/native"
-                "${NEXUS_SOURCE_DIR}/soc/${usb_soc}/private")
+                "${NEXUS_SOURCE_DIR}/soc/native/drivers"
+                "${NEXUS_SOC_SOURCE_${usb_soc}}/private")
         target_compile_options(${usb_target} PRIVATE
             "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_device_soc_model.h"
             "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_factory_model.h")

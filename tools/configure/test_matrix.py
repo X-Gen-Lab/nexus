@@ -23,8 +23,25 @@ class MaintainedMatrixTests(unittest.TestCase):
     def test_authoring_factory_provider_and_cmake_contracts_agree(self):
         contract = matrix.check_contracts()
         self.assertEqual(set(contract["kinds"]), configure.KINDS)
+        self.assertEqual(contract["components"], sorted(matrix.COMPONENTS))
         self.assertIn("stm32h743", contract["families"])
         self.assertIn("stm32u575", contract["families"])
+
+    def test_cmake_component_mapping_drift_is_rejected(self):
+        name = "cmake/platform/Components.cmake"
+        original = (configure.ROOT / name).read_text(encoding="utf-8")
+        for index, altered in enumerate((
+                original.replace('"log=Nexus::Log"', ''),
+                original.replace('"log=Nexus::Log"',
+                                 '"unknown=Nexus::Log"'))):
+            with self.subTest(mapping=index):
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    path = root / name
+                    path.parent.mkdir(parents=True)
+                    path.write_text(altered, encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "components"):
+                        matrix.check_contracts(root)
 
     def test_missing_factory_kind_is_rejected(self):
         with patch.object(factory, "KINDS", tuple(

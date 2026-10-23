@@ -100,7 +100,7 @@ partition are unselected; single-core H743 is not an AMP target.
 
 ### F407 masked tail handoff and clock barrier
 
-The [handoff component](../../components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h)
+The [handoff component](../../components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h)
 reuses the existing ClockDomain barrier. Initialize once, explicitly enroll every
 owner, close admission, cancel/drain/join all users, stop the actual Platform and
 release exact leases. An empty foreign domain, stale epoch or retained lease
@@ -126,7 +126,7 @@ H743/cache handoff, DVFS and deep-STOP continuity remain open.
 
 ### U575 retained LSE calendar in RUN
 
-The [RTC provider](../../soc/stm32u575/drivers/rtc.c) requires an external boot
+The [RTC provider](../../soc/stm32/stm32u575/drivers/rtc.c) requires an external boot
 owner to preserve a valid 24-hour BCD calendar, `BYPSHAD`, prescalers 127/255,
 actual LSE 32768 Hz, `RTCSEL=LSE`, `RTCEN`, `LSERDY`, `RTCAPBEN`, `PWREN` and
 `DBP`. Boot hands over locked WPR; it remains locked between calls with no other

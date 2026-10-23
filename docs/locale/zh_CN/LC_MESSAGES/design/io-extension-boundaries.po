@@ -1,6 +1,6 @@
 # Exact extracted messages; unchanged translations preserved.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b2226db2d8f6e6809d5745608640fbc90bee199d54b7574a2d163c81de56c2c6\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: f2d1dbc2f788573cd44d6c4fad67fd01663d011f7d9683280333959900d36d05\n"
 
 msgid "Mapped storage, AMP, image handoff, RTC and frame boundaries"
 msgstr "映射存储、AMP、镜像交接、RTC 与帧边界"
@@ -104,8 +104,22 @@ msgstr "已接受的 send 保留 payload，直到 acquire 观察到精确 epoch 
 msgid "F407 masked tail handoff and clock barrier"
 msgstr "F407 屏蔽中断尾跳与时钟 barrier"
 
-msgid "The [handoff component](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h) reuses the existing ClockDomain barrier. Initialize once, explicitly enroll every owner, close admission, cancel/drain/join all users, stop the actual Platform and release exact leases. An empty foreign domain, stale epoch or retained lease rejects. The domain cannot discover unenrolled users or other bus masters."
-msgstr "[交接组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/components/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h)复用既有 ClockDomain barrier。初始化一次，显式登记每个 owner，关闭接纳，cancel／drain／join 全部用户，停止实际 Platform，再 release 精确 lease。空的外来 domain、过期 epoch 或保留 lease 均拒绝。domain 不能发现未登记用户或其他 bus master。"
+#: docs/design/io-extension-boundaries.md:103
+msgid ""
+"The [handoff component](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-"
+"SOURCE/components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h)"
+" reuses the existing ClockDomain barrier. Initialize once, explicitly enroll"
+" every owner, close admission, cancel/drain/join all users, stop the actual "
+"Platform and release exact leases. An empty foreign domain, stale epoch or "
+"retained lease rejects. The domain cannot discover unenrolled users or other"
+" bus masters."
+msgstr ""
+"[交接组件](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/components/soc/stm32/stm32f407_handoff/include/nexus/components/stm32f407_handoff.h)复用既有"
+" ClockDomain barrier。初始化一次，显式登记每个 owner，关闭接纳，cancel／drain／join 全部用户，停止实际 "
+"Platform，再 release 精确 lease。空的外来 domain、过期 epoch 或保留 lease 均拒绝。domain "
+"不能发现未登记用户或其他 bus master。"
 
 msgid "The caller enters privileged MSP Thread with `PRIMASK=1`, `BASEPRI=FAULTMASK=0` and `CONTROL=0`. It must establish stopped System, HSI16/reset buses, no active FP/lazy context or MPU, no enabled/pending/active SysTick/NVIC source, no live peripheral/DMA gate and idle Flash with `ACR=0` (ART/prefetch disabled). Rejection preserves masks and writes no MMIO; reading SysTick CTRL consumes COUNTFLAG. The 98-entry Flash vector table is 512 B aligned and fits the exact generated/observed 512 KiB or 1 MiB density. MSP is 8 B aligned in `(0x20000000,0x20020000]`; Thumb PC's first halfword lies in physical Flash. Shared device ID `0x413` cannot establish exact-part/PCB identity. The caller excludes NMI/HardFault, debugger and other masters throughout transfer."
 msgstr "调用方从特权 MSP Thread 进入，要求 `PRIMASK=1`、`BASEPRI=FAULTMASK=0` 和 `CONTROL=0`。调用方必须建立 System 已停止、HSI16／复位总线、无活动 FP／lazy context 或 MPU、无 enabled／pending／active SysTick／NVIC 源、无活动外设／DMA gate 且 Flash 空闲，`ACR=0`（ART／prefetch 禁用）。拒绝保持中断屏蔽并且不写 MMIO；读取 SysTick CTRL 会消费 COUNTFLAG。98 项 Flash 向量表按 512 B 对齐，并完整位于精确生成／观测的 512 KiB 或 1 MiB 容量内。MSP 在 `(0x20000000,0x20020000]` 中按 8 B 对齐；Thumb PC 的首个半字位于物理 Flash。共享器件 ID `0x413` 不能建立精确型号／PCB 身份。调用方在整个交接期间排除 NMI／HardFault、调试器和其他 master。"
@@ -116,8 +130,28 @@ msgstr "尾跳成功后不返回：它设置 VTOR，经 barrier 禁用 CP10/11�
 msgid "U575 retained LSE calendar in RUN"
 msgstr "U575 RUN 中保留 LSE 日历"
 
-msgid "The [RTC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/rtc.c) requires an external boot owner to preserve a valid 24-hour BCD calendar, `BYPSHAD`, prescalers 127/255, actual LSE 32768 Hz, `RTCSEL=LSE`, `RTCEN`, `LSERDY`, `RTCAPBEN`, `PWREN` and `DBP`. Boot hands over locked WPR; it remains locked between calls with no other writer. Calibration, shift, binary mode, another RTC owner and a live RTC vector reject. Accepted service briefly unlocks WPR with CA/53, checks the protected write and unconditionally relocks with FF. The provider does not write calendar, RCC, PWR or TAMP, enable an IRQ or repair/reset the backup domain. Year-00 provenance remains external; INITS cannot prove it. `set` returns `UNSUPPORTED`."
-msgstr "[RTC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/rtc.c)要求外部 boot owner 保留有效 24 小时 BCD 日历、`BYPSHAD`、127/255 预分频、实际 LSE 32768 Hz、`RTCSEL=LSE`、`RTCEN`、`LSERDY`、`RTCAPBEN`、`PWREN` 和 `DBP`。校准、shift、binary 模式、其他 RTC owner 和活动 RTC vector 均拒绝。Boot 以 locked WPR 交接；调用间 WPR 保持 locked，且无其他 writer。已接受的 service 以 CA/53 短暂解锁 WPR，检查受保护写入，并无条件以 FF 重新锁定。provider 不写日历、RCC、PWR 或 TAMP，不启用 IRQ，也不修复／复位 backup domain。年份 00 来源仍属外部；INITS 无法证明它。`set` 返回 `UNSUPPORTED`。"
+#: docs/design/io-extension-boundaries.md:129
+msgid ""
+"The [RTC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32u575/drivers/rtc.c) requires an external"
+" boot owner to preserve a valid 24-hour BCD calendar, `BYPSHAD`, prescalers "
+"127/255, actual LSE 32768 Hz, `RTCSEL=LSE`, `RTCEN`, `LSERDY`, `RTCAPBEN`, "
+"`PWREN` and `DBP`. Boot hands over locked WPR; it remains locked between "
+"calls with no other writer. Calibration, shift, binary mode, another RTC "
+"owner and a live RTC vector reject. Accepted service briefly unlocks WPR "
+"with CA/53, checks the protected write and unconditionally relocks with FF. "
+"The provider does not write calendar, RCC, PWR or TAMP, enable an IRQ or "
+"repair/reset the backup domain. Year-00 provenance remains external; INITS "
+"cannot prove it. `set` returns `UNSUPPORTED`."
+msgstr ""
+"[RTC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/drivers/rtc.c)要求外部 boot owner 保留有效 24 小时 BCD "
+"日历、`BYPSHAD`、127/255 预分频、实际 LSE 32768 "
+"Hz、`RTCSEL=LSE`、`RTCEN`、`LSERDY`、`RTCAPBEN`、`PWREN` 和 `DBP`。校准、shift、binary "
+"模式、其他 RTC owner 和活动 RTC vector 均拒绝。Boot 以 locked WPR 交接；调用间 WPR 保持 "
+"locked，且无其他 writer。已接受的 service 以 CA/53 短暂解锁 WPR，检查受保护写入，并无条件以 FF "
+"重新锁定。provider 不写日历、RCC、PWR 或 TAMP，不启用 IRQ，也不修复／复位 backup domain。年份 00 "
+"来源仍属外部；INITS 无法证明它。`set` 返回 `UNSUPPORTED`。"
 
 msgid "ES0499 Rev12 sections 2.2.3 and 2.2.16 identify oscillator-stop limitations for LSE drive codes 00/01 on revision X; Table 3 marks these limitations repaired on W/U. This reference does not qualify a silicon revision, so its crystal-mode profile requires `LSEBYP=0` and conservatively admits only `LSEDRV=10/11` on every revision. It never writes either field. Section 2.2.1 separately requires external boot and Board owners to exclude PC13 transitions for crystal LSE on this LQFP part. LSE bypass is unaffected by section 2.2.1 and is outside this selected profile. GPIO reads cannot prove that electrical condition, and this software reference declares no PCB route or measured oscillator behavior."
 msgstr "ES0499 Rev12 第2.2.3和2.2.16节记录了 revision X 在 LSE 驱动代码 00/01 下可能停止振荡的限制；表3将 W/U 标为已修复。本参考不限定硅修订版，因此晶体模式配置要求 `LSEBYP=0`，并对所有修订版保守地仅准入 `LSEDRV=10/11`，绝不写入这两个字段。第2.2.1节另要求外部 boot 与 Board owner 在该 LQFP 器件使用晶体 LSE 时排除 PC13 跳变。LSE 旁路不受第2.2.1节影响，并且不属于此选定配置。GPIO 读取不能证明这一电气条件，本软件参考也不声明 PCB 走线或振荡器实测行为。"
@@ -148,4 +182,3 @@ msgstr "验证与剩余退出条件"
 
 msgid "Maintained regressions are [mapped storage](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/mapped_storage_test.cpp), [AMP](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/amp_ipc_test.cpp), [handoff](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/stm32f407_handoff_test.cpp), [RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/u575_rtc_test.cpp), [frame layouts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/frame_stream_test.cpp) and [DMA2D](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_frame_dma2d_test.cpp). They exercise software contracts and external hardware models; they do not establish electrical, retained-power, multicore or station behavior. Exact execution and frozen-source identities belong in the [compact development evidence](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/io-extensions-20261020/README.md) and delivery records. The original {download}`I/O <io-evolution-execution.csv>` and {download}`SoC <soc-refinement-execution.csv>` ledgers retain their full exits and authoritative status. No exit is narrowed by this page."
 msgstr "已维护回归为[映射存储](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/mapped_storage_test.cpp)、[AMP](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/amp_ipc_test.cpp)、[交接](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/stm32f407_handoff_test.cpp)、[RTC](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/u575_rtc_test.cpp)、[帧布局](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/frame_stream_test.cpp)和 [DMA2D](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tests/google/h743_frame_dma2d_test.cpp)。它们检查软件合同和外部硬件模型，不建立电气、保留供电、多核或工位行为。精确执行和冻结源码身份由[紧凑开发证据](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/testing/evidence/io-extensions-20261020/README.md)与交付记录维护。原始 {download}`I/O <io-evolution-execution.csv>` 与 {download}`SoC <soc-refinement-execution.csv>` 台账保留完整退出条件和权威状态。本页不缩小任何退出条件。"
-

@@ -1,6 +1,0 @@
-{
-  "boards/stm32f407_qiming_v31/board.json": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
-  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
-  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json",
-  "tools/configure/assemblies/qiming-baremetal.toml": "/workspace/nexus/tools/configure/assemblies/qiming-baremetal.toml"
-}

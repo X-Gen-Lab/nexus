@@ -146,7 +146,11 @@ def observe(root=ROOT):
                "cpu_facts": guard_schema(runtime, "facts"),
                "runtime_resolved": dict_schema(runtime, "schema_version", {"cpu_profile"}),
                "source_sdk_manifest": dict_schema(package, "schema", {"kind", "source_revision"})}
-    for pattern, name in (("boards/*/board.json", "board"), ("soc/*/soc.json", "soc"), ("soc/*/routes.json", "routes")):
+    # Manufacturer namespaces must not hide MCU facts behind the flat Native
+    # directory. Every observed fact remains part of the checked input snapshot.
+    for pattern, name in (("boards/*/board.json", "board"),
+                          ("soc/**/soc.json", "soc"),
+                          ("soc/**/routes.json", "routes")):
         paths = sorted(root.glob(pattern))
         if not paths:
             raise ValueError(f"Missing actual {name} facts")

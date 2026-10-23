@@ -135,7 +135,7 @@ class GD303ProviderTests(unittest.TestCase):
             self.provider.start_resources(Result())))
 
     def test_exact_geometry_and_package_inventory_are_not_family_wide(self):
-        facts = json.loads((ROOT / "soc/gd32f303/soc.json").read_text())
+        facts = json.loads((ROOT / "soc/gd32/gd32f303/soc.json").read_text())
         self.assertEqual(set(facts["variants"]), {"GD32F303RCT6"})
         part = facts["variants"]["GD32F303RCT6"]
         self.assertEqual(part["flash"]["erase_blocks"], [2048] * 128)

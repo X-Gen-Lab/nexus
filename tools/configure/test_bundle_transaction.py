@@ -99,6 +99,7 @@ class BundleTransactionTests(unittest.TestCase):
         identity = json.loads((self.output / "generator-identity.json").read_text())
         self.assertIn("tools/configure/factory.py", paths)
         self.assertIn("tools/configure/bundle.py", paths)
+        self.assertIn("tools/configure/emission.py", paths)
         self.assertIn("tools/configure/providers/native/emission.py", paths)
         self.assertNotIn("tools/configure/providers/gd32f470/emission.py", paths)
         self.assertEqual(set(paths), {item["path"] for item in identity["files"]})
@@ -175,17 +176,19 @@ class BundleTransactionTests(unittest.TestCase):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         original = gate.resolve_ir
-        def changing(*args, **kwargs):
-            result = original(*args, **kwargs)
-            path = code_root / "tools/configure/factory.py"
-            path.write_bytes(path.read_bytes() + b"\n# concurrent edit\n")
-            return result
-        self.configure()
-        with patch.object(gate.dependencies, "ROOT", code_root):
-            with patch.object(gate, "resolve_ir", side_effect=changing):
-                with self.assertRaisesRegex(ValueError, "code changed"):
-                    self.configure()
-        self.assertFalse(self.output.exists())
+        for module in ("factory", "emission"):
+            with self.subTest(module=module):
+                def changing(*args, **kwargs):
+                    result = original(*args, **kwargs)
+                    path = code_root / f"tools/configure/{module}.py"
+                    path.write_bytes(path.read_bytes() + b"\n# concurrent edit\n")
+                    return result
+                self.configure()
+                with patch.object(gate.dependencies, "ROOT", code_root):
+                    with patch.object(gate, "resolve_ir", side_effect=changing):
+                        with self.assertRaisesRegex(ValueError, "code changed"):
+                            self.configure()
+                self.assertFalse(self.output.exists())
 
     def test_endpoint_constructor_decisions_are_typed_and_immutable(self):
         self.authored["controllers"] = [{"id": "bus", "binding": "spi0",

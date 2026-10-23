@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_ADVANCED_PWM_H
 #define NEXUS_IO_ADVANCED_PWM_H
 #include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,10 +30,10 @@ typedef struct {
 } nx_advanced_pwm_ops_t;
 /** \brief Immutable identity; controller state and configuration outlive IRQs.
  */
-typedef struct {
+struct nx_advanced_pwm {
     const nx_advanced_pwm_ops_t* ops;
     void* context;
-} nx_advanced_pwm_t;
+};
 /**
  * \brief Stage duty against the fixed declared PSC/ARR and complementary pair.
  * \param[in] port: One serialized privileged task owner.

@@ -1,8 +1,0 @@
-sleep_sources=/tmp/nexus-pre-fix-soc-bge33wmc/soc/stm32f407/sleep.c
-selected=TRUE
-SOURCES=/tmp/nexus-pre-fix-soc-bge33wmc/soc/stm32f407/sleep.c
-INCLUDE_DIRECTORIES=/tmp/nexus-pre-fix-soc-bge33wmc/soc/stm32f407/private;/components/clock_domain/private;/vendors/st/cmsis_device_f4/Include;/vendors/arm/CMSIS_5/CMSIS/Core/Include
-INTERFACE_INCLUDE_DIRECTORIES=value-NOTFOUND
-COMPILE_DEFINITIONS=STM32F407xx
-LINK_LIBRARIES=Nexus::ClockDomain;Nexus::Arch;nexus_build_options;nexus_owned_warnings
-EXCLUDE_FROM_ALL=TRUE

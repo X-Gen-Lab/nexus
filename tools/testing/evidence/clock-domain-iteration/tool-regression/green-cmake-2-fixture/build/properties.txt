@@ -1,2 +1,0 @@
-sleep_sources=
-selected=FALSE

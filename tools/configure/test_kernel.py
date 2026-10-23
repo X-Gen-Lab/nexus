@@ -286,7 +286,7 @@ class KernelAssemblyTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(prefix="kernel profile ")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        soc = json.loads((ROOT / "soc/stm32f407/soc.json").read_text())
+        soc = json.loads((ROOT / "soc/stm32/stm32f407/soc.json").read_text())
         self.facts = self.root / "cpu.json"
         self.facts.write_text(json.dumps({"schema_version": 1, "cpu": soc["cpu"],
                                          "irq": soc["irq"], "clock_hz": 168000000}))
@@ -340,7 +340,7 @@ class KernelAssemblyTests(unittest.TestCase):
         self.assertEqual(result.cpu_profile.irq.syscall_priority, 7)
 
     def test_missing_maintained_soc_mpu_fact_is_a_clear_configuration_rejection(self):
-        soc = json.loads((ROOT / "soc/stm32f407/soc.json").read_text())
+        soc = json.loads((ROOT / "soc/stm32/stm32f407/soc.json").read_text())
         soc["cpu"].pop("mpu_regions")
         with self.assertRaisesRegex(ValueError, "capabilities differ"):
             configure.validate_soc(soc, "STM32F407ZGT6")

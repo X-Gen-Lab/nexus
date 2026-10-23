@@ -26,7 +26,7 @@ current detailed limits; this page explains how to select them.
 | U575 separate dual-domain reference | TZEN=1, no OS; synchronous scalar gateway and copied cooperative jobs of at most eight PC7 commands in Secure storage; no retained NS pointer or generic asynchronous cross-domain transport |
 | CPU-only Runtime | M0/M0+/M3/M4/M7/M23/M33/M55/M85 Core/Arch and selected baremetal/FreeRTOS software profiles; no generated SoC/Board/factory |
 
-The [F103 source boundary](../../../soc/stm32f103/README.md) separates the
+The [F103 source boundary](../../../soc/stm32/stm32f103/README.md) separates the
 CPU-readable 128 KiB Flash-density check from its declared orderable part.
 ES096 section2.2.2 prevents normal firmware from observing the debug-only
 device group and revision. Standalone startup does not require a debugger, and

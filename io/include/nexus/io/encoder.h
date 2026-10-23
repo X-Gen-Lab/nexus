@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_ENCODER_H
 #define NEXUS_IO_ENCODER_H
 #include "nexus/core/time.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,10 +39,10 @@ typedef struct {
     nx_result_t (*state)(const void* context, nx_encoder_state_t* state);
 } nx_encoder_ops_t;
 /** \brief Immutable identity; exact private state owns the whole controller. */
-typedef struct {
+struct nx_encoder {
     const nx_encoder_ops_t* ops;
     void* context;
-} nx_encoder_t;
+};
 /**
  * \brief Enable only the two cold-selected encoder inputs and counter.
  * \param[in] port: One serialized privileged Thread-mode owner.

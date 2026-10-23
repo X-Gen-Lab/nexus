@@ -1,9 +1,0 @@
-{
-  "phase": "platform-red-r1",
-  "exit_code": 1,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/platform-red-r1/command.attempts/1792296931214684668-ea79e2022c7f46c9bd8ef59777f20d0e/receipt.json",
-  "guards_stable": true,
-  "persistent_allocated_bytes": 143360,
-  "TMP_live_allocated_bytes": 0,
-  "child_max_rss_KiB": 24632
-}

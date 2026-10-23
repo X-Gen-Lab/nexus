@@ -1,9 +1,0 @@
-{
-  "phase": "navigation-green-r1",
-  "exit_code": 1,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/followup-host-navigation-r1/execution/navigation-green-r1/command.attempts/1792298293159849883-b0a93551697347e780adf28c30c3d6d3/receipt.json",
-  "guards_stable": true,
-  "persistent_allocated_bytes": 1404928,
-  "TMP_live_allocated_bytes": 0,
-  "child_max_rss_KiB": 31048
-}

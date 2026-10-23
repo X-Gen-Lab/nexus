@@ -22,12 +22,12 @@ nexus_google_test(nexus_h743_runtime_clock_test SOURCES
     h743_spi_dma_factory_model.cpp h743_spi_dma_model.cpp h743_model.cpp
     "${runtime_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/components/clock_domain/src/clock_domain.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_dma.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_dma.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${runtime_bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32h743/private"
+    INCLUDES "${runtime_bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
         "${NEXUS_SOURCE_DIR}/components/clock_domain/include"
         "${NEXUS_SOURCE_DIR}/components/clock_domain/private")
 target_include_directories(nexus_h743_runtime_clock_test SYSTEM PRIVATE

@@ -1,6 +1,0 @@
-{
-  "build/ng-agent-qiming-components/generated/nexus_config.h": "641786647057c93e4135fdbe0e83250fce2fd45bb50748656aa73adfcfeeb0ca",
-  "build/ng-agent-liangshan-components/generated/nexus_config.h": "9a1eb0b43e895ca0fdad97a0bb528c9bc2100b7835b92e0db5beba5ff51a1134",
-  "soc/stm32f407/drivers/gpio.c": "cc9f96ded9b52f11f15fc24552dfebfc2bbd45b66b293ae55bfa6f9e6f954559",
-  "soc/gd32f470/drivers/gpio.c": "85f4f9eff2c016a4d3d70be3f0df4f32e66fa9841701f99425e8247df4ec3140"
-}

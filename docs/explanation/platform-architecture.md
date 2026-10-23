@@ -30,6 +30,41 @@ or access; it is not an initialization sequence.
 | Optional component | Bounded algorithms through narrow ports |
 | External product | Main, workers, roles, private PCB, budgets, partitions and recovery |
 
+## Current source organization
+
+The source tree groups MCU families by vendor and CPU implementations by
+instruction-set architecture. These directories describe ownership at build
+time; they add no runtime dispatch or lookup layer. Public include paths,
+target names and authored family identifiers remain stable.
+
+The [source-adjacent contracts](source-map.md) own the directory map and layer
+README content. Native models implement the same public I/O contracts under the
+Native SoC package. Shared register-protocol algorithms remain in `soc/common/`
+only when the participating wrappers independently establish their silicon
+semantics.
+
+Common components and selected STM32 extensions have distinct source ownership.
+Components are explicit targets; a chip-specific target still requires its
+exact SoC, mode and backend, and its presence does not extend the public support
+matrix.
+
+## Platform and CPU-only Runtime
+
+| Consumption entry | Provided assembly | External responsibility |
+| --- | --- | --- |
+| `Nexus::Platform` | Exact SoC/Board facts, selected providers, static factory and explicit lifecycle | Product sources, workers, budgets, storage regions and recovery |
+| `Nexus::Runtime` | Core, Arch, public I/O faces and the explicitly selected OS adapter | Startup, vectors, memory/clock facts, Board wiring and concrete device providers |
+
+One build directory admits one resolved assembly. Use separate build
+directories for different boards or CPU/security images; a product build
+coordinator or CI matrix owns their orchestration. Runtime and Platform reuse
+the same production mechanisms but are separate consumption modes.
+
+The common OS boundary is the wait/wake port. Task, queue, join and storage APIs
+remain backend-specific, including the real kernel control-block types.
+Products switching kernels must adapt that lifecycle explicitly; no universal
+object pool or hidden scheduling task is supplied.
+
 ## Build-time decisions and runtime work
 
 The resolver combines authored TOML with reviewed SoC/Board facts into immutable

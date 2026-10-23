@@ -1,11 +1,11 @@
 # Real G474 timer algorithms with external register and CPU ports modeled.
 nexus_google_test(nexus_g474_timer_modes_test SOURCES g474_timer_modes_test.cpp
-    "${NEXUS_SOURCE_DIR}/io/src/timer_capture.c"
-    "${NEXUS_SOURCE_DIR}/io/src/encoder.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/timer_capture.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/encoder.c"
+    "${NEXUS_SOURCE_DIR}/io/src/api/timer_capture.c"
+    "${NEXUS_SOURCE_DIR}/io/src/api/encoder.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/timer_capture.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/encoder.c"
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/io/include"
         "${NEXUS_SOURCE_DIR}/io/private")

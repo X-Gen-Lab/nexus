@@ -9,10 +9,10 @@
 #define NEXUS_GPIO_H
 
 #include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_gpio_port nx_gpio_port_t;
 
 /**
  * \brief           Shared read-only methods using one provider state.

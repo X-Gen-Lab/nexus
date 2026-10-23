@@ -10,10 +10,10 @@
 #define NEXUS_WATCHDOG_H
 
 #include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_watchdog_port nx_watchdog_port_t;
 #define NX_RESET_POWER_ON  1u
 #define NX_RESET_PIN       2u
 #define NX_RESET_SOFTWARE  4u

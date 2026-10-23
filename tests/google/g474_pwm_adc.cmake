@@ -1,10 +1,10 @@
 nexus_google_test(nexus_g474_pwm_adc_test
     SOURCES g474_pwm_adc_test.cpp g474_pwm_adc_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm_group.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm_adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_group.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_adc.c"
     LIBRARIES Nexus::IO
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/io/private")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")

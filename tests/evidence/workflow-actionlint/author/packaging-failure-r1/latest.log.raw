@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/tmp/nexus-workflow-actionlint-20261018-r1/package_execution.py", line 95, in <module>
-    print(json.dumps({'archive_bytes':archive.stat().st_size,'archive_sha256':sha(archive.read_bytes()),'members':len(rows),'commands':len(commands),'persistent_allocated':sum(p.stat().st_blocks*512 for p in OUT.rglob('*') if p.is_file()),'guards':guard()}))
-                                                                                                                                                                                                                                                        ^^^^^^^
-  File "/tmp/nexus-workflow-actionlint-20261018-r1/author.py", line 9, in guard
-    assert g['tmp_free']>=200*1024**2 and g['persistent_free']>=64*1024**2 and g['memory_available']>=600*1024**2 and not any(int(e[k]) for k in ('oom','oom_kill','oom_group_kill')),g
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: {'tmp_free': 426754048, 'persistent_free': 66297856, 'memory_available': 1595158528, 'events': {'low': '0', 'high': '0', 'max': '0', 'oom': '0', 'oom_kill': '0', 'oom_group_kill': '0'}}

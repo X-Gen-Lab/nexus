@@ -312,9 +312,9 @@ and modes need their own exact review.
 
 See the [public UART contract](../../io/include/nexus/io/uart.h),
 [shared private algorithm](../../io/private/uart_fifo_impl.h),
-[H743 specialization](../../soc/stm32h743/drivers/uart_fifo.c),
-[U575 specialization](../../soc/stm32u575/drivers/uart_fifo.c),
-[H743 RTSCTS specialization](../../soc/stm32h743/drivers/uart_rtscts.c),
-[U575 RTSCTS specialization](../../soc/stm32u575/drivers/uart_rtscts.c),
+[H743 specialization](../../soc/stm32/stm32h743/drivers/uart_fifo.c),
+[U575 specialization](../../soc/stm32/stm32u575/drivers/uart_fifo.c),
+[H743 RTSCTS specialization](../../soc/stm32/stm32h743/drivers/uart_rtscts.c),
+[U575 RTSCTS specialization](../../soc/stm32/stm32u575/drivers/uart_rtscts.c),
 [finite U575 DMA selection](u575-uart-gpdma.md) and
 [current qualification boundaries](../delivery/qualification.md).

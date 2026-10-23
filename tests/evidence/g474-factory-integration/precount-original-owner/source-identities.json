@@ -1,6 +1,0 @@
-{
-  "scope": "explicit historical defect reproduction, not original TDD chronology",
-  "path": "tools/configure/bindings.py",
-  "green_sha256": "ee49b8af81e170fd6b46b70da2c74f1475cf782a4e4cc5214ef599483bf725ca",
-  "historical_predicate_sha256": "81d57ed6752ad5bb085ae8ff77ccbf5d59e3f004f404c03ad0a13f96ff6fd417"
-}

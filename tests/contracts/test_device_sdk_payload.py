@@ -1,4 +1,5 @@
 """SDK device components retain exactly their reviewed upstream closure."""
+from tools.configure.providers.descriptor import source_directory
 from pathlib import Path
 import hashlib
 import json
@@ -95,10 +96,10 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         canonical = "tools/configure/assemblies/g474-pin-states.toml"
         directory = "cmake/package/verification/io_evolution/"
         required = {
-            "io/include/nexus/io/pin_state.h", "io/src/pin_state.c",
+            "io/include/nexus/io/pin_state.h", "io/src/api/pin_state.c",
             "io/private/pin_state_impl.h", "tools/configure/pin_states.py",
-            "soc/stm32g474/drivers/pin_state.c",
-            "soc/stm32g474/private/stm32g474_pin_state.h",
+            "soc/stm32/stm32g474/drivers/pin_state.c",
+            "soc/stm32/stm32g474/private/stm32g474_pin_state.h",
             canonical, directory + "boards/g474-pin-states/board.json",
             directory + "consumers/pin-states.c",
         }
@@ -145,8 +146,8 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         payload = {
             "io/include/nexus/io/rtc.h", "io/include/nexus/io/lptim.h",
             "io/include/nexus/io/native/rtc_lptim_model.h",
-            "io/native/rtc_lptim_provider.h", "io/native/rtc_lptim.c",
-            "io/private/rtc_lptim_internal.h", "io/src/rtc.c", "io/src/lptim.c",
+            "soc/native/drivers/rtc_lptim_provider.h", "soc/native/drivers/rtc_lptim.c",
+            "io/private/rtc_lptim_internal.h", "io/src/api/rtc.c", "io/src/api/lptim.c",
             "boards/native_reference/board.json",
         }
         base = "cmake/package/verification/io_evolution/"
@@ -329,7 +330,7 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         for family, relative in additions.items():
             payload = set(descriptor.maintained(family).owned_payload)
             for name in relative:
-                source = f"soc/{family}/{name}"
+                source = f"{source_directory(family)}/{name}"
                 with self.subTest(source=source):
                     self.assertTrue((ROOT / source).is_file())
                     self.assertIn(source, payload)
@@ -340,13 +341,13 @@ class DeviceSDKPayloadTests(unittest.TestCase):
         required = set(sdk.REQUIRED_FILES)
         for family in ("stm32f103", "gd32f303", "stm32g474",
                        "stm32h743", "stm32u575"):
-            directory = ROOT / "soc" / family
+            directory = ROOT / source_directory(family)
             # This independent boundary inventories owned firmware files; it
             # does not discover or select production translation units.
             expected = {path.relative_to(ROOT).as_posix()
                         for path in directory.rglob("*")
                         if path.is_file() and path.suffix in {".c", ".h", ".S"}}
-            expected.add(f"soc/{family}/CMakeLists.txt")
+            expected.add(f"{source_directory(family)}/CMakeLists.txt")
             payload = set(descriptor.maintained(family).owned_payload)
             with self.subTest(family=family):
                 self.assertFalse(expected - payload,
@@ -361,19 +362,19 @@ class DeviceSDKPayloadTests(unittest.TestCase):
             "soc/common/legacy_adc.c", "soc/common/legacy_pwm.c",
             "soc/common/legacy_flash.c", "soc/common/uart_v1_channel_dma.c",
             "soc/common/i2c_v1_async.h", "soc/common/i2c_v2.c",
-            "soc/stm32g474/drivers/adc_stream.c",
-            "soc/stm32g474/private/stm32g474_acquisition.h",
-            "soc/stm32h743/memory_init.c",
-            "soc/stm32h743/private/memory_init.h",
-            "soc/stm32h743/drivers/adc.c", "soc/stm32h743/drivers/flash.c",
-            "soc/stm32u575/secure_batch.c",
-            "soc/stm32u575/private/stm32u575_secure_batch.h",
-            "soc/stm32g474/drivers/adc_group.c",
-            "soc/stm32g474/private/stm32g474_adc_group.h",
-            "soc/stm32h743/drivers/uart_rtscts.c",
-            "soc/stm32h743/private/stm32h743_uart_rtscts.h",
-            "soc/stm32u575/drivers/uart_rtscts.c",
-            "soc/stm32u575/private/stm32u575_uart_rtscts.h",
+            "soc/stm32/stm32g474/drivers/adc_stream.c",
+            "soc/stm32/stm32g474/private/stm32g474_acquisition.h",
+            "soc/stm32/stm32h743/memory_init.c",
+            "soc/stm32/stm32h743/private/memory_init.h",
+            "soc/stm32/stm32h743/drivers/adc.c", "soc/stm32/stm32h743/drivers/flash.c",
+            "soc/stm32/stm32u575/secure_batch.c",
+            "soc/stm32/stm32u575/private/stm32u575_secure_batch.h",
+            "soc/stm32/stm32g474/drivers/adc_group.c",
+            "soc/stm32/stm32g474/private/stm32g474_adc_group.h",
+            "soc/stm32/stm32h743/drivers/uart_rtscts.c",
+            "soc/stm32/stm32h743/private/stm32h743_uart_rtscts.h",
+            "soc/stm32/stm32u575/drivers/uart_rtscts.c",
+            "soc/stm32/stm32u575/private/stm32u575_uart_rtscts.h",
             "boards/stm32h743zi_rtscts_reference/board.json",
             "boards/stm32u575zi_rtscts_reference/board.json",
             "cmake/package/verification/io_evolution/h743-uart-rtscts.toml",
@@ -494,10 +495,10 @@ class DeviceSDKPayloadTests(unittest.TestCase):
                               ("stm32f103", "stm32f103_reference"),
                               ("gd32f303", "gd32f303_reference"),
                               ("stm32g474", "stm32g474re_hse24_reference")):
-            names = (f"soc/{family}/CMakeLists.txt", f"soc/{family}/system.c",
-                     f"soc/{family}/drivers/gpio.c", f"soc/{family}/drivers/uart.c",
-                     f"soc/{family}/private/{family}_system.h",
-                     f"soc/{family}/private/{family}_provider.h",
+            names = (f"{source_directory(family)}/CMakeLists.txt", f"{source_directory(family)}/system.c",
+                     f"{source_directory(family)}/drivers/gpio.c", f"{source_directory(family)}/drivers/uart.c",
+                     f"{source_directory(family)}/private/{family}_system.h",
+                     f"{source_directory(family)}/private/{family}_provider.h",
                      f"boards/{board}/board.json")
             for name in names:
                 with self.subTest(name=name):
@@ -506,8 +507,8 @@ class DeviceSDKPayloadTests(unittest.TestCase):
 
     def test_h743_pre_ram_power_boot_assembly_and_header_are_required(self):
         required = set(sdk.REQUIRED_FILES)
-        for name in ("soc/stm32h743/power_boot.S",
-                     "soc/stm32h743/private/boot_registers.h"):
+        for name in ("soc/stm32/stm32h743/power_boot.S",
+                     "soc/stm32/stm32h743/private/boot_registers.h"):
             with self.subTest(name=name):
                 self.assertTrue(name in required,
                                 "SDK omitted the actual H743 pre-RAM startup input")

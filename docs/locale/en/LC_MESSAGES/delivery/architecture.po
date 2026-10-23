@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 21d84318fa1d11c1f5ad5ad542c04ad85ca530b03a725097414d55440dc238a3\n"
+"X-Nexus-Source-SHA256: 46b73bd18b5c78a8c2e7c8baa8b017a9eb184e741e94519561b3ff0042e3fa4c\n"
 
 msgid "当前系统架构"
 msgstr "Current system architecture"
@@ -34,9 +34,6 @@ msgstr ""
 msgid "C11；无 Board、RTOS、SDK"
 msgstr "C11; no Board, RTOS or SDK"
 
-msgid "`arch/`"
-msgstr "`arch/`"
-
 msgid ""
 "编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 "
 "Cache／MPU／SAU 与 Secure CMSE 权限观察"
@@ -44,21 +41,6 @@ msgstr ""
 "Compile-time Cortex-M/Native primitives, exception/privilege/mask queries, "
 "interrupt save/restore, barriers, cycle snapshots; explicitly selected "
 "Cache/MPU/SAU and Secure CMSE permission observation"
-
-msgid "无 SDK／OS／SoC 政策；原语编译与整平台资格分别记录"
-msgstr ""
-"No SDK/OS/SoC policy; primitive compilation and whole-platform qualification"
-" are recorded separately"
-
-msgid "`soc/<family>/`"
-msgstr "`soc/<family>/`"
-
-msgid ""
-"F103、GD303、F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed "
-"controller 实现"
-msgstr ""
-"Exact memory/clock/IRQ/startup, timebase and typed controller "
-"implementations for F103, GD303, F407, F470, G474, H743 and U575"
 
 msgid "私有 SDK 与私有 provider storage；各家族只开放已维护模式"
 msgstr ""
@@ -78,14 +60,6 @@ msgstr "Read-only resource package; creates no product tasks"
 msgid "`io/`"
 msgstr "`io/`"
 
-msgid "typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同"
-msgstr ""
-"Typed polymorphic contracts, shared operation tables, DMA/stream/wake; "
-"optional CAN, USB, Ethernet and advanced-timer contracts"
-
-msgid "公共头不含厂商类型；Native 是行为模型"
-msgstr "Public headers contain no vendor types; Native is a behavior model"
-
 msgid "`os/`"
 msgstr "`os/`"
 
@@ -98,14 +72,6 @@ msgstr "Drivers do not depend on OS or create application workers"
 
 msgid "`components/`"
 msgstr "`components/`"
-
-msgid "显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制"
-msgstr ""
-"Explicitly selected generic owner, BMP280, Modbus, Storage and Log "
-"mechanisms"
-
-msgid "通过窄端口访问设备、时间与外部政策"
-msgstr "Access devices, time and external policy through narrow ports"
 
 msgid "`tools/`、`cmake/`"
 msgstr "`tools/`, `cmake/`"
@@ -825,3 +791,72 @@ msgstr ""
 "documentation does not replace tested-code identity. New candidates have "
 "independent exit conditions. No hardware is connected; physical results "
 "remain `not_executed`."
+
+#: docs/delivery/architecture.md:0
+msgid "`arch/arm/cortex_m/`、`arch/native/`"
+msgstr "`arch/arm/cortex_m/`、`arch/native/`"
+
+#: docs/delivery/architecture.md:0
+msgid "公共头仍位于 `arch/include/nexus/arch/`；无 SDK／OS／SoC 政策，原语编译与整平台资格分别记录"
+msgstr ""
+"Public headers remain in `arch/include/nexus/arch/`; no SDK/OS/SoC policy; "
+"primitive compilation and whole-platform qualification are recorded "
+"separately"
+
+#: docs/delivery/architecture.md:0
+msgid "`soc/<vendor>/<family>/`"
+msgstr "`soc/<vendor>/<family>/`"
+
+#: docs/delivery/architecture.md:0
+msgid ""
+"`stm32`／`gd32` 下 F103、GD303、F407、F470、G474、H743、U575 "
+"的精确内存/clock/IRQ/startup、timebase、typed controller 实现"
+msgstr ""
+"Exact memory/clock/IRQ/startup, timebase and typed controller "
+"implementations for F103, GD303, F407, F470, G474, H743 and U575 under "
+"`stm32`/`gd32`"
+
+#: docs/delivery/architecture.md:0
+msgid ""
+"公共 include、`src/api` 检查分派、`src/mechanisms` 共用规则、`src/controllers` "
+"控制器引擎；private 硬件边界"
+msgstr ""
+"Public includes, checked dispatch in `src/api`, shared rules in "
+"`src/mechanisms`, controller engines in `src/controllers`; private hardware "
+"boundaries"
+
+#: docs/delivery/architecture.md:0
+msgid "公共头不含厂商类型；Native provider 位于 `soc/native/drivers`，建立行为模型"
+msgstr ""
+"Public headers contain no vendor types; Native providers in "
+"`soc/native/drivers` establish behavior models"
+
+#: docs/delivery/architecture.md:0
+msgid ""
+"显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制；`components/soc/stm32` "
+"分类维护精确芯片扩展"
+msgstr ""
+"Explicitly selected generic owner, BMP280, Modbus, Storage and Log "
+"mechanisms; exact-chip extensions are maintained under "
+"`components/soc/stm32`"
+
+#: docs/delivery/architecture.md:0
+msgid "通过窄端口访问设备、时间与外部政策；芯片扩展不扩大其他型号支持"
+msgstr ""
+"Access devices, time and external policy through narrow ports; chip-specific"
+" extensions do not broaden support for other parts"
+
+#: docs/delivery/architecture.md:17
+msgid ""
+"完整物理目录与相邻 README 以[源码合同入口](../explanation/source-map.md)为准。 厂家与 ISA "
+"分组只改变构建期源码所有权；公共 include、CMake target 和装配中的 family "
+"标识保持。公共等待／唤醒端口可跨后端连接，Task／Queue／join／静态控制块 仍使用后端专用 API；切换 RTOS "
+"的产品显式适配其生命周期，不引入通用最大池。"
+msgstr ""
+"The [source contracts](../explanation/source-map.md) own the complete "
+"physical layout and adjacent READMEs. Vendor and ISA grouping changes only "
+"build-time source ownership; public includes, CMake targets and authored "
+"family identifiers remain stable. The public wait/wake port can connect "
+"across backends, while Task/Queue/join/static control blocks retain backend-"
+"specific APIs. Products switching RTOS explicitly adapt their lifecycle; no "
+"universal maximum pool is introduced."

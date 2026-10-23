@@ -55,7 +55,7 @@ def collect(root=ROOT):
     routes = {}
     declared = defaultdict(set)
     exports = {}
-    for path in sorted((root / "soc").glob("*/soc.json")):
+    for path in sorted((root / "soc").rglob("soc.json")):
         soc = configure.load(path)
         if soc["id"] == "native":
             continue
@@ -81,8 +81,8 @@ def collect(root=ROOT):
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
     shared_sources = (set((root / "soc/common").glob("*.c"))
-                      | set((root / "io/src").glob("*.c"))
-                      | set((root / "io/native").glob("*.c")))
+                      | set((root / "io/src").rglob("*.c"))
+                      | set((root / "soc/native/drivers").glob("*.c")))
     for source in sorted(shared_sources):
         for symbol in source_ops(source, root):
             if symbol in exports:

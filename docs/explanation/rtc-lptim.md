@@ -99,4 +99,4 @@ Phase3 development evidence binds the frozen dirty-source tuple identified by so
 
 No H743/U575 RTC or LPTIM provider, ARM RTC/LPTIM execution, backup-domain reset/ownership, oscillator selection/calibration, STOP-mode wake, VBAT persistence, hardware retention or physical HIL result is established here. Future adaptation must prove its exact SoC/Board/clock/IRQ/security and retained-storage contracts; a chip datasheet capability or this public API alone does not provide that proof.
 
-Related mechanisms: [request ownership](ownership.md), [typed factory](factory.md), [Native provider source](../../io/native/rtc_lptim.c) and the [I/O evolution contract](../design/io-evolution.md). Product schedules, protocol state, persistence policy and private board wiring stay in external repositories.
+Related mechanisms: [request ownership](ownership.md), [typed factory](factory.md), [Native provider source](../../soc/native/drivers/rtc_lptim.c) and the [I/O evolution contract](../design/io-evolution.md). Product schedules, protocol state, persistence policy and private board wiring stay in external repositories.

@@ -5,6 +5,12 @@ BMP280 core and SPI transport, instance-level Log, two-bank commit-last Storage,
 physical Flash region and Native file adapters, and pure Modbus RTU parsing.
 Unreferenced component code does not enter a firmware image.
 
+General mechanisms remain in their named component directories. Exact STM32
+extensions live under `components/soc/stm32/`, including selected F407 handoff/I2S2
+and U575 retained-time/LPDMA/Stop2 mechanisms. Their public include paths and
+explicit target names stay stable. This source grouping does not broaden the supported
+chip, backend, clock, security or physical qualification scope.
+
 Owners have one executor, exact slot capacity, stable cancellation epochs and
 caller-owned operations. Initialization links unused slots before publication.
 Admission removes one free slot and appends one FIFO entry under the metadata

@@ -1,5 +1,5 @@
 # Compile real provider sources against deterministic register/event models.
-set(stm32_root "${NEXUS_SOURCE_DIR}/soc/stm32f407")
+set(stm32_root "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407")
 set(stm32_device "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include")
 set(stm32_cmsis "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
 add_executable(contract_stm32_system_model

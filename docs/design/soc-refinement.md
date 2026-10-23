@@ -76,7 +76,7 @@ exit condition.
 The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and EXTI1/PA1
 rings, pending-bit acknowledgement, mux/gate ownership and source withdrawal.
 Its test Board is an explicit software fixture, with no inferred connector,
-button or electrical bias. The [H743 contract](../../soc/stm32h743/README.md)
+button or electrical bias. The [H743 contract](../../soc/stm32/stm32h743/README.md)
 defines all four HSI 32/64 MHz and Cache off/on combinations. Fixed cold profile
 selection does not implement a running frequency transition.
 

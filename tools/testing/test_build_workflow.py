@@ -803,10 +803,12 @@ class DeveloperWorkflowTests(unittest.TestCase):
 
     def test_all_new_presets_have_real_authored_assemblies_and_matching_builds(self):
         from tools.dev import dev
-        from tools.dev.presets import selected_configure
-        rows = json.loads((dev.ROOT / "CMakePresets.json").read_text())
-        configurations = rows["configurePresets"]
-        builds = {row["configurePreset"] for row in rows["buildPresets"]}
+        from tools.dev.presets import Presets, selected_configure
+        rows = Presets(dev.ROOT)
+        configurations = [row for row, _ in rows.rows["configure"].values()
+                          if not row.get("hidden", False)]
+        builds = {row["configurePreset"]
+                  for row, _ in rows.rows["build"].values()}
         names = {row["name"] for row in configurations}
         self.assertIn("native-step-debug", names)
         self.assertEqual(len({name for name in names

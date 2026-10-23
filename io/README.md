@@ -1,76 +1,69 @@
-# Typed I/O
+# Typed I/O contracts and shared mechanisms
 
-GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 interfaces.
-The optional [GPIO pin-state contract](../docs/explanation/gpio-pin-states.md)
-adds an explicit selected face for authored DEFAULT/SLEEP images. Its generated
-instance ID and runtime selection enum remain separate; lookup never acquires
-pad ownership or starts a power transition.
-Each selected instance has an immutable face with two pointers: shared read-only
-methods and a pointer to private provider state. Generated faces live in read-only
-storage; their state and selected buffers are private static objects in the
-generated translation unit. Manually assembled providers use storage supplied
-by their explicit constructor owner. A 32-bit target spends eight bytes of Flash
-per face; mutable state and exact-capacity buffers are separate. Method pointers are shared per provider and
-mode rather than repeated in every mutable instance.
+Public C11 interfaces cover GPIO, UART, SPI, I2C, physical Flash, watchdog,
+interrupt/timer/acquisition mechanisms, CAN, USB, Ethernet and selected RTC/LPTIM
+contracts. The [derived capability matrix](../docs/delivery/capabilities.md)
+identifies actual provider modes and reviewed routes. An interface header alone
+does not provide every operation on every chip or authorize PCB wiring.
 
-Public operations check the face and dispatch its exact context. Different
-provider tables can coexist in one image without redefining public symbols.
-A missing optional method reports `NX_ERROR_UNSUPPORTED`; invalid faces reject
-before provider access. A method must preserve the public operation's execution,
-deadline, buffer ownership and failure contract. Provider headers, register
-layouts and SDK types stay private.
+| Source group | Responsibility |
+| --- | --- |
+| `include/nexus/io/` | Stable public Nexus types and operation/ownership contracts |
+| `src/api/` | Checked dispatch through the selected immutable face |
+| `src/mechanisms/` | Shared stream, DMA drain, wake, transaction and observation rules |
+| `src/controllers/` | Shared CAN, USB and Ethernet controller engines selected by SoC targets |
+| `private/` | Private engine structures, hardware boundaries and direct provider templates |
+| `../soc/native/drivers/` | Independent host models implementing the same public faces |
+| `../soc/<vendor>/<family>/drivers/` | Exact MCU provider and mode implementations |
 
-Generated typed factory IDs select instances and distinguish SPI/I2C controllers
-from their child endpoints. Lookup returns a static identity. Platform start,
-request admission, service, recovery and stop remain explicit; lookup performs
-no hardware initialization, allocation, name search or locking. Faces remain
-valid while provider storage exists, so stopping requires caller and IRQ
-quiescence rather than promising that a pointer has been revoked.
+Every selected instance has a readonly face containing shared readonly methods
+and an independent private context. On a 32-bit target the face occupies eight
+bytes of readonly storage; method tables, mutable state, selected buffers and
+linked code have separate costs. Generated instances use exact static storage;
+explicit constructors use storage provided by their owner. Public consumers
+receive no vendor register layout or SDK state type.
 
-Stream reserve, publish, acquire, release, abort and stop access constant
-metadata independent of block count. Stop checks an outstanding-block count;
-filling, ready and borrowed blocks remain counted until proved abort or matching
-release. It never scans the block array or revokes a loan under the interrupt
-mask. Storage overlap validation remains a cold assembly operation whose work
-grows with block count. This complexity contract is not physical IRQ latency or
-cycle qualification.
+Public operations validate the face and dispatch `ops(context, ...)`. Providers
+can use direct private calls within their register hot paths. A missing optional
+method reports `NX_ERROR_UNSUPPORTED`. Different provider/mode tables coexist
+without replacing public symbols. IRQ entries are fixed to the selected concrete
+instances and do not look up a factory for each byte.
 
-Default paths need no OS locks or hidden tasks. Requests and transfer buffers
-remain caller-owned; generated provider buffers are assembly-owned and separate.
-UART tracks physical TC separately from loaded bytes and request release; error-only RX events never invent data. SPI
-and I2C preserve their bounded polling contracts, and controller recovery never
-replays a failed transaction. Flash exposes physical geometry; products provide
-explicit restricted regions.
+Generated factory getters return existing identities. Lookup, Platform start,
+request admission, service, recovery and stop remain separate actions. Controller
+and endpoint identities stay distinct for SPI/I2C buses. New products should use
+the generated strong-reference header; see the
+[factory contract](../docs/explanation/factory.md) for headers and ID lifetime.
 
-The Native model owns independent state per instance. Its explicit default
-fixtures support focused tests; generated assemblies use separate state and
-buffers. Native behavior, production-register fault models and ARM link fixtures
-establish software evidence. Board facts authorize reviewed physical routes;
-software-only fixtures do not establish PCB connectivity or physical timing.
+The direct path has one serialized executor in each operation's allowed context.
+Requests and transfer buffers remain caller-owned through acquire-observed
+SETTLED. Cancel, deadline and failed drain never revoke a borrow. A provider
+withdraws hardware, IRQ and deferred references before its final release
+publication; QUARANTINED storage and cleanup responsibility remain retained.
+The [ownership table](../docs/explanation/ownership.md) distinguishes direct
+calls, fixed IRQ work, cross-task adapters, waiting and shutdown.
 
-The optional USB `nx_usb_activation_port_t` is a controller face with one
-synchronous setter and the existing provider context. Its generated
-`nx_factory_usb_activation` lookup is independent of optional ROM profiles and
-`factory.capabilities`, with no hardware access or new mutable state, queue,
-worker or allocation. Existing USB faces, ops/profile layouts and factory ABI
-epoch 1 stay unchanged. Retained read-only ARM cost and unreferenced GC require
-linked evidence separate from the two-pointer face layout.
+Stream reserve, publish, acquire, release, abort and stop access a constant amount
+of metadata independent of block count. Stop checks the outstanding count and does
+not scan or revoke borrowed blocks under an interrupt mask. Cold storage-overlap
+validation examines the complete selected block set; it has a different cost.
+These software complexity contracts do not establish physical IRQ latency.
 
-Activation controls one already selected nonzero endpoint direction; EP0 remains
-separate. Cold start activates/unmasks only EP0. A setter uses the current
-software epoch, including valid cold epoch 0, and requires a quiet target with no
-loan. Enable proves endpoint geometry, DATA0, NAK and active state before
-unmasking that direction; disable masks it before withdrawing active. Neither
-starts a transfer. Repeated enable preserves DATA1/HALT; explicit disable/enable
-establishes fresh DATA0 only after proof. Other directions and their loans remain
-owned. After actual reset drain, common software explicitly masks/deactivates
-nonzero directions on both families; this does not assert an unproved GD reset
-side effect. Reset, clear-halt and submit never activate a nonzero endpoint.
+DMA memory completion, peripheral wire completion and request settlement are
+separate facts. Providers check exact DMA reachability, selected domains, Cache
+ownership and real source withdrawal. Finite and continuous modes have distinct
+loan/rearm/backpressure contracts. Default paths add no mandatory OS locks,
+hidden driver tasks or universal buffer pools. The
+[DMA and stream contracts](../docs/design/io-evolution.md) own exact scope.
 
-A failed post-write proof may have partial effects: IO closes admission, retains
-clock/storage and requires continued drain plus explicit full stop. External
-Chapter 9 policy stages selected endpoints before status IN, gates ordinary
-packet admission until configured readiness is committed, and owns rollback or
-stop on superseding SETUP/status failure. The setter is not a configuration
-transaction. The [USB packet contract](../docs/design/usb-device.md) retains
-FIG-16 and the full IO-35, class/configuration and physical HIL limits.
+The optional [USB activation contract](../docs/design/usb-device.md) keeps a
+separate immutable activation face and the existing provider context. Its
+selected nonzero endpoint setter is a bounded controller action; external
+Chapter 9 policy owns configuration, rollback and ordinary packet admission.
+It adds no default worker or configuration transaction. The public declaration
+retains its context, partial-effect and full-stop obligations.
+
+Native, production-register models, selected ARM links and physical HIL establish
+different evidence. Independent instance state and source-directory organization
+do not establish electrical behavior, measured timing or losslessness under
+arbitrary load. MCU physical HIL remains `not_executed`.

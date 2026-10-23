@@ -1,9 +1,0 @@
-[1/9] Building C object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/os/threadx/threadx.c.o
-[2/9] Building C object CMakeFiles/nexus_threadx_bootstrap_test.dir/workspace/nexus/os/threadx/threadx.c.o
-[3/9] Building C object CMakeFiles/nexus_threadx_irq_test.dir/workspace/nexus/os/threadx/threadx.c.o
-[4/9] Building C object CMakeFiles/nexus_threadx_irq_primask_test.dir/workspace/nexus/os/threadx/threadx.c.o
-[5/9] Linking CXX executable nexus_threadx_bootstrap_test
-[6/9] Linking CXX executable nexus_threadx_irq_test
-[7/9] Linking CXX executable nexus_threadx_irq_primask_test
-[8/9] Building CXX object CMakeFiles/nexus_threadx_kernel_test.dir/workspace/nexus/tests/google/threadx_kernel_test.cpp.o
-[9/9] Linking CXX executable nexus_threadx_kernel_test

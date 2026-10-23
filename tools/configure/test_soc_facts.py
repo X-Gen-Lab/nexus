@@ -1,4 +1,5 @@
 """Exact package admission and imported SDK inputs fail before publication."""
+from tools.configure.providers.descriptor import source_directory
 import hashlib
 import json
 from pathlib import Path
@@ -12,7 +13,7 @@ from tools.configure import configure as gate
 
 class PackagePinContractTests(unittest.TestCase):
     def facts(self, family="stm32g474"):
-        return gate.load(gate.ROOT / "soc" / family / "soc.json")
+        return gate.load(gate.ROOT / source_directory(family) / "soc.json")
 
     def test_physical_part_cannot_omit_its_complete_package_pin_set(self):
         for family, part in (("stm32f407", "STM32F407VET6"),
@@ -95,8 +96,8 @@ class ImportedDependencyContractTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
         for relative in ("dependencies/platform-compatibility.json",
-                         "soc/gd32f470/soc.json", "soc/gd32f470/routes.json",
-                         "soc/gd32f470/references.json",
+                         "soc/gd32/gd32f470/soc.json", "soc/gd32/gd32f470/routes.json",
+                         "soc/gd32/gd32f470/references.json",
                          "boards/gd32f470_liangshan/board.json"):
             destination = self.root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
@@ -104,7 +105,7 @@ class ImportedDependencyContractTests(unittest.TestCase):
         self.vendor = self.root / "vendors/gigadevice/gd32f4xx"
         shutil.copytree(gate.ROOT / "vendors/gigadevice/gd32f4xx", self.vendor)
         self.lock_path = self.vendor / "source.lock.json"
-        self.soc_path = self.root / "soc/gd32f470/soc.json"
+        self.soc_path = self.root / "soc/gd32/gd32f470/soc.json"
         soc = json.loads(self.soc_path.read_text())
         soc["source_lock"] = "vendors/gigadevice/gd32f4xx/source.lock.json"
         # Fixture facts have the reviewed complete LQFP144 GPIO set, independent
@@ -189,7 +190,7 @@ class ImportedDependencyContractTests(unittest.TestCase):
         self.assertEqual(list(self.root.glob(".nexus-config-*")), [])
 
     def test_unselected_route_cannot_claim_gpio_outside_exact_package(self):
-        routes_path = self.root / "soc/gd32f470/routes.json"
+        routes_path = self.root / "soc/gd32/gd32f470/routes.json"
         routes = json.loads(routes_path.read_text())
         route = next(item for item in routes["routes"]
                      if item["kind"] == "gpio")

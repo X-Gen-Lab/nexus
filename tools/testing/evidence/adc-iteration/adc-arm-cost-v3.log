@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "/workspace/nexus-adc-iteration/cost_v3.py", line 130, in <module>
-    section_sizes = {m[0]: int(m[1]) for line in sections.splitlines()
-                           ^^^^^^^^^
-ValueError: invalid literal for int() with base 10: '.text'

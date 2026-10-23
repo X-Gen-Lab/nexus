@@ -270,8 +270,11 @@ class WorkflowContracts(unittest.TestCase):
             'stm32-qiming-baremetal', 'stm32-qiming-freertos',
             'stm32-sky-baremetal', 'stm32-sky-freertos',
             'gd32-liangshan-baremetal', 'gd32-liangshan-freertos'})
-        presets = json.loads((ROOT / 'CMakePresets.json').read_text())
-        configured = {p['name'] for p in presets['configurePresets']}
+        from tools.dev.presets import Presets
+        presets = Presets(ROOT)
+        configured = {name for name, (row, _) in
+                      presets.rows['configure'].items()
+                      if not row.get('hidden', False)}
         self.assertLessEqual(selected, configured)
         native = set(jobs['native']['strategy']['matrix']['preset'])
         self.assertEqual(native, {'native-debug', 'native-release', 'native-asan',

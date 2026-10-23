@@ -81,7 +81,7 @@ def _stack_inputs(path):
              "nonempty bounded compile database required")
     selected = []
     for name in RAM_SOURCES:
-        source = regular_file(ROOT / "soc/stm32h743/drivers" / name)
+        source = regular_file(ROOT / "soc/stm32/stm32h743/drivers" / name)
         matches = []
         for row in data:
             _require(isinstance(row, dict), "compile entry is not an object")
@@ -188,7 +188,7 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
     outputs = _outputs(report_path)
     preliminary = [elf_path, resolved_path, commands_path,
                    *input_protection_paths(resolved_path),
-                   *(ROOT / "soc/stm32h743/drivers" / name for name in RAM_SOURCES),
+                   *(ROOT / "soc/stm32/stm32h743/drivers" / name for name in RAM_SOURCES),
                    *(ROOT / name for name in DEPENDENCIES)]
     tool = shutil.which(str(objdump))
     _require(tool is not None, "actual CMake objdump is unavailable")

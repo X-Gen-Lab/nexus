@@ -72,7 +72,7 @@ class H743ClockConfigurationTests(unittest.TestCase):
                 gate.resolve_ir(self.assembly(clock))
 
     def test_machine_facts_cannot_change_clock_without_provider_review(self):
-        facts = gate.load(gate.ROOT / "soc/stm32h743/soc.json")
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
         self.assertIn("hsi32-fixed-cache-off", facts["clock_profiles"])
         facts["clock_profiles"]["hsi32-fixed-cache-off"]["apb1_hz"] = 16000000
         with self.assertRaises(ValueError):

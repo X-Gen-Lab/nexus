@@ -1,4 +1,0 @@
-[1/4] Building C object io/CMakeFiles/nexus_io.dir/src/i2c_bus_clear.c.o
-[2/4] Linking C static library lib/libnexus_io.a
-[3/4] Building CXX object tests/contracts/google/CMakeFiles/nexus_uart_rs485_test.dir/uart_rs485_test.cpp.o
-[4/4] Linking CXX executable bin/nexus_uart_rs485_test

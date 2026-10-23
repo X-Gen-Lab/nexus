@@ -3,12 +3,12 @@ nexus_google_test(nexus_h743_flash_ram_closure_test
     SOURCES h743_flash_ram_closure_test.cpp h743_flash_ram_closure_model.cpp
         h743_flash_mpu_model.cpp h743_flash_ram_observer.cpp
         h743_model.cpp h743_flash_image_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"
         ${h743_flash_ram_production_sources}
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_flash_ram_closure_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -25,20 +25,20 @@ nexus_google_test(nexus_h743_flash_ram_generated_test
         h743_flash_mpu_model.cpp h743_flash_ram_observer.cpp
         "${h7_high_bundle}/bindings.c" ${h743_high_model_sources}
         h743_flash_image_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/i2c.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"
         ${h743_flash_ram_production_sources}
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_high_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
         "${NEXUS_SOURCE_DIR}/soc/common")
 target_include_directories(nexus_h743_flash_ram_generated_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
@@ -56,12 +56,12 @@ nexus_google_test(nexus_h743_flash_fixed_storage_test
     SOURCES h743_flash_fixed_storage_test.cpp h743_flash_ram_closure_model.cpp
         h743_flash_mpu_model.cpp h743_flash_ram_observer.cpp
         h743_model.cpp h743_flash_image_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"
         ${h743_flash_ram_production_sources}
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_flash_fixed_storage_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")

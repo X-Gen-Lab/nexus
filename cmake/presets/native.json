@@ -1,0 +1,90 @@
+{
+    "version": 6,
+    "include": [
+        "base.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "native-debug",
+            "inherits": "nexus-native"
+        },
+        {
+            "name": "native-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            },
+            "inherits": "nexus-native"
+        },
+        {
+            "name": "native-asan",
+            "cacheVariables": {
+                "NEXUS_ENABLE_SANITIZERS": "ON"
+            },
+            "inherits": "nexus-native"
+        },
+        {
+            "name": "native-tsan",
+            "cacheVariables": {
+                "NEXUS_ENABLE_THREAD_SANITIZER": "ON"
+            },
+            "inherits": "nexus-native"
+        },
+        {
+            "name": "native-step-debug",
+            "displayName": "Native single-step debug (Og and debug symbols)",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/native-step-debug.toml"
+            },
+            "inherits": "nexus-native"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "native-debug",
+            "configurePreset": "native-debug"
+        },
+        {
+            "name": "native-release",
+            "configurePreset": "native-release"
+        },
+        {
+            "name": "native-asan",
+            "configurePreset": "native-asan"
+        },
+        {
+            "name": "native-tsan",
+            "configurePreset": "native-tsan"
+        },
+        {
+            "name": "native-step-debug",
+            "configurePreset": "native-step-debug"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "native-debug",
+            "inherits": "nexus-test",
+            "configurePreset": "native-debug"
+        },
+        {
+            "name": "native-release",
+            "inherits": "nexus-test",
+            "configurePreset": "native-release"
+        },
+        {
+            "name": "native-asan",
+            "inherits": "nexus-test",
+            "configurePreset": "native-asan"
+        },
+        {
+            "name": "native-tsan",
+            "inherits": "nexus-test",
+            "configurePreset": "native-tsan"
+        },
+        {
+            "name": "native-step-debug",
+            "inherits": "nexus-test",
+            "configurePreset": "native-step-debug"
+        }
+    ]
+}

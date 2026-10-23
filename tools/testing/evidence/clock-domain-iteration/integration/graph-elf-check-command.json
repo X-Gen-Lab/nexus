@@ -1,9 +1,0 @@
-{
-  "command": [
-    "python3",
-    "/workspace/nexus-industrial-design/sleep-consumer/check_evidence.py"
-  ],
-  "exit_code": 0,
-  "source_sha256": "e56a82b34f522d6ff9bc65511e498b8bc44f877888eca915dc24ef585da1e93c",
-  "log": "graph-elf-checks.log"
-}

@@ -5,14 +5,19 @@
 | 层与目录 | 拥有的责任 | 依赖边界 |
 |---|---|---|
 | `core/` | 中性结果、绝对 monotonic deadline、caller-owned request 状态 | C11；无 Board、RTOS、SDK |
-| `arch/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 Cache／MPU／SAU 与 Secure CMSE 权限观察 | 无 SDK／OS／SoC 政策；原语编译与整平台资格分别记录 |
-| `soc/<family>/` | F103、GD303、F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
+| `arch/arm/cortex_m/`、`arch/native/` | 编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 Cache／MPU／SAU 与 Secure CMSE 权限观察 | 公共头仍位于 `arch/include/nexus/arch/`；无 SDK／OS／SoC 政策，原语编译与整平台资格分别记录 |
+| `soc/<vendor>/<family>/` | `stm32`／`gd32` 下 F103、GD303、F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed controller 实现 | 私有 SDK 与私有 provider storage；各家族只开放已维护模式 |
 | `boards/<board>/board.json` | 精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项 | 只读资源包；不创建产品任务 |
-| `io/` | typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同 | 公共头不含厂商类型；Native 是行为模型 |
+| `io/` | 公共 include、`src/api` 检查分派、`src/mechanisms` 共用规则、`src/controllers` 控制器引擎；private 硬件边界 | 公共头不含厂商类型；Native provider 位于 `soc/native/drivers`，建立行为模型 |
 | `os/` | 可选 wait/wake、按对象静态 task/stack/TCB/queue 适配 | driver 不依赖 OS；不创建应用 worker |
-| `components/` | 显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制 | 通过窄端口访问设备、时间与外部政策 |
+| `components/` | 显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制；`components/soc/stm32` 分类维护精确芯片扩展 | 通过窄端口访问设备、时间与外部政策；芯片扩展不扩大其他型号支持 |
 | `tools/`、`cmake/` | 严格输入解析、单份生成结果、源码 SDK、ELF/资格/HIL 工具 | CMake 是代码依赖唯一权威 |
 | 外部应用工程 | 产品 composition、任务、策略、布局、预算、恢复与业务 | pin 一个明确平台版本，拥有实际执行进展 |
+
+完整物理目录与相邻 README 以[源码合同入口](../explanation/source-map.md)为准。
+厂家与 ISA 分组只改变构建期源码所有权；公共 include、CMake target 和装配中的
+family 标识保持。公共等待／唤醒端口可跨后端连接，Task／Queue／join／静态控制块
+仍使用后端专用 API；切换 RTOS 的产品显式适配其生命周期，不引入通用最大池。
 
 SoC 按 controller kind/mode 组织 translation unit，同一实现可服务多个独立实例。
 选入一个 UART 不会默认驻留所有

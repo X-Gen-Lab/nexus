@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "docs/archive/evidence/20261023/tools-testing-evidence-part-04.tar.gz",
+    "sha256": "3c8ffd52db40f1a262c9c4f1fe5a42aefb141a1c3141b734d9abec6fe214cf9b",
+    "size": 16363945
+  },
+  "bytes": 62331294,
+  "files": 998,
+  "kind": "portable_evidence",
+  "manifest_sha256": "d20aa85b59976e06482f65c1acd3bfcb9a74d8288d5714deed08eaf342b96397",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

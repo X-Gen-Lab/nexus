@@ -1,7 +1,0 @@
-{
-  "kind": "fixture coherency correction before first Native runtime",
-  "first_native_build_only": true,
-  "no_Native_runtime_yet": true,
-  "detail": "Both fixed32 private-controller test setups now set actual RCC HSIDIV2/ready alongside nominal core32/model core32/state kernel32; first build source retained; no production change.",
-  "new_test_sha256": "b5fbef62991a953b400d80e0605333cfee77859448d58ba872ed1a56e56794a2"
-}

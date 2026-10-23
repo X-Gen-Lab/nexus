@@ -1,9 +1,0 @@
-[1/9] Building C object CMakeFiles/g474_system_test.dir/tests/contracts/g474_model.c.o
-[2/9] Building C object CMakeFiles/g474_provider_test.dir/soc/stm32g474/drivers/gpio.c.o
-[3/9] Building C object CMakeFiles/g474_system_test.dir/soc/stm32g474/drivers/gpio.c.o
-[4/9] Building C object CMakeFiles/g474_provider_test.dir/tests/contracts/g474_model.c.o
-[5/9] Building C object CMakeFiles/g474_system_test.dir/soc/stm32g474/drivers/uart.c.o
-[6/9] Building C object CMakeFiles/g474_provider_test.dir/soc/stm32g474/drivers/uart.c.o
-[7/9] Linking CXX executable g474_system_test
-[8/9] Building CXX object CMakeFiles/g474_provider_test.dir/tests/google/g474_provider_test.cpp.o
-[9/9] Linking CXX executable g474_provider_test

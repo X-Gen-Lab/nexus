@@ -1,5 +1,0 @@
-/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-uart_receive-legacy-io-src-uart_rs485.c.o: in function `direction':
-uart_rs485.c:(.text+0xb0): undefined reference to `nx_gpio_port_write'
-/usr/bin/ld: /workspace/nexus-multi-controller-iteration/gd-uart_receive-legacy-io-src-uart_rs485.c.o: in function `nx_uart_rs485_initialize':
-uart_rs485.c:(.text+0x3b6): undefined reference to `nx_gpio_port_write'
-collect2: error: ld returned 1 exit status

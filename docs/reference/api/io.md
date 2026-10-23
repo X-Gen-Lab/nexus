@@ -123,6 +123,14 @@ The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h
 :project: nexus
 ```
 
+(fwd_8h)=
+
+## fwd.h
+
+```{doxygenfile} fwd.h
+:project: nexus
+```
+
 (gpio_8h)=
 
 ## gpio.h

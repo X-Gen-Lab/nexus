@@ -165,7 +165,7 @@ retry. Stopped identities must not be treated as revoked pointers.
 The authoritative public contracts are
 [the coupled request API](../../io/include/nexus/io/pwm_adc.h) and
 [the core request lifecycle](../../core/include/nexus/core/request.h).
-[The private provider](../../soc/stm32g474/drivers/pwm_adc.c) reuses the selected
+[The private provider](../../soc/stm32/stm32g474/drivers/pwm_adc.c) reuses the selected
 official ADC/DMAMUX primitives and subordinate cold helpers; it does not replace
 the existing TIM6 stream's timer pointer or expose two hardware owners.
 

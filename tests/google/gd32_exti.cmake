@@ -1,12 +1,12 @@
 # Selected EXTI ownership; only CPU and physical register effects are modeled.
 nexus_google_test(nexus_gd32_exti_test SOURCES gd32_exti_test.cpp
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f470/drivers/exti.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/exti.c"
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
         "${NEXUS_SOURCE_DIR}/arch/include"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/private")
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
 target_include_directories(nexus_gd32_exti_test SYSTEM PRIVATE
     "${gd_multi_vendor}/CMSIS/GD/GD32F4xx/Include"
     "${gd_multi_vendor}/GD32F4xx_standard_peripheral/Include")

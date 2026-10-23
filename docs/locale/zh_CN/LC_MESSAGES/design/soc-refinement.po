@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 4fb5b8c9d09850d18310a09b8018f16bd5e37e578da4509590be3be70768eaf7\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 27fab468a0cec0736ca90b0cc6406e2173c66b637d4fdf74387221f738b7a1eb\n"
 
 msgid "SoC refinement and physical acceptance"
 msgstr "SoC 完善与物理验收"
@@ -83,8 +83,22 @@ msgstr "通用双域 factory、NS RTOS／任务身份、保留 NS 指针或异�
 msgid "These are source-reviewed Board references. Their physical PCB revisions, silicon revisions, solder bridges, electrical connections and option bytes have not been observed. Reference-only HIL admission fails closed; selecting a matching chip name cannot promote a reference into a qualified physical Board. The [extension execution record](../delivery/soc-extensions-verification.md) distinguishes normal commit gates, development ARM observations and final qualification. The [earlier baseline](../delivery/soc-refinement-verification.md) retains its original source identity and evidence. Reference software status in the ledger records bounded host/ARM evidence; it does not establish a clean candidate, physical acceptance or every original exit condition."
 msgstr "这些是来源已复核的 Board 参考；实际 PCB/silicon revision、焊桥、电气连接与 option bytes 尚未观测。reference-only HIL admission 默认拒绝，匹配芯片名称不能使参考成为合格实板。[扩展执行记录](../delivery/soc-extensions-verification.md)区分普通 commit gate、开发 ARM 观测与最终资格。[原始基线](../delivery/soc-refinement-verification.md)保留原 source identity 和证据。台账中的参考软件状态仅建立有界 host/ARM 证据，不建立 clean candidate、物理验收或全部原始退出条件。"
 
-msgid "The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source withdrawal. Its test Board is an explicit software fixture, with no inferred connector, button or electrical bias. The [H743 contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md) defines all four HSI 32/64 MHz and Cache off/on combinations. Fixed cold profile selection does not implement a running frequency transition."
-msgstr "[G474 合同](stm32g474.md)定义独立 EXTI0/PA0 和 EXTI1/PA1 ring、pending ACK、mux/gate ownership 和源撤离。测试 Board 是显式软件 fixture，不推测连接器、按钮或电气偏置。[H743 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md)定义 HSI 32/64 MHz 与 Cache 关/开的四种组合。固定 cold profile 选择不实现运行中频率切换。"
+#: docs/design/soc-refinement.md:76
+msgid ""
+"The [G474 contract](stm32g474.md) describes independent EXTI0/PA0 and "
+"EXTI1/PA1 rings, pending-bit acknowledgement, mux/gate ownership and source "
+"withdrawal. Its test Board is an explicit software fixture, with no inferred"
+" connector, button or electrical bias. The [H743 "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32h743/README.md) defines all four HSI 32/64 MHz and "
+"Cache off/on combinations. Fixed cold profile selection does not implement a"
+" running frequency transition."
+msgstr ""
+"[G474 合同](stm32g474.md)定义独立 EXTI0/PA0 和 EXTI1/PA1 ring、pending ACK、mux/gate "
+"ownership 和源撤离。测试 Board 是显式软件 fixture，不推测连接器、按钮或电气偏置。[H743 "
+"合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32h743/README.md)定义 HSI 32/64 MHz 与 Cache 关/开的四种组合。固定 "
+"cold profile 选择不实现运行中频率切换。"
 
 msgid "H743 USART3 DMA TX owns DMA1 Stream0, DMAMUX1 Channel0 request46 and its separate vector; the alternative RX-IDLE selection owns DMA1 Stream1/channel1 request45 and keeps TX IRQ-driven. Finite RX needs owner service and rearm gaps; it is not continuous or implicit duplex. Cache-on buffers occupy exclusively owned complete 32-byte lines in selected initialized AXI/SRAM1, with no outward rounding or hidden bounce buffer. Cache cleaning follows borrow admission, runs outside the long interrupt mask, and cannot settle storage while preparation is active. DMA completion, wire TC and source withdrawal remain distinct. Failed withdrawal quarantines the loan; the provider must drain before cache and timer shutdown."
 msgstr "H743 USART3 DMA TX 拥有 DMA1 Stream0、DMAMUX1 Channel0 request46 和独立向量；替代的 RX-IDLE 选择拥有 DMA1 Stream1/channel1 request45，TX 保持 IRQ 推进。有限 RX 需要 owner service 且有 rearm 间隙，不是连续或隐式 duplex。Cache-on 缓冲区占有所选已初始化 AXI/SRAM1 内独占的完整 32-byte lines，不向外扩展对齐，也没有隐藏 bounce buffer。借用准入后才 clean，操作不置于长中断屏蔽区，准备仍在进行时不能 settle 存储。DMA 完成、真实 wire TC 和源撤回分别证明。撤回失败将 loan 隔离；provider 必须排空后才能停止 cache 与 timer。"
@@ -274,4 +288,3 @@ msgstr "SOC-36 要形成通用userspace支持，仍需独立审查的双域confi
 
 msgid "Physical equipment is currently disconnected. SOC-37–55 have executable tooling and station-binding obligations; their physical exit status remains `not_executed`. See [HIL authoring and commands](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)."
 msgstr "当前设备未连接。SOC-37–55 有可执行工装和station绑定义务，物理退出状态仍为 `not_executed`。见[HIL编写与命令](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/README.md)。"
-

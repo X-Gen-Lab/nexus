@@ -1,9 +1,9 @@
 # Real selected pre-RAM C; only constant MMIO leaves are modeled.
 nexus_google_test(nexus_u575_memory_test
     SOURCES u575_memory_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/memory_init.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/memory_init.c"
     LIBRARIES Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32u575"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_memory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"

@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 94106fc151e6e9d78dd55f924d65850e411cf5e5c30ffb8b691dffa293c0a47b\n"
+"X-Nexus-Source-SHA256: 5050f472d9d71f2405b27571290b30e3c238566a5cfea2db2a2ce765bc0c0e75\n"
 
 msgid "Borrow, completion and observer lifetime"
 msgstr "借用、完成与观察者生命周期"
@@ -155,3 +155,101 @@ msgstr ""
 "FIG-15 包括可见丢失和停止/drain 责任。容量与服务延迟预算是明确的产品输入；不能承诺任意 IRQ "
 "延迟或消费者速度下无损。[教程](../tutorials/async-io.md)执行拒绝和隔离；[OS 停机](../guides/os-"
 "shutdown.md)说明等待与 join 责任。"
+
+#: docs/explanation/ownership.md:33
+msgid "Execution contexts and shutdown ownership"
+msgstr "执行上下文与停机所有权"
+
+#: docs/explanation/ownership.md:0
+msgid "Operation group"
+msgstr "操作组"
+
+#: docs/explanation/ownership.md:0
+msgid "Execution owner"
+msgstr "执行所有者"
+
+#: docs/explanation/ownership.md:0
+msgid "Required lifetime and progress"
+msgstr "必需的生命周期与执行进度"
+
+#: docs/explanation/ownership.md:0
+msgid "Direct request admission and service"
+msgstr "直接请求接纳与 service"
+
+#: docs/explanation/ownership.md:0
+msgid "One serialized executor in the public operation's permitted context"
+msgstr "公共操作允许上下文中的单一串行执行者"
+
+#: docs/explanation/ownership.md:0
+msgid ""
+"Keep admitted request and buffers through acquire-observed SETTLED; explicit"
+" service advances deadline and drain"
+msgstr "保留已接纳的请求和缓冲，直到 acquire 观察 SETTLED；显式 service 推进 deadline 与排空"
+
+#: docs/explanation/ownership.md:0
+msgid "Fixed provider IRQ"
+msgstr "固定 provider IRQ"
+
+#: docs/explanation/ownership.md:0
+msgid "The selected vector and its declared IRQ policy"
+msgstr "所选向量及其声明的 IRQ 策略"
+
+#: docs/explanation/ownership.md:0
+msgid ""
+"Record bounded hardware facts; retain every reference until the provider "
+"proves withdrawal"
+msgstr "记录有界硬件事实；provider 证明撤回前保留所有引用"
+
+#: docs/explanation/ownership.md:0
+msgid "Cross-task producers or cancellation"
+msgstr "跨任务生产者或取消"
+
+#: docs/explanation/ownership.md:0
+msgid "An explicit owner/adapter using stable slots and epochs"
+msgstr "使用稳定 slot 与 epoch 的显式 owner／adapter"
+
+#: docs/explanation/ownership.md:0
+msgid ""
+"Drain controls and join observers before recycling operation or adapter "
+"storage"
+msgstr "复用操作或 adapter 存储前，排空控制并 join 观察者"
+
+#: docs/explanation/ownership.md:0
+msgid "Waiting"
+msgstr "等待"
+
+#: docs/explanation/ownership.md:0
+msgid "The caller with an explicit wait/wake port"
+msgstr "具有显式等待／唤醒端口的调用者"
+
+#: docs/explanation/ownership.md:0
+msgid ""
+"Check readiness, arm, recheck, wait and recheck the authoritative predicate;"
+" a hint alone does not settle a request or service hardware"
+msgstr "检查就绪、arm、重新检查、等待，再检查权威谓词；单个通知不能结清请求或推进硬件"
+
+#: docs/explanation/ownership.md:0
+msgid "Platform start and stop"
+msgstr "Platform 启动与停止"
+
+#: docs/explanation/ownership.md:0
+msgid "One external lifecycle owner"
+msgstr "单一外部生命周期所有者"
+
+#: docs/explanation/ownership.md:0
+msgid ""
+"Quiesce callers and publishers, keep cleanup progressing and retain "
+"remaining effects after BUSY or failure"
+msgstr "使调用者与发布者静止，持续推进清理，并在 BUSY 或失败后保留剩余效果"
+
+#: docs/explanation/ownership.md:43
+msgid ""
+"Atomic publication of request state does not serialize accesses to other "
+"request fields or payload buffers, or permit competing admission owners. Use"
+" the public operation contract and an explicit shared owner when multiple "
+"tasks access a controller. Platform stop does not revoke a static face or "
+"automatically stop product tasks."
+msgstr ""
+"请求状态的原子发布不会串行化对其他请求字段或 payload "
+"缓冲的访问，也不允许多个接纳所有者竞争。多个任务访问同一控制器时，应遵守公共操作合同并使用显式共享 owner。Platform "
+"停止不会撤销静态接口面，也不会自动停止产品任务。"

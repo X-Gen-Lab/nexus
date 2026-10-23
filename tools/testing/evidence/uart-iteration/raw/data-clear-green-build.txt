@@ -1,4 +1,0 @@
-[1/4] Building C object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/__/__/soc/stm32f407/drivers/uart_receive.c.o
-[2/4] Building C object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/__/__/soc/gd32f470/drivers/uart_receive.c.o
-[3/4] Linking CXX executable bin/nexus_stm32_uart_receive_test
-[4/4] Linking CXX executable bin/nexus_gd32_uart_receive_test

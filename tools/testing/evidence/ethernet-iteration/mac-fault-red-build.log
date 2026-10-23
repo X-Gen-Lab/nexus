@@ -1,6 +1,0 @@
-[1/6] Building CXX object CMakeFiles/ethernet_mac_test.dir/tests/google/ethernet_mac_test.cpp.o
-[2/6] Building CXX object CMakeFiles/ethernet_gd32_test.dir/tests/google/ethernet_mac_test.cpp.o
-[3/6] Building CXX object CMakeFiles/ethernet_stm32_test.dir/tests/google/ethernet_mac_test.cpp.o
-[4/6] Linking CXX executable ethernet_mac_test
-[5/6] Linking CXX executable ethernet_gd32_test
-[6/6] Linking CXX executable ethernet_stm32_test

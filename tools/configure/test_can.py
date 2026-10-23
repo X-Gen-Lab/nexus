@@ -101,7 +101,7 @@ class CanConfigurationTests(unittest.TestCase):
         selected = [row for row in rows if row["kind"] == "can"]
         self.assertEqual(len(selected), 4)
         for row in selected:
-            self.assertEqual(row["exports"], ["io/src/can_controller.c"])
+            self.assertEqual(row["exports"], ["io/src/controllers/can_controller.c"])
             self.assertTrue(row["fixtures"])
 
     def test_no_can_configuration_produces_no_domain_state_or_driver_calls(self):

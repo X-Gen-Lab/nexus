@@ -21,13 +21,13 @@ nexus_google_test(nexus_h743_uart_fifo_factory_test
     SOURCES h743_uart_fifo_factory_test.cpp
         "${h7_fifo_bundle}/bindings.c"
         h743_uart_fifo_model.cpp h743_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_fifo.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_fifo.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_fifo_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
         "${NEXUS_SOURCE_DIR}/tests/google"
         "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(nexus_h743_uart_fifo_factory_test SYSTEM PRIVATE

@@ -1,7 +1,8 @@
 # Maintenance scripts
 
 Builds use `python tools/dev/dev.py configure|build|test --preset <name>` and
-one assembly JSON. Native CMake arguments pass through to the maintained presets.
+one schema-2 TOML assembly. Reviewed SoC and Board facts remain JSON. Native
+CMake arguments pass through to the maintained presets.
 Configuration, source SDK, ELF measurement, HIL and artifact sealing tools live in
 `tools/` and `cmake/package/`; see [delivery](../docs/delivery/README.md).
 
@@ -20,6 +21,9 @@ python scripts/setup/install_dev_tools.py
 .venv/bin/python tools/dev/dev.py test --preset native-debug
 ```
 
-The source checkout initializes only three pinned Git dependencies: FreeRTOS,
-CMSIS Core and the STM32 device package. The reviewed GD32 SDK import is tracked.
+The checkout has fourteen pinned Git submodules: FreeRTOS, ThreadX, GoogleTest,
+Arm CMSIS Core and five pairs of ST device/HAL packages. The reviewed GD32F30x
+and GD32F4xx SDK imports are tracked with per-file locks. The current gitlinks
+and [dependency policy](../dependencies/platform-compatibility.json) own their
+identity; directory presence does not enable a platform or mode.
 ARM link checks and Native models do not establish physical board qualification.

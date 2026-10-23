@@ -1,0 +1,829 @@
+{
+  "schema_version": 1,
+  "id": "stm32g474",
+  "variants": {
+    "STM32G474RET6": {
+      "package": "LQFP64",
+      "flash": {
+        "origin": 134217728,
+        "size": 524288,
+        "erase_blocks": [
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048,
+          2048
+        ]
+      },
+      "memory": [
+        {
+          "id": "sram1-sram2",
+          "origin": 536870912,
+          "size": 98304,
+          "dma": true,
+          "linker": true
+        },
+        {
+          "id": "ccm-sram",
+          "origin": 268435456,
+          "size": 32768,
+          "dma": false,
+          "linker": false
+        }
+      ],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15",
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15",
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15",
+        "PD2",
+        "PF0",
+        "PF1",
+        "PG10"
+      ]
+    }
+  },
+  "cpu": {
+    "arch": "cortex-m4",
+    "fpu": "fpv4-sp-d16",
+    "float_abi": "hard",
+    "dsp": true,
+    "dwt_cyccnt": true,
+    "mpu_version": 7,
+    "mpu_regions": 8,
+    "icache_line_bytes": 0,
+    "dcache_line_bytes": 0,
+    "security": "single",
+    "sau": false,
+    "mve": "none"
+  },
+  "irq": {
+    "priority_bits": 4,
+    "external_count": 102
+  },
+  "clock_profiles": {
+    "hse24-pll170": {
+      "hse_hz": 24000000,
+      "core_hz": 170000000,
+      "apb1_hz": 170000000,
+      "apb2_hz": 170000000
+    }
+  },
+  "controllers": {
+    "GPIOA": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output",
+        "named-states"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1",
+        "PA2",
+        "PA3",
+        "PA4",
+        "PA5",
+        "PA6",
+        "PA7",
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA11",
+        "PA12",
+        "PA13",
+        "PA14",
+        "PA15"
+      ]
+    },
+    "LPUART1": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "LPUART1_IRQn"
+      ],
+      "irq_numbers": [
+        91
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA2",
+        "PA3"
+      ]
+    },
+    "EXTI0": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI0_IRQn"
+      ],
+      "irq_numbers": [
+        6
+      ],
+      "pins": [
+        "PA0"
+      ]
+    },
+    "EXTI1": {
+      "kind": "exti",
+      "modes": [
+        "edge-event"
+      ],
+      "irq": [
+        "EXTI1_IRQn"
+      ],
+      "irq_numbers": [
+        7
+      ],
+      "pins": [
+        "PA1"
+      ]
+    },
+    "GPIOB": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PB0",
+        "PB1",
+        "PB2",
+        "PB3",
+        "PB4",
+        "PB5",
+        "PB6",
+        "PB7",
+        "PB8",
+        "PB9",
+        "PB10",
+        "PB11",
+        "PB12",
+        "PB13",
+        "PB14",
+        "PB15"
+      ]
+    },
+    "GPIOC": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PC0",
+        "PC1",
+        "PC2",
+        "PC3",
+        "PC4",
+        "PC5",
+        "PC6",
+        "PC7",
+        "PC8",
+        "PC9",
+        "PC10",
+        "PC11",
+        "PC12",
+        "PC13",
+        "PC14",
+        "PC15"
+      ]
+    },
+    "GPIOD": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PD2"
+      ]
+    },
+    "GPIOF": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PF0",
+        "PF1"
+      ]
+    },
+    "GPIOG": {
+      "kind": "gpio",
+      "modes": [
+        "input",
+        "output"
+      ],
+      "irq": [],
+      "pins": [
+        "PG10"
+      ]
+    },
+    "USART1": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART1_IRQn"
+      ],
+      "irq_numbers": [
+        37
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA9",
+        "PA10"
+      ]
+    },
+    "USART2": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART2_IRQn"
+      ],
+      "irq_numbers": [
+        38
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA2",
+        "PA3"
+      ]
+    },
+    "USART3": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "USART3_IRQn"
+      ],
+      "irq_numbers": [
+        39
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PB10",
+        "PB11"
+      ]
+    },
+    "UART4": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "UART4_IRQn"
+      ],
+      "irq_numbers": [
+        52
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PC10",
+        "PC11"
+      ]
+    },
+    "UART5": {
+      "kind": "uart",
+      "modes": [
+        "irq-bytes"
+      ],
+      "irq": [
+        "UART5_IRQn"
+      ],
+      "irq_numbers": [
+        53
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PC12",
+        "PD2"
+      ]
+    },
+    "IWDG": {
+      "kind": "watchdog",
+      "modes": [
+        "independent"
+      ],
+      "irq": [],
+      "pins": []
+    },
+    "SPI1": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "max_hz": 42500000,
+      "pins": [
+        "PA5",
+        "PA6",
+        "PA7"
+      ]
+    },
+    "SPI2": {
+      "kind": "spi",
+      "modes": [
+        "short-poll"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "max_hz": 42500000,
+      "pins": [
+        "PB13",
+        "PB14",
+        "PB15"
+      ]
+    },
+    "TIM3": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm",
+        "shared-fixed-pwm"
+      ],
+      "irq": [
+        "TIM3_IRQn"
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA6",
+        "PA7"
+      ],
+      "interfaces": {
+        "encoder": [
+          "quadrature"
+        ]
+      },
+      "irq_numbers": [
+        29
+      ]
+    },
+    "ADC1": {
+      "kind": "adc",
+      "modes": [
+        "single-shot",
+        "trigger-dma"
+      ],
+      "irq": [],
+      "pins": [
+        "PA0",
+        "PA1"
+      ],
+      "clock_hz": 1328125,
+      "interfaces": {
+        "adc_group": [
+          "regular-sequence-dma",
+          "injected-sequence"
+        ]
+      }
+    },
+    "I2C1": {
+      "kind": "i2c",
+      "modes": [
+        "poll-messages"
+      ],
+      "irq": [],
+      "pins": [
+        "PB8",
+        "PB9"
+      ],
+      "clock_hz": 16000000,
+      "max_hz": 100000
+    },
+    "FLASH": {
+      "kind": "flash",
+      "modes": [
+        "poll-word"
+      ],
+      "irq": [
+        "FLASH_IRQn"
+      ],
+      "irq_numbers": [
+        4
+      ],
+      "pins": []
+    },
+    "TIM4": {
+      "kind": "pwm",
+      "modes": [
+        "fixed-pwm"
+      ],
+      "irq": [],
+      "clock_hz": 170000000,
+      "pins": [
+        "PB6"
+      ]
+    },
+    "TIM1": {
+      "kind": "pwm_group",
+      "modes": [
+        "coherent-pwm"
+      ],
+      "irq": [
+        "TIM1_BRK_TIM15_IRQn"
+      ],
+      "irq_numbers": [
+        24
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA8",
+        "PA9",
+        "PA10",
+        "PA1",
+        "PA4",
+        "PA0"
+      ],
+      "resources": [
+        "controller:COMP1",
+        "controller:TIM15",
+        "timer:TIM1",
+        "clock:TIM1",
+        "clock:SYSCFG"
+      ],
+      "interfaces": {
+        "pwm_adc": [
+          "finite-regular-dma"
+        ]
+      }
+    },
+    "TIM5": {
+      "kind": "timer_capture",
+      "modes": [
+        "edge-capture"
+      ],
+      "irq": [
+        "TIM5"
+      ],
+      "irq_numbers": [
+        50
+      ],
+      "clock_hz": 170000000,
+      "pins": [
+        "PA0"
+      ],
+      "resources": [
+        "clock:TIM5"
+      ]
+    },
+    "FDCAN1": {
+      "kind": "can_fd",
+      "modes": [
+        "iso-fd-loopback",
+        "iso-fd-normal"
+      ],
+      "irq": [
+        "FDCAN1_IT0_IRQn",
+        "FDCAN1_IT1_IRQn"
+      ],
+      "irq_numbers": [
+        21,
+        22
+      ],
+      "clock_hz": 24000000,
+      "message_ram_words": 212,
+      "pins": [
+        "PA11",
+        "PA12"
+      ],
+      "resources": [
+        "clock:FDCAN",
+        "message-ram:FDCAN1"
+      ]
+    }
+  },
+  "reserved_resources": [
+    "timer:TIM2",
+    "irq:TIM2_IRQn",
+    "pin:PF0",
+    "pin:PF1",
+    "pin:PG10"
+  ],
+  "source_lock": {
+    "cmsis_core": "55b19837f5703e418ca37894d5745b1dc05e4c91",
+    "cmsis_device_g4": "626ee412334a5ed2e5b320af5a8d77d69f03a558",
+    "hal_driver_g4": "f5929f431f9effe45fbe18f5337e4753ced9ac92"
+  },
+  "provenance": [
+    "DS12288 Rev6 STM32G474xx: exact RE512KiB/LQFP64; SRAM1 80KiB+SRAM2 16KiB are DMA-visible96KiB at0x20000000. CCM32KiB is declared once at0x10000000. RM0440p89 also permits DMA through its0x20018000 SRAM-bus alias; the selected linker/DMA policy deliberately excludes both CCM addresses rather than claiming a silicon restriction. Default linker and generated DMA domains select96KiB SRAM1/2 only.",
+    "RM0440 Rev9: DBANK=1 required,256 physical2KiB pages; startup validates option/density/category without writing Flash. HSE24 PLLM6/N85/R2, boost170MHz/APB170MHz; TIM2 PSC169 reserved.",
+    "https://www.st.com/resource/en/datasheet/stm32g474rc.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "https://github.com/STMicroelectronics/cmsis-device-g4/tree/626ee412334a5ed2e5b320af5a8d77d69f03a558",
+    "DS12288 Rev6 November2021; Table12 Section4.10 LQFP64 column; Figure7 p50; Table2 p16 independently confirm52 package GPIOs. PDF SHA256 b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add. PG10 shares NRST and option-byte/electrical restrictions; inventory does not open new Board routes or provider modes.",
+    "Fixed HSE24 profile reserves PF0/PF1 oscillator pads. Conditional PG10/NRST GPIO remains reserved until a reviewed option-byte/Board policy is implemented; inventory52 does not authorize these pads."
+  ],
+  "references": "references.json",
+  "adc_group_review": "soc/stm32/stm32g474/reviews/adc-group.json"
+}

@@ -1,8 +1,0 @@
-test_async_modes_have_immutable_irq_policy_and_exact_directional_claims (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_modes_have_immutable_irq_policy_and_exact_directional_claims) ... ok
-test_async_requires_explicit_irq_and_polling_rejects_irq_options (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_async_requires_explicit_irq_and_polling_rejects_irq_options) ... ok
-test_priority_integer_range_is_validated_before_emission (tools.configure.test_i2c_modes.I2cAsyncConfigurationTests.test_priority_integer_range_is_validated_before_emission) ... ok
-
-----------------------------------------------------------------------
-Ran 3 tests in 0.124s
-
-OK

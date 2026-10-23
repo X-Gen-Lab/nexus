@@ -1,5 +1,0 @@
-#include "stm32g474_provider.h"
-const char nx_size_system[sizeof(nx_stm32g474_system_t)]={0};
-const char nx_size_gpio[sizeof(nx_stm32g474_gpio_state_t)]={0};
-const char nx_size_uart[sizeof(nx_stm32g474_uart_state_t)]={0};
-const char nx_size_request[sizeof(nx_uart_tx_request_t)]={0};

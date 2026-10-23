@@ -1,6 +1,6 @@
 # Exact messages independently reviewed; approval bound by companion receipt.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 20c45eeab37fe160d511f6bb8791efb1b3baa2fa7f2ad8e1e5e198fef51f2208\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 95b60b1db0684786a6e57597a99b21775b54199e2b9b34cf1d974f40b6ddbf84\n"
 
 msgid "当前设计与实施台账"
 msgstr "当前设计与实施台账"
@@ -263,8 +263,13 @@ msgstr "[STM32G474 接入](stm32g474.md)"
 msgid "精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI"
 msgstr "精确型号、MB1367、六 UART、封装 GPIO、有限 SPI、TIM3/4 CH1 PWM、IWDG 与 PA0/PA1 EXTI"
 
-msgid "[STM32H743 接入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md)"
-msgstr "[STM32H743 接入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32h743/README.md)"
+#: docs/design/README.md:0
+msgid ""
+"[STM32H743 接入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32h743/README.md)"
+msgstr ""
+"[STM32H743 接入](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32h743/README.md)"
 
 msgid "四种固定 HSI/cache 配置及冷态 cache 所有权；独立 V／HSI64／裸机参考增加 SPI4 有限 DMA、USART3 连续 RX／IRQ TX，以及显式有限 TX DMA／连续 RX 双向模式"
 msgstr "四种固定 HSI/cache 配置及冷态 cache 所有权；独立 V／HSI64／裸机参考增加 SPI4 有限 DMA、USART3 连续 RX／IRQ TX，以及显式有限 TX DMA／连续 RX 双向模式"

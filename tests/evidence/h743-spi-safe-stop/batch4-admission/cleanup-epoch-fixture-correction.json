@@ -1,9 +1,0 @@
-{
-  "classification": "new test contract expectation correction, production unchanged",
-  "actual_source": "cleanup-epoch-correction-source",
-  "actual_evidence": "build/batch4-admission-evidence/final-r2-whole-nexus_h743_peripheral_factory_test",
-  "actual_failure_assertions": 1,
-  "retained_elf": "/tmp/nexus-h743-spi-safe-stop-20261018/build/retained-admission-r2-factory13",
-  "reason": "Existing nx_stm32h743_system_stop sets started=false before DIER/CR1 withdrawal; refused CEN clearing retains EFFECT_TIMER and actual gate/CEN, invalidating the old epoch. Correct test proves retained cleanup rather than requiring the invalid epoch to remain started.",
-  "production_guard_remains": "2bc6e44e9714eaee41232b607cb44271a47ddea72aefdf316582d0a64d0c6af0"
-}

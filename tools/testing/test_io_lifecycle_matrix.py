@@ -131,6 +131,106 @@ class IOLifecycleMatrixTests(unittest.TestCase):
         p.write_text(json.dumps(entries))
         with self.assertRaises(ValueError): matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
 
+    def shared_native_model(self, owner="nexus_io_native"):
+        source = self.root / "soc/native/drivers/uart.c"
+        source.parent.mkdir(parents=True)
+        self.production.rename(source)
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        entry = entries[1]
+        old_object = Path(entry["arguments"][-1])
+        output = (self.build / "soc/native/CMakeFiles" / (owner + ".dir") /
+                  "drivers/uart.c.o")
+        output.parent.mkdir(parents=True)
+        output.write_bytes(old_object.read_bytes())
+        entry["file"] = str(source)
+        entry["arguments"][2] = str(source)
+        entry["arguments"][-1] = str(output)
+        database.write_text(json.dumps(entries))
+        catalogue = json.loads(self.catalogue.read_text())
+        catalogue["properties"][0]["production_sources"] = [
+            source.relative_to(self.root).as_posix()]
+        self.catalogue.write_text(json.dumps(catalogue))
+        return source, output
+
+    def test_shared_native_model_has_one_owned_compiled_context(self):
+        source, output = self.shared_native_model()
+        snapshot = matrix.capture(self.root, self.build, self.catalogue,
+                                  self.snapshot)
+        context = snapshot["compiled"][source.relative_to(self.root).as_posix()]
+        self.assertEqual(len(context), 1)
+        self.assertEqual(context[0]["object"], str(output))
+        self.assertEqual(context[0]["object_sha256"], matrix.digest(output))
+        self.write_execution()
+        self.assertEqual(self.run_audit()["properties"][0]["status"],
+                         "executed-bounded")
+
+    def test_shared_native_model_compiled_for_another_owner_rejects(self):
+        self.shared_native_model(owner="another_target")
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_native_owner_marker_cannot_hide_another_compiled_target(self):
+        _, output = self.shared_native_model()
+        another = (self.build / "soc/native/CMakeFiles/another_target.dir" /
+                   "drivers/uart.c.o")
+        another.parent.mkdir(parents=True)
+        another.write_bytes(output.read_bytes())
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        entries[1]["arguments"][-1] = str(
+            output.parent.parent / "../another_target.dir/drivers/uart.c.o")
+        database.write_text(json.dumps(entries))
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_hardware_provider_compiled_for_shared_native_owner_rejects(self):
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        old_object = Path(entries[1]["arguments"][-1])
+        output = (self.build / "soc/native/CMakeFiles/nexus_io_native.dir" /
+                  old_object.name)
+        output.parent.mkdir(parents=True)
+        output.write_bytes(old_object.read_bytes())
+        entries[1]["arguments"][-1] = str(output)
+        database.write_text(json.dumps(entries))
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def hardware_source_alias(self, name):
+        source = self.root / "soc/stm32/stm32f407/drivers/uart.c"
+        source.parent.mkdir(parents=True)
+        self.production.rename(source)
+        alias = self.root / name
+        alias.parent.mkdir(parents=True, exist_ok=True)
+        self.assertEqual(alias.resolve(), source)
+        database = self.build / "compile_commands.json"
+        entries = json.loads(database.read_text())
+        entry = entries[1]
+        old_object = Path(entry["arguments"][-1])
+        output = (self.build / "soc/native/CMakeFiles/nexus_io_native.dir" /
+                  "drivers/uart.c.o")
+        output.parent.mkdir(parents=True)
+        output.write_bytes(old_object.read_bytes())
+        entry["file"] = str(alias)
+        entry["arguments"][2] = str(alias)
+        entry["arguments"][-1] = str(output)
+        database.write_text(json.dumps(entries))
+        catalogue = json.loads(self.catalogue.read_text())
+        catalogue["properties"][0]["production_sources"] = [name]
+        self.catalogue.write_text(json.dumps(catalogue))
+
+    def test_hardware_source_alias_cannot_borrow_the_native_owner(self):
+        self.hardware_source_alias(
+            "soc/native/drivers/../../stm32/stm32f407/drivers/uart.c")
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
+    def test_hardware_source_alias_cannot_skip_soc_ownership(self):
+        self.hardware_source_alias("io/../soc/stm32/stm32f407/drivers/uart.c")
+        with self.assertRaisesRegex(ValueError, "compiled only for another target"):
+            matrix.capture(self.root, self.build, self.catalogue, self.snapshot)
+
     def test_duplicate_property_rejected(self):
         j = json.loads(self.catalogue.read_text()); j["properties"].append(copy.deepcopy(j["properties"][0])); self.catalogue.write_text(json.dumps(j))
         with self.assertRaises(ValueError): matrix.capture(self.root, self.build, self.catalogue, self.snapshot)

@@ -47,19 +47,19 @@ function(nexus_legacy_device_factory family)
     set(target "nexus_${short}_devices_factory_test")
     set(exti)
     if(family STREQUAL "gd32f303")
-        set(exti "${NEXUS_SOURCE_DIR}/soc/${family}/drivers/exti.c")
+        set(exti "${NEXUS_SOC_SOURCE_${family}}/drivers/exti.c")
     endif()
     nexus_google_test(${target}
         SOURCES legacy_devices_factory_test.cpp "${bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/tests/contracts/${family}_model/model.c"
-            "${NEXUS_SOURCE_DIR}/soc/${family}/system.c"
-            "${NEXUS_SOURCE_DIR}/soc/${family}/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/${family}/drivers/devices.c" ${exti}
+            "${NEXUS_SOC_SOURCE_${family}}/system.c"
+            "${NEXUS_SOC_SOURCE_${family}}/drivers/gpio.c"
+            "${NEXUS_SOC_SOURCE_${family}}/drivers/devices.c" ${exti}
             "${NEXUS_SOURCE_DIR}/soc/common/legacy_adc.c"
             "${NEXUS_SOURCE_DIR}/soc/common/legacy_pwm.c"
             "${NEXUS_SOURCE_DIR}/soc/common/legacy_flash.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/${family}/private"
+        INCLUDES "${bundle}" "${NEXUS_SOC_SOURCE_${family}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/${family}_model")
     target_include_directories(${target} SYSTEM PRIVATE ${vendor}
         "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -109,10 +109,10 @@ function(nexus_physical_flash_program_test family)
     set(target "nexus_${family}_flash_program_test")
     nexus_google_test(${target} SOURCES flash_program_test.cpp
         flash_capability_test.cpp "${bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/${soc}/drivers/flash.c"
+        "${NEXUS_SOC_SOURCE_${soc}}/drivers/flash.c"
         LIBRARIES Nexus::NativeModel Nexus::Arch
-        INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/${soc}"
-            "${NEXUS_SOURCE_DIR}/soc/${soc}/private"
+        INCLUDES "${bundle}" "${NEXUS_SOC_SOURCE_${soc}}"
+            "${NEXUS_SOC_SOURCE_${soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_include_directories(${target} SYSTEM PRIVATE ${includes})
     target_compile_definitions(${target} PRIVATE ${definitions}

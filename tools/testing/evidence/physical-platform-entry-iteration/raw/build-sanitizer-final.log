@@ -1,5 +1,0 @@
-[0/2] Re-checking globbed directories...
-[1/5] Building CXX object test-import/CMakeFiles/nexus_stm32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o
-[2/5] Building CXX object test-import/CMakeFiles/nexus_gd32_physical_platform_factory_test.dir/workspace/nexus/tests/google/physical_platform_factory_test.cpp.o
-[3/5] Linking CXX executable test-import/nexus_stm32_physical_platform_factory_test
-[4/5] Linking CXX executable test-import/nexus_gd32_physical_platform_factory_test

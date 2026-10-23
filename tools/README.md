@@ -6,9 +6,11 @@ ELF physical regions, selected configuration and budgets, and compares minimum
 images across compiler profiles. `hil/` validates station admission and raw
 physical evidence without operating unavailable equipment. `evidence/` binds
 clean source, exact files, executed logs, SDK, environment and candidate bytes.
-`maintenance/` verifies the derived capability matrix and reports real team
-assignment gaps. It prepares review ownership only after named accounts exist;
-it neither configures branch protection nor claims hardware qualification.
+`maintenance/` verifies the derived capability matrix and the checked
+agent-managed ownership policy. Codex owns all maintenance domains; named
+accounts are not required. Independent review and mandatory automated gates
+remain explicit. Local role checks neither configure GitHub branch protection
+nor establish hardware qualification.
 
 ```sh
 python tools/dev/dev.py configure --preset native-debug
@@ -45,3 +47,9 @@ Candidate sealing requires all executed software qualification scopes and
 recursively retains actual raw logs and referenced artifacts. Evidence reports
 belong outside the source tree to avoid self-referential source identity. Hardware
 measurements, product promotion and signatures stay explicitly separate.
+
+The [historical evidence archive](../docs/archive/evidence/README.md) retains
+original development collections with exact member manifests and restore
+instructions. Source navigation keeps compact references instead of repeated
+source/build snapshots. Restoring an old collection preserves its original
+source and execution scope; it does not qualify the current checkout.

@@ -31,12 +31,12 @@ foreach(profile regular-software regular-timer injected-software injected-timer)
             g474_adc_group_factory_ports.cpp g474_adc_group_model.cpp
             "${group_bundle}/bindings.c"
             "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/adc_group.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc_group.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${group_bundle}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
             "${NEXUS_SOURCE_DIR}/soc/common"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts")

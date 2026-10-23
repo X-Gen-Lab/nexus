@@ -1,7 +1,7 @@
 # Optional observation exercises the real CPU algorithm and external leaf model.
 nexus_google_test(nexus_cycle_probe_test
     SOURCES cycle_probe_test.cpp
-        "${NEXUS_SOURCE_DIR}/arch/cortex_m/nx_arch_cortex_m.c"
+        "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_cortex_m.c"
     LIBRARIES Nexus::IOCycleProbe
     INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/tests/google")

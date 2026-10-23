@@ -12,10 +12,12 @@ templates bind direct operations macros to concrete readonly tables; they do not
 create a runtime mode registry or a forwarding layer.
 
 Use `soc/common/` for a shared, silicon-specific register algorithm such as I2C
-V1. Use `io/src/` for an I/O mechanism compiled as a normal target source. Use
-this directory for private structures, external hardware boundaries or direct
-provider templates. Move files only when responsibility and target dependencies
-become clearer; identical names do not establish identical hardware semantics.
+V1. `io/src/api/` owns public checked dispatch, `io/src/mechanisms/` owns reusable
+I/O rules, and `io/src/controllers/` owns shared controller engines. Use this
+directory for private structures, external hardware boundaries or direct provider
+templates. Native models live in `soc/native/drivers/`; MCU wrappers live under
+`soc/<vendor>/<family>/drivers/`. Identical names do not establish identical
+hardware semantics.
 
 The selected SoC CMake target owns which controller sources are linked. Maintain
 private SDK includes and C11 firmware. No common engine may allocate implicit

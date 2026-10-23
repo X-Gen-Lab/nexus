@@ -1,9 +1,0 @@
-test_gd32_default_declares_no_automatic_sleep_target (sleep_selection.SocSleepSelectionTests.test_gd32_default_declares_no_automatic_sleep_target) ... ok
-test_gd32_external_selection_uses_private_checked_sdk_paths (sleep_selection.SocSleepSelectionTests.test_gd32_external_selection_uses_private_checked_sdk_paths) ... ok
-test_stm32_default_declares_no_automatic_sleep_target (sleep_selection.SocSleepSelectionTests.test_stm32_default_declares_no_automatic_sleep_target) ... ok
-test_stm32_external_selection_uses_private_checked_sdk_paths (sleep_selection.SocSleepSelectionTests.test_stm32_external_selection_uses_private_checked_sdk_paths) ... ok
-
-----------------------------------------------------------------------
-Ran 4 tests in 0.951s
-
-OK

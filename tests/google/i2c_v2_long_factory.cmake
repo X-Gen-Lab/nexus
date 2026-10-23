@@ -35,11 +35,11 @@ foreach(long_family g474 h743 u575)
     if(NOT long_timing_count EQUAL 1)
         message(FATAL_ERROR "The maintained long fixture must select exactly one timed I2C")
     endif()
-    set(long_sources "${NEXUS_SOURCE_DIR}/soc/${long_soc}/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/${long_soc}/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/${long_soc}/drivers/i2c.c"
-        "${NEXUS_SOURCE_DIR}/soc/${long_soc}/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/${long_soc}/drivers/flash.c")
+    set(long_sources "${NEXUS_SOC_SOURCE_${long_soc}}/system.c"
+        "${NEXUS_SOC_SOURCE_${long_soc}}/drivers/gpio.c"
+        "${NEXUS_SOC_SOURCE_${long_soc}}/drivers/i2c.c"
+        "${NEXUS_SOC_SOURCE_${long_soc}}/drivers/adc.c"
+        "${NEXUS_SOC_SOURCE_${long_soc}}/drivers/flash.c")
     if(long_family STREQUAL "g474")
         list(APPEND long_sources "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c")
         set(long_official g4)
@@ -50,19 +50,19 @@ foreach(long_family g474 h743 u575)
             h743_flash_fixture.cpp h743_flash_fixture_generated.cpp
             h743_flash_ram_closure_model.cpp h743_flash_mpu_model.cpp
             h743_flash_ram_observer.cpp ${h743_flash_ram_production_sources}
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/flash_execution.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/pwm.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/exti.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/watchdog.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/pwm.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/exti.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/watchdog.c")
         set(long_official h7)
         set(long_part STM32H743xx)
         set(long_define NX_I2C_LONG_H743)
     else()
         list(APPEND long_sources u575_model.cpp u575_devices_model.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/spi.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/exti.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/spi.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/exti.c")
         set(long_official u5)
         set(long_part STM32U575xx)
         set(long_define NX_I2C_LONG_U575)
@@ -73,7 +73,7 @@ foreach(long_family g474 h743 u575)
             "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${long_bundle}" "${NEXUS_SOURCE_DIR}/tests/contracts"
-            "${NEXUS_SOURCE_DIR}/soc/${long_soc}/private"
+            "${NEXUS_SOC_SOURCE_${long_soc}}/private"
             "${NEXUS_SOURCE_DIR}/soc/common")
     nexus_stm32_official(${long_target} ${long_official})
     target_include_directories(${long_target} SYSTEM PRIVATE

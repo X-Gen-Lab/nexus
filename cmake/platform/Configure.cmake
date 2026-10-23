@@ -29,7 +29,7 @@ function(nexus_resolve_assembly)
         string(JSON path GET "${configuration_code}" "${name}")
         set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${path}")
     endforeach()
-    foreach(value NEXUS_SOC_FAMILY NEXUS_EXACT_PART NEXUS_BACKEND
+    foreach(value NEXUS_SOC_FAMILY NEXUS_SOC_SOURCE_DIRECTORY NEXUS_EXACT_PART NEXUS_BACKEND
                   NEXUS_CPU_ARCH NEXUS_CPU_FPU NEXUS_FLOAT_ABI NEXUS_ENUM_ABI
                   NEXUS_ARCH_HAS_DWT_CYCCNT NEXUS_IRQ_PRIORITY_BITS
                   NEXUS_ARCH_MPU_VERSION NEXUS_ARCH_ICACHE_LINE_BYTES
@@ -46,7 +46,8 @@ function(nexus_resolve_assembly)
                   NEXUS_IO_CYCLE_PROBES NEXUS_RUNTIME_POWER
                   NEXUS_F407_I2S2_SLAVE_TX_SELECTED NEXUS_F407_I2S2_PROFILE
                   NEXUS_SELECTED_COMPONENTS NEXUS_CONFIG_SHA256
-                  NEXUS_OS_SELECTION_VARIABLES ${NEXUS_OS_SELECTION_VARIABLES})
+                  NEXUS_OS_SELECTION_VARIABLES ${NEXUS_OS_SELECTION_VARIABLES}
+                  NEXUS_SOC_SOURCE_VARIABLES ${NEXUS_SOC_SOURCE_VARIABLES})
         set(${value} "${${value}}" PARENT_SCOPE)
     endforeach()
     set(NEXUS_CONFIG_DIR "${bundle}" PARENT_SCOPE)

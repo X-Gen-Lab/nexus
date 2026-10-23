@@ -310,19 +310,19 @@ qualification. Missing production proof remains an open exit. The
 authority; per-profile execution, source identities, SDK checks and remaining
 software-candidate obligations belong in delivery evidence.
 
-The implementation is split between [cold preparation and admission](../../soc/stm32h743/drivers/flash_ram_owner.c),
-the [CPU bridge and assembly return gate](../../soc/stm32h743/drivers/flash_ram_enter.S),
-[RAM vector publication](../../soc/stm32h743/drivers/flash_ram_transaction.c),
-the [MPU transaction](../../soc/stm32h743/drivers/flash_mpu.c) and
-[physical pulse/time observations](../../soc/stm32h743/drivers/flash_ram.c).
+The implementation is split between [cold preparation and admission](../../soc/stm32/stm32h743/drivers/flash_ram_owner.c),
+the [CPU bridge and assembly return gate](../../soc/stm32/stm32h743/drivers/flash_ram_enter.S),
+[RAM vector publication](../../soc/stm32/stm32h743/drivers/flash_ram_transaction.c),
+the [MPU transaction](../../soc/stm32/stm32h743/drivers/flash_mpu.c) and
+[physical pulse/time observations](../../soc/stm32/stm32h743/drivers/flash_ram.c).
 Their private workspace and checked C/assembly prefix are declared in
-[the RAM contract](../../soc/stm32h743/private/stm32h743_flash_ram.h).
+[the RAM contract](../../soc/stm32/stm32h743/private/stm32h743_flash_ram.h).
 These links locate current work; they do not substitute for the required
 execution and production-ELF evidence.
 
 Primary references are PM0253 Rev6 sections 2.3 and 4.6–4.8, AN4838 Rev11
 section 3.4, RM0433 Rev9's Flash maps/read-while-write rules and ES0392 Rev15
 section 2.1.2. The source-identity record and selected provider evidence must
-accompany the implementation review. See also the [H743 provider scope](../../soc/stm32h743/README.md),
+accompany the implementation review. See also the [H743 provider scope](../../soc/stm32/stm32h743/README.md),
 [V-only clock contract](h743-high-clock.md), [I/O evolution](io-evolution.md),
 [Arch contract](arch-contracts.md) and [qualification boundary](../delivery/qualification.md).

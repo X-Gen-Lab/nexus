@@ -24,7 +24,7 @@ class PowerGate(unittest.TestCase):
         cls.objdump = shutil.which('arm-none-eabi-objdump')
         if not cls.compiler or not cls.objdump:
             raise RuntimeError('Actual ARM compiler/objdump required; no skips')
-        cls.source = (ROOT / 'soc/stm32h743/power_boot.S').read_text()
+        cls.source = (ROOT / 'soc/stm32/stm32h743/power_boot.S').read_text()
 
     def build(self, source):
         temporary = tempfile.TemporaryDirectory(prefix='h743-power-contract-')
@@ -37,7 +37,7 @@ class PowerGate(unittest.TestCase):
                    '-mfpu=fpv5-d16', '-mfloat-abi=hard', '-nostdlib',
                    '-Wl,-e,ExitRun0Mode', '-Wl,-Ttext=0x08000000',
                    '-Wl,--build-id=none',
-                   '-I' + str(ROOT / 'soc/stm32h743/private'),
+                   '-I' + str(ROOT / 'soc/stm32/stm32h743/private'),
                    str(assembly), '-o', str(elf)]
         compiled = subprocess.run(command, capture_output=True, timeout=15)
         self.assertEqual(compiled.returncode, 0, compiled.stderr.decode())
@@ -139,7 +139,7 @@ class PowerGate(unittest.TestCase):
 
 class MemoryFacts(unittest.TestCase):
     def setUp(self):
-        facts = json.loads((ROOT / 'soc/stm32h743/soc.json').read_text())
+        facts = json.loads((ROOT / 'soc/stm32/stm32h743/soc.json').read_text())
         self.resolved = {
             'part': 'STM32H743ZIT6',
             'memory': copy.deepcopy(facts['variants']['STM32H743ZIT6']['memory'])}
@@ -310,20 +310,20 @@ class StartupClosure(unittest.TestCase):
             '-mfloat-abi=hard', '-fshort-enums', '-Os', '-ffunction-sections',
             '-fdata-sections', '-DNEXUS_ARCH_HAS_DWT_CYCCNT=1', '-DSTM32H743xx',
             '-I' + str(generated),
-            '-I' + str(ROOT / 'soc/stm32h743/private'),
+            '-I' + str(ROOT / 'soc/stm32/stm32h743/private'),
             '-I' + str(ROOT / 'core/include'), '-I' + str(ROOT / 'arch/include'),
             '-I' + str(ROOT / 'vendors/st/cmsis_device_h7/Include'),
             '-I' + str(ROOT / 'vendors/arm/CMSIS_5/CMSIS/Core/Include'),
-            str(ROOT / 'soc/stm32h743/system.c'),
-            str(ROOT / 'soc/stm32h743/memory_init.c'),
-            str(ROOT / 'soc/stm32h743/power_boot.S'),
+            str(ROOT / 'soc/stm32/stm32h743/system.c'),
+            str(ROOT / 'soc/stm32/stm32h743/memory_init.c'),
+            str(ROOT / 'soc/stm32/stm32h743/power_boot.S'),
             str(ROOT / 'vendors/st/cmsis_device_h7/Source/Templates/gcc/startup_stm32h743xx.s'),
-            str(ROOT / 'arch/cortex_m/nx_arch_cortex_m.c'),
+            str(ROOT / 'arch/arm/cortex_m/nx_arch_cortex_m.c'),
             str(ROOT / 'core/src/fault.c'), str(main), '-nostartfiles',
             '-Wl,--gc-sections', '-Wl,--build-id=none',
             '-T' + str(generated / 'memory.ld'), '-lc', '-lgcc', '-o', str(image)]
         if not getattr(cls, 'optional_sram1', False):
-            command.remove(str(ROOT / 'soc/stm32h743/memory_init.c'))
+            command.remove(str(ROOT / 'soc/stm32/stm32h743/memory_init.c'))
         compiled = subprocess.run(command, capture_output=True, timeout=30)
         if compiled.returncode:
             raise RuntimeError(compiled.stderr.decode())

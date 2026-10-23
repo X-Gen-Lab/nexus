@@ -16,6 +16,6 @@ are not direct PC2/PC3 GPIO routes. No analog-switch configuration or electrical
 qualification is provided. Physical DMA-engine memory reachability does not
 open DMA modes, cache ownership or TCM placement in this reference.
 
-[SoC ownership and limits](../../soc/stm32h743/README.md) describe the software
+[SoC ownership and limits](../../soc/stm32/stm32h743/README.md) describe the software
 scope. Host models and ARM linking do not establish hardware clock accuracy,
 power-entry latency, serial reliability or safe electrical outputs.

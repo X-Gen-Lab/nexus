@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2c0e65267d3500d36fdde78ed67bd55e2c8987df928e36dfd847d43ddb98d271`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -101,7 +101,7 @@ source_language: zh_CN
 | `phase` | P0 |
 | `area` | budgets |
 | `task` | Bounded IRQ and service execution observation |
-| `implementation_paths` | io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py |
+| `implementation_paths` | io/include/nexus/io/cycle_probe.h;io/src/mechanisms/cycle_probe.c;tools/configure/factory.py |
 | `exit_condition` | Optional probes compile out; explicit service and IRQ budgets |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -117,7 +117,7 @@ source_language: zh_CN
 | `phase` | P0 |
 | `area` | stream |
 | `task` | Rate block hold-time loss and backpressure budgets |
-| `implementation_paths` | tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c |
+| `implementation_paths` | tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/mechanisms/stream_profile.c |
 | `exit_condition` | Actual selected-provider configuration validates stream budget |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -165,7 +165,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | resources |
 | `task` | Hierarchical controller base channel resource claims |
-| `implementation_paths` | tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py |
+| `implementation_paths` | tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py |
 | `exit_condition` | Compatible shared base plus channels requires one actual hardware owner |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -181,7 +181,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | resources |
 | `task` | Physical peripheral identity and mutually exclusive personalities |
-| `implementation_paths` | tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json |
+| `implementation_paths` | tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32/stm32g474/soc.json |
 | `exit_condition` | Canonical aliases and personality conflicts rejected |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -229,7 +229,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | dma |
 | `task` | Descriptor ownership placement cache and chain cancellation |
-| `implementation_paths` | tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-chain.toml |
+| `implementation_paths` | tools/configure/dma_topology.py;soc/stm32/stm32u575/drivers/uart_dma_chain.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-chain.toml |
 | `exit_condition` | Static validation plus actual linked-list provider drain and loans |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -261,7 +261,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | uart |
 | `task` | Bounded FIFO IRQ service and concurrent stream load |
-| `implementation_paths` | io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md |
+| `implementation_paths` | io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-fifo.md |
 | `exit_condition` | Bounded batch and IRQ latency observations on exact providers |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -277,7 +277,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | spi |
 | `task` | Whole-CS segments dummy cycles and 8/16-bit words |
-| `implementation_paths` | io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c |
+| `implementation_paths` | io/include/nexus/io/spi_dma_owner_binding.h;soc/native/drivers/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32/stm32f407/drivers/spi_dma.c;soc/gd32/gd32f470/drivers/spi_dma.c |
 | `exit_condition` | Native STM32F407 GD32F470 polling then async DMA loan and drain |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -309,7 +309,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | adc |
 | `task` | Explicit sample formats groups triggers and provenance |
-| `implementation_paths` | io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-group.md |
+| `implementation_paths` | io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/api/adc_group.c;soc/stm32/stm32g474/drivers/adc_group.c;docs/design/adc-group.md |
 | `exit_condition` | Integer storage metadata and actual provider group support |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -325,7 +325,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | pwm |
 | `task` | Atomic multi-channel shadow commit and break fault handling |
-| `implementation_paths` | io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py |
+| `implementation_paths` | io/include/nexus/io/pwm_group.h;soc/stm32/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py |
 | `exit_condition` | Single timer owner; no automatic restart after break |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -341,7 +341,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | capture |
 | `task` | Counter widths filters encoders and overcapture |
-| `implementation_paths` | io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c |
+| `implementation_paths` | io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32/stm32g474/drivers/timer_capture.c;soc/stm32/stm32g474/drivers/encoder.c |
 | `exit_condition` | Wrap-safe capture and reviewed encoder modes on real providers |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -357,7 +357,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | timestamps |
 | `task` | Timestamp source domain epoch frequency and uncertainty |
-| `implementation_paths` | io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md |
+| `implementation_paths` | io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-frames.md |
 | `exit_condition` | Reject incompatible domains and distinguish observation from event time |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -373,7 +373,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | diagnostics |
 | `task` | Optional state recovery ownership and checked service entry |
-| `implementation_paths` | io/src/observation.c |
+| `implementation_paths` | io/src/mechanisms/observation.c |
 | `exit_condition` | Checked dispatch is distinct from I/O progress or settlement |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -389,7 +389,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | memory |
 | `task` | Remove unused TX DMA fields from RX-only providers |
-| `implementation_paths` | soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/uart_receive.c;soc/stm32/stm32f407/drivers/uart_duplex.c;soc/gd32/gd32f470/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly |
 | `exit_condition` | Fresh linked RAM measurements and duplex lifecycle regression |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -405,7 +405,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | flash |
 | `task` | Busy-bank pulse RAM closure cache ECC and watchdog contract |
-| `implementation_paths` | soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-ram.md |
+| `implementation_paths` | soc/stm32/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-ram.md |
 | `exit_condition` | Uncancellable pulse and complete execution closure verified per profile |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -421,7 +421,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | providers |
 | `task` | Reuse reviewed peripheral IP generations and official HAL/LL |
-| `implementation_paths` | soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py |
+| `implementation_paths` | soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py |
 | `exit_condition` | Private implementation sharing with exact per-family facts |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -437,7 +437,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | h743 |
 | `task` | Cold PLL voltage latency and kernel-clock profiles |
-| `implementation_paths` | soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-clock.md |
+| `implementation_paths` | soc/stm32/stm32h743/clock.c;soc/stm32/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-clock.md |
 | `exit_condition` | Readback rollback and exact reference identity |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -453,7 +453,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | h743 |
 | `task` | UART continuous duplex DMA and SPI DMA with cache |
-| `implementation_paths` | soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml |
+| `implementation_paths` | soc/stm32/stm32h743;soc/stm32/stm32h743/drivers/uart_continuous.c;soc/stm32/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32/stm32h743/drivers/uart_duplex.c;soc/stm32/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml |
 | `exit_condition` | Selected SRAM reachability and held-buffer protection |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -469,7 +469,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | u575 |
 | `task` | Finite GPDMA provider and USART errata handling |
-| `implementation_paths` | soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-gpdma.md |
+| `implementation_paths` | soc/stm32/stm32u575/drivers/uart_dma.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-gpdma.md |
 | `exit_condition` | Actual GPDMA drain and exact ES0499 workarounds; TZEN0 first |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -485,7 +485,7 @@ source_language: zh_CN
 | `phase` | P1 |
 | `area` | g474 |
 | `task` | Synchronous PWM ADC trigger and comparator break reference |
-| `implementation_paths` | io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-adc.md |
+| `implementation_paths` | io/include/nexus/io/pwm_adc.h;soc/stm32/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-adc.md |
 | `exit_condition` | Generic control capture mechanisms; product algorithms external |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -501,7 +501,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | power |
 | `task` | Optional runtime clock and power transitions |
-| `implementation_paths` | tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-domain-sleep.md |
+| `implementation_paths` | tools/configure/runtime_power.py;soc/stm32/stm32h743/system.c;docs/design/clock-domain-sleep.md |
 | `exit_condition` | Active I/O leases rollback and monotonic deadline continuity |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -517,7 +517,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | pinctrl |
 | `task` | Explicit default sleep safe levels wake and retention |
-| `implementation_paths` | io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-pin-states.md |
+| `implementation_paths` | io/include/nexus/io/pin_state.h;soc/stm32/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-pin-states.md |
 | `exit_condition` | No invented board wiring; selected reviewed state only |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -533,7 +533,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | u575 |
 | `task` | LPDMA autonomous Stop2 and LPBAM reference |
-| `implementation_paths` | soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
+| `implementation_paths` | soc/stm32/stm32u575;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
 | `exit_condition` | Selected low-power peripheral SRAM4 and wake/stop ownership |
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | not_qualified |
@@ -549,7 +549,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | canfd |
 | `task` | CAN FD payload timing BRS ESI and message RAM |
-| `implementation_paths` | io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-fd.md |
+| `implementation_paths` | io/include/nexus/io/can_fd.h;soc/stm32/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-fd.md |
 | `exit_condition` | Classic CAN remains compact; exact FDCAN provider required |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -565,7 +565,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | ethernet |
 | `task` | VLAN scatter gather frame loans and hardware timestamps |
-| `implementation_paths` | io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md |
+| `implementation_paths` | io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-frames.md |
 | `exit_condition` | Actual hardware descriptor ownership and truthful global abort |
 | `implementation_status` | implemented |
 | `software_status` | not_qualified |
@@ -581,7 +581,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | usb |
 | `task` | Optional class adapters and exact PHY endpoint capabilities |
-| `implementation_paths` | io/src/usb_device_controller.c;io/native/usb_device.c;components |
+| `implementation_paths` | io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components |
 | `exit_condition` | Control reset ACK ZLP and device mode before additional USB modes |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -597,7 +597,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | time |
 | `task` | RTC LPTIM alarms wrap backup and reset domains |
-| `implementation_paths` | io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md |
+| `implementation_paths` | io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;soc/native/drivers/rtc_lptim.c;soc/stm32/stm32u575/drivers/lptim.c;soc/stm32/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | Wall-clock and monotonic domains remain separate |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |
@@ -677,7 +677,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | audio |
 | `task` | I2S SAI PDM framing and continuous DMA loans |
-| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md |
+| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;io/src/mechanisms/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/soc/stm32/f407_i2s2_slave_tx;soc/stm32/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md |
 | `exit_condition` | Frame-slot format and bounded underrun; optional external codec |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |

@@ -106,10 +106,10 @@ def run(root: Path, compiler: str, output: Path) -> int:
                            for key, value in selected.items()}
         for key, value in selected.items():
             recorder.execute([value, '--version'], key + '-version', nonempty=True)
-        source = root / 'arch/cortex_m/nx_arch_cache_control.c'
+        source = root / 'arch/arm/cortex_m/nx_arch_cache_control.c'
         for path in [source, Path(__file__),
-                     root / 'arch/cortex_m/private/cache_control.h',
-                     root / 'arch/cortex_m/private/mechanisms.h',
+                     root / 'arch/arm/cortex_m/private/cache_control.h',
+                     root / 'arch/arm/cortex_m/private/mechanisms.h',
                      root / 'arch/include/nexus/arch/cache_control.h',
                      root / 'arch/include/nexus/arch/arch.h',
                      root / 'arch/include/nexus/arch/features.h']:

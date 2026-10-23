@@ -56,9 +56,9 @@ from the borrowed spans. Both blocks use incrementing byte transfers; length is
 at least 2 B and every extent must fit the window. The provider generates all six
 LLI words; callers supply no raw DMA instructions.
 
-Use the [retained-time API](../../components/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h),
-[copy API](../../components/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h)
-and [Stop2 copy API](../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h)
+Use the [retained-time API](../../components/soc/stm32/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h),
+[copy API](../../components/soc/stm32/stm32u575_lpdma_copy/include/nexus/components/stm32u575_lpdma_copy.h)
+and [Stop2 copy API](../../components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h)
 as the declaration authority. One privileged Thread serializes lifecycle and
 control calls; no ISR or concurrent producer uses these objects. Copied faces
 retain the same owner identity and require their own external observer joins.
@@ -148,8 +148,8 @@ fails.
 ## Scope and evidence
 
 The public headers and
-[copy implementation](../../soc/stm32u575/drivers/lpdma_copy.c) define the source
-contract; the [private collaboration](../../components/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h)
+[copy implementation](../../soc/stm32/stm32u575/drivers/lpdma_copy.c) define the source
+contract; the [private collaboration](../../components/soc/stm32/stm32u575_lpdma_copy/private/stm32u575_lpdma_copy_internal.h)
 connects only the concrete Stop2 owner. Meaningful RED preceded the production
 changes. Focused Native execution passed 30 receiver cases, 33 retained-clock
 cases, 17 coupled cases using all three real C owners and Core, and 30 WUT-only

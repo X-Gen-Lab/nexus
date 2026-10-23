@@ -134,7 +134,7 @@ class F103ProviderTests(unittest.TestCase):
             self.assertIn(f"NX_IRQ_KERNEL_{kernel}, 43u, 4u, {ceiling}u", source)
 
     def test_exact_memory_and_clock_match_fixed_implementation(self):
-        facts = json.loads((ROOT / "soc/stm32f103/soc.json").read_text())
+        facts = json.loads((ROOT / "soc/stm32/stm32f103/soc.json").read_text())
         validate_clock_profiles(facts, self.provider)
         part = facts["variants"]["STM32F103RBT6"]
         self.assertEqual(part["flash"]["size"], 128 * 1024)

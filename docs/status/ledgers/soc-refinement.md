@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/soc-refinement-execution.csv)。
-源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`。
+源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`74141c1c0293638cf0cd2f4651d91a08362aff8eaedd4e029bfc13cc3e5b1ffd`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -40,7 +40,7 @@ source_language: zh_CN
 | `implementation_status` | documentation_updated |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md |
+| `implementation_paths` | soc/stm32/stm32f407/README.md;soc/gd32/gd32f470/README.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;tools/configure/README.md |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md |
 | `exit_condition` | SoC configure README match maintained modes and ownership |
 | `owner` | codex |
@@ -159,7 +159,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c |
+| `implementation_paths` | soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c;soc/stm32/stm32g474/system.c;soc/stm32/stm32h743/system.c;soc/stm32/stm32u575/system.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp |
 | `exit_condition` | Pre-RAM post-RAM and fail-stop restrictions explicit and tested |
 | `owner` | codex |
@@ -193,7 +193,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/system.c;soc/gd32f470/system.c |
+| `implementation_paths` | soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp |
 | `exit_condition` | Critical readback bounded failures safe source switching and retained rollback responsibility |
 | `owner` | codex |
@@ -210,7 +210,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/system.c;soc/gd32f470/system.c |
+| `implementation_paths` | soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_system_transaction_test.cpp |
 | `exit_condition` | Primary cleanup remaining obligations distinguished from allowed retained PWR Flash settings |
 | `owner` | codex |
@@ -227,7 +227,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private |
+| `implementation_paths` | soc/stm32/stm32f407/private;soc/gd32/gd32f470/private;soc/stm32/stm32g474/private |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/gd32_timebase_contract_test.cpp;core/include/nexus/core/time.h |
 | `exit_condition` | Task configurable IRQ masks and NMI HardFault limitations align |
 | `owner` | codex |
@@ -244,7 +244,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c |
+| `implementation_paths` | soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/timebase.c;soc/stm32/stm32g474/system.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/gd32_timebase_contract_test.cpp;tests/google/g474_system_test.cpp |
 | `exit_condition` | Before-start failed-start and stopped reads have a documented tested valid domain |
 | `owner` | codex |
@@ -278,7 +278,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/system.c;soc/gd32f470/system.c |
+| `implementation_paths` | soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/stm32_system_transaction_test.cpp;tests/google/gd32_timebase_contract_test.cpp |
 | `exit_condition` | Per-phase and total work bounds distinguish polls from measured elapsed time |
 | `owner` | codex |
@@ -295,7 +295,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/gd32f470/timebase.c |
+| `implementation_paths` | soc/gd32/gd32f470/timebase.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/gd32_timebase_contract_test.cpp |
 | `exit_condition` | Secondary polling enabled-controller defenses match maintained set |
 | `owner` | codex |
@@ -329,7 +329,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c |
+| `implementation_paths` | soc/stm32/stm32f407/usb_clock.c;soc/gd32/gd32f470/usb_clock.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/usb_clock_test.cpp |
 | `exit_condition` | Shared consumers fail cleanup ownership and detached hardware precede clock release |
 | `owner` | codex |
@@ -363,7 +363,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32g474/drivers/uart.c |
+| `implementation_paths` | soc/stm32/stm32g474/drivers/uart.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/g474_provider_test.cpp |
 | `exit_condition` | No runtime modulo and explicit bounded blackout preserving arbitrary capacity loss order |
 | `owner` | codex |
@@ -380,7 +380,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | selected_profiles_observed |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470 |
+| `implementation_paths` | soc/gd32/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470 |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/gd32_exti_test.cpp;tools/configure/test_gd32_exti_generation.py |
 | `exit_condition` | Measured selected-line costs preserve shared priority pending clear and owner isolation |
 | `owner` | codex |
@@ -431,7 +431,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/stm32f407;tools/configure/memory.py |
+| `implementation_paths` | soc/stm32/stm32f407;tools/configure/memory.py |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/stm32_memory_boot_test.cpp;scripts/ci/stm32_memory.py |
 | `exit_condition` | Explicit selected data bss noinit init budget bounds and DMA rejection with default zero cost |
 | `owner` | codex |
@@ -448,7 +448,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | soc/gd32f470/memory_init.c;tools/configure/memory.py |
+| `implementation_paths` | soc/gd32/gd32f470/memory_init.c;tools/configure/memory.py |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;tests/google/gd32_memory_boot_test.cpp;scripts/ci/gd32_memory.py |
 | `exit_condition` | Linker facts boot spans and first-write validation agree preserving noinit |
 | `owner` | codex |
@@ -499,8 +499,8 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
+| `implementation_paths` | soc/stm32/stm32h743/system.c;arch/arm/cortex_m/nx_arch_cache_control.c;soc/stm32/stm32u575/system.c;tools/configure/test_clock_sources.py |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
 | `exit_condition` | An exact reviewed oscillator profile has implementation rollback and HIL |
 | `owner` | codex |
 
@@ -516,7 +516,7 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474 |
+| `implementation_paths` | soc/stm32/stm32g474/drivers/exti.c;soc/stm32/stm32g474/soc.json;soc/stm32/stm32g474/routes.json;tools/configure/providers/stm32g474 |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/stm32g474.md;tests/google/g474_exti_test.cpp;tests/google/g474_factory_test.cpp;tests/contracts/g474_assembly;scripts/ci/provider_assemblies.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
 | `exit_condition` | Each selected controller mode closes facts provider generated model ARM and HIL |
 | `owner` | codex |
@@ -533,8 +533,8 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
+| `implementation_paths` | soc/stm32/stm32g474;soc/stm32/stm32h743;soc/stm32/stm32u575;boards;tests/contracts/g474_assembly/exti_board |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32/stm32g474/routes.json;soc/stm32/stm32h743/routes.json;soc/stm32/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
 | `exit_condition` | Exact hardware and independent resources budgets Board sources and isolation reviewed |
 | `owner` | codex |
 
@@ -550,8 +550,8 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32h743;soc/stm32u575;arch;os |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
+| `implementation_paths` | soc/stm32/stm32h743;soc/stm32/stm32u575;arch;os |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
 | `exit_condition` | Exact selected MCU startup clock memory IRQ peripherals OS and unit-specific HIL |
 | `owner` | codex |
 
@@ -567,8 +567,8 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py |
-| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
+| `implementation_paths` | arch/arm/cortex_m/nx_arch_cache_control.c;arch/arm/cortex_m/nx_arch_nonsecure.c;soc/stm32/stm32h743/drivers/uart_dma.c;soc/stm32/stm32h743/system.c;soc/stm32/stm32u575/security.c;tools/configure/memory.py |
+| `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;soc/stm32/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md |
 | `exit_condition` | Per-engine reachability alignment cache security faults verified on exact target |
 | `owner` | codex |
 
@@ -584,7 +584,7 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp |
+| `implementation_paths` | soc;docs/design/integration-contracts.md;components/soc/stm32/stm32f407_handoff;soc/stm32/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md |
 | `exit_condition` | Clock VTOR masks FP SysTick DMA RAM and live owners have exact entry contract |
 | `owner` | codex |
@@ -618,7 +618,7 @@ source_language: zh_CN
 | `implementation_status` | partial_exact_reference_implemented |
 | `software_status` | not_qualified |
 | `hardware_status` | not_executed |
-| `implementation_paths` | components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
+| `implementation_paths` | components/soc/stm32/stm32u575_retained_time;components/soc/stm32/stm32u575_stop2;soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md |
 | `exit_condition` | Exact RTC LPTIM retention wake recovery precision and power physically verified |
 | `owner` | codex |
@@ -635,7 +635,7 @@ source_language: zh_CN
 | `implementation_status` | partial_reference_implemented |
 | `software_status` | reference_software_validated |
 | `hardware_status` | not_executed |
-| `implementation_paths` | arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp |
+| `implementation_paths` | arch/arm/cortex_m/nx_arch_nonsecure.c;soc/stm32/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp |
 | `evidence_paths` | docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json |
 | `exit_condition` | Actual permissions address copy borrow async exit gateway and hardware isolation verified |
 | `owner` | codex |

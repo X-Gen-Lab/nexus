@@ -1,1 +1,0 @@
-clang-tidy==14.0.6 --hash=sha256:c9ffcb91f17ee920fdd7a83f30484f3cb4c183f7b490d092373e4a6f2c82729d

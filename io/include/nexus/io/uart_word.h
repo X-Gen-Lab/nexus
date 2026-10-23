@@ -7,6 +7,7 @@
 #define NEXUS_UART_WORD_H
 
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/uart_format.h"
 #ifdef __cplusplus
 extern "C" {
@@ -32,10 +33,10 @@ typedef struct {
 /** \brief Independent immutable face; default byte face/state do not grow.
  * \note Static identity; lookup does not allocate, discover or initialize.
  */
-typedef struct {
+struct nx_uart_word_port {
     const nx_uart_word_ops_t* ops;
     void* context;
-} nx_uart_word_port_t;
+};
 /** \brief Prepare an unborrowed nine-bit payload, without admitting it.
  * \param[in,out] request: Initialized READY or consumed SETTLED descriptor.
  * \param[in] data: Aligned immutable words, disjoint from the descriptor.

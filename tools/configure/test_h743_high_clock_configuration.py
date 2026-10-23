@@ -84,7 +84,7 @@ class H743HighClockConfigurationTests(unittest.TestCase):
         self.assertFalse(result["physical_qualified"])
 
     def test_legacy_projections_have_one_reviewed_nominal_authority(self):
-        facts = gate.load(gate.ROOT / "soc/stm32h743/soc.json")
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
         profile = facts["clock_profiles"][PROFILE]
         self.assertTrue(all(name not in profile for name in
                             ("core_hz", "apb1_hz", "apb2_hz")))
@@ -103,7 +103,7 @@ class H743HighClockConfigurationTests(unittest.TestCase):
                     clocks.normalize(competing)
 
     def test_foreign_or_unknown_domain_bounds_fail_before_publication(self):
-        original = gate.load(gate.ROOT / "soc/stm32h743/soc.json")
+        original = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
         for domain, field, value in (("tim2", "nominal_hz", 384000000),
                                      ("spi4", "maximum_hz", None),
                                      ("usart3", "minimum_hz", 0),
@@ -208,7 +208,7 @@ class H743SelectedKernelConfigurationTests(unittest.TestCase):
         return gate.resolve_ir(path)
 
     def test_high_profile_cannot_drop_its_domains_and_bypass_the_joint_owner(self):
-        facts = gate.load(gate.ROOT / "soc/stm32h743/soc.json")
+        facts = gate.load(gate.ROOT / "soc/stm32/stm32h743/soc.json")
         facts["clock_profiles"][PROFILE] = {
             "source": "hsi", "input_hz": 64000000,
             "core_hz": 384000000, "apb1_hz": 96000000,

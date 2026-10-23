@@ -1,0 +1,104 @@
+{
+    "version": 6,
+    "include": [
+        "base.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "gd32-liangshan-baremetal",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-baremetal.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-liangshan-freertos",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/liangshan-freertos.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-f303-baremetal-empty",
+            "displayName": "gd32-f303-baremetal-empty software reference; PCB/HIL unqualified",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-baremetal-empty.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-f303-baremetal-io",
+            "displayName": "gd32-f303-baremetal-io software reference; PCB/HIL unqualified",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-baremetal-io.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-f303-baremetal-spi-watchdog",
+            "displayName": "gd32-f303-baremetal-spi-watchdog software reference; PCB/HIL unqualified",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-baremetal-spi-watchdog.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-f303-freertos-empty",
+            "displayName": "gd32-f303-freertos-empty software reference; PCB/HIL unqualified",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-freertos-empty.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-f303-freertos-io",
+            "displayName": "gd32-f303-freertos-io software reference; PCB/HIL unqualified",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-freertos-io.toml"
+            },
+            "inherits": "nexus-arm"
+        },
+        {
+            "name": "gd32-f303-freertos-spi-watchdog",
+            "displayName": "gd32-f303-freertos-spi-watchdog software reference; PCB/HIL unqualified",
+            "cacheVariables": {
+                "NEXUS_ASSEMBLY_FILE": "${sourceDir}/tools/configure/assemblies/gd32-f303-freertos-spi-watchdog.toml"
+            },
+            "inherits": "nexus-arm"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "gd32-liangshan-baremetal",
+            "configurePreset": "gd32-liangshan-baremetal"
+        },
+        {
+            "name": "gd32-liangshan-freertos",
+            "configurePreset": "gd32-liangshan-freertos"
+        },
+        {
+            "name": "gd32-f303-baremetal-empty",
+            "configurePreset": "gd32-f303-baremetal-empty"
+        },
+        {
+            "name": "gd32-f303-baremetal-io",
+            "configurePreset": "gd32-f303-baremetal-io"
+        },
+        {
+            "name": "gd32-f303-baremetal-spi-watchdog",
+            "configurePreset": "gd32-f303-baremetal-spi-watchdog"
+        },
+        {
+            "name": "gd32-f303-freertos-empty",
+            "configurePreset": "gd32-f303-freertos-empty"
+        },
+        {
+            "name": "gd32-f303-freertos-io",
+            "configurePreset": "gd32-f303-freertos-io"
+        },
+        {
+            "name": "gd32-f303-freertos-spi-watchdog",
+            "configurePreset": "gd32-f303-freertos-spi-watchdog"
+        }
+    ]
+}

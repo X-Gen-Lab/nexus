@@ -1,11 +1,11 @@
 # Exact static DBM receive contract; firmware never links GoogleTest.
 nexus_google_test(nexus_h743_uart_continuous_test SOURCES
     h743_uart_continuous_test.cpp h743_uart_continuous_model.cpp h743_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_continuous.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_continuous.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_uart_continuous_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -15,13 +15,13 @@ target_compile_options(nexus_h743_uart_continuous_test PRIVATE
 
 nexus_google_test(nexus_h743_uart_duplex_test SOURCES
     h743_uart_duplex_test.cpp h743_uart_continuous_model.cpp h743_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_continuous.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_duplex.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_dma.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_continuous.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_duplex.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_dma.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_uart_duplex_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -59,16 +59,16 @@ foreach(cache off on)
     set(target "nexus_h743_uart_${mode}_${cache}_factory_test")
     nexus_google_test(${target} SOURCES h743_uart_continuous_factory_test.cpp
         h743_uart_continuous_model.cpp h743_model.cpp "${bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_continuous.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_continuous.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+        INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
     if(mode STREQUAL "duplex")
         target_sources(${target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_duplex.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_dma.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_duplex.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_dma.c")
     endif()
     target_include_directories(${target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"

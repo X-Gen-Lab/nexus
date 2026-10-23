@@ -1,7 +1,0 @@
-[0/1] Re-running CMake...
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: /workspace/nexus-iteration-bus-design/eth-build
-[1/4] Building C object CMakeFiles/ethernet_api_test.dir/io/src/mdio.c.o
-[2/4] Building C object CMakeFiles/ethernet_api_test.dir/io/src/ethernet.c.o
-[3/4] Linking CXX executable ethernet_api_test

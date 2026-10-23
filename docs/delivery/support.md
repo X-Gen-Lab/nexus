@@ -34,8 +34,8 @@ clean/disable。U575 默认 Platform 使用官方 Cortex-M33 启动并维护 TZE
 register 不能使不匹配的启动变成合法状态。两者都不修改 option bytes，不自动
 接管 bootloader、DMA 或既有 clock/IRQ owner。原始 CMSIS Device H7/U5 源码、
 许可和版本固定在 source lock。
-精确入口见 [H743](../../soc/stm32h743/README.md) 与
-[U575](../../soc/stm32u575/README.md)。
+精确入口见 [H743](../../soc/stm32/stm32h743/README.md) 与
+[U575](../../soc/stm32/stm32u575/README.md)。
 
 ThreadX 是额外显式后端，锁定官方 Eclipse ThreadX 6.5.2.202603 release。当前
 配置维护三块 F407/F470 Board 的 Cortex-M4 GNU port，以及 Native Linux GNU。
@@ -165,7 +165,7 @@ HSI64 默认 trim、Cache off/on 和裸机。PE12/PE13/PE14 AF5 与 PE11 active-
 TX/RX span；Cache off 为 1..65535 bytes，Cache on 的地址和长度须为独占完整
 32-byte lines，长度为 32..65504 bytes。可与独立 USART3 Stream0 TX 或 Stream1 RX
 配置组合；不开放 PLL384、FreeRTOS、16-bit、固定 dummy/discard 或多段传输。精确约束见
-[H743 provider 合同](../../soc/stm32h743/README.md)。
+[H743 provider 合同](../../soc/stm32/stm32h743/README.md)。
 
 U575 USART1 的 `dma-tx` 选择 GPDMA1 channel0/request25、TZEN0、MSIS4、8N1 和
 Cache off，只接纳非安全 SRAM1 中 1..65535 bytes；USART1 RX 仍使用 IRQ byte ring。
@@ -200,8 +200,8 @@ overflow IRQ 在 4,294,967,296 µs 内服务；实际 carry 传播仍须 HIL 核
 两者均只修正一个 pending full wrap，不把软件观察时间当作实测精度。
 两者的 SPI 均为 8-bit、mode 0..3、有界轮询，每笔最多 256 bytes，31.25 kHz..4 MHz；
 F103 使用 SPI1，GD303 使用 SPI0。F103 的 PA5 同时连接 LED 与 SPI SCK，不能冲突
-选择。具体接入与失败停止合同见 [F103](../../soc/stm32f103/README.md) 和
-[GD303](../../soc/gd32f303/README.md)；没有把这些切片提升为全系列或全外设支持。
+选择。具体接入与失败停止合同见 [F103](../../soc/stm32/stm32f103/README.md) 和
+[GD303](../../soc/gd32/gd32f303/README.md)；没有把这些切片提升为全系列或全外设支持。
 
 F103/GD303 的 UART channel-DMA 仅接纳声明 SRAM 的 1..65535-byte span；TX-only
 实例保留紧凑 TX 状态和 IRQ byte ring，duplex 才增加调用者 block 接收扩展。DMA TC
@@ -216,18 +216,18 @@ SYSCLK/128=1.328125 MHz、sample code0。TIM6 正常 DMA block 只接纳精确�
 1 MHz 的 2.5–50 kHz；孔径由前次 EOC 到下次 trigger 决定，不能从 SMPR 单独推算。
 每次丢弃首次转换，发布前停止 trigger、DMA/ADC 并观察 ADEN 关闭；下一次 service
 重启，具有间隙。I2C1 PB8/PB9 使用独立 HSI16、固定标准模式 timing。具体预热、
-校准、勘误和内存合同以 [G474](../../soc/stm32g474/README.md) 为准。
+校准、勘误和内存合同以 [G474](../../soc/stm32/stm32g474/README.md) 为准。
 
 H743 新有限外设使用独立软件 Board 包；不能把 SPI4、I2C1、PA3 ADC1、PA6 TIM3
 及 EXTI 的选择推成 NUCLEO 实板接线。可选 D2 SRAM1 有独立预算和启动 DATA/BSS
 初始化；NOINIT 由调用者初始化，DMA 借用前再查 SRAM1 gate。Cache-on DMA 要求
 独占完整 32-byte lines。FIG-09 的 AXI-only TX 图是一个精确参考，不枚举这些新增
-放置或有限 RX 模式。详见 [H743 合同](../../soc/stm32h743/README.md)。
+放置或有限 RX 模式。详见 [H743 合同](../../soc/stm32/stm32h743/README.md)。
 
 U575 的 SPI1/I2C1/ADC4/PWM/EXTI/Flash 仍处于 TZEN0。ADC4 单次采样要求外部
 VDDA、电源时钟及 ASV；SPI1 MISO 与 TIM3 CH1 共用 PA6，必须使用互斥装配。
 独立 TZEN1 参考只把最多八项同步 GPIO 消息复制到 Secure 私有存储，不提供这些
-新外设的通用双域 factory 或异步 transport。详见 [U575](../../soc/stm32u575/README.md)
+新外设的通用双域 factory 或异步 transport。详见 [U575](../../soc/stm32/stm32u575/README.md)
 及 [双域合同](../design/u575-trustzone-contract.md)。
 
 | 精确 Flash | 物理几何与编程粒度 |

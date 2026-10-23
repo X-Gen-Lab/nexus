@@ -1,5 +1,0 @@
-/usr/bin/ld: /workspace/nexus-memory-iteration/both/system.o: in function `SystemInit':
-system.c:(.text+0x117): undefined reference to `__gVectors'
-/usr/bin/ld: /workspace/nexus-memory-iteration/both/system.o: in function `nx_gd32_clock_start':
-system.c:(.text+0x1eb): undefined reference to `rcu_periph_clock_enable'
-collect2: error: ld returned 1 exit status

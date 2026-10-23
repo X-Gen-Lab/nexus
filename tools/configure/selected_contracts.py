@@ -6,6 +6,10 @@ remain expressions; unknown bounds never become unlimited hardware capacity.
 These compiler records add no firmware objects unless an existing consumer emits
 its explicitly selected readonly metadata.
 """
+try:
+    from .providers.descriptor import source_directory
+except ImportError:
+    from providers.descriptor import source_directory
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -146,8 +150,8 @@ def catalogue(root):
         if family == "native":
             continue
         provider = maintained(family)
-        soc = configure.load(root / "soc" / family / "soc.json")
-        routes = configure.load(root / "soc" / family / "routes.json")
+        soc = configure.load(root / source_directory(family) / "soc.json")
+        routes = configure.load(root / source_directory(family) / "routes.json")
         for part in sorted(soc["variants"]):
             configure.validate_soc(soc, part)
             reviewed = configure.resolve_routes(routes, soc, part, provider)

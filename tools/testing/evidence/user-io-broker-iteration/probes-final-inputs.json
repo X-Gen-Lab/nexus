@@ -1,6 +1,0 @@
-{
-  "build/usb-config-model/tests/contracts/google/usb-factory-stm32/nexus_config.h": "64322dcc3a9efa953a28278c19abac39b9d610c87869056bce30f933c417cb59",
-  "build/usb-config-model/tests/contracts/google/usb-factory-gd32/nexus_config.h": "939a4ea631cab9b1c61181b0f9da2554ace06833e3d1b5fc1d99a843a54b52ec",
-  "soc/stm32f407/drivers/gpio.c": "cc9f96ded9b52f11f15fc24552dfebfc2bbd45b66b293ae55bfa6f9e6f954559",
-  "soc/gd32f470/drivers/gpio.c": "85f4f9eff2c016a4d3d70be3f0df4f32e66fa9841701f99425e8247df4ec3140"
-}

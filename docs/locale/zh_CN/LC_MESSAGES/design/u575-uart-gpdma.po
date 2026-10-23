@@ -1,6 +1,6 @@
 # Authored translation; independent semantic review completed.
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 0b5a581ac0c38b0c3b0531720fcbfaa92d4ff37266987a0a2b9570f96fd5fee3\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: b0dcc09caff39ab125ddb43184f954dfcaa7fd1da6e9626559d527851b1fffc7\n"
 
 msgid "Finite USART1 GPDMA TX on STM32U575"
 msgstr "STM32U575 USART1 有限 GPDMA TX"
@@ -197,5 +197,23 @@ msgstr "当前开发证据包括40个真实 provider 的 GoogleTest/GoogleMock �
 msgid "The source uses the already pinned official LL DMA and USART headers for the selected register operations. It adds no vendor HAL handle, HAL tick, vendor IRQ callback, linked-list descriptor or second transfer owner. USART2 DMA, RX DMA, continuous streams, autonomous/low-power DMA and a TrustZone broker remain outside this implementation. The general Cortex-M33 architecture and other chip DMA capabilities do not extend this exact provider scope."
 msgstr "源码使用已锁定的官方 LL DMA 和 USART 头文件完成选定寄存器操作，不增加厂商 HAL 句柄、HAL tick、厂商 IRQ 回调、链表描述符或第二个传输所有者。USART2 DMA、RX DMA、连续流、自主或低功耗 DMA 及 TrustZone broker 均不在此实现范围内。通用 Cortex-M33 架构和芯片的其他 DMA 能力不会扩大此精确 provider 的范围。"
 
-msgid "See the [U575 source map](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md), [private provider contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/private/stm32u575_uart_gpdma.h), [real provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_dma.c), [public UART ownership contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h) and [current qualification boundaries](../delivery/qualification.md)."
-msgstr "参见 [U575 源码地图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md)、[私有 provider 合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/private/stm32u575_uart_gpdma.h)、[真实 provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/drivers/uart_dma.c)、[公共 UART 所有权合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/uart.h) 和[当前资格边界](../delivery/qualification.md)。"
+#: docs/design/u575-uart-gpdma.md:174
+msgid ""
+"See the [U575 source map](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/soc/stm32/stm32u575/README.md), [private provider "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h), [real "
+"provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/drivers/uart_dma.c), [public UART ownership "
+"contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/include/nexus/io/uart.h) and [current qualification "
+"boundaries](../delivery/qualification.md)."
+msgstr ""
+"参见 [U575 源码地图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/README.md)、[私有 provider "
+"合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h)、[真实 "
+"provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/drivers/uart_dma.c)、[公共 UART "
+"所有权合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/include/nexus/io/uart.h) 和[当前资格边界](../delivery/qualification.md)。"

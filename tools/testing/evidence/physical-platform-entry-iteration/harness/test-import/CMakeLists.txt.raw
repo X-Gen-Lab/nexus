@@ -1,2 +1,0 @@
-set(CMAKE_CURRENT_SOURCE_DIR "${ROOT}/tests/google")
-include("${ROOT}/tests/google/physical_platform_factory.cmake")

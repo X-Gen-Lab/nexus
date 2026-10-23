@@ -1,11 +1,11 @@
 # Live epochs execute the production timer against external SDK/clock mocks.
 nexus_google_test(nexus_gd32_timebase_contract_test
     SOURCES gd32_timebase_contract_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/timebase.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/timebase.c"
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
         "${NEXUS_SOURCE_DIR}/arch/include")
 set(system_gd_firmware
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
@@ -20,9 +20,9 @@ target_compile_options(nexus_gd32_timebase_contract_test PRIVATE
 
 nexus_google_test(nexus_stm32_system_transaction_test
     SOURCES stm32_system_transaction_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32f407/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/system.c"
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f407/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_stm32_system_transaction_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
@@ -34,11 +34,11 @@ target_compile_options(nexus_stm32_system_transaction_test PRIVATE
 
 nexus_google_test(nexus_gd32_system_transaction_test
     SOURCES gd32_system_transaction_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/system.c"
     LIBRARIES Nexus::Core
     INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
         "${NEXUS_SOURCE_DIR}/arch/include")
 target_include_directories(nexus_gd32_system_transaction_test SYSTEM PRIVATE
     "${system_gd_firmware}/CMSIS/GD/GD32F4xx/Include"

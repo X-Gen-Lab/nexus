@@ -1,5 +1,0 @@
-{
-  "before": "3cbee45fdb70598e162711a30ff8de1db206b8139d4464c8245655adcef14ead",
-  "after": "f8d4ca67304d050d7a30b4f4c6835db31c5f0e08ff0dfc7ebf450e4faaa67eaa",
-  "classification": "canonical legacy module absolute import needs tools/configure on module path; first loader error is setup, not executed test suite"
-}

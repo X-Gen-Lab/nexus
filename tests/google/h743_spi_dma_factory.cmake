@@ -30,23 +30,23 @@ foreach(variant spi-dma spi-dma-cache-on spi-dma-uart-tx spi-dma-uart-rx)
     if(variant STREQUAL "spi-dma-uart-tx")
         set(uart_mode 0)
         set(uart_sources
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_dma.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_dma.c")
     elseif(variant STREQUAL "spi-dma-uart-rx")
         set(uart_mode 1)
         set(uart_sources
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_receive.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_receive.c")
     endif()
     nexus_google_test(${target} SOURCES h743_spi_dma_factory_test.cpp
         h743_spi_dma_factory_model.cpp h743_spi_dma_model.cpp h743_model.cpp
         "${bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_wire.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/spi_dma.c" ${uart_sources}
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_wire.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/spi_dma.c" ${uart_sources}
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+        INCLUDES "${bundle}" "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
     target_include_directories(${target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
         "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")

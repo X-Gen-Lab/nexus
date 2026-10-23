@@ -1,6 +1,0 @@
-{
-  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
-  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json",
-  "tests/contracts/stm32_assembly/zg-i2c-irq.toml": "/workspace/nexus/tests/contracts/stm32_assembly/zg-i2c-irq.toml",
-  "tests/contracts/stm32_assembly/zg_board/board.json": "/workspace/nexus/tests/contracts/stm32_assembly/zg_board/board.json"
-}

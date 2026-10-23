@@ -1,7 +1,0 @@
--- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT
--- Performing Test NEXUS_THREADX_HAS_SEM_CLOCKWAIT - Success
--- Nexus: NATIVE_MODEL/native, Os
--- Sole resolved configuration: /workspace/nexus/build/usb-config-model/generated/resolved.json
--- Configuring done (1.3s)
--- Generating done (0.1s)
--- Build files have been written to: /workspace/nexus/build/usb-config-model

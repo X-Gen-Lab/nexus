@@ -1,6 +1,0 @@
-{
-  "original_sha256": "a8c849ccd0ee49b7c9da5ffde395f084bd5e04a889786c77e3db12669d9b312f",
-  "uncompressed_bytes": 6845208,
-  "gzip_sha256": "12b60c2395c384c57971a849d9683aea0742676a9e2aa22a057c0b2641e40721",
-  "original_path": "/workspace/nexus-industrial-design/physical-factory-tests/build-sanitizer/test-import/nexus_gd32_physical_platform_factory_test"
-}

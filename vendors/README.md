@@ -5,8 +5,9 @@ Maintained firmware targets use the SDKs below. A directory or submodule for ano
 | Sources | Origin and version identity | License boundary |
 | --- | --- | --- |
 | `arm/CMSIS_5` | Official Arm repository, pinned gitlink | Upstream notices |
-| `st/cmsis_device_f4` | Official ST repository, pinned gitlink | Upstream notices |
-| `st/stm32f4xx_hal_driver` | Official ST repository, pinned gitlink | Upstream notices |
+| `st/cmsis_device_{f1,f4,g4,h7,u5}` | Five official ST device repositories, pinned gitlinks | Upstream notices |
+| `st/stm32{f1,f4,g4,h7,u5}_hal` | Five official ST HAL/LL repositories, pinned gitlinks | Upstream notices |
+| `gigadevice/gd32f30x` | Official GD32F30x 3.0.3 selected headers/startup, per-file source lock | Original BSD-3-Clause, Apache-2.0 and GigaDevice notices; see its README and LICENSES |
 | `gigadevice/gd32f4xx` | Official GD32F4xx 3.3.3 Firmware subtree, per-file source lock | BSD-3-Clause, Apache-2.0 and two original Arm Cortex-M distribution notices; see its README and LICENSES |
 
 The GigaDevice import is byte-identical to the selected upstream subtree. Git attributes preserve its original line endings. Validate it with:

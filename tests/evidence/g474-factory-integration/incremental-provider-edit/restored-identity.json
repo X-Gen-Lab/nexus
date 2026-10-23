@@ -1,8 +1,0 @@
-{
-  "source": "/workspace/nexus/tools/configure/providers/stm32g474/emission.py",
-  "operation": "restore exact original bytes; actual write no timestamp injection",
-  "sha256": "dd3af048e2aafa85b87ec20da172a2d60ff0604e6618fb3cac4c9a1452de7303",
-  "bytes": 7032,
-  "observed_mtime_ns": 1791748748364901785,
-  "observed_wall_ns": 1791748748365012239
-}

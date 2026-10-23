@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_RTC_H
 #define NEXUS_IO_RTC_H
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -67,10 +68,10 @@ typedef struct {
 } nx_rtc_ops_t;
 /** \brief Two-pointer identity; face, ops and context outlive loans/observers.
  */
-typedef struct {
+struct nx_rtc_port {
     const nx_rtc_ops_t* ops;
     void* context;
-} nx_rtc_port_t;
+};
 /** \brief Validate raw calendar fields without changing any storage.
  * \param[in] calendar: Readable naturally aligned value.
  * \return SUCCESS or INVALID; no clock or provider access.

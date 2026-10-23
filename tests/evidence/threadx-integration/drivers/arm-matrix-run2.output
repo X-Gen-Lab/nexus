@@ -1,8 +1,0 @@
-+ cmake -S /workspace/nexus/tests/contracts/os_threadx_runtime -B /workspace/nexus-threadx-probe/arm-qiming-basepri -G Ninja -DCMAKE_TOOLCHAIN_FILE=/workspace/nexus/cmake/toolchains/arm-gcc.cmake -DNEXUS_ASSEMBLY_FILE=/workspace/nexus-threadx-probe/arm-assemblies/qiming-basepri.toml
-+ cmake --build /workspace/nexus-threadx-probe/arm-qiming-basepri --target nexus_threadx_runtime --parallel 1
-Traceback (most recent call last):
-  File "/workspace/nexus-threadx-probe/arm_matrix_run2.py", line 30, in <module>
-    execute(['cmake','--build',str(build),'--target','nexus_threadx_runtime','--parallel','1'],env,OUT/(name+'-build.log'))
-  File "/workspace/nexus/scripts/ci/tdd_gate.py", line 103, in execute
-    raise ValueError(f"Command failed ({result.returncode}); see {log}")
-ValueError: Command failed (1); see /workspace/nexus-threadx-probe/evidence/arm-matrix-run2/qiming-basepri-build.log
