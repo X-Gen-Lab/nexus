@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/developer-experience-execution.csv)。
-源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`23ac52fad0b94a3f71f0aa88ca5bb3f0941d73c385436d7d7dfd30535b59a54e`。
+源文件：`docs/design/developer-experience-execution.csv`；SHA-256：`4262874b4348573e4908d30634fb02ddf33a63a5f83119f731efb1634fd07855`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -36,10 +36,10 @@ source_language: zh_CN
 | `task_id` | W1-01 |
 | `task` | Separate application and maintainer entry points |
 | `implementation_status` | implemented |
-| `software_status` | source_check_and_independent_prose_review_passed_final_docs_pending |
+| `software_status` | source_and_independent_bilingual_review_verified_strict_html_ci_live |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/tutorials/source-sdk.md;README.md;README_CN.md |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;/tmp/nexus-iteration-20261024/docs/source-check-02.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Application quickstart precedes SDK maintenance and both locales agree |
 | `owner` | codex |
 
@@ -125,11 +125,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | W1-07 |
 | `task` | Clean user onboarding exercise |
-| `implementation_status` | pending |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | P_sdk_E_native_onboarding_and_authored_error_recovery_passed |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | （原字段为空） |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | tools/dev/projects.py;docs/tutorials/source-sdk.md;X-Gen-Lab/nexus-examples/templates/native |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual Native creation build execution and configuration-error recovery recorded |
 | `owner` | codex |
 
@@ -336,10 +336,10 @@ source_language: zh_CN
 | `task_id` | W3-07 |
 | `task` | H743 frame DMA2D source ownership |
 | `implementation_status` | implemented |
-| `software_status` | byte_equivalence_verified_final_sdk_link_pending |
+| `software_status` | byte_equivalence_and_P_complete_sdk_consumption_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | components/soc/stm32/stm32h743_frame_dma2d;components/soc/stm32/CMakeLists.txt;cmake/package/package_source_sdk.py;Doxyfile |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;/tmp/nexus-iteration-20261024/provider-vendor/dma2d-relocation.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Chip extension moved with stable public identity and updated build SDK references |
 | `owner` | codex |
 
@@ -425,11 +425,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | W4-06 |
 | `task` | Provider build SDK and test coverage mapping |
-| `implementation_status` | in_progress |
-| `software_status` | mode_projection_and_sdk_omission_regressions_verified_full_sdk_pending |
+| `implementation_status` | implemented |
+| `software_status` | mode_mapping_and_P_complete_50_consumer_plan_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/experience.py |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;/tmp/nexus-iteration-20261024/configuration/handoff.json;/tmp/nexus-iteration-20261024/configuration/experience-final-green.log;tests/contracts/test_source_sdk.py;/tmp/nexus-iteration-20261024/sdk-closure-green.log |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Every admitted mode resolves to actual implementation and explicit verification scope |
 | `owner` | codex |
 
@@ -861,10 +861,10 @@ source_language: zh_CN
 | `task_id` | W8-07 |
 | `task` | Sustainable feedback and delivery constraints |
 | `implementation_status` | implemented |
-| `software_status` | focused_behavior_passed_final_gates_pending |
+| `software_status` | P_complete_ordinary_gate_and_feedback_boundaries_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | tools/dev/README.md;docs/development/workflow.md |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;/tmp/nexus-iteration-20261024/devtools/focused-integration-green-03.log |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Measured feedback trends failures cancellation and normal complete gates remain enforced |
 | `owner` | codex |
 
@@ -890,11 +890,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | W9-02 |
 | `task` | Real examples platform migration |
-| `implementation_status` | pending |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | E_lock_gitlink_and_P_public_sdk_consumption_verified |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | （原字段为空） |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | X-Gen-Lab/nexus-examples/dependencies/nexus.lock.json;X-Gen-Lab/nexus-examples/.gitmodules |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Final platform source lock gitlink and public consumption agree |
 | `owner` | codex |
 
@@ -921,10 +921,10 @@ source_language: zh_CN
 | `task_id` | W9-04 |
 | `task` | Examples Native application CI |
 | `implementation_status` | implemented |
-| `software_status` | focused_native_application_and_gate_contracts_passed_final_ci_pending |
+| `software_status` | E_complete_local_native_gate_passed_hosted_ci_blocked_billing |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-examples/scripts/tdd_gate.py;X-Gen-Lab/nexus-examples/tests/developer_recipes_test.cpp |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;X-Gen-Lab/nexus-examples/tests/developer_recipes_test.cpp;/tmp/nexus-iteration-20261024/examples/development-summary.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual successful rejected and shutdown behavior runs with nonempty outcomes |
 | `owner` | codex |
 
@@ -936,10 +936,10 @@ source_language: zh_CN
 | `task_id` | W9-05 |
 | `task` | Examples ARM consumption CI |
 | `implementation_status` | implemented |
-| `software_status` | five_actual_arm_consumers_linked_and_budget_checked_final_ci_pending |
+| `software_status` | E_39_arm_images_and_budgets_passed_hosted_ci_blocked_billing |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-examples/apps/shared_spi_runtime/CMakeLists.txt;X-Gen-Lab/nexus-examples/apps/stream_recovery/h743/CMakeLists.txt |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;/tmp/nexus-iteration-20261024/examples/development-summary.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json;X-Gen-Lab/nexus-examples/.github/workflows/ci.yml |
 | `exit_condition` | Exact maintained board backend tuples link within public and resource boundaries |
 | `owner` | codex |
 
@@ -950,11 +950,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | W9-06 |
 | `task` | Candidate to examples evidence association |
-| `implementation_status` | pending |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | immutable_P_E_sdk_and_application_evidence_associated |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | （原字段为空） |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | docs/delivery/developer-experience-results.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Platform and examples identities link independent SDK and application execution |
 | `owner` | codex |
 
@@ -965,8 +965,8 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | W9-07 |
 | `task` | Upgrade exercise and bilingual migration guide |
-| `implementation_status` | in_progress |
-| `software_status` | bilingual_migration_ready_final_pin_upgrade_pending |
+| `implementation_status` | implemented |
+| `software_status` | locked_platform_upgrade_and_actual_error_recovery_verified |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/tutorials/source-sdk.md;docs/guides/developer-workflow.md;X-Gen-Lab/nexus-examples/docs/developer-recipes.md |
 | `evidence_paths` | docs/delivery/developer-experience-results.json |
@@ -1010,11 +1010,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | I-03 |
 | `task` | Final-source complete software gates |
-| `implementation_status` | pending |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | P_complete_ordinary_gate_passed_platform_remote_ci_not_yet_observed |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | （原字段为空） |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | scripts/ci/tdd_gate.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual final-source outputs and original evidence required |
 | `owner` | codex |
 
@@ -1025,11 +1025,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | I-04 |
 | `task` | Complete source SDK and external consumption |
-| `implementation_status` | pending |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | P_publishable_sdk_50_consumers_and_E_onboarding_passed |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | （原字段为空） |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | cmake/package/verify_consumers.py;cmake/package/package_source_sdk.py |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual final-source outputs and original evidence required |
 | `owner` | codex |
 
@@ -1040,11 +1040,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | I-05 |
 | `task` | Bilingual documentation and diagram delivery |
-| `implementation_status` | in_progress |
-| `software_status` | source_check_passed_translation_review_and_fresh_build_pending |
+| `implementation_status` | implemented |
+| `software_status` | local_fresh_bilingual_checks_passed_strict_html_ci_pending |
 | `hardware_status` | not_applicable |
 | `implementation_paths` | docs/design/developer-experience.md;docs/guides/developer-workflow.md;docs/locale |
-| `evidence_paths` | docs/delivery/developer-experience-results.json;/tmp/nexus-iteration-20261024/docs/source-check-02.json;/tmp/nexus-iteration-20261024/docs/catalog-delta.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual final-source outputs and original evidence required |
 | `owner` | codex |
 
@@ -1055,11 +1055,11 @@ source_language: zh_CN
 | --- | --- |
 | `task_id` | I-06 |
 | `task` | Candidate identity and review handoff |
-| `implementation_status` | pending |
-| `software_status` | not_executed |
+| `implementation_status` | implemented |
+| `software_status` | P_E_software_review_handoff_bound_no_formal_candidate |
 | `hardware_status` | not_applicable |
-| `implementation_paths` | （原字段为空） |
-| `evidence_paths` | （原字段为空） |
+| `implementation_paths` | docs/delivery/developer-experience-results.json |
+| `evidence_paths` | docs/delivery/developer-experience-results.json |
 | `exit_condition` | Actual final-source outputs and original evidence required |
 | `owner` | codex |
 

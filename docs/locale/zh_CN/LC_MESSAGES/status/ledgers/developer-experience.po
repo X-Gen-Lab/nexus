@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: c83f63763168b418ac200c7fadb2c92197a87d9eea76bcf5a313e1e075cec3f5\n"
+"X-Nexus-Source-SHA256: 61c139f679b36adaf6f8459336b947936aead02fb45dd99b80dc4b164e856e0e\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:9
 msgid "开发体验75 项台账"
@@ -18,12 +18,12 @@ msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/developer-experience-execution.csv>`。 "
 "源文件：`docs/design/developer-experience-"
-"execution.csv`；SHA-256：`23ac52fad0b94a3f71f0aa88ca5bb3f0941d73c385436d7d7dfd30535b59a54e`。"
+"execution.csv`；SHA-256：`4262874b4348573e4908d30634fb02ddf33a63a5f83119f731efb1634fd07855`。"
 msgstr ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/developer-experience-execution.csv>`。 "
 "源文件：`docs/design/developer-experience-"
-"execution.csv`；SHA-256：`23ac52fad0b94a3f71f0aa88ca5bb3f0941d73c385436d7d7dfd30535b59a54e`。"
+"execution.csv`；SHA-256：`4262874b4348573e4908d30634fb02ddf33a63a5f83119f731efb1634fd07855`。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:15
 msgid ""
@@ -83,8 +83,8 @@ msgid "`software_status`"
 msgstr "`software_status`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "source_check_and_independent_prose_review_passed_final_docs_pending"
-msgstr "source_check_and_independent_prose_review_passed_final_docs_pending"
+msgid "source_and_independent_bilingual_review_verified_strict_html_ci_live"
+msgstr "source_and_independent_bilingual_review_verified_strict_html_ci_live"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "`hardware_status`"
@@ -107,12 +107,8 @@ msgid "`evidence_paths`"
 msgstr "`evidence_paths`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/docs/source-check-02.json"
-msgstr ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/docs/source-check-02.json"
+msgid "docs/delivery/developer-experience-results.json"
+msgstr "docs/delivery/developer-experience-results.json"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "`exit_condition`"
@@ -281,12 +277,16 @@ msgid "Clean user onboarding exercise"
 msgstr "干净环境的新用户入门演练"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "pending"
-msgstr "pending"
+msgid "P_sdk_E_native_onboarding_and_authored_error_recovery_passed"
+msgstr "P_sdk_E_native_onboarding_and_authored_error_recovery_passed"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "（原字段为空）"
-msgstr "（原字段为空）"
+msgid ""
+"tools/dev/projects.py;docs/tutorials/source-sdk.md;X-Gen-Lab/nexus-"
+"examples/templates/native"
+msgstr ""
+"tools/dev/projects.py;docs/tutorials/source-sdk.md;X-Gen-Lab/nexus-"
+"examples/templates/native"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -596,22 +596,14 @@ msgid "H743 frame DMA2D source ownership"
 msgstr "H743 frame DMA2D 源码归属"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "byte_equivalence_verified_final_sdk_link_pending"
-msgstr "byte_equivalence_verified_final_sdk_link_pending"
+msgid "byte_equivalence_and_P_complete_sdk_consumption_verified"
+msgstr "byte_equivalence_and_P_complete_sdk_consumption_verified"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
 "components/soc/stm32/stm32h743_frame_dma2d;components/soc/stm32/CMakeLists.txt;cmake/package/package_source_sdk.py;Doxyfile"
 msgstr ""
 "components/soc/stm32/stm32h743_frame_dma2d;components/soc/stm32/CMakeLists.txt;cmake/package/package_source_sdk.py;Doxyfile"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/provider-vendor/dma2d-relocation.json"
-msgstr ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/provider-vendor/dma2d-relocation.json"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -745,33 +737,14 @@ msgid "Provider build SDK and test coverage mapping"
 msgstr "Provider 构建、SDK 与测试覆盖映射"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "in_progress"
-msgstr "in_progress"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "mode_projection_and_sdk_omission_regressions_verified_full_sdk_pending"
-msgstr ""
-"mode_projection_and_sdk_omission_regressions_verified_full_sdk_pending"
+msgid "mode_mapping_and_P_complete_50_consumer_plan_verified"
+msgstr "mode_mapping_and_P_complete_50_consumer_plan_verified"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
 "tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/experience.py"
 msgstr ""
 "tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/experience.py"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
-"iteration-20261024/configuration/experience-final-"
-"green.log;tests/contracts/test_source_sdk.py;/tmp/nexus-"
-"iteration-20261024/sdk-closure-green.log"
-msgstr ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
-"iteration-20261024/configuration/experience-final-"
-"green.log;tests/contracts/test_source_sdk.py;/tmp/nexus-"
-"iteration-20261024/sdk-closure-green.log"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -814,6 +787,14 @@ msgid ""
 msgstr ""
 "docs/guides/developer-workflow.md;X-Gen-Lab/nexus-examples/docs/developer-"
 "recipes.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/docs/source-check-02.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/docs/source-check-02.json"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1591,16 +1572,8 @@ msgid "Sustainable feedback and delivery constraints"
 msgstr "可持续反馈与交付约束"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "focused_behavior_passed_final_gates_pending"
-msgstr "focused_behavior_passed_final_gates_pending"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/devtools/focused-integration-green-03.log"
-msgstr ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/devtools/focused-integration-green-03.log"
+msgid "P_complete_ordinary_gate_and_feedback_boundaries_verified"
+msgstr "P_complete_ordinary_gate_and_feedback_boundaries_verified"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1638,6 +1611,18 @@ msgstr "W9-02"
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "Real examples platform migration"
 msgstr "真实示例的平台迁移"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "E_lock_gitlink_and_P_public_sdk_consumption_verified"
+msgstr "E_lock_gitlink_and_P_public_sdk_consumption_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/dependencies/nexus.lock.json;X-Gen-Lab/nexus-"
+"examples/.gitmodules"
+msgstr ""
+"X-Gen-Lab/nexus-examples/dependencies/nexus.lock.json;X-Gen-Lab/nexus-"
+"examples/.gitmodules"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "Final platform source lock gitlink and public consumption agree"
@@ -1681,8 +1666,8 @@ msgid "Examples Native application CI"
 msgstr "示例 Native 应用 CI"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "focused_native_application_and_gate_contracts_passed_final_ci_pending"
-msgstr "focused_native_application_and_gate_contracts_passed_final_ci_pending"
+msgid "E_complete_local_native_gate_passed_hosted_ci_blocked_billing"
+msgstr "E_complete_local_native_gate_passed_hosted_ci_blocked_billing"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1709,8 +1694,8 @@ msgid "Examples ARM consumption CI"
 msgstr "示例 ARM 消费 CI"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "five_actual_arm_consumers_linked_and_budget_checked_final_ci_pending"
-msgstr "five_actual_arm_consumers_linked_and_budget_checked_final_ci_pending"
+msgid "E_39_arm_images_and_budgets_passed_hosted_ci_blocked_billing"
+msgstr "E_39_arm_images_and_budgets_passed_hosted_ci_blocked_billing"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1721,6 +1706,14 @@ msgstr ""
 "X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-"
 "examples/apps/shared_spi_runtime/CMakeLists.txt;X-Gen-Lab/nexus-"
 "examples/apps/stream_recovery/h743/CMakeLists.txt"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;X-Gen-Lab/nexus-"
+"examples/.github/workflows/ci.yml"
+msgstr ""
+"docs/delivery/developer-experience-results.json;X-Gen-Lab/nexus-"
+"examples/.github/workflows/ci.yml"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1738,6 +1731,10 @@ msgid "Candidate to examples evidence association"
 msgstr "候选与示例证据关联"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "immutable_P_E_sdk_and_application_evidence_associated"
+msgstr "immutable_P_E_sdk_and_application_evidence_associated"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
 "Platform and examples identities link independent SDK and application "
 "execution"
@@ -1753,8 +1750,8 @@ msgid "Upgrade exercise and bilingual migration guide"
 msgstr "升级演练与双语迁移指南"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "bilingual_migration_ready_final_pin_upgrade_pending"
-msgstr "bilingual_migration_ready_final_pin_upgrade_pending"
+msgid "locked_platform_upgrade_and_actual_error_recovery_verified"
+msgstr "locked_platform_upgrade_and_actual_error_recovery_verified"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1763,10 +1760,6 @@ msgid ""
 msgstr ""
 "docs/tutorials/source-sdk.md;docs/guides/developer-workflow.md;X-Gen-"
 "Lab/nexus-examples/docs/developer-recipes.md"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "docs/delivery/developer-experience-results.json"
-msgstr "docs/delivery/developer-experience-results.json"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1820,6 +1813,14 @@ msgid "Final-source complete software gates"
 msgstr "最终源码完整软件门禁"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "P_complete_ordinary_gate_passed_platform_remote_ci_not_yet_observed"
+msgstr "P_complete_ordinary_gate_passed_platform_remote_ci_not_yet_observed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "scripts/ci/tdd_gate.py"
+msgstr "scripts/ci/tdd_gate.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1022
 msgid "I-04"
 msgstr "I-04"
@@ -1827,6 +1828,14 @@ msgstr "I-04"
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "Complete source SDK and external consumption"
 msgstr "完整源码 SDK 与外部消费"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "P_publishable_sdk_50_consumers_and_E_onboarding_passed"
+msgstr "P_publishable_sdk_50_consumers_and_E_onboarding_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "cmake/package/verify_consumers.py;cmake/package/package_source_sdk.py"
+msgstr "cmake/package/verify_consumers.py;cmake/package/package_source_sdk.py"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1037
@@ -1838,8 +1847,8 @@ msgid "Bilingual documentation and diagram delivery"
 msgstr "双语文档与图示交付"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid "source_check_passed_translation_review_and_fresh_build_pending"
-msgstr "source_check_passed_translation_review_and_fresh_build_pending"
+msgid "local_fresh_bilingual_checks_passed_strict_html_ci_pending"
+msgstr "local_fresh_bilingual_checks_passed_strict_html_ci_pending"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid ""
@@ -1848,16 +1857,6 @@ msgid ""
 msgstr ""
 "docs/design/developer-experience.md;docs/guides/developer-"
 "workflow.md;docs/locale"
-
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
-msgid ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/docs/source-check-02.json;/tmp/nexus-"
-"iteration-20261024/docs/catalog-delta.json"
-msgstr ""
-"docs/delivery/developer-experience-results.json;/tmp/nexus-"
-"iteration-20261024/docs/source-check-02.json;/tmp/nexus-"
-"iteration-20261024/docs/catalog-delta.json"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1052
@@ -1867,6 +1866,10 @@ msgstr "I-06"
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "Candidate identity and review handoff"
 msgstr "候选身份与评审交接"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "P_E_software_review_handoff_bound_no_formal_candidate"
+msgstr "P_E_software_review_handoff_bound_no_formal_candidate"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1067
@@ -1938,3 +1941,11 @@ msgstr "H6"
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
 msgid "Physical support-scope sealing"
 msgstr "物理支持范围封存"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "pending"
+msgstr "pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "（原字段为空）"
+msgstr "（原字段为空）"

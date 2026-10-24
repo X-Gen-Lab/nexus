@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "/tmp/nexus-iteration24-review-records-package/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+    "sha256": "da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816",
+    "size": 3539302
+  },
+  "bytes": 30862622,
+  "files": 4457,
+  "kind": "portable_evidence",
+  "manifest_sha256": "a9e5bb7ccb727e5e71d5f1b77ee7d51018ab161d02eef2aa3cc7194b7d1f1ade",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

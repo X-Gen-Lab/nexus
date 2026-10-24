@@ -2,13 +2,13 @@
   "schema_version": 1,
   "kind": "nexus_developer_experience_development_index",
   "date": "2026-10-24",
-  "time_zone": "Asia/Shanghai",
-  "scope": "Observed scoped development execution; not final-source candidate qualification",
+  "time_zone": "Etc/UTC",
+  "scope": "Observed ordinary software gate, publishable P Source SDK and independent E application execution. This documentation update records P/E; it is not a separately SDK-tested firmware revision or formal candidate.",
   "platform_baseline": "f52cb3e614bf599dd741b743c25e9411f56e76df",
   "examples_baseline": "e96bf7bf41d3887b7e91cb3f5b71838555ffeb5a",
-  "final_platform_commit": null,
-  "final_examples_commit": null,
-  "pr_ci_association": "Recorded in the final PR after both commits exist; no future-commit circular lock",
+  "final_platform_commit": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+  "final_examples_commit": "acb923cae407c8cfc4ac5788f8026d35c84cc841",
+  "pr_ci_association": "Examples PR: https://github.com/X-Gen-Lab/nexus-examples/pull/11. The final platform PR records this documentation commit separately from P. Remote CI and strict bilingual HTML status come from its actual live checks, not from a predeclared result in this file.",
   "publishable_candidate": false,
   "physical_hil": "not_executed",
   "task_authority": "docs/design/developer-experience-execution.csv",
@@ -66,7 +66,7 @@
       "fresh_doxygen_xml": "passed with restored and fully byte-verified locked tool files",
       "fresh_gettext": "passed with strict warnings after explicit diagnostic header-path and anchor disambiguation",
       "translation_review": "passed: independently reviewed prose, 150 task fields and 25 public API/time facts; exact fresh gettext message sets admitted for both languages",
-      "strict_en_zh_html": "pending_remote_ci",
+      "strict_en_zh_html": "not_executed_locally; actual final platform PR checks are authoritative",
       "current_pages": 130,
       "language_records": 260
     },
@@ -236,6 +236,103 @@
       "new_required_omissions_red": 6,
       "complete_focused_tests_green": 31,
       "scope": "Missing-module SDK regressions; not final installed SDK qualification"
+    },
+    "final_integration": {
+      "platform": {
+        "commit": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "tree": "d662c46e31e180a348d61ba1567a6487c28cc74d",
+        "ordinary_gate": "passed",
+        "source_scope": "complete staged tree, committed unchanged",
+        "tool_cases": 3090,
+        "google_programs": 352,
+        "google_cases": 6350,
+        "bounded_io_properties": 203,
+        "property_count_is_same_execution": true
+      },
+      "examples": {
+        "commit": "acb923cae407c8cfc4ac5788f8026d35c84cc841",
+        "tree": "663c6474ed9589cdefd81f46cf760864eddf9dea",
+        "platform_lock": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "platform_gitlink_verified": true,
+        "gate_consumption": "verified explicit P source checkout; independent SDK onboarding recorded separately",
+        "source_override": true,
+        "python_cases": 64,
+        "ctest": 15,
+        "google": {
+          "tests": 69,
+          "passed": 69,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "programs": 6
+        },
+        "ctest_composition": {
+          "applications": 7,
+          "google_wrappers": 6,
+          "actual_freertos_tests": 2
+        },
+        "counts_overlap_and_must_not_be_added": true,
+        "pull_request": "https://github.com/X-Gen-Lab/nexus-examples/pull/11",
+        "upgrade_from": {
+          "examples_commit": "7b7fea3e0bb0465a8a4e93ab8132a458c0373f31",
+          "platform_lock_commit": "d0b8637453330070a052ededbd39bb1f597c76a9",
+          "platform_lock_tree": "f3a54d3847d104ca5504b455fb70c51bcc695982",
+          "scope": "Actual parent of E and its committed source lock; initial e96bf7bf/6f09ea78 development observation remains recorded separately"
+        }
+      },
+      "source_sdk": {
+        "source_revision": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "source_tree": "d662c46e31e180a348d61ba1567a6487c28cc74d",
+        "publishable_package": true,
+        "payload_files": 6021,
+        "relocated_prefix": true,
+        "consumers": 50,
+        "commands": 202,
+        "all_commands_passed": true,
+        "is_formal_platform_candidate": false,
+        "total_consumer_images": 53,
+        "selected_fixture_images": 37,
+        "archived_raw_files": 9047
+      },
+      "onboarding": {
+        "source_revision": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+        "examples_revision": "acb923cae407c8cfc4ac5788f8026d35c84cc841",
+        "create_build_run": "passed",
+        "authored_error_and_recovery": "passed",
+        "public_include_audit": "passed",
+        "development_fixture": false,
+        "checkout_fallback": false
+      },
+      "remote_ci": {
+        "examples": {
+          "run_id": 40058250985,
+          "url": "https://github.com/X-Gen-Lab/nexus-examples/actions/runs/40058250985",
+          "status": "blocked_billing",
+          "runner_id": 0,
+          "executed_steps": 0,
+          "annotation": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        },
+        "platform": {
+          "status": "not_yet_observed",
+          "authority": "Actual checks on the final platform PR; no earlier CI success is inherited"
+        }
+      },
+      "physical_status": "not_executed",
+      "offline_dual_build": "not_executed",
+      "examples_arm": {
+        "status": "passed",
+        "scope": "Actual existing build.py and standalone CMake configure/build/resource validation on final clean P/E; warm incremental builds allowed. Local software evidence does not establish hosted CI success or physical hardware qualification.",
+        "preset_count": 16,
+        "main_firmware_elf_count": 32,
+        "existing_fifo_elf_count": 2,
+        "new_recipe_and_starter_elf_count": 5,
+        "elf_budget_count": 39,
+        "commands_passed": 83,
+        "prepared_unbound_hil_plans": 12,
+        "physical_status": "not_executed",
+        "native_rerun": false,
+        "elapsed_seconds": 90.464
+      }
     }
   },
   "evidence_members": {
@@ -338,12 +435,151 @@
         "member": "sdk-closure-green.log",
         "sha256": "c92054734f7882df9ffcf9cadf69790a4d0fa768e0fd6fb443f5008c44a9f20e"
       }
+    ],
+    "final_integration": [
+      {
+        "path": "/tmp/nexus-iteration-20261024/platform-gate.json",
+        "bytes": 1157,
+        "sha256": "75851d99284b85bb17c97f71ada1f198237d661835254e9bc1606893b4663d20"
+      },
+      {
+        "path": "/dev/shm/nexus-examples-iteration-20261024/build/native-debug/tdd/execution.json",
+        "bytes": 25773,
+        "sha256": "9a122061e7ad5bc770c44ea6c198db10ff0e1102073138b160de1c4252d28124"
+      },
+      {
+        "path": "/dev/shm/nexus-iteration24-sdk-consumers-c8df1c49-attempt01/verification.json",
+        "bytes": 355860,
+        "sha256": "fd188df4ef2f12760f461421acd1328fc410de73bf610e6de4e230a8a7f3acab"
+      },
+      {
+        "path": "/tmp/nexus-iteration-20261024/sdk/onboarding-summary.json",
+        "bytes": 3824,
+        "sha256": "b745f6f3d6f6e6e522e0fb26963b5e35dd3130d4e794eddde5a13e44c4985924"
+      }
+    ],
+    "sdk_transport": [
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/.nexus-sdk-consumer-transport",
+        "sha256": "e5b57c43099018458471cb10f89740ceaa95bd00f088d9070ed3297d4be41486",
+        "bytes": 29
+      },
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw-manifest.json",
+        "sha256": "4a19fda7188ed536e0f36edf5cd09d2ab0030f7d563bf361475993853830575c",
+        "bytes": 2777048
+      },
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw.tar.gz",
+        "sha256": "f782abfea437c9c98734685660e4f53b58a719e91776e0fb2a46f6140a84cb59",
+        "bytes": 12315248
+      },
+      {
+        "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/verification.json",
+        "sha256": "fd188df4ef2f12760f461421acd1328fc410de73bf610e6de4e230a8a7f3acab",
+        "bytes": 355860
+      }
+    ],
+    "iteration_records": [
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/README.md",
+        "sha256": "9ba3ce7f2982b264cb5335b116042ddf3892df77e4f055249014b9de0378e23b",
+        "bytes": 1840
+      },
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.json",
+        "sha256": "547769bb37912ba65244ee4b5c6fc735b0e7ae1df52b1bb139f615b3b43ca92c",
+        "bytes": 503
+      },
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+        "sha256": "da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816",
+        "bytes": 3539302
+      },
+      {
+        "path": "docs/archive/evidence/20261024/iteration-records/verification.json",
+        "sha256": "1ff81cfdd373b402643a9540287c47f1f1ba024e340cff08dae7a69a8f623328",
+        "bytes": 153
+      }
     ]
   },
-  "evidence_archive_locator": null,
+  "evidence_archive_locator": {
+    "sdk_consumers": {
+      "directory": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49",
+      "source_revision": "c8df1c49d4f771a55490b3a8be32a9d1f24faa1e",
+      "source_tree": "d662c46e31e180a348d61ba1567a6487c28cc74d",
+      "files": [
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/.nexus-sdk-consumer-transport",
+          "sha256": "e5b57c43099018458471cb10f89740ceaa95bd00f088d9070ed3297d4be41486",
+          "bytes": 29
+        },
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw-manifest.json",
+          "sha256": "4a19fda7188ed536e0f36edf5cd09d2ab0030f7d563bf361475993853830575c",
+          "bytes": 2777048
+        },
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/consumer-raw.tar.gz",
+          "sha256": "f782abfea437c9c98734685660e4f53b58a719e91776e0fb2a46f6140a84cb59",
+          "bytes": 12315248
+        },
+        {
+          "path": "docs/archive/evidence/20261024/sdk-consumers-c8df1c49/verification.json",
+          "sha256": "fd188df4ef2f12760f461421acd1328fc410de73bf610e6de4e230a8a7f3acab",
+          "bytes": 355860
+        }
+      ],
+      "status": "original_transport_verified_before_copy_and_all_four_copy_digests_match"
+    },
+    "iteration_records": {
+      "directory": "docs/archive/evidence/20261024/iteration-records",
+      "files": [
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/README.md",
+          "sha256": "9ba3ce7f2982b264cb5335b116042ddf3892df77e4f055249014b9de0378e23b",
+          "bytes": 1840
+        },
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.json",
+          "sha256": "547769bb37912ba65244ee4b5c6fc735b0e7ae1df52b1bb139f615b3b43ca92c",
+          "bytes": 503
+        },
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+          "sha256": "da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816",
+          "bytes": 3539302
+        },
+        {
+          "path": "docs/archive/evidence/20261024/iteration-records/verification.json",
+          "sha256": "1ff81cfdd373b402643a9540287c47f1f1ba024e340cff08dae7a69a8f623328",
+          "bytes": 153
+        }
+      ],
+      "original_members": 4457,
+      "original_bytes": 30862622,
+      "record_index_member": "record-index.json",
+      "scope": "Original development, local complete gates, final P/E ARM observations, documentation failure/correction and billing annotations; not a software candidate or physical qualification",
+      "status": "original_store_package_verified_before_copy_and_all_four_copy_digests_match",
+      "verify_command": [
+        "python",
+        "tools/evidence/store.py",
+        "verify",
+        "--package",
+        "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.json",
+        "--archive",
+        "docs/archive/evidence/20261024/iteration-records/da50b3c196413bf8501486591d40302bd19abbcd70dc3fb1100d416fe0b60816.tar.gz",
+        "--report",
+        "/tmp/nexus-20261024-records-verification.json"
+      ],
+      "working_directory": "repository root",
+      "sdk_raw_not_duplicated": true,
+      "documentation_D_checks_not_included_to_avoid_hash_cycle": true
+    }
+  },
   "limitations": [
-    "Final-source ordinary complete gates and installed SDK integration remain pending until observed by root integration.",
-    "Development record hashes identify original members; archive availability and final PR/CI must be checked separately.",
+    "The ordinary platform gate and independent SDK/application execution bind P/E only. The recording documentation commit is checked separately; remote CI and strict HTML remain actual live PR evidence.",
+    "Original SDK consumer bytes are included at the recorded repository-relative transport paths. The separate iteration record package retains its own source and execution scopes.",
     "Physical H1-H6 remain not_executed.",
     "HAL reference handle layout objects are not equivalent complete linked images."
   ],
