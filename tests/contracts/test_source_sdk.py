@@ -1,5 +1,5 @@
 """Relocate the real source SDK and compile/run independent public consumers."""
-from tools.configure.providers.descriptor import source_directory
+
 import json
 import os
 from pathlib import Path
@@ -11,10 +11,12 @@ import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "cmake/package"))
 import verify_consumers as consumer_gate
 import package_source_sdk as source_sdk
 from tools.configure.metadata import load_policy
+from tools.configure.providers.descriptor import source_directory
 from tools.dev.presets import Presets
 
 # Fixture repositories are disposable; automatic maintenance must neither

@@ -1,6 +1,9 @@
 """The maintained software plan executes complete Native and SDK boundaries."""
 
 from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 
 from scripts.ci import provider_assemblies
@@ -38,6 +41,17 @@ class QualificationPlanTests(unittest.TestCase):
         self.assertEqual(selected[0]["args"], [])
         self.assertTrue(any(stage["checker"] == "sdk_consumers"
                             for stage in self.stages))
+
+    def test_sdk_boundary_script_bootstraps_without_import_environment(self):
+        script, = CHECKERS["sdk_boundary_tests"]
+        case = ("SourceSDKSelectionTests."
+                "test_component_construction_helpers_are_required_sdk_payload")
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, "-I", "-B", str(ROOT / script), case],
+                cwd=directory, capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Ran 1 test", result.stderr)
 
     def test_all_four_tool_domains_share_the_fixed_complete_runner(self):
         selected = [stage for stage in self.stages

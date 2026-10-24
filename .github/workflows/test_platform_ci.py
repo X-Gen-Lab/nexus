@@ -1545,9 +1545,13 @@ class FormalSoftwareWorkflow(unittest.TestCase):
         document = self.document()
         self.assertEqual(set(document['on']), {'workflow_dispatch'})
         inputs = document['on']['workflow_dispatch']['inputs']
-        self.assertEqual(set(inputs), {'expected_commit'})
-        self.assertEqual(inputs['expected_commit']['required'], 'true')
+        self.assertEqual(set(inputs), {'mode', 'expected_commit', 'run_id',
+                                      'attempt', 'expected_source'})
+        self.assertEqual(inputs['mode']['default'], 'formal')
+        self.assertEqual(inputs['mode']['options'], ['formal', 'diagnostics'])
+        self.assertEqual(inputs['expected_commit']['required'], 'false')
         self.assertEqual(document['permissions'], {'contents': 'read'})
+
         self.assertEqual(document['concurrency']['cancel-in-progress'], 'false')
         steps = document['jobs']['formal']['steps']
         self.assertEqual(steps[0]['id'], 'request')
@@ -1560,6 +1564,142 @@ class FormalSoftwareWorkflow(unittest.TestCase):
         self.assertEqual(checkout['with']['fetch-depth'], '0')
         self.assertEqual(checkout['with']['persist-credentials'], 'false')
         self.assertNotIn('${{ inputs.', self.step('request')['run'])
+
+    def diagnostic_step(self, identifier):
+        steps = self.document()['jobs']['diagnostics']['steps']
+        return next(step for step in steps if step.get('id') == identifier)
+
+    def test_diagnostics_is_separate_readonly_without_plan_or_build(self):
+        jobs = self.document()['jobs']
+        self.assertEqual(jobs['formal']['if'],
+                         "inputs.mode == 'formal' || inputs.mode == ''")
+        job = jobs['diagnostics']
+        self.assertEqual(job['if'], "inputs.mode == 'diagnostics'")
+        self.assertEqual(job['permissions'],
+                         {'contents': 'read', 'actions': 'read'})
+        self.assertEqual(job['timeout-minutes'], '30')
+        commands = '\n'.join(step.get('run', '') for step in job['steps'])
+        for forbidden in ('qualification.py', 'candidate.py', 'cmake',
+                          'setup-build', 'git push', 'gh release'):
+            self.assertNotIn(forbidden, commands)
+        self.assertNotIn('${{ inputs.', commands)
+        checkout = self.diagnostic_step('checkout')
+        self.assertEqual(checkout['with']['ref'], '${{ github.sha }}')
+        self.assertEqual(checkout['with']['persist-credentials'], 'false')
+
+    def test_diagnostics_checks_actual_run_attempt_and_artifact_before_download(self):
+        from unittest.mock import patch
+        script = self.diagnostic_step('request')['run']
+        body = script.split("<<'PY'\n", 1)[1].rsplit('\nPY', 1)[0]
+        source = 'a' * 40
+        run = {'id': 123, 'run_attempt': 2, 'head_sha': source,
+               'head_branch': 'main', 'status': 'completed',
+               'conclusion': 'failure', 'event': 'workflow_dispatch',
+               'path': '.github/workflows/formal-software.yml',
+               'repository': {'full_name': 'X-Gen-Lab/nexus'}}
+        artifact = {'id': 789, 'name': f'formal-software-{source}-123-2',
+                    'expired': False, 'size_in_bytes': 12345,
+                    'workflow_run': {'id': 123, 'head_sha': source}}
+        cases = [('valid', {}, {}, {}, False),
+                 ('malformed_run', {'NEXUS_TARGET_RUN': '../123'}, {}, {}, True),
+                 ('malformed_attempt', {'NEXUS_TARGET_ATTEMPT': '0'}, {}, {}, True),
+                 ('malformed_source', {'NEXUS_EXPECTED_SOURCE': 'short'}, {}, {}, True),
+                 ('api_failure', {}, {}, {}, True),
+                 ('duplicate_artifact', {}, {}, {'_copies': 2}, True),
+                 ('wrong_source', {}, {'head_sha': 'b' * 40}, {}, True),
+                 ('wrong_attempt', {}, {'run_attempt': 1}, {}, True),
+                 ('wrong_run', {}, {'id': 124}, {}, True),
+                 ('wrong_repo', {}, {'repository': {'full_name': 'else/repo'}}, {}, True),
+                 ('wrong_workflow', {}, {'path': '.github/workflows/ci.yml'}, {}, True),
+                 ('running', {}, {'status': 'in_progress'}, {}, True),
+                 ('success', {}, {'conclusion': 'success'}, {}, False),
+                 ('cancelled', {}, {'conclusion': 'cancelled'}, {}, True),
+                 ('expired', {}, {}, {'expired': True}, True),
+                 ('artifact_source', {}, {}, {'workflow_run': {'id': 123, 'head_sha': 'b' * 40}}, True),
+                 ('artifact_attempt', {}, {}, {'name': f'formal-software-{source}-123-1'}, True)]
+        for name, changed, run_change, artifact_change, rejected in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                env = {'D': str(root / 'diagnostic'),
+                       'GITHUB_EVENT_NAME': 'workflow_dispatch',
+                       'GITHUB_REF': 'refs/heads/fix/diagnostics',
+                       'GITHUB_REPOSITORY': 'X-Gen-Lab/nexus',
+                       'GITHUB_SHA': 'c' * 40,
+                       'NEXUS_WORKFLOW_SHA': 'c' * 40,
+                       'GITHUB_OUTPUT': str(root / 'outputs'),
+                       'NEXUS_TARGET_RUN': '123',
+                       'NEXUS_TARGET_ATTEMPT': '2',
+                       'NEXUS_EXPECTED_SOURCE': source, **changed}
+                calls = []
+
+                def api(argv, **kwargs):
+                    calls.append(argv)
+                    self.assertEqual(argv[:2], ['gh', 'api'])
+                    self.assertEqual(kwargs['timeout'], 60)
+                    if name == 'api_failure':
+                        raise subprocess.CalledProcessError(1, argv)
+                    if '/attempts/' in argv[-1]:
+                        return json.dumps({**run, **run_change})
+                    self.assertIn('--paginate', argv)
+                    self.assertIn('--slurp', argv)
+                    copies = artifact_change.get('_copies', 1)
+                    changed_artifact = {key: value for key, value in
+                                        artifact_change.items() if key != '_copies'}
+                    return json.dumps([{'artifacts':
+                        [{**artifact, **changed_artifact}] * copies}])
+
+                with patch.dict(os.environ, env), \
+                        patch('subprocess.check_output', side_effect=api):
+                    if rejected:
+                        with self.assertRaises(SystemExit):
+                            exec(compile(body, '<diagnostics-request>', 'exec'), {})
+                    else:
+                        exec(compile(body, '<diagnostics-request>', 'exec'), {})
+                selected = json.loads((root / 'diagnostic/request/selection.json').read_text())
+                self.assertEqual(selected['accepted'], not rejected)
+                self.assertFalse(selected['software_qualified'])
+                if not rejected:
+                    self.assertEqual(selected['source_conclusion'],
+                                     run_change.get('conclusion', 'failure'))
+                    self.assertIn('artifact_id=789\n', (root / 'outputs').read_text())
+                    self.assertEqual(calls[0][-1],
+                                     'repos/X-Gen-Lab/nexus/actions/runs/123/attempts/2')
+                else:
+                    self.assertFalse((root / 'outputs').exists())
+
+    def test_diagnostics_downloads_only_selected_official_artifact(self):
+        step = self.diagnostic_step('download')
+        self.assertEqual(step['uses'],
+                         'actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333')
+        self.assertEqual(step['with']['artifact-ids'],
+                         '${{ steps.request.outputs.artifact_id }}')
+        self.assertEqual(step['with']['run-id'], '${{ inputs.run_id }}')
+        self.assertEqual(step['with']['repository'], '${{ github.repository }}')
+        self.assertEqual(step['with']['github-token'], '${{ github.token }}')
+        extract = self.diagnostic_step('extract')['run']
+        self.assertIn('tools/evidence/formal_diagnostics.py', extract)
+        self.assertIn('--run-attempt "$NEXUS_TARGET_ATTEMPT"', extract)
+        self.assertIn('--expected-commit "$NEXUS_EXPECTED_SOURCE"', extract)
+
+    def test_diagnostics_keeps_each_bounded_part_in_separate_artifact(self):
+        steps = self.document()['jobs']['diagnostics']['steps']
+        uploads = [step for step in steps
+                   if step.get('uses', '').startswith('actions/upload-artifact@')]
+        self.assertEqual(len(uploads), 18)
+        for index in range(16):
+            step = self.diagnostic_step(f'part_{index:03}')
+            self.assertEqual(step['with']['path'],
+                             '${{ runner.temp }}/formal-inspection/result/parts/' +
+                             f'part-{index:03}')
+            self.assertEqual(step['if'],
+                             "always() && steps.extract.outcome == 'success' && "
+                             f'fromJSON(steps.extract.outputs.part_count) > {index}')
+            self.assertEqual(step['with']['compression-level'], '0')
+            self.assertEqual(step['with']['if-no-files-found'], 'error')
+        for step in uploads:
+            self.assertNotIn('continue-on-error', step)
+            self.assertNotIn('/artifact/', step['with']['path'])
+            self.assertNotIn('result/\n', step['with']['path'])
 
     def test_actual_guard_rejects_wrong_event_branch_and_sha(self):
         source = self.python_body('request')
@@ -1683,6 +1823,84 @@ class FormalSoftwareWorkflow(unittest.TestCase):
                 self.assertEqual(step['with']['if-no-files-found'], 'error')
                 self.assertEqual(step['with']['retention-days'], '30')
                 self.assertNotIn('continue-on-error', step)
+
+    def test_stage_metadata_upload_is_early_original_and_only_after_execution(self):
+        observe = self.step('stage_metadata')
+        upload = self.step('stage_metadata_upload')
+        condition = ("always() && (steps.software.outcome == 'success' || "
+                     "steps.software.outcome == 'failure' || "
+                     "steps.software.outcome == 'cancelled')")
+        self.assertEqual(observe['if'], condition)
+        self.assertEqual(upload['if'], condition)
+        self.assertNotIn('continue-on-error', observe)
+        self.assertNotIn('continue-on-error', upload)
+        self.assertEqual(upload['with']['path'].splitlines(), [
+            '${{ runner.temp }}/formal/software/report.json',
+            '${{ runner.temp }}/formal/software/*.command.json',
+            '${{ runner.temp }}/formal-stage-metadata.json'])
+        self.assertEqual(upload['with']['if-no-files-found'], 'error')
+        steps = self.document()['jobs']['formal']['steps']
+        self.assertLess(steps.index(self.step('software')), steps.index(observe))
+        self.assertLess(steps.index(observe), steps.index(upload))
+        self.assertLess(steps.index(upload), steps.index(self.step('formal_archive')))
+
+    def stage_metadata_fixture(self, outcome, *, missing=None, malformed=False):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            software = root / 'formal/software'
+            software.mkdir(parents=True)
+            status = {'success': 'executed_passed', 'failure': 'failed',
+                      'cancelled': 'running'}[outcome]
+            report = json.dumps({'status': status, 'stages': [
+                {'name': 'quality', 'duration_s': 12.5,
+                 'status': 'passed' if outcome == 'success' else 'failed'}]})
+            originals = {'report.json': b'{' if malformed else report.encode(),
+                         'quality.command.json': b'{"exit_code":17}\n'}
+            for name, data in originals.items():
+                if name != missing:
+                    (software / name).write_bytes(data)
+            nested = software / 'quality.attempts/one'
+            nested.mkdir(parents=True)
+            (nested / 'unexpected.command.json').write_bytes(b'nested')
+            env = {**os.environ, 'F': str(root / 'formal'),
+                   'RUNNER_TEMP': str(root), 'GITHUB_SHA': 'a' * 40,
+                   'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '1',
+                   'NEXUS_SOFTWARE_OUTCOME': outcome}
+            result = subprocess.run([
+                sys.executable, '-B', '-c', self.python_body('stage_metadata')],
+                env=env, capture_output=True, timeout=10)
+            observed = json.loads((root / 'formal-stage-metadata.json').read_text())
+            for name, data in originals.items():
+                if name != missing:
+                    self.assertEqual((software / name).read_bytes(), data)
+            return result, observed
+
+    def test_stage_metadata_retains_success_failure_and_partial_cancel_bytes(self):
+        for outcome in ('success', 'failure', 'cancelled'):
+            with self.subTest(outcome=outcome):
+                result, record = self.stage_metadata_fixture(outcome)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(record['software_step_outcome'], outcome)
+                self.assertEqual(record['metadata_status'], 'complete')
+                self.assertFalse(record['software_qualified'])
+                self.assertEqual(record['missing'], [])
+                self.assertEqual({item['path'] for item in record['files']},
+                                 {'report.json', 'quality.command.json'})
+                self.assertTrue(all(re.fullmatch('[0-9a-f]{64}', item['sha256'])
+                                    for item in record['files']))
+
+    def test_stage_metadata_missing_or_invalid_files_remain_explicit_failures(self):
+        for missing in ('report.json', 'quality.command.json'):
+            with self.subTest(missing=missing):
+                result, record = self.stage_metadata_fixture('failure', missing=missing)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(record['metadata_status'], 'incomplete')
+                self.assertIn(missing, record['missing'])
+                self.assertFalse(record['software_qualified'])
+        result, record = self.stage_metadata_fixture('failure', malformed=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(record['metadata_status'], 'incomplete')
+        self.assertTrue(record['errors'])
 
     def test_upload_failure_or_cancel_selects_complete_raw_fallback(self):
         condition = self.step('fallback_upload')['if']
