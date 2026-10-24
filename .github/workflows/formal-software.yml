@@ -157,6 +157,77 @@ jobs:
           print(result.stderr, end='', file=sys.stderr)
           raise SystemExit(result.returncode)
           PY
+      - name: Observe original stage reports and missing command receipts
+        id: stage_metadata
+        if: >-
+          always() && (steps.software.outcome == 'success' ||
+          steps.software.outcome == 'failure' || steps.software.outcome == 'cancelled')
+        env:
+          NEXUS_SOFTWARE_OUTCOME: ${{ steps.software.outcome }}
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          source = Path(os.environ['F']) / 'software'
+          report = source / 'report.json'
+          record = {'source_commit': os.environ['GITHUB_SHA'],
+              'run_id': os.environ['GITHUB_RUN_ID'],
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'software_step_outcome': os.environ['NEXUS_SOFTWARE_OUTCOME'],
+              'software_qualified': False, 'physical_status': 'not_executed',
+              'scope': 'Original stage metadata; not qualification or replacement stores',
+              'files': [], 'missing': [], 'errors': []}
+          report_bytes = None
+          for path in sorted({report, *source.glob('*.command.json')}):
+              if path.is_symlink() or not path.is_file():
+                  record['missing'].append(path.name)
+                  continue
+              try:
+                  data = path.read_bytes()
+              except OSError as error:
+                  record['errors'].append(f'{path.name}: {error}')
+                  continue
+              record['files'].append({'path': path.name, 'size': len(data),
+                  'sha256': hashlib.sha256(data).hexdigest()})
+              if path == report:
+                  report_bytes = data
+          if report_bytes is not None:
+              try:
+                  original = json.loads(report_bytes)
+                  record['original_report_status'] = original['status']
+                  available = {item['path'] for item in record['files']}
+                  for stage in original['stages']:
+                      name = stage['name']
+                      if (not isinstance(name, str) or not name or
+                              name in ('.', '..') or '/' in name or '\\' in name):
+                          raise ValueError('Invalid original stage name')
+                      expected = name + '.command.json'
+                      if expected not in available:
+                          record['missing'].append(expected)
+              except (KeyError, TypeError, ValueError) as error:
+                  record['errors'].append(f'report.json: {error}')
+          complete = not record['missing'] and not record['errors']
+          record['metadata_status'] = 'complete' if complete else 'incomplete'
+          (Path(os.environ['RUNNER_TEMP']) / 'formal-stage-metadata.json').write_text(
+              json.dumps(record, indent=2) + '\n')
+          if not complete:
+              raise SystemExit('Original stage metadata is missing or invalid')
+          PY
+      - name: Retain stage status and timing before complete archive transfer
+        id: stage_metadata_upload
+        if: >-
+          always() && (steps.software.outcome == 'success' ||
+          steps.software.outcome == 'failure' || steps.software.outcome == 'cancelled')
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: formal-software-stages-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/formal/software/report.json
+            ${{ runner.temp }}/formal/software/*.command.json
+            ${{ runner.temp }}/formal-stage-metadata.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
       - name: Preserve the complete temporary output with the existing verifier
         id: formal_archive
         if: always() && steps.source.outputs.validated == 'true'

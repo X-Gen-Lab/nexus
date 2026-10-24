@@ -1824,6 +1824,84 @@ class FormalSoftwareWorkflow(unittest.TestCase):
                 self.assertEqual(step['with']['retention-days'], '30')
                 self.assertNotIn('continue-on-error', step)
 
+    def test_stage_metadata_upload_is_early_original_and_only_after_execution(self):
+        observe = self.step('stage_metadata')
+        upload = self.step('stage_metadata_upload')
+        condition = ("always() && (steps.software.outcome == 'success' || "
+                     "steps.software.outcome == 'failure' || "
+                     "steps.software.outcome == 'cancelled')")
+        self.assertEqual(observe['if'], condition)
+        self.assertEqual(upload['if'], condition)
+        self.assertNotIn('continue-on-error', observe)
+        self.assertNotIn('continue-on-error', upload)
+        self.assertEqual(upload['with']['path'].splitlines(), [
+            '${{ runner.temp }}/formal/software/report.json',
+            '${{ runner.temp }}/formal/software/*.command.json',
+            '${{ runner.temp }}/formal-stage-metadata.json'])
+        self.assertEqual(upload['with']['if-no-files-found'], 'error')
+        steps = self.document()['jobs']['formal']['steps']
+        self.assertLess(steps.index(self.step('software')), steps.index(observe))
+        self.assertLess(steps.index(observe), steps.index(upload))
+        self.assertLess(steps.index(upload), steps.index(self.step('formal_archive')))
+
+    def stage_metadata_fixture(self, outcome, *, missing=None, malformed=False):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            software = root / 'formal/software'
+            software.mkdir(parents=True)
+            status = {'success': 'executed_passed', 'failure': 'failed',
+                      'cancelled': 'running'}[outcome]
+            report = json.dumps({'status': status, 'stages': [
+                {'name': 'quality', 'duration_s': 12.5,
+                 'status': 'passed' if outcome == 'success' else 'failed'}]})
+            originals = {'report.json': b'{' if malformed else report.encode(),
+                         'quality.command.json': b'{"exit_code":17}\n'}
+            for name, data in originals.items():
+                if name != missing:
+                    (software / name).write_bytes(data)
+            nested = software / 'quality.attempts/one'
+            nested.mkdir(parents=True)
+            (nested / 'unexpected.command.json').write_bytes(b'nested')
+            env = {**os.environ, 'F': str(root / 'formal'),
+                   'RUNNER_TEMP': str(root), 'GITHUB_SHA': 'a' * 40,
+                   'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '1',
+                   'NEXUS_SOFTWARE_OUTCOME': outcome}
+            result = subprocess.run([
+                sys.executable, '-B', '-c', self.python_body('stage_metadata')],
+                env=env, capture_output=True, timeout=10)
+            observed = json.loads((root / 'formal-stage-metadata.json').read_text())
+            for name, data in originals.items():
+                if name != missing:
+                    self.assertEqual((software / name).read_bytes(), data)
+            return result, observed
+
+    def test_stage_metadata_retains_success_failure_and_partial_cancel_bytes(self):
+        for outcome in ('success', 'failure', 'cancelled'):
+            with self.subTest(outcome=outcome):
+                result, record = self.stage_metadata_fixture(outcome)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(record['software_step_outcome'], outcome)
+                self.assertEqual(record['metadata_status'], 'complete')
+                self.assertFalse(record['software_qualified'])
+                self.assertEqual(record['missing'], [])
+                self.assertEqual({item['path'] for item in record['files']},
+                                 {'report.json', 'quality.command.json'})
+                self.assertTrue(all(re.fullmatch('[0-9a-f]{64}', item['sha256'])
+                                    for item in record['files']))
+
+    def test_stage_metadata_missing_or_invalid_files_remain_explicit_failures(self):
+        for missing in ('report.json', 'quality.command.json'):
+            with self.subTest(missing=missing):
+                result, record = self.stage_metadata_fixture('failure', missing=missing)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(record['metadata_status'], 'incomplete')
+                self.assertIn(missing, record['missing'])
+                self.assertFalse(record['software_qualified'])
+        result, record = self.stage_metadata_fixture('failure', malformed=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(record['metadata_status'], 'incomplete')
+        self.assertTrue(record['errors'])
+
     def test_upload_failure_or_cancel_selects_complete_raw_fallback(self):
         condition = self.step('fallback_upload')['if']
         prefix, alternatives = condition.split('&&', 1)
