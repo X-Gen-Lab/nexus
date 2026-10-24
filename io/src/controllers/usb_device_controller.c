@@ -1318,6 +1318,14 @@ static nx_result_t stop(void* context) {
         return NX_SUCCESS;
     }
     c->snapshot.closing = true;
+    nx_usb_endpoint_t* out0 = endpoint(c, 0U, false);
+    if (out0 == NULL) {
+        /* Cold admission requires OUT0. An invalid private plan cannot
+         * authorize packet withdrawal or release any retained ownership.
+         */
+        nx_arch_irq_restore(saved);
+        return NX_ERROR_STATE;
+    }
     if (c->publishers != 0U) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
@@ -1379,7 +1387,6 @@ static nx_result_t stop(void* context) {
         nx_arch_irq_restore(saved);
         return NX_ERROR_BUSY;
     }
-    nx_usb_endpoint_t* out0 = endpoint(c, 0U, false);
     if (out0->request != NULL) {
         nx_result_t terminal = out0->terminal == NX_ERROR_STATE
                                    ? NX_ERROR_CANCELLED

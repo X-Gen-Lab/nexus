@@ -9,6 +9,7 @@ import unittest
 
 import bindings
 import configure as gate
+import selection as selection_rules
 
 
 class ProviderContractTests(unittest.TestCase):
@@ -89,7 +90,7 @@ class ProviderContractTests(unittest.TestCase):
                     {"pin": f"PA{channel}"} for channel in channels]}
                 with self.subTest(family=family, mode=mode):
                     with self.assertRaisesRegex(ValueError, "channel count"):
-                        common.validate_selection(selection, route, provider,
+                        selection_rules.validate_selection(selection, route, provider,
                                                   131072)
 
     def test_adc_constructor_sequences_are_validated_before_generation(self):
@@ -101,7 +102,7 @@ class ProviderContractTests(unittest.TestCase):
         for family in ("stm32f407", "gd32f470"):
             with self.subTest(family=family):
                 with self.assertRaisesRegex(ValueError, "channel sequence"):
-                    common.validate_selection(selection, route,
+                    selection_rules.validate_selection(selection, route,
                                               maintained(family), 131072)
 
     def test_mode_traits_are_explicit_immutable_and_directional(self):

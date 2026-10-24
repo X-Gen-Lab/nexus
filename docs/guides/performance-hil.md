@@ -103,3 +103,34 @@ Capture completion means executed but unqualified. Validate the actual smoke,
 measurement and OS records separately. Do not synthesize physical traces or
 convert a software model into HIL. Qualification covers recorded observations;
 it does not establish unobserved WCET, electrical safety or a product release.
+
+## Compare two admitted raw measurements
+
+After actual acquisition, compare two existing raw records and their station
+admissions. Run from the same fixed source root; use a new report path you own:
+
+```sh
+python tools/hil/measure.py compare \
+    --baseline-raw /path/baseline-raw.json \
+    --baseline-admission /path/baseline-admission.json \
+    --candidate-raw /path/candidate-raw.json \
+    --candidate-admission /path/candidate-admission.json \
+    --report /path/new-comparison.json
+```
+
+Both admissions and raw traces are revalidated, including their permitted age
+(`--maximum-age-s` defaults to 86400). Comparison requires matching hardware,
+station, fixture, effective configuration profile, workload bytes, clock, load,
+executor, IRQ policy, measurement method, calibration, resolution, observation
+window and metric sample counts. Source and ELF identities may differ for an
+implementation comparison; acquisition-specific DWT epochs may also differ.
+Source provenance is retained separately from effective configuration equality.
+Changing the workload or mode answers a different question and rejects here.
+
+The report retains original metrics and signed minimum, maximum and mean deltas.
+Success is `status = compared` with `physical_status = comparison_only`: it
+compares previously acquired observations and never operates equipment. It does
+not label a direction as better, establish statistical significance, infer WCET
+or promote a candidate. Synthetic regression traces only test the comparison
+contract. Without actual raw acquisitions, physical measurements remain
+`not_executed`; no baseline values or thresholds are fabricated.

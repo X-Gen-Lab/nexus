@@ -8,13 +8,13 @@ from types import MappingProxyType
 
 try:
     from .gpio_phase import withdraw_pin
-    from .emission import dma_regions
+    from .memory import dma_regions
     from .providers.common import Construction, fail, mode_traits
     from .providers import hardware
     from . import enhanced_endpoints
 except ImportError:
     from gpio_phase import withdraw_pin
-    from emission import dma_regions
+    from memory import dma_regions
     from providers.common import Construction, fail, mode_traits
     from providers import hardware
     import enhanced_endpoints

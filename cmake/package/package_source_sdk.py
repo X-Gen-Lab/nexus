@@ -477,7 +477,8 @@ for _descriptor in provider_descriptors.families():
                        + _descriptor.owned_payload)
 REQUIRED_FILES += ("tools/configure/providers/descriptor.py",
                    "tools/configure/providers/hardware.py",
-                   "tools/configure/clocks.py", "tools/configure/physical_facts.py")
+                   "tools/configure/clocks.py", "tools/configure/physical_facts.py",
+                   "tools/configure/selection.py", "tools/configure/onboarding.py")
 REQUIRED_FILES = tuple(dict.fromkeys(REQUIRED_FILES))
 HEX40 = re.compile(r"[0-9a-f]{40}")
 HEX64 = re.compile(r"[0-9a-f]{64}")

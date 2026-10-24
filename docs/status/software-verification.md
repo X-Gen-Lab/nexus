@@ -28,21 +28,22 @@ source_language: zh_CN
 这里不手填一个很快漂移的 HEAD 常量。未打包的工作树可执行 `git rev-parse HEAD`
 核对 checkout，但命令输出本身不是 qualification receipt。
 
-## 已有三个独立结果索引
+## 已有独立结果索引
 
 | 范围 | 精确代码源码 | 原权威及执行说明 |
 | --- | --- | --- |
+| 开发体验迭代 P 与示例 E | P `c8df1c49d4f771a55490b3a8be32a9d1f24faa1e`；E `acb923cae407c8cfc4ac5788f8026d35c84cc841` | [结果索引](../delivery/developer-experience-results.json)保留本地完整 gate、SDK 独立消费、示例 ARM 和原始归档；不是正式软件候选 |
 | 构建系统及其实际软件 scopes | `cc6a065c002041234a212a964be863a69198f9b4` | [结果索引](../delivery/build-system-results.json)、[执行记录](../delivery/build-system-verification.md) |
 | SoC 扩展软件切片 | `98270512ea2ff7eefe8ff79720018e582be3a949` | [结果索引](../delivery/soc-extensions-results.json)、[执行记录](../delivery/soc-extensions-verification.md) |
 | 较早 SoC refinement 基线 | `3728b334b02eb2eb70bcf5d4caafbb9746837dd3` | [结果索引](../delivery/soc-refinement-results.json)、[执行记录](../delivery/soc-refinement-verification.md) |
 
-三个索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加
+各索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加
 测试次数、ARM 镜像数或任务数量，也不能据此计算全项目完成率。后续文档 commit
 只记录这些基线。当前文档的检查、渲染、离线恢复与部署验证各自有独立记录。
 
 构建系统记录没有执行一次完整 72-stage 软件总计划，也没有执行 OCI recipe 重建、
 CP311 离线安装、Windows/macOS 集成或 MCU HIL。独立执行过的具体 scopes 按原索引
-解释；不要从其 aggregate 状态扩大结论。八个当前无签名软件候选是 H743 HSI64／
+解释；不要从其 aggregate 状态扩大结论。其八个无签名软件候选是 H743 HSI64／
 Cache off 和 U575 MSIS4／TZEN=0 的 empty／UART、裸机／FreeRTOS 组合。
 
 ## 如何取得与核对旧证据

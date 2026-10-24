@@ -6,8 +6,8 @@ import unittest
 
 from tools.configure import bindings, configure
 from tools.configure.ir import ControllerIR
-from tools.configure.providers.common import (ConfigurationError,
-                                              validate_clock_profiles)
+from tools.configure.providers.common import ConfigurationError
+from tools.configure.selection import validate_clock_profiles
 
 
 ROOT = Path(__file__).resolve().parents[4]

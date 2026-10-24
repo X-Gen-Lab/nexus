@@ -16,6 +16,7 @@ extern "C" {
 #include <gtest/gtest.h>
 #include <mutex>
 #include <thread>
+#include <utility>
 
 class UsbDevice : public testing::Test {
   protected:
@@ -219,6 +220,7 @@ TEST_F(UsbDevice, InvalidTransferPlansRejectBeforeClockCallsOrMmio) {
     const auto clock = model.controller.clock;
     model.controller.clock = {&ops, &calls, sizeof(calls)};
     const auto control = endpoints[0];
+    const auto control_out = endpoints[1];
     const auto nonzero = endpoints[2];
     struct Plan {
         unsigned index;
@@ -233,7 +235,9 @@ TEST_F(UsbDevice, InvalidTransferPlansRejectBeforeClockCallsOrMmio) {
                             {2U, NX_USB_PROFILE_INTERRUPT, 1U, true, 0U},
                             {2U, NX_USB_PROFILE_INTERRUPT, 1U, true, 65U},
                             {2U, NX_USB_PROFILE_BULK, 1U, true, 10U},
-                            {2U, NX_USB_PROFILE_CONTROL, 1U, true, 64U}};
+                            {2U, NX_USB_PROFILE_CONTROL, 1U, true, 64U},
+                            {0U, NX_USB_PROFILE_BULK, 2U, true, 64U},
+                            {1U, NX_USB_PROFILE_BULK, 2U, false, 64U}};
     const auto reads = model.hardware.mmio_reads;
     const auto writes = model.hardware.mmio_writes;
     for (const auto& plan : invalid) {
@@ -243,6 +247,7 @@ TEST_F(UsbDevice, InvalidTransferPlansRejectBeforeClockCallsOrMmio) {
                      << " number=" << static_cast<unsigned>(plan.number)
                      << " in=" << plan.in << " MPS=" << plan.maximum);
         endpoints[0] = control;
+        endpoints[1] = control_out;
         endpoints[2] = nonzero;
         auto& selected = endpoints[plan.index];
         selected.transfer = plan.transfer;
@@ -264,8 +269,70 @@ TEST_F(UsbDevice, InvalidTransferPlansRejectBeforeClockCallsOrMmio) {
         EXPECT_EQ(selected.request, nullptr);
     }
     endpoints[0] = control;
+    endpoints[1] = control_out;
     endpoints[2] = nonzero;
     model.controller.clock = clock;
+}
+TEST_F(UsbDevice, StopFindsControlOutByIdentityAndRetainsItUntilFifoDrain) {
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    std::swap(endpoints[0], endpoints[3]);
+    std::swap(endpoints[1], endpoints[2]);
+    ASSERT_EQ(nx_native_usb_initialize(&model), NX_SUCCESS);
+    const uint8_t setup[8] = {0, 1, 0, 0, 0, 0, 4, 0};
+    ReceiveSetup(setup);
+    auto out = Port(2);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 4U, NX_USB_DATA,
+                                 model.controller.snapshot.epoch, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    model.hardware.hold_flush = true;
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_BUSY);
+    EXPECT_NE(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(endpoints[2].request, &request);
+    EXPECT_EQ(model.hardware.consumers, 1U);
+    model.hardware.hold_flush = false;
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(endpoints[2].request, nullptr);
+    EXPECT_EQ(model.hardware.consumers, 0U);
+    EXPECT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    EXPECT_EQ(model.hardware.consumers, 0U);
+}
+TEST_F(UsbDevice, MissingControlOutAtStopRetainsLoanAndClockWithoutMmio) {
+    const uint8_t setup[8] = {0, 1, 0, 0, 0, 0, 4, 0};
+    ReceiveSetup(setup);
+    auto out = Port(1);
+    ASSERT_EQ(nx_usb_out_prepare(&request, bytes, 4U, NX_USB_DATA,
+                                 model.controller.snapshot.epoch, 200U),
+              NX_SUCCESS);
+    ASSERT_EQ(nx_usb_endpoint_submit(&out, &request), NX_SUCCESS);
+    /* Inject an invalid private plan only in the child. Legal initialization
+     * requires OUT0; this checks conservative failure, not metadata repair.
+     */
+    EXPECT_EXIT(
+        {
+            endpoints[1].number = 2U;
+            const auto reads = model.hardware.mmio_reads;
+            const auto writes = model.hardware.mmio_writes;
+            EXPECT_EQ(nx_usb_device_stop(&device), NX_ERROR_STATE);
+            EXPECT_TRUE(model.controller.snapshot.closing);
+            EXPECT_TRUE(model.controller.snapshot.started);
+            EXPECT_TRUE(model.controller.clock_retained);
+            EXPECT_EQ(model.hardware.consumers, 1U);
+            EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_ACTIVE);
+            EXPECT_EQ(endpoints[1].request, &request);
+            EXPECT_EQ(model.hardware.mmio_reads, reads);
+            EXPECT_EQ(model.hardware.mmio_writes, writes);
+            _exit(testing::Test::HasFailure() ? 1 : 0);
+        },
+        testing::ExitedWithCode(0), "");
+    /* The untouched parent still owns its request until actual full stop. */
+    ASSERT_EQ(nx_usb_device_stop(&device), NX_SUCCESS);
+    EXPECT_EQ(nx_request_state(&request.base), NX_REQUEST_SETTLED);
+    EXPECT_EQ(request.base.result, NX_ERROR_CANCELLED);
+    EXPECT_EQ(endpoints[1].request, nullptr);
+    EXPECT_EQ(model.hardware.consumers, 0U);
 }
 TEST_F(UsbDevice, FifoWriteDoesNotCompleteHostAcknowledgement) {
     auto port = Port(2);

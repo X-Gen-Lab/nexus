@@ -18,19 +18,19 @@ import tomllib
 
 try:
     from . import cpu as cpu_profiles
-    from . import bundle, dependencies, sdk, uart_formats, i2s2
+    from . import bundle, dependencies, sdk, i2s2
     from . import resource_graph, trigger_graph, dma_topology
     from .contracts import COMPONENTS
     from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
     from .providers import descriptor, maintained
+    from .selection import (validate_clock_profiles, resolve_interrupts,
+                            validate_selection)
     from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
-                                   mode_traits, route_dma, validate_clock_profiles,
-                                   resolve_interrupts, sequence,
-                                   validate_selection)
+                                   mode_traits, route_dma,
+                                   sequence)
 except ImportError:
     import cpu as cpu_profiles
     import bundle
-    import uart_formats
     import dependencies
     import sdk
     import i2s2
@@ -52,10 +52,11 @@ except ImportError:
     import factory
     import memory as memory_regions
     from providers import descriptor, maintained
+    from selection import (validate_clock_profiles, resolve_interrupts,
+                           validate_selection)
     from providers.common import (ConfigurationError, cpu_abi, fail, integer,
-                                   mode_traits, route_dma, validate_clock_profiles,
-                                  resolve_interrupts, sequence,
-                                  validate_selection)
+                                   mode_traits, route_dma,
+                                  sequence)
 
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
@@ -73,7 +74,9 @@ def error_context(context):
     try:
         yield
     except ConfigurationError as error:
-        raise ConfigurationError(f"{context}: {error}") from error
+        details = {**error.details,
+                   "contexts": [*error.details.get("contexts", ()), context]}
+        raise ConfigurationError(f"{context}: {error}", **details) from error
 
 
 def c_identity(value):
@@ -110,11 +113,20 @@ def dependency_identity(root, relative, expected=None):
             if command.returncode:
                 fail(f"Cannot verify SDK dependency: {relative}")
             return command.stdout.strip()
-        commit = git(checkout, "rev-parse", "HEAD")
+        # One porcelain snapshot supplies HEAD and dirty state. Every call still
+        # observes the checkout and parent Gitlink afresh; no result is cached.
+        status = git(checkout, "status", "--porcelain=v2", "--branch",
+                     "--no-ahead-behind", "--untracked-files=normal").splitlines()
+        commits = [line.removeprefix("# branch.oid ") for line in status
+                   if line.startswith("# branch.oid ")]
+        if (len(commits) != 1 or re.fullmatch(
+                r"(?:[0-9a-f]{40}|[0-9a-f]{64})", commits[0]) is None):
+            fail(f"Cannot verify SDK dependency: {relative}")
+        commit = commits[0]
         entry = git(root, "ls-tree", "HEAD", "--", relative).split()
         if len(entry) != 4 or entry[:2] != ["160000", "commit"] or entry[2] != commit:
             fail(f"SDK dependency differs from the locked Gitlink: {relative}")
-        if git(checkout, "status", "--porcelain", "--untracked-files=normal"):
+        if any(line and not line.startswith("# ") for line in status):
             fail(f"SDK dependency has unrecorded changes: {relative}")
     if expected is not None and commit != expected:
         fail(f"SDK source lock contradicts actual dependency: {relative}")
@@ -190,7 +202,9 @@ def load(path, snapshots=None):
         return json.loads(contents.decode("utf-8"), object_pairs_hook=pairs,
                           parse_constant=lambda value: fail(f"Invalid number {value}"))
     except (ValueError, UnicodeDecodeError) as error:
-        raise ConfigurationError(f"{path}: {error}") from error
+        details = (error.details if isinstance(error, ConfigurationError) else {})
+        raise ConfigurationError(f"{path}: {error}",
+                                 **{**details, "source": str(path)}) from error
 
 
 def obj(value, required, optional=(), context="object"):
@@ -199,7 +213,9 @@ def obj(value, required, optional=(), context="object"):
     missing = set(required) - value.keys()
     unknown = value.keys() - set(required) - set(optional)
     if missing or unknown:
-        fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}")
+        fail(f"{context}: missing {sorted(missing)}, unknown {sorted(unknown)}",
+             code="unknown_or_missing_key", context=context,
+             missing=sorted(missing), unknown=sorted(unknown))
     return value
 
 
@@ -556,6 +572,64 @@ def resolve_components(assembly):
     return components
 
 
+def resource_claims(provider):
+    """One claim ledger serves resolution and read-only reservation queries."""
+    claims = {}
+    claim_list = []
+
+    def claim(key, owner, mode, source):
+        text(key, "resource key")
+        if key.startswith("dma:"):
+            provider.validate_dma_resource(key)
+        key = normalize_resource(key)
+        previous = claims.get(key)
+        record = {"key": key, "owner": owner, "mode": mode, "source": source}
+        if previous is not None:
+            if previous == record:
+                return
+            fail(f"Resource conflict {key}: {previous['owner']} "
+                 f"(source {previous['source']}) versus {owner} "
+                 f"(source {source})", code="resource_conflict",
+                 resource=key, claims=[previous, record])
+        claims[key] = record
+        claim_list.append(record)
+
+    return claims, claim_list, claim
+
+
+def reserved_claims(soc, board, provider):
+    """Project the same immutable SoC and Board reservations used by resolve."""
+    claims, records, claim = resource_claims(provider)
+    family = soc["id"]
+    for resource in soc.get("reserved_resources", []):
+        claim(resource, "soc-timebase", "reserved", family)
+    for reserved in sequence(board["reserved_resources"], "reserved resources"):
+        if isinstance(reserved, str):
+            key = "pin:" + reserved if PIN.fullmatch(reserved) else reserved
+            owner = "board-reserved"
+        else:
+            obj(reserved, {"key", "owner"}, (), "reserved resource")
+            key, owner = reserved["key"], reserved["owner"]
+        # A Board may restate a silicon reservation; it cannot release it.
+        if key.startswith("dma:"):
+            provider.validate_dma_resource(key)
+        previous = claims.get(normalize_resource(text(key, "resource key")))
+        if previous is not None and previous["owner"] == "soc-timebase":
+            continue
+        claim(key, owner, "reserved", board["id"])
+    return records
+
+
+def board_directory(path):
+    """Accept explicit private paths, rejecting symlinks before normalization."""
+    path = Path(path).absolute()
+    if any(item.is_symlink() for item in (path, *path.parents)):
+        fail("Board package must not follow a symlink")
+    if not path.is_dir():
+        fail(f"Board package must be a directory: {path}")
+    return path.resolve()
+
+
 def resolve(assembly_path, root=ROOT, *, input_paths=None):
     """Validate all input facts before producing the sole resolved decision."""
     root = root.resolve()
@@ -585,9 +659,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             type(factory_options["capabilities"]) is not bool):
         fail("Factory capabilities must be boolean")
     board_name = text(assembly["board_package"], "Board package")
-    board_dir = (assembly_path.parent / board_name).resolve()
-    if Path(assembly_path.parent / board_name).is_symlink():
-        fail("Board package must not be a symlink")
+    board_dir = board_directory(assembly_path.parent / board_name)
     board_path = board_dir / "board.json"
     board = obj(read(board_path),
                 {"schema_version", "id", "soc", "soc_family", "source_revision",
@@ -698,41 +770,9 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     selected_memory = memory_regions.select(
         variant["memory"], budgets, family, part, obj=obj, integer=integer, fail=fail)
     bindings = resolve_bindings(board, routes, part)
-    claims = {}
-    claim_list = []
-
-    def claim(key, owner, mode, source):
-        text(key, "resource key")
-        if key.startswith("dma:"):
-            provider.validate_dma_resource(key)
-        key = normalize_resource(key)
-        previous = claims.get(key)
-        record = {"key": key, "owner": owner, "mode": mode, "source": source}
-        if previous is not None:
-            if previous == record:
-                return
-            fail(f"Resource conflict {key}: {previous['owner']} "
-                 f"(source {previous['source']}) versus {owner} "
-                 f"(source {source})")
-        claims[key] = record
-        claim_list.append(record)
-
-    for resource in soc.get("reserved_resources", []):
-        claim(resource, "soc-timebase", "reserved", family)
-    for reserved in sequence(board["reserved_resources"], "reserved resources"):
-        if isinstance(reserved, str):
-            key = "pin:" + reserved if PIN.fullmatch(reserved) else reserved
-            owner = "board-reserved"
-        else:
-            obj(reserved, {"key", "owner"}, (), "reserved resource")
-            key, owner = reserved["key"], reserved["owner"]
-        # A Board may restate a silicon reservation; it cannot release it.
-        if key.startswith("dma:"):
-            provider.validate_dma_resource(key)
-        previous = claims.get(normalize_resource(text(key, "resource key")))
-        if previous is not None and previous["owner"] == "soc-timebase":
-            continue
-        claim(key, owner, "reserved", board["id"])
+    claims, claim_list, claim = resource_claims(provider)
+    for record in reserved_claims(soc, board, provider):
+        claim(**record)
     if i2s2_role is not None:
         for resource in i2s2_role.claims:
             claim(resource, "i2s2", i2s2_role.profile, "RM0090/DS8626 chip reference")
@@ -1164,26 +1204,7 @@ def c_id(value):
     return value.replace("-", "_")
 
 
-def normalize_resource(value):
-    timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
-    if timer is not None:
-        return "controller:" + timer[1]
-    if value.startswith("dma:"):
-        channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
-                               r"(?::request(0|[1-9][0-9]*))?", value)
-        if channel is not None:
-            return f"dma:{channel[1]}:channel{channel[2]}"
-        match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
-                             r"(?::channel([0-9]+))?", value)
-        if match is None:
-            fail(f"Invalid physical DMA resource: {value}")
-        return f"dma:{match[1]}:stream{int(match[2])}"
-    if value.startswith("irq:"):
-        irq = value[4:]
-        for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
-            if irq.endswith(suffix):
-                return "irq:" + irq[:-len(suffix)]
-    return value
+normalize_resource = resource_graph.normalize_resource
 
 
 def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
@@ -1196,7 +1217,8 @@ def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
         return ConfigurationIR.from_validated(
             resolve(assembly_path, root, input_paths=input_paths))
     except ConfigurationError as error:
-        raise ConfigurationError(f"{assembly_path}: {error}") from error
+        raise ConfigurationError(f"{assembly_path}: {error}",
+                                 **error.details) from error
 
 
 def generate(result, output):
@@ -1236,6 +1258,8 @@ def protected_inputs(assembly, root):
             if isinstance(family, str):
                 paths.append(root / descriptor.maintained(family).source_directory)
         except (OSError, ValueError, AttributeError):
+            # This probe only protects output paths; resolve validates the
+            # complete Board and reports malformed or unsupported facts.
             pass
     if isinstance(raw.get("layout"), str):
         paths.append(assembly.parent / raw["layout"])

@@ -1,10 +1,14 @@
 """One selected immutable face, actual shared ops and bounded private storage."""
-from ..common import Construction, controller_ir, fail, kernel_policy_constant
+try:
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
+from ..common import Construction, fail, kernel_policy_constant
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Guard old ownership before updating any static constructor input."""
-    from . import validate_selection
+    from .contract import validate_selection
     item = controller_ir(item, "gd32f303")
     if item.provider != "gd32f303":
         fail("GD303 constructor cannot reinterpret a foreign provider")

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -29,12 +30,12 @@ class ConfigurationExperienceTests(unittest.TestCase):
                      '[memory]\nmain_stack_bytes = 2048\n')
         self.assembly.write_text(self.base)
 
-    def command(self, *arguments):
+    def command(self, *arguments, source_root=None):
         output, errors = io.StringIO(), io.StringIO()
         with redirect_stdout(output), redirect_stderr(errors):
             try:
                 status = configure.main([
-                    *arguments, "--source-root", str(self.root)])
+                    *arguments, "--source-root", str(source_root or self.root)])
             except SystemExit as error:
                 status = error.code
         return status, output.getvalue(), errors.getvalue()
@@ -169,6 +170,118 @@ class ConfigurationExperienceTests(unittest.TestCase):
         self.assertEqual(status, 1)
         self.assertFalse(output.exists())
 
+    def test_private_board_init_stays_relative_after_product_relocation(self):
+        product = self.root / "product"
+        package = product / "hardware" / "private-board"
+        shutil.copytree(self.root / "boards/native_reference", package)
+        output = product / "assembly.toml"
+        status, _, errors = self.command(
+            "init", "--board-package", str(package), "--backend", "native",
+            "--clock", "model", "--profile", "uart", "--binding", "uart0",
+            "--output", str(output))
+        self.assertEqual(status, 0, errors)
+        document = tomllib.loads(output.read_text())
+        self.assertNotIn("board", document)
+        self.assertEqual(document["board_package"], "hardware/private-board")
+        moved = self.root / "relocated product"
+        product.rename(moved)
+        resolved = configure.resolve_ir(moved / "assembly.toml", self.root)
+        self.assertEqual(resolved.controllers[0].controller, "UART0")
+
+    def test_private_board_init_rejects_two_selectors_before_writing(self):
+        output = self.root / "ambiguous.toml"
+        status, _, errors = self.command(
+            "init", "--board", "native_reference", "--board-package",
+            str(self.root / "boards/native_reference"), "--backend", "native",
+            "--clock", "model", "--output", str(output))
+        self.assertNotEqual(status, 0)
+        self.assertIn("exactly one", errors)
+        self.assertFalse(output.exists())
+
+    def test_mode_query_reports_dma_irq_and_actual_owner(self):
+        assembly = configure.ROOT / (
+            "tools/configure/assemblies/qiming-baremetal-uart-dma.toml")
+        status, output, errors = self.command(
+            "list-bindings", "--assembly", str(assembly), "--kind", "uart",
+            "--json", source_root=configure.ROOT)
+        self.assertEqual(status, 0, errors)
+        row = next(item for item in json.loads(output)["bindings"]
+                   if item["binding"] == "uart1")
+        mode = row["mode_contracts"]["dma-tx"]
+        self.assertIn("dma:DMA2:stream7", mode["resource_keys"])
+        self.assertIn("irq:DMA2_Stream7", mode["resource_keys"])
+        self.assertIn("irq:USART1", mode["resource_keys"])
+        owners = {(item["key"], item["owner"])
+                  for item in mode["occupied_resources"]}
+        self.assertIn(("dma:DMA2:stream7", "uart1"), owners)
+        self.assertEqual(mode["admission"], "configuration-required")
+
+    def test_polling_mode_does_not_claim_its_alternative_dma_route(self):
+        status, output, errors = self.command(
+            "list-bindings", "--board", "gd32f470_liangshan",
+            "--kind", "spi", "--json", source_root=configure.ROOT)
+        self.assertEqual(status, 0, errors)
+        row = json.loads(output)["bindings"][0]
+        mode = row["mode_contracts"]["short-poll"]
+        self.assertEqual(mode["dma"], [])
+        self.assertFalse(any(key.startswith("dma:")
+                             for key in mode["resource_keys"]))
+
+    def test_bound_soc_view_rejects_changed_facts(self):
+        resolved = configure.resolve_ir(self.assembly, self.root)
+        path = self.root / "soc/native/soc.json"
+        path.write_text(path.read_text() + "\n")
+        with self.assertRaisesRegex(configure.ConfigurationError,
+                                    "differ from the resolved input"):
+            experience.binding_facts(configure, resolved, self.root)
+
+    def test_factory_order_impact_uses_selected_public_class(self):
+        path = self.root / "boards/native_reference/board.json"
+        board = json.loads(path.read_text())
+        board["bindings"].append({"id": "uart1", "controller": "UART1",
+                                  "route": "uart1"})
+        path.write_text(json.dumps(board))
+        def uart(name, binding):
+            return (f'\n[uart.{name}]\nbinding="{binding}"\nmode="irq"\n'
+                    f'baud=115200\n[uart.{name}.rx]\nformat="events"\n'
+                    f'capacity=64\n[uart.{name}.irq]\npriority=5\n'
+                    'calls_os=false\n')
+        first, second = uart("first", "uart0"), uart("second", "uart1")
+        self.assembly.write_text(self.base + first + second)
+        other = self.root / "reordered.toml"
+        other.write_text(self.base + second + first)
+        status, output, errors = self.command(
+            "diff", "--assembly", str(self.assembly), "--against", str(other),
+            "--json")
+        self.assertEqual(status, 0, errors)
+        impacts = json.loads(output)["impacts"]
+        item = next(value for value in impacts
+                    if value["path"] == "factory_ids.uart")
+        self.assertEqual(item["before"], ["first", "second"])
+        self.assertEqual(item["after"], ["second", "first"])
+
+    def test_board_first_owns_silicon_and_board_reservations(self):
+        path = self.root / "boards/native_reference/board.json"
+        board = json.loads(path.read_text())
+        board["reserved_resources"] = ["PA1", "controller:UART0"]
+        path.write_text(json.dumps(board))
+        path = self.root / "soc/native/soc.json"
+        soc = json.loads(path.read_text())
+        soc["reserved_resources"] = ["controller:UART0"]
+        path.write_text(json.dumps(soc))
+        status, output, errors = self.command(
+            "list-bindings", "--board", "native_reference", "--kind", "uart",
+            "--json")
+        self.assertEqual(status, 0, errors)
+        row = json.loads(output)["bindings"][0]
+        mode = row["mode_contracts"]["irq-byte-event"]
+        owners = {(item["key"], item["owner"])
+                  for item in mode["occupied_resources"]}
+        self.assertIn(("controller:UART0", "soc-timebase"), owners)
+        self.assertIn(("pin:PA1", "board-reserved"), owners)
+        self.assertEqual(mode["admission"], "configuration-required")
+
+
     def test_init_write_failure_does_not_leave_partial_file(self):
         output = self.root / "new.toml"
         real_open = Path.open
@@ -220,6 +333,45 @@ class ConfigurationExperienceTests(unittest.TestCase):
             "diff", "--assembly", str(self.assembly), "--against", str(other))
         self.assertEqual(status, 0, errors)
         self.assertIn("controllers.link.rx_capacity: 64 -> 128", output)
+
+    def test_diff_explains_public_word_face_and_transfer_unit_change(self):
+        byte = (self.base +
+            '[uart.link]\nbinding="uart0"\nmode="irq"\nbaud=115200\n'
+            '[uart.link.rx]\nformat="events"\ncapacity=64\n'
+            '[uart.link.irq]\npriority=5\ncalls_os=false\n')
+        self.assembly.write_text(byte)
+        other = self.root / "words.toml"
+        other.write_text(byte.replace('mode="irq"', 'mode="irq-words"')
+                         .replace('format="events"', 'format="words"') +
+                         '[uart.link.frame]\ndata_bits=9\nparity="none"\n'
+                         'stop_bits=1\nflow="none"\n')
+        status, output, errors = self.command(
+            "diff", "--assembly", str(self.assembly), "--against", str(other),
+            "--json")
+        self.assertEqual(status, 0, errors)
+        impacts = json.loads(output)["impacts"]
+        face = next(item for item in impacts
+                    if item["category"] == "public_interface")
+        self.assertEqual((face["before"], face["after"]),
+                         ("uart", "uart_word"))
+        transfer = next(item for item in impacts
+                        if item["category"] == "transfer_contract")
+        self.assertEqual(transfer["before"]["unit"], "bytes")
+        self.assertEqual(transfer["after"]["unit"], "words")
+        self.assertIn("not measured", json.loads(output)["measurement"])
+
+    def test_diff_explains_changed_declared_storage_without_savings_claim(self):
+        other = self.root / "larger.toml"
+        other.write_text(self.base.replace("2048", "4096"))
+        status, output, errors = self.command(
+            "diff", "--assembly", str(self.assembly), "--against", str(other),
+            "--json")
+        self.assertEqual(status, 0, errors)
+        impacts = json.loads(output)["impacts"]
+        storage = next(item for item in impacts
+                       if item["category"] == "storage")
+        self.assertEqual(storage["path"], "memory_budgets.main_stack_bytes")
+        self.assertIn("measure", storage["obligation"])
 
     def test_diff_keeps_instance_order_as_an_explicit_change(self):
         before = configure.resolve_ir(self.assembly, self.root).to_dict()

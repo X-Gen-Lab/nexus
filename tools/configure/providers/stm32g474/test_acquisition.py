@@ -4,6 +4,7 @@ from pathlib import Path
 import unittest
 
 from tools.configure import bindings, configure, factory
+from tools.configure import selection as selection_rules
 from tools.configure.providers import common
 
 
@@ -16,10 +17,10 @@ class AdcMappingTests(unittest.TestCase):
                  "pins": [{"pin": "PA0", "function": "analog", "af": 0}]}
         selection = {"id": "sensor", "binding": "sensor", "mode": "single-shot",
                      "channels": [1], "sample_times": [0], "reference_mv": 3300}
-        common.validate_selection(selection, route, provider, 98304)
+        selection_rules.validate_selection(selection, route, provider, 98304)
         route["controller"] = "ADC2"
         with self.assertRaises(common.ConfigurationError):
-            common.validate_selection(selection, route, provider, 98304)
+            selection_rules.validate_selection(selection, route, provider, 98304)
 
     def test_real_factory_has_exact_adc_flash_and_i2c_construction(self):
         root = Path(__file__).resolve().parents[4]

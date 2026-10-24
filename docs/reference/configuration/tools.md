@@ -22,7 +22,8 @@ executing these tools; a default-branch clone may not contain the documented ent
 | `tools/dev/dev.py flash/debug/monitor` | Plan or explicitly execute an identified daily device operation | HIL qualification |
 | `tools/dev/dev.py timings` | Summarize existing process receipts and preserve unknowns | Unobserved CPU/RSS or a complete candidate |
 | `tools/dev/dev.py doctor/check` | Tool availability and repository checks | A platform candidate |
-| `tools/configure/configure.py` | init/list-bindings/check/explain/diff/generate | PCB electrical truth |
+| `tools/configure/configure.py` | init/list-bindings/check/explain/diff/generate/provider-check | PCB electrical truth |
+| `tools/maintenance/capabilities.py --assembly` | Exact resolved selection and separate validation stages | Model, ARM, SDK or physical execution |
 | `scripts/ci/tdd_gate.py` | Actual full tool and GoogleTest/GoogleMock execution | Historical RED order or HIL |
 | `cmake/package/package_source_sdk.py` | Package or verify exact source bytes | MCU execution or release promotion |
 | `cmake/package/verify_consumers.py` | Relocated public consumer compile/run/link | Hardware timing |

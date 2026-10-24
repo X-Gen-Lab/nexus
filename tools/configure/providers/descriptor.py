@@ -58,7 +58,7 @@ class FamilyDescriptor:
     def configuration_modules(self):
         directory = f"tools/configure/providers/{self.family}"
         modules = tuple(f"{directory}/{name}" for name in (
-            "__init__.py", "bindings.py", "emission.py"))
+            "__init__.py", "contract.py", "bindings.py", "emission.py"))
         return modules + self.configuration_helpers
 
     @property

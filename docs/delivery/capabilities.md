@@ -26,6 +26,41 @@ python tools/maintenance/capabilities.py --check
 python tools/maintenance/capabilities.py --write
 ```
 
+## 查询实际选择与验收阶段
+
+全局表适合寻找已有路线；产品是否可用要回到精确装配。从固定源码或 SDK 根目录
+执行以下只读查询，选择自己的 TOML。命令正常退出时输出 JSON，不更新下方矩阵：
+
+```sh
+python tools/maintenance/capabilities.py --assembly tools/configure/assemblies/qiming-baremetal-uart-dma.toml
+```
+
+报告保留 Board、完整料号、封装、后端、时钟、CPU、IRQ、物理 PCB 修订、内存域、
+资源所有者和输入哈希。每个 controller 与 endpoint 分别提供已选择的公开合同；
+额外公共 face 单列在 `companion_interfaces`，不伪装成 endpoint。DMA 与引脚来自
+本次解析，不从同系列其他路线补齐。上例是 F407ZG 的 USART1
+有限 `dma-tx` 选择，不能扩展为 F407 全外设或全部 UART 模式支持。
+
+`validation` 分开列出以下阶段。查询只执行生产 resolver 和合同投影，不搜索旧
+报告，也不运行编译、测试、烧录或测量。因此，下面的 `not_assessed` 表示本次查询
+没有评估该阶段，不表示实现失败或历史上从未执行。
+
+| 阶段 | 本次查询值 | 判定通过还需要什么 |
+| --- | --- | --- |
+| `configuration` | `validated` | 本次完整输入实际通过 resolver；不建立执行资格 |
+| `host_models` | `not_assessed` | 对应源码与模型范围的真实测试报告 |
+| `arm_image` | `not_assessed` | 精确配置、编译工具及 ELF、链接和资源报告 |
+| `installed_sdk` | `not_assessed` | 固定 SDK 的独立公开接口消费记录 |
+| `software_candidate` | `not_assessed` | clean source、完整计划、两次离线构建与封存产物 |
+| `physical_hil` | MCU 为 `not_assessed`；Native 为 `not_applicable` | 实际 station、板卡、镜像、观测和准入结果 |
+
+用 `configuration_sha256`、`input_identities` 和实际执行记录的源码、配置及工具
+身份对应证据。源码变化、模式变化或 Board 变化后，不能继承另一条记录的通过值。
+`physical_qualified` 保持 `false`；未知 PCB 事实不会因解析成功变为已验证。
+现有记录从[软件证据入口](../status/software-verification.md)进入，实际执行范围
+以各记录中的不可变源码为准。配置、软件和物理阶段是不同证据，并非会自动晋级的
+单个“支持等级”。
+
 <!-- nexus-capabilities:start -->
 | SoC | Controller | Kind | Mode | Reviewed SoC routes | Declared reference Boards | Resolver fixtures | Selected production source |
 | --- | --- | --- | --- | --- | --- | --- | --- |

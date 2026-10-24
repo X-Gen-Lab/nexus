@@ -11,7 +11,7 @@ import tempfile
 import tomllib
 import unittest
 
-from tools.configure import bindings, configure, dependencies, factory
+from tools.configure import matrix, bindings, configure, dependencies, factory
 from tools.configure.ir import ControllerIR
 
 
@@ -75,7 +75,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         self.assertFalse(result["physical_qualified"])
 
     def test_catalogue_has_eight_exact_parts_without_family_inference(self):
-        rows = self.compiler().catalogue(configure.ROOT)
+        rows = matrix.support_catalogue(configure.ROOT)
         self.assertEqual({row.part for row in rows}, {
             "STM32F103RBT6", "STM32F407VET6", "STM32F407ZGT6",
             "STM32G474RET6", "STM32H743ZIT6", "STM32U575ZIT6Q",
@@ -117,7 +117,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
                     spi.unit = "words"
 
     def test_unrouted_f407ve_ethernet_is_not_inherited_from_the_zg_route(self):
-        rows = self.compiler().catalogue(configure.ROOT)
+        rows = matrix.support_catalogue(configure.ROOT)
         ethernet = {row.part: row for row in rows
                     if row.controller == "ETH" and row.mode == "raw-rmii"}
         self.assertEqual(set(ethernet), {"STM32F407VET6", "STM32F407ZGT6"})
@@ -127,7 +127,7 @@ class SelectedContractAuthorityTests(unittest.TestCase):
         self.assertTrue(ethernet["STM32F407ZGT6"].reviewed_routes)
 
     def test_reviewed_gpio_route_cannot_release_the_oscillator_pad(self):
-        rows = self.compiler().catalogue(configure.ROOT)
+        rows = matrix.support_catalogue(configure.ROOT)
         gpio, = [row for row in rows if row.part == "STM32G474RET6" and
                  row.controller == "GPIOF" and row.mode == "input"]
         self.assertIn("gpio-pf0", gpio.reviewed_routes)

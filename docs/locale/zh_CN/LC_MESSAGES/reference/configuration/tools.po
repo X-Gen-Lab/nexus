@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 138f1ea3ec5db12805f9b046fac9dbd0232a90e36c22a78e518117a93ca9de59\n"
+"X-Nexus-Source-SHA256: 3d9b127fb594ba7f213202ff30c75dd4dacaaec106ead6e86f41b7e0cdea2a67\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:9
 msgid "Configuration, development and evidence tools"
@@ -108,12 +108,24 @@ msgid "`tools/configure/configure.py`"
 msgstr "`tools/configure/configure.py`"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
-msgid "init/list-bindings/check/explain/diff/generate"
-msgstr "init/list-bindings/check/explain/diff/generate"
+msgid "init/list-bindings/check/explain/diff/generate/provider-check"
+msgstr "init/list-bindings/check/explain/diff/generate/provider-check"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "PCB electrical truth"
 msgstr "PCB 电气事实"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "`tools/maintenance/capabilities.py --assembly`"
+msgstr "`tools/maintenance/capabilities.py --assembly`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "Exact resolved selection and separate validation stages"
+msgstr "精确解析选择和独立验收阶段"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "Model, ARM, SDK or physical execution"
+msgstr "模型、ARM、SDK 或物理执行"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`scripts/ci/tdd_gate.py`"
@@ -188,7 +200,7 @@ msgstr "绑定执行范围、环境和实际产物字节"
 msgid "Product signature or safety certification"
 msgstr "产品签名或安全认证"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:33
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:34
 msgid ""
 "Use [the SDK tutorial](../../tutorials/source-sdk.md), [configuration and "
 "ownership guide](../../guides/developer-workflow.md), [assembly "
@@ -203,7 +215,7 @@ msgstr ""
 "工作流](../../development/workflow.md)和[性能／HIL 指南](../../guides/performance-"
 "hil.md)。详细参数以各已维护 CLI 的 `--help` 为准；不在此维护第二份解析器规范。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:40
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:41
 msgid ""
 "Fresh reports require nonzero actual executions and original logs. A missing"
 " tool, empty XML, skipped-only run, stale output or changed input cannot "

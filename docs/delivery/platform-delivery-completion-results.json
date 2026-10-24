@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_platform_delivery_completion_development_index",
+  "date": "2026-10-24",
+  "time_zone": "Etc/UTC",
+  "scope": "N01-N14 development observations. Exact final-source gates, SDK consumers, examples pin, merge and candidate records have separate execution identities. This index does not inherit the earlier P/E qualification.",
+  "platform_baseline": "9ac38931e9f15b27ebe50698a7daad8263928a20",
+  "task_authority": "docs/design/platform-delivery-completion.csv",
+  "previous_iteration": "docs/delivery/developer-experience-results.json",
+  "publishable_candidate": false,
+  "physical_hil": "not_executed",
+  "final_integration_authority": "The final change review and existing evidence-store package bind immutable platform/examples revisions and actual executions after source freeze. Expected CI, old receipts and development tests do not establish those exits.",
+  "maintained_execution_entries": {
+    "usb_ep0": "tests/google/usb_device_test.cpp",
+    "configuration": [
+      "tools/configure/test_experience.py",
+      "tools/testing/test_support_selection.py"
+    ],
+    "process_resources": [
+      "tools/testing/test_process_resources.py",
+      "tools/testing/test_dev_timings.py"
+    ],
+    "measurement_comparison": "tools/testing/test_hil_measurement_compare.py",
+    "h743_flash_ram": "tools/measurement/h743_flash_ram.py",
+    "examples_local_ci": "X-Gen-Lab/nexus-examples/scripts/local_ci.py",
+    "source_sdk": "cmake/package/verify_consumers.py",
+    "candidate": "tools/evidence/candidate.py",
+    "reproduction": "tools/evidence/reproduce.py"
+  },
+  "observations": {
+    "configuration_equivalence": {
+      "assemblies": 71,
+      "ir_equal": true,
+      "generated_files_checked": 710,
+      "unchanged_generated_files": 639,
+      "intentional_changes": "71 selection.cmake outputs add explicit family contract dependencies; no generated C/ABI change is claimed.",
+      "raw_record": "/tmp/nexus-next-20261024/configuration/equivalence-green.json",
+      "scope": "development worktree compared with the captured pre-refactor inputs"
+    },
+    "exact_support": {
+      "part": "STM32F407ZGT6",
+      "board": "stm32f407zg-qiming-v31",
+      "backend": "baremetal",
+      "clock_profile": "hse8-pll168",
+      "controller": "USART1",
+      "mode": "dma-tx",
+      "dma": [
+        "DMA2:stream7:channel4"
+      ],
+      "configuration": "validated",
+      "execution_stages": "not_assessed",
+      "raw_record": "/tmp/nexus-next-20261024/documentation/exact-support-observed.json",
+      "focused_contract_cases": 8
+    },
+    "process_resources": {
+      "method": "linux_wait4",
+      "scope": "waited_process_and_reaped_descendants",
+      "user_cpu_seconds": 0.063219,
+      "system_cpu_seconds": 0.01208,
+      "maximum_process_rss_bytes": 15499264,
+      "interpretation": "One observed tool-test attempt; single-process peak, not simultaneous tree RSS or a whole-build speedup.",
+      "raw_record": "/tmp/nexus-next-20261024/devtools/actual-resource-observation.json"
+    },
+    "measurement_comparison": {
+      "focused_contract_cases": 9,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Synthetic validator contracts; admission ELF service mocked, trace/hash/context/workload validation real. No physical baseline acquired.",
+      "raw_record": "/tmp/nexus-next-20261024/io-cost/handoff.json",
+      "complete_targeted_suite": {
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "modules": [
+          "tools.testing.test_hil_measurement_compare",
+          "tools.testing.test_hil_measurements",
+          "tools.testing.test_interface_storage",
+          "tests.contracts.test_interface_cost"
+        ],
+        "scope": "Synthetic validator/ELF contracts only; no physical HIL execution.",
+        "raw_record": "/tmp/nexus-next-20261024/io-cost/summary.json",
+        "raw_sha256": "0ca2ef4791d8ae3097e228cfe3461a1bdcf6be9cac5fa1069475482d701fa8c6",
+        "raw_log": "/tmp/nexus-next-20261024/io-cost/tests.log",
+        "count_note": "Includes the nine comparison cases above; not additional distinct cases."
+      }
+    },
+    "documentation": {
+      "current_pages": 131,
+      "ledger_views": 10,
+      "source_check": "passed_development_worktree",
+      "bilingual_admission": "fresh_gettext_and_independent_semantic_review_passed",
+      "api_xml": "Public include inputs unchanged; current gettext reuses the previously extracted XML. This is not a new Doxygen or strict HTML execution."
+    },
+    "usb_ep0": {
+      "native_cases": 78,
+      "stm32f407_cases": 11,
+      "gd32f470_cases": 11,
+      "scope": "Current development model executions; the malformed private-plan RED does not prove a legal lifecycle could reach NULL. CodeQL re-execution belongs to final CI.",
+      "raw_record": "/tmp/nexus-next-20261024/provider/handoff.json"
+    },
+    "h743_flash_ram": {
+      "scope": "current source development ARM links; common GPIO baseline, only PLL384 pair gives Flash selection delta; no pulse execution or software candidate",
+      "arm_cases": 23,
+      "commands": 52,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": [
+        {
+          "profile": "hsi32-fixed-cache-off",
+          "elf_sha256": "79406def38c9904bf64cd22f7162d4fc8fb267c671bb6bd528f2dffae172ea6d",
+          "configuration_sha256": "4c3dcfeef65a4b10b076797aef965c8d06c050e48f179959c1d57177802c4834",
+          "flash_load_bytes": 10620,
+          "axi_reserved_bytes": 6260,
+          "public_flash_linkage": "retained_verified"
+        },
+        {
+          "profile": "hsi64-fixed-cache-off",
+          "elf_sha256": "437ddf5f1594ed7d209a1ac2da2db808e6caecde43927b8feb8cabe6361fbd20",
+          "configuration_sha256": "9d909190033ca2d2a5c9425d1a700cd4d6e7d131d5db7244b7bc1ecbefefe306",
+          "flash_load_bytes": 10532,
+          "axi_reserved_bytes": 6260,
+          "public_flash_linkage": "retained_verified"
+        },
+        {
+          "profile": "hsi64-pll384-cache-off",
+          "elf_sha256": "111661996e56f8cd8c80294db3e3edda356da23d601e1e14d64491577535ef47",
+          "configuration_sha256": "1561c45dc0a83da84caeda3e949bb25613f1d39c8769923b9d46584f63f31223",
+          "flash_load_bytes": 12468,
+          "axi_reserved_bytes": 6260,
+          "public_flash_linkage": "retained_verified"
+        },
+        {
+          "profile": "unselected",
+          "elf_sha256": "3d8944ae6504598862f08df4bcdbf41d2b77af3a5733b566e26f39f3e04aa78f",
+          "configuration_sha256": "71878e67f4354e8e5c7b95093eb9b3f9acba2eec934c4ed0812174b10b5ab495",
+          "flash_load_bytes": 6896,
+          "axi_reserved_bytes": 2160,
+          "public_flash_linkage": "not_observed_unselected"
+        }
+      ],
+      "pll384_flash_selection_delta": {
+        "flash_loaded_bytes": 5572,
+        "axi_reserved_bytes": 4100,
+        "scope": "same H743 high-clock baremetal cache-off GPIO assembly; Flash selection adds controller, RAM execution, generated lifecycle and reachable dependencies; not a before/after optimization or hardware performance result"
+      },
+      "pod_bytes": 2276,
+      "workspace_bytes": 1800,
+      "private_stack_capacity_bytes": 1024,
+      "private_stack_static_bound_bytes": 344,
+      "incoming_caller_stack_reserve_bytes": 260,
+      "pod_to_workspace_alignment_gap_bytes": 796,
+      "accounting": "Pod/workspace/private stack are nested within linked allocations; gap is reported separately and not allocated storage. Static bounds are not measured high-water marks.",
+      "physical_hil": "not_executed",
+      "raw_record": "/tmp/nexus-next-20261024/provider/h743-linked-costs.json"
+    }
+  },
+  "pending_exits": {
+    "ordinary_complete_index_gate": "pending_final_source_execution",
+    "examples_locked_consumption": "pending_new_platform_pin",
+    "installed_sdk_consumers": "pending_final_source_execution",
+    "formal_software_plan": "pending_final_source_execution",
+    "two_independent_offline_builds": "pending_final_source_execution",
+    "seal_and_verify": "pending_final_source_execution",
+    "post_merge_source_association": "pending_actual_merge",
+    "physical_hil": "not_executed"
+  },
+  "evidence_archive_locator": {
+    "status": "pending_final_archive",
+    "scope": "One compact package of original current-iteration records, using the existing evidence store. Original execution-host paths identify members through that package index; they are not public download URLs.",
+    "previous_iteration_archives": "unchanged; retain their original P/E identity"
+  }
+}

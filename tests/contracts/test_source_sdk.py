@@ -304,6 +304,8 @@ class SourceSDKSelectionTests(unittest.TestCase):
         required = (
             "tools/release/transport.py",
             "tools/configure/experience.py",
+            "tools/configure/selection.py",
+            "tools/configure/onboarding.py",
             "tools/dev/projects.py",
             "tools/dev/device.py",
             "tools/dev/timings.py",

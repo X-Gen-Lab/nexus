@@ -17,6 +17,22 @@ H1–H6 require connected equipment. Implementation, software execution and phys
 execution are separate columns. A software mechanism does not close a physical
 exit condition.
 
+The subsequent [N01–N14 delivery-completion ledger](platform-delivery-completion.csv)
+and its [readable view](../status/ledgers/platform-delivery-completion.md) track a
+separate follow-up scope. They preserve the original 75-task ledger and its fixed
+P/E evidence. This follow-up closes concrete diagnostics, configuration,
+consumer-workflow and measurement gaps, then verifies its own final source.
+Hardware execution and a formal software candidate have separate exits; neither
+inherits an earlier iteration's status. The existing architecture diagram still
+applies because these changes refine maintained mechanisms rather than add a
+new runtime layer.
+
+The [follow-up development index](../delivery/platform-delivery-completion-results.json)
+records current observations without relabeling old P/E results. Its pending
+final-source exits require actual complete gates, fixed examples consumption,
+offline reproduction and post-merge association; a prepared plan or successful
+configuration query cannot close them.
+
 ## Boundaries that stay explicit
 
 The current [architecture diagram](../explanation/platform-architecture.md) still

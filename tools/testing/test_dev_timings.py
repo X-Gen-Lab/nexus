@@ -98,6 +98,39 @@ class DeveloperTimingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "receipt"):
             self.summary()
 
+    def test_resource_samples_preserve_scope_without_summing_nested_cpu(self):
+        outer = self.receipt("outer", 0, 4_000_000_000)
+        inner = self.receipt("inner", 1_000_000_000, 3_000_000_000)
+        usage = {"method": "linux_wait4",
+                 "scope": "waited_process_and_reaped_descendants",
+                 "user_cpu_seconds": 0.5, "system_cpu_seconds": 0.25,
+                 "maximum_process_rss_bytes": 4096}
+        for path in (outer, inner):
+            data = json.loads(path.read_text())
+            path.write_text(json.dumps({**data, "resource_usage": usage}))
+        result = self.summary()
+        self.assertEqual(result["measured_resource_attempts"], 2)
+        self.assertEqual(result["attempts"][0]["resource_usage"], usage)
+        self.assertIsNone(result["cpu_seconds"])
+        self.assertIsNone(result["peak_rss_bytes"])
+        self.assertEqual(result["maximum_observed_process_rss_bytes"], 4096)
+
+    def test_malformed_resource_sample_cannot_become_an_observation(self):
+        path = self.receipt("test", 0, 1_000_000_000)
+        original = json.loads(path.read_text())
+        usage = {"method": "linux_wait4",
+                 "scope": "waited_process_and_reaped_descendants",
+                 "user_cpu_seconds": 0.5, "system_cpu_seconds": 0.25,
+                 "maximum_process_rss_bytes": 4096}
+        for change in ({"user_cpu_seconds": -1},
+                       {"system_cpu_seconds": float("nan")},
+                       {"maximum_process_rss_bytes": True},
+                       {"scope": "whole_parallel_tree"}):
+            path.write_text(json.dumps({**original,
+                                        "resource_usage": {**usage, **change}}))
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.summary()
+
 
 if __name__ == "__main__":
     unittest.main()

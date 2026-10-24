@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 17a342fe71dfb077c4d67b2fdaa9ae5b356b118579920c4bb9224d65878a2fe0\n"
+"X-Nexus-Source-SHA256: f072413de7ce3cf3fb1f1152672d9a0e6e2fe17dad505c896180bb0461259520\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:9
 msgid "Build an independent Source SDK consumer"
@@ -115,6 +115,22 @@ msgstr "维护者：验证完整 SDK 消费"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:73
 msgid ""
+"To verify the examples repository itself, use its maintained "
+"`scripts/local_ci.py` and bilingual `docs/local-ci.md` at the fixed examples"
+" revision. The default scope runs the complete mapped local workflow from a "
+"new output directory; `--scope native`, `--scope arm` and preset selection "
+"remain partial scopes. Its explicit `--nexus-source` must match the examples"
+" lock. An optional `--installed-sdk` must match the same pin. This workflow "
+"does not turn a blocked hosted CI run into a passed one, nor establish "
+"physical HIL."
+msgstr ""
+"验证示例仓库本身时，使用固定示例版本中的维护入口 `scripts/local_ci.py` 和双语 `docs/local-ci.md`。默认 "
+"scope 从新输出目录执行完整映射的本地工作流；`--scope native`、`--scope arm` 和 preset 选择仍是局部范围。显式"
+" `--nexus-source` 必须匹配示例锁定版本；可选 `--installed-sdk` 也必须匹配同一版本。该工作流不会把受阻的托管 CI "
+"改为通过，也不建立物理 HIL 资格。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:81
+msgid ""
 "The remaining sections are platform maintenance tasks. First obtain the "
 "[fixed source and recursive dependencies](../guides/source-checkout.md). Run"
 " from that checkout, not an arbitrary default branch. The maintained "
@@ -124,7 +140,7 @@ msgstr ""
 "以下各节是平台维护任务。先取得[固定源码与递归依赖](../guides/source-"
 "checkout.md)。从该检出执行，不使用任意默认分支。以下已维护合同检查独立 C／C++ 消费、搬移与包身份。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:78
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:86
 msgid ""
 "Work from the repository root with the pinned recursive dependencies "
 "initialized. Keep output outside the source checkout. This exact test calls "
@@ -135,7 +151,7 @@ msgstr ""
 "从仓库根目录执行，先初始化锁定的递归依赖。输出置于源码 checkout "
 "外。下面这个确切测试调用生产打包器和维护中的消费者模板，将前缀搬移到含空格的路径，配置独立工程，构建两种语言并运行 Native 可执行文件："
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:88
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:96
 msgid ""
 "Success is a nonempty unittest execution ending in `OK`, with exit code "
 "zero. The test's temporary directory is removed automatically. Failure "
@@ -147,30 +163,30 @@ msgstr ""
 "成功要求非空 unittest 执行以 `OK` "
 "结束，退出码为零。测试自动清理临时目录。失败保留实际命令诊断；编译器缺失不能记作消费者通过。夹具明确打包开发快照并显式允许消费；这验证消费流程，不建立可发布软件候选。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:94
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:102
 msgid ""
 "The complete consumer is maintained in the production verifier rather than "
 "copied into this page. These literal inputs are the same templates exercised"
 " by the test:"
 msgstr "完整消费者由生产验证器维护，本页不复制实现。以下真实输入就是该测试执行的模板："
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:97
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:105
 msgid ""
 "Maintained Native/F407/F470 consumer preparation; template code is not a "
 "shell command."
 msgstr "维护中的 Native/F407/F470 消费者准备；模板代码不是 shell 命令。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:104
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:112
 msgid "Maintainer: prepare a publishable prefix"
 msgstr "维护者：准备可发布前缀"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:114
 msgid ""
 "From an initialized, clean, committed checkout, choose a new owned output "
 "path:"
 msgstr "从已初始化、干净且已提交的 checkout 开始，选择自己拥有的新输出路径："
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:113
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:121
 msgid ""
 "Move the entire prefix, including its identity and licenses, before "
 "consumption. The [Source SDK contract](../design/source-compatibility.md) "
@@ -184,7 +200,7 @@ msgstr ""
 "epoch 检查。内容文件缺失、额外、修改或符号链接文件会拒绝配置。使用 `--development-fixture` "
 "生成的包保持不可发布，消费者必须显式设置 `NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON`。不得用该选项绕过发布资格。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:120
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:128
 msgid ""
 "The formal installed-prefix verifier requires the locked ARM compiler on "
 "`PATH` in addition to host tools. It builds Native C/C++ and the maintained "
@@ -192,7 +208,7 @@ msgid ""
 msgstr ""
 "正式安装前缀验证器除主机工具外，还要求锁定的 ARM 编译器位于 `PATH`。它构建 Native C/C++ 和维护中的 MCU 消费者："
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:127
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:135
 msgid ""
 "Check `verification.json`, every recorded exit code, Native runtime results,"
 " MCU ELF/BIN/map and resource reports. MCU linking does not execute "
@@ -208,11 +224,11 @@ msgstr ""
 "前缀与输出必须是没有符号链接别名的规范路径，且两者均不得包含另一方。路径被拒绝时，SDK 字节和既有报告保持不变；失败诊断写入 "
 "stderr。通过准入的专有输出会在下一次尝试前清空。仅在保留所需证据后删除自己创建的输出。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:136
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:144
 msgid "Choose a product assembly"
 msgstr "选择产品装配"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:138
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:146
 msgid ""
 "Products keep `assembly.toml`, `main`, workers and private Board data in an "
 "external repository. They consume `Nexus::Platform` through "
@@ -229,19 +245,19 @@ msgstr ""
 " 说明](../explanation/factory.md)取得接口面。公开产品示例位于 [nexus-"
 "examples](https://github.com/X-Gen-Lab/nexus-examples)。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:146
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:154
 msgid ""
 "![Source SDK preparation, relocation and independent consumer "
 "verification](../assets/diagrams/source-sdk-consumer.svg)"
 msgstr ""
 "![Source SDK 准备、搬移与独立消费者验证](../assets/diagrams/source-sdk-consumer.svg)"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:146
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:154
 msgid ""
 "Source SDK preparation, relocation and independent consumer verification"
 msgstr "Source SDK 准备、搬移与独立消费者验证"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:148
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:156
 msgid ""
 "FIG-10 shows the current software consumption flow. Runtime and MCU link "
 "evidence remain separate from [physical "
@@ -250,11 +266,11 @@ msgstr ""
 "FIG-10 表示当前软件消费流程。Runtime 与 MCU "
 "链接证据和[物理资格](../reference/platforms/qualification.md)分别记录。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:151
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:159
 msgid "Maintainer: recover delivery without moving an existing tag"
 msgstr "维护者：恢复交付且不移动已有 tag"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:153
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:161
 msgid ""
 "Release maintainers normally use the same commit for SDK source and the "
 "delivery workflow. If only delivery tooling needs repair after the source "
@@ -268,7 +284,7 @@ msgstr ""
 "`false`；只有显式选择恢复并设置 `publish=true`，才允许已标签源码与当前 `main` 工作流构建器使用不同提交。同源运行无需 "
 "`builder_ci_run_id`。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:160
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:168
 msgid ""
 "Before recovery, open this repository's **Settings → Secrets and variables →"
 " Actions → New repository secret** and create `NEXUS_RELEASE_TOKEN`. Use an "
@@ -287,7 +303,7 @@ msgstr ""
 "SOURCE/tools/release/README.md#publishing-credentials)。仅在 GitHub 的 secret "
 "输入框填写凭据值；不得通过聊天发送。将 GitHub 连接到助手并不会创建该 Actions secret。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:169
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:177
 msgid ""
 "Recovery rejects a missing secret before SDK work. This check proves only "
 "that the secret is configured, not that its permissions, approval or expiry "
@@ -300,7 +316,7 @@ msgstr ""
 "已配置，不能证明其权限、批准状态或有效期符合要求。仅恢复流程的最终发布步骤使用该凭据；SDK "
 "准备、下载与证明继续使用内置工作流凭据。源码与构建器使用同一提交的普通发布始终使用内置 token。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:175
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:183
 msgid ""
 "From the repository root, use an authenticated GitHub CLI with Actions write"
 " permission. Set `NEXUS_RELEASE_SOURCE` to the tagged 40-character source "
@@ -316,7 +332,7 @@ msgstr ""
 "`NEXUS_BUILDER_CI_RUN_ID` 设为当前 `main` 构建器成功执行的完整 CI 运行编号。两次运行均须在过去 24 "
 "小时内创建；源码 CI 不能为不同的构建器建立资格。每次修复交付工具后，选择新构建器的 CI 运行，保持源码提交与标签不变。然后触发工作流："
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:191
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:199
 msgid ""
 "The workflow derives the builder from its actual `main` workflow and "
 "checkout. Recovery requires identical source and builder version-policy "
@@ -329,7 +345,7 @@ msgstr ""
 "工作流根据实际 `main` 工作流与 checkout 确定构建器。恢复要求源码与构建器的版本策略字节完全相同、既有标签指向该源码、实时 `main`"
 " 引用指向该构建器。SDK、文档和源码 CI 保持已标签源码的身份，交付记录另行标明构建器。策略不一致时拒绝准入；资产上传前后均复核这两个引用。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:199
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/source-sdk.md:207
 msgid ""
 "Keep every original evidence file when repairing packaging limits. Do not "
 "move the tag, omit evidence or substitute a different source CI run to "

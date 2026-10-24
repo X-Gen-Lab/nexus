@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: b09dad96927d28d004235d345d3f68151a6ceba3ecd33537d8d9d890d15edaf3\n"
+"X-Nexus-Source-SHA256: 720a0c94f05496b8e156b5c3132933925e74540863b0d0b91ff674bb2ab77a3b\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
@@ -138,6 +138,37 @@ msgstr ""
 
 #: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:84
 msgid ""
+"On Linux, a normally reaped process, including a nonzero exit, can have "
+"`resource_usage` observed by `wait4`: user/system CPU seconds and "
+"`maximum_process_rss_bytes`. The scope is the waited process and descendants"
+" it has already reaped. The RSS value is the largest observed single-process"
+" peak, not simultaneous process-tree memory. Timeout, cancellation, launch "
+"failure, older receipts and other platforms retain unknown values rather "
+"than estimating them from wall time."
+msgstr ""
+"在 Linux 上，正常回收的进程（包括非零退出）可带有由 `wait4` 观测的 `resource_usage`：用户态／内核态 CPU 秒数和 "
+"`maximum_process_rss_bytes`。范围是被等待的进程及其已经回收的后代。RSS "
+"值是观测到的最大单进程峰值，不是整个进程树的同时占用。超时、取消、启动失败、旧收据和其他平台保留未知值，不从墙钟耗时估算。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:92
+msgid ""
+"The timings summary exposes `measured_resource_attempts` and "
+"`maximum_observed_process_rss_bytes` while preserving each original receipt."
+" Aggregate `cpu_seconds`, `peak_rss_bytes` and `cache_hits` remain unknown "
+"because nested receipts can double-count work and these observations do not "
+"establish a global memory peak or cache behavior. Compare cold and warm "
+"attempts separately under the same toolchain, source and profile; "
+"measurements from a small tool regression do not quantify whole-project "
+"build improvement."
+msgstr ""
+"耗时汇总公开 `measured_resource_attempts` 和 "
+"`maximum_observed_process_rss_bytes`，同时保留每份原始收据。汇总的 "
+"`cpu_seconds`、`peak_rss_bytes` 和 `cache_hits` "
+"仍为未知，因为嵌套收据可能重复计算工作，这些观测也不能建立全局内存峰值或缓存行为。分别比较同一工具链、源码和 profile 下的 cold 与 "
+"warm 尝试；小型工具回归的测量不能量化全项目构建收益。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:100
+msgid ""
 "Choose an explicit finite compiler budget for available RAM and disk, not "
 "just CPU count. Reuse verified source/tool preparation and ordinary "
 "incremental builds; invalidate changed configuration, dependencies and "
@@ -149,7 +180,7 @@ msgstr ""
 "根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU "
 "数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:91
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:107
 msgid ""
 "Before deleting a test, identify its behavioral obligation and independent "
 "remaining coverage. Remove only an obsolete behavior or a demonstrated "
@@ -163,11 +194,11 @@ msgstr ""
 "删除测试前，指出其行为责任和仍存在的独立覆盖。仅删除过时行为或已经证明重复覆盖同一合同的测试。保留检查拒绝所有权、借用保留、实例隔离、取消、IRQ "
 "顺序、真实厂家行为或外部 SDK 消费的测试。照着实现编写的通过断言本身不能作为独立替代。审查未找到可安全删除的测试时应保留；减少测试数量不是优化目标。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:99
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:115
 msgid "Preserve style and scope"
 msgstr "保留风格与范围"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:101
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:117
 msgid ""
 "Use the unchanged `.clang-format` and `.editorconfig`: 80 columns, four "
 "spaces, attached braces, type-attached pointer stars and backslash Doxygen "
@@ -179,7 +210,7 @@ msgstr ""
 "使用未改变的 `.clang-format` 和 `.editorconfig`：80 列、四空格、附着大括号、类型侧指针星号和反斜杠 Doxygen "
 "注释。公共头文件说明上下文、截止时间、所有权和失败。源注释解释不变量和硬件顺序，不重复声明参数。新增／修改文件通过整文件检查；已有冻结欠账只能减少。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:107
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:123
 msgid ""
 "Commit one reviewable change with Conventional Commits. Review "
 "interface/configuration changes together with diagrams, examples, "

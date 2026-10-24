@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bbcf989c908d498696df092cf7457ccdfbf4bbaf89a9bd59ae9ab0e353c9b9e4\n"
+"X-Nexus-Source-SHA256: 7bacb1fc91ca7e6c543cb487ce7a2e9839c31e182fd09abdbfed1b06d8122250\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:9
 msgid "原台账、退出条件与派生视图"
@@ -18,58 +18,69 @@ msgstr "Original ledgers, exit conditions and derived views"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:11
 msgid ""
-"下面的页面来自九份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 "
+"下面的页面来自十份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 "
 "SHA-256 可核对。 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。"
 msgstr ""
-"These pages derive from nine original CSVs without creating a second status "
-"database. Every task preserves its original ID, order, fields, exit "
-"conditions, implementation, software and physical states, and original "
-"evidence locators; the source SHA-256 can be checked. If an original CSV has"
-" no separate exit field, that absence is explicit. Do not assemble a passed "
-"condition from other ledgers."
+"The pages below derive from ten original CSV files; they do not establish a "
+"second status database. Every task preserves its original ID, order, fields,"
+" exit conditions, implementation, software/physical state and evidence "
+"locator, with a verifiable source SHA-256. When an original CSV has no "
+"separate exit field, the page says so; other ledgers cannot be combined to "
+"invent a passed condition."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:29
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:30
 msgid "正确解读状态"
 msgstr "Interpret statuses correctly"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:31
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:32
 msgid "`implemented` 表示实现存在；不保证当前 checkout 的完整软件资格。"
 msgstr ""
 "`implemented` means implementation exists; it does not guarantee complete "
 "software qualification for the current checkout."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:32
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:33
 msgid "`development_passed` 保留开发验证含义；不扩大成 clean-source 正式封存。"
 msgstr ""
 "`development_passed` retains its development-validation meaning; do not "
 "expand it into formal clean-source archiving."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:33
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:34
 msgid ""
 "`qualification_record_authority` 要回到 [精确结果索引](software-verification.md)。"
 msgstr ""
 "Consult the [exact results index](software-verification.md) for "
 "`qualification_record_authority`."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:35
 msgid "`implemented_tooling` 只表示工装实现，物理未执行仍为 `not_executed`。"
 msgstr ""
 "`implemented_tooling` only means tooling is implemented; unexecuted physical"
 " work remains `not_executed`."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:35
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:36
 msgid "`not_implemented`、`not_executed`、失败和有条件扩展保持原值。"
 msgstr ""
 "`not_implemented`, `not_executed`, failures and conditional extensions "
 "retain their original values."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:36
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:37
 msgid "不同专项重复覆盖同一机制，不能相加数量或计算全项目完成百分比。"
 msgstr ""
 "Different workstreams cover overlapping mechanisms; do not add their counts "
 "or calculate project-wide completion percentages."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:38
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:39
+msgid ""
+"`platform-delivery-completion` 的 N01–N14 是开发体验迭代之后的独立任务范围。 它不改写原 75 项的退出条件或 "
+"P/E 软件执行身份。N11 需要真实设备；N13 需要 当前 clean source 的完整计划和两次离线构建，不能由旧候选或开发测试代替。"
+msgstr ""
+"`platform-delivery-completion` tracks N01–N14 as a separate follow-up to the"
+" developer-experience iteration. It does not rewrite the original 75 exits "
+"or P/E software identities. N11 requires real equipment; N13 requires the "
+"complete plan and two offline builds of current clean source, not an old "
+"candidate or development test."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:43
 msgid ""
 "`platform-refinement` 保留较早的 60 项完善记录；`io-evolution` 是当前 42 项增量 台账。两份台账复用 "
 "`IO-` 编号，但来源、任务和退出条件不同，必须同时注明 CSV 或派生页面，不能按编号合并状态。增量台账的 `not_qualified` "
@@ -82,7 +93,7 @@ msgstr ""
 "original `not_qualified` values. Generating a view does not execute tests or"
 " promote software or physical qualification."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:43
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:48
 msgid ""
 "旧“48 项 OS 清单”已继续扩展。现有原 CSV 的编号为 OS01–OS55；其中 OS49–OS55 "
 "是物理工装／真实验收项，原状态均保留。构建系统的 48 项是另一个独立台账。 历史 RF 台账留在 "
@@ -96,11 +107,11 @@ msgstr ""
 "reachable through the [history entry](../reference/history.md), and cannot "
 "establish current support qualification."
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:48
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:53
 msgid "维护派生页"
 msgstr "Maintain derived pages"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:55
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers.md:60
 msgid ""
 "第一条仅由同一原 CSV 重新生成视图；第二条检查 missing／stale，失败时返回非零， 不写文件。更改原台账后应重新生成，commit／CI "
 "检查同一派生关系。生成、检查成功 只证明文档与原字段一致，不运行固件或采集硬件。实际测试证据见原结果索引。"

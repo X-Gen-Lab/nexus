@@ -70,6 +70,14 @@ retaining needed logs.
 
 ## Maintainer: verify the complete SDK consumer
 
+To verify the examples repository itself, use its maintained
+`scripts/local_ci.py` and bilingual `docs/local-ci.md` at the fixed examples
+revision. The default scope runs the complete mapped local workflow from a new
+output directory; `--scope native`, `--scope arm` and preset selection remain
+partial scopes. Its explicit `--nexus-source` must match the examples lock.
+An optional `--installed-sdk` must match the same pin. This workflow does not
+turn a blocked hosted CI run into a passed one, nor establish physical HIL.
+
 The remaining sections are platform maintenance tasks. First obtain the
 [fixed source and recursive dependencies](../guides/source-checkout.md).
 Run from that checkout, not an arbitrary default branch. The maintained contract

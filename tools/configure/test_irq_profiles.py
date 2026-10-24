@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 import configure as gate
+import selection
 from providers import common, maintained
 
 
@@ -42,7 +43,7 @@ class InterruptProfileTests(unittest.TestCase):
         provider = maintained("stm32f407")
         for bits in (3, 4, 8):
             with self.subTest(bits=bits):
-                irq = common.resolve_interrupts(provider.CPU_ABI,
+                irq = selection.resolve_interrupts(provider.CPU_ABI,
                                                  {"priority_bits": bits},
                                                  "freertos", provider)
                 self.assertEqual(irq["maximum_priority"], (1 << bits) - 1)
@@ -50,19 +51,19 @@ class InterruptProfileTests(unittest.TestCase):
                 self.assertEqual(irq["kernel_port"], "GCC/ARM_CM4F")
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "IRQ priority bits"):
-            common.resolve_interrupts(provider.CPU_ABI,
+            selection.resolve_interrupts(provider.CPU_ABI,
                                       {"priority_bits": 2}, "freertos", provider)
 
     def test_kernel_profile_cannot_inherit_another_cpu_or_unknown_port(self):
         provider = maintained("stm32f407")
         with self.assertRaisesRegex(gate.ConfigurationError, "kernel CPU ABI"):
-            common.resolve_interrupts({"arch": "cortex-m0", "fpu": "none",
+            selection.resolve_interrupts({"arch": "cortex-m0", "fpu": "none",
                                        "float_abi": "soft"},
                                       {"priority_bits": 4}, "freertos", provider)
         with patch.object(provider, "FREERTOS_PORT", "GCC/ARM_CM0"):
             with self.assertRaisesRegex(gate.ConfigurationError,
                                         "Unmaintained FreeRTOS port"):
-                common.resolve_interrupts(provider.CPU_ABI,
+                selection.resolve_interrupts(provider.CPU_ABI,
                                           {"priority_bits": 4},
                                           "freertos", provider)
 

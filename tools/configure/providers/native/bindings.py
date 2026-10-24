@@ -1,6 +1,10 @@
 """Emit exact host model storage and wiring, without runtime hardware policy."""
+try:
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
 
-from ..common import Construction, controller_ir
+from ..common import Construction
 
 
 def symbol(name):

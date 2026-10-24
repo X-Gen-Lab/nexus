@@ -1,10 +1,14 @@
 """Cold static F103 contexts; typed factory never constructs on the I/O path."""
-from ..common import Construction, controller_ir, fail, kernel_policy_constant
+try:
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
+from ..common import Construction, fail, kernel_policy_constant
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct exact static states and child endpoints outside the I/O path."""
-    from . import LIMITS, validate_selection
+    from .contract import LIMITS, validate_selection
     item = controller_ir(item, "stm32f103")
     if item.provider != "stm32f103":
         fail("F103 constructor cannot reinterpret a foreign provider decision")

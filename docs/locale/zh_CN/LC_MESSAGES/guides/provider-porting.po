@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,11 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: be58f37fd3dcd86dc14795bf59195d9d126a403b999be4149a218adcab46cb70\n"
+"X-Nexus-Source-SHA256: c9c65bf7f4d2494a95df465d28f04154f2eb295bf32bf7b2248b88a874e57303\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:9
 msgid "Add a SoC, provider or reusable component"
 msgstr "接入 SoC、提供者或通用组件"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:11
 msgid ""
 "Use this guide to add a maintained implementation with explicit resources "
 "and measurable costs. A new family or mode requires behavior, configuration "
@@ -21,53 +23,69 @@ msgstr ""
 "使用本指南增加具有明确资源和可测成本的维护实现。新芯片家族或模式需要同时完成行为、配置和构建集成。STM32／GD32 "
 "的外设名称相似，不能证明寄存器兼容。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:16
 msgid "Keep the layer boundary narrow"
 msgstr "保持清晰而窄的分层边界"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Owner"
 msgstr "所有者"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Required responsibility"
 msgstr "必需责任"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Arch"
 msgstr "Arch"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Exact CPU primitives, feature facts and ABI; no PCB or device registry"
 msgstr "精确 CPU 原语、特性事实和 ABI；不拥有 PCB 或设备注册表"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "SoC"
 msgstr "SoC"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid ""
 "Full part, memory, clocks, IRQ/DMA routes, reset/startup and private "
 "provider"
 msgstr "完整型号、内存、时钟、IRQ／DMA 路由、复位／启动和私有提供者"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Board"
 msgstr "Board"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Source-reviewed wiring, oscillators, safe levels and actual unknowns"
 msgstr "经来源审查的接线、晶振、安全电平，以及真实未知项"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "I/O provider"
 msgstr "I/O 提供者"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Public operation contract, private state, admission and final drain"
 msgstr "公共操作合同、私有状态、准入判定和最终排空"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Component"
 msgstr "组件"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Caller-owned storage, bounded algorithm and explicit narrow ports"
 msgstr "调用者拥有的存储、有界算法和显式窄端口"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "External product"
 msgstr "外部产品"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:0
 msgid "Roles, tasks, queue depth, recovery, Flash reservations and release"
 msgstr "角色、任务、队列深度、恢复、Flash 预留和发行"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:27
 msgid ""
 "Read the [architecture](../explanation/platform-architecture.md), "
 "[integration contract](../design/integration-contracts.md) and [provider "
@@ -77,15 +95,18 @@ msgstr ""
 "architecture.md)、[接入合同](../design/integration-"
 "contracts.md)和[提供者装配合同](../design/provider-assemblies.md)。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:31
 msgid "Implement in a reviewable sequence"
 msgstr "按可评审的顺序实现"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:33
 msgid ""
 "Prepare the [fixed source and recursive dependencies](source-checkout.md). "
 "Define the new behavior, supported modes, public ownership obligations and "
 "rejection boundaries before changing its production implementation."
 msgstr "准备[固定源码与递归依赖](source-checkout.md)。改变生产实现前，先定义新行为、支持模式、公共所有权义务和拒绝边界。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:36
 msgid ""
 "Add and execute a meaningful RED GoogleTest/GoogleMock contract against the "
 "current production path. Retain the actual command, nonzero execution and "
@@ -96,94 +117,7 @@ msgstr ""
 "为当前生产路径新增并执行有意义的 RED GoogleTest／GoogleMock 合同。保留实际命令、非零执行及预期失败断言。通过 mock 测试 "
 "MMIO／CPU／依赖端口；Python 解析器行为使用标准库 unittest。工具缺失或只有编译错误，不能当作预期的行为 RED 结果。"
 
-msgid ""
-"Add the family to the explicit maintained provider map in "
-"`tools/configure/`. Define supported modes, numerical limits, constructors, "
-"rollback and IRQ wiring. Return an explicit frozen `Construction` record, "
-"including the private state type and failed-init cleanup responsibility; do "
-"not require family-name inference in common generation. Unsupported modes "
-"reject; there is no runtime registration or plugin discovery."
-msgstr ""
-"将家族加入 `tools/configure/` 中显式维护的 provider 映射。定义支持模式、数值限制、构造器、回滚与 IRQ "
-"接线。返回明确冻结的 `Construction` "
-"记录，包含私有状态类型与初始化失败清理责任；不得要求公共生成器从家族名称推断。不支持的模式直接拒绝，不引入运行时注册或插件发现。"
-
-msgid ""
-"Add explicit CMake targets and private SDK dependencies. Update declared "
-"resolver reconfiguration inputs and the Source SDK required-file closure."
-msgstr "增加显式 CMake 目标与私有 SDK 依赖。更新解析器声明的重新配置输入，以及 Source SDK 的必需文件闭包。"
-
-msgid ""
-"Implement the smallest correct production change. Define an immutable public"
-" face with shared readonly ops and independent context. Reuse public Nexus "
-"types; keep vendor structures and concrete storage private. Review official "
-"HAL/LL reuse before duplicating a vendor state machine. Apply [the official-"
-"driver boundary](../design/official-stm32-provider.md) to time, callbacks, "
-"cancellation, private dependencies and mode-specific comparison."
-msgstr ""
-"实施最小正确生产变更。定义不可变公共 face，共享只读 ops，并使用独立 context。复用 Nexus "
-"公共类型，厂商结构与具体存储保持私有。复制厂商状态机前，先审查官方 HAL/LL "
-"复用。时间、回调、取消、私有依赖与逐模式比较遵守[官方驱动边界](../design/official-stm32-provider.md)。"
-
-msgid ""
-"Execute GREEN against the real provider. Verify rejection without residual "
-"effects, accepted borrow, cancel/deadline, failed drain, quarantine, "
-"stop/restart and instance isolation where the mode needs them."
-msgstr "对真实提供者执行 GREEN。按模式需要验证无残留效果的拒绝、接受后的借用、取消／截止时间、排空失败、隔离保留、停止／重启和实例隔离。"
-
-msgid ""
-"Refactor while keeping contracts passing. Link exact ARM fixtures and verify"
-" actual resources, handler retention, vector bytes and unselected-driver "
-"pruning. Validate an independent relocated SDK consumer and record physical "
-"work as not executed."
-msgstr ""
-"保持合同通过再重构。链接精确 ARM 夹具，验证实际资源、处理函数保留、向量表字节和未选择驱动裁剪。验证独立搬移后的 SDK "
-"消费工程，并将实板工作记录为未执行。"
-
-msgid ""
-"For a component, pass explicit bus, GPIO, time and optional OS ports. Do not"
-" create workers, probe devices, invent application roles or supply a maximum"
-" object pool. Flash drivers expose physical geometry; persistence and update"
-" policy remain external."
-msgstr ""
-"组件通过显式总线、GPIO、时间和可选 OS 端口工作。不得创建执行任务、探测设备、虚构应用角色或提供最大对象池。Flash "
-"驱动暴露物理几何；持久化和升级策略仍在外部。"
-
-msgid ""
-"The read-only [work-package view](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/README.md) "
-"connects exact maintained modes to resolver fixtures, selected ops sources "
-"and reviewed lifecycle properties. Its entries are navigation, not executed "
-"tests or new support declarations. Run actual applicable gates separately."
-msgstr ""
-"只读[工作包视图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/maintenance/README.md)将精确维护模式关联到 resolver 夹具、所选 ops "
-"源码与已审生命周期性质。视图条目用于导航，不是已执行测试或新增支持声明。实际适用门禁需要另行运行。"
-
-msgid "Review performance and ownership"
-msgstr "审查性能与所有权"
-
-msgid ""
-"Measure the selected empty image and the same fixture after enabling the new"
-" mode. Report Flash LOAD, Flash footprint, each RAM domain and reserved "
-"task/IO storage separately. Hot IRQ work should directly access its fixed "
-"provider; an interface lookup is a cold action. Keep bounded admission and "
-"stream metadata operations independent of queue length where their contracts"
-" require it."
-msgstr ""
-"测量所选空镜像和同一夹具启用新模式后的镜像。分别报告 Flash LOAD、Flash 占用范围、各 RAM 域和预留任务／I/O 存储。高频 IRQ "
-"应直接访问固定提供者；接口查找属于冷路径。在合同要求时，准入判定和流元数据操作保持有界，并且不随队列长度增长。"
-
-msgid ""
-"A passing host register model proves its modeled software scope. New CPU, "
-"Cache, FPU/MVE, security or low-power behavior needs its own actual "
-"execution boundary; [platform support](../reference/platforms/support.md) "
-"does not infer it from a name."
-msgstr ""
-"通过的主机寄存器模型只证明其建模的软件范围。新增 "
-"CPU、缓存、FPU／MVE、安全或低功耗行为必须建立自己的实际执行边界；[平台支持](../reference/platforms/support.md)不能仅凭名称推导它们。"
-
-#: docs/guides/provider-porting.md:41
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:41
 msgid ""
 "Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the"
 " shared CPU resolver; do not duplicate CPU flags or infer optional features."
@@ -197,3 +131,120 @@ msgstr ""
 "或推断可选能力。MCU 实现放在 `soc/<vendor>/<family>/`，并在维护中的系列描述符声明该规范 "
 "`source_directory`。公共系列标识独立于目录。CPU 实现源码按 ISA 归属，例如 "
 "`arch/arm/cortex_m/`；经过审查的跨厂家寄存器算法保留在 `soc/common/`。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:48
+msgid ""
+"Add the family to the explicit maintained provider map in "
+"`tools/configure/`. Define supported modes, numerical limits, constructors, "
+"rollback and IRQ wiring. Return an explicit frozen `Construction` record, "
+"including the private state type and failed-init cleanup responsibility; do "
+"not require family-name inference in common generation. Unsupported modes "
+"reject; there is no runtime registration or plugin discovery."
+msgstr ""
+"将家族加入 `tools/configure/` 中显式维护的 provider 映射。定义支持模式、数值限制、构造器、回滚与 IRQ "
+"接线。返回明确冻结的 `Construction` "
+"记录，包含私有状态类型与初始化失败清理责任；不得要求公共生成器从家族名称推断。不支持的模式直接拒绝，不引入运行时注册或插件发现。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:54
+msgid ""
+"Add explicit CMake targets and private SDK dependencies. Update declared "
+"resolver reconfiguration inputs and the Source SDK required-file closure."
+msgstr "增加显式 CMake 目标与私有 SDK 依赖。更新解析器声明的重新配置输入，以及 Source SDK 的必需文件闭包。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:56
+msgid ""
+"Implement the smallest correct production change. Define an immutable public"
+" face with shared readonly ops and independent context. Reuse public Nexus "
+"types; keep vendor structures and concrete storage private. Review official "
+"HAL/LL reuse before duplicating a vendor state machine. Apply [the official-"
+"driver boundary](../design/official-stm32-provider.md) to time, callbacks, "
+"cancellation, private dependencies and mode-specific comparison."
+msgstr ""
+"实施最小正确生产变更。定义不可变公共 face，共享只读 ops，并使用独立 context。复用 Nexus "
+"公共类型，厂商结构与具体存储保持私有。复制厂商状态机前，先审查官方 HAL/LL "
+"复用。时间、回调、取消、私有依赖与逐模式比较遵守[官方驱动边界](../design/official-stm32-provider.md)。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:62
+msgid ""
+"Execute GREEN against the real provider. Verify rejection without residual "
+"effects, accepted borrow, cancel/deadline, failed drain, quarantine, "
+"stop/restart and instance isolation where the mode needs them."
+msgstr "对真实提供者执行 GREEN。按模式需要验证无残留效果的拒绝、接受后的借用、取消／截止时间、排空失败、隔离保留、停止／重启和实例隔离。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:65
+msgid ""
+"Refactor while keeping contracts passing. Link exact ARM fixtures and verify"
+" actual resources, handler retention, vector bytes and unselected-driver "
+"pruning. Validate an independent relocated SDK consumer and record physical "
+"work as not executed."
+msgstr ""
+"保持合同通过再重构。链接精确 ARM 夹具，验证实际资源、处理函数保留、向量表字节和未选择驱动裁剪。验证独立搬移后的 SDK "
+"消费工程，并将实板工作记录为未执行。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:69
+msgid ""
+"For a component, pass explicit bus, GPIO, time and optional OS ports. Do not"
+" create workers, probe devices, invent application roles or supply a maximum"
+" object pool. Flash drivers expose physical geometry; persistence and update"
+" policy remain external."
+msgstr ""
+"组件通过显式总线、GPIO、时间和可选 OS 端口工作。不得创建执行任务、探测设备、虚构应用角色或提供最大对象池。Flash "
+"驱动暴露物理几何；持久化和升级策略仍在外部。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:73
+msgid ""
+"Within configuration tools, each family's `contract.py` owns mode "
+"capabilities, ABI/limits and family admission policy. Sibling modules import"
+" that contract directly; `__init__.py` explicitly exports it with "
+"constructors and emitters. The leaf `providers/common.py` owns validation "
+"helpers and immutable `Construction`; leaf contracts and common helpers do "
+"not import the top-level resolver or emitter. `selection.py` checks cross-"
+"domain options, clocks and IRQ policy, `ir.py` adapts typed IR, and "
+"`matrix.py` orchestrates support catalogues. The descriptor explicitly lists"
+" `configuration_modules`, including `contract.py`, so edits trigger "
+"reconfiguration and remain in the Source SDK closure."
+msgstr ""
+"在配置工具内，每个 family 的 `contract.py` 负责模式能力、ABI／限值和 family "
+"准入策略。同级模块直接导入该合同；`__init__.py` 将其与 constructor、emitter 显式导出。底层 "
+"`providers/common.py` 负责校验 helper 和不可变 `Construction`；底层合同与公共 helper "
+"不导入顶层解析器或 emitter。`selection.py` 检查跨领域选项、时钟和 IRQ 策略，`ir.py` 负责 typed IR "
+"适配，`matrix.py` 编排支持目录。descriptor 显式列出包含 `contract.py` 的 "
+"`configuration_modules`，使修改触发重新配置并保留在 Source SDK 闭包中。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:83
+msgid ""
+"The read-only [work-package view](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/maintenance/README.md) "
+"connects exact maintained modes to resolver fixtures, selected ops sources "
+"and reviewed lifecycle properties. Its entries are navigation, not executed "
+"tests or new support declarations. Run actual applicable gates separately."
+msgstr ""
+"只读[工作包视图](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/maintenance/README.md)将精确维护模式关联到 resolver 夹具、所选 ops "
+"源码与已审生命周期性质。视图条目用于导航，不是已执行测试或新增支持声明。实际适用门禁需要另行运行。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:88
+msgid "Review performance and ownership"
+msgstr "审查性能与所有权"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:90
+msgid ""
+"Measure the selected empty image and the same fixture after enabling the new"
+" mode. Report Flash LOAD, Flash footprint, each RAM domain and reserved "
+"task/IO storage separately. Hot IRQ work should directly access its fixed "
+"provider; an interface lookup is a cold action. Keep bounded admission and "
+"stream metadata operations independent of queue length where their contracts"
+" require it."
+msgstr ""
+"测量所选空镜像和同一夹具启用新模式后的镜像。分别报告 Flash LOAD、Flash 占用范围、各 RAM 域和预留任务／I/O 存储。高频 IRQ "
+"应直接访问固定提供者；接口查找属于冷路径。在合同要求时，准入判定和流元数据操作保持有界，并且不随队列长度增长。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/provider-porting.md:96
+msgid ""
+"A passing host register model proves its modeled software scope. New CPU, "
+"Cache, FPU/MVE, security or low-power behavior needs its own actual "
+"execution boundary; [platform support](../reference/platforms/support.md) "
+"does not infer it from a name."
+msgstr ""
+"通过的主机寄存器模型只证明其建模的软件范围。新增 "
+"CPU、缓存、FPU／MVE、安全或低功耗行为必须建立自己的实际执行边界；[平台支持](../reference/platforms/support.md)不能仅凭名称推导它们。"

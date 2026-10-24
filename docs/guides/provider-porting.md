@@ -70,6 +70,16 @@ For a component, pass explicit bus, GPIO, time and optional OS ports. Do not cre
 workers, probe devices, invent application roles or supply a maximum object pool.
 Flash drivers expose physical geometry; persistence and update policy remain external.
 
+Within configuration tools, each family's `contract.py` owns mode capabilities,
+ABI/limits and family admission policy. Sibling modules import that contract
+directly; `__init__.py` explicitly exports it with constructors and emitters.
+The leaf `providers/common.py` owns validation helpers and immutable
+`Construction`; leaf contracts and common helpers do not import the top-level
+resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
+policy, `ir.py` adapts typed IR, and `matrix.py` orchestrates support catalogues.
+The descriptor explicitly lists `configuration_modules`, including `contract.py`,
+so edits trigger reconfiguration and remain in the Source SDK closure.
+
 The read-only [work-package view](../../tools/maintenance/README.md) connects
 exact maintained modes to resolver fixtures, selected ops sources and reviewed
 lifecycle properties. Its entries are navigation, not executed tests or new

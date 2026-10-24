@@ -24,7 +24,16 @@ static bool valid_request(const nx_request_observation_t* request) {
            request->settled == (request->state == NX_REQUEST_SETTLED);
 }
 
-/** \brief Unknown facts never become default negative or positive evidence. */
+/**
+ * \brief Classify only explicit copied facts without changing their owners.
+ *
+ * Validate each supplied group before publishing the local result. A rejected
+ * group leaves the caller's output untouched, including when output aliases an
+ * input snapshot. Missing groups remain unknown rather than becoming healthy
+ * or stalled by default. Findings are independent observations, not an inferred
+ * cause: a deadline never settles a borrow, and unchanged state does not prove
+ * that service was omitted.
+ */
 nx_result_t nx_io_diagnose(const nx_io_diagnostic_facts_t* facts,
                            nx_io_diagnostic_t* out) {
     const uint32_t explicit_groups = NX_IO_FACT_LIFECYCLE | NX_IO_FACT_OWNER |
@@ -36,6 +45,9 @@ nx_result_t nx_io_diagnose(const nx_io_diagnostic_facts_t* facts,
         (facts->known & ~explicit_groups) != 0U) {
         return NX_ERROR_INVALID;
     }
+    /* Keep publication atomic with respect to validation, not concurrency. The
+     * caller supplies stable copied snapshots and synchronizes its own output.
+     */
     nx_io_diagnostic_t result = {0U, NX_IO_FACT_ALL & ~facts->known};
     if (facts->request != NULL) {
         const nx_request_observation_t* request = facts->request;
@@ -85,6 +97,7 @@ nx_result_t nx_io_diagnose(const nx_io_diagnostic_facts_t* facts,
         if (!stream->next_free) {
             result.findings |= NX_IO_DIAG_STREAM_CURSOR_BUSY;
         }
+        /* Loss is pending metadata in this snapshot, not a lifetime total. */
         if (stream->losses != 0U) {
             result.findings |= NX_IO_DIAG_STREAM_LOSS;
         }
@@ -116,6 +129,8 @@ nx_result_t nx_io_diagnose(const nx_io_diagnostic_facts_t* facts,
         result.findings |= NX_IO_DIAG_OBSERVERS_PENDING;
     }
     if ((facts->known & NX_IO_FACT_SERVICE) != 0U) {
+        /* Only explicit same-domain service timestamps establish a missed
+         * budget. The never sentinel is a deadline, not an observed clock. */
         if (facts->observed_at == NX_DEADLINE_NEVER ||
             facts->last_service_at == NX_DEADLINE_NEVER ||
             facts->maximum_service_gap_us == 0U ||

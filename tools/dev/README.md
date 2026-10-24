@@ -114,8 +114,15 @@ tool rechecks completed stdout/stderr bytes and hashes, deduplicates attempts
 and retains failures and unfinished attempts. Phase grouping is a conservative
 view of the original command; each stage/argv remains in JSON. Cumulative
 attempt seconds can overlap. Wall time is the union of observed wall-clock
-intervals, excluding idle gaps and assuming one stable host clock. Unobserved
-stages, unfinished duration, CPU, peak RSS and cache counters remain unknown.
+intervals, excluding idle gaps and assuming one stable host clock. Completed
+Linux attempts also retain `wait4` user/system CPU and maximum process RSS.
+This accounting covers the waited process and descendants it has reaped; the
+RSS value is a maximum individual process peak, not a concurrent tree total.
+Nested attempt accounting can overlap, so the summary retains per-attempt CPU
+and the maximum observed process RSS without inventing aggregate CPU or tree
+memory. Historical, interrupted and unsupported-host resource costs stay
+unknown; unobserved stages, unfinished duration and cache counters also remain
+unknown.
 The JSON output must be new. This is a cost summary, never a cached success
 report, MCU timing measurement or qualification record.
 
@@ -271,6 +278,10 @@ Timeout/cancellation/launch failure return 124/130/127. Outstanding uninterrupti
 kernel processes remain explicit identities with `withdrawal_complete = false`;
 they cannot establish success. Receipts also retain the
 actual child return code, command, working directory, timing and raw output hashes.
+Normal Linux completion additionally records exact-child `wait4` accounting.
+It never subtracts global child resource counters, which would mix concurrent
+invocations. Timeout and cancellation retain the existing withdrawal path and
+report unknown resource usage; no terminal sample is invented after withdrawal.
 Complete withdrawal also requires a stable inspected frozen tree; merely stopping
 the identities discovered before the inspection deadline is insufficient.
 Each logged invocation records its start before launching a child. An interrupted

@@ -1,19 +1,23 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 try:
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
+try:
     from ... import enhanced_endpoints, timer_advanced
 except ImportError:
     import enhanced_endpoints
     import timer_advanced
-from ..common import Construction, controller_ir, fail, kernel_policy_constant
+from ..common import Construction, fail, kernel_policy_constant
 try:
-    from ...emission import dma_regions
+    from ...memory import dma_regions
 except ImportError:
-    from emission import dma_regions
+    from memory import dma_regions
 
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct exact static controller state, endpoints and bounded storage."""
-    from . import validate_selection
+    from .contract import validate_selection
     item = controller_ir(item, "stm32g474")
     if item.provider != "stm32g474":
         fail("G474 constructor cannot reinterpret a foreign provider decision")

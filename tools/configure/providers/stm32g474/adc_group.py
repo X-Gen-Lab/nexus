@@ -7,9 +7,9 @@ import re
 
 from ..common import Construction, fail, integer, sequence
 try:
-    from ...emission import dma_regions
+    from ...memory import dma_regions
 except ImportError:
-    from emission import dma_regions
+    from memory import dma_regions
 
 
 MODES = ("regular-sequence-dma", "injected-sequence")
@@ -167,7 +167,7 @@ def preflight(result):
                   f"        result.primary = nx_silicon_preflight(&{source},",
                   f"                                               &{policy},",
                   "                                               &observed);",
-                  "        if (result.primary != NX_SUCCESS)"
+                  "        if (result.primary != NX_SUCCESS)" +
                   " { return result; }",
                   "    }"]
     return lines

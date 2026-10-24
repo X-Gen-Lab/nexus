@@ -33,8 +33,12 @@ python tools/configure/configure.py explain --assembly /tmp/product-uart.toml
 TOML values and run the normal resolver; nonempty profiles require an explicit
 binding. A rejected route is not replaced with another one. Read the generated
 TOML before adopting its baud rate, event capacity, IRQ priority and budgets.
-For an external Board use `--board-package` when querying bindings; its reviewed
-package remains separate from the product assembly.
+For an external Board, both `init` and `list-bindings` accept `--board-package`
+instead of `--board`. The command resolves that package path from the working
+directory; `init` writes it relative to the new TOML directory. Moving the whole
+product tree preserves this relationship. The reviewed Board package remains
+separate from the product assembly; use the [Board porting guide](board-porting.md)
+for package contents and provider boundaries.
 
 The explanation lists public faces, modes, clock, resources, memory domains,
 declared budgets and execution duties. `list-bindings --json` includes
@@ -42,6 +46,14 @@ declared budgets and execution duties. `list-bindings --json` includes
 still `configuration-required`: backend, clock and all selected instances must
 resolve together. Missing physical PCB facts remain unknown. MCU queries state
 `not_established_by_configuration`; Native states `not_applicable`.
+
+Each candidate mode lists its own `resource_keys`, `occupied_resources` and
+`resource_scope`. A polling mode does not claim the alternative DMA route.
+Board-first queries retain known SoC and Board reservations without inventing an
+OS owner before a backend is selected. Assembly queries read facts matching the
+resolved input hashes. Options can add requirements, so this projection does not
+replace full-assembly admission. Use the [exact support query](../delivery/capabilities.md)
+to separate configuration acceptance from model, ARM, SDK and physical evidence.
 
 After editing a separate next assembly, compare effective changes:
 
@@ -58,12 +70,28 @@ behavior change. JSON distinguishes absent fields from explicit `null`. Scripts
 that previously consumed default JSON from `explain` must now pass `--json`.
 Editor hints are assistance; the resolver remains the acceptance authority.
 
+The diff also groups `impacts` into `factory_ids`, `public_interface`,
+`transfer_contract`, `execution` and `storage`. Each item identifies its effective
+path, before/after value and review obligation. Changed or reordered factory IDs
+may require consumer changes; a new executor or DMA mode needs its lifecycle and
+storage
+contract reviewed. These are declared configuration impacts, not measured timing,
+memory savings or an assertion that a consumer was migrated.
+
 A conflict diagnostic identifies the authored file/key and competing resource
 owners. Correct those inputs, then configure again. Never fix generated C,
 weaken a DMA reservation or change a clock implicitly to make a build pass.
 Configuration budgets are declarations; measure the actual linked image before
 claiming resource savings. See the [assembly reference](../reference/configuration/assembly.md)
 and [support matrix](../reference/platforms/support.md).
+
+Automation can add `--diagnostics-json` to receive one structured rejection on
+standard error, with exit code 1; successful standard output keeps its existing
+format. Human and JSON diagnostics use the same error record. Unknown/missing
+fields preserve their context and key sets; resource conflicts identify the
+resource and competing claims, including owner, mode and source. These records
+locate authored inputs without silently correcting them.
+CLI argument syntax errors retain argparse diagnostics and exit code 2.
 
 ## Assign one executor and retain borrowed storage
 

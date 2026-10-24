@@ -76,6 +76,26 @@ def _raw(identity):
         raise ValueError("Receipt raw output identity changed")
 
 
+def _resource_usage(value):
+    """Admit wait accounting without inventing a process-tree peak."""
+    if value is None:
+        return None
+    fields = {"method", "scope", "user_cpu_seconds", "system_cpu_seconds",
+              "maximum_process_rss_bytes"}
+    if (not isinstance(value, dict) or set(value) != fields
+            or value["method"] != "linux_wait4"
+            or value["scope"] != "waited_process_and_reaped_descendants"):
+        raise ValueError("Unknown resource observation scope or method")
+    for name in ("user_cpu_seconds", "system_cpu_seconds"):
+        if (type(value[name]) not in (float, int)
+                or not math.isfinite(value[name]) or value[name] < 0):
+            raise ValueError("Invalid observed CPU cost")
+    if (type(value["maximum_process_rss_bytes"]) is not int
+            or value["maximum_process_rss_bytes"] < 0):
+        raise ValueError("Invalid observed maximum process RSS")
+    return value
+
+
 def summarize(paths):
     """Use monotonic cost and wall interval union, never summed wall."""
     attempts, phases, outcomes, intervals = [], {}, {}, []
@@ -91,6 +111,9 @@ def summarize(paths):
         outcome = data.get("outcome")
         if outcome not in OUTCOMES:
             raise ValueError("Unknown execution receipt outcome")
+        usage = _resource_usage(data.get("resource_usage"))
+        if usage is not None and outcome != "completed":
+            raise ValueError("Incomplete execution cannot claim accounting")
         start, finish = data.get("started_ns"), data.get("finished_ns")
         duration, code = data.get("duration_seconds"), data.get("exit_code")
         if type(start) is not int or start < 0:
@@ -122,13 +145,16 @@ def summarize(paths):
         attempts.append({"receipt": str(path), "stage": stage, "phase": phase,
                          "command": command, "outcome": outcome,
                          "exit_code": code,
-                         "duration_seconds": duration})
+                         "duration_seconds": duration,
+                         "resource_usage": usage})
     merged = []
     for start, finish in sorted(intervals):
         if merged and start <= merged[-1][1]:
             merged[-1][1] = max(merged[-1][1], finish)
         else:
             merged.append([start, finish])
+    measured = [row["resource_usage"] for row in attempts
+                if row["resource_usage"] is not None]
     return {
         "schema": 1, "kind": "development_receipt_costs",
         "qualification": False,
@@ -143,8 +169,14 @@ def summarize(paths):
         "wall_clock_note": ("interval union excludes idle gaps; "
                             "assumes a shared stable host clock"),
         "cpu_seconds": None, "peak_rss_bytes": None, "cache_hits": None,
-        "unobserved_metrics": ("Original receipts do not sample CPU, "
-                               "RSS or cache counters"),
+        "measured_resource_attempts": len(measured),
+        "maximum_observed_process_rss_bytes": max(
+            (row["maximum_process_rss_bytes"] for row in measured),
+            default=None),
+        "unobserved_metrics": ("CPU is per waited attempt; nested attempts can "
+                               "overlap accounting. No aggregate CPU, parallel "
+                               "tree peak RSS or cache counters are inferred. "
+                               "Historical/interrupted costs stay unknown."),
         "phases": phases, "attempts": attempts,
     }
 
@@ -160,7 +192,8 @@ def main(argv=None):
         print(f"{phase:21} {data['attempts']:8} {data['seconds']:14.3f}"
               f" {data['failed']:7} {data['incomplete']:11}")
     print(f"Observed wall union: {result['observed_wall_seconds']:.3f}s; "
-          "CPU/RSS/cache: unknown; development only")
+          f"resource observations: {result['measured_resource_attempts']}; "
+          "aggregate CPU/tree RSS/cache unknown; development only")
     if arguments.json:
         with arguments.json.open("x", encoding="utf-8") as stream:
             json.dump(result, stream, indent=2)

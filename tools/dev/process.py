@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import signal
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -259,6 +260,41 @@ def _write_json(path, record):
         temporary.unlink(missing_ok=True)
 
 
+def _wait(process, timeout, cancel_event):
+    """Wait for our exact child; Linux reports its kernel resource accounting.
+
+    wait4 includes descendants only when the child has reaped them. Its maximum
+    RSS is the largest process peak, not the sum of a concurrent process tree.
+    Global RUSAGE_CHILDREN deltas would mix unrelated concurrent invocations.
+    """
+    observed = sys.platform.startswith("linux") and hasattr(os, "wait4")
+    deadline, delay = time.monotonic() + timeout, 0.001
+    while True:
+        if cancel_event is not None and cancel_event.is_set():
+            raise KeyboardInterrupt
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise subprocess.TimeoutExpired(process.args, timeout)
+        if observed:
+            pid, status, usage = os.wait4(process.pid, os.WNOHANG)
+            if pid:
+                process.returncode = os.waitstatus_to_exitcode(status)
+                return process.returncode, {
+                    "method": "linux_wait4",
+                    "scope": "waited_process_and_reaped_descendants",
+                    "user_cpu_seconds": usage.ru_utime,
+                    "system_cpu_seconds": usage.ru_stime,
+                    "maximum_process_rss_bytes": usage.ru_maxrss * 1024,
+                }
+            time.sleep(min(delay, remaining))
+            delay = min(delay * 2, 0.05)
+        else:
+            try:
+                return process.wait(timeout=min(0.05, remaining)), None
+            except subprocess.TimeoutExpired:
+                continue
+
+
 def run(command, *, cwd, env, log=None, timeout=None, stage="command",
         input=None, cancel_event=None):
     """Execute with cancellation deferred until cleanup and receipts finish."""
@@ -320,6 +356,7 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
         stdin_path.write_bytes(input)
     started_ns, started = time.time_ns(), time.monotonic()
     outcome, returncode, process = "completed", 127, None
+    resource_usage = None
     withdrawn = []
     withdrawal_stable = True
     started_record = {
@@ -349,21 +386,7 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
             process = subprocess.Popen(command, cwd=cwd, env=env,
                                        stdin=stdin, stdout=stdout,
                                        stderr=stderr, **settings)
-            if cancel_event is None:
-                returncode = process.wait(timeout=timeout)
-            else:
-                deadline = time.monotonic() + timeout
-                while True:
-                    if cancel_event.is_set():
-                        raise KeyboardInterrupt
-                    remaining = deadline - time.monotonic()
-                    if remaining <= 0:
-                        raise subprocess.TimeoutExpired(command, timeout)
-                    try:
-                        returncode = process.wait(timeout=min(0.05, remaining))
-                        break
-                    except subprocess.TimeoutExpired:
-                        continue
+            returncode, resource_usage = _wait(process, timeout, cancel_event)
         except subprocess.TimeoutExpired:
             outcome, returncode = "timed_out", 124
             state["withdrawing"] = True
@@ -392,6 +415,7 @@ def _run(command, *, cwd, env, log, timeout, stage, state, input=None,
         "withdrawal_complete": withdrawal_stable and all(
             item.get("withdrawal_complete", True) for item in withdrawn),
         "build_parallelism": int(env["CMAKE_BUILD_PARALLEL_LEVEL"]),
+        "resource_usage": resource_usage,
         "stdout": _identity(stdout_path), "stderr": _identity(stderr_path),
     }
     if stdin_path is not None:

@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.configure import bindings, configure, dependencies, factory
+from tools.configure import matrix, bindings, configure, dependencies, factory
 
 
 CANONICAL = "tools/configure/assemblies/g474-pin-states.toml"
@@ -165,7 +165,7 @@ class PinStateConfigurationTests(unittest.TestCase):
 
     def test_physical_catalogue_contains_exactly_one_new_mode(self):
         from tools.configure import selected_contracts
-        rows = [row for row in selected_contracts.catalogue(configure.ROOT)
+        rows = [row for row in matrix.support_catalogue(configure.ROOT)
                 if row.mode == "named-states"]
         self.assertEqual([(row.family, row.part, row.controller,
                            row.kind, row.implementation, row.reviewed_routes)

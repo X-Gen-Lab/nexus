@@ -7,7 +7,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: cf492c91165d5ab0238449c2fc51cc9d84c4f1a137599f45a0bafd6ff9adcc2e\n"
+"X-Nexus-Source-SHA256: aec0726e00f00a7c457aaea391e40fea2a8202330257c10a37aeba196a400e9c\n"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:9
 msgid "Developer experience and provider iteration"
@@ -30,10 +30,41 @@ msgstr ""
 "需要连接实物设备。实现、软件执行与实板执行分别记录；软件机制不能关闭物理退出条件。"
 
 #: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:20
+msgid ""
+"The subsequent {download}`N01–N14 delivery-completion ledger <platform-"
+"delivery-completion.csv>` and its [readable "
+"view](../status/ledgers/platform-delivery-completion.md) track a separate "
+"follow-up scope. They preserve the original 75-task ledger and its fixed P/E"
+" evidence. This follow-up closes concrete diagnostics, configuration, "
+"consumer-workflow and measurement gaps, then verifies its own final source. "
+"Hardware execution and a formal software candidate have separate exits; "
+"neither inherits an earlier iteration's status. The existing architecture "
+"diagram still applies because these changes refine maintained mechanisms "
+"rather than add a new runtime layer."
+msgstr ""
+"后续的 {download}`N01–N14 交付完善台账 <platform-delivery-"
+"completion.csv>`及其[可读视图](../status/ledgers/platform-delivery-"
+"completion.md)跟踪独立的后续范围，保留原 75 项台账和固定 P/E "
+"证据。本轮修复具体的诊断、配置、消费者工作流与测量缺口，然后验证自身最终源码。硬件执行和正式软件候选各有独立退出条件，都不继承此前迭代状态。既有架构图仍适用，因为这些变更完善维护中的机制，没有新增运行时层。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:30
+msgid ""
+"The {download}`follow-up development index <../delivery/platform-delivery-"
+"completion-results.json>` records current observations without relabeling "
+"old P/E results. Its pending final-source exits require actual complete "
+"gates, fixed examples consumption, offline reproduction and post-merge "
+"association; a prepared plan or successful configuration query cannot close "
+"them."
+msgstr ""
+"{download}`后续开发结果索引 <../delivery/platform-delivery-completion-"
+"results.json>`记录当前观测，不重标旧 P/E 结果。仍待最终源码证据的退出条件，需要实际完整 "
+"gate、固定版本示例消费、离线复现和合并后关联；已准备的计划或成功的配置查询不能关闭这些条件。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:36
 msgid "Boundaries that stay explicit"
 msgstr "保持明确的边界"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:22
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:38
 msgid ""
 "The current [architecture diagram](../explanation/platform-architecture.md) "
 "still applies. One product TOML becomes immutable typed IR and exact static "
@@ -192,11 +223,11 @@ msgstr "真实示例应用、源码锁与公共 SDK 消费"
 msgid "Platform P and examples E are fixed in the final delivery association"
 msgstr "平台 P 与示例 E 在最终交付关联中固定"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:40
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:56
 msgid "Source ownership and migration"
 msgstr "源码归属与迁移"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:58
 msgid ""
 "The H743 DMA2D component lives at "
 "`components/soc/stm32/stm32h743_frame_dma2d`. Its public include "
@@ -208,7 +239,7 @@ msgstr ""
 "`nexus/components/frame_dma2d.h` 与 CMake "
 "目标保持稳定。这是私有源码归属修正，不增加多媒体或硬件支持。历史记录保留其对应版本中的路径。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:48
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:64
 msgid ""
 "`explain` now prints a human summary by default; automation must use "
 "`--json`. The optional owner observation gains admission facts and changes "
@@ -221,7 +252,7 @@ msgstr ""
 "布局，源码消费方需要重新编译。新辅助函数不会向每个 provider "
 "添加必需状态、分配全局注册表或释放借用存储。[产品工作流](../guides/developer-workflow.md)说明这些变化。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:54
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:70
 msgid ""
 "Official library reuse is evaluated per exact operation. A library name "
 "alone does not determine timing or ownership. The F4 HAL reference is finite"
@@ -239,7 +270,7 @@ msgstr ""
 " 或中断式 abort 描述为 `HAL_GetTick` 等待。[官方 provider 合同](official-"
 "stm32-provider.md)继续约束 callback、deadline、唯一 owner 和完整排空。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:64
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:80
 msgid ""
 "The current decision retains the single production LL/provider engine and "
 "GD32 SPL operation reuse. Actual HAL software behavior, current production "
@@ -253,11 +284,11 @@ msgstr ""
 "handle 布局分别记录。参考实现尚未实现完整 NVIC 抢占／向量撤回、IRQ 唤醒、并发 "
 "RX、冷启动回滚或完整平台停止。升级为生产实现及比较等价完整镜像属于后续工作；本轮不提供 HAL 与 LL 的资源排名，也不声称替换生产实现。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:72
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:88
 msgid "Close work with observations"
 msgstr "以实际观察关闭任务"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:90
 msgid ""
 "The ledger records actual implementation and evidence paths, including "
 "limited development tests. The {download}`development result index "
@@ -272,7 +303,7 @@ msgstr ""
 "experience-results.json>` 保留已维护测试入口和观察范围；最终 PR／CI 关联在源码提交产生后记录。最终源码门禁、独立 SDK"
 " 消费与双语文档各有集成退出条件。预期的 CI 运行、模板 manifest 或旧版本结果都不能冒充当前源码的通过结果。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:81
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:97
 msgid ""
 "Platform commit P is created before examples lock and gitlink are updated to"
 " P. Examples commit E is then recorded with P by the delivery association. "
@@ -283,7 +314,7 @@ msgstr ""
 "先创建平台提交 P，再将示例源码锁和 gitlink 更新为 P。随后在交付关联中记录示例提交 E 与 "
 "P。教程使用该记录提供的显式示例版本变量；两个仓库都不嵌入对方尚未产生的提交。正常评审与发布控制继续生效。"
 
-#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:87
+#: ../../../../tmp/nexus-quality-20261019/docs/design/developer-experience.md:103
 msgid ""
 "No physical station is connected for this iteration. H1–H6 remain "
 "`not_executed`: launch-board bring-up and tools; serial/SPI/I2C and "

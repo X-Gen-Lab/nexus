@@ -284,6 +284,21 @@ remain separate evidence. A successful future run can establish only its actual
 source, image and reproduced scope; it does not close the full IO-24 exit or
 change physical HIL from `not_executed`.
 
+The same ELF audit reports `public_flash_linkage`. `retained_verified` means the
+observed readonly operation table contains four Thumb pointers associated with
+the known public operations in `flash.c`. `not_retained` means the named table
+was not observed. `retained_not_proved` preserves retained executable targets
+whose method identity cannot be proved after LTO renaming or missing metadata;
+it neither rejects a valid build nor claims verified method identity. Explicit
+null, non-Thumb or recognized invalid entries still reject. This distinction
+does not relax the existing RAM closure proof; RAM-pod retention cannot replace
+public-face linkage evidence.
+
+`linked_resources` reports whole-image allocation through the existing resource
+observer. The RAM pod and workspace are subsets of those totals, not additional
+allocations to sum again. These observations audit actual linked bytes; they do
+not execute a Flash pulse, establish a stack peak or measure busy-bank behavior.
+
 | Evidence required before software exit | Boundary |
 | --- | --- |
 | Real GoogleTest/GoogleMock RED then GREEN | Actual provider/bridge boundary, failures, late drain and instance isolation; no mock implementation |

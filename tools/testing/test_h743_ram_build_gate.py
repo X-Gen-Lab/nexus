@@ -39,11 +39,10 @@ class H743RamBuildGateTests(unittest.TestCase):
                     json.dumps(str(ROOT / "boards/stm32h743zi_hsi_reference")) +
                     '\nbackend = "baremetal"\nclock = ' + json.dumps(clock) +
                     '\n[memory]\nmain_stack_bytes = 2048\nlibc_heap_bytes = 0\n'
-                    'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n')
+                    'static_ram_limit_bytes = 16384\nflash_load_limit_bytes = 65536\n'
+                    '\n[gpio.led]\nbinding = "led0"\nmode = "output"\n')
             if profile != "unselected":
                 text += '\n[flash.storage]\nbinding = "flash0"\nmode = "poll-word"\n'
-            else:
-                text += '\n[gpio.led]\nbinding = "led0"\nmode = "output"\n'
             assembly.write_text(text)
             build = directory / "build"
             command = ["cmake", "-S", str(ROOT), "-B", str(build), "-G", "Ninja",
@@ -119,6 +118,14 @@ class H743RamBuildGateTests(unittest.TestCase):
                 pulses = closure["program_invocations"]
                 self.assertEqual(1, pulses["maximum_invocations"])
                 self.assertEqual(8, pulses["maximum_dynamic_word_stores"])
+                linkage = report["public_flash_linkage"]
+                self.assertEqual("retained_verified", linkage["status"])
+                self.assertEqual(["geometry", "read", "program", "erase"],
+                                 [row["operation"] for row in linkage["operations"]])
+                resources = report["linked_resources"]
+                self.assertGreater(resources["flash"]["loaded_bytes"],
+                                   report["ram_layout"]["copied_bytes"])
+                self.assertEqual("not_measured", resources["dynamic_high_water"])
 
     def test_unselected_build_has_no_pod_audit_or_stack_usage_cost(self):
         build = self.projects["unselected"]
@@ -127,6 +134,29 @@ class H743RamBuildGateTests(unittest.TestCase):
         elf = (build / "bin/io_evolution_fixture.elf").read_bytes()
         from tools.measurement.elf import Elf32
         self.assertNotIn("nx_stm32h743_flash_ram_enter", Elf32(elf).symbols)
+
+    def test_real_public_ops_words_must_bind_the_selected_flash_methods(self):
+        from tools.measurement.elf import Elf32
+        original = (self.selected() / "bin/io_evolution_fixture.elf").read_bytes()
+        image = Elf32(original)
+        address = image.symbol("nx_stm32h743_flash_ops")
+        load, = [row for row in image.loads
+                 if row["virtual"] <= address < address + 16 <=
+                 row["virtual"] + row["files"]]
+        offset = load["offset"] + address - load["virtual"]
+        for name, replacement in (("null", b"\0" * 4),
+                                  ("swapped", original[offset + 8:offset + 12])):
+            with self.subTest(name=name):
+                changed = bytearray(original)
+                changed[offset:offset + 4] = replacement
+                path = self.root / ("changed-ops-" + name + ".elf")
+                path.write_bytes(changed)
+                result, output = self.invoke(elf=path, report=self.root /
+                                             ("changed-ops-" + name + ".json"))
+                self.assertNotEqual(0, result.returncode)
+                report = json.loads(output.read_text())
+                self.assertEqual("failed", report["status"])
+                self.assertIn("public Flash ops word", report["failure"])
 
     def test_real_image_guard_record_must_match_its_linked_endpoints(self):
         from tools.measurement.elf import Elf32

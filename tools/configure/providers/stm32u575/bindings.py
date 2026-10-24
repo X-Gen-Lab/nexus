@@ -1,10 +1,14 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 try:
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
+try:
     from ... import enhanced_endpoints, uart_formats
 except ImportError:
     import enhanced_endpoints
     import uart_formats
-from ..common import Construction, controller_ir, fail, kernel_policy_constant
+from ..common import Construction, fail, kernel_policy_constant
 
 
 def _gpdma_uart(item, result, state, name, capacity):
@@ -71,7 +75,7 @@ def _lptim(item, result):
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct the selected exact static provider and cold resource leases."""
-    from . import mode_implementation, validate_selection
+    from .contract import mode_implementation, validate_selection
     item = controller_ir(item, "stm32u575")
     if item.kind == "rtc":
         if result["backend"] != "baremetal":
