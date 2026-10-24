@@ -123,7 +123,7 @@ class U575Sram4ConfigurationTests(unittest.TestCase):
                     f'set(NEXUS_SOURCE_DIR "{gate.ROOT}")\n'
                     f'set(NEXUS_CONFIG_DIR "{output}")\n'
                     f'set(NEXUS_MEMORY_SRAM4 {selected})\n'
-                    f'add_subdirectory("{gate.ROOT / "soc/stm32u575"}" soc)\n'
+                    f'add_subdirectory("{gate.ROOT / "soc/stm32/stm32u575"}" soc)\n'
                     'if(NOT "STM32U575xx" IN_LIST NEXUS_SYSTEM_COMPILE_DEFINITIONS)\n'
                     '  message(FATAL_ERROR "Exact startup part define missing")\n'
                     'endif()\n'

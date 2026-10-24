@@ -181,13 +181,13 @@ class RuntimeConsumerAssertions:
         commands = json.loads((build / "compile_commands.json").read_text())
         self.assertGreater(len(commands), 4)
         names = {Path(command["file"]).name for command in commands}
-        self.assertTrue({"request.c", "nx_arch_native.c", "gpio.c",
-                         "notify.c", "main.c", "main.cpp"} <= names)
+        self.assertLessEqual({"request.c", "nx_arch_native.c", "gpio.c",
+                              "notify.c", "main.c", "main.cpp"}, names)
         for command in commands:
             arguments = command.get("command", "")
             self.assertNotIn("/vendors/", arguments)
             self.assertNotIn("/soc/", arguments)
-            self.assertNotIn("/io/native/", arguments)
+            self.assertNotIn("/soc/native/drivers/", arguments)
             self.assertNotIn("/os/native/", arguments)
             self.assertNotIn("googletest", arguments)
             self.assertNotIn("googlemock", arguments)
@@ -439,10 +439,10 @@ class RuntimeInstalledSDKTests(RuntimeConsumerAssertions, unittest.TestCase):
                 "tools/configure/cpu.py", "tools/configure/kernel.py",
                 "arch/include/nexus/arch/atomic.h",
                 "arch/include/nexus/arch/features.h",
-                "arch/cortex_m/private/mechanisms.h",
-                "arch/cortex_m/nx_arch_cache.c",
-                "arch/cortex_m/nx_arch_mpu.c",
-                "arch/cortex_m/nx_arch_security.c"))
+                "arch/arm/cortex_m/private/mechanisms.h",
+                "arch/arm/cortex_m/nx_arch_cache.c",
+                "arch/arm/cortex_m/nx_arch_mpu.c",
+                "arch/arm/cortex_m/nx_arch_security.c"))
 
     def test_rehashed_missing_kernel_optional_closures_fail_closed(self):
         files = (

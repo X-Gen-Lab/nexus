@@ -1,14 +1,18 @@
 """Reviewed STM32 fixed construction, never a runtime resource allocator."""
 try:
-    from ...emission import dma_regions
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
+try:
+    from ...memory import dma_regions
     from ...gpio_phase import rollback_pin, withdraw_pin
     from ... import enhanced_endpoints, uart_formats
 except ImportError:
-    from emission import dma_regions
+    from memory import dma_regions
     from gpio_phase import rollback_pin, withdraw_pin
     import enhanced_endpoints
     import uart_formats
-from ..common import Construction, controller_ir, mode_traits
+from ..common import Construction, mode_traits
 from .. import hardware
 try:
     from ... import can, usb_device, ethernet, timer_advanced, secondary_controllers
@@ -18,7 +22,7 @@ except ImportError:
     import ethernet
     import timer_advanced
     import secondary_controllers
-from . import ADC_CHANNEL_SEQUENCES, LIMITS
+from .contract import ADC_CHANNEL_SEQUENCES, LIMITS
 
 
 def _symbol(value):
@@ -492,7 +496,7 @@ def _controller_constructor(item, result, board_bindings, routes, devices):
                  f"    RCC->AHB1ENR = (RCC->AHB1ENR & ~{mask}u) | saved_ahb1 | retained_gpio_clocks;",
                  "    nx_arch_dsb();", "    return status;"]
     body.append("}")
-    from . import mode_implementation
+    from .contract import mode_implementation
     implementation = mode_implementation(item.kind, item.mode)
     return Construction(
         state_type=f"nx_stm32_{implementation}_state_t",
@@ -651,7 +655,7 @@ def _uart_constructor(item, result):
         definitions[rejected:rejected] = [
             f'        if (s_nx_port_{name}.initialized) {{ return uart; }}']
     if traits.dma:
-        from . import _FIXED_DMA
+        from .contract import _FIXED_DMA
         expected = _FIXED_DMA.get((item["controller"], item.mode))
         if tuple(item.get("dma", ())) != expected:
             raise ValueError("UART DMA differs from its reviewed fixed route")

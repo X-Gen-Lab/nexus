@@ -1,9 +1,0 @@
-Running main() from gmock_main.cc
-UsbSoc.
-  RealRegisterFactsAndClockConsumerSurviveUntilDetach
-  ActualSdkEndpointOffsetWritesPioAndWaitsForHostXfrc
-  FalseCpuFactsRejectBeforeBorrowingTheClock
-  ForeignCoreIsNotReboundOrReset
-  FailedCoreResetKeepsClockAndOwnerStorage
-  FreshResetFailureCanBeStoppedWithoutDereferencingNullEndpoint
-  FreshFlushFailureRetainsClockUntilBoundedStopRetry

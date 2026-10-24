@@ -7,13 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bc74e6fe204936dd37b0425ca3384dd9de8200a2e8ac2c3d62f27142c1d07a39\n"
+"X-Nexus-Source-SHA256: 106f592299a30bbdfc5c4c0e2c51bba3ab9dbee0391cbd176c926879ccf43643\n"
 
-#: ../../../../docs/explanation/source-map.md:8
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:8
 msgid "Source-adjacent contracts"
 msgstr "Source-adjacent contracts"
 
-#: ../../../../docs/explanation/source-map.md:10
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:10
 msgid ""
 "The layer README files remain canonical beside their implementation. The "
 "following inclusions read those exact files rather than copying a second "
@@ -23,15 +23,43 @@ msgstr ""
 "following inclusions read those exact files rather than copying a second "
 "contract. Relative source links are bound to the website source revision."
 
-#: ../../../../docs/explanation/source-map.md:14
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:14
+msgid ""
+"The physical layout groups Arm CPU implementations by ISA and MCU packages "
+"by vendor. Family identifiers, public include paths and explicit target "
+"names remain stable. These are source ownership groups, not runtime "
+"forwarding layers."
+msgstr ""
+"The physical layout groups Arm CPU implementations by ISA and MCU packages "
+"by vendor. Family identifiers, public include paths and explicit target "
+"names remain stable. These are source ownership groups, not runtime "
+"forwarding layers."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:18
+msgid ""
+"Historical development collections are retained in the [evidence "
+"archive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/docs/archive/evidence/README.md) with exact member identities and "
+"restore instructions. Their original source and execution scope remain "
+"unchanged; archive restoration does not establish current-source "
+"qualification."
+msgstr ""
+"Historical development collections are retained in the [evidence "
+"archive](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/docs/archive/evidence/README.md) with exact member identities and "
+"restore instructions. Their original source and execution scope remain "
+"unchanged; archive restoration does not establish current-source "
+"qualification."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:44
 msgid "Core"
 msgstr "Core"
 
-#: ../../../../core/README.md:2
+#: ../../../../tmp/nexus-quality-20261019/core/README.md:2
 msgid "Core contracts"
 msgstr "Core contracts"
 
-#: ../../../../core/README.md:4
+#: ../../../../tmp/nexus-quality-20261019/core/README.md:4
 msgid ""
 "C11 caller-owned request admission, stable control identities, completion "
 "state and monotonic absolute deadlines. No devices, OS scheduler, allocation"
@@ -41,7 +69,7 @@ msgstr ""
 "state and monotonic absolute deadlines. No devices, OS scheduler, allocation"
 " or global registry. Public interfaces are in `include/nexus/core`."
 
-#: ../../../../core/README.md:8
+#: ../../../../tmp/nexus-quality-20261019/core/README.md:8
 msgid ""
 "REJECTED retains no references. An accepted chain borrows request and "
 "buffers until acquire-observed SETTLED. SETTLED is its last request access. "
@@ -57,7 +85,7 @@ msgstr ""
 "the operation. Queue adapters own their outer request and use explicit inner"
 " provider metadata where needed."
 
-#: ../../../../core/README.md:14
+#: ../../../../tmp/nexus-quality-20261019/core/README.md:14
 msgid ""
 "`tests/contracts/core_contract_test.c` executes publication, admission, "
 "wrapping time arithmetic and terminal-state invariants. Host results do not "
@@ -67,15 +95,31 @@ msgstr ""
 "wrapping time arithmetic and terminal-state invariants. Host results do not "
 "prove MCU interrupt ordering or worst-case execution time."
 
-#: ../../../../docs/explanation/source-map.md:21
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:51
 msgid "Arch"
 msgstr "Arch"
 
-#: ../../../../arch/README.md:2
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:2
 msgid "CPU-local primitives"
 msgstr "CPU-local primitives"
 
-#: ../../../../arch/README.md:4
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:4
+msgid ""
+"Public headers remain in `include/nexus/arch/`. Arm Cortex-M implementation "
+"sources live in `arm/cortex_m/`, and host primitives live in `native/`. The "
+"ISA directory is a build-time ownership boundary; CPU facts select one "
+"implementation without a runtime CPU factory. A new architecture needs its "
+"own reviewed implementation and compiler contract rather than a placeholder "
+"support claim."
+msgstr ""
+"Public headers remain in `include/nexus/arch/`. Arm Cortex-M implementation "
+"sources live in `arm/cortex_m/`, and host primitives live in `native/`. The "
+"ISA directory is a build-time ownership boundary; CPU facts select one "
+"implementation without a runtime CPU factory. A new architecture needs its "
+"own reviewed implementation and compiler contract rather than a placeholder "
+"support claim."
+
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:10
 msgid ""
 "`Nexus::Arch` exposes saved interrupt masks, exact exception identity, "
 "current privilege, ordering barriers and an optional already-enabled DWT "
@@ -103,7 +147,7 @@ msgstr ""
 "startup or factory. See [CPU contracts](/design/arch-contracts.md) and the "
 "[runtime assembly example](/delivery/cortex-m.md)."
 
-#: ../../../../arch/README.md:16
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:22
 msgid ""
 "Save/restore tokens on the same CPU/thread in strict reverse order. Cortex-M"
 " preserves incoming PRIMASK and does not overwrite BASEPRI/FAULTMASK where "
@@ -121,7 +165,7 @@ msgstr ""
 "large copies, kernel calls or user callbacks. A saved Arch token is not a "
 "kernel critical-section token or an SMP lock."
 
-#: ../../../../arch/README.md:24
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:30
 msgid ""
 "Mask/context queries let blocking I/O reject contexts that prevent its "
 "progress. The read-only mask snapshot distinguishes PRIMASK, BASEPRI and "
@@ -155,7 +199,7 @@ msgstr ""
 "are explicit CPU facts, never inferred by probing arbitrary registers or "
 "enabling optional units."
 
-#: ../../../../arch/README.md:38
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:44
 msgid ""
 "`sleep.h` exposes two explicit shallow-sleep operations. The masked "
 "`nx_arch_wait_for_interrupt()` requires privileged Thread mode, PRIMASK=1, "
@@ -189,7 +233,7 @@ msgstr ""
 "evidence does not qualify a concrete timer, clock continuity, physical power"
 " behavior or wake latency."
 
-#: ../../../../arch/README.md:53
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:59
 msgid ""
 "`cache.h` exposes distinct data clean, invalidate, combined maintenance and "
 "instruction synchronization. Every range must own complete reviewed 32-byte "
@@ -235,7 +279,7 @@ msgstr ""
 "caller. The optional M0+ MPU uses the v7-format registers confirmed by "
 "CMSIS."
 
-#: ../../../../arch/README.md:73
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:79
 msgid ""
 "`security.h` identifies the reviewed image state and encodes explicit SAU "
 "regions. Only a Secure compiler/profile with reviewed SAU regions can "
@@ -253,7 +297,7 @@ msgstr ""
 " unsupported without SAU MMIO. IDAU, overlap rules, memory permissions and "
 "gateway policy stay outside these mechanisms."
 
-#: ../../../../arch/README.md:80
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:86
 msgid ""
 "`nonsecure.h` supplies an instantaneous Secure Thread observation of a "
 "complete span using the actual CMSE NonSecure unprivileged read or "
@@ -273,7 +317,7 @@ msgstr ""
 " must separately establish these conditions before accessing memory or "
 "performing an operation."
 
-#: ../../../../arch/README.md:88
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:94
 msgid ""
 "`features.h` reports immutable reviewed cache/MPU/DWT/security/SAU "
 "capabilities, not enabled state or hardware qualification. Native exposes "
@@ -307,7 +351,7 @@ msgstr ""
 "establish a fixed cycle bound. Initialize words before publication and "
 "retain their lifetime until every reader/writer has stopped."
 
-#: ../../../../arch/README.md:103
+#: ../../../../tmp/nexus-quality-20261019/arch/README.md:109
 msgid ""
 "Native models recursive exclusion and C11 fences; it does not model real "
 "NVIC, DMA, physical timing or signal-safe interrupts. Invalid restore "
@@ -335,105 +379,285 @@ msgstr ""
 "establish the maintained register layouts. Actual IRQ latency, privilege "
 "transitions, DMA/cache coherency and CPU timing require HIL."
 
-#: ../../../../docs/explanation/source-map.md:28 ../../../../io/README.md:2
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:58
 msgid "Typed I/O"
 msgstr "Typed I/O"
 
-#: ../../../../io/README.md:17
-msgid ""
-"Public operations check the face and dispatch its exact context. Different "
-"provider tables can coexist in one image without redefining public symbols. "
-"A missing optional method reports `NX_ERROR_UNSUPPORTED`; invalid faces "
-"reject before provider access. A method must preserve the public operation's"
-" execution, deadline, buffer ownership and failure contract. Provider "
-"headers, register layouts and SDK types stay private."
-msgstr ""
-"Public operations check the face and dispatch its exact context. Different "
-"provider tables can coexist in one image without redefining public symbols. "
-"A missing optional method reports `NX_ERROR_UNSUPPORTED`; invalid faces "
-"reject before provider access. A method must preserve the public operation's"
-" execution, deadline, buffer ownership and failure contract. Provider "
-"headers, register layouts and SDK types stay private."
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:2
+msgid "Typed I/O contracts and shared mechanisms"
+msgstr "Typed I/O contracts and shared mechanisms"
 
-#: ../../../../io/README.md:24
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:4
 msgid ""
-"Generated typed factory IDs select instances and distinguish SPI/I2C "
-"controllers from their child endpoints. Lookup returns a static identity. "
-"Platform start, request admission, service, recovery and stop remain "
-"explicit; lookup performs no hardware initialization, allocation, name "
-"search or locking. Faces remain valid while provider storage exists, so "
-"stopping requires caller and IRQ quiescence rather than promising that a "
-"pointer has been revoked."
+"Public C11 interfaces cover GPIO, UART, SPI, I2C, physical Flash, watchdog, "
+"interrupt/timer/acquisition mechanisms, CAN, USB, Ethernet and selected "
+"RTC/LPTIM contracts. The [derived capability "
+"matrix](/delivery/capabilities.md) identifies actual provider modes and "
+"reviewed routes. An interface header alone does not provide every operation "
+"on every chip or authorize PCB wiring."
 msgstr ""
-"Generated typed factory IDs select instances and distinguish SPI/I2C "
-"controllers from their child endpoints. Lookup returns a static identity. "
-"Platform start, request admission, service, recovery and stop remain "
-"explicit; lookup performs no hardware initialization, allocation, name "
-"search or locking. Faces remain valid while provider storage exists, so "
-"stopping requires caller and IRQ quiescence rather than promising that a "
-"pointer has been revoked."
+"Public C11 interfaces cover GPIO, UART, SPI, I2C, physical Flash, watchdog, "
+"interrupt/timer/acquisition mechanisms, CAN, USB, Ethernet and selected "
+"RTC/LPTIM contracts. The [derived capability "
+"matrix](/delivery/capabilities.md) identifies actual provider modes and "
+"reviewed routes. An interface header alone does not provide every operation "
+"on every chip or authorize PCB wiring."
 
-#: ../../../../io/README.md:31
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Source group"
+msgstr "Source group"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Responsibility"
+msgstr "Responsibility"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`include/nexus/io/`"
+msgstr "`include/nexus/io/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Stable public Nexus types and operation/ownership contracts"
+msgstr "Stable public Nexus types and operation/ownership contracts"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`src/api/`"
+msgstr "`src/api/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Checked dispatch through the selected immutable face"
+msgstr "Checked dispatch through the selected immutable face"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`src/mechanisms/`"
+msgstr "`src/mechanisms/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Shared stream, DMA drain, wake, transaction and observation rules"
+msgstr "Shared stream, DMA drain, wake, transaction and observation rules"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`src/controllers/`"
+msgstr "`src/controllers/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid ""
-"Stream reserve, publish, acquire, release, abort and stop access constant "
-"metadata independent of block count. Stop checks an outstanding-block count;"
-" filling, ready and borrowed blocks remain counted until proved abort or "
-"matching release. It never scans the block array or revokes a loan under the"
-" interrupt mask. Storage overlap validation remains a cold assembly "
-"operation whose work grows with block count. This complexity contract is not"
-" physical IRQ latency or cycle qualification."
+"Shared CAN, USB and Ethernet controller engines selected by SoC targets"
 msgstr ""
-"Stream reserve, publish, acquire, release, abort and stop access constant "
-"metadata independent of block count. Stop checks an outstanding-block count;"
-" filling, ready and borrowed blocks remain counted until proved abort or "
-"matching release. It never scans the block array or revokes a loan under the"
-" interrupt mask. Storage overlap validation remains a cold assembly "
-"operation whose work grows with block count. This complexity contract is not"
-" physical IRQ latency or cycle qualification."
+"Shared CAN, USB and Ethernet controller engines selected by SoC targets"
 
-#: ../../../../io/README.md:39
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`private/`"
+msgstr "`private/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
 msgid ""
-"Default paths need no OS locks or hidden tasks. Requests and transfer "
-"buffers remain caller-owned; generated provider buffers are assembly-owned "
-"and separate. UART tracks physical TC separately from loaded bytes and "
-"request release; error-only RX events never invent data. SPI and I2C "
-"preserve their bounded polling contracts, and controller recovery never "
-"replays a failed transaction. Flash exposes physical geometry; products "
-"provide explicit restricted regions."
+"Private engine structures, hardware boundaries and direct provider templates"
 msgstr ""
-"Default paths need no OS locks or hidden tasks. Requests and transfer "
-"buffers remain caller-owned; generated provider buffers are assembly-owned "
-"and separate. UART tracks physical TC separately from loaded bytes and "
-"request release; error-only RX events never invent data. SPI and I2C "
-"preserve their bounded polling contracts, and controller recovery never "
-"replays a failed transaction. Flash exposes physical geometry; products "
-"provide explicit restricted regions."
+"Private engine structures, hardware boundaries and direct provider templates"
 
-#: ../../../../io/README.md:46
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`../soc/native/drivers/`"
+msgstr "`../soc/native/drivers/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Independent host models implementing the same public faces"
+msgstr "Independent host models implementing the same public faces"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "`../soc/<vendor>/<family>/drivers/`"
+msgstr "`../soc/<vendor>/<family>/drivers/`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:60
+msgid "Exact MCU provider and mode implementations"
+msgstr "Exact MCU provider and mode implementations"
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:20
 msgid ""
-"The Native model owns independent state per instance. Its explicit default "
-"fixtures support focused tests; generated assemblies use separate state and "
-"buffers. Native behavior, production-register fault models and ARM link "
-"fixtures establish software evidence. Board facts authorize reviewed "
-"physical routes; software-only fixtures do not establish PCB connectivity or"
-" physical timing."
+"Every selected instance has a readonly face containing shared readonly "
+"methods and an independent private context. On a 32-bit target the face "
+"occupies eight bytes of readonly storage; method tables, mutable state, "
+"selected buffers and linked code have separate costs. Generated instances "
+"use exact static storage; explicit constructors use storage provided by "
+"their owner. Public consumers receive no vendor register layout or SDK state"
+" type."
 msgstr ""
-"The Native model owns independent state per instance. Its explicit default "
-"fixtures support focused tests; generated assemblies use separate state and "
-"buffers. Native behavior, production-register fault models and ARM link "
-"fixtures establish software evidence. Board facts authorize reviewed "
-"physical routes; software-only fixtures do not establish PCB connectivity or"
-" physical timing."
+"Every selected instance has a readonly face containing shared readonly "
+"methods and an independent private context. On a 32-bit target the face "
+"occupies eight bytes of readonly storage; method tables, mutable state, "
+"selected buffers and linked code have separate costs. Generated instances "
+"use exact static storage; explicit constructors use storage provided by "
+"their owner. Public consumers receive no vendor register layout or SDK state"
+" type."
 
-#: ../../../../docs/explanation/source-map.md:35
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:27
+msgid ""
+"Public operations validate the face and dispatch `ops(context, ...)`. "
+"Providers can use direct private calls within their register hot paths. A "
+"missing optional method reports `NX_ERROR_UNSUPPORTED`. Different "
+"provider/mode tables coexist without replacing public symbols. IRQ entries "
+"are fixed to the selected concrete instances and do not look up a factory "
+"for each byte."
+msgstr ""
+"Public operations validate the face and dispatch `ops(context, ...)`. "
+"Providers can use direct private calls within their register hot paths. A "
+"missing optional method reports `NX_ERROR_UNSUPPORTED`. Different "
+"provider/mode tables coexist without replacing public symbols. IRQ entries "
+"are fixed to the selected concrete instances and do not look up a factory "
+"for each byte."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:33
+msgid ""
+"Generated factory getters return existing identities. Lookup, Platform "
+"start, request admission, service, recovery and stop remain separate "
+"actions. Controller and endpoint identities stay distinct for SPI/I2C buses."
+" New products should use the generated strong-reference header; see the "
+"[factory contract](/explanation/factory.md) for headers and ID lifetime."
+msgstr ""
+"Generated factory getters return existing identities. Lookup, Platform "
+"start, request admission, service, recovery and stop remain separate "
+"actions. Controller and endpoint identities stay distinct for SPI/I2C buses."
+" New products should use the generated strong-reference header; see the "
+"[factory contract](/explanation/factory.md) for headers and ID lifetime."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:39
+msgid ""
+"The direct path has one serialized executor in each operation's allowed "
+"context. Requests and transfer buffers remain caller-owned through acquire-"
+"observed SETTLED. Cancel, deadline and failed drain never revoke a borrow. A"
+" provider withdraws hardware, IRQ and deferred references before its final "
+"release publication; QUARANTINED storage and cleanup responsibility remain "
+"retained. The [ownership table](/explanation/ownership.md) distinguishes "
+"direct calls, fixed IRQ work, cross-task adapters, waiting and shutdown."
+msgstr ""
+"The direct path has one serialized executor in each operation's allowed "
+"context. Requests and transfer buffers remain caller-owned through acquire-"
+"observed SETTLED. Cancel, deadline and failed drain never revoke a borrow. A"
+" provider withdraws hardware, IRQ and deferred references before its final "
+"release publication; QUARANTINED storage and cleanup responsibility remain "
+"retained. The [ownership table](/explanation/ownership.md) distinguishes "
+"direct calls, fixed IRQ work, cross-task adapters, waiting and shutdown."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:47
+msgid ""
+"`nexus/io/diagnostic.h` composes copied request/stream observations and "
+"explicitly known lifecycle, owner admission, service-time and observer-join "
+"facts. The result retains independent finding bits and unknown fact groups. "
+"An unchanged request does not prove a missed service; a service-gap finding "
+"requires explicit timestamps and a declared budget in the same monotonic "
+"domain. Neither this helper nor a readable reason key touches live hardware "
+"or changes ownership. SETTLED does not prove successful transfer or joined "
+"observers. An outstanding stream count includes producer, ready and consumer"
+" loans, and a busy ordinary cursor does not describe a private preposted "
+"cursor. Unknown facts remain unknown; an empty finding mask does not "
+"establish health."
+msgstr ""
+"`nexus/io/diagnostic.h` composes copied request/stream observations and "
+"explicitly known lifecycle, owner admission, service-time and observer-join "
+"facts. The result retains independent finding bits and unknown fact groups. "
+"An unchanged request does not prove a missed service; a service-gap finding "
+"requires explicit timestamps and a declared budget in the same monotonic "
+"domain. Neither this helper nor a readable reason key touches live hardware "
+"or changes ownership. SETTLED does not prove successful transfer or joined "
+"observers. An outstanding stream count includes producer, ready and consumer"
+" loans, and a busy ordinary cursor does not describe a private preposted "
+"cursor. Unknown facts remain unknown; an empty finding mask does not "
+"establish health."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:58
+msgid ""
+"Stream reserve, publish, acquire, release, abort and stop access a constant "
+"amount of metadata independent of block count. Stop checks the outstanding "
+"count and does not scan or revoke borrowed blocks under an interrupt mask. "
+"Cold storage-overlap validation examines the complete selected block set; it"
+" has a different cost. These software complexity contracts do not establish "
+"physical IRQ latency."
+msgstr ""
+"Stream reserve, publish, acquire, release, abort and stop access a constant "
+"amount of metadata independent of block count. Stop checks the outstanding "
+"count and does not scan or revoke borrowed blocks under an interrupt mask. "
+"Cold storage-overlap validation examines the complete selected block set; it"
+" has a different cost. These software complexity contracts do not establish "
+"physical IRQ latency."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:64
+msgid ""
+"DMA memory completion, peripheral wire completion and request settlement are"
+" separate facts. Providers check exact DMA reachability, selected domains, "
+"Cache ownership and real source withdrawal. Finite and continuous modes have"
+" distinct loan/rearm/backpressure contracts. Default paths add no mandatory "
+"OS locks, hidden driver tasks or universal buffer pools. The [DMA and stream"
+" contracts](/design/io-evolution.md) own exact scope."
+msgstr ""
+"DMA memory completion, peripheral wire completion and request settlement are"
+" separate facts. Providers check exact DMA reachability, selected domains, "
+"Cache ownership and real source withdrawal. Finite and continuous modes have"
+" distinct loan/rearm/backpressure contracts. Default paths add no mandatory "
+"OS locks, hidden driver tasks or universal buffer pools. The [DMA and stream"
+" contracts](/design/io-evolution.md) own exact scope."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:71
+msgid ""
+"`nx_dma_storage_validate` checks a caller's explicit whole reservation "
+"separately from the transfer payload. For example, an aligned 64-byte "
+"reservation may carry a 17-byte payload while exclusively owning two 32-byte"
+" cache lines. Address and capacity must already fit the declared alignment, "
+"complete DMA-visible domain and optional whole-line geometry; no rounding, "
+"allocation or hidden bounce buffer occurs. The caller supplies reviewed "
+"geometry and exclusive ownership. The provider still validates the selected "
+"mode and actual cache/DMA capabilities and performs necessary maintenance. "
+"Cancel or deadline expiry never permits storage reuse before drain and "
+"acquire-observed settlement."
+msgstr ""
+"`nx_dma_storage_validate` checks a caller's explicit whole reservation "
+"separately from the transfer payload. For example, an aligned 64-byte "
+"reservation may carry a 17-byte payload while exclusively owning two 32-byte"
+" cache lines. Address and capacity must already fit the declared alignment, "
+"complete DMA-visible domain and optional whole-line geometry; no rounding, "
+"allocation or hidden bounce buffer occurs. The caller supplies reviewed "
+"geometry and exclusive ownership. The provider still validates the selected "
+"mode and actual cache/DMA capabilities and performs necessary maintenance. "
+"Cancel or deadline expiry never permits storage reuse before drain and "
+"acquire-observed settlement."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:81
+msgid ""
+"The optional [USB activation contract](/design/usb-device.md) keeps a "
+"separate immutable activation face and the existing provider context. Its "
+"selected nonzero endpoint setter is a bounded controller action; external "
+"Chapter 9 policy owns configuration, rollback and ordinary packet admission."
+" It adds no default worker or configuration transaction. The public "
+"declaration retains its context, partial-effect and full-stop obligations."
+msgstr ""
+"The optional [USB activation contract](/design/usb-device.md) keeps a "
+"separate immutable activation face and the existing provider context. Its "
+"selected nonzero endpoint setter is a bounded controller action; external "
+"Chapter 9 policy owns configuration, rollback and ordinary packet admission."
+" It adds no default worker or configuration transaction. The public "
+"declaration retains its context, partial-effect and full-stop obligations."
+
+#: ../../../../tmp/nexus-quality-20261019/io/README.md:88
+msgid ""
+"Native, production-register models, selected ARM links and physical HIL "
+"establish different evidence. Independent instance state and source-"
+"directory organization do not establish electrical behavior, measured timing"
+" or losslessness under arbitrary load. MCU physical HIL remains "
+"`not_executed`."
+msgstr ""
+"Native, production-register models, selected ARM links and physical HIL "
+"establish different evidence. Independent instance state and source-"
+"directory organization do not establish electrical behavior, measured timing"
+" or losslessness under arbitrary load. MCU physical HIL remains "
+"`not_executed`."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:65
 msgid "OS adapters"
 msgstr "OS adapters"
 
-#: ../../../../os/README.md:2
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:2
 msgid "Optional OS adapters"
 msgstr "Optional OS adapters"
 
-#: ../../../../os/README.md:4
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:4
 msgid ""
 "Thin wait/wake and per-object storage contracts. Baremetal has no scheduler;"
 " Native uses POSIX threads; FreeRTOS uses explicit static TCB, stack and "
@@ -445,7 +669,21 @@ msgstr ""
 "queue storage selected by the caller. No universal maximum pool, hidden "
 "worker, default timer daemon or device dependency on OS."
 
-#: ../../../../os/README.md:9
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:9
+msgid ""
+"The common public abstraction is the wait/wake port. Task, queue, join and "
+"storage APIs are deliberately backend-specific and expose the selected "
+"kernel's real control-block requirements. A product switching kernels adapts"
+" its task lifecycle explicitly; the platform supplies no universal "
+"Task/Queue ABI or maximum storage pool."
+msgstr ""
+"The common public abstraction is the wait/wake port. Task, queue, join and "
+"storage APIs are deliberately backend-specific and expose the selected "
+"kernel's real control-block requirements. A product switching kernels adapts"
+" its task lifecycle explicitly; the platform supplies no universal "
+"Task/Queue ABI or maximum storage pool."
+
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:15
 msgid ""
 "Notifications are hints: arm/recheck the authoritative request predicate. "
 "Kernel ISR operations validate the selected syscall ceiling. Native task "
@@ -465,7 +703,7 @@ msgstr ""
 "detachment. Applications own scheduler start, workers, queue depth, fairness"
 " and shutdown progress."
 
-#: ../../../../os/README.md:17
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:23
 msgid ""
 "The real FreeRTOS POSIX scheduler fixture validates host task/queue "
 "lifecycle. The default privileged runtime selects exact pinned kernel "
@@ -487,7 +725,7 @@ msgstr ""
 "qualify MCU exception priority, FP/MVE context switches, stack high-water or"
 " timing."
 
-#: ../../../../os/README.md:26
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:32
 msgid ""
 "Running APIs require privileged, unmasked Thread mode. Before scheduler "
 "start, the pinned Baseline ports may retain PRIMASK=1 and Mainline ports "
@@ -507,7 +745,7 @@ msgstr ""
 " the PRIMASK kernel contract; Mainline IRQ wakes validate implemented "
 "bounds, priority width and syscall ceiling."
 
-#: ../../../../os/README.md:34
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:40
 msgid ""
 "Armv8-M supports explicit NTZ, Secure-only, and Nonsecure standalone build "
 "modes. The selected NTZ kernels do not allocate Secure task contexts or "
@@ -533,7 +771,7 @@ msgstr ""
 "split security, are rejected. See the OS contracts and current matrix before"
 " selecting an optional isolation profile."
 
-#: ../../../../os/README.md:45
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:51
 msgid ""
 "Explicit split mode instead selects the real TrustZone-aware Nonsecure ports"
 " and a separately linked Secure baremetal Runtime with "
@@ -563,7 +801,7 @@ msgstr ""
 "and host lease tests do not qualify physical attribution, context retention,"
 " stack peaks or adversarial NS-kernel isolation."
 
-#: ../../../../os/README.md:57
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:63
 msgid ""
 "The first scheduler start requires cold privileged Thread/MSP state with "
 "FPCA clear; applications must not leave active FP context before bootstrap. "
@@ -585,7 +823,7 @@ msgstr ""
 "`NEXUS_CPU_SECURE_ONLY` macro selects that port encoding and does not grant "
 "Secure access to a single-world image."
 
-#: ../../../../os/README.md:66
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:72
 msgid ""
 "M55/M85 use their actual MVE-aware exception/context ports. The kernel's "
 "`configENABLE_FPU` switch activates the shared coprocessor register bank and"
@@ -607,7 +845,7 @@ msgstr ""
 "does not qualify that behavior or guarantee cross-world payload "
 "preservation."
 
-#: ../../../../os/README.md:75
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:81
 msgid ""
 "The host fixture keeps the pinned kernel and POSIX port unchanged, and uses "
 "`tests/contracts/os_freertos_runtime/posix_event.c` as its owned event "
@@ -627,11 +865,11 @@ msgstr ""
 "correction does not change the MCU backend or establish MCU scheduler "
 "qualification."
 
-#: ../../../../os/README.md:83
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:89
 msgid "Maintained execution contracts"
 msgstr "Maintained execution contracts"
 
-#: ../../../../os/README.md:85
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:91
 msgid ""
 "See [OS contracts](/design/os-contracts.md), [delivery "
 "scope](/delivery/os.md) and the {download}`OS01-OS55 execution ledger "
@@ -645,7 +883,7 @@ msgstr ""
 "integration contract](/design/os-backend-integration.md) and its active "
 "execution probe; a probe pass does not register another supported RTOS."
 
-#: ../../../../os/README.md:92
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:98
 msgid ""
 "Finite notification deadlines are checked even after a coalesced sequence "
 "hint; continuous unrelated wakes cannot extend a wait. The public predicate "
@@ -661,7 +899,7 @@ msgstr ""
 "absolute budget only when blocking. `NX_DEADLINE_NEVER` uses genuine untimed"
 " host waiting."
 
-#: ../../../../os/README.md:98
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:104
 msgid ""
 "Task creation validates the selected port's startup frame and alignment "
 "before kernel mutation. Startup minimum and measured runtime stack budget "
@@ -677,7 +915,7 @@ msgstr ""
 " tasks and direct notifications are explicit optional paths with their own "
 "storage and receiver/index contracts."
 
-#: ../../../../os/README.md:104
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:110
 msgid ""
 "Closable queues use separate caller-owned controls and per-operation waiter "
 "storage; raw queues retain their minimal native blocking implementation. "
@@ -693,7 +931,7 @@ msgstr ""
 "destroy notification, queue and guard storage. The external UART owner "
 "example demonstrates that flow."
 
-#: ../../../../os/README.md:110
+#: ../../../../tmp/nexus-quality-20261019/os/README.md:116
 msgid ""
 "The optional tickless path needs an explicitly bound timer port and a "
 "continuous clock; without it, normal Tick remains active. Diagnostics use "
@@ -709,15 +947,15 @@ msgstr ""
 "or verifies retained OS hardware records without operating equipment; all "
 "unexecuted physical cases stay `not_executed`."
 
-#: ../../../../docs/explanation/source-map.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:72
 msgid "Components"
 msgstr "Components"
 
-#: ../../../../components/README.md:2
+#: ../../../../tmp/nexus-quality-20261019/components/README.md:2
 msgid "Optional common components"
 msgstr "Optional common components"
 
-#: ../../../../components/README.md:4
+#: ../../../../tmp/nexus-quality-20261019/components/README.md:4
 msgid ""
 "Explicit CMake targets compose narrow ports: bounded BusOwner, SPI/UART "
 "owner, BMP280 core and SPI transport, instance-level Log, two-bank commit-"
@@ -731,7 +969,23 @@ msgstr ""
 "Modbus RTU parsing. Unreferenced component code does not enter a firmware "
 "image."
 
-#: ../../../../components/README.md:9
+#: ../../../../tmp/nexus-quality-20261019/components/README.md:9
+msgid ""
+"General mechanisms remain in their named component directories. Exact STM32 "
+"extensions live under `components/soc/stm32/`, including selected F407 "
+"handoff/I2S2 and U575 retained-time/LPDMA/Stop2 mechanisms. Their public "
+"include paths and explicit target names stay stable. This source grouping "
+"does not broaden the supported chip, backend, clock, security or physical "
+"qualification scope."
+msgstr ""
+"General mechanisms remain in their named component directories. Exact STM32 "
+"extensions live under `components/soc/stm32/`, including selected F407 "
+"handoff/I2S2 and U575 retained-time/LPDMA/Stop2 mechanisms. Their public "
+"include paths and explicit target names stay stable. This source grouping "
+"does not broaden the supported chip, backend, clock, security or physical "
+"qualification scope."
+
+#: ../../../../tmp/nexus-quality-20261019/components/README.md:15
 msgid ""
 "Owners have one executor, exact slot capacity, stable cancellation epochs "
 "and caller-owned operations. Initialization links unused slots before "
@@ -759,7 +1013,7 @@ msgstr ""
 "or global lookup. Products supply transports, authorization, regions, task "
 "policy and budgets."
 
-#: ../../../../components/README.md:21
+#: ../../../../tmp/nexus-quality-20261019/components/README.md:27
 msgid ""
 "Meaningful regressions in `tests/contracts` cover concurrent producers, late"
 " cancel/TC, failure quarantine, interrupted persistence and protocol "
@@ -771,99 +1025,168 @@ msgstr ""
 "malformed inputs. A durable host file is not a physical Flash power-cut "
 "qualification."
 
-#: ../../../../docs/explanation/source-map.md:49
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:79
 msgid "Exact SoC implementations"
 msgstr "Exact SoC implementations"
 
-#: ../../../../docs/explanation/source-map.md:51
+#: ../../../../tmp/nexus-quality-20261019/soc/README.md:2
+msgid "SoC packages and private providers"
+msgstr "SoC packages and private providers"
+
+#: ../../../../tmp/nexus-quality-20261019/soc/README.md:4
+msgid ""
+"MCU source ownership follows the vendor and exact maintained family. Public "
+"family identifiers such as `stm32f407` and `gd32f470` remain unchanged. The "
+"maintained family descriptor supplies the canonical source directory; "
+"directory names do not create another configuration authority or a runtime "
+"registry."
+msgstr ""
+"MCU source ownership follows the vendor and exact maintained family. Public "
+"family identifiers such as `stm32f407` and `gd32f470` remain unchanged. The "
+"maintained family descriptor supplies the canonical source directory; "
+"directory names do not create another configuration authority or a runtime "
+"registry."
+
+#: ../../../../tmp/nexus-quality-20261019/soc/README.md:20
+msgid ""
+"Each MCU family owns `soc.json`, `routes.json`, its private controller "
+"state, selected driver sources and explicit CMake targets. Startup, clocks, "
+"timebase, memory and power code remain with that family. Common register "
+"algorithms are shared only after every wrapper checks the real vendor "
+"layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do"
+" not establish equivalence."
+msgstr ""
+"Each MCU family owns `soc.json`, `routes.json`, its private controller "
+"state, selected driver sources and explicit CMake targets. Startup, clocks, "
+"timebase, memory and power code remain with that family. Common register "
+"algorithms are shared only after every wrapper checks the real vendor "
+"layout, bits, clocks, IRQ/DMA routes and errata. Similar peripheral names do"
+" not establish equivalence."
+
+#: ../../../../tmp/nexus-quality-20261019/soc/README.md:26
+msgid ""
+"`native/drivers/` implements the public I/O contracts as independent host "
+"models; it does not establish MCU timing or electrical behavior. `common/` "
+"remains cross-vendor because its reviewed algorithms serve both STM32 and "
+"GD32."
+msgstr ""
+"`native/drivers/` implements the public I/O contracts as independent host "
+"models; it does not establish MCU timing or electrical behavior. `common/` "
+"remains cross-vendor because its reviewed algorithms serve both STM32 and "
+"GD32."
+
+#: ../../../../tmp/nexus-quality-20261019/soc/README.md:30
+msgid ""
+"The [Board packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/boards/README.md) authorize reviewed PCB bindings. "
+"Adding a Board does not enable a new clock tree automatically: select an "
+"exact maintained clock profile, or implement and verify another profile. "
+"Keep unsupported oscillators, domains, modes and silicon revisions explicit."
+msgstr ""
+"The [Board packages](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/boards/README.md) authorize reviewed PCB bindings. "
+"Adding a Board does not enable a new clock tree automatically: select an "
+"exact maintained clock profile, or implement and verify another profile. "
+"Keep unsupported oscillators, domains, modes and silicon revisions explicit."
+
+#: ../../../../tmp/nexus-quality-20261019/soc/README.md:35
+msgid ""
+"Use the [provider guide](/guides/provider-porting.md) for implementation, "
+"the [derived matrix](/delivery/capabilities.md) for selected routes and "
+"modes, and the [qualification guide](/reference/platforms/qualification.md) "
+"for actual evidence. CPU support, SDK macros and source-directory presence "
+"do not establish whole-family support. MCU physical HIL remains "
+"`not_executed`."
+msgstr ""
+"Use the [provider guide](/guides/provider-porting.md) for implementation, "
+"the [derived matrix](/delivery/capabilities.md) for selected routes and "
+"modes, and the [qualification guide](/reference/platforms/qualification.md) "
+"for actual evidence. CPU support, SDK macros and source-directory presence "
+"do not establish whole-family support. MCU physical HIL remains "
+"`not_executed`."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:86
 msgid ""
 "The private implementation boundaries and reference configurations are "
 "maintained in [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32f103/README.md), "
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md), "
 "[GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32f407/README.md), "
+"SOURCE/soc/gd32/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md), "
 "[GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/README.md), "
+"SOURCE/soc/gd32/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md), "
 "[STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32h743/README.md) and [STM32U575](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md). Their "
-"links bind this website revision."
+"SOURCE/soc/stm32/stm32h743/README.md) and "
+"[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/README.md). Their links bind this website "
+"revision."
 msgstr ""
 "The private implementation boundaries and reference configurations are "
 "maintained in [STM32F103](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32f103/README.md), "
+"DOCUMENTATION-SOURCE/soc/stm32/stm32f103/README.md), "
 "[GD32F303](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32f407/README.md), "
+"SOURCE/soc/gd32/gd32f303/README.md), [STM32F407](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32f407/README.md), "
 "[GD32F470](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/README.md), "
+"SOURCE/soc/gd32/gd32f470/README.md), [STM32G474](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32g474/README.md), "
 "[STM32H743](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32h743/README.md) and [STM32U575](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32u575/README.md). Their "
-"links bind this website revision."
+"SOURCE/soc/stm32/stm32h743/README.md) and "
+"[STM32U575](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32u575/README.md). Their links bind this website "
+"revision."
 
-#: ../../../../io/README.md:4
+#: ../../../../tmp/nexus-quality-20261019/docs/explanation/source-map.md:95
+msgid "Board packages"
+msgstr "Board packages"
+
+#: ../../../../tmp/nexus-quality-20261019/boards/README.md:2
+msgid "Reviewed Board facts"
+msgstr "Reviewed Board facts"
+
+#: ../../../../tmp/nexus-quality-20261019/boards/README.md:4
 msgid ""
-"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-"interfaces. The optional [GPIO pin-state contract](/explanation/gpio-pin-"
-"states.md) adds an explicit selected face for authored DEFAULT/SLEEP images."
-" Its generated instance ID and runtime selection enum remain separate; "
-"lookup never acquires pad ownership or starts a power transition. Each "
-"selected instance has an immutable face with two pointers: shared read-only "
-"methods and a pointer to private provider state. Generated faces live in "
-"read-only storage; their state and selected buffers are private static "
-"objects in the generated translation unit. Manually assembled providers use "
-"storage supplied by their explicit constructor owner. A 32-bit target spends"
-" eight bytes of Flash per face; mutable state and exact-capacity buffers are"
-" separate. Method pointers are shared per provider and mode rather than "
-"repeated in every mutable instance."
+"A Board package records PCB/source identity, the exact SoC, oscillators, "
+"reviewed controller bindings, safe initial levels, reserved resources, "
+"provenance and explicitly unknown electrical facts. It reuses the selected "
+"[SoC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/README.md); it does not copy drivers or vendor SDKs."
 msgstr ""
-"GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-"interfaces. The optional [GPIO pin-state contract](/explanation/gpio-pin-"
-"states.md) adds an explicit selected face for authored DEFAULT/SLEEP images."
-" Its generated instance ID and runtime selection enum remain separate; "
-"lookup never acquires pad ownership or starts a power transition. Each "
-"selected instance has an immutable face with two pointers: shared read-only "
-"methods and a pointer to private provider state. Generated faces live in "
-"read-only storage; their state and selected buffers are private static "
-"objects in the generated translation unit. Manually assembled providers use "
-"storage supplied by their explicit constructor owner. A 32-bit target spends"
-" eight bytes of Flash per face; mutable state and exact-capacity buffers are"
-" separate. Method pointers are shared per provider and mode rather than "
-"repeated in every mutable instance."
+"A Board package records PCB/source identity, the exact SoC, oscillators, "
+"reviewed controller bindings, safe initial levels, reserved resources, "
+"provenance and explicitly unknown electrical facts. It reuses the selected "
+"[SoC provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/README.md); it does not copy drivers or vendor SDKs."
 
-#~ msgid ""
-#~ "GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-#~ "interfaces. Each selected instance has an immutable face with two pointers: "
-#~ "shared read-only methods and a pointer to private provider state. Generated "
-#~ "faces live in read-only storage; their state and selected buffers are "
-#~ "private static objects in the generated translation unit. Manually assembled"
-#~ " providers use storage supplied by their explicit constructor owner. A "
-#~ "32-bit target spends eight bytes of Flash per face; mutable state and exact-"
-#~ "capacity buffers are separate. Method pointers are shared per provider and "
-#~ "mode rather than repeated in every mutable instance."
-#~ msgstr ""
-#~ "GPIO, UART, SPI, I2C, Flash, watchdog, EXTI, PWM and ADC expose C11 "
-#~ "interfaces. Each selected instance has an immutable face with two pointers: "
-#~ "shared read-only methods and a pointer to private provider state. Generated "
-#~ "faces live in read-only storage; their state and selected buffers are "
-#~ "private static objects in the generated translation unit. Manually assembled"
-#~ " providers use storage supplied by their explicit constructor owner. A "
-#~ "32-bit target spends eight bytes of Flash per face; mutable state and exact-"
-#~ "capacity buffers are separate. Method pointers are shared per provider and "
-#~ "mode rather than repeated in every mutable instance."
+#: ../../../../tmp/nexus-quality-20261019/boards/README.md:15
+msgid ""
+"Private PCB packages belong in external product repositories and are "
+"selected through `board_package`. Maintained public packages are selected "
+"through `board`. Keep the family identifier independent of the "
+"manufacturer's physical directory. Board declarations cannot change a chip's"
+" memory geometry or enable an unmaintained clock profile, DMA route or "
+"controller mode."
+msgstr ""
+"Private PCB packages belong in external product repositories and are "
+"selected through `board_package`. Maintained public packages are selected "
+"through `board`. Keep the family identifier independent of the "
+"manufacturer's physical directory. Board declarations cannot change a chip's"
+" memory geometry or enable an unmaintained clock profile, DMA route or "
+"controller mode."
 
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:52
-msgid "The optional USB `nx_usb_activation_port_t` is a controller face with one synchronous setter and the existing provider context. Its generated `nx_factory_usb_activation` lookup is independent of optional ROM profiles and `factory.capabilities`, with no hardware access or new mutable state, queue, worker or allocation. Existing USB faces, ops/profile layouts and factory ABI epoch 1 stay unchanged. Retained read-only ARM cost and unreferenced GC require linked evidence separate from the two-pointer face layout."
-msgstr "The optional USB `nx_usb_activation_port_t` is a controller face with one synchronous setter and the existing provider context. Its generated `nx_factory_usb_activation` lookup is independent of optional ROM profiles and `factory.capabilities`, with no hardware access or new mutable state, queue, worker or allocation. Existing USB faces, ops/profile layouts and factory ABI epoch 1 stay unchanged. Retained read-only ARM cost and unreferenced GC require linked evidence separate from the two-pointer face layout."
-
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:60
-msgid "Activation controls one already selected nonzero endpoint direction; EP0 remains separate. Cold start activates/unmasks only EP0. A setter uses the current software epoch, including valid cold epoch 0, and requires a quiet target with no loan. Enable proves endpoint geometry, DATA0, NAK and active state before unmasking that direction; disable masks it before withdrawing active. Neither starts a transfer. Repeated enable preserves DATA1/HALT; explicit disable/enable establishes fresh DATA0 only after proof. Other directions and their loans remain owned. After actual reset drain, common software explicitly masks/deactivates nonzero directions on both families; this does not assert an unproved GD reset side effect. Reset, clear-halt and submit never activate a nonzero endpoint."
-msgstr "Activation controls one already selected nonzero endpoint direction; EP0 remains separate. Cold start activates/unmasks only EP0. A setter uses the current software epoch, including valid cold epoch 0, and requires a quiet target with no loan. Enable proves endpoint geometry, DATA0, NAK and active state before unmasking that direction; disable masks it before withdrawing active. Neither starts a transfer. Repeated enable preserves DATA1/HALT; explicit disable/enable establishes fresh DATA0 only after proof. Other directions and their loans remain owned. After actual reset drain, common software explicitly masks/deactivates nonzero directions on both families; this does not assert an unproved GD reset side effect. Reset, clear-halt and submit never activate a nonzero endpoint."
-
-#: ../../../../tmp/nexus-quality-20261019/io/README.md:71
-msgid "A failed post-write proof may have partial effects: IO closes admission, retains clock/storage and requires continued drain plus explicit full stop. External Chapter 9 policy stages selected endpoints before status IN, gates ordinary packet admission until configured readiness is committed, and owns rollback or stop on superseding SETUP/status failure. The setter is not a configuration transaction. The [USB packet contract](/design/usb-device.md) retains FIG-16 and the full IO-35, class/configuration and physical HIL limits."
-msgstr "A failed post-write proof may have partial effects: IO closes admission, retains clock/storage and requires continued drain plus explicit full stop. External Chapter 9 policy stages selected endpoints before status IN, gates ordinary packet admission until configured readiness is committed, and owns rollback or stop on superseding SETUP/status failure. The setter is not a configuration transaction. The [USB packet contract](/design/usb-device.md) retains FIG-16 and the full IO-35, class/configuration and physical HIL limits."
+#: ../../../../tmp/nexus-quality-20261019/boards/README.md:21
+msgid ""
+"Start with an exact part and a small reviewed route set, then follow the "
+"[Board porting guide](/guides/board-porting.md). A syntactically valid JSON "
+"file does not establish fitted components, connector continuity, power "
+"supply or physical timing. Uninspected PCB revisions and jumpers remain "
+"unknown; software fixtures do not qualify a real PCB. MCU physical HIL "
+"remains `not_executed`."
+msgstr ""
+"Start with an exact part and a small reviewed route set, then follow the "
+"[Board porting guide](/guides/board-porting.md). A syntactically valid JSON "
+"file does not establish fitted components, connector continuity, power "
+"supply or physical timing. Uninspected PCB revisions and jumpers remain "
+"unknown; software fixtures do not qualify a real PCB. MCU physical HIL "
+"remains `not_executed`."

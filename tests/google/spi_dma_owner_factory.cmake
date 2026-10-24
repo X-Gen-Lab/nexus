@@ -27,5 +27,5 @@ nexus_google_test(nexus_native_spi_dma_factory_test
     SOURCES native_spi_dma_factory_test.cpp
         "${spi_owner_factory_bundle}/bindings.c"
     LIBRARIES Nexus::SPIDMATransactionOwner Nexus::NativeModel Nexus::Arch
-    INCLUDES "${spi_owner_factory_bundle}" "${NEXUS_SOURCE_DIR}/io/native"
+    INCLUDES "${spi_owner_factory_bundle}" "${NEXUS_SOURCE_DIR}/soc/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")

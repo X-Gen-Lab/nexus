@@ -4,6 +4,7 @@ This configure-only contract requires host CMake and the maintained pinned SDK
 inputs. It compiles neither placeholder SDK code nor ARM firmware. Final ARM
 link/resource evidence is maintained separately from these target properties.
 """
+from tools.configure.providers.descriptor import source_directory
 
 import json
 from pathlib import Path
@@ -42,7 +43,7 @@ add_library(Nexus::Config ALIAS nexus_build_options)
 set_target_properties(nexus_build_options PROPERTIES
     NEXUS_LTO_REQUIRED {"ON" if lto else "OFF"}
     NEXUS_COMPILER_LAUNCHER "{launcher}")
-add_subdirectory("{(ROOT / 'soc' / family).as_posix()}" provider)
+add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" provider)
 ''', encoding="utf-8")
             selection = (
                 f"nexus_add_{family}_sleep(selected_sleep)"
@@ -119,7 +120,7 @@ endif()
     def assert_selected_private_imports(self, family):
         properties = self.configure_properties(family, True)
         self.assertEqual(properties["selected"], "TRUE")
-        provider = ROOT / "soc" / family
+        provider = ROOT / source_directory(family)
         self.assertEqual(properties["SOURCES"],
                          (provider / "sleep.c").as_posix())
         self.assertEqual(properties["sleep_sources"],
@@ -164,8 +165,8 @@ endif()
     def configure_u575_variant(self, variants):
         """Use real optional target definitions, with interface-only SDK ports."""
         root = self.u575_root
-        copy_component = root / "components/stm32u575_lpdma_copy"
-        lptim_component = root / "components/stm32u575_lpdma_lptim1"
+        copy_component = root / "components/soc/stm32/stm32u575_lpdma_copy"
+        lptim_component = root / "components/soc/stm32/stm32u575_lpdma_lptim1"
         with tempfile.TemporaryDirectory(prefix="nexus-u575-owner-cmake-") as name:
             source = Path(name)
             (source / "main.c").write_text("int main(void) { return 0; }\n")
@@ -190,7 +191,7 @@ add_subdirectory("{copy_component.as_posix()}" copy_receiver)
 if(EXISTS "{lptim_component.as_posix()}/CMakeLists.txt")
     add_subdirectory("{lptim_component.as_posix()}" lptim_receiver)
 endif()
-add_subdirectory("{(root / 'components/stm32u575_stop2').as_posix()}" owner)
+add_subdirectory("{(root / 'components/soc/stm32/stm32u575_stop2').as_posix()}" owner)
 add_executable(consumer main.c)
 target_link_libraries(consumer PRIVATE {libraries})
 foreach(name nexus_stm32u575_stop2 nexus_stm32u575_stop2_copy
@@ -243,7 +244,7 @@ endforeach()
         self.assertEqual(properties[original + "SOURCES"],
                          properties[selected + "SOURCES"])
         self.assertEqual(properties[selected + "SOURCES"],
-                         (self.u575_root / "soc/stm32u575/stop2.c").as_posix())
+                         (self.u575_root / "soc/stm32/stm32u575/stop2.c").as_posix())
         self.assertNotIn("NEXUS_U575_STOP2_LPTIM1",
                          properties[original + "COMPILE_DEFINITIONS"])
         for target in (selected, receiver):
@@ -253,17 +254,17 @@ endforeach()
             self.assertEqual(properties[target + "EXCLUDE_FROM_ALL"], "TRUE")
         self.assertEqual(
             set(properties[receiver + "SOURCES"].split(";")),
-            {(self.u575_root / "soc/stm32u575/drivers" / unit).as_posix()
+            {(self.u575_root / "soc/stm32/stm32u575/drivers" / unit).as_posix()
              for unit in ("lpdma_copy.c", "lpdma_lptim1.c")})
         private = (self.u575_root /
-                   "components/stm32u575_lpdma_lptim1/private").as_posix()
+                   "components/soc/stm32/stm32u575_lpdma_lptim1/private").as_posix()
         for target in (selected, receiver):
             self.assertIn(private,
                           properties[target + "INCLUDE_DIRECTORIES"].split(";"))
             self.assertNotIn(
                 private, properties[target +
                                     "INTERFACE_INCLUDE_DIRECTORIES"].split(";"))
-        self.assertTrue((self.u575_root / "soc/stm32u575/private" /
+        self.assertTrue((self.u575_root / "soc/stm32/stm32u575/private" /
                          "stm32u575_lptim1_profile.h").is_file())
         self.assertIn("Nexus::U575LpdmaLptim1",
                       properties[selected + "LINK_LIBRARIES"].split(";"))

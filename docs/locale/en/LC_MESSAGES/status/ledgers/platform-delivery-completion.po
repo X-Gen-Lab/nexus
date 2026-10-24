@@ -1,0 +1,595 @@
+# Authored translation; independent review is recorded in metadata.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 40e9e0f95e4c0f90f346f7ada5385427c951a466eff3823a0b89ac26a0e95acb\n"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:9
+msgid "平台交付完善14 项台账"
+msgstr "Platform delivery-completion 14-task ledger"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:11
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/platform-delivery-completion.csv>`。 源文件：`docs/design/platform-"
+"delivery-"
+"completion.csv`；SHA-256：`31ec1589e03f3172b5cbf1d4ddb63d05deba831cbb4e524b14e043aeb20cb672`。"
+msgstr ""
+"This page derives from the original CSV; it is not a new status authority, "
+"execution record or software qualification. Original IDs, order and every "
+"original field come from the {download}`original ledger "
+"<../../design/platform-delivery-completion.csv>`. Source: "
+"`docs/design/platform-delivery-completion.csv`; SHA-256: "
+"`31ec1589e03f3172b5cbf1d4ddb63d05deba831cbb4e524b14e043aeb20cb672`."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:15
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:21
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:24
+msgid "本表包含 14 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 14 original records; this is only the source row count."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:32
+msgid "N01"
+msgstr "N01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "原字段"
+msgstr "Original field"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "原值"
+msgstr "Original value"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`task_id`"
+msgstr "`task_id`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`task`"
+msgstr "`task`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "USB EP0 告警闭环"
+msgstr "Close the USB EP0 alert"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "implemented"
+msgstr "implemented"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`software_status`"
+msgstr "`software_status`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "development_models_passed_remote_scan_pending"
+msgstr "development_models_passed_remote_scan_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "not_applicable"
+msgstr "not_applicable"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"io/src/controllers/usb_device_controller.c;tests/google/usb_device_test.cpp"
+msgstr ""
+"io/src/controllers/usb_device_controller.c;tests/google/usb_device_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tests/google/usb_device_test.cpp;/tmp/nexus-"
+"next-20261024/provider/handoff.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tests/google/usb_device_test.cpp;/tmp/nexus-"
+"next-20261024/provider/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "CodeQL 有证据处置；错误路径不误释放请求、clock 或借用。"
+msgstr ""
+"Address CodeQL with evidence; error paths must not incorrectly release "
+"requests, clocks or borrows."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "`owner`"
+msgstr "`owner`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "codex"
+msgstr "codex"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:47
+msgid "N02"
+msgstr "N02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "配置工具依赖收敛"
+msgstr "Reduce configuration-tool dependencies"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "ir_and_generated_equivalence_verified_sdk_pending"
+msgstr "ir_and_generated_equivalence_verified_sdk_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/configure/;cmake/package/"
+msgstr "tools/configure/;cmake/package/"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/configuration/equivalence-green.json;/tmp/nexus-"
+"next-20261024/configuration/import-orders-green.log"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/configuration/equivalence-green.json;/tmp/nexus-"
+"next-20261024/configuration/import-orders-green.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "维护配置 IR 与生成结果等价；导入顺序测试通过；SDK 闭包完整。"
+msgstr ""
+"Preserve maintained configuration IR and generated-output equivalence; pass "
+"import-order tests and complete the SDK closure."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:62
+msgid "N03"
+msgstr "N03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "本轮扫描提示审查"
+msgstr "Review this iteration's scan findings"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "reviewed_fixes_implemented"
+msgstr "reviewed_fixes_implemented"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "focused_regressions_passed_current_scan_pending"
+msgstr "focused_regressions_passed_current_scan_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/maintenance/;tools/measurement/;tests/"
+msgstr "tools/maintenance/;tools/measurement/;tests/"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/io-cost/handoff.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/io-cost/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "真缺陷修复并回归；合法用法与误报有明确依据；不靠扩大忽略范围消除新增问题。"
+msgstr ""
+"Fix real defects with regressions; justify valid uses and false positives; "
+"do not expand ignores to hide new problems."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:77
+msgid "N04"
+msgstr "N04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "收束分支与 PR"
+msgstr "Consolidate branches and PRs"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pending_merge"
+msgstr "pending_merge"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pending_post_merge_source_association"
+msgstr "pending_post_merge_source_association"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "X-Gen-Lab/nexus;X-Gen-Lab/nexus-examples"
+msgstr "X-Gen-Lab/nexus;X-Gen-Lab/nexus-examples"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "docs/delivery/platform-delivery-completion-results.json"
+msgstr "docs/delivery/platform-delivery-completion-results.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "最终 main 包含目标改动；示例 E 锁定明确的平台版本；合并后源码与验证对应。"
+msgstr ""
+"Final main contains the intended changes; examples E locks an explicit "
+"platform revision; post-merge source and validation correspond."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:92
+msgid "N05"
+msgstr "N05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "示例本地 CI 入口"
+msgstr "Provide an examples local-CI entry"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "local_contracts_passed_final_pinned_run_pending"
+msgstr "local_contracts_passed_final_pinned_run_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "X-Gen-Lab/nexus-examples/scripts/local_ci.py"
+msgstr "X-Gen-Lab/nexus-examples/scripts/local_ci.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-"
+"examples/scripts/local_ci.py"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;X-Gen-Lab/nexus-"
+"examples/scripts/local_ci.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "新 checkout 以固定依赖、新输出完整执行；缺工具失败，旧报告拒绝。"
+msgstr ""
+"A fresh checkout executes the complete scope with fixed dependencies and new"
+" output; missing tools fail and old reports reject."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:107
+msgid "N06"
+msgstr "N06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "当前支持与验收视图"
+msgstr "Expose exact support and validation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "selected_query_and_contracts_passed"
+msgstr "selected_query_and_contracts_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/maintenance/capabilities.py;docs/delivery/capabilities.md"
+msgstr "tools/maintenance/capabilities.py;docs/delivery/capabilities.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/testing/test_support_selection.py;/tmp/nexus-"
+"next-20261024/documentation/exact-support-observed.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/testing/test_support_selection.py;/tmp/nexus-"
+"next-20261024/documentation/exact-support-observed.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "能够查询精确配置支持什么、如何验证，以及哪些是参考配置或尚未实测。"
+msgstr ""
+"Query what an exact configuration supports, how to verify it, and which "
+"selections are references or physically unmeasured."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:122
+msgid "N07"
+msgstr "N07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "私有 Board 与 provider 接入"
+msgstr "Integrate private Boards and providers"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "external_board_contracts_passed_final_sdk_pending"
+msgstr "external_board_contracts_passed_final_sdk_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/configure/experience.py;docs/guides/board-porting.md"
+msgstr "tools/configure/experience.py;docs/guides/board-porting.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/configuration/final-focused-green.log;/tmp/nexus-"
+"next-20261024/examples/installed-board/result.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/configuration/final-focused-green.log;/tmp/nexus-"
+"next-20261024/examples/installed-board/result.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "新板与同类实例经维护入口接入；不改无关 family，不猜测 PCB 事实。"
+msgstr ""
+"Integrate new Boards and same-family instances through maintained entry "
+"points without changing unrelated families or guessing PCB facts."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:137
+msgid "N08"
+msgstr "N08"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "配置诊断与变更影响"
+msgstr "Explain configuration errors and change impacts"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "focused_diagnostics_and_diff_passed"
+msgstr "focused_diagnostics_and_diff_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/configure/;docs/guides/developer-workflow.md"
+msgstr "tools/configure/;docs/guides/developer-workflow.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/configure/test_experience.py;/tmp/nexus-"
+"next-20261024/configuration/final-focused-green.log"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/configure/test_experience.py;/tmp/nexus-"
+"next-20261024/configuration/final-focused-green.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "人读与 JSON 来自同一记录；冲突可定位；不自动换模式或补造未知事实。"
+msgstr ""
+"Human and JSON diagnostics share one record; conflicts are locatable; no "
+"automatic mode change or invented unknown facts."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:152
+msgid "N09"
+msgstr "N09"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "真实热点与执行效率优化"
+msgstr "Optimize measured hotspots and execution efficiency"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "measured_attempts_recorded_no_global_speedup_claim"
+msgstr "measured_attempts_recorded_no_global_speedup_claim"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/dev/process.py;tools/dev/timings.py;tools/configure/"
+msgstr "tools/dev/process.py;tools/dev/timings.py;tools/configure/"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-"
+"next-20261024/configuration/git-after-measurements.jsonl"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/devtools/actual-resource-observation.json;/tmp/nexus-"
+"next-20261024/configuration/git-after-measurements.jsonl"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "同环境 cold/warm 对比；不同编译上下文和失败诊断完整；不缓存成功测试报告。"
+msgstr ""
+"Compare cold/warm runs in the same environment; preserve all distinct "
+"compiler contexts and failure diagnostics; never cache passing test reports."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:167
+msgid "N10"
+msgstr "N10"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "可比较 I/O 性能基线"
+msgstr "Establish comparable I/O performance baselines"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "implemented_tooling"
+msgstr "implemented_tooling"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "synthetic_compare_contracts_passed"
+msgstr "synthetic_compare_contracts_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "not_executed"
+msgstr "not_executed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/hil/measure.py;tools/measurement/;docs/guides/performance-hil.md"
+msgstr ""
+"tools/hil/measure.py;tools/measurement/;docs/guides/performance-hil.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-"
+"next-20261024/io-cost/handoff.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/testing/test_hil_measurement_compare.py;/tmp/nexus-"
+"next-20261024/io-cost/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "每项结论关联同一镜像的原始测量，并提供优化前后对照；默认未选能力无额外资源；物理部分未取得证据前保持 pending。"
+msgstr ""
+"Bind each conclusion to raw measurements of the same image and before/after "
+"comparisons; unselected capabilities add no default resources; physical work"
+" stays pending until evidence exists."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:182
+msgid "N11"
+msgstr "N11"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "三板硬件验收"
+msgstr "Execute three-Board hardware acceptance"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "existing_plans_current_source_preparation_pending"
+msgstr "existing_plans_current_source_preparation_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/hil/fixtures/;tools/hil/prepare.py;tools/hil/measure.py"
+msgstr "tools/hil/fixtures/;tools/hil/prepare.py;tools/hil/measure.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/hil/fixtures/;tools/hil/prepare.py"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/hil/fixtures/;tools/hil/prepare.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "每板保留固件、设备身份、仪器记录和逐 mode 结果；未知明确保留；工装准备不能代替真实硬件退出条件。"
+msgstr ""
+"For each Board retain firmware, equipment identity, instrument records and "
+"per-mode results; preserve unknowns explicitly; prepared tooling cannot "
+"replace the real hardware exit."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:197
+msgid "N12"
+msgstr "N12"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "H743 Flash 与 RAM 专项"
+msgstr "Audit H743 Flash and RAM"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "selected_arm_checks_passed_full_sdk_and_candidate_pending"
+msgstr "selected_arm_checks_passed_full_sdk_and_candidate_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/measurement/;soc/stm32/stm32h743/drivers/flash.c"
+msgstr "tools/measurement/;soc/stm32/stm32h743/drivers/flash.c"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/provider/h743-arm-suite.json;/tmp/nexus-"
+"next-20261024/provider/h743-linked-costs.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/provider/h743-arm-suite.json;/tmp/nexus-"
+"next-20261024/provider/h743-linked-costs.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "当前精确 profile 有完整软件结论；实板另验 busy-bank、watchdog、掉电与 IRQ。"
+msgstr ""
+"Complete the software conclusion for the exact current profile; separately "
+"verify busy-bank, watchdog, power loss and IRQ on hardware."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:212
+msgid "N13"
+msgstr "N13"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "当前正式软件候选"
+msgstr "Produce the current formal software candidate"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "existing_workflow"
+msgstr "existing_workflow"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "pending_final_clean_source_execution"
+msgstr "pending_final_clean_source_execution"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "tools/release/;tools/evidence/"
+msgstr "tools/release/;tools/evidence/"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py"
+msgstr ""
+"docs/delivery/platform-delivery-completion-"
+"results.json;tools/evidence/reproduce.py;tools/evidence/candidate.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"最终 clean source 执行完整 software plan；锁定环境两份独立断网构建实际比较 ELF/BIN；经既有流程 "
+"seal/verify。"
+msgstr ""
+"Execute the complete software plan at final clean source; actually compare "
+"ELF/BIN from two independent network-disabled builds in the locked "
+"environment; seal/verify through the existing workflow."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:227
+msgid "N14"
+msgstr "N14"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "文档与原始证据维护"
+msgstr "Maintain documentation and original evidence"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "implemented_documentation"
+msgstr "implemented_documentation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"source_gettext_bilingual_review_passed_final_archive_and_onboarding_pending"
+msgstr ""
+"source_gettext_bilingual_review_passed_final_archive_and_onboarding_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid "docs/;tools/documentation/;tools/evidence/"
+msgstr "docs/;tools/documentation/;tools/evidence/"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/documentation/final-checks.json"
+msgstr ""
+"docs/delivery/platform-delivery-completion-results.json;/tmp/nexus-"
+"next-20261024/documentation/final-checks.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/platform-delivery-completion.md:26
+msgid ""
+"当前状态从既有索引派生；历史保留原身份；一份 raw 归档与小索引并验证恢复；外部用户实际完成 "
+"install/create/build/run/upgrade。"
+msgstr ""
+"Derive current status from existing indexes; preserve historical identities;"
+" retain one raw archive and a small index with verified recovery; external "
+"users actually complete install/create/build/run/upgrade."

@@ -8,7 +8,7 @@ No board has executed this reference yet.
 
 ## Ownership and assembly
 
-`soc/stm32u575/security.c` implements the cold-owner mechanism. Its private
+`soc/stm32/stm32u575/security.c` implements the cold-owner mechanism. Its private
 `nx_stm32u575_tz_layout_t` contains caller-selected spans, not a platform-owned
 product partition. The owner lives in Secure SRAM1 and remains allocated until
 reset. The boot owner supplies mutually consistent linker scripts, vectors,

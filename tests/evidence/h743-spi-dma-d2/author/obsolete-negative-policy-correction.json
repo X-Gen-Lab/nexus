@@ -1,6 +1,0 @@
-{
-  "path": "tools/configure/providers/stm32h743/test_peripherals.py",
-  "before": "0978195195a70a6db67fdcc29ee81f27df0e43545c9c92c356407514a43e4f04",
-  "after": "5580e5009c4a1ab502b7ff4074a439eb4c8ac3cb80886b77750b8e80b77a83ee",
-  "classification": "one formerly unsupported SPI DMA tuple is now supported; preserve same negative method with still unsupported linked mode; original 7-method whole failure retained; positive finite mode independently covered"
-}

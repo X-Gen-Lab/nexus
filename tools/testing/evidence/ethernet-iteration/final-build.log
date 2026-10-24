@@ -1,8 +1,0 @@
-[1/8] Building C object CMakeFiles/ethernet_mac_test.dir/io/src/eth_mac.c.o
-[2/8] Building C object CMakeFiles/ethernet_native_test.dir/io/src/eth_mac.c.o
-[3/8] Building C object CMakeFiles/ethernet_stm32_test.dir/io/src/eth_mac.c.o
-[4/8] Building C object CMakeFiles/ethernet_gd32_test.dir/io/src/eth_mac.c.o
-[5/8] Linking CXX executable ethernet_mac_test
-[6/8] Linking CXX executable ethernet_native_test
-[7/8] Linking CXX executable ethernet_stm32_test
-[8/8] Linking CXX executable ethernet_gd32_test

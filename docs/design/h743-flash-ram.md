@@ -284,6 +284,21 @@ remain separate evidence. A successful future run can establish only its actual
 source, image and reproduced scope; it does not close the full IO-24 exit or
 change physical HIL from `not_executed`.
 
+The same ELF audit reports `public_flash_linkage`. `retained_verified` means the
+observed readonly operation table contains four Thumb pointers associated with
+the known public operations in `flash.c`. `not_retained` means the named table
+was not observed. `retained_not_proved` preserves retained executable targets
+whose method identity cannot be proved after LTO renaming or missing metadata;
+it neither rejects a valid build nor claims verified method identity. Explicit
+null, non-Thumb or recognized invalid entries still reject. This distinction
+does not relax the existing RAM closure proof; RAM-pod retention cannot replace
+public-face linkage evidence.
+
+`linked_resources` reports whole-image allocation through the existing resource
+observer. The RAM pod and workspace are subsets of those totals, not additional
+allocations to sum again. These observations audit actual linked bytes; they do
+not execute a Flash pulse, establish a stack peak or measure busy-bank behavior.
+
 | Evidence required before software exit | Boundary |
 | --- | --- |
 | Real GoogleTest/GoogleMock RED then GREEN | Actual provider/bridge boundary, failures, late drain and instance isolation; no mock implementation |
@@ -310,19 +325,19 @@ qualification. Missing production proof remains an open exit. The
 authority; per-profile execution, source identities, SDK checks and remaining
 software-candidate obligations belong in delivery evidence.
 
-The implementation is split between [cold preparation and admission](../../soc/stm32h743/drivers/flash_ram_owner.c),
-the [CPU bridge and assembly return gate](../../soc/stm32h743/drivers/flash_ram_enter.S),
-[RAM vector publication](../../soc/stm32h743/drivers/flash_ram_transaction.c),
-the [MPU transaction](../../soc/stm32h743/drivers/flash_mpu.c) and
-[physical pulse/time observations](../../soc/stm32h743/drivers/flash_ram.c).
+The implementation is split between [cold preparation and admission](../../soc/stm32/stm32h743/drivers/flash_ram_owner.c),
+the [CPU bridge and assembly return gate](../../soc/stm32/stm32h743/drivers/flash_ram_enter.S),
+[RAM vector publication](../../soc/stm32/stm32h743/drivers/flash_ram_transaction.c),
+the [MPU transaction](../../soc/stm32/stm32h743/drivers/flash_mpu.c) and
+[physical pulse/time observations](../../soc/stm32/stm32h743/drivers/flash_ram.c).
 Their private workspace and checked C/assembly prefix are declared in
-[the RAM contract](../../soc/stm32h743/private/stm32h743_flash_ram.h).
+[the RAM contract](../../soc/stm32/stm32h743/private/stm32h743_flash_ram.h).
 These links locate current work; they do not substitute for the required
 execution and production-ELF evidence.
 
 Primary references are PM0253 Rev6 sections 2.3 and 4.6–4.8, AN4838 Rev11
 section 3.4, RM0433 Rev9's Flash maps/read-while-write rules and ES0392 Rev15
 section 2.1.2. The source-identity record and selected provider evidence must
-accompany the implementation review. See also the [H743 provider scope](../../soc/stm32h743/README.md),
+accompany the implementation review. See also the [H743 provider scope](../../soc/stm32/stm32h743/README.md),
 [V-only clock contract](h743-high-clock.md), [I/O evolution](io-evolution.md),
 [Arch contract](arch-contracts.md) and [qualification boundary](../delivery/qualification.md).

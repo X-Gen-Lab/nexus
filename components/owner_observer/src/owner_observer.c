@@ -92,6 +92,9 @@ nx_result_t nx_owner_observer_service(nx_owner_observer_t* observer,
     observation->has_active = false;
     observation->active = (nx_owner_ticket_t){.slot = owner->capacity};
     observation->active_state = NX_REQUEST_READY;
+    observation->accepting = owner->accepting;
+    observation->queued = owner->head < owner->capacity;
+    observation->slot_available = owner->free_head < owner->capacity;
     observation->idle = owner->head == owner->capacity &&
                         owner->active == owner->capacity && !owner->servicing;
     if (owner->active < owner->capacity) {
@@ -106,8 +109,10 @@ nx_result_t nx_owner_observer_service(nx_owner_observer_t* observer,
         } else {
             observation->diagnostic_result = NX_ERROR_STATE;
         }
-    } else if (owner->active != owner->capacity ||
-               owner->head > owner->capacity) {
+    } else if (owner->active != owner->capacity) {
+        observation->diagnostic_result = NX_ERROR_STATE;
+    }
+    if (owner->head > owner->capacity || owner->free_head > owner->capacity) {
         observation->diagnostic_result = NX_ERROR_STATE;
     }
     owner->guard.leave(owner->guard.context, saved);

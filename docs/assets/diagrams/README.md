@@ -60,7 +60,7 @@ python tools/dev/dev.py docs check --full \
 
 参考tools/configure/assemblies/nucleo-h743-baremetal-uart.toml的选定目标。箭头从依赖者指向被依赖目标；虚线明确PRIVATE include或OBJECT注入。统一warnings、配置选项边和GC策略省略；它们仍由真实CMake管理。厂商headers只进入实现/启动私有范围，配置生成的bindings也按私有include规则消费SDK；可选组件不在本装配中。
 
-依据：[根目标图](../../../CMakeLists.txt)、[firmware helper](../../../cmake/platform/Firmware.cmake)、[IO targets](../../../io/CMakeLists.txt)、[Arch targets](../../../arch/CMakeLists.txt)、[OS targets](../../../os/CMakeLists.txt)、[H743 target](../../../soc/stm32h743/CMakeLists.txt)、[ABI/Config目标](../../../cmake/platform/Options.cmake)。
+依据：[根目标图](../../../CMakeLists.txt)、[firmware helper](../../../cmake/platform/Firmware.cmake)、[IO targets](../../../io/CMakeLists.txt)、[Arch targets](../../../arch/CMakeLists.txt)、[OS targets](../../../os/CMakeLists.txt)、[H743 target](../../../soc/stm32/stm32h743/CMakeLists.txt)、[ABI/Config目标](../../../cmake/platform/Options.cmake)。
 [可编辑DOT](build-targets.dot)；实施关联：DOC-44。
 
 ## FIG-03 配置与原子生成
@@ -93,7 +93,7 @@ python tools/dev/dev.py docs check --full \
 
 外部唯一执行者串行调用start/stop。start不启动调度器；失败的primary、cleanup、remaining_effects分别保留。已取得效果者参与逆序cleanup，停止可能先成功释放部分实例再返回BUSY/IO。不能把BUSY视为仍然完整运行，也不能因timeout回收存储。具体start_system失败可能在其私有路径中完成清理或保留失败阶段，重试必须满足该provider合同，不能把图视为统一恢复API。
 
-依据：[生成的start/stop](../../../tools/configure/bindings.py)、[GPIO冷租约](../../../tools/configure/gpio_phase.py)、[H743冷生命周期](../../../soc/stm32h743/README.md)、[当前平台合同](../../delivery/architecture.md)。
+依据：[生成的start/stop](../../../tools/configure/bindings.py)、[GPIO冷租约](../../../tools/configure/gpio_phase.py)、[H743冷生命周期](../../../soc/stm32/stm32h743/README.md)、[当前平台合同](../../delivery/architecture.md)。
 [可编辑DOT](platform-lifecycle.dot)；实施关联：DOC-47。
 
 ## FIG-06 Core请求状态与借用
@@ -115,7 +115,7 @@ REJECTED/ACCEPTED是admission结果而非request状态。ACCEPTED后保持reques
 
 上到下为先后，并区分Task、DMA IRQ和UART IRQ。UART DMA TC不替代最后串行位的TC；SPI两个DMA完成不替代BSY=0/TXE=1。最终排空与错误观察、引用撤回都先于SETTLED。CS节点描述软件命令，未证明电气电平或物理时序。取消/错误分支仍需同样的实际排空条件；失败保持QUARANTINED借用。不把NDTR推导为可靠wire字节数，也不推广为GD32 reset语义。
 
-依据：[F407 UART DMA](../../../soc/stm32f407/drivers/uart_dma.c)、[F407 SPI DMA](../../../soc/stm32f407/drivers/spi_dma.c)、[DMA排空合同](../../../io/include/nexus/io/dma.h)、[多控制器合同](../../design/multiple-dma-controllers.md)。
+依据：[F407 UART DMA](../../../soc/stm32/stm32f407/drivers/uart_dma.c)、[F407 SPI DMA](../../../soc/stm32/stm32f407/drivers/spi_dma.c)、[DMA排空合同](../../../io/include/nexus/io/dma.h)、[多控制器合同](../../design/multiple-dma-controllers.md)。
 [可编辑DOT](dma-completion.dot)；实施关联：DOC-49。
 
 ## FIG-08 wait wake与外部退出
@@ -137,7 +137,7 @@ nx_wait_until只检查谓词并等待提示，不service硬件或创建worker。
 
 选定TX DMA仅授权AXI SRAM 512 KiB；其他物理域和dma_engines可达事实不自动授权placement或供电。Cache-on要求完整32-byte lines独占，最大65504 bytes；Cache-off接受1..65535 bytes。PREPARING借用先成立，clean在调用方正常mask下进行，完成前不能取消回收。图不实现或声明H743 RX DMA；未来RX需要独立前置及排空后维护合同。可信复位或此前成功自有clean/disable才建立冷cache前提，CCR关闭位不能认领外国dirty状态。
 
-依据：[精确物理域](../../../soc/stm32h743/soc.json)、[H743 provider范围](../../../soc/stm32h743/README.md)、[TX DMA实现](../../../soc/stm32h743/drivers/uart_dma.c)、[cache范围合同](../../../arch/include/nexus/arch/cache.h)、[冷cache合同](../../../arch/include/nexus/arch/cache_control.h)。
+依据：[精确物理域](../../../soc/stm32/stm32h743/soc.json)、[H743 provider范围](../../../soc/stm32/stm32h743/README.md)、[TX DMA实现](../../../soc/stm32/stm32h743/drivers/uart_dma.c)、[cache范围合同](../../../arch/include/nexus/arch/cache.h)、[冷cache合同](../../../arch/include/nexus/arch/cache_control.h)。
 [可编辑DOT](h743-memory-cache.dot)；实施关联：DOC-51。
 
 ## FIG-10 Source SDK独立消费
@@ -192,7 +192,7 @@ CpuProfileIR显式选择合法ABI和optional feature，不从内核名推导能�
 
 boot owner供给并在执行前建立实际option-byte/镜像布局前提，机制不写option bytes。GTZC/SAU/NS MPU是不同边界，NSC fetch检查Secure MPU，不能用CMSE观察替代bus firewall或pin。参考要求无NS handlers、RTOS和自主masters，固定world principal只允许同步scalar GPIO。取得不可逆效果后的失败只能保留到reset；SG的同步pin来自静态映射和无并发条件。实际8/16 MPU region观测仅属于此参考，不修改TZEN0 provider的exact-eight tuple。全部物理隔离尚未执行。
 
-依据：[双域权威合同](../../design/u575-trustzone-contract.md)、[生产冷owner](../../../soc/stm32u575/security.c)、[真实配对镜像fixture](../../../tests/contracts/u575_trustzone)、[UserIoBroker](../../../components/user_io_broker/README.md)、[CMSE公开观察合同](../../../arch/include/nexus/arch/nonsecure.h)。
+依据：[双域权威合同](../../design/u575-trustzone-contract.md)、[生产冷owner](../../../soc/stm32/stm32u575/security.c)、[真实配对镜像fixture](../../../tests/contracts/u575_trustzone)、[UserIoBroker](../../../components/user_io_broker/README.md)、[CMSE公开观察合同](../../../arch/include/nexus/arch/nonsecure.h)。
 [可编辑DOT](u575-security-domains.dot)；实施关联：DOC-56。
 
 ## FIG-15 连续RX与可见丢块
@@ -203,7 +203,7 @@ boot owner供给并在执行前建立实际option-byte/镜像布局前提，机�
 
 preposted producer和普通producer不得混用。旧块在两个hardware targets中完全消失并证明CT/EN/新flags后才能FIFO发布；失败撤源并LIFO撤未来贷款，BORROWED consumer块不被覆盖。缺spare、IDLE和恢复可有间隙，lost_blocks是已观察边界而非精确遗漏wire字节。TC标志不能数任意多次合并回绕，实际IRQ/换址延迟必须小于一块fill时间。stop关闭admission、保持drain，outstanding=0后仍需调用者/observer退出。ADC首发trigger blocks由service显式rearm且有块间间隙，本图不声称连续ADC。
 
-依据：[UART DMA/连续贷款合同](../../design/uart-dma-rs485.md)、[stream状态合同](../../../io/include/nexus/io/stream.h)、[容量与观察合同](../../design/io-observation-recovery.md)、[F407 RX DMA实现](../../../soc/stm32f407/drivers/uart_receive.c)、[ADC显式rearm](../../../soc/stm32f407/drivers/adc_stream.c)。
+依据：[UART DMA/连续贷款合同](../../design/uart-dma-rs485.md)、[stream状态合同](../../../io/include/nexus/io/stream.h)、[容量与观察合同](../../design/io-observation-recovery.md)、[F407 RX DMA实现](../../../soc/stm32/stm32f407/drivers/uart_receive.c)、[ADC显式rearm](../../../soc/stm32/stm32f407/drivers/adc_stream.c)。
 [可编辑DOT](continuous-stream.dot)；实施关联：DOC-57。
 
 ## FIG-16 当前 I/O 装配与执行
@@ -247,7 +247,7 @@ preposted producer和普通producer不得混用。旧块在两个hardware target
 其他 bus master 的撤回／join、调用者栈预留及恢复策略仍由外部调用者按合同保证。
 
 目标依据：[RAM 维护目标合同](../../design/h743-flash-ram.md)、
-[既有 H743 provider 范围](../../../soc/stm32h743/README.md)、
+[既有 H743 provider 范围](../../../soc/stm32/stm32h743/README.md)、
 [IO-24 原始退出条件](../../design/io-evolution-execution.csv)。
 [可编辑 DOT](h743-flash-ram-architecture.dot)。图的渲染、独立语义审查与双语输出检查
 只建立各自范围的文档证据；软件候选与实板资格仍分别判断。
@@ -301,7 +301,7 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 依据：[RTC/LPTIM 说明](../../explanation/rtc-lptim.md)、
 [公共 RTC](../../../io/include/nexus/io/rtc.h)、
 [公共 LPTIM](../../../io/include/nexus/io/lptim.h)、
-[Native 实现](../../../io/native/rtc_lptim.c)、
+[Native 实现](../../../soc/native/drivers/rtc_lptim.c)、
 [Native 装配](../../../tools/configure/providers/native/bindings.py)。
 [可编辑 DOT](rtc-lptim-lifecycle.dot)；实施关联：IO-36。软件开发证据与 main／SDK／
 候选／实板资格分别判断，不能从该图或渲染成功推断。
@@ -314,7 +314,7 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 
 构建箭头只表示 Board/TOML 到不可变计划与静态对象的生成；factory 箭头只返回既有 face。运行选择不转让 pad 所有权。失败可能保留部分寄存器效果；重试目标或检查 stop 不能丢弃 lease。provider stop 成功后，Platform 仍须独立证明冷快照与 gate 清理；失败继续保留。图不表达 AF、wake、retention、深睡或实板结果。
 
-依据：[GPIO pin-state 说明](../../explanation/gpio-pin-states.md)、[公共接口](../../../io/include/nexus/io/pin_state.h)、[G474 provider](../../../soc/stm32g474/drivers/pin_state.c)、[冷态租约生成](../../../tools/configure/gpio_phase.py)。
+依据：[GPIO pin-state 说明](../../explanation/gpio-pin-states.md)、[公共接口](../../../io/include/nexus/io/pin_state.h)、[G474 provider](../../../soc/stm32/stm32g474/drivers/pin_state.c)、[冷态租约生成](../../../tools/configure/gpio_phase.py)。
 [可编辑 DOT](gpio-pin-states.dot)；实施关联：IO-31。
 
 (fig-28-u575-lptim1-lpbam)=
@@ -332,7 +332,7 @@ ACCEPTED 借用 request、12 B tuple 与完整 48 B LLI 工作区。ENABLE 后�
 
 cancel／deadline 不撤销存储。UEDE0／DIEROK 证明先于 DMA suspend／reset／idle 及引用撤除；随后通过自有 RCC reset 关闭 LPTIM1，绝不清 ENABLE。全部 RTC／IRQ／loan gate／电源／时钟与引用恢复后才最终 SETTLED；acquire 观察与外部 observer join 后，joined 公共 stop 另行归还启动 access claims。未知 profile 禁止 RTC／DMA／LPTIM MMIO；recover 不再 WFI。自有 reset 仅在 DMA 最终访问证明后可重试；活动借用期间观察到的外部 reset 永久隔离，安静默认值不能证明 join。
 
-依据：[单 tuple 参考合同](../../design/u575-lptim1-lpbam.md)、[公共 receiver](../../../components/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)、[公共 Stop2 face](../../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)、[私有 LPTIM1 profile](../../../soc/stm32u575/private/stm32u575_lptim1_profile.h)。[可编辑 DOT](u575-lptim1-lpbam.dot)；实施关联：IO-32／SOC-35。图不表示引脚路由、完整 PWM 周期播放或物理／HIL 执行；原完整退出条件仍开放。
+依据：[单 tuple 参考合同](../../design/u575-lptim1-lpbam.md)、[公共 receiver](../../../components/soc/stm32/stm32u575_lpdma_lptim1/include/nexus/components/stm32u575_lpdma_lptim1.h)、[公共 Stop2 face](../../../components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_lptim1.h)、[私有 LPTIM1 profile](../../../soc/stm32/stm32u575/private/stm32u575_lptim1_profile.h)。[可编辑 DOT](u575-lptim1-lpbam.dot)；实施关联：IO-32／SOC-35。图不表示引脚路由、完整 PWM 周期播放或物理／HIL 执行；原完整退出条件仍开放。
 
 (fig-29-u575-mpu-gpio)=
 ## FIG-29 U575 MPU-v2 单任务 scalar GPIO WRITE authority
@@ -347,7 +347,7 @@ cancel／deadline 不撤销存储。UEDE0／DIEROK 证明先于 DMA suspend／re
 
 close 撤回准入，join 在同一单核掩码排除边界解除 pin；随后由外部 owner 删除另一任务。closing marker 覆盖实际 kernel delete，task epoch 不复位，溢出拒绝。图不代替产品的 user quiescence、栈寿命、scheduler、安全输出或 provider stop 责任。
 
-依据：[精确实施合同](../../design/u575-mpu-gpio.md)、[公共 authority](../../../os/freertos/include/nexus/os/freertos_mpu_gpio.h)、[派发与生命周期](../../../os/freertos/mpu/gpio.c)、[真实 GPIO provider](../../../soc/stm32u575/drivers/gpio.c)、[normal memory generator](../../../tools/configure/memory.py)。[可编辑 DOT](u575-mpu-gpio.dot)。维护的 Native host 模型、normal M33 reset 链接及单个搬移 development SDK consumer 已实际通过；[源码绑定证据](../../../tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 分开记录阶段、ABI 与资源。软件模型及静态 layout／opcode／selected 入口及受支持 startup 调用目标 不证明真实 MPU 隔离或物理 HIL，也不建立 M7、完整 SDK plan 或 IO-39／SOC-36 原退出资格。
+依据：[精确实施合同](../../design/u575-mpu-gpio.md)、[公共 authority](../../../os/freertos/include/nexus/os/freertos_mpu_gpio.h)、[派发与生命周期](../../../os/freertos/mpu/gpio.c)、[真实 GPIO provider](../../../soc/stm32/stm32u575/drivers/gpio.c)、[normal memory generator](../../../tools/configure/memory.py)。[可编辑 DOT](u575-mpu-gpio.dot)。维护的 Native host 模型、normal M33 reset 链接及单个搬移 development SDK consumer 已实际通过；[源码绑定证据](../../../tools/testing/evidence/u575-mpu-gpio-20261020/README.md) 分开记录阶段、ABI 与资源。软件模型及静态 layout／opcode／selected 入口及受支持 startup 调用目标 不证明真实 MPU 隔离或物理 HIL，也不建立 M7、完整 SDK plan 或 IO-39／SOC-36 原退出资格。
 
 (fig-30-f407-i2s2-slave-tx)=
 ## FIG-30 F407 I2S2 从机有限发送与整块借用退出
@@ -360,4 +360,4 @@ close 撤回准入，join 在同一单核掩码排除边界解除 pin；随后�
 
 TCIF／NDTR0 只证明内存计数。停止 DMA 请求／引擎、观察 TXE 后另读新鲜 BSY、撤回地址／计数／标志和向量引用后，才能解除 owner 引用、归还原始整块借用并最终 release 发布 SETTLED。取消、超时或缺失证明都不撤销借用；首个错误保留，错误排空可能欠载且不保证有效音频。观察到复位／门控／时钟或时间历史丢失会永久隔离。所有共享用户及外部观察者先 join，最后才允许 Platform stop。
 
-依据：[精确机制页](../../design/f407-i2s2-slave-tx.md)、[公共合同](../../../components/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h)、[真实 provider](../../../soc/stm32f407/drivers/i2s2_slave_tx.c) 与[源码绑定证据](../../../tools/testing/evidence/f407-i2s2-20261020/README.md)。[可编辑 DOT](f407-i2s2-slave-tx.dot)。Native 模型、normal VE/ZG/default 链接和单个搬移 development SDK consumer 是有范围的软件执行；图和静态链接不执行外部时钟、不证明真实音频或 HIL。IO-41、完整 SDK／formal／OCI 与物理退出仍分别开放。
+依据：[精确机制页](../../design/f407-i2s2-slave-tx.md)、[公共合同](../../../components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/f407_i2s2_slave_tx.h)、[真实 provider](../../../soc/stm32/stm32f407/drivers/i2s2_slave_tx.c) 与[源码绑定证据](../../../tools/testing/evidence/f407-i2s2-20261020/README.md)。[可编辑 DOT](f407-i2s2-slave-tx.dot)。Native 模型、normal VE/ZG/default 链接和单个搬移 development SDK consumer 是有范围的软件执行；图和静态链接不执行外部时钟、不证明真实音频或 HIL。IO-41、完整 SDK／formal／OCI 与物理退出仍分别开放。

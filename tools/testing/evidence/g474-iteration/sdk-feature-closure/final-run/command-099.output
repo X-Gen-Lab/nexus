@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/cmake/package/package_source_sdk.py", line 169, in <module>
-    stm32g4_lock.contract(_g4_lock)
-  File "/tmp/nexus installed source sdk jducych8/relocated prefix with spaces/share/nexus/src/tools/maintenance/stm32g4_lock.py", line 43, in contract
-    raise ValueError("G4 identities must close the entire reviewed part graph")
-ValueError: G4 identities must close the entire reviewed part graph

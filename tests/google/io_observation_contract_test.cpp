@@ -6,7 +6,10 @@
  * \date            2026-10-17
  * \copyright       Copyright (c) 2026 Nexus Team
  */
+#include "nexus/io/i2c.h"
 #include "nexus/io/observation.h"
+#include "nexus/io/spi.h"
+#include "nexus/io/uart.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

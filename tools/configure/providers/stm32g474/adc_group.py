@@ -7,13 +7,18 @@ import re
 
 from ..common import Construction, fail, integer, sequence
 try:
-    from ...emission import dma_regions
+    from ...memory import dma_regions
 except ImportError:
-    from emission import dma_regions
+    from memory import dma_regions
 
 
 MODES = ("regular-sequence-dma", "injected-sequence")
 SAMPLE_HALFCYCLES = (5, 13, 25, 49, 95, 185, 495, 1281)
+
+
+def trigger_resources(selection):
+    """The reviewed trigger consumes the family's exact physical timer."""
+    return ("controller:TIM6",) if selection["trigger"] == "tim6-trgo" else ()
 
 
 def validate_selection(selection, route):
@@ -162,7 +167,7 @@ def preflight(result):
                   f"        result.primary = nx_silicon_preflight(&{source},",
                   f"                                               &{policy},",
                   "                                               &observed);",
-                  "        if (result.primary != NX_SUCCESS)"
+                  "        if (result.primary != NX_SUCCESS)" +
                   " { return result; }",
                   "    }"]
     return lines

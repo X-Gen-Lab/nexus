@@ -17,6 +17,16 @@ the observer detaches. Detach drops only the sidecar reference. A timeout,
 quarantined operation or observer failure never permits request/buffer reuse.
 Copied output contains a ticket and state, without borrowed payload pointers.
 
+The same bounded snapshot reports `accepting`, `queued` and `slot_available`.
+These describe admission and retained work independently of the service return
+code: BUSY alone never proves a full queue. Consumers use these fields only when
+`diagnostic_result` succeeds. They can copy the facts into
+`nx_io_diagnostic_facts_t` without introducing an I/O dependency into the owner
+component or retaining its live request pointers. The additional fields change
+the optional public observation/sidecar layout, so consumers must recompile;
+they add no fields to the default owner or provider. Optional diagnostic storage
+must be measured for the selected ABI rather than assumed to cost zero RAM.
+
 See [the observation and recovery contract](../../docs/design/io-observation-recovery.md)
 for the Core observer, stream budget, measured optional storage and external
 application escalation policy.

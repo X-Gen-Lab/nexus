@@ -1,4 +1,5 @@
 """Readonly capability evidence follows actual C template specializations."""
+from tools.configure.providers.descriptor import source_directory
 from pathlib import Path
 import tempfile
 import unittest
@@ -19,7 +20,7 @@ class TimerCapabilityObserverTests(unittest.TestCase):
         for family, prefix in (("stm32f407", "stm32"), ("gd32f470", "gd32")):
             for kind in ("timer_capture", "advanced_pwm"):
                 with self.subTest(family=family, kind=kind):
-                    source = configure.ROOT / f"soc/{family}/drivers/{kind}.c"
+                    source = configure.ROOT / f"{source_directory(family)}/drivers/{kind}.c"
                     self.assertEqual(capabilities.source_ops(source, configure.ROOT),
                                      {f"nx_{prefix}_{kind}_ops"})
 
@@ -80,7 +81,7 @@ class TimerCapabilityObserverTests(unittest.TestCase):
                            row["mode"]) for row in selected}, expected)
         for row in selected:
             self.assertTrue(row["fixtures"])
-            self.assertEqual(row["exports"], [f"soc/{row['family']}/drivers/{row['kind']}.c"])
+            self.assertEqual(row["exports"], [f"{source_directory(row['family'])}/drivers/{row['kind']}.c"])
             self.assertFalse(row["boards"])
 
 

@@ -1,9 +1,0 @@
-[  5%] Building C object CMakeFiles/usb_engine.dir/workspace/nexus/io/src/usb_device_controller.c.o
-[ 10%] Linking C static library libusb_engine.a
-[ 47%] Built target usb_engine
-[ 57%] Linking CXX executable usb_stm32f407_contract
-[ 57%] Linking CXX executable usb_contract
-[ 63%] Linking CXX executable usb_gd32f470_contract
-[ 78%] Built target usb_stm32f407_contract
-[ 94%] Built target usb_gd32f470_contract
-[100%] Built target usb_contract

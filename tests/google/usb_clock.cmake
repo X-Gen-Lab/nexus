@@ -3,9 +3,9 @@
 foreach(clock_family stm32f407 gd32f470)
     set(clock_target "nexus_${clock_family}_usb_clock_test")
     nexus_google_test(${clock_target} SOURCES usb_clock_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${clock_family}/usb_clock.c"
+        "${NEXUS_SOC_SOURCE_${clock_family}}/usb_clock.c"
         LIBRARIES Nexus::Core
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/${clock_family}/private"
+        INCLUDES "${NEXUS_SOC_SOURCE_${clock_family}}/private"
             "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/io/include"
             "${NEXUS_SOURCE_DIR}/io/private")

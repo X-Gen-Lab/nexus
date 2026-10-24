@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "status": "failed",
-  "base_ref": "HEAD",
-  "errors": [
-    "Files are not in the Git index: ['cmake/package/verification/io_evolution/consumers/h743-spi-dma.c', 'tools/configure/assemblies/h743-spi-dma-uart-rx.toml', 'tools/configure/assemblies/h743-spi-dma-uart-tx.toml', 'tools/configure/assemblies/h743-spi-dma.toml']"
-  ]
-}

@@ -1,9 +1,0 @@
-{
-  "kind": "earlier_prewrite_resource_guard_rejection",
-  "actual_exec_command_exit": 1,
-  "stdout": "",
-  "stderr": "Traceback (most recent call last):\n  File \"<stdin>\", line 7, in <module>\nAssertionError\n",
-  "classification": "actual external tool invocation failed before mkdir/backup/source writes; not a test RED",
-  "maintained_process_receipt": "not emitted by that direct exec_command; no historical receipt fabricated",
-  "root_recovery": "Root separately reported scoped memory.reclaim actual0; no source/log/ELF/archive deletion and unchanged memory limit/OOM0"
-}

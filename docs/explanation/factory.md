@@ -26,11 +26,28 @@ references, private independent contexts, fixed IRQ wiring and compact getters.
 Native assemblies receive independent model state too; a test singleton is not
 the production instance-generation mechanism.
 
-`nexus_factory.h` is generated for each assembly, so its IDs are not a universal
+`nexus_factory.h` is generated for each Platform assembly, so its IDs are not a universal
 header or persistent numbering scheme. Default IDs are compact `uint16_t` aliases
-with named constants. COUNT, invalid and unselected entries return NULL. Optional
-nominal strong IDs and capability records are explicit configuration choices;
-a chip capability record does not grant Board routing or physical qualification.
+with named constants. COUNT, invalid and unselected entries return NULL.
+A chip capability record does not grant Board routing or physical qualification.
+
+## Choose strong references for new products
+
+Every Platform assembly emits `nexus_factory_strong.h`. New products should
+include it and use the class-specific `NX_*_REF_*` constants with
+`nx_factory_*_ref()` getters. These wrappers return the same static faces and
+add no global storage, hardware access or configuration key.
+
+Default scalar IDs remain assembly-local `uint16_t` aliases; C does not reject
+mixing two such aliases. Nominal structure references let the compiler reject
+that class mismatch. They do not authenticate an external value or make an
+instance active. Optional capability records are separately selected by
+`factory.capabilities`.
+
+The factory header includes complete public APIs only for selected interface
+classes and preserves forward declarations for unselected getters. Include a
+specific public I/O header explicitly when code needs that API or its complete
+face layout; an empty getter still returns NULL.
 
 ## What a call does
 

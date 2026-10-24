@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="2" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T19:15:42.651" name="AllTests">
-  <testsuite name="InstalledThreadX" tests="2" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T19:15:42.651">
-    <testcase name="ByteQueueAndActualJoin" file="/workspace/nexus-threadx-probe/sdk-native/main.cpp" line="44" status="run" result="completed" time="0." timestamp="2026-10-11T19:15:42.651" classname="InstalledThreadX" />
-    <testcase name="ActualMonotonicNotification" file="/workspace/nexus-threadx-probe/sdk-native/main.cpp" line="58" status="run" result="completed" time="0." timestamp="2026-10-11T19:15:42.652" classname="InstalledThreadX" />
-  </testsuite>
-</testsuites>

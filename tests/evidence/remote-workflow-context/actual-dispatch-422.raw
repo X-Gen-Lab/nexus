@@ -1,4 +1,0 @@
-gh: Invalid Argument - failed to parse workflow: error parsing called workflow
-""
--> "./.github/workflows/software-qualification.yml" (source branch with sha:19cf06b04173c254e3faf84b85760193e100b5b4)
-: (Line: 37, Col: 10): Unrecognized named-value: 'runner'. Located at position 1 within expression: runner.temp (HTTP 422)

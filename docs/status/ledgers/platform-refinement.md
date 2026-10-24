@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/platform-refinement-execution.csv)。
-源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`775c626d571c734c924a53fdf5a7eb49490d7f3c07e135ce8b589d4afda0da0c`。
+源文件：`docs/design/platform-refinement-execution.csv`；SHA-256：`c5a33e63631b76b3b79a1261ed9dd7640f3baf699fa894dfdcc02878e5a92966`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -38,7 +38,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | development_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32f407/drivers/adc.c |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/adc.c |
 | `evidence_paths` | tools/testing/evidence/adc-iteration |
 | `exit_condition` | stream to polling clears scan sequence before sample |
 | `owner` | codex |
@@ -53,7 +53,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | development_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/gd32f470/drivers/adc.c |
+| `implementation_paths` | soc/gd32/gd32f470/drivers/adc.c |
 | `evidence_paths` | tools/testing/evidence/adc-iteration |
 | `exit_condition` | retry repeats bounded stable reset calibration |
 | `owner` | codex |
@@ -173,7 +173,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/stream.c;tools/hil |
+| `implementation_paths` | io/src/mechanisms/stream.c;tools/hil |
 | `evidence_paths` | tools/testing/evidence/io-observer-iteration |
 | `exit_condition` | bounded capacity and caller policy; no overwritten loans |
 | `owner` | codex |
@@ -203,7 +203,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_receive.c |
 | `evidence_paths` | tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-streams |
 | `exit_condition` | reviewed DMA routes; finite and continuous ownership |
 | `owner` | codex |
@@ -218,7 +218,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32f407/drivers/uart_receive.c;soc/gd32f470/drivers/uart_receive.c |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_receive.c |
 | `evidence_paths` | tools/testing/evidence/uart-iteration;tools/testing/evidence/configure-streams |
 | `exit_condition` | TX DMA plus RX blocks without default state growth |
 | `owner` | codex |
@@ -233,7 +233,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/uart_rs485.c;soc;tools/configure |
+| `implementation_paths` | io/src/mechanisms/uart_rs485.c;soc;tools/configure |
 | `evidence_paths` | tools/testing/evidence/uart-iteration;docs/design/uart-dma-rs485.md |
 | `exit_condition` | reviewed pins; actual TC; DE delay borrowing contract |
 | `owner` | codex |
@@ -248,7 +248,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/stream.c;soc/*/drivers/adc_continuous.c |
+| `implementation_paths` | io/src/mechanisms/stream.c;soc/*/*/drivers/adc_continuous.c |
 | `evidence_paths` | tools/testing/evidence/adc-iteration;tools/testing/evidence/configure-streams |
 | `exit_condition` | preposted targets; hardware address replacement proof |
 | `owner` | codex |
@@ -263,7 +263,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/adc_observer.c;soc;tools/configure |
+| `implementation_paths` | io/src/mechanisms/adc_observer.c;soc;tools/configure |
 | `evidence_paths` | tools/testing/evidence/adc-iteration |
 | `exit_condition` | sample-time and scan rate hardware bounds |
 | `owner` | codex |
@@ -278,7 +278,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/dma.c;tools/configure |
+| `implementation_paths` | io/src/mechanisms/dma.c;tools/configure |
 | `evidence_paths` | tools/testing/evidence/configure-iteration |
 | `exit_condition` | common opaque IDs; provider validates reviewed physical topology |
 | `owner` | codex |
@@ -293,7 +293,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/spi.c;soc/*/drivers/spi_dma.c |
+| `implementation_paths` | io/src/api/spi.c;soc/*/*/drivers/spi_dma.c |
 | `evidence_paths` | tools/testing/evidence/spi-memory-arm-commands.json |
 | `exit_condition` | caller dummy discard; actual spans; per-direction MINC |
 | `owner` | codex |
@@ -308,7 +308,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/i2c.c;soc/common/i2c_v1_async.c;soc/*/drivers/i2c_async.c |
+| `implementation_paths` | io/src/api/i2c.c;soc/common/i2c_v1_async.c;soc/*/*/drivers/i2c_async.c |
 | `evidence_paths` | tools/testing/evidence/i2c-async-iteration;tools/testing/evidence/configure-streams |
 | `exit_condition` | ACK final byte sequence; BTF STOP; request final access |
 | `owner` | codex |
@@ -323,7 +323,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io/src/i2c_bus_clear.c |
+| `implementation_paths` | io/src/mechanisms/i2c_bus_clear.c |
 | `evidence_paths` | tests/evidence/i2c-bus-clear |
 | `exit_condition` | bounded pulses STOP; open-drain and cleanup ownership |
 | `owner` | codex |
@@ -338,7 +338,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/*/drivers;tests/google |
+| `implementation_paths` | soc/*/*/drivers;tests/google |
 | `evidence_paths` | tools/testing/evidence/multi-controller-iteration |
 | `exit_condition` | static multi-controller assembly across three exact parts and two backends; 18 authored firmware fixtures, pure cold I2C identity and retained lifecycle; final maintained ARM and clean SDK qualification required |
 | `owner` | codex |
@@ -353,7 +353,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | core/include/nexus/core/memory.h;soc/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform |
+| `implementation_paths` | core/include/nexus/core/memory.h;soc/gd32/gd32f470/memory_init.c;tools/configure/memory.py;cmake/platform |
 | `evidence_paths` | tools/testing/evidence/memory-iteration;tools/testing/evidence/configure-memory-metadata |
 | `exit_condition` | explicit sections and budgets; DMA TCM rejection |
 | `owner` | codex |
@@ -878,7 +878,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | io; soc/*/drivers; tools/configure/timer_advanced.py |
+| `implementation_paths` | io; soc/*/*/drivers; tools/configure/timer_advanced.py |
 | `evidence_paths` | tools/testing/evidence/timer-iteration;tools/testing/evidence/timer-factory-iteration |
 | `exit_condition` | two-family timer capture and complementary PWM deadtime break ownership; actual shared-resource and cold cleanup regressions, selected/default ARM graphs; physical output and timing not executed |
 | `owner` | codex |
@@ -908,7 +908,7 @@ source_language: zh_CN
 | `implementation_status` | implemented |
 | `software_status` | targeted_passed |
 | `hardware_status` | not_executed |
-| `implementation_paths` | soc/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474 |
+| `implementation_paths` | soc/stm32/stm32g474;boards/stm32g474re_hse24_reference;tools/configure/providers/stm32g474 |
 | `evidence_paths` | tools/testing/evidence/g474-iteration;tests/evidence/g474-factory-integration |
 | `exit_condition` | exact STM32G474RET6 GPIO LPUART factory/startup clock/linker longitudinal slice; actual regular sanitizer and selected/empty ARM; reference PCB and other peripherals unqualified |
 | `owner` | codex |

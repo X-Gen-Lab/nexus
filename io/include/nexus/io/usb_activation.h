@@ -5,6 +5,7 @@
  */
 #ifndef NEXUS_IO_USB_ACTIVATION_H
 #define NEXUS_IO_USB_ACTIVATION_H
+#include "nexus/io/fwd.h"
 #include "nexus/io/usb_device.h"
 #ifdef __cplusplus
 extern "C" {
@@ -15,10 +16,10 @@ typedef struct {
                        bool active);
 } nx_usb_activation_ops_t;
 /** \brief Immutable borrowed face, using the existing controller context. */
-typedef struct {
+struct nx_usb_activation_port {
     const nx_usb_activation_ops_t* ops;
     void* context;
-} nx_usb_activation_port_t;
+};
 /**
  * \brief Explicitly activate or deactivate one selected nonzero direction.
  * \param[in] port: Started serialized privileged Task owner, IRQ masks clear.

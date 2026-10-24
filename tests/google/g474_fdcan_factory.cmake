@@ -35,12 +35,12 @@ nexus_google_test(${g4_fdcan_target}
     SOURCES g474_fdcan_factory_test.cpp
         "${g4_fdcan_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/fdcan.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/fdcan.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_fdcan_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts"
         "${NEXUS_SOURCE_DIR}/io/private")
 target_include_directories(${g4_fdcan_target} SYSTEM PRIVATE

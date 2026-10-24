@@ -40,6 +40,11 @@ Read the [architecture](../explanation/platform-architecture.md),
    error is not the expected behavioral RED result.
 3. Add exact `soc.json`/`routes.json` facts and documented provenance. Feed the
    shared CPU resolver; do not duplicate CPU flags or infer optional features.
+   Place MCU implementations under `soc/<vendor>/<family>/` and declare that
+   canonical `source_directory` in the maintained family descriptor. Public
+   family identifiers stay independent of the directory. CPU implementation
+   sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed
+   cross-vendor register algorithms remain in `soc/common/`.
 4. Add the family to the explicit maintained provider map in `tools/configure/`.
    Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
    Return an explicit frozen `Construction` record, including the private state
@@ -64,6 +69,16 @@ Read the [architecture](../explanation/platform-architecture.md),
 For a component, pass explicit bus, GPIO, time and optional OS ports. Do not create
 workers, probe devices, invent application roles or supply a maximum object pool.
 Flash drivers expose physical geometry; persistence and update policy remain external.
+
+Within configuration tools, each family's `contract.py` owns mode capabilities,
+ABI/limits and family admission policy. Sibling modules import that contract
+directly; `__init__.py` explicitly exports it with constructors and emitters.
+The leaf `providers/common.py` owns validation helpers and immutable
+`Construction`; leaf contracts and common helpers do not import the top-level
+resolver or emitter. `selection.py` checks cross-domain options, clocks and IRQ
+policy, `ir.py` adapts typed IR, and `matrix.py` orchestrates support catalogues.
+The descriptor explicitly lists `configuration_modules`, including `contract.py`,
+so edits trigger reconfiguration and remain in the Source SDK closure.
 
 The read-only [work-package view](../../tools/maintenance/README.md) connects
 exact maintained modes to resolver fixtures, selected ops sources and reviewed

@@ -11,6 +11,14 @@ function(nexus_stm32_hal_reference target)
     set(official "${source}/vendors/st/stm32f4_hal")
     set(device "${source}/vendors/st/cmsis_device_f4/Include")
     set(cmsis "${source}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
+    target_sources(${target} PRIVATE "${fixture}/adapter.c")
+    target_include_directories(${target} PRIVATE "${source}/core/include")
+    if(TARGET Nexus::Core)
+        target_link_libraries(${target} PRIVATE Nexus::Core)
+    else()
+        target_sources(${target} PRIVATE "${source}/core/src/request.c"
+            "${source}/core/src/time.c")
+    endif()
     add_library(${target}_vendor STATIC
         "${official}/Src/stm32f4xx_hal_uart.c"
         "${official}/Src/stm32f4xx_hal_dma.c")

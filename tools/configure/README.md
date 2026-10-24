@@ -7,20 +7,103 @@ and publishes one atomic compile/link bundle. CMake targets own the software
 source graph.
 
 ```sh
+python tools/configure/configure.py list-bindings \
+  --board stm32f407_qiming_v31 --kind uart
 python tools/configure/configure.py init \
   --board stm32f407_qiming_v31 --backend baremetal --clock hse8-pll168 \
+  --profile uart --binding uart1 --instance link0 \
   --output my-platform.toml
 python tools/configure/configure.py list-bindings --assembly my-platform.toml
 python tools/configure/configure.py check --assembly my-platform.toml
 python tools/configure/configure.py explain --assembly my-platform.toml
+python tools/configure/configure.py explain --assembly my-platform.toml --json
+python tools/configure/configure.py diff \
+  --assembly my-platform.toml --against my-platform-next.toml
 python tools/configure/configure.py generate \
   --assembly my-platform.toml --output build/my-config
 ```
 
-`init` creates an empty assembly with an explicit Board, backend and clock. It
-validates that selection and refuses to overwrite an existing file. `check` and
-`explain` have no generated-output side effects. `list-bindings` shows the actual
-Board bindings and maintained modes; it does not invent connector wiring.
+`init` accepts `empty` (the default), `gpio` or `uart`. Every profile requires an
+explicit Board, backend and clock; nonempty profiles also require a reviewed
+`--binding`. `--instance` defaults to `device0`. GPIO selects output; UART selects
+115200 baud, IRQ events with capacity 64 and priority 5 without kernel calls.
+These are visible authored values, not hardware defaults. Normal resolution
+rejects a profile where its exact mode or route is unavailable. It never changes
+the selection to make it pass. Creation refuses overwrite and removes its own
+incomplete file after a write or validation failure.
+
+Private Boards use `init --board-package /path/to/package` instead of `--board`.
+The command reads the package relative to the current directory and writes its
+path relative to the new TOML file. Moving the product tree preserves that
+relationship. Init, resolution and binding queries share the same directory
+checks: ordinary `..` paths are allowed, but every original symlink component is
+rejected before path normalization. The package must already contain reviewed
+`board.json` facts; init never invents pin assignments or clocks.
+
+`check`, `explain`, `list-bindings` and `diff` have no generated-output side
+effects. `explain` now defaults to a human-readable summary of selected public
+faces, clock, resources, memory domains, declared budgets and execution duties.
+Automation that consumed its previous JSON output must add `--json`; that flag
+retains the exact resolved IR projection. Budget declarations and provider limits
+are not measured image, stack, throughput or latency results.
+
+`list-bindings` accepts exactly one of `--assembly`, `--board` or
+`--board-package`. Board-first queries need no invented backend or clock. Optional
+`--kind uart` filters by public class. `--json` reports each route's actual
+provider implementation, execution shape, DMA paths, normalized per-mode
+`resource_keys` and `occupied_resources`. Board-first queries include SoC and
+Board reservations; assembly queries also show the selected owners. A polling
+mode does not acquire an alternative DMA route. Assembly queries verify the SoC
+fact bytes against the resolved input hash before adding view-only metadata. A candidate remains
+`admission = "configuration-required"`: clocks, backend, options and the complete
+resource set must still pass normal resolution. Missing wiring stays missing.
+The selected backend and clock are `null` in a Board-first query, not defaults.
+
+`diff` compares effective platform, route, mode, storage, endpoint, clock and
+budget decisions. Instance paths identify changed fields; `$order` preserves
+meaningful declaration order. JSON changes include `before_present` and
+`after_present` to distinguish a missing field from explicit `null`. Source-file
+renames and configuration hashes alone do not count as effective changes. Both
+inputs must resolve before a comparison is printed.
+
+JSON `impacts` explains changes to declared storage, typed factory ID ordering,
+public interfaces, transfer units/bounds/alignment and execution obligations.
+Reordered numeric factory IDs require consumer recompilation and must not be
+persisted as ABI. Changes to DMA or cancellation policy require reviewing the
+product's service and shutdown sequence. No impact estimates an ELF saving.
+
+Every command accepts `--diagnostics-json`. Configuration rejection then writes
+one JSON object to stderr and returns 1; successful output is unchanged. CLI
+argument syntax errors remain argparse errors with exit 2. Diagnostics retain
+`code`, `message` and the command input `source`; known file-read errors identify
+the file itself. Unknown/missing fields include `context`, `unknown` and
+`missing`; resource conflicts include the physical `resource` and both complete
+`claims` with owner, mode and source. `contexts` retains enclosing instance
+information. Other validation failures retain `invalid_configuration` and the
+precise original message; no guessed line numbers or replacement values are
+reported.
+
+```sh
+python tools/configure/configure.py provider-check \
+  --assembly my-platform.toml --expect-family stm32f407 \
+  --expect-part STM32F407ZGT6 --json
+python tools/configure/configure.py check \
+  --assembly my-platform.toml --diagnostics-json
+```
+
+`provider-check` resolves the exact input and runs the production static emitter
+in a disposable directory. Optional identity assertions reject a different
+family or part. The report lists selected controller faces/implementations,
+reviewed inputs, explicit configuration modules and generated-file SHA256s.
+Its checks are only `resolved_typed_ir` and `static_bundle_emitted`; complete
+compile/link, GoogleTest/GoogleMock and applicable station validation still use
+the maintained gates. This does not register a provider or create hardware facts.
+
+Human views and binding JSON report physical scope as
+`not_established_by_configuration` for MCU or `not_applicable` for Native. Consult
+the exact Board and station records for physical evidence. The legacy raw IR
+qualification placeholders describe the generator's scope; they cannot establish
+the absence or presence of a separate station result.
 
 ```toml
 schema = 2
@@ -168,7 +251,8 @@ an exact independent register-model buffer, between 1 and 256 bytes. Native I2C
 requires it; Native SPI without it explicitly uses the loopback model.
 
 `assembly.schema.json` is generated from the same `authored.py` field model used
-for normalization. It assists editor completion. The resolver additionally
+for normalization. It assists editor completion with units and lifecycle duties.
+Descriptions add no independent acceptance rules. The resolver additionally
 checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
@@ -187,11 +271,12 @@ The schema-1 JSON reader remains for explicit legacy contract fixtures and
 migration measurements. Maintained assemblies and source-SDK examples use TOML;
 JSON is never consulted as a fallback for a failed TOML assembly.
 
-`providers/` has an explicit maintained map for Native, STM32F407, GD32F470,
-STM32G474, STM32H743 and STM32U575. The latter three retain their documented
-narrow reference scopes.
-Each family package owns its implemented mode map, CPU/enum ABI, numerical limits,
-fixed DMA/trigger routes, IRQ sharing and built-in CS rules. Its `bindings.py`
+`providers/` explicitly admits Native, STM32F103/F407/G474/H743/U575 and
+GD32F303/F470. Each retains its documented exact part, route and mode scope.
+Each family's `contract.py` owns its mode map, CPU/enum ABI, numerical limits,
+fixed DMA/trigger routes, IRQ sharing and built-in CS rules. `__init__.py`
+reexports the explicit contract and constructors; sibling implementations import
+`contract.py` directly rather than the partially initialized package. `bindings.py`
 owns constructors, rollback and fixed IRQ wiring; `emission.py` owns system and
 shared-clock lifecycle emission. Each constructor returns the frozen
 `Construction` contract with explicit `state_type`, `definitions`, `initialize`,
@@ -202,6 +287,26 @@ no runtime registration or additional dispatch is emitted. The public resolver o
 input snapshots and resource conflicts. The public binding emitter owns Nexus
 faces and common lifecycle progress. There is no package discovery or runtime
 provider registration, and unknown families or unimplemented modes fail closed.
+
+Family packages also own endpoint capability policy, exact backend/clock coupling,
+cache-derived mode fields, whole-selection exclusions and optional compile-time
+constants. The resolver invokes these explicit contracts while retaining input
+identity, schema validation, transaction assembly and resource arbitration.
+G474's ADC review and shared-PWM owner are explicit family helpers; their exact
+timer choices do not live in the generic resolver. `FamilyDescriptor` lists
+configuration helpers directly, while CMake alone owns compiled sources. Public
+mode traits describe execution shape and never admit a family by themselves.
+This refactor adds no firmware registration, allocation or dispatch layer.
+
+Dependency direction stays explicit: `providers/common.py` contains leaf input
+checks and frozen contracts; cross-domain option/clock/IRQ validation lives in
+`selection.py`. `ir.py` owns the legacy-controller-to-typed-IR adapter. DMA region
+rendering lives with memory policy in `memory.py`; provider bindings do not
+import the top-level emitter. Preflight receives the selected H743 DMA admission
+callback from its emitter instead of importing that emitter back. Derived
+support catalogue orchestration lives in `matrix.support_catalogue`; selected
+contract descriptions never import the resolver. These are build-time boundaries
+and do not alter the static typed factory or public C ABI.
 
 Adding a family requires a real capability and constructor contract in that map,
 explicit CMake reconfiguration dependencies, source-SDK required files and tests.

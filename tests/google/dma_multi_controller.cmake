@@ -12,15 +12,15 @@ foreach(dma_multi_family stm32f407 gd32f470)
             "nexus_${dma_multi_family}_${dma_multi_kind}_multi_controller_test")
         nexus_google_test(${dma_multi_target} ${dma_multi_official}
             SOURCES "${dma_multi_kind}_multi_controller_test.cpp"
-                "${NEXUS_SOURCE_DIR}/soc/${dma_multi_family}/drivers/${dma_multi_kind}.c"
-                "${NEXUS_SOURCE_DIR}/soc/${dma_multi_family}/drivers/${dma_multi_kind}_dma.c"
+                "${NEXUS_SOC_SOURCE_${dma_multi_family}}/drivers/${dma_multi_kind}.c"
+                "${NEXUS_SOC_SOURCE_${dma_multi_family}}/drivers/${dma_multi_kind}_dma.c"
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model/model.c"
             LIBRARIES Nexus::IO
             INCLUDES "${NEXUS_SOURCE_DIR}/tests/contracts/dma_multi_controller"
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-                "${NEXUS_SOURCE_DIR}/soc/gd32f470"
-                "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
-                "${NEXUS_SOURCE_DIR}/soc/${dma_multi_family}/private"
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470"
+                "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
+                "${NEXUS_SOC_SOURCE_${dma_multi_family}}/private"
                 "${NEXUS_SOURCE_DIR}/arch/include")
         if(dma_multi_kind STREQUAL "spi")
             target_include_directories(${dma_multi_target} PRIVATE
@@ -41,7 +41,7 @@ foreach(dma_multi_family stm32f407 gd32f470)
                 STM32F407xx NX_DMA_MULTI_STM32)
             if(dma_multi_kind STREQUAL "spi")
                 target_sources(${dma_multi_target} PRIVATE
-                    "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/gpio.c")
+                    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/gpio.c")
             endif()
         endif()
     endforeach()

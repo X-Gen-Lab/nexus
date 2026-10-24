@@ -36,6 +36,10 @@ class RawEvidenceTests(unittest.TestCase):
         self.check_bytes("tests/evidence/kernel/run.log",
                          b"source bytes\r\nretained evidence\r\n")
 
+    def test_archived_execution_payload_retains_actual_crlf_bytes(self):
+        self.check_bytes("docs/archive/evidence/20261023/probe.tar.gz",
+                         b"source bytes\r\nretained evidence\r\n")
+
     def test_owned_production_source_still_uses_normalized_lf(self):
         self.check_bytes("io/src/ordinary.c",
                          b"source bytes\nretained evidence\n")

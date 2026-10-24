@@ -9,11 +9,11 @@
 #define NEXUS_EXTI_H
 
 #include "nexus/core/time.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_exti_port nx_exti_port_t;
 typedef enum {
     NX_EXTI_RISING = 1,
     NX_EXTI_FALLING = 2,

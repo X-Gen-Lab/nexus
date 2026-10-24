@@ -10,12 +10,11 @@
 #define NEXUS_SPI_H
 
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_spi_port nx_spi_port_t;
-typedef struct nx_spi_endpoint nx_spi_endpoint_t;
 
 /** \brief Explicit single-cell DMA addresses, both borrowed until SETTLED. */
 #define NX_SPI_MEMORY_TX_FIXED 1U

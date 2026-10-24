@@ -10,12 +10,12 @@
 
 #include "nexus/core/time.h"
 #include "nexus/io/adc_observer.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/stream.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_adc_port nx_adc_port_t;
 /**
  * \brief           Raw count facts; nominal Vref is not a calibrated physical
  *                  measurement.

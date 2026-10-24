@@ -1,7 +1,0 @@
-{
-  "classification": "fixture_compile_failure_not_behavior_RED",
-  "actual_returncode": 1,
-  "reason": "Vendor RCC macros are unsigned long on host; range initializer conversion rejected by existing -Wconversion -Werror. Add explicit uint32_t constants only; no assertions or production change.",
-  "historical_sources": "tests-first-compile-setup-r1.tar.gz",
-  "receipt": "/dev/shm/nexus-h743-spi-dma-runtime-domain-20261018-r1/build-red.attempts/1792307706860173929-dd9dad309eb7464f9d1f8bb6c06dea79/receipt.json"
-}

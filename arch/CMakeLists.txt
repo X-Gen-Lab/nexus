@@ -1,17 +1,19 @@
 # The selected CPU implementation has no vendor or kernel include surface.
 if(NEXUS_CPU_ARCH STREQUAL "native")
     set(nexus_arch_port native)
+    set(nexus_arch_directory native)
 elseif(NEXUS_CPU_ARCH MATCHES "^cortex-m(0|0plus|3|4|7|23|33|55|85)$")
     set(nexus_arch_port cortex_m)
+    set(nexus_arch_directory arm/cortex_m)
 else()
     message(FATAL_ERROR "Unsupported CPU architecture: ${NEXUS_CPU_ARCH}")
 endif()
-add_library(nexus_arch STATIC "${nexus_arch_port}/nx_arch_${nexus_arch_port}.c")
-target_sources(nexus_arch PRIVATE cortex_m/nx_arch_cache.c
-    cortex_m/nx_arch_cache_control.c
-    cortex_m/nx_arch_mpu.c cortex_m/nx_arch_security.c
-    cortex_m/nx_arch_nonsecure.c
-    cortex_m/nx_arch_sleep.c)
+add_library(nexus_arch STATIC "${nexus_arch_directory}/nx_arch_${nexus_arch_port}.c")
+target_sources(nexus_arch PRIVATE arm/cortex_m/nx_arch_cache.c
+    arm/cortex_m/nx_arch_cache_control.c
+    arm/cortex_m/nx_arch_mpu.c arm/cortex_m/nx_arch_security.c
+    arm/cortex_m/nx_arch_nonsecure.c
+    arm/cortex_m/nx_arch_sleep.c)
 target_include_directories(nexus_arch PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(nexus_arch PUBLIC nexus_abi_options
     PRIVATE nexus_build_options nexus_owned_warnings)

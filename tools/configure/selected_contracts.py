@@ -127,49 +127,6 @@ def endpoint_class(item):
             else item.kind + "_device")
 
 
-def catalogue(root):
-    """Reuse complete existing validation, including the real provider gate.
-
-    Review sources identify the maintained input facts, not complete per-mode
-    errata audits. A missing route remains missing. Profile/Board reservations
-    are still checked by the normal resolver when an actual instance is chosen.
-    """
-    try:
-        from . import configure
-        from .providers import descriptor
-    except ImportError:
-        import configure
-        from providers import descriptor
-    rows = []
-    for integration in descriptor.families():
-        family = integration.family
-        if family == "native":
-            continue
-        provider = maintained(family)
-        soc = configure.load(root / "soc" / family / "soc.json")
-        routes = configure.load(root / "soc" / family / "routes.json")
-        for part in sorted(soc["variants"]):
-            configure.validate_soc(soc, part)
-            reviewed = configure.resolve_routes(routes, soc, part, provider)
-            for controller, facts in sorted(soc["controllers"].items()):
-                interfaces = [(facts["kind"], facts["modes"])]
-                interfaces += sorted(facts.get("interfaces", {}).items())
-                for kind, modes in interfaces:
-                    for mode in sorted(modes):
-                        implementation = provider.mode_implementation(
-                            kind, mode)
-                        mode_traits(kind, mode)
-                        matches = tuple(sorted(route["id"] for route in
-                            reviewed.values() if part in route["variants"] and
-                            route["controller"] == controller and
-                            route["kind"] == kind and mode in route["modes"]))
-                        rows.append(SupportContract(
-                            family, part, controller, kind, mode,
-                            implementation,
-                            matches, integration.fact_files))
-    return tuple(rows)
-
-
 def _features(shape, model):
     features = ["MODEL"] if model else []
     if shape.polling:

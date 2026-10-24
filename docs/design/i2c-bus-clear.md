@@ -6,7 +6,7 @@
 才允许切换双引脚并驱动实际电气总线。
 
 公共接口在 `io/include/nexus/io/i2c_bus_clear.h`，算法在
-`io/src/i2c_bus_clear.c`。生产代码仍为 C11，没有 heap、默认 worker、动态注册表
+`io/src/mechanisms/i2c_bus_clear.c`。生产代码仍为 C11，没有 heap、默认 worker、动态注册表
 或隐藏 OS 锁。调用方保存 session、只读 ops 表、adapter context 和 clock，按
 单 executor 合同调用；这些对象必须活到租约成功归还。
 

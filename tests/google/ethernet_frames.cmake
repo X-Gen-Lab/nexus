@@ -5,7 +5,7 @@ foreach(eth_frames_family common stm32 gd32)
     set(eth_frames_target "nexus_${eth_frames_family}_ethernet_frames_test")
     nexus_google_test(${eth_frames_target}
         SOURCES ethernet_frames_mac_test.cpp
-            "${NEXUS_SOURCE_DIR}/io/src/eth_frames_mac.c"
+            "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${NEXUS_SOURCE_DIR}/io/private")
     target_compile_options(${eth_frames_target} PRIVATE
@@ -15,9 +15,9 @@ foreach(eth_frames_family common stm32 gd32)
             NX_ETH_FRAMES_TEST_STM32 STM32F407xx USE_RTOS=0
             USE_HAL_ETH_REGISTER_CALLBACKS=0)
         target_sources(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/ethernet_frames.c")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/ethernet_frames.c")
         target_include_directories(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${eth_frames_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
             "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -28,9 +28,9 @@ foreach(eth_frames_family common stm32 gd32)
         set(eth_frames_gd
             "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_sources(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/drivers/ethernet_frames.c")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/ethernet_frames.c")
         target_include_directories(${eth_frames_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/private"
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
         target_include_directories(${eth_frames_target} SYSTEM PRIVATE
             "${eth_frames_gd}/CMSIS/GD/GD32F4xx/Include"
@@ -41,10 +41,10 @@ foreach(eth_frames_family common stm32 gd32)
 endforeach()
 nexus_google_test(nexus_ethernet_frames_native_test
     SOURCES ethernet_frames_native_test.cpp
-        "${NEXUS_SOURCE_DIR}/io/native/ethernet_frames.c"
-        "${NEXUS_SOURCE_DIR}/io/src/eth_frames_mac.c"
+        "${NEXUS_SOURCE_DIR}/soc/native/drivers/ethernet_frames.c"
+        "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_frames_mac.c"
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")
 target_compile_definitions(nexus_ethernet_frames_native_test PRIVATE
     NX_ETH_FRAMES_NATIVE)

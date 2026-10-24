@@ -34,6 +34,14 @@ the source dependency graph. Kconfig and cache macros are not parallel authoriti
 | `tools/` | Resolution, build, measurement, HIL preparation and evidence |
 | `tests/` | Actual host, register-model, ARM-link and tool boundary executions |
 
+The source map groups MCU families under `soc/stm32/` and `soc/gd32/`, Arm
+primitives under `arch/arm/cortex_m/`, and Native models under
+`soc/native/drivers/`. Public include paths, CMake target names and authored
+family identifiers stay stable. Read the
+[source-adjacent contracts](docs/explanation/source-map.md) for ownership and
+the current directory map. New products should use the generated
+`nexus_factory_strong.h` for class-specific factory references.
+
 There is no default heap, registry, driver worker or maximum instance pool.
 Accepted asynchronous requests retain storage until acquire-observed SETTLED;
 cancel, timeout and failed drain preserve that borrow. Finite and continuous
@@ -42,8 +50,9 @@ progress contracts. No arbitrary load or IRQ delay is promised lossless.
 
 ## Start with a verified task
 
-- [Build an independent relocated Source SDK consumer](docs/tutorials/source-sdk.md).
+- [Create and run an external application](docs/tutorials/source-sdk.md).
 - [Execute rejection, cancellation and drain fixtures](docs/tutorials/async-io.md).
+- [Inspect configuration, progress and daily device commands](docs/guides/developer-workflow.md).
 - [Inspect the complete assembly format](docs/reference/configuration/assembly.md).
 - [Understand layers, factory and ownership](docs/explanation/platform-architecture.md).
 - [Check exact platform support and qualification](docs/reference/platforms/support.md).

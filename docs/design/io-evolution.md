@@ -178,7 +178,7 @@ with finite TX DMA on one USART3 owner. Its exact V/HSI64/baremetal reference
 uses AXI SRAM with Cache off or on; requests and the complete RX pool remain
 disjoint and borrowed through their respective drain. The existing
 `rx-dma-continuous` selection retains IRQ TX. See the
-[H743 provider contract](../../soc/stm32h743/README.md#selected-continuous-rx-and-finite-tx-dma-duplex)
+[H743 provider contract](../../soc/stm32/stm32h743/README.md#selected-continuous-rx-and-finite-tx-dma-duplex)
 for the three-vector, cold-restart and retained-taint boundaries. Neither
 selection expands to RTOS, PLL384 or D2 RAM.
 
@@ -470,7 +470,7 @@ validated topology or model does not complete these exits. Each mode needs its
 own provider, reviewed route, failure and ownership tests, ARM/SDK checks,
 resource costs and physical evidence where applicable. Finite
 [U575 UART GPDMA TX](u575-uart-gpdma.md), its separate
-[hardware-chain TX selection](../../soc/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx), the [joint PWM/ADC window](pwm-adc.md), selected
+[hardware-chain TX selection](../../soc/stm32/stm32u575/README.md#optional-usart1-finite-hardware-chain-tx), the [joint PWM/ADC window](pwm-adc.md), selected
 [G474 CAN FD modes](can-fd.md) and the separately selected
 [finite SRAM4/LPDMA1 channel-0 Stop2 copy](u575-stop2-copy.md) now have specific
 software paths; those selections do not complete the broader exits or establish

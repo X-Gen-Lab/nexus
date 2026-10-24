@@ -17,11 +17,13 @@ These declarations come from public header files. Selection, lifecycle, supporte
 :project: nexus
 ```
 
+(os_2include_2nexus_2os_2diagnostic_8h)=
+
 (diagnostic_8h)=
 
 ## diagnostic.h
 
-```{doxygenfile} diagnostic.h
+```{doxygenfile} os/include/nexus/os/diagnostic.h
 :project: nexus
 ```
 

@@ -1,2 +1,0 @@
-os/threadx/config/tx_user.h: run python scripts/tools/format.py --files os/threadx/config/tx_user.h
-Nexus style: failed; checked 426 source files; unchanged legacy format/comment files: 0/0

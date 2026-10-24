@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="3" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T17:56:11.293" name="AllTests">
-  <testsuite name="EthernetApi" tests="3" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T17:56:11.293">
-    <testcase name="PrepareExcludesFcsAndPreservesRejectedRequest" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_api_test.cpp" line="14" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:11.293" classname="EthernetApi" />
-    <testcase name="DispatchesExactInstanceWithoutInitialization" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_api_test.cpp" line="42" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:11.293" classname="EthernetApi" />
-    <testcase name="MdioRejectsMalformedAddressWithoutProviderCall" file="/workspace/nexus-iteration-bus-design/eth-src/tests/google/ethernet_api_test.cpp" line="53" status="run" result="completed" time="0." timestamp="2026-10-11T17:56:11.293" classname="EthernetApi" />
-  </testsuite>
-</testsuites>

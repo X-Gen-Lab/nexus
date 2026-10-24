@@ -6,7 +6,7 @@ except ImportError:
 
 
 def implementation(item):
-    from . import mode_implementation
+    from .contract import mode_implementation
     return mode_implementation(item.kind, item.mode)
 
 
@@ -174,10 +174,10 @@ def state_declarations(result):
 
 
 def start_system(result):
-    from . import cache_mask
+    from .contract import cache_mask
     cache = f'{cache_mask(result["clock_profile"])}u'
     if result.clock_plan is not None:
-        return preflight.emit(result) + [
+        return preflight.emit(result, dma_conditions=dma_admission_conditions) + [
             '    result.primary = nx_stm32h743_validate_identity();',
             '    if (result.primary != NX_SUCCESS) { return result; }',
             '    nx_stm32h743_start_result_t clock = nx_stm32h743_pll384_start(&s_nx_high_clock, 1000000u);',
@@ -194,7 +194,7 @@ def start_system(result):
             '        result.cleanup = nx_platform_stop_impl(diagnostic, true);',
             '        result.remaining_effects = result.cleanup == NX_SUCCESS ? 0u : 1u;',
             '        return result;', '    }']
-    source = preflight.emit(result) + [
+    source = preflight.emit(result, dma_conditions=dma_admission_conditions) + [
         '    result.primary = nx_stm32h743_validate_identity();',
         '    if (result.primary != NX_SUCCESS) { return result; }',
         f'    nx_stm32h743_start_result_t system = nx_stm32h743_system_start(&g_nx_stm32h743_system, {result["clock"]["core_hz"]}u, {cache}, 1000000u);',

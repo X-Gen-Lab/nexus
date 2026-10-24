@@ -33,12 +33,12 @@ foreach(g4_timer_kind capture encoder)
     nexus_google_test(${g4_timer_target} SOURCES g474_timer_factory_test.cpp
         g474_timer_factory_ports.c "${g4_timer_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/${g4_timer_driver}.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/${g4_timer_driver}.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${g4_timer_bundle}"
-            "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts")
     target_include_directories(${g4_timer_target} SYSTEM PRIVATE

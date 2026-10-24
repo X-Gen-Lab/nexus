@@ -10,12 +10,12 @@ target_compile_options(nexus_uart_v1_channel_dma_test PRIVATE
 foreach(legacy_family stm32f103 gd32f303)
     set(legacy_target "nexus_${legacy_family}_transport_test")
     nexus_google_test(${legacy_target} SOURCES legacy_transport_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${legacy_family}/drivers/uart_dma.c"
-        "${NEXUS_SOURCE_DIR}/soc/${legacy_family}/drivers/i2c_async.c"
+        "${NEXUS_SOC_SOURCE_${legacy_family}}/drivers/uart_dma.c"
+        "${NEXUS_SOC_SOURCE_${legacy_family}}/drivers/i2c_async.c"
         "${NEXUS_SOURCE_DIR}/soc/common/uart_v1_channel_dma.c"
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch Nexus::NativeModel
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/${legacy_family}/private")
+        INCLUDES "${NEXUS_SOC_SOURCE_${legacy_family}}/private")
     target_compile_options(${legacy_target} PRIVATE
         "-include${NEXUS_SOURCE_DIR}/tests/google/legacy_transport_model.h")
     target_include_directories(${legacy_target} SYSTEM PRIVATE

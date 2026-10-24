@@ -1,4 +1,0 @@
-[1/4] Building C object CMakeFiles/g474_system_test.dir/tests/contracts/g474_model.c.o
-[2/4] Building C object CMakeFiles/g474_system_test.dir/soc/stm32g474/system.c.o
-[3/4] Building CXX object CMakeFiles/g474_system_test.dir/tests/google/g474_system_test.cpp.o
-[4/4] Linking CXX executable g474_system_test

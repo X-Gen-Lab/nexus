@@ -1,7 +1,0 @@
-{"preserved": 50, "allocated": 403169280}
-{"preserved": 100, "allocated": 403169280}
-{"preserved": 150, "allocated": 403169280}
-{"preserved": 200, "allocated": 403169280}
-{"preserved": 250, "allocated": 403169280}
-{"preserved": 300, "allocated": 454868992}
-{"report": "/dev/shm/nexus-main-native-elf-retention-20261018-r1/retention.json", "sha256": "6da16ef8fa8cbbb060a1a4a9bbee81c13e9c4556ee8edbf2b9f2f7fd95bd2cf4", "programs": 306, "gzip_bytes": 477771753, "unique_blobs": 297}

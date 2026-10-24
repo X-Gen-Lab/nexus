@@ -1,3 +1,0 @@
-[ 10%] Building C object CMakeFiles/usb_contract.dir/workspace/nexus/io/src/usb_device_controller.c.o
-[ 20%] Linking CXX executable usb_contract
-[100%] Built target usb_contract

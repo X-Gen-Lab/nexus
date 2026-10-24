@@ -25,14 +25,14 @@ nexus_google_test(nexus_g474_pwm_adc_factory_test
     SOURCES g474_pwm_adc_factory_test.cpp g474_pwm_adc_factory_ports.cpp
         g474_pwm_adc_model.cpp "${g4_pwm_adc_bundle}/bindings.c"
         "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm_group.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm_adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_group.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm_adc.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_pwm_adc_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/io/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")

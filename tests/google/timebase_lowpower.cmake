@@ -13,11 +13,11 @@ target_compile_options(nexus_timebase_lowpower_test PRIVATE
 foreach(timebase_family stm32f407 gd32f470)
     set(timebase_target "nexus_${timebase_family}_lowpower_test")
     nexus_google_test(${timebase_target} SOURCES timebase_soc_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${timebase_family}/timebase_lowpower.c"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/timebase_lowpower.c"
         "${NEXUS_SOURCE_DIR}/os/freertos/timebase_lowpower.c"
         LIBRARIES Nexus::Core
         INCLUDES timebase_soc_profile
-            "${NEXUS_SOURCE_DIR}/soc/${timebase_family}/private"
+            "${NEXUS_SOC_SOURCE_${timebase_family}}/private"
             "${NEXUS_SOURCE_DIR}/os/freertos/private"
             "${NEXUS_SOURCE_DIR}/os/freertos/include"
             "${NEXUS_SOURCE_DIR}/arch/include")
@@ -54,13 +54,13 @@ foreach(timebase_family stm32f407 gd32f470)
         set(timebase_clock_source timebase.c)
     endif()
     nexus_google_test(${timebase_target} SOURCES timebase_soc_integration_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${timebase_family}/${timebase_clock_source}"
-        "${NEXUS_SOURCE_DIR}/soc/${timebase_family}/timebase_lowpower.c"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/${timebase_clock_source}"
+        "${NEXUS_SOC_SOURCE_${timebase_family}}/timebase_lowpower.c"
         "${NEXUS_SOURCE_DIR}/os/freertos/timebase_lowpower.c"
         LIBRARIES Nexus::Core
         INCLUDES timebase_soc_profile
-            "${NEXUS_SOURCE_DIR}/soc/${timebase_family}/private"
-            "${NEXUS_SOURCE_DIR}/soc/${timebase_family}"
+            "${NEXUS_SOC_SOURCE_${timebase_family}}/private"
+            "${NEXUS_SOC_SOURCE_${timebase_family}}"
             "${NEXUS_SOURCE_DIR}/os/freertos/private"
             "${NEXUS_SOURCE_DIR}/os/freertos/include"
             "${NEXUS_SOURCE_DIR}/arch/include")

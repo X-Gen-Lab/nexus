@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0e051631b1eb352f43bd868c61bb3e0efebc642dc7ec938570d4761e65454e43\n"
+"X-Nexus-Source-SHA256: e7d5ced8c74b0b015c14594ff34a0c89add6ed6dda57c37a461bbc8d4a35ccfc\n"
 
 msgid "原平台重构台账"
 msgstr "Original platform-reconstruction ledger"
@@ -19,14 +19,14 @@ msgid ""
 "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
 "<../../design/next-generation-execution.csv>`。 源文件：`docs/design/next-"
 "generation-"
-"execution.csv`；SHA-256：`7ac51ba75151159ac854db5e5f5791652fab48827ea8d1373d87432ae5ad93e1`。"
+"execution.csv`；SHA-256：`e2aa73331dd8779fd8f3802f358f09d5a197baccb565ded86982b5860472937b`。"
 msgstr ""
 "This page is derived from the original CSV; it is not a new status "
 "authority, execution record or software qualification. Original IDs, order "
 "and all fields come from the {download}`original ledger <../../design/next-"
 "generation-execution.csv>`. Source: `docs/design/next-generation-"
 "execution.csv`; SHA-256: "
-"`7ac51ba75151159ac854db5e5f5791652fab48827ea8d1373d87432ae5ad93e1`."
+"`e2aa73331dd8779fd8f3802f358f09d5a197baccb565ded86982b5860472937b`."
 
 msgid ""
 "不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
@@ -296,10 +296,11 @@ msgstr "Document/physical-PCB consistency awaits hardware"
 msgid "RF-BRD-01;RF-BLD-01"
 msgstr "RF-BRD-01;RF-BLD-01"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"tools/configure/configure.py;soc/*/soc.json;soc/*/routes.json;boards/*/board.json"
+"tools/configure/configure.py;soc/native/soc.json;soc/*/*/soc.json;soc/native/routes.json;soc/*/*/routes.json;boards/*/board.json"
 msgstr ""
-"tools/configure/configure.py;soc/*/soc.json;soc/*/routes.json;boards/*/board.json"
+"tools/configure/configure.py;soc/native/soc.json;soc/*/*/soc.json;soc/native/routes.json;soc/*/*/routes.json;boards/*/board.json"
 
 msgid ""
 "tests/contracts:contract_configuration_rejection;tools/configure/test_configure.py"
@@ -420,10 +421,11 @@ msgstr "Measure mask/cycle overhead, timer accuracy and IRQ preemption"
 msgid "RF-ARC-01;RF-OS-01"
 msgstr "RF-ARC-01;RF-OS-01"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"arch/include/nexus/arch/arch.h;arch/cortex_m/nx_arch_cortex_m.c;core/src/time.c"
+"arch/include/nexus/arch/arch.h;arch/arm/cortex_m/nx_arch_cortex_m.c;core/src/time.c"
 msgstr ""
-"arch/include/nexus/arch/arch.h;arch/cortex_m/nx_arch_cortex_m.c;core/src/time.c"
+"arch/include/nexus/arch/arch.h;arch/arm/cortex_m/nx_arch_cortex_m.c;core/src/time.c"
 
 msgid ""
 "tests/contracts/core_contract_test.c;tests/google/arch_cortex_test.cpp;tests/google/arch_native_test.cpp;tests/google/gd32_arch_test.cpp;tests/contracts/gd32_system_test.c;tests/contracts/stm32_model"
@@ -456,10 +458,11 @@ msgstr "Reset/clock/Flash-density/safe-output qualification"
 msgid "RF-BOOT-01;RF-FIX-01;RF-FIX-02"
 msgstr "RF-BOOT-01;RF-FIX-01;RF-FIX-02"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"soc/stm32f407/system.c;soc/stm32f407/soc.json;soc/stm32f407/CMakeLists.txt"
+"soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/soc.json;soc/stm32/stm32f407/CMakeLists.txt"
 msgstr ""
-"soc/stm32f407/system.c;soc/stm32f407/soc.json;soc/stm32f407/CMakeLists.txt"
+"soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/soc.json;soc/stm32/stm32f407/CMakeLists.txt"
 
 msgid ""
 "tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;tests/contracts/stm32_assembly"
@@ -481,10 +484,11 @@ msgstr "Actual ELF; exact chip modes; diagnosable clock/IRQ/reset errors"
 msgid "RF-BRD-02"
 msgstr "RF-BRD-02"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"soc/gd32f470/system.c;soc/gd32f470/timebase.c;soc/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json"
+"soc/gd32/gd32f470/system.c;soc/gd32/gd32f470/timebase.c;soc/gd32/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json"
 msgstr ""
-"soc/gd32f470/system.c;soc/gd32f470/timebase.c;soc/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json"
+"soc/gd32/gd32f470/system.c;soc/gd32/gd32f470/timebase.c;soc/gd32/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json"
 
 msgid ""
 "tests/contracts/gd32_system_test.c;tests/contracts/gd32_io_test.c;tests/contracts/gd32_assembly"
@@ -563,8 +567,11 @@ msgstr ""
 msgid "RF-HAL-01;RF-FIX-02"
 msgstr "RF-HAL-01;RF-FIX-02"
 
-msgid "io/include/nexus/io/gpio.h;soc/*/drivers/gpio.c;io/native/gpio.c"
-msgstr "io/include/nexus/io/gpio.h;soc/*/drivers/gpio.c;io/native/gpio.c"
+#: docs/status/ledgers/next-generation.md:26
+msgid ""
+"io/include/nexus/io/gpio.h;soc/*/*/drivers/gpio.c;soc/native/drivers/gpio.c"
+msgstr ""
+"io/include/nexus/io/gpio.h;soc/*/*/drivers/gpio.c;soc/native/drivers/gpio.c"
 
 msgid ""
 "tests/contracts/native_io_test.c;tests/contracts/stm32_io_test.c;tests/contracts/gd32_io_test.c;actual"
@@ -650,8 +657,9 @@ msgstr "TC/abort/RX loss/time accuracy/throughput; unexecuted"
 msgid "RF-HAL-02;RF-FIX-03;RF-HIL-02"
 msgstr "RF-HAL-02;RF-FIX-03;RF-HIL-02"
 
-msgid "soc/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h"
-msgstr "soc/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h"
+#: docs/status/ledgers/next-generation.md:26
+msgid "soc/stm32/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h"
+msgstr "soc/stm32/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h"
 
 msgid ""
 "tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;actual ARM "
@@ -677,8 +685,9 @@ msgstr ""
 msgid "RF-BRD-02;RF-HIL-02"
 msgstr "RF-BRD-02;RF-HIL-02"
 
-msgid "soc/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h"
-msgstr "soc/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h"
+#: docs/status/ledgers/next-generation.md:26
+msgid "soc/gd32/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h"
+msgstr "soc/gd32/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h"
 
 msgid "tests/contracts/gd32_io_test.c;contract_gd32_io;actual ARM preset"
 msgstr "tests/contracts/gd32_io_test.c;contract_gd32_io;actual ARM preset"
@@ -713,10 +722,11 @@ msgstr "CS/clock/MISO/DMA abort/drain; qualify only actually measured modes"
 msgid "RF-HAL-01;RF-HAL-04;RF-HIL-02"
 msgstr "RF-HAL-01;RF-HAL-04;RF-HIL-02"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"soc/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;io/native/spi.c"
+"soc/*/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;soc/native/drivers/spi.c"
 msgstr ""
-"soc/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;io/native/spi.c"
+"soc/*/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;soc/native/drivers/spi.c"
 
 msgid ""
 "tests/contracts/components_spi.c;tests/contracts/*_io_test.c;tests/contracts/*_assembly/*spi.json"
@@ -746,8 +756,11 @@ msgstr "Actual wiring/stuck bus/recovery/waveforms; unexecuted"
 msgid "RF-HAL-03;RF-HIL-02"
 msgstr "RF-HAL-03;RF-HIL-02"
 
-msgid "soc/*/drivers/i2c.c;tools/configure/*_bindings.py;io/native/i2c.c"
-msgstr "soc/*/drivers/i2c.c;tools/configure/*_bindings.py;io/native/i2c.c"
+#: docs/status/ledgers/next-generation.md:26
+msgid ""
+"soc/*/*/drivers/i2c.c;tools/configure/*_bindings.py;soc/native/drivers/i2c.c"
+msgstr ""
+"soc/*/*/drivers/i2c.c;tools/configure/*_bindings.py;soc/native/drivers/i2c.c"
 
 msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*i2c.json"
 msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*i2c.json"
@@ -781,10 +794,11 @@ msgstr "Erase/program/power and voltage/power loss; unexecuted"
 msgid "RF-FLS-01;RF-FLS-02;RF-FLS-03"
 msgstr "RF-FLS-01;RF-FLS-02;RF-FLS-03"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"soc/*/drivers/flash.c;io/src/flash_region.c;io/include/nexus/io/flash.h"
+"soc/*/*/drivers/flash.c;io/src/mechanisms/flash_region.c;io/include/nexus/io/flash.h"
 msgstr ""
-"soc/*/drivers/flash.c;io/src/flash_region.c;io/include/nexus/io/flash.h"
+"soc/*/*/drivers/flash.c;io/src/mechanisms/flash_region.c;io/include/nexus/io/flash.h"
 
 msgid ""
 "tests/contracts/*_io_test.c;tests/contracts/components_flash_storage.c;tests/contracts/components_storage.c"
@@ -821,10 +835,11 @@ msgstr "Actual timeout reset/debug freeze/power-on reset cause; unexecuted"
 msgid "RF-ARC-01;RF-HIL-02;RF-HIL-03"
 msgstr "RF-ARC-01;RF-HIL-02;RF-HIL-03"
 
+#: docs/status/ledgers/next-generation.md:26
 msgid ""
-"soc/*/drivers/watchdog.c;io/native/watchdog.c;io/include/nexus/io/watchdog.h"
+"soc/*/*/drivers/watchdog.c;soc/native/drivers/watchdog.c;io/include/nexus/io/watchdog.h"
 msgstr ""
-"soc/*/drivers/watchdog.c;io/native/watchdog.c;io/include/nexus/io/watchdog.h"
+"soc/*/*/drivers/watchdog.c;soc/native/drivers/watchdog.c;io/include/nexus/io/watchdog.h"
 
 msgid ""
 "tests/contracts/*_io_test.c;contract_gd32_watchdog-late-"
@@ -864,8 +879,11 @@ msgstr ""
 msgid "RF-HAL-01;RF-HIL-02"
 msgstr "RF-HAL-01;RF-HIL-02"
 
-msgid "soc/*/drivers/exti.c;io/include/nexus/io/exti.h;io/native/exti.c"
-msgstr "soc/*/drivers/exti.c;io/include/nexus/io/exti.h;io/native/exti.c"
+#: docs/status/ledgers/next-generation.md:26
+msgid ""
+"soc/*/*/drivers/exti.c;io/include/nexus/io/exti.h;soc/native/drivers/exti.c"
+msgstr ""
+"soc/*/*/drivers/exti.c;io/include/nexus/io/exti.h;soc/native/drivers/exti.c"
 
 msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*exti.json"
 msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*exti.json"
@@ -904,8 +922,11 @@ msgstr ""
 msgid "RF-HAL-01;RF-HIL-02;RF-HIL-03"
 msgstr "RF-HAL-01;RF-HIL-02;RF-HIL-03"
 
-msgid "soc/*/drivers/timer.c;io/include/nexus/io/timer.h;io/native/timer.c"
-msgstr "soc/*/drivers/timer.c;io/include/nexus/io/timer.h;io/native/timer.c"
+#: docs/status/ledgers/next-generation.md:26
+msgid ""
+"soc/*/*/drivers/timer.c;io/include/nexus/io/timer.h;soc/native/drivers/timer.c"
+msgstr ""
+"soc/*/*/drivers/timer.c;io/include/nexus/io/timer.h;soc/native/drivers/timer.c"
 
 msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*pwm.json"
 msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*pwm.json"
@@ -943,8 +964,11 @@ msgstr ""
 "Actual initial counts/accuracy/sample rate/timeout; unexecuted; high-rate "
 "trigger/DMA/block separately accepted"
 
-msgid "soc/*/drivers/adc.c;io/include/nexus/io/adc.h;io/native/adc.c"
-msgstr "soc/*/drivers/adc.c;io/include/nexus/io/adc.h;io/native/adc.c"
+#: docs/status/ledgers/next-generation.md:26
+msgid ""
+"soc/*/*/drivers/adc.c;io/include/nexus/io/adc.h;soc/native/drivers/adc.c"
+msgstr ""
+"soc/*/*/drivers/adc.c;io/include/nexus/io/adc.h;soc/native/drivers/adc.c"
 
 msgid "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*adc*.json"
 msgstr "tests/contracts/*_io_test.c;tests/contracts/*_assembly/*adc*.json"

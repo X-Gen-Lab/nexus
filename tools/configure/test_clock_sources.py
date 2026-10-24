@@ -1,4 +1,5 @@
 """Clock input identity never invents an external Board oscillator."""
+from tools.configure.providers.descriptor import source_directory
 import unittest
 
 from tools.configure import configure as gate
@@ -10,7 +11,7 @@ class ClockSourceContractTests(unittest.TestCase):
                              ("gd32f470", "GD32F470ZGT6"),
                              ("stm32g474", "STM32G474RET6")):
             with self.subTest(family=family):
-                soc = gate.load(gate.ROOT / "soc" / family / "soc.json")
+                soc = gate.load(gate.ROOT / source_directory(family) / "soc.json")
                 for profile in soc["clock_profiles"].values():
                     profile["source"] = "hse"
                     profile["input_hz"] = profile.pop("hse_hz")

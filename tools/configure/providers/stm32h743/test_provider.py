@@ -42,8 +42,8 @@ class H743DmaConfiguration(unittest.TestCase):
                          "irq:DMA1_Stream0")
 
     def test_soc_facts_declare_dma_for_the_existing_pin_route_only(self):
-        soc = json.loads((ROOT / "soc/stm32h743/soc.json").read_text())
-        routes = json.loads((ROOT / "soc/stm32h743/routes.json").read_text())
+        soc = json.loads((ROOT / "soc/stm32/stm32h743/soc.json").read_text())
+        routes = json.loads((ROOT / "soc/stm32/stm32h743/routes.json").read_text())
         self.assertIn("dma-tx", soc["controllers"]["USART3"]["modes"])
         route = next(item for item in routes["routes"]
                      if item["controller"] == "USART3")

@@ -3,6 +3,7 @@
 These tests qualify resolver/emission contracts. Whole generated provider tests,
 ARM images and physical peer behavior have separate evidence boundaries.
 """
+from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -256,7 +257,7 @@ class UartRtsCtsConfiguration(unittest.TestCase):
                 provider = maintained(item.provider)
                 self.assertEqual(provider.mode_implementation(item.kind, item.mode),
                                  "uart_rtscts")
-                directory = configure.ROOT / "soc" / item.provider
+                directory = configure.ROOT / source_directory(item.provider)
                 self.assertEqual(capabilities.source_ops(
                     directory / "drivers/uart_rtscts.c", configure.ROOT),
                     {"nx_stm32" + family + "_uart_rtscts_ops"})

@@ -30,6 +30,22 @@ FIG-06 does not treat REJECTED/ACCEPTED as request-state enum members. Core help
 cannot observe a peripheral's physical drain; the provider must establish that
 proof before publishing settlement.
 
+## Execution contexts and shutdown ownership
+
+| Operation group | Execution owner | Required lifetime and progress |
+| --- | --- | --- |
+| Direct request admission and service | One serialized executor in the public operation's permitted context | Keep admitted request and buffers through acquire-observed SETTLED; explicit service advances deadline and drain |
+| Fixed provider IRQ | The selected vector and its declared IRQ policy | Record bounded hardware facts; retain every reference until the provider proves withdrawal |
+| Cross-task producers or cancellation | An explicit owner/adapter using stable slots and epochs | Drain controls and join observers before recycling operation or adapter storage |
+| Waiting | The caller with an explicit wait/wake port | Check readiness, arm, recheck, wait and recheck the authoritative predicate; a hint alone does not settle a request or service hardware |
+| Platform start and stop | One external lifecycle owner | Quiesce callers and publishers, keep cleanup progressing and retain remaining effects after BUSY or failure |
+
+Atomic publication of request state does not serialize accesses to other
+request fields or payload buffers, or permit competing admission owners. Use
+the public operation contract and an explicit shared owner when multiple tasks
+access a controller. Platform stop does not revoke a static face or
+automatically stop product tasks.
+
 ## Three different completion facts
 
 ![Current UART and SPI memory, wire and final-publication order](../assets/diagrams/dma-completion.svg)

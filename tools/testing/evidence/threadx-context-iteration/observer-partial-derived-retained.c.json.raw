@@ -1,6 +1,0 @@
-{
-  "qualification": "owned intermediate build-derived cache retained before regeneration; not final candidate",
-  "source_sha256": "760b2e8e341b7fcdd2b5984eb9724100c562ccd27b79a18673f9fe45dd93b1da",
-  "output_sha256": "85ae6754cc6c9a74c6b29f2b0accd375c78ce2cd091a7bfa0e6c3a3a7396a989",
-  "reason": "add debug volatile qualification and reject failure to initialize recursive mutex attributes"
-}

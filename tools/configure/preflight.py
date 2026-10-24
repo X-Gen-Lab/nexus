@@ -40,7 +40,7 @@ def _clock(controller, family):
             else (f"RCU_APB{bus}EN", f"RCU_APB{bus}EN_{controller}EN"))
 
 
-def _modern_selected(result):
+def _modern_selected(result, dma_conditions=None):
     """Cold GPIO/byte-UART profiles keep family-specific banks and SDK hooks."""
     h7 = result.soc_family == "stm32h743"
     hook = "H743" if h7 else "U575"
@@ -90,15 +90,14 @@ def _modern_selected(result):
                 source += _reject(
                     "(NX_H743_READ(&RCC->D2CCIP1R) & RCC_D2CCIP1R_SPI45SEL) != 0u")
                 if item.mode == "dma":
-                    try:
-                        from .providers.stm32h743.emission import dma_admission_conditions
-                    except ImportError:
-                        from providers.stm32h743.emission import dma_admission_conditions
+                    if dma_conditions is None:
+                        fail("H743 DMA preflight requires its explicit provider "
+                             "admission contract")
                     for irq in ("DMA1_Stream2", "DMA1_Stream3", "SPI4"):
                         source += _reject(f"!NX_H743_IRQ_AVAILABLE({irq}_IRQn)")
                     source += [
                         "    if ((NX_H743_READ(&RCC->AHB1ENR) & RCC_AHB1ENR_DMA1EN) != 0u) {"]
-                    source += _reject(" || ".join(dma_admission_conditions(
+                    source += _reject(" || ".join(dma_conditions(
                         result, spi_only=True)), indent=8)
                     source.append("    }")
         if h7 and item.kind == "exti":
@@ -206,11 +205,11 @@ def _modern_selected(result):
     return source
 
 
-def selected(result):
+def selected(result, *, dma_conditions=None):
     """Project exact selected leases; base preflight owns the reserved timer."""
     family = result.soc_family
     if family in {"stm32h743", "stm32u575"}:
-        return _modern_selected(result)
+        return _modern_selected(result, dma_conditions)
     if family not in {"stm32f407", "gd32f470", "stm32g474"}:
         fail("No maintained selected cold preflight: " + family)
     source = []
@@ -365,7 +364,7 @@ def selected(result):
     return source + gpio_phase.preflight(result)
 
 
-def emit(result):
+def emit(result, *, dma_conditions=None):
     """Finish base and selected rejection before the system transaction."""
     calls = {
         "stm32f407": "nx_stm32_system_preflight(&g_nx_stm32_system)",
@@ -379,4 +378,4 @@ def emit(result):
         fail("No maintained base cold preflight: " + result.soc_family)
     return [f"    result.primary = {call};",
             "    if (result.primary != NX_SUCCESS) { return result; }",
-            *selected(result)]
+            *selected(result, dma_conditions=dma_conditions)]

@@ -313,4 +313,69 @@ def editor_schema():
     properties["usb_endpoint"] = {"type": "object", "additionalProperties": endpoint_schema}
     schema["oneOf"] = [{"required": ["board"], "not": {"required": ["board_package"]}},
                        {"required": ["board_package"], "not": {"required": ["board"]}}]
+    explain_schema(schema)
     return schema
+
+
+def explain_schema(schema):
+    """Attach editor help to the same fields without duplicating constraints."""
+    descriptions = {
+        "binding": "Exact reviewed Board binding; no route fallback.",
+        "controller": "Authored controller instance id, not an endpoint id.",
+        "mode": ("Explicit maintained mode; the product owns service "
+                 "and shutdown."),
+        "board": ("Maintained Board directory id; use board_package for "
+                  "private PCB data."),
+        "board_package": "Explicit Board package path relative to this assembly.",
+        "clock": "Reviewed clock profile matching the Board oscillator facts.",
+        "baud": ("UART baud in bits per second; the selected provider "
+                 "checks its divider."),
+        "capacity": ("Exact caller-selected ring capacity; not a hidden "
+                     "maximum pool."),
+        "priority": "Logical NVIC priority; lower numeric values are more urgent.",
+        "calls_os": ("Whether this IRQ may call the selected kernel; "
+                     "its ceiling is checked."),
+        "reference_mv": ("Declared analog reference in millivolts; "
+                         "not a measurement."),
+        "main_stack_bytes": ("Reserved main stack in bytes, not measured "
+                             "high-water."),
+        "libc_heap_bytes": ("Explicit libc heap reservation in bytes; "
+                            "zero disables it."),
+        "static_ram_limit_bytes": ("Declared static RAM limit in bytes; "
+                                   "checked against linked output."),
+        "flash_load_limit_bytes": ("Declared Flash LOAD limit in bytes; "
+                                   "not the ELF file size."),
+        "max_units_per_second": "Producer-rate bound in payload units per second.",
+        "units_per_block": "Payload units in each equally sized stream block.",
+        "blocks": "Explicit caller-owned stream block count.",
+        "source": "Reviewed source supporting this declared constraint.",
+    }
+
+    def visit(value):
+        if isinstance(value, list):
+            for child in value:
+                visit(child)
+        elif isinstance(value, dict):
+            for name, field in value.get("properties", {}).items():
+                if name in descriptions:
+                    field["description"] = descriptions[name]
+                elif name.endswith("_hz"):
+                    field["description"] = (
+                        "Frequency in hertz; exact provider limits still apply.")
+                elif name.endswith("_us"):
+                    field["description"] = (
+                        "Time interval in microseconds; "
+                        "not a measured hardware guarantee.")
+                elif name.endswith("_ns"):
+                    field["description"] = "Time interval in nanoseconds."
+                elif name.endswith("_ticks"):
+                    field["description"] = (
+                        "Count in the explicitly selected timer clock ticks.")
+                elif name.endswith("_bytes"):
+                    field["description"] = "Explicit storage size in bytes."
+            for key, child in value.items():
+                # Conditions express admission predicates, not editor fields.
+                if key != "if":
+                    visit(child)
+
+    visit(schema)

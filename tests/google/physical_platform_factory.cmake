@@ -36,8 +36,8 @@ foreach(physical_family stm32 gd32)
         set(physical_object "${physical_target}_${physical_mode}")
         add_library(${physical_object} OBJECT "${physical_bundle}/bindings.c")
         target_include_directories(${physical_object} PRIVATE
-            "${physical_bundle}" "${NEXUS_SOURCE_DIR}/soc/${physical_soc}"
-            "${NEXUS_SOURCE_DIR}/soc/${physical_soc}/private"
+            "${physical_bundle}" "${NEXUS_SOC_SOURCE_${physical_soc}}"
+            "${NEXUS_SOC_SOURCE_${physical_soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
         target_link_libraries(${physical_object} PRIVATE Nexus::IO Nexus::Arch)
         target_compile_definitions(${physical_object} PRIVATE
@@ -89,10 +89,10 @@ foreach(physical_family stm32 gd32)
     endforeach()
     nexus_google_test(${physical_target} ${physical_official}
         SOURCES physical_platform_factory_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${physical_soc}/drivers/gpio.c"
+        "${NEXUS_SOC_SOURCE_${physical_soc}}/drivers/gpio.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${physical_gpio_bundle}" "${NEXUS_SOURCE_DIR}/soc/${physical_soc}"
-            "${NEXUS_SOURCE_DIR}/soc/${physical_soc}/private"
+        INCLUDES "${physical_gpio_bundle}" "${NEXUS_SOC_SOURCE_${physical_soc}}"
+            "${NEXUS_SOC_SOURCE_${physical_soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_sources(${physical_target} PRIVATE
         $<TARGET_OBJECTS:${physical_target}_empty>
@@ -123,7 +123,7 @@ foreach(physical_family stm32 gd32)
             "${physical_gd}/GD32F4xx_standard_peripheral/Source/gd32f4xx_rcu.c")
         target_include_directories(${physical_vendor} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/private")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${physical_vendor} SYSTEM PRIVATE
             "${physical_gd}/CMSIS/GD/GD32F4xx/Include"
             "${physical_gd}/GD32F4xx_standard_peripheral/Include")

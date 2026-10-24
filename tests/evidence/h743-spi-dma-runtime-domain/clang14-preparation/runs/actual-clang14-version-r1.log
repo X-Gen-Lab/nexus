@@ -1,5 +1,0 @@
-LLVM (http://llvm.org/):
-  LLVM version 14.0.6
-  Optimized build.
-  Default target: x86_64-unknown-linux-gnu
-  Host CPU: znver3

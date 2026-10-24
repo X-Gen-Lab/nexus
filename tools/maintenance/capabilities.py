@@ -8,6 +8,7 @@ selected by existing software fixtures. It does not infer physical support.
 
 import argparse
 from collections import defaultdict
+import json
 from pathlib import Path
 import re
 import sys
@@ -19,6 +20,69 @@ from tools.configure import bindings, configure, documentation  # noqa: E402
 DOCUMENT = "docs/delivery/capabilities.md"
 START = "<!-- nexus-capabilities:start -->"
 END = "<!-- nexus-capabilities:end -->"
+
+
+def selection(assembly, root=ROOT):
+    """Describe one validated selection; execution has a separate authority.
+
+    Family declarations cannot establish a selected Board/backend/clock tuple.
+    Resolve the authored input normally, then project the existing typed public
+    contracts. No test receipt, linked image or physical observation is inferred
+    from an accepted configuration or a model implementation.
+    """
+    from tools.configure.ir import ConfigurationIR
+    from tools.configure import selected_contracts
+    from tools.configure.resource_graph import json_value
+
+    data = configure.resolve(Path(assembly), Path(root).resolve())
+    typed = ConfigurationIR.from_validated(data)
+    contracts = selected_contracts.for_configuration(typed)
+    by_face = {(item.id, item.public_class): item for item in contracts}
+    by_id = {item.id: item for item in typed.controllers}
+    selected_faces = set()
+    controllers = []
+    for item in data["controllers"]:
+        record = {key: item[key] for key in
+                  ("id", "controller", "kind", "mode", "binding")}
+        face = (item["id"], selected_contracts.controller_class(
+            by_id[item["id"]]))
+        selected_faces.add(face)
+        contract = by_face[face]
+        record.update(dma=item.get("dma", []), pins=item.get("pins", []),
+                      contract=json_value(vars(contract)))
+        controllers.append(record)
+    endpoints = []
+    for item in typed.devices:
+        face = (item.id, selected_contracts.endpoint_class(item))
+        selected_faces.add(face)
+        contract = by_face[face]
+        endpoints.append({"id": item.id, "controller": item.controller,
+                          "contract": json_value(vars(contract))})
+    validation = dict.fromkeys(("host_models", "arm_image", "installed_sdk",
+                                "software_candidate", "physical_hil"),
+                               "not_assessed")
+    validation["configuration"] = "validated"
+    if typed.soc_family == "native":
+        validation["physical_hil"] = "not_applicable"
+    return {"schema_version": 1, "kind": "selected_support",
+            "selection": {key: data[key] for key in
+                          ("board", "soc_family", "part", "package",
+                           "backend", "clock_profile", "cpu", "irq",
+                           "optimization", "physical_pcb_revision")},
+            "configuration_sha256": data["configuration_sha256"],
+            "controllers": controllers, "endpoints": endpoints,
+            "companion_interfaces": [json_value(vars(item))
+                                     for item in contracts if
+                                     (item.id, item.public_class) not in
+                                     selected_faces],
+            "memory_domains": data["memory"],
+            "resource_owners": data["claims"],
+            "input_identities": data["inputs"],
+            "validation": validation, "physical_qualified": False,
+            "limitations": ["Selection does not establish execution or "
+                            "hardware qualification.",
+                            *[item for item in data.get("limitations", [])
+                              if item != "Physical qualification not executed"]]}
 
 
 def c_code(source):
@@ -55,7 +119,7 @@ def collect(root=ROOT):
     routes = {}
     declared = defaultdict(set)
     exports = {}
-    for path in sorted((root / "soc").glob("*/soc.json")):
+    for path in sorted((root / "soc").rglob("soc.json")):
         soc = configure.load(path)
         if soc["id"] == "native":
             continue
@@ -81,8 +145,8 @@ def collect(root=ROOT):
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
     shared_sources = (set((root / "soc/common").glob("*.c"))
-                      | set((root / "io/src").glob("*.c"))
-                      | set((root / "io/native").glob("*.c")))
+                      | set((root / "io/src").rglob("*.c"))
+                      | set((root / "soc/native/drivers").glob("*.c")))
     for source in sorted(shared_sources):
         for symbol in source_ops(source, root):
             if symbol in exports:
@@ -201,9 +265,16 @@ def main(arguments=None):
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--check", action="store_true")
     action.add_argument("--write", action="store_true")
+    action.add_argument("--assembly", type=Path,
+                        help="print exact selected support JSON, not execution "
+                             "qualification")
     parser.add_argument("--root", type=Path, default=ROOT)
     args = parser.parse_args(arguments)
     try:
+        if args.assembly is not None:
+            print(json.dumps(selection(args.assembly, args.root), indent=2,
+                             sort_keys=True))
+            return 0
         examples = documentation.check(args.root)
         expected = render(collect(args.root))
         path = args.root / DOCUMENT

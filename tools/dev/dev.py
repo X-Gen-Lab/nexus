@@ -188,7 +188,9 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("configure", "build", "test",
                                           "check", "doctor", "prepare",
-                                          "qualify", "candidate", "cache", "docs"))
+                                          "qualify", "candidate", "cache", "docs",
+                                          "create", "flash", "debug", "monitor",
+                                          "timings"))
     parser.add_argument("--preset", default="native-debug")
     args, native = parser.parse_known_args(argv)
     try:
@@ -197,6 +199,15 @@ def main(argv=None):
         local_bin = ROOT / ".venv" / ("Scripts" if os.name == "nt" else "bin")
         environment["PATH"] = (str(local_bin) + os.pathsep
                                + environment.get("PATH", ""))
+        if args.action == "create":
+            from tools.dev import projects
+            return projects.main(native)
+        if args.action in ("flash", "debug", "monitor"):
+            from tools.dev import device
+            return device.main(args.action, native)
+        if args.action == "timings":
+            from tools.dev import timings
+            return timings.main(native)
         if args.action == "docs":
             return execute([sys.executable, "tools/documentation/cli.py"] + native,
                            environment)
@@ -240,10 +251,10 @@ def main(argv=None):
         if args.action == "test":
             command += ["--output-on-failure", "--no-tests=error"]
         if args.action == "test":
-            build = binary_directory(ROOT, args.preset, kind="test",
-                                     environment=environment)
-            selected_test = Presets(ROOT, environment).selected(
-                "test", args.preset)
+            presets = Presets(ROOT, environment)
+            selected_test = presets.selected("test", args.preset)
+            build = Path(presets.selected(
+                "configure", selected_test["configurePreset"])["binaryDir"])
             report = build / "ctest-results.xml"
             sys.path.insert(0, str(ROOT))
             from scripts.validation.junit import prepare_report, validate_junit

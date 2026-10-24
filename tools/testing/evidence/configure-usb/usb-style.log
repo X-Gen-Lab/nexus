@@ -1,1 +1,0 @@
-Style check failed: Files are not in the Git index: ['tests/contracts/usb_assembly/controller_main.c', 'tests/google/usb_factory_test.cpp']

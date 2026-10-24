@@ -19,7 +19,7 @@ foreach(family IN ITEMS h743 u575)
         SOURCES uart_fifo_acquisition_probe_test.cpp
             "${fifo_fixture}/irq_probe.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/${soc}/private")
+        INCLUDES "${NEXUS_SOC_SOURCE_${soc}}/private")
     target_compile_definitions(${target} PRIVATE ${selection} ${device}
         FIFO_FIXTURE_REVIEWED_MARKERS=1)
     # Reuse the existing host-only device-header boundary. Firmware still uses

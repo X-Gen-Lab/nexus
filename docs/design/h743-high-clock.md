@@ -26,14 +26,14 @@ owner. The diagram is not a frequency-transition sequence or physical proof;
 the exact clock stages below specialize its lifecycle responsibilities.
 
 One TOML `clock` selection resolves through reviewed
-[SoC facts](../../soc/stm32h743/soc.json) into immutable clock-domain IR.
+[SoC facts](../../soc/stm32/stm32h743/soc.json) into immutable clock-domain IR.
 The generated bundle selects the private implementation and CMake selects its
 translation unit. The typed factory still returns existing static faces without
 MMIO, allocation, clock setup or discovery. Runtime calls enter the selected
 provider directly through its shared read-only operations table.
 
-The [private clock contract](../../soc/stm32h743/private/stm32h743_clock.h) owns
-admission and clock responsibility. [System](../../soc/stm32h743/system.c) owns
+The [private clock contract](../../soc/stm32/stm32h743/private/stm32h743_clock.h) owns
+admission and clock responsibility. [System](../../soc/stm32/stm32h743/system.c) owns
 TIM2 and its vector. The generated
 [lifecycle glue](../../tools/configure/providers/stm32h743/emission.py) orders
 them and preserves startup and cleanup diagnostics. Their effect masks are

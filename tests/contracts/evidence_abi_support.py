@@ -1,7 +1,6 @@
 """Actual linked M3 soft and M4F hard/softfp ELF fixtures for consumer gates."""
 
 import os
-from pathlib import Path
 import re
 import shutil
 import subprocess

@@ -5,6 +5,7 @@
  */
 #ifndef NEXUS_IO_SPI_DMA_TRANSACTION_H
 #define NEXUS_IO_SPI_DMA_TRANSACTION_H
+#include "nexus/io/fwd.h"
 #include "nexus/io/spi.h"
 #include "nexus/io/spi_transaction.h"
 #ifdef __cplusplus
@@ -46,10 +47,10 @@ typedef struct {
                           nx_spi_dma_transaction_request_t* request);
 } nx_spi_dma_transaction_endpoint_ops_t;
 
-typedef struct {
+struct nx_spi_dma_transaction_endpoint {
     const nx_spi_dma_transaction_endpoint_ops_t* ops;
     void* context;
-} nx_spi_dma_transaction_endpoint_t;
+};
 
 typedef struct {
     nx_result_t (*cancel)(void* context,
@@ -58,10 +59,10 @@ typedef struct {
     nx_result_t (*stop)(void* context);
 } nx_spi_dma_transaction_port_ops_t;
 
-typedef struct {
+struct nx_spi_dma_transaction_port {
     const nx_spi_dma_transaction_port_ops_t* ops;
     void* context;
-} nx_spi_dma_transaction_port_t;
+};
 
 /**
  * \brief           Prepare unborrowed storage after validating every span.

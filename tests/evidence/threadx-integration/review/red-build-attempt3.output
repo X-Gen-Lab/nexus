@@ -1,8 +1,0 @@
-[1/8] Building CXX object CMakeFiles/threadx_probe.dir/workspace/nexus/tests/google/threadx_admission_test.cpp.o
-[2/8] Building CXX object CMakeFiles/threadx_bootstrap_test.dir/workspace/nexus/tests/google/threadx_bootstrap_test.cpp.o
-[3/8] Building C object CMakeFiles/threadx_bootstrap_test.dir/workspace/nexus/os/threadx/threadx.c.o
-[4/8] Building C object CMakeFiles/threadx_bootstrap_test.dir/workspace/nexus/arch/native/nx_arch_native.c.o
-[5/8] Building C object CMakeFiles/threadx_bootstrap_test.dir/workspace/nexus/core/src/time.c.o
-[6/8] Building C object CMakeFiles/threadx_bootstrap_test.dir/workspace/nexus/tests/contracts/os_threadx_runtime/clock.c.o
-[7/8] Linking CXX executable threadx_probe
-[8/8] Linking CXX executable threadx_bootstrap_test

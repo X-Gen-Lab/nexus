@@ -37,7 +37,7 @@ WUT-only scope of FIG-24.
 ## Select one RTC owner
 
 Use the public
-[retained-time header](../../components/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h)
+[retained-time header](../../components/soc/stm32/stm32u575_retained_time/include/nexus/components/stm32u575_retained_time.h)
 and link `Nexus::U575RetainedTime` explicitly. The optional target exists only
 for U575 baremetal single-state builds with no polling AlarmA `[rtc.*]` factory
 selection. It is not a generated factory, global Core clock replacement or
@@ -148,8 +148,8 @@ RUN clock has no SRAM4 admission requirement.
 ## Select and use the Stop2 owner
 
 Link `Nexus::U575Stop2` explicitly alongside the same no-AlarmA assembly. Its
-[public header](../../components/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h),
-[component contract](../../components/stm32u575_stop2/README.md) and
+[public header](../../components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2.h),
+[component contract](../../components/soc/stm32/stm32u575_stop2/README.md) and
 [public C11 consumer](../../cmake/package/verification/io_evolution/consumers/u575-stop2.c)
 define the exact STM32U575ZIT6Q TZEN0 baremetal sequence. Initialize the retained
 clock with `wake_owner=nx_stm32u575_stop2_identity()` and a maximum observation
@@ -216,8 +216,8 @@ sections 2.2.1, 2.2.3, 2.2.16 and 2.19.3. The latter shadow-read erratum uses
 BYPSHAD plus complete repeated tuples. Official CMSIS U5 headers remain pinned
 to `624374fa1e21ca195d6f2102ac0caaa50d0ea4c8`; no vendor bytes are modified.
 
-The [production source](../../components/stm32u575_retained_time/src/stm32u575_retained_time.c),
-[shared tuple reader](../../soc/stm32u575/private/stm32u575_rtc_calendar.h) and
+The [production source](../../components/soc/stm32/stm32u575_retained_time/src/stm32u575_retained_time.c),
+[shared tuple reader](../../soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h) and
 [GoogleTest/GoogleMock regressions](../../tests/google/u575_retained_time_test.cpp)
 cover real C11 behavior against external register and fault-observer ports.
 Development RED/GREEN and M33 public-link receipts establish software behavior

@@ -1,6 +1,0 @@
-{
-  "external/stm32f407vet6-freertos-i2c-dma.toml": "/workspace/nexus-config-iteration-evidence/mode-arm-expanded/stm32f407vet6-freertos-i2c-dma.toml",
-  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
-  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json",
-  "tests/contracts/stm32_assembly/ve_board/board.json": "/workspace/nexus/tests/contracts/stm32_assembly/ve_board/board.json"
-}

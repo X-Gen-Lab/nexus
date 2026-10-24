@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_LPTIM_H
 #define NEXUS_IO_LPTIM_H
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,10 +52,10 @@ typedef struct {
     nx_result_t (*stop)(void* context);
 } nx_lptim_ops_t;
 /** \brief Immutable two-pointer face; provider storage remains private. */
-typedef struct {
+struct nx_lptim_port {
     const nx_lptim_ops_t* ops;
     void* context;
-} nx_lptim_port_t;
+};
 /** \brief Prepare initialized unborrowed storage with copied shot metadata.
  * \param[in,out] request: READY or consumed SETTLED with all observers joined.
  * \param[in] domain: Separate nonzero owner/generation value copied here.

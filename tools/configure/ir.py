@@ -895,3 +895,9 @@ class ConfigurationIR(Record):
 
     def to_dict(self):
         return thaw(self)
+
+
+def controller_ir(item, family):
+    """Adapt validated legacy constructor fixtures without re-resolving facts."""
+    return (item if isinstance(item, ControllerIR) else
+            ControllerIR.create(item, family))

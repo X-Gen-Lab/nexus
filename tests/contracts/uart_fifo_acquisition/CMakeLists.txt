@@ -56,7 +56,7 @@ foreach(property NEXUS_SYSTEM_PRIVATE_INCLUDES NEXUS_SYSTEM_VENDOR_INCLUDES
     get_target_property(${property} Nexus::Platform ${property})
 endforeach()
 target_include_directories(fifo_acquisition_irq PRIVATE
-    "${NEXUS_SOURCE}/soc/${fifo_soc}/private" ${NEXUS_SYSTEM_PRIVATE_INCLUDES})
+    "${NEXUS_SOC_SOURCE_${fifo_soc}}/private" ${NEXUS_SYSTEM_PRIVATE_INCLUDES})
 target_include_directories(fifo_acquisition_irq SYSTEM PRIVATE
     ${NEXUS_SYSTEM_VENDOR_INCLUDES})
 target_compile_definitions(fifo_acquisition_irq PRIVATE

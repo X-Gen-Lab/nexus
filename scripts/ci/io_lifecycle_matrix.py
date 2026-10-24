@@ -12,7 +12,6 @@ import re
 import shlex
 import sys
 import tempfile
-import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -189,9 +188,16 @@ def build_inputs(root, build, catalogue):
         raise ValueError("A reviewed production/test TU has no compiled object")
     for row in data["properties"]:
         for source in [row["test_source"], *row["production_sources"]]:
-            if source == row["test_source"] or source.startswith("soc/"):
-                marker = "/CMakeFiles/" + row["target"] + ".dir/"
-                if not any(marker in item["object"] for item in contexts[source]):
+            source_name = (root / source).resolve().relative_to(
+                root.resolve()).as_posix()
+            if source == row["test_source"] or source_name.startswith("soc/"):
+                # The complete Native model is shared by public test targets;
+                # hardware providers and test bodies retain target-local builds.
+                owner = ("nexus_io_native" if source != row["test_source"] and
+                         source_name.startswith("soc/native/drivers/") else row["target"])
+                marker = "/CMakeFiles/" + owner + ".dir/"
+                if not any(marker in Path(item["object"]).resolve().as_posix()
+                           for item in contexts[source]):
                     raise ValueError("Reviewed test/provider compiled only for another target")
     return {"catalogue_sha256": digest(catalogue),
             "plan_sha256": digest(plan_path),

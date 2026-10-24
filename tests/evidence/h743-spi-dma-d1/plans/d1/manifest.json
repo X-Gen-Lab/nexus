@@ -1,9 +1,0 @@
-{
-  "kind": "read-only D1 execution-slice proposal; not authorization or actual RED/GREEN",
-  "plan_sha256": "550730eb694a727a4b5ae217d497bc4014aab4f6e0eac55d9690e6f2bdb4adc0",
-  "bytes": 14438,
-  "based_on_b1_r2_plan_sha256": "10fc6cdf560a00ca5c7a9e268532c8d77b437c8cb2dfdce7e48c0020be5a0783",
-  "w1_final_manifest_sha256": "333484a14a720b84588c47866f701d60d56d78f899845d367ed705ad0c194b7b",
-  "production_written": false,
-  "build_or_tests_executed": false
-}

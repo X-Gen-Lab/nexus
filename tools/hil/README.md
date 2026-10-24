@@ -111,6 +111,64 @@ python tools/hil/measure.py validate \
     --report station/measurement-validation.json
 ```
 
+To compare an optimization against an executed baseline, reuse the same raw
+measurement and admission contracts. Both runs are fully revalidated; a saved
+validation summary cannot replace retained inputs. The report destination must
+not already exist.
+
+```sh
+python tools/hil/measure.py compare \
+    --baseline-raw station/before/measurements.json \
+    --baseline-admission station/before/admission.json \
+    --candidate-raw station/after/measurements.json \
+    --candidate-admission station/after/admission.json \
+    --report station/comparison.json
+```
+
+Comparison requires the same station/fixture bytes, Board/part/chip UID,
+reviewed budgets, resolved runtime configuration, workload bytes, CPU rate,
+load, executor, IRQ priorities and acquisition method, instrument, resolution
+and window. It reuses the linked-cost observer's configuration projection;
+source provenance and ELF bytes may differ, but routes, modes, memory regions
+and stack/heap reservations must remain equivalent. This is a runtime
+comparison, not a claim that compiler flags or implementation bytes are equal.
+Each metric also needs the same sample count. Changed condition groups reject
+with their names; a different workload or chip is a separate experiment.
+
+DWT runs may use different correctly owned counter epochs. Each run still
+passes the existing independent-reference and wrap checks. Capture clock role,
+instrument identity, rate, uncertainty and CPU frequency envelope remain equal;
+each run's capture timestamps and epoch are retained in its original evidence.
+The default freshness window is 86400 seconds for both runs. A reviewed older
+baseline needs explicit `--maximum-age-s`; it is never silently exempted.
+
+The result is `compared` / `comparison_only`, with original per-run statistics
+and signed candidate-minus-baseline minimum, maximum and mean. It does not
+choose an improvement direction, infer statistical confidence or prove WCET.
+Both runs must already satisfy their reviewed budgets. Synthetic validator
+tests do not qualify a board; unexecuted physical baselines remain
+`not_executed`.
+
+优化前后比较复用同一套原始测量与准入合同，两边均重新验证，不能用先前的
+通过摘要代替原件。输出路径必须尚不存在，防止覆盖任一输入。
+
+比较要求站点和 fixture 字节、板卡／芯片／UID、评审预算、运行时配置、负载
+字节、CPU 频率、并发负荷、执行器、IRQ 优先级、测量方法、仪器、分辨率和
+观测窗口相同，并要求每个指标的样本数一致。配置比较复用链接成本工具的
+投影；源码来源和 ELF 允许变化，路由、模式、内存及栈／heap 保留量不能改变。
+这只比较运行时条件，不声称编译选项或实现字节等价。条件不同时报告对应组，
+不同芯片或负载应作为独立实验。
+
+DWT 两次运行可以使用各自合法的新 epoch，但都必须通过独立参考时钟与回绕
+检查。采集时钟角色、仪器身份、频率、误差和 CPU 频率边界必须一致；各自的
+时间戳与 epoch 仍保留在原始记录。两边默认只接受 86400 秒内的记录，使用
+经评审的更早基线时显式设置 `--maximum-age-s`，不能静默豁免。
+
+输出状态为 `compared`／`comparison_only`，保留两边统计值并给出候选减基线的
+最小值、最大值及平均值差量；不自动判定优劣，不推断统计置信度或 WCET。
+两边均须满足原有评审预算。合成测试只验证工具合同，未进行的实板基线继续
+标记为 `not_executed`。
+
 A measurement run is a strict schema-2 `physical_hil_measurements` object with
 `started_utc`, `finished_utc` (UTC offsets required), `station_id`, `board`, `part`,
 `chip_uid`, `elf_sha256`, `resolved_sha256`, `admission_sha256`, `context` and

@@ -7,7 +7,7 @@ except ImportError:
 
 
 def implementation(item):
-    from . import mode_implementation
+    from .contract import mode_implementation
     return mode_implementation(item.kind, item.mode)
 
 

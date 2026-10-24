@@ -122,6 +122,14 @@ def _same_attributes(left, right):
                 for (a, x), (b, y) in zip(left, right)))
 
 
+def conflict(key, previous, current, reason="Resource conflict"):
+    """Preserve both canonical owners for human and machine diagnostics."""
+    fail(f"{reason} {key}: {previous.owner} (source {previous.source}) "
+         f"versus {current.owner} (source {current.source})",
+         code="resource_conflict", resource=key,
+         claims=[json_value(asdict(previous)), json_value(asdict(current))])
+
+
 def resolve(records, *, aliases=None, shared=None):
     """Resolve validated fact aliases and explicit compatible subresources.
 
@@ -162,6 +170,10 @@ with compatible attributes. Existing controller reservations stay exclusive.
                 key not in sharing or fields != sharing[key]):
             fail("Compatible resource requires exact reviewed sharing facts")
         personality = value.get("personality")
+        item = ResourceClaimIR(key, _text(value["owner"], "resource owner"),
+                               _text(value["mode"], "resource mode"),
+                               _text(value["source"], "resource source"),
+                               policy, attrs, personality)
         if personality is not None:
             identifier(personality, "IP personality")
             physical_ip = key.partition("/")[0]
@@ -170,13 +182,10 @@ with compatible attributes. Existing controller reservations stay exclusive.
                 fail("IP personality requires an explicit physical IP identity")
             previous_personality = personalities.get(physical_ip)
             if (previous_personality is not None and
-                    previous_personality != personality):
-                fail(f"Resource personality conflict {physical_ip}")
-            personalities[physical_ip] = personality
-        item = ResourceClaimIR(key, _text(value["owner"], "resource owner"),
-                               _text(value["mode"], "resource mode"),
-                               _text(value["source"], "resource source"),
-                               policy, attrs, personality)
+                    previous_personality.personality != personality):
+                conflict(physical_ip, previous_personality, item,
+                         "Resource personality conflict")
+            personalities[physical_ip] = item
         duplicate = False
         for previous in result:
             related = (key == previous.key or
@@ -186,7 +195,7 @@ with compatible attributes. Existing controller reservations stay exclusive.
                 continue
             if (personality is not None and previous.personality is not None and
                     personality != previous.personality):
-                fail(f"Resource personality conflict {key}")
+                conflict(key, previous, item, "Resource personality conflict")
             if key == previous.key:
                 if (item == previous and
                         _same_attributes(attrs, previous.attributes)):
@@ -195,11 +204,31 @@ with compatible attributes. Existing controller reservations stay exclusive.
                 if (policy == previous.policy == "compatible" and
                         _same_attributes(attrs, previous.attributes)):
                     continue
-                fail(f"Resource conflict {key}: "
-                     f"{previous.owner} versus {item.owner}")
+                conflict(key, previous, item)
             if item.owner != previous.owner:
-                fail(f"Resource parent/child conflict {key}: "
-                     f"{previous.owner} versus {item.owner}")
+                conflict(key, previous, item, "Resource parent/child conflict")
         if not duplicate:
             result.append(item)
     return ResourcePlanIR(tuple(result))
+
+
+def normalize_resource(value):
+    timer = re.fullmatch(r"(?:timer:|controller:)?(TIM[0-9]+|TIMER[0-9]+)", value)
+    if timer is not None:
+        return "controller:" + timer[1]
+    if value.startswith("dma:"):
+        channel = re.fullmatch(r"dma:(GPDMA1):channel(0|[1-9][0-9]*)"
+                               r"(?::request(0|[1-9][0-9]*))?", value)
+        if channel is not None:
+            return f"dma:{channel[1]}:channel{channel[2]}"
+        match = re.fullmatch(r"dma:([A-Z][A-Z0-9_]*):stream([0-9]+)"
+                             r"(?::channel([0-9]+))?", value)
+        if match is None:
+            fail(f"Invalid physical DMA resource: {value}")
+        return f"dma:{match[1]}:stream{int(match[2])}"
+    if value.startswith("irq:"):
+        irq = value[4:]
+        for suffix in ("_IRQHandler", "_IRQn", "_Handler"):
+            if irq.endswith(suffix):
+                return "irq:" + irq[:-len(suffix)]
+    return value

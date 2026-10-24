@@ -1,7 +1,0 @@
-{
-  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
-  "external/gd32-freertos.toml": "/workspace/nexus-config-iteration-evidence/usb-arm-matrix-green/gd32-freertos.toml",
-  "soc/gd32f470/routes.json": "/workspace/nexus/soc/gd32f470/routes.json",
-  "soc/gd32f470/soc.json": "/workspace/nexus/soc/gd32f470/soc.json",
-  "tests/contracts/usb_assembly/gd32-board/board.json": "/workspace/nexus/tests/contracts/usb_assembly/gd32-board/board.json"
-}

@@ -9,6 +9,15 @@
  *                  Methods are linked but never called by this fixture. This
  *                  is software evidence, not a HIL image or Board wiring proof.
  */
+#include "nexus/io/adc.h"
+#include "nexus/io/exti.h"
+#include "nexus/io/flash.h"
+#include "nexus/io/gpio.h"
+#include "nexus/io/i2c.h"
+#include "nexus/io/spi.h"
+#include "nexus/io/timer.h"
+#include "nexus/io/uart.h"
+#include "nexus/io/watchdog.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
 

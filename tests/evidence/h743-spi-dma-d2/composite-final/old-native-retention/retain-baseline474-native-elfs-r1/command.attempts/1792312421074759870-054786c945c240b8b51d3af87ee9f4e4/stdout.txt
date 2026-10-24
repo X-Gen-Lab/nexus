@@ -1,5 +1,0 @@
-{"preserved": 50, "allocated": 60141568}
-{"preserved": 100, "allocated": 146423808}
-{"preserved": 150, "allocated": 222072832}
-{"preserved": 200, "allocated": 304627712}
-{"preserved": 250, "allocated": 381124608}

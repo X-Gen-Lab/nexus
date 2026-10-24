@@ -185,6 +185,55 @@ class ComponentPublicContractsTests(unittest.TestCase):
                 metadata.write_text("typedef unsigned long nx_component_metadata_t;\n")
                 self.assertIn(file_identity(metadata), source_contracts(root)[3])
 
+    def test_tagged_typedef_faces_are_discovered_without_changing_the_alias(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, header, _, _ = self.tree(directory)
+            header.write_text(header.read_text().replace(
+                "typedef struct { const nx_component_probe_ops_t* ops;",
+                "typedef struct nx_component_probe { "
+                "const nx_component_probe_ops_t* ops;"))
+            faces, _, _, _ = source_contracts(root)
+            self.assertEqual(faces["nx_component_probe_t"],
+                             "nx_component_probe_ops_t")
+
+    def test_standalone_face_resolves_its_canonical_forward_alias(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, header, _, _ = self.tree(directory)
+            forward = root / "io/include/nexus/io/fwd.h"
+            forward.write_text("typedef struct nx_component_owner_face "
+                               "nx_component_probe_t;\n")
+            header.write_text(header.read_text().replace(
+                "typedef struct { const nx_component_probe_ops_t* ops; "
+                "void* context; } nx_component_probe_t;",
+                "struct nx_component_owner_face { "
+                "const nx_component_probe_ops_t* ops; void* context; };"))
+            faces, _, _, _ = source_contracts(root)
+            self.assertEqual(faces["nx_component_probe_t"],
+                             "nx_component_probe_ops_t")
+            self.assertNotIn("nx_component_owner_face_t", faces)
+
+    def test_nested_component_headers_and_relocated_mechanisms_are_inputs(self):
+        from tools.evidence.common import file_identity
+        from tools.measurement.retention import component_owner_input_paths
+        with tempfile.TemporaryDirectory() as directory:
+            root, header, source, metadata = self.tree(directory)
+            nested = root / "components/soc/vendor/probe/include/nexus/components"
+            nested.mkdir(parents=True)
+            moved_header = nested / header.name
+            header.rename(moved_header)
+            metadata.rename(nested / metadata.name)
+            mechanism = root / "io/src/mechanisms/probe.c"
+            mechanism.parent.mkdir(parents=True)
+            source.rename(mechanism)
+            _, _, providers, inputs = source_contracts(root)
+            self.assertIn("nx_component_probe_ops", providers)
+            self.assertIn(file_identity(moved_header), inputs)
+            self.assertEqual(providers["nx_component_probe_ops"]["source"],
+                             file_identity(mechanism))
+            owners = component_owner_input_paths(root)
+            self.assertIn(moved_header, owners)
+            self.assertIn(mechanism, owners)
+
     def test_actual_soc_component_operations_use_the_public_component_header(self):
         from tools.evidence.common import file_identity
         faces, layouts, providers, inputs = source_contracts()
@@ -195,7 +244,7 @@ class ComponentPublicContractsTests(unittest.TestCase):
         self.assertEqual(set(providers["nx_stm32u575_lpdma_copy_ops"]["fields"]),
                          {"cancel", "service", "stop"})
         root = Path(__file__).resolve().parents[2]
-        self.assertIn(file_identity(root / "components/stm32u575_lpdma_copy/include/"
+        self.assertIn(file_identity(root / "components/soc/stm32/stm32u575_lpdma_copy/include/"
                                     "nexus/components/stm32u575_lpdma_copy.h"), inputs)
 
     def test_duplicate_component_operations_and_face_types_are_rejected(self):
@@ -258,7 +307,7 @@ class ProviderRetentionTests(unittest.TestCase):
         self.assertEqual(faces.get("nx_can_port_t"), "nx_can_ops_t")
         self.assertEqual(providers["nx_classic_can_ops"]["type"], "nx_can_ops_t")
         self.assertTrue(providers["nx_classic_can_ops"]["source"]["path"].endswith(
-            "/io/src/can_controller.c"))
+            "/io/src/controllers/can_controller.c"))
         self.assertEqual(set(providers["nx_classic_can_ops"]["fields"]),
                          set(layouts["nx_can_ops_t"]))
 
@@ -617,7 +666,7 @@ class I2s2ComponentRetentionTests(unittest.TestCase):
         self.rejected()
 
     def test_reordered_public_slots_cannot_expand_the_component_abi(self):
-        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+        relative = ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
                     "f407_i2s2_slave_tx.h")
         source = (Path(__file__).resolve().parents[2] / relative).read_text()
         source = source.replace("(*submit)", "(*temporary)").replace(
@@ -627,7 +676,7 @@ class I2s2ComponentRetentionTests(unittest.TestCase):
             header = root / relative
             header.parent.mkdir(parents=True)
             header.write_text(source)
-            provider = root / "soc/stm32f407/drivers/i2s2_slave_tx.c"
+            provider = root / "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c"
             provider.parent.mkdir(parents=True)
             provider.write_text(
                 "const nx_f407_i2s2_slave_tx_ops_t "
@@ -656,7 +705,7 @@ class I2s2ComponentRetentionTests(unittest.TestCase):
 
     def test_storage_size_follows_the_public_32bit_union_contract(self):
         from tools.measurement.retention import i2s2_storage_contract
-        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+        relative = ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
                     "f407_i2s2_slave_tx.h")
         source = (Path(__file__).resolve().parents[2] / relative).read_text()
         with tempfile.TemporaryDirectory() as directory:
@@ -668,7 +717,7 @@ class I2s2ComponentRetentionTests(unittest.TestCase):
 
     def test_redefined_or_changed_public_storage_contract_is_rejected(self):
         from tools.measurement.retention import i2s2_storage_contract
-        relative = ("components/f407_i2s2_slave_tx/include/nexus/components/"
+        relative = ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
                     "f407_i2s2_slave_tx.h")
         source = (Path(__file__).resolve().parents[2] / relative).read_text()
         changes = [source.replace("typedef union {",
@@ -863,7 +912,7 @@ static const nx_pwm_port_t s_nx_face_right = {
             self.assertEqual(face['selector_field'], 'channel')
             self.assertEqual(face['selector_value'], index)
             self.assertTrue(face['context_contract']['path'].endswith(
-                'soc/stm32g474/private/stm32g474_pwm_shared.h'))
+                'soc/stm32/stm32g474/private/stm32g474_pwm_shared.h'))
 
     def test_face_pointer_cannot_target_the_neighbor_const_reference(self):
         elf, bindings = self.fixture()

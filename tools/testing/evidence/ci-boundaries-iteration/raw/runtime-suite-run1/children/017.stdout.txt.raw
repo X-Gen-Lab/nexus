@@ -1,4 +1,0 @@
-[0/1] Re-running CMake...
--- Configuring incomplete, errors occurred!
-FAILED: [code=1] build.ninja 
-/workspace/nexus/.venv/lib/python3.12/site-packages/cmake/data/bin/cmake --regenerate-during-build -S"/tmp/nexus CPU runtime a2f4x1lc/consumer source" -B"/tmp/nexus CPU runtime a2f4x1lc/consumer build"

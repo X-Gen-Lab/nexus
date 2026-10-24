@@ -1,9 +1,9 @@
 """Cold-only generated glue for two independently selected G474 owners."""
 from ..common import Construction, fail, kernel_policy_constant
 try:
-    from ...emission import dma_regions
+    from ...memory import dma_regions
 except ImportError:
-    from emission import dma_regions
+    from memory import dma_regions
 
 
 def constructor(item, result, bindings):

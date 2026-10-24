@@ -9,12 +9,15 @@ msgstr ""
 "X-Nexus-Reviewed: true\n"
 "X-Nexus-Source-SHA256: ebadb74337357a4c4328799c28ff908ce7306d3d13ef83e8502388777152e223\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:1
 msgid "后续迭代与团队执行"
 msgstr "Next iterations and team execution"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:3
 msgid "第一阶段：把软件候选变成实板证据"
 msgstr "Stage one: turn software candidates into physical evidence"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:5
 msgid ""
 "当前最高优先级是接入三块首发实际 Board、记录 PCB/晶振/供电/接线，建立 probe、serial 和 waveform/power-cut "
 "station。G474、H743、U575 来源参考配置另行核对实际板卡， H743 还需观察供电模式，U575 需在执行镜像前确认 option "
@@ -33,6 +36,7 @@ msgstr ""
 "Keep trial outputs disconnected from product loads; station contracts govern"
 " field actions."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:12
 msgid ""
 "以同一 candidate ELF 做 cycles、IRQ latency、最长 service 间隔、stack high-water、 "
 "丢失、长负载测量。源码／汇编推断只能帮助定位，不写成真实时序结果。需要调整 预算或 provider 时重新生成对应 "
@@ -43,9 +47,11 @@ msgstr ""
 "inference helps locate causes but is not a measured timing result. Budget or"
 " provider changes require regenerated source/config/artifact evidence."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:16
 msgid "第二阶段：按测量增加能力"
 msgstr "Stage two: add capabilities according to measurements"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:18
 msgid ""
 "F407/F470 已有 UART/SPI 有限 DMA、UART 连续 RX／双向 DMA、ADC 有限／连续 trigger blocks、I2C "
 "IRQ／DMA、Classic CAN、USB FS PIO，以及精确软件夹具的 Ethernet、capture 和 complementary "
@@ -63,6 +69,7 @@ msgstr ""
 " eight messages and exact routes; 10-bit or longer transactions are separate"
 " extensions."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:25
 msgid ""
 "F103/GD303 新增有限 UART channel-DMA、正常 RX block、I2C IRQ 消息及物理 Flash／单次 ADC／固定 "
 "PWM；GD303 另维护 EXTI。有限 RX 依赖 owner service 重新装填，必须测量间隙、背压和丢失；I2C priority0 "
@@ -75,6 +82,7 @@ msgstr ""
 "hardware timer cascade also needs physical carry and Flash-stall "
 "observations; host models cannot establish bridge propagation delay."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:30
 msgid ""
 "G474 新增 ADC1 bulb 单次／TIM6 正常 DMA block、I2C1 polling 和 ECC Flash； "
 "必须实测首次转换丢弃、预热、2.5–50 kHz 精确触发范围与真实采样孔径。H743 已维护 有限 UART RX DMA-IDLE、可选已初始化 "
@@ -99,24 +107,30 @@ msgstr ""
 "physical qualification. See [SOC-28–36](../design/soc-refinement.md) for "
 "sequencing and explicit exits:"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "方向"
 msgstr "Direction"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "进入实现前必须固定的合同"
 msgstr "Contract to fix before implementation"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "G474 新模式或更多 controller/route"
 msgstr "New G474 modes or more controllers/routes"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "已有 bulb/有限 DMA/I2C/Flash 的实测边界；新控制器另固定 IRQ／DMA 冲突、Board 来源、实例隔离与预算"
 msgstr ""
 "Measured limits of existing bulb/finite-DMA/I2C/Flash paths; new controllers"
 " additionally fix IRQ/DMA conflicts, Board provenance, instance isolation "
 "and budgets"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "H743 DMA 与 Cache"
 msgstr "H743 DMA and Cache"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid ""
 "已有 AXI/SRAM1 有限路径的实测一致性；其他 DMA1/2、BDMA、MDMA 分别审查可达域、cache-line 所有权、维护时点与失败借用"
 msgstr ""
@@ -124,33 +138,41 @@ msgstr ""
 "and MDMA paths independently review reachability, cache-line ownership, "
 "maintenance points and retained borrows on failure"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "U575 DMA 与安全域"
 msgstr "U575 DMA and security domains"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "GPDMA/LPDMA descriptor 生命周期、内存和外设归属、GTZC/MPCBB、实际 TZEN 入口与错误处理"
 msgstr ""
 "GPDMA/LPDMA descriptor lifecycle, memory/peripheral ownership, GTZC/MPCBB, "
 "actual TZEN entry and error handling"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "新固定时钟或运行时变频"
 msgstr "New fixed clocks or runtime frequency changes"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "供电／Flash／bus 顺序、consumer 重配置、回滚和 deadline domain；固定 profile 与动态转换分别实现"
 msgstr ""
 "Power/Flash/bus ordering, consumer reconfiguration, rollback and deadline "
 "domains; implement fixed profiles separately from dynamic transitions"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "bootloader 接管或 deep STOP"
 msgstr "Bootloader handover or deep STOP"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "VTOR／mask／FP／DMA 活跃状态、RAM 所有权，RTC/LPTIM 连续域、wake 恢复与精度"
 msgstr ""
 "Active VTOR/mask/FP/DMA state, RAM ownership, RTC/LPTIM continuous domain, "
 "wake recovery and precision"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "userspace I/O transport"
-msgstr "Userspace I/O transport"
+msgstr "userspace I/O transport"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid ""
 "真实 principal、权限、copy/pin、异步借用、退出回收和 SVC/MPU/TZ gateway；现有 scalar broker 不代替 "
 "transport"
@@ -159,6 +181,7 @@ msgstr ""
 "reclamation and SVC/MPU/TZ gateways; the existing scalar broker does not "
 "replace transport"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:50
 msgid ""
 "每次扩展先明确 owner、buffer、cancel/drain、ISR、deadline、对齐/cache 与停止 合同，再用 "
 "GoogleTest/GoogleMock 做真实 RED→GREEN 的生产 provider 纵切片， 随后验证实际生成 factory、ARM "
@@ -171,6 +194,7 @@ msgstr ""
 "retain no resources; growing generic-object costs are not imposed on every "
 "product."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:55
 msgid ""
 "本轮源实现、定向开发执行与最终集成软件资格分开记录。最终验收须绑定冻结后的 精确 "
 "source/config/tool/artifact；新文档、源码合并或旧测试计数不替代实际执行。 ECC Flash 的 "
@@ -186,6 +210,7 @@ msgstr ""
 "equipment is absent, so physical items remain `not_executed`; they are not "
 "promoted to safety certification or production release."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:60
 msgid ""
 "优先复用已有窄端口与静态装配；当现有合同无法表达硬件事实时允许明确版本化的 破坏性变更。Flash "
 "认证、升级、制造密钥与工业安全政策属于外部产品／独立机制， 不能因已有 storage CRC 或 watchdog feed 就声称完成。"
@@ -196,64 +221,83 @@ msgstr ""
 "policy belong to external products/independent mechanisms. Existing storage "
 "CRC or watchdog feed cannot establish their completion."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:64
 msgid "十人角色与企业工作流"
 msgstr "Ten-person roles and enterprise workflow"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "角色"
 msgstr "Role"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "席位"
 msgstr "Seats"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "负责的可复核产物"
 msgstr "Reviewable outputs owned"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "技术负责人"
 msgstr "Technical lead"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "1"
 msgstr "1"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "契约、边界、预算与支持 scope，跨层设计审查"
 msgstr ""
 "Contracts, boundaries, budgets, support scope and cross-layer design review"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "Core/I/O/OS"
 msgstr "Core/I/O/OS"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "2"
 msgstr "2"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "所有权、并发、时间、静态资源与公共 ABI"
 msgstr "Ownership, concurrency, time, static resources and public ABI"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "STM32/GD32 BSP"
 msgstr "STM32/GD32 BSP"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "精确 facts/routes、SDK/startup/provider、故障模型"
 msgstr "Exact facts/routes, SDK/startup/provider and fault models"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "通用器件／通信与外部应用"
 msgstr "Generic devices/communications and external applications"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "窄端口组件、器件 driver、外部 composition"
 msgstr "Narrow-port components, device drivers and external composition"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "QA/HIL"
 msgstr "QA/HIL"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "软件故障、实际 station、时序／掉电／长期负载证据"
 msgstr ""
 "Software faults, actual stations, timing/power-cut/sustained-load evidence"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "构建发布"
 msgstr "Build/release"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:0
 msgid "唯一配置／CMake图、锁与 SDK、CI、候选／复现证据"
 msgstr ""
 "Single configuration/CMake graph, locks/SDK, CI and candidate/reproduction "
 "evidence"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:75
 msgid ""
 "维护责任由 Codex 全部承担，`.github/maintainer-roles.json` 使用 `agent_managed` "
 "策略。十人角色保留为领域与容量划分，不再要求实名账号；安全、 制造和现场接口也由同一维护责任覆盖，产品权限／流程留在外部应用仓库。"
@@ -264,6 +308,7 @@ msgstr ""
 "responsibility covers security, manufacturing and field interfaces; product "
 "permissions/processes remain in external application repositories."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:79
 msgid ""
 "`python tools/maintenance/ownership.py --require-assigned` 验证负责 agent、 "
 "路径覆盖、备用领域和强制门禁。GoogleTest／GoogleMock、配置、ARM、预算、SDK 和证据身份检查继续执行。该策略不生成虚构 "
@@ -280,6 +325,7 @@ msgstr ""
 "tools](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
 "SOURCE/tools/maintenance/README.md)."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/next-iterations.md:85
 msgid ""
 "Issue 描述具体触发和可观察结果；PR 明确源／配置／依赖／工具与影响的合同。每次 commit 自动检查 staged 内容和 "
 "Conventional Commit，CI 用同一整文件规范。 新行为和缺陷修复必须 TDD，主机合同采用 "

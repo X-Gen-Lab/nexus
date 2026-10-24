@@ -12,6 +12,51 @@ from tools.measurement.compare import compare, tool_identity, profile_input
 
 
 class MeasurementMatrixTests(unittest.TestCase):
+    def test_parallelism_rejects_unbounded_or_noninteger_work_before_build(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for jobs in (0, -1, True, 1.5, "2"):
+                with self.subTest(jobs=jobs), self.assertRaisesRegex(
+                        EvidenceError, "parallel"):
+                    compare(root, root / "absent.json", root / "build",
+                            parallel=jobs)
+            self.assertFalse((root / "build").exists())
+
+    def test_actual_build_respects_explicit_single_job_and_retains_failure(self):
+        cmake = shutil.which("cmake")
+        ninja = shutil.which("ninja")
+        if not cmake or not ninja:
+            self.skipTest("CMake/Ninja unavailable; build control not exercised")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source"
+            source.mkdir()
+            subprocess.run(["git", "init", "-q", str(source)], check=True)
+            (source / "CMakeLists.txt").write_text(
+                "cmake_minimum_required(VERSION 3.20)\n"
+                "project(bounded_measurement NONE)\n"
+                "add_custom_target(expected_failure ALL COMMAND "
+                "${CMAKE_COMMAND} -E false)\n")
+            toolchain = source / "cmake/toolchains/arm-gcc.cmake"
+            toolchain.parent.mkdir(parents=True)
+            toolchain.write_text("# No compiler needed for this build boundary.\n")
+            subprocess.run(["git", "-C", str(source), "add", "."], check=True)
+            subprocess.run(["git", "-C", str(source), "-c", "user.name=Test",
+                "-c", "user.email=test@example.invalid", "commit", "-qm", "fixture"], check=True)
+            assembly = root / "fixture.json"
+            atomic_json(assembly, {"board_package": "board.json"})
+            atomic_json(root / "fixture-empty.json", {"board_package": "board.json"})
+            report = compare(source, assembly, root / "build",
+                compiler=str(Path(sys.executable).resolve()),
+                cmake=str(Path(cmake).resolve()), ninja=str(Path(ninja).resolve()),
+                workloads=("empty",), optimizations=("Os",), parallel=1)
+            self.assertEqual(report["status"], "failed")
+            commands = report["images"][0]["commands"]
+            self.assertEqual(commands[0]["exit_code"], 0)
+            self.assertNotEqual(commands[1]["exit_code"], 0)
+            self.assertEqual(commands[1]["argv"][-2:], ["--parallel", "1"])
+            self.assertEqual(report["build_parallelism"], 1)
+
     def test_authored_toml_profiles_preserve_endpoint_and_board_paths(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

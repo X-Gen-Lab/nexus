@@ -24,6 +24,9 @@ typedef struct {
     nx_request_state_t active_state;
     bool has_active;
     bool idle;
+    bool accepting;
+    bool queued;
+    bool slot_available;
 } nx_owner_observation_t;
 /**
  * \brief           Opt-in caller sidecar; no pointer added to default owner.

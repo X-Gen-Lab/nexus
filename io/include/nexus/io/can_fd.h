@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_CAN_FD_H
 #define NEXUS_IO_CAN_FD_H
 #include "nexus/io/can.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -77,10 +78,10 @@ typedef struct {
     nx_result_t (*recover)(void*);
     nx_result_t (*attach_wake)(void*, const nx_irq_wake_t*, uint8_t);
 } nx_can_fd_ops_t;
-typedef struct {
+struct nx_can_fd_port {
     const nx_can_fd_ops_t* ops;
     void* context;
-} nx_can_fd_port_t;
+};
 /**
  * \brief Validate and copy an exact frame into unborrowed request storage.
  * \param[in,out] request: Initialized READY or consumed SETTLED storage.

@@ -1,7 +1,0 @@
-[0/2] Re-checking globbed directories...
-[1/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_flash_fault_test.dir/gd32_flash_fault_test.cpp.o
-[2/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_adc_stream_test.dir/gd32_adc_stream_test.cpp.o
-[3/7] Linking CXX executable bin/nexus_gd32_flash_fault_test
-[4/7] Linking CXX executable bin/nexus_gd32_adc_stream_test
-[5/7] Building CXX object tests/contracts/google/CMakeFiles/nexus_can_controller_test.dir/can_controller_test.cpp.o
-[6/7] Linking CXX executable bin/nexus_can_controller_test

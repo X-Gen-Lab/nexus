@@ -1,18 +1,22 @@
 """Cold assembly selects static contexts; hot I/O uses the one actual ops table."""
 try:
+    from ...ir import controller_ir
+except ImportError:
+    from ir import controller_ir
+try:
     from ... import enhanced_endpoints, uart_formats
 except ImportError:
     import enhanced_endpoints
     import uart_formats
-from ..common import Construction, controller_ir, fail, kernel_policy_constant
+from ..common import Construction, fail, kernel_policy_constant
 
 
 def spi_dma_constructor(item, result, board_bindings, routes, devices):
     """One exact static owner; Platform already holds its gates and pads."""
     try:
-        from ...emission import dma_regions
+        from ...memory import dma_regions
     except ImportError:
-        from emission import dma_regions
+        from memory import dma_regions
     name = item.id.replace("-", "_")
     state = "s_nx_port_" + name
     children = [child for child in devices if child.controller == item.id]
@@ -95,7 +99,7 @@ def spi_dma_constructor(item, result, board_bindings, routes, devices):
 
 def constructor(item, result, board_bindings, routes, devices):
     """Construct only the exact GPIOB/byte USART3 implementation."""
-    from . import mode_implementation, validate_selection
+    from .contract import mode_implementation, validate_selection
     item = controller_ir(item, "stm32h743")
     if item.provider != "stm32h743":
         fail("H743 constructor cannot reinterpret a foreign provider decision")
@@ -141,9 +145,9 @@ def constructor(item, result, board_bindings, routes, devices):
             fail("USART baud is not representable by the selected local kernel")
         if dma:
             try:
-                from ...emission import dma_regions
+                from ...memory import dma_regions
             except ImportError:
-                from emission import dma_regions
+                from memory import dma_regions
             # Reachability does not authorize unselected, uninitialized RAM.
             allowed_memory = {"axi-sram"} if continuous else {"axi-sram", "sram1"}
             memory = [region for region in result["memory"]

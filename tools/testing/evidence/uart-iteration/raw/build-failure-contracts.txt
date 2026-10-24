@@ -1,4 +1,0 @@
-[1/4] Building CXX object tests/contracts/google/CMakeFiles/nexus_gd32_uart_receive_test.dir/gd32_uart_receive_test.cpp.o
-[2/4] Building CXX object tests/contracts/google/CMakeFiles/nexus_stm32_uart_receive_test.dir/stm32_uart_receive_test.cpp.o
-[3/4] Linking CXX executable bin/nexus_gd32_uart_receive_test
-[4/4] Linking CXX executable bin/nexus_stm32_uart_receive_test

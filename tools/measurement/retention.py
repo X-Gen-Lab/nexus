@@ -126,8 +126,17 @@ def source_contracts(root=ROOT):
     """Read public ABI and provider initializers without a mode registry."""
     faces, layouts, providers, inputs = {}, {}, {}, []
     public_headers = set((root / "io/include/nexus/io").glob("*.h"))
-    public_headers.update((root / "components").glob(
-        "*/include/nexus/components/*.h"))
+    public_headers.update((root / "components").rglob(
+        "include/nexus/components/*.h"))
+    forward_aliases = {}
+    for path in sorted(public_headers):
+        source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
+                        flags=re.DOTALL)
+        for tag, alias in re.findall(
+                r"typedef\s+struct\s+(nx_\w+)\s+(nx_\w+_t)\s*;", source):
+            if tag in forward_aliases and forward_aliases[tag] != alias:
+                raise EvidenceError("ambiguous public face alias")
+            forward_aliases[tag] = alias
     for path in sorted(public_headers):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
@@ -145,19 +154,20 @@ def source_contracts(root=ROOT):
         for name, operations in re.findall(
                 r"struct\s+(nx_\w+)\s*\{\s*const\s+(nx_\w+_ops_t)\s*"
                 r"\*\s*ops\s*;\s*void\s*\*\s*context\s*;\s*\}\s*;", source):
-            if name + "_t" in faces:
+            alias = forward_aliases.get(name, name + "_t")
+            if alias in faces:
                 raise EvidenceError("duplicate public face type")
-            faces[name + "_t"] = operations
+            faces[alias] = operations
         for operations, name in re.findall(
-                r"typedef\s+struct\s*\{\s*const\s+(nx_\w+_ops_t)\s*"
+                r"typedef\s+struct(?:\s+nx_\w+)?\s*\{\s*const\s+(nx_\w+_ops_t)\s*"
                 r"\*\s*ops\s*;\s*void\s*\*\s*context\s*;\s*\}\s*"
                 r"(nx_\w+_t)\s*;", source):
             if name in faces:
                 raise EvidenceError("duplicate public face type")
             faces[name] = operations
-    provider_sources = set((root / "soc").glob("*/drivers/*.c"))
+    provider_sources = set((root / "soc").rglob("drivers/*.c"))
     provider_sources.update((root / "soc/common").glob("*.c"))
-    provider_sources.update((root / "io/src").glob("*.c"))
+    provider_sources.update((root / "io/src").rglob("*.c"))
     for path in sorted(provider_sources):
         source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                         flags=re.DOTALL)
@@ -266,7 +276,7 @@ def reference_layout(root, bindings, typename):
         include = directive[1]
         if Path(include).name != include:
             continue
-        candidates = set((root / "soc").glob("*/private/" + include))
+        candidates = set((root / "soc").rglob("private/" + include))
         for directory in (root / "io/private", root / "io/include/nexus/io"):
             path = directory / include
             if path.is_file():
@@ -485,7 +495,7 @@ def selected_i2s2_role(resolved):
 
 def i2s2_storage_contract(root):
     """Read the maintained 32-bit union ABI, including its uint64 alignment."""
-    path = root / ("components/f407_i2s2_slave_tx/include/nexus/components/"
+    path = root / ("components/soc/stm32/f407_i2s2_slave_tx/include/nexus/components/"
                    "f407_i2s2_slave_tx.h")
     source = re.sub(r"/\*.*?\*/|//[^\n]*", " ", path.read_text(),
                     flags=re.DOTALL)
@@ -525,7 +535,7 @@ def inspect_i2s2_component(elf, role, face_types, layouts, providers, root):
     if (provider is None or expected_type is None
             or provider["type"] != expected_type
             or provider["source"] != file_identity(
-                root / "soc/stm32f407/drivers/i2s2_slave_tx.c")):
+                root / "soc/stm32/stm32f407/drivers/i2s2_slave_tx.c")):
         raise EvidenceError(
             "missing exact I2S2 public/private operations contract")
     slot_names = layouts[expected_type]
@@ -611,7 +621,7 @@ COMPONENT_OWNER_SMOKES = frozenset((
 
 def component_storage_size(root, stem, macro):
     """Read the public ARM32 owner extent, rather than guess it from names."""
-    path = root / f"components/{stem}/include/nexus/components/{stem}.h"
+    path = root / f"components/soc/stm32/{stem}/include/nexus/components/{stem}.h"
     source = path.read_text()
     sizes = re.findall(r"#if UINTPTR_MAX == UINT32_MAX\s+"
                        r"#define " + macro + r" ([1-9][0-9]*)U", source)
@@ -641,13 +651,13 @@ def component_owner_input_paths(root):
     paths = {root / "core/include/nexus/core/time.h",
              root / "tools/release/transport.py"}
     paths.update((root / "io/include/nexus/io").glob("*.h"))
-    paths.update((root / "components").glob("*/include/nexus/components/*.h"))
-    paths.update((root / "components").glob("*/src/*.c"))
-    paths.update((root / "soc").glob("*/drivers/*.c"))
+    paths.update((root / "components").rglob("include/nexus/components/*.h"))
+    paths.update((root / "components").rglob("src/*.c"))
+    paths.update((root / "soc").rglob("drivers/*.c"))
     paths.update((root / "soc/common").glob("*.c"))
-    paths.update((root / "io/src").glob("*.c"))
+    paths.update((root / "io/src").rglob("*.c"))
     paths.update((root / "io/private").glob("*.h"))
-    paths.add(root / "soc/stm32u575/stop2.c")
+    paths.add(root / "soc/stm32/stm32u575/stop2.c")
     for _, assembly, smoke in SELECTED_CONSUMERS:
         if smoke in COMPONENT_OWNER_SMOKES:
             paths.update((root / assembly,
@@ -1186,12 +1196,12 @@ def inspect_mpu_gpio(elf, resolved, providers, *, root=ROOT):
     proof_sources = [file_identity(root / path) for path in (
         "os/freertos/mpu/gpio.c", "os/freertos/mpu/syscalls.c",
         "os/freertos/mpu/task.c", "os/freertos/mpu/prepare_port.py",
-        "tools/configure/memory.py", "soc/stm32u575/system.c",
-        "soc/stm32u575/mpu_user_init.c",
+        "tools/configure/memory.py", "soc/stm32/stm32u575/system.c",
+        "soc/stm32/stm32u575/mpu_user_init.c",
         "os/freertos/include/nexus/os/freertos_mpu_gpio.h",
         "os/freertos/include/nexus/os/freertos_mpu.h",
         "os/freertos/include/nexus/os/freertos_user.h",
-        "soc/stm32u575/drivers/gpio.c")]
+        "soc/stm32/stm32u575/drivers/gpio.c")]
     return {"status": "passed", "kind": "selected_u575_mpu_gpio_linked_layout",
             "domains": {name: list(span) for name, span in domains.items()},
             "task_bytes": abi["task"], "control_bytes": abi["control"],

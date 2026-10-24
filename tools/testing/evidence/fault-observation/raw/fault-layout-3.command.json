@@ -1,9 +1,0 @@
-{
-  "command": [
-    "/workspace/nexus-tools-arm/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-size",
-    "-A",
-    "/workspace/nexus-io-implementation-evidence/lifecycle-tdd/fault-default-arm.o"
-  ],
-  "cwd": "/workspace/nexus",
-  "exit_code": 0
-}

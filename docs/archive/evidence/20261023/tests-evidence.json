@@ -1,0 +1,14 @@
+{
+  "archive": {
+    "path": "docs/archive/evidence/20261023/tests-evidence.tar.gz",
+    "sha256": "ed0d291899c5d98379cf148081e14cbb2230a4d5c06d0548f02b93e6d127887b",
+    "size": 40906576
+  },
+  "bytes": 73575258,
+  "files": 4215,
+  "kind": "portable_evidence",
+  "manifest_sha256": "28d973c5d49ea9eb30b2b99ffb20ead30770bbdf5161a68147f390fe5633954e",
+  "product_promotion": false,
+  "schema_version": 1,
+  "signature_status": "unsigned"
+}

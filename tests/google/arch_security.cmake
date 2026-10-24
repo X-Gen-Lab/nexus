@@ -14,7 +14,7 @@ foreach(profile single secure secure-no-sau nonsecure)
     endif()
     set(name "nexus_arch_security_${profile}_test")
     nexus_google_test(${name} SOURCES arch_security_test.cpp
-        "${NEXUS_SOURCE_DIR}/arch/cortex_m/nx_arch_security.c"
+        "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_security.c"
         INCLUDES "${NEXUS_SOURCE_DIR}/arch/include"
             "${NEXUS_SOURCE_DIR}/tests/google")
     target_compile_definitions(${name} PRIVATE NEXUS_ARCH_MECHANISM_MODEL

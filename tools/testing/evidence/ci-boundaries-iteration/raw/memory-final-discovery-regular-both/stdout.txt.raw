@@ -1,6 +1,0 @@
-Running main() from gmock_main.cc
-MemoryBootFixture.
-  OccupiedAddressKeepsItsOriginalOwnerAndContents
-  HostImageAndHeapStayAboveEveryHardwareWindow
-  ResetInitializesOnlyAuthoredRegions
-  IncomingTcmClockIsNeverDisabledByReset

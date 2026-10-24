@@ -236,7 +236,7 @@ class G474ADCGroupConfiguration(unittest.TestCase):
                   if entry["sha256"] == policy.review_sha256]
         self.assertEqual(len(review), 1)
         self.assertTrue(re.fullmatch(
-            r"soc/stm32g474/reviews/[a-z0-9-]+\.json", review[0]["path"]))
+            r"soc/stm32/stm32g474/reviews/[a-z0-9-]+\.json", review[0]["path"]))
 
 
 if __name__ == "__main__":

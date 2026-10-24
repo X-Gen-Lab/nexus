@@ -17,6 +17,28 @@ class ResourceGraphTests(unittest.TestCase):
             graph.resolve([claim("controller:TIM3"),
                            claim("controller:TIM3", "other")])
 
+    def test_conflicts_retain_both_canonical_claims_for_diagnostics(self):
+        cases = (
+            ([claim("controller:TIM3", "owner-a", source="route-a"),
+              claim("controller:TIM3/channel/1", "owner-b", source="route-b")], {}),
+            ([claim("controller:TIM3", "owner-a", source="route-a"),
+              claim("controller:TIM3", "owner-b", source="route-b")], {}),
+            ([claim("controller:UART", "owner-a", source="route-a",
+                    personality="uart"),
+              claim("controller:SPI", "owner-b", source="route-b",
+                    personality="spi")],
+             {"controller:UART": "ip:FLEXCOMM0", "controller:SPI": "ip:FLEXCOMM0"}),
+        )
+        for claims, aliases in cases:
+            with self.subTest(claims=claims), self.assertRaises(ValueError) as error:
+                graph.resolve(claims, aliases=aliases)
+            details = error.exception.details
+            self.assertEqual(details["code"], "resource_conflict")
+            self.assertEqual([item["owner"] for item in details["claims"]],
+                             ["owner-a", "owner-b"])
+            self.assertEqual([item["source"] for item in details["claims"]],
+                             ["route-a", "route-b"])
+
     def test_parent_claim_blocks_other_owner_child(self):
         for records in ([claim("controller:TIM3"),
                          claim("controller:TIM3/channel/1", "other")],

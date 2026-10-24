@@ -13,4 +13,4 @@ target_compile_definitions(nexus_user_io_broker_test_provider PRIVATE
 nexus_google_test(nexus_user_io_broker_test SOURCES user_io_broker_test.cpp
     LIBRARIES nexus_user_io_broker_test_provider Nexus::NativeModel Nexus::Arch
     INCLUDES "${NEXUS_SOURCE_DIR}/io/private"
-        "${NEXUS_SOURCE_DIR}/io/native")
+        "${NEXUS_SOURCE_DIR}/soc/native/drivers")

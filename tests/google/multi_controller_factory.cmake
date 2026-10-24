@@ -35,17 +35,17 @@ foreach(multi_family stm32 gd32)
     nexus_google_test(${multi_target} ${multi_official}
         SOURCES multi_controller_factory_test.cpp
         "${multi_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/uart_dma.c"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/spi_dma.c"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/i2c_async.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/uart_dma.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi_dma.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/i2c_async.c"
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${multi_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/soc/common"
-            "${NEXUS_SOURCE_DIR}/soc/${multi_soc}"
-            "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/private"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_compile_options(${multi_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/multi_controller_factory_model.h"
@@ -55,11 +55,11 @@ foreach(multi_family stm32 gd32)
     # Keep real GPIO methods; only the external cold pin/clock ports are modeled.
     set(multi_gpio "${multi_target}_gpio")
     add_library(${multi_gpio} OBJECT
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/gpio.c")
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/gpio.c")
     target_link_libraries(${multi_gpio} PRIVATE Nexus::IO Nexus::Arch)
     target_include_directories(${multi_gpio} PRIVATE
-        "${multi_bundle}" "${NEXUS_SOURCE_DIR}/soc/${multi_soc}"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/private"
+        "${multi_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_compile_options(${multi_gpio} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/multi_controller_factory_model.h"
@@ -108,7 +108,7 @@ foreach(multi_family stm32 gd32)
             "${multi_gd}/GD32F4xx_standard_peripheral/Source/gd32f4xx_spi.c")
         target_include_directories(${multi_vendor} PRIVATE
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model"
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/private")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${multi_vendor} SYSTEM PRIVATE
             "${multi_gd}/CMSIS/GD/GD32F4xx/Include"
             "${multi_gd}/GD32F4xx_standard_peripheral/Include")
@@ -146,10 +146,10 @@ foreach(multi_family stm32 gd32)
     nexus_google_test(${single_target} ${multi_official}
         SOURCES single_spi_factory_test.cpp
         "${single_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/drivers/spi.c"
+        "${NEXUS_SOC_SOURCE_${multi_soc}}/drivers/spi.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${single_bundle}" "${NEXUS_SOURCE_DIR}/soc/${multi_soc}"
-            "${NEXUS_SOURCE_DIR}/soc/${multi_soc}/private"
+        INCLUDES "${single_bundle}" "${NEXUS_SOC_SOURCE_${multi_soc}}"
+            "${NEXUS_SOC_SOURCE_${multi_soc}}/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
     target_sources(${single_target} PRIVATE $<TARGET_OBJECTS:${multi_gpio}>)
     target_compile_options(${single_target} PRIVATE

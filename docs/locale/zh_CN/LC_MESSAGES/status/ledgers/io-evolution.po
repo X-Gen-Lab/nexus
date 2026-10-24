@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source documentation\n"
@@ -7,13 +7,23 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: ad5817cc175469415cf53e1ab3a5724f57a657afc910b8f2c55eff524f52852d\n"
+"X-Nexus-Source-SHA256: 2cd9b171dbb489eaff86150f68813ddf78f2a90f25347999cebee628134d661b\n"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:9
 msgid "I/O 增量实施台账"
 msgstr "I/O 增量实施台账"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:15
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:11
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-"
+"execution.csv`；SHA-256：`ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1`。"
+msgstr ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-"
+"execution.csv`；SHA-256：`ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1`。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:15
 msgid ""
 "不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
 "已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
@@ -25,1033 +35,1091 @@ msgstr ""
 "`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
 "[软件证据入口](../software-verification.md)。"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:21
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:21
 msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
 msgstr "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:24
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:24
 msgid "本表包含 42 条原记录，仅表示来源行数。"
 msgstr "本表包含 42 条原记录，仅表示来源行数。"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:32
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:32
 msgid "IO-01"
 msgstr "IO-01"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "原字段"
 msgstr "原字段"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "原值"
 msgstr "原值"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`task_id`"
 msgstr "`task_id`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`phase`"
 msgstr "`phase`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "P0"
 msgstr "P0"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`area`"
 msgstr "`area`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "capabilities"
 msgstr "capabilities"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`task`"
 msgstr "`task`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Single authority for exact provider and mode support"
 msgstr "精确 provider 与模式支持的单一权威"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`implementation_paths`"
 msgstr "`implementation_paths`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "tools/configure/selected_contracts.py;tools/configure/io_traits.py;tools/configure/factory.py;tools/maintenance/work_packages.py;docs/delivery/capabilities.md"
 msgstr ""
 "tools/configure/selected_contracts.py;tools/configure/io_traits.py;tools/configure/factory.py;tools/maintenance/work_packages.py;docs/delivery/capabilities.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`exit_condition`"
 msgstr "`exit_condition`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Existing catalogue plus selected metadata; document exact boundaries"
 msgstr "既有目录加选定元数据；明确记录精确边界"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`implementation_status`"
 msgstr "`implementation_status`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "implemented"
 msgstr "implemented"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`software_status`"
 msgstr "`software_status`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "not_qualified"
 msgstr "not_qualified"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`hardware_status`"
 msgstr "`hardware_status`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "not_executed"
 msgstr "not_executed"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "`maintenance_owner`"
 msgstr "`maintenance_owner`"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Codex"
 msgstr "Codex"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:48
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:48
 msgid "IO-02"
 msgstr "IO-02"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "traits"
 msgstr "traits"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Optional immutable typed I/O traits"
 msgstr "可选不可变 typed I/O traits"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "tools/configure/io_traits.py;tools/configure/factory.py"
 msgstr "tools/configure/io_traits.py;tools/configure/factory.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Capability switch controls all emitted readonly trait objects"
 msgstr "能力开关控制所有生成的只读 trait 对象"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:64
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:64
 msgid "IO-03"
 msgstr "IO-03"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "silicon"
 msgstr "silicon"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Observed silicon identity and revision admission"
 msgstr "实际硅片身份观察与修订准入"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "core/include/nexus/core/silicon.h;core/src/silicon.c"
 msgstr "core/include/nexus/core/silicon.h;core/src/silicon.c"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "Exact documents and revision policy; unknown is explicit; factory stays cold"
 msgstr "精确资料与修订政策；unknown 明确保留；factory 保持冷查找"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "in_progress"
-msgstr "in_progress"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:80
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:80
 msgid "IO-04"
 msgstr "IO-04"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "lifecycle"
 msgstr "lifecycle"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Admission cancellation drain epochs and quarantine regression matrix"
 msgstr "准入、取消、排空、epoch 与隔离回归矩阵"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "core/src/request.c;tests/google/io_state_machine_test.cpp;tests/google/spi_dma_owner_wait_test.cpp"
 msgstr ""
 "core/src/request.c;tests/google/io_state_machine_test.cpp;tests/google/spi_dma_owner_wait_test.cpp"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Fresh complete no-skip software gate for this iteration"
 msgstr "本轮 fresh、完整、零跳过的软件门禁"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:96
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:96
 msgid "IO-05"
 msgstr "IO-05"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "budgets"
 msgstr "budgets"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Bounded IRQ and service execution observation"
 msgstr "有界 IRQ 与 service 执行观察"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py"
+"io/include/nexus/io/cycle_probe.h;io/src/mechanisms/cycle_probe.c;tools/configure/factory.py"
 msgstr ""
-"io/include/nexus/io/cycle_probe.h;io/src/cycle_probe.c;tools/configure/factory.py"
+"io/include/nexus/io/cycle_probe.h;io/src/mechanisms/cycle_probe.c;tools/configure/factory.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Optional probes compile out; explicit service and IRQ budgets"
 msgstr "可选探针可编译裁剪；显式 service 与 IRQ 预算"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:112
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:112
 msgid "IO-06"
 msgstr "IO-06"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "stream"
 msgstr "stream"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Rate block hold-time loss and backpressure budgets"
 msgstr "速率、block 持有时间、丢失与背压预算"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c"
+"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/mechanisms/stream_profile.c"
 msgstr ""
-"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/stream_profile.c"
+"tools/configure/stream_profiles.py;io/include/nexus/io/stream_profile.h;io/src/mechanisms/stream_profile.c"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Actual selected-provider configuration validates stream budget"
 msgstr "真实选定 provider 配置校验 stream 预算"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:128
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:128
 msgid "IO-07"
 msgstr "IO-07"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "hil"
 msgstr "hil"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Board fixtures and fault-injection station preparation"
 msgstr "Board 夹具与故障注入站点准备"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "tools/hil;tools/testing/test_hil_io_protocols.py"
 msgstr "tools/hil;tools/testing/test_hil_io_protocols.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Prepare software tooling; physical tests remain not_executed"
 msgstr "准备软件工装；物理测试保持 not_executed"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:144
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:144
 msgid "IO-08"
 msgstr "IO-08"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "measurement"
 msgstr "measurement"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Linked resource and runtime cost comparison"
 msgstr "链接资源与运行成本比较"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "tools/measurement;tests/contracts/uart_rx_compact_assembly"
 msgstr "tools/measurement;tests/contracts/uart_rx_compact_assembly"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Fresh exact ELF comparison; no inferred physical timing or energy"
 msgstr "fresh 精确 ELF 比较；不推断物理时序或能耗"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:160
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:160
 msgid "IO-09"
 msgstr "IO-09"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "P1"
 msgstr "P1"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "resources"
 msgstr "resources"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Hierarchical controller base channel resource claims"
 msgstr "分层 controller、base 与 channel 资源声明"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
+"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
 msgstr ""
-"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
+"tools/configure/resource_graph.py;tools/configure/providers/stm32g474/pwm_shared.py;soc/stm32/stm32g474/drivers/pwm_shared.c;tests/google/g474_pwm_shared_factory_test.cpp;tools/measurement/retention.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "Compatible shared base plus channels requires one actual hardware owner"
 msgstr "兼容共享 base 加 channel 必须由一个真实硬件 owner 管理"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:176
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:176
 msgid "IO-10"
 msgstr "IO-10"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Physical peripheral identity and mutually exclusive personalities"
 msgstr "物理外设身份与互斥工作模式"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json"
+"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32/stm32g474/soc.json"
 msgstr ""
-"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32g474/soc.json"
+"tools/configure/resource_graph.py;tools/configure/matrix.py;soc/stm32/stm32g474/soc.json"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Canonical aliases and personality conflicts rejected"
 msgstr "拒绝规范别名与工作模式冲突"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:192
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:192
 msgid "IO-11"
 msgstr "IO-11"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "events"
 msgstr "events"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Typed hardware event graph and startup ordering"
 msgstr "typed 硬件事件图与启动顺序"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "tools/configure/trigger_graph.py"
 msgstr "tools/configure/trigger_graph.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "Validate event cycles with owned stop gates; emit selected reviewed routes"
 msgstr "校验带自有停止门的事件环；生成选定受审路线"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:208
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:208
 msgid "IO-12"
 msgstr "IO-12"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "dma"
 msgstr "dma"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Selected DMA engines lanes requests and reachability"
 msgstr "选定 DMA engine、lane、request 与可达域"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "tools/configure/dma_topology.py"
 msgstr "tools/configure/dma_topology.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Exact provider tuples; reject physical lane collisions"
 msgstr "精确 provider tuple；拒绝物理 lane 冲突"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:224
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:224
 msgid "IO-13"
 msgstr "IO-13"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Descriptor ownership placement cache and chain cancellation"
 msgstr "descriptor 所有权、放置、cache 与链式取消"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"tools/configure/dma_topology.py;soc/stm32/stm32u575/drivers/uart_dma_chain.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"chain.toml"
+msgstr ""
+"tools/configure/dma_topology.py;soc/stm32/stm32u575/drivers/uart_dma_chain.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
+"chain.toml"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Static validation plus actual linked-list provider drain and loans"
 msgstr "静态校验加真实链表 provider 的排空和借用"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:240
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:240
 msgid "IO-14"
 msgstr "IO-14"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "uart"
 msgstr "uart"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Explicit line formats flow control and independent nine-bit I/O"
 msgstr "显式线格式、流控与独立九位 I/O"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "io/include/nexus/io/uart_word.h"
 msgstr "io/include/nexus/io/uart_word.h"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Native and exact STM32/GD32 register paths; compact byte default"
 msgstr "Native 及精确 STM32/GD32 寄存器路径；默认 byte 模式保持紧凑"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:256
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:256
 msgid "IO-15"
 msgstr "IO-15"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Bounded FIFO IRQ service and concurrent stream load"
 msgstr "有界 FIFO IRQ service 与并发 stream 负载"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
+"io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
 "fifo.md"
 msgstr ""
-"io/private/uart_fifo_impl.h;soc/stm32h743/drivers/uart_fifo.c;soc/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
+"io/private/uart_fifo_impl.h;soc/stm32/stm32h743/drivers/uart_fifo.c;soc/stm32/stm32u575/drivers/uart_fifo.c;docs/design/uart-"
 "fifo.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Bounded batch and IRQ latency observations on exact providers"
 msgstr "精确 provider 上的有界批次与 IRQ 延迟观察"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:272
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "in_progress"
+msgstr "in_progress"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:272
 msgid "IO-16"
 msgstr "IO-16"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "spi"
 msgstr "spi"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Whole-CS segments dummy cycles and 8/16-bit words"
 msgstr "完整 CS 区间分段、dummy cycle 与 8/16-bit word"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c"
+"io/include/nexus/io/spi_dma_owner_binding.h;soc/native/drivers/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32/stm32f407/drivers/spi_dma.c;soc/gd32/gd32f470/drivers/spi_dma.c"
 msgstr ""
-"io/include/nexus/io/spi_dma_owner_binding.h;io/native/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32f407/drivers/spi_dma.c;soc/gd32f470/drivers/spi_dma.c"
+"io/include/nexus/io/spi_dma_owner_binding.h;soc/native/drivers/spi_dma_transaction.c;components/bus_owner/src/spi_dma_owner.c;soc/stm32/stm32f407/drivers/spi_dma.c;soc/gd32/gd32f470/drivers/spi_dma.c"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Native STM32F407 GD32F470 polling then async DMA loan and drain"
 msgstr "Native、STM32F407、GD32F470 先轮询，再异步 DMA 借用与排空"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:288
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:288
 msgid "IO-17"
 msgstr "IO-17"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "i2c"
 msgstr "i2c"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Kernel-clock timing and long-message reload"
 msgstr "内核时钟定时与长消息 reload"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "soc/common/i2c_v2.c;tools/configure/i2c_timing.py;tools/configure/i2c_timing_selection.py;tests/google/i2c_v2_long_factory_test.cpp"
 msgstr ""
 "soc/common/i2c_v2.c;tools/configure/i2c_timing.py;tools/configure/i2c_timing_selection.py;tests/google/i2c_v2_long_factory_test.cpp"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Reviewed electrical timing inputs; preserve message START and STOP"
 msgstr "受审电气定时输入；保留消息 START 与 STOP"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:304
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:304
 msgid "IO-18"
 msgstr "IO-18"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "adc"
 msgstr "adc"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Explicit sample formats groups triggers and provenance"
 msgstr "显式采样格式、分组、触发与来源"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-"
+"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/api/adc_group.c;soc/stm32/stm32g474/drivers/adc_group.c;docs/design/adc-"
 "group.md"
 msgstr ""
-"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/adc_group.c;soc/stm32g474/drivers/adc_group.c;docs/design/adc-"
+"io/include/nexus/io/adc_format.h;io/include/nexus/io/adc_group.h;io/src/api/adc_group.c;soc/stm32/stm32g474/drivers/adc_group.c;docs/design/adc-"
 "group.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Integer storage metadata and actual provider group support"
 msgstr "整数存储元数据与真实 provider 分组支持"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:320
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:320
 msgid "IO-19"
 msgstr "IO-19"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "pwm"
 msgstr "pwm"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Atomic multi-channel shadow commit and break fault handling"
 msgstr "原子多通道 shadow 提交与 break fault 处理"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
+"io/include/nexus/io/pwm_group.h;soc/stm32/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
 msgstr ""
-"io/include/nexus/io/pwm_group.h;soc/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
+"io/include/nexus/io/pwm_group.h;soc/stm32/stm32g474/drivers/pwm_group.c;tools/configure/providers/stm32g474/emission.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Single timer owner; no automatic restart after break"
 msgstr "单一 timer owner；break 后不自动重启"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:336
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:336
 msgid "IO-20"
 msgstr "IO-20"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "capture"
 msgstr "capture"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Counter widths filters encoders and overcapture"
 msgstr "counter 位宽、filter、encoder 与 overcapture"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c"
+"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32/stm32g474/drivers/timer_capture.c;soc/stm32/stm32g474/drivers/encoder.c"
 msgstr ""
-"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32g474/drivers/timer_capture.c;soc/stm32g474/drivers/encoder.c"
+"io/include/nexus/io/timer_capture.h;io/include/nexus/io/encoder.h;soc/stm32/stm32g474/drivers/timer_capture.c;soc/stm32/stm32g474/drivers/encoder.c"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Wrap-safe capture and reviewed encoder modes on real providers"
 msgstr "真实 provider 上可正确处理计数器回绕的 capture 与受审 encoder 模式"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:352
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:352
 msgid "IO-21"
 msgstr "IO-21"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "timestamps"
 msgstr "timestamps"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Timestamp source domain epoch frequency and uncertainty"
 msgstr "时间戳来源、domain、epoch、频率与不确定度"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
+"io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
 "frames.md"
 msgstr ""
-"io/include/nexus/io/observation.h;io/src/observation.c;io/src/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
+"io/include/nexus/io/observation.h;io/src/mechanisms/observation.c;io/src/controllers/eth_frames_mac.c;tests/google/ethernet_frames_mac_test.cpp;docs/design/ethernet-"
 "frames.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "Reject incompatible domains and distinguish observation from event time"
 msgstr "拒绝不兼容 domain，区分观察时间与事件时间"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:368
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:368
 msgid "IO-22"
 msgstr "IO-22"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "diagnostics"
 msgstr "diagnostics"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Optional state recovery ownership and checked service entry"
 msgstr "可选状态、恢复所有权与受检 service 入口"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "io/src/observation.c"
-msgstr "io/src/observation.c"
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "io/src/mechanisms/observation.c"
+msgstr "io/src/mechanisms/observation.c"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Checked dispatch is distinct from I/O progress or settlement"
 msgstr "受检 dispatch 与 I/O 进展或 settlement 分别解释"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:384
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:384
 msgid "IO-23"
 msgstr "IO-23"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "memory"
 msgstr "memory"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Remove unused TX DMA fields from RX-only providers"
 msgstr "移除 RX-only provider 未使用的 TX DMA 字段"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
+"soc/stm32/stm32f407/drivers/uart_receive.c;soc/stm32/stm32f407/drivers/uart_duplex.c;soc/gd32/gd32f470/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
 msgstr ""
-"soc/stm32f407/drivers/uart_receive.c;soc/stm32f407/drivers/uart_duplex.c;soc/gd32f470/drivers/uart_receive.c;soc/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
+"soc/stm32/stm32f407/drivers/uart_receive.c;soc/stm32/stm32f407/drivers/uart_duplex.c;soc/gd32/gd32f470/drivers/uart_receive.c;soc/gd32/gd32f470/drivers/uart_duplex.c;tests/contracts/uart_rx_compact_assembly"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Fresh linked RAM measurements and duplex lifecycle regression"
 msgstr "fresh 链接 RAM 测量与 duplex 生命周期回归"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:400
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:400
 msgid "IO-24"
 msgstr "IO-24"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "flash"
 msgstr "flash"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Busy-bank pulse RAM closure cache ECC and watchdog contract"
 msgstr "busy-bank 脉冲、RAM 闭包、cache、ECC 与 watchdog 合同"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"ram.md"
+msgstr ""
+"soc/stm32/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
+"ram.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
 "Uncancellable pulse and complete execution closure verified per profile"
 msgstr "逐 profile 验证不可取消脉冲与完整执行闭包"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:416
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:416
 msgid "IO-25"
 msgstr "IO-25"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "providers"
 msgstr "providers"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Reuse reviewed peripheral IP generations and official HAL/LL"
 msgstr "复用受审外设 IP 代际及官方 HAL/LL"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py"
+"soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py"
 msgstr ""
-"soc/common;io/private/uart_fifo_impl.h;io/src/eth_frames_mac.c;tools/configure/selected_contracts.py"
+"soc/common;io/private/uart_fifo_impl.h;io/src/controllers/eth_frames_mac.c;tools/configure/selected_contracts.py"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Private implementation sharing with exact per-family facts"
 msgstr "私有实现共享与精确逐系列事实"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:432
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:432
 msgid "IO-26"
 msgstr "IO-26"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "h743"
 msgstr "h743"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Cold PLL voltage latency and kernel-clock profiles"
 msgstr "冷 PLL、电压、latency 与内核时钟 profile"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
+"soc/stm32/stm32h743/clock.c;soc/stm32/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
 "clock.md"
 msgstr ""
-"soc/stm32h743/clock.c;soc/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
+"soc/stm32/stm32h743/clock.c;soc/stm32/stm32h743/system.c;tools/configure/clocks.py;tests/google/h743_high_factory_test.cpp;docs/design/h743-high-"
 "clock.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Readback rollback and exact reference identity"
 msgstr "读回、回滚与精确参考身份"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:448
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:448
 msgid "IO-27"
 msgstr "IO-27"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "UART continuous duplex DMA and SPI DMA with cache"
 msgstr "UART 连续 duplex DMA 与带 cache 的 SPI DMA"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32/stm32h743;soc/stm32/stm32h743/drivers/uart_continuous.c;soc/stm32/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32/stm32h743/drivers/uart_duplex.c;soc/stm32/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
+"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
+"on.toml;tools/configure/assemblies/h743-uart-duplex-"
+"continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-"
+"cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+msgstr ""
+"soc/stm32/stm32h743;soc/stm32/stm32h743/drivers/uart_continuous.c;soc/stm32/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32/stm32h743/drivers/uart_duplex.c;soc/stm32/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-"
+"continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-"
+"on.toml;tools/configure/assemblies/h743-uart-duplex-"
+"continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-"
+"cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Selected SRAM reachability and held-buffer protection"
 msgstr "选定 SRAM 可达域与被持有 buffer 的保护"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:464
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:464
 msgid "IO-28"
 msgstr "IO-28"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "u575"
 msgstr "u575"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Finite GPDMA provider and USART errata handling"
 msgstr "有限 GPDMA provider 与 USART 勘误处理"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
+"soc/stm32/stm32u575/drivers/uart_dma.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
 "gpdma.md"
 msgstr ""
-"soc/stm32u575/drivers/uart_dma.c;soc/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
+"soc/stm32/stm32u575/drivers/uart_dma.c;soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h;tests/google/u575_uart_gpdma_test.cpp;tests/google/u575_uart_gpdma_factory_test.cpp;docs/design/u575-uart-"
 "gpdma.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Actual GPDMA drain and exact ES0499 workarounds; TZEN0 first"
 msgstr "真实 GPDMA 排空及精确 ES0499 workaround；优先 TZEN0"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:480
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:480
 msgid "IO-29"
 msgstr "IO-29"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "g474"
 msgstr "g474"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Synchronous PWM ADC trigger and comparator break reference"
 msgstr "同步 PWM、ADC 触发与 comparator break 参考"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
+"io/include/nexus/io/pwm_adc.h;soc/stm32/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
 "adc.md"
 msgstr ""
-"io/include/nexus/io/pwm_adc.h;soc/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
+"io/include/nexus/io/pwm_adc.h;soc/stm32/stm32g474/drivers/pwm_adc.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_pwm_adc_factory_test.cpp;docs/design/pwm-"
 "adc.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Generic control capture mechanisms; product algorithms external"
 msgstr "通用控制与采集机制；产品算法外置"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:496
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:496
 msgid "IO-30"
 msgstr "IO-30"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "P2"
 msgstr "P2"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "power"
 msgstr "power"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Optional runtime clock and power transitions"
 msgstr "可选运行时 clock 与 power 转换"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-"
+"tools/configure/runtime_power.py;soc/stm32/stm32h743/system.c;docs/design/clock-"
 "domain-sleep.md"
 msgstr ""
-"tools/configure/runtime_power.py;soc/stm32h743/system.c;docs/design/clock-"
+"tools/configure/runtime_power.py;soc/stm32/stm32h743/system.c;docs/design/clock-"
 "domain-sleep.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Active I/O leases rollback and monotonic deadline continuity"
 msgstr "活动 I/O lease、回滚与单调 deadline 连续性"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:512
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:512
 msgid "IO-31"
 msgstr "IO-31"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "pinctrl"
 msgstr "pinctrl"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Explicit default sleep safe levels wake and retention"
 msgstr "显式 default/sleep 安全电平、wake 与 retention"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid ""
-"io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
+"io/include/nexus/io/pin_state.h;soc/stm32/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
 "pin-states.md"
 msgstr ""
-"io/include/nexus/io/pin_state.h;soc/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
+"io/include/nexus/io/pin_state.h;soc/stm32/stm32g474/drivers/pin_state.c;tools/configure/pin_states.py;docs/explanation/gpio-"
 "pin-states.md"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "No invented board wiring; selected reviewed state only"
 msgstr "不编造 Board 接线；仅选定受审状态"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:528
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:528
 msgid "IO-32"
 msgstr "IO-32"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "LPDMA autonomous Stop2 and LPBAM reference"
 msgstr "LPDMA 自主 Stop2 与 LPBAM 参考"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"soc/stm32/stm32u575;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-"
+"copy-"
+"stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-"
+"copy.c"
+msgstr ""
+"soc/stm32/stm32u575;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-"
+"copy-"
+"stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-"
+"copy.c"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "Selected low-power peripheral SRAM4 and wake/stop ownership"
 msgstr "选定低功耗外设、SRAM4 与 wake/stop 所有权"
 
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:544
-msgid "IO-33"
-msgstr "IO-33"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "canfd"
-msgstr "canfd"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "CAN FD payload timing BRS ESI and message RAM"
-msgstr "CAN FD payload、timing、BRS、ESI 与消息 RAM"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
-"fd.md"
-msgstr ""
-"io/include/nexus/io/can_fd.h;soc/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
-"fd.md"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Classic CAN remains compact; exact FDCAN provider required"
-msgstr "Classic CAN 保持紧凑；要求精确 FDCAN provider"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:560
-msgid "IO-34"
-msgstr "IO-34"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "ethernet"
-msgstr "ethernet"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "VLAN scatter gather frame loans and hardware timestamps"
-msgstr "VLAN、SG frame loan 与硬件时间戳"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
-"frames.md"
-msgstr ""
-"io/include/nexus/io/ethernet_frames.h;io/src/eth_frames_mac.c;soc/stm32f407/drivers/ethernet_frames.c;soc/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
-"frames.md"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Actual hardware descriptor ownership and truthful global abort"
-msgstr "真实硬件 descriptor 所有权与如实的全局 abort"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:576
-msgid "IO-35"
-msgstr "IO-35"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "usb"
-msgstr "usb"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Optional class adapters and exact PHY endpoint capabilities"
-msgstr "可选 class adapter 与精确 PHY/endpoint 能力"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "io/src/usb_device_controller.c;io/native/usb_device.c;components"
-msgstr "io/src/usb_device_controller.c;io/native/usb_device.c;components"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Control reset ACK ZLP and device mode before additional USB modes"
-msgstr "扩展其他 USB 模式前验证 control、reset、ACK、ZLP 与 device 模式"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:592
-msgid "IO-36"
-msgstr "IO-36"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "time"
-msgstr "time"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "RTC LPTIM alarms wrap backup and reset domains"
-msgstr "RTC/LPTIM alarm、wrap、backup 与 reset domain"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Wall-clock and monotonic domains remain separate"
-msgstr "墙钟与单调时间域分别维护"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:608
-msgid "IO-37"
-msgstr "IO-37"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "storage"
-msgstr "storage"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "SDMMC and serial memory block command mapped interfaces"
-msgstr "SDMMC 与串行存储 block、command、mapped 接口"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "XIP cache DMA loans and erase ownership are explicit"
-msgstr "XIP、cache、DMA loan 与 erase 所有权明确"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:624
-msgid "IO-38"
-msgstr "IO-38"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "i3c"
-msgstr "i3c"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Bounded discovery IBI and hot-join caller storage"
-msgstr "有界发现、IBI、hot-join 与调用者存储"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "No implicit factory discovery; exact peripheral reference required"
-msgstr "factory 不隐式发现；要求精确外设参考"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:640
-msgid "IO-39"
-msgstr "IO-39"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "security"
-msgstr "security"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "TrustZone peripheral broker and attribution"
-msgstr "TrustZone 外设 broker 与归属"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Principal and memory validation; copied and borrowed data distinct"
-msgstr "principal 与内存校验；复制数据与借用数据分开"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:656
-msgid "IO-40"
-msgstr "IO-40"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "multicore"
-msgstr "multicore"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "AMP resource partition and epoch-safe IPC"
-msgstr "AMP 资源分区与 epoch 安全 IPC"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Unique hardware owner and explicit remote reset/cache contract"
-msgstr "唯一硬件 owner，显式远端 reset/cache 合同"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:672
-msgid "IO-41"
-msgstr "IO-41"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "audio"
-msgstr "audio"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "I2S SAI PDM framing and continuous DMA loans"
-msgstr "I2S/SAI/PDM framing 与连续 DMA loan"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Frame-slot format and bounded underrun; optional external codec"
-msgstr "frame/slot 格式与有界 underrun；可选外部 codec"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:688
-msgid "IO-42"
-msgstr "IO-42"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "multimedia"
-msgstr "multimedia"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Camera display accelerator planar and strided buffers"
-msgstr "camera/display/accelerator 的 planar 与 strided buffer"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid "Frame completion backpressure external memory and 2D DMA ownership"
-msgstr "frame 完成、背压、外部内存与 2D DMA 所有权"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
-"chain.toml"
-msgstr ""
-"tools/configure/dma_topology.py;soc/stm32u575/drivers/uart_dma_chain.c;soc/stm32u575/private/stm32u575_uart_gpdma_chain.h;soc/stm32u575/private/stm32u575_uart_gpdma_impl.h;tests/google/u575_uart_chain_test.cpp;tools/configure/assemblies/u575-uart-"
-"chain.toml"
-
-#: ../../nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
-msgid ""
-"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
-"ram.md"
-msgstr ""
-"soc/stm32h743/drivers/flash.c;tools/configure/providers/stm32h743/emission.py;soc/stm32h743/system.c;tools/measurement/h743_flash_ram.py;tools/measurement/flash_execution.py;tools/testing/test_h743_ram_build_gate.py;docs/design/h743-flash-"
-"ram.md"
-
-msgid ""
-"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
-msgstr ""
-"soc/stm32h743;soc/stm32h743/drivers/uart_continuous.c;soc/stm32h743/private/stm32h743_uart_continuous.h;soc/stm32h743/drivers/uart_duplex.c;soc/stm32h743/private/stm32h743_uart_duplex.h;soc/stm32h743/drivers/spi_dma.c;tests/google/h743_uart_continuous_test.cpp;tests/google/h743_uart_duplex_test.cpp;tests/google/h743_spi_dma_test.cpp;tools/configure/assemblies/h743-uart-continuous.toml;tools/configure/assemblies/h743-uart-continuous-cache-on.toml;tools/configure/assemblies/h743-uart-duplex-continuous.toml;tools/configure/assemblies/h743-uart-duplex-continuous-cache-on.toml;tools/configure/assemblies/h743-spi-dma-cache-on.toml"
-
-# Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
-msgstr "io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;io/native/rtc_lptim.c;soc/stm32u575/drivers/lptim.c;soc/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-run.toml;tests/google/u575_lptim_test.cpp;soc/stm32u575/drivers/rtc.c;soc/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-boundaries.md"
-
-# Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
-msgstr "io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-extension-boundaries.md"
-
-# Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
-msgstr "core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-extension-boundaries.md"
-
-# Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
-msgstr "io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md"
-
-msgid "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
-msgstr "components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
-
-msgid "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
-msgstr "components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-io-broker.md;tests/contracts/u575_trustzone"
-
-
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
 msgid "partial_exact_reference_implemented"
 msgstr "partial_exact_reference_implemented"
 
-msgid "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
-msgstr "soc/stm32u575;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:544
+msgid "IO-33"
+msgstr "IO-33"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
-msgstr "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/io-evolution-execution.csv>`。 源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`1c6b255dba79e239d269bc5a86dbe6e07ce10c90fad06e875fa9b952255fd24d`。"
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "canfd"
+msgstr "canfd"
 
-msgid "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
-msgstr "io;soc;io/include/nexus/io/frame_stream.h;io/src/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-extension-boundaries.md;components/f407_i2s2_slave_tx;soc/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-tx.toml;tools/configure/assemblies/qiming-i2s2-slave-tx.toml;docs/design/f407-i2s2-slave-tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "CAN FD payload timing BRS ESI and message RAM"
+msgstr "CAN FD payload、timing、BRS、ESI 与消息 RAM"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/can_fd.h;soc/stm32/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
+"fd.md"
+msgstr ""
+"io/include/nexus/io/can_fd.h;soc/stm32/stm32g474/drivers/fdcan.c;tools/configure/providers/stm32g474/coupled.py;tests/google/g474_fdcan_test.cpp;tests/google/g474_fdcan_factory_test.cpp;docs/design/can-"
+"fd.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Classic CAN remains compact; exact FDCAN provider required"
+msgstr "Classic CAN 保持紧凑；要求精确 FDCAN provider"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:560
+msgid "IO-34"
+msgstr "IO-34"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "ethernet"
+msgstr "ethernet"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "VLAN scatter gather frame loans and hardware timestamps"
+msgstr "VLAN、SG frame loan 与硬件时间戳"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
+"frames.md"
+msgstr ""
+"io/include/nexus/io/ethernet_frames.h;io/src/controllers/eth_frames_mac.c;soc/stm32/stm32f407/drivers/ethernet_frames.c;soc/gd32/gd32f470/drivers/ethernet_frames.c;docs/design/ethernet-"
+"frames.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Actual hardware descriptor ownership and truthful global abort"
+msgstr "真实硬件 descriptor 所有权与如实的全局 abort"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:576
+msgid "IO-35"
+msgstr "IO-35"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "usb"
+msgstr "usb"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Optional class adapters and exact PHY endpoint capabilities"
+msgstr "可选 class adapter 与精确 PHY/endpoint 能力"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
+msgstr ""
+"io/src/controllers/usb_device_controller.c;soc/native/drivers/usb_device.c;components"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Control reset ACK ZLP and device mode before additional USB modes"
+msgstr "扩展其他 USB 模式前验证 control、reset、ACK、ZLP 与 device 模式"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:592
+msgid "IO-36"
+msgstr "IO-36"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "time"
+msgstr "time"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "RTC LPTIM alarms wrap backup and reset domains"
+msgstr "RTC/LPTIM alarm、wrap、backup 与 reset domain"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;soc/native/drivers/rtc_lptim.c;soc/stm32/stm32u575/drivers/lptim.c;soc/stm32/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-"
+"run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-"
+"boundaries.md"
+msgstr ""
+"io/include/nexus/io/rtc.h;io/include/nexus/io/lptim.h;soc/native/drivers/rtc_lptim.c;soc/stm32/stm32u575/drivers/lptim.c;soc/stm32/stm32u575/private/stm32u575_lptim.h;tools/configure/assemblies/u575-lptim-"
+"run.toml;tests/google/u575_lptim_test.cpp;soc/stm32/stm32u575/drivers/rtc.c;soc/stm32/stm32u575/private/stm32u575_rtc.h;tools/configure/assemblies/u575-rtc-"
+"run.toml;tests/google/u575_rtc_test.cpp;docs/design/io-extension-"
+"boundaries.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Wall-clock and monotonic domains remain separate"
+msgstr "墙钟与单调时间域分别维护"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:608
+msgid "IO-37"
+msgstr "IO-37"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "storage"
+msgstr "storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "SDMMC and serial memory block command mapped interfaces"
+msgstr "SDMMC 与串行存储 block、command、mapped 接口"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-"
+"extension-boundaries.md"
+msgstr ""
+"io;soc;components/mapped_storage;tests/google/mapped_storage_test.cpp;docs/design/io-"
+"extension-boundaries.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "XIP cache DMA loans and erase ownership are explicit"
+msgstr "XIP、cache、DMA loan 与 erase 所有权明确"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:624
+msgid "IO-38"
+msgstr "IO-38"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "i3c"
+msgstr "i3c"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Bounded discovery IBI and hot-join caller storage"
+msgstr "有界发现、IBI、hot-join 与调用者存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
+msgstr ""
+"components/i3c_controller;tests/google/i3c_controller_test.cpp;tests/contracts/i3c_runtime;docs/design/i3c-controller.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "No implicit factory discovery; exact peripheral reference required"
+msgstr "factory 不隐式发现；要求精确外设参考"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:640
+msgid "IO-39"
+msgstr "IO-39"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "security"
+msgstr "security"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "TrustZone peripheral broker and attribution"
+msgstr "TrustZone 外设 broker 与归属"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-"
+"io-broker.md;tests/contracts/u575_trustzone"
+msgstr ""
+"components/user_io_broker;components/bus_owner;tests/google/user_io_async_test.cpp;docs/design/user-"
+"io-broker.md;tests/contracts/u575_trustzone"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Principal and memory validation; copied and borrowed data distinct"
+msgstr "principal 与内存校验；复制数据与借用数据分开"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:656
+msgid "IO-40"
+msgstr "IO-40"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "multicore"
+msgstr "multicore"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "AMP resource partition and epoch-safe IPC"
+msgstr "AMP 资源分区与 epoch 安全 IPC"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-"
+"extension-boundaries.md"
+msgstr ""
+"core;arch;components/amp_ipc;tests/google/amp_ipc_test.cpp;docs/design/io-"
+"extension-boundaries.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Unique hardware owner and explicit remote reset/cache contract"
+msgstr "唯一硬件 owner，显式远端 reset/cache 合同"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:672
+msgid "IO-41"
+msgstr "IO-41"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "audio"
+msgstr "audio"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "I2S SAI PDM framing and continuous DMA loans"
+msgstr "I2S/SAI/PDM framing 与连续 DMA loan"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io;soc;io/include/nexus/io/frame_stream.h;io/src/mechanisms/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-"
+"extension-"
+"boundaries.md;components/soc/stm32/f407_i2s2_slave_tx;soc/stm32/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-"
+"tx.toml;tools/configure/assemblies/qiming-i2s2-slave-"
+"tx.toml;docs/design/f407-i2s2-slave-"
+"tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+msgstr ""
+"io;soc;io/include/nexus/io/frame_stream.h;io/src/mechanisms/frame_stream.c;tests/google/frame_stream_test.cpp;docs/design/io-"
+"extension-"
+"boundaries.md;components/soc/stm32/f407_i2s2_slave_tx;soc/stm32/stm32f407/drivers/i2s2_slave_tx.c;soc/stm32/stm32f407/private/stm32f407_system.h;tests/google/f407_i2s2_slave_tx_test.cpp;tests/contracts/f407_i2s2_slave_tx;tools/configure/assemblies/sky-i2s2-slave-"
+"tx.toml;tools/configure/assemblies/qiming-i2s2-slave-"
+"tx.toml;docs/design/f407-i2s2-slave-"
+"tx.md;tools/testing/evidence/f407-i2s2-20261020/README.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Frame-slot format and bounded underrun; optional external codec"
+msgstr "frame/slot 格式与有界 underrun；可选外部 codec"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:688
+msgid "IO-42"
+msgstr "IO-42"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "multimedia"
+msgstr "multimedia"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Camera display accelerator planar and strided buffers"
+msgstr "camera/display/accelerator 的 planar 与 strided buffer"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid ""
+"io;soc;io/include/nexus/io/frame_stream.h;components/soc/stm32/stm32h743_frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-"
+"extension-boundaries.md"
+msgstr ""
+"io;soc;io/include/nexus/io/frame_stream.h;components/soc/stm32/stm32h743_frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-"
+"extension-boundaries.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/io-evolution.md:26
+msgid "Frame completion backpressure external memory and 2D DMA ownership"
+msgstr "frame 完成、背压、外部内存与 2D DMA 所有权"

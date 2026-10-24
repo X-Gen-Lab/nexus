@@ -1,7 +1,0 @@
-{
-  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
-  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
-  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json",
-  "tests/contracts/timer_assembly/stm32-zg-board/board.json": "/workspace/nexus/tests/contracts/timer_assembly/stm32-zg-board/board.json",
-  "tests/contracts/timer_assembly/stm32-zg.toml": "/workspace/nexus/tests/contracts/timer_assembly/stm32-zg.toml"
-}

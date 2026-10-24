@@ -10,12 +10,11 @@
 #define NEXUS_I2C_H
 
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_i2c_port nx_i2c_port_t;
-typedef struct nx_i2c_endpoint nx_i2c_endpoint_t;
 /** \brief Maintained finite-message admission bounds, checked before hardware
  * access.
  */

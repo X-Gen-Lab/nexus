@@ -1,9 +1,0 @@
-{
-  "scope": "two_owned_files",
-  "paths": [
-    "scripts/ci/native_contracts.py",
-    "tools/testing/test_native_contracts.py"
-  ],
-  "errors": [],
-  "returncode": 0
-}

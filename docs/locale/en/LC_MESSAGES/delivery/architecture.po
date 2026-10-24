@@ -7,36 +7,46 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 21d84318fa1d11c1f5ad5ad542c04ad85ca530b03a725097414d55440dc238a3\n"
+"X-Nexus-Source-SHA256: 46b73bd18b5c78a8c2e7c8baa8b017a9eb184e741e94519561b3ff0042e3fa4c\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:1
 msgid "当前系统架构"
 msgstr "Current system architecture"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:3
 msgid "目录与责任"
 msgstr "Directories and responsibility"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "层与目录"
 msgstr "Layer and directory"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "拥有的责任"
 msgstr "Owned responsibility"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "依赖边界"
 msgstr "Dependency boundary"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`core/`"
 msgstr "`core/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "中性结果、绝对 monotonic deadline、caller-owned request 状态"
 msgstr ""
 "Neutral results, absolute monotonic deadlines and caller-owned request state"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "C11；无 Board、RTOS、SDK"
 msgstr "C11; no Board, RTOS or SDK"
 
-msgid "`arch/`"
-msgstr "`arch/`"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid "`arch/arm/cortex_m/`、`arch/native/`"
+msgstr "`arch/arm/cortex_m/`、`arch/native/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid ""
 "编译期 Cortex-M/Native 原语、异常／特权／掩码查询、中断保存恢复、屏障、cycle snapshot；显式选入的 "
 "Cache／MPU／SAU 与 Secure CMSE 权限观察"
@@ -45,90 +55,140 @@ msgstr ""
 "interrupt save/restore, barriers, cycle snapshots; explicitly selected "
 "Cache/MPU/SAU and Secure CMSE permission observation"
 
-msgid "无 SDK／OS／SoC 政策；原语编译与整平台资格分别记录"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid "公共头仍位于 `arch/include/nexus/arch/`；无 SDK／OS／SoC 政策，原语编译与整平台资格分别记录"
 msgstr ""
-"No SDK/OS/SoC policy; primitive compilation and whole-platform qualification"
-" are recorded separately"
+"Public headers remain in `arch/include/nexus/arch/`; no SDK/OS/SoC policy; "
+"primitive compilation and whole-platform qualification are recorded "
+"separately"
 
-msgid "`soc/<family>/`"
-msgstr "`soc/<family>/`"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid "`soc/<vendor>/<family>/`"
+msgstr "`soc/<vendor>/<family>/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid ""
-"F103、GD303、F407、F470、G474、H743、U575 的精确内存/clock/IRQ/startup、timebase、typed "
-"controller 实现"
+"`stm32`／`gd32` 下 F103、GD303、F407、F470、G474、H743、U575 "
+"的精确内存/clock/IRQ/startup、timebase、typed controller 实现"
 msgstr ""
 "Exact memory/clock/IRQ/startup, timebase and typed controller "
-"implementations for F103, GD303, F407, F470, G474, H743 and U575"
+"implementations for F103, GD303, F407, F470, G474, H743 and U575 under "
+"`stm32`/`gd32`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "私有 SDK 与私有 provider storage；各家族只开放已维护模式"
 msgstr ""
 "Private SDK/provider storage; each family exposes only maintained modes"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`boards/<board>/board.json`"
 msgstr "`boards/<board>/board.json`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "精确型号、已审 route、晶振声明、safe initial、来源与未知 PCB 项"
 msgstr ""
 "Exact part, reviewed routes, declared crystals, safe initial values, "
 "provenance and unknown PCB facts"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "只读资源包；不创建产品任务"
 msgstr "Read-only resource package; creates no product tasks"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`io/`"
 msgstr "`io/`"
 
-msgid "typed 多态合同、共享操作表、DMA/stream/wake；可选 CAN、USB、Ethernet 与高级 timer 合同"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid ""
+"公共 include、`src/api` 检查分派、`src/mechanisms` 共用规则、`src/controllers` "
+"控制器引擎；private 硬件边界"
 msgstr ""
-"Typed polymorphic contracts, shared operation tables, DMA/stream/wake; "
-"optional CAN, USB, Ethernet and advanced-timer contracts"
+"Public includes, checked dispatch in `src/api`, shared rules in "
+"`src/mechanisms`, controller engines in `src/controllers`; private hardware "
+"boundaries"
 
-msgid "公共头不含厂商类型；Native 是行为模型"
-msgstr "Public headers contain no vendor types; Native is a behavior model"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid "公共头不含厂商类型；Native provider 位于 `soc/native/drivers`，建立行为模型"
+msgstr ""
+"Public headers contain no vendor types; Native providers in "
+"`soc/native/drivers` establish behavior models"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`os/`"
 msgstr "`os/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "可选 wait/wake、按对象静态 task/stack/TCB/queue 适配"
 msgstr ""
 "Optional wait/wake and per-object static task/stack/TCB/queue adaptation"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "driver 不依赖 OS；不创建应用 worker"
 msgstr "Drivers do not depend on OS or create application workers"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`components/`"
 msgstr "`components/`"
 
-msgid "显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid ""
+"显式选入的 owner、BMP280、Modbus、Storage、Log 等通用机制；`components/soc/stm32` "
+"分类维护精确芯片扩展"
 msgstr ""
 "Explicitly selected generic owner, BMP280, Modbus, Storage and Log "
-"mechanisms"
+"mechanisms; exact-chip extensions are maintained under "
+"`components/soc/stm32`"
 
-msgid "通过窄端口访问设备、时间与外部政策"
-msgstr "Access devices, time and external policy through narrow ports"
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
+msgid "通过窄端口访问设备、时间与外部政策；芯片扩展不扩大其他型号支持"
+msgstr ""
+"Access devices, time and external policy through narrow ports; chip-specific"
+" extensions do not broaden support for other parts"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "`tools/`、`cmake/`"
-msgstr "`tools/`, `cmake/`"
+msgstr "`tools/`、`cmake/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "严格输入解析、单份生成结果、源码 SDK、ELF/资格/HIL 工具"
 msgstr ""
 "Strict input parsing, one generated result, source SDK and "
 "ELF/qualification/HIL tools"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "CMake 是代码依赖唯一权威"
 msgstr "CMake is the sole authority for code dependencies"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "外部应用工程"
 msgstr "External application projects"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "产品 composition、任务、策略、布局、预算、恢复与业务"
 msgstr ""
 "Product composition, tasks, policy, layout, budgets, recovery and business "
 "behavior"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "pin 一个明确平台版本，拥有实际执行进展"
 msgstr "Pin an explicit platform version and own actual execution progress"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:17
+msgid ""
+"完整物理目录与相邻 README 以[源码合同入口](../explanation/source-map.md)为准。 厂家与 ISA "
+"分组只改变构建期源码所有权；公共 include、CMake target 和装配中的 family "
+"标识保持。公共等待／唤醒端口可跨后端连接，Task／Queue／join／静态控制块 仍使用后端专用 API；切换 RTOS "
+"的产品显式适配其生命周期，不引入通用最大池。"
+msgstr ""
+"The [source contracts](../explanation/source-map.md) own the complete "
+"physical layout and adjacent READMEs. Vendor and ISA grouping changes only "
+"build-time source ownership; public includes, CMake targets and authored "
+"family identifiers remain stable. The public wait/wake port can connect "
+"across backends, while Task/Queue/join/static control blocks retain backend-"
+"specific APIs. Products switching RTOS explicitly adapt their lifecycle; no "
+"universal maximum pool is introduced."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:22
 msgid ""
 "SoC 按 controller kind/mode 组织 translation unit，同一实现可服务多个独立实例。 选入一个 UART "
 "不会默认驻留所有 外设、RTOS 队列或最大对象池。启动与 system source 是显式 firmware 输入，不依靠 静态 archive "
@@ -142,6 +202,7 @@ msgstr ""
 "provider IRQs enter the image only with selected implementations; section GC"
 " removes unused implementations."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:28
 msgid ""
 "CMake 从同一 resolved 结果读取选中的 controller kind/mode，仅查询选择事实； 源码集合仍由各家族 CMake "
 "维护。未选择的驱动不参与编译，端点所需 base driver 按组合补齐。STM 空配置不编译外设驱动；GD 保留 system/timebase "
@@ -155,6 +216,7 @@ msgstr ""
 "removes unreferenced functions. Compilation trimming and image trimming are "
 "verified separately."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:33
 msgid ""
 "G474 的 HSE24/170 MHz 参考维护静态 GPIO、六 UART、SPI1/2、TIM3/4 PWM、IWDG 与 EXTI。独立 "
 "acquisition 夹具选择 ADC1 bulb 单次／TIM6 有限 DMA、I2C1 和 物理 Flash。ADC DMA 仅开放 "
@@ -174,6 +236,7 @@ msgstr ""
 " do not establish reference PCB, analog timing, ThreadX G474 or physical "
 "qualification."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:41
 msgid ""
 "H743 与 U575 分别增加 M7／M33 的具体 SoC 装配。H743 维护 LDO、固定 HSI32／HSI64 × Cache "
 "off/on、TIM2、PB0 与 USART3 PD8/PD9；UART 可选 IRQ bytes、 有限 TX DMA 或有限 RX DMA-"
@@ -220,6 +283,7 @@ msgstr ""
 "the [extension record](soc-extensions-verification.md) separately records "
 "later evidence."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:62
 msgid ""
 "F103/GD303 通过私有 legacy 引擎复用实际兼容的 UART channel-DMA、I2C V1、ADC、 PWM 和半字 Flash "
 "算法；家族层检查官方寄存器 ABI、时钟、IRQ 和内存事实。TX-only UART 状态不包含 duplex RX block 扩展，方法表和直接 "
@@ -237,6 +301,7 @@ msgstr ""
 "bank fetch stalls and kernel tick loss still require physical measurements; "
 "the time domain does not catch up kernel ticks."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:69
 msgid ""
 "Board 不复制 SoC 驱动。GD32 的 I2C/PWM/ADC/EXTI route、STM32 的高级控制器 route "
 "可以在明确标为软件测试夹具的外部 Board 包中编译／链接；这不意味着三块参考 PCB 已核对相同 connector 和电气。默认 Board "
@@ -248,9 +313,11 @@ msgstr ""
 "PCBs have matching verified connectors/electrical facts. Default Boards bind"
 " only routes with existing provenance."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:73
 msgid "构建与配置"
 msgstr "Build and configuration"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:75
 msgid ""
 "![当前配置链：严格解析与原子bundle进入唯一CMake目标图](../assets/diagrams/configuration-"
 "generation.svg)"
@@ -258,11 +325,13 @@ msgstr ""
 "![Current configuration chain: strict parsing and an atomic bundle enter the"
 " sole CMake target graph](../assets/diagrams/configuration-generation.svg)"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:75
 msgid "当前配置链：严格解析与原子bundle进入唯一CMake目标图"
 msgstr ""
 "Current configuration chain: strict parsing and an atomic bundle enter the "
 "sole CMake target graph"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:77
 msgid ""
 "当前图的输入/产物关系见[FIG-03及源码依据](../assets/diagrams/README.md#fig-03-配置与原子生成)。 "
 "软件证据与物理资格分别取得，见[FIG-11](../assets/diagrams/qualification-evidence.svg)。 "
@@ -275,9 +344,11 @@ msgstr ""
 "below is retained only as historical migration input; its arrows cannot "
 "represent current HIL admission or completed verification."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:81
 msgid "**历史构建简图源：**"
 msgstr "**Historical build sketch source:**"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:97
 msgid ""
 "一个 assembly 选择 Board、clock profile、OS backend、控制器实例、有限 mode、 容量、IRQ "
 "优先级、endpoint 和预算。生成器只生成静态硬件装配，不生成任务、业务 代码或软件依赖图。未知键、失效输入、非法模式、引脚／IRQ／timer "
@@ -291,6 +362,7 @@ msgstr ""
 "reconfiguration invalidates the old bundle instead of silently reusing a "
 "previous success."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:102
 msgid ""
 "SoC/Board 事实采用 JSON，使用者编写 schema-2 TOML。严格 resolver 产生不可变 typed "
 "IR；各生成器消费同一结果。`resolved.json` 是该结果的序列化，不能作为手工 配置回填。迁移期 schema-1 JSON "
@@ -302,6 +374,7 @@ msgstr ""
 "configuration input. Migration schema-1 JSON fixtures have explicit entry "
 "points and are not overlaid with TOML."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:106
 msgid ""
 "IR 身份、预算和各类 controller options 使用冻结 record，IRQ 为嵌套 record， ADC "
 "channels/sample times 为 tuple；完整 JSON 事实投影仍保留只读 mapping， "
@@ -325,6 +398,7 @@ msgstr ""
 "defaults. Ordinary Boards reuse implementations without duplicating drivers;"
 " documentation matrices cannot determine configuration backward."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:116
 msgid ""
 "不可变 family descriptor 统一配置入口、依赖身份和 SDK 必需 payload；controller descriptor "
 "复用精确寄存器基址、IRQ、DMA 和引脚绑定事实，生产 C 的 SDK 静态 断言仍独立核对。`clock.source`／`input_hz` 表达"
@@ -342,6 +416,7 @@ msgstr ""
 "hiding differences. These are build-time facts, not a runtime registry/query"
 " layer or second source graph."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:123
 msgid ""
 "CMake 中 `Nexus::Platform` 导出配置、typed factory 和不可变接口；SDK headers 和 provider "
 "storage 只对实现与生成 binding TU 可见。公共消费路径没有厂商 SDK ABI。 外部 firmware 通过 "
@@ -353,9 +428,11 @@ msgstr ""
 "ABI. External firmware explicitly adds startup/system/linker/resource checks"
 " through `nexus_add_firmware()`."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:127
 msgid "固定对象与执行"
 msgstr "Fixed objects and execution"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:129
 msgid ""
 "CPU 原语、特权、中断屏蔽和 FreeRTOS 启动合同见 [Cortex-M 架构接入](cortex-m.md)。Arch "
 "按编译期目标选择实现，不使用运行时 CPU factory；设备 typed factory 与共享多态方法表保持。F407／F470 的首发模式 和 "
@@ -368,6 +445,7 @@ msgstr ""
 " vertical slices are maintained separately. Nine-core CPU models/compilation"
 " cannot replace concrete SoC integration or physical verification."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:135
 msgid ""
 "独立 CPU runtime 读取外部 `runtime.toml` 与显式 `cpu.json`，复用同一冻结 `CpuProfileIR` 和生产 "
 "CMake targets。`nexus_add_runtime(ASSEMBLY ...)` 导出 `Nexus::Runtime`，传递 "
@@ -395,6 +473,7 @@ msgstr ""
 "SoC ownership and external image partitioning; Runtime/default Platform does"
 " not generate it automatically."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:147
 msgid ""
 "ThreadX 是独立的真实内核后端，选入锁定的 Eclipse ThreadX Linux GNU 或 Cortex-M4 GNU port，不复用 "
 "FreeRTOS 的配置字段。首批维护三块 F407/F470 Board、Native Linux 及明确的 M4 integer/M4F CPU "
@@ -414,6 +493,7 @@ msgstr ""
 "kernel timers, but caller stack parameters are not actual host-pthread stack"
 " budgets. See [ThreadX integration](../design/threadx.md)."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:156
 msgid ""
 "当前恢复 factory＋多态接口骨架，生成阶段完成实例构造。每类接口 face 只有 `const ops*` 和 `context*`；face "
 "与操作表只读，provider 可变状态及按实例选择的 buffer 独立静态存储。方法接收自己的 context，不通过操作表地址推断实例。"
@@ -424,6 +504,7 @@ msgstr ""
 "per-instance buffers use independent static storage. Methods receive their "
 "own context rather than infer instances from operation-table addresses."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:160
 msgid ""
 "生成 `nexus_factory.h` 和 assembly-local ID。`nx_factory_uart()` 等 typed 函数 "
 "只返回已存在对象：不申请堆、不启硬件、不查字符串、不加锁。非法 ID 返回 NULL； 取得对象与 "
@@ -437,6 +518,7 @@ msgstr ""
 "handles are not revocable sessions; shutdown must settle callers, IRQs, "
 "owners and notification publishers."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:165
 msgid ""
 "factory 默认 ID 按类命名并以 `uint16_t` 表达；C typedef 不阻止把另一个类的数值 传入。可显式选择按类 struct "
 "reference，防止正常调用混用 ID，或选入只读能力查询； 两者仍返回同一静态对象，不增加运行时注册或构造。能力查询描述已选择的有限模式， "
@@ -456,6 +538,7 @@ msgstr ""
 "after start failure. Stop may withdraw some instances before returning BUSY;"
 " BUSY does not restore complete running state."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:174
 msgid ""
 "冷启动先拒绝可观察到的外部 owner。GPIO 装配先观察全部选中 bank 的 gate， 再检查全部选中 pin 的 "
 "mode/lock，最后才保存租约并修改 pin；不能先改一个 bank 再因另一个 bank 冲突而假称未产生效果。控制器路线和 endpoint "
@@ -467,6 +550,7 @@ msgstr ""
 "effects on another-bank conflict. Controller routes and endpoint CS share "
 "this check. Unselected pins in shared banks remain externally owned."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:179
 msgid ""
 "H743 从可信复位或已成功完成自有 clean/disable 的冷状态建立固定时钟和 Cache 配置，不能仅凭 CCR 关闭位认领未知 "
 "bootloader 状态。Arch 冷 Cache 控制对象 保留已取得的 I/D Cache 与 selector 恢复责任；当前机制只维护 "
@@ -488,6 +572,7 @@ msgstr ""
 " divider in that order. Uncleared effects remain with original owners. This "
 "is cold lifecycle, not live frequency scaling."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:188
 msgid ""
 "驱动自己的 GPIO stop 保持声明的 safe idle。完整 Platform stop 只有在所有 "
 "IRQ／DMA／调用者引用排空后，才恢复原来的选中 pin 租约并释放 gate；恢复读回 失败仍保留对应清理责任。因此完整 Platform "
@@ -502,6 +587,7 @@ msgstr ""
 "under external power/safety policy. This is resource ownership, not built-in"
 " product shutdown policy."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:194
 msgid ""
 "timebase 只在成功启动后发布有效 epoch。启动先排除旧 UIF，再观察 UG 产生的 新更新；运行期 ACK 拒绝时不累加 "
 "epoch，而是使时间失效并有界撤回中断源。 无论中断源隔离是否成功，都保留终止路径的中断屏蔽并调用故障观察端口；观察者 "
@@ -520,6 +606,7 @@ msgstr ""
 " recheck epoch validity under the same mask to prevent entry-gap IRQ "
 "invalidation. Old deadlines cannot cross stop/failure/restart."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:202
 msgid ""
 "SPI/I2C controller factory 返回真实控制器，device factory 返回 CS/address 端点。一个 "
 "controller 仲裁所有子端点；恢复属于 controller，不借用第一个端点 来冒充总线。不同 provider "
@@ -532,6 +619,7 @@ msgstr ""
 "tables/state. Native generated objects no longer bind multiple names to one "
 "global model."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:207
 msgid ""
 "公共函数做有界检查并调用共享表；provider 内部可以直接调用自己的实现，避免在 "
 "寄存器热路径反复多态分派。组件通过公共合同接入，应用角色、任务与恢复策略仍由 外部工程拥有。编译选中某实例不代表其硬件已经启动或请求已经完成。"
@@ -542,6 +630,7 @@ msgstr ""
 "application roles/tasks/recovery. Compile-time instance selection means "
 "neither started hardware nor completed requests."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:211
 msgid ""
 "生成器的私有对象按 port、endpoint、CS、buffer 和平台状态分开命名，避免合法 实例 ID 与内部辅助对象共用存储。设备字段按实际 "
 "transport 校验；I2C endpoint 只声明地址，不接受无效的 SPI mode、频率或通用 capacity。`devices` "
@@ -554,78 +643,98 @@ msgstr ""
 " `devices` generates bus endpoints and `components` selects libraries; "
 "applications explicitly construct device/owner instances."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "路径"
 msgstr "Path"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "资源与责任"
 msgstr "Resources and responsibility"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "GPIO 直接访问"
 msgstr "Direct GPIO access"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "授权 mask；set/reset 一次 BSRR/BOP；toggle 要求单一 writer"
 msgstr ""
 "Authorized mask; one BSRR/BOP for set/reset; single writer required for "
 "toggle"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "UART 直接访问"
 msgstr "Direct UART access"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "调用者 request/payload；一个 execution owner；真正 TC 决定 wire 完成"
 msgstr ""
 "Caller request/payload; one execution owner; actual TC determines wire "
 "completion"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "SPI/I2C/Flash/ADC polling"
 msgstr "SPI/I2C/Flash/ADC polling"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "明确 CPU-active polling；有限模式；只报告有效完成前缀"
 msgstr ""
 "Explicit CPU-active polling; bounded modes; only valid completed prefixes "
 "reported"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "UART/SPI finite DMA"
 msgstr "UART/SPI finite DMA"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "精确域与通道；零隐式复制；内存和线上独立排空；失败保留借用"
 msgstr ""
 "Exact domains/channels; zero implicit copying; separate memory/line drain; "
 "retained borrows on failure"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "UART RX blocks"
 msgstr "UART RX blocks"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "IRQ／IDLE；调用者精确块数组；不可变 consumer loan；可见 loss"
 msgstr ""
 "IRQ/IDLE; exact caller block arrays; immutable consumer loans; visible loss"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "ADC trigger blocks"
 msgstr "ADC trigger blocks"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "精确 timer/DMA；每块停机；显式 service 稳定／校准与 rearm；块间间隙"
 msgstr ""
 "Exact timer/DMA; stop per block; explicit service for "
 "stabilization/calibration/rearm; inter-block gaps"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "多 producer owner"
 msgstr "Multi-producer owner"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "外部按容量提供 slot/storage；唯一 admission；slot/epoch 防止旧取消命中新请求"
 msgstr ""
 "Externally capacity-sized slots/storage; single admission; slot/epoch "
 "prevents stale cancellation of new requests"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "OS wait/wake"
 msgstr "OS wait/wake"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "sequence/predicate 防 lost wake；通知是提示，client 不 service hardware"
 msgstr ""
 "Sequence/predicate prevents lost wake; notifications are hints; clients do "
 "not service hardware"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid "shutdown"
 msgstr "shutdown"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:0
 msgid ""
 "拒绝 producer→保持 executor drain→结清 borrow/通知发布者→join→逆序释放接口；仍运行的内核保留 "
 "clock/Tick，产品决定 park 或 reset"
@@ -634,6 +743,7 @@ msgstr ""
 "publishers→join→reverse interface release; running kernels retain clock/Tick"
 " and products choose park/reset"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:228
 msgid ""
 "Flash geometry 的 `program_flags` 将 ECC 新擦除前提暴露给调用者。要求 fresh erase "
 "的单元在一次脉冲后不可仅凭 FF 读回重用；失败／中断后重新擦除，全 FF 输入不发脉冲。 "
@@ -649,6 +759,7 @@ msgstr ""
 "declarations, writable regions, execution stalls, watchdog and power-loss "
 "recovery."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:233
 msgid ""
 "CAN 使用真实三邮箱和共享 filter domain；USB FS 使用显式 endpoint/FIFO/event 容量、PIO packet "
 "loan 和独立 48 MHz owner；Ethernet 使用 caller-sized normal descriptor ring、RX "
@@ -666,6 +777,7 @@ msgstr ""
 "types alone cannot prove complete reference-PCB integration. See "
 "[support](support.md)."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:240
 msgid ""
 "可选 `UserIoBroker` 只实现被特权 kernel gateway 调用的 scalar GPIO read/set-reset "
 "admission。调用者提供真实 principal、memory pin/copy/unpin 与有界策略；用户消息 不能选择指针、MMIO "
@@ -687,6 +799,7 @@ msgstr ""
 "instruction/layout gates confer no physical-isolation/electrical-safety "
 "qualification."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:249
 msgid ""
 "FreeRTOS 的 `lowpower_port = \"timebase\"` 显式选入 F407/GD470 私有浅 Sleep 定时器 "
 "适配；默认 `custom` 保持应用端口或弱 NULL 行为。所选实际 getter 验证固定 PLL、 timebase 与 IRQ "
@@ -704,6 +817,7 @@ msgstr ""
 "quantization-phase models are not measured power/timing. See [shallow-sleep "
 "contract](../design/timebase-lowpower.md)."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:256
 msgid ""
 "UART `REJECTED` 不借用 request 或 buffer；`ACCEPTED` 借用到 acquire-observed "
 "`SETTLED`。provider 先 detach，再 release-publish，之后不能读取 request。取消与 "
@@ -717,6 +831,7 @@ msgstr ""
 "TC-IRQ observation checks the absolute deadline; later service cannot "
 "overwrite earlier completion facts."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:261
 msgid ""
 "STM32 取消保留到实际 TC drain；GD32 可用受控 USART reset 终止 wire interval， 未观察 TC 时保守 "
 "count=0，并产生 RX loss。两者都不把写入 DR/DATA 的数量当作 完整发送字节。错误-only RX 和 loss marker 带 "
@@ -728,9 +843,11 @@ msgstr ""
 "completely sent bytes. Error-only RX/loss markers have `NO_BYTE` and cannot "
 "consume stale register data."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:265
 msgid "性能与空间"
 msgstr "Performance and space"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:267
 msgid ""
 "默认 C11 路径无 heap、运行时 registry、字符串查找、隐藏 worker、mandatory OS lock 或 闲置 DMA/copy"
 " pool。RX/EXTI queue、OS object、owner slot 和组件 workspace 按 选择的实例配置分配。IRQ "
@@ -742,6 +859,7 @@ msgstr ""
 "move bounded facts; bulk reads use short critical sections and ring hot "
 "paths avoid unnecessary dynamic division."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:272
 msgid ""
 "资源工具计算真实 ELF 的 Flash LOAD/footprint、每个物理 RAM 域、MSP、heap 和 未使用 provider 的 "
 "GC。O2/Os/O3 与 LTO 的选择依据相同 workload 的实测，不凭 源码行数推断效率。原生测试耗时、汇编数量和真实 MCU "
@@ -754,6 +872,7 @@ msgstr ""
 "hardware, minimum cycles/completed physical timing budgets cannot be "
 "promised."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:277
 msgid ""
 "固定容量也要测量最坏临界区。Owner admission 使用 free-head 链，提交与可复用 slot 归还为 O(1)，epoch 耗尽的 "
 "slot 永久退休。stream 用 outstanding 记录 FILLING/READY/BORROWED 总借用，stop 判断为 "
@@ -777,6 +896,7 @@ msgstr ""
 "no priority preemption/deadline ordering; applications budget transaction "
 "lengths, service intervals and quarantine effects on later requests."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:288
 msgid ""
 "`tools/measurement/interfaces.py` 从实际 ELF 审计保留的 face 与操作表。非 LTO ARM face 为 8"
 " bytes Flash／0 bytes RAM，表按 provider 共享；独立状态另外核算。 简单 LTO workload 可能消除整个 "
@@ -788,9 +908,11 @@ msgstr ""
 "workloads may remove entire faces/tables; arbitrary applications do not "
 "inherit that guarantee."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:292
 msgid "测试与新版本资格"
 msgstr "Testing and new-version qualification"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:294
 msgid ""
 "主机新增合同使用固定版本 GoogleTest/GoogleMock，固件仍是 C11；测试框架、C++ runtime 和依赖 archive 不进入"
 " MCU 镜像。保留已有生产 TU 的 C 寄存器/故障回归， 新增 mock 只替换硬件交互，不替换被测 owner、dispatch 或生成器。"
@@ -800,6 +922,7 @@ msgstr ""
 "production-TU C register/fault regressions remain; new mocks replace "
 "hardware interaction, not owners/dispatch/generators under test."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:298
 msgid ""
 "TDD 按 Red→Green→Refactor 实施，新增行为先保留失败证据。commit hook 实际执行 测试并验证全量发现的用例、未过滤的新 "
 "XML 和返回码；机械门禁只能证明当前执行， 不能证明所有开发者的历史编辑顺序。代码格式与反斜线 Doxygen 沿用既有规则。"
@@ -810,6 +933,7 @@ msgstr ""
 "execution, not every developer's historical editing order. "
 "Formatting/backslash Doxygen retain existing rules."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/delivery/architecture.md:302
 msgid ""
 "本轮 factory/TOML/多态和 SoC 迭代不能继承此前候选的资格。 [初次 SoC 执行记录](soc-refinement-"
 "verification.md) 绑定其历史 code revision， 不覆盖后续扩展；[扩展执行记录](soc-extensions-"

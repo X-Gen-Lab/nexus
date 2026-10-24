@@ -1,4 +1,0 @@
-[1/4] Building C object CMakeFiles/g474_system_test.dir/soc/stm32g474/drivers/gpio.c.o
-[2/4] Building C object CMakeFiles/g474_provider_test.dir/soc/stm32g474/drivers/gpio.c.o
-[3/4] Linking CXX executable g474_system_test
-[4/4] Linking CXX executable g474_provider_test

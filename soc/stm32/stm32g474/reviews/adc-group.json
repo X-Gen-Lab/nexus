@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "provider": "stm32g474",
+  "part": "STM32G474RET6",
+  "kind": "adc_group",
+  "modes": ["regular-sequence-dma", "injected-sequence"],
+  "device_id": 1129,
+  "flash_bytes": 524288,
+  "sources": [
+    {
+      "document": "ES0430 Rev9 June 2024",
+      "sha256": "72194383290900475df60f464dfa382e8c84ae79e15fb6392c7707a397436586",
+      "scope": "Table2 cut IDs; sections2.7.5 and2.7.8 through2.7.11"
+    },
+    {
+      "document": "RM0440 Rev9 March 2025",
+      "sha256": "7f8c15bc667c46614e2c5ad0341b9eaa20e8d417f21b819b9f2dde7dfe1ae564",
+      "scope": "ADC1 SQR/JSQR, legal stop/disable, finite limited DMA, TIM6 selectors"
+    },
+    {
+      "document": "DS12288 Rev6 November 2021",
+      "sha256": "b018e20dbe34b63a43e49365518b186ef0e0e8e899deeabc1c9f53a3a10c1add",
+      "scope": "Table12 PA0/PA1; Table66 ADC timing; Tables20/81/82 internal sources"
+    }
+  ],
+  "workarounds": {
+    "1": "Z: repeat every physical rank twice and keep the first slot (ES2.7.8)",
+    "2": "Discard a real priming scan and repeat it after bounded idle (ES2.7.9)",
+    "4": "Prove START/STOP quiet, actual ADDIS, then actual ADEN restart (ES2.7.10 Y)"
+  },
+  "invariants": [
+    "Single ADC1 and exclusive ADC1/ADC2/ADC345 common-clock ownership",
+    "HSE24/PLL170, HCLK170MHz, ADC12 SYSCLK/8=21.25MHz, ratio8",
+    "12-bit single-ended normal sampling, JQDIS1, no dual conversion or preemption",
+    "Regular finite normal DMA ending on a complete physical rank boundary",
+    "Injected one complete frame; software or single owned TIM6 trigger",
+    "All physical ranks use one sample-time value per channel"
+  ],
+  "implementation": {
+    "source": "soc/stm32/stm32g474/drivers/adc_group.c",
+    "algorithms": ["sequence", "prime_start", "withdraw", "enable_adc"],
+    "tests": ["tests/google/g474_adc_group_test.cpp", "tests/google/adc_group_test.cpp"],
+    "scope": "Reviewed algorithms and exact named layouts; whole Platform and cleanup tests remain separate"
+  },
+  "profiles": {
+    "g474-adc-group-x": {
+      "revision_id": 8195,
+      "rank_repeat": 1,
+      "required_workarounds": 2
+    },
+    "g474-adc-group-y": {
+      "revision_id": 8194,
+      "rank_repeat": 1,
+      "required_workarounds": 6
+    },
+    "g474-adc-group-z": {
+      "revision_id": 8193,
+      "rank_repeat": 2,
+      "required_workarounds": 3
+    }
+  },
+  "physical_qualified": false,
+  "limitations": [
+    "An expected named cut is not an observed identity; startup must read actual IDCODE and Flash size",
+    "Device group and density do not identify an exact package or orderable part",
+    "No connected PCB, analog impedance/accuracy, measured timing or physical HIL qualification"
+  ]
+}

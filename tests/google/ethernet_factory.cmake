@@ -27,12 +27,12 @@ foreach(eth_family stm32 gd32)
     set(eth_target "nexus_${eth_family}_eth_factory_test")
     nexus_google_test(${eth_target} SOURCES ethernet_factory_test.cpp
         "${eth_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/${eth_soc}/drivers/ethernet.c"
-        "${NEXUS_SOURCE_DIR}/io/src/eth_mac.c"
+        "${NEXUS_SOC_SOURCE_${eth_soc}}/drivers/ethernet.c"
+        "${NEXUS_SOURCE_DIR}/io/src/controllers/eth_mac.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${eth_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOURCE_DIR}/io/native"
-            "${NEXUS_SOURCE_DIR}/soc/${eth_soc}/private")
+            "${NEXUS_SOURCE_DIR}/soc/native/drivers"
+            "${NEXUS_SOC_SOURCE_${eth_soc}}/private")
     target_compile_options(${eth_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_model.h"
         "-include${CMAKE_CURRENT_SOURCE_DIR}/ethernet_factory_model.h")

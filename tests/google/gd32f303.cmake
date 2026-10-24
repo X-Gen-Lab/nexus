@@ -4,14 +4,14 @@ set(gd303_target nexus_gd32f303_${gd303_suite}_test)
 nexus_google_test(${gd303_target}
     SOURCES gd32f303_${gd303_suite}_test.cpp
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model/model.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/watchdog.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/exti.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/exti.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/gd32f303/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model")
 target_include_directories(${gd303_target} SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"
@@ -46,14 +46,14 @@ endforeach()
 nexus_google_test(nexus_gd32f303_factory_test SOURCES gd32f303_factory_test.cpp
     "${gd303_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model/model.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f303/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/watchdog.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/spi.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/spi.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${gd303_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/private"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model")
 target_include_directories(nexus_gd32f303_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"
@@ -88,14 +88,14 @@ endforeach()
 nexus_google_test(nexus_gd32f303_spi_factory_test SOURCES gd32f303_spi_factory_test.cpp
     "${gd303_spi_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model/model.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f303/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/watchdog.c"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/drivers/spi.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/drivers/spi.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${gd303_spi_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/gd32f303/private"
+        "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f303/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts/gd32f303_model")
 target_include_directories(nexus_gd32f303_spi_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f30x/Firmware/CMSIS/GD/GD32F30x/Include"

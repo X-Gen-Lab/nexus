@@ -1,6 +1,0 @@
-{
-  "path": "scripts/ci/test_style_gate.py",
-  "bytes": 23216,
-  "sha256": "c8af95c20cc3b90d3a63561f06b5a763b4bea280b73fad8fdbf4d4ed993beeb6",
-  "reason": "Root-approved style-only disposable fixture excludes the new unrelated always-run workflow hook using its existing TDD exclusion mechanism; all style assertions unchanged."
-}

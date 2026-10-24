@@ -7,6 +7,7 @@
 #define NEXUS_IO_SPI_TRANSACTION_H
 
 #include "nexus/core/time.h"
+#include "nexus/io/fwd.h"
 #include <stddef.h>
 #include <stdint.h>
 #ifdef __cplusplus
@@ -41,10 +42,10 @@ typedef struct {
 } nx_spi_transaction_ops_t;
 
 /** \brief Optional face sharing the selected provider's existing bus state. */
-typedef struct {
+struct nx_spi_transaction_endpoint {
     const nx_spi_transaction_ops_t* ops;
     void* context;
-} nx_spi_transaction_endpoint_t;
+};
 
 /**
  * \brief           Validate every descriptor and span without hardware effects.

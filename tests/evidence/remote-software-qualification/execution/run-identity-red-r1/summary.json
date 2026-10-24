@@ -1,9 +1,0 @@
-{
-  "phase": "run-identity-red-r1",
-  "exit_code": 1,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/run-identity-red-r1/command.attempts/1792297158139520073-6f042779c1cf476a81b38702ee007b2f/receipt.json",
-  "guards_stable": true,
-  "persistent_allocated_bytes": 458752,
-  "TMP_live_allocated_bytes": 0,
-  "child_max_rss_KiB": 26768
-}

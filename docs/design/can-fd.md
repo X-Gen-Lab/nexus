@@ -166,7 +166,7 @@ External adapter observers still need their own join before storage reuse.
 
 The authoritative API is [can_fd.h](../../io/include/nexus/io/can_fd.h), with
 the shared [request contract](../../core/include/nexus/core/request.h).
-[The private provider](../../soc/stm32g474/drivers/fdcan.c) uses pinned official
+[The private provider](../../soc/stm32/stm32g474/drivers/fdcan.c) uses pinned official
 FDCAN definitions and direct volatile MMIO. It does not link HAL driver C,
 `HAL_GetTick`, HAL handles or MSP callbacks into this implementation. The
 [G4 source lock](../../dependencies/stm32g4-hal.lock.json) preserves the exact

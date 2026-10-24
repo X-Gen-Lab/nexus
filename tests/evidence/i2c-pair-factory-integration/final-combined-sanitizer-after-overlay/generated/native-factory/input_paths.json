@@ -1,7 +1,0 @@
-{
-  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
-  "soc/native/routes.json": "/workspace/nexus/soc/native/routes.json",
-  "soc/native/soc.json": "/workspace/nexus/soc/native/soc.json",
-  "tests/contracts/native_assembly/multi.toml": "/workspace/nexus/tests/contracts/native_assembly/multi.toml",
-  "tests/contracts/native_assembly/multi_board/board.json": "/workspace/nexus/tests/contracts/native_assembly/multi_board/board.json"
-}

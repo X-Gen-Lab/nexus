@@ -11,8 +11,8 @@
       "case": "Stm32UartDma.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
       "test_source": "tests/google/stm32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -44,8 +44,8 @@
       "case": "Stm32UartDma.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
       "test_source": "tests/google/stm32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -77,8 +77,8 @@
       "case": "Stm32UartDma.WireIdleCannotReleaseMemoryWhenEngineRefusesDisable",
       "test_source": "tests/google/stm32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -113,8 +113,8 @@
       "case": "Stm32UartDma.LateServiceWithWireAndEngineProofPreservesSuccess",
       "test_source": "tests/google/stm32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -147,11 +147,11 @@
       "case": "Stm32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -185,11 +185,11 @@
       "case": "Stm32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -220,11 +220,11 @@
       "case": "Stm32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -252,11 +252,11 @@
       "case": "Stm32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -294,11 +294,11 @@
       "case": "Stm32UartReceive.ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -325,11 +325,11 @@
       "case": "Stm32UartReceive.RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -356,11 +356,11 @@
       "case": "Stm32UartReceive.ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -387,11 +387,11 @@
       "case": "Stm32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -429,11 +429,11 @@
       "case": "Stm32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -468,11 +468,11 @@
       "case": "Stm32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -501,11 +501,11 @@
       "case": "Stm32UartReceive.ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -534,11 +534,11 @@
       "case": "Stm32UartReceive.ContinuousWrongAddressStoreFailsExactReplacementProof",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -566,12 +566,12 @@
       "case": "Stm32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
       "test_source": "tests/google/stm32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_dma.c",
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/stm32f407/drivers/uart_receive.c",
-        "soc/stm32f407/drivers/uart_duplex.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart_receive.c",
+        "soc/stm32/stm32f407/drivers/uart_duplex.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_uart_receive_model.h"
@@ -616,8 +616,8 @@
       "case": "Stm32SpiDma.PollingEndpointsProveSharedControllerWithoutDmaAlias",
       "test_source": "tests/google/stm32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/spi.c",
-        "soc/stm32f407/drivers/spi_dma.c",
+        "soc/stm32/stm32f407/drivers/spi.c",
+        "soc/stm32/stm32f407/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -644,8 +644,8 @@
       "case": "Stm32SpiDma.CancelledPartialDmaRetainsCsAndNeverInventsWireByteCount",
       "test_source": "tests/google/stm32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/spi.c",
-        "soc/stm32f407/drivers/spi_dma.c",
+        "soc/stm32/stm32f407/drivers/spi.c",
+        "soc/stm32/stm32f407/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -684,8 +684,8 @@
       "case": "Stm32SpiDma.RefusedEngineDisableRetainsBorrowEvenWhenWireIsIdle",
       "test_source": "tests/google/stm32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/spi.c",
-        "soc/stm32f407/drivers/spi_dma.c",
+        "soc/stm32/stm32f407/drivers/spi.c",
+        "soc/stm32/stm32f407/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -719,8 +719,8 @@
       "case": "Stm32SpiDma.CompletedDmaHasBoundedDrainEvenWithoutRequestDeadline",
       "test_source": "tests/google/stm32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/spi.c",
-        "soc/stm32f407/drivers/spi_dma.c",
+        "soc/stm32/stm32f407/drivers/spi.c",
+        "soc/stm32/stm32f407/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -754,7 +754,7 @@
       "case": "I2CRegisters.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
       "test_source": "tests/google/i2c_register_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/i2c.c"
+        "soc/stm32/stm32f407/drivers/i2c.c"
       ],
       "model_sources": [
         "tests/google/i2c_register_model.h"
@@ -780,7 +780,7 @@
       "case": "I2CRegisters.DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
       "test_source": "tests/google/i2c_register_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/i2c.c"
+        "soc/stm32/stm32f407/drivers/i2c.c"
       ],
       "model_sources": [
         "tests/google/i2c_register_model.h"
@@ -809,7 +809,7 @@
       "case": "I2CRegisters.StopBitClearWithoutMasterReleaseCannotReportSuccess",
       "test_source": "tests/google/i2c_register_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/i2c.c"
+        "soc/stm32/stm32f407/drivers/i2c.c"
       ],
       "model_sources": [
         "tests/google/i2c_register_model.h"
@@ -836,7 +836,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/stm32f407/drivers/i2c_async.c",
+        "soc/stm32/stm32f407/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -869,7 +869,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/stm32f407/drivers/i2c_async.c",
+        "soc/stm32/stm32f407/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -905,7 +905,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/stm32f407/drivers/i2c_async.c",
+        "soc/stm32/stm32f407/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -941,7 +941,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/stm32f407/drivers/i2c_async.c",
+        "soc/stm32/stm32f407/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -975,7 +975,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/stm32f407/drivers/i2c_async.c",
+        "soc/stm32/stm32f407/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1003,7 +1003,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/stm32f407/drivers/i2c_async.c",
+        "soc/stm32/stm32f407/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1029,10 +1029,10 @@
       "case": "Stm32AdcStream.RefusedDisableNeverPublishesMutableDmaMemory",
       "test_source": "tests/google/stm32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/adc.c",
-        "soc/stm32f407/drivers/adc_stream.c",
-        "soc/stm32f407/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/adc.c",
+        "soc/stm32/stm32f407/drivers/adc_stream.c",
+        "soc/stm32/stm32f407/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_adc_stream_model.h"
@@ -1068,10 +1068,10 @@
       "case": "Stm32AdcStream.ObservedDmaFaultCannotBeReplacedByLateTransferComplete",
       "test_source": "tests/google/stm32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/adc.c",
-        "soc/stm32f407/drivers/adc_stream.c",
-        "soc/stm32f407/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/adc.c",
+        "soc/stm32/stm32f407/drivers/adc_stream.c",
+        "soc/stm32/stm32f407/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_adc_stream_model.h"
@@ -1109,10 +1109,10 @@
       "case": "Stm32AdcContinuous.HeldConsumerForcesStopAndExplicitWarmResume",
       "test_source": "tests/google/stm32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/adc.c",
-        "soc/stm32f407/drivers/adc_stream.c",
-        "soc/stm32f407/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/adc.c",
+        "soc/stm32/stm32f407/drivers/adc_stream.c",
+        "soc/stm32/stm32f407/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_adc_stream_model.h"
@@ -1151,10 +1151,10 @@
       "case": "Stm32AdcContinuous.RefusedTargetWriteRetainsSpareUntilProvedDrain",
       "test_source": "tests/google/stm32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/adc.c",
-        "soc/stm32f407/drivers/adc_stream.c",
-        "soc/stm32f407/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/adc.c",
+        "soc/stm32/stm32f407/drivers/adc_stream.c",
+        "soc/stm32/stm32f407/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_adc_stream_model.h"
@@ -1186,10 +1186,10 @@
       "case": "Stm32AdcContinuous.NewErrorAtCompletionAcknowledgementCannotDisappear",
       "test_source": "tests/google/stm32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/adc.c",
-        "soc/stm32f407/drivers/adc_stream.c",
-        "soc/stm32f407/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/adc.c",
+        "soc/stm32/stm32f407/drivers/adc_stream.c",
+        "soc/stm32/stm32f407/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_adc_stream_model.h"
@@ -1216,10 +1216,10 @@
       "case": "Stm32AdcContinuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
       "test_source": "tests/google/stm32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/adc.c",
-        "soc/stm32f407/drivers/adc_stream.c",
-        "soc/stm32f407/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/adc.c",
+        "soc/stm32/stm32f407/drivers/adc_stream.c",
+        "soc/stm32/stm32f407/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/stm32_adc_stream_model.h"
@@ -1247,8 +1247,8 @@
       "case": "GD32UARTDMA.DmaErrorAtCompletionDetachCannotBecomeSuccessfulTx",
       "test_source": "tests/google/gd32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1280,8 +1280,8 @@
       "case": "GD32UARTDMA.DmaErrorBeforeW1cCannotBeErasedAsSuccessfulTx",
       "test_source": "tests/google/gd32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1313,8 +1313,8 @@
       "case": "GD32UARTDMA.CancellationCannotReleaseMemoryWhenEngineStillOwnsIt",
       "test_source": "tests/google/gd32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1349,8 +1349,8 @@
       "case": "GD32UARTDMA.AlreadyCompletedMemoryAndWireStaySuccessfulAtLateService",
       "test_source": "tests/google/gd32_uart_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1381,11 +1381,11 @@
       "case": "Gd32UartReceive.RefusedDisableRetainsLoanUntilARealServiceRetryDrains",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1419,11 +1419,11 @@
       "case": "Gd32UartReceive.TransferErrorAbortsUnreliablePrefixAndLatchesLoss",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1454,11 +1454,11 @@
       "case": "Gd32UartReceive.PendingIdleThenDmaFlagCannotPublishSameBufferTwice",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1486,11 +1486,11 @@
       "case": "Gd32UartReceive.StopClosesTransmitAdmissionWhileConsumerLoanExists",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1528,11 +1528,11 @@
       "case": "Gd32UartReceive.ErrorArrivingDuringIdleDisableIsObservedBeforeDataClearsIt",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1559,11 +1559,11 @@
       "case": "Gd32UartReceive.RejectedExhaustedAdmissionRetainsNoPrivateStreamOrPayloadReference",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1590,11 +1590,11 @@
       "case": "Gd32UartReceive.ObservedOverrunInFiniteGapIsRecordedBeforeRearmClearsStatus",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1621,11 +1621,11 @@
       "case": "Gd32UartReceive.ContinuousStarvationStopsBeforeItCanOverwriteBorrowedBlock",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1663,11 +1663,11 @@
       "case": "Gd32UartReceive.ContinuousRefusedTargetStoreNeverPublishesHardwareOwnedMemory",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1702,11 +1702,11 @@
       "case": "Gd32UartReceive.ContinuousBankFlipDuringStoreStopsWithoutPublishingOldTarget",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1735,11 +1735,11 @@
       "case": "Gd32UartReceive.ContinuousFreshErrorBetweenStatusReadAndAckCannotDisappear",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1768,11 +1768,11 @@
       "case": "Gd32UartReceive.ContinuousWrongAddressStoreFailsExactReplacementProof",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1800,12 +1800,12 @@
       "case": "Gd32UartReceive.DmaDuplexSeparatesMemoryCompletionFromWireTcAndReceiveLoan",
       "test_source": "tests/google/gd32_uart_receive_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_dma.c",
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_dma.c",
         "core/src/request.c",
-        "soc/gd32f470/drivers/uart_receive.c",
-        "soc/gd32f470/drivers/uart_duplex.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart_receive.c",
+        "soc/gd32/gd32f470/drivers/uart_duplex.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_uart_receive_model.h"
@@ -1850,8 +1850,8 @@
       "case": "GD32SPIDMA.PollingEndpointsProveSharedControllerWithoutDmaAlias",
       "test_source": "tests/google/gd32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/spi.c",
-        "soc/gd32f470/drivers/spi_dma.c",
+        "soc/gd32/gd32f470/drivers/spi.c",
+        "soc/gd32/gd32f470/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1878,8 +1878,8 @@
       "case": "GD32SPIDMA.CancelRetainsBorrowAndCsUntilQuarantineActuallyDrains",
       "test_source": "tests/google/gd32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/spi.c",
-        "soc/gd32f470/drivers/spi_dma.c",
+        "soc/gd32/gd32f470/drivers/spi.c",
+        "soc/gd32/gd32f470/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1918,8 +1918,8 @@
       "case": "GD32SPIDMA.RefusedEngineDisableKeepsBorrowDespiteIdleWire",
       "test_source": "tests/google/gd32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/spi.c",
-        "soc/gd32f470/drivers/spi_dma.c",
+        "soc/gd32/gd32f470/drivers/spi.c",
+        "soc/gd32/gd32f470/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1952,8 +1952,8 @@
       "case": "GD32SPIDMA.CompletedMemoryWithUnboundedRequestStillHasBoundedDrain",
       "test_source": "tests/google/gd32_spi_dma_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/spi.c",
-        "soc/gd32f470/drivers/spi_dma.c",
+        "soc/gd32/gd32f470/drivers/spi.c",
+        "soc/gd32/gd32f470/drivers/spi_dma.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -1985,7 +1985,7 @@
       "case": "I2CRegisters.ExpiredDeadlineRejectsWithoutAddressOrRegisterChanges",
       "test_source": "tests/google/i2c_register_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/i2c.c"
+        "soc/gd32/gd32f470/drivers/i2c.c"
       ],
       "model_sources": [
         "tests/google/i2c_register_model.h"
@@ -2011,7 +2011,7 @@
       "case": "I2CRegisters.DeadlineDuringReadReturnsOnlyTheCompletedPrefix",
       "test_source": "tests/google/i2c_register_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/i2c.c"
+        "soc/gd32/gd32f470/drivers/i2c.c"
       ],
       "model_sources": [
         "tests/google/i2c_register_model.h"
@@ -2040,7 +2040,7 @@
       "case": "I2CRegisters.StopBitClearWithoutMasterReleaseCannotReportSuccess",
       "test_source": "tests/google/i2c_register_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/i2c.c"
+        "soc/gd32/gd32f470/drivers/i2c.c"
       ],
       "model_sources": [
         "tests/google/i2c_register_model.h"
@@ -2067,7 +2067,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/gd32f470/drivers/i2c_async.c",
+        "soc/gd32/gd32f470/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -2100,7 +2100,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/gd32f470/drivers/i2c_async.c",
+        "soc/gd32/gd32f470/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -2136,7 +2136,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/gd32f470/drivers/i2c_async.c",
+        "soc/gd32/gd32f470/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -2172,7 +2172,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/gd32f470/drivers/i2c_async.c",
+        "soc/gd32/gd32f470/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -2206,7 +2206,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/gd32f470/drivers/i2c_async.c",
+        "soc/gd32/gd32f470/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -2234,7 +2234,7 @@
       "test_source": "tests/google/i2c_async_register_test.cpp",
       "production_sources": [
         "soc/common/i2c_v1_async.c",
-        "soc/gd32f470/drivers/i2c_async.c",
+        "soc/gd32/gd32f470/drivers/i2c_async.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -2260,10 +2260,10 @@
       "case": "GD32ADCStream.StopRetainsProducerUntilEngineStopsAndLateIRQIsHarmless",
       "test_source": "tests/google/gd32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/adc.c",
-        "soc/gd32f470/drivers/adc_stream.c",
-        "soc/gd32f470/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/adc.c",
+        "soc/gd32/gd32f470/drivers/adc_stream.c",
+        "soc/gd32/gd32f470/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_adc_stream_model.h"
@@ -2297,10 +2297,10 @@
       "case": "GD32ADCStream.DmaFaultDiscardsIncompleteBlockAndCountsOneObservedLoss",
       "test_source": "tests/google/gd32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/adc.c",
-        "soc/gd32f470/drivers/adc_stream.c",
-        "soc/gd32f470/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/adc.c",
+        "soc/gd32/gd32f470/drivers/adc_stream.c",
+        "soc/gd32/gd32f470/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_adc_stream_model.h"
@@ -2335,10 +2335,10 @@
       "case": "GD32ADCContinuous.StarvationStopsAndNeverOverwritesBorrowedBlock",
       "test_source": "tests/google/gd32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/adc.c",
-        "soc/gd32f470/drivers/adc_stream.c",
-        "soc/gd32f470/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/adc.c",
+        "soc/gd32/gd32f470/drivers/adc_stream.c",
+        "soc/gd32/gd32f470/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_adc_stream_model.h"
@@ -2373,10 +2373,10 @@
       "case": "GD32ADCContinuous.RefusedAddressWriteAndDrainRetainThreeLoans",
       "test_source": "tests/google/gd32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/adc.c",
-        "soc/gd32f470/drivers/adc_stream.c",
-        "soc/gd32f470/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/adc.c",
+        "soc/gd32/gd32f470/drivers/adc_stream.c",
+        "soc/gd32/gd32f470/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_adc_stream_model.h"
@@ -2405,10 +2405,10 @@
       "case": "GD32ADCContinuous.ErrorBeforeW1cCompletionStoreRemainsAuthoritative",
       "test_source": "tests/google/gd32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/adc.c",
-        "soc/gd32f470/drivers/adc_stream.c",
-        "soc/gd32f470/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/adc.c",
+        "soc/gd32/gd32f470/drivers/adc_stream.c",
+        "soc/gd32/gd32f470/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_adc_stream_model.h"
@@ -2433,10 +2433,10 @@
       "case": "GD32ADCContinuous.EpochExhaustionAtReplacementHaltsWithoutConsumerOverwrite",
       "test_source": "tests/google/gd32_adc_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/adc.c",
-        "soc/gd32f470/drivers/adc_stream.c",
-        "soc/gd32f470/drivers/adc_continuous.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/adc.c",
+        "soc/gd32/gd32f470/drivers/adc_stream.c",
+        "soc/gd32/gd32f470/drivers/adc_continuous.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
         "tests/google/gd32_adc_stream_model.h"
@@ -2462,9 +2462,9 @@
       "case": "Stm32UartStreamFacts.StopPublishesErrorPrefixAndJoinsConsumerLoan",
       "test_source": "tests/google/stm32_uart_stream_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/uart.c",
-        "soc/stm32f407/drivers/uart_stream.c",
-        "io/src/stream.c"
+        "soc/stm32/stm32f407/drivers/uart.c",
+        "soc/stm32/stm32f407/drivers/uart_stream.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [],
       "assertions": [
@@ -2495,9 +2495,9 @@
       "case": "GD32UARTStream.FailedResetRetainsTxAndRxLoanUntilProvedDrain",
       "test_source": "tests/google/gd32_uart_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_stream.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_stream.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [],
       "assertions": [
@@ -2541,9 +2541,9 @@
       "case": "GD32UARTStream.ErrorOnlyNeverCreatesAStaleByteAndMarksValidPrefix",
       "test_source": "tests/google/gd32_uart_stream_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/uart.c",
-        "soc/gd32f470/drivers/uart_stream.c",
-        "io/src/stream.c"
+        "soc/gd32/gd32f470/drivers/uart.c",
+        "soc/gd32/gd32f470/drivers/uart_stream.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [],
       "assertions": [
@@ -2571,11 +2571,11 @@
       "case": "IOProviderSequences.NativeUartThirtyTwoCancelDeadlineDrainHistories",
       "test_source": "tests/google/io_state_machine_test.cpp",
       "production_sources": [
-        "io/native/uart.c",
+        "soc/native/drivers/uart.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/provider.h"
+        "soc/native/drivers/provider.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_native_clock_configure(true,0U),NX_SUCCESS)",
@@ -2630,11 +2630,11 @@
       "case": "IOProviderSequences.NativeSpiSixteenCancelDeadlineDrainHistories",
       "test_source": "tests/google/io_state_machine_test.cpp",
       "production_sources": [
-        "io/native/spi.c",
+        "soc/native/drivers/spi.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/provider.h"
+        "soc/native/drivers/provider.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_native_clock_configure(true,0U),NX_SUCCESS)",
@@ -2685,11 +2685,11 @@
       "case": "IOProviderSequences.NativeAdcConsumerDelayStopAndOutOfOrderReleaseHistories",
       "test_source": "tests/google/io_state_machine_test.cpp",
       "production_sources": [
-        "io/native/adc.c",
-        "io/src/stream.c"
+        "soc/native/drivers/adc.c",
+        "io/src/mechanisms/stream.c"
       ],
       "model_sources": [
-        "io/native/provider.h"
+        "soc/native/drivers/provider.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_native_clock_configure(true,0U),NX_SUCCESS)",
@@ -2736,7 +2736,7 @@
       "case": "UartRs485.FailedDirectionWithdrawalQuarantinesUntilActualRetry",
       "test_source": "tests/google/uart_rs485_test.cpp",
       "production_sources": [
-        "io/src/uart_rs485.c",
+        "io/src/mechanisms/uart_rs485.c",
         "core/src/request.c"
       ],
       "model_sources": [],
@@ -2769,7 +2769,7 @@
       "case": "UartRs485.SetupConsumesAbsoluteDeadlineAndDoesNotStartExpiredTransfer",
       "test_source": "tests/google/uart_rs485_test.cpp",
       "production_sources": [
-        "io/src/uart_rs485.c",
+        "io/src/mechanisms/uart_rs485.c",
         "core/src/request.c"
       ],
       "model_sources": [],
@@ -2798,12 +2798,12 @@
       "case": "ClassicCan.ThreeMailboxesAndFourthRejectionHaveExactBorrowBoundaries",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&requests[i]),NX_SUCCESS)",
@@ -2827,12 +2827,12 @@
       "case": "ClassicCan.TxokAndCompletionDetachBeforeSettlement",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
@@ -2862,12 +2862,12 @@
       "case": "ClassicCan.CancellationWaitsForActualAbortAcknowledgement",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
@@ -2903,12 +2903,12 @@
       "case": "ClassicCan.TimeoutUsesAbsoluteDeadlineAndRetainsAbortResponsibility",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
@@ -2937,12 +2937,12 @@
       "case": "ClassicCan.DeadlineExpiredRejectsWithNoMailboxEffect",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_native_clock_advance(100U),NX_SUCCESS)",
@@ -2967,12 +2967,12 @@
       "case": "ClassicCan.FullRingPlacesLossAfterOlderFactsAndBeforeLaterFrames",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_read_events(&port,output,4U,&count),NX_SUCCESS)",
@@ -3000,12 +3000,12 @@
       "case": "ClassicCan.HardwareOverrunReportsLowerBoundWithoutInventedExactCount",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_read_events(&port,&output,1U,&count),NX_SUCCESS)",
@@ -3029,12 +3029,12 @@
       "case": "ClassicCan.BusOffRemainsAuthoritativeWhenTheRingIsFull",
       "test_source": "tests/google/can_controller_test.cpp",
       "production_sources": [
-        "io/src/can_controller.c",
-        "io/native/can.c",
+        "io/src/controllers/can_controller.c",
+        "soc/native/drivers/can.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&requests[0]),NX_SUCCESS)",
@@ -3068,13 +3068,13 @@
       "case": "CanSoc.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
         "tests/google/can_soc_model.h",
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&request),NX_SUCCESS)",
@@ -3106,13 +3106,13 @@
       "case": "CanSoc.FailedExitAcknowledgementRetainsDomainResponsibility",
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
         "tests/google/can_soc_model.h",
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
@@ -3138,13 +3138,13 @@
       "case": "CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
         "tests/google/can_soc_model.h",
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
@@ -3167,8 +3167,8 @@
       "case": "CanFactory.BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3201,8 +3201,8 @@
       "case": "CanFactory.StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3234,8 +3234,8 @@
       "case": "CanFactory.FailedSecondStartupIsIncludedInReverseCleanup",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3266,8 +3266,8 @@
       "case": "CanFactory.FirstControllerClockFailureReleasesUnchangedGlobalLeases",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/stm32/stm32f407/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3300,13 +3300,13 @@
       "case": "CanSoc.UnacknowledgedAbortRetainsRequestUntilActualSdkCompletion",
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
         "tests/google/can_soc_model.h",
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_submit(&port,&request),NX_SUCCESS)",
@@ -3338,13 +3338,13 @@
       "case": "CanSoc.FailedExitAcknowledgementRetainsDomainResponsibility",
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
         "tests/google/can_soc_model.h",
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
@@ -3370,13 +3370,13 @@
       "case": "CanSoc.ForeignPrimaryFilterDomainRejectsWithoutControllerEffects",
       "test_source": "tests/google/can_soc_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
         "tests/google/can_soc_model.h",
-        "io/native/can_access.h"
+        "soc/native/drivers/can_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_can_port_stop(&port),NX_SUCCESS)",
@@ -3399,8 +3399,8 @@
       "case": "CanFactory.BothInstancesUseOneDomainAndDistinctRingsAndMailboxes",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3433,8 +3433,8 @@
       "case": "CanFactory.StuckSecondControllerRetainsPinsAndSharedDomainUntilDrain",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3466,8 +3466,8 @@
       "case": "CanFactory.FailedSecondStartupIsIncludedInReverseCleanup",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3498,8 +3498,8 @@
       "case": "CanFactory.FirstControllerClockFailureReleasesUnchangedGlobalLeases",
       "test_source": "tests/google/can_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/can.c",
-        "io/src/can_controller.c",
+        "soc/gd32/gd32f470/drivers/can.c",
+        "io/src/controllers/can_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3532,12 +3532,12 @@
       "case": "UsbDevice.FifoWriteDoesNotCompleteHostAcknowledgement",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,1,NX_USB_DATA,0,200),NX_SUCCESS)",
@@ -3569,12 +3569,12 @@
       "case": "UsbDevice.OutOverflowCannotWriteBeyondCallerCapacity",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_out_prepare(&request,bytes,2,NX_USB_DATA,0,200),NX_SUCCESS)",
@@ -3603,12 +3603,12 @@
       "case": "UsbDevice.FailedDisableKeepsRequestBorrowedThroughDrainDeadline",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,1,NX_USB_DATA,0,200),NX_SUCCESS)",
@@ -3642,12 +3642,12 @@
       "case": "UsbDevice.FifoFlushFailureCannotSettleDisabledEndpoint",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,1,NX_USB_DATA,0,200),NX_SUCCESS)",
@@ -3678,12 +3678,12 @@
       "case": "UsbDevice.StopCannotReleaseWakeOrClockWithAnEnabledIrq",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_device_attach_wake(&device,&wake,0),NX_SUCCESS)",
@@ -3707,12 +3707,12 @@
       "case": "UsbDevice.NewSetupInvalidatesOldControlBeforeReusingStorage",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,4,NX_USB_DATA,epoch,200),NX_SUCCESS)",
@@ -3739,12 +3739,12 @@
       "case": "UsbDevice.ResetDoesNotRevokeAnUnprovedEndpointLoan",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,4,NX_USB_DATA,0,200),NX_SUCCESS)",
@@ -3772,12 +3772,12 @@
       "case": "UsbDevice.StaleCompletionCannotFinishANewRequestEpoch",
       "test_source": "tests/google/usb_device_test.cpp",
       "production_sources": [
-        "io/src/usb_device_controller.c",
-        "io/native/usb_device.c",
+        "io/src/controllers/usb_device_controller.c",
+        "soc/native/drivers/usb_device.c",
         "core/src/request.c"
       ],
       "model_sources": [
-        "io/native/usb_device_access.h"
+        "soc/native/drivers/usb_device_access.h"
       ],
       "assertions": [
         "ASSERT_EQ(nx_usb_in_prepare(&request,bytes,4,NX_USB_DATA,0,200),NX_SUCCESS)",
@@ -3801,9 +3801,9 @@
       "case": "UsbSoc.FalseCpuFactsRejectBeforeBorrowingTheClock",
       "test_source": "tests/google/usb_device_soc_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3829,9 +3829,9 @@
       "case": "UsbSoc.FailedCoreResetKeepsClockAndOwnerStorage",
       "test_source": "tests/google/usb_device_soc_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3859,9 +3859,9 @@
       "case": "UsbFactory.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3894,9 +3894,9 @@
       "case": "UsbFactory.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3927,9 +3927,9 @@
       "case": "UsbFactory.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -3966,9 +3966,9 @@
       "case": "UsbFactory.SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4000,9 +4000,9 @@
       "case": "UsbFactory.RestartCannotReuseAStaleSetupEpochForSetAddress",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4034,9 +4034,9 @@
       "case": "UsbFactory.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/usb_device.c",
-        "soc/stm32f407/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/stm32/stm32f407/drivers/usb_device.c",
+        "soc/stm32/stm32f407/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4067,9 +4067,9 @@
       "case": "UsbSoc.FalseCpuFactsRejectBeforeBorrowingTheClock",
       "test_source": "tests/google/usb_device_soc_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4095,9 +4095,9 @@
       "case": "UsbSoc.FailedCoreResetKeepsClockAndOwnerStorage",
       "test_source": "tests/google/usb_device_soc_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4125,9 +4125,9 @@
       "case": "UsbFactory.PureFactoryDoesNotStartAndControllerIsNotAnEndpoint",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4160,9 +4160,9 @@
       "case": "UsbFactory.FailedColdDcdIsCountedAndRetainsClockAndPinsUntilProof",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4193,9 +4193,9 @@
       "case": "UsbFactory.BusyPioLoanRetainsTheSameRequestUntilDetachAndSettlement",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4232,9 +4232,9 @@
       "case": "UsbFactory.SuccessfulDrainAllowsTheSameStaticIdentityToRestart",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4266,9 +4266,9 @@
       "case": "UsbFactory.RestartCannotReuseAStaleSetupEpochForSetAddress",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4300,9 +4300,9 @@
       "case": "UsbFactory.ExhaustedLifetimeEpochCannotBeReopenedByColdReconstruction",
       "test_source": "tests/google/usb_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/usb_device.c",
-        "soc/gd32f470/usb_clock.c",
-        "io/src/usb_device_controller.c",
+        "soc/gd32/gd32f470/drivers/usb_device.c",
+        "soc/gd32/gd32f470/usb_clock.c",
+        "io/src/controllers/usb_device_controller.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4333,8 +4333,8 @@
       "case": "EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4368,8 +4368,8 @@
       "case": "EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4402,8 +4402,8 @@
       "case": "EthernetMac.CancellationWaitsForActualEngineAndFifoDrain",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4438,8 +4438,8 @@
       "case": "EthernetMac.InitializationCannotResetForeignDescriptorEngine",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4465,8 +4465,8 @@
       "case": "EthernetMac.FatalBusErrorCannotTurnMissingStatusIntoSuccess",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4499,8 +4499,8 @@
       "case": "EthernetMac.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4530,8 +4530,8 @@
       "case": "EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4561,8 +4561,8 @@
       "case": "EthernetMac.StopClosesNewReceiveLoansBeforeDrainCompletes",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4589,8 +4589,8 @@
       "case": "EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4620,8 +4620,8 @@
       "case": "EthernetFactory.FailedPinRestoreKeepsClocksAndStorageUntilRetry",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4649,8 +4649,8 @@
       "case": "EthernetFactory.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4682,8 +4682,8 @@
       "case": "EthernetFactory.RejectedDmaDomainDoesNotResetMacOrRetainPayload",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4712,8 +4712,8 @@
       "case": "EthernetFactory.ExhaustedReceiveEpochCannotBeResetByReconstruction",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4740,8 +4740,8 @@
       "case": "EthernetFactory.StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/stm32/stm32f407/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4782,8 +4782,8 @@
       "case": "EthernetMac.OwnHandoffRetainsBorrowUntilRealTransmitStatus",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4817,8 +4817,8 @@
       "case": "EthernetMac.HeldReceiveLoanIsNeverOverwrittenAtRingWrap",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4851,8 +4851,8 @@
       "case": "EthernetMac.CancellationWaitsForActualEngineAndFifoDrain",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4887,8 +4887,8 @@
       "case": "EthernetMac.InitializationCannotResetForeignDescriptorEngine",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4914,8 +4914,8 @@
       "case": "EthernetMac.FatalBusErrorCannotTurnMissingStatusIntoSuccess",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4948,8 +4948,8 @@
       "case": "EthernetMac.ReturnedDescriptorWithoutFrameStatusCannotInventWireSuccess",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -4979,8 +4979,8 @@
       "case": "EthernetMac.StopRechecksCapturedPublisherAfterNvicDisableBoundary",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5010,8 +5010,8 @@
       "case": "EthernetMac.StopClosesNewReceiveLoansBeforeDrainCompletes",
       "test_source": "tests/google/ethernet_mac_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5038,8 +5038,8 @@
       "case": "EthernetFactory.RefusedMacClockWithdrawalRetainsPlatformUntilReadback",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5069,8 +5069,8 @@
       "case": "EthernetFactory.FailedPinRestoreKeepsClocksAndStorageUntilRetry",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5098,8 +5098,8 @@
       "case": "EthernetFactory.HeldReceiveLoanPreventsDestructiveStopAndStaleRestartToken",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5131,8 +5131,8 @@
       "case": "EthernetFactory.RejectedDmaDomainDoesNotResetMacOrRetainPayload",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5161,8 +5161,8 @@
       "case": "EthernetFactory.ExhaustedReceiveEpochCannotBeResetByReconstruction",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5189,8 +5189,8 @@
       "case": "EthernetFactory.StuckTxEngineRetainsBorrowedStorageUntilRealDrain",
       "test_source": "tests/google/ethernet_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/ethernet.c",
-        "io/src/eth_mac.c",
+        "soc/gd32/gd32f470/drivers/ethernet.c",
+        "io/src/controllers/eth_mac.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5231,8 +5231,8 @@
       "case": "EthernetNative.ExplicitIngressCannotOverwriteAnAcquiredLoan",
       "test_source": "tests/google/ethernet_native_test.cpp",
       "production_sources": [
-        "io/src/eth_mac.c",
-        "io/native/ethernet.c",
+        "io/src/controllers/eth_mac.c",
+        "soc/native/drivers/ethernet.c",
         "core/src/request.c"
       ],
       "model_sources": [],
@@ -5264,8 +5264,8 @@
       "case": "EthernetNative.EpochSurvivesStopAndPreventsReleaseOfReusedStorage",
       "test_source": "tests/google/ethernet_native_test.cpp",
       "production_sources": [
-        "io/src/eth_mac.c",
-        "io/native/ethernet.c",
+        "io/src/controllers/eth_mac.c",
+        "soc/native/drivers/ethernet.c",
         "core/src/request.c"
       ],
       "model_sources": [],
@@ -5305,8 +5305,8 @@
       "case": "G474Provider.TxSettlesOnlyAfterFinalWireTc",
       "test_source": "tests/google/g474_provider_test.cpp",
       "production_sources": [
-        "soc/stm32g474/drivers/uart.c",
-        "soc/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5342,8 +5342,8 @@
       "case": "G474Provider.CancelKeepsBorrowQuarantinedUntilRealTc",
       "test_source": "tests/google/g474_provider_test.cpp",
       "production_sources": [
-        "soc/stm32g474/drivers/uart.c",
-        "soc/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5379,8 +5379,8 @@
       "case": "G474Provider.CompletedWireFactWinsLaterDeadlineAndCancel",
       "test_source": "tests/google/g474_provider_test.cpp",
       "production_sources": [
-        "soc/stm32g474/drivers/uart.c",
-        "soc/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5412,8 +5412,8 @@
       "case": "G474Provider.CorruptByteIsDiscardedWithObservableAggregateLoss",
       "test_source": "tests/google/g474_provider_test.cpp",
       "production_sources": [
-        "soc/stm32g474/drivers/uart.c",
-        "soc/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5441,8 +5441,8 @@
       "case": "G474Provider.ReadOutputCannotOverwriteRingOrActiveRequest",
       "test_source": "tests/google/g474_provider_test.cpp",
       "production_sources": [
-        "soc/stm32g474/drivers/uart.c",
-        "soc/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5473,8 +5473,8 @@
       "case": "G474Provider.FailedSourceWithdrawalRetainsAllStorage",
       "test_source": "tests/google/g474_provider_test.cpp",
       "production_sources": [
-        "soc/stm32g474/drivers/uart.c",
-        "soc/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5502,9 +5502,9 @@
       "case": "G474Factory.LookupIsPureStaticIdentityBeforeAnyHardwareAccess",
       "test_source": "tests/google/g474_factory_test.cpp",
       "production_sources": [
-        "soc/stm32g474/system.c",
-        "soc/stm32g474/drivers/gpio.c",
-        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/gpio.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5540,9 +5540,9 @@
       "case": "G474Factory.ForeignLiveUartRejectsBeforeAnyClockOrPinMutation",
       "test_source": "tests/google/g474_factory_test.cpp",
       "production_sources": [
-        "soc/stm32g474/system.c",
-        "soc/stm32g474/drivers/gpio.c",
-        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/gpio.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5574,9 +5574,9 @@
       "case": "G474Factory.ForeignDmaControlRejectsBeforeAnyClockOrPinMutation",
       "test_source": "tests/google/g474_factory_test.cpp",
       "production_sources": [
-        "soc/stm32g474/system.c",
-        "soc/stm32g474/drivers/gpio.c",
-        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/gpio.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5608,9 +5608,9 @@
       "case": "G474Factory.FailedPeripheralRollbackRetainsClockPinsAndResponsibility",
       "test_source": "tests/google/g474_factory_test.cpp",
       "production_sources": [
-        "soc/stm32g474/system.c",
-        "soc/stm32g474/drivers/gpio.c",
-        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/gpio.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5643,9 +5643,9 @@
       "case": "G474Factory.StopFailurePreservesIdentityUntilActualIrqWithdrawal",
       "test_source": "tests/google/g474_factory_test.cpp",
       "production_sources": [
-        "soc/stm32g474/system.c",
-        "soc/stm32g474/drivers/gpio.c",
-        "soc/stm32g474/drivers/uart.c",
+        "soc/stm32/stm32g474/system.c",
+        "soc/stm32/stm32g474/drivers/gpio.c",
+        "soc/stm32/stm32g474/drivers/uart.c",
         "core/src/request.c"
       ],
       "model_sources": [
@@ -5678,10 +5678,10 @@
       "case": "TimerHardware.CaptureOverflowIsObservableWithoutOverwritingConsumer",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5715,10 +5715,10 @@
       "case": "TimerHardware.CaptureStopRetainsQueuedRingUntilTaskDrain",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5751,10 +5751,10 @@
       "case": "TimerHardware.CaptureFailedDetachRetainsRingAndIncomingMask",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5783,10 +5783,10 @@
       "case": "TimerHardware.CaptureRejectsRingControlOutputAndOverflowAliases",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5815,10 +5815,10 @@
       "case": "TimerHardware.AdvancedHardwareBreakLatchesAndNeverAutorestarts",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5851,10 +5851,10 @@
       "case": "TimerHardware.AdvancedFailedMoeDetachKeepsOwnerResponsibility",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5882,10 +5882,10 @@
       "case": "TimerHardware.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5911,10 +5911,10 @@
       "case": "TimerHardware.UntouchedReleaseNeverWithdrawsForeignActiveTimer",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -5951,10 +5951,10 @@
       "case": "TimerFactory.UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -5982,10 +5982,10 @@
       "case": "TimerFactory.ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6012,10 +6012,10 @@
       "case": "TimerFactory.RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6045,10 +6045,10 @@
       "case": "TimerFactory.RefusedPendingClearRetainsExactProviderBeforeReuse",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6078,10 +6078,10 @@
       "case": "TimerFactory.ActivePublisherPreventsStorageReuseEvenAfterDisable",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6109,10 +6109,10 @@
       "case": "TimerFactory.QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6146,10 +6146,10 @@
       "case": "TimerFactory.RefusedSafeOutputLatchDoesNotReleasePinOrClock",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6177,10 +6177,10 @@
       "case": "TimerFactory.AllInactiveOutputProofsPrecedeAnyPinRelease",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6208,10 +6208,10 @@
       "case": "TimerFactory.RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6239,10 +6239,10 @@
       "case": "TimerFactory.StopAndColdRestartReuseOnlyAProvedQuiescentSession",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/stm32f407/drivers/timer_capture.c",
-        "soc/stm32f407/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/stm32/stm32f407/drivers/timer_capture.c",
+        "soc/stm32/stm32f407/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6278,10 +6278,10 @@
       "case": "TimerHardware.CaptureOverflowIsObservableWithoutOverwritingConsumer",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6315,10 +6315,10 @@
       "case": "TimerHardware.CaptureStopRetainsQueuedRingUntilTaskDrain",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6351,10 +6351,10 @@
       "case": "TimerHardware.CaptureFailedDetachRetainsRingAndIncomingMask",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6383,10 +6383,10 @@
       "case": "TimerHardware.CaptureRejectsRingControlOutputAndOverflowAliases",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6415,10 +6415,10 @@
       "case": "TimerHardware.AdvancedHardwareBreakLatchesAndNeverAutorestarts",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6451,10 +6451,10 @@
       "case": "TimerHardware.AdvancedFailedMoeDetachKeepsOwnerResponsibility",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6482,10 +6482,10 @@
       "case": "TimerHardware.AdvancedPendingBreakBeforeMoeIsNeverExplicitlyReenabled",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6511,10 +6511,10 @@
       "case": "TimerHardware.UntouchedReleaseNeverWithdrawsForeignActiveTimer",
       "test_source": "tests/google/timer_advanced_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_advanced_model.h"
@@ -6551,10 +6551,10 @@
       "case": "TimerFactory.UnprivilegedOwnerRejectsBeforeAnyColdSystemEffects",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6582,10 +6582,10 @@
       "case": "TimerFactory.ForeignSharedTimerRefusalLeavesItsSourceAndPriorityIntact",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6612,10 +6612,10 @@
       "case": "TimerFactory.RefusedIrqDisableRetainsPinsGatesAndProviderStorage",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6645,10 +6645,10 @@
       "case": "TimerFactory.RefusedPendingClearRetainsExactProviderBeforeReuse",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6678,10 +6678,10 @@
       "case": "TimerFactory.ActivePublisherPreventsStorageReuseEvenAfterDisable",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6709,10 +6709,10 @@
       "case": "TimerFactory.QueuedCaptureLoanBlocksPlatformClockAndPinRelease",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6746,10 +6746,10 @@
       "case": "TimerFactory.RefusedSafeOutputLatchDoesNotReleasePinOrClock",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6777,10 +6777,10 @@
       "case": "TimerFactory.AllInactiveOutputProofsPrecedeAnyPinRelease",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6808,10 +6808,10 @@
       "case": "TimerFactory.RefusedOwnedClockReleaseRetainsStopAndPreventsRestart",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"
@@ -6839,10 +6839,10 @@
       "case": "TimerFactory.StopAndColdRestartReuseOnlyAProvedQuiescentSession",
       "test_source": "tests/google/timer_factory_test.cpp",
       "production_sources": [
-        "soc/gd32f470/drivers/timer_capture.c",
-        "soc/gd32f470/drivers/advanced_pwm.c",
-        "io/src/timer_capture.c",
-        "io/src/advanced_pwm.c"
+        "soc/gd32/gd32f470/drivers/timer_capture.c",
+        "soc/gd32/gd32f470/drivers/advanced_pwm.c",
+        "io/src/api/timer_capture.c",
+        "io/src/api/advanced_pwm.c"
       ],
       "model_sources": [
         "tests/google/timer_factory_model.h"

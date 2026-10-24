@@ -1,5 +1,0 @@
-Running main() from gmock_main.cc
-[==========] Running 9 tests from 1 test suite.
-[----------] Global test environment set-up.
-[----------] 9 tests from G474System
-[ RUN      ] G474System.Exact170MHzProfileUsesBoostFlashAndDelayedAhbSwitch

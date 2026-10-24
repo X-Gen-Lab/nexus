@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 56742f9e78b984bfb1c8cf4348ff560c479848e9de289854d3f14bea2c7e85eb\n"
+"X-Nexus-Source-SHA256: 7a83cab6e6d4b3c517d39a4b02c56f5a87c2ad9c84c21ac5b7f82657d6ef98cb\n"
 
 msgid "SoC 原专项台账"
 msgstr "Original SoC workstream ledger"
@@ -91,10 +91,11 @@ msgstr "not_applicable"
 msgid "`implementation_paths`"
 msgstr "`implementation_paths`"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
-"soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md"
+"soc/stm32/stm32f407/README.md;soc/gd32/gd32f470/README.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;tools/configure/README.md"
 msgstr ""
-"soc/stm32f407/README.md;soc/gd32f470/README.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tools/configure/README.md"
+"soc/stm32/stm32f407/README.md;soc/gd32/gd32f470/README.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;tools/configure/README.md"
 
 msgid "`evidence_paths`"
 msgstr "`evidence_paths`"
@@ -289,10 +290,11 @@ msgstr "contract"
 msgid "Startup phase responsibilities"
 msgstr "Startup phase responsibilities"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
-"soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c"
+"soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c;soc/stm32/stm32g474/system.c;soc/stm32/stm32h743/system.c;soc/stm32/stm32u575/system.c"
 msgstr ""
-"soc/stm32f407/system.c;soc/gd32f470/system.c;soc/stm32g474/system.c;soc/stm32h743/system.c;soc/stm32u575/system.c"
+"soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c;soc/stm32/stm32g474/system.c;soc/stm32/stm32h743/system.c;soc/stm32/stm32u575/system.c"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -334,8 +336,9 @@ msgstr "SOC-10"
 msgid "Clock transaction consistency"
 msgstr "Clock transaction consistency"
 
-msgid "soc/stm32f407/system.c;soc/gd32f470/system.c"
-msgstr "soc/stm32f407/system.c;soc/gd32f470/system.c"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c"
+msgstr "soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/system.c"
 
 msgid ""
 "Critical readback bounded failures safe source switching and retained "
@@ -363,8 +366,11 @@ msgstr "SOC-12"
 msgid "Time context restrictions"
 msgstr "Time context restrictions"
 
-msgid "soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private"
-msgstr "soc/stm32f407/private;soc/gd32f470/private;soc/stm32g474/private"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid ""
+"soc/stm32/stm32f407/private;soc/gd32/gd32f470/private;soc/stm32/stm32g474/private"
+msgstr ""
+"soc/stm32/stm32f407/private;soc/gd32/gd32f470/private;soc/stm32/stm32g474/private"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -382,8 +388,11 @@ msgstr "SOC-13"
 msgid "Time lifecycle validity"
 msgstr "Time lifecycle validity"
 
-msgid "soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c"
-msgstr "soc/stm32f407/system.c;soc/gd32f470/timebase.c;soc/stm32g474/system.c"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid ""
+"soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/timebase.c;soc/stm32/stm32g474/system.c"
+msgstr ""
+"soc/stm32/stm32f407/system.c;soc/gd32/gd32f470/timebase.c;soc/stm32/stm32g474/system.c"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -449,8 +458,9 @@ msgstr "SOC-16"
 msgid "GD stop controller coverage"
 msgstr "GD stop controller coverage"
 
-msgid "soc/gd32f470/timebase.c"
-msgstr "soc/gd32f470/timebase.c"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/gd32/gd32f470/timebase.c"
+msgstr "soc/gd32/gd32f470/timebase.c"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -491,8 +501,9 @@ msgstr "SOC-18"
 msgid "USB48 lifecycle"
 msgstr "USB48 lifecycle"
 
-msgid "soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c"
-msgstr "soc/stm32f407/usb_clock.c;soc/gd32f470/usb_clock.c"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/stm32/stm32f407/usb_clock.c;soc/gd32/gd32f470/usb_clock.c"
+msgstr "soc/stm32/stm32f407/usb_clock.c;soc/gd32/gd32f470/usb_clock.c"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -528,8 +539,9 @@ msgstr "SOC-20"
 msgid "G474 UART bounded critical sections"
 msgstr "G474 UART bounded critical sections"
 
-msgid "soc/stm32g474/drivers/uart.c"
-msgstr "soc/stm32g474/drivers/uart.c"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/stm32/stm32g474/drivers/uart.c"
+msgstr "soc/stm32/stm32g474/drivers/uart.c"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -554,8 +566,9 @@ msgstr "GD selected EXTI dispatch"
 msgid "selected_profiles_observed"
 msgstr "selected_profiles_observed"
 
-msgid "soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
-msgstr "soc/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/gd32/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
+msgstr "soc/gd32/gd32f470/drivers/exti.c;tools/configure/providers/gd32f470"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -630,8 +643,9 @@ msgstr "feature"
 msgid "F407 CCM placement"
 msgstr "F407 CCM placement"
 
-msgid "soc/stm32f407;tools/configure/memory.py"
-msgstr "soc/stm32f407;tools/configure/memory.py"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/stm32/stm32f407;tools/configure/memory.py"
+msgstr "soc/stm32/stm32f407;tools/configure/memory.py"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -653,8 +667,9 @@ msgstr "SOC-25"
 msgid "GD RAM initializer consistency"
 msgstr "GD RAM initializer consistency"
 
-msgid "soc/gd32f470/memory_init.c;tools/configure/memory.py"
-msgstr "soc/gd32f470/memory_init.c;tools/configure/memory.py"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/gd32/gd32f470/memory_init.c;tools/configure/memory.py"
+msgstr "soc/gd32/gd32f470/memory_init.c;tools/configure/memory.py"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -723,18 +738,20 @@ msgstr "reference_software_validated"
 msgid "not_executed"
 msgstr "not_executed"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
-"soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py"
+"soc/stm32/stm32h743/system.c;arch/arm/cortex_m/nx_arch_cache_control.c;soc/stm32/stm32u575/system.c;tools/configure/test_clock_sources.py"
 msgstr ""
-"soc/stm32h743/system.c;arch/cortex_m/nx_arch_cache_control.c;soc/stm32u575/system.c;tools/configure/test_clock_sources.py"
+"soc/stm32/stm32h743/system.c;arch/arm/cortex_m/nx_arch_cache_control.c;soc/stm32/stm32u575/system.c;tools/configure/test_clock_sources.py"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
+"verification.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
 "extensions-results.json;docs/delivery/soc-extensions-verification.md"
 msgstr ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
+"verification.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;tests/google/h743_system_test.cpp;scripts/ci/stm32h743.py;docs/delivery/soc-"
 "extensions-results.json;docs/delivery/soc-extensions-verification.md"
 
 msgid ""
@@ -748,10 +765,11 @@ msgstr "SOC-29"
 msgid "Additional G474 peripheral modes"
 msgstr "Additional G474 peripheral modes"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
-"soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474"
+"soc/stm32/stm32g474/drivers/exti.c;soc/stm32/stm32g474/soc.json;soc/stm32/stm32g474/routes.json;tools/configure/providers/stm32g474"
 msgstr ""
-"soc/stm32g474/drivers/exti.c;soc/stm32g474/soc.json;soc/stm32g474/routes.json;tools/configure/providers/stm32g474"
+"soc/stm32/stm32g474/drivers/exti.c;soc/stm32/stm32g474/soc.json;soc/stm32/stm32g474/routes.json;tools/configure/providers/stm32g474"
 
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
@@ -775,18 +793,20 @@ msgstr "SOC-30"
 msgid "Additional controllers routes packages"
 msgstr "Additional controllers routes packages"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
-"soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
+"soc/stm32/stm32g474;soc/stm32/stm32h743;soc/stm32/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
 msgstr ""
-"soc/stm32g474;soc/stm32h743;soc/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
+"soc/stm32/stm32g474;soc/stm32/stm32h743;soc/stm32/stm32u575;boards;tests/contracts/g474_assembly/exti_board"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
+"verification.md;soc/stm32/stm32g474/routes.json;soc/stm32/stm32h743/routes.json;soc/stm32/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
 "extensions-results.json;docs/delivery/soc-extensions-verification.md"
 msgstr ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32g474/routes.json;soc/stm32h743/routes.json;soc/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
+"verification.md;soc/stm32/stm32g474/routes.json;soc/stm32/stm32h743/routes.json;soc/stm32/stm32u575/routes.json;docs/design/stm32g474.md;docs/delivery/soc-"
 "extensions-results.json;docs/delivery/soc-extensions-verification.md"
 
 msgid ""
@@ -802,16 +822,18 @@ msgstr "SOC-31"
 msgid "Non-M4 full SoC integration"
 msgstr "Non-M4 full SoC integration"
 
-msgid "soc/stm32h743;soc/stm32u575;arch;os"
-msgstr "soc/stm32h743;soc/stm32u575;arch;os"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid "soc/stm32/stm32h743;soc/stm32/stm32u575;arch;os"
+msgstr "soc/stm32/stm32h743;soc/stm32/stm32u575;arch;os"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
+"verification.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
 "extensions-results.json;docs/delivery/soc-extensions-verification.md"
 msgstr ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32h743/README.md;soc/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
+"verification.md;soc/stm32/stm32h743/README.md;soc/stm32/stm32u575/README.md;scripts/ci/stm32h743.py;scripts/ci/stm32u575.py;docs/delivery/soc-"
 "extensions-results.json;docs/delivery/soc-extensions-verification.md"
 
 msgid ""
@@ -827,19 +849,21 @@ msgstr "SOC-32"
 msgid "Complex DMA cache security domains"
 msgstr "Complex DMA cache security domains"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
-"arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py"
+"arch/arm/cortex_m/nx_arch_cache_control.c;arch/arm/cortex_m/nx_arch_nonsecure.c;soc/stm32/stm32h743/drivers/uart_dma.c;soc/stm32/stm32h743/system.c;soc/stm32/stm32u575/security.c;tools/configure/memory.py"
 msgstr ""
-"arch/cortex_m/nx_arch_cache_control.c;arch/cortex_m/nx_arch_nonsecure.c;soc/stm32h743/drivers/uart_dma.c;soc/stm32h743/system.c;soc/stm32u575/security.c;tools/configure/memory.py"
+"arch/arm/cortex_m/nx_arch_cache_control.c;arch/arm/cortex_m/nx_arch_nonsecure.c;soc/stm32/stm32h743/drivers/uart_dma.c;soc/stm32/stm32h743/system.c;soc/stm32/stm32u575/security.c;tools/configure/memory.py"
 
+#: docs/status/ledgers/soc-refinement.md:26
 msgid ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
+"verification.md;soc/stm32/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
 "contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-"
 "extensions-verification.md"
 msgstr ""
 "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-"
-"verification.md;soc/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
+"verification.md;soc/stm32/stm32h743/README.md;tests/google/arch_cache_control_test.cpp;tests/google/h743_dma_test.cpp;tests/google/h743_dma_factory_test.cpp;tests/contracts/h743_assembly;scripts/ci/cache_control_compile.py;scripts/ci/stm32h743.py;docs/design/u575-trustzone-"
 "contract.md;docs/delivery/soc-extensions-results.json;docs/delivery/soc-"
 "extensions-verification.md"
 
@@ -1055,9 +1079,13 @@ msgstr "Load endurance"
 msgid "not_qualified"
 msgstr "not_qualified"
 
-# Authoritative CSV machine identity; retained unchanged in both locales.
-msgid "soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
-msgstr "soc;docs/design/integration-contracts.md;components/stm32f407_handoff;soc/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid ""
+"soc;docs/design/integration-"
+"contracts.md;components/soc/stm32/stm32f407_handoff;soc/stm32/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
+msgstr ""
+"soc;docs/design/integration-"
+"contracts.md;components/soc/stm32/stm32f407_handoff;soc/stm32/stm32f407/handoff.c;tests/google/stm32f407_handoff_test.cpp"
 
 # Authoritative CSV machine identity; retained unchanged in both locales.
 msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/soc-refinement.md;docs/design/io-extension-boundaries.md;tools/testing/evidence/io-extensions-20261020/README.md"
@@ -1066,18 +1094,33 @@ msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-v
 msgid "partial_reference_implemented"
 msgstr "partial_reference_implemented"
 
-
-msgid "components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
-msgstr "components/stm32u575_retained_time;components/stm32u575_stop2;soc/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/stm32u575_lpdma_copy;components/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32u575/drivers/lpdma_copy.c;soc/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32u575/memory_init.c;soc/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-copy-stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-copy.c"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid ""
+"components/soc/stm32/stm32u575_retained_time;components/soc/stm32/stm32u575_stop2;soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-"
+"copy-"
+"stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-"
+"copy.c"
+msgstr ""
+"components/soc/stm32/stm32u575_retained_time;components/soc/stm32/stm32u575_stop2;soc/stm32/stm32u575/private/stm32u575_rtc_calendar.h;soc/stm32/stm32u575/stop2.c;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;components/soc/stm32/stm32u575_lpdma_copy;components/soc/stm32/stm32u575_stop2/include/nexus/components/stm32u575_stop2_copy.h;soc/stm32/stm32u575/drivers/lpdma_copy.c;soc/stm32/stm32u575/private/stm32u575_lpdma_copy_hw.h;soc/stm32/stm32u575/memory_init.c;soc/stm32/stm32u575/system.c;tests/google/u575_lpdma_copy;tests/google/u575_stop2_copy;tests/google/u575_memory_test.cpp;tools/configure/assemblies/u575-lpdma-"
+"copy-"
+"stop2.toml;cmake/package/verification/io_evolution/consumers/u575-lpdma-"
+"copy.c"
 
 msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md"
 msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/timebase-lowpower.md;docs/design/u575-retained-time.md;tests/google/u575_retained_time_test.cpp;tests/google/u575_stop2_test.cpp;docs/design/u575-stop2-copy.md;tests/google/u575_lpdma_copy/test.cpp;tests/google/u575_stop2_copy/test.cpp;tests/google/u575_memory_test.cpp;tools/testing/evidence/u575-copy-20261020/README.md"
 
-msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`。"
-msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/soc-refinement-execution.csv>`. Source: `docs/design/soc-refinement-execution.csv`; SHA-256: `d4d9d86886cbefa6d91aef680045db585544463a39f65443325acf4aaa5e2ee3`."
+msgid "本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 <../../design/soc-refinement-execution.csv>`。 源文件：`docs/design/soc-refinement-execution.csv`；SHA-256：`74141c1c0293638cf0cd2f4651d91a08362aff8eaedd4e029bfc13cc3e5b1ffd`。"
+msgstr "This page is derived from the original CSV; it is not a new status authority, execution record or software qualification. Original IDs, order and all fields come from the {download}`original ledger <../../design/soc-refinement-execution.csv>`. Source: `docs/design/soc-refinement-execution.csv`; SHA-256: `74141c1c0293638cf0cd2f4651d91a08362aff8eaedd4e029bfc13cc3e5b1ffd`."
 
-msgid "arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp"
-msgstr "arch/cortex_m/nx_arch_nonsecure.c;soc/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-gpio-write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp"
+#: docs/status/ledgers/soc-refinement.md:26
+msgid ""
+"arch/arm/cortex_m/nx_arch_nonsecure.c;soc/stm32/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-"
+"gpio-"
+"write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp"
+msgstr ""
+"arch/arm/cortex_m/nx_arch_nonsecure.c;soc/stm32/stm32u575/security.c;components/user_io_broker;tests/contracts/u575_trustzone;tests/google/user_io_async_test.cpp;os/freertos/mpu/gpio.c;os/freertos/mpu/task.c;os/freertos/mpu/prepare_port.py;os/freertos/include/nexus/os/freertos_mpu_gpio.h;tools/configure/assemblies/u575-mpu-"
+"gpio-"
+"write.toml;tests/contracts/u575_mpu_gpio;tests/google/freertos_mpu_gpio_test.cpp"
 
 msgid "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json"
 msgstr "docs/delivery/soc-refinement-results.json;docs/delivery/soc-refinement-verification.md;docs/design/u575-trustzone-contract.md;docs/design/user-io-broker.md;tests/google/arch_nonsecure_test.cpp;tests/google/u575_security_test.cpp;tests/contracts/u575_trustzone/README.md;scripts/ci/u575_trustzone.py;docs/delivery/soc-extensions-results.json;docs/delivery/soc-extensions-verification.md;tests/google/user_io_async_test.cpp;docs/design/u575-mpu-gpio.md;tools/testing/evidence/u575-mpu-gpio-20261020/README.md;tools/testing/evidence/u575-mpu-gpio-20261020/final-closure.json;tools/testing/evidence/u575-mpu-gpio-20261020/ordinary-gate-package.json"

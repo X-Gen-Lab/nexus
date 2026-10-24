@@ -171,8 +171,8 @@ DMA, continuous streams, autonomous/low-power DMA and a TrustZone broker remain
 outside this implementation. The general Cortex-M33 architecture and other
 chip DMA capabilities do not extend this exact provider scope.
 
-See the [U575 source map](../../soc/stm32u575/README.md),
-[private provider contract](../../soc/stm32u575/private/stm32u575_uart_gpdma.h),
-[real provider](../../soc/stm32u575/drivers/uart_dma.c),
+See the [U575 source map](../../soc/stm32/stm32u575/README.md),
+[private provider contract](../../soc/stm32/stm32u575/private/stm32u575_uart_gpdma.h),
+[real provider](../../soc/stm32/stm32u575/drivers/uart_dma.c),
 [public UART ownership contract](../../io/include/nexus/io/uart.h) and
 [current qualification boundaries](../delivery/qualification.md).

@@ -34,7 +34,7 @@ The diagram shows the current static construction and call path. Factory lookup
 does not initialize hardware. Platform owns startup and reverse cleanup; a
 failed drain retains its concrete request, pin and clock responsibilities.
 
-See the [SoC mode and ownership contract](../../soc/stm32h743/README.md) and
+See the [SoC mode and ownership contract](../../soc/stm32/stm32h743/README.md) and
 [complete software assembly](../../tests/contracts/h743_assembly/peripherals.toml).
 
 本包是精确料号的软件引脚组合，不代表已审查PCB。SPI、I2C、ADC、PWM、EXTI及

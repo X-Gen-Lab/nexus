@@ -1,7 +1,0 @@
-tests/google/i2c_multi_controller_test.cpp: In member function ‘virtual void {anonymous}::I2CMultiple::SetUp()’:
-tests/google/i2c_multi_controller_test.cpp:16:23: error: expected primary-expression before ‘NX_STM32_I2C2_DMA’
-   16 | #define SECONDARY_DMA NX_STM32_I2C2_DMA
-      |                       ^~~~~~~~~~~~~~~~~
-tests/google/i2c_multi_controller_test.cpp:95:34: note: in expansion of macro ‘SECONDARY_DMA’
-   95 |         dma[1] = nx_i2c_v1_dma_t SECONDARY_DMA(regions, 1U);
-      |                                  ^~~~~~~~~~~~~

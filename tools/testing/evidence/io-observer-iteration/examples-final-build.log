@@ -1,6 +1,0 @@
-[1/6] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/quarantine_policy.c.o
-[2/6] Building C object CMakeFiles/uart_owner_runtime.dir/apps/uart_owner_runtime/main.c.o
-[3/6] Building C object tests/CMakeFiles/owner_lifecycle_test.dir/__/apps/uart_owner_runtime/quarantine_policy.c.o
-[4/6] Linking C executable bin/uart_owner_runtime
-[5/6] Building CXX object tests/CMakeFiles/owner_lifecycle_test.dir/quarantine_policy_test.cpp.o
-[6/6] Linking CXX executable tests/owner_lifecycle_test

@@ -4,14 +4,14 @@ foreach(f1_suite system provider watchdog exti spi)
     nexus_google_test(${f1_target}
         SOURCES "stm32f103_${f1_suite}_test.cpp"
             "${NEXUS_SOURCE_DIR}/tests/contracts/stm32f103_model/model.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32f103/system.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32f103/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32f103/drivers/uart.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32f103/drivers/watchdog.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32f103/drivers/exti.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32f103/drivers/spi.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/drivers/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/drivers/uart.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/drivers/watchdog.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/drivers/exti.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/drivers/spi.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32f103/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f103/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts/stm32f103_model")
     target_include_directories(${f1_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f1/Include"

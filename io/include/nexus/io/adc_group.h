@@ -7,6 +7,7 @@
 #define NEXUS_IO_ADC_GROUP_H
 #include "nexus/core/request.h"
 #include "nexus/io/adc_format.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,10 +60,10 @@ typedef struct {
  *       close. Existing ordinary ADC or PWM/ADC faces cannot expose the same
  *       leased ADC. A factory only returns this existing object.
  */
-typedef struct {
+struct nx_adc_group_port {
     const nx_adc_group_ops_t* ops;
     void* context;
-} nx_adc_group_port_t;
+};
 /** \brief Prepare caller storage without hardware access or retained borrow.
  * \param[in,out] request: Initialized READY or fully consumed SETTLED storage.
  * \param[out] frames: Aligned nonempty raw output including explicit padding.

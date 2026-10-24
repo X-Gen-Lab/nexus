@@ -6,6 +6,7 @@
 #ifndef NEXUS_I2C_LONG_H
 #define NEXUS_I2C_LONG_H
 
+#include "nexus/io/fwd.h"
 #include "nexus/io/i2c.h"
 
 #ifdef __cplusplus
@@ -24,10 +25,10 @@ typedef struct {
 /** \brief Optional immutable face; controller state is shared with base I2C.
  * \note Face and private context outlive callers. No queue or heap is owned.
  */
-typedef struct {
+struct nx_i2c_long_endpoint {
     const nx_i2c_long_ops_t* ops;
     void* context;
-} nx_i2c_long_endpoint_t;
+};
 
 /**
  * \brief           Validate complete messages before acquiring any hardware

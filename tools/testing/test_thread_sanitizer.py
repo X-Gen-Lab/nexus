@@ -7,6 +7,8 @@ import subprocess
 import tempfile
 import unittest
 
+from tools.dev.presets import Presets
+
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -53,19 +55,16 @@ class ThreadSanitizerConfigurationTests(unittest.TestCase):
             self.assertIn("mutually exclusive", result.stdout)
 
     def test_native_tsan_preset_uses_separate_build_root(self):
-        presets = json.loads((ROOT / "CMakePresets.json").read_text())
-        configured = {row["name"]: row
-                      for row in presets["configurePresets"]}
-        self.assertIn("native-tsan", configured)
-        tsan = configured["native-tsan"]
-        self.assertEqual(tsan["binaryDir"], "${sourceDir}/build/native-tsan")
+        presets = Presets(ROOT)
+        self.assertIn("native-tsan", presets.rows["configure"])
+        tsan = presets.selected("configure", "native-tsan")
+        self.assertEqual(tsan["binaryDir"], str(ROOT / "build/native-tsan"))
         self.assertEqual(tsan["cacheVariables"][
             "NEXUS_ENABLE_THREAD_SANITIZER"], "ON")
         self.assertNotIn("NEXUS_ENABLE_SANITIZERS", tsan["cacheVariables"])
-        for kind in ("buildPresets", "testPresets"):
-            self.assertEqual(next(row["configurePreset"]
-                                  for row in presets[kind]
-                                  if row["name"] == "native-tsan"),
+        for kind in ("build", "test"):
+            self.assertEqual(presets.selected(kind, "native-tsan")[
+                                 "configurePreset"],
                              "native-tsan")
 
 

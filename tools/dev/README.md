@@ -5,6 +5,145 @@ the only software dependency graph. Native arguments and actual failures pass
 through. The default build parallelism is two; set `NEXUS_BUILD_JOBS` or pass
 CMake's explicit `--parallel` to select a different finite budget.
 
+Application creation uses versioned templates from the separate
+`X-Gen-Lab/nexus-examples` checkout. It does not copy a platform tree or download
+dependencies. Select its exact checked-out commit; branches and mutable names
+are rejected. The output must be a new directory outside that checkout.
+
+```sh
+python tools/dev/dev.py create --templates ../nexus-examples \
+  --revision <exact-40-character-examples-commit> \
+  --template native --output ../my-controller
+```
+
+The maintained template IDs are `native`, `qiming`, `sky` and `liangshan`.
+The command verifies the selected commit, manifest, tracked regular files and
+their hashes before exclusive creation. It resolves the copied assembly in its
+final location and rolls back its new directory if validation or copying fails.
+Referenced inputs must belong to the new project or selected platform. Each file
+is bounded to 4 MiB and the project to 16 MiB before reading the next payload.
+An existing destination is never overwritten. `.nexus-template.json` records
+the examples identity, its **expected** platform lock and the actual resolver
+and input identities used for this invocation. That lock does not imply the
+current checkout equals the expected platform. Follow the template README to
+build with the selected source SDK, or explicitly select a development
+`NEXUS_SOURCE`. Creation is configuration validation, not a successful build.
+
+Daily operations consume one explicit equipment JSON file. `flash` and `debug`
+also require an actual completed build's `quality/build-provenance.json`.
+`monitor` needs only the Board identifier, serial selection and station lock;
+an optional build provenance associates known image bytes with the recording.
+They reuse the bounded process runner; serial monitoring also reuses HIL's
+stable by-id device opening, exclusive access and terminal restoration.
+They do not run the formal HIL admission or qualification workflow.
+
+```sh
+# Inspect the command and exact target without opening equipment.
+python tools/dev/dev.py flash --target /station/development-target.json \
+  --provenance build/board/quality/build-provenance.json
+# Execute only after reviewing that equipment selection.
+python tools/dev/dev.py flash --target /station/development-target.json \
+  --provenance build/board/quality/build-provenance.json \
+  --execute --output /station/runs/flash-001
+python tools/dev/dev.py debug --target /station/development-target.json \
+  --provenance build/board/quality/build-provenance.json \
+  --timeout 600 --port 3333 --execute --output /station/runs/debug-001
+python tools/dev/dev.py monitor --target /station/development-target.json \
+  --timeout 30 --execute --output /station/runs/monitor-001
+```
+
+The equipment file is a local operator selection, not a second Board authority:
+
+```json
+{
+  "schema": 1,
+  "kind": "nexus_development_target",
+  "board": "<resolved-board-id>",
+  "part": "<resolved-part-id>",
+  "station_lock": "/station/board-01.lock",
+  "probe": {
+    "serial": "<explicit-probe-serial>",
+    "transport": "swd",
+    "tool": {"path": "/tools/openocd", "size": 1, "sha256": "<sha256>"},
+    "interface_config": {
+      "path": "/station/interface.cfg", "size": 1, "sha256": "<sha256>"
+    },
+    "target_config": {
+      "path": "/station/target.cfg", "size": 1, "sha256": "<sha256>"
+    }
+  },
+  "serial": {"path": "/dev/serial/by-id/<actual-device>", "baudrate": 115200}
+}
+```
+
+Replace every placeholder and size with the actual reviewed tool, configuration
+and equipment identity. For SWD-only use, omit `serial`; for serial-only use,
+omit `probe` and optional `part`. Commands validate only their required equipment.
+When a build is supplied, Board and any supplied part must match its resolved
+configuration; the image must
+be an unchanged little-endian ARM ELF from that build. `--elf` selects one when
+multiple ELF artifacts exist. Probe serial is mandatory, including at a station
+with only one attached probe; no first-device fallback exists. Target/interface
+configuration remains explicit and must support the selected OpenOCD adapter's
+serial selector. Without provenance, monitor explicitly records
+`image_linkage = unassociated`; a Board label never proves the running firmware.
+Software identifiers cannot prove the physical PCB identity.
+
+Execution defaults to 300 seconds and accepts 1..3600. Debug binds only
+`127.0.0.1`, disables Telnet/Tcl ports and prints the GDB connection command;
+connect GDB from another terminal. Monitor is Linux/POSIX, read-only 115200 8N1,
+bounded to 16 MiB, and uses a `/dev/serial/by-id/` name. Every actual operation
+requires a new output directory and acquires the shared station lock. Successful
+commands, including monitor reaching its requested duration, release their owned
+lock. Monitor treats EOF as a disconnect failure. Failure, cancellation or changed
+input/lock
+identity retains quarantine; inspect the board and process receipt before an
+operator explicitly clears that lock. Exit codes and raw attempt logs survive.
+An operation reports `not_executed` until launched and then
+`executed_unqualified`; a zero host exit never establishes physical acceptance.
+
+Observe feedback cost from existing independent attempt receipts:
+
+```sh
+python tools/dev/dev.py timings build/quality/developer-command.attempts \
+  --json /new/output/development-costs.json
+```
+
+Inputs can be receipt files, latest `.command.json` views or directories. The
+tool rechecks completed stdout/stderr bytes and hashes, deduplicates attempts
+and retains failures and unfinished attempts. Phase grouping is a conservative
+view of the original command; each stage/argv remains in JSON. Cumulative
+attempt seconds can overlap. Wall time is the union of observed wall-clock
+intervals, excluding idle gaps and assuming one stable host clock. Completed
+Linux attempts also retain `wait4` user/system CPU and maximum process RSS.
+This accounting covers the waited process and descendants it has reaped; the
+RSS value is a maximum individual process peak, not a concurrent tree total.
+Nested attempt accounting can overlap, so the summary retains per-attempt CPU
+and the maximum observed process RSS without inventing aggregate CPU or tree
+memory. Historical, interrupted and unsupported-host resource costs stay
+unknown; unobserved stages, unfinished duration and cache counters also remain
+unknown.
+The JSON output must be new. This is a cost summary, never a cached success
+report, MCU timing measurement or qualification record.
+
+For a small edit, use the relevant `unittest` module or `dev.py test -R <case>`
+first, then the ordinary complete gate at delivery. Test metadata now resolves
+the selected configure path and filter from one preset snapshot, avoiding a
+second parse and inconsistent observations. Changed inputs must still be
+validated for every cache hit; `cache.py` binds compiler namespaces to compiler,
+flags, dependencies and environment, and rejects compiler caching in formal
+independent rebuilds. Keep finite `NEXUS_BUILD_JOBS` and command deadlines.
+Do not cache successful JUnit or skip complete domains after a focused pass.
+
+Test retention is semantic: identical test bodies are only review candidates.
+For example, F1 and F4 official-source lock regressions use different SDK
+verifiers, source closures, commits and CMSIS pairings and must remain. Remove a
+test only when its contract is obsolete or equivalent independent coverage is
+identified. A review with no justified deletion does not claim reduced coverage
+or shorter whole-gate time. Keep mode-independent tools in their owned domain;
+all four Native modes, failure/cancellation regressions and fresh full-domain
+reports remain required.
+
 ```sh
 python tools/dev/dev.py doctor --target arm
 python tools/dev/dev.py configure --preset stm32-nucleo-h743-baremetal-uart
@@ -139,6 +278,10 @@ Timeout/cancellation/launch failure return 124/130/127. Outstanding uninterrupti
 kernel processes remain explicit identities with `withdrawal_complete = false`;
 they cannot establish success. Receipts also retain the
 actual child return code, command, working directory, timing and raw output hashes.
+Normal Linux completion additionally records exact-child `wait4` accounting.
+It never subtracts global child resource counters, which would mix concurrent
+invocations. Timeout and cancellation retain the existing withdrawal path and
+report unknown resource usage; no terminal sample is invented after withdrawal.
 Complete withdrawal also requires a stable inspected frozen tree; merely stopping
 the identities discovered before the inspection deadline is insufficient.
 Each logged invocation records its start before launching a child. An interrupted

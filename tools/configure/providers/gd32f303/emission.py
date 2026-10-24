@@ -3,7 +3,7 @@ from .. import legacy_transport
 
 
 def implementation(item):
-    from . import mode_implementation
+    from .contract import mode_implementation
     return mode_implementation(item.kind, item.mode)
 
 

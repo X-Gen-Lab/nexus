@@ -1,5 +1,0 @@
-{
-  "schema": 1,
-  "scope": "Restore original archived bytes retained in shared source after Git LF conversion; never rewrite reported execution hashes",
-  "files": []
-}

@@ -1,6 +1,5 @@
 """Persisted enhanced selections traverse the normal atomic bundle path."""
 from pathlib import Path
-import json
 import tempfile
 import unittest
 
@@ -9,10 +8,11 @@ from tools.configure import configure
 
 class IOEvolutionFixtures(unittest.TestCase):
     def test_every_fixture_has_a_normal_explicit_retention_preset(self):
-        presets = json.loads((configure.ROOT / "CMakePresets.json").read_text())
-        configured = {item["name"]: item
-                      for item in presets["configurePresets"]}
-        built = {item["name"]: item for item in presets["buildPresets"]}
+        from tools.dev.presets import Presets
+        presets = Presets(configure.ROOT)
+        configured = {name: row for name, (row, _) in
+                      presets.rows["configure"].items()}
+        built = {name: row for name, (row, _) in presets.rows["build"].items()}
         root = configure.ROOT / "tests/contracts/io_evolution_assembly"
         for fixture in root.glob("*.toml"):
             with self.subTest(fixture=fixture.name):

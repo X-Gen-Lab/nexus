@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "status": "failed",
-  "base_ref": "HEAD",
-  "errors": [
-    "Files are not in the Git index: ['os/freertos/private/timebase_lowpower.h', 'os/freertos/timebase_lowpower.c', 'soc/gd32f470/private/gd32f470_lowpower.h', 'soc/gd32f470/timebase_lowpower.c', 'soc/stm32f407/private/stm32f407_lowpower.h', 'soc/stm32f407/timebase_lowpower.c', 'tests/google/timebase_lowpower_model.h', 'tests/google/timebase_lowpower_test.cpp', 'tests/google/timebase_soc_integration_test.cpp', 'tests/google/timebase_soc_model.h', 'tests/google/timebase_soc_profile/FreeRTOSConfig.h', 'tests/google/timebase_soc_test.cpp']"
-  ]
-}

@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_PIN_STATE_H
 #define NEXUS_IO_PIN_STATE_H
 #include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,10 +22,10 @@ typedef struct {
     nx_result_t (*select)(void* context, nx_pin_state_selection_t state);
 } nx_pin_state_ops_t;
 /** \brief Immutable face; provider storage and plans outlive every use. */
-typedef struct {
+struct nx_pin_state_port {
     const nx_pin_state_ops_t* ops;
     void* context;
-} nx_pin_state_port_t;
+};
 /**
  * \brief Select one explicitly supported GPIO state without waiting.
  * \param[in] port: Exclusive static pad/gate lease, with all writers quiescent.

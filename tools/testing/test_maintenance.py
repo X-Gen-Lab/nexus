@@ -43,7 +43,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                     and row["mode"] == "dma-tx"]
         self.assertEqual(len(uart_dma), 1)
         self.assertEqual(uart_dma[0]["exports"],
-                         ["soc/stm32f407/drivers/uart_dma.c"])
+                         ["soc/stm32/stm32f407/drivers/uart_dma.c"])
         self.assertTrue(uart_dma[0]["fixtures"])
         spi = next(row for row in rows if row["family"] == "stm32f407"
                    and row["controller"] == "SPI1" and row["mode"] == "dma")
@@ -69,7 +69,7 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
                 self.assertIs(row["physical_qualified"], False)
                 self.assertEqual(row["routes"], [])
                 self.assertEqual(row["boards"], [])
-                self.assertEqual(row["exports"], ["io/native/rtc_lptim.c"])
+                self.assertEqual(row["exports"], ["soc/native/drivers/rtc_lptim.c"])
                 self.assertIn(fixture, row["fixtures"])
         empty = "cmake/package/verification/io_evolution/native-time-empty.toml"
         self.assertFalse(any(empty in row["fixtures"] for row in rows),
@@ -123,12 +123,12 @@ const nx_uart_ops_t nx_sample_uart_ops = {0};
         self.assertEqual(pwm["routes"], ["tim3-ch1-pa6"])
         self.assertEqual(shared["routes"], ["tim3-ch1-pa6", "tim3-ch2-pa7"])
         self.assertEqual(shared["exports"],
-                         ["soc/stm32g474/drivers/pwm_shared.c"])
+                         ["soc/stm32/stm32g474/drivers/pwm_shared.c"])
         self.assertIn("cmake/package/verification/io_evolution/"
                       "g474-pwm-shared.toml",
                       shared["fixtures"])
         self.assertEqual(encoder["exports"],
-                         ["soc/stm32g474/drivers/encoder.c"])
+                         ["soc/stm32/stm32g474/drivers/encoder.c"])
         self.assertIn("tests/contracts/g474_control_assembly/encoder.toml",
                       encoder["fixtures"])
         self.assertEqual(encoder["boards"], [])

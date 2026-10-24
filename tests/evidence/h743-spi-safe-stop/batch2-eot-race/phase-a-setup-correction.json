@@ -1,5 +1,0 @@
-{
-  "kind": "setup failure, no behavior result",
-  "error": "Preparation substring lookup failed after restoring original spi.c; subsequent command-red-build was started and joined0 but no command oracle had yet been written. No runtime executed.",
-  "format_correction": "Initial provisional formatting ran on a durable path outside the repository and used LLVM fallback. New preparation uses stdin with assume-filename in ownROOT so canonical .clang-format applies. Old observed source hashes and output preserved."
-}

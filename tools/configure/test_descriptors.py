@@ -22,15 +22,15 @@ class DescriptorBoundaryTests(unittest.TestCase):
 
     def test_h743_dma_configuration_binds_private_provider_payload(self):
         payload = descriptor.maintained("stm32h743").owned_payload
-        for name in ("soc/stm32h743/drivers/uart_dma.c",
-                     "soc/stm32h743/private/stm32h743_dma.h"):
+        for name in ("soc/stm32/stm32h743/drivers/uart_dma.c",
+                     "soc/stm32/stm32h743/private/stm32h743_dma.h"):
             self.assertIn(name, payload)
 
     def test_h743_flash_configuration_binds_the_complete_private_ram_pod(self):
         from tools.configure import dependencies
 
         payload = set(descriptor.maintained("stm32h743").owned_payload)
-        required = {"soc/stm32h743/" + name for name in (
+        required = {"soc/stm32/stm32h743/" + name for name in (
             "drivers/flash_ram.c", "drivers/flash_ram_owner.c",
             "drivers/flash_ram_transaction.c", "drivers/flash_mpu.c",
             "drivers/flash_ram_enter.S", "private/stm32h743_flash_ram.h",

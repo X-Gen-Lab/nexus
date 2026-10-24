@@ -1,6 +1,0 @@
-/tmp/nexus-recovery-docs-tools-20261018-r1/venv/lib/python3.12/site-packages/breathe/project.py:116: RemovedInSphinx80Warning: Sphinx 8 will drop support for representing paths as strings. Use "pathlib.Path" or "os.fspath" instead.
-  self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
-/tmp/nexus-recovery-docs-tools-20261018-r1/venv/lib/python3.12/site-packages/breathe/project.py:116: RemovedInSphinx80Warning: Sphinx 8 will drop support for representing paths as strings. Use "pathlib.Path" or "os.fspath" instead.
-  self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
-/tmp/nexus-recovery-docs-tools-20261018-r1/venv/lib/python3.12/site-packages/breathe/project.py:116: RemovedInSphinx80Warning: Sphinx 8 will drop support for representing paths as strings. Use "pathlib.Path" or "os.fspath" instead.
-  self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))

@@ -31,7 +31,8 @@ def shared_operation_symbols(root=None):
     _, _, providers, _ = source_contracts(root)
     directories = {root / "soc/common", root / "io/src"}
     return frozenset(name for name, provider in providers.items()
-                     if Path(provider["source"]["path"]).parent in directories)
+                     if any(Path(provider["source"]["path"]).is_relative_to(path)
+                            for path in directories))
 
 
 def inspect_interfaces(elf, *, require_interfaces=False):
@@ -79,7 +80,7 @@ def inspect_interfaces(elf, *, require_interfaces=False):
             "provider_state_ram_bytes": "separately_accounted",
             "faces": sorted(faces, key=lambda item: item["name"]),
             "tables": sorted(tables, key=lambda item: item["name"]),
-            "limits": ["Linked storage only; controller state and buffers belong "
+            "limits": ["Linked storage only; controller state and buffers belong " +
                        "to the complete resource report.",
                        "Dispatch cycles and IRQ latency require target measurement."]}
 
@@ -113,7 +114,7 @@ def main(argv=None):
             report["resolved"] = config
             report["configuration_inputs"] = inputs
         atomic_json(args.output, report)
-        print(f"Interface storage: {report['interface_flash_bytes']} Flash bytes; "
+        print(f"Interface storage: {report['interface_flash_bytes']} Flash bytes; " +
               f"shared operations: {report['operations_flash_bytes']} Flash bytes")
         return 0
     except (OSError, ValueError, EvidenceError) as error:

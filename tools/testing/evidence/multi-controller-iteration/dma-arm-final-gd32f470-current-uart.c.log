@@ -1,4 +1,0 @@
-/workspace/nexus/soc/gd32f470/drivers/uart.c:11:10: fatal error: private/system.h: No such file or directory
-   11 | #include "private/system.h"
-      |          ^~~~~~~~~~~~~~~~~~
-compilation terminated.

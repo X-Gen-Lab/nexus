@@ -1,4 +1,5 @@
 """Reviewed reference indices reject fictitious identity and qualification."""
+from tools.configure.providers.descriptor import source_directory
 import copy
 import hashlib
 import json
@@ -13,13 +14,13 @@ from tools.configure import configure as gate, fact_references
 
 class FactReferenceContractTests(unittest.TestCase):
     def test_g474_cannot_omit_its_exact_official_reference_index(self):
-        soc = gate.load(gate.ROOT / "soc/stm32g474/soc.json")
+        soc = gate.load(gate.ROOT / "soc/stm32/stm32g474/soc.json")
         soc.pop("references", None)
         with self.assertRaisesRegex(ValueError, "references"):
             gate.validate_soc(soc, "STM32G474RET6")
 
     def references(self, family="stm32f407"):
-        package = gate.ROOT / "soc" / family
+        package = gate.ROOT / source_directory(family)
         return (json.loads((package / "references.json").read_text()),
                 json.loads((package / "soc.json").read_text())["variants"])
 
@@ -111,19 +112,19 @@ class ReferenceInputClosureTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
         for relative in ("dependencies/platform-compatibility.json",
-                         "soc/gd32f470/soc.json", "soc/gd32f470/routes.json",
-                         "soc/gd32f470/references.json",
+                         "soc/gd32/gd32f470/soc.json", "soc/gd32/gd32f470/routes.json",
+                         "soc/gd32/gd32f470/references.json",
                          "boards/gd32f470_liangshan/board.json"):
             destination = self.root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(gate.ROOT / relative, destination)
         vendor = "vendors/gigadevice/gd32f4xx"
         shutil.copytree(gate.ROOT / vendor, self.root / vendor)
-        soc_path = self.root / "soc/gd32f470/soc.json"
+        soc_path = self.root / "soc/gd32/gd32f470/soc.json"
         soc = json.loads(soc_path.read_text())
         soc["references"] = "references.json"
         soc_path.write_text(json.dumps(soc))
-        self.references = self.root / "soc/gd32f470/references.json"
+        self.references = self.root / "soc/gd32/gd32f470/references.json"
         self.assembly = self.root / "assembly.toml"
         self.assembly.write_text('schema=2\nboard="gd32f470_liangshan"\n'
                                  'backend="baremetal"\nclock="hxtal25-pll200"\n'
@@ -134,7 +135,7 @@ class ReferenceInputClosureTests(unittest.TestCase):
         self.assertEqual(result.to_dict()["fact_references"],
                          json.loads(self.references.read_text()))
         inputs = {item["path"]: item["sha256"] for item in result["inputs"]}
-        self.assertEqual(inputs["soc/gd32f470/references.json"],
+        self.assertEqual(inputs["soc/gd32/gd32f470/references.json"],
                          hashlib.sha256(self.references.read_bytes()).hexdigest())
         before = result["configuration_sha256"]
         data = json.loads(self.references.read_text())

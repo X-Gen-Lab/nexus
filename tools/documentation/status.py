@@ -22,6 +22,8 @@ SPECIFICATIONS = (
     ("soc-refinement-execution.csv", "soc-refinement", "SoC 原专项台账"),
     ("build-system-execution.csv", "build-system", "构建系统原专项台账"),
     ("documentation-system-execution.csv", "documentation-system", "文档系统台账"),
+    ("developer-experience-execution.csv", "developer-experience", "开发体验75 项台账"),
+    ("platform-delivery-completion.csv", "platform-delivery-completion", "平台交付完善14 项台账"),
 )
 EXIT_FIELDS = {"exit_condition", "software_exit", "hardware_exit"}
 

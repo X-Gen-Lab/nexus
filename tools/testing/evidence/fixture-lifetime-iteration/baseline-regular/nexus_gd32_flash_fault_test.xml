@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="1" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-11T22:45:39.348" name="AllTests">
-  <testsuite name="GD32FlashFault" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-11T22:45:39.348">
-    <testcase name="RelockFailureCannotReleaseOrReacquireController" file="/workspace/nexus/tests/google/gd32_flash_fault_test.cpp" line="65" status="run" result="completed" time="0." timestamp="2026-10-11T22:45:39.348" classname="GD32FlashFault" />
-  </testsuite>
-</testsuites>

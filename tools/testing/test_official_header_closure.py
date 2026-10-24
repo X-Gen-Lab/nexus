@@ -112,7 +112,7 @@ class OfficialHeaderClosureTests(unittest.TestCase):
         import re
         header = 'Inc/stm32u5xx_ll_rtc.h'
         profile = PROFILES['u5']
-        provider = (ROOT / 'soc/stm32u575/drivers/rtc.c').read_text()
+        provider = (ROOT / 'soc/stm32/stm32u575/drivers/rtc.c').read_text()
         self.assertIn('#include "stm32u5xx_ll_rtc.h"', provider)
         spec = importlib.util.spec_from_file_location(
             'nexus_package_for_rtc_header_closure',

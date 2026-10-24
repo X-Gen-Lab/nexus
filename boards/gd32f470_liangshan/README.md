@@ -1,6 +1,6 @@
 # GD32F470ZGT6 梁山派资源包
 
-下一代输入为 `board.json`，只引用 `soc/gd32f470` 的精确芯片事实与
+下一代输入为 `board.json`，只引用 `soc/gd32/gd32f470` 的精确芯片事实与
 reviewed routes。默认只声明资料已复核的 PD7 LED、USART0 PA9/PA10、
 SPI4 PF6/PF7/PF8/PF9、内部 Flash 和独立看门狗，不创建 worker 或器件实例。
 

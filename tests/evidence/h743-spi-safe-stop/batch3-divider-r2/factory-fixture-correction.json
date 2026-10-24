@@ -1,7 +1,0 @@
-{
-  "kind": "New factory-case cold hardware fixture correction, not production behavior change",
-  "official": "RM0433 Rev9 50.11.6 p2224/text158364 reset SPI_SR0x1002 =TXP|TXC",
-  "first_whole11": "2 divider assertions genuine; timeout/count0 two extra assertions due missing reset status; retain full actual evidence",
-  "scope": "Only added case establishes cold RO status before platform start; old10 methods, generic model, all runtime flags untouched; EOT never forced.",
-  "new_factory_test_sha256": "7551119fdbddee24e9f60716c60aa537d1db59f566b76e4870d9339b9dc6b3ee"
-}

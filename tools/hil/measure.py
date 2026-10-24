@@ -384,6 +384,107 @@ def validate_measurements(raw: dict, admission: dict, *,
     }
 
 
+def _comparison_conditions(raw: dict, admission: dict) -> dict:
+    """Keep runtime controls; separate each run's provenance and clock epoch.
+
+    The existing resolved-profile projection owns configuration equivalence.
+    Compiler choices and implementation bytes may change in this runtime
+    experiment; their equivalence belongs to the separate linked-cost audit.
+    """
+    from tools.measurement.soc_costs import comparison_profile
+    resolved, _ = resolved_identity(verify_file_identity(admission["resolved"]))
+    configuration = comparison_profile(resolved, [])
+    configuration.pop("actual_compile_profiles")
+    context = load_json(verify_file_identity(raw["context"]))
+
+    def content(identity):
+        return {key: identity[key] for key in ("sha256", "size")}
+
+    metrics = {}
+    for name, observed in context["measurements"].items():
+        conditions = dict(observed)
+        conditions["instrument"] = content(observed["instrument"])
+        if name == "cycles":
+            # Resetting a properly owned counter starts a new epoch. Both
+            # runs have already passed the complete paired-endpoint contract.
+            conditions.pop("cycle_epoch")
+            reference = observed["reference"]
+            clock = load_json(verify_file_identity(reference["instrument"]))
+            conditions["reference"] = {
+                key: reference[key] for key in
+                ("domain", "ticks_per_second", "method")}
+            conditions["reference"]["calibration"] = {
+                key: clock[key] for key in
+                ("role", "clock_source", "instrument_id", "uncertainty_ticks",
+                 "cpu_clock_lower_hz", "cpu_clock_upper_hz")}
+        metrics[name] = conditions
+    return {
+        "hardware": {key: admission[key] for key in
+                     ("station_id", "board", "part", "chip_uid")},
+        "station": content(admission["station"]),
+        "fixture": content(admission["fixture"]),
+        "budgets": admission["budgets"], "configuration": configuration,
+        "workload": content(context["workload"]),
+        "runtime": {key: context[key] for key in
+                    ("cpu_clock_hz", "load", "executor", "irq_priorities")},
+        "measurements": metrics,
+    }
+
+
+def compare_measurements(baseline_raw: dict, baseline_admission: dict,
+                         candidate_raw: dict, candidate_admission: dict, *,
+                         maximum_age_s: int = 86400,
+                         now: datetime | None = None) -> dict:
+    """Revalidate both runs and report signed differences, never a WCET bound.
+
+    All samples must satisfy the same reviewed budgets. Comparable acquisition
+    conditions and equal sample counts do not establish statistical confidence
+    or causal attribution. The caller chooses a physically meaningful workload.
+    """
+    observed_at = now or datetime.now(timezone.utc)
+    records = ((baseline_raw, baseline_admission),
+               (candidate_raw, candidate_admission))
+    validated = [validate_measurements(raw, admission,
+        maximum_age_s=maximum_age_s, now=observed_at)
+        for raw, admission in records]
+    conditions = [_comparison_conditions(raw, admission)
+                  for raw, admission in records]
+    differences = sorted(key for key in conditions[0]
+                         if conditions[0][key] != conditions[1][key])
+    require(not differences,
+            "comparison conditions differ: " + ", ".join(differences))
+    metrics = {}
+    for name, first in validated[0]["metrics"].items():
+        last = validated[1]["metrics"][name]
+        require(first["samples"] == last["samples"],
+                "comparison sample count differs: " + name)
+        metrics[name] = {
+            "unit": first["unit"], "method": first["method"],
+            "samples_per_run": first["samples"],
+            "baseline": first, "candidate": last,
+            "candidate_minus_baseline": {
+                key: last[key] - first[key]
+                for key in ("minimum", "maximum", "mean")},
+        }
+    inputs = {}
+    for name, (raw, admission) in zip(("baseline", "candidate"), records):
+        inputs[name] = {
+            "raw_sha256": canonical_digest(raw),
+            "admission_sha256": canonical_digest(admission),
+            "elf": admission["elf"], "resolved": admission["resolved"],
+            "context": raw["context"], "started_utc": raw["started_utc"],
+            "finished_utc": raw["finished_utc"],
+        }
+    return {
+        "schema_version": MEASUREMENT_SCHEMA,
+        "kind": "hil_measurement_comparison", "status": "compared",
+        "physical_status": "comparison_only", "conditions": conditions[0],
+        "maximum_age_s": maximum_age_s, "metrics": metrics, **inputs,
+        "limits": "Recorded samples only; no WCET, statistical confidence, " +
+                  "causal speedup, build equivalence or product release claim.",
+    }
+
+
 def _identity_paths(value) -> set[Path]:
     """Protect retained evidence and tool inputs, including nested paths."""
     paths = set()
@@ -409,12 +510,25 @@ def main(argv=None) -> int:
     validate = subparsers.add_parser("validate")
     validate.add_argument("--admission", type=Path, required=True)
     validate.add_argument("--raw-evidence", type=Path, required=True)
-    for command in (plan, validate):
+    compare = subparsers.add_parser("compare")
+    comparison_inputs = ("baseline_raw", "baseline_admission", "candidate_raw",
+                         "candidate_admission")
+    for key in comparison_inputs:
+        compare.add_argument("--" + key.replace("_", "-"), type=Path,
+                             required=True)
+    compare.add_argument("--maximum-age-s", type=int, default=86400)
+    for command in (plan, validate, compare):
         command.add_argument("--report", type=Path, required=True)
     args = parser.parse_args(argv)
     inputs = [getattr(args, key) for key in
-              (("fixture", "resolved") if args.command == "plan" else
+              (comparison_inputs if args.command == "compare" else
+               ("fixture", "resolved") if args.command == "plan" else
                ("admission", "raw_evidence"))]
+    # A comparison has two independent nested input closures. Require a new
+    # destination so even invalid or undeclared evidence cannot be overwritten.
+    if args.command == "compare" and (args.report.exists() or
+                                      args.report.is_symlink()):
+        parser.exit(1, "measurement comparison requires an unused report\n")
     if args.report.resolve() in {path.resolve() for path in inputs}:
         parser.exit(1, "measurement report cannot overwrite its inputs\n")
     try:
@@ -423,6 +537,11 @@ def main(argv=None) -> int:
             report = measurement_plan(load_json(args.fixture), resolved)
             report.update(fixture=file_identity(args.fixture),
                           resolved=identity)
+        elif args.command == "compare":
+            report = compare_measurements(*(load_json(path) for path in inputs),
+                                          maximum_age_s=args.maximum_age_s)
+            report.update({key: file_identity(path)
+                           for key, path in zip(comparison_inputs, inputs)})
         else:
             raw = load_json(args.raw_evidence)
             admission = load_json(args.admission)
@@ -453,12 +572,14 @@ def main(argv=None) -> int:
                           raw_evidence=file_identity(args.raw_evidence))
     except (EvidenceError, OSError, ValueError, KeyError, TypeError) as error:
         report = {"schema_version": MEASUREMENT_SCHEMA,
-                  "kind": "hil_measurement_validation",
+                  "kind": ("hil_measurement_comparison" if
+                           args.command == "compare" else
+                           "hil_measurement_validation"),
                   "status": "failed", "physical_status": "not_executed",
                   "failure": str(error)}
     atomic_json(args.report, report)
     print("HIL measurements: " + report["status"] + "; equipment not operated")
-    return 0 if report["status"] in {"prepared_unbound", "passed"} else 1
+    return 0 if report["status"] in {"prepared_unbound", "passed", "compared"} else 1
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 """Polling Flash owns its completion vector without enabling an IRQ mode."""
+from tools.configure.providers.descriptor import source_directory
 import json
 from pathlib import Path
 import re
@@ -68,7 +69,7 @@ class FlashPollingIrqTests(unittest.TestCase):
         }
         for label, family, controller, vector in CASES:
             with self.subTest(family=family):
-                facts = json.loads((ROOT / "soc" / family /
+                facts = json.loads((ROOT / source_directory(family) /
                                     "soc.json").read_text(encoding="utf-8"))
                 physical = facts["controllers"][controller]
                 self.assertEqual([vector], physical["irq"])

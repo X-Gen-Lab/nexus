@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "status": "failed",
-  "base_ref": "HEAD",
-  "errors": [
-    "Files are not in the Git index: ['io/include/nexus/io/usb_device.h', 'io/native/usb_device.c', 'io/native/usb_device.h', 'io/native/usb_device_access.h', 'io/private/usb_device_controller.h', 'io/src/usb_device.c', 'io/src/usb_device_controller.c', 'soc/gd32f470/drivers/usb_device.c', 'soc/gd32f470/private/gd32f470_usb_device.h', 'soc/gd32f470/private/usb_conf.h', 'soc/stm32f407/drivers/usb_device.c', 'soc/stm32f407/private/stm32f407_usb_device.h', 'tests/google/usb_device_soc_model.h', 'tests/google/usb_device_soc_test.cpp', 'tests/google/usb_device_test.cpp']"
-  ]
-}

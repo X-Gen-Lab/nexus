@@ -11,6 +11,7 @@
 
 | 阅读入口 | 说明 |
 |---|---|
+| [开发体验迭代](../design/developer-experience.md) | 九组软件工作和集成退出；实际状态以75 项台账为准，H1–H6 实板未执行 |
 | [当前架构](architecture.md) | 物理目录、依赖方向、执行与资源责任 |
 | [Cortex-M 软件支持](cortex-m.md) | 九核 ABI/feature、Core/Arch/OS runtime 与配置示例 |
 | [OS 交付](os.md) | 配置、显式存储、外部多任务示例与 OS HIL 范围 |

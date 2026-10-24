@@ -1,7 +1,0 @@
-{
-  "module": "test_maintenance.py",
-  "actual_exit": 1,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/io36-native/metadata-followup/validation/maintenance-red-r1/command.attempts/1792291302591120280-387b9a0dce42417d8034d14fbb303df4/receipt.json",
-  "source_unchanged": true,
-  "scope": "Whole metadata unit module; no preset build/runtime qualification or full suite"
-}

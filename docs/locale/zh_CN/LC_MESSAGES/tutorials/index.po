@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,12 +8,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 041c6d7fc9d602ec69588fc14d9ef2f96722ac163ef1d3f69802f42251422e34\n"
+"X-Nexus-Source-SHA256: 48c0d9d38abb6636820c2a1865c555625a0b306b42bd92886a719f11b2a51c32\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/index.md:8
 msgid "Tutorials"
 msgstr "入门教程"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/tutorials/index.md:10
 msgid ""
-"Follow one fixed, verifiable path. Start with the external Source SDK "
-"consumer; use the request tutorial before adding asynchronous execution."
-msgstr "沿一条固定、可验证的路径完成任务。先构建外部 Source SDK 消费工程，再通过请求教程理解异步执行。"
+"Follow one fixed, verifiable path. Start by creating an external application"
+" from a fixed template and running its Native model. SDK packaging and "
+"consumer verification are separate maintainer tasks. Use the request "
+"tutorial before adding asynchronous execution."
+msgstr ""
+"沿一条固定且可验证的路径学习。先从固定模板创建外部应用并运行 Native 模型。SDK "
+"打包和消费验证是独立的维护者任务。增加异步执行之前先学习请求教程。"

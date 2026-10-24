@@ -1,6 +1,0 @@
-+ cmake -S /workspace/nexus-threadx-probe/sdk-native -B /workspace/nexus-threadx-probe/sdk-native-build-run2 -G Ninja -DCMAKE_PREFIX_PATH=/workspace/nexus-threadx-probe/sdk-native-package-run2 -DNEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON -DNEXUS_ASSEMBLY_FILE=/workspace/nexus-threadx-probe/sdk-native/threadx.toml
-+ cmake --build /workspace/nexus-threadx-probe/sdk-native-build-run2 --target installed_threadx_execution --parallel 1
-+ timeout 20 /workspace/nexus-threadx-probe/sdk-native-build-run2/bin/installed_threadx_execution --gtest_filter=* --gtest_list_tests
-+ timeout 20 /workspace/nexus-threadx-probe/sdk-native-build-run2/bin/installed_threadx_execution --gtest_filter=* --gtest_repeat=1 --gtest_also_run_disabled_tests --gtest_output=xml:/workspace/nexus-threadx-probe/evidence/sdk-native-execution-run2/results.xml
-+ /workspace/nexus/.venv/bin/python -B /workspace/nexus-threadx-probe/sdk-native-package-run2/share/nexus/src/cmake/package/package_source_sdk.py --verify /workspace/nexus-threadx-probe/sdk-native-package-run2/share/nexus/src
-actual installed SDK kernel cases 2

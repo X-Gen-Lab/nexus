@@ -5,6 +5,7 @@ import unittest
 
 from scripts.ci import provider_assemblies
 from tools.dev.qualification import CHECKERS, validate_plan
+from tools.dev.presets import Presets
 from tools.evidence.common import load_json
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -146,9 +147,8 @@ class QualificationPlanTests(unittest.TestCase):
         validate_plan(self.plan)
 
     def test_each_io_evolution_preset_configures_and_builds_once(self):
-        presets = load_json(ROOT / "CMakePresets.json")["configurePresets"]
-        selected = [preset["name"] for preset in presets
-                    if preset["name"].startswith("fixture-io-evolution-")]
+        selected = [name for name in Presets(ROOT).rows["configure"]
+                    if name.startswith("fixture-io-evolution-")]
         self.assertTrue(selected)
         for preset in selected:
             with self.subTest(preset=preset):
@@ -159,9 +159,9 @@ class QualificationPlanTests(unittest.TestCase):
         validate_plan(self.plan)
 
     def test_native_time_presets_keep_real_host_targets_and_execution_boundaries(self):
-        presets = load_json(ROOT / "CMakePresets.json")
-        configurations = presets["configurePresets"]
-        builds = presets["buildPresets"]
+        presets = Presets(ROOT)
+        configurations = [row for row, _ in presets.rows["configure"].values()]
+        builds = [row for row, _ in presets.rows["build"].values()]
         for profile in ("pair", "empty"):
             with self.subTest(profile=profile):
                 name = "fixture-io-evolution-native-time-" + profile
@@ -212,7 +212,7 @@ class QualificationPlanTests(unittest.TestCase):
         directory = ROOT / "cmake/package/verification/io_evolution"
         fixtures = sorted(directory.glob("*.toml"))
         self.assertTrue(fixtures, "Redistributed references must not disappear")
-        presets = load_json(ROOT / "CMakePresets.json")["configurePresets"]
+        presets = [row for row, _ in Presets(ROOT).rows["configure"].values()]
         for fixture in fixtures:
             with self.subTest(fixture=fixture.name):
                 source = "${sourceDir}/" + fixture.relative_to(ROOT).as_posix()

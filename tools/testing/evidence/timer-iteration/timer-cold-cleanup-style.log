@@ -1,3 +1,0 @@
-usage: comment_style.py [-h] [--root ROOT] (--all | --files FILES [FILES ...])
-                        [--baseline BASELINE] [--json]
-comment_style.py: error: one of the arguments --all --files is required

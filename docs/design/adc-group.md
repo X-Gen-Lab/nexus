@@ -109,7 +109,7 @@ All four canonical inputs select the X layout. Y/Z selections require their
 matching observed cut and separate qualification receipts; an X factory run
 does not qualify those configurations.
 
-[The reviewed mode record](../../soc/stm32g474/reviews/adc-group.json) is the
+[The reviewed mode record](../../soc/stm32/stm32g474/reviews/adc-group.json) is the
 single source of cut rules and required workaround masks. The provider does not
 maintain another revision allowlist or reader. The group and density values
 cannot identify an exact package or orderable part by themselves; the selected
@@ -232,7 +232,7 @@ close and restart, never an automatic replay.
 ## Sources and software evidence
 
 The authoritative API is [the public group contract](../../io/include/nexus/io/adc_group.h).
-[The private provider](../../soc/stm32g474/drivers/adc_group.c) implements the
+[The private provider](../../soc/stm32/stm32g474/drivers/adc_group.c) implements the
 actual sequencer, timer, watchdog and DMA transitions. The selected official
 ADC/DMAMUX definitions remain private and locked by
 [the STM32G4 dependency record](../../dependencies/stm32g4-hal.lock.json).

@@ -1,7 +1,0 @@
-{
-  "boards/stm32f407_qiming_v31/board.json": "/workspace/nexus/boards/stm32f407_qiming_v31/board.json",
-  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
-  "external/stm32.toml": "/workspace/nexus-industrial-design/sleep-consumer/stm32.toml",
-  "soc/stm32f407/routes.json": "/workspace/nexus/soc/stm32f407/routes.json",
-  "soc/stm32f407/soc.json": "/workspace/nexus/soc/stm32f407/soc.json"
-}

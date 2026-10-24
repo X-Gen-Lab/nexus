@@ -138,13 +138,13 @@ class RuntimeAuditTests(unittest.TestCase):
                            item['facts']['cpu']['arch'] == 'cortex-m7' and
                            item['facts']['cpu']['fpu'] == 'none')
             names = ('core/src/request.c', 'core/src/time.c',
-                     'arch/cortex_m/nx_arch_cortex_m.c',
-                     'arch/cortex_m/nx_arch_cache.c',
-                     'arch/cortex_m/nx_arch_cache_control.c',
-                     'arch/cortex_m/nx_arch_mpu.c',
-                     'arch/cortex_m/nx_arch_security.c',
-                     'arch/cortex_m/nx_arch_nonsecure.c',
-                     'arch/cortex_m/nx_arch_sleep.c', 'os/wait.c')
+                     'arch/arm/cortex_m/nx_arch_cortex_m.c',
+                     'arch/arm/cortex_m/nx_arch_cache.c',
+                     'arch/arm/cortex_m/nx_arch_cache_control.c',
+                     'arch/arm/cortex_m/nx_arch_mpu.c',
+                     'arch/arm/cortex_m/nx_arch_security.c',
+                     'arch/arm/cortex_m/nx_arch_nonsecure.c',
+                     'arch/arm/cortex_m/nx_arch_sleep.c', 'os/wait.c')
             sources = [root / name for name in names] + [
                 build / 'nexus-runtime/os/freertos/m7-integer-port/port.c']
             entries = []

@@ -3,11 +3,11 @@ foreach(u5_suite system provider)
     set(u5_target "nexus_u575_${u5_suite}_test")
     nexus_google_test(${u5_target}
         SOURCES "u575_${u5_suite}_test.cpp" u575_model.cpp
-            "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-            "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
             "${NEXUS_SOURCE_DIR}/tests/google")
     target_include_directories(${u5_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"

@@ -1,17 +1,17 @@
 # Actual PIO mechanism, SDK register facts and retained 48MHz cold ownership.
 nexus_google_test(nexus_usb_device_test SOURCES usb_device_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers"
         "${NEXUS_SOURCE_DIR}/io/private")
 foreach(usb_family stm32f407 gd32f470)
     set(usb_target "nexus_${usb_family}_usb_device_test")
     nexus_google_test(${usb_target} SOURCES usb_device_soc_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${usb_family}/drivers/usb_device.c"
-        "${NEXUS_SOURCE_DIR}/soc/${usb_family}/usb_clock.c"
+        "${NEXUS_SOC_SOURCE_${usb_family}}/drivers/usb_device.c"
+        "${NEXUS_SOC_SOURCE_${usb_family}}/usb_clock.c"
         LIBRARIES Nexus::NativeModel Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/io/native"
+        INCLUDES "${NEXUS_SOURCE_DIR}/soc/native/drivers"
             "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOURCE_DIR}/soc/${usb_family}/private")
+            "${NEXUS_SOC_SOURCE_${usb_family}}/private")
     target_compile_options(${usb_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/usb_device_soc_model.h")
     if(usb_family STREQUAL "stm32f407")

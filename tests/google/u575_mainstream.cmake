@@ -1,17 +1,17 @@
 # Actual U575 providers; CPU/MMIO/NVIC leaves are the only modeled boundaries.
 nexus_google_test(nexus_u575_devices_test
     SOURCES u575_devices_test.cpp u575_model.cpp u575_devices_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/pwm.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/exti.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/flash.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/pwm.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/exti.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/i2c.c"
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_devices_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
@@ -46,17 +46,17 @@ endforeach()
 nexus_google_test(nexus_u575_peripheral_factory_test
     SOURCES u575_peripheral_factory_test.cpp u575_model.cpp u575_devices_model.cpp
         "${u5_peripheral_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/spi.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/i2c.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/spi.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/i2c.c"
         "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/adc.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/exti.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/flash.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/adc.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/exti.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/flash.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${u5_peripheral_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_peripheral_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
@@ -69,12 +69,12 @@ nexus_stm32_official(nexus_u575_peripheral_factory_test u5)
 
 nexus_google_test(nexus_u575_mainstream_test
     SOURCES u575_mainstream_test.cpp u575_watchdog_test.cpp u575_model.cpp
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/watchdog.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_mainstream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"
@@ -108,13 +108,13 @@ endforeach()
 nexus_google_test(nexus_u575_mainstream_factory_test
     SOURCES u575_mainstream_factory_test.cpp u575_model.cpp
         "${u5_mainstream_bundle}/bindings.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart.c"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/watchdog.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/watchdog.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${u5_mainstream_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_mainstream_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"

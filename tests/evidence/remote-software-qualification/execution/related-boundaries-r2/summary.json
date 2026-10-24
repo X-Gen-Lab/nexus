@@ -1,9 +1,0 @@
-{
-  "phase": "related-boundaries-r2",
-  "exit_code": 0,
-  "receipt": "/workspace/nexus-io-recovery-20261018/features/remote-software-qualification-r1/execution/related-boundaries-r2/command.attempts/1792297283069191105-0acbac11f07540a0b8be2703edcdcde9/receipt.json",
-  "guards_stable": true,
-  "persistent_allocated_bytes": 659456,
-  "TMP_live_allocated_bytes": 0,
-  "child_max_rss_KiB": 44084
-}

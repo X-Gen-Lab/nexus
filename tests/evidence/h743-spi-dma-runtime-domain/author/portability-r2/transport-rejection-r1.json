@@ -1,8 +1,0 @@
-{
-  "outcome": "exec_server_transport_rejected_before_process_creation",
-  "session": null,
-  "actual_returncode": null,
-  "raw_error": "CreateProcess { message: Rejected(Failed to create unified exec process: exec-server transport disconnected) }",
-  "controlled_probe": "Source, XML, receipts and ASAN ELF retained; rejected seal script and final manifest did not exist. Root unified probe authorized continued sealing.",
-  "qualification": "Not a test/build execution and not RED."
-}

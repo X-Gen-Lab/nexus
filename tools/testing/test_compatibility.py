@@ -51,6 +51,27 @@ class CompatibilityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "factory.*epoch"):
                 compatibility.check(root)
 
+    def test_all_manufacturer_fact_schemas_are_bound_to_observation(self):
+        observed = compatibility.observe(ROOT)
+        paths = {item["path"] for item in observed["inputs"]}
+        expected = {str(path.absolute())
+                    for name in ("soc.json", "routes.json")
+                    for path in (ROOT / "soc").rglob(name)}
+        self.assertTrue(expected.issubset(paths), sorted(expected - paths))
+
+    def test_invalid_manufacturer_facts_cannot_hide_behind_native(self):
+        for family in ("stm32/stm32f407", "gd32/gd32f470"):
+            for name in ("soc.json", "routes.json"):
+                with self.subTest(family=family, name=name):
+                    with tempfile.TemporaryDirectory() as directory:
+                        root = self.fixture(directory)
+                        path = root / "soc" / family / name
+                        path.parent.mkdir(parents=True)
+                        path.write_text('{"schema_version":999}')
+                        with self.assertRaisesRegex(ValueError,
+                                                    "fact schema differs"):
+                            compatibility.check(root)
+
     def test_exact_source_generation_is_accepted(self):
         report = compatibility.validate(self.policy, self.observed, 1)
         self.assertEqual(report["semantic_version"], self.version)

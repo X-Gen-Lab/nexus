@@ -1,5 +1,0 @@
-[ 20%] Building C object CMakeFiles/usb_contract.dir/workspace/nexus/io/native/usb_device.c.o
-[ 20%] Building C object CMakeFiles/usb_contract.dir/workspace/nexus/io/src/usb_device_controller.c.o
-[ 30%] Building CXX object CMakeFiles/usb_contract.dir/workspace/nexus/tests/google/usb_device_test.cpp.o
-[ 40%] Linking CXX executable usb_contract
-[100%] Built target usb_contract

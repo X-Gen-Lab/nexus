@@ -10,11 +10,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 428dc47701a2526dd08639514a896f8ecd93c1bc89c7ee4f842525c163c5f02e\n"
+"X-Nexus-Source-SHA256: 11978a6523f423d8d4aa48b8442265713c9dbf09a7c8b03adebe7acbc9069091\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:9
 msgid "软件验证、源码身份与证据"
 msgstr "Software verification, source identity and evidence"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:11
 msgid ""
 "本页导航已有执行记录，不建立本次文档 HEAD 的平台软件资格。必须同时比对 源码、装配、依赖、工具、实际执行与同一 ELF／BIN／map "
 "字节，不能只看 passed。 资格规则由 [资格合同](../delivery/qualification.md)维护。"
@@ -25,9 +27,11 @@ msgstr ""
 "bytes together, rather than reading passed alone. The [qualification "
 "contract](../delivery/qualification.md) maintains qualification rules."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:15
 msgid "三种身份分别解释"
 msgstr "Interpret three identities separately"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:17
 msgid ""
 "下面字段用于成功打包的正式站点与离线包。构建预览先查看 `documentation-build.json` 的 `source`、状态和原命令 "
 "receipts；预览尚没有正式 `documentation-manifest.json`，也不据此声称发行完成。"
@@ -37,47 +41,60 @@ msgstr ""
 "command receipts in `documentation-build.json`. A preview has no formal "
 "`documentation-manifest.json` yet and does not establish release completion."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "身份"
 msgstr "Identity"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "取得位置"
 msgstr "Location"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "含义"
 msgstr "Meaning"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "当前代码源码"
 msgstr "Current code source"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "站点 `documentation-manifest.json` 的 `code_source`"
 msgstr "`code_source` in the site's `documentation-manifest.json`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "本站描述的 checkout、tree、dirty 状态和代码路径"
 msgstr ""
 "The checkout, tree, dirty status and code paths described by this site"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "当前文档源码"
 msgstr "Current documentation source"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "同一 manifest 的 `documentation_source`"
 msgstr "`documentation_source` in the same manifest"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "本次正式文档包的精确 commit/tree；不替代预览构建记录"
 msgstr ""
 "Exact commit/tree for this formal documentation package; not a replacement "
 "for preview-build records"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "被引用资格源码"
 msgstr "Referenced qualification source"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "同一 manifest 的 `qualified_code` 与其结果索引"
 msgstr "`qualified_code` and its results index in the same manifest"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "旧的精确代码执行；不是当前代码／文档 HEAD 自动继承的资格"
 msgstr ""
 "Earlier exact-code execution; no qualification automatically inherited by "
 "current code/documentation HEAD"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:27
 msgid ""
 "成功打包后，公开站点和离线包的 manifest 由实际构建输入生成。Git HEAD 可以因文档提交改变； 这里不手填一个很快漂移的 HEAD "
 "常量。未打包的工作树可执行 `git rev-parse HEAD` 核对 checkout，但命令输出本身不是 qualification "
@@ -89,24 +106,53 @@ msgstr ""
 "constant. An unpackaged working tree can run `git rev-parse HEAD` to check "
 "its checkout, but that command output alone is not a qualification receipt."
 
-msgid "已有三个独立结果索引"
-msgstr "Three existing independent results indexes"
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:31
+msgid "已有独立结果索引"
+msgstr "Existing independent results indexes"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "范围"
 msgstr "Scope"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "精确代码源码"
 msgstr "Exact code source"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "原权威及执行说明"
 msgstr "Original authority and execution explanation"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
+msgid "开发体验迭代 P 与示例 E"
+msgstr "Developer-experience iteration P and examples E"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
+msgid ""
+"P `c8df1c49d4f771a55490b3a8be32a9d1f24faa1e`；E "
+"`acb923cae407c8cfc4ac5788f8026d35c84cc841`"
+msgstr ""
+"P `c8df1c49d4f771a55490b3a8be32a9d1f24faa1e`；E "
+"`acb923cae407c8cfc4ac5788f8026d35c84cc841`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
+msgid ""
+"{download}`结果索引 <../delivery/developer-experience-results.json>`保留本地完整 "
+"gate、SDK 独立消费、示例 ARM 和原始归档；不是正式软件候选"
+msgstr ""
+"The {download}`results index <../delivery/developer-experience-"
+"results.json>` preserves complete local gates, independent SDK consumption, "
+"examples ARM results and original archives; it is not a formal software "
+"candidate"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "构建系统及其实际软件 scopes"
 msgstr "Build system and its actual software scopes"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "`cc6a065c002041234a212a964be863a69198f9b4`"
 msgstr "`cc6a065c002041234a212a964be863a69198f9b4`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid ""
 "{download}`结果索引 <../delivery/build-system-"
 "results.json>`、[执行记录](../delivery/build-system-verification.md)"
@@ -114,12 +160,15 @@ msgstr ""
 "{download}`Results index <../delivery/build-system-results.json>`, "
 "[execution records](../delivery/build-system-verification.md)"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "SoC 扩展软件切片"
 msgstr "SoC extension software slices"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "`98270512ea2ff7eefe8ff79720018e582be3a949`"
 msgstr "`98270512ea2ff7eefe8ff79720018e582be3a949`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid ""
 "{download}`结果索引 <../delivery/soc-extensions-"
 "results.json>`、[执行记录](../delivery/soc-extensions-verification.md)"
@@ -127,12 +176,15 @@ msgstr ""
 "{download}`Results index <../delivery/soc-extensions-results.json>`, "
 "[execution records](../delivery/soc-extensions-verification.md)"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "较早 SoC refinement 基线"
 msgstr "Earlier SoC refinement baseline"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid "`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`"
 msgstr "`3728b334b02eb2eb70bcf5d4caafbb9746837dd3`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:0
 msgid ""
 "{download}`结果索引 <../delivery/soc-refinement-"
 "results.json>`、[执行记录](../delivery/soc-refinement-verification.md)"
@@ -140,43 +192,47 @@ msgstr ""
 "{download}`Results index <../delivery/soc-refinement-results.json>`, "
 "[execution records](../delivery/soc-refinement-verification.md)"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:40
 msgid ""
-"三个索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加 测试次数、ARM "
+"各索引保留原 schema、范围、失败尝试、receipt、归档和 member 身份，不能相加 测试次数、ARM "
 "镜像数或任务数量，也不能据此计算全项目完成率。后续文档 commit 只记录这些基线。当前文档的检查、渲染、离线恢复与部署验证各自有独立记录。"
 msgstr ""
-"The three indexes retain their original schemas, scopes, failed attempts, "
-"receipts, archives and member identities. Do not add test executions, ARM "
-"images or task counts, or calculate a project-wide completion rate. Later "
-"documentation commits only record these baselines. Current documentation "
-"checking, rendering, offline recovery and deployment validation each have "
-"independent records."
+"Each index preserves its original schema, scope, failed attempts, receipts, "
+"archive and member identities. Do not add test counts, ARM images or task "
+"counts, or calculate a project-wide completion rate. Later documentation "
+"commits only record these baselines. Current documentation checks, "
+"rendering, offline recovery and deployment have their own records."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:44
 msgid ""
 "构建系统记录没有执行一次完整 72-stage 软件总计划，也没有执行 OCI recipe 重建、 CP311 离线安装、Windows/macOS "
-"集成或 MCU HIL。独立执行过的具体 scopes 按原索引 解释；不要从其 aggregate 状态扩大结论。八个当前无签名软件候选是 H743 "
+"集成或 MCU HIL。独立执行过的具体 scopes 按原索引 解释；不要从其 aggregate 状态扩大结论。其八个无签名软件候选是 H743 "
 "HSI64／ Cache off 和 U575 MSIS4／TZEN=0 的 empty／UART、裸机／FreeRTOS 组合。"
 msgstr ""
-"The build-system records did not execute one complete 72-stage software "
-"master plan, OCI recipe reconstruction, CP311 offline installation, "
-"Windows/macOS integration or MCU HIL. Interpret independently executed "
-"scopes according to their original indexes; do not expand conclusions from "
-"aggregate status. Eight current unsigned software candidates combine "
-"empty/UART and baremetal/FreeRTOS for H743 HSI64/Cache off and U575 "
-"MSIS4/TZEN=0."
+"The build-system record did not execute one complete 72-stage software plan,"
+" an OCI recipe rebuild, CP311 offline installation, Windows/macOS "
+"integration or MCU HIL. Interpret separately executed scopes through the "
+"original index rather than expanding an aggregate status. Its eight unsigned"
+" software candidates are H743 HSI64/Cache-off and U575 MSIS4/TZEN=0 "
+"empty/UART baremetal/FreeRTOS combinations."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:49
 msgid "如何取得与核对旧证据"
 msgstr "Acquire and verify earlier evidence"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:51
 msgid "先打开对应结果索引，确认 canonical code commit、配置和记录 scope。"
 msgstr ""
 "Open the corresponding results index and confirm the canonical code commit, "
 "configuration and recorded scope."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:52
 msgid "使用索引中的归档定位，核对归档 SHA-256 和 bytes；记录失败尝试的原身份。"
 msgstr ""
 "Locate the archive through the index and verify SHA-256 and bytes; retain "
 "the original identities of failed attempts."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:53
 msgid ""
 "根据 `archive_relative_path`、`archive_member_relative_path` 等原字段定位 member， "
 "继续核对该 member 的 hash 和 bytes。字段名因原 schema 而不同，按该索引解释。"
@@ -185,16 +241,19 @@ msgstr ""
 "`archive_member_relative_path`, then verify each member's hash and bytes. "
 "Field names vary by original schema; interpret them according to that index."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:55
 msgid "查看实际执行记录、原始日志和同一产物。软件模型、链接、独立消费和两次断网 重建分别证明自己的范围，某一类成功不替代另一类。"
 msgstr ""
 "Inspect actual execution records, raw logs and the same artifacts. Software "
 "models, linking, independent consumption and two network-disabled rebuilds "
 "prove their own scopes; success in one does not replace another."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:57
 msgid "物理记录按 [HIL 状态](hardware.md)另行判断。"
 msgstr ""
 "Assess physical records separately according to [HIL status](hardware.md)."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:59
 msgid ""
 "原 `/workspace/...`、`/dev/shm/...` 是执行主机定位，离开该主机不能当作公开下载。 构建系统索引的 "
 "`evidence_navigation` 明确候选归档、candidate document、ELF／BIN／map 和全部 member "
@@ -209,16 +268,19 @@ msgstr ""
 "remote evidence. Documentation packages include original JSON for checking; "
 "they do not copy large raw archives or re-sign historical bytes."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:64
 msgid "![软件与物理证据分别绑定精确源码和执行范围](../assets/diagrams/qualification-evidence.svg)"
 msgstr ""
 "![Software and physical evidence separately bind exact source and execution "
 "scope](../assets/diagrams/qualification-evidence.svg)"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:64
 msgid "软件与物理证据分别绑定精确源码和执行范围"
 msgstr ""
 "Software and physical evidence separately bind exact source and execution "
 "scope"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/status/software-verification.md:66
 msgid ""
 "FIG-11 表达资格关系，不生成 receipt。标准与图源依据见 [图册](../assets/diagrams/README.md)。 "
 "逐项原退出条件见 [台账视图](ledgers.md)。"

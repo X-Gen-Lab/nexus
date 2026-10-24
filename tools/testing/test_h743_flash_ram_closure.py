@@ -99,7 +99,7 @@ class H743FlashRamClosureTests(unittest.TestCase):
             argv.insert(1, "-Wl,-e,Flash_Helper")
         if mutation and mutation.startswith("CPU_"):
             argv.append("-DEXTERNAL_CPU_BRIDGE=1")
-            original = ROOT / "soc/stm32h743/drivers/flash_ram_enter.S"
+            original = ROOT / "soc/stm32/stm32h743/drivers/flash_ram_enter.S"
             changes = {
                 "CPU_BAD_MSP": ("msr msp, r4", "msr msp, r5"),
                 "CPU_BAD_PSP": ("msr psp, r5", "msr psp, r4"),
@@ -129,7 +129,7 @@ class H743FlashRamClosureTests(unittest.TestCase):
                 self.assertEqual(1, text.count(old))
                 source = directory / "bridge.S"
                 source.write_text(text.replace(old, new))
-            argv += ["-I", str(ROOT / "soc/stm32h743/private"), str(source)]
+            argv += ["-I", str(ROOT / "soc/stm32/stm32h743/private"), str(source)]
         if mutation in ("DUPLICATE_FLASH_LOCALS", "DUPLICATE_RAM_LOCALS"):
             for index in range(2):
                 source = directory / f"local{index}.S"

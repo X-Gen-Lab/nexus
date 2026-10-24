@@ -1,8 +1,0 @@
-{
-  "kind": "fixture-only-after-two-real-target-link-RED",
-  "path": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/files/tests/google/physical_platform_factory.cmake",
-  "bytes": 7810,
-  "sha256": "d3953632ea93bd2c97727fcf51d1403ddcd73d494552c0c013a3275f2919d42d",
-  "actual_RED": "/workspace/nexus-io-recovery-20261018/features/io36-native/physical-factory-fixture-r1/validation/build-red-r1/summary.json",
-  "does_not_modify_Google_body_or_production": true
-}

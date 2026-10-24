@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/next-generation-execution.csv)。
-源文件：`docs/design/next-generation-execution.csv`；SHA-256：`7ac51ba75151159ac854db5e5f5791652fab48827ea8d1373d87432ae5ad93e1`。
+源文件：`docs/design/next-generation-execution.csv`；SHA-256：`e2aa73331dd8779fd8f3802f358f09d5a197baccb565ded86982b5860472937b`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -115,7 +115,7 @@ source_language: zh_CN
 | `hardware_exit` | 资料与实际PCB一致性待实板 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-BRD-01;RF-BLD-01 |
-| `implementation_paths` | tools/configure/configure.py;soc/*/soc.json;soc/*/routes.json;boards/*/board.json |
+| `implementation_paths` | tools/configure/configure.py;soc/native/soc.json;soc/*/*/soc.json;soc/native/routes.json;soc/*/*/routes.json;boards/*/board.json |
 | `evidence_paths` | tests/contracts:contract_configuration_rejection;tools/configure/test_configure.py |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -184,7 +184,7 @@ source_language: zh_CN
 | `hardware_exit` | 测量mask/cycle开销;timer精度;IRQ抢占 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-ARC-01;RF-OS-01 |
-| `implementation_paths` | arch/include/nexus/arch/arch.h;arch/cortex_m/nx_arch_cortex_m.c;core/src/time.c |
+| `implementation_paths` | arch/include/nexus/arch/arch.h;arch/arm/cortex_m/nx_arch_cortex_m.c;core/src/time.c |
 | `evidence_paths` | tests/contracts/core_contract_test.c;tests/google/arch_cortex_test.cpp;tests/google/arch_native_test.cpp;tests/google/gd32_arch_test.cpp;tests/contracts/gd32_system_test.c;tests/contracts/stm32_model |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -207,7 +207,7 @@ source_language: zh_CN
 | `hardware_exit` | 复位/clock/Flash density/safe-output资格 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-BOOT-01;RF-FIX-01;RF-FIX-02 |
-| `implementation_paths` | soc/stm32f407/system.c;soc/stm32f407/soc.json;soc/stm32f407/CMakeLists.txt |
+| `implementation_paths` | soc/stm32/stm32f407/system.c;soc/stm32/stm32f407/soc.json;soc/stm32/stm32f407/CMakeLists.txt |
 | `evidence_paths` | tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;tests/contracts/stm32_assembly |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -230,7 +230,7 @@ source_language: zh_CN
 | `hardware_exit` | 复位/clock/Flash density/safe-output资格 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-BRD-02 |
-| `implementation_paths` | soc/gd32f470/system.c;soc/gd32f470/timebase.c;soc/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json |
+| `implementation_paths` | soc/gd32/gd32f470/system.c;soc/gd32/gd32f470/timebase.c;soc/gd32/gd32f470/soc.json;vendors/gigadevice/gd32f4xx/source.lock.json |
 | `evidence_paths` | tests/contracts/gd32_system_test.c;tests/contracts/gd32_io_test.c;tests/contracts/gd32_assembly |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -276,7 +276,7 @@ source_language: zh_CN
 | `hardware_exit` | GPIO波形/复位初值/并发电气;批量cycles |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-01;RF-FIX-02 |
-| `implementation_paths` | io/include/nexus/io/gpio.h;soc/*/drivers/gpio.c;io/native/gpio.c |
+| `implementation_paths` | io/include/nexus/io/gpio.h;soc/*/*/drivers/gpio.c;soc/native/drivers/gpio.c |
 | `evidence_paths` | tests/contracts/native_io_test.c;tests/contracts/stm32_io_test.c;tests/contracts/gd32_io_test.c;actual resource matrices |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -322,7 +322,7 @@ source_language: zh_CN
 | `hardware_exit` | TC/abort/RX丢失/时间精度/吞吐;未执行 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-02;RF-FIX-03;RF-HIL-02 |
-| `implementation_paths` | soc/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/uart.c;io/include/nexus/io/uart.h |
 | `evidence_paths` | tests/contracts/stm32_io_test.c;tests/contracts/stm32_model;actual ARM presets |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -345,7 +345,7 @@ source_language: zh_CN
 | `hardware_exit` | TC/abort/RX丢失/时间精度/吞吐;未执行 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-BRD-02;RF-HIL-02 |
-| `implementation_paths` | soc/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h |
+| `implementation_paths` | soc/gd32/gd32f470/drivers/uart.c;io/include/nexus/io/uart.h |
 | `evidence_paths` | tests/contracts/gd32_io_test.c;contract_gd32_io;actual ARM preset |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -368,7 +368,7 @@ source_language: zh_CN
 | `hardware_exit` | CS/clock/MISO/DMA abort/drain;只对实测模式资格化 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-01;RF-HAL-04;RF-HIL-02 |
-| `implementation_paths` | soc/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;io/native/spi.c |
+| `implementation_paths` | soc/*/*/drivers/spi.c;components/bus_owner/src/spi_owner.c;soc/native/drivers/spi.c |
 | `evidence_paths` | tests/contracts/components_spi.c;tests/contracts/*_io_test.c;tests/contracts/*_assembly/*spi.json |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -391,7 +391,7 @@ source_language: zh_CN
 | `hardware_exit` | 真实连线/总线挂死/recovery/波形;未执行 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-03;RF-HIL-02 |
-| `implementation_paths` | soc/*/drivers/i2c.c;tools/configure/*_bindings.py;io/native/i2c.c |
+| `implementation_paths` | soc/*/*/drivers/i2c.c;tools/configure/*_bindings.py;soc/native/drivers/i2c.c |
 | `evidence_paths` | tests/contracts/*_io_test.c;tests/contracts/*_assembly/*i2c.json |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -414,7 +414,7 @@ source_language: zh_CN
 | `hardware_exit` | erase/program/功耗电压/掉电;未执行 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-FLS-01;RF-FLS-02;RF-FLS-03 |
-| `implementation_paths` | soc/*/drivers/flash.c;io/src/flash_region.c;io/include/nexus/io/flash.h |
+| `implementation_paths` | soc/*/*/drivers/flash.c;io/src/mechanisms/flash_region.c;io/include/nexus/io/flash.h |
 | `evidence_paths` | tests/contracts/*_io_test.c;tests/contracts/components_flash_storage.c;tests/contracts/components_storage.c |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -437,7 +437,7 @@ source_language: zh_CN
 | `hardware_exit` | 真实超时复位/调试冻结/上电reset cause;未执行 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-ARC-01;RF-HIL-02;RF-HIL-03 |
-| `implementation_paths` | soc/*/drivers/watchdog.c;io/native/watchdog.c;io/include/nexus/io/watchdog.h |
+| `implementation_paths` | soc/*/*/drivers/watchdog.c;soc/native/drivers/watchdog.c;io/include/nexus/io/watchdog.h |
 | `evidence_paths` | tests/contracts/*_io_test.c;contract_gd32_watchdog-late-failure;contract_gd32_watchdog-hardware-enabled |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -460,7 +460,7 @@ source_language: zh_CN
 | `hardware_exit` | 真实edge/去抖策略边界/优先级/丢失与排空;未执行 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-01;RF-HIL-02 |
-| `implementation_paths` | soc/*/drivers/exti.c;io/include/nexus/io/exti.h;io/native/exti.c |
+| `implementation_paths` | soc/*/*/drivers/exti.c;io/include/nexus/io/exti.h;soc/native/drivers/exti.c |
 | `evidence_paths` | tests/contracts/*_io_test.c;tests/contracts/*_assembly/*exti.json |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -483,7 +483,7 @@ source_language: zh_CN
 | `hardware_exit` | 真实周期/占空比/停止输出;首发模式未执行;capture/advanced另验收 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-01;RF-HIL-02;RF-HIL-03 |
-| `implementation_paths` | soc/*/drivers/timer.c;io/include/nexus/io/timer.h;io/native/timer.c |
+| `implementation_paths` | soc/*/*/drivers/timer.c;io/include/nexus/io/timer.h;soc/native/drivers/timer.c |
 | `evidence_paths` | tests/contracts/*_io_test.c;tests/contracts/*_assembly/*pwm.json |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |
@@ -506,7 +506,7 @@ source_language: zh_CN
 | `hardware_exit` | 首发真实计数/精度/采样率/超时;未执行;高频trigger/DMA/block独立验收 |
 | `status` | implemented |
 | `legacy_rf_refs` | RF-HAL-01;RF-HIL-02;RF-HIL-03 |
-| `implementation_paths` | soc/*/drivers/adc.c;io/include/nexus/io/adc.h;io/native/adc.c |
+| `implementation_paths` | soc/*/*/drivers/adc.c;io/include/nexus/io/adc.h;soc/native/drivers/adc.c |
 | `evidence_paths` | tests/contracts/*_io_test.c;tests/contracts/*_assembly/*adc*.json |
 | `software_status` | qualification_record_authority |
 | `hardware_status` | not_executed |

@@ -258,6 +258,9 @@ TEST_F(OwnerObservation,
         .WillOnce(testing::Return(NX_SUCCESS));
     ASSERT_EQ(nx_owner_observer_service(&observer, 100U, &output), NX_SUCCESS);
     EXPECT_TRUE(output.has_active);
+    EXPECT_TRUE(output.accepting);
+    EXPECT_FALSE(output.queued);
+    EXPECT_FALSE(output.slot_available);
     EXPECT_EQ(output.active.epoch, ticket.epoch);
     EXPECT_EQ(output.active_state, NX_REQUEST_ACTIVE);
     EXPECT_CALL(hardware, Service(testing::_, testing::_))
@@ -276,6 +279,7 @@ TEST_F(OwnerObservation,
     EXPECT_EQ(output.clock_errors, 1U);
     EXPECT_EQ(output.calls, 3U);
     EXPECT_TRUE(output.idle);
+    EXPECT_TRUE(output.slot_available);
     EXPECT_EQ(nx_request_state(&request), NX_REQUEST_SETTLED);
     EXPECT_EQ(slots[0].identity.request, nullptr);
     nx_owner_observer_detach(&observer);
@@ -295,7 +299,19 @@ TEST_F(OwnerObservation, BusyAndSaturatingCountersNeverInventQuarantine) {
     EXPECT_EQ(output.errors, 0U);
     EXPECT_FALSE(output.has_active);
     EXPECT_FALSE(output.idle);
+    EXPECT_TRUE(output.accepting);
+    EXPECT_TRUE(output.queued);
+    EXPECT_FALSE(output.slot_available);
     EXPECT_EQ(nx_request_state(&request), NX_REQUEST_QUEUED);
+}
+TEST_F(OwnerObservation, ClosedIdleOwnerReportsAdmissionSeparatelyFromLoans) {
+    ASSERT_EQ(nx_owner_observer_bind(&observer, &owner), NX_SUCCESS);
+    nx_bus_owner_stop(&owner);
+    ASSERT_EQ(nx_owner_observer_service(&observer, 10U, &output), NX_SUCCESS);
+    EXPECT_FALSE(output.accepting);
+    EXPECT_FALSE(output.queued);
+    EXPECT_TRUE(output.slot_available);
+    EXPECT_TRUE(output.idle);
 }
 TEST_F(OwnerObservation, OutputAliasRejectsBeforeHardwareService) {
     ASSERT_EQ(nx_owner_observer_bind(&observer, &owner), NX_SUCCESS);

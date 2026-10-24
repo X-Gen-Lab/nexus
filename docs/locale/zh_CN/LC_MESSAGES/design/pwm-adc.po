@@ -1,6 +1,6 @@
 #
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: e20d49807a1347cb91530762c3c490c880d47f59a8f1ec6f52fe67a26ef55bdb\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 54ea1c0d92929904440fa127ecee4050b2eaf81f37428fb07af0154ce41ab2a3\n"
 
 msgid "Finite PWM and ADC windows with one hardware owner"
 msgstr "由同一硬件 owner 管理的有限 PWM 与 ADC 窗口"
@@ -209,8 +209,26 @@ msgstr "公共 stop 关闭后续准入并尝试源排空。成功不归还引脚
 msgid "Sources and software evidence"
 msgstr "来源与软件证据"
 
-msgid "The authoritative public contracts are [the coupled request API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/pwm_adc.h) and [the core request lifecycle](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/core/include/nexus/core/request.h). [The private provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/pwm_adc.c) reuses the selected official ADC/DMAMUX primitives and subordinate cold helpers; it does not replace the existing TIM6 stream's timer pointer or expose two hardware owners."
-msgstr "公共权威合同为[联合请求 API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/io/include/nexus/io/pwm_adc.h)和[核心请求生命周期](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/core/include/nexus/core/request.h)。[私有 provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32g474/drivers/pwm_adc.c)复用选定的官方 ADC/DMAMUX 原语与下属冷态辅助函数，不会替换既有 TIM6 流的定时器指针，也不会暴露两个硬件 owner。"
+#: docs/design/pwm-adc.md:165
+msgid ""
+"The authoritative public contracts are [the coupled request "
+"API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/io/include/nexus/io/pwm_adc.h) and [the core request "
+"lifecycle](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/request.h). [The private "
+"provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32g474/drivers/pwm_adc.c) reuses the selected official "
+"ADC/DMAMUX primitives and subordinate cold helpers; it does not replace the "
+"existing TIM6 stream's timer pointer or expose two hardware owners."
+msgstr ""
+"公共权威合同为[联合请求 API](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-"
+"SOURCE/io/include/nexus/io/pwm_adc.h)和[核心请求生命周期](https://github.com/X-Gen-"
+"Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/core/include/nexus/core/request.h)。[私有 "
+"provider](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/soc/stm32/stm32g474/drivers/pwm_adc.c)复用选定的官方 ADC/DMAMUX "
+"原语与下属冷态辅助函数，不会替换既有 TIM6 流的定时器指针，也不会暴露两个硬件 owner。"
 
 msgid "The reviewed hardware references are RM0440 Rev9, DS12288 Rev6 and ES0430 Rev9. The original official driver identities, paired CMSIS and licenses remain in [the exact source lock](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json). ADC priming, limited DMA and specific flag acknowledgement address the selected errata conditions; they are not a claim that every silicon limitation or physical circuit has been qualified."
 msgstr "已审阅的硬件来源为 RM0440 Rev9、DS12288 Rev6 和 ES0430 Rev9。官方驱动的原始身份、配对 CMSIS 与许可证保留在[精确源码锁](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/dependencies/stm32g4-hal.lock.json)中。ADC 预转换、有限 DMA 和特定标志应答处理了选定的勘误条件，不表示每一项芯片限制或物理电路均已通过验收。"

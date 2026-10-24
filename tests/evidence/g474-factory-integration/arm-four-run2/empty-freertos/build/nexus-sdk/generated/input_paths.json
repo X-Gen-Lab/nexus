@@ -1,7 +1,0 @@
-{
-  "boards/stm32g474re_hse24_reference/board.json": "/workspace/nexus/boards/stm32g474re_hse24_reference/board.json",
-  "dependencies/platform-compatibility.json": "/workspace/nexus/dependencies/platform-compatibility.json",
-  "soc/stm32g474/routes.json": "/workspace/nexus/soc/stm32g474/routes.json",
-  "soc/stm32g474/soc.json": "/workspace/nexus/soc/stm32g474/soc.json",
-  "tests/contracts/g474_assembly/empty-freertos.toml": "/workspace/nexus/tests/contracts/g474_assembly/empty-freertos.toml"
-}

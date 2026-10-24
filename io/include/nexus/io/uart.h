@@ -10,12 +10,12 @@
 #define NEXUS_UART_H
 
 #include "nexus/core/request.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/stream.h"
 #include "nexus/io/wake.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef struct nx_uart_port nx_uart_port_t;
 typedef enum {
     NX_UART_RX_BYTES,
     NX_UART_RX_EVENTS,

@@ -19,7 +19,7 @@ class U575MpuGeometryTests(unittest.TestCase):
         return ROOT / "tests/contracts/u575_assembly" / name
 
     def test_machine_fact_and_provider_declare_exact_eight_regions(self):
-        facts = configure.load(ROOT / "soc/stm32u575/soc.json")
+        facts = configure.load(ROOT / "soc/stm32/stm32u575/soc.json")
         self.assertEqual(facts["cpu"]["mpu_regions"], 8)
         self.assertEqual(stm32u575.CPU_FEATURES["mpu_regions"], 8)
 
@@ -42,7 +42,7 @@ class U575MpuGeometryTests(unittest.TestCase):
                               (output / "selection.cmake").read_text())
 
     def test_unreviewed_sixteen_cannot_override_exact_part_fact(self):
-        facts = configure.load(ROOT / "soc/stm32u575/soc.json")
+        facts = configure.load(ROOT / "soc/stm32/stm32u575/soc.json")
         facts["cpu"]["mpu_regions"] = 16
         with self.assertRaisesRegex(ValueError, "capabilities differ"):
             configure.validate_soc(facts, "STM32U575ZIT6Q")

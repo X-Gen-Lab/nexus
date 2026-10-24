@@ -7,6 +7,7 @@
 #define NEXUS_IO_PWM_ADC_H
 #include "nexus/core/request.h"
 #include "nexus/io/adc_format.h"
+#include "nexus/io/fwd.h"
 #include "nexus/io/pwm_group.h"
 #ifdef __cplusplus
 extern "C" {
@@ -63,10 +64,10 @@ typedef struct {
  *       and IRQ publisher. One coupled face owns all selected hardware; no
  *       independently startable PWM-group or ADC face exposes that hardware.
  */
-typedef struct {
+struct nx_pwm_adc {
     const nx_pwm_adc_ops_t* ops;
     void* context;
-} nx_pwm_adc_t;
+};
 /** \brief Prepare distinct unborrowed request, frame and sample storage.
  * \param[in,out] request: Initialized READY or fully consumed SETTLED storage.
  * \param[out] samples: Naturally aligned writable caller sample array.

@@ -1,7 +1,0 @@
-CMake Error at /tmp/runtime source SDK xcj2_a50/relocated prefix with spaces/lib/cmake/Nexus/NexusConfig.cmake:15 (message):
-  This source SDK is a nonpublishable development fixture; explicitly set
-  NEXUS_ALLOW_SOURCE_SDK_FIXTURE=ON for a development consumer
-Call Stack (most recent call first):
-  CMakeLists.txt:10 (find_package)
-
-

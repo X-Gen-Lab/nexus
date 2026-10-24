@@ -1,7 +1,0 @@
-{
-  "dependency_proof": "/dev/shm/nexus-qualification-transport-sdk-prepare-20261018-r3/result.json",
-  "note": "Root verified three locked dependency closures; not duplicated into bounded feature packet",
-  "original_plan": "/workspace/nexus-io-recovery-20261018/validation/qualification-artifact-volumes-readonly-r1.json",
-  "plan_sha256": "9c59a67b2ae9ab786da5c4e278478cea03835f0ab85db8060d2bdc51322967d9",
-  "resolver_probe": "/dev/shm/nexus-qualification-transport-sdk-prepare-20261018-r3/actual-resolver-probe.json"
-}

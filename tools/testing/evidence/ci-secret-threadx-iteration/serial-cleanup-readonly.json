@@ -1,7 +1,0 @@
-{
-  "scope": "readonly current _new_stream / _Trace ownership transfer + joined close",
-  "source_path": "/workspace/nexus/tools/hil/serial_echo.py",
-  "source_sha256": "7785cfb9291813c856988959ce1d6bc1f58f6112406439bf6df3cb491ce01368",
-  "status": "reported FD conversion/close-loop defects closed in read scope; no test reruns/physical validation",
-  "original_check": 114566935661
-}

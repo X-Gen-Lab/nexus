@@ -25,13 +25,13 @@ nexus_google_test(nexus_u575_uart_gpdma_factory_test SOURCES u575_uart_gpdma_fac
     "${u5_gpdma_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/google/u575_model.cpp"
     "${NEXUS_SOURCE_DIR}/tests/google/u575_uart_gpdma_model.cpp"
-    "${NEXUS_SOURCE_DIR}/soc/stm32u575/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32u575/drivers/uart_dma.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/drivers/uart_dma.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${u5_gpdma_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32u575/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32u575/private"
         "${NEXUS_SOURCE_DIR}/tests/google")
 target_include_directories(nexus_u575_uart_gpdma_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_u5/Include"

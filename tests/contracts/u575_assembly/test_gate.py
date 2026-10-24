@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[3]
 class U575ReferenceGateTests(unittest.TestCase):
     def setUp(self):
         self.gate = importlib.import_module("scripts.ci.stm32u575")
-        facts = json.loads((ROOT / "soc/stm32u575/soc.json").read_text())
+        facts = json.loads((ROOT / "soc/stm32/stm32u575/soc.json").read_text())
         self.profile = {"part": "STM32U575ZIT6Q", "soc_family": "stm32u575",
             "board": "stm32u575-nucleo-zi-q", "backend": "baremetal",
             "cpu": facts["cpu"], "clock": facts["clock_profiles"]["msis4"],

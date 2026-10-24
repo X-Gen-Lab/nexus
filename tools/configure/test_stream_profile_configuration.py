@@ -2,7 +2,6 @@
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 import re
-import json
 import tempfile
 import unittest
 
@@ -132,9 +131,11 @@ class StreamProfileConfiguration(unittest.TestCase):
                          factory.emit(result)[0])
 
     def test_persisted_profiles_retain_selected_typed_face_and_cold_helper(self):
-        presets = json.loads((configure.ROOT / "CMakePresets.json").read_text())
-        configured = {item["name"]: item for item in presets["configurePresets"]}
-        built = {item["name"]: item for item in presets["buildPresets"]}
+        from tools.dev.presets import Presets
+        presets = Presets(configure.ROOT)
+        configured = {name: row for name, (row, _) in
+                      presets.rows["configure"].items()}
+        built = {name: row for name, (row, _) in presets.rows["build"].items()}
         directory = configure.ROOT / "tests/contracts/io_evolution_assembly"
         main = (directory / "controller_main.c").read_text()
         for family in ("f407", "gd470"):

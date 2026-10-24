@@ -1,11 +1,11 @@
 # Real production DMA provider with external MMIO and cache boundaries.
 nexus_google_test(nexus_h743_dma_test SOURCES h743_dma_test.cpp
     h743_dma_model.cpp h743_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_dma.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_dma.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_dma_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -35,13 +35,13 @@ foreach(index RANGE 0 ${h7_dma_last_input})
 endforeach()
 nexus_google_test(nexus_h743_dma_factory_test SOURCES h743_dma_factory_test.cpp
     "${h7_dma_factory_bundle}/bindings.c" h743_dma_model.cpp h743_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_dma.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_dma.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_dma_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_dma_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -52,11 +52,11 @@ target_compile_options(nexus_h743_dma_factory_test PRIVATE
 
 nexus_google_test(nexus_h743_receive_test SOURCES h743_receive_test.cpp
     h743_dma_model.cpp h743_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_receive.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_receive.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_receive_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
@@ -86,13 +86,13 @@ endforeach()
 nexus_google_test(nexus_h743_receive_factory_test
     SOURCES h743_receive_factory_test.cpp
     "${h7_receive_bundle}/bindings.c" h743_dma_model.cpp h743_model.cpp
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32h743/drivers/uart_receive.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/uart_receive.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_receive_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32h743/private")
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private")
 target_include_directories(nexus_h743_receive_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"
     "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")

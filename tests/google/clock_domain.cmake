@@ -14,10 +14,10 @@ nexus_google_test(nexus_clock_domain_test SOURCES clock_domain_test.cpp
 foreach(sleep_family stm32f407 gd32f470)
     set(sleep_target "nexus_${sleep_family}_clock_sleep_test")
     nexus_google_test(${sleep_target} SOURCES clock_sleep_soc_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/${sleep_family}/sleep.c"
-        "${NEXUS_SOURCE_DIR}/arch/cortex_m/nx_arch_sleep.c"
+        "${NEXUS_SOC_SOURCE_${sleep_family}}/sleep.c"
+        "${NEXUS_SOURCE_DIR}/arch/arm/cortex_m/nx_arch_sleep.c"
         LIBRARIES nexus_clock_domain_test_provider Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/${sleep_family}/private"
+        INCLUDES "${NEXUS_SOC_SOURCE_${sleep_family}}/private"
             "${CMAKE_CURRENT_SOURCE_DIR}")
     target_compile_definitions(${sleep_target} PRIVATE NEXUS_ARCH_SLEEP_MODEL)
     target_compile_options(${sleep_target} PRIVATE
@@ -29,7 +29,7 @@ foreach(sleep_family stm32f407 gd32f470)
     else()
         set(sleep_vendor "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
         target_include_directories(${sleep_target} PRIVATE
-            "${NEXUS_SOURCE_DIR}/soc/gd32f470/private")
+            "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${sleep_target} SYSTEM PRIVATE
             "${sleep_vendor}/CMSIS"
             "${sleep_vendor}/CMSIS/GD/GD32F4xx/Include"

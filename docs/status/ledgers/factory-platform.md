@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/factory-platform-execution.csv)。
-源文件：`docs/design/factory-platform-execution.csv`；SHA-256：`49215c9d35115fd258b86d516869215950c78ee5579ca440d9427de731780836`。
+源文件：`docs/design/factory-platform-execution.csv`；SHA-256：`3020b37aa2e32245511b3be8ca7acc5c961a6fa49409aa170a795dbbd6fc8df8`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -118,7 +118,7 @@ source_language: zh_CN
 | `area` | native |
 | `task` | multiple independent Native providers |
 | `roles` | Core;QA |
-| `implementation_paths` | io/native;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp |
+| `implementation_paths` | soc/native/drivers;tests/google/native_instances_test.cpp;tests/google/native_factory_test.cpp |
 | `software_exit` | actual generated factory; independent resources; stopped admission; borrowed storage retained |
 | `implementation_status` | implemented |
 | `hardware_status` | not_applicable |
@@ -150,7 +150,7 @@ source_language: zh_CN
 | `area` | io |
 | `task` | all nine interface kinds share static ops |
 | `roles` | Core;BSP |
-| `implementation_paths` | io/include/nexus/io;io/src;soc/*/drivers;io/native |
+| `implementation_paths` | io/include/nexus/io;io/src;soc/*/*/drivers;soc/native/drivers |
 | `software_exit` | production SDK private; all calls use exact context; C/C++ ABI consumers |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -182,7 +182,7 @@ source_language: zh_CN
 | `area` | wake |
 | `task` | explicit bounded IRQ wake |
 | `roles` | Core;BSP |
-| `implementation_paths` | io/include/nexus/io/wake.h;io/src/wake.c;tests/google/irq_wake_test.cpp |
+| `implementation_paths` | io/include/nexus/io/wake.h;io/src/mechanisms/wake.c;tests/google/irq_wake_test.cpp |
 | `software_exit` | latched predicates; actual publisher priority ceiling; detach publishers before release |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -198,7 +198,7 @@ source_language: zh_CN
 | `area` | dma |
 | `task` | STM32 USART1 finite TX DMA |
 | `roles` | BSP;QA |
-| `implementation_paths` | soc/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/uart_dma.c;tests/google/stm32_uart_dma_test.cpp |
 | `software_exit` | DMA2 stream7 channel4; memory-domain rejection; memory TC distinct from wire TC; quarantine |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -214,7 +214,7 @@ source_language: zh_CN
 | `area` | dma |
 | `task` | GD32 USART0 finite TX DMA |
 | `roles` | BSP;QA |
-| `implementation_paths` | soc/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp |
+| `implementation_paths` | soc/gd32/gd32f470/drivers/uart_dma.c;tests/google/gd32_uart_dma_test.cpp |
 | `software_exit` | DMA1 channel7 selector4; independent wire and engine drain; late IRQ protection |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -230,7 +230,7 @@ source_language: zh_CN
 | `area` | dma |
 | `task` | STM32 SPI1 full duplex finite DMA |
 | `roles` | BSP;QA |
-| `implementation_paths` | soc/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp |
+| `implementation_paths` | soc/stm32/stm32f407/drivers/spi_dma.c;tests/google/stm32_spi_dma_test.cpp |
 | `software_exit` | DMA2 RXstream0/TXstream3 channel3; nonoverlapping buffers; CS retained until idle |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -246,7 +246,7 @@ source_language: zh_CN
 | `area` | dma |
 | `task` | GD32 SPI4 full duplex finite DMA |
 | `roles` | BSP;QA |
-| `implementation_paths` | soc/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp |
+| `implementation_paths` | soc/gd32/gd32f470/drivers/spi_dma.c;tests/google/gd32_spi_dma_test.cpp |
 | `software_exit` | DMA1 RXchannel3/TXchannel4 selector2; no poll-as-async; exact CS interval |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -278,7 +278,7 @@ source_language: zh_CN
 | `area` | stream |
 | `task` | bounded fixed-block loans and Native producers |
 | `roles` | Core;QA |
-| `implementation_paths` | io/src/stream.c;io/native/stream.c;tests/google/native_async_test.cpp |
+| `implementation_paths` | io/src/mechanisms/stream.c;soc/native/drivers/stream.c;tests/google/native_async_test.cpp |
 | `software_exit` | never overwrite loan; epoch identity; loss ordering; stop joins producers and consumers |
 | `implementation_status` | implemented |
 | `hardware_status` | not_applicable |
@@ -294,7 +294,7 @@ source_language: zh_CN
 | `area` | stream |
 | `task` | STM32 and GD32 UART RX IDLE/block providers |
 | `roles` | BSP;QA |
-| `implementation_paths` | soc/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp |
+| `implementation_paths` | soc/*/*/drivers/uart_stream.c;tests/google/*uart_stream_test.cpp |
 | `software_exit` | exact mode; whole/IDLE prefix publication; bounded loss; final block and held consumer survive stop |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -310,7 +310,7 @@ source_language: zh_CN
 | `area` | adc |
 | `task` | STM32 and GD32 timer trigger DMA block providers |
 | `roles` | BSP;QA |
-| `implementation_paths` | soc/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp |
+| `implementation_paths` | soc/*/*/drivers/adc_stream.c;tests/google/*adc_stream_test.cpp |
 | `software_exit` | timer and conversion limits; disabled normal DMA before publication; pause/rearm without overwrite |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |
@@ -326,7 +326,7 @@ source_language: zh_CN
 | `area` | controllers |
 | `task` | multiple GD32 controllers and reviewed resources |
 | `roles` | BSP;Build |
-| `implementation_paths` | soc/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml |
+| `implementation_paths` | soc/gd32/gd32f470/private/gd32f470_provider.h;tests/google/gd32_multi_test.cpp;tests/contracts/gd32_assembly/multi.toml |
 | `software_exit` | independent UART/SPI/I2C descriptors; exact controller clocks and generated IRQ state |
 | `implementation_status` | implemented |
 | `hardware_status` | not_executed |

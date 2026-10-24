@@ -1,8 +1,0 @@
-/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-uart_receive-legacy-tests-google-stm32_uart_receive_test.cpp.o: warning: relocation against `nx_uart_rs485_ops' in read-only section `.text'
-/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-uart_receive-legacy-tests-google-stm32_uart_receive_test.cpp.o: in function `Stm32UartReceive_Rs485ActualProviderPrevalidatesAndWaitsWireTcBeforeDeWithdrawal_Test::TestBody()':
-stm32_uart_receive_test.cpp:(.text+0xdce6): undefined reference to `nx_uart_rs485_ops'
-/usr/bin/ld: stm32_uart_receive_test.cpp:(.text+0xde36): undefined reference to `nx_uart_rs485_initialize'
-/usr/bin/ld: /workspace/nexus-multi-controller-iteration/stm-uart_receive-legacy-soc-stm32f407-drivers-uart_dma.c.o: in function `acknowledge_bits':
-uart_dma.c:(.text+0x12a): undefined reference to `nx_stm32_uart_dma_model_ack'
-/usr/bin/ld: warning: creating DT_TEXTREL in a PIE
-collect2: error: ld returned 1 exit status

@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_MDIO_H
 #define NEXUS_IO_MDIO_H
 #include "nexus/core/time.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,10 +14,10 @@ typedef struct {
     nx_result_t (*read)(void*, uint8_t, uint8_t, uint16_t*, nx_time_us_t);
     nx_result_t (*write)(void*, uint8_t, uint8_t, uint16_t, nx_time_us_t);
 } nx_mdio_ops_t;
-typedef struct {
+struct nx_mdio_port {
     const nx_mdio_ops_t* ops;
     void* context;
-} nx_mdio_port_t;
+};
 /**
  * \brief Read one Clause22 PHY register without retaining output storage.
  * \param[in] port: Stable face and caller-owned execution context.

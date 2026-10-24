@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="1" failures="0" disabled="0" errors="0" time="0." timestamp="2026-10-18T02:10:53.941" name="AllTests">
-  <testsuite name="NativeTimeGenerated" tests="1" failures="0" disabled="0" skipped="0" errors="0" time="0." timestamp="2026-10-18T02:10:53.941">
-    <testcase name="PublicCScenarioUsesRealFactoryAndPlatform" file="/tmp/nexus-io36-native-20261018/tests/google/rtc_lptim_generated_test.cpp" line="12" status="run" result="completed" time="0." timestamp="2026-10-18T02:10:53.941" classname="NativeTimeGenerated" />
-  </testsuite>
-</testsuites>

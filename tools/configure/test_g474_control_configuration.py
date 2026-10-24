@@ -1,7 +1,6 @@
 """The selected TIM1 group is a real typed, exclusive cold assembly."""
 from pathlib import Path
 import copy
-import json
 import subprocess
 import sys
 import tempfile
@@ -59,7 +58,7 @@ class G474ControlConfiguration(unittest.TestCase):
                 self.resolve(before, after)
 
     def test_reviewed_personalities_keep_one_physical_tim3_identity(self):
-        soc = configure.load(configure.ROOT / "soc/stm32g474/soc.json")
+        soc = configure.load(configure.ROOT / "soc/stm32/stm32g474/soc.json")
         self.assertEqual(soc["controllers"]["TIM3"]["kind"], "pwm")
         self.assertEqual(soc["controllers"]["TIM3"]["interfaces"],
                          {"encoder": ["quadrature"]})
@@ -88,7 +87,7 @@ class G474ControlConfiguration(unittest.TestCase):
         self.assertNotIn("nx_timer_capture_start(", source)
 
     def test_personality_facts_reject_unreviewed_or_duplicate_primary_kind(self):
-        original = configure.load(configure.ROOT / "soc/stm32g474/soc.json")
+        original = configure.load(configure.ROOT / "soc/stm32/stm32g474/soc.json")
         for interfaces in ({"pwm": ["fixed-pwm"]},
                            {"encoder": ["unsupported"]},
                            {"unknown": ["quadrature"]},
@@ -139,9 +138,11 @@ class G474ControlConfiguration(unittest.TestCase):
                     configure.resolve_ir(path)
 
     def test_control_fixtures_have_normal_firmware_presets_and_face_retention(self):
-        document = json.loads((configure.ROOT / "CMakePresets.json").read_text())
-        configured = {item["name"]: item for item in document["configurePresets"]}
-        built = {item["name"]: item for item in document["buildPresets"]}
+        from tools.dev.presets import Presets
+        presets = Presets(configure.ROOT)
+        configured = {name: row for name, (row, _) in
+                      presets.rows["configure"].items()}
+        built = {name: row for name, (row, _) in presets.rows["build"].items()}
         main = (configure.ROOT /
             "tests/contracts/io_evolution_assembly/controller_main.c").read_text()
         for fixture, kind in (("pwm-group", "pwm_group"),

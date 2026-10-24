@@ -1,7 +1,0 @@
-test_audit_archives_stay_outside_sdk_but_operational_tools_remain (__main__.SourceSDKSelectionTests.test_audit_archives_stay_outside_sdk_but_operational_tools_remain) ... ok
-test_real_git_snapshots_exclude_archives_in_both_package_modes (__main__.SourceSDKDevelopmentSnapshotTests.test_real_git_snapshots_exclude_archives_in_both_package_modes) ... ok
-
-----------------------------------------------------------------------
-Ran 2 tests in 0.026s
-
-OK

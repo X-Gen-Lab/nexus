@@ -24,12 +24,12 @@ endforeach()
 nexus_google_test(nexus_g474_mainstream_test SOURCES g474_mainstream_test.cpp
     "${g4_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/uart.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/uart.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_mainstream_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
@@ -42,10 +42,10 @@ target_compile_options(nexus_g474_mainstream_test PRIVATE
 # Actual irreversible watchdog implementation, external MMIO only modeled.
 nexus_google_test(nexus_g474_watchdog_test SOURCES g474_watchdog_test.cpp
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/watchdog.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/watchdog.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_watchdog_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
@@ -56,11 +56,11 @@ target_compile_options(nexus_g474_watchdog_test PRIVATE
 
 nexus_google_test(nexus_g474_spi_test SOURCES g474_spi_test.cpp
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/spi.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/spi.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_spi_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
@@ -95,13 +95,13 @@ endforeach()
 nexus_google_test(nexus_g474_peripheral_factory_test SOURCES g474_peripheral_factory_test.cpp
     "${g4_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/spi.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/watchdog.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/spi.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/watchdog.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_peripheral_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
@@ -113,11 +113,11 @@ target_compile_options(nexus_g474_peripheral_factory_test PRIVATE
 
 nexus_google_test(nexus_g474_pwm_test SOURCES g474_pwm_test.cpp
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm.c"
     LIBRARIES Nexus::IO Nexus::Arch
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_pwm_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"
@@ -152,12 +152,12 @@ endforeach()
 nexus_google_test(nexus_g474_pwm_factory_test SOURCES g474_pwm_factory_test.cpp
     "${g4_factory_bundle}/bindings.c"
     "${NEXUS_SOURCE_DIR}/tests/contracts/g474_model.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/system.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/gpio.c"
-    "${NEXUS_SOURCE_DIR}/soc/stm32g474/drivers/pwm.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/system.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/gpio.c"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/drivers/pwm.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${g4_factory_bundle}"
-        "${NEXUS_SOURCE_DIR}/soc/stm32g474/private"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
         "${NEXUS_SOURCE_DIR}/tests/contracts")
 target_include_directories(nexus_g474_pwm_factory_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_g4/Include"

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "stm32f407zg-two-spi-endpoints-software-fixture",
+  "soc": "STM32F407ZGT6",
+  "soc_family": "stm32f407",
+  "source_revision": "software-only-reviewed-secondary-pad-contract",
+  "physical_pcb_revision": null,
+  "clocks": {
+    "hse_hz": 8000000
+  },
+  "bindings": [
+    {
+      "id": "primary-spi",
+      "controller": "SPI1",
+      "route": "spi1-pa5-pa6-pa7"
+    },
+    {
+      "id": "secondary-cs",
+      "controller": "GPIOE",
+      "route": "gpio-pe3",
+      "initial": 8
+    },
+    {
+      "id": "primary-cs",
+      "controller": "GPIOE",
+      "route": "gpio-pe4",
+      "initial": 16
+    }
+  ],
+  "reserved_resources": [],
+  "unknowns": [
+    "Software-only silicon pad and active-low CS contract; no PCB devices or connections are claimed.",
+    "No physical UART/SPI/I2C timing, pulls, voltage or external-device qualification was executed."
+  ],
+  "provenance": [
+    {
+      "url": "https://www.st.com/resource/en/datasheet/stm32f407vg.pdf",
+      "scope": "STM32F407 silicon alternate-function pads only. No board revision, attached device, or electrical qualification is claimed."
+    }
+  ]
+}

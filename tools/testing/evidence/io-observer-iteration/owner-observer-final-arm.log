@@ -1,6 +1,0 @@
-In file included from /workspace/nexus/components/owner_observer/include/nexus/components/owner_observer.h:8,
-                 from /workspace/nexus/components/owner_observer/src/owner_observer.c:10:
-/workspace/nexus/components/bus_owner/include/nexus/components/bus_owner.h:9:10: fatal error: nexus/os/wait.h: No such file or directory
-    9 | #include "nexus/os/wait.h"
-      |          ^~~~~~~~~~~~~~~~~
-compilation terminated.

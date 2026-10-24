@@ -21,22 +21,22 @@ foreach(can_family stm32 gd32)
     nexus_google_test(${can_target} SOURCES can_factory_test.cpp
         "${can_bundle}/bindings.c" LIBRARIES Nexus::NativeModel Nexus::Arch
         INCLUDES "${can_bundle}" "${NEXUS_SOURCE_DIR}/io/private"
-            "${NEXUS_SOURCE_DIR}/io/native")
+            "${NEXUS_SOURCE_DIR}/soc/native/drivers")
     target_compile_options(${can_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/can_soc_model.h")
     target_compile_definitions(${can_target} PRIVATE
         _init=nx_can_fixture_init _fini=nx_can_fixture_fini)
     if(can_family STREQUAL "stm32")
-        target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32f407/drivers/can.c")
-        target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32f407/private")
+        target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/drivers/can.c")
+        target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/stm32/stm32f407/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
             "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_f4/Include"
             "${NEXUS_SOURCE_DIR}/vendors/arm/CMSIS_5/CMSIS/Core/Include")
         target_compile_definitions(${can_target} PRIVATE STM32F407xx NX_CAN_TEST_STM32 NX_CAN_FACTORY_STM32)
     else()
         set(can_gd "${NEXUS_SOURCE_DIR}/vendors/gigadevice/gd32f4xx/Firmware")
-        target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32f470/drivers/can.c")
-        target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32f470/private")
+        target_sources(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/drivers/can.c")
+        target_include_directories(${can_target} PRIVATE "${NEXUS_SOURCE_DIR}/soc/gd32/gd32f470/private")
         target_include_directories(${can_target} SYSTEM PRIVATE
             "${can_gd}/CMSIS" "${can_gd}/CMSIS/GD/GD32F4xx/Include"
             "${can_gd}/GD32F4xx_standard_peripheral/Include")

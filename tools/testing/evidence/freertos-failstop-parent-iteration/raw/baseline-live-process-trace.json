@@ -1,8 +1,0 @@
-[
-  {
-    "pid": 3725762,
-    "ppid": 1,
-    "cmd": "/tmp/nexus-freertos-failstop-iteration/baseline-native-tsan/bin/nexus_freertos_failstop_test --gtest_repeat=1 --gtest_also_run_disabled_tests --gtest_output=xml:/workspace/nexus-freertos-failstop-iteration/baseline-tsan.xml ",
-    "status": "Name:\tnexus_freertos_\nUmask:\t0077\nState:\tR (running)\nTgid:\t3725762\nNgid:\t0\nPid:\t3725762\nPPid:\t1\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t \nNStgid:\t3725762\nNSpid:\t3725762\nNSpgid:\t3725749\nNSsid:\t3725749\nKthread:\t0\nVmPeak:\t123480379984 kB\nVmSize:\t123480379984 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   17904 kB\nVmRSS:\t   17904 kB\nRssAnon:\t   17032 kB\nRssFile:\t     520 kB\nRssShmem:\t     352 kB\nVmData:\t42949721068 kB\nVmStk:\t     132 kB\nVmExe:\t     432 kB\nVmLib:\t    4188 kB\nVmPTE:\t    1028 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t2\nSigQ:\t0/71955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000001000024c0\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\talways enabled\nCpus_allowed:\t1f\nCpus_allowed_list:\t0-4\nMems_allowed:\t00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t0\nnonvoluntary_ctxt_switches:\t454\n"
-  }
-]

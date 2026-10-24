@@ -1,4 +1,0 @@
-[ 13%] Built target timer_arch
-[ 33%] Built target timer_api
-[ 66%] Built target nexus_stm32_timer_factory_test
-[100%] Built target nexus_gd32_timer_factory_test

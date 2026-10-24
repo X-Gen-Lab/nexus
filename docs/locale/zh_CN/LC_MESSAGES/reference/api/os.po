@@ -1,1380 +1,2356 @@
+# Authored translation; independent review is recorded in metadata.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: zh_CN\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 62e0a29a586d3356a3fcfdc221e877e0919f8bdaba0767963c1b44123c23e852\nX-Nexus-Reviewed: true\n"
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3cf1f083d00f759ba5e3039ee77636dc41fc0b6be71a56510dc6847ebf00a55b\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:8
 msgid "OS adapters: tasks, waits and explicit storage"
 msgstr "OS 适配器：任务、等待与显式存储"
 
-msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:10
+msgid ""
+"These declarations come from public header files. Selection, lifecycle, "
+"supported execution modes and physical authorization remain bounded by the "
+"corresponding design and support records."
 msgstr "这些声明来自公共头文件。选择、生命周期、支持的执行模式和物理资源授权范围仍以对应设计及支持记录为准。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:14
 msgid "baremetal.h"
 msgstr "baremetal.h"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "Bare-metal poll notification with caller-owned storage."
 msgstr "使用调用者存储的裸机轮询通知。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
 msgid "Author  Nexus Team"
 msgstr "作者  Nexus Team"
 
-msgid "Functions"
-msgstr "函数"
-
-msgid "Initialize storage before exposing it to any ISR."
-msgstr "向任何 ISR 暴露存储之前先初始化。"
-
-msgid "Parameters"
-msgstr "参数"
-
-msgid "Returns"
-msgstr "返回值"
-
-msgid "Bind the explicit polling notification."
-msgstr "绑定显式轮询通知。"
-
-msgid "Explicit nonblocking bare-metal notification storage."
-msgstr "显式、非阻塞的裸机通知存储。"
-
-msgid "Public Members"
-msgstr "公共成员"
-
-msgid "diagnostic.h"
-msgstr "diagnostic.h"
-
-msgid "Bounded diagnostics with explicit caller-owned ring storage."
-msgstr "使用调用者显式环形存储的有界诊断。"
-
-msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
-msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus Team"
-
-msgid "Initialize unpublished ring and caller-owned entries."
-msgstr "初始化尚未发布的环与调用者提供的条目。"
-
-msgid "Copy one event under a bounded saved interrupt mask."
-msgstr "在有界且保存原屏蔽状态的临界区内复制一个事件。"
-
-msgid "Consume one event from caller-owned ring."
-msgstr "从调用者拥有的环中消费一个事件。"
-
-msgid "Snapshot the saturating overflow count."
-msgstr "读取饱和溢出计数快照。"
-
-msgid "One opaque diagnostic record; interpretation belongs to its owner."
-msgstr "一个不透明诊断记录；解释责任属于其所有者。"
-
-msgid "Explicit ring state, with no default pool, worker or transport."
-msgstr "显式环状态，不提供默认池、执行任务或传输机制。"
-
-msgid "freertos.h"
-msgstr "freertos.h"
-
-msgid "Per-object static FreeRTOS storage and optional thin services."
-msgstr "每对象静态 FreeRTOS 存储与可选轻量服务。"
-
-msgid "Typedefs"
-msgstr "类型定义"
-
-msgid "Caller-owned single-operation latch for a closable queue."
-msgstr "调用者拥有的单操作锁存器，用于可关闭队列。"
-
-msgid "Test whether the current context may call kernel ISR APIs."
-msgstr "检查当前上下文是否允许调用内核 ISR API。"
-
-msgid "Initialize unused notification storage."
-msgstr "初始化尚未使用的通知存储。"
-
-msgid "Bind a latched single-waiter notification."
-msgstr "绑定序列锁存、单等待者通知。"
-
-msgid "Destroy after publishers and waiter have stopped and joined."
-msgstr "发布者和等待者均停止并完成 join 后再销毁。"
-
-msgid "Create one task from its exact caller-owned stack and TCB."
-msgstr "使用调用者提供的准确栈和 TCB 创建一个任务。"
-
-msgid "Discard one created task before its wrapper has executed."
-msgstr "在包装函数执行之前，丢弃一个已创建的任务。"
-
-msgid "Join a cooperatively returned task and reclaim kernel state."
-msgstr "对协作返回的任务执行 join，并回收内核状态。"
-
-msgid "Create an exact-sized static byte-copy queue."
-msgstr "创建准确容量的静态字节复制队列。"
-
-msgid "Copy an item with a bounded relative kernel wait."
-msgstr "在有界内核相对等待内复制一个条目。"
-
-msgid "Receive one byte-copy item."
-msgstr "接收一个字节复制条目。"
-
-msgid "Destroy after admission is stopped and all users joined."
-msgstr "准入已停止且全部使用者完成 join 后再销毁。"
-
-msgid "Send using one absolute monotonic deadline."
-msgstr "使用一个绝对单调截止时间发送。"
-
-msgid "Receive using one absolute monotonic deadline."
-msgstr "使用一个绝对单调截止时间接收。"
-
-msgid "Bind an exclusive slot of one live receiver task."
-msgstr "绑定一个存活接收任务的独占通知槽。"
-
-msgid "Get a direct notification wait port."
-msgstr "取得直接任务通知的等待端口。"
-
-msgid "Unbind after all publishers stop and join."
-msgstr "全部发布者停止并完成 join 后解除绑定。"
-
-msgid "Start a task whose entry must never return."
-msgstr "启动入口函数绝不允许返回的任务。"
-
-msgid "Initialize one exact caller-owned queue waiter."
-msgstr "初始化调用者提供的准确队列等待者存储。"
-
-msgid "Destroy only after all operations stop and join."
-msgstr "全部操作停止并完成 join 后才允许销毁。"
-
-msgid "Initialize an optional reliably closable byte-copy queue."
-msgstr "初始化可选、能可靠关闭的字节复制队列。"
-
-msgid "Send with close-aware admission and absolute deadline."
-msgstr "发送时执行关闭感知准入，并采用绝对截止时间。"
-
-msgid "Receive existing items after close, then CANCELLED."
-msgstr "关闭后仍接收已有条目，排空后返回 CANCELLED。"
-
-msgid "Stop sends and wake every currently registered waiter."
-msgstr "停止发送，并唤醒当前登记的全部等待者。"
-
-msgid "Destroy a closed, drained and quiesced queue."
-msgstr "销毁已关闭、已排空且静止的队列。"
-
-msgid "Static binary latch; one waiter, independently quiesced publishers."
-msgstr "静态二值锁存器；一个等待者，发布者分别停止并排空。"
-
-msgid "Task has its own TCB; stack is supplied with its actual word count."
-msgstr "任务拥有独立 TCB；栈以其实际字数显式供给。"
-
-msgid "Queue control only; actual depth/item byte storage is external."
-msgstr "仅队列控制状态；实际深度／条目字节存储由外部提供。"
-
-msgid "Fixed receiver and exclusive kernel notification slot; no latch."
-msgstr "固定接收者及独占内核通知槽；不含锁存器。"
-
-msgid "Permanent task control without a join completion semaphore."
-msgstr "永久任务控制，不含 join 完成信号量。"
-
-msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
-msgstr "显式选择的关闭广播；原始队列存储不变。"
-
-msgid "freertos_diagnostics.h"
-msgstr "freertos_diagnostics.h"
-
-msgid "Bounded explicit FreeRTOS trace sink without global storage."
-msgstr "显式、有界的 FreeRTOS 跟踪接收端，不使用全局存储。"
-
-msgid "Enums"
-msgstr "枚举"
-
-msgid "Maintained kernel trace identities; product interpretation is external."
-msgstr "维护范围内的内核跟踪身份；产品解释位于外部。"
-
-msgid "Values:"
-msgstr "取值："
-
-msgid "Consume one bounded kernel trace event."
-msgstr "消费一个有界内核跟踪事件。"
-
-msgid "freertos_mpu.h"
-msgstr "freertos_mpu.h"
-
-msgid "Privileged static lifecycle for isolated MPU user tasks."
-msgstr "隔离 MPU 用户任务的特权静态生命周期。"
-
-msgid "User data is nonexecuting normal RAM with only these permissions."
-msgstr "用户数据是不可执行的普通 RAM，仅允许这些权限。"
-
-msgid "Create an unprivileged task from exact caller-owned storage."
-msgstr "使用调用者准确存储创建非特权任务。"
-
-msgid "Delete another isolated task after external users quiesce."
-msgstr "外部使用者静止后，删除另一个隔离任务。"
-
-msgid "A caller-selected exact region, copied during task creation."
-msgstr "调用者选定的准确区域，在任务创建时复制。"
-
-msgid "Complete caller-owned protected task metadata."
-msgstr "调用者拥有的完整受保护任务元数据。"
-
-msgid "Immutable creation inputs, borrowed for this call only."
-msgstr "不可变创建输入，仅在本次调用内被借用。"
-
-msgid "freertos_stack.h"
-msgstr "freertos_stack.h"
-
-msgid "Optional bounded task stack paint snapshot."
-msgstr "可选、有界的任务栈涂色快照。"
-
-msgid "Copy bounded stack paint facts using actual kernel identity."
-msgstr "使用真实内核身份复制有界栈涂色事实。"
-
-msgid "Exact static task facts supplied at original creation."
-msgstr "原始创建时提供的准确静态任务事实。"
-
-msgid "freertos_user.h"
-msgstr "freertos_user.h"
-
-msgid "Narrow pointer-free services for MPU-isolated user tasks."
-msgstr "MPU 隔离用户任务的窄接口、无指针服务。"
-
-msgid "Defines"
-msgstr "宏定义"
-
-msgid "Explicitly reviewed unprivileged executable code section."
-msgstr "显式审查的非特权可执行代码段。"
-
-msgid "Explicit user RAM, separate from kernel and provider state."
-msgstr "显式用户 RAM，与内核和提供者状态分离。"
-
-msgid "Trusted static task metadata placed in protected kernel RAM."
-msgstr "放入受保护内核 RAM 的可信静态任务元数据。"
-
-msgid "Delay the calling user task through the real MPU SVC."
-msgstr "通过真实 MPU SVC 延迟调用用户任务。"
-
-msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
-msgstr "通过 SVC 读取内核可回绕的 32 位 tick 计数器。"
-
-msgid "lowpower.h"
-msgstr "lowpower.h"
-
-msgid "Explicit continuous-clock tickless timer port."
-msgstr "显式的连续时钟无 tick 定时器端口。"
-
-msgid "Bounded late alarm catch-up; larger delays violate the timer port."
-msgstr "有界的延迟闹钟追赶；超出边界即违反定时器端口合同。"
-
-msgid "Return the explicitly selected continuous timer port."
-msgstr "返回显式选定的连续定时器端口。"
-
-msgid "Kernel tickless hook with measured phase preservation."
-msgstr "保留实测相位的内核无 tick 钩子。"
-
-msgid "Stopped-tick epoch with the concrete port's declared precision."
-msgstr "tick 停止 epoch，精度以具体端口声明为准。"
-
-msgid "Caller-owned, immutable tickless timer implementation."
-msgstr "调用者拥有的不可变无 tick 定时器实现。"
-
-msgid "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler suspended. They are bounded, never block or call kernel functions. pause_tick atomically stops the periodic tick and snapshots elapsed phase in its current tick period; a pending tick is rejected without effects. SUCCESS borrows the timer until resume_tick. now_us is the same monotonic clock as snapshot, continuous during shallow sleep. arm_deadline programs an enabled IRQ wake source; rejection retains no alarm. disarm removes only that alarm. resume_tick restores the periodic source with its next expiry at the supplied absolute clock instant, preserving phase within its declared quantization and sampling bound rather than adding callback latency to every tick. It must not publish an already accounted tick. The alarm wakes by deadline; at most eight extra ticks of latency may be caught up. Reversed clocks or larger latency fail stop. This does not configure clocks, NVIC, SCR or a board timer."
-msgstr "全部方法在特权 Idle Thread 模式、PRIMASK=1 且调度器挂起时运行。方法必须有界，不阻塞、不调用内核函数。pause_tick 以原子方式停止周期 tick，并快照当前 tick 周期已经过的相位；若有 pending tick，则无效果地拒绝。SUCCESS 开始借用定时器，直到 resume_tick。now_us 必须与 snapshot 使用同一单调时钟，并在浅睡眠期间连续运行。arm_deadline 配置已启用的 IRQ 唤醒源；拒绝时不得保留闹钟。disarm 仅撤销该闹钟。resume_tick 恢复周期源，下一次到期必须位于所供给的绝对时钟时刻；在已声明量化和采样边界内保持相位，而不是给每个 tick 累加回调延迟。不得发布已经计入的 tick。闹钟必须不晚于截止时间唤醒；至多允许追赶八个额外 tick 的延迟。时钟倒退或更大延迟必须故障停止。本接口不配置时钟、NVIC、SCR 或板级定时器。"
-
-msgid "native.h"
-msgstr "native.h"
-
-msgid "Explicit POSIX notification, queue and task storage."
-msgstr "显式 POSIX 通知、队列与任务存储。"
-
-msgid "Read POSIX monotonic microseconds."
-msgstr "读取 POSIX 单调微秒时间。"
-
-msgid "Initialize a notification in unused caller storage."
-msgstr "在调用者尚未使用的存储中初始化通知。"
-
-msgid "Bind a single-waiter latched notification port."
-msgstr "绑定单等待者的序列锁存通知端口。"
-
-msgid "Destroy after external publisher quiescence."
-msgstr "外部发布者静止后再销毁。"
-
-msgid "Initialize an explicit bounded byte-copy queue."
-msgstr "初始化显式、有界的字节复制队列。"
-
-msgid "Copy one item to the queue."
-msgstr "向队列复制一个条目。"
-
-msgid "Receive one item; closed queues can still be drained."
-msgstr "接收一个条目；关闭的队列仍可排空。"
-
-msgid "Reject sends and wake all waiting callers."
-msgstr "拒绝发送，并唤醒全部正在等待的调用者。"
-
-msgid "Destroy quiesced and drained queue storage."
-msgstr "销毁已静止且已排空的队列存储。"
-
-msgid "Start a task using the supplied host stack."
-msgstr "使用供给的主机栈启动任务。"
-
-msgid "Join after requesting cooperative application stop."
-msgstr "请求应用协作停止之后执行 join。"
-
-msgid "Single waiter, multiple task publishers; fields are private."
-msgstr "单等待者、多个 Task 发布者；字段为私有状态。"
-
-msgid "Caller-sized queue storage; no heap or global object pool."
-msgstr "由调用者确定容量的队列存储，不使用堆或全局对象池。"
-
-msgid "Explicit task handle; stack storage is supplied at start."
-msgstr "显式任务句柄；启动时供给栈存储。"
-
-msgid "secure_context.h"
-msgstr "secure_context.h"
-
-msgid "Caller-owned Secure context leases for a trusted NS kernel."
-msgstr "供可信 NS 内核使用的调用者自有 Secure 上下文租约。"
-
-msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
-msgstr "最小上下文容量不包含八字节 ARM 栈封印。"
-
-msgid "Secure-context integrity failures, distinct from normal rejection."
-msgstr "Secure 上下文完整性失败，与普通拒绝区分。"
-
-msgid "Prepare exact Secure storage for one trusted task identity."
-msgstr "为一个可信任务身份准备准确 Secure 存储。"
-
-msgid "Rebind retired metadata while preserving its epoch history."
-msgstr "在保留 epoch 历史的前提下重新绑定已退役元数据。"
-
-msgid "Resolve a trusted, statically composed Secure task record."
-msgstr "解析可信、静态组合的 Secure 任务记录。"
-
-msgid "Fail stop after a loaded Secure stack integrity failure."
-msgstr "已加载 Secure 栈发生完整性失败后执行故障停止。"
-
-msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
-msgstr "显式 Secure 元数据，绝不存放于 Nonsecure RAM。"
-
-msgid "threadx.h"
-msgstr "threadx.h"
-
-msgid "Caller-owned ThreadX task, wait and byte queue services."
-msgstr "调用者拥有的 ThreadX 任务、等待和字节队列服务。"
-
-msgid "One explicit caller latch per simultaneous close-aware operation."
-msgstr "每个同时执行的关闭感知操作都显式拥有一个调用者锁存器。"
-
-msgid "Explicit irreversible kernel entry owned by the product."
-msgstr "由产品拥有的显式、不可逆内核入口。"
-
-msgid "Product failure hook; default parks forever."
-msgstr "产品失败钩子；默认永久停驻。"
-
-msgid "Mandatory product hook only for explicit external Tick."
-msgstr "仅显式外部 Tick 模式要求的产品钩子。"
-
-msgid "Read-only configurable-IRQ and selected mask-policy gate."
-msgstr "只读的可配置 IRQ 与选定屏蔽策略检查。"
-
-msgid "Initialize one binary latch in task or actual bootstrap."
-msgstr "在任务或真实 bootstrap 上下文初始化一个二值锁存器。"
-
-msgid "Bind a sequence hint and one concurrent blocking waiter."
-msgstr "绑定序列提示和一个并发阻塞等待者。"
-
-msgid "Destroy only after all publishers and waiter quiesce."
-msgstr "全部发布者和等待者静止后才允许销毁。"
-
-msgid "Create a cooperatively returning task using exact storage."
-msgstr "使用准确存储创建可协作返回的任务。"
-
-msgid "Join a cooperatively returned task and prove detachment."
-msgstr "对协作返回的任务执行 join，并证明引用已撤离。"
-
-msgid "Discard an unused task only inside actual bootstrap."
-msgstr "仅在真实 bootstrap 内丢弃尚未使用的任务。"
-
-msgid "Start a permanent task without a completion latch."
-msgstr "启动不含完成锁存器的永久任务。"
-
-msgid "Initialize an exact arbitrary-byte bounded queue."
-msgstr "初始化支持准确任意字节条目的有界队列。"
-
-msgid "Task-only send; immediate readiness wins over expiration."
-msgstr "仅 Task 发送；立即就绪优先于截止到期。"
-
-msgid "Task-only receive; output changes only on SUCCESS."
-msgstr "仅 Task 接收；只在 SUCCESS 时修改输出。"
-
-msgid "Destroy a drained queue after every caller quiesces."
-msgstr "每个调用者静止后，销毁已排空队列。"
-
-msgid "Initialize one explicit close-aware operation latch."
-msgstr "初始化一个显式关闭感知操作锁存器。"
-
-msgid "Destroy inactive waiter after its operation has returned."
-msgstr "等待者操作返回后，销毁其非活动存储。"
-
-msgid "Add explicit bounded close broadcast to a byte queue."
-msgstr "向字节队列加入显式、有界的关闭广播。"
-
-msgid "Reject sends, wake registered waiters, retain queued items."
-msgstr "拒绝发送、唤醒已登记等待者、保留已入队条目。"
-
-msgid "Send with immediate close wake and explicit admission."
-msgstr "发送时提供立即关闭唤醒与显式准入。"
-
-msgid "Receive and drain previously queued items after close."
-msgstr "关闭后接收并排空此前已入队的条目。"
-
-msgid "Destroy only a closed, drained and quiesced queue."
-msgstr "仅销毁已关闭、已排空且静止的队列。"
-
-msgid "One binary latch; publishers quiesce before destruction."
-msgstr "一个二值锁存器；销毁之前发布者必须静止。"
-
-msgid "Returning task retains all storage until external successful join."
-msgstr "返回型任务保留全部存储，直到外部成功 join。"
-
-msgid "Permanent task has no completion latch, join or destroy."
-msgstr "永久任务不含完成锁存器、join 或 destroy。"
-
-msgid "Exact arbitrary byte items; no native word-size narrowing."
-msgstr "准确的任意字节条目，不缩减为原生字尺寸。"
-
-msgid "Optional bounded close broadcast; registry is task-only."
-msgstr "可选、有界关闭广播；登记仅在 Task 上下文执行。"
-
-msgid "tick.h"
-msgstr "tick.h"
-
-msgid "Explicit external Tick and diagnostic counter contracts."
-msgstr "显式外部 Tick 与诊断计数器合同。"
-
-msgid "Configure the application's selected kernel Tick source."
-msgstr "配置应用选定的内核 Tick 源。"
-
-msgid "Start the explicitly selected diagnostic counter."
-msgstr "启动显式选定的诊断计数器。"
-
-msgid "Read the diagnostic counter without blocking."
-msgstr "无阻塞地读取诊断计数器。"
-
-msgid "wait.h"
-msgstr "wait.h"
-
-msgid "Optional sequence-latched waiting without hidden workers."
-msgstr "可选的序列锁存等待，不含隐藏执行任务。"
-
-msgid "Wait for an authoritative caller predicate."
-msgstr "等待调用者的权威谓词。"
-
-msgid "Single-waiter notification port."
-msgstr "单等待者通知端口。"
-
-msgid "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
-msgstr "调用者拥有存储，并串行执行 arm/wait。各后端文档规定的上下文允许多个唤醒发布者。序列只是提示；谓词／请求才是权威依据。arm 与重新检查之间的唤醒次数必须少于 2^32。所有截止时间均为后端时钟域内的绝对单调微秒时间；NX_DEADLINE_NEVER 显式禁用超时。时钟必须在等待期间连续运行且不得改变时间域；应使用 nx_deadline_after 构造相对预算，避免溢出。超时不会使请求结清或释放缓冲区。销毁前，必须停止并 join 每个发布者和等待者；仅有 SETTLED 不能证明通知存储可回收。arm 快照序列；wait 必须原子地观察序列变化或已锁存唤醒，包括调用者再次检查与睡眠之间发生的唤醒。序列变化不能绕过有限截止时间：wait 在每次调用以及每次从阻塞返回后，都先检查到期，再报告提示。未到期时，非阻塞后端可以返回 BUSY。仅一个所有者可以执行 arm/wait；即使后端会拒绝第二个并发等待，其行为仍位于端口合同之外。"
-
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-msgid "Startup context; not a task/queue emulation. Word publication uses the reviewed inline compiler/CPU port."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Functions"
+msgstr "函数"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid "Initialize storage before exposing it to any ISR."
+msgstr "向任何 ISR 暴露存储之前先初始化。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid ""
+"Startup context; not a task/queue emulation. Word publication uses the "
+"reviewed inline compiler/CPU port."
 msgstr "启动上下文；不模拟任务或队列。字发布使用经审查的内联编译器／CPU 端口。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "[out] Unused caller-owned storage"
 msgstr "[out] 尚未使用、由调用者拥有的存储"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "[in] Monotonic microsecond source, continuing while waiting"
 msgstr "[in] 单调微秒时间源，等待期间持续运行"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "[in] Clock source context"
 msgstr "[in] 时钟源上下文"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "NX_SUCCESS or NX_ERROR_INVALID"
 msgstr "NX_SUCCESS 或 NX_ERROR_INVALID"
 
-msgid "wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That guard requires one CPU and privileged Thread/configurable-IRQ callers; NMI/HardFault, unprivileged, DMA and other security-domain access to its metadata are unsupported. The owner loop continues to service controller/drain after BUSY. No WFI/WFE is inserted without a reviewed architecture-specific atomic sleep contract."
-msgstr "wake 使用编译器读改写（RMW），在 M0/M0+ 上则使用保存原状态的有界 PRIMASK 保护。该保护仅适用于单 CPU 上的特权 Thread／可配置 IRQ 调用者；不支持 NMI/HardFault、非特权代码、DMA 或其他安全域访问其元数据。返回 BUSY 后，所有者循环仍须继续服务控制器并推进排空。没有经过审查的架构专用原子睡眠合同，不插入 WFI/WFE。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid "Bind the explicit polling notification."
+msgstr "绑定显式轮询通知。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid ""
+"wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That "
+"guard requires one CPU and privileged Thread/configurable-IRQ callers; "
+"NMI/HardFault, unprivileged, DMA and other security-domain access to its "
+"metadata are unsupported. The owner loop continues to service "
+"controller/drain after BUSY. No WFI/WFE is inserted without a reviewed "
+"architecture-specific atomic sleep contract."
+msgstr ""
+"wake 使用编译器读改写（RMW），在 M0/M0+ 上则使用保存原状态的有界 PRIMASK 保护。该保护仅适用于单 CPU 上的特权 "
+"Thread／可配置 IRQ 调用者；不支持 NMI/HardFault、非特权代码、DMA 或其他安全域访问其元数据。返回 BUSY "
+"后，所有者循环仍须继续服务控制器并推进排空。没有经过审查的架构专用原子睡眠合同，不插入 WFI/WFE。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[in] Initialized storage"
 msgstr "[in] 已初始化的存储"
 
-msgid "Port whose wait returns BUSY while unchanged before deadline; NX_DEADLINE_NEVER disables expiry, never implies blocking"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid ""
+"Port whose wait returns BUSY while unchanged before deadline; "
+"NX_DEADLINE_NEVER disables expiry, never implies blocking"
 msgstr "等待端口：截止时间前若状态未变，wait 返回 BUSY；NX_DEADLINE_NEVER 禁用到期，不意味着阻塞"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid "Explicit nonblocking bare-metal notification storage."
+msgstr "显式、非阻塞的裸机通知存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Public Members"
+msgstr "公共成员"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:24
+msgid "diagnostic.h"
+msgstr "diagnostic.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Bounded diagnostics with explicit caller-owned ring storage."
+msgstr "使用调用者显式环形存储的有界诊断。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-11   版权  Copyright (c) 2026 Nexus "
+"Team"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
 msgid "1.0.0"
 msgstr "1.0.0"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
 msgid "2026-10-11"
 msgstr "2026-10-11"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
 msgid "Copyright (c) 2026 Nexus Team"
 msgstr "Copyright (c) 2026 Nexus Team"
 
-msgid "Startup or exclusive lifecycle owner only. Both allocations remain alive until all publishers and readers are stopped. Entries cannot alias ring state or a submitted record."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Initialize unpublished ring and caller-owned entries."
+msgstr "初始化尚未发布的环与调用者提供的条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid ""
+"Startup or exclusive lifecycle owner only. Both allocations remain alive "
+"until all publishers and readers are stopped. Entries cannot alias ring "
+"state or a submitted record."
 msgstr "仅限启动上下文或独占生命周期所有者。两块存储都必须保持存活，直到所有发布者和读取者停止。条目不得与环状态或已提交记录存在内存别名。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[out] Unused caller-owned state."
 msgstr "[out] 尚未使用、由调用者拥有的状态。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Naturally aligned contiguous entry storage."
 msgstr "[in] 自然对齐的连续条目存储。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Nonzero storage length, at most UINT32_MAX."
 msgstr "[in] 非零存储长度，至多为 UINT32_MAX。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS or INVALID without modifying storage on rejection."
 msgstr "SUCCESS 或 INVALID；拒绝时不修改存储。"
 
-msgid "Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, unprivileged, SMP, DMA and other security worlds are excluded. Full rings retain older records and saturate the lost-record counter. No clock callback, OS operation, heap, string formatting or transport is used."
-msgstr "仅适用于单 CPU 上的特权 Thread／可配置 IRQ。排除 NMI/HardFault、非特权代码、SMP、DMA 和其他安全域。环满时保留较早记录，并使丢失记录计数器饱和递增。不使用时钟回调、OS 操作、堆、字符串格式化或传输机制。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Copy one event under a bounded saved interrupt mask."
+msgstr "在有界且保存原屏蔽状态的临界区内复制一个事件。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid ""
+"Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, "
+"unprivileged, SMP, DMA and other security worlds are excluded. Full rings "
+"retain older records and saturate the lost-record counter. No clock "
+"callback, OS operation, heap, string formatting or transport is used."
+msgstr ""
+"仅适用于单 CPU 上的特权 Thread／可配置 IRQ。排除 NMI/HardFault、非特权代码、SMP、DMA "
+"和其他安全域。环满时保留较早记录，并使丢失记录计数器饱和递增。不使用时钟回调、OS 操作、堆、字符串格式化或传输机制。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[inout] Initialized ring."
 msgstr "[inout] 已初始化的环。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Stable record until this call returns."
 msgstr "[in] 保持稳定直到本次调用返回的记录。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS, BUSY when full, INVALID or CONTEXT."
 msgstr "SUCCESS、环满时的 BUSY、INVALID 或 CONTEXT。"
 
-msgid "Same privileged single-CPU domain as write. Failed reads leave destination unchanged. This is diagnostic storage, never a completion queue or application work queue."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Consume one event from caller-owned ring."
+msgstr "从调用者拥有的环中消费一个事件。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid ""
+"Same privileged single-CPU domain as write. Failed reads leave destination "
+"unchanged. This is diagnostic storage, never a completion queue or "
+"application work queue."
 msgstr "与 write 使用相同的特权单 CPU 域。读取失败时目标保持不变。这是诊断存储，不能用作完成队列或应用工作队列。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[inout] Initialized ring with live producers."
 msgstr "[inout] 已初始化且仍有存活生产者的环。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[out] Separate caller-owned destination."
 msgstr "[out] 调用者拥有的独立目标存储。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS, BUSY when empty, INVALID or CONTEXT."
 msgstr "SUCCESS、环空时的 BUSY、INVALID 或 CONTEXT。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Snapshot the saturating overflow count."
+msgstr "读取饱和溢出计数快照。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "Uses the same bounded saved-mask domain as record access."
 msgstr "与记录访问使用相同的有界、保存原屏蔽状态的执行域。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Initialized ring."
 msgstr "[in] 已初始化的环。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[out] Caller-owned result."
 msgstr "[out] 调用者拥有的结果存储。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS, INVALID or CONTEXT."
 msgstr "SUCCESS、INVALID 或 CONTEXT。"
 
-msgid "Running task operations require privileged unmasked Thread mode; IRQ wake has its own contract. Before scheduler start, the selected Baseline port may retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other masks must be zero. Matching a value cannot prove mask provenance. Unsafe contexts return CONTEXT before mutating kernel APIs or object storage; a scheduler-state read may be needed. Startup permits init, task creation, wake and zero-wait queues. Wait, join and nonzero waits require a running scheduler. Port binding and sequence snapshots remain reads. MPU user-task gateways and cross-world secure task calls are outside these privileged, current-security-domain APIs."
-msgstr "运行期任务操作要求特权、未屏蔽的 Thread 模式；IRQ 唤醒有独立合同。调度器启动前，选定的 Baseline 端口可保留 PRIMASK=1，Mainline 端口可保留其准确的系统调用 BASEPRI；其他屏蔽值都必须为零。数值匹配不能证明屏蔽状态的来源。不安全的上下文会在修改内核 API 状态或对象存储之前返回 CONTEXT；可能需要读取调度器状态。启动阶段允许初始化、创建任务、唤醒和零等待队列操作。wait、join 和非零等待要求调度器正在运行。端口绑定和序列快照始终只读。MPU 用户任务网关及跨安全域的 Secure 任务调用不属于这些特权、当前安全域 API 的范围。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "One opaque diagnostic record; interpretation belongs to its owner."
+msgstr "一个不透明诊断记录；解释责任属于其所有者。"
 
-msgid "Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-owned exceptions are rejected before entering FreeRTOS. Mainline priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports accept every configurable IRQ and do not read Mainline priority grouping. Nonsecure permission does not exclude Secure-side accesses."
-msgstr "Native POSIX 没有物理 IRQ，返回 false。NMI、故障和内核拥有的异常会在进入 FreeRTOS 前被拒绝。Mainline 的优先级／分组必须遵守系统调用优先级上限。Baseline PRIMASK 端口接受所有可配置 IRQ，不读取 Mainline 优先级分组。Nonsecure 侧权限不排除 Secure 侧访问。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Explicit ring state, with no default pool, worker or transport."
+msgstr "显式环状态，不提供默认池、执行任务或传输机制。"
 
-msgid "True for a privileged unmasked external Cortex-M IRQ within the selected CPU/SoC bounds and kernel mask contract"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:32
+msgid "freertos.h"
+msgstr "freertos.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Per-object static FreeRTOS storage and optional thin services."
+msgstr "每对象静态 FreeRTOS 存储与可选轻量服务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Running task operations require privileged unmasked Thread mode; IRQ wake "
+"has its own contract. Before scheduler start, the selected Baseline port may"
+" retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other "
+"masks must be zero. Matching a value cannot prove mask provenance. Unsafe "
+"contexts return CONTEXT before mutating kernel APIs or object storage; a "
+"scheduler-state read may be needed. Startup permits init, task creation, "
+"wake and zero-wait queues. Wait, join and nonzero waits require a running "
+"scheduler. Port binding and sequence snapshots remain reads. MPU user-task "
+"gateways and cross-world secure task calls are outside these privileged, "
+"current-security-domain APIs."
+msgstr ""
+"运行期任务操作要求特权、未屏蔽的 Thread 模式；IRQ 唤醒有独立合同。调度器启动前，选定的 Baseline 端口可保留 "
+"PRIMASK=1，Mainline 端口可保留其准确的系统调用 "
+"BASEPRI；其他屏蔽值都必须为零。数值匹配不能证明屏蔽状态的来源。不安全的上下文会在修改内核 API 状态或对象存储之前返回 "
+"CONTEXT；可能需要读取调度器状态。启动阶段允许初始化、创建任务、唤醒和零等待队列操作。wait、join "
+"和非零等待要求调度器正在运行。端口绑定和序列快照始终只读。MPU 用户任务网关及跨安全域的 Secure 任务调用不属于这些特权、当前安全域 API "
+"的范围。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Typedefs"
+msgstr "类型定义"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Caller-owned single-operation latch for a closable queue."
+msgstr "调用者拥有的单操作锁存器，用于可关闭队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Test whether the current context may call kernel ISR APIs."
+msgstr "检查当前上下文是否允许调用内核 ISR API。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-"
+"owned exceptions are rejected before entering FreeRTOS. Mainline "
+"priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports "
+"accept every configurable IRQ and do not read Mainline priority grouping. "
+"Nonsecure permission does not exclude Secure-side accesses."
+msgstr ""
+"Native POSIX 没有物理 IRQ，返回 false。NMI、故障和内核拥有的异常会在进入 FreeRTOS 前被拒绝。Mainline "
+"的优先级／分组必须遵守系统调用优先级上限。Baseline PRIMASK 端口接受所有可配置 IRQ，不读取 Mainline "
+"优先级分组。Nonsecure 侧权限不排除 Secure 侧访问。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"True for a privileged unmasked external Cortex-M IRQ within the selected "
+"CPU/SoC bounds and kernel mask contract"
 msgstr "仅当当前为特权、未屏蔽的外部 Cortex-M IRQ，且符合选定 CPU／SoC 边界及内核屏蔽合同，才返回 true"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Initialize unused notification storage."
+msgstr "初始化尚未使用的通知存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Task/startup context; no heap or timer daemon is needed."
 msgstr "任务／启动上下文；不需要堆或定时器守护任务。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Caller storage, zeroed before first use"
 msgstr "[out] 调用者提供的存储，首次使用前清零"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS or invalid/context/initialization error"
 msgstr "SUCCESS 或无效参数／上下文／初始化错误"
 
-msgid "Task wake uses xSemaphoreGive. IRQ wake validates priority then uses xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request predicates remain authoritative. No deferred daemon publishes wakes."
-msgstr "任务唤醒使用 xSemaphoreGive。IRQ 唤醒先验证优先级，再使用 xSemaphoreGiveFromISR。锁存器饱和无害；序列和请求谓词仍是权威依据。不通过延迟守护任务发布唤醒。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Bind a latched single-waiter notification."
+msgstr "绑定序列锁存、单等待者通知。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task wake uses xSemaphoreGive. IRQ wake validates priority then uses "
+"xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request "
+"predicates remain authoritative. No deferred daemon publishes wakes."
+msgstr ""
+"任务唤醒使用 xSemaphoreGive。IRQ 唤醒先验证优先级，再使用 "
+"xSemaphoreGiveFromISR。锁存器饱和无害；序列和请求谓词仍是权威依据。不通过延迟守护任务发布唤醒。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Initialized live storage"
 msgstr "[in] 已初始化且存活的存储"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Notification port using nx_time_now_us clock domain"
 msgstr "使用 nx_time_now_us 时钟域的通知端口"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy after publishers and waiter have stopped and joined."
+msgstr "发布者和等待者均停止并完成 join 后再销毁。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Task context. Quiescence is required beyond this busy check."
 msgstr "任务上下文。除了本项 busy 检查，还必须确保所有使用者静止。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live storage with no future users"
 msgstr "[inout] 存活存储，之后不再有使用者"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY if a waiter is still registered, or error"
 msgstr "SUCCESS、仍有等待者登记时的 BUSY，或错误"
 
-msgid "Task/startup context. No hidden worker or maximum pool. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
-msgstr "任务／启动上下文。没有隐藏执行任务或池容量上限。入口返回时必须处于特权 Thread 模式，已恢复手动设置的中断屏蔽，并在任何临时挂起后恢复调度器。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Create one task from its exact caller-owned stack and TCB."
+msgstr "使用调用者提供的准确栈和 TCB 创建一个任务。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task/startup context. No hidden worker or maximum pool. Entry must return in"
+" privileged Thread mode, with manual interrupt masks restored and the "
+"scheduler resumed after any temporary suspension."
+msgstr ""
+"任务／启动上下文。没有隐藏执行任务或池容量上限。入口返回时必须处于特权 Thread 模式，已恢复手动设置的中断屏蔽，并在任何临时挂起后恢复调度器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zero-initialized unused control storage"
 msgstr "[out] 已清零且尚未使用的控制存储"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Kernel diagnostic name, copied by the kernel"
 msgstr "[in] 内核诊断名称，由内核复制"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] StackType_t array kept until successful join"
 msgstr "[in] 保留直到成功 join 的 StackType_t 数组"
 
-msgid "[in] Actual capacity, at least the selected port startup minimum; runtime stack budget remains caller-owned"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"[in] Actual capacity, at least the selected port startup minimum; runtime "
+"stack budget remains caller-owned"
 msgstr "[in] 实际容量，至少满足选定端口的启动最小值；运行期栈预算仍由调用者负责"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Priority below configMAX_PRIORITIES"
 msgstr "[in] 小于 configMAX_PRIORITIES 的优先级"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Application entry, may return after cooperative stop"
 msgstr "[in] 应用入口，可在协作停止后返回"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Entry context kept until join"
 msgstr "[in] 保留直到 join 的入口上下文"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS or invalid/context/start error"
 msgstr "SUCCESS 或无效参数／上下文／启动错误"
 
-msgid "Single privileged startup lifecycle owner; scheduler state must be NOT_STARTED. The kernel candidate is first suspended to remove its retained TCB reference before deletion. No unmatched vTaskSuspendAll may remain during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension nesting. This caller precondition applies before mutation. Success permits TCB, stack and context reuse after all external users are quiescent. This does not cancel or join an executed task."
-msgstr "仅限一个特权启动生命周期所有者；调度器状态必须为 NOT_STARTED。内核候选任务先被挂起，以在删除前移除内核保留的 TCB 引用。bootstrap 期间不得遗留未配对的 vTaskSuspendAll：NOT_STARTED 无法揭示内核私有的挂起嵌套层数。该调用者前置条件必须在修改前满足。成功后，只有在所有外部使用者均静止时，才允许复用 TCB、栈和上下文。这不会取消或 join 已执行的任务。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Discard one created task before its wrapper has executed."
+msgstr "在包装函数执行之前，丢弃一个已创建的任务。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Single privileged startup lifecycle owner; scheduler state must be "
+"NOT_STARTED. The kernel candidate is first suspended to remove its retained "
+"TCB reference before deletion. No unmatched vTaskSuspendAll may remain "
+"during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension "
+"nesting. This caller precondition applies before mutation. Success permits "
+"TCB, stack and context reuse after all external users are quiescent. This "
+"does not cancel or join an executed task."
+msgstr ""
+"仅限一个特权启动生命周期所有者；调度器状态必须为 NOT_STARTED。内核候选任务先被挂起，以在删除前移除内核保留的 TCB "
+"引用。bootstrap 期间不得遗留未配对的 vTaskSuspendAll：NOT_STARTED "
+"无法揭示内核私有的挂起嵌套层数。该调用者前置条件必须在修改前满足。成功后，只有在所有外部使用者均静止时，才允许复用 TCB、栈和上下文。这不会取消或 "
+"join 已执行的任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live caller-owned static task, unused by other callers"
 msgstr "[inout] 存活、由调用者拥有且未被其他调用者使用的静态任务"
 
-msgid "SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for absent, incomplete or already entered control; CONTEXT for ISR, unprivileged, noncanonical masks or a running/suspended scheduler, without mutation"
-msgstr "仅在同步内核删除及锁存器清理完成后返回 SUCCESS；控制状态不存在、不完整或已经进入执行时返回 INVALID；ISR、非特权、非规范屏蔽状态或调度器正在运行／挂起时返回 CONTEXT，且不修改状态"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for "
+"absent, incomplete or already entered control; CONTEXT for ISR, "
+"unprivileged, noncanonical masks or a running/suspended scheduler, without "
+"mutation"
+msgstr ""
+"仅在同步内核删除及锁存器清理完成后返回 SUCCESS；控制状态不存在、不完整或已经进入执行时返回 "
+"INVALID；ISR、非特权、非规范屏蔽状态或调度器正在运行／挂起时返回 CONTEXT，且不修改状态"
 
-msgid "Single joiner, task context. The entry return parks its wrapper; no self-delete/idle cleanup race releases caller storage early. Stop producers, keep bus owner draining, join producers, then join owner."
-msgstr "单个 join 调用者，任务上下文。入口返回后停驻于包装函数；不会因自删除／Idle 清理竞态而提前释放调用者存储。先停止生产者，保持总线所有者推进排空，join 生产者，再 join 所有者。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Join a cooperatively returned task and reclaim kernel state."
+msgstr "对协作返回的任务执行 join，并回收内核状态。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Single joiner, task context. The entry return parks its wrapper; no self-"
+"delete/idle cleanup race releases caller storage early. Stop producers, keep"
+" bus owner draining, join producers, then join owner."
+msgstr ""
+"单个 join 调用者，任务上下文。入口返回后停驻于包装函数；不会因自删除／Idle "
+"清理竞态而提前释放调用者存储。先停止生产者，保持总线所有者推进排空，join 生产者，再 join 所有者。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Started task, distinct from current task"
 msgstr "[inout] 已启动且不是当前任务的任务"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Absolute wait deadline in nx_time_now_us domain"
 msgstr "[in] nx_time_now_us 域内的绝对等待截止时间"
 
-msgid "SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-join or stopped scheduler"
-msgstr "仅当外部 vTaskDelete 已移除任务后返回 SUCCESS；TIMEOUT 保留句柄、TCB、栈和上下文；CONTEXT 拒绝不安全的 CPU 上下文、自 join 或已停止的调度器"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains "
+"handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-"
+"join or stopped scheduler"
+msgstr ""
+"仅当外部 vTaskDelete 已移除任务后返回 SUCCESS；TIMEOUT 保留句柄、TCB、栈和上下文；CONTEXT 拒绝不安全的 CPU "
+"上下文、自 join 或已停止的调度器"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Create an exact-sized static byte-copy queue."
+msgstr "创建准确容量的静态字节复制队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zero-initialized caller queue control"
 msgstr "[out] 已清零的调用者队列控制存储"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Byte buffer kept until destroy"
 msgstr "[in] 保留直到 destroy 的字节缓冲区"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[in] Actual byte capacity"
 msgstr "[in] 实际字节容量"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Number of items"
 msgstr "[in] 条目数量"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Bytes copied per item"
 msgstr "[in] 每个条目复制的字节数"
 
-msgid "Task context. Admission/stop belongs to the application's explicit owner adapter, not this generic copy queue."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Copy an item with a bounded relative kernel wait."
+msgstr "在有界内核相对等待内复制一个条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task context. Admission/stop belongs to the application's explicit owner "
+"adapter, not this generic copy queue."
 msgstr "任务上下文。准入／停止由应用显式所有者适配器负责，不属于此通用复制队列。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[inout] Live queue"
 msgstr "[inout] 存活队列"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] At least configured item bytes; not retained afterward"
 msgstr "[in] 至少为已配置条目字节数；返回后不再保留"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Explicit relative wait; portMAX_DELAY prohibited"
 msgstr "[in] 显式相对等待；禁止 portMAX_DELAY"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, TIMEOUT, INVALID or CONTEXT"
 msgstr "SUCCESS、TIMEOUT、INVALID 或 CONTEXT"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Receive one byte-copy item."
+msgstr "接收一个字节复制条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Configured item byte capacity, valid only on success"
 msgstr "[out] 已配置的条目字节容量，仅在成功时有效"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy after admission is stopped and all users joined."
+msgstr "准入已停止且全部使用者完成 join 后再销毁。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live drained queue, no future operations"
 msgstr "[inout] 存活且已排空的队列，之后不再有操作"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY while users/items remain, or invalid/context"
 msgstr "SUCCESS、仍有使用者／条目时的 BUSY，或无效参数／上下文错误"
 
-msgid "Immediate readiness wins over expiration. Stop admission and user quiescence remain external raw-queue obligations."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Send using one absolute monotonic deadline."
+msgstr "使用一个绝对单调截止时间发送。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Immediate readiness wins over expiration. Stop admission and user quiescence"
+" remain external raw-queue obligations."
 msgstr "立即就绪优先于截止到期。停止准入和使用者静止仍是外部对原始队列必须履行的责任。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live raw queue"
 msgstr "[inout] 存活的原始队列"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Configured bytes borrowed until return"
 msgstr "[in] 已配置数量的字节，借用直到返回"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] nx_time_now_us domain, NEVER permits long waits"
 msgstr "[in] nx_time_now_us 域；NEVER 允许长时间等待"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, TIMEOUT or validation/context error"
 msgstr "SUCCESS、TIMEOUT 或验证／上下文错误"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Receive using one absolute monotonic deadline."
+msgstr "使用一个绝对单调截止时间接收。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Configured bytes valid only on SUCCESS"
 msgstr "[out] 已配置数量的字节，仅在 SUCCESS 时有效"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] nx_time_now_us domain"
 msgstr "[in] nx_time_now_us 域"
 
-msgid "Caller ensures slot exclusivity. No global slot registry, allocation, slot discovery or cross-world synchronization."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Bind an exclusive slot of one live receiver task."
+msgstr "绑定一个存活接收任务的独占通知槽。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Caller ensures slot exclusivity. No global slot registry, allocation, slot "
+"discovery or cross-world synchronization."
 msgstr "调用者确保通知槽独占。不提供全局槽注册表、分配、槽发现或跨安全域同步。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed caller storage"
 msgstr "[out] 已清零的调用者存储"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Task retained until all publishers quiesce"
 msgstr "[in] 保留直到所有发布者静止的任务"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Exclusively owned kernel notification slot"
 msgstr "[in] 独占拥有的内核通知槽"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED by OS profile"
 msgstr "SUCCESS、INVALID、CONTEXT，或 OS profile 不支持时的 UNSUPPORTED"
 
-msgid "Only receiver may wait. Task/validated IRQ publishers use the exclusive slot; notification remains a predicate hint."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Get a direct notification wait port."
+msgstr "取得直接任务通知的等待端口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Only receiver may wait. Task/validated IRQ publishers use the exclusive "
+"slot; notification remains a predicate hint."
 msgstr "仅接收者可以等待。任务／已验证 IRQ 发布者使用独占槽；通知仍只是谓词提示。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Live explicitly bound storage"
 msgstr "[in] 存活且已显式绑定的存储"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Port using nx_time_now_us or an invalid zero port"
 msgstr "使用 nx_time_now_us 的端口，或无效的零端口"
 
-msgid "Does not delete receiver or clear its kernel slot. Receiver and storage must outlive every retained port and publisher."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Unbind after all publishers stop and join."
+msgstr "全部发布者停止并完成 join 后解除绑定。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Does not delete receiver or clear its kernel slot. Receiver and storage must"
+" outlive every retained port and publisher."
 msgstr "不删除接收者，也不清除其内核槽。接收者和存储必须比每个保留的端口及发布者存活更久。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY if waiting, or validation/context error"
 msgstr "SUCCESS、正在等待时的 BUSY，或验证／上下文错误"
 
-msgid "No join latch, destroy or forced deletion. Choose joinable tasks for cooperative shutdown and reclaimable storage."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Start a task whose entry must never return."
+msgstr "启动入口函数绝不允许返回的任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"No join latch, destroy or forced deletion. Choose joinable tasks for "
+"cooperative shutdown and reclaimable storage."
 msgstr "不提供 join 锁存器、destroy 或强制删除。需要协作关闭和可回收存储时，应选择可 join 的任务。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed permanent control, retained until reset"
 msgstr "[out] 已清零的永久控制存储，保留直到复位"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Copied kernel diagnostic name"
 msgstr "[in] 由内核复制的诊断名称"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Aligned actual stack retained until reset"
 msgstr "[in] 已对齐的实际栈，保留直到复位"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Capacity includes reviewed startup minimum"
 msgstr "[in] 包含已审查启动最小值的容量"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Below configMAX_PRIORITIES"
 msgstr "[in] 小于 configMAX_PRIORITIES"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Permanent entry; return violates kernel contract"
 msgstr "[in] 永久入口；返回将违反内核合同"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Retained until reset"
 msgstr "[in] 保留直到复位"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS or validation/context/start error"
 msgstr "SUCCESS 或验证／上下文／启动错误"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Initialize one exact caller-owned queue waiter."
+msgstr "初始化调用者提供的准确队列等待者存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed storage, one simultaneous operation maximum"
 msgstr "[out] 已清零的存储，最多同时执行一个操作"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy only after all operations stop and join."
+msgstr "全部操作停止并完成 join 后才允许销毁。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live storage without future callers"
 msgstr "[inout] 存活存储，之后不再有调用者"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY if active, or validation/context error"
 msgstr "SUCCESS、活动时的 BUSY，或验证／上下文错误"
 
-msgid "No hidden worker or waiter pool. Each concurrent blocking operation supplies its own initialized waiter. Broadcasting pauses scheduling while visiting at most maximum_waiters latches. Kernel payload copies and each latch signal have their own short IRQ guards. Budget scheduling delay and IRQ latency separately. Large payloads should queue stable handles. The registry is single-core and task-only."
-msgstr "没有隐藏执行任务或等待者池。每个并发阻塞操作都提供自己的已初始化等待者。广播在访问至多 maximum_waiters 个锁存器期间暂停调度。内核载荷复制和每次锁存器信号各自使用短 IRQ 保护。调度延迟和 IRQ 延迟须分别预算。大载荷应通过队列传递稳定句柄。登记机制仅适用于单核和任务上下文。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Initialize an optional reliably closable byte-copy queue."
+msgstr "初始化可选、能可靠关闭的字节复制队列。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"No hidden worker or waiter pool. Each concurrent blocking operation supplies"
+" its own initialized waiter. Broadcasting pauses scheduling while visiting "
+"at most maximum_waiters latches. Kernel payload copies and each latch signal"
+" have their own short IRQ guards. Budget scheduling delay and IRQ latency "
+"separately. Large payloads should queue stable handles. The registry is "
+"single-core and task-only."
+msgstr ""
+"没有隐藏执行任务或等待者池。每个并发阻塞操作都提供自己的已初始化等待者。广播在访问至多 maximum_waiters "
+"个锁存器期间暂停调度。内核载荷复制和每次锁存器信号各自使用短 IRQ 保护。调度延迟和 IRQ "
+"延迟须分别预算。大载荷应通过队列传递稳定句柄。登记机制仅适用于单核和任务上下文。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed control kept until destroy"
 msgstr "[out] 已清零的控制存储，保留直到 destroy"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Payload buffer kept until destroy"
 msgstr "[in] 载荷缓冲区，保留直到 destroy"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Actual payload capacity"
 msgstr "[in] 实际载荷容量"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Positive item count"
 msgstr "[in] 正数条目数量"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Positive byte-copy size"
 msgstr "[in] 正数的字节复制大小"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Explicit positive simultaneous-call budget"
 msgstr "[in] 显式、正数的同时调用预算"
 
-msgid "Readiness/admission and close serialize in a kernel task scheduling guard. A latched wake closes wake-before-sleep."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Send with close-aware admission and absolute deadline."
+msgstr "发送时执行关闭感知准入，并采用绝对截止时间。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Readiness/admission and close serialize in a kernel task scheduling guard. A"
+" latched wake closes wake-before-sleep."
 msgstr "就绪／准入与 close 在内核任务调度保护内串行化。锁存唤醒消除先唤醒、后睡眠的竞态。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live closable queue"
 msgstr "[inout] 存活的可关闭队列"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Bytes borrowed until return, never after timeout"
 msgstr "[in] 借用直到返回的字节，超时后绝不保留"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] nx_time_now_us domain, NEVER supported"
 msgstr "[in] nx_time_now_us 域，支持 NEVER"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Exclusive initialized caller waiter"
 msgstr "[inout] 调用者独占、已初始化的等待者"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
 msgstr "SUCCESS、关闭后的 CANCELLED、TIMEOUT、BUSY 或错误"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Receive existing items after close, then CANCELLED."
+msgstr "关闭后仍接收已有条目，排空后返回 CANCELLED。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, CANCELLED when closed/empty, TIMEOUT or error"
 msgstr "SUCCESS、已关闭且为空时的 CANCELLED、TIMEOUT 或错误"
 
-msgid "Task-only, no forced cancellation or task deletion. Close does not join users or authorize storage reclamation."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Stop sends and wake every currently registered waiter."
+msgstr "停止发送，并唤醒当前登记的全部等待者。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task-only, no forced cancellation or task deletion. Close does not join "
+"users or authorize storage reclamation."
 msgstr "仅限任务上下文，不提供强制取消或任务删除。close 不会 join 使用者，也不授权回收存储。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, including repeated close, or validation/context"
 msgstr "SUCCESS（包括重复 close），或验证／上下文错误"
 
-msgid "Stop/join producers, drain with owner, join consumers and then destroy queue and every waiter independently."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy a closed, drained and quiesced queue."
+msgstr "销毁已关闭、已排空且静止的队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Stop/join producers, drain with owner, join consumers and then destroy queue"
+" and every waiter independently."
 msgstr "停止并 join 生产者，由所有者排空，join 消费者，然后分别销毁队列和每个等待者。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live queue without future entrants"
 msgstr "[inout] 存活队列，之后不再有调用者进入"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY while open/users/items remain, or error"
 msgstr "SUCCESS、尚未关闭／仍有使用者／仍有条目时的 BUSY，或错误"
 
-msgid "Control fields are adapter-owned. The caller zero-initializes storage before first use and does not modify live fields. Entry is consumed as the wrapper begins execution; context remains borrowed until successful join or prestart discard."
-msgstr "控制字段由适配器拥有。调用者在首次使用前将存储清零，不得修改存活字段。包装函数开始执行时即消耗入口；上下文继续被借用，直到成功 join 或启动前 discard。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Static binary latch; one waiter, independently quiesced publishers."
+msgstr "静态二值锁存器；一个等待者，发布者分别停止并排空。"
 
-msgid "Application may override the weak no-op and write an explicit nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so never block, allocate, format, transmit, acquire OS locks or call kernel services. The sink owns timestamp and lifetime; no buffer is provided automatically. Trace profile enables real kernel hooks."
-msgstr "应用可覆盖弱空操作，并写入显式 nx_diagnostic_ring_t。可能在内核屏蔽状态或可配置 IRQ 下运行，因此绝不能阻塞、分配、格式化、传输、取得 OS 锁或调用内核服务。接收端负责时间戳和生命周期；不会自动提供缓冲区。trace profile 启用真实内核钩子。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Task has its own TCB; stack is supplied with its actual word count."
+msgstr "任务拥有独立 TCB；栈以其实际字数显式供给。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Control fields are adapter-owned. The caller zero-initializes storage before"
+" first use and does not modify live fields. Entry is consumed as the wrapper"
+" begins execution; context remains borrowed until successful join or "
+"prestart discard."
+msgstr ""
+"控制字段由适配器拥有。调用者在首次使用前将存储清零，不得修改存活字段。包装函数开始执行时即消耗入口；上下文继续被借用，直到成功 join 或启动前 "
+"discard。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Queue control only; actual depth/item byte storage is external."
+msgstr "仅队列控制状态；实际深度／条目字节存储由外部提供。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Fixed receiver and exclusive kernel notification slot; no latch."
+msgstr "固定接收者及独占内核通知槽；不含锁存器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Permanent task control without a join completion semaphore."
+msgstr "永久任务控制，不含 join 完成信号量。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
+msgstr "显式选择的关闭广播；原始队列存储不变。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:40
+msgid "freertos_diagnostics.h"
+msgstr "freertos_diagnostics.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid "Bounded explicit FreeRTOS trace sink without global storage."
+msgstr "显式、有界的 FreeRTOS 跟踪接收端，不使用全局存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Enums"
+msgstr "枚举"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid ""
+"Maintained kernel trace identities; product interpretation is external."
+msgstr "维护范围内的内核跟踪身份；产品解释位于外部。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Values:"
+msgstr "取值："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid "Consume one bounded kernel trace event."
+msgstr "消费一个有界内核跟踪事件。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid ""
+"Application may override the weak no-op and write an explicit "
+"nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so "
+"never block, allocate, format, transmit, acquire OS locks or call kernel "
+"services. The sink owns timestamp and lifetime; no buffer is provided "
+"automatically. Trace profile enables real kernel hooks."
+msgstr ""
+"应用可覆盖弱空操作，并写入显式 nx_diagnostic_ring_t。可能在内核屏蔽状态或可配置 IRQ "
+"下运行，因此绝不能阻塞、分配、格式化、传输、取得 OS 锁或调用内核服务。接收端负责时间戳和生命周期；不会自动提供缓冲区。trace profile "
+"启用真实内核钩子。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
 msgid "[in] Maintained trace kind."
 msgstr "[in] 维护范围内的跟踪类别。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
 msgid "[in] Opaque task identity, never a dereference license."
 msgstr "[in] 不透明任务身份，绝不构成解引用许可。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
 msgid "[in] Optional caller-defined numeric diagnostic."
 msgstr "[in] 可选的调用者自定义数值诊断信息。"
 
-msgid "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
-msgstr "仅限特权 Thread，调度器未挂起且没有手动屏蔽。拒绝时不保留引用，不调用内核创建 API。检查实际链接器边界及 MPU_TYPE。创建容量最少为 64 个字；应用须另外预算实际执行深度。不使用堆或对象池。"
-
-msgid "[in] Validated user entry, stack and data mappings."
-msgstr "[in] 已验证的用户入口、栈和数据映射。"
-
-msgid "[inout] Owned live protected metadata; never the calling task."
-msgstr "[inout] 已拥有、存活且受保护的元数据；绝不能是调用任务本身。"
-
-msgid "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
-msgstr "入口必须是显式用户代码，且不得返回。栈和上下文数据保持被借用，直到所有者删除；区域不得包含内核 RAM、代码或 MMIO。上下文必须完整位于用户栈、用户 Flash 或已映射数据内。名称必须在可读的链接器保留区域内、在 configMAX_TASK_NAME_LEN 长度内终止；名称在冷路径复制。"
-
-msgid "Privileged unmasked running Thread; task stack quiescent throughout the scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies TCB/stack identity, not size. The original capacity is a caller contract. No task suspend, interrupt mask, allocation or live painting is performed. Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. The POSIX kernel port uses a separate pthread execution stack; its query is not an MCU or Linux execution-stack peak measurement."
-msgstr "特权、未屏蔽、正在运行的 Thread；整个扫描期间任务栈必须静止。仅在 NEXUS_OS_TRACE 下可用。xTaskGetStaticBuffers 验证 TCB／栈身份，不验证大小。原始容量属于调用者合同。不挂起任务、不屏蔽中断、不分配，也不对存活栈重新涂色。最坏工作量为读取 words*sizeof(StackType_t) 个字节。涂色值是锁定内核使用的 0xA5。未触及／已触及的字节不能证明物理栈峰值。POSIX 内核端口使用独立的 pthread 执行栈；其查询不能测得 MCU 或 Linux 执行栈峰值。"
-
-msgid "[in] Exact original TCB, stack and capacity, all live."
-msgstr "[in] 准确的原始 TCB、栈及容量，均须存活。"
-
-msgid "[out] Distinct output, unchanged on rejection."
-msgstr "[out] 独立输出，拒绝时保持不变。"
-
-msgid "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
-msgstr "SUCCESS、INVALID、CONTEXT，或绑定不匹配时的 STATE。"
-
-msgid "The caller retains all storage, excludes delete/join/discard and never replaces the live binding. This is not a registry."
-msgstr "调用者保留全部存储，排除 delete/join/discard，并且绝不替换存活绑定。这不是注册表。"
-
-msgid "Thread only with a running scheduler. No handle or pointer crosses the boundary. This is not a microsecond deadline."
-msgstr "仅限调度器正在运行的 Thread。边界两侧不传递句柄或指针。这不是微秒截止时间。"
-
-msgid "[in] Relative kernel ticks; zero requests rescheduling."
-msgstr "[in] 内核相对 tick 数；零表示请求重新调度。"
-
-msgid "Current kernel tick count in the selected OS clock domain."
-msgstr "选定 OS 时钟域内的当前内核 tick 计数。"
-
-msgid "A maintained SoC binding or application implementation overrides the weak NULL default. The port and context remain live throughout the scheduler; no runtime rebinding, hidden pool or worker is provided. Absence of a port never stops ticks or sleeps."
-msgstr "维护范围内的 SoC 绑定或应用实现覆盖弱 NULL 默认值。端口和上下文必须在调度器整个生命周期内存活；不提供运行期重新绑定、隐藏池或执行任务。没有端口时绝不停止 tick，也不进入睡眠。"
-
-msgid "Stable port or NULL to leave normal periodic ticking."
-msgstr "稳定端口，或以 NULL 保持正常周期 tick。"
-
-msgid "Called only by Idle with scheduler suspended. Uses reviewed masked shallow WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The configured tick rate must divide 1000000 exactly. The final kernel readiness check precedes tick pause; a rejected pause makes no changes. Default profiles do not call this hook. HIL must verify the concrete timer, clock continuity and actual wake latency."
-msgstr "仅由 Idle 在调度器挂起时调用。使用经过审查的屏蔽状态浅睡眠 WFI、准确恢复保存的 PRIMASK，并有界追赶待处理 tick。配置的 tick 频率必须能整除 1000000。暂停 tick 前先做最后一次内核就绪检查；暂停被拒绝时不产生修改。默认 profile 不调用此钩子。HIL 必须验证具体定时器、时钟连续性和实际唤醒延迟。"
-
-msgid "[in] Kernel's bounded next-unblock window."
-msgstr "[in] 内核给出的有界、距下一次解除阻塞的窗口。"
-
-msgid "Clock value; clock_gettime failure is process-fatal"
-msgstr "时钟值；clock_gettime 失败会导致进程终止"
-
-msgid "Task context; POSIX signal handlers are unsupported."
-msgstr "任务上下文；不支持 POSIX 信号处理函数。"
-
-msgid "[out] Storage kept alive through all publishers"
-msgstr "[out] 存储须比所有发布者存活更久"
-
-msgid "NX_SUCCESS or an initialization error"
-msgstr "NX_SUCCESS 或初始化错误"
-
-msgid "Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for untimed waiting"
-msgstr "端口使用 CLOCK_MONOTONIC 绝对微秒时间；NX_DEADLINE_NEVER 表示不设超时的等待"
-
-msgid "Stop and join publishers first. The check cannot authorize a future call to race destruction. No storage access is allowed afterward."
-msgstr "先停止并 join 发布者。本项检查不能授权未来调用与销毁竞态执行。此后不允许访问存储。"
-
-msgid "[inout] Live storage with no future publishers"
-msgstr "[inout] 存活存储，之后不再有发布者"
-
-msgid "NX_SUCCESS or BUSY when a waiter is still registered"
-msgstr "NX_SUCCESS，或仍有等待者登记时的 BUSY"
-
-msgid "Task context; caller keeps buffer until successful destroy."
-msgstr "任务上下文；调用者保留缓冲区，直到成功 destroy。"
-
-msgid "[out] Unused caller storage"
-msgstr "[out] 尚未使用的调用者存储"
-
-msgid "[in] Caller-owned byte buffer"
-msgstr "[in] 调用者拥有的字节缓冲区"
-
-msgid "[in] Number of items, greater than zero"
-msgstr "[in] 条目数量，大于零"
-
-msgid "[in] Bytes per item, greater than zero"
-msgstr "[in] 每条目字节数，大于零"
-
-msgid "NX_SUCCESS or invalid/initialization error"
-msgstr "NX_SUCCESS 或无效参数／初始化错误"
-
-msgid "Immediately available capacity is used even at an expired deadline. A finite deadline bounds waiting; spurious wakes never restart its budget. No item is retained on failure."
-msgstr "即使截止时间已到期，仍使用立即可用的容量。有限截止时间约束等待；伪唤醒绝不重新开始等待预算。失败时不保留任何条目。"
-
-msgid "[in] At least item_size bytes, borrowed during call only"
-msgstr "[in] 至少 item_size 字节，仅在调用期间借用"
-
-msgid "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
-msgstr "[in] CLOCK_MONOTONIC 绝对截止时间，或 NX_DEADLINE_NEVER"
-
-msgid "SUCCESS, TIMEOUT, STATE (closed) or error"
-msgstr "SUCCESS、TIMEOUT、STATE（已关闭）或错误"
-
-msgid "An immediately available item can be received at an expired deadline. On failure the output is unchanged. Closed queues return STATE only after existing items have been drained."
-msgstr "截止时间已到期时仍可接收立即可用的条目。失败时输出不变。关闭的队列仅在现有条目排空后返回 STATE。"
-
-msgid "[out] At least item_size bytes; valid only on SUCCESS"
-msgstr "[out] 至少 item_size 字节；仅在 SUCCESS 时有效"
-
-msgid "Task context; caller must join queue users before destroy."
-msgstr "任务上下文；调用者必须在 destroy 前 join 队列使用者。"
-
-msgid "NX_SUCCESS or invalid error"
-msgstr "NX_SUCCESS 或无效参数错误"
-
-msgid "[inout] Closed queue, no future users"
-msgstr "[inout] 已关闭队列，之后不再有使用者"
-
-msgid "NX_SUCCESS or BUSY if users/items remain"
-msgstr "NX_SUCCESS，或仍有使用者／条目时的 BUSY"
-
-msgid "Task context. No default task, pool or hidden stack exists. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence."
-msgstr "任务上下文。没有默认任务、池或隐藏栈。POSIX 库的内部管理分配属于主机运行时，不能作为 MCU RAM 证据。"
-
-msgid "[out] Zero-initialized unused caller handle"
-msgstr "[out] 已清零且尚未使用的调用者句柄"
-
-msgid "[in] Aligned storage accepted by pthread_attr_setstack"
-msgstr "[in] pthread_attr_setstack 接受的对齐存储"
-
-msgid "[in] Host stack size, at least PTHREAD_STACK_MIN"
-msgstr "[in] 主机栈大小，至少为 PTHREAD_STACK_MIN"
-
-msgid "[in] Returning bounded application entry"
-msgstr "[in] 会返回、执行有界的应用入口"
-
-msgid "[in] Entry context, kept alive until join"
-msgstr "[in] 入口上下文，保留直到 join"
-
-msgid "NX_SUCCESS or invalid/start error"
-msgstr "NX_SUCCESS 或无效参数／启动错误"
-
-msgid "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage."
-msgstr "可能阻塞直到入口返回。不提供强制取消。调用者仅在成功后才可释放上下文、句柄和栈。一个外部所有者串行执行 start/join；不支持多个同时 join 的调用者，也不支持外部 pthread_cancel/detach。销毁通知或队列存储前，先停止并 join 发布者。"
-
-msgid "[inout] Started task; caller must not be the joined task"
-msgstr "[inout] 已启动的任务；调用者不得是被 join 的任务"
-
-msgid "NX_SUCCESS only after pthread_join confirms execution exit"
-msgstr "仅在 pthread_join 确认执行已退出后返回 NX_SUCCESS"
-
-msgid "Initialize/destroy have one external lifecycle owner. Stop and join all publishers and the waiter before destroy. External pthread_cancel of a caller blocked in these APIs is unsupported; use cooperative stop, publish and join."
-msgstr "initialize/destroy 由一个外部生命周期所有者负责。destroy 前，停止并 join 所有发布者和等待者。不支持外部对阻塞在这些 API 中的调用者执行 pthread_cancel；应使用协作停止、发布和 join。"
-
-msgid "One lifecycle owner initializes, closes and destroys. Multiple producers/consumers are supported while live. External pthread_cancel of blocked users is unsupported."
-msgstr "由一个生命周期所有者执行 initialize、close 和 destroy。存活期间支持多个生产者／消费者。不支持外部对阻塞使用者执行 pthread_cancel。"
-
-msgid "Start/join are serialized by one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
-msgstr "由一个外部生命周期所有者串行执行 start/join；仅有一个 join 调用者。入口可以尝试自 join，此时返回 BUSY。不支持外部取消或 detach。"
-
-msgid "Secure privileged Thread startup/exclusive lifecycle owner. Both memory spans must be Secure, writable and disjoint. No NS task may run against this identity during prepare. Repeat prepare is rejected; epochs are never reset. No allocation, kernel operation or runtime registry is used."
-msgstr "Secure 特权 Thread 启动上下文／独占生命周期所有者。两段内存都必须是 Secure、可写且互不重叠。prepare 期间，不得有 NS 任务以此身份运行。拒绝重复 prepare；epoch 绝不重置。不使用分配、内核操作或运行期注册表。"
-
-msgid "[out] Zero-initialized caller-owned Secure metadata."
-msgstr "[out] 已清零、由调用者拥有的 Secure 元数据。"
-
-msgid "[in] Eight-byte-aligned Secure writable stack allocation."
-msgstr "[in] 八字节对齐的 Secure 可写栈分配。"
-
-msgid "[in] Whole allocation, including eight-byte upper seal."
-msgstr "[in] 整块分配，包含上端八字节封印。"
-
-msgid "[in] Opaque NS task identity, never dereferenced here."
-msgstr "[in] 不透明 NS 任务身份，此处绝不解引用。"
-
-msgid "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
-msgstr "SUCCESS、INVALID、CONTEXT、STATE 或 BUSY。"
-
-msgid "Secure lifecycle owner only after joining the previous task and stopping every observer. Existing stack is reused; stale handles remain invalid after the next allocation."
-msgstr "仅限 Secure 生命周期所有者，在先前任务已 join 且每个观察者均已停止后调用。复用现有栈；下一次分配后，过期句柄仍无效。"
-
-msgid "[inout] Prepared, unleased and unloaded Secure metadata."
-msgstr "[inout] 已准备、未租出且未加载的 Secure 元数据。"
-
-msgid "[in] New trusted NS task identity."
-msgstr "[in] 新的可信 NS 任务身份。"
-
-msgid "Secure application overrides the weak NULL default with an immutable mapping. Called with both PRIMASK states held; never dereference an NS-provided metadata pointer, allocate, block, discover objects, call a kernel or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this mechanism does not authenticate an adversarial NS privileged kernel. NS Thread calls cannot spoof Handler origin."
-msgstr "Secure 应用使用不可变映射覆盖弱 NULL 默认值。调用期间持有两侧 PRIMASK 状态；绝不能解引用 NS 提供的元数据指针、分配、阻塞、发现对象、调用内核或修改映射。NS 内核及其 SVC/PendSV 被信任：此机制不认证恶意 NS 特权内核。NS Thread 调用不能伪装为 Handler 来源。"
-
-msgid "[in] Opaque identity supplied by the trusted NS kernel."
-msgstr "[in] 可信 NS 内核提供的不透明身份。"
-
-msgid "Prepared caller-owned metadata, or NULL when unauthorized."
-msgstr "已准备、由调用者拥有的元数据；未获授权时为 NULL。"
-
-msgid "Secure application may override to record/reset safely. Called with both masks held; must not return, block, call a kernel or release retained storage. Default holds masks and spins. No transport or product recovery policy is imposed."
-msgstr "Secure 应用可覆盖以安全记录／复位。调用期间持有两侧屏蔽；不得返回、阻塞、调用内核或释放保留的存储。默认保持屏蔽并自旋。不强加传输机制或产品恢复策略。"
-
-msgid "[in] Seal or stack invariant violation."
-msgstr "[in] 封印或栈不变量被破坏。"
-
-msgid "Zero-initialize before prepare. Fields are mechanism-owned while prepared; applications cannot modify them. Metadata and stack remain alive until the task is joined, lease freed and no loaded context remains. Runtime Secure stack capacity is an application budget, not this port minimum."
-msgstr "prepare 前清零。准备期间字段由机制拥有，应用不得修改。元数据和栈必须保持存活，直到任务已 join、租约已释放且不再有已加载上下文。Secure 栈的运行期容量属于应用预算，不是此端口的最小值。"
-
-msgid "Privileged, single-core, current-security-domain APIs. All controls start zeroed and remain adapter-owned while live. One external lifecycle owner serializes init/destroy and joins; publishers, queue callers and IRQ sources must quiesce before reclaiming storage. Runtime task operations require unmasked Thread mode and a running kernel. Actual bootstrap permits object init, task create/discard and wake; it does not permit blocking waits or queue operations. A manual mask, ISR or unsupported context returns CONTEXT before mutation. The byte queue's task threshold guard rejects foreign priority-zero time-sliced callers. Caller controls, stack ranges, full borrowed name/context objects, queue payloads, item buffers and waiters must be disjoint. Cold admission rejects known control/stack/payload overlap and name/context starting inside control or stack; unknown opaque extents remain the caller's responsibility. Never operate a closable queue through its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is an actual unbounded kernel wait. Timeout never revokes any accepted I/O borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are outside this backend scope."
-msgstr "特权、单核、当前安全域 API。所有控制存储初始清零，存活期间由适配器拥有。一个外部生命周期所有者串行执行 init/destroy 和 join；回收存储前，发布者、队列调用者和 IRQ 源必须静止。运行期任务操作要求未屏蔽的 Thread 模式且内核正在运行。真实 bootstrap 允许对象初始化、任务 create/discard 和唤醒；不允许阻塞等待或队列操作。手动屏蔽、ISR 或不支持的上下文会在修改前返回 CONTEXT。字节队列的任务阈值保护拒绝外来的优先级零时间片调用者。调用者控制存储、栈范围、完整借用的名称／上下文对象、队列载荷、条目缓冲区和等待者必须互不重叠。冷路径准入拒绝已知的控制／栈／载荷重叠，以及起始地址位于控制存储或栈内的名称／上下文；未知不透明对象的完整范围仍由调用者负责。绝不能通过可关闭队列内部的原始队列执行操作。所有截止时间均使用 nx_time_now_us；NX_DEADLINE_NEVER 是真正无界的内核等待。超时绝不撤销任何已接受的 I/O 借用。MPU/TZ 隔离、无 tick 睡眠及其他 Cortex-M 端口不属于此后端范围。"
-
-msgid "Privileged cold Thread/MSP, no live FP context or masks. Startup may create and discard unused static objects. After startup returns, the bootstrap scope is sealed. Only the trusted kernel may call adapter tx_application_define; it validates canonical privileged Thread context before the product callback. This is not a security isolation API. An unexpected kernel return invokes fail-stop and retains all effects; it never reopens bootstrap reclamation."
-msgstr "特权冷启动 Thread/MSP，无存活 FP 上下文或屏蔽状态。启动阶段可创建并 discard 尚未使用的静态对象。启动返回后，bootstrap 范围即被封闭。只有可信内核可调用适配器 tx_application_define；适配器在产品回调之前验证规范的特权 Thread 上下文。这不是安全隔离 API。内核意外返回时调用故障停止并保留全部效果；绝不重新开放 bootstrap 回收。"
-
-msgid "[in] Product initialization inside tx_application_define"
-msgstr "[in] 在 tx_application_define 内执行的产品初始化"
-
-msgid "[in] Borrowed through startup and kernel lifetime"
-msgstr "[in] 在整个启动及内核生命周期内借用"
-
-msgid "CONTEXT or INVALID before entry; successful entry never returns"
-msgstr "进入前返回 CONTEXT 或 INVALID；成功进入后绝不返回"
-
-msgid "Actual fault context is not repaired or normalized; it may be masked, ISR or unprivileged. Do not assume a working kernel, clock, stack or permission to access a peripheral. The adapter observes the Core fault hook before this hook. Product owns separately reviewed safe output/reset actions. Returning does not authorize cleanup; the adapter parks."
-msgstr "不修复或规范化实际故障上下文；它可能处于屏蔽、ISR 或非特权状态。不得假定内核、时钟、栈可正常使用，也不得假定拥有访问外设的权限。适配器在此钩子之前先调用 Core 故障钩子。产品负责另外审查的安全输出／复位动作。返回不授权清理；适配器将停驻。"
-
-msgid "[in] Context, permanent-entry or kernel-return failure"
-msgstr "[in] 上下文、永久入口或内核返回失败"
-
-msgid "Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer clock and IRQ ceiling; it must not change the platform's continuous monotonic clock. Missing hook fails linking. Failure enters retaining fail-stop."
-msgstr "真实内核 bootstrap，特权且 PRIMASK 屏蔽。提供者负责定时器时钟和 IRQ 优先级上限；不得改变平台的连续单调时钟。缺少钩子会导致链接失败。失败将进入保留状态的故障停止。"
-
-msgid "[in] Exact immutable resolved kernel frequency"
-msgstr "[in] 准确、不可变、已解析的内核频率"
-
-msgid "SUCCESS after binding a real bounded periodic IRQ source"
-msgstr "绑定真实、有界的周期 IRQ 源后返回 SUCCESS"
-
-msgid "Native has no hardware IRQ source and returns false."
-msgstr "Native 没有硬件 IRQ 源，返回 false。"
-
-msgid "True only in a privileged unmasked reviewed external IRQ"
-msgstr "仅在特权、未屏蔽且经过审查的外部 IRQ 中返回 true"
-
-msgid "[inout] Zeroed caller control retained until destroy"
-msgstr "[inout] 已清零的调用者控制存储，保留直到 destroy"
-
-msgid "SUCCESS, INVALID, CONTEXT or IO"
-msgstr "SUCCESS、INVALID、CONTEXT 或 IO"
-
-msgid "Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration precedes a changed sequence."
-msgstr "绑定／arm 为只读操作。wake 支持任务／bootstrap，或经 nx_threadx_isr_allowed 准入的 IRQ。wait 仅限任务上下文；有限截止时间到期的判断优先于序列变化。"
-
-msgid "[inout] Live latch retained through every port user"
-msgstr "[inout] 存活锁存器，须在每个端口使用者存活期间保留"
-
-msgid "Wait face; empty face for null or non-live control"
-msgstr "等待接口；控制存储为 null 或未存活时返回空接口"
-
-msgid "[inout] Live caller latch"
-msgstr "[inout] 存活的调用者锁存器"
-
-msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
-msgstr "SUCCESS、INVALID、CONTEXT、BUSY 或 IO；失败时保留锁存器"
-
-msgid "No adapter heap or worker. Name is borrowed, not copied. Linux uses its own pthread stack; the caller buffer only validates kernel metadata and is not a host stack budget. Higher-priority entries may run before start returns."
-msgstr "没有适配器堆或执行任务。名称被借用，不复制。Linux 使用自己的 pthread 栈；调用者缓冲区仅用于验证内核元数据，不是主机栈预算。优先级更高的入口可能在 start 返回前运行。"
-
-msgid "[inout] Zeroed caller TCB/control, retained until join/discard"
-msgstr "[inout] 已清零的调用者 TCB／控制存储，保留直到 join/discard"
-
-msgid "[in] Borrowed immutable name, retained until reclamation"
-msgstr "[in] 借用的不可变名称，保留直到回收"
-
-msgid "[in] Eight-byte aligned caller storage"
-msgstr "[in] 八字节对齐的调用者存储"
-
-msgid "[in] Actual capacity, at least TX_MINIMUM_STACK"
-msgstr "[in] 实际容量，至少为 TX_MINIMUM_STACK"
-
-msgid "[in] ThreadX priority; smaller values run first"
-msgstr "[in] ThreadX 优先级；数值越小越先运行"
-
-msgid "[in] Returns only after application stop/drain"
-msgstr "[in] 仅在应用停止／排空后返回"
-
-msgid "[in] Borrowed until successful join/discard"
-msgstr "[in] 借用直到成功 join/discard"
-
-msgid "SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if reclamation cannot be established"
-msgstr "SUCCESS、INVALID、CONTEXT 或 IO；部分失败且无法确认可回收时，保留存活控制存储"
-
-msgid "Self-join is rejected. Timeout retains task, borrowed name, stack and context. Completion hint alone never reclaims; successful real kernel deletion establishes detachment."
-msgstr "拒绝自 join。超时保留任务、借用名称、栈和上下文。仅有完成提示绝不允许回收；真实内核删除成功才证明引用已撤离。"
-
-msgid "[inout] Live caller task, one external joiner only"
-msgstr "[inout] 存活的调用者任务，仅允许一个外部 join 调用者"
-
-msgid "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
-msgstr "[in] 绝对 Core 截止时间，或 NX_DEADLINE_NEVER"
-
-msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
-msgstr "SUCCESS、INVALID、CONTEXT、TIMEOUT 或 IO"
-
-msgid "This is prestart rollback, never runtime cancellation."
-msgstr "这是启动前回滚，绝不是运行期取消。"
-
-msgid "[inout] Live task whose entry has never begun"
-msgstr "[inout] 存活且入口从未开始执行的任务"
-
-msgid "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
-msgstr "SUCCESS、INVALID、CONTEXT 或 IO；失败时保留存储"
-
-msgid "Eight-byte stack alignment; failure can retain live state."
-msgstr "栈按八字节对齐；失败时可能保留存活状态。"
-
-msgid "[inout] Zeroed caller control, retained until reset"
-msgstr "[inout] 已清零的调用者控制存储，保留直到复位"
-
-msgid "[in] Borrowed immutable name, retained until reset"
-msgstr "[in] 借用的不可变名称，保留直到复位"
-
-msgid "[in] Aligned caller buffer, retained until reset"
-msgstr "[in] 已对齐的调用者缓冲区，保留直到复位"
-
-msgid "[in] Smaller ThreadX priority values run first"
-msgstr "[in] ThreadX 优先级数值越小越先运行"
-
-msgid "[in] Never returns; return invokes retaining fail-stop"
-msgstr "[in] 绝不返回；返回将触发保留状态的故障停止"
-
-msgid "[in] Borrowed until reset"
-msgstr "[in] 借用直到复位"
-
-msgid "[in] Caller payload storage retained until destroy"
-msgstr "[in] 调用者载荷存储，保留直到 destroy"
-
-msgid "[in] Exact depth multiplied by item_size"
-msgstr "[in] 准确的深度乘以 item_size"
-
-msgid "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
-msgstr "[in] 正数、有界且小于 TX_WAIT_FOREVER 的容量"
-
-msgid "[in] Positive byte count, without word-size narrowing"
-msgstr "[in] 正数字节数，不缩减为字尺寸"
-
-msgid "[inout] Live queue retained throughout the operation"
-msgstr "[inout] 存活队列，在整个操作期间保留"
-
-msgid "[in] Exactly item_size readable bytes borrowed until return"
-msgstr "[in] 准确的 item_size 个可读字节，借用直到返回"
-
-msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
-msgstr "SUCCESS、INVALID、CONTEXT、TIMEOUT、OVERFLOW 或 IO"
-
-msgid "[out] Exactly item_size writable bytes borrowed until return"
-msgstr "[out] 准确的 item_size 个可写字节，借用直到返回"
-
-msgid "[inout] Live caller control and storage"
-msgstr "[inout] 存活的调用者控制存储及数据存储"
-
-msgid "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
-msgstr "SUCCESS、INVALID、CONTEXT 或 BUSY；失败时保留存储"
-
-msgid "[inout] Zeroed caller storage retained until waiter destroy"
-msgstr "[inout] 已清零的调用者存储，保留直到等待者 destroy"
-
-msgid "[inout] Live caller latch with no concurrent users"
-msgstr "[inout] 存活的调用者锁存器，不能有并发使用者"
-
-msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO"
-msgstr "SUCCESS、INVALID、CONTEXT、BUSY 或 IO"
-
-msgid "Payload size and maximum_waiters bound task scheduling pause; the entire copy/broadcast does not mask interrupts."
-msgstr "载荷大小和 maximum_waiters 约束任务调度暂停时长；整个复制／广播过程不屏蔽中断。"
-
-msgid "[in] Positive capacity below TX_WAIT_FOREVER"
-msgstr "[in] 正数且小于 TX_WAIT_FOREVER 的容量"
-
-msgid "[in] Positive exact payload byte count"
-msgstr "[in] 正数、准确的载荷字节数"
-
-msgid "[in] Positive maximum simultaneous operations"
-msgstr "[in] 正数的最大同时操作数"
-
-msgid "[inout] Live close-aware queue"
-msgstr "[inout] 存活的关闭感知队列"
-
-msgid "SUCCESS, INVALID or CONTEXT; close is idempotent"
-msgstr "SUCCESS、INVALID 或 CONTEXT；close 是幂等操作"
-
-msgid "A closed queue rejects sends without changing payload."
-msgstr "已关闭队列拒绝发送，且不修改载荷。"
-
-msgid "[inout] Live exclusive latch for this simultaneous call"
-msgstr "[inout] 本次并发调用独占的存活锁存器"
-
-msgid "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
-msgstr "SUCCESS、CANCELLED、TIMEOUT、BUSY、INVALID、CONTEXT 或 IO"
-
-msgid "Closed and empty returns CANCELLED; failure leaves output."
-msgstr "已关闭且为空时返回 CANCELLED；失败时输出保持不变。"
-
-msgid "[inout] Live control and its borrowed payload storage"
-msgstr "[inout] 存活控制存储及其借用的载荷存储"
-
-msgid "Applications implement these symbols only when the authored OS policy enables them. No weak timer/counter fallback is supplied. The platform never invents timer wiring."
-msgstr "只有配置中显式声明的 OS 策略启用这些符号时，应用才实现它们。不提供弱定时器／计数器回退实现。平台绝不臆造定时器接线。"
-
-msgid "Scheduler startup calls this in its canonical masked, privileged context. Configure a periodic interrupt, clear pending state and route it to the selected kernel Tick handler at its validated priority. Do not start tasks here. Hardware clock and routing remain application/SoC-owned."
-msgstr "调度器启动时在其规范、已屏蔽、特权上下文调用。配置周期中断，清除 pending 状态，并以已验证的优先级路由到选定内核 Tick 处理函数。不得在此启动任务。硬件时钟和路由仍由应用／SoC 拥有。"
-
-msgid "[in] Exact authored Tick frequency in hertz"
-msgstr "[in] 配置中显式声明的准确 Tick 频率，单位为赫兹"
-
-msgid "Called during scheduler startup. Counter initialization must be bounded, allocation-free and safe in the startup mask."
-msgstr "调度器启动期间调用。计数器初始化必须有界、不分配，并在启动屏蔽状态下安全。"
-
-msgid "Called by the kernel during context switches. It must be bounded, allocation-free and safe in interrupt/critical context. Configure a frequency above Tick frequency and account for wrapping when interpreting recorded totals."
-msgstr "由内核在上下文切换期间调用。必须有界、不分配，并在中断／临界上下文中安全。配置高于 Tick 的频率，并在解释记录总量时处理回绕。"
-
-msgid "Monotonic modulo-32-bit counter in application-defined units"
-msgstr "以应用定义单位计量、按 2^32 取模回绕的单调计数器"
-
-msgid "Task context. No service, queue, callback dispatch or task creation is implicit. A shared-bus client must not use ready to service the controller; its execution owner must remain running during stop/drain."
-msgstr "任务上下文。不隐式执行服务、队列操作、回调派发或任务创建。共享总线客户端不得用 ready 服务控制器；停止／排空期间，其执行所有者必须保持运行。"
-
-msgid "[in] Live single-waiter notification port"
-msgstr "[in] 存活的单等待者通知端口"
-
-msgid "[in] Bounded predicate, called in caller context"
-msgstr "[in] 有界谓词，在调用者上下文调用"
-
-msgid "[in] Predicate context, retained for this call only"
-msgstr "[in] 谓词上下文，仅在本次调用期间保留"
-
-msgid "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no wall-clock or relative values"
-msgstr "[in] 端口时钟域内的绝对截止时间，或 NX_DEADLINE_NEVER；不能使用墙上时钟或相对值"
-
-msgid "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
-msgstr "观察到谓词为 true 时返回 NX_SUCCESS，包括 TIMEOUT 后的最后一次观察；否则返回端口错误"
-
-
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:48
+msgid "freertos_mpu.h"
+msgstr "freertos_mpu.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Privileged static lifecycle for isolated MPU user tasks."
+msgstr "隔离 MPU 用户任务的特权静态生命周期。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "User data is nonexecuting normal RAM with only these permissions."
+msgstr "用户数据是不可执行的普通 RAM，仅允许这些权限。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Create an unprivileged task from exact caller-owned storage."
+msgstr "使用调用者准确存储创建非特权任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"Privileged Thread only, scheduler not suspended, no manual masks. Rejection "
+"retains no references and calls no kernel creation API. Actual linker bounds"
+" and MPU_TYPE are checked. Minimum creation capacity is 64 words; "
+"applications budget actual execution depth separately. No heap or object "
+"pool."
+msgstr ""
+"仅限特权 Thread，调度器未挂起且没有手动屏蔽。拒绝时不保留引用，不调用内核创建 API。检查实际链接器边界及 MPU_TYPE。创建容量最少为 "
+"64 个字；应用须另外预算实际执行深度。不使用堆或对象池。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
 msgid "[inout] Cold or live-free metadata in protected linker RAM."
 msgstr "[inout] 受保护链接器 RAM 中的冷态或已无存活任务的元数据。"
 
-msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile also rejects task epoch OVERFLOW."
-msgstr "返回 SUCCESS；或在接纳前返回 INVALID／CONTEXT／STATE／BUSY／IO。GPIO 配置还会以 OVERFLOW 拒绝任务代次溢出。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "[in] Validated user entry, stack and data mappings."
+msgstr "[in] 已验证的用户入口、栈和数据映射。"
 
-msgid "One privileged lifecycle owner stops external access first. Kernel deletion synchronously removes scheduler references. Self deletion is rejected; no hidden reaper."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile "
+"also rejects task epoch OVERFLOW."
+msgstr ""
+"返回 SUCCESS；或在接纳前返回 INVALID／CONTEXT／STATE／BUSY／IO。GPIO 配置还会以 OVERFLOW "
+"拒绝任务代次溢出。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Delete another isolated task after external users quiesce."
+msgstr "外部使用者静止后，删除另一个隔离任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"One privileged lifecycle owner stops external access first. Kernel deletion "
+"synchronously removes scheduler references. Self deletion is rejected; no "
+"hidden reaper."
 msgstr "一个特权生命周期所有者先停止外部访问。内核删除会同步移除调度器引用。拒绝自删除；不设隐藏回收任务。"
 
-msgid "The GPIO profile returns BUSY while its authority pins the task. Close and join before deletion. A closing marker prevents reopen during kernel deletion; the epoch survives."
-msgstr "GPIO 配置在其授权持有任务生命周期固定引用时返回 BUSY。删除前须先 close 和 join。closing 标记防止在内核删除期间重新打开；保留该代次。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"The GPIO profile returns BUSY while its authority pins the task. Close and "
+"join before deletion. A closing marker prevents reopen during kernel "
+"deletion; the epoch survives."
+msgstr ""
+"GPIO 配置在其授权持有任务生命周期固定引用时返回 BUSY。删除前须先 close 和 join。closing "
+"标记防止在内核删除期间重新打开；保留该代次。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "[inout] Owned live protected metadata; never the calling task."
+msgstr "[inout] 已拥有、存活且受保护的元数据；绝不能是调用任务本身。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
 msgid "Success, INVALID, CONTEXT, STATE or BUSY."
 msgstr "SUCCESS、INVALID、CONTEXT、STATE 或 BUSY。"
 
-msgid "Zero-initialize in privileged RAM before first start. The TCB includes the real port context and protected stack. One privileged lifecycle owner serializes start/delete."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "A caller-selected exact region, copied during task creation."
+msgstr "调用者选定的准确区域，在任务创建时复制。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Complete caller-owned protected task metadata."
+msgstr "调用者拥有的完整受保护任务元数据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"Zero-initialize in privileged RAM before first start. The TCB includes the "
+"real port context and protected stack. One privileged lifecycle owner "
+"serializes start/delete."
 msgstr "首次启动前，在特权 RAM 中零初始化。TCB 包含真实端口上下文和受保护栈。一个特权生命周期所有者串行调用 start/delete。"
 
-msgid "The GPIO profile requires cold zero-initialization and keeps the task epoch across deletion; never reset that history."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"The GPIO profile requires cold zero-initialization and keeps the task epoch "
+"across deletion; never reset that history."
 msgstr "GPIO 配置要求冷态零初始化，并在删除后保留任务代次；不得重置该历史。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Immutable creation inputs, borrowed for this call only."
+msgstr "不可变创建输入，仅在本次调用内被借用。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"The entry must be explicit user code and must not return. Stack and context "
+"data remain borrowed until owner deletion; regions never include kernel RAM,"
+" code or MMIO. Context must be contained in the user stack, user flash or "
+"mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable "
+"reserved linker region; names are copied cold."
+msgstr ""
+"入口必须是显式用户代码，且不得返回。栈和上下文数据保持被借用，直到所有者删除；区域不得包含内核 RAM、代码或 MMIO。上下文必须完整位于用户栈、用户"
+" Flash 或已映射数据内。名称必须在可读的链接器保留区域内、在 configMAX_TASK_NAME_LEN 长度内终止；名称在冷路径复制。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:56
 msgid "freertos_mpu_gpio.h"
 msgstr "freertos_mpu_gpio.h"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "One protected-task scalar GPIO WRITE authority."
 msgstr "供一个受保护任务使用的标量 GPIO WRITE 授权。"
 
-msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
-msgstr "作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus Team"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"作者  Nexus Team   版本  1.0.0   日期  2026-10-20   版权  Copyright (c) 2026 Nexus "
+"Team"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "2026-10-20"
 msgstr "2026-10-20"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Open the fixed grant for its exact live protected task."
 msgstr "为精确的存活受保护任务打开固定授权。"
 
-msgid "Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK must be zero, except the selected port's bootstrap BASEPRI before scheduler start. PRIMASK is saved and restored. This operation pins task deletion until join."
-msgstr "特权 Thread；调度器正在运行或尚未启动。BASEPRI/FAULTMASK 必须为零，但调度器启动前所选端口的引导 BASEPRI 除外。保存并恢复 PRIMASK。此操作固定任务生命周期，阻止其删除，直到 join。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK "
+"must be zero, except the selected port's bootstrap BASEPRI before scheduler "
+"start. PRIMASK is saved and restored. This operation pins task deletion "
+"until join."
+msgstr ""
+"特权 Thread；调度器正在运行或尚未启动。BASEPRI/FAULTMASK 必须为零，但调度器启动前所选端口的引导 BASEPRI "
+"除外。保存并恢复 PRIMASK。此操作固定任务生命周期，阻止其删除，直到 join。"
 
-msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
 msgstr "SUCCESS，或 INVALID／CONTEXT／STATE／BUSY。拒绝不遗留部分固定引用。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Revoke further calls without deleting or stopping the GPIO."
 msgstr "撤销后续调用；不删除任务，也不停止 GPIO。"
 
-msgid "The same privileged lifecycle owner serializes open/close/ join and task start/delete. NMI/HardFault never access this authority. Incoming interrupt masks are preserved."
-msgstr "同一个特权生命周期所有者串行调用 open/close/join 和任务 start/delete。NMI/HardFault 不得访问此授权。保留传入的中断屏蔽状态。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"The same privileged lifecycle owner serializes open/close/ join and task "
+"start/delete. NMI/HardFault never access this authority. Incoming interrupt "
+"masks are preserved."
+msgstr ""
+"同一个特权生命周期所有者串行调用 open/close/join 和任务 start/delete。NMI/HardFault "
+"不得访问此授权。保留传入的中断屏蔽状态。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "SUCCESS, INVALID, CONTEXT or STATE; preserves all pins."
 msgstr "SUCCESS、INVALID、CONTEXT 或 STATE；保留全部固定引用。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Join a closed authority before task deletion or GPIO stop."
 msgstr "在删除任务或停止 GPIO 之前，对已关闭的授权执行 join。"
 
-msgid "The single-core saved-mask boundary excludes every active scalar effect. Join detaches its task pin before returning; it does not delete the task or reset its lifetime epoch."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"The single-core saved-mask boundary excludes every active scalar effect. "
+"Join detaches its task pin before returning; it does not delete the task or "
+"reset its lifetime epoch."
 msgstr "单核上保存中断屏蔽状态的边界排除所有正在执行的标量效果。join 返回前解除其任务固定引用；不删除任务，也不重置其生命周期代次。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "SUCCESS detaches the pin; INVALID/CONTEXT/STATE retain it."
 msgstr "SUCCESS 解除固定引用；INVALID／CONTEXT／STATE 保留固定引用。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Variables"
 msgstr "变量"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Immutable WRITE grant in privileged Flash."
 msgstr "特权 Flash 中不可变的 WRITE 授权。"
 
-msgid "port_slot addresses the readonly generated nx_binding_led pointer. The initialized exact GPIOC PC7 face, operations and provider state outlive an open authority through successful join. The sole lifecycle owner does not stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping is granted."
-msgstr "port_slot 指向只读、生成的 nx_binding_led 指针。已初始化的精确 GPIOC PC7 接口、操作表与提供者状态须在授权打开期间持续有效，直到成功 join。唯一生命周期所有者不得停止或重新配置该 GPIO。不授予 READ、翻转、指针复制或 MMIO 映射能力。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"port_slot addresses the readonly generated nx_binding_led pointer. The "
+"initialized exact GPIOC PC7 face, operations and provider state outlive an "
+"open authority through successful join. The sole lifecycle owner does not "
+"stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping"
+" is granted."
+msgstr ""
+"port_slot 指向只读、生成的 nx_binding_led 指针。已初始化的精确 GPIOC PC7 "
+"接口、操作表与提供者状态须在授权打开期间持续有效，直到成功 join。唯一生命周期所有者不得停止或重新配置该 GPIO。不授予 "
+"READ、翻转、指针复制或 MMIO 映射能力。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Caller-owned protected authority; zero only at cold startup."
 msgstr "调用方拥有的受保护授权；仅在冷启动时清零。"
 
-msgid "Treat all fields as private. Join detaches the captured task epoch, without resetting the bound task's epoch history. Storage remains valid for the linked binding's entire lifetime, including rejection and closed states."
-msgstr "所有字段均视为私有。join 解除所捕获任务代次的绑定，不重置绑定任务的代次历史。存储必须在所链接绑定的整个生命周期内保持有效，包括拒绝和关闭状态。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Treat all fields as private. Join detaches the captured task epoch, without "
+"resetting the bound task's epoch history. Storage remains valid for the "
+"linked binding's entire lifetime, including rejection and closed states."
+msgstr ""
+"所有字段均视为私有。join 解除所捕获任务代次的绑定，不重置绑定任务的代次历史。存储必须在所链接绑定的整个生命周期内保持有效，包括拒绝和关闭状态。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "One immutable assembly binding, in privileged Flash."
 msgstr "特权 Flash 中单个不可变装配绑定。"
 
-msgid "Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are disjoint privileged RAM; grant is privileged Flash. User arguments never select these objects."
-msgstr "仅定义一个 nx_freertos_mpu_gpio_binding 符号。control 和 task 位于互不重叠的特权 RAM 中；grant 位于特权 Flash 中。用户参数从不选择这些对象。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are"
+" disjoint privileged RAM; grant is privileged Flash. User arguments never "
+"select these objects."
+msgstr ""
+"仅定义一个 nx_freertos_mpu_gpio_binding 符号。control 和 task 位于互不重叠的特权 RAM 中；grant "
+"位于特权 Flash 中。用户参数从不选择这些对象。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Keep the task epoch after deletion. Initialize only at cold startup."
 msgstr "删除后保留任务代次。仅在冷启动时初始化。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:64
+msgid "freertos_stack.h"
+msgstr "freertos_stack.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "Optional bounded task stack paint snapshot."
+msgstr "可选、有界的任务栈涂色快照。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "Copy bounded stack paint facts using actual kernel identity."
+msgstr "使用真实内核身份复制有界栈涂色事实。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid ""
+"Privileged unmasked running Thread; task stack quiescent throughout the "
+"scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies "
+"TCB/stack identity, not size. The original capacity is a caller contract. No"
+" task suspend, interrupt mask, allocation or live painting is performed. "
+"Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked"
+" kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. "
+"The POSIX kernel port uses a separate pthread execution stack; its query is "
+"not an MCU or Linux execution-stack peak measurement."
+msgstr ""
+"特权、未屏蔽、正在运行的 Thread；整个扫描期间任务栈必须静止。仅在 NEXUS_OS_TRACE "
+"下可用。xTaskGetStaticBuffers 验证 "
+"TCB／栈身份，不验证大小。原始容量属于调用者合同。不挂起任务、不屏蔽中断、不分配，也不对存活栈重新涂色。最坏工作量为读取 "
+"words*sizeof(StackType_t) 个字节。涂色值是锁定内核使用的 0xA5。未触及／已触及的字节不能证明物理栈峰值。POSIX "
+"内核端口使用独立的 pthread 执行栈；其查询不能测得 MCU 或 Linux 执行栈峰值。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "[in] Exact original TCB, stack and capacity, all live."
+msgstr "[in] 准确的原始 TCB、栈及容量，均须存活。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "[out] Distinct output, unchanged on rejection."
+msgstr "[out] 独立输出，拒绝时保持不变。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
+msgstr "SUCCESS、INVALID、CONTEXT，或绑定不匹配时的 STATE。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "Exact static task facts supplied at original creation."
+msgstr "原始创建时提供的准确静态任务事实。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid ""
+"The caller retains all storage, excludes delete/join/discard and never "
+"replaces the live binding. This is not a registry."
+msgstr "调用者保留全部存储，排除 delete/join/discard，并且绝不替换存活绑定。这不是注册表。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:72
+msgid "freertos_user.h"
+msgstr "freertos_user.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Narrow pointer-free services for MPU-isolated user tasks."
+msgstr "MPU 隔离用户任务的窄接口、无指针服务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Defines"
+msgstr "宏定义"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Explicitly reviewed unprivileged executable code section."
+msgstr "显式审查的非特权可执行代码段。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Explicit user RAM, separate from kernel and provider state."
+msgstr "显式用户 RAM，与内核和提供者状态分离。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "Explicit zero-initialized user storage in its reserved RAM span."
 msgstr "在预留 RAM 区间中显式定义、零初始化的用户存储。"
 
-msgid "Thread-only MPU profile service, distinct from Core time. No object handle or pointer crosses this service."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Trusted static task metadata placed in protected kernel RAM."
+msgstr "放入受保护内核 RAM 的可信静态任务元数据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Delay the calling user task through the real MPU SVC."
+msgstr "通过真实 MPU SVC 延迟调用用户任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid ""
+"Thread only with a running scheduler. No handle or pointer crosses the "
+"boundary. This is not a microsecond deadline."
+msgstr "仅限调度器正在运行的 Thread。边界两侧不传递句柄或指针。这不是微秒截止时间。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "[in] Relative kernel ticks; zero requests rescheduling."
+msgstr "[in] 内核相对 tick 数；零表示请求重新调度。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
+msgstr "通过 SVC 读取内核可回绕的 32 位 tick 计数器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid ""
+"Thread-only MPU profile service, distinct from Core time. No object handle "
+"or pointer crosses this service."
 msgstr "仅限 Thread 的 MPU 配置服务，与 Core 时间不同。此服务不跨边界传递对象句柄或指针。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Current kernel tick count in the selected OS clock domain."
+msgstr "选定 OS 时钟域内的当前内核 tick 计数。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "Write the current protected task's one static GPIO grant."
 msgstr "通过当前受保护任务的一个静态 GPIO 授权执行写入。"
 
-msgid "Thread only with a running scheduler. Unknown identifiers and out-of-grant bits return PERMISSION; overlapping or zero masks return INVALID. No user MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A closed or stale task incarnation performs no GPIO write."
-msgstr "仅限 Thread，且调度器正在运行。未知标识符和授权外的位返回 PERMISSION；掩码重叠或两者均为零时返回 INVALID。不引入用户 MMIO 映射、READ、翻转、OS 等待、堆分配或指针借用。已关闭或陈旧的任务代次不产生 GPIO 写入。"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid ""
+"Thread only with a running scheduler. Unknown identifiers and out-of-grant "
+"bits return PERMISSION; overlapping or zero masks return INVALID. No user "
+"MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A"
+" closed or stale task incarnation performs no GPIO write."
+msgstr ""
+"仅限 Thread，且调度器正在运行。未知标识符和授权外的位返回 PERMISSION；掩码重叠或两者均为零时返回 INVALID。不引入用户 MMIO"
+" 映射、READ、翻转、OS 等待、堆分配或指针借用。已关闭或陈旧的任务代次不产生 GPIO 写入。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "[in] Exact assembly-local grant identifier, no pointer."
 msgstr "[in] 精确的装配内授权标识符，不是指针。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "[in] Granted bits to set, disjoint from reset_mask."
 msgstr "[in] 获授权可置位的位，与 reset_mask 不重叠。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "[in] Granted bits to reset."
 msgstr "[in] 获授权可复位的位。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "Scalar SUCCESS or INVALID/PERMISSION/STATE/CONTEXT."
 msgstr "标量 SUCCESS，或 INVALID／PERMISSION／STATE／CONTEXT。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:80
+msgid "lowpower.h"
+msgstr "lowpower.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Explicit continuous-clock tickless timer port."
+msgstr "显式的连续时钟无 tick 定时器端口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Bounded late alarm catch-up; larger delays violate the timer port."
+msgstr "有界的延迟闹钟追赶；超出边界即违反定时器端口合同。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Return the explicitly selected continuous timer port."
+msgstr "返回显式选定的连续定时器端口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid ""
+"A maintained SoC binding or application implementation overrides the weak "
+"NULL default. The port and context remain live throughout the scheduler; no "
+"runtime rebinding, hidden pool or worker is provided. Absence of a port "
+"never stops ticks or sleeps."
+msgstr ""
+"维护范围内的 SoC 绑定或应用实现覆盖弱 NULL "
+"默认值。端口和上下文必须在调度器整个生命周期内存活；不提供运行期重新绑定、隐藏池或执行任务。没有端口时绝不停止 tick，也不进入睡眠。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Stable port or NULL to leave normal periodic ticking."
+msgstr "稳定端口，或以 NULL 保持正常周期 tick。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Kernel tickless hook with measured phase preservation."
+msgstr "保留实测相位的内核无 tick 钩子。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid ""
+"Called only by Idle with scheduler suspended. Uses reviewed masked shallow "
+"WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The "
+"configured tick rate must divide 1000000 exactly. The final kernel readiness"
+" check precedes tick pause; a rejected pause makes no changes. Default "
+"profiles do not call this hook. HIL must verify the concrete timer, clock "
+"continuity and actual wake latency."
+msgstr ""
+"仅由 Idle 在调度器挂起时调用。使用经过审查的屏蔽状态浅睡眠 WFI、准确恢复保存的 PRIMASK，并有界追赶待处理 tick。配置的 tick "
+"频率必须能整除 1000000。暂停 tick 前先做最后一次内核就绪检查；暂停被拒绝时不产生修改。默认 profile 不调用此钩子。HIL "
+"必须验证具体定时器、时钟连续性和实际唤醒延迟。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "[in] Kernel's bounded next-unblock window."
+msgstr "[in] 内核给出的有界、距下一次解除阻塞的窗口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Stopped-tick epoch with the concrete port's declared precision."
+msgstr "tick 停止 epoch，精度以具体端口声明为准。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Caller-owned, immutable tickless timer implementation."
+msgstr "调用者拥有的不可变无 tick 定时器实现。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid ""
+"All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler "
+"suspended. They are bounded, never block or call kernel functions. "
+"pause_tick atomically stops the periodic tick and snapshots elapsed phase in"
+" its current tick period; a pending tick is rejected without effects. "
+"SUCCESS borrows the timer until resume_tick. now_us is the same monotonic "
+"clock as snapshot, continuous during shallow sleep. arm_deadline programs an"
+" enabled IRQ wake source; rejection retains no alarm. disarm removes only "
+"that alarm. resume_tick restores the periodic source with its next expiry at"
+" the supplied absolute clock instant, preserving phase within its declared "
+"quantization and sampling bound rather than adding callback latency to every"
+" tick. It must not publish an already accounted tick. The alarm wakes by "
+"deadline; at most eight extra ticks of latency may be caught up. Reversed "
+"clocks or larger latency fail stop. This does not configure clocks, NVIC, "
+"SCR or a board timer."
+msgstr ""
+"全部方法在特权 Idle Thread 模式、PRIMASK=1 且调度器挂起时运行。方法必须有界，不阻塞、不调用内核函数。pause_tick "
+"以原子方式停止周期 tick，并快照当前 tick 周期已经过的相位；若有 pending tick，则无效果地拒绝。SUCCESS "
+"开始借用定时器，直到 resume_tick。now_us 必须与 snapshot 使用同一单调时钟，并在浅睡眠期间连续运行。arm_deadline"
+" 配置已启用的 IRQ 唤醒源；拒绝时不得保留闹钟。disarm 仅撤销该闹钟。resume_tick "
+"恢复周期源，下一次到期必须位于所供给的绝对时钟时刻；在已声明量化和采样边界内保持相位，而不是给每个 tick 累加回调延迟。不得发布已经计入的 "
+"tick。闹钟必须不晚于截止时间唤醒；至多允许追赶八个额外 tick 的延迟。时钟倒退或更大延迟必须故障停止。本接口不配置时钟、NVIC、SCR "
+"或板级定时器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:88
+msgid "native.h"
+msgstr "native.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Explicit POSIX notification, queue and task storage."
+msgstr "显式 POSIX 通知、队列与任务存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Read POSIX monotonic microseconds."
+msgstr "读取 POSIX 单调微秒时间。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Clock value; clock_gettime failure is process-fatal"
+msgstr "时钟值；clock_gettime 失败会导致进程终止"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Initialize a notification in unused caller storage."
+msgstr "在调用者尚未使用的存储中初始化通知。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Task context; POSIX signal handlers are unsupported."
+msgstr "任务上下文；不支持 POSIX 信号处理函数。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] Storage kept alive through all publishers"
+msgstr "[out] 存储须比所有发布者存活更久"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or an initialization error"
+msgstr "NX_SUCCESS 或初始化错误"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Bind a single-waiter latched notification port."
+msgstr "绑定单等待者的序列锁存通知端口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for "
+"untimed waiting"
+msgstr "端口使用 CLOCK_MONOTONIC 绝对微秒时间；NX_DEADLINE_NEVER 表示不设超时的等待"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Destroy after external publisher quiescence."
+msgstr "外部发布者静止后再销毁。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Stop and join publishers first. The check cannot authorize a future call to "
+"race destruction. No storage access is allowed afterward."
+msgstr "先停止并 join 发布者。本项检查不能授权未来调用与销毁竞态执行。此后不允许访问存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[inout] Live storage with no future publishers"
+msgstr "[inout] 存活存储，之后不再有发布者"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or BUSY when a waiter is still registered"
+msgstr "NX_SUCCESS，或仍有等待者登记时的 BUSY"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Initialize an explicit bounded byte-copy queue."
+msgstr "初始化显式、有界的字节复制队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Task context; caller keeps buffer until successful destroy."
+msgstr "任务上下文；调用者保留缓冲区，直到成功 destroy。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] Unused caller storage"
+msgstr "[out] 尚未使用的调用者存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Caller-owned byte buffer"
+msgstr "[in] 调用者拥有的字节缓冲区"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Number of items, greater than zero"
+msgstr "[in] 条目数量，大于零"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Bytes per item, greater than zero"
+msgstr "[in] 每条目字节数，大于零"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or invalid/initialization error"
+msgstr "NX_SUCCESS 或无效参数／初始化错误"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Copy one item to the queue."
+msgstr "向队列复制一个条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Immediately available capacity is used even at an expired deadline. A finite"
+" deadline bounds waiting; spurious wakes never restart its budget. No item "
+"is retained on failure."
+msgstr "即使截止时间已到期，仍使用立即可用的容量。有限截止时间约束等待；伪唤醒绝不重新开始等待预算。失败时不保留任何条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] At least item_size bytes, borrowed during call only"
+msgstr "[in] 至少 item_size 字节，仅在调用期间借用"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
+msgstr "[in] CLOCK_MONOTONIC 绝对截止时间，或 NX_DEADLINE_NEVER"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "SUCCESS, TIMEOUT, STATE (closed) or error"
+msgstr "SUCCESS、TIMEOUT、STATE（已关闭）或错误"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Receive one item; closed queues can still be drained."
+msgstr "接收一个条目；关闭的队列仍可排空。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"An immediately available item can be received at an expired deadline. On "
+"failure the output is unchanged. Closed queues return STATE only after "
+"existing items have been drained."
+msgstr "截止时间已到期时仍可接收立即可用的条目。失败时输出不变。关闭的队列仅在现有条目排空后返回 STATE。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] At least item_size bytes; valid only on SUCCESS"
+msgstr "[out] 至少 item_size 字节；仅在 SUCCESS 时有效"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Reject sends and wake all waiting callers."
+msgstr "拒绝发送，并唤醒全部正在等待的调用者。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Task context; caller must join queue users before destroy."
+msgstr "任务上下文；调用者必须在 destroy 前 join 队列使用者。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or invalid error"
+msgstr "NX_SUCCESS 或无效参数错误"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Destroy quiesced and drained queue storage."
+msgstr "销毁已静止且已排空的队列存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[inout] Closed queue, no future users"
+msgstr "[inout] 已关闭队列，之后不再有使用者"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or BUSY if users/items remain"
+msgstr "NX_SUCCESS，或仍有使用者／条目时的 BUSY"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Start a task using the supplied host stack."
+msgstr "使用供给的主机栈启动任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Task context. No default task, pool or hidden stack exists. POSIX library "
+"bookkeeping is host-runtime allocation, not MCU RAM evidence."
+msgstr "任务上下文。没有默认任务、池或隐藏栈。POSIX 库的内部管理分配属于主机运行时，不能作为 MCU RAM 证据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] Zero-initialized unused caller handle"
+msgstr "[out] 已清零且尚未使用的调用者句柄"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Aligned storage accepted by pthread_attr_setstack"
+msgstr "[in] pthread_attr_setstack 接受的对齐存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Host stack size, at least PTHREAD_STACK_MIN"
+msgstr "[in] 主机栈大小，至少为 PTHREAD_STACK_MIN"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Returning bounded application entry"
+msgstr "[in] 会返回、执行有界的应用入口"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Entry context, kept alive until join"
+msgstr "[in] 入口上下文，保留直到 join"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or invalid/start error"
+msgstr "NX_SUCCESS 或无效参数／启动错误"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Join after requesting cooperative application stop."
+msgstr "请求应用协作停止之后执行 join。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"May block until entry returns. No forced cancellation. Caller may release "
+"context, handle and stack only after success. One external owner serializes "
+"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
+" are unsupported. Stop/join publishers before destroying their notification "
+"or queue storage."
+msgstr ""
+"可能阻塞直到入口返回。不提供强制取消。调用者仅在成功后才可释放上下文、句柄和栈。一个外部所有者串行执行 start/join；不支持多个同时 join "
+"的调用者，也不支持外部 pthread_cancel/detach。销毁通知或队列存储前，先停止并 join 发布者。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[inout] Started task; caller must not be the joined task"
+msgstr "[inout] 已启动的任务；调用者不得是被 join 的任务"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS only after pthread_join confirms execution exit"
+msgstr "仅在 pthread_join 确认执行已退出后返回 NX_SUCCESS"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Single waiter, multiple task publishers; fields are private."
+msgstr "单等待者、多个 Task 发布者；字段为私有状态。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Initialize/destroy have one external lifecycle owner. Stop and join all "
+"publishers and the waiter before destroy. External pthread_cancel of a "
+"caller blocked in these APIs is unsupported; use cooperative stop, publish "
+"and join."
+msgstr ""
+"initialize/destroy 由一个外部生命周期所有者负责。destroy 前，停止并 join 所有发布者和等待者。不支持外部对阻塞在这些 "
+"API 中的调用者执行 pthread_cancel；应使用协作停止、发布和 join。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Caller-sized queue storage; no heap or global object pool."
+msgstr "由调用者确定容量的队列存储，不使用堆或全局对象池。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"One lifecycle owner initializes, closes and destroys. Multiple "
+"producers/consumers are supported while live. External pthread_cancel of "
+"blocked users is unsupported."
+msgstr ""
+"由一个生命周期所有者执行 initialize、close 和 destroy。存活期间支持多个生产者／消费者。不支持外部对阻塞使用者执行 "
+"pthread_cancel。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Explicit task handle; stack storage is supplied at start."
+msgstr "显式任务句柄；启动时供给栈存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Start/join are serialized by one external lifecycle owner; there is one "
+"joiner. An entry may attempt a self-join, which returns BUSY. External "
+"cancellation and detachment are unsupported."
+msgstr ""
+"由一个外部生命周期所有者串行执行 start/join；仅有一个 join 调用者。入口可以尝试自 join，此时返回 BUSY。不支持外部取消或 "
+"detach。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:96
+msgid "secure_context.h"
+msgstr "secure_context.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Caller-owned Secure context leases for a trusted NS kernel."
+msgstr "供可信 NS 内核使用的调用者自有 Secure 上下文租约。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
+msgstr "最小上下文容量不包含八字节 ARM 栈封印。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Secure-context integrity failures, distinct from normal rejection."
+msgstr "Secure 上下文完整性失败，与普通拒绝区分。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Prepare exact Secure storage for one trusted task identity."
+msgstr "为一个可信任务身份准备准确 Secure 存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure privileged Thread startup/exclusive lifecycle owner. Both memory "
+"spans must be Secure, writable and disjoint. No NS task may run against this"
+" identity during prepare. Repeat prepare is rejected; epochs are never "
+"reset. No allocation, kernel operation or runtime registry is used."
+msgstr ""
+"Secure 特权 Thread 启动上下文／独占生命周期所有者。两段内存都必须是 Secure、可写且互不重叠。prepare 期间，不得有 NS "
+"任务以此身份运行。拒绝重复 prepare；epoch 绝不重置。不使用分配、内核操作或运行期注册表。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[out] Zero-initialized caller-owned Secure metadata."
+msgstr "[out] 已清零、由调用者拥有的 Secure 元数据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Eight-byte-aligned Secure writable stack allocation."
+msgstr "[in] 八字节对齐的 Secure 可写栈分配。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Whole allocation, including eight-byte upper seal."
+msgstr "[in] 整块分配，包含上端八字节封印。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Opaque NS task identity, never dereferenced here."
+msgstr "[in] 不透明 NS 任务身份，此处绝不解引用。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
+msgstr "SUCCESS、INVALID、CONTEXT、STATE 或 BUSY。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Rebind retired metadata while preserving its epoch history."
+msgstr "在保留 epoch 历史的前提下重新绑定已退役元数据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure lifecycle owner only after joining the previous task and stopping "
+"every observer. Existing stack is reused; stale handles remain invalid after"
+" the next allocation."
+msgstr "仅限 Secure 生命周期所有者，在先前任务已 join 且每个观察者均已停止后调用。复用现有栈；下一次分配后，过期句柄仍无效。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[inout] Prepared, unleased and unloaded Secure metadata."
+msgstr "[inout] 已准备、未租出且未加载的 Secure 元数据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] New trusted NS task identity."
+msgstr "[in] 新的可信 NS 任务身份。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Resolve a trusted, statically composed Secure task record."
+msgstr "解析可信、静态组合的 Secure 任务记录。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure application overrides the weak NULL default with an immutable "
+"mapping. Called with both PRIMASK states held; never dereference an NS-"
+"provided metadata pointer, allocate, block, discover objects, call a kernel "
+"or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this "
+"mechanism does not authenticate an adversarial NS privileged kernel. NS "
+"Thread calls cannot spoof Handler origin."
+msgstr ""
+"Secure 应用使用不可变映射覆盖弱 NULL 默认值。调用期间持有两侧 PRIMASK 状态；绝不能解引用 NS "
+"提供的元数据指针、分配、阻塞、发现对象、调用内核或修改映射。NS 内核及其 SVC/PendSV 被信任：此机制不认证恶意 NS 特权内核。NS "
+"Thread 调用不能伪装为 Handler 来源。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Opaque identity supplied by the trusted NS kernel."
+msgstr "[in] 可信 NS 内核提供的不透明身份。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Prepared caller-owned metadata, or NULL when unauthorized."
+msgstr "已准备、由调用者拥有的元数据；未获授权时为 NULL。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Fail stop after a loaded Secure stack integrity failure."
+msgstr "已加载 Secure 栈发生完整性失败后执行故障停止。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure application may override to record/reset safely. Called with both "
+"masks held; must not return, block, call a kernel or release retained "
+"storage. Default holds masks and spins. No transport or product recovery "
+"policy is imposed."
+msgstr ""
+"Secure "
+"应用可覆盖以安全记录／复位。调用期间持有两侧屏蔽；不得返回、阻塞、调用内核或释放保留的存储。默认保持屏蔽并自旋。不强加传输机制或产品恢复策略。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Seal or stack invariant violation."
+msgstr "[in] 封印或栈不变量被破坏。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
+msgstr "显式 Secure 元数据，绝不存放于 Nonsecure RAM。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Zero-initialize before prepare. Fields are mechanism-owned while prepared; "
+"applications cannot modify them. Metadata and stack remain alive until the "
+"task is joined, lease freed and no loaded context remains. Runtime Secure "
+"stack capacity is an application budget, not this port minimum."
+msgstr ""
+"prepare 前清零。准备期间字段由机制拥有，应用不得修改。元数据和栈必须保持存活，直到任务已 join、租约已释放且不再有已加载上下文。Secure"
+" 栈的运行期容量属于应用预算，不是此端口的最小值。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:104
+msgid "threadx.h"
+msgstr "threadx.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Caller-owned ThreadX task, wait and byte queue services."
+msgstr "调用者拥有的 ThreadX 任务、等待和字节队列服务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Privileged, single-core, current-security-domain APIs. All controls start "
+"zeroed and remain adapter-owned while live. One external lifecycle owner "
+"serializes init/destroy and joins; publishers, queue callers and IRQ sources"
+" must quiesce before reclaiming storage. Runtime task operations require "
+"unmasked Thread mode and a running kernel. Actual bootstrap permits object "
+"init, task create/discard and wake; it does not permit blocking waits or "
+"queue operations. A manual mask, ISR or unsupported context returns CONTEXT "
+"before mutation. The byte queue's task threshold guard rejects foreign "
+"priority-zero time-sliced callers. Caller controls, stack ranges, full "
+"borrowed name/context objects, queue payloads, item buffers and waiters must"
+" be disjoint. Cold admission rejects known control/stack/payload overlap and"
+" name/context starting inside control or stack; unknown opaque extents "
+"remain the caller's responsibility. Never operate a closable queue through "
+"its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is "
+"an actual unbounded kernel wait. Timeout never revokes any accepted I/O "
+"borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are "
+"outside this backend scope."
+msgstr ""
+"特权、单核、当前安全域 API。所有控制存储初始清零，存活期间由适配器拥有。一个外部生命周期所有者串行执行 init/destroy 和 "
+"join；回收存储前，发布者、队列调用者和 IRQ 源必须静止。运行期任务操作要求未屏蔽的 Thread 模式且内核正在运行。真实 bootstrap "
+"允许对象初始化、任务 create/discard 和唤醒；不允许阻塞等待或队列操作。手动屏蔽、ISR 或不支持的上下文会在修改前返回 "
+"CONTEXT。字节队列的任务阈值保护拒绝外来的优先级零时间片调用者。调用者控制存储、栈范围、完整借用的名称／上下文对象、队列载荷、条目缓冲区和等待者必须互不重叠。冷路径准入拒绝已知的控制／栈／载荷重叠，以及起始地址位于控制存储或栈内的名称／上下文；未知不透明对象的完整范围仍由调用者负责。绝不能通过可关闭队列内部的原始队列执行操作。所有截止时间均使用"
+" nx_time_now_us；NX_DEADLINE_NEVER 是真正无界的内核等待。超时绝不撤销任何已接受的 I/O 借用。MPU/TZ 隔离、无"
+" tick 睡眠及其他 Cortex-M 端口不属于此后端范围。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "One explicit caller latch per simultaneous close-aware operation."
+msgstr "每个同时执行的关闭感知操作都显式拥有一个调用者锁存器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Explicit irreversible kernel entry owned by the product."
+msgstr "由产品拥有的显式、不可逆内核入口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Privileged cold Thread/MSP, no live FP context or masks. Startup may create "
+"and discard unused static objects. After startup returns, the bootstrap "
+"scope is sealed. Only the trusted kernel may call adapter "
+"tx_application_define; it validates canonical privileged Thread context "
+"before the product callback. This is not a security isolation API. An "
+"unexpected kernel return invokes fail-stop and retains all effects; it never"
+" reopens bootstrap reclamation."
+msgstr ""
+"特权冷启动 Thread/MSP，无存活 FP 上下文或屏蔽状态。启动阶段可创建并 discard 尚未使用的静态对象。启动返回后，bootstrap "
+"范围即被封闭。只有可信内核可调用适配器 tx_application_define；适配器在产品回调之前验证规范的特权 Thread "
+"上下文。这不是安全隔离 API。内核意外返回时调用故障停止并保留全部效果；绝不重新开放 bootstrap 回收。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Product initialization inside tx_application_define"
+msgstr "[in] 在 tx_application_define 内执行的产品初始化"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed through startup and kernel lifetime"
+msgstr "[in] 在整个启动及内核生命周期内借用"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "CONTEXT or INVALID before entry; successful entry never returns"
+msgstr "进入前返回 CONTEXT 或 INVALID；成功进入后绝不返回"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Product failure hook; default parks forever."
+msgstr "产品失败钩子；默认永久停驻。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Actual fault context is not repaired or normalized; it may be masked, ISR or"
+" unprivileged. Do not assume a working kernel, clock, stack or permission to"
+" access a peripheral. The adapter observes the Core fault hook before this "
+"hook. Product owns separately reviewed safe output/reset actions. Returning "
+"does not authorize cleanup; the adapter parks."
+msgstr ""
+"不修复或规范化实际故障上下文；它可能处于屏蔽、ISR "
+"或非特权状态。不得假定内核、时钟、栈可正常使用，也不得假定拥有访问外设的权限。适配器在此钩子之前先调用 Core "
+"故障钩子。产品负责另外审查的安全输出／复位动作。返回不授权清理；适配器将停驻。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Context, permanent-entry or kernel-return failure"
+msgstr "[in] 上下文、永久入口或内核返回失败"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Mandatory product hook only for explicit external Tick."
+msgstr "仅显式外部 Tick 模式要求的产品钩子。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer "
+"clock and IRQ ceiling; it must not change the platform's continuous "
+"monotonic clock. Missing hook fails linking. Failure enters retaining fail-"
+"stop."
+msgstr ""
+"真实内核 bootstrap，特权且 PRIMASK 屏蔽。提供者负责定时器时钟和 IRQ "
+"优先级上限；不得改变平台的连续单调时钟。缺少钩子会导致链接失败。失败将进入保留状态的故障停止。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Exact immutable resolved kernel frequency"
+msgstr "[in] 准确、不可变、已解析的内核频率"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS after binding a real bounded periodic IRQ source"
+msgstr "绑定真实、有界的周期 IRQ 源后返回 SUCCESS"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Read-only configurable-IRQ and selected mask-policy gate."
+msgstr "只读的可配置 IRQ 与选定屏蔽策略检查。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Native has no hardware IRQ source and returns false."
+msgstr "Native 没有硬件 IRQ 源，返回 false。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "True only in a privileged unmasked reviewed external IRQ"
+msgstr "仅在特权、未屏蔽且经过审查的外部 IRQ 中返回 true"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Initialize one binary latch in task or actual bootstrap."
+msgstr "在任务或真实 bootstrap 上下文初始化一个二值锁存器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller control retained until destroy"
+msgstr "[inout] 已清零的调用者控制存储，保留直到 destroy"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT or IO"
+msgstr "SUCCESS、INVALID、CONTEXT 或 IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Bind a sequence hint and one concurrent blocking waiter."
+msgstr "绑定序列提示和一个并发阻塞等待者。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by "
+"nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration "
+"precedes a changed sequence."
+msgstr ""
+"绑定／arm 为只读操作。wake 支持任务／bootstrap，或经 nx_threadx_isr_allowed 准入的 IRQ。wait "
+"仅限任务上下文；有限截止时间到期的判断优先于序列变化。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live latch retained through every port user"
+msgstr "[inout] 存活锁存器，须在每个端口使用者存活期间保留"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Wait face; empty face for null or non-live control"
+msgstr "等待接口；控制存储为 null 或未存活时返回空接口"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy only after all publishers and waiter quiesce."
+msgstr "全部发布者和等待者静止后才允许销毁。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller latch"
+msgstr "[inout] 存活的调用者锁存器"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
+msgstr "SUCCESS、INVALID、CONTEXT、BUSY 或 IO；失败时保留锁存器"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Create a cooperatively returning task using exact storage."
+msgstr "使用准确存储创建可协作返回的任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"No adapter heap or worker. Name is borrowed, not copied. Linux uses its own "
+"pthread stack; the caller buffer only validates kernel metadata and is not a"
+" host stack budget. Higher-priority entries may run before start returns."
+msgstr ""
+"没有适配器堆或执行任务。名称被借用，不复制。Linux 使用自己的 pthread "
+"栈；调用者缓冲区仅用于验证内核元数据，不是主机栈预算。优先级更高的入口可能在 start 返回前运行。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller TCB/control, retained until join/discard"
+msgstr "[inout] 已清零的调用者 TCB／控制存储，保留直到 join/discard"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed immutable name, retained until reclamation"
+msgstr "[in] 借用的不可变名称，保留直到回收"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Eight-byte aligned caller storage"
+msgstr "[in] 八字节对齐的调用者存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Actual capacity, at least TX_MINIMUM_STACK"
+msgstr "[in] 实际容量，至少为 TX_MINIMUM_STACK"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] ThreadX priority; smaller values run first"
+msgstr "[in] ThreadX 优先级；数值越小越先运行"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Returns only after application stop/drain"
+msgstr "[in] 仅在应用停止／排空后返回"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed until successful join/discard"
+msgstr "[in] 借用直到成功 join/discard"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if "
+"reclamation cannot be established"
+msgstr "SUCCESS、INVALID、CONTEXT 或 IO；部分失败且无法确认可回收时，保留存活控制存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Join a cooperatively returned task and prove detachment."
+msgstr "对协作返回的任务执行 join，并证明引用已撤离。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Self-join is rejected. Timeout retains task, borrowed name, stack and "
+"context. Completion hint alone never reclaims; successful real kernel "
+"deletion establishes detachment."
+msgstr "拒绝自 join。超时保留任务、借用名称、栈和上下文。仅有完成提示绝不允许回收；真实内核删除成功才证明引用已撤离。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller task, one external joiner only"
+msgstr "[inout] 存活的调用者任务，仅允许一个外部 join 调用者"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
+msgstr "[in] 绝对 Core 截止时间，或 NX_DEADLINE_NEVER"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
+msgstr "SUCCESS、INVALID、CONTEXT、TIMEOUT 或 IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Discard an unused task only inside actual bootstrap."
+msgstr "仅在真实 bootstrap 内丢弃尚未使用的任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "This is prestart rollback, never runtime cancellation."
+msgstr "这是启动前回滚，绝不是运行期取消。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live task whose entry has never begun"
+msgstr "[inout] 存活且入口从未开始执行的任务"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
+msgstr "SUCCESS、INVALID、CONTEXT 或 IO；失败时保留存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Start a permanent task without a completion latch."
+msgstr "启动不含完成锁存器的永久任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Eight-byte stack alignment; failure can retain live state."
+msgstr "栈按八字节对齐；失败时可能保留存活状态。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller control, retained until reset"
+msgstr "[inout] 已清零的调用者控制存储，保留直到复位"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed immutable name, retained until reset"
+msgstr "[in] 借用的不可变名称，保留直到复位"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Aligned caller buffer, retained until reset"
+msgstr "[in] 已对齐的调用者缓冲区，保留直到复位"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Smaller ThreadX priority values run first"
+msgstr "[in] ThreadX 优先级数值越小越先运行"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Never returns; return invokes retaining fail-stop"
+msgstr "[in] 绝不返回；返回将触发保留状态的故障停止"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed until reset"
+msgstr "[in] 借用直到复位"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Initialize an exact arbitrary-byte bounded queue."
+msgstr "初始化支持准确任意字节条目的有界队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Caller payload storage retained until destroy"
+msgstr "[in] 调用者载荷存储，保留直到 destroy"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Exact depth multiplied by item_size"
+msgstr "[in] 准确的深度乘以 item_size"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
+msgstr "[in] 正数、有界且小于 TX_WAIT_FOREVER 的容量"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive byte count, without word-size narrowing"
+msgstr "[in] 正数字节数，不缩减为字尺寸"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Task-only send; immediate readiness wins over expiration."
+msgstr "仅 Task 发送；立即就绪优先于截止到期。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live queue retained throughout the operation"
+msgstr "[inout] 存活队列，在整个操作期间保留"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Exactly item_size readable bytes borrowed until return"
+msgstr "[in] 准确的 item_size 个可读字节，借用直到返回"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
+msgstr "SUCCESS、INVALID、CONTEXT、TIMEOUT、OVERFLOW 或 IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Task-only receive; output changes only on SUCCESS."
+msgstr "仅 Task 接收；只在 SUCCESS 时修改输出。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[out] Exactly item_size writable bytes borrowed until return"
+msgstr "[out] 准确的 item_size 个可写字节，借用直到返回"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy a drained queue after every caller quiesces."
+msgstr "每个调用者静止后，销毁已排空队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller control and storage"
+msgstr "[inout] 存活的调用者控制存储及数据存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
+msgstr "SUCCESS、INVALID、CONTEXT 或 BUSY；失败时保留存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Initialize one explicit close-aware operation latch."
+msgstr "初始化一个显式关闭感知操作锁存器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller storage retained until waiter destroy"
+msgstr "[inout] 已清零的调用者存储，保留直到等待者 destroy"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy inactive waiter after its operation has returned."
+msgstr "等待者操作返回后，销毁其非活动存储。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller latch with no concurrent users"
+msgstr "[inout] 存活的调用者锁存器，不能有并发使用者"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO"
+msgstr "SUCCESS、INVALID、CONTEXT、BUSY 或 IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Add explicit bounded close broadcast to a byte queue."
+msgstr "向字节队列加入显式、有界的关闭广播。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Payload size and maximum_waiters bound task scheduling pause; the entire "
+"copy/broadcast does not mask interrupts."
+msgstr "载荷大小和 maximum_waiters 约束任务调度暂停时长；整个复制／广播过程不屏蔽中断。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive capacity below TX_WAIT_FOREVER"
+msgstr "[in] 正数且小于 TX_WAIT_FOREVER 的容量"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive exact payload byte count"
+msgstr "[in] 正数、准确的载荷字节数"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive maximum simultaneous operations"
+msgstr "[in] 正数的最大同时操作数"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Reject sends, wake registered waiters, retain queued items."
+msgstr "拒绝发送、唤醒已登记等待者、保留已入队条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live close-aware queue"
+msgstr "[inout] 存活的关闭感知队列"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID or CONTEXT; close is idempotent"
+msgstr "SUCCESS、INVALID 或 CONTEXT；close 是幂等操作"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Send with immediate close wake and explicit admission."
+msgstr "发送时提供立即关闭唤醒与显式准入。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "A closed queue rejects sends without changing payload."
+msgstr "已关闭队列拒绝发送，且不修改载荷。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live exclusive latch for this simultaneous call"
+msgstr "[inout] 本次并发调用独占的存活锁存器"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
+msgstr "SUCCESS、CANCELLED、TIMEOUT、BUSY、INVALID、CONTEXT 或 IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Receive and drain previously queued items after close."
+msgstr "关闭后接收并排空此前已入队的条目。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Closed and empty returns CANCELLED; failure leaves output."
+msgstr "已关闭且为空时返回 CANCELLED；失败时输出保持不变。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy only a closed, drained and quiesced queue."
+msgstr "仅销毁已关闭、已排空且静止的队列。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live control and its borrowed payload storage"
+msgstr "[inout] 存活控制存储及其借用的载荷存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "One binary latch; publishers quiesce before destruction."
+msgstr "一个二值锁存器；销毁之前发布者必须静止。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Returning task retains all storage until external successful join."
+msgstr "返回型任务保留全部存储，直到外部成功 join。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Permanent task has no completion latch, join or destroy."
+msgstr "永久任务不含完成锁存器、join 或 destroy。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Exact arbitrary byte items; no native word-size narrowing."
+msgstr "准确的任意字节条目，不缩减为原生字尺寸。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Optional bounded close broadcast; registry is task-only."
+msgstr "可选、有界关闭广播；登记仅在 Task 上下文执行。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:112
+msgid "tick.h"
+msgstr "tick.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Explicit external Tick and diagnostic counter contracts."
+msgstr "显式外部 Tick 与诊断计数器合同。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Applications implement these symbols only when the authored OS policy "
+"enables them. No weak timer/counter fallback is supplied. The platform never"
+" invents timer wiring."
+msgstr "只有配置中显式声明的 OS 策略启用这些符号时，应用才实现它们。不提供弱定时器／计数器回退实现。平台绝不臆造定时器接线。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Configure the application's selected kernel Tick source."
+msgstr "配置应用选定的内核 Tick 源。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Scheduler startup calls this in its canonical masked, privileged context. "
+"Configure a periodic interrupt, clear pending state and route it to the "
+"selected kernel Tick handler at its validated priority. Do not start tasks "
+"here. Hardware clock and routing remain application/SoC-owned."
+msgstr ""
+"调度器启动时在其规范、已屏蔽、特权上下文调用。配置周期中断，清除 pending 状态，并以已验证的优先级路由到选定内核 Tick "
+"处理函数。不得在此启动任务。硬件时钟和路由仍由应用／SoC 拥有。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "[in] Exact authored Tick frequency in hertz"
+msgstr "[in] 配置中显式声明的准确 Tick 频率，单位为赫兹"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Start the explicitly selected diagnostic counter."
+msgstr "启动显式选定的诊断计数器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Called during scheduler startup. Counter initialization must be bounded, "
+"allocation-free and safe in the startup mask."
+msgstr "调度器启动期间调用。计数器初始化必须有界、不分配，并在启动屏蔽状态下安全。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Read the diagnostic counter without blocking."
+msgstr "无阻塞地读取诊断计数器。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Called by the kernel during context switches. It must be bounded, "
+"allocation-free and safe in interrupt/critical context. Configure a "
+"frequency above Tick frequency and account for wrapping when interpreting "
+"recorded totals."
+msgstr "由内核在上下文切换期间调用。必须有界、不分配，并在中断／临界上下文中安全。配置高于 Tick 的频率，并在解释记录总量时处理回绕。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Monotonic modulo-32-bit counter in application-defined units"
+msgstr "以应用定义单位计量、按 2^32 取模回绕的单调计数器"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:120
+msgid "wait.h"
+msgstr "wait.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Optional sequence-latched waiting without hidden workers."
+msgstr "可选的序列锁存等待，不含隐藏执行任务。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Wait for an authoritative caller predicate."
+msgstr "等待调用者的权威谓词。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"Task context. No service, queue, callback dispatch or task creation is "
+"implicit. A shared-bus client must not use ready to service the controller; "
+"its execution owner must remain running during stop/drain."
+msgstr ""
+"任务上下文。不隐式执行服务、队列操作、回调派发或任务创建。共享总线客户端不得用 ready 服务控制器；停止／排空期间，其执行所有者必须保持运行。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "[in] Live single-waiter notification port"
+msgstr "[in] 存活的单等待者通知端口"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "[in] Bounded predicate, called in caller context"
+msgstr "[in] 有界谓词，在调用者上下文调用"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "[in] Predicate context, retained for this call only"
+msgstr "[in] 谓词上下文，仅在本次调用期间保留"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no "
+"wall-clock or relative values"
+msgstr "[in] 端口时钟域内的绝对截止时间，或 NX_DEADLINE_NEVER；不能使用墙上时钟或相对值"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"NX_SUCCESS when predicate is observed true, including a final observation "
+"after TIMEOUT; otherwise port error"
+msgstr "观察到谓词为 true 时返回 NX_SUCCESS，包括 TIMEOUT 后的最后一次观察；否则返回端口错误"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Single-waiter notification port."
+msgstr "单等待者通知端口。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"Caller owns storage and serializes arm/wait. Multiple wake publishers are "
+"permitted by each backend's documented context. Sequence is a hint; the "
+"predicate/request is authoritative. There must be fewer than 2^32 wakes "
+"between arm and recheck. All deadlines are absolute monotonic microseconds "
+"in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling "
+"timeout. Clocks must continue while waiting and never change domain; "
+"construct relative budgets with nx_deadline_after to avoid overflow. A "
+"timeout does not settle a request or release its buffers. Before destroy, "
+"stop and join every publisher and waiter; SETTLED alone does not prove "
+"notification storage is reclaimable. arm snapshots the sequence. wait must "
+"atomically observe a changed sequence or a latched wake, including a wake "
+"between the caller's recheck and sleeping. A changed sequence cannot bypass "
+"a finite deadline: wait checks expiry on every call and every return from "
+"blocking before reporting a hint. A nonblocking backend may return BUSY "
+"while unexpired. Only one owner may arm/wait; a second concurrent wait is "
+"outside the port contract even when a backend rejects it."
+msgstr ""
+"调用者拥有存储，并串行执行 arm/wait。各后端文档规定的上下文允许多个唤醒发布者。序列只是提示；谓词／请求才是权威依据。arm "
+"与重新检查之间的唤醒次数必须少于 2^32。所有截止时间均为后端时钟域内的绝对单调微秒时间；NX_DEADLINE_NEVER "
+"显式禁用超时。时钟必须在等待期间连续运行且不得改变时间域；应使用 nx_deadline_after "
+"构造相对预算，避免溢出。超时不会使请求结清或释放缓冲区。销毁前，必须停止并 join 每个发布者和等待者；仅有 SETTLED "
+"不能证明通知存储可回收。arm 快照序列；wait "
+"必须原子地观察序列变化或已锁存唤醒，包括调用者再次检查与睡眠之间发生的唤醒。序列变化不能绕过有限截止时间：wait "
+"在每次调用以及每次从阻塞返回后，都先检查到期，再报告提示。未到期时，非阻塞后端可以返回 BUSY。仅一个所有者可以执行 "
+"arm/wait；即使后端会拒绝第二个并发等待，其行为仍位于端口合同之外。"

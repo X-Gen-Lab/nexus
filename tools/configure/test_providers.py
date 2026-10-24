@@ -1,4 +1,5 @@
 """Maintained provider boundaries and immutable mode decisions."""
+from tools.configure.providers.descriptor import source_directory
 from dataclasses import FrozenInstanceError
 import json
 from pathlib import Path
@@ -8,13 +9,14 @@ import unittest
 
 import bindings
 import configure as gate
+import selection as selection_rules
 
 
 class ProviderContractTests(unittest.TestCase):
     def test_unselected_mode_cannot_invent_a_software_capability(self):
         for family in ("native", "stm32f407", "gd32f470", "stm32g474"):
             with self.subTest(family=family):
-                soc = gate.load(gate.ROOT / "soc" / family / "soc.json")
+                soc = gate.load(gate.ROOT / source_directory(family) / "soc.json")
                 part = next(iter(soc["variants"]))
                 controller = next(item for item in soc["controllers"].values()
                                   if item["kind"] == "gpio")
@@ -31,7 +33,7 @@ class ProviderContractTests(unittest.TestCase):
                                  ('apb2_hz', 100000000.0),
                                  ('profile_alias', 'unimplemented-clock')):
                 with self.subTest(family=family, field=field, value=value):
-                    soc = gate.load(gate.ROOT / f'soc/{family}/soc.json')
+                    soc = gate.load(gate.ROOT / f'{source_directory(family)}/soc.json')
                     if field == 'profile_alias':
                         soc['clock_profiles'][value] = dict(
                             soc['clock_profiles'][profile])
@@ -88,7 +90,7 @@ class ProviderContractTests(unittest.TestCase):
                     {"pin": f"PA{channel}"} for channel in channels]}
                 with self.subTest(family=family, mode=mode):
                     with self.assertRaisesRegex(ValueError, "channel count"):
-                        common.validate_selection(selection, route, provider,
+                        selection_rules.validate_selection(selection, route, provider,
                                                   131072)
 
     def test_adc_constructor_sequences_are_validated_before_generation(self):
@@ -100,7 +102,7 @@ class ProviderContractTests(unittest.TestCase):
         for family in ("stm32f407", "gd32f470"):
             with self.subTest(family=family):
                 with self.assertRaisesRegex(ValueError, "channel sequence"):
-                    common.validate_selection(selection, route,
+                    selection_rules.validate_selection(selection, route,
                                               maintained(family), 131072)
 
     def test_mode_traits_are_explicit_immutable_and_directional(self):
@@ -127,7 +129,7 @@ class ProviderContractTests(unittest.TestCase):
             common.mode_traits("uart", "dma-unimplemented")
 
     def test_unknown_family_cannot_inherit_cortex_m4_abi(self):
-        soc = gate.load(gate.ROOT / "soc/stm32f407/soc.json")
+        soc = gate.load(gate.ROOT / "soc/stm32/stm32f407/soc.json")
         soc["id"] = "unmaintained-m4"
         with self.assertRaisesRegex(gate.ConfigurationError,
                                     "Unmaintained SoC provider"):

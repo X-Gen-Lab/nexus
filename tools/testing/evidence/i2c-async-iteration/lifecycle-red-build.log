@@ -1,6 +1,0 @@
-[1/6] Building CXX object CMakeFiles/i2c_async_register_test.dir/tests/i2c_async_register_test.cpp.o
-[2/6] Building CXX object CMakeFiles/i2c_async_stm32_test.dir/tests/i2c_async_register_test.cpp.o
-[3/6] Linking CXX executable i2c_async_register_test
-[4/6] Building CXX object CMakeFiles/i2c_async_gd32_test.dir/tests/i2c_async_register_test.cpp.o
-[5/6] Linking CXX executable i2c_async_stm32_test
-[6/6] Linking CXX executable i2c_async_gd32_test

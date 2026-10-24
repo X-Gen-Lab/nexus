@@ -6,6 +6,7 @@
 #ifndef NEXUS_IO_PWM_GROUP_H
 #define NEXUS_IO_PWM_GROUP_H
 #include "nexus/core/status.h"
+#include "nexus/io/fwd.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,10 +38,10 @@ typedef struct {
     nx_result_t (*state)(const void* context, nx_pwm_group_state_t* state);
 } nx_pwm_group_ops_t;
 /** \brief Immutable identity with no default-device state or allocation. */
-typedef struct {
+struct nx_pwm_group {
     const nx_pwm_group_ops_t* ops;
     void* context;
-} nx_pwm_group_t;
+};
 /**
  * \brief Stage a complete channel group and its internal trigger comparison.
  * \param[in] port: One serialized privileged task/configurable-IRQ owner.

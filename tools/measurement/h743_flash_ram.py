@@ -24,8 +24,8 @@ from tools.measurement.elf import Elf32
 from tools.measurement.flash_execution import (verify_h743_cpu_bridge,
     verify_h743_ram_layout)
 from tools.measurement.flash_ram_static import verify_h743_ram_static
-from tools.measurement.resources import (input_protection_paths,
-    resolved_float_abi, validate_elf_configuration)
+from tools.measurement.resources import (allocation, input_protection_paths,
+    memory_contract, resolved_float_abi, validate_elf_configuration)
 from tools.measurement.soc_costs import compiler_commands
 
 RAM_SOURCES = ("flash_ram.c", "flash_ram_owner.c", "flash_ram_transaction.c",
@@ -49,6 +49,70 @@ class _OutputError(EvidenceError):
 def _require(ok, message):
     if not ok:
         raise EvidenceError("H743 link audit: " + message)
+
+
+def flash_linkage(elf):
+    """Observe the actual public ops words separately from RAM-pod retention.
+
+    Some consumers select Flash cold preparation without retaining its public
+    face. A passed RAM audit then proves no public operation linkage. Retained
+    operations below are linked bytes, not execution or whole-provider cost.
+    """
+    name = "nx_stm32h743_flash_ops"
+    result = {"status": "not_retained", "qualification": False,
+              "operations": [], "table_bytes": 0}
+    tables = [row for row in elf.defined_symbols if row["name"] == name or
+              row["name"].startswith(name + ".lto_priv.")]
+    if not tables and name not in elf.symbols:
+        return result
+
+    def read_only(address, size, executable=False):
+        loads = [row for row in elf.loads if row["virtual"] <= address and
+                 address + size <= row["virtual"] + row["files"] and
+                 row["flags"] & 4 and not row["flags"] & 2 and
+                 (not executable or row["flags"] & 1)]
+        _require(len(loads) == 1, "public Flash bytes lack readonly LOAD")
+        offset = loads[0]["offset"] + address - loads[0]["virtual"]
+        data = elf.data[offset:offset + size]
+        _require(len(data) == size, "public Flash LOAD bytes are truncated")
+        return data
+
+    _require(len(tables) == 1 and tables[0]["type"] == 1 and
+             tables[0]["size"] == 16, "public Flash ops needs its exact object")
+    address = tables[0]["value"]
+    _require(name not in elf.symbols or elf.symbols[name] == address,
+             "public Flash ops symbol differs from its object")
+    words = read_only(address, 16)
+    operations = ("geometry", "read", "program", "erase")
+    for index, operation in enumerate(operations):
+        pointer = int.from_bytes(words[4 * index:4 * index + 4], "little")
+        _require(pointer & 1,
+                 "public Flash ops word does not bind " + operation)
+        read_only(pointer & ~1, 2, executable=True)
+        symbols = [row for row in elf.defined_symbols
+                   if row["value"] in (pointer, pointer & ~1)]
+        methods = [row for row in symbols if row["value"] == pointer and
+                   row["type"] == 2 and row["size"] > 0]
+        _require(not symbols or methods,
+                 "public Flash ops word names no nonempty function")
+        recognized = [row for row in methods if row["file"] == "flash.c" and
+                      row["name"] in operations]
+        _require(not recognized or any(row["name"] == operation
+                                       for row in recognized),
+                 "public Flash ops word does not bind " + operation)
+        proved = [row for row in recognized if row["name"] == operation]
+        method = proved[0] if proved else methods[0] if methods else None
+        if method is not None:
+            read_only(pointer & ~1, method["size"], executable=True)
+        result["operations"].append({"operation": operation, "address": pointer,
+            "status": "verified" if proved else "not_proved",
+            "symbol": method["name"] if method else None,
+            "source_file": method["file"] if method else None,
+            "bytes": method["size"] if method else None})
+    proved = all(row["status"] == "verified" for row in result["operations"])
+    result.update(status="retained_verified" if proved else "retained_not_proved",
+                  table_address=address, table_bytes=16)
+    return result
 
 
 def _argv(row):
@@ -81,7 +145,7 @@ def _stack_inputs(path):
              "nonempty bounded compile database required")
     selected = []
     for name in RAM_SOURCES:
-        source = regular_file(ROOT / "soc/stm32h743/drivers" / name)
+        source = regular_file(ROOT / "soc/stm32/stm32h743/drivers" / name)
         matches = []
         for row in data:
             _require(isinstance(row, dict), "compile entry is not an object")
@@ -188,7 +252,7 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
     outputs = _outputs(report_path)
     preliminary = [elf_path, resolved_path, commands_path,
                    *input_protection_paths(resolved_path),
-                   *(ROOT / "soc/stm32h743/drivers" / name for name in RAM_SOURCES),
+                   *(ROOT / "soc/stm32/stm32h743/drivers" / name for name in RAM_SOURCES),
                    *(ROOT / name for name in DEPENDENCIES)]
     tool = shutil.which(str(objdump))
     _require(tool is not None, "actual CMake objdump is unavailable")
@@ -242,6 +306,8 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
                          "arguments": row["arguments"]}}
             for row in selected],
             return_gate="nx_stm32h743_flash_ram_return")
+        linkage = flash_linkage(elf)
+        resources = allocation(elf, *memory_contract(resolved))
         _require(before == [file_identity(path) for path in protected],
                  "an audit input changed during execution")
         report = {
@@ -260,10 +326,12 @@ def audit(elf_path, resolved_path, commands_path, objdump, report_path):
             "objdump_execution": load_json(outputs["objdump_receipt"]),
             "compiler_execution": load_json(outputs["compiler_receipt"]),
             "ram_layout": layout, "cpu_bridge": cpu, "static_closure": static,
+            "public_flash_linkage": linkage, "linked_resources": resources,
             "physical_execution": "not_executed",
             "limits": ["conditional CPU/AAPCS and static RAM residency/frame checks",
                        "C data ownership, Flash-read and MPU/device protocol not proved",
                        "identified compile metadata is not signed build history",
+                       "public ops linkage is not execution or isolated provider cost",
                        "no hardware or software-candidate qualification"],
         }
     except _OutputError:

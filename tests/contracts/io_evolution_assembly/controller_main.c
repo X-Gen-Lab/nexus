@@ -14,8 +14,50 @@
  * even when a consumer includes its generic I/O header before the factory. */
 #include "nexus/io/cycle_probe.h"
 #endif
+#include "nexus/io/adc.h"
+#include "nexus/io/encoder.h"
+#include "nexus/io/exti.h"
+#include "nexus/io/flash.h"
+#include "nexus/io/gpio.h"
+#include "nexus/io/i2c.h"
+#include "nexus/io/pwm_group.h"
+#include "nexus/io/spi.h"
+#include "nexus/io/timer.h"
+#include "nexus/io/timer_capture.h"
+#include "nexus/io/uart.h"
+#include "nexus/io/watchdog.h"
 #include "nexus_bindings.h"
 #include "nexus_factory.h"
+#if defined(NX_FIXTURE_ADC_GROUP)
+#include "nexus/io/adc_group.h"
+#endif
+#if defined(NX_FIXTURE_ETH_FRAMES)
+#include "nexus/io/ethernet_frames.h"
+#include "nexus/io/mdio.h"
+#endif
+#if defined(NX_FIXTURE_PWM_ADC)
+#include "nexus/io/pwm_adc.h"
+#endif
+#if defined(NX_FIXTURE_CAN_FD)
+#include "nexus/io/can_fd.h"
+#endif
+#if defined(NX_FIXTURE_UART_WORD)
+#include "nexus/io/uart_word.h"
+#endif
+#if defined(NX_FIXTURE_SPI_TRANSACTION)
+#include "nexus/io/spi_transaction.h"
+#endif
+#if defined(NX_FIXTURE_SPI_DMA_TRANSACTION)
+#include "nexus/io/spi_dma_owner_binding.h"
+#include "nexus/io/spi_dma_transaction.h"
+#endif
+#if defined(NX_FIXTURE_I2C_LONG)
+#include "nexus/io/i2c_long.h"
+#endif
+#if defined(NX_FIXTURE_UART_STREAM_PROFILE) ||                                 \
+    defined(NX_FIXTURE_ADC_STREAM_PROFILE)
+#include "nexus/io/stream_profile.h"
+#endif
 
 /* Volatile-qualified face fields force real ROM reads. Their relocations keep
  * concrete ops and all non-NULL methods alive through section GC, independently

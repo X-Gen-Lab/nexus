@@ -67,6 +67,51 @@ Automation proves execution, while retained development logs document historical
 RED/GREEN order. Pure prose or diagram edits need corresponding document checks
 and semantic review rather than mirrored implementation tests.
 
+## Keep feedback fast and evidence complete
+
+Use a focused development run for the behavior being changed, then execute the
+normal complete acceptance gates for the final source. Discover the maintained
+case names instead of adding duplicate test programs. Retain the original RED
+failure, GREEN result and actual command. A filter or a cached result cannot
+qualify a complete candidate.
+
+`python tools/dev/dev.py timings /path/to/receipts` summarizes existing process
+receipts without rerunning work. Separate preparation, configuration, compilation,
+tests, documentation and SDK consumption. Preserve failed/cancelled attempts and
+unknown CPU or RSS observations; overlapping wall times are not additive elapsed
+time. Compare equivalent source/tool/profile scopes before attributing a speedup.
+
+On Linux, a normally reaped process, including a nonzero exit, can have
+`resource_usage` observed by `wait4`: user/system CPU seconds and
+`maximum_process_rss_bytes`.
+The scope is the waited process and descendants it has already reaped. The RSS
+value is the largest observed single-process peak, not simultaneous process-tree
+memory. Timeout, cancellation, launch failure, older receipts and other platforms
+retain unknown values rather than estimating them from wall time.
+
+The timings summary exposes `measured_resource_attempts` and
+`maximum_observed_process_rss_bytes` while preserving each original receipt.
+Aggregate `cpu_seconds`, `peak_rss_bytes` and `cache_hits` remain unknown because
+nested receipts can double-count work and these observations do not establish a
+global memory peak or cache behavior. Compare cold and warm attempts separately
+under the same toolchain, source and profile; measurements from a small tool
+regression do not quantify whole-project build improvement.
+
+Choose an explicit finite compiler budget for available RAM and disk, not just
+CPU count. Reuse verified source/tool preparation and ordinary incremental builds;
+invalidate changed configuration, dependencies and generated inputs normally.
+Do not cache acceptance reports, restore incompatible objects or parallelize two
+mutations of the same build tree. Full gate discovery, actual exits, output
+identities and failure/cancellation retention remain mandatory.
+
+Before deleting a test, identify its behavioral obligation and independent
+remaining coverage. Remove only an obsolete behavior or a demonstrated duplicate
+of the same contract. Keep tests that expose rejected ownership, retained borrows,
+instance isolation, cancellation, IRQ ordering, real vendor behavior or external
+SDK consumption. A passing implementation-shaped assertion alone is not an
+independent substitute. If the audit finds no safe deletion, retain the test;
+shrinking a count is not an optimization objective.
+
 ## Preserve style and scope
 
 Use the unchanged `.clang-format` and `.editorconfig`: 80 columns, four spaces,

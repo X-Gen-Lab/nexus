@@ -1,3 +1,0 @@
-usage: style_gate.py [-h] [--all] [--base-ref BASE_REF] [--report REPORT]
-                     [files ...]
-style_gate.py: error: unrecognized arguments: --files
