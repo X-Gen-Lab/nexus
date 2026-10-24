@@ -163,3 +163,84 @@ a software candidate, physical MCU execution, HIL or independent validation of a
 historical artifact that could not be downloaded. New runs have new transport
 identities; the previous oversized ZIP and all failed download observations keep
 their original identities and unresolved validation status.
+
+## Original formal-run diagnostics and large archive transport
+
+`formal_diagnostics.py` reads a previously downloaded formal artifact. Select
+its exact source commit, run and attempt; the workflow checks the original
+GitHub run and artifact identity before download. Local file names alone do not
+authenticate GitHub. The tool verifies both complete existing store archives,
+binds the original job identity and nested envelope, then copies the original
+plan report, all executed stage receipts and complete failed-stage raw/attempt
+files. It never executes archived scripts or reruns checkers.
+
+The maintained `formal-software.yml` workflow also accepts `mode=diagnostics`,
+`run_id`, `attempt` and `expected_source`. Dispatch the revision containing that
+entry point; its own workflow SHA is distinct from the original source being
+read. The original run must have completed with success or failure, and its
+actual conclusion remains recorded. `expected_commit` belongs to formal mode.
+A successful diagnostics job cannot change the original plan's conclusion.
+
+```sh
+python -B tools/evidence/formal_diagnostics.py \
+  --artifact /download/original-formal \
+  --output /new/formal-diagnostics \
+  --expected-commit EXACT_ORIGINAL_SHA --run-id ORIGINAL_RUN \
+  --run-attempt ORIGINAL_ATTEMPT
+```
+
+`diagnostics/` retains the observed original outcome; exit zero means extraction
+and byte verification succeeded, even when that original outcome is failure.
+It never establishes software qualification. `transport/` contains the exact
+original build envelope and a manifest of the unchanged archive's full size/SHA
+and ordered offsets, sizes and SHA256 values for `parts/part-000`, and so on.
+Each part is at most 450 MiB, with at most 16 parts. Upload each part as a separate
+artifact; combining them defeats the connector's 512 MiB limit. Keep diagnostics
+and transport metadata separate too. Reject missing or changed parts before
+joining them in the recorded order, verify the complete archive size/SHA, then
+run the unchanged store verifier with the original envelope and an explicit
+archive location. Splitting does not alter the original package format.
+
+Unknown files, aliases, context mismatches, archive changes and exceeded bounds
+fail without truncating evidence. The complete diagnostic directory is limited
+to 400 MiB. Failed attempts retain their output; retries require a new directory.
+Original input files remain unchanged and must stay available for recovery.
+
+For a failed stage, an explicit `--report` is restricted to that stage's original
+output directory and copied with its matching `.contexts` directory. Native
+contract failures select only the declared one of the four maintained Native
+presets: its complete `tdd/` logs, `ctest-results.xml` and
+`Testing/Temporary/LastTest.log`. Absent optional diagnostics remain explicitly
+missing. These files share the same complete 400 MiB diagnostic budget.
+
+## 原始 formal 诊断与大归档传输
+
+`formal_diagnostics.py` 只读取已经下载的原始 formal artifact。必须指定精确
+源码提交、run 和 attempt；workflow 在下载前核对 GitHub 原始运行及 artifact
+身份，本地文件名不能证明远端来源。工具完整验证既有外层和内层 store 归档，
+绑定原始 job identity 与内层 envelope，复制原计划报告、全部已执行阶段收据及
+失败阶段的完整 raw／attempt 文件；不执行归档内脚本，也不重跑 checker。
+
+维护中的 `formal-software.yml` 另支持 `mode=diagnostics`、`run_id`、`attempt`
+和 `expected_source`。应从包含该入口的 revision 派发；诊断 workflow 自身的
+SHA 与读取的原始源码身份分开。原运行须已完成，且实际结论为成功或失败，原结论
+保持记录；`expected_commit` 仅用于 formal 模式。诊断 job 成功不能改变原计划
+的失败结论。
+
+`diagnostics/` 保留原始结果。退出零仅表示抽取和字节验证成功，原始失败仍为
+失败，不产生软件资格。`transport/` 保存原始 build envelope 和传输清单；
+清单记录原归档完整大小／SHA，以及 `parts/part-000` 等分片的顺序、偏移、大小
+和 SHA256。每片最多 450 MiB、最多 16 片，必须分别上传为独立 artifact，不能
+重新合并成超出连接器 512 MiB 限额的大包。诊断和传输元数据也分别上传。
+接收端先拒绝缺失或变更的分片，按清单顺序拼接，再核对完整归档大小／SHA，
+最后用原 envelope 和明确的新归档路径调用既有 store 验证器。原包格式不变。
+
+未知文件、别名、上下文错配、归档变化或超限均失败，不截断证据；完整诊断目录
+上限为 400 MiB。失败尝试保留输出，重试必须使用新目录。原始输入保持不变，
+仍须保留以便恢复；传输成功不替代候选资格或实际硬件验收。
+
+失败阶段显式声明的 `--report` 必须位于原阶段输出目录内部；工具复制该文件及
+同名 `.contexts` 目录。Native 契约失败只选择明确声明的四种维护 preset 之一，
+保留其完整 `tdd/` 日志、`ctest-results.xml` 和
+`Testing/Temporary/LastTest.log`。不存在的可选诊断明确记为缺失；这些文件同样
+计入完整诊断目录共享的 400 MiB 上限。
