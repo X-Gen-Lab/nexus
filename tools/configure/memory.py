@@ -4,11 +4,6 @@ Physical memory facts remain authoritative in the SoC package. Selection adds
 only placement and per-domain budgets; it never changes bus-master reachability.
 """
 
-try:
-    from .providers.common import fail
-except ImportError:
-    from providers.common import fail
-
 
 def select(regions, budgets, family, part, *, obj, integer, fail):
     choices = obj(budgets.get("regions", {}), set(),
@@ -347,17 +342,22 @@ SECTIONS {{
 
 
 def dma_regions(name, result, include_flash=False, *, engine=None):
-    """Emit immutable exact silicon DMA domains without runtime allocation."""
+    """Emit exact DMA domains; invalid physical reachability raises ValueError.
+
+    Keep this module usable by independent ELF budget checkers without provider
+    configuration imports. The configuration entry point owns error reporting.
+    """
     if include_flash and any("dma_engines" in region
                              for region in result["memory"]):
         # RAM bus reachability never implies access to the Flash bus. New
         # heterogeneous engines need reviewed Flash facts before enabling it.
-        fail("Engine-specific Flash reachability is not declared")
+        raise ValueError("Engine-specific Flash reachability is not declared")
     regions = []
     for region in result["memory"]:
         if "dma_engines" in region:
             if engine is None or engine not in region["dma_engines"]:
-                fail("DMA memory projection requires an exact declared engine")
+                raise ValueError(
+                    "DMA memory projection requires an exact declared engine")
             reachable = region["dma_engines"][engine]
         else:
             reachable = region["dma"]

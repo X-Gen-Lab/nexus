@@ -12,7 +12,6 @@ import re
 import shlex
 import sys
 import tempfile
-import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))

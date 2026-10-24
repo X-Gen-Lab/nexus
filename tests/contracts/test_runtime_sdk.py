@@ -181,8 +181,8 @@ class RuntimeConsumerAssertions:
         commands = json.loads((build / "compile_commands.json").read_text())
         self.assertGreater(len(commands), 4)
         names = {Path(command["file"]).name for command in commands}
-        self.assertTrue({"request.c", "nx_arch_native.c", "gpio.c",
-                         "notify.c", "main.c", "main.cpp"} <= names)
+        self.assertLessEqual({"request.c", "nx_arch_native.c", "gpio.c",
+                              "notify.c", "main.c", "main.cpp"}, names)
         for command in commands:
             arguments = command.get("command", "")
             self.assertNotIn("/vendors/", arguments)
