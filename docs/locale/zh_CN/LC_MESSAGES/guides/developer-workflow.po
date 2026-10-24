@@ -1,0 +1,306 @@
+# Authored translation; independent review is recorded in metadata.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 1b3c485969dab48c494682d18221c30066a11efefed6192d56e2eabb2d5f8860\n"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:9
+msgid "Configure a product and make I/O progress"
+msgstr "配置产品并推进 I/O"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:11
+msgid ""
+"Start with the [external application tutorial](../tutorials/source-sdk.md). "
+"Use the same fixed SDK or checkout for the commands below. Commands run from"
+" its source root; product TOML, tasks, buffers and recovery policy stay in "
+"the product repository. The resolver reports supported software choices, not"
+" electrical verification of a connected board."
+msgstr ""
+"从[外部应用教程](../tutorials/source-sdk.md)开始。下面的命令使用同一固定 SDK 或源码检出，并从其源码根目录执行；产品 "
+"TOML、任务、缓冲区与恢复策略保留在产品仓库。解析器报告支持的软件选择，不验证连接板卡的电气事实。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:17
+msgid "Choose and compare a complete configuration"
+msgstr "选择并比较完整配置"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:19
+msgid ""
+"Inspect choices before authoring a complete assembly. This query requires no"
+" guessed backend or clock:"
+msgstr "编写完整装配之前先查询可选项。该查询不需要猜测后端或时钟："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:32
+msgid ""
+"`init` refuses an existing file. Profiles `empty`, `gpio` and `uart` write "
+"visible TOML values and run the normal resolver; nonempty profiles require "
+"an explicit binding. A rejected route is not replaced with another one. Read"
+" the generated TOML before adopting its baud rate, event capacity, IRQ "
+"priority and budgets. For an external Board use `--board-package` when "
+"querying bindings; its reviewed package remains separate from the product "
+"assembly."
+msgstr ""
+"`init` 拒绝已有文件。`empty`、`gpio` 和 `uart` profile 写出可见的 TOML 值并执行正常解析器；非空 "
+"profile 需要显式 binding。被拒绝的路由不会替换为其他路由。采用波特率、事件容量、IRQ 优先级和预算前先阅读生成的 TOML。查询外部 "
+"Board 时使用 `--board-package`；其复核包仍独立于产品装配。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:39
+msgid ""
+"The explanation lists public faces, modes, clock, resources, memory domains,"
+" declared budgets and execution duties. `list-bindings --json` includes "
+"`mode_contracts`, resource claims, `fact_sources` and `limitations`. A "
+"binding is still `configuration-required`: backend, clock and all selected "
+"instances must resolve together. Missing physical PCB facts remain unknown. "
+"MCU queries state `not_established_by_configuration`; Native states "
+"`not_applicable`."
+msgstr ""
+"解释列出公共 face、模式、时钟、资源、内存域、声明预算和执行责任。`list-bindings --json` 包含 "
+"`mode_contracts`、资源声明、`fact_sources` 与 `limitations`。binding 仍为 "
+"`configuration-required`：后端、时钟和全部实例必须一起通过解析。缺失的物理 PCB 事实仍未知。MCU 查询标为 "
+"`not_established_by_configuration`；Native 标为 `not_applicable`。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:46
+msgid "After editing a separate next assembly, compare effective changes:"
+msgstr "编辑独立的下一份装配后，比较有效变化："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:55
+msgid ""
+"Both assemblies must resolve. The diff reports effective platform, route, "
+"mode, endpoint, storage and budget changes; renaming a source file alone is "
+"not a behavior change. JSON distinguishes absent fields from explicit "
+"`null`. Scripts that previously consumed default JSON from `explain` must "
+"now pass `--json`. Editor hints are assistance; the resolver remains the "
+"acceptance authority."
+msgstr ""
+"两份装配都必须成功解析。diff 报告有效的平台、路由、模式、端点、存储和预算变化；只重命名源文件不构成行为变化。JSON 区分缺失字段和显式 "
+"`null`。以前依赖 `explain` 默认 JSON 的脚本现在必须传入 `--json`。编辑器提示仅提供帮助；解析器仍是准入权威。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:61
+msgid ""
+"A conflict diagnostic identifies the authored file/key and competing "
+"resource owners. Correct those inputs, then configure again. Never fix "
+"generated C, weaken a DMA reservation or change a clock implicitly to make a"
+" build pass. Configuration budgets are declarations; measure the actual "
+"linked image before claiming resource savings. See the [assembly "
+"reference](../reference/configuration/assembly.md) and [support "
+"matrix](../reference/platforms/support.md)."
+msgstr ""
+"冲突诊断指出 authored 文件／key 及争用资源的 owner。修正这些输入后重新配置。不要修补生成 C、削弱 DMA reservation "
+"或隐式改变时钟来让构建通过。配置预算是声明；宣称资源节省前必须测量实际链接镜像。见[装配参考](../reference/configuration/assembly.md)与[支持矩阵](../reference/platforms/support.md)。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:68
+msgid "Assign one executor and retain borrowed storage"
+msgstr "指定唯一执行者并保留借用存储"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:70
+msgid ""
+"The factory returns an existing typed face. Platform start, request "
+"admission, progress, completion, recovery and shutdown remain separate "
+"operations. Choose one execution recipe explicitly:"
+msgstr ""
+"factory 返回已有的 typed face。Platform "
+"start、请求准入、执行推进、完成、恢复和停机仍是分开的操作。显式选择一种执行配方："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid "Recipe"
+msgstr "配方"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid "Progress owner"
+msgstr "进度责任方"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid "Storage and shutdown responsibility"
+msgstr "存储与停机责任"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid "Main loop"
+msgstr "主循环"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid ""
+"The loop calls the selected service steps; fixed IRQ entries perform bounded"
+" IRQ work"
+msgstr "循环调用选定的 service 步骤；固定 IRQ 入口执行有界 IRQ 工作"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid ""
+"Keep request and buffers alive through settlement; stop admission, cancel or"
+" drain, observe settlement, join observers, then stop"
+msgstr "请求和缓冲区保持有效直至结清；关闭准入、取消或排空、观察结清、join observer，然后停止"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid "Exclusive task"
+msgstr "独占任务"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid ""
+"One product task owns direct operations; declared IRQ policy permits only "
+"its selected OS interaction"
+msgstr "一个产品任务拥有直接操作；声明的 IRQ 策略仅允许选定的 OS 交互"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid ""
+"Wake and service explicitly; a task timeout does not revoke a borrowed "
+"buffer or permit task-stack destruction"
+msgstr "显式唤醒和 service；任务超时不能撤销缓冲借用，也不能允许销毁任务栈"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid "Shared bus owner"
+msgstr "共享总线 owner"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid ""
+"Callers submit bounded slots; one owner services the controller and "
+"endpoints"
+msgstr "调用者提交有界 slot；一个 owner service 控制器和端点"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:0
+msgid ""
+"Queue capacity, callbacks and storage are explicit; stop admission, drain "
+"accepted slots and controller references, join observers, then destroy the "
+"owner"
+msgstr ""
+"队列容量、callback 与存储显式提供；关闭准入、排空已接受的 slot 和控制器引用、join observer，然后销毁 owner"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:80
+msgid ""
+"These are application choices, not three hidden driver workers. Product "
+"examples live in [nexus-examples](https://github.com/X-Gen-Lab/nexus-"
+"examples): `templates/{native,qiming,sky,liangshan}`, "
+"`apps/shared_spi_runtime` and `apps/stream_recovery`. Use their README with "
+"the fixed examples revision associated with your platform. The SPI Native "
+"example and FreeRTOS POSIX-host exercise are separate scopes; Native "
+"Platform does not accept `backend = \"freertos\"`. A software two-CS fixture"
+" does not establish a second physical CS on a launch board."
+msgstr ""
+"这些是应用选择，不是三个隐藏驱动 worker。产品示例位于 [nexus-examples](https://github.com/X-Gen-"
+"Lab/nexus-"
+"examples)：`templates/{native,qiming,sky,liangshan}`、`apps/shared_spi_runtime`"
+" 和 `apps/stream_recovery`。使用与平台对应的固定示例版本及其 README。SPI Native 示例与 FreeRTOS "
+"POSIX-host 演练范围不同；Native Platform 不接受 `backend = \"freertos\"`。软件双 CS "
+"fixture 不能证明首发实板存在第二条 CS 接线。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:89
+msgid ""
+"For finite requests, REJECTED retains no caller references. ACCEPTED borrows"
+" request and transfer storage until acquire-observed SETTLED. Cancel and "
+"deadline expiry request progress toward withdrawal; they do not settle the "
+"request. QUARANTINED preserves storage and cleanup obligations. SETTLED does"
+" not imply a successful transfer or that callbacks and observers have "
+"already joined. Read [ownership](../explanation/ownership.md) before placing"
+" asynchronous storage on a stack or stopping a worker."
+msgstr ""
+"有限请求的 REJECTED 不保留调用者引用。ACCEPTED 借用请求和传输存储，直到 acquire 观察到 SETTLED。取消与 "
+"deadline 到期要求向撤销引用推进，并不结清请求。QUARANTINED 保留存储及清理义务。SETTLED 不表示传输成功，也不表示 "
+"callback 和 observer 已 join。在栈上放置异步存储或停止 worker "
+"前先阅读[所有权](../explanation/ownership.md)。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:97
+msgid ""
+"For streams, a consumer releases each acquired block explicitly. Slow "
+"consumers can cause loss or stop on backpressure according to the selected "
+"mode; providers must not overwrite outstanding loans. Stop may return BUSY "
+"until loans and hardware references drain. Restart uses a new valid "
+"lifecycle after complete stop; clearing counters is not recovery. The H743 "
+"continuous-mode exercise is a separate exact ARM configuration, not a claim "
+"that the three launch boards have identical continuous-mode wiring."
+msgstr ""
+"对于 stream，消费者显式释放每个取得的块。慢消费者可能按选定模式造成 loss 或因背压停止；provider "
+"不得覆盖未归还的借用块。在借用块与硬件引用排空前 stop 可以返回 BUSY。完整停止后以新的有效生命周期 "
+"restart；清除计数器不等于恢复。H743 连续模式演练使用独立的精确 ARM 配置，不声称三块首发板具有相同的连续模式接线。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:105
+msgid "Diagnose facts without changing ownership"
+msgstr "诊断事实，不改变所有权"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:107
+msgid ""
+"`nx_io_diagnose` in `nexus/io/diagnostic.h` composes copied request and "
+"stream observations with explicitly known lifecycle, owner, service-time and"
+" observer facts. It neither reads live MMIO nor invokes service or recovery."
+" Its independent finding bits can coexist; `unknown_facts` preserves missing"
+" information. No findings does not certify health."
+msgstr ""
+"`nexus/io/diagnostic.h` 中的 `nx_io_diagnose` 组合复制的 request 和 stream "
+"观察，以及明确已知的生命周期、owner、service 时间与 observer 事实。它既不读取实际 MMIO，也不调用 service "
+"或恢复。独立 finding 位可以并存；`unknown_facts` 保留缺失信息。没有 finding 不构成健康证明。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:113
+msgid ""
+"A request that stops advancing does not prove the service loop was omitted. "
+"`SERVICE_OVERDUE` requires finite timestamps in the same monotonic domain "
+"and a positive declared maximum gap; reversed time rejects with STATE. Owner"
+" admission fields are known only after a successful owner diagnostic "
+"snapshot. BUSY alone does not prove a full queue. Outstanding stream blocks "
+"can be producer, ready or consumer loans; the ordinary cursor says nothing "
+"about a private preposted slot. Application escalation still owns retry, "
+"safe outputs and reset policy."
+msgstr ""
+"request 停止推进不能证明遗漏 service 循环。`SERVICE_OVERDUE` "
+"需要同一单调时钟域的有限时间戳及正的最大间隔声明；时间倒退以 STATE 拒绝。只有成功取得 owner 诊断快照，准入字段才算已知。仅凭 BUSY "
+"不能证明队列满。未结清 stream 块可以属于生产者、ready 或消费者；普通 cursor 不说明私有预投递 "
+"slot。应用仍拥有重试、安全输出与复位策略。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:121
+msgid ""
+"`nx_dma_storage_validate` checks the complete explicit reservation "
+"separately from its payload. For example, a 17-byte payload may use a "
+"caller-owned 64-byte reservation aligned to 32-byte cache lines. The entire "
+"reservation must already fit its declared DMA-visible domain and whole-line "
+"ownership. The helper does not round, allocate, bounce, perform cache "
+"maintenance or replace provider mode admission. Deadline expiry never "
+"permits reusing the reservation before drain."
+msgstr ""
+"`nx_dma_storage_validate` 将完整的显式 reservation 与 payload 分开验证。例如17 字节 payload "
+"可以放在调用者拥有、按32 字节 cache line 对齐的64 字节 reservation 中。完整 reservation 必须已经满足声明的 "
+"DMA 可达域和完整行所有权。该函数不取整、不分配、不 bounce、不执行 cache 维护，也不替代 provider 模式准入。deadline "
+"到期绝不允许在排空前重用 reservation。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:128
+msgid ""
+"The optional owner observation adds `accepting`, `queued` and "
+"`slot_available`. Recompile consumers because its public observation/sidecar"
+" layout changed. Default owner and provider structures do not gain these "
+"fields. Measure optional sidecar storage for the selected ABI; it is not "
+"assumed to be free."
+msgstr ""
+"可选 owner 观察增加 `accepting`、`queued` 和 `slot_available`。其公共 "
+"observation／sidecar 布局已改变，消费方须重新编译。默认 owner 与 provider 结构不增加这些字段。按选定 ABI "
+"测量可选 sidecar 存储，不能假定它没有成本。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:133
+msgid "Plan daily device operations separately from qualification"
+msgstr "日常设备操作计划与资格验收分开"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:135
+msgid ""
+"For flash/debug, use an identified equipment file and provenance from the "
+"actual successful build. Monitor may run without build association:"
+msgstr "对于 flash／debug，使用已识别的设备文件和实际成功构建的 provenance。Monitor 可以不关联构建："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/developer-workflow.md:147
+msgid ""
+"The default prints a plan. Actual execution requires `--execute --output` "
+"with a new owned directory. Flash/debug require matching board/part, image, "
+"probe serial and pinned tool/configuration bytes; they do not require a "
+"serial console. Monitor requires the board, stable serial by-id and station "
+"lock, but may omit build provenance: that result states `image_linkage = "
+"unassociated`, not an image-qualified observation. Monitor uses 115200 8N1 "
+"and finite duration; EOF or disconnection fails. Debug binds loopback. "
+"Failed or cancelled device operations retain their locks for explicit "
+"inspection; normal completion releases them. A successful daily operation "
+"does not qualify HIL. Until real equipment is connected, record physical "
+"execution as `not_executed`. The [performance and HIL guide](performance-"
+"hil.md) owns capture and qualification."
+msgstr ""
+"默认只打印计划。实际执行需要 `--execute --output` 与新的自有目录。Flash／debug "
+"要求相符的板卡／料号、镜像、探针序列号及固定工具／配置字节，不要求串口控制台。Monitor 需要板卡、稳定的 serial by-id "
+"和测试站锁，可以省略构建 provenance；此时结果标为 `image_linkage = "
+"unassociated`，不构成关联镜像的观察。Monitor 使用115200 8N1 和有限时长；EOF 或断连失败。Debug 仅绑定 "
+"loopback。失败或取消的设备操作保留锁供显式检查；正常完成释放锁。日常操作成功不构成 HIL 资格。真实设备未连接前，物理执行记录为 "
+"`not_executed`。[性能与 HIL 指南](performance-hil.md)负责采集和资格合同。"

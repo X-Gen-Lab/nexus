@@ -34,6 +34,7 @@ class FamilyDescriptor:
     import_lock: str | None = None
     references: str | None = None
     owned_payload: tuple = ()
+    configuration_helpers: tuple = ()
 
     @property
     def source_directory(self):
@@ -58,12 +59,7 @@ class FamilyDescriptor:
         directory = f"tools/configure/providers/{self.family}"
         modules = tuple(f"{directory}/{name}" for name in (
             "__init__.py", "bindings.py", "emission.py"))
-        if self.family in {"stm32f103", "gd32f303"}:
-            modules += ("tools/configure/providers/legacy_transport.py",)
-        if self.family == "stm32g474":
-            modules += (f"{directory}/coupled.py", f"{directory}/adc_group.py",
-                        f"{directory}/pwm_shared.py")
-        return modules
+        return modules + self.configuration_helpers
 
     @property
     def fact_files(self):
@@ -95,6 +91,7 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_f1", "stm32f1_cmsis"),
         ("hal_driver_f1", "stm32f1_hal")), references="references.json",
+        configuration_helpers=("tools/configure/providers/legacy_transport.py",),
         owned_payload=(
             "soc/stm32/stm32f103/CMakeLists.txt", "soc/stm32/stm32f103/system.c",
             "soc/stm32/stm32f103/drivers/gpio.c", "soc/stm32/stm32f103/drivers/uart.c",
@@ -135,6 +132,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/gd32/gd32f470/private/gd32f470_eth_frames.h")),
     "gd32f303": FamilyDescriptor("gd32f303", (("cmsis_core", "cmsis5"),),
         import_lock="vendors/gigadevice/gd32f30x/source.lock.json",
+        configuration_helpers=("tools/configure/providers/legacy_transport.py",),
         references="references.json", owned_payload=(
             "soc/gd32/gd32f303/CMakeLists.txt", "soc/gd32/gd32f303/system.c",
             "soc/gd32/gd32f303/drivers/gpio.c", "soc/gd32/gd32f303/drivers/uart.c",
@@ -178,6 +176,9 @@ _DESCRIPTORS = MappingProxyType({
         ("cmsis_core", "cmsis5"),
         ("cmsis_device_g4", "stm32g4_cmsis"),
         ("hal_driver_g4", "stm32g4_hal")), references="references.json",
+        configuration_helpers=tuple("tools/configure/providers/stm32g474/" + name
+                                    for name in ("coupled.py", "adc_group.py",
+                                                 "pwm_shared.py")),
         owned_payload=(
             "soc/stm32/stm32g474/CMakeLists.txt", "soc/stm32/stm32g474/system.c",
             "soc/stm32/stm32g474/drivers/gpio.c", "soc/stm32/stm32g474/drivers/uart.c",

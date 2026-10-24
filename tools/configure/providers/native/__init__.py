@@ -89,6 +89,19 @@ def builtin_cs(controller):
     del controller
     return True
 
+# Explicit software capabilities do not authorize an unreviewed route.
+ADC_GROUP = None
+PWM_SHARED = None
+ENDPOINT_POLICY = common.EndpointPolicy(
+    spi_transaction=True, spi_dma=(None, "async-model"), model_async_echo=True)
+TIMEBASE_ALARM = False
+validate_mode_context = common.validate_mode_context
+mode_fields = common.mode_fields
+validate_controller_set = common.validate_controller_set
+validate_endpoint_clock = common.validate_endpoint_clock
+configuration_header = common.configuration_header
+validate_user_io_context = common.validate_user_io_context
+
 # Import maintained emitters explicitly; importing a package performs no I/O.
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,

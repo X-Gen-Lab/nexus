@@ -58,7 +58,9 @@ def tool_identity(executable: str, version_args: list[str]) -> dict:
 def compare(source: Path, assembly_path: Path, build_root: Path,
             *, compiler: str = "arm-none-eabi-gcc", cmake: str = "cmake",
             ninja: str = "ninja", workloads: tuple = WORKLOADS,
-            optimizations: tuple = OPTIMIZATIONS) -> dict:
+            optimizations: tuple = OPTIMIZATIONS, parallel: int = 1) -> dict:
+    if type(parallel) is not int or parallel <= 0:
+        raise EvidenceError("measurement parallelism must be a positive integer")
     if build_root.exists():
         raise EvidenceError("measurement matrix requires new independent build roots")
     if (not workloads or not optimizations or len(set(workloads)) != len(workloads)
@@ -79,6 +81,7 @@ def compare(source: Path, assembly_path: Path, build_root: Path,
     report = {"schema_version": 1, "kind": "minimal_resource_matrix",
               "status": "failed", "source": git_source(source), "tools": tools,
               "assembly_input": file_identity(assembly_path), "images": [],
+              "build_parallelism": parallel,
               "physical_cycles_status": "not_measured",
               "instruction_counts": "not_measured",
               "hermetic_status": "not_asserted_by_host_measurement"}
@@ -97,7 +100,8 @@ def compare(source: Path, assembly_path: Path, build_root: Path,
                 "-DNEXUS_BUILD_TESTS=OFF", "-DNEXUS_WORKLOAD=" + workload,
                 "-DCMAKE_C_FLAGS=-ffile-prefix-map=" + str(source) + "=. " +
                 "-fdebug-prefix-map=" + str(build_root.resolve()) + "=build"],
-                [tools["cmake"]["file"]["path"], "--build", str(profile), "--parallel", "2"]]
+                [tools["cmake"]["file"]["path"], "--build", str(profile),
+                 "--parallel", str(parallel)]]
             image = {"workload": workload, "optimization": optimization,
                      "commands": [], "status": "failed"}
             report["images"].append(image)
@@ -174,13 +178,16 @@ def main() -> int:
     parser.add_argument("--compiler", default="arm-none-eabi-gcc")
     parser.add_argument("--cmake", default="cmake")
     parser.add_argument("--ninja", default="ninja")
+    parser.add_argument("--parallel", type=int, default=1,
+                        help="positive build job limit (default: 1)")
     parser.add_argument("--workloads", nargs="+", choices=WORKLOADS, default=WORKLOADS)
     parser.add_argument("--optimizations", nargs="+", choices=OPTIMIZATIONS, default=OPTIMIZATIONS)
     args = parser.parse_args()
     try:
         report = compare(args.source, args.assembly, args.build_root,
             compiler=args.compiler, cmake=args.cmake, ninja=args.ninja,
-            workloads=tuple(args.workloads), optimizations=tuple(args.optimizations))
+            workloads=tuple(args.workloads), optimizations=tuple(args.optimizations),
+            parallel=args.parallel)
         print("Minimal resource comparison: " + report["status"])
         return 0 if report["status"] == "passed" else 1
     except (EvidenceError, OSError, ValueError, KeyError, TypeError,

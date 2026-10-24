@@ -62,7 +62,6 @@ add_subdirectory(usb_control)
 
 add_subdirectory(mapped_storage)
 add_subdirectory(amp_ipc)
-add_subdirectory(frame_dma2d)
 add_subdirectory(soc)
 
 

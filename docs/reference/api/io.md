@@ -75,6 +75,21 @@ The Native model controls in `model.h`, `spi_dma_model.h` and `rtc_lptim_model.h
 :project: nexus
 ```
 
+(io_2include_2nexus_2io_2diagnostic_8h)=
+
+(io_diagnostic_8h)=
+
+## diagnostic.h
+
+A valid request snapshot has a nonzero epoch and finite `observed_at`; its
+`deadline` may be `NX_DEADLINE_NEVER` to mean no deadline. SERVICE facts require
+finite `last_service_at` and `observed_at` in the same monotonic domain, and a
+finite positive `maximum_service_gap_us`. Unknown groups stay unknown.
+
+```{doxygenfile} io/include/nexus/io/diagnostic.h
+:project: nexus
+```
+
 (dma_8h)=
 
 ## dma.h

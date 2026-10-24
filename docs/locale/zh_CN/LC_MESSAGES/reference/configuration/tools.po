@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,11 +8,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 0cde957a56914468a60aba8beff69e25052b87e057f36501491c70f3cd130560\n"
+"X-Nexus-Source-SHA256: 138f1ea3ec5db12805f9b046fac9dbd0232a90e36c22a78e518117a93ca9de59\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:9
 msgid "Configuration, development and evidence tools"
 msgstr "配置、开发与证据工具"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:11
 msgid ""
 "Tools preserve actual process exits and input identities. A prepared plan is"
 " not execution evidence; a model pass is not physical qualification. Run "
@@ -21,6 +23,7 @@ msgid ""
 msgstr ""
 "工具保留真实进程退出码与输入身份。准备计划不是执行证据；模型通过不是物理资格。从仓库根目录运行维护命令，并将所选工具放在 `PATH` 上。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:15
 msgid ""
 "Use the [fixed source checkout guide](../../guides/source-checkout.md) "
 "before executing these tools; a default-branch clone may not contain the "
@@ -28,108 +31,179 @@ msgid ""
 msgstr ""
 "执行这些工具前使用[固定源码取得指南](../../guides/source-checkout.md)；默认分支克隆可能没有文档中的入口。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Entry"
 msgstr "入口"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Task"
 msgstr "任务"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Success does not establish"
 msgstr "成功不建立以下结论"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`tools/dev/dev.py configure/build/test`"
 msgstr "`tools/dev/dev.py configure/build/test`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Explicit CMake/CTest preset path"
 msgstr "显式 CMake／CTest 预设路径"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Other presets, skipped tests or HIL"
 msgstr "其他预设、跳过测试或 HIL"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "`tools/dev/dev.py create`"
+msgstr "`tools/dev/dev.py create`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "Create a verified external application from an exact template commit"
+msgstr "从精确模板提交创建经过验证的外部应用"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "SDK or physical qualification"
+msgstr "SDK 或物理资格"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "`tools/dev/dev.py flash/debug/monitor`"
+msgstr "`tools/dev/dev.py flash/debug/monitor`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "Plan or explicitly execute an identified daily device operation"
+msgstr "计划或显式执行身份确定的日常设备操作"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "HIL qualification"
+msgstr "HIL 资格"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "`tools/dev/dev.py timings`"
+msgstr "`tools/dev/dev.py timings`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "Summarize existing process receipts and preserve unknowns"
+msgstr "汇总已有进程 receipt 并保留未知项"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "Unobserved CPU/RSS or a complete candidate"
+msgstr "未观测的 CPU／RSS 或完整候选"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`tools/dev/dev.py doctor/check`"
 msgstr "`tools/dev/dev.py doctor/check`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Tool availability and repository checks"
 msgstr "工具可用性与仓库检查"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "A platform candidate"
 msgstr "平台候选"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`tools/configure/configure.py`"
 msgstr "`tools/configure/configure.py`"
 
-msgid "init/list-bindings/check/explain/generate"
-msgstr "init/list-bindings/check/explain/generate"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
+msgid "init/list-bindings/check/explain/diff/generate"
+msgstr "init/list-bindings/check/explain/diff/generate"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "PCB electrical truth"
 msgstr "PCB 电气事实"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`scripts/ci/tdd_gate.py`"
 msgstr "`scripts/ci/tdd_gate.py`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Actual full tool and GoogleTest/GoogleMock execution"
 msgstr "实际完整工具与 GoogleTest／GoogleMock 执行"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Historical RED order or HIL"
 msgstr "历史 RED 顺序或 HIL"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`cmake/package/package_source_sdk.py`"
 msgstr "`cmake/package/package_source_sdk.py`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Package or verify exact source bytes"
 msgstr "打包或验证精确源码字节"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "MCU execution or release promotion"
 msgstr "MCU 执行或发行升级"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`cmake/package/verify_consumers.py`"
 msgstr "`cmake/package/verify_consumers.py`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Relocated public consumer compile/run/link"
 msgstr "搬移后公共消费工程编译／运行／链接"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Hardware timing"
 msgstr "硬件时序"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`tools/measurement/`"
 msgstr "`tools/measurement/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Actual ELF resource, layout and retention checks"
 msgstr "实际 ELF 资源、布局与保留检查"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Measured stack peaks or WCET"
 msgstr "实测栈峰值或 WCET"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`tools/hil/`"
 msgstr "`tools/hil/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid ""
 "Preparation, admission, capture and raw validation by distinct commands"
 msgstr "通过不同命令完成准备、准入、采集与原始记录验证"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Physical cases never executed"
 msgstr "从未执行的物理用例"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "`tools/evidence/`"
 msgstr "`tools/evidence/`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Bind executed scope, environment and actual artifact bytes"
 msgstr "绑定执行范围、环境和实际产物字节"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:0
 msgid "Product signature or safety certification"
 msgstr "产品签名或安全认证"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:33
 msgid ""
-"Use [the SDK tutorial](../../tutorials/source-sdk.md), [assembly "
+"Use [the SDK tutorial](../../tutorials/source-sdk.md), [configuration and "
+"ownership guide](../../guides/developer-workflow.md), [assembly "
 "reference](assembly.md), [TDD workflow](../../development/workflow.md) and "
 "[performance/HIL guide](../../guides/performance-hil.md) for complete tasks."
 " Detailed flags come from each maintained CLI `--help`; do not maintain a "
 "second parser specification here."
 msgstr ""
-"完整任务见[SDK 教程](../../tutorials/source-sdk.md)、[装配参考](assembly.md)、[TDD "
+"完整任务见 [SDK 教程](../../tutorials/source-"
+"sdk.md)、[配置与所有权指南](../../guides/developer-"
+"workflow.md)、[装配参考](assembly.md)、[TDD "
 "工作流](../../development/workflow.md)和[性能／HIL 指南](../../guides/performance-"
-"hil.md)。详细标志由各维护 CLI 的 `--help` 给出，不在此维护第二份解析器规范。"
+"hil.md)。详细参数以各已维护 CLI 的 `--help` 为准；不在此维护第二份解析器规范。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/tools.md:40
 msgid ""
 "Fresh reports require nonzero actual executions and original logs. A missing"
 " tool, empty XML, skipped-only run, stale output or changed input cannot "

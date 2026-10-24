@@ -10,7 +10,7 @@ source_language: zh_CN
 
 本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。
 原编号、顺序和全部原字段来自 [原台账](../../design/io-evolution-execution.csv)。
-源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`2c0e65267d3500d36fdde78ed67bd55e2c8987df928e36dfd847d43ddb98d271`。
+源文件：`docs/design/io-evolution-execution.csv`；SHA-256：`ccd837a5f0d2b7bd6eac1f184847b43b547d77c37010030db39c2c24563ae4b1`。
 
 不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、
 物理状态分别解释；`development_passed` 不表示当前文档 HEAD 已执行。
@@ -693,7 +693,7 @@ source_language: zh_CN
 | `phase` | P2 |
 | `area` | multimedia |
 | `task` | Camera display accelerator planar and strided buffers |
-| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;components/frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md |
+| `implementation_paths` | io;soc;io/include/nexus/io/frame_stream.h;components/soc/stm32/stm32h743_frame_dma2d;tests/google/h743_frame_dma2d_test.cpp;docs/design/io-extension-boundaries.md |
 | `exit_condition` | Frame completion backpressure external memory and 2D DMA ownership |
 | `implementation_status` | in_progress |
 | `software_status` | not_qualified |

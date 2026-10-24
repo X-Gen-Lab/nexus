@@ -168,7 +168,7 @@ complete frame bytes. Empty acquisition increments a saturating underrun counter
 without choosing silence/repeat policy. DMA-view release requires actual engine,
 IRQ and peripheral detachment facts and exact control identity/epoch.
 
-The [DMA2D component](../../components/frame_dma2d/include/nexus/components/frame_dma2d.h)
+The [DMA2D component](../../components/soc/stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h)
 has one caller-owned executor and no queue. It admits exact H743 V ID `0x20030450`,
 D-Cache off and exclusive cold DMA2D. The two request formats are RGB565 copy
 (the zero value) and fixed ARGB8888-to-RGB565 pixel format conversion (PFC).

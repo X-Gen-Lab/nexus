@@ -50,8 +50,9 @@ progress contracts. No arbitrary load or IRQ delay is promised lossless.
 
 ## Start with a verified task
 
-- [Build an independent relocated Source SDK consumer](docs/tutorials/source-sdk.md).
+- [Create and run an external application](docs/tutorials/source-sdk.md).
 - [Execute rejection, cancellation and drain fixtures](docs/tutorials/async-io.md).
+- [Inspect configuration, progress and daily device commands](docs/guides/developer-workflow.md).
 - [Inspect the complete assembly format](docs/reference/configuration/assembly.md).
 - [Understand layers, factory and ownership](docs/explanation/platform-architecture.md).
 - [Check exact platform support and qualification](docs/reference/platforms/support.md).

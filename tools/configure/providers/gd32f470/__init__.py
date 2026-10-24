@@ -135,6 +135,19 @@ def builtin_cs(controller):
     return any(pin["function"] == "cs" for pin in controller["pins"])
 
 # Import maintained emitters explicitly; importing a package performs no I/O.
+# Explicit software capabilities do not authorize an unreviewed route.
+ADC_GROUP = None
+PWM_SHARED = None
+ENDPOINT_POLICY = common.EndpointPolicy(
+    spi_transaction=True, spi_dma=("SPI4", "dma-full-duplex"))
+TIMEBASE_ALARM = True
+validate_mode_context = common.validate_mode_context
+mode_fields = common.mode_fields
+validate_controller_set = common.validate_controller_set
+validate_endpoint_clock = common.validate_endpoint_clock
+configuration_header = common.configuration_header
+validate_user_io_context = common.validate_user_io_context
+
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,

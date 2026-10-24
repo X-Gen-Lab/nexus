@@ -5,9 +5,32 @@ linker MSP/heap reservations. `interfaces.py` separately checks readonly interfa
 faces and shared operation tables. Neither source-line counts nor selected
 controller counts establish linked cost.
 
+Shared operation tables remain identifiable after source grouping under
+`io/src/controllers/` and `io/src/mechanisms/`. The audit derives exact symbols
+from maintained source initializers and checks their actual loaded readonly ELF
+storage separately from instance faces. Vendor or similarly named tables do
+not become accepted interfaces merely through a name prefix.
+
 `resources.py` 从真实 ARM ELF 的 LOAD、RAM 区间并集和链接器保留区测量 Flash、
 RAM、MSP 与 heap。`interfaces.py` 单独检查只读接口对象和共享操作表。源码行数或
 选中控制器的数量不能证明最终镜像成本。
+
+共享操作表移动到 `io/src/controllers/` 或 `io/src/mechanisms/` 后仍须正确计量。
+审计从维护源码的真实初始化器获得精确符号，检查 ELF 中实际加载的只读存储，
+与各实例接口分别计量。厂商目录或任意相似名称的表不会仅凭前缀被认定为公共接口。
+
+`compare.py --parallel 1` explicitly bounds build concurrency and records it in
+the matrix; one job is the default. Each requested workload/optimization uses a
+new build directory and actual ELF. Board profile files must already exist;
+missing reviewed routes are not invented to complete a benchmark matrix.
+Different modes or workloads may show marginal linked cost, but they are not
+equivalent-profile optimization regressions. Keep those comparisons separate
+from `soc_costs.py compare`, which enforces equivalent recorded profiles.
+
+`compare.py --parallel 1` 显式限制构建并发并将其写入矩阵，默认只用一个 job。
+每个负载和优化组合使用新构建目录与真实 ELF；所需板级配置必须已经存在，
+不会为了凑齐矩阵而虚构路线。不同模式或负载的差量可以说明链接成本，不能当作
+等价条件下的优化回归；等价比较仍由 `soc_costs.py compare` 严格核对记录条件。
 
 `soc_costs.py observe` binds the exact ELF, resolved configuration, resource
 budget, complete actual compile database, selected source bytes and tools. Its

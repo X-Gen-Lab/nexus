@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "kind": "nexus_developer_experience_development_index",
+  "date": "2026-10-24",
+  "time_zone": "Asia/Shanghai",
+  "scope": "Observed scoped development execution; not final-source candidate qualification",
+  "platform_baseline": "f52cb3e614bf599dd741b743c25e9411f56e76df",
+  "examples_baseline": "e96bf7bf41d3887b7e91cb3f5b71838555ffeb5a",
+  "final_platform_commit": null,
+  "final_examples_commit": null,
+  "pr_ci_association": "Recorded in the final PR after both commits exist; no future-commit circular lock",
+  "publishable_candidate": false,
+  "physical_hil": "not_executed",
+  "task_authority": "docs/design/developer-experience-execution.csv",
+  "maintained_execution_entries": {
+    "configuration": "tools/configure/test_experience.py",
+    "development_tools": [
+      "tools/testing/test_dev_projects.py",
+      "tools/testing/test_dev_device.py",
+      "tools/testing/test_dev_timings.py",
+      "tools/testing/test_dev_efficiency.py"
+    ],
+    "provider_vendor": [
+      "tests/contracts/stm32_hal_reference/reference_test.cpp",
+      "tests/google/gd32_official_gpio_test.cpp",
+      "tests/google/i2c_multi_controller_test.cpp"
+    ],
+    "io": [
+      "tests/google/io_diagnostic_test.cpp",
+      "tests/google/dma_test.cpp",
+      "tests/google/io_observer_test.cpp"
+    ],
+    "examples": [
+      "X-Gen-Lab/nexus-examples/scripts/test_starter_templates.py",
+      "X-Gen-Lab/nexus-examples/tests/developer_recipes_test.cpp"
+    ]
+  },
+  "observations": {
+    "configuration": {
+      "new_behavior_cases": 20,
+      "identical_ir_projections": 71,
+      "identical_generated_files": 710
+    },
+    "development_tools": {
+      "focused_cases": 53,
+      "preset_selection_median_before_ms": 1.734,
+      "preset_selection_median_after_ms": 0.948,
+      "speed_scope": "Preset metadata only; not whole build or gate",
+      "test_retention": "No independent duplicate or obsolete obligation justified deletion"
+    },
+    "provider_vendor": {
+      "hal_reference_cases": 15,
+      "real_gd32_gpio_cases": 3,
+      "shared_i2c_cases_each_family": 14,
+      "production_decision": "Retain current single LL/provider and SPL operation reuse; no HAL production migration or equivalent image cost ranking"
+    },
+    "examples": {
+      "templates": 4,
+      "native_recipe_ctest_cases": 4,
+      "google_application_contract_cases": 2,
+      "arm_consumer_links": 5
+    },
+    "documentation": {
+      "source_check": "passed",
+      "ledger_views": "all nine registered views checked against their original CSV; existing 21 renderer tests passed",
+      "fresh_doxygen_xml": "passed with restored and fully byte-verified locked tool files",
+      "fresh_gettext": "passed with strict warnings after explicit diagnostic header-path and anchor disambiguation",
+      "translation_review": "passed: independently reviewed prose, 150 task fields and 25 public API/time facts; exact fresh gettext message sets admitted for both languages",
+      "strict_en_zh_html": "pending_remote_ci",
+      "current_pages": 130,
+      "language_records": 260
+    },
+    "io": {
+      "focused_google_cases": 55,
+      "changed_python_contracts": 22,
+      "linked_images": 9,
+      "allocation_model_images": 4,
+      "tuple": {
+        "cpu": "Cortex-M4",
+        "float_abi": "hard; fpv4-sp-d16",
+        "enum_abi": "short-enums",
+        "optimization": "Os",
+        "compiler": {
+          "path": "/tmp/nexus-quality-arm/bin/arm-none-eabi-gcc",
+          "bytes": 2421736,
+          "sha256": "510c55cfeed7328ade1eb8cb23808fcce1ba6c52dac8d4ebfe033ae4b2534385"
+        }
+      },
+      "rows": [
+        {
+          "profile": "qiming-empty",
+          "flash_load_bytes": 2827,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2112
+          },
+          "readonly_interface_bytes": 0,
+          "readonly_operations_bytes": 0,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "qiming-gpio",
+          "flash_load_bytes": 4452,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2136
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 12,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "qiming-uart",
+          "flash_load_bytes": 8020,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2736
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-empty",
+          "flash_load_bytes": 4291,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2088,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 0,
+          "readonly_operations_bytes": 0,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-gpio",
+          "flash_load_bytes": 5872,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2112,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 12,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-uart",
+          "flash_load_bytes": 9818,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2708,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": []
+        },
+        {
+          "profile": "liangshan-spi",
+          "flash_load_bytes": 8088,
+          "ram_reserved_bytes": {
+            "addsram": 0,
+            "sram": 2136,
+            "tcm": 0
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": [
+            "s_nx_face_spi0"
+          ]
+        },
+        {
+          "profile": "endpoints-1",
+          "flash_load_bytes": 6856,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2184
+          },
+          "readonly_interface_bytes": 8,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": [
+            "s_nx_face_spi0"
+          ]
+        },
+        {
+          "profile": "endpoints-2",
+          "flash_load_bytes": 7208,
+          "ram_reserved_bytes": {
+            "ccm": 0,
+            "sram": 2216
+          },
+          "readonly_interface_bytes": 16,
+          "readonly_operations_bytes": 40,
+          "unused_faces_collected": [
+            "s_nx_face_spi0"
+          ]
+        }
+      ],
+      "one_to_two_spi1_endpoint": {
+        "flash_loaded_bytes": 352,
+        "interface_flash_bytes": 8,
+        "operations_flash_bytes": 0,
+        "ram": {
+          "ccm": 0,
+          "sram": 32
+        },
+        "static_objects": {
+          "buffers": 0,
+          "other_static": 2,
+          "provider_state": 32,
+          "rtos_control": 0,
+          "rtos_stack": 0
+        }
+      },
+      "allocation": {
+        "slot_bytes": 48,
+        "request_bytes": 32,
+        "payload_bytes": 32,
+        "slots_1_to_4_ram_delta_bytes": 336,
+        "optional_observer_sidecar_bytes": 96,
+        "selected_abi_observation_before_after_bytes": [
+          72,
+          72
+        ]
+      },
+      "limits": [
+        "No hardware supplied; physical acceptance remains not_executed.",
+        "No cycle, dynamic stack, WCET or throughput measurements claimed.",
+        "M4 short-enum observation72/sidecar96 size equality is limited to selected ABI; consumers still rebuild.",
+        "Cost matrices are developmental observations, not candidates or reproducibility attestations.",
+        "SPI-only consumers collect unused controller factory face; full-factory retention does not apply to those images."
+      ]
+    },
+    "sdk_closure": {
+      "new_required_omissions_red": 6,
+      "complete_focused_tests_green": 31,
+      "scope": "Missing-module SDK regressions; not final installed SDK qualification"
+    }
+  },
+  "evidence_members": {
+    "configuration": [
+      {
+        "member": "configuration/handoff.json",
+        "sha256": "b59298d349176b4016f0524a8a61a37a2fc9573c883ee7383ed796ae10d5097e"
+      },
+      {
+        "member": "configuration/emission-equivalence.json",
+        "sha256": "899db41915d4b9df97eaf142cdab90ecf8c267bfa0f603b248d27cca2f7c2e5d"
+      }
+    ],
+    "development_tools": [
+      {
+        "member": "devtools/focused-integration-green-03.log",
+        "sha256": "f3652bb5d6dc583381bef14386a63e0b58a47cf72eabb3132f0790450357c99f"
+      },
+      {
+        "member": "devtools/feedback-cost-comparison.json",
+        "sha256": "45023459e1a6b881393c8a5803018db228a301570f91be82d4b656a121eb2a38"
+      },
+      {
+        "member": "devtools/observed-costs-01.json",
+        "sha256": "ac9ee893f099c1e9859ea8365e3ec123d357b9e24303e2f3b68541c5e191d7b4"
+      },
+      {
+        "member": "devtools/test-retention-review.md",
+        "sha256": "c33b1efc1b0d5674fbaccac8cfdfcd19931297de164c9bf2d7a7a48456d3b078"
+      }
+    ],
+    "provider_vendor": [
+      {
+        "member": "provider-vendor/handoff.json",
+        "sha256": "04a1b9592503d1999b31a639524cdb0b4071f63f85c17e13e9b7f06d4d16a903"
+      },
+      {
+        "member": "provider-vendor/official-reuse-audit.json",
+        "sha256": "6173aac1eb264db88a5bbcd96c01d7fa1b04123206bdc1cd8f9716ebf71fe798"
+      },
+      {
+        "member": "provider-vendor/dma2d-relocation.json",
+        "sha256": "f9a8f45b16f91dc9593bb69f2beb0b5dfc45e7836e5ac7e61b71da850bfacfaa"
+      }
+    ],
+    "external_examples": [
+      {
+        "member": "examples/development-summary.json",
+        "sha256": "0201c9808b311bed4d5477facfbe5111c1a306c4b415e6f1a4788ae372c4c522"
+      }
+    ],
+    "documentation": [
+      {
+        "member": "docs/semantic-review.json",
+        "sha256": "b32dbfe63866e11afb4a4f13dfcebd433031671cfa0a1a3dbdd2d2169d18d729"
+      },
+      {
+        "member": "docs/final-documentation-checks.json",
+        "sha256": "169e9a2f7315389fb1d848ae436c7629eb7d3715725b0ebf7df04b579eb0d757"
+      },
+      {
+        "member": "docs/fresh-gettext-final-02.log",
+        "sha256": "cb19ec1d6b5139386f79704190e5b08ff9885816650f254f8215025e0a9d42bf"
+      },
+      {
+        "member": "docs/ledger-tests.log",
+        "sha256": "5dff172626b13aa6f13aab34a42d1d5a75db8d8d18ceb4a35b55a26f45cf57af"
+      }
+    ],
+    "io_cost": [
+      {
+        "member": "io-cost/handoff.json",
+        "sha256": "126f42f62b2919ed4e5920a1b0e1926170a2bf8c521de6456d2823b54f30a2d6"
+      },
+      {
+        "member": "io-cost/observations/summary.json",
+        "sha256": "56013fce5f09a99799dcab1c64e08cfebe084bff06d29fdfb8b3c4742b640dcc"
+      },
+      {
+        "member": "io-cost/storage-probes/report.json",
+        "sha256": "d02e2504016ed24d4b55b2d8e7f27ff27cfb35232ae7ea0a40b40e4dfc559e19"
+      }
+    ],
+    "examples_arm": [
+      {
+        "member": "examples/arm-consumer-execution.json",
+        "sha256": "391f4a87b7d4913f354d262a6d5b3229662ef5c23cdfa206080703452d914c56"
+      },
+      {
+        "member": "examples/endpoint-cost-execution.json",
+        "sha256": "51a8cad68f4ed78d16d416d09bf204072bd4f0bf621ef53ecde812312277d53b"
+      }
+    ],
+    "sdk_closure": [
+      {
+        "member": "sdk-closure-red.log",
+        "sha256": "08dd59911ec1ced722836406fa18cfbd6f3ef77be69ce888856c7150d67c26e0"
+      },
+      {
+        "member": "sdk-closure-green.log",
+        "sha256": "c92054734f7882df9ffcf9cadf69790a4d0fa768e0fd6fb443f5008c44a9f20e"
+      }
+    ]
+  },
+  "evidence_archive_locator": null,
+  "limitations": [
+    "Final-source ordinary complete gates and installed SDK integration remain pending until observed by root integration.",
+    "Development record hashes identify original members; archive availability and final PR/CI must be checked separately.",
+    "Physical H1-H6 remain not_executed.",
+    "HAL reference handle layout objects are not equivalent complete linked images."
+  ],
+  "branches": {
+    "platform": "feat/developer-platform-iteration-20261024",
+    "examples": "feat/developer-platform-iteration-20261024",
+    "previous_open_pr": 31,
+    "previous_pr_merged": false,
+    "examples_previous_platform_lock": "6f09ea78e99e341d8da9f99e52d6c0d7111ddd6c"
+  }
+}

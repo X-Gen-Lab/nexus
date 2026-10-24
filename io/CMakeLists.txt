@@ -27,6 +27,7 @@ add_library(nexus_io STATIC
     src/api/watchdog.c
     src/mechanisms/adc_format.c
     src/mechanisms/adc_observer.c
+    src/mechanisms/diagnostic.c
     src/mechanisms/dma.c
     src/mechanisms/flash_region.c
     src/mechanisms/frame_stream.c

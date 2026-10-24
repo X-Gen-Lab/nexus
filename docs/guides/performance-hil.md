@@ -36,6 +36,26 @@ FIG-09 is an exact H743 reference. Cache-enabled TX requires complete 32-byte
 line ownership and AXI SRAM reachability; DMA completion, wire completion and
 borrow settlement are separate. It does not authorize RX DMA or TCM placement.
 
+## Compare costs without changing the question
+
+Resource regression compares equivalent CPU, ABI, optimization, clock, backend,
+routes, modes, stack/heap budgets and compiler identity. Use explicit nonnegative
+growth limits for each metric. A comparison that adds a controller, slot or mode
+explains marginal cost; it does not prove an equivalent implementation became
+smaller. Keep actual ELF files and load-layout reports with the comparison.
+
+Flash LOAD, RAM intervals, provider state, buffers and reserved RTOS storage are
+separate views; nested categories must not be summed twice. Product stack usage
+cannot be inferred from an arbitrary symbol name. Dynamic high-water marks require
+measurement. Shared operation tables need a retained-symbol audit in actual ELF
+variants before changing their organization; no measured benefit means no
+production table split justified by this experiment.
+
+Physical IRQ latency and throughput require raw acquisition, explicit units,
+image/station identity, clock and load. A host test duration is not MCU cycles;
+the largest observed latency is not WCET. Unexecuted measurements remain
+`not_executed`, without guessed thresholds or converted model results.
+
 ## Prepare without operating equipment
 
 First configure and build the selected maintained assembly. For the Liangshan

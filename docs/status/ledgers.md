@@ -8,7 +8,7 @@ source_language: zh_CN
 (status-ledgers)=
 # 原台账、退出条件与派生视图
 
-下面的页面来自八份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、
+下面的页面来自九份原 CSV，不建立第二套状态数据库。每个任务保留原编号、顺序、
 所有字段、退出条件、实现状态、软件／物理状态和原证据定位；源 SHA-256 可核对。
 原 CSV 没有单独退出字段时明确说明，不能从其他台账拼造一条“已通过”的条件。
 
@@ -23,6 +23,7 @@ ledgers/io-evolution
 ledgers/soc-refinement
 ledgers/build-system
 ledgers/documentation-system
+ledgers/developer-experience
 ```
 
 ## 正确解读状态

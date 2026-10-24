@@ -13,6 +13,23 @@
  */
 #include "nexus/io/dma.h"
 
+/** \brief Never round into a neighbouring object or outside a DMA domain. */
+nx_result_t nx_dma_storage_validate(const nx_dma_memory_region_t* regions,
+                                    size_t count, const void* storage,
+                                    size_t capacity, size_t transfer_bytes,
+                                    size_t alignment, size_t cache_line_bytes,
+                                    nx_dma_direction_t direction) {
+    if (transfer_bytes == 0U || transfer_bytes > capacity ||
+        (cache_line_bytes != 0U &&
+         ((cache_line_bytes & (cache_line_bytes - 1U)) != 0U ||
+          (uintptr_t)storage % cache_line_bytes != 0U ||
+          capacity % cache_line_bytes != 0U))) {
+        return NX_ERROR_INVALID;
+    }
+    return nx_dma_buffer_validate(regions, count, storage, capacity, alignment,
+                                  direction);
+}
+
 /** \brief Validate domains before selecting one, rejecting wrapped metadata. */
 nx_result_t nx_dma_buffer_validate(const nx_dma_memory_region_t* regions,
                                    size_t count, const void* data,

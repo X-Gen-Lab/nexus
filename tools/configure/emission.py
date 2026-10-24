@@ -43,7 +43,7 @@ def emit_bundle(result, output):
     """
     try:
         from . import cpu as cpu_profiles
-        from . import kernel, memory as memory_regions, metadata
+        from . import kernel, memory as memory_regions, metadata, i2s2
         from .ir import thaw
         from .providers import descriptor, maintained
     except ImportError:
@@ -51,6 +51,7 @@ def emit_bundle(result, output):
         import kernel
         import memory as memory_regions
         import metadata
+        import i2s2
         from ir import thaw
         from providers import descriptor, maintained
     write = lambda name, data: (output / name).write_text(data, encoding="utf-8")
@@ -77,8 +78,7 @@ def emit_bundle(result, output):
               *cpu_profiles.header_lines(profile), *kernel.header_lines(policy),
               *memory_regions.header_lines(result),
               *metadata.header_lines(thaw(result["platform_metadata"]))]
-    header.append("#define NEXUS_F407_I2S2_SLAVE_TX_SELECTED " +
-                  ("1u" if result.i2s2 is not None else "0u"))
+    header.extend(i2s2.header_lines(result.i2s2))
     probes = any(getattr(getattr(item.options, "irq", None), "probe", False)
                  for item in result.controllers)
     if probes:
@@ -88,9 +88,7 @@ def emit_bundle(result, output):
                    "#define NX_IO_CYCLE_PROBES 1", "#endif"]
     if result["clock"]["source"] == "hse":
         header.insert(7, f'#define NEXUS_HSE_HZ {result["clock"]["input_hz"]}u')
-    if result["soc_family"] == "stm32h743":
-        cache_mask = maintained("stm32h743").cache_mask(result["clock_profile"])
-        header.append(f'#define NEXUS_SOC_CACHE_MASK {cache_mask}u')
+    header.extend(maintained(result.soc_family).configuration_header(result))
     cmake = [f'set(NEXUS_SOC_FAMILY "{result["soc_family"]}")',
              'set(NEXUS_SOC_SOURCE_DIRECTORY "' +
              descriptor.maintained(result["soc_family"]).source_directory + '")',
@@ -111,10 +109,7 @@ def emit_bundle(result, output):
               item.source_directory + '")' for item in descriptor.families()]
     cmake += ['set(NEXUS_SOC_SOURCE_VARIABLES "' + ';'.join(
         'NEXUS_SOC_SOURCE_' + item.family for item in descriptor.families()) + '")']
-    cmake += ['set(NEXUS_F407_I2S2_SLAVE_TX_SELECTED ' +
-              ("ON" if result.i2s2 is not None else "OFF") + ')',
-              'set(NEXUS_F407_I2S2_PROFILE "' +
-              (result.i2s2.profile if result.i2s2 is not None else "") + '")']
+    cmake.extend(i2s2.selection_lines(result.i2s2))
     cmake.append('set(NEXUS_RUNTIME_POWER "' + ("ON" if result.runtime_power is not None else "OFF") + '")')
     cmake.append("set(NEXUS_IO_CYCLE_PROBES " + ("ON" if probes else "OFF") + ")")
     for selection in result.controllers:

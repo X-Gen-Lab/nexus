@@ -16,6 +16,73 @@ def fail(message):
 
 
 @dataclass(frozen=True)
+class EndpointPolicy:
+    """Family-owned endpoint capabilities; hardware routes remain separate."""
+
+    spi_transaction: bool = False
+    i2c_long: bool = False
+    spi_dma: tuple[str | None, str] | None = None
+    model_async_echo: bool = False
+
+    def validate(self, device, controller):
+        driver, kind, mode = (device["driver"], controller["kind"],
+                              controller["mode"])
+        if driver == "spi-transaction":
+            if kind != "spi":
+                fail("SPI transaction requires its SPI controller")
+            if not self.spi_transaction:
+                fail("SPI transaction provider is not maintained")
+            if mode != "short-poll":
+                fail("SPI transaction requires the polling provider mode")
+        if driver == "i2c-long-endpoint" and (
+                kind != "i2c" or not self.i2c_long or mode != "poll-messages"):
+            fail("Long I2C requires a maintained polling V2 provider")
+        if driver == "spi-dma-transaction":
+            if (kind != "spi" or self.spi_dma is None or
+                    mode != self.spi_dma[1] or
+                    (self.spi_dma[0] is not None and
+                     controller["controller"] != self.spi_dma[0])):
+                fail("SPI DMA transaction requires a reviewed DMA mode")
+        if self.model_async_echo and mode == "async-model":
+            if driver != "spi-dma-transaction" or "model_bytes" in device:
+                fail("Native async SPI requires enhanced echo transactions "
+                     "without model_bytes")
+
+
+def validate_mode_context(selection, route, *, backend, clock_profile):
+    """Default families impose no additional mode/profile coupling here."""
+    del selection, route, backend, clock_profile
+
+
+def mode_fields(selection, route, *, clock_profile):
+    """Families explicitly derive private hardware admission fields."""
+    del selection, route, clock_profile
+    return {}
+
+
+def validate_controller_set(selected, *, clock_profile):
+    """Default families have no additional whole-selection constraints."""
+    del selected, clock_profile
+
+
+def validate_endpoint_clock(speed, *, clock_plan):
+    """Default fixed-clock bounds are already checked by controller facts."""
+    del speed, clock_plan
+
+
+def configuration_header(result):
+    """An ordinary family has no extra compile-time public constants."""
+    del result
+    return []
+
+
+def validate_user_io_context(assembly, part):
+    """Protected user GPIO is admitted only by its exact maintained family."""
+    del assembly, part
+    fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
+
+
+@dataclass(frozen=True)
 class Construction(Mapping):
     """One provider's explicit static storage and cold lifecycle contract.
 

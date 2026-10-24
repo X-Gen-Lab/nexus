@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,11 +8,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 25e71f14ff2185a54246010a7d95f057740ba2f0d5ebdc52f161a4fee6903abb\n"
+"X-Nexus-Source-SHA256: e3e0f46b508706832312e3520c9bc626927ca3e776e6e87b245e4812b4422e0c\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:9
 msgid "Assembly input and rejected selections"
 msgstr "装配输入与拒绝规则"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:11
 msgid ""
 "The authored configuration authority is one schema-2 TOML assembly. SoC and "
 "Board facts remain maintained JSON; `resolved.json` is output, not an "
@@ -24,92 +26,120 @@ msgstr ""
 "是输出，不是另一份人工编写的输入。CMake 拥有软件依赖。TOML 解析失败绝不回退 Kconfig、缓存变量、schema-1 JSON "
 "或旧生成头。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:16
 msgid ""
 "Before running the resolver, prepare the [fixed source and recursive "
 "dependencies](../../guides/source-checkout.md)."
 msgstr "运行解析器前，先准备[固定源码与递归依赖](../../guides/source-checkout.md)。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:19
 msgid "Complete maintained input"
 msgstr "完整维护输入"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Complete Native UART assembly, parsed by the production resolver."
 msgstr "完整 Native UART 装配，由生产解析器解析。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Selection"
 msgstr "选择"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Meaning and rejection boundary"
 msgstr "含义与拒绝边界"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`schema = 2`"
 msgstr "`schema = 2`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Authored TOML generation; unknown keys reject"
 msgstr "人工编写的 TOML 生成；未知键拒绝"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`board`"
 msgstr "`board`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Maintained immediate child of `boards/`; exactly one Board selector"
 msgstr "`boards/` 的维护中直接子目录；必须恰好选择一个 Board"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`board_package`"
 msgstr "`board_package`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "External package path relative to the assembly; alternative to `board`"
 msgstr "相对装配定位的外部包路径；与 `board` 二选一"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`backend`"
 msgstr "`backend`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid ""
 "Explicit `native`, `baremetal`, `freertos` or supported `threadx` subset"
 msgstr "显式 `native`、`baremetal`、`freertos` 或受支持 `threadx` 子集"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`clock`"
 msgstr "`clock`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Maintained exact profile matching Board and SoC facts"
 msgstr "匹配 Board 与 SoC 事实的维护中精确配置"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`optimization`"
 msgstr "`optimization`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid ""
 "Maintained optimization/debug/LTO profile; no arbitrary compiler override"
 msgstr "维护中的优化/调试/LTO 配置；不接受任意编译器覆盖"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`[memory]`"
 msgstr "`[memory]`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Byte budgets for stack, libc heap, static RAM and Flash LOAD"
 msgstr "以字节记录栈、libc 堆、静态 RAM 和 Flash LOAD 预算"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`[factory]`"
 msgstr "`[factory]`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Explicit optional strong IDs and capability metadata"
 msgstr "显式可选强类型 ID 和能力元数据"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Kind instance table"
 msgstr "类别实例表"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Stable authored name, reviewed binding, mode and bounded options"
 msgstr "稳定人工编写的名称、复核绑定、模式与有界选项"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "SPI/I2C device table"
 msgstr "SPI/I2C 器件表"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "Separate endpoint identity tied to an existing controller"
 msgstr "关联已有控制器的独立端点身份"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid "`[abi]`"
 msgstr "`[abi]`"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:21
 msgid ""
 "Assert reviewed CPU architecture/FPU/float ABI; cannot invent chip features"
 msgstr "断言复核 CPU architecture/FPU/float ABI；不能虚构芯片特性"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:40
 msgid ""
 "Resource checks cover actual pin/AF, controller, IRQ ceiling, shared "
 "timer/timebase, physical DMA controller/stream, clock, exact memory domain, "
@@ -120,12 +150,25 @@ msgstr ""
 "资源检查覆盖实际引脚／AF、控制器、IRQ 系统调用优先级阈值、共享定时器／时间基准、物理 DMA "
 "控制器／流、时钟、准确内存域、模式及端点身份。即使选择项语法合法，仍可能因提供者未实现该路由而被拒绝。解析器绝不静默改变引脚、模式或时钟。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:45
+msgid ""
+"See the [configuration and ownership guide](../../guides/developer-"
+"workflow.md) for Board-first queries, validated profiles, human summaries "
+"and effective diffs. `explain` defaults to human-readable output; automation"
+" must select `--json`."
+msgstr ""
+"[配置与所有权指南](../../guides/developer-workflow.md)说明从 Board 查询、经验证的 "
+"profile、人读摘要及有效差异。`explain` 默认输出人读内容；自动化必须选择 `--json`。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:49
 msgid "Inspect and generate"
 msgstr "检查并生成"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:51
 msgid "Run from the repository root, using a new output you own:"
 msgstr "从仓库根目录执行，使用自己拥有的新输出："
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:60
 msgid ""
 "`check` and `explain` do not generate output. `generate` publishes one "
 "atomic owned bundle; failure invalidates its owned output without replacing "
@@ -139,6 +182,7 @@ msgstr ""
 "`nexus_config.h`、绑定、factory、链接器内存和预算。声明输入变化要求重新解析；不同 Board/backend "
 "组合使用独立构建根目录。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/configuration/assembly.md:66
 msgid ""
 "CPU-only Runtime has a separate authored runtime TOML using the shared CPU "
 "resolver. It emits Core/Arch/optional OS policy, no "

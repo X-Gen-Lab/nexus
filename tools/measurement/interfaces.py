@@ -31,7 +31,8 @@ def shared_operation_symbols(root=None):
     _, _, providers, _ = source_contracts(root)
     directories = {root / "soc/common", root / "io/src"}
     return frozenset(name for name, provider in providers.items()
-                     if Path(provider["source"]["path"]).parent in directories)
+                     if any(Path(provider["source"]["path"]).is_relative_to(path)
+                            for path in directories))
 
 
 def inspect_interfaces(elf, *, require_interfaces=False):

@@ -42,6 +42,10 @@ physical DMA controller/stream, clock, exact memory domain, mode and endpoint id
 A syntactically valid selector can still reject because that provider does not
 implement the route. The resolver never silently changes pins, modes or clock.
 
+See the [configuration and ownership guide](../../guides/developer-workflow.md)
+for Board-first queries, validated profiles, human summaries and effective diffs.
+`explain` defaults to human-readable output; automation must select `--json`.
+
 ## Inspect and generate
 
 Run from the repository root, using a new output you own:

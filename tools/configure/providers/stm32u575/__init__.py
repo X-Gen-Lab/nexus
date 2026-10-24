@@ -232,6 +232,35 @@ def builtin_cs(controller):
 
 
 # Explicit static imports; importing this package performs no filesystem I/O.
+# Explicit software capabilities do not authorize an unreviewed route.
+ADC_GROUP = None
+PWM_SHARED = None
+ENDPOINT_POLICY = common.EndpointPolicy(i2c_long=True)
+TIMEBASE_ALARM = False
+mode_fields = common.mode_fields
+validate_controller_set = common.validate_controller_set
+validate_endpoint_clock = common.validate_endpoint_clock
+configuration_header = common.configuration_header
+
+
+def validate_mode_context(selection, route, *, backend, clock_profile):
+    mode = selection["mode"]
+    if route["kind"] in {"lptim", "rtc"} and (
+            backend != "baremetal" or clock_profile != "msis4"):
+        common.fail(f"U575 {route['kind'].upper()} requires baremetal/fixed MSIS4")
+    if mode in {"irq-fifo-bytes", "irq-fifo-rtscts-bytes"} and (
+            clock_profile != "msis4"):
+        common.fail("FIFO UART requires its reviewed fixed clock profile")
+    if mode == "irq-fifo-rtscts-bytes" and backend != "baremetal":
+        common.fail("RTSCTS FIFO UART requires its reviewed baremetal owner")
+
+
+def validate_user_io_context(assembly, part):
+    if (part != "STM32U575ZIT6Q" or assembly["clock_profile"] != "msis4" or
+            assembly["layout"] is not None or "power" in assembly):
+        common.fail("GPIO user I/O requires the exact U575 TZEN0 MSIS4 reference")
+
+
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,

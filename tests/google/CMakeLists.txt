@@ -81,6 +81,10 @@ nexus_google_test(nexus_io_observer_test SOURCES io_observer_test.cpp
 nexus_google_test(nexus_io_observation_contract_test
     SOURCES io_observation_contract_test.cpp
     LIBRARIES Nexus::IO)
+nexus_google_test(nexus_io_diagnostic_test
+    SOURCES io_diagnostic_test.cpp
+    LIBRARIES Nexus::IO)
+include("${CMAKE_CURRENT_SOURCE_DIR}/gd32_official.cmake")
 nexus_google_test(nexus_silicon_admission_test
     SOURCES silicon_admission_test.cpp
     LIBRARIES Nexus::Core

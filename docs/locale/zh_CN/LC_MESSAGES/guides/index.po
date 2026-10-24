@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,13 +8,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 1d1967bcdbbd6c04486b2fc3c54261a071713a78810560d371b05100247f8fed\n"
+"X-Nexus-Source-SHA256: 39b6947df1fd683882d26ae41ce2de4d24545cde8b949ba4ef8f695c0c8d34c5\n"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/guides/index.md:8
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/index.md:8
 msgid "Task guides"
 msgstr "操作指南"
 
-#: ../../../workspace/nexus-build-system-20261012/docs/guides/index.md:10
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/index.md:10
 msgid ""
 "Each guide defines inputs, ownership, rejection and an observable result. "
 "Hardware commands require an actual connected station; the documentation "

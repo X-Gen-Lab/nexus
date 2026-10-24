@@ -1,0 +1,2026 @@
+# Authored translation; independent review is recorded in metadata.
+msgid ""
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: c83f63763168b418ac200c7fadb2c92197a87d9eea76bcf5a313e1e075cec3f5\n"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:9
+msgid "开发体验75 项台账"
+msgstr "Developer experience 75-task ledger"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:11
+msgid ""
+"本页由原 CSV 派生，不是新的状态权威、执行记录或软件资格。 原编号、顺序和全部原字段来自 {download}`原台账 "
+"<../../design/developer-experience-execution.csv>`。 "
+"源文件：`docs/design/developer-experience-"
+"execution.csv`；SHA-256：`23ac52fad0b94a3f71f0aa88ca5bb3f0941d73c385436d7d7dfd30535b59a54e`。"
+msgstr ""
+"This page derives from the original CSV; it is not a new status authority, "
+"execution record or software qualification. Original IDs, order and every "
+"original field come from the {download}`original ledger "
+"<../../design/developer-experience-execution.csv>`. Source: "
+"`docs/design/developer-experience-execution.csv`; SHA-256: "
+"`23ac52fad0b94a3f71f0aa88ca5bb3f0941d73c385436d7d7dfd30535b59a54e`."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:15
+msgid ""
+"不同台账范围重叠，不相加数量或计算全项目完成率。实现状态与软件、 物理状态分别解释；`development_passed` 不表示当前文档 HEAD "
+"已执行。 `qualification_record_authority` 要回到精确结果索引判断源码和范围。 绝对 "
+"`/workspace`、`/dev/shm` 定位保留原字节，仅说明原执行主机位置； 可取得归档及 member 定位见 "
+"[软件证据入口](../software-verification.md)。"
+msgstr ""
+"Different ledgers overlap in scope; do not add their counts or calculate a "
+"project-wide completion rate. Interpret implementation, software and "
+"physical status separately. `development_passed` does not mean execution at "
+"the current documentation HEAD. Consult the exact results index for the "
+"source and scope of `qualification_record_authority`. Absolute `/workspace` "
+"and `/dev/shm` locators retain their original bytes and only identify the "
+"original execution host. See the [software-evidence entry](../software-"
+"verification.md) for retrievable archives and member locations."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:21
+msgid "**原退出字段**只有原 CSV 中实际存在的字段；任务、资格前提和合同链接 也按原文保留，不能据此补造某次执行。"
+msgstr ""
+"**Original exit fields** are only fields actually present in the original "
+"CSV. Tasks, qualification prerequisites and contract links also retain their"
+" original wording; they cannot be used to invent an execution."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:24
+msgid "本表包含 75 条原记录，仅表示来源行数。"
+msgstr ""
+"This table contains 75 original records; this is only the source row count."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:32
+msgid "W1-01"
+msgstr "W1-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "原字段"
+msgstr "Original field"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "原值"
+msgstr "Original value"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`task_id`"
+msgstr "`task_id`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`task`"
+msgstr "`task`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Separate application and maintainer entry points"
+msgstr "Separate application and maintainer entry points"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`implementation_status`"
+msgstr "`implementation_status`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "implemented"
+msgstr "implemented"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`software_status`"
+msgstr "`software_status`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "source_check_and_independent_prose_review_passed_final_docs_pending"
+msgstr "source_check_and_independent_prose_review_passed_final_docs_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`hardware_status`"
+msgstr "`hardware_status`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "not_applicable"
+msgstr "not_applicable"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`implementation_paths`"
+msgstr "`implementation_paths`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "docs/tutorials/source-sdk.md;README.md;README_CN.md"
+msgstr "docs/tutorials/source-sdk.md;README.md;README_CN.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`evidence_paths`"
+msgstr "`evidence_paths`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/docs/source-check-02.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/docs/source-check-02.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`exit_condition`"
+msgstr "`exit_condition`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Application quickstart precedes SDK maintenance and both locales agree"
+msgstr ""
+"Application quickstart precedes SDK maintenance and both locales agree"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "`owner`"
+msgstr "`owner`"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "codex"
+msgstr "codex"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:47
+msgid "W1-02"
+msgstr "W1-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Minimal Native product template"
+msgstr "Minimal Native product template"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "native_execution_passed"
+msgstr "native_execution_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "X-Gen-Lab/nexus-examples/templates/native"
+msgstr "X-Gen-Lab/nexus-examples/templates/native"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/examples/development-summary.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/examples/development-summary.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "External C11 product builds and runs through strong factory references"
+msgstr ""
+"External C11 product builds and runs through strong factory references"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:62
+msgid "W1-03"
+msgstr "W1-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "F407 board product templates"
+msgstr "F407 board product templates"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "actual_arm_link_and_budget_passed"
+msgstr "actual_arm_link_and_budget_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/templates/qiming;X-Gen-Lab/nexus-"
+"examples/templates/sky"
+msgstr ""
+"X-Gen-Lab/nexus-examples/templates/qiming;X-Gen-Lab/nexus-"
+"examples/templates/sky"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Both reviewed F407 boards link with exact facts and explicit physical "
+"unknowns"
+msgstr ""
+"Both reviewed F407 boards link with exact facts and explicit physical "
+"unknowns"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:77
+msgid "W1-04"
+msgstr "W1-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "F470 board product template"
+msgstr "F470 board product template"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "X-Gen-Lab/nexus-examples/templates/liangshan"
+msgstr "X-Gen-Lab/nexus-examples/templates/liangshan"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Independent GD32 product consumes only public interfaces"
+msgstr "Independent GD32 product consumes only public interfaces"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:92
+msgid "W1-05"
+msgstr "W1-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Versioned external project creation"
+msgstr "Versioned external project creation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "focused_behavior_passed"
+msgstr "focused_behavior_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/dev/projects.py;tools/testing/test_dev_projects.py"
+msgstr "tools/dev/projects.py;tools/testing/test_dev_projects.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_projects.py;/tmp/nexus-"
+"iteration-20261024/devtools/projects-origin-green.log;/tmp/nexus-"
+"iteration-20261024/devtools/projects-budget-green.log"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_projects.py;/tmp/nexus-"
+"iteration-20261024/devtools/projects-origin-green.log;/tmp/nexus-"
+"iteration-20261024/devtools/projects-budget-green.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Pinned template creates atomically and never overwrites an existing "
+"destination"
+msgstr ""
+"Pinned template creates atomically and never overwrites an existing "
+"destination"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:107
+msgid "W1-06"
+msgstr "W1-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Daily flash debug and monitor tools"
+msgstr "Daily flash debug and monitor tools"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "not_executed"
+msgstr "not_executed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/dev/device.py;tools/testing/test_dev_device.py"
+msgstr "tools/dev/device.py;tools/testing/test_dev_device.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_device.py;/tmp/nexus-"
+"iteration-20261024/devtools/device-actions-green-01.log"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_device.py;/tmp/nexus-"
+"iteration-20261024/devtools/device-actions-green-01.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Explicit target probe image and bounded process lifecycle; hardware "
+"execution separate"
+msgstr ""
+"Explicit target probe image and bounded process lifecycle; hardware "
+"execution separate"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:122
+msgid "W1-07"
+msgstr "W1-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Clean user onboarding exercise"
+msgstr "Clean user onboarding exercise"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "pending"
+msgstr "pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "（原字段为空）"
+msgstr "(original field empty)"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Actual Native creation build execution and configuration-error recovery "
+"recorded"
+msgstr ""
+"Actual Native creation build execution and configuration-error recovery "
+"recorded"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:137
+msgid "W2-01"
+msgstr "W2-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Human-readable assembly explanation"
+msgstr "Human-readable assembly explanation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/configure/experience.py"
+msgstr "tools/configure/experience.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-green.log"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-green.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Summary derives from resolved facts and preserves explicit JSON output"
+msgstr ""
+"Summary derives from resolved facts and preserves explicit JSON output"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:152
+msgid "W2-02"
+msgstr "W2-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Configuration location and provenance diagnostics"
+msgstr "Configuration location and provenance diagnostics"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/configure/experience.py;tools/configure/configure.py"
+msgstr "tools/configure/experience.py;tools/configure/configure.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Failure identifies file key and source constraint without changing rejection"
+msgstr ""
+"Failure identifies file key and source constraint without changing rejection"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:167
+msgid "W2-03"
+msgstr "W2-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Resource conflict explanations"
+msgstr "Resource conflict explanations"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/configure/configure.py;tools/configure/experience.py"
+msgstr "tools/configure/configure.py;tools/configure/experience.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Conflicting owners and resource are identified with real rejection "
+"regressions"
+msgstr ""
+"Conflicting owners and resource are identified with real rejection "
+"regressions"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:182
+msgid "W2-04"
+msgstr "W2-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Board-first binding and capability queries"
+msgstr "Board-first binding and capability queries"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/configure/experience.py;tools/configure/experience.py"
+msgstr "tools/configure/experience.py;tools/configure/experience.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Reviewed choices and limits visible without a guessed full assembly"
+msgstr "Reviewed choices and limits visible without a guessed full assembly"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:197
+msgid "W2-05"
+msgstr "W2-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Validated profile-based assembly initialization"
+msgstr "Validated profile-based assembly initialization"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Complete explicit TOML is resolved without fallback or implicit overlays"
+msgstr ""
+"Complete explicit TOML is resolved without fallback or implicit overlays"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:212
+msgid "W2-06"
+msgstr "W2-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Assembly difference explanation"
+msgstr "Assembly difference explanation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Changes in routes modes storage and execution requirements are explained"
+msgstr ""
+"Changes in routes modes storage and execution requirements are explained"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:227
+msgid "W2-07"
+msgstr "W2-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Editor schema and unit guidance"
+msgstr "Editor schema and unit guidance"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/configure/authored.py;tools/configure/assembly.schema.json"
+msgstr "tools/configure/authored.py;tools/configure/assembly.schema.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Hints and examples agree with actual accepted and rejected fields"
+msgstr "Hints and examples agree with actual accepted and rejected fields"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:242
+msgid "W3-01"
+msgstr "W3-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Provider extension responsibility audit"
+msgstr "Provider extension responsibility audit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "generation_equivalence_passed"
+msgstr "generation_equivalence_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/configure/README.md"
+msgstr "tools/configure/README.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-green.log;/tmp/nexus-"
+"iteration-20261024/configuration/emission-equivalence.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-green.log;/tmp/nexus-"
+"iteration-20261024/configuration/emission-equivalence.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Family-specific decisions and necessary common responsibilities mapped"
+msgstr ""
+"Family-specific decisions and necessary common responsibilities mapped"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:257
+msgid "W3-02"
+msgstr "W3-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Move family-specific resolution decisions"
+msgstr "Move family-specific resolution decisions"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/configure/configure.py;tools/configure/providers/common.py;tools/configure/providers/*/__init__.py;tools/configure/providers/stm32g474/adc_group.py"
+msgstr ""
+"tools/configure/configure.py;tools/configure/providers/common.py;tools/configure/providers/*/__init__.py;tools/configure/providers/stm32g474/adc_group.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Common resolver retains transaction identity and resource arbitration"
+msgstr "Common resolver retains transaction identity and resource arbitration"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:272
+msgid "W3-03"
+msgstr "W3-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Construction-driven emission"
+msgstr "Construction-driven emission"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/configure/emission.py;tools/configure/i2s2.py;tools/configure/providers/stm32h743/__init__.py"
+msgstr ""
+"tools/configure/emission.py;tools/configure/i2s2.py;tools/configure/providers/stm32h743/__init__.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Emitters consume explicit provider construction and cleanup contracts"
+msgstr "Emitters consume explicit provider construction and cleanup contracts"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:287
+msgid "W3-04"
+msgstr "W3-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Public class and family binding separation"
+msgstr "Public class and family binding separation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/configure/providers/common.py;tools/configure/providers/descriptor.py;tools/configure/README.md"
+msgstr ""
+"tools/configure/providers/common.py;tools/configure/providers/descriptor.py;tools/configure/README.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Same-class provider additions do not duplicate public lifecycle semantics"
+msgstr ""
+"Same-class provider additions do not duplicate public lifecycle semantics"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:302
+msgid "W3-05"
+msgstr "W3-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Reviewed peripheral IP reuse pilot"
+msgstr "Reviewed peripheral IP reuse pilot"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "verified_existing"
+msgstr "verified_existing"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "two_family_shared_engine_regressions_passed"
+msgstr "two_family_shared_engine_regressions_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"soc/common/i2c_v1_async.c;tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake"
+msgstr ""
+"soc/common/i2c_v1_async.c;tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/final-google-results.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/final-google-results.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Equivalent hardware protocols share implementation while errata remain "
+"explicit"
+msgstr ""
+"Equivalent hardware protocols share implementation while errata remain "
+"explicit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:317
+msgid "W3-06"
+msgstr "W3-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Same-class instance extension exercise"
+msgstr "Same-class instance extension exercise"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "two_family_multiple_controller_regressions_passed"
+msgstr "two_family_multiple_controller_regressions_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake"
+msgstr ""
+"tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake;/tmp/nexus-"
+"iteration-20261024/provider-vendor/final-google-results.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/google/i2c_multi_controller_test.cpp;tests/google/i2c_multi_controller.cmake;/tmp/nexus-"
+"iteration-20261024/provider-vendor/final-google-results.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Independent resources IRQ bindings and retained software ownership verified"
+msgstr ""
+"Independent resources IRQ bindings and retained software ownership verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:332
+msgid "W3-07"
+msgstr "W3-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "H743 frame DMA2D source ownership"
+msgstr "H743 frame DMA2D source ownership"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "byte_equivalence_verified_final_sdk_link_pending"
+msgstr "byte_equivalence_verified_final_sdk_link_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"components/soc/stm32/stm32h743_frame_dma2d;components/soc/stm32/CMakeLists.txt;cmake/package/package_source_sdk.py;Doxyfile"
+msgstr ""
+"components/soc/stm32/stm32h743_frame_dma2d;components/soc/stm32/CMakeLists.txt;cmake/package/package_source_sdk.py;Doxyfile"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/dma2d-relocation.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/dma2d-relocation.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Chip extension moved with stable public identity and updated build SDK "
+"references"
+msgstr ""
+"Chip extension moved with stable public identity and updated build SDK "
+"references"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:347
+msgid "W4-01"
+msgstr "W4-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Exact maintained support dimensions"
+msgstr "Exact maintained support dimensions"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "configuration_projection_verified"
+msgstr "configuration_projection_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Part revision mode clock memory backend route and evidence remain distinct"
+msgstr ""
+"Part revision mode clock memory backend route and evidence remain distinct"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:362
+msgid "W4-02"
+msgstr "W4-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Derived user support selection view"
+msgstr "Derived user support selection view"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Existing authorities produce useful capability choices without a second "
+"status database"
+msgstr ""
+"Existing authorities produce useful capability choices without a second "
+"status database"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:377
+msgid "W4-03"
+msgstr "W4-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Launch board fact and unknown audit"
+msgstr "Launch board fact and unknown audit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "reviewed"
+msgstr "reviewed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "official_source_and_unknown_facts_audited"
+msgstr "official_source_and_unknown_facts_audited"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"boards/stm32f407_qiming_v31;boards/stm32f407ve_sky_qingchun;boards/gd32f470_liangshan;tools/configure/experience.py"
+msgstr ""
+"boards/stm32f407_qiming_v31;boards/stm32f407ve_sky_qingchun;boards/gd32f470_liangshan;tools/configure/experience.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/official-reuse-audit.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/official-reuse-audit.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Reviewed sources retained and unobserved PCB wiring remains unknown"
+msgstr "Reviewed sources retained and unobserved PCB wiring remains unknown"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:392
+msgid "W4-04"
+msgstr "W4-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Mode execution responsibility summaries"
+msgstr "Mode execution responsibility summaries"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Admission executor service DMA borrow stop and recovery limits recorded"
+msgstr ""
+"Admission executor service DMA borrow stop and recovery limits recorded"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:407
+msgid "W4-05"
+msgstr "W4-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Unsupported capability rejection boundaries"
+msgstr "Unsupported capability rejection boundaries"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/configure/test_experience.py;tools/configure/providers/*/__init__.py"
+msgstr ""
+"tools/configure/test_experience.py;tools/configure/providers/*/__init__.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/configure/test_experience.py;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-green.log;/tmp/nexus-"
+"iteration-20261024/configuration/emission-equivalence.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/configure/test_experience.py;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-green.log;/tmp/nexus-"
+"iteration-20261024/configuration/emission-equivalence.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Invalid route memory backend and modes reject without implicit substitution"
+msgstr ""
+"Invalid route memory backend and modes reject without implicit substitution"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:422
+msgid "W4-06"
+msgstr "W4-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Provider build SDK and test coverage mapping"
+msgstr "Provider build SDK and test coverage mapping"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "in_progress"
+msgstr "in_progress"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "mode_projection_and_sdk_omission_regressions_verified_full_sdk_pending"
+msgstr ""
+"mode_projection_and_sdk_omission_regressions_verified_full_sdk_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/experience.py"
+msgstr ""
+"tools/configure/dependencies.py;tools/configure/providers/descriptor.py;tools/configure/experience.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-"
+"green.log;tests/contracts/test_source_sdk.py;/tmp/nexus-"
+"iteration-20261024/sdk-closure-green.log"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/configuration/handoff.json;/tmp/nexus-"
+"iteration-20261024/configuration/experience-final-"
+"green.log;tests/contracts/test_source_sdk.py;/tmp/nexus-"
+"iteration-20261024/sdk-closure-green.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Every admitted mode resolves to actual implementation and explicit "
+"verification scope"
+msgstr ""
+"Every admitted mode resolves to actual implementation and explicit "
+"verification scope"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:437
+msgid "W4-07"
+msgstr "W4-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Compatibility and migration impact"
+msgstr "Compatibility and migration impact"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Source interface configuration and reference-scope changes explained "
+"precisely"
+msgstr ""
+"Source interface configuration and reference-scope changes explained "
+"precisely"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:452
+msgid "W5-01"
+msgstr "W5-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Three execution ownership recipes"
+msgstr "Three execution ownership recipes"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "native_recipes_passed_translation_reviewed"
+msgstr "native_recipes_passed_translation_reviewed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/guides/developer-workflow.md;X-Gen-Lab/nexus-examples/docs/developer-"
+"recipes.md"
+msgstr ""
+"docs/guides/developer-workflow.md;X-Gen-Lab/nexus-examples/docs/developer-"
+"recipes.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Main loop exclusive task and shared owner each define progress and shutdown"
+msgstr ""
+"Main loop exclusive task and shared owner each define progress and shutdown"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:467
+msgid "W5-02"
+msgstr "W5-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Baremetal UART complete lifecycle example"
+msgstr "Baremetal UART complete lifecycle example"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "native_execution_passed_mcu_link_passed_physical_pending"
+msgstr "native_execution_passed_mcu_link_passed_physical_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "X-Gen-Lab/nexus-examples/templates;tests/google"
+msgstr "X-Gen-Lab/nexus-examples/templates;tests/google"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;tests/google;/tmp/nexus-"
+"iteration-20261024/examples/development-summary.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;tests/google;/tmp/nexus-"
+"iteration-20261024/examples/development-summary.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Normal busy deadline cancel late IRQ and settlement preserve storage"
+msgstr "Normal busy deadline cancel late IRQ and settlement preserve storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:482
+msgid "W5-03"
+msgstr "W5-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Shared SPI two-endpoint example"
+msgstr "Shared SPI two-endpoint example"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "native_and_real_freertos_host_passed_arm_link_passed"
+msgstr "native_and_real_freertos_host_passed_arm_link_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/apps/shared_spi_runtime;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp"
+msgstr ""
+"X-Gen-Lab/nexus-examples/apps/shared_spi_runtime;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp;/tmp/nexus-"
+"iteration-20261024/examples/development-summary.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp;/tmp/nexus-"
+"iteration-20261024/examples/development-summary.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Explicit owner tasks storage arbitration cancellation and shutdown verified"
+msgstr ""
+"Explicit owner tasks storage arbitration cancellation and shutdown verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:497
+msgid "W5-04"
+msgstr "W5-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Continuous stream slow-consumer example"
+msgstr "Continuous stream slow-consumer example"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "native_ownership_passed_h743_arm_link_passed"
+msgstr "native_ownership_passed_h743_arm_link_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/apps/stream_recovery;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp"
+msgstr ""
+"X-Gen-Lab/nexus-examples/apps/stream_recovery;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Block loans loss backpressure and recovery are observable without overwrite"
+msgstr ""
+"Block loans loss backpressure and recovery are observable without overwrite"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:512
+msgid "W5-05"
+msgstr "W5-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Composed lifecycle diagnostics"
+msgstr "Composed lifecycle diagnostics"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "verified"
+msgstr "verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"io/include/nexus/io/diagnostic.h;io/src/mechanisms/diagnostic.c;tests/google/io_diagnostic_test.cpp"
+msgstr ""
+"io/include/nexus/io/diagnostic.h;io/src/mechanisms/diagnostic.c;tests/google/io_diagnostic_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/io-cost/handoff.json;/tmp/nexus-iteration-20261024/io-"
+"cost/observations/summary.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/io-cost/handoff.json;/tmp/nexus-iteration-20261024/io-"
+"cost/observations/summary.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Known facts distinguish causes; missing evidence stays unknown and does not "
+"mutate ownership"
+msgstr ""
+"Known facts distinguish causes; missing evidence stays unknown and does not "
+"mutate ownership"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:527
+msgid "W5-06"
+msgstr "W5-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Explicit DMA storage assistance"
+msgstr "Explicit DMA storage assistance"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"io/include/nexus/io/dma.h;io/src/mechanisms/dma.c;tests/google/dma_test.cpp"
+msgstr ""
+"io/include/nexus/io/dma.h;io/src/mechanisms/dma.c;tests/google/dma_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Alignment extent memory and cache ownership validated without hidden bounce "
+"buffers"
+msgstr ""
+"Alignment extent memory and cache ownership validated without hidden bounce "
+"buffers"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:542
+msgid "W5-07"
+msgstr "W5-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Necessary ergonomic helpers and timeout audit"
+msgstr "Necessary ergonomic helpers and timeout audit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/guides/developer-workflow.md;X-Gen-Lab/nexus-"
+"examples/apps/shared_spi_runtime;X-Gen-Lab/nexus-"
+"examples/apps/stream_recovery"
+msgstr ""
+"docs/guides/developer-workflow.md;X-Gen-Lab/nexus-"
+"examples/apps/shared_spi_runtime;X-Gen-Lab/nexus-"
+"examples/apps/stream_recovery"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Real consumers justify helpers and no outstanding stack borrow escapes"
+msgstr ""
+"Real consumers justify helpers and no outstanding stack borrow escapes"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:557
+msgid "W6-01"
+msgstr "W6-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Representative benchmark identity"
+msgstr "Representative benchmark identity"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/measurement/compare.py;tests/contracts/io_storage_cost"
+msgstr "tools/measurement/compare.py;tests/contracts/io_storage_cost"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Configuration tools profiles load and reference workloads fixed"
+msgstr "Configuration tools profiles load and reference workloads fixed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:572
+msgid "W6-02"
+msgstr "W6-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Image resource decomposition"
+msgstr "Image resource decomposition"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/measurement/resources.py;tests/contracts/io_storage_cost/probe.c"
+msgstr ""
+"tools/measurement/resources.py;tests/contracts/io_storage_cost/probe.c"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Flash load layout sections RAM domains and caller storage reported "
+"separately"
+msgstr ""
+"Flash load layout sections RAM domains and caller storage reported "
+"separately"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:587
+msgid "W6-03"
+msgstr "W6-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Instance and capability marginal costs"
+msgstr "Instance and capability marginal costs"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tests/contracts/io_storage_cost;tools/measurement/compare.py"
+msgstr "tests/contracts/io_storage_cost;tools/measurement/compare.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Actual linked variants establish controller endpoint slot and mode deltas"
+msgstr ""
+"Actual linked variants establish controller endpoint slot and mode deltas"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:602
+msgid "W6-04"
+msgstr "W6-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Operation table and linker retention audit"
+msgstr "Operation table and linker retention audit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/measurement/interfaces.py;tools/testing/test_interface_storage.py"
+msgstr ""
+"tools/measurement/interfaces.py;tools/testing/test_interface_storage.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Retained methods and selected modes inspected in actual ELF variants"
+msgstr "Retained methods and selected modes inspected in actual ELF variants"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:617
+msgid "W6-05"
+msgstr "W6-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "IRQ service and throughput measurement preparation"
+msgstr "IRQ service and throughput measurement preparation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "prepared"
+msgstr "prepared"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "software_verified"
+msgstr "software_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/hil/measure.py;docs/guides/performance-hil.md"
+msgstr "tools/hil/measure.py;docs/guides/performance-hil.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Existing probes and capture tools preserve units and physical limitations"
+msgstr ""
+"Existing probes and capture tools preserve units and physical limitations"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:632
+msgid "W6-06"
+msgstr "W6-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Evidence-based resource optimization"
+msgstr "Evidence-based resource optimization"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "reviewed_keep_existing_ops"
+msgstr "reviewed_keep_existing_ops"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "io/src/api;components/owner_observer;docs/guides/performance-hil.md"
+msgstr "io/src/api;components/owner_observer;docs/guides/performance-hil.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Only measured benefit with equivalent behavior enters production"
+msgstr "Only measured benefit with equivalent behavior enters production"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:647
+msgid "W6-07"
+msgstr "W6-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Performance regression rules"
+msgstr "Performance regression rules"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/measurement/soc_costs.py;docs/guides/performance-hil.md"
+msgstr "tools/measurement/soc_costs.py;docs/guides/performance-hil.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Static and physical baselines separate noise and observed latency from WCET"
+msgstr ""
+"Static and physical baselines separate noise and observed latency from WCET"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:662
+msgid "W7-01"
+msgstr "W7-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Official driver reuse inventory"
+msgstr "Official driver reuse inventory"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "seven_dependency_scopes_audited"
+msgstr "seven_dependency_scopes_audited"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "dependencies;tests/contracts/stm32_hal_reference/README.md"
+msgstr "dependencies;tests/contracts/stm32_hal_reference/README.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;/tmp/nexus-"
+"iteration-20261024/provider-vendor/official-reuse-audit.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;/tmp/nexus-"
+"iteration-20261024/provider-vendor/official-reuse-audit.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Header LL algorithm and complete transport reuse distinguished by family"
+msgstr ""
+"Header LL algorithm and complete transport reuse distinguished by family"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:677
+msgid "W7-02"
+msgstr "W7-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Vendor dependency pairing and patch audit"
+msgstr "Vendor dependency pairing and patch audit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "seven_locked_sources_verified"
+msgstr "seven_locked_sources_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "dependencies;tools/maintenance"
+msgstr "dependencies;tools/maintenance"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Exact source license CMSIS pairing and SDK closure reviewed"
+msgstr "Exact source license CMSIS pairing and SDK closure reviewed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:692
+msgid "W7-03"
+msgstr "W7-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Bounded vendor transport comparison contract"
+msgstr "Bounded vendor transport comparison contract"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "bounded_reference_contract_verified"
+msgstr "bounded_reference_contract_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/adapter.h"
+msgstr ""
+"tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/adapter.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/adapter.h;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/adapter.h;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"An existing maintained representative mode fixes semantics costs and failure"
+" exits"
+msgstr ""
+"An existing maintained representative mode fixes semantics costs and failure"
+" exits"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:707
+msgid "W7-04"
+msgstr "W7-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Real STM32 HAL adaptation evaluation"
+msgstr "Real STM32 HAL adaptation evaluation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "implemented_test_reference"
+msgstr "implemented_test_reference"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "real_hal_adapter_15_cases_passed"
+msgstr "real_hal_adapter_15_cases_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tests/contracts/stm32_hal_reference/adapter.c;tests/contracts/stm32_hal_reference/reference_test.cpp"
+msgstr ""
+"tests/contracts/stm32_hal_reference/adapter.c;tests/contracts/stm32_hal_reference/reference_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/adapter.c;tests/contracts/stm32_hal_reference/reference_test.cpp;/tmp/nexus-"
+"iteration-20261024/provider-vendor/hal-review-green.xml;/tmp/nexus-"
+"iteration-20261024/provider-vendor/hal-review-red.log;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/adapter.c;tests/contracts/stm32_hal_reference/reference_test.cpp;/tmp/nexus-"
+"iteration-20261024/provider-vendor/hal-review-green.xml;/tmp/nexus-"
+"iteration-20261024/provider-vendor/hal-review-red.log;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Tick deadline callbacks abort and drain evaluated with one live peripheral "
+"owner"
+msgstr ""
+"Tick deadline callbacks abort and drain evaluated with one live peripheral "
+"owner"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:722
+msgid "W7-05"
+msgstr "W7-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "GD32 official-operation reuse evaluation"
+msgstr "GD32 official-operation reuse evaluation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "verified_existing_with_new_test"
+msgstr "verified_existing_with_new_test"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "real_spl_three_cases_passed"
+msgstr "real_spl_three_cases_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tests/google/gd32_official_gpio_test.cpp;tests/google/gd32_official.cmake"
+msgstr ""
+"tests/google/gd32_official_gpio_test.cpp;tests/google/gd32_official.cmake"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/google/gd32_official_gpio_test.cpp;tests/google/gd32_official.cmake;/tmp/nexus-"
+"iteration-20261024/provider-vendor/final-google-results.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/google/gd32_official_gpio_test.cpp;tests/google/gd32_official.cmake;/tmp/nexus-"
+"iteration-20261024/provider-vendor/final-google-results.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Actual GD32 source and errata govern the chosen bounded algorithm"
+msgstr "Actual GD32 source and errata govern the chosen bounded algorithm"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:737
+msgid "W7-06"
+msgstr "W7-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Semantic cost and maintenance comparison"
+msgstr "Semantic cost and maintenance comparison"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "evaluation_completed_scoped_negative"
+msgstr "evaluation_completed_scoped_negative"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"real_vendor_behavior_production_cost_and_nonequivalent_layout_separated"
+msgstr ""
+"real_vendor_behavior_production_cost_and_nonequivalent_layout_separated"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/layout.c;tools/measurement/compare.py"
+msgstr ""
+"tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/layout.c;tools/measurement/compare.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/layout.c;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/hal-layout.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;tests/contracts/stm32_hal_reference/layout.c;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json;/tmp/nexus-"
+"iteration-20261024/provider-vendor/hal-layout.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Actual vendor execution and linked cost evidence support a scoped decision"
+msgstr ""
+"Actual vendor execution and linked cost evidence support a scoped decision"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:752
+msgid "W7-07"
+msgstr "W7-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Single production implementation decision"
+msgstr "Single production implementation decision"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "decision_recorded"
+msgstr "decision_recorded"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "single_production_ll_retained_scoped_reason_verified"
+msgstr "single_production_ll_retained_scoped_reason_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tests/contracts/stm32_hal_reference/README.md;docs/design/developer-"
+"experience.md"
+msgstr ""
+"tests/contracts/stm32_hal_reference/README.md;docs/design/developer-"
+"experience.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tests/contracts/stm32_hal_reference/README.md;/tmp/nexus-"
+"iteration-20261024/provider-vendor/handoff.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Accepted implementation or justified retention documented; unused "
+"experimental paths removed"
+msgstr ""
+"Accepted implementation or justified retention documented; unused "
+"experimental paths removed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:767
+msgid "W8-01"
+msgstr "W8-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Execution stage cost baseline"
+msgstr "Execution stage cost baseline"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "historical_receipts_observed_not_iteration_total"
+msgstr "historical_receipts_observed_not_iteration_total"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/dev/timings.py;tools/testing/test_dev_timings.py"
+msgstr "tools/dev/timings.py;tools/testing/test_dev_timings.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_timings.py;/tmp/nexus-"
+"iteration-20261024/devtools/observed-costs-01.json;/tmp/nexus-"
+"iteration-20261024/devtools/timings-green-01.log"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_timings.py;/tmp/nexus-"
+"iteration-20261024/devtools/observed-costs-01.json;/tmp/nexus-"
+"iteration-20261024/devtools/timings-green-01.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Existing receipts distinguish preparation configure compile test docs and "
+"SDK with unknowns preserved"
+msgstr ""
+"Existing receipts distinguish preparation configure compile test docs and "
+"SDK with unknowns preserved"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:782
+msgid "W8-02"
+msgstr "W8-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Focused developer feedback discovery"
+msgstr "Focused developer feedback discovery"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/dev/dev.py;tools/testing/test_dev_efficiency.py;tools/dev/README.md"
+msgstr ""
+"tools/dev/dev.py;tools/testing/test_dev_efficiency.py;tools/dev/README.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_efficiency.py;/tmp/nexus-"
+"iteration-20261024/devtools/efficiency-green-01.log"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_efficiency.py;/tmp/nexus-"
+"iteration-20261024/devtools/efficiency-green-01.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Selected development tests easy to run and never qualify a complete source"
+msgstr ""
+"Selected development tests easy to run and never qualify a complete source"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:797
+msgid "W8-03"
+msgstr "W8-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Repeated setup and process cost reduction"
+msgstr "Repeated setup and process cost reduction"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "metadata_cost_measured_only"
+msgstr "metadata_cost_measured_only"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/dev/dev.py;tools/testing/test_dev_efficiency.py"
+msgstr "tools/dev/dev.py;tools/testing/test_dev_efficiency.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_efficiency.py;/tmp/nexus-"
+"iteration-20261024/devtools/feedback-cost-comparison.json;/tmp/nexus-"
+"iteration-20261024/devtools/efficiency-green-01.log"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_efficiency.py;/tmp/nexus-"
+"iteration-20261024/devtools/feedback-cost-comparison.json;/tmp/nexus-"
+"iteration-20261024/devtools/efficiency-green-01.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Equivalent independent coverage retained with measured preparation "
+"improvements"
+msgstr ""
+"Equivalent independent coverage retained with measured preparation "
+"improvements"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:812
+msgid "W8-04"
+msgstr "W8-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Cache invalidation and concurrency budgets"
+msgstr "Cache invalidation and concurrency budgets"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "cache_and_budget_regressions_passed"
+msgstr "cache_and_budget_regressions_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/dev/cache.py;tools/dev/process.py;tools/testing/test_dev_efficiency.py"
+msgstr ""
+"tools/dev/cache.py;tools/dev/process.py;tools/testing/test_dev_efficiency.py"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_efficiency.py;/tmp/nexus-"
+"iteration-20261024/devtools/focused-integration-green-03.log"
+msgstr ""
+"docs/delivery/developer-experience-"
+"results.json;tools/testing/test_dev_efficiency.py;/tmp/nexus-"
+"iteration-20261024/devtools/focused-integration-green-03.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Validated inputs and finite resource budgets improve repeat execution "
+"without report caching"
+msgstr ""
+"Validated inputs and finite resource budgets improve repeat execution "
+"without report caching"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:827
+msgid "W8-05"
+msgstr "W8-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Test retention review"
+msgstr "Test retention review"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "independent_behavior_coverage_preserved"
+msgstr "independent_behavior_coverage_preserved"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/dev/README.md;docs/development/workflow.md"
+msgstr "tools/dev/README.md;docs/development/workflow.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/devtools/test-retention-candidates.json;/tmp/nexus-"
+"iteration-20261024/devtools/test-retention-review.md"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/devtools/test-retention-candidates.json;/tmp/nexus-"
+"iteration-20261024/devtools/test-retention-review.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Each deletion candidate identifies obsolete behavior or independent "
+"equivalent coverage"
+msgstr ""
+"Each deletion candidate identifies obsolete behavior or independent "
+"equivalent coverage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:842
+msgid "W8-06"
+msgstr "W8-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Remove confirmed obsolete or duplicate tests"
+msgstr "Remove confirmed obsolete or duplicate tests"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "reviewed_no_removal_justified"
+msgstr "reviewed_no_removal_justified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "no_test_deletion_or_gate_reduction_claimed"
+msgstr "no_test_deletion_or_gate_reduction_claimed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/devtools/test-retention-review.md"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/devtools/test-retention-review.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Meaningful failure ownership isolation concurrency and consumption "
+"regressions retained"
+msgstr ""
+"Meaningful failure ownership isolation concurrency and consumption "
+"regressions retained"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:857
+msgid "W8-07"
+msgstr "W8-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Sustainable feedback and delivery constraints"
+msgstr "Sustainable feedback and delivery constraints"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "focused_behavior_passed_final_gates_pending"
+msgstr "focused_behavior_passed_final_gates_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/devtools/focused-integration-green-03.log"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/devtools/focused-integration-green-03.log"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Measured feedback trends failures cancellation and normal complete gates "
+"remain enforced"
+msgstr ""
+"Measured feedback trends failures cancellation and normal complete gates "
+"remain enforced"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:872
+msgid "W9-01"
+msgstr "W9-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Remote platform and examples baseline"
+msgstr "Remote platform and examples baseline"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "actual_remote_baselines_observed"
+msgstr "actual_remote_baselines_observed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ".gitmodules;X-Gen-Lab/nexus-examples/dependencies/nexus.lock.json"
+msgstr ".gitmodules;X-Gen-Lab/nexus-examples/dependencies/nexus.lock.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Actual commits gitlinks and locks recorded rather than stale local snapshots"
+msgstr ""
+"Actual commits gitlinks and locks recorded rather than stale local snapshots"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:887
+msgid "W9-02"
+msgstr "W9-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Real examples platform migration"
+msgstr "Real examples platform migration"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Final platform source lock gitlink and public consumption agree"
+msgstr "Final platform source lock gitlink and public consumption agree"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:902
+msgid "W9-03"
+msgstr "W9-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Product recipes maintained externally"
+msgstr "Product recipes maintained externally"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "external_application_behavior_passed"
+msgstr "external_application_behavior_passed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/templates;X-Gen-Lab/nexus-"
+"examples/apps/shared_spi_runtime;X-Gen-Lab/nexus-"
+"examples/apps/stream_recovery"
+msgstr ""
+"X-Gen-Lab/nexus-examples/templates;X-Gen-Lab/nexus-"
+"examples/apps/shared_spi_runtime;X-Gen-Lab/nexus-"
+"examples/apps/stream_recovery"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Templates and lifecycle examples are real applications outside platform core"
+msgstr ""
+"Templates and lifecycle examples are real applications outside platform core"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:917
+msgid "W9-04"
+msgstr "W9-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Examples Native application CI"
+msgstr "Examples Native application CI"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "focused_native_application_and_gate_contracts_passed_final_ci_pending"
+msgstr "focused_native_application_and_gate_contracts_passed_final_ci_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-"
+"examples/scripts/tdd_gate.py;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp"
+msgstr ""
+"X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-"
+"examples/scripts/tdd_gate.py;X-Gen-Lab/nexus-"
+"examples/tests/developer_recipes_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Actual successful rejected and shutdown behavior runs with nonempty outcomes"
+msgstr ""
+"Actual successful rejected and shutdown behavior runs with nonempty outcomes"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:932
+msgid "W9-05"
+msgstr "W9-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Examples ARM consumption CI"
+msgstr "Examples ARM consumption CI"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "five_actual_arm_consumers_linked_and_budget_checked_final_ci_pending"
+msgstr "five_actual_arm_consumers_linked_and_budget_checked_final_ci_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-"
+"examples/apps/shared_spi_runtime/CMakeLists.txt;X-Gen-Lab/nexus-"
+"examples/apps/stream_recovery/h743/CMakeLists.txt"
+msgstr ""
+"X-Gen-Lab/nexus-examples/.github/workflows/ci.yml;X-Gen-Lab/nexus-"
+"examples/apps/shared_spi_runtime/CMakeLists.txt;X-Gen-Lab/nexus-"
+"examples/apps/stream_recovery/h743/CMakeLists.txt"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Exact maintained board backend tuples link within public and resource "
+"boundaries"
+msgstr ""
+"Exact maintained board backend tuples link within public and resource "
+"boundaries"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:947
+msgid "W9-06"
+msgstr "W9-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Candidate to examples evidence association"
+msgstr "Candidate to examples evidence association"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Platform and examples identities link independent SDK and application "
+"execution"
+msgstr ""
+"Platform and examples identities link independent SDK and application "
+"execution"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:962
+msgid "W9-07"
+msgstr "W9-07"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Upgrade exercise and bilingual migration guide"
+msgstr "Upgrade exercise and bilingual migration guide"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "bilingual_migration_ready_final_pin_upgrade_pending"
+msgstr "bilingual_migration_ready_final_pin_upgrade_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/tutorials/source-sdk.md;docs/guides/developer-workflow.md;X-Gen-"
+"Lab/nexus-examples/docs/developer-recipes.md"
+msgstr ""
+"docs/tutorials/source-sdk.md;docs/guides/developer-workflow.md;X-Gen-"
+"Lab/nexus-examples/docs/developer-recipes.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "docs/delivery/developer-experience-results.json"
+msgstr "docs/delivery/developer-experience-results.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Actual locked baseline upgrade and failure diagnosis documented with "
+"hardware status separate"
+msgstr ""
+"Actual locked baseline upgrade and failure diagnosis documented with "
+"hardware status separate"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:977
+msgid "I-01"
+msgstr "I-01"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Establish execution source and branches"
+msgstr "Establish execution source and branches"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "actual_platform_and_examples_branches_observed"
+msgstr "actual_platform_and_examples_branches_observed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Actual final-source outputs and original evidence required"
+msgstr "Actual final-source outputs and original evidence required"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:992
+msgid "I-02"
+msgstr "I-02"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Independent cross-layer review"
+msgstr "Independent cross-layer review"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "independent_cross_layer_findings_fixed_and_verified"
+msgstr "independent_cross_layer_findings_fixed_and_verified"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"tools/configure/test_experience.py;tools/testing/test_dev_projects.py;tests/contracts/stm32_hal_reference/reference_test.cpp"
+msgstr ""
+"tools/configure/test_experience.py;tools/testing/test_dev_projects.py;tests/contracts/stm32_hal_reference/reference_test.cpp"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1007
+msgid "I-03"
+msgstr "I-03"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Final-source complete software gates"
+msgstr "Final-source complete software gates"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1022
+msgid "I-04"
+msgstr "I-04"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Complete source SDK and external consumption"
+msgstr "Complete source SDK and external consumption"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1037
+msgid "I-05"
+msgstr "I-05"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Bilingual documentation and diagram delivery"
+msgstr "Bilingual documentation and diagram delivery"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "source_check_passed_translation_review_and_fresh_build_pending"
+msgstr "source_check_passed_translation_review_and_fresh_build_pending"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/design/developer-experience.md;docs/guides/developer-"
+"workflow.md;docs/locale"
+msgstr ""
+"docs/design/developer-experience.md;docs/guides/developer-"
+"workflow.md;docs/locale"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/docs/source-check-02.json;/tmp/nexus-"
+"iteration-20261024/docs/catalog-delta.json"
+msgstr ""
+"docs/delivery/developer-experience-results.json;/tmp/nexus-"
+"iteration-20261024/docs/source-check-02.json;/tmp/nexus-"
+"iteration-20261024/docs/catalog-delta.json"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1052
+msgid "I-06"
+msgstr "I-06"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Candidate identity and review handoff"
+msgstr "Candidate identity and review handoff"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1067
+msgid "H1"
+msgstr "H1"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Launch board bring-up and developer tools"
+msgstr "Launch board bring-up and developer tools"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "software_tools_verified_physical_not_executed"
+msgstr "software_tools_verified_physical_not_executed"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/dev/device.py;tools/hil/fixtures"
+msgstr "tools/dev/device.py;tools/hil/fixtures"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid ""
+"Connected identified equipment exact image and actual observations required"
+msgstr ""
+"Connected identified equipment exact image and actual observations required"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1082
+msgid "H2"
+msgstr "H2"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Serial SPI I2C and recovery"
+msgstr "Serial SPI I2C and recovery"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "tools/hil;docs/guides/performance-hil.md"
+msgstr "tools/hil;docs/guides/performance-hil.md"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1097
+msgid "H3"
+msgstr "H3"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "IRQ CPU critical-section and latency measurement"
+msgstr "IRQ CPU critical-section and latency measurement"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1112
+msgid "H4"
+msgstr "H4"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Continuous DMA and Cache coherence"
+msgstr "Continuous DMA and Cache coherence"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1127
+msgid "H5"
+msgstr "H5"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Flash watchdog and exceptional shutdown"
+msgstr "Flash watchdog and exceptional shutdown"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:1142
+msgid "H6"
+msgstr "H6"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/status/ledgers/developer-experience.md:26
+msgid "Physical support-scope sealing"
+msgstr "Physical support-scope sealing"

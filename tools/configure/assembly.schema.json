@@ -65,6 +65,7 @@
                 "type": "boolean"
               },
               "secure_idle_stack_bytes": {
+                "description": "Explicit storage size in bytes.",
                 "maximum": 65536,
                 "minimum": 64,
                 "type": "integer"
@@ -89,6 +90,7 @@
                 "type": "boolean"
               },
               "tick_hz": {
+                "description": "Frequency in hertz; exact provider limits still apply.",
                 "maximum": 1000000,
                 "minimum": 1,
                 "type": "integer"
@@ -149,6 +151,7 @@
                 "type": "integer"
               },
               "tick_hz": {
+                "description": "Frequency in hertz; exact provider limits still apply.",
                 "maximum": 1000000,
                 "minimum": 1,
                 "type": "integer"
@@ -215,6 +218,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "channels": {
@@ -228,9 +232,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -241,9 +247,11 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "reference_mv": {
+            "description": "Declared analog reference in millivolts; not a measurement.",
             "minimum": 0,
             "type": "integer"
           },
@@ -258,10 +266,12 @@
             "additionalProperties": false,
             "properties": {
               "blocks": {
+                "description": "Explicit caller-owned stream block count.",
                 "minimum": 0,
                 "type": "integer"
               },
               "max_units_per_second": {
+                "description": "Producer-rate bound in payload units per second.",
                 "minimum": 0,
                 "type": "integer"
               },
@@ -269,17 +279,21 @@
                 "const": "stop-and-report-gap"
               },
               "release_delay_us": {
+                "description": "Time interval in microseconds; not a measured hardware guarantee.",
                 "minimum": 0,
                 "type": "integer"
               },
               "source": {
+                "description": "Reviewed source supporting this declared constraint.",
                 "type": "string"
               },
               "target_delay_us": {
+                "description": "Time interval in microseconds; not a measured hardware guarantee.",
                 "minimum": 0,
                 "type": "integer"
               },
               "units_per_block": {
+                "description": "Payload units in each equally sized stream block.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -313,6 +327,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "channels": {
@@ -329,9 +344,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -342,13 +359,16 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "period_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
           "reference_mv": {
+            "description": "Declared analog reference in millivolts; not a measurement.",
             "minimum": 0,
             "type": "integer"
           },
@@ -397,12 +417,14 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "break_active_high": {
             "type": "boolean"
           },
           "deadtime_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
@@ -419,9 +441,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -432,13 +456,16 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "period_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
           "tick_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           }
@@ -461,9 +488,11 @@
       "type": "string"
     },
     "board": {
+      "description": "Maintained Board directory id; use board_package for private PCB data.",
       "type": "string"
     },
     "board_package": {
+      "description": "Explicit Board package path relative to this assembly.",
       "type": "string"
     },
     "can": {
@@ -471,6 +500,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "bitrate": {
@@ -478,6 +508,7 @@
             "type": "integer"
           },
           "drain_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
@@ -492,9 +523,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -505,6 +538,7 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "operation": {
@@ -563,12 +597,14 @@
                 "type": "integer"
               },
               "controller": {
+                "description": "Authored controller instance id, not an endpoint id.",
                 "type": "string"
               },
               "fifo": {
                 "additionalProperties": false,
                 "properties": {
                   "rx_budget_bytes": {
+                    "description": "Explicit storage size in bytes.",
                     "maximum": 16,
                     "minimum": 1,
                     "type": "integer"
@@ -577,6 +613,7 @@
                     "type": "string"
                   },
                   "tx_budget_bytes": {
+                    "description": "Explicit storage size in bytes.",
                     "maximum": 16,
                     "minimum": 1,
                     "type": "integer"
@@ -641,6 +678,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "bitrate": {
@@ -652,6 +690,7 @@
             "type": "integer"
           },
           "drain_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
@@ -702,9 +741,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -715,6 +756,7 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "poll_limit": {
@@ -731,6 +773,7 @@
       "type": "object"
     },
     "clock": {
+      "description": "Reviewed clock profile matching the Board oscillator facts.",
       "type": "string"
     },
     "components": {
@@ -745,6 +788,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "counting": {
@@ -768,6 +812,7 @@
             "type": "boolean"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },
@@ -794,13 +839,16 @@
             "type": "array"
           },
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "drain_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
           "init_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
@@ -808,9 +856,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -821,6 +871,7 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "rx_count": {
@@ -828,6 +879,7 @@
             "type": "integer"
           },
           "rx_storage_bytes": {
+            "description": "Explicit storage size in bytes.",
             "minimum": 0,
             "type": "integer"
           },
@@ -859,13 +911,16 @@
             "type": "array"
           },
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "drain_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
           "init_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
@@ -873,9 +928,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -886,6 +943,7 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "rx_count": {
@@ -893,6 +951,7 @@
             "type": "integer"
           },
           "rx_storage_bytes": {
+            "description": "Explicit storage size in bytes.",
             "minimum": 0,
             "type": "integer"
           },
@@ -914,6 +973,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "edge": {
@@ -927,9 +987,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -940,6 +1002,7 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },
@@ -965,9 +1028,11 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },
@@ -984,9 +1049,11 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },
@@ -1003,15 +1070,18 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "irq": {
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1022,10 +1092,12 @@
             "type": "object"
           },
           "max_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "timing": {
@@ -1056,6 +1128,7 @@
                 "type": "integer"
               },
               "source": {
+                "description": "Reviewed source supporting this declared constraint.",
                 "type": "string"
               }
             },
@@ -1088,12 +1161,14 @@
             "type": "integer"
           },
           "controller": {
+            "description": "Authored controller instance id, not an endpoint id.",
             "type": "string"
           },
           "driver": {
             "type": "string"
           },
           "model_bytes": {
+            "description": "Explicit storage size in bytes.",
             "minimum": 0,
             "type": "integer"
           }
@@ -1125,15 +1200,18 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "irq": {
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1144,9 +1222,11 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "tick_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "maximum": 4294967295,
             "minimum": 1,
             "type": "integer"
@@ -1165,14 +1245,17 @@
       "additionalProperties": false,
       "properties": {
         "flash_load_limit_bytes": {
+          "description": "Declared Flash LOAD limit in bytes; not the ELF file size.",
           "minimum": 0,
           "type": "integer"
         },
         "libc_heap_bytes": {
+          "description": "Explicit libc heap reservation in bytes; zero disables it.",
           "minimum": 0,
           "type": "integer"
         },
         "main_stack_bytes": {
+          "description": "Reserved main stack in bytes, not measured high-water.",
           "minimum": 0,
           "type": "integer"
         },
@@ -1180,30 +1263,35 @@
           "additionalProperties": false,
           "properties": {
             "privileged_flash_bytes": {
+              "description": "Explicit storage size in bytes.",
               "maximum": 4294967295,
               "minimum": 32,
               "multipleOf": 32,
               "type": "integer"
             },
             "privileged_ram_bytes": {
+              "description": "Explicit storage size in bytes.",
               "maximum": 4294967295,
               "minimum": 32,
               "multipleOf": 32,
               "type": "integer"
             },
             "syscall_flash_bytes": {
+              "description": "Explicit storage size in bytes.",
               "maximum": 4294967295,
               "minimum": 32,
               "multipleOf": 32,
               "type": "integer"
             },
             "user_flash_bytes": {
+              "description": "Explicit storage size in bytes.",
               "maximum": 4294967295,
               "minimum": 32,
               "multipleOf": 32,
               "type": "integer"
             },
             "user_ram_bytes": {
+              "description": "Explicit storage size in bytes.",
               "maximum": 4294967295,
               "minimum": 32,
               "multipleOf": 32,
@@ -1224,6 +1312,7 @@
             "additionalProperties": false,
             "properties": {
               "limit_bytes": {
+                "description": "Explicit storage size in bytes.",
                 "minimum": 4,
                 "multipleOf": 4,
                 "type": "integer"
@@ -1237,6 +1326,7 @@
           "type": "object"
         },
         "static_ram_limit_bytes": {
+          "description": "Declared static RAM limit in bytes; checked against linked output.",
           "minimum": 0,
           "type": "integer"
         }
@@ -1311,6 +1401,7 @@
               "type": "boolean"
             },
             "secure_idle_stack_bytes": {
+              "description": "Explicit storage size in bytes.",
               "maximum": 65536,
               "minimum": 64,
               "type": "integer"
@@ -1335,6 +1426,7 @@
               "type": "boolean"
             },
             "tick_hz": {
+              "description": "Frequency in hertz; exact provider limits still apply.",
               "maximum": 1000000,
               "minimum": 1,
               "type": "integer"
@@ -1379,6 +1471,7 @@
               "type": "integer"
             },
             "tick_hz": {
+              "description": "Frequency in hertz; exact provider limits still apply.",
               "maximum": 1000000,
               "minimum": 1,
               "type": "integer"
@@ -1408,7 +1501,8 @@
           "uniqueItems": true
         },
         "mode": {
-          "const": "fixed-run"
+          "const": "fixed-run",
+          "description": "Explicit maintained mode; the product owns service and shutdown."
         }
       },
       "required": [
@@ -1422,20 +1516,25 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "duty_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "period_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
           "tick_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           }
@@ -1453,6 +1552,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "channels": {
@@ -1463,6 +1563,7 @@
             "type": "array"
           },
           "deadtime_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
@@ -1473,9 +1574,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1486,13 +1589,16 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "period_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
           "reference_mv": {
+            "description": "Declared analog reference in millivolts; not a measurement.",
             "minimum": 0,
             "type": "integer"
           },
@@ -1504,10 +1610,12 @@
             "type": "array"
           },
           "tick_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           },
           "trigger_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           }
@@ -1525,9 +1633,11 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "deadtime_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
@@ -1538,9 +1648,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1551,13 +1663,16 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "period_ticks": {
+            "description": "Count in the explicitly selected timer clock ticks.",
             "minimum": 0,
             "type": "integer"
           },
           "tick_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           }
@@ -1575,9 +1690,11 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },
@@ -1597,15 +1714,18 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "irq": {
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1616,10 +1736,12 @@
             "type": "object"
           },
           "max_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },
@@ -1636,6 +1758,7 @@
         "additionalProperties": false,
         "properties": {
           "controller": {
+            "description": "Authored controller instance id, not an endpoint id.",
             "type": "string"
           },
           "cs_binding": {
@@ -1645,15 +1768,18 @@
             "type": "string"
           },
           "max_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "maximum": 3,
             "minimum": 0,
             "type": "integer"
           },
           "model_bytes": {
+            "description": "Explicit storage size in bytes.",
             "minimum": 0,
             "type": "integer"
           }
@@ -1670,6 +1796,7 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "edge": {
@@ -1686,9 +1813,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1699,9 +1828,11 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "tick_hz": {
+            "description": "Frequency in hertz; exact provider limits still apply.",
             "minimum": 0,
             "type": "integer"
           }
@@ -1756,16 +1887,19 @@
         ],
         "properties": {
           "baud": {
+            "description": "UART baud in bits per second; the selected provider checks its divider.",
             "minimum": 0,
             "type": "integer"
           },
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "fifo": {
             "additionalProperties": false,
             "properties": {
               "rx_budget_bytes": {
+                "description": "Explicit storage size in bytes.",
                 "maximum": 16,
                 "minimum": 1,
                 "type": "integer"
@@ -1774,6 +1908,7 @@
                 "type": "string"
               },
               "tx_budget_bytes": {
+                "description": "Explicit storage size in bytes.",
                 "maximum": 16,
                 "minimum": 1,
                 "type": "integer"
@@ -1829,9 +1964,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               },
@@ -1845,12 +1982,14 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "rx": {
             "additionalProperties": false,
             "properties": {
               "capacity": {
+                "description": "Exact caller-selected ring capacity; not a hidden maximum pool.",
                 "minimum": 0,
                 "type": "integer"
               },
@@ -1873,10 +2012,12 @@
             "additionalProperties": false,
             "properties": {
               "blocks": {
+                "description": "Explicit caller-owned stream block count.",
                 "minimum": 0,
                 "type": "integer"
               },
               "max_units_per_second": {
+                "description": "Producer-rate bound in payload units per second.",
                 "minimum": 0,
                 "type": "integer"
               },
@@ -1884,17 +2025,21 @@
                 "const": "stop-and-report-gap"
               },
               "release_delay_us": {
+                "description": "Time interval in microseconds; not a measured hardware guarantee.",
                 "minimum": 0,
                 "type": "integer"
               },
               "source": {
+                "description": "Reviewed source supporting this declared constraint.",
                 "type": "string"
               },
               "target_delay_us": {
+                "description": "Time interval in microseconds; not a measured hardware guarantee.",
                 "minimum": 0,
                 "type": "integer"
               },
               "units_per_block": {
+                "description": "Payload units in each equally sized stream block.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1924,13 +2069,16 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "clock_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
           "drain_timeout_us": {
+            "description": "Time interval in microseconds; not a measured hardware guarantee.",
             "minimum": 0,
             "type": "integer"
           },
@@ -1942,9 +2090,11 @@
             "additionalProperties": false,
             "properties": {
               "calls_os": {
+                "description": "Whether this IRQ may call the selected kernel; its ceiling is checked.",
                 "type": "boolean"
               },
               "priority": {
+                "description": "Logical NVIC priority; lower numeric values are more urgent.",
                 "minimum": 0,
                 "type": "integer"
               }
@@ -1955,6 +2105,7 @@
             "type": "object"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           },
           "poll_limit": {
@@ -1982,6 +2133,7 @@
         "additionalProperties": false,
         "properties": {
           "controller": {
+            "description": "Authored controller instance id, not an endpoint id.",
             "type": "string"
           },
           "direction": {
@@ -2026,9 +2178,11 @@
         "additionalProperties": false,
         "properties": {
           "binding": {
+            "description": "Exact reviewed Board binding; no route fallback.",
             "type": "string"
           },
           "mode": {
+            "description": "Explicit maintained mode; the product owns service and shutdown.",
             "type": "string"
           }
         },

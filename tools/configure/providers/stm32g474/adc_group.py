@@ -16,6 +16,11 @@ MODES = ("regular-sequence-dma", "injected-sequence")
 SAMPLE_HALFCYCLES = (5, 13, 25, 49, 95, 185, 495, 1281)
 
 
+def trigger_resources(selection):
+    """The reviewed trigger consumes the family's exact physical timer."""
+    return ("controller:TIM6",) if selection["trigger"] == "tim6-trgo" else ()
+
+
 def validate_selection(selection, route):
     """Limit selected channels to documented pads and internal sources."""
     required = {"channels", "sample_times", "reference_mv", "exclusive",

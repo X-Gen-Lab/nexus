@@ -9,6 +9,8 @@ block storage 由调用者提供。SDK 和 provider storage 私有，应用产�
 
 | 文档 | 用途 |
 |---|---|
+| [开发体验与 provider 迭代](developer-experience.md) | 应用入口、配置解释、实例接入、生命周期、资源成本、官方复用与执行效率的九组边界 |
+| [75 项执行台账](developer-experience-execution.csv) | 63 项软件工作、6 项集成交付及6 项实板退出；实现与实际验证分列 |
 | [文档系统架构与交付规划](documentation-system.md) | 读者任务、单一正文、MyST/API、双语、门禁、版本与离线交付的目标方案 |
 | [文档系统58项台账](documentation-system-execution.csv) | 保留DOC-01至40并补内容/图示任务；依赖、退出条件与实施/验证分别记录 |
 | [完整文档优化清单](documentation-improvements.md) | 从同一台账派生的读者清单，不建立第二份状态权威 |

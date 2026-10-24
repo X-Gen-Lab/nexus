@@ -79,6 +79,7 @@ REQUIRED_FILES = (
     "core/include/nexus/core/memory.h",
     "core/include/nexus/core/request_observer.h", "core/src/request_observer.c",
     "io/include/nexus/io/stream_budget.h", "io/src/mechanisms/stream_budget.c",
+    "io/include/nexus/io/diagnostic.h", "io/src/mechanisms/diagnostic.c",
     "components/owner_observer/CMakeLists.txt",
     "components/owner_observer/include/nexus/components/owner_observer.h",
     "components/owner_observer/src/owner_observer.c",
@@ -94,10 +95,11 @@ REQUIRED_FILES = (
     "cmake/platform/TargetPolicy.cmake", "cmake/platform/Components.cmake",
     "tools/configure/bundle.py", "tools/configure/dependencies.py",
     "tools/configure/contracts.py", "tools/configure/matrix.py",
-    "tools/configure/sdk.py",
+    "tools/configure/sdk.py", "tools/configure/experience.py",
     "tools/configure/assemblies/catalogue.json",
     "tools/dev/dev.py", "tools/dev/presets.py", "tools/dev/process.py",
     "tools/dev/change_paths.py",
+    "tools/dev/projects.py", "tools/dev/device.py", "tools/dev/timings.py",
     "tools/dev/cache.py", "tools/dev/dependencies.py",
     "tools/dev/qualification.py", "tools/dev/provenance.py",
     "tools/evidence/store.py",
@@ -388,9 +390,9 @@ REQUIRED_FILES += (
     "cmake/package/verification/io_evolution/consumers/u575-stop2.c")
 REQUIRED_FILES += (
     "io/include/nexus/io/frame_stream.h", "io/src/mechanisms/frame_stream.c",
-    "components/frame_dma2d/CMakeLists.txt",
-    "components/frame_dma2d/include/nexus/components/frame_dma2d.h",
-    "components/frame_dma2d/src/h743_frame_dma2d.c")
+    "components/soc/stm32/stm32h743_frame_dma2d/CMakeLists.txt",
+    "components/soc/stm32/stm32h743_frame_dma2d/include/nexus/components/frame_dma2d.h",
+    "components/soc/stm32/stm32h743_frame_dma2d/src/h743_frame_dma2d.c")
 REQUIRED_FILES += (
     "components/i3c_controller/CMakeLists.txt",
     "components/i3c_controller/src/i3c_controller.c",

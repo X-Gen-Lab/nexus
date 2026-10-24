@@ -7,20 +7,59 @@ and publishes one atomic compile/link bundle. CMake targets own the software
 source graph.
 
 ```sh
+python tools/configure/configure.py list-bindings \
+  --board stm32f407_qiming_v31 --kind uart
 python tools/configure/configure.py init \
   --board stm32f407_qiming_v31 --backend baremetal --clock hse8-pll168 \
+  --profile uart --binding uart1 --instance link0 \
   --output my-platform.toml
 python tools/configure/configure.py list-bindings --assembly my-platform.toml
 python tools/configure/configure.py check --assembly my-platform.toml
 python tools/configure/configure.py explain --assembly my-platform.toml
+python tools/configure/configure.py explain --assembly my-platform.toml --json
+python tools/configure/configure.py diff \
+  --assembly my-platform.toml --against my-platform-next.toml
 python tools/configure/configure.py generate \
   --assembly my-platform.toml --output build/my-config
 ```
 
-`init` creates an empty assembly with an explicit Board, backend and clock. It
-validates that selection and refuses to overwrite an existing file. `check` and
-`explain` have no generated-output side effects. `list-bindings` shows the actual
-Board bindings and maintained modes; it does not invent connector wiring.
+`init` accepts `empty` (the default), `gpio` or `uart`. Every profile requires an
+explicit Board, backend and clock; nonempty profiles also require a reviewed
+`--binding`. `--instance` defaults to `device0`. GPIO selects output; UART selects
+115200 baud, IRQ events with capacity 64 and priority 5 without kernel calls.
+These are visible authored values, not hardware defaults. Normal resolution
+rejects a profile where its exact mode or route is unavailable. It never changes
+the selection to make it pass. Creation refuses overwrite and removes its own
+incomplete file after a write or validation failure.
+
+`check`, `explain`, `list-bindings` and `diff` have no generated-output side
+effects. `explain` now defaults to a human-readable summary of selected public
+faces, clock, resources, memory domains, declared budgets and execution duties.
+Automation that consumed its previous JSON output must add `--json`; that flag
+retains the exact resolved IR projection. Budget declarations and provider limits
+are not measured image, stack, throughput or latency results.
+
+`list-bindings` accepts exactly one of `--assembly`, `--board` or
+`--board-package`. Board-first queries need no invented backend or clock. Optional
+`--kind uart` filters by public class. `--json` reports each route's actual
+provider implementation, execution shape, DMA paths, mode resources and current
+owners when an assembly is supplied. A candidate remains
+`admission = "configuration-required"`: clocks, backend, options and the complete
+resource set must still pass normal resolution. Missing wiring stays missing.
+The selected backend and clock are `null` in a Board-first query, not defaults.
+
+`diff` compares effective platform, route, mode, storage, endpoint, clock and
+budget decisions. Instance paths identify changed fields; `$order` preserves
+meaningful declaration order. JSON changes include `before_present` and
+`after_present` to distinguish a missing field from explicit `null`. Source-file
+renames and configuration hashes alone do not count as effective changes. Both
+inputs must resolve before a comparison is printed.
+
+Human views and binding JSON report physical scope as
+`not_established_by_configuration` for MCU or `not_applicable` for Native. Consult
+the exact Board and station records for physical evidence. The legacy raw IR
+qualification placeholders describe the generator's scope; they cannot establish
+the absence or presence of a separate station result.
 
 ```toml
 schema = 2
@@ -168,7 +207,8 @@ an exact independent register-model buffer, between 1 and 256 bytes. Native I2C
 requires it; Native SPI without it explicitly uses the loopback model.
 
 `assembly.schema.json` is generated from the same `authored.py` field model used
-for normalization. It assists editor completion. The resolver additionally
+for normalization. It assists editor completion with units and lifecycle duties.
+Descriptions add no independent acceptance rules. The resolver additionally
 checks hardware-specific routes, ranges, IRQ priorities, source identities and
 resources. Schema completion does not establish a chip or PCB capability.
 
@@ -202,6 +242,16 @@ no runtime registration or additional dispatch is emitted. The public resolver o
 input snapshots and resource conflicts. The public binding emitter owns Nexus
 faces and common lifecycle progress. There is no package discovery or runtime
 provider registration, and unknown families or unimplemented modes fail closed.
+
+Family packages also own endpoint capability policy, exact backend/clock coupling,
+cache-derived mode fields, whole-selection exclusions and optional compile-time
+constants. The resolver invokes these explicit contracts while retaining input
+identity, schema validation, transaction assembly and resource arbitration.
+G474's ADC review and shared-PWM owner are explicit family helpers; their exact
+timer choices do not live in the generic resolver. `FamilyDescriptor` lists
+configuration helpers directly, while CMake alone owns compiled sources. Public
+mode traits describe execution shape and never admit a family by themselves.
+This refactor adds no firmware registration, allocation or dispatch layer.
 
 Adding a family requires a real capability and constructor contract in that map,
 explicit CMake reconfiguration dependencies, source-SDK required files and tests.

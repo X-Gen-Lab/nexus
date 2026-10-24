@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,11 +8,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: bffa39842170cd4f0b0d38784be1ddbdc3253cf647182dc9f4654ba887b3dfec\n"
+"X-Nexus-Source-SHA256: c7079b67b266d62c7f8c06939a1d6cef2b5f87102f86e9c0a32b883af0e7eb0e\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:9
 msgid "Measure resources and prepare hardware acceptance"
 msgstr "测量资源并准备硬件验收"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:11
 msgid ""
 "Use this guide to separate linked software costs from physical MCU behavior."
 " The platform supplies measurement and HIL tooling; products choose "
@@ -22,14 +24,17 @@ msgstr ""
 "使用本指南区分链接后的软件成本与物理 MCU 行为。平台提供测量与 HIL "
 "工具；产品选择工作负载、电气限制、安全输出和发行策略。真实设备执行已审查范围之前，任何 Board 都没有实板资格。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:16
 msgid ""
 "Prepare the [fixed source and recursive dependencies](source-checkout.md), "
 "then the locked toolchain for the exact selected assembly."
 msgstr "先准备[固定源码与递归依赖](source-checkout.md)，再为精确选择的装配准备锁定工具链。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:19
 msgid "Measure an exact image"
 msgstr "测量精确镜像"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:21
 msgid ""
 "Record clean source, assembly/resolved digest, dependencies, compiler and "
 "flags. Build the same workload before and after a change. Check actual "
@@ -42,6 +47,7 @@ msgstr ""
 "与资源报告，不使用对象数量估算。分别记录 Flash LOAD、Flash 占用范围、各物理 RAM 预留、MSP、任务栈／TCB、队列和 I/O "
 "缓冲区。栈容量不是实测栈高水位。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:27
 msgid ""
 "The [build contract](../design/build-system.md) owns resource checks. Use "
 "maintained `tools/measurement/` gates; [execution budgets](../design/soc-"
@@ -55,14 +61,17 @@ msgstr ""
 "budgets.md)说明范围。速度结论必须包含单位、时钟、输入规模、负载、采样方法和不确定度。DWT 32 "
 "位快照需要有界回绕间隔；主机到达时间戳不能证明 MCU cycles 或 IRQ 延迟。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:33
 msgid ""
 "![H743 exact memory and Cache ownership "
 "reference](../assets/diagrams/h743-memory-cache.svg)"
 msgstr "![H743 精确内存与缓存所有权参考](../assets/diagrams/h743-memory-cache.svg)"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:33
 msgid "H743 exact memory and Cache ownership reference"
 msgstr "H743 精确内存与缓存所有权参考"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:35
 msgid ""
 "FIG-09 is an exact H743 reference. Cache-enabled TX requires complete "
 "32-byte line ownership and AXI SRAM reachability; DMA completion, wire "
@@ -72,15 +81,59 @@ msgstr ""
 "FIG-09 是精确 H743 参考。启用缓存的 TX 要求拥有完整 32 字节缓存行，并可达 AXI SRAM；DMA "
 "完成、线上完成和借用结束分别判断。它不授权 RX DMA 或 TCM 放置。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:39
+msgid "Compare costs without changing the question"
+msgstr "保持同一问题再比较成本"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:41
+msgid ""
+"Resource regression compares equivalent CPU, ABI, optimization, clock, "
+"backend, routes, modes, stack/heap budgets and compiler identity. Use "
+"explicit nonnegative growth limits for each metric. A comparison that adds a"
+" controller, slot or mode explains marginal cost; it does not prove an "
+"equivalent implementation became smaller. Keep actual ELF files and load-"
+"layout reports with the comparison."
+msgstr ""
+"资源回归比较等价的 CPU、ABI、优化、时钟、后端、路由、模式、栈／heap 预算和编译器身份。每项指标使用显式非负增长上限。新增控制器、slot "
+"或模式的比较解释边际成本，不能证明等价实现变小。随比较保留实际 ELF 文件和装载布局报告。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:47
+msgid ""
+"Flash LOAD, RAM intervals, provider state, buffers and reserved RTOS storage"
+" are separate views; nested categories must not be summed twice. Product "
+"stack usage cannot be inferred from an arbitrary symbol name. Dynamic high-"
+"water marks require measurement. Shared operation tables need a retained-"
+"symbol audit in actual ELF variants before changing their organization; no "
+"measured benefit means no production table split justified by this "
+"experiment."
+msgstr ""
+"Flash LOAD、RAM 区间、provider 状态、缓冲区和预留 RTOS "
+"存储是不同观察视角；嵌套类别不能重复累加。不能由任意符号名称推断产品栈使用量。动态 high-water mark "
+"需要测量。改变共享操作表组织前，必须审计实际 ELF 变体中保留的符号；没有测得收益，本实验就不能成为拆分生产方法表的依据。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:54
+msgid ""
+"Physical IRQ latency and throughput require raw acquisition, explicit units,"
+" image/station identity, clock and load. A host test duration is not MCU "
+"cycles; the largest observed latency is not WCET. Unexecuted measurements "
+"remain `not_executed`, without guessed thresholds or converted model "
+"results."
+msgstr ""
+"物理 IRQ 延迟和吞吐需要原始采集、明确单位、镜像／测试站身份、时钟及负载。host 测试耗时不是 MCU cycle；观测到的最大延迟不是 "
+"WCET。未执行的测量保持 `not_executed`，不猜测阈值或转换模型结果。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:59
 msgid "Prepare without operating equipment"
 msgstr "在不操作设备的情况下准备"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:61
 msgid ""
 "First configure and build the selected maintained assembly. For the "
 "Liangshan baremetal reference, these repository-root commands consume its "
 "actual output:"
 msgstr "先配置并构建所选维护装配。以下仓库根目录命令使用梁山派裸机参考的实际输出："
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:71
 msgid ""
 "The locked ARM compiler must be on `PATH`. Check the part, pins, selected "
 "modes and `not_executed` cases in reports. Preparation does not open serial,"
@@ -93,9 +146,47 @@ msgstr ""
 "项。准备流程不打开串口、不刷写，也不操作电源设备。数值限制和仪器在审查前保持未绑定。G474／H743／U575 "
 "软件参考夹具会明确拒绝物理工位准入；未来实板夹具需要独立审查的工具集成。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:77
+msgid ""
+"The [selected-mode HIL contracts](../design/selected-mode-hil.md) add exact "
+"preparation for H743 Cache-enabled SPI4 DMA, continuous USART3 RX with IRQ "
+"TX, and separately selected finite TX-DMA/continuous RX duplex, plus U575 "
+"finite USART1 hardware-chain TX and LPTIM2 RUN one-shots. Select their "
+"maintained assemblies and keep independent mode, wire, memory and lifecycle "
+"observations. These protocols retain the software-reference fixture boundary"
+" above; a valid plan or synthetic parser test does not supply a physical "
+"station result."
+msgstr ""
+"[选定模式 HIL 合同](../design/selected-mode-hil.md)为 H743 开启 Cache 的 SPI4 DMA、使用 "
+"IRQ TX 的连续 USART3 RX，以及独立选择的有限 TX DMA／连续 RX 双向模式，另为 U575 有限 USART1 硬件链 TX 和 "
+"LPTIM2 RUN 单次计数增加精确准备。选择对应维护中的装配，并分别保留模式、线上、内存和生命周期观察记录。这些协议保留上面的软件参考 "
+"fixture 边界；有效计划或合成 parser 测试不提供实板 station 结果。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:85
+msgid ""
+"ThreadX preparation uses [independent acquisition "
+"contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
+"SOURCE/tools/hil/threadx.md) for tasks, IRQ wake, context, stack, deadlines,"
+" lifecycle and fail-stop. Select one of the three maintained M4 Boards for a"
+" physical plan; Native establishes host software behavior only. Generate the"
+" OS plan from the exact resolved ThreadX configuration with "
+"`tools/hil/os_acceptance.py plan`. These seven cases do not inherit FreeRTOS"
+" low-power acceptance contracts. Their plans remain `prepared_unbound` / "
+"`not_executed` until real equipment supplies the required observations and "
+"the full station admission succeeds."
+msgstr ""
+"ThreadX 准备使用[独立采集合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
+"DOCUMENTATION-SOURCE/tools/hil/threadx.md)，覆盖任务、IRQ 唤醒、上下文、栈、deadline、生命周期和 "
+"fail-stop。物理计划必须选择三块受维护 M4 Board 之一；Native 只建立主机软件行为证据。通过 "
+"`tools/hil/os_acceptance.py plan` 从精确解析后的 ThreadX 配置生成 OS 计划。这七项不会沿用 "
+"FreeRTOS 低功耗验收合同。在真实设备提供必需观察记录且完整 station 准入成功之前，计划仍为 "
+"`prepared_unbound`／`not_executed`。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:94
 msgid "Execute only a real reviewed station"
 msgstr "只执行真实且经过审查的工位"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:96
 msgid ""
 "Bind observed PCB/part/UID, probe, stable serial path, wiring and supply to "
 "the exact ELF, resolved configuration and resource report. Pin acquisition "
@@ -108,6 +199,7 @@ msgstr ""
 "配置与资源报告。锁定采集工具、操作配方、仪器和数值上下限。遵守维护中的 HIL "
 "采集合同：识别、刷写、验证、复位、串口和清理。失败保留原始日志；清理失败继续隔离保留工位，并要求实物检查。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/guides/performance-hil.md:102
 msgid ""
 "Capture completion means executed but unqualified. Validate the actual "
 "smoke, measurement and OS records separately. Do not synthesize physical "
@@ -117,39 +209,3 @@ msgid ""
 msgstr ""
 "采集完成只表示执行过，尚未取得资格。分别验证实际基本功能检查、测量和 OS 记录。不得合成物理跟踪记录或将软件模型当作 "
 "HIL。资格只覆盖已记录观察，不证明未观察的 WCET、电气安全或产品发行。"
-
-
-msgid ""
-"The [selected-mode HIL contracts](../design/selected-mode-hil.md) add "
-"exact preparation for H743 Cache-enabled SPI4 DMA, continuous USART3 RX "
-"with IRQ TX, and separately selected finite TX-DMA/continuous RX duplex,"
-" plus U575 finite USART1 hardware-chain TX and LPTIM2 RUN one-shots. "
-"Select their maintained assemblies and keep independent mode, wire, "
-"memory and lifecycle observations. These protocols retain the "
-"software-reference fixture boundary above; a valid plan or synthetic "
-"parser test does not supply a physical station result."
-msgstr ""
-"[选定模式 HIL 合同](../design/selected-mode-hil.md)为 H743 开启 Cache 的 SPI4 "
-"DMA、使用 IRQ TX 的连续 USART3 RX，以及独立选择的有限 TX DMA／连续 RX 双向模式，另为 U575 有限 "
-"USART1 硬件链 TX 和 LPTIM2 RUN "
-"单次计数增加精确准备。选择对应维护中的装配，并分别保留模式、线上、内存和生命周期观察记录。这些协议保留上面的软件参考 fixture "
-"边界；有效计划或合成 parser 测试不提供实板 station 结果。"
-
-msgid ""
-"ThreadX preparation uses [independent acquisition "
-"contracts](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/threadx.md)"
-" for tasks, IRQ wake, context, stack, deadlines, lifecycle and "
-"fail-stop. Select one of the three maintained M4 Boards for a physical "
-"plan; Native establishes host software behavior only. Generate the OS "
-"plan from the exact resolved ThreadX configuration with "
-"`tools/hil/os_acceptance.py plan`. These seven cases do not inherit "
-"FreeRTOS low-power acceptance contracts. Their plans remain "
-"`prepared_unbound` / `not_executed` until real equipment supplies the "
-"required observations and the full station admission succeeds."
-msgstr ""
-"ThreadX "
-"准备使用[独立采集合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/hil/threadx.md)，覆盖任务、IRQ"
-" 唤醒、上下文、栈、deadline、生命周期和 fail-stop。物理计划必须选择三块受维护 M4 Board 之一；Native "
-"只建立主机软件行为证据。通过 `tools/hil/os_acceptance.py plan` 从精确解析后的 ThreadX 配置生成 OS"
-" 计划。这七项不会沿用 FreeRTOS 低功耗验收合同。在真实设备提供必需观察记录且完整 station 准入成功之前，计划仍为 "
-"`prepared_unbound`／`not_executed`。"

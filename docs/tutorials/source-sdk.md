@@ -8,14 +8,72 @@ source_language: en
 (docs-tutorials-source-sdk)=
 # Build an independent Source SDK consumer
 
-This tutorial verifies that an independent C and C++ project can consume a relocated
-Nexus Source SDK. It runs on a Linux host with Python 3.11+, CMake 3.31+, Ninja,
-a C/C++ compiler and Git. It does not flash or execute an MCU.
+Start a real external C11 application from a reviewed template, then build and
+run its Native model. This path needs Linux, Python 3.11+, CMake 3.31+, Ninja,
+a C compiler and Git. The product owns its assembly and application sources;
+Nexus owns reusable mechanisms. No MCU is flashed by this tutorial.
 
-First obtain the [fixed source and recursive dependencies](../guides/source-checkout.md).
-The following commands run from that checkout, not an arbitrary default branch.
+## Create and run an application
 
-## Run the maintained complete consumer
+Obtain a verified Source SDK and the external
+[nexus-examples](https://github.com/X-Gen-Lab/nexus-examples) checkout. Set
+`NEXUS_SDK_PREFIX` to the installed SDK prefix, `NEXUS_EXAMPLES_DIR` to that
+checkout and `NEXUS_EXAMPLES_REVISION` to the exact 40-character examples commit
+recorded with the chosen platform delivery. These are separate identities: the
+template's expected platform revision does not prove which SDK was used.
+Run these commands from `$NEXUS_SDK_PREFIX/share/nexus/src`; choose a new product
+directory outside both input checkouts:
+
+```sh
+python tools/dev/dev.py create --templates "$NEXUS_EXAMPLES_DIR" \
+    --revision "$NEXUS_EXAMPLES_REVISION" --template native \
+    --output /tmp/my-nexus-product
+cmake -S /tmp/my-nexus-product -B /tmp/my-nexus-product-build -G Ninja \
+    -DNexus_DIR="$NEXUS_SDK_PREFIX/lib/cmake/Nexus"
+cmake --build /tmp/my-nexus-product-build --parallel 2
+ctest --test-dir /tmp/my-nexus-product-build \
+    --output-on-failure --no-tests=error
+```
+
+Creation reads committed template blobs and their SHA-256 manifest without
+network access. It rejects a different Git HEAD, changed template bytes, a
+symlink or an existing destination. It resolves the copied assembly before
+success; failure removes only its newly created destination. Inspect
+`.nexus-template.json`: `expected_platform` is the template's lock expectation;
+`validation` records the resolver and input bytes actually checked.
+
+The generated product contains `CMakeLists.txt`, `assembly.toml`, `main.c` and
+`README.md`. A successful Native test prints
+`Nexus starter: transfer settled; platform stopped` and exits zero. Native UART
+is a software model, not a host serial port. The example uses strong factory
+references, provides request storage, observes settlement and stops the platform.
+A timeout is an error, not permission to release outstanding storage.
+
+For a development checkout instead of an installed SDK, replace `Nexus_DIR`
+with `-DNEXUS_SOURCE=/absolute/path/to/nexus`. This exercises that checkout and
+does not qualify an SDK. Select `qiming`, `sky` or `liangshan` for the maintained
+MCU template. SDK consumers add
+`-DCMAKE_TOOLCHAIN_FILE="$NEXUS_SDK_PREFIX/share/nexus/src/cmake/toolchains/arm-gcc.cmake"`;
+checkout consumers instead select
+`-DCMAKE_TOOLCHAIN_FILE=/absolute/path/to/nexus/cmake/toolchains/arm-gcc.cmake`.
+Use the locked ARM compiler. An MCU link is software evidence; board bring-up
+and electrical verification remain separate.
+
+If creation rejects configuration, read the reported file, key and constraint.
+Check the selected SDK/interface and fixed template revision first. A template
+correction requires a newly reviewed commit, not edits to pinned template bytes.
+After successful creation, edit the product's authored assembly and configure
+again; use the [configuration and ownership guide](../guides/developer-workflow.md)
+to inspect reviewed bindings. Do not repair generated files or suppress a rejected
+selection. Keep product sources; remove only your own build output after
+retaining needed logs.
+
+## Maintainer: verify the complete SDK consumer
+
+The remaining sections are platform maintenance tasks. First obtain the
+[fixed source and recursive dependencies](../guides/source-checkout.md).
+Run from that checkout, not an arbitrary default branch. The maintained contract
+below checks independent C and C++ consumption, relocation and package identity.
 
 Work from the repository root with the pinned recursive dependencies initialized.
 Keep output outside the source checkout. This exact test calls the production
@@ -43,7 +101,7 @@ into this page. These literal inputs are the same templates exercised by the tes
 :caption: Maintained Native/F407/F470 consumer preparation; template code is not a shell command.
 ```
 
-## Prepare a publishable prefix
+## Maintainer: prepare a publishable prefix
 
 From an initialized, clean, committed checkout, choose a new owned output path:
 
@@ -90,7 +148,7 @@ Public product examples live in
 FIG-10 shows the current software consumption flow. Runtime and MCU link evidence
 remain separate from [physical qualification](../reference/platforms/qualification.md).
 
-## Recover delivery without moving an existing tag
+## Maintainer: recover delivery without moving an existing tag
 
 Release maintainers normally use the same commit for SDK source and the
 delivery workflow. If only delivery tooling needs repair after the source has

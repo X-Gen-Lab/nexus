@@ -13,6 +13,7 @@ Each guide defines inputs, ownership, rejection and an observable result. Hardwa
 :maxdepth: 2
 
 source-checkout
+developer-workflow
 board-porting
 provider-porting
 os-shutdown

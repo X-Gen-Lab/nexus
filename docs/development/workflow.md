@@ -67,6 +67,35 @@ Automation proves execution, while retained development logs document historical
 RED/GREEN order. Pure prose or diagram edits need corresponding document checks
 and semantic review rather than mirrored implementation tests.
 
+## Keep feedback fast and evidence complete
+
+Use a focused development run for the behavior being changed, then execute the
+normal complete acceptance gates for the final source. Discover the maintained
+case names instead of adding duplicate test programs. Retain the original RED
+failure, GREEN result and actual command. A filter or a cached result cannot
+qualify a complete candidate.
+
+`python tools/dev/dev.py timings /path/to/receipts` summarizes existing process
+receipts without rerunning work. Separate preparation, configuration, compilation,
+tests, documentation and SDK consumption. Preserve failed/cancelled attempts and
+unknown CPU or RSS observations; overlapping wall times are not additive elapsed
+time. Compare equivalent source/tool/profile scopes before attributing a speedup.
+
+Choose an explicit finite compiler budget for available RAM and disk, not just
+CPU count. Reuse verified source/tool preparation and ordinary incremental builds;
+invalidate changed configuration, dependencies and generated inputs normally.
+Do not cache acceptance reports, restore incompatible objects or parallelize two
+mutations of the same build tree. Full gate discovery, actual exits, output
+identities and failure/cancellation retention remain mandatory.
+
+Before deleting a test, identify its behavioral obligation and independent
+remaining coverage. Remove only an obsolete behavior or a demonstrated duplicate
+of the same contract. Keep tests that expose rejected ownership, retained borrows,
+instance isolation, cancellation, IRQ ordering, real vendor behavior or external
+SDK consumption. A passing implementation-shaped assertion alone is not an
+independent substitute. If the audit finds no safe deletion, retain the test;
+shrinking a count is not an optimization objective.
+
 ## Preserve style and scope
 
 Use the unchanged `.clang-format` and `.editorconfig`: 80 columns, four spaces,

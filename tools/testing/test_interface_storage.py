@@ -60,6 +60,15 @@ def image(*, table_name="nx_legacy_adc_ops", table_size=40,
 
 
 class SharedInterfaceStorageTests(unittest.TestCase):
+    def test_shared_controllers_and_mechanisms_survive_directory_grouping(self):
+        for name in ("nx_classic_can_ops", "nx_eth_frames_mac_ops",
+                     "nx_usb_fs_device_ops", "nx_uart_rs485_ops",
+                     "nx_spi_dma_sequence_port_ops"):
+            with self.subTest(name=name):
+                result = inspect_interfaces(image(table_name=name))
+                self.assertEqual(result["operations_table_count"], 3)
+                self.assertEqual(result["operations_flash_bytes"], 72)
+
     def test_actual_shared_tables_count_once_without_caller_buffer_ram(self):
         result = inspect_interfaces(image(), require_interfaces=True)
         self.assertEqual(result["interface_count"], 3)

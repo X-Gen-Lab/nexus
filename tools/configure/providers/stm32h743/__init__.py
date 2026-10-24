@@ -185,6 +185,59 @@ def builtin_cs(controller):
 
 
 # Explicit static imports; importing this package performs no filesystem I/O.
+# Explicit software capabilities do not authorize an unreviewed route.
+ADC_GROUP = None
+PWM_SHARED = None
+ENDPOINT_POLICY = common.EndpointPolicy(i2c_long=True)
+TIMEBASE_ALARM = False
+validate_user_io_context = common.validate_user_io_context
+
+
+def validate_mode_context(selection, route, *, backend, clock_profile):
+    """Keep silicon/profile coupling beside the actual H743 mode admission."""
+    mode, kind = selection["mode"], route["kind"]
+    fixed = {"hsi64-fixed-cache-off", "hsi64-fixed-cache-on"}
+    if kind == "spi" and mode == "dma" and (
+            backend != "baremetal" or clock_profile not in fixed):
+        common.fail("H743 SPI DMA requires baremetal/fixed HSI64")
+    if kind == "uart" and mode in (
+            "rx-dma-continuous", "dma-duplex-continuous") and (
+            backend != "baremetal" or clock_profile not in fixed):
+        common.fail("H743 continuous UART requires baremetal/fixed HSI64")
+    if mode in {"irq-fifo-bytes", "irq-fifo-rtscts-bytes"} and (
+            clock_profile != "hsi64-fixed-cache-off"):
+        common.fail("FIFO UART requires its reviewed fixed clock profile")
+    if mode == "irq-fifo-rtscts-bytes" and backend != "baremetal":
+        common.fail("RTSCTS FIFO UART requires its reviewed baremetal owner")
+
+
+def mode_fields(selection, route, *, clock_profile):
+    """Derive cache admission from the selected clock, never an authored flag."""
+    if ((route["kind"] == "spi" and selection["mode"] == "dma") or
+            (route["kind"] == "uart" and selection["mode"] in (
+                "rx-dma-continuous", "dma-duplex-continuous"))):
+        return {"dma_cache_line_bytes": 32 if cache_mask(clock_profile) else 0}
+    return {}
+
+
+def validate_controller_set(selected, *, clock_profile):
+    if cache_mask(clock_profile) != 0 and any(
+            item["kind"] == "flash" for item in selected):
+        common.fail("H743 physical Flash requires the reviewed "
+                    "cache-off timing owner")
+
+
+def validate_endpoint_clock(speed, *, clock_plan):
+    if clock_plan is not None and (
+            speed * 256 < clock_plan["domains"]["spi4"]["maximum_hz"]):
+        common.fail("SPI speed cannot be realized by the reviewed "
+                    "upper clock bound and divider")
+
+
+def configuration_header(result):
+    return [f'#define NEXUS_SOC_CACHE_MASK {cache_mask(result["clock_profile"])}u']
+
+
 from .bindings import constructor
 from .emission import (includes, instance_declarations, implementation, operations,
                        state_declarations, shared_irqs, stop_system,

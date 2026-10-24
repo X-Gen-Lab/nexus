@@ -41,8 +41,9 @@ IRQ／DMA 的有限与连续模式是明确选择，具有各自的缓冲贷款�
 
 ## 从可验证任务开始
 
-- [独立搬移与消费 Source SDK](docs/tutorials/source-sdk.md)。
+- [创建并运行独立应用工程](docs/tutorials/source-sdk.md)。
 - [执行拒绝、取消、排空与隔离实例](docs/tutorials/async-io.md)。
+- [配置诊断、执行进度与日常设备操作](docs/guides/developer-workflow.md)。
 - [完整装配格式与拒绝规则](docs/reference/configuration/assembly.md)。
 - [平台分层、factory 与所有权](docs/explanation/platform-architecture.md)。
 - [精确支持与资格范围](docs/reference/platforms/support.md)。

@@ -1,4 +1,4 @@
-#
+# Authored translation; independent review is recorded in metadata.
 msgid ""
 msgstr ""
 "Project-Id-Version: Nexus source docs\n"
@@ -8,11 +8,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 2e7174b73757efc3485a0b32d187a8481b2eee9b4d35cbedb58cbc266a05fa40\n"
+"X-Nexus-Source-SHA256: b09dad96927d28d004235d345d3f68151a6ceba3ecd33537d8d9d890d15edaf3\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:9
 msgid "Develop with TDD and normal commit gates"
 msgstr "使用 TDD 与正常提交门禁开发"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:11
 msgid ""
 "This workflow preserves current C11 architecture, formatting and explicit "
 "evidence. Codex owns platform maintenance; independent agents review high-"
@@ -22,15 +24,18 @@ msgstr ""
 "本工作流保留当前 C11 架构、格式与显式证据。Codex 负责平台维护；独立 agent 审查高风险变更。虚构人员或本地文件都不能建立 GitHub "
 "分支保护。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:15
 msgid "Install and check tools"
 msgstr "安装并检查工具"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:17
 msgid ""
 "First complete the [fixed source and recursive dependency "
 "guide](../guides/source-checkout.md). From that repository root, install the"
 " maintenance tools:"
 msgstr "先完成[固定源码与递归依赖指南](../guides/source-checkout.md)。然后从该仓库根目录安装维护工具："
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:26
 msgid ""
 "Windows uses `.venv/Scripts/python.exe`. Installation establishes pre-commit"
 " and commit-msg hooks. Hooks inspect staged inputs without staging or "
@@ -40,9 +45,41 @@ msgstr ""
 "Windows 使用 `.venv/Scripts/python.exe`。安装建立 pre-commit 和 commit-msg "
 "钩子。钩子检查暂存输入，不替用户暂存，也不静默修复文件。保留未暂存工作和真实失败诊断；不得绕过钩子。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:30
+msgid "Prepare the pinned host test framework"
+msgstr "准备锁定的主机测试框架"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:32
+msgid ""
+"GoogleTest and GoogleMock are the Git submodule `ext/googletest`, pinned to "
+"version 1.16.0 and commit `6910c9d9165801d8827d628cb72eb7ea9dd538c5`. The "
+"recursive checkout above includes it. For an existing checkout, prepare the "
+"Native dependency scope explicitly before running tests:"
+msgstr ""
+"GoogleTest 与 GoogleMock 通过 Git 子模块 `ext/googletest` 引入，锁定版本 1.16.0 和 commit "
+"`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。上面的递归检出已包含它。已有检出应在运行测试前显式准备 "
+"Native 依赖范围："
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:41
+msgid ""
+"To initialize only this submodule, use `git submodule update --init "
+"--recursive ext/googletest` instead. Preparation may use the network; CMake "
+"configuration uses only the prepared local source and fails if the required "
+"source is missing, differs from the pin or has local modifications. It "
+"neither fetches a dependency nor substitutes a system installation. The "
+"framework stays in the host test graph; ARM builds and firmware SDK "
+"consumers do not require it."
+msgstr ""
+"如果只需初始化此子模块，可改用 `git submodule update --init --recursive "
+"ext/googletest`。准备阶段可以使用网络；CMake "
+"配置只使用已准备的本地源码，缺失、版本与锁定值不符或存在本地修改均失败。配置过程不获取依赖，也不使用系统安装替代。框架只进入主机测试目标图；ARM "
+"构建和固件 SDK 消费者不需要它。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:49
 msgid "Execute RED, GREEN and review"
 msgstr "执行 RED、GREEN 与评审"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:51
 msgid ""
 "For new C behavior or defect fixes, first add a meaningful "
 "GoogleTest/GoogleMock regression. Execute it and retain the expected failure"
@@ -56,6 +93,7 @@ msgstr ""
 " GREEN，再重构。Mock 外部端口／MMIO，而不是被测实现。覆盖相关拒绝、取消、排空、溢出、隔离保留和实例隔离。Python 生产工具使用标准库"
 " unittest，遵循相同实际 RED／GREEN 规则。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:62
 msgid ""
 "The full gate builds the pinned offline framework and executes discovered "
 "cases with fresh reports and no filters/shards. Empty, skipped, partial, "
@@ -70,9 +108,66 @@ msgstr ""
 "filter／shard。空、跳过、部分、陈旧或变化输入均失败。钩子核对暂存树保持不变；CI 独立执行门禁。框架仅用于主机 C++17；固件保持 "
 "C11。自动化证明执行，保留的开发日志记录历史 RED／GREEN 顺序。纯正文或图源修改需要对应文档检查和语义审查，不需要镜像实现测试。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:70
+msgid "Keep feedback fast and evidence complete"
+msgstr "快速反馈与完整证据"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:72
+msgid ""
+"Use a focused development run for the behavior being changed, then execute "
+"the normal complete acceptance gates for the final source. Discover the "
+"maintained case names instead of adding duplicate test programs. Retain the "
+"original RED failure, GREEN result and actual command. A filter or a cached "
+"result cannot qualify a complete candidate."
+msgstr ""
+"先对修改的行为执行定向开发测试，再对最终源码执行正常完整验收门禁。发现已维护的测试名称，不增加重复测试程序。保留原始 RED 失败、GREEN "
+"结果和实际命令。过滤执行或缓存结果不能使完整候选通过验收。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:78
+msgid ""
+"`python tools/dev/dev.py timings /path/to/receipts` summarizes existing "
+"process receipts without rerunning work. Separate preparation, "
+"configuration, compilation, tests, documentation and SDK consumption. "
+"Preserve failed/cancelled attempts and unknown CPU or RSS observations; "
+"overlapping wall times are not additive elapsed time. Compare equivalent "
+"source/tool/profile scopes before attributing a speedup."
+msgstr ""
+"`python tools/dev/dev.py timings /path/to/receipts` 汇总已有进程 "
+"receipt，不重新运行工作。分别观察准备、配置、编译、测试、文档和 SDK 消费。保留失败／取消的尝试以及未观测的 CPU 或 "
+"RSS；重叠的墙钟时间不能相加作为总耗时。比较等价源码、工具与配置范围后再归因提速。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:84
+msgid ""
+"Choose an explicit finite compiler budget for available RAM and disk, not "
+"just CPU count. Reuse verified source/tool preparation and ordinary "
+"incremental builds; invalidate changed configuration, dependencies and "
+"generated inputs normally. Do not cache acceptance reports, restore "
+"incompatible objects or parallelize two mutations of the same build tree. "
+"Full gate discovery, actual exits, output identities and "
+"failure/cancellation retention remain mandatory."
+msgstr ""
+"根据可用 RAM 与磁盘显式选择有限编译并发预算，不能只看 CPU "
+"数量。复用已验证的源码／工具准备与正常增量构建；按正常规则使改变的配置、依赖和生成输入失效。不得缓存验收报告、恢复不相容的对象或同时修改同一构建树。完整门禁发现、实际退出码、输出身份及失败／取消保留仍为必需。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:91
+msgid ""
+"Before deleting a test, identify its behavioral obligation and independent "
+"remaining coverage. Remove only an obsolete behavior or a demonstrated "
+"duplicate of the same contract. Keep tests that expose rejected ownership, "
+"retained borrows, instance isolation, cancellation, IRQ ordering, real "
+"vendor behavior or external SDK consumption. A passing implementation-shaped"
+" assertion alone is not an independent substitute. If the audit finds no "
+"safe deletion, retain the test; shrinking a count is not an optimization "
+"objective."
+msgstr ""
+"删除测试前，指出其行为责任和仍存在的独立覆盖。仅删除过时行为或已经证明重复覆盖同一合同的测试。保留检查拒绝所有权、借用保留、实例隔离、取消、IRQ "
+"顺序、真实厂家行为或外部 SDK 消费的测试。照着实现编写的通过断言本身不能作为独立替代。审查未找到可安全删除的测试时应保留；减少测试数量不是优化目标。"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:99
 msgid "Preserve style and scope"
 msgstr "保留风格与范围"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:101
 msgid ""
 "Use the unchanged `.clang-format` and `.editorconfig`: 80 columns, four "
 "spaces, attached braces, type-attached pointer stars and backslash Doxygen "
@@ -84,6 +179,7 @@ msgstr ""
 "使用未改变的 `.clang-format` 和 `.editorconfig`：80 列、四空格、附着大括号、类型侧指针星号和反斜杠 Doxygen "
 "注释。公共头文件说明上下文、截止时间、所有权和失败。源注释解释不变量和硬件顺序，不重复声明参数。新增／修改文件通过整文件检查；已有冻结欠账只能减少。"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/development/workflow.md:107
 msgid ""
 "Commit one reviewable change with Conventional Commits. Review "
 "interface/configuration changes together with diagrams, examples, "
@@ -94,35 +190,3 @@ msgid ""
 msgstr ""
 "每次使用 Conventional Commits 提交一个可评审变更。将接口／配置变化与图示、示例、翻译和执行范围一起评审。产品、执行任务、私有 "
 "PCB 和恢复策略保留在 Nexus 外。记录实际源码／配置／工具／ELF 身份与物理待执行项；成功 commit 或 CI 不将结果升级为产品发行。"
-
-
-msgid ""
-"Prepare the pinned host test framework"
-msgstr ""
-"准备锁定的主机测试框架"
-
-msgid ""
-"GoogleTest and GoogleMock are the Git submodule `ext/googletest`, pinned"
-" to version 1.16.0 and commit "
-"`6910c9d9165801d8827d628cb72eb7ea9dd538c5`. The recursive checkout above"
-" includes it. For an existing checkout, prepare the Native dependency "
-"scope explicitly before running tests:"
-msgstr ""
-"GoogleTest 与 GoogleMock 通过 Git 子模块 `ext/googletest` 引入，锁定版本 1.16.0 和 "
-"commit "
-"`6910c9d9165801d8827d628cb72eb7ea9dd538c5`。上面的递归检出已包含它。已有检出应在运行测试前显式准备 "
-"Native 依赖范围："
-
-msgid ""
-"To initialize only this submodule, use `git submodule update --init "
-"--recursive ext/googletest` instead. Preparation may use the network; "
-"CMake configuration uses only the prepared local source and fails if the"
-" required source is missing, differs from the pin or has local "
-"modifications. It neither fetches a dependency nor substitutes a system "
-"installation. The framework stays in the host test graph; ARM builds and"
-" firmware SDK consumers do not require it."
-msgstr ""
-"如果只需初始化此子模块，可改用 `git submodule update --init --recursive "
-"ext/googletest`。准备阶段可以使用网络；CMake "
-"配置只使用已准备的本地源码，缺失、版本与锁定值不符或存在本地修改均失败。配置过程不获取依赖，也不使用系统安装替代。框架只进入主机测试目标图；ARM"
-" 构建和固件 SDK 消费者不需要它。"

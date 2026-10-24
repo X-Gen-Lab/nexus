@@ -43,6 +43,17 @@ publication; QUARANTINED storage and cleanup responsibility remain retained.
 The [ownership table](../docs/explanation/ownership.md) distinguishes direct
 calls, fixed IRQ work, cross-task adapters, waiting and shutdown.
 
+`nexus/io/diagnostic.h` composes copied request/stream observations and explicitly
+known lifecycle, owner admission, service-time and observer-join facts. The
+result retains independent finding bits and unknown fact groups. An unchanged
+request does not prove a missed service; a service-gap finding requires explicit
+timestamps and a declared budget in the same monotonic domain. Neither this
+helper nor a readable reason key touches live hardware or changes ownership.
+SETTLED does not prove successful transfer or joined observers. An outstanding
+stream count includes producer, ready and consumer loans, and a busy ordinary
+cursor does not describe a private preposted cursor. Unknown facts remain
+unknown; an empty finding mask does not establish health.
+
 Stream reserve, publish, acquire, release, abort and stop access a constant amount
 of metadata independent of block count. Stop checks the outstanding count and does
 not scan or revoke borrowed blocks under an interrupt mask. Cold storage-overlap
@@ -55,6 +66,16 @@ ownership and real source withdrawal. Finite and continuous modes have distinct
 loan/rearm/backpressure contracts. Default paths add no mandatory OS locks,
 hidden driver tasks or universal buffer pools. The
 [DMA and stream contracts](../docs/design/io-evolution.md) own exact scope.
+
+`nx_dma_storage_validate` checks a caller's explicit whole reservation separately
+from the transfer payload. For example, an aligned 64-byte reservation may carry
+a 17-byte payload while exclusively owning two 32-byte cache lines. Address and
+capacity must already fit the declared alignment, complete DMA-visible domain
+and optional whole-line geometry; no rounding, allocation or hidden bounce
+buffer occurs. The caller supplies reviewed geometry and exclusive ownership.
+The provider still validates the selected mode and actual cache/DMA capabilities
+and performs necessary maintenance. Cancel or deadline expiry never permits
+storage reuse before drain and acquire-observed settlement.
 
 The optional [USB activation contract](../docs/design/usb-device.md) keeps a
 separate immutable activation face and the existing provider context. Its

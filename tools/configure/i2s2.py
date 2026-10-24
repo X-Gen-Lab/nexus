@@ -31,3 +31,17 @@ def resolve(choice, *, family, part, backend, clock_profile):
     return I2s2RoleIR(PROFILE, part, (
         "controller:SPI2", "pin:PB12", "pin:PB13", "pin:PB15",
         "dma:DMA1:stream4:channel0", "irq:DMA1_Stream4", "irq:SPI2"))
+
+
+def header_lines(role):
+    """Keep the established optional-role constant at its owning contract."""
+    return ["#define NEXUS_F407_I2S2_SLAVE_TX_SELECTED " +
+            ("1u" if role is not None else "0u")]
+
+
+def selection_lines(role):
+    """Emit selection only; CMake still owns source target dependencies."""
+    return ['set(NEXUS_F407_I2S2_SLAVE_TX_SELECTED ' +
+            ("ON" if role is not None else "OFF") + ')',
+            'set(NEXUS_F407_I2S2_PROFILE "' +
+            (role.profile if role is not None else "") + '")']

@@ -87,6 +87,32 @@ nx_result_t nx_dma_buffer_validate(const nx_dma_memory_region_t* regions,
                                    nx_dma_direction_t direction);
 
 /**
+ * \brief           Check an explicit owned reservation and its DMA payload.
+ * \param[in]       regions: Immutable reviewed SoC DMA domains, not retained.
+ * \param[in]       count: Positive domain count.
+ * \param[in]       storage: Caller-owned reservation, distinct from live loans.
+ * \param[in]       capacity: Whole reservation bytes, including owned padding.
+ * \param[in]       transfer_bytes: Positive payload size, at most capacity.
+ * \param[in]       alignment: Nonzero power-of-two transfer alignment.
+ * \param[in]       cache_line_bytes: Zero for no cache constraint, otherwise a
+ *                  reviewed power-of-two line size; address and capacity must
+ *                  be exact multiples. The helper never rounds ranges.
+ * \param[in]       direction: Device access permission for the whole storage.
+ * \return          SUCCESS, INVALID or PERMISSION; no memory access or borrow.
+ * \note            Bounded task/IRQ validation, no allocation/cache operation.
+ *                  Callers exclusively own all lines and padding until drain
+ *                  and acquire-observed SETTLED. This validates geometry only;
+ *                  it cannot prove ownership or replace provider admission,
+ *                  actual cache geometry, mode-specific length checks or cache
+ *                  maintenance. Cancellation never releases that obligation.
+ */
+nx_result_t nx_dma_storage_validate(const nx_dma_memory_region_t* regions,
+                                    size_t count, const void* storage,
+                                    size_t capacity, size_t transfer_bytes,
+                                    size_t alignment, size_t cache_line_bytes,
+                                    nx_dma_direction_t direction);
+
+/**
  * \brief           Reject duplicate physical streams in an assembled resource
  *                  set.
  *

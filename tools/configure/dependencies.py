@@ -14,7 +14,7 @@ COMMON = (
     "enhanced_endpoints", "uart_formats", "stream_profiles", "usb_profiles",
 )
 PLATFORM = (
-    "configure", "authored", "bindings", "emission", "can", "memory", "contracts",
+    "configure", "authored", "bindings", "emission", "experience", "can", "memory", "contracts",
     "usb_device", "ethernet", "timer_advanced", "secondary_controllers", "coupled_io",
     "fact_references", "clocks", "physical_facts", "preflight", "gpio_phase",
     "i2c_timing", "i2c_timing_selection", "pin_states", "runtime_power",

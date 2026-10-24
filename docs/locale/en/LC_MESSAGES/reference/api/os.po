@@ -1,1380 +1,2554 @@
+# Authored translation; independent review is recorded in metadata.
 msgid ""
-msgstr "Project-Id-Version: Nexus documentation\nLanguage: en\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nX-Nexus-Source-SHA256: 62e0a29a586d3356a3fcfdc221e877e0919f8bdaba0767963c1b44123c23e852\nX-Nexus-Reviewed: true\n"
+msgstr ""
+"Project-Id-Version: Nexus documentation\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Nexus-Reviewed: true\n"
+"X-Nexus-Source-SHA256: 3cf1f083d00f759ba5e3039ee77636dc41fc0b6be71a56510dc6847ebf00a55b\n"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:8
 msgid "OS adapters: tasks, waits and explicit storage"
 msgstr "OS adapters: tasks, waits and explicit storage"
 
-msgid "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
-msgstr "These declarations come from public header files. Selection, lifecycle, supported execution modes and physical authorization remain bounded by the corresponding design and support records."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:10
+msgid ""
+"These declarations come from public header files. Selection, lifecycle, "
+"supported execution modes and physical authorization remain bounded by the "
+"corresponding design and support records."
+msgstr ""
+"These declarations come from public header files. Selection, lifecycle, "
+"supported execution modes and physical authorization remain bounded by the "
+"corresponding design and support records."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:14
 msgid "baremetal.h"
 msgstr "baremetal.h"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "Bare-metal poll notification with caller-owned storage."
 msgstr "Bare-metal poll notification with caller-owned storage."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
 msgid "Author  Nexus Team"
 msgstr "Author  Nexus Team"
 
-msgid "Functions"
-msgstr "Functions"
-
-msgid "Initialize storage before exposing it to any ISR."
-msgstr "Initialize storage before exposing it to any ISR."
-
-msgid "Parameters"
-msgstr "Parameters"
-
-msgid "Returns"
-msgstr "Returns"
-
-msgid "Bind the explicit polling notification."
-msgstr "Bind the explicit polling notification."
-
-msgid "Explicit nonblocking bare-metal notification storage."
-msgstr "Explicit nonblocking bare-metal notification storage."
-
-msgid "Public Members"
-msgstr "Public Members"
-
-msgid "diagnostic.h"
-msgstr "diagnostic.h"
-
-msgid "Bounded diagnostics with explicit caller-owned ring storage."
-msgstr "Bounded diagnostics with explicit caller-owned ring storage."
-
-msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
-msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  Copyright (c) 2026 Nexus Team"
-
-msgid "Initialize unpublished ring and caller-owned entries."
-msgstr "Initialize unpublished ring and caller-owned entries."
-
-msgid "Copy one event under a bounded saved interrupt mask."
-msgstr "Copy one event under a bounded saved interrupt mask."
-
-msgid "Consume one event from caller-owned ring."
-msgstr "Consume one event from caller-owned ring."
-
-msgid "Snapshot the saturating overflow count."
-msgstr "Snapshot the saturating overflow count."
-
-msgid "One opaque diagnostic record; interpretation belongs to its owner."
-msgstr "One opaque diagnostic record; interpretation belongs to its owner."
-
-msgid "Explicit ring state, with no default pool, worker or transport."
-msgstr "Explicit ring state, with no default pool, worker or transport."
-
-msgid "freertos.h"
-msgstr "freertos.h"
-
-msgid "Per-object static FreeRTOS storage and optional thin services."
-msgstr "Per-object static FreeRTOS storage and optional thin services."
-
-msgid "Typedefs"
-msgstr "Typedefs"
-
-msgid "Caller-owned single-operation latch for a closable queue."
-msgstr "Caller-owned single-operation latch for a closable queue."
-
-msgid "Test whether the current context may call kernel ISR APIs."
-msgstr "Test whether the current context may call kernel ISR APIs."
-
-msgid "Initialize unused notification storage."
-msgstr "Initialize unused notification storage."
-
-msgid "Bind a latched single-waiter notification."
-msgstr "Bind a latched single-waiter notification."
-
-msgid "Destroy after publishers and waiter have stopped and joined."
-msgstr "Destroy after publishers and waiter have stopped and joined."
-
-msgid "Create one task from its exact caller-owned stack and TCB."
-msgstr "Create one task from its exact caller-owned stack and TCB."
-
-msgid "Discard one created task before its wrapper has executed."
-msgstr "Discard one created task before its wrapper has executed."
-
-msgid "Join a cooperatively returned task and reclaim kernel state."
-msgstr "Join a cooperatively returned task and reclaim kernel state."
-
-msgid "Create an exact-sized static byte-copy queue."
-msgstr "Create an exact-sized static byte-copy queue."
-
-msgid "Copy an item with a bounded relative kernel wait."
-msgstr "Copy an item with a bounded relative kernel wait."
-
-msgid "Receive one byte-copy item."
-msgstr "Receive one byte-copy item."
-
-msgid "Destroy after admission is stopped and all users joined."
-msgstr "Destroy after admission is stopped and all users joined."
-
-msgid "Send using one absolute monotonic deadline."
-msgstr "Send using one absolute monotonic deadline."
-
-msgid "Receive using one absolute monotonic deadline."
-msgstr "Receive using one absolute monotonic deadline."
-
-msgid "Bind an exclusive slot of one live receiver task."
-msgstr "Bind an exclusive slot of one live receiver task."
-
-msgid "Get a direct notification wait port."
-msgstr "Get a direct notification wait port."
-
-msgid "Unbind after all publishers stop and join."
-msgstr "Unbind after all publishers stop and join."
-
-msgid "Start a task whose entry must never return."
-msgstr "Start a task whose entry must never return."
-
-msgid "Initialize one exact caller-owned queue waiter."
-msgstr "Initialize one exact caller-owned queue waiter."
-
-msgid "Destroy only after all operations stop and join."
-msgstr "Destroy only after all operations stop and join."
-
-msgid "Initialize an optional reliably closable byte-copy queue."
-msgstr "Initialize an optional reliably closable byte-copy queue."
-
-msgid "Send with close-aware admission and absolute deadline."
-msgstr "Send with close-aware admission and absolute deadline."
-
-msgid "Receive existing items after close, then CANCELLED."
-msgstr "Receive existing items after close, then CANCELLED."
-
-msgid "Stop sends and wake every currently registered waiter."
-msgstr "Stop sends and wake every currently registered waiter."
-
-msgid "Destroy a closed, drained and quiesced queue."
-msgstr "Destroy a closed, drained and quiesced queue."
-
-msgid "Static binary latch; one waiter, independently quiesced publishers."
-msgstr "Static binary latch; one waiter, independently quiesced publishers."
-
-msgid "Task has its own TCB; stack is supplied with its actual word count."
-msgstr "Task has its own TCB; stack is supplied with its actual word count."
-
-msgid "Queue control only; actual depth/item byte storage is external."
-msgstr "Queue control only; actual depth/item byte storage is external."
-
-msgid "Fixed receiver and exclusive kernel notification slot; no latch."
-msgstr "Fixed receiver and exclusive kernel notification slot; no latch."
-
-msgid "Permanent task control without a join completion semaphore."
-msgstr "Permanent task control without a join completion semaphore."
-
-msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
-msgstr "Opt-in close broadcasts; raw queue storage remains unchanged."
-
-msgid "freertos_diagnostics.h"
-msgstr "freertos_diagnostics.h"
-
-msgid "Bounded explicit FreeRTOS trace sink without global storage."
-msgstr "Bounded explicit FreeRTOS trace sink without global storage."
-
-msgid "Enums"
-msgstr "Enums"
-
-msgid "Maintained kernel trace identities; product interpretation is external."
-msgstr "Maintained kernel trace identities; product interpretation is external."
-
-msgid "Values:"
-msgstr "Values:"
-
-msgid "Consume one bounded kernel trace event."
-msgstr "Consume one bounded kernel trace event."
-
-msgid "freertos_mpu.h"
-msgstr "freertos_mpu.h"
-
-msgid "Privileged static lifecycle for isolated MPU user tasks."
-msgstr "Privileged static lifecycle for isolated MPU user tasks."
-
-msgid "User data is nonexecuting normal RAM with only these permissions."
-msgstr "User data is nonexecuting normal RAM with only these permissions."
-
-msgid "Create an unprivileged task from exact caller-owned storage."
-msgstr "Create an unprivileged task from exact caller-owned storage."
-
-msgid "Delete another isolated task after external users quiesce."
-msgstr "Delete another isolated task after external users quiesce."
-
-msgid "A caller-selected exact region, copied during task creation."
-msgstr "A caller-selected exact region, copied during task creation."
-
-msgid "Complete caller-owned protected task metadata."
-msgstr "Complete caller-owned protected task metadata."
-
-msgid "Immutable creation inputs, borrowed for this call only."
-msgstr "Immutable creation inputs, borrowed for this call only."
-
-msgid "freertos_stack.h"
-msgstr "freertos_stack.h"
-
-msgid "Optional bounded task stack paint snapshot."
-msgstr "Optional bounded task stack paint snapshot."
-
-msgid "Copy bounded stack paint facts using actual kernel identity."
-msgstr "Copy bounded stack paint facts using actual kernel identity."
-
-msgid "Exact static task facts supplied at original creation."
-msgstr "Exact static task facts supplied at original creation."
-
-msgid "freertos_user.h"
-msgstr "freertos_user.h"
-
-msgid "Narrow pointer-free services for MPU-isolated user tasks."
-msgstr "Narrow pointer-free services for MPU-isolated user tasks."
-
-msgid "Defines"
-msgstr "Defines"
-
-msgid "Explicitly reviewed unprivileged executable code section."
-msgstr "Explicitly reviewed unprivileged executable code section."
-
-msgid "Explicit user RAM, separate from kernel and provider state."
-msgstr "Explicit user RAM, separate from kernel and provider state."
-
-msgid "Trusted static task metadata placed in protected kernel RAM."
-msgstr "Trusted static task metadata placed in protected kernel RAM."
-
-msgid "Delay the calling user task through the real MPU SVC."
-msgstr "Delay the calling user task through the real MPU SVC."
-
-msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
-msgstr "Read the kernel's wrapping 32-bit tick counter through SVC."
-
-msgid "lowpower.h"
-msgstr "lowpower.h"
-
-msgid "Explicit continuous-clock tickless timer port."
-msgstr "Explicit continuous-clock tickless timer port."
-
-msgid "Bounded late alarm catch-up; larger delays violate the timer port."
-msgstr "Bounded late alarm catch-up; larger delays violate the timer port."
-
-msgid "Return the explicitly selected continuous timer port."
-msgstr "Return the explicitly selected continuous timer port."
-
-msgid "Kernel tickless hook with measured phase preservation."
-msgstr "Kernel tickless hook with measured phase preservation."
-
-msgid "Stopped-tick epoch with the concrete port's declared precision."
-msgstr "Stopped-tick epoch with the concrete port's declared precision."
-
-msgid "Caller-owned, immutable tickless timer implementation."
-msgstr "Caller-owned, immutable tickless timer implementation."
-
-msgid "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler suspended. They are bounded, never block or call kernel functions. pause_tick atomically stops the periodic tick and snapshots elapsed phase in its current tick period; a pending tick is rejected without effects. SUCCESS borrows the timer until resume_tick. now_us is the same monotonic clock as snapshot, continuous during shallow sleep. arm_deadline programs an enabled IRQ wake source; rejection retains no alarm. disarm removes only that alarm. resume_tick restores the periodic source with its next expiry at the supplied absolute clock instant, preserving phase within its declared quantization and sampling bound rather than adding callback latency to every tick. It must not publish an already accounted tick. The alarm wakes by deadline; at most eight extra ticks of latency may be caught up. Reversed clocks or larger latency fail stop. This does not configure clocks, NVIC, SCR or a board timer."
-msgstr "All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler suspended. They are bounded, never block or call kernel functions. pause_tick atomically stops the periodic tick and snapshots elapsed phase in its current tick period; a pending tick is rejected without effects. SUCCESS borrows the timer until resume_tick. now_us is the same monotonic clock as snapshot, continuous during shallow sleep. arm_deadline programs an enabled IRQ wake source; rejection retains no alarm. disarm removes only that alarm. resume_tick restores the periodic source with its next expiry at the supplied absolute clock instant, preserving phase within its declared quantization and sampling bound rather than adding callback latency to every tick. It must not publish an already accounted tick. The alarm wakes by deadline; at most eight extra ticks of latency may be caught up. Reversed clocks or larger latency fail stop. This does not configure clocks, NVIC, SCR or a board timer."
-
-msgid "native.h"
-msgstr "native.h"
-
-msgid "Explicit POSIX notification, queue and task storage."
-msgstr "Explicit POSIX notification, queue and task storage."
-
-msgid "Read POSIX monotonic microseconds."
-msgstr "Read POSIX monotonic microseconds."
-
-msgid "Initialize a notification in unused caller storage."
-msgstr "Initialize a notification in unused caller storage."
-
-msgid "Bind a single-waiter latched notification port."
-msgstr "Bind a single-waiter latched notification port."
-
-msgid "Destroy after external publisher quiescence."
-msgstr "Destroy after external publisher quiescence."
-
-msgid "Initialize an explicit bounded byte-copy queue."
-msgstr "Initialize an explicit bounded byte-copy queue."
-
-msgid "Copy one item to the queue."
-msgstr "Copy one item to the queue."
-
-msgid "Receive one item; closed queues can still be drained."
-msgstr "Receive one item; closed queues can still be drained."
-
-msgid "Reject sends and wake all waiting callers."
-msgstr "Reject sends and wake all waiting callers."
-
-msgid "Destroy quiesced and drained queue storage."
-msgstr "Destroy quiesced and drained queue storage."
-
-msgid "Start a task using the supplied host stack."
-msgstr "Start a task using the supplied host stack."
-
-msgid "Join after requesting cooperative application stop."
-msgstr "Join after requesting cooperative application stop."
-
-msgid "Single waiter, multiple task publishers; fields are private."
-msgstr "Single waiter, multiple task publishers; fields are private."
-
-msgid "Caller-sized queue storage; no heap or global object pool."
-msgstr "Caller-sized queue storage; no heap or global object pool."
-
-msgid "Explicit task handle; stack storage is supplied at start."
-msgstr "Explicit task handle; stack storage is supplied at start."
-
-msgid "secure_context.h"
-msgstr "secure_context.h"
-
-msgid "Caller-owned Secure context leases for a trusted NS kernel."
-msgstr "Caller-owned Secure context leases for a trusted NS kernel."
-
-msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
-msgstr "Minimum context capacity excludes the eight-byte ARM stack seal."
-
-msgid "Secure-context integrity failures, distinct from normal rejection."
-msgstr "Secure-context integrity failures, distinct from normal rejection."
-
-msgid "Prepare exact Secure storage for one trusted task identity."
-msgstr "Prepare exact Secure storage for one trusted task identity."
-
-msgid "Rebind retired metadata while preserving its epoch history."
-msgstr "Rebind retired metadata while preserving its epoch history."
-
-msgid "Resolve a trusted, statically composed Secure task record."
-msgstr "Resolve a trusted, statically composed Secure task record."
-
-msgid "Fail stop after a loaded Secure stack integrity failure."
-msgstr "Fail stop after a loaded Secure stack integrity failure."
-
-msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
-msgstr "Explicit Secure metadata, never stored in Nonsecure RAM."
-
-msgid "threadx.h"
-msgstr "threadx.h"
-
-msgid "Caller-owned ThreadX task, wait and byte queue services."
-msgstr "Caller-owned ThreadX task, wait and byte queue services."
-
-msgid "One explicit caller latch per simultaneous close-aware operation."
-msgstr "One explicit caller latch per simultaneous close-aware operation."
-
-msgid "Explicit irreversible kernel entry owned by the product."
-msgstr "Explicit irreversible kernel entry owned by the product."
-
-msgid "Product failure hook; default parks forever."
-msgstr "Product failure hook; default parks forever."
-
-msgid "Mandatory product hook only for explicit external Tick."
-msgstr "Mandatory product hook only for explicit external Tick."
-
-msgid "Read-only configurable-IRQ and selected mask-policy gate."
-msgstr "Read-only configurable-IRQ and selected mask-policy gate."
-
-msgid "Initialize one binary latch in task or actual bootstrap."
-msgstr "Initialize one binary latch in task or actual bootstrap."
-
-msgid "Bind a sequence hint and one concurrent blocking waiter."
-msgstr "Bind a sequence hint and one concurrent blocking waiter."
-
-msgid "Destroy only after all publishers and waiter quiesce."
-msgstr "Destroy only after all publishers and waiter quiesce."
-
-msgid "Create a cooperatively returning task using exact storage."
-msgstr "Create a cooperatively returning task using exact storage."
-
-msgid "Join a cooperatively returned task and prove detachment."
-msgstr "Join a cooperatively returned task and prove detachment."
-
-msgid "Discard an unused task only inside actual bootstrap."
-msgstr "Discard an unused task only inside actual bootstrap."
-
-msgid "Start a permanent task without a completion latch."
-msgstr "Start a permanent task without a completion latch."
-
-msgid "Initialize an exact arbitrary-byte bounded queue."
-msgstr "Initialize an exact arbitrary-byte bounded queue."
-
-msgid "Task-only send; immediate readiness wins over expiration."
-msgstr "Task-only send; immediate readiness wins over expiration."
-
-msgid "Task-only receive; output changes only on SUCCESS."
-msgstr "Task-only receive; output changes only on SUCCESS."
-
-msgid "Destroy a drained queue after every caller quiesces."
-msgstr "Destroy a drained queue after every caller quiesces."
-
-msgid "Initialize one explicit close-aware operation latch."
-msgstr "Initialize one explicit close-aware operation latch."
-
-msgid "Destroy inactive waiter after its operation has returned."
-msgstr "Destroy inactive waiter after its operation has returned."
-
-msgid "Add explicit bounded close broadcast to a byte queue."
-msgstr "Add explicit bounded close broadcast to a byte queue."
-
-msgid "Reject sends, wake registered waiters, retain queued items."
-msgstr "Reject sends, wake registered waiters, retain queued items."
-
-msgid "Send with immediate close wake and explicit admission."
-msgstr "Send with immediate close wake and explicit admission."
-
-msgid "Receive and drain previously queued items after close."
-msgstr "Receive and drain previously queued items after close."
-
-msgid "Destroy only a closed, drained and quiesced queue."
-msgstr "Destroy only a closed, drained and quiesced queue."
-
-msgid "One binary latch; publishers quiesce before destruction."
-msgstr "One binary latch; publishers quiesce before destruction."
-
-msgid "Returning task retains all storage until external successful join."
-msgstr "Returning task retains all storage until external successful join."
-
-msgid "Permanent task has no completion latch, join or destroy."
-msgstr "Permanent task has no completion latch, join or destroy."
-
-msgid "Exact arbitrary byte items; no native word-size narrowing."
-msgstr "Exact arbitrary byte items; no native word-size narrowing."
-
-msgid "Optional bounded close broadcast; registry is task-only."
-msgstr "Optional bounded close broadcast; registry is task-only."
-
-msgid "tick.h"
-msgstr "tick.h"
-
-msgid "Explicit external Tick and diagnostic counter contracts."
-msgstr "Explicit external Tick and diagnostic counter contracts."
-
-msgid "Configure the application's selected kernel Tick source."
-msgstr "Configure the application's selected kernel Tick source."
-
-msgid "Start the explicitly selected diagnostic counter."
-msgstr "Start the explicitly selected diagnostic counter."
-
-msgid "Read the diagnostic counter without blocking."
-msgstr "Read the diagnostic counter without blocking."
-
-msgid "wait.h"
-msgstr "wait.h"
-
-msgid "Optional sequence-latched waiting without hidden workers."
-msgstr "Optional sequence-latched waiting without hidden workers."
-
-msgid "Wait for an authoritative caller predicate."
-msgstr "Wait for an authoritative caller predicate."
-
-msgid "Single-waiter notification port."
-msgstr "Single-waiter notification port."
-
-msgid "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
-msgstr "Caller owns storage and serializes arm/wait. Multiple wake publishers are permitted by each backend's documented context. Sequence is a hint; the predicate/request is authoritative. There must be fewer than 2^32 wakes between arm and recheck. All deadlines are absolute monotonic microseconds in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling timeout. Clocks must continue while waiting and never change domain; construct relative budgets with nx_deadline_after to avoid overflow. A timeout does not settle a request or release its buffers. Before destroy, stop and join every publisher and waiter; SETTLED alone does not prove notification storage is reclaimable. arm snapshots the sequence. wait must atomically observe a changed sequence or a latched wake, including a wake between the caller's recheck and sleeping. A changed sequence cannot bypass a finite deadline: wait checks expiry on every call and every return from blocking before reporting a hint. A nonblocking backend may return BUSY while unexpired. Only one owner may arm/wait; a second concurrent wait is outside the port contract even when a backend rejects it."
-
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
 msgid "Nexus Team"
 msgstr "Nexus Team"
 
-msgid "Startup context; not a task/queue emulation. Word publication uses the reviewed inline compiler/CPU port."
-msgstr "Startup context; not a task/queue emulation. Word publication uses the reviewed inline compiler/CPU port."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Functions"
+msgstr "Functions"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid "Initialize storage before exposing it to any ISR."
+msgstr "Initialize storage before exposing it to any ISR."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid ""
+"Startup context; not a task/queue emulation. Word publication uses the "
+"reviewed inline compiler/CPU port."
+msgstr ""
+"Startup context; not a task/queue emulation. Word publication uses the "
+"reviewed inline compiler/CPU port."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:0
+msgid "Parameters"
+msgstr "Parameters"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "[out] Unused caller-owned storage"
 msgstr "[out] Unused caller-owned storage"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "[in] Monotonic microsecond source, continuing while waiting"
 msgstr "[in] Monotonic microsecond source, continuing while waiting"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "[in] Clock source context"
 msgstr "[in] Clock source context"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:0
+msgid "Returns"
+msgstr "Returns"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
 msgid "NX_SUCCESS or NX_ERROR_INVALID"
 msgstr "NX_SUCCESS or NX_ERROR_INVALID"
 
-msgid "wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That guard requires one CPU and privileged Thread/configurable-IRQ callers; NMI/HardFault, unprivileged, DMA and other security-domain access to its metadata are unsupported. The owner loop continues to service controller/drain after BUSY. No WFI/WFE is inserted without a reviewed architecture-specific atomic sleep contract."
-msgstr "wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That guard requires one CPU and privileged Thread/configurable-IRQ callers; NMI/HardFault, unprivileged, DMA and other security-domain access to its metadata are unsupported. The owner loop continues to service controller/drain after BUSY. No WFI/WFE is inserted without a reviewed architecture-specific atomic sleep contract."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid "Bind the explicit polling notification."
+msgstr "Bind the explicit polling notification."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid ""
+"wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That "
+"guard requires one CPU and privileged Thread/configurable-IRQ callers; "
+"NMI/HardFault, unprivileged, DMA and other security-domain access to its "
+"metadata are unsupported. The owner loop continues to service "
+"controller/drain after BUSY. No WFI/WFE is inserted without a reviewed "
+"architecture-specific atomic sleep contract."
+msgstr ""
+"wake uses compiler RMW or, on M0/M0+, a bounded saved PRIMASK guard. That "
+"guard requires one CPU and privileged Thread/configurable-IRQ callers; "
+"NMI/HardFault, unprivileged, DMA and other security-domain access to its "
+"metadata are unsupported. The owner loop continues to service "
+"controller/drain after BUSY. No WFI/WFE is inserted without a reviewed "
+"architecture-specific atomic sleep contract."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[in] Initialized storage"
 msgstr "[in] Initialized storage"
 
-msgid "Port whose wait returns BUSY while unchanged before deadline; NX_DEADLINE_NEVER disables expiry, never implies blocking"
-msgstr "Port whose wait returns BUSY while unchanged before deadline; NX_DEADLINE_NEVER disables expiry, never implies blocking"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid ""
+"Port whose wait returns BUSY while unchanged before deadline; "
+"NX_DEADLINE_NEVER disables expiry, never implies blocking"
+msgstr ""
+"Port whose wait returns BUSY while unchanged before deadline; "
+"NX_DEADLINE_NEVER disables expiry, never implies blocking"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+msgid "Explicit nonblocking bare-metal notification storage."
+msgstr "Explicit nonblocking bare-metal notification storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:16
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Public Members"
+msgstr "Public Members"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:24
+msgid "diagnostic.h"
+msgstr "diagnostic.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Bounded diagnostics with explicit caller-owned ring storage."
+msgstr "Bounded diagnostics with explicit caller-owned ring storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-11   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
 msgid "1.0.0"
 msgstr "1.0.0"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
 msgid "2026-10-11"
 msgstr "2026-10-11"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
 msgid "Copyright (c) 2026 Nexus Team"
 msgstr "Copyright (c) 2026 Nexus Team"
 
-msgid "Startup or exclusive lifecycle owner only. Both allocations remain alive until all publishers and readers are stopped. Entries cannot alias ring state or a submitted record."
-msgstr "Startup or exclusive lifecycle owner only. Both allocations remain alive until all publishers and readers are stopped. Entries cannot alias ring state or a submitted record."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Initialize unpublished ring and caller-owned entries."
+msgstr "Initialize unpublished ring and caller-owned entries."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid ""
+"Startup or exclusive lifecycle owner only. Both allocations remain alive "
+"until all publishers and readers are stopped. Entries cannot alias ring "
+"state or a submitted record."
+msgstr ""
+"Startup or exclusive lifecycle owner only. Both allocations remain alive "
+"until all publishers and readers are stopped. Entries cannot alias ring "
+"state or a submitted record."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[out] Unused caller-owned state."
 msgstr "[out] Unused caller-owned state."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Naturally aligned contiguous entry storage."
 msgstr "[in] Naturally aligned contiguous entry storage."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Nonzero storage length, at most UINT32_MAX."
 msgstr "[in] Nonzero storage length, at most UINT32_MAX."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS or INVALID without modifying storage on rejection."
 msgstr "SUCCESS or INVALID without modifying storage on rejection."
 
-msgid "Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, unprivileged, SMP, DMA and other security worlds are excluded. Full rings retain older records and saturate the lost-record counter. No clock callback, OS operation, heap, string formatting or transport is used."
-msgstr "Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, unprivileged, SMP, DMA and other security worlds are excluded. Full rings retain older records and saturate the lost-record counter. No clock callback, OS operation, heap, string formatting or transport is used."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Copy one event under a bounded saved interrupt mask."
+msgstr "Copy one event under a bounded saved interrupt mask."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid ""
+"Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, "
+"unprivileged, SMP, DMA and other security worlds are excluded. Full rings "
+"retain older records and saturate the lost-record counter. No clock "
+"callback, OS operation, heap, string formatting or transport is used."
+msgstr ""
+"Privileged Thread/configurable IRQ on one CPU only. NMI/HardFault, "
+"unprivileged, SMP, DMA and other security worlds are excluded. Full rings "
+"retain older records and saturate the lost-record counter. No clock "
+"callback, OS operation, heap, string formatting or transport is used."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[inout] Initialized ring."
 msgstr "[inout] Initialized ring."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Stable record until this call returns."
 msgstr "[in] Stable record until this call returns."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS, BUSY when full, INVALID or CONTEXT."
 msgstr "SUCCESS, BUSY when full, INVALID or CONTEXT."
 
-msgid "Same privileged single-CPU domain as write. Failed reads leave destination unchanged. This is diagnostic storage, never a completion queue or application work queue."
-msgstr "Same privileged single-CPU domain as write. Failed reads leave destination unchanged. This is diagnostic storage, never a completion queue or application work queue."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Consume one event from caller-owned ring."
+msgstr "Consume one event from caller-owned ring."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid ""
+"Same privileged single-CPU domain as write. Failed reads leave destination "
+"unchanged. This is diagnostic storage, never a completion queue or "
+"application work queue."
+msgstr ""
+"Same privileged single-CPU domain as write. Failed reads leave destination "
+"unchanged. This is diagnostic storage, never a completion queue or "
+"application work queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[inout] Initialized ring with live producers."
 msgstr "[inout] Initialized ring with live producers."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[out] Separate caller-owned destination."
 msgstr "[out] Separate caller-owned destination."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS, BUSY when empty, INVALID or CONTEXT."
 msgstr "SUCCESS, BUSY when empty, INVALID or CONTEXT."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Snapshot the saturating overflow count."
+msgstr "Snapshot the saturating overflow count."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "Uses the same bounded saved-mask domain as record access."
 msgstr "Uses the same bounded saved-mask domain as record access."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[in] Initialized ring."
 msgstr "[in] Initialized ring."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "[out] Caller-owned result."
 msgstr "[out] Caller-owned result."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
 msgid "SUCCESS, INVALID or CONTEXT."
 msgstr "SUCCESS, INVALID or CONTEXT."
 
-msgid "Running task operations require privileged unmasked Thread mode; IRQ wake has its own contract. Before scheduler start, the selected Baseline port may retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other masks must be zero. Matching a value cannot prove mask provenance. Unsafe contexts return CONTEXT before mutating kernel APIs or object storage; a scheduler-state read may be needed. Startup permits init, task creation, wake and zero-wait queues. Wait, join and nonzero waits require a running scheduler. Port binding and sequence snapshots remain reads. MPU user-task gateways and cross-world secure task calls are outside these privileged, current-security-domain APIs."
-msgstr "Running task operations require privileged unmasked Thread mode; IRQ wake has its own contract. Before scheduler start, the selected Baseline port may retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other masks must be zero. Matching a value cannot prove mask provenance. Unsafe contexts return CONTEXT before mutating kernel APIs or object storage; a scheduler-state read may be needed. Startup permits init, task creation, wake and zero-wait queues. Wait, join and nonzero waits require a running scheduler. Port binding and sequence snapshots remain reads. MPU user-task gateways and cross-world secure task calls are outside these privileged, current-security-domain APIs."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "One opaque diagnostic record; interpretation belongs to its owner."
+msgstr "One opaque diagnostic record; interpretation belongs to its owner."
 
-msgid "Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-owned exceptions are rejected before entering FreeRTOS. Mainline priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports accept every configurable IRQ and do not read Mainline priority grouping. Nonsecure permission does not exclude Secure-side accesses."
-msgstr "Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-owned exceptions are rejected before entering FreeRTOS. Mainline priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports accept every configurable IRQ and do not read Mainline priority grouping. Nonsecure permission does not exclude Secure-side accesses."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:26
+msgid "Explicit ring state, with no default pool, worker or transport."
+msgstr "Explicit ring state, with no default pool, worker or transport."
 
-msgid "True for a privileged unmasked external Cortex-M IRQ within the selected CPU/SoC bounds and kernel mask contract"
-msgstr "True for a privileged unmasked external Cortex-M IRQ within the selected CPU/SoC bounds and kernel mask contract"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:32
+msgid "freertos.h"
+msgstr "freertos.h"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Per-object static FreeRTOS storage and optional thin services."
+msgstr "Per-object static FreeRTOS storage and optional thin services."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Running task operations require privileged unmasked Thread mode; IRQ wake "
+"has its own contract. Before scheduler start, the selected Baseline port may"
+" retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other "
+"masks must be zero. Matching a value cannot prove mask provenance. Unsafe "
+"contexts return CONTEXT before mutating kernel APIs or object storage; a "
+"scheduler-state read may be needed. Startup permits init, task creation, "
+"wake and zero-wait queues. Wait, join and nonzero waits require a running "
+"scheduler. Port binding and sequence snapshots remain reads. MPU user-task "
+"gateways and cross-world secure task calls are outside these privileged, "
+"current-security-domain APIs."
+msgstr ""
+"Running task operations require privileged unmasked Thread mode; IRQ wake "
+"has its own contract. Before scheduler start, the selected Baseline port may"
+" retain PRIMASK=1 or the Mainline port its exact syscall BASEPRI; all other "
+"masks must be zero. Matching a value cannot prove mask provenance. Unsafe "
+"contexts return CONTEXT before mutating kernel APIs or object storage; a "
+"scheduler-state read may be needed. Startup permits init, task creation, "
+"wake and zero-wait queues. Wait, join and nonzero waits require a running "
+"scheduler. Port binding and sequence snapshots remain reads. MPU user-task "
+"gateways and cross-world secure task calls are outside these privileged, "
+"current-security-domain APIs."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Typedefs"
+msgstr "Typedefs"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Caller-owned single-operation latch for a closable queue."
+msgstr "Caller-owned single-operation latch for a closable queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Test whether the current context may call kernel ISR APIs."
+msgstr "Test whether the current context may call kernel ISR APIs."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-"
+"owned exceptions are rejected before entering FreeRTOS. Mainline "
+"priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports "
+"accept every configurable IRQ and do not read Mainline priority grouping. "
+"Nonsecure permission does not exclude Secure-side accesses."
+msgstr ""
+"Native POSIX has no physical IRQ and returns false. NMI, faults and kernel-"
+"owned exceptions are rejected before entering FreeRTOS. Mainline "
+"priority/grouping must respect the syscall ceiling. Baseline PRIMASK ports "
+"accept every configurable IRQ and do not read Mainline priority grouping. "
+"Nonsecure permission does not exclude Secure-side accesses."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"True for a privileged unmasked external Cortex-M IRQ within the selected "
+"CPU/SoC bounds and kernel mask contract"
+msgstr ""
+"True for a privileged unmasked external Cortex-M IRQ within the selected "
+"CPU/SoC bounds and kernel mask contract"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Initialize unused notification storage."
+msgstr "Initialize unused notification storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Task/startup context; no heap or timer daemon is needed."
 msgstr "Task/startup context; no heap or timer daemon is needed."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Caller storage, zeroed before first use"
 msgstr "[out] Caller storage, zeroed before first use"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS or invalid/context/initialization error"
 msgstr "SUCCESS or invalid/context/initialization error"
 
-msgid "Task wake uses xSemaphoreGive. IRQ wake validates priority then uses xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request predicates remain authoritative. No deferred daemon publishes wakes."
-msgstr "Task wake uses xSemaphoreGive. IRQ wake validates priority then uses xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request predicates remain authoritative. No deferred daemon publishes wakes."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Bind a latched single-waiter notification."
+msgstr "Bind a latched single-waiter notification."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task wake uses xSemaphoreGive. IRQ wake validates priority then uses "
+"xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request "
+"predicates remain authoritative. No deferred daemon publishes wakes."
+msgstr ""
+"Task wake uses xSemaphoreGive. IRQ wake validates priority then uses "
+"xSemaphoreGiveFromISR. Saturated latch is harmless; sequence and request "
+"predicates remain authoritative. No deferred daemon publishes wakes."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Initialized live storage"
 msgstr "[in] Initialized live storage"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Notification port using nx_time_now_us clock domain"
 msgstr "Notification port using nx_time_now_us clock domain"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy after publishers and waiter have stopped and joined."
+msgstr "Destroy after publishers and waiter have stopped and joined."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Task context. Quiescence is required beyond this busy check."
 msgstr "Task context. Quiescence is required beyond this busy check."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live storage with no future users"
 msgstr "[inout] Live storage with no future users"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY if a waiter is still registered, or error"
 msgstr "SUCCESS, BUSY if a waiter is still registered, or error"
 
-msgid "Task/startup context. No hidden worker or maximum pool. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
-msgstr "Task/startup context. No hidden worker or maximum pool. Entry must return in privileged Thread mode, with manual interrupt masks restored and the scheduler resumed after any temporary suspension."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Create one task from its exact caller-owned stack and TCB."
+msgstr "Create one task from its exact caller-owned stack and TCB."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task/startup context. No hidden worker or maximum pool. Entry must return in"
+" privileged Thread mode, with manual interrupt masks restored and the "
+"scheduler resumed after any temporary suspension."
+msgstr ""
+"Task/startup context. No hidden worker or maximum pool. Entry must return in"
+" privileged Thread mode, with manual interrupt masks restored and the "
+"scheduler resumed after any temporary suspension."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zero-initialized unused control storage"
 msgstr "[out] Zero-initialized unused control storage"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Kernel diagnostic name, copied by the kernel"
 msgstr "[in] Kernel diagnostic name, copied by the kernel"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] StackType_t array kept until successful join"
 msgstr "[in] StackType_t array kept until successful join"
 
-msgid "[in] Actual capacity, at least the selected port startup minimum; runtime stack budget remains caller-owned"
-msgstr "[in] Actual capacity, at least the selected port startup minimum; runtime stack budget remains caller-owned"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"[in] Actual capacity, at least the selected port startup minimum; runtime "
+"stack budget remains caller-owned"
+msgstr ""
+"[in] Actual capacity, at least the selected port startup minimum; runtime "
+"stack budget remains caller-owned"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Priority below configMAX_PRIORITIES"
 msgstr "[in] Priority below configMAX_PRIORITIES"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Application entry, may return after cooperative stop"
 msgstr "[in] Application entry, may return after cooperative stop"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Entry context kept until join"
 msgstr "[in] Entry context kept until join"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS or invalid/context/start error"
 msgstr "SUCCESS or invalid/context/start error"
 
-msgid "Single privileged startup lifecycle owner; scheduler state must be NOT_STARTED. The kernel candidate is first suspended to remove its retained TCB reference before deletion. No unmatched vTaskSuspendAll may remain during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension nesting. This caller precondition applies before mutation. Success permits TCB, stack and context reuse after all external users are quiescent. This does not cancel or join an executed task."
-msgstr "Single privileged startup lifecycle owner; scheduler state must be NOT_STARTED. The kernel candidate is first suspended to remove its retained TCB reference before deletion. No unmatched vTaskSuspendAll may remain during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension nesting. This caller precondition applies before mutation. Success permits TCB, stack and context reuse after all external users are quiescent. This does not cancel or join an executed task."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Discard one created task before its wrapper has executed."
+msgstr "Discard one created task before its wrapper has executed."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Single privileged startup lifecycle owner; scheduler state must be "
+"NOT_STARTED. The kernel candidate is first suspended to remove its retained "
+"TCB reference before deletion. No unmatched vTaskSuspendAll may remain "
+"during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension "
+"nesting. This caller precondition applies before mutation. Success permits "
+"TCB, stack and context reuse after all external users are quiescent. This "
+"does not cancel or join an executed task."
+msgstr ""
+"Single privileged startup lifecycle owner; scheduler state must be "
+"NOT_STARTED. The kernel candidate is first suspended to remove its retained "
+"TCB reference before deletion. No unmatched vTaskSuspendAll may remain "
+"during bootstrap: NOT_STARTED cannot reveal the kernel's private suspension "
+"nesting. This caller precondition applies before mutation. Success permits "
+"TCB, stack and context reuse after all external users are quiescent. This "
+"does not cancel or join an executed task."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live caller-owned static task, unused by other callers"
 msgstr "[inout] Live caller-owned static task, unused by other callers"
 
-msgid "SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for absent, incomplete or already entered control; CONTEXT for ISR, unprivileged, noncanonical masks or a running/suspended scheduler, without mutation"
-msgstr "SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for absent, incomplete or already entered control; CONTEXT for ISR, unprivileged, noncanonical masks or a running/suspended scheduler, without mutation"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for "
+"absent, incomplete or already entered control; CONTEXT for ISR, "
+"unprivileged, noncanonical masks or a running/suspended scheduler, without "
+"mutation"
+msgstr ""
+"SUCCESS after synchronous kernel deletion and latch cleanup; INVALID for "
+"absent, incomplete or already entered control; CONTEXT for ISR, "
+"unprivileged, noncanonical masks or a running/suspended scheduler, without "
+"mutation"
 
-msgid "Single joiner, task context. The entry return parks its wrapper; no self-delete/idle cleanup race releases caller storage early. Stop producers, keep bus owner draining, join producers, then join owner."
-msgstr "Single joiner, task context. The entry return parks its wrapper; no self-delete/idle cleanup race releases caller storage early. Stop producers, keep bus owner draining, join producers, then join owner."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Join a cooperatively returned task and reclaim kernel state."
+msgstr "Join a cooperatively returned task and reclaim kernel state."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Single joiner, task context. The entry return parks its wrapper; no self-"
+"delete/idle cleanup race releases caller storage early. Stop producers, keep"
+" bus owner draining, join producers, then join owner."
+msgstr ""
+"Single joiner, task context. The entry return parks its wrapper; no self-"
+"delete/idle cleanup race releases caller storage early. Stop producers, keep"
+" bus owner draining, join producers, then join owner."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Started task, distinct from current task"
 msgstr "[inout] Started task, distinct from current task"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Absolute wait deadline in nx_time_now_us domain"
 msgstr "[in] Absolute wait deadline in nx_time_now_us domain"
 
-msgid "SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-join or stopped scheduler"
-msgstr "SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-join or stopped scheduler"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains "
+"handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-"
+"join or stopped scheduler"
+msgstr ""
+"SUCCESS only after external vTaskDelete removes the task; TIMEOUT retains "
+"handle, TCB, stack and context; CONTEXT rejects unsafe CPU context, self-"
+"join or stopped scheduler"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Create an exact-sized static byte-copy queue."
+msgstr "Create an exact-sized static byte-copy queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zero-initialized caller queue control"
 msgstr "[out] Zero-initialized caller queue control"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Byte buffer kept until destroy"
 msgstr "[in] Byte buffer kept until destroy"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[in] Actual byte capacity"
 msgstr "[in] Actual byte capacity"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Number of items"
 msgstr "[in] Number of items"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Bytes copied per item"
 msgstr "[in] Bytes copied per item"
 
-msgid "Task context. Admission/stop belongs to the application's explicit owner adapter, not this generic copy queue."
-msgstr "Task context. Admission/stop belongs to the application's explicit owner adapter, not this generic copy queue."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Copy an item with a bounded relative kernel wait."
+msgstr "Copy an item with a bounded relative kernel wait."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task context. Admission/stop belongs to the application's explicit owner "
+"adapter, not this generic copy queue."
+msgstr ""
+"Task context. Admission/stop belongs to the application's explicit owner "
+"adapter, not this generic copy queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
 msgid "[inout] Live queue"
 msgstr "[inout] Live queue"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] At least configured item bytes; not retained afterward"
 msgstr "[in] At least configured item bytes; not retained afterward"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Explicit relative wait; portMAX_DELAY prohibited"
 msgstr "[in] Explicit relative wait; portMAX_DELAY prohibited"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, TIMEOUT, INVALID or CONTEXT"
 msgstr "SUCCESS, TIMEOUT, INVALID or CONTEXT"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Receive one byte-copy item."
+msgstr "Receive one byte-copy item."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Configured item byte capacity, valid only on success"
 msgstr "[out] Configured item byte capacity, valid only on success"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy after admission is stopped and all users joined."
+msgstr "Destroy after admission is stopped and all users joined."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live drained queue, no future operations"
 msgstr "[inout] Live drained queue, no future operations"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY while users/items remain, or invalid/context"
 msgstr "SUCCESS, BUSY while users/items remain, or invalid/context"
 
-msgid "Immediate readiness wins over expiration. Stop admission and user quiescence remain external raw-queue obligations."
-msgstr "Immediate readiness wins over expiration. Stop admission and user quiescence remain external raw-queue obligations."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Send using one absolute monotonic deadline."
+msgstr "Send using one absolute monotonic deadline."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Immediate readiness wins over expiration. Stop admission and user quiescence"
+" remain external raw-queue obligations."
+msgstr ""
+"Immediate readiness wins over expiration. Stop admission and user quiescence"
+" remain external raw-queue obligations."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live raw queue"
 msgstr "[inout] Live raw queue"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Configured bytes borrowed until return"
 msgstr "[in] Configured bytes borrowed until return"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] nx_time_now_us domain, NEVER permits long waits"
 msgstr "[in] nx_time_now_us domain, NEVER permits long waits"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, TIMEOUT or validation/context error"
 msgstr "SUCCESS, TIMEOUT or validation/context error"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Receive using one absolute monotonic deadline."
+msgstr "Receive using one absolute monotonic deadline."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Configured bytes valid only on SUCCESS"
 msgstr "[out] Configured bytes valid only on SUCCESS"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] nx_time_now_us domain"
 msgstr "[in] nx_time_now_us domain"
 
-msgid "Caller ensures slot exclusivity. No global slot registry, allocation, slot discovery or cross-world synchronization."
-msgstr "Caller ensures slot exclusivity. No global slot registry, allocation, slot discovery or cross-world synchronization."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Bind an exclusive slot of one live receiver task."
+msgstr "Bind an exclusive slot of one live receiver task."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Caller ensures slot exclusivity. No global slot registry, allocation, slot "
+"discovery or cross-world synchronization."
+msgstr ""
+"Caller ensures slot exclusivity. No global slot registry, allocation, slot "
+"discovery or cross-world synchronization."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed caller storage"
 msgstr "[out] Zeroed caller storage"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Task retained until all publishers quiesce"
 msgstr "[in] Task retained until all publishers quiesce"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Exclusively owned kernel notification slot"
 msgstr "[in] Exclusively owned kernel notification slot"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, INVALID, CONTEXT or UNSUPPORTED by OS profile"
 msgstr "SUCCESS, INVALID, CONTEXT or UNSUPPORTED by OS profile"
 
-msgid "Only receiver may wait. Task/validated IRQ publishers use the exclusive slot; notification remains a predicate hint."
-msgstr "Only receiver may wait. Task/validated IRQ publishers use the exclusive slot; notification remains a predicate hint."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Get a direct notification wait port."
+msgstr "Get a direct notification wait port."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Only receiver may wait. Task/validated IRQ publishers use the exclusive "
+"slot; notification remains a predicate hint."
+msgstr ""
+"Only receiver may wait. Task/validated IRQ publishers use the exclusive "
+"slot; notification remains a predicate hint."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Live explicitly bound storage"
 msgstr "[in] Live explicitly bound storage"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "Port using nx_time_now_us or an invalid zero port"
 msgstr "Port using nx_time_now_us or an invalid zero port"
 
-msgid "Does not delete receiver or clear its kernel slot. Receiver and storage must outlive every retained port and publisher."
-msgstr "Does not delete receiver or clear its kernel slot. Receiver and storage must outlive every retained port and publisher."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Unbind after all publishers stop and join."
+msgstr "Unbind after all publishers stop and join."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Does not delete receiver or clear its kernel slot. Receiver and storage must"
+" outlive every retained port and publisher."
+msgstr ""
+"Does not delete receiver or clear its kernel slot. Receiver and storage must"
+" outlive every retained port and publisher."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY if waiting, or validation/context error"
 msgstr "SUCCESS, BUSY if waiting, or validation/context error"
 
-msgid "No join latch, destroy or forced deletion. Choose joinable tasks for cooperative shutdown and reclaimable storage."
-msgstr "No join latch, destroy or forced deletion. Choose joinable tasks for cooperative shutdown and reclaimable storage."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Start a task whose entry must never return."
+msgstr "Start a task whose entry must never return."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"No join latch, destroy or forced deletion. Choose joinable tasks for "
+"cooperative shutdown and reclaimable storage."
+msgstr ""
+"No join latch, destroy or forced deletion. Choose joinable tasks for "
+"cooperative shutdown and reclaimable storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed permanent control, retained until reset"
 msgstr "[out] Zeroed permanent control, retained until reset"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Copied kernel diagnostic name"
 msgstr "[in] Copied kernel diagnostic name"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Aligned actual stack retained until reset"
 msgstr "[in] Aligned actual stack retained until reset"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Capacity includes reviewed startup minimum"
 msgstr "[in] Capacity includes reviewed startup minimum"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Below configMAX_PRIORITIES"
 msgstr "[in] Below configMAX_PRIORITIES"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Permanent entry; return violates kernel contract"
 msgstr "[in] Permanent entry; return violates kernel contract"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Retained until reset"
 msgstr "[in] Retained until reset"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS or validation/context/start error"
 msgstr "SUCCESS or validation/context/start error"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Initialize one exact caller-owned queue waiter."
+msgstr "Initialize one exact caller-owned queue waiter."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed storage, one simultaneous operation maximum"
 msgstr "[out] Zeroed storage, one simultaneous operation maximum"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy only after all operations stop and join."
+msgstr "Destroy only after all operations stop and join."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live storage without future callers"
 msgstr "[inout] Live storage without future callers"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY if active, or validation/context error"
 msgstr "SUCCESS, BUSY if active, or validation/context error"
 
-msgid "No hidden worker or waiter pool. Each concurrent blocking operation supplies its own initialized waiter. Broadcasting pauses scheduling while visiting at most maximum_waiters latches. Kernel payload copies and each latch signal have their own short IRQ guards. Budget scheduling delay and IRQ latency separately. Large payloads should queue stable handles. The registry is single-core and task-only."
-msgstr "No hidden worker or waiter pool. Each concurrent blocking operation supplies its own initialized waiter. Broadcasting pauses scheduling while visiting at most maximum_waiters latches. Kernel payload copies and each latch signal have their own short IRQ guards. Budget scheduling delay and IRQ latency separately. Large payloads should queue stable handles. The registry is single-core and task-only."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Initialize an optional reliably closable byte-copy queue."
+msgstr "Initialize an optional reliably closable byte-copy queue."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"No hidden worker or waiter pool. Each concurrent blocking operation supplies"
+" its own initialized waiter. Broadcasting pauses scheduling while visiting "
+"at most maximum_waiters latches. Kernel payload copies and each latch signal"
+" have their own short IRQ guards. Budget scheduling delay and IRQ latency "
+"separately. Large payloads should queue stable handles. The registry is "
+"single-core and task-only."
+msgstr ""
+"No hidden worker or waiter pool. Each concurrent blocking operation supplies"
+" its own initialized waiter. Broadcasting pauses scheduling while visiting "
+"at most maximum_waiters latches. Kernel payload copies and each latch signal"
+" have their own short IRQ guards. Budget scheduling delay and IRQ latency "
+"separately. Large payloads should queue stable handles. The registry is "
+"single-core and task-only."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[out] Zeroed control kept until destroy"
 msgstr "[out] Zeroed control kept until destroy"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Payload buffer kept until destroy"
 msgstr "[in] Payload buffer kept until destroy"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Actual payload capacity"
 msgstr "[in] Actual payload capacity"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Positive item count"
 msgstr "[in] Positive item count"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Positive byte-copy size"
 msgstr "[in] Positive byte-copy size"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Explicit positive simultaneous-call budget"
 msgstr "[in] Explicit positive simultaneous-call budget"
 
-msgid "Readiness/admission and close serialize in a kernel task scheduling guard. A latched wake closes wake-before-sleep."
-msgstr "Readiness/admission and close serialize in a kernel task scheduling guard. A latched wake closes wake-before-sleep."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Send with close-aware admission and absolute deadline."
+msgstr "Send with close-aware admission and absolute deadline."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Readiness/admission and close serialize in a kernel task scheduling guard. A"
+" latched wake closes wake-before-sleep."
+msgstr ""
+"Readiness/admission and close serialize in a kernel task scheduling guard. A"
+" latched wake closes wake-before-sleep."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live closable queue"
 msgstr "[inout] Live closable queue"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] Bytes borrowed until return, never after timeout"
 msgstr "[in] Bytes borrowed until return, never after timeout"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[in] nx_time_now_us domain, NEVER supported"
 msgstr "[in] nx_time_now_us domain, NEVER supported"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Exclusive initialized caller waiter"
 msgstr "[inout] Exclusive initialized caller waiter"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
 msgstr "SUCCESS, CANCELLED after close, TIMEOUT, BUSY or error"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Receive existing items after close, then CANCELLED."
+msgstr "Receive existing items after close, then CANCELLED."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, CANCELLED when closed/empty, TIMEOUT or error"
 msgstr "SUCCESS, CANCELLED when closed/empty, TIMEOUT or error"
 
-msgid "Task-only, no forced cancellation or task deletion. Close does not join users or authorize storage reclamation."
-msgstr "Task-only, no forced cancellation or task deletion. Close does not join users or authorize storage reclamation."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Stop sends and wake every currently registered waiter."
+msgstr "Stop sends and wake every currently registered waiter."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Task-only, no forced cancellation or task deletion. Close does not join "
+"users or authorize storage reclamation."
+msgstr ""
+"Task-only, no forced cancellation or task deletion. Close does not join "
+"users or authorize storage reclamation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, including repeated close, or validation/context"
 msgstr "SUCCESS, including repeated close, or validation/context"
 
-msgid "Stop/join producers, drain with owner, join consumers and then destroy queue and every waiter independently."
-msgstr "Stop/join producers, drain with owner, join consumers and then destroy queue and every waiter independently."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Destroy a closed, drained and quiesced queue."
+msgstr "Destroy a closed, drained and quiesced queue."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Stop/join producers, drain with owner, join consumers and then destroy queue"
+" and every waiter independently."
+msgstr ""
+"Stop/join producers, drain with owner, join consumers and then destroy queue"
+" and every waiter independently."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "[inout] Live queue without future entrants"
 msgstr "[inout] Live queue without future entrants"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
 msgid "SUCCESS, BUSY while open/users/items remain, or error"
 msgstr "SUCCESS, BUSY while open/users/items remain, or error"
 
-msgid "Control fields are adapter-owned. The caller zero-initializes storage before first use and does not modify live fields. Entry is consumed as the wrapper begins execution; context remains borrowed until successful join or prestart discard."
-msgstr "Control fields are adapter-owned. The caller zero-initializes storage before first use and does not modify live fields. Entry is consumed as the wrapper begins execution; context remains borrowed until successful join or prestart discard."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Static binary latch; one waiter, independently quiesced publishers."
+msgstr "Static binary latch; one waiter, independently quiesced publishers."
 
-msgid "Application may override the weak no-op and write an explicit nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so never block, allocate, format, transmit, acquire OS locks or call kernel services. The sink owns timestamp and lifetime; no buffer is provided automatically. Trace profile enables real kernel hooks."
-msgstr "Application may override the weak no-op and write an explicit nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so never block, allocate, format, transmit, acquire OS locks or call kernel services. The sink owns timestamp and lifetime; no buffer is provided automatically. Trace profile enables real kernel hooks."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Task has its own TCB; stack is supplied with its actual word count."
+msgstr "Task has its own TCB; stack is supplied with its actual word count."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid ""
+"Control fields are adapter-owned. The caller zero-initializes storage before"
+" first use and does not modify live fields. Entry is consumed as the wrapper"
+" begins execution; context remains borrowed until successful join or "
+"prestart discard."
+msgstr ""
+"Control fields are adapter-owned. The caller zero-initializes storage before"
+" first use and does not modify live fields. Entry is consumed as the wrapper"
+" begins execution; context remains borrowed until successful join or "
+"prestart discard."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Queue control only; actual depth/item byte storage is external."
+msgstr "Queue control only; actual depth/item byte storage is external."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Fixed receiver and exclusive kernel notification slot; no latch."
+msgstr "Fixed receiver and exclusive kernel notification slot; no latch."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Permanent task control without a join completion semaphore."
+msgstr "Permanent task control without a join completion semaphore."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:34
+msgid "Opt-in close broadcasts; raw queue storage remains unchanged."
+msgstr "Opt-in close broadcasts; raw queue storage remains unchanged."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:40
+msgid "freertos_diagnostics.h"
+msgstr "freertos_diagnostics.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid "Bounded explicit FreeRTOS trace sink without global storage."
+msgstr "Bounded explicit FreeRTOS trace sink without global storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Enums"
+msgstr "Enums"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid ""
+"Maintained kernel trace identities; product interpretation is external."
+msgstr ""
+"Maintained kernel trace identities; product interpretation is external."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Values:"
+msgstr "Values:"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid "Consume one bounded kernel trace event."
+msgstr "Consume one bounded kernel trace event."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
+msgid ""
+"Application may override the weak no-op and write an explicit "
+"nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so "
+"never block, allocate, format, transmit, acquire OS locks or call kernel "
+"services. The sink owns timestamp and lifetime; no buffer is provided "
+"automatically. Trace profile enables real kernel hooks."
+msgstr ""
+"Application may override the weak no-op and write an explicit "
+"nx_diagnostic_ring_t. May run under kernel masks or configurable IRQ, so "
+"never block, allocate, format, transmit, acquire OS locks or call kernel "
+"services. The sink owns timestamp and lifetime; no buffer is provided "
+"automatically. Trace profile enables real kernel hooks."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
 msgid "[in] Maintained trace kind."
 msgstr "[in] Maintained trace kind."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
 msgid "[in] Opaque task identity, never a dereference license."
 msgstr "[in] Opaque task identity, never a dereference license."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:42
 msgid "[in] Optional caller-defined numeric diagnostic."
 msgstr "[in] Optional caller-defined numeric diagnostic."
 
-msgid "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
-msgstr "Privileged Thread only, scheduler not suspended, no manual masks. Rejection retains no references and calls no kernel creation API. Actual linker bounds and MPU_TYPE are checked. Minimum creation capacity is 64 words; applications budget actual execution depth separately. No heap or object pool."
-
-msgid "[in] Validated user entry, stack and data mappings."
-msgstr "[in] Validated user entry, stack and data mappings."
-
-msgid "[inout] Owned live protected metadata; never the calling task."
-msgstr "[inout] Owned live protected metadata; never the calling task."
-
-msgid "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
-msgstr "The entry must be explicit user code and must not return. Stack and context data remain borrowed until owner deletion; regions never include kernel RAM, code or MMIO. Context must be contained in the user stack, user flash or mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable reserved linker region; names are copied cold."
-
-msgid "Privileged unmasked running Thread; task stack quiescent throughout the scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies TCB/stack identity, not size. The original capacity is a caller contract. No task suspend, interrupt mask, allocation or live painting is performed. Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. The POSIX kernel port uses a separate pthread execution stack; its query is not an MCU or Linux execution-stack peak measurement."
-msgstr "Privileged unmasked running Thread; task stack quiescent throughout the scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies TCB/stack identity, not size. The original capacity is a caller contract. No task suspend, interrupt mask, allocation or live painting is performed. Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. The POSIX kernel port uses a separate pthread execution stack; its query is not an MCU or Linux execution-stack peak measurement."
-
-msgid "[in] Exact original TCB, stack and capacity, all live."
-msgstr "[in] Exact original TCB, stack and capacity, all live."
-
-msgid "[out] Distinct output, unchanged on rejection."
-msgstr "[out] Distinct output, unchanged on rejection."
-
-msgid "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
-msgstr "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
-
-msgid "The caller retains all storage, excludes delete/join/discard and never replaces the live binding. This is not a registry."
-msgstr "The caller retains all storage, excludes delete/join/discard and never replaces the live binding. This is not a registry."
-
-msgid "Thread only with a running scheduler. No handle or pointer crosses the boundary. This is not a microsecond deadline."
-msgstr "Thread only with a running scheduler. No handle or pointer crosses the boundary. This is not a microsecond deadline."
-
-msgid "[in] Relative kernel ticks; zero requests rescheduling."
-msgstr "[in] Relative kernel ticks; zero requests rescheduling."
-
-msgid "Current kernel tick count in the selected OS clock domain."
-msgstr "Current kernel tick count in the selected OS clock domain."
-
-msgid "A maintained SoC binding or application implementation overrides the weak NULL default. The port and context remain live throughout the scheduler; no runtime rebinding, hidden pool or worker is provided. Absence of a port never stops ticks or sleeps."
-msgstr "A maintained SoC binding or application implementation overrides the weak NULL default. The port and context remain live throughout the scheduler; no runtime rebinding, hidden pool or worker is provided. Absence of a port never stops ticks or sleeps."
-
-msgid "Stable port or NULL to leave normal periodic ticking."
-msgstr "Stable port or NULL to leave normal periodic ticking."
-
-msgid "Called only by Idle with scheduler suspended. Uses reviewed masked shallow WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The configured tick rate must divide 1000000 exactly. The final kernel readiness check precedes tick pause; a rejected pause makes no changes. Default profiles do not call this hook. HIL must verify the concrete timer, clock continuity and actual wake latency."
-msgstr "Called only by Idle with scheduler suspended. Uses reviewed masked shallow WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The configured tick rate must divide 1000000 exactly. The final kernel readiness check precedes tick pause; a rejected pause makes no changes. Default profiles do not call this hook. HIL must verify the concrete timer, clock continuity and actual wake latency."
-
-msgid "[in] Kernel's bounded next-unblock window."
-msgstr "[in] Kernel's bounded next-unblock window."
-
-msgid "Clock value; clock_gettime failure is process-fatal"
-msgstr "Clock value; clock_gettime failure is process-fatal"
-
-msgid "Task context; POSIX signal handlers are unsupported."
-msgstr "Task context; POSIX signal handlers are unsupported."
-
-msgid "[out] Storage kept alive through all publishers"
-msgstr "[out] Storage kept alive through all publishers"
-
-msgid "NX_SUCCESS or an initialization error"
-msgstr "NX_SUCCESS or an initialization error"
-
-msgid "Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for untimed waiting"
-msgstr "Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for untimed waiting"
-
-msgid "Stop and join publishers first. The check cannot authorize a future call to race destruction. No storage access is allowed afterward."
-msgstr "Stop and join publishers first. The check cannot authorize a future call to race destruction. No storage access is allowed afterward."
-
-msgid "[inout] Live storage with no future publishers"
-msgstr "[inout] Live storage with no future publishers"
-
-msgid "NX_SUCCESS or BUSY when a waiter is still registered"
-msgstr "NX_SUCCESS or BUSY when a waiter is still registered"
-
-msgid "Task context; caller keeps buffer until successful destroy."
-msgstr "Task context; caller keeps buffer until successful destroy."
-
-msgid "[out] Unused caller storage"
-msgstr "[out] Unused caller storage"
-
-msgid "[in] Caller-owned byte buffer"
-msgstr "[in] Caller-owned byte buffer"
-
-msgid "[in] Number of items, greater than zero"
-msgstr "[in] Number of items, greater than zero"
-
-msgid "[in] Bytes per item, greater than zero"
-msgstr "[in] Bytes per item, greater than zero"
-
-msgid "NX_SUCCESS or invalid/initialization error"
-msgstr "NX_SUCCESS or invalid/initialization error"
-
-msgid "Immediately available capacity is used even at an expired deadline. A finite deadline bounds waiting; spurious wakes never restart its budget. No item is retained on failure."
-msgstr "Immediately available capacity is used even at an expired deadline. A finite deadline bounds waiting; spurious wakes never restart its budget. No item is retained on failure."
-
-msgid "[in] At least item_size bytes, borrowed during call only"
-msgstr "[in] At least item_size bytes, borrowed during call only"
-
-msgid "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
-msgstr "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
-
-msgid "SUCCESS, TIMEOUT, STATE (closed) or error"
-msgstr "SUCCESS, TIMEOUT, STATE (closed) or error"
-
-msgid "An immediately available item can be received at an expired deadline. On failure the output is unchanged. Closed queues return STATE only after existing items have been drained."
-msgstr "An immediately available item can be received at an expired deadline. On failure the output is unchanged. Closed queues return STATE only after existing items have been drained."
-
-msgid "[out] At least item_size bytes; valid only on SUCCESS"
-msgstr "[out] At least item_size bytes; valid only on SUCCESS"
-
-msgid "Task context; caller must join queue users before destroy."
-msgstr "Task context; caller must join queue users before destroy."
-
-msgid "NX_SUCCESS or invalid error"
-msgstr "NX_SUCCESS or invalid error"
-
-msgid "[inout] Closed queue, no future users"
-msgstr "[inout] Closed queue, no future users"
-
-msgid "NX_SUCCESS or BUSY if users/items remain"
-msgstr "NX_SUCCESS or BUSY if users/items remain"
-
-msgid "Task context. No default task, pool or hidden stack exists. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence."
-msgstr "Task context. No default task, pool or hidden stack exists. POSIX library bookkeeping is host-runtime allocation, not MCU RAM evidence."
-
-msgid "[out] Zero-initialized unused caller handle"
-msgstr "[out] Zero-initialized unused caller handle"
-
-msgid "[in] Aligned storage accepted by pthread_attr_setstack"
-msgstr "[in] Aligned storage accepted by pthread_attr_setstack"
-
-msgid "[in] Host stack size, at least PTHREAD_STACK_MIN"
-msgstr "[in] Host stack size, at least PTHREAD_STACK_MIN"
-
-msgid "[in] Returning bounded application entry"
-msgstr "[in] Returning bounded application entry"
-
-msgid "[in] Entry context, kept alive until join"
-msgstr "[in] Entry context, kept alive until join"
-
-msgid "NX_SUCCESS or invalid/start error"
-msgstr "NX_SUCCESS or invalid/start error"
-
-msgid "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage."
-msgstr "May block until entry returns. No forced cancellation. Caller may release context, handle and stack only after success. One external owner serializes start/join; multiple simultaneous joiners and external pthread_cancel/detach are unsupported. Stop/join publishers before destroying their notification or queue storage."
-
-msgid "[inout] Started task; caller must not be the joined task"
-msgstr "[inout] Started task; caller must not be the joined task"
-
-msgid "NX_SUCCESS only after pthread_join confirms execution exit"
-msgstr "NX_SUCCESS only after pthread_join confirms execution exit"
-
-msgid "Initialize/destroy have one external lifecycle owner. Stop and join all publishers and the waiter before destroy. External pthread_cancel of a caller blocked in these APIs is unsupported; use cooperative stop, publish and join."
-msgstr "Initialize/destroy have one external lifecycle owner. Stop and join all publishers and the waiter before destroy. External pthread_cancel of a caller blocked in these APIs is unsupported; use cooperative stop, publish and join."
-
-msgid "One lifecycle owner initializes, closes and destroys. Multiple producers/consumers are supported while live. External pthread_cancel of blocked users is unsupported."
-msgstr "One lifecycle owner initializes, closes and destroys. Multiple producers/consumers are supported while live. External pthread_cancel of blocked users is unsupported."
-
-msgid "Start/join are serialized by one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
-msgstr "Start/join are serialized by one external lifecycle owner; there is one joiner. An entry may attempt a self-join, which returns BUSY. External cancellation and detachment are unsupported."
-
-msgid "Secure privileged Thread startup/exclusive lifecycle owner. Both memory spans must be Secure, writable and disjoint. No NS task may run against this identity during prepare. Repeat prepare is rejected; epochs are never reset. No allocation, kernel operation or runtime registry is used."
-msgstr "Secure privileged Thread startup/exclusive lifecycle owner. Both memory spans must be Secure, writable and disjoint. No NS task may run against this identity during prepare. Repeat prepare is rejected; epochs are never reset. No allocation, kernel operation or runtime registry is used."
-
-msgid "[out] Zero-initialized caller-owned Secure metadata."
-msgstr "[out] Zero-initialized caller-owned Secure metadata."
-
-msgid "[in] Eight-byte-aligned Secure writable stack allocation."
-msgstr "[in] Eight-byte-aligned Secure writable stack allocation."
-
-msgid "[in] Whole allocation, including eight-byte upper seal."
-msgstr "[in] Whole allocation, including eight-byte upper seal."
-
-msgid "[in] Opaque NS task identity, never dereferenced here."
-msgstr "[in] Opaque NS task identity, never dereferenced here."
-
-msgid "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
-msgstr "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
-
-msgid "Secure lifecycle owner only after joining the previous task and stopping every observer. Existing stack is reused; stale handles remain invalid after the next allocation."
-msgstr "Secure lifecycle owner only after joining the previous task and stopping every observer. Existing stack is reused; stale handles remain invalid after the next allocation."
-
-msgid "[inout] Prepared, unleased and unloaded Secure metadata."
-msgstr "[inout] Prepared, unleased and unloaded Secure metadata."
-
-msgid "[in] New trusted NS task identity."
-msgstr "[in] New trusted NS task identity."
-
-msgid "Secure application overrides the weak NULL default with an immutable mapping. Called with both PRIMASK states held; never dereference an NS-provided metadata pointer, allocate, block, discover objects, call a kernel or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this mechanism does not authenticate an adversarial NS privileged kernel. NS Thread calls cannot spoof Handler origin."
-msgstr "Secure application overrides the weak NULL default with an immutable mapping. Called with both PRIMASK states held; never dereference an NS-provided metadata pointer, allocate, block, discover objects, call a kernel or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this mechanism does not authenticate an adversarial NS privileged kernel. NS Thread calls cannot spoof Handler origin."
-
-msgid "[in] Opaque identity supplied by the trusted NS kernel."
-msgstr "[in] Opaque identity supplied by the trusted NS kernel."
-
-msgid "Prepared caller-owned metadata, or NULL when unauthorized."
-msgstr "Prepared caller-owned metadata, or NULL when unauthorized."
-
-msgid "Secure application may override to record/reset safely. Called with both masks held; must not return, block, call a kernel or release retained storage. Default holds masks and spins. No transport or product recovery policy is imposed."
-msgstr "Secure application may override to record/reset safely. Called with both masks held; must not return, block, call a kernel or release retained storage. Default holds masks and spins. No transport or product recovery policy is imposed."
-
-msgid "[in] Seal or stack invariant violation."
-msgstr "[in] Seal or stack invariant violation."
-
-msgid "Zero-initialize before prepare. Fields are mechanism-owned while prepared; applications cannot modify them. Metadata and stack remain alive until the task is joined, lease freed and no loaded context remains. Runtime Secure stack capacity is an application budget, not this port minimum."
-msgstr "Zero-initialize before prepare. Fields are mechanism-owned while prepared; applications cannot modify them. Metadata and stack remain alive until the task is joined, lease freed and no loaded context remains. Runtime Secure stack capacity is an application budget, not this port minimum."
-
-msgid "Privileged, single-core, current-security-domain APIs. All controls start zeroed and remain adapter-owned while live. One external lifecycle owner serializes init/destroy and joins; publishers, queue callers and IRQ sources must quiesce before reclaiming storage. Runtime task operations require unmasked Thread mode and a running kernel. Actual bootstrap permits object init, task create/discard and wake; it does not permit blocking waits or queue operations. A manual mask, ISR or unsupported context returns CONTEXT before mutation. The byte queue's task threshold guard rejects foreign priority-zero time-sliced callers. Caller controls, stack ranges, full borrowed name/context objects, queue payloads, item buffers and waiters must be disjoint. Cold admission rejects known control/stack/payload overlap and name/context starting inside control or stack; unknown opaque extents remain the caller's responsibility. Never operate a closable queue through its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is an actual unbounded kernel wait. Timeout never revokes any accepted I/O borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are outside this backend scope."
-msgstr "Privileged, single-core, current-security-domain APIs. All controls start zeroed and remain adapter-owned while live. One external lifecycle owner serializes init/destroy and joins; publishers, queue callers and IRQ sources must quiesce before reclaiming storage. Runtime task operations require unmasked Thread mode and a running kernel. Actual bootstrap permits object init, task create/discard and wake; it does not permit blocking waits or queue operations. A manual mask, ISR or unsupported context returns CONTEXT before mutation. The byte queue's task threshold guard rejects foreign priority-zero time-sliced callers. Caller controls, stack ranges, full borrowed name/context objects, queue payloads, item buffers and waiters must be disjoint. Cold admission rejects known control/stack/payload overlap and name/context starting inside control or stack; unknown opaque extents remain the caller's responsibility. Never operate a closable queue through its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is an actual unbounded kernel wait. Timeout never revokes any accepted I/O borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are outside this backend scope."
-
-msgid "Privileged cold Thread/MSP, no live FP context or masks. Startup may create and discard unused static objects. After startup returns, the bootstrap scope is sealed. Only the trusted kernel may call adapter tx_application_define; it validates canonical privileged Thread context before the product callback. This is not a security isolation API. An unexpected kernel return invokes fail-stop and retains all effects; it never reopens bootstrap reclamation."
-msgstr "Privileged cold Thread/MSP, no live FP context or masks. Startup may create and discard unused static objects. After startup returns, the bootstrap scope is sealed. Only the trusted kernel may call adapter tx_application_define; it validates canonical privileged Thread context before the product callback. This is not a security isolation API. An unexpected kernel return invokes fail-stop and retains all effects; it never reopens bootstrap reclamation."
-
-msgid "[in] Product initialization inside tx_application_define"
-msgstr "[in] Product initialization inside tx_application_define"
-
-msgid "[in] Borrowed through startup and kernel lifetime"
-msgstr "[in] Borrowed through startup and kernel lifetime"
-
-msgid "CONTEXT or INVALID before entry; successful entry never returns"
-msgstr "CONTEXT or INVALID before entry; successful entry never returns"
-
-msgid "Actual fault context is not repaired or normalized; it may be masked, ISR or unprivileged. Do not assume a working kernel, clock, stack or permission to access a peripheral. The adapter observes the Core fault hook before this hook. Product owns separately reviewed safe output/reset actions. Returning does not authorize cleanup; the adapter parks."
-msgstr "Actual fault context is not repaired or normalized; it may be masked, ISR or unprivileged. Do not assume a working kernel, clock, stack or permission to access a peripheral. The adapter observes the Core fault hook before this hook. Product owns separately reviewed safe output/reset actions. Returning does not authorize cleanup; the adapter parks."
-
-msgid "[in] Context, permanent-entry or kernel-return failure"
-msgstr "[in] Context, permanent-entry or kernel-return failure"
-
-msgid "Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer clock and IRQ ceiling; it must not change the platform's continuous monotonic clock. Missing hook fails linking. Failure enters retaining fail-stop."
-msgstr "Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer clock and IRQ ceiling; it must not change the platform's continuous monotonic clock. Missing hook fails linking. Failure enters retaining fail-stop."
-
-msgid "[in] Exact immutable resolved kernel frequency"
-msgstr "[in] Exact immutable resolved kernel frequency"
-
-msgid "SUCCESS after binding a real bounded periodic IRQ source"
-msgstr "SUCCESS after binding a real bounded periodic IRQ source"
-
-msgid "Native has no hardware IRQ source and returns false."
-msgstr "Native has no hardware IRQ source and returns false."
-
-msgid "True only in a privileged unmasked reviewed external IRQ"
-msgstr "True only in a privileged unmasked reviewed external IRQ"
-
-msgid "[inout] Zeroed caller control retained until destroy"
-msgstr "[inout] Zeroed caller control retained until destroy"
-
-msgid "SUCCESS, INVALID, CONTEXT or IO"
-msgstr "SUCCESS, INVALID, CONTEXT or IO"
-
-msgid "Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration precedes a changed sequence."
-msgstr "Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration precedes a changed sequence."
-
-msgid "[inout] Live latch retained through every port user"
-msgstr "[inout] Live latch retained through every port user"
-
-msgid "Wait face; empty face for null or non-live control"
-msgstr "Wait face; empty face for null or non-live control"
-
-msgid "[inout] Live caller latch"
-msgstr "[inout] Live caller latch"
-
-msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
-msgstr "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
-
-msgid "No adapter heap or worker. Name is borrowed, not copied. Linux uses its own pthread stack; the caller buffer only validates kernel metadata and is not a host stack budget. Higher-priority entries may run before start returns."
-msgstr "No adapter heap or worker. Name is borrowed, not copied. Linux uses its own pthread stack; the caller buffer only validates kernel metadata and is not a host stack budget. Higher-priority entries may run before start returns."
-
-msgid "[inout] Zeroed caller TCB/control, retained until join/discard"
-msgstr "[inout] Zeroed caller TCB/control, retained until join/discard"
-
-msgid "[in] Borrowed immutable name, retained until reclamation"
-msgstr "[in] Borrowed immutable name, retained until reclamation"
-
-msgid "[in] Eight-byte aligned caller storage"
-msgstr "[in] Eight-byte aligned caller storage"
-
-msgid "[in] Actual capacity, at least TX_MINIMUM_STACK"
-msgstr "[in] Actual capacity, at least TX_MINIMUM_STACK"
-
-msgid "[in] ThreadX priority; smaller values run first"
-msgstr "[in] ThreadX priority; smaller values run first"
-
-msgid "[in] Returns only after application stop/drain"
-msgstr "[in] Returns only after application stop/drain"
-
-msgid "[in] Borrowed until successful join/discard"
-msgstr "[in] Borrowed until successful join/discard"
-
-msgid "SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if reclamation cannot be established"
-msgstr "SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if reclamation cannot be established"
-
-msgid "Self-join is rejected. Timeout retains task, borrowed name, stack and context. Completion hint alone never reclaims; successful real kernel deletion establishes detachment."
-msgstr "Self-join is rejected. Timeout retains task, borrowed name, stack and context. Completion hint alone never reclaims; successful real kernel deletion establishes detachment."
-
-msgid "[inout] Live caller task, one external joiner only"
-msgstr "[inout] Live caller task, one external joiner only"
-
-msgid "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
-msgstr "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
-
-msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
-msgstr "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
-
-msgid "This is prestart rollback, never runtime cancellation."
-msgstr "This is prestart rollback, never runtime cancellation."
-
-msgid "[inout] Live task whose entry has never begun"
-msgstr "[inout] Live task whose entry has never begun"
-
-msgid "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
-msgstr "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
-
-msgid "Eight-byte stack alignment; failure can retain live state."
-msgstr "Eight-byte stack alignment; failure can retain live state."
-
-msgid "[inout] Zeroed caller control, retained until reset"
-msgstr "[inout] Zeroed caller control, retained until reset"
-
-msgid "[in] Borrowed immutable name, retained until reset"
-msgstr "[in] Borrowed immutable name, retained until reset"
-
-msgid "[in] Aligned caller buffer, retained until reset"
-msgstr "[in] Aligned caller buffer, retained until reset"
-
-msgid "[in] Smaller ThreadX priority values run first"
-msgstr "[in] Smaller ThreadX priority values run first"
-
-msgid "[in] Never returns; return invokes retaining fail-stop"
-msgstr "[in] Never returns; return invokes retaining fail-stop"
-
-msgid "[in] Borrowed until reset"
-msgstr "[in] Borrowed until reset"
-
-msgid "[in] Caller payload storage retained until destroy"
-msgstr "[in] Caller payload storage retained until destroy"
-
-msgid "[in] Exact depth multiplied by item_size"
-msgstr "[in] Exact depth multiplied by item_size"
-
-msgid "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
-msgstr "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
-
-msgid "[in] Positive byte count, without word-size narrowing"
-msgstr "[in] Positive byte count, without word-size narrowing"
-
-msgid "[inout] Live queue retained throughout the operation"
-msgstr "[inout] Live queue retained throughout the operation"
-
-msgid "[in] Exactly item_size readable bytes borrowed until return"
-msgstr "[in] Exactly item_size readable bytes borrowed until return"
-
-msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
-msgstr "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
-
-msgid "[out] Exactly item_size writable bytes borrowed until return"
-msgstr "[out] Exactly item_size writable bytes borrowed until return"
-
-msgid "[inout] Live caller control and storage"
-msgstr "[inout] Live caller control and storage"
-
-msgid "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
-msgstr "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
-
-msgid "[inout] Zeroed caller storage retained until waiter destroy"
-msgstr "[inout] Zeroed caller storage retained until waiter destroy"
-
-msgid "[inout] Live caller latch with no concurrent users"
-msgstr "[inout] Live caller latch with no concurrent users"
-
-msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO"
-msgstr "SUCCESS, INVALID, CONTEXT, BUSY or IO"
-
-msgid "Payload size and maximum_waiters bound task scheduling pause; the entire copy/broadcast does not mask interrupts."
-msgstr "Payload size and maximum_waiters bound task scheduling pause; the entire copy/broadcast does not mask interrupts."
-
-msgid "[in] Positive capacity below TX_WAIT_FOREVER"
-msgstr "[in] Positive capacity below TX_WAIT_FOREVER"
-
-msgid "[in] Positive exact payload byte count"
-msgstr "[in] Positive exact payload byte count"
-
-msgid "[in] Positive maximum simultaneous operations"
-msgstr "[in] Positive maximum simultaneous operations"
-
-msgid "[inout] Live close-aware queue"
-msgstr "[inout] Live close-aware queue"
-
-msgid "SUCCESS, INVALID or CONTEXT; close is idempotent"
-msgstr "SUCCESS, INVALID or CONTEXT; close is idempotent"
-
-msgid "A closed queue rejects sends without changing payload."
-msgstr "A closed queue rejects sends without changing payload."
-
-msgid "[inout] Live exclusive latch for this simultaneous call"
-msgstr "[inout] Live exclusive latch for this simultaneous call"
-
-msgid "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
-msgstr "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
-
-msgid "Closed and empty returns CANCELLED; failure leaves output."
-msgstr "Closed and empty returns CANCELLED; failure leaves output."
-
-msgid "[inout] Live control and its borrowed payload storage"
-msgstr "[inout] Live control and its borrowed payload storage"
-
-msgid "Applications implement these symbols only when the authored OS policy enables them. No weak timer/counter fallback is supplied. The platform never invents timer wiring."
-msgstr "Applications implement these symbols only when the authored OS policy enables them. No weak timer/counter fallback is supplied. The platform never invents timer wiring."
-
-msgid "Scheduler startup calls this in its canonical masked, privileged context. Configure a periodic interrupt, clear pending state and route it to the selected kernel Tick handler at its validated priority. Do not start tasks here. Hardware clock and routing remain application/SoC-owned."
-msgstr "Scheduler startup calls this in its canonical masked, privileged context. Configure a periodic interrupt, clear pending state and route it to the selected kernel Tick handler at its validated priority. Do not start tasks here. Hardware clock and routing remain application/SoC-owned."
-
-msgid "[in] Exact authored Tick frequency in hertz"
-msgstr "[in] Exact authored Tick frequency in hertz"
-
-msgid "Called during scheduler startup. Counter initialization must be bounded, allocation-free and safe in the startup mask."
-msgstr "Called during scheduler startup. Counter initialization must be bounded, allocation-free and safe in the startup mask."
-
-msgid "Called by the kernel during context switches. It must be bounded, allocation-free and safe in interrupt/critical context. Configure a frequency above Tick frequency and account for wrapping when interpreting recorded totals."
-msgstr "Called by the kernel during context switches. It must be bounded, allocation-free and safe in interrupt/critical context. Configure a frequency above Tick frequency and account for wrapping when interpreting recorded totals."
-
-msgid "Monotonic modulo-32-bit counter in application-defined units"
-msgstr "Monotonic modulo-32-bit counter in application-defined units"
-
-msgid "Task context. No service, queue, callback dispatch or task creation is implicit. A shared-bus client must not use ready to service the controller; its execution owner must remain running during stop/drain."
-msgstr "Task context. No service, queue, callback dispatch or task creation is implicit. A shared-bus client must not use ready to service the controller; its execution owner must remain running during stop/drain."
-
-msgid "[in] Live single-waiter notification port"
-msgstr "[in] Live single-waiter notification port"
-
-msgid "[in] Bounded predicate, called in caller context"
-msgstr "[in] Bounded predicate, called in caller context"
-
-msgid "[in] Predicate context, retained for this call only"
-msgstr "[in] Predicate context, retained for this call only"
-
-msgid "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no wall-clock or relative values"
-msgstr "[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no wall-clock or relative values"
-
-msgid "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
-msgstr "NX_SUCCESS when predicate is observed true, including a final observation after TIMEOUT; otherwise port error"
-
-
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:48
+msgid "freertos_mpu.h"
+msgstr "freertos_mpu.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Privileged static lifecycle for isolated MPU user tasks."
+msgstr "Privileged static lifecycle for isolated MPU user tasks."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "User data is nonexecuting normal RAM with only these permissions."
+msgstr "User data is nonexecuting normal RAM with only these permissions."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Create an unprivileged task from exact caller-owned storage."
+msgstr "Create an unprivileged task from exact caller-owned storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"Privileged Thread only, scheduler not suspended, no manual masks. Rejection "
+"retains no references and calls no kernel creation API. Actual linker bounds"
+" and MPU_TYPE are checked. Minimum creation capacity is 64 words; "
+"applications budget actual execution depth separately. No heap or object "
+"pool."
+msgstr ""
+"Privileged Thread only, scheduler not suspended, no manual masks. Rejection "
+"retains no references and calls no kernel creation API. Actual linker bounds"
+" and MPU_TYPE are checked. Minimum creation capacity is 64 words; "
+"applications budget actual execution depth separately. No heap or object "
+"pool."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
 msgid "[inout] Cold or live-free metadata in protected linker RAM."
 msgstr "[inout] Cold or live-free metadata in protected linker RAM."
 
-msgid "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile also rejects task epoch OVERFLOW."
-msgstr "Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile also rejects task epoch OVERFLOW."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "[in] Validated user entry, stack and data mappings."
+msgstr "[in] Validated user entry, stack and data mappings."
 
-msgid "One privileged lifecycle owner stops external access first. Kernel deletion synchronously removes scheduler references. Self deletion is rejected; no hidden reaper."
-msgstr "One privileged lifecycle owner stops external access first. Kernel deletion synchronously removes scheduler references. Self deletion is rejected; no hidden reaper."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile "
+"also rejects task epoch OVERFLOW."
+msgstr ""
+"Success or INVALID/CONTEXT/STATE/BUSY/IO before admission. The GPIO profile "
+"also rejects task epoch OVERFLOW."
 
-msgid "The GPIO profile returns BUSY while its authority pins the task. Close and join before deletion. A closing marker prevents reopen during kernel deletion; the epoch survives."
-msgstr "The GPIO profile returns BUSY while its authority pins the task. Close and join before deletion. A closing marker prevents reopen during kernel deletion; the epoch survives."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Delete another isolated task after external users quiesce."
+msgstr "Delete another isolated task after external users quiesce."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"One privileged lifecycle owner stops external access first. Kernel deletion "
+"synchronously removes scheduler references. Self deletion is rejected; no "
+"hidden reaper."
+msgstr ""
+"One privileged lifecycle owner stops external access first. Kernel deletion "
+"synchronously removes scheduler references. Self deletion is rejected; no "
+"hidden reaper."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"The GPIO profile returns BUSY while its authority pins the task. Close and "
+"join before deletion. A closing marker prevents reopen during kernel "
+"deletion; the epoch survives."
+msgstr ""
+"The GPIO profile returns BUSY while its authority pins the task. Close and "
+"join before deletion. A closing marker prevents reopen during kernel "
+"deletion; the epoch survives."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "[inout] Owned live protected metadata; never the calling task."
+msgstr "[inout] Owned live protected metadata; never the calling task."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
 msgid "Success, INVALID, CONTEXT, STATE or BUSY."
 msgstr "Success, INVALID, CONTEXT, STATE or BUSY."
 
-msgid "Zero-initialize in privileged RAM before first start. The TCB includes the real port context and protected stack. One privileged lifecycle owner serializes start/delete."
-msgstr "Zero-initialize in privileged RAM before first start. The TCB includes the real port context and protected stack. One privileged lifecycle owner serializes start/delete."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "A caller-selected exact region, copied during task creation."
+msgstr "A caller-selected exact region, copied during task creation."
 
-msgid "The GPIO profile requires cold zero-initialization and keeps the task epoch across deletion; never reset that history."
-msgstr "The GPIO profile requires cold zero-initialization and keeps the task epoch across deletion; never reset that history."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Complete caller-owned protected task metadata."
+msgstr "Complete caller-owned protected task metadata."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"Zero-initialize in privileged RAM before first start. The TCB includes the "
+"real port context and protected stack. One privileged lifecycle owner "
+"serializes start/delete."
+msgstr ""
+"Zero-initialize in privileged RAM before first start. The TCB includes the "
+"real port context and protected stack. One privileged lifecycle owner "
+"serializes start/delete."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"The GPIO profile requires cold zero-initialization and keeps the task epoch "
+"across deletion; never reset that history."
+msgstr ""
+"The GPIO profile requires cold zero-initialization and keeps the task epoch "
+"across deletion; never reset that history."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid "Immutable creation inputs, borrowed for this call only."
+msgstr "Immutable creation inputs, borrowed for this call only."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:50
+msgid ""
+"The entry must be explicit user code and must not return. Stack and context "
+"data remain borrowed until owner deletion; regions never include kernel RAM,"
+" code or MMIO. Context must be contained in the user stack, user flash or "
+"mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable "
+"reserved linker region; names are copied cold."
+msgstr ""
+"The entry must be explicit user code and must not return. Stack and context "
+"data remain borrowed until owner deletion; regions never include kernel RAM,"
+" code or MMIO. Context must be contained in the user stack, user flash or "
+"mapped data. Names terminate within configMAX_TASK_NAME_LEN in a readable "
+"reserved linker region; names are copied cold."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:56
 msgid "freertos_mpu_gpio.h"
 msgstr "freertos_mpu_gpio.h"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "One protected-task scalar GPIO WRITE authority."
 msgstr "One protected-task scalar GPIO WRITE authority."
 
-msgid "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
-msgstr "Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  Copyright (c) 2026 Nexus Team"
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  "
+"Copyright (c) 2026 Nexus Team"
+msgstr ""
+"Author  Nexus Team   Version  1.0.0   Date  2026-10-20   Copyright  "
+"Copyright (c) 2026 Nexus Team"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "2026-10-20"
 msgstr "2026-10-20"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Open the fixed grant for its exact live protected task."
 msgstr "Open the fixed grant for its exact live protected task."
 
-msgid "Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK must be zero, except the selected port's bootstrap BASEPRI before scheduler start. PRIMASK is saved and restored. This operation pins task deletion until join."
-msgstr "Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK must be zero, except the selected port's bootstrap BASEPRI before scheduler start. PRIMASK is saved and restored. This operation pins task deletion until join."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK "
+"must be zero, except the selected port's bootstrap BASEPRI before scheduler "
+"start. PRIMASK is saved and restored. This operation pins task deletion "
+"until join."
+msgstr ""
+"Privileged Thread; scheduler running or not yet started. BASEPRI/FAULTMASK "
+"must be zero, except the selected port's bootstrap BASEPRI before scheduler "
+"start. PRIMASK is saved and restored. This operation pins task deletion "
+"until join."
 
-msgid "SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
-msgstr "SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
+msgstr ""
+"SUCCESS or INVALID/CONTEXT/STATE/BUSY. Rejection leaves no partial pin."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Revoke further calls without deleting or stopping the GPIO."
 msgstr "Revoke further calls without deleting or stopping the GPIO."
 
-msgid "The same privileged lifecycle owner serializes open/close/ join and task start/delete. NMI/HardFault never access this authority. Incoming interrupt masks are preserved."
-msgstr "The same privileged lifecycle owner serializes open/close/ join and task start/delete. NMI/HardFault never access this authority. Incoming interrupt masks are preserved."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"The same privileged lifecycle owner serializes open/close/ join and task "
+"start/delete. NMI/HardFault never access this authority. Incoming interrupt "
+"masks are preserved."
+msgstr ""
+"The same privileged lifecycle owner serializes open/close/ join and task "
+"start/delete. NMI/HardFault never access this authority. Incoming interrupt "
+"masks are preserved."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "SUCCESS, INVALID, CONTEXT or STATE; preserves all pins."
 msgstr "SUCCESS, INVALID, CONTEXT or STATE; preserves all pins."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Join a closed authority before task deletion or GPIO stop."
 msgstr "Join a closed authority before task deletion or GPIO stop."
 
-msgid "The single-core saved-mask boundary excludes every active scalar effect. Join detaches its task pin before returning; it does not delete the task or reset its lifetime epoch."
-msgstr "The single-core saved-mask boundary excludes every active scalar effect. Join detaches its task pin before returning; it does not delete the task or reset its lifetime epoch."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"The single-core saved-mask boundary excludes every active scalar effect. "
+"Join detaches its task pin before returning; it does not delete the task or "
+"reset its lifetime epoch."
+msgstr ""
+"The single-core saved-mask boundary excludes every active scalar effect. "
+"Join detaches its task pin before returning; it does not delete the task or "
+"reset its lifetime epoch."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "SUCCESS detaches the pin; INVALID/CONTEXT/STATE retain it."
 msgstr "SUCCESS detaches the pin; INVALID/CONTEXT/STATE retain it."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Variables"
 msgstr "Variables"
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Immutable WRITE grant in privileged Flash."
 msgstr "Immutable WRITE grant in privileged Flash."
 
-msgid "port_slot addresses the readonly generated nx_binding_led pointer. The initialized exact GPIOC PC7 face, operations and provider state outlive an open authority through successful join. The sole lifecycle owner does not stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping is granted."
-msgstr "port_slot addresses the readonly generated nx_binding_led pointer. The initialized exact GPIOC PC7 face, operations and provider state outlive an open authority through successful join. The sole lifecycle owner does not stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping is granted."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"port_slot addresses the readonly generated nx_binding_led pointer. The "
+"initialized exact GPIOC PC7 face, operations and provider state outlive an "
+"open authority through successful join. The sole lifecycle owner does not "
+"stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping"
+" is granted."
+msgstr ""
+"port_slot addresses the readonly generated nx_binding_led pointer. The "
+"initialized exact GPIOC PC7 face, operations and provider state outlive an "
+"open authority through successful join. The sole lifecycle owner does not "
+"stop or reconfigure that GPIO. No READ, toggle, pointer-copy or MMIO mapping"
+" is granted."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Caller-owned protected authority; zero only at cold startup."
 msgstr "Caller-owned protected authority; zero only at cold startup."
 
-msgid "Treat all fields as private. Join detaches the captured task epoch, without resetting the bound task's epoch history. Storage remains valid for the linked binding's entire lifetime, including rejection and closed states."
-msgstr "Treat all fields as private. Join detaches the captured task epoch, without resetting the bound task's epoch history. Storage remains valid for the linked binding's entire lifetime, including rejection and closed states."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Treat all fields as private. Join detaches the captured task epoch, without "
+"resetting the bound task's epoch history. Storage remains valid for the "
+"linked binding's entire lifetime, including rejection and closed states."
+msgstr ""
+"Treat all fields as private. Join detaches the captured task epoch, without "
+"resetting the bound task's epoch history. Storage remains valid for the "
+"linked binding's entire lifetime, including rejection and closed states."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "One immutable assembly binding, in privileged Flash."
 msgstr "One immutable assembly binding, in privileged Flash."
 
-msgid "Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are disjoint privileged RAM; grant is privileged Flash. User arguments never select these objects."
-msgstr "Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are disjoint privileged RAM; grant is privileged Flash. User arguments never select these objects."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
+msgid ""
+"Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are"
+" disjoint privileged RAM; grant is privileged Flash. User arguments never "
+"select these objects."
+msgstr ""
+"Define exactly one nx_freertos_mpu_gpio_binding symbol. Control and task are"
+" disjoint privileged RAM; grant is privileged Flash. User arguments never "
+"select these objects."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:58
 msgid "Keep the task epoch after deletion. Initialize only at cold startup."
 msgstr "Keep the task epoch after deletion. Initialize only at cold startup."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:64
+msgid "freertos_stack.h"
+msgstr "freertos_stack.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "Optional bounded task stack paint snapshot."
+msgstr "Optional bounded task stack paint snapshot."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "Copy bounded stack paint facts using actual kernel identity."
+msgstr "Copy bounded stack paint facts using actual kernel identity."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid ""
+"Privileged unmasked running Thread; task stack quiescent throughout the "
+"scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies "
+"TCB/stack identity, not size. The original capacity is a caller contract. No"
+" task suspend, interrupt mask, allocation or live painting is performed. "
+"Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked"
+" kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. "
+"The POSIX kernel port uses a separate pthread execution stack; its query is "
+"not an MCU or Linux execution-stack peak measurement."
+msgstr ""
+"Privileged unmasked running Thread; task stack quiescent throughout the "
+"scan. Available only with NEXUS_OS_TRACE. xTaskGetStaticBuffers verifies "
+"TCB/stack identity, not size. The original capacity is a caller contract. No"
+" task suspend, interrupt mask, allocation or live painting is performed. "
+"Worst-case work is words*sizeof(StackType_t) byte reads. Paint is the locked"
+" kernel's 0xA5. Untouched/touched bytes do not prove physical stack peaks. "
+"The POSIX kernel port uses a separate pthread execution stack; its query is "
+"not an MCU or Linux execution-stack peak measurement."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "[in] Exact original TCB, stack and capacity, all live."
+msgstr "[in] Exact original TCB, stack and capacity, all live."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "[out] Distinct output, unchanged on rejection."
+msgstr "[out] Distinct output, unchanged on rejection."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
+msgstr "SUCCESS, INVALID, CONTEXT or STATE for a binding mismatch."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid "Exact static task facts supplied at original creation."
+msgstr "Exact static task facts supplied at original creation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:66
+msgid ""
+"The caller retains all storage, excludes delete/join/discard and never "
+"replaces the live binding. This is not a registry."
+msgstr ""
+"The caller retains all storage, excludes delete/join/discard and never "
+"replaces the live binding. This is not a registry."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:72
+msgid "freertos_user.h"
+msgstr "freertos_user.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Narrow pointer-free services for MPU-isolated user tasks."
+msgstr "Narrow pointer-free services for MPU-isolated user tasks."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Defines"
+msgstr "Defines"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Explicitly reviewed unprivileged executable code section."
+msgstr "Explicitly reviewed unprivileged executable code section."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Explicit user RAM, separate from kernel and provider state."
+msgstr "Explicit user RAM, separate from kernel and provider state."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "Explicit zero-initialized user storage in its reserved RAM span."
 msgstr "Explicit zero-initialized user storage in its reserved RAM span."
 
-msgid "Thread-only MPU profile service, distinct from Core time. No object handle or pointer crosses this service."
-msgstr "Thread-only MPU profile service, distinct from Core time. No object handle or pointer crosses this service."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Trusted static task metadata placed in protected kernel RAM."
+msgstr "Trusted static task metadata placed in protected kernel RAM."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Delay the calling user task through the real MPU SVC."
+msgstr "Delay the calling user task through the real MPU SVC."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid ""
+"Thread only with a running scheduler. No handle or pointer crosses the "
+"boundary. This is not a microsecond deadline."
+msgstr ""
+"Thread only with a running scheduler. No handle or pointer crosses the "
+"boundary. This is not a microsecond deadline."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "[in] Relative kernel ticks; zero requests rescheduling."
+msgstr "[in] Relative kernel ticks; zero requests rescheduling."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Read the kernel's wrapping 32-bit tick counter through SVC."
+msgstr "Read the kernel's wrapping 32-bit tick counter through SVC."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid ""
+"Thread-only MPU profile service, distinct from Core time. No object handle "
+"or pointer crosses this service."
+msgstr ""
+"Thread-only MPU profile service, distinct from Core time. No object handle "
+"or pointer crosses this service."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid "Current kernel tick count in the selected OS clock domain."
+msgstr "Current kernel tick count in the selected OS clock domain."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "Write the current protected task's one static GPIO grant."
 msgstr "Write the current protected task's one static GPIO grant."
 
-msgid "Thread only with a running scheduler. Unknown identifiers and out-of-grant bits return PERMISSION; overlapping or zero masks return INVALID. No user MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A closed or stale task incarnation performs no GPIO write."
-msgstr "Thread only with a running scheduler. Unknown identifiers and out-of-grant bits return PERMISSION; overlapping or zero masks return INVALID. No user MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A closed or stale task incarnation performs no GPIO write."
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
+msgid ""
+"Thread only with a running scheduler. Unknown identifiers and out-of-grant "
+"bits return PERMISSION; overlapping or zero masks return INVALID. No user "
+"MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A"
+" closed or stale task incarnation performs no GPIO write."
+msgstr ""
+"Thread only with a running scheduler. Unknown identifiers and out-of-grant "
+"bits return PERMISSION; overlapping or zero masks return INVALID. No user "
+"MMIO mapping, READ, toggle, OS wait, heap or pointer borrow is introduced. A"
+" closed or stale task incarnation performs no GPIO write."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "[in] Exact assembly-local grant identifier, no pointer."
 msgstr "[in] Exact assembly-local grant identifier, no pointer."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "[in] Granted bits to set, disjoint from reset_mask."
 msgstr "[in] Granted bits to set, disjoint from reset_mask."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "[in] Granted bits to reset."
 msgstr "[in] Granted bits to reset."
 
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:74
 msgid "Scalar SUCCESS or INVALID/PERMISSION/STATE/CONTEXT."
 msgstr "Scalar SUCCESS or INVALID/PERMISSION/STATE/CONTEXT."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:80
+msgid "lowpower.h"
+msgstr "lowpower.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Explicit continuous-clock tickless timer port."
+msgstr "Explicit continuous-clock tickless timer port."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Bounded late alarm catch-up; larger delays violate the timer port."
+msgstr "Bounded late alarm catch-up; larger delays violate the timer port."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Return the explicitly selected continuous timer port."
+msgstr "Return the explicitly selected continuous timer port."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid ""
+"A maintained SoC binding or application implementation overrides the weak "
+"NULL default. The port and context remain live throughout the scheduler; no "
+"runtime rebinding, hidden pool or worker is provided. Absence of a port "
+"never stops ticks or sleeps."
+msgstr ""
+"A maintained SoC binding or application implementation overrides the weak "
+"NULL default. The port and context remain live throughout the scheduler; no "
+"runtime rebinding, hidden pool or worker is provided. Absence of a port "
+"never stops ticks or sleeps."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Stable port or NULL to leave normal periodic ticking."
+msgstr "Stable port or NULL to leave normal periodic ticking."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Kernel tickless hook with measured phase preservation."
+msgstr "Kernel tickless hook with measured phase preservation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid ""
+"Called only by Idle with scheduler suspended. Uses reviewed masked shallow "
+"WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The "
+"configured tick rate must divide 1000000 exactly. The final kernel readiness"
+" check precedes tick pause; a rejected pause makes no changes. Default "
+"profiles do not call this hook. HIL must verify the concrete timer, clock "
+"continuity and actual wake latency."
+msgstr ""
+"Called only by Idle with scheduler suspended. Uses reviewed masked shallow "
+"WFI, exact saved PRIMASK restoration and bounded pended-tick catch-up. The "
+"configured tick rate must divide 1000000 exactly. The final kernel readiness"
+" check precedes tick pause; a rejected pause makes no changes. Default "
+"profiles do not call this hook. HIL must verify the concrete timer, clock "
+"continuity and actual wake latency."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "[in] Kernel's bounded next-unblock window."
+msgstr "[in] Kernel's bounded next-unblock window."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Stopped-tick epoch with the concrete port's declared precision."
+msgstr "Stopped-tick epoch with the concrete port's declared precision."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid "Caller-owned, immutable tickless timer implementation."
+msgstr "Caller-owned, immutable tickless timer implementation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:82
+msgid ""
+"All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler "
+"suspended. They are bounded, never block or call kernel functions. "
+"pause_tick atomically stops the periodic tick and snapshots elapsed phase in"
+" its current tick period; a pending tick is rejected without effects. "
+"SUCCESS borrows the timer until resume_tick. now_us is the same monotonic "
+"clock as snapshot, continuous during shallow sleep. arm_deadline programs an"
+" enabled IRQ wake source; rejection retains no alarm. disarm removes only "
+"that alarm. resume_tick restores the periodic source with its next expiry at"
+" the supplied absolute clock instant, preserving phase within its declared "
+"quantization and sampling bound rather than adding callback latency to every"
+" tick. It must not publish an already accounted tick. The alarm wakes by "
+"deadline; at most eight extra ticks of latency may be caught up. Reversed "
+"clocks or larger latency fail stop. This does not configure clocks, NVIC, "
+"SCR or a board timer."
+msgstr ""
+"All methods run in privileged Idle Thread mode with PRIMASK=1 and scheduler "
+"suspended. They are bounded, never block or call kernel functions. "
+"pause_tick atomically stops the periodic tick and snapshots elapsed phase in"
+" its current tick period; a pending tick is rejected without effects. "
+"SUCCESS borrows the timer until resume_tick. now_us is the same monotonic "
+"clock as snapshot, continuous during shallow sleep. arm_deadline programs an"
+" enabled IRQ wake source; rejection retains no alarm. disarm removes only "
+"that alarm. resume_tick restores the periodic source with its next expiry at"
+" the supplied absolute clock instant, preserving phase within its declared "
+"quantization and sampling bound rather than adding callback latency to every"
+" tick. It must not publish an already accounted tick. The alarm wakes by "
+"deadline; at most eight extra ticks of latency may be caught up. Reversed "
+"clocks or larger latency fail stop. This does not configure clocks, NVIC, "
+"SCR or a board timer."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:88
+msgid "native.h"
+msgstr "native.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Explicit POSIX notification, queue and task storage."
+msgstr "Explicit POSIX notification, queue and task storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Read POSIX monotonic microseconds."
+msgstr "Read POSIX monotonic microseconds."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Clock value; clock_gettime failure is process-fatal"
+msgstr "Clock value; clock_gettime failure is process-fatal"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Initialize a notification in unused caller storage."
+msgstr "Initialize a notification in unused caller storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Task context; POSIX signal handlers are unsupported."
+msgstr "Task context; POSIX signal handlers are unsupported."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] Storage kept alive through all publishers"
+msgstr "[out] Storage kept alive through all publishers"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or an initialization error"
+msgstr "NX_SUCCESS or an initialization error"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Bind a single-waiter latched notification port."
+msgstr "Bind a single-waiter latched notification port."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for "
+"untimed waiting"
+msgstr ""
+"Port using CLOCK_MONOTONIC absolute microseconds and NX_DEADLINE_NEVER for "
+"untimed waiting"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Destroy after external publisher quiescence."
+msgstr "Destroy after external publisher quiescence."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Stop and join publishers first. The check cannot authorize a future call to "
+"race destruction. No storage access is allowed afterward."
+msgstr ""
+"Stop and join publishers first. The check cannot authorize a future call to "
+"race destruction. No storage access is allowed afterward."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[inout] Live storage with no future publishers"
+msgstr "[inout] Live storage with no future publishers"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or BUSY when a waiter is still registered"
+msgstr "NX_SUCCESS or BUSY when a waiter is still registered"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Initialize an explicit bounded byte-copy queue."
+msgstr "Initialize an explicit bounded byte-copy queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Task context; caller keeps buffer until successful destroy."
+msgstr "Task context; caller keeps buffer until successful destroy."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] Unused caller storage"
+msgstr "[out] Unused caller storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Caller-owned byte buffer"
+msgstr "[in] Caller-owned byte buffer"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Number of items, greater than zero"
+msgstr "[in] Number of items, greater than zero"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Bytes per item, greater than zero"
+msgstr "[in] Bytes per item, greater than zero"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or invalid/initialization error"
+msgstr "NX_SUCCESS or invalid/initialization error"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Copy one item to the queue."
+msgstr "Copy one item to the queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Immediately available capacity is used even at an expired deadline. A finite"
+" deadline bounds waiting; spurious wakes never restart its budget. No item "
+"is retained on failure."
+msgstr ""
+"Immediately available capacity is used even at an expired deadline. A finite"
+" deadline bounds waiting; spurious wakes never restart its budget. No item "
+"is retained on failure."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] At least item_size bytes, borrowed during call only"
+msgstr "[in] At least item_size bytes, borrowed during call only"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
+msgstr "[in] Absolute CLOCK_MONOTONIC deadline or NX_DEADLINE_NEVER"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "SUCCESS, TIMEOUT, STATE (closed) or error"
+msgstr "SUCCESS, TIMEOUT, STATE (closed) or error"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Receive one item; closed queues can still be drained."
+msgstr "Receive one item; closed queues can still be drained."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"An immediately available item can be received at an expired deadline. On "
+"failure the output is unchanged. Closed queues return STATE only after "
+"existing items have been drained."
+msgstr ""
+"An immediately available item can be received at an expired deadline. On "
+"failure the output is unchanged. Closed queues return STATE only after "
+"existing items have been drained."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] At least item_size bytes; valid only on SUCCESS"
+msgstr "[out] At least item_size bytes; valid only on SUCCESS"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Reject sends and wake all waiting callers."
+msgstr "Reject sends and wake all waiting callers."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Task context; caller must join queue users before destroy."
+msgstr "Task context; caller must join queue users before destroy."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or invalid error"
+msgstr "NX_SUCCESS or invalid error"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Destroy quiesced and drained queue storage."
+msgstr "Destroy quiesced and drained queue storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[inout] Closed queue, no future users"
+msgstr "[inout] Closed queue, no future users"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or BUSY if users/items remain"
+msgstr "NX_SUCCESS or BUSY if users/items remain"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Start a task using the supplied host stack."
+msgstr "Start a task using the supplied host stack."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Task context. No default task, pool or hidden stack exists. POSIX library "
+"bookkeeping is host-runtime allocation, not MCU RAM evidence."
+msgstr ""
+"Task context. No default task, pool or hidden stack exists. POSIX library "
+"bookkeeping is host-runtime allocation, not MCU RAM evidence."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[out] Zero-initialized unused caller handle"
+msgstr "[out] Zero-initialized unused caller handle"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Aligned storage accepted by pthread_attr_setstack"
+msgstr "[in] Aligned storage accepted by pthread_attr_setstack"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Host stack size, at least PTHREAD_STACK_MIN"
+msgstr "[in] Host stack size, at least PTHREAD_STACK_MIN"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Returning bounded application entry"
+msgstr "[in] Returning bounded application entry"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[in] Entry context, kept alive until join"
+msgstr "[in] Entry context, kept alive until join"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS or invalid/start error"
+msgstr "NX_SUCCESS or invalid/start error"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Join after requesting cooperative application stop."
+msgstr "Join after requesting cooperative application stop."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"May block until entry returns. No forced cancellation. Caller may release "
+"context, handle and stack only after success. One external owner serializes "
+"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
+" are unsupported. Stop/join publishers before destroying their notification "
+"or queue storage."
+msgstr ""
+"May block until entry returns. No forced cancellation. Caller may release "
+"context, handle and stack only after success. One external owner serializes "
+"start/join; multiple simultaneous joiners and external pthread_cancel/detach"
+" are unsupported. Stop/join publishers before destroying their notification "
+"or queue storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "[inout] Started task; caller must not be the joined task"
+msgstr "[inout] Started task; caller must not be the joined task"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "NX_SUCCESS only after pthread_join confirms execution exit"
+msgstr "NX_SUCCESS only after pthread_join confirms execution exit"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Single waiter, multiple task publishers; fields are private."
+msgstr "Single waiter, multiple task publishers; fields are private."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Initialize/destroy have one external lifecycle owner. Stop and join all "
+"publishers and the waiter before destroy. External pthread_cancel of a "
+"caller blocked in these APIs is unsupported; use cooperative stop, publish "
+"and join."
+msgstr ""
+"Initialize/destroy have one external lifecycle owner. Stop and join all "
+"publishers and the waiter before destroy. External pthread_cancel of a "
+"caller blocked in these APIs is unsupported; use cooperative stop, publish "
+"and join."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Caller-sized queue storage; no heap or global object pool."
+msgstr "Caller-sized queue storage; no heap or global object pool."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"One lifecycle owner initializes, closes and destroys. Multiple "
+"producers/consumers are supported while live. External pthread_cancel of "
+"blocked users is unsupported."
+msgstr ""
+"One lifecycle owner initializes, closes and destroys. Multiple "
+"producers/consumers are supported while live. External pthread_cancel of "
+"blocked users is unsupported."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid "Explicit task handle; stack storage is supplied at start."
+msgstr "Explicit task handle; stack storage is supplied at start."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:90
+msgid ""
+"Start/join are serialized by one external lifecycle owner; there is one "
+"joiner. An entry may attempt a self-join, which returns BUSY. External "
+"cancellation and detachment are unsupported."
+msgstr ""
+"Start/join are serialized by one external lifecycle owner; there is one "
+"joiner. An entry may attempt a self-join, which returns BUSY. External "
+"cancellation and detachment are unsupported."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:96
+msgid "secure_context.h"
+msgstr "secure_context.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Caller-owned Secure context leases for a trusted NS kernel."
+msgstr "Caller-owned Secure context leases for a trusted NS kernel."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Minimum context capacity excludes the eight-byte ARM stack seal."
+msgstr "Minimum context capacity excludes the eight-byte ARM stack seal."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Secure-context integrity failures, distinct from normal rejection."
+msgstr "Secure-context integrity failures, distinct from normal rejection."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Prepare exact Secure storage for one trusted task identity."
+msgstr "Prepare exact Secure storage for one trusted task identity."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure privileged Thread startup/exclusive lifecycle owner. Both memory "
+"spans must be Secure, writable and disjoint. No NS task may run against this"
+" identity during prepare. Repeat prepare is rejected; epochs are never "
+"reset. No allocation, kernel operation or runtime registry is used."
+msgstr ""
+"Secure privileged Thread startup/exclusive lifecycle owner. Both memory "
+"spans must be Secure, writable and disjoint. No NS task may run against this"
+" identity during prepare. Repeat prepare is rejected; epochs are never "
+"reset. No allocation, kernel operation or runtime registry is used."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[out] Zero-initialized caller-owned Secure metadata."
+msgstr "[out] Zero-initialized caller-owned Secure metadata."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Eight-byte-aligned Secure writable stack allocation."
+msgstr "[in] Eight-byte-aligned Secure writable stack allocation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Whole allocation, including eight-byte upper seal."
+msgstr "[in] Whole allocation, including eight-byte upper seal."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Opaque NS task identity, never dereferenced here."
+msgstr "[in] Opaque NS task identity, never dereferenced here."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
+msgstr "SUCCESS, INVALID, CONTEXT, STATE or BUSY."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Rebind retired metadata while preserving its epoch history."
+msgstr "Rebind retired metadata while preserving its epoch history."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure lifecycle owner only after joining the previous task and stopping "
+"every observer. Existing stack is reused; stale handles remain invalid after"
+" the next allocation."
+msgstr ""
+"Secure lifecycle owner only after joining the previous task and stopping "
+"every observer. Existing stack is reused; stale handles remain invalid after"
+" the next allocation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[inout] Prepared, unleased and unloaded Secure metadata."
+msgstr "[inout] Prepared, unleased and unloaded Secure metadata."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] New trusted NS task identity."
+msgstr "[in] New trusted NS task identity."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Resolve a trusted, statically composed Secure task record."
+msgstr "Resolve a trusted, statically composed Secure task record."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure application overrides the weak NULL default with an immutable "
+"mapping. Called with both PRIMASK states held; never dereference an NS-"
+"provided metadata pointer, allocate, block, discover objects, call a kernel "
+"or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this "
+"mechanism does not authenticate an adversarial NS privileged kernel. NS "
+"Thread calls cannot spoof Handler origin."
+msgstr ""
+"Secure application overrides the weak NULL default with an immutable "
+"mapping. Called with both PRIMASK states held; never dereference an NS-"
+"provided metadata pointer, allocate, block, discover objects, call a kernel "
+"or mutate mappings. The NS kernel and its SVC/PendSV are trusted: this "
+"mechanism does not authenticate an adversarial NS privileged kernel. NS "
+"Thread calls cannot spoof Handler origin."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Opaque identity supplied by the trusted NS kernel."
+msgstr "[in] Opaque identity supplied by the trusted NS kernel."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Prepared caller-owned metadata, or NULL when unauthorized."
+msgstr "Prepared caller-owned metadata, or NULL when unauthorized."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Fail stop after a loaded Secure stack integrity failure."
+msgstr "Fail stop after a loaded Secure stack integrity failure."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Secure application may override to record/reset safely. Called with both "
+"masks held; must not return, block, call a kernel or release retained "
+"storage. Default holds masks and spins. No transport or product recovery "
+"policy is imposed."
+msgstr ""
+"Secure application may override to record/reset safely. Called with both "
+"masks held; must not return, block, call a kernel or release retained "
+"storage. Default holds masks and spins. No transport or product recovery "
+"policy is imposed."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "[in] Seal or stack invariant violation."
+msgstr "[in] Seal or stack invariant violation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid "Explicit Secure metadata, never stored in Nonsecure RAM."
+msgstr "Explicit Secure metadata, never stored in Nonsecure RAM."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:98
+msgid ""
+"Zero-initialize before prepare. Fields are mechanism-owned while prepared; "
+"applications cannot modify them. Metadata and stack remain alive until the "
+"task is joined, lease freed and no loaded context remains. Runtime Secure "
+"stack capacity is an application budget, not this port minimum."
+msgstr ""
+"Zero-initialize before prepare. Fields are mechanism-owned while prepared; "
+"applications cannot modify them. Metadata and stack remain alive until the "
+"task is joined, lease freed and no loaded context remains. Runtime Secure "
+"stack capacity is an application budget, not this port minimum."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:104
+msgid "threadx.h"
+msgstr "threadx.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Caller-owned ThreadX task, wait and byte queue services."
+msgstr "Caller-owned ThreadX task, wait and byte queue services."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Privileged, single-core, current-security-domain APIs. All controls start "
+"zeroed and remain adapter-owned while live. One external lifecycle owner "
+"serializes init/destroy and joins; publishers, queue callers and IRQ sources"
+" must quiesce before reclaiming storage. Runtime task operations require "
+"unmasked Thread mode and a running kernel. Actual bootstrap permits object "
+"init, task create/discard and wake; it does not permit blocking waits or "
+"queue operations. A manual mask, ISR or unsupported context returns CONTEXT "
+"before mutation. The byte queue's task threshold guard rejects foreign "
+"priority-zero time-sliced callers. Caller controls, stack ranges, full "
+"borrowed name/context objects, queue payloads, item buffers and waiters must"
+" be disjoint. Cold admission rejects known control/stack/payload overlap and"
+" name/context starting inside control or stack; unknown opaque extents "
+"remain the caller's responsibility. Never operate a closable queue through "
+"its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is "
+"an actual unbounded kernel wait. Timeout never revokes any accepted I/O "
+"borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are "
+"outside this backend scope."
+msgstr ""
+"Privileged, single-core, current-security-domain APIs. All controls start "
+"zeroed and remain adapter-owned while live. One external lifecycle owner "
+"serializes init/destroy and joins; publishers, queue callers and IRQ sources"
+" must quiesce before reclaiming storage. Runtime task operations require "
+"unmasked Thread mode and a running kernel. Actual bootstrap permits object "
+"init, task create/discard and wake; it does not permit blocking waits or "
+"queue operations. A manual mask, ISR or unsupported context returns CONTEXT "
+"before mutation. The byte queue's task threshold guard rejects foreign "
+"priority-zero time-sliced callers. Caller controls, stack ranges, full "
+"borrowed name/context objects, queue payloads, item buffers and waiters must"
+" be disjoint. Cold admission rejects known control/stack/payload overlap and"
+" name/context starting inside control or stack; unknown opaque extents "
+"remain the caller's responsibility. Never operate a closable queue through "
+"its raw inner queue. All deadlines use nx_time_now_us; NX_DEADLINE_NEVER is "
+"an actual unbounded kernel wait. Timeout never revokes any accepted I/O "
+"borrow. MPU/TZ isolation, tickless sleep and additional Cortex-M ports are "
+"outside this backend scope."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "One explicit caller latch per simultaneous close-aware operation."
+msgstr "One explicit caller latch per simultaneous close-aware operation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Explicit irreversible kernel entry owned by the product."
+msgstr "Explicit irreversible kernel entry owned by the product."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Privileged cold Thread/MSP, no live FP context or masks. Startup may create "
+"and discard unused static objects. After startup returns, the bootstrap "
+"scope is sealed. Only the trusted kernel may call adapter "
+"tx_application_define; it validates canonical privileged Thread context "
+"before the product callback. This is not a security isolation API. An "
+"unexpected kernel return invokes fail-stop and retains all effects; it never"
+" reopens bootstrap reclamation."
+msgstr ""
+"Privileged cold Thread/MSP, no live FP context or masks. Startup may create "
+"and discard unused static objects. After startup returns, the bootstrap "
+"scope is sealed. Only the trusted kernel may call adapter "
+"tx_application_define; it validates canonical privileged Thread context "
+"before the product callback. This is not a security isolation API. An "
+"unexpected kernel return invokes fail-stop and retains all effects; it never"
+" reopens bootstrap reclamation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Product initialization inside tx_application_define"
+msgstr "[in] Product initialization inside tx_application_define"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed through startup and kernel lifetime"
+msgstr "[in] Borrowed through startup and kernel lifetime"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "CONTEXT or INVALID before entry; successful entry never returns"
+msgstr "CONTEXT or INVALID before entry; successful entry never returns"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Product failure hook; default parks forever."
+msgstr "Product failure hook; default parks forever."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Actual fault context is not repaired or normalized; it may be masked, ISR or"
+" unprivileged. Do not assume a working kernel, clock, stack or permission to"
+" access a peripheral. The adapter observes the Core fault hook before this "
+"hook. Product owns separately reviewed safe output/reset actions. Returning "
+"does not authorize cleanup; the adapter parks."
+msgstr ""
+"Actual fault context is not repaired or normalized; it may be masked, ISR or"
+" unprivileged. Do not assume a working kernel, clock, stack or permission to"
+" access a peripheral. The adapter observes the Core fault hook before this "
+"hook. Product owns separately reviewed safe output/reset actions. Returning "
+"does not authorize cleanup; the adapter parks."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Context, permanent-entry or kernel-return failure"
+msgstr "[in] Context, permanent-entry or kernel-return failure"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Mandatory product hook only for explicit external Tick."
+msgstr "Mandatory product hook only for explicit external Tick."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer "
+"clock and IRQ ceiling; it must not change the platform's continuous "
+"monotonic clock. Missing hook fails linking. Failure enters retaining fail-"
+"stop."
+msgstr ""
+"Actual kernel bootstrap, privileged PRIMASK masked. Provider owns timer "
+"clock and IRQ ceiling; it must not change the platform's continuous "
+"monotonic clock. Missing hook fails linking. Failure enters retaining fail-"
+"stop."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Exact immutable resolved kernel frequency"
+msgstr "[in] Exact immutable resolved kernel frequency"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS after binding a real bounded periodic IRQ source"
+msgstr "SUCCESS after binding a real bounded periodic IRQ source"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Read-only configurable-IRQ and selected mask-policy gate."
+msgstr "Read-only configurable-IRQ and selected mask-policy gate."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Native has no hardware IRQ source and returns false."
+msgstr "Native has no hardware IRQ source and returns false."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "True only in a privileged unmasked reviewed external IRQ"
+msgstr "True only in a privileged unmasked reviewed external IRQ"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Initialize one binary latch in task or actual bootstrap."
+msgstr "Initialize one binary latch in task or actual bootstrap."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller control retained until destroy"
+msgstr "[inout] Zeroed caller control retained until destroy"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT or IO"
+msgstr "SUCCESS, INVALID, CONTEXT or IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Bind a sequence hint and one concurrent blocking waiter."
+msgstr "Bind a sequence hint and one concurrent blocking waiter."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by "
+"nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration "
+"precedes a changed sequence."
+msgstr ""
+"Binding/arm are reads. Wake supports task/bootstrap or an IRQ admitted by "
+"nx_threadx_isr_allowed. Wait is task-only; finite deadline expiration "
+"precedes a changed sequence."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live latch retained through every port user"
+msgstr "[inout] Live latch retained through every port user"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Wait face; empty face for null or non-live control"
+msgstr "Wait face; empty face for null or non-live control"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy only after all publishers and waiter quiesce."
+msgstr "Destroy only after all publishers and waiter quiesce."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller latch"
+msgstr "[inout] Live caller latch"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
+msgstr "SUCCESS, INVALID, CONTEXT, BUSY or IO; failure retains it"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Create a cooperatively returning task using exact storage."
+msgstr "Create a cooperatively returning task using exact storage."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"No adapter heap or worker. Name is borrowed, not copied. Linux uses its own "
+"pthread stack; the caller buffer only validates kernel metadata and is not a"
+" host stack budget. Higher-priority entries may run before start returns."
+msgstr ""
+"No adapter heap or worker. Name is borrowed, not copied. Linux uses its own "
+"pthread stack; the caller buffer only validates kernel metadata and is not a"
+" host stack budget. Higher-priority entries may run before start returns."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller TCB/control, retained until join/discard"
+msgstr "[inout] Zeroed caller TCB/control, retained until join/discard"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed immutable name, retained until reclamation"
+msgstr "[in] Borrowed immutable name, retained until reclamation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Eight-byte aligned caller storage"
+msgstr "[in] Eight-byte aligned caller storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Actual capacity, at least TX_MINIMUM_STACK"
+msgstr "[in] Actual capacity, at least TX_MINIMUM_STACK"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] ThreadX priority; smaller values run first"
+msgstr "[in] ThreadX priority; smaller values run first"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Returns only after application stop/drain"
+msgstr "[in] Returns only after application stop/drain"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed until successful join/discard"
+msgstr "[in] Borrowed until successful join/discard"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if "
+"reclamation cannot be established"
+msgstr ""
+"SUCCESS, INVALID, CONTEXT or IO; partial failure retains live control if "
+"reclamation cannot be established"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Join a cooperatively returned task and prove detachment."
+msgstr "Join a cooperatively returned task and prove detachment."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Self-join is rejected. Timeout retains task, borrowed name, stack and "
+"context. Completion hint alone never reclaims; successful real kernel "
+"deletion establishes detachment."
+msgstr ""
+"Self-join is rejected. Timeout retains task, borrowed name, stack and "
+"context. Completion hint alone never reclaims; successful real kernel "
+"deletion establishes detachment."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller task, one external joiner only"
+msgstr "[inout] Live caller task, one external joiner only"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
+msgstr "[in] Absolute Core deadline or NX_DEADLINE_NEVER"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
+msgstr "SUCCESS, INVALID, CONTEXT, TIMEOUT or IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Discard an unused task only inside actual bootstrap."
+msgstr "Discard an unused task only inside actual bootstrap."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "This is prestart rollback, never runtime cancellation."
+msgstr "This is prestart rollback, never runtime cancellation."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live task whose entry has never begun"
+msgstr "[inout] Live task whose entry has never begun"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
+msgstr "SUCCESS, INVALID, CONTEXT or IO; failure retains storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Start a permanent task without a completion latch."
+msgstr "Start a permanent task without a completion latch."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Eight-byte stack alignment; failure can retain live state."
+msgstr "Eight-byte stack alignment; failure can retain live state."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller control, retained until reset"
+msgstr "[inout] Zeroed caller control, retained until reset"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed immutable name, retained until reset"
+msgstr "[in] Borrowed immutable name, retained until reset"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Aligned caller buffer, retained until reset"
+msgstr "[in] Aligned caller buffer, retained until reset"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Smaller ThreadX priority values run first"
+msgstr "[in] Smaller ThreadX priority values run first"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Never returns; return invokes retaining fail-stop"
+msgstr "[in] Never returns; return invokes retaining fail-stop"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Borrowed until reset"
+msgstr "[in] Borrowed until reset"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Initialize an exact arbitrary-byte bounded queue."
+msgstr "Initialize an exact arbitrary-byte bounded queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Caller payload storage retained until destroy"
+msgstr "[in] Caller payload storage retained until destroy"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Exact depth multiplied by item_size"
+msgstr "[in] Exact depth multiplied by item_size"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
+msgstr "[in] Positive bounded capacity, below TX_WAIT_FOREVER"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive byte count, without word-size narrowing"
+msgstr "[in] Positive byte count, without word-size narrowing"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Task-only send; immediate readiness wins over expiration."
+msgstr "Task-only send; immediate readiness wins over expiration."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live queue retained throughout the operation"
+msgstr "[inout] Live queue retained throughout the operation"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Exactly item_size readable bytes borrowed until return"
+msgstr "[in] Exactly item_size readable bytes borrowed until return"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
+msgstr "SUCCESS, INVALID, CONTEXT, TIMEOUT, OVERFLOW or IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Task-only receive; output changes only on SUCCESS."
+msgstr "Task-only receive; output changes only on SUCCESS."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[out] Exactly item_size writable bytes borrowed until return"
+msgstr "[out] Exactly item_size writable bytes borrowed until return"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy a drained queue after every caller quiesces."
+msgstr "Destroy a drained queue after every caller quiesces."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller control and storage"
+msgstr "[inout] Live caller control and storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
+msgstr "SUCCESS, INVALID, CONTEXT or BUSY; failure retains storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Initialize one explicit close-aware operation latch."
+msgstr "Initialize one explicit close-aware operation latch."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Zeroed caller storage retained until waiter destroy"
+msgstr "[inout] Zeroed caller storage retained until waiter destroy"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy inactive waiter after its operation has returned."
+msgstr "Destroy inactive waiter after its operation has returned."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live caller latch with no concurrent users"
+msgstr "[inout] Live caller latch with no concurrent users"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID, CONTEXT, BUSY or IO"
+msgstr "SUCCESS, INVALID, CONTEXT, BUSY or IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Add explicit bounded close broadcast to a byte queue."
+msgstr "Add explicit bounded close broadcast to a byte queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid ""
+"Payload size and maximum_waiters bound task scheduling pause; the entire "
+"copy/broadcast does not mask interrupts."
+msgstr ""
+"Payload size and maximum_waiters bound task scheduling pause; the entire "
+"copy/broadcast does not mask interrupts."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive capacity below TX_WAIT_FOREVER"
+msgstr "[in] Positive capacity below TX_WAIT_FOREVER"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive exact payload byte count"
+msgstr "[in] Positive exact payload byte count"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[in] Positive maximum simultaneous operations"
+msgstr "[in] Positive maximum simultaneous operations"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Reject sends, wake registered waiters, retain queued items."
+msgstr "Reject sends, wake registered waiters, retain queued items."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live close-aware queue"
+msgstr "[inout] Live close-aware queue"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, INVALID or CONTEXT; close is idempotent"
+msgstr "SUCCESS, INVALID or CONTEXT; close is idempotent"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Send with immediate close wake and explicit admission."
+msgstr "Send with immediate close wake and explicit admission."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "A closed queue rejects sends without changing payload."
+msgstr "A closed queue rejects sends without changing payload."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live exclusive latch for this simultaneous call"
+msgstr "[inout] Live exclusive latch for this simultaneous call"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
+msgstr "SUCCESS, CANCELLED, TIMEOUT, BUSY, INVALID, CONTEXT or IO"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Receive and drain previously queued items after close."
+msgstr "Receive and drain previously queued items after close."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Closed and empty returns CANCELLED; failure leaves output."
+msgstr "Closed and empty returns CANCELLED; failure leaves output."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Destroy only a closed, drained and quiesced queue."
+msgstr "Destroy only a closed, drained and quiesced queue."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "[inout] Live control and its borrowed payload storage"
+msgstr "[inout] Live control and its borrowed payload storage"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "One binary latch; publishers quiesce before destruction."
+msgstr "One binary latch; publishers quiesce before destruction."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Returning task retains all storage until external successful join."
+msgstr "Returning task retains all storage until external successful join."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Permanent task has no completion latch, join or destroy."
+msgstr "Permanent task has no completion latch, join or destroy."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Exact arbitrary byte items; no native word-size narrowing."
+msgstr "Exact arbitrary byte items; no native word-size narrowing."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:106
+msgid "Optional bounded close broadcast; registry is task-only."
+msgstr "Optional bounded close broadcast; registry is task-only."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:112
+msgid "tick.h"
+msgstr "tick.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Explicit external Tick and diagnostic counter contracts."
+msgstr "Explicit external Tick and diagnostic counter contracts."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Applications implement these symbols only when the authored OS policy "
+"enables them. No weak timer/counter fallback is supplied. The platform never"
+" invents timer wiring."
+msgstr ""
+"Applications implement these symbols only when the authored OS policy "
+"enables them. No weak timer/counter fallback is supplied. The platform never"
+" invents timer wiring."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Configure the application's selected kernel Tick source."
+msgstr "Configure the application's selected kernel Tick source."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Scheduler startup calls this in its canonical masked, privileged context. "
+"Configure a periodic interrupt, clear pending state and route it to the "
+"selected kernel Tick handler at its validated priority. Do not start tasks "
+"here. Hardware clock and routing remain application/SoC-owned."
+msgstr ""
+"Scheduler startup calls this in its canonical masked, privileged context. "
+"Configure a periodic interrupt, clear pending state and route it to the "
+"selected kernel Tick handler at its validated priority. Do not start tasks "
+"here. Hardware clock and routing remain application/SoC-owned."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "[in] Exact authored Tick frequency in hertz"
+msgstr "[in] Exact authored Tick frequency in hertz"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Start the explicitly selected diagnostic counter."
+msgstr "Start the explicitly selected diagnostic counter."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Called during scheduler startup. Counter initialization must be bounded, "
+"allocation-free and safe in the startup mask."
+msgstr ""
+"Called during scheduler startup. Counter initialization must be bounded, "
+"allocation-free and safe in the startup mask."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Read the diagnostic counter without blocking."
+msgstr "Read the diagnostic counter without blocking."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid ""
+"Called by the kernel during context switches. It must be bounded, "
+"allocation-free and safe in interrupt/critical context. Configure a "
+"frequency above Tick frequency and account for wrapping when interpreting "
+"recorded totals."
+msgstr ""
+"Called by the kernel during context switches. It must be bounded, "
+"allocation-free and safe in interrupt/critical context. Configure a "
+"frequency above Tick frequency and account for wrapping when interpreting "
+"recorded totals."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:114
+msgid "Monotonic modulo-32-bit counter in application-defined units"
+msgstr "Monotonic modulo-32-bit counter in application-defined units"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:120
+msgid "wait.h"
+msgstr "wait.h"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Optional sequence-latched waiting without hidden workers."
+msgstr "Optional sequence-latched waiting without hidden workers."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Wait for an authoritative caller predicate."
+msgstr "Wait for an authoritative caller predicate."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"Task context. No service, queue, callback dispatch or task creation is "
+"implicit. A shared-bus client must not use ready to service the controller; "
+"its execution owner must remain running during stop/drain."
+msgstr ""
+"Task context. No service, queue, callback dispatch or task creation is "
+"implicit. A shared-bus client must not use ready to service the controller; "
+"its execution owner must remain running during stop/drain."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "[in] Live single-waiter notification port"
+msgstr "[in] Live single-waiter notification port"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "[in] Bounded predicate, called in caller context"
+msgstr "[in] Bounded predicate, called in caller context"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "[in] Predicate context, retained for this call only"
+msgstr "[in] Predicate context, retained for this call only"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no "
+"wall-clock or relative values"
+msgstr ""
+"[in] Absolute deadline in port's clock domain, or NX_DEADLINE_NEVER; no "
+"wall-clock or relative values"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"NX_SUCCESS when predicate is observed true, including a final observation "
+"after TIMEOUT; otherwise port error"
+msgstr ""
+"NX_SUCCESS when predicate is observed true, including a final observation "
+"after TIMEOUT; otherwise port error"
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid "Single-waiter notification port."
+msgstr "Single-waiter notification port."
+
+#: ../../../../tmp/nexus-quality-20261019/docs/reference/api/os.md:122
+msgid ""
+"Caller owns storage and serializes arm/wait. Multiple wake publishers are "
+"permitted by each backend's documented context. Sequence is a hint; the "
+"predicate/request is authoritative. There must be fewer than 2^32 wakes "
+"between arm and recheck. All deadlines are absolute monotonic microseconds "
+"in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling "
+"timeout. Clocks must continue while waiting and never change domain; "
+"construct relative budgets with nx_deadline_after to avoid overflow. A "
+"timeout does not settle a request or release its buffers. Before destroy, "
+"stop and join every publisher and waiter; SETTLED alone does not prove "
+"notification storage is reclaimable. arm snapshots the sequence. wait must "
+"atomically observe a changed sequence or a latched wake, including a wake "
+"between the caller's recheck and sleeping. A changed sequence cannot bypass "
+"a finite deadline: wait checks expiry on every call and every return from "
+"blocking before reporting a hint. A nonblocking backend may return BUSY "
+"while unexpired. Only one owner may arm/wait; a second concurrent wait is "
+"outside the port contract even when a backend rejects it."
+msgstr ""
+"Caller owns storage and serializes arm/wait. Multiple wake publishers are "
+"permitted by each backend's documented context. Sequence is a hint; the "
+"predicate/request is authoritative. There must be fewer than 2^32 wakes "
+"between arm and recheck. All deadlines are absolute monotonic microseconds "
+"in the backend's clock domain, with NX_DEADLINE_NEVER explicitly disabling "
+"timeout. Clocks must continue while waiting and never change domain; "
+"construct relative budgets with nx_deadline_after to avoid overflow. A "
+"timeout does not settle a request or release its buffers. Before destroy, "
+"stop and join every publisher and waiter; SETTLED alone does not prove "
+"notification storage is reclaimable. arm snapshots the sequence. wait must "
+"atomically observe a changed sequence or a latched wake, including a wake "
+"between the caller's recheck and sleeping. A changed sequence cannot bypass "
+"a finite deadline: wait checks expiry on every call and every return from "
+"blocking before reporting a hint. A nonblocking backend may return BUSY "
+"while unexpired. Only one owner may arm/wait; a second concurrent wait is "
+"outside the port contract even when a backend rejects it."

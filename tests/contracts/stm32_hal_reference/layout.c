@@ -7,10 +7,12 @@
  * \copyright       Copyright (c) 2026 Nexus Team
  */
 #define NEXUS_STM32_MODEL
+#include "adapter.h"
 #include "stm32f407_dma.h"
-#include "stm32f4xx_hal.h"
 const unsigned char size_hal_uart_handle[sizeof(UART_HandleTypeDef)] = {0};
 const unsigned char size_hal_dma_handle[sizeof(DMA_HandleTypeDef)] = {0};
 const unsigned char size_nexus_uart_state[sizeof(nx_stm32_uart_state_t)] = {0};
 const unsigned char
     size_nexus_uart_dma_state[sizeof(nx_stm32_uart_dma_state_t)] = {0};
+const unsigned char size_hal_reference_adapter[sizeof(nx_hal_reference_t)] = {
+    0};
