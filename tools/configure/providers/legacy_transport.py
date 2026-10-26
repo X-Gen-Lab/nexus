@@ -1,9 +1,6 @@
 """Cold construction for reviewed F103/GD303 legacy transport instances."""
-from .common import Construction, fail, kernel_policy_constant
-try:
-    from ..memory import dma_regions
-except ImportError:
-    from memory import dma_regions
+from tools.configure.providers.common import Construction, fail, kernel_policy_constant
+from tools.configure.memory import dma_regions
 
 
 def dma_selected(result):

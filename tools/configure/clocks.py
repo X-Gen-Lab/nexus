@@ -1,10 +1,7 @@
 """One explicit clock input identity, separate from Board oscillator facts."""
 from collections.abc import Mapping
 
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers.common import fail, integer
 
 
 def normalize(profile):

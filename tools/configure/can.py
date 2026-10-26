@@ -4,14 +4,9 @@ One selected assembly owns its filter domain, exact receive rings and pin leases
 The emitted C calls the real common controller directly; no runtime registry,
 forwarding face, protocol retry policy or inferred transceiver is introduced.
 """
-try:
-    from .gpio_phase import withdraw_pin
-    from .providers.common import (Construction, fail, integer, sequence,
-                                   kernel_policy_constant)
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from providers.common import (Construction, fail, integer, sequence,
-                                  kernel_policy_constant)
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers.common import (Construction, fail, integer, sequence,
+                               kernel_policy_constant)
 
 FILTER_FIELDS = {"controller", "bank", "id", "mask", "format", "fifo",
                  "remote", "match_remote"}

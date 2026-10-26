@@ -118,6 +118,15 @@ class ProviderTemplateTests(unittest.TestCase):
             with self.assertRaisesRegex(EvidenceError, "before"):
                 source_contracts(root)
 
+    def test_shared_driver_header_cannot_shadow_a_private_template(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root, _, _ = self.tree(directory)
+            shadow = root / "drivers/probe/other_ip/probe_impl.h"
+            shadow.parent.mkdir(parents=True)
+            shadow.write_text(TEMPLATE)
+            with self.assertRaisesRegex(EvidenceError, "ambiguous"):
+                source_contracts(root)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,10 +1,6 @@
 """Compatibility metadata advertises names without broadening CPU admission."""
 import unittest
-try:
-    from . import metadata, threadx
-except ImportError:
-    import metadata
-    import threadx
+from tools.configure import metadata, threadx
 
 
 class BackendMetadataTest(unittest.TestCase):

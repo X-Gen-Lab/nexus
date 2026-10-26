@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import configure as gate
+from tools.configure import configure as gate
 
 
 class TomlConfigurationTests(unittest.TestCase):
@@ -212,7 +212,7 @@ model_bytes=128
                                    "--source-root", str(self.root)]), 1)
 
     def test_editor_schema_uses_resolver_field_model(self):
-        import authored
+        from tools.configure import authored
         schema = authored.editor_schema()
         gpio = schema["properties"]["gpio"]["additionalProperties"]
         uart = schema["properties"]["uart"]["additionalProperties"]

@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-import runtime
+from tools.configure import runtime
 
 
 ROOT = Path(__file__).resolve().parents[2]

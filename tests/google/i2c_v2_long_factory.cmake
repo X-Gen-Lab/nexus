@@ -70,11 +70,11 @@ foreach(long_family g474 h743 u575)
     nexus_google_test(${long_target}
         SOURCES i2c_v2_long_factory_test.cpp i2c_v2_long_factory_model.cpp
             "${long_bundle}/bindings.c" ${long_sources}
-            "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
+            "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${long_bundle}" "${NEXUS_SOURCE_DIR}/tests/contracts"
             "${NEXUS_SOC_SOURCE_${long_soc}}/private"
-            "${NEXUS_SOURCE_DIR}/soc/common")
+            "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
     nexus_stm32_official(${long_target} ${long_official})
     target_include_directories(${long_target} SYSTEM PRIVATE
         "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_${long_official}/Include"

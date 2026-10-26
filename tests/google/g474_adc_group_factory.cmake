@@ -37,7 +37,7 @@ foreach(profile regular-software regular-timer injected-software injected-timer)
         LIBRARIES Nexus::IO Nexus::Arch
         INCLUDES "${group_bundle}"
             "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
-            "${NEXUS_SOURCE_DIR}/soc/common"
+            "${NEXUS_SOURCE_DIR}/soc/stm32/common"
             "${NEXUS_SOURCE_DIR}/io/private"
             "${NEXUS_SOURCE_DIR}/tests/contracts")
     include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")

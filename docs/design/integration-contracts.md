@@ -14,7 +14,7 @@
 - 默认入口是外部工程的 `assembly.toml`。硬件输入分为 SoC、Board、assembly 三类，一次验证建立冻结 typed IR；`resolved.json` 是其权威 JSON 投影。
 - CMake 仍是代码目标和代码依赖的权威。生成器不生成组件依赖图、业务线程、产品 main 或调度策略。
 - 实例选择使用 TOML schema 2，SoC/Board 事实保持 JSON。工具只解析这一个装配输入；Kconfig、CMake cache 和旧生成头不形成平行配置权威。
-- 目录可采用 `core/ arch/ soc/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。
+- 目录可采用 `core/ arch/ soc/ drivers/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。
 - 未维护的能力不因 SDK 有宏、路由表有 AF 值、同系列有示例而自动可用。新路由、新 DMA 模式、新控制器分别接入。
 
 ## 2. 各类接入拥有的事实
@@ -44,6 +44,7 @@ soc/<vendor>/<family>/
   soc.json                 # 精确 SKU、内存、时钟与控制器事实
   routes.json              # 已复核路由及模式的有限 allowlist
   CMakeLists.txt           # 私有 SDK/provider 的显式目标依赖
+  configure/              # 家族能力、准入、构造与生命周期生成
   private/                 # 私有 SDK 接口与硬件实现
   ...                      # startup、controller、clock/IRQ、linker 实现
 ```
@@ -51,10 +52,17 @@ soc/<vendor>/<family>/
 family 目录可以复用代码，`soc.json` 仍分别定义 STM32F407VET6、STM32F407ZGT6、GD32F470ZGT6。型号、封装、Flash、SRAM 域和 IRQ 表不能被一个家族字符串代替。新增型号不等于已有所有 controller 都支持该型号。
 
 当前厂家目录为 `stm32` 与 `gd32`，例如 `soc/stm32/stm32f407` 和
-`soc/gd32/gd32f470`。`soc/common` 保留已核实的跨厂家寄存器协议算法；
-`soc/native/drivers` 实现独立主机模型。`source_directory` 由同一维护中的
+`soc/gd32/gd32f470`。已核实的共享 IP 算法位于 `drivers/<kind>/<ip>/`，由所选
+SoC target 私有选编；`soc/common` 保留跨厂家 SoC 协作合同，STM32 identity helper
+位于 `soc/stm32/common`。`soc/native/drivers` 实现独立主机模型。
+`source_directory` 由同一维护中的
 family descriptor 给出，配置仍使用原 family 标识；物理目录不构成第二份配置权威。
 CPU 实现按 ISA 位于 `arch/arm/cortex_m` 或 `arch/native`，公共头路径保持稳定。
+
+八个 provider 的生产配置模块随 SoC 放置；Native 使用 `soc/native/configure`。
+显式 provider map、共享 leaf 合同、通用解析、资源仲裁、typed IR 与原子 bundle
+仍在 `tools/configure`。配置测试位于 `tools/configure/tests/providers/<family>`。
+模块位置不增加运行时注册、转发、分配或任务，也不改变 CMake 的源码依赖权威。
 
 `routes.json` 每条记录至少绑定精确 SKU、controller、pin/AF、clock domain、IRQ、允许传输模式、允许 DMA route 和来源。可复用路由记录，但必须限定适用 SKU/封装。源资料复核与实板资格采用不同字段。
 

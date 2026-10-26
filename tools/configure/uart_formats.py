@@ -1,8 +1,5 @@
 """Reviewed byte frames and an independent nine-bit IRQ personality."""
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers.common import fail, integer
 
 
 DEFAULT = {"data_bits": 8, "parity": "none", "stop_bits": 1, "flow": "none"}

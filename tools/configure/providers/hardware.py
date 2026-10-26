@@ -7,7 +7,7 @@ it does not infer silicon capabilities or authorize additional Board routes.
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from .common import fail
+from tools.configure.providers.common import fail
 
 
 @dataclass(frozen=True)

@@ -43,7 +43,7 @@ except ImportError as error:
 ROOT_FILES = {"CMakeLists.txt", "LICENSE", "README.md", "AGENTS.md", ".gitmodules",
               ".clang-format", ".editorconfig", ".clang-format-dirs"}
 ROOT_DIRS = {"arch", "boards", "cmake", "dependencies", "core", "io", "os",
-             "components", "tools", "scripts", "soc"}
+             "components", "drivers", "tools", "scripts", "soc"}
 REQUIRED_DEPENDENCIES = tuple(item.path for item in SOURCE_DEPENDENCIES)
 CMSIS_CORE_DIRECTORY = "vendors/arm/CMSIS_6"
 CMSIS_CORE_REQUIRED_HEADERS = (
@@ -142,15 +142,8 @@ REQUIRED_FILES = (
     "cmake/platform/Runtime.cmake", "os/freertos/prepare_m7_integer.py",
     "tools/configure/providers/__init__.py",
     "tools/configure/providers/common.py",
-    "tools/configure/providers/native/__init__.py",
-    "tools/configure/providers/native/bindings.py",
-    "tools/configure/providers/native/emission.py",
-    "tools/configure/providers/stm32f407/__init__.py",
-    "tools/configure/providers/stm32f407/bindings.py",
-    "tools/configure/providers/stm32f407/emission.py",
-    "tools/configure/providers/gd32f470/__init__.py",
-    "tools/configure/providers/gd32f470/bindings.py",
-    "tools/configure/providers/gd32f470/emission.py",
+    "tools/__init__.py", "tools/configure/__init__.py",
+    "soc/__init__.py", "soc/stm32/__init__.py", "soc/gd32/__init__.py",
     "tools/configure/factory.py", "tools/configure/assemblies/native.toml",
     "tools/configure/assemblies/qiming-baremetal-uart-dma.toml",
     "tools/configure/assemblies/sky-baremetal.toml",
@@ -211,7 +204,7 @@ REQUIRED_FILES += (
     "soc/native/drivers/ethernet_frames.c", "soc/native/drivers/ethernet_frames.h",
     "soc/native/drivers/ethernet_frames_access.h")
 REQUIRED_FILES += (
-    "tools/configure/providers/stm32g474/adc_group.py",
+    "soc/stm32/stm32g474/configure/adc_group.py",
     "soc/stm32/stm32g474/reviews/adc-group.json",
     "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c")
 # Required payload identity is separate from CMake's production source graph.
@@ -294,11 +287,11 @@ REQUIRED_FILES += (
     "os/freertos/private/timebase_lowpower.h", "os/freertos/stack_snapshot.c",
     "os/freertos/include/nexus/os/freertos_stack.h",
     "os/threadx/private/irq_model.h", "os/threadx/private/m4_model.h",
-    "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h")
+    "drivers/i2c/i2c_v1_async/i2c_v1_async.c", "drivers/i2c/i2c_v1_async/i2c_v1_async.h")
 REQUIRED_FILES += tuple("core/include/nexus/core/" + name + ".h" for name in (
     "fault", "memory", "request", "request_observer", "stack_observation",
     "silicon", "status", "time"))
-REQUIRED_FILES += ("core/src/silicon.c", "soc/common/stm32_identity.h")
+REQUIRED_FILES += ("core/src/silicon.c", "soc/stm32/common/stm32_identity.h")
 REQUIRED_FILES += tuple("io/include/nexus/io/" + name + ".h" for name in (
     "adc", "adc_format", "adc_observer", "advanced_pwm", "can", "can_fd", "cycle_probe",
     "dma", "encoder",
@@ -422,8 +415,6 @@ REQUIRED_FILES += tuple("soc/stm32/stm32g474/" + name for name in (
     "private/stm32g474_system.h", "private/stm32g474_provider.h",
     "soc.json", "routes.json"))
 REQUIRED_FILES += ("boards/stm32g474re_hse24_reference/board.json",)
-REQUIRED_FILES += tuple("tools/configure/providers/stm32g474/" + name for name in (
-    "__init__.py", "bindings.py", "emission.py"))
 # The standalone Secure mechanism includes its complete private hardware port.
 REQUIRED_FILES += tuple("soc/stm32/stm32u575/" + name for name in (
     "security.c", "private/stm32u575_security.h",

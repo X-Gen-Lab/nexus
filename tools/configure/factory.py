@@ -1,18 +1,9 @@
 """Generate pure, typed static lookup without registration or construction."""
 
-try:
-    from .ir import ConfigurationIR
-    from . import io_traits, selected_contracts
-    from . import enhanced_endpoints
-    from . import stream_profiles, uart_formats, usb_profiles
-except ImportError:
-    from ir import ConfigurationIR
-    import io_traits
-    import selected_contracts
-    import enhanced_endpoints
-    import stream_profiles
-    import uart_formats
-    import usb_profiles
+from tools.configure.ir import ConfigurationIR
+from tools.configure import io_traits, selected_contracts
+from tools.configure import enhanced_endpoints
+from tools.configure import stream_profiles, uart_formats, usb_profiles
 
 FACTORY_ABI_EPOCH = 1
 

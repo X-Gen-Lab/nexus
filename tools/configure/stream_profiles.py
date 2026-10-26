@@ -4,10 +4,7 @@ Rate and delay inputs remain engineering assumptions. Reviewed provider modes
 own target count, replacement count and units; the actual runtime pool is still
 checked before the original provider may borrow it. No pool is generated here.
 """
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers.common import fail, integer
 
 
 FIELDS = frozenset(("max_units_per_second", "units_per_block", "blocks",

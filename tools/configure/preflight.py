@@ -6,14 +6,9 @@ and outside-assembly owners retain the explicit reset-like admission contract.
 """
 import re
 
-try:
-    from .providers.common import fail, owned_claims
-    from .providers import hardware
-    from . import gpio_phase
-except ImportError:
-    from providers.common import fail, owned_claims
-    from providers import hardware
-    import gpio_phase
+from tools.configure.providers.common import fail, owned_claims
+from tools.configure.providers import hardware
+from tools.configure import gpio_phase
 
 
 def _reject(condition, indent=4):

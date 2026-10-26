@@ -10,12 +10,8 @@ from dataclasses import dataclass, field
 import re
 from types import MappingProxyType
 
-try:
-    from . import selected_contracts
-    from .providers.common import fail, integer
-except ImportError:
-    import selected_contracts
-    from providers.common import fail, integer
+from tools.configure import selected_contracts
+from tools.configure.providers.common import fail, integer
 
 
 _KINDS = selected_contracts.FORMAT_KINDS

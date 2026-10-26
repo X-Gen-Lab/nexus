@@ -1,10 +1,7 @@
 """Nominal endpoint classes share controllers without interface casts."""
 from dataclasses import replace
 
-try:
-    from . import selected_contracts
-except ImportError:
-    import selected_contracts
+from tools.configure import selected_contracts
 
 DRIVERS = selected_contracts.ENDPOINT_DRIVERS
 

@@ -82,7 +82,7 @@ python tools/dev/dev.py docs check --full \
 
 结构图展示由生成器支持的按配置实例布局，不声称每块PCB均授权这些组合。同provider同模式实例共享readonly ops，各自context/state/storage独立。不同provider或模式可使用不同ops；调用方法接收本次context。controller和endpoint有独立factory命名空间，endpoint不冒充控制器。ID只在当前assembly有效，默认uint16_t typedef不提供语言级跨类防混用。
 
-依据：[typed factory生成](../../../tools/configure/factory.py)、[face/state装配](../../../tools/configure/bindings.py)、[SPI公开接口](../../../io/include/nexus/io/spi.h)、[Native provider](../../../tools/configure/providers/native/bindings.py)。
+依据：[typed factory生成](../../../tools/configure/factory.py)、[face/state装配](../../../tools/configure/bindings.py)、[SPI公开接口](../../../io/include/nexus/io/spi.h)、[Native provider](../../../soc/native/configure/bindings.py)。
 [可编辑DOT](factory-instances.dot)；实施关联：DOC-46。
 
 ## FIG-05 显式启动停机与失败撤回
@@ -302,7 +302,7 @@ Platform 首次准备构造一次，后续对已构造 owner 调用私有 start�
 [公共 RTC](../../../io/include/nexus/io/rtc.h)、
 [公共 LPTIM](../../../io/include/nexus/io/lptim.h)、
 [Native 实现](../../../soc/native/drivers/rtc_lptim.c)、
-[Native 装配](../../../tools/configure/providers/native/bindings.py)。
+[Native 装配](../../../soc/native/configure/bindings.py)。
 [可编辑 DOT](rtc-lptim-lifecycle.dot)；实施关联：IO-36。软件开发证据与 main／SDK／
 候选／实板资格分别判断，不能从该图或渲染成功推断。
 

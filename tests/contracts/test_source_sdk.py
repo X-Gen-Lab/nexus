@@ -345,12 +345,12 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "g474-adc-group-injected-timer.toml",
             "boards/g474-adc-group/board.json", "consumers/g474-adc-group.c")}
         required.update({
-            "tools/configure/providers/stm32g474/adc_group.py",
+            "soc/stm32/stm32g474/configure/adc_group.py",
             "soc/stm32/stm32g474/reviews/adc-group.json",
             "io/include/nexus/io/adc_group.h", "io/src/api/adc_group.c",
             "soc/stm32/stm32g474/private/stm32g474_adc_group.h",
             "soc/stm32/stm32g474/drivers/adc_group.c",
-            "soc/common/stm32_identity.h", "core/include/nexus/core/silicon.h",
+            "soc/stm32/common/stm32_identity.h", "core/include/nexus/core/silicon.h",
             "core/src/silicon.c"})
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
@@ -478,7 +478,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
             "io/include/nexus/io/can_fd.h", "io/include/nexus/io/pwm_adc.h",
             "io/src/api/can_fd.c", "io/src/api/pwm_adc.c", "io/private/can_fd_impl.h",
             "tools/configure/coupled_io.py",
-            "tools/configure/providers/stm32g474/coupled.py",
+            "soc/stm32/stm32g474/configure/coupled.py",
             "soc/stm32/stm32g474/drivers/fdcan.c",
             "soc/stm32/stm32g474/drivers/pwm_adc.c",
             "soc/stm32/stm32g474/private/stm32g474_fdcan.h",
@@ -494,7 +494,7 @@ class SourceSDKSelectionTests(unittest.TestCase):
                     "soc/stm32/stm32g474/private/stm32g474_pwm_adc.h"}
         self.assertTrue(required.issubset(set(descriptor.owned_payload)),
                         sorted(required - set(descriptor.owned_payload)))
-        self.assertIn("tools/configure/providers/stm32g474/coupled.py",
+        self.assertIn("soc/stm32/stm32g474/configure/coupled.py",
                       descriptor.configuration_modules)
 
     def test_build_policy_and_tool_module_closure_is_required(self):
@@ -874,9 +874,9 @@ class SourceSDKG4SelectionTests(unittest.TestCase):
             "soc/stm32/stm32g474/private/stm32g474_provider.h",
             "soc/stm32/stm32g474/soc.json", "soc/stm32/stm32g474/routes.json",
             "boards/stm32g474re_hse24_reference/board.json",
-            "tools/configure/providers/stm32g474/__init__.py",
-            "tools/configure/providers/stm32g474/bindings.py",
-            "tools/configure/providers/stm32g474/emission.py"}
+            "soc/stm32/stm32g474/configure/__init__.py",
+            "soc/stm32/stm32g474/configure/bindings.py",
+            "soc/stm32/stm32g474/configure/emission.py"}
         self.assertTrue(required.issubset(set(source_sdk.REQUIRED_FILES)),
                         sorted(required - set(source_sdk.REQUIRED_FILES)))
 
@@ -1797,9 +1797,9 @@ class SourceSDKTests(unittest.TestCase):
             "soc/stm32/stm32g474/private/stm32g474_provider.h",
             "soc/stm32/stm32g474/soc.json", "soc/stm32/stm32g474/routes.json",
             "boards/stm32g474re_hse24_reference/board.json",
-            "tools/configure/providers/stm32g474/__init__.py",
-            "tools/configure/providers/stm32g474/bindings.py",
-            "tools/configure/providers/stm32g474/emission.py")
+            "soc/stm32/stm32g474/configure/__init__.py",
+            "soc/stm32/stm32g474/configure/bindings.py",
+            "soc/stm32/stm32g474/configure/emission.py")
         for name in names:
             with self.subTest(name=name):
                 target = self.sdk / name

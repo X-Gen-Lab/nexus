@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 6c8396c78fcfda35a2a503d1dc8521afa8ab1d00f0018f7cbc285d17fe9d8fb8\n"
+"X-Nexus-Source-SHA256: adb88a2c4a7eb6ea4199a4e427a376782b52ae500d348d7a7c2295a9b91ee3b0\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/integration-contracts.md:1
 msgid "接入、资源装配与源码 SDK 合同"
@@ -93,16 +93,6 @@ msgstr ""
 "Instance selection uses TOML schema 2; SoC/Board facts remain JSON. Tools "
 "parse only that assembly input; Kconfig, CMake cache and old generated "
 "headers do not become parallel authorities."
-
-#: ../../../workspace/nexus-build-system-20261012/docs/design/integration-contracts.md:17
-msgid ""
-"目录可采用 `core/ arch/ soc/ io/ os/ components/ tools/ tests/`；Board 可位于独立 "
-"package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。"
-msgstr ""
-"Directories may follow `core/ arch/ soc/ io/ os/ components/ tools/ tests/`;"
-" Boards may be separate packages. Layer names describe responsibility "
-"without requiring each layer, port or object to occupy a separate "
-"translation unit."
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/integration-contracts.md:18
 msgid "未维护的能力不因 SDK 有宏、路由表有 AF 值、同系列有示例而自动可用。新路由、新 DMA 模式、新控制器分别接入。"
@@ -1421,23 +1411,6 @@ msgstr ""
 " pin databases, all SDK features, automatic topology solving and runtime "
 "discovery are not first-stage exit criteria."
 
-#: docs/design/integration-contracts.md:53
-msgid ""
-"当前厂家目录为 `stm32` 与 `gd32`，例如 `soc/stm32/stm32f407` 和 "
-"`soc/gd32/gd32f470`。`soc/common` 保留已核实的跨厂家寄存器协议算法； `soc/native/drivers` "
-"实现独立主机模型。`source_directory` 由同一维护中的 family descriptor 给出，配置仍使用原 family "
-"标识；物理目录不构成第二份配置权威。 CPU 实现按 ISA 位于 `arch/arm/cortex_m` 或 "
-"`arch/native`，公共头路径保持稳定。"
-msgstr ""
-"Current vendor directories are `stm32` and `gd32`, such as "
-"`soc/stm32/stm32f407` and `soc/gd32/gd32f470`. `soc/common` retains verified"
-" cross-vendor register-protocol algorithms; `soc/native/drivers` implements "
-"independent host models. The same maintained family descriptor supplies "
-"`source_directory`, while authored configuration retains the original family"
-" identifiers. Physical directories do not create a second configuration "
-"authority. CPU implementations are grouped by ISA under `arch/arm/cortex_m` "
-"or `arch/native`; public header paths remain stable."
-
 #: docs/design/integration-contracts.md:74
 msgid ""
 "Board 的晶振声明必须匹配已维护的固定时钟 profile。一个新的晶振数值不会自动 生成任意 PLL、电源、Flash wait-state "
@@ -1451,3 +1424,12 @@ msgstr ""
 "assemblies to select a new combination. Current software capability and "
 "physical frequency, supply and wake measurements are established separately;"
 " successful configuration parsing does not establish board qualification."
+
+msgid "目录可采用 `core/ arch/ soc/ drivers/ io/ os/ components/ tools/ tests/`；Board 可位于独立 package。层名说明职责，不要求每个层、端口或对象成为一个独立 translation unit。"
+msgstr "The directory layout may use `core/ arch/ soc/ drivers/ io/ os/ components/ tools/ tests/`; Boards may live in separate packages. Layer names describe responsibilities, not a requirement for every layer, port or object to become its own translation unit."
+
+msgid "当前厂家目录为 `stm32` 与 `gd32`，例如 `soc/stm32/stm32f407` 和 `soc/gd32/gd32f470`。已核实的共享 IP 算法位于 `drivers/<kind>/<ip>/`，由所选 SoC target 私有选编；`soc/common` 保留跨厂家 SoC 协作合同，STM32 identity helper 位于 `soc/stm32/common`。`soc/native/drivers` 实现独立主机模型。 `source_directory` 由同一维护中的 family descriptor 给出，配置仍使用原 family 标识；物理目录不构成第二份配置权威。 CPU 实现按 ISA 位于 `arch/arm/cortex_m` 或 `arch/native`，公共头路径保持稳定。"
+msgstr "The current vendor directories are `stm32` and `gd32`, for example `soc/stm32/stm32f407` and `soc/gd32/gd32f470`. Reviewed shared IP algorithms live in `drivers/<kind>/<ip>/` and are selected privately by the SoC target; `soc/common` retains cross-vendor SoC collaboration contracts, while STM32 identity helpers live in `soc/stm32/common`. `soc/native/drivers` implements independent host models. The same maintained family descriptor supplies `source_directory`; configuration still uses the original family identifier. Physical directories do not create a second configuration authority. CPU implementations follow their ISA under `arch/arm/cortex_m` or `arch/native`; public include paths stay stable."
+
+msgid "八个 provider 的生产配置模块随 SoC 放置；Native 使用 `soc/native/configure`。 显式 provider map、共享 leaf 合同、通用解析、资源仲裁、typed IR 与原子 bundle 仍在 `tools/configure`。配置测试位于 `tools/configure/tests/providers/<family>`。 模块位置不增加运行时注册、转发、分配或任务，也不改变 CMake 的源码依赖权威。"
+msgstr "Production configuration modules for the eight providers live with their SoC; Native uses `soc/native/configure`. The explicit provider map, shared leaf contracts, common parsing, resource arbitration, typed IR and atomic bundle remain in `tools/configure`. Configuration tests live in `tools/configure/tests/providers/<family>`. Module placement adds no runtime registration, forwarding, allocation or tasks, and preserves CMake as the source dependency authority."

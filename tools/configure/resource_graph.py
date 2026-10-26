@@ -11,10 +11,7 @@ from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 import re
 
-try:
-    from .providers.common import fail
-except ImportError:
-    from providers.common import fail
+from tools.configure.providers.common import fail
 
 
 def identifier(value, context):

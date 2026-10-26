@@ -5,8 +5,8 @@
  */
 #ifndef NX_GD32F303_TRANSPORT_H
 #define NX_GD32F303_TRANSPORT_H
-#include "../../../common/i2c_v1_async.h"
-#include "../../../common/uart_v1_channel_dma.h"
+#include "../../../../drivers/i2c/i2c_v1_async/i2c_v1_async.h"
+#include "../../../../drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h"
 #include "gd32f303_provider.h"
 #include "gd32f30x_dma.h"
 #include "gd32f30x_i2c.h"

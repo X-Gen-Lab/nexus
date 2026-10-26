@@ -19,7 +19,8 @@ MCU 实板 HIL 状态为 `not_executed`。
 CMake 负责源码依赖图；Kconfig 与 cache 宏不构成平行配置权威。
 
 源码按厂家分为 `soc/stm32/` 与 `soc/gd32/`，Arm 原语位于
-`arch/arm/cortex_m/`，Native 模型位于 `soc/native/drivers/`。公共头文件路径、
+`arch/arm/cortex_m/`，Native 模型位于 `soc/native/drivers/`。可复用 IP 算法位于
+`drivers/<kind>/<ip>/`，家族配置策略位于对应 SoC 的 `configure/`。公共头文件路径、
 CMake 目标名称及配置中的系列标识保持稳定。[源码相邻合同](docs/explanation/source-map.md)
 说明目录与所有权。新产品应使用生成的 `nexus_factory_strong.h`，取得按类别区分的
 强类型 factory 引用。
@@ -29,6 +30,7 @@ CMake 目标名称及配置中的系列标识保持稳定。[源码相邻合同]
 | Core | 结果、单调 deadline、请求借用和稳定 epoch |
 | Arch | 编译期 CPU 原语、掩码、屏障及可选 Cache／MPU／SAU |
 | SoC | 精确芯片内存、时钟、启动、IRQ／DMA 与私有控制器实现 |
+| Drivers | 经复核的可复用 IP 算法，由 SoC target 私有选编 |
 | Board | 复核接线、晶振、初始电平和明确未知项 |
 | I/O | 公共类型化操作合同，不暴露 provider／SDK 布局 |
 | 可选 OS／组件 | 调用方显式提供存储、窄端口和执行进度 |

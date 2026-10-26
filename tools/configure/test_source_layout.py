@@ -104,8 +104,10 @@ class SourceLayoutTests(unittest.TestCase):
                                 for name in (build / "sources").read_text(
                                     encoding="utf-8").splitlines()]
                     for kind in ("adc", "pwm", "flash"):
-                        engine = ROOT / "soc/common" / (
-                            "legacy_" + kind + ".c")
+                        device_class = "timer" if kind == "pwm" else kind
+                        engine = (ROOT / "drivers" / device_class /
+                                  ("legacy_" + kind) /
+                                  ("legacy_" + kind + ".c"))
                         self.assertEqual(selected.count(engine), 1,
                                          (family, kind, selected))
                     self.assertTrue(all(path.is_file() for path in selected))

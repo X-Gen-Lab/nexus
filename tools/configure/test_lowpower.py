@@ -1,7 +1,7 @@
 """Strict opt-in port selection without changing Tick or security policy."""
 import unittest
 
-import lowpower
+from tools.configure import lowpower
 
 
 class LowpowerPortTests(unittest.TestCase):

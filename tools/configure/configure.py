@@ -16,47 +16,21 @@ import subprocess
 import sys
 import tomllib
 
-try:
-    from . import cpu as cpu_profiles
-    from . import bundle, dependencies, sdk, i2s2
-    from . import resource_graph, trigger_graph, dma_topology
-    from .contracts import COMPONENTS
-    from . import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
-    from .providers import descriptor, maintained
-    from .selection import (validate_clock_profiles, resolve_interrupts,
-                            validate_selection)
-    from .providers.common import (ConfigurationError, cpu_abi, fail, integer,
-                                   mode_traits, route_dma,
-                                   sequence)
-except ImportError:
-    import cpu as cpu_profiles
-    import bundle
-    import dependencies
-    import sdk
-    import i2s2
-    import resource_graph
-    import trigger_graph
-    import dma_topology
-    from contracts import COMPONENTS
-    import kernel
-    import can
-    import threadx
-    import usb_device
-    import ethernet
-    import timer_advanced
-    import secondary_controllers
-    import fact_references
-    import clocks
-    import physical_facts
-    import metadata
-    import factory
-    import memory as memory_regions
-    from providers import descriptor, maintained
-    from selection import (validate_clock_profiles, resolve_interrupts,
-                           validate_selection)
-    from providers.common import (ConfigurationError, cpu_abi, fail, integer,
-                                   mode_traits, route_dma,
-                                  sequence)
+# Direct CLI execution binds only this checkout or relocated SDK.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from tools.configure import cpu as cpu_profiles
+from tools.configure import bundle, dependencies, sdk, i2s2
+from tools.configure import resource_graph, trigger_graph, dma_topology
+from tools.configure.contracts import COMPONENTS
+from tools.configure import kernel, memory as memory_regions, metadata, factory, can, threadx, usb_device, ethernet, timer_advanced, secondary_controllers, fact_references, clocks, physical_facts
+from tools.configure.providers import descriptor, maintained
+from tools.configure.selection import (validate_clock_profiles, resolve_interrupts,
+                        validate_selection)
+from tools.configure.providers.common import (ConfigurationError, cpu_abi, fail, integer,
+                               mode_traits, route_dma,
+                               sequence)
 
 ROOT = Path(__file__).resolve().parents[2]
 UINT32_MAX = (1 << 32) - 1
@@ -386,10 +360,7 @@ def validate_soc(soc, part):
     ethernet.validate_soc(soc, provider)
     timer_advanced.validate_soc(soc, provider)
     secondary_controllers.validate_soc(soc, provider)
-    try:
-        from . import coupled_io
-    except ImportError:
-        import coupled_io
+    from tools.configure import coupled_io
     coupled_io.validate_soc(soc, provider)
     if not isinstance(soc["clock_profiles"], dict) or not soc["clock_profiles"]:
         fail("Clock profiles are required")
@@ -405,10 +376,7 @@ def load_assembly(path, root=ROOT, snapshots=None):
     path = path.resolve()
     snapshots = {} if snapshots is None else snapshots
     if path.suffix == ".toml":
-        try:
-            from . import authored
-        except ImportError:
-            import authored
+        from tools.configure import authored
         return authored.read(path, snapshots, root.resolve(), fail, obj, integer, text)
     if path.suffix == ".json":
         return load(path, snapshots)
@@ -535,10 +503,7 @@ def resolve_bindings(board, routes, part):
             fail(f"GPIO initial sets unauthorized bits: {binding['id']}")
         if route["kind"] == "gpio":
             binding = {**binding, "mask": actual_mask}
-        try:
-            from . import pin_states
-        except ImportError:
-            import pin_states
+        from tools.configure import pin_states
         resolved_states = pin_states.validate_binding(binding, route["kind"], actual_mask)
         if resolved_states is not None:
             binding = {**binding, "pin_state_resolution": resolved_states}
@@ -834,10 +799,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
             validate_selection(selection, route, provider, ram["size"])
             resolved_pin_states = None
             if mode == "named-states":
-                try:
-                    from . import pin_states
-                except ImportError:
-                    import pin_states
+                from tools.configure import pin_states
                 resolved_pin_states = pin_states.select(
                     binding, family=family, part=part,
                     controller=route["controller"], backend=backend,
@@ -909,16 +871,10 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
                     claim(provider.dma_irq(dma), name, mode, route["id"])
             resolved_timing = None
             if route["kind"] == "i2c":
-                try:
-                    from . import i2c_timing_selection
-                except ImportError:
-                    import i2c_timing_selection
+                from tools.configure import i2c_timing_selection
                 resolved_timing = i2c_timing_selection.resolve(
                     selection, clock, provider, clock_plan=clock_plan)
-            try:
-                from . import stream_profiles
-            except ImportError:
-                import stream_profiles
+            from tools.configure import stream_profiles
             resolved_stream = stream_profiles.resolve(
                 selection, route["kind"], provider)
             selected.append({**selection, "controller": route["controller"],
@@ -1175,10 +1131,7 @@ def resolve(assembly_path, root=ROOT, *, input_paths=None):
     if i2s2_role is not None:
         result["i2s2"] = {"profile": i2s2_role.profile, "part": i2s2_role.part,
                           "claims": list(i2s2_role.claims)}
-    try:
-        from . import runtime_power
-    except ImportError:
-        import runtime_power
+    from tools.configure import runtime_power
     runtime = (runtime_power.resolve(assembly["power"], result)
                if "power" in assembly else None)
     if runtime is not None:
@@ -1216,10 +1169,7 @@ normalize_resource = resource_graph.normalize_resource
 
 def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
     """Return the immutable typed resolution consumed by every emitter."""
-    try:
-        from .ir import ConfigurationIR
-    except ImportError:
-        from ir import ConfigurationIR
+    from tools.configure.ir import ConfigurationIR
     try:
         return ConfigurationIR.from_validated(
             resolve(assembly_path, root, input_paths=input_paths))
@@ -1230,10 +1180,7 @@ def resolve_ir(assembly_path, root=ROOT, *, input_paths=None):
 
 def generate(result, output):
     """Keep the generation entry point independent of bundle publication."""
-    try:
-        from .emission import emit_bundle
-    except ImportError:
-        from emission import emit_bundle
+    from tools.configure.emission import emit_bundle
     return emit_bundle(result, output)
 
 
@@ -1275,9 +1222,10 @@ def protected_inputs(assembly, root):
 
 def configure(assembly, output, root=ROOT):
     inputs = protected_inputs(assembly, root)
-    packages = [root / name for name in ("soc", "boards", "dependencies", "vendors", "ext")]
+    packages = [root / name for name in (
+        "soc", "drivers", "boards", "dependencies", "vendors", "ext")]
     packages.extend(ROOT / name for name in (
-        "tools/configure", "tools/maintenance", "scripts/ci"))
+        "soc", "drivers", "tools/configure", "tools/maintenance", "scripts/ci"))
     packages.extend(path for path in inputs if Path(path).is_dir() and
                     Path(path).resolve() not in {root.resolve(), ROOT.resolve()})
     with bundle.transaction(output, ".nexus-config-bundle",
@@ -1304,10 +1252,7 @@ def configure(assembly, output, root=ROOT):
 
 def main(argv=None):
     """Run the developer CLI; resolution and emission remain independent."""
-    try:
-        from .experience import run
-    except ImportError:
-        from experience import run
+    from tools.configure.experience import run
     return run(sys.modules[__name__], argv)
 
 

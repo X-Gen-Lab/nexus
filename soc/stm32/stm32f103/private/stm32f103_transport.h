@@ -5,8 +5,8 @@
  */
 #ifndef NX_STM32F103_TRANSPORT_H
 #define NX_STM32F103_TRANSPORT_H
-#include "../../../common/i2c_v1_async.h"
-#include "../../../common/uart_v1_channel_dma.h"
+#include "../../../../drivers/i2c/i2c_v1_async/i2c_v1_async.h"
+#include "../../../../drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h"
 #include "stm32f103_provider.h"
 typedef nx_uart_v1_dma_state_t nx_stm32f103_uart_dma_state_t;
 typedef nx_uart_v1_dma_duplex_state_t nx_stm32f103_uart_duplex_state_t;

@@ -5,10 +5,10 @@ from pathlib import Path
 import tempfile
 import unittest
 
-import cpu
-import kernel
-import runtime
-from test_cpu_profiles import facts, irq
+from tools.configure import cpu
+from tools.configure import kernel
+from tools.configure import runtime
+from tools.configure.test_cpu_profiles import facts, irq
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -156,7 +156,7 @@ class ThreadXPolicyTests(unittest.TestCase):
         self.assertIn('set(NEXUS_FREERTOS_PORT "")', selected)
 
     def test_editor_schema_is_backend_specific(self):
-        module = importlib.import_module("threadx")
+        module = importlib.import_module("tools.configure.threadx")
         properties = module.editor_schema()["properties"]
         self.assertEqual(properties["max_priorities"], {"const": 32})
         self.assertNotIn("profile", properties)
@@ -164,7 +164,7 @@ class ThreadXPolicyTests(unittest.TestCase):
         self.assertFalse(module.editor_schema()["additionalProperties"])
 
     def test_platform_scope_does_not_turn_arbitrary_board_into_support(self):
-        module = importlib.import_module("threadx")
+        module = importlib.import_module("tools.configure.threadx")
         for directory, family in (("native_reference", "native"),
                                   ("stm32f407_qiming_v31", "stm32f407"),
                                   ("stm32f407ve_sky_qingchun", "stm32f407"),

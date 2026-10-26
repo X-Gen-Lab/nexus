@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COMMON = (
-    "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
+    "__init__", "bundle", "dependencies", "sdk", "cpu", "kernel", "metadata", "factory", "ir", "i2s2",
     "threadx", "lowpower", "providers/__init__", "providers/common",
     "providers/descriptor",
     "resource_graph", "trigger_graph", "dma_topology", "io_traits",
@@ -36,16 +36,13 @@ def _names(mode, family, *, sdk=False):
     if mode not in {"platform", "runtime"}:
         raise ValueError("Unknown configuration-code dependency scope")
     names = ["tools/configure/" + name + ".py" for name in COMMON]
-    names.append("tools/maintenance/source_catalogue.py")
+    names.extend(("tools/__init__.py", "tools/maintenance/source_catalogue.py"))
     if sdk:
         names.extend(SDK)
     if mode == "runtime":
         names.append("tools/configure/runtime.py")
     else:
-        try:
-            from .providers import descriptor
-        except ImportError:
-            from providers import descriptor
+        from tools.configure.providers import descriptor
         names.extend("tools/configure/" + name + ".py" for name in PLATFORM)
         providers = (descriptor.families() if family is None else
                      (descriptor.maintained(family),))

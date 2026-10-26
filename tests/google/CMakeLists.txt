@@ -90,7 +90,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/gd32_official.cmake")
 nexus_google_test(nexus_silicon_admission_test
     SOURCES silicon_admission_test.cpp
     LIBRARIES Nexus::Core
-    INCLUDES "${NEXUS_SOURCE_DIR}/soc/common")
+    INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/common")
 nexus_google_test(nexus_spi_dma_transaction_test
     SOURCES spi_dma_transaction_test.cpp
     LIBRARIES Nexus::NativeModel Nexus::Arch
@@ -442,9 +442,9 @@ target_compile_options(nexus_gd32_i2c_register_test PRIVATE
 foreach(i2c_family generic stm32 gd32)
     set(i2c_target "nexus_${i2c_family}_i2c_async_test")
     nexus_google_test(${i2c_target} SOURCES i2c_async_register_test.cpp
-        "${NEXUS_SOURCE_DIR}/soc/common/i2c_v1_async.c"
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async/i2c_v1_async.c"
         LIBRARIES Nexus::IO Nexus::Arch
-        INCLUDES "${NEXUS_SOURCE_DIR}/soc/common")
+        INCLUDES "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v1_async")
     target_compile_options(${i2c_target} PRIVATE
         "-include${CMAKE_CURRENT_SOURCE_DIR}/i2c_async_register_model.h")
     if(i2c_family STREQUAL "stm32")

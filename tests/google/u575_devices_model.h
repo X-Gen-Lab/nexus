@@ -5,7 +5,7 @@
  */
 #ifndef NX_U575_DEVICES_MODEL_H
 #define NX_U575_DEVICES_MODEL_H
-#include "../../soc/common/i2c_v2.h"
+#include "../../drivers/i2c/i2c_v2/i2c_v2.h"
 #include "u575_model.h"
 #ifdef __cplusplus
 extern "C" {

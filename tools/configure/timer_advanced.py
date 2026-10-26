@@ -3,12 +3,8 @@
 Idle levels are explicit assembly policy, not a claim about an output stage or
 physical break circuit. Capture ring storage remains supplied by the caller.
 """
-try:
-    from .gpio_phase import withdraw_pin
-    from .providers.common import Construction, fail, integer
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from providers.common import Construction, fail, integer
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers.common import Construction, fail, integer
 
 
 KINDS = {"timer_capture", "advanced_pwm"}

@@ -74,7 +74,7 @@ def private_compile_inputs(entry, sdk):
                 continue
             relative = path.relative_to(root)
             parts = relative.parts
-            if (not parts or parts[0] == "soc" or
+            if (not parts or parts[0] in {"soc", "drivers"} or
                     {"vendors", "private"}.intersection(parts)):
                 return True
             if parts == ("components",):

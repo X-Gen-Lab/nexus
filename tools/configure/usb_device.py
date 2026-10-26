@@ -3,14 +3,9 @@
 This mechanism does not infer a Board connector, powered role, class protocol or
 physical qualification. Selected endpoints are separate static typed identities.
 """
-try:
-    from .gpio_phase import withdraw_pin
-    from .providers.common import (Construction, fail, integer,
-                                   kernel_policy_constant)
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from providers.common import (Construction, fail, integer,
-                                  kernel_policy_constant)
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers.common import (Construction, fail, integer,
+                               kernel_policy_constant)
 
 
 FIELDS = {"event_capacity", "rx_fifo_words", "vbus_sensing", "poll_limit",

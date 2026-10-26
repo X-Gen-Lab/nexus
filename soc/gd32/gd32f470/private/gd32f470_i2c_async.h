@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_GD32F470_I2C_ASYNC_H
 #define NEXUS_GD32F470_I2C_ASYNC_H
-#include "../../../common/i2c_v1_async.h"
+#include "../../../../drivers/i2c/i2c_v1_async/i2c_v1_async.h"
 #include "gd32f470_provider.h"
 
 /** \brief Exact reviewed physical routes; caller supplies immutable domains. */

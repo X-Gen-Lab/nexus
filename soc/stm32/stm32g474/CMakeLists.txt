@@ -87,7 +87,7 @@ if(g4_can_fd_modes)
     list(APPEND g4_sources drivers/fdcan.c)
 endif()
 if(g4_i2c_modes)
-    list(APPEND g4_sources drivers/i2c.c "../../common/i2c_v2.c")
+    list(APPEND g4_sources drivers/i2c.c "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c")
 endif()
 if(g4_flash_modes)
     list(APPEND g4_sources drivers/flash.c)
@@ -98,7 +98,8 @@ if(g4_sources)
         PRIVATE Nexus::Arch nexus_build_options nexus_owned_warnings)
     target_include_directories(nexus_soc_stm32g474 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private"
-        "${CMAKE_CURRENT_SOURCE_DIR}/../../common"
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common"
         "${NEXUS_SOURCE_DIR}/io/private")
     if(g4_adc_modes OR g4_pwm_adc_modes OR g4_can_fd_modes OR g4_adc_group_modes)
         include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")
@@ -120,8 +121,11 @@ set(NEXUS_STARTUP_SOURCE
     "${g4_device}/Source/Templates/gcc/startup_stm32g474xx.s" PARENT_SCOPE)
 set(NEXUS_SYSTEM_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/system.c" PARENT_SCOPE)
 set(g4_binding_private "${CMAKE_CURRENT_SOURCE_DIR}/private")
-if(g4_i2c_modes OR g4_adc_group_modes)
-    list(APPEND g4_binding_private "${CMAKE_CURRENT_SOURCE_DIR}/../../common")
+if(g4_i2c_modes)
+    list(APPEND g4_binding_private "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
+endif()
+if(g4_adc_group_modes)
+    list(APPEND g4_binding_private "${NEXUS_SOURCE_DIR}/soc/stm32/common")
 endif()
 set(NEXUS_SYSTEM_PRIVATE_INCLUDES ${g4_binding_private} PARENT_SCOPE)
 set(NEXUS_SYSTEM_VENDOR_INCLUDES "${g4_device}/Include" "${g4_cmsis}"

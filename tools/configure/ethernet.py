@@ -3,14 +3,9 @@
 The MAC bus-master domain is distinct from stream-DMA controller routes. PHY
 presence, reset, clock, negotiation and network policy remain external facts.
 """
-try:
-    from .gpio_phase import withdraw_pin
-    from .providers.common import (Construction, fail, integer,
-                                   kernel_policy_constant)
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from providers.common import (Construction, fail, integer,
-                                  kernel_policy_constant)
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.providers.common import (Construction, fail, integer,
+                               kernel_policy_constant)
 
 
 FIELDS = {"tx_count", "rx_count", "rx_storage_bytes", "address",

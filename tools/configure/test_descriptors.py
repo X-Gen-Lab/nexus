@@ -4,10 +4,7 @@ import subprocess
 import sys
 import unittest
 
-try:
-    from .providers import descriptor, hardware
-except ImportError:
-    from providers import descriptor, hardware
+from tools.configure.providers import descriptor, hardware
 
 
 class DescriptorBoundaryTests(unittest.TestCase):
@@ -16,9 +13,9 @@ class DescriptorBoundaryTests(unittest.TestCase):
 
         names = set(dependencies._names("platform", "stm32g474"))
         self.assertIn("tools/configure/coupled_io.py", names)
-        self.assertIn("tools/configure/providers/stm32g474/coupled.py", names)
+        self.assertIn("soc/stm32/stm32g474/configure/coupled.py", names)
         native = set(dependencies._names("platform", "native"))
-        self.assertNotIn("tools/configure/providers/stm32g474/coupled.py", native)
+        self.assertNotIn("soc/stm32/stm32g474/configure/coupled.py", native)
 
     def test_h743_dma_configuration_binds_private_provider_payload(self):
         payload = descriptor.maintained("stm32h743").owned_payload

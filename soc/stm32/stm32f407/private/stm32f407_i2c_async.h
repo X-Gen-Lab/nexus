@@ -5,7 +5,7 @@
  */
 #ifndef NEXUS_STM32F407_I2C_ASYNC_H
 #define NEXUS_STM32F407_I2C_ASYNC_H
-#include "../../../common/i2c_v1_async.h"
+#include "../../../../drivers/i2c/i2c_v1_async/i2c_v1_async.h"
 #include "stm32f407_provider.h"
 
 /** \brief Exact reviewed physical routes; caller supplies immutable domains. */

@@ -10,12 +10,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-try:
-    from .providers import maintained
-    from .providers.common import fail, mode_traits
-except ImportError:
-    from providers import maintained
-    from providers.common import fail, mode_traits
+from tools.configure.providers import maintained
+from tools.configure.providers.common import fail, mode_traits
 
 
 ENDPOINT_DRIVERS = MappingProxyType({

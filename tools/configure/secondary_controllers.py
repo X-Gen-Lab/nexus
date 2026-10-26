@@ -6,18 +6,11 @@ runtime registry, allocator, worker or dispatch layer.
 """
 from types import MappingProxyType
 
-try:
-    from .gpio_phase import withdraw_pin
-    from .memory import dma_regions
-    from .providers.common import Construction, fail, mode_traits
-    from .providers import hardware
-    from . import enhanced_endpoints
-except ImportError:
-    from gpio_phase import withdraw_pin
-    from memory import dma_regions
-    from providers.common import Construction, fail, mode_traits
-    from providers import hardware
-    import enhanced_endpoints
+from tools.configure.gpio_phase import withdraw_pin
+from tools.configure.memory import dma_regions
+from tools.configure.providers.common import Construction, fail, mode_traits
+from tools.configure.providers import hardware
+from tools.configure import enhanced_endpoints
 
 
 # Assertions for the maintained SDK cold constructors, not Board wiring.

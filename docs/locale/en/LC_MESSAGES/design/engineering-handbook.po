@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Nexus-Reviewed: true\n"
-"X-Nexus-Source-SHA256: 538044c4d2a2153eeadd49b07fba56171551896cbe8392ca4114658fe7f69bd6\n"
+"X-Nexus-Source-SHA256: 7b5ca7d05e689286cf86e3b0a770271ec67e3854ab660c67cd4c3ca5311430a8\n"
 
 #: ../../../workspace/nexus-build-system-20261012/docs/design/engineering-handbook.md:1
 msgid "下一代平台工程运行手册"
@@ -2233,7 +2233,6 @@ msgstr ""
 "and scheduled entry points remain available. Event deduplication does not "
 "remove PR checks, mode matrices or formal candidate acceptance."
 
-
 msgid ""
 "普通可重定位 source SDK 的验收证明搬移后能够配置、构建、链接和运行，不保证任意 安装路径生成相同 ELF。未配置 path "
 "mapping 时，故障位置的 `__FILE__` 字符串可以 包含 SDK 绝对路径；路径长度和链接对齐会影响 Flash 字节数。因此不同"
@@ -2250,3 +2249,9 @@ msgstr ""
 "firmware apply `-ffile-prefix-map` to source, consumer and build "
 "directories and compare two actual ELF/BIN outputs. That process must "
 "still execute before claiming byte-for-byte reproducibility."
+
+msgid "`drivers/`"
+msgstr "`drivers/`"
+
+msgid "经复核的共享 IP 寄存器算法，由所选 SoC target 私有选编"
+msgstr "Reviewed shared IP register algorithms, selected privately by the SoC target"

@@ -2,8 +2,8 @@
 from importlib import import_module
 from types import MappingProxyType
 
-from . import descriptor
-from .common import fail
+from tools.configure.providers import descriptor
+from tools.configure.providers.common import fail
 
 _DESCRIPTORS = MappingProxyType({item.family: item
                                 for item in descriptor.families()})
@@ -15,4 +15,4 @@ def maintained(family):
         fail(f"Unmaintained SoC provider: {family}")
     # Only the selected exact family participates in the configuration import
     # graph. Python caches the explicit module; no filesystem discovery occurs.
-    return import_module("." + family, __name__)
+    return import_module(_DESCRIPTORS[family].configuration_directory.replace("/", "."))

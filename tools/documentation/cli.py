@@ -70,16 +70,21 @@ def _staged_sources(root):
                     and (parts[0] == "assets" or path.suffix in {
                         ".md", ".rst", ".dot", ".svg", ".csv", ".json",
                         ".toml", ".po", ".py", ".html", ".css", ".js"}))
-        return (name == "Doxyfile" or name.startswith("dependencies/docs-")
+        return (name in {"Doxyfile", "tools/__init__.py"}
+                or name.startswith("dependencies/docs-")
                 or name.startswith(("tools/documentation/", "tools/configure/"))
-                or (name.startswith(("boards/", "soc/")) and path.suffix == ".json"))
+                or (name.startswith("boards/") and path.suffix == ".json")
+                or (name.startswith("soc/") and path.suffix in {".json", ".py"}))
     indexed_names = subprocess.run(["git", "ls-files", "-z", "--", "docs/", "Doxyfile",
-                                   "dependencies/docs-*", "tools/documentation/",
+                                   "dependencies/docs-*", "tools/__init__.py",
+                                   "tools/documentation/",
                                    "tools/configure/", "boards/", "soc/"],
                                    cwd=root, check=True, capture_output=True,
                                    timeout=30).stdout.split(b"\0")
     indexed_paths = {root / os.fsdecode(name) for name in indexed_names if name}
     candidates = {path for path in indexed_paths if relevant(path)}
+    if (root / "tools/__init__.py").is_file():
+        candidates.add(root / "tools/__init__.py")
     for directory in ("docs", "tools/documentation", "tools/configure", "boards", "soc"):
         candidates.update(path for path in (root / directory).rglob("*")
                           if path.is_file() and relevant(path)

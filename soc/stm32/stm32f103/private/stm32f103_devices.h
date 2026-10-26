@@ -8,7 +8,9 @@
  */
 #ifndef NX_STM32F103_DEVICES_H
 #define NX_STM32F103_DEVICES_H
-#include "../../../common/legacy_devices.h"
+#include "../../../../drivers/adc/legacy_adc/legacy_adc.h"
+#include "../../../../drivers/flash/legacy_flash/legacy_flash.h"
+#include "../../../../drivers/timer/legacy_pwm/legacy_pwm.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

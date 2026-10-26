@@ -190,7 +190,8 @@ def build_inputs(root, build, catalogue):
         for source in [row["test_source"], *row["production_sources"]]:
             source_name = (root / source).resolve().relative_to(
                 root.resolve()).as_posix()
-            if source == row["test_source"] or source_name.startswith("soc/"):
+            if (source == row["test_source"] or
+                    source_name.startswith(("soc/", "drivers/"))):
                 # The complete Native model is shared by public test targets;
                 # hardware providers and test bodies retain target-local builds.
                 owner = ("nexus_io_native" if source != row["test_source"] and

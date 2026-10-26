@@ -336,6 +336,33 @@ class OutputAdmission(unittest.TestCase):
             with self.assertRaisesRegex(EvidenceError, "snapshot"):
                 gate.verify_snapshot(root, [], original)
 
+    def test_shared_driver_bytes_are_in_the_independent_source_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "CMakeLists.txt").write_text("project(test)\n")
+            for suffix in (".c", ".h"):
+                with self.subTest(suffix=suffix):
+                    source = root / ("drivers/i2c/reviewed_ip/driver" + suffix)
+                    source.parent.mkdir(parents=True, exist_ok=True)
+                    source.write_text("/* Reviewed driver bytes. */\n")
+                    original = gate.source_inputs(root, [])
+                    source.write_text("/* Changed during observation. */\n")
+                    with self.assertRaisesRegex(EvidenceError, "input changed"):
+                        gate.verify_inputs(original)
+                    with self.assertRaisesRegex(EvidenceError, "snapshot"):
+                        gate.verify_snapshot(root, [], original)
+
+    def test_new_driver_cannot_escape_independent_snapshot_verification(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "CMakeLists.txt").write_text("project(test)\n")
+            original = gate.source_inputs(root, [])
+            source = root / "drivers/i2c/reviewed_ip/new_driver.c"
+            source.parent.mkdir(parents=True)
+            source.write_text("/* New source after observation. */\n")
+            with self.assertRaisesRegex(EvidenceError, "snapshot"):
+                gate.verify_snapshot(root, [], original)
+
     def test_existing_output_is_not_fresh_execution(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "output"

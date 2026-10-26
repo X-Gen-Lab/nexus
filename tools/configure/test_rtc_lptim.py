@@ -5,12 +5,12 @@ from pathlib import Path
 import tempfile
 import unittest
 
-import authored
-import bindings
-import configure as gate
-import factory
-import selected_contracts
-from providers import maintained
+from tools.configure import authored
+from tools.configure import bindings
+from tools.configure import configure as gate
+from tools.configure import factory
+from tools.configure import selected_contracts
+from tools.configure.providers import maintained
 
 
 class NativeTimeAssemblyTests(unittest.TestCase):

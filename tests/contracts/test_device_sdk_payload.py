@@ -20,6 +20,26 @@ from tools.configure.providers import descriptor
 
 
 class DeviceSDKPayloadTests(unittest.TestCase):
+    def test_shared_driver_sources_are_transportable_and_mandatory(self):
+        required = {
+            "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c",
+            "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h",
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.c",
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.h",
+            "drivers/i2c/i2c_v2/i2c_v2.c",
+            "drivers/i2c/i2c_v2/i2c_v2.h",
+            "drivers/adc/legacy_adc/legacy_adc.c",
+            "drivers/adc/legacy_adc/legacy_adc.h",
+            "drivers/flash/legacy_flash/legacy_flash.c",
+            "drivers/flash/legacy_flash/legacy_flash.h",
+            "drivers/timer/legacy_pwm/legacy_pwm.c",
+            "drivers/timer/legacy_pwm/legacy_pwm.h",
+        }
+        for name in sorted(required):
+            with self.subTest(source=name):
+                self.assertTrue(sdk.selected(name), name)
+                self.assertTrue(name in sdk.REQUIRED_FILES, name)
+
     def test_runtime_clock_helper_and_actual_consumer_are_mandatory(self):
         names = {"tools/configure/runtime_power.py",
                  "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
@@ -359,9 +379,9 @@ class DeviceSDKPayloadTests(unittest.TestCase):
 
     def test_rehashed_omission_cannot_remove_new_provider_inputs(self):
         names = {
-            "soc/common/legacy_adc.c", "soc/common/legacy_pwm.c",
-            "soc/common/legacy_flash.c", "soc/common/uart_v1_channel_dma.c",
-            "soc/common/i2c_v1_async.h", "soc/common/i2c_v2.c",
+            "drivers/adc/legacy_adc/legacy_adc.c", "drivers/timer/legacy_pwm/legacy_pwm.c",
+            "drivers/flash/legacy_flash/legacy_flash.c", "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c",
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.h", "drivers/i2c/i2c_v2/i2c_v2.c",
             "soc/stm32/stm32g474/drivers/adc_stream.c",
             "soc/stm32/stm32g474/private/stm32g474_acquisition.h",
             "soc/stm32/stm32h743/memory_init.c",

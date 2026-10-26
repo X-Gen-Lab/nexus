@@ -4,9 +4,11 @@ from pathlib import Path
 
 root = Path(sys.argv[1]).resolve()
 output = Path(sys.argv[2])
-sys.path.insert(0, str(root / "tools/configure"))
-from configure import resolve_ir  # noqa: E402
-from providers.stm32f407.bindings import constructor, shared_irq_definitions  # noqa: E402
+sys.path.insert(0, str(root))
+from tools.configure.configure import resolve_ir  # noqa: E402
+from soc.stm32.stm32f407.configure.bindings import (  # noqa: E402
+    constructor, shared_irq_definitions,
+)
 
 lines = ["#ifndef NX_PLATFORM_REGISTER_WRITE",
          "#define NX_PLATFORM_REGISTER_WRITE(reg, value) ((reg) = (value))",

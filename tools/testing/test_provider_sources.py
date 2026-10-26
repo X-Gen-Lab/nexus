@@ -13,6 +13,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ProviderSourceSelectionTests(unittest.TestCase):
+    def private_sources(self, family, names):
+        """Spell expected SoC-local sources without erasing their ownership."""
+        directory = Path(source_directory(family))
+        return {(directory / (name if name == "timebase.c" else
+                              "drivers/" + name)).as_posix() for name in names}
+
     def configure_sources(self, family, controllers):
         """Inspect production targets without claiming an ARM link proof."""
         with tempfile.TemporaryDirectory() as temporary:
@@ -54,8 +60,14 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 return set(), set()
             units = json.loads(database.read_text())
             provider_directory = ROOT / source_directory(family)
-            provider = {Path(unit["file"]).name for unit in units
-                        if Path(unit["file"]).is_relative_to(provider_directory)}
+            owned_directories = (provider_directory, ROOT / "drivers",
+                                 ROOT / "io/src")
+            # Observe the actual build output; no provider-to-source registry
+            # may decide which shared translation units the test can see.
+            provider = {Path(unit["file"]).relative_to(ROOT).as_posix()
+                        for unit in units if any(
+                            Path(unit["file"]).is_relative_to(directory)
+                            for directory in owned_directories)}
             sdk = {Path(unit["file"]).stem for unit in units
                    if "/GD32F4xx_standard_peripheral/Source/" in unit["file"]}
             self.assertEqual(len(units), len({unit["file"] for unit in units}))
@@ -67,7 +79,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
 
     def test_empty_gd32_retains_only_timebase_and_system_sdk(self):
         self.assertEqual(self.configure_sources("gd32f470", []), (
-            {"timebase.c"},
+            self.private_sources("gd32f470", {"timebase.c"}),
             {"gd32f4xx_rcu", "gd32f4xx_fmc", "gd32f4xx_timer"},
         ))
 
@@ -81,7 +93,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                     expected.add("timebase.c")
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                            "gd32f4xx_timer", "gd32f4xx_gpio"})
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(family, expected))
 
     def test_irq_uart_retains_pin_helpers_without_dma_or_block_provider(self):
         for family in ("stm32f407", "gd32f470"):
@@ -94,7 +106,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                            "gd32f4xx_timer", "gd32f4xx_gpio",
                                            "gd32f4xx_usart"})
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(family, expected))
 
     def test_dma_modes_compile_base_and_dma_without_rx_stream(self):
         for family, spi_mode in (("stm32f407", "dma"),
@@ -109,7 +121,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                     self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                            "gd32f4xx_timer", "gd32f4xx_gpio",
                                            "gd32f4xx_usart", "gd32f4xx_spi"})
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(family, expected))
 
     def test_rx_and_adc_blocks_retain_base_but_not_pwm_driver(self):
         for family in ("stm32f407", "gd32f470"):
@@ -120,7 +132,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                             "adc_stream.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(family, expected))
 
     def test_gd32_adc_retains_platform_pin_helpers(self):
         for mode in ("single-shot", "low-rate-scan", "trigger-dma",
@@ -134,7 +146,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                     expected.add("adc_stream.c")
                 if mode == "trigger-dma-continuous":
                     expected.add("adc_continuous.c")
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(
+                    "gd32f470", expected))
                 self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                        "gd32f4xx_timer", "gd32f4xx_gpio",
                                        "gd32f4xx_adc"})
@@ -145,7 +158,8 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
             with self.subTest(kind=kind):
                 provider, sdk = self.configure_sources(
                     "gd32f470", [(kind, mode)])
-                self.assertEqual(provider, {"timebase.c", source, "gpio.c"})
+                self.assertEqual(provider, self.private_sources(
+                    "gd32f470", {"timebase.c", source, "gpio.c"}))
                 self.assertEqual(sdk, {"gd32f4xx_rcu", "gd32f4xx_fmc",
                                        "gd32f4xx_timer", "gd32f4xx_gpio"})
 
@@ -155,7 +169,9 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                                    ("pwm", "fixed-pwm", "timer.c")):
             with self.subTest(kind=kind):
                 self.assertEqual(self.configure_sources(
-                    "stm32f407", [(kind, mode)]), ({"gpio.c", source}, set()))
+                    "stm32f407", [(kind, mode)]), (
+                        self.private_sources("stm32f407", {"gpio.c", source}),
+                        set()))
 
     def test_pinless_devices_do_not_compile_gpio(self):
         for family in ("stm32f407", "gd32f470"):
@@ -170,7 +186,7 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                                            "gd32f4xx_timer", "gd32f4xx_fwdgt"})
                 else:
                     self.assertEqual(sdk, set())
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(family, expected))
 
     def test_multiple_instances_share_one_compilation_unit(self):
         for family in ("stm32f407", "gd32f470"):
@@ -181,7 +197,39 @@ add_subdirectory("{(ROOT / source_directory(family)).as_posix()}" soc)
                 expected = {"gpio.c", "uart.c", "uart_stream.c"}
                 if family == "gd32f470":
                     expected.add("timebase.c")
-                self.assertEqual(provider, expected)
+                self.assertEqual(provider, self.private_sources(family, expected))
+
+    def test_i2c_selection_observes_the_shared_ip_translation_unit(self):
+        for family in ("stm32f407", "gd32f470"):
+            with self.subTest(family=family):
+                provider, _ = self.configure_sources(
+                    family, [("i2c", "irq-messages")])
+                expected = {"gpio.c", "i2c.c", "i2c_async.c"}
+                if family == "gd32f470":
+                    expected.add("timebase.c")
+                self.assertEqual(provider,
+                    self.private_sources(family, expected) |
+                    {"drivers/i2c/i2c_v1_async/i2c_v1_async.c"})
+
+    def test_legacy_modes_retain_shared_engines_once_and_private_wrappers(self):
+        provider, _ = self.configure_sources("stm32f103", [
+            ("uart", "dma-tx"), ("uart", "dma-duplex"),
+            ("i2c", "irq-messages"), ("adc", "single-shot"),
+            ("pwm", "fixed-pwm"), ("flash", "poll-word")])
+        self.assertEqual(provider, self.private_sources("stm32f103", {
+            "gpio.c", "uart_dma.c", "i2c_async.c", "devices.c"}) | {
+                "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c",
+                "drivers/i2c/i2c_v1_async/i2c_v1_async.c",
+                "drivers/adc/legacy_adc/legacy_adc.c",
+                "drivers/timer/legacy_pwm/legacy_pwm.c",
+                "drivers/flash/legacy_flash/legacy_flash.c"})
+
+    def test_i2c_v2_retains_its_distinct_shared_engine(self):
+        provider, _ = self.configure_sources(
+            "stm32g474", [("i2c", "poll-messages")])
+        self.assertEqual(provider,
+            self.private_sources("stm32g474", {"i2c.c"}) |
+            {"drivers/i2c/i2c_v2/i2c_v2.c"})
 
 
 if __name__ == "__main__":

@@ -2,9 +2,9 @@
 set(g4_factory_input "${NEXUS_SOURCE_DIR}/tests/contracts/g474_assembly/mainstream.toml")
 set(g4_factory_bundle "${CMAKE_CURRENT_BINARY_DIR}/g474-mainstream")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/__init__.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/bindings.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/emission.py")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/__init__.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/bindings.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/emission.py")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
     --source-root "${NEXUS_SOURCE_DIR}" --assembly "${g4_factory_input}"
@@ -76,9 +76,9 @@ target_compile_options(nexus_g474_spi_test PRIVATE
 set(g4_factory_input "${NEXUS_SOURCE_DIR}/tests/contracts/g474_assembly/spi.toml")
 set(g4_factory_bundle "${CMAKE_CURRENT_BINARY_DIR}/g474-peripheral-factory")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/__init__.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/bindings.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/emission.py")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/__init__.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/bindings.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/emission.py")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
     --source-root "${NEXUS_SOURCE_DIR}" --assembly "${g4_factory_input}"
@@ -135,9 +135,9 @@ target_compile_options(nexus_g474_pwm_test PRIVATE
 set(g4_factory_input "${NEXUS_SOURCE_DIR}/tests/contracts/g474_assembly/pwm.toml")
 set(g4_factory_bundle "${CMAKE_CURRENT_BINARY_DIR}/g474-pwm-factory")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/__init__.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/bindings.py"
-    "${NEXUS_SOURCE_DIR}/tools/configure/providers/stm32g474/emission.py")
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/__init__.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/bindings.py"
+    "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/configure/emission.py")
 execute_process(COMMAND "${Python3_EXECUTABLE}" -B
     "${NEXUS_SOURCE_DIR}/tools/configure/configure.py"
     --source-root "${NEXUS_SOURCE_DIR}" --assembly "${g4_factory_input}"

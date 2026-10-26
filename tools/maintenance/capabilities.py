@@ -144,7 +144,7 @@ def collect(root=ROOT):
                 exports[symbol] = source.relative_to(root).as_posix()
     # Shared algorithms keep one real readonly table across SoC wrappers.
     # Read actual production definitions, never expand provider-name guesses.
-    shared_sources = (set((root / "soc/common").glob("*.c"))
+    shared_sources = (set((root / "drivers").rglob("*.c"))
                       | set((root / "io/src").rglob("*.c"))
                       | set((root / "soc/native/drivers").glob("*.c")))
     for source in sorted(shared_sources):

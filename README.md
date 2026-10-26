@@ -27,6 +27,7 @@ the source dependency graph. Kconfig and cache macros are not parallel authoriti
 | `core/` | Results, monotonic deadlines, borrowed requests and stable epochs |
 | `arch/` | Compile-time CPU primitives, masks, barriers and optional Cache/MPU/SAU |
 | `soc/` | Exact chip memory, clock, startup, IRQ/DMA and private controllers |
+| `drivers/` | Reviewed reusable IP algorithms, selected privately by SoC targets |
 | `boards/` | Reviewed wiring, oscillator facts, initial levels and explicit unknowns |
 | `io/` | Typed public operation contracts; provider/SDK types remain private |
 | `os/` | Optional caller-owned baremetal, Native, FreeRTOS and maintained ThreadX adapters |
@@ -36,8 +37,9 @@ the source dependency graph. Kconfig and cache macros are not parallel authoriti
 
 The source map groups MCU families under `soc/stm32/` and `soc/gd32/`, Arm
 primitives under `arch/arm/cortex_m/`, and Native models under
-`soc/native/drivers/`. Public include paths, CMake target names and authored
-family identifiers stay stable. Read the
+`soc/native/drivers/`. Reusable IP algorithms live under `drivers/<kind>/<ip>/`;
+family configuration policy lives beside its SoC in `configure/`. Public include
+paths, CMake target names and authored family identifiers stay stable. Read the
 [source-adjacent contracts](docs/explanation/source-map.md) for ownership and
 the current directory map. New products should use the generated
 `nexus_factory_strong.h` for class-specific factory references.

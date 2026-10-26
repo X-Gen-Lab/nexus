@@ -7,16 +7,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
-try:
-    from .resource_graph import ResourcePlanIR
-    from .trigger_graph import TriggerPlanIR
-    from .dma_topology import DmaTopologyIR
-    from .i2s2 import I2s2RoleIR
-except ImportError:
-    from resource_graph import ResourcePlanIR
-    from trigger_graph import TriggerPlanIR
-    from dma_topology import DmaTopologyIR
-    from i2s2 import I2s2RoleIR
+from tools.configure.resource_graph import ResourcePlanIR
+from tools.configure.trigger_graph import TriggerPlanIR
+from tools.configure.dma_topology import DmaTopologyIR
+from tools.configure.i2s2 import I2s2RoleIR
 
 
 def freeze(value):

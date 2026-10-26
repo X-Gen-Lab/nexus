@@ -1,10 +1,6 @@
 """One optional fixed-run provider lifecycle lease; no clock-policy engine."""
-try:
-    from .providers.common import fail
-    from .ir import RuntimePowerIR
-except ImportError:
-    from providers.common import fail
-    from ir import RuntimePowerIR
+from tools.configure.providers.common import fail
+from tools.configure.ir import RuntimePowerIR
 
 
 def resolve(value, result):
@@ -84,10 +80,7 @@ def state():
 
 def runtime_functions(result, context_guard, initialize):
     """Use the same emitted I/O helpers as cold startup and global cleanup."""
-    try:
-        from .providers.stm32h743 import emission
-    except ImportError:
-        from providers.stm32h743 import emission
+    from soc.stm32.stm32h743.configure import emission
     source = [
         'nx_result_t nx_platform_runtime_pause(void) {',
         f'    if ({context_guard}) {{ return NX_ERROR_CONTEXT; }}',

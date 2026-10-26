@@ -8,7 +8,7 @@
  */
 #ifndef NX_STM32H743_PROVIDER_H
 #define NX_STM32H743_PROVIDER_H
-#include "../../../common/i2c_v2.h"
+#include "../../../../drivers/i2c/i2c_v2/i2c_v2.h"
 #include "nexus/io/adc.h"
 #include "nexus/io/exti.h"
 #include "nexus/io/flash.h"

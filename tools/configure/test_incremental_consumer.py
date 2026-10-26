@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 import unittest
 
-import configure
+from tools.configure import configure
 
 
 class IncrementalConsumerTests(unittest.TestCase):

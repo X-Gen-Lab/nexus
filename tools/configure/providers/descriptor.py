@@ -5,24 +5,12 @@ CMake remains the sole owner of production translation units and dependencies.
 No descriptor performs file discovery, downloads or runtime registration.
 """
 from dataclasses import dataclass
-import importlib.util
-from pathlib import Path
+from pathlib import PurePosixPath
 from types import MappingProxyType
 
-from .common import fail
+from tools.configure.providers.common import fail
 
-try:
-    from ...maintenance.source_catalogue import SOURCE_DEPENDENCIES
-except ImportError:
-    # The CLI also runs as a standalone script in a relocated Source SDK.
-    # Load one exact maintained catalogue, never search an ambient sys.path.
-    path = Path(__file__).resolve().parents[2] / "maintenance/source_catalogue.py"
-    spec = importlib.util.spec_from_file_location("nexus_source_catalogue", path)
-    if spec is None or spec.loader is None:
-        fail("Missing maintained source dependency catalogue")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    SOURCE_DEPENDENCIES = module.SOURCE_DEPENDENCIES
+from tools.maintenance.source_catalogue import SOURCE_DEPENDENCIES
 
 
 @dataclass(frozen=True)
@@ -30,21 +18,14 @@ class FamilyDescriptor:
     """Inputs required by one maintained family, without CPU-family inference."""
 
     family: str
+    vendor: str
+    source_directory: str
+    configuration_directory: str
     git_modules: tuple = ()
     import_lock: str | None = None
     references: str | None = None
     owned_payload: tuple = ()
     configuration_helpers: tuple = ()
-
-    @property
-    def source_directory(self):
-        """Physical layout only; maintained() independently admits a family."""
-        if self.family == "native":
-            return "soc/native"
-        for manufacturer in ("stm32", "gd32"):
-            if self.family.startswith(manufacturer):
-                return f"soc/{manufacturer}/{self.family}"
-        fail(f"No source directory for maintained family: {self.family}")
 
     @property
     def git_dependencies(self):
@@ -56,10 +37,13 @@ class FamilyDescriptor:
 
     @property
     def configuration_modules(self):
-        directory = f"tools/configure/providers/{self.family}"
+        directory = self.configuration_directory
+        packages = tuple(str(parent / "__init__.py") for parent in
+                         reversed(PurePosixPath(directory).parents)
+                         if str(parent) != ".")
         modules = tuple(f"{directory}/{name}" for name in (
             "__init__.py", "contract.py", "bindings.py", "emission.py"))
-        return modules + self.configuration_helpers
+        return packages + modules + self.configuration_helpers
 
     @property
     def fact_files(self):
@@ -71,7 +55,8 @@ class FamilyDescriptor:
 
 
 _DESCRIPTORS = MappingProxyType({
-    "native": FamilyDescriptor("native", owned_payload=(
+    "native": FamilyDescriptor("native", "native",
+        "soc/native", "soc/native/configure", owned_payload=(
         "soc/native/CMakeLists.txt",
         'io/include/nexus/io/rtc.h',
         'io/include/nexus/io/lptim.h',
@@ -87,7 +72,8 @@ _DESCRIPTORS = MappingProxyType({
         'cmake/package/verification/io_evolution/consumers/native-time-pair.c',
         'cmake/package/verification/io_evolution/consumers/native-time-empty.c',
     )),
-    "stm32f103": FamilyDescriptor("stm32f103", (
+    "stm32f103": FamilyDescriptor("stm32f103", "stm32",
+        "soc/stm32/stm32f103", "soc/stm32/stm32f103/configure", (
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_f1", "stm32f1_cmsis"),
         ("hal_driver_f1", "stm32f1_hal")), references="references.json",
@@ -101,17 +87,20 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32/stm32f103/drivers/uart_dma.c",
             "soc/stm32/stm32f103/drivers/i2c_async.c",
             "soc/stm32/stm32f103/private/stm32f103_transport.h",
-            "soc/common/uart_v1_channel_dma.c",
-            "soc/common/uart_v1_channel_dma.h",
-            "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h",
+            "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c",
+            "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h",
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.c", "drivers/i2c/i2c_v1_async/i2c_v1_async.h",
             "soc/stm32/stm32f103/drivers/devices.c",
             "soc/stm32/stm32f103/private/stm32f103_devices.h",
-            "soc/common/legacy_devices.h", "soc/common/legacy_adc.c",
-            "soc/common/legacy_pwm.c", "soc/common/legacy_flash.c",
+            "drivers/adc/legacy_adc/legacy_adc.h",
+            "drivers/timer/legacy_pwm/legacy_pwm.h",
+            "drivers/flash/legacy_flash/legacy_flash.h", "drivers/adc/legacy_adc/legacy_adc.c",
+            "drivers/timer/legacy_pwm/legacy_pwm.c", "drivers/flash/legacy_flash/legacy_flash.c",
             "soc/stm32/stm32f103/private/stm32f103_system.h",
             "soc/stm32/stm32f103/private/stm32f103_provider.h",
             "boards/stm32f103_reference/board.json")),
-    "stm32f407": FamilyDescriptor("stm32f407", (
+    "stm32f407": FamilyDescriptor("stm32f407", "stm32",
+        "soc/stm32/stm32f407", "soc/stm32/stm32f407/configure", (
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_f4", "stm32f4_cmsis"),
         ("hal_driver_f4", "stm32f4_hal")),
@@ -125,13 +114,15 @@ _DESCRIPTORS = MappingProxyType({
             "cmake/package/verification/io_evolution/consumers/f407-i2s2-slave-tx.c",
             "soc/stm32/stm32f407/drivers/ethernet_frames.c",
             "soc/stm32/stm32f407/private/stm32f407_eth_frames.h")),
-    "gd32f470": FamilyDescriptor("gd32f470",
+    "gd32f470": FamilyDescriptor("gd32f470", "gd32",
+        "soc/gd32/gd32f470", "soc/gd32/gd32f470/configure",
         (("cmsis_core", "cmsis_core"),),
         import_lock="vendors/gigadevice/gd32f4xx/source.lock.json",
         references="references.json", owned_payload=(
             "soc/gd32/gd32f470/drivers/ethernet_frames.c",
             "soc/gd32/gd32f470/private/gd32f470_eth_frames.h")),
-    "gd32f303": FamilyDescriptor("gd32f303", (("cmsis_core", "cmsis_core"),),
+    "gd32f303": FamilyDescriptor("gd32f303", "gd32",
+        "soc/gd32/gd32f303", "soc/gd32/gd32f303/configure", (("cmsis_core", "cmsis_core"),),
         import_lock="vendors/gigadevice/gd32f30x/source.lock.json",
         configuration_helpers=("tools/configure/providers/legacy_transport.py",),
         references="references.json", owned_payload=(
@@ -141,14 +132,16 @@ _DESCRIPTORS = MappingProxyType({
             "soc/gd32/gd32f303/drivers/uart_dma.c",
             "soc/gd32/gd32f303/drivers/i2c_async.c",
             "soc/gd32/gd32f303/private/gd32f303_transport.h",
-            "soc/common/uart_v1_channel_dma.c",
-            "soc/common/uart_v1_channel_dma.h",
-            "soc/common/i2c_v1_async.c", "soc/common/i2c_v1_async.h",
+            "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.c",
+            "drivers/uart/uart_v1_channel_dma/uart_v1_channel_dma.h",
+            "drivers/i2c/i2c_v1_async/i2c_v1_async.c", "drivers/i2c/i2c_v1_async/i2c_v1_async.h",
             "soc/gd32/gd32f303/drivers/devices.c", "soc/gd32/gd32f303/drivers/exti.c",
             "soc/gd32/gd32f303/private/gd32f303_devices.h",
             "soc/gd32/gd32f303/private/gd32f303_exti.h",
-            "soc/common/legacy_devices.h", "soc/common/legacy_adc.c",
-            "soc/common/legacy_pwm.c", "soc/common/legacy_flash.c",
+            "drivers/adc/legacy_adc/legacy_adc.h",
+            "drivers/timer/legacy_pwm/legacy_pwm.h",
+            "drivers/flash/legacy_flash/legacy_flash.h", "drivers/adc/legacy_adc/legacy_adc.c",
+            "drivers/timer/legacy_pwm/legacy_pwm.c", "drivers/flash/legacy_flash/legacy_flash.c",
             "soc/gd32/gd32f303/private/gd32f303_system.h",
             "soc/gd32/gd32f303/private/gd32f303_provider.h",
             "soc/gd32/gd32f303/private/gd32f30x_libopt.h",
@@ -173,11 +166,12 @@ _DESCRIPTORS = MappingProxyType({
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_spi.h",
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_fwdgt.h",
             "vendors/gigadevice/gd32f30x/Firmware/GD32F30x_standard_peripheral/Include/gd32f30x_dbg.h")),
-    "stm32g474": FamilyDescriptor("stm32g474", (
+    "stm32g474": FamilyDescriptor("stm32g474", "stm32",
+        "soc/stm32/stm32g474", "soc/stm32/stm32g474/configure", (
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_g4", "stm32g4_cmsis"),
         ("hal_driver_g4", "stm32g4_hal")), references="references.json",
-        configuration_helpers=tuple("tools/configure/providers/stm32g474/" + name
+        configuration_helpers=tuple("soc/stm32/stm32g474/configure/" + name
                                     for name in ("coupled.py", "adc_group.py",
                                                  "pwm_shared.py")),
         owned_payload=(
@@ -207,9 +201,10 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32/stm32g474/private/stm32g474_timer.h",
             "soc/stm32/stm32g474/private/stm32g474_system.h",
             "soc/stm32/stm32g474/private/stm32g474_provider.h",
-            "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
+            "drivers/i2c/i2c_v2/i2c_v2.c", "drivers/i2c/i2c_v2/i2c_v2.h",
             "boards/stm32g474re_hse24_reference/board.json")),
-    "stm32h743": FamilyDescriptor("stm32h743", (
+    "stm32h743": FamilyDescriptor("stm32h743", "stm32",
+        "soc/stm32/stm32h743", "soc/stm32/stm32h743/configure", (
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_h7", "stm32h7_cmsis")), owned_payload=(
             "tools/configure/assemblies/h743-spi-dma-runtime-clock.toml",
@@ -265,7 +260,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32/stm32h743/private/stm32h743_flash_mpu.h",
             "soc/stm32/stm32h743/memory_init.c",
             "soc/stm32/stm32h743/private/memory_init.h",
-            "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
+            "drivers/i2c/i2c_v2/i2c_v2.c", "drivers/i2c/i2c_v2/i2c_v2.h",
             "soc/stm32/stm32h743/private/stm32h743_dma.h",
             "soc/stm32/stm32h743/private/stm32h743_uart_receive.h",
             "soc/stm32/stm32h743/private/stm32h743_uart_fifo.h",
@@ -279,7 +274,8 @@ _DESCRIPTORS = MappingProxyType({
             "boards/stm32h743_nucleo_zi2/board.json",
             "boards/stm32h743zi_hsi_reference/board.json",
             "boards/stm32h743zi_rtscts_reference/board.json")),
-    "stm32u575": FamilyDescriptor("stm32u575", (
+    "stm32u575": FamilyDescriptor("stm32u575", "stm32",
+        "soc/stm32/stm32u575", "soc/stm32/stm32u575/configure", (
         ("cmsis_core", "cmsis_core"),
         ("cmsis_device_u5", "stm32u5_cmsis"),
         ("hal_driver_u5", "stm32u5_hal")), owned_payload=(
@@ -351,7 +347,7 @@ _DESCRIPTORS = MappingProxyType({
             "soc/stm32/stm32u575/security.c",
             "soc/stm32/stm32u575/private/stm32u575_security.h",
             "soc/stm32/stm32u575/private/stm32u575_security_hw.h",
-            "soc/common/i2c_v2.c", "soc/common/i2c_v2.h",
+            "drivers/i2c/i2c_v2/i2c_v2.c", "drivers/i2c/i2c_v2/i2c_v2.h",
             "soc/stm32/stm32u575/private/stm32u575_system.h",
             "soc/stm32/stm32u575/private/stm32u575_provider.h",
             "boards/stm32u575_nucleo_zi_q/board.json",

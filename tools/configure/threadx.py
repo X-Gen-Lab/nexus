@@ -1,12 +1,8 @@
 """Strict initial ThreadX policy; no FreeRTOS feature/profile substitution."""
 from types import MappingProxyType
 
-try:
-    from .ir import ThreadXKernelProfileIR
-    from .providers.common import fail, integer
-except ImportError:
-    from ir import ThreadXKernelProfileIR
-    from providers.common import fail, integer
+from tools.configure.ir import ThreadXKernelProfileIR
+from tools.configure.providers.common import fail, integer
 
 
 FIELDS = frozenset({"tick_source", "tick_hz", "max_priorities",

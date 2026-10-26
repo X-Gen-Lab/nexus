@@ -44,8 +44,13 @@ Read the [architecture](../explanation/platform-architecture.md),
    canonical `source_directory` in the maintained family descriptor. Public
    family identifiers stay independent of the directory. CPU implementation
    sources belong under their ISA, such as `arch/arm/cortex_m/`; reviewed
-   cross-vendor register algorithms remain in `soc/common/`.
+   cross-vendor register algorithms belong in `drivers/<kind>/<ip>/` only after
+   checking each participating silicon contract. Cross-vendor SoC collaboration
+   stays in `soc/common/`; STM32 identity helpers stay in `soc/stm32/common/`.
 4. Add the family to the explicit maintained provider map in `tools/configure/`.
+   Place its production configuration package in
+   `soc/<vendor>/<family>/configure/` (Native uses `soc/native/configure/`) and
+   its configuration tests in `tools/configure/tests/providers/<family>/`.
    Define supported modes, numerical limits, constructors, rollback and IRQ wiring.
    Return an explicit frozen `Construction` record, including the private state
    type and failed-init cleanup responsibility; do not require family-name
@@ -70,7 +75,7 @@ For a component, pass explicit bus, GPIO, time and optional OS ports. Do not cre
 workers, probe devices, invent application roles or supply a maximum object pool.
 Flash drivers expose physical geometry; persistence and update policy remain external.
 
-Within configuration tools, each family's `contract.py` owns mode capabilities,
+Within each SoC's `configure/` package, `contract.py` owns mode capabilities,
 ABI/limits and family admission policy. Sibling modules import that contract
 directly; `__init__.py` explicitly exports it with constructors and emitters.
 The leaf `providers/common.py` owns validation helpers and immutable

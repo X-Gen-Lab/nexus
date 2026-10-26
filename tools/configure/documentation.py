@@ -7,12 +7,7 @@ import re
 import tempfile
 import tomllib
 
-try:
-    from . import authored, configure, runtime
-except ImportError:
-    import authored
-    import configure
-    import runtime
+from tools.configure import authored, configure, runtime
 
 FENCE = re.compile(r"^```(?P<language>toml|json)[ \t]*\n"
                    r"(?P<body>.*?)^```[ \t]*$", re.MULTILINE | re.DOTALL)

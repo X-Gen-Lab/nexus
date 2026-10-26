@@ -1,6 +1,6 @@
 #
 msgid ""
-msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: 8c54867d2b791fac8a2c363ec99cad7b7413a73110c81614c9fd98a30551c391\n"
+msgstr "Project-Id-Version: Nexus source documentation\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\nX-Nexus-Reviewed: true\nX-Nexus-Source-SHA256: f9d36f35000c94e4ff85adf16fe1893ba437893097069fafc3e8263d5bd8d1d0\n"
 
 msgid "H743 V-only high-clock profile"
 msgstr "H743 仅限 V 修订的高频配置"
@@ -34,27 +34,6 @@ msgstr ""
 "DOCUMENTATION-SOURCE/soc/stm32/stm32h743/soc.json)解析为不可变时钟域 IR。生成 bundle "
 "选择私有实现，CMake 选择其编译单元。typed factory 仍只返回已有静态 face，不执行 "
 "MMIO、分配、时钟设置或探测。运行调用通过共享只读方法表直接进入选定 provider。"
-
-#: docs/design/h743-high-clock.md:35
-msgid ""
-"The [private clock contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-SOURCE/soc/stm32/stm32h743/private/stm32h743_clock.h) owns "
-"admission and clock responsibility. [System](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/system.c) owns"
-" TIM2 and its vector. The generated [lifecycle "
-"glue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/tools/configure/providers/stm32h743/emission.py) orders them and "
-"preserves startup and cleanup diagnostics. Their effect masks are different "
-"namespaces; the platform projects retained responsibility without treating "
-"the numeric masks as interchangeable."
-msgstr ""
-"[私有时钟合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-"
-"SOURCE/soc/stm32/stm32h743/private/stm32h743_clock.h)负责准入与时钟责任，[System](https://github.com/X-Gen-"
-"Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/system.c)负责 "
-"TIM2 及其向量。生成的[生命周期装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-"
-"DOCUMENTATION-"
-"SOURCE/tools/configure/providers/stm32h743/emission.py)规定调用顺序并保留启动、清理诊断。两者的 "
-"effect mask 属于不同命名空间；平台投影仍保留的责任，不能把数值 mask 当作可互换标识。"
 
 msgid "Admit an exact cold configuration"
 msgstr "准入精确的冷态配置"
@@ -280,3 +259,6 @@ msgstr "高频 Cache-on、H743 连续 DMA、SPI DMA、更多硅片修订、bootl
 
 msgid "The ARM presets are `fixture-io-evolution-h743-high-empty`, `fixture-io-evolution-h743-high-uart` and `fixture-io-evolution-h743-high-peripherals`. Their maintained inputs are [empty](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-empty.toml), [UART](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-uart.toml) and [peripherals](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/h743-high-peripherals.toml). These records describe this development iteration; they do not establish a clean software candidate, offline reproducibility or physical qualification. The {download}`I/O ledger <io-evolution-execution.csv>` remains the status authority."
 msgstr "ARM preset 为 `fixture-io-evolution-h743-high-empty`、`fixture-io-evolution-h743-high-uart` 和 `fixture-io-evolution-h743-high-peripherals`。其维护输入是 [empty](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-empty.toml)、[UART](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/cmake/package/verification/io_evolution/h743-high-uart.toml) 和 [peripherals](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/tools/configure/assemblies/h743-high-peripherals.toml)。这些记录描述本开发迭代，不建立 clean 软件候选、离线可复现或物理资格。{download}`I/O 台账 <io-evolution-execution.csv>`仍是状态权威。"
+
+msgid "The [private clock contract](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/private/stm32h743_clock.h) owns admission and clock responsibility. [System](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/system.c) owns TIM2 and its vector. The generated [lifecycle glue](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/configure/emission.py) orders them and preserves startup and cleanup diagnostics. Their effect masks are different namespaces; the platform projects retained responsibility without treating the numeric masks as interchangeable."
+msgstr "[私有时钟合同](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/private/stm32h743_clock.h)负责准入与时钟责任，[System](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/system.c)负责 TIM2 及其向量。生成的[生命周期装配](https://github.com/X-Gen-Lab/nexus/blob/NEXUS-DOCUMENTATION-SOURCE/soc/stm32/stm32h743/configure/emission.py)规定调用顺序并保留启动、清理诊断。两者的 effect mask 属于不同命名空间；平台投影仍保留的责任，不能把数值 mask 当作可互换标识。"

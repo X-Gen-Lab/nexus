@@ -4,10 +4,10 @@ from pathlib import Path
 import tempfile
 import unittest
 
-import cpu
-import kernel
-import runtime
-from test_cpu_profiles import facts, irq
+from tools.configure import cpu
+from tools.configure import kernel
+from tools.configure import runtime
+from tools.configure.test_cpu_profiles import facts, irq
 
 
 class LowpowerIntegrationTests(unittest.TestCase):

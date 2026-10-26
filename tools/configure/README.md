@@ -273,7 +273,13 @@ JSON is never consulted as a fallback for a failed TOML assembly.
 
 `providers/` explicitly admits Native, STM32F103/F407/G474/H743/U575 and
 GD32F303/F470. Each retains its documented exact part, route and mode scope.
-Each family's `contract.py` owns its mode map, CPU/enum ABI, numerical limits,
+Production family packages live in `soc/<vendor>/<family>/configure/`; Native
+uses `soc/native/configure/`. The explicit map, `FamilyDescriptor` and shared
+leaf contracts remain in `tools/configure/providers/`; provider tests remain
+in `tools/configure/tests/providers/<family>/`. Common parsing, resource
+arbitration, typed IR and atomic bundle publication remain in this tool directory.
+
+Each family's `configure/contract.py` owns its mode map, CPU/enum ABI, numerical limits,
 fixed DMA/trigger routes, IRQ sharing and built-in CS rules. `__init__.py`
 reexports the explicit contract and constructors; sibling implementations import
 `contract.py` directly rather than the partially initialized package. `bindings.py`

@@ -6,7 +6,7 @@ nexus_google_test(nexus_g474_adc_group_test
     SOURCES g474_adc_group_test.cpp g474_adc_group_model.cpp
     LIBRARIES Nexus::IO
     INCLUDES "${NEXUS_SOURCE_DIR}/soc/stm32/stm32g474/private"
-        "${NEXUS_SOURCE_DIR}/soc/common"
+        "${NEXUS_SOURCE_DIR}/soc/stm32/common"
         "${NEXUS_SOURCE_DIR}/arch/include"
         "${NEXUS_SOURCE_DIR}/io/private")
 include("${NEXUS_SOURCE_DIR}/cmake/platform/STM32Official.cmake")

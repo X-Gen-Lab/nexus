@@ -1,20 +1,10 @@
 """Static faces and common lifecycle order; SoC modules emit hardware wiring."""
-try:
-    from .providers import maintained
-    from .ir import ConfigurationIR
-    from .factory import interface_type, public_header, controller_class
-    from . import gpio_phase, runtime_power
-    from . import enhanced_endpoints
-    from . import stream_profiles, uart_formats
-except ImportError:
-    from providers import maintained
-    from ir import ConfigurationIR
-    from factory import interface_type, public_header, controller_class
-    import gpio_phase
-    import runtime_power
-    import enhanced_endpoints
-    import stream_profiles
-    import uart_formats
+from tools.configure.providers import maintained
+from tools.configure.ir import ConfigurationIR
+from tools.configure.factory import interface_type, public_header, controller_class
+from tools.configure import gpio_phase, runtime_power
+from tools.configure import enhanced_endpoints
+from tools.configure import stream_profiles, uart_formats
 
 
 def symbol(name):
@@ -150,10 +140,7 @@ def emit(result):
                       for member in owner.members}
     physical_constructed = set()
     if shared_members:
-        try:
-            from .providers.stm32g474 import pwm_shared
-        except ImportError:
-            from providers.stm32g474 import pwm_shared
+        from soc.stm32.stm32g474.configure import pwm_shared
     for selection_index, item in enumerate(selections):
         name = symbol(item.id)
         exported_type = interface_type(controller_class(item), "port")

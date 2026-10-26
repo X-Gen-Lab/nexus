@@ -5,12 +5,8 @@ explicit envelope; it never substitutes a nominal, zero-error oscillator model.
 Only the currently implemented analog-filter-on / DNF-zero hardware mode is
 admitted. Its conservative delay model follows the maintained AN4235 review.
 """
-try:
-    from . import i2c_timing
-    from .providers.common import fail, integer
-except ImportError:
-    import i2c_timing
-    from providers.common import fail, integer
+from tools.configure import i2c_timing
+from tools.configure.providers.common import fail, integer
 
 
 FIELDS = frozenset(("kernel_hz_min", "kernel_hz_max", "pclk_hz_min",

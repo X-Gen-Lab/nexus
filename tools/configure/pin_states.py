@@ -3,10 +3,7 @@
 These plans describe two software states, never a power mode or physical safety.
 No electrical values are inferred from a route, PCB name or unselected state.
 """
-try:
-    from .providers.common import fail, integer
-except ImportError:
-    from providers.common import fail, integer
+from tools.configure.providers.common import fail, integer
 
 
 def _object(value, fields, label):

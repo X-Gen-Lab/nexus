@@ -36,11 +36,11 @@ nexus_google_test(nexus_h743_flash_ram_generated_test
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash.c"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/drivers/flash_execution.c"
         ${h743_flash_ram_production_sources}
-        "${NEXUS_SOURCE_DIR}/soc/common/i2c_v2.c"
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2/i2c_v2.c"
     LIBRARIES Nexus::IO Nexus::Arch
     INCLUDES "${h7_high_bundle}"
         "${NEXUS_SOURCE_DIR}/soc/stm32/stm32h743/private"
-        "${NEXUS_SOURCE_DIR}/soc/common")
+        "${NEXUS_SOURCE_DIR}/drivers/i2c/i2c_v2")
 target_include_directories(nexus_h743_flash_ram_generated_test SYSTEM PRIVATE
     "${NEXUS_SOURCE_DIR}/vendors/st/stm32h7_hal/Inc"
     "${NEXUS_SOURCE_DIR}/vendors/st/cmsis_device_h7/Include"

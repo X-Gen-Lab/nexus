@@ -7,10 +7,7 @@ lease survives failed cleanup and is released after all device publishers drain.
 import re
 from collections.abc import Mapping
 
-try:
-    from .providers.common import fail, owned_claims
-except ImportError:
-    from providers.common import fail, owned_claims
+from tools.configure.providers.common import fail, owned_claims
 
 
 FAMILIES = frozenset({"stm32f407", "gd32f470", "stm32g474"})

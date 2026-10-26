@@ -23,13 +23,13 @@ def shared_operation_symbols(root=None):
 
     A prefix alone cannot admit an arbitrary shared object. Reuse retention's
     strict public-layout/initializer parser, then retain only translation units
-    actually owned by the shared SoC or I/O directories. This observes source;
-    it does not become a provider selection or software-build authority.
+    actually owned by the shared IP driver or I/O directories. This observes
+    source; it does not become a provider selection or software-build authority.
     """
     from tools.measurement.retention import source_contracts
     root = Path(root or Path(__file__).resolve().parents[2]).resolve()
     _, _, providers, _ = source_contracts(root)
-    directories = {root / "soc/common", root / "io/src"}
+    directories = {root / "drivers", root / "io/src"}
     return frozenset(name for name, provider in providers.items()
                      if any(Path(provider["source"]["path"]).is_relative_to(path)
                             for path in directories))

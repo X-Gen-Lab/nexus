@@ -5,9 +5,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import configure
-import factory
-import matrix
+from tools.configure import configure
+from tools.configure import factory
+from tools.configure import matrix
 
 
 H743_SPI_DMA_REFERENCES = {
