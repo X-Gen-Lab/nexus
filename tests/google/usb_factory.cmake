@@ -73,10 +73,9 @@ foreach(usb_family stm32 gd32)
             target_include_directories(${usb_target} PRIVATE
                 "${NEXUS_SOURCE_DIR}/tests/contracts/gd32_model")
             target_include_directories(${usb_target} SYSTEM PRIVATE
-                "${NEXUS_CMSIS_CORE_INCLUDE_DIR}" "${usb_gd}/CMSIS/GD/GD32F4xx/Include"
+                "${usb_gd}/CMSIS/GD/GD32F4xx/Include"
                 "${usb_gd}/GD32F4xx_standard_peripheral/Include"
                 "${usb_gd}/GD32F4xx_usb_library/driver/Include")
-            nexus_use_cmsis_core(${usb_target})
             target_compile_definitions(${usb_target} PRIVATE GD32F470 HXTAL_VALUE=25000000 NX_USB_GD_MODEL)
             target_compile_options(${usb_target} PRIVATE
                 "$<$<COMPILE_LANGUAGE:C>:-Wno-int-to-pointer-cast>")
